@@ -4,115 +4,162 @@
  * Server-side only: reads from the database to build NavSection[] arrays
  * for pages that need contextual sidebar navigation.
  *
- * Supported sidebar contexts:
- * - Knowledge-base sections (risks, responses, organizations, etc.)
- * - Analytical Models & Key Metrics
- * - AI Transition Model
- * - Internal pages
+ * Navigation is fully data-driven: section titles come from index page
+ * frontmatter, subcategory groupings are derived from page.subcategory,
+ * and labels are formatted from slugs. No hardcoded section configs.
  *
  * Uses the shared data layer from @/data — no direct fs reads.
  */
 
-import { getEntityHref, getAllPages } from "@/data";
+import { getEntityHref, getAllPages, getPageById } from "@/data";
 import type { NavSection } from "./internal-nav";
 
 // Re-export NavSection so consumers can import from one place
 export type { NavSection } from "./internal-nav";
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
 
 /** Check if a filePath is an index file (should be excluded from sidebar nav). */
 function isIndexFile(filePath: string): boolean {
   return filePath.endsWith("index.mdx") || filePath.endsWith("index.md");
 }
 
+/** Convert a kebab-case slug to a Title Case label. */
+function formatLabel(slug: string): string {
+  return slug
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 /** Resolve an index page slug to its /wiki/E<id> URL, with fallback. */
-function indexHref(sectionKey: string): string {
-  const slug = `__index__/knowledge-base/${sectionKey}`;
+function indexHref(prefix: string): string {
+  const slug = `__index__/${prefix}`;
   const resolved = getEntityHref(slug);
-  // If it resolved to a numeric ID, use that
   if (resolved.startsWith("/wiki/E")) return resolved;
-  // Fallback: direct path
-  return `/wiki/knowledge-base/${sectionKey}`;
+  return `/wiki/${prefix}`;
+}
+
+/**
+ * Look up the index page title for a section.
+ * Falls back to formatting the section key if no index page exists.
+ */
+function getSectionTitle(prefix: string, sectionKey: string): string {
+  const indexSlug = `__index__/${prefix}`;
+  const indexPage = getPageById(indexSlug);
+  return indexPage?.title || formatLabel(sectionKey);
 }
 
 // ============================================================================
-// MODEL CATEGORY LABELS
+// GENERIC SUBCATEGORY-GROUPED NAV BUILDER
 // ============================================================================
 
-const MODEL_CATEGORY_LABELS: Record<string, string> = {
-  "analysis-models": "Analysis Models",
-  "cascade-models": "Cascade Models",
-  "domain-models": "Domain Models",
-  "dynamics-models": "Dynamics Models",
-  "framework-models": "Framework Models",
-  "governance-models": "Governance Models",
-  "impact-models": "Impact Models",
-  "intervention-models": "Intervention Models",
-  "race-models": "Race Models",
-  "risk-models": "Risk Models",
-  "safety-models": "Safety Models",
-  "societal-models": "Societal Models",
-  "threshold-models": "Threshold Models",
-  "timeline-models": "Timeline Models",
-};
-
-const MODEL_CATEGORY_ORDER = [
-  "domain-models",
-  "timeline-models",
-  "cascade-models",
-  "societal-models",
-  "risk-models",
-  "framework-models",
-  "analysis-models",
-  "threshold-models",
-  "dynamics-models",
-  "impact-models",
-  "race-models",
-  "intervention-models",
-  "safety-models",
-  "governance-models",
-];
-
-// ============================================================================
-// ANALYTICAL MODELS NAV
-// ============================================================================
-
-export function getModelsNav(): NavSection[] {
+/**
+ * Build sidebar navigation for any section by reading page data.
+ * Groups pages by subcategory, deriving labels from slugs.
+ * Section title comes from the index page's frontmatter title.
+ */
+function buildSectionNav(
+  filePathPrefix: string,
+  sectionKey: string,
+): NavSection[] {
   const pages = getAllPages().filter(
     (p) =>
       p.filePath &&
-      p.filePath.startsWith("knowledge-base/models/") &&
+      p.filePath.startsWith(`${filePathPrefix}/`) &&
       !isIndexFile(p.filePath)
   );
 
-  // Group by subcategory (set during content flattening)
-  const groups: Record<string, { id: string; title: string }[]> = {};
+  if (pages.length === 0) return [];
+
+  const sectionTitle = getSectionTitle(filePathPrefix, sectionKey);
+
+  // Group pages by subcategory
+  const groups = new Map<string, { id: string; title: string }[]>();
+  const ungrouped: { id: string; title: string }[] = [];
+
   for (const page of pages) {
-    const category = page.subcategory; // e.g., "risk-models"
-    if (!category) continue;
-    if (!groups[category]) groups[category] = [];
-    groups[category].push({ id: page.id, title: page.title });
+    const item = { id: page.id, title: page.title };
+    if (page.subcategory) {
+      const list = groups.get(page.subcategory) || [];
+      list.push(item);
+      groups.set(page.subcategory, list);
+    } else {
+      ungrouped.push(item);
+    }
   }
 
   // Sort items within each group alphabetically
-  for (const key of Object.keys(groups)) {
-    groups[key].sort((a, b) => a.title.localeCompare(b.title));
+  for (const list of groups.values()) {
+    list.sort((a, b) => a.title.localeCompare(b.title));
+  }
+  ungrouped.sort((a, b) => a.title.localeCompare(b.title));
+
+  function toNavItems(items: { id: string; title: string }[]) {
+    return items.map((item) => ({
+      label: item.title,
+      href: getEntityHref(item.id),
+    }));
   }
 
-  // Build sections in specified order
-  const sections: NavSection[] = [];
-  for (const category of MODEL_CATEGORY_ORDER) {
-    const items = groups[category];
-    if (!items || items.length === 0) continue;
-    sections.push({
-      title: MODEL_CATEGORY_LABELS[category] || category,
-      items: items.map((item) => ({
-        label: item.title,
-        href: getEntityHref(item.id),
-      })),
-    });
+  // Top section with overview link
+  const sections: NavSection[] = [
+    {
+      title: sectionTitle,
+      defaultOpen: true,
+      items: [{ label: "Overview", href: indexHref(filePathPrefix) }],
+    },
+  ];
+
+  if (groups.size > 0) {
+    // Build sections sorted alphabetically by subcategory label
+    const sortedGroups = [...groups.entries()].sort((a, b) =>
+      formatLabel(a[0]).localeCompare(formatLabel(b[0]))
+    );
+
+    for (const [subcat, items] of sortedGroups) {
+      sections.push({
+        title: formatLabel(subcat),
+        items: toNavItems(items),
+      });
+    }
+
+    // Uncategorized pages go in "Other"
+    if (ungrouped.length > 0) {
+      sections.push({
+        title: "Other",
+        items: toNavItems(ungrouped),
+      });
+    }
+  } else {
+    // No subcategories — flat list under the section title
+    sections[0].items.push(...toNavItems(ungrouped));
   }
 
   return sections;
+}
+
+// ============================================================================
+// KNOWLEDGE-BASE SECTION NAV (generic, data-driven)
+// ============================================================================
+
+/**
+ * Build sidebar navigation for a knowledge-base section.
+ * Reads section title from the index page, groups by subcategory,
+ * and derives all labels from the page data.
+ */
+export function getKbSectionNav(sectionKey: string): NavSection[] {
+  return buildSectionNav(`knowledge-base/${sectionKey}`, sectionKey);
+}
+
+// ============================================================================
+// ANALYTICAL MODELS NAV (uses generic builder)
+// ============================================================================
+
+export function getModelsNav(): NavSection[] {
+  return buildSectionNav("knowledge-base/models", "models");
 }
 
 // ============================================================================
@@ -120,20 +167,14 @@ export function getModelsNav(): NavSection[] {
 // ============================================================================
 
 export function getMetricsNav(): NavSection[] {
-  const pages = getAllPages().filter(
-    (p) =>
-      p.filePath &&
-      p.filePath.startsWith("knowledge-base/metrics/") &&
-      !isIndexFile(p.filePath)
-  );
-
-  const items = pages
-    .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-
-  return items.length > 0
-    ? [{ title: "Key Metrics", defaultOpen: false, items }]
-    : [];
+  const nav = buildSectionNav("knowledge-base/metrics", "metrics");
+  // Metrics section starts collapsed since it's secondary to models
+  if (nav.length > 0) {
+    for (const section of nav) {
+      section.defaultOpen = false;
+    }
+  }
+  return nav;
 }
 
 // ============================================================================
@@ -227,179 +268,6 @@ export function getAtmNav(): NavSection[] {
 
 export function getReferenceNav(): NavSection[] {
   return [...getModelsNav(), ...getMetricsNav()];
-}
-
-// ============================================================================
-// KNOWLEDGE-BASE SECTION SIDEBARS
-// ============================================================================
-
-/**
- * Configuration for a knowledge-base section sidebar.
- * Sections with subcategoryGroups get grouped navigation;
- * sections without get a flat alphabetical list.
- */
-interface KbSectionConfig {
-  title: string;
-  subcategoryGroups?: { title: string; subcategories: string[] }[];
-}
-
-/**
- * Sidebar configurations for knowledge-base sections.
- * Models and metrics are excluded — they use their own specialized nav builders.
- */
-const KB_SECTIONS: Record<string, KbSectionConfig> = {
-  risks: {
-    title: "AI Risks",
-    subcategoryGroups: [
-      { title: "Accident Risks", subcategories: ["accident"] },
-      { title: "Misuse Risks", subcategories: ["misuse"] },
-      { title: "Structural Risks", subcategories: ["structural"] },
-      { title: "Epistemic Risks", subcategories: ["epistemic"] },
-      { title: "Economic Risks", subcategories: ["economic"] },
-    ],
-  },
-  responses: {
-    title: "Responses",
-    subcategoryGroups: [
-      {
-        title: "Alignment",
-        subcategories: [
-          "alignment",
-          "alignment-deployment",
-          "alignment-evaluation",
-          "alignment-interpretability",
-          "alignment-policy",
-          "alignment-theoretical",
-          "alignment-training",
-        ],
-      },
-      {
-        title: "Governance",
-        subcategories: [
-          "governance",
-          "governance-compute-governance",
-          "governance-industry",
-          "governance-international",
-          "governance-legislation",
-        ],
-      },
-      {
-        title: "Epistemic Tools",
-        subcategories: [
-          "epistemic-tools",
-          "epistemic-tools-approaches",
-          "epistemic-tools-tools",
-        ],
-      },
-      { title: "Biosecurity", subcategories: ["biosecurity"] },
-      { title: "Field Building", subcategories: ["field-building"] },
-      { title: "Institutions", subcategories: ["institutions"] },
-      { title: "Legal Frameworks", subcategories: ["legal-frameworks"] },
-      {
-        title: "Organizational Practices",
-        subcategories: ["organizational-practices"],
-      },
-      { title: "Resilience", subcategories: ["resilience"] },
-    ],
-  },
-  organizations: {
-    title: "Organizations",
-    subcategoryGroups: [
-      { title: "Labs", subcategories: ["labs"] },
-      { title: "Safety Organizations", subcategories: ["safety-orgs"] },
-      { title: "Funders", subcategories: ["funders"] },
-      { title: "Government", subcategories: ["government"] },
-      { title: "Community Building", subcategories: ["community-building"] },
-      {
-        title: "Epistemic Organizations",
-        subcategories: ["epistemic-orgs"],
-      },
-      { title: "Biosecurity", subcategories: ["biosecurity-orgs"] },
-      { title: "Political Advocacy", subcategories: ["political-advocacy"] },
-      { title: "Finance", subcategories: ["finance", "venture-capital"] },
-    ],
-  },
-  people: { title: "People" },
-  capabilities: { title: "Capabilities" },
-  "intelligence-paradigms": { title: "Intelligence Paradigms" },
-  debates: { title: "Debates" },
-  cruxes: { title: "Cruxes" },
-  "future-projections": { title: "Future Projections" },
-  worldviews: { title: "Worldviews" },
-  history: { title: "History" },
-  incidents: { title: "Incidents" },
-  forecasting: { title: "Forecasting" },
-};
-
-/** Set of KB section keys that have their own sidebar config. */
-export const KB_SECTION_KEYS = new Set(Object.keys(KB_SECTIONS));
-
-/**
- * Build sidebar navigation for a knowledge-base section.
- * Pages are grouped by subcategory when configured, otherwise shown as a flat list.
- */
-export function getKbSectionNav(sectionKey: string): NavSection[] {
-  const config = KB_SECTIONS[sectionKey];
-  if (!config) return [];
-
-  const pages = getAllPages().filter(
-    (p) =>
-      p.filePath &&
-      p.filePath.startsWith(`knowledge-base/${sectionKey}/`) &&
-      !isIndexFile(p.filePath)
-  );
-
-  // Top section with overview link
-  const sections: NavSection[] = [
-    {
-      title: config.title,
-      defaultOpen: true,
-      items: [{ label: "Overview", href: indexHref(sectionKey) }],
-    },
-  ];
-
-  if (config.subcategoryGroups) {
-    // Track which pages have been assigned to a group
-    const assignedIds = new Set<string>();
-
-    for (const group of config.subcategoryGroups) {
-      const groupPages = pages.filter(
-        (p) => p.subcategory && group.subcategories.includes(p.subcategory)
-      );
-      if (groupPages.length === 0) continue;
-
-      for (const p of groupPages) assignedIds.add(p.id);
-
-      sections.push({
-        title: group.title,
-        items: groupPages
-          .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
-          .sort((a, b) => a.label.localeCompare(b.label)),
-      });
-    }
-
-    // Pages without a matching subcategory
-    const uncategorized = pages.filter((p) => !assignedIds.has(p.id));
-    if (uncategorized.length > 0) {
-      sections.push({
-        title: "Other",
-        items: uncategorized
-          .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
-          .sort((a, b) => a.label.localeCompare(b.label)),
-      });
-    }
-  } else {
-    // Flat list — all pages in one section
-    const items = pages
-      .map((p) => ({ label: p.title, href: getEntityHref(p.id) }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    if (items.length > 0) {
-      sections[0].items.push(...items);
-    }
-  }
-
-  return sections;
 }
 
 // ============================================================================
@@ -507,7 +375,7 @@ export type WikiSidebarType = "models" | "atm" | "internal" | "kb" | null;
 export function detectSidebarType(entityPath: string): WikiSidebarType {
   if (!entityPath) return null;
 
-  // Models and metrics keep their specialized sidebar
+  // Models and metrics keep their combined reference sidebar
   if (
     entityPath.startsWith("/knowledge-base/models/") ||
     entityPath.startsWith("/knowledge-base/metrics/")
@@ -523,11 +391,10 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     return "internal";
   }
 
-  // All other knowledge-base sections with a configured sidebar
+  // Any knowledge-base subsection gets a sidebar (no hardcoded list needed)
   if (entityPath.startsWith("/knowledge-base/")) {
     const parts = entityPath.split("/").filter(Boolean);
-    // Need at least "knowledge-base" + section name (e.g., "risks")
-    if (parts.length >= 2 && KB_SECTION_KEYS.has(parts[1])) {
+    if (parts.length >= 2) {
       return "kb";
     }
   }
@@ -542,10 +409,7 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
 export function extractKbSection(entityPath: string): string | null {
   if (!entityPath.startsWith("/knowledge-base/")) return null;
   const parts = entityPath.split("/").filter(Boolean);
-  if (parts.length >= 2 && KB_SECTION_KEYS.has(parts[1])) {
-    return parts[1];
-  }
-  return null;
+  return parts.length >= 2 ? parts[1] : null;
 }
 
 /**

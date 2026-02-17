@@ -1,14 +1,16 @@
 ## 2026-02-17 | claude/formalize-wiki-sections-2aqHv | Formalize wiki section sidebars and /wiki page filter
 
-**What was done:** Extended sidebar navigation to all knowledge-base sections (risks, responses, organizations, people, capabilities, etc.) with subcategory grouping for large sections. Added a "Section" filter row to the /wiki explore page so users can filter by wiki section.
+**What was done:** Extended sidebar navigation to all knowledge-base sections with fully data-driven navigation. Section titles come from index page frontmatter, subcategory groupings are derived from page.subcategory fields, and labels are formatted from slugs. No hardcoded section configs. Also added a "Section" filter row to the /wiki explore page.
 
 **Pages:** (no page content changes — infrastructure/UI only)
 
 **Issues encountered:**
-- None
+- Initial implementation had hardcoded KB_SECTIONS config — refactored to be fully programmatic
 
 **Learnings/notes:**
-- KB sections are configured via `KB_SECTIONS` in `wiki-nav.ts` with optional `subcategoryGroups` for sections that have subcategories (risks, responses, organizations)
-- Sections without subcategories (people, capabilities, debates, etc.) get a flat alphabetical list in the sidebar
-- Models and metrics retain their existing specialized sidebar builders
-- The `detectSidebarType` function now returns `"kb"` for all knowledge-base sections not handled by the models/metrics sidebar, and `getWikiNav` extracts the section key from the entityPath
+- Navigation is now fully data-driven via a generic `buildSectionNav()` function that reads page.category, page.subcategory, and index page titles
+- Section titles come from `getPageById("__index__/knowledge-base/{section}")?.title`
+- Subcategory labels are derived from slugs via `formatLabel()` (kebab-case → Title Case)
+- Models nav now uses the same generic builder instead of separate hardcoded MODEL_CATEGORY_LABELS/ORDER
+- To customize a subcategory label, update the subcategory value in page frontmatter — the nav derives from data, not code
+- ATM sidebar still uses hardcoded grouping because its subcategories are hierarchical and non-trivially grouped
