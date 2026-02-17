@@ -128,11 +128,13 @@ function ContentMeta({
   pageData,
   slug,
   contentFormat,
+  isInternal,
 }: {
   page: MdxPage;
   pageData: Page | undefined;
   slug: string;
   contentFormat: ContentFormat;
+  isInternal?: boolean;
 }) {
   const lastUpdated = pageData?.lastUpdated;
   const githubUrl = pageData?.filePath
@@ -141,13 +143,13 @@ function ContentMeta({
   const entity = getEntityById(slug);
   const numId = slugToNumericId(slug);
   const pageTitle = page.frontmatter.title || entity?.title || slug;
-  const formatInfo = CONTENT_FORMAT_INFO[contentFormat];
 
   return (
     <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
       <Breadcrumbs
         category={pageData?.category}
         title={page.frontmatter.title || entity?.title}
+        isInternal={isInternal}
       />
       <div className="page-meta">
         {lastUpdated && (
@@ -166,14 +168,14 @@ function ContentMeta({
             History
           </a>
         )}
-        {numId && (
+        {!isInternal && numId && (
           <a href={`/wiki/${numId}/data`} className="page-meta-github">
             <Database size={14} />
             Data
           </a>
         )}
-        <PageFeedback pageTitle={pageTitle} pageSlug={slug} />
-        <InfoBoxToggle />
+        {!isInternal && <PageFeedback pageTitle={pageTitle} pageSlug={slug} />}
+        {!isInternal && <InfoBoxToggle />}
       </div>
     </div>
   );
@@ -222,12 +224,13 @@ function ContentView({
 
   return (
     <InfoBoxVisibilityProvider>
-      <JsonLd pageData={pageData} title={page.frontmatter.title} slug={slug} />
+      {!isInternal && <JsonLd pageData={pageData} title={page.frontmatter.title} slug={slug} />}
       <ContentMeta
         page={page}
         pageData={pageData}
         slug={slug}
         contentFormat={contentFormat}
+        isInternal={isInternal}
       />
       {!isInternal && <LlmWarningBanner />}
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>

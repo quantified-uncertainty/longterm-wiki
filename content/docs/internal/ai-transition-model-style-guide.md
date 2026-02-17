@@ -144,7 +144,7 @@ causeEffectGraph:
       strength: strong
 ```
 
-See `/internal/cause-effect-diagrams/` for detailed guidance.
+See the [Cause-Effect Diagrams](/wiki/E758) page for detailed guidance.
 
 ---
 
@@ -170,8 +170,8 @@ Task({
   subagent_type: 'general-purpose',
   prompt: `Add a cause-effect diagram to ATM entity [ENTITY_ID].
 
-  1. Read /internal/cause-effect-diagrams/ for schema
-  2. Read /internal/ai-transition-model-style-guide/
+  1. Read /wiki/E758 (Cause-Effect Diagrams) for schema
+  2. Read /wiki/E721 (AI Transition Model Style Guide)
   3. Identify upstream drivers and downstream effects
   4. Add causeEffectGraph to the entity in ai-transition-model.yaml
 
