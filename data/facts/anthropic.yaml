@@ -6,6 +6,12 @@ facts:
     asOf: "2026-02"
     note: "Series G post-money valuation, February 2026"
 
+  valuation-nov-2025:
+    value: "$350 billion"
+    numeric: 350000000000
+    asOf: "2025-11"
+    note: "Valuation at Microsoft/Nvidia commitment, November 2025"
+
   revenue-run-rate:
     value: "$14 billion"
     numeric: 14000000000

@@ -19,7 +19,7 @@ balanceFlags:
 subcategory: finance
 entityType: organization
 ---
-import {EntityLink, KeyPeople, KeyQuestions, Section, F} from '@components/wiki';
+import {EntityLink, KeyPeople, KeyQuestions, Section, F, Calc} from '@components/wiki';
 
 :::note[Page Scope]
 This page focuses on **IPO timeline and preparation**. For valuation analysis (bull/bear cases, scenarios), see <EntityLink id="anthropic-valuation">Anthropic Valuation Analysis</EntityLink>. For company overview, see <EntityLink id="anthropic">Anthropic</EntityLink>. For EA capital implications, see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink>.
@@ -132,7 +132,7 @@ Anthropic's valuation has increased dramatically through successive funding roun
 | Nov 2025 | - | \$15B (committed) | \$350B | Microsoft, Nvidia |
 | Feb 2026 | Series G | \$30B | \$380B | GIC, Coatue (co-leads) |
 
-The February 2026 Series G round raised \$30 billion at a \$380 billion post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX. At the time of announcement, Anthropic reported \$14 billion in run-rate revenue. This follows the November 2025 partnership with Microsoft and Nvidia, which valued the company at \$350 billion.[^6][^16] The rapid succession of funding rounds—raising \$30B+ in under six months—reflects both the company's accelerating revenue growth and the broader AI investment boom.
+The February 2026 Series G round raised \$30 billion at a <F e="anthropic" f="valuation">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX. At the time of announcement, Anthropic reported <F e="anthropic" f="revenue-run-rate">\$14 billion</F> in run-rate revenue. This follows the November 2025 partnership with Microsoft and Nvidia, which valued the company at <F e="anthropic" f="valuation-nov-2025">\$350 billion</F>.[^6][^16] The rapid succession of funding rounds—raising \$30B+ in under six months—reflects both the company's accelerating revenue growth and the broader AI investment boom.
 
 Private market discussions reportedly reference aggressive forward revenue multiples of 30-50x for 2026 projections to justify these high valuations.[^5] While such multiples are elevated by historical standards, they reflect investor belief in Anthropic's potential to capture significant market share in enterprise AI.
 
@@ -147,7 +147,7 @@ For comprehensive valuation analysis including bear cases, see <EntityLink id="a
 | **Moderate Bull** | \$500-700B | 1.3-1.8x | 20-30% | Diversified customers, sustained growth |
 | **Strong Bull** | \$1-1.75T | 2.6-4.6x | 5-10% | Market leader, AGI progress |
 
-**Key context**: Anthropic now trades at ≈27x revenue (\$380B / \$14B run-rate) vs OpenAI's ≈25x (at \$500B with \$20B ARR)—a significant convergence from the ≈39x premium at the previous valuation. If OpenAI closes its \$100B round at \$830B, it would trade at ≈41x, well above Anthropic's current multiple. See the valuation page for detailed bull and bear case arguments.
+**Key context**: Anthropic now trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> revenue (<F e="anthropic" f="valuation">\$380B</F> / <F e="anthropic" f="revenue-run-rate">\$14B</F> run-rate) vs OpenAI's ≈<Calc expr="{openai.valuation-2025} / {openai.revenue-arr-2025}" precision={0} suffix="x" /> (at <F e="openai" f="valuation-2025">\$500B</F> with <F e="openai" f="revenue-arr-2025">\$20B</F> ARR)—a significant convergence from the ≈<Calc expr="{anthropic.valuation-nov-2025} / {anthropic.revenue-arr-2025}" precision={0} suffix="x" /> premium at the previous valuation. If OpenAI closes its \$100B round at \$830B, it would trade at ≈41x, well above Anthropic's current multiple. See the valuation page for detailed bull and bear case arguments.
 
 For implications of higher valuations on EA-aligned philanthropic capital (\$150B-\$1.5T+ potential), see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink>.
 
@@ -299,7 +299,7 @@ Market analysts have noted what one analysis describes as a "pit of speculative 
 - Supply chain disruptions that could affect AI infrastructure
 - Geopolitical tensions affecting international operations and markets
 
-The rapid valuation increase from \$183 billion in September 2025 to \$350 billion by November 2025 and \$380 billion by February 2026—more than doubling in five months—exemplifies these bubble concerns.[^16][^6] However, the revenue multiple compression from ≈39x to ≈27x suggests the valuation growth is partially supported by revenue growth rather than purely speculative.
+The rapid valuation increase from \$183 billion in September 2025 to <F e="anthropic" f="valuation-nov-2025">\$350 billion</F> by November 2025 and <F e="anthropic" f="valuation">\$380 billion</F> by February 2026—more than doubling in five months—exemplifies these bubble concerns.[^16][^6] However, the revenue multiple compression from ≈<Calc expr="{anthropic.valuation-nov-2025} / {anthropic.revenue-arr-2025}" precision={0} suffix="x" /> to ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> suggests the valuation growth is partially supported by revenue growth rather than purely speculative.
 
 ### Revenue Concentration and Business Model Risks
 
