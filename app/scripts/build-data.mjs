@@ -24,6 +24,7 @@ import { transformEntities } from './lib/entity-transform.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
+import { fetchBranchToPrMap, enrichWithPrNumbers } from './lib/github-pr-lookup.mjs';
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
@@ -616,7 +617,7 @@ function buildPathRegistry() {
 }
 
 
-function main() {
+async function main() {
   console.log('Building data bundle...\n');
 
   const database = {};
@@ -934,6 +935,14 @@ function main() {
   const sessionLogPath = join(PROJECT_ROOT, '..', '.claude', 'session-log.md');
   const sessionsDir = join(PROJECT_ROOT, '..', '.claude', 'sessions');
   const pageChangeHistory = parseAllSessionLogs(sessionLogPath, sessionsDir);
+
+  // Auto-populate PR numbers from GitHub API for entries that don't have them
+  const branchToPr = await fetchBranchToPrMap();
+  const prEnriched = enrichWithPrNumbers(pageChangeHistory, branchToPr);
+  if (branchToPr.size > 0) {
+    console.log(`  changeHistory: enriched ${prEnriched} entries with PR numbers (${branchToPr.size} PRs fetched)`);
+  }
+
   let pagesWithHistory = 0;
   for (const page of pages) {
     const history = pageChangeHistory[page.id];
@@ -1117,4 +1126,7 @@ function main() {
   console.log('Or run `npm run validate` for all validators');
 }
 
-main();
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

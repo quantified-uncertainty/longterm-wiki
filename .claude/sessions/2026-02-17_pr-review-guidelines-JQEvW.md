@@ -4,6 +4,8 @@
 
 **Pages:** (none — infrastructure-only)
 
+**PR:** #187
+
 **Issues encountered:**
 - Built-in Claude Code skills collided with project commands; fixed by renaming to descriptive names
 - Pre-existing TS error in `validate-entities.test.ts` (trivial cast fix) blocked adding `tsc --noEmit` to gate

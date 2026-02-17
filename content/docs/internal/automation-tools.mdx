@@ -174,11 +174,12 @@ Claude Code sessions log which wiki pages they modify. This creates a per-page c
 
 ### How It Works
 
-1. Each Claude Code session appends an entry to `.claude/session-log.md` with a `**Pages:**` field listing the page slugs that were edited.
-2. At build time, `build-data.mjs` parses the session log and attaches a `changeHistory` array to each page in `database.json`.
-3. The data flows to two places:
-   - **Per-page**: A "Change History" section in the PageStatus card shows which sessions touched this page.
-   - **Site-wide**: The [Page Changes dashboard](/internal/page-changes/) shows all page edits across all sessions in a sortable table.
+1. Each Claude Code session appends an entry to `.claude/sessions/` with a `**Pages:**` field listing the page slugs that were edited.
+2. At build time, `build-data.mjs` parses session logs and attaches a `changeHistory` array to each page in `database.json`.
+3. PR numbers are auto-populated at build time via the GitHub API (`github-pr-lookup.mjs`), mapping branch names to PR numbers. Session logs can also include an explicit `**PR:** #123` as an override.
+4. The data flows to two places:
+   - **Per-page**: A "Change History" section in the PageStatus card shows which sessions touched this page, with clickable PR links.
+   - **Site-wide**: The [Page Changes dashboard](/internal/page-changes/) shows all page edits across all sessions in a sortable table with PR links.
 
 ### Session Log Format
 

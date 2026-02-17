@@ -4,6 +4,8 @@
 
 **Pages:** (none — infrastructure fix only)
 
+**PR:** #183
+
 **Changes to resolve-conflicts.yml:**
 - Added `pull_request: [opened, synchronize]` trigger for immediate detection
 - Reduced cron from 6h to 2h, increased timeout from 30 to 45 min

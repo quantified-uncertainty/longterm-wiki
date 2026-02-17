@@ -4,6 +4,8 @@
 
 **Pages:** state-capacity-ai-governance, recoding-america
 
+**PR:** #179
+
 **Issues encountered:**
 - External research APIs (Perplexity, SCRY, Firecrawl, canonical links) all failed due to network restrictions in the sandbox environment
 - First synthesis attempt timed out (300s) using Claude CLI subprocess mode; switched to `--api-direct` which worked

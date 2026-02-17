@@ -4,6 +4,8 @@
 
 **Pages:** about-this-wiki, anthropic-pages-refactor-notes, architecture, automation-tools, cause-effect-diagrams, content-database, documentation-maintenance, enhancement-queue, gap-analysis-2026-02, knowledge-base, longtermwiki-value-proposition, mermaid-diagrams, models, page-length-research, page-types, rating-system, research-reports, response-style-guide, risk-style-guide, ai-research-workflows, causal-diagram-visualization, controlled-vocabulary, cross-link-automation-proposal, diagram-naming-research, page-creator-pipeline, diagrams, entities, common-writing-principles, longterm-vision, longterm-strategy, stub-style-guide, parameters-strategy, models-style-guide, ai-transition-model-style-guide
 
+**PR:** #142
+
 **Issues encountered:**
 - Original commit missed 7 `.md` files (only converted `.mdx` files)
 - Internal pages leaked into public explore page — no filter for `entityType === 'internal'`

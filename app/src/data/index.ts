@@ -289,6 +289,7 @@ export interface ChangeEntry {
   branch: string;
   title: string;
   summary: string;
+  pr?: number;
 }
 
 export interface Page {
@@ -579,6 +580,7 @@ export interface PageChangeItem {
   sessionTitle: string;
   summary: string;
   category: string;
+  pr?: number;
 }
 
 export function getPageChanges(): PageChangeItem[] {
@@ -600,6 +602,7 @@ export function getPageChanges(): PageChangeItem[] {
         sessionTitle: entry.title,
         summary: entry.summary,
         category: page.category,
+        ...(entry.pr !== undefined && { pr: entry.pr }),
       });
     }
   }

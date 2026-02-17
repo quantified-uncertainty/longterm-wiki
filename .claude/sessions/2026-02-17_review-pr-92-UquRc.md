@@ -4,6 +4,8 @@
 
 **Pages:** anthropic-ipo
 
+**PR:** #186
+
 **Issues encountered:**
 - PR #92 branch was deleted from remote, so the implementation was rebuilt from the PR diff
 - Mechanical batch fact retrofitter had fatal false-positive problem: same dollar amounts in different semantic contexts got wrapped with wrong fact IDs

@@ -4,6 +4,8 @@
 
 **Pages:** ea-shareholder-diversification-anthropic, anthropic-pre-ipo-daf-transfers, ea-funding-absorption-capacity, ftx-collapse-ea-funding-lessons
 
+**PR:** #133
+
 **Issues encountered:**
 - Crux content pipeline synthesis fails (nested claude session). Wrote pages manually.
 - Linter reassigned diversification page from E694 to E697, breaking four EntityLinks across two pages that referenced E694.

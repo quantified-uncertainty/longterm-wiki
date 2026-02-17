@@ -4,6 +4,8 @@
 
 **Pages:** capability-alignment-race, ea-shareholder-diversification-anthropic, factors-ai-capabilities-overview, factors-ai-ownership-overview, factors-ai-uses-overview, factors-misalignment-potential-overview, factors-misuse-potential-overview, factors-transition-turbulence-overview, automation-tools, gap-analysis-2026-02
 
+**PR:** #138
+
 **Issues encountered:**
 - PR #121 (page changes dashboard) had broken links to internal pages — used `/wiki/` prefix for pages that live under `/internal/`
 - Legacy data validator (`validate-data.ts`) did not understand numeric entity IDs (E5, E11, etc.) introduced by the EntityLink ID migration, causing 213 false positive errors

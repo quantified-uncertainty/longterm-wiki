@@ -4,6 +4,8 @@
 
 **Pages:** astralis-foundation
 
+**PR:** #154
+
 **Issues encountered:**
 - Crux content create pipeline failed: Perplexity research phase returned "fetch failed" (likely network restrictions in sandbox)
 - Tried `--source-file` workaround which loaded research successfully, but synthesis phase failed because it spawns a nested `claude` subprocess which is blocked inside an existing Claude Code session

@@ -4,6 +4,8 @@
 
 **Pages:** (all 650 wiki pages had frontmatter updated — field rename only, no content changes)
 
+**PR:** #151
+
 **Issues encountered:**
 - Several files in `crux/authoring/` and `crux/analyze/` were missed in the initial pass and caught by the Next.js type checker during build
 - The `SimilarityGraph` component and `get-similarity-data.ts` had their own local `importance` property on the `SimilarityNode` interface which maps from the renamed Page field

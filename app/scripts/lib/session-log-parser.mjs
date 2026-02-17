@@ -23,6 +23,7 @@ import { join } from 'path';
  *   ## 2026-02-13 | branch-name | Short title
  *   **What was done:** Summary text.
  *   **Pages:** page-id-1, page-id-2
+ *   **PR:** #123
  *   ...
  */
 export function parseSessionLogContent(content) {
@@ -59,11 +60,24 @@ export function parseSessionLogContent(content) {
       .map(id => id.trim())
       .filter(id => id.length > 0 && /^[a-z0-9][a-z0-9-]*$/.test(id));
 
+    // Extract optional "PR" field — supports "#123" or full GitHub URL
+    const prMatch = body.match(/\*\*PR:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
+    let pr = undefined;
+    if (prMatch) {
+      const raw = prMatch[1].trim();
+      // Extract PR number from "#123" or "https://github.com/.../pull/123"
+      const numMatch = raw.match(/^#(\d+)$/) || raw.match(/\/pull\/(\d+)/);
+      if (numMatch) {
+        pr = parseInt(numMatch[1], 10);
+      }
+    }
+
     const changeEntry = {
       date: entry.date,
       branch: entry.branch,
       title: entry.title,
       summary,
+      ...(pr !== undefined && { pr }),
     };
 
     for (const pageId of pageIds) {

@@ -4,6 +4,8 @@
 
 **Pages:** (no page content changes — only frontmatter numericId reassignment for internal and overview pages)
 
+**PR:** #170
+
 **Issues encountered:**
 - Internal pages were included in `sitemap.ts` via unfiltered `getAllPages()` call
 - Search index in `search.mjs` didn't filter `entityType: internal` entities or `category: internal` pages

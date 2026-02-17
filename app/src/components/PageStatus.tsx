@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@lib/utils";
 import { formatAge, formatFrequency } from "@lib/format";
+import { GITHUB_REPO_URL } from "@lib/site-config";
 import {
   detectPageType,
   PAGE_TYPE_INFO,
@@ -774,6 +775,17 @@ function ChangeHistorySection({
               <span className="font-medium text-foreground">
                 {entry.title}
               </span>
+              {entry.pr && (
+                <a
+                  href={`${GITHUB_REPO_URL}/pull/${entry.pr}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-sky-500 hover:text-sky-600 no-underline"
+                  title={`PR #${entry.pr}`}
+                >
+                  #{entry.pr}
+                </a>
+              )}
               <span className="text-muted-foreground">
                 {formatAge(entry.date)}
               </span>

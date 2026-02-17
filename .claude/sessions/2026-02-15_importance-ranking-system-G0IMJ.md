@@ -14,6 +14,8 @@ Session 5: Paranoid code review found and fixed 6 critical + 3 warning issues: (
 
 **Pages:** importance-ranking (internal documentation), importance-rankings (new internal dashboard)
 
+**PR:** #151
+
 **Issues encountered:**
 - Binary search merge artifacts: pages from later batches accumulated comparison errors, causing important concepts (mesa-optimization, sleeper agents, treacherous turn) to sink to the bottom. Fixed by adding verification pass that re-sorts overlapping windows of 20 pages.
 - `~\$` pattern in MDX report page triggered test failures. Fixed by using `≈\$` (Unicode approximately symbol).

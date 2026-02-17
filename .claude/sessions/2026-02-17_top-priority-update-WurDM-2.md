@@ -4,6 +4,8 @@
 
 **Pages:** existential-risk, superintelligence, agentic-ai, ai-timelines, scaling-laws
 
+**PR:** #188
+
 **Issues encountered:**
 - Research phase consistently returned "0 sources found" due to JSON parsing errors in the research output, but the improve phase still generated high-quality content using analysis data and model knowledge
 - Agentic-ai `--grade` flag hung after the improve pipeline completed successfully; quality score was set manually

@@ -4,6 +4,8 @@
 
 **Pages:** (no wiki page content edited — infrastructure/components only)
 
+**PR:** #145
+
 **Issues encountered:**
 - The `<InsightsTable />` MDX component was a stub (empty gray box) on the public insights page — fixed by creating a server component wrapper + shared client table component.
 - 81% of insights have source paths that don't map to any page title (deep ATM factor paths, model subpaths) — added `formatSourceLabel()` to derive readable labels from paths.
