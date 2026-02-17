@@ -16,7 +16,7 @@ ratings:
   completeness: 5.5
 clusters: ["ai-safety"]
 ---
-import {DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink} from '@components/wiki';
+import {DisagreementMap, InfoBox, KeyQuestions, DataExternalLinks, Mermaid, EntityLink, F} from '@components/wiki';
 
 <DataExternalLinks pageId="scaling-debate" />
 
@@ -315,7 +315,7 @@ This debate has major implications for AI safety strategy, resource allocation, 
 
 The debate affects billions of dollars in investment decisions:
 
-- **Stargate Project**: [\$500B committed through 2029](https://openai.com/index/announcing-the-stargate-project/) by <EntityLink id="openai">OpenAI</EntityLink>, SoftBank, Oracle—implicitly betting on scaling
+- **Stargate Project**: [<F e="openai" f="valuation-2025">\$500B</F> committed through 2029](https://openai.com/index/announcing-the-stargate-project/) by <EntityLink id="openai">OpenAI</EntityLink>, SoftBank, Oracle—implicitly betting on scaling
 - **<EntityLink id="meta-ai">Meta</EntityLink>'s LLM focus**: [<EntityLink id="yann-lecun">Yann LeCun</EntityLink>'s November 2025 departure](https://fortune.com/2026/01/23/deepmind-demis-hassabis-anthropic-dario-amodei-yann-lecun-ai-davos/) to found Advanced Machine Intelligence Labs signals internal disagreement
 - **<EntityLink id="deepmind">DeepMind</EntityLink>'s approach**: Combines scaling with algorithmic innovation (AlphaFold, Gemini)—hedging both sides
 
@@ -356,7 +356,7 @@ The past two years have provided significant new evidence, though interpretation
 The emergence of "reasoning models" in 2024-2025 partially resolved the debate by introducing a new scaling paradigm:
 
 - **Test-time compute scaling**: [OpenAI observed](https://www.interconnects.ai/p/openais-o3-the-2024-finale-of-ai) that reinforcement learning exhibits "more compute = better performance" trends similar to pretraining
-- **o3 benchmark results**: 96.7% on AIME 2024, 87.7% on GPQA Diamond, 71.7% on SWE-bench Verified (vs o1's 48.9%)
+- **o3 benchmark results**: 96.7% on AIME 2024, 87.7% on GPQA Diamond, <F e="openai" f="o1-swe-bench-score">71.7%</F> on SWE-bench Verified (vs o1's 48.9%)
 - **Key insight**: Rather than scaling model parameters, scale inference-time reasoning through reinforcement learning
 
 This suggests a "scaling-plus" resolution: pure pretraining scaling has diminishing returns, but new scaling regimes (reasoning, test-time compute) can unlock continued progress.

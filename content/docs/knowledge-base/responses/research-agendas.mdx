@@ -23,7 +23,7 @@ clusters:
 subcategory: alignment
 entityType: approach
 ---
-import {ComparisonTable, DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
+import {ComparisonTable, DataInfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks, F} from '@components/wiki';
 
 <DataExternalLinks pageId="research-agendas" />
 
@@ -137,7 +137,7 @@ The table illustrates why portfolio diversification across research agendas is c
 
 Anthropic's approach represents the most direct attempt to scale current techniques to advanced AI systems. Their constitutional AI methodology trains language models to follow a set of principles through a two-stage process: first using AI feedback to critique and revise outputs according to the constitution, then using this data for reinforcement learning. Their Responsible Scaling Policy framework creates concrete capability thresholds (ASL-2, ASL-3, etc.) with corresponding safety requirements, providing a roadmap for scaling safely through increasingly capable systems.
 
-With <R id="68563d565e6852e0">over \$16 billion raised in 2025</R> (including a \$13B Series F at \$183B valuation in September 2025, followed by further growth to over \$350 billion valuation by November), Anthropic dedicates substantial resources to safety research. Their Frontier Red Team comprises approximately 15 researchers who stress-test advanced systems for misuse risks in biological research, cybersecurity, and autonomous systems. The company's <R id="e65e76531931acc2">Anthropic Fellows Program</R> provides \$3,850/week stipends plus ≈\$15k/month in compute funding, producing research papers from over 80% of fellows. Their Claude Academy has trained over 300 engineers in AI safety practices, converting generalist software developers into specialized practitioners.
+With <R id="68563d565e6852e0">over \$16 billion raised in 2025</R> (including a \$13B Series F at \$183B valuation in September 2025, followed by further growth to over <F e="anthropic" f="valuation-nov-2025">\$350 billion</F> valuation by November), Anthropic dedicates substantial resources to safety research. Their Frontier Red Team comprises approximately 15 researchers who stress-test advanced systems for misuse risks in biological research, cybersecurity, and autonomous systems. The company's <R id="e65e76531931acc2">Anthropic Fellows Program</R> provides \$3,850/week stipends plus ≈\$15k/month in compute funding, producing research papers from over 80% of fellows. Their Claude Academy has trained over 300 engineers in AI safety practices, converting generalist software developers into specialized practitioners.
 
 The constitutional AI work has shown promising empirical results on current models, successfully reducing harmful outputs while maintaining helpfulness across various tasks. Their 2024 research on "sleeper agents" provided concerning evidence that deceptive alignment could persist through standard training techniques, while their mechanistic interpretability research aims to understand model internals well enough to detect such deception. The combination suggests a research program that takes seriously both the promise and the perils of scaling current approaches.
 
