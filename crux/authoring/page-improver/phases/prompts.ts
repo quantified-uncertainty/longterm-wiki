@@ -60,6 +60,19 @@ You are EDITING an existing page, not rewriting it from scratch. Your output mus
 - **Word count**: Your output should be AT LEAST as long as the input. If the current page is 3000 words, your output must be ≥3000 words.
 
 Do NOT summarize, condense, or "streamline" existing content. Add to it. If a section is too long, leave it as-is rather than cutting it.
+
+### Section Deduplication (CRITICAL)
+Do NOT create sections that repeat content already covered elsewhere on the page. Before adding or expanding a section, check if the same information already appears in another section. Common duplication patterns to avoid:
+- Research priorities listed in both a "Key Contributions" section AND a "Current Research Focus" section
+- Technical challenges listed in both a "Views" section AND a "Research" section
+- Career history repeated in both "Background" and a separate "Career" section
+- The same quotes or facts appearing in multiple sections
+
+If two existing sections cover the same topic, MERGE them into one section rather than keeping both.
+Do NOT add thin, speculative, or padding sections. A section with only 2-3 bullet points of vague content (like "Recognition and Influence: {/* NEEDS CITATION */} has been cited") adds no value. Only add new sections if you have substantive content to put in them.
+
+### No Editorial Meta-Comments
+Do NOT add editorial meta-comments in the output like \`{/* Note: Previous version used evaluative language... */}\` or \`{/* Note: This section was restructured... */}\`. The only acceptable MDX comments are \`{/* NEEDS CITATION */}\` markers. The output should be clean wiki content, not a track-changes document.
 ${isPolish ? `
 ### Polish Tier Rules (NO RESEARCH AVAILABLE)
 This is a polish-tier improvement — you have NO new research sources. Therefore:
@@ -68,7 +81,9 @@ This is a polish-tier improvement — you have NO new research sources. Therefor
 - **KEEP all existing citations exactly as they are** — do not renumber, modify, or remove existing footnotes.
 - You MAY fix formatting, improve prose clarity, add EntityLinks, fix escaping, and restructure sections.
 - You MAY add factual context from the existing content (moving info between sections, adding transitions).
-- If you cannot verify a claim, flag it with <!-- NEEDS CITATION --> rather than inventing a source.
+- If you add a NEW specific claim that needs verification, flag it with {/* NEEDS CITATION */} rather than inventing a source.
+- Do NOT add {/* NEEDS CITATION */} to claims that already existed in the original content — those claims were already accepted. Only mark NEW claims you're adding.
+- Use {/* NEEDS CITATION */} sparingly — at most 3-5 per page. An excess of citation markers makes the page look like an unfinished draft.
 ` : ''}
 Make targeted improvements based on the analysis and directions. Follow these guidelines:
 
