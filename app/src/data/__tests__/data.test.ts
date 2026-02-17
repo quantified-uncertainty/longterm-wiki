@@ -171,6 +171,7 @@ const mockDatabase = {
       title: "Test Entity",
       quality: 7,
       readerImportance: 85,
+      researchImportance: 60,
       tractability: null,
       neglectedness: null,
       uncertainty: null,
@@ -181,6 +182,7 @@ const mockDatabase = {
       ratings: { novelty: 3, rigor: 4 },
       category: "risks",
       wordCount: 2500,
+      backlinkCount: 12,
     },
     {
       id: "table-entity",
@@ -389,6 +391,8 @@ describe("Data Layer", () => {
       expect(testItem).toBeDefined();
       expect(testItem?.quality).toBe(7);
       expect(testItem?.readerImportance).toBe(85);
+      expect(testItem?.researchImportance).toBe(60);
+      expect(testItem?.backlinkCount).toBe(12);
       expect(testItem?.description).toBe("A summary of the test entity.");
       expect(testItem?.wordCount).toBe(2500);
       expect(testItem?.lastUpdated).toBe("2025-01-15");

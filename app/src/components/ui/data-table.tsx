@@ -31,6 +31,8 @@ interface DataTableWithTableProps<TData> {
   renderExpandedRow?: (row: Row<TData>) => React.ReactNode
   getRowClassName?: (row: Row<TData>) => string
   stickyFirstColumn?: boolean
+  /** Override the outer scroll-container classes (border, max-h, etc.) */
+  containerClassName?: string
 }
 
 // Legacy API: accepts data and columns (creates table internally)
@@ -57,7 +59,7 @@ export function DataTable<TData, TValue = unknown>(
   props: DataTableProps<TData, TValue>
 ) {
   if (isTableProps(props)) {
-    return <DataTableWithTable table={props.table} renderExpandedRow={props.renderExpandedRow} getRowClassName={props.getRowClassName} stickyFirstColumn={props.stickyFirstColumn} />
+    return <DataTableWithTable table={props.table} renderExpandedRow={props.renderExpandedRow} getRowClassName={props.getRowClassName} stickyFirstColumn={props.stickyFirstColumn} containerClassName={props.containerClassName} />
   }
   return <DataTableWithData {...(props as DataTableWithDataProps<TData, TValue>)} />
 }
@@ -68,11 +70,12 @@ function DataTableWithTable<TData>({
   renderExpandedRow,
   getRowClassName,
   stickyFirstColumn,
+  containerClassName,
 }: DataTableWithTableProps<TData>) {
   const columns = table.getAllColumns()
 
   return (
-    <div className="rounded-lg border border-border/60 shadow-sm max-h-[80vh] overflow-auto">
+    <div className={containerClassName ?? "rounded-lg border border-border/60 shadow-sm max-h-[80vh] overflow-auto"}>
       <Table>
         <TableHeader className="sticky top-0 z-20">
           {table.getHeaderGroups().map((headerGroup) => (

@@ -6,6 +6,9 @@ import type { ExploreItem } from "@/data";
 import { ENTITY_GROUPS } from "@/data/entity-ontology";
 import { searchWikiScores } from "@/lib/search";
 import { ContentCard } from "./ContentCard";
+import { ExploreTable } from "./ExploreTable";
+
+type ViewMode = "cards" | "table";
 
 // FIELD filter — based on page clusters
 const FIELD_GROUPS: { label: string; cluster: string | null }[] = [
@@ -27,7 +30,7 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "quality" | "wordCount" | "recentlyEdited";
+type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "quality" | "wordCount" | "recentlyEdited";
 
 /** Compute a blended "recommended" score that favors recent, high-quality content. */
 function recommendedScore(item: ExploreItem): number {
@@ -144,6 +147,10 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     : 0;
   const initialEntityIndex = initialEntity ? resolveEntityGroupIndex(initialEntity) : 0;
 
+  const rawView = searchParams.get("view");
+  const initialView: ViewMode = rawView === "table" ? "table" : "cards";
+
+  const [viewMode, setViewMode] = useState<ViewMode>(initialView);
   const [search, setSearch] = useState(initialTag);
   const [activeField, setActiveField] = useState(0);
   const [activeEntity, setActiveEntity] = useState(
@@ -211,14 +218,14 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     [searchParams, router, pathname]
   );
 
-  function handleSearchChange(value: string) {
+  const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
     setVisibleCount(60);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       updateUrlParams({ tag: value || null });
     }, 300);
-  }
+  }, [updateUrlParams]);
 
   function handleFieldChange(index: number) {
     setActiveField(index);
@@ -235,6 +242,11 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     setVisibleCount(60);
     const value = RISK_CATEGORY_GROUPS[index].value;
     updateUrlParams({ riskCategory: value });
+  }
+
+  function handleViewChange(mode: ViewMode) {
+    setViewMode(mode);
+    updateUrlParams({ view: mode === "cards" ? null : mode });
   }
 
   // Filter out AI transition model subitems (internal model data, not articles)
@@ -293,7 +305,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const filtered = useMemo(() => {
     let result = fieldFiltered;
 
-
     // Entity type filter
     const group = ENTITY_GROUPS[activeEntity];
     if (group.types.length > 0) {
@@ -306,121 +317,178 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       result = result.filter((item) => item.riskCategory === riskCatGroup.value);
     }
 
-    // Sort
-    result = [...result].sort((a, b) => {
-      switch (sortKey) {
-        case "title":
-          return a.title.localeCompare(b.title);
-        case "readerImportance":
-          return (b.readerImportance || 0) - (a.readerImportance || 0);
-        case "quality":
-          return (b.quality || 0) - (a.quality || 0);
-        case "wordCount":
-          return (b.wordCount || 0) - (a.wordCount || 0);
-        case "recentlyEdited":
-          return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
-        case "relevance": {
-          // When searching with MiniSearch, sort by search relevance score
-          if (searchScores) {
-            const scoreA = searchScores.get(a.id) || 0;
-            const scoreB = searchScores.get(b.id) || 0;
+    // Sort — skip in table mode since TanStack handles its own column sorting
+    if (viewMode !== "table") {
+      result = [...result].sort((a, b) => {
+        switch (sortKey) {
+          case "title":
+            return a.title.localeCompare(b.title);
+          case "readerImportance":
+            return (b.readerImportance || 0) - (a.readerImportance || 0);
+          case "researchImportance":
+            return (b.researchImportance || 0) - (a.researchImportance || 0);
+          case "quality":
+            return (b.quality || 0) - (a.quality || 0);
+          case "wordCount":
+            return (b.wordCount || 0) - (a.wordCount || 0);
+          case "recentlyEdited":
+            return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
+          case "relevance": {
+            if (searchScores) {
+              const scoreA = searchScores.get(a.id) || 0;
+              const scoreB = searchScores.get(b.id) || 0;
+              return scoreB - scoreA;
+            }
+            const scoreA = (a.readerImportance || 0) * 2 + (a.quality || 0);
+            const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);
             return scoreB - scoreA;
           }
-          // Fallback: importance-weighted relevance
-          const scoreA = (a.readerImportance || 0) * 2 + (a.quality || 0);
-          const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);
-          return scoreB - scoreA;
-        }
-        case "recommended":
-        default: {
-          // When searching, defer to MiniSearch relevance
-          if (searchScores) {
-            const scoreA = searchScores.get(a.id) || 0;
-            const scoreB = searchScores.get(b.id) || 0;
-            return scoreB - scoreA;
+          case "recommended":
+          default: {
+            if (searchScores) {
+              const scoreA = searchScores.get(a.id) || 0;
+              const scoreB = searchScores.get(b.id) || 0;
+              return scoreB - scoreA;
+            }
+            return recommendedScore(b) - recommendedScore(a);
           }
-          // Blend of recency, quality, and importance
-          return recommendedScore(b) - recommendedScore(a);
         }
-      }
-    });
+      });
+    }
 
     return result;
-  }, [fieldFiltered, activeEntity, activeRiskCat, searchScores, sortKey]);
+  }, [fieldFiltered, activeEntity, activeRiskCat, searchScores, sortKey, viewMode]);
 
   return (
     <div>
-      {/* Search */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search entities..."
-          value={search}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Filter rows */}
-      <div className="mb-6">
-        <FilterRow
-          label="Field"
-          options={FIELD_GROUPS.map((g) => g.label)}
-          active={activeField}
-          onSelect={handleFieldChange}
-          counts={fieldCounts}
-        />
-        <FilterRow
-          label="Entity"
-          options={ENTITY_GROUPS.map((g) => g.label)}
-          active={activeEntity}
-          onSelect={handleEntityChange}
-          counts={entityCounts}
-        />
-        {showRiskCatFilter && (
-          <FilterRow
-            label="Risk"
-            options={RISK_CATEGORY_GROUPS.map((g) => g.label)}
-            active={activeRiskCat}
-            onSelect={handleRiskCatChange}
-            counts={riskCatCounts}
+      {/* Search + filters — constrained width */}
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Search */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search entities..."
+            value={search}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
-        )}
+        </div>
+
+        {/* Filter rows */}
+        <div className="mb-4">
+          <FilterRow
+            label="Field"
+            options={FIELD_GROUPS.map((g) => g.label)}
+            active={activeField}
+            onSelect={handleFieldChange}
+            counts={fieldCounts}
+          />
+          <FilterRow
+            label="Entity"
+            options={ENTITY_GROUPS.map((g) => g.label)}
+            active={activeEntity}
+            onSelect={handleEntityChange}
+            counts={entityCounts}
+          />
+          {showRiskCatFilter && (
+            <FilterRow
+              label="Risk"
+              options={RISK_CATEGORY_GROUPS.map((g) => g.label)}
+              active={activeRiskCat}
+              onSelect={handleRiskCatChange}
+              counts={riskCatCounts}
+            />
+          )}
+        </div>
+
+        {/* Results header */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm text-muted-foreground">{filtered.length} items</span>
+          <div className="flex items-center gap-3">
+            {/* View toggle */}
+            <div className="flex items-center border border-border rounded-md overflow-hidden">
+              <button
+                onClick={() => handleViewChange("cards")}
+                className={`px-2.5 py-1.5 text-sm transition-colors ${
+                  viewMode === "cards"
+                    ? "bg-foreground text-background"
+                    : "bg-background text-foreground hover:bg-muted"
+                }`}
+                title="Card view"
+                aria-label="Card view"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+              </button>
+              <button
+                onClick={() => handleViewChange("table")}
+                className={`px-2.5 py-1.5 text-sm transition-colors ${
+                  viewMode === "table"
+                    ? "bg-foreground text-background"
+                    : "bg-background text-foreground hover:bg-muted"
+                }`}
+                title="Table view"
+                aria-label="Table view"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M3 9h18" />
+                  <path d="M3 15h18" />
+                  <path d="M9 3v18" />
+                </svg>
+              </button>
+            </div>
+            {/* Sort dropdown — only in card mode; table has its own column sorting */}
+            {viewMode === "cards" && (
+              <select
+                value={sortKey}
+                onChange={(e) => setSortKey(e.target.value as SortKey)}
+                className="text-sm px-3 py-1.5 border border-border rounded-md bg-background text-foreground"
+              >
+                <option value="recommended">Recommended</option>
+                <option value="recentlyEdited">Recently Edited</option>
+                <option value="quality">Quality</option>
+                <option value="readerImportance">Reader Importance</option>
+                <option value="researchImportance">Research Importance</option>
+                <option value="relevance">Relevance</option>
+                <option value="wordCount">Word Count</option>
+                <option value="title">Title (A-Z)</option>
+              </select>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Results header */}
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-sm text-muted-foreground">{filtered.length} items</span>
-        <select
-          value={sortKey}
-          onChange={(e) => setSortKey(e.target.value as SortKey)}
-          className="text-sm px-3 py-1.5 border border-border rounded-md bg-background text-foreground"
-        >
-          <option value="recommended">Recommended</option>
-          <option value="recentlyEdited">Recently Edited</option>
-          <option value="quality">Quality</option>
-          <option value="readerImportance">Importance</option>
-          <option value="relevance">Relevance</option>
-          <option value="wordCount">Word Count</option>
-          <option value="title">Title (A-Z)</option>
-        </select>
-      </div>
+      {/* Card grid — constrained width */}
+      {viewMode === "cards" && (
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filtered.slice(0, visibleCount).map((item) =>
+              <ContentCard key={item.id} item={item} />
+            )}
+          </div>
 
-      {/* Card grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.slice(0, visibleCount).map((item) =>
-          <ContentCard key={item.id} item={item} />
-        )}
-      </div>
+          {filtered.length > visibleCount && (
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={() => setVisibleCount((c) => c + 60)}
+                className="px-6 py-2.5 text-sm border border-border rounded-lg bg-background text-foreground hover:bg-muted transition-colors"
+              >
+                Show more ({filtered.length - visibleCount} remaining)
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
-      {filtered.length > visibleCount && (
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => setVisibleCount((c) => c + 60)}
-            className="px-6 py-2.5 text-sm border border-border rounded-lg bg-background text-foreground hover:bg-muted transition-colors"
-          >
-            Show more ({filtered.length - visibleCount} remaining)
-          </button>
+      {/* Table view — full page width */}
+      {viewMode === "table" && (
+        <div className="px-6">
+          <ExploreTable items={filtered} onSearchChange={handleSearchChange} />
         </div>
       )}
 

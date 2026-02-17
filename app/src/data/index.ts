@@ -1010,6 +1010,8 @@ export interface ExploreItem {
   wordCount: number | null;
   quality: number | null;
   readerImportance: number | null;
+  researchImportance: number | null;
+  backlinkCount: number | null;
   category: string | null;
   riskCategory: string | null;
   lastUpdated: string | null;
@@ -1062,6 +1064,8 @@ export function getExploreItems(): ExploreItem[] {
       wordCount: page?.wordCount ?? null,
       quality: page?.quality ?? null,
       readerImportance: page?.readerImportance ?? null,
+      researchImportance: page?.researchImportance ?? null,
+      backlinkCount: page?.backlinkCount ?? null,
       category: page?.category ?? null,
       riskCategory: isRisk(entity) ? (entity.riskCategory || null) : null,
       lastUpdated: page?.lastUpdated ?? null,
@@ -1084,6 +1088,8 @@ export function getExploreItems(): ExploreItem[] {
       wordCount: page.wordCount ?? null,
       quality: page.quality ?? null,
       readerImportance: page.readerImportance ?? null,
+      researchImportance: page.researchImportance ?? null,
+      backlinkCount: page.backlinkCount ?? null,
       category: page.category ?? null,
       riskCategory: null,
       lastUpdated: page.lastUpdated ?? null,
@@ -1138,6 +1144,8 @@ export function getExploreItems(): ExploreItem[] {
         wordCount: null,
         quality: null,
         readerImportance: null,
+        researchImportance: null,
+        backlinkCount: null,
         category: null,
         riskCategory: null,
         lastUpdated: e.lastUpdated || null,
