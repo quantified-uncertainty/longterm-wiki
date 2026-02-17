@@ -347,6 +347,17 @@ export interface Page {
       similarity: number;
     }>;
   };
+  /** Resolved canonical entity type (e.g. 'person', 'organization', 'risk') */
+  entityType?: string;
+  /** Computed hallucination risk — used by UI banners and AI agent triage */
+  hallucinationRisk?: {
+    /** Risk bucket: 'low' | 'medium' | 'high' */
+    level: "low" | "medium" | "high";
+    /** Numeric score 0-100 (higher = riskier) */
+    score: number;
+    /** Machine-readable factors explaining the score */
+    factors: string[];
+  };
 }
 
 // ============================================================================
