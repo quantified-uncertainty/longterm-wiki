@@ -69,17 +69,18 @@ jobs:
             if git rebase origin/main; then
               # Check if rebase actually changed anything
               if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$branch")" ]; then
-                if git push origin -- "$branch" --force-with-lease; then
+                push_output=""
+                if push_output=$(git push origin -- "$branch" --force-with-lease 2>&1); then
                   echo "Rebased and pushed successfully."
                 else
-                  echo "::warning::PR #${pr_number} — push failed (branch may have been updated concurrently)."
+                  echo "::error::PR #${pr_number} — push failed: ${push_output}"
                   failed=$((failed + 1))
                 fi
               else
                 echo "Already up to date."
               fi
             else
-              echo "::warning::PR #${pr_number} (${branch}) has merge conflicts — skipping rebase."
+              echo "::warning::PR #${pr_number} (${branch}) has merge conflicts — leaving for conflict resolver."
               git rebase --abort
             fi
 
@@ -87,5 +88,6 @@ jobs:
           done <<< "$prs"
 
           if [ "$failed" -gt 0 ]; then
-            echo "::warning::${failed} PR(s) failed to push — they may need manual attention or will be retried on next run."
+            echo "::error::${failed} PR(s) failed to push — they may need manual attention or will be retried on next run."
+            exit 1
           fi
