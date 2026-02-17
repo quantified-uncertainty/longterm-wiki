@@ -56,6 +56,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const entity = getEntityById(slug);
   const pageData = getPageById(slug);
+  const entityPath = getEntityPath(slug);
+  const isInternal = entityPath?.startsWith("/internal");
   const title = entity?.title || pageData?.title || slug;
   const description = entity?.description || pageData?.description || undefined;
   const format = (pageData?.contentFormat || "article") as ContentFormat;
@@ -63,6 +65,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    // Internal pages should not be indexed by search engines
+    ...(isInternal && { robots: { index: false, follow: false } }),
     openGraph: {
       title,
       description,
@@ -214,6 +218,7 @@ function ContentView({
   const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
   const formatInfo = CONTENT_FORMAT_INFO[contentFormat];
   const isArticle = contentFormat === "article";
+  const isInternal = entityPath.startsWith("/internal");
 
   return (
     <InfoBoxVisibilityProvider>
@@ -224,39 +229,41 @@ function ContentView({
         slug={slug}
         contentFormat={contentFormat}
       />
-      <LlmWarningBanner />
+      {!isInternal && <LlmWarningBanner />}
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
         {/* PageStatus shown for graded formats or pages with editorial content */}
-        <PageStatus
-          quality={pageData?.quality ?? undefined}
-          importance={pageData?.readerImportance ?? undefined}
-          researchImportance={pageData?.researchImportance ?? undefined}
-          llmSummary={pageData?.llmSummary ?? undefined}
-          structuredSummary={pageData?.structuredSummary ?? undefined}
-          lastEdited={pageData?.lastUpdated ?? undefined}
-          updateFrequency={pageData?.updateFrequency ?? undefined}
-          evergreen={pageData?.evergreen}
-          todo={page.frontmatter.todo}
-          todos={page.frontmatter.todos}
-          wordCount={pageData?.wordCount}
-          backlinkCount={pageData?.backlinkCount}
-          metrics={pageData?.metrics}
-          suggestedQuality={pageData?.suggestedQuality}
-          changeHistory={pageData?.changeHistory}
-          issues={{
-            unconvertedLinkCount: pageData?.unconvertedLinkCount,
-            redundancy: pageData?.redundancy,
-          }}
-          pageType={page.frontmatter.pageType}
-          pathname={entityPath}
-          contentFormat={contentFormat}
-        />
+        {!isInternal && (
+          <PageStatus
+            quality={pageData?.quality ?? undefined}
+            importance={pageData?.readerImportance ?? undefined}
+            researchImportance={pageData?.researchImportance ?? undefined}
+            llmSummary={pageData?.llmSummary ?? undefined}
+            structuredSummary={pageData?.structuredSummary ?? undefined}
+            lastEdited={pageData?.lastUpdated ?? undefined}
+            updateFrequency={pageData?.updateFrequency ?? undefined}
+            evergreen={pageData?.evergreen}
+            todo={page.frontmatter.todo}
+            todos={page.frontmatter.todos}
+            wordCount={pageData?.wordCount}
+            backlinkCount={pageData?.backlinkCount}
+            metrics={pageData?.metrics}
+            suggestedQuality={pageData?.suggestedQuality}
+            changeHistory={pageData?.changeHistory}
+            issues={{
+              unconvertedLinkCount: pageData?.unconvertedLinkCount,
+              redundancy: pageData?.redundancy,
+            }}
+            pageType={page.frontmatter.pageType}
+            pathname={entityPath}
+            contentFormat={contentFormat}
+          />
+        )}
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
-        {isArticle && entity && <DataInfoBox entityId={slug} />}
+        {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
         {page.content}
       </article>
       {/* Related pages rendered outside prose to avoid inherited link styles */}
-      {isArticle && <RelatedPages entityId={slug} entity={entity} />}
+      {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>
   );
 }
