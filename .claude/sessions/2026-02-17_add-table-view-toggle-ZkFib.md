@@ -5,7 +5,7 @@
 **Pages:** (no wiki content pages changed)
 
 **Issues encountered:**
-- None
+- Test mock data was missing `researchImportance` and `backlinkCount` fields — fixed and assertions added.
 
 **Learnings/notes:**
 - Added `containerClassName` prop to DataTable so callers can override the scroll container's height/styling without forking the component.
