@@ -9,12 +9,14 @@
  * Steps (fast mode, default):
  *   1. Build data layer (required for validation + tests)
  *   2. Run vitest tests
- *   3. MDX syntax (comparison-operators, dollar-signs)
- *   4. YAML schema validation
- *   5. Frontmatter schema validation
+ *   3. Auto-fix escaping + markdown (with --fix)
+ *   4. MDX syntax (comparison-operators, dollar-signs)
+ *   5. YAML schema validation
+ *   6. Frontmatter schema validation
+ *   7. TypeScript type check
  *
  * With --full:
- *   6. Full Next.js production build
+ *   8. Full Next.js production build
  *
  * Exit codes:
  *   0 = All checks passed
@@ -27,6 +29,7 @@ import { getColors } from '../lib/output.ts';
 
 const args: string[] = process.argv.slice(2);
 const FULL_MODE: boolean = args.includes('--full');
+const FIX_MODE: boolean = args.includes('--fix');
 const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 
 const c = getColors(CI_MODE);
@@ -56,6 +59,20 @@ const STEPS: Step[] = [
     args: ['test'],
     cwd: APP_DIR,
   },
+  ...(FIX_MODE ? [{
+    id: 'fix-escaping',
+    name: 'Auto-fix escaping',
+    command: 'pnpm',
+    args: ['crux', 'fix', 'escaping'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'fix-markdown',
+    name: 'Auto-fix markdown',
+    command: 'pnpm',
+    args: ['crux', 'fix', 'markdown'],
+    cwd: PROJECT_ROOT,
+  }] : []),
   {
     id: 'mdx-syntax',
     name: 'MDX syntax (blocking)',
@@ -76,6 +93,13 @@ const STEPS: Step[] = [
     command: 'pnpm',
     args: ['crux', 'validate', 'unified', '--rules=frontmatter-schema', '--errors-only'],
     cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'typecheck',
+    name: 'TypeScript type check',
+    command: 'npx',
+    args: ['tsc', '--noEmit'],
+    cwd: APP_DIR,
   },
 ];
 
