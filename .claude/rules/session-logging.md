@@ -33,7 +33,7 @@ Where `<branch-suffix>` is the branch name without the `claude/` prefix (e.g., f
 - Keep entries concise (5-10 lines max)
 - Always include the branch name so entries can be correlated with PRs
 - **Always include the `Pages:` field** listing the page IDs (filenames without `.mdx`) of any wiki pages created or edited in the session. Use the page slug (e.g., `ai-risks`, `compute-governance`), not the full path. Omit the field only if the session made no page content changes (infrastructure-only work).
-- **Always include the `PR:` field** with the PR number (e.g., `#123`) once the PR is created. This links change history entries to their PRs in the UI. Accepts `#NNN` or a full GitHub PR URL.
+- **The `PR:` field is optional** — PR numbers are auto-populated at build time by looking up branches via the GitHub API (`app/scripts/lib/github-pr-lookup.mjs`). You can include `**PR:** #123` manually as an override, but it's not required.
 - If you encountered an issue that seems likely to recur, also add it to `.claude/common-issues.md`
 - Do NOT skip logging just because the session was small — even one-line fixes are worth tracking
 - The session log file should be part of the same commit as your other changes (not a separate commit)

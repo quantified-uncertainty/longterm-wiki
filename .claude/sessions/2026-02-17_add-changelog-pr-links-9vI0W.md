@@ -1,6 +1,6 @@
 ## 2026-02-17 | claude/add-changelog-pr-links-9vI0W | Add PR links to change history
 
-**What was done:** Added support for PR links in the Change History UI and page-changes table. Extended the session log format with an optional `**PR:**` field, updated the parser to extract PR numbers (from `#NNN` or full GitHub URLs), flowed the `pr` field through `ChangeEntry` → `PageChangeItem` → UI components, and backfilled PR numbers into all 47 existing session log files using the GitHub API.
+**What was done:** Added PR links to Change History UI and page-changes table. PR numbers are auto-populated at build time via GitHub API branch→PR lookup (`github-pr-lookup.mjs`), so session logs don't need to manually include them. Also added manual `**PR:**` field support in session logs as an override, backfilled 47 existing session logs, and added 8 new tests.
 
 **Pages:** (no wiki content pages changed)
 
