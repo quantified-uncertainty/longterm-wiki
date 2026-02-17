@@ -11,9 +11,16 @@ on:
     workflows: ["Auto-Rebase PRs"]
     types: [completed]
 
-  # Also run on a schedule to catch any stragglers
+  # Run when PRs are opened or updated — catches PRs that are created
+  # with conflicts before the next push to main triggers Auto-Rebase.
+  # The concurrency group ensures only one instance runs at a time.
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+
+  # Catch any stragglers (e.g. PRs made conflicting by force-pushes)
   schedule:
-    - cron: "0 */6 * * *" # every 6 hours
+    - cron: "0 */2 * * *" # every 2 hours
 
   # Allow manual trigger
   workflow_dispatch:
@@ -41,10 +48,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Get open PRs and check mergeable state
-          prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open \
-            --json number,headRefName,mergeable \
-            --jq '[.[] | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
+          # GitHub lazily computes mergeable state — newly opened PRs may
+          # show "UNKNOWN" for a few seconds. Retry up to 3 times with a
+          # short delay so we don't miss freshly-conflicted PRs.
+          for attempt in 1 2 3; do
+            all_prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open \
+              --json number,headRefName,mergeable)
+
+            unknown_count=$(echo "$all_prs" | jq '[.[] | select(.mergeable == "UNKNOWN")] | length')
+
+            if [ "$unknown_count" -eq 0 ] || [ "$attempt" -eq 3 ]; then
+              break
+            fi
+
+            echo "Attempt $attempt: $unknown_count PR(s) have UNKNOWN mergeable state — waiting 10s for GitHub to compute..."
+            sleep 10
+          done
+
+          prs=$(echo "$all_prs" | jq '[.[] | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
 
           echo "Conflicted PRs: $prs"
 
@@ -81,6 +102,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Resolve conflicts
+        id: resolve
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PR_BRANCH: ${{ matrix.branch }}
@@ -100,5 +122,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" \
-            --body "Automatic conflict resolution failed for this PR. Manual resolution is needed."
+          DIAG="${{ steps.resolve.outputs.diagnostic_summary }}"
+          if [ -n "$DIAG" ]; then
+            BODY="$(cat <<EOFBODY
+          Automatic conflict resolution failed for this PR. Manual resolution is needed.
+
+          **Diagnostics:**
+          $DIAG
+
+          [View workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOFBODY
+          )"
+          else
+            BODY="Automatic conflict resolution failed for this PR. Manual resolution is needed. [View logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          fi
+          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" --body "$BODY"
