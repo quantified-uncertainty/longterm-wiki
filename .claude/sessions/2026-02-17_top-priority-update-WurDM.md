@@ -4,6 +4,8 @@
 
 **Pages:** ai-enabled-untraceable-misuse
 
+**PR:** #188
+
 **Issues encountered:**
 - Initially worked on wrong task (entityType migration from crux/TODO.md) before user clarified they meant wiki content updates
 - Research phase JSON parsing warning (non-fatal, pipeline continued successfully)

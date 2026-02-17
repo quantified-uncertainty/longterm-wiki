@@ -4,6 +4,8 @@
 
 **Pages:** pre-tai-capital-deployment, ai-megaproject-infrastructure, safety-spending-at-scale, frontier-lab-cost-structure, ai-talent-market-dynamics, planning-for-frontier-lab-scaling
 
+**PR:** #155
+
 **Issues encountered:**
 - numericId conflicts with ea-funding-absorption-capacity (E695) and ftx-collapse-ea-funding-lessons (E696) — resolved by using E700-E705
 - CAIRN `ratings` included `focus` and `concreteness` fields not supported by wiki InfoBox — removed

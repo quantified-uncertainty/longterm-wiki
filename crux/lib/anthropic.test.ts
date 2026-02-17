@@ -24,6 +24,7 @@ describe('resolveModel', () => {
 
   it('resolves alternate model IDs', () => {
     expect(resolveModel('claude-sonnet-4-5-20250929')).toBe(MODELS.sonnet);
+    expect(resolveModel('claude-sonnet-4-6')).toBe(MODELS.sonnet);
     expect(resolveModel('claude-opus-4-6')).toBe(MODELS.opus);
   });
 

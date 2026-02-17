@@ -4,6 +4,8 @@
 
 **Pages:** (no wiki content pages changed)
 
+**PR:** #178
+
 **Issues encountered:**
 - Test mock data was missing `researchImportance` and `backlinkCount` fields — fixed and assertions added.
 

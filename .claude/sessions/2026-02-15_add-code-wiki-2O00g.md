@@ -4,6 +4,8 @@
 
 **Pages:** ai-assisted-knowledge-management
 
+**PR:** #135
+
 **Issues encountered:**
 - pnpm install failed due to puppeteer postinstall script; resolved with --ignore-scripts
 

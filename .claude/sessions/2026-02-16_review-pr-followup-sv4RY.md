@@ -4,6 +4,8 @@
 
 **Pages:** ea-shareholder-diversification-anthropic, ai-investigation-risks, ai-powered-investigation, deanonymization, ai-accountability, anthropic-investors
 
+**PR:** #169
+
 **Issues encountered:**
 - vitest not on PATH; needed to use full binary path after pnpm install --ignore-scripts
 - Numeric ID collisions (E694, E695) found from parallel PR merges but not fixed in this session (separate issue)

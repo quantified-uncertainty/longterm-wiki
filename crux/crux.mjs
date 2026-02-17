@@ -18,6 +18,7 @@
  *   visual      Diagram, chart & model pipeline (create, review, audit, improve)
  *   resources   External resource management
  *   updates     Schedule-aware page update system
+ *   auto-update News-driven automatic wiki updates
  *   check-links External URL health checking
  *   edit-log    View and query per-page edit history
  *   importance  Ranking-based importance scoring
@@ -51,6 +52,7 @@ import * as editLogCommands from './commands/edit-log.ts';
 import * as importanceCommands from './commands/importance.ts';
 import * as ciCommands from './commands/ci.ts';
 import * as maintainCommands from './commands/maintain.ts';
+import * as autoUpdateCommands from './commands/auto-update.ts';
 
 const domains = {
   validate: validateCommands,
@@ -61,6 +63,7 @@ const domains = {
   visual: visualCommands,
   resources: resourcesCommands,
   updates: updatesCommands,
+  'auto-update': autoUpdateCommands,
   'check-links': checkLinksCommands,
   'edit-log': editLogCommands,
   importance: importanceCommands,
@@ -123,6 +126,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   visual      Diagram, chart & model pipeline
   resources   External resource management
   updates     Schedule-aware page update system
+  auto-update News-driven automatic wiki updates
   check-links External URL health checking
   edit-log    View and query per-page edit history
   importance  Ranking-based importance scoring

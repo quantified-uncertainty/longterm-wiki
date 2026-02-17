@@ -9,7 +9,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-const REPO = "quantified-uncertainty/longterm-wiki";
+import { GITHUB_REPO } from "@lib/site-config";
 
 type FeedbackOption = {
   template: string;
@@ -60,7 +60,7 @@ function buildIssueUrl(option: FeedbackOption, pageTitle: string, pageSlug: stri
       params.set(key, value);
     }
   }
-  return `https://github.com/${REPO}/issues/new?${params.toString()}`;
+  return `https://github.com/${GITHUB_REPO}/issues/new?${params.toString()}`;
 }
 
 export function PageFeedback({

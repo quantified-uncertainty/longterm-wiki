@@ -4,6 +4,8 @@
 
 **Pages:** (no wiki content pages changed)
 
+**PR:** #167
+
 **Issues encountered:**
 - `computeLeverage` was initially in a `"use client"` file but called from a server component — extracted into `leverage.ts`
 - Unused `ColumnFiltersState` import caught in review

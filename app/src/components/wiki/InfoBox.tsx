@@ -64,6 +64,8 @@ export interface InfoBoxProps {
   scope?: string;
   // Summary/overview page this entity belongs to
   summaryPage?: { title: string; href: string };
+  // Child pages (for overview entities)
+  childPages?: { id: string; title: string; type: string; href: string }[];
 }
 
 
@@ -177,29 +179,33 @@ export function InfoBox({
   policyAuthor,
   scope,
   summaryPage,
+  childPages,
 }: InfoBoxProps) {
   const typeInfo = getEntityTypeHeader(type, orgType);
 
+  // For overview entities, skip inapplicable fields and show child pages instead
+  const isOverview = type === "overview";
+
   const fields: { label: string; value: string; link?: string }[] = [];
-  if (orgType) {
+  if (!isOverview && orgType) {
     fields.push({ label: "Type", value: getOrgTypeLabel(orgType) });
   }
-  if (founded) fields.push({ label: "Founded", value: founded });
-  if (location) fields.push({ label: "Location", value: location });
-  if (headcount) fields.push({ label: "Employees", value: headcount });
-  if (funding) fields.push({ label: "Funding", value: funding });
-  if (introduced) fields.push({ label: "Introduced", value: introduced });
-  if (policyStatus) fields.push({ label: "Status", value: policyStatus });
-  if (policyAuthor) fields.push({ label: "Author", value: policyAuthor });
-  if (scope) fields.push({ label: "Scope", value: scope });
-  if (category) fields.push({ label: "Category", value: categoryLabels[category] || category, link: `/wiki?riskCategory=${category}` });
-  if (severity) fields.push({ label: "Severity", value: severity.charAt(0).toUpperCase() + severity.slice(1) });
-  if (likelihood) fields.push({ label: "Likelihood", value: likelihood });
-  if (timeframe) fields.push({ label: "Timeframe", value: timeframe });
-  if (maturity) fields.push({ label: "Maturity", value: maturityLabels[maturity.toLowerCase()] || maturity });
-  if (affiliation) fields.push({ label: "Affiliation", value: affiliation });
-  if (role) fields.push({ label: "Role", value: role });
-  if (knownFor) fields.push({ label: "Known For", value: knownFor });
+  if (!isOverview && founded) fields.push({ label: "Founded", value: founded });
+  if (!isOverview && location) fields.push({ label: "Location", value: location });
+  if (!isOverview && headcount) fields.push({ label: "Employees", value: headcount });
+  if (!isOverview && funding) fields.push({ label: "Funding", value: funding });
+  if (!isOverview && introduced) fields.push({ label: "Introduced", value: introduced });
+  if (!isOverview && policyStatus) fields.push({ label: "Status", value: policyStatus });
+  if (!isOverview && policyAuthor) fields.push({ label: "Author", value: policyAuthor });
+  if (!isOverview && scope) fields.push({ label: "Scope", value: scope });
+  if (!isOverview && category) fields.push({ label: "Category", value: categoryLabels[category] || category, link: `/wiki?riskCategory=${category}` });
+  if (!isOverview && severity) fields.push({ label: "Severity", value: severity.charAt(0).toUpperCase() + severity.slice(1) });
+  if (!isOverview && likelihood) fields.push({ label: "Likelihood", value: likelihood });
+  if (!isOverview && timeframe) fields.push({ label: "Timeframe", value: timeframe });
+  if (!isOverview && maturity) fields.push({ label: "Maturity", value: maturityLabels[maturity.toLowerCase()] || maturity });
+  if (!isOverview && affiliation) fields.push({ label: "Affiliation", value: affiliation });
+  if (!isOverview && role) fields.push({ label: "Role", value: role });
+  if (!isOverview && knownFor) fields.push({ label: "Known For", value: knownFor });
   if (website) fields.push({ label: "Website", value: website });
   if (customFields) fields.push(...customFields);
 
@@ -262,6 +268,47 @@ export function InfoBox({
 
       {/* Description — expandable if text overflows 3 lines */}
       {description && <InfoBoxDescription description={description} />}
+
+      {/* Child Pages — for overview entities */}
+      {isOverview && childPages && childPages.length > 0 && (() => {
+        const grouped = childPages.reduce(
+          (acc, page) => {
+            if (!acc[page.type]) acc[page.type] = [];
+            acc[page.type].push(page);
+            return acc;
+          },
+          {} as Record<string, typeof childPages>
+        );
+        const types = Object.keys(grouped);
+        return (
+          <div className="px-4 py-3 border-b border-border">
+            <div className="text-[0.7rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+              Pages in this section ({childPages.length})
+            </div>
+            <div className="flex flex-col gap-3">
+              {types.map((t) => {
+                const pages = grouped[t]!;
+                const config = entityTypeConfig[t as keyof typeof entityTypeConfig];
+                return (
+                  <div key={t} className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-1">
+                      {config && <EntityTypeIcon type={t} size="xs" />}
+                      <span className="text-muted-foreground font-medium text-[0.65rem] uppercase tracking-tight">
+                        {pluralize(getEntityTypeLabel(t))}
+                      </span>
+                    </div>
+                    <div className="pl-[1.125rem] flex flex-wrap gap-1.5">
+                      {pages.map((page) => (
+                        <EntityLink key={page.id} id={page.id} className="text-xs">{page.title}</EntityLink>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* External Links */}
       {extLinkEntries.length > 0 && (

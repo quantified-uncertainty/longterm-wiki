@@ -171,6 +171,20 @@ pnpm crux ci status --wait       # Poll every 30s until all checks complete
 - **build-and-test**: Builds the app and runs vitest (blocking)
 - **validate**: Runs three blocking checks (MDX syntax, YAML schema, frontmatter schema), then the full validation suite (advisory/non-blocking)
 
+## Auto-Update System
+
+News-driven automatic wiki updates. Fetches from RSS feeds and web searches, routes relevant news to wiki pages, and runs improvements. See `crux/auto-update/` for implementation and `data/auto-update/sources.yaml` for source configuration.
+
+```bash
+pnpm crux auto-update plan                    # Preview what would be updated
+pnpm crux auto-update run --budget=30         # Run with $30 budget cap
+pnpm crux auto-update digest                  # Just fetch and show news digest
+pnpm crux auto-update sources                 # List configured sources
+pnpm crux auto-update history                 # Show past runs
+```
+
+GitHub Actions workflow (`.github/workflows/auto-update.yml`) runs daily at 06:00 UTC. Configurable via `workflow_dispatch` with budget, page count, and source filters.
+
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
@@ -182,3 +196,18 @@ pnpm crux ci status --wait       # Poll every 30s until all checks complete
 - **Mermaid diagrams**: Follow `content/docs/internal/mermaid-diagrams.mdx` style guide — prefer `flowchart TD`, max 3-4 parallel nodes, use tables for taxonomies, max 15-20 nodes per diagram.
 - **Page templates**: Defined in `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
 - **Edit logs**: Per-page edit history in `data/edit-logs/<page-id>.yaml`, auto-maintained by Crux pipelines. Use `pnpm crux edit-log view <page-id>` to inspect. See `crux/lib/edit-log.ts` for the API.
+
+## Internal Dashboards for New Features
+
+**When building significant new features, always consider creating an internal dashboard page** (`/internal/<feature>`) to visualize the feature's data, status, and history. Dashboards are essential for debugging, monitoring, and iterating on features later.
+
+**When to build a dashboard:** Any feature that produces data over time (run history, discovered items, status tracking, metrics) or that involves a pipeline with multiple stages (where seeing intermediate results aids debugging).
+
+**How to build one:**
+1. Create `app/src/app/internal/<name>/page.tsx` (server component — loads data)
+2. Create `app/src/app/internal/<name>/<name>-table.tsx` (client component — `"use client"` with `DataTable` from `@/components/ui/data-table.tsx`)
+3. Add navigation entry in `app/src/lib/wiki-nav.ts` under "Dashboards & Tools"
+4. Server components can read YAML/JSON files directly via `fs` for operational data
+5. Follow existing patterns in `app/src/app/internal/updates/` or `auto-update-runs/`
+
+**Examples:** Update Schedule, Page Changes, Fact Dashboard, Auto-Update Runs, Auto-Update News, Importance Rankings, Page Similarity, Interventions, Proposals.

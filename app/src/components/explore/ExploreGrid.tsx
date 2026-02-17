@@ -10,8 +10,8 @@ import { ExploreTable } from "./ExploreTable";
 
 type ViewMode = "cards" | "table";
 
-// FIELD filter — based on page clusters
-const FIELD_GROUPS: { label: string; cluster: string | null }[] = [
+// FIELD filter — based on page clusters (or entity type for special entries)
+const FIELD_GROUPS: { label: string; cluster: string | null; entityType?: string }[] = [
   { label: "All", cluster: null },
   { label: "AI Safety", cluster: "ai-safety" },
   { label: "Governance", cluster: "governance" },
@@ -19,6 +19,7 @@ const FIELD_GROUPS: { label: string; cluster: string | null }[] = [
   { label: "Community", cluster: "community" },
   { label: "Cyber", cluster: "cyber" },
   { label: "Biorisks", cluster: "biorisks" },
+  { label: "Internal", cluster: null, entityType: "internal" },
 ];
 
 // RISK CATEGORY filter
@@ -270,6 +271,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   // Compute field filter counts (against search-filtered items)
   const fieldCounts = useMemo(() => {
     return FIELD_GROUPS.map((group) => {
+      if (group.entityType) return searchFiltered.filter((item) => item.type === group.entityType).length;
       if (!group.cluster) return searchFiltered.length;
       return searchFiltered.filter((item) => item.clusters.includes(group.cluster!)).length;
     });
@@ -278,6 +280,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   // Items after search + field filter
   const fieldFiltered = useMemo(() => {
     const group = FIELD_GROUPS[activeField];
+    if (group.entityType) return searchFiltered.filter((item) => item.type === group.entityType);
     if (!group.cluster) return searchFiltered;
     return searchFiltered.filter((item) => item.clusters.includes(group.cluster!));
   }, [searchFiltered, activeField]);

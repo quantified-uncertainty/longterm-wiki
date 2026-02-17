@@ -297,7 +297,7 @@ async function resolveLargeFile(filePath, content) {
     );
 
     const result = await callAPIWithRetry({
-      model: "claude-sonnet-4-5-20250929",
+      model: "claude-sonnet-4-6",
       max_tokens: 16_000,
       system: HUNK_SYSTEM_PROMPT,
       messages: [
@@ -398,7 +398,7 @@ async function resolveFile(filePath) {
   } else {
     // Small file — send the whole thing
     const result = await callAPIWithRetry({
-      model: "claude-sonnet-4-5-20250929",
+      model: "claude-sonnet-4-6",
       max_tokens: 64_000,
       system: SYSTEM_PROMPT,
       messages: [

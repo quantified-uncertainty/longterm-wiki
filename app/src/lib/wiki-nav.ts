@@ -261,6 +261,8 @@ export function getInternalNav(): NavSection[] {
         { label: "Page Similarity", href: "/internal/similarity" },
         { label: "Interventions", href: "/internal/interventions" },
         { label: "Proposals", href: "/internal/proposals" },
+        { label: "Auto-Update Runs", href: "/internal/auto-update-runs" },
+        { label: "Auto-Update News", href: "/internal/auto-update-news" },
       ],
     },
     {

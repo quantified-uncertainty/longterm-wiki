@@ -8,6 +8,8 @@ Post-review fixes: Fixed 13 incorrect wikiPageId E-codes in interventions.yaml (
 
 **Pages:** anthropic-pledge-enforcement, ea-shareholder-diversification-anthropic, whistleblower-protections, hardware-enabled-governance, evals-governance, openai-foundation-governance, blueprint-biosecurity, securedna, ea-biosecurity-scope, worldview-intervention-mapping, intervention-portfolio
 
+**PR:** #141
+
 **Issues encountered:**
 - interventions.yaml had wikiPageId set to numeric E-codes (E174, E6, etc.) instead of entity slugs. Fixed.
 - `replace_all` on `E6` also caught `E64`, creating `ai-control4`. Caught and fixed.

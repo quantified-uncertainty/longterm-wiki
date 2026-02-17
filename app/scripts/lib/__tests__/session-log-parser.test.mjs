@@ -118,6 +118,52 @@ describe('parseSessionLogContent', () => {
     expect(result['my-page'][0].title).toBe('EOF test');
   });
 
+  it('parses PR number from #NNN format', () => {
+    const content = `## 2026-02-15 | claude/my-branch | Fix some bug
+
+**What was done:** Fixed the thing.
+
+**Pages:** page-one
+
+**PR:** #42
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    expect(result['page-one'][0].pr).toBe(42);
+  });
+
+  it('parses PR number from full GitHub URL', () => {
+    const content = `## 2026-02-15 | claude/my-branch | Fix some bug
+
+**What was done:** Fixed the thing.
+
+**Pages:** page-one
+
+**PR:** https://github.com/quantified-uncertainty/longterm-wiki/pull/99
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    expect(result['page-one'][0].pr).toBe(99);
+  });
+
+  it('omits pr field when no PR is specified', () => {
+    const content = `## 2026-02-15 | claude/my-branch | Fix some bug
+
+**What was done:** Fixed the thing.
+
+**Pages:** page-one
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    expect(result['page-one'][0].pr).toBeUndefined();
+  });
+
   it('accumulates multiple entries for the same page', () => {
     const content = `## 2026-02-14 | claude/a | First edit
 

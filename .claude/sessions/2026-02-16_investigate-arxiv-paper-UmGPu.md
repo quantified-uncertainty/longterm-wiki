@@ -4,6 +4,8 @@
 
 **Pages:** international-summits, yoshua-bengio, stuart-russell, max-tegmark, singapore-consensus
 
+**PR:** #157
+
 **Issues encountered:**
 - Crux content create pipeline failed due to better-sqlite3 native binding not being built (pnpm install --ignore-scripts was needed due to puppeteer failure). Rebuilt the binding manually.
 - Crux pipeline's Perplexity research phase failed with network errors ("fetch failed"), so the page was written manually following the fallback procedure in CLAUDE.md.

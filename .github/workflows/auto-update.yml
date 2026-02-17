@@ -1,0 +1,202 @@
+name: Auto-Update Wiki
+
+# News-driven automatic wiki update system.
+# Fetches news from configured sources, routes relevant items to pages,
+# and creates PRs with improvements.
+#
+# Runs daily at 06:00 UTC by default, or manually via workflow_dispatch.
+# Budget and page limits are configurable per-run.
+
+on:
+  schedule:
+    # Daily at 06:00 UTC (adjust as needed)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      budget:
+        description: 'Max budget in dollars'
+        required: false
+        default: '30'
+        type: string
+      count:
+        description: 'Max pages to update'
+        required: false
+        default: '5'
+        type: string
+      dry_run:
+        description: 'Dry run (no page improvements)'
+        required: false
+        default: false
+        type: boolean
+      sources:
+        description: 'Comma-separated source IDs (empty = all)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Only one auto-update run at a time
+concurrency:
+  group: auto-update
+  cancel-in-progress: false
+
+jobs:
+  auto-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          # Use a token that can create PRs
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data layer
+        run: cd app && node --import tsx/esm scripts/build-data.mjs
+
+      - name: Create auto-update branch
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="auto-update/${DATE}"
+          git checkout -b "$BRANCH"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "DATE=$DATE" >> $GITHUB_ENV
+
+      - name: Run auto-update pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          SCRY_API_KEY: ${{ secrets.SCRY_API_KEY }}
+          FIRECRAWL_KEY: ${{ secrets.FIRECRAWL_KEY }}
+        run: |
+          ARGS="--trigger=scheduled --verbose"
+
+          # Use workflow_dispatch inputs or defaults
+          BUDGET="${{ inputs.budget || '30' }}"
+          COUNT="${{ inputs.count || '5' }}"
+          ARGS="$ARGS --budget=$BUDGET --count=$COUNT"
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          if [ -n "${{ inputs.sources }}" ]; then
+            ARGS="$ARGS --sources=${{ inputs.sources }}"
+          fi
+
+          echo "Running: pnpm crux auto-update run $ARGS"
+          pnpm crux auto-update run $ARGS
+
+      - name: Run validation
+        if: success()
+        run: |
+          pnpm crux fix escaping
+          pnpm crux fix markdown
+          pnpm crux validate gate --fix || echo "::warning::Validation issues found"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+          fi
+
+      - name: Find run report
+        id: report
+        if: always()
+        run: |
+          # Run reports use timestamp filenames (e.g., 2026-02-17T06-00-00.yaml)
+          REPORT=$(ls -t data/auto-update/runs/${DATE}*.yaml 2>/dev/null | head -1)
+          if [ -n "$REPORT" ]; then
+            echo "path=$REPORT" >> $GITHUB_OUTPUT
+            echo "Found report: $REPORT"
+          else
+            echo "path=" >> $GITHUB_OUTPUT
+            echo "No report found"
+          fi
+
+      - name: Commit and push
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "auto-update: ${DATE} daily wiki refresh
+
+          Automated news-driven wiki update.
+          Run report: ${{ steps.report.outputs.path }}"
+          git push -u origin "$BRANCH"
+
+      - name: Create or update PR
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if PR already exists for this branch
+          EXISTING_PR=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR #$EXISTING_PR already exists, changes pushed to branch"
+          else
+            REPORT="${{ steps.report.outputs.path }}"
+            PAGES_UPDATED=0
+            BUDGET_SPENT=0
+            if [ -n "$REPORT" ] && [ -f "$REPORT" ]; then
+              PAGES_UPDATED=$(grep 'pagesUpdated' "$REPORT" | head -1 | awk '{print $2}')
+              BUDGET_SPENT=$(grep 'spent' "$REPORT" | head -1 | awk '{print $2}')
+            fi
+
+            gh pr create \
+              --title "Auto-update: ${DATE} daily wiki refresh" \
+              --body "## Auto-Update Run — ${DATE}
+
+          Automated news-driven wiki update.
+
+          - **Pages updated:** ${PAGES_UPDATED:-0}
+          - **Budget spent:** \$${BUDGET_SPENT:-0}
+
+          ### Run Report
+          See \`${REPORT:-data/auto-update/runs/}\` for full details.
+
+          ### Review Checklist
+          - [ ] Spot-check updated pages for accuracy
+          - [ ] Verify no hallucinated content was added
+          - [ ] Check that EntityLinks resolve correctly
+          - [ ] Confirm validation passes
+
+          ---
+          *This PR was created automatically by the auto-update workflow.*" \
+              --label "auto-update" || echo "PR creation failed (label may not exist)"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          REPORT="${{ steps.report.outputs.path }}"
+          if [ -n "$REPORT" ] && [ -f "$REPORT" ]; then
+            echo "## Auto-Update Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```yaml' >> $GITHUB_STEP_SUMMARY
+            head -30 "$REPORT" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No run report generated" >> $GITHUB_STEP_SUMMARY
+          fi

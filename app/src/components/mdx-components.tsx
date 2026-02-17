@@ -20,6 +20,7 @@ import { TransitionModelInteractive } from "@/components/wiki/TransitionModelTab
 import { FactorSubItemsList, AllFactorsSubItems } from "@/components/wiki/FactorSubItemsList";
 import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
+import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -137,6 +138,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Cause-Effect Graph components
   CauseEffectGraph,
   PageCauseEffectGraph,
+
+  // Overview banner
+  OverviewBanner,
 
   // Table view components
   SafetyApproachesTableView,
