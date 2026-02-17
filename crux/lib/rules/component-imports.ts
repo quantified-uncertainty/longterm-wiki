@@ -10,6 +10,7 @@
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
+import { COMPONENT_USAGE_RE, WIKI_IMPORT_RE } from '../patterns.ts';
 
 // Components from @components/wiki that are commonly used.
 // Must match actual exports from app/src/components/wiki/index.ts
@@ -28,12 +29,6 @@ const WIKI_COMPONENTS = [
   'F',
   'SquiggleEstimate',
 ];
-
-// Pattern to find JSX component usage: <ComponentName or <ComponentName>
-const COMPONENT_USAGE_PATTERN = /<([A-Z][a-zA-Z0-9]*)/g;
-
-// Pattern to find imports from @components/wiki
-const WIKI_IMPORT_PATTERN = /import\s*\{([^}]+)\}\s*from\s*['"]@components\/wiki['"]/;
 
 // Pattern to find any import that includes a component name
 const ANY_IMPORT_PATTERN = (component: string) => new RegExp(`import.*\\b${component}\\b.*from`);
@@ -54,7 +49,7 @@ export const componentImportsRule = createRule({
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       let match: RegExpExecArray | null;
-      const regex = new RegExp(COMPONENT_USAGE_PATTERN.source, 'g');
+      const regex = new RegExp(COMPONENT_USAGE_RE.source, 'g');
 
       while ((match = regex.exec(line)) !== null) {
         const absolutePos = position + match.index;
@@ -74,7 +69,7 @@ export const componentImportsRule = createRule({
     }
 
     // Check what's imported from @components/wiki
-    const wikiImportMatch = content.raw.match(WIKI_IMPORT_PATTERN);
+    const wikiImportMatch = content.raw.match(WIKI_IMPORT_RE);
     const importedComponents = new Set<string>();
 
     if (wikiImportMatch) {
@@ -156,7 +151,7 @@ export const componentImportsRule = createRule({
       // Add components to existing @components/wiki import
       const { quoteChar } = issue.fix;
       return content.replace(
-        WIKI_IMPORT_PATTERN,
+        WIKI_IMPORT_RE,
         (match: string, imports: string) => {
           const trimmedImports = imports.trim();
           const newImports = `${trimmedImports}, ${components.join(', ')}`;

@@ -16,6 +16,7 @@
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.ts';
+import { ENTITY_LINK_RE, NUMERIC_ID_RE } from '../patterns.ts';
 import { existsSync } from 'fs';
 import { join } from 'path';
 
@@ -72,7 +73,7 @@ export const entityLinkIdsRule = createRule({
     }
 
     // Match <EntityLink id="..."> patterns
-    const regex = /<EntityLink\s+[^>]*id=["']([^"']+)["'][^>]*>/g;
+    const regex = new RegExp(ENTITY_LINK_RE.source, 'g');
     let match: RegExpExecArray | null;
     let lineNum = 0;
     const lines = content.body.split('\n');
@@ -86,7 +87,7 @@ export const entityLinkIdsRule = createRule({
 
         // Resolve numeric IDs (E35 → slug) before validation
         let id = rawId;
-        if (/^E\d+$/i.test(rawId) && engine.idRegistry) {
+        if (NUMERIC_ID_RE.test(rawId) && engine.idRegistry) {
           const slug = engine.idRegistry.byNumericId[rawId.toUpperCase()];
           if (slug) {
             id = slug;

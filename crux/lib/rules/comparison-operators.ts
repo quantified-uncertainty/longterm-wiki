@@ -13,9 +13,7 @@
 import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
 import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 import { matchLinesOutsideCode, isInJsxAttribute } from '../mdx-utils.ts';
-
-// Pattern: < followed by a digit or \$ (escaped dollar sign)
-const LESS_THAN_PATTERN = /<(\d|\\?\$)/g;
+import { LESS_THAN_BEFORE_NUM_RE } from '../patterns.ts';
 
 /**
  * Check if the < is already escaped
@@ -43,7 +41,7 @@ export const comparisonOperatorsRule = createRule({
   check(content: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
 
-    matchLinesOutsideCode(content.body, LESS_THAN_PATTERN, ({ match, line, lineNum, absolutePos }: { match: RegExpExecArray; line: string; lineNum: number; absolutePos: number }) => {
+    matchLinesOutsideCode(content.body, LESS_THAN_BEFORE_NUM_RE, ({ match, line, lineNum, absolutePos }: { match: RegExpExecArray; line: string; lineNum: number; absolutePos: number }) => {
       // Skip if in safe context
       if (isInJsxAttribute(content.body, absolutePos)) return;
       if (isAlreadyEscaped(content.body, absolutePos)) return;

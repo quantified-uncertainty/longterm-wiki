@@ -1,0 +1,24 @@
+/**
+ * Phase Modules Index
+ *
+ * Re-exports all phase functions from their individual modules.
+ * This file replaces the monolithic phases.ts.
+ */
+
+export { analyzePhase } from './analyze.ts';
+export { researchPhase } from './research.ts';
+export { improvePhase } from './improve.ts';
+export { reviewPhase } from './review.ts';
+export { validatePhase } from './validate.ts';
+export { gapFillPhase } from './gap-fill.ts';
+export { triagePhase } from './triage.ts';
+
+// Also export Zod schemas and parsing utilities for external use
+export {
+  parseJsonFromLlm,
+  parseAndValidate,
+  AnalysisResultSchema,
+  ResearchResultSchema,
+  ReviewResultSchema,
+  TriageResponseSchema,
+} from './json-parsing.ts';

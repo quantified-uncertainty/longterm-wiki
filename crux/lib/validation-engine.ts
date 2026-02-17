@@ -539,4 +539,96 @@ export function createRule({ id, name, description, scope = 'file', check, fix }
   return { id, name, description, scope, check, ...(fix && { fix }) };
 }
 
+// ---------------------------------------------------------------------------
+// In-process single-file validation
+// ---------------------------------------------------------------------------
+
+/**
+ * Validate a single file against specific rules in-process.
+ *
+ * This is much faster than spawning a subprocess for each rule,
+ * since the engine loads files and registries only once.
+ *
+ * Usage:
+ *   const { issues, engine } = await validateFileInProcess(filePath, ['dollar-signs', 'comparison-operators']);
+ */
+export async function validateFileInProcess(
+  filePath: string,
+  ruleIds: string[],
+  rules: Rule[],
+  options?: EngineOptions,
+): Promise<{ issues: Issue[]; engine: ValidationEngine }> {
+  const engine = new ValidationEngine(options);
+  await engine.load();
+
+  // Register only the requested rules
+  const ruleMap = new Map(rules.map(r => [r.id, r]));
+  for (const id of ruleIds) {
+    const rule = ruleMap.get(id);
+    if (rule) engine.addRule(rule);
+  }
+
+  // Validate only the target file
+  const issues = await engine.validate({ files: [filePath] });
+  return { issues, engine };
+}
+
+/**
+ * Run all specified rules against a single file and return categorized results.
+ * Designed for use in authoring pipelines (page-improver, page-creator).
+ */
+export async function validateSingleFile(
+  filePath: string,
+  criticalRuleIds: string[],
+  qualityRuleIds: string[],
+  rules: Rule[],
+  options?: EngineOptions,
+): Promise<{
+  critical: { rule: string; count: number; issues: Issue[] }[];
+  quality: { rule: string; count: number; issues: Issue[] }[];
+  engine: ValidationEngine;
+}> {
+  const engine = new ValidationEngine(options);
+  await engine.load();
+
+  const allRuleIds = [...criticalRuleIds, ...qualityRuleIds];
+  const ruleMap = new Map(rules.map(r => [r.id, r]));
+  for (const id of allRuleIds) {
+    const rule = ruleMap.get(id);
+    if (rule) engine.addRule(rule);
+  }
+
+  const allIssues = await engine.validate({ files: [filePath] });
+
+  const criticalSet = new Set(criticalRuleIds);
+  const qualitySet = new Set(qualityRuleIds);
+
+  const criticalByRule = new Map<string, Issue[]>();
+  const qualityByRule = new Map<string, Issue[]>();
+
+  for (const issue of allIssues) {
+    if (criticalSet.has(issue.rule)) {
+      if (!criticalByRule.has(issue.rule)) criticalByRule.set(issue.rule, []);
+      criticalByRule.get(issue.rule)!.push(issue);
+    } else if (qualitySet.has(issue.rule)) {
+      if (!qualityByRule.has(issue.rule)) qualityByRule.set(issue.rule, []);
+      qualityByRule.get(issue.rule)!.push(issue);
+    }
+  }
+
+  return {
+    critical: [...criticalByRule.entries()].map(([rule, issues]) => ({
+      rule,
+      count: issues.filter(i => i.severity === 'error').length,
+      issues,
+    })),
+    quality: [...qualityByRule.entries()].map(([rule, issues]) => ({
+      rule,
+      count: issues.length,
+      issues,
+    })),
+    engine,
+  };
+}
+
 export default ValidationEngine;
