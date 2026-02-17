@@ -315,6 +315,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Stub Pages", href: href("stub-style-guide") },
         { label: "Rating System", href: href("rating-system") },
         { label: "Mermaid Diagrams", href: href("mermaid-diagrams") },
+        { label: "Canonical Facts & Calc", href: href("canonical-facts") },
         { label: "Cause-Effect Diagrams", href: href("cause-effect-diagrams") },
         { label: "Research Reports", href: href("research-reports") },
         { label: "AI Transition Model", href: href("ai-transition-model-style-guide") },

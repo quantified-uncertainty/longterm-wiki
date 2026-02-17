@@ -6,6 +6,8 @@ interface FProps {
   e: string;
   /** Fact ID within the entity (e.g., "valuation-2024") */
   f: string;
+  /** Show the asOf date inline after the value, e.g. "300,000+ (as of 2025)" */
+  showDate?: boolean;
   /** Optional display override */
   children?: React.ReactNode;
   className?: string;
@@ -17,7 +19,7 @@ interface FProps {
  * Renders a fact value from the canonical facts store with a hover tooltip
  * showing metadata (asOf, source, note, computed status).
  */
-export function F({ e, f, children, className }: FProps) {
+export function F({ e, f, showDate, children, className }: FProps) {
   const fact = getFact(e, f);
 
   if (!fact) {
@@ -34,7 +36,11 @@ export function F({ e, f, children, className }: FProps) {
     );
   }
 
-  const displayValue = children || fact.value || `[no value: ${e}.${f}]`;
+  const baseValue = children || fact.value || `[no value: ${e}.${f}]`;
+  const showDateInline = showDate && fact.asOf && !children;
+  const displayValue = showDateInline ? (
+    <>{baseValue} <span className="text-muted-foreground font-normal">(as of {fact.asOf})</span></>
+  ) : baseValue;
   const isComputed = Boolean(fact.computed);
   const hasMetadata = fact.asOf || fact.source || fact.note || isComputed;
 
@@ -66,7 +72,7 @@ export function F({ e, f, children, className }: FProps) {
         role="tooltip"
       >
         <span className="block font-semibold text-foreground mb-1">
-          {fact.value || displayValue}
+          {fact.value || baseValue}
         </span>
         {isComputed && (
           <span className="block text-blue-500 text-[10px] font-medium mb-0.5">
