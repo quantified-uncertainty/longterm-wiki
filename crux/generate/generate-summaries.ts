@@ -31,6 +31,7 @@ import { fileURLToPath } from 'url';
 import { articles, sources, summaries } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { createClient, resolveModel, sleep } from '../lib/anthropic.ts';
+import { extractText } from '../lib/llm.ts';
 
 interface SummaryResult {
   oneLiner: string;
@@ -189,11 +190,10 @@ async function generateSummary(prompt: string): Promise<SummaryResult> {
     }]
   });
 
-  const block = response.content[0];
-  if (!block || block.type !== 'text') {
+  const text = extractText(response);
+  if (!text) {
     throw new Error('Expected text content block from API response');
   }
-  const text = block.text;
   const tokensUsed = response.usage.input_tokens + response.usage.output_tokens;
 
   // Parse JSON response

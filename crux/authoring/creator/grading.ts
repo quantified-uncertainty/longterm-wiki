@@ -6,8 +6,9 @@
 
 import fs from 'fs';
 import path from 'path';
-import { createClient, parseJsonResponse } from '../../lib/anthropic.ts';
+import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import { appendEditLog } from '../../lib/edit-log.ts';
+import { extractText } from '../../lib/llm.ts';
 import type { TopicPhaseContext } from './types.ts';
 
 type GradingContext = TopicPhaseContext;
@@ -142,17 +143,16 @@ Respond with JSON:
 }`;
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+      model: MODELS.sonnet,
       max_tokens: 800,
       system: GRADING_SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userPrompt }]
     });
 
-    const block = response.content[0];
-    if (!block || block.type !== 'text') {
+    const text = extractText(response);
+    if (!text) {
       return { success: false, error: 'Expected text response from API' };
     }
-    const text = block.text;
     const grades = parseJsonResponse(text) as GradingResult | null;
 
     if (!grades || !grades.readerImportance) {

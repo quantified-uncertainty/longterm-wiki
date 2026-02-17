@@ -12,6 +12,7 @@ import { join, dirname } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { isInCodeBlock } from '../mdx-utils.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, PROJECT_ROOT } from '../content-types.ts';
+import { MARKDOWN_LINK_RE } from '../patterns.ts';
 
 const APP_DIR = join(PROJECT_ROOT, 'app/src/app');
 
@@ -67,9 +68,6 @@ export const internalLinksRule = createRule({
     const issues: Issue[] = [];
     const body = content.body;
 
-    // Match markdown links: [text](path)
-    const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
-    let match: RegExpExecArray | null;
     let position = 0;
     const lines = body.split('\n');
 
@@ -83,9 +81,8 @@ export const internalLinksRule = createRule({
         continue;
       }
 
-      linkRegex.lastIndex = 0;
-      while ((match = linkRegex.exec(line)) !== null) {
-        const [fullMatch, text, href] = match;
+      for (const match of line.matchAll(MARKDOWN_LINK_RE)) {
+        const [, text, href] = match;
 
         // Skip external links, anchors, mailto, tel
         if (href.startsWith('http://') ||
