@@ -5,7 +5,7 @@ sidebar:
   order: 15
 quality: 19
 llmSummary: Biographical overview of Dan Hendrycks, CAIS director who coordinated the May 2023 AI risk statement signed by major AI researchers. Covers his technical work on benchmarks (MMLU, ETHICS), robustness research, and institution-building efforts, emphasizing his focus on catastrophic AI risk as a global priority.
-lastEdited: "2026-01-29"
+lastEdited: "2026-02-17"
 readerImportance: 87
 researchImportance: 39.5
 ratings:
@@ -24,286 +24,113 @@ import {DataInfoBox, DataExternalLinks, EntityLink} from '@components/wiki';
 
 ## Background
 
-Dan Hendrycks is the director of the <EntityLink id="cais">Center for AI Safety</EntityLink> (CAIS) and a prominent researcher focused on catastrophic and existential risks from AI. He has made significant contributions to both <EntityLink id="technical-research">technical AI safety research</EntityLink> and public awareness of AI risks.
+Dan Hendrycks is the director of the <EntityLink id="cais">Center for AI Safety</EntityLink> (CAIS) and a researcher in machine learning safety and robustness. He completed his PhD in Computer Science at UC Berkeley, where he subsequently held a postdoctoral position before founding CAIS.
 
-Background:
-- PhD in Computer Science from UC Berkeley
-- Post-doc at UC Berkeley
-- Founded Center for AI Safety
-- Research on robustness, uncertainty, and safety
+His research has focused on several areas within machine learning:
+- Robustness of neural networks to distribution shift
+- Out-of-distribution detection and uncertainty quantification
+- Development of benchmarks for evaluating language models
+- <EntityLink id="adversarial-robustness">Adversarial robustness</EntityLink> and natural adversarial examples
 
-Hendrycks combines rigorous technical research with effective communication and institution-building to advance AI safety.
+Through CAIS, Hendrycks has worked to connect technical research with policy discussions around AI risk, particularly focusing on scenarios involving catastrophic outcomes.
 
-## Major Contributions
+## Center for AI Safety
 
-### Center for AI Safety (CAIS)
+Hendrycks founded the <EntityLink id="cais">Center for AI Safety</EntityLink> as a nonprofit research organization. CAIS describes its mission as reducing societal-scale risks from artificial intelligence through research, field-building, and advocacy work.
 
-Founded CAIS as organization focused on:
-- Reducing catastrophic risks from AI
-- Technical safety research
-- Public awareness and advocacy
-- Connecting researchers and resources
+The organization's activities include:
+- Conducting technical <EntityLink id="safety-research">safety research</EntityLink> on topics such as robustness and evaluation methods
+- Educational programs, including the ML Safety course curriculum
+- Policy-oriented work on <EntityLink id="compute-governance">compute governance</EntityLink> and hardware-level interventions
+- Coordination efforts within the AI safety research community
 
-**Impact:** CAIS has become major hub for AI safety work, coordinating research and advocacy.
+CAIS has served as an institutional platform for Hendrycks' work connecting technical researchers with policymakers and coordinating public statements on AI risk.
 
-### Statement on AI Risk (May 2023)
+## Statement on AI Risk (May 2023)
 
-Coordinated landmark statement: "Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war."
+In May 2023, Hendrycks coordinated a public statement that read: "Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war." The statement was signed by researchers and executives from multiple AI organizations.
 
-**Signatories included:**
-- <EntityLink id="geoffrey-hinton">Geoffrey Hinton</EntityLink>
-- <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>
-- <EntityLink id="sam-altman">Sam Altman</EntityLink> (<EntityLink id="openai">OpenAI</EntityLink>)
-- <EntityLink id="demis-hassabis">Demis Hassabis</EntityLink> (DeepMind)
-- <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (<EntityLink id="anthropic">Anthropic</EntityLink>)
-- Hundreds of AI researchers
+Signatories included <EntityLink id="geoffrey-hinton">Geoffrey Hinton</EntityLink>, <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="sam-altman">Sam Altman</EntityLink> (<EntityLink id="openai">OpenAI</EntityLink>), <EntityLink id="demis-hassabis">Demis Hassabis</EntityLink> (<EntityLink id="deepmind">Google DeepMind</EntityLink>), and <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (<EntityLink id="anthropic">Anthropic</EntityLink>), along with hundreds of other AI researchers.
 
-**Impact:** Massively raised profile of AI existential risk, made it mainstream concern.
+The statement received coverage in major media outlets and was cited in subsequent policy discussions. Its brevity and high-profile signatories generated public attention to the topic of AI existential risk, though some commentators noted the statement's lack of specificity regarding which risks or interventions were being prioritized.
 
-### Technical Research
+## Technical Research Contributions
 
-Significant contributions to:
+### Benchmarks and Evaluation
 
-**AI Safety Benchmarks:**
-- ETHICS dataset - evaluating moral reasoning
-- Hendrycks Test (MMLU) - measuring knowledge
-- Safety-specific evaluation methods
-- Adversarial robustness testing
+Hendrycks has developed several benchmarks used in evaluating language models and AI systems:
 
-**Uncertainty and Robustness:**
-- Out-of-distribution detection
-- Robustness to distribution shift
-- Calibration of neural networks
-- Anomaly detection
+**MMLU (Measuring Massive Multitask Language Understanding)**: A benchmark designed to test knowledge across multiple academic and professional domains. The benchmark is used by researchers to evaluate the breadth of capabilities in large language models.
 
-**Natural Adversarial Examples:**
-- Real-world failure modes
-- Testing model robustness
-- Understanding generalization limits
+**ETHICS Dataset**: A benchmark for evaluating whether language models can perform tasks related to moral reasoning across different ethical frameworks.
 
-## Research Philosophy
+These benchmarks have been adopted by research groups evaluating new language models, providing standardized metrics for comparing systems.
 
-### Focus on Catastrophic Risk
+### Robustness and Distribution Shift
 
-Hendrycks emphasizes:
-- Not just any AI safety issue
-- Specifically catastrophic/existential risks
-- High-stakes scenarios
-- Long-term implications
+Hendrycks' work on robustness has examined how neural networks perform when tested on data that differs from their training distribution. His research has included:
 
-### Empirical and Practical
+- Methods for detecting when inputs are out-of-distribution relative to training data
+- Studies of how models fail when encountering natural variations in data
+- Development of datasets containing "natural adversarial examples" that cause model failures without artificial perturbations
+- Analysis of calibration in neural network predictions
 
-Approach characterized by:
-- Concrete benchmarks and metrics
-- Testing on real systems
-- Measurable progress
-- Actionable results
+This work connects to broader questions in <EntityLink id="technical-research">technical AI safety research</EntityLink> about how to ensure systems behave reliably in novel situations.
 
-### Bridging Research and Policy
+## Risk Assessment and Strategic Focus
 
-Works to:
-- Make research policy-relevant
-- Communicate findings clearly
-- Engage with policymakers
-- Translate technical work to action
+Hendrycks has publicly positioned AI risk as comparable in priority to other large-scale threats. The May 2023 statement he coordinated explicitly equated mitigating AI extinction risk with addressing pandemics and nuclear war.
 
-## Views on AI Risk
+His activities through CAIS reflect a strategic approach combining multiple intervention points:
+- Technical research aimed at improving system safety and evaluation
+- Policy engagement with government bodies and international organizations
+- Public communication to broaden awareness of AI risk concerns
+- <EntityLink id="compute-governance">Compute governance</EntityLink> work exploring hardware-level interventions
 
-### Dan Hendrycks' Risk Assessment
+Hendrycks has argued for attention to catastrophic and existential risk scenarios specifically, distinguishing these from other categories of AI-related harms. This prioritization shapes CAIS's research agenda and advocacy focus.
 
-Dan Hendrycks has been explicit and consistent about the severity of catastrophic risks from AI, positioning them alongside society's most pressing existential threats. His actions—founding CAIS, coordinating the May 2023 AI risk statement signed by major AI researchers, and maintaining an active research program—demonstrate his belief that technical solutions are both necessary and achievable, though time is of the essence.
+## CAIS Programs and Activities
 
-| Expert/Source | Estimate | Reasoning |
-|---------------|----------|-----------|
-| Catastrophic risk priority | On par with pandemics and nuclear war | Hendrycks coordinated the May 2023 Statement on AI Risk which explicitly positioned extinction risk from AI as a global priority alongside pandemics and nuclear war. This framing was deliberate and endorsed by hundreds of leading AI researchers including Geoffrey Hinton, Yoshua Bengio, and the CEOs of major AI labs. The parallel to other existential risks signals that AI risk deserves similar institutional resources, research funding, and policy attention as these established threats. |
-| Need for action | Urgent | Hendrycks founded the Center for AI Safety and coordinated the landmark 2023 statement specifically to accelerate action on catastrophic AI risks. His decision to focus CAIS explicitly on catastrophic and existential risks—rather than broader AI safety concerns—reflects his assessment that these high-stakes scenarios require immediate attention. The timing and prominence of the statement suggest he believes we are in a critical window where preventive measures can still be effective. |
-| Technical tractability | Research can reduce risk | CAIS maintains an active research program spanning technical safety research, compute governance, and ML safety education. This investment indicates Hendrycks' belief that concrete technical work—developing robustness measures, creating safety benchmarks, and training the next generation of safety researchers—can meaningfully reduce catastrophic risks. His focus on empirical methods and measurable progress suggests optimism that systematic research can address key problems before advanced AI systems are deployed. |
+### Research
 
-### Core Concerns
+CAIS conducts and supports research in several areas:
 
-1. **Catastrophic risks are real**: AI poses existential-level threats
-2. **Need technical and governance solutions**: Both required
-3. **Current systems already show concerning behaviors**: Problems visible now
-4. **Rapid capability growth**: Moving faster than safety work
-5. **Coordination challenges**: Individual labs can't solve alone
+**Technical Safety**: Work on robustness, alignment techniques, and evaluation methodologies for AI systems. Research includes both empirical studies of current systems and development of new safety methods.
 
-### Strategic Approach
+**<EntityLink id="compute-governance">Compute Governance</EntityLink>**: Investigation of interventions based on the hardware supply chain for AI systems, including tracking of compute resources and potential <EntityLink id="international-coordination">international coordination</EntityLink> mechanisms.
 
-**Multi-pronged:**
-- Technical research on safety
-- Public awareness and advocacy
-- Policy engagement
-- Field building and coordination
+**ML Safety Education**: Development of curriculum materials for teaching machine learning safety concepts, aimed at integrating safety considerations into academic computer science programs.
 
-**Pragmatic:**
-- Work with systems as they are
-- Focus on measurable improvements
-- Build coalitions
-- Incremental progress
+### Advocacy and Field-Building
 
-## CAIS Work
+CAIS has organized workshops, maintained networks of researchers working on safety-related topics, and engaged with policymakers. The organization has provided testimony and technical input to legislative bodies considering AI regulation, including the U.S. Congress and bodies involved in developing the <EntityLink id="eu-ai-act">EU AI Act</EntityLink>.
 
-### Research Programs
+Hendrycks has given public presentations and media interviews explaining AI risk concerns to non-technical audiences, contributing to broader public discourse on AI policy.
 
-**Technical Safety:**
-- Robustness research
-- Evaluation methods
-- Alignment techniques
-- Empirical studies
+## Selected Publications
 
-**Compute Governance:**
-- Hardware-level safety measures
-- Compute tracking and allocation
-- <EntityLink id="international-coordination">International coordination</EntityLink>
-- Supply chain interventions
+Hendrycks' research has been published in machine learning conferences and journals. Notable papers include:
 
-**ML Safety Course:**
-- Educational curriculum
-- Training next generation
-- Making safety knowledge accessible
-- Academic integration
+- Work on out-of-distribution detection methods
+- The MMLU benchmark paper on measuring multitask language understanding
+- Research on natural adversarial examples showing real-world failure modes
+- Papers on calibration and uncertainty in neural networks
+- The ETHICS dataset for evaluating moral reasoning in language models
 
-### Advocacy and Communication
+His publication record spans technical machine learning research and safety-focused evaluation work, with papers appearing in venues such as NeurIPS, ICML, and ICLR.
 
-**Statement on AI Risk:**
-- Coordinated broad consensus
-- Brought issue to mainstream
-- Influenced policy discussions
-- Demonstrated unity in field
+## Evolution of Research Focus
 
-**Public Communication:**
-- Media appearances
-- Op-eds and articles
-- Talks and presentations
-- Social media engagement
+Hendrycks' early research concentrated on standard machine learning problems in robustness and uncertainty quantification. Over time, his work has increasingly emphasized connections between technical research and potential catastrophic risks from AI systems.
 
-### Field Building
+The founding of CAIS marked a shift toward more explicit focus on risk reduction as an organizing principle for research priorities. His current work combines continued technical research with institutional efforts to coordinate the AI safety research community and influence policy discussions.
 
-**Connecting Researchers:**
-- Workshops and conferences
-- Research collaborations
-- Funding opportunities
-- Community building
+## Perspectives and Debates
 
-## Key Publications
+Hendrycks' approach to AI safety emphasizes catastrophic and existential risk scenarios as a top priority. This focus has been part of broader debates within the AI research community about how to allocate attention and resources across different categories of AI-related concerns.
 
-### Safety Benchmarks
+Some researchers and commentators have argued that emphasis on long-term or extinction-level risks may divert attention from more immediate harms related to bias, fairness, and misuse of current AI systems. Others have questioned whether the framing of extinction risk is well-supported by available evidence or have noted tensions between different perspectives on AI safety that were unified under the brief May 2023 statement.
 
-- **"ETHICS: Measuring Ethical Reasoning in Language Models"** - Evaluating moral reasoning
-- **"Measuring Massive Multitask Language Understanding" (MMLU)** - Comprehensive knowledge benchmark
-- **"Natural Adversarial Examples"** - Real-world robustness testing
+Hendrycks has maintained that catastrophic risks warrant prioritization while not dismissing other AI safety concerns. The design of CAIS programs reflects this prioritization, with research and advocacy efforts concentrated on scenarios involving large-scale harm.
 
-### Technical Safety
-
-- **"Unsolved Problems in ML Safety"** - Research agenda
-- **"Out-of-Distribution Detection"** - Methods for identifying distribution shift
-- **"Robustness research"** - Multiple papers on making models more robust
-
-### Position Papers
-
-- **"X-Risk Analysis for AI Research"** - Framework for thinking about catastrophic risks
-- **Contributions to policy discussions** - Technical input for governance
-
-## Public Impact
-
-### Raising Awareness
-
-The Statement on AI Risk:
-- Reached global media
-- Influenced policy discussions
-- Made x-risk mainstream
-- Built consensus among experts
-
-### Policy Influence
-
-Hendrycks' work has influenced:
-- Congressional testimony and hearings
-- <EntityLink id="eu-ai-act">EU AI Act</EntityLink> discussions
-- International coordination efforts
-- Industry standards
-
-### Academic Integration
-
-CAIS has helped:
-- Make safety research academically respectable
-- Create curricula and courses
-- Train students in safety
-- Publish in top venues
-
-## Unique Contributions
-
-### Consensus Building
-
-Exceptional at:
-- Bringing together diverse groups
-- Finding common ground
-- Building coalitions
-- Coordinating action
-
-### Communication
-
-Skilled at:
-- Explaining technical concepts clearly
-- Reaching different audiences
-- Media engagement
-- Policy translation
-
-### Pragmatic Approach
-
-Focuses on:
-- What can actually be done
-- Working with current systems
-- Measurable progress
-- Building bridges
-
-## Current Priorities at CAIS
-
-1. **Technical safety research**: Advancing robustness and alignment
-2. **Compute governance**: Hardware-level interventions
-3. **Public awareness**: Maintaining pressure on the issue
-4. **Policy engagement**: Influencing regulation and governance
-5. **Field building**: Growing the safety research community
-
-## Evolution of Focus
-
-**Early research:**
-- Robustness and uncertainty
-- Benchmarks and evaluation
-- Academic ML research
-
-**Growing safety focus:**
-- Increasingly concerned about risks
-- Founded CAIS
-- More explicit about catastrophic risks
-
-**Current:**
-- Explicitly focused on x-risk
-- Leading advocacy efforts
-- Building coalitions
-- Policy engagement
-
-## Criticism and Challenges
-
-**Some argue:**
-- Focus on catastrophic risk might neglect near-term harms
-- Statement was too brief/vague
-- Consensus might paper over important disagreements
-
-**Supporters argue:**
-- X-risk deserves special focus
-- Brief statement was strategically effective
-- Consensus demonstrates seriousness of concern
-
-**Hendrycks' approach:**
-- X-risk is priority but not only concern
-- Brief statement was feature, not bug
-- Diversity of views compatible with shared concern
-
-## Vision for the Field
-
-Hendrycks envisions:
-- AI safety as central to AI development
-- Strong safety standards and regulations
-- International coordination on AI
-- Technical solutions to catastrophic risks
-- Safety research well-funded and respected
+The field of AI safety research contains diverse perspectives on which problems are most important, what methods are most promising, and how technical research should relate to policy and governance questions. Hendrycks' work represents one approach within this broader landscape, characterized by focus on measurable technical progress, public communication, and building consensus around specific risk framings.
