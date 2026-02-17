@@ -2,3 +2,12 @@
   tool: crux-fix
   agency: automated
   note: Auto-fixed validation issues (escaping, markdown, etc.)
+- date: 2026-02-17
+  tool: crux-fix
+  agency: automated
+  note: Auto-fixed validation issues (escaping, markdown, etc.)
+- date: 2026-02-17
+  tool: crux-improve
+  agency: ai-directed
+  requestedBy: system
+  note: "Improved (polish): Wrap hardcoded numeric values with <F> tags wherever a matching fact exists in the fact lookup table. Use <Calc> for der"
