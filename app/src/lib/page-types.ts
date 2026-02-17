@@ -114,6 +114,14 @@ export const PAGE_TYPE_INFO: Record<PageType, PageTypeInfo> = {
   },
 };
 
+/** Determine if a page should use full-width layout based on format and frontmatter. */
+export function isFullWidth(
+  contentFormat: ContentFormat,
+  frontmatter: Record<string, unknown>
+): boolean {
+  return frontmatter.fullWidth === true || CONTENT_FORMAT_INFO[contentFormat].fullWidth;
+}
+
 export function detectPageType(
   pathname: string,
   frontmatterType?: string

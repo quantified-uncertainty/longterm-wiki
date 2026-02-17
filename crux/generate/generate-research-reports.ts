@@ -77,7 +77,7 @@ function getEntitiesWithReports(): Set<string> {
 
   if (!fs.existsSync(reportsDir)) return entityIds;
 
-  const files = fs.readdirSync(reportsDir).filter(f => f.endsWith('.mdx') && f !== 'index.mdx');
+  const files = fs.readdirSync(reportsDir).filter(f => (f.endsWith('.mdx') || f.endsWith('.md')) && f !== 'index.mdx' && f !== 'index.md');
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(reportsDir, file), 'utf-8');

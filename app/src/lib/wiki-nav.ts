@@ -14,6 +14,11 @@ import type { NavSection } from "./internal-nav";
 // Re-export NavSection so consumers can import from one place
 export type { NavSection } from "./internal-nav";
 
+/** Check if a filePath is an index file (should be excluded from sidebar nav). */
+function isIndexFile(filePath: string): boolean {
+  return filePath.endsWith("index.mdx") || filePath.endsWith("index.md");
+}
+
 // ============================================================================
 // MODEL CATEGORY LABELS
 // ============================================================================
@@ -61,7 +66,7 @@ export function getModelsNav(): NavSection[] {
     (p) =>
       p.filePath &&
       p.filePath.startsWith("knowledge-base/models/") &&
-      !p.filePath.endsWith("index.mdx")
+      !isIndexFile(p.filePath)
   );
 
   // Group by subcategory (set during content flattening)
@@ -104,7 +109,7 @@ export function getMetricsNav(): NavSection[] {
     (p) =>
       p.filePath &&
       p.filePath.startsWith("knowledge-base/metrics/") &&
-      !p.filePath.endsWith("index.mdx")
+      !isIndexFile(p.filePath)
   );
 
   const items = pages
@@ -168,7 +173,7 @@ export function getAtmNav(): NavSection[] {
     (p) =>
       p.filePath &&
       p.filePath.startsWith("ai-transition-model/") &&
-      !p.filePath.endsWith("index.mdx")
+      !isIndexFile(p.filePath)
   );
 
   // Top-level items (overview, parameter table)
