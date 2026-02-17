@@ -216,6 +216,7 @@ const mockDatabase = {
       lastUpdated: "2025-02-01",
       category: "internal",
       wordCount: 500,
+      updateFrequency: 90,
     },
   ],
   facts: {
@@ -445,6 +446,15 @@ describe("Data Layer", () => {
       // No items should have type "internal"
       const internalItems = items.filter((i) => i.type === "internal");
       expect(internalItems).toHaveLength(0);
+    });
+  });
+
+  describe("getUpdateSchedule", () => {
+    it("excludes internal pages from update schedule", async () => {
+      const { getUpdateSchedule } = await import("../../data/index");
+      const items = getUpdateSchedule();
+      const internalItem = items.find((i) => i.id === "internal-doc");
+      expect(internalItem).toBeUndefined();
     });
   });
 

@@ -1,5 +1,5 @@
 ---
-numericId: E725
+numericId: E726
 title: "Common Writing Principles"
 description: "Cross-cutting writing standards that apply to all content types. Covers epistemic honesty, language neutrality, and analytical tone."
 entityType: internal

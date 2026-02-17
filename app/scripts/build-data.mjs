@@ -669,12 +669,34 @@ function main() {
     process.exit(1);
   }
 
-  // Compute next available ID from existing assignments
+  // Compute next available ID from existing assignments.
+  // Also scan page-level numericIds (from MDX frontmatter) so auto-assigned
+  // entity IDs don't collide with IDs that pages already claim.
   let nextId = 1;
   for (const numId of Object.keys(numericIdToSlug)) {
     const n = parseInt(numId.slice(1));
     if (n >= nextId) nextId = n + 1;
   }
+  // Quick scan: collect numericIds already declared in MDX frontmatter across
+  // all content directories. This prevents auto-assigned entity IDs from
+  // colliding with page-level IDs that haven't been registered as entities yet.
+  const CONTENT_DIR_ROOT = join(PROJECT_ROOT, '..', 'content', 'docs');
+  function scanFrontmatterNumericIds(dir) {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        scanFrontmatterNumericIds(join(dir, entry.name));
+      } else if (entry.name.endsWith('.mdx') || entry.name.endsWith('.md')) {
+        const content = readFileSync(join(dir, entry.name), 'utf-8');
+        const match = content.match(/^numericId:\s*(E\d+)/m);
+        if (match) {
+          const n = parseInt(match[1].slice(1));
+          if (n >= nextId) nextId = n + 1;
+        }
+      }
+    }
+  }
+  scanFrontmatterNumericIds(CONTENT_DIR_ROOT);
 
   // Assign IDs to entities that don't have one yet, writing back to source
   let newAssignments = 0;

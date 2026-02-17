@@ -492,6 +492,7 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
   for (const page of pages) {
     if (!page.updateFrequency) continue;
     if (page.evergreen === false) continue;
+    if (page.category === "internal") continue;
 
     const lastUpdated = page.lastUpdated;
     const daysSince = lastUpdated
