@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { formatAge } from "@lib/format";
+import { GITHUB_REPO_URL } from "@lib/site-config";
 import type { PageChangeItem } from "@/data";
 
 const columns: ColumnDef<PageChangeItem>[] = [
@@ -75,7 +76,7 @@ const columns: ColumnDef<PageChangeItem>[] = [
         </code>
         {row.original.pr && (
           <a
-            href={`https://github.com/quantified-uncertainty/longterm-wiki/pull/${row.original.pr}`}
+            href={`${GITHUB_REPO_URL}/pull/${row.original.pr}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-[11px] text-sky-500 hover:text-sky-600 no-underline font-medium"

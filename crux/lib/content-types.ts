@@ -136,6 +136,7 @@ export interface PageEntry {
     branch: string;
     title: string;
     summary: string;
+    pr?: number;
   }>;
   wordCount?: number;
   unconvertedLinks?: Array<{ url: string; text: string; line: number }>;

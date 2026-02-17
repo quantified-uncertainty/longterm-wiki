@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@lib/utils";
 import { formatAge, formatFrequency } from "@lib/format";
+import { GITHUB_REPO_URL } from "@lib/site-config";
 import {
   detectPageType,
   PAGE_TYPE_INFO,
@@ -748,8 +749,6 @@ function IssuesSection({
 // CHANGE HISTORY SECTION
 // ============================================================================
 
-const REPO_URL = "https://github.com/quantified-uncertainty/longterm-wiki";
-
 function ChangeHistorySection({
   changeHistory,
 }: {
@@ -778,7 +777,7 @@ function ChangeHistorySection({
               </span>
               {entry.pr && (
                 <a
-                  href={`${REPO_URL}/pull/${entry.pr}`}
+                  href={`${GITHUB_REPO_URL}/pull/${entry.pr}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 text-sky-500 hover:text-sky-600 no-underline"
