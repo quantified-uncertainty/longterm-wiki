@@ -28,7 +28,7 @@ config({ path: '.env.local' });
  * validate-models.ts warns if this is more than 60 days old.
  * Update this date after confirming models are still the latest versions.
  */
-export const MODELS_LAST_VERIFIED = '2026-02-12';
+export const MODELS_LAST_VERIFIED = '2026-02-17';
 
 /**
  * Available Claude models with standardized names
@@ -37,7 +37,7 @@ export const MODELS: Record<string, string> = {
   // Fast and cheap - good for high-volume tasks
   haiku: 'claude-haiku-4-5-20251001',
   // Balanced - good for most tasks
-  sonnet: 'claude-sonnet-4-5-20250929',
+  sonnet: 'claude-sonnet-4-6',
   // Most capable - for complex tasks
   opus: 'claude-opus-4-6',
 };
@@ -54,6 +54,7 @@ const MODEL_ALIASES: Record<string, string> = {
   'claude-3-5-haiku-20241022': MODELS.haiku,
   'claude-sonnet-4-20250514': MODELS.sonnet,
   'claude-sonnet-4-5-20250929': MODELS.sonnet,
+  'claude-sonnet-4-6': MODELS.sonnet,
   'claude-opus-4-20250514': MODELS.opus,
   'claude-opus-4-5-20251101': MODELS.opus,
   'claude-opus-4-6': MODELS.opus,
