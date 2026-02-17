@@ -13,6 +13,7 @@
 
 import { execSync } from 'child_process';
 import { getColors } from '../lib/output.ts';
+import { REPO } from '../lib/github.ts';
 
 const args: string[] = process.argv.slice(2);
 const WAIT_MODE: boolean = args.includes('--wait');
@@ -20,8 +21,6 @@ const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const SHA_ARG = args.find((a) => a.startsWith('--sha='))?.split('=')[1];
 const POLL_INTERVAL = 30_000; // 30 seconds
 const MAX_POLLS = 40; // 20 minutes max
-
-const REPO = 'quantified-uncertainty/longterm-wiki';
 
 const c = getColors(CI_MODE);
 

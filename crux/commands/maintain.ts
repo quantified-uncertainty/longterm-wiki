@@ -17,6 +17,7 @@ import { join } from 'path';
 import { execSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { githubApi, REPO } from '../lib/github.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
@@ -41,7 +42,7 @@ interface SessionLogEntry {
   learnings: string[];
 }
 
-interface OpenIssue {
+interface GitHubIssue {
   number: number;
   title: string;
   labels: string[];
@@ -51,11 +52,13 @@ interface OpenIssue {
 }
 
 interface CruftItem {
-  type: 'orphan-file' | 'todo' | 'large-file' | 'commented-code';
+  type: 'todo' | 'large-file' | 'commented-code';
   path: string;
   line?: number;
   detail: string;
 }
+
+type TriageCategory = 'potentially-resolved' | 'stale' | 'actionable' | 'keep';
 
 interface CommandOptions {
   ci?: boolean;
@@ -66,45 +69,38 @@ interface CommandOptions {
 }
 
 // ---------------------------------------------------------------------------
+// GitHub API response interfaces (type-safe parsing)
+// ---------------------------------------------------------------------------
+
+interface GitHubPullResponse {
+  number: number;
+  title: string;
+  merged_at: string | null;
+  head: { ref: string };
+  user: { login: string } | null;
+}
+
+interface GitHubIssueResponse {
+  number: number;
+  title: string;
+  labels: Array<{ name: string }>;
+  created_at: string;
+  updated_at: string;
+  body: string | null;
+  pull_request?: unknown;
+}
+
+// ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const LAST_RUN_FILE = join(PROJECT_ROOT, '.claude/maintain-last-run.txt');
 const SESSIONS_DIR = join(PROJECT_ROOT, '.claude/sessions');
-const REPO = 'quantified-uncertainty/longterm-wiki';
+const DATE_FORMAT = /^\d{4}-\d{2}-\d{2}$/;
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function getGitHubToken(): string {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) {
-    throw new Error('GITHUB_TOKEN not set. Required for GitHub API calls.');
-  }
-  return token;
-}
-
-function githubApi(endpoint: string, method = 'GET', body?: object): unknown {
-  const token = getGitHubToken();
-  const url = `https://api.github.com${endpoint}`;
-  const args = [
-    '-s', '-X', method,
-    '-H', `Authorization: token ${token}`,
-    '-H', 'Accept: application/vnd.github+json',
-  ];
-  if (body) {
-    args.push('-d', JSON.stringify(body));
-  }
-  args.push(url);
-
-  const result = execSync(`curl ${args.map(a => `'${a.replace(/'/g, "'\\''")}'`).join(' ')}`, {
-    encoding: 'utf-8',
-    timeout: 30_000,
-    maxBuffer: 10 * 1024 * 1024,
-  });
-  return JSON.parse(result);
-}
 
 function getLastRunDate(): string {
   if (existsSync(LAST_RUN_FILE)) {
@@ -116,15 +112,57 @@ function getLastRunDate(): string {
   return d.toISOString().slice(0, 10);
 }
 
-function daysBetween(dateStr: string): number {
+function parseSinceOption(options: CommandOptions): string {
+  const since = (options.since as string) || getLastRunDate();
+  if (!DATE_FORMAT.test(since)) {
+    throw new Error(`Invalid --since date format: "${since}". Expected YYYY-MM-DD.`);
+  }
+  return since;
+}
+
+function daysSince(dateStr: string): number {
   const now = new Date();
   const then = new Date(dateStr);
   return Math.floor((now.getTime() - then.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Tokenize a string into lowercase words for fuzzy matching.
+ * More robust than substring slicing — avoids false positives from short prefixes.
+ */
+function tokenize(text: string): Set<string> {
+  return new Set(
+    text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(w => w.length > 2)
+  );
+}
+
+/**
+ * Check if an issue title is likely referenced by PR/session text.
+ * Uses word-overlap ratio rather than naive substring matching.
+ * Requires >60% of the issue's significant words to appear in the text.
+ */
+function isLikelyReferenced(issueTitle: string, searchText: string): boolean {
+  const issueWords = tokenize(issueTitle);
+  if (issueWords.size < 2) return false; // Too short to match reliably
+  const searchWords = tokenize(searchText);
+  let matches = 0;
+  for (const word of issueWords) {
+    if (searchWords.has(word)) matches++;
+  }
+  return matches / issueWords.size > 0.6;
+}
+
 // ---------------------------------------------------------------------------
-// Session log parser (lightweight, for maintenance use)
+// Session log parser
+//
+// Note: The canonical parser is in app/scripts/lib/session-log-parser.mjs.
+// This version extracts additional fields (issues, learnings) needed for
+// maintenance analysis. Keep section terminators aligned with the canonical
+// parser (includes \n--- as a terminator).
 // ---------------------------------------------------------------------------
+
+/** Terminator pattern shared with canonical parser — matches \n\n, \n**, or \n--- */
+const SECTION_END = /(?:\n\n|\n\*\*|\n---)/;
 
 function parseSessionLog(content: string): SessionLogEntry | null {
   const headerMatch = content.match(/^## (\d{4}-\d{2}-\d{2}) \| ([^\|]+?) \| (.+)/m);
@@ -132,27 +170,27 @@ function parseSessionLog(content: string): SessionLogEntry | null {
 
   const [, date, branch, title] = headerMatch;
 
-  // Extract "What was done"
-  const whatMatch = content.match(/\*\*What was done:\*\*\s*(.+?)(?:\n\n|\n\*\*)/s);
+  // Extract "What was done" — aligned with canonical parser terminators
+  const whatMatch = content.match(new RegExp(`\\*\\*What was done:\\*\\*\\s*(.+?)${SECTION_END.source}`, 's'));
   const whatWasDone = whatMatch ? whatMatch[1].trim() : '';
 
-  // Extract "Pages"
-  const pagesMatch = content.match(/\*\*Pages:\*\*\s*(.+?)(?:\n\n|\n\*\*)/s);
+  // Extract "Pages" — aligned with canonical parser terminators
+  const pagesMatch = content.match(new RegExp(`\\*\\*Pages:\\*\\*\\s*(.+?)${SECTION_END.source}`, 's'));
   const pages = pagesMatch
     ? pagesMatch[1].split(',').map(p => p.trim()).filter(p => /^[a-z0-9][a-z0-9-]*$/.test(p))
     : [];
 
   // Extract "Issues encountered"
-  const issuesMatch = content.match(/\*\*Issues encountered:\*\*\s*([\s\S]+?)(?:\n\*\*|\n##|$)/);
+  const issuesMatch = content.match(/\*\*Issues encountered:\*\*\s*([\s\S]+?)(?:\n\*\*|\n##|\n---|$)/);
   const issuesRaw = issuesMatch ? issuesMatch[1].trim() : '';
-  const issues = issuesRaw === 'None' || issuesRaw === '- None'
+  const issues = (!issuesRaw || issuesRaw === 'None' || issuesRaw === '- None')
     ? []
     : issuesRaw.split('\n').map(l => l.replace(/^-\s*/, '').trim()).filter(Boolean);
 
   // Extract "Learnings/notes"
-  const learningsMatch = content.match(/\*\*Learnings\/notes:\*\*\s*([\s\S]+?)(?:\n##|$)/);
+  const learningsMatch = content.match(/\*\*Learnings\/notes:\*\*\s*([\s\S]+?)(?:\n##|\n---|$)/);
   const learningsRaw = learningsMatch ? learningsMatch[1].trim() : '';
-  const learnings = learningsRaw === 'None' || learningsRaw === '- None'
+  const learnings = (!learningsRaw || learningsRaw === 'None' || learningsRaw === '- None')
     ? []
     : learningsRaw.split('\n').map(l => l.replace(/^-\s*/, '').trim()).filter(Boolean);
 
@@ -166,10 +204,8 @@ function loadSessionLogsSince(since: string): SessionLogEntry[] {
   const entries: SessionLogEntry[] = [];
 
   for (const file of files) {
-    // Extract date from filename (YYYY-MM-DD_suffix.md)
     const dateMatch = file.match(/^(\d{4}-\d{2}-\d{2})/);
-    if (!dateMatch) continue;
-    if (dateMatch[1] < since) continue;
+    if (!dateMatch || dateMatch[1] < since) continue;
 
     const content = readFileSync(join(SESSIONS_DIR, file), 'utf-8');
     const entry = parseSessionLog(content);
@@ -189,27 +225,30 @@ function loadSessionLogsSince(since: string): SessionLogEntry[] {
 async function reviewPrs(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
-  const since = options.since || getLastRunDate();
+  const since = parseSinceOption(options);
 
   let output = '';
   output += `${c.bold}${c.blue}PR & Session Log Review${c.reset}\n`;
   output += `${c.dim}Since: ${since}${c.reset}\n\n`;
 
   // Fetch merged PRs
-  const prsData = githubApi(
+  const prsData = await githubApi<GitHubPullResponse[]>(
     `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=50`
-  ) as Array<Record<string, unknown>>;
+  );
+
+  if (!Array.isArray(prsData)) {
+    return { output: `${c.red}GitHub API returned unexpected response (not an array). Check GITHUB_TOKEN.${c.reset}\n`, exitCode: 1 };
+  }
 
   const mergedPrs: MergedPR[] = [];
   for (const p of prsData) {
-    const mergedAt = p.merged_at as string | null;
-    if (mergedAt && mergedAt.slice(0, 10) >= since) {
+    if (p.merged_at && p.merged_at.slice(0, 10) >= since) {
       mergedPrs.push({
-        number: p.number as number,
-        title: p.title as string,
-        mergedAt: mergedAt.slice(0, 10),
-        branch: (p.head as Record<string, unknown>).ref as string,
-        author: ((p.user as Record<string, unknown>)?.login as string) || '?',
+        number: p.number,
+        title: p.title,
+        mergedAt: p.merged_at.slice(0, 10),
+        branch: p.head.ref,
+        author: p.user?.login || '?',
       });
     }
   }
@@ -254,7 +293,6 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
     // Find recurring issues (same text appearing in 2+ sessions)
     const issueCounts: Record<string, number> = {};
     for (const { issue } of allIssues) {
-      // Normalize for comparison
       const key = issue.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
       issueCounts[key] = (issueCounts[key] || 0) + 1;
     }
@@ -281,12 +319,12 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
   }
 
   // Pages edited by multiple sessions
-  const multiEditPages = Object.entries(pageEdits).filter(([, sessions]) => sessions.length >= 2);
+  const multiEditPages = Object.entries(pageEdits).filter(([, s]) => s.length >= 2);
   if (multiEditPages.length > 0) {
     output += `${c.bold}${c.yellow}Pages Edited by Multiple Sessions:${c.reset}\n`;
-    for (const [page, sessions] of multiEditPages) {
-      output += `  ${page}: ${sessions.length} sessions\n`;
-      for (const s of sessions) {
+    for (const [page, pageSessions] of multiEditPages) {
+      output += `  ${page}: ${pageSessions.length} sessions\n`;
+      for (const s of pageSessions) {
         output += `    ${c.dim}- ${s}${c.reset}\n`;
       }
     }
@@ -295,7 +333,13 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
 
   if (options.json || options.ci) {
     return {
-      output: JSON.stringify({ mergedPrs, sessions, allIssues, allLearnings, multiEditPages }, null, 2),
+      output: JSON.stringify({
+        mergedPrs,
+        sessions,
+        allIssues,
+        allLearnings,
+        multiEditPages: Object.fromEntries(multiEditPages),
+      }, null, 2),
       exitCode: 0,
     };
   }
@@ -309,49 +353,53 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
 async function triageIssues(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
-  const since = options.since || getLastRunDate();
+  const since = parseSinceOption(options);
 
   let output = '';
   output += `${c.bold}${c.blue}GitHub Issue Triage${c.reset}\n\n`;
 
   // Fetch open issues
-  const issuesData = githubApi(
+  const issuesData = await githubApi<GitHubIssueResponse[]>(
     `/repos/${REPO}/issues?state=open&per_page=100&sort=updated&direction=desc`
-  ) as Array<Record<string, unknown>>;
+  );
 
-  const openIssues: OpenIssue[] = [];
+  if (!Array.isArray(issuesData)) {
+    return { output: `${c.red}GitHub API returned unexpected response. Check GITHUB_TOKEN.${c.reset}\n`, exitCode: 1 };
+  }
+
+  const openIssues: GitHubIssue[] = [];
   for (const i of issuesData) {
-    if ('pull_request' in i) continue; // Skip PRs
+    if (i.pull_request) continue; // Skip PRs
     openIssues.push({
-      number: i.number as number,
-      title: i.title as string,
-      labels: ((i.labels as Array<Record<string, string>>) || []).map(l => l.name),
-      createdAt: (i.created_at as string).slice(0, 10),
-      updatedAt: (i.updated_at as string).slice(0, 10),
-      body: ((i.body as string) || '').slice(0, 500),
+      number: i.number,
+      title: i.title,
+      labels: (i.labels || []).map(l => l.name),
+      createdAt: i.created_at.slice(0, 10),
+      updatedAt: i.updated_at.slice(0, 10),
+      body: (i.body || '').slice(0, 500),
     });
   }
 
   // Fetch recent merged PRs to cross-reference
-  const prsData = githubApi(
+  const prsData = await githubApi<GitHubPullResponse[]>(
     `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=50`
-  ) as Array<Record<string, unknown>>;
+  );
 
-  const recentPrTitles: string[] = [];
-  for (const p of prsData) {
-    if (p.merged_at) {
-      recentPrTitles.push((p.title as string).toLowerCase());
-    }
-  }
+  // Build searchable text from PR titles and session logs
+  const prText = (Array.isArray(prsData) ? prsData : [])
+    .filter(p => p.merged_at)
+    .map(p => p.title)
+    .join(' ');
 
-  // Load session logs to check for issue references
   const sessions = loadSessionLogsSince(since);
   const sessionText = sessions.map(s =>
     `${s.whatWasDone} ${s.issues.join(' ')} ${s.learnings.join(' ')}`
-  ).join(' ').toLowerCase();
+  ).join(' ');
+
+  const combinedSearchText = `${prText} ${sessionText}`;
 
   // Categorize issues
-  const categories: Record<string, Array<OpenIssue & { reason: string }>> = {
+  const categories: Record<TriageCategory, Array<GitHubIssue & { reason: string }>> = {
     'potentially-resolved': [],
     'stale': [],
     'actionable': [],
@@ -359,22 +407,23 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
   };
 
   for (const issue of openIssues) {
-    const daysInactive = daysBetween(issue.updatedAt);
-    const titleLower = issue.title.toLowerCase();
+    const daysInactive = daysSince(issue.updatedAt);
     const issueNum = `#${issue.number}`;
 
-    // Check if a recent PR title references this issue
-    const referencedInPr = recentPrTitles.some(t =>
-      t.includes(issueNum) || t.includes(titleLower.slice(0, 30))
-    );
-    // Check if session logs mention this issue
-    const referencedInSession = sessionText.includes(issueNum) ||
-      sessionText.includes(titleLower.slice(0, 30));
+    // Check by issue number (exact match — high confidence)
+    const referencedByNumber = combinedSearchText.includes(issueNum);
+    // Check by title word overlap (fuzzy — moderate confidence)
+    const referencedByTitle = isLikelyReferenced(issue.title, combinedSearchText);
 
-    if (referencedInPr || referencedInSession) {
+    if (referencedByNumber) {
       categories['potentially-resolved'].push({
         ...issue,
-        reason: referencedInPr ? 'Referenced in a recent PR' : 'Referenced in a session log',
+        reason: `Issue ${issueNum} referenced in recent PR or session log`,
+      });
+    } else if (referencedByTitle) {
+      categories['potentially-resolved'].push({
+        ...issue,
+        reason: `Title keywords match recent PR or session log (verify manually)`,
       });
     } else if (daysInactive > 30) {
       categories['stale'].push({
@@ -397,37 +446,37 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
   // Output report
   output += `${c.bold}Open Issues: ${openIssues.length}${c.reset}\n\n`;
 
-  if (categories['potentially-resolved'].length > 0) {
-    output += `${c.bold}${c.green}Potentially Resolved (${categories['potentially-resolved'].length}):${c.reset}\n`;
-    output += `${c.dim}These issues may have been addressed by recent PRs. Verify and close.${c.reset}\n`;
-    for (const issue of categories['potentially-resolved']) {
-      output += `  ${c.green}#${issue.number}${c.reset}: ${issue.title}\n`;
+  const categoryMeta: Record<TriageCategory, { label: string; color: string; desc: string }> = {
+    'potentially-resolved': {
+      label: 'Potentially Resolved',
+      color: c.green,
+      desc: 'May have been addressed by recent PRs. Verify and close.',
+    },
+    'stale': {
+      label: 'Stale',
+      color: c.yellow,
+      desc: 'No activity for 30+ days. Consider closing with a comment or updating.',
+    },
+    'actionable': {
+      label: 'Actionable Now',
+      color: c.cyan,
+      desc: 'Could be fixed in this maintenance session.',
+    },
+    'keep': {
+      label: 'Keep Open',
+      color: '',
+      desc: 'Still valid, not actionable right now.',
+    },
+  };
+
+  for (const [cat, items] of Object.entries(categories) as Array<[TriageCategory, Array<GitHubIssue & { reason: string }>]>) {
+    if (items.length === 0) continue;
+    const meta = categoryMeta[cat];
+    output += `${c.bold}${meta.color}${meta.label} (${items.length}):${c.reset}\n`;
+    output += `${c.dim}${meta.desc}${c.reset}\n`;
+    for (const issue of items) {
+      output += `  ${meta.color}#${issue.number}${c.reset}: ${issue.title}\n`;
       output += `    ${c.dim}${issue.reason}${c.reset}\n`;
-    }
-    output += '\n';
-  }
-
-  if (categories['stale'].length > 0) {
-    output += `${c.bold}${c.yellow}Stale (${categories['stale'].length}):${c.reset}\n`;
-    output += `${c.dim}No activity for 30+ days. Consider closing or updating.${c.reset}\n`;
-    for (const issue of categories['stale']) {
-      output += `  ${c.yellow}#${issue.number}${c.reset}: ${issue.title} (${issue.reason})\n`;
-    }
-    output += '\n';
-  }
-
-  if (categories['actionable'].length > 0) {
-    output += `${c.bold}${c.cyan}Actionable (${categories['actionable'].length}):${c.reset}\n`;
-    for (const issue of categories['actionable']) {
-      output += `  ${c.cyan}#${issue.number}${c.reset}: ${issue.title}\n`;
-    }
-    output += '\n';
-  }
-
-  if (categories['keep'].length > 0) {
-    output += `${c.bold}Keep (${categories['keep'].length}):${c.reset}\n`;
-    for (const issue of categories['keep']) {
-      output += `  #${issue.number}: ${issue.title}\n`;
     }
     output += '\n';
   }
@@ -440,7 +489,7 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
 }
 
 /**
- * Detect codebase cruft: dead code, stale TODOs, large files.
+ * Detect codebase cruft: stale TODOs, large files, commented-out code.
  */
 async function detectCruft(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -451,16 +500,21 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
   output += `${c.bold}${c.blue}Codebase Cruft Detection${c.reset}\n\n`;
 
   const items: CruftItem[] = [];
+  const execOpts = { encoding: 'utf-8' as const, cwd: PROJECT_ROOT, timeout: 15_000, maxBuffer: 5 * 1024 * 1024 };
 
-  // 1. Find TODO/FIXME/HACK/XXX comments
+  // 1. Find TODO/FIXME/HACK/XXX comments (excluding test files and this file)
   try {
     const todoOutput = execSync(
       `grep -rn 'TODO\\|FIXME\\|HACK\\|XXX' crux/ app/src/ --include='*.ts' --include='*.tsx' --include='*.mjs' 2>/dev/null || true`,
-      { encoding: 'utf-8', cwd: PROJECT_ROOT, timeout: 15_000, maxBuffer: 5 * 1024 * 1024 }
+      execOpts
     );
     for (const line of todoOutput.split('\n').filter(Boolean)) {
       const match = line.match(/^([^:]+):(\d+):(.+)$/);
       if (match) {
+        // Skip test files and this file's own grep patterns
+        if (match[1].includes('.test.') || match[1].includes('maintain.ts')) continue;
+        // Skip lines that are defining TODO detection patterns (rules, validators)
+        if (match[3].includes('pattern:') || match[3].includes('Pattern') || match[3].includes("'TODO")) continue;
         items.push({
           type: 'todo',
           path: match[1],
@@ -469,13 +523,13 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
         });
       }
     }
-  } catch { /* grep may fail if no matches */ }
+  } catch { /* grep may return non-zero if no matches */ }
 
   // 2. Find large files (>400 lines)
   try {
     const wcOutput = execSync(
-      `find crux/ app/src/ -name '*.ts' -o -name '*.tsx' -o -name '*.mjs' | xargs wc -l 2>/dev/null | sort -rn | head -30`,
-      { encoding: 'utf-8', cwd: PROJECT_ROOT, timeout: 15_000, maxBuffer: 5 * 1024 * 1024 }
+      `find crux/ app/src/ \\( -name '*.ts' -o -name '*.tsx' -o -name '*.mjs' \\) ! -name '*.test.*' ! -name '*.d.ts' | xargs wc -l 2>/dev/null | sort -rn | head -30`,
+      execOpts
     );
     for (const line of wcOutput.split('\n').filter(Boolean)) {
       const match = line.trim().match(/^(\d+)\s+(.+)$/);
@@ -492,24 +546,23 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
     }
   } catch { /* may fail */ }
 
-  // 3. Find commented-out code blocks (3+ consecutive comment lines)
+  // 3. Find commented-out code blocks (3+ consecutive comment lines with code syntax)
   try {
     const commentOutput = execSync(
-      `grep -rn '^\s*//.*[;{}()\[\]]' crux/ app/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | head -50 || true`,
-      { encoding: 'utf-8', cwd: PROJECT_ROOT, timeout: 15_000, maxBuffer: 5 * 1024 * 1024 }
+      `grep -rn '^\\s*//.*[;{}()\\[\\]]' crux/ app/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | head -100 || true`,
+      execOpts
     );
-    // Group consecutive lines by file
     const byFile: Record<string, number[]> = {};
     for (const line of commentOutput.split('\n').filter(Boolean)) {
       const match = line.match(/^([^:]+):(\d+):/);
       if (match) {
+        if (match[1].includes('.test.')) continue;
         const file = match[1];
         const lineNum = parseInt(match[2], 10);
         if (!byFile[file]) byFile[file] = [];
         byFile[file].push(lineNum);
       }
     }
-    // Find runs of 3+ consecutive commented lines
     for (const [file, lines] of Object.entries(byFile)) {
       lines.sort((a, b) => a - b);
       let runStart = lines[0];
@@ -519,24 +572,14 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
           runLen++;
         } else {
           if (runLen >= 3) {
-            items.push({
-              type: 'commented-code',
-              path: file,
-              line: runStart,
-              detail: `${runLen} consecutive commented-out code lines`,
-            });
+            items.push({ type: 'commented-code', path: file, line: runStart, detail: `${runLen} consecutive commented-out code lines` });
           }
           runStart = lines[i];
           runLen = 1;
         }
       }
       if (runLen >= 3) {
-        items.push({
-          type: 'commented-code',
-          path: file,
-          line: runStart,
-          detail: `${runLen} consecutive commented-out code lines`,
-        });
+        items.push({ type: 'commented-code', path: file, line: runStart, detail: `${runLen} consecutive commented-out code lines` });
       }
     }
   } catch { /* may fail */ }
@@ -551,7 +594,6 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
   const typeLabels: Record<string, { label: string; color: string }> = {
     'todo': { label: 'TODO/FIXME/HACK Comments', color: c.yellow },
     'large-file': { label: 'Large Files (>400 lines)', color: c.cyan },
-    'orphan-file': { label: 'Orphan Files (not imported)', color: c.red },
     'commented-code': { label: 'Commented-Out Code', color: c.dim },
   };
 
@@ -594,7 +636,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
   output += `${c.bold}${c.blue}Maintenance Status${c.reset}\n\n`;
 
   if (lastRun) {
-    const daysAgo = daysBetween(lastRun);
+    const daysAgo = daysSince(lastRun);
     const urgency = daysAgo > 7 ? c.red : daysAgo > 3 ? c.yellow : c.green;
     output += `Last maintenance run: ${urgency}${lastRun} (${daysAgo} days ago)${c.reset}\n`;
   } else {
@@ -607,17 +649,16 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
   const sessions = loadSessionLogsSince(since);
   output += `Session logs since last run: ${sessions.length}\n`;
 
-  // Count issues with encountered problems
   const sessionsWithIssues = sessions.filter(s => s.issues.length > 0);
   if (sessionsWithIssues.length > 0) {
     output += `${c.yellow}Sessions with issues: ${sessionsWithIssues.length}${c.reset}\n`;
   }
 
   output += '\n';
-  output += `${c.dim}Run \`crux maintain\` for a full report, or individual subcommands:${c.reset}\n`;
-  output += `${c.dim}  crux maintain review-prs       Review merged PRs + session logs${c.reset}\n`;
-  output += `${c.dim}  crux maintain triage-issues     Triage open GitHub issues${c.reset}\n`;
-  output += `${c.dim}  crux maintain detect-cruft      Find dead code, TODOs, large files${c.reset}\n`;
+  output += `${c.bold}Recommended cadences:${c.reset}\n`;
+  output += `  ${c.dim}Daily:   crux maintain review-prs   (review new PRs + session logs)${c.reset}\n`;
+  output += `  ${c.dim}Weekly:  crux maintain               (full sweep + issue triage)${c.reset}\n`;
+  output += `  ${c.dim}Monthly: crux maintain detect-cruft  (deep cruft analysis + cleanup)${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -629,15 +670,32 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
   const log = createLogger(options.ci);
   const c = log.colors;
 
+  // For JSON mode, collect structured data from all sub-reports
+  if (options.json || options.ci) {
+    const prResult = await reviewPrs(args, { ...options, json: true });
+    const issueResult = await triageIssues(args, { ...options, json: true });
+    const cruftResult = await detectCruft(args, { ...options, json: true });
+
+    const combined = {
+      timestamp: new Date().toISOString(),
+      prReview: JSON.parse(prResult.output),
+      issueTriage: JSON.parse(issueResult.output),
+      cruftDetection: JSON.parse(cruftResult.output),
+    };
+
+    writeFileSync(LAST_RUN_FILE, new Date().toISOString().slice(0, 10) + '\n');
+    return { output: JSON.stringify(combined, null, 2), exitCode: 0 };
+  }
+
   let output = '';
   output += `${c.bold}${c.blue}${'═'.repeat(60)}${c.reset}\n`;
   output += `${c.bold}${c.blue}  Maintenance Sweep Report${c.reset}\n`;
   output += `${c.bold}${c.blue}${'═'.repeat(60)}${c.reset}\n\n`;
 
   // Run all three sub-reports
-  const prResult = await reviewPrs(args, { ...options, json: false });
-  const issueResult = await triageIssues(args, { ...options, json: false });
-  const cruftResult = await detectCruft(args, { ...options, json: false });
+  const prResult = await reviewPrs(args, options);
+  const issueResult = await triageIssues(args, options);
+  const cruftResult = await detectCruft(args, options);
 
   output += prResult.output;
   output += `${c.dim}${'─'.repeat(60)}${c.reset}\n\n`;
@@ -647,18 +705,19 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
 
   // Priority summary
   output += `${c.bold}${c.blue}${'═'.repeat(60)}${c.reset}\n`;
-  output += `${c.bold}Suggested Priority Order:${c.reset}\n\n`;
-  output += `  ${c.red}P0${c.reset} — Fix broken things (CI failures, blocking errors)\n`;
-  output += `  ${c.yellow}P1${c.reset} — Close resolved issues (quick wins)\n`;
-  output += `  ${c.cyan}P2${c.reset} — Propagate learnings to common-issues.md / rules\n`;
-  output += `  P3 — Fix actionable GitHub issues\n`;
-  output += `  ${c.dim}P4 — Cruft cleanup (dead code, TODOs)${c.reset}\n`;
-  output += `  ${c.dim}P5 — Page content updates (delegate to crux updates)${c.reset}\n`;
+  output += `${c.bold}Suggested Action Plan:${c.reset}\n\n`;
+  output += `  ${c.red}P0${c.reset} — Fix broken things (CI failures, blocking validation errors)\n`;
+  output += `  ${c.yellow}P1${c.reset} — Close resolved issues (verify + close issues fixed by recent PRs)\n`;
+  output += `  ${c.cyan}P2${c.reset} — Propagate learnings (add recurring issues to common-issues.md/rules)\n`;
+  output += `  P3 — Work actionable issues (fix small issues; file new issues for larger tasks)\n`;
+  output += `  ${c.dim}P4 — Cruft cleanup (dead code, stale TODOs, file splitting)${c.reset}\n`;
+  output += `  ${c.dim}P5 — Page content updates (delegate to \`crux updates run\`)${c.reset}\n`;
   output += '\n';
 
   // Update last-run timestamp
-  writeFileSync(LAST_RUN_FILE, new Date().toISOString().slice(0, 10) + '\n');
-  output += `${c.dim}Updated last-run timestamp: ${new Date().toISOString().slice(0, 10)}${c.reset}\n`;
+  const today = new Date().toISOString().slice(0, 10);
+  writeFileSync(LAST_RUN_FILE, today + '\n');
+  output += `${c.dim}Updated last-run timestamp: ${today}${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -698,11 +757,11 @@ Commands:
   review-prs      Review merged PRs and session logs since last run
   triage-issues   Triage open GitHub issues for staleness/resolution
   detect-cruft    Find dead code, TODOs, large files, commented-out code
-  status          Show last maintenance run info
+  status          Show last maintenance run info and recommended cadences
   mark-run        Update the last-run timestamp without running a report
 
 Options:
-  --since=DATE    Override the start date (default: last run or 7 days ago)
+  --since=DATE    Override the start date (YYYY-MM-DD; default: last run or 7d ago)
   --limit=N       Max items per category in cruft report (default: 30)
   --json          Output as JSON
   --ci            JSON output for CI pipelines
@@ -711,9 +770,14 @@ Priority order for maintenance work:
   P0 — Broken things (CI failures, blocking errors)
   P1 — Close resolved issues (quick wins)
   P2 — Propagate learnings (common-issues.md, rules)
-  P3 — Actionable GitHub issues
+  P3 — Work actionable issues / file new issues for larger tasks
   P4 — Cruft cleanup (dead code, TODOs)
   P5 — Page content updates (via crux updates)
+
+Recommended cadences:
+  Daily   — review-prs (review new session logs, catch recurring issues)
+  Weekly  — full report (triage issues, propagate learnings)
+  Monthly — detect-cruft + cleanup (deep analysis, file splitting, dead code)
 
 Examples:
   crux maintain                          Full maintenance report
