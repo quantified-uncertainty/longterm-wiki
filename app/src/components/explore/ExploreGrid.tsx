@@ -217,14 +217,14 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     [searchParams, router, pathname]
   );
 
-  function handleSearchChange(value: string) {
+  const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
     setVisibleCount(60);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       updateUrlParams({ tag: value || null });
     }, 300);
-  }
+  }, [updateUrlParams]);
 
   function handleFieldChange(index: number) {
     setActiveField(index);
@@ -304,7 +304,6 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const filtered = useMemo(() => {
     let result = fieldFiltered;
 
-
     // Entity type filter
     const group = ENTITY_GROUPS[activeEntity];
     if (group.types.length > 0) {
@@ -317,47 +316,45 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
       result = result.filter((item) => item.riskCategory === riskCatGroup.value);
     }
 
-    // Sort
-    result = [...result].sort((a, b) => {
-      switch (sortKey) {
-        case "title":
-          return a.title.localeCompare(b.title);
-        case "readerImportance":
-          return (b.readerImportance || 0) - (a.readerImportance || 0);
-        case "quality":
-          return (b.quality || 0) - (a.quality || 0);
-        case "wordCount":
-          return (b.wordCount || 0) - (a.wordCount || 0);
-        case "recentlyEdited":
-          return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
-        case "relevance": {
-          // When searching with MiniSearch, sort by search relevance score
-          if (searchScores) {
-            const scoreA = searchScores.get(a.id) || 0;
-            const scoreB = searchScores.get(b.id) || 0;
+    // Sort — skip in table mode since TanStack handles its own column sorting
+    if (viewMode !== "table") {
+      result = [...result].sort((a, b) => {
+        switch (sortKey) {
+          case "title":
+            return a.title.localeCompare(b.title);
+          case "readerImportance":
+            return (b.readerImportance || 0) - (a.readerImportance || 0);
+          case "quality":
+            return (b.quality || 0) - (a.quality || 0);
+          case "wordCount":
+            return (b.wordCount || 0) - (a.wordCount || 0);
+          case "recentlyEdited":
+            return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
+          case "relevance": {
+            if (searchScores) {
+              const scoreA = searchScores.get(a.id) || 0;
+              const scoreB = searchScores.get(b.id) || 0;
+              return scoreB - scoreA;
+            }
+            const scoreA = (a.readerImportance || 0) * 2 + (a.quality || 0);
+            const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);
             return scoreB - scoreA;
           }
-          // Fallback: importance-weighted relevance
-          const scoreA = (a.readerImportance || 0) * 2 + (a.quality || 0);
-          const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);
-          return scoreB - scoreA;
-        }
-        case "recommended":
-        default: {
-          // When searching, defer to MiniSearch relevance
-          if (searchScores) {
-            const scoreA = searchScores.get(a.id) || 0;
-            const scoreB = searchScores.get(b.id) || 0;
-            return scoreB - scoreA;
+          case "recommended":
+          default: {
+            if (searchScores) {
+              const scoreA = searchScores.get(a.id) || 0;
+              const scoreB = searchScores.get(b.id) || 0;
+              return scoreB - scoreA;
+            }
+            return recommendedScore(b) - recommendedScore(a);
           }
-          // Blend of recency, quality, and importance
-          return recommendedScore(b) - recommendedScore(a);
         }
-      }
-    });
+      });
+    }
 
     return result;
-  }, [fieldFiltered, activeEntity, activeRiskCat, searchScores, sortKey]);
+  }, [fieldFiltered, activeEntity, activeRiskCat, searchScores, sortKey, viewMode]);
 
   return (
     <div>
@@ -415,6 +412,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
                     : "bg-background text-foreground hover:bg-muted"
                 }`}
                 title="Card view"
+                aria-label="Card view"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -431,6 +429,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
                     : "bg-background text-foreground hover:bg-muted"
                 }`}
                 title="Table view"
+                aria-label="Table view"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="2" />

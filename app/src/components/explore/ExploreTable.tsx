@@ -53,13 +53,6 @@ function ClickableTag({ label, onClick }: { label: string; onClick: () => void }
   );
 }
 
-const FORMAT_LABELS: Record<string, string> = {
-  table: "Table",
-  diagram: "Diagram",
-  index: "Index",
-  dashboard: "Dash",
-};
-
 function buildColumns(onSearchChange: (value: string) => void): ColumnDef<ExploreItem>[] {
   return [
     {
@@ -145,6 +138,16 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
       sortUndefined: "last",
     },
     {
+      accessorKey: "numericId",
+      header: ({ column }) => <SortableHeader column={column}>ID</SortableHeader>,
+      cell: ({ row }) => (
+        <span className="text-[0.65rem] text-muted-foreground/60 tabular-nums">
+          {row.original.numericId}
+        </span>
+      ),
+      size: 55,
+    },
+    {
       id: "tags",
       header: "Tags",
       cell: ({ row }) => {
@@ -162,32 +165,6 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
         );
       },
       size: 180,
-    },
-    {
-      id: "format",
-      accessorFn: (row) => row.contentFormat || "article",
-      header: ({ column }) => <SortableHeader column={column}>Format</SortableHeader>,
-      cell: ({ row }) => {
-        const fmt = row.original.contentFormat || "article";
-        if (fmt === "article") return <span className="text-muted-foreground/50 text-xs">—</span>;
-        return (
-          <span className="text-[0.6rem] leading-none font-medium px-1.5 py-0.5 rounded bg-slate-500/15 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-            {FORMAT_LABELS[fmt] || fmt}
-          </span>
-        );
-      },
-      size: 70,
-      sortUndefined: "last",
-    },
-    {
-      accessorKey: "numericId",
-      header: ({ column }) => <SortableHeader column={column}>ID</SortableHeader>,
-      cell: ({ row }) => (
-        <span className="text-[0.65rem] text-muted-foreground/60 tabular-nums">
-          {row.original.numericId}
-        </span>
-      ),
-      size: 55,
     },
   ];
 }
