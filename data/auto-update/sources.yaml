@@ -98,7 +98,7 @@ sources:
     name: AI Executive Orders & Legislation
     type: web-search
     query: "AI executive order legislation bill 2026"
-    frequency: weekly
+    frequency: daily
     categories: [policy, governance, regulation]
     reliability: medium
     enabled: true
@@ -109,7 +109,7 @@ sources:
     name: Import AI Newsletter
     type: rss
     url: https://importai.substack.com/feed
-    frequency: weekly
+    frequency: daily
     categories: [ai-labs, models, policy, research]
     reliability: high
     enabled: true
@@ -118,7 +118,7 @@ sources:
     name: The Gradient
     type: rss
     url: https://thegradient.pub/rss/
-    frequency: weekly
+    frequency: daily
     categories: [research, models, safety]
     reliability: high
     enabled: true
@@ -127,7 +127,7 @@ sources:
     name: ML Safety Newsletter
     type: rss
     url: https://newsletter.mlsafety.org/feed
-    frequency: weekly
+    frequency: daily
     categories: [safety, alignment, research]
     reliability: high
     enabled: true
@@ -149,7 +149,7 @@ sources:
     name: AI Industry News
     type: web-search
     query: "artificial intelligence funding compute GPU chips 2026"
-    frequency: weekly
+    frequency: daily
     categories: [compute, industry, funding]
     reliability: medium
     enabled: true
