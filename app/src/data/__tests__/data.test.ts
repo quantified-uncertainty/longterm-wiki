@@ -452,11 +452,12 @@ describe("Data Layer", () => {
   });
 
   describe("getUpdateSchedule", () => {
-    it("excludes internal pages from update schedule", async () => {
+    it("includes internal pages in update schedule", async () => {
       const { getUpdateSchedule } = await import("../../data/index");
       const items = getUpdateSchedule();
       const internalItem = items.find((i) => i.id === "internal-doc");
-      expect(internalItem).toBeUndefined();
+      expect(internalItem).toBeDefined();
+      expect(internalItem!.category).toBe("internal");
     });
   });
 

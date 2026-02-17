@@ -133,6 +133,7 @@ export function detectPageType(
     if (pathname.includes("/ai-transition-model/")) return "ai-transition-model";
     if (pathname.includes("/knowledge-base/risks/")) return "risk";
     if (pathname.includes("/knowledge-base/responses/")) return "response";
+    if (pathname.startsWith("/internal")) return "documentation";
   }
 
   if (
