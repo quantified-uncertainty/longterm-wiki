@@ -25,6 +25,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { relative } from 'path';
 import { fileURLToPath } from 'url';
 import Anthropic from '@anthropic-ai/sdk';
+import { getApiKey } from '../lib/api-keys.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter as parseFm } from '../lib/mdx-utils.ts';
@@ -359,7 +360,7 @@ async function main(): Promise<void> {
   const apply: boolean = args.includes('--apply');
   const verbose: boolean = args.includes('--verbose');
 
-  const client = new Anthropic();
+  const client = new Anthropic({ apiKey: getApiKey('ANTHROPIC_API_KEY') });
 
   // Collect all pages that have update_frequency
   const files = findMdxFiles(CONTENT_DIR);

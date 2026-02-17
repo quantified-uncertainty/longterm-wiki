@@ -6,6 +6,7 @@
 
 import { loadResources, saveResources } from './resource-io.ts';
 import { extractArxivId, extractForumSlug, extractDOI, isScholarlyUrl, sleep } from './resource-utils.ts';
+import { getApiKey } from './lib/api-keys.ts';
 import type { Resource, ParsedOpts, ArxivMetadata, ForumMetadata, ScholarMetadata } from './resource-types.ts';
 
 // ─── ArXiv ──────────────────────────────────────────────────────────────────
@@ -310,7 +311,7 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
 
   if (!opts._skipSave) console.log('🔥 Web Metadata Extractor (Firecrawl)');
 
-  const FIRECRAWL_KEY = process.env.FIRECRAWL_KEY;
+  const FIRECRAWL_KEY = getApiKey('FIRECRAWL_KEY');
   if (!FIRECRAWL_KEY) {
     if (!opts._skipSave) console.log('   ⚠️  FIRECRAWL_KEY not set in .env - skipping');
     return 0;

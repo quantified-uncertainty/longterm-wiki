@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createPhaseLogger } from '../../lib/output.ts';
+import { getApiKey } from '../../lib/api-keys.ts';
 import type { AnalysisResult, PageData, TierConfig } from './types.ts';
 
 // ── Shared constants ─────────────────────────────────────────────────────────
@@ -19,7 +20,7 @@ export const ROOT: string = path.join(__dirname, '../../..');
 export const NODE_TSX: string = 'node --import tsx/esm --no-warnings';
 export const TEMP_DIR: string = path.join(ROOT, '.claude/temp/page-improver');
 
-export const SCRY_PUBLIC_KEY: string = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v1_2025';
+export const SCRY_PUBLIC_KEY: string = getApiKey('SCRY_API_KEY') || 'exopriors_public_readonly_v1_2025';
 
 export const log = createPhaseLogger();
 

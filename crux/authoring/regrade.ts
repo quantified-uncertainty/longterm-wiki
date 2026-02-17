@@ -22,6 +22,7 @@ import { spawn, type ChildProcess } from 'child_process';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { loadPages, PROJECT_ROOT } from '../lib/content-types.ts';
+import { getApiKey } from '../lib/api-keys.ts';
 import type { PageEntry } from '../lib/content-types.ts';
 
 const __dirname: string = dirname(fileURLToPath(import.meta.url));
@@ -34,7 +35,7 @@ const OVERRATED_MODE: boolean = args.includes('--overrated');
 const pageIds: string[] = args.filter(a => !a.startsWith('--'));
 
 // Check for API key
-if (!process.env.ANTHROPIC_API_KEY) {
+if (!getApiKey('ANTHROPIC_API_KEY')) {
   console.error('Error: ANTHROPIC_API_KEY not found.');
   console.error('Add it to .env or set in environment.\n');
   process.exit(1);

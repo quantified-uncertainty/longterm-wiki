@@ -9,6 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { batchResearch, generateResearchQueries } from '../../lib/openrouter.ts';
 import type { BatchResearchResult, ResearchQuery } from '../../lib/openrouter.ts';
+import { getApiKey } from '../../lib/api-keys.ts';
 import type { ResearchPhaseContext } from './types.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,13 +42,13 @@ interface ScryRow {
   searchQuery?: string;
 }
 
-const SCRY_PUBLIC_KEY = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v1_2025';
+const SCRY_PUBLIC_KEY = getApiKey('SCRY_API_KEY') || 'exopriors_public_readonly_v1_2025';
 
 export async function runPerplexityResearch(topic: string, depth: string, { log, saveResult }: ResearchContext): Promise<{ success: boolean; cost: number; queryCount: number }> {
   log('research', `Starting Perplexity research (${depth})...`);
 
   // Check if OPENROUTER_API_KEY is available
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!getApiKey('OPENROUTER_API_KEY')) {
     log('research', 'Warning: OPENROUTER_API_KEY not set — skipping Perplexity research');
     log('research', 'The synthesis step will have limited research data available');
     saveResult(topic, 'perplexity-research.json', {

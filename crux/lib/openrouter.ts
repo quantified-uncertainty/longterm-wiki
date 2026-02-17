@@ -13,7 +13,9 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+import { getApiKey } from './api-keys.ts';
+
+const OPENROUTER_API_KEY = getApiKey('OPENROUTER_API_KEY');
 const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 /**
@@ -93,8 +95,16 @@ async function callOpenRouter(prompt: string, options: OpenRouterOptions = {}): 
     usage: Record<string, unknown> & { cost?: number };
   };
 
-  if (data.error) {
-    throw new Error(`OpenRouter error: ${data.error.message || JSON.stringify(data.error)}`);
+  if (!response.ok || data.error) {
+    const msg = data.error?.message || JSON.stringify(data.error) || `HTTP ${response.status}`;
+    // Provide actionable diagnostics for common failures
+    if (response.status === 401 || response.status === 403 || msg.includes('authenticate')) {
+      throw new Error(`OpenRouter auth failed (${response.status}): check OPENROUTER_API_KEY — key may be invalid, expired, or contain embedded quotes`);
+    }
+    if (response.status === 402 || msg.includes('credits') || msg.includes('insufficient')) {
+      throw new Error(`OpenRouter payment required: account has insufficient credits — visit https://openrouter.ai/credits`);
+    }
+    throw new Error(`OpenRouter error: ${msg}`);
   }
 
   // Perplexity includes citations in the response - extract them

@@ -9,13 +9,14 @@ import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropi
 import fs from 'fs';
 import path from 'path';
 import { MODELS } from '../../lib/anthropic.ts';
+import { getApiKey } from '../../lib/api-keys.ts';
 import { withRetry as _withRetry, startHeartbeat as _startHeartbeat } from '../../lib/resilience.ts';
 import type { RunAgentOptions } from './types.ts';
 import { ROOT, SCRY_PUBLIC_KEY, log } from './utils.ts';
 
 // ── Anthropic client ─────────────────────────────────────────────────────────
 
-const anthropic = new Anthropic({ timeout: 10 * 60 * 1000 });
+const anthropic = new Anthropic({ apiKey: getApiKey('ANTHROPIC_API_KEY'), timeout: 10 * 60 * 1000 });
 
 // ── Resilience wrappers ──────────────────────────────────────────────────────
 
