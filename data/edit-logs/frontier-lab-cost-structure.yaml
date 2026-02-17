@@ -7,7 +7,3 @@
   agency: ai-directed
   requestedBy: system
   note: Improved (polish)
-- date: 2026-02-17
-  tool: crux-fix
-  agency: automated
-  note: Wrapped hardcoded fact values with <F> components (59 replacements)
