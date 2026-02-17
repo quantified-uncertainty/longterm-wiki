@@ -12,35 +12,7 @@
  * - Entity type overrides (path-based and explicit)
  */
 
-// ============================================================================
-// TYPE MAPPING
-// ============================================================================
-
-/**
- * Maps old database.json `type` values to canonical `entityType` values.
- * NOTE: Canonical definition lives in app/src/data/entity-type-names.ts.
- * This .mjs copy exists because build scripts can't import .ts directly.
- */
-const OLD_TYPE_MAP = {
-  lab: 'organization',
-  'lab-frontier': 'organization',
-  'lab-research': 'organization',
-  'lab-academic': 'organization',
-  'lab-startup': 'organization',
-  researcher: 'person',
-};
-
-/**
- * Maps old lab types to orgType values.
- * NOTE: Canonical definition lives in app/src/data/entity-type-names.ts.
- */
-const OLD_LAB_TYPE_TO_ORG_TYPE = {
-  lab: 'generic',
-  'lab-frontier': 'frontier-lab',
-  'lab-research': 'safety-org',
-  'lab-academic': 'academic',
-  'lab-startup': 'startup',
-};
+import { OLD_TYPE_MAP, OLD_LAB_TYPE_TO_ORG_TYPE } from './entity-type-mappings.mjs';
 
 // ============================================================================
 // RISK CATEGORIES

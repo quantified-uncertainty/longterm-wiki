@@ -42,6 +42,7 @@ export const INTERNAL_NAV: NavSection[] = [
       { label: "Fact Dashboard", href: "/internal/facts" },
       { label: "Automation Tools", href: "/internal/automation-tools" },
       { label: "Content Database", href: "/internal/content-database" },
+      { label: "Importance Rankings", href: "/internal/importance-rankings" },
       { label: "Page Similarity", href: "/internal/similarity" },
       { label: "Interventions", href: "/internal/interventions" },
       { label: "Proposals", href: "/internal/proposals" },

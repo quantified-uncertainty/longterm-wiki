@@ -17,10 +17,9 @@ interface CanonicalLink {
   domain: string;
 }
 
-interface CanonicalLinksContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-}
+import type { ResearchPhaseContext } from './types.ts';
+
+type CanonicalLinksContext = ResearchPhaseContext;
 
 interface PerplexityResult {
   content: string;

@@ -30,7 +30,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build data
-        run: cd app && node scripts/build-data.mjs
+        run: cd app && node --import tsx/esm scripts/build-data.mjs
 
       - name: Run tests
         run: cd app && pnpm test
@@ -56,7 +56,7 @@ jobs:
 
       - name: Build data (needed for validation)
         id: build-data
-        run: cd app && node scripts/build-data.mjs
+        run: cd app && node --import tsx/esm scripts/build-data.mjs
 
       - name: MDX syntax check (blocking)
         run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only

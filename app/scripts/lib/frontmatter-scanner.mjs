@@ -11,6 +11,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { join, basename } from 'path';
 import { parse } from 'yaml';
+import { TOP_LEVEL_CONTENT_DIRS } from './content-types.mjs';
 
 /**
  * Extract frontmatter from MDX/MD content using YAML parser.
@@ -74,7 +75,7 @@ export function scanFrontmatterEntities(yamlEntityIds, contentDir) {
   }
 
   scanDir(join(contentDir, 'knowledge-base'));
-  for (const topDir of ['ai-transition-model', 'analysis', 'internal']) {
+  for (const topDir of TOP_LEVEL_CONTENT_DIRS) {
     scanDir(join(contentDir, topDir));
   }
 

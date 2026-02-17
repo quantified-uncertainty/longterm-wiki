@@ -48,7 +48,7 @@ const FREQUENCY_RULES: FrequencyRule[] = [
 
 /**
  * Insert update_frequency into frontmatter YAML string without rewriting the whole thing.
- * Places it after lastEdited or importance, whichever comes last.
+ * Places it after lastEdited or readerImportance, whichever comes last.
  */
 function insertUpdateFrequency(content: string, frequency: number): string {
   const fmMatch: RegExpMatchArray | null = content.match(/^(---\n)([\s\S]*?)(\n---)/);
@@ -57,10 +57,10 @@ function insertUpdateFrequency(content: string, frequency: number): string {
   const yaml: string = fmMatch[2];
   const lines: string[] = yaml.split('\n');
 
-  // Find best insertion point: after lastEdited, importance, or at end of top-level fields
+  // Find best insertion point: after lastEdited, readerImportance, or at end of top-level fields
   let insertAfter: number = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (/^(lastEdited|importance):/.test(lines[i])) {
+    if (/^(lastEdited|readerImportance):/.test(lines[i])) {
       insertAfter = i;
     }
   }
@@ -74,9 +74,9 @@ function insertUpdateFrequency(content: string, frequency: number): string {
   return `${fmMatch[1]}${lines.join('\n')}${fmMatch[3]}${content.slice(fmMatch[0].length)}`;
 }
 
-function getFrequencyForImportance(importance: number): number | null {
+function getFrequencyForReaderImportance(readerImportance: number): number | null {
   for (const rule of FREQUENCY_RULES) {
-    if (importance >= rule.minImportance) {
+    if (readerImportance >= rule.minImportance) {
       return rule.frequency;
     }
   }
@@ -91,7 +91,7 @@ interface Change {
   filePath: string;
   rel: string;
   title: string;
-  importance: number;
+  readerImportance: number;
   frequency: number;
 }
 
@@ -149,19 +149,19 @@ async function main(): Promise<void> {
       continue;
     }
 
-    // No importance score
-    if (fm.importance == null) {
+    // No readerImportance score
+    if (fm.readerImportance == null) {
       noImportance++;
       continue;
     }
 
-    const importance: number = Number(fm.importance);
-    const frequency: number | null = getFrequencyForImportance(importance);
+    const readerImportance: number = Number(fm.readerImportance);
+    const frequency: number | null = getFrequencyForReaderImportance(readerImportance);
 
     if (frequency === null) {
       belowThreshold++;
       if (verbose) {
-        console.log(`  SKIP  imp=${importance}  ${rel}`);
+        console.log(`  SKIP  readerImp=${readerImportance}  ${rel}`);
       }
       continue;
     }
@@ -170,7 +170,7 @@ async function main(): Promise<void> {
       filePath,
       rel,
       title: (fm.title as string) || rel,
-      importance,
+      readerImportance,
       frequency,
     });
 
@@ -187,7 +187,7 @@ async function main(): Promise<void> {
   console.log('\u2500'.repeat(50));
   console.log(`  Total files scanned:    ${files.length}`);
   console.log(`  Already have frequency: ${alreadySet}`);
-  console.log(`  No importance score:    ${noImportance}`);
+  console.log(`  No readerImportance:    ${noImportance}`);
   console.log(`  Below threshold (<20):  ${belowThreshold}`);
   console.log(`  Skipped (stubs/index):  ${skipped}`);
   console.log(`  ${apply ? 'Updated' : 'Would update'}:        ${updated}`);
@@ -210,7 +210,7 @@ async function main(): Promise<void> {
   if (toShow.length > 0) {
     console.log(`${apply ? 'Updated' : 'Would update'} pages:`);
     for (const ch of toShow) {
-      console.log(`  ${String(ch.frequency + 'd').padEnd(5)} imp=${String(ch.importance).padEnd(3)} ${ch.title}`);
+      console.log(`  ${String(ch.frequency + 'd').padEnd(5)} readerImp=${String(ch.readerImportance).padEnd(3)} ${ch.title}`);
     }
     if (!verbose && changes.length > 30) {
       console.log(`  ... and ${changes.length - 30} more (use --verbose to see all)`);

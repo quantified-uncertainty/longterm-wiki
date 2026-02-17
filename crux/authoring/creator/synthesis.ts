@@ -9,15 +9,10 @@ import path from 'path';
 import { spawn } from 'child_process';
 import { inferEntityType } from '../../lib/category-entity-types.ts';
 import { buildEntityLookupForTopic } from '../../lib/entity-lookup.ts';
+import type { SynthesisPhaseContext, CreatorContext } from './types.ts';
 
-interface LoadResultContext {
-  loadResult: (topic: string, filename: string) => Record<string, unknown> | null;
-}
-
-interface SynthesisContext {
-  log: (phase: string, message: string) => void;
-  ROOT: string;
-}
+type LoadResultContext = Pick<Required<CreatorContext>, 'loadResult'>;
+type SynthesisContext = SynthesisPhaseContext;
 
 interface CanonicalLink {
   name: string;

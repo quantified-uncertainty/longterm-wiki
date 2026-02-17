@@ -12,9 +12,9 @@ import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readd
 import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
-import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './lib/metrics-extractor.mjs';
+import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../crux/lib/metrics-extractor.ts';
 import { computeRedundancy } from './lib/redundancy.mjs';
-import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT } from './lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
 import { buildUrlToResourceMap, findUnconvertedLinks, countConvertedLinks } from './lib/unconverted-links.mjs';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
@@ -50,8 +50,14 @@ function loadYaml(filename) {
     console.warn(`File not found: ${filepath}`);
     return [];
   }
-  const content = readFileSync(filepath, 'utf-8');
-  return parse(content) || [];
+  try {
+    const content = readFileSync(filepath, 'utf-8');
+    return parse(content) || [];
+  } catch (e) {
+    console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
+    process.exitCode = 1;
+    return [];
+  }
 }
 
 /**
@@ -69,9 +75,14 @@ function loadYamlDir(dirname) {
 
   for (const file of files) {
     const filepath = join(dirpath, file);
-    const content = readFileSync(filepath, 'utf-8');
-    const data = parse(content) || [];
-    merged.push(...data);
+    try {
+      const content = readFileSync(filepath, 'utf-8');
+      const data = parse(content) || [];
+      merged.push(...data);
+    } catch (e) {
+      console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
+      process.exitCode = 1;
+    }
   }
 
   return merged;
@@ -174,7 +185,7 @@ function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
  *   5. Shared tags                    (weight varies by specificity)
  *
  * Quality boost: Each neighbor's raw score is multiplied by a gentle factor
- * based on the target page's quality and importance ratings:
+ * based on the target page's quality and readerImportance ratings:
  *   boost = 1 + quality/40 + importance/400   (max ~1.45x)
  * Unrated pages default to average values (q=5, imp=50 → 1.25x) so they
  * aren't penalized vs rated pages. This nudges high-quality content up
@@ -311,7 +322,7 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
         // Unrated pages get average defaults so they aren't penalized.
         const targetPage = pageMap.get(targetId);
         const q = targetPage?.quality ?? 5;
-        const imp = targetPage?.importance ?? 50;
+        const imp = targetPage?.readerImportance ?? 50;
         const boost = 1 + q / 40 + imp / 400;
         const e = entityMap.get(targetId);
         const entry = {
@@ -440,7 +451,7 @@ function buildPagesRegistry(urlToResource) {
         // Extract structural metrics (format-aware scoring)
         const contentFormat = fm.contentFormat || 'article';
         const metrics = extractMetrics(content, fullPath, contentFormat);
-        const currentQuality = fm.quality ? parseInt(fm.quality) : null;
+        const currentQuality = fm.quality != null ? Number(fm.quality) : null;
 
         // Find unconverted links (markdown links that have matching resources)
         const unconvertedLinks = urlToResource ? findUnconvertedLinks(content, urlToResource) : [];
@@ -456,13 +467,14 @@ function buildPagesRegistry(urlToResource) {
           filePath: relative(CONTENT_DIR, fullPath),
           title: fm.title || id.replace(/-/g, ' '),
           quality: currentQuality,
-          importance: fm.importance ? parseInt(fm.importance) : null,
+          readerImportance: fm.readerImportance != null ? Number(fm.readerImportance) : null,
+          researchImportance: fm.researchImportance != null ? Number(fm.researchImportance) : null,
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           // ITN framework fields (0-100 scale)
-          tractability: fm.tractability ? parseInt(fm.tractability) : null,
-          neglectedness: fm.neglectedness ? parseInt(fm.neglectedness) : null,
-          uncertainty: fm.uncertainty ? parseInt(fm.uncertainty) : null,
+          tractability: fm.tractability != null ? Number(fm.tractability) : null,
+          neglectedness: fm.neglectedness != null ? Number(fm.neglectedness) : null,
+          uncertainty: fm.uncertainty != null ? Number(fm.uncertainty) : null,
           causalLevel: fm.causalLevel || null,
           lastUpdated: fm.lastUpdated || fm.lastEdited || null,
           llmSummary: fm.llmSummary || null,
@@ -512,8 +524,7 @@ function buildPagesRegistry(urlToResource) {
   // Scan all content directories
   scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
 
-  const otherDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides', 'guides', 'insight-hunting', 'dashboard', 'project'];
-  for (const topDir of otherDirs) {
+  for (const topDir of TOP_LEVEL_CONTENT_DIRS) {
     const dirPath = join(CONTENT_DIR, topDir);
     if (existsSync(dirPath)) {
       scanDirectory(dirPath, `/${topDir}`);
@@ -565,8 +576,7 @@ function buildPathRegistry() {
   scanDirectory(join(CONTENT_DIR, 'knowledge-base'), '/knowledge-base');
 
   // Also scan other top-level content directories
-  const topLevelDirs = ['ai-transition-model', 'analysis', 'getting-started', 'browse', 'internal', 'style-guides', 'guides', 'insight-hunting', 'dashboard', 'project'];
-  for (const topDir of topLevelDirs) {
+  for (const topDir of TOP_LEVEL_CONTENT_DIRS) {
     const dirPath = join(CONTENT_DIR, topDir);
     if (existsSync(dirPath)) {
       scanDirectory(dirPath, `/${topDir}`);

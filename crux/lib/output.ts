@@ -136,6 +136,32 @@ export function formatCount(count: number, singular: string, plural: string | nu
   return `${count} ${form}`;
 }
 
+// ============================================================================
+// TIMESTAMPED PHASE LOGGING
+// ============================================================================
+
+/** Format current time as HH:MM:SS (ISO-based, no date). */
+export function formatTime(date: Date = new Date()): string {
+  return date.toISOString().split('T')[1].split('.')[0];
+}
+
+/** Signature for pipeline-style phase loggers used by authoring scripts. */
+export type PhaseLogger = (phase: string, message: string) => void;
+
+/**
+ * Create a timestamped phase logger: `[HH:MM:SS] [phase] message`.
+ * Use this instead of defining local `log()` functions in authoring scripts.
+ */
+export function createPhaseLogger(): PhaseLogger {
+  return (phase: string, message: string) => {
+    console.log(`[${formatTime()}] [${phase}] ${message}`);
+  };
+}
+
+// ============================================================================
+// PROGRESS TRACKER
+// ============================================================================
+
 /**
  * Create a progress indicator for long operations
  */

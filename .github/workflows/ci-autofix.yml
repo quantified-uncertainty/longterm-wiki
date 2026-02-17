@@ -1,0 +1,91 @@
+name: Auto-Fix CI Failures
+
+# When CI fails on a claude/* branch, Claude diagnoses the failure
+# from the workflow logs and pushes a fix commit.
+#
+# Only runs on claude/* branches to avoid touching human branches.
+# Requires: ANTHROPIC_API_KEY secret + Claude GitHub App installed.
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  id-token: write
+
+# One fix attempt at a time per PR to avoid conflicting pushes
+concurrency:
+  group: ci-autofix-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  autofix:
+    # Only run when CI failed on a claude/* branch (not main, not human branches)
+    if: |
+      github.event.workflow_run.conclusion == 'failure' &&
+      startsWith(github.event.workflow_run.head_branch, 'claude/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for prior autofix attempts
+        id: check-attempts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Count recent autofix commits to prevent infinite loops.
+          # If the last 3 commits are all autofixes, bail out.
+          recent_autofixes=$(git log --oneline -3 --format="%s" | grep -c "\[ci-autofix\]" || true)
+          if [ "$recent_autofixes" -ge 2 ]; then
+            echo "Too many consecutive autofix attempts — stopping to avoid infinite loop."
+            echo "should_fix=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_fix=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Auto-fix CI failure
+        if: steps.check-attempts.outputs.should_fix == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          additional_permissions: |
+            actions: read
+          prompt: |
+            REPO: ${{ github.repository }}
+            BRANCH: ${{ github.event.workflow_run.head_branch }}
+            FAILED RUN: ${{ github.event.workflow_run.id }}
+
+            The CI workflow just failed on this branch. Your job:
+
+            1. Use the CI tools to read the failing workflow logs and identify what failed.
+            2. Diagnose the root cause — is it a test failure, build error, validation error, or something else?
+            3. Read the relevant source files to understand the issue.
+            4. Implement the minimal fix needed.
+            5. Run the local validation gate to verify your fix:
+               - pnpm crux validate gate
+            6. Commit with a message prefixed with "[ci-autofix]" explaining what you fixed.
+            7. Push the fix to the branch.
+
+            Important:
+            - Only make minimal, targeted fixes. Do not refactor or improve unrelated code.
+            - If the failure is in test expectations that need updating (not a real bug), update the tests.
+            - If you cannot diagnose or fix the issue, post a comment on the PR explaining what you found.
+            - Follow the project conventions in CLAUDE.md.

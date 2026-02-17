@@ -5,7 +5,8 @@ entityType: internal
 description: "Complete reference for all scripts and automation workflows for maintaining wiki content"
 sidebar:
   order: 1
-importance: 0
+readerImportance: 10
+researchImportance: 9
 quality: 41
 llmSummary: "Comprehensive technical documentation for wiki maintenance automation, covering page improvement workflows (Q5 standards requiring 10+ citations, 800+ words), content grading via Claude API (~$0.02/page), validation suite, and knowledge base system. Provides detailed command reference, cost estimates, and common workflows for maintaining content quality."
 ratings:
@@ -85,7 +86,7 @@ Each page declares how often it should be updated:
 ```yaml
 update_frequency: 7     # Check weekly
 lastEdited: "2026-01-15"
-importance: 85
+readerImportance: 85
 ```
 
 **Priority scoring**: `staleness x (importance / 100)`, where staleness = days since edit / update frequency. Pages with staleness >= 1.0 are overdue.

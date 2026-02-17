@@ -1,0 +1,14 @@
+## 2026-02-16 | claude/importance-ranking-system-G0IMJ | Rename importance → readerImportance
+
+**What was done:** Renamed the ambiguous `importance` field to `readerImportance` across the entire codebase to distinguish it from `researchImportance`. Renamed `data/importance-ranking.yaml` → `data/reader-importance-ranking.yaml`. Updated 650 MDX frontmatter files, all TypeScript interfaces, build scripts, CLI modules, React components, tests, and validation schemas.
+
+**Pages:** (all 650 wiki pages had frontmatter updated — field rename only, no content changes)
+
+**Issues encountered:**
+- Several files in `crux/authoring/` and `crux/analyze/` were missed in the initial pass and caught by the Next.js type checker during build
+- The `SimilarityGraph` component and `get-similarity-data.ts` had their own local `importance` property on the `SimilarityNode` interface which maps from the renamed Page field
+
+**Learnings/notes:**
+- The categorical `importance` enum (low/medium/high/critical) used in cruxes/interventions is a completely separate concept and was correctly left unchanged
+- `PageRankingItem.importanceRank` was renamed to `readerRank` to parallel `researchRank`
+- Component props named `importance=` that receive data from `Page.readerImportance` were kept as `importance=` on the component interface since they're internal props, not data model fields

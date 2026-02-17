@@ -54,7 +54,7 @@ export function DataInfoBox({ entityId, type: inlineType, ...inlineProps }: Data
           customFields={data.customFields}
           relatedTopics={data.relatedTopics}
           relatedEntries={data.relatedEntries}
-          importance={pageData?.importance ?? undefined}
+          importance={pageData?.readerImportance ?? undefined}
           tractability={pageData?.tractability ?? undefined}
           neglectedness={pageData?.neglectedness ?? undefined}
           uncertainty={pageData?.uncertainty ?? undefined}
