@@ -13,6 +13,7 @@ import type {
 } from './types.ts';
 import { ROOT, NODE_TSX, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
+import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import {
   analyzePhase, researchPhase, improvePhase, reviewPhase,
   validatePhase, gapFillPhase, triagePhase,
@@ -109,7 +110,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         improvedContent = await improvePhase(page, analysis!, research || { sources: [] }, directions, options);
         // Warn about unverified citations in tiers without research
         if (tier === 'polish' && !research?.sources?.length) {
-          const footnoteCount = new Set(improvedContent.match(/\[\^\d+\]/g) || []).size;
+          const footnoteCount = new Set(improvedContent.match(FOOTNOTE_REF_RE) || []).size;
           if (footnoteCount > 0) {
             log('improve', `⚠ ${footnoteCount} footnote citations added without web research — citations are LLM-generated and should be verified`);
           }

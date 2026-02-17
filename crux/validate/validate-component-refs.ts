@@ -22,6 +22,7 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { createLogger, formatPath } from '../lib/output.ts';
 import { CONTENT_DIR, DATA_DIR, loadDatabase as loadDatabaseJson } from '../lib/content-types.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
+import { ENTITY_LINK_RE } from '../lib/patterns.ts';
 
 const log = createLogger();
 const c = log.colors;
@@ -176,9 +177,7 @@ function findComponentRefs(content: string): ComponentRef[] {
   const refs: ComponentRef[] = [];
 
   // EntityLink id="..."
-  const entityLinkRegex = /<EntityLink\s+id=["']([^"']+)["']/g;
-  let match: RegExpExecArray | null;
-  while ((match = entityLinkRegex.exec(content)) !== null) {
+  for (const match of content.matchAll(ENTITY_LINK_RE)) {
     refs.push({
       component: 'EntityLink',
       prop: 'id',

@@ -29,6 +29,7 @@ import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { fileURLToPath } from 'url';
 import { CONTENT_DIR } from '../../lib/content-types.ts';
 import { parseFrontmatter } from '../../lib/mdx-utils.ts';
+import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 import { findMdxFiles } from '../../lib/file-utils.ts';
 import { parseCliArgs } from '../../lib/cli.ts';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
@@ -131,7 +132,7 @@ function collectPages(): PageInfo[] {
 /** Apply grades to frontmatter YAML in the source file. */
 function applyGradesToFile(page: PageInfo, grades: GradeResult, metrics: { wordCount: number; citations: number; tables: number; diagrams: number }, derivedQuality: number): boolean {
   const content = readFileSync(page.filePath, 'utf-8');
-  const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  const fmMatch = content.match(FRONTMATTER_RE);
 
   if (!fmMatch) {
     console.warn(`No frontmatter found in ${page.filePath}`);

@@ -10,6 +10,7 @@
 
 import { createClient, callClaude, parseJsonResponse } from '../../lib/anthropic.ts';
 import { readFileSync } from 'fs';
+import { stripFrontmatter } from '../../lib/patterns.ts';
 import { ValidationEngine, ContentFile } from '../../lib/validation-engine.ts';
 import { countFootnoteRefs } from '../../lib/metrics-extractor.ts';
 import {
@@ -51,7 +52,7 @@ const WARNING_RULES = [
 
 /** Get content without frontmatter, optionally truncated. */
 export function getContent(text: string, maxWords: number = 10000): string {
-  const withoutFm = text.replace(/^---[\s\S]*?---\n*/, '');
+  const withoutFm = stripFrontmatter(text);
   const words = withoutFm.split(/\s+/);
   if (words.length <= maxWords) return withoutFm;
   return words.slice(0, maxWords).join(' ') + '\n\n[... truncated at ' + maxWords + ' words]';
@@ -59,7 +60,7 @@ export function getContent(text: string, maxWords: number = 10000): string {
 
 /** Compute automated metrics from content. */
 export function computeMetrics(content: string): Metrics {
-  const withoutFm = content.replace(/^---[\s\S]*?---\n*/, '');
+  const withoutFm = stripFrontmatter(content);
 
   const withoutTables = withoutFm.replace(/\|[^\n]+\|/g, '');
   const withoutCodeBlocks = withoutTables.replace(/```[\s\S]*?```/g, '');
