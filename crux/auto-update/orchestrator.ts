@@ -12,8 +12,8 @@ import { join } from 'path';
 import { execFileSync } from 'child_process';
 import { stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
-import { fetchAllSources } from './feed-fetcher.ts';
-import { buildDigest } from './digest.ts';
+import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts';
+import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest } from './page-router.ts';
 import type { AutoUpdateOptions, RunReport, RunResult } from './types.ts';
 
@@ -162,13 +162,25 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
 
   console.log(`\n── Stage 2: Building news digest ──`);
   const entityIds = loadEntityIds();
+  const previouslySeen = loadSeenItems();
   const digest = await buildDigest(
     fetchResult.items,
     fetchResult.fetchedSources,
     fetchResult.failedSources.map(f => f.id),
-    { entityIds, verbose },
+    { entityIds, previouslySeen, verbose },
   );
   console.log(`  Digest: ${digest.itemCount} relevant items`);
+
+  // Record all digest items as seen for future runs
+  if (digest.items.length > 0) {
+    const now = new Date().toISOString().slice(0, 10);
+    const newHashes: Record<string, string> = {};
+    for (const item of digest.items) {
+      const hash = normalizeTitle(item.title);
+      if (hash.length >= 5) newHashes[hash] = now;
+    }
+    saveSeenItems(newHashes);
+  }
 
   if (digest.itemCount === 0) {
     console.log(`\nNo relevant news found. Nothing to update.`);

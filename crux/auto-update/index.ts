@@ -4,8 +4,8 @@
  * Re-exports from internal modules for use by CLI commands and workflows.
  */
 
-export { fetchAllSources, loadSources, loadFetchTimes } from './feed-fetcher.ts';
-export { buildDigest } from './digest.ts';
+export { fetchAllSources, loadSources, loadFetchTimes, loadSeenItems, saveSeenItems } from './feed-fetcher.ts';
+export { buildDigest, normalizeTitle } from './digest.ts';
 export { routeDigest } from './page-router.ts';
 export { runPipeline } from './orchestrator.ts';
 export type {

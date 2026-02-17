@@ -25,6 +25,7 @@ import {
   routeDigest,
   loadSources,
   loadFetchTimes,
+  loadSeenItems,
 } from '../auto-update/index.ts';
 import type { AutoUpdateOptions, RunReport } from '../auto-update/types.ts';
 import type { CommandResult } from '../lib/cli.ts';
@@ -75,11 +76,12 @@ async function digest(args: string[], options: AutoUpdateOptions): Promise<Comma
   }
 
   console.log(`\nBuilding digest...`);
+  const previouslySeen = loadSeenItems();
   const newsDigest = await buildDigest(
     fetchResult.items,
     fetchResult.fetchedSources,
     fetchResult.failedSources.map(f => f.id),
-    { entityIds, verbose },
+    { entityIds, previouslySeen, verbose },
   );
 
   if (options.json || options.ci) {
@@ -141,11 +143,12 @@ async function plan(args: string[], options: AutoUpdateOptions): Promise<Command
     } catch { /* ignore */ }
   }
 
+  const previouslySeenPlan = loadSeenItems();
   const newsDigest = await buildDigest(
     fetchResult.items,
     fetchResult.fetchedSources,
     fetchResult.failedSources.map(f => f.id),
-    { entityIds, verbose },
+    { entityIds, previouslySeen: previouslySeenPlan, verbose },
   );
 
   console.log(`Routing to pages...`);

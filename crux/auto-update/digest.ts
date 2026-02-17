@@ -15,23 +15,31 @@ import type { FeedItem, DigestItem, NewsDigest } from './types.ts';
 
 // ── Deduplication ───────────────────────────────────────────────────────────
 
-function normalizeTitle(title: string): string {
+export function normalizeTitle(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 60);
 }
 
-function deduplicateItems(items: FeedItem[]): FeedItem[] {
-  const seen = new Set<string>();
+/**
+ * Deduplicate items within this batch and against previously seen items.
+ * @param previouslySeen - Hashes from prior runs (loaded from state file)
+ */
+function deduplicateItems(items: FeedItem[], previouslySeen?: Set<string>): { items: FeedItem[]; skippedAsSeen: number } {
+  const seen = new Set<string>(previouslySeen || []);
   const result: FeedItem[] = [];
+  let skippedAsSeen = 0;
 
   for (const item of items) {
     const key = normalizeTitle(item.title);
     if (key.length < 5) continue; // Skip empty/trivial titles
-    if (seen.has(key)) continue;
+    if (seen.has(key)) {
+      if (previouslySeen?.has(key)) skippedAsSeen++;
+      continue;
+    }
     seen.add(key);
     result.push(item);
   }
 
-  return result;
+  return { items: result, skippedAsSeen };
 }
 
 // ── LLM Classification ─────────────────────────────────────────────────────
@@ -133,6 +141,8 @@ export interface BuildDigestOptions {
   minRelevance?: number;
   /** Known entity IDs from the wiki for matching */
   entityIds?: string[];
+  /** Previously seen item hashes (from prior runs) to skip */
+  previouslySeen?: Set<string>;
   verbose?: boolean;
 }
 
@@ -151,16 +161,19 @@ export async function buildDigest(
   failedSources: string[],
   options: BuildDigestOptions = {},
 ): Promise<NewsDigest> {
-  const { minRelevance = 20, entityIds = [], verbose = false } = options;
+  const { minRelevance = 20, entityIds = [], previouslySeen, verbose = false } = options;
 
   if (verbose) {
     console.log(`\nBuilding digest from ${feedItems.length} raw items...`);
+    if (previouslySeen) {
+      console.log(`  ${previouslySeen.size} previously seen items loaded for cross-run dedup`);
+    }
   }
 
-  // Step 1: Deduplicate
-  const unique = deduplicateItems(feedItems);
+  // Step 1: Deduplicate (within batch + against prior runs)
+  const { items: unique, skippedAsSeen } = deduplicateItems(feedItems, previouslySeen);
   if (verbose) {
-    console.log(`  ${feedItems.length} → ${unique.length} after dedup`);
+    console.log(`  ${feedItems.length} → ${unique.length} after dedup${skippedAsSeen > 0 ? ` (${skippedAsSeen} seen in prior runs)` : ''}`);
   }
 
   // Step 2: If no items, return empty digest

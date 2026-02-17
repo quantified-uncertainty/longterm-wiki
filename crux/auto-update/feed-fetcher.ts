@@ -29,24 +29,89 @@ export function loadSources(): SourcesConfig {
 }
 
 /**
- * Persist last_fetch_times without rewriting the entire YAML file.
+ * Persistent state for the auto-update system.
  * Uses a separate state file to avoid stripping comments from sources.yaml.
+ *
+ * State includes:
+ * - last_fetch_times: when each source was last fetched (ISO string)
+ * - seen_items: normalized title hashes of items we've already processed,
+ *   mapped to the date they were first seen (for pruning old entries)
  */
 const STATE_PATH = join(PROJECT_ROOT, 'data/auto-update/state.yaml');
 
+const SEEN_ITEMS_MAX_AGE_DAYS = 90;
+
+interface AutoUpdateState {
+  last_fetch_times: Record<string, string>;
+  seen_items: Record<string, string>;  // hash → ISO date first seen
+}
+
+function loadState(): AutoUpdateState {
+  if (!existsSync(STATE_PATH)) {
+    return { last_fetch_times: {}, seen_items: {} };
+  }
+  try {
+    const raw = readFileSync(STATE_PATH, 'utf-8');
+    const data = parseYaml(raw) as Partial<AutoUpdateState>;
+    return {
+      last_fetch_times: data?.last_fetch_times || {},
+      seen_items: data?.seen_items || {},
+    };
+  } catch {
+    return { last_fetch_times: {}, seen_items: {} };
+  }
+}
+
+function saveState(state: AutoUpdateState): void {
+  writeFileSync(STATE_PATH, stringifyYaml(state, { lineWidth: 120 }));
+}
+
 export function saveFetchTimes(times: Record<string, string>): void {
-  writeFileSync(STATE_PATH, stringifyYaml({ last_fetch_times: times }, { lineWidth: 120 }));
+  const state = loadState();
+  state.last_fetch_times = times;
+  saveState(state);
 }
 
 export function loadFetchTimes(): Record<string, string> {
-  if (!existsSync(STATE_PATH)) return {};
-  try {
-    const raw = readFileSync(STATE_PATH, 'utf-8');
-    const data = parseYaml(raw) as { last_fetch_times?: Record<string, string> };
-    return data?.last_fetch_times || {};
-  } catch {
-    return {};
+  return loadState().last_fetch_times;
+}
+
+/**
+ * Load previously seen item hashes, pruning entries older than 90 days.
+ */
+export function loadSeenItems(): Set<string> {
+  const state = loadState();
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - SEEN_ITEMS_MAX_AGE_DAYS);
+  const cutoffStr = cutoff.toISOString();
+
+  // Prune old entries while loading
+  const pruned: Record<string, string> = {};
+  let prunedCount = 0;
+  for (const [hash, dateStr] of Object.entries(state.seen_items)) {
+    if (dateStr >= cutoffStr) {
+      pruned[hash] = dateStr;
+    } else {
+      prunedCount++;
+    }
   }
+
+  // Save back if we pruned anything
+  if (prunedCount > 0) {
+    state.seen_items = pruned;
+    saveState(state);
+  }
+
+  return new Set(Object.keys(pruned));
+}
+
+/**
+ * Record newly seen item hashes (merges with existing).
+ */
+export function saveSeenItems(newHashes: Record<string, string>): void {
+  const state = loadState();
+  state.seen_items = { ...state.seen_items, ...newHashes };
+  saveState(state);
 }
 
 // ── RSS/Atom Parsing ────────────────────────────────────────────────────────

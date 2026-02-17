@@ -1,6 +1,6 @@
 ## 2026-02-17 | claude/wiki-auto-update-system-0stG2 | Auto-update system
 
-**What was done:** Built a news-driven wiki auto-update system that fetches RSS feeds and web searches, builds a relevance-scored digest, routes news items to wiki pages, and executes improvements through the existing crux content pipeline. Includes CLI commands, GitHub Actions workflow for daily scheduled runs, and run history tracking.
+**What was done:** Built a news-driven wiki auto-update system that fetches RSS feeds and web searches, builds a relevance-scored digest, routes news items to wiki pages, and executes improvements through the existing crux content pipeline. Includes CLI commands, GitHub Actions workflow for daily scheduled runs, and run history tracking. Added cumulative digest memory: tracks previously seen items in state.yaml to avoid re-processing the same news items across runs, with automatic pruning of entries older than 90 days.
 
 **Pages:** (none — infrastructure-only)
 
@@ -13,3 +13,4 @@
 - Web search sources use the existing Anthropic web_search tool via the LLM layer
 - The system has a two-stage routing approach: fast entity ID matching first, then LLM routing for unmatched items
 - Budget controls are built into both the CLI and the GitHub Actions workflow
+- Cumulative digest memory uses a flat YAML state file (no DB needed) — `seen_items` is a hash→date map pruned to 90 days
