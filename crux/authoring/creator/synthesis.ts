@@ -9,6 +9,7 @@ import path from 'path';
 import { spawn } from 'child_process';
 import { inferEntityType } from '../../lib/category-entity-types.ts';
 import { buildEntityLookupForTopic } from '../../lib/entity-lookup.ts';
+import { buildFactLookupForContent } from '../../lib/fact-lookup.ts';
 import type { SynthesisPhaseContext, CreatorContext } from './types.ts';
 
 type LoadResultContext = Pick<Required<CreatorContext>, 'loadResult'>;
@@ -260,6 +261,16 @@ Use these to keep numbers in sync with the canonical facts database:
   Example: \\\`<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />\\\` → "27x"
   Formats: "currency" (\\$X billion), "percent" (X%), "number" (X,XXX), or auto.
   Use \\\`<Calc>\\\` instead of hardcoding ratios, multiples, or other derived numbers.
+
+**Only wrap a value when the prose clearly refers to the same thing the fact describes.** When in doubt, leave it as plain text.
+
+### Fact Lookup Table
+
+ONLY use fact IDs from this table. If a value doesn't match a fact here, leave it as plain text.
+
+\`\`\`
+${ROOT ? buildFactLookupForContent(topic.toLowerCase().replace(/[^a-z0-9]+/g, '-'), researchContent || topic, ROOT) || '(no matching facts available)' : '(fact lookup not available)'}
+\`\`\`
 
 ## Article Sections
 - Quick Assessment (table)

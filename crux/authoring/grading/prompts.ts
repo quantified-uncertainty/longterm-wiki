@@ -50,10 +50,10 @@ NOVELTY CALIBRATION (critical):
 - 0: Stub/placeholder
 
 **CONCRETENESS (0-10)**: Specific vs. abstract?
-- 9-10: Specific numbers, examples, recommendations throughout (consultant-ready)
-- 7-8: Mostly concrete with specific details (exceptional)
-- 5-6: Mix of concrete and abstract
-- 3-4: Mostly abstract, vague generalities ("consider the tradeoffs", "it depends")
+- 9-10: Specific numbers, examples, recommendations throughout; key values use canonical \`<F>\` fact bindings and \`<Calc>\` for derived numbers (consultant-ready, data stays in sync)
+- 7-8: Mostly concrete with specific details; uses \`<F>\`/\`<Calc>\` for important values (exceptional)
+- 5-6: Mix of concrete and abstract; some canonical facts wrapped
+- 3-4: Mostly abstract, vague generalities ("consider the tradeoffs", "it depends"); numeric values hardcoded
 - 1-2: Almost entirely abstract hand-waving
 - 0: No concrete content
 
@@ -162,7 +162,7 @@ Checklist categories:
 - Focus & Structure (FOC): title mismatch, scope creep, buried lede, redundant sections, wall of text
 - Completeness (CMP): missing counterarguments, missing stakeholders, unanswered questions, missing limitations
 - Concreteness (CON): vague generalities, abstract recommendations, vague timelines, missing magnitudes
-- Cross-Page (XPC): contradictory figures, stale valuations, missing cross-references
+- Cross-Page (XPC): contradictory figures, stale valuations, missing cross-references, hardcoded values that should use \`<F>\` fact bindings or \`<Calc>\` for derived values (ratios, multiples)
 - Formatting (FMT): long paragraphs, missing data dates, formatting inconsistencies
 - Biographical Accuracy (BIO) — APPLY ONLY TO PERSON/ORG PAGES: unsourced dates/roles/credentials, missing primary sources (official site, CV, direct statements), attributed quotes without verbatim source, speculative motivations ("X believed that..." without citation), unverified employment history, potential LLM hallucination patterns (confident specific claims without evidence)
 

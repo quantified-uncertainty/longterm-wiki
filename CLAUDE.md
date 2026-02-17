@@ -104,7 +104,8 @@ Re-read the full page and verify:
 1. **Links resolve**: Every `<EntityLink id="X">` has a matching `- id: X` in `data/entities/*.yaml`
 2. **Prose matches data**: Claims in prose agree with numbers in tables/charts on the same page
 3. **Units are consistent**: Same unit throughout (don't mix years in overview with months in tables)
-4. **Rendering works**: For `\$`, `^`, `{}` or LaTeX-like notation, think through MDX rendering. When in doubt, use plain text.
+4. **Facts wrapped**: Key numeric values that exist in `data/facts/*.yaml` are wrapped with `<F>`, and derived values (ratios, multiples) use `<Calc>`. Only wrap when the semantic meaning matches the fact — `$1B` could be revenue or investment.
+5. **Rendering works**: For `\$`, `^`, `{}` or LaTeX-like notation, think through MDX rendering. When in doubt, use plain text.
 
 For model/analysis pages, also run the full review checklist in `content/docs/internal/models.mdx` (Part 7).
 
@@ -176,6 +177,7 @@ print(f\"Total: {data['total_count']} checks\")
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
 - **Entity types**: Canonical list in `app/src/data/entity-type-names.ts`. Category-mapped types (used by page creator): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project. Additional types include: risk-factor, safety-agenda, policy, case-study, scenario, resource, funder, historical, analysis, parameter, argument, table, diagram, insight
+- **Canonical facts**: Use `<F e="entity" f="fact-id">display</F>` for values that exist in `data/facts/*.yaml`. Use `<Calc expr="{entity.factId} / {entity.factId}" precision={1} suffix="x" />` for derived values (ratios, multiples). Only wrap values that semantically match a fact — when in doubt, leave as plain text. Both pipelines (`create` and `improve`) inject a fact lookup table into the LLM prompt automatically.
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide
