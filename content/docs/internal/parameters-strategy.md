@@ -1,7 +1,9 @@
 ---
+numericId: E740
 title: "Parameters Strategy"
 description: "Strategy for AI transition model parameters"
 pageType: "documentation"
+entityType: internal
 importance: 39
 researchImportance: 69.5
 quality: 3

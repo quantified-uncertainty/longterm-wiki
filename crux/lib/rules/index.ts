@@ -43,6 +43,7 @@ import { externalLinksRule } from './external-links.ts';
 
 // Schema validation rules
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
+import { numericIdIntegrityRule } from './numeric-id-integrity.ts';
 
 // Quality validation rules
 import { qualitySourceRule } from './quality-source.ts';
@@ -105,6 +106,7 @@ export {
   vagueCitationsRule,
   externalLinksRule,
   frontmatterSchemaRule,
+  numericIdIntegrityRule,
   qualitySourceRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
@@ -149,6 +151,7 @@ export const allRules: Rule[] = [
   vagueCitationsRule,
   externalLinksRule,
   frontmatterSchemaRule,
+  numericIdIntegrityRule,
   qualitySourceRule,
   temporalArtifactsRule,
   editorialArtifactsRule,

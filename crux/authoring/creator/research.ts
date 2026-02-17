@@ -46,6 +46,23 @@ const SCRY_PUBLIC_KEY = process.env.SCRY_API_KEY || 'exopriors_public_readonly_v
 export async function runPerplexityResearch(topic: string, depth: string, { log, saveResult }: ResearchContext): Promise<{ success: boolean; cost: number; queryCount: number }> {
   log('research', `Starting Perplexity research (${depth})...`);
 
+  // Check if OPENROUTER_API_KEY is available
+  if (!process.env.OPENROUTER_API_KEY) {
+    log('research', 'Warning: OPENROUTER_API_KEY not set — skipping Perplexity research');
+    log('research', 'The synthesis step will have limited research data available');
+    saveResult(topic, 'perplexity-research.json', {
+      topic,
+      depth,
+      queryCount: 0,
+      totalCost: 0,
+      timestamp: new Date().toISOString(),
+      sources: [],
+      skipped: true,
+      skipReason: 'OPENROUTER_API_KEY not available',
+    });
+    return { success: true, cost: 0, queryCount: 0 };
+  }
+
   let queries: ResearchQuery[] = generateResearchQueries(topic);
 
   if (depth === 'lite') {
@@ -61,7 +78,25 @@ export async function runPerplexityResearch(topic: string, depth: string, { log,
 
   log('research', `Running ${queries.length} Perplexity queries...`);
 
-  const results: BatchResearchResult[] = await batchResearch(queries, { concurrency: 3 });
+  let results: BatchResearchResult[];
+  try {
+    results = await batchResearch(queries, { concurrency: 3 });
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('research', `Warning: Perplexity research failed: ${error.message}`);
+    log('research', 'Continuing with empty research — synthesis will use available data only');
+    saveResult(topic, 'perplexity-research.json', {
+      topic,
+      depth,
+      queryCount: queries.length,
+      totalCost: 0,
+      timestamp: new Date().toISOString(),
+      sources: [],
+      skipped: true,
+      skipReason: `Network error: ${error.message}`,
+    });
+    return { success: true, cost: 0, queryCount: 0 };
+  }
 
   let totalCost = 0;
   const researchSources: ResearchSource[] = [];
@@ -105,6 +140,7 @@ export async function runScryResearch(topic: string, { log, saveResult }: ScryCo
   ];
 
   const results: ScryRow[] = [];
+  let allFailed = true;
 
   for (const search of searches) {
     try {
@@ -120,11 +156,13 @@ export async function runScryResearch(topic: string, { log, saveResult }: ScryCo
           'Content-Type': 'text/plain',
         },
         body: sql,
+        signal: AbortSignal.timeout(15000),
       });
 
       const data = await response.json() as { rows?: ScryRow[] };
 
       if (data.rows) {
+        allFailed = false;
         const platform = search.table.includes('eaforum') ? 'EA Forum' : 'LessWrong';
         log('scry', `  ${platform} "${search.query}": ${data.rows.length} results`);
         results.push(...data.rows.map(row => ({
@@ -137,6 +175,11 @@ export async function runScryResearch(topic: string, { log, saveResult }: ScryCo
       const error = err instanceof Error ? err : new Error(String(err));
       log('scry', `  Error searching ${search.table}: ${error.message}`);
     }
+  }
+
+  if (allFailed && results.length === 0) {
+    log('scry', 'Warning: All SCRY searches failed (network may be unavailable)');
+    log('scry', 'Continuing without community discussion data');
   }
 
   // Deduplicate by URI

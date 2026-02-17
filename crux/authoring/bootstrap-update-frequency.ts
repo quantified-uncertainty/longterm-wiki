@@ -132,7 +132,7 @@ async function main(): Promise<void> {
     }
 
     // Skip stubs
-    if (fm.pageType === 'stub' || fm.pageType === 'documentation') {
+    if (fm.pageType === 'stub' || fm.pageType === 'documentation' || fm.entityType === 'internal') {
       skipped++;
       continue;
     }

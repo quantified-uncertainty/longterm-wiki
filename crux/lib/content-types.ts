@@ -22,6 +22,7 @@ export interface Frontmatter {
   description?: string;
   sidebar?: { label?: string; order?: number; hidden?: boolean; badge?: unknown };
   pageType?: 'content' | 'stub' | 'documentation';
+  entityType?: string;
   quality?: number;
   readerImportance?: number;
   tractability?: number;

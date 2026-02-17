@@ -1,0 +1,687 @@
+---
+numericId: E753
+title: "Wiki Generation Architecture: Multi-Agent Multi-Pass Design"
+entityType: internal
+description: "Architecture proposal for scalable, high-quality wiki page generation using specialist agents, multi-pass refinement, knowledge graph integration, and dynamic computation"
+createdAt: 2026-02-16
+lastUpdated: 2026-02-16
+sidebar:
+  order: 35
+importance: 75
+quality: 55
+evergreen: false
+llmSummary: "Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan building on existing Crux infrastructure."
+ratings:
+  novelty: 7
+  rigor: 6
+  actionability: 8
+  completeness: 7
+---
+import { Mermaid } from '@components/wiki';
+
+## Executive Summary
+
+Our current page generation pipeline (Crux content create/improve) is a **single-pipeline, single-agent** system. It works, but produces pages that are adequate rather than excellent. The best wiki pages require depth that a single LLM pass cannot achieve: dense cross-linking, verified citations, complex diagrams, embedded calculations, and knowledge graph coherence.
+
+This document proposes a **multi-agent, multi-pass architecture** inspired by Stanford's STORM, Microsoft's GraphRAG, CrewAI's specialist agent patterns, and the Self-Refine iterative paradigm. The core idea: decompose page generation into **composable passes**, each executed by a **specialist agent** optimized for one concern.
+
+| Current System | Proposed System |
+|----------------|-----------------|
+| Single synthesis prompt | 12+ composable passes |
+| One LLM does everything | 8 specialist agents |
+| Research then write (2 phases) | Research, structure, write, link, verify, compute, diagram, review (8+ phases) |
+| Knowledge graph consulted at link time | Knowledge graph drives content planning |
+| Static calculations | Dynamic Squiggle models derived from wiki data |
+| Post-hoc validation | Validation integrated into each pass |
+| \$4-15 per page | \$8-25 per page (higher quality ceiling) |
+
+---
+
+## Part 1: Problems with the Current System
+
+### What We Have
+
+The current pipeline (`crux/authoring/page-creator.ts`) follows this flow:
+
+```
+canonical-links -> research -> source-fetching -> synthesis -> verification -> validation -> grade
+```
+
+This produces pages scoring 70-80/100 on our grading rubric. The pipeline has been iterated significantly (see the [Page Creator Pipeline report](/internal/reports/page-creator-pipeline/)) and represents solid work. But it has structural limitations:
+
+### Limitation 1: Single-Agent Synthesis Bottleneck
+
+One Claude call synthesizes the entire article from research. This means the model must simultaneously:
+- Write coherent prose
+- Place citations correctly
+- Decide which EntityLinks to use
+- Structure sections per template
+- Include appropriate tables and diagrams
+- Maintain balanced perspective
+
+No single prompt can optimize all of these. The result: pages that are structurally correct but lack depth in cross-linking, calculations, and visual elements.
+
+### Limitation 2: Knowledge Graph is Read-Only
+
+The current system *consults* the entity database to resolve EntityLinks, but doesn't use the knowledge graph to *plan* content. A page about "deceptive alignment" should proactively cover its graph neighbors (situational awareness, mesa-optimization, sleeper agents) with appropriate depth. Currently, this happens only if the LLM independently decides to mention them.
+
+### Limitation 3: No Iterative Deepening
+
+The pipeline runs once. If the synthesis phase produces a page with weak sections, those sections stay weak. The review phase in the improver can identify gaps, but the fix is another monolithic LLM call. There's no mechanism for targeted, section-level improvement.
+
+### Limitation 4: Diagrams and Calculations are Afterthoughts
+
+Mermaid diagrams and Squiggle models are included only if the synthesis prompt happens to produce them. There's no dedicated agent reasoning about what visual or computational elements would add value, and no agent that specializes in producing high-quality versions of these.
+
+### Limitation 5: Cross-Linking is Shallow
+
+EntityLinks are added during synthesis, then validated. But the system doesn't reason about the *topology* of links: which inbound links should this page attract? Which pages should link *to* this one? A new page about "compute governance" should trigger updates to pages about "compute thresholds," "chip export controls," and "training run monitoring."
+
+---
+
+## Part 2: State of the Art
+
+### Stanford STORM (2024)
+
+[STORM](https://github.com/stanford-oval/storm) (Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking) is the closest academic system to what we need. Key innovations:
+
+| Innovation | How It Works | Relevance to Us |
+|------------|-------------|-----------------|
+| **Perspective-guided research** | Discovers multiple perspectives by surveying similar articles, then simulates conversations from each perspective | We could mine perspectives from our existing 625 pages on related topics |
+| **Simulated expert conversations** | A "writer" agent asks questions to a "topic expert" agent grounded in search results. Follow-up questions arise naturally | Better than our "dump all research into one synthesis prompt" approach |
+| **Two-stage pipeline** | Pre-writing (research + outline) is separated from writing. Outline quality correlates with article quality | We already do this loosely; could formalize it |
+| **Co-STORM mind map** | Organizes collected information into a hierarchical concept structure updated throughout the process | Maps to our entity graph, but dynamically maintained during authoring |
+
+**Key finding**: STORM articles were rated 25% better organized and 10% broader in coverage than baseline RAG approaches by Wikipedia editors.
+
+**Limitation**: STORM produces Wikipedia-style articles but doesn't handle our specific requirements: EntityLinks, Squiggle models, Mermaid diagrams, YAML entity synchronization, or the frontmatter/grading system.
+
+### Microsoft GraphRAG (2024)
+
+[GraphRAG](https://github.com/microsoft/graphrag) extends RAG with knowledge graph structure. Instead of retrieving text chunks, it retrieves **subgraphs** -- entities, relationships, and community summaries.
+
+| Innovation | How It Works | Relevance to Us |
+|------------|-------------|-----------------|
+| **Community detection** | Clusters related entities and generates hierarchical summaries | We could use this to identify which entities a new page should cover |
+| **Global search via map-reduce** | Pre-generates community summaries, then runs map-reduce across them for corpus-wide questions | Useful for "what's the relationship between X and all its neighbors?" |
+| **Entity extraction pipeline** | Extracts entities and relationships from text, builds graph | We already have this (YAML entities + content scanning), but could improve |
+
+**Key finding**: GraphRAG dramatically outperforms naive RAG on multi-hop reasoning and synthesis questions. Exactly the kind of reasoning needed for wiki cross-linking.
+
+### CrewAI Specialist Agent Pattern (2025)
+
+[CrewAI](https://www.crewai.com/) demonstrates that splitting work across specialist agents with **clear handoff contracts** produces better results than one mega-agent.
+
+The pattern: Researcher -> Writer -> Editor -> Specialist, with each agent optimized for its role (different system prompts, different tools, potentially different models).
+
+**Key insight from CrewAI**: "Squeezing too much into one agent causes context windows to blow up, too many tools confuse it, and hallucinations increase." This directly explains our synthesis bottleneck.
+
+### Self-Refine (Madaan et al., 2023)
+
+[Self-Refine](https://selfrefine.info/) demonstrates that iterative `generate -> feedback -> refine` loops improve LLM output by ~20% on average. The key: the same model generates, critiques, and refines, but with different prompts for each role.
+
+**Key finding**: The refine loop works best when feedback is *specific and actionable* (not "make it better" but "paragraph 3 lacks a citation for the 40% claim"). This maps to our validation rules, which already produce specific, fixable issues.
+
+### SemanticCite (2025)
+
+[SemanticCite](https://arxiv.org/html/2511.16198v1) proposes a pipeline for citation verification: extract claims, retrieve source passages via hybrid search, classify support level (SUPPORTED / PARTIALLY SUPPORTED / UNSUPPORTED / UNCERTAIN). Their fine-tuned models achieve competitive performance with commercial systems.
+
+**Relevance**: We already have a verify-sources phase, but it's coarse-grained. Per-claim verification with confidence scoring would significantly improve citation quality.
+
+### Anthropic Multi-Agent Research System (2025)
+
+[Anthropic's own research system](https://www.anthropic.com/engineering/multi-agent-research-system) uses an orchestrator-worker pattern: a lead agent analyzes a query, develops strategy, and spawns subagents to explore different aspects in parallel. Multi-agent Opus + Sonnet outperformed single-agent Opus by **90.2%** on their research eval.
+
+**Key insight**: Use expensive models (Opus) for orchestration and synthesis, cheap models (Sonnet/Haiku) for parallel research and extraction. This is exactly the cost structure we should adopt.
+
+---
+
+## Part 3: Proposed Architecture
+
+### Core Principle: Composable Passes
+
+Instead of a monolithic pipeline, we define **passes** that can be composed in different orders depending on the page type, tier, and goals. Each pass:
+
+1. Takes a well-defined input (page draft + metadata)
+2. Produces a well-defined output (modified draft + metadata)
+3. Is idempotent (running it twice produces the same result)
+4. Has a cost estimate
+5. Can be run independently for debugging
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Orchestrator["Orchestrator Agent"]
+        PLAN[Plan Generation Strategy]
+        SCHEDULE[Schedule Passes]
+        QUALITY[Quality Gate Check]
+    end
+
+    subgraph Research["Research Passes"]
+        RP[Perspective Discovery]
+        RW[Web Research]
+        RS[SCRY/Academic Search]
+        RG[Graph Neighbor Analysis]
+    end
+
+    subgraph Structure["Structure Passes"]
+        SO[Outline Generation]
+        ST[Template Compliance]
+        SK[Knowledge Graph Planning]
+    end
+
+    subgraph Content["Content Passes"]
+        CS[Section-by-Section Synthesis]
+        CC[Citation Placement]
+        CE[EntityLink Enrichment]
+    end
+
+    subgraph Enrichment["Enrichment Passes"]
+        ED[Diagram Generation]
+        EC[Squiggle Model Creation]
+        ET[Table Structuring]
+        EF[Fact Extraction to YAML]
+    end
+
+    subgraph Verification["Verification Passes"]
+        VC[Citation Verification]
+        VL[EntityLink Resolution]
+        VV[Validation Rules]
+        VR[Self-Review]
+    end
+
+    PLAN --> Research
+    Research --> Structure
+    Structure --> Content
+    Content --> Enrichment
+    Enrichment --> Verification
+    Verification --> QUALITY
+    QUALITY -->|"Below threshold"| Content
+    QUALITY -->|"Pass"| DONE[Final Page]
+`} />
+
+### The 8 Specialist Agents
+
+Each agent has a focused role, specific tools, and an optimal model choice:
+
+| # | Agent | Role | Model | Tools | Cost/Page |
+|---|-------|------|-------|-------|-----------|
+| 1 | **Orchestrator** | Plans strategy, schedules passes, checks quality gates | Opus | All agents, quality scorer | \$1-2 |
+| 2 | **Researcher** | Web search, academic search, source fetching | Sonnet | Perplexity, SCRY, Firecrawl | \$1-3 |
+| 3 | **Graph Analyst** | Analyzes knowledge graph neighbors, plans cross-links | Sonnet | Entity DB, backlinks, graph data | \$0.50-1 |
+| 4 | **Structurer** | Generates outlines, ensures template compliance | Sonnet | Page templates, existing page analysis | \$0.50-1 |
+| 5 | **Writer** | Section-by-section prose synthesis from research | Opus | Research output, entity lookup | \$2-4 |
+| 6 | **Enricher** | Creates diagrams, Squiggle models, tables | Sonnet | Mermaid validator, Squiggle runtime | \$1-2 |
+| 7 | **Verifier** | Citation checking, EntityLink resolution, fact validation | Haiku | Source DB, validation engine | \$0.25-0.50 |
+| 8 | **Reviewer** | Identifies gaps, bias, weak sections; triggers re-passes | Opus | Quality rubric, template checker | \$1-2 |
+
+**Total estimated cost**: \$8-16 for standard tier (vs \$4-6 currently). The quality ceiling is substantially higher.
+
+### The 12+ Composable Passes
+
+#### Research Passes
+
+**Pass R1: Perspective Discovery**
+- Input: Topic title + entity type
+- Process: Survey our existing pages on related topics. What perspectives do they cover? What's missing? (Inspired by STORM's perspective mining)
+- Output: List of 5-10 perspectives to investigate (e.g., for "compute governance": technical feasibility, political economy, international coordination, industry self-regulation, civil liberties)
+- Agent: Graph Analyst
+- Cost: \$0.25
+
+**Pass R2: Multi-Source Research**
+- Input: Topic + perspectives list
+- Process: For each perspective, run targeted Perplexity queries. Fetch and register sources.
+- Output: `research.json` with categorized findings per perspective
+- Agent: Researcher
+- Cost: \$1-3
+
+**Pass R3: Graph Neighbor Analysis**
+- Input: Topic + entity database
+- Process: Identify all entities within 2 hops in the knowledge graph. Analyze which are most relevant and what relationship labels apply. Determine which existing pages should link *to* this new page.
+- Output: `graph-context.json` with neighbor entities, relationship types, and suggested inbound link updates
+- Agent: Graph Analyst
+- Cost: \$0.50
+
+**Pass R4: Existing Content Analysis**
+- Input: Topic + similar pages (from redundancy detection)
+- Process: Read the top 5 most similar existing pages. Identify what this page should cover that they don't, and what it can reference rather than repeat.
+- Output: `content-gap.json` with unique angles and cross-references
+- Agent: Graph Analyst
+- Cost: \$0.50
+
+#### Structure Passes
+
+**Pass S1: Outline Generation**
+- Input: Research output + template + graph context
+- Process: Generate a detailed section-by-section outline with word count targets and required elements per section (tables, citations, diagrams)
+- Output: `outline.json` with sections, subsections, planned elements
+- Agent: Structurer
+- Cost: \$0.50
+
+**Pass S2: Knowledge Graph Planning**
+- Input: Outline + entity database
+- Process: For each section, identify which EntityLinks should appear. Plan where Squiggle models and diagrams will go. Identify facts to extract to YAML.
+- Output: Enriched outline with EntityLink targets, diagram specs, computation specs
+- Agent: Graph Analyst
+- Cost: \$0.50
+
+#### Content Passes
+
+**Pass C1: Section-by-Section Synthesis**
+- Input: Outline + research + graph context (one section at a time)
+- Process: Write each section independently, using only the research relevant to that section. Enforce citation discipline per section.
+- Output: Draft page with all sections assembled
+- Agent: Writer
+- Cost: \$2-4
+
+This is the biggest departure from the current system. Instead of one synthesis call, we write section by section. Each section gets a focused context window with only the relevant research, entity lookups, and template requirements. This prevents context window overload and ensures each section gets full attention.
+
+**Pass C2: Citation Placement**
+- Input: Draft page + source database
+- Process: Verify every factual claim has a citation. Add missing citations from the source database. Convert inline URLs to `<R>` components where sources exist.
+- Output: Fully cited draft
+- Agent: Verifier
+- Cost: \$0.25
+
+**Pass C3: EntityLink Enrichment**
+- Input: Draft + entity database
+- Process: Scan for entity mentions that lack EntityLinks. Add `<EntityLink>` components for all resolvable entities. Ensure link density meets template requirements.
+- Output: Cross-linked draft
+- Agent: Graph Analyst
+- Cost: \$0.25
+
+#### Enrichment Passes
+
+**Pass E1: Diagram Generation**
+- Input: Draft + outline diagram specs
+- Process: For each planned diagram location, generate a Mermaid diagram that visualizes the concept. Validate syntax. Follow Mermaid style guide (max 15-20 nodes, flowchart TD, proper colors).
+- Output: Draft with embedded diagrams
+- Agent: Enricher
+- Cost: \$0.50-1
+
+**Pass E2: Computation Embedding**
+- Input: Draft + facts database + graph data
+- Process: Identify quantitative claims that could be dynamic. Create Squiggle models that compute from wiki data (facts YAML, entity metrics). Embed `<SquiggleEstimate>` components.
+- Output: Draft with dynamic computations
+- Agent: Enricher
+- Cost: \$0.50-1
+
+**Pass E3: Table Structuring**
+- Input: Draft
+- Process: Identify data that's better presented as tables. Ensure tables have proper headers, sourced data, and comparative structure. Enforce the "max 4 tables, tables are for genuinely comparative data" rule.
+- Output: Draft with optimized tables
+- Agent: Enricher
+- Cost: \$0.25
+
+**Pass E4: Fact Extraction**
+- Input: Draft + existing facts YAML
+- Process: Extract key quantitative claims from the page and propose additions to `data/facts/`. Link computed facts to their source pages.
+- Output: `proposed-facts.yaml` + draft with fact references
+- Agent: Enricher
+- Cost: \$0.25
+
+#### Verification Passes
+
+**Pass V1: Citation Verification**
+- Input: Draft + source database
+- Process: For each citation, verify the claim is actually supported by the source. Classify as SUPPORTED / PARTIALLY_SUPPORTED / UNSUPPORTED. Flag unsupported claims.
+- Output: Verification report + flagged claims
+- Agent: Verifier (inspired by SemanticCite)
+- Cost: \$0.25-0.50
+
+**Pass V2: Validation Rules**
+- Input: Draft
+- Process: Run the full validation engine (dollar signs, comparison operators, frontmatter schema, EntityLink IDs, etc.). Auto-fix where possible.
+- Output: Clean draft passing all blocking rules
+- Agent: Verifier
+- Cost: \$0.10
+
+**Pass V3: Self-Review**
+- Input: Draft + template + quality rubric
+- Process: Grade the page against the template rubric. Identify weak sections with specific, actionable feedback. Determine if another pass through content/enrichment is needed.
+- Output: Review report with per-section scores and improvement suggestions
+- Agent: Reviewer (inspired by Self-Refine)
+- Cost: \$1-2
+
+### Iterative Refinement Loop
+
+The Reviewer (V3) can trigger re-execution of specific passes:
+
+<Mermaid chart={`
+flowchart LR
+    V3[Self-Review] -->|"Section 3 lacks citations"| C2[Citation Pass]
+    V3 -->|"No diagram for key concept"| E1[Diagram Pass]
+    V3 -->|"Missing perspective on X"| R2[Research Pass]
+    V3 -->|"Weak prose in section 5"| C1[Rewrite Section 5]
+    V3 -->|"Score >= 80"| DONE[Accept]
+`} />
+
+The orchestrator limits iterations (default: 2 refinement cycles) to control cost. Each cycle targets only the specific passes needed.
+
+---
+
+## Part 4: Tier Configurations
+
+### Budget Tier (\$5-8)
+
+For drafts and low-importance pages:
+
+```
+R2(lite) -> S1 -> C1 -> V2 -> V3(single)
+```
+
+5 passes, no enrichment, no iterative refinement. Produces a well-structured, cited article without diagrams or calculations.
+
+### Standard Tier (\$12-18)
+
+For most pages:
+
+```
+R1 -> R2 -> R3 -> S1 -> S2 -> C1 -> C2 -> C3 -> E1 -> E3 -> V1 -> V2 -> V3 -> [1 refinement cycle]
+```
+
+13+ passes including diagrams, cross-linking, and one refinement cycle. The expected quality ceiling.
+
+### Premium Tier (\$20-30)
+
+For high-importance or controversial pages:
+
+```
+R1 -> R2(deep) -> R3 -> R4 -> S1 -> S2 -> C1 -> C2 -> C3 -> E1 -> E2 -> E3 -> E4 -> V1 -> V2 -> V3 -> [2 refinement cycles]
+```
+
+All passes including Squiggle models, fact extraction, content gap analysis, and two refinement cycles.
+
+### Polish Tier (\$3-5)
+
+For improving existing pages (replaces current `crux content improve`):
+
+```
+R3 -> C3 -> E1(if missing) -> V1 -> V2 -> V3
+```
+
+Focuses on cross-linking, enrichment gaps, and citation verification. Doesn't rewrite prose.
+
+---
+
+## Part 5: Knowledge Graph Integration
+
+### Graph-Driven Content Planning
+
+The biggest architectural shift: the knowledge graph **drives** content creation rather than being consulted as an afterthought.
+
+<Mermaid chart={`
+flowchart TD
+    NEW[New Page: Compute Governance]
+
+    subgraph GraphAnalysis["Graph Neighbor Analysis"]
+        N1["compute-thresholds\n(1 hop, weight: 8)"]
+        N2["chip-export-controls\n(1 hop, weight: 7)"]
+        N3["training-run-monitoring\n(1 hop, weight: 6)"]
+        N4["international-coordination\n(2 hops, weight: 4)"]
+        N5["hardware-overhang\n(2 hops, weight: 3)"]
+    end
+
+    subgraph ContentPlan["Content Plan"]
+        SEC1["Section: Compute Thresholds\n- EntityLink to N1\n- 200 words"]
+        SEC2["Section: Export Controls\n- EntityLink to N2\n- 300 words"]
+        SEC3["Section: Monitoring\n- EntityLink to N3\n- 150 words"]
+        SEC4["Mention in overview\n- EntityLinks to N4, N5"]
+    end
+
+    NEW --> GraphAnalysis
+    GraphAnalysis --> ContentPlan
+
+    N1 --> SEC1
+    N2 --> SEC2
+    N3 --> SEC3
+    N4 --> SEC4
+    N5 --> SEC4
+`} />
+
+### Bidirectional Link Updates
+
+When a new page is created, the system should also propose updates to *existing* pages that should link to it. The Graph Analyst agent:
+
+1. Identifies entities in the graph that relate to the new page
+2. Reads existing pages for those entities
+3. Identifies natural insertion points for EntityLinks to the new page
+4. Produces a `link-updates.json` with proposed edits
+
+This transforms page creation from an isolated act into a **graph maintenance operation**.
+
+### Community Summaries (GraphRAG-inspired)
+
+For entity clusters (e.g., all "alignment approaches"), maintain pre-computed community summaries that:
+- Describe the cluster's theme
+- List key entities and their relationships
+- Identify gaps (entities that exist but lack pages)
+
+These summaries can be used by the Writer agent as context when synthesizing content that touches on a cluster.
+
+---
+
+## Part 6: Dynamic Computation Embedding
+
+### The Vision
+
+Wiki pages shouldn't just *state* numbers -- they should *compute* them from the knowledge base.
+
+Example: A page about "AI lab safety spending" could include:
+
+```
+<SquiggleEstimate
+  title="Estimated AI Safety Spending (2025)"
+  code={`
+    anthropicRevenue = 2B to 3.5B
+    openaiRevenue = 3B to 5B
+    deepmindBudget = 1.5B to 2.5B
+
+    safetyFraction = {
+      anthropic: 0.15 to 0.25,
+      openai: 0.05 to 0.12,
+      deepmind: 0.10 to 0.20
+    }
+
+    totalSafetySpending = anthropicRevenue * safetyFraction.anthropic
+      + openaiRevenue * safetyFraction.openai
+      + deepmindBudget * safetyFraction.deepmind
+  `}
+/>
+```
+
+### How the Enricher Agent Creates These
+
+1. **Identify computational opportunities**: Scan the draft for quantitative claims that involve estimation or aggregation
+2. **Pull from facts YAML**: Use existing `data/facts/` values as inputs where available
+3. **Create Squiggle models**: Write distribution-based models (never point estimates) following the Squiggle style guide
+4. **Validate**: Run the Squiggle code to ensure it executes without errors
+5. **Embed**: Place `<SquiggleEstimate>` components at appropriate locations
+
+### Fact Feedback Loop
+
+The Enricher can also propose *new* facts to `data/facts/` based on claims in the page, creating a feedback loop where page content enriches the data layer, which in turn feeds future computations.
+
+---
+
+## Part 7: Implementation Plan
+
+### Phase 1: Pass Infrastructure (Foundation)
+
+Build the composable pass system on top of existing Crux infrastructure:
+
+```typescript
+interface Pass {
+  id: string;
+  name: string;
+  agent: AgentType;
+
+  // Input/output contract
+  requires: string[];  // IDs of passes that must run first
+  produces: string[];  // Artifact keys this pass creates
+
+  // Execution
+  execute(context: PassContext): Promise<PassResult>;
+
+  // Cost estimation
+  estimateCost(context: PassContext): number;
+}
+
+interface PassContext {
+  topic: string;
+  entityType: string;
+  tier: TierConfig;
+
+  // Accumulated artifacts from prior passes
+  artifacts: Map<string, any>;
+
+  // Shared resources
+  entityDb: EntityDatabase;
+  sourceDb: SourceDatabase;
+  validationEngine: ValidationEngine;
+}
+```
+
+This leverages the existing Crux validation engine, entity lookup, and source database. Each pass is a module in `crux/authoring/passes/`.
+
+### Phase 2: Specialist Agents
+
+Implement agents as wrappers around Claude API calls with focused system prompts:
+
+```typescript
+interface Agent {
+  id: AgentType;
+  model: 'opus' | 'sonnet' | 'haiku';
+  systemPrompt: string;
+  tools: Tool[];
+
+  run(input: AgentInput): Promise<AgentOutput>;
+}
+```
+
+Start with the Writer and Verifier agents (biggest impact), then add Graph Analyst and Enricher.
+
+### Phase 3: Orchestrator
+
+Build the orchestrator that plans pass sequences and manages quality gates:
+
+```typescript
+class Orchestrator {
+  planPasses(topic: string, tier: Tier, entityType: string): Pass[];
+  executePlan(passes: Pass[], context: PassContext): Promise<Page>;
+  checkQualityGate(page: Page, template: Template): QualityResult;
+  planRefinement(review: ReviewResult): Pass[];
+}
+```
+
+### Phase 4: Graph Integration
+
+Add bidirectional link updates and community summaries. This requires changes to `build-data.mjs` to compute community clusters and maintain summary cache.
+
+### Phase 5: Computation Embedding
+
+Add the Squiggle model generation pass. Requires integration with the Squiggle runtime for validation.
+
+### Migration Path
+
+The new system can coexist with the current pipeline:
+
+```bash
+# Current system (preserved)
+pnpm crux content create "Topic" --tier=standard
+
+# New system (opt-in)
+pnpm crux content create "Topic" --tier=standard --engine=v2
+
+# Eventually
+pnpm crux content create "Topic" --tier=standard  # defaults to v2
+```
+
+---
+
+## Part 8: Comparison with Alternatives
+
+### Alternative A: Keep Improving Current Pipeline
+
+**Pros**: Lower risk, incremental improvement, already works.
+**Cons**: Structural ceiling -- single-agent synthesis can't produce the cross-linking, computation, and diagram density we want. Diminishing returns on prompt engineering.
+
+### Alternative B: Adopt STORM Directly
+
+**Pros**: Battle-tested, open source, good research quality.
+**Cons**: Python-only (we're TypeScript), no support for EntityLinks/Squiggle/Mermaid/YAML entities, no knowledge graph integration, would require heavy forking. The research stage is valuable but the writing stage doesn't match our needs.
+
+### Alternative C: Full CrewAI/LangGraph Framework
+
+**Pros**: Rich agent orchestration, built-in patterns for sequential/parallel execution.
+**Cons**: Heavy framework dependency, Python ecosystem, abstractions don't map cleanly to our YAML-first data model. We'd spend more time fighting the framework than building features.
+
+### Alternative D: Claude Agent SDK Multi-Agent (Proposed Approach)
+
+**Pros**: Same TypeScript ecosystem, direct Anthropic API integration, subagent orchestration built-in, proven at scale (90.2% improvement over single-agent in Anthropic's own eval). Builds on existing Crux infrastructure.
+**Cons**: Higher implementation effort than Alternative A, less battle-tested than STORM for research quality.
+
+**Recommendation**: Alternative D, borrowing specific ideas from STORM (perspective-guided research, simulated conversations) and GraphRAG (community summaries, graph-driven planning).
+
+---
+
+## Part 9: Key Ideas Borrowed
+
+| Source | Idea | How We Use It |
+|--------|------|---------------|
+| **STORM** | Perspective-guided question asking | Pass R1 discovers perspectives from existing wiki pages |
+| **STORM** | Simulated expert conversations | Writer agent can simulate researcher/expert dialogue |
+| **STORM** | Pre-writing/writing separation | Passes R1-S2 are pre-writing; C1+ is writing |
+| **GraphRAG** | Community summaries | Pre-computed cluster summaries for entity groups |
+| **GraphRAG** | Subgraph retrieval | Graph Analyst retrieves relevant subgraph, not just entity list |
+| **CrewAI** | Specialist agents with handoff contracts | 8 agents with typed input/output |
+| **CrewAI** | Sequential pipeline with clear boundaries | Pass dependency graph |
+| **Self-Refine** | Generate-feedback-refine loop | V3 reviewer triggers targeted re-passes |
+| **Self-Refine** | Specific, actionable feedback | Reviewer produces per-section scores, not vague "improve" |
+| **SemanticCite** | Per-claim citation verification | V1 classifies each claim's support level |
+| **Anthropic Research** | Orchestrator + parallel subagents | Orchestrator plans, specialists execute (potentially in parallel) |
+| **Anthropic Research** | Expensive orchestrator, cheap workers | Opus for orchestrator/writer/reviewer, Sonnet/Haiku for research/verification |
+
+---
+
+## Part 10: Success Metrics
+
+How we'll know the new architecture is working:
+
+| Metric | Current | Target | How Measured |
+|--------|---------|--------|--------------|
+| Average page quality score | 70-78 | 82-90 | Template grading rubric |
+| EntityLinks per page | 5-10 | 15-25 | Metrics extractor |
+| Citations per page | 35-42 | 40-60 | Footnote count |
+| Diagrams per page | 0-1 | 1-3 | Metrics extractor |
+| Squiggle models per page | 0 | 0-2 (where applicable) | Component count |
+| Inbound links created | 0 | 3-5 per new page | Bidirectional link updates |
+| Facts extracted to YAML | 0 | 2-5 per new page | Fact extraction pass |
+| Cost per standard page | \$4-6 | \$12-18 | API cost tracking |
+
+The cost increase is intentional. We're trading \$8-12 more per page for substantially higher quality. At 625 pages, even regenerating the entire wiki would cost \$7,500-11,000 -- a one-time investment.
+
+---
+
+## References
+
+Key sources informing this architecture:
+
+[^1]: [Stanford STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking](https://github.com/stanford-oval/storm) (NAACL 2024)
+
+[^2]: [Microsoft GraphRAG: A modular graph-based Retrieval-Augmented Generation system](https://github.com/microsoft/graphrag) (Microsoft Research, 2024)
+
+[^3]: [Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/abs/2303.17651) (Madaan et al., 2023)
+
+[^4]: [SemanticCite: Citation Verification with AI-Powered Full-Text Analysis](https://arxiv.org/html/2511.16198v1) (2025)
+
+[^5]: [Anthropic: How We Built Our Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) (2025)
+
+[^6]: [Anthropic: Building Agents with the Claude Agent SDK](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk) (2025)
+
+[^7]: [CrewAI: How to Build Agentic Systems](https://blog.crewai.com/agentic-systems-with-crewai/) (2025)
+
+[^8]: [KARMA: Leveraging Multi-Agent LLMs for Automated Knowledge Graph Enrichment](https://arxiv.org/html/2502.06472v2) (2025)
+
+[^9]: [Co-STORM Collaborative Knowledge Curation System](https://deepwiki.com/stanford-oval/storm/3-co-storm-collaborative-system) (EMNLP 2024)
+
+[^10]: [Google Developers: Multi-Agent Patterns in ADK](https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/) (2025)

@@ -1,7 +1,9 @@
 ---
+numericId: E733
 title: "LongtermWiki Vision"
 description: "Strategic vision and scope for the LongtermWiki project"
 pageType: "documentation"
+entityType: internal
 importance: 58.5
 researchImportance: 12.5
 quality: 2

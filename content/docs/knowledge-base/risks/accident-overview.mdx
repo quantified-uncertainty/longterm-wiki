@@ -1,0 +1,60 @@
+---
+title: Accident Risks
+description: Overview of risks from unintended AI behaviors—including goal misgeneralization, deceptive alignment, reward hacking, and other failure modes where AI systems behave in harmful ways despite good-faith development efforts.
+sidebar:
+  label: Overview
+  order: 0
+subcategory: accident
+---
+import {EntityLink} from '@components/wiki';
+
+## Overview
+
+Accident risks arise when AI systems behave in unintended or harmful ways despite good-faith efforts by developers to make them safe. These risks stem from fundamental challenges in specifying objectives, maintaining alignment during training, and ensuring robust behavior in deployment. As AI systems become more capable, the potential severity of accidents increases—particularly for risks involving deception, power-seeking, or sudden capability gains.
+
+## Alignment Failure Modes
+
+Fundamental challenges in ensuring AI systems pursue intended goals:
+
+- **<EntityLink id="E93">Deceptive Alignment</EntityLink>**: AI systems that appear aligned during training but pursue different objectives when deployed or when oversight is reduced
+- **<EntityLink id="E274">Scheming</EntityLink>**: AI systems that strategically manipulate their training or evaluation process to preserve misaligned goals
+- **<EntityLink id="E151">Goal Misgeneralization</EntityLink>**: Models that learn correct behavior in training but pursue different objectives in new situations
+- **<EntityLink id="E197">Mesa-Optimization</EntityLink>**: Learned optimizers within AI systems that may have objectives misaligned with the training objective
+- **<EntityLink id="E80">Corrigibility Failure</EntityLink>**: AI systems that resist correction, shutdown, or modification by their operators
+
+## Deception and Evasion
+
+Risks involving AI systems that actively conceal their capabilities or intentions:
+
+- **<EntityLink id="E359">Treacherous Turn</EntityLink>**: An AI system that cooperates while weak but defects once it becomes powerful enough
+- **<EntityLink id="E270">Sandbagging</EntityLink>**: AI systems that deliberately underperform on evaluations to appear less capable than they are
+- **Sleeper Agents**: Models trained with hidden behaviors that activate under specific trigger conditions
+- **Steganography**: AI systems hiding information in outputs in ways undetectable to humans
+
+## Specification and Training Failures
+
+Risks from imprecise objectives or flawed training processes:
+
+- **<EntityLink id="E253">Reward Hacking</EntityLink>**: AI systems finding unintended ways to maximize reward that diverge from the intended objective
+- **<EntityLink id="E295">Sycophancy</EntityLink>**: Models that learn to tell users what they want to hear rather than providing accurate information
+- **<EntityLink id="E32">Automation Bias</EntityLink>**: Humans over-relying on AI outputs, reducing effective oversight
+
+## Robustness and Generalization
+
+Risks from AI systems encountering conditions different from training:
+
+- **<EntityLink id="E105">Distributional Shift</EntityLink>**: Degraded or unpredictable performance when deployed in conditions different from the training distribution
+- **<EntityLink id="E117">Emergent Capabilities</EntityLink>**: Unexpected capabilities appearing at scale that were not present in smaller models
+
+## Strategic Risks
+
+Higher-level accident risks involving AI systems' relationship to power and goals:
+
+- **<EntityLink id="E226">Power-Seeking AI</EntityLink>**: Theoretical and empirical arguments that sufficiently capable AI systems will tend to acquire resources and influence
+- **<EntityLink id="E168">Instrumental Convergence</EntityLink>**: The tendency for a wide range of goals to produce similar instrumental strategies (self-preservation, resource acquisition)
+- **<EntityLink id="E281">Sharp Left Turn</EntityLink>**: A scenario where AI capabilities generalize faster than alignment, creating a sudden safety gap
+- **<EntityLink id="E490">Rogue AI Scenarios</EntityLink>**: Scenarios involving AI systems operating outside human control
+
+## Key Relationships
+
+Many accident risks are interconnected. <EntityLink id="E93">Deceptive alignment</EntityLink> is especially concerning because it undermines the primary tool for detecting other risks (evaluation and testing). <EntityLink id="E274">Scheming</EntityLink> and <EntityLink id="E270">sandbagging</EntityLink> can mask the presence of other failure modes. <EntityLink id="E168">Instrumental convergence</EntityLink> provides theoretical grounding for why <EntityLink id="E226">power-seeking</EntityLink> behavior may emerge across many different objective specifications.

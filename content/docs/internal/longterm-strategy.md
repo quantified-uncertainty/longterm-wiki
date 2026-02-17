@@ -1,7 +1,9 @@
 ---
+numericId: E732
 title: "LongtermWiki Strategy Brainstorm"
 description: "Strategic planning and brainstorming for LongtermWiki development"
 pageType: "documentation"
+entityType: internal
 importance: 47.5
 researchImportance: 15.5
 quality: 4

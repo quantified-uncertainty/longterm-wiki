@@ -33,6 +33,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
 
   // 1. Entities with pages — primary search targets
   for (const entity of typedEntities) {
+    if (entity.entityType === 'internal') continue; // skip internal pages
     const page = pageMap.get(entity.id);
     if (!page) continue; // skip entities without content pages
 
@@ -56,7 +57,7 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
   // 2. Pages without entities
   for (const page of pages) {
     if (entityIds.has(page.id)) continue;
-    if (!page.title || page.category === 'schema') continue;
+    if (!page.title || page.category === 'schema' || page.category === 'internal') continue;
 
     const numericId = idRegistry?.bySlug?.[page.id] || page.id;
 

@@ -14,6 +14,10 @@ pnpm build                      # Production build (runs build-data automaticall
 # Testing
 pnpm test                        # Run vitest tests
 
+# Pre-push gate (CI-blocking checks)
+pnpm crux validate gate          # Build data + tests + blocking validations
+pnpm crux validate gate --full   # Also runs full Next.js build
+
 # Tooling (Crux CLI)
 pnpm crux validate               # Run all validation checks
 pnpm crux --help                 # Show all CLI domains
@@ -69,7 +73,7 @@ node app/scripts/build-data.mjs
 ```bash
 pnpm crux content create "Page Title" --tier=standard
 ```
-Tiers: `polish` (quick, ~$2-3), `standard` (with research, ~$5-8), `deep` (full research, ~$10-15)
+Tiers: `budget` (~$2-3), `standard` (default, ~$4-6), `premium` (~$8-12)
 
 **API keys are in environment variables** (`process.env`), NOT in `.env` files. Check `env | grep -i API` to verify available keys before assuming they're missing. Required keys: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`. Optional: `FIRECRAWL_KEY`, `SCRY_API_KEY`.
 
@@ -77,6 +81,7 @@ Tiers: `polish` (quick, ~$2-3), `standard` (with research, ~$5-8), `deep` (full 
 ```bash
 pnpm crux content improve <page-id> --tier=polish --apply
 ```
+Tiers: `polish` (~$2-3), `standard` (default, ~$5-8), `deep` (~$10-15)
 Use `--directions "specific instructions"` for targeted improvements.
 Use `--apply` to write changes directly (otherwise outputs to temp file for review).
 Use `--grade` with `--apply` to auto-grade after improvement.
@@ -126,16 +131,22 @@ This adds proper citations, fixes escaping, validates EntityLinks, and syncs fro
 
 **Never assume CI will pass. Always verify.**
 
-### Before pushing: run CI checks locally
+### Before pushing: run the gate check
 ```bash
-cd app && node scripts/build-data.mjs            # 1. Build data layer
-pnpm test                                         # 2. Run all tests (must be 0 failures)
-pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # 3. MDX syntax (blocking)
-pnpm crux validate schema                         # 4. YAML schema (blocking)
-pnpm crux validate unified --rules=frontmatter-schema --errors-only  # 5. Frontmatter schema (blocking)
-pnpm build                                        # 6. Full Next.js build (catches compile errors)
+pnpm crux validate gate          # Runs: build-data, tests, 3 blocking validations
+pnpm crux validate gate --full   # Also runs full Next.js build
 ```
-All six must succeed before pushing. If any fail, fix the issue first.
+The gate check bundles all CI-blocking checks into one command. It fails fast — if any step fails, it stops and reports. The `.githooks/pre-push` hook runs this automatically on every `git push`.
+
+**Setup (one-time):** `git config core.hooksPath .githooks`
+
+The gate runs these steps sequentially:
+1. Build data layer (`app/scripts/build-data.mjs`)
+2. Run vitest tests
+3. MDX syntax check (comparison-operators, dollar-signs)
+4. YAML schema validation
+5. Frontmatter schema validation
+6. *(with `--full` only)* Full Next.js production build
 
 ### After pushing: confirm CI is green
 1. Check CI status using the GitHub API (`gh` is not installed; use `curl` instead):
@@ -164,7 +175,7 @@ print(f\"Total: {data['total_count']} checks\")
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
-- **Entity types**: risk, person, organization, approach, model, concept, etc.
+- **Entity types**: Canonical list in `app/src/data/entity-type-names.ts`. Category-mapped types (used by page creator): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project. Additional types include: risk-factor, safety-agenda, policy, case-study, scenario, resource, funder, historical, analysis, parameter, argument, table, diagram, insight
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide
