@@ -65,7 +65,7 @@ jobs:
             sleep 10
           done
 
-          prs=$(echo "$all_prs" | jq '[.[] | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
+          prs=$(echo "$all_prs" | jq -c '[.[] | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
 
           echo "Conflicted PRs: $prs"
 
