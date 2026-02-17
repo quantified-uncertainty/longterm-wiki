@@ -4,6 +4,8 @@
 
 **Pages:** (no page content changes — infrastructure only)
 
+**PR:** #180
+
 **Issues encountered:**
 - Major rebase conflict: main merged opposite architectural approach (internal pages route through `/wiki/E<id>` instead of `/internal/*`), superseding ~80% of original PR changes
 - Had to reset to main and apply only the still-additive DRY/defensive changes

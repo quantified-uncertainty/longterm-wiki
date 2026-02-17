@@ -4,6 +4,8 @@
 
 **Pages:** anthropic-investors
 
+**PR:** #152
+
 **Issues encountered:**
 - `pnpm crux` command failed (workspace resolution issue); had to invoke via `node --import tsx/esm crux/crux.mjs` directly
 - Crux content improve pipeline research phase hit tool turn limit (10) after 18 minutes, finding 0 sources

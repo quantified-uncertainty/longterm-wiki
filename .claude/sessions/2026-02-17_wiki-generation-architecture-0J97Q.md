@@ -4,6 +4,8 @@
 
 **Pages:** wiki-generation-architecture, stub-style-guide, page-types, risk-style-guide, response-style-guide, ai-transition-model-style-guide, documentation-maintenance, project-roadmap
 
+**PR:** #182
+
 **Issues encountered:**
 - `resolveContentPath()` only tried `.mdx` extension, causing 404s for `.md` internal pages (e.g., stub-style-guide.md) — fixed by adding `.md` fallback
 - Index files (index.md/mdx) were excluded from pages list in build-data.mjs, preventing numericId registration — fixed by including them with `__index__/` slug pattern

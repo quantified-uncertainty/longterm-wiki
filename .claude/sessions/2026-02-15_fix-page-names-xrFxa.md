@@ -4,6 +4,8 @@
 
 **Pages:** (none — infrastructure fix only; MDX files were auto-fixed but no page content changed)
 
+**PR:** #139
+
 **Issues encountered:**
 - Two-phase ID registry population: page-only entries had numericIds added in a later phase. Required pre-populating page numericIds before the EntityLink scan.
 - One dangling reference (E616 in `knowledge-monopoly.mdx`) refers to a non-existent entity — pre-existing data issue.

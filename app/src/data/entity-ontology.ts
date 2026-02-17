@@ -38,6 +38,7 @@ import {
   MessageSquare,
   Brain,
   FileText,
+  LayoutList,
 } from "lucide-react";
 
 type LucideIcon = React.ForwardRefExoticComponent<
@@ -243,6 +244,13 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     badgeColor: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
     headerColor: "#ea580c",
   },
+  overview: {
+    label: "Overview",
+    icon: LayoutList,
+    iconColor: "text-blue-600 dark:text-blue-400",
+    badgeColor: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+    headerColor: "#3b82f6",
+  },
   "intelligence-paradigm": {
     label: "Intelligence Paradigm",
     icon: Brain,
@@ -307,6 +315,7 @@ export const ENTITY_GROUPS: { label: string; types: string[] }[] = [
   { label: "Capabilities", types: ["capability"] },
   { label: "Models", types: ["model"] },
   { label: "Concepts", types: ["concept", "crux", "argument", "analysis", "historical"] },
+  { label: "Overviews", types: ["overview"] },
   { label: "Tables", types: ["table"] },
   { label: "Diagrams", types: ["diagram"] },
   { label: "Internal", types: ["internal"] },

@@ -26,8 +26,9 @@ import {
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 import { LlmWarningBanner } from "@/components/wiki/LlmWarningBanner";
 
-const GITHUB_HISTORY_BASE =
-  "https://github.com/quantified-uncertainty/longterm-wiki/commits/main/content/docs";
+import { GITHUB_REPO_URL } from "@lib/site-config";
+
+const GITHUB_HISTORY_BASE = `${GITHUB_REPO_URL}/commits/main/content/docs`;
 
 
 interface PageProps {

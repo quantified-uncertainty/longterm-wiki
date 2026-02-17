@@ -4,6 +4,8 @@
 
 **Pages:** (no wiki content pages changed)
 
+**PR:** #131
+
 **Issues encountered:**
 - The `pnpm install` had puppeteer download failures (network), and `vitest`/`next` binaries weren't on PATH — had to invoke them via full pnpm store paths.
 

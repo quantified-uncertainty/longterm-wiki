@@ -4,6 +4,8 @@
 
 **Pages:** ai-investigation-risks
 
+**PR:** #143
+
 **Issues encountered:**
 - OpenRouter API key expired/invalid (auth error with Clerk), preventing crux research-perplexity phase
 - Crux synthesis phase spawns nested `claude` CLI session, which is blocked inside Claude Code environment

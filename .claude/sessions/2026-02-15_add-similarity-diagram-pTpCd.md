@@ -4,6 +4,8 @@
 
 **Pages:** (no wiki page content changes)
 
+**PR:** #140
+
 **Issues encountered:**
 - `getDatabase` is a private function in `@data/index` — used public API (`getAllPages`, `getTypedEntityById`, `getRelatedGraphFor`) instead
 - `pnpm add d3` failed silently (puppeteer postinstall error) leaving d3 runtime packages missing from package.json — caught in review, fixed by adding `d3-force`, `d3-selection`, `d3-zoom` as explicit dependencies

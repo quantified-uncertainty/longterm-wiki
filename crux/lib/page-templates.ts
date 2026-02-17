@@ -327,4 +327,24 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { id: 'has-entitylinks', label: 'Links to Related Entities', weight: 10, detection: 'component', pattern: 'EntityLink' },
     ],
   },
+  'knowledge-base-overview': {
+    id: 'knowledge-base-overview',
+    name: 'Knowledge Base - Overview',
+    contentFormat: 'index',
+    minWordCount: 200,
+    frontmatter: [
+      { name: 'title', required: true, weight: 5 },
+      { name: 'description', required: true, weight: 15 },
+      { name: 'entityType', required: true, weight: 10 },
+    ],
+    sections: [
+      { id: 'intro', label: 'Introduction', alternateLabels: ['Overview', 'Context'], required: false, weight: 10 },
+    ],
+    qualityCriteria: [
+      { id: 'has-entitylinks', label: 'Has EntityLinks to Child Pages', weight: 30, detection: 'component', pattern: 'EntityLink' },
+      { id: 'has-overview-banner', label: 'Has OverviewBanner', weight: 15, detection: 'component', pattern: 'OverviewBanner' },
+      { id: 'has-categorization', label: 'Organizes Pages into Categories', weight: 20, detection: 'content', pattern: '##' },
+      { id: 'word-count', label: 'Sufficient Length', weight: 10, detection: 'content' },
+    ],
+  },
 };

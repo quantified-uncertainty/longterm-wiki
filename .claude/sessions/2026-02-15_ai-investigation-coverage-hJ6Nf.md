@@ -4,6 +4,8 @@
 
 **Pages:** ai-powered-investigation, deanonymization, ai-accountability
 
+**PR:** #153
+
 **Issues encountered:**
 - Crux content create pipeline failed: Perplexity API key unavailable (no PERPLEXITY_API_KEY), and the Claude Code SDK subprocess failed to spawn inside a nested Claude Code session (CLAUDECODE env var blocks it). Fixed the spawn issue in synthesis.ts, validation.ts, and deployment.ts by unsetting CLAUDECODE in the env, but the subprocess still hung silently. Fell back to manual page creation per CLAUDE.md fallback protocol.
 - Entity numericId conflicts: IDs E694-E696 were already allocated by auto-generated frontmatter entities. Used E698-E700 instead (after checking _nextId in id-registry.json).
