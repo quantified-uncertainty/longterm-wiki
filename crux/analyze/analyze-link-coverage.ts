@@ -43,7 +43,7 @@ interface PageAnalysis {
   path: string;
   slug: string;
   title: string;
-  importance: number;
+  readerImportance: number;
   quality: number;
   pageType: string;
   wordCount: number;
@@ -132,7 +132,7 @@ function analyzePage(filePath: string, backlinks: BacklinksMap, _pathRegistry: P
     path: relPath,
     slug,
     title: (frontmatter.title as string) || slug,
-    importance: (frontmatter.importance as number) || 0,
+    readerImportance: (frontmatter.readerImportance as number) || 0,
     quality: (frontmatter.quality as number) || 0,
     pageType: (frontmatter.pageType as string) || 'content',
     wordCount,
@@ -161,13 +161,13 @@ function generateSummary(pages: PageAnalysis[]): Summary {
 
   // Find orphans (pages with 0-1 incoming links, excluding index pages)
   const orphans = contentPages.filter(
-    (p) => p.incomingLinks <= 1 && !p.path.includes('index.mdx') && p.importance >= 30
+    (p) => p.incomingLinks <= 1 && !p.path.includes('index.mdx') && p.readerImportance >= 30
   );
 
   // Find pages with low outgoing links but high word count
   const underlinkd = contentPages.filter(
     (p) =>
-      p.outgoingEntityLinks < 3 && p.wordCount > 500 && p.importance >= 30 && parseFloat(p.linkDensity) < 2
+      p.outgoingEntityLinks < 3 && p.wordCount > 500 && p.readerImportance >= 30 && parseFloat(p.linkDensity) < 2
   );
 
   // Most linked pages
@@ -175,7 +175,7 @@ function generateSummary(pages: PageAnalysis[]): Summary {
 
   // Least linked important pages
   const leastLinked = [...contentPages]
-    .filter((p) => p.importance >= 50)
+    .filter((p) => p.readerImportance >= 50)
     .sort((a, b) => a.incomingLinks - b.incomingLinks)
     .slice(0, 20);
 
@@ -225,7 +225,7 @@ function main(): void {
     } else {
       console.log(`${colors.bold}${colors.cyan}${page.title}${colors.reset}`);
       console.log(`Path: ${page.path}`);
-      console.log(`Importance: ${page.importance}, Quality: ${page.quality}`);
+      console.log(`Reader Importance: ${page.readerImportance}, Quality: ${page.quality}`);
       console.log();
       console.log(`${colors.bold}Outgoing Links:${colors.reset}`);
       console.log(`  EntityLinks: ${page.outgoingEntityLinks}`);
@@ -273,12 +273,12 @@ function main(): void {
 
   // Orphan pages
   if (SHOW_ORPHANS || !SHOW_TOP_LINKED) {
-    console.log(`${colors.bold}${colors.yellow}Orphan Pages${colors.reset} (≤1 incoming link, importance ≥30): ${summary.orphanCount}`);
+    console.log(`${colors.bold}${colors.yellow}Orphan Pages${colors.reset} (≤1 incoming link, readerImportance ≥30): ${summary.orphanCount}`);
     if (summary.orphans.length > 0) {
-      const sortedOrphans = summary.orphans.sort((a, b) => b.importance - a.importance);
+      const sortedOrphans = summary.orphans.sort((a, b) => b.readerImportance - a.readerImportance);
       for (const page of sortedOrphans.slice(0, 15)) {
         console.log(
-          `  ${colors.dim}[imp:${page.importance}]${colors.reset} ${page.title} (${page.incomingLinks} incoming)`
+          `  ${colors.dim}[imp:${page.readerImportance}]${colors.reset} ${page.title} (${page.incomingLinks} incoming)`
         );
       }
       if (sortedOrphans.length > 15) {
@@ -288,13 +288,13 @@ function main(): void {
     console.log();
 
     console.log(
-      `${colors.bold}${colors.yellow}Underlinked Pages${colors.reset} (<3 outgoing, >500 words, importance ≥30): ${summary.underlinkedCount}`
+      `${colors.bold}${colors.yellow}Underlinked Pages${colors.reset} (<3 outgoing, >500 words, readerImportance ≥30): ${summary.underlinkedCount}`
     );
     if (summary.underlinked.length > 0) {
-      const sortedUnderlinked = summary.underlinked.sort((a, b) => b.importance - a.importance);
+      const sortedUnderlinked = summary.underlinked.sort((a, b) => b.readerImportance - a.readerImportance);
       for (const page of sortedUnderlinked.slice(0, 15)) {
         console.log(
-          `  ${colors.dim}[imp:${page.importance}]${colors.reset} ${page.title} (${page.outgoingEntityLinks} EntityLinks, ${page.wordCount} words)`
+          `  ${colors.dim}[imp:${page.readerImportance}]${colors.reset} ${page.title} (${page.outgoingEntityLinks} EntityLinks, ${page.wordCount} words)`
         );
       }
       if (sortedUnderlinked.length > 15) {
@@ -315,10 +315,10 @@ function main(): void {
 
   // Least linked important pages
   if (!SHOW_TOP_LINKED) {
-    console.log(`${colors.bold}${colors.red}Least Linked Important Pages${colors.reset} (importance ≥50):`);
+    console.log(`${colors.bold}${colors.red}Least Linked Important Pages${colors.reset} (readerImportance ≥50):`);
     for (const page of summary.leastLinked.slice(0, 10)) {
       console.log(
-        `  ${colors.dim}[imp:${page.importance}]${colors.reset} ${page.incomingLinks} ← ${page.title}`
+        `  ${colors.dim}[imp:${page.readerImportance}]${colors.reset} ${page.incomingLinks} ← ${page.title}`
       );
     }
     console.log();

@@ -7,37 +7,20 @@
 import fs from 'fs';
 import path from 'path';
 import { sources, hashId, SOURCES_DIR } from '../../lib/knowledge-db.ts';
+import type { TopicPhaseContext, ResearchPhaseContext } from './types.ts';
 
-interface RegisterContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-  getTopicDir: (topic: string) => string;
-}
-
-interface FetchContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-  getTopicDir: (topic: string) => string;
-}
+type RegisterContext = TopicPhaseContext;
+type FetchContext = TopicPhaseContext;
 
 interface FetchOptions {
   maxSources?: number;
   skipExisting?: boolean;
 }
 
-interface LoadSourceContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-}
+type LoadSourceContext = ResearchPhaseContext;
+type DirectionsContext = ResearchPhaseContext;
 
-interface DirectionsContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: unknown) => string;
-}
-
-interface GetTopicDirContext {
-  getTopicDir: (topic: string) => string;
-}
+type GetTopicDirContext = Pick<TopicPhaseContext, 'getTopicDir'>;
 
 interface FetchedSourceContent {
   sourceCount: number;

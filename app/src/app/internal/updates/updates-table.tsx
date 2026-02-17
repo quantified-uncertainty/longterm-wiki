@@ -84,14 +84,14 @@ const columns: ColumnDef<UpdateScheduleItem>[] = [
     cell: ({ row }) => <StatusBadge daysUntil={row.original.daysUntilDue} />,
   },
   {
-    accessorKey: "importance",
+    accessorKey: "readerImportance",
     header: ({ column }) => (
       <SortableHeader column={column}>Imp.</SortableHeader>
     ),
     cell: ({ row }) => (
       <span className="text-xs tabular-nums text-muted-foreground">
-        {row.original.importance != null
-          ? Math.round(row.original.importance)
+        {row.original.readerImportance != null
+          ? Math.round(row.original.readerImportance)
           : "-"}
       </span>
     ),

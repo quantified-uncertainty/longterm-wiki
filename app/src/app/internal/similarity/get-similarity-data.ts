@@ -55,7 +55,7 @@ export function getSimilarityGraphData(): SimilarityGraphData {
       title: p.title,
       entityType,
       color: getColor(entityType),
-      importance: p.importance ?? 50,
+      importance: p.readerImportance ?? 50,
       quality: p.quality ?? 30,
       category: p.category,
     };

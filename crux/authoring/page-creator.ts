@@ -49,7 +49,8 @@ import { runSynthesisApiDirect, runValidationLoopApiDirect, runReviewApiDirect }
 import { shouldUseApiDirect } from '../lib/claude-cli.ts';
 import { inferEntityType } from '../lib/category-entity-types.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { getColors } from '../lib/output.ts';
+import { getColors, createPhaseLogger } from '../lib/output.ts';
+import type { CreatorContext } from './creator/types.ts';
 
 dotenv.config();
 
@@ -89,13 +90,7 @@ const TIERS: Record<string, TierConfig> = {
 
 // ============ Utility Functions ============
 
-interface PipelineContext {
-  log: (phase: string, message: string) => void;
-  saveResult: (topic: string, filename: string, data: string | object) => string;
-  getTopicDir: (topic: string) => string;
-  ensureDir: (dirPath: string) => void;
-  ROOT: string;
-}
+type PipelineContext = CreatorContext;
 
 function ensureDir(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
@@ -103,10 +98,7 @@ function ensureDir(dirPath: string): void {
   }
 }
 
-function log(phase: string, message: string): void {
-  const timestamp: string = new Date().toISOString().split('T')[1].split('.')[0];
-  console.log(`[${timestamp}] [${phase}] ${message}`);
-}
+const log = createPhaseLogger();
 
 function getTopicDir(topic: string): string {
   const sanitized = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');

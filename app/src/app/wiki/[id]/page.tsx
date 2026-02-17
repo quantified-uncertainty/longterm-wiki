@@ -229,7 +229,8 @@ function ContentView({
         {/* PageStatus shown for graded formats or pages with editorial content */}
         <PageStatus
           quality={pageData?.quality ?? undefined}
-          importance={pageData?.importance ?? undefined}
+          importance={pageData?.readerImportance ?? undefined}
+          researchImportance={pageData?.researchImportance ?? undefined}
           llmSummary={pageData?.llmSummary ?? undefined}
           structuredSummary={pageData?.structuredSummary ?? undefined}
           lastEdited={pageData?.lastUpdated ?? undefined}

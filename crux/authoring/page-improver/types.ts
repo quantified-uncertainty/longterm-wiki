@@ -1,0 +1,128 @@
+/**
+ * Types for the page-improver pipeline.
+ */
+
+export interface TierConfig {
+  name: string;
+  cost: string;
+  phases: string[];
+  description: string;
+}
+
+export interface PageData {
+  id: string;
+  title: string;
+  path: string;
+  quality?: number;
+  readerImportance?: number;
+  ratings?: {
+    objectivity?: number;
+    rigor?: number;
+    focus?: number;
+    novelty?: number;
+    completeness?: number;
+    concreteness?: number;
+    actionability?: number;
+    [key: string]: number | undefined;
+  };
+}
+
+export interface AnalysisResult {
+  currentState?: string;
+  gaps?: string[];
+  researchNeeded?: string[];
+  improvements?: string[];
+  entityLinks?: string[];
+  citations?: unknown;
+  raw?: string;
+  error?: string;
+}
+
+export interface ResearchResult {
+  sources: Array<{
+    topic: string;
+    title: string;
+    url: string;
+    author?: string;
+    date?: string;
+    facts: string[];
+    relevance: string;
+  }>;
+  summary?: string;
+  raw?: string;
+  error?: string;
+}
+
+export interface ReviewResult {
+  valid: boolean;
+  issues: string[];
+  suggestions?: string[];
+  qualityScore?: number;
+  raw?: string;
+}
+
+export interface ValidationIssue {
+  rule: string;
+  count?: number;
+  output?: string;
+  error?: string;
+}
+
+export interface ValidationResult {
+  issues: {
+    critical: ValidationIssue[];
+    quality: ValidationIssue[];
+  };
+  hasCritical: boolean;
+  improvedContent: string;
+}
+
+export interface RunAgentOptions {
+  model?: string;
+  maxTokens?: number;
+  tools?: Array<{
+    name: string;
+    description: string;
+    input_schema: Record<string, unknown>;
+  }>;
+  systemPrompt?: string;
+}
+
+export interface PipelineOptions {
+  tier?: string;
+  directions?: string;
+  dryRun?: boolean;
+  grade?: boolean;
+  analysisModel?: string;
+  researchModel?: string;
+  improveModel?: string;
+  reviewModel?: string;
+  deep?: boolean;
+}
+
+export interface PipelineResults {
+  pageId: string;
+  title: string;
+  tier: string;
+  directions: string;
+  duration: string;
+  phases: string[];
+  review: ReviewResult | undefined;
+  outputPath: string;
+}
+
+export interface TriageResult {
+  pageId: string;
+  title: string;
+  lastEdited: string;
+  recommendedTier: 'skip' | 'polish' | 'standard' | 'deep';
+  reason: string;
+  newDevelopments: string[];
+  estimatedCost: string;
+  triageCost: string;
+}
+
+export interface ParsedArgs {
+  _positional: string[];
+  [key: string]: string | boolean | string[];
+}

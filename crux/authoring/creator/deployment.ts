@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
+import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
 
 interface IdRegistry {
   _nextId: number;
@@ -66,17 +67,8 @@ export function convertSlugsToNumericIds(content: string, ROOT: string): { conte
   return { content: result2, converted };
 }
 
-interface DeployContext {
-  ROOT: string;
-  getTopicDir: (topic: string) => string;
-  ensureDir: (dirPath: string) => void;
-}
-
-interface ReviewContext {
-  ROOT: string;
-  getTopicDir: (topic: string) => string;
-  log: (phase: string, message: string) => void;
-}
+type DeployContext = DeployPhaseContext;
+type ReviewContext = ValidationPhaseContext;
 
 interface CrossLinkResult {
   warnings: string[];

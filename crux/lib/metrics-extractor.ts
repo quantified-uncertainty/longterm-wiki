@@ -23,6 +23,9 @@ export interface SectionCount {
   total: number;
 }
 
+/** Content format used for format-aware structural scoring. */
+export type ContentFormat = 'article' | 'table' | 'diagram' | 'index' | 'dashboard';
+
 export interface ContentMetrics {
   wordCount: number;
   tableCount: number;
@@ -37,6 +40,8 @@ export interface ContentMetrics {
   hasConclusion: boolean;
   structuralScore: number;
   structuralScoreNormalized: number;
+  /** Content format used for scoring. */
+  contentFormat?: ContentFormat;
   /** Per-type visual counts (mermaid, squiggle, cause-effect, etc.) */
   visualCounts?: VisualCounts;
 }
@@ -49,9 +54,10 @@ export interface QualityDiscrepancy {
 }
 
 /**
- * Extract all structural metrics from MDX content
+ * Extract all structural metrics from MDX content.
+ * @param contentFormat — drives format-aware structural scoring (default: 'article')
  */
-export function extractMetrics(content: string, filePath: string = ''): ContentMetrics {
+export function extractMetrics(content: string, filePath: string = '', contentFormat: ContentFormat = 'article'): ContentMetrics {
   // Remove frontmatter for analysis
   const bodyContent = content.replace(/^---\n[\s\S]*?\n---\n?/, '');
 
@@ -85,12 +91,15 @@ export function extractMetrics(content: string, filePath: string = ''): ContentM
     // Normalized score (0-50)
     structuralScoreNormalized: 0,
 
+    // Content format used for scoring
+    contentFormat,
+
     // Detailed per-type visual counts
     visualCounts,
   };
 
-  // Calculate structural score
-  metrics.structuralScore = calculateStructuralScore(metrics);
+  // Calculate structural score (format-aware)
+  metrics.structuralScore = calculateStructuralScore(metrics, contentFormat);
   metrics.structuralScoreNormalized = Math.round((metrics.structuralScore / 15) * 50);
 
   return metrics;
@@ -215,49 +224,114 @@ function hasSection(content: string, pattern: RegExp): boolean {
 }
 
 /**
- * Calculate structural score (0-15)
- * Based on countable/measurable aspects of content
+ * Calculate structural score (0-15).
+ * Scoring formulas are tailored to content format.
  */
-function calculateStructuralScore(metrics: ContentMetrics): number {
-  let score = 0;
+function calculateStructuralScore(metrics: ContentMetrics, contentFormat: ContentFormat = 'article'): number {
+  if (contentFormat === 'table') return calculateTableScore(metrics);
+  if (contentFormat === 'diagram') return calculateDiagramScore(metrics);
+  if (contentFormat === 'index' || contentFormat === 'dashboard') return calculateIndexScore(metrics);
+  return calculateArticleScore(metrics);
+}
 
-  // Word count: 0-2 pts
+/** Article scoring (default) — prose-centric, rewards depth */
+function calculateArticleScore(metrics: ContentMetrics): number {
+  let score = 0;
   if (metrics.wordCount >= 800) score += 2;
   else if (metrics.wordCount >= 300) score += 1;
-
-  // Tables: 0-3 pts
   if (metrics.tableCount >= 3) score += 3;
   else if (metrics.tableCount >= 2) score += 2;
   else if (metrics.tableCount >= 1) score += 1;
-
-  // Diagrams: 0-2 pts
   if (metrics.diagramCount >= 2) score += 2;
   else if (metrics.diagramCount >= 1) score += 1;
-
-  // Internal links: 0-2 pts
   if (metrics.internalLinks >= 4) score += 2;
   else if (metrics.internalLinks >= 1) score += 1;
-
-  // External citations (footnotes + external links): 0-3 pts
   const citationCount = metrics.footnoteCount + metrics.externalLinks;
   if (citationCount >= 6) score += 3;
   else if (citationCount >= 3) score += 2;
   else if (citationCount >= 1) score += 1;
-
-  // Bullet ratio (lower is better): 0-2 pts
   if (metrics.bulletRatio < 0.3) score += 2;
   else if (metrics.bulletRatio < 0.5) score += 1;
-
-  // Has overview section: 0-1 pt
   if (metrics.hasOverview) score += 1;
-
   return score;
 }
 
+/** Table scoring — rewards data richness, not prose volume */
+function calculateTableScore(metrics: ContentMetrics): number {
+  let score = 0;
+  if (metrics.tableCount >= 3) score += 5;
+  else if (metrics.tableCount >= 2) score += 4;
+  else if (metrics.tableCount >= 1) score += 3;
+  if (metrics.wordCount >= 400) score += 2;
+  else if (metrics.wordCount >= 100) score += 1;
+  if (metrics.internalLinks >= 4) score += 2;
+  else if (metrics.internalLinks >= 1) score += 1;
+  const citations = metrics.footnoteCount + metrics.externalLinks;
+  if (citations >= 3) score += 2;
+  else if (citations >= 1) score += 1;
+  const sections = metrics.sectionCount.total;
+  if (sections >= 3) score += 2;
+  else if (sections >= 1) score += 1;
+  if (metrics.hasOverview) score += 1;
+  if (metrics.diagramCount >= 1) score += 1;
+  return Math.min(15, score);
+}
+
+/** Diagram scoring — rewards visualizations and explanatory text */
+function calculateDiagramScore(metrics: ContentMetrics): number {
+  let score = 0;
+  if (metrics.diagramCount >= 3) score += 5;
+  else if (metrics.diagramCount >= 2) score += 4;
+  else if (metrics.diagramCount >= 1) score += 3;
+  if (metrics.wordCount >= 400) score += 2;
+  else if (metrics.wordCount >= 100) score += 1;
+  if (metrics.internalLinks >= 4) score += 2;
+  else if (metrics.internalLinks >= 1) score += 1;
+  const citations = metrics.footnoteCount + metrics.externalLinks;
+  if (citations >= 3) score += 2;
+  else if (citations >= 1) score += 1;
+  const sections = metrics.sectionCount.total;
+  if (sections >= 3) score += 2;
+  else if (sections >= 1) score += 1;
+  if (metrics.hasOverview) score += 1;
+  if (metrics.tableCount >= 1) score += 1;
+  return Math.min(15, score);
+}
+
+/** Index/dashboard scoring — rewards navigation structure and links */
+function calculateIndexScore(metrics: ContentMetrics): number {
+  let score = 0;
+  if (metrics.internalLinks >= 20) score += 5;
+  else if (metrics.internalLinks >= 10) score += 4;
+  else if (metrics.internalLinks >= 5) score += 3;
+  else if (metrics.internalLinks >= 1) score += 1;
+  const sections = metrics.sectionCount.total;
+  if (sections >= 6) score += 3;
+  else if (sections >= 3) score += 2;
+  else if (sections >= 1) score += 1;
+  if (metrics.wordCount >= 200) score += 2;
+  else if (metrics.wordCount >= 50) score += 1;
+  if (metrics.tableCount >= 2) score += 2;
+  else if (metrics.tableCount >= 1) score += 1;
+  if (metrics.diagramCount >= 1) score += 2;
+  if (metrics.hasOverview) score += 1;
+  return Math.min(15, score);
+}
+
 /**
- * Suggest quality rating based on structural score and frontmatter
+ * Suggest quality rating based on structural score and frontmatter.
+ *
+ * Mapping: structural score 0-15 → quality 0-100.
+ * Index/dashboard pages return 0 (not graded).
+ * Stub pages are capped at 35.
  */
 export function suggestQuality(structuralScore: number, frontmatter: Record<string, unknown> = {}): number {
+  // Non-graded formats return 0 — they don't participate in quality assessment
+  const format = (frontmatter.contentFormat as string) || 'article';
+  if (format === 'index' || format === 'dashboard') {
+    return 0;
+  }
+
   // Linear mapping: score 0 → quality 0, score 15 → quality 100
   let quality = Math.round((structuralScore / 15) * 100);
 
