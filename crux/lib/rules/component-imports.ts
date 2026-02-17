@@ -26,6 +26,7 @@ const WIKI_COMPONENTS = [
   'CredibilityBadge',
   'ResourceTags',
   'F',
+  'Calc',
   'SquiggleEstimate',
 ];
 

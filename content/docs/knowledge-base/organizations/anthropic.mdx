@@ -70,7 +70,7 @@ This is the main Anthropic company page. For detailed analysis on specific topic
 
 ### Quick Financial Context
 
-As of February 2026: \$380B valuation (Series G), \$14B run-rate revenue, targeting \$20-26B for 2026. Anthropic trades at ≈27x current revenue vs <EntityLink id="openai">OpenAI</EntityLink>'s ≈25x—see <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including 25% customer concentration risk and margin pressure.
+As of February 2026: <F e="anthropic" f="valuation">\$380B</F> valuation (Series G), <F e="anthropic" f="revenue-run-rate">\$14B</F> run-rate revenue, targeting \$20-26B for 2026. Anthropic trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />  current revenue vs <EntityLink id="openai">OpenAI</EntityLink>'s ≈25x—see <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including <F e="anthropic" f="customer-concentration">25%</F> customer concentration risk and margin pressure.
 
 <SquiggleEstimate title="Anthropic Revenue Trajectory (ARR, $B)" code={`
 // Anthropic revenue growth trajectory
