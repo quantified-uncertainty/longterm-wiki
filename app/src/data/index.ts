@@ -946,7 +946,46 @@ export function getEntityInfoBoxData(entityId: string) {
     policyStatus,
     policyAuthor,
     scope,
+    // Overview
+    childPages: entity.entityType === "overview"
+      ? getChildPagesForOverview(entity.id)
+      : undefined,
   };
+}
+
+// ============================================================================
+// CHILD PAGES (for overview entities)
+// ============================================================================
+
+export interface ChildPageEntry {
+  id: string;
+  title: string;
+  type: string;
+  href: string;
+}
+
+/**
+ * Find all entities that reference this overview page via `summaryPage`.
+ * Returns them grouped by entity type for display in the InfoBox.
+ */
+export function getChildPagesForOverview(overviewId: string): ChildPageEntry[] {
+  const allEntities = getTypedEntities();
+  const children: ChildPageEntry[] = [];
+
+  for (const entity of allEntities) {
+    if (entity.summaryPage === overviewId) {
+      children.push({
+        id: entity.id,
+        title: entity.title,
+        type: entity.entityType,
+        href: getEntityHref(entity.id, entity.entityType),
+      });
+    }
+  }
+
+  // Sort alphabetically by title
+  children.sort((a, b) => a.title.localeCompare(b.title));
+  return children;
 }
 
 // ============================================================================

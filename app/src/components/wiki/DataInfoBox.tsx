@@ -81,6 +81,8 @@ export function DataInfoBox({ entityId, type: inlineType, ...inlineProps }: Data
           scope={data.scope}
           // Summary page
           summaryPage={data.summaryPage}
+          // Overview child pages
+          childPages={data.childPages}
           {...inlineProps}
         />
       </HideableInfoBox>

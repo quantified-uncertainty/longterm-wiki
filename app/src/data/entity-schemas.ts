@@ -192,6 +192,10 @@ const MetricEntitySchema = BaseEntity.extend({
   entityType: z.literal("metric"),
 });
 
+const OverviewEntitySchema = BaseEntity.extend({
+  entityType: z.literal("overview"),
+});
+
 // Catch-all for entity types we haven't explicitly modeled
 // (e.g., ai-transition-model-* types)
 const GenericEntitySchema = BaseEntity.extend({
@@ -228,6 +232,7 @@ export const TypedEntitySchema = z.discriminatedUnion("entityType", [
   ResourceEntitySchema,
   ParameterEntitySchema,
   MetricEntitySchema,
+  OverviewEntitySchema,
 ]);
 
 // ============================================================================
@@ -239,6 +244,7 @@ export type RiskEntity = z.infer<typeof RiskEntitySchema>;
 export type PersonEntity = z.infer<typeof PersonEntitySchema>;
 export type OrganizationEntity = z.infer<typeof OrganizationEntitySchema>;
 export type PolicyEntity = z.infer<typeof PolicyEntitySchema>;
+export type OverviewEntity = z.infer<typeof OverviewEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;
 
 // ============================================================================
