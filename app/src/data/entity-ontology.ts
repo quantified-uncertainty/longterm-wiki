@@ -309,6 +309,7 @@ export const ENTITY_GROUPS: { label: string; types: string[] }[] = [
   { label: "Concepts", types: ["concept", "crux", "argument", "analysis", "historical"] },
   { label: "Tables", types: ["table"] },
   { label: "Diagrams", types: ["diagram"] },
+  { label: "Internal", types: ["internal"] },
 ];
 
 // ---------------------------------------------------------------------------

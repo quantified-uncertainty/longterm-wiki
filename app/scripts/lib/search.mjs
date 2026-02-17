@@ -33,7 +33,6 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
 
   // 1. Entities with pages — primary search targets
   for (const entity of typedEntities) {
-    if (entity.entityType === 'internal') continue; // skip internal pages
     const page = pageMap.get(entity.id);
     if (!page) continue; // skip entities without content pages
 
