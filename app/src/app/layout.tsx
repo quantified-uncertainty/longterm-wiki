@@ -56,7 +56,7 @@ export default function RootLayout({
                 Explore
               </Link>
               <Link
-                href="/internal"
+                href="/wiki/E779"
                 className="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
                 Internal

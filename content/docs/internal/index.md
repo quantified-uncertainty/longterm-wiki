@@ -1,6 +1,8 @@
 ---
+numericId: E779
 title: Internal
 description: Project documentation, style guides, and roadmap
+entityType: internal
 sidebar:
   order: 0
   label: Overview

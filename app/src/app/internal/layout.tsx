@@ -1,4 +1,5 @@
-import { InternalSidebar } from "@/components/internal/InternalSidebar";
+import { WikiSidebar } from "@/components/wiki/WikiSidebar";
+import { getInternalNav } from "@/lib/wiki-nav";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import type { Metadata } from "next";
 
@@ -11,9 +12,10 @@ export default function InternalLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const sections = getInternalNav();
   return (
     <SidebarProvider>
-      <InternalSidebar />
+      <WikiSidebar sections={sections} />
       <div className="flex-1 min-w-0 px-8 py-4">{children}</div>
     </SidebarProvider>
   );

@@ -443,10 +443,11 @@ function buildPagesRegistry(urlToResource) {
         const content = readFileSync(fullPath, 'utf-8');
         const fm = extractFrontmatter(content);
 
-        // Skip index files for the pages list
-        if (id === 'index') continue;
+        // Index files use __index__ slug and are marked for ID registration only
+        const isIndexFile = (id === 'index');
+        const effectiveId = isIndexFile ? `__index__${urlPrefix}` : id;
 
-        const urlPath = `${urlPrefix}/${id}/`;
+        const urlPath = isIndexFile ? `${urlPrefix}/` : `${urlPrefix}/${id}/`;
 
         // Extract structural metrics (format-aware scoring)
         const contentFormat = fm.contentFormat || 'article';
@@ -460,7 +461,7 @@ function buildPagesRegistry(urlToResource) {
         const convertedLinkCount = countConvertedLinks(content);
 
         pages.push({
-          id,
+          id: effectiveId,
           numericId: fm.numericId || null,
           _fullPath: fullPath,
           path: urlPath,

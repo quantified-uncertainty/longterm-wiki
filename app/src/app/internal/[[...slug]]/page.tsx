@@ -1,10 +1,33 @@
-import { notFound } from "next/navigation";
-import { renderInternalPage, getAllInternalSlugs, getInternalPageFrontmatter, isMdxError } from "@/lib/mdx";
-import { AlertTriangle } from "lucide-react";
+import { notFound, redirect } from "next/navigation";
+import { getInternalPageFrontmatter, getAllInternalSlugs, isMdxError } from "@/lib/mdx";
+import { slugToNumericId } from "@/lib/mdx";
 import type { Metadata } from "next";
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
+}
+
+/**
+ * Resolve an internal URL slug path to the entity slug used in the ID registry.
+ * Internal pages use basename-only slugs (e.g., "ai-research-workflows"),
+ * but index pages use special "__index__/..." slugs.
+ */
+function resolveEntitySlug(slugParts: string[]): string {
+  if (slugParts.length === 0) return "__index__/internal";
+  // For nested index pages, the catch-all slug is just the directory path
+  // We need to check if it matches a directory index
+  const basename = slugParts[slugParts.length - 1];
+
+  // Try the basename first (most internal pages use just their filename as slug)
+  const numId = slugToNumericId(basename);
+  if (numId) return basename;
+
+  // Try __index__ pattern for directory indexes (e.g., ["reports"] → "__index__/internal/reports")
+  const indexSlug = `__index__/internal/${slugParts.join("/")}`;
+  const indexNumId = slugToNumericId(indexSlug);
+  if (indexNumId) return indexSlug;
+
+  return basename;
 }
 
 export async function generateStaticParams() {
@@ -24,38 +47,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function InternalPage({ params }: PageProps) {
   const { slug } = await params;
-  const slugPath = slug ? slug.join("/") : "";
+  const slugParts = slug || [];
 
-  const result = await renderInternalPage(slugPath);
-  if (!result) {
-    notFound();
+  // Resolve to entity slug and look up numeric ID for redirect
+  const entitySlug = resolveEntitySlug(slugParts);
+  const numericId = slugToNumericId(entitySlug);
+
+  if (numericId) {
+    redirect(`/wiki/${numericId}`);
   }
 
-  if (isMdxError(result)) {
-    return (
-      <div className="max-w-3xl mx-auto px-6 py-12">
-        <div className="flex items-start gap-3 p-4 rounded-lg border border-destructive/30 bg-destructive/5">
-          <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
-          <div>
-            <h2 className="text-lg font-semibold mb-1">Content compilation error</h2>
-            <p className="text-sm text-muted-foreground mb-3">
-              The MDX content for <code className="text-xs px-1.5 py-0.5 bg-muted rounded">{result.slug}</code> failed to compile.
-            </p>
-            <pre className="text-xs bg-muted p-3 rounded overflow-x-auto whitespace-pre-wrap break-words max-h-60">
-              {result.error}
-            </pre>
-          </div>
-        </div>
-      </div>
-    );
+  // No numeric ID found — check if frontmatter has one directly
+  const slugPath = slugParts.join("/");
+  const frontmatter = getInternalPageFrontmatter(slugPath);
+  if (frontmatter?.numericId) {
+    redirect(`/wiki/${frontmatter.numericId}`);
   }
 
-  return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-    <article className="prose max-w-none">
-      {result.frontmatter.title && <h1>{result.frontmatter.title}</h1>}
-      {result.content}
-    </article>
-    </div>
-  );
+  // Fallback: page has no numeric ID, render not found
+  // (React dashboard pages have their own dedicated routes and won't hit this catch-all)
+  notFound();
 }

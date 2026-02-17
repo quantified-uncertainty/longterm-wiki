@@ -63,27 +63,35 @@ function isSafePath(resolved: string, baseDir: string): boolean {
 
 function resolveContentPath(slug: string): string | null {
   const pathRegistry = getPathRegistry();
+  const EXTENSIONS = [".mdx", ".md"];
 
   // The pathRegistry maps slug → path like "/knowledge-base/people/geoffrey-hinton"
   // Strip leading slash to get relative path from CONTENT_DIR
   const registryPath = pathRegistry[slug];
   if (registryPath) {
     const relativePath = registryPath.replace(/^\//, "").replace(/\/$/, "");
-    const directPath = path.join(CONTENT_DIR, `${relativePath}.mdx`);
-    if (isSafePath(directPath, CONTENT_DIR) && fs.existsSync(directPath)) return directPath;
-
-    const indexPath = path.join(CONTENT_DIR, relativePath, "index.mdx");
-    if (isSafePath(indexPath, CONTENT_DIR) && fs.existsSync(indexPath)) return indexPath;
+    for (const ext of EXTENSIONS) {
+      const directPath = path.join(CONTENT_DIR, `${relativePath}${ext}`);
+      if (isSafePath(directPath, CONTENT_DIR) && fs.existsSync(directPath)) return directPath;
+    }
+    for (const ext of EXTENSIONS) {
+      const indexPath = path.join(CONTENT_DIR, relativePath, `index${ext}`);
+      if (isSafePath(indexPath, CONTENT_DIR) && fs.existsSync(indexPath)) return indexPath;
+    }
   }
 
   // Fallback: try direct slug match in content dir
-  const directPath = path.join(CONTENT_DIR, `${slug}.mdx`);
-  if (!isSafePath(directPath, CONTENT_DIR)) return null;
-  if (fs.existsSync(directPath)) return directPath;
+  for (const ext of EXTENSIONS) {
+    const directPath = path.join(CONTENT_DIR, `${slug}${ext}`);
+    if (!isSafePath(directPath, CONTENT_DIR)) return null;
+    if (fs.existsSync(directPath)) return directPath;
+  }
 
-  const indexPath = path.join(CONTENT_DIR, slug, "index.mdx");
-  if (!isSafePath(indexPath, CONTENT_DIR)) return null;
-  if (fs.existsSync(indexPath)) return indexPath;
+  for (const ext of EXTENSIONS) {
+    const indexPath = path.join(CONTENT_DIR, slug, `index${ext}`);
+    if (!isSafePath(indexPath, CONTENT_DIR)) return null;
+    if (fs.existsSync(indexPath)) return indexPath;
+  }
 
   return null;
 }

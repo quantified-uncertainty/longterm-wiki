@@ -188,6 +188,8 @@ describe("Entity data validation", () => {
       for (const page of pages) {
         if (!ENTITY_REQUIRED_CATEGORIES.has(page.category)) continue;
         if (EXCLUDED_PAGE_IDS.has(page.id)) continue;
+        // Index pages (e.g. __index__/knowledge-base/models) are directory listings, not entities
+        if (page.id.startsWith("__index__/")) continue;
         if (!entityIds.has(page.id)) {
           missing.push(`${page.id} (category=${page.category}, path=${page.path})`);
         }

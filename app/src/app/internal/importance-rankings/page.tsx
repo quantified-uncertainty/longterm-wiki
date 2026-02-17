@@ -26,7 +26,7 @@ export default function ImportanceRankingsPage() {
         <span className="font-medium text-foreground">{withResearch}</span> have
         research scores. Scores are derived from position in ordered rankings
         (see{" "}
-        <Link href="/internal/importance-ranking" className="no-underline">
+        <Link href="/wiki/E777" className="no-underline">
           Importance Ranking System
         </Link>
         ).

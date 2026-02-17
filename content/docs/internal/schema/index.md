@@ -1,6 +1,8 @@
 ---
+numericId: E781
 title: Schema Documentation
 description: "Complete reference for the data schema powering Longterm Wiki — entity types, relationships, data flow, and validation"
+entityType: internal
 sidebar:
   label: Schema Overview
   order: 0
