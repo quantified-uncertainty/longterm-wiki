@@ -704,12 +704,34 @@ async function main() {
     process.exit(1);
   }
 
-  // Compute next available ID from existing assignments
+  // Compute next available ID from existing assignments.
+  // Also scan page-level numericIds (from MDX frontmatter) so auto-assigned
+  // entity IDs don't collide with IDs that pages already claim.
   let nextId = 1;
   for (const numId of Object.keys(numericIdToSlug)) {
     const n = parseInt(numId.slice(1));
     if (n >= nextId) nextId = n + 1;
   }
+  // Quick scan: collect numericIds already declared in MDX frontmatter across
+  // all content directories. This prevents auto-assigned entity IDs from
+  // colliding with page-level IDs that haven't been registered as entities yet.
+  const CONTENT_DIR_ROOT = join(PROJECT_ROOT, '..', 'content', 'docs');
+  function scanFrontmatterNumericIds(dir) {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        scanFrontmatterNumericIds(join(dir, entry.name));
+      } else if (entry.name.endsWith('.mdx') || entry.name.endsWith('.md')) {
+        const content = readFileSync(join(dir, entry.name), 'utf-8');
+        const match = content.match(/^numericId:\s*(E\d+)/m);
+        if (match) {
+          const n = parseInt(match[1].slice(1));
+          if (n >= nextId) nextId = n + 1;
+        }
+      }
+    }
+  }
+  scanFrontmatterNumericIds(CONTENT_DIR_ROOT);
 
   // Assign IDs to entities that don't have one yet, writing back to source.
   // When the wiki server is running, IDs are allocated atomically from Postgres
@@ -863,10 +885,30 @@ async function main() {
   // YAML entities but have numericId in frontmatter). This ensures numeric IDs
   // like "E660" resolve to slugs like "factors-ai-capabilities-overview" when
   // scanning EntityLink references below.
+  // Also detect conflicts where a page claims a numericId already owned by an entity.
+  const pageIdConflicts = [];
   for (const page of pages) {
-    if (page.numericId && !numericIdToSlug[page.numericId]) {
-      numericIdToSlug[page.numericId] = page.id;
+    if (page.numericId) {
+      const existing = numericIdToSlug[page.numericId];
+      if (existing && existing !== page.id) {
+        // Check if this is a legitimate alias: the entity's path maps to this page
+        // (e.g. entity "tmc-epistemics" renders at page "epistemics")
+        const entityPath = pathRegistry[existing];
+        if (entityPath && entityPath.endsWith(`/${page.id}/`)) {
+          // Entity maps to this page — they're the same content, just add alias
+          slugToNumericId[page.id] = page.numericId;
+        } else {
+          pageIdConflicts.push(`${page.numericId} claimed by entity "${existing}" and page "${page.id}"`);
+        }
+      } else {
+        numericIdToSlug[page.numericId] = page.id;
+      }
     }
+  }
+  if (pageIdConflicts.length > 0) {
+    console.error('\n  ERROR: numericId conflicts between entities and pages:');
+    for (const c of pageIdConflicts) console.error(`    ${c}`);
+    process.exit(1);
   }
 
   const entityMap = new Map(entities.map(e => [e.id, e]));
@@ -957,10 +999,11 @@ async function main() {
   // Pages can declare numericId in MDX frontmatter. New pages get auto-assigned.
   // =========================================================================
   const entityIds = new Set(entities.map(e => e.id));
-  // Skip infrastructure/internal categories — only assign IDs to real content pages
+  // Skip infrastructure categories — only assign IDs to non-content pages
+  // Note: 'internal', 'reports', 'schema' removed — internal pages now get entity IDs
   const skipCategories = new Set([
-    'internal', 'style-guides', 'schema', 'browse',
-    'dashboard', 'project', 'reports', 'guides',
+    'style-guides', 'browse',
+    'dashboard', 'project', 'guides',
   ]);
   let pageIdAssignments = 0;
   for (const page of pages) {
@@ -971,9 +1014,14 @@ async function main() {
 
     if (page.numericId) {
       // Page already has a numericId from frontmatter.
-      // For generated stubs, the numericId may already be assigned to the parent
-      // entity (e.g., page "epistemics" inherits E319 from entity "tmc-epistemics").
-      // Just add the page slug as an alias — don't error on this.
+      // Check for conflicts: another entity/page may already own this numericId.
+      const existingOwner = numericIdToSlug[page.numericId];
+      if (existingOwner && existingOwner !== page.id) {
+        // For generated stubs, the numericId may already be assigned to the parent
+        // entity (e.g., page "epistemics" inherits E319 from entity "tmc-epistemics").
+        // That's fine — just log a warning. But if they're unrelated, it's a real conflict.
+        console.warn(`    WARNING: ${page.numericId} claimed by "${existingOwner}" and page "${page.id}" — keeping "${existingOwner}"`);
+      }
       if (!numericIdToSlug[page.numericId]) {
         numericIdToSlug[page.numericId] = page.id;
       }

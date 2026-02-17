@@ -101,6 +101,11 @@ const SCRIPTS = {
     description: 'Financial data staleness and consistency',
     passthrough: ['ci'],
   },
+  gate: {
+    script: 'validate/validate-gate.ts',
+    description: 'CI-blocking checks (pre-push gate)',
+    passthrough: ['ci', 'full'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'all');
@@ -130,6 +135,8 @@ Options:
 
 Examples:
   crux validate                           Run all checks
+  crux validate gate                      Run CI-blocking checks (pre-push)
+  crux validate gate --full               Include full Next.js build
   crux validate compile --quick           Quick compile check
   crux validate unified --rules=dollar-signs,markdown-lists
   crux validate unified --fix             Auto-fix unified rule issues

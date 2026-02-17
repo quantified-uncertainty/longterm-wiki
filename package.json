@@ -15,7 +15,8 @@
     "server:start": "pnpm --filter longterm-wiki-server start",
     "db:generate": "pnpm --filter longterm-wiki-server db:generate",
     "db:migrate": "pnpm --filter longterm-wiki-server db:migrate",
-    "db:seed": "pnpm --filter longterm-wiki-server db:seed"
+    "db:seed": "pnpm --filter longterm-wiki-server db:seed",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",

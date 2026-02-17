@@ -1,0 +1,213 @@
+#!/usr/bin/env node
+
+/**
+ * Gate Validation — CI-blocking checks in one command
+ *
+ * Runs the same checks that CI enforces, locally, before push.
+ * Used by .githooks/pre-push to mechanically block bad pushes.
+ *
+ * Steps (fast mode, default):
+ *   1. Build data layer (required for validation + tests)
+ *   2. Run vitest tests
+ *   3. MDX syntax (comparison-operators, dollar-signs)
+ *   4. YAML schema validation
+ *   5. Frontmatter schema validation
+ *
+ * With --full:
+ *   6. Full Next.js production build
+ *
+ * Exit codes:
+ *   0 = All checks passed
+ *   1 = One or more checks failed
+ */
+
+import { spawn, type ChildProcess } from 'child_process';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { getColors } from '../lib/output.ts';
+
+const args: string[] = process.argv.slice(2);
+const FULL_MODE: boolean = args.includes('--full');
+const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
+
+const c = getColors(CI_MODE);
+
+interface Step {
+  id: string;
+  name: string;
+  command: string;
+  args: string[];
+  cwd: string;
+}
+
+const APP_DIR = `${PROJECT_ROOT}/app`;
+
+const STEPS: Step[] = [
+  {
+    id: 'build-data',
+    name: 'Build data layer',
+    command: 'node',
+    args: ['scripts/build-data.mjs'],
+    cwd: APP_DIR,
+  },
+  {
+    id: 'test',
+    name: 'Run tests',
+    command: 'pnpm',
+    args: ['test'],
+    cwd: APP_DIR,
+  },
+  {
+    id: 'mdx-syntax',
+    name: 'MDX syntax (blocking)',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'unified', '--rules=comparison-operators,dollar-signs', '--errors-only'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'yaml-schema',
+    name: 'YAML schema (blocking)',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'schema'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'frontmatter',
+    name: 'Frontmatter schema (blocking)',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'unified', '--rules=frontmatter-schema', '--errors-only'],
+    cwd: PROJECT_ROOT,
+  },
+];
+
+if (FULL_MODE) {
+  STEPS.push({
+    id: 'build',
+    name: 'Full Next.js build',
+    command: 'pnpm',
+    args: ['build'],
+    cwd: APP_DIR,
+  });
+}
+
+interface StepResult {
+  id: string;
+  name: string;
+  passed: boolean;
+  duration: number;
+  exitCode: number | null;
+}
+
+function runStep(step: Step): Promise<StepResult> {
+  const start = Date.now();
+  return new Promise((resolve) => {
+    const child: ChildProcess = spawn(step.command, step.args, {
+      cwd: step.cwd,
+      stdio: ['inherit', 'pipe', 'pipe'],
+    });
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout!.on('data', (data: Buffer) => {
+      stdout += data.toString();
+      // Stream output in non-CI mode so user sees progress
+      if (!CI_MODE) {
+        process.stdout.write(data);
+      }
+    });
+
+    child.stderr!.on('data', (data: Buffer) => {
+      stderr += data.toString();
+      if (!CI_MODE) {
+        process.stderr.write(data);
+      }
+    });
+
+    child.on('close', (code: number | null) => {
+      resolve({
+        id: step.id,
+        name: step.name,
+        passed: code === 0,
+        duration: Date.now() - start,
+        exitCode: code,
+      });
+    });
+
+    child.on('error', (err: Error) => {
+      // Print error so it's visible
+      if (!CI_MODE) {
+        process.stderr.write(`Error spawning ${step.command}: ${err.message}\n`);
+      }
+      resolve({
+        id: step.id,
+        name: step.name,
+        passed: false,
+        duration: Date.now() - start,
+        exitCode: 1,
+      });
+    });
+  });
+}
+
+function formatMs(ms: number): string {
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
+}
+
+async function main(): Promise<void> {
+  const totalStart = Date.now();
+  const results: StepResult[] = [];
+
+  if (!CI_MODE) {
+    const mode = FULL_MODE ? 'full' : 'fast';
+    console.log(`\n${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`);
+    console.log(`${c.bold}${c.blue}  Gate Check (${mode})${c.reset}`);
+    console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}\n`);
+    console.log(`${c.dim}  Running ${STEPS.length} CI-blocking checks...${c.reset}\n`);
+  }
+
+  for (const step of STEPS) {
+    if (!CI_MODE) {
+      console.log(`${c.cyan}▶ ${step.name}${c.reset}`);
+    }
+
+    const result = await runStep(step);
+    results.push(result);
+
+    if (!CI_MODE) {
+      if (result.passed) {
+        console.log(`${c.green}✓ ${step.name}${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}\n`);
+      } else {
+        console.log(`${c.red}✗ ${step.name} FAILED${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}\n`);
+      }
+    }
+
+    // Fail fast — no point continuing if data build or tests fail
+    if (!result.passed) {
+      break;
+    }
+  }
+
+  const totalDuration = Date.now() - totalStart;
+  const passed = results.every((r) => r.passed);
+  const failed = results.filter((r) => !r.passed);
+
+  if (CI_MODE) {
+    console.log(JSON.stringify({ passed, results, duration: formatMs(totalDuration) }));
+  } else {
+    console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`);
+    if (passed) {
+      console.log(`${c.green}${c.bold}  ✅ All ${results.length} gate checks passed${c.reset} ${c.dim}(${formatMs(totalDuration)})${c.reset}`);
+    } else {
+      console.log(`${c.red}${c.bold}  ❌ Gate check failed${c.reset} ${c.dim}(${formatMs(totalDuration)})${c.reset}`);
+      for (const f of failed) {
+        console.log(`${c.red}  • ${f.name}${c.reset}`);
+      }
+    }
+    console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}\n`);
+  }
+
+  process.exit(passed ? 0 : 1);
+}
+
+main();

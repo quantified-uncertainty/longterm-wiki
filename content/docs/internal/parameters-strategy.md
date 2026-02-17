@@ -1,7 +1,8 @@
 ---
+numericId: E740
 title: "Parameters Strategy"
 description: "Strategy for AI transition model parameters"
-pageType: "documentation"
+entityType: internal
 importance: 0
 quality: 3
 llmSummary: "Internal project management document providing implementation instructions for creating parameter pages in a knowledge base. Outlines workflow, templates, and batch assignments for parallel development work."

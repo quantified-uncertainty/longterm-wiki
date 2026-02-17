@@ -1,7 +1,8 @@
 ---
+numericId: E753
 title: "Stub Pages Style Guide"
 description: "Guidelines for minimal placeholder pages"
-pageType: "documentation"
+entityType: internal
 sidebar:
   order: 13
 importance: 0

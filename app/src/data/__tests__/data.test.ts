@@ -86,6 +86,18 @@ const mockDatabase = {
       customFields: [],
       relatedTopics: [],
     },
+    {
+      id: "internal-doc",
+      entityType: "internal",
+      title: "Architecture Docs",
+      description: "Internal documentation page",
+      tags: [],
+      clusters: [],
+      relatedEntries: [],
+      sources: [],
+      customFields: [],
+      relatedTopics: [],
+    },
   ],
   resources: [
     {
@@ -145,10 +157,11 @@ const mockDatabase = {
     "other-entity": "/knowledge-base/concepts/other-entity",
     "table-entity": "/knowledge-base/responses/table-entity",
     "orphan-table": "/knowledge-base/risks/orphan-table",
+    "internal-doc": "/internal/architecture",
   },
   idRegistry: {
-    byNumericId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1", E4: "table-entity", E5: "orphan-table" },
-    bySlug: { "test-entity": "E1", "other-entity": "E2", "researcher-1": "E3", "table-entity": "E4", "orphan-table": "E5" },
+    byNumericId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1", E4: "table-entity", E5: "orphan-table", E6: "internal-doc" },
+    bySlug: { "test-entity": "E1", "other-entity": "E2", "researcher-1": "E3", "table-entity": "E4", "orphan-table": "E5", "internal-doc": "E6" },
   },
   pages: [
     {
@@ -192,6 +205,18 @@ const mockDatabase = {
       lastUpdated: "2025-02-01",
       category: "risks",
       wordCount: 0,
+    },
+    {
+      id: "internal-doc",
+      path: "/internal/architecture",
+      filePath: "internal/architecture.mdx",
+      title: "Architecture Docs",
+      quality: 0,
+      importance: 0,
+      lastUpdated: "2025-02-01",
+      category: "internal",
+      wordCount: 500,
+      updateFrequency: 90,
     },
   ],
   facts: {
@@ -410,6 +435,26 @@ describe("Data Layer", () => {
       const tableItems = items.filter((i) => i.type === "table");
       // Both table pages (with and without entity) must show as type "table"
       expect(tableItems).toHaveLength(2);
+    });
+
+    it("excludes internal pages from explore items", async () => {
+      const { getExploreItems } = await import("../../data/index");
+      const items = getExploreItems();
+      // internal-doc has entityType "internal" — must NOT appear in explore
+      const internalItem = items.find((i) => i.id === "internal-doc");
+      expect(internalItem).toBeUndefined();
+      // No items should have type "internal"
+      const internalItems = items.filter((i) => i.type === "internal");
+      expect(internalItems).toHaveLength(0);
+    });
+  });
+
+  describe("getUpdateSchedule", () => {
+    it("excludes internal pages from update schedule", async () => {
+      const { getUpdateSchedule } = await import("../../data/index");
+      const items = getUpdateSchedule();
+      const internalItem = items.find((i) => i.id === "internal-doc");
+      expect(internalItem).toBeUndefined();
     });
   });
 

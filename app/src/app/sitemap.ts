@@ -3,7 +3,8 @@ import { getAllPages, getEntityHref } from "@/data";
 import { SITE_URL } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pages = getAllPages();
+  // Exclude internal pages — they are not public content
+  const pages = getAllPages().filter((p) => p.category !== "internal");
 
   const pageEntries: MetadataRoute.Sitemap = pages.map((page) => ({
     url: `${SITE_URL}${getEntityHref(page.id)}`,
