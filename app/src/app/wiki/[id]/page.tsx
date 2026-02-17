@@ -9,7 +9,7 @@ import {
 import type { MdxPage, MdxError } from "@/lib/mdx";
 import { getEntityById, getPageById, getEntityPath } from "@/data";
 import type { Page, ContentFormat } from "@/data";
-import { CONTENT_FORMAT_INFO } from "@/lib/page-types";
+import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RelatedPages } from "@/components/RelatedPages";
@@ -321,8 +321,8 @@ export default async function WikiPage({ params }: PageProps) {
 
     const entityPath = getEntityPath(slug) || "";
     const pageData = getPageById(slug);
-    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
-    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
+    const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
+    const fullWidth = isFullWidth(contentFormat, result.frontmatter);
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ContentView
@@ -349,8 +349,8 @@ export default async function WikiPage({ params }: PageProps) {
 
     const entityPath = getEntityPath(id) || "";
     const pageData = getPageById(id);
-    const formatInfo = CONTENT_FORMAT_INFO[(pageData?.contentFormat || "article") as ContentFormat];
-    const fullWidth = result.frontmatter.fullWidth === true || formatInfo?.fullWidth === true;
+    const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
+    const fullWidth = isFullWidth(contentFormat, result.frontmatter);
     return (
       <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
         <ContentView
