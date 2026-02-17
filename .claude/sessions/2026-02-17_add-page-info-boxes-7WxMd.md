@@ -6,8 +6,12 @@
 
 **Issues encountered:**
 - The build script reads `update_frequency` (snake_case) from frontmatter, not `updateFrequency` (camelCase). Initially used the wrong casing and had to fix across all files.
+- `getUpdateSchedule()` excluded internal pages — removed that guard so the update schedule dashboard includes them.
+- `detectPageType()` didn't recognize `/internal/` paths — added path-based detection so internal pages badge as "Documentation".
+- Existing test asserted internal pages were excluded from update schedule — updated to assert inclusion.
 
 **Learnings/notes:**
 - Internal pages are detected via `entityPath.startsWith("/internal")` in `app/src/app/wiki/[id]/page.tsx`
 - The build system at `app/scripts/build-data.mjs` uses `fm.update_frequency` for the frontmatter field name
 - `JsonLd`, `LlmWarningBanner`, `DataInfoBox`, and `RelatedPages` remain intentionally hidden for internal pages
+- `page-status-dev-only` CSS class means PageStatus is only visible when dev mode is toggled on (localStorage)
