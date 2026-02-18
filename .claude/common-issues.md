@@ -46,6 +46,13 @@ Use `\<` not `<` in prose (outside of JSX tags). The unified validator catches t
 ### Branch naming for Claude Code web sessions
 Branches must start with `claude/` and end with the session ID, otherwise push fails with 403.
 
+### "ahead N, behind M" diverged branch state
+When `git status -b --short` shows `[ahead 3, behind 23]`, it means the auto-rebase GitHub Actions workflow already rebased the remote branch onto main (force-pushing to origin), but the local session still has the old (pre-rebase) commits.
+
+**Fix:** Run `git pull --rebase` to rebase local commits onto the updated remote. Then push with `git push --force-with-lease -u origin HEAD` (force-with-lease is required because the rebase rewrote history).
+
+This is handled automatically by the `/push-and-ensure-green` Step 0 workflow. If `git pull --rebase` succeeds cleanly (no conflicts), no manual conflict resolution is needed — the auto-rebase workflow already incorporated your commits on top of main on the remote side.
+
 ---
 
 ## Dependencies

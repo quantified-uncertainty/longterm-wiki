@@ -5,7 +5,14 @@ Run all CI checks locally, push to GitHub, and monitor until green. Fix and retr
 ## Step 0: Pre-flight
 
 1. Run `git fetch origin` to ensure remote refs are up to date.
-2. Check if the current branch is behind the remote (`git status -b --short`). If behind, warn the user — they may need to pull/rebase before pushing.
+2. Check the branch status: `git status -b --short`
+3. Handle the result based on ahead/behind counts:
+   - **Only ahead** (e.g. `[ahead 3]`): Normal — proceed to Step 1.
+   - **Only behind** (e.g. `[behind 5]`): Run `git pull --rebase` to incorporate remote changes, then proceed.
+   - **Both ahead and behind** (e.g. `[ahead 3, behind 23]`): The auto-rebase GitHub Actions workflow has already rebased the remote branch onto main, but the local copy is stale. Run `git pull --rebase` to rebase local commits on top of the updated remote. If conflicts arise, run `git rebase --abort`, report conflicts to the user, and stop.
+   - After any `git pull --rebase`, re-run `git status -b --short` to confirm the branch is only ahead (or up to date) before continuing.
+
+**Why "ahead N, behind M" happens:** When the auto-rebase workflow runs after another PR merges to main, it rebases this branch's commits on the remote and force-pushes. The local session hasn't pulled those changes yet, so it appears ahead (local commits) and behind (rebased remote commits).
 
 ## Step 1: Run all local checks (be paranoid)
 
@@ -26,7 +33,8 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
 1. Check `git status` for uncommitted changes. If there are any, ask the user what to do (commit, stash, etc.) — do NOT auto-commit without asking.
 2. **NEVER push directly to main.** If on `main`, stop and warn the user: "You are on the main branch. Create a feature branch first." Do not proceed.
 3. If on a feature branch:
-   - Push with `git push -u origin HEAD`.
+   - If you ran `git pull --rebase` in Step 0 (branch was diverged), push with `git push --force-with-lease -u origin HEAD` since the history was rewritten by the rebase.
+   - Otherwise push normally with `git push -u origin HEAD`.
    - Check if a PR already exists:
      ```bash
      BRANCH=$(git branch --show-current)
@@ -90,6 +98,6 @@ If all check runs show **success**: Report success. Include the PR URL if on a f
 ## Guardrails
 
 - Maximum 3 full retry cycles. If still failing after 3 attempts, stop and report what's wrong so the user can decide how to proceed.
-- Never force-push unless explicitly asked.
+- Never force-push unless explicitly asked, **except** after a `git pull --rebase` in Step 0 (where `--force-with-lease` is required and safe because the rebase rewrote local history to match the remote's rebased history).
 - Never skip pre-commit hooks.
 - Always show the user what failed and what you're fixing before making changes.
