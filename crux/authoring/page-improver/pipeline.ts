@@ -5,13 +5,13 @@
  */
 
 import fs from 'fs';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult,
 } from './types.ts';
-import { ROOT, NODE_TSX, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
+import { ROOT, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import {
@@ -189,7 +189,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     if (options.grade !== false) {
       console.log('\nRunning grade-content.ts...');
       try {
-        execSync(`${NODE_TSX} crux/authoring/grade-content.ts --page "${page.id}" --apply`, {
+        execFileSync('node', ['--import', 'tsx/esm', '--no-warnings', 'crux/authoring/grade-content.ts', '--page', page.id, '--apply'], {
           cwd: ROOT,
           stdio: 'inherit'
         });
