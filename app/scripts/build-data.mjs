@@ -1171,6 +1171,67 @@ async function main() {
   }
   database.facts = facts;
 
+  // Resolve sourceResource IDs → enrich facts with resource metadata
+  // Also auto-match fact source URLs to known resources
+  {
+    const allResources = database.resources || [];
+    const resourceById = new Map(allResources.map(r => [r.id, r]));
+    const publicationById = new Map((database.publications || []).map(p => [p.id, p]));
+
+    // Build URL → resource ID map for auto-matching
+    const sourceUrlToResourceId = new Map();
+    for (const r of allResources) {
+      if (!r.url) continue;
+      sourceUrlToResourceId.set(r.url, r.id);
+      // Also try without trailing slash
+      sourceUrlToResourceId.set(r.url.replace(/\/$/, ''), r.id);
+      if (!r.url.endsWith('/')) sourceUrlToResourceId.set(r.url + '/', r.id);
+    }
+
+    let resolvedCount = 0;
+    let autoMatchedCount = 0;
+
+    for (const [key, fact] of Object.entries(facts)) {
+      // Auto-match: if fact has a source URL but no sourceResource, try to find a matching resource
+      if (fact.source && !fact.sourceResource) {
+        const matchedId = sourceUrlToResourceId.get(fact.source) || sourceUrlToResourceId.get(fact.source.replace(/\/$/, ''));
+        if (matchedId) {
+          fact.sourceResource = matchedId;
+          autoMatchedCount++;
+        }
+      }
+
+      // Resolve: if fact has sourceResource, enrich with resource metadata
+      if (fact.sourceResource) {
+        const resource = resourceById.get(fact.sourceResource);
+        if (resource) {
+          fact.sourceTitle = resource.title;
+          if (resource.publication_id) {
+            const pub = publicationById.get(resource.publication_id);
+            if (pub) {
+              fact.sourcePublication = pub.name;
+              fact.sourceCredibility = pub.credibility;
+            }
+          }
+          if (resource.credibility_override != null) {
+            fact.sourceCredibility = resource.credibility_override;
+          }
+          // Backfill source URL from resource if fact doesn't have one
+          if (!fact.source && resource.url) {
+            fact.source = resource.url;
+          }
+          resolvedCount++;
+        } else {
+          console.warn(`  ⚠ fact ${key}: sourceResource "${fact.sourceResource}" not found in resources`);
+        }
+      }
+    }
+
+    if (resolvedCount > 0 || autoMatchedCount > 0) {
+      console.log(`  sourceResource: ${resolvedCount} resolved, ${autoMatchedCount} auto-matched from URLs`);
+    }
+  }
+
   // Build timeseries index: group facts by measure, sorted chronologically
   // Facts with a `subject` override are excluded from the parent entity's timeseries
   // (they represent benchmarks/comparisons, not entity-owned data)

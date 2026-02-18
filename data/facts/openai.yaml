@@ -7,6 +7,7 @@ facts:
     value: 13e9
     asOf: "2024-01"
     source: "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/"
+    sourceResource: "862e2d851c171321"
     note: "Microsoft cumulative investment"
 
   # === User metrics ===
@@ -24,6 +25,7 @@ facts:
     value: { min: 157e9 }
     asOf: "2024-12"
     note: "October 2024 funding round valuation"
+    sourceResource: "b8e4c3ef3a3c7827"
 
   valuation-2025:
     value: { min: 500e9 }
@@ -49,18 +51,21 @@ facts:
     value: 175e9
     asOf: "2020-06"
     source: "https://arxiv.org/abs/2005.14165"
+    sourceResource: "2cab3ea10b8b7ae2"
 
   o1-aime-score:
     measure: benchmark-score
     value: 83
     asOf: "2024-09"
     note: "o1 model performance on AIME math competition"
+    sourceResource: "9edf2bd5938d8386"
 
   o1-swe-bench-score:
     measure: benchmark-score
     value: 71.7
     asOf: "2024-09"
     note: "o1 model on SWE-bench Verified"
+    sourceResource: "9edf2bd5938d8386"
 
   # === Standalone facts (no measure — keep as strings) ===
 
@@ -73,3 +78,4 @@ facts:
     value: "75%"
     asOf: "2024"
     note: "75% of co-founders departed within 9 years of founding"
+    sourceResource: "85ba042a002437a0"

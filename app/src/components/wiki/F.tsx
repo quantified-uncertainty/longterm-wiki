@@ -42,7 +42,8 @@ export function F({ e, f, showDate, children, className }: FProps) {
     <>{baseValue} <span className="text-muted-foreground font-normal">(as of {fact.asOf})</span></>
   ) : baseValue;
   const isComputed = Boolean(fact.computed);
-  const hasMetadata = fact.asOf || fact.source || fact.note || isComputed;
+  const hasResource = Boolean(fact.sourceTitle);
+  const hasMetadata = fact.asOf || fact.source || fact.note || isComputed || hasResource;
 
   if (!hasMetadata) {
     return (
@@ -89,11 +90,32 @@ export function F({ e, f, showDate, children, className }: FProps) {
             {fact.note}
           </span>
         )}
-        {fact.source && (
+        {hasResource ? (
+          <span className="block text-muted-foreground mt-1">
+            <span className="block truncate">
+              Source: {fact.sourceTitle}
+            </span>
+            {fact.sourcePublication && (
+              <span className="flex items-center gap-1 mt-0.5">
+                <span className="text-muted-foreground/80">{fact.sourcePublication}</span>
+                {fact.sourceCredibility != null && (
+                  <span className={cn(
+                    "inline-block px-1 py-px rounded text-[9px] font-medium",
+                    fact.sourceCredibility >= 4 ? "bg-green-500/15 text-green-600 dark:text-green-400" :
+                    fact.sourceCredibility >= 3 ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400" :
+                    "bg-red-500/15 text-red-600 dark:text-red-400"
+                  )}>
+                    {fact.sourceCredibility}/5
+                  </span>
+                )}
+              </span>
+            )}
+          </span>
+        ) : fact.source ? (
           <span className="block text-muted-foreground mt-1 truncate">
             Source: {fact.source}
           </span>
-        )}
+        ) : null}
         <span className="block text-muted-foreground/60 mt-1.5 font-mono text-[10px]">
           {e}.{f}
         </span>

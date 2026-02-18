@@ -2,6 +2,17 @@
 # Resources from major AI labs and companies
 # Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
 
+- id: 862e2d851c171321
+  url: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
+  title: "Microsoft and OpenAI extend partnership"
+  type: web
+  publication_id: microsoft
+  cited_by:
+    - openai
+  tags:
+    - funding
+    - ai-labs
+
 - id: 384cd95f0c4dbbc6
   url: https://scholar.google.com/scholar?q=replika+parasocial+relationship
   title: Academic research on Replika relationships

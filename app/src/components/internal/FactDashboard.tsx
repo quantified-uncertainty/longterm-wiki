@@ -29,6 +29,10 @@ interface FactEntry {
   high?: number;
   asOf?: string;
   source?: string;
+  sourceResource?: string;
+  sourceTitle?: string;
+  sourcePublication?: string;
+  sourceCredibility?: number;
   note?: string;
   computed?: boolean;
   compute?: string;
@@ -48,19 +52,24 @@ export function FactDashboard({
 }) {
   const [filter, setFilter] = useState("");
   const [showComputed, setShowComputed] = useState(true);
+  const [sourceFilter, setSourceFilter] = useState<"all" | "sourced" | "unsourced">("all");
   const [viewMode, setViewMode] = useState<ViewMode>("entity");
 
   const filtered = useMemo(() => facts.filter((f) => {
     if (!showComputed && f.computed) return false;
+    if (sourceFilter === "sourced" && !f.sourceResource && !f.source) return false;
+    if (sourceFilter === "unsourced" && (f.sourceResource || f.source)) return false;
     if (!filter) return true;
     const q = filter.toLowerCase();
     return (
       f.entity.toLowerCase().includes(q) ||
       f.factId.toLowerCase().includes(q) ||
       (f.value || "").toLowerCase().includes(q) ||
-      (f.measure || "").toLowerCase().includes(q)
+      (f.measure || "").toLowerCase().includes(q) ||
+      (f.sourcePublication || "").toLowerCase().includes(q) ||
+      (f.sourceTitle || "").toLowerCase().includes(q)
     );
-  }), [facts, filter, showComputed]);
+  }), [facts, filter, showComputed, sourceFilter]);
 
   // Stats
   const measureCount = useMemo(() => {
@@ -72,16 +81,97 @@ export function FactDashboard({
     return new Set(filtered.map(f => f.entity)).size;
   }, [filtered]);
 
+  // Source coverage stats (computed from all facts, not filtered)
+  const sourceStats = useMemo(() => {
+    const total = facts.length;
+    const withResource = facts.filter(f => f.sourceResource).length;
+    const withUrlOnly = facts.filter(f => f.source && !f.sourceResource).length;
+    const unsourced = total - withResource - withUrlOnly;
+    const pct = total > 0 ? Math.round((withResource / total) * 100) : 0;
+    // Credibility breakdown
+    const credCounts = { high: 0, medium: 0, low: 0 };
+    for (const f of facts) {
+      if (f.sourceCredibility != null) {
+        if (f.sourceCredibility >= 4) credCounts.high++;
+        else if (f.sourceCredibility >= 3) credCounts.medium++;
+        else credCounts.low++;
+      }
+    }
+    return { total, withResource, withUrlOnly, unsourced, pct, credCounts };
+  }, [facts]);
+
   return (
     <div>
+      {/* Source coverage summary */}
+      <div className="flex items-center gap-3 mb-4 p-3 bg-muted/50 rounded-lg flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Source Coverage:</span>
+          <span className={`text-sm font-semibold ${sourceStats.pct >= 50 ? "text-green-600 dark:text-green-400" : sourceStats.pct >= 25 ? "text-yellow-600 dark:text-yellow-400" : "text-red-600 dark:text-red-400"}`}>
+            {sourceStats.pct}%
+          </span>
+        </div>
+        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden min-w-[100px] max-w-[200px]">
+          <div className="h-full bg-green-500/60 rounded-full" style={{ width: `${sourceStats.pct}%` }} />
+        </div>
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-green-500/60 inline-block" />
+            {sourceStats.withResource} linked
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-yellow-500/60 inline-block" />
+            {sourceStats.withUrlOnly} URL only
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-red-500/40 inline-block" />
+            {sourceStats.unsourced} unsourced
+          </span>
+        </div>
+        {(sourceStats.credCounts.high > 0 || sourceStats.credCounts.medium > 0) && (
+          <div className="flex items-center gap-2 text-xs border-l border-border pl-3 ml-1">
+            <span className="text-muted-foreground">Credibility:</span>
+            {sourceStats.credCounts.high > 0 && (
+              <span className="px-1.5 py-0.5 bg-green-500/15 text-green-600 dark:text-green-400 rounded font-medium">
+                {sourceStats.credCounts.high} high
+              </span>
+            )}
+            {sourceStats.credCounts.medium > 0 && (
+              <span className="px-1.5 py-0.5 bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 rounded font-medium">
+                {sourceStats.credCounts.medium} med
+              </span>
+            )}
+            {sourceStats.credCounts.low > 0 && (
+              <span className="px-1.5 py-0.5 bg-red-500/15 text-red-600 dark:text-red-400 rounded font-medium">
+                {sourceStats.credCounts.low} low
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center gap-4 mb-4 flex-wrap">
         <input
           type="text"
-          placeholder="Filter by entity, fact ID, or measure..."
+          placeholder="Filter by entity, fact ID, measure, or source..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="flex-1 min-w-[200px] px-3 py-2 text-sm border border-border rounded-md bg-background"
         />
+        <div className="flex rounded-md border border-border overflow-hidden">
+          {(["all", "sourced", "unsourced"] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setSourceFilter(mode)}
+              className={`px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                sourceFilter === mode
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background text-muted-foreground hover:bg-muted"
+              }`}
+            >
+              {mode === "all" ? "All" : mode === "sourced" ? "Sourced" : "Unsourced"}
+            </button>
+          ))}
+        </div>
         <label className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
           <input
             type="checkbox"
@@ -179,12 +269,8 @@ function EntityView({
                     <ValueDisplay fact={fact} />
                   </td>
                   <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
-                  <td className="py-1.5 pr-4 text-muted-foreground text-xs max-w-[200px] truncate">
-                    {fact.source ? (
-                      <a href={fact.source} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                        {new URL(fact.source).hostname.replace("www.", "")}
-                      </a>
-                    ) : "\u2014"}
+                  <td className="py-1.5 pr-4">
+                    <SourceBadge fact={fact} />
                   </td>
                   <td className="py-1.5">
                     {fact.computed ? (
@@ -298,6 +384,7 @@ function MeasureView({
                         <th className="pb-1 pr-4 font-medium">Fact ID</th>
                         <th className="pb-1 pr-4 font-medium">Value</th>
                         <th className="pb-1 pr-4 font-medium">As Of</th>
+                        <th className="pb-1 pr-4 font-medium">Source</th>
                         <th className="pb-1 font-medium">Note</th>
                       </tr>
                     </thead>
@@ -314,6 +401,9 @@ function MeasureView({
                             <ValueDisplay fact={fact} />
                           </td>
                           <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+                          <td className="py-1.5 pr-4">
+                            <SourceBadge fact={fact} />
+                          </td>
                           <td className="py-1.5 text-muted-foreground text-xs max-w-[300px] truncate">
                             {fact.note || "\u2014"}
                           </td>
@@ -489,6 +579,45 @@ function TimeseriesView({
 }
 
 // === Shared components ===
+
+function SourceBadge({ fact }: { fact: FactEntry }) {
+  if (fact.sourceTitle) {
+    return (
+      <span className="flex items-center gap-1 text-xs max-w-[200px]">
+        <a
+          href={fact.source}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline truncate"
+          title={fact.sourceTitle}
+        >
+          {fact.sourcePublication || fact.sourceTitle}
+        </a>
+        {fact.sourceCredibility != null && (
+          <span className={`inline-block px-1 py-px rounded text-[9px] font-medium shrink-0 ${
+            fact.sourceCredibility >= 4 ? "bg-green-500/15 text-green-600 dark:text-green-400" :
+            fact.sourceCredibility >= 3 ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400" :
+            "bg-red-500/15 text-red-600 dark:text-red-400"
+          }`}>
+            {fact.sourceCredibility}/5
+          </span>
+        )}
+      </span>
+    );
+  }
+  if (fact.source) {
+    try {
+      return (
+        <a href={fact.source} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">
+          {new URL(fact.source).hostname.replace("www.", "")}
+        </a>
+      );
+    } catch {
+      return <span className="text-xs text-muted-foreground truncate">{fact.source}</span>;
+    }
+  }
+  return <span className="text-xs text-muted-foreground">{"\u2014"}</span>;
+}
 
 function MeasureBadge({
   measureId,

@@ -8,6 +8,7 @@ facts:
     asOf: "2026-02"
     note: "Series G post-money valuation"
     source: "https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/"
+    sourceResource: "8e3ff50b9ef2a1a8"
 
   valuation-nov-2025:
     value: 350e9
@@ -21,6 +22,7 @@ facts:
     value: 14e9
     asOf: "2026-02"
     note: "Run-rate revenue at Series G announcement"
+    sourceResource: "8e3ff50b9ef2a1a8"
 
   revenue-arr-2025:
     value: 9e9
@@ -50,11 +52,13 @@ facts:
     asOf: "2026-02"
     note: "Series G round size"
     source: "https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/"
+    sourceResource: "8e3ff50b9ef2a1a8"
 
   total-funding:
     value: { min: 67e9 }
     asOf: "2026-02"
     note: "Total funding raised including $30B Series G"
+    sourceResource: "8e3ff50b9ef2a1a8"
 
   # === Business metrics ===
 
@@ -90,6 +94,7 @@ facts:
   interpretability-team-size:
     value: [40, 60]
     asOf: "2025"
+    sourceResource: "4507d36fc38ca05d"
 
   safety-researchers:
     measure: safety-researcher-count
