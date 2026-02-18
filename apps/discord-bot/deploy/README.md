@@ -41,7 +41,7 @@ image:
 env:
   DISCORD_TOKEN: ""         # injected from k8s secret
   ANTHROPIC_API_KEY: ""     # injected from k8s secret
-  WIKI_BASE_URL: "https://longterm-wiki.vercel.app"
+  WIKI_BASE_URL: "https://www.longtermwiki.com"
   # WIKI_ROOT is not needed — defaults to /repo inside the image
 ```
 

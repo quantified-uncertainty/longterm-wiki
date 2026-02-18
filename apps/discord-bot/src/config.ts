@@ -10,7 +10,7 @@ export const WIKI_ROOT =
 export const WIKI_CONTENT_PATH = `${WIKI_ROOT}/content/docs`;
 
 export const WIKI_BASE_URL =
-  (process.env.WIKI_BASE_URL ?? "https://longterm-wiki.vercel.app").replace(
+  (process.env.WIKI_BASE_URL ?? "https://www.longtermwiki.com").replace(
     /\/$/,
     ""
   );
