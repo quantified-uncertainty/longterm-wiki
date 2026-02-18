@@ -16,11 +16,12 @@
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { join, basename, relative } from 'path';
+import { join, basename } from 'path';
 import { parse } from 'yaml';
 import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
-import { detectReassignments, scanEntityLinkRefs, formatReassignments } from './lib/id-stability.mjs';
+import { runStabilityCheck } from './lib/id-stability.mjs';
+import { buildIdMaps, computeNextId, filterEligiblePages } from './lib/id-assignment.mjs';
 
 const ALLOW_ID_REASSIGNMENT = process.argv.includes('--allow-id-reassignment');
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -124,34 +125,27 @@ function scanPages() {
 }
 
 /**
- * Run the stability check and exit on failure.
+ * Collect all "E###" numericId values declared in MDX/MD frontmatter within a
+ * directory tree. Used to reserve page-level IDs before assigning entity IDs,
+ * so the two namespaces don't collide.
  */
-function checkStability(prevRegistry, numericIdToSlug, slugToNumericId, phase) {
-  if (!prevRegistry?.entities || ALLOW_ID_REASSIGNMENT) return;
-
-  const reassignments = detectReassignments(prevRegistry, numericIdToSlug, slugToNumericId);
-  if (reassignments.length === 0) return;
-
-  const { lines, affectedIds } = formatReassignments(reassignments);
-  const CONTENT_SCAN_DIR = join(DATA_DIR, '..', 'content', 'docs');
-  const brokenRefs = scanEntityLinkRefs(CONTENT_SCAN_DIR, affectedIds);
-
-  console.error(`\n  ERROR: Numeric ID reassignment detected at ${phase} level! (issue #148)`);
-  console.error('  The following IDs changed between builds:\n');
-  for (const line of lines) console.error(`  ${line}`);
-
-  if (brokenRefs.length > 0) {
-    console.error(`\n  ${brokenRefs.length} EntityLink reference(s) would break:\n`);
-    for (const ref of brokenRefs) {
-      const relPath = relative(CONTENT_SCAN_DIR, ref.file);
-      console.error(`    ${relPath}:${ref.line} — id="${ref.id}"`);
+function collectFrontmatterNumericIds(dir) {
+  if (!existsSync(dir)) return [];
+  const ids = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      ids.push(...collectFrontmatterNumericIds(join(dir, entry.name)));
+    } else if (entry.name.endsWith('.mdx') || entry.name.endsWith('.md')) {
+      const content = readFileSync(join(dir, entry.name), 'utf-8');
+      const match = content.match(/^numericId:\s*(E\d+)/m);
+      if (match) ids.push(match[1]);
     }
   }
-
-  console.error('\n  To fix: restore the original numericId values in source files.');
-  console.error('  To override: re-run with --allow-id-reassignment\n');
-  process.exit(1);
+  return ids;
 }
+
+// Directory scanned for broken EntityLink refs when a stability violation is found
+const CONTENT_SCAN_DIR = join(DATA_DIR, '..', 'content', 'docs');
 
 // ============================================================================
 // Main
@@ -182,21 +176,7 @@ async function main() {
   const frontmatterEntities = scanFrontmatterEntities(yamlEntityIds, CONTENT_DIR);
   const entities = [...yamlEntityItems, ...frontmatterEntities];
 
-  const slugToNumericId = {};
-  const numericIdToSlug = {};
-  const conflicts = [];
-
-  for (const entity of entities) {
-    if (entity.numericId) {
-      if (numericIdToSlug[entity.numericId] && numericIdToSlug[entity.numericId] !== entity.id) {
-        conflicts.push(
-          `${entity.numericId} claimed by both "${numericIdToSlug[entity.numericId]}" and "${entity.id}"`
-        );
-      }
-      numericIdToSlug[entity.numericId] = entity.id;
-      slugToNumericId[entity.id] = entity.numericId;
-    }
-  }
+  const { numericIdToSlug, slugToNumericId, conflicts } = buildIdMaps(entities);
 
   if (conflicts.length > 0) {
     console.error('\n  ERROR: numericId conflicts detected:');
@@ -205,37 +185,21 @@ async function main() {
   }
 
   // -------------------------------------------------------------------------
-  // Compute next available ID from existing assignments.
+  // Compute next available ID.
   // Scan MDX frontmatter to reserve page-level IDs already declared there,
   // so auto-assigned entity IDs don't collide with them.
   // -------------------------------------------------------------------------
-  let nextId = 1;
-  for (const numId of Object.keys(numericIdToSlug)) {
-    const n = parseInt(numId.slice(1));
-    if (n >= nextId) nextId = n + 1;
-  }
-
-  function reserveFrontmatterIds(dir) {
-    if (!existsSync(dir)) return;
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      if (entry.isDirectory()) {
-        reserveFrontmatterIds(join(dir, entry.name));
-      } else if (entry.name.endsWith('.mdx') || entry.name.endsWith('.md')) {
-        const content = readFileSync(join(dir, entry.name), 'utf-8');
-        const match = content.match(/^numericId:\s*(E\d+)/m);
-        if (match) {
-          const n = parseInt(match[1].slice(1));
-          if (n >= nextId) nextId = n + 1;
-        }
-      }
-    }
-  }
-  reserveFrontmatterIds(CONTENT_DIR);
+  const reservedIds = collectFrontmatterNumericIds(CONTENT_DIR);
+  let nextId = computeNextId(numericIdToSlug, reservedIds);
 
   // -------------------------------------------------------------------------
   // Stability check (entity-level) — detect silent reassignments (#148)
   // -------------------------------------------------------------------------
-  checkStability(prevRegistry, numericIdToSlug, slugToNumericId, 'entity');
+  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
+    allowReassignment: ALLOW_ID_REASSIGNMENT,
+    phase: 'entity',
+    contentDir: CONTENT_SCAN_DIR,
+  });
 
   // -------------------------------------------------------------------------
   // Assign IDs to entities without one, write back to source files.
@@ -293,12 +257,11 @@ async function main() {
   // -------------------------------------------------------------------------
   const pages = scanPages();
   const entityIds = new Set(entities.map(e => e.id));
+  const eligiblePages = filterEligiblePages(pages, entityIds, SKIP_CATEGORIES);
+
   // Pass 1: collect existing page numericIds from frontmatter
-  for (const page of pages) {
-    if (entityIds.has(page.id)) continue;
-    if (slugToNumericId[page.id]) continue;
-    if (SKIP_CATEGORIES.has(page.category)) continue;
-    if (page.contentFormat === 'dashboard') continue;
+  for (const page of eligiblePages) {
+    if (slugToNumericId[page.id]) continue; // already assigned (entity or prior pass)
 
     if (page.numericId) {
       const existingOwner = numericIdToSlug[page.numericId];
@@ -316,15 +279,16 @@ async function main() {
   }
 
   // Stability check (page-level) — full check now that all IDs are collected
-  checkStability(prevRegistry, numericIdToSlug, slugToNumericId, 'page');
+  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
+    allowReassignment: ALLOW_ID_REASSIGNMENT,
+    phase: 'page',
+    contentDir: CONTENT_SCAN_DIR,
+  });
 
   // Pass 2: assign new IDs to pages that don't have one yet
   let pageAssignments = 0;
-  for (const page of pages) {
-    if (entityIds.has(page.id)) continue;
-    if (slugToNumericId[page.id]) continue;
-    if (SKIP_CATEGORIES.has(page.category)) continue;
-    if (page.contentFormat === 'dashboard') continue;
+  for (const page of eligiblePages) {
+    if (slugToNumericId[page.id]) continue; // already has an ID
 
     const numId = `E${nextId}`;
     numericIdToSlug[numId] = page.id;

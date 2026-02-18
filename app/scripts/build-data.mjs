@@ -25,7 +25,7 @@ import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
-import { detectReassignments, scanEntityLinkRefs, formatReassignments } from './lib/id-stability.mjs';
+import { runStabilityCheck } from './lib/id-stability.mjs';
 
 // ---------------------------------------------------------------------------
 // Structured value formatting — converts numeric fact values to display strings
@@ -161,47 +161,8 @@ function countEntries(data) {
   return 0;
 }
 
-/**
- * Check ID stability — detect silent numeric ID reassignments (issue #148).
- * Compares current slug↔ID mappings against a previous registry snapshot.
- * If reassignments are found, reports them with affected EntityLink references
- * and exits with an error.
- *
- * @param {Object|null} prevRegistry  Previous id-registry.json content
- * @param {Object} numericIdToSlug  Current mapping: numericId → slug
- * @param {Object} slugToNumericId  Current mapping: slug → numericId
- * @param {boolean} allowReassignment  If true, skip the check
- * @param {string} phase  Label for error messages ('entity' or 'page')
- */
-function checkIdStability(prevRegistry, numericIdToSlug, slugToNumericId, allowReassignment, phase) {
-  if (!prevRegistry?.entities || allowReassignment) return;
-
-  const reassignments = detectReassignments(prevRegistry, numericIdToSlug, slugToNumericId);
-  if (reassignments.length === 0) return;
-
-  console.error(`\n  ERROR: Numeric ID reassignment detected at ${phase} level! (issue #148)`);
-  console.error('  The following IDs changed between builds:\n');
-
-  const { lines, affectedIds } = formatReassignments(reassignments);
-  for (const line of lines) {
-    console.error(`  ${line}`);
-  }
-
-  const CONTENT_SCAN_DIR = join(PROJECT_ROOT, '..', 'content', 'docs');
-  const brokenRefs = scanEntityLinkRefs(CONTENT_SCAN_DIR, affectedIds);
-
-  if (brokenRefs.length > 0) {
-    console.error(`\n  ${brokenRefs.length} EntityLink reference(s) would break:\n`);
-    for (const ref of brokenRefs) {
-      const relPath = relative(CONTENT_SCAN_DIR, ref.file);
-      console.error(`    ${relPath}:${ref.line} — id="${ref.id}"`);
-    }
-  }
-
-  console.error('\n  To fix: restore the original numericId values in source files.');
-  console.error('  To override: re-run with --allow-id-reassignment\n');
-  process.exit(1);
-}
+// Directory scanned for broken EntityLink refs during stability checks
+const CONTENT_SCAN_DIR = join(PROJECT_ROOT, '..', 'content', 'docs');
 
 /**
  * Compute backlinks for all entities
@@ -987,7 +948,11 @@ async function main() {
   // -------------------------------------------------------------------------
   // ID Stability Check (entity-level) — detect silent reassignments (#148)
   // -------------------------------------------------------------------------
-  checkIdStability(prevRegistry, numericIdToSlug, slugToNumericId, ALLOW_ID_REASSIGNMENT, 'entity');
+  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
+    allowReassignment: ALLOW_ID_REASSIGNMENT,
+    phase: 'entity',
+    contentDir: CONTENT_SCAN_DIR,
+  });
 
   // Compute next available ID from existing assignments.
   // Also scan page-level numericIds (from MDX frontmatter) so auto-assigned
@@ -1512,7 +1477,11 @@ async function main() {
 
   // ID Stability Check (page-level) — now both entity and page IDs are
   // collected, compare the full set against the previous registry (#148)
-  checkIdStability(prevRegistry, numericIdToSlug, slugToNumericId, ALLOW_ID_REASSIGNMENT, 'page');
+  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
+    allowReassignment: ALLOW_ID_REASSIGNMENT,
+    phase: 'page',
+    contentDir: CONTENT_SCAN_DIR,
+  });
 
   // Pass 2: Assign new numericIds in-memory to pages that don't have one yet.
   // NOTE: Writing IDs back to source files is the job of assign-ids.mjs (the
