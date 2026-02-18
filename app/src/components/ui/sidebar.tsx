@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
+import { PanelLeftIcon, X } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@lib/utils";
 
@@ -31,6 +31,8 @@ export function SidebarProvider({
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
+  // Mobile sidebar is closed by default
+  const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const toggleSidebar = React.useCallback(() => {
     setOpen((prev) => !prev);
@@ -41,16 +43,138 @@ export function SidebarProvider({
     [open, toggleSidebar]
   );
 
+  const mobileContextValue = React.useMemo<MobileSidebarContextProps>(
+    () => ({ mobileOpen, setMobileOpen }),
+    [mobileOpen]
+  );
+
   return (
     <SidebarContext.Provider value={contextValue}>
-      <div
-        data-slot="sidebar-wrapper"
-        className={cn("flex min-h-0 w-full", className)}
-        {...props}
-      >
-        {children}
-      </div>
+      <MobileSidebarContext.Provider value={mobileContextValue}>
+        <div
+          data-slot="sidebar-wrapper"
+          className={cn("flex min-h-0 w-full", className)}
+          {...props}
+        >
+          {children}
+        </div>
+      </MobileSidebarContext.Provider>
     </SidebarContext.Provider>
+  );
+}
+
+// --- Mobile sidebar context & components ---
+
+type MobileSidebarContextProps = {
+  mobileOpen: boolean;
+  setMobileOpen: (open: boolean) => void;
+};
+
+const MobileSidebarContext =
+  React.createContext<MobileSidebarContextProps | null>(null);
+
+export function useMobileSidebar() {
+  const context = React.useContext(MobileSidebarContext);
+  if (!context) {
+    throw new Error(
+      "useMobileSidebar must be used within a SidebarProvider."
+    );
+  }
+  return context;
+}
+
+export function MobileSidebarTrigger({
+  className,
+  ...props
+}: React.ComponentProps<"button">) {
+  const { setMobileOpen } = useMobileSidebar();
+
+  return (
+    <button
+      data-slot="mobile-sidebar-trigger"
+      className={cn(
+        "md:hidden inline-flex items-center justify-center rounded-md text-sm font-medium h-8 w-8 hover:bg-accent hover:text-accent-foreground",
+        className
+      )}
+      onClick={() => setMobileOpen(true)}
+      aria-label="Open navigation menu"
+      {...props}
+    >
+      <PanelLeftIcon className="h-5 w-5" />
+    </button>
+  );
+}
+
+export function MobileSidebar({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const { mobileOpen, setMobileOpen } = useMobileSidebar();
+
+  // Close on Escape key
+  React.useEffect(() => {
+    if (!mobileOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [mobileOpen, setMobileOpen]);
+
+  // Prevent body scroll when open
+  React.useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  return (
+    <div
+      data-slot="mobile-sidebar"
+      className={cn(
+        "md:hidden fixed inset-0 z-40",
+        mobileOpen ? "pointer-events-auto" : "pointer-events-none"
+      )}
+    >
+      {/* Backdrop */}
+      <div
+        className={cn(
+          "absolute inset-0 bg-black/50 transition-opacity duration-200",
+          mobileOpen ? "opacity-100" : "opacity-0"
+        )}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden="true"
+      />
+      {/* Panel */}
+      <div
+        className={cn(
+          "absolute inset-y-0 left-0 z-50 w-72 bg-background border-r border-border flex flex-col shadow-lg",
+          "transform transition-transform duration-200 ease-out",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          className
+        )}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <span className="text-sm font-semibold">Navigation</span>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="inline-flex items-center justify-center rounded-md h-7 w-7 hover:bg-accent hover:text-accent-foreground"
+            aria-label="Close navigation menu"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">{children}</div>
+      </div>
+    </div>
   );
 }
 
