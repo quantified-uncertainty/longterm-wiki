@@ -1,5 +1,7 @@
 import { getAllFacts, getEntityHref, getFactMeasures } from "@/data";
 import { FactDashboard } from "@/components/internal/FactDashboard";
+import { FactPageTabs } from "./fact-page-tabs";
+import { FactsDataTable } from "./facts-data-table";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -25,6 +27,10 @@ export default function FactsPage() {
     computed: f.computed,
     compute: f.compute,
     measure: f.measure,
+    subject: f.subject,
+    format: f.format,
+    formatDivisor: f.formatDivisor,
+    noCompute: f.noCompute,
   }));
 
   // Compute entity hrefs server-side (requires id-registry)
@@ -44,7 +50,14 @@ export default function FactsPage() {
         All canonical facts from the YAML fact store, used by the <code>&lt;F&gt;</code> component.
         Facts are defined in <code>data/facts/*.yaml</code>, measures in <code>data/fact-measures.yaml</code>.
       </p>
-      <FactDashboard facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} />
+      <FactPageTabs
+        dashboardContent={
+          <FactDashboard facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} />
+        }
+        dataContent={
+          <FactsDataTable facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} />
+        }
+      />
     </article>
   );
 }
