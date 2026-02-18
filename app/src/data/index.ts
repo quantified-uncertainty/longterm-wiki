@@ -178,6 +178,8 @@ interface DatabaseShape {
   factMeasures: Record<string, FactMeasure>;
   /** Timeseries index: measure ID → sorted array of observations */
   factTimeseries: Record<string, TimeseriesPoint[]>;
+  /** Reverse index: "entity.factId" → pages that reference it via <F> */
+  factUsage: Record<string, FactUsagePage[]>;
   stats: Record<string, unknown>;
 }
 
@@ -873,6 +875,22 @@ export function getEntityMeasures(entityId: string): FactMeasure[] {
     }
   }
   return measures;
+}
+
+// ============================================================================
+// FACT USAGE (reverse index: which pages use each fact)
+// ============================================================================
+
+export interface FactUsagePage {
+  id: string;
+  title: string;
+  path: string;
+}
+
+/** Get the reverse index of which pages reference each fact via the <F> component.
+ *  Returns a map of "entity.factId" → array of pages that use it. */
+export function getFactUsage(): Record<string, FactUsagePage[]> {
+  return getDatabase().factUsage || {};
 }
 
 // ============================================================================

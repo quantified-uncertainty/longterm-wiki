@@ -1,0 +1,13 @@
+entity: worldcoin
+facts:
+  users:
+    measure: user-count
+    value: 26e6
+    asOf: "2024"
+    note: "Total users on Worldcoin (World) network"
+
+  verified-users:
+    measure: user-count
+    value: 12e6
+    asOf: "2024"
+    note: "Verified Worldcoin users (identity verified via Orb device)"

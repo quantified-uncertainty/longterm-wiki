@@ -273,6 +273,49 @@ function scanContentEntityLinks(pages, entityMap, numericIdToSlug) {
 }
 
 /**
+ * Scan MDX content for <F e="..." f="..."> references.
+ * Returns a reverse index: factKey ("entity.factId") -> array of pages using it.
+ * Must be called before rawContent is stripped from pages.
+ */
+function scanFactUsage(pages) {
+  /** @type {Record<string, {id: string, title: string, path: string}[]>} */
+  const usage = {};
+  let totalRefs = 0;
+
+  for (const page of pages) {
+    if (!page.rawContent) continue;
+
+    // Match both attribute orderings: <F e="x" f="y"> and <F f="y" e="x">
+    const regexEF = /<F\s[^>]*e="([^"]+)"[^>]*f="([^"]+)"/g;
+    const regexFE = /<F\s[^>]*f="([^"]+)"[^>]*e="([^"]+)"/g;
+
+    const seen = new Set();
+
+    let match;
+    while ((match = regexEF.exec(page.rawContent)) !== null) {
+      const key = `${match[1]}.${match[2]}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        if (!usage[key]) usage[key] = [];
+        usage[key].push({ id: page.id, title: page.title, path: page.path || `/${page.id}/` });
+        totalRefs++;
+      }
+    }
+    while ((match = regexFE.exec(page.rawContent)) !== null) {
+      const key = `${match[2]}.${match[1]}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        if (!usage[key]) usage[key] = [];
+        usage[key].push({ id: page.id, title: page.title, path: page.path || `/${page.id}/` });
+        totalRefs++;
+      }
+    }
+  }
+
+  return { usage, totalRefs };
+}
+
+/**
  * Compute a bidirectional related-pages graph combining all signals.
  * Every connection is symmetric: if A relates to B, B relates to A.
  *
@@ -1323,6 +1366,11 @@ async function main() {
     }
   }
   console.log(`  contentLinks: ${contentLinkCount} EntityLink references scanned, ${contentBacklinksMerged} new backlinks added`);
+
+  // Scan MDX for <F> component usage — build reverse index for the fact dashboard
+  const { usage: factUsage, totalRefs: factRefCount } = scanFactUsage(pages);
+  database.factUsage = factUsage;
+  console.log(`  factUsage: ${factRefCount} <F> references across ${Object.keys(factUsage).length} unique facts`);
 
   // Re-count backlinks after merging content links
   // Enrich pages with backlink counts
