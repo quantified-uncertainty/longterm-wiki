@@ -49,10 +49,24 @@ E124-E127, E133, E136-E142, E145, E149, E151, E153-E157
 - `anthropic-pre-ipo-daf-transfers.mdx` - References non-existent entities
 - Various person and organization pages
 
+### Validation Tool Confirmation
+The `pnpm crux validate unified` command confirms these errors:
+```
+[error] [component-refs]: EntityLink id="anthropic" not found in entities or safety-approaches
+[error] [component-refs]: EntityLink id="language-models" not found in entities or safety-approaches
+[error] [component-refs]: EntityLink id="lock-in" not found in entities or safety-approaches
+[error] [component-refs]: DataInfoBox entityId="E5" not found in entities
+[error] [component-refs]: DataInfoBox entityId="E11" not found in entities
+... (total of 470+ broken references)
+```
+
+The validation tool detected **707 broken external URLs** as well.
+
 ### Remediation
 - Audit data/entities/ to see if referenced entities should exist
 - Remove broken EntityLinks from pages if entities don't exist
 - Or create missing entities if they're genuinely needed
+- Fix broken external URLs in citations and sources
 
 ---
 
@@ -211,7 +225,29 @@ Readers may assume data is current when it's actually 1-2 years stale.
 
 ---
 
-## ISSUE 8: Patterns in High-Risk Pages
+## ISSUE 8: Broken External URLs (707 Instances)
+
+### Overview
+The validation tool checked 5,411 external URLs in the wiki and found **707 broken links** (13% failure rate).
+
+### Impact
+- Citation links broken, making verification impossible
+- Source links dead, reducing credibility
+- Reader experience degraded (404 errors)
+
+### Examples
+Links in citations, reference sections, and inline references that return HTTP errors.
+
+### Remediation
+- Audit high-priority pages first (those with citations)
+- Replace dead links with archived versions (archive.org)
+- Update to current URLs where sources have moved
+- Remove links to sources that no longer exist
+- Document why links are removed if necessary
+
+---
+
+## ISSUE 9: Patterns in High-Risk Pages
 
 ### Common Risk Factors (High-Risk Pages)
 All high-risk pages share:
