@@ -26,6 +26,7 @@
  *   maintain    Periodic maintenance and housekeeping
  *   review      Human review tracking and status
  *   citations   Citation verification and archival
+ *   issues      Track Claude Code work on GitHub issues
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -58,6 +59,7 @@ import * as autoUpdateCommands from './commands/auto-update.ts';
 import * as reviewCommands from './commands/review.ts';
 import * as citationsCommands from './commands/citations.ts';
 import * as grokipediaCommands from './commands/grokipedia.ts';
+import * as issuesCommands from './commands/issues.ts';
 
 const domains = {
   validate: validateCommands,
@@ -77,6 +79,7 @@ const domains = {
   review: reviewCommands,
   citations: citationsCommands,
   grokipedia: grokipediaCommands,
+  issues: issuesCommands,
 };
 
 /**
@@ -142,6 +145,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   maintain    Periodic maintenance and housekeeping
   review      Human review tracking and status
   citations   Citation verification and archival
+ *   issues      Track Claude Code work on GitHub issues
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

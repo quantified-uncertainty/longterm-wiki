@@ -31,6 +31,12 @@ pnpm crux edit-log view <id>     # View edit history for a page
 pnpm crux maintain               # Run maintenance sweep (PRs, issues, cruft)
 pnpm crux maintain status        # Check when maintenance last ran
 
+# GitHub issue tracking
+pnpm crux issues                 # List open issues ranked by priority
+pnpm crux issues next            # Show next highest-priority issue to work on
+pnpm crux issues start <N>       # Signal start: comment + add claude-working label
+pnpm crux issues done <N>        # Signal completion: comment + remove label
+
 # Hallucination risk & review tracking
 pnpm crux validate hallucination-risk         # Risk assessment report
 pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
@@ -146,6 +152,14 @@ Write the initial draft, then immediately run the improve pipeline on it:
 pnpm crux content improve <page-id> --tier=polish --apply
 ```
 This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
+
+## GitHub Issue Tracking — MANDATORY
+
+When a session works on a GitHub issue, signal activity on that issue. See `.claude/rules/github-issue-tracking.md` for full instructions. Summary:
+
+1. **At session start**: `pnpm crux issues start <N>` — posts a comment + adds `claude-working` label
+2. **At session end**: `pnpm crux issues done <N> --pr=<URL>` — posts completion comment + removes label
+3. **To pick the next issue**: `/next-issue` — fetches and ranks open issues, starts work on the top one
 
 ## PR Review & Ship Workflow — MANDATORY
 
