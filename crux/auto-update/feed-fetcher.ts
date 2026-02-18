@@ -7,7 +7,8 @@
  * Design:
  * - RSS/Atom feeds are fetched via HTTP and parsed with lightweight regex
  *   (no external XML parser dependency needed for the subset we care about)
- * - Web search sources use the Anthropic web_search tool via the LLM layer
+ * - Web search sources use the Exa API (EXA_API_KEY) for structured JSON results.
+ *   Falls back to the Anthropic web_search tool if Exa is unavailable.
  * - Respects last_fetch_times to only return new items
  * - Handles errors gracefully per-source (one failing source doesn't break others)
  */
@@ -18,6 +19,8 @@ import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { executeWebSearch } from '../authoring/page-improver/api.ts';
 import type { NewsSource, SourcesConfig, FeedItem } from './types.ts';
+
+const EXA_API_KEY = process.env.EXA_API_KEY;
 
 const SOURCES_PATH = join(PROJECT_ROOT, 'data/auto-update/sources.yaml');
 
@@ -232,11 +235,97 @@ async function fetchRssFeed(source: NewsSource, since: string | null): Promise<F
   return items;
 }
 
+// ── Exa Search ──────────────────────────────────────────────────────────────
+
+interface ExaResult {
+  title: string;
+  url: string;
+  publishedDate?: string;
+  text?: string;
+}
+
+interface ExaResponse {
+  results: ExaResult[];
+}
+
+/**
+ * Search via the Exa API. Returns structured JSON — no parsing needed.
+ *
+ * @param query - Search query string
+ * @param since - ISO date string; only return results published after this date
+ */
+async function executeExaSearch(query: string, since: string | null): Promise<ExaResult[]> {
+  if (!EXA_API_KEY) throw new Error('EXA_API_KEY not set');
+
+  const body: Record<string, unknown> = {
+    query,
+    type: 'auto',
+    numResults: 10,
+    contents: { text: { maxCharacters: 500 } },
+  };
+
+  if (since) {
+    // Exa expects ISO 8601 date strings for date filtering
+    const sinceDate = new Date(since);
+    if (!isNaN(sinceDate.getTime())) {
+      body.startPublishedDate = sinceDate.toISOString();
+    }
+  }
+
+  const response = await fetch('https://api.exa.ai/search', {
+    method: 'POST',
+    headers: {
+      'x-api-key': EXA_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(30_000),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`Exa API error ${response.status}: ${text.slice(0, 200)}`);
+  }
+
+  const data = await response.json() as ExaResponse;
+  return data.results || [];
+}
+
 /**
  * Fetch news via web search for a source that doesn't have an RSS feed.
+ *
+ * Uses Exa API as primary (structured JSON, date-filtered, cheaper).
+ * Falls back to the Anthropic web_search tool if Exa is unavailable.
  */
 async function fetchWebSearch(source: NewsSource, since: string | null): Promise<FeedItem[]> {
   const query = source.query || source.name;
+
+  // ── Try Exa first ──────────────────────────────────────────────────────────
+  if (EXA_API_KEY) {
+    try {
+      const results = await executeExaSearch(query, since);
+      return results
+        .filter(r => r.title && r.url)
+        .map(r => ({
+          sourceId: source.id,
+          sourceName: source.name,
+          title: r.title,
+          url: r.url,
+          publishedAt: r.publishedDate
+            ? new Date(r.publishedDate).toISOString().slice(0, 10)
+            : new Date().toISOString().slice(0, 10),
+          summary: (r.text || '').slice(0, 500),
+          categories: [...source.categories],
+          reliability: source.reliability,
+        }));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      // Log but fall through to Anthropic fallback
+      console.warn(`  Exa search failed for "${source.id}", falling back to LLM search: ${message}`);
+    }
+  }
+
+  // ── Fallback: Anthropic web_search tool ───────────────────────────────────
   const dateRange = since ? `after:${since}` : '';
   const fullQuery = `${query} ${dateRange}`.trim();
 
