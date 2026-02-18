@@ -1,6 +1,6 @@
 ## 2026-02-18 | claude/resolve-issue-245-NGX6L | Fix build-data.mjs ID write-back side effect (issue #245)
 
-**What was done:** Created `app/scripts/assign-ids.mjs` as a dedicated pre-build step that handles all numericId assignment and file writes. Modified `build-data.mjs` to be purely read-only (no source file mutations during build). Updated `app/package.json` `prebuild`/`sync:data` scripts to run `assign-ids.mjs` before `build-data.mjs`.
+**What was done:** Created `app/scripts/assign-ids.mjs` as a dedicated pre-build step that handles all numericId assignment and file writes. Modified `build-data.mjs` to be purely read-only (no source file mutations during build). Updated `app/package.json` `prebuild`/`sync:data` scripts to run `assign-ids.mjs` before `build-data.mjs`. Follow-up: extracted pure functions (`buildIdMaps`, `computeNextId`, `filterEligiblePages`) into `lib/id-assignment.mjs` with 30 comprehensive tests; added `runStabilityCheck()` to `lib/id-stability.mjs` eliminating duplicate `checkStability`/`checkIdStability` functions from both scripts; updated CLAUDE.md.
 
 **Pages:** (none — infrastructure-only change)
 
