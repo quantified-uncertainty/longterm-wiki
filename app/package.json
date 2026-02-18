@@ -7,8 +7,9 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start --port 3001",
-    "sync:data": "node --import tsx/esm scripts/build-data.mjs",
-    "prebuild": "node --import tsx/esm scripts/build-data.mjs",
+    "assign-ids": "node scripts/assign-ids.mjs",
+    "sync:data": "node scripts/assign-ids.mjs && node --import tsx/esm scripts/build-data.mjs",
+    "prebuild": "node scripts/assign-ids.mjs && node --import tsx/esm scripts/build-data.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },
