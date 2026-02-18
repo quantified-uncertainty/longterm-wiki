@@ -357,14 +357,14 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
     body: { body },
   });
 
-  // Remove the claude-working label (ignore errors — may not exist)
+  // Remove the claude-working label (404 = label wasn't applied — that's fine)
   try {
     await githubApi(
       `/repos/${REPO}/issues/${issueNum}/labels/${encodeURIComponent(CLAUDE_WORKING_LABEL)}`,
       { method: 'DELETE' }
     );
-  } catch {
-    // Label may not have been applied — that's fine
+  } catch (err) {
+    if (!(err instanceof Error && err.message.includes('returned 404'))) throw err;
   }
 
   let output = '';

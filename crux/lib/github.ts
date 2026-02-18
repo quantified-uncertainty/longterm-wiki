@@ -23,7 +23,8 @@ export function getGitHubToken(): string {
 /**
  * Make a GitHub API request using native fetch().
  *
- * Returns the parsed JSON body. Throws on HTTP errors with the status code
+ * Returns the parsed JSON body, or undefined for 204 No Content responses
+ * (e.g. DELETE /labels/{name}). Throws on HTTP errors with the status code
  * and response body for easy debugging.
  */
 export async function githubApi<T = unknown>(
@@ -50,6 +51,11 @@ export async function githubApi<T = unknown>(
   if (!resp.ok) {
     const text = await resp.text().catch(() => '(no body)');
     throw new Error(`GitHub API ${method} ${endpoint} returned ${resp.status}: ${text}`);
+  }
+
+  // 204 No Content — no body to parse (e.g. DELETE /labels/{name})
+  if (resp.status === 204) {
+    return undefined as T;
   }
 
   return (await resp.json()) as T;
