@@ -208,7 +208,7 @@ for (const mdxPath of mdxFiles) {
   // Update {entity.factId} references in Calc expressions and computed facts
   // These appear in expr="..." attributes and compute: fields
   content = content.replace(
-    /\{([a-z][a-z0-9-]*)\.([ a-z][a-z0-9-]*)\}/g,
+    /\{([a-z][a-z0-9-]*)\.([a-z][a-z0-9-]*)\}/g,
     (match, entity, factId) => {
       const compositeKey = `${entity}.${factId}`;
       const info = mapping[compositeKey];

@@ -1073,13 +1073,18 @@ async function main() {
   }
   database.factMeasures = factMeasures;
 
-  // Validate measure references: ensure every explicit measure points to a known measure ID.
+  // Validate measure references and count assignments.
   // Note: measure auto-inference from fact IDs is no longer supported — facts use hash IDs
   // and must specify their measure explicitly via `measure:` in YAML.
-  const knownMeasureIds = Object.keys(factMeasures);
+  const knownMeasureIds = new Set(Object.keys(factMeasures));
   let measuredCount = 0;
   for (const [key, fact] of Object.entries(facts)) {
-    if (fact.measure) measuredCount++;
+    if (fact.measure) {
+      measuredCount++;
+      if (!knownMeasureIds.has(fact.measure)) {
+        console.warn(`  WARNING: fact ${key} references unknown measure "${fact.measure}"`);
+      }
+    }
   }
   if (measuredCount > 0) {
     console.log(`  measures: ${measuredCount} facts have explicit measure assignments`);
