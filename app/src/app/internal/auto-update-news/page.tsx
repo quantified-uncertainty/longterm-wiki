@@ -96,12 +96,6 @@ export interface SourceRow {
 
 // ── Data Loading ───────────────────────────────────────────────────────────
 
-/** js-yaml parses bare dates (e.g. 2026-02-18) as Date objects. Coerce to string. */
-function str(val: unknown): string {
-  if (val instanceof Date) return val.toISOString().slice(0, 10);
-  return String(val ?? "");
-}
-
 function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
   const runsDir = path.resolve(process.cwd(), "../data/auto-update/runs");
   if (!fs.existsSync(runsDir)) return { items: [], runDates: [] };
@@ -121,7 +115,7 @@ function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
     try {
       const raw = fs.readFileSync(path.join(runsDir, file), "utf-8");
       const details = loadYaml<RunDetails>(raw);
-      const runDate = str(details.digest.date);
+      const runDate = details.digest.date;
       runDates.push(runDate);
 
       // Build routing lookup: news title → page it was routed to
@@ -141,7 +135,7 @@ function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
           title: item.title,
           url: item.url,
           sourceId: item.sourceId,
-          publishedAt: str(item.publishedAt),
+          publishedAt: item.publishedAt,
           summary: item.summary,
           relevanceScore: item.relevanceScore,
           topics: Array.isArray(item.topics) ? item.topics : [],
@@ -195,7 +189,7 @@ function loadSources(): SourceRow[] {
       categories: s.categories.join(", "),
       reliability: s.reliability,
       enabled: s.enabled,
-      lastFetched: fetchTimes[s.id] ? str(fetchTimes[s.id]) : null,
+      lastFetched: fetchTimes[s.id] ?? null,
     }));
   } catch {
     return [];

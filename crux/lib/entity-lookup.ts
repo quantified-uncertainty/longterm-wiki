@@ -58,7 +58,7 @@ function loadAllEntities(ROOT: string): EntityEntry[] {
   for (const file of files) {
     try {
       const raw = fs.readFileSync(path.join(entitiesDir, file), 'utf-8');
-      const parsed = yaml.load(raw) as EntityEntry[] | null;
+      const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as EntityEntry[] | null;
       if (Array.isArray(parsed)) {
         for (const entry of parsed) {
           if (entry && entry.id && entry.title) {
