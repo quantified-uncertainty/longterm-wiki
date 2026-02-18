@@ -199,21 +199,3 @@ export function parseJsonResponse(text: string): unknown {
   return JSON.parse(cleaned);
 }
 
-/**
- * Parse YAML from Claude response, handling markdown code blocks
- */
-export function parseYamlResponse(text: string, parseYaml: (input: string) => unknown): unknown {
-  // Remove markdown code blocks if present
-  let cleaned = text.trim();
-  if (cleaned.startsWith('```yaml')) {
-    cleaned = cleaned.slice(7);
-  } else if (cleaned.startsWith('```')) {
-    cleaned = cleaned.slice(3);
-  }
-  if (cleaned.endsWith('```')) {
-    cleaned = cleaned.slice(0, -3);
-  }
-  cleaned = cleaned.trim();
-
-  return parseYaml(cleaned);
-}

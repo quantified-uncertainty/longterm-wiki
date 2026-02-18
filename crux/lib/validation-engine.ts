@@ -21,7 +21,6 @@ import { findMdxFiles } from './file-utils.ts';
 import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter } from './content-types.ts';
-import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts';
 import { logBulkFixes } from './edit-log.ts';
 
 // ---------------------------------------------------------------------------
@@ -41,7 +40,10 @@ interface FixSpec {
   [key: string]: unknown;
 }
 
-type SidebarConfig = SidebarParseResult;
+interface SidebarConfig {
+  entries: string[];
+  directories: Set<string>;
+}
 
 interface IssueOptions {
   rule: string;
@@ -279,10 +281,10 @@ export class ValidationEngine {
 
   /**
    * Parse sidebar configuration.
-   * Returns empty data in Next.js — sidebar is managed by wiki-nav.ts.
+   * Returns empty data — sidebar is managed by wiki-nav.ts in the Next.js app.
    */
   private _parseSidebarConfig(): SidebarConfig {
-    return parseSidebarConfig();
+    return { entries: [], directories: new Set() };
   }
 
   /** Register a validation rule */

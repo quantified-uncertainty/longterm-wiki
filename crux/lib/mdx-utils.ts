@@ -4,7 +4,7 @@
  * Common functions for parsing and manipulating MDX content files.
  */
 
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { parse as parseYaml } from 'yaml';
 import { FRONTMATTER_RE, stripFrontmatter } from './patterns.ts';
 
 /**
@@ -42,19 +42,6 @@ export function parseFrontmatterAndBody(content: string): { frontmatter: Record<
  */
 export function getContentBody(content: string): string {
   return stripFrontmatter(content);
-}
-
-/**
- * Update frontmatter fields while preserving existing content
- */
-export function updateFrontmatter(content: string, updates: Record<string, unknown>): string {
-  const frontmatter = parseFrontmatter(content);
-  const body = getContentBody(content);
-
-  const newFrontmatter = { ...frontmatter, ...updates };
-  const yamlString = stringifyYaml(newFrontmatter, { lineWidth: 0 }).trim();
-
-  return `---\n${yamlString}\n---\n${body}`;
 }
 
 /**
