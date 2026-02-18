@@ -219,12 +219,16 @@ else
   ok "Git hooks configured (core.hooksPath = .githooks)"
 fi
 
-if [ -x ".githooks/pre-push" ]; then
-  ok "Pre-push hook is executable"
-else
-  chmod +x .githooks/pre-push
-  ok "Pre-push hook made executable"
-fi
+for hook in pre-push post-merge; do
+  if [ -f ".githooks/$hook" ]; then
+    if [ -x ".githooks/$hook" ]; then
+      ok "$hook hook is executable"
+    else
+      chmod +x ".githooks/$hook"
+      ok "$hook hook made executable"
+    fi
+  fi
+done
 
 # --- Step 5: Check environment variables ---
 
