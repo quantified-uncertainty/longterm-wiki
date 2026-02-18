@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { CONTENT_DIR } from './content-types.mjs';
+import { extractDescriptionFromIntro } from './text-utils.mjs';
 
 /**
  * Check if an MDX file needs regeneration based on entity content
@@ -43,8 +44,17 @@ function generateMdxStub(entity) {
   // Include numericId so the page inherits the entity's stable ID
   const numericIdLine = entity.numericId ? `\nnumericId: ${entity.numericId}` : '';
 
+  // Include description from entity content intro if available
+  let descriptionLine = '';
+  if (entity.content?.intro) {
+    const desc = extractDescriptionFromIntro(entity.content.intro);
+    if (desc) {
+      descriptionLine = `\ndescription: "${desc.replace(/"/g, '\\"')}"`;
+    }
+  }
+
   return `---
-title: "${entity.title}"${numericIdLine}
+title: "${entity.title}"${descriptionLine}${numericIdLine}
 sidebar:
   order: ${sidebarOrder}
 ---

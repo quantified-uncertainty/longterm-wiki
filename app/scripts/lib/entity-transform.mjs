@@ -13,6 +13,7 @@
  */
 
 import { OLD_TYPE_MAP, OLD_LAB_TYPE_TO_ORG_TYPE } from './entity-type-mappings.mjs';
+import { extractDescriptionFromIntro } from './text-utils.mjs';
 
 // ============================================================================
 // RISK CATEGORIES
@@ -266,6 +267,21 @@ function transformEntity(raw, expertMap, orgMap) {
 export function transformEntities(rawEntities, pages, experts, organizations) {
   // Apply overrides first
   const entities = applyEntityOverrides(rawEntities, pages);
+
+  // Enrich entity descriptions from page frontmatter when the entity has none.
+  // Many entities (from YAML or frontmatter auto-creation) lack descriptions,
+  // but their corresponding MDX pages have description fields in frontmatter.
+  const pageMap = new Map(pages.map(p => [p.id, p]));
+  for (const entity of entities) {
+    if (!entity.description) {
+      const page = pageMap.get(entity.id);
+      if (page?.description) {
+        entity.description = page.description;
+      } else if (entity.content?.intro) {
+        entity.description = extractDescriptionFromIntro(entity.content.intro);
+      }
+    }
+  }
 
   // Build lookup maps
   const expertMap = new Map(experts.map(e => [e.id, e]));

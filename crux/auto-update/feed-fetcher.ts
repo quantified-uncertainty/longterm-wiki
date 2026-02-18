@@ -7,7 +7,8 @@
  * Design:
  * - RSS/Atom feeds are fetched via HTTP and parsed with lightweight regex
  *   (no external XML parser dependency needed for the subset we care about)
- * - Web search sources use the Anthropic web_search tool via the LLM layer
+ * - Web search sources use the Exa API (EXA_API_KEY) for structured JSON results.
+ *   Falls back to the Anthropic web_search tool if Exa is unavailable.
  * - Respects last_fetch_times to only return new items
  * - Handles errors gracefully per-source (one failing source doesn't break others)
  */
@@ -18,6 +19,8 @@ import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { executeWebSearch } from '../authoring/page-improver/api.ts';
 import type { NewsSource, SourcesConfig, FeedItem } from './types.ts';
+
+const EXA_API_KEY = process.env.EXA_API_KEY;
 
 const SOURCES_PATH = join(PROJECT_ROOT, 'data/auto-update/sources.yaml');
 
@@ -232,17 +235,107 @@ async function fetchRssFeed(source: NewsSource, since: string | null): Promise<F
   return items;
 }
 
+// ── Exa Search ──────────────────────────────────────────────────────────────
+
+interface ExaResult {
+  title: string;
+  url: string;
+  publishedDate?: string;
+  text?: string;
+}
+
+interface ExaResponse {
+  results: ExaResult[];
+}
+
+/**
+ * Search via the Exa API. Returns structured JSON — no parsing needed.
+ *
+ * @param query - Search query string
+ * @param since - ISO date string; only return results published after this date
+ */
+async function executeExaSearch(query: string, since: string | null): Promise<ExaResult[]> {
+  if (!EXA_API_KEY) throw new Error('EXA_API_KEY not set');
+
+  const body: Record<string, unknown> = {
+    query,
+    type: 'auto',
+    numResults: 10,
+    contents: { text: { maxCharacters: 500 } },
+  };
+
+  if (since) {
+    // Exa expects ISO 8601 date strings for date filtering
+    const sinceDate = new Date(since);
+    if (!isNaN(sinceDate.getTime())) {
+      body.startPublishedDate = sinceDate.toISOString();
+    }
+  }
+
+  const response = await fetch('https://api.exa.ai/search', {
+    method: 'POST',
+    headers: {
+      'x-api-key': EXA_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(30_000),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`Exa API error ${response.status}: ${text.slice(0, 200)}`);
+  }
+
+  const data = await response.json() as ExaResponse;
+  return data.results || [];
+}
+
 /**
  * Fetch news via web search for a source that doesn't have an RSS feed.
+ *
+ * Uses Exa API as primary (structured JSON, date-filtered, cheaper).
+ * Falls back to the Anthropic web_search tool if Exa is unavailable.
  */
 async function fetchWebSearch(source: NewsSource, since: string | null): Promise<FeedItem[]> {
   const query = source.query || source.name;
+
+  // ── Try Exa first ──────────────────────────────────────────────────────────
+  if (EXA_API_KEY) {
+    try {
+      const results = await executeExaSearch(query, since);
+      return results
+        .filter(r => r.title && r.url)
+        .map(r => ({
+          sourceId: source.id,
+          sourceName: source.name,
+          title: r.title,
+          url: r.url,
+          publishedAt: r.publishedDate
+            ? new Date(r.publishedDate).toISOString().slice(0, 10)
+            : new Date().toISOString().slice(0, 10),
+          summary: (r.text || '').slice(0, 500),
+          categories: [...source.categories],
+          reliability: source.reliability,
+        }));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      // Log but fall through to Anthropic fallback
+      console.warn(`  Exa search failed for "${source.id}", falling back to LLM search: ${message}`);
+    }
+  }
+
+  // ── Fallback: Anthropic web_search tool ───────────────────────────────────
   const dateRange = since ? `after:${since}` : '';
   const fullQuery = `${query} ${dateRange}`.trim();
 
   const searchResults = await executeWebSearch(fullQuery);
 
-  // Parse the LLM-formatted search results into structured items
+  // Parse the LLM-formatted search results into structured items.
+  // The LLM returns markdown with various formats:
+  //   "### 1. Title" or "1. **Title**" or "**1. Title** —" etc.
+  //   URLs in "**URL:** [url](url)" or inline markdown links or bare URLs
+  //   Descriptions in "**Description:**" lines or plain text
   const items: FeedItem[] = [];
   const lines = searchResults.split('\n');
   let currentTitle = '';
@@ -250,10 +343,22 @@ async function fetchWebSearch(source: NewsSource, since: string | null): Promise
   let currentSummary = '';
 
   for (const line of lines) {
-    const urlMatch = line.match(/https?:\/\/[^\s)]+/);
-    const titleMatch = line.match(/^\d+\.\s*\*?\*?(.+?)\*?\*?\s*[-–—]/);
+    const trimmed = line.trim();
 
-    if (titleMatch) {
+    // Match numbered item headers in various formats:
+    //   "### 1. 🏛️ Title Here"
+    //   "1. **Title Here** — description"
+    //   "**1. Title Here**"
+    const titleMatch = trimmed.match(
+      /^(?:#{1,4}\s+)?(\d+)\.\s*(?:[\p{Emoji}\p{Emoji_Presentation}\u200d\ufe0f]+\s*)?(?:\*\*)?(.+?)(?:\*\*)?$/u
+    ) || trimmed.match(
+      /^(\d+)\.\s*\*?\*?(.+?)\*?\*?\s*[-–—]/
+    );
+
+    // Match explicit URL lines: "**URL:** [text](url)" or "**URL:** url"
+    const explicitUrlMatch = trimmed.match(/^\*\*URL:?\*\*:?\s*(?:\[.*?\]\()?(https?:\/\/[^\s)]+)/i);
+
+    if (titleMatch && titleMatch[2]) {
       // Save previous item if we have one
       if (currentTitle && currentUrl) {
         items.push({
@@ -267,23 +372,37 @@ async function fetchWebSearch(source: NewsSource, since: string | null): Promise
           reliability: source.reliability,
         });
       }
-      currentTitle = titleMatch[1].trim();
-      currentUrl = urlMatch?.[0] || '';
+      // Clean title: remove trailing markdown artifacts
+      currentTitle = titleMatch[2]
+        .replace(/\*\*/g, '')
+        .replace(/\[.*?\]\(.*?\)/g, '')
+        .trim();
+      // Check if title line also contains a URL
+      const inlineUrl = trimmed.match(/https?:\/\/[^\s)]+/);
+      currentUrl = inlineUrl?.[0] || '';
       currentSummary = '';
-    } else if (urlMatch && !currentUrl) {
-      currentUrl = urlMatch[0];
-    } else if (line.trim()) {
-      currentSummary += ' ' + line.trim();
+    } else if (explicitUrlMatch) {
+      currentUrl = explicitUrlMatch[1];
+    } else if (!currentUrl && trimmed.match(/^https?:\/\//)) {
+      // Bare URL line
+      currentUrl = trimmed.match(/https?:\/\/[^\s)]+/)?.[0] || '';
+    } else if (trimmed.startsWith('**Description:**') || trimmed.startsWith('**Source:**')) {
+      // Extract description text, stripping the label
+      const descText = trimmed.replace(/^\*\*(Description|Source):\*\*\s*/, '');
+      currentSummary += ' ' + descText;
+    } else if (trimmed && !trimmed.startsWith('---') && !trimmed.startsWith('|') && !trimmed.startsWith('🔑')) {
+      // Regular text contributes to summary (skip separators and tables)
+      currentSummary += ' ' + trimmed;
     }
   }
 
   // Don't forget the last item
-  if (currentTitle) {
+  if (currentTitle && currentUrl) {
     items.push({
       sourceId: source.id,
       sourceName: source.name,
       title: currentTitle,
-      url: currentUrl || '',
+      url: currentUrl,
       publishedAt: new Date().toISOString().slice(0, 10),
       summary: currentSummary.trim().slice(0, 500),
       categories: [...source.categories],

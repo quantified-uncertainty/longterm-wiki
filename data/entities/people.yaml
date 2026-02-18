@@ -5,6 +5,7 @@
   numericId: E46
   type: researcher
   title: Buck Shlegeris
+  description: CEO of Redwood Research, focused on AI safety research and alignment techniques.
   website: https://redwoodresearch.org
   customFields:
     - label: Role
@@ -299,6 +300,7 @@
   numericId: E115
   type: researcher
   title: Elizabeth Kelly (US AISI Director)
+  description: Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts.
   customFields:
     - label: Role
       value: Director
@@ -312,6 +314,7 @@
   numericId: E148
   type: researcher
   title: Gary Marcus
+  description: Cognitive scientist and AI critic, known for skepticism of deep learning's path to AGI and advocacy for hybrid AI approaches.
 - id: geoffrey-hinton
   numericId: E149
   type: researcher
@@ -417,6 +420,7 @@
   numericId: E162
   type: researcher
   title: Ian Hogarth
+  description: Chair of the UK AI Safety Institute, AI investor, and author of influential writing on frontier AI risks.
   customFields:
     - label: Role
       value: Chair
@@ -531,6 +535,7 @@
   numericId: E212
   type: researcher
   title: Nate Soares (MIRI)
+  description: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of AI alignment.
 - id: neel-nanda
   numericId: E214
   type: researcher
@@ -706,6 +711,7 @@
   numericId: E280
   type: researcher
   title: Shane Legg
+  description: Co-founder and Chief AGI Scientist at Google DeepMind, early pioneer of machine superintelligence research.
   website: https://deepmind.google
   customFields:
     - label: Role
