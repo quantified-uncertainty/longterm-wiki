@@ -24,7 +24,7 @@ import { transformEntities } from './lib/entity-transform.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
-import { fetchBranchToPrMap, enrichWithPrNumbers } from './lib/github-pr-lookup.mjs';
+import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
@@ -1116,6 +1116,13 @@ async function main() {
     }
   }
   console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history`);
+
+  // =========================================================================
+  // PR DESCRIPTIONS — full PR metadata for the dashboard
+  // =========================================================================
+  const prItems = await fetchPrItems();
+  database.prItems = prItems;
+  console.log(`  prItems: ${prItems.length} PRs fetched for dashboard`);
 
   database.pages = pages;
 

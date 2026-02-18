@@ -123,6 +123,7 @@ interface DatabaseShape {
   organizations: Organization[];
   interventions: Intervention[];
   proposals: Proposal[];
+  prItems: PrItem[];
   backlinks: Record<string, BacklinkEntry[]>;
   relatedGraph: Record<string, RelatedGraphEntry[]>;
   pathRegistry: Record<string, string>;
@@ -788,6 +789,29 @@ export interface Proposal {
 export function getProposals(): Proposal[] {
   const db = getDatabase();
   return db.proposals || [];
+}
+
+// ============================================================================
+// PR ITEMS (GitHub pull request metadata)
+// ============================================================================
+
+export interface PrItem {
+  number: number;
+  title: string;
+  body: string;
+  state: string;
+  branch: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+  mergedAt: string | null;
+  closedAt: string | null;
+  labels: string[];
+}
+
+export function getPrItems(): PrItem[] {
+  const db = getDatabase();
+  return db.prItems || [];
 }
 
 // ============================================================================
