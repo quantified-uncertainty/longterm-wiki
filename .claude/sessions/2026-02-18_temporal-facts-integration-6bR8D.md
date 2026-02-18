@@ -1,15 +1,16 @@
 ## 2026-02-18 | claude/temporal-facts-integration-6bR8D | Link facts to resources for citations
 
-**What was done:** Added `sourceResource` field to the Facts system, linking canonical facts to the curated Resources database (3,137 entries). The build pipeline now resolves resource IDs to enrich facts with source title, publication name, and credibility scores. The `<F>` component tooltip shows rich citation info (source title, publication, credibility badge) when a resource is linked. YAML schema validation cross-references sourceResource IDs against known resources. Wired up all 4 existing sourced facts to resources (created 2 new resource entries for Reuters and Microsoft blog URLs).
+**What was done:** Added `sourceResource` field to the Facts system, linking canonical facts to the curated Resources database (3,137 entries). The build pipeline resolves resource IDs at build time to enrich facts with source title, publication name, and credibility scores. The `<F>` component tooltip shows rich citation info (source title, publication, credibility badge). Linked 12 of 42 facts (29%) to curated resources with credibility scores from 5 publications (Reuters 4/5, OpenAI 4/5, Microsoft 4/5, NYT 4/5, TechCrunch 3/5, Fortune 3/5, arXiv 3/5). Enhanced the Fact Dashboard with source coverage stats bar, source/unsourced filter, credibility breakdown, and SourceBadge component across all views.
 
 **Pages:** (none — infrastructure only)
 
 **Model:** opus-4-6
 
-**Duration:** ~30min
+**Duration:** ~45min
 
 **Issues encountered:**
 - `pnpm install` fails (puppeteer postinstall) and `vitest` not found — pre-existing dependency issues, not related to changes
+- 30 of 42 facts remain unsourced (mostly Anthropic financial metrics and Sam Altman biographical facts) — no matching resources in the 3,137-entry database
 
 **Learnings/notes:**
 - The build pipeline's auto-match feature (matching fact source URLs to resource URLs) found 0 matches because all facts with sources already had explicit sourceResource fields. This feature will be useful as more facts get sourced.

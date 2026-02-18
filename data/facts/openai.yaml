@@ -25,6 +25,7 @@ facts:
     value: { min: 157e9 }
     asOf: "2024-12"
     note: "October 2024 funding round valuation"
+    sourceResource: "b8e4c3ef3a3c7827"
 
   valuation-2025:
     value: { min: 500e9 }
@@ -57,12 +58,14 @@ facts:
     value: 83
     asOf: "2024-09"
     note: "o1 model performance on AIME math competition"
+    sourceResource: "9edf2bd5938d8386"
 
   o1-swe-bench-score:
     measure: benchmark-score
     value: 71.7
     asOf: "2024-09"
     note: "o1 model on SWE-bench Verified"
+    sourceResource: "9edf2bd5938d8386"
 
   # === Standalone facts (no measure — keep as strings) ===
 
@@ -75,3 +78,4 @@ facts:
     value: "75%"
     asOf: "2024"
     note: "75% of co-founders departed within 9 years of founding"
+    sourceResource: "85ba042a002437a0"

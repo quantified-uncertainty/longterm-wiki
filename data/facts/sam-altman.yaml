@@ -25,6 +25,7 @@ facts:
     value: "95%"
     asOf: "2023-11"
     note: "738 of 770 employees signed letter threatening to quit"
+    sourceResource: "ddced8916d043aa2"
 
   worldcoin-users:
     measure: user-count
