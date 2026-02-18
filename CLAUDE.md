@@ -25,6 +25,12 @@ pnpm crux content improve <id>   # Improve a wiki page
 pnpm crux edit-log view <id>     # View edit history for a page
 pnpm crux maintain               # Run maintenance sweep (PRs, issues, cruft)
 pnpm crux maintain status        # Check when maintenance last ran
+
+# Hallucination risk & review tracking
+pnpm crux validate hallucination-risk         # Risk assessment report
+pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
+pnpm crux review mark <id> --reviewer="name"  # Mark page as human-reviewed
+pnpm crux review list                         # List reviewed pages
 ```
 
 ## Repository Structure

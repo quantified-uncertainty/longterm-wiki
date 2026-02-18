@@ -74,6 +74,10 @@ import { footnoteCoverageRule } from './footnote-coverage.ts';
 // Citation accuracy
 import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 
+// Hallucination risk reduction (issue #200)
+import { citationDensityRule } from './citation-density.ts';
+import { balanceFlagsRule } from './balance-flags.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -115,6 +119,8 @@ export {
   evaluativeFlattery,
   footnoteCoverageRule,
   citationDoiMismatchRule,
+  citationDensityRule,
+  balanceFlagsRule,
 };
 
 export const allRules: Rule[] = [
@@ -157,6 +163,8 @@ export const allRules: Rule[] = [
   evaluativeFlattery,
   footnoteCoverageRule,
   citationDoiMismatchRule,
+  citationDensityRule,
+  balanceFlagsRule,
 ];
 
 export default allRules;

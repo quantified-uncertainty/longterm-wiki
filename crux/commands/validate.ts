@@ -101,6 +101,11 @@ const SCRIPTS = {
     description: 'CI-blocking checks (pre-push gate)',
     passthrough: ['ci', 'full', 'fix'],
   },
+  'hallucination-risk': {
+    script: 'validate/validate-hallucination-risk.ts',
+    description: 'Hallucination risk assessment report',
+    passthrough: ['ci', 'json', 'top'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'all');
