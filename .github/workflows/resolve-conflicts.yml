@@ -117,17 +117,30 @@ jobs:
       - name: Validate resolved code
         id: validate
         run: |
-          # Run the CI-blocking validation gate to catch broken resolutions
-          # before pushing. This prevents the conflict resolver from pushing
-          # code that immediately fails CI.
-          echo "Running post-resolution validation gate..."
-          if pnpm crux validate gate 2>&1; then
+          # Run the CI-blocking validation gate with --fix to auto-fix trivial
+          # escaping/markdown issues that may arise from the merge, then validate.
+          # This prevents the conflict resolver from pushing code that immediately
+          # fails CI. Includes numeric ID integrity checks for duplicate detection.
+          echo "Running post-resolution validation gate (with auto-fix)..."
+          if pnpm crux validate gate --fix 2>&1; then
             echo "Validation passed — safe to push."
             echo "valid=true" >> "$GITHUB_OUTPUT"
           else
             echo "::error::Post-resolution validation failed — conflict resolution may have introduced errors."
             echo "valid=false" >> "$GITHUB_OUTPUT"
             exit 1
+          fi
+
+      - name: Commit auto-fix changes (if any)
+        run: |
+          # The --fix flag may have auto-fixed escaping/markdown issues.
+          # Amend the merge commit to include those fixes.
+          if ! git diff --quiet; then
+            echo "Auto-fix produced changes — amending merge commit..."
+            git add -A
+            git commit --amend --no-edit
+          else
+            echo "No auto-fix changes — merge commit is clean."
           fi
 
       - name: Push resolved merge

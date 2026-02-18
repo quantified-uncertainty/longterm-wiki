@@ -13,10 +13,11 @@
  *   4. MDX syntax (comparison-operators, dollar-signs)
  *   5. YAML schema validation
  *   6. Frontmatter schema validation
- *   7. TypeScript type check
+ *   7. Numeric ID integrity (cross-entity/page duplicate detection)
+ *   8. TypeScript type check
  *
  * With --full:
- *   8. Full Next.js production build
+ *   9. Full Next.js production build
  *
  * Exit codes:
  *   0 = All checks passed
@@ -92,6 +93,13 @@ const STEPS: Step[] = [
     name: 'Frontmatter schema (blocking)',
     command: 'pnpm',
     args: ['crux', 'validate', 'unified', '--rules=frontmatter-schema', '--errors-only'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'numeric-id-integrity',
+    name: 'Numeric ID integrity (blocking)',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'unified', '--rules=numeric-id-integrity', '--errors-only'],
     cwd: PROJECT_ROOT,
   },
   {

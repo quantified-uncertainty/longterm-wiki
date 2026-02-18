@@ -167,8 +167,9 @@ The gate runs these steps sequentially:
 4. MDX syntax check (comparison-operators, dollar-signs)
 5. YAML schema validation
 6. Frontmatter schema validation
-7. TypeScript type check (`tsc --noEmit`)
-8. *(with `--full` only)* Full Next.js production build
+7. Numeric ID integrity (cross-entity/page duplicate detection)
+8. TypeScript type check (`tsc --noEmit`)
+9. *(with `--full` only)* Full Next.js production build
 
 ### After pushing: confirm CI is green
 ```bash
