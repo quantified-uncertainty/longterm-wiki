@@ -4,3 +4,4 @@ facts:
     value: "2003"
     noCompute: true
     note: "Co-founded Skype, sold to eBay for $2.6B in 2005"
+    sourceResource: "3f21a01b3b4948e1"

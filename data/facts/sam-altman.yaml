@@ -3,23 +3,31 @@ facts:
   net-worth:
     value: 2.8e9
     asOf: "2024"
+    note: "Investment portfolio value per WSJ investigation"
+    sourceResource: "69a7aca55efbfa51"
 
   # Standalone facts (no measure — keep as strings)
   openai-salary:
     value: "$76,001/year"
     asOf: "2024"
+    note: "Per OpenAI tax filing"
+    sourceResource: "29e5d58fe306259d"
 
   loopt-sale-price:
     value: "$43 million"
-    note: "Sold to Green Dot Corporation"
+    note: "Sold to Green Dot Corporation (precise figure $43.4M)"
+    sourceResource: "9eb603bcd6ee754a"
 
   early-stripe-investment:
     value: "$15,000 for 2%"
     asOf: "2009"
+    note: "Per WSJ investigation of Altman's investment portfolio"
+    sourceResource: "792c07f18a99af7c"
 
   yc-companies-funded:
     value: "1,900"
-    note: "Companies funded during YC tenure"
+    note: "Companies funded during YC tenure (through 2019)"
+    sourceResource: "b795385697c55df2"
 
   board-crisis-employee-letter:
     value: "95%"
@@ -30,15 +38,18 @@ facts:
   worldcoin-users:
     measure: user-count
     value: 26e6
-    asOf: "2024"
-    note: "Total users on Worldcoin network"
+    asOf: "2025-05"
+    note: "Total users on World network at US launch"
+    sourceResource: "8a37ca8f26efa9bc"
 
   worldcoin-verified:
     measure: user-count
     value: 12e6
-    asOf: "2024"
-    note: "Verified Worldcoin users (via orb)"
+    asOf: "2025-05"
+    note: "Verified World users (via orb) at US launch"
+    sourceResource: "8a37ca8f26efa9bc"
 
   helion-personal-investment:
     value: "$375 million"
     note: "Personal investment in Helion Energy"
+    sourceResource: "003e2cbd0f507952"

@@ -2907,3 +2907,38 @@
     - alignment
     - truthfulness
     - user-experience
+
+# Anthropic official announcements (fact sources)
+- id: 83a73ffe5e230d5f
+  url: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
+  title: "Anthropic raises $13B Series F at $183B post-money valuation"
+  type: web
+  publication_id: anthropic
+  cited_by:
+    - anthropic
+  tags:
+    - funding
+    - ai-labs
+
+- id: 52c1c2def0184008
+  url: https://www.anthropic.com/news/anthropic-invests-50-billion-in-american-ai-infrastructure
+  title: "Anthropic invests $50 billion in American AI infrastructure"
+  type: web
+  publication_id: anthropic
+  cited_by:
+    - anthropic
+  tags:
+    - infrastructure
+    - ai-labs
+
+# World (Worldcoin) official announcements
+- id: 8a37ca8f26efa9bc
+  url: https://world.org/blog/announcements/at-last-trust-in-the-age-of-ai
+  title: "At Last, Trust In the Age of AI"
+  type: web
+  publication_id: world-network
+  cited_by:
+    - sam-altman
+  tags:
+    - identity
+    - cryptocurrency
