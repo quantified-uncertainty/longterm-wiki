@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
-// Default WIKI_ROOT to the repo root (two levels up from discord-bot/src/)
+// Default WIKI_ROOT to the repo root (three levels up from apps/discord-bot/src/)
 export const WIKI_ROOT =
   process.env.WIKI_ROOT ?? resolve(__dirname, "../../..");
 
