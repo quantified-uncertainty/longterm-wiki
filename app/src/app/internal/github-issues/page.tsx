@@ -158,27 +158,28 @@ export default async function GitHubIssuesPage() {
             <IssuesTable data={inProgress} defaultSort="number" />
           )}
 
-          <h2 className="mt-8 mb-3">Priority Queue (top {queue.length})</h2>
+          <h2 className="mt-8 mb-1">Priority Queue</h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            {(() => {
+              const queuedCount = issues.filter((i) => !i.inProgress).length;
+              return queuedCount > 20
+                ? `Showing top 20 of ${queuedCount} queued issues. `
+                : `${queuedCount} queued issues. `;
+            })()}
+            <a
+              href={`https://github.com/${REPO}/issues`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              View all on GitHub
+            </a>
+            .
+          </p>
           {queue.length === 0 ? (
             <p className="text-muted-foreground text-sm">No open issues.</p>
           ) : (
             <IssuesTable data={queue} defaultSort="priority" />
-          )}
-
-          {issues.filter((i) => !i.inProgress).length > 20 && (
-            <p className="text-sm text-muted-foreground mt-2">
-              Showing top 20 of{" "}
-              {issues.filter((i) => !i.inProgress).length} queued issues.{" "}
-              <a
-                href={`https://github.com/${REPO}/issues`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                View all on GitHub
-              </a>
-              .
-            </p>
           )}
         </>
       )}
