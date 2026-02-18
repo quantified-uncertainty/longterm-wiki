@@ -253,6 +253,53 @@ export function getAtmNav(): NavSection[] {
 }
 
 // ============================================================================
+// ABOUT NAV (user-facing pages)
+// ============================================================================
+
+/** Slugs that belong to the "About" section rather than "Internal". */
+const ABOUT_PAGE_SLUGS = new Set([
+  "about-this-wiki",
+  "longterm-vision",
+  "longterm-strategy",
+  "project-roadmap",
+  "longtermwiki-value-proposition",
+]);
+
+/** Check whether an entity path belongs to the About section. */
+export function isAboutPage(entityPath: string): boolean {
+  if (!entityPath.startsWith("/internal/")) return false;
+  const slug = entityPath.replace(/^\/internal\//, "").replace(/\/$/, "");
+  return ABOUT_PAGE_SLUGS.has(slug);
+}
+
+/** Resolve a slug to its /wiki/E<id> URL, falling back to /internal/ path */
+function internalHref(slug: string, fallback?: string): string {
+  const resolved = getEntityHref(slug);
+  if (resolved.startsWith("/wiki/E")) return resolved;
+  return fallback || resolved;
+}
+
+/**
+ * Build "About" sidebar navigation for user-facing pages
+ * (About, Vision, Strategy, Roadmap, Value Proposition).
+ */
+export function getAboutNav(): NavSection[] {
+  return [
+    {
+      title: "About",
+      defaultOpen: true,
+      items: [
+        { label: "About This Wiki", href: internalHref("about-this-wiki") },
+        { label: "Vision", href: internalHref("longterm-vision") },
+        { label: "Strategy", href: internalHref("longterm-strategy") },
+        { label: "Roadmap", href: internalHref("project-roadmap") },
+        { label: "Value Proposition", href: internalHref("longtermwiki-value-proposition") },
+      ],
+    },
+  ];
+}
+
+// ============================================================================
 // INTERNAL NAV
 // ============================================================================
 
@@ -262,40 +309,26 @@ export function getAtmNav(): NavSection[] {
  * For React dashboard pages (no entity), keeps /internal/ URLs.
  */
 export function getInternalNav(): NavSection[] {
-  /** Resolve a slug to its /wiki/E<id> URL, falling back to /internal/ path */
-  function href(slug: string, internalPath?: string): string {
-    const resolved = getEntityHref(slug);
-    // getEntityHref always returns /wiki/...; if the slug had a numericId it will be /wiki/E<id>
-    // If slug is not found in registry, it returns /wiki/<slug> which won't resolve — use fallback
-    if (resolved.startsWith("/wiki/E")) return resolved;
-    return internalPath || resolved;
-  }
-
   return [
     {
       title: "Overview",
       defaultOpen: true,
       items: [
-        { label: "Internal Home", href: href("__index__/internal", "/wiki/E779") },
-        { label: "About This Wiki", href: href("about-this-wiki") },
-        { label: "Vision", href: href("longterm-vision") },
-        { label: "Strategy", href: href("longterm-strategy") },
-        { label: "Roadmap", href: href("project-roadmap") },
-        { label: "Value Proposition", href: href("longtermwiki-value-proposition") },
+        { label: "Internal Home", href: internalHref("__index__/internal", "/wiki/E779") },
       ],
     },
     {
       title: "Dashboards & Tools",
       defaultOpen: true,
       items: [
-        { label: "Enhancement Queue", href: href("enhancement-queue") },
+        { label: "Enhancement Queue", href: internalHref("enhancement-queue") },
         { label: "Suggested Pages", href: "/internal/suggested-pages" },
         { label: "Update Schedule", href: "/internal/updates" },
         { label: "Page Changes", href: "/internal/page-changes" },
         { label: "PR Descriptions", href: "/internal/pr-descriptions" },
         { label: "Fact Dashboard", href: "/internal/facts" },
-        { label: "Automation Tools", href: href("automation-tools") },
-        { label: "Content Database", href: href("content-database") },
+        { label: "Automation Tools", href: internalHref("automation-tools") },
+        { label: "Content Database", href: internalHref("content-database") },
         { label: "Importance Rankings", href: "/internal/importance-rankings" },
         { label: "Page Similarity", href: "/internal/similarity" },
         { label: "Interventions", href: "/internal/interventions" },
@@ -307,42 +340,42 @@ export function getInternalNav(): NavSection[] {
     {
       title: "Style Guides",
       items: [
-        { label: "Common Writing Principles", href: href("common-writing-principles") },
-        { label: "Page Types", href: href("page-types") },
-        { label: "Knowledge Base", href: href("knowledge-base") },
-        { label: "Risk Pages", href: href("risk-style-guide") },
-        { label: "Response Pages", href: href("response-style-guide") },
-        { label: "Models", href: href("models-style-guide") },
-        { label: "Stub Pages", href: href("stub-style-guide") },
-        { label: "Rating System", href: href("rating-system") },
-        { label: "Mermaid Diagrams", href: href("mermaid-diagrams") },
-        { label: "Canonical Facts & Calc", href: href("canonical-facts") },
-        { label: "Cause-Effect Diagrams", href: href("cause-effect-diagrams") },
-        { label: "Research Reports", href: href("research-reports") },
-        { label: "AI Transition Model", href: href("ai-transition-model-style-guide") },
+        { label: "Common Writing Principles", href: internalHref("common-writing-principles") },
+        { label: "Page Types", href: internalHref("page-types") },
+        { label: "Knowledge Base", href: internalHref("knowledge-base") },
+        { label: "Risk Pages", href: internalHref("risk-style-guide") },
+        { label: "Response Pages", href: internalHref("response-style-guide") },
+        { label: "Models", href: internalHref("models-style-guide") },
+        { label: "Stub Pages", href: internalHref("stub-style-guide") },
+        { label: "Rating System", href: internalHref("rating-system") },
+        { label: "Mermaid Diagrams", href: internalHref("mermaid-diagrams") },
+        { label: "Canonical Facts & Calc", href: internalHref("canonical-facts") },
+        { label: "Cause-Effect Diagrams", href: internalHref("cause-effect-diagrams") },
+        { label: "Research Reports", href: internalHref("research-reports") },
+        { label: "AI Transition Model", href: internalHref("ai-transition-model-style-guide") },
       ],
     },
     {
       title: "Research",
       items: [
-        { label: "Reports Index", href: href("__index__/internal/reports", "/wiki/E780") },
-        { label: "AI Research Workflows", href: href("ai-research-workflows") },
-        { label: "Causal Diagram Visualization", href: href("causal-diagram-visualization") },
-        { label: "Controlled Vocabulary", href: href("controlled-vocabulary") },
-        { label: "Cross-Link Automation", href: href("cross-link-automation-proposal") },
-        { label: "Diagram Naming", href: href("diagram-naming-research") },
-        { label: "Page Creator Pipeline", href: href("page-creator-pipeline") },
-        { label: "Gap Analysis (Feb 2026)", href: href("gap-analysis-2026-02") },
+        { label: "Reports Index", href: internalHref("__index__/internal/reports", "/wiki/E780") },
+        { label: "AI Research Workflows", href: internalHref("ai-research-workflows") },
+        { label: "Causal Diagram Visualization", href: internalHref("causal-diagram-visualization") },
+        { label: "Controlled Vocabulary", href: internalHref("controlled-vocabulary") },
+        { label: "Cross-Link Automation", href: internalHref("cross-link-automation-proposal") },
+        { label: "Diagram Naming", href: internalHref("diagram-naming-research") },
+        { label: "Page Creator Pipeline", href: internalHref("page-creator-pipeline") },
+        { label: "Gap Analysis (Feb 2026)", href: internalHref("gap-analysis-2026-02") },
       ],
     },
     {
       title: "Architecture & Schema",
       items: [
-        { label: "Architecture", href: href("architecture") },
-        { label: "Wiki Generation Architecture", href: href("wiki-generation-architecture") },
-        { label: "Schema Overview", href: href("__index__/internal/schema", "/wiki/E781") },
-        { label: "Entity Reference", href: href("entities") },
-        { label: "Schema Diagrams", href: href("diagrams") },
+        { label: "Architecture", href: internalHref("architecture") },
+        { label: "Wiki Generation Architecture", href: internalHref("wiki-generation-architecture") },
+        { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
+        { label: "Entity Reference", href: internalHref("entities") },
+        { label: "Schema Diagrams", href: internalHref("diagrams") },
       ],
     },
   ];
@@ -352,7 +385,7 @@ export function getInternalNav(): NavSection[] {
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "atm" | "internal" | "kb" | null;
+export type WikiSidebarType = "models" | "atm" | "internal" | "about" | "kb" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -373,6 +406,12 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
 
   if (entityPath.startsWith("/ai-transition-model/")) {
     return "atm";
+  }
+
+  // About pages live under /internal/ but get their own sidebar.
+  // Must check before the generic /internal/ pattern below.
+  if (isAboutPage(entityPath)) {
+    return "about";
   }
 
   if (entityPath.startsWith("/internal/") || entityPath === "/internal") {
@@ -417,6 +456,8 @@ export function getWikiNav(
       ];
     case "atm":
       return getAtmNav();
+    case "about":
+      return getAboutNav();
     case "internal":
       return getInternalNav();
     case "kb": {

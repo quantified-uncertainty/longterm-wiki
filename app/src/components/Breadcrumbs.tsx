@@ -17,14 +17,18 @@ export function Breadcrumbs({
   category,
   title,
   isInternal,
+  isAbout,
 }: {
   category?: string | null;
   title?: string;
   isInternal?: boolean;
+  isAbout?: boolean;
 }) {
-  const items: BreadcrumbItem[] = isInternal
-    ? [{ label: "Internal", href: "/wiki/E779" }]
-    : [{ label: "Wiki", href: "/wiki" }];
+  const items: BreadcrumbItem[] = isAbout
+    ? [{ label: "About", href: "/wiki/E755" }]
+    : isInternal
+      ? [{ label: "Internal", href: "/wiki/E779" }]
+      : [{ label: "Wiki", href: "/wiki" }];
 
   if (category && !isInternal) {
     items.push({
