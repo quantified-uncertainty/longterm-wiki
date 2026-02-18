@@ -11,9 +11,9 @@
  *   crux issues done <N> [--pr=URL]  Signal completion: comment + remove label
  */
 
-import { execSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
+import { currentBranch } from '../lib/session-checklist.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
@@ -202,14 +202,6 @@ function isBlocked(labels: string[], body: string): boolean {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function currentBranch(): string {
-  try {
-    return execSync('git branch --show-current', { encoding: 'utf-8' }).trim();
-  } catch {
-    return 'unknown-branch';
-  }
-}
 
 async function ensureLabelExists(): Promise<void> {
   try {

@@ -332,7 +332,21 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: 'push-ci-green',
     label: 'Push and CI green',
-    description: '`/push-and-ensure-green` completed successfully.',
+    description: 'Pushed to remote. CI checks pass (use `pnpm crux ci status --wait`).',
+    phase: 'ship',
+    applicableTypes: 'all',
+  },
+  {
+    id: 'no-merge-conflicts',
+    label: 'No merge conflicts',
+    description: 'PR is mergeable (not "dirty"). If conflicts exist, rebase onto main.',
+    phase: 'ship',
+    applicableTypes: 'all',
+  },
+  {
+    id: 'check-recent-merges',
+    label: 'Check recent merges',
+    description: 'Reviewed commits merged to main since session started. No conflicts or relevant overlapping changes.',
     phase: 'ship',
     applicableTypes: 'all',
   },
