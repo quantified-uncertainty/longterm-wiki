@@ -1,10 +1,10 @@
 entity: sam-altman
 facts:
-  # measure auto-inferred as "net-worth" from fact ID
   net-worth:
-    value: "$2.8 billion"
+    value: 2.8e9
     asOf: "2024"
 
+  # Standalone facts (no measure — keep as strings)
   openai-salary:
     value: "$76,001/year"
     asOf: "2024"
@@ -28,13 +28,13 @@ facts:
 
   worldcoin-users:
     measure: user-count
-    value: "26 million"
+    value: 26e6
     asOf: "2024"
     note: "Total users on Worldcoin network"
 
   worldcoin-verified:
     measure: user-count
-    value: "12 million"
+    value: 12e6
     asOf: "2024"
     note: "Verified Worldcoin users (via orb)"
 

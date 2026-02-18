@@ -26,6 +26,51 @@ import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers } from './lib/github-pr-lookup.mjs';
 
+// ---------------------------------------------------------------------------
+// Structured value formatting — converts numeric fact values to display strings
+// ---------------------------------------------------------------------------
+
+/** Format a single number into a human-readable string using measure context */
+function formatFactNumber(n, measure) {
+  if (measure?.unit === 'USD') {
+    if (Math.abs(n) >= 1e12) return `$${cleanDecimal(n / 1e12)} trillion`;
+    if (Math.abs(n) >= 1e9) return `$${cleanDecimal(n / 1e9)} billion`;
+    if (Math.abs(n) >= 1e6) return `$${cleanDecimal(n / 1e6)} million`;
+    return `$${n.toLocaleString('en-US')}`;
+  }
+  if (measure?.unit === 'percent') return `${cleanDecimal(n)}%`;
+  if (measure?.unit === 'count') {
+    if (Math.abs(n) >= 1e9) return `${cleanDecimal(n / 1e9)} billion`;
+    if (Math.abs(n) >= 1e6) return `${cleanDecimal(n / 1e6)} million`;
+    return n.toLocaleString('en-US');
+  }
+  // Fallback for other units
+  if (Math.abs(n) >= 1e9) return `${cleanDecimal(n / 1e9)} billion`;
+  if (Math.abs(n) >= 1e6) return `${cleanDecimal(n / 1e6)} million`;
+  return n.toLocaleString('en-US');
+}
+
+/** Format a [low, high] range into a human-readable string */
+function formatFactRange(lo, hi, measure) {
+  if (measure?.unit === 'percent') return `${cleanDecimal(lo)}-${cleanDecimal(hi)}%`;
+  if (measure?.unit === 'USD') {
+    // Same scale: "$20-26 billion"
+    if (lo >= 1e9 && hi >= 1e9) return `$${cleanDecimal(lo / 1e9)}-${cleanDecimal(hi / 1e9)} billion`;
+    if (lo >= 1e6 && hi >= 1e6) return `$${cleanDecimal(lo / 1e6)}-${cleanDecimal(hi / 1e6)} million`;
+    return `$${lo.toLocaleString('en-US')}-$${hi.toLocaleString('en-US')}`;
+  }
+  if (measure?.unit === 'count') {
+    if (lo >= 1e6 && hi >= 1e6) return `${cleanDecimal(lo / 1e6)}-${cleanDecimal(hi / 1e6)} million`;
+    return `${lo.toLocaleString('en-US')}-${hi.toLocaleString('en-US')}`;
+  }
+  return `${lo.toLocaleString('en-US')}-${hi.toLocaleString('en-US')}`;
+}
+
+/** Remove trailing .0 from formatted numbers: 380.0 → "380", 2.5 → "2.5" */
+function cleanDecimal(n) {
+  return n % 1 === 0 ? String(n) : n.toFixed(1);
+}
+
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
 // Entity type alias map: legacy YAML type names → canonical types
@@ -950,27 +995,10 @@ async function main() {
       }
     }
 
-    // Auto-parse numeric values from value strings where not explicitly set
-    for (const [key, fact] of Object.entries(facts)) {
-      if (fact.numeric == null && fact.value && !fact.compute) {
-        const parsed = parseNumericValue(fact.value);
-        if (parsed !== null) {
-          fact.numeric = parsed;
-        }
-      }
-    }
-
-    // Evaluate computed facts (topological order)
-    const computedCount = resolveComputedFacts(facts);
-    if (computedCount > 0) {
-      console.log(`  facts: ${totalFacts} canonical facts (${computedCount} computed) from ${factFiles.length} files`);
-    } else {
-      console.log(`  facts: ${totalFacts} canonical facts from ${factFiles.length} files`);
-    }
+    console.log(`  facts: ${totalFacts} canonical facts from ${factFiles.length} files`);
   }
-  database.facts = facts;
 
-  // Load fact measure definitions from data/fact-metrics.yaml
+  // Load fact measure definitions from data/fact-metrics.yaml (needed for value normalization)
   const factMeasuresPath = join(DATA_DIR, 'fact-metrics.yaml');
   const factMeasures = {};
   if (existsSync(factMeasuresPath)) {
@@ -990,7 +1018,8 @@ async function main() {
   const knownMeasureIds = Object.keys(factMeasures);
   let autoInferredCount = 0;
   for (const [key, fact] of Object.entries(facts)) {
-    if (fact.measure || fact.noCompute) continue;
+    // Skip if measure is already set (truthy) or explicitly null (opt-out via `measure: ~`)
+    if (fact.measure || fact.noCompute || ('measure' in fact && fact.measure === null)) continue;
     // 1. Exact match: fact ID is a known measure name
     if (knownMeasureIds.includes(fact.factId)) {
       fact.measure = fact.factId;
@@ -1014,6 +1043,73 @@ async function main() {
   if (autoInferredCount > 0) {
     console.log(`  measures: auto-inferred ${autoInferredCount} measures from fact IDs`);
   }
+
+  // Normalize structured values → flat format (value string, numeric, low, high)
+  // Structured values: number, [low, high], { min: N }
+  // After normalization, fact.value is always a display string and numeric/low/high are numbers.
+  let structuredCount = 0;
+  for (const [key, fact] of Object.entries(facts)) {
+    const val = fact.value;
+    const measure = fact.measure ? factMeasures[fact.measure] : null;
+
+    if (typeof val === 'number') {
+      // Precise numeric value — derive display string from measure
+      if (measure?.unit === 'percent') {
+        fact.numeric = val / 100;  // 40 → 0.4 for computation
+      } else {
+        fact.numeric = val;
+      }
+      fact.value = formatFactNumber(val, measure);
+      structuredCount++;
+
+    } else if (Array.isArray(val) && val.length === 2 && typeof val[0] === 'number') {
+      // Range [low, high]
+      const [lo, hi] = val;
+      if (measure?.unit === 'percent') {
+        fact.low = lo / 100;
+        fact.high = hi / 100;
+        fact.numeric = (lo + hi) / 200;
+      } else {
+        fact.low = lo;
+        fact.high = hi;
+        fact.numeric = (lo + hi) / 2;
+      }
+      fact.value = formatFactRange(lo, hi, measure);
+      structuredCount++;
+
+    } else if (val && typeof val === 'object' && !Array.isArray(val) && 'min' in val) {
+      // Lower bound { min: N }
+      const n = val.min;
+      if (measure?.unit === 'percent') {
+        fact.numeric = n / 100;
+      } else {
+        fact.numeric = n;
+      }
+      fact.value = formatFactNumber(n, measure) + '+';
+      structuredCount++;
+
+    } else if (typeof val === 'string') {
+      // Legacy string value — auto-parse numeric where possible
+      if (fact.numeric == null && !fact.compute) {
+        const parsed = parseNumericValue(val);
+        if (parsed !== null) {
+          fact.numeric = parsed;
+        }
+      }
+    }
+  }
+  if (structuredCount > 0) {
+    console.log(`  values: normalized ${structuredCount} structured values`);
+  }
+
+  // Evaluate computed facts (topological order) — must happen after value normalization
+  {
+    const computedCount = resolveComputedFacts(facts);
+    if (computedCount > 0) {
+      console.log(`  computed: ${computedCount} facts resolved`);
+    }
+  }
+  database.facts = facts;
 
   // Build timeseries index: group facts by measure, sorted chronologically
   // Facts with a `subject` override are excluded from the parent entity's timeseries

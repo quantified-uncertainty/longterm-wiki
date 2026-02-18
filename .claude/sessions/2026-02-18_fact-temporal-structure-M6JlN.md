@@ -1,15 +1,21 @@
 ## 2026-02-18 | claude/fact-temporal-structure-M6JlN | Refactor fact system to knowledge-graph measures
 
-**What was done:** Redesigned the fact system from simple metric tags to a knowledge-graph architecture with first-class "measures" (renamed from "metrics" to avoid collision with existing `metric` entity type). Measures have rich metadata (direction, display formatting, relatedMeasures, applicableTo). Facts auto-infer their measure from ID (e.g., `valuation-nov-2025` resolves to measure `valuation`), eliminating redundant YAML boilerplate. Added `subject` field for benchmark/comparison facts. Cleaned up YAML: removed redundant `numeric` fields where auto-parseable, added source URLs. Dashboard updated to show measure metadata and direction indicators.
+**What was done:** Redesigned the fact system with three layers of improvement:
+1. **Measures** — renamed from "metrics" to avoid collision with entity type. Rich metadata: direction, display format, relatedMeasures, applicableTo.
+2. **Auto-inference** — facts auto-infer their measure from ID (e.g., `valuation-nov-2025` → `valuation`). Use `measure: ~` to opt out.
+3. **Structured values** — fact values can now be numbers (`380e9`), ranges (`[20e9, 26e9]`), or lower bounds (`{min: 67e9}`) instead of just strings. Build pipeline auto-derives display strings, numeric, low/high from the measure context.
+
+Also added `subject` field for benchmark facts, source URLs, and updated the dashboard.
 
 **Pages:** (infrastructure-only, no wiki page edits)
 
 **Issues encountered:**
 - Naming collision between `metric` (entity type) and `metric` (fact field) — resolved by renaming to `measure`
-- Context ran out during v2 refactor, required continuation session
+- Auto-inference was too aggressive for `revenue-yoy-growth-2024` (matched `revenue-` prefix) — fixed with `measure: ~` opt-out
 
 **Learnings/notes:**
-- Build pipeline auto-parses `numeric` from value strings, so `numeric` is only needed for `+` suffix values
-- Measure auto-inference uses longest prefix match: fact ID `valuation-nov-2025` → measure `valuation`
-- Facts with `subject` override (e.g., `industry-average`) are excluded from parent entity's timeseries
-- 20 measure definitions, 17 auto-inferred, 32 timeseries observations across 19 measures
+- Structured values: `value: 380e9` + measure `unit: USD` → auto-formatted as `"$380 billion"`
+- Percentages: `value: 40` + measure `unit: percent` → `"40%"`, stored as `numeric: 0.4` for computation
+- Ranges: `value: [20e9, 26e9]` → `"$20-26 billion"`, auto-sets low/high/numeric
+- Lower bounds: `value: {min: 67e9}` → `"$67 billion+"`, handles the "+" suffix semantically
+- 20 measures, 16 auto-inferred, 32 structured values normalized, 31 timeseries observations

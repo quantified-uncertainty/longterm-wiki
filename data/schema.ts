@@ -939,9 +939,21 @@ export type SubgraphSpec = z.infer<typeof SubgraphSpec>;
 // =============================================================================
 
 export const Fact = z.object({
-  value: z.string().optional(),                // Display value (auto-generated for computed facts)
-  numeric: z.number().optional(),              // Machine-readable numeric value (auto-parsed from value if omitted)
-  // Range support — for facts that are estimates or ranges (e.g., "$20-26 billion")
+  // Value — the semantic core of a fact. Can be:
+  //   - number: precise value (e.g., 380e9 → "$380 billion" via measure.display)
+  //   - [number, number]: range (e.g., [20e9, 26e9] → "$20-26 billion")
+  //   - { min: number }: lower bound (e.g., { min: 67e9 } → "$67 billion+")
+  //   - string: literal display text (for non-numeric or compound values)
+  // When value is structured (number/array/object), the build pipeline derives
+  // displayable `value` string + `numeric`/`low`/`high` fields automatically.
+  value: z.union([
+    z.string(),
+    z.number(),
+    z.tuple([z.number(), z.number()]),
+    z.object({ min: z.number() }),
+  ]).optional(),
+  // Build-time derived fields (populated by build pipeline from structured value):
+  numeric: z.number().optional(),              // Machine-readable number (from value or parsed from string)
   low: z.number().optional(),                  // Lower bound of range
   high: z.number().optional(),                 // Upper bound of range
   asOf: z.string().optional(),
@@ -950,7 +962,7 @@ export const Fact = z.object({
   noCompute: z.boolean().optional(),           // If true, numeric value cannot be referenced in compute expressions
   // Measure grouping — links this fact to a reusable measure definition
   // If omitted, the build pipeline auto-infers from the fact ID (e.g., "valuation-nov-2025" → "valuation")
-  measure: z.string().optional(),              // Measure ID from data/fact-metrics.yaml (e.g., "valuation", "revenue")
+  measure: z.string().nullable().optional(),    // Measure ID from data/fact-metrics.yaml; null = explicit opt-out of auto-inference
   // Subject override — defaults to the parent entity; use to assign a fact to a different subject
   // (e.g., subject: "industry-average" for benchmark facts that shouldn't appear in the entity's timeseries)
   subject: z.string().optional(),
