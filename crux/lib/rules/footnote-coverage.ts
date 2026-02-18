@@ -16,37 +16,10 @@
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
+import { countProseWords } from '../page-analysis.ts';
 
 /** Minimum word count to expect citations */
 const MIN_WORDS_FOR_CITATIONS = 300;
-
-/** Count words in body text, excluding code blocks, imports, and frontmatter */
-function countProseWords(body: string): number {
-  let inCodeBlock = false;
-  let wordCount = 0;
-
-  for (const line of body.split('\n')) {
-    const trimmed = line.trim();
-
-    // Toggle code blocks
-    if (trimmed.startsWith('```')) {
-      inCodeBlock = !inCodeBlock;
-      continue;
-    }
-    if (inCodeBlock) continue;
-
-    // Skip non-prose lines
-    if (trimmed.startsWith('import ')) continue;
-    if (trimmed.startsWith('<')) continue;  // JSX components
-    if (trimmed.startsWith('|')) continue;  // Table rows
-    if (trimmed === '---') continue;        // Horizontal rules
-    if (/^\[\^\d+\]:/.test(trimmed)) continue; // Footnote definitions
-
-    wordCount += trimmed.split(/\s+/).filter(w => w.length > 0).length;
-  }
-
-  return wordCount;
-}
 
 /** Count unique footnote references in the body (e.g. [^1], [^2]) */
 function countFootnoteRefs(body: string): number {
