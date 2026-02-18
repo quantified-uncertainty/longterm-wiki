@@ -172,19 +172,15 @@ jobs:
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pass through env var (not inline expression) to avoid bash treating
+          # markdown backticks in the diagnostic summary as command substitution.
+          DIAG: ${{ steps.resolve.outputs.diagnostic_summary }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_NUMBER: ${{ matrix.number }}
         run: |
-          DIAG="${{ steps.resolve.outputs.diagnostic_summary }}"
           if [ -n "$DIAG" ]; then
-            BODY="$(cat <<EOFBODY
-          Automatic conflict resolution failed for this PR. Manual resolution is needed.
-
-          **Diagnostics:**
-          $DIAG
-
-          [View workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          EOFBODY
-          )"
+            BODY="$(printf 'Automatic conflict resolution failed for this PR. Manual resolution is needed.\n\n**Diagnostics:**\n%s\n\n[View workflow logs](%s)' "$DIAG" "$RUN_URL")"
           else
-            BODY="Automatic conflict resolution failed for this PR. Manual resolution is needed. [View logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            BODY="Automatic conflict resolution failed for this PR. Manual resolution is needed. [View logs]($RUN_URL)"
           fi
-          gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$BODY"
