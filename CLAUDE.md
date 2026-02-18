@@ -161,7 +161,7 @@ The gate check bundles all CI-blocking checks into one command. It fails fast â€
 **Setup (one-time):** `git config core.hooksPath .githooks`
 
 The gate runs these steps sequentially:
-1. Build data layer (`app/scripts/build-data.mjs`)
+1. Build data layer (`app/scripts/build-data.mjs`) â€” includes **ID stability check** (see below)
 2. Run vitest tests
 3. *(with `--fix` only)* Auto-fix escaping and markdown formatting
 4. MDX syntax check (comparison-operators, dollar-signs)
@@ -170,6 +170,8 @@ The gate runs these steps sequentially:
 7. Numeric ID integrity (cross-entity/page duplicate detection)
 8. TypeScript type check (`tsc --noEmit`)
 9. *(with `--full` only)* Full Next.js production build
+
+**ID stability check (issue #148):** The build-data step verifies that no entity or page numeric IDs (`numericId: E123`) were silently reassigned between builds. If a `numericId` was removed from a source file and the build would assign a different one, the build fails with a list of affected `<EntityLink>` references. To fix: restore the original `numericId` in the source file. To intentionally reassign IDs (rare): `node app/scripts/build-data.mjs --allow-id-reassignment`.
 
 ### After pushing: confirm CI is green
 ```bash
