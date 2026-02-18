@@ -174,63 +174,72 @@ facts:
     note: "Projected breakeven year per internal financial projections"
     sourceResource: "eb642ee7de582ff5"
 
-  # google-stake-pct — Google's approximate equity stake; updates with new rounds
+  # google-stake-pct
   b3a9f201:
+    label: "Google equity stake"
     value: 14
     asOf: 2026-02
-    note: "Google's approximate equity stake post-Series G; computed from disclosed $3.3B invested across 3 rounds at prevailing valuations"
+    note: "Approximate post-Series G; computed from $3.3B invested across 3 rounds at prevailing valuations"
     measure: equity-stake-percent
-    source: https://fortune.com/2023/10/27/google-anthropic-investment-stake/
+    sourceResource: "233fe5e95bfcf8bc"
 
-  # google-total-invested — cumulative Google investment
+  # google-total-invested
   e7c42d88:
+    label: "Google total invested in Anthropic"
     value: 3300000000
     asOf: 2026-02
-    note: "Google total invested: $300M (2022) + $2B (2023) + $1B (2025)"
+    note: "$300M (2022) + $2B (2023) + $1B (2025)"
     measure: total-funding
-    source: https://fortune.com/2023/10/27/google-anthropic-investment-stake/
+    sourceResource: "233fe5e95bfcf8bc"
 
-  # amazon-total-invested — cumulative Amazon investment
+  # amazon-total-invested
   9a1f5c63:
+    label: "Amazon total invested in Anthropic"
     value: 10750000000
     asOf: 2026-02
-    note: "Amazon total invested: $4B (2023) + $2.75B (2024) + $4B (2024)"
+    note: "$4B (2023) + $2.75B (2024) + $4B (2024); primary cloud partner"
     measure: total-funding
-    source: https://www.reuters.com/technology/anthropic-raises-27-billion-amazon-cloud-deal-2024-11-22/
+    sourceResource: "92cd6cda9477a52e"
 
-  # founder-equity-total — all 7 founders combined equity value range at current valuation
+  # founder-equity-total
   c3e8a742:
+    label: "All-founder combined equity value"
     value:
       - 53000000000
       - 80000000000
     asOf: 2026-02
-    note: "Seven founders × 2–3% each × $380B valuation"
+    note: "Seven founders × 2–3% each × current valuation"
     measure: net-worth
+    sourceResource: "fd8351a24e375eba"
 
-  # founder-pledge-total — 80% of all founder equity (their stated pledge)
+  # founder-pledge-total
   d5f91ab0:
+    label: "Founder pledge total (80% of all-founder equity)"
     value:
       - 43000000000
       - 64000000000
     asOf: 2026-02
-    note: "80% of $53–80B founder equity; all seven founders pledged to donate 80% of wealth"
+    note: "80% of $53–80B; all seven co-founders pledged to donate 80% of their wealth"
     measure: net-worth
-    source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+    sourceResource: "fd8351a24e375eba"
 
-  # employee-equity-pool — employee equity pool value at current valuation
+  # employee-equity-pool
   f2a06bd3:
+    label: "Employee equity pool value"
     value:
       - 46000000000
       - 68000000000
     asOf: 2026-02
-    note: "12–18% of $380B; ~870–2,847 employees"
+    note: "12–18% of current valuation; ~870–2,847 employees"
     measure: net-worth
+    sourceResource: "8e3ff50b9ef2a1a8"
 
-  # ea-aligned-capital-risk-adjusted — total EA-directed giving from Anthropic stakeholders
+  # ea-aligned-capital-risk-adjusted
   a8c71e05:
+    label: "EA-aligned capital (risk-adjusted total)"
     value:
       - 27000000000
       - 76000000000
     asOf: 2026-02
-    note: "Risk-adjusted estimate of EA-aligned philanthropic capital from Anthropic stakeholders"
+    note: "Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
     measure: net-worth

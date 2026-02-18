@@ -2,16 +2,18 @@
  * AnthropicStakeholdersTable
  *
  * Programmatic table showing Anthropic stakeholder ownership with computed donation
- * and EA-alignment columns. Values scale automatically with the current valuation fact.
+ * and EA-alignment columns. Dollar values scale automatically with the live valuation fact.
  *
  * Columns:
  *   Stakeholder | Category | Est. Stake | Value | Pledge % | EA Align % | Exp. Donated | Exp. EA-Effective
  *
- * The "Exp. Donated" and "Exp. EA-Effective" columns are derived:
- *   Exp. Donated     = Value × Pledge %
+ * Derived columns (computed per row):
+ *   Exp. Donated      = Value × Pledge %
  *   Exp. EA-Effective = Exp. Donated × EA Align %
  *
- * Totals are shown in a footer row (pledged stakeholders only).
+ * Totals footer shows sums across pledged stakeholders only.
+ *
+ * Stake fields use null to mean "undisclosed/unknown" (distinct from 0 = "no stake").
  */
 
 import { getFact } from "@/data";
@@ -31,12 +33,15 @@ import { cn } from "@/lib/utils";
 interface Stakeholder {
   name: string;
   category: string;
-  /** Stake as a fraction of total equity, e.g. 0.02 = 2% */
-  stakeMin: number;
-  stakeMax: number;
-  /** Fraction pledged to charitable donation, e.g. 0.80 = 80% */
+  /**
+   * Stake as a fraction of total equity (e.g. 0.02 = 2%).
+   * null = undisclosed/unknown (distinct from 0 = genuinely no stake).
+   */
+  stakeMin: number | null;
+  stakeMax: number | null;
+  /** Fraction pledged to charitable donation (e.g. 0.80 = 80%). 0 = no pledge. */
   pledgePct: number;
-  /** Estimated probability the donations are EA-aligned, e.g. 0.85 = 85% */
+  /** Estimated probability the pledged donations go to EA-aligned causes. 0 = none. */
   eaAlignPct: number;
   link?: string;
   notes?: string;
@@ -44,7 +49,6 @@ interface Stakeholder {
   includeInTotal?: boolean;
 }
 
-/** Static stakeholder definitions. Stake ranges and pledge/alignment estimates. */
 const STAKEHOLDERS: Stakeholder[] = [
   {
     name: "Dario Amodei",
@@ -148,7 +152,7 @@ const STAKEHOLDERS: Stakeholder[] = [
     stakeMax: 0.18,
     pledgePct: 0.5,
     eaAlignPct: 0.6,
-    notes: "~870–2,847 employees; historical 3:1 matching (reduced to 1:1 at 25% for post-2024 hires)",
+    notes: "~870–2,847 employees; 3:1 matching reduced to 1:1 at 25% for post-2024 hires",
     includeInTotal: true,
   },
   {
@@ -158,47 +162,45 @@ const STAKEHOLDERS: Stakeholder[] = [
     stakeMax: 0.15,
     pledgePct: 0,
     eaAlignPct: 0,
-    notes: "$3.3B invested across 3 rounds",
+    notes: "$3.3B invested across 3 rounds; no philanthropic pledge",
   },
   {
     name: "Amazon",
     category: "Strategic investor",
-    stakeMin: 0,
-    stakeMax: 0,
+    // Exact stake is undisclosed — null signals unknown, not zero
+    stakeMin: null,
+    stakeMax: null,
     pledgePct: 0,
     eaAlignPct: 0,
-    notes: "$10.75B invested; exact stake undisclosed",
+    notes: "$10.75B invested; exact stake undisclosed; primary cloud partner",
   },
   {
     name: "Series G / Other institutional",
     category: "Institutional",
-    stakeMin: 0,
-    stakeMax: 0,
+    // Distributed across many institutions; individual stakes undisclosed
+    stakeMin: null,
+    stakeMax: null,
     pledgePct: 0,
     eaAlignPct: 0,
     notes: "GIC, Coatue, D.E. Shaw, Dragoneer, Founders Fund, ICONIQ, MGX",
   },
 ];
 
-function fmtB(value: number): string {
-  if (value < 1e8) return `$${(value / 1e6).toFixed(0)}M`;
-  return `$${(value / 1e9).toFixed(1)}B`;
+function fmtB(v: number): string {
+  return v < 1e8 ? `$${(v / 1e6).toFixed(0)}M` : `$${(v / 1e9).toFixed(1)}B`;
 }
 
 function fmtRange(min: number, max: number): string {
-  if (min === 0 && max === 0) return "—";
-  if (Math.abs(min - max) < 0.15e9) return fmtB(min);
-  return `${fmtB(min)}–${fmtB(max)}`;
+  return Math.abs(min - max) < 0.15e9 ? fmtB(min) : `${fmtB(min)}–${fmtB(max)}`;
 }
 
-function fmtStake(min: number, max: number): string {
-  if (min === 0 && max === 0) return "—";
-  if (min === max) return `~${(min * 100).toFixed(0)}%`;
-  if (Math.abs(min - max) < 0.001) return `~${(min * 100).toFixed(1)}%`;
+function fmtStake(min: number | null, max: number | null): string {
+  if (min === null || max === null) return "Undisclosed";
+  if (Math.abs(min - max) < 0.001) return `~${(min * 100).toFixed(0)}%`;
   return `${(min * 100).toFixed(1)}–${(max * 100).toFixed(1)}%`;
 }
 
-function eaAlignLabel(pct: number): { label: string; cls: string } {
+function eaAlignBadge(pct: number): { label: string; cls: string } {
   if (pct >= 0.9) return { label: "Very high", cls: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800" };
   if (pct >= 0.7) return { label: "High", cls: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800" };
   if (pct >= 0.45) return { label: "Medium", cls: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800" };
@@ -212,26 +214,26 @@ export function AnthropicStakeholdersTable() {
   const valuationDisplay = valuationFact?.value ?? "$380B";
   const asOf = valuationFact?.asOf;
 
-  // Compute per-row derived values
+  // Compute per-row dollar values and derived donation columns
   const rows = STAKEHOLDERS.map((s) => {
-    const valueMin = s.stakeMin * valuation;
-    const valueMax = s.stakeMax * valuation;
-    const donatedMin = valueMin * s.pledgePct;
-    const donatedMax = valueMax * s.pledgePct;
-    const eaMin = donatedMin * s.eaAlignPct;
-    const eaMax = donatedMax * s.eaAlignPct;
+    const valueMin = s.stakeMin !== null ? s.stakeMin * valuation : null;
+    const valueMax = s.stakeMax !== null ? s.stakeMax * valuation : null;
+    const donatedMin = valueMin !== null ? valueMin * s.pledgePct : null;
+    const donatedMax = valueMax !== null ? valueMax * s.pledgePct : null;
+    const eaMin = donatedMin !== null ? donatedMin * s.eaAlignPct : null;
+    const eaMax = donatedMax !== null ? donatedMax * s.eaAlignPct : null;
     return { ...s, valueMin, valueMax, donatedMin, donatedMax, eaMin, eaMax };
   });
 
-  // Totals for pledged stakeholders only
+  // Totals: only sum rows with known stakes and active pledges
   const totals = rows
-    .filter((r) => r.includeInTotal)
+    .filter((r) => r.includeInTotal && r.donatedMin !== null)
     .reduce(
       (acc, r) => ({
-        donatedMin: acc.donatedMin + r.donatedMin,
-        donatedMax: acc.donatedMax + r.donatedMax,
-        eaMin: acc.eaMin + r.eaMin,
-        eaMax: acc.eaMax + r.eaMax,
+        donatedMin: acc.donatedMin + (r.donatedMin ?? 0),
+        donatedMax: acc.donatedMax + (r.donatedMax ?? 0),
+        eaMin: acc.eaMin + (r.eaMin ?? 0),
+        eaMax: acc.eaMax + (r.eaMax ?? 0),
       }),
       { donatedMin: 0, donatedMax: 0, eaMin: 0, eaMax: 0 }
     );
@@ -251,9 +253,8 @@ export function AnthropicStakeholdersTable() {
           All dollar values at {valuationDisplay} post-money valuation.{" "}
           <strong>Pledge %</strong> = fraction of equity pledged to charitable giving.{" "}
           <strong>EA Align %</strong> = estimated probability those donations go to
-          EA-aligned causes. <em>Exp. Donated</em> and <em>Exp. EA-Effective</em> are
-          derived estimates with significant uncertainty — pledge enforcement is not
-          legally binding.
+          EA-aligned causes. Derived columns are estimates with significant uncertainty
+          — pledges are not legally binding.
         </p>
       </CardHeader>
       <CardContent className="px-0 pt-0">
@@ -263,7 +264,7 @@ export function AnthropicStakeholdersTable() {
               <TableHead className="pl-4 min-w-[140px]">Stakeholder</TableHead>
               <TableHead className="min-w-[120px]">Category</TableHead>
               <TableHead className="text-right">Est. Stake</TableHead>
-              <TableHead className="text-right min-w-[110px]">
+              <TableHead className="text-right min-w-[120px]">
                 Value at {valuationDisplay}
               </TableHead>
               <TableHead className="text-right min-w-[80px]">Pledge %</TableHead>
@@ -271,17 +272,16 @@ export function AnthropicStakeholdersTable() {
               <TableHead className="text-right min-w-[110px] bg-blue-500/5">
                 Exp. Donated
               </TableHead>
-              <TableHead className="text-right min-w-[120px] bg-green-500/5">
+              <TableHead className="text-right min-w-[130px] bg-green-500/5">
                 Exp. EA-Effective
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.map((s, i) => {
-              const { label, cls } = eaAlignLabel(s.eaAlignPct);
-              const hasStake = s.stakeMin > 0 || s.stakeMax > 0;
+              const { label: eaLabel, cls: eaCls } = eaAlignBadge(s.eaAlignPct);
+              const stakeKnown = s.stakeMin !== null && s.stakeMax !== null;
               const hasPledge = s.pledgePct > 0;
-              const hasEA = s.eaAlignPct > 0;
 
               return (
                 <TableRow key={i}>
@@ -298,37 +298,47 @@ export function AnthropicStakeholdersTable() {
                     {s.category}
                   </TableCell>
                   <TableCell className="text-right text-sm tabular-nums">
-                    {fmtStake(s.stakeMin, s.stakeMax)}
+                    {stakeKnown ? (
+                      fmtStake(s.stakeMin, s.stakeMax)
+                    ) : (
+                      <span className="text-muted-foreground italic text-xs">Undisclosed</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right text-sm tabular-nums">
-                    {hasStake ? fmtRange(s.valueMin, s.valueMax) : "—"}
+                    {stakeKnown && s.valueMin !== null && s.valueMax !== null ? (
+                      fmtRange(s.valueMin, s.valueMax)
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right text-sm tabular-nums">
-                    {hasPledge ? `${Math.round(s.pledgePct * 100)}%` : (
+                    {hasPledge ? (
+                      `${Math.round(s.pledgePct * 100)}%`
+                    ) : (
                       <span className="text-muted-foreground">—</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    {hasEA ? (
+                    {s.eaAlignPct > 0 ? (
                       <Badge
                         variant="outline"
-                        className={cn("text-[10px] whitespace-nowrap", cls)}
+                        className={cn("text-[10px] whitespace-nowrap", eaCls)}
                       >
-                        {Math.round(s.eaAlignPct * 100)}% · {label}
+                        {Math.round(s.eaAlignPct * 100)}% · {eaLabel}
                       </Badge>
                     ) : (
                       <span className="text-muted-foreground text-sm">—</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right text-sm tabular-nums bg-blue-500/5">
-                    {hasPledge && hasStake ? (
+                    {hasPledge && stakeKnown && s.donatedMin !== null && s.donatedMax !== null ? (
                       fmtRange(s.donatedMin, s.donatedMax)
                     ) : (
                       <span className="text-muted-foreground">$0</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right text-sm tabular-nums bg-green-500/5">
-                    {hasEA && hasStake ? (
+                    {s.eaAlignPct > 0 && stakeKnown && s.eaMin !== null && s.eaMax !== null ? (
                       fmtRange(s.eaMin, s.eaMax)
                     ) : (
                       <span className="text-muted-foreground">$0</span>
