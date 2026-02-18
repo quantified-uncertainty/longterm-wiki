@@ -70,7 +70,7 @@ export function runCheck(_options?: ValidatorOptions): ValidatorResult {
   const entities: Entity[] = [];
   for (const filePath of ENTITY_FILES) {
     if (existsSync(filePath)) {
-      const content = yaml.load(readFileSync(filePath, 'utf8')) as Entity[] | undefined;
+      const content = yaml.load(readFileSync(filePath, 'utf8'), { schema: yaml.JSON_SCHEMA }) as Entity[] | undefined;
       if (Array.isArray(content)) {
         entities.push(...content);
       }
@@ -78,7 +78,7 @@ export function runCheck(_options?: ValidatorOptions): ValidatorResult {
   }
 
   const masterYaml: string = readFileSync(MASTER_GRAPH_PATH, 'utf8');
-  const masterGraph = yaml.load(masterYaml) as MasterGraph;
+  const masterGraph = yaml.load(masterYaml, { schema: yaml.JSON_SCHEMA }) as MasterGraph;
 
   // Extract all node IDs from master graph
   const masterNodeIds = new Set<string>();

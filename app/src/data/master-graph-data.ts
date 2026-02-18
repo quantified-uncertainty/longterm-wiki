@@ -10,7 +10,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import yaml from 'js-yaml';
+import { loadYaml } from '@lib/yaml';
 import type { Edge } from '@xyflow/react';
 import type { CauseEffectEdgeData } from '@/components/wiki/CauseEffectGraph/types';
 
@@ -66,7 +66,7 @@ let cachedData: MasterGraphYaml | null = null;
 
 function getData(): MasterGraphYaml {
   if (!cachedData) {
-    cachedData = yaml.load(getRawYaml()) as MasterGraphYaml;
+    cachedData = loadYaml<MasterGraphYaml>(getRawYaml());
   }
   return cachedData;
 }

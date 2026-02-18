@@ -42,7 +42,7 @@ function loadVisualDefinitions(): VisualDefinition[] {
   for (const file of files) {
     try {
       const content = fs.readFileSync(path.join(VISUALS_DIR, file), 'utf-8');
-      const docs = yaml.loadAll(content) as VisualDefinition[];
+      const docs = yaml.loadAll(content, null, { schema: yaml.JSON_SCHEMA }) as VisualDefinition[];
       for (const doc of docs) {
         if (doc && doc.id && doc.type && doc.content) {
           visuals.push(doc);

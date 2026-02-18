@@ -5,7 +5,7 @@
 
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import { loadYaml } from "@lib/yaml";
 
 // Source YAML data lives at the repo root
 const DATA_DIR = path.resolve(process.cwd(), "../data");
@@ -164,7 +164,7 @@ function getRawData(): RawGraphData {
   if (_rawData) return _rawData;
 
   const graphYaml = readYaml("parameter-graph.yaml");
-  _rawData = yaml.load(graphYaml) as RawGraphData;
+  _rawData = loadYaml<RawGraphData>(graphYaml);
 
   // Run validation
   const validationErrors = validateGraph(_rawData);
@@ -199,21 +199,21 @@ function getRawEntities(): RawEntity[] {
   const subitemsMisusePotential = readYaml("entities/ai-transition-model-subitems-misuse-potential.yaml");
 
   _rawEntities = [
-    ...(yaml.load(factorsYaml) as RawEntity[] || []),
-    ...(yaml.load(scenariosYaml) as RawEntity[] || []),
-    ...(yaml.load(metricsYaml) as RawEntity[] || []),
-    ...(yaml.load(parametersYaml) as RawEntity[] || []),
-    ...(yaml.load(contentYaml) as RawEntity[] || []),
+    ...(loadYaml<RawEntity[]>(factorsYaml) || []),
+    ...(loadYaml<RawEntity[]>(scenariosYaml) || []),
+    ...(loadYaml<RawEntity[]>(metricsYaml) || []),
+    ...(loadYaml<RawEntity[]>(parametersYaml) || []),
+    ...(loadYaml<RawEntity[]>(contentYaml) || []),
     // Split subitem files
-    ...(yaml.load(subitemsAiCapabilities) as RawEntity[] || []),
-    ...(yaml.load(subitemsAiOwnership) as RawEntity[] || []),
-    ...(yaml.load(subitemsAiTakeover) as RawEntity[] || []),
-    ...(yaml.load(subitemsAiUses) as RawEntity[] || []),
-    ...(yaml.load(subitemsCivilizationalCompetence) as RawEntity[] || []),
-    ...(yaml.load(subitemsHumanCatastrophe) as RawEntity[] || []),
-    ...(yaml.load(subitemsLongTermLockin) as RawEntity[] || []),
-    ...(yaml.load(subitemsMisalignmentPotential) as RawEntity[] || []),
-    ...(yaml.load(subitemsMisusePotential) as RawEntity[] || []),
+    ...(loadYaml<RawEntity[]>(subitemsAiCapabilities) || []),
+    ...(loadYaml<RawEntity[]>(subitemsAiOwnership) || []),
+    ...(loadYaml<RawEntity[]>(subitemsAiTakeover) || []),
+    ...(loadYaml<RawEntity[]>(subitemsAiUses) || []),
+    ...(loadYaml<RawEntity[]>(subitemsCivilizationalCompetence) || []),
+    ...(loadYaml<RawEntity[]>(subitemsHumanCatastrophe) || []),
+    ...(loadYaml<RawEntity[]>(subitemsLongTermLockin) || []),
+    ...(loadYaml<RawEntity[]>(subitemsMisalignmentPotential) || []),
+    ...(loadYaml<RawEntity[]>(subitemsMisusePotential) || []),
   ];
 
   return _rawEntities;

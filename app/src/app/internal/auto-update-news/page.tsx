@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import { loadYaml } from "@lib/yaml";
 import { NewsTable } from "./news-table";
 import { SourcesTable } from "./sources-table";
 import type { Metadata } from "next";
@@ -96,12 +96,6 @@ export interface SourceRow {
 
 // ── Data Loading ───────────────────────────────────────────────────────────
 
-/** js-yaml parses bare dates (e.g. 2026-02-18) as Date objects. Coerce to string. */
-function str(val: unknown): string {
-  if (val instanceof Date) return val.toISOString().slice(0, 10);
-  return String(val ?? "");
-}
-
 function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
   const runsDir = path.resolve(process.cwd(), "../data/auto-update/runs");
   if (!fs.existsSync(runsDir)) return { items: [], runDates: [] };
@@ -120,8 +114,8 @@ function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
   for (const file of detailFiles) {
     try {
       const raw = fs.readFileSync(path.join(runsDir, file), "utf-8");
-      const details = yaml.load(raw) as RunDetails;
-      const runDate = str(details.digest.date);
+      const details = loadYaml<RunDetails>(raw);
+      const runDate = details.digest.date;
       runDates.push(runDate);
 
       // Build routing lookup: news title → page it was routed to
@@ -141,7 +135,7 @@ function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
           title: item.title,
           url: item.url,
           sourceId: item.sourceId,
-          publishedAt: str(item.publishedAt),
+          publishedAt: item.publishedAt,
           summary: item.summary,
           relevanceScore: item.relevanceScore,
           topics: Array.isArray(item.topics) ? item.topics : [],
@@ -172,15 +166,15 @@ function loadSources(): SourceRow[] {
 
   try {
     const raw = fs.readFileSync(sourcesPath, "utf-8");
-    const config = yaml.load(raw) as { sources: NewsSource[] };
+    const config = loadYaml<{ sources: NewsSource[] }>(raw);
 
     let fetchTimes: Record<string, string> = {};
     if (fs.existsSync(statePath)) {
       try {
         const stateRaw = fs.readFileSync(statePath, "utf-8");
-        const state = yaml.load(stateRaw) as {
+        const state = loadYaml<{
           last_fetch_times?: Record<string, string>;
-        };
+        }>(stateRaw);
         fetchTimes = state?.last_fetch_times || {};
       } catch {
         /* ignore */
@@ -195,7 +189,7 @@ function loadSources(): SourceRow[] {
       categories: s.categories.join(", "),
       reliability: s.reliability,
       enabled: s.enabled,
-      lastFetched: fetchTimes[s.id] ? str(fetchTimes[s.id]) : null,
+      lastFetched: fetchTimes[s.id] ?? null,
     }));
   } catch {
     return [];
