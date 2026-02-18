@@ -45,11 +45,13 @@ export function computeStats(entities, backlinks, tagIndex) {
     }));
 
   // Most linked (entities with most backlinks)
+  // Pre-build a Map for O(1) lookups instead of O(n) entities.find() per entry
+  const entityById = new Map(entities.map(e => [e.id, e]));
   const mostLinked = Object.entries(backlinks)
     .map(([id, links]) => ({
       id,
       count: links.length,
-      entity: entities.find((e) => e.id === id),
+      entity: entityById.get(id),
     }))
     .filter((item) => item.entity)
     .sort((a, b) => b.count - a.count)

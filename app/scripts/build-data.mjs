@@ -413,11 +413,21 @@ function computeRelatedGraph(entities, pages, contentInbound, tagIndex) {
   }
 
   // 2. Name/prefix matching (e.g. "anthropic" ↔ "anthropic-ipo")
-  for (let i = 0; i < entities.length; i++) {
-    for (let j = i + 1; j < entities.length; j++) {
-      const a = entities[i].id, b = entities[j].id;
-      if (b.startsWith(a + '-') || a.startsWith(b + '-')) {
+  // Sort IDs alphabetically so prefix matches are adjacent, then scan forward
+  // while the prefix relationship holds. This is O(n log n) instead of O(n²).
+  // Correctness: `-` (ASCII 45) is the lowest character in entity-ID slugs
+  // (lower than digits 48-57 and letters 97-122), so all `a-*` entries are
+  // contiguous immediately after `a` in sorted order.
+  const sortedIds = entities.map(e => e.id).sort();
+  for (let i = 0; i < sortedIds.length; i++) {
+    const a = sortedIds[i];
+    const prefix = a + '-';
+    for (let j = i + 1; j < sortedIds.length; j++) {
+      const b = sortedIds[j];
+      if (b.startsWith(prefix)) {
         addEdge(a, b, 6);
+      } else {
+        break;
       }
     }
   }

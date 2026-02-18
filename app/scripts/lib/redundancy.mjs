@@ -115,7 +115,8 @@ export function computeRedundancy(pages) {
     };
   }).filter(p => p.words.size > 10); // Skip very short pages
 
-  // Compare all pairs
+  // Compare pairs within each content-format cluster (avoids cross-format
+  // comparisons entirely, reducing the number of pairs significantly).
   const pairs = [];
   const pageRedundancy = new Map();
 
@@ -128,56 +129,66 @@ export function computeRedundancy(pages) {
     });
   }
 
-  for (let i = 0; i < processed.length; i++) {
-    for (let j = i + 1; j < processed.length; j++) {
-      const a = processed[i];
-      const b = processed[j];
+  // Group pages by contentFormat so we only compare within the same group
+  const formatGroups = new Map();
+  for (const page of processed) {
+    const group = formatGroups.get(page.contentFormat);
+    if (group) {
+      group.push(page);
+    } else {
+      formatGroups.set(page.contentFormat, [page]);
+    }
+  }
 
-      // Only compare pages of the same content format
-      if (a.contentFormat !== b.contentFormat) continue;
+  for (const cluster of formatGroups.values()) {
+    for (let i = 0; i < cluster.length; i++) {
+      for (let j = i + 1; j < cluster.length; j++) {
+        const a = cluster[i];
+        const b = cluster[j];
 
-      // Compute both n-gram and word similarity
-      const shingleSimilarity = jaccardSimilarity(a.shingles, b.shingles);
-      const wordSimilarity = jaccardSimilarity(a.words, b.words);
+        // Compute both n-gram and word similarity
+        const shingleSimilarity = jaccardSimilarity(a.shingles, b.shingles);
+        const wordSimilarity = jaccardSimilarity(a.words, b.words);
 
-      // Use the higher of the two for detection
-      const combinedSimilarity = Math.max(shingleSimilarity, wordSimilarity * 0.8);
+        // Use the higher of the two for detection
+        const combinedSimilarity = Math.max(shingleSimilarity, wordSimilarity * 0.8);
 
-      if (combinedSimilarity >= SIMILARITY_THRESHOLD) {
-        pairs.push({
-          pageA: a.id,
-          pageB: b.id,
-          pathA: a.path,
-          pathB: b.path,
-          titleA: a.title,
-          titleB: b.title,
-          similarity: Math.round(combinedSimilarity * 100),
-          shingleSimilarity: Math.round(shingleSimilarity * 100),
-          wordSimilarity: Math.round(wordSimilarity * 100),
-        });
-
-        // Update page redundancy data
-        const redA = pageRedundancy.get(a.id);
-        const redB = pageRedundancy.get(b.id);
-
-        if (redA) {
-          redA.maxSimilarity = Math.max(redA.maxSimilarity, combinedSimilarity);
-          redA.similarPages.push({
-            id: b.id,
-            title: b.title,
-            path: b.path,
+        if (combinedSimilarity >= SIMILARITY_THRESHOLD) {
+          pairs.push({
+            pageA: a.id,
+            pageB: b.id,
+            pathA: a.path,
+            pathB: b.path,
+            titleA: a.title,
+            titleB: b.title,
             similarity: Math.round(combinedSimilarity * 100),
+            shingleSimilarity: Math.round(shingleSimilarity * 100),
+            wordSimilarity: Math.round(wordSimilarity * 100),
           });
-        }
 
-        if (redB) {
-          redB.maxSimilarity = Math.max(redB.maxSimilarity, combinedSimilarity);
-          redB.similarPages.push({
-            id: a.id,
-            title: a.title,
-            path: a.path,
-            similarity: Math.round(combinedSimilarity * 100),
-          });
+          // Update page redundancy data
+          const redA = pageRedundancy.get(a.id);
+          const redB = pageRedundancy.get(b.id);
+
+          if (redA) {
+            redA.maxSimilarity = Math.max(redA.maxSimilarity, combinedSimilarity);
+            redA.similarPages.push({
+              id: b.id,
+              title: b.title,
+              path: b.path,
+              similarity: Math.round(combinedSimilarity * 100),
+            });
+          }
+
+          if (redB) {
+            redB.maxSimilarity = Math.max(redB.maxSimilarity, combinedSimilarity);
+            redB.similarPages.push({
+              id: a.id,
+              title: a.title,
+              path: a.path,
+              similarity: Math.round(combinedSimilarity * 100),
+            });
+          }
         }
       }
     }
