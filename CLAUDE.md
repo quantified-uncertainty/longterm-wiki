@@ -173,7 +173,7 @@ When a session works on a GitHub issue, signal activity on that issue. See `.cla
 
 ## PR Review & Ship Workflow — MANDATORY
 
-Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. The preferred flow is `/agent-session-ready-PR` (verifies checklist, ships). Fallback: `/paranoid-pr-review` → `/push-and-ensure-green` → conflict check.
+Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. Run `/agent-session-ready-PR` to verify the checklist, polish the PR, and ship. At bare minimum, always run `/push-and-ensure-green`.
 
 ## CI Verification — MANDATORY
 
