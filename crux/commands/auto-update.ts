@@ -17,7 +17,7 @@ import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { createLogger } from '../lib/output.ts';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { PROJECT_ROOT, loadPages } from '../lib/content-types.ts';
 import {
   runPipeline,
   fetchAllSources,
@@ -63,17 +63,8 @@ async function digest(args: string[], options: AutoUpdateOptions): Promise<Comma
     return { output: 'No new items found.', exitCode: 0 };
   }
 
-  // Load entity IDs for classification
-  const pagesPath = join(PROJECT_ROOT, 'app/src/data/pages.json');
-  let entityIds: string[] = [];
-  if (existsSync(pagesPath)) {
-    try {
-      const pages = JSON.parse(readFileSync(pagesPath, 'utf-8'));
-      if (Array.isArray(pages)) {
-        entityIds = pages.map((p: { id?: string }) => p.id).filter((id): id is string => Boolean(id));
-      }
-    } catch { /* ignore */ }
-  }
+  // Load entity IDs for classification (auto-builds data layer if missing)
+  const entityIds = loadPages().map(p => p.id).filter((id): id is string => Boolean(id));
 
   console.log(`\nBuilding digest...`);
   const previouslySeen = loadSeenItems();

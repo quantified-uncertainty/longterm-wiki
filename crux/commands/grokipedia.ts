@@ -15,10 +15,9 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { parse, stringify } from "yaml";
 import { execFileSync } from "child_process";
+import { PROJECT_ROOT, loadPages as loadPagesFromRegistry } from "../lib/content-types.ts";
 
-const PROJECT_ROOT = join(import.meta.dirname, "../..");
 const DATA_DIR = join(PROJECT_ROOT, "data");
-const PAGES_JSON = join(PROJECT_ROOT, "app/src/data/pages.json");
 const EXTERNAL_LINKS_YAML = join(DATA_DIR, "external-links.yaml");
 const APP_EXTERNAL_LINKS_YAML = join(
   PROJECT_ROOT,
@@ -171,16 +170,8 @@ async function match(
   lines.push("Grokipedia URL Matcher");
   lines.push("======================\n");
 
-  // Load pages
-  if (!existsSync(PAGES_JSON)) {
-    return {
-      output:
-        "Error: pages.json not found. Run `cd app && node scripts/build-data.mjs` first.",
-      exitCode: 1,
-    };
-  }
-
-  const pages: PageInfo[] = JSON.parse(readFileSync(PAGES_JSON, "utf-8"));
+  // Load pages (auto-builds data layer if missing)
+  const pages: PageInfo[] = loadPagesFromRegistry() as PageInfo[];
   lines.push(`Loaded ${pages.length} wiki pages`);
 
   // Load existing external links to skip pages that already have grokipedia links

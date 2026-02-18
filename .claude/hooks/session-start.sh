@@ -17,6 +17,8 @@ ISSUES=()
 # Check if dependencies are installed
 if [ ! -d "node_modules" ] || [ ! -d "app/node_modules" ]; then
   echo "Installing dependencies..." >&2
+  # PUPPETEER_SKIP_DOWNLOAD: Chrome binary download fails in sandboxed environments
+  # and is only needed for screenshot tests, not core development.
   PUPPETEER_SKIP_DOWNLOAD=1 pnpm install --reporter=silent 2>/dev/null || true
   if [ -d "node_modules" ] && [ -d "app/node_modules" ]; then
     echo "Dependencies installed." >&2

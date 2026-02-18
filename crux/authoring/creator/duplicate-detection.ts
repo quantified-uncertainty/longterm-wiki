@@ -6,6 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { loadPathRegistry, loadGeneratedJson } from '../../lib/content-types.ts';
 
 interface DuplicateMatch {
   title: string;
@@ -76,63 +77,54 @@ export function toSlug(str: string): string {
  * Check if a page with similar name already exists
  * Returns { exists: boolean, matches: Array<{title, path, similarity}> }
  */
-export async function checkForExistingPage(topic: string, ROOT: string): Promise<DuplicateCheckResult> {
-  const registryPath = path.join(ROOT, 'app/src/data/pathRegistry.json');
-  const databasePath = path.join(ROOT, 'app/src/data/database.json');
-
+export async function checkForExistingPage(topic: string, _ROOT: string): Promise<DuplicateCheckResult> {
   const matches: DuplicateMatch[] = [];
   const topicSlug = toSlug(topic);
   const topicLower = topic.toLowerCase();
 
-  // Check pathRegistry for slug matches
-  if (fs.existsSync(registryPath)) {
-    const registry: Record<string, string> = JSON.parse(fs.readFileSync(registryPath, 'utf-8'));
-    for (const [id, urlPath] of Object.entries(registry)) {
-      if (id.startsWith('__index__')) continue;
+  // Use centralized loaders (auto-builds data layer if missing)
+  const registry = loadPathRegistry();
+  for (const [id, urlPath] of Object.entries(registry)) {
+    if (id.startsWith('__index__')) continue;
 
-      // Exact slug match
-      if (id === topicSlug) {
-        matches.push({ title: id, path: urlPath, similarity: 1.0, type: 'exact-id' });
-        continue;
-      }
+    // Exact slug match
+    if (id === topicSlug) {
+      matches.push({ title: id, path: urlPath, similarity: 1.0, type: 'exact-id' });
+      continue;
+    }
 
-      // Fuzzy slug match
-      const sim = similarity(id, topicSlug);
-      if (sim >= 0.7) {
-        matches.push({ title: id, path: urlPath, similarity: sim, type: 'fuzzy-id' });
-      }
+    // Fuzzy slug match
+    const sim = similarity(id, topicSlug);
+    if (sim >= 0.7) {
+      matches.push({ title: id, path: urlPath, similarity: sim, type: 'fuzzy-id' });
     }
   }
 
-  // Check database.json for title matches
-  if (fs.existsSync(databasePath)) {
-    const database: Record<string, DatabaseEntity[]> = JSON.parse(fs.readFileSync(databasePath, 'utf-8'));
-    const allEntities = Object.values(database).flat();
+  // Check entities for title matches (uses centralized loader with auto-build)
+  const allEntities = loadGeneratedJson<DatabaseEntity[]>('entities.json', []);
+  for (const entity of allEntities) {
+    if (!entity.path) continue;
 
-    for (const entity of allEntities) {
-      if (!entity.path) continue;
+    const entityName = entity.title || entity.name;
+    if (!entityName) continue;
 
-      const entityName = entity.title || entity.name;
-      if (!entityName) continue;
+    const entityNameLower = entityName.toLowerCase();
 
-      const entityNameLower = entityName.toLowerCase();
-
-      // Exact title match
-      if (entityNameLower === topicLower) {
-        const existingMatch = matches.find(m => m.path === entity.path);
-        if (!existingMatch) {
-          matches.push({ title: entityName, path: entity.path, similarity: 1.0, type: 'exact-title' });
-        }
-        continue;
+    // Exact title match
+    if (entityNameLower === topicLower) {
+      const existingMatch = matches.find(m => m.path === entity.path);
+      if (!existingMatch) {
+        matches.push({ title: entityName, path: entity.path, similarity: 1.0, type: 'exact-title' });
       }
+      continue;
+    }
 
-      // Fuzzy title match
-      const sim = similarity(entityName, topic);
-      if (sim >= 0.7) {
-        const existingMatch = matches.find(m => m.path === entity.path);
-        if (!existingMatch) {
-          matches.push({ title: entityName, path: entity.path, similarity: sim, type: 'fuzzy-title' });
-        }
+    // Fuzzy title match
+    const sim = similarity(entityName, topic);
+    if (sim >= 0.7) {
+      const existingMatch = matches.find(m => m.path === entity.path);
+      if (!existingMatch) {
+        matches.push({ title: entityName, path: entity.path, similarity: sim, type: 'fuzzy-title' });
       }
     }
   }

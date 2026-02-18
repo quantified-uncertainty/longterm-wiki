@@ -229,7 +229,7 @@ function loadEntityLookup(): Map<string, EntityEntry> {
   const pathRegistry = loadPathRegistry();
 
   if (Object.keys(pathRegistry).length === 0) {
-    console.error('Error: Run pnpm build first (pathRegistry.json not found)');
+    console.error('Error: pathRegistry.json is empty after auto-build. Check data/ directory for issues.');
     process.exit(1);
   }
 

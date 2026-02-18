@@ -81,7 +81,7 @@ function makeColors(ciMode: boolean): AnsiColors {
 function loadPages(): PageEntry[] {
   const pages: PageEntry[] = loadPagesData();
   if (pages.length === 0) {
-    console.error('Error: pages.json not found or empty. Run `pnpm build` first.');
+    console.error('Error: pages.json is empty after auto-build. Check data/ directory for issues.');
     process.exit(1);
   }
   return pages;
