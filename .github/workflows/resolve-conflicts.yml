@@ -101,7 +101,40 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # ── Fingerprint check: skip if we already tried this exact SHA combination ──
+      - name: Check if already attempted
+        id: fingerprint
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BRANCH: ${{ matrix.branch }}
+          PR_NUMBER: ${{ matrix.number }}
+        run: |
+          set -euo pipefail
+
+          git fetch origin main
+          git fetch origin "$PR_BRANCH"
+
+          MAIN_SHA=$(git rev-parse origin/main)
+          PR_SHA=$(git rev-parse "origin/$PR_BRANCH")
+          FINGERPRINT="${PR_SHA:0:8}+${MAIN_SHA:0:8}"
+
+          echo "fingerprint=$FINGERPRINT" >> "$GITHUB_OUTPUT"
+          echo "Fingerprint: $FINGERPRINT (PR ${PR_SHA:0:8}, main ${MAIN_SHA:0:8})"
+
+          # Check if there's already a failure comment with this exact fingerprint.
+          # If so, skip — nothing has changed since the last attempt.
+          EXISTING=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
+            --jq "[.[] | select(.body | test(\"fingerprint: \`${FINGERPRINT}\`\"))] | length" 2>/dev/null || echo "0")
+
+          if [ "$EXISTING" -gt 0 ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping PR #$PR_NUMBER — already attempted for fingerprint $FINGERPRINT (same branch+main SHAs). Will retry when either branch is updated."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Resolve conflicts (merge + commit, no push yet)
+        if: steps.fingerprint.outputs.skip != 'true'
         id: resolve
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -110,11 +143,14 @@ jobs:
         run: node .github/scripts/resolve-conflicts.mjs --no-push
 
       - uses: pnpm/action-setup@v4
+        if: steps.fingerprint.outputs.skip != 'true'
 
       - name: Install dependencies
+        if: steps.fingerprint.outputs.skip != 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Validate resolved code
+        if: steps.fingerprint.outputs.skip != 'true'
         id: validate
         run: |
           # Run the CI-blocking validation gate with --fix to auto-fix trivial
@@ -122,7 +158,24 @@ jobs:
           # This prevents the conflict resolver from pushing code that immediately
           # fails CI. Includes numeric ID integrity checks for duplicate detection.
           echo "Running post-resolution validation gate (with auto-fix)..."
-          if pnpm crux validate gate --fix 2>&1; then
+
+          # Capture output for diagnostics while also streaming to logs.
+          # The validate-gate now prints child process output for failed steps
+          # even in CI mode, so we capture everything for the failure comment.
+          GATE_OUTPUT=$(pnpm crux validate gate --fix 2>&1) && GATE_EXIT=0 || GATE_EXIT=$?
+
+          # Always print to workflow logs
+          echo "$GATE_OUTPUT"
+
+          # Save last 80 lines for the PR failure comment
+          GATE_TAIL=$(echo "$GATE_OUTPUT" | tail -80)
+          {
+            echo "gate_output<<GATEEOF"
+            echo "$GATE_TAIL"
+            echo "GATEEOF"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ "$GATE_EXIT" -eq 0 ]; then
             echo "Validation passed — safe to push."
             echo "valid=true" >> "$GITHUB_OUTPUT"
           else
@@ -132,6 +185,7 @@ jobs:
           fi
 
       - name: Commit auto-fix changes (if any)
+        if: steps.fingerprint.outputs.skip != 'true'
         run: |
           # The --fix flag may have auto-fixed escaping/markdown issues.
           # Create a separate commit (not amend) to preserve the merge commit's
@@ -145,6 +199,7 @@ jobs:
           fi
 
       - name: Push resolved merge
+        if: steps.fingerprint.outputs.skip != 'true'
         env:
           PR_BRANCH: ${{ matrix.branch }}
         run: |
@@ -160,8 +215,8 @@ jobs:
           echo "::error::Push failed after 3 attempts"
           exit 1
 
-      - name: Post comment on PR
-        if: success()
+      - name: Post success comment
+        if: success() && steps.fingerprint.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -169,18 +224,31 @@ jobs:
             --body "Merge conflicts with \`main\` were automatically resolved by the conflict resolver. Please review the merge commit to ensure correctness."
 
       - name: Post failure comment
-        if: failure()
+        if: failure() && steps.fingerprint.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Pass through env var (not inline expression) to avoid bash treating
           # markdown backticks in the diagnostic summary as command substitution.
           DIAG: ${{ steps.resolve.outputs.diagnostic_summary }}
+          GATE_OUTPUT: ${{ steps.validate.outputs.gate_output }}
+          FINGERPRINT: ${{ steps.fingerprint.outputs.fingerprint }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           PR_NUMBER: ${{ matrix.number }}
         run: |
+          # Build a detailed failure comment with diagnostics and fingerprint.
+          # The fingerprint prevents re-attempting the same resolution when
+          # nothing has changed (see "Check if already attempted" step).
+          BODY="Automatic conflict resolution failed for this PR."
+          BODY="$BODY Manual resolution is needed."
+
           if [ -n "$DIAG" ]; then
-            BODY="$(printf 'Automatic conflict resolution failed for this PR. Manual resolution is needed.\n\n**Diagnostics:**\n%s\n\n[View workflow logs](%s)' "$DIAG" "$RUN_URL")"
-          else
-            BODY="Automatic conflict resolution failed for this PR. Manual resolution is needed. [View logs]($RUN_URL)"
+            BODY="$(printf '%s\n\n**Resolution diagnostics:**\n%s' "$BODY" "$DIAG")"
           fi
+
+          if [ -n "$GATE_OUTPUT" ]; then
+            BODY="$(printf '%s\n\n<details>\n<summary>Validation output (click to expand)</summary>\n\n```\n%s\n```\n\n</details>' "$BODY" "$GATE_OUTPUT")"
+          fi
+
+          BODY="$(printf '%s\n\n[View workflow logs](%s)\n\n<!-- fingerprint: `%s` -->' "$BODY" "$RUN_URL" "$FINGERPRINT")"
+
           gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$BODY"

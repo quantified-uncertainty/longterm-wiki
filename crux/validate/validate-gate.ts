@@ -156,6 +156,12 @@ function runStep(step: Step): Promise<StepResult> {
     });
 
     child.on('close', (code: number | null) => {
+      // In CI mode, dump captured output when a step fails so errors are
+      // visible in workflow logs (otherwise they're silently discarded).
+      if (CI_MODE && code !== 0) {
+        if (stdout) process.stdout.write(stdout);
+        if (stderr) process.stderr.write(stderr);
+      }
       resolve({
         id: step.id,
         name: step.name,
