@@ -13,7 +13,7 @@ import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RelatedPages } from "@/components/RelatedPages";
-import { WikiSidebar } from "@/components/wiki/WikiSidebar";
+import { WikiSidebar, MobileSidebarTrigger } from "@/components/wiki/WikiSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { detectSidebarType, getWikiNav, isAboutPage } from "@/lib/wiki-nav";
 import { AlertTriangle, Database, Github } from "lucide-react";
@@ -310,6 +310,9 @@ function WithSidebar({
     <SidebarProvider>
       <WikiSidebar sections={sections} />
       <div className="flex-1 min-w-0">
+        <div className="md:hidden px-4 pt-3">
+          <MobileSidebarTrigger />
+        </div>
         <div className={contentClass}>{children}</div>
       </div>
     </SidebarProvider>
