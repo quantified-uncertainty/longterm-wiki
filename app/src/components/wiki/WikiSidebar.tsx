@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import {
@@ -17,6 +18,9 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  MobileSidebar,
+  MobileSidebarTrigger,
+  useMobileSidebar,
 } from "@/components/ui/sidebar";
 import type { NavSection } from "@/lib/internal-nav";
 
@@ -58,14 +62,45 @@ function SidebarNavSection({ section }: { section: NavSection }) {
   );
 }
 
-export function WikiSidebar({ sections }: { sections: NavSection[] }) {
+function SidebarNav({ sections }: { sections: NavSection[] }) {
   return (
-    <Sidebar className="sticky top-14 h-[calc(100vh-3.5rem)] border-r-0">
-      <SidebarContent className="pt-2">
-        {sections.map((section) => (
-          <SidebarNavSection key={section.title} section={section} />
-        ))}
-      </SidebarContent>
-    </Sidebar>
+    <SidebarContent className="pt-2">
+      {sections.map((section) => (
+        <SidebarNavSection key={section.title} section={section} />
+      ))}
+    </SidebarContent>
   );
 }
+
+/** Auto-close mobile sidebar on route change */
+function MobileSidebarAutoClose() {
+  const pathname = usePathname();
+  const { setMobileOpen } = useMobileSidebar();
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname, setMobileOpen]);
+
+  return null;
+}
+
+export function WikiSidebar({ sections }: { sections: NavSection[] }) {
+  return (
+    <>
+      {/* Desktop: static sidebar */}
+      <Sidebar className="sticky top-14 h-[calc(100vh-3.5rem)] border-r-0">
+        <SidebarNav sections={sections} />
+      </Sidebar>
+
+      {/* Mobile: slide-out overlay */}
+      <MobileSidebar>
+        <SidebarNav sections={sections} />
+      </MobileSidebar>
+
+      <MobileSidebarAutoClose />
+    </>
+  );
+}
+
+/** Trigger button for mobile sidebar — place in content area */
+export { MobileSidebarTrigger };

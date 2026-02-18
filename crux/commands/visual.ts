@@ -18,7 +18,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   },
   review: {
     script: 'visual/visual-review.ts',
-    description: 'Render and review visuals with puppeteer + AI quality check',
+    description: 'Render and review visuals with playwright + AI quality check',
     passthrough: ['ci', 'screenshot', 'fix', 'dryRun', 'verbose'],
     positional: true,
   },
@@ -69,7 +69,7 @@ Options:
   --directions=<d> Specific instructions for generation or improvement
   --output=<path>  Output file path (defaults to .claude/temp/visual/)
   --model=<m>      Model: haiku, sonnet (default: sonnet)
-  --screenshot     Take puppeteer screenshot during review
+  --screenshot     Take playwright screenshot during review
   --fix            Auto-apply suggested fixes during review
   --min-words=<n>  Minimum word count for audit coverage (default: 500)
   --format=<f>     Audit output format: table, json (default: table)
