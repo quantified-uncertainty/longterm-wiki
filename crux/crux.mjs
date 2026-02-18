@@ -25,6 +25,7 @@
  *   ci          GitHub CI status and monitoring
  *   maintain    Periodic maintenance and housekeeping
  *   review      Human review tracking and status
+ *   citations   Citation verification and archival
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -55,6 +56,7 @@ import * as ciCommands from './commands/ci.ts';
 import * as maintainCommands from './commands/maintain.ts';
 import * as autoUpdateCommands from './commands/auto-update.ts';
 import * as reviewCommands from './commands/review.ts';
+import * as citationsCommands from './commands/citations.ts';
 import * as grokipediaCommands from './commands/grokipedia.ts';
 
 const domains = {
@@ -73,6 +75,7 @@ const domains = {
   ci: ciCommands,
   maintain: maintainCommands,
   review: reviewCommands,
+  citations: citationsCommands,
   grokipedia: grokipediaCommands,
 };
 
@@ -138,6 +141,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   ci          GitHub CI status and monitoring
   maintain    Periodic maintenance and housekeeping
   review      Human review tracking and status
+  citations   Citation verification and archival
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
