@@ -90,7 +90,7 @@ const STEPS: Step[] = [
     id: 'build-data',
     name: 'Build data layer',
     command: 'node',
-    args: ['scripts/build-data.mjs'],
+    args: ['--import', 'tsx/esm', 'scripts/build-data.mjs'],
     cwd: APP_DIR,
   },
   {

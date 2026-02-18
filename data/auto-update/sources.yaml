@@ -31,11 +31,12 @@ sources:
   - id: anthropic-blog
     name: Anthropic Blog / Research
     type: web-search
-    query: "Anthropic blog new research safety interpretability 2026"
+    query: "site:anthropic.com/news OR site:anthropic.com/research 2026"
     frequency: daily
     categories: [ai-labs, safety, models, interpretability]
     reliability: high
     enabled: true
+    # Note: anthropic.com/rss.xml returns 404; no working RSS feed found.
 
   - id: deepmind-blog
     name: Google DeepMind Blog
@@ -49,11 +50,12 @@ sources:
   - id: meta-ai-blog
     name: Meta AI Blog
     type: web-search
-    query: "Meta AI blog new models open source Llama 2026"
+    query: "site:ai.meta.com/blog 2026"
     frequency: daily
     categories: [ai-labs, models, open-source]
     reliability: high
     enabled: true
+    # Note: ai.meta.com/blog/rss/ returns 404; no working RSS feed found.
 
   # ── AI Safety / Alignment ─────────────────────────────────────────────────
 
@@ -118,11 +120,12 @@ sources:
   - id: the-gradient
     name: The Gradient
     type: rss
-    url: https://thegradient.pub/rss/
+    url: https://thegradientpub.substack.com/feed
     frequency: daily
     categories: [research, models, safety]
     reliability: high
     enabled: true
+    # Note: thegradient.pub/rss/ returns 502; using Substack mirror instead.
 
   - id: ml-safety-newsletter
     name: ML Safety Newsletter
@@ -162,30 +165,43 @@ sources:
 
   - id: navigating-ai-risks
     name: Navigating AI Risks
-    type: rss
-    url: https://www.navigatingrisks.ai/feed
+    type: web-search
+    query: "navigating AI risks safety governance policy site:navigatingrisks.ai OR site:navigatingairisks.substack.com"
     frequency: daily
     categories: [safety, governance, policy, risk]
     reliability: medium
     enabled: true
+    # Note: RSS feed (navigatingrisks.ai/feed) returns 403 for automated requests,
+    # switched to web-search as workaround.
 
   # ── Arxiv ─────────────────────────────────────────────────────────────────
+  # Direct RSS feeds from arxiv — free, reliable, structured, updates daily.
+  # Replaced previous web-search approach which was expensive and unreliable.
 
   - id: arxiv-cs-ai
     name: arXiv cs.AI (Artificial Intelligence)
     type: rss
-    url: https://arxiv.org/rss/cs.AI
+    url: https://rss.arxiv.org/rss/cs.AI
     frequency: daily
-    categories: [research, safety, alignment, interpretability]
+    categories: [research, safety, alignment, models, interpretability]
     reliability: high
     enabled: true
 
   - id: arxiv-cs-cl
     name: arXiv cs.CL (Computation and Language)
     type: rss
-    url: https://arxiv.org/rss/cs.CL
+    url: https://rss.arxiv.org/rss/cs.CL
     frequency: daily
-    categories: [research, models, capabilities]
+    categories: [research, models, interpretability, capabilities]
+    reliability: high
+    enabled: true
+
+  - id: arxiv-cs-lg
+    name: arXiv cs.LG (Machine Learning)
+    type: rss
+    url: https://rss.arxiv.org/rss/cs.LG
+    frequency: daily
+    categories: [research, models, safety, alignment]
     reliability: high
     enabled: true
 

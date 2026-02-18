@@ -130,6 +130,7 @@ export interface AutoUpdateOptions {
   count?: string;            // Max pages to update
   dryRun?: boolean;          // Preview without executing
   sources?: string;          // Comma-separated source IDs to check
+  check?: boolean;           // Health-check source URLs (used by sources --check)
   ci?: boolean;
   json?: boolean;
   verbose?: boolean;

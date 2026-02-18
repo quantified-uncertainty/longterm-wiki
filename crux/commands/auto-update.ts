@@ -195,6 +195,12 @@ async function plan(args: string[], options: AutoUpdateOptions): Promise<Command
 async function sources(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const config = loadSources();
+
+  // Health check mode: test each RSS/Atom source URL
+  if (options.check) {
+    return checkSourceHealth(config, options);
+  }
+
   const fetchTimes = loadFetchTimes();
 
   if (options.json || options.ci) {
@@ -222,8 +228,147 @@ async function sources(args: string[], options: AutoUpdateOptions): Promise<Comm
 
   output += `\n${c.dim}${config.sources.length} sources configured (${config.sources.filter(s => s.enabled).length} enabled)${c.reset}\n`;
   output += `${c.dim}Config: data/auto-update/sources.yaml${c.reset}\n`;
+  output += `${c.dim}Run with --check to test source URLs for reachability.${c.reset}\n`;
 
   return { output, exitCode: 0 };
+}
+
+// ── Source Health Check ──────────────────────────────────────────────────────
+
+interface HealthCheckResult {
+  id: string;
+  name: string;
+  type: string;
+  enabled: boolean;
+  status: 'ok' | 'error' | 'skip';
+  httpStatus?: number;
+  latencyMs?: number;
+  error?: string;
+}
+
+/**
+ * Test reachability of all RSS/Atom source URLs.
+ * Web-search sources are skipped (no URL to test).
+ */
+async function checkSourceHealth(
+  config: ReturnType<typeof loadSources>,
+  options: AutoUpdateOptions,
+): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const results: HealthCheckResult[] = [];
+
+  console.log(`Checking health of ${config.sources.length} sources...`);
+
+  for (const source of config.sources) {
+    if (source.type === 'web-search' || !source.url) {
+      results.push({
+        id: source.id,
+        name: source.name,
+        type: source.type,
+        enabled: source.enabled,
+        status: 'skip',
+      });
+      continue;
+    }
+
+    const start = Date.now();
+    try {
+      // Try HEAD first (fast), fall back to GET if HEAD returns 4xx
+      // (some servers block HEAD requests but serve GET fine)
+      let response = await fetch(source.url, {
+        method: 'HEAD',
+        headers: { 'User-Agent': 'longterm-wiki-auto-update/1.0 (health-check)' },
+        signal: AbortSignal.timeout(15_000),
+        redirect: 'follow',
+      });
+
+      if (!response.ok && response.status >= 400) {
+        // Retry with GET to rule out HEAD-blocking servers
+        response = await fetch(source.url, {
+          method: 'GET',
+          headers: { 'User-Agent': 'longterm-wiki-auto-update/1.0 (health-check)' },
+          signal: AbortSignal.timeout(15_000),
+          redirect: 'follow',
+        });
+      }
+
+      const latencyMs = Date.now() - start;
+
+      if (response.ok) {
+        results.push({
+          id: source.id,
+          name: source.name,
+          type: source.type,
+          enabled: source.enabled,
+          status: 'ok',
+          httpStatus: response.status,
+          latencyMs,
+        });
+      } else {
+        results.push({
+          id: source.id,
+          name: source.name,
+          type: source.type,
+          enabled: source.enabled,
+          status: 'error',
+          httpStatus: response.status,
+          latencyMs,
+          error: `HTTP ${response.status}`,
+        });
+      }
+    } catch (err: unknown) {
+      const latencyMs = Date.now() - start;
+      const error = err instanceof Error ? err.message.slice(0, 120) : String(err);
+      results.push({
+        id: source.id,
+        name: source.name,
+        type: source.type,
+        enabled: source.enabled,
+        status: 'error',
+        latencyMs,
+        error,
+      });
+    }
+  }
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify(results, null, 2), exitCode: 0 };
+  }
+
+  const ok = results.filter(r => r.status === 'ok');
+  const errors = results.filter(r => r.status === 'error');
+  const skipped = results.filter(r => r.status === 'skip');
+
+  let output = `\n${c.bold}${c.blue}Source Health Check${c.reset}\n\n`;
+  output += `${c.bold}  Result   Status  Latency  Name${c.reset}\n`;
+  output += `${c.dim}${'─'.repeat(70)}${c.reset}\n`;
+
+  for (const r of results) {
+    if (r.status === 'ok') {
+      const latency = r.latencyMs ? `${r.latencyMs}ms`.padEnd(9) : ''.padEnd(9);
+      output += `  ${c.green}OK   ${c.reset}    ${String(r.httpStatus || '').padEnd(7)} ${latency}${r.name}\n`;
+    } else if (r.status === 'error') {
+      const latency = r.latencyMs ? `${r.latencyMs}ms`.padEnd(9) : ''.padEnd(9);
+      output += `  ${c.red}ERROR${c.reset}    ${String(r.httpStatus || '').padEnd(7)} ${latency}${r.name}\n`;
+      output += `  ${c.dim}         → ${r.error}${c.reset}\n`;
+    } else {
+      const skipReason = r.type === 'web-search' ? 'web-search' : 'no url';
+      output += `  ${c.dim}SKIP          (${skipReason}) ${r.name}${c.reset}\n`;
+    }
+  }
+
+  output += `\n${c.dim}─${c.reset}\n`;
+  output += `  ${c.green}${ok.length} OK${c.reset}`;
+  if (errors.length > 0) output += `  ${c.red}${errors.length} ERRORS${c.reset}`;
+  if (skipped.length > 0) output += `  ${c.dim}${skipped.length} skipped${c.reset}`;
+  output += `\n`;
+
+  if (errors.length > 0) {
+    output += `\n${c.red}Broken sources detected. Edit data/auto-update/sources.yaml to fix or disable them.${c.reset}\n`;
+  }
+
+  return { output, exitCode: errors.length > 0 ? 1 : 0 };
 }
 
 /**
@@ -311,6 +456,7 @@ Options:
   --count=N            Max pages to update per run (default: 10)
   --sources=a,b,c      Only fetch these source IDs
   --dry-run            Run pipeline but skip page improvements
+  --check              (sources only) Test all RSS/Atom source URLs for reachability
   --verbose            Show detailed progress
   --json               Output as JSON
   --ci                 JSON output for CI pipelines
@@ -338,6 +484,7 @@ Examples:
   crux auto-update run --count=3 --verbose       Update 3 pages with details
   crux auto-update digest --sources=openai-blog  Check one source
   crux auto-update sources                       List all sources
+  crux auto-update sources --check               Test all source URLs for reachability
   crux auto-update history                       Show recent runs
   crux auto-update run --dry-run                 Full pipeline without executing
 `;
