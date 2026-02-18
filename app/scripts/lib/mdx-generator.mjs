@@ -43,8 +43,19 @@ function generateMdxStub(entity) {
   // Include numericId so the page inherits the entity's stable ID
   const numericIdLine = entity.numericId ? `\nnumericId: ${entity.numericId}` : '';
 
+  // Include description from entity content intro if available
+  let descriptionLine = '';
+  if (entity.content?.intro) {
+    // Extract first sentence as description (up to 160 chars)
+    const firstSentence = entity.content.intro.split(/\.\s|\n/)[0].replace(/"/g, '\\"').trim();
+    if (firstSentence) {
+      const desc = firstSentence.length > 157 ? firstSentence.slice(0, 157) + '...' : firstSentence + '.';
+      descriptionLine = `\ndescription: "${desc}"`;
+    }
+  }
+
   return `---
-title: "${entity.title}"${numericIdLine}
+title: "${entity.title}"${descriptionLine}${numericIdLine}
 sidebar:
   order: ${sidebarOrder}
 ---

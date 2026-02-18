@@ -68,6 +68,9 @@ export function scanFrontmatterEntities(yamlEntityIds, contentDir) {
           if (fm.numericId) {
             entity.numericId = fm.numericId;
           }
+          if (fm.description) {
+            entity.description = fm.description;
+          }
           autoEntities.push(entity);
         }
       }

@@ -267,6 +267,31 @@ export function transformEntities(rawEntities, pages, experts, organizations) {
   // Apply overrides first
   const entities = applyEntityOverrides(rawEntities, pages);
 
+  // Enrich entity descriptions from page frontmatter when the entity has none.
+  // Many entities (from YAML or frontmatter auto-creation) lack descriptions,
+  // but their corresponding MDX pages have description fields in frontmatter.
+  const pageMap = new Map(pages.map(p => [p.id, p]));
+  for (const entity of entities) {
+    if (!entity.description) {
+      const page = pageMap.get(entity.id);
+      if (page?.description) {
+        entity.description = page.description;
+      } else if (entity.content?.intro) {
+        // Extract first sentence from YAML content intro (for entities without pages)
+        const text = entity.content.intro
+          .replace(/<[^>]+>/g, '') // Strip JSX/HTML tags
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Strip markdown links
+          .trim();
+        const firstSentence = text.split(/\.\s|\n\n/)[0]?.trim();
+        if (firstSentence && firstSentence.length > 10) {
+          entity.description = firstSentence.length > 157
+            ? firstSentence.slice(0, 157) + '...'
+            : firstSentence + (firstSentence.endsWith('.') ? '' : '.');
+        }
+      }
+    }
+  }
+
   // Build lookup maps
   const expertMap = new Map(experts.map(e => [e.id, e]));
   const orgMap = new Map(organizations.map(o => [o.id, o]));
