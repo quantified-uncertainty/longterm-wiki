@@ -469,7 +469,7 @@ function TimeseriesView({
                     {entries.some(e => e.low != null) && (
                       <td className="py-1.5 pr-4 text-muted-foreground text-xs">
                         {fact.low != null && fact.high != null
-                          ? `${formatCompact(fact.low)} \u2013 ${formatCompact(fact.high)}`
+                          ? `${formatWithMeasure(fact.low, def)} \u2013 ${formatWithMeasure(fact.high, def)}`
                           : "\u2014"}
                       </td>
                     )}
@@ -586,11 +586,11 @@ function formatCompact(n: number): string {
   if (Math.abs(n) >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
   if (Math.abs(n) >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
   if (Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
-  if (Math.abs(n) < 1 && n !== 0) return `${(n * 100).toFixed(0)}%`;
-  return String(n);
+  return n % 1 === 0 ? String(n) : n.toFixed(2);
 }
 
-/** Format a numeric value using the measure's display config if available */
+/** Format a numeric value using the measure's display config if available.
+ *  Note: percentages are stored as decimals (0.4 = 40%) in fact.numeric/low/high. */
 function formatWithMeasure(n: number, def?: FactMeasureDef): string {
   if (def?.display) {
     const { divisor, prefix, suffix } = def.display;
@@ -599,12 +599,24 @@ function formatWithMeasure(n: number, def?: FactMeasureDef): string {
     return `${prefix || ""}${formatted}${suffix || ""}`;
   }
   if (def?.unit === "USD") {
-    if (Math.abs(n) >= 1e12) return `$${(n / 1e12).toFixed(1)}T`;
-    if (Math.abs(n) >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-    if (Math.abs(n) >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
-    if (Math.abs(n) >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
-    return `$${n}`;
+    if (Math.abs(n) >= 1e12) return `$${cleanNum(n / 1e12)} trillion`;
+    if (Math.abs(n) >= 1e9) return `$${cleanNum(n / 1e9)} billion`;
+    if (Math.abs(n) >= 1e6) return `$${cleanNum(n / 1e6)} million`;
+    return `$${n.toLocaleString("en-US")}`;
   }
-  if (def?.unit === "percent") return `${n}%`;
+  if (def?.unit === "percent") {
+    // Stored as decimal (0.4 = 40%), convert back to display percentage
+    const pct = n * 100;
+    return `${pct % 1 === 0 ? String(pct) : pct.toFixed(1)}%`;
+  }
+  if (def?.unit === "count") {
+    if (Math.abs(n) >= 1e9) return `${cleanNum(n / 1e9)} billion`;
+    if (Math.abs(n) >= 1e6) return `${cleanNum(n / 1e6)} million`;
+    return n.toLocaleString("en-US");
+  }
   return formatCompact(n);
+}
+
+function cleanNum(n: number): string {
+  return n % 1 === 0 ? String(n) : n.toFixed(1);
 }

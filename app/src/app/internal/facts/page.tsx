@@ -38,7 +38,7 @@ export default function FactsPage() {
       <h1>Canonical Facts Dashboard</h1>
       <p className="text-muted-foreground">
         All canonical facts from the YAML fact store, used by the <code>&lt;F&gt;</code> component.
-        Facts are defined in <code>data/facts/*.yaml</code>, measures in <code>data/fact-metrics.yaml</code>.
+        Facts are defined in <code>data/facts/*.yaml</code>, measures in <code>data/fact-measures.yaml</code>.
       </p>
       <FactDashboard facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} />
     </article>

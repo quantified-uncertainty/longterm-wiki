@@ -962,7 +962,7 @@ export const Fact = z.object({
   noCompute: z.boolean().optional(),           // If true, numeric value cannot be referenced in compute expressions
   // Measure grouping — links this fact to a reusable measure definition
   // If omitted, the build pipeline auto-infers from the fact ID (e.g., "valuation-nov-2025" → "valuation")
-  measure: z.string().nullable().optional(),    // Measure ID from data/fact-metrics.yaml; null = explicit opt-out of auto-inference
+  measure: z.string().nullable().optional(),    // Measure ID from data/fact-measures.yaml; null = explicit opt-out of auto-inference
   // Subject override — defaults to the parent entity; use to assign a fact to a different subject
   // (e.g., subject: "industry-average" for benchmark facts that shouldn't appear in the entity's timeseries)
   subject: z.string().optional(),

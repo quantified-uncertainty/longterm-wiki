@@ -6,12 +6,15 @@
 3. **Structured values** — fact values can now be numbers (`380e9`), ranges (`[20e9, 26e9]`), or lower bounds (`{min: 67e9}`) instead of just strings. Build pipeline auto-derives display strings, numeric, low/high from the measure context.
 
 Also added `subject` field for benchmark facts, source URLs, and updated the dashboard.
+4. **PR review fixes** — renamed `fact-metrics.yaml` → `fact-measures.yaml` for naming consistency, fixed `formatCompact()` percentage detection bug (false positive on `n < 1`), aligned dashboard formatting with build-time formatting.
 
 **Pages:** (infrastructure-only, no wiki page edits)
 
 **Issues encountered:**
 - Naming collision between `metric` (entity type) and `metric` (fact field) — resolved by renaming to `measure`
 - Auto-inference was too aggressive for `revenue-yoy-growth-2024` (matched `revenue-` prefix) — fixed with `measure: ~` opt-out
+- `formatCompact()` in FactDashboard falsely detected any value < 1 as a percentage — fixed by removing heuristic and using measure context instead
+- Source YAML file was still named `fact-metrics.yaml` despite the rename to "measures" — renamed to `fact-measures.yaml`
 
 **Learnings/notes:**
 - Structured values: `value: 380e9` + measure `unit: USD` → auto-formatted as `"$380 billion"`
@@ -19,3 +22,4 @@ Also added `subject` field for benchmark facts, source URLs, and updated the das
 - Ranges: `value: [20e9, 26e9]` → `"$20-26 billion"`, auto-sets low/high/numeric
 - Lower bounds: `value: {min: 67e9}` → `"$67 billion+"`, handles the "+" suffix semantically
 - 20 measures, 16 auto-inferred, 32 structured values normalized, 31 timeseries observations
+- Dashboard formatting functions (`formatWithMeasure`, `formatCompact`) must be kept aligned with build-time formatters (`formatFactNumber`, `formatFactRange`)

@@ -998,8 +998,8 @@ async function main() {
     console.log(`  facts: ${totalFacts} canonical facts from ${factFiles.length} files`);
   }
 
-  // Load fact measure definitions from data/fact-metrics.yaml (needed for value normalization)
-  const factMeasuresPath = join(DATA_DIR, 'fact-metrics.yaml');
+  // Load fact measure definitions from data/fact-measures.yaml (needed for value normalization)
+  const factMeasuresPath = join(DATA_DIR, 'fact-measures.yaml');
   const factMeasures = {};
   if (existsSync(factMeasuresPath)) {
     const measuresContent = readFileSync(factMeasuresPath, 'utf-8');

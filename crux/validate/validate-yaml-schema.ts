@@ -188,7 +188,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   let validMeasureIds: Set<string> | null = null;
 
   // Load measure definitions first (for cross-reference validation)
-  const measuresPath = join(DATA_DIR, 'fact-metrics.yaml');
+  const measuresPath = join(DATA_DIR, 'fact-measures.yaml');
   if (existsSync(measuresPath)) {
     const measuresContent = readFileSync(measuresPath, 'utf-8');
     const measuresParsed = parseYaml(measuresContent);
@@ -196,7 +196,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     if (!measuresResult.success) {
       allErrors.push({
         file: measuresPath,
-        id: 'fact-metrics',
+        id: 'fact-measures',
         type: 'FactMeasuresFile',
         issues: formatZodErrors(measuresResult.error),
       });
@@ -234,7 +234,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
                 file: filepath,
                 id: `${result.data.entity}.${factId}`,
                 type: 'Fact',
-                issues: [`Unknown measure "${fact.measure}" — not defined in data/fact-metrics.yaml`],
+                issues: [`Unknown measure "${fact.measure}" — not defined in data/fact-measures.yaml`],
               });
             }
           }

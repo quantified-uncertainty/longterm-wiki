@@ -47,7 +47,7 @@ export interface Fact {
   source?: string;
   note?: string;
   noCompute?: boolean;
-  /** Measure ID from data/fact-metrics.yaml — groups related facts into timeseries.
+  /** Measure ID from data/fact-measures.yaml — groups related facts into timeseries.
    *  Auto-inferred from fact ID at build time if not set explicitly. */
   measure?: string;
   /** Subject override — defaults to parent entity. Use for benchmark/comparison facts
