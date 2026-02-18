@@ -136,6 +136,25 @@ try {
   // Column already exists, ignore error
 }
 
+// Add citation_content table for full article text storage (issue #200)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS citation_content (
+    url TEXT PRIMARY KEY,
+    page_id TEXT NOT NULL,
+    footnote INTEGER NOT NULL,
+    fetched_at TEXT NOT NULL,
+    http_status INTEGER,
+    content_type TEXT,
+    page_title TEXT,
+    full_html TEXT,
+    full_text TEXT,
+    content_length INTEGER,
+    content_hash TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_citation_content_page ON citation_content(page_id);
+`);
+
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -787,6 +806,89 @@ export const claims = {
       GROUP BY claim_type
     `).all() as ClaimStats[];
   }
+};
+
+// =============================================================================
+// CITATION CONTENT (full article text storage for verification — issue #200)
+// =============================================================================
+
+export interface CitationContentRow {
+  url: string;
+  page_id: string;
+  footnote: number;
+  fetched_at: string;
+  http_status: number | null;
+  content_type: string | null;
+  page_title: string | null;
+  full_html: string | null;
+  full_text: string | null;
+  content_length: number | null;
+  content_hash: string | null;
+  created_at: string;
+}
+
+export const citationContent = {
+  /**
+   * Store full content for a citation URL
+   */
+  upsert(data: {
+    url: string;
+    pageId: string;
+    footnote: number;
+    fetchedAt: string;
+    httpStatus: number | null;
+    contentType: string | null;
+    pageTitle: string | null;
+    fullHtml: string | null;
+    fullText: string | null;
+    contentLength: number | null;
+  }) {
+    const hash = data.fullText ? createHash('sha256').update(data.fullText).digest('hex').slice(0, 16) : null;
+    return db.prepare(`
+      INSERT OR REPLACE INTO citation_content
+        (url, page_id, footnote, fetched_at, http_status, content_type, page_title, full_html, full_text, content_length, content_hash)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      data.url, data.pageId, data.footnote, data.fetchedAt,
+      data.httpStatus, data.contentType, data.pageTitle,
+      data.fullHtml, data.fullText, data.contentLength, hash
+    );
+  },
+
+  /**
+   * Get stored content for a URL
+   */
+  getByUrl(url: string): CitationContentRow | null {
+    return db.prepare('SELECT * FROM citation_content WHERE url = ?').get(url) as CitationContentRow | null;
+  },
+
+  /**
+   * Get all stored content for a page
+   */
+  getByPage(pageId: string): CitationContentRow[] {
+    return db.prepare('SELECT * FROM citation_content WHERE page_id = ? ORDER BY footnote').all(pageId) as CitationContentRow[];
+  },
+
+  /**
+   * Count stored citations
+   */
+  count(): number {
+    return (db.prepare('SELECT COUNT(*) as count FROM citation_content').get() as { count: number }).count;
+  },
+
+  /**
+   * Get storage stats
+   */
+  stats(): { totalUrls: number; totalPages: number; totalBytes: number } {
+    const row = db.prepare(`
+      SELECT
+        COUNT(*) as totalUrls,
+        COUNT(DISTINCT page_id) as totalPages,
+        COALESCE(SUM(content_length), 0) as totalBytes
+      FROM citation_content
+    `).get() as { totalUrls: number; totalPages: number; totalBytes: number };
+    return row;
+  },
 };
 
 export interface DatabaseStats {

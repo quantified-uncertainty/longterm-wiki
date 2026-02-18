@@ -290,6 +290,9 @@ export interface FetchResult {
   pageTitle: string | null;
   contentSnippet: string | null;
   contentLength: number;
+  contentType: string | null;
+  fullHtml: string | null;
+  fullText: string | null;
   error: string | null;
 }
 
@@ -304,6 +307,9 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
       pageTitle: null,
       contentSnippet: null,
       contentLength: 0,
+      contentType: null,
+      fullHtml: null,
+      fullText: null,
       error: 'unverifiable domain (social media)',
     };
   }
@@ -319,6 +325,7 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
     });
 
     const status = response.status;
+    const contentType = response.headers.get('content-type') || '';
 
     if (!response.ok) {
       return {
@@ -326,21 +333,25 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
         pageTitle: null,
         contentSnippet: null,
         contentLength: 0,
+        contentType,
+        fullHtml: null,
+        fullText: null,
         error: `HTTP ${status}`,
       };
     }
 
-    const contentType = response.headers.get('content-type') || '';
     const isHtml = contentType.includes('text/html') || contentType.includes('application/xhtml');
     const isPdf = contentType.includes('application/pdf');
 
     if (isPdf) {
-      // PDFs exist but we can't extract content easily — mark as verified by status
       return {
         httpStatus: status,
         pageTitle: '(PDF document)',
         contentSnippet: null,
         contentLength: parseInt(response.headers.get('content-length') || '0', 10),
+        contentType,
+        fullHtml: null,
+        fullText: null,
         error: null,
       };
     }
@@ -351,6 +362,9 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
         pageTitle: null,
         contentSnippet: `(non-HTML content: ${contentType})`,
         contentLength: parseInt(response.headers.get('content-length') || '0', 10),
+        contentType,
+        fullHtml: null,
+        fullText: null,
         error: null,
       };
     }
@@ -365,6 +379,9 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
       pageTitle: title,
       contentSnippet: snippet || null,
       contentLength: html.length,
+      contentType,
+      fullHtml: html,
+      fullText: text,
       error: null,
     };
   } catch (err: unknown) {
@@ -374,13 +391,50 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
       pageTitle: null,
       contentSnippet: null,
       contentLength: 0,
+      contentType: null,
+      fullHtml: null,
+      fullText: null,
       error: message.includes('abort') ? 'timeout' : message,
     };
   }
 }
 
 /**
+ * Store full fetched content in the SQLite knowledge database.
+ * Lazy-loaded to avoid pulling in better-sqlite3 for read-only operations.
+ */
+let _citationContentModule: typeof import('./knowledge-db.ts') | null = null;
+
+async function storeCitationContent(
+  url: string,
+  pageId: string,
+  footnote: number,
+  result: FetchResult,
+) {
+  try {
+    if (!_citationContentModule) {
+      _citationContentModule = await import('./knowledge-db.ts');
+    }
+    _citationContentModule.citationContent.upsert({
+      url,
+      pageId,
+      footnote,
+      fetchedAt: new Date().toISOString(),
+      httpStatus: result.httpStatus,
+      contentType: result.contentType,
+      pageTitle: result.pageTitle,
+      fullHtml: result.fullHtml,
+      fullText: result.fullText,
+      contentLength: result.contentLength,
+    });
+  } catch {
+    // SQLite storage is best-effort — don't fail verification if DB is unavailable
+  }
+}
+
+/**
  * Verify all citations on a page: fetch each URL, store results.
+ * Metadata is saved to YAML (in git). Full content is stored in SQLite (.cache/knowledge.db).
  */
 export async function verifyCitationsForPage(
   pageId: string,
@@ -421,7 +475,6 @@ export async function verifyCitationsForPage(
             note: 'Social media domain — cannot verify automatically',
           };
         } else if (isSkipScrape(ext.url)) {
-          // For academic publishers: do a HEAD check only
           const result = await fetchCitationUrl(ext.url);
           record = {
             footnote: ext.footnote,
@@ -436,6 +489,8 @@ export async function verifyCitationsForPage(
             status: result.httpStatus >= 200 && result.httpStatus < 400 ? 'verified' : 'broken',
             note: result.error ? `Academic publisher: ${result.error}` : 'Academic publisher — URL accessible',
           };
+          // Store whatever content we got from academic publishers
+          await storeCitationContent(ext.url, pageId, ext.footnote, result);
         } else {
           const result = await fetchCitationUrl(ext.url);
           const status: VerificationStatus =
@@ -456,6 +511,10 @@ export async function verifyCitationsForPage(
             status,
             note: result.error,
           };
+          // Store full HTML + text content in SQLite for deep verification
+          if (result.fullHtml || result.fullText) {
+            await storeCitationContent(ext.url, pageId, ext.footnote, result);
+          }
         }
 
         if (verbose) {
