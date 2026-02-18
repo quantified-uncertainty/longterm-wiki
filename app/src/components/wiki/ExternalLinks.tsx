@@ -1,5 +1,5 @@
 import React from "react";
-import { ExternalLink, BookOpen, MessageSquare, GraduationCap, Briefcase } from "lucide-react";
+import { ExternalLink, BookOpen, MessageSquare, GraduationCap, Briefcase, Bot } from "lucide-react";
 
 // Re-use the canonical type from the data layer
 import type { ExternalLinksData } from "@/data";
@@ -13,6 +13,7 @@ const platformConfig = {
   stampy: { name: "AI Safety Info", icon: MessageSquare },
   arbital: { name: "Arbital", icon: BookOpen },
   eightyK: { name: "80,000 Hours", icon: Briefcase },
+  grokipedia: { name: "Grokipedia", icon: Bot },
 };
 
 type PlatformKey = keyof typeof platformConfig;

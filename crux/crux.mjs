@@ -55,6 +55,7 @@ import * as ciCommands from './commands/ci.ts';
 import * as maintainCommands from './commands/maintain.ts';
 import * as autoUpdateCommands from './commands/auto-update.ts';
 import * as reviewCommands from './commands/review.ts';
+import * as grokipediaCommands from './commands/grokipedia.ts';
 
 const domains = {
   validate: validateCommands,
@@ -72,6 +73,7 @@ const domains = {
   ci: ciCommands,
   maintain: maintainCommands,
   review: reviewCommands,
+  grokipedia: grokipediaCommands,
 };
 
 /**
