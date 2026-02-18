@@ -24,14 +24,54 @@
  *   1 = One or more checks failed
  */
 
-import { spawn, type ChildProcess } from 'child_process';
+import { execSync, spawn, type ChildProcess } from 'child_process';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 
 const args: string[] = process.argv.slice(2);
-const FULL_MODE: boolean = args.includes('--full');
 const FIX_MODE: boolean = args.includes('--fix');
 const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
+
+/**
+ * Auto-detect whether --full (Next.js build) is needed based on changed files.
+ * Triggers when the diff includes app page components or data files that are
+ * prerendered at build time (e.g. auto-update YAML that dashboards read).
+ */
+function shouldAutoEscalateToFull(): boolean {
+  try {
+    // Check all files changed on the branch vs main (covers all commits being pushed).
+    // Falls back to HEAD~1 if merge-base fails (e.g. shallow clone).
+    let diffOutput = '';
+    try {
+      const base = execSync('git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
+        { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
+      if (base) {
+        diffOutput = execSync(`git diff --name-only ${base} HEAD`,
+          { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
+      }
+    } catch {
+      diffOutput = execSync('git diff --name-only HEAD~1 HEAD 2>/dev/null || echo ""',
+        { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
+    }
+    if (!diffOutput) return false;
+
+    const files = diffOutput.split('\n');
+    return files.some(f =>
+      // App page components (prerendered by Next.js)
+      f.startsWith('app/src/app/') ||
+      // Auto-update run data (read by dashboard pages at build time)
+      f.startsWith('data/auto-update/runs/') ||
+      // Auto-update state/sources (read by dashboard pages at build time)
+      (f.startsWith('data/auto-update/') && f.endsWith('.yaml'))
+    );
+  } catch {
+    return false;
+  }
+}
+
+const EXPLICIT_FULL: boolean = args.includes('--full');
+const AUTO_FULL: boolean = !EXPLICIT_FULL && shouldAutoEscalateToFull();
+const FULL_MODE: boolean = EXPLICIT_FULL || AUTO_FULL;
 
 const c = getColors(CI_MODE);
 
@@ -201,6 +241,9 @@ async function main(): Promise<void> {
     console.log(`\n${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`);
     console.log(`${c.bold}${c.blue}  Gate Check (${mode})${c.reset}`);
     console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}\n`);
+    if (AUTO_FULL) {
+      console.log(`${c.dim}  Auto-escalated to full build (app pages or data files changed)${c.reset}`);
+    }
     console.log(`${c.dim}  Running ${STEPS.length} CI-blocking checks...${c.reset}\n`);
   }
 
