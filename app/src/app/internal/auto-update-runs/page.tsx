@@ -59,6 +59,12 @@ export interface RunRow {
   results: RunReport["execution"]["results"];
 }
 
+/** js-yaml parses bare dates (e.g. 2026-02-18) as Date objects. Coerce to string. */
+function str(val: unknown): string {
+  if (val instanceof Date) return val.toISOString();
+  return String(val ?? "");
+}
+
 function loadRunReports(): RunRow[] {
   const runsDir = path.resolve(process.cwd(), "../data/auto-update/runs");
   if (!fs.existsSync(runsDir)) return [];
@@ -74,12 +80,12 @@ function loadRunReports(): RunRow[] {
     try {
       const raw = fs.readFileSync(path.join(runsDir, file), "utf-8");
       const report = yaml.load(raw) as RunReport;
-      const startMs = new Date(report.startedAt).getTime();
-      const endMs = new Date(report.completedAt).getTime();
+      const startMs = new Date(str(report.startedAt)).getTime();
+      const endMs = new Date(str(report.completedAt)).getTime();
 
       rows.push({
-        date: report.date,
-        startedAt: report.startedAt,
+        date: str(report.date).slice(0, 10),
+        startedAt: str(report.startedAt),
         trigger: report.trigger || "manual",
         sourcesChecked: report.digest.sourcesChecked,
         sourcesFailed: report.digest.sourcesFailed,

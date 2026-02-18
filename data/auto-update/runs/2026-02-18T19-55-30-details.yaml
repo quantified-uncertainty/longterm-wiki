@@ -1,0 +1,60 @@
+digest:
+  date: 2026-02-18
+  itemCount: 2
+  items:
+    - title: Dario Amodei — "The Urgency of Interpretability"
+      url: https://www.darioamodei.com/post/the-urgency-of-interpretability
+      sourceId: anthropic-blog
+      publishedAt: 2026-02-18
+      summary: Amodei states that recent progress — especially results on circuits and interpretability-based testing — has
+        made him feel that Anthropic is "on the verge of cracking interpretability in a big way," with a realistic path
+        towards interpretability becoming a sophisticated and reliable way to diagnose problems in even very advanced
+        AI. He notes it is likely that a key part of how the most capable models will be tested and deployed — such as
+        those at AI Safety Level 4 — will involve performing and f
+      relevanceScore: 90
+      topics:
+        - interpretability
+        - safety-research
+        - circuits
+        - alignment-progress
+      entities:
+        - interpretability-sufficient
+        - safety-research
+        - alignment-progress
+        - anthropic-impact
+    - title: Anthropic Research Hub (Official Page)
+      url: https://www.anthropic.com/research
+      sourceId: anthropic-blog
+      publishedAt: 2026-02-18
+      summary: " Anthropic's research teams investigate the safety, inner workings, and societal impacts of AI models — so
+        that artificial intelligence has a positive impact as it becomes increasingly capable. Recent circuit-tracing
+        work lets researchers watch Claude think, uncovering a shared conceptual space where reasoning happens before
+        being translated into language. One paper provides the first empirical example of a model engaging in alignment
+        faking without being trained to do so — selectively complying"
+      relevanceScore: 85
+      topics:
+        - safety-research
+        - interpretability
+        - ai-safety
+        - anthropic
+      entities:
+        - anthropic-impact
+        - safety-research
+        - __index__/knowledge-base
+  fetchedSources:
+    - anthropic-blog
+  failedSources: []
+plan:
+  date: 2026-02-18
+  pageUpdates: []
+  newPageSuggestions: []
+  skippedReasons:
+    - item: Alignment Progress
+      reason: Exceeded budget
+    - item: Safety Research & Resources
+      reason: Exceeded budget
+    - item: Anthropic Impact Assessment Model
+      reason: Exceeded budget
+    - item: Is Interpretability Sufficient for Safety?
+      reason: Exceeded budget
+  estimatedCost: 0

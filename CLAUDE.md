@@ -14,7 +14,11 @@ pnpm setup:check                 # Check environment without changing anything
 
 # Development
 pnpm dev                         # Start dev server on port 3001
-pnpm build                      # Production build (runs build-data automatically)
+pnpm build                      # Production build (runs assign-ids + build-data automatically)
+
+# Numeric ID assignment (issue #245)
+node app/scripts/assign-ids.mjs              # Assign numericIds to new entities/pages
+node app/scripts/assign-ids.mjs --dry-run    # Preview assignments without writing files
 
 # Testing
 pnpm test                        # Run vitest tests

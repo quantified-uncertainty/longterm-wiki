@@ -9,7 +9,8 @@
 #   name:        Human-readable name
 #   type:        rss | atom | web-search
 #   url:         Feed URL (for rss/atom types)
-#   query:       Search query (for web-search types)
+#   query:       Search query (for web-search types; uses Exa API if EXA_API_KEY
+#                is set, otherwise falls back to Anthropic web_search tool)
 #   frequency:   How often to check: daily | twice-daily | weekly
 #   categories:  Topic categories this source covers (used for routing)
 #   reliability: high | medium | low (affects how aggressively we trust items)
@@ -182,7 +183,7 @@ sources:
     type: rss
     url: https://rss.arxiv.org/rss/cs.AI
     frequency: daily
-    categories: [research, safety, alignment, models]
+    categories: [research, safety, alignment, models, interpretability]
     reliability: high
     enabled: true
 
@@ -191,7 +192,7 @@ sources:
     type: rss
     url: https://rss.arxiv.org/rss/cs.CL
     frequency: daily
-    categories: [research, models, interpretability]
+    categories: [research, models, interpretability, capabilities]
     reliability: high
     enabled: true
 
