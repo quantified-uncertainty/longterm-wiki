@@ -31,6 +31,13 @@ pnpm crux validate hallucination-risk         # Risk assessment report
 pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
 pnpm crux review mark <id> --reviewer="name"  # Mark page as human-reviewed
 pnpm crux review list                         # List reviewed pages
+
+# Citation verification & archival
+pnpm crux citations verify <id>              # Verify all citations on a page
+pnpm crux citations verify --all --limit=20  # Verify top 20 pages with citations
+pnpm crux citations status <id>              # Show verification results for a page
+pnpm crux citations report                   # Summary across all archived pages
+pnpm crux citations report --broken          # List all broken citations
 ```
 
 ## Repository Structure
