@@ -38,21 +38,21 @@ export function printStats(results: PageResult[]): void {
     console.log(`  Bottom 5: ${importanceScores.slice(-5).map(x => x.toFixed(1)).join(', ')}`);
   }
 
-  const qualRanges: Record<string, number> = {
-    '80-100 (Comprehensive)': qualityScores.filter(x => x >= 80).length,
-    '60-79 (Good)': qualityScores.filter(x => x >= 60 && x < 80).length,
-    '40-59 (Adequate)': qualityScores.filter(x => x >= 40 && x < 60).length,
-    '20-39 (Draft)': qualityScores.filter(x => x >= 20 && x < 40).length,
-    '0-19 (Stub)': qualityScores.filter(x => x < 20).length,
-  };
-
-  console.log('\nQuality Distribution (0-100):');
-  for (const [range, count] of Object.entries(qualRanges)) {
-    const bar = '\u2588'.repeat(Math.ceil(count / 3));
-    console.log(`  ${range}: ${bar} (${count})`);
-  }
-
   if (qualityScores.length > 0) {
+    const qualRanges: Record<string, number> = {
+      '80-100 (Comprehensive)': qualityScores.filter(x => x >= 80).length,
+      '60-79 (Good)': qualityScores.filter(x => x >= 60 && x < 80).length,
+      '40-59 (Adequate)': qualityScores.filter(x => x >= 40 && x < 60).length,
+      '20-39 (Draft)': qualityScores.filter(x => x >= 20 && x < 40).length,
+      '0-19 (Stub)': qualityScores.filter(x => x < 20).length,
+    };
+
+    console.log('\nQuality Distribution (0-100):');
+    for (const [range, count] of Object.entries(qualRanges)) {
+      const bar = '\u2588'.repeat(Math.ceil(count / 3));
+      console.log(`  ${range}: ${bar} (${count})`);
+    }
+
     const qualAvg: number = qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length;
     const qualMedian: number = qualityScores[Math.floor(qualityScores.length / 2)];
     console.log(`\n  Avg: ${qualAvg.toFixed(1)}, Median: ${qualMedian.toFixed(1)}`);

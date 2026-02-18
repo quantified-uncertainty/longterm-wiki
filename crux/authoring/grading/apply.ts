@@ -7,13 +7,13 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { FRONTMATTER_RE } from '../../lib/patterns.ts';
-import type { PageInfo, GradeResult } from './types.ts';
+import type { PageInfo, GradeResult, Metrics } from './types.ts';
 
 /** Apply grades to frontmatter YAML in the source file. */
 export function applyGradesToFile(
   page: PageInfo,
   grades: GradeResult,
-  metrics: { wordCount: number; citations: number; tables: number; diagrams: number },
+  metrics: Metrics,
   derivedQuality: number,
 ): boolean {
   const content = readFileSync(page.filePath, 'utf-8');

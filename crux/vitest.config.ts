@@ -7,6 +7,7 @@ export default defineConfig({
     include: [
       'lib/**/*.test.ts',
       'authoring/**/*.test.ts',
+      'link-checker/**/*.test.ts',
     ],
     // creator.test.ts imports source-fetching.ts which eagerly loads
     // better-sqlite3 native bindings via knowledge-db.ts at module scope.

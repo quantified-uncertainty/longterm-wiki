@@ -24,6 +24,7 @@
  *   --warnings-only    Run Steps 1-2, skip rating (Step 3)
  */
 
+import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '../../lib/anthropic.ts';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
@@ -70,7 +71,7 @@ function parseOptions(argv: string[]): Options {
 // ── Page Processing ──────────────────────────────────────────────────────────
 
 async function processPage(
-  client: ReturnType<typeof createClient>,
+  client: Anthropic,
   page: PageInfo,
   index: number,
   total: number,

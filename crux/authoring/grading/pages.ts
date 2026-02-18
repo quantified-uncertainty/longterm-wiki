@@ -12,9 +12,6 @@ import { parseFrontmatter } from '../../lib/mdx-utils.ts';
 import { findMdxFiles } from '../../lib/file-utils.ts';
 import type { Frontmatter, PageInfo } from './types.ts';
 
-/** Alias for shared parseFrontmatter. */
-const extractFrontmatter = parseFrontmatter;
-
 /**
  * Detect page type based on filename and frontmatter.
  * - 'overview': index.mdx files (navigation pages)
@@ -34,7 +31,7 @@ export function collectPages(): PageInfo[] {
 
   for (const fullPath of files) {
     const content = readFileSync(fullPath, 'utf-8');
-    const fm = extractFrontmatter(content) as Frontmatter;
+    const fm = parseFrontmatter(content) as Frontmatter;
     const entry = basename(fullPath);
     const id = basename(entry, entry.endsWith('.mdx') ? '.mdx' : '.md');
 
@@ -57,7 +54,7 @@ export function collectPages(): PageInfo[] {
       subcategory,
       isModel,
       pageType,
-      contentFormat: fm.contentFormat || 'article',
+      contentFormat: (fm.contentFormat as string) || 'article',
       currentReaderImportance: fm.readerImportance ?? null,
       currentQuality: fm.quality ?? null,
       currentRatings: fm.ratings ?? null,
