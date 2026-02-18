@@ -78,8 +78,8 @@ flowchart TD
 | Risk | Relevance | How It Helps |
 |------|-----------|--------------|
 | <EntityLink id="misuse">Misuse</EntityLink> | High | Prevents jailbreaks that could enable harmful content generation |
-| <EntityLink id="prompt-injection">Prompt Injection</EntityLink> | High | Trains models to distinguish instructions from data |
-| <EntityLink id="jailbreaking">Jailbreaking</EntityLink> | High | Primary defense against circumventing safety guidelines |
+| Prompt Injection | High | Trains models to distinguish instructions from data |
+| Jailbreaking | High | Primary defense against circumventing safety guidelines |
 | <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink> | None | Does not address internal model goals or hidden objectives |
 | <EntityLink id="goal-misgeneralization">Goal Misgeneralization</EntityLink> | None | Targets external inputs, not internal learned representations |
 
@@ -298,6 +298,6 @@ Adversarial training relates to the <EntityLink id="ai-transition-model" /> thro
 | Factor | Parameter | Impact |
 |--------|-----------|--------|
 | <EntityLink id="misalignment-potential" /> | Attack surface | Reduces but doesn't eliminate vulnerability |
-| <EntityLink id="deployment-decisions" /> | Deployment safety | Necessary for responsible deployment |
+| Deployment Decisions | Deployment safety | Necessary for responsible deployment |
 
 Adversarial training is important operational security but doesn't address fundamental alignment challenges - it defends against external attacks while the deeper concern is internal model properties.
