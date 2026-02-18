@@ -25,6 +25,7 @@ import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
+import { detectReassignments, scanEntityLinkRefs, formatReassignments } from './lib/id-stability.mjs';
 
 // ---------------------------------------------------------------------------
 // Structured value formatting — converts numeric fact values to display strings
@@ -846,6 +847,18 @@ async function main() {
   // The id-registry.json is generated as a derived build artifact only.
   // =========================================================================
   const ID_REGISTRY_FILE = join(DATA_DIR, 'id-registry.json');
+  const ALLOW_ID_REASSIGNMENT = process.argv.includes('--allow-id-reassignment');
+
+  // Load previous registry for stability check (before overwriting)
+  let prevRegistry = null;
+  if (existsSync(ID_REGISTRY_FILE)) {
+    try {
+      prevRegistry = JSON.parse(readFileSync(ID_REGISTRY_FILE, 'utf-8'));
+    } catch {
+      // Corrupted registry — will be regenerated
+    }
+  }
+
   const slugToNumericId = {};
   const numericIdToSlug = {};
   const conflicts = [];
@@ -866,6 +879,44 @@ async function main() {
     console.error('\n  ERROR: numericId conflicts detected:');
     for (const c of conflicts) console.error(`    ${c}`);
     process.exit(1);
+  }
+
+  // -------------------------------------------------------------------------
+  // ID Stability Check — detect silent reassignments (issue #148)
+  //
+  // Compare the newly collected slug↔ID mappings against the previous
+  // id-registry.json. If any slug's numeric ID changed, or any numeric ID
+  // now points to a different slug, report the reassignment and scan for
+  // EntityLink references that would break.
+  // -------------------------------------------------------------------------
+  if (prevRegistry?.entities && !ALLOW_ID_REASSIGNMENT) {
+    const reassignments = detectReassignments(prevRegistry, numericIdToSlug, slugToNumericId);
+
+    if (reassignments.length > 0) {
+      console.error('\n  ERROR: Numeric ID reassignment detected! (issue #148)');
+      console.error('  The following entity IDs changed between builds:\n');
+
+      const { lines, affectedIds } = formatReassignments(reassignments);
+      for (const line of lines) {
+        console.error(`  ${line}`);
+      }
+
+      // Scan content files for EntityLink references using affected numeric IDs
+      const CONTENT_SCAN_DIR = join(PROJECT_ROOT, '..', 'content', 'docs');
+      const brokenRefs = scanEntityLinkRefs(CONTENT_SCAN_DIR, affectedIds);
+
+      if (brokenRefs.length > 0) {
+        console.error(`\n  ${brokenRefs.length} EntityLink reference(s) would break:\n`);
+        for (const ref of brokenRefs) {
+          const relPath = relative(CONTENT_SCAN_DIR, ref.file);
+          console.error(`    ${relPath}:${ref.line} — id="${ref.id}"`);
+        }
+      }
+
+      console.error('\n  To fix: restore the original numericId values in source files.');
+      console.error('  To override: re-run with --allow-id-reassignment\n');
+      process.exit(1);
+    }
   }
 
   // Compute next available ID from existing assignments.
