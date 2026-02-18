@@ -43,9 +43,11 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
      ```
    - If no PR exists (empty array), create one:
      ```bash
+     PR_TITLE="<descriptive title>"
+     PR_BODY="<summary>"
      curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
        "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls" \
-       -d "{\"title\": \"<descriptive title>\", \"head\": \"$BRANCH\", \"base\": \"main\", \"body\": \"<summary>\"}"
+       -d "$(jq -n --arg t "$PR_TITLE" --arg h "$BRANCH" --arg b "$PR_BODY" '{title: $t, head: $h, base: "main", body: $b}')"
      ```
    - If a PR exists, note its number and move on.
 

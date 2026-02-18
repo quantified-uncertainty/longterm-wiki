@@ -17,6 +17,17 @@ For each change, ask:
 - If types were changed, do all usages still type-check?
 - Were any imports added that don't exist, or removed when still needed?
 
+## Step 2.5: Project-specific checks
+
+These are the most common bug categories from recent PRs — check each one:
+
+- **EntityLinks**: Every `<EntityLink id="X">` must have a matching `- id: X` in `data/entities/*.yaml`. Grep for `EntityLink` in changed files and verify each ID resolves. Path-style IDs (e.g., `risks/accident/scheming`) are wrong — use the slug (e.g., `scheming`).
+- **Numeric ID stability**: If entity YAML files were modified, check that no `numericId` values were removed or changed. The build will fail if IDs are reassigned (see issue #148).
+- **MDX escaping**: Scan changed `.mdx` files for unescaped `$` (must be `\$`) and `<` in prose (must be `\<`). These are CI-blocking.
+- **Content accuracy**: For wiki page edits, watch for hallucination signals: round-number statistics ("300%", "50-75%"), specific dates without citations, and claims that contradict data on the same page. These have been the most common factual errors.
+- **Shell injection in curl**: Any `curl -d` that interpolates variables into JSON must use proper quoting or `jq` to construct the payload. Raw string interpolation of titles/descriptions into JSON is vulnerable.
+- **crux/ TypeScript**: If `crux/` files were modified, run `cd crux && npx tsc --noEmit` — crux has its own tsconfig that isn't covered by the app-level type check in the gate.
+
 ## Step 3: Check for regressions and unintended side effects
 
 - Did any change accidentally modify behavior that should have stayed the same?

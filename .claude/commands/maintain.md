@@ -49,11 +49,13 @@ The report categorizes work into priority tiers. Review the output and decide wh
 
 ### Filing new issues
 
-When the sweep reveals problems too large to fix now, **create GitHub issues** so they aren't lost:
+When the sweep reveals problems too large to fix now, **create GitHub issues** so they aren't lost. Use `jq` to safely construct the JSON payload (avoids shell injection from titles/descriptions containing quotes or special characters):
 ```bash
+TITLE="<title>"
+BODY="<description>"
 curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
   "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues" \
-  -d '{"title": "<title>", "body": "<description>", "labels": ["enhancement"]}'
+  -d "$(jq -n --arg t "$TITLE" --arg b "$BODY" '{title: $t, body: $b, labels: ["enhancement"]}')"
 ```
 
 This is a key output of maintenance — converting discovered problems into tracked work items.
@@ -75,13 +77,16 @@ Work through the prioritized list:
 ### Closing resolved issues
 For each issue the triage report flagged as "Potentially Resolved," verify it was actually fixed, then comment and close:
 ```bash
+NUMBER=<issue number>
+COMMENT="Resolved by #<PR_NUMBER>. <brief explanation>"
+
 # Comment explaining resolution
 curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/<NUMBER>/comments" \
-  -d '{"body": "Resolved by #<PR_NUMBER>. <brief explanation>"}'
+  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${NUMBER}/comments" \
+  -d "$(jq -n --arg b "$COMMENT" '{body: $b}')"
 # Close the issue
 curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/<NUMBER>" \
+  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${NUMBER}" \
   -d '{"state": "closed", "state_reason": "completed"}'
 ```
 
