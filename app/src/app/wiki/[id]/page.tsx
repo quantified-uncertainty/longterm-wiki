@@ -13,9 +13,9 @@ import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RelatedPages } from "@/components/RelatedPages";
-import { WikiSidebar } from "@/components/wiki/WikiSidebar";
+import { WikiSidebar, MobileSidebarTrigger } from "@/components/wiki/WikiSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { detectSidebarType, getWikiNav } from "@/lib/wiki-nav";
+import { detectSidebarType, getWikiNav, isAboutPage } from "@/lib/wiki-nav";
 import { AlertTriangle, Database, Github } from "lucide-react";
 import { PageFeedback } from "@/components/wiki/PageFeedback";
 import type { Metadata } from "next";
@@ -59,6 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const isInternal = entityPath?.startsWith("/internal");
+  const isAbout = entityPath ? isAboutPage(entityPath) : false;
   const title = entity?.title || pageData?.title || slug;
   const description = entity?.description || pageData?.description || undefined;
   const format = (pageData?.contentFormat || "article") as ContentFormat;
@@ -66,8 +67,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    // Internal pages should not be indexed by search engines
-    ...(isInternal && { robots: { index: false, follow: false } }),
+    // Internal pages (but not About pages) should not be indexed by search engines
+    ...(isInternal && !isAbout && { robots: { index: false, follow: false } }),
     openGraph: {
       title,
       description,
@@ -130,12 +131,14 @@ function ContentMeta({
   slug,
   contentFormat,
   isInternal,
+  isAbout,
 }: {
   page: MdxPage;
   pageData: Page | undefined;
   slug: string;
   contentFormat: ContentFormat;
   isInternal?: boolean;
+  isAbout?: boolean;
 }) {
   const lastUpdated = pageData?.lastUpdated;
   const githubUrl = pageData?.filePath
@@ -151,6 +154,7 @@ function ContentMeta({
         category={pageData?.category}
         title={page.frontmatter.title || entity?.title}
         isInternal={isInternal}
+        isAbout={isAbout}
       />
       <div className="page-meta">
         {lastUpdated && (
@@ -222,6 +226,7 @@ function ContentView({
   const formatInfo = CONTENT_FORMAT_INFO[contentFormat];
   const isArticle = contentFormat === "article";
   const isInternal = entityPath.startsWith("/internal");
+  const isAbout = isAboutPage(entityPath);
 
   return (
     <InfoBoxVisibilityProvider>
@@ -232,6 +237,7 @@ function ContentView({
         slug={slug}
         contentFormat={contentFormat}
         isInternal={isInternal}
+        isAbout={isAbout}
       />
       {!isInternal && (
         <ContentConfidenceBanner
@@ -304,6 +310,9 @@ function WithSidebar({
     <SidebarProvider>
       <WikiSidebar sections={sections} />
       <div className="flex-1 min-w-0">
+        <div className="md:hidden px-4 pt-3">
+          <MobileSidebarTrigger />
+        </div>
         <div className={contentClass}>{children}</div>
       </div>
     </SidebarProvider>
