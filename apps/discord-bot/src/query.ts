@@ -11,7 +11,7 @@ export interface QueryResult {
   model?: string;
 }
 
-function buildPrompt(question: string): string {
+export function buildPrompt(question: string): string {
   return `Answer this question about the LongtermWiki AI safety wiki: "${question}"
 
 The wiki content is at: ${WIKI_CONTENT_PATH}/

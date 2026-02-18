@@ -66,7 +66,7 @@ const PHASE_LABELS: Record<ChecklistPhase, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Checklist Item Catalog (~28 items)
+// Checklist Item Catalog (~29 items)
 // ---------------------------------------------------------------------------
 
 export const CHECKLIST_ITEMS: ChecklistItem[] = [
@@ -277,6 +277,13 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Works in Claude Code web sandboxes (limited network) and local dev.',
     phase: 'review',
     applicableTypes: ['infrastructure', 'commands'],
+  },
+  {
+    id: 'ci-coverage',
+    label: 'CI covers new code',
+    description: 'If you added a new test suite, package, or build step: verify it is wired into `.github/workflows/ci.yml`. New `pnpm test` invocations or scripts need a corresponding CI job step — they do not run automatically.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'commands', 'refactor'],
   },
 
   // Phase 4: Ship
