@@ -82,6 +82,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           SCRY_API_KEY: ${{ secrets.SCRY_API_KEY }}
           FIRECRAWL_KEY: ${{ secrets.FIRECRAWL_KEY }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
         run: |
           ARGS="--trigger=scheduled --verbose"
 

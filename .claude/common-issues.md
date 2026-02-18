@@ -72,6 +72,15 @@ npx node-gyp rebuild
 
 ---
 
+## Network / Proxy
+
+### Next.js server-side fetch() ignores HTTPS_PROXY by default
+Node.js's built-in `fetch()` (undici) does NOT respect `HTTPS_PROXY`/`HTTP_PROXY` env vars unless `NODE_USE_ENV_PROXY=1` is set. This causes silent failures when any server component makes outbound HTTP calls (e.g. the GitHub Issues dashboard). The flag is a no-op when no proxy is configured, so it's safe to include unconditionally in `dev`/`build`/`start` scripts in `app/package.json`.
+
+The `crux` CLI already sets this via `NODE_USE_ENV_PROXY=1 node ...` in the root `package.json`.
+
+---
+
 ## Environment Detection
 
 ### Crux content pipeline auto-detects API-direct mode
