@@ -1,9 +1,10 @@
 entity: sam-altman
 facts:
   net-worth:
-    value: "$2.8 billion"
+    value: 2.8e9
     asOf: "2024"
 
+  # Standalone facts (no measure — keep as strings)
   openai-salary:
     value: "$76,001/year"
     asOf: "2024"
@@ -26,12 +27,14 @@ facts:
     note: "738 of 770 employees signed letter threatening to quit"
 
   worldcoin-users:
-    value: "26 million"
+    measure: user-count
+    value: 26e6
     asOf: "2024"
     note: "Total users on Worldcoin network"
 
   worldcoin-verified:
-    value: "12 million"
+    measure: user-count
+    value: 12e6
     asOf: "2024"
     note: "Verified Worldcoin users (via orb)"
 

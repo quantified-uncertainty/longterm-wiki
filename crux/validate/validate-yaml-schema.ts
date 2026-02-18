@@ -14,7 +14,7 @@ import { join, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { fileURLToPath } from 'url';
 import { getColors, isCI, formatPath } from '../lib/output.ts';
-import { Entity, Resource, Publication, Intervention, Proposal } from '../../data/schema.ts';
+import { Entity, Resource, Publication, Intervention, Proposal, FactsFile, FactMeasuresFile } from '../../data/schema.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { ZodSchema, ZodError, ZodIssue } from 'zod';
 import type { Colors } from '../lib/output.ts';
@@ -180,6 +180,69 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const propErrors = validateItems(proposals, Proposal, 'Proposal');
   allErrors.push(...propErrors);
   if (!ciMode) console.log(`  ${proposals.length} proposals loaded`);
+
+  // 6. Validate facts/*.yaml against FactsFile schema and check measure references
+  if (!ciMode) console.log(`${colors.dim}Checking facts...${colors.reset}`);
+  const factsDir = join(DATA_DIR, 'facts');
+  let totalFacts = 0;
+  let validMeasureIds: Set<string> | null = null;
+
+  // Load measure definitions first (for cross-reference validation)
+  const measuresPath = join(DATA_DIR, 'fact-measures.yaml');
+  if (existsSync(measuresPath)) {
+    const measuresContent = readFileSync(measuresPath, 'utf-8');
+    const measuresParsed = parseYaml(measuresContent);
+    const measuresResult = FactMeasuresFile.safeParse(measuresParsed);
+    if (!measuresResult.success) {
+      allErrors.push({
+        file: measuresPath,
+        id: 'fact-measures',
+        type: 'FactMeasuresFile',
+        issues: formatZodErrors(measuresResult.error),
+      });
+    } else {
+      validMeasureIds = new Set(Object.keys(measuresResult.data.measures));
+      if (!ciMode) console.log(`  ${validMeasureIds.size} measure definitions loaded`);
+    }
+    totalValidated++;
+  }
+
+  // Validate each facts file
+  if (existsSync(factsDir)) {
+    const factFiles = readdirSync(factsDir).filter(f => f.endsWith('.yaml'));
+    for (const file of factFiles) {
+      const filepath = join(factsDir, file);
+      const content = readFileSync(filepath, 'utf-8');
+      const parsed = parseYaml(content);
+      totalValidated++;
+
+      const result = FactsFile.safeParse(parsed);
+      if (!result.success) {
+        allErrors.push({
+          file: filepath,
+          id: basename(file, '.yaml'),
+          type: 'FactsFile',
+          issues: formatZodErrors(result.error),
+        });
+      } else {
+        totalFacts += Object.keys(result.data.facts).length;
+        // Cross-reference: check that measure values point to valid measure IDs
+        if (validMeasureIds) {
+          for (const [factId, fact] of Object.entries(result.data.facts)) {
+            if (fact.measure && !validMeasureIds.has(fact.measure)) {
+              allErrors.push({
+                file: filepath,
+                id: `${result.data.entity}.${factId}`,
+                type: 'Fact',
+                issues: [`Unknown measure "${fact.measure}" — not defined in data/fact-measures.yaml`],
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+  if (!ciMode) console.log(`  ${totalFacts} facts across ${existsSync(factsDir) ? readdirSync(factsDir).filter(f => f.endsWith('.yaml')).length : 0} files`);
 
   // Output Results
   console.log();
