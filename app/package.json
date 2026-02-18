@@ -59,7 +59,7 @@
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
     "@vitest/ui": "^4.0.18",
-    "puppeteer": "^24.37.2",
+    "playwright": "^1.50.0",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "typescript": "^5.9.3",

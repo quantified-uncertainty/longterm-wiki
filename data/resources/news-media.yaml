@@ -1281,3 +1281,194 @@
   cited_by:
     - corporate-influence
   publication_id: fortune
+
+# === Fact source resources ===
+
+# Anthropic financial fact sources
+# Note: 787a2639f9e64ca5 (CNBC Anthropic $350B valuation) already in web-other.yaml
+
+- id: cb2a21a2cd1472e3
+  url: https://www.bloomberg.com/news/articles/2026-01-21/anthropic-s-revenue-run-rate-tops-9-billion-as-vcs-pile-in
+  title: "Anthropic's Revenue Run Rate Tops $9 Billion as VCs Pile In"
+  type: web
+  publication_id: bloomberg
+  cited_by:
+    - anthropic
+  tags:
+    - revenue
+    - ai-labs
+
+- id: e590534db9ece639
+  url: https://www.reuters.com/business/anthropic-hits-3-billion-annualized-revenue-business-demand-ai-2025-05-30/
+  title: "Anthropic hits $3 billion annualized revenue on business demand for AI"
+  type: web
+  publication_id: reuters
+  cited_by:
+    - anthropic
+  tags:
+    - revenue
+    - ai-labs
+
+- id: cb3e2358bd128df5
+  url: https://finance.yahoo.com/news/exclusive-anthropic-aims-nearly-triple-170234463.html
+  title: "Exclusive: Anthropic aims to nearly triple annualized revenue in 2026"
+  type: web
+  publication_id: reuters
+  cited_by:
+    - anthropic
+  tags:
+    - revenue
+    - ai-labs
+
+- id: 7483f41af6325c71
+  url: https://www.theinformation.com/articles/anthropic-lowers-profit-margin-projection-revenue-skyrockets
+  title: "Anthropic Lowers Gross Margin Projection as Revenue Skyrockets"
+  type: web
+  publication_id: theinformation
+  cited_by:
+    - anthropic
+  tags:
+    - revenue
+    - ai-labs
+
+- id: eb642ee7de582ff5
+  url: https://techcrunch.com/2025/11/04/anthropic-expects-b2b-demand-to-boost-revenue-to-70b-in-2028-report/
+  title: "Anthropic projects $70B in revenue by 2028: Report"
+  type: web
+  publication_id: techcrunch
+  cited_by:
+    - anthropic
+  tags:
+    - revenue
+    - ai-labs
+
+# Sam Altman biographical fact sources
+- id: 69a7aca55efbfa51
+  url: https://qz.com/openai-ceo-sam-altman-investments-2-8-billion-reddit-st-1851515945
+  title: "Sam Altman's secretive investment portfolio is worth at least $2.8 billion"
+  type: web
+  publication_id: quartz
+  cited_by:
+    - sam-altman
+  tags:
+    - biography
+
+- id: 29e5d58fe306259d
+  url: https://fortune.com/2024/11/20/openai-ceo-sam-altman-salary-76001/
+  title: "OpenAI CEO received $76,001 in pay last year, filing shows"
+  type: web
+  publication_id: fortune
+  cited_by:
+    - sam-altman
+  tags:
+    - compensation
+
+- id: 9eb603bcd6ee754a
+  url: https://techcrunch.com/2012/03/09/loopt-acquired-by-green-dot/
+  title: "Loopt Location App Sells To Green Dot For $43.4 Million Cash"
+  type: web
+  publication_id: techcrunch
+  cited_by:
+    - sam-altman
+  tags:
+    - acquisition
+
+- id: 792c07f18a99af7c
+  url: https://www.benzinga.com/general/24/06/39206589/sam-altmans-65k-openai-salary-masks-a-2-8-billion-startup-empire
+  title: "Sam Altman's $65K OpenAI Salary Masks A $2.8 Billion Startup Empire"
+  type: web
+  publication_id: benzinga
+  cited_by:
+    - sam-altman
+  tags:
+    - biography
+    - investments
+
+- id: b795385697c55df2
+  url: https://www.britannica.com/money/Sam-Altman
+  title: "Sam Altman | Biography, OpenAI, Microsoft, & Facts"
+  type: web
+  publication_id: britannica
+  cited_by:
+    - sam-altman
+  tags:
+    - biography
+
+- id: 003e2cbd0f507952
+  url: https://www.cnbc.com/2021/11/05/sam-altman-puts-375-million-into-fusion-start-up-helion-energy.html
+  title: "Nuclear fusion start-up Helion scores $375 million investment from Sam Altman"
+  type: web
+  publication_id: cnbc
+  cited_by:
+    - sam-altman
+  tags:
+    - investment
+    - energy
+
+# OpenAI fact sources
+- id: aef77c1c7d4ec173
+  url: https://www.reuters.com/technology/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01/
+  title: "ChatGPT sets record for fastest-growing user base - analyst note"
+  type: web
+  publication_id: reuters
+  cited_by:
+    - openai
+  tags:
+    - chatgpt
+    - users
+
+- id: 85d93d2a25bf612a
+  url: https://www.cnbc.com/2025/10/02/openai-share-sale-500-billion-valuation.html
+  title: "OpenAI wraps $6.6 billion share sale at $500 billion valuation"
+  type: web
+  publication_id: cnbc
+  cited_by:
+    - openai
+  tags:
+    - funding
+    - valuation
+
+- id: b7e5b0d5d490071c
+  url: https://sherwood.news/business/openais-arr-reached-over-usd20-billion-in-2025-cfo-says/
+  title: "OpenAI's ARR reached over $20 billion in 2025, CFO says"
+  type: web
+  publication_id: sherwood-news
+  cited_by:
+    - openai
+  tags:
+    - revenue
+    - ai-labs
+
+- id: 8c2d2cc48afb479d
+  url: https://www.theinformation.com/articles/openais-annualized-revenue-doubles-to-3-4-billion-since-late-2023
+  title: "OpenAI's Annualized Revenue Doubles to $3.4 Billion Since Late 2023"
+  type: web
+  publication_id: theinformation
+  cited_by:
+    - openai
+  tags:
+    - revenue
+    - ai-labs
+
+- id: 9437e7cf32e629df
+  url: https://www.cnbc.com/2024/09/27/openai-sees-5-billion-loss-this-year-on-3point7-billion-in-revenue.html
+  title: "OpenAI sees roughly $5 billion loss this year on $3.7 billion in revenue"
+  type: web
+  publication_id: cnbc
+  cited_by:
+    - openai
+  tags:
+    - revenue
+    - ai-labs
+
+# Jaan Tallinn fact source
+- id: 3f21a01b3b4948e1
+  url: https://www.cnbc.com/2020/11/20/skype-co-founder-jaan-tallinn-puts-130-million-into-start-ups.html
+  title: "Skype co-founder reveals he's invested over $130 million into tech start-ups"
+  type: web
+  publication_id: cnbc
+  cited_by:
+    - jaan-tallinn
+  tags:
+    - biography
+    - investments

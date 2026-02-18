@@ -6,7 +6,7 @@
  * Renders and reviews visuals using:
  * 1. Static syntax analysis (always runs)
  * 2. Mermaid CLI rendering validation (if available)
- * 3. Puppeteer screenshot + AI quality review (if --screenshot flag)
+ * 3. Playwright screenshot + AI quality review (if --screenshot flag)
  *
  * Usage:
  *   crux visual review <page-id>                    # Static analysis only
@@ -183,7 +183,7 @@ function analyzeVisualSyntax(visual: ExtractedVisual): SyntaxIssue[] {
 }
 
 // ============================================================================
-// Puppeteer screenshot (optional)
+// Playwright screenshot (optional)
 // ============================================================================
 
 async function takeScreenshot(
@@ -191,13 +191,13 @@ async function takeScreenshot(
   visualIndex: number,
 ): Promise<string | null> {
   try {
-    execSync('node -e "require(\'puppeteer\')"', {
+    execSync('node -e "require(\'playwright\')"', {
       stdio: 'pipe',
       cwd: PROJECT_ROOT,
     });
   } catch {
     console.warn(
-      'Puppeteer not installed. Install with: pnpm add -D puppeteer',
+      'Playwright not installed. Install with: pnpm add -D playwright && npx playwright install chromium',
     );
     console.warn(
       'Falling back to static analysis only.\n',
@@ -226,20 +226,21 @@ async function takeScreenshot(
   );
 
   const screenshotScript = `
-    const puppeteer = require('puppeteer');
+    const { chromium } = require('playwright');
     (async () => {
-      const browser = await puppeteer.launch({
-        headless: 'new',
+      const browser = await chromium.launch({
+        headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
-      const page = await browser.newPage();
-      await page.setViewport({ width: 1200, height: 800 });
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await page.setViewportSize({ width: 1200, height: 800 });
       await page.goto('http://localhost:3001/${pageId}', {
-        waitUntil: 'networkidle2',
+        waitUntil: 'networkidle',
         timeout: 30000,
       });
       // Wait for visuals to render
-      await page.waitForTimeout(3000);
+      await new Promise(r => setTimeout(r, 3000));
       await page.screenshot({ path: '${screenshotPath}', fullPage: true });
       await browser.close();
     })();

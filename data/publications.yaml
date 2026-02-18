@@ -609,3 +609,59 @@
   credibility: 2
   peer_reviewed: false
   description: E-commerce (book links)
+
+- id: bloomberg
+  domains: [bloomberg.com]
+  name: Bloomberg
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: Financial news and data provider
+
+- id: theinformation
+  domains: [theinformation.com]
+  name: The Information
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: Tech industry investigative journalism
+
+- id: quartz
+  domains: [qz.com]
+  name: Quartz
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Business news publication
+
+- id: benzinga
+  domains: [benzinga.com]
+  name: Benzinga
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Financial news and market data
+
+- id: britannica
+  domains: [britannica.com]
+  name: Encyclopaedia Britannica
+  type: encyclopedia
+  credibility: 4
+  peer_reviewed: false
+  description: Established reference encyclopedia
+
+- id: world-network
+  domains: [world.org]
+  name: World (Worldcoin)
+  type: company_blog
+  credibility: 3
+  peer_reviewed: false
+  description: Digital identity and cryptocurrency platform
+
+- id: sherwood-news
+  domains: [sherwood.news]
+  name: Sherwood News
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Financial news publication

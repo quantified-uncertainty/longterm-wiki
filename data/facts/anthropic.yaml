@@ -4,7 +4,7 @@ facts:
   "6796e194":
     value: 380000000000
     asOf: 2026-02
-    note: Series G post-money valuation
+    note: "Series G post-money valuation"
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
     sourceResource: 8e3ff50b9ef2a1a8
     measure: valuation
@@ -13,14 +13,15 @@ facts:
   c45b168f:
     value: 350000000000
     asOf: 2025-11
-    note: Valuation at Microsoft/Nvidia commitment
+    note: "Valuation at Microsoft/Nvidia commitment"
+    sourceResource: "787a2639f9e64ca5"
     measure: valuation
 
   # revenue-run-rate
   0ed4db9e:
     value: 14000000000
     asOf: 2026-02
-    note: Run-rate revenue at Series G announcement
+    note: "Run-rate revenue at Series G announcement"
     sourceResource: 8e3ff50b9ef2a1a8
     measure: revenue
 
@@ -28,21 +29,24 @@ facts:
   55d88868:
     value: 9000000000
     asOf: 2025-12
-    note: Annualized run rate at end of 2025
+    note: "Annualized run rate at end of 2025"
+    sourceResource: "cb2a21a2cd1472e3"
     measure: revenue
 
   # revenue-early-2025
   bc497a3d:
     value: 1000000000
     asOf: 2025-01
-    note: Approximate ARR at start of 2025
+    note: "Approximate ARR at start of 2025, per Reuters"
+    sourceResource: "e590534db9ece639"
     measure: revenue
 
   # revenue-mid-2025
   "83e76962":
     value: 4000000000
     asOf: 2025-07
-    note: ARR as of mid-2025, per Series F announcement
+    note: "ARR as of mid-2025, per Series F announcement"
+    sourceResource: "83a73ffe5e230d5f"
     measure: revenue
 
   # revenue-2026-guidance
@@ -52,6 +56,8 @@ facts:
       - 20000000000
       - 26000000000
     asOf: 2026-01
+    note: "Base case $20B, best case $26B per Reuters"
+    sourceResource: "cb3e2358bd128df5"
 
   # series-g-raise
   5b0663a0:
@@ -75,6 +81,8 @@ facts:
   a1e87600:
     value: 40
     asOf: "2025"
+    note: "2025 gross margin projection, lowered from earlier 50% estimate"
+    sourceResource: "7483f41af6325c71"
     measure: gross-margin
 
   # enterprise-retention-rate
@@ -82,6 +90,7 @@ facts:
     measure: retention-rate
     value: 88
     asOf: "2025"
+    note: "Estimate; no published source identified for this specific figure"
 
   # industry-avg-retention
   7ccb9764:
@@ -89,7 +98,7 @@ facts:
     value: 76
     asOf: "2025"
     subject: industry-average
-    note: Industry average for SaaS retention (comparison benchmark)
+    note: "Industry average for SaaS retention (comparison benchmark); estimate, standard benchmarks vary"
 
   # business-customers
   7a3815b4:
@@ -97,12 +106,14 @@ facts:
     value:
       min: 300000
     asOf: "2025"
+    note: "Per Series F announcement"
+    sourceResource: "83a73ffe5e230d5f"
 
   # customer-concentration
   fac5b934:
     value: 25
     asOf: "2025"
-    note: Revenue share from top customers (Cursor, GitHub Copilot)
+    note: "Revenue share from top customers (Cursor, GitHub Copilot); estimate based on reporting"
     measure: customer-concentration
 
   # interpretability-team-size
@@ -121,6 +132,7 @@ facts:
       - 200
       - 330
     asOf: "2025"
+    note: "Estimate; Anthropic does not publicly disclose aggregate safety team headcount"
 
   # safety-pct-of-technical
   d8034d80:
@@ -129,31 +141,35 @@ facts:
       - 20
       - 30
     asOf: "2025"
+    note: "Estimate; no published source confirms this specific percentage"
 
   # claude-code-run-rate
   d08706cf:
     measure: product-revenue
     value: 2500000000
     asOf: 2026-02
-    note: Claude Code product run-rate revenue
+    note: "Claude Code product run-rate revenue, per Series G announcement"
+    sourceResource: "8e3ff50b9ef2a1a8"
 
   # net-cash-burn-2025
   6406a657:
     measure: cash-burn
     value: 2800000000
     asOf: "2025"
-    note: Projected net cash burn for 2025
+    note: "Projected net cash burn for 2025; reports cite approximately $3B"
+    sourceResource: "eb642ee7de582ff5"
 
   # infrastructure-investment
   f8f3c9a7:
     value: 50000000000
     asOf: "2026"
-    note: AI infrastructure expansion plan
+    note: "AI infrastructure expansion plan announced November 2025"
+    sourceResource: "52c1c2def0184008"
     measure: infrastructure-investment
 
   # breakeven-target
   "023e1116":
     value: "2028"
     noCompute: true
-    note: Projected breakeven year
-
+    note: "Projected breakeven year per internal financial projections"
+    sourceResource: "eb642ee7de582ff5"

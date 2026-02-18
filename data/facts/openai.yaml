@@ -14,14 +14,15 @@ facts:
     measure: user-count
     value: 100000000
     asOf: 2023-02
-    note: Fastest-growing consumer application in history at that time
+    note: "Fastest-growing consumer application in history at that time"
+    sourceResource: "aef77c1c7d4ec173"
 
   # valuation-2024
   6ce1d805:
     value:
       min: 157000000000
     asOf: 2024-12
-    note: October 2024 funding round valuation
+    note: "October 2024 funding round valuation"
     sourceResource: b8e4c3ef3a3c7827
     measure: valuation
 
@@ -29,21 +30,25 @@ facts:
   39d6868e:
     value:
       min: 500000000000
-    asOf: "2025"
-    note: Approximate valuation in 2025 private market transactions
+    asOf: "2025-10"
+    note: "Secondary share sale valuation, October 2025"
+    sourceResource: "85d93d2a25bf612a"
     measure: valuation
 
   # revenue-arr-2025
   609b9796:
     value: 20000000000
     asOf: "2025"
-    note: Annualized run rate referenced in Anthropic valuation comparisons
+    note: "ARR per CFO Sarah Friar disclosure"
+    sourceResource: "b7e5b0d5d490071c"
     measure: revenue
 
   # revenue-2024-projected
   7e938d7a:
     value: 3400000000
     asOf: 2024-10
+    note: "Annualized run rate as of mid-2024"
+    sourceResource: "8c2d2cc48afb479d"
     measure: revenue
 
   # gpt3-parameters
@@ -72,9 +77,11 @@ facts:
 
   # revenue-yoy-growth-2024
   be463d29:
-    measure: null
-    value: 1,700%
-    asOf: "2024"
+    measure: ~
+    value: "1,700%"
+    asOf: "2024-09"
+    note: "Monthly revenue growth from early 2023 to September 2024, not single-year YoY"
+    sourceResource: "9437e7cf32e629df"
 
   # cofounder-departure-rate
   fba50864:
