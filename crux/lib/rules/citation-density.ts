@@ -21,6 +21,7 @@
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
+import { countProseWords, getEntityTypeFromPath } from '../page-analysis.ts';
 
 /** Minimum word count before citation density applies */
 const MIN_WORDS = 300;
@@ -43,51 +44,6 @@ const CITATION_MINIMUMS: Record<string, number> = {
 
 /** Default minimum for entity types not listed above */
 const DEFAULT_MINIMUM = 2;
-
-/** Map page directory paths to entity type keys */
-function getEntityTypeFromPath(relativePath: string): string | null {
-  // knowledge-base/people/... → person
-  if (relativePath.includes('/people/')) return 'person';
-  if (relativePath.includes('/organizations/')) return 'organization';
-  if (relativePath.includes('/history/')) return 'historical';
-  if (relativePath.includes('/risks/')) return 'risk';
-  if (relativePath.includes('/responses/')) return 'response';
-  if (relativePath.includes('/models/')) return 'model';
-  if (relativePath.includes('/capabilities/')) return 'capability';
-  if (relativePath.includes('/metrics/')) return 'metric';
-  if (relativePath.includes('/debates/')) return 'debate';
-  if (relativePath.includes('/cruxes/')) return 'crux';
-  if (relativePath.includes('/intelligence-paradigms/')) return 'concept';
-  if (relativePath.includes('/forecasting/')) return 'concept';
-  if (relativePath.includes('/worldviews/')) return 'overview';
-  return null;
-}
-
-/** Count words in body text, excluding code blocks, imports, and frontmatter */
-function countProseWords(body: string): number {
-  let inCodeBlock = false;
-  let wordCount = 0;
-
-  for (const line of body.split('\n')) {
-    const trimmed = line.trim();
-
-    if (trimmed.startsWith('```')) {
-      inCodeBlock = !inCodeBlock;
-      continue;
-    }
-    if (inCodeBlock) continue;
-
-    if (trimmed.startsWith('import ')) continue;
-    if (trimmed.startsWith('<')) continue;
-    if (trimmed.startsWith('|')) continue;
-    if (trimmed === '---') continue;
-    if (/^\[\^\d+\]:/.test(trimmed)) continue;
-
-    wordCount += trimmed.split(/\s+/).filter(w => w.length > 0).length;
-  }
-
-  return wordCount;
-}
 
 /** Count all citation types: footnotes [^N], <R id=...>, and inline links */
 function countCitations(body: string): number {

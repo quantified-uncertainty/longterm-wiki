@@ -17,9 +17,8 @@
  * Part of the hallucination risk reduction initiative (issue #200).
  */
 
-import { readFileSync, existsSync, readdirSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join, relative, basename } from 'path';
-import { parse as parseYaml } from 'yaml';
 import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatterAndBody } from '../lib/mdx-utils.ts';
@@ -28,6 +27,7 @@ import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { readReviews } from '../lib/review-tracking.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
+import { getEntityTypeFromPath } from '../lib/page-analysis.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -67,23 +67,6 @@ const ENTITY_TYPE_RISK: Record<string, number> = {
   debate: 0.8,
   crux: 0.7,
 };
-
-function getEntityTypeFromPath(relativePath: string): string | null {
-  if (relativePath.includes('/people/')) return 'person';
-  if (relativePath.includes('/organizations/')) return 'organization';
-  if (relativePath.includes('/history/')) return 'historical';
-  if (relativePath.includes('/risks/')) return 'risk';
-  if (relativePath.includes('/responses/')) return 'response';
-  if (relativePath.includes('/models/')) return 'model';
-  if (relativePath.includes('/capabilities/')) return 'concept';
-  if (relativePath.includes('/metrics/')) return 'metric';
-  if (relativePath.includes('/debates/')) return 'debate';
-  if (relativePath.includes('/cruxes/')) return 'crux';
-  if (relativePath.includes('/intelligence-paradigms/')) return 'concept';
-  if (relativePath.includes('/forecasting/')) return 'concept';
-  if (relativePath.includes('/worldviews/')) return 'overview';
-  return null;
-}
 
 function countRComponents(body: string): number {
   const matches = body.match(/<R\s+id=/g);

@@ -17,6 +17,7 @@
 
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
+import { countProseWords } from '../page-analysis.ts';
 
 /** Minimum word count before balance checks apply */
 const MIN_WORDS = 500;
@@ -32,33 +33,6 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 /** References older than this many years are flagged */
 const OUTDATED_YEARS = 2;
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function countProseWords(body: string): number {
-  let inCodeBlock = false;
-  let wordCount = 0;
-
-  for (const line of body.split('\n')) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith('```')) {
-      inCodeBlock = !inCodeBlock;
-      continue;
-    }
-    if (inCodeBlock) continue;
-    if (trimmed.startsWith('import ')) continue;
-    if (trimmed.startsWith('<')) continue;
-    if (trimmed.startsWith('|')) continue;
-    if (trimmed === '---') continue;
-    if (/^\[\^\d+\]:/.test(trimmed)) continue;
-
-    wordCount += trimmed.split(/\s+/).filter(w => w.length > 0).length;
-  }
-
-  return wordCount;
-}
 
 /**
  * Extract domains from footnote definition URLs.
