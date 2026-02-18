@@ -72,6 +72,12 @@ const SCRIPTS = {
     description: 'Remove redundant manual Related Pages / See Also sections',
     passthrough: ['apply', 'verbose', 'file', 'ci', 'dryRun'],
   },
+  'fact-wrap': {
+    script: 'fix/fact-wrap.ts',
+    description: 'Wrap hardcoded numbers with <F> fact components',
+    passthrough: ['apply', 'verbose', 'ci'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'all');
@@ -102,5 +108,8 @@ Examples:
   crux fix markdown                 Fix markdown formatting
   crux fix related-pages            Remove redundant Related Pages sections
   crux fix dollars                  Escape dollar signs only
+  crux fix fact-wrap                Preview fact wrapping (dry run)
+  crux fix fact-wrap --apply        Wrap hardcoded numbers with <F> tags
+  crux fix fact-wrap anthropic      Preview single page
 `;
 }
