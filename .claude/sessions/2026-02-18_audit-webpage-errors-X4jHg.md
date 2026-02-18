@@ -1,8 +1,8 @@
 ## 2026-02-18 | claude/audit-webpage-errors-X4jHg | Audit wiki pages for factual errors and hallucinations
 
-**What was done:** Systematic audit of ~20 wiki pages for factual errors, hallucinations, and inconsistencies. Found and fixed 18+ confirmed errors across 14 pages, including wrong dates, fabricated statistics, false attributions, missing major events, and internal inconsistencies.
+**What was done:** Systematic audit of ~20 wiki pages for factual errors, hallucinations, and inconsistencies. Found and fixed 20+ confirmed errors across 15 pages, including wrong dates, fabricated statistics, false attributions, missing major events, broken entity references, and internal inconsistencies.
 
-**Pages:** geoffrey-hinton, nick-bostrom, dario-amodei, fhi, apollo-research, openai, early-warnings, miri-era, deep-learning-era, cset, epistemic-orgs-epoch-ai, bioweapons, sam-altman
+**Pages:** geoffrey-hinton, nick-bostrom, dario-amodei, fhi, apollo-research, openai, early-warnings, miri-era, deep-learning-era, cset, epistemic-orgs-epoch-ai, bioweapons, sam-altman, stuart-russell
 
 **Issues encountered:**
 - Many pages have zero citations, making verification harder
