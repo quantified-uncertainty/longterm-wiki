@@ -110,7 +110,7 @@ pnpm crux validate schema           # MUST pass (blocking in CI) — validates Y
 pnpm crux validate unified --rules=frontmatter-schema --errors-only  # MUST pass (blocking in CI) — validates MDX frontmatter
 pnpm crux validate                  # Full validation (advisory)
 ```
-**Three checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, and `unified --rules=frontmatter-schema`. All must pass before committing.
+**Four checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, `unified --rules=frontmatter-schema`, and `unified --rules=numeric-id-integrity`. All must pass before committing.
 
 ### Self-review checklist (before committing any page)
 
@@ -183,7 +183,7 @@ pnpm crux ci status --wait       # Poll every 30s until all checks complete
 
 ### CI jobs
 - **build-and-test**: Builds the app and runs vitest (blocking)
-- **validate**: Runs three blocking checks (MDX syntax, YAML schema, frontmatter schema), then the full validation suite (advisory/non-blocking)
+- **validate**: Runs four blocking checks (MDX syntax, YAML schema, frontmatter schema, numeric ID integrity), then the full validation suite (advisory/non-blocking)
 
 ## Auto-Update System
 

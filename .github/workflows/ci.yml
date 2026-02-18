@@ -67,6 +67,9 @@ jobs:
       - name: Frontmatter schema validation (blocking)
         run: pnpm crux validate unified --rules=frontmatter-schema --errors-only
 
+      - name: Numeric ID integrity (blocking)
+        run: pnpm crux validate unified --rules=numeric-id-integrity --errors-only
+
       - name: TypeScript type check (blocking)
         run: cd app && npx tsc --noEmit
 

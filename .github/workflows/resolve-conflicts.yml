@@ -134,11 +134,12 @@ jobs:
       - name: Commit auto-fix changes (if any)
         run: |
           # The --fix flag may have auto-fixed escaping/markdown issues.
-          # Amend the merge commit to include those fixes.
-          if ! git diff --quiet; then
-            echo "Auto-fix produced changes — amending merge commit..."
+          # Create a separate commit (not amend) to preserve the merge commit's
+          # integrity and make fixes visible in the PR history.
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            echo "Auto-fix produced changes — committing fixes..."
             git add -A
-            git commit --amend --no-edit
+            git commit -m "Auto-fix escaping/markdown after conflict resolution"
           else
             echo "No auto-fix changes — merge commit is clean."
           fi
