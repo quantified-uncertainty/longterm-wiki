@@ -958,6 +958,7 @@ export const Fact = z.object({
   high: z.number().optional(),                 // Upper bound of range
   asOf: z.string().optional(),
   source: z.string().optional(),
+  sourceResource: z.string().optional(),   // Resource ID from data/resources/ — links fact to a curated source with metadata
   note: z.string().optional(),
   noCompute: z.boolean().optional(),           // If true, numeric value cannot be referenced in compute expressions
   // Measure grouping — links this fact to a reusable measure definition

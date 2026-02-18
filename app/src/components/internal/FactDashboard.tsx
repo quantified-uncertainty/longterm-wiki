@@ -29,6 +29,10 @@ interface FactEntry {
   high?: number;
   asOf?: string;
   source?: string;
+  sourceResource?: string;
+  sourceTitle?: string;
+  sourcePublication?: string;
+  sourceCredibility?: number;
   note?: string;
   computed?: boolean;
   compute?: string;
@@ -180,7 +184,22 @@ function EntityView({
                   </td>
                   <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
                   <td className="py-1.5 pr-4 text-muted-foreground text-xs max-w-[200px] truncate">
-                    {fact.source ? (
+                    {fact.sourceTitle ? (
+                      <span className="flex items-center gap-1">
+                        <a href={fact.source} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate" title={fact.sourceTitle}>
+                          {fact.sourcePublication || fact.sourceTitle}
+                        </a>
+                        {fact.sourceCredibility != null && (
+                          <span className={`inline-block px-1 py-px rounded text-[9px] font-medium shrink-0 ${
+                            fact.sourceCredibility >= 4 ? "bg-green-500/15 text-green-600 dark:text-green-400" :
+                            fact.sourceCredibility >= 3 ? "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400" :
+                            "bg-red-500/15 text-red-600 dark:text-red-400"
+                          }`}>
+                            {fact.sourceCredibility}/5
+                          </span>
+                        )}
+                      </span>
+                    ) : fact.source ? (
                       <a href={fact.source} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                         {new URL(fact.source).hostname.replace("www.", "")}
                       </a>

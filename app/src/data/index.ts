@@ -45,6 +45,11 @@ export interface Fact {
   high?: number;
   asOf?: string;
   source?: string;
+  sourceResource?: string;
+  /** Resolved resource metadata (populated at build time from sourceResource) */
+  sourceTitle?: string;
+  sourcePublication?: string;
+  sourceCredibility?: number;
   note?: string;
   noCompute?: boolean;
   /** Measure ID from data/fact-measures.yaml — groups related facts into timeseries.

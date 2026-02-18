@@ -2,6 +2,19 @@
 # News articles and media coverage
 # Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
 
+- id: 8e3ff50b9ef2a1a8
+  url: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
+  title: "Anthropic closes $30 billion funding round"
+  type: web
+  publication_id: reuters
+  cited_by:
+    - anthropic
+    - anthropic-valuation
+    - anthropic-investors
+  tags:
+    - funding
+    - ai-labs
+
 - id: 85ba042a002437a0
   url: https://fortune.com/2025/06/20/openai-files-sam-altman-leadership-concerns-safety-failures-ai-lab/
   title: '"The OpenAI Files" reveals deep leadership concerns about Sam Altman and safety failures'

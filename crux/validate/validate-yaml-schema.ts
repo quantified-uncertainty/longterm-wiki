@@ -181,6 +181,11 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   allErrors.push(...propErrors);
   if (!ciMode) console.log(`  ${proposals.length} proposals loaded`);
 
+  // Build set of valid resource IDs for sourceResource cross-referencing
+  const validResourceIds = new Set<string>(
+    resources.map((r: YamlItemWithSource) => (r as Record<string, unknown>).id as string).filter(Boolean)
+  );
+
   // 6. Validate facts/*.yaml against FactsFile schema and check measure references
   if (!ciMode) console.log(`${colors.dim}Checking facts...${colors.reset}`);
   const factsDir = join(DATA_DIR, 'facts');
@@ -237,6 +242,17 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
                 issues: [`Unknown measure "${fact.measure}" — not defined in data/fact-measures.yaml`],
               });
             }
+          }
+        }
+        // Cross-reference: check that sourceResource IDs point to valid resources
+        for (const [factId, fact] of Object.entries(result.data.facts)) {
+          if (fact.sourceResource && !validResourceIds.has(fact.sourceResource)) {
+            allErrors.push({
+              file: filepath,
+              id: `${result.data.entity}.${factId}`,
+              type: 'Fact',
+              issues: [`Unknown sourceResource "${fact.sourceResource}" — not found in data/resources/`],
+            });
           }
         }
       }

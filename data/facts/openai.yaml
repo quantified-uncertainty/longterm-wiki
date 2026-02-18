@@ -7,6 +7,7 @@ facts:
     value: 13e9
     asOf: "2024-01"
     source: "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/"
+    sourceResource: "862e2d851c171321"
     note: "Microsoft cumulative investment"
 
   # === User metrics ===
@@ -49,6 +50,7 @@ facts:
     value: 175e9
     asOf: "2020-06"
     source: "https://arxiv.org/abs/2005.14165"
+    sourceResource: "2cab3ea10b8b7ae2"
 
   o1-aime-score:
     measure: benchmark-score
