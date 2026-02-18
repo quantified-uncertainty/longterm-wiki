@@ -164,6 +164,97 @@ describe('parseSessionLogContent', () => {
     expect(result['page-one'][0].pr).toBeUndefined();
   });
 
+  it('parses Model field', () => {
+    const content = `## 2026-02-15 | claude/my-branch | Fix some bug
+
+**What was done:** Fixed the thing.
+
+**Pages:** page-one
+
+**Model:** opus-4-6
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    expect(result['page-one'][0].model).toBe('opus-4-6');
+  });
+
+  it('parses Duration field', () => {
+    const content = `## 2026-02-15 | claude/my-branch | Fix some bug
+
+**What was done:** Fixed the thing.
+
+**Pages:** page-one
+
+**Duration:** ~45min
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    expect(result['page-one'][0].duration).toBe('~45min');
+  });
+
+  it('parses Cost field', () => {
+    const content = `## 2026-02-15 | claude/my-branch | Fix some bug
+
+**What was done:** Fixed the thing.
+
+**Pages:** page-one
+
+**Cost:** ~$5
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    expect(result['page-one'][0].cost).toBe('~$5');
+  });
+
+  it('parses all metadata fields together', () => {
+    const content = `## 2026-02-15 | claude/my-branch | Full metadata session
+
+**What was done:** Did everything.
+
+**Pages:** page-one
+
+**PR:** #42
+
+**Model:** sonnet-4
+
+**Duration:** ~2h
+
+**Cost:** ~$12 (premium tier)
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    const entry = result['page-one'][0];
+    expect(entry.pr).toBe(42);
+    expect(entry.model).toBe('sonnet-4');
+    expect(entry.duration).toBe('~2h');
+    expect(entry.cost).toBe('~$12 (premium tier)');
+  });
+
+  it('omits metadata fields when not specified', () => {
+    const content = `## 2026-02-15 | claude/my-branch | No metadata
+
+**What was done:** Minimal entry.
+
+**Pages:** page-one
+
+**Issues encountered:**
+- None
+`;
+    const result = parseSessionLogContent(content);
+    const entry = result['page-one'][0];
+    expect(entry.model).toBeUndefined();
+    expect(entry.duration).toBeUndefined();
+    expect(entry.cost).toBeUndefined();
+  });
+
   it('accumulates multiple entries for the same page', () => {
     const content = `## 2026-02-14 | claude/a | First edit
 
