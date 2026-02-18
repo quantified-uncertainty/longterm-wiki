@@ -2,15 +2,15 @@
 
 Before considering any session complete, you MUST execute the review-and-ship workflow. Do not skip steps. Do not ask the user whether to do this — it is always required.
 
-## Preferred: `/finalize`
+## Preferred: `/agent-session-ready-PR`
 
-The recommended end-of-session command is `/finalize`. It verifies the session checklist (from `/kickoff`), polishes the PR description, updates GitHub issues, creates a session log, and calls `/push-and-ensure-green` to ship.
+The recommended end-of-session command is `/agent-session-ready-PR`. It verifies the agent checklist (from `/agent-session-start`), polishes the PR description, updates GitHub issues, creates a session log, and calls `/push-and-ensure-green` to ship.
 
-If `/kickoff` was run at session start and `.claude/wip-checklist.md` exists, just run `/finalize` — it handles everything.
+If `/agent-session-start` was run at session start and `.claude/wip-checklist.md` exists, just run `/agent-session-ready-PR` — it handles everything.
 
 ## Fallback: Manual sequence
 
-If `/kickoff` was not run (e.g., a quick fix session), the minimum end-of-session sequence is:
+If `/agent-session-start` was not run (e.g., a quick fix session), the minimum end-of-session sequence is:
 
 1. **`/paranoid-pr-review`** — code review. Fix all CRITICAL and WARNING issues found.
 2. **`/push-and-ensure-green`** — push and confirm CI green.

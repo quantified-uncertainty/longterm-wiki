@@ -35,11 +35,11 @@ pnpm crux edit-log view <id>     # View edit history for a page
 pnpm crux maintain               # Run maintenance sweep (PRs, issues, cruft)
 pnpm crux maintain status        # Check when maintenance last ran
 
-# Session checklists
-pnpm crux session init "Task" --type=X    # Generate typed checklist
-pnpm crux session init --issue=N          # Auto-detect type from issue labels
-pnpm crux session status                  # Show checklist progress
-pnpm crux session complete                # Validate all items checked
+# Agent checklists
+pnpm crux agent-checklist init "Task" --type=X    # Generate typed checklist
+pnpm crux agent-checklist init --issue=N          # Auto-detect type from issue labels
+pnpm crux agent-checklist status                  # Show checklist progress
+pnpm crux agent-checklist complete                # Validate all items checked
 
 # GitHub issue tracking
 pnpm crux issues                 # List open issues ranked by priority
@@ -173,7 +173,7 @@ When a session works on a GitHub issue, signal activity on that issue. See `.cla
 
 ## PR Review & Ship Workflow — MANDATORY
 
-Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. The sequence is: `/paranoid-pr-review` (fix all issues) → `/push-and-ensure-green` (push + CI green) → conflict check. This is enforced automatically via the rules file.
+Before finishing any session, run the full review-and-ship workflow defined in `.claude/rules/pr-review-guidelines.md`. The preferred flow is `/agent-session-ready-PR` (verifies checklist, ships). Fallback: `/paranoid-pr-review` → `/push-and-ensure-green` → conflict check.
 
 ## CI Verification — MANDATORY
 

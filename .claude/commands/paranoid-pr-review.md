@@ -1,6 +1,6 @@
 # Paranoid Code Review
 
-> **Note:** This review is now integrated into Phase 3 (Review) of the session checklist. If you ran `/kickoff`, work through Phase 3 items instead. This command remains available for standalone use.
+> **Note:** This review is now integrated into Phase 3 (Review) of the agent checklist. If you ran `/agent-session-start`, work through Phase 3 items instead. This command remains available for standalone use.
 
 Aggressively review all changes made in this session. Be skeptical, thorough, and assume nothing is correct until proven otherwise.
 

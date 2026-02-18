@@ -1,5 +1,5 @@
 /**
- * Tests for crux/commands/session.ts
+ * Tests for crux/commands/agent-checklist.ts
  *
  * Focus areas:
  * - init: generates checklist for each type, handles --issue, validates args
@@ -29,7 +29,7 @@ vi.mock('child_process', () => ({
 }));
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { commands } from './session.ts';
+import { commands } from './agent-checklist.ts';
 import * as githubLib from '../lib/github.ts';
 import { buildChecklist, type ChecklistMetadata } from '../lib/session-checklist.ts';
 
@@ -42,7 +42,7 @@ const mockExistsSync = vi.mocked(existsSync);
 // init command
 // ---------------------------------------------------------------------------
 
-describe('session init', () => {
+describe('agent-checklist init', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -178,7 +178,7 @@ describe('session init', () => {
 // status command
 // ---------------------------------------------------------------------------
 
-describe('session status', () => {
+describe('agent-checklist status', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -249,7 +249,7 @@ describe('session status', () => {
 // complete command
 // ---------------------------------------------------------------------------
 
-describe('session complete', () => {
+describe('agent-checklist complete', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

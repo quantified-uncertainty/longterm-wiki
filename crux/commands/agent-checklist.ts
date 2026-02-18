@@ -1,13 +1,13 @@
 /**
- * Session Command Handlers
+ * Agent Checklist Command Handlers
  *
- * Manage session checklists: generate, track progress, and validate completion.
+ * Manage agent checklists: generate, track progress, and validate completion.
  *
  * Usage:
- *   crux session init <task> --type=X   Generate a typed checklist
- *   crux session init --issue=N         Auto-detect type from issue labels
- *   crux session status                 Show checklist progress
- *   crux session complete               Validate all items checked
+ *   crux agent-checklist init <task> --type=X   Generate a typed checklist
+ *   crux agent-checklist init --issue=N         Auto-detect type from issue labels
+ *   crux agent-checklist status                 Show checklist progress
+ *   crux agent-checklist complete               Validate all items checked
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -59,8 +59,8 @@ interface GitHubIssueResponse {
  * Initialize a session checklist.
  *
  * Usage:
- *   crux session init "Task description" --type=bugfix
- *   crux session init --issue=42
+ *   crux agent-checklist init "Task description" --type=bugfix
+ *   crux agent-checklist init --issue=42
  */
 async function init(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -111,7 +111,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
 
   if (!task) {
     return {
-      output: `${c.red}Usage: crux session init "Task description" --type=X\n       crux session init --issue=N${c.reset}\n`,
+      output: `${c.red}Usage: crux agent-checklist init "Task description" --type=X\n       crux agent-checklist init --issue=N${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -131,7 +131,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
 
   let output = '';
-  output += `${c.green}✓${c.reset} Session checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
+  output += `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
   output += `  Type: ${c.bold}${type}${c.reset}\n`;
   output += `  Task: ${task}\n`;
   output += `  Branch: ${c.cyan}${metadata.branch}${c.reset}\n`;
@@ -142,7 +142,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   // Count items
   const status = parseChecklist(markdown);
   output += `  Items: ${status.totalItems}\n`;
-  output += `\n${c.dim}Work through the checklist as you go. Run \`crux session status\` to check progress.${c.reset}\n`;
+  output += `\n${c.dim}Work through the checklist as you go. Run \`crux agent-checklist status\` to check progress.${c.reset}\n`;
 
   return { output, exitCode: 0 };
 }
@@ -156,7 +156,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
 
   if (!existsSync(CHECKLIST_PATH)) {
     return {
-      output: `${c.yellow}No checklist found. Run \`crux session init\` first.${c.reset}\n`,
+      output: `${c.yellow}No checklist found. Run \`crux agent-checklist init\` first.${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -204,7 +204,7 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
 
   if (!existsSync(CHECKLIST_PATH)) {
     return {
-      output: `${c.red}No checklist found. Run \`crux session init\` first.${c.reset}\n`,
+      output: `${c.red}No checklist found. Run \`crux agent-checklist init\` first.${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -220,7 +220,7 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
         output += `  ${c.cyan}-${c.reset} ${d}\n`;
       }
     }
-    output += `\n${c.dim}Session is ready to ship.${c.reset}\n`;
+    output += `\n${c.dim}Ready to ship.${c.reset}\n`;
     return { output, exitCode: 0 };
   }
 
@@ -257,7 +257,7 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Session Domain - Manage session checklists
+Agent Checklist Domain - Manage agent checklists
 
 Commands:
   init <task>      Generate a typed checklist (default)
@@ -265,7 +265,7 @@ Commands:
   complete         Validate all items checked (exit code 1 if incomplete)
 
 Options:
-  --type=TYPE      Session type: content, infrastructure, bugfix, refactor, commands
+  --type=TYPE      Task type: content, infrastructure, bugfix, refactor, commands
   --issue=N        Auto-detect type from GitHub issue labels
   --ci             JSON output
 
@@ -277,11 +277,11 @@ Type detection from issue labels:
   (other/none)           → infrastructure
 
 Examples:
-  crux session init "Add session checklist CLI" --type=commands
-  crux session init --issue=42
-  crux session init "Fix broken scoring" --type=bugfix
-  crux session status
-  crux session complete
+  crux agent-checklist init "Add checklist CLI" --type=commands
+  crux agent-checklist init --issue=42
+  crux agent-checklist init "Fix broken scoring" --type=bugfix
+  crux agent-checklist status
+  crux agent-checklist complete
 
 Checklist markers:
   [x]  Checked (complete)
@@ -289,7 +289,7 @@ Checklist markers:
   [~]  N/A (not applicable — counts as passing)
 
 Slash commands:
-  /kickoff    Runs \`crux session init\` and presents the checklist
-  /finalize   Runs \`crux session status\`, completes items, ships
+  /agent-session-start      Runs \`crux agent-checklist init\` and presents the checklist
+  /agent-session-ready-PR   Runs \`crux agent-checklist status\`, completes items, ships
 `;
 }

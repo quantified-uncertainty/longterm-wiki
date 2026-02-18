@@ -1,14 +1,14 @@
-# Finalize
+# Agent Session Ready PR
 
-Verify the session checklist is complete, polish the PR, and ship.
+Verify the agent checklist is complete, polish the PR, and ship.
 
-This command assumes `/kickoff` was run earlier and `.claude/wip-checklist.md` exists.
+This command assumes `/agent-session-start` was run earlier and `.claude/wip-checklist.md` exists.
 
 ## Step 1: Check progress
 
-Run `pnpm crux session status` to see what remains.
+Run `pnpm crux agent-checklist status` to see what remains.
 
-If `.claude/wip-checklist.md` doesn't exist, generate one now with `pnpm crux session init "Task description" --type=X` and work through ALL items before proceeding.
+If `.claude/wip-checklist.md` doesn't exist, generate one now with `pnpm crux agent-checklist init "Task description" --type=X` and work through ALL items before proceeding.
 
 ## Step 2: Complete unchecked items
 
@@ -39,7 +39,7 @@ Create `.claude/sessions/YYYY-MM-DD_<branch-suffix>.md` per `.claude/rules/sessi
 
 ## Step 6: Validate completion
 
-Run `pnpm crux session complete` — must exit 0 (all items checked or N/A).
+Run `pnpm crux agent-checklist complete` — must exit 0 (all items checked or N/A).
 
 ## Step 7: Ship
 

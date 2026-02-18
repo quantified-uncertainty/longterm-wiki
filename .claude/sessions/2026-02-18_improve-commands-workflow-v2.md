@@ -1,6 +1,6 @@
 ## 2026-02-18 | claude/improve-commands-workflow | Programmatic session checklist system
 
-**What was done:** Built `crux session init/status/complete` CLI — a typed checklist system that replaces the static checklist-template.md. Generates tailored checklists based on session type (content, infrastructure, bugfix, refactor, commands) from a 40-item catalog. Added Key Decisions logging, merge/CI verification items, and deduplicated `currentBranch()`. Simplified `/kickoff` and `/finalize` slash commands to use the new CLI.
+**What was done:** Built `crux agent-checklist init/status/complete` CLI — a typed checklist system that replaces the static checklist-template.md. Generates tailored checklists based on task type (content, infrastructure, bugfix, refactor, commands) from a 40-item catalog. Added Key Decisions logging, merge/CI verification items, and deduplicated `currentBranch()`. Renamed `/kickoff` → `/agent-session-start` and `/finalize` → `/agent-session-ready-PR`. Renamed CLI domain from "session" to "agent-checklist".
 
 **Pages:** none
 
