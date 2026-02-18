@@ -65,7 +65,9 @@ export const numericIdIntegrityRule = {
         // Check if entity slug contains the page slug (e.g. "tmc-epistemics" → "epistemics")
         // or vice versa — these are generated stubs, not real conflicts
         const isAlias = entitySlug.endsWith(`-${pageSlug}`) || pageSlug.endsWith(`-${entitySlug}`);
-        if (!isAlias) {
+        // Index pages generate __index__/<path> entities — these are the same entity
+        const isIndexEntity = entitySlug.startsWith('__index__');
+        if (!isAlias && !isIndexEntity) {
           issues.push(new Issue({
             rule: 'numeric-id-integrity',
             file: cf.path,

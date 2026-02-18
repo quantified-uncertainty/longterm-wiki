@@ -199,7 +199,7 @@ Each Rule has:
 - Optional `fix()`: returns corrected content (declarative `FixSpec` with `oldText`/`newText`)
 - `scope`: `'file'` (runs per file) or `'global'` (runs once on all files)
 
-Fixes are applied in bulk and logged to edit-logs. Three rules are **CI-blocking** (`comparison-operators`, `dollar-signs`, `frontmatter-schema`); the rest are advisory.
+Fixes are applied in bulk and logged to edit-logs. Four rules are **CI-blocking** (`comparison-operators`, `dollar-signs`, `frontmatter-schema`, `numeric-id-integrity`); the rest are advisory.
 
 ### 9. YAML-First MDX Generation
 
