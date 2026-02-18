@@ -7,11 +7,11 @@
  * Designed for unattended operation with budget controls and error recovery.
  */
 
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { execFileSync } from 'child_process';
 import { stringify as stringifyYaml } from 'yaml';
-import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { PROJECT_ROOT, loadPages } from '../lib/content-types.ts';
 import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts';
 import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest } from './page-router.ts';
@@ -22,18 +22,9 @@ const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
 // ── Entity ID Loading ───────────────────────────────────────────────────────
 
 function loadEntityIds(): string[] {
-  // Try loading from pages.json (built by build-data.mjs)
-  const pagesPath = join(PROJECT_ROOT, 'app/src/data/pages.json');
-  if (existsSync(pagesPath)) {
-    try {
-      const pages = JSON.parse(readFileSync(pagesPath, 'utf-8'));
-      if (Array.isArray(pages)) {
-        return pages.map((p: { id?: string }) => p.id).filter((id): id is string => Boolean(id));
-      }
-    } catch { /* fall through */ }
-  }
-
-  return [];
+  // Uses centralized loader which auto-builds the data layer if missing
+  const pages = loadPages();
+  return pages.map(p => p.id).filter((id): id is string => Boolean(id));
 }
 
 // ── Run Report Persistence ──────────────────────────────────────────────────

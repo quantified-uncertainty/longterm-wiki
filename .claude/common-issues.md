@@ -48,4 +48,28 @@ Branches must start with `claude/` and end with the session ID, otherwise push f
 
 ---
 
+## Dependencies
+
+### Puppeteer download fails in sandboxed environments
+`pnpm install` fails because Puppeteer tries to download a Chrome binary. This affects ~50% of sessions. The setup script handles this automatically, but if running `pnpm install` directly, use:
+```bash
+PUPPETEER_SKIP_DOWNLOAD=1 pnpm install
+```
+Puppeteer is only needed for screenshot tests, not core development.
+
+### better-sqlite3 may need native module rebuild
+If you get errors about `better-sqlite3` native bindings, run:
+```bash
+npx node-gyp rebuild
+```
+
+---
+
+## Environment Detection
+
+### Crux content pipeline auto-detects API-direct mode
+When running inside Claude Code SDK (web sessions), the `CLAUDECODE` env var is set. The pipeline automatically switches from spawning `claude` CLI subprocesses to calling the Anthropic API directly. If synthesis hangs despite this, verify with `echo $CLAUDECODE` and check that `shouldUseApiDirect()` in `crux/lib/claude-cli.ts` returns `true`.
+
+---
+
 _Add new issues below as they're discovered. Group by category._

@@ -71,7 +71,7 @@ async function analyzeLinkCoverage(): Promise<LinkCoverageResult> {
     return {
       name: 'Link Coverage',
       description: 'Cross-reference density analysis',
-      error: 'Run pnpm build first',
+      error: 'No entities found (data layer may be empty)',
       totalIssues: 0,
       orphanPages: [],
       stats: null

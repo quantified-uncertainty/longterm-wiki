@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { shouldUseApiDirect, isClaudeCliAvailable, resetCliDetectionCache } from './claude-cli.ts';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { shouldUseApiDirect, isClaudeCliAvailable, isInsideClaudeCodeSession, resetCliDetectionCache } from './claude-cli.ts';
 
 describe('Claude CLI Detection', () => {
   beforeEach(() => {
@@ -37,5 +37,37 @@ describe('Claude CLI Detection', () => {
     // After reset, should re-detect (still same result, but cache was cleared)
     const result = isClaudeCliAvailable();
     expect(typeof result).toBe('boolean');
+  });
+
+  describe('CLAUDECODE env var detection', () => {
+    const originalClaudeCode = process.env.CLAUDECODE;
+
+    afterEach(() => {
+      if (originalClaudeCode !== undefined) {
+        process.env.CLAUDECODE = originalClaudeCode;
+      } else {
+        delete process.env.CLAUDECODE;
+      }
+    });
+
+    it('isInsideClaudeCodeSession: returns true when CLAUDECODE=1', () => {
+      process.env.CLAUDECODE = '1';
+      expect(isInsideClaudeCodeSession()).toBe(true);
+    });
+
+    it('isInsideClaudeCodeSession: returns false when CLAUDECODE unset', () => {
+      delete process.env.CLAUDECODE;
+      expect(isInsideClaudeCodeSession()).toBe(false);
+    });
+
+    it('shouldUseApiDirect: returns true inside Claude Code session', () => {
+      process.env.CLAUDECODE = '1';
+      expect(shouldUseApiDirect(undefined)).toBe(true);
+    });
+
+    it('shouldUseApiDirect: explicit false still overrides CLAUDECODE', () => {
+      process.env.CLAUDECODE = '1';
+      expect(shouldUseApiDirect(false)).toBe(false);
+    });
   });
 });

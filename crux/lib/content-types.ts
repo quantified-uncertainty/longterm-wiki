@@ -7,6 +7,7 @@
 
 import { join, dirname } from 'path';
 import { readFileSync, existsSync } from 'fs';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 // ---------------------------------------------------------------------------
@@ -299,16 +300,57 @@ export function extractEntityId(filePath: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// Data layer auto-build
+// ---------------------------------------------------------------------------
+
+let _dataLayerBuildAttempted = false;
+
+/**
+ * Ensure the data layer (database.json, pages.json, etc.) exists.
+ * If missing, attempts to build it automatically by running build-data.mjs.
+ *
+ * Returns true if the data layer exists (or was successfully built).
+ */
+export function ensureDataLayer(): boolean {
+  const pagesPath = join(GENERATED_DATA_DIR_ABS, 'pages.json');
+  const dbPath = join(GENERATED_DATA_DIR_ABS, 'database.json');
+
+  if (existsSync(pagesPath) && existsSync(dbPath)) return true;
+  if (_dataLayerBuildAttempted) return false;
+
+  _dataLayerBuildAttempted = true;
+
+  console.error('\x1b[33m⚠ Data layer missing — auto-building...\x1b[0m');
+  try {
+    execSync('node --import tsx/esm scripts/build-data.mjs', {
+      cwd: join(PROJECT_ROOT, 'app'),
+      stdio: 'inherit',
+      timeout: 120_000,
+    });
+    console.error('\x1b[32m✓ Data layer built successfully.\x1b[0m');
+    return existsSync(pagesPath) && existsSync(dbPath);
+  } catch {
+    console.error('\x1b[31m✗ Auto-build failed. Run manually: pnpm run --filter longterm-next sync:data\x1b[0m');
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Generated JSON loaders (app/src/data/*.json)
 // ---------------------------------------------------------------------------
 
 /**
  * Load a JSON file from the generated data directory.
  * Returns the fallback value if the file doesn't exist.
+ * Attempts auto-build if the data layer is missing.
  */
 export function loadGeneratedJson<T>(filename: string, fallback: T): T {
   const filepath = join(GENERATED_DATA_DIR_ABS, filename);
-  if (!existsSync(filepath)) return fallback;
+  if (!existsSync(filepath)) {
+    // Try auto-building the data layer before giving up
+    ensureDataLayer();
+    if (!existsSync(filepath)) return fallback;
+  }
   return JSON.parse(readFileSync(filepath, 'utf-8'));
 }
 

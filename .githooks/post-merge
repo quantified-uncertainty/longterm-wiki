@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Post-merge hook — rebuilds the data layer after pulling new changes.
+#
+# Triggers when files in data/, content/docs/, or data-related scripts change.
+# This prevents stale-data bugs after git pull.
+#
+
+# Check if any data-relevant files changed in the merge
+CHANGED_FILES=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null || echo "")
+
+NEEDS_REBUILD=false
+
+if echo "$CHANGED_FILES" | grep -qE '^(data/|content/docs/|app/scripts/build-data)'; then
+  NEEDS_REBUILD=true
+fi
+
+if [ "$NEEDS_REBUILD" = true ]; then
+  echo ""
+  echo "Data files changed — rebuilding data layer..."
+  echo ""
+  if (cd "$(git rev-parse --show-toplevel)/app" && node --import tsx/esm scripts/build-data.mjs 2>/dev/null); then
+    echo "Data layer rebuilt successfully."
+  else
+    echo "WARNING: Data layer rebuild failed. Run manually: pnpm run --filter longterm-next sync:data"
+  fi
+fi

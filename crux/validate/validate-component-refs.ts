@@ -102,7 +102,7 @@ function loadEntities(): Set<string> {
     const database = loadDatabaseJson();
     return new Set(Object.keys(database.entities || {}));
   } catch {
-    log.warn('Warning: Could not load entities database. Run pnpm build first.');
+    log.warn('Warning: Could not load entities database. Data layer may need manual rebuild.');
     return new Set();
   }
 }

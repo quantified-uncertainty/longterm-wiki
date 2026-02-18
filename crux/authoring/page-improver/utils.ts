@@ -10,6 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createPhaseLogger } from '../../lib/output.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
+import { loadPages as loadPagesFromRegistry } from '../../lib/content-types.ts';
 import type { AnalysisResult, PageData, TierConfig } from './types.ts';
 import { FRONTMATTER_RE } from '../../lib/patterns.ts';
 
@@ -100,12 +101,13 @@ export function getImportPath(): string {
 // ── Page loading ─────────────────────────────────────────────────────────────
 
 export function loadPages(): PageData[] {
-  const pagesPath = path.join(ROOT, 'app/src/data/pages.json');
-  if (!fs.existsSync(pagesPath)) {
-    console.error('Error: pages.json not found. Run `pnpm build` first.');
+  // Use centralized loader which auto-builds the data layer if missing
+  const pages = loadPagesFromRegistry();
+  if (pages.length === 0) {
+    console.error('Error: pages.json is empty after auto-build. Check data/ for issues.');
     process.exit(1);
   }
-  return JSON.parse(fs.readFileSync(pagesPath, 'utf-8'));
+  return pages as PageData[];
 }
 
 function enrichWithFrontmatterRatings(page: PageData): PageData {
