@@ -1,88 +1,92 @@
 entity: openai
 facts:
-  # === Funding ===
-
-  microsoft-total-investment:
+  # microsoft-total-investment
+  931278d9:
     measure: total-funding
-    value: 13e9
-    asOf: "2024-01"
-    source: "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/"
-    sourceResource: "862e2d851c171321"
-    note: "Microsoft cumulative investment"
+    value: 13000000000
+    asOf: 2024-01
+    source: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/
+    sourceResource: 862e2d851c171321
+    note: Microsoft cumulative investment
 
-  # === User metrics ===
-
-  chatgpt-users-first-2-months:
+  # chatgpt-users-first-2-months
+  599b42cc:
     measure: user-count
-    value: 100e6
-    asOf: "2023-02"
+    value: 100000000
+    asOf: 2023-02
     note: "Fastest-growing consumer application in history at that time"
     sourceResource: "aef77c1c7d4ec173"
 
-  # === Valuation timeseries ===
-  # measure auto-inferred as "valuation" from fact ID prefix
-
-  valuation-2024:
-    value: { min: 157e9 }
-    asOf: "2024-12"
+  # valuation-2024
+  6ce1d805:
+    value:
+      min: 157000000000
+    asOf: 2024-12
     note: "October 2024 funding round valuation"
-    sourceResource: "b8e4c3ef3a3c7827"
+    sourceResource: b8e4c3ef3a3c7827
+    measure: valuation
 
-  valuation-2025:
-    value: { min: 500e9 }
+  # valuation-2025
+  39d6868e:
+    value:
+      min: 500000000000
     asOf: "2025-10"
     note: "Secondary share sale valuation, October 2025"
     sourceResource: "85d93d2a25bf612a"
+    measure: valuation
 
-  # === Revenue timeseries ===
-  # measure auto-inferred as "revenue" from fact ID prefix
-
-  revenue-arr-2025:
-    value: 20e9
+  # revenue-arr-2025
+  609b9796:
+    value: 20000000000
     asOf: "2025"
     note: "ARR per CFO Sarah Friar disclosure"
     sourceResource: "b7e5b0d5d490071c"
+    measure: revenue
 
-  revenue-2024-projected:
-    value: 3.4e9
-    asOf: "2024-06"
+  # revenue-2024-projected
+  7e938d7a:
+    value: 3400000000
+    asOf: 2024-10
     note: "Annualized run rate as of mid-2024"
     sourceResource: "8c2d2cc48afb479d"
+    measure: revenue
 
-  # === Model benchmarks ===
-
-  gpt3-parameters:
+  # gpt3-parameters
+  7c9b9073:
     measure: model-parameters
-    value: 175e9
-    asOf: "2020-06"
-    source: "https://arxiv.org/abs/2005.14165"
-    sourceResource: "2cab3ea10b8b7ae2"
+    value: 175000000000
+    asOf: 2020-06
+    source: https://arxiv.org/abs/2005.14165
+    sourceResource: 2cab3ea10b8b7ae2
 
-  o1-aime-score:
+  # o1-aime-score
+  84af6115:
     measure: benchmark-score
     value: 83
-    asOf: "2024-09"
-    note: "o1 model performance on AIME math competition"
-    sourceResource: "9edf2bd5938d8386"
+    asOf: 2024-09
+    note: o1 model performance on AIME math competition
+    sourceResource: 9edf2bd5938d8386
 
-  o1-swe-bench-score:
+  # o1-swe-bench-score
+  25d2308f:
     measure: benchmark-score
     value: 71.7
-    asOf: "2024-09"
-    note: "o1 model on SWE-bench Verified"
-    sourceResource: "9edf2bd5938d8386"
+    asOf: 2024-09
+    note: o1 model on SWE-bench Verified
+    sourceResource: 9edf2bd5938d8386
 
-  # === Standalone facts (no measure — keep as strings) ===
-
-  revenue-yoy-growth-2024:
+  # revenue-yoy-growth-2024
+  be463d29:
     measure: ~
     value: "1,700%"
     asOf: "2024-09"
     note: "Monthly revenue growth from early 2023 to September 2024, not single-year YoY"
     sourceResource: "9437e7cf32e629df"
 
-  cofounder-departure-rate:
-    value: "75%"
+  # cofounder-departure-rate
+  fba50864:
+    value: 75%
     asOf: "2024"
-    note: "75% of co-founders departed within 9 years of founding"
-    sourceResource: "85ba042a002437a0"
+    note: 75% of co-founders departed within 9 years of founding
+    sourceResource: 85ba042a002437a0
+

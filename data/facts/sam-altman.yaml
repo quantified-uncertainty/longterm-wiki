@@ -1,44 +1,51 @@
 entity: sam-altman
 facts:
-  net-worth:
-    value: 2.8e9
+  # net-worth
+  7da0d60e:
+    value: 2800000000
     asOf: "2024"
     note: "Investment portfolio value per WSJ investigation"
     sourceResource: "69a7aca55efbfa51"
+    measure: net-worth
 
-  # Standalone facts (no measure — keep as strings)
-  openai-salary:
-    value: "$76,001/year"
+  # openai-salary
+  3362f219:
+    value: $76,001/year
     asOf: "2024"
     note: "Per OpenAI tax filing"
     sourceResource: "29e5d58fe306259d"
 
-  loopt-sale-price:
+  # loopt-sale-price
+  a73016c2:
     value: "$43 million"
     note: "Sold to Green Dot Corporation (precise figure $43.4M)"
     sourceResource: "9eb603bcd6ee754a"
 
-  early-stripe-investment:
-    value: "$15,000 for 2%"
+  # early-stripe-investment
+  7a1f98d6:
+    value: $15,000 for 2%
     asOf: "2009"
     note: "Per WSJ investigation of Altman's investment portfolio"
     sourceResource: "792c07f18a99af7c"
 
-  yc-companies-funded:
+  # yc-companies-funded
+  c9b9b3d2:
     value: "1,900"
     note: "Companies funded during YC tenure (through 2019)"
     sourceResource: "b795385697c55df2"
 
-  board-crisis-employee-letter:
-    value: "95%"
-    asOf: "2023-11"
-    note: "738 of 770 employees signed letter threatening to quit"
-    sourceResource: "ddced8916d043aa2"
+  # board-crisis-employee-letter
+  6783fa6c:
+    value: 95%
+    asOf: 2023-11
+    note: 738 of 770 employees signed letter threatening to quit
+    sourceResource: ddced8916d043aa2
 
   # Worldcoin user metrics moved to data/facts/worldcoin.yaml
   # (Worldcoin is a separate entity from Sam Altman as an individual)
 
-  helion-personal-investment:
+  # helion-personal-investment
+  "0872e650":
     value: "$375 million"
     note: "Personal investment in Helion Energy"
     sourceResource: "003e2cbd0f507952"

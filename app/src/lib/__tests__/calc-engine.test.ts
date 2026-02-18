@@ -2,35 +2,35 @@ import { describe, it, expect } from "vitest";
 import { calc, formatValue, type CalcFormat } from "../calc-engine";
 import type { Fact } from "@/data";
 
-// Mock fact store
+// Mock fact store — fact IDs are 8-char hex hashes
 const mockFacts: Record<string, Fact> = {
-  "anthropic.valuation": {
+  "anthropic.6796e194": {
     value: "$380 billion",
     numeric: 380_000_000_000,
     asOf: "2026-02",
     entity: "anthropic",
-    factId: "valuation",
+    factId: "6796e194",
   },
-  "anthropic.revenue-arr-2025": {
+  "anthropic.55d88868": {
     value: "$9 billion",
     numeric: 9_000_000_000,
     asOf: "2025-12",
     entity: "anthropic",
-    factId: "revenue-arr-2025",
+    factId: "55d88868",
   },
-  "anthropic.gross-margin": {
+  "anthropic.a1e87600": {
     value: "40%",
     numeric: 0.4,
     asOf: "2025",
     entity: "anthropic",
-    factId: "gross-margin",
+    factId: "a1e87600",
   },
-  "anthropic.business-customers": {
+  "anthropic.7a3815b4": {
     value: "300,000+",
     numeric: 300_000,
     asOf: "2025",
     entity: "anthropic",
-    factId: "business-customers",
+    factId: "7a3815b4",
   },
 };
 
@@ -44,26 +44,26 @@ function mockLookup(entity: string, factId: string): Fact | undefined {
 
 describe("calc — expression evaluation", () => {
   it("evaluates a simple fact reference", () => {
-    const result = calc("{anthropic.valuation}", mockLookup);
+    const result = calc("{anthropic.6796e194}", mockLookup);
     expect(result.value).toBe(380_000_000_000);
   });
 
   it("evaluates division of two facts", () => {
     const result = calc(
-      "{anthropic.valuation} / {anthropic.revenue-arr-2025}",
+      "{anthropic.6796e194} / {anthropic.55d88868}",
       mockLookup
     );
     expect(result.value).toBeCloseTo(42.22, 1);
   });
 
   it("evaluates multiplication", () => {
-    const result = calc("{anthropic.revenue-arr-2025} * 2", mockLookup);
+    const result = calc("{anthropic.55d88868} * 2", mockLookup);
     expect(result.value).toBe(18_000_000_000);
   });
 
   it("evaluates addition and subtraction", () => {
     const result = calc(
-      "{anthropic.valuation} - {anthropic.revenue-arr-2025}",
+      "{anthropic.6796e194} - {anthropic.55d88868}",
       mockLookup
     );
     expect(result.value).toBe(371_000_000_000);
@@ -71,7 +71,7 @@ describe("calc — expression evaluation", () => {
 
   it("evaluates parenthesized expressions", () => {
     const result = calc(
-      "({anthropic.valuation} + {anthropic.revenue-arr-2025}) / 2",
+      "({anthropic.6796e194} + {anthropic.55d88868}) / 2",
       mockLookup
     );
     expect(result.value).toBe(194_500_000_000);
@@ -83,12 +83,12 @@ describe("calc — expression evaluation", () => {
   });
 
   it("evaluates unary negation", () => {
-    const result = calc("-{anthropic.revenue-arr-2025}", mockLookup);
+    const result = calc("-{anthropic.55d88868}", mockLookup);
     expect(result.value).toBe(-9_000_000_000);
   });
 
   it("evaluates scientific notation", () => {
-    const result = calc("1e9 + {anthropic.revenue-arr-2025}", mockLookup);
+    const result = calc("1e9 + {anthropic.55d88868}", mockLookup);
     expect(result.value).toBe(10_000_000_000);
   });
 
@@ -112,13 +112,13 @@ describe("calc — error handling", () => {
   });
 
   it("throws on division by zero", () => {
-    expect(() => calc("{anthropic.valuation} / 0", mockLookup)).toThrow(
+    expect(() => calc("{anthropic.6796e194} / 0", mockLookup)).toThrow(
       "Division by zero"
     );
   });
 
   it("throws on unexpected characters", () => {
-    expect(() => calc("{anthropic.valuation} @ 2", mockLookup)).toThrow(
+    expect(() => calc("{anthropic.6796e194} @ 2", mockLookup)).toThrow(
       "Unexpected character"
     );
   });
@@ -131,18 +131,18 @@ describe("calc — error handling", () => {
 describe("calc — input tracking", () => {
   it("tracks all referenced facts", () => {
     const result = calc(
-      "{anthropic.valuation} / {anthropic.revenue-arr-2025}",
+      "{anthropic.6796e194} / {anthropic.55d88868}",
       mockLookup
     );
     expect(result.inputs).toHaveLength(2);
-    expect(result.inputs[0].ref).toBe("anthropic.valuation");
+    expect(result.inputs[0].ref).toBe("anthropic.6796e194");
     expect(result.inputs[0].value).toBe("$380 billion");
     expect(result.inputs[0].asOf).toBe("2026-02");
-    expect(result.inputs[1].ref).toBe("anthropic.revenue-arr-2025");
+    expect(result.inputs[1].ref).toBe("anthropic.55d88868");
   });
 
   it("preserves the original expression", () => {
-    const expr = "{anthropic.valuation} / {anthropic.revenue-arr-2025}";
+    const expr = "{anthropic.6796e194} / {anthropic.55d88868}";
     const result = calc(expr, mockLookup);
     expect(result.expr).toBe(expr);
   });
@@ -205,7 +205,7 @@ describe("formatValue", () => {
 describe("calc — formatted output", () => {
   it("formats P/S ratio with suffix", () => {
     const result = calc(
-      "{anthropic.valuation} / {anthropic.revenue-arr-2025}",
+      "{anthropic.6796e194} / {anthropic.55d88868}",
       mockLookup,
       { precision: 0, suffix: "x" }
     );
@@ -213,14 +213,14 @@ describe("calc — formatted output", () => {
   });
 
   it("formats gross margin as percent", () => {
-    const result = calc("{anthropic.gross-margin}", mockLookup, {
+    const result = calc("{anthropic.a1e87600}", mockLookup, {
       format: "percent",
     });
     expect(result.display).toBe("40%");
   });
 
   it("formats revenue as currency", () => {
-    const result = calc("{anthropic.revenue-arr-2025}", mockLookup, {
+    const result = calc("{anthropic.55d88868}", mockLookup, {
       format: "currency",
     });
     expect(result.display).toBe("$9.0 billion");

@@ -253,11 +253,11 @@ import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@component
 
 Use these to keep numbers in sync with the canonical facts database:
 
-- **\\\`<F e="entity-id" f="fact-id">display text</F>\\\`** — Inline canonical fact with hover tooltip.
-  Example: \\\`<F e="anthropic" f="valuation">\\\\$380B</F>\\\`
+- **\\\`<F e="entity-id" f="hashId">display text</F>\\\`** — Inline canonical fact with hover tooltip. Fact IDs are 8-char hex hashes — use only IDs from the Fact Lookup Table.
+  Example: \\\`<F e="anthropic" f="6796e194">\\\\$380B</F>\\\`
 - **\\\`<Calc expr="..." format="..." precision={N} suffix="x" />\\\`** — Computed value from fact expressions.
-  The \\\`expr\\\` uses \\\`{entity.factId}\\\` references and supports +, -, *, /, ^, ().
-  Example: \\\`<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />\\\` → "27x"
+  The \\\`expr\\\` uses \\\`{entity.hashId}\\\` references and supports +, -, *, /, ^, ().
+  Example: \\\`<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" />\\\` → "27x"
   Formats: "currency" (\\$X billion), "percent" (X%), "number" (X,XXX), or auto.
   Use \\\`<Calc>\\\` instead of hardcoding ratios, multiples, or other derived numbers.
 

@@ -115,7 +115,9 @@ export function buildFactLookupForContent(pageId: string, content: string, ROOT:
     for (const [factId, fact] of Object.entries(factFile.facts)) {
       if (fact.compute) continue; // Skip computed facts — use <Calc> for those
 
+      // Fact IDs are 8-char hex hashes; include measure and note for LLM context
       const parts = [`${factFile.entity}.${factId}: "${fact.value}"`];
+      if (fact.measure) parts.push(`[${fact.measure}]`);
       if (fact.asOf) parts.push(`(as of ${fact.asOf})`);
       if (fact.note) parts.push(`— ${fact.note}`);
       rows.push(parts.join(' '));

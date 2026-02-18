@@ -94,8 +94,8 @@ Make targeted improvements based on the analysis and directions. Follow these gu
 - EntityLinks use **numeric IDs**: \`<EntityLink id="E22">Anthropic</EntityLink>\`
 - Escape dollar signs: \\$100M not $100M
 - Import from: '${importPath}'
-- Use \`<F e="entity" f="fact-id">display</F>\` for canonical fact values (hover tooltip shows source/date)
-- Use \`<Calc expr="{entity.factId} / {entity.factId}" precision={1} suffix="x" />\` for derived values (ratios, multiples, percentages)
+- Use \`<F e="entity" f="hashId">display</F>\` for canonical fact values (hover tooltip shows source/date). Fact IDs are 8-char hex hashes — always copy from the Fact Lookup Table below.
+- Use \`<Calc expr="{entity.hashId} / {entity.hashId}" precision={1} suffix="x" />\` for derived values (ratios, multiples, percentages)
   - Supports: +, -, *, /, ^, (). Formats: "currency", "percent", "number", or auto.
   - Prefer \`<Calc>\` over hardcoded derived numbers — it stays in sync when source facts update
 
@@ -110,12 +110,12 @@ ${entityLookup}
 ${factLookup ? `
 ### Fact Lookup Table
 
-These canonical facts are available for wrapping with \`<F>\`. The format is: entity.factId: "display value" (as of date) — note.
-ONLY use fact IDs from this table. If a value doesn't match a fact here, leave it as plain text.
+These canonical facts are available for wrapping with \`<F>\`. The format is: entity.hashId: "display value" [measure] (as of date) — note.
+Fact IDs are 8-char hex hashes. ONLY use IDs from this table. If a value doesn't match a fact here, leave it as plain text.
 
 When you encounter a hardcoded number in the prose that matches a fact below, wrap it:
 - Before: \`Anthropic raised \\$30 billion\`
-- After: \`Anthropic raised <F e="anthropic" f="series-g-raise">\\$30 billion</F>\`
+- After: \`Anthropic raised <F e="anthropic" f="5b0663a0">\\$30 billion</F>\`
 
 **Important:** Only wrap a value when the prose is clearly referring to the same thing the fact describes. For example, "\\$1B" could be revenue OR investment — check the fact's note to confirm the semantic match. When in doubt, leave it unwrapped.
 

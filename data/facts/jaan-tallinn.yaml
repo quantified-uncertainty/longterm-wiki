@@ -1,6 +1,7 @@
 entity: jaan-tallinn
 facts:
-  skype-cofounder:
+  # skype-cofounder
+  cf22bd43:
     value: "2003"
     noCompute: true
     note: "Co-founded Skype, sold to eBay for $2.6B in 2005"

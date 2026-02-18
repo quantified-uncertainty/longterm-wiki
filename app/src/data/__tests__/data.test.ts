@@ -222,16 +222,16 @@ const mockDatabase = {
     },
   ],
   facts: {
-    "test-entity.severity-level": {
+    "test-entity.a1b2c3d4": {
       value: "high",
       entity: "test-entity",
-      factId: "severity-level",
+      factId: "a1b2c3d4",
     },
-    "test-entity.impact-estimate": {
+    "test-entity.e5f6a7b8": {
       value: "$1 billion",
       numeric: 1000000000,
       entity: "test-entity",
-      factId: "impact-estimate",
+      factId: "e5f6a7b8",
     },
   },
   stats: {},
@@ -329,7 +329,7 @@ describe("Data Layer", () => {
   describe("getFact / getFactValue", () => {
     it("returns fact by composite key", async () => {
       const { getFact } = await import("../../data/index");
-      const fact = getFact("test-entity", "severity-level");
+      const fact = getFact("test-entity", "a1b2c3d4");
       expect(fact).toBeDefined();
       expect(fact?.value).toBe("high");
     });
@@ -341,7 +341,7 @@ describe("Data Layer", () => {
 
     it("getFactValue returns just the value string", async () => {
       const { getFactValue } = await import("../../data/index");
-      expect(getFactValue("test-entity", "impact-estimate")).toBe("$1 billion");
+      expect(getFactValue("test-entity", "e5f6a7b8")).toBe("$1 billion");
     });
   });
 
@@ -350,8 +350,8 @@ describe("Data Layer", () => {
       const { getFactsForEntity } = await import("../../data/index");
       const facts = getFactsForEntity("test-entity");
       expect(Object.keys(facts)).toHaveLength(2);
-      expect(facts["severity-level"]).toBeDefined();
-      expect(facts["impact-estimate"]).toBeDefined();
+      expect(facts["a1b2c3d4"]).toBeDefined();
+      expect(facts["e5f6a7b8"]).toBeDefined();
     });
 
     it("returns empty object for entity with no facts", async () => {

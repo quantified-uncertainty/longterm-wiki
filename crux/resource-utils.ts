@@ -5,13 +5,18 @@
  */
 
 import { basename } from 'path';
-import { createHash } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from './lib/content-types.ts';
 import { findMdxFiles } from './lib/file-utils.ts';
 import type { Resource, MarkdownLink } from './resource-types.ts';
 
 export function hashId(str: string): string {
   return createHash('sha256').update(str).digest('hex').slice(0, 16);
+}
+
+/** Generate a random 8-char hex ID for facts. */
+export function generateFactId(): string {
+  return randomBytes(4).toString('hex');
 }
 
 export function normalizeUrl(url: string): string[] {
