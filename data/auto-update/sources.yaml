@@ -29,8 +29,8 @@ sources:
 
   - id: anthropic-blog
     name: Anthropic Blog / Research
-    type: rss
-    url: https://www.anthropic.com/rss.xml
+    type: web-search
+    query: "Anthropic blog new research safety interpretability 2026"
     frequency: daily
     categories: [ai-labs, safety, models, interpretability]
     reliability: high
@@ -47,8 +47,8 @@ sources:
 
   - id: meta-ai-blog
     name: Meta AI Blog
-    type: rss
-    url: https://ai.meta.com/blog/rss/
+    type: web-search
+    query: "Meta AI blog new models open source Llama 2026"
     frequency: daily
     categories: [ai-labs, models, open-source]
     reliability: high
@@ -162,7 +162,7 @@ sources:
   - id: navigating-ai-risks
     name: Navigating AI Risks
     type: rss
-    url: https://navigatingairisks.substack.com/feed
+    url: https://www.navigatingrisks.ai/feed
     frequency: daily
     categories: [safety, governance, policy, risk]
     reliability: medium

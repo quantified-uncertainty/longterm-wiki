@@ -1,0 +1,21 @@
+date: 2026-02-18
+startedAt: 2026-02-18T19:38:20.553Z
+completedAt: 2026-02-18T19:46:27.620Z
+trigger: manual
+budget:
+  limit: 50
+  spent: 0
+digest:
+  sourcesChecked: 15
+  sourcesFailed: 3
+  itemsFetched: 1089
+  itemsRelevant: 1040
+plan:
+  pagesPlanned: 8
+  newPagesSuggested: 0
+execution:
+  pagesUpdated: 0
+  pagesFailed: 0
+  pagesSkipped: 0
+  results: []
+newPagesCreated: []

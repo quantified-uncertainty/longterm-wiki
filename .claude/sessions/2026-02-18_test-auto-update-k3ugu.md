@@ -1,0 +1,20 @@
+## 2026-02-18 | claude/test-auto-update-k3ugu | Fix and test auto-update pipeline
+
+**What was done:** Fixed three bugs in the auto-update system: (1) web search result parser couldn't parse LLM markdown output format, (2) orchestrator called page-improver shim instead of index.ts causing main() to never execute, (3) broken RSS URLs for Anthropic/Meta AI blogs (no official RSS feeds). Verified full pipeline end-to-end: fetch → digest → route → improve → validate.
+
+**Pages:** ai-timelines
+
+**Model:** opus-4-6
+
+**Duration:** ~45min
+
+**Issues encountered:**
+- Anthropic and Meta AI do not have official RSS feeds; switched to web-search type
+- navigating-ai-risks substack redirects to navigatingrisks.ai (updated URL, still returns 403 from some clients)
+- Page-improver research phase JSON parsing warning (non-blocking, 0 sources found)
+- Research phase took ~15 minutes for standard tier on AI Timelines page
+
+**Learnings/notes:**
+- The `executeWebSearch` LLM output uses `### N. emoji **Title**` format with `**URL:**` on separate lines — parser regex must handle this
+- The page-improver shim (`page-improver.ts`) imports index.ts dynamically, but `process.argv[1]` doesn't match `import.meta.url` in the index, so `main()` never runs. Must call `page-improver/index.ts` directly.
+- Web-search sources work well as replacements for broken RSS feeds; produce ~5 relevant items per query

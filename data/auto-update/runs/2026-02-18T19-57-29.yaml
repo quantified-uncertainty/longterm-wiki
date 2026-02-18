@@ -1,0 +1,25 @@
+date: 2026-02-18
+startedAt: 2026-02-18T19:57:29.332Z
+completedAt: 2026-02-18T19:58:58.110Z
+trigger: manual
+budget:
+  limit: 7
+  spent: 6.5
+digest:
+  sourcesChecked: 1
+  sourcesFailed: 0
+  itemsFetched: 10
+  itemsRelevant: 10
+plan:
+  pagesPlanned: 1
+  newPagesSuggested: 0
+execution:
+  pagesUpdated: 1
+  pagesFailed: 0
+  pagesSkipped: 0
+  results:
+    - pageId: language-models
+      status: success
+      tier: standard
+      durationMs: 1706
+newPagesCreated: []

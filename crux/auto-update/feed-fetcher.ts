@@ -242,7 +242,11 @@ async function fetchWebSearch(source: NewsSource, since: string | null): Promise
 
   const searchResults = await executeWebSearch(fullQuery);
 
-  // Parse the LLM-formatted search results into structured items
+  // Parse the LLM-formatted search results into structured items.
+  // The LLM returns markdown with various formats:
+  //   "### 1. Title" or "1. **Title**" or "**1. Title** —" etc.
+  //   URLs in "**URL:** [url](url)" or inline markdown links or bare URLs
+  //   Descriptions in "**Description:**" lines or plain text
   const items: FeedItem[] = [];
   const lines = searchResults.split('\n');
   let currentTitle = '';
@@ -250,10 +254,22 @@ async function fetchWebSearch(source: NewsSource, since: string | null): Promise
   let currentSummary = '';
 
   for (const line of lines) {
-    const urlMatch = line.match(/https?:\/\/[^\s)]+/);
-    const titleMatch = line.match(/^\d+\.\s*\*?\*?(.+?)\*?\*?\s*[-–—]/);
+    const trimmed = line.trim();
 
-    if (titleMatch) {
+    // Match numbered item headers in various formats:
+    //   "### 1. 🏛️ Title Here"
+    //   "1. **Title Here** — description"
+    //   "**1. Title Here**"
+    const titleMatch = trimmed.match(
+      /^(?:#{1,4}\s+)?(\d+)\.\s*(?:[\p{Emoji}\p{Emoji_Presentation}\u200d\ufe0f]+\s*)?(?:\*\*)?(.+?)(?:\*\*)?$/u
+    ) || trimmed.match(
+      /^(\d+)\.\s*\*?\*?(.+?)\*?\*?\s*[-–—]/
+    );
+
+    // Match explicit URL lines: "**URL:** [text](url)" or "**URL:** url"
+    const explicitUrlMatch = trimmed.match(/^\*\*URL:?\*\*:?\s*(?:\[.*?\]\()?(https?:\/\/[^\s)]+)/i);
+
+    if (titleMatch && titleMatch[2]) {
       // Save previous item if we have one
       if (currentTitle && currentUrl) {
         items.push({
@@ -267,23 +283,37 @@ async function fetchWebSearch(source: NewsSource, since: string | null): Promise
           reliability: source.reliability,
         });
       }
-      currentTitle = titleMatch[1].trim();
-      currentUrl = urlMatch?.[0] || '';
+      // Clean title: remove trailing markdown artifacts
+      currentTitle = titleMatch[2]
+        .replace(/\*\*/g, '')
+        .replace(/\[.*?\]\(.*?\)/g, '')
+        .trim();
+      // Check if title line also contains a URL
+      const inlineUrl = trimmed.match(/https?:\/\/[^\s)]+/);
+      currentUrl = inlineUrl?.[0] || '';
       currentSummary = '';
-    } else if (urlMatch && !currentUrl) {
-      currentUrl = urlMatch[0];
-    } else if (line.trim()) {
-      currentSummary += ' ' + line.trim();
+    } else if (explicitUrlMatch) {
+      currentUrl = explicitUrlMatch[1];
+    } else if (!currentUrl && trimmed.match(/^https?:\/\//)) {
+      // Bare URL line
+      currentUrl = trimmed.match(/https?:\/\/[^\s)]+/)?.[0] || '';
+    } else if (trimmed.startsWith('**Description:**') || trimmed.startsWith('**Source:**')) {
+      // Extract description text, stripping the label
+      const descText = trimmed.replace(/^\*\*(Description|Source):\*\*\s*/, '');
+      currentSummary += ' ' + descText;
+    } else if (trimmed && !trimmed.startsWith('---') && !trimmed.startsWith('|') && !trimmed.startsWith('🔑')) {
+      // Regular text contributes to summary (skip separators and tables)
+      currentSummary += ' ' + trimmed;
     }
   }
 
   // Don't forget the last item
-  if (currentTitle) {
+  if (currentTitle && currentUrl) {
     items.push({
       sourceId: source.id,
       sourceName: source.name,
       title: currentTitle,
-      url: currentUrl || '',
+      url: currentUrl,
       publishedAt: new Date().toISOString().slice(0, 10),
       summary: currentSummary.trim().slice(0, 500),
       categories: [...source.categories],
