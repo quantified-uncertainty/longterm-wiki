@@ -1,14 +1,16 @@
 ## 2026-02-18 | claude/integrate-grokepedia-gKpMf | Integrate Grokipedia as external link platform
 
-**What was done:** Added Grokipedia as a new external link platform (alongside LessWrong, Wikipedia, etc.) and populated 171 page-to-Grokipedia mappings — 65 derived from existing Wikipedia links, 106 from high-confidence title matching for person and organization pages.
+**What was done:** Added Grokipedia as a 9th external link platform with 79 verified page mappings. Full integration across data types, UI (InfoBox), CLI tooling (`crux grokipedia match`), content pipeline (canonical-links, source-fetching, scan-content, resource-utils), and verification scripts. Fixed shell injection vulnerability in curl-based URL checkers (execSync -> execFileSync). Removed 89 broken links via HEAD verification + 3 semantic mismatches (conjecture/mesa-optimization/chain-of-thought pointed to wrong articles).
 
 **Pages:** grokipedia
 
 **Issues encountered:**
-- DNS resolution blocked in this environment (`EAI_AGAIN`), so HTTP-based URL verification against grokipedia.com was not possible. Used Wikipedia-derived slugs and conservative title matching instead.
-- `pnpm install` fails on puppeteer postinstall; workaround with `--ignore-scripts`.
+- DNS resolution blocked in this environment (`EAI_AGAIN`) for Node.js https; curl works as fallback
+- Title-based matching produced ~52% false positive rate (89/171 broken); curl HEAD verification was essential
+- `conjecture` mapped to math concept instead of AI safety org; `mesa-optimization` and `chain-of-thought` mapped to parent topics
 
 **Learnings/notes:**
+- Always verify Grokipedia links via HEAD requests; title-based matching is unreliable for niche topics
+- Use `execFileSync` (not `execSync`) when passing external data to shell commands to prevent injection
 - Grokipedia URL pattern: `https://grokipedia.com/page/Article_Name` (Wikipedia-style slugs)
-- The `crux grokipedia match` command supports live HTTP checking for future use when network access is available
-- The offline script (`crux/scripts/grokipedia-from-wikipedia.mjs`) is useful as a fallback when DNS is blocked
+- Created GitHub Issue #209 for future Option C: using Grokipedia as research source in content pipeline

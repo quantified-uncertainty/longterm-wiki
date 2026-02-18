@@ -14,7 +14,7 @@ import type { CommandResult } from "../lib/cli.ts";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { parse, stringify } from "yaml";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 const PROJECT_ROOT = join(import.meta.dirname, "../..");
 const DATA_DIR = join(PROJECT_ROOT, "data");
@@ -78,8 +78,9 @@ function checkGrokipediaUrl(
   const url = GROKIPEDIA_BASE + slug;
   try {
     const status = parseInt(
-      execSync(
-        `curl -sI -o /dev/null -w "%{http_code}" --max-time ${Math.round(REQUEST_TIMEOUT_MS / 1000)} "${url}"`,
+      execFileSync(
+        "curl",
+        ["-sI", "-o", "/dev/null", "-w", "%{http_code}", "--max-time", String(Math.round(REQUEST_TIMEOUT_MS / 1000)), url],
         { encoding: "utf-8", timeout: REQUEST_TIMEOUT_MS + 4000 }
       ).trim(),
       10

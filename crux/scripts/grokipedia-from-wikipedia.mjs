@@ -30,7 +30,7 @@ const apply = process.argv.includes("--apply");
 
 // Load data
 const pages = JSON.parse(readFileSync(PAGES_JSON, "utf-8"));
-const externalLinks = parse(readFileSync(EXTERNAL_LINKS_YAML, "utf-8"));
+const externalLinks = parse(readFileSync(EXTERNAL_LINKS_YAML, "utf-8")) || [];
 const linkMap = new Map(externalLinks.map((e) => [e.pageId, e]));
 
 console.log(`Loaded ${pages.length} pages, ${externalLinks.length} external link entries\n`);

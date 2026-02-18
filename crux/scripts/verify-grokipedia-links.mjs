@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { parse, stringify } from "yaml";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 const PROJECT_ROOT = join(import.meta.dirname, "../..");
 const EXTERNAL_LINKS_YAML = join(PROJECT_ROOT, "data/external-links.yaml");
@@ -23,8 +23,9 @@ const apply = process.argv.includes("--apply");
  */
 function checkUrl(url) {
   try {
-    const status = execSync(
-      `curl -sI -o /dev/null -w "%{http_code}" --max-time 8 "${url}"`,
+    const status = execFileSync(
+      "curl",
+      ["-sI", "-o", "/dev/null", "-w", "%{http_code}", "--max-time", "8", url],
       { encoding: "utf-8", timeout: 12000 }
     ).trim();
     return parseInt(status, 10) || 0;
@@ -34,8 +35,8 @@ function checkUrl(url) {
 }
 
 // Load data
-const entries = parse(readFileSync(EXTERNAL_LINKS_YAML, "utf-8"));
-const grokEntries = entries.filter(e => e.links.grokipedia);
+const entries = parse(readFileSync(EXTERNAL_LINKS_YAML, "utf-8")) || [];
+const grokEntries = entries.filter(e => e.links?.grokipedia);
 console.log(`Found ${grokEntries.length} entries with Grokipedia links\n`);
 
 // Check all URLs sequentially (curl doesn't parallelize well via execSync)

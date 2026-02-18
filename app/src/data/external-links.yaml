@@ -227,7 +227,6 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/chain-of-thought-alignment
     wikipedia: https://en.wikipedia.org/wiki/Prompt_engineering#Chain-of-thought
-    grokipedia: https://grokipedia.com/page/Prompt_engineering
 - pageId: chan-zuckerberg-initiative
   links:
     grokipedia: https://grokipedia.com/page/Chan_Zuckerberg_Initiative
@@ -269,7 +268,6 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/conjecture-org
     eaForum: https://forum.effectivealtruism.org/topics/conjecture
-    grokipedia: https://grokipedia.com/page/Conjecture
 - pageId: constitutional-ai
   links:
     lesswrong: https://www.lesswrong.com/tag/constitutional-ai
@@ -741,7 +739,6 @@
     lesswrong: https://www.lesswrong.com/tag/mesa-optimization
     stampy: https://aisafety.info/questions/8V5k/What-is-mesa-optimization
     alignmentForum: https://www.alignmentforum.org/tag/mesa-optimization
-    grokipedia: https://grokipedia.com/page/AI_alignment
 - pageId: mesa-optimization-analysis
   links:
     lesswrong: https://www.lesswrong.com/tag/mesa-optimization
