@@ -57,7 +57,7 @@ jobs:
               continue
             fi
 
-            if ! git fetch origin -- "$branch" 2>/dev/null; then
+            if ! git fetch origin "$branch" 2>/dev/null; then
               echo "::warning::PR #${pr_number} — could not fetch branch ${branch} (may be from a fork)."
               echo "::endgroup::"
               continue
@@ -70,7 +70,7 @@ jobs:
               # Check if rebase actually changed anything
               if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$branch")" ]; then
                 push_output=""
-                if push_output=$(git push origin -- "$branch" --force-with-lease 2>&1); then
+                if push_output=$(git push --force-with-lease origin "$branch" 2>&1); then
                   echo "Rebased and pushed successfully."
                 else
                   echo "::error::PR #${pr_number} — push failed: ${push_output}"
