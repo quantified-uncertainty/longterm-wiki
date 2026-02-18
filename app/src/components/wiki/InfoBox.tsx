@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { cn } from "@lib/utils";
-import { Lightbulb, FlaskConical, Target, CheckCircle2, ExternalLink, BookOpen, GraduationCap, MessageSquare, Briefcase } from "lucide-react";
+import { Lightbulb, FlaskConical, Target, CheckCircle2, ExternalLink, BookOpen, GraduationCap, MessageSquare, Briefcase, Bot } from "lucide-react";
 import { EntityTypeIcon, entityTypeConfig } from "./EntityTypeIcon";
 import { EntityLink } from "./EntityLink";
 import { severityColors, maturityColors, riskCategoryColors } from "./shared/style-config";
@@ -129,6 +129,7 @@ const externalLinkPlatforms: Record<string, { name: string; icon: typeof BookOpe
   stampy: { name: "AI Safety Info", icon: MessageSquare },
   arbital: { name: "Arbital", icon: BookOpen },
   eightyK: { name: "80,000 Hours", icon: Briefcase },
+  grokipedia: { name: "Grokipedia", icon: Bot },
 };
 
 function RatingItem({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: number }) {

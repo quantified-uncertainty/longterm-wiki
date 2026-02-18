@@ -78,6 +78,10 @@ import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 import { citationDensityRule } from './citation-density.ts';
 import { balanceFlagsRule } from './balance-flags.ts';
 
+// Security / safety checks
+import { urlSafetyRule } from './url-safety.ts';
+import { noExecSyncRule } from './no-exec-sync.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -121,6 +125,8 @@ export {
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
+  urlSafetyRule,
+  noExecSyncRule,
 };
 
 export const allRules: Rule[] = [
@@ -165,6 +171,8 @@ export const allRules: Rule[] = [
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
+  urlSafetyRule,
+  noExecSyncRule,
 ];
 
 export default allRules;

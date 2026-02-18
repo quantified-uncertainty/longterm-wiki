@@ -6,11 +6,11 @@
  */
 
 import fs from 'fs';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { validateSingleFile } from '../../../lib/validation-engine.ts';
 import { allRules } from '../../../lib/rules/index.ts';
 import type { PageData, ValidationResult, PipelineOptions } from '../types.ts';
-import { ROOT, NODE_TSX, CRITICAL_RULES, QUALITY_RULES, log, getFilePath, writeTemp } from '../utils.ts';
+import { ROOT, CRITICAL_RULES, QUALITY_RULES, log, getFilePath, writeTemp } from '../utils.ts';
 
 export async function validatePhase(page: PageData, improvedContent: string, _options: PipelineOptions): Promise<ValidationResult> {
   log('validate', 'Running validation checks (in-process)...');
@@ -80,13 +80,13 @@ export async function validatePhase(page: PageData, improvedContent: string, _op
     // Also run auto-fix commands for fixes not covered by the engine
     log('validate', 'Running supplemental auto-fixes (escaping, markdown)...');
     try {
-      execSync(
-        `${NODE_TSX} crux/crux.mjs fix escaping 2>&1`,
-        { cwd: ROOT, encoding: 'utf-8', timeout: 60000 }
+      execFileSync(
+        'node', ['--import', 'tsx/esm', '--no-warnings', 'crux/crux.mjs', 'fix', 'escaping'],
+        { cwd: ROOT, encoding: 'utf-8', stdio: 'pipe', timeout: 60000 }
       );
-      execSync(
-        `${NODE_TSX} crux/crux.mjs fix markdown 2>&1`,
-        { cwd: ROOT, encoding: 'utf-8', timeout: 60000 }
+      execFileSync(
+        'node', ['--import', 'tsx/esm', '--no-warnings', 'crux/crux.mjs', 'fix', 'markdown'],
+        { cwd: ROOT, encoding: 'utf-8', stdio: 'pipe', timeout: 60000 }
       );
       fixedContent = fs.readFileSync(filePath, 'utf-8');
       log('validate', '  ok supplemental fixes applied');
@@ -98,7 +98,7 @@ export async function validatePhase(page: PageData, improvedContent: string, _op
     // Check MDX compilation
     log('validate', 'Checking MDX compilation...');
     try {
-      execSync(`${NODE_TSX} crux/crux.mjs validate compile --quick`, {
+      execFileSync('node', ['--import', 'tsx/esm', '--no-warnings', 'crux/crux.mjs', 'validate', 'compile', '--quick'], {
         cwd: ROOT,
         stdio: 'pipe',
         timeout: 60000

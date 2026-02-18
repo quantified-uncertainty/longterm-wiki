@@ -201,6 +201,7 @@ function inferSourceType(url: string | undefined): string {
   if (lower.includes('whitehouse.gov')) return 'government';
 
   if (lower.includes('wikipedia.org')) return 'reference';
+  if (lower.includes('grokipedia.com')) return 'reference';
 
   if (lower.includes('.pdf')) return 'report';
 
