@@ -1039,6 +1039,7 @@ export interface ExternalLinksData {
   stampy?: string;
   arbital?: string;
   eightyK?: string;
+  grokipedia?: string;
 }
 
 let _externalLinksMap: Map<string, ExternalLinksData> | null = null;

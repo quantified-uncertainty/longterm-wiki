@@ -1,3 +1,6 @@
+- pageId: 80000-hours
+  links:
+    grokipedia: https://grokipedia.com/page/80,000_Hours
 - pageId: accident-risks
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-risk
@@ -26,6 +29,7 @@
     stampy: https://aisafety.info/questions/5651/What-is-artificial-general-intelligence-AGI
     arbital: https://arbital.greaterwrong.com/p/agi
     wikidata: https://www.wikidata.org/wiki/Q2264109
+    grokipedia: https://grokipedia.com/page/Artificial_general_intelligence
 - pageId: agi-development
   links:
     lesswrong: https://www.lesswrong.com/tag/agi
@@ -49,11 +53,13 @@
     lesswrong: https://www.lesswrong.com/tag/ai-boxing-containment
     wikipedia: https://en.wikipedia.org/wiki/AI_capability_control
     stampy: https://aisafety.info/questions/6175/What-is-AI-boxing
+    grokipedia: https://grokipedia.com/page/AI_capability_control
 - pageId: ai-control
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-control
     wikipedia: https://en.wikipedia.org/wiki/AI_capability_control
     alignmentForum: https://www.alignmentforum.org/tag/ai-control
+    grokipedia: https://grokipedia.com/page/AI_capability_control
 - pageId: ai-evaluations
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-evaluations
@@ -73,6 +79,7 @@
     eaForum: https://forum.effectivealtruism.org/topics/ai-safety
     wikidata: https://www.wikidata.org/wiki/Q116291231
     eightyK: https://80000hours.org/problem-profiles/artificial-intelligence/
+    grokipedia: https://grokipedia.com/page/AI_safety
 - pageId: ai-safety-institutes
   links:
     eaForum: https://forum.effectivealtruism.org/topics/ai-safety-institutes
@@ -86,6 +93,7 @@
     wikipedia: https://en.wikipedia.org/wiki/AI_takeover
     wikidata: https://www.wikidata.org/wiki/Q2254427
     eightyK: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+    grokipedia: https://grokipedia.com/page/AI_takeover
 - pageId: ai-timelines
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-timelines
@@ -94,6 +102,7 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/algorithms
     wikipedia: https://en.wikipedia.org/wiki/Machine_learning
+    grokipedia: https://grokipedia.com/page/Machine_learning
 - pageId: aligned-good
   links:
     eaForum: https://forum.effectivealtruism.org/topics/transformative-ai
@@ -106,6 +115,7 @@
     arbital: https://arbital.greaterwrong.com/p/ai_alignment
     wikidata: https://www.wikidata.org/wiki/Q24882728
     eightyK: https://80000hours.org/problem-profiles/artificial-intelligence/
+    grokipedia: https://grokipedia.com/page/AI_alignment
 - pageId: alignment-evals
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-evaluations
@@ -120,6 +130,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Anthropic
     lesswrong: https://www.lesswrong.com/tag/anthropic-org
     wikidata: https://www.wikidata.org/wiki/Q116758847
+    grokipedia: https://grokipedia.com/page/Anthropic
 - pageId: apollo-research
   links:
     lesswrong: https://www.lesswrong.com/tag/apollo-research-org
@@ -139,6 +150,7 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Automation
     lesswrong: https://www.lesswrong.com/tag/automation
+    grokipedia: https://grokipedia.com/page/Automation
 - pageId: automation-bias
   links:
     lesswrong: https://www.lesswrong.com/tag/automation
@@ -151,11 +163,13 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Lethal_autonomous_weapon
     wikidata: https://www.wikidata.org/wiki/Q25378861
+    grokipedia: https://grokipedia.com/page/Lethal_autonomous_weapon
 - pageId: biological-threat-exposure
   links:
     eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-biological-risk
     wikipedia: https://en.wikipedia.org/wiki/Biological_warfare
     eightyK: https://80000hours.org/problem-profiles/preventing-catastrophic-pandemics/
+    grokipedia: https://grokipedia.com/page/Biological_warfare
 - pageId: biosecurity
   links:
     eightyK: https://80000hours.org/problem-profiles/preventing-catastrophic-pandemics/
@@ -164,11 +178,13 @@
     wikipedia: https://en.wikipedia.org/wiki/Biological_warfare
     eaForum: https://forum.effectivealtruism.org/topics/global-catastrophic-biological-risk
     eightyK: https://80000hours.org/problem-profiles/preventing-catastrophic-pandemics/
+    grokipedia: https://grokipedia.com/page/Biological_warfare
 - pageId: brain-computer-interfaces
   links:
     lesswrong: https://www.lesswrong.com/tag/brain-computer-interfaces
     wikipedia: https://en.wikipedia.org/wiki/Brain%E2%80%93computer_interface
     wikidata: https://www.wikidata.org/wiki/Q897410
+    grokipedia: https://grokipedia.com/page/Brain–computer_interface
 - pageId: cais
   links:
     eaForum: https://forum.effectivealtruism.org/topics/center-for-ai-safety
@@ -199,6 +215,9 @@
     stampy: https://aisafety.info/questions/8mTg/What-is-existential-risk
     wikidata: https://www.wikidata.org/wiki/Q1531622
     eightyK: https://80000hours.org/articles/existential-risks/
+- pageId: cea
+  links:
+    grokipedia: https://grokipedia.com/page/Centre_for_Effective_Altruism
 - pageId: chai
   links:
     lesswrong: https://www.lesswrong.com/tag/center-for-human-compatible-ai-chai
@@ -208,13 +227,23 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/chain-of-thought-alignment
     wikipedia: https://en.wikipedia.org/wiki/Prompt_engineering#Chain-of-thought
+- pageId: chan-zuckerberg-initiative
+  links:
+    grokipedia: https://grokipedia.com/page/Chan_Zuckerberg_Initiative
+- pageId: chris-olah
+  links:
+    grokipedia: https://grokipedia.com/page/Chris_Olah
 - pageId: civilizational-resilience
   links:
     eightyK: https://80000hours.org/problem-profiles/civilisation-resilience/
+- pageId: coalition-for-epidemic-preparedness-innovations
+  links:
+    grokipedia: https://grokipedia.com/page/Coalition_for_Epidemic_Preparedness_Innovations
 - pageId: collective-intelligence
   links:
     wikipedia: https://en.wikipedia.org/wiki/Collective_intelligence
     wikidata: https://www.wikidata.org/wiki/Q432197
+    grokipedia: https://grokipedia.com/page/Collective_intelligence
 - pageId: companies
   links:
     eaForum: https://forum.effectivealtruism.org/topics/ai-labs
@@ -284,6 +313,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Cyberwarfare
     eaForum: https://forum.effectivealtruism.org/topics/cybersecurity
     eightyK: https://80000hours.org/career-reviews/information-security/
+    grokipedia: https://grokipedia.com/page/Cyberwarfare
 - pageId: cybersecurity
   links:
     eightyK: https://80000hours.org/career-reviews/information-security/
@@ -291,9 +321,14 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Cyberwarfare
     lesswrong: https://www.lesswrong.com/tag/computer-security-and-cryptography
+    grokipedia: https://grokipedia.com/page/Cyberwarfare
+- pageId: dan-hendrycks
+  links:
+    grokipedia: https://grokipedia.com/page/Dan_Hendrycks
 - pageId: daniela-amodei
   links:
     eaForum: https://forum.effectivealtruism.org/topics/anthropic
+    grokipedia: https://grokipedia.com/page/Daniela_Amodei
 - pageId: dario-amodei
   links:
     wikipedia: https://en.wikipedia.org/wiki/Dario_Amodei
@@ -320,19 +355,23 @@
     stampy: https://aisafety.info/questions/5LJp/What-is-decision-theory
     wikidata: https://www.wikidata.org/wiki/Q177571
     eightyK: https://80000hours.org/problem-profiles/ai-enhanced-decision-making/
+    grokipedia: https://grokipedia.com/page/Decision_theory
 - pageId: deep-learning
   links:
     wikidata: https://www.wikidata.org/wiki/Q197536
 - pageId: deep-learning-era
   links:
     wikipedia: https://en.wikipedia.org/wiki/Deep_learning
+    grokipedia: https://grokipedia.com/page/Deep_learning
 - pageId: deepfake-detection
   links:
     wikipedia: https://en.wikipedia.org/wiki/Deepfake#Detection
+    grokipedia: https://grokipedia.com/page/Deepfake
 - pageId: deepfakes
   links:
     wikipedia: https://en.wikipedia.org/wiki/Deepfake
     wikidata: https://www.wikidata.org/wiki/Q49473179
+    grokipedia: https://grokipedia.com/page/Deepfake
 - pageId: deepmind
   links:
     wikipedia: https://en.wikipedia.org/wiki/DeepMind
@@ -342,6 +381,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Demis_Hassabis
     eaForum: https://forum.effectivealtruism.org/topics/demis-hassabis
     wikidata: https://www.wikidata.org/wiki/Q3022141
+    grokipedia: https://grokipedia.com/page/Demis_Hassabis
 - pageId: dense-transformers
   links:
     lesswrong: https://www.lesswrong.com/tag/transformers
@@ -354,6 +394,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Disinformation
     eaForum: https://forum.effectivealtruism.org/topics/misinformation-and-disinformation
     wikidata: https://www.wikidata.org/wiki/Q189656
+    grokipedia: https://grokipedia.com/page/Disinformation
 - pageId: economic-disruption
   links:
     lesswrong: https://www.lesswrong.com/tag/economic-consequences-of-agi
@@ -372,6 +413,7 @@
     lesswrong: https://www.lesswrong.com/tag/effective-altruism
     eaForum: https://forum.effectivealtruism.org/topics/building-effective-altruism
     wikidata: https://www.wikidata.org/wiki/Q13489381
+    grokipedia: https://grokipedia.com/page/Effective_altruism
 - pageId: effectiveness-assessment
   links:
     eaForum: https://forum.effectivealtruism.org/topics/impact-assessment
@@ -385,6 +427,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
     lesswrong: https://www.lesswrong.com/tag/eliezer-yudkowsky
     wikidata: https://www.wikidata.org/wiki/Q704195
+    grokipedia: https://grokipedia.com/page/Eliezer_Yudkowsky
 - pageId: emergent-capabilities
   links:
     lesswrong: https://www.lesswrong.com/tag/emergent-behavior-emergence
@@ -395,6 +438,9 @@
 - pageId: epistemic-health
   links:
     eaForum: https://forum.effectivealtruism.org/topics/community-epistemic-health
+- pageId: epistemic-orgs-epoch-ai
+  links:
+    grokipedia: https://grokipedia.com/page/Epoch_AI
 - pageId: epistemic-sycophancy
   links:
     lesswrong: https://www.lesswrong.com/tag/sycophancy
@@ -414,6 +460,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Artificial_Intelligence_Act
     eaForum: https://forum.effectivealtruism.org/topics/eu-ai-act
     wikidata: https://www.wikidata.org/wiki/Q108456694
+    grokipedia: https://grokipedia.com/page/Artificial_Intelligence_Act
 - pageId: evals
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-evaluations
@@ -430,6 +477,7 @@
     eaForum: https://forum.effectivealtruism.org/topics/existential-catastrophe-1
     wikipedia: https://en.wikipedia.org/wiki/Global_catastrophic_risk
     eightyK: https://80000hours.org/articles/existential-risks/
+    grokipedia: https://grokipedia.com/page/Global_catastrophic_risk
 - pageId: existential-risk
   links:
     lesswrong: https://www.lesswrong.com/tag/existential-risk
@@ -462,6 +510,9 @@
 - pageId: flash-dynamics
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-takeoff
+- pageId: founders-fund
+  links:
+    grokipedia: https://grokipedia.com/page/Founders_Fund
 - pageId: fraud
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-misuse
@@ -469,13 +520,16 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Game_theory
     wikidata: https://www.wikidata.org/wiki/Q44455
+    grokipedia: https://grokipedia.com/page/Game_theory
 - pageId: genetic-enhancement
   links:
     wikipedia: https://en.wikipedia.org/wiki/Human_genetic_enhancement
+    grokipedia: https://grokipedia.com/page/Human_genetic_enhancement
 - pageId: geoffrey-hinton
   links:
     wikipedia: https://en.wikipedia.org/wiki/Geoffrey_Hinton
     wikidata: https://www.wikidata.org/wiki/Q92894
+    grokipedia: https://grokipedia.com/page/Geoffrey_Hinton
 - pageId: geopolitics
   links:
     eightyK: https://80000hours.org/problem-profiles/great-power-conflict/
@@ -488,6 +542,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Goodhart%27s_law
     lesswrong: https://www.lesswrong.com/tag/goodhart-s-law
     stampy: https://aisafety.info/questions/5943/What-is-Goodharts-Law
+    grokipedia: https://grokipedia.com/page/Goodhart's_law
 - pageId: govai
   links:
     eaForum: https://forum.effectivealtruism.org/topics/centre-for-the-governance-of-ai
@@ -514,9 +569,13 @@
 - pageId: great-power-conflict
   links:
     eightyK: https://80000hours.org/problem-profiles/great-power-conflict/
+- pageId: helen-toner
+  links:
+    grokipedia: https://grokipedia.com/page/Helen_Toner
 - pageId: holden-karnofsky
   links:
     eaForum: https://forum.effectivealtruism.org/topics/holden-karnofsky
+    grokipedia: https://grokipedia.com/page/Holden_Karnofsky
 - pageId: human-agency
   links:
     lesswrong: https://www.lesswrong.com/tag/agency
@@ -537,9 +596,11 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Ilya_Sutskever
     wikidata: https://www.wikidata.org/wiki/Q21712134
+    grokipedia: https://grokipedia.com/page/Ilya_Sutskever
 - pageId: industries
   links:
     wikipedia: https://en.wikipedia.org/wiki/Applications_of_artificial_intelligence
+    grokipedia: https://grokipedia.com/page/Applications_of_artificial_intelligence
 - pageId: inner-alignment
   links:
     lesswrong: https://www.lesswrong.com/tag/inner-alignment
@@ -555,6 +616,7 @@
     stampy: https://aisafety.info/questions/5FhD/What-is-instrumental-convergence
     arbital: https://arbital.greaterwrong.com/p/instrumental_convergence
     eightyK: https://80000hours.org/problem-profiles/risks-from-power-seeking-ai/
+    grokipedia: https://grokipedia.com/page/Instrumental_convergence
 - pageId: instrumental-convergence-framework
   links:
     lesswrong: https://www.lesswrong.com/tag/instrumental-convergence
@@ -576,6 +638,7 @@
     stampy: https://aisafety.info/questions/9SIA/What-is-interpretability
     wikidata: https://www.wikidata.org/wiki/Q17027399
     alignmentForum: https://www.alignmentforum.org/tag/interpretability-ml-and-ai
+    grokipedia: https://grokipedia.com/page/Explainable_artificial_intelligence
 - pageId: interpretability-coverage
   links:
     lesswrong: https://www.lesswrong.com/tag/interpretability-ml-and-ai
@@ -586,9 +649,15 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/existential-risk
     eaForum: https://forum.effectivealtruism.org/topics/existential-risk
+- pageId: jaan-tallinn
+  links:
+    grokipedia: https://grokipedia.com/page/Jaan_Tallinn
 - pageId: jan-leike
   links:
     wikidata: https://www.wikidata.org/wiki/Q123130693
+- pageId: johns-hopkins-center-for-health-security
+  links:
+    grokipedia: https://grokipedia.com/page/Johns_Hopkins_Center_for_Health_Security
 - pageId: lab-behavior
   links:
     eightyK: https://80000hours.org/career-reviews/working-at-an-ai-lab/
@@ -608,12 +677,19 @@
     wikipedia: https://en.wikipedia.org/wiki/Large_language_model
     lesswrong: https://www.lesswrong.com/tag/language-models-llms
     eaForum: https://forum.effectivealtruism.org/topics/large-language-models
+    grokipedia: https://grokipedia.com/page/Large_language_model
 - pageId: large-language-models
   links:
     eaForum: https://forum.effectivealtruism.org/topics/large-language-models
 - pageId: learned-helplessness
   links:
     eightyK: https://80000hours.org/problem-profiles/gradual-disempowerment/
+- pageId: leopold-aschenbrenner
+  links:
+    grokipedia: https://grokipedia.com/page/Leopold_Aschenbrenner
+- pageId: lesswrong
+  links:
+    grokipedia: https://grokipedia.com/page/LessWrong
 - pageId: lock-in
   links:
     eaForum: https://forum.effectivealtruism.org/topics/lock-in
@@ -632,6 +708,10 @@
     eaForum: https://forum.effectivealtruism.org/topics/longtermism
     wikidata: https://www.wikidata.org/wiki/Q109311813
     eightyK: https://80000hours.org/articles/future-generations/
+    grokipedia: https://grokipedia.com/page/Longtermism
+- pageId: macarthur-foundation
+  links:
+    grokipedia: https://grokipedia.com/page/MacArthur_Foundation
 - pageId: machine-learning
   links:
     wikidata: https://www.wikidata.org/wiki/Q2539
@@ -644,6 +724,7 @@
 - pageId: max-tegmark
   links:
     wikidata: https://www.wikidata.org/wiki/Q2076321
+    grokipedia: https://grokipedia.com/page/Max_Tegmark
 - pageId: mech-interp
   links:
     eaForum: https://forum.effectivealtruism.org/topics/mechanistic-interpretability
@@ -661,6 +742,9 @@
 - pageId: mesa-optimization-analysis
   links:
     lesswrong: https://www.lesswrong.com/tag/mesa-optimization
+- pageId: metaculus
+  links:
+    grokipedia: https://grokipedia.com/page/Metaculus
 - pageId: metr
   links:
     eaForum: https://forum.effectivealtruism.org/topics/metr
@@ -673,6 +757,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute
     lesswrong: https://www.lesswrong.com/tag/machine-intelligence-research-institute-miri
     wikidata: https://www.wikidata.org/wiki/Q2040269
+    grokipedia: https://grokipedia.com/page/Machine_Intelligence_Research_Institute
 - pageId: miri-era
   links:
     lesswrong: https://www.lesswrong.com/tag/machine-intelligence-research-institute-miri
@@ -710,6 +795,7 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Multi-agent_system
     wikidata: https://www.wikidata.org/wiki/Q85786957
+    grokipedia: https://grokipedia.com/page/Multi-agent_system
 - pageId: multipolar-competition
   links:
     lesswrong: https://www.lesswrong.com/tag/multipolar-scenarios
@@ -722,6 +808,7 @@
 - pageId: neuro-symbolic
   links:
     wikipedia: https://en.wikipedia.org/wiki/Neuro-symbolic_AI
+    grokipedia: https://grokipedia.com/page/Neuro-symbolic_AI
 - pageId: neuromorphic
   links:
     lesswrong: https://www.lesswrong.com/tag/neuromorphic-ai
@@ -730,6 +817,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Nick_Bostrom
     lesswrong: https://www.lesswrong.com/tag/nick-bostrom
     wikidata: https://www.wikidata.org/wiki/Q460475
+    grokipedia: https://grokipedia.com/page/Nick_Bostrom
 - pageId: nuclear-risk
   links:
     eightyK: https://80000hours.org/problem-profiles/nuclear-security/
@@ -744,6 +832,7 @@
     wikipedia: https://en.wikipedia.org/wiki/OpenAI
     lesswrong: https://www.lesswrong.com/tag/openai
     wikidata: https://www.wikidata.org/wiki/Q21708200
+    grokipedia: https://grokipedia.com/page/OpenAI
 - pageId: oracle-ai
   links:
     lesswrong: https://www.lesswrong.com/tag/oracle-ai
@@ -758,6 +847,9 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/outer-alignment
     alignmentForum: https://www.alignmentforum.org/tag/outer-alignment
+- pageId: palisade-research
+  links:
+    grokipedia: https://grokipedia.com/page/Palisade_Research
 - pageId: paul-christiano
   links:
     eaForum: https://forum.effectivealtruism.org/topics/paul-christiano
@@ -777,6 +869,9 @@
 - pageId: political-power
   links:
     eightyK: https://80000hours.org/problem-profiles/extreme-power-concentration/
+- pageId: polymarket
+  links:
+    grokipedia: https://grokipedia.com/page/Polymarket
 - pageId: power-concentration
   links:
     lesswrong: https://www.lesswrong.com/tag/instrumental-convergence
@@ -792,6 +887,7 @@
     eaForum: https://forum.effectivealtruism.org/topics/prediction-markets
     wikipedia: https://en.wikipedia.org/wiki/Prediction_market
     wikidata: https://www.wikidata.org/wiki/Q55903482
+    grokipedia: https://grokipedia.com/page/Prediction_market
 - pageId: preference-authenticity
   links:
     lesswrong: https://www.lesswrong.com/tag/human-values
@@ -830,6 +926,9 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/redwood-research
     eaForum: https://forum.effectivealtruism.org/topics/redwood-research
+- pageId: redwood-research
+  links:
+    grokipedia: https://grokipedia.com/page/Redwood_Research
 - pageId: regulation
   links:
     lesswrong: https://www.lesswrong.com/tag/regulation-and-ai-risk
@@ -844,6 +943,7 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Reinforcement_learning
     lesswrong: https://www.lesswrong.com/tag/reinforcement-learning
+    grokipedia: https://grokipedia.com/page/Reinforcement_learning
 - pageId: research-agendas
   links:
     lesswrong: https://www.lesswrong.com/tag/research-agendas
@@ -866,6 +966,10 @@
     wikipedia: https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback
     stampy: https://aisafety.info/questions/8RIL/What-is-RLHF
     wikidata: https://www.wikidata.org/wiki/Q115570683
+    grokipedia: https://grokipedia.com/page/Reinforcement_learning_from_human_feedback
+- pageId: robin-hanson
+  links:
+    grokipedia: https://grokipedia.com/page/Robin_Hanson
 - pageId: robot-threat-exposure
   links:
     lesswrong: https://www.lesswrong.com/tag/robotics
@@ -890,10 +994,14 @@
 - pageId: safety-culture-strength
   links:
     eaForum: https://forum.effectivealtruism.org/topics/ai-lab-safety
+- pageId: safety-orgs-epoch-ai
+  links:
+    grokipedia: https://grokipedia.com/page/Epoch_AI
 - pageId: sam-altman
   links:
     wikipedia: https://en.wikipedia.org/wiki/Sam_Altman
     wikidata: https://www.wikidata.org/wiki/Q7407093
+    grokipedia: https://grokipedia.com/page/Sam_Altman
 - pageId: sandbagging
   links:
     lesswrong: https://www.lesswrong.com/tag/sandbagging
@@ -901,6 +1009,7 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/ai-boxing-containment
     wikipedia: https://en.wikipedia.org/wiki/AI_capability_control
+    grokipedia: https://grokipedia.com/page/AI_capability_control
 - pageId: sb-1047
   links:
     wikidata: https://www.wikidata.org/wiki/Q127393140
@@ -916,6 +1025,10 @@
   links:
     lesswrong: https://www.lesswrong.com/tag/scaling-laws
     wikipedia: https://en.wikipedia.org/wiki/Neural_scaling_law
+    grokipedia: https://grokipedia.com/page/Neural_scaling_law
+- pageId: schmidt-futures
+  links:
+    grokipedia: https://grokipedia.com/page/Schmidt_Futures
 - pageId: scientific-corruption
   links:
     lesswrong: https://www.lesswrong.com/tag/science
@@ -953,6 +1066,7 @@
   links:
     wikipedia: https://en.wikipedia.org/wiki/Stuart_J._Russell
     wikidata: https://www.wikidata.org/wiki/Q7627055
+    grokipedia: https://grokipedia.com/page/Stuart_J._Russell
 - pageId: suffering-lock-in
   links:
     eaForum: https://forum.effectivealtruism.org/topics/s-risk
@@ -963,6 +1077,7 @@
     lesswrong: https://www.lesswrong.com/tag/superintelligence
     stampy: https://aisafety.info/questions/5880/What-is-superintelligence
     wikidata: https://www.wikidata.org/wiki/Q1566000
+    grokipedia: https://grokipedia.com/page/Superintelligence
 - pageId: superintelligence-book
   links:
     wikidata: https://www.wikidata.org/wiki/Q18386449
@@ -975,6 +1090,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Mass_surveillance
     wikidata: https://www.wikidata.org/wiki/Q334401
     eightyK: https://80000hours.org/problem-profiles/risks-of-stable-totalitarianism/
+    grokipedia: https://grokipedia.com/page/Mass_surveillance
 - pageId: sycophancy
   links:
     lesswrong: https://www.lesswrong.com/tag/sycophancy
@@ -999,6 +1115,7 @@
   links:
     eaForum: https://forum.effectivealtruism.org/topics/toby-ord
     wikidata: https://www.wikidata.org/wiki/Q7811863
+    grokipedia: https://grokipedia.com/page/Toby_Ord
 - pageId: tool-ai
   links:
     lesswrong: https://www.lesswrong.com/tag/tool-ai
@@ -1057,6 +1174,7 @@
     wikipedia: https://en.wikipedia.org/wiki/Mind_uploading
     wikidata: https://www.wikidata.org/wiki/Q2267982
     eightyK: https://80000hours.org/problem-profiles/whole-brain-emulation/
+    grokipedia: https://grokipedia.com/page/Mind_uploading
 - pageId: x-risk
   links:
     wikidata: https://www.wikidata.org/wiki/Q21715237
@@ -1064,7 +1182,12 @@
 - pageId: xai
   links:
     lesswrong: https://www.lesswrong.com/tag/xai
+    grokipedia: https://grokipedia.com/page/xAI
+- pageId: yann-lecun
+  links:
+    grokipedia: https://grokipedia.com/page/Yann_LeCun
 - pageId: yoshua-bengio
   links:
     wikipedia: https://en.wikipedia.org/wiki/Yoshua_Bengio
     wikidata: https://www.wikidata.org/wiki/Q3572699
+    grokipedia: https://grokipedia.com/page/Yoshua_Bengio

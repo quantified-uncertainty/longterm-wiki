@@ -118,6 +118,7 @@ export async function registerResearchSources(topic: string, { log, saveResult, 
       else if (url.includes('forum.effectivealtruism.org')) sourceType = 'blog';
       else if (url.includes('substack.com')) sourceType = 'blog';
       else if (url.includes('medium.com')) sourceType = 'blog';
+      else if (url.includes('grokipedia.com')) sourceType = 'reference';
 
       const id = hashId(url);
       sources.upsert({

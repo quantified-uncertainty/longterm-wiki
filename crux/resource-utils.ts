@@ -79,6 +79,7 @@ export function guessResourceType(url: string): string {
   if (domain.includes('ncbi.nlm.nih.gov') || domain.includes('pubmed')) return 'paper';
   if (domain.includes('gov') || domain.includes('government')) return 'government';
   if (domain.includes('wikipedia.org')) return 'reference';
+  if (domain.includes('grokipedia.com')) return 'reference';
   if (domain.includes('youtube.com') || domain.includes('youtu.be')) return 'talk';
   if (domain.includes('podcast') || domain.includes('spotify.com')) return 'podcast';
   if (domain.includes('substack.com') || domain.includes('medium.com')) return 'blog';
