@@ -46,9 +46,14 @@ function generateMdxStub(entity) {
   // Include description from entity content intro if available
   let descriptionLine = '';
   if (entity.content?.intro) {
-    // Extract first sentence as description (up to 160 chars)
-    const firstSentence = entity.content.intro.split(/\.\s|\n/)[0].replace(/"/g, '\\"').trim();
-    if (firstSentence) {
+    // Strip JSX/HTML tags and markdown links, then extract first sentence
+    const text = entity.content.intro
+      .replace(/<[^>]+>/g, '')  // Strip JSX/HTML tags
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Strip markdown links
+      .replace(/\*\*([^*]+)\*\*/g, '$1') // Strip bold markers
+      .trim();
+    const firstSentence = text.split(/\.\s|\n\n/)[0]?.replace(/"/g, '\\"').trim();
+    if (firstSentence && firstSentence.length > 10) {
       const desc = firstSentence.length > 157 ? firstSentence.slice(0, 157) + '...' : firstSentence + '.';
       descriptionLine = `\ndescription: "${desc}"`;
     }
