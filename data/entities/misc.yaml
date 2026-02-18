@@ -80,6 +80,43 @@
       type: lab
   lastUpdated: 2026-02
 
+- id: anthropic-stakeholders
+  numericId: E815
+  type: table
+  title: Anthropic Stakeholders
+  description: >-
+    Consolidated ownership table for Anthropic at $380B valuation (Feb 2026).
+    Seven co-founders (2-3% each), Google (~14%), Amazon (significant minority),
+    EA-aligned investors Tallinn ($2-6B) and Moskovitz ($3-9B), employee pool
+    (12-18%). Total EA-aligned capital: $27-76B risk-adjusted.
+  tags:
+    - anthropic
+    - stakeholders
+    - ownership
+    - ea-capital
+  clusters:
+    - community
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: anthropic
+      type: lab
+    - id: anthropic-investors
+      type: analysis
+    - id: anthropic-valuation
+      type: analysis
+    - id: anthropic-ipo
+      type: analysis
+    - id: jaan-tallinn
+      type: researcher
+    - id: dustin-moskovitz
+      type: researcher
+    - id: dario-amodei
+      type: researcher
+    - id: daniela-amodei
+      type: researcher
+  lastUpdated: 2026-02
+
 - id: anthropic-investors
   numericId: E406
   type: analysis
