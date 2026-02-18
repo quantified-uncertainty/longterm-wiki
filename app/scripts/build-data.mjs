@@ -735,7 +735,14 @@ function buildPathRegistry() {
     for (const file of readdirSync(entityDir)) {
       if (!file.endsWith('.yaml')) continue;
       const content = readFileSync(join(entityDir, file), 'utf-8');
-      const entities = parse(content);
+      let entities;
+      try {
+        entities = parse(content);
+      } catch (e) {
+        console.error(`Failed to parse YAML ${join(entityDir, file)}: ${e.message}`);
+        process.exitCode = 1;
+        continue;
+      }
       if (!Array.isArray(entities)) continue;
       for (const entity of entities) {
         if (!entity.id || registry[entity.id]) continue;
@@ -1088,7 +1095,14 @@ async function main() {
     for (const file of factFiles) {
       const filepath = join(factsDir, file);
       const content = readFileSync(filepath, 'utf-8');
-      const parsed = parse(content);
+      let parsed;
+      try {
+        parsed = parse(content);
+      } catch (e) {
+        console.error(`Failed to parse YAML ${filepath}: ${e.message}`);
+        process.exitCode = 1;
+        continue;
+      }
       if (parsed && parsed.entity && parsed.facts) {
         for (const [factId, factData] of Object.entries(parsed.facts)) {
           const key = `${parsed.entity}.${factId}`;
@@ -1106,7 +1120,13 @@ async function main() {
   const factMeasures = {};
   if (existsSync(factMeasuresPath)) {
     const measuresContent = readFileSync(factMeasuresPath, 'utf-8');
-    const measuresParsed = parse(measuresContent);
+    let measuresParsed;
+    try {
+      measuresParsed = parse(measuresContent);
+    } catch (e) {
+      console.error(`Failed to parse YAML ${factMeasuresPath}: ${e.message}`);
+      process.exitCode = 1;
+    }
     if (measuresParsed && measuresParsed.measures) {
       for (const [measureId, measureDef] of Object.entries(measuresParsed.measures)) {
         factMeasures[measureId] = { id: measureId, ...measureDef };
