@@ -106,7 +106,7 @@ async function main() {
   }
 
   // Table header
-  console.log(`${c.bold}${'Verified'.padEnd(10)} ${'Broken'.padEnd(8)} ${'Total'.padEnd(7)} ${'Date'.padEnd(12)} Page${c.reset}`);
+  console.log(`${c.bold}${'Verified'.padEnd(10)} ${'Broken'.padEnd(8)} ${'Total'.padEnd(7)} ${'Checked'.padEnd(12)} Page${c.reset}`);
   console.log(`${c.dim}${'─'.repeat(65)}${c.reset}`);
 
   for (const s of display) {

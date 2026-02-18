@@ -91,7 +91,9 @@ export function readCitationArchive(pageId: string): CitationArchiveFile | null 
   try {
     const raw = fs.readFileSync(filePath, 'utf-8');
     return parseYaml(raw) as CitationArchiveFile;
-  } catch {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`Warning: failed to read citation archive ${filePath}: ${msg}`);
     return null;
   }
 }
@@ -116,7 +118,9 @@ export function listArchivedPages(): string[] {
       .filter((f: string) => f.endsWith('.yaml'))
       .map((f: string) => f.replace(/\.yaml$/, ''))
       .sort();
-  } catch {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`Warning: failed to list citation archives: ${msg}`);
     return [];
   }
 }
@@ -145,7 +149,8 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Pattern 1: [^N]: [Title](URL) with optional trailing description
+    // Pattern 1: [^N]: [Title](URL) optional-description
+    // Captures: (1) footnote number, (2) link title, (3) URL, (4) optional trailing text
     const titledMatch = line.match(/^\[\^(\d+)\]:\s*\[([^\]]*)\]\((https?:\/\/[^)]+)\)(?:\s+(.+))?/);
     if (titledMatch) {
       const desc = titledMatch[4]?.trim();
@@ -157,7 +162,8 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
       continue;
     }
 
-    // Pattern 2: [^N]: URL (bare URL)
+    // Pattern 2: [^N]: URL (bare URL, no title)
+    // Captures: (1) footnote number, (2) URL
     const bareMatch = line.match(/^\[\^(\d+)\]:\s*(https?:\/\/[^\s]+)/);
     if (bareMatch) {
       footnoteDefinitions.set(parseInt(bareMatch[1], 10), {

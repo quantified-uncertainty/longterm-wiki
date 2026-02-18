@@ -132,8 +132,11 @@ db.exec(`
 // Add review column to summaries table if it doesn't exist
 try {
   db.exec('ALTER TABLE summaries ADD COLUMN review TEXT');
-} catch (e) {
-  // Column already exists, ignore error
+} catch (e: unknown) {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (!msg.includes('duplicate column') && !msg.includes('already exists')) {
+    console.warn('Warning: ALTER TABLE summaries migration failed:', msg);
+  }
 }
 
 // Add citation_content table for full article text storage (issue #200)

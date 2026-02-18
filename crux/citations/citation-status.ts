@@ -22,7 +22,7 @@ async function main() {
   const pageId = positional[0];
 
   if (!pageId) {
-    console.log(`${c.red}Error: page ID required. Usage: crux citations status <page-id>${c.reset}`);
+    console.error(`${c.red}Error: page ID required. Usage: crux citations status <page-id>${c.reset}`);
     process.exit(1);
   }
 
@@ -43,11 +43,11 @@ async function main() {
   }
 
   console.log(`\n${c.bold}${c.blue}Citation Status: ${pageId}${c.reset}`);
-  console.log(`  Verified: ${archive.verifiedAt}`);
-  console.log(`  Total:        ${archive.totalCitations}`);
-  console.log(`  ${c.green}Verified:${c.reset}     ${archive.verified}`);
-  console.log(`  ${c.red}Broken:${c.reset}       ${archive.broken}`);
-  console.log(`  ${c.yellow}Unverifiable:${c.reset} ${archive.unverifiable}\n`);
+  console.log(`  Verified at:     ${archive.verifiedAt}`);
+  console.log(`  Total:           ${archive.totalCitations}`);
+  console.log(`  ${c.green}Verified:${c.reset}        ${archive.verified}`);
+  console.log(`  ${c.red}Broken:${c.reset}          ${archive.broken}`);
+  console.log(`  ${c.yellow}Unverifiable:${c.reset}    ${archive.unverifiable}\n`);
 
   const displayCitations = broken
     ? archive.citations.filter(cit => cit.status === 'broken')

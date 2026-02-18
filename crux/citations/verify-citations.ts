@@ -86,9 +86,9 @@ async function main() {
   const pageId = positional[0];
 
   if (!all && !pageId) {
-    console.log(`${c.red}Error: provide a page ID or use --all${c.reset}`);
-    console.log(`  Usage: pnpm crux citations verify <page-id>`);
-    console.log(`         pnpm crux citations verify --all [--limit=50]`);
+    console.error(`${c.red}Error: provide a page ID or use --all${c.reset}`);
+    console.error(`  Usage: pnpm crux citations verify <page-id>`);
+    console.error(`         pnpm crux citations verify --all [--limit=50]`);
     process.exit(1);
   }
 
@@ -175,7 +175,7 @@ async function main() {
   // Single page verification
   const filePath = findPageFile(pageId);
   if (!filePath) {
-    console.log(`${c.red}Error: page "${pageId}" not found${c.reset}`);
+    console.error(`${c.red}Error: page "${pageId}" not found${c.reset}`);
     process.exit(1);
   }
 
