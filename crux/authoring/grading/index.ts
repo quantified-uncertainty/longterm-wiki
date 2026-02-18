@@ -4,7 +4,9 @@
  * Grade Content CLI — 3-Step Pipeline entry point.
  *
  * Orchestrates page collection, filtering, cost estimation, parallel
- * processing, and statistics output. Delegates grading logic to steps.ts.
+ * processing, and statistics output. Delegates grading logic to steps.ts,
+ * page collection to pages.ts, frontmatter writes to apply.ts,
+ * and statistics to stats.ts.
  *
  * Usage:
  *   ANTHROPIC_API_KEY=sk-... node crux/authoring/grading/index.ts [options]
@@ -23,21 +25,15 @@
  */
 
 import { createClient } from '../../lib/anthropic.ts';
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
-import { relative, basename, dirname } from 'path';
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { CONTENT_DIR } from '../../lib/content-types.ts';
-import { parseFrontmatter } from '../../lib/mdx-utils.ts';
-import { FRONTMATTER_RE } from '../../lib/patterns.ts';
-import { findMdxFiles } from '../../lib/file-utils.ts';
 import { parseCliArgs } from '../../lib/cli.ts';
-import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import { getApiKey } from '../../lib/api-keys.ts';
-import type Anthropic from '@anthropic-ai/sdk';
+import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 
 import type {
-  Frontmatter, PageInfo, Warning, ChecklistWarning,
+  PageInfo, Warning, ChecklistWarning,
   GradeResult, PageResult, ProcessPageResult, Options,
 } from './types.ts';
 import {
@@ -45,6 +41,9 @@ import {
   runAutomatedWarnings, runChecklistReview,
   formatWarningsSummary, gradePage,
 } from './steps.ts';
+import { collectPages } from './pages.ts';
+import { applyGradesToFile } from './apply.ts';
+import { printStats } from './stats.ts';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -68,130 +67,105 @@ function parseOptions(argv: string[]): Options {
   };
 }
 
-// ── Page Collection ──────────────────────────────────────────────────────────
+// ── Page Processing ──────────────────────────────────────────────────────────
 
-/** Alias for shared parseFrontmatter. */
-const extractFrontmatter = parseFrontmatter;
+async function processPage(
+  client: ReturnType<typeof createClient>,
+  page: PageInfo,
+  index: number,
+  total: number,
+  options: Options,
+): Promise<ProcessPageResult> {
+  try {
+    let automatedWarnings: Warning[] = [];
+    let checklistWarnings: ChecklistWarning[] = [];
+    let warningsSummary: string | null = null;
 
-/**
- * Detect page type based on filename and frontmatter.
- * - 'overview': index.mdx files (navigation pages)
- * - 'stub': explicitly marked in frontmatter
- * - 'content': default
- */
-function detectPageType(id: string, frontmatter: Frontmatter): string {
-  if (id === 'index') return 'overview';
-  if (frontmatter.pageType === 'stub') return 'stub';
-  return 'content';
-}
+    // Step 1 & 2: Run warnings (unless --skip-warnings)
+    if (!options.skipWarnings) {
+      automatedWarnings = await runAutomatedWarnings(page);
+      console.log(`  [${index + 1}/${total}] ${page.id}: Step 1 — ${automatedWarnings.length} automated warnings`);
 
-/** Scan content directory and collect all pages. */
-function collectPages(): PageInfo[] {
-  const files = findMdxFiles(CONTENT_DIR);
-  const pages: PageInfo[] = [];
+      if (!options.dryRun) {
+        checklistWarnings = await runChecklistReview(client, page);
+        console.log(`  [${index + 1}/${total}] ${page.id}: Step 2 — ${checklistWarnings.length} checklist warnings`);
+      }
 
-  for (const fullPath of files) {
-    const content = readFileSync(fullPath, 'utf-8');
-    const fm = extractFrontmatter(content) as Frontmatter;
-    const entry = basename(fullPath);
-    const id = basename(entry, entry.endsWith('.mdx') ? '.mdx' : '.md');
+      warningsSummary = formatWarningsSummary(automatedWarnings, checklistWarnings);
+    }
 
-    const relPath = relative(CONTENT_DIR, fullPath);
-    const pathParts = dirname(relPath).split('/').filter(p => p && p !== '.');
-    const category = pathParts[0] || 'other';
-    const subcategory = pathParts[1] || null;
-    const urlPrefix = '/' + pathParts.join('/');
+    // If --warnings-only, skip Step 3
+    if (options.warningsOnly) {
+      const metrics = computeMetrics(page.content);
+      const result: PageResult = {
+        id: page.id,
+        filePath: page.relativePath,
+        category: page.category,
+        title: page.title,
+        metrics,
+        warnings: {
+          automated: automatedWarnings,
+          checklist: checklistWarnings,
+          totalCount: automatedWarnings.length + checklistWarnings.length,
+        },
+      };
+      console.log(`[${index + 1}/${total}] ${page.id}: ${automatedWarnings.length + checklistWarnings.length} total warnings (warnings-only mode)`);
+      return { success: true, result };
+    }
 
-    const isModel = relPath.includes('/models') || fm.ratings !== undefined;
-    const pageType = detectPageType(id, fm);
+    // Step 3: LLM rating (Sonnet)
+    const grades = await gradePage(client, page, warningsSummary);
 
-    pages.push({
-      id,
-      filePath: fullPath,
-      relativePath: relPath,
-      urlPath: id === 'index' ? `${urlPrefix}/` : `${urlPrefix}/${id}/`,
-      title: fm.title || id.replace(/-/g, ' '),
-      category,
-      subcategory,
-      isModel,
-      pageType,
-      contentFormat: fm.contentFormat || 'article',
-      currentReaderImportance: fm.readerImportance ?? null,
-      currentQuality: fm.quality ?? null,
-      currentRatings: fm.ratings ?? null,
-      content,
-      frontmatter: fm,
-    });
+    if (grades && grades.ratings) {
+      const metrics = computeMetrics(page.content);
+      const derivedQuality = computeQuality(grades.ratings, metrics, page.frontmatter, page.relativePath);
+
+      const result: PageResult = {
+        id: page.id,
+        filePath: page.relativePath,
+        category: page.category,
+        isModel: page.isModel,
+        title: page.title,
+        readerImportance: grades.readerImportance,
+        ratings: grades.ratings,
+        metrics,
+        quality: derivedQuality,
+        llmSummary: grades.llmSummary,
+        warnings: options.skipWarnings ? undefined : {
+          automated: automatedWarnings,
+          checklist: checklistWarnings,
+          totalCount: automatedWarnings.length + checklistWarnings.length,
+        },
+      };
+
+      let applied = false;
+      if (options.apply) {
+        applied = applyGradesToFile(page, grades, metrics, derivedQuality);
+        if (applied) {
+          appendEditLog(page.id, {
+            tool: 'crux-grade',
+            agency: 'automated',
+            requestedBy: getDefaultRequestedBy(),
+            note: `Quality graded: ${derivedQuality}, readerImportance: ${grades.readerImportance.toFixed(1)}`,
+          });
+        } else {
+          console.error(`  Failed to apply grades to ${page.filePath}`);
+        }
+      }
+
+      const r = grades.ratings;
+      const warnCount: string = options.skipWarnings ? '' : ` [${automatedWarnings.length + checklistWarnings.length}w]`;
+      console.log(`[${index + 1}/${total}] ${page.id}: imp=${grades.readerImportance.toFixed(1)}, f=${r.focus} n=${r.novelty} r=${r.rigor} c=${r.completeness} con=${r.concreteness} a=${r.actionability} o=${r.objectivity} → qual=${derivedQuality} (${metrics.wordCount}w, ${metrics.citations}cit)${warnCount}${options.apply ? (applied ? ' ok' : ' FAIL') : ''}`);
+      return { success: true, result };
+    } else {
+      console.log(`[${index + 1}/${total}] ${page.id}: FAILED (no ratings in response)`);
+      return { success: false };
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.log(`[${index + 1}/${total}] ${page.id}: ERROR - ${error.message}`);
+    return { success: false, error: error.message };
   }
-
-  return pages;
-}
-
-// ── Frontmatter Application ──────────────────────────────────────────────────
-
-/** Apply grades to frontmatter YAML in the source file. */
-function applyGradesToFile(page: PageInfo, grades: GradeResult, metrics: { wordCount: number; citations: number; tables: number; diagrams: number }, derivedQuality: number): boolean {
-  const content = readFileSync(page.filePath, 'utf-8');
-  const fmMatch = content.match(FRONTMATTER_RE);
-
-  if (!fmMatch) {
-    console.warn(`No frontmatter found in ${page.filePath}`);
-    return false;
-  }
-
-  const fm = parseYaml(fmMatch[1]) || {} as Record<string, unknown>;
-
-  fm.readerImportance = grades.readerImportance;
-  fm.quality = derivedQuality;
-  if (grades.llmSummary) {
-    fm.llmSummary = grades.llmSummary;
-  }
-  if (grades.ratings) {
-    fm.ratings = grades.ratings;
-  }
-  // Metrics are computed at build time — not stored in frontmatter.
-  delete fm.metrics;
-
-  if (fm.lastEdited instanceof Date) {
-    fm.lastEdited = fm.lastEdited.toISOString().split('T')[0];
-  }
-
-  let newFm: string = stringifyYaml(fm, {
-    defaultStringType: 'QUOTE_DOUBLE',
-    defaultKeyType: 'PLAIN',
-    lineWidth: 0,
-  });
-
-  // Ensure lastEdited is always quoted
-  newFm = newFm.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');
-
-  if (!newFm.endsWith('\n')) {
-    newFm += '\n';
-  }
-
-  const bodyStart: number = content.indexOf('---', 4) + 3;
-  let body: string = content.slice(bodyStart);
-  body = '\n' + body.replace(/^\n+/, '');
-  const newContent: string = `---\n${newFm}---${body}`;
-
-  // Validation: ensure file structure is correct
-  const fmTest = newContent.match(/^---\n[\s\S]*?\n---\n/);
-  if (!fmTest) {
-    console.error(`ERROR: Invalid frontmatter structure in ${page.filePath}`);
-    console.error('Frontmatter must end with ---\\n');
-    return false;
-  }
-
-  // Validation: ensure no corrupted imports
-  const afterFm: string = newContent.slice(fmTest[0].length);
-  if (/^[a-z]/.test(afterFm.trim()) && !/^(import|export|const|let|var|function|class|\/\/)/.test(afterFm.trim())) {
-    console.error(`ERROR: Suspicious content after frontmatter in ${page.filePath}`);
-    console.error(`First chars: "${afterFm.slice(0, 50)}..."`);
-    return false;
-  }
-
-  writeFileSync(page.filePath, newContent);
-  return true;
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -312,104 +286,11 @@ async function main(): Promise<void> {
   const concurrency: number = options.parallel;
   console.log(`Processing ${pages.length} pages with concurrency ${concurrency}...\n`);
 
-  async function processPage(page: PageInfo, index: number): Promise<ProcessPageResult> {
-    try {
-      let automatedWarnings: Warning[] = [];
-      let checklistWarnings: ChecklistWarning[] = [];
-      let warningsSummary: string | null = null;
-
-      // Step 1 & 2: Run warnings (unless --skip-warnings)
-      if (!options.skipWarnings) {
-        automatedWarnings = await runAutomatedWarnings(page);
-        console.log(`  [${index + 1}/${pages.length}] ${page.id}: Step 1 — ${automatedWarnings.length} automated warnings`);
-
-        if (!options.dryRun) {
-          checklistWarnings = await runChecklistReview(client, page);
-          console.log(`  [${index + 1}/${pages.length}] ${page.id}: Step 2 — ${checklistWarnings.length} checklist warnings`);
-        }
-
-        warningsSummary = formatWarningsSummary(automatedWarnings, checklistWarnings);
-      }
-
-      // If --warnings-only, skip Step 3
-      if (options.warningsOnly) {
-        const metrics = computeMetrics(page.content);
-        const result: PageResult = {
-          id: page.id,
-          filePath: page.relativePath,
-          category: page.category,
-          title: page.title,
-          metrics,
-          warnings: {
-            automated: automatedWarnings,
-            checklist: checklistWarnings,
-            totalCount: automatedWarnings.length + checklistWarnings.length,
-          },
-        };
-        console.log(`[${index + 1}/${pages.length}] ${page.id}: ${automatedWarnings.length + checklistWarnings.length} total warnings (warnings-only mode)`);
-        return { success: true, result };
-      }
-
-      // Step 3: LLM rating (Sonnet)
-      const grades = await gradePage(client, page, warningsSummary);
-
-      if (grades && grades.ratings) {
-        const metrics = computeMetrics(page.content);
-        const derivedQuality = computeQuality(grades.ratings, metrics, page.frontmatter, page.relativePath);
-
-        const result: PageResult = {
-          id: page.id,
-          filePath: page.relativePath,
-          category: page.category,
-          isModel: page.isModel,
-          title: page.title,
-          readerImportance: grades.readerImportance,
-          ratings: grades.ratings,
-          metrics,
-          quality: derivedQuality,
-          llmSummary: grades.llmSummary,
-          warnings: options.skipWarnings ? undefined : {
-            automated: automatedWarnings,
-            checklist: checklistWarnings,
-            totalCount: automatedWarnings.length + checklistWarnings.length,
-          },
-        };
-
-        let applied = false;
-        if (options.apply) {
-          applied = applyGradesToFile(page, grades, metrics, derivedQuality);
-          if (applied) {
-            appendEditLog(page.id, {
-              tool: 'crux-grade',
-              agency: 'automated',
-              requestedBy: getDefaultRequestedBy(),
-              note: `Quality graded: ${derivedQuality}, readerImportance: ${grades.readerImportance.toFixed(1)}`,
-            });
-          } else {
-            console.error(`  Failed to apply grades to ${page.filePath}`);
-          }
-        }
-
-        const r = grades.ratings;
-        const warnCount: string = options.skipWarnings ? '' : ` [${automatedWarnings.length + checklistWarnings.length}w]`;
-        console.log(`[${index + 1}/${pages.length}] ${page.id}: imp=${grades.readerImportance.toFixed(1)}, f=${r.focus} n=${r.novelty} r=${r.rigor} c=${r.completeness} con=${r.concreteness} a=${r.actionability} o=${r.objectivity} → qual=${derivedQuality} (${metrics.wordCount}w, ${metrics.citations}cit)${warnCount}${options.apply ? (applied ? ' ok' : ' FAIL') : ''}`);
-        return { success: true, result };
-      } else {
-        console.log(`[${index + 1}/${pages.length}] ${page.id}: FAILED (no ratings in response)`);
-        return { success: false };
-      }
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      console.log(`[${index + 1}/${pages.length}] ${page.id}: ERROR - ${error.message}`);
-      return { success: false, error: error.message };
-    }
-  }
-
   // Process in parallel batches
   for (let i = 0; i < pages.length; i += concurrency) {
     const batch = pages.slice(i, i + concurrency);
     const batchPromises = batch.map((page, batchIndex) =>
-      processPage(page, i + batchIndex)
+      processPage(client, page, i + batchIndex, pages.length, options)
     );
 
     const batchResults = await Promise.all(batchPromises);
@@ -437,50 +318,7 @@ async function main(): Promise<void> {
   console.log(`Processed: ${processed}, Errors: ${errors}`);
 
   // Summary statistics
-  const importanceScores: number[] = results.map(r => r.readerImportance).filter((x): x is number => x != null).sort((a, b) => b - a);
-  const qualityScores: number[] = results.map(r => r.quality).filter((x): x is number => x != null).sort((a, b) => b - a);
-
-  const impRanges: Record<string, number> = {
-    '90-100': importanceScores.filter(x => x >= 90).length,
-    '70-89': importanceScores.filter(x => x >= 70 && x < 90).length,
-    '50-69': importanceScores.filter(x => x >= 50 && x < 70).length,
-    '30-49': importanceScores.filter(x => x >= 30 && x < 50).length,
-    '0-29': importanceScores.filter(x => x < 30).length,
-  };
-
-  console.log('\nImportance Distribution (0-100):');
-  for (const [range, count] of Object.entries(impRanges)) {
-    const bar = '\u2588'.repeat(Math.ceil(count / 3));
-    console.log(`  ${range}: ${bar} (${count})`);
-  }
-
-  if (importanceScores.length > 0) {
-    const impAvg: number = importanceScores.reduce((a, b) => a + b, 0) / importanceScores.length;
-    const impMedian: number = importanceScores[Math.floor(importanceScores.length / 2)];
-    console.log(`\n  Avg: ${impAvg.toFixed(1)}, Median: ${impMedian.toFixed(1)}`);
-    console.log(`  Top 5: ${importanceScores.slice(0, 5).map(x => x.toFixed(1)).join(', ')}`);
-    console.log(`  Bottom 5: ${importanceScores.slice(-5).map(x => x.toFixed(1)).join(', ')}`);
-  }
-
-  const qualRanges: Record<string, number> = {
-    '80-100 (Comprehensive)': qualityScores.filter(x => x >= 80).length,
-    '60-79 (Good)': qualityScores.filter(x => x >= 60 && x < 80).length,
-    '40-59 (Adequate)': qualityScores.filter(x => x >= 40 && x < 60).length,
-    '20-39 (Draft)': qualityScores.filter(x => x >= 20 && x < 40).length,
-    '0-19 (Stub)': qualityScores.filter(x => x < 20).length,
-  };
-
-  console.log('\nQuality Distribution (0-100):');
-  for (const [range, count] of Object.entries(qualRanges)) {
-    const bar = '\u2588'.repeat(Math.ceil(count / 3));
-    console.log(`  ${range}: ${bar} (${count})`);
-  }
-
-  if (qualityScores.length > 0) {
-    const qualAvg: number = qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length;
-    const qualMedian: number = qualityScores[Math.floor(qualityScores.length / 2)];
-    console.log(`\n  Avg: ${qualAvg.toFixed(1)}, Median: ${qualMedian.toFixed(1)}`);
-  }
+  printStats(results);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
