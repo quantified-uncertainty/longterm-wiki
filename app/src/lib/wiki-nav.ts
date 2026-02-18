@@ -292,6 +292,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Suggested Pages", href: "/internal/suggested-pages" },
         { label: "Update Schedule", href: "/internal/updates" },
         { label: "Page Changes", href: "/internal/page-changes" },
+        { label: "PR Descriptions", href: "/internal/pr-descriptions" },
         { label: "Fact Dashboard", href: "/internal/facts" },
         { label: "Automation Tools", href: href("automation-tools") },
         { label: "Content Database", href: href("content-database") },
