@@ -149,14 +149,36 @@ function CauseEffectGraphInner({
 
   // Layout effect - uses JSON stringify to ensure deep comparison of graphConfig
   const graphConfigKey = JSON.stringify(graphConfig);
+  const [layoutKey, setLayoutKey] = useState(0);
+  const retryLayout = useCallback(() => setLayoutKey((k) => k + 1), []);
+
   useEffect(() => {
     setIsLayouting(true);
     setLayoutError(null);
+    let cancelled = false;
+
+    // Timeout to prevent the UI from being stuck on "Computing layout..." forever
+    const LAYOUT_TIMEOUT_MS = 10_000;
+    const timeoutId = setTimeout(() => {
+      if (!cancelled) {
+        console.error('Layout timed out after', LAYOUT_TIMEOUT_MS, 'ms');
+        setNodes(initialNodes);
+        setEdges(initialEdges);
+        setLayoutError('Layout computation timed out. Showing unpositioned graph.');
+        setIsLayouting(false);
+        cancelled = true;
+      }
+    }, LAYOUT_TIMEOUT_MS);
+
     getLayoutedElements(initialNodes, initialEdges, graphConfig).then(({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+      if (cancelled) return;
+      clearTimeout(timeoutId);
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
       setIsLayouting(false);
     }).catch((error) => {
+      if (cancelled) return;
+      clearTimeout(timeoutId);
       console.error('Layout failed:', error);
       // Fall back to unpositioned nodes so the graph is still usable
       setNodes(initialNodes);
@@ -164,8 +186,13 @@ function CauseEffectGraphInner({
       setLayoutError('Layout computation failed. Showing unpositioned graph.');
       setIsLayouting(false);
     });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialNodes, initialEdges, graphConfigKey, setNodes, setEdges]);
+  }, [initialNodes, initialEdges, graphConfigKey, setNodes, setEdges, layoutKey]);
 
   // Event handlers
   const onConnect = useCallback(
@@ -350,7 +377,12 @@ function CauseEffectGraphInner({
         {activeTab === 'graph' && (
           <div className="cause-effect-graph__content">
             {isLayouting && <div className="cause-effect-graph__loading">Computing layout...</div>}
-            {layoutError && <div className="cause-effect-graph__loading" style={{ color: '#b45309', backgroundColor: '#fef3c7' }}>{layoutError}</div>}
+            {layoutError && (
+              <div className="cause-effect-graph__error">
+                <span>{layoutError}</span>
+                <button className="cause-effect-graph__error-retry" onClick={retryLayout}>Retry</button>
+              </div>
+            )}
             <ReactFlow
               nodes={styledNodes}
               edges={styledEdges}

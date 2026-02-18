@@ -105,6 +105,60 @@
   z-index: 10;
 }
 
+/* Layout error banner */
+.cause-effect-graph__error {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+.cause-effect-graph__error-retry {
+  all: unset;
+  box-sizing: border-box;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #92400e;
+  background-color: rgba(146, 64, 14, 0.1);
+  border: 1px solid #d97706;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cause-effect-graph__error-retry:hover {
+  background-color: rgba(146, 64, 14, 0.2);
+}
+
+.dark .cause-effect-graph__error {
+  background-color: #422006;
+  color: #fbbf24;
+  border-color: #92400e;
+}
+
+.dark .cause-effect-graph__error-retry {
+  color: #fbbf24;
+  background-color: rgba(251, 191, 36, 0.1);
+  border-color: #b45309;
+}
+
+.dark .cause-effect-graph__error-retry:hover {
+  background-color: rgba(251, 191, 36, 0.2);
+}
+
 /* Details panel - positioned on the left to avoid overlapping "On this page" nav */
 .cause-effect-graph__panel {
   position: absolute;
