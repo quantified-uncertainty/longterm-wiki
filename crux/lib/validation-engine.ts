@@ -40,11 +40,6 @@ interface FixSpec {
   [key: string]: unknown;
 }
 
-interface SidebarConfig {
-  entries: string[];
-  directories: Set<string>;
-}
-
 interface IssueOptions {
   rule: string;
   file: string;
@@ -215,7 +210,6 @@ export class ValidationEngine {
   reversePathRegistry: Record<string, string>;
   entities: unknown;
   idRegistry: { byNumericId: Record<string, string>; bySlug: Record<string, string> } | null;
-  sidebarConfig: SidebarConfig;
 
   constructor(options: EngineOptions = {}) {
     this.options = {
@@ -232,7 +226,6 @@ export class ValidationEngine {
     this.reversePathRegistry = {};
     this.entities = null;
     this.idRegistry = null;
-    this.sidebarConfig = { entries: [], directories: new Set() };
   }
 
   /** Load all content and shared data */
@@ -274,17 +267,7 @@ export class ValidationEngine {
       this.reversePathRegistry[path.replace(/\/$/, '')] = id;
     }
 
-    // Parse sidebar config (returns empty data in Next.js — sidebar is in wiki-nav.ts)
-    this.sidebarConfig = this._parseSidebarConfig();
     this.loaded = true;
-  }
-
-  /**
-   * Parse sidebar configuration.
-   * Returns empty data — sidebar is managed by wiki-nav.ts in the Next.js app.
-   */
-  private _parseSidebarConfig(): SidebarConfig {
-    return { entries: [], directories: new Set() };
   }
 
   /** Register a validation rule */

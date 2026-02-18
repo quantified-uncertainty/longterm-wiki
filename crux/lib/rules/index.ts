@@ -20,7 +20,6 @@ import { componentRefsRule } from './component-refs.ts';
 import { preferEntityLinkRule } from './prefer-entitylink.ts';
 
 // Sidebar/structure rules
-import { sidebarCoverageRule } from './sidebar-coverage.ts';
 import { sidebarIndexRule } from './sidebar-index.ts';
 
 // File-level rules
@@ -94,7 +93,6 @@ export {
   internalLinksRule,
   componentRefsRule,
   preferEntityLinkRule,
-  sidebarCoverageRule,
   sidebarIndexRule,
   jsxInMdRule,
   cruftFilesRule,
@@ -140,7 +138,6 @@ export const allRules: Rule[] = [
   internalLinksRule,
   componentRefsRule,
   preferEntityLinkRule,
-  sidebarCoverageRule,
   sidebarIndexRule,
   jsxInMdRule,
   cruftFilesRule,
