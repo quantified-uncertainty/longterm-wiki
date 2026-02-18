@@ -3,6 +3,10 @@ name: Resolve Merge Conflicts
 # Runs after auto-rebase completes to resolve PRs that still have
 # actual merge conflicts using the Claude API.
 #
+# Two-tier resolution:
+#   1. Sonnet API — fast, cheap text-level conflict resolution (~$0.01-0.05/file)
+#   2. Claude Code SDK — agentic escalation that can read errors and iterate
+#
 # Requires: ANTHROPIC_API_KEY secret in the repository.
 
 on:
@@ -133,9 +137,11 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Resolve conflicts (merge + commit, no push yet)
+      # ── Tier 1: Sonnet API — fast text-level conflict resolution ──
+      - name: "Tier 1: Resolve conflicts with Sonnet (merge + commit, no push)"
         if: steps.fingerprint.outputs.skip != 'true'
         id: resolve
+        continue-on-error: true # Don't fail the job — Tier 2 may fix it
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PR_BRANCH: ${{ matrix.branch }}
@@ -143,31 +149,25 @@ jobs:
         run: node .github/scripts/resolve-conflicts.mjs --no-push
 
       - uses: pnpm/action-setup@v4
-        if: steps.fingerprint.outputs.skip != 'true'
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
 
       - name: Install dependencies
-        if: steps.fingerprint.outputs.skip != 'true'
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
         run: pnpm install --frozen-lockfile
 
-      - name: Validate resolved code
-        if: steps.fingerprint.outputs.skip != 'true'
+      - name: "Tier 1: Validate resolved code"
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
         id: validate
+        continue-on-error: true # Don't fail the job — Tier 2 may fix it
         run: |
-          # Run the CI-blocking validation gate with --fix to auto-fix trivial
-          # escaping/markdown issues that may arise from the merge, then validate.
-          # This prevents the conflict resolver from pushing code that immediately
-          # fails CI. Includes numeric ID integrity checks for duplicate detection.
           echo "Running post-resolution validation gate (with auto-fix)..."
 
-          # Capture output for diagnostics while also streaming to logs.
-          # The validate-gate now prints child process output for failed steps
-          # even in CI mode, so we capture everything for the failure comment.
           GATE_OUTPUT=$(pnpm crux validate gate --fix 2>&1) && GATE_EXIT=0 || GATE_EXIT=$?
 
-          # Always print to workflow logs
-          echo "$GATE_OUTPUT"
+          # Always print to workflow logs (printf avoids echo misinterpreting leading -)
+          printf '%s\n' "$GATE_OUTPUT"
 
-          # Save last 80 lines for the PR failure comment
+          # Save last 80 lines for diagnostics
           GATE_TAIL=$(echo "$GATE_OUTPUT" | tail -80)
           {
             echo "gate_output<<GATEEOF"
@@ -176,34 +176,106 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
           if [ "$GATE_EXIT" -eq 0 ]; then
-            echo "Validation passed — safe to push."
-            echo "valid=true" >> "$GITHUB_OUTPUT"
+            echo "Tier 1 validation passed — safe to push."
           else
-            echo "::error::Post-resolution validation failed — conflict resolution may have introduced errors."
-            echo "valid=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Tier 1 validation failed — will escalate to Tier 2 (Claude Code)."
             exit 1
           fi
 
-      - name: Commit auto-fix changes (if any)
-        if: steps.fingerprint.outputs.skip != 'true'
+      # ── Tier 2: Claude Code SDK — agentic escalation ──
+      # Only runs if Tier 1 resolved conflicts (merge committed) but validation
+      # failed. If the resolve script itself failed, the merge was aborted and
+      # there's nothing for Tier 2 to fix — the failure comment handles that.
+      - name: "Tier 2: Install Claude Code CLI"
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure'
+        run: npm install -g @anthropic-ai/claude-code@latest
+
+      - name: "Tier 2: Agentic fix with Claude Code"
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure'
+        id: agentic
+        timeout-minutes: 10
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GATE_OUTPUT: ${{ steps.validate.outputs.gate_output }}
         run: |
-          # The --fix flag may have auto-fixed escaping/markdown issues.
-          # Create a separate commit (not amend) to preserve the merge commit's
-          # integrity and make fixes visible in the PR history.
+          echo "Escalating to Claude Code for agentic conflict resolution..."
+
+          # Build prompt with validation error context
+          PROMPT="$(cat <<PROMPT_EOF
+          The automated conflict resolution system merged main into this PR branch and
+          resolved all git conflict markers using Sonnet, but the post-merge validation
+          failed. Your job is to fix the files so validation passes.
+
+          Validation error output:
+          $GATE_OUTPUT
+
+          Instructions:
+          1. Read the failing files to understand what went wrong
+          2. Fix the issues — common causes after conflict resolution include:
+             - YAML files with inconsistent ID formats (mixing slug IDs with hex-hash IDs)
+             - TypeScript/JS files with type errors from combining incompatible changes
+             - Build-data failures from mismatched entity/fact references between files
+             - MDX files with broken EntityLink references
+          3. After fixing, verify by running: pnpm crux validate gate --fix
+          4. Only fix what's needed to pass validation — do not make unrelated changes
+          5. Stage your changes with git add but do NOT commit or push
+          PROMPT_EOF
+          )"
+
+          claude -p "$PROMPT" \
+            --model sonnet \
+            --dangerously-skip-permissions \
+            --verbose
+
+      - name: "Tier 2: Validate after agentic fix"
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.validate.outcome == 'failure' && steps.agentic.outcome == 'success'
+        id: revalidate
+        run: |
+          echo "Running validation after Claude Code fix..."
+
+          GATE_OUTPUT=$(pnpm crux validate gate --fix 2>&1) && GATE_EXIT=0 || GATE_EXIT=$?
+
+          printf '%s\n' "$GATE_OUTPUT"
+
+          GATE_TAIL=$(echo "$GATE_OUTPUT" | tail -80)
+          {
+            echo "gate_output<<GATEEOF"
+            echo "$GATE_TAIL"
+            echo "GATEEOF"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ "$GATE_EXIT" -eq 0 ]; then
+            echo "Tier 2 validation passed — safe to push."
+          else
+            echo "::error::Tier 2 validation also failed — manual resolution needed."
+            exit 1
+          fi
+
+      # ── Commit, push, and comment (runs after whichever tier succeeded) ──
+      - name: Commit auto-fix changes (if any)
+        if: >-
+          always() &&
+          steps.fingerprint.outputs.skip != 'true' &&
+          (steps.validate.outcome == 'success' || steps.revalidate.outcome == 'success')
+        run: |
           if ! git diff --quiet || ! git diff --cached --quiet; then
             echo "Auto-fix produced changes — committing fixes..."
             git add -A
-            git commit -m "Auto-fix escaping/markdown after conflict resolution"
+            TIER="${{ steps.validate.outcome == 'success' && 'Sonnet' || 'Claude Code' }}"
+            git commit -m "Auto-fix after conflict resolution ($TIER)"
           else
             echo "No auto-fix changes — merge commit is clean."
           fi
 
       - name: Push resolved merge
-        if: steps.fingerprint.outputs.skip != 'true'
+        if: >-
+          always() &&
+          steps.fingerprint.outputs.skip != 'true' &&
+          (steps.validate.outcome == 'success' || steps.revalidate.outcome == 'success')
         env:
           PR_BRANCH: ${{ matrix.branch }}
         run: |
-          # Push with retry for transient failures
           for attempt in 1 2 3; do
             if git push origin "$PR_BRANCH"; then
               echo "Pushed successfully."
@@ -216,37 +288,55 @@ jobs:
           exit 1
 
       - name: Post success comment
-        if: success() && steps.fingerprint.outputs.skip != 'true'
+        if: >-
+          always() &&
+          steps.fingerprint.outputs.skip != 'true' &&
+          (steps.validate.outcome == 'success' || steps.revalidate.outcome == 'success')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TIER: ${{ steps.validate.outcome == 'success' && 'Tier 1 (Sonnet)' || 'Tier 2 (Claude Code)' }}
         run: |
           gh pr comment "${{ matrix.number }}" --repo "$GITHUB_REPOSITORY" \
-            --body "Merge conflicts with \`main\` were automatically resolved by the conflict resolver. Please review the merge commit to ensure correctness."
+            --body "Merge conflicts with \`main\` were automatically resolved by the conflict resolver ($TIER). Please review the merge commit to ensure correctness."
 
       - name: Post failure comment
-        if: failure() && steps.fingerprint.outputs.skip != 'true'
+        if: >-
+          always() &&
+          steps.fingerprint.outputs.skip != 'true' &&
+          (steps.resolve.outcome == 'failure' || steps.validate.outcome == 'failure') &&
+          steps.revalidate.outcome != 'success'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Pass through env var (not inline expression) to avoid bash treating
-          # markdown backticks in the diagnostic summary as command substitution.
           DIAG: ${{ steps.resolve.outputs.diagnostic_summary }}
-          GATE_OUTPUT: ${{ steps.validate.outputs.gate_output }}
+          RESOLVE_OUTCOME: ${{ steps.resolve.outcome }}
+          GATE_OUTPUT_T1: ${{ steps.validate.outputs.gate_output }}
+          GATE_OUTPUT_T2: ${{ steps.revalidate.outputs.gate_output }}
           FINGERPRINT: ${{ steps.fingerprint.outputs.fingerprint }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           PR_NUMBER: ${{ matrix.number }}
+          AGENTIC_OUTCOME: ${{ steps.agentic.outcome }}
         run: |
-          # Build a detailed failure comment with diagnostics and fingerprint.
-          # The fingerprint prevents re-attempting the same resolution when
-          # nothing has changed (see "Check if already attempted" step).
-          BODY="Automatic conflict resolution failed for this PR."
+          if [ "$RESOLVE_OUTCOME" = "failure" ]; then
+            BODY="Automatic conflict resolution failed for this PR. The Sonnet conflict resolver could not merge the files."
+          else
+            BODY="Automatic conflict resolution failed for this PR (both Tier 1 Sonnet and Tier 2 Claude Code)."
+          fi
           BODY="$BODY Manual resolution is needed."
 
           if [ -n "$DIAG" ]; then
             BODY="$(printf '%s\n\n**Resolution diagnostics:**\n%s' "$BODY" "$DIAG")"
           fi
 
-          if [ -n "$GATE_OUTPUT" ]; then
-            BODY="$(printf '%s\n\n<details>\n<summary>Validation output (click to expand)</summary>\n\n```\n%s\n```\n\n</details>' "$BODY" "$GATE_OUTPUT")"
+          # Show Tier 1 validation output
+          if [ -n "$GATE_OUTPUT_T1" ]; then
+            BODY="$(printf '%s\n\n<details>\n<summary>Tier 1 (Sonnet) validation output</summary>\n\n```\n%s\n```\n\n</details>' "$BODY" "$GATE_OUTPUT_T1")"
+          fi
+
+          # Show Tier 2 info
+          if [ "$AGENTIC_OUTCOME" = "success" ] && [ -n "$GATE_OUTPUT_T2" ]; then
+            BODY="$(printf '%s\n\n<details>\n<summary>Tier 2 (Claude Code) validation output</summary>\n\n```\n%s\n```\n\n</details>' "$BODY" "$GATE_OUTPUT_T2")"
+          elif [ "$AGENTIC_OUTCOME" = "failure" ]; then
+            BODY="$(printf '%s\n\n**Tier 2 (Claude Code):** Agent failed to produce a fix.' "$BODY")"
           fi
 
           BODY="$(printf '%s\n\n[View workflow logs](%s)\n\n<!-- fingerprint: `%s` -->' "$BODY" "$RUN_URL" "$FINGERPRINT")"
