@@ -1230,6 +1230,7 @@ export interface ExploreItem {
   quality: number | null;
   readerImportance: number | null;
   researchImportance: number | null;
+  tacticalValue: number | null;
   backlinkCount: number | null;
   category: string | null;
   riskCategory: string | null;
@@ -1284,6 +1285,7 @@ export function getExploreItems(): ExploreItem[] {
       quality: page?.quality ?? null,
       readerImportance: page?.readerImportance ?? null,
       researchImportance: page?.researchImportance ?? null,
+      tacticalValue: page?.tacticalValue ?? null,
       backlinkCount: page?.backlinkCount ?? null,
       category: page?.category ?? null,
       riskCategory: isRisk(entity) ? (entity.riskCategory || null) : null,
@@ -1308,6 +1310,7 @@ export function getExploreItems(): ExploreItem[] {
       quality: page.quality ?? null,
       readerImportance: page.readerImportance ?? null,
       researchImportance: page.researchImportance ?? null,
+      tacticalValue: page.tacticalValue ?? null,
       backlinkCount: page.backlinkCount ?? null,
       category: page.category ?? null,
       riskCategory: null,
@@ -1364,6 +1367,7 @@ export function getExploreItems(): ExploreItem[] {
         quality: null,
         readerImportance: null,
         researchImportance: null,
+        tacticalValue: null,
         backlinkCount: null,
         category: null,
         riskCategory: null,
