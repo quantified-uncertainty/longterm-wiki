@@ -4,7 +4,7 @@
 
 **Pages:** (no wiki pages edited — infrastructure-only)
 
-**Model:** sonnet-4
+**Model:** sonnet-4-6
 
 **Duration:** ~45min
 
