@@ -6,3 +6,4 @@
  */
 
 await import('./link-checker/index.ts');
+export {};
