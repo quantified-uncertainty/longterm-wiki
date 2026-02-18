@@ -1,0 +1,16 @@
+## 2026-02-18 | claude/improve-commands-workflow | Overhaul Claude Code commands with checklist workflow
+
+**What was done:** Reviewed all `.claude/commands/` against last 50 PRs and session logs. Deleted 2 stale duplicate commands (`push-safe.md`, `review.md`). Added project-specific review checks to `paranoid-pr-review.md`. Fixed shell injection in `maintain.md` and `push-and-ensure-green.md` curl commands. Created a checklist-based workflow: `/kickoff` generates a session checklist from a template, `/finalize` verifies completion and ships. Updated `pr-review-guidelines.md` to prefer the new workflow.
+
+**Model:** opus-4-6
+
+**Duration:** ~60min
+
+**Issues encountered:**
+- Local gate check fails on clean main (Node v23.1.0 tsx loader issue with `.ts` imports in child processes). CI passes fine.
+- `git pull` blocked by untracked files that existed both locally and in remote — required `git clean` to resolve.
+
+**Learnings/notes:**
+- The most common bugs from the last 50 PRs are: broken EntityLinks, numeric ID conflicts, MDX escaping, and hallucinated statistics. These are now in the paranoid-pr-review checklist.
+- `push-safe.md` and `review.md` were never deleted when PR #187 renamed them — untracked files are easy to miss.
+- File-based checklists (`.claude/wip-checklist.md`) are simpler and more transparent than the Tasks API for single-agent sessions.

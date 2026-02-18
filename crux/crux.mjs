@@ -27,6 +27,7 @@
  *   review      Human review tracking and status
  *   citations   Citation verification and archival
  *   issues      Track Claude Code work on GitHub issues
+ *   agent-checklist  Manage agent checklists (init, status, complete)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -60,6 +61,7 @@ import * as reviewCommands from './commands/review.ts';
 import * as citationsCommands from './commands/citations.ts';
 import * as grokipediaCommands from './commands/grokipedia.ts';
 import * as issuesCommands from './commands/issues.ts';
+import * as agentChecklistCommands from './commands/agent-checklist.ts';
 
 const domains = {
   validate: validateCommands,
@@ -80,6 +82,7 @@ const domains = {
   citations: citationsCommands,
   grokipedia: grokipediaCommands,
   issues: issuesCommands,
+  'agent-checklist': agentChecklistCommands,
 };
 
 /**
@@ -146,6 +149,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   review      Human review tracking and status
   citations   Citation verification and archival
   issues      Track Claude Code work on GitHub issues
+  agent-checklist  Manage agent checklists
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
