@@ -4,6 +4,10 @@
  * Focus areas:
  * - Input validation (start/done reject bad args)
  * - Priority ranking logic (via list command with mocked GitHub data)
+ * - Weighted scoring (scoreIssue helper)
+ * - Blocked detection (isBlocked helper + UI separation)
+ * - Claude-ready label boost
+ * - Score breakdown display (--scores flag)
  * - Edge cases: empty issue list, all issues in-progress, unknown labels
  */
 
@@ -20,7 +24,7 @@ vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/test-branch-ABC'),
 }));
 
-import { commands } from './issues.ts';
+import { commands, scoreIssue, isBlocked } from './issues.ts';
 import * as githubLib from '../lib/github.ts';
 
 const mockGithubApi = vi.mocked(githubLib.githubApi);
@@ -94,6 +98,115 @@ describe('issues done — input validation', () => {
 });
 
 // ---------------------------------------------------------------------------
+// scoreIssue unit tests
+// ---------------------------------------------------------------------------
+
+describe('scoreIssue', () => {
+  const OLD_DATE = '2025-01-01T00:00:00Z';  // ~13 months ago
+  const RECENT_DATE = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(); // 2 days ago
+
+  it('P0 scores much higher than P1', () => {
+    const p0 = scoreIssue(['P0'], '', OLD_DATE, OLD_DATE);
+    const p1 = scoreIssue(['P1'], '', OLD_DATE, OLD_DATE);
+    expect(p0.total).toBeGreaterThan(p1.total);
+    expect(p0.priority).toBe(1000);
+    expect(p1.priority).toBe(500);
+  });
+
+  it('P1 > P2 > P3 > unlabeled', () => {
+    const p1 = scoreIssue(['P1'], '', OLD_DATE, OLD_DATE).total;
+    const p2 = scoreIssue(['P2'], '', OLD_DATE, OLD_DATE).total;
+    const p3 = scoreIssue(['P3'], '', OLD_DATE, OLD_DATE).total;
+    const none = scoreIssue([], '', OLD_DATE, OLD_DATE).total;
+    expect(p1).toBeGreaterThan(p2);
+    expect(p2).toBeGreaterThan(p3);
+    expect(p3).toBeGreaterThan(none);
+  });
+
+  it('bug label adds bonus', () => {
+    const withBug = scoreIssue(['bug', 'P2'], '', OLD_DATE, OLD_DATE);
+    const withoutBug = scoreIssue(['P2'], '', OLD_DATE, OLD_DATE);
+    expect(withBug.bugBonus).toBe(50);
+    expect(withBug.total).toBeGreaterThan(withoutBug.total);
+  });
+
+  it('claude-ready label adds ~50% bonus', () => {
+    const withReady = scoreIssue(['P2', 'claude-ready'], '', OLD_DATE, OLD_DATE);
+    const withoutReady = scoreIssue(['P2'], '', OLD_DATE, OLD_DATE);
+    expect(withReady.claudeReadyBonus).toBeGreaterThan(0);
+    expect(withReady.total).toBeGreaterThan(withoutReady.total);
+  });
+
+  it('effort:low adds bonus, effort:high subtracts', () => {
+    const low = scoreIssue(['effort:low', 'P2'], '', OLD_DATE, OLD_DATE);
+    const high = scoreIssue(['effort:high', 'P2'], '', OLD_DATE, OLD_DATE);
+    const neutral = scoreIssue(['P2'], '', OLD_DATE, OLD_DATE);
+    expect(low.effortAdjustment).toBe(20);
+    expect(high.effortAdjustment).toBe(-20);
+    expect(low.total).toBeGreaterThan(neutral.total);
+    expect(neutral.total).toBeGreaterThan(high.total);
+  });
+
+  it('recency bonus applies when updated within 7 days', () => {
+    const recent = scoreIssue([], '', OLD_DATE, RECENT_DATE);
+    const old = scoreIssue([], '', OLD_DATE, OLD_DATE);
+    expect(recent.recencyBonus).toBe(15);
+    expect(old.recencyBonus).toBe(0);
+    expect(recent.total).toBeGreaterThan(old.total);
+  });
+
+  it('age bonus increases with issue age (capped at 10)', () => {
+    const veryOld = scoreIssue([], '', '2020-01-01T00:00:00Z', OLD_DATE);
+    const recent = scoreIssue([], '', new Date().toISOString(), new Date().toISOString());
+    expect(veryOld.ageBonus).toBe(10); // capped
+    expect(recent.ageBonus).toBe(0);
+  });
+
+  it('total is sum of all components', () => {
+    const bd = scoreIssue(['P1', 'bug'], '', OLD_DATE, OLD_DATE);
+    expect(bd.total).toBe(bd.priority + bd.bugBonus + bd.claudeReadyBonus + bd.effortAdjustment + bd.recencyBonus + bd.ageBonus);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// isBlocked unit tests
+// ---------------------------------------------------------------------------
+
+describe('isBlocked', () => {
+  it('detects blocked label', () => {
+    expect(isBlocked(['blocked'], '')).toBe(true);
+  });
+
+  it('detects waiting label', () => {
+    expect(isBlocked(['waiting'], '')).toBe(true);
+  });
+
+  it('detects needs-info label', () => {
+    expect(isBlocked(['needs-info'], '')).toBe(true);
+  });
+
+  it('detects stalled label', () => {
+    expect(isBlocked(['stalled'], '')).toBe(true);
+  });
+
+  it('detects "blocked by" in body text', () => {
+    expect(isBlocked([], 'This is blocked by issue #42')).toBe(true);
+  });
+
+  it('detects "waiting for" in body text', () => {
+    expect(isBlocked([], 'Waiting for upstream fix')).toBe(true);
+  });
+
+  it('detects "depends on #N" in body text', () => {
+    expect(isBlocked([], 'This depends on #123 being merged')).toBe(true);
+  });
+
+  it('returns false for normal issues', () => {
+    expect(isBlocked(['bug', 'P1'], 'This is a normal bug report')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Priority ranking via list command
 // ---------------------------------------------------------------------------
 
@@ -141,8 +254,8 @@ describe('issues list — priority ranking', () => {
 
   it('within same priority, older issues rank higher', async () => {
     mockGithubApi.mockResolvedValueOnce([
-      makeIssue({ number: 5, title: 'Newer P1', labels: ['P1'], created_at: '2026-02-01T00:00:00Z' }),
-      makeIssue({ number: 3, title: 'Older P1', labels: ['P1'], created_at: '2026-01-01T00:00:00Z' }),
+      makeIssue({ number: 5, title: 'Newer P1', labels: ['P1'], created_at: '2026-02-01T00:00:00Z', updated_at: '2026-02-01T00:00:00Z' }),
+      makeIssue({ number: 3, title: 'Older P1', labels: ['P1'], created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }),
     ]);
     const result = await commands.list([], {});
     const pos3 = result.output.indexOf('#3');
@@ -160,6 +273,21 @@ describe('issues list — priority ranking', () => {
     // claude-working issue should appear before the queue section
     const progressSection = result.output.slice(0, result.output.indexOf('Queue:'));
     expect(progressSection).toContain('#20');
+  });
+
+  it('separates blocked issues into Blocked section', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 10, title: 'Normal issue', labels: [] }),
+      makeIssue({ number: 30, title: 'Blocked issue', labels: ['blocked'] }),
+    ]);
+    const result = await commands.list([], {});
+    expect(result.output).toContain('Blocked');
+    // blocked issue should appear before the queue section
+    const blockedSection = result.output.slice(0, result.output.indexOf('Queue:'));
+    expect(blockedSection).toContain('#30');
+    // normal issue should be in the queue
+    const queueSection = result.output.slice(result.output.indexOf('Queue:'));
+    expect(queueSection).toContain('#10');
   });
 
   it('excludes wontfix and invalid issues', async () => {
@@ -203,6 +331,40 @@ describe('issues list — priority ranking', () => {
     expect(Array.isArray(parsed)).toBe(true);
     expect(parsed[0].number).toBe(42);
     expect(parsed[0].priority).toBe(1);
+    expect(parsed[0]).toHaveProperty('score');
+    expect(parsed[0]).toHaveProperty('scoreBreakdown');
+  });
+
+  it('shows score breakdown when --scores flag set', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 5, title: 'Bug issue', labels: ['P1', 'bug'] }),
+    ]);
+    const result = await commands.list([], { scores: true });
+    expect(result.output).toContain('score:');
+    expect(result.output).toContain('priority:');
+    expect(result.output).toContain('bug:+50');
+  });
+
+  it('bug label boosts ranking above same-priority non-bug', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 10, title: 'P2 bug', labels: ['P2', 'bug'], created_at: '2026-02-01T00:00:00Z', updated_at: '2026-02-01T00:00:00Z' }),
+      makeIssue({ number: 20, title: 'P2 feature', labels: ['P2'], created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }),
+    ]);
+    const result = await commands.list([], {});
+    const posBug = result.output.indexOf('#10');
+    const posFeature = result.output.indexOf('#20');
+    expect(posBug).toBeLessThan(posFeature);
+  });
+
+  it('claude-ready label boosts ranking', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 10, title: 'P2 claude-ready', labels: ['P2', 'claude-ready'], created_at: '2026-02-01T00:00:00Z', updated_at: '2026-02-01T00:00:00Z' }),
+      makeIssue({ number: 20, title: 'P2 plain', labels: ['P2'], created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }),
+    ]);
+    const result = await commands.list([], {});
+    const posReady = result.output.indexOf('#10');
+    const posPlain = result.output.indexOf('#20');
+    expect(posReady).toBeLessThan(posPlain);
   });
 });
 
@@ -243,6 +405,38 @@ describe('issues next', () => {
     expect(result.output).toContain('crux issues start 1');
   });
 
+  it('excludes blocked issues from recommendation', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 1, title: 'P0 but blocked', labels: ['P0', 'blocked'] }),
+      makeIssue({ number: 2, title: 'P1 not blocked', labels: ['P1'] }),
+    ]);
+    const result = await commands.next([], {});
+    expect(result.exitCode).toBe(0);
+    // P1 non-blocked should be recommended, not P0 blocked
+    expect(result.output).toContain('#2');
+    expect(result.output).not.toContain('Next Issue: #1');
+  });
+
+  it('shows blocked issues in a separate section', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 1, title: 'P0 but blocked', labels: ['P0', 'blocked'] }),
+      makeIssue({ number: 2, title: 'P1 not blocked', labels: ['P1'] }),
+    ]);
+    const result = await commands.next([], {});
+    expect(result.output).toContain('Blocked');
+    expect(result.output).toContain('#1');
+  });
+
+  it('reports when all issues are blocked or in-progress', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 1, labels: ['blocked'] }),
+      makeIssue({ number: 2, labels: ['claude-working'] }),
+    ]);
+    const result = await commands.next([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('blocked');
+  });
+
   it('returns JSON object when --json flag set', async () => {
     mockGithubApi.mockResolvedValueOnce([
       makeIssue({ number: 7, title: 'Next issue', labels: ['P1'] }),
@@ -252,5 +446,16 @@ describe('issues next', () => {
     const parsed = JSON.parse(result.output);
     expect(parsed.number).toBe(7);
     expect(parsed.priority).toBe(1);
+    expect(parsed).toHaveProperty('score');
+    expect(parsed).toHaveProperty('scoreBreakdown');
+  });
+
+  it('shows score breakdown when --scores flag set', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 7, title: 'Next issue', labels: ['P1', 'bug'] }),
+    ]);
+    const result = await commands.next([], { scores: true });
+    expect(result.output).toContain('score:');
+    expect(result.output).toContain('bug:+50');
   });
 });

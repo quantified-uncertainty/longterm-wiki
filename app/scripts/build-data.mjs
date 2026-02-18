@@ -25,7 +25,7 @@ import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
-import { detectReassignments, scanEntityLinkRefs, formatReassignments } from './lib/id-stability.mjs';
+import { runStabilityCheck } from './lib/id-stability.mjs';
 
 // ---------------------------------------------------------------------------
 // Structured value formatting — converts numeric fact values to display strings
@@ -161,47 +161,8 @@ function countEntries(data) {
   return 0;
 }
 
-/**
- * Check ID stability — detect silent numeric ID reassignments (issue #148).
- * Compares current slug↔ID mappings against a previous registry snapshot.
- * If reassignments are found, reports them with affected EntityLink references
- * and exits with an error.
- *
- * @param {Object|null} prevRegistry  Previous id-registry.json content
- * @param {Object} numericIdToSlug  Current mapping: numericId → slug
- * @param {Object} slugToNumericId  Current mapping: slug → numericId
- * @param {boolean} allowReassignment  If true, skip the check
- * @param {string} phase  Label for error messages ('entity' or 'page')
- */
-function checkIdStability(prevRegistry, numericIdToSlug, slugToNumericId, allowReassignment, phase) {
-  if (!prevRegistry?.entities || allowReassignment) return;
-
-  const reassignments = detectReassignments(prevRegistry, numericIdToSlug, slugToNumericId);
-  if (reassignments.length === 0) return;
-
-  console.error(`\n  ERROR: Numeric ID reassignment detected at ${phase} level! (issue #148)`);
-  console.error('  The following IDs changed between builds:\n');
-
-  const { lines, affectedIds } = formatReassignments(reassignments);
-  for (const line of lines) {
-    console.error(`  ${line}`);
-  }
-
-  const CONTENT_SCAN_DIR = join(PROJECT_ROOT, '..', 'content', 'docs');
-  const brokenRefs = scanEntityLinkRefs(CONTENT_SCAN_DIR, affectedIds);
-
-  if (brokenRefs.length > 0) {
-    console.error(`\n  ${brokenRefs.length} EntityLink reference(s) would break:\n`);
-    for (const ref of brokenRefs) {
-      const relPath = relative(CONTENT_SCAN_DIR, ref.file);
-      console.error(`    ${relPath}:${ref.line} — id="${ref.id}"`);
-    }
-  }
-
-  console.error('\n  To fix: restore the original numericId values in source files.');
-  console.error('  To override: re-run with --allow-id-reassignment\n');
-  process.exit(1);
-}
+// Directory scanned for broken EntityLink refs during stability checks
+const CONTENT_SCAN_DIR = join(PROJECT_ROOT, '..', 'content', 'docs');
 
 /**
  * Compute backlinks for all entities
@@ -944,9 +905,10 @@ async function main() {
   // ID REGISTRY — derive from numericId fields in source files (YAML + MDX)
   //
   // IDs are stored in source files (YAML `numericId:` or MDX frontmatter).
-  // This section reads them, detects conflicts, and assigns IDs to any
-  // new entities that don't have one yet (writing back to source files).
-  // The id-registry.json is generated as a derived build artifact only.
+  // The assign-ids.mjs pre-build script is responsible for assigning new IDs
+  // and writing them back to source files. This section only READS existing
+  // IDs, detects conflicts, and generates id-registry.json as a derived
+  // build artifact. It does NOT write back to source files.
   // =========================================================================
   const ID_REGISTRY_FILE = join(DATA_DIR, 'id-registry.json');
   const ALLOW_ID_REASSIGNMENT = process.argv.includes('--allow-id-reassignment');
@@ -986,7 +948,11 @@ async function main() {
   // -------------------------------------------------------------------------
   // ID Stability Check (entity-level) — detect silent reassignments (#148)
   // -------------------------------------------------------------------------
-  checkIdStability(prevRegistry, numericIdToSlug, slugToNumericId, ALLOW_ID_REASSIGNMENT, 'entity');
+  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
+    allowReassignment: ALLOW_ID_REASSIGNMENT,
+    phase: 'entity',
+    contentDir: CONTENT_SCAN_DIR,
+  });
 
   // Compute next available ID from existing assignments.
   // Also scan page-level numericIds (from MDX frontmatter) so auto-assigned
@@ -1017,7 +983,10 @@ async function main() {
   }
   scanFrontmatterNumericIds(CONTENT_DIR_ROOT);
 
-  // Assign IDs to entities that don't have one yet, writing back to source
+  // Assign IDs in-memory to entities that don't have one yet.
+  // NOTE: Writing IDs back to source files is the job of assign-ids.mjs (the
+  // pre-build step). This section only performs in-memory assignment so the
+  // rest of the build has consistent IDs even if assign-ids.mjs wasn't run.
   let newAssignments = 0;
   for (const entity of entities) {
     if (!entity.numericId) {
@@ -1027,19 +996,6 @@ async function main() {
       slugToNumericId[entity.id] = numId;
       nextId++;
       newAssignments++;
-
-      // Write the new numericId back to the source file
-      if (entity._source === 'frontmatter' && entity._filePath) {
-        // MDX frontmatter entity: inject numericId into frontmatter
-        const content = readFileSync(entity._filePath, 'utf-8');
-        const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
-        writeFileSync(entity._filePath, updated);
-        console.log(`    Assigned ${numId} → ${entity.id} (wrote to MDX frontmatter)`);
-      } else {
-        // YAML entity: would need to update YAML file
-        // For now, warn — this should be handled by `crux content create`
-        console.warn(`    WARNING: Assigned ${numId} → ${entity.id} (YAML entity without numericId — add manually)`);
-      }
     }
   }
 
@@ -1049,7 +1005,7 @@ async function main() {
   copyFileSync(ID_REGISTRY_FILE, join(OUTPUT_DIR, 'id-registry.json'));
 
   if (newAssignments > 0) {
-    console.log(`  idRegistry: assigned ${newAssignments} new IDs (total: ${Object.keys(numericIdToSlug).length})`);
+    console.log(`  idRegistry: assigned ${newAssignments} new IDs in-memory (run \`node scripts/assign-ids.mjs\` to persist)`);
   } else {
     console.log(`  idRegistry: all ${Object.keys(numericIdToSlug).length} entities have IDs`);
   }
@@ -1521,30 +1477,27 @@ async function main() {
 
   // ID Stability Check (page-level) — now both entity and page IDs are
   // collected, compare the full set against the previous registry (#148)
-  checkIdStability(prevRegistry, numericIdToSlug, slugToNumericId, ALLOW_ID_REASSIGNMENT, 'page');
+  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
+    allowReassignment: ALLOW_ID_REASSIGNMENT,
+    phase: 'page',
+    contentDir: CONTENT_SCAN_DIR,
+  });
 
-  // Pass 2: Assign new numericIds to pages that don't have one yet
+  // Pass 2: Assign new numericIds in-memory to pages that don't have one yet.
+  // NOTE: Writing IDs back to source files is the job of assign-ids.mjs (the
+  // pre-build step). Pages should already have IDs if assign-ids.mjs was run.
   for (const page of pages) {
     if (entityIds.has(page.id)) continue;
     if (slugToNumericId[page.id]) continue;
     if (skipCategories.has(page.category)) continue;
     if (page.contentFormat === 'dashboard') continue;
 
-    // Assign a new numericId and write it back to the MDX frontmatter
     const numId = `E${nextId}`;
     numericIdToSlug[numId] = page.id;
     slugToNumericId[page.id] = numId;
     page.numericId = numId;
     nextId++;
     pageIdAssignments++;
-
-    // Write back to MDX frontmatter
-    if (page._fullPath) {
-      const content = readFileSync(page._fullPath, 'utf-8');
-      const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
-      writeFileSync(page._fullPath, updated);
-      console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
-    }
   }
 
   // Always update the registry output maps (page-only entries may have added slugs)
@@ -1555,7 +1508,7 @@ async function main() {
   idRegistryOutput.bySlug = { ...slugToNumericId };
   database.idRegistry = idRegistryOutput;
   if (pageIdAssignments > 0) {
-    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs (total: ${Object.keys(numericIdToSlug).length})`);
+    console.log(`  idRegistry: assigned ${pageIdAssignments} new page IDs in-memory (run \`node scripts/assign-ids.mjs\` to persist)`);
   }
 
   const pagesWithQuality = pages.filter(p => p.quality !== null).length;

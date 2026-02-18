@@ -6,14 +6,17 @@
  * references in MDX content.
  *
  * Usage:
- *   import { detectReassignments, scanEntityLinkRefs } from './lib/id-stability.mjs';
+ *   import { detectReassignments, scanEntityLinkRefs, runStabilityCheck } from './lib/id-stability.mjs';
  *
  *   const reassignments = detectReassignments(prevRegistry, numericIdToSlug, slugToNumericId);
  *   if (reassignments.length > 0) { ... }
+ *
+ *   // Or use the higher-level helper that handles error output + exit:
+ *   runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, { phase: 'entity', contentDir, allowReassignment });
  */
 
 import { existsSync, readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { join, relative } from 'path';
 
 /**
  * Detect ID reassignments between an old registry and newly collected mappings.
@@ -91,6 +94,53 @@ export function scanEntityLinkRefs(dir, numericIds) {
     }
   }
   return results;
+}
+
+/**
+ * Run a stability check and exit with error if reassignments are found.
+ *
+ * This is the high-level helper used by both build-data.mjs and assign-ids.mjs
+ * to enforce ID stability (issue #148). Encapsulates error formatting, EntityLink
+ * scanning, and process.exit so callers don't repeat the pattern.
+ *
+ * @param {Object|null} prevRegistry  Previous id-registry.json content
+ * @param {Object} numericIdToSlug  Current mapping: numericId → slug
+ * @param {Object} slugToNumericId  Current mapping: slug → numericId
+ * @param {Object} opts
+ * @param {boolean} [opts.allowReassignment=false]  If true, skip the check
+ * @param {string}  [opts.phase='entity']  Label for error messages ('entity' or 'page')
+ * @param {string}  opts.contentDir  Root dir to scan for broken EntityLink refs
+ */
+export function runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
+  allowReassignment = false,
+  phase = 'entity',
+  contentDir,
+}) {
+  if (!prevRegistry?.entities || allowReassignment) return;
+
+  const reassignments = detectReassignments(prevRegistry, numericIdToSlug, slugToNumericId);
+  if (reassignments.length === 0) return;
+
+  const { lines, affectedIds } = formatReassignments(reassignments);
+
+  console.error(`\n  ERROR: Numeric ID reassignment detected at ${phase} level! (issue #148)`);
+  console.error('  The following IDs changed between builds:\n');
+  for (const line of lines) console.error(`  ${line}`);
+
+  if (contentDir) {
+    const brokenRefs = scanEntityLinkRefs(contentDir, affectedIds);
+    if (brokenRefs.length > 0) {
+      console.error(`\n  ${brokenRefs.length} EntityLink reference(s) would break:\n`);
+      for (const ref of brokenRefs) {
+        const relPath = relative(contentDir, ref.file);
+        console.error(`    ${relPath}:${ref.line} — id="${ref.id}"`);
+      }
+    }
+  }
+
+  console.error('\n  To fix: restore the original numericId values in source files.');
+  console.error('  To override: re-run with --allow-id-reassignment\n');
+  process.exit(1);
 }
 
 /**

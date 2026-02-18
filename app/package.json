@@ -7,8 +7,9 @@
     "dev": "NODE_USE_ENV_PROXY=1 next dev --port 3001",
     "build": "NODE_USE_ENV_PROXY=1 next build",
     "start": "NODE_USE_ENV_PROXY=1 next start --port 3001",
-    "sync:data": "node --import tsx/esm scripts/build-data.mjs",
-    "prebuild": "node --import tsx/esm scripts/build-data.mjs",
+    "assign-ids": "node scripts/assign-ids.mjs",
+    "sync:data": "node scripts/assign-ids.mjs && node --import tsx/esm scripts/build-data.mjs",
+    "prebuild": "node scripts/assign-ids.mjs && node --import tsx/esm scripts/build-data.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },
