@@ -14,7 +14,7 @@ import type { CommandResult } from "../lib/cli.ts";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { parse, stringify } from "yaml";
-import https from "https";
+import { execSync } from "child_process";
 
 const PROJECT_ROOT = join(import.meta.dirname, "../..");
 const DATA_DIR = join(PROJECT_ROOT, "data");
@@ -26,7 +26,6 @@ const APP_EXTERNAL_LINKS_YAML = join(
 );
 
 const GROKIPEDIA_BASE = "https://grokipedia.com/page/";
-const CONCURRENCY = 8;
 const REQUEST_TIMEOUT_MS = 8000;
 
 interface PageInfo {
@@ -69,93 +68,64 @@ function generateCandidateSlugs(title: string): string[] {
 }
 
 /**
- * Check if a Grokipedia page exists via HTTP HEAD request.
+ * Check if a Grokipedia page exists via curl HEAD request.
+ * Uses curl instead of Node.js https because Node DNS resolution
+ * fails in some sandboxed environments.
  */
 function checkGrokipediaUrl(
   slug: string
-): Promise<{ exists: boolean; url: string; status: number }> {
+): { exists: boolean; url: string; status: number } {
   const url = GROKIPEDIA_BASE + slug;
-
-  return new Promise((resolve) => {
-    const req = https.request(
-      url,
-      {
-        method: "HEAD",
-        timeout: REQUEST_TIMEOUT_MS,
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; LongtermWikiBot/1.0)",
-          Accept: "text/html",
-        },
-      },
-      (res) => {
-        res.resume();
-        const status = res.statusCode || 0;
-        resolve({
-          exists: status >= 200 && status < 400,
-          url,
-          status,
-        });
-      }
-    );
-
-    req.on("error", () => resolve({ exists: false, url, status: 0 }));
-    req.on("timeout", () => {
-      req.destroy();
-      resolve({ exists: false, url, status: 0 });
-    });
-    req.end();
-  });
+  try {
+    const status = parseInt(
+      execSync(
+        `curl -sI -o /dev/null -w "%{http_code}" --max-time ${Math.round(REQUEST_TIMEOUT_MS / 1000)} "${url}"`,
+        { encoding: "utf-8", timeout: REQUEST_TIMEOUT_MS + 4000 }
+      ).trim(),
+      10
+    ) || 0;
+    return { exists: status >= 200 && status < 400, url, status };
+  } catch {
+    return { exists: false, url, status: 0 };
+  }
 }
 
 /**
- * Run URL checks with concurrency limit
+ * Run URL checks sequentially (curl is synchronous via execSync).
  */
-async function checkWithConcurrency(
+function checkAllUrls(
   items: Array<{ pageId: string; title: string; slugs: string[] }>
-): Promise<
-  Array<{ pageId: string; title: string; url: string; slug: string }>
-> {
+): Array<{ pageId: string; title: string; url: string; slug: string }> {
   const matches: Array<{
     pageId: string;
     title: string;
     url: string;
     slug: string;
   }> = [];
-  let index = 0;
   let checked = 0;
   const total = items.reduce((sum, i) => sum + i.slugs.length, 0);
 
-  async function worker(): Promise<void> {
-    while (index < items.length) {
-      const item = items[index++];
+  for (const item of items) {
+    for (const slug of item.slugs) {
+      checked++;
+      if (checked % 10 === 0) {
+        process.stdout.write(
+          `\r  Checked ${checked}/${total} URLs, ${matches.length} matches found...`
+        );
+      }
 
-      for (const slug of item.slugs) {
-        checked++;
-        if (checked % 50 === 0) {
-          process.stdout.write(
-            `\r  Checked ${checked}/${total} URLs, ${matches.length} matches found...`
-          );
-        }
-
-        const result = await checkGrokipediaUrl(slug);
-        if (result.exists) {
-          matches.push({
-            pageId: item.pageId,
-            title: item.title,
-            url: result.url,
-            slug,
-          });
-          break; // Found a match, skip remaining slugs for this page
-        }
+      const result = checkGrokipediaUrl(slug);
+      if (result.exists) {
+        matches.push({
+          pageId: item.pageId,
+          title: item.title,
+          url: result.url,
+          slug,
+        });
+        break; // Found a match, skip remaining slugs for this page
       }
     }
   }
-
-  const workers: Promise<void>[] = [];
-  for (let i = 0; i < CONCURRENCY; i++) {
-    workers.push(worker());
-  }
-  await Promise.all(workers);
 
   process.stdout.write("\n");
   return matches;
@@ -240,7 +210,7 @@ async function match(
 
   const totalUrls = items.reduce((s, i) => s + i.slugs.length, 0);
   console.log(`Checking ${totalUrls} candidate URLs against grokipedia.com...`);
-  const matches = await checkWithConcurrency(items);
+  const matches = checkAllUrls(items);
 
   lines.push(
     `Results: ${matches.length} matches found out of ${candidates.length} candidates\n`
