@@ -1073,35 +1073,21 @@ async function main() {
   }
   database.factMeasures = factMeasures;
 
-  // Auto-infer measure from fact ID where not explicitly set
-  // Algorithm: 1) exact match against known measure IDs, 2) longest prefix match (factId starts with "<measure>-")
-  const knownMeasureIds = Object.keys(factMeasures);
-  let autoInferredCount = 0;
+  // Validate measure references and count assignments.
+  // Note: measure auto-inference from fact IDs is no longer supported — facts use hash IDs
+  // and must specify their measure explicitly via `measure:` in YAML.
+  const knownMeasureIds = new Set(Object.keys(factMeasures));
+  let measuredCount = 0;
   for (const [key, fact] of Object.entries(facts)) {
-    // Skip if measure is already set (truthy) or explicitly null (opt-out via `measure: ~`)
-    if (fact.measure || fact.noCompute || ('measure' in fact && fact.measure === null)) continue;
-    // 1. Exact match: fact ID is a known measure name
-    if (knownMeasureIds.includes(fact.factId)) {
-      fact.measure = fact.factId;
-      autoInferredCount++;
-      continue;
-    }
-    // 2. Longest prefix match: fact ID starts with "<measure>-"
-    let bestMatch = null;
-    let bestLen = 0;
-    for (const measureId of knownMeasureIds) {
-      if (fact.factId.startsWith(measureId + '-') && measureId.length > bestLen) {
-        bestMatch = measureId;
-        bestLen = measureId.length;
+    if (fact.measure) {
+      measuredCount++;
+      if (!knownMeasureIds.has(fact.measure)) {
+        console.warn(`  WARNING: fact ${key} references unknown measure "${fact.measure}"`);
       }
     }
-    if (bestMatch) {
-      fact.measure = bestMatch;
-      autoInferredCount++;
-    }
   }
-  if (autoInferredCount > 0) {
-    console.log(`  measures: auto-inferred ${autoInferredCount} measures from fact IDs`);
+  if (measuredCount > 0) {
+    console.log(`  measures: ${measuredCount} facts have explicit measure assignments`);
   }
 
   // Normalize structured values → flat format (value string, numeric, low, high)
