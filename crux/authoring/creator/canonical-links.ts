@@ -32,6 +32,7 @@ export const CANONICAL_DOMAINS: CanonicalDomain[] = [
   { domain: 'www.wikidata.org', name: 'Wikidata', priority: 2 },
   { domain: 'lesswrong.com', name: 'LessWrong', priority: 3 },
   { domain: 'forum.effectivealtruism.org', name: 'EA Forum', priority: 3 },
+  { domain: 'grokipedia.com', name: 'Grokipedia', priority: 3 },
   { domain: 'www.britannica.com', name: 'Britannica', priority: 4 },
   { domain: 'arxiv.org', name: 'arXiv', priority: 5 },
   { domain: 'scholar.google.com', name: 'Google Scholar', priority: 5 },
@@ -51,6 +52,7 @@ export async function findCanonicalLinks(topic: string, { log, saveResult }: Can
 - Wikidata ID and URL (if exists)
 - LessWrong profile or wiki page (if exists)
 - EA Forum profile or posts (if exists)
+- Grokipedia page at grokipedia.com/page/ (if exists)
 - Official website (if organization or person)
 - Twitter/X profile (if exists)
 - GitHub (if relevant)
