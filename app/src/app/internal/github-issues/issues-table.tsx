@@ -3,7 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { formatAge } from "@lib/format";
-import type { IssueRow } from "./page";
+import type { IssueRow } from "./types";
 
 function PriorityBadge({ priority }: { priority: number }) {
   const label = priority < 99 ? `P${priority}` : "—";

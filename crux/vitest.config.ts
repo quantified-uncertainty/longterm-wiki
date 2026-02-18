@@ -7,6 +7,7 @@ export default defineConfig({
     include: [
       'lib/**/*.test.ts',
       'authoring/**/*.test.ts',
+      'auto-update/**/*.test.ts',
       'link-checker/**/*.test.ts',
       'commands/**/*.test.ts',
     ],

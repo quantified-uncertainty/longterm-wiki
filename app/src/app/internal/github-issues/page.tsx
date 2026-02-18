@@ -1,4 +1,5 @@
 import { IssuesTable } from "./issues-table";
+import type { IssueRow } from "./types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -31,17 +32,6 @@ const PRIORITY_LABELS: Record<string, number> = {
   p3: 3,
   "priority:low": 3,
 };
-
-export interface IssueRow {
-  number: number;
-  title: string;
-  labels: string[];
-  createdAt: string;
-  updatedAt: string;
-  url: string;
-  priority: number;
-  inProgress: boolean;
-}
 
 interface GitHubIssueResponse {
   number: number;

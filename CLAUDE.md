@@ -105,7 +105,7 @@ pnpm crux content create "Page Title" --tier=standard
 ```
 Tiers: `budget` (~$2-3), `standard` (default, ~$4-6), `premium` (~$8-12)
 
-**API keys are in environment variables** (`process.env`), NOT in `.env` files. Check `env | grep -i API` to verify available keys before assuming they're missing. Required keys: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`. Optional: `FIRECRAWL_KEY`, `SCRY_API_KEY`.
+**API keys are in environment variables** (`process.env`), NOT in `.env` files. Check `env | grep -i API` to verify available keys before assuming they're missing. Required keys: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`. Optional: `FIRECRAWL_KEY`, `SCRY_API_KEY`, `EXA_API_KEY` (auto-update web search — faster/cheaper than LLM search), `GITHUB_TOKEN` (required for `crux issues` commands and the `/internal/github-issues` dashboard).
 
 ### Improving an existing page
 ```bash

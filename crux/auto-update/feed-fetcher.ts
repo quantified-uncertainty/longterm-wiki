@@ -20,8 +20,6 @@ import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { executeWebSearch } from '../authoring/page-improver/api.ts';
 import type { NewsSource, SourcesConfig, FeedItem } from './types.ts';
 
-const EXA_API_KEY = process.env.EXA_API_KEY;
-
 const SOURCES_PATH = join(PROJECT_ROOT, 'data/auto-update/sources.yaml');
 
 // ── Source Loading ──────────────────────────────────────────────────────────
@@ -255,7 +253,8 @@ interface ExaResponse {
  * @param since - ISO date string; only return results published after this date
  */
 async function executeExaSearch(query: string, since: string | null): Promise<ExaResult[]> {
-  if (!EXA_API_KEY) throw new Error('EXA_API_KEY not set');
+  const exaApiKey = process.env.EXA_API_KEY;
+  if (!exaApiKey) throw new Error('EXA_API_KEY not set');
 
   const body: Record<string, unknown> = {
     query,
@@ -275,7 +274,7 @@ async function executeExaSearch(query: string, since: string | null): Promise<Ex
   const response = await fetch('https://api.exa.ai/search', {
     method: 'POST',
     headers: {
-      'x-api-key': EXA_API_KEY,
+      'x-api-key': exaApiKey,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
@@ -301,7 +300,7 @@ async function fetchWebSearch(source: NewsSource, since: string | null): Promise
   const query = source.query || source.name;
 
   // ── Try Exa first ──────────────────────────────────────────────────────────
-  if (EXA_API_KEY) {
+  if (process.env.EXA_API_KEY) {
     try {
       const results = await executeExaSearch(query, since);
       return results
