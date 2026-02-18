@@ -24,6 +24,7 @@
  *   importance  Ranking-based importance scoring
  *   ci          GitHub CI status and monitoring
  *   maintain    Periodic maintenance and housekeeping
+ *   review      Human review tracking and status
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -53,6 +54,7 @@ import * as importanceCommands from './commands/importance.ts';
 import * as ciCommands from './commands/ci.ts';
 import * as maintainCommands from './commands/maintain.ts';
 import * as autoUpdateCommands from './commands/auto-update.ts';
+import * as reviewCommands from './commands/review.ts';
 
 const domains = {
   validate: validateCommands,
@@ -69,6 +71,7 @@ const domains = {
   importance: importanceCommands,
   ci: ciCommands,
   maintain: maintainCommands,
+  review: reviewCommands,
 };
 
 /**
@@ -132,6 +135,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   importance  Ranking-based importance scoring
   ci          GitHub CI status and monitoring
   maintain    Periodic maintenance and housekeeping
+  review      Human review tracking and status
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

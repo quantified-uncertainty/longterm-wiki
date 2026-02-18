@@ -28,7 +28,7 @@ config({ path: '.env.local' });
  * validate-models.ts warns if this is more than 60 days old.
  * Update this date after confirming models are still the latest versions.
  */
-export const MODELS_LAST_VERIFIED = '2026-02-17';
+export const MODELS_LAST_VERIFIED = '2026-02-18';
 
 /**
  * Available Claude models with standardized names
