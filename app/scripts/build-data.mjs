@@ -1573,6 +1573,8 @@ async function main() {
     database.organizations || []
   );
   database.typedEntities = typedEntities;
+  // Update description count to reflect post-enrichment state
+  stats.withDescription = typedEntities.filter(e => e.description).length;
   console.log(`  typedEntities: ${typedEntities.length} transformed`);
 
   // Ensure output directory exists
