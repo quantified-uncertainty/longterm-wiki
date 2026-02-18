@@ -30,6 +30,7 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { createLlmClient, extractText, MODELS } from '../lib/llm.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 
 // ---------------------------------------------------------------------------
 // Config
@@ -325,10 +326,11 @@ Return ONLY: {"frequency": N, "reason": "5 words max"}`;
 
     const text = extractText(response).trim();
     if (!text) throw new Error('No text block in response');
-    const jsonMatch = text.match(/\{[\s\S]*?\}/);
-    if (!jsonMatch) throw new Error(`No JSON: ${text}`);
-
-    const parsed: { frequency: number; reason: string } = JSON.parse(jsonMatch[0]);
+    const parsed = parseJsonFromLlm<{ frequency: number; reason: string }>(
+      text,
+      'reassign-update-frequency',
+      (_raw, error) => { throw new Error(error ?? `Could not parse JSON from response`); },
+    );
     const freq = Number(parsed.frequency);
 
     if (!VALID_FREQUENCIES.includes(freq)) {

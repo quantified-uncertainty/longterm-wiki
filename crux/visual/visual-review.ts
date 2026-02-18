@@ -23,7 +23,7 @@ import { createClient, callClaude } from '../lib/anthropic.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors, isCI } from '../lib/output.ts';
-import { stripMarkdownFences } from '../lib/mdx-utils.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { findPageById } from '../lib/page-resolution.ts';
 import {
   type VisualReviewResult,
@@ -289,7 +289,7 @@ Return ONLY a JSON object with: score (0-100), strengths (array), issues (array)
       temperature: 0,
     });
 
-    return JSON.parse(stripMarkdownFences(result.text));
+    return parseJsonFromLlm(result.text, 'visual-review', () => null);
   } catch {
     return null;
   }

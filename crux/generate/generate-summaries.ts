@@ -73,6 +73,7 @@ interface ProcessStats {
 }
 
 import { parseCliArgs } from '../lib/cli.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 
 const parsed = parseCliArgs(process.argv.slice(2));
 
@@ -196,29 +197,20 @@ async function generateSummary(prompt: string): Promise<SummaryResult> {
   }
   const tokensUsed = response.usage.input_tokens + response.usage.output_tokens;
 
-  // Parse JSON response
-  try {
-    // Extract JSON from response (handle markdown code blocks)
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response');
-    }
-    const parsed = JSON.parse(jsonMatch[0]);
-    return { ...parsed, tokensUsed };
-  } catch (err: unknown) {
+  // Parse JSON response (resilient: handles code fences, truncation, embedded JSON)
+  const parsed = parseJsonFromLlm(text, 'generate-summaries', (raw, _error) => {
     console.error(`${colors.yellow}Warning: Could not parse response as JSON${colors.reset}`);
     if (VERBOSE) {
-      console.error('Response:', text);
+      console.error('Response:', raw);
     }
-    // Return a basic structure
     return {
-      oneLiner: text.slice(0, 200),
-      summary: text,
-      keyPoints: [],
-      keyClaims: [],
-      tokensUsed
+      oneLiner: raw.slice(0, 200),
+      summary: raw,
+      keyPoints: [] as string[],
+      keyClaims: [] as Array<{ claim: string; value: string }>,
     };
-  }
+  });
+  return { ...parsed, tokensUsed };
 }
 
 /**
