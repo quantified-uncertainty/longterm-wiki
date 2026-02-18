@@ -173,3 +173,64 @@ facts:
     noCompute: true
     note: "Projected breakeven year per internal financial projections"
     sourceResource: "eb642ee7de582ff5"
+
+  # google-stake-pct — Google's approximate equity stake; updates with new rounds
+  b3a9f201:
+    value: 14
+    asOf: 2026-02
+    note: "Google's approximate equity stake post-Series G; computed from disclosed $3.3B invested across 3 rounds at prevailing valuations"
+    measure: equity-stake-percent
+    source: https://fortune.com/2023/10/27/google-anthropic-investment-stake/
+
+  # google-total-invested — cumulative Google investment
+  e7c42d88:
+    value: 3300000000
+    asOf: 2026-02
+    note: "Google total invested: $300M (2022) + $2B (2023) + $1B (2025)"
+    measure: total-funding
+    source: https://fortune.com/2023/10/27/google-anthropic-investment-stake/
+
+  # amazon-total-invested — cumulative Amazon investment
+  9a1f5c63:
+    value: 10750000000
+    asOf: 2026-02
+    note: "Amazon total invested: $4B (2023) + $2.75B (2024) + $4B (2024)"
+    measure: total-funding
+    source: https://www.reuters.com/technology/anthropic-raises-27-billion-amazon-cloud-deal-2024-11-22/
+
+  # founder-equity-total — all 7 founders combined equity value range at current valuation
+  c3e8a742:
+    value:
+      - 53000000000
+      - 80000000000
+    asOf: 2026-02
+    note: "Seven founders × 2–3% each × $380B valuation"
+    measure: net-worth
+
+  # founder-pledge-total — 80% of all founder equity (their stated pledge)
+  d5f91ab0:
+    value:
+      - 43000000000
+      - 64000000000
+    asOf: 2026-02
+    note: "80% of $53–80B founder equity; all seven founders pledged to donate 80% of wealth"
+    measure: net-worth
+    source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+
+  # employee-equity-pool — employee equity pool value at current valuation
+  f2a06bd3:
+    value:
+      - 46000000000
+      - 68000000000
+    asOf: 2026-02
+    note: "12–18% of $380B; ~870–2,847 employees"
+    measure: net-worth
+
+  # ea-aligned-capital-risk-adjusted — total EA-directed giving from Anthropic stakeholders
+  a8c71e05:
+    value:
+      - 27000000000
+      - 76000000000
+    asOf: 2026-02
+    note: "Risk-adjusted estimate of EA-aligned philanthropic capital from Anthropic stakeholders"
+    measure: net-worth

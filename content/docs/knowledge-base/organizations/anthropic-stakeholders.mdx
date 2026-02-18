@@ -19,37 +19,23 @@ clusters:
   - governance
 entityType: table
 ---
-import {EntityLink, F} from '@components/wiki';
+import {EntityLink, F, Calc} from '@components/wiki';
 
 :::note[Data as of February 2026]
-All values at \$380B post-money valuation (<EntityLink id="E22">Anthropic</EntityLink> Series G, Feb 2026). For detailed analysis of EA-aligned capital flows, see <EntityLink id="E406">Anthropic (Funder)</EntityLink>. For valuation scenarios, see <EntityLink id="E405">Anthropic Valuation Analysis</EntityLink>.
+All values at <F e="anthropic" f="6796e194" /> post-money valuation (<EntityLink id="E22">Anthropic</EntityLink> Series G, Feb 2026). For detailed analysis of EA-aligned capital flows, see <EntityLink id="E406">Anthropic (Funder)</EntityLink>. For valuation scenarios, see <EntityLink id="E405">Anthropic Valuation Analysis</EntityLink>.
 :::
 
-## Ownership Overview
+## Stakeholder Ownership & Philanthropy
 
-| Stakeholder | Category | Est. Stake | Value at \$380B | Notes |
-|---|---|---|---|---|
-| **<EntityLink id="E91">Dario Amodei</EntityLink>** | Co-founder, CEO | 2-3% | \$7.6-11.4B | GWWC pledge signatory; pledged 80% to charity |
-| **<EntityLink id="E90">Daniela Amodei</EntityLink>** | Co-founder, President | 2-3% | \$7.6-11.4B | Married to <EntityLink id="E156">Holden Karnofsky</EntityLink>; pledged 80% |
-| **<EntityLink id="E59">Chris Olah</EntityLink>** | Co-founder | 2-3% | \$7.6-11.4B | Interpretability pioneer; pledged 80% |
-| **Jack Clark** | Co-founder | 2-3% | \$7.6-11.4B | Former OpenAI Policy Director; pledged 80% |
-| **Tom Brown** | Co-founder | 2-3% | \$7.6-11.4B | GPT-3 lead author; pledged 80% |
-| **Jared Kaplan** | Co-founder, Chief Scientist | 2-3% | \$7.6-11.4B | Scaling laws pioneer; pledged 80% |
-| **Sam McCandlish** | Co-founder | 2-3% | \$7.6-11.4B | Alignment researcher; pledged 80% |
-| **Google** | Strategic investor | ≈14% | ≈\$53B | \$3.3B total invested across 3 rounds |
-| **Amazon** | Strategic investor | Significant minority | — | \$10.75B total invested; primary cloud partner |
-| **<EntityLink id="E577">Jaan Tallinn</EntityLink>** | Early investor | 0.6-1.7% | \$2-6B | Led Series A; Skype co-founder; major AI safety funder |
-| **<EntityLink id="E436">Dustin Moskovitz</EntityLink>** | Early investor | 0.8-2.5% | \$3-9B | Facebook co-founder; \$500M moved to nonprofit |
-| **Microsoft** | Strategic partner | — | Up to \$5B | Nov 2025 partnership; \$30B Azure compute deal |
-| **Nvidia** | Strategic partner | — | Up to \$10B | Nov 2025 partnership |
-| **Employee equity pool** | Employees | 12-18% | \$46-68B | ≈870-2,847 employees; early hires hold 40-60% of pool |
-| **Series G investors** | Institutional | — | \$30B round | GIC, Coatue (co-leads), D.E. Shaw, Dragoneer, Founders Fund, ICONIQ, MGX |
+The table below shows each stakeholder's estimated equity stake, the fraction pledged to charitable giving ("Pledge %"), the estimated probability those donations go to EA-aligned causes ("EA Align %"), and two derived columns: expected donated dollars and expected EA-effective giving. All values scale automatically with the current valuation.
 
-**Total funding raised**: Over \$67B. **Total valuation**: \$380B (Series G, Feb 2026).
+<AnthropicStakeholdersTable />
+
+**Total funding raised**: <F e="anthropic" f="226cc0eb" /> across 16 rounds. **Current valuation**: <F e="anthropic" f="6796e194" showDate /> (Series G).
 
 ## Founder Donation Pledges
 
-All seven co-founders have pledged to donate 80% of their equity. [Fortune](https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/) At current valuations, that's **\$43-64B** if fully honored.
+All seven co-founders have pledged to donate 80% of their equity. [Fortune](https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/) At current valuations, that's <F e="anthropic" f="d5f91ab0">\$43–64B</F> if fully honored — derived from <F e="anthropic" f="c3e8a742">\$53–80B</F> in combined founder equity.
 
 | Founder | EA Connection | Pledge Fulfillment Likelihood |
 |---|---|---|
@@ -74,9 +60,9 @@ Only **2 of 7 founders** (Dario and Daniela, ~29% of founder equity) have docume
 | **Dustin Moskovitz** | \$3-9B | \$2.7-9B | Certain (already committed) |
 | **Employee pledges + matching** | \$20-40B | \$16-38B | Legally bound (in DAFs) |
 | **Non-pledged EA employees** | ≈\$2B | \$0.4-0.8B | Moderate |
-| **Total** | **\$66-116B** | **\$27-76B** | — |
+| **Total** | **\$66-116B** | <F e="anthropic" f="a8c71e05">**\$27-76B**</F> | — |
 
-Employee capital in donor-advised funds (\$16-38B risk-adjusted) is the **most reliable** source — legally bound, though donors retain discretion over which charities receive grants. The historical 3:1 matching program (employees pledge up to 50%, Anthropic matches 3x) has been **reduced to 1:1 at 25%** for employees hired after 2024. [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) [Anthropic Careers](https://www.anthropic.com/careers)
+Employee capital in donor-advised funds (<F e="anthropic" f="a8c71e05">\$27–76B</F> risk-adjusted) is the **most reliable** source — legally bound, though donors retain discretion over which charities receive grants. The historical 3:1 matching program (employees pledge up to 50%, Anthropic matches 3x) has been **reduced to 1:1 at 25%** for employees hired after 2024. [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) [Anthropic Careers](https://www.anthropic.com/careers)
 
 ## Funding Timeline
 
@@ -97,9 +83,11 @@ Employee capital in donor-advised funds (\$16-38B risk-adjusted) is the **most r
 | Series E | Mar 2025 | \$3.5B | \$61.5B | Lightspeed |
 | Series F | Sept 2025 | \$13B | \$183B | Altimeter, Baillie Gifford, BlackRock |
 | Microsoft/Nvidia | Nov 2025 | Up to \$15B | \$350B | Microsoft, Nvidia |
-| Series G | Feb 2026 | \$30B | \$380B | GIC, Coatue (co-leads) |
+| Series G | Feb 2026 | <F e="anthropic" f="5b0663a0" /> | <F e="anthropic" f="6796e194" /> | GIC, Coatue (co-leads) |
 
-**Total raised**: Over \$67B across 16 rounds. [Anthropic](https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation)
+**Total raised**: <F e="anthropic" f="226cc0eb" /> across 16 rounds. [Anthropic](https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation)
+
+**Google** has invested <F e="anthropic" f="e7c42d88" /> across 3 rounds for approximately <F e="anthropic" f="b3a9f201">~14%</F> of equity. **Amazon** has invested <F e="anthropic" f="9a1f5c63" /> and serves as Anthropic's primary cloud partner; its exact stake is undisclosed.
 
 ## Capital Deployment Timeline
 
