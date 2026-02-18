@@ -1,44 +1,54 @@
 entity: sam-altman
 facts:
-  net-worth:
-    value: 2.8e9
+  # net-worth
+  7da0d60e:
+    value: 2800000000
+    asOf: "2024"
+    measure: net-worth
+
+  # openai-salary
+  3362f219:
+    value: $76,001/year
     asOf: "2024"
 
-  # Standalone facts (no measure — keep as strings)
-  openai-salary:
-    value: "$76,001/year"
-    asOf: "2024"
+  # loopt-sale-price
+  a73016c2:
+    value: $43 million
+    note: Sold to Green Dot Corporation
 
-  loopt-sale-price:
-    value: "$43 million"
-    note: "Sold to Green Dot Corporation"
-
-  early-stripe-investment:
-    value: "$15,000 for 2%"
+  # early-stripe-investment
+  7a1f98d6:
+    value: $15,000 for 2%
     asOf: "2009"
 
-  yc-companies-funded:
-    value: "1,900"
-    note: "Companies funded during YC tenure"
+  # yc-companies-funded
+  c9b9b3d2:
+    value: 1,900
+    note: Companies funded during YC tenure
 
-  board-crisis-employee-letter:
-    value: "95%"
-    asOf: "2023-11"
-    note: "738 of 770 employees signed letter threatening to quit"
-    sourceResource: "ddced8916d043aa2"
+  # board-crisis-employee-letter
+  6783fa6c:
+    value: 95%
+    asOf: 2023-11
+    note: 738 of 770 employees signed letter threatening to quit
+    sourceResource: ddced8916d043aa2
 
-  worldcoin-users:
+  # worldcoin-users
+  5e01ac09:
     measure: user-count
-    value: 26e6
+    value: 26000000
     asOf: "2024"
-    note: "Total users on Worldcoin network"
+    note: Total users on Worldcoin network
 
-  worldcoin-verified:
+  # worldcoin-verified
+  6a3265ad:
     measure: user-count
-    value: 12e6
+    value: 12000000
     asOf: "2024"
-    note: "Verified Worldcoin users (via orb)"
+    note: Verified Worldcoin users (via orb)
 
-  helion-personal-investment:
-    value: "$375 million"
-    note: "Personal investment in Helion Energy"
+  # helion-personal-investment
+  "0872e650":
+    value: $375 million
+    note: Personal investment in Helion Energy
+

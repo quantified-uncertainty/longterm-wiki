@@ -13,7 +13,7 @@ ratings:
   rigor: 6
   actionability: 8
   completeness: 7
-lastEdited: "2026-02-17"
+lastEdited: "2026-02-18"
 evergreen: true
 update_frequency: 90
 ---
@@ -30,19 +30,19 @@ Two MDX components power this:
 
 ```jsx
 {/* Simple fact display */}
-<F e="anthropic" f="valuation">$380B</F>
+<F e="anthropic" f="6796e194">$380B</F>
 
 {/* Fact with auto-rendered value (no children needed) */}
-<F e="anthropic" f="valuation" />
+<F e="anthropic" f="6796e194" />
 
 {/* Fact with inline date — renders "300,000+ (as of 2025)" */}
-<F e="anthropic" f="business-customers" showDate />
+<F e="anthropic" f="7a3815b4" showDate />
 
 {/* Computed value from two facts */}
-<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />
+<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" />
 
 {/* Growth percentage */}
-<Calc expr="({anthropic.revenue-mid-2025} / {anthropic.revenue-early-2025} - 1) * 100" precision={0} suffix="%" />
+<Calc expr="({anthropic.83e76962} / {anthropic.bc497a3d} - 1) * 100" precision={0} suffix="%" />
 ```
 
 ## Which Numbers Should Be Facts?
@@ -99,13 +99,13 @@ Any time you're showing a stored number — a valuation, revenue figure, headcou
 
 ```jsx
 {/* With explicit display text */}
-<F e="anthropic" f="valuation">\$380 billion</F>
+<F e="anthropic" f="6796e194">\$380 billion</F>
 
 {/* Auto-display from the fact's value field */}
-<F e="anthropic" f="valuation" />
+<F e="anthropic" f="6796e194" />
 
 {/* With inline date for temporal claims */}
-Over <F e="anthropic" f="business-customers" showDate /> business customers
+Over <F e="anthropic" f="7a3815b4" showDate /> business customers
 {/* Renders: "Over 300,000+ (as of 2025) business customers" */}
 ```
 
@@ -117,13 +117,13 @@ When you need a value that's **computed from 2+ facts** — ratios, multiples, g
 
 ```jsx
 {/* Revenue multiple */}
-<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" />
+<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" />
 
 {/* Growth rate */}
-<Calc expr="({anthropic.revenue-mid-2025} / {anthropic.revenue-early-2025} - 1) * 100" precision={0} suffix="%" />
+<Calc expr="({anthropic.83e76962} / {anthropic.bc497a3d} - 1) * 100" precision={0} suffix="%" />
 
 {/* Comparison */}
-<Calc expr="{openai.valuation-2025} / {anthropic.valuation}" precision={1} suffix="x" />
+<Calc expr="{openai.39d6868e} / {anthropic.6796e194}" precision={1} suffix="x" />
 ```
 
 The power: when **either** input fact updates, the derived number auto-updates too. A revenue multiple stays correct whether the valuation or revenue changes.
@@ -134,10 +134,10 @@ If you're just displaying one fact with no computation, use `<F>`, not `<Calc>`.
 
 ```jsx
 {/* Wrong — no computation happening */}
-<Calc expr="{anthropic.valuation}" format="currency" />
+<Calc expr="{anthropic.6796e194}" format="currency" />
 
 {/* Right — just display the fact */}
-<F e="anthropic" f="valuation" />
+<F e="anthropic" f="6796e194" />
 ```
 
 ### Use plain text for everything else
@@ -146,54 +146,64 @@ Historical numbers, qualitative descriptions, and one-off figures that won't cha
 
 ## YAML Fact Structure
 
-Facts live in `data/facts/<entity>.yaml`:
+Facts live in `data/facts/<entity>.yaml`. Each fact has an **8-character hex hash ID** (not a human-readable name). A comment above each fact shows its purpose:
 
 ```yaml
 entity: anthropic
 facts:
-  valuation:
-    value: "$380 billion"        # Human-readable display string
-    numeric: 380000000000        # Raw number (required for Calc)
-    asOf: "2026-02"              # When this was current
-    note: "Series G post-money"  # Context shown in tooltip
-    source: "https://..."        # Attribution URL
+  # valuation
+  6796e194:
+    value: 380e9                   # Structured numeric (build auto-formats)
+    asOf: "2026-02"                # When this was current
+    measure: valuation             # Links to fact-measures.yaml
+    note: "Series G post-money"    # Context shown in tooltip
+    source: "https://..."          # Attribution URL
 ```
 
+**Why hash IDs?** Naming facts is tedious and error-prone at scale. Hash IDs are generated once (`generateFactId()` from `crux/resource-utils.ts`) and never need to change. The YAML comment and `measure` field provide human context.
+
 **Required fields:**
-- `value` — display string (used by `<F>` when no children are provided)
-- `numeric` — raw number (required if used in any `<Calc>` expression)
+- `value` — numeric (e.g. `380e9`, `[20e9, 26e9]`, `\{min: 300000\}`) or string (e.g. `"$76,001/year"`, `"2028"`). Numeric values are auto-formatted at build time.
 - `asOf` — temporal anchor (strongly recommended for any changing number)
+- `measure` — must reference a valid ID from `data/fact-measures.yaml` (required for timeseries grouping)
 
 **Optional fields:**
 - `note` — shown in tooltip
 - `source` — attribution link
+- `sourceResource` — 16-char resource hash ID linking to `data/resources/*.yaml`
 - `noCompute: true` — skip build-time computation (for non-numeric values like "2028")
 - `compute` — formula for build-time derived facts
 - `format` / `formatDivisor` — display formatting hints
+
+## Adding New Facts
+
+1. Generate an ID: use `generateFactId()` or run `node -e "console.log(require('crypto').randomBytes(4).toString('hex'))"`
+2. Add the entry to the appropriate `data/facts/<entity>.yaml` file with a comment
+3. Run `node app/scripts/build-data.mjs` to rebuild
 
 ## Updating Facts
 
 When new data arrives:
 
 1. Edit the YAML file in `data/facts/<entity>.yaml`
-2. Update `value`, `numeric`, and `asOf`
+2. Update `value` and `asOf`
 3. Run `node app/scripts/build-data.mjs` to rebuild
 4. Every `<F>` and `<Calc>` referencing that fact auto-updates
 
 **Keep old point-in-time facts as separate entries** when pages reference them explicitly:
 
 ```yaml
-# Current valuation (gets updated)
-valuation:
-  value: "$380 billion"
-  numeric: 380000000000
-  asOf: "2026-02"
+  # current valuation (gets updated)
+  6796e194:
+    value: 380e9
+    asOf: "2026-02"
+    measure: valuation
 
-# Historical snapshot (stays fixed, referenced by comparison sections)
-valuation-nov-2025:
-  value: "$350 billion"
-  numeric: 350000000000
-  asOf: "2025-11"
+  # historical snapshot (stays fixed, referenced by comparison sections)
+  c45b168f:
+    value: 350e9
+    asOf: "2025-11"
+    measure: valuation
 ```
 
 ## Scaling Strategy
@@ -216,13 +226,13 @@ Don't try to fact-ify everything at once. Expand entity-by-entity as pages get c
 ### Valuation with context
 
 ```jsx
-valued at <F e="anthropic" f="valuation" /> in its latest funding round
+valued at <F e="anthropic" f="6796e194" /> in its latest funding round
 ```
 
 ### Temporal metric in prose
 
 ```jsx
-Over <F e="anthropic" f="business-customers" showDate /> business customers
+Over <F e="anthropic" f="7a3815b4" showDate /> business customers
 {/* → "Over 300,000+ (as of 2025) business customers" */}
 ```
 
@@ -231,18 +241,18 @@ Over <F e="anthropic" f="business-customers" showDate /> business customers
 ```jsx
 | Metric | Value |
 |--------|-------|
-| **Revenue Multiple** | <Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> |
+| **Revenue Multiple** | <Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" /> |
 ```
 
 ### Growth rate comparison
 
 ```jsx
-revenue grew <Calc expr="({anthropic.revenue-mid-2025} / {anthropic.revenue-early-2025} - 1) * 100" precision={0} suffix="%" /> in seven months
+revenue grew <Calc expr="({anthropic.83e76962} / {anthropic.bc497a3d} - 1) * 100" precision={0} suffix="%" /> in seven months
 ```
 
 ### Side-by-side company comparison
 
 ```jsx
-Anthropic trades at ≈<Calc expr="{anthropic.valuation} / {anthropic.revenue-run-rate}" precision={0} suffix="x" /> revenue
-vs OpenAI's ≈<Calc expr="{openai.valuation-2025} / {openai.revenue-arr-2025}" precision={0} suffix="x" />
+Anthropic trades at ≈<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" /> revenue
+vs OpenAI's ≈<Calc expr="{openai.39d6868e} / {openai.609b9796}" precision={0} suffix="x" />
 ```
