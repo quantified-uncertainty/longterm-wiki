@@ -3,12 +3,20 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 
-interface FactMetricDef {
+interface FactMeasureDef {
   id: string;
   label: string;
   unit: string;
   category: string;
+  direction?: "higher" | "lower";
   description?: string;
+  display?: {
+    divisor?: number;
+    prefix?: string;
+    suffix?: string;
+  };
+  relatedMeasures?: string[];
+  applicableTo?: string[];
 }
 
 interface FactEntry {
@@ -24,19 +32,19 @@ interface FactEntry {
   note?: string;
   computed?: boolean;
   compute?: string;
-  metric?: string;
+  measure?: string;
 }
 
-type ViewMode = "entity" | "metric" | "timeseries";
+type ViewMode = "entity" | "measure" | "timeseries";
 
 export function FactDashboard({
   facts,
   entityHrefs,
-  factMetrics,
+  factMeasures,
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
-  factMetrics: Record<string, FactMetricDef>;
+  factMeasures: Record<string, FactMeasureDef>;
 }) {
   const [filter, setFilter] = useState("");
   const [showComputed, setShowComputed] = useState(true);
@@ -50,14 +58,14 @@ export function FactDashboard({
       f.entity.toLowerCase().includes(q) ||
       f.factId.toLowerCase().includes(q) ||
       (f.value || "").toLowerCase().includes(q) ||
-      (f.metric || "").toLowerCase().includes(q)
+      (f.measure || "").toLowerCase().includes(q)
     );
   }), [facts, filter, showComputed]);
 
   // Stats
-  const metricCount = useMemo(() => {
-    const metrics = new Set(filtered.filter(f => f.metric).map(f => f.metric));
-    return metrics.size;
+  const measureCount = useMemo(() => {
+    const measures = new Set(filtered.filter(f => f.measure).map(f => f.measure));
+    return measures.size;
   }, [filtered]);
 
   const entityCount = useMemo(() => {
@@ -69,7 +77,7 @@ export function FactDashboard({
       <div className="flex items-center gap-4 mb-4 flex-wrap">
         <input
           type="text"
-          placeholder="Filter by entity, fact ID, or metric..."
+          placeholder="Filter by entity, fact ID, or measure..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="flex-1 min-w-[200px] px-3 py-2 text-sm border border-border rounded-md bg-background"
@@ -87,7 +95,7 @@ export function FactDashboard({
 
       <div className="flex items-center gap-3 mb-6">
         <div className="flex rounded-md border border-border overflow-hidden">
-          {(["entity", "metric", "timeseries"] as ViewMode[]).map((mode) => (
+          {(["entity", "measure", "timeseries"] as ViewMode[]).map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
@@ -97,38 +105,38 @@ export function FactDashboard({
                   : "bg-background text-muted-foreground hover:bg-muted"
               }`}
             >
-              {mode === "entity" ? "By Entity" : mode === "metric" ? "By Metric" : "Timeseries"}
+              {mode === "entity" ? "By Entity" : mode === "measure" ? "By Measure" : "Timeseries"}
             </button>
           ))}
         </div>
         <span className="text-sm text-muted-foreground">
-          {filtered.length} facts | {entityCount} entities | {metricCount} metrics
+          {filtered.length} facts | {entityCount} entities | {measureCount} measures
         </span>
       </div>
 
       {viewMode === "entity" && (
-        <EntityView facts={filtered} entityHrefs={entityHrefs} factMetrics={factMetrics} />
+        <EntityView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} />
       )}
-      {viewMode === "metric" && (
-        <MetricView facts={filtered} entityHrefs={entityHrefs} factMetrics={factMetrics} />
+      {viewMode === "measure" && (
+        <MeasureView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} />
       )}
       {viewMode === "timeseries" && (
-        <TimeseriesView facts={filtered} entityHrefs={entityHrefs} factMetrics={factMetrics} />
+        <TimeseriesView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} />
       )}
     </div>
   );
 }
 
-// === Entity View (original, enhanced with metric badges) ===
+// === Entity View (original, enhanced with measure badges) ===
 
 function EntityView({
   facts,
   entityHrefs,
-  factMetrics,
+  factMeasures,
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
-  factMetrics: Record<string, FactMetricDef>;
+  factMeasures: Record<string, FactMeasureDef>;
 }) {
   const grouped = useMemo(() => {
     const map = new Map<string, FactEntry[]>();
@@ -153,7 +161,7 @@ function EntityView({
             <thead>
               <tr className="text-left text-muted-foreground">
                 <th className="pb-1 pr-4 font-medium">Fact ID</th>
-                <th className="pb-1 pr-4 font-medium">Metric</th>
+                <th className="pb-1 pr-4 font-medium">Measure</th>
                 <th className="pb-1 pr-4 font-medium">Value</th>
                 <th className="pb-1 pr-4 font-medium">As Of</th>
                 <th className="pb-1 pr-4 font-medium">Source</th>
@@ -165,14 +173,18 @@ function EntityView({
                 <tr key={fact.key} className="border-t border-border">
                   <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
                   <td className="py-1.5 pr-4">
-                    <MetricBadge metricId={fact.metric} factMetrics={factMetrics} />
+                    <MeasureBadge measureId={fact.measure} factMeasures={factMeasures} />
                   </td>
                   <td className="py-1.5 pr-4">
                     <ValueDisplay fact={fact} />
                   </td>
-                  <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "—"}</td>
+                  <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
                   <td className="py-1.5 pr-4 text-muted-foreground text-xs max-w-[200px] truncate">
-                    {fact.source || "—"}
+                    {fact.source ? (
+                      <a href={fact.source} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        {new URL(fact.source).hostname.replace("www.", "")}
+                      </a>
+                    ) : "\u2014"}
                   </td>
                   <td className="py-1.5">
                     {fact.computed ? (
@@ -195,76 +207,81 @@ function EntityView({
   );
 }
 
-// === Metric View (grouped by metric) ===
+// === Measure View (grouped by measure) ===
 
-function MetricView({
+function MeasureView({
   facts,
   entityHrefs,
-  factMetrics,
+  factMeasures,
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
-  factMetrics: Record<string, FactMetricDef>;
+  factMeasures: Record<string, FactMeasureDef>;
 }) {
-  const { metricGroups, untagged } = useMemo(() => {
-    const byMetric = new Map<string, FactEntry[]>();
-    const noMetric: FactEntry[] = [];
+  const { measureGroups, untagged } = useMemo(() => {
+    const byMeasure = new Map<string, FactEntry[]>();
+    const noMeasure: FactEntry[] = [];
     for (const fact of facts) {
-      if (fact.metric) {
-        const group = byMetric.get(fact.metric) || [];
+      if (fact.measure) {
+        const group = byMeasure.get(fact.measure) || [];
         group.push(fact);
-        byMetric.set(fact.metric, group);
+        byMeasure.set(fact.measure, group);
       } else {
-        noMetric.push(fact);
+        noMeasure.push(fact);
       }
     }
-    // Sort within each metric by entity then asOf
-    for (const group of byMetric.values()) {
+    // Sort within each measure by entity then asOf
+    for (const group of byMeasure.values()) {
       group.sort((a, b) => a.entity.localeCompare(b.entity) || (a.asOf || "").localeCompare(b.asOf || ""));
     }
-    // Sort metrics by category then label
-    const sorted = [...byMetric.entries()].sort((a, b) => {
-      const catA = factMetrics[a[0]]?.category || "zzz";
-      const catB = factMetrics[b[0]]?.category || "zzz";
+    // Sort measures by category then label
+    const sorted = [...byMeasure.entries()].sort((a, b) => {
+      const catA = factMeasures[a[0]]?.category || "zzz";
+      const catB = factMeasures[b[0]]?.category || "zzz";
       if (catA !== catB) return catA.localeCompare(catB);
       return a[0].localeCompare(b[0]);
     });
-    return { metricGroups: sorted, untagged: noMetric };
-  }, [facts, factMetrics]);
+    return { measureGroups: sorted, untagged: noMeasure };
+  }, [facts, factMeasures]);
 
   // Group by category
   const byCategory = useMemo(() => {
     const cats = new Map<string, [string, FactEntry[]][]>();
-    for (const [metricId, entries] of metricGroups) {
-      const cat = factMetrics[metricId]?.category || "uncategorized";
+    for (const [measureId, entries] of measureGroups) {
+      const cat = factMeasures[measureId]?.category || "uncategorized";
       const group = cats.get(cat) || [];
-      group.push([metricId, entries]);
+      group.push([measureId, entries]);
       cats.set(cat, group);
     }
     return [...cats.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  }, [metricGroups, factMetrics]);
+  }, [measureGroups, factMeasures]);
 
   return (
     <div className="space-y-8">
-      {byCategory.map(([category, metrics]) => (
+      {byCategory.map(([category, measures]) => (
         <div key={category}>
           <h2 className="text-lg font-bold mb-4 capitalize text-foreground border-b border-border pb-1">
             {category}
           </h2>
           <div className="space-y-6">
-            {metrics.map(([metricId, entries]) => {
-              const def = factMetrics[metricId];
+            {measures.map(([measureId, entries]) => {
+              const def = factMeasures[measureId];
               const entities = [...new Set(entries.map(e => e.entity))];
               return (
-                <div key={metricId} className="pl-2 border-l-2 border-primary/20">
+                <div key={measureId} className="pl-2 border-l-2 border-primary/20">
                   <div className="flex items-baseline gap-2 mb-1">
                     <h3 className="text-base font-semibold text-foreground">
-                      {def?.label || metricId}
+                      {def?.label || measureId}
                     </h3>
-                    <span className="text-xs text-muted-foreground font-mono">{metricId}</span>
+                    <span className="text-xs text-muted-foreground font-mono">{measureId}</span>
                     {def?.unit && (
                       <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
                         {def.unit}
+                      </span>
+                    )}
+                    {def?.direction && (
+                      <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+                        {def.direction === "higher" ? "\u2191 higher is better" : "\u2193 lower is better"}
                       </span>
                     )}
                     <span className="text-xs text-muted-foreground">
@@ -296,9 +313,9 @@ function MetricView({
                           <td className="py-1.5 pr-4">
                             <ValueDisplay fact={fact} />
                           </td>
-                          <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "—"}</td>
+                          <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
                           <td className="py-1.5 text-muted-foreground text-xs max-w-[300px] truncate">
-                            {fact.note || "—"}
+                            {fact.note || "\u2014"}
                           </td>
                         </tr>
                       ))}
@@ -314,7 +331,7 @@ function MetricView({
       {untagged.length > 0 && (
         <div>
           <h2 className="text-lg font-bold mb-4 text-muted-foreground border-b border-border pb-1">
-            Untagged (no metric)
+            Untagged (no measure)
           </h2>
           <table className="w-full text-sm border-collapse">
             <thead>
@@ -335,9 +352,9 @@ function MetricView({
                     </Link>
                   </td>
                   <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
-                  <td className="py-1.5 pr-4">{fact.value || "—"}</td>
-                  <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "—"}</td>
-                  <td className="py-1.5 text-muted-foreground text-xs">{fact.note || "—"}</td>
+                  <td className="py-1.5 pr-4">{fact.value || "\u2014"}</td>
+                  <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+                  <td className="py-1.5 text-muted-foreground text-xs">{fact.note || "\u2014"}</td>
                 </tr>
               ))}
             </tbody>
@@ -348,23 +365,23 @@ function MetricView({
   );
 }
 
-// === Timeseries View (visual timeline per metric+entity) ===
+// === Timeseries View (visual timeline per measure+entity) ===
 
 function TimeseriesView({
   facts,
   entityHrefs,
-  factMetrics,
+  factMeasures,
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
-  factMetrics: Record<string, FactMetricDef>;
+  factMeasures: Record<string, FactMeasureDef>;
 }) {
-  // Build timeseries: group by metric+entity, sort by date
+  // Build timeseries: group by measure+entity, sort by date
   const series = useMemo(() => {
     const map = new Map<string, FactEntry[]>();
     for (const fact of facts) {
-      if (!fact.metric || !fact.asOf) continue;
-      const seriesKey = `${fact.metric}:${fact.entity}`;
+      if (!fact.measure || !fact.asOf) continue;
+      const seriesKey = `${fact.measure}:${fact.entity}`;
       const group = map.get(seriesKey) || [];
       group.push(fact);
       map.set(seriesKey, group);
@@ -377,10 +394,10 @@ function TimeseriesView({
     const multiPoint = [...map.entries()]
       .filter(([, entries]) => entries.length >= 2)
       .sort((a, b) => {
-        // Sort by metric then entity
-        const [metricA] = a[0].split(":");
-        const [metricB] = b[0].split(":");
-        if (metricA !== metricB) return metricA.localeCompare(metricB);
+        // Sort by measure then entity
+        const [measureA] = a[0].split(":");
+        const [measureB] = b[0].split(":");
+        if (measureA !== measureB) return measureA.localeCompare(measureB);
         return a[0].localeCompare(b[0]);
       });
     return multiPoint;
@@ -389,8 +406,8 @@ function TimeseriesView({
   if (series.length === 0) {
     return (
       <p className="text-muted-foreground text-sm">
-        No metrics with multiple time observations found. Facts need both a <code>metric</code> and <code>asOf</code> field,
-        and at least 2 observations of the same metric for the same entity.
+        No measures with multiple time observations found. Facts need both a <code>measure</code> and <code>asOf</code> field,
+        and at least 2 observations of the same measure for the same entity.
       </p>
     );
   }
@@ -398,20 +415,25 @@ function TimeseriesView({
   return (
     <div className="space-y-8">
       {series.map(([seriesKey, entries]) => {
-        const [metricId, entityId] = seriesKey.split(":");
-        const def = factMetrics[metricId];
+        const [measureId, entityId] = seriesKey.split(":");
+        const def = factMeasures[measureId];
         const hasNumeric = entries.some(e => e.numeric != null || e.low != null);
 
         return (
           <div key={seriesKey} className="border border-border rounded-lg p-4">
             <div className="flex items-baseline gap-2 mb-3">
               <h3 className="text-base font-semibold text-foreground">
-                {def?.label || metricId}
+                {def?.label || measureId}
               </h3>
-              <span className="text-sm text-muted-foreground">—</span>
+              <span className="text-sm text-muted-foreground">\u2014</span>
               <Link href={entityHrefs[entityId] || `/wiki/${entityId}`} className="text-sm text-primary hover:underline">
                 {entityId}
               </Link>
+              {def?.direction && (
+                <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
+                  {def.direction === "higher" ? "\u2191" : "\u2193"}
+                </span>
+              )}
               {def?.unit && (
                 <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground ml-auto">
                   {def.unit}
@@ -421,7 +443,7 @@ function TimeseriesView({
 
             {/* Mini bar chart for numeric timeseries */}
             {hasNumeric && (
-              <MiniBarChart entries={entries} unit={def?.unit} />
+              <MiniBarChart entries={entries} def={def} />
             )}
 
             {/* Data table */}
@@ -447,13 +469,13 @@ function TimeseriesView({
                     {entries.some(e => e.low != null) && (
                       <td className="py-1.5 pr-4 text-muted-foreground text-xs">
                         {fact.low != null && fact.high != null
-                          ? `${formatCompact(fact.low)} – ${formatCompact(fact.high)}`
-                          : "—"}
+                          ? `${formatCompact(fact.low)} \u2013 ${formatCompact(fact.high)}`
+                          : "\u2014"}
                       </td>
                     )}
                     <td className="py-1.5 pr-4 font-mono text-xs text-muted-foreground">{fact.factId}</td>
                     <td className="py-1.5 text-muted-foreground text-xs max-w-[300px] truncate">
-                      {fact.note || "—"}
+                      {fact.note || "\u2014"}
                     </td>
                   </tr>
                 ))}
@@ -468,21 +490,21 @@ function TimeseriesView({
 
 // === Shared components ===
 
-function MetricBadge({
-  metricId,
-  factMetrics,
+function MeasureBadge({
+  measureId,
+  factMeasures,
 }: {
-  metricId?: string;
-  factMetrics: Record<string, FactMetricDef>;
+  measureId?: string;
+  factMeasures: Record<string, FactMeasureDef>;
 }) {
-  if (!metricId) return <span className="text-muted-foreground text-xs">—</span>;
-  const def = factMetrics[metricId];
+  if (!measureId) return <span className="text-muted-foreground text-xs">\u2014</span>;
+  const def = factMeasures[measureId];
   return (
     <span
       className="text-xs px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded dark:bg-violet-900 dark:text-violet-300"
-      title={def?.description || metricId}
+      title={def?.description || measureId}
     >
-      {def?.label || metricId}
+      {def?.label || measureId}
     </span>
   );
 }
@@ -491,10 +513,10 @@ function ValueDisplay({ fact }: { fact: FactEntry }) {
   const hasRange = fact.low != null && fact.high != null;
   return (
     <span>
-      {fact.value || (fact.numeric !== undefined ? String(fact.numeric) : "—")}
+      {fact.value || (fact.numeric !== undefined ? String(fact.numeric) : "\u2014")}
       {hasRange && !fact.value && (
         <span className="text-muted-foreground text-xs ml-1">
-          ({formatCompact(fact.low!)} – {formatCompact(fact.high!)})
+          ({formatCompact(fact.low!)} \u2013 {formatCompact(fact.high!)})
         </span>
       )}
     </span>
@@ -502,7 +524,7 @@ function ValueDisplay({ fact }: { fact: FactEntry }) {
 }
 
 /** Minimal horizontal bar chart for numeric timeseries */
-function MiniBarChart({ entries, unit }: { entries: FactEntry[]; unit?: string }) {
+function MiniBarChart({ entries, def }: { entries: FactEntry[]; def?: FactMeasureDef }) {
   // Get numeric values, using midpoint of range if no exact numeric
   const points = entries.map(e => ({
     asOf: e.asOf || "",
@@ -550,7 +572,7 @@ function MiniBarChart({ entries, unit }: { entries: FactEntry[]; unit?: string }
               )}
             </div>
             <span className="text-xs text-muted-foreground w-[90px] shrink-0">
-              {formatCompactWithUnit(point.value!, unit)}
+              {formatWithMeasure(point.value!, def)}
             </span>
           </div>
         );
@@ -568,14 +590,21 @@ function formatCompact(n: number): string {
   return String(n);
 }
 
-function formatCompactWithUnit(n: number, unit?: string): string {
-  if (unit === "USD") {
+/** Format a numeric value using the measure's display config if available */
+function formatWithMeasure(n: number, def?: FactMeasureDef): string {
+  if (def?.display) {
+    const { divisor, prefix, suffix } = def.display;
+    const val = divisor ? n / divisor : n;
+    const formatted = val % 1 === 0 ? String(val) : val.toFixed(1);
+    return `${prefix || ""}${formatted}${suffix || ""}`;
+  }
+  if (def?.unit === "USD") {
     if (Math.abs(n) >= 1e12) return `$${(n / 1e12).toFixed(1)}T`;
     if (Math.abs(n) >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
     if (Math.abs(n) >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
     if (Math.abs(n) >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
     return `$${n}`;
   }
-  if (unit === "percent") return `${n}%`;
+  if (def?.unit === "percent") return `${n}%`;
   return formatCompact(n);
 }

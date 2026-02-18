@@ -14,7 +14,7 @@ import { join, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { fileURLToPath } from 'url';
 import { getColors, isCI, formatPath } from '../lib/output.ts';
-import { Entity, Resource, Publication, Intervention, Proposal, FactsFile, FactMetricsFile } from '../../data/schema.ts';
+import { Entity, Resource, Publication, Intervention, Proposal, FactsFile, FactMeasuresFile } from '../../data/schema.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { ZodSchema, ZodError, ZodIssue } from 'zod';
 import type { Colors } from '../lib/output.ts';
@@ -181,28 +181,28 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   allErrors.push(...propErrors);
   if (!ciMode) console.log(`  ${proposals.length} proposals loaded`);
 
-  // 6. Validate facts/*.yaml against FactsFile schema and check metric references
+  // 6. Validate facts/*.yaml against FactsFile schema and check measure references
   if (!ciMode) console.log(`${colors.dim}Checking facts...${colors.reset}`);
   const factsDir = join(DATA_DIR, 'facts');
   let totalFacts = 0;
-  let validMetricIds: Set<string> | null = null;
+  let validMeasureIds: Set<string> | null = null;
 
-  // Load metric definitions first (for cross-reference validation)
-  const metricsPath = join(DATA_DIR, 'fact-metrics.yaml');
-  if (existsSync(metricsPath)) {
-    const metricsContent = readFileSync(metricsPath, 'utf-8');
-    const metricsParsed = parseYaml(metricsContent);
-    const metricsResult = FactMetricsFile.safeParse(metricsParsed);
-    if (!metricsResult.success) {
+  // Load measure definitions first (for cross-reference validation)
+  const measuresPath = join(DATA_DIR, 'fact-metrics.yaml');
+  if (existsSync(measuresPath)) {
+    const measuresContent = readFileSync(measuresPath, 'utf-8');
+    const measuresParsed = parseYaml(measuresContent);
+    const measuresResult = FactMeasuresFile.safeParse(measuresParsed);
+    if (!measuresResult.success) {
       allErrors.push({
-        file: metricsPath,
+        file: measuresPath,
         id: 'fact-metrics',
-        type: 'FactMetricsFile',
-        issues: formatZodErrors(metricsResult.error),
+        type: 'FactMeasuresFile',
+        issues: formatZodErrors(measuresResult.error),
       });
     } else {
-      validMetricIds = new Set(Object.keys(metricsResult.data.metrics));
-      if (!ciMode) console.log(`  ${validMetricIds.size} metric definitions loaded`);
+      validMeasureIds = new Set(Object.keys(measuresResult.data.measures));
+      if (!ciMode) console.log(`  ${validMeasureIds.size} measure definitions loaded`);
     }
     totalValidated++;
   }
@@ -226,15 +226,15 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
         });
       } else {
         totalFacts += Object.keys(result.data.facts).length;
-        // Cross-reference: check that metric values point to valid metric IDs
-        if (validMetricIds) {
+        // Cross-reference: check that measure values point to valid measure IDs
+        if (validMeasureIds) {
           for (const [factId, fact] of Object.entries(result.data.facts)) {
-            if (fact.metric && !validMetricIds.has(fact.metric)) {
+            if (fact.measure && !validMeasureIds.has(fact.measure)) {
               allErrors.push({
                 file: filepath,
                 id: `${result.data.entity}.${factId}`,
                 type: 'Fact',
-                issues: [`Unknown metric "${fact.metric}" — not defined in data/fact-metrics.yaml`],
+                issues: [`Unknown measure "${fact.measure}" — not defined in data/fact-metrics.yaml`],
               });
             }
           }

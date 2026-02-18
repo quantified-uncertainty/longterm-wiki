@@ -940,7 +940,7 @@ export type SubgraphSpec = z.infer<typeof SubgraphSpec>;
 
 export const Fact = z.object({
   value: z.string().optional(),                // Display value (auto-generated for computed facts)
-  numeric: z.number().optional(),              // Machine-readable numeric value
+  numeric: z.number().optional(),              // Machine-readable numeric value (auto-parsed from value if omitted)
   // Range support — for facts that are estimates or ranges (e.g., "$20-26 billion")
   low: z.number().optional(),                  // Lower bound of range
   high: z.number().optional(),                 // Upper bound of range
@@ -948,8 +948,12 @@ export const Fact = z.object({
   source: z.string().optional(),
   note: z.string().optional(),
   noCompute: z.boolean().optional(),           // If true, numeric value cannot be referenced in compute expressions
-  // Metric grouping — links this fact to a reusable metric definition
-  metric: z.string().optional(),               // Metric ID from data/fact-metrics.yaml (e.g., "valuation", "revenue")
+  // Measure grouping — links this fact to a reusable measure definition
+  // If omitted, the build pipeline auto-infers from the fact ID (e.g., "valuation-nov-2025" → "valuation")
+  measure: z.string().optional(),              // Measure ID from data/fact-metrics.yaml (e.g., "valuation", "revenue")
+  // Subject override — defaults to the parent entity; use to assign a fact to a different subject
+  // (e.g., subject: "industry-average" for benchmark facts that shouldn't appear in the entity's timeseries)
+  subject: z.string().optional(),
   // Computed fact fields
   compute: z.string().optional(),              // Expression: "{anthropic.valuation} * {jaan-tallinn.anthropic-ownership-low}"
   format: z.string().optional(),               // Display format: "$%.1f billion"
@@ -968,21 +972,32 @@ export const FactsFile = z.object({
 export type FactsFile = z.infer<typeof FactsFile>;
 
 /**
- * A metric definition — a reusable "measurement type" that groups related facts.
- * Facts with the same `metric` field across entities and time form a timeseries.
+ * A measure definition — a reusable "measurement type" that groups related facts.
+ * Facts with the same measure across entities and time form a timeseries.
+ *
+ * We use "measure" (not "metric") to avoid collision with the existing wiki
+ * entity type "metric" which represents measurement domain pages.
  */
-export const FactMetric = z.object({
+export const FactMeasure = z.object({
   label: z.string(),                           // Display name (e.g., "Valuation")
   unit: z.enum(['USD', 'percent', 'count', 'score', 'ratio', 'years', 'other']),
   category: z.string(),                        // Grouping category (e.g., "financial", "safety")
-  description: z.string().optional(),          // What this metric measures
+  direction: z.enum(['higher', 'lower']).optional(), // Whether higher values are better
+  description: z.string().optional(),          // What this measure tracks
+  display: z.object({                          // Auto-formatting for charts/display
+    divisor: z.number().optional(),            // Divide numeric value (e.g., 1e9 for billions)
+    prefix: z.string().optional(),             // Display prefix (e.g., "$")
+    suffix: z.string().optional(),             // Display suffix (e.g., "B")
+  }).optional(),
+  relatedMeasures: z.array(z.string()).optional(),  // IDs of related measures
+  applicableTo: z.array(z.string()).optional(),     // Entity types this measure applies to
 });
-export type FactMetric = z.infer<typeof FactMetric>;
+export type FactMeasure = z.infer<typeof FactMeasure>;
 
-export const FactMetricsFile = z.object({
-  metrics: z.record(z.string(), FactMetric),
+export const FactMeasuresFile = z.object({
+  measures: z.record(z.string(), FactMeasure),
 });
-export type FactMetricsFile = z.infer<typeof FactMetricsFile>;
+export type FactMeasuresFile = z.infer<typeof FactMeasuresFile>;
 
 // =============================================================================
 // MASTER GRAPH

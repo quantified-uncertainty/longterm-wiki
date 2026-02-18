@@ -1,14 +1,15 @@
-## 2026-02-18 | claude/fact-temporal-structure-M6JlN | Add temporal metric structure to fact system
+## 2026-02-18 | claude/fact-temporal-structure-M6JlN | Refactor fact system to knowledge-graph measures
 
-**What was done:** Added formal metric definitions and temporal structure to the fact system. Facts can now reference a `metric` (like "valuation" or "revenue") that groups related observations across time and entities, enabling timeseries queries and cross-entity comparisons. Also added `low`/`high` range fields for estimate-style facts. Updated the Fact Dashboard with three views: By Entity, By Metric, and Timeseries (with mini bar charts).
+**What was done:** Redesigned the fact system from simple metric tags to a knowledge-graph architecture with first-class "measures" (renamed from "metrics" to avoid collision with existing `metric` entity type). Measures have rich metadata (direction, display formatting, relatedMeasures, applicableTo). Facts auto-infer their measure from ID (e.g., `valuation-nov-2025` resolves to measure `valuation`), eliminating redundant YAML boilerplate. Added `subject` field for benchmark/comparison facts. Cleaned up YAML: removed redundant `numeric` fields where auto-parseable, added source URLs. Dashboard updated to show measure metadata and direction indicators.
 
-**Pages:** (no wiki page content changes)
+**Pages:** (infrastructure-only, no wiki page edits)
 
 **Issues encountered:**
-- None
+- Naming collision between `metric` (entity type) and `metric` (fact field) — resolved by renaming to `measure`
+- Context ran out during v2 refactor, required continuation session
 
 **Learnings/notes:**
-- The fact system now supports 19 metric definitions with 32 timeseries observations across 18 metrics
-- `metric` field is optional for backward compatibility — existing `<F>` component usage is unaffected
-- Schema validation now cross-references metric IDs in facts against `data/fact-metrics.yaml`
-- Range support via `low`/`high` fields enables facts like "$20-26 billion" to have structured numeric bounds
+- Build pipeline auto-parses `numeric` from value strings, so `numeric` is only needed for `+` suffix values
+- Measure auto-inference uses longest prefix match: fact ID `valuation-nov-2025` → measure `valuation`
+- Facts with `subject` override (e.g., `industry-average`) are excluded from parent entity's timeseries
+- 20 measure definitions, 17 auto-inferred, 32 timeseries observations across 19 measures

@@ -47,8 +47,12 @@ export interface Fact {
   source?: string;
   note?: string;
   noCompute?: boolean;
-  /** Metric ID from data/fact-metrics.yaml — groups related facts into timeseries */
-  metric?: string;
+  /** Measure ID from data/fact-metrics.yaml — groups related facts into timeseries.
+   *  Auto-inferred from fact ID at build time if not set explicitly. */
+  measure?: string;
+  /** Subject override — defaults to parent entity. Use for benchmark/comparison facts
+   *  (e.g., subject: "industry-average") that shouldn't appear in entity timeseries. */
+  subject?: string;
   compute?: string;
   format?: string;
   formatDivisor?: number;
@@ -57,19 +61,27 @@ export interface Fact {
   computed?: boolean;
 }
 
-export interface FactMetric {
+export interface FactMeasure {
   id: string;
   label: string;
   unit: string;
   category: string;
+  direction?: "higher" | "lower";
   description?: string;
+  display?: {
+    divisor?: number;
+    prefix?: string;
+    suffix?: string;
+  };
+  relatedMeasures?: string[];
+  applicableTo?: string[];
 }
 
-/** A timeseries entry — a fact observation for a specific entity+metric at a point in time */
+/** A timeseries entry — a fact observation for a specific entity+measure at a point in time */
 export interface TimeseriesPoint {
   entity: string;
   factId: string;
-  metric: string;
+  measure: string;
   asOf: string;
   value?: string;
   numeric?: number;
@@ -157,8 +169,8 @@ interface DatabaseShape {
   idRegistry: IdRegistryMaps;
   pages: Page[];
   facts: Record<string, Fact>;
-  factMetrics: Record<string, FactMetric>;
-  /** Timeseries index: metric ID → sorted array of observations */
+  factMeasures: Record<string, FactMeasure>;
+  /** Timeseries index: measure ID → sorted array of observations */
   factTimeseries: Record<string, TimeseriesPoint[]>;
   stats: Record<string, unknown>;
 }
@@ -788,26 +800,26 @@ export function getAllFacts(): Array<Fact & { key: string }> {
 }
 
 // ============================================================================
-// FACT METRICS & TIMESERIES
+// FACT MEASURES & TIMESERIES
 // ============================================================================
 
-/** Get all metric definitions */
-export function getFactMetrics(): Record<string, FactMetric> {
-  return getDatabase().factMetrics || {};
+/** Get all measure definitions */
+export function getFactMeasures(): Record<string, FactMeasure> {
+  return getDatabase().factMeasures || {};
 }
 
-/** Get a single metric definition by ID */
-export function getFactMetric(metricId: string): FactMetric | undefined {
-  return getDatabase().factMetrics?.[metricId];
+/** Get a single measure definition by ID */
+export function getFactMeasure(measureId: string): FactMeasure | undefined {
+  return getDatabase().factMeasures?.[measureId];
 }
 
 /**
- * Get timeseries for a metric, optionally filtered by entity.
+ * Get timeseries for a measure, optionally filtered by entity.
  * Returns observations sorted chronologically (oldest first).
  */
-export function getMetricTimeseries(metricId: string, entityId?: string): TimeseriesPoint[] {
+export function getMeasureTimeseries(measureId: string, entityId?: string): TimeseriesPoint[] {
   const db = getDatabase();
-  const series = db.factTimeseries?.[metricId] || [];
+  const series = db.factTimeseries?.[measureId] || [];
   if (entityId) {
     return series.filter(p => p.entity === entityId);
   }
@@ -815,37 +827,37 @@ export function getMetricTimeseries(metricId: string, entityId?: string): Timese
 }
 
 /**
- * Get all timeseries data for a given entity, grouped by metric.
- * Returns a map of metricId → sorted observations.
+ * Get all timeseries data for a given entity, grouped by measure.
+ * Returns a map of measureId → sorted observations.
  */
 export function getEntityTimeseries(entityId: string): Record<string, TimeseriesPoint[]> {
   const db = getDatabase();
   const result: Record<string, TimeseriesPoint[]> = {};
-  for (const [metricId, series] of Object.entries(db.factTimeseries || {})) {
+  for (const [measureId, series] of Object.entries(db.factTimeseries || {})) {
     const filtered = series.filter(p => p.entity === entityId);
     if (filtered.length > 0) {
-      result[metricId] = filtered;
+      result[measureId] = filtered;
     }
   }
   return result;
 }
 
-/** Get all metrics that have data for a given entity */
-export function getEntityMetrics(entityId: string): FactMetric[] {
+/** Get all measures that have data for a given entity */
+export function getEntityMeasures(entityId: string): FactMeasure[] {
   const db = getDatabase();
-  const metrics: FactMetric[] = [];
+  const measures: FactMeasure[] = [];
   const seen = new Set<string>();
-  for (const [metricId, series] of Object.entries(db.factTimeseries || {})) {
-    if (seen.has(metricId)) continue;
+  for (const [measureId, series] of Object.entries(db.factTimeseries || {})) {
+    if (seen.has(measureId)) continue;
     if (series.some(p => p.entity === entityId)) {
-      const metric = db.factMetrics?.[metricId];
-      if (metric) {
-        metrics.push(metric);
-        seen.add(metricId);
+      const measure = db.factMeasures?.[measureId];
+      if (measure) {
+        measures.push(measure);
+        seen.add(measureId);
       }
     }
   }
-  return metrics;
+  return measures;
 }
 
 // ============================================================================

@@ -1,131 +1,227 @@
-# Fact Metric Definitions
+# Fact Measure Definitions
 #
-# Metrics are reusable "measurement types" that group related facts across
-# entities and time. A fact with `metric: valuation` is a point-in-time
-# observation of the "valuation" metric for that entity.
+# Measures are first-class concepts in the knowledge graph — the "verbs/nouns"
+# that describe what is being measured. Each measure has rich metadata for
+# chart generation, cross-entity comparison, and knowledge graph queries.
 #
-# This enables:
-#   - Timeseries: all valuations for Anthropic over time
-#   - Cross-entity comparison: all company valuations at a given date
-#   - Knowledge graph queries: "what metrics does this entity have?"
-#   - Auto-generated charts and tables
+# Every fact observation is a (Subject, Measure, Time, Value) tuple:
+#   (Anthropic, valuation, 2026-02, $380B)
+#   (OpenAI,    valuation, 2025,    $500B)
+#
+# Naming: We use "measure" (not "metric") to avoid collision with the existing
+# wiki entity type "metric" which represents measurement domain pages.
 
-metrics:
+measures:
   # === Financial ===
   valuation:
     label: "Valuation"
     unit: USD
     category: financial
+    direction: higher
     description: "Post-money valuation from funding rounds or private market transactions"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [revenue, total-funding, funding-round]
+    applicableTo: [organization]
 
   revenue:
     label: "Revenue"
     unit: USD
     category: financial
+    direction: higher
     description: "Annualized run-rate revenue (ARR) or reported annual revenue"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [valuation, gross-margin, product-revenue]
+    applicableTo: [organization]
 
   revenue-guidance:
     label: "Revenue Guidance"
     unit: USD
     category: financial
+    direction: higher
     description: "Forward-looking revenue projections or guidance ranges"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [revenue]
+    applicableTo: [organization]
 
   funding-round:
     label: "Funding Round"
     unit: USD
     category: financial
+    direction: higher
     description: "Amount raised in a single funding round"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [total-funding, valuation]
+    applicableTo: [organization]
 
   total-funding:
     label: "Total Funding"
     unit: USD
     category: financial
+    direction: higher
     description: "Cumulative funding raised across all rounds"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [funding-round, valuation]
+    applicableTo: [organization]
 
   cash-burn:
     label: "Cash Burn"
     unit: USD
     category: financial
+    direction: lower
     description: "Net cash burn rate (annualized)"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [revenue, gross-margin]
+    applicableTo: [organization]
 
   gross-margin:
     label: "Gross Margin"
     unit: percent
     category: financial
+    direction: higher
     description: "Gross margin percentage"
+    relatedMeasures: [revenue, cash-burn]
+    applicableTo: [organization]
 
   product-revenue:
     label: "Product Revenue"
     unit: USD
     category: financial
+    direction: higher
     description: "Revenue from a specific product line"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [revenue]
+    applicableTo: [organization]
 
   infrastructure-investment:
     label: "Infrastructure Investment"
     unit: USD
     category: financial
     description: "Planned or committed infrastructure spending"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    applicableTo: [organization]
 
   # === Organizational ===
   headcount:
     label: "Headcount"
     unit: count
     category: organizational
-    description: "Number of employees or team members"
+    direction: higher
+    description: "Total number of employees"
+    relatedMeasures: [safety-researcher-count, interpretability-team-size]
+    applicableTo: [organization]
 
   customer-count:
     label: "Customer Count"
     unit: count
     category: organizational
+    direction: higher
     description: "Number of business customers"
+    relatedMeasures: [revenue, customer-concentration, retention-rate]
+    applicableTo: [organization]
 
   customer-concentration:
     label: "Customer Concentration"
     unit: percent
     category: organizational
-    description: "Revenue share from top customers"
+    direction: lower
+    description: "Revenue share from top customers (lower = more diversified)"
+    relatedMeasures: [customer-count, revenue]
+    applicableTo: [organization]
 
   retention-rate:
     label: "Retention Rate"
     unit: percent
     category: organizational
-    description: "Customer or revenue retention rate"
+    direction: higher
+    description: "Customer or net revenue retention rate"
+    relatedMeasures: [customer-count, revenue]
+    applicableTo: [organization]
+
+  user-count:
+    label: "User Count"
+    unit: count
+    category: organizational
+    direction: higher
+    description: "Number of users of a product or platform"
+    applicableTo: [organization]
 
   # === Safety ===
-  safety-headcount:
-    label: "Safety Headcount"
+  safety-researcher-count:
+    label: "Safety Researchers"
     unit: count
     category: safety
+    direction: higher
     description: "Number of safety/alignment researchers"
+    relatedMeasures: [safety-staffing-ratio, interpretability-team-size, headcount]
+    applicableTo: [organization]
+
+  interpretability-team-size:
+    label: "Interpretability Team Size"
+    unit: count
+    category: safety
+    direction: higher
+    description: "Number of researchers on interpretability/mechanistic interpretability team"
+    relatedMeasures: [safety-researcher-count, headcount]
+    applicableTo: [organization]
 
   safety-staffing-ratio:
     label: "Safety Staffing Ratio"
     unit: percent
     category: safety
+    direction: higher
     description: "Safety researchers as percentage of technical staff"
+    relatedMeasures: [safety-researcher-count, headcount]
+    applicableTo: [organization]
 
   # === Model Performance ===
   benchmark-score:
     label: "Benchmark Score"
     unit: percent
     category: performance
+    direction: higher
     description: "Score on a standardized benchmark"
+    applicableTo: [organization]
 
   model-parameters:
     label: "Model Parameters"
     unit: count
     category: performance
     description: "Number of parameters in a model"
+    applicableTo: [organization]
 
   # === People ===
   net-worth:
     label: "Net Worth"
     unit: USD
     category: financial
+    direction: higher
     description: "Estimated personal net worth"
-
-  user-count:
-    label: "User Count"
-    unit: count
-    category: organizational
-    description: "Number of users of a product or platform"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    applicableTo: [person]

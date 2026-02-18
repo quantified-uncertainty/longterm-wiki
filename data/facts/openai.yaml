@@ -1,49 +1,70 @@
 entity: openai
 facts:
+  # === Funding ===
+
   microsoft-total-investment:
-    metric: total-funding
+    measure: total-funding
     value: "$13 billion"
-    numeric: 13000000000
     asOf: "2024-01"
     source: "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenai/"
     note: "Microsoft cumulative investment"
 
+  # === User metrics ===
+
   chatgpt-users-first-2-months:
-    metric: user-count
+    measure: user-count
     value: "100 million"
     asOf: "2023-02"
     note: "Fastest-growing consumer application in history at that time"
 
+  # === Valuation timeseries ===
+  # measure auto-inferred as "valuation" from fact ID prefix
+
   valuation-2024:
-    metric: valuation
     value: "$157 billion+"
     numeric: 157000000000
     asOf: "2024-12"
     note: "October 2024 funding round valuation"
 
   valuation-2025:
-    metric: valuation
     value: "$500 billion+"
     numeric: 500000000000
     asOf: "2025"
     note: "Approximate valuation in 2025 private market transactions"
 
+  # === Revenue timeseries ===
+  # measure auto-inferred as "revenue" from fact ID prefix
+
   revenue-arr-2025:
-    metric: revenue
     value: "$20 billion"
-    numeric: 20000000000
     asOf: "2025"
     note: "Annualized run rate referenced in Anthropic valuation comparisons"
 
-  gpt3-parameters:
-    metric: model-parameters
-    value: "175 billion"
-    asOf: "2020-06"
-
   revenue-2024-projected:
-    metric: revenue
     value: "$3.4 billion"
     asOf: "2024-10"
+
+  # === Model benchmarks ===
+
+  gpt3-parameters:
+    measure: model-parameters
+    value: "175 billion"
+    asOf: "2020-06"
+    source: "https://arxiv.org/abs/2005.14165"
+
+  o1-aime-score:
+    measure: benchmark-score
+    value: "83%"
+    asOf: "2024-09"
+    note: "o1 model performance on AIME math competition"
+
+  o1-swe-bench-score:
+    measure: benchmark-score
+    value: "71.7%"
+    asOf: "2024-09"
+    note: "o1 model on SWE-bench Verified"
+
+  # === Standalone facts ===
 
   revenue-yoy-growth-2024:
     value: "1,700%"
@@ -53,15 +74,3 @@ facts:
     value: "75%"
     asOf: "2024"
     note: "75% of co-founders departed within 9 years of founding"
-
-  o1-aime-score:
-    metric: benchmark-score
-    value: "83%"
-    asOf: "2024-09"
-    note: "o1 model performance on AIME math competition"
-
-  o1-swe-bench-score:
-    metric: benchmark-score
-    value: "71.7%"
-    asOf: "2024-09"
-    note: "o1 model on SWE-bench Verified"

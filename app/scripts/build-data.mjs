@@ -970,32 +970,65 @@ async function main() {
   }
   database.facts = facts;
 
-  // Load fact metric definitions from data/fact-metrics.yaml
-  const factMetricsPath = join(DATA_DIR, 'fact-metrics.yaml');
-  const factMetrics = {};
-  if (existsSync(factMetricsPath)) {
-    const metricsContent = readFileSync(factMetricsPath, 'utf-8');
-    const metricsParsed = parse(metricsContent);
-    if (metricsParsed && metricsParsed.metrics) {
-      for (const [metricId, metricDef] of Object.entries(metricsParsed.metrics)) {
-        factMetrics[metricId] = { id: metricId, ...metricDef };
+  // Load fact measure definitions from data/fact-metrics.yaml
+  const factMeasuresPath = join(DATA_DIR, 'fact-metrics.yaml');
+  const factMeasures = {};
+  if (existsSync(factMeasuresPath)) {
+    const measuresContent = readFileSync(factMeasuresPath, 'utf-8');
+    const measuresParsed = parse(measuresContent);
+    if (measuresParsed && measuresParsed.measures) {
+      for (const [measureId, measureDef] of Object.entries(measuresParsed.measures)) {
+        factMeasures[measureId] = { id: measureId, ...measureDef };
       }
     }
-    console.log(`  factMetrics: ${Object.keys(factMetrics).length} metric definitions`);
+    console.log(`  factMeasures: ${Object.keys(factMeasures).length} measure definitions`);
   }
-  database.factMetrics = factMetrics;
+  database.factMeasures = factMeasures;
 
-  // Build timeseries index: group facts by metric, sorted chronologically
+  // Auto-infer measure from fact ID where not explicitly set
+  // Algorithm: 1) exact match against known measure IDs, 2) longest prefix match (factId starts with "<measure>-")
+  const knownMeasureIds = Object.keys(factMeasures);
+  let autoInferredCount = 0;
+  for (const [key, fact] of Object.entries(facts)) {
+    if (fact.measure || fact.noCompute) continue;
+    // 1. Exact match: fact ID is a known measure name
+    if (knownMeasureIds.includes(fact.factId)) {
+      fact.measure = fact.factId;
+      autoInferredCount++;
+      continue;
+    }
+    // 2. Longest prefix match: fact ID starts with "<measure>-"
+    let bestMatch = null;
+    let bestLen = 0;
+    for (const measureId of knownMeasureIds) {
+      if (fact.factId.startsWith(measureId + '-') && measureId.length > bestLen) {
+        bestMatch = measureId;
+        bestLen = measureId.length;
+      }
+    }
+    if (bestMatch) {
+      fact.measure = bestMatch;
+      autoInferredCount++;
+    }
+  }
+  if (autoInferredCount > 0) {
+    console.log(`  measures: auto-inferred ${autoInferredCount} measures from fact IDs`);
+  }
+
+  // Build timeseries index: group facts by measure, sorted chronologically
+  // Facts with a `subject` override are excluded from the parent entity's timeseries
+  // (they represent benchmarks/comparisons, not entity-owned data)
   const factTimeseries = {};
   for (const [key, fact] of Object.entries(facts)) {
-    if (!fact.metric || !fact.asOf) continue;
-    if (!factTimeseries[fact.metric]) {
-      factTimeseries[fact.metric] = [];
+    if (!fact.measure || !fact.asOf) continue;
+    if (fact.subject) continue; // Skip benchmark/comparison facts
+    if (!factTimeseries[fact.measure]) {
+      factTimeseries[fact.measure] = [];
     }
-    factTimeseries[fact.metric].push({
+    factTimeseries[fact.measure].push({
       entity: fact.entity,
       factId: fact.factId,
-      metric: fact.metric,
+      measure: fact.measure,
       asOf: fact.asOf,
       value: fact.value,
       numeric: fact.numeric,
@@ -1010,7 +1043,7 @@ async function main() {
     series.sort((a, b) => a.asOf.localeCompare(b.asOf));
   }
   const timeseriesCount = Object.values(factTimeseries).reduce((sum, s) => sum + s.length, 0);
-  console.log(`  factTimeseries: ${timeseriesCount} observations across ${Object.keys(factTimeseries).length} metrics`);
+  console.log(`  factTimeseries: ${timeseriesCount} observations across ${Object.keys(factTimeseries).length} measures`);
   database.factTimeseries = factTimeseries;
 
   // Build URL → resource map for unconverted link detection
