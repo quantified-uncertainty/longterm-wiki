@@ -163,6 +163,12 @@ pnpm crux content improve <page-id> --tier=polish --apply
 ```
 This adds proper citations, fixes escaping, validates EntityLinks, and syncs frontmatter metrics.
 
+## Agent Session Workflow — MANDATORY
+
+Run `/agent-session-start` **before writing any code**. It generates a typed checklist and signals start on the GitHub issue. See `.claude/rules/agent-session-workflow.md` for full instructions.
+
+At session end, run `/agent-session-ready-PR` to verify the checklist, polish the PR, and ship.
+
 ## GitHub Issue Tracking — MANDATORY
 
 When a session works on a GitHub issue, signal activity on that issue. See `.claude/rules/github-issue-tracking.md` for full instructions. Summary:
