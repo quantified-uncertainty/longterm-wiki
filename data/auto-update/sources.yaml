@@ -9,7 +9,8 @@
 #   name:        Human-readable name
 #   type:        rss | atom | web-search
 #   url:         Feed URL (for rss/atom types)
-#   query:       Search query (for web-search types)
+#   query:       Search query (for web-search types; uses Exa API if EXA_API_KEY
+#                is set, otherwise falls back to Anthropic web_search tool)
 #   frequency:   How often to check: daily | twice-daily | weekly
 #   categories:  Topic categories this source covers (used for routing)
 #   reliability: high | medium | low (affects how aggressively we trust items)
@@ -170,13 +171,22 @@ sources:
 
   # ── Arxiv ─────────────────────────────────────────────────────────────────
 
-  - id: arxiv-ai-safety
-    name: arXiv AI Safety Papers
-    type: web-search
-    query: "arxiv AI safety alignment interpretability new paper 2026"
+  - id: arxiv-cs-ai
+    name: arXiv cs.AI (Artificial Intelligence)
+    type: rss
+    url: https://arxiv.org/rss/cs.AI
     frequency: daily
     categories: [research, safety, alignment, interpretability]
-    reliability: medium
+    reliability: high
+    enabled: true
+
+  - id: arxiv-cs-cl
+    name: arXiv cs.CL (Computation and Language)
+    type: rss
+    url: https://arxiv.org/rss/cs.CL
+    frequency: daily
+    categories: [research, models, capabilities]
+    reliability: high
     enabled: true
 
   # ── Compute & Industry ────────────────────────────────────────────────────
