@@ -58,6 +58,16 @@ curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/
 
 This is a key output of maintenance — converting discovered problems into tracked work items.
 
+### Issue tracking cleanup
+
+Check for stale `claude-working` labels on issues where the session has ended:
+```bash
+pnpm crux issues list   # shows "In Progress" section with claude-working issues
+```
+For each orphaned in-progress issue:
+- If work completed: `pnpm crux issues done <N> --pr=<URL>` (posts comment + removes label)
+- If work abandoned: post a comment explaining, then remove label via `crux issues done <N>`
+
 ## Phase 3: Execute
 
 Work through the prioritized list:
