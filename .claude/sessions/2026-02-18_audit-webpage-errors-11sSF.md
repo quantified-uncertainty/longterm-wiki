@@ -1,8 +1,8 @@
 ## 2026-02-18 | claude/audit-webpage-errors-11sSF | Fix factual errors found in wiki audit
 
-**What was done:** Systematically audited ~25 high-risk wiki pages for factual errors and hallucinations using 4 parallel background agents plus direct reading. Fixed 10 confirmed errors across 8 files.
+**What was done:** Systematically audited ~35+ high-risk wiki pages for factual errors and hallucinations using parallel background agents plus direct reading. Fixed 13 confirmed errors across 11 files.
 
-**Pages:** deep-learning-era, world-models, anthropic, deepmind, dario-amodei, demis-hassabis, geoffrey-hinton, ilya-sutskever
+**Pages:** deep-learning-era, world-models, anthropic, deepmind, dario-amodei, demis-hassabis, geoffrey-hinton, ilya-sutskever, mainstream-era, coefficient-giving, holden-karnofsky
 
 **Issues encountered:**
 - DeepMind acquisition price on demis-hassabis.mdx was \$100M (wrong by ~5x) — corrected to \$500–650M
@@ -14,6 +14,11 @@
 - Nobel Prize attribution in deepmind.mdx omitted David Baker — added
 - Hinton extinction risk "10%" understated — updated to "10–20%" throughout geoffrey-hinton.mdx
 - Dario Amodei funding table "\$1B+" inconsistent with body text "\$7B+" — fixed to \$7B+
+- mainstream-era.mdx funding stat "growing from ~\$100M to \$100M annually" (same number, obvious error) — corrected to \$50M to \$200M+
+- mainstream-era.mdx Altman reinstatement date "November 29" — corrected to "November 22" (confirmed by news reporting)
+- coefficient-giving.mdx described itself as "formerly Coefficient Giving" (circular) — corrected to "formerly Open Philanthropy"
+- holden-karnofsky.mdx described Open Philanthropy as "formerly Coefficient Giving" (inverted) — corrected to "formerly Open Philanthropy"
+- holden-karnofsky.mdx funding claim "over \$100M toward AI safety" — updated to "over \$300M" (more consistent with actual grant volume)
 
 **Learnings/notes:**
 - FLI \$665.8M Buterin donation (SHIB tokens) is accurate in nominal terms; Coefficient Giving rebrand of Open Philanthropy (Nov 18 2025) is confirmed accurate
