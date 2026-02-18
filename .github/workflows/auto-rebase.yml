@@ -3,18 +3,27 @@ name: Auto-Rebase PRs
 # When main is updated, rebase all open PRs to surface conflicts early.
 # PRs with no real conflicts get silently rebased; PRs with conflicts
 # are left alone for the conflict-resolver workflow to handle.
+#
+# Safeguards to avoid disrupting active agent work:
+#   1. Skip PRs with the `claude-working` label (agent actively working)
+#   2. Skip branches with commits pushed in the last 30 minutes
+#   3. Skip branches with recent ci-autofix commits (feedback loop risk)
+#   4. Runs on schedule (every 4 hours) instead of every push to main,
+#      reducing churn when many PRs are open.
 
 on:
-  push:
-    branches: [main]
+  schedule:
+    - cron: '0 */4 * * *'   # every 4 hours
+  workflow_dispatch:          # allow manual trigger
 
 permissions:
   contents: write
   pull-requests: read
+  issues: read
 
 concurrency:
   group: auto-rebase
-  cancel-in-progress: true # newer main state supersedes in-progress rebase
+  cancel-in-progress: true # newer run supersedes an in-progress rebase
 
 jobs:
   rebase-open-prs:
@@ -35,9 +44,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # List open PR branches targeting main (skip drafts)
-          prs=$(gh pr list --base main --state open --json number,headRefName,isDraft \
-            --jq '.[] | select(.isDraft == false) | "\(.number) \(.headRefName)"')
+          NOW=$(date +%s)
+          RECENT_WINDOW=1800  # 30 minutes in seconds
+
+          # List open PR branches targeting main (skip drafts), include labels and updatedAt
+          prs=$(gh pr list --base main --state open \
+            --json number,headRefName,isDraft,labels,updatedAt \
+            --jq '.[] | select(.isDraft == false) | "\(.number) \(.headRefName) \(.updatedAt) \(.labels | map(.name) | join(","))"')
 
           if [ -z "$prs" ]; then
             echo "No open PRs to rebase."
@@ -47,8 +60,26 @@ jobs:
           failed=0
 
           # Use here-string to avoid subshell from pipe (errors propagate correctly)
-          while read -r pr_number branch; do
+          while IFS=' ' read -r pr_number branch updated_at labels; do
             echo "::group::PR #${pr_number} (${branch})"
+
+            # --- Safeguard 1: skip if claude-working label is present ---
+            if echo "$labels" | grep -q "claude-working"; then
+              echo "Skipping — branch has 'claude-working' label (agent actively working)."
+              echo "::endgroup::"
+              continue
+            fi
+
+            # --- Safeguard 2: skip branches with very recent activity (last 30 min) ---
+            # updatedAt from gh pr list is the PR updated timestamp; also check the
+            # actual branch tip timestamp after fetching.
+            pr_updated_epoch=$(date -d "$updated_at" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$updated_at" +%s 2>/dev/null || echo 0)
+            age=$(( NOW - pr_updated_epoch ))
+            if [ "$age" -lt "$RECENT_WINDOW" ]; then
+              echo "Skipping — PR updated ${age}s ago (within 30-minute window)."
+              echo "::endgroup::"
+              continue
+            fi
 
             # Validate branch name
             if ! echo "$branch" | grep -qE '^[a-zA-Z0-9._/-]+$'; then
@@ -59,6 +90,24 @@ jobs:
 
             if ! git fetch origin "$branch" 2>/dev/null; then
               echo "::warning::PR #${pr_number} — could not fetch branch ${branch} (may be from a fork)."
+              echo "::endgroup::"
+              continue
+            fi
+
+            # --- Safeguard 3: skip if branch tip was pushed very recently ---
+            branch_tip_time=$(git log -1 --format='%ct' "origin/$branch" 2>/dev/null || echo 0)
+            branch_age=$(( NOW - branch_tip_time ))
+            if [ "$branch_age" -lt "$RECENT_WINDOW" ]; then
+              echo "Skipping — branch tip is ${branch_age}s old (within 30-minute window)."
+              echo "::endgroup::"
+              continue
+            fi
+
+            # --- Safeguard 4: skip if most recent commit is from ci-autofix ---
+            last_committer=$(git log -1 --format='%an' "origin/$branch" 2>/dev/null || echo "")
+            last_msg=$(git log -1 --format='%s' "origin/$branch" 2>/dev/null || echo "")
+            if echo "$last_committer $last_msg" | grep -qi "ci-autofix\|autofix\[bot\]"; then
+              echo "Skipping — most recent commit appears to be from ci-autofix (feedback-loop risk)."
               echo "::endgroup::"
               continue
             fi
