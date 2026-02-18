@@ -12,8 +12,7 @@ import { createRule, Issue, Severity, FixType, type ContentFile, type Validation
 import { isInCodeBlock } from '../mdx-utils.ts';
 import { COMPONENT_USAGE_RE, WIKI_IMPORT_RE } from '../patterns.ts';
 
-// Components from @components/wiki that are commonly used.
-// Must match actual exports from app/src/components/wiki/index.ts
+// Components from @components/wiki that are commonly used in MDX pages.
 const WIKI_COMPONENTS = [
   'EntityLink',
   'MultiEntityLinks',

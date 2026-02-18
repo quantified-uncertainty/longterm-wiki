@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { parseJsonResponse, parseYamlResponse, resolveModel, MODELS } from './anthropic.ts';
+import { parseJsonResponse, resolveModel, MODELS } from './anthropic.ts';
 
 describe('resolveModel', () => {
   it('resolves "sonnet" to canonical model ID', () => {
@@ -64,34 +64,3 @@ describe('parseJsonResponse', () => {
   });
 });
 
-describe('parseYamlResponse', () => {
-  const mockYamlParser = (input: string) => {
-    // Simple mock: split lines into key-value pairs
-    const result: Record<string, string> = {};
-    for (const line of input.split('\n')) {
-      const match = line.match(/^(\w+):\s*(.+)$/);
-      if (match) result[match[1]] = match[2];
-    }
-    return result;
-  };
-
-  it('passes cleaned content to yaml parser', () => {
-    const result = parseYamlResponse('key: value', mockYamlParser);
-    expect(result).toEqual({ key: 'value' });
-  });
-
-  it('strips ```yaml code block wrapper', () => {
-    const result = parseYamlResponse('```yaml\nkey: value\n```', mockYamlParser);
-    expect(result).toEqual({ key: 'value' });
-  });
-
-  it('strips ``` code block wrapper', () => {
-    const result = parseYamlResponse('```\nkey: value\n```', mockYamlParser);
-    expect(result).toEqual({ key: 'value' });
-  });
-
-  it('handles whitespace', () => {
-    const result = parseYamlResponse('  ```yaml\nkey: value\n```  ', mockYamlParser);
-    expect(result).toEqual({ key: 'value' });
-  });
-});

@@ -21,7 +21,6 @@ import { findMdxFiles } from './file-utils.ts';
 import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter } from './content-types.ts';
-import { parseSidebarConfig, type SidebarParseResult } from './sidebar-utils.ts';
 import { logBulkFixes } from './edit-log.ts';
 
 // ---------------------------------------------------------------------------
@@ -40,8 +39,6 @@ interface FixSpec {
   quoteChar?: string;
   [key: string]: unknown;
 }
-
-type SidebarConfig = SidebarParseResult;
 
 interface IssueOptions {
   rule: string;
@@ -213,7 +210,6 @@ export class ValidationEngine {
   reversePathRegistry: Record<string, string>;
   entities: unknown;
   idRegistry: { byNumericId: Record<string, string>; bySlug: Record<string, string> } | null;
-  sidebarConfig: SidebarConfig;
 
   constructor(options: EngineOptions = {}) {
     this.options = {
@@ -230,7 +226,6 @@ export class ValidationEngine {
     this.reversePathRegistry = {};
     this.entities = null;
     this.idRegistry = null;
-    this.sidebarConfig = { entries: [], directories: new Set() };
   }
 
   /** Load all content and shared data */
@@ -272,17 +267,7 @@ export class ValidationEngine {
       this.reversePathRegistry[path.replace(/\/$/, '')] = id;
     }
 
-    // Parse sidebar config (returns empty data in Next.js — sidebar is in wiki-nav.ts)
-    this.sidebarConfig = this._parseSidebarConfig();
     this.loaded = true;
-  }
-
-  /**
-   * Parse sidebar configuration.
-   * Returns empty data in Next.js — sidebar is managed by wiki-nav.ts.
-   */
-  private _parseSidebarConfig(): SidebarConfig {
-    return parseSidebarConfig();
   }
 
   /** Register a validation rule */
