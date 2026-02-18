@@ -35,6 +35,9 @@ jobs:
       - name: Run tests
         run: cd app && pnpm test
 
+      - name: Run discord-bot tests
+        run: cd apps/discord-bot && pnpm test
+
       - name: Build Next.js
         run: cd app && pnpm build
 
