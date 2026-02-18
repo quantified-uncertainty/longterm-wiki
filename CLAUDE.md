@@ -7,6 +7,11 @@ AI safety wiki with ~625 MDX pages, Next.js frontend, YAML data layer, and CLI t
 ## Quick Reference
 
 ```bash
+# First-time setup
+pnpm setup                       # Full setup: install, build data, validate
+pnpm setup:quick                 # Install + build data only (skip validation)
+pnpm setup:check                 # Check environment without changing anything
+
 # Development
 pnpm dev                         # Start dev server on port 3001
 pnpm build                      # Production build (runs build-data automatically)
