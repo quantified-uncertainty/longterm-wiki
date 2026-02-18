@@ -21,6 +21,12 @@ Where `<branch-suffix>` is the branch name without the `claude/` prefix (e.g., f
 
 **PR:** #123
 
+**Model:** opus-4-6
+
+**Duration:** ~45min
+
+**Cost:** ~$5
+
 **Issues encountered:**
 - List any problems, errors, or unexpected behavior (or "None")
 
@@ -34,8 +40,11 @@ Where `<branch-suffix>` is the branch name without the `claude/` prefix (e.g., f
 - Always include the branch name so entries can be correlated with PRs
 - **Always include the `Pages:` field** listing the page IDs (filenames without `.mdx`) of any wiki pages created or edited in the session. Use the page slug (e.g., `ai-risks`, `compute-governance`), not the full path. Omit the field only if the session made no page content changes (infrastructure-only work).
 - **The `PR:` field is optional** — PR numbers are auto-populated at build time by looking up branches via the GitHub API (`app/scripts/lib/github-pr-lookup.mjs`). You can include `**PR:** #123` manually as an override, but it's not required.
+- **Always include the `Model:` field** with the short model name (e.g., `opus-4-6`, `sonnet-4`, `sonnet-4-5`). This is the LLM model powering the session. Check the system prompt for "You are powered by the model named..." to find the current model ID.
+- **Always include the `Duration:` field** with an approximate session duration (e.g., `~15min`, `~45min`, `~2h`). Estimate based on how much work was done — a single small fix is ~10-15min, a multi-file feature is ~30-60min, a large refactor or page creation session is ~1-2h+.
+- **The `Cost:` field is optional** — include it when the session used the content pipeline (`crux content create/improve`) since tiers map to approximate costs (budget ~\$2-3, standard ~\$5-8, premium ~\$10-15). For infrastructure-only sessions, omit this field.
 - If you encountered an issue that seems likely to recur, also add it to `.claude/common-issues.md`
 - Do NOT skip logging just because the session was small — even one-line fixes are worth tracking
 - The session log file should be part of the same commit as your other changes (not a separate commit)
 - Each session gets its own file — this avoids merge conflicts between parallel sessions
-- **Format is machine-parsed**: The `## date | branch | title` heading, `**Pages:**` field, and `**PR:**` field are parsed by `app/scripts/lib/session-log-parser.mjs` to build the `/internal/page-changes` dashboard. If you change the format here, update the parser and its tests too.
+- **Format is machine-parsed**: The `## date | branch | title` heading, `**Pages:**`, `**PR:**`, `**Model:**`, `**Duration:**`, and `**Cost:**` fields are parsed by `app/scripts/lib/session-log-parser.mjs` to build the `/internal/page-changes` dashboard. If you change the format here, update the parser and its tests too.

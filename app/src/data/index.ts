@@ -334,6 +334,9 @@ export interface ChangeEntry {
   title: string;
   summary: string;
   pr?: number;
+  model?: string;
+  duration?: string;
+  cost?: string;
 }
 
 export interface Page {
@@ -636,6 +639,9 @@ export interface PageChangeItem {
   summary: string;
   category: string;
   pr?: number;
+  model?: string;
+  duration?: string;
+  cost?: string;
 }
 
 export function getPageChanges(): PageChangeItem[] {
@@ -658,6 +664,9 @@ export function getPageChanges(): PageChangeItem[] {
         summary: entry.summary,
         category: page.category,
         ...(entry.pr !== undefined && { pr: entry.pr }),
+        ...(entry.model !== undefined && { model: entry.model }),
+        ...(entry.duration !== undefined && { duration: entry.duration }),
+        ...(entry.cost !== undefined && { cost: entry.cost }),
       });
     }
   }

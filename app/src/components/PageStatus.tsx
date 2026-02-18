@@ -795,6 +795,13 @@ function ChangeHistorySection({
                 {entry.summary}
               </p>
             )}
+            {(entry.model || entry.duration || entry.cost) && (
+              <p className="mt-0.5 ml-[18px] text-muted-foreground/60 text-[11px]">
+                {[entry.model, entry.duration, entry.cost]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            )}
           </div>
         ))}
       </div>

@@ -72,12 +72,27 @@ export function parseSessionLogContent(content) {
       }
     }
 
+    // Extract optional "Model" field (e.g., "opus-4-6", "sonnet-4")
+    const modelMatch = body.match(/\*\*Model:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
+    const model = modelMatch ? modelMatch[1].trim() : undefined;
+
+    // Extract optional "Duration" field (e.g., "~45min", "~2h")
+    const durationMatch = body.match(/\*\*Duration:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
+    const duration = durationMatch ? durationMatch[1].trim() : undefined;
+
+    // Extract optional "Cost" field (e.g., "~$5", "~$12 (premium tier)")
+    const costMatch = body.match(/\*\*Cost:\*\*\s*(.+?)(?:\n\n|\n\*\*|\n---)/s);
+    const cost = costMatch ? costMatch[1].trim() : undefined;
+
     const changeEntry = {
       date: entry.date,
       branch: entry.branch,
       title: entry.title,
       summary,
       ...(pr !== undefined && { pr }),
+      ...(model !== undefined && { model }),
+      ...(duration !== undefined && { duration }),
+      ...(cost !== undefined && { cost }),
     };
 
     for (const pageId of pageIds) {

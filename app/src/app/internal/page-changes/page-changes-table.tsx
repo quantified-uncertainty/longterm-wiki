@@ -52,8 +52,29 @@ const columns: ColumnDef<PageChangeItem>[] = [
             {row.original.summary}
           </p>
         )}
+        {(row.original.duration || row.original.cost) && (
+          <p className="mt-0.5 text-[11px] text-muted-foreground/60">
+            {[row.original.duration, row.original.cost]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        )}
       </div>
     ),
+  },
+  {
+    accessorKey: "model",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Model</SortableHeader>
+    ),
+    cell: ({ row }) =>
+      row.original.model ? (
+        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 whitespace-nowrap">
+          {row.original.model}
+        </span>
+      ) : (
+        <span className="text-[11px] text-muted-foreground/40">—</span>
+      ),
   },
   {
     accessorKey: "category",
