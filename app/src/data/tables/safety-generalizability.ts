@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import type { Node, Edge } from '@xyflow/react';
 import type { CauseEffectNodeData, CauseEffectEdgeData } from '@/components/wiki/CauseEffectGraph/types';
-import yaml from 'js-yaml';
+import { loadYaml } from '@lib/yaml';
 
 // Lazy-loaded YAML content from repo-root data directory
 let _rawYaml: string | null = null;
@@ -52,7 +52,7 @@ interface RawGraphData {
 let _rawData: RawGraphData | null = null;
 function getRawData(): RawGraphData {
   if (!_rawData) {
-    _rawData = yaml.load(getGraphYaml()) as RawGraphData;
+    _rawData = loadYaml<RawGraphData>(getGraphYaml());
   }
   return _rawData;
 }

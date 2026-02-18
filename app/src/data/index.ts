@@ -10,7 +10,7 @@
 
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import { loadYaml } from "@lib/yaml";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -1186,10 +1186,10 @@ function loadExternalLinksMap(): Map<string, ExternalLinksData> {
   try {
     const yamlPath = path.join(DATA_DIR, "external-links.yaml");
     const raw = fs.readFileSync(yamlPath, "utf-8");
-    const entries = yaml.load(raw) as Array<{
+    const entries = loadYaml<Array<{
       pageId: string;
       links: ExternalLinksData;
-    }>;
+    }>>(raw);
     _externalLinksMap = new Map();
     for (const entry of entries) {
       if (entry.pageId && entry.links) {

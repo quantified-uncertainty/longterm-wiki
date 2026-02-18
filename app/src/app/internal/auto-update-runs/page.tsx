@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import { loadYaml } from "@lib/yaml";
 import { RunsTable } from "./runs-table";
 import type { Metadata } from "next";
 
@@ -73,7 +73,7 @@ function loadRunReports(): RunRow[] {
   for (const file of files) {
     try {
       const raw = fs.readFileSync(path.join(runsDir, file), "utf-8");
-      const report = yaml.load(raw) as RunReport;
+      const report = loadYaml<RunReport>(raw);
       const startMs = new Date(report.startedAt).getTime();
       const endMs = new Date(report.completedAt).getTime();
 

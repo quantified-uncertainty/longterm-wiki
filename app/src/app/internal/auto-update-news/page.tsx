@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import { loadYaml } from "@lib/yaml";
 import { NewsTable } from "./news-table";
 import { SourcesTable } from "./sources-table";
 import type { Metadata } from "next";
@@ -114,7 +114,7 @@ function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
   for (const file of detailFiles) {
     try {
       const raw = fs.readFileSync(path.join(runsDir, file), "utf-8");
-      const details = yaml.load(raw) as RunDetails;
+      const details = loadYaml<RunDetails>(raw);
       const runDate = details.digest.date;
       runDates.push(runDate);
 
@@ -166,15 +166,15 @@ function loadSources(): SourceRow[] {
 
   try {
     const raw = fs.readFileSync(sourcesPath, "utf-8");
-    const config = yaml.load(raw) as { sources: NewsSource[] };
+    const config = loadYaml<{ sources: NewsSource[] }>(raw);
 
     let fetchTimes: Record<string, string> = {};
     if (fs.existsSync(statePath)) {
       try {
         const stateRaw = fs.readFileSync(statePath, "utf-8");
-        const state = yaml.load(stateRaw) as {
+        const state = loadYaml<{
           last_fetch_times?: Record<string, string>;
-        };
+        }>(stateRaw);
         fetchTimes = state?.last_fetch_times || {};
       } catch {
         /* ignore */
