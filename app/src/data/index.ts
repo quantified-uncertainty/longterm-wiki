@@ -354,6 +354,7 @@ export interface Page {
   quality: number | null;
   readerImportance: number | null;
   researchImportance: number | null;
+  tacticalValue: number | null;
   contentFormat: ContentFormat;
   tractability: number | null;
   neglectedness: number | null;
@@ -566,7 +567,10 @@ export function getUpdateSchedule(): UpdateScheduleItem[] {
     const daysUntil = page.updateFrequency - daysSince;
     const staleness = daysSince / page.updateFrequency;
     const readerImp = page.readerImportance ?? 50;
-    const priority = staleness * (readerImp / 100);
+    const tv = page.tacticalValue ?? 0;
+    // Tactical value can boost priority for high-shareability content (e.g. tables)
+    const effectiveImportance = tv > readerImp ? (readerImp + tv) / 2 : readerImp;
+    const priority = staleness * (effectiveImportance / 100);
 
     const numericId = db.idRegistry?.bySlug[page.id] || page.id;
 
@@ -600,6 +604,7 @@ export interface PageRankingItem {
   readerRank: number | null;
   researchImportance: number | null;
   researchRank: number | null;
+  tacticalValue: number | null;
   category: string;
   wordCount: number;
 }
@@ -619,6 +624,7 @@ export function getPageRankings(): PageRankingItem[] {
       readerRank: null as number | null,
       researchImportance: p.researchImportance,
       researchRank: null as number | null,
+      tacticalValue: p.tacticalValue,
       category: p.category,
       wordCount: p.wordCount ?? p.metrics?.wordCount ?? 0,
     }));
