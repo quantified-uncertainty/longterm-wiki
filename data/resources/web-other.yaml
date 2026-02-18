@@ -2057,7 +2057,7 @@
   publication_id: cnbc
 - id: 787a2639f9e64ca5
   url: https://www.cnbc.com/2025/11/18/anthropic-ai-azure-microsoft-nvidia.html
-  title: CNBC Anthropic
+  title: "Anthropic valued at $350 billion following investment deal with Microsoft, Nvidia"
   type: web
   local_filename: 787a2639f9e64ca5.txt
   summary: Microsoft and Nvidia are making substantial investments in Anthropic, expanding their AI
@@ -2086,8 +2086,12 @@
     - Comprehensive partnership includes compute capacity and technological collaboration
   cited_by:
     - economic-labor
+    - anthropic
   fetched_at: 2025-12-28 01:09:10
   publication_id: cnbc
+  tags:
+    - funding
+    - ai-labs
 - id: 5332423c9ca5ece3
   url: https://www.cnbc.com/2024/06/02/nvidia-dominates-the-ai-chip-market-but-theres-rising-competition-.html
   title: CNBC Nvidia market analysis

@@ -1285,16 +1285,7 @@
 # === Fact source resources ===
 
 # Anthropic financial fact sources
-- id: 787a2639f9e64ca5
-  url: https://www.cnbc.com/2025/11/18/anthropic-ai-azure-microsoft-nvidia.html
-  title: "Anthropic valued at $350 billion following investment deal with Microsoft, Nvidia"
-  type: web
-  publication_id: cnbc
-  cited_by:
-    - anthropic
-  tags:
-    - funding
-    - ai-labs
+# Note: 787a2639f9e64ca5 (CNBC Anthropic $350B valuation) already in web-other.yaml
 
 - id: cb2a21a2cd1472e3
   url: https://www.bloomberg.com/news/articles/2026-01-21/anthropic-s-revenue-run-rate-tops-9-billion-as-vcs-pile-in
