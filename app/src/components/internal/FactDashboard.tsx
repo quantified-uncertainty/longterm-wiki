@@ -19,6 +19,12 @@ interface FactMeasureDef {
   applicableTo?: string[];
 }
 
+interface FactUsagePage {
+  id: string;
+  title: string;
+  path: string;
+}
+
 interface FactEntry {
   key: string;
   entity: string;
@@ -37,6 +43,7 @@ interface FactEntry {
   computed?: boolean;
   compute?: string;
   measure?: string;
+  subject?: string;
 }
 
 type ViewMode = "entity" | "measure" | "timeseries";
@@ -45,10 +52,12 @@ export function FactDashboard({
   facts,
   entityHrefs,
   factMeasures,
+  factUsage = {},
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
   factMeasures: Record<string, FactMeasureDef>;
+  factUsage?: Record<string, FactUsagePage[]>;
 }) {
   const [filter, setFilter] = useState("");
   const [showComputed, setShowComputed] = useState(true);
@@ -102,6 +111,17 @@ export function FactDashboard({
 
   return (
     <div>
+      {/* ID naming convention note */}
+      <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg text-xs text-blue-700 dark:text-blue-300">
+        <strong>ID convention:</strong> A bare measure name (e.g.{" "}
+        <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">valuation</code>) always refers to the{" "}
+        <em>latest/canonical</em> observation. When a newer value arrives, rename the old fact to a dated ID
+        (e.g. <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">valuation-nov-2025</code>) and create
+        a fresh <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">valuation</code>. This lets pages
+        using <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">&lt;F e="x" f="valuation" /&gt;</code> always
+        show the current value without code changes.
+      </div>
+
       {/* Source coverage summary */}
       <div className="flex items-center gap-3 mb-4 p-3 bg-muted/50 rounded-lg flex-wrap">
         <div className="flex items-center gap-2">
@@ -205,13 +225,13 @@ export function FactDashboard({
       </div>
 
       {viewMode === "entity" && (
-        <EntityView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} />
+        <EntityView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
       )}
       {viewMode === "measure" && (
-        <MeasureView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} />
+        <MeasureView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
       )}
       {viewMode === "timeseries" && (
-        <TimeseriesView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} />
+        <TimeseriesView facts={filtered} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
       )}
     </div>
   );
@@ -223,10 +243,12 @@ function EntityView({
   facts,
   entityHrefs,
   factMeasures,
+  factUsage,
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
   factMeasures: Record<string, FactMeasureDef>;
+  factUsage: Record<string, FactUsagePage[]>;
 }) {
   const grouped = useMemo(() => {
     const map = new Map<string, FactEntry[]>();
@@ -255,36 +277,50 @@ function EntityView({
                 <th className="pb-1 pr-4 font-medium">Value</th>
                 <th className="pb-1 pr-4 font-medium">As Of</th>
                 <th className="pb-1 pr-4 font-medium">Source</th>
-                <th className="pb-1 font-medium">Type</th>
+                <th className="pb-1 pr-4 font-medium">Type</th>
+                <th className="pb-1 font-medium">Used in</th>
               </tr>
             </thead>
             <tbody>
-              {entityFacts.map((fact) => (
-                <tr key={fact.key} className="border-t border-border">
-                  <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
-                  <td className="py-1.5 pr-4">
-                    <MeasureBadge measureId={fact.measure} factMeasures={factMeasures} />
-                  </td>
-                  <td className="py-1.5 pr-4">
-                    <ValueDisplay fact={fact} />
-                  </td>
-                  <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
-                  <td className="py-1.5 pr-4">
-                    <SourceBadge fact={fact} />
-                  </td>
-                  <td className="py-1.5">
-                    {fact.computed ? (
-                      <span className="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded dark:bg-blue-900 dark:text-blue-300">
-                        computed
-                      </span>
-                    ) : (
-                      <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded dark:bg-green-900 dark:text-green-300">
-                        manual
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {entityFacts.map((fact) => {
+                const pages = factUsage[fact.key] || [];
+                return (
+                  <tr key={fact.key} className="border-t border-border">
+                    <td className="py-1.5 pr-4">
+                      <span className="font-mono text-xs">{fact.factId}</span>
+                      {fact.subject && (
+                        <span className="ml-1.5 text-[10px] px-1 py-px bg-orange-100 text-orange-700 rounded dark:bg-orange-900 dark:text-orange-300">
+                          subject: {fact.subject}
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-1.5 pr-4">
+                      <MeasureBadge measureId={fact.measure} factMeasures={factMeasures} />
+                    </td>
+                    <td className="py-1.5 pr-4">
+                      <ValueDisplay fact={fact} />
+                    </td>
+                    <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+                    <td className="py-1.5 pr-4">
+                      <SourceBadge fact={fact} />
+                    </td>
+                    <td className="py-1.5 pr-4">
+                      {fact.computed ? (
+                        <span className="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded dark:bg-blue-900 dark:text-blue-300">
+                          computed
+                        </span>
+                      ) : (
+                        <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded dark:bg-green-900 dark:text-green-300">
+                          manual
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-1.5">
+                      <UsedInBadge pages={pages} />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -299,10 +335,12 @@ function MeasureView({
   facts,
   entityHrefs,
   factMeasures,
+  factUsage,
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
   factMeasures: Record<string, FactMeasureDef>;
+  factUsage: Record<string, FactUsagePage[]>;
 }) {
   const { measureGroups, untagged } = useMemo(() => {
     const byMeasure = new Map<string, FactEntry[]>();
@@ -355,7 +393,7 @@ function MeasureView({
               const entities = [...new Set(entries.map(e => e.entity))];
               return (
                 <div key={measureId} className="pl-2 border-l-2 border-primary/20">
-                  <div className="flex items-baseline gap-2 mb-1">
+                  <div className="flex items-baseline gap-2 mb-1 flex-wrap">
                     <h3 className="text-base font-semibold text-foreground">
                       {def?.label || measureId}
                     </h3>
@@ -373,9 +411,25 @@ function MeasureView({
                     <span className="text-xs text-muted-foreground">
                       {entries.length} observations across {entities.length} {entities.length === 1 ? "entity" : "entities"}
                     </span>
+                    {def?.applicableTo && def.applicableTo.length > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        · applies to: {def.applicableTo.join(", ")}
+                      </span>
+                    )}
                   </div>
                   {def?.description && (
-                    <p className="text-xs text-muted-foreground mb-2">{def.description}</p>
+                    <p className="text-xs text-muted-foreground mb-1">{def.description}</p>
+                  )}
+                  {def?.relatedMeasures && def.relatedMeasures.length > 0 && (
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Related: {def.relatedMeasures.map((rm, i) => (
+                        <span key={rm}>
+                          {i > 0 && ", "}
+                          <span className="font-mono">{rm}</span>
+                          {factMeasures[rm] ? ` (${factMeasures[rm].label})` : ""}
+                        </span>
+                      ))}
+                    </p>
                   )}
                   <table className="w-full text-sm border-collapse">
                     <thead>
@@ -385,30 +439,42 @@ function MeasureView({
                         <th className="pb-1 pr-4 font-medium">Value</th>
                         <th className="pb-1 pr-4 font-medium">As Of</th>
                         <th className="pb-1 pr-4 font-medium">Source</th>
-                        <th className="pb-1 font-medium">Note</th>
+                        <th className="pb-1 pr-4 font-medium">Note</th>
+                        <th className="pb-1 font-medium">Used in</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {entries.map((fact) => (
-                        <tr key={fact.key} className="border-t border-border">
-                          <td className="py-1.5 pr-4">
-                            <Link href={entityHrefs[fact.entity] || `/wiki/${fact.entity}`} className="hover:underline text-primary">
-                              {fact.entity}
-                            </Link>
-                          </td>
-                          <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
-                          <td className="py-1.5 pr-4">
-                            <ValueDisplay fact={fact} />
-                          </td>
-                          <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
-                          <td className="py-1.5 pr-4">
-                            <SourceBadge fact={fact} />
-                          </td>
-                          <td className="py-1.5 text-muted-foreground text-xs max-w-[300px] truncate">
-                            {fact.note || "\u2014"}
-                          </td>
-                        </tr>
-                      ))}
+                      {entries.map((fact) => {
+                        const pages = factUsage[fact.key] || [];
+                        return (
+                          <tr key={fact.key} className="border-t border-border">
+                            <td className="py-1.5 pr-4">
+                              <Link href={entityHrefs[fact.entity] || `/wiki/${fact.entity}`} className="hover:underline text-primary">
+                                {fact.entity}
+                              </Link>
+                              {fact.subject && (
+                                <span className="ml-1.5 text-[10px] px-1 py-px bg-orange-100 text-orange-700 rounded dark:bg-orange-900 dark:text-orange-300">
+                                  subj: {fact.subject}
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
+                            <td className="py-1.5 pr-4">
+                              <ValueDisplay fact={fact} />
+                            </td>
+                            <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+                            <td className="py-1.5 pr-4">
+                              <SourceBadge fact={fact} />
+                            </td>
+                            <td className="py-1.5 pr-4 text-muted-foreground text-xs max-w-[200px] truncate">
+                              {fact.note || "\u2014"}
+                            </td>
+                            <td className="py-1.5">
+                              <UsedInBadge pages={pages} />
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -430,23 +496,30 @@ function MeasureView({
                 <th className="pb-1 pr-4 font-medium">Fact ID</th>
                 <th className="pb-1 pr-4 font-medium">Value</th>
                 <th className="pb-1 pr-4 font-medium">As Of</th>
-                <th className="pb-1 font-medium">Note</th>
+                <th className="pb-1 pr-4 font-medium">Note</th>
+                <th className="pb-1 font-medium">Used in</th>
               </tr>
             </thead>
             <tbody>
-              {untagged.map((fact) => (
-                <tr key={fact.key} className="border-t border-border">
-                  <td className="py-1.5 pr-4">
-                    <Link href={entityHrefs[fact.entity] || `/wiki/${fact.entity}`} className="hover:underline text-primary">
-                      {fact.entity}
-                    </Link>
-                  </td>
-                  <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
-                  <td className="py-1.5 pr-4">{fact.value || "\u2014"}</td>
-                  <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
-                  <td className="py-1.5 text-muted-foreground text-xs">{fact.note || "\u2014"}</td>
-                </tr>
-              ))}
+              {untagged.map((fact) => {
+                const pages = factUsage[fact.key] || [];
+                return (
+                  <tr key={fact.key} className="border-t border-border">
+                    <td className="py-1.5 pr-4">
+                      <Link href={entityHrefs[fact.entity] || `/wiki/${fact.entity}`} className="hover:underline text-primary">
+                        {fact.entity}
+                      </Link>
+                    </td>
+                    <td className="py-1.5 pr-4 font-mono text-xs">{fact.factId}</td>
+                    <td className="py-1.5 pr-4">{fact.value || "\u2014"}</td>
+                    <td className="py-1.5 pr-4 text-muted-foreground">{fact.asOf || "\u2014"}</td>
+                    <td className="py-1.5 pr-4 text-muted-foreground text-xs">{fact.note || "\u2014"}</td>
+                    <td className="py-1.5">
+                      <UsedInBadge pages={pages} />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -461,10 +534,12 @@ function TimeseriesView({
   facts,
   entityHrefs,
   factMeasures,
+  factUsage,
 }: {
   facts: FactEntry[];
   entityHrefs: Record<string, string>;
   factMeasures: Record<string, FactMeasureDef>;
+  factUsage: Record<string, FactUsagePage[]>;
 }) {
   // Build timeseries: group by measure+entity, sort by date
   const series = useMemo(() => {
@@ -508,14 +583,17 @@ function TimeseriesView({
         const [measureId, entityId] = seriesKey.split(":");
         const def = factMeasures[measureId];
         const hasNumeric = entries.some(e => e.numeric != null || e.low != null);
+        // All pages using any fact in this series
+        const allPages = entries.flatMap(e => factUsage[e.key] || []);
+        const uniquePages = allPages.filter((p, i, arr) => arr.findIndex(q => q.id === p.id) === i);
 
         return (
           <div key={seriesKey} className="border border-border rounded-lg p-4">
-            <div className="flex items-baseline gap-2 mb-3">
+            <div className="flex items-baseline gap-2 mb-3 flex-wrap">
               <h3 className="text-base font-semibold text-foreground">
                 {def?.label || measureId}
               </h3>
-              <span className="text-sm text-muted-foreground">\u2014</span>
+              <span className="text-sm text-muted-foreground">&mdash;</span>
               <Link href={entityHrefs[entityId] || `/wiki/${entityId}`} className="text-sm text-primary hover:underline">
                 {entityId}
               </Link>
@@ -525,8 +603,13 @@ function TimeseriesView({
                 </span>
               )}
               {def?.unit && (
-                <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground ml-auto">
+                <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
                   {def.unit}
+                </span>
+              )}
+              {uniquePages.length > 0 && (
+                <span className="ml-auto">
+                  <UsedInBadge pages={uniquePages} />
                 </span>
               )}
             </div>
@@ -619,6 +702,7 @@ function SourceBadge({ fact }: { fact: FactEntry }) {
   return <span className="text-xs text-muted-foreground">{"\u2014"}</span>;
 }
 
+/** Rich measure badge with hover tooltip showing full measure metadata */
 function MeasureBadge({
   measureId,
   factMeasures,
@@ -626,21 +710,80 @@ function MeasureBadge({
   measureId?: string;
   factMeasures: Record<string, FactMeasureDef>;
 }) {
-  if (!measureId) return <span className="text-muted-foreground text-xs">\u2014</span>;
+  if (!measureId) return <span className="text-muted-foreground text-xs">&mdash;</span>;
   const def = factMeasures[measureId];
+
   return (
-    <span
-      className="text-xs px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded dark:bg-violet-900 dark:text-violet-300"
-      title={def?.description || measureId}
-    >
-      {def?.label || measureId}
-    </span>
+    <div className="relative group inline-block">
+      <span className="text-xs px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded dark:bg-violet-900 dark:text-violet-300 cursor-help">
+        {def?.label || measureId}
+      </span>
+      {/* Hover tooltip */}
+      <div className="absolute z-50 invisible group-hover:visible bottom-full left-0 mb-1 w-64 p-3 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border pointer-events-none">
+        <div className="font-semibold mb-1">{def?.label || measureId}</div>
+        <div className="font-mono text-muted-foreground mb-1.5">{measureId}</div>
+        {def?.description && (
+          <p className="text-muted-foreground mb-2 leading-relaxed">{def.description}</p>
+        )}
+        <div className="space-y-0.5">
+          {def?.unit && (
+            <div className="flex gap-2">
+              <span className="text-muted-foreground w-20 shrink-0">Unit:</span>
+              <span>{def.unit}</span>
+            </div>
+          )}
+          {def?.category && (
+            <div className="flex gap-2">
+              <span className="text-muted-foreground w-20 shrink-0">Category:</span>
+              <span className="capitalize">{def.category}</span>
+            </div>
+          )}
+          {def?.direction && (
+            <div className="flex gap-2">
+              <span className="text-muted-foreground w-20 shrink-0">Direction:</span>
+              <span>{def.direction === "higher" ? "↑ higher is better" : "↓ lower is better"}</span>
+            </div>
+          )}
+          {def?.applicableTo && def.applicableTo.length > 0 && (
+            <div className="flex gap-2">
+              <span className="text-muted-foreground w-20 shrink-0">Applies to:</span>
+              <span>{def.applicableTo.join(", ")}</span>
+            </div>
+          )}
+          {def?.display && (
+            <div className="flex gap-2">
+              <span className="text-muted-foreground w-20 shrink-0">Format:</span>
+              <span className="font-mono">
+                {def.display.prefix || ""}{"{n}"}{def.display.suffix || ""}
+                {def.display.divisor ? ` (÷${def.display.divisor.toLocaleString("en-US")})` : ""}
+              </span>
+            </div>
+          )}
+          {def?.relatedMeasures && def.relatedMeasures.length > 0 && (
+            <div className="flex gap-2 pt-0.5">
+              <span className="text-muted-foreground w-20 shrink-0 leading-relaxed">Related:</span>
+              <span className="leading-relaxed">
+                {def.relatedMeasures.map((rm, i) => (
+                  <span key={rm}>
+                    {i > 0 && ", "}
+                    <span className="font-mono">{rm}</span>
+                  </span>
+                ))}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
+/** Value display with hover tooltip showing raw numeric & format info */
 function ValueDisplay({ fact }: { fact: FactEntry }) {
   const hasRange = fact.low != null && fact.high != null;
-  return (
+  const hasTooltip = fact.numeric != null || hasRange || fact.note;
+
+  const displayValue = (
     <span>
       {fact.value || (fact.numeric !== undefined ? String(fact.numeric) : "\u2014")}
       {hasRange && !fact.value && (
@@ -649,6 +792,72 @@ function ValueDisplay({ fact }: { fact: FactEntry }) {
         </span>
       )}
     </span>
+  );
+
+  if (!hasTooltip) return displayValue;
+
+  return (
+    <div className="relative group inline-block">
+      <span className="cursor-help border-b border-dotted border-muted-foreground/50">
+        {displayValue}
+      </span>
+      <div className="absolute z-50 invisible group-hover:visible bottom-full left-0 mb-1 w-56 p-3 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border pointer-events-none">
+        {fact.note && (
+          <p className="text-muted-foreground mb-2 leading-relaxed">{fact.note}</p>
+        )}
+        <div className="space-y-0.5 font-mono">
+          {fact.numeric != null && (
+            <div className="flex gap-2">
+              <span className="text-muted-foreground w-16 shrink-0">numeric:</span>
+              <span>{fact.numeric.toLocaleString("en-US")}</span>
+            </div>
+          )}
+          {hasRange && (
+            <>
+              <div className="flex gap-2">
+                <span className="text-muted-foreground w-16 shrink-0">low:</span>
+                <span>{fact.low!.toLocaleString("en-US")}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-muted-foreground w-16 shrink-0">high:</span>
+                <span>{fact.high!.toLocaleString("en-US")}</span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Shows how many pages use this fact, with a hover list of page links */
+function UsedInBadge({ pages }: { pages: FactUsagePage[] }) {
+  if (pages.length === 0) {
+    return <span className="text-xs text-muted-foreground/50">&mdash;</span>;
+  }
+
+  return (
+    <div className="relative group inline-block">
+      <span className={`text-xs px-1.5 py-0.5 rounded cursor-help font-medium ${
+        pages.length >= 5 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" :
+        pages.length >= 2 ? "bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300" :
+        "bg-muted text-muted-foreground"
+      }`}>
+        {pages.length} {pages.length === 1 ? "page" : "pages"}
+      </span>
+      {/* Hover tooltip with page list */}
+      <div className="absolute z-50 invisible group-hover:visible bottom-full right-0 mb-1 w-64 p-2 bg-popover text-popover-foreground text-xs rounded-lg shadow-lg border border-border pointer-events-none">
+        <div className="font-medium mb-1.5 text-muted-foreground">Used in {pages.length} {pages.length === 1 ? "page" : "pages"}:</div>
+        <div className="space-y-1 max-h-48 overflow-y-auto">
+          {pages.map((p) => (
+            <div key={p.id} className="truncate">
+              <span className="text-primary">{p.title}</span>
+              <span className="text-muted-foreground ml-1 font-mono">/{p.id}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

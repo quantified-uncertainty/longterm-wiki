@@ -1,0 +1,15 @@
+entity: worldcoin
+facts:
+  users:
+    measure: user-count
+    value: 26e6
+    asOf: "2025-05"
+    note: "Total users on World (Worldcoin) network at US launch"
+    sourceResource: "8a37ca8f26efa9bc"
+
+  verified-users:
+    measure: user-count
+    value: 12e6
+    asOf: "2025-05"
+    note: "Verified World users (identity verified via Orb device) at US launch"
+    sourceResource: "8a37ca8f26efa9bc"

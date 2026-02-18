@@ -1,4 +1,4 @@
-import { getAllFacts, getEntityHref, getFactMeasures } from "@/data";
+import { getAllFacts, getEntityHref, getFactMeasures, getFactUsage } from "@/data";
 import { FactDashboard } from "@/components/internal/FactDashboard";
 import { FactPageTabs } from "./fact-page-tabs";
 import { FactsDataTable } from "./facts-data-table";
@@ -42,6 +42,7 @@ export default function FactsPage() {
   }
 
   const factMeasures = getFactMeasures();
+  const factUsage = getFactUsage();
 
   return (
     <article className="prose max-w-none">
@@ -52,7 +53,7 @@ export default function FactsPage() {
       </p>
       <FactPageTabs
         dashboardContent={
-          <FactDashboard facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} />
+          <FactDashboard facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} factUsage={factUsage} />
         }
         dataContent={
           <FactsDataTable facts={facts} entityHrefs={entityHrefs} factMeasures={factMeasures} />
