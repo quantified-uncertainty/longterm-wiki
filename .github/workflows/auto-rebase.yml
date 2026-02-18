@@ -104,10 +104,10 @@ jobs:
             fi
 
             # --- Safeguard 4: skip if most recent commit is from ci-autofix ---
-            last_committer=$(git log -1 --format='%an' "origin/$branch" 2>/dev/null || echo "")
+            # ci-autofix commits are prefixed "[ci-autofix]" in the subject line (see ci-autofix.yml)
             last_msg=$(git log -1 --format='%s' "origin/$branch" 2>/dev/null || echo "")
-            if echo "$last_committer $last_msg" | grep -qi "ci-autofix\|autofix\[bot\]"; then
-              echo "Skipping — most recent commit appears to be from ci-autofix (feedback-loop risk)."
+            if echo "$last_msg" | grep -qi "\[ci-autofix\]"; then
+              echo "Skipping — most recent commit is a ci-autofix commit (feedback-loop risk)."
               echo "::endgroup::"
               continue
             fi
