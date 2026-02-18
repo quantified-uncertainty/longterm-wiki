@@ -70,8 +70,11 @@ jobs:
       - name: Numeric ID integrity (blocking)
         run: pnpm crux validate unified --rules=numeric-id-integrity --errors-only
 
-      - name: TypeScript type check (blocking)
+      - name: TypeScript type check — app (blocking)
         run: cd app && npx tsc --noEmit
+
+      - name: TypeScript type check — discord-bot (blocking)
+        run: cd apps/discord-bot && npx tsc --noEmit
 
       - name: Run validation suite (advisory)
         if: "!cancelled()"

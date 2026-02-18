@@ -55,7 +55,7 @@ export function logQuery(log: QueryLog): void {
 
 export function formatCost(costUsd: number): string {
   if (costUsd < 0.01) {
-    return `$${(costUsd * 100).toFixed(2)}¢`;
+    return `${(costUsd * 100).toFixed(2)}¢`;
   }
   return `$${costUsd.toFixed(4)}`;
 }

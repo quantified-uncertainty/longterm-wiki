@@ -64,9 +64,11 @@ jobs:
           IMAGE_TAG="sha-${{ github.sha }}"
           echo "Deploying image tag: $IMAGE_TAG"
 
-          # Download ArgoCD CLI
+          # Download ArgoCD CLI from pinned GitHub release (not from ARGOCD_SERVER,
+          # which would allow arbitrary code execution if the secret is compromised)
+          ARGOCD_VERSION="v3.3.1"
           curl -sSL -o /usr/local/bin/argocd \
-            "https://${ARGOCD_SERVER}/download/argocd-linux-amd64"
+            "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
           chmod +x /usr/local/bin/argocd
 
           argocd app set longterm-wiki-discord-bot \
