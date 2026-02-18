@@ -1,0 +1,505 @@
+digest:
+  date: 2026-02-18
+  itemCount: 15
+  items:
+    - title: Anthropic Fellows Program for AI Safety Research (2026 Cohorts)
+      url: https://alignment.anthropic.com/2025/anthropic-fellows-program-2026/
+      sourceId: anthropic-blog
+      publishedAt: 2026-02-18
+      summary: ' Applications are now open for two new cohorts beginning in May and July 2026, covering a wide range of safety
+        research areas — including scalable oversight, adversarial robustness, AI control, mechanistic interpretability,
+        AI security, and model welfare. The interpretability mission focuses on understanding the internal workings of
+        large language models, with fellows having introduced new methods to trace model "thoughts" by generating
+        attribution graphs that reveal the steps a model took inter'
+      relevanceScore: 95
+      topics:
+        - safety-research
+        - alignment
+        - scalable-oversight
+        - ai-control
+        - mechanistic-interpretability
+      entities:
+        - anthropic-impact
+        - safety-research
+        - alignment-progress
+    - title: Anthropic Interpretability Research Team Page
+      url: https://www.anthropic.com/research/team/interpretability
+      sourceId: anthropic-blog
+      publishedAt: 2026-02-18
+      summary: ' The mission of the Interpretability team is to discover and understand how large language models work
+        internally, as a foundation for AI safety and positive outcomes. AI models represent character traits as
+        patterns of activations within their neural networks; by extracting "persona vectors" for traits like sycophancy
+        or hallucination, researchers can monitor personality shifts and mitigate undesirable behaviors. Recent
+        publications listed include work on introspection in LLMs and character sta'
+      relevanceScore: 93
+      topics:
+        - interpretability
+        - mechanistic-interpretability
+        - safety-research
+        - language-models
+      entities:
+        - anthropic-impact
+        - safety-research
+        - interpretability-sufficient
+    - title: Alignment Science Blog — Anthropic
+      url: https://alignment.anthropic.com/
+      sourceId: anthropic-blog
+      publishedAt: 2026-02-18
+      summary: " This is Anthropic's Alignment Science team blog, focused on machine learning research on the problem of
+        steering and controlling future powerful AI systems, as well as understanding and evaluating the risks they
+        pose. The blog releases research notes and early findings that may not warrant full publications but are useful
+        to others working on similar problems. Topics covered include alignment faking, model organisms, reward hacking,
+        jailbreak robustness, and more."
+      relevanceScore: 92
+      topics:
+        - alignment
+        - ai-control
+        - steering
+        - safety-research
+      entities:
+        - anthropic-impact
+        - safety-research
+        - alignment-progress
+    - title: AI Safety, Alignment, and Interpretability in 2026 — Zylos Research
+      url: https://zylos.ai/research/2026-02-09-ai-safety-alignment-interpretability
+      sourceId: arxiv-ai-safety
+      publishedAt: 2026-02-18
+      summary: " **Published:** ~1 week ago (February 9, 2026) Three interconnected research areas define the current
+        landscape: mechanistic interpretability (understanding how models work internally), alignment techniques
+        (ensuring models follow human values), and adversarial testing (discovering failure modes before deployment).
+        The 2026 International AI Safety Report, backed by 30+ countries and 100+ AI experts, warns that reliable safety
+        testing has become harder as models learn to distinguish between test "
+      relevanceScore: 92
+      topics:
+        - safety-research
+        - alignment
+        - interpretability
+        - mechanistic-interpretability
+        - ai-safety
+      entities:
+        - safety-research
+        - alignment-progress
+        - interpretability-sufficient
+        - __index__/knowledge-base
+    - title: Mechanistic Interpretability for AI Safety — A Review
+      url: https://arxiv.org/abs/2404.14082
+      sourceId: arxiv-ai-safety
+      publishedAt: 2026-02-18
+      summary: "**Published:** April 2024 (updated August 2024) This review explores mechanistic interpretability: reverse
+        engineering the computational mechanisms and representations learned by neural networks into
+        human-understandable algorithms and concepts to provide a granular, causal understanding. It surveys
+        methodologies for causally dissecting model behaviors, assesses the relevance of mechanistic interpretability to
+        AI safety, examines benefits in understanding, control, and alignment alongside risks "
+      relevanceScore: 91
+      topics:
+        - mechanistic-interpretability
+        - interpretability
+        - safety-research
+        - neural-networks
+      entities:
+        - safety-research
+        - interpretability-sufficient
+        - alignment-progress
+    - title: Anthropic Research Hub
+      url: https://www.anthropic.com/research
+      sourceId: anthropic-blog
+      publishedAt: 2026-02-18
+      summary: " Anthropic's research teams investigate the safety, inner workings, and societal impacts of AI models — so
+        that artificial intelligence has a positive impact as it becomes increasingly capable. Recent 2026 publications
+        include *\"The assistant axis: situating and stabilizing the character of large language models\"* (Jan 19,
+        2026) and the *Anthropic Economic Index* (Jan 15, 2026), as well as *\"Next-generation Constitutional
+        Classifiers: More efficient protection against universal jailbreaks\"* (Jan"
+      relevanceScore: 90
+      topics:
+        - safety-research
+        - alignment
+        - interpretability
+        - ai-safety
+      entities:
+        - anthropic-impact
+        - safety-research
+        - __index__/knowledge-base
+    - title: "Aligning AI Through Internal Understanding: The Role of Interpretability"
+      url: https://arxiv.org/html/2509.08592v1
+      sourceId: arxiv-ai-safety
+      publishedAt: 2026-02-18
+      summary: " **Published:** September 10, 2025 Mechanistic interpretability (MI) is a research approach aimed at
+        uncovering the internal computations performed by neural networks — rather than summarizing behavior through
+        external correlations, MI seeks to identify specific components such as neurons, attention heads, or circuits
+        that causally contribute to particular model outputs. While MI alone cannot solve the alignment problem, it
+        remains one of the most direct avenues for understanding and shaping how"
+      relevanceScore: 90
+      topics:
+        - interpretability
+        - mechanistic-interpretability
+        - alignment
+        - safety-research
+      entities:
+        - safety-research
+        - interpretability-sufficient
+        - alignment-progress
+    - title: Mechanistic Interpretability Named MIT's 2026 Breakthrough
+      url: https://theconsciousness.ai/posts/mechanistic-interpretability-breakthrough-2026/
+      sourceId: anthropic-blog
+      publishedAt: 2026-02-18
+      summary: MIT Technology Review recognized mechanistic interpretability as a major breakthrough, revealing how AI models
+        process information from prompt to response through feature mapping and pathway analysis. Anthropic used
+        mechanistic interpretability in the pre-deployment safety assessment of Claude Sonnet 4.5 — examining internal
+        features for dangerous capabilities, deceptive tendencies, or undesired goals — representing the first
+        integration of interpretability research into deployment decisions for
+      relevanceScore: 88
+      topics:
+        - mechanistic-interpretability
+        - interpretability
+        - safety-research
+        - breakthrough
+      entities:
+        - safety-research
+        - interpretability-sufficient
+        - alignment-progress
+    - title: Steerability of Instrumental-Convergence Tendencies in LLMs
+      url: https://arxiv.org/html/2601.01584v2
+      sourceId: arxiv-ai-safety
+      publishedAt: 2026-02-18
+      summary: " **Published:** January 6, 2026 A recurring concern in the AI safety field is that sufficiently advanced AI
+        systems might become uncontrollable, positing that as capability scales, systems might pursue objectives not
+        aligned with builders' intentions. This paper analyzes that assumption, treating the negative relationship
+        between capability and steerability as a hypothesis rather than a default prior. Using Qwen3 and
+        InstrumentalEval, the authors find that a short anti-instrumental prompt suffix"
+      relevanceScore: 88
+      topics:
+        - instrumental-convergence
+        - alignment
+        - safety-research
+        - ai-control
+        - power-seeking
+      entities:
+        - safety-research
+        - instrumental-convergence-framework
+        - power-seeking-conditions
+        - alignment-progress
+    - title: "RASA: Routing-Aware Safety Alignment for Mixture-of-Experts Models"
+      url: https://arxiv.org/html/2602.04448v1
+      sourceId: arxiv-ai-safety
+      publishedAt: 2026-02-18
+      summary: " **Published:** ~2 weeks ago (February 2026) RASA introduces a framework that alternates between selectively
+        fine-tuning Safety-Critical Experts under fixed routing and optimizing router consistency using safe anchor
+        distributions, preventing routing-based shortcut solutions. RASA consistently achieves near-perfect defense
+        against diverse jailbreak attacks, substantially improves cross-attack generalization, and significantly reduces
+        over-refusal — while also preserving general performance acros"
+      relevanceScore: 85
+      topics:
+        - safety-alignment
+        - mixture-of-experts
+        - routing
+        - mechanistic-safety
+        - interpretability
+      entities:
+        - safety-research
+        - alignment-progress
+        - interpretability-sufficient
+    - title: "The Open-Source Revolution: How Meta's Llama Series Erased the Proprietary AI Advantage"
+      url: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-the-open-source-revolution-how-metas-llama-series-erased-the-proprietary-ai-advantage
+      sourceId: meta-ai-blog
+      publishedAt: 2026-02-18
+      summary: " A 2026 analysis piece examining Llama's broader geopolitical and technological impact. In 2026, the emergence
+        of \"Sovereign AI\" is being observed, where nations like France, India, and the UAE are using Llama as the
+        backbone for national AI initiatives. Looking ahead, the industry is focused on the full public release of Llama
+        4 Behemoth, currently in limited research preview and expected to be the first open-weights model to achieve
+        \"Expert-Level\" reasoning across all scientific and mathematic"
+      relevanceScore: 75
+      topics:
+        - open-source
+        - geopolitics
+        - sovereign-ai
+        - ai-governance
+        - multipolar-competition
+      entities:
+        - open-vs-closed
+        - geopolitics
+        - multipolar-competition
+        - multipolar-trap-dynamics
+    - title: "The Llama 4 Herd: The Beginning of a New Era of Natively Multimodal AI Innovation"
+      url: https://ai.meta.com/blog/llama-4-multimodal-intelligence/
+      sourceId: meta-ai-blog
+      publishedAt: 2026-02-18
+      summary: " This is Meta's most current and significant release blog. It introduces Llama 4 Scout and Llama 4 Maverick —
+        the first open-weight, natively multimodal models with unprecedented context length support and Meta's first
+        built using a mixture-of-experts (MoE) architecture. Llama 4 Maverick, a 17 billion active parameter model with
+        128 experts, beats GPT-4o and Gemini 2.0 Flash across a broad range of benchmarks. These models benefit from
+        distillation from Llama 4 Behemoth — a 288 billion active pa"
+      relevanceScore: 65
+      topics:
+        - language-models
+        - multimodal-ai
+        - capabilities
+        - large-language-models
+      entities:
+        - language-models
+        - large-language-models
+        - capabilities
+    - title: "The Future of AI: Built with Llama"
+      url: https://ai.meta.com/blog/future-of-ai-built-with-llama/
+      sourceId: meta-ai-blog
+      publishedAt: 2026-02-18
+      summary: " A comprehensive look at Llama's explosive growth and roadmap. Llama has quickly become the most adopted
+        model, with more than 650 million downloads of Llama and its derivatives — twice as many downloads as three
+        months prior. The open source community has published more than 85,000 Llama derivatives on Hugging Face alone —
+        an increase of over 5x from the start of the year."
+      relevanceScore: 60
+      topics:
+        - language-models
+        - capabilities
+        - adoption
+        - large-language-models
+      entities:
+        - language-models
+        - large-language-models
+        - capabilities
+    - title: Everything We Announced at Our First-Ever LlamaCon
+      url: https://ai.meta.com/blog/llamacon-llama-news/
+      sourceId: meta-ai-blog
+      publishedAt: 2026-02-18
+      summary: " A recap of Meta's inaugural developer conference for the Llama ecosystem. The Llama API, launching as a
+        limited preview, combines the best features of closed models with open-source flexibility, offering easy
+        one-click API key creation and interactive playgrounds to explore different Llama models. New Llama Protection
+        Tools and the Llama Defenders Program were also announced, giving select trusted partners access to AI-enabled
+        tools to evaluate system security."
+      relevanceScore: 55
+      topics:
+        - language-models
+        - open-source
+        - api
+        - developer-tools
+      entities:
+        - language-models
+        - open-vs-closed
+    - title: Llama (Language Model) — Wikipedia
+      url: https://en.wikipedia.org/wiki/Llama_(language_model
+      sourceId: meta-ai-blog
+      publishedAt: 2026-02-18
+      summary: "A comprehensive and up-to-date encyclopedic overview of the entire Llama model family. Llama (\"Large Language
+        Model Meta AI\") is a family of large language models released by Meta AI starting in February 2023, with models
+        ranging from 1 billion to 2 trillion parameters. Starting with Llama 2, Meta AI released instruction fine-tuned
+        versions alongside foundation models, and subsequent versions were released under licenses that permitted some
+        commercial use. These five results cover Meta's latest "
+      relevanceScore: 50
+      topics:
+        - language-models
+        - large-language-models
+      entities:
+        - language-models
+        - large-language-models
+  fetchedSources:
+    - anthropic-blog
+    - meta-ai-blog
+    - aisafety-news-search
+    - arxiv-ai-safety
+  failedSources: []
+plan:
+  date: 2026-02-18
+  pageUpdates:
+    - pageId: language-models
+      pageTitle: Large Language Models
+      reason: 4 news item(s) mention this entity directly
+      suggestedTier: polish
+      relevantNews:
+        - title: "The Llama 4 Herd: The Beginning of a New Era of Natively Multimodal AI Innovation"
+          url: https://ai.meta.com/blog/llama-4-multimodal-intelligence/
+          summary: " This is Meta's most current and significant release blog. It introduces Llama 4 Scout and Llama 4 Maverick —
+            the first open-weight, natively multimodal models with unprecedented context length suppor"
+        - title: "The Future of AI: Built with Llama"
+          url: https://ai.meta.com/blog/future-of-ai-built-with-llama/
+          summary: " A comprehensive look at Llama's explosive growth and roadmap. Llama has quickly become the most adopted
+            model, with more than 650 million downloads of Llama and its derivatives — twice as many downlo"
+        - title: Everything We Announced at Our First-Ever LlamaCon
+          url: https://ai.meta.com/blog/llamacon-llama-news/
+          summary: " A recap of Meta's inaugural developer conference for the Llama ecosystem. The Llama API, launching as a
+            limited preview, combines the best features of closed models with open-source flexibility, offe"
+        - title: Llama (Language Model) — Wikipedia
+          url: https://en.wikipedia.org/wiki/Llama_(language_model
+          summary: A comprehensive and up-to-date encyclopedic overview of the entire Llama model family. Llama ("Large Language
+            Model Meta AI") is a family of large language models released by Meta AI starting in Febru
+      directions: "Review and incorporate recent developments: The Llama 4 Herd: The Beginning of a New Era of Natively
+        Multimodal AI Innovation; The Future of AI: Built with Llama; Everything We Announced at Our First-Ever
+        LlamaCon; Llama (Language Model) — Wikipedia"
+    - pageId: alignment-progress
+      pageTitle: Alignment Progress
+      reason: 8 news item(s) mention this entity directly
+      suggestedTier: standard
+      relevantNews:
+        - title: Anthropic Fellows Program for AI Safety Research (2026 Cohorts)
+          url: https://alignment.anthropic.com/2025/anthropic-fellows-program-2026/
+          summary: " Applications are now open for two new cohorts beginning in May and July 2026, covering a wide range of safety
+            research areas — including scalable oversight, adversarial robustness, AI control, mechan"
+        - title: Alignment Science Blog — Anthropic
+          url: https://alignment.anthropic.com/
+          summary: " This is Anthropic's Alignment Science team blog, focused on machine learning research on the problem of
+            steering and controlling future powerful AI systems, as well as understanding and evaluating th"
+        - title: AI Safety, Alignment, and Interpretability in 2026 — Zylos Research
+          url: https://zylos.ai/research/2026-02-09-ai-safety-alignment-interpretability
+          summary: " **Published:** ~1 week ago (February 9, 2026) Three interconnected research areas define the current
+            landscape: mechanistic interpretability (understanding how models work internally), alignment tech"
+        - title: Mechanistic Interpretability for AI Safety — A Review
+          url: https://arxiv.org/abs/2404.14082
+          summary: "**Published:** April 2024 (updated August 2024) This review explores mechanistic interpretability: reverse
+            engineering the computational mechanisms and representations learned by neural networks into "
+        - title: "Aligning AI Through Internal Understanding: The Role of Interpretability"
+          url: https://arxiv.org/html/2509.08592v1
+          summary: " **Published:** September 10, 2025 Mechanistic interpretability (MI) is a research approach aimed at
+            uncovering the internal computations performed by neural networks — rather than summarizing behavio"
+        - title: Mechanistic Interpretability Named MIT's 2026 Breakthrough
+          url: https://theconsciousness.ai/posts/mechanistic-interpretability-breakthrough-2026/
+          summary: MIT Technology Review recognized mechanistic interpretability as a major breakthrough, revealing how AI models
+            process information from prompt to response through feature mapping and pathway analysis.
+        - title: Steerability of Instrumental-Convergence Tendencies in LLMs
+          url: https://arxiv.org/html/2601.01584v2
+          summary: " **Published:** January 6, 2026 A recurring concern in the AI safety field is that sufficiently advanced AI
+            systems might become uncontrollable, positing that as capability scales, systems might pursu"
+        - title: "RASA: Routing-Aware Safety Alignment for Mixture-of-Experts Models"
+          url: https://arxiv.org/html/2602.04448v1
+          summary: " **Published:** ~2 weeks ago (February 2026) RASA introduces a framework that alternates between selectively
+            fine-tuning Safety-Critical Experts under fixed routing and optimizing router consistency u"
+      directions: "Review and incorporate recent developments: Anthropic Fellows Program for AI Safety Research (2026
+        Cohorts); Alignment Science Blog — Anthropic; AI Safety, Alignment, and Interpretability in 2026 — Zylos
+        Research; Mechanistic Interpretability for AI Safety — A Review; Aligning AI Through Internal Understanding: The
+        Role of Interpretability; Mechanistic Interpretability Named MIT's 2026 Breakthrough; Steerability of
+        Instrumental-Convergence Tendencies in LLMs; RASA: Routing-Aware Safety Alignment for Mixture-of-Experts Models"
+    - pageId: safety-research
+      pageTitle: Safety Research & Resources
+      reason: 10 news item(s) mention this entity directly
+      suggestedTier: standard
+      relevantNews:
+        - title: Anthropic Fellows Program for AI Safety Research (2026 Cohorts)
+          url: https://alignment.anthropic.com/2025/anthropic-fellows-program-2026/
+          summary: " Applications are now open for two new cohorts beginning in May and July 2026, covering a wide range of safety
+            research areas — including scalable oversight, adversarial robustness, AI control, mechan"
+        - title: Anthropic Interpretability Research Team Page
+          url: https://www.anthropic.com/research/team/interpretability
+          summary: " The mission of the Interpretability team is to discover and understand how large language models work
+            internally, as a foundation for AI safety and positive outcomes. AI models represent character tr"
+        - title: Alignment Science Blog — Anthropic
+          url: https://alignment.anthropic.com/
+          summary: " This is Anthropic's Alignment Science team blog, focused on machine learning research on the problem of
+            steering and controlling future powerful AI systems, as well as understanding and evaluating th"
+        - title: AI Safety, Alignment, and Interpretability in 2026 — Zylos Research
+          url: https://zylos.ai/research/2026-02-09-ai-safety-alignment-interpretability
+          summary: " **Published:** ~1 week ago (February 9, 2026) Three interconnected research areas define the current
+            landscape: mechanistic interpretability (understanding how models work internally), alignment tech"
+        - title: Mechanistic Interpretability for AI Safety — A Review
+          url: https://arxiv.org/abs/2404.14082
+          summary: "**Published:** April 2024 (updated August 2024) This review explores mechanistic interpretability: reverse
+            engineering the computational mechanisms and representations learned by neural networks into "
+        - title: Anthropic Research Hub
+          url: https://www.anthropic.com/research
+          summary: " Anthropic's research teams investigate the safety, inner workings, and societal impacts of AI models — so
+            that artificial intelligence has a positive impact as it becomes increasingly capable. Recent"
+        - title: "Aligning AI Through Internal Understanding: The Role of Interpretability"
+          url: https://arxiv.org/html/2509.08592v1
+          summary: " **Published:** September 10, 2025 Mechanistic interpretability (MI) is a research approach aimed at
+            uncovering the internal computations performed by neural networks — rather than summarizing behavio"
+        - title: Mechanistic Interpretability Named MIT's 2026 Breakthrough
+          url: https://theconsciousness.ai/posts/mechanistic-interpretability-breakthrough-2026/
+          summary: MIT Technology Review recognized mechanistic interpretability as a major breakthrough, revealing how AI models
+            process information from prompt to response through feature mapping and pathway analysis.
+        - title: Steerability of Instrumental-Convergence Tendencies in LLMs
+          url: https://arxiv.org/html/2601.01584v2
+          summary: " **Published:** January 6, 2026 A recurring concern in the AI safety field is that sufficiently advanced AI
+            systems might become uncontrollable, positing that as capability scales, systems might pursu"
+        - title: "RASA: Routing-Aware Safety Alignment for Mixture-of-Experts Models"
+          url: https://arxiv.org/html/2602.04448v1
+          summary: " **Published:** ~2 weeks ago (February 2026) RASA introduces a framework that alternates between selectively
+            fine-tuning Safety-Critical Experts under fixed routing and optimizing router consistency u"
+      directions: "Review and incorporate recent developments: Anthropic Fellows Program for AI Safety Research (2026
+        Cohorts); Anthropic Interpretability Research Team Page; Alignment Science Blog — Anthropic; AI Safety,
+        Alignment, and Interpretability in 2026 — Zylos Research; Mechanistic Interpretability for AI Safety — A Review;
+        Anthropic Research Hub; Aligning AI Through Internal Understanding: The Role of Interpretability; Mechanistic
+        Interpretability Named MIT's 2026 Breakthrough; Steerability of Instrumental-Convergence Tendencies in LLMs;
+        RASA: Routing-Aware Safety Alignment for Mixture-of-Experts Models"
+    - pageId: large-language-models
+      pageTitle: Large Language Models
+      reason: 3 news item(s) mention this entity directly
+      suggestedTier: polish
+      relevantNews:
+        - title: "The Llama 4 Herd: The Beginning of a New Era of Natively Multimodal AI Innovation"
+          url: https://ai.meta.com/blog/llama-4-multimodal-intelligence/
+          summary: " This is Meta's most current and significant release blog. It introduces Llama 4 Scout and Llama 4 Maverick —
+            the first open-weight, natively multimodal models with unprecedented context length suppor"
+        - title: "The Future of AI: Built with Llama"
+          url: https://ai.meta.com/blog/future-of-ai-built-with-llama/
+          summary: " A comprehensive look at Llama's explosive growth and roadmap. Llama has quickly become the most adopted
+            model, with more than 650 million downloads of Llama and its derivatives — twice as many downlo"
+        - title: Llama (Language Model) — Wikipedia
+          url: https://en.wikipedia.org/wiki/Llama_(language_model
+          summary: A comprehensive and up-to-date encyclopedic overview of the entire Llama model family. Llama ("Large Language
+            Model Meta AI") is a family of large language models released by Meta AI starting in Febru
+      directions: "Review and incorporate recent developments: The Llama 4 Herd: The Beginning of a New Era of Natively
+        Multimodal AI Innovation; The Future of AI: Built with Llama; Llama (Language Model) — Wikipedia"
+    - pageId: geopolitics
+      pageTitle: Geopolitics & Coordination
+      reason: 1 news item(s) mention this entity directly
+      suggestedTier: standard
+      relevantNews:
+        - title: "The Open-Source Revolution: How Meta's Llama Series Erased the Proprietary AI Advantage"
+          url: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-the-open-source-revolution-how-metas-llama-series-erased-the-proprietary-ai-advantage
+          summary: " A 2026 analysis piece examining Llama's broader geopolitical and technological impact. In 2026, the emergence
+            of \"Sovereign AI\" is being observed, where nations like France, India, and the UAE are us"
+      directions: "Review and incorporate recent developments: The Open-Source Revolution: How Meta's Llama Series Erased the
+        Proprietary AI Advantage"
+    - pageId: power-seeking-conditions
+      pageTitle: Power-Seeking Emergence Conditions Model
+      reason: 1 news item(s) mention this entity directly
+      suggestedTier: standard
+      relevantNews:
+        - title: Steerability of Instrumental-Convergence Tendencies in LLMs
+          url: https://arxiv.org/html/2601.01584v2
+          summary: " **Published:** January 6, 2026 A recurring concern in the AI safety field is that sufficiently advanced AI
+            systems might become uncontrollable, positing that as capability scales, systems might pursu"
+      directions: "Review and incorporate recent developments: Steerability of Instrumental-Convergence Tendencies in LLMs"
+    - pageId: multipolar-trap-dynamics
+      pageTitle: Multipolar Trap Dynamics Model
+      reason: 1 news item(s) mention this entity directly
+      suggestedTier: standard
+      relevantNews:
+        - title: "The Open-Source Revolution: How Meta's Llama Series Erased the Proprietary AI Advantage"
+          url: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-the-open-source-revolution-how-metas-llama-series-erased-the-proprietary-ai-advantage
+          summary: " A 2026 analysis piece examining Llama's broader geopolitical and technological impact. In 2026, the emergence
+            of \"Sovereign AI\" is being observed, where nations like France, India, and the UAE are us"
+      directions: "Review and incorporate recent developments: The Open-Source Revolution: How Meta's Llama Series Erased the
+        Proprietary AI Advantage"
+    - pageId: instrumental-convergence-framework
+      pageTitle: Instrumental Convergence Framework
+      reason: 1 news item(s) mention this entity directly
+      suggestedTier: standard
+      relevantNews:
+        - title: Steerability of Instrumental-Convergence Tendencies in LLMs
+          url: https://arxiv.org/html/2601.01584v2
+          summary: " **Published:** January 6, 2026 A recurring concern in the AI safety field is that sufficiently advanced AI
+            systems might become uncontrollable, positing that as capability scales, systems might pursu"
+      directions: "Review and incorporate recent developments: Steerability of Instrumental-Convergence Tendencies in LLMs"
+    - pageId: capabilities
+      pageTitle: AI Capabilities
+      reason: 2 news item(s) mention this entity directly
+      suggestedTier: polish
+      relevantNews:
+        - title: "The Llama 4 Herd: The Beginning of a New Era of Natively Multimodal AI Innovation"
+          url: https://ai.meta.com/blog/llama-4-multimodal-intelligence/
+          summary: " This is Meta's most current and significant release blog. It introduces Llama 4 Scout and Llama 4 Maverick —
+            the first open-weight, natively multimodal models with unprecedented context length suppor"
+        - title: "The Future of AI: Built with Llama"
+          url: https://ai.meta.com/blog/future-of-ai-built-with-llama/
+          summary: " A comprehensive look at Llama's explosive growth and roadmap. Llama has quickly become the most adopted
+            model, with more than 650 million downloads of Llama and its derivatives — twice as many downlo"
+      directions: "Review and incorporate recent developments: The Llama 4 Herd: The Beginning of a New Era of Natively
+        Multimodal AI Innovation; The Future of AI: Built with Llama"
+  newPageSuggestions: []
+  skippedReasons:
+    - item: Open vs Closed Source AI
+      reason: Exceeded budget
+    - item: Anthropic Impact Assessment Model
+      reason: Exceeded budget
+    - item: Is Interpretability Sufficient for Safety?
+      reason: Exceeded budget
+    - item: Multipolar Competition - The Fragmented World
+      reason: Exceeded budget
+  estimatedCost: 46.5

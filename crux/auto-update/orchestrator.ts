@@ -62,7 +62,7 @@ function executePageImprove(
   try {
     const args = [
       '--import', 'tsx/esm', '--no-warnings',
-      'crux/authoring/page-improver.ts',
+      'crux/authoring/page-improver/index.ts',
       '--', pageId,
       '--tier', tier,
       '--apply',

@@ -9,7 +9,7 @@ Run all CI checks locally, push to GitHub, and monitor until green. Fix and retr
 
 ## Step 1: Run all local checks (be paranoid)
 
-Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all CI-blocking checks including TypeScript). If you also want the full Next.js build, use `--full`.
+Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all CI-blocking checks including TypeScript). The gate auto-escalates to include the full Next.js build when app page components or prerendered data files are in the diff. You can also force it with `--full`.
 
 ### Handling failures
 
