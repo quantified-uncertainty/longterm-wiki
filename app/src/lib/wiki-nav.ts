@@ -335,6 +335,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Proposals", href: "/internal/proposals" },
         { label: "Auto-Update Runs", href: "/internal/auto-update-runs" },
         { label: "Auto-Update News", href: "/internal/auto-update-news" },
+        { label: "GitHub Issues", href: "/internal/github-issues" },
       ],
     },
     {
