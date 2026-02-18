@@ -28,6 +28,7 @@ interface IdRegistry {
 
 let _registry: IdRegistry | null = null;
 let _entities: EntityEntry[] | null = null;
+let _entityById: Map<string, EntityEntry> | null = null;
 let _slugToEid: Record<string, string> | null = null;
 
 function loadRegistry(ROOT: string): IdRegistry {
@@ -77,6 +78,12 @@ function loadAllEntities(ROOT: string): EntityEntry[] {
   return _entities;
 }
 
+function loadEntityById(ROOT: string): Map<string, EntityEntry> {
+  if (_entityById) return _entityById;
+  _entityById = new Map(loadAllEntities(ROOT).map(e => [e.id, e]));
+  return _entityById;
+}
+
 /**
  * Build a lookup table of entities relevant to the given content.
  *
@@ -90,6 +97,7 @@ function loadAllEntities(ROOT: string): EntityEntry[] {
 export function buildEntityLookupForContent(content: string, ROOT: string): string {
   const slugToEid = loadSlugToEidMap(ROOT);
   const entities = loadAllEntities(ROOT);
+  const entityById = loadEntityById(ROOT);
 
   const relevantEntities = new Map<string, { eid: string; title: string; type?: string; reason: string }>();
 
@@ -101,7 +109,7 @@ export function buildEntityLookupForContent(content: string, ROOT: string): stri
       const registry = loadRegistry(ROOT);
       const slug = registry.entities[id.toUpperCase()];
       if (slug) {
-        const entity = entities.find(e => e.id === slug);
+        const entity = entityById.get(slug);
         relevantEntities.set(slug, {
           eid: id.toUpperCase(),
           title: entity?.title || slug,
@@ -113,7 +121,7 @@ export function buildEntityLookupForContent(content: string, ROOT: string): stri
       // Slug-based reference
       const eid = slugToEid[id];
       if (eid) {
-        const entity = entities.find(e => e.id === id);
+        const entity = entityById.get(id);
         relevantEntities.set(id, {
           eid,
           title: entity?.title || id,
@@ -156,7 +164,7 @@ export function buildEntityLookupForContent(content: string, ROOT: string): stri
     if (relevantEntities.has(slug)) continue;
     const eid = slugToEid[slug];
     if (!eid) continue;
-    const entity = entities.find(e => e.id === slug);
+    const entity = entityById.get(slug);
     relevantEntities.set(slug, {
       eid,
       title: entity?.title || slug,
@@ -186,6 +194,7 @@ export function buildEntityLookupForContent(content: string, ROOT: string): stri
 export function buildEntityLookupForTopic(topic: string, ROOT: string): string {
   const slugToEid = loadSlugToEidMap(ROOT);
   const entities = loadAllEntities(ROOT);
+  const entityById = loadEntityById(ROOT);
 
   const relevantEntities = new Map<string, { eid: string; title: string; type?: string }>();
 
@@ -224,7 +233,7 @@ export function buildEntityLookupForTopic(topic: string, ROOT: string): string {
     if (relevantEntities.has(slug)) continue;
     const eid = slugToEid[slug];
     if (!eid) continue;
-    const entity = entities.find(e => e.id === slug);
+    const entity = entityById.get(slug);
     relevantEntities.set(slug, { eid, title: entity?.title || slug, type: entity?.type });
   }
 
@@ -241,14 +250,11 @@ export function buildEntityLookupForTopic(topic: string, ROOT: string): string {
  */
 export function buildFullEntityLookup(ROOT: string): string {
   const registry = loadRegistry(ROOT);
-  const entities = loadAllEntities(ROOT);
-
-  const entityMap = new Map<string, EntityEntry>();
-  for (const e of entities) entityMap.set(e.id, e);
+  const entityById = loadEntityById(ROOT);
 
   const rows: string[] = [];
   for (const [eid, slug] of Object.entries(registry.entities)) {
-    const entity = entityMap.get(slug);
+    const entity = entityById.get(slug);
     rows.push(`${eid} = ${slug} → "${entity?.title || slug}"`);
   }
 

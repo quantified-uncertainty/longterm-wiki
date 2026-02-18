@@ -302,11 +302,13 @@ export async function routeDigest(
     suggestedTier: np.suggestedTier,
   }));
 
-  // Sort by importance and apply limits
+  // Sort by importance and apply limits.
+  // Pre-build a Map so the sort comparator does O(1) lookups instead of O(n).
+  const pageById = new Map(pages.map(p => [p.id, p]));
   const allUpdates = [...pageUpdateMap.values()]
     .sort((a, b) => {
-      const pageA = pages.find(p => p.id === a.pageId);
-      const pageB = pages.find(p => p.id === b.pageId);
+      const pageA = pageById.get(a.pageId);
+      const pageB = pageById.get(b.pageId);
       return (pageB?.readerImportance || 0) - (pageA?.readerImportance || 0);
     });
 
