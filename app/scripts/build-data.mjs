@@ -970,6 +970,49 @@ async function main() {
   }
   database.facts = facts;
 
+  // Load fact metric definitions from data/fact-metrics.yaml
+  const factMetricsPath = join(DATA_DIR, 'fact-metrics.yaml');
+  const factMetrics = {};
+  if (existsSync(factMetricsPath)) {
+    const metricsContent = readFileSync(factMetricsPath, 'utf-8');
+    const metricsParsed = parse(metricsContent);
+    if (metricsParsed && metricsParsed.metrics) {
+      for (const [metricId, metricDef] of Object.entries(metricsParsed.metrics)) {
+        factMetrics[metricId] = { id: metricId, ...metricDef };
+      }
+    }
+    console.log(`  factMetrics: ${Object.keys(factMetrics).length} metric definitions`);
+  }
+  database.factMetrics = factMetrics;
+
+  // Build timeseries index: group facts by metric, sorted chronologically
+  const factTimeseries = {};
+  for (const [key, fact] of Object.entries(facts)) {
+    if (!fact.metric || !fact.asOf) continue;
+    if (!factTimeseries[fact.metric]) {
+      factTimeseries[fact.metric] = [];
+    }
+    factTimeseries[fact.metric].push({
+      entity: fact.entity,
+      factId: fact.factId,
+      metric: fact.metric,
+      asOf: fact.asOf,
+      value: fact.value,
+      numeric: fact.numeric,
+      low: fact.low,
+      high: fact.high,
+      note: fact.note,
+      source: fact.source,
+    });
+  }
+  // Sort each timeseries chronologically (oldest first)
+  for (const series of Object.values(factTimeseries)) {
+    series.sort((a, b) => a.asOf.localeCompare(b.asOf));
+  }
+  const timeseriesCount = Object.values(factTimeseries).reduce((sum, s) => sum + s.length, 0);
+  console.log(`  factTimeseries: ${timeseriesCount} observations across ${Object.keys(factTimeseries).length} metrics`);
+  database.factTimeseries = factTimeseries;
+
   // Build URL → resource map for unconverted link detection
   const resources = database.resources || [];
   const urlToResource = buildUrlToResourceMap(resources);

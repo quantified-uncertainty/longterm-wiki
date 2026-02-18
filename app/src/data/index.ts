@@ -39,16 +39,44 @@ interface IdRegistryMaps {
 export interface Fact {
   value?: string;
   numeric?: number;
+  /** Lower bound of range (for estimates like "$20-26 billion") */
+  low?: number;
+  /** Upper bound of range */
+  high?: number;
   asOf?: string;
   source?: string;
   note?: string;
   noCompute?: boolean;
+  /** Metric ID from data/fact-metrics.yaml — groups related facts into timeseries */
+  metric?: string;
   compute?: string;
   format?: string;
   formatDivisor?: number;
   entity: string;
   factId: string;
   computed?: boolean;
+}
+
+export interface FactMetric {
+  id: string;
+  label: string;
+  unit: string;
+  category: string;
+  description?: string;
+}
+
+/** A timeseries entry — a fact observation for a specific entity+metric at a point in time */
+export interface TimeseriesPoint {
+  entity: string;
+  factId: string;
+  metric: string;
+  asOf: string;
+  value?: string;
+  numeric?: number;
+  low?: number;
+  high?: number;
+  note?: string;
+  source?: string;
 }
 
 /** Raw entity shape as stored in database.json (before transformation) */
@@ -129,6 +157,9 @@ interface DatabaseShape {
   idRegistry: IdRegistryMaps;
   pages: Page[];
   facts: Record<string, Fact>;
+  factMetrics: Record<string, FactMetric>;
+  /** Timeseries index: metric ID → sorted array of observations */
+  factTimeseries: Record<string, TimeseriesPoint[]>;
   stats: Record<string, unknown>;
 }
 
@@ -754,6 +785,67 @@ export function getAllFacts(): Array<Fact & { key: string }> {
     ...fact,
     key,
   }));
+}
+
+// ============================================================================
+// FACT METRICS & TIMESERIES
+// ============================================================================
+
+/** Get all metric definitions */
+export function getFactMetrics(): Record<string, FactMetric> {
+  return getDatabase().factMetrics || {};
+}
+
+/** Get a single metric definition by ID */
+export function getFactMetric(metricId: string): FactMetric | undefined {
+  return getDatabase().factMetrics?.[metricId];
+}
+
+/**
+ * Get timeseries for a metric, optionally filtered by entity.
+ * Returns observations sorted chronologically (oldest first).
+ */
+export function getMetricTimeseries(metricId: string, entityId?: string): TimeseriesPoint[] {
+  const db = getDatabase();
+  const series = db.factTimeseries?.[metricId] || [];
+  if (entityId) {
+    return series.filter(p => p.entity === entityId);
+  }
+  return series;
+}
+
+/**
+ * Get all timeseries data for a given entity, grouped by metric.
+ * Returns a map of metricId → sorted observations.
+ */
+export function getEntityTimeseries(entityId: string): Record<string, TimeseriesPoint[]> {
+  const db = getDatabase();
+  const result: Record<string, TimeseriesPoint[]> = {};
+  for (const [metricId, series] of Object.entries(db.factTimeseries || {})) {
+    const filtered = series.filter(p => p.entity === entityId);
+    if (filtered.length > 0) {
+      result[metricId] = filtered;
+    }
+  }
+  return result;
+}
+
+/** Get all metrics that have data for a given entity */
+export function getEntityMetrics(entityId: string): FactMetric[] {
+  const db = getDatabase();
+  const metrics: FactMetric[] = [];
+  const seen = new Set<string>();
+  for (const [metricId, series] of Object.entries(db.factTimeseries || {})) {
+    if (seen.has(metricId)) continue;
+    if (series.some(p => p.entity === entityId)) {
+      const metric = db.factMetrics?.[metricId];
+      if (metric) {
+        metrics.push(metric);
+        seen.add(metricId);
+      }
+    }
+  }
+  return metrics;
 }
 
 // ============================================================================

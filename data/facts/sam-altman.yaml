@@ -1,6 +1,7 @@
 entity: sam-altman
 facts:
   net-worth:
+    metric: net-worth
     value: "$2.8 billion"
     asOf: "2024"
 
@@ -26,11 +27,13 @@ facts:
     note: "738 of 770 employees signed letter threatening to quit"
 
   worldcoin-users:
+    metric: user-count
     value: "26 million"
     asOf: "2024"
     note: "Total users on Worldcoin network"
 
   worldcoin-verified:
+    metric: user-count
     value: "12 million"
     asOf: "2024"
     note: "Verified Worldcoin users (via orb)"

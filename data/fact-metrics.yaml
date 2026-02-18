@@ -1,0 +1,131 @@
+# Fact Metric Definitions
+#
+# Metrics are reusable "measurement types" that group related facts across
+# entities and time. A fact with `metric: valuation` is a point-in-time
+# observation of the "valuation" metric for that entity.
+#
+# This enables:
+#   - Timeseries: all valuations for Anthropic over time
+#   - Cross-entity comparison: all company valuations at a given date
+#   - Knowledge graph queries: "what metrics does this entity have?"
+#   - Auto-generated charts and tables
+
+metrics:
+  # === Financial ===
+  valuation:
+    label: "Valuation"
+    unit: USD
+    category: financial
+    description: "Post-money valuation from funding rounds or private market transactions"
+
+  revenue:
+    label: "Revenue"
+    unit: USD
+    category: financial
+    description: "Annualized run-rate revenue (ARR) or reported annual revenue"
+
+  revenue-guidance:
+    label: "Revenue Guidance"
+    unit: USD
+    category: financial
+    description: "Forward-looking revenue projections or guidance ranges"
+
+  funding-round:
+    label: "Funding Round"
+    unit: USD
+    category: financial
+    description: "Amount raised in a single funding round"
+
+  total-funding:
+    label: "Total Funding"
+    unit: USD
+    category: financial
+    description: "Cumulative funding raised across all rounds"
+
+  cash-burn:
+    label: "Cash Burn"
+    unit: USD
+    category: financial
+    description: "Net cash burn rate (annualized)"
+
+  gross-margin:
+    label: "Gross Margin"
+    unit: percent
+    category: financial
+    description: "Gross margin percentage"
+
+  product-revenue:
+    label: "Product Revenue"
+    unit: USD
+    category: financial
+    description: "Revenue from a specific product line"
+
+  infrastructure-investment:
+    label: "Infrastructure Investment"
+    unit: USD
+    category: financial
+    description: "Planned or committed infrastructure spending"
+
+  # === Organizational ===
+  headcount:
+    label: "Headcount"
+    unit: count
+    category: organizational
+    description: "Number of employees or team members"
+
+  customer-count:
+    label: "Customer Count"
+    unit: count
+    category: organizational
+    description: "Number of business customers"
+
+  customer-concentration:
+    label: "Customer Concentration"
+    unit: percent
+    category: organizational
+    description: "Revenue share from top customers"
+
+  retention-rate:
+    label: "Retention Rate"
+    unit: percent
+    category: organizational
+    description: "Customer or revenue retention rate"
+
+  # === Safety ===
+  safety-headcount:
+    label: "Safety Headcount"
+    unit: count
+    category: safety
+    description: "Number of safety/alignment researchers"
+
+  safety-staffing-ratio:
+    label: "Safety Staffing Ratio"
+    unit: percent
+    category: safety
+    description: "Safety researchers as percentage of technical staff"
+
+  # === Model Performance ===
+  benchmark-score:
+    label: "Benchmark Score"
+    unit: percent
+    category: performance
+    description: "Score on a standardized benchmark"
+
+  model-parameters:
+    label: "Model Parameters"
+    unit: count
+    category: performance
+    description: "Number of parameters in a model"
+
+  # === People ===
+  net-worth:
+    label: "Net Worth"
+    unit: USD
+    category: financial
+    description: "Estimated personal net worth"
+
+  user-count:
+    label: "User Count"
+    unit: count
+    category: organizational
+    description: "Number of users of a product or platform"

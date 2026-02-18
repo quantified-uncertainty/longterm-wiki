@@ -14,7 +14,7 @@ import { join, basename } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { fileURLToPath } from 'url';
 import { getColors, isCI, formatPath } from '../lib/output.ts';
-import { Entity, Resource, Publication, Intervention, Proposal } from '../../data/schema.ts';
+import { Entity, Resource, Publication, Intervention, Proposal, FactsFile, FactMetricsFile } from '../../data/schema.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { ZodSchema, ZodError, ZodIssue } from 'zod';
 import type { Colors } from '../lib/output.ts';
@@ -180,6 +180,69 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const propErrors = validateItems(proposals, Proposal, 'Proposal');
   allErrors.push(...propErrors);
   if (!ciMode) console.log(`  ${proposals.length} proposals loaded`);
+
+  // 6. Validate facts/*.yaml against FactsFile schema and check metric references
+  if (!ciMode) console.log(`${colors.dim}Checking facts...${colors.reset}`);
+  const factsDir = join(DATA_DIR, 'facts');
+  let totalFacts = 0;
+  let validMetricIds: Set<string> | null = null;
+
+  // Load metric definitions first (for cross-reference validation)
+  const metricsPath = join(DATA_DIR, 'fact-metrics.yaml');
+  if (existsSync(metricsPath)) {
+    const metricsContent = readFileSync(metricsPath, 'utf-8');
+    const metricsParsed = parseYaml(metricsContent);
+    const metricsResult = FactMetricsFile.safeParse(metricsParsed);
+    if (!metricsResult.success) {
+      allErrors.push({
+        file: metricsPath,
+        id: 'fact-metrics',
+        type: 'FactMetricsFile',
+        issues: formatZodErrors(metricsResult.error),
+      });
+    } else {
+      validMetricIds = new Set(Object.keys(metricsResult.data.metrics));
+      if (!ciMode) console.log(`  ${validMetricIds.size} metric definitions loaded`);
+    }
+    totalValidated++;
+  }
+
+  // Validate each facts file
+  if (existsSync(factsDir)) {
+    const factFiles = readdirSync(factsDir).filter(f => f.endsWith('.yaml'));
+    for (const file of factFiles) {
+      const filepath = join(factsDir, file);
+      const content = readFileSync(filepath, 'utf-8');
+      const parsed = parseYaml(content);
+      totalValidated++;
+
+      const result = FactsFile.safeParse(parsed);
+      if (!result.success) {
+        allErrors.push({
+          file: filepath,
+          id: basename(file, '.yaml'),
+          type: 'FactsFile',
+          issues: formatZodErrors(result.error),
+        });
+      } else {
+        totalFacts += Object.keys(result.data.facts).length;
+        // Cross-reference: check that metric values point to valid metric IDs
+        if (validMetricIds) {
+          for (const [factId, fact] of Object.entries(result.data.facts)) {
+            if (fact.metric && !validMetricIds.has(fact.metric)) {
+              allErrors.push({
+                file: filepath,
+                id: `${result.data.entity}.${factId}`,
+                type: 'Fact',
+                issues: [`Unknown metric "${fact.metric}" — not defined in data/fact-metrics.yaml`],
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+  if (!ciMode) console.log(`  ${totalFacts} facts across ${existsSync(factsDir) ? readdirSync(factsDir).filter(f => f.endsWith('.yaml')).length : 0} files`);
 
   // Output Results
   console.log();

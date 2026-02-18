@@ -1,103 +1,132 @@
 entity: anthropic
 facts:
   valuation:
+    metric: valuation
     value: "$380 billion"
     numeric: 380000000000
     asOf: "2026-02"
     note: "Series G post-money valuation, February 2026"
 
   valuation-nov-2025:
+    metric: valuation
     value: "$350 billion"
     numeric: 350000000000
     asOf: "2025-11"
     note: "Valuation at Microsoft/Nvidia commitment, November 2025"
 
   revenue-run-rate:
+    metric: revenue
     value: "$14 billion"
     numeric: 14000000000
     asOf: "2026-02"
     note: "Current run-rate revenue as of Series G announcement"
 
   revenue-arr-2025:
+    metric: revenue
     value: "$9 billion"
     numeric: 9000000000
     asOf: "2025-12"
     note: "Annualized run rate at end of 2025"
 
   revenue-early-2025:
+    metric: revenue
     value: "$1 billion"
     numeric: 1000000000
     asOf: "2025-01"
     note: "Approximate ARR at start of 2025"
 
   revenue-mid-2025:
+    metric: revenue
     value: "$4 billion"
     numeric: 4000000000
     asOf: "2025-07"
     note: "ARR as of mid-2025, per Series F announcement"
 
   revenue-2026-guidance:
+    metric: revenue-guidance
     value: "$20-26 billion"
+    low: 20000000000
+    high: 26000000000
     asOf: "2026-01"
 
   series-g-raise:
+    metric: funding-round
     value: "$30 billion"
     numeric: 30000000000
     asOf: "2026-02"
     note: "Series G round size, February 2026"
 
   total-funding:
+    metric: total-funding
     value: "$67 billion+"
     numeric: 67000000000
     asOf: "2026-02"
     note: "Total funding raised including $30B Series G"
 
   gross-margin:
+    metric: gross-margin
     value: "40%"
     asOf: "2025"
 
   enterprise-retention-rate:
+    metric: retention-rate
     value: "88%"
     asOf: "2025"
 
   industry-avg-retention:
+    metric: retention-rate
     value: "76%"
     asOf: "2025"
+    note: "Industry average for comparison"
 
   business-customers:
+    metric: customer-count
     value: "300,000+"
     asOf: "2025"
 
   customer-concentration:
+    metric: customer-concentration
     value: "25%"
     asOf: "2025"
     note: "Revenue share from top customers (Cursor, GitHub Copilot)"
 
   interpretability-team-size:
+    metric: safety-headcount
     value: "40-60"
+    low: 40
+    high: 60
     asOf: "2025"
 
   safety-researchers:
+    metric: safety-headcount
     value: "200-330"
+    low: 200
+    high: 330
     asOf: "2025"
 
   safety-pct-of-technical:
+    metric: safety-staffing-ratio
     value: "20-30%"
+    low: 0.2
+    high: 0.3
     asOf: "2025"
 
   claude-code-run-rate:
+    metric: product-revenue
     value: "$2.5 billion"
     numeric: 2500000000
     asOf: "2026-02"
     note: "Claude Code product run-rate revenue"
 
   net-cash-burn-2025:
+    metric: cash-burn
     value: "$2.8 billion"
     numeric: 2800000000
     asOf: "2025"
     note: "Projected net cash burn for 2025"
 
   infrastructure-investment:
+    metric: infrastructure-investment
     value: "$50 billion"
     numeric: 50000000000
     asOf: "2026"

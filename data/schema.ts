@@ -941,10 +941,15 @@ export type SubgraphSpec = z.infer<typeof SubgraphSpec>;
 export const Fact = z.object({
   value: z.string().optional(),                // Display value (auto-generated for computed facts)
   numeric: z.number().optional(),              // Machine-readable numeric value
+  // Range support — for facts that are estimates or ranges (e.g., "$20-26 billion")
+  low: z.number().optional(),                  // Lower bound of range
+  high: z.number().optional(),                 // Upper bound of range
   asOf: z.string().optional(),
   source: z.string().optional(),
   note: z.string().optional(),
   noCompute: z.boolean().optional(),           // If true, numeric value cannot be referenced in compute expressions
+  // Metric grouping — links this fact to a reusable metric definition
+  metric: z.string().optional(),               // Metric ID from data/fact-metrics.yaml (e.g., "valuation", "revenue")
   // Computed fact fields
   compute: z.string().optional(),              // Expression: "{anthropic.valuation} * {jaan-tallinn.anthropic-ownership-low}"
   format: z.string().optional(),               // Display format: "$%.1f billion"
@@ -961,6 +966,23 @@ export const FactsFile = z.object({
   facts: z.record(z.string(), Fact),
 });
 export type FactsFile = z.infer<typeof FactsFile>;
+
+/**
+ * A metric definition — a reusable "measurement type" that groups related facts.
+ * Facts with the same `metric` field across entities and time form a timeseries.
+ */
+export const FactMetric = z.object({
+  label: z.string(),                           // Display name (e.g., "Valuation")
+  unit: z.enum(['USD', 'percent', 'count', 'score', 'ratio', 'years', 'other']),
+  category: z.string(),                        // Grouping category (e.g., "financial", "safety")
+  description: z.string().optional(),          // What this metric measures
+});
+export type FactMetric = z.infer<typeof FactMetric>;
+
+export const FactMetricsFile = z.object({
+  metrics: z.record(z.string(), FactMetric),
+});
+export type FactMetricsFile = z.infer<typeof FactMetricsFile>;
 
 // =============================================================================
 // MASTER GRAPH
