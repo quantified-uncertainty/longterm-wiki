@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { CONTENT_DIR } from './content-types.mjs';
+import { extractDescriptionFromIntro } from './text-utils.mjs';
 
 /**
  * Check if an MDX file needs regeneration based on entity content
@@ -46,16 +47,9 @@ function generateMdxStub(entity) {
   // Include description from entity content intro if available
   let descriptionLine = '';
   if (entity.content?.intro) {
-    // Strip JSX/HTML tags and markdown links, then extract first sentence
-    const text = entity.content.intro
-      .replace(/<[^>]+>/g, '')  // Strip JSX/HTML tags
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Strip markdown links
-      .replace(/\*\*([^*]+)\*\*/g, '$1') // Strip bold markers
-      .trim();
-    const firstSentence = text.split(/\.\s|\n\n/)[0]?.replace(/"/g, '\\"').trim();
-    if (firstSentence && firstSentence.length > 10) {
-      const desc = firstSentence.length > 157 ? firstSentence.slice(0, 157) + '...' : firstSentence + '.';
-      descriptionLine = `\ndescription: "${desc}"`;
+    const desc = extractDescriptionFromIntro(entity.content.intro);
+    if (desc) {
+      descriptionLine = `\ndescription: "${desc.replace(/"/g, '\\"')}"`;
     }
   }
 

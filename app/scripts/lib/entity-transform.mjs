@@ -13,6 +13,7 @@
  */
 
 import { OLD_TYPE_MAP, OLD_LAB_TYPE_TO_ORG_TYPE } from './entity-type-mappings.mjs';
+import { extractDescriptionFromIntro } from './text-utils.mjs';
 
 // ============================================================================
 // RISK CATEGORIES
@@ -277,17 +278,7 @@ export function transformEntities(rawEntities, pages, experts, organizations) {
       if (page?.description) {
         entity.description = page.description;
       } else if (entity.content?.intro) {
-        // Extract first sentence from YAML content intro (for entities without pages)
-        const text = entity.content.intro
-          .replace(/<[^>]+>/g, '') // Strip JSX/HTML tags
-          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Strip markdown links
-          .trim();
-        const firstSentence = text.split(/\.\s|\n\n/)[0]?.trim();
-        if (firstSentence && firstSentence.length > 10) {
-          entity.description = firstSentence.length > 157
-            ? firstSentence.slice(0, 157) + '...'
-            : firstSentence + (firstSentence.endsWith('.') ? '' : '.');
-        }
+        entity.description = extractDescriptionFromIntro(entity.content.intro);
       }
     }
   }
