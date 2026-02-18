@@ -59,7 +59,7 @@ const frontmatterSchema = z.object({
     uncertainty: z.number().min(0).max(100).optional(),
   }).optional(),
   // metrics (wordCount, citations, tables, diagrams) are computed at build time
-  // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
+  // by crux/lib/metrics-extractor.ts — not stored in frontmatter.
   balanceFlags: z.array(z.string()).optional(),
   maturity: z.string().optional(),
   fullWidth: z.boolean().optional(),

@@ -187,7 +187,7 @@ Respond with JSON:
     }
 
     // Metrics (wordCount, citations, tables, diagrams) are computed at build time
-    // by app/scripts/lib/metrics-extractor.mjs — not stored in frontmatter.
+    // by crux/lib/metrics-extractor.ts — not stored in frontmatter.
     delete frontmatter.metrics;
 
     // Write updated file
