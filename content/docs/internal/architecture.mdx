@@ -40,7 +40,7 @@ flowchart TB
         BUILDDATA["build-data.mjs\nCompilation pipeline"]
         REDUNDANCY["redundancy.mjs\nSimilarity detection"]
         SEARCH["search.mjs\nMiniSearch index"]
-        METRICS["metrics-extractor.mjs\nStructural scoring"]
+        METRICS["metrics-extractor.ts\nStructural scoring"]
         FACTS["computed-facts.mjs\nExpression evaluator"]
     end
 
@@ -175,7 +175,7 @@ By doing this at build time, the runtime never encounters legacy type names. Unk
 
 ### 7. Format-Aware Quality Metrics
 
-**Location**: `app/scripts/lib/metrics-extractor.mjs`
+**Location**: `crux/lib/metrics-extractor.ts`
 
 Content quality is measured structurally, but the scoring adapts to the content format:
 - **Articles** are scored on word count, section structure, presence of overview/conclusion

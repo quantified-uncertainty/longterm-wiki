@@ -1,6 +1,6 @@
 ## 2026-02-18 | claude/resolve-issue-244-vnx6i | Remove duplicate metrics-extractor.mjs
 
-**What was done:** Deleted the now-unused `app/scripts/lib/metrics-extractor.mjs` file (372 lines) since the build script had already been migrated to import directly from `crux/lib/metrics-extractor.ts`. Updated two stale inline comments in `crux/authoring/creator/grading.ts` and `crux/lib/rules/frontmatter-schema.ts` that still referenced the old `.mjs` path.
+**What was done:** Deleted the now-unused `app/scripts/lib/metrics-extractor.mjs` file (372 lines) since the build script had already been migrated to import directly from `crux/lib/metrics-extractor.ts`. Updated stale inline comments in `crux/authoring/creator/grading.ts` and `crux/lib/rules/frontmatter-schema.ts`, stale references in `content/docs/internal/architecture.mdx` (Mermaid diagram + prose), and marked item 2 in `CODE-REVIEW.md` as resolved.
 
 **Model:** sonnet-4
 
