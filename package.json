@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter longterm-next dev",
     "build": "pnpm --filter longterm-next build",
-    "test": "pnpm --filter longterm-next test && vitest run --config crux/vitest.config.ts",
+    "test": "pnpm --filter longterm-next test && pnpm --filter discord-bot test && vitest run --config crux/vitest.config.ts",
     "test:crux": "vitest run --config crux/vitest.config.ts",
     "validate": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs validate",
     "crux": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs",
