@@ -35,6 +35,12 @@ pnpm crux edit-log view <id>     # View edit history for a page
 pnpm crux maintain               # Run maintenance sweep (PRs, issues, cruft)
 pnpm crux maintain status        # Check when maintenance last ran
 
+# Session checklists
+pnpm crux session init "Task" --type=X    # Generate typed checklist
+pnpm crux session init --issue=N          # Auto-detect type from issue labels
+pnpm crux session status                  # Show checklist progress
+pnpm crux session complete                # Validate all items checked
+
 # GitHub issue tracking
 pnpm crux issues                 # List open issues ranked by priority
 pnpm crux issues next            # Show next highest-priority issue to work on
