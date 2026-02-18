@@ -56,6 +56,12 @@ export default function RootLayout({
                 Explore
               </Link>
               <Link
+                href="/wiki/E755"
+                className="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+              >
+                About
+              </Link>
+              <Link
                 href="/wiki/E779"
                 className="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
