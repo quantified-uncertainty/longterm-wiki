@@ -21,7 +21,8 @@ import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createClient, MODELS, parseJsonResponse, callClaude } from '../lib/anthropic.ts';
+import { createClient, MODELS, callClaude } from '../lib/anthropic.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { getColors } from '../lib/output.ts';
 import { evalCalcExpr } from '../lib/calc-evaluator.ts';
 
@@ -323,21 +324,25 @@ For each hardcoded derived pattern provided:
 ## CRITICAL: originalText must be narrow and JSX-free
 
 The \`originalText\` field is the exact substring that will be removed and replaced with the \`<Calc>\` tag. Rules:
-- It MUST be the **match string itself** (as given in "Match: ..."), possibly plus a few plain-text characters for disambiguation
+- It MUST be the **match string itself** (exactly as given in "Match: ...")
 - It MUST NOT contain any JSX/MDX tags (\`<F\`, \`<Calc\`, \`<EntityLink\`, etc.)
+- It MUST NOT contain any markdown table pipe characters (\`|\`) — EVER, under any circumstances
 - It MUST NOT span multiple words beyond the immediate number phrase
 - It MAY add at most 20 extra characters of plain text for disambiguation (e.g. "(current)" to distinguish identical matches)
-- If multiple identical matches exist on the page, just use the exact match string — the tool replaces the first occurrence per run
+- **PREFERRED: When the match string uniquely or approximately identifies the location, use ONLY the match string itself** — never add disambiguation text unless absolutely necessary
+- If multiple identical matches exist on the page, use the exact match string — the tool replaces the first occurrence per run, and you can process the rest in subsequent runs
 - It MUST appear verbatim in the page content (character-for-character)
 - The \`suffix\` prop must be a short unit or symbol only (e.g. "x", "%", " pp", "x/yr") — NEVER include prose words
 
 Examples:
 - BAD: \`"≈39x multiple at the previous <F e=\\"anthropic\\" ...>$350B</F> valuation..."\` (JSX tags)
 - BAD: \`"OpenAI's ≈25x. The valuation itself"\` (too wide — 28 chars of extra prose)
-- BAD: \`"≈25x | [i10x]"\` (contains table pipe)
+- BAD: \`"≈25x | [i10x]"\` (contains table pipe — ABSOLUTELY FORBIDDEN)
+- BAD: \`"≈25x |"\` (contains table pipe — ABSOLUTELY FORBIDDEN even if just one char)
 - BAD: \`suffix="x multiple at the previous"\` (prose in suffix)
-- GOOD: \`"≈39x"\` (just the match)
-- GOOD: \`"≈25x (current)"\` (match + ≤20 chars disambiguation)
+- GOOD: \`"≈39x"\` (just the match — preferred)
+- GOOD: \`"≈25x"\` (just the match even if there are multiple occurrences — first one gets replaced)
+- GOOD: \`"≈25x (current)"\` (match + ≤20 chars disambiguation when needed)
 - GOOD: \`"39x multiple"\` (exact match for the detected pattern)
 
 ## <Calc> props guide
@@ -420,13 +425,11 @@ Return exactly ${patterns.length} proposals (one per pattern, in order).`;
     temperature: 0,
   });
 
-  let parsed: LlmProposalResponse;
-  try {
-    parsed = parseJsonResponse(result.text) as LlmProposalResponse;
-  } catch {
-    console.error('[calc-derive] Failed to parse LLM JSON response');
-    return [];
-  }
+  const parsed = parseJsonFromLlm<LlmProposalResponse>(
+    result.text,
+    'calc-derive',
+    () => ({ proposals: [] }),
+  );
 
   const rawProposals = parsed?.proposals || [];
 
@@ -478,14 +481,29 @@ function validateOriginalText(proposal: CalcProposal, matchedPattern: DetectedPa
 /**
  * Validate a proposed <Calc> expression against current facts.
  * Checks that the result is within 20% of the expected hardcoded value.
+ * Auto-fallbacks: if originalText fails due to table pipe or excess width,
+ * retry with just the pattern match string.
  */
 function validateProposal(
   proposal: CalcProposal,
   pattern: DetectedPattern,
   factsMap: Map<string, FactFile>,
 ): CalcProposal {
-  // Structural validation first
-  const structuralError = validateOriginalText(proposal, pattern);
+  // Structural validation — with auto-fallback to match string for recoverable errors
+  let structuralError = validateOriginalText(proposal, pattern);
+  if (structuralError) {
+    // If the issue is a table pipe or too-wide text, try falling back to the bare match string
+    const isRecoverable = /table pipe|chars wider/.test(structuralError);
+    if (isRecoverable && proposal.originalText !== pattern.match) {
+      proposal.originalText = pattern.match;
+      structuralError = validateOriginalText(proposal, pattern);
+      if (!structuralError) {
+        console.log(
+          `      [auto-fix] originalText narrowed to match string: "${pattern.match}"`,
+        );
+      }
+    }
+  }
   if (structuralError) {
     proposal.valid = false;
     proposal.validationError = structuralError;

@@ -373,6 +373,85 @@ describe('buildCalcComponent', () => {
 // Tests: ensureCalcImport
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Inline copy of validateOriginalText for testing
+// ---------------------------------------------------------------------------
+
+function validateOriginalText(proposal: { originalText: string; suffix?: string }, matchedPattern: { match: string }): string | null {
+  if (/<[A-Z]|<\/|<F |<Calc |<Entity/i.test(proposal.originalText)) {
+    return 'originalText contains JSX/MDX tags — must be plain text only';
+  }
+  const excess = proposal.originalText.length - matchedPattern.match.length;
+  if (excess > 20) {
+    return `originalText is ${excess} chars wider than the pattern match "${matchedPattern.match}" — keep it narrow`;
+  }
+  if (/\|/.test(proposal.originalText)) {
+    return 'originalText contains a table pipe character — would corrupt markdown table';
+  }
+  if (proposal.suffix && /\s\w{4,}/.test(proposal.suffix)) {
+    return `suffix "${proposal.suffix}" contains prose — must be a unit symbol only`;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Tests: validateOriginalText
+// ---------------------------------------------------------------------------
+
+describe('validateOriginalText', () => {
+  const pattern = { match: '≈25x' };
+
+  it('returns null for a valid originalText matching the pattern', () => {
+    expect(validateOriginalText({ originalText: '≈25x' }, pattern)).toBeNull();
+  });
+
+  it('returns null when disambiguation adds ≤20 chars', () => {
+    // "(current)" is 9 chars — within the 20-char budget
+    expect(validateOriginalText({ originalText: '≈25x (current)' }, pattern)).toBeNull();
+  });
+
+  it('rejects originalText containing JSX/MDX tags', () => {
+    const error = validateOriginalText(
+      { originalText: '≈25x <F e="openai" f="123">$500B</F>' },
+      pattern
+    );
+    expect(error).toMatch(/JSX\/MDX tags/);
+  });
+
+  it('rejects originalText wider than 20 chars above match length', () => {
+    // "OpenAI's ≈25x. The valuation itself" is 24 chars wider than "≈25x"
+    const error = validateOriginalText(
+      { originalText: "OpenAI's ≈25x. The valuation itself" },
+      pattern
+    );
+    expect(error).toMatch(/chars wider/);
+  });
+
+  it('rejects originalText containing a table pipe character', () => {
+    const error = validateOriginalText({ originalText: '≈25x |' }, pattern);
+    expect(error).toMatch(/table pipe/);
+  });
+
+  it('rejects originalText with a single table pipe for disambiguation', () => {
+    const error = validateOriginalText({ originalText: '≈25x |' }, pattern);
+    expect(error).toMatch(/table pipe/);
+  });
+
+  it('rejects suffix containing prose words', () => {
+    const error = validateOriginalText(
+      { originalText: '≈25x', suffix: 'x multiple at the previous' },
+      pattern
+    );
+    expect(error).toMatch(/suffix.*prose/);
+  });
+
+  it('accepts short unit suffixes', () => {
+    expect(validateOriginalText({ originalText: '≈25x', suffix: 'x' }, pattern)).toBeNull();
+    expect(validateOriginalText({ originalText: '≈25x', suffix: '%' }, pattern)).toBeNull();
+    expect(validateOriginalText({ originalText: '≈25x', suffix: ' pp' }, pattern)).toBeNull();
+  });
+});
+
 describe('ensureCalcImport', () => {
   it('does not duplicate existing Calc import from @components/facts', () => {
     const content = `---\ntitle: Test\n---\nimport {F, Calc} from '@components/facts';\n\nContent.`;
