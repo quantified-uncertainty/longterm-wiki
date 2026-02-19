@@ -27,6 +27,9 @@ export function applyGradesToFile(
   const fm = parseYaml(fmMatch[1]) || {} as Record<string, unknown>;
 
   fm.readerImportance = grades.readerImportance;
+  if (grades.tacticalValue != null) {
+    fm.tacticalValue = grades.tacticalValue;
+  }
   fm.quality = derivedQuality;
   if (grades.llmSummary) {
     fm.llmSummary = grades.llmSummary;

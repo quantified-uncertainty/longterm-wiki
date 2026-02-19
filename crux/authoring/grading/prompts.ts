@@ -4,9 +4,13 @@
  * System prompts and user templates for Steps 2 (checklist) and 3 (rating).
  */
 
+import { TACTICAL_VALUE_GUIDELINES } from '../../lib/grading-shared.ts';
+
 export const SYSTEM_PROMPT: string = `You are an expert evaluator of AI safety content for a resource aimed at **expert AI prioritization work** - helping researchers and funders identify and prioritize concrete interventions to reduce AI existential risk.
 
-Score each page on readerImportance (0-100, one decimal place). Be discriminating - use the full range.
+Score each page on readerImportance (0-100, one decimal place) and tacticalValue (0-100, integer). Be discriminating - use the full range.
+
+${TACTICAL_VALUE_GUIDELINES}
 
 Also score each page on SEVEN quality dimensions (0-10 scale, one decimal). BE EXTREMELY HARSH - a 7 is exceptional, 8+ is world-class. Most wiki content should score 3-5.
 
@@ -125,6 +129,7 @@ FULL CONTENT:
 Respond with JSON (keep reasoning SHORT - max 2-3 sentences total):
 {
   "readerImportance": <0-100, one decimal>,
+  "tacticalValue": <0-100, integer>,
   "ratings": {
     "focus": <0-10, one decimal>,
     "novelty": <0-10, one decimal>,
