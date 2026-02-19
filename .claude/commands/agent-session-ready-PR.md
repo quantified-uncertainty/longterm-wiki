@@ -19,6 +19,7 @@ For each unchecked item in the checklist:
 3. **Blocked?** Note why next to the item.
 
 Pay special attention to:
+- **Paranoid review** (`paranoid-review`): Use the Task tool to spawn a fresh subagent with the full diff (`git diff main`) and this prompt: *"You are a paranoid code reviewer with no prior context. Find every bug, DRY violation, dead code, missing export, test coverage gap, hardcoded constant, and deferred work item in this diff. Be adversarial — assume something is wrong."* Paste findings here. Fix or document every issue before checking the item off.
 - **Self-audit**: Re-run commands you claimed to run. Verify outputs match your claims.
 - **Gate check**: `pnpm crux validate gate --fix` — record the exact test count.
 

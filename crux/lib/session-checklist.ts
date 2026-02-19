@@ -68,7 +68,7 @@ const PHASE_LABELS: Record<ChecklistPhase, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Checklist Item Catalog (~29 items)
+// Checklist Item Catalog (~30 items)
 // ---------------------------------------------------------------------------
 
 export const CHECKLIST_ITEMS: ChecklistItem[] = [
@@ -196,6 +196,14 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Traced logic step by step. No off-by-one, flipped conditions, wrong variable names.',
     phase: 'review',
     applicableTypes: 'all',
+  },
+  {
+    id: 'paranoid-review',
+    label: 'Paranoid review done',
+    description:
+      'Spawn a fresh Task subagent with no prior context. Give it the git diff and this adversarial prompt: "Find every bug, DRY violation, dead code, missing export, coverage gap, hardcoded constant, and deferred work item." Review all findings. Fix or document every issue raised before checking this off.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'commands', 'refactor', 'bugfix'],
   },
   {
     id: 'shell-injection',

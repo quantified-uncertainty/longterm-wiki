@@ -119,10 +119,12 @@ describe('getItemsForType', () => {
     expect(contentItems.some(i => i.id === 'live-data-test')).toBe(false);
   });
 
-  it('content type has at least as many items as infrastructure', () => {
-    const contentItems = getItemsForType('content');
-    const infraItems = getItemsForType('infrastructure');
-    expect(contentItems.length).toBeGreaterThanOrEqual(infraItems.length);
+  it('paranoid-review is included for infrastructure, commands, refactor, bugfix but not content', () => {
+    const typesWithParanoid = ['infrastructure', 'commands', 'refactor', 'bugfix'] as const;
+    for (const type of typesWithParanoid) {
+      expect(getItemsForType(type).some(i => i.id === 'paranoid-review')).toBe(true);
+    }
+    expect(getItemsForType('content').some(i => i.id === 'paranoid-review')).toBe(false);
   });
 });
 
