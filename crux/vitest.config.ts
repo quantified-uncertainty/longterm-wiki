@@ -12,6 +12,7 @@ export default defineConfig({
       'commands/**/*.test.ts',
       'facts/**/*.test.ts',
       'entity/**/*.test.ts',
+      'citations/**/*.test.ts',
     ],
     // creator.test.ts imports source-fetching.ts which eagerly loads
     // better-sqlite3 native bindings via knowledge-db.ts at module scope.

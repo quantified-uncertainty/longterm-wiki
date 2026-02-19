@@ -4,7 +4,7 @@
  * Given a wiki claim and the full text of a source, uses an LLM to identify
  * the specific passage in the source that supports the claim.
  *
- * Uses OpenRouter (Sonnet via OpenRouter or Gemini Flash) for cost efficiency.
+ * Uses OpenRouter (Gemini Flash) for cost efficiency.
  */
 
 import { getApiKey } from './api-keys.ts';
@@ -12,8 +12,8 @@ import { getApiKey } from './api-keys.ts';
 const OPENROUTER_API_KEY = getApiKey('OPENROUTER_API_KEY');
 const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Default to a cheap but capable model
-const DEFAULT_MODEL = 'google/gemini-2.0-flash-001';
+/** Default LLM model for citation operations. Exported so other modules can reference it. */
+export const DEFAULT_CITATION_MODEL = 'google/gemini-2.0-flash-001';
 const MAX_SOURCE_CHARS = 50_000;
 
 export interface QuoteExtractionResult {
@@ -24,6 +24,10 @@ export interface QuoteExtractionResult {
 
 export type AccuracyVerdict = 'accurate' | 'minor_issues' | 'inaccurate' | 'unsupported' | 'not_verifiable';
 
+export const VALID_ACCURACY_VERDICTS: readonly AccuracyVerdict[] = [
+  'accurate', 'minor_issues', 'inaccurate', 'unsupported', 'not_verifiable',
+] as const;
+
 export interface AccuracyCheckResult {
   verdict: AccuracyVerdict;
   score: number;
@@ -32,6 +36,84 @@ export interface AccuracyCheckResult {
   /** How hard it was to verify — describes what level of source access is needed */
   verificationDifficulty: string;
 }
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+/** Truncate source text to MAX_SOURCE_CHARS, adding a truncation marker. */
+export function truncateSource(text: string): string {
+  return text.length > MAX_SOURCE_CHARS
+    ? text.slice(0, MAX_SOURCE_CHARS) + '\n\n[... truncated ...]'
+    : text;
+}
+
+/** Strip markdown code fences from LLM JSON responses. */
+export function stripCodeFences(content: string): string {
+  return content
+    .replace(/^```json\s*/i, '')
+    .replace(/```\s*$/, '')
+    .trim();
+}
+
+interface OpenRouterChatResponse {
+  choices: Array<{ message: { content: string } }>;
+  error?: { message: string };
+}
+
+/**
+ * Call OpenRouter chat completions API. Shared by both quote extraction and
+ * accuracy checking to avoid duplicating request/error handling logic.
+ */
+async function callOpenRouter(
+  systemPrompt: string,
+  userPrompt: string,
+  opts: { model?: string; maxTokens?: number; title?: string } = {},
+): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY not set — required for citation operations');
+  }
+
+  const model = opts.model || DEFAULT_CITATION_MODEL;
+
+  const response = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://www.longtermwiki.com',
+      'X-Title': opts.title || 'LongtermWiki Citations',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      max_tokens: opts.maxTokens || 2000,
+      temperature: 0,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(
+      `OpenRouter API error (${response.status}): ${errorBody.slice(0, 200)}`,
+    );
+  }
+
+  const data = (await response.json()) as OpenRouterChatResponse;
+
+  if (data.error) {
+    throw new Error(`OpenRouter error: ${data.error.message}`);
+  }
+
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 /**
  * Extract the specific supporting quote from a source for a given wiki claim.
@@ -46,17 +128,7 @@ export async function extractSupportingQuote(
   sourceText: string,
   opts?: { model?: string },
 ): Promise<QuoteExtractionResult> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY not set — required for quote extraction');
-  }
-
-  // Truncate source text if too long
-  const truncatedSource =
-    sourceText.length > MAX_SOURCE_CHARS
-      ? sourceText.slice(0, MAX_SOURCE_CHARS) + '\n\n[... truncated ...]'
-      : sourceText;
-
-  const model = opts?.model || DEFAULT_MODEL;
+  const truncatedSource = truncateSource(sourceText);
 
   const systemPrompt = `You are a citation verification assistant. Given a claim from a wiki article and the full text of a cited source, find the specific passage in the source that most directly supports the claim.
 
@@ -78,48 +150,18 @@ ${truncatedSource}
 
 Find the specific passage in the source that supports this claim. Return JSON only.`;
 
-  const response = await fetch(BASE_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://www.longtermwiki.com',
-      'X-Title': 'LongtermWiki Citation Quotes',
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      max_tokens: 1000,
-      temperature: 0,
-    }),
+  const content = await callOpenRouter(systemPrompt, userPrompt, {
+    model: opts?.model,
+    maxTokens: 1000,
+    title: 'LongtermWiki Citation Quotes',
   });
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(
-      `OpenRouter API error (${response.status}): ${errorBody.slice(0, 200)}`,
-    );
-  }
+  return parseQuoteExtractionResponse(content);
+}
 
-  const data = (await response.json()) as {
-    choices: Array<{ message: { content: string } }>;
-    error?: { message: string };
-  };
-
-  if (data.error) {
-    throw new Error(`OpenRouter error: ${data.error.message}`);
-  }
-
-  const content = data.choices?.[0]?.message?.content || '';
-
-  // Parse the JSON response — handle markdown code blocks
-  const jsonStr = content
-    .replace(/^```json\s*/i, '')
-    .replace(/```\s*$/, '')
-    .trim();
+/** Parse the LLM response for quote extraction. Exported for testing. */
+export function parseQuoteExtractionResponse(content: string): QuoteExtractionResult {
+  const jsonStr = stripCodeFences(content);
 
   try {
     const parsed = JSON.parse(jsonStr) as {
@@ -136,7 +178,6 @@ Find the specific passage in the source that supports this claim. Return JSON on
           : 0,
     };
   } catch {
-    // If JSON parsing fails, try to extract quote from the response
     return {
       quote: '',
       location: 'unknown',
@@ -162,18 +203,8 @@ export async function checkClaimAccuracy(
   sourceText: string,
   opts?: { model?: string; sourceTitle?: string },
 ): Promise<AccuracyCheckResult> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY not set — required for accuracy checking');
-  }
-
-  const model = opts?.model || DEFAULT_MODEL;
+  const truncatedSource = truncateSource(sourceText);
   const sourceContext = opts?.sourceTitle ? `\nSource title: "${opts.sourceTitle}"` : '';
-
-  // Truncate source if very long
-  const truncatedSource =
-    sourceText.length > MAX_SOURCE_CHARS
-      ? sourceText.slice(0, MAX_SOURCE_CHARS) + '\n\n[... truncated ...]'
-      : sourceText;
 
   const systemPrompt = `You are a fact-checking assistant. Given a claim from a wiki article and the full text of the cited source, determine whether the wiki claim ACCURATELY represents what the source says.
 
@@ -213,46 +244,18 @@ ${truncatedSource}
 
 Search the entire source for all passages relevant to this claim, then check every factual detail. Return JSON only.`;
 
-  const response = await fetch(BASE_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://www.longtermwiki.com',
-      'X-Title': 'LongtermWiki Accuracy Check',
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      max_tokens: 2000,
-      temperature: 0,
-    }),
+  const content = await callOpenRouter(systemPrompt, userPrompt, {
+    model: opts?.model,
+    maxTokens: 2000,
+    title: 'LongtermWiki Accuracy Check',
   });
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(
-      `OpenRouter API error (${response.status}): ${errorBody.slice(0, 200)}`,
-    );
-  }
+  return parseAccuracyCheckResponse(content);
+}
 
-  const data = (await response.json()) as {
-    choices: Array<{ message: { content: string } }>;
-    error?: { message: string };
-  };
-
-  if (data.error) {
-    throw new Error(`OpenRouter error: ${data.error.message}`);
-  }
-
-  const content = data.choices?.[0]?.message?.content || '';
-  const jsonStr = content
-    .replace(/^```json\s*/i, '')
-    .replace(/```\s*$/, '')
-    .trim();
+/** Parse the LLM response for accuracy checking. Exported for testing. */
+export function parseAccuracyCheckResponse(content: string): AccuracyCheckResult {
+  const jsonStr = stripCodeFences(content);
 
   try {
     const parsed = JSON.parse(jsonStr) as {
@@ -263,8 +266,7 @@ Search the entire source for all passages relevant to this claim, then check eve
       verification_difficulty?: string;
     };
 
-    const validVerdicts: AccuracyVerdict[] = ['accurate', 'minor_issues', 'inaccurate', 'unsupported', 'not_verifiable'];
-    const verdict = validVerdicts.includes(parsed.verdict as AccuracyVerdict)
+    const verdict = VALID_ACCURACY_VERDICTS.includes(parsed.verdict as AccuracyVerdict)
       ? (parsed.verdict as AccuracyVerdict)
       : 'not_verifiable';
 

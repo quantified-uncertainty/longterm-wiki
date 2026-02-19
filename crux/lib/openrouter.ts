@@ -27,7 +27,7 @@ export const MODELS: Record<string, string> = {
   PERPLEXITY_SONAR_PRO: 'perplexity/sonar-pro',
 
   // Cheap general purpose
-  GEMINI_FLASH: 'google/gemini-flash-1.5',
+  GEMINI_FLASH: 'google/gemini-2.0-flash-001',
   DEEPSEEK_CHAT: 'deepseek/deepseek-chat',
 
   // Quality general purpose
