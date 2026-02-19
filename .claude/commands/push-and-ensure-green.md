@@ -41,13 +41,40 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
      curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
        "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls?head=quantified-uncertainty:$BRANCH&state=open"
      ```
-   - If no PR exists (empty array), create one:
+   - If no PR exists (empty array), create one. **IMPORTANT: always use a heredoc for PR_BODY** — never use `\n` escape sequences inside a `"..."` string, as bash won't expand them and GitHub will show literal `\n` in the rendered comment:
      ```bash
      PR_TITLE="<descriptive title>"
-     PR_BODY="<summary>"
-     curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+     PR_BODY="$(cat <<'BODY'
+     ## Summary
+
+     - <key change 1>
+     - <key change 2>
+
+     ## Test plan
+     - [ ] <test step>
+
+     https://claude.ai/code/session_019e8FwRtmSEkPFfqZGuVEKi
+     BODY
+     )"
+     PR_RESPONSE=$(curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
        "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls" \
-       -d "$(jq -n --arg t "$PR_TITLE" --arg h "$BRANCH" --arg b "$PR_BODY" '{title: $t, head: $h, base: "main", body: $b}')"
+       -d "$(jq -n --arg t "$PR_TITLE" --arg h "$BRANCH" --arg b "$PR_BODY" '{title: $t, head: $h, base: "main", body: $b}')")
+     echo "$PR_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print('PR created:', d.get('html_url','(no url)'))"
+     # Validate: if the body contains literal \n the template was filled in wrong — auto-fix it
+     PR_NUM=$(echo "$PR_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('number',''))" 2>/dev/null)
+     if [ -n "$PR_NUM" ]; then
+       FETCHED_BODY=$(curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+         "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls/$PR_NUM" \
+         | python3 -c "import sys,json; print(json.load(sys.stdin).get('body',''))")
+       if echo "$FETCHED_BODY" | grep -qF '\n'; then
+         echo "⚠️  PR body contains literal \\n — auto-fixing..."
+         FIXED_BODY=$(printf '%s' "$FETCHED_BODY" | sed 's/\\n/\n/g')
+         curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+           "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls/$PR_NUM" \
+           -d "$(jq -n --arg b "$FIXED_BODY" '{body: $b}')" > /dev/null
+         echo "✓ PR body fixed."
+       fi
+     fi
      ```
    - If a PR exists, note its number and move on.
 
