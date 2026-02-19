@@ -85,4 +85,29 @@ describe('computeAccuracyRisk', () => {
     // Just over: 51/100 = 0.51 (>0.5)
     expect(computeAccuracyRisk(100, 51).factor).toBe('majority-inaccurate');
   });
+
+  // --- Defensive edge cases ---
+
+  it('returns no risk for negative checked count', () => {
+    expect(computeAccuracyRisk(-1, 0)).toEqual({ score: 0, factor: null });
+    expect(computeAccuracyRisk(-5, 3)).toEqual({ score: 0, factor: null });
+  });
+
+  it('returns no risk for negative inaccurate count', () => {
+    expect(computeAccuracyRisk(10, -1)).toEqual({ score: 0, factor: null });
+    expect(computeAccuracyRisk(5, -3)).toEqual({ score: 0, factor: null });
+  });
+
+  it('clamps inaccurate to checked when inaccurate > checked (impossible state)', () => {
+    // 10 inaccurate out of 5 checked is impossible — should clamp to 5/5 = 100%
+    const result = computeAccuracyRisk(5, 10);
+    expect(result.score).toBe(20);
+    expect(result.factor).toBe('majority-inaccurate');
+  });
+
+  it('handles NaN inputs safely', () => {
+    expect(computeAccuracyRisk(NaN, 0)).toEqual({ score: 0, factor: null });
+    expect(computeAccuracyRisk(10, NaN)).toEqual({ score: 0, factor: null });
+    expect(computeAccuracyRisk(NaN, NaN)).toEqual({ score: 0, factor: null });
+  });
 });

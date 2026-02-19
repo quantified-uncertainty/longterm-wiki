@@ -74,16 +74,24 @@ const ENTITY_TYPE_RISK: Record<string, number> = {
 /**
  * Compute the accuracy-based risk contribution.
  * Exported for unit testing.
+ *
+ * Thresholds (from issue #323):
+ *   >50% inaccurate/unsupported → +20 points
+ *   >30% inaccurate/unsupported → +10 points
+ *   any inaccurate              → +5 points
  */
 export function computeAccuracyRisk(
   checked: number,
   inaccurate: number,
 ): { score: number; factor: string | null } {
-  if (checked === 0) return { score: 0, factor: null };
-  const pct = inaccurate / checked;
+  if (!Number.isFinite(checked) || !Number.isFinite(inaccurate) ||
+      checked <= 0 || inaccurate < 0) return { score: 0, factor: null };
+  // Clamp to avoid impossible percentages from bad data
+  const clampedInaccurate = Math.min(inaccurate, checked);
+  const pct = clampedInaccurate / checked;
   if (pct > 0.5) return { score: 20, factor: 'majority-inaccurate' };
   if (pct > 0.3) return { score: 10, factor: 'many-inaccurate' };
-  if (inaccurate > 0) return { score: 5, factor: 'some-inaccurate' };
+  if (clampedInaccurate > 0) return { score: 5, factor: 'some-inaccurate' };
   return { score: 0, factor: null };
 }
 
