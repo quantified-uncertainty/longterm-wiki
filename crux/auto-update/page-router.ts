@@ -194,6 +194,77 @@ const COST_MAP: Record<string, number> = {
   premium: 10,
 };
 
+// ── Routing Helpers (exported for testing) ───────────────────────────────────
+
+const TIER_RANK = { polish: 1, standard: 2, deep: 3 } as const;
+
+/**
+ * Deduplicate page updates by pageId.
+ * For duplicates: merge relevantNews arrays and take the highest tier.
+ */
+export function deduplicatePageUpdates(updates: PageUpdate[]): PageUpdate[] {
+  const seen = new Map<string, PageUpdate>();
+
+  for (const update of updates) {
+    const existing = seen.get(update.pageId);
+    if (existing) {
+      existing.relevantNews.push(...update.relevantNews);
+      if ((TIER_RANK[update.suggestedTier] ?? 0) > (TIER_RANK[existing.suggestedTier] ?? 0)) {
+        existing.suggestedTier = update.suggestedTier;
+      }
+      if (update.directions && !existing.directions.includes(update.directions)) {
+        existing.directions += '\n' + update.directions;
+      }
+    } else {
+      seen.set(update.pageId, { ...update, relevantNews: [...update.relevantNews] });
+    }
+  }
+
+  return [...seen.values()];
+}
+
+/**
+ * Apply page count and budget limits to a sorted list of updates.
+ *
+ * Budget floor: when a page's assigned tier exceeds the remaining budget,
+ * downgrade to 'polish' instead of skipping entirely — a polish-tier update
+ * with relevant context is better than no update at all.
+ */
+export function applyBudgetAndPageLimits(
+  updates: PageUpdate[],
+  maxPages: number,
+  maxBudget: number,
+): { finalUpdates: PageUpdate[]; skippedReasons: Array<{ item: string; reason: string }> } {
+  const finalUpdates: PageUpdate[] = [];
+  const skippedReasons: Array<{ item: string; reason: string }> = [];
+  let budgetRemaining = maxBudget;
+
+  for (const update of updates) {
+    if (finalUpdates.length >= maxPages) {
+      skippedReasons.push({ item: update.pageTitle, reason: 'Exceeded page limit' });
+      continue;
+    }
+
+    const cost = COST_MAP[update.suggestedTier] ?? 6.5;
+    if (cost > budgetRemaining) {
+      // Try downgrading to polish before giving up
+      const polishCost = COST_MAP.polish;
+      if (update.suggestedTier !== 'polish' && polishCost <= budgetRemaining) {
+        budgetRemaining -= polishCost;
+        finalUpdates.push({ ...update, suggestedTier: 'polish' });
+      } else {
+        skippedReasons.push({ item: update.pageTitle, reason: 'Exceeded budget' });
+      }
+      continue;
+    }
+
+    budgetRemaining -= cost;
+    finalUpdates.push(update);
+  }
+
+  return { finalUpdates, skippedReasons };
+}
+
 // ── Main Export ──────────────────────────────────────────────────────────────
 
 export interface RoutingOptions {
@@ -268,8 +339,7 @@ export async function routeDigest(
         summary: i.summary.slice(0, 200),
       })));
       // Upgrade tier if LLM suggests higher
-      const tierRank = { polish: 1, standard: 2, deep: 3 };
-      if (tierRank[update.suggestedTier] > tierRank[existing.suggestedTier]) {
+      if ((TIER_RANK[update.suggestedTier] ?? 0) > (TIER_RANK[existing.suggestedTier] ?? 0)) {
         existing.suggestedTier = update.suggestedTier;
       }
       existing.directions += '\n' + update.directions;
@@ -312,24 +382,16 @@ export async function routeDigest(
       return (pageB?.readerImportance || 0) - (pageA?.readerImportance || 0);
     });
 
-  // Apply budget + count limits
-  let budgetRemaining = maxBudget;
-  const finalUpdates: PageUpdate[] = [];
-  const skippedReasons: Array<{ item: string; reason: string }> = [];
+  // Deduplicate by pageId before applying limits (defensive: entity matching
+  // across source batches or LLM routing can occasionally produce duplicates).
+  const deduplicatedUpdates = deduplicatePageUpdates(allUpdates);
 
-  for (const update of allUpdates) {
-    if (finalUpdates.length >= maxPages) {
-      skippedReasons.push({ item: update.pageTitle, reason: 'Exceeded page limit' });
-      continue;
-    }
-    const cost = COST_MAP[update.suggestedTier] || 6.5;
-    if (cost > budgetRemaining) {
-      skippedReasons.push({ item: update.pageTitle, reason: 'Exceeded budget' });
-      continue;
-    }
-    budgetRemaining -= cost;
-    finalUpdates.push(update);
-  }
+  // Apply budget + count limits (with polish-tier downgrade as budget floor).
+  const { finalUpdates, skippedReasons } = applyBudgetAndPageLimits(
+    deduplicatedUpdates,
+    maxPages,
+    maxBudget,
+  );
 
   // Add skipped items from LLM
   for (const skip of llmResults.skipped) {
