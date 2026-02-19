@@ -1,0 +1,62 @@
+date: 2026-02-19
+branch: claude/add-crux-issue-commands-qaiUS
+title: "Consolidate duplicated entityDisplayNames into shared module"
+issue: 313
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/330
+model: claude-opus-4-6
+duration: ~15min
+cost: ~$2.00
+
+summary: |
+  Extracted the duplicated `entityDisplayNames` map (entity ID → human-readable
+  display names for content matching) from `crux/lib/fact-lookup.ts` and
+  `crux/facts/calc-derive.ts` into a new shared module `crux/lib/entity-names.ts`.
+  Both consumers now import from the single source of truth. Minor improvement:
+  `worldcoin` is now matched in `fact-lookup.ts` (was previously only in
+  `calc-derive.ts`). No behavioral regressions — the old lowercase duplicate
+  entries were redundant since both call sites use case-insensitive matching.
+
+pages: []
+
+changes:
+  - crux/lib/entity-names.ts: "New file — canonical entityDisplayNames map with 5 entries"
+  - crux/lib/fact-lookup.ts: "Removed inline map, imports from shared module"
+  - crux/facts/calc-derive.ts: "Removed inline map, imports from shared module"
+
+decisions:
+  - "Used superset of both maps (5 entries including worldcoin) as the canonical version"
+  - "Kept lowercase duplicates out since both consumers do case-insensitive matching"
+  - "Did not add a helper function for the || [entity] fallback pattern — 1-liner in 2 places doesn't warrant abstraction"
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-19T16:10:24.162Z"
+  total: 30
+  completed: 23
+  na: 5
+  skipped: 2
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - no-hardcoded
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - backward-compatible
+    - multi-environment
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - no-merge-conflicts
+    - check-recent-merges
+    - crux-typescript
