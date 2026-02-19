@@ -35,6 +35,7 @@ const frontmatterSchema = z.object({
   quality: z.number().min(0).max(100).optional(),
   readerImportance: z.number().min(0).max(100).optional(),
   researchImportance: z.number().min(0).max(100).optional(),
+  tacticalValue: z.number().min(0).max(100).optional(),
   tractability: z.number().min(0).max(100).optional(),
   neglectedness: z.number().min(0).max(100).optional(),
   uncertainty: z.number().min(0).max(100).optional(),

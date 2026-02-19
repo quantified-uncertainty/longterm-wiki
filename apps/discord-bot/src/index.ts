@@ -19,6 +19,14 @@ if (!process.env.ANTHROPIC_API_KEY) {
   process.exit(1);
 }
 
+const RATE_LIMIT_MS = 30_000; // 30 second per-user cooldown
+const MAX_CONCURRENT_REQUESTS = 3; // global concurrency cap
+
+// Map of userId -> last request timestamp
+const userLastRequest = new Map<string, number>();
+// Count of currently active requests
+let activeRequests = 0;
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -49,9 +57,35 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   }
 
+  // Per-user rate limiting: enforce 30-second cooldown
+  const now = Date.now();
+  const lastRequest = userLastRequest.get(message.author.id);
+  if (lastRequest !== undefined) {
+    const elapsed = now - lastRequest;
+    if (elapsed < RATE_LIMIT_MS) {
+      const remaining = Math.ceil((RATE_LIMIT_MS - elapsed) / 1000);
+      await message.reply(
+        `Please wait ${remaining} more second${remaining === 1 ? "" : "s"} before asking another question.`
+      );
+      return;
+    }
+  }
+
+  // Global concurrency cap
+  if (activeRequests >= MAX_CONCURRENT_REQUESTS) {
+    await message.reply(
+      "The bot is currently busy handling other requests. Please try again in a moment."
+    );
+    return;
+  }
+
   console.log(`\n${"=".repeat(60)}`);
   console.log(`Question from ${message.author.tag}: ${question}`);
   console.log("=".repeat(60));
+
+  // Record this user's request time and increment active count
+  userLastRequest.set(message.author.id, now);
+  activeRequests++;
 
   await message.channel.sendTyping();
 
@@ -118,6 +152,8 @@ client.on(Events.MessageCreate, async (message) => {
 
     console.error("Error querying Claude:", error);
     await message.reply(`Sorry, I encountered an error: ${errorMessage}`);
+  } finally {
+    activeRequests--;
   }
 });
 

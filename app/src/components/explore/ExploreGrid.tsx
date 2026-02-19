@@ -48,7 +48,7 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "quality" | "wordCount" | "recentlyEdited";
+type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "tacticalValue" | "quality" | "wordCount" | "recentlyEdited";
 
 /** Compute a blended "recommended" score that favors recent, high-quality content. */
 function recommendedScore(item: ExploreItem): number {
@@ -393,6 +393,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
             return (b.readerImportance || 0) - (a.readerImportance || 0);
           case "researchImportance":
             return (b.researchImportance || 0) - (a.researchImportance || 0);
+          case "tacticalValue":
+            return (b.tacticalValue || 0) - (a.tacticalValue || 0);
           case "quality":
             return (b.quality || 0) - (a.quality || 0);
           case "wordCount":
@@ -527,6 +529,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
                 <option value="quality">Quality</option>
                 <option value="readerImportance">Reader Importance</option>
                 <option value="researchImportance">Research Importance</option>
+                <option value="tacticalValue">Tactical Value</option>
                 <option value="relevance">Relevance</option>
                 <option value="wordCount">Word Count</option>
                 <option value="title">Title (A-Z)</option>
