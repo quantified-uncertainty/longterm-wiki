@@ -55,6 +55,22 @@ export const TriageResponseSchema = z.object({
   newDevelopments: z.array(z.string()),
 });
 
+/** Schema for a single gap in the adversarial review response. */
+export const AdversarialGapSchema = z.object({
+  type: z.enum(['fact-density', 'speculation', 'missing-standard-data', 'redundancy', 'source-gap']),
+  description: z.string().min(1),
+  reResearchQuery: z.string().optional(),
+  actionType: z.enum(['re-research', 'edit', 'none']),
+});
+
+/** Schema for the adversarial review phase response. */
+export const AdversarialReviewResultSchema = z.object({
+  gaps: z.array(AdversarialGapSchema),
+  needsReResearch: z.boolean(),
+  reResearchQueries: z.array(z.string()),
+  overallAssessment: z.string(),
+}).passthrough();
+
 /**
  * Parse and validate an LLM response against a Zod schema.
  * Returns the validated result or the fallback on failure.

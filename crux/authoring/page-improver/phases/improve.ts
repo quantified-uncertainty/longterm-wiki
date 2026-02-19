@@ -18,11 +18,13 @@ import {
 import { runAgent } from '../api.ts';
 import { IMPROVE_PROMPT } from './prompts.ts';
 
-export async function improvePhase(page: PageData, analysis: AnalysisResult, research: ResearchResult, directions: string, options: PipelineOptions): Promise<string> {
+export async function improvePhase(page: PageData, analysis: AnalysisResult, research: ResearchResult, directions: string, options: PipelineOptions, contentOverride?: string): Promise<string> {
   log('improve', 'Starting improvements');
 
   const filePath = getFilePath(page.path);
-  const currentContent = fs.readFileSync(filePath, 'utf-8');
+  // Use contentOverride if provided (e.g., adversarial loop iterating on in-memory content),
+  // otherwise read from disk (initial improve pass).
+  const currentContent = contentOverride ?? fs.readFileSync(filePath, 'utf-8');
   const importPath = getImportPath();
 
   const objectivityContext = buildObjectivityContext(page, analysis);
