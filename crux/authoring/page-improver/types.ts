@@ -98,6 +98,9 @@ export interface PipelineOptions {
   researchModel?: string;
   improveModel?: string;
   reviewModel?: string;
+  adversarialModel?: string;
+  /** Maximum number of adversarial re-research iterations (default: 2). */
+  maxAdversarialIterations?: number;
   deep?: boolean;
 }
 
@@ -121,6 +124,41 @@ export interface TriageResult {
   newDevelopments: string[];
   estimatedCost: string;
   triageCost: string;
+}
+
+export type AdversarialGapType =
+  | 'fact-density'
+  | 'speculation'
+  | 'missing-standard-data'
+  | 'redundancy'
+  | 'source-gap';
+
+export interface AdversarialGap {
+  type: AdversarialGapType;
+  description: string;
+  /** Targeted query to run if re-research is warranted (omit for edit-only gaps). */
+  reResearchQuery?: string;
+  /** 're-research' = fetch new sources; 'edit' = fix without new data; 'none' = advisory only. */
+  actionType: 're-research' | 'edit' | 'none';
+}
+
+export interface AdversarialReviewResult {
+  gaps: AdversarialGap[];
+  /** True if any gap has actionType === 're-research'. */
+  needsReResearch: boolean;
+  /** Flat list of re-research queries extracted from gaps. */
+  reResearchQueries: string[];
+  overallAssessment: string;
+  raw?: string;
+  error?: string;
+}
+
+export interface AdversarialLoopResult {
+  iterations: number;
+  adversarialReview: AdversarialReviewResult;
+  /** Research gathered during the re-research loop (merged into existing research). */
+  additionalResearch: ResearchResult;
+  finalContent: string;
 }
 
 export interface ParsedArgs {

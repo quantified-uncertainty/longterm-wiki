@@ -1,0 +1,18 @@
+date: 2026-02-19
+branch: claude/issue-130-longterm-wiki-dqhSZ
+title: Add adversarial reviewer with re-research feedback loop
+model: sonnet-4
+duration: ~45min
+pages: []
+summary: "Implemented the adversarial reviewer + re-research loop from issue #130. Added two new phases: adversarial-review.ts (runs a dedicated reviewer asking 5 diagnostic questions: fact density, speculation detection, missing standard data, redundancy, source gap) and adversarial-loop.ts (compound phase that runs adversarial review → targeted re-research → re-improve, up to 2 iterations). The deep tier now includes adversarial-loop between validate and review. Also updated types.ts with AdversarialGap, AdversarialReviewResult, AdversarialLoopResult, and PipelineOptions.adversarialModel/maxAdversarialIterations. Session log format updated to YAML per PR #302."
+issues:
+  - Pre-existing TypeScript errors in crux/ (327 lines, not from this PR — actually reduced from 339 by removing some stale imports).
+  - The crux TypeScript verify command reports failure due to pre-existing errors unrelated to this PR.
+learnings:
+  - The adversarial reviewer must be a separate model call from synthesis — the issue explicitly notes this prevents the model from defending its own output.
+  - Page-type hints (person vs org vs incident vs concept) are needed for the "missing standard data" check to be useful. Implemented via path-based detection.
+  - The loop compound phase needs to merge research cumulatively so each re-improve call has all sources (base + all targeted additions).
+recommendations:
+  - Consider adding `--max-adversarial-iterations` CLI flag to page-improver index.ts so users can tune the loop at call time.
+  - The adversarial review output (adversarial-review.json) is saved to .claude/temp — a future PR could surface this in an internal dashboard alongside page quality scores.
+  - The `crux-typescript` verify item fails on pre-existing errors. Consider adding a baseline error count to the verify command so it passes if error count doesn't increase.

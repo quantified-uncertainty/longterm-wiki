@@ -16,7 +16,7 @@ import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import {
   analyzePhase, researchPhase, improvePhase, reviewPhase,
-  validatePhase, gapFillPhase, triagePhase,
+  validatePhase, gapFillPhase, triagePhase, adversarialLoopPhase,
 } from './phases.ts';
 
 /** Main pipeline orchestration. */
@@ -133,6 +133,26 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       case 'gap-fill':
         improvedContent = await gapFillPhase(page, improvedContent!, review || { valid: true, issues: [] }, options);
         break;
+
+      case 'adversarial-loop': {
+        const loopResult = await adversarialLoopPhase(
+          page,
+          improvedContent!,
+          analysis!,
+          research || { sources: [] },
+          directions,
+          options,
+        );
+        improvedContent = loopResult.finalContent;
+        // Merge any additional research back so gap-fill has full context
+        if (loopResult.additionalResearch.sources.length > 0) {
+          research = {
+            sources: [...(research?.sources || []), ...loopResult.additionalResearch.sources],
+            summary: research?.summary,
+          };
+        }
+        break;
+      }
 
       case 'review':
         review = await reviewPhase(page, improvedContent!, options);
