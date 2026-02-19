@@ -2,6 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: ea-shareholder-diversification-anthropic
+  numericId: E858
   type: concept
   title: EA Shareholder Diversification from Anthropic
   description: >-

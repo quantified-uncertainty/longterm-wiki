@@ -3627,6 +3627,7 @@
     - governance
   lastUpdated: 2026-02
 - id: state-capacity-ai-governance
+  numericId: E859
   type: concept
   title: State Capacity and AI Governance
   customFields:
@@ -3660,6 +3661,7 @@
     being toothless or counterproductive.
   lastUpdated: 2026-02
 - id: recoding-america
+  numericId: E860
   type: resource
   title: "Recoding America"
   customFields:
