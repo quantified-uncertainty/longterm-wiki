@@ -15,6 +15,7 @@ import { PROJECT_ROOT, loadPages } from '../lib/content-types.ts';
 import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts';
 import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest } from './page-router.ts';
+import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
@@ -221,6 +222,31 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
     maxBudget: budget,
     verbose,
   });
+
+  // ── Watchlist Injection ────────────────────────────────────────────────────
+  // Force-include pages scheduled for regular updates, regardless of news routing.
+  const watchlistUpdates = getDueWatchlistUpdates(date, verbose);
+  const watchlistPageIds: string[] = [];
+  if (watchlistUpdates.length > 0) {
+    console.log(`  Watchlist: ${watchlistUpdates.length} page(s) due for scheduled update`);
+    const existingIds = new Set(plan.pageUpdates.map(u => u.pageId));
+    for (const wu of watchlistUpdates) {
+      watchlistPageIds.push(wu.pageId);
+      if (existingIds.has(wu.pageId)) {
+        // Merge directions into the existing news-driven entry
+        const existing = plan.pageUpdates.find(u => u.pageId === wu.pageId)!;
+        existing.directions = wu.directions + '\n\nAlso from news routing: ' + existing.directions;
+        const tierRank: Record<string, number> = { polish: 1, standard: 2, deep: 3 };
+        if (tierRank[wu.suggestedTier] > tierRank[existing.suggestedTier]) {
+          existing.suggestedTier = wu.suggestedTier;
+        }
+      } else {
+        // Insert at front of list so watchlist pages are prioritised
+        plan.pageUpdates.unshift(wu);
+      }
+    }
+  }
+
   console.log(`  Plan: ${plan.pageUpdates.length} page updates, ${plan.newPageSuggestions.length} new page suggestions`);
   console.log(`  Estimated cost: ~$${plan.estimatedCost.toFixed(0)}`);
 
@@ -298,6 +324,18 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       console.log(`    Done (${((result.durationMs || 0) / 1000).toFixed(0)}s)`);
     } else {
       console.log(`    FAILED: ${result.error?.slice(0, 100)}`);
+    }
+  }
+
+  // Mark watchlist entries as updated so they aren't re-run until next window
+  if (watchlistPageIds.length > 0) {
+    const succeededIds = results.filter(r => r.status === 'success').map(r => r.pageId);
+    const updatedWatchlistIds = watchlistPageIds.filter(id => succeededIds.includes(id));
+    if (updatedWatchlistIds.length > 0) {
+      markWatchlistUpdated(updatedWatchlistIds, date);
+      if (verbose) {
+        console.log(`\n  Watchlist last_run updated: ${updatedWatchlistIds.join(', ')}`);
+      }
     }
   }
 
