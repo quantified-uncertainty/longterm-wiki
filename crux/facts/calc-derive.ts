@@ -214,6 +214,22 @@ function loadAllFacts(root: string): Map<string, FactFile> {
   return result;
 }
 
+/** Extract a single numeric value from a fact entry (handles range objects) */
+function extractNumericFromFact(entry: FactEntry): number | null {
+  if (typeof entry.numeric === 'number') return entry.numeric;
+  if (typeof entry.value === 'number') return entry.value;
+  // Handle range objects like { min: 500000000000 } or { min: N, max: M }
+  if (entry.value && typeof entry.value === 'object' && !Array.isArray(entry.value)) {
+    const range = entry.value as { min?: number; max?: number };
+    if (typeof range.min === 'number' && typeof range.max === 'number') {
+      return (range.min + range.max) / 2;
+    }
+    if (typeof range.min === 'number') return range.min;
+    if (typeof range.max === 'number') return range.max;
+  }
+  return null;
+}
+
 /** Build a lookup function for evalCalcExpr given the facts map */
 function buildFactLookup(
   factsMap: Map<string, FactFile>
@@ -223,10 +239,8 @@ function buildFactLookup(
     if (!factFile) return undefined;
     const entry = factFile.facts[factId];
     if (!entry) return undefined;
-    // Return the explicit numeric field, or parse value if it's a number
-    if (typeof entry.numeric === 'number') return entry.numeric;
-    if (typeof entry.value === 'number') return entry.value;
-    return undefined;
+    const val = extractNumericFromFact(entry);
+    return val !== null ? val : undefined;
   };
 }
 
@@ -241,9 +255,7 @@ function formatFactsForPrompt(factsMap: Map<string, FactFile>, relevantEntities:
     for (const [factId, fact] of Object.entries(factFile.facts)) {
       // Skip computed facts and facts with no numeric value
       if (fact.compute) continue;
-      const numericVal = typeof fact.numeric === 'number' ? fact.numeric
-        : typeof fact.value === 'number' ? fact.value
-        : null;
+      const numericVal = extractNumericFromFact(fact);
       if (numericVal === null) continue;
 
       const ref = `{${entity}.${factId}}`;
@@ -306,7 +318,27 @@ For each hardcoded derived pattern provided:
 1. Determine if it can be computed from two or more facts in the provided facts table
 2. If yes, generate the appropriate \`<Calc>\` expression
 3. Choose correct props: precision, suffix, prefix, format
-4. Provide the EXACT original text to replace (must match character-for-character what appears in the content)
+4. Provide the EXACT original text to replace — keep it as narrow as possible
+
+## CRITICAL: originalText must be narrow and JSX-free
+
+The \`originalText\` field is the exact substring that will be removed and replaced with the \`<Calc>\` tag. Rules:
+- It MUST be the **match string itself** (as given in "Match: ..."), possibly plus a few plain-text characters for disambiguation
+- It MUST NOT contain any JSX/MDX tags (\`<F\`, \`<Calc\`, \`<EntityLink\`, etc.)
+- It MUST NOT span multiple words beyond the immediate number phrase
+- It MAY add at most 20 extra characters of plain text for disambiguation (e.g. "(current)" to distinguish identical matches)
+- If multiple identical matches exist on the page, just use the exact match string — the tool replaces the first occurrence per run
+- It MUST appear verbatim in the page content (character-for-character)
+- The \`suffix\` prop must be a short unit or symbol only (e.g. "x", "%", " pp", "x/yr") — NEVER include prose words
+
+Examples:
+- BAD: \`"≈39x multiple at the previous <F e=\\"anthropic\\" ...>$350B</F> valuation..."\` (JSX tags)
+- BAD: \`"OpenAI's ≈25x. The valuation itself"\` (too wide — 28 chars of extra prose)
+- BAD: \`"≈25x | [i10x]"\` (contains table pipe)
+- BAD: \`suffix="x multiple at the previous"\` (prose in suffix)
+- GOOD: \`"≈39x"\` (just the match)
+- GOOD: \`"≈25x (current)"\` (match + ≤20 chars disambiguation)
+- GOOD: \`"39x multiple"\` (exact match for the detected pattern)
 
 ## <Calc> props guide
 
@@ -324,6 +356,14 @@ For each hardcoded derived pattern provided:
 | "300% growth" | (new/old - 1) * 100 | \`({entity.revenue-new} / {entity.revenue-old} - 1) * 100\` |
 | "+12 pp" | rate difference | \`{entity.rate-a} - {entity.rate-b}\` |
 | "raised $Xm more" | dollar difference | \`{entity.funding-a} - {entity.funding-b}\` |
+
+## Handling named-multiple patterns (e.g. "39x multiple", "27x revenue")
+
+For patterns like "≈39x multiple" or "27x revenue", replace ONLY the number portion — do not include the trailing word in \`originalText\` or \`suffix\`:
+- The detected match "39x multiple" appears in text like "≈39x multiple at the previous..."
+- Set \`originalText = "≈39x"\` (just the approximation symbol + number)
+- Set \`suffix = "x"\`, NOT \`suffix = "x multiple"\`
+- This keeps the trailing word "multiple" in the surrounding prose unchanged
 
 ## Rules
 
@@ -412,6 +452,29 @@ Return exactly ${patterns.length} proposals (one per pattern, in order).`;
 // Validation
 // ---------------------------------------------------------------------------
 
+/** Check that originalText doesn't contain JSX tags, isn't too wide, and suffix is a unit */
+function validateOriginalText(proposal: CalcProposal, matchedPattern: DetectedPattern): string | null {
+  // Reject if originalText contains JSX/MDX tags
+  if (/<[A-Z]|<\/|<F |<Calc |<Entity/i.test(proposal.originalText)) {
+    return 'originalText contains JSX/MDX tags — must be plain text only';
+  }
+  // Reject if originalText is much wider than the detected pattern match.
+  // Allow up to 20 extra characters for disambiguation parentheticals like "(current)".
+  const excess = proposal.originalText.length - matchedPattern.match.length;
+  if (excess > 20) {
+    return `originalText is ${excess} chars wider than the pattern match "${matchedPattern.match}" — keep it narrow`;
+  }
+  // Reject if originalText contains a table pipe (would corrupt markdown table)
+  if (/\|/.test(proposal.originalText)) {
+    return 'originalText contains a table pipe character — would corrupt markdown table';
+  }
+  // Reject if suffix contains spaces followed by a word of 4+ chars (prose leaked in)
+  if (proposal.suffix && /\s\w{4,}/.test(proposal.suffix)) {
+    return `suffix "${proposal.suffix}" contains prose — must be a unit symbol only (e.g. "x", "%", " pp")`;
+  }
+  return null;
+}
+
 /**
  * Validate a proposed <Calc> expression against current facts.
  * Checks that the result is within 20% of the expected hardcoded value.
@@ -421,6 +484,14 @@ function validateProposal(
   pattern: DetectedPattern,
   factsMap: Map<string, FactFile>,
 ): CalcProposal {
+  // Structural validation first
+  const structuralError = validateOriginalText(proposal, pattern);
+  if (structuralError) {
+    proposal.valid = false;
+    proposal.validationError = structuralError;
+    return proposal;
+  }
+
   const lookup = buildFactLookup(factsMap);
 
   try {
@@ -616,11 +687,15 @@ async function processPage(
     return { proposed: 0, applied: 0 };
   }
 
-  // Validate proposals
+  // Validate proposals — match each proposal to its source pattern by originalText,
+  // not by index (LLM may omit null proposals, causing index drift).
   const validatedProposals: CalcProposal[] = [];
-  for (let i = 0; i < proposals.length; i++) {
-    const pattern = patterns[i] || patterns[patterns.length - 1];
-    const validated = validateProposal(proposals[i], pattern, factsMap);
+  for (const proposal of proposals) {
+    // Find the pattern whose match string is contained in the proposal's originalText
+    const matchedPattern = patterns.find(p =>
+      proposal.originalText.includes(p.match) || p.match.includes(proposal.originalText)
+    ) ?? patterns[0];
+    const validated = validateProposal(proposal, matchedPattern, factsMap);
     validatedProposals.push(validated);
   }
 

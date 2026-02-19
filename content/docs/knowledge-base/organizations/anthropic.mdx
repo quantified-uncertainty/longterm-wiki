@@ -20,7 +20,8 @@ clusters:
 subcategory: labs
 entityType: organization
 ---
-import {DataInfoBox, EntityLink, DataExternalLinks, SquiggleEstimate} from '@components/wiki';
+import {DataInfoBox, EntityLink, DataExternalLinks, SquiggleEstimate} from '@components/wiki'
+import {Calc} from '@components/facts';;
 
 <DataExternalLinks pageId="anthropic" />
 
@@ -85,7 +86,7 @@ This is the main Anthropic company page. For detailed analysis on specific topic
 
 ### Quick Financial Context
 
-As of February 2026: <F e="anthropic" f="6796e194">\$380B</F> valuation (Series G), <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate revenue, targeting \$20-26B for 2026. Anthropic trades at ≈<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" />  current revenue vs <EntityLink id="openai">OpenAI</EntityLink>'s ≈25x—see <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including <F e="anthropic" f="fac5b934">25%</F> customer concentration risk and margin pressure.
+As of February 2026: <F e="anthropic" f="6796e194">\$380B</F> valuation (Series G), <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate revenue, targeting \$20-26B for 2026. Anthropic trades at ≈<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" />  current revenue vs <EntityLink id="openai">OpenAI</EntityLink>'s <Calc expr="{openai.39d6868e} / {openai.609b9796}" precision={0} prefix="≈" suffix="x" />—see <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including <F e="anthropic" f="fac5b934">25%</F> customer concentration risk and margin pressure.
 
 <SquiggleEstimate title="Anthropic Revenue Trajectory (ARR, $B)" code={`
 // Anthropic revenue growth trajectory
