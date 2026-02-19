@@ -1,0 +1,25 @@
+date: 2026-02-19
+branch: claude/issue-281-implementation-OB7Kk
+title: Rename app/ → apps/web/ to complete monorepo layout
+model: sonnet-4
+duration: ~2h
+pages: []
+summary: >
+  Renamed the Next.js app from app/ to apps/web/ using git mv, completing the monorepo layout
+  where apps/discord-bot/ already lived. Updated all path references across CI workflows,
+  crux library, scripts, documentation, and configuration files. Fixed a latent path-depth
+  bug in build-data.mjs (CONTENT_DIR_ROOT and REPO_ROOT were computing one level too shallow
+  after the move), updated the pnpm workspace definition, and rebased onto main to incorporate
+  PR #302 (session log YAML format migration).
+issues:
+  - "build-data.mjs had TWO hardcoded path-depth bugs after the move: CONTENT_DIR_ROOT used join(PROJECT_ROOT, '..', 'content/docs') (should be '../..') and REPO_ROOT in scripts/lib/content-types.mjs used join(PROJECT_ROOT, '..') (should be '../..'). The wrong CONTENT_DIR_ROOT caused entity auto-assignment to start at the wrong nextId, triggering the ID stability check."
+  - "id-registry.json (gitignored) was corrupted by failed build runs with wrong entity IDs. Had to manually restore correct IDs (E851-E853) to unblock the stability check."
+  - "The crux/lib/rules/frontmatter-schema.ts had a deep relative import path (../../../app/src/data/entity-type-names.ts) that needed updating."
+  - "pnpm install was needed after updating pnpm-workspace.yaml to re-link the renamed workspace package."
+learnings:
+  - "When moving a workspace package to a deeper path, search for ALL relative path computations that use PROJECT_ROOT or process.cwd() with '../' — they all need one more level added."
+  - "The data/id-registry.json (gitignored) can be corrupted by failed builds. Always check its contents when debugging ID stability failures."
+  - "git mv correctly handles bulk renames (all 250+ files moved atomically, git tracking preserved)."
+recommendations:
+  - "Consider replacing hardcoded '../' path constructions in build-data.mjs with the already-imported CONTENT_DIR/DATA_DIR constants from content-types.mjs to avoid depth-sensitive paths."
+  - "The crux/lib/rules/frontmatter-schema.ts deep relative import (../../../apps/web/src/data/entity-type-names.ts) is fragile — consider adding a path alias or moving the import to go through GENERATED_DATA_DIR_ABS."

@@ -117,9 +117,9 @@ export function extractEntityId(filePath) {
 }
 
 /**
- * Repository root (parent of the app/ directory).
+ * Repository root (grandparent of the apps/web/ directory).
  */
-export const REPO_ROOT = join(PROJECT_ROOT, '..');
+export const REPO_ROOT = join(PROJECT_ROOT, '../..');
 
 /**
  * Content directory — MDX pages at repo root.

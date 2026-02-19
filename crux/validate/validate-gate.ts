@@ -58,7 +58,7 @@ function shouldAutoEscalateToFull(): boolean {
     const files = diffOutput.split('\n');
     return files.some(f =>
       // App page components (prerendered by Next.js)
-      f.startsWith('app/src/app/') ||
+      f.startsWith('apps/web/src/app/') ||
       // Auto-update run data (read by dashboard pages at build time)
       f.startsWith('data/auto-update/runs/') ||
       // Auto-update state/sources (read by dashboard pages at build time)
@@ -83,7 +83,7 @@ interface Step {
   cwd: string;
 }
 
-const APP_DIR = `${PROJECT_ROOT}/app`;
+const APP_DIR = `${PROJECT_ROOT}/apps/web`;
 
 const STEPS: Step[] = [
   {

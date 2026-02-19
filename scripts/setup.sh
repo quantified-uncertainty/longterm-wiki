@@ -156,7 +156,7 @@ if [ "$MODE" = "check" ]; then
   fi
 
   step "Checking data layer"
-  if [ -f "app/src/data/database.json" ] && [ -f "app/src/data/pages.json" ]; then
+  if [ -f "apps/web/src/data/database.json" ] && [ -f "apps/web/src/data/pages.json" ]; then
     ok "Data layer exists (database.json + pages.json)"
   else
     warn "Data layer not built — run: pnpm run --filter longterm-next sync:data"
@@ -182,7 +182,7 @@ if PUPPETEER_SKIP_DOWNLOAD=1 pnpm install; then
 else
   # pnpm install can fail for non-critical reasons (postinstall scripts, etc.)
   # Check if node_modules actually got created
-  if [ -d "node_modules" ] && [ -d "app/node_modules" ]; then
+  if [ -d "node_modules" ] && [ -d "apps/web/node_modules" ]; then
     warn "pnpm install had warnings/errors but node_modules exists — continuing"
     WARNINGS=$((WARNINGS + 1))
   else
@@ -195,12 +195,12 @@ fi
 
 step "Building data layer (YAML + MDX → database.json)"
 BUILD_OK=true
-(cd "$REPO_ROOT/app" && node --import tsx/esm scripts/build-data.mjs) || BUILD_OK=false
+(cd "$REPO_ROOT/apps/web" && node --import tsx/esm scripts/build-data.mjs) || BUILD_OK=false
 
-if [ "$BUILD_OK" = true ] && [ -f "app/src/data/database.json" ] && [ -f "app/src/data/pages.json" ]; then
+if [ "$BUILD_OK" = true ] && [ -f "apps/web/src/data/database.json" ] && [ -f "apps/web/src/data/pages.json" ]; then
   ok "Data layer built successfully"
-  ENTITY_COUNT=$(node -e "const d=JSON.parse(require('fs').readFileSync('app/src/data/database.json','utf8')); console.log(Object.keys(d.typedEntities||d.entities||{}).length)")
-  PAGE_COUNT=$(node -e "const d=JSON.parse(require('fs').readFileSync('app/src/data/pages.json','utf8')); console.log(Array.isArray(d)?d.length:Object.keys(d).length)")
+  ENTITY_COUNT=$(node -e "const d=JSON.parse(require('fs').readFileSync('apps/web/src/data/database.json','utf8')); console.log(Object.keys(d.typedEntities||d.entities||{}).length)")
+  PAGE_COUNT=$(node -e "const d=JSON.parse(require('fs').readFileSync('apps/web/src/data/pages.json','utf8')); console.log(Array.isArray(d)?d.length:Object.keys(d).length)")
   info "$ENTITY_COUNT entities, $PAGE_COUNT pages"
 else
   fail "Data layer build failed — check output above"

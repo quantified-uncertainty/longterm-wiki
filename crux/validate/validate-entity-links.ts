@@ -87,7 +87,7 @@ interface EntityLinkValidatorOptions extends ValidatorOptions {
 type ReverseRegistry = Record<string, string>;
 
 // Next.js app directory for standalone pages
-const APP_DIR: string = join(PROJECT_ROOT, 'app/src/app');
+const APP_DIR: string = join(PROJECT_ROOT, 'apps/web/src/app');
 
 /**
  * Extract all markdown links from file content
