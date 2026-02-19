@@ -15,6 +15,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml } from 'yaml';
+import { entityDisplayNames } from './entity-names.ts';
 
 interface FactEntry {
   value: string;
@@ -83,14 +84,6 @@ export function buildFactLookupForContent(pageId: string, content: string, ROOT:
   }
 
   // 2. Check which entities are mentioned in the content
-  //    Entity display names → entity IDs
-  const entityDisplayNames: Record<string, string[]> = {
-    'anthropic': ['Anthropic'],
-    'openai': ['OpenAI'],
-    'sam-altman': ['Sam Altman', 'Altman'],
-    'jaan-tallinn': ['Jaan Tallinn', 'Tallinn'],
-  };
-
   for (const factFile of allFacts) {
     if (relevantEntities.has(factFile.entity)) continue;
 
