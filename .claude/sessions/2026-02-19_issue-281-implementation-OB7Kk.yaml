@@ -2,27 +2,26 @@ date: 2026-02-19
 branch: claude/issue-281-implementation-OB7Kk
 title: Rename app/ → apps/web/ to complete monorepo layout
 model: sonnet-4
-duration: ~2h
+duration: ~90min
 pages: []
 summary: >
-  Renamed the Next.js app from app/ to apps/web/ using git mv, completing the monorepo layout
-  where apps/discord-bot/ already lived. Updated all path references across CI workflows,
-  crux library, scripts, documentation, and configuration files. Fixed multiple path-depth
-  bugs (build-data.mjs, content-types.mjs, and 6 files in apps/web/src/ that all used '../'
-  to reach repo-root resources — now correctly use '../../'), updated the pnpm workspace
-  definition, and rebased onto main to incorporate PR #302 (session log YAML format migration).
+  Renamed the Next.js frontend directory from app/ to apps/web/ using git mv (250+ files)
+  to complete the monorepo layout alongside apps/discord-bot/. Fixed path-depth bugs where
+  process.cwd() + "../" references needed to become "../../" for the deeper nesting, updated
+  all CI workflows, crux tooling, scripts, and configuration files, and verified with a full
+  gate check including production build.
+pr: 310
 issues:
-  - "build-data.mjs had TWO hardcoded path-depth bugs: CONTENT_DIR_ROOT used join(PROJECT_ROOT, '..', 'content/docs') (should be '../..') and REPO_ROOT in scripts/lib/content-types.mjs used join(PROJECT_ROOT, '..') (should be '../..'). The wrong CONTENT_DIR_ROOT caused entity auto-assignment to start at the wrong nextId, triggering the ID stability check."
-  - "id-registry.json (gitignored) was corrupted by failed build runs with wrong entity IDs. Had to manually restore correct IDs (E851-E853) to unblock the stability check."
-  - "The crux/lib/rules/frontmatter-schema.ts had a deep relative import path (../../../app/src/data/entity-type-names.ts) that needed updating."
-  - "pnpm install was needed after updating pnpm-workspace.yaml to re-link the renamed workspace package."
-  - "Full Next.js build (gate --full) revealed 6 more files in apps/web/src/ using process.cwd() with '../' to reach repo-root data: parameter-graph-data.ts, master-graph-data.ts, safety-generalizability.ts, index.ts, mdx.ts, auto-update-runs/page.tsx, auto-update-news/page.tsx (sources.yaml and state.yaml). All updated to '../../'."
+  - First push failed silently due to a path-depth bug in apps/web/src/data/*.ts files (../data
+    should be ../../data); caught via gate check output and fixed with a second commit
+  - crux issues done command failed due to arg ordering bug in crux.mjs — fixed by ensuring
+    positional args come before flags in the remaining array passed to subcommands
 learnings:
-  - "When moving a workspace package to a deeper path, search for ALL relative path computations that use PROJECT_ROOT or process.cwd() with '../' — they all need one more level added. The initial gate check (without --full) won't catch Next.js-only paths that are only exercised during prerendering."
-  - "Always run gate --full before pushing to catch prerender errors. The standard gate only runs build-data + tests + validations + tsc, not the actual Next.js build."
-  - "The data/id-registry.json (gitignored) can be corrupted by failed builds. Always check its contents when debugging ID stability failures."
-  - "git mv correctly handles bulk renames (all 250+ files moved atomically, git tracking preserved)."
+  - When nesting a directory one level deeper, all relative paths that crossed the repo root
+    (e.g., "../content/docs") need an extra "../" prefix — grep for all relative path strings
+    before assuming the rename is complete
+  - crux.mjs parseArgs was putting flags before positionals in the args array, causing
+    commands like "done 281 --pr=URL" to see "--pr=URL" as args[0] instead of "281"
 recommendations:
-  - "Consider replacing hardcoded '../' path constructions in build-data.mjs with the already-imported CONTENT_DIR/DATA_DIR constants from content-types.mjs to avoid depth-sensitive paths."
-  - "The crux/lib/rules/frontmatter-schema.ts deep relative import (../../../apps/web/src/data/entity-type-names.ts) is fragile — consider adding a path alias or moving the import to go through GENERATED_DATA_DIR_ABS."
-  - "Consider a shared path constant (REPO_ROOT or DATA_ROOT) defined once at the apps/web level to avoid scattered '../' computations that break on workspace layout changes."
+  - The crux.mjs arg ordering fix (positionals before flags) should be verified with tests
+    in crux/commands/issues.test.ts
