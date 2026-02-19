@@ -1,0 +1,216 @@
+pageId: colorado-ai-act
+verifiedAt: 2026-02-19
+totalCitations: 19
+verified: 18
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://fostergraham.com/2025/12/colorados-artificial-intelligence-act-what-businesses-need-to-know-about-sb-24-205/
+    linkText: "Colorado's Artificial Intelligence Act: What Businesses Need to Know About SB 24-205 — - Foster Graham Law Firm, December 2024"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:32.874Z
+    httpStatus: 200
+    pageTitle: "Colorado’s Artificial Intelligence Act: What Businesses Need to Know About SB 24-205 - Foster Graham Milstein & Calisher"
+    contentSnippet: "Colorado’s Artificial Intelligence Act: What Businesses Need to Know About SB 24-205 - Foster Graham Milstein & Calisher Colorado’s Artificial Intelligence Act: What Businesses Need to Know About SB 24-205 Sasha Tovar on December 17, 2025 (and Why Uncertainty Is Growing as We Head into 2026) Artificial intelligence isn’t just shaping the future—it’s already here. Whether it’s using ChatGPT to draft an email, scrolling past AI‑generated ads, or transitioning to smart tools at work, nearly everyon"
+    contentLength: 148694
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://coag.gov/ai/
+    linkText: Colorado Anti-Discrimination in AI Law (ADAI) Rulemaking — - Colorado Attorney General's Office, December 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:33.031Z
+    httpStatus: 200
+    pageTitle: Colorado Anti-Discrimination in AI Law (ADAI) Rulemaking | Colorado Attorney General
+    contentSnippet: Colorado Anti-Discrimination in AI Law (ADAI) Rulemaking | Colorado Attorney General Skip to Main Content Colorado Anti-Discrimination in AI Law (ADAI) Rulemaking On May 17, 2024, Senate Bill 24-205, also known as the Colorado Anti-Discrimination in AI Law, or ADAI, was signed into law. The ADAI protects consumers from algorithmic discrimination in consequential decisions made by high-risk artificial intelligence systems. Specifically, the ADAI obligates developers and deployers of high-risk art
+    contentLength: 64263
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.naag.org/attorney-general-journal/a-deep-dive-into-colorados-artificial-intelligence-act/
+    linkText: A Deep Dive into Colorado's Artificial Intelligence Act — - National Association of Attorneys General, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:33.024Z
+    httpStatus: 200
+    pageTitle: A Deep Dive into Colorado’s Artificial Intelligence Act - National Association of Attorneys General
+    contentSnippet: A Deep Dive into Colorado’s Artificial Intelligence Act - National Association of Attorneys General Skip to content A Deep Dive into Colorado’s Artificial Intelligence Act Home &#047; Consumer Protection &#047; A Deep Dive into Colorado’s Artificial Intelligence Act October 26, 2024 Consumer Protection Share this On May 17, 2024, Colorado Governor Jared Polis signed into law Senate Bill 24-205, known colloquially as the Colorado Artificial Intelligence Act (hereinafter the CAIA). 1 . The legisla
+    contentLength: 297778
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://coloradosun.com/2024/10/22/task-force-talks-revisions-to-colorados-controversial-artificial-intelligence-law/
+    linkText: Google, Microsoft seem OK with Colorado's controversial AI law. Local tech not so much. — - Colorado Sun, October 22, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:34.437Z
+    httpStatus: 200
+    pageTitle: Google, Microsoft OK with Colorado's new AI law. Local tech not so much.
+    contentSnippet: "Google, Microsoft OK with Colorado&#039;s new AI law. Local tech not so much. Close Search for: Search Close Bluesky Facebook X Twitter Instagram Reddit Mastodon Threads LinkedIn YouTube Skip to content News events donate Original Reporting On the Ground The Trust Project Original Reporting This article contains firsthand information gathered by reporters. This includes directly interviewing sources and analyzing primary source documents. On the Ground A journalist was physically present to repo"
+    contentLength: 256928
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.americanbar.org/groups/business_law/resources/business-law-today/2025-november/colorados-ai-act-still-standing/
+    linkText: "Colorado's AI Act: Still Standing — - American Bar Association, November 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:32.680Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.brookings.edu/articles/how-different-states-are-approaching-ai/
+    linkText: How different states are approaching AI — - Brookings Institution, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:35.524Z
+    httpStatus: 200
+    pageTitle: How different states are approaching AI | Brookings
+    contentSnippet: "How different states are approaching AI | Brookings Search Home How different states are approaching AI Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to the Center for Technology Innovation Newsletter Si"
+    contentLength: 250159
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://iapp.org/news/a/us-state-ai-legislation-reviewing-the-2025-session
+    linkText: "US state AI legislation: Reviewing the 2025 session — - International Association of Privacy Professionals, 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:36.159Z
+    httpStatus: 200
+    pageTitle: "US state AI legislation: Reviewing the 2025 session | IAPP"
+    contentSnippet: "US state AI legislation: Reviewing the 2025 session | IAPP All News 16 July 2025 ANALYSIS Subscribe to Newsletters Advertise with the IAPP AI Governance Law & Regulation US state AI legislation: Reviewing the 2025 session Related stories House Commerce Committee floats 10-year moratorium on state-level AI enforcement Policy analysis: US House committee seeks moratorium on state AI rules A view from DC: Colorado considers re-forging AI guardrails US state AI governance bills: Reflecting on the 20"
+    contentLength: 471466
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+    linkText: Ensuring a National Policy Framework for Artificial Intelligence — - The White House, December 11, 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:35.849Z
+    httpStatus: 200
+    pageTitle: Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House
+    contentSnippet: "Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House Presidential Actions ENSURING A NATIONAL POLICY FRAMEWORK FOR ARTIFICIAL INTELLIGENCE Executive Orders December 11, 2025 By the authority vested in me as President by the Constitution and the laws of the United States of America, it is hereby ordered: Section 1 . Purpose . United States leadership in Artificial Intelligence (AI) will promote United States national and economic security and dominance across m"
+    contentLength: 287718
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.lw.com/en/insights/ai-executive-order-targets-state-laws-and-seeks-uniform-federal-standards
+    linkText: AI Executive Order Targets State Laws and Seeks Uniform Federal Standards — - Latham & Watkins, December 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:36.784Z
+    httpStatus: 200
+    pageTitle: AI Executive Order Targets State Laws and Seeks Uniform Federal Standards
+    contentSnippet: AI Executive Order Targets State Laws and Seeks Uniform Federal Standards skip to Main Content skip to Footer Latham & Watkins LLP Share pdf Share on linkedin Share on facebook Share on twitter Share on email Key points The Order establishes an AI Litigation Task Force that will challenge state AI laws in court and creates a process to assess any such conflicting state laws . The Order targets states that enact or enforce &ldquo;onerous&rdquo; AI laws with the threat that they may lose access to
+    contentLength: 107842
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.nist.gov/publications/towards-standard-identifying-and-managing-bias-artificial-intelligence
+    linkText: "NIST Special Publication 1270: Towards a Standard for Identifying and Managing Bias in AI — - National Institute of Standards and Technology, 2021"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:35.664Z
+    httpStatus: 200
+    pageTitle: Towards a Standard for Identifying and Managing Bias in Artificial Intelligence | NIST
+    contentSnippet: Towards a Standard for Identifying and Managing Bias in Artificial Intelligence | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/publications/towards-standard-identifying-and-managing-bias-artificial
+    contentLength: 82873
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.schellman.com/blog/ai-services/what-you-need-to-know-about-the-colorado-ai-act
+    linkText: What You Need to Know About the Colorado AI Act — - Schellman, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:38.150Z
+    httpStatus: 200
+    pageTitle: What You Need to Know About the Colorado AI Act | Schellman
+    contentSnippet: "What You Need to Know About the Colorado AI Act | Schellman « View All Posts By: Schellman Print/Save as PDF What You Need to Know About the Colorado AI Act Artificial Intelligence | ISO 42001 Published: Sep 25, 2025 Last Updated: Sep 29, 2025 --> Colorado is leading the charge of U.S. AI policy with the Consumer Protections for Artificial Intelligence (SB24-205) law . This law, commonly referred to as the C olorado AI Act (CO AI Act) , is the first enacted comprehensive state law regulating hig"
+    contentLength: 245789
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.uschamber.com/technology/the-hidden-cost-of-50-state-ai-laws-a-data-driven-breakdown
+    linkText: How Patchwork AI Regulations Threaten Small Businesses — - U.S. Chamber of Commerce, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:38.140Z
+    httpStatus: 200
+    pageTitle: How Patchwork AI Regulations Threaten Small Businesses | U.S. Chamber of Commerce
+    contentSnippet: "How Patchwork AI Regulations Threaten Small Businesses | U.S. Chamber of Commerce Skip to content Close search Site search Enter your search query Submit The Hidden Cost of 50 State AI Laws: A Data-Driven Breakdown The U.S. needs federal AI regulation to prevent a costly patchwork of conflicting state laws that burden businesses and threaten American innovation leadership. Jordan Crenshaw Senior Vice President, C_TEC, U.S. Chamber of Commerce Michael Richards Executive Director, Policy, U.S. Cha"
+    contentLength: 153662
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://iapp.org/news/a/the-colorado-ai-act-what-you-need-to-know
+    linkText: "The Colorado AI Act: What You Need to Know — - International Association of Privacy Professionals, 2024"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:38.472Z
+    httpStatus: 200
+    pageTitle: "The Colorado AI Act: What you need to know | IAPP"
+    contentSnippet: "The Colorado AI Act: What you need to know | IAPP All News 21 May 2024 Subscribe to Newsletters Advertise with the IAPP North America AI Governance The Colorado AI Act: What you need to know Related stories Notes from the Asia-Pacific region: AI takes center stage as China rings in the Year of the Horse What makes the Global CBPR Forum an attractive data transfer framework to implement? A view from Brussels: Time is of the — high-risk — essence Colombia introduces new model contractual clauses H"
+    contentLength: 407406
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://law.vanderbilt.edu/hal-9000-among-the-several-states-the-irony-of-the-dormant-commerce-clause-and-ai-regulations-after-the-one-big-beautiful-bill-act/
+    linkText: "Hal 9000 'among the Several States': The Irony of the Dormant Commerce Clause and AI Regulations After the One Big Beautiful Bill Act — - Vanderbilt Law School, December 5, 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:38.350Z
+    httpStatus: 200
+    pageTitle: "Hal 9000 “among the Several States”: The Irony of the Dormant Commerce Clause and Ai Regulations After the One Big Beautiful Bill Act -Vanderbilt Law School | Vanderbilt University"
+    contentSnippet: "Hal 9000 “among the Several States”: The Irony of the Dormant Commerce Clause and Ai Regulations After the One Big Beautiful Bill Act -Vanderbilt Law School | Vanderbilt University > Hal 9000 “among the Several States”: The Irony of the Dormant Commerce Clause and Ai Regulations After the One Big Beautiful Bill Act Nov 16, 2025, 9:34 AM Share Twitter Facebook Email LinkedIn By Thomas Farlow On July 4, 2025, President Trump signed Public Law 119-21, more commonly known as the “One Big Beautiful B"
+    contentLength: 157421
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://a16z.com/the-commerce-clause-in-the-age-of-ai-guardrails-and-opportunities-for-state-legislatures/
+    linkText: "The Commerce Clause in the Age of AI: Guardrails and Opportunities for State Legislatures — - Andreessen Horowitz, October 14, 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:38.200Z
+    httpStatus: 200
+    pageTitle: "The Commerce Clause in the Age of AI: Guardrails and Opportunities for State Legislatures | Andreessen Horowitz"
+    contentSnippet: "The Commerce Clause in the Age of AI: Guardrails and Opportunities for State Legislatures | Andreessen Horowitz The Commerce Clause in the Age of AI: Guardrails and Opportunities for State Legislatures Matt Perault and Jai Ramaswamy share Copy Link Email X LinkedIn Facebook Hacker News WhatsApp Flipboard Reddit Table of Contents Table of Contents Posted September 2, 2025 In Brief The Constitution gives Congress and states distinct roles in regulating AI: Congress should govern the national AI ma"
+    contentLength: 158784
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.clarkhill.com/news-events/news/what-does-trumps-ai-executive-order-mean-for-colorados-ai-act/
+    linkText: What Does Trump's AI Executive Order Mean for Colorado's AI Act? — - Clark Hill PLC, December 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:39.868Z
+    httpStatus: 200
+    pageTitle: What Does Trump’s AI Executive Order Mean for Colorado’s AI Act? | News & Events | Clark Hill PLC
+    contentSnippet: What Does Trump’s AI Executive Order Mean for Colorado’s AI Act? | News & Events | Clark Hill PLC Skip to content What Does Trump’s AI Executive Order Mean for Colorado’s AI Act? December 12, 2025 Authors Michael J. Laszlo , Jason M. Schwent On Dec. 11th, President Trump issued an AI Executive Order titled “ Ensuring A National Policy Framework For Artificial Intelligence ” that poses an existential threat to Colorado’s AI Act . The President’s AI order explicitly targets state-level AI laws, an
+    contentLength: 145010
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.multistate.us/insider/2025/12/19/how-trumps-ai-executive-order-will-impact-states
+    linkText: How Trump's AI Executive Order Will Impact States — - MultiState, December 19, 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:40.073Z
+    httpStatus: 200
+    pageTitle: How Trump&#39;s AI Executive Order Will Impact States | MultiState
+    contentSnippet: "How Trump&#39;s AI Executive Order Will Impact States | MultiState 2026 Legislative Session Dates Technology & Privacy How Trump&#39;s AI Executive Order Will Impact States December 19, 2025 | Bill Kramer Home / Insider / ••• Share Key Takeaways: President Trump’s AI executive order directs federal agencies to challenge state AI regulations through lawsuits and funding cuts, but it does not have the power to preempt state laws without congressional action. The executive order specifically target"
+    contentLength: 57583
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.commonsenseinstituteus.org/colorado/research/jobs-and-our-economy/unintended-costs-the-economic-impact-of-colorados-ai-policy
+    linkText: "Unintended Costs: The Economic Impact of Colorado's AI Policy — - Common Sense Institute, 2024"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:40.331Z
+    httpStatus: 200
+    pageTitle: "Unintended Costs: The Economic Impact of Colorado’s AI Policy"
+    contentSnippet: "Unintended Costs: The Economic Impact of Colorado’s AI Policy Warning! Your browser is extremely outdated and not web standards compliant. Your browsing experience would greatly improve by upgrading to a modern browser . Unintended Costs: The Economic Impact of Colorado’s AI Policy August 20, 2025 Download Full Report Unintended Costs: The Economic Impact of Colorado&rsquo;s AI Policy Introduction & Key Findings As is well publicized, the use of artificial intelligence (AI) algorithms is rapidly"
+    contentLength: 339450
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.du.edu/news/colorado-pumping-brakes-first-its-kind-ai-regulation-find-practical-path-forward
+    linkText: Colorado is pumping the brakes on first-of-its-kind AI regulation — - University of Denver, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T20:45:39.685Z
+    httpStatus: 200
+    pageTitle: Colorado is pumping the brakes on first-of-its-kind AI regulation to find a practical path forward | University of Denver
+    contentSnippet: Colorado is pumping the brakes on first-of-its-kind AI regulation to find a practical path forward | University of Denver Skip to Content Current Students Alumni Families Neighbors Faculty Staff Businesses Event Portal Newman Center Ritchie Center Kennedy Mountain Campus DU Bookstore Cable Center Museum of Anthropology Vicki Myhren Gallery Evans Chapel Weddings Colorado is pumping the brakes on first-of-its-kind AI regulation to find a practical path forward Back to News Listing Author(s) Univer
+    contentLength: 97961
+    status: verified
+    note: null

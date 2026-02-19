@@ -103,4 +103,52 @@ AI safety is important. The field has grown to \\$100M in funding.[^1] Growth co
     const citations = extractCitationsFromContent(body);
     expect(citations[0].claimContext).toContain('100M');
   });
+
+  it('extracts text-then-bare-URL citations', () => {
+    const body = `
+TransformerLens is a key tool.[^1] It was built for mechanistic interpretability.[^2]
+
+[^1]: TransformerLens GitHub repository: https://github.com/neelnanda-io/TransformerLens
+[^2]: Elhage, N., Nanda, N., et al. (2021). "A Mathematical Framework for Transformer Circuits." Transformer Circuits Thread. https://transformer-circuits.pub/2021/framework/index.html
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(2);
+
+    expect(citations[0].footnote).toBe(1);
+    expect(citations[0].url).toBe('https://github.com/neelnanda-io/TransformerLens');
+    expect(citations[0].linkText).toBe('TransformerLens GitHub repository');
+
+    expect(citations[1].footnote).toBe(2);
+    expect(citations[1].url).toBe('https://transformer-circuits.pub/2021/framework/index.html');
+    expect(citations[1].linkText).toContain('Mathematical Framework');
+  });
+
+  it('skips footnotes without URLs', () => {
+    const body = `
+Some claim.[^1] Another claim.[^2]
+
+[^1]: [Report](https://example.com/report)
+[^2]: Based on statements in blog posts discussing limitations
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(1);
+    expect(citations[0].footnote).toBe(1);
+  });
+
+  it('handles mixed footnote formats in the same page', () => {
+    const body = `
+Claim A.[^1] Claim B.[^2] Claim C.[^3] Claim D.[^4]
+
+[^1]: [Titled Link](https://example.com/titled)
+[^2]: Author, "[Embedded Link](https://example.com/embedded)," Journal, 2024.
+[^3]: Description text: https://example.com/text-url
+[^4]: https://example.com/bare
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(4);
+    expect(citations[0].url).toBe('https://example.com/titled');
+    expect(citations[1].url).toBe('https://example.com/embedded');
+    expect(citations[2].url).toBe('https://example.com/text-url');
+    expect(citations[3].url).toBe('https://example.com/bare');
+  });
 });

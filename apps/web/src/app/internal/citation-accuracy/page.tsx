@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { loadYaml } from "@lib/yaml";
 import { CitationAccuracyDashboard } from "./citation-accuracy-dashboard";
 import { VERDICT_COLORS } from "./verdict-colors";
 import type { Metadata } from "next";
@@ -66,15 +67,15 @@ export interface DomainSummary {
 }
 
 function loadDashboardData(): DashboardData | null {
-  const jsonPath = path.resolve(
+  const yamlPath = path.resolve(
     process.cwd(),
-    "../../.cache/citation-accuracy-dashboard.json"
+    "../../data/citation-accuracy/dashboard.yaml"
   );
-  if (!fs.existsSync(jsonPath)) return null;
+  if (!fs.existsSync(yamlPath)) return null;
 
   try {
-    const raw = fs.readFileSync(jsonPath, "utf-8");
-    return JSON.parse(raw) as DashboardData;
+    const raw = fs.readFileSync(yamlPath, "utf-8");
+    return loadYaml<DashboardData>(raw);
   } catch {
     return null;
   }

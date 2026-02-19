@@ -1,20 +1,21 @@
 /**
  * Export Citation Accuracy Dashboard Data
  *
- * Reads accuracy data from the SQLite DB and exports a JSON file
- * that the Next.js internal dashboard can read without needing
- * a native SQLite dependency.
+ * Reads accuracy data from the SQLite DB and exports a YAML file
+ * to data/citation-accuracy/dashboard.yaml so it's available in
+ * production (SQLite is not available on Vercel).
  *
- * Output: .cache/citation-accuracy-dashboard.json
+ * Output: data/citation-accuracy/dashboard.yaml
  *
  * Usage:
  *   pnpm crux citations export-dashboard
  *   pnpm crux citations export-dashboard --json
  */
 
-import { writeFileSync, existsSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
+import yaml from 'js-yaml';
 import { citationQuotes, getDb, PROJECT_ROOT, CACHE_DIR } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
@@ -284,12 +285,14 @@ export function buildDashboardExport(): DashboardExport | null {
   };
 }
 
-const OUTPUT_PATH = join(CACHE_DIR, 'citation-accuracy-dashboard.json');
+const OUTPUT_DIR = join(PROJECT_ROOT, 'data', 'citation-accuracy');
+const OUTPUT_PATH = join(OUTPUT_DIR, 'dashboard.yaml');
 
 export function exportDashboardData(): string | null {
   const data = buildDashboardExport();
   if (!data) return null;
-  writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2));
+  mkdirSync(OUTPUT_DIR, { recursive: true });
+  writeFileSync(OUTPUT_PATH, yaml.dump(data, { lineWidth: -1, noRefs: true }));
   return OUTPUT_PATH;
 }
 

@@ -1,0 +1,804 @@
+exportedAt: '2026-02-19T19:23:36.984Z'
+summary:
+  totalCitations: 232
+  checkedCitations: 181
+  accurateCitations: 104
+  inaccurateCitations: 13
+  unsupportedCitations: 17
+  minorIssueCitations: 36
+  uncheckedCitations: 51
+  averageScore: 0.8
+verdictDistribution:
+  accurate: 104
+  minor_issues: 36
+  unsupported: 17
+  inaccurate: 13
+  not_verifiable: 11
+difficultyDistribution:
+  Easy. The relevant information is explicitly stated in the source.: 1
+  The information is explicitly stated in the text.: 1
+  The article mentions Tara MacAulay's role in Alameda Research, but does not provide specific details about her joining date or co-founding status.: 1
+  All information is present in the text and easy to find.: 1
+  The information is spread across multiple sections of the source, requiring careful reading to piece together the details.: 1
+  The source is a short description of the Community Building Grants Program and does not contain the information mentioned in the claim. The claim is about the organization as a whole, not just the grant program.: 1
+  The relevant information is contained within a single paragraph.: 10
+  The information is directly stated in the text and easy to verify.: 2
+  The relevant information is contained within a few sentences.: 2
+  The source does not mention the speakers at the first EA Global, nor does it mention the locations of additional conferences. It does support the claim about animal advocacy content at the 2015 and 2016 conferences. Needed to read the entire document to confirm the unsupported details.: 1
+  The source confirms that the EA Forum was based on the LessWrong codebase.: 1
+  The claim is a footnote definition, so there is no claim to verify without the context of the claim itself.: 1
+  The article directly discusses the questions that arose after the collapse of FTX and Bankman-Fried's arrest.: 1
+  'The source mentions the dates and locations of EA Global: Bay Area 2025 and EA Global: London 2025. However, it does not mention the dates or location of EA Global: Boston 2024.': 2
+  Some details are present, but others are not explicitly mentioned in the article, requiring careful reading and inference.: 1
+  All details are explicitly stated in the article.: 3
+  The claim is supported by multiple statements in the article. It was easy to verify.: 2
+  The title of the post is the same as in the claim.: 1
+  The source confirms that Zach Robinson will be the next CEO of CEA and that he will transition into the role in mid-February. However, the source does not mention that he was the 'Former Chief of Staff at Coefficient Giving', but rather that he was the 'interim CEO of EV US'.: 1
+  The single paragraph contains all the information needed to verify the claim.: 1
+  The source is a survey about EA groups. It mentions the Centre for Effective Altruism (CEA) as a collaborator but does not contain information about the specific programs and activities mentioned in the claim. The number of local EA groups across 50 countries is mentioned in the summary.: 1
+  The source is a short announcement. The funding information is not mentioned in the source. The spin-out and merger are mentioned, but the details are not fully accurate.: 1
+  The source confirms the legal structure and the countries where the entities are registered. However, it does not provide the charity number or EIN, making it impossible to verify those details.: 1
+  All details are explicitly stated in the provided source.: 1
+  The source is a short blog post that confirms most of the details, but some details are missing.: 1
+  The source is a short announcement. The claim contains information not found in the source.: 1
+  The source mentions the first EA Global in 2015 and the locations of the initial conferences. However, it does not mention specific speakers or explicitly state that the 2015 and 2016 conferences made mistakes regarding animal advocacy content.: 1
+  The information about Sam Bankman-Fried is in one sentence. The other details are not mentioned in the article.: 1
+  The source is a short description of the Community Health team and does not contain the information claimed.: 1
+  Several sentences needed to be combined to verify the claim. The exact dollar amount returned is explicitly stated. The date of the inquiry is also explicitly stated.: 3
+  Easy. The information about Nick Beckstead is explicitly stated in the article. However, the article does not mention Will MacAskill stepping down from the boards.: 1
+  The information is available in the first paragraph and in the comments.: 1
+  Easy. The relevant information is contained within a few sentences.: 1
+  The source is a short mission statement that does not contain any of the details mentioned in the claim.: 1
+  The source is a single webpage. The number of alumni and the average participant rating are explicitly stated. The other details are not mentioned.: 1
+  Some parts of the claim are supported by the source, but other details are missing, making it difficult to fully verify.: 1
+  Easy. The relevant information is contained within a few paragraphs, but some details are missing or inaccurate.: 1
+  The source was easily searchable, but some parts of the claim were not supported by the text.: 1
+  The claim is directly supported by the source.: 1
+  The source is a single webpage. The claim contains information not found in the source.: 1
+  Easy. The article mentions the cost and length of the seminar. The article does not mention the three core pillars.: 1
+  The source text is a transcript of a workshop. The claim is a general statement about the techniques taught at CFAR workshops. The source text does not list or describe the key techniques taught at CFAR workshops. The source text mentions some techniques, but does not state that these are key techniques taught at CFAR workshops.: 1
+  The claim was not found in the source document.: 1
+  The document is a blog post about CFAR workshops. It does not contain the information mentioned in the claim.: 1
+  The claim is supported by multiple sections of the report, requiring careful reading to ensure accuracy.: 1
+  The claim is too vague to verify. It needs to be more specific about what examples it is referring to.: 1
+  The source is a short announcement about a single grant. The claim includes details about multiple grants and funds that are not mentioned in the source.: 1
+  The source is a short blog post. The claim contains many details not found in the source.: 1
+  All details are present in the endnote.: 1
+  The relevant information is contained within a single paragraph. The document does not contain the total assets for the organization.: 1
+  The source is a summary of the organization's 990 report. It only contains information about total assets and grantmaking activities, not the specific details about liquidity mentioned in the claim. Therefore, the claim is unsupported by the source.: 1
+  The source does not contain the specific details mentioned in the claim, making it difficult to verify. The claim mentions specific techniques and their relevance to AI safety, which are not explicitly discussed in the source.: 1
+  The source mentions CFAR workshops and scope insensitivity, but does not explicitly mention all the techniques listed in the claim or their relevance to AI safety work. Requires careful reading and interpretation.: 1
+  The information is explicitly stated in a single paragraph.: 1
+  Several paragraphs spread throughout the text support the claim. The claim is a summary of the author's arguments.: 1
+  The source provides a general overview of CFAR's activities and financial information, but it does not contain specific details about its role in building social infrastructure, serving as a gathering point for "rationality geeks," or connecting individuals interested in existential risk reduction, AI safety, and effective altruism. Therefore, the claim is unsupported by the provided source.: 1
+  All details are explicitly stated in the source text.: 1
+  Multiple comments across the discussion thread confirm the details of the claim.: 1
+  All details are explicitly stated in the source document.: 1
+  The definition of compute governance and its relation to AI chips is explicitly stated in the article.: 1
+  The source explicitly mentions the AI chips and the need for tens of thousands of them for frontier AI training.: 1
+  The claim is supported by multiple sentences in the article.: 1
+  The source provides a definition of compute governance but does not explicitly mention its origins or the specific timeframe of 2022-2023.: 1
+  Easy. The title and date are at the top of the report. The relevant text is in the introduction.: 1
+  The claim is directly supported by the text. The relevant information is found in the 'Compute governance is feasible' section.: 1
+  Relatively easy to verify, as the information is contained within a few sentences.: 1
+  The claim is directly supported by a single sentence in the source document.: 2
+  The details are explicitly stated in the article.: 1
+  The information is available in the 'Section 232 Tariffs on Certain Covered AI Chip Imports' section.: 1
+  Easy. The date and administration are clearly stated in the press release.: 1
+  The information is contained within a single sentence.: 1
+  The claim is directly supported by sentences in the source.: 1
+  The relevant information is contained in two different paragraphs.: 1
+  The claim is supported by two sentences in the same paragraph.: 1
+  The claim is directly supported by a single sentence in the source text.: 2
+  The claim contains details not found in the source, requiring careful reading to confirm absence.: 1
+  Easy. The relevant information is explicitly stated in the source. The claim makes an incorrect attribution and references a non-existent rule.: 1
+  The claim is supported by multiple sections of the report, which mention the listed countries and their implementation of list-based controls on AI chips and semiconductor manufacturing equipment.: 1
+  The specific nanometer threshold is mentioned in a single sentence.: 1
+  The entire document was searched and no mention of the claimed improvements was found.: 1
+  The relevant information is spread across multiple sections of the article, but each detail is clearly stated.: 1
+  The relevant information is contained within a few paragraphs and is easy to verify.: 1
+  The relevant information is contained within a single sentence.: 8
+  Multiple sentences across the document support the claim.: 2
+  The claim is a summary of multiple points made in the document, but all are present and accurately represented.: 1
+  Easy, the exact number is stated in the summary.: 1
+  All information is contained in the first two sentences.: 1
+  The first part of the claim is supported by the text, but the specific program areas are listed in a different section.: 1
+  The relevant information is contained within a few sentences in the source.: 1
+  The article focuses on specific foundations (Hewlett and Omidyar) and their funding of right-wing initiatives. It does not discuss AI or a general foundation's nonpartisan mission.: 1
+  The source focuses on the Hewlett Foundation's funding of a pro-Trump nonprofit and does not provide information about the foundation's work in AI or comparisons to other foundations.: 1
+  The source is a press release about a specific grant to Florida A&M University. It does not contain the information needed to verify the claim about the Hewlett Foundation's broader activities or mission.: 1
+  The information is explicitly stated in the source text.: 1
+  Easy. The source mentions the foundation started in the living room of their Palo Alto house, but does not specify that the period from 1966 to 1972 was known as "the living room years," nor does it mention that family members met informally at home to decide how the foundation could do the most good.: 1
+  All details are found in a few sentences.: 1
+  The source confirms the foundation's history of media funding and its early grant to KQED. However, it does not list the foundation's early focus areas.: 1
+  The information is contained within a few paragraphs and is clearly stated.: 1
+  All information is explicitly stated in the source document.: 1
+  The source mentions education as a focus area, but does not provide specific data on the number of education-related grants or compare it to other focus areas by recipient count. Requires careful reading of the entire document to confirm absence of specific details.: 1
+  All details are explicitly stated in the source.: 1
+  All information is contained within a few paragraphs.: 1
+  The claim is supported by multiple sentences in the article. It requires careful reading to ensure that the details are accurately represented.: 1
+  The claim contains multiple details that require searching the entire document to verify. The source mentions the foundation being a funder of anti-capitalist and socially liberal causes, but the other details are not directly supported.: 1
+  The source mentions Paul Brest's role as Stanford Law School dean and his praise for law-and-economics donors. It also mentions his current position at the Hewlett Foundation. However, the 'implicit critiques' aspect is not directly stated, requiring some interpretation. The source does not explicitly state that Brest is the president of the Hewlett Foundation, only that he 'presides over' it.: 1
+  The relevant information is spread across multiple sections, but each detail is clearly stated.: 1
+  The rating and its basis in accountability and finance are stated explicitly.: 1
+  The source mentions the founding year and the organization's mission, but the specific month and the focus on effective altruism are not explicitly stated.: 1
+  The claim contains multiple details, but the source only mentions one detail related to Davis's previous work.: 1
+  The term "hits-based giving" is not found in the document.: 1
+  The relevant information is in one paragraph, but requires some calculation to determine the total number of staff.: 1
+  Single sentence confirms the exact numbers.: 1
+  The information is explicitly stated in the executive summary of the report.: 1
+  The announcement explicitly states that Davis became sole CEO and that Wildeford was the former co-CEO.: 1
+  The relevant information is contained within a single section of the document.: 1
+  The information is stated in the TLDR and in the section about funding needs.: 1
+  The source mentions Open Philanthropy as a client, but does not mention any of the other organizations or services listed in the claim.: 1
+  The claim was not found in the article. I read the entire article and searched for keywords related to the claim.: 1
+  The relevant information is contained in a single paragraph.: 1
+  The relevant information is found in the 'The timeline of a typical project' section. The claim accurately represents the methodology described in the source, including premortems, crux identification, and expert consultations.: 1
+  Single sentence confirms the claim.: 1
+  The claim is supported by multiple statements in the article.: 1
+  The claim is supported by two sentences in the overview and purpose sections.: 1
+  The abstract of the report is summarized in the text.: 1
+  The source only contains information about the NYC plant-based meals program. The other claims are not mentioned.: 1
+  The relevant information is contained within a single sentence in the executive summary.: 1
+  The relevant information is spread across multiple paragraphs, but each detail is explicitly stated.: 1
+  Easy. The article is a reflective post from 2023 where the co-founders acknowledge mistakes.: 1
+  The relevant information is spread across multiple paragraphs, but the language is clear and easy to interpret.: 1
+  The entire document was searched for the terms 'hierarchicalism' and 'unitarianism' and neither were found. This makes the claim unsupported by the provided source.: 1
+  The claim is a summary of the author's points.: 1
+  The relevant sentence is found in the Limitations section of the article.: 1
+  The relevant text is in one paragraph and easy to find.: 1
+  The claim is directly supported by a sentence in the source.: 1
+  The relevant information is located in the section describing the Animal Welfare department's plans for 2026.: 1
+  The relevant information is contained within a few paragraphs.: 1
+  The rating is stated clearly at the top of the page. The methodology is explained in the description of the rating.: 1
+  The claim is directly supported by the announcement.: 1
+  The board of directors is listed in one section, but the date is different and most of the names are not present.: 1
+  The claim is not explicitly stated in the source, but it is implied. Needed to combine information from multiple sections.: 1
+  The source mentions cause prioritization surveys in the EA community.: 1
+  The claim is supported by multiple mentions of the tools in the source.: 1
+  The relevant information is contained within a few paragraphs of the document.: 1
+  The entire article was read and the claim could not be found.: 1
+  The text directly supports the claim.: 1
+pages:
+  - pageId: center-for-applied-rationality
+    totalCitations: 34
+    checked: 30
+    accurate: 11
+    inaccurate: 2
+    unsupported: 8
+    minorIssues: 7
+    accuracyRate: 0.6
+    avgScore: 0.63
+  - pageId: cea
+    totalCitations: 53
+    checked: 42
+    accurate: 17
+    inaccurate: 4
+    unsupported: 2
+    minorIssues: 14
+    accuracyRate: 0.7380952380952381
+    avgScore: 0.78
+  - pageId: compute-governance
+    totalCitations: 38
+    checked: 30
+    accurate: 22
+    inaccurate: 3
+    unsupported: 1
+    minorIssues: 3
+    accuracyRate: 0.8333333333333334
+    avgScore: 0.88
+  - pageId: hewlett-foundation
+    totalCitations: 29
+    checked: 23
+    accurate: 10
+    inaccurate: 2
+    unsupported: 1
+    minorIssues: 8
+    accuracyRate: 0.782608695652174
+    avgScore: 0.8
+  - pageId: rethink-priorities
+    totalCitations: 58
+    checked: 55
+    accurate: 43
+    inaccurate: 2
+    unsupported: 5
+    minorIssues: 4
+    accuracyRate: 0.8545454545454545
+    avgScore: 0.88
+  - pageId: colorado-ai-act
+    totalCitations: 19
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    minorIssues: 0
+    accuracyRate: null
+    avgScore: null
+  - pageId: p1
+    totalCitations: 1
+    checked: 1
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    minorIssues: 0
+    accuracyRate: 1
+    avgScore: 0.9
+flaggedCitations:
+  - pageId: cea
+    footnote: 7
+    claimText: The organization runs <EntityLink id="ea-global">EA Global</EntityLink> conferences that bring together people interested in effective altruism ideas, supports over 200 local EA groups across 50 countries, and builds and moderates the EA Forum—an online discussion platform for the community. CEA also operates effectivealtruism.org and publishes the Effective Altruism Newsletter. Through its Community Building Grants Program launched in 2018, CEA provides funding to individuals and groups doing local EA community building.
+    sourceTitle: Community Building Grants Program | Centre For Effective Altruism
+    url: https://www.centreforeffectivealtruism.org/community-building-grants
+    verdict: unsupported
+    score: 0
+    issues: The source does not mention EA Global conferences, the number of local EA groups, the EA Forum, effectivealtruism.org, or the Effective Altruism Newsletter.
+    difficulty: The source is a short description of the Community Building Grants Program and does not contain the information mentioned in the claim. The claim is about the organization as a whole, not just the grant program.
+    checkedAt: '2026-02-19 18:56:17'
+  - pageId: center-for-applied-rationality
+    footnote: 15
+    claimText: 'Key techniques taught at CFAR workshops include:'
+    sourceTitle: Center for Applied Rationality Workshop (2018) | Effective Altruism
+    url: https://www.effectivealtruism.org/articles/ea-global-2018-cfar-workshop
+    verdict: unsupported
+    score: 0
+    issues: null
+    difficulty: The source text is a transcript of a workshop. The claim is a general statement about the techniques taught at CFAR workshops. The source text does not list or describe the key techniques taught at CFAR workshops. The source text mentions some techniques, but does not state that these are key techniques taught at CFAR workshops.
+    checkedAt: '2026-02-19 19:22:45'
+  - pageId: center-for-applied-rationality
+    footnote: 16
+    claimText: According to CFAR, these techniques aim to bridge System 1 and System 2 cognition, helping participants work with emotions, reframe problems, and understand the modular nature of the mind.
+    sourceTitle: CFAR workshop review | benkuhn.net
+    url: https://www.benkuhn.net/cfar-workshop/
+    verdict: unsupported
+    score: 0
+    issues: The source does not mention that the techniques aim to bridge System 1 and System 2 cognition, help participants work with emotions, reframe problems, and understand the modular nature of the mind.
+    difficulty: The claim was not found in the source document.
+    checkedAt: '2026-02-19 19:22:47'
+  - pageId: center-for-applied-rationality
+    footnote: 25
+    claimText: As of December 2019 or 2020, CFAR reported approximately \$1.4 million in total liquidity, including \$650,000 in cash, \$575,000 in expected grants, and \$215,000 in accounts receivable. The organization's total assets have been reported at \$23,039,646, though this figure may include the venue property acquired in 2018.
+    sourceTitle: Center for Applied Rationality | Berkeley, CA | 990 Report
+    url: https://www.instrumentl.com/990-report/center-for-applied-rationality
+    verdict: unsupported
+    score: 0
+    issues: The source does not contain any information about the organization's liquidity, cash, expected grants, or accounts receivable. It only mentions the total assets.
+    difficulty: The source is a summary of the organization's 990 report. It only contains information about total assets and grantmaking activities, not the specific details about liquidity mentioned in the claim. Therefore, the claim is unsupported by the source.
+    checkedAt: '2026-02-19 19:23:05'
+  - pageId: compute-governance
+    footnote: 28
+    claimText: Recommended improvements include expanding BIS staffing, deploying supply chain analytics capabilities, monitoring end-use patterns across high-risk jurisdictions, and developing new export controls on semiconductor manufacturing sub-systems.
+    sourceTitle: 'AI Chip Export Controls: A New Challenge for Data Centers'
+    url: https://www.datacenterknowledge.com/data-center-chips/ai-chip-export-controls-a-new-challenge-for-data-center-operators
+    verdict: unsupported
+    score: 0
+    issues: The source does not contain any recommended improvements related to BIS staffing, supply chain analytics, end-use monitoring, or export controls on semiconductor manufacturing sub-systems.
+    difficulty: The entire document was searched and no mention of the claimed improvements was found.
+    checkedAt: '2026-02-19 18:59:38'
+  - pageId: hewlett-foundation
+    footnote: 9
+    claimText: While the foundation has supported progressive causes throughout its history, it has recently drawn criticism for funding organizations with ties to right-wing initiatives, creating tension with its stated nonpartisan mission. The foundation's work in AI focuses primarily on cybersecurity risks rather than AI alignment or existential safety concerns, distinguishing it from foundations like <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> that prioritize AI existential risk.
+    sourceTitle: FAMU Cyber Policy Institute Expands AI, Cybersecurity Initiatives with Hewlett Foundation Support
+    url: https://news.famu.edu/2025/famu-cyber-policy-institute-expands-ai-cybersecurity-initiatives-with-hewlett-foundation-support.php
+    verdict: unsupported
+    score: 0
+    issues: The source does not contain information about the Hewlett Foundation's overall history, its funding of progressive or right-wing causes, its nonpartisan mission, or its focus on cybersecurity risks versus AI alignment or existential safety concerns.
+    difficulty: The source is a press release about a specific grant to Florida A&M University. It does not contain the information needed to verify the claim about the Hewlett Foundation's broader activities or mission.
+    checkedAt: '2026-02-19 19:04:59'
+  - pageId: rethink-priorities
+    footnote: 7
+    claimText: This "hits-based giving" approach focused on identifying tractable opportunities that mainstream philanthropy overlooked.
+    sourceTitle: 'Five Years of Rethink Priorities: Impact, Future Plans, Funding Needs (July 2023) — EA Forum'
+    url: https://forum.effectivealtruism.org/posts/7QyemcXLaxNicLNNa/five-years-of-rethink-priorities-impact-future-plans-funding
+    verdict: unsupported
+    score: 0
+    issues: The source does not mention "hits-based giving".
+    difficulty: The term "hits-based giving" is not found in the document.
+    checkedAt: '2026-02-19 18:52:54'
+  - pageId: rethink-priorities
+    footnote: 19
+    claimText: The organization also examines other catastrophic risks and conducts cost-effectiveness analyses of interventions aimed at reducing existential threats.
+    sourceTitle: 'Cause Area: AI Governance and Strategy &#x2d; Rethink Priorities'
+    url: https://rethinkpriorities.org/cause-area/ai-governance-and-strategy/
+    verdict: unsupported
+    score: 0
+    issues: The source does not mention that the organization examines other catastrophic risks or conducts cost-effectiveness analyses of interventions aimed at reducing existential threats.
+    difficulty: The claim was not found in the article. I read the entire article and searched for keywords related to the claim.
+    checkedAt: '2026-02-19 18:53:12'
+  - pageId: rethink-priorities
+    footnote: 41
+    claimText: Critics argue that the project's dismissal of hierarchicalism (the view that some welfare matters more based on the type of being experiencing it) in favor of unitarianism (equal welfare value across beings) represents a substantive philosophical assumption that may not hold.
+    sourceTitle: Is RP&#x27;s Moral Weights Project too animal friendly? Four critical junctures — EA Forum
+    url: https://forum.effectivealtruism.org/posts/E9NnR9cJMM7m5G2r4/is-rp-s-moral-weights-project-too-animal-friendly-four
+    verdict: unsupported
+    score: 0
+    issues: The source does not discuss the concepts of hierarchicalism or unitarianism in relation to welfare or moral weight.
+    difficulty: The entire document was searched for the terms 'hierarchicalism' and 'unitarianism' and neither were found. This makes the claim unsupported by the provided source.
+    checkedAt: '2026-02-19 18:53:51'
+  - pageId: rethink-priorities
+    footnote: 57
+    claimText: The extent to which Rethink Priorities' specific methodological choices introduce bias—and in which direction—remains contested.
+    sourceTitle: Rethink Priorities’ Welfare Range Estimates &#x2d; Rethink Priorities
+    url: https://rethinkpriorities.org/research-area/welfare-range-estimates/
+    verdict: unsupported
+    score: 0
+    issues: The source does not contain any discussion of whether Rethink Priorities' methodological choices introduce bias, nor whether this is contested.
+    difficulty: The entire article was read and the claim could not be found.
+    checkedAt: '2026-02-19 18:54:20'
+  - pageId: center-for-applied-rationality
+    footnote: 17
+    claimText: '- **SPARC (Summer Program on Applied Rationality and Cognition)**: Annual summer programs, including events in 2019 and funding from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> (\$304,000 over two years in 2016). - **MIRI-focused workshops**: Specialized sessions for AI safety researchers, including the 2015 MIRI Summer Fellows Program (a 3-week training program for AI safety researchers). - **Alumni support**: Six-week official follow-up programs and ongoing coaching/mentorship for workshop graduates.'
+    sourceTitle: 'The Centre for Applied Rationality: a year later from a (somewhat) outside perspective — LessWrong'
+    url: https://www.lesswrong.com/posts/zqqQDtsWGpXN3wBLZ/the-centre-for-applied-rationality-a-year-later-from-a
+    verdict: unsupported
+    score: 0.1
+    issues: The source does not mention SPARC, MIRI-focused workshops, Coefficient Giving, or alumni support programs.
+    difficulty: The document is a blog post about CFAR workshops. It does not contain the information mentioned in the claim.
+    checkedAt: '2026-02-19 19:22:48'
+  - pageId: center-for-applied-rationality
+    footnote: 22
+    claimText: '- **<EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>**: Over \$3.5 million - \$1,035,000 grant in 2016 (two years) for operational improvements and research - Multi-year institutional grant renewed in 2018 for 2018-2019 - **Survival and Flourishing Fund**: Over \$1.6 million - **Effective Altruism Funds**: Over \$300,000 - \$150,000 from Long-Term Future Fund in April 2019 (addressing funding shortfall after 2018 controversy) - Additional \$150,000 recommended in August 2019'
+    sourceTitle: Fundraising & Leadership Updates | Center for Applied Rationality
+    url: http://www.rationality.org/resources/updates/2018/fundraising-and-leadership-updates
+    verdict: inaccurate
+    score: 0.2
+    issues: |-
+      WRONG NUMBERS: The grant amount from Open Philanthropy is incorrect.
+      UNSUPPORTED: The source does not mention Coefficient Giving, Survival and Flourishing Fund, or Effective Altruism Funds.
+      UNSUPPORTED: The source does not mention the Long-Term Future Fund or any funding shortfall after a 2018 controversy.
+      UNSUPPORTED: The source does not mention any additional recommendation in August 2019.
+    difficulty: The source is a short blog post. The claim contains many details not found in the source.
+    checkedAt: '2026-02-19 19:22:59'
+  - pageId: center-for-applied-rationality
+    footnote: 26
+    claimText: The rationality techniques taught at CFAR workshops—such as Bayesian reasoning, debiasing methods, and systematic decision-making frameworks—are presented as relevant to challenges in AI safety work, including addressing scope insensitivity and improving collaborative research practices.
+    sourceTitle: CFAR’s new focus, and AI Safety — LessWrong
+    url: https://www.lesswrong.com/posts/3zYXD8RyB6fv2czFz/cfar-s-new-focus-and-ai-safety
+    verdict: unsupported
+    score: 0.2
+    issues: |-
+      The source does not mention the specific rationality techniques taught at CFAR workshops, such as Bayesian reasoning, debiasing methods, and systematic decision-making frameworks.
+      The source does not explicitly state that these techniques are presented as relevant to challenges in AI safety work, including addressing scope insensitivity and improving collaborative research practices.
+    difficulty: The source does not contain the specific details mentioned in the claim, making it difficult to verify. The claim mentions specific techniques and their relevance to AI safety, which are not explicitly discussed in the source.
+    checkedAt: '2026-02-19 19:23:08'
+  - pageId: center-for-applied-rationality
+    footnote: 30
+    claimText: CFAR has contributed to building social infrastructure within rationality and EA communities through workshops, alumni networks, and partnerships with organizations like Effective Altruism Global. The organization has served as a gathering point for "rationality geeks" to exchange ideas on cognitive improvement and has helped connect individuals interested in existential risk reduction, AI safety, and effective altruism.
+    sourceTitle: Center for Applied Rationality (CFAR) | Berkeley, CA | Cause IQ
+    url: https://www.causeiq.com/organizations/center-for-applied-rationality,453100226/
+    verdict: unsupported
+    score: 0.2
+    issues: |-
+      The source does not mention CFAR's contribution to building social infrastructure within rationality and EA communities through workshops, alumni networks, and partnerships with organizations like Effective Altruism Global.
+      The source does not mention CFAR serving as a gathering point for "rationality geeks" to exchange ideas on cognitive improvement.
+      The source does not mention CFAR helping connect individuals interested in existential risk reduction, AI safety, and effective altruism.
+    difficulty: The source provides a general overview of CFAR's activities and financial information, but it does not contain specific details about its role in building social infrastructure, serving as a gathering point for "rationality geeks," or connecting individuals interested in existential risk reduction, AI safety, and effective altruism. Therefore, the claim is unsupported by the provided source.
+    checkedAt: '2026-02-19 19:23:19'
+  - pageId: rethink-priorities
+    footnote: 18
+    claimText: The team provides consulting services to organizations like <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> and GiveWell on top opportunities, reviews of discount rates, road safety policy advocacy, and health metrics like QALYs and DALYs.
+    sourceTitle: 'Our research process: an overview from Rethink Priorities’ Global Health and Development team &#x2d; Rethink Priorities'
+    url: https://rethinkpriorities.org/ghd-research-process/
+    verdict: unsupported
+    score: 0.2
+    issues: The source does not mention Coefficient Giving, reviews of discount rates, road safety policy advocacy, or health metrics like QALYs and DALYs.
+    difficulty: The source mentions Open Philanthropy as a client, but does not mention any of the other organizations or services listed in the claim.
+    checkedAt: '2026-02-19 18:53:11'
+  - pageId: cea
+    footnote: 47
+    claimText: The Community Building Grants Program launched in 2018, enabling CEA to fund local community builders around the world. Also in 2018, CEA launched a new version of the EA Forum based on the <EntityLink id="lesswrong">LessWrong</EntityLink> codebase. The Community Health team, led by Julia Wise (CEA's longest-serving employee, who joined in 2015), was formalized to handle complaints and community concerns.
+    sourceTitle: Community health team | Centre For Effective Altruism
+    url: https://www.centreforeffectivealtruism.org/community-health
+    verdict: unsupported
+    score: 0.25
+    issues: |-
+      The source does not mention the Community Building Grants Program, the launch of the EA Forum, or Julia Wise's start date at CEA.
+      The source only describes the purpose and approach of the Community Health team.
+    difficulty: The source is a short description of the Community Health team and does not contain the information claimed.
+    checkedAt: '2026-02-19 18:57:23'
+  - pageId: cea
+    footnote: 34
+    claimText: The organization runs <EntityLink id="ea-global">EA Global</EntityLink> conferences that bring together people interested in effective altruism ideas, supports over 200 local EA groups across 50 countries, and builds and moderates the EA Forum—an online discussion platform for the community. CEA also operates effectivealtruism.org and publishes the Effective Altruism Newsletter. Through its Community Building Grants Program launched in 2018, CEA provides funding to individuals and groups doing local EA community building.
+    sourceTitle: EA groups survey 2020 &#x2d; Rethink Priorities
+    url: https://rethinkpriorities.org/research-area/ea-groups-survey-2020/
+    verdict: inaccurate
+    score: 0.3
+    issues: |-
+      unsupported: The source does not mention EA Global conferences.
+      unsupported: The source does not mention the EA Forum.
+      unsupported: The source does not mention effectivealtruism.org or the Effective Altruism Newsletter.
+      unsupported: The source does not mention the Community Building Grants Program or its launch year.
+    difficulty: The source is a survey about EA groups. It mentions the Centre for Effective Altruism (CEA) as a collaborator but does not contain information about the specific programs and activities mentioned in the claim. The number of local EA groups across 50 countries is mentioned in the summary.
+    checkedAt: '2026-02-19 18:57:02'
+  - pageId: center-for-applied-rationality
+    footnote: 3
+    claimText: CFAR's stated mission is "Developing clear thinking for the sake of humanity's future," with particular emphasis on addressing challenges related to existential risks, including AI safety. The organization has trained over 1,300 workshop alumni through approximately 60 flagship workshops held between 2012 and early 2020, with participants reporting an average satisfaction rating of 9.2 out of 10. Beyond its core workshop programs, CFAR has contributed to the broader rationality and effective altruism communities through specialized programs, curriculum development, and connections to organizations working on <EntityLink id="alignment">AI alignment</EntityLink> and existential risk reduction.
+    sourceTitle: Mission | Center for Applied Rationality
+    url: http://www.rationality.org/about/mission/
+    verdict: unsupported
+    score: 0.3
+    issues: |-
+      The source does not contain the stated mission of CFAR.
+      The source does not contain the number of workshop alumni trained.
+      The source does not contain the number of flagship workshops held.
+      The source does not contain the average satisfaction rating of participants.
+      The source does not mention CFAR's contributions to the broader rationality and effective altruism communities through specialized programs, curriculum development, and connections to organizations working on AI alignment and existential risk reduction.
+    difficulty: The source is a short mission statement that does not contain any of the details mentioned in the claim.
+    checkedAt: '2026-02-19 19:22:26'
+  - pageId: compute-governance
+    footnote: 23
+    claimText: policy aims to promote American export of "full-stack AI export packages"—hardware, models, software, applications, and standards—to allied nations while simultaneously tightening enforcement on American adversaries.
+    sourceTitle: Export Controls and Export Promotion | GovAI
+    url: https://www.governance.ai/research-paper/export-controls-and-export-promotion
+    verdict: inaccurate
+    score: 0.3
+    issues: |-
+      unsupported: The source does not mention "full-stack AI export packages" including hardware, models, software, applications, and standards.
+      unsupported: The source does not explicitly mention tightening enforcement on American adversaries, although it does discuss export controls to China.
+    difficulty: The claim contains details not found in the source, requiring careful reading to confirm absence.
+    checkedAt: '2026-02-19 18:59:30'
+  - pageId: compute-governance
+    footnote: 24
+    claimText: The approach reflects a shift from the Biden Administration's AI Diffusion Rule toward sustaining and enhancing America's global AI dominance.
+    sourceTitle: Export Controls and Export Promotion | GovAI
+    url: https://www.governance.ai/research-paper/export-controls-and-export-promotion
+    verdict: inaccurate
+    score: 0.3
+    issues: |-
+      WRONG ATTRIBUTION: The source attributes the policy of sustaining and enhancing America's global AI dominance to President Trump, not the Biden Administration.
+      MISLEADING PARAPHRASE: The source does not mention an 'AI Diffusion Rule'.
+    difficulty: Easy. The relevant information is explicitly stated in the source. The claim makes an incorrect attribution and references a non-existent rule.
+    checkedAt: '2026-02-19 18:59:32'
+  - pageId: hewlett-foundation
+    footnote: 6
+    claimText: While the foundation has supported progressive causes throughout its history, it has recently drawn criticism for funding organizations with ties to right-wing initiatives, creating tension with its stated nonpartisan mission. The foundation's work in AI focuses primarily on cybersecurity risks rather than AI alignment or existential safety concerns, distinguishing it from foundations like <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> that prioritize AI existential risk.
+    sourceTitle: Why “Liberal” Donors Love Giving Money to the Extreme Right | The Nation
+    url: https://www.thenation.com/article/politics/project-2025-liberal-donors/
+    verdict: inaccurate
+    score: 0.3
+    issues: |-
+      unsupported: The article does not mention the foundation's work in AI or its focus on cybersecurity risks.
+      misleading_paraphrase: The article focuses on the Hewlett Foundation and Omidyar Network Foundation, not a general foundation.
+      unsupported: The article does not mention the foundation's nonpartisan mission.
+    difficulty: The article focuses on specific foundations (Hewlett and Omidyar) and their funding of right-wing initiatives. It does not discuss AI or a general foundation's nonpartisan mission.
+    checkedAt: '2026-02-19 19:04:51'
+  - pageId: cea
+    footnote: 35
+    claimText: The organization has received substantial funding from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>, including \$26 million for general support in 2022 and \$11 million in June 2023. CEA currently operates as a project within Effective Ventures, though it announced plans in January 2024 to spin out as an independent organization, with a target date of July 1, 2025. As part of this spinout, CEA and EA Funds have decided to merge into a single organization that will retain the CEA name.
+    sourceTitle: CEA is spinning out of Effective Ventures — EA Forum
+    url: https://forum.effectivealtruism.org/posts/abs8xsBDyCzR83YzY/cea-is-spinning-out-of-effective-ventures
+    verdict: inaccurate
+    score: 0.4
+    issues: |-
+      WRONG NUMBERS: The source does not mention any funding amounts from Coefficient Giving.
+      FABRICATED DETAILS: The source does not mention a target date of July 1, 2025.
+      MISLEADING PARAPHRASE: The claim that CEA and EA Funds have decided to merge into a single organization that will retain the CEA name is not explicitly stated in the source. The source only mentions that 'EA Funds and CEA are merging'.
+    difficulty: The source is a short announcement. The funding information is not mentioned in the source. The spin-out and merger are mentioned, but the details are not fully accurate.
+    checkedAt: '2026-02-19 18:57:04'
+  - pageId: center-for-applied-rationality
+    footnote: 21
+    claimText: '- **<EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>**: Over \$3.5 million - \$1,035,000 grant in 2016 (two years) for operational improvements and research - Multi-year institutional grant renewed in 2018 for 2018-2019 - **Survival and Flourishing Fund**: Over \$1.6 million - **Effective Altruism Funds**: Over \$300,000 - \$150,000 from Long-Term Future Fund in April 2019 (addressing funding shortfall after 2018 controversy) - Additional \$150,000 recommended in August 2019'
+    sourceTitle: Grant from Open Philanthropy Project | Center for Applied Rationality
+    url: http://www.rationality.org/resources/updates/2016/grant-from-open-philanthropy-project
+    verdict: unsupported
+    score: 0.4
+    issues: The source only mentions a single grant of $1,035,000 from Open Philanthropy Project to CFAR. It does not mention Coefficient Giving, Survival and Flourishing Fund, or Effective Altruism Funds. It also does not mention any renewals or additional funding in 2018 or 2019.
+    difficulty: The source is a short announcement about a single grant. The claim includes details about multiple grants and funds that are not mentioned in the source.
+    checkedAt: '2026-02-19 19:22:57'
+  - pageId: cea
+    footnote: 46
+    claimText: In 2017, <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> provided \$2.5 million in general support, reflecting growing funder confidence in CEA's work. CEA also established a Berkeley, California office and launched EA Funds that year. Sam Bankman-Fried joined CEA as director of development in late 2017, though he worked there only from October to November before leaving to co-found Alameda Research with Tara MacAulay.
+    sourceTitle: Centre for Effective Altruism - Wikipedia
+    url: https://en.wikipedia.org/wiki/Centre_for_Effective_Altruism
+    verdict: inaccurate
+    score: 0.5
+    issues: |-
+      WRONG ORGANIZATION: The source does not mention Coefficient Giving, but it does mention that Sam Bankman-Fried joined CEA as director of development in late 2017.
+      UNSUPPORTED: The source does not mention CEA establishing a Berkeley, California office.
+      UNSUPPORTED: The source does not mention EA Funds being launched in 2017.
+      WRONG DATES: The source does not specify the months that Sam Bankman-Fried worked at CEA, but it does say that he left shortly thereafter to fund Alameda Research.
+    difficulty: The information about Sam Bankman-Fried is in one sentence. The other details are not mentioned in the article.
+    checkedAt: '2026-02-19 18:57:21'
+  - pageId: hewlett-foundation
+    footnote: 21
+    claimText: According to data from IRS Form 990-PF filings, education-related organizations received thousands of grants from the foundation, making it one of the largest focus areas by recipient count.
+    sourceTitle: The William and Flora Hewlett Foundation | 990 Report
+    url: https://www.instrumentl.com/990-report/william-and-flora-hewlett-foundation
+    verdict: inaccurate
+    score: 0.5
+    issues: |-
+      OVERCLAIMS
+      UNSUPPORTED
+    difficulty: The source mentions education as a focus area, but does not provide specific data on the number of education-related grants or compare it to other focus areas by recipient count. Requires careful reading of the entire document to confirm absence of specific details.
+    checkedAt: '2026-02-19 19:05:22'
+  - pageId: cea
+    footnote: 12
+    claimText: The first EA Global in 2015 featured speakers including <EntityLink id="elon-musk">Elon Musk</EntityLink>, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, and Will MacAskill at Google's Mountain View campus, with additional conferences in Oxford and Melbourne. CEA has acknowledged that the 2015 and 2016 conferences made mistakes by not providing strong animal advocacy content, which made community members focused on animal welfare feel undervalued.
+    sourceTitle: Mistakes we’ve made | Centre For Effective Altruism
+    url: https://www.centreforeffectivealtruism.org/our-mistakes
+    verdict: inaccurate
+    score: 0.6
+    issues: |-
+      unsupported
+      unsupported
+      unsupported
+    difficulty: The source does not mention the speakers at the first EA Global, nor does it mention the locations of additional conferences. It does support the claim about animal advocacy content at the 2015 and 2016 conferences. Needed to read the entire document to confirm the unsupported details.
+    checkedAt: '2026-02-19 18:56:27'
+  - pageId: center-for-applied-rationality
+    footnote: 6
+    claimText: The organization has evolved significantly since its founding, transitioning from a full-time staff of approximately 12 to a mostly-remote operation with eight part-time curriculum developers and instructors as of September 2025. After a multi-year hiatus from regular programming, CFAR resumed mainline workshops in November 2025, testing new formats while continuing to refine its approach to teaching applied rationality.
+    sourceTitle: Mission | Center for Applied Rationality
+    url: http://www.rationality.org/about/mission/
+    verdict: inaccurate
+    score: 0.6
+    issues: |-
+      WRONG NUMBERS: The claim states the organization transitioned from a full-time staff of approximately 12, but the source does not mention the original staff size.
+      WRONG NUMBERS: The claim states the organization has eight part-time curriculum developers and instructors as of September 2025, but the source only mentions eight part-time curriculum developers.
+      UNSUPPORTED: The claim states that CFAR resumed mainline workshops in November 2025, but the source does not mention this date or the resumption of workshops.
+    difficulty: Easy. The relevant information is contained within a few paragraphs, but some details are missing or inaccurate.
+    checkedAt: '2026-02-19 19:22:33'
+  - pageId: rethink-priorities
+    footnote: 6
+    claimText: Davis had previously co-founded Charity Science Health, where he analyzed global poverty interventions and led cost-effectiveness analyses, while also running Effective Altruism Chicago and working with Rethink Charity on global EA group outreach.
+    sourceTitle: 'Five Years of Rethink Priorities: What We&#8217;ve Learned &#x2d; Rethink Priorities'
+    url: https://rethinkpriorities.org/five-years-of-rethink-priorities-what-weve-learned/
+    verdict: inaccurate
+    score: 0.6
+    issues: The source only mentions Davis co-founding an organization that used text message reminders to encourage new parents in India to get their children vaccinated, not Charity Science Health. The source does not mention Davis analyzing global poverty interventions and leading cost-effectiveness analyses, running Effective Altruism Chicago, or working with Rethink Charity on global EA group outreach.
+    difficulty: The claim contains multiple details, but the source only mentions one detail related to Davis's previous work.
+    checkedAt: '2026-02-19 18:52:53'
+  - pageId: compute-governance
+    footnote: 14
+    claimText: '| Early 2026 | Biden rule rescission | Trump administration rescinds AI Diffusion Rule while strengthening certain controls |'
+    sourceTitle: Lock
+    url: https://www.bis.gov/press-release/department-commerce-announces-rescission-biden-era-artificial-intelligence-diffusion-rule-strengthens
+    verdict: inaccurate
+    score: 0.7
+    issues: |-
+      WRONG DATE: The source states the rescission occurred on May 13, 2025, not in early 2026 as the claim states.
+      WRONG ATTRIBUTION: The source states the Trump administration rescinded the AI Diffusion Rule, not the Biden administration.
+    difficulty: Easy. The date and administration are clearly stated in the press release.
+    checkedAt: '2026-02-19 18:59:16'
+  - pageId: rethink-priorities
+    footnote: 51
+    claimText: 'The board of directors as of June 2023 included individuals from organizations connected to the effective altruism movement: Marcus Davis (Rethink Priorities), Vicky Bond (The Humane League), Cameron Meyer Shorb (Wild Animal Initiative), Niel Bowerman (<EntityLink id="80000-hours">80,000 Hours</EntityLink>), Nikolai Vetr (Stanford University), JueYan Zhang, Elysha Png (Vygo), and Abigail Olvera.'
+    sourceTitle: Rethink Priorities - GuideStar Profile
+    url: https://www.guidestar.org/profile/84-3896318
+    verdict: inaccurate
+    score: 0.7
+    issues: |-
+      WRONG DATE: The source states the board of directors as of 5/22/2025, not June 2023.
+      FABRICATED DETAILS: The source does not mention Vicky Bond (The Humane League), Cameron Meyer Shorb (Wild Animal Initiative), Niel Bowerman (80,000 Hours), JueYan Zhang, or Elysha Png (Vygo).
+    difficulty: The board of directors is listed in one section, but the date is different and most of the names are not present.
+    checkedAt: '2026-02-19 18:54:09'
+domainAnalysis:
+  - domain: effectivealtruism.org
+    totalCitations: 3
+    checked: 1
+    accurate: 0
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 1
+  - domain: instrumentl.com
+    totalCitations: 2
+    checked: 2
+    accurate: 0
+    inaccurate: 1
+    unsupported: 1
+    inaccuracyRate: 1
+  - domain: causeiq.com
+    totalCitations: 2
+    checked: 1
+    accurate: 0
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 1
+  - domain: lesswrong.com
+    totalCitations: 5
+    checked: 5
+    accurate: 3
+    inaccurate: 0
+    unsupported: 2
+    inaccuracyRate: 0.4
+  - domain: governance.ai
+    totalCitations: 5
+    checked: 5
+    accurate: 3
+    inaccurate: 2
+    unsupported: 0
+    inaccuracyRate: 0.4
+  - domain: centreforeffectivealtruism.org
+    totalCitations: 11
+    checked: 8
+    accurate: 5
+    inaccurate: 1
+    unsupported: 2
+    inaccuracyRate: 0.375
+  - domain: datacenterknowledge.com
+    totalCitations: 3
+    checked: 3
+    accurate: 1
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.3333333333333333
+  - domain: rationality.org
+    totalCitations: 15
+    checked: 13
+    accurate: 8
+    inaccurate: 2
+    unsupported: 2
+    inaccuracyRate: 0.3076923076923077
+  - domain: rethinkpriorities.org
+    totalCitations: 34
+    checked: 32
+    accurate: 26
+    inaccurate: 2
+    unsupported: 3
+    inaccuracyRate: 0.15625
+  - domain: forum.effectivealtruism.org
+    totalCitations: 31
+    checked: 31
+    accurate: 28
+    inaccurate: 1
+    unsupported: 2
+    inaccuracyRate: 0.0967741935483871
+  - domain: en.wikipedia.org
+    totalCitations: 11
+    checked: 11
+    accurate: 9
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.09090909090909091
+  - domain: time.com
+    totalCitations: 7
+    checked: 7
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: openphilanthropy.org
+    totalCitations: 6
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: gov.uk
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: vice.com
+    totalCitations: 3
+    checked: 3
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: blog.bluedot.org
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: morganlewis.com
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: csis.org
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: mayerbrown.com
+    totalCitations: 3
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: github.com
+    totalCitations: 2
+    checked: 2
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: sierraclub.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: iapp.org
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: whitehouse.gov
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: cset.georgetown.edu
+    totalCitations: 2
+    checked: 2
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: lawfaremedia.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: congress.gov
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: cfr.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: alvarezandmarsal.com
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: cdn.governance.ai
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: philanthropynewsdigest.org
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: insidephilanthropy.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: mediaimpactfunders.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: charitynavigator.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0

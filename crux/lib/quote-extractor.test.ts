@@ -106,14 +106,14 @@ describe('parseAccuracyCheckResponse', () => {
       score: 0.95,
       issues: [],
       supporting_quotes: ['The report states XYZ.'],
-      verification_difficulty: 'Single sentence confirms the claim',
+      verification_difficulty: 'easy',
     });
     const result = parseAccuracyCheckResponse(response);
     expect(result.verdict).toBe('accurate');
     expect(result.score).toBe(0.95);
     expect(result.issues).toEqual([]);
     expect(result.supportingQuotes).toEqual(['The report states XYZ.']);
-    expect(result.verificationDifficulty).toBe('Single sentence confirms the claim');
+    expect(result.verificationDifficulty).toBe('easy');
   });
 
   it('parses an inaccurate response with issues', () => {
@@ -187,9 +187,30 @@ describe('parseAccuracyCheckResponse', () => {
     expect(result.issues).toEqual([]);
   });
 
-  it('defaults verificationDifficulty to empty string', () => {
+  it('defaults verificationDifficulty to empty string when missing', () => {
     const result = parseAccuracyCheckResponse('{}');
     expect(result.verificationDifficulty).toBe('');
+  });
+
+  it('normalizes free-form difficulty to structured categories', () => {
+    const testCases: Array<[string, string]> = [
+      ['easy', 'easy'],
+      ['medium', 'medium'],
+      ['hard', 'hard'],
+      ['Single sentence confirms the claim', 'easy'],
+      ['Directly stated in the text', 'easy'],
+      ['Required cross-referencing multiple sections', 'hard'],
+      ['Needed to read the entire document', 'hard'],
+      ['Needed to combine several paragraphs', 'medium'],
+      ['something random', 'medium'], // default
+    ];
+    for (const [input, expected] of testCases) {
+      const result = parseAccuracyCheckResponse(JSON.stringify({
+        verdict: 'accurate',
+        verification_difficulty: input,
+      }));
+      expect(result.verificationDifficulty).toBe(expected);
+    }
   });
 
   it('returns fallback on invalid JSON', () => {
