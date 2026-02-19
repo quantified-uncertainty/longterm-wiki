@@ -1,0 +1,66 @@
+date: 2026-02-19
+branch: claude/checklist-cli-tool-2BhLk
+title: "Add paranoid-review item to agent-checklist workflow"
+issue: 321
+model: claude-sonnet-4-6
+duration: ~30min
+cost: ~$0.50
+
+summary: |
+  Added a mandatory `paranoid-review` checklist item to the agent-checklist workflow
+  (issue #321). The item appears in Phase 3: Review for infrastructure, commands,
+  refactor, and bugfix session types. It prompts agents to spawn a fresh Task subagent
+  with the git diff and adversarial review instructions, then address all findings
+  before checking the item off. Also updated agent-session-ready-PR.md with explicit
+  paranoid review instructions.
+
+pages: []
+
+changes:
+  - crux/lib/session-checklist.ts: Added `paranoid-review` item to CHECKLIST_ITEMS; fixed stale ~29→~30 comment
+  - crux/lib/session-checklist.test.ts: Replaced stale structural invariant test with targeted paranoid-review test
+  - crux/commands/agent-checklist.test.ts: Added it.each tests for paranoid-review inclusion/exclusion per type
+  - .claude/commands/agent-session-ready-PR.md: Added explicit paranoid review step with adversarial prompt
+
+key_decisions:
+  - paranoid-review applies to infrastructure/commands/refactor/bugfix but not content (different workflow)
+  - Label follows catalog convention (outcome noun phrase): "Paranoid review done"
+  - Description uses imperative form matching other item descriptions
+  - No verifyCommand — inherently requires human/agent action
+  - it.each used for per-type tests to give clear failure attribution
+  - Pre-existing crux TypeScript errors unrelated to changes; gate TypeScript check passes
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-19T06:55:42.146Z"
+  total: 30
+  completed: 25
+  na: 0
+  skipped: 5
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - fix-escaping
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - check-recent-merges
+    - crux-typescript

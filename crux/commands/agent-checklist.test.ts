@@ -104,6 +104,25 @@ describe('agent-checklist init', () => {
     expect(writtenContent).toContain('Behavior unchanged');
   });
 
+  it.each(['infrastructure', 'commands', 'refactor', 'bugfix'] as const)(
+    'includes paranoid-review for %s type',
+    async (type) => {
+      const result = await commands.init([`Test ${type}`], { type });
+      expect(result.exitCode).toBe(0);
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+      const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+      expect(writtenContent).toContain('paranoid-review');
+    }
+  );
+
+  it('excludes paranoid-review for content type', async () => {
+    const result = await commands.init(['Write wiki page'], { type: 'content' });
+    expect(result.exitCode).toBe(0);
+    expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(writtenContent).not.toContain('paranoid-review');
+  });
+
   it('rejects invalid --type', async () => {
     const result = await commands.init(['Task'], { type: 'invalid' });
     expect(result.exitCode).toBe(1);

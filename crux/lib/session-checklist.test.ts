@@ -119,10 +119,24 @@ describe('getItemsForType', () => {
     expect(contentItems.some(i => i.id === 'live-data-test')).toBe(false);
   });
 
-  it('content type has at least as many items as infrastructure', () => {
-    const contentItems = getItemsForType('content');
-    const infraItems = getItemsForType('infrastructure');
-    expect(contentItems.length).toBeGreaterThanOrEqual(infraItems.length);
+  it('paranoid-review is included for infrastructure, commands, refactor, bugfix but not content', () => {
+    const typesWithParanoid = ['infrastructure', 'commands', 'refactor', 'bugfix'] as const;
+    for (const type of typesWithParanoid) {
+      expect(getItemsForType(type).some(i => i.id === 'paranoid-review')).toBe(true);
+    }
+    expect(getItemsForType('content').some(i => i.id === 'paranoid-review')).toBe(false);
+  });
+
+  it('paranoid-review item has correct phase, label, and properties', () => {
+    const item = CHECKLIST_ITEMS.find(i => i.id === 'paranoid-review');
+    expect(item).toBeDefined();
+    expect(item!.phase).toBe('review');
+    expect(item!.label).toBe('Paranoid review done');
+    expect(item!.description).toContain('fresh Task subagent');
+    expect(item!.description).toContain('adversarial prompt');
+    expect(item!.description).toContain('test coverage gap');
+    // Must NOT have a verifyCommand — this item requires human/agent action
+    expect(item!.verifyCommand).toBeUndefined();
   });
 });
 
@@ -679,5 +693,11 @@ describe('checklist catalog integrity', () => {
     for (const item of verifiable) {
       expect(item.verifyCommand!.length).toBeGreaterThan(0);
     }
+  });
+
+  it('catalog has exactly 43 items (update this when adding/removing items)', () => {
+    // This test locks in the expected catalog size. If you add or remove items,
+    // update this count AND the comment on the CHECKLIST_ITEMS declaration.
+    expect(CHECKLIST_ITEMS.length).toBe(43);
   });
 });
