@@ -32,6 +32,9 @@ data/id-registry.json
 
 # Auto-generated LLM accessibility files
 app/public/llms*.txt
+app/public/wiki/
+app/public/search-docs.json
+app/public/search-index.json
 
 # Knowledge cache
 .cache/
