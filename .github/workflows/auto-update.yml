@@ -76,6 +76,15 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "DATE=$DATE" >> $GITHUB_ENV
 
+      - name: Restore auto-update state
+        uses: actions/cache/restore@v4
+        with:
+          path: data/auto-update/state.yaml
+          # Unique key per run so we always save; restore-keys picks up latest
+          key: auto-update-state-${{ github.run_id }}
+          restore-keys: |
+            auto-update-state-
+
       - name: Run auto-update pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -102,12 +111,53 @@ jobs:
           echo "Running: pnpm crux auto-update run $ARGS"
           pnpm crux auto-update run $ARGS
 
+      - name: Save auto-update state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/auto-update/state.yaml
+          key: auto-update-state-${{ github.run_id }}
+
       - name: Run validation
         if: success()
         run: |
           pnpm crux fix escaping
           pnpm crux fix markdown
           pnpm crux validate gate --fix || echo "::warning::Validation issues found"
+
+      - name: Review AI-generated content
+        if: success()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          # Find changed MDX files that contain NEEDS CITATION markers
+          FLAGGED=$(grep -rl "NEEDS CITATION" content/docs/ 2>/dev/null || true)
+          if [ -z "$FLAGGED" ]; then
+            echo "No NEEDS CITATION markers found — content review passed."
+            exit 0
+          fi
+
+          echo "::warning::Found NEEDS CITATION markers in: $FLAGGED"
+          echo "Running targeted improvement pass to remove uncited claims..."
+
+          for FILE in $FLAGGED; do
+            # Extract page ID from filename (strip path and .mdx extension)
+            PAGE_ID=$(basename "$FILE" .mdx)
+            echo "Fixing: $PAGE_ID ($FILE)"
+            pnpm crux content improve "$PAGE_ID" --tier=polish --apply \
+              --directions "Remove all {/* NEEDS CITATION */} markers and the content they flag. If a claim cannot be verified from your knowledge, remove it entirely rather than leaving uncited speculation. Do not add speculative content as a replacement." \
+              || echo "::warning::Could not auto-fix $PAGE_ID — marker left in place"
+          done
+
+          # Final check: fail if markers still present after fix attempt
+          STILL_FLAGGED=$(grep -rl "NEEDS CITATION" content/docs/ 2>/dev/null || true)
+          if [ -n "$STILL_FLAGGED" ]; then
+            echo "::error::NEEDS CITATION markers remain after fix attempt: $STILL_FLAGGED"
+            echo "Manual review required before merging."
+            exit 1
+          fi
+          echo "All NEEDS CITATION markers resolved."
 
       - name: Check for changes
         id: changes

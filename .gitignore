@@ -53,3 +53,8 @@ app/public/search-index.json
 
 # Mermaid validation temp
 .mermaid-validate-temp/
+
+# Auto-update operational state (persisted via GH Actions cache, not git)
+data/auto-update/state.yaml
+# Auto-update details files are large ephemeral digests (~1MB/run)
+data/auto-update/runs/*-details.yaml
