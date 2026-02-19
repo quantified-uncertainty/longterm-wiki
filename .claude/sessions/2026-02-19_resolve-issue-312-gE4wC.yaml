@@ -1,0 +1,57 @@
+date: 2026-02-19
+branch: claude/resolve-issue-312-gE4wC
+title: "Export pure utility functions from calc-derive.ts; update tests to import"
+model: claude-sonnet-4-6
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/331
+pages: []
+summary: >
+  Resolved issue #312 by exporting 8 pure utility functions and 4 interfaces
+  from crux/facts/calc-derive.ts, and guarding the main() call with
+  fileURLToPath(import.meta.url) so the module can be imported without triggering
+  the CLI entrypoint. Updated calc-derive.test.ts to import these functions
+  directly instead of maintaining ~160 lines of inline copies. This makes
+  refactoring safe — changes to source functions are now automatically reflected
+  in the tests.
+issues:
+  - None
+learnings:
+  - The issue was identified as a recommendation in the session log for issue #203,
+    which itself noted that the inline-copy pattern was used to avoid main() side effects.
+    The fileURLToPath guard is the correct fix, matching the pattern used by other
+    crux scripts (analyze-all.ts, etc.).
+  - validateOriginalText test fixtures required full CalcProposal and DetectedPattern
+    objects (with all required fields) rather than the structural subsets the inline
+    copy used — the spread operator pattern `{ ...baseProposal, originalText: '...' }`
+    makes this clean.
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-19T16:28:37.367Z"
+  total: 30
+  completed: 23
+  na: 0
+  skipped: 7
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - fix-escaping
+    - typescript-used
+    - correctness
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - crux-typescript
