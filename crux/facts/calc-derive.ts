@@ -24,6 +24,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { createClient, MODELS, parseJsonResponse, callClaude } from '../lib/anthropic.ts';
 import { getColors } from '../lib/output.ts';
 import { evalCalcExpr } from '../lib/calc-evaluator.ts';
+import { entityDisplayNames } from '../lib/entity-names.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -280,16 +281,8 @@ function findRelevantEntities(content: string, factsMap: Map<string, FactFile>):
   const relevant = new Set<string>();
 
   // Simple heuristic: check if entity name appears in content
-  const displayNames: Record<string, string[]> = {
-    anthropic: ['Anthropic', 'anthropic'],
-    openai: ['OpenAI', 'openai'],
-    'sam-altman': ['Sam Altman', 'Altman'],
-    'jaan-tallinn': ['Jaan Tallinn', 'Tallinn'],
-    worldcoin: ['Worldcoin', 'worldcoin'],
-  };
-
   for (const entity of factsMap.keys()) {
-    const names = displayNames[entity] || [entity];
+    const names = entityDisplayNames[entity] || [entity];
     for (const name of names) {
       if (contentLower.includes(name.toLowerCase())) {
         relevant.add(entity);
