@@ -28,6 +28,9 @@ export interface AccuracyCheckResult {
   verdict: AccuracyVerdict;
   score: number;
   issues: string[];
+  supportingQuotes: string[];
+  /** How hard it was to verify — describes what level of source access is needed */
+  verificationDifficulty: string;
 }
 
 /**
@@ -143,14 +146,20 @@ Find the specific passage in the source that supports this claim. Return JSON on
 }
 
 /**
- * Check whether a wiki claim accurately represents what the source quote says.
+ * Check whether a wiki claim accurately represents what the cited source says.
  *
- * This is the "second pass" — after extracting a supporting quote,
- * compare the wiki's specific factual claims against the source.
+ * This is the "second pass" — given the full source text, the LLM finds ALL
+ * relevant passages (could be multiple paragraphs from different sections)
+ * and checks the wiki claim's factual accuracy against everything the source contains.
+ *
+ * @param claimText - The wiki claim to check
+ * @param sourceText - Full text of the cited source (or the extracted quote as fallback)
+ * @param opts.sourceTitle - Title of the source for context
+ * @param opts.model - LLM model override
  */
 export async function checkClaimAccuracy(
   claimText: string,
-  sourceQuote: string,
+  sourceText: string,
   opts?: { model?: string; sourceTitle?: string },
 ): Promise<AccuracyCheckResult> {
   if (!OPENROUTER_API_KEY) {
@@ -160,36 +169,49 @@ export async function checkClaimAccuracy(
   const model = opts?.model || DEFAULT_MODEL;
   const sourceContext = opts?.sourceTitle ? `\nSource title: "${opts.sourceTitle}"` : '';
 
-  const systemPrompt = `You are a fact-checking assistant. Given a claim from a wiki article and the supporting quote from the cited source, determine whether the wiki claim ACCURATELY represents what the source says.
+  // Truncate source if very long
+  const truncatedSource =
+    sourceText.length > MAX_SOURCE_CHARS
+      ? sourceText.slice(0, MAX_SOURCE_CHARS) + '\n\n[... truncated ...]'
+      : sourceText;
+
+  const systemPrompt = `You are a fact-checking assistant. Given a claim from a wiki article and the full text of the cited source, determine whether the wiki claim ACCURATELY represents what the source says.
+
+Your task:
+1. First, search the ENTIRE source for ALL passages relevant to the claim. The supporting evidence may be spread across multiple paragraphs or sections. Collect every relevant passage.
+2. Then, check every specific factual detail in the wiki claim against those passages.
 
 Check for these specific issues:
 1. WRONG NUMBERS: dates, percentages, dollar amounts, counts that differ between claim and source
 2. WRONG ATTRIBUTION: claim attributes a statement to the wrong person/organization
 3. MISLEADING PARAPHRASE: claim distorts the meaning or emphasis of the source
 4. OVERCLAIMS: claim states something more definitively than the source supports
-5. FABRICATED DETAILS: claim includes specific details not present in the source quote
+5. FABRICATED DETAILS: claim includes specific details not in the source at all
 
 Rules:
-- Compare the claim against the source quote carefully, word by word for factual details
+- Search the FULL source text thoroughly — relevant info may be in different sections
+- Only flag an issue if you've checked the entire source and the detail truly isn't there
 - Be strict about numbers, dates, and names — even small discrepancies matter
 - "accurate" = claim faithfully represents the source (minor wording differences are OK)
 - "minor_issues" = small discrepancies that don't change the core meaning (e.g., rounding)
 - "inaccurate" = claim misrepresents what the source says in a meaningful way
-- "unsupported" = source quote doesn't actually support this specific claim
-- "not_verifiable" = not enough information in the quote to check the claim
+- "unsupported" = the source genuinely doesn't contain information supporting this claim
+- "not_verifiable" = source is too short or ambiguous to check
 - For "score", rate 0.0-1.0 (1.0 = perfectly accurate, 0.0 = completely wrong)
 - For "issues", list each specific discrepancy found. Be concise but precise.
+- For "supporting_quotes", include the key passages from the source that you used to verify the claim. Include enough context to confirm each factual detail. Multiple quotes are encouraged.
+- For "verification_difficulty", write a brief description of how hard this was to verify and what kind of source access was needed. Examples: "Single sentence confirms the exact number", "Needed to combine author name from intro with statistic from results section", "Claim requires reading the entire methodology section to confirm no mention of X", "The specific date is stated once in a timeline table"
 
 Respond in exactly this JSON format:
-{"verdict": "accurate", "score": 0.95, "issues": ["optional issue description"]}`;
+{"verdict": "accurate", "score": 0.95, "issues": [], "supporting_quotes": ["passage 1", "passage 2"], "verification_difficulty": "Single paragraph contains all claimed details"}`;
 
   const userPrompt = `WIKI CLAIM:
 ${claimText}
 ${sourceContext}
-SOURCE QUOTE:
-"${sourceQuote}"
+SOURCE TEXT:
+${truncatedSource}
 
-Does the wiki claim accurately represent what the source says? Check all facts, numbers, dates, and attributions. Return JSON only.`;
+Search the entire source for all passages relevant to this claim, then check every factual detail. Return JSON only.`;
 
   const response = await fetch(BASE_URL, {
     method: 'POST',
@@ -205,7 +227,7 @@ Does the wiki claim accurately represent what the source says? Check all facts, 
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      max_tokens: 1000,
+      max_tokens: 2000,
       temperature: 0,
     }),
   });
@@ -237,6 +259,8 @@ Does the wiki claim accurately represent what the source says? Check all facts, 
       verdict?: string;
       score?: number;
       issues?: string[];
+      supporting_quotes?: string[];
+      verification_difficulty?: string;
     };
 
     const validVerdicts: AccuracyVerdict[] = ['accurate', 'minor_issues', 'inaccurate', 'unsupported', 'not_verifiable'];
@@ -248,12 +272,16 @@ Does the wiki claim accurately represent what the source says? Check all facts, 
       verdict,
       score: typeof parsed.score === 'number' ? Math.max(0, Math.min(1, parsed.score)) : 0.5,
       issues: Array.isArray(parsed.issues) ? parsed.issues.filter((i) => typeof i === 'string' && i.length > 0) : [],
+      supportingQuotes: Array.isArray(parsed.supporting_quotes) ? parsed.supporting_quotes.filter((q) => typeof q === 'string' && q.length > 0) : [],
+      verificationDifficulty: typeof parsed.verification_difficulty === 'string' ? parsed.verification_difficulty : '',
     };
   } catch {
     return {
       verdict: 'not_verifiable',
       score: 0.5,
       issues: ['Failed to parse LLM response'],
+      supportingQuotes: [],
+      verificationDifficulty: '',
     };
   }
 }

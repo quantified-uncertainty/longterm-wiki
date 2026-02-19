@@ -14,7 +14,7 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationQuotes, db } from '../lib/knowledge-db.ts';
+import { citationQuotes, citationContent, db } from '../lib/knowledge-db.ts';
 import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
 
@@ -94,9 +94,19 @@ async function checkAccuracyForPage(
     }
 
     try {
+      // Use full cached source text when available (much better accuracy),
+      // fall back to the narrow extracted quote
+      let sourceText = q.source_quote!;
+      if (q.url) {
+        const cached = citationContent.getByUrl(q.url);
+        if (cached?.full_text && cached.full_text.length > sourceText.length) {
+          sourceText = cached.full_text;
+        }
+      }
+
       const check = await checkClaimAccuracy(
         q.claim_text,
-        q.source_quote!,
+        sourceText,
         { sourceTitle: q.source_title ?? undefined },
       );
 
@@ -107,6 +117,8 @@ async function checkAccuracyForPage(
         check.verdict,
         check.score,
         check.issues.length > 0 ? check.issues.join('\n') : null,
+        check.supportingQuotes.length > 0 ? check.supportingQuotes.join('\n---\n') : null,
+        check.verificationDifficulty || null,
       );
 
       switch (check.verdict) {

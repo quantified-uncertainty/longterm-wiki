@@ -199,6 +199,12 @@ try {
 try {
   db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_checked_at TEXT`);
 } catch { /* column already exists */ }
+try {
+  db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_supporting_quotes TEXT`);
+} catch { /* column already exists */ }
+try {
+  db.exec(`ALTER TABLE citation_quotes ADD COLUMN verification_difficulty TEXT`);
+} catch { /* column already exists */ }
 
 // =============================================================================
 // TYPES
@@ -961,6 +967,8 @@ export interface CitationQuoteRow {
   accuracy_issues: string | null;
   accuracy_score: number | null;
   accuracy_checked_at: string | null;
+  accuracy_supporting_quotes: string | null;
+  verification_difficulty: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -1144,12 +1152,16 @@ export const citationQuotes = {
     verdict: string,
     score: number,
     issues: string | null,
+    supportingQuotes?: string | null,
+    verificationDifficulty?: string | null,
   ) {
     return db.prepare(`
       UPDATE citation_quotes
-      SET accuracy_verdict = ?, accuracy_score = ?, accuracy_issues = ?, accuracy_checked_at = datetime('now'), updated_at = datetime('now')
+      SET accuracy_verdict = ?, accuracy_score = ?, accuracy_issues = ?,
+          accuracy_supporting_quotes = ?, verification_difficulty = ?,
+          accuracy_checked_at = datetime('now'), updated_at = datetime('now')
       WHERE page_id = ? AND footnote = ?
-    `).run(verdict, score, issues, pageId, footnote);
+    `).run(verdict, score, issues, supportingQuotes ?? null, verificationDifficulty ?? null, pageId, footnote);
   },
 
   /**
