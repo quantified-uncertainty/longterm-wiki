@@ -16,6 +16,7 @@
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { basename, join } from 'path';
+import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
@@ -30,7 +31,7 @@ import { evalCalcExpr } from '../lib/calc-evaluator.ts';
 // Types
 // ---------------------------------------------------------------------------
 
-interface FactEntry {
+export interface FactEntry {
   label?: string;
   value: number | string | number[] | { min?: number; max?: number };
   numeric?: number;
@@ -42,12 +43,12 @@ interface FactEntry {
   measure?: string;
 }
 
-interface FactFile {
+export interface FactFile {
   entity: string;
   facts: Record<string, FactEntry>;
 }
 
-interface DetectedPattern {
+export interface DetectedPattern {
   /** The matched text (e.g. "≈27x") */
   match: string;
   /** Line number (1-based) */
@@ -60,7 +61,7 @@ interface DetectedPattern {
   patternType: string;
 }
 
-interface CalcProposal {
+export interface CalcProposal {
   /** The exact text in the MDX file to replace */
   originalText: string;
   /** The <Calc> expression, e.g. "{anthropic.valuation} / {anthropic.revenue-run-rate}" */
@@ -93,7 +94,7 @@ interface LlmProposalResponse {
 // Hardcoded pattern detection (mirrors hardcoded-calculations.ts patterns)
 // ---------------------------------------------------------------------------
 
-const CALC_PATTERNS: Array<{ regex: RegExp; description: string }> = [
+export const CALC_PATTERNS: Array<{ regex: RegExp; description: string }> = [
   // "≈27x" or "~42x" — approximate multiples
   {
     regex: /[≈~∼][\s]*\d+(?:\.\d+)?x\b/g,
@@ -117,7 +118,7 @@ const CALC_PATTERNS: Array<{ regex: RegExp; description: string }> = [
 ];
 
 /** Skip matches inside <Calc> or <F> tags */
-function isInsideCalcOrF(body: string, matchIndex: number): boolean {
+export function isInsideCalcOrF(body: string, matchIndex: number): boolean {
   const before = body.slice(Math.max(0, matchIndex - 500), matchIndex);
   if (before.includes('<Calc ') && !before.includes('/>') && !before.includes('</Calc>')) return true;
   const lastF = before.lastIndexOf('<F ');
@@ -129,14 +130,14 @@ function isInsideCalcOrF(body: string, matchIndex: number): boolean {
 }
 
 /** Skip matches inside fenced code blocks */
-function isInCodeBlock(body: string, index: number): boolean {
+export function isInCodeBlock(body: string, index: number): boolean {
   const before = body.slice(0, index);
   const fenceCount = (before.match(/^```/gm) || []).length;
   return fenceCount % 2 !== 0;
 }
 
 /** Extract approximate numeric value from a pattern match for validation */
-function extractNumericValue(matchText: string): number | undefined {
+export function extractNumericValue(matchText: string): number | undefined {
   const numMatch = matchText.match(/(\d+(?:\.\d+)?)/);
   if (!numMatch) return undefined;
   return parseFloat(numMatch[1]);
@@ -145,7 +146,7 @@ function extractNumericValue(matchText: string): number | undefined {
 /**
  * Detect all hardcoded derived patterns in MDX body text.
  */
-function detectPatterns(body: string): DetectedPattern[] {
+export function detectPatterns(body: string): DetectedPattern[] {
   const patterns: DetectedPattern[] = [];
   const lines = body.split('\n');
   const seen = new Set<string>(); // Deduplicate by line+text
@@ -456,7 +457,7 @@ Return exactly ${patterns.length} proposals (one per pattern, in order).`;
 // ---------------------------------------------------------------------------
 
 /** Check that originalText doesn't contain JSX tags, isn't too wide, and suffix is a unit */
-function validateOriginalText(proposal: CalcProposal, matchedPattern: DetectedPattern): string | null {
+export function validateOriginalText(proposal: CalcProposal, matchedPattern: DetectedPattern): string | null {
   // Reject if originalText contains JSX/MDX tags
   if (/<[A-Z]|<\/|<F |<Calc |<Entity/i.test(proposal.originalText)) {
     return 'originalText contains JSX/MDX tags — must be plain text only';
@@ -548,7 +549,7 @@ function validateProposal(
  * Check if the file already imports Calc from @components/facts.
  * Returns the updated content with the import added if needed.
  */
-function ensureCalcImport(content: string): string {
+export function ensureCalcImport(content: string): string {
   // Match: import { ..., Calc, ... } from '@components/facts'
   // or: import { Calc } from '@components/facts'
   if (/import\s+\{[^}]*\bCalc\b[^}]*\}\s+from\s+['"]@components\/facts['"]/m.test(content)) {
@@ -586,7 +587,7 @@ function ensureCalcImport(content: string): string {
 }
 
 /** Build the <Calc> component string from a proposal */
-function buildCalcComponent(proposal: CalcProposal): string {
+export function buildCalcComponent(proposal: CalcProposal): string {
   const props: string[] = [`expr="${proposal.expr}"`];
   if (proposal.precision !== undefined) props.push(`precision={${proposal.precision}}`);
   if (proposal.format) props.push(`format="${proposal.format}"`);
@@ -821,7 +822,9 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch(err => {
-  console.error('Fatal error:', err instanceof Error ? err.message : String(err));
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch(err => {
+    console.error('Fatal error:', err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  });
+}
