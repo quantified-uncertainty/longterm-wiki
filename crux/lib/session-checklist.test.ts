@@ -105,10 +105,24 @@ describe('getItemsForType', () => {
     expect(bugfixItems.some(i => i.id === 'behavior-unchanged')).toBe(false);
   });
 
-  it('content type has more items than infrastructure', () => {
+  it('includes live-data-test for non-content types only', () => {
+    const infraItems = getItemsForType('infrastructure');
+    const cmdItems = getItemsForType('commands');
+    const bugfixItems = getItemsForType('bugfix');
+    const refactorItems = getItemsForType('refactor');
+    const contentItems = getItemsForType('content');
+
+    expect(infraItems.some(i => i.id === 'live-data-test')).toBe(true);
+    expect(cmdItems.some(i => i.id === 'live-data-test')).toBe(true);
+    expect(bugfixItems.some(i => i.id === 'live-data-test')).toBe(true);
+    expect(refactorItems.some(i => i.id === 'live-data-test')).toBe(true);
+    expect(contentItems.some(i => i.id === 'live-data-test')).toBe(false);
+  });
+
+  it('content type has at least as many items as infrastructure', () => {
     const contentItems = getItemsForType('content');
     const infraItems = getItemsForType('infrastructure');
-    expect(contentItems.length).toBeGreaterThan(infraItems.length);
+    expect(contentItems.length).toBeGreaterThanOrEqual(infraItems.length);
   });
 });
 

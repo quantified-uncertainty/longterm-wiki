@@ -240,6 +240,14 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     applicableTypes: 'all',
   },
   {
+    id: 'live-data-test',
+    label: 'Tested on live data',
+    description:
+      'If possible, run the code against real data, review the output, and adjust. Repeat the loop until results look correct. Do not ship untested scripts.',
+    phase: 'review',
+    applicableTypes: ['infrastructure', 'commands', 'bugfix', 'refactor'],
+  },
+  {
     id: 'entitylinks-resolve',
     label: 'EntityLinks resolve',
     description: 'Every `<EntityLink id="X">` has a matching entity in `data/entities/*.yaml`.',
