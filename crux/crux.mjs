@@ -28,6 +28,8 @@
  *   citations   Citation verification and archival
  *   issues      Track Claude Code work on GitHub issues
  *   agent-checklist  Manage agent checklists (init, check, verify, status, complete)
+ *   facts       Propose new canonical facts from wiki page content
+ *   entity      Entity ID management (rename with safe word-boundary matching)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -62,6 +64,8 @@ import * as citationsCommands from './commands/citations.ts';
 import * as grokipediaCommands from './commands/grokipedia.ts';
 import * as issuesCommands from './commands/issues.ts';
 import * as agentChecklistCommands from './commands/agent-checklist.ts';
+import * as factsCommands from './commands/facts.ts';
+import * as entityCommands from './commands/entity.ts';
 
 const domains = {
   validate: validateCommands,
@@ -83,6 +87,8 @@ const domains = {
   grokipedia: grokipediaCommands,
   issues: issuesCommands,
   'agent-checklist': agentChecklistCommands,
+  facts: factsCommands,
+  entity: entityCommands,
 };
 
 /**
@@ -98,8 +104,15 @@ function parseArgs() {
   const command = positional[1] || null;
 
   // Convert kebab-case option keys to camelCase and build remaining args
+  // Positionals come first so that args[0] is always the first positional,
+  // not a flag (flags are also available in options for handlers to use).
   const options = {};
   const remaining = [];
+  // Extra positional args (beyond domain + command) come first
+  for (const arg of positional.slice(2)) {
+    remaining.push(arg);
+  }
+  // Then flags (also available via options, but included for pass-through)
   for (const [key, value] of Object.entries(parsed)) {
     if (key === '_positional') continue;
     options[kebabToCamel(key)] = value;
@@ -109,10 +122,6 @@ function parseArgs() {
     } else {
       remaining.push(`--${key}=${value}`);
     }
-  }
-  // Pass extra positional args (beyond domain + command) as remaining
-  for (const arg of positional.slice(2)) {
-    remaining.push(arg);
   }
 
   return { domain, command, args: remaining, options };
@@ -150,6 +159,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   citations   Citation verification and archival
   issues      Track Claude Code work on GitHub issues
   agent-checklist  Manage agent checklists
+  entity      Entity ID management (safe rename)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

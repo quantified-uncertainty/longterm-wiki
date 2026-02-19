@@ -1,0 +1,11 @@
+date: 2026-02-18
+branch: claude/issue-289-zWYpw
+title: Add vitest unit tests to discord-bot
+model: sonnet-4
+duration: ~20min
+pages: []
+summary: "Added vitest unit tests for pure functions in the discord-bot app: `calculateCost()`, `formatCost()` (in logger.test.ts), and `buildPrompt()` (in query.test.ts). Also exported `buildPrompt` for testability, added vitest as a dev dependency with a `test` script in the bot's package.json, created a vitest.config.ts, and wired the bot's tests into the root `pnpm test` command."
+issues:
+  - One test had an arithmetic error in the expected cost calculation (off by 1000x in the comment); corrected the expected value.
+learnings:
+  - The discord-bot's `buildPrompt` function was not exported; exporting it enables unit testing without changing behavior.

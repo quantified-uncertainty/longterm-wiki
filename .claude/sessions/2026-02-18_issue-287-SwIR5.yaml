@@ -1,0 +1,10 @@
+date: 2026-02-18
+branch: claude/issue-287-SwIR5
+title: "Discord bot: add per-user rate limiting"
+model: sonnet-4
+duration: ~15min
+pages: []
+summary: Added per-user 30-second cooldown and a global concurrency cap (max 3 simultaneous requests) to the Discord bot's `MessageCreate` handler to prevent cost abuse.
+learnings:
+  - Rate limit timestamp is recorded only after passing all checks (empty question, rate limit, concurrency cap) so the slot is not consumed on rejected requests.
+  - "`activeRequests` is decremented in a `finally` block to ensure it always decrements even on errors."

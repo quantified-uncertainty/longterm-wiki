@@ -1,0 +1,12 @@
+date: 2026-02-16
+branch: claude/improve-github-actions-trWPD
+title: Improve GitHub Actions CI workflows
+pages: []
+summary: "Analyzed GitHub Actions history (100 recent runs, 73% CI success rate) and implemented two key improvements to ci.yml: (1) added concurrency groups to cancel superseded PR runs, saving ~3 min per cancelled run, and (2) fixed the advisory validation step so it uses `!cancelled()` instead of `always()` (preventing it from running without data when build-data fails) and added `continue-on-error: true` (preventing a non-blocking step from failing the validate job)."
+issues:
+  - Primary CI failure cause is numericId conflicts in build-data.mjs when multiple branches assign overlapping entity IDs — this is a data-layer issue, not a workflow issue
+  - Considered sharing build-data via artifacts between jobs, but abandoned because build-data.mjs also modifies YAML source files in-place (assigning numericIds), and the validate job needs those modifications
+learnings:
+  - Build-data step takes ~2 seconds — not worth optimizing via artifacts given the YAML mutation side-effect
+  - Resolve-conflicts workflow and auto-rebase workflow are both well-designed and working reliably (100% and 95%+ success rates)
+  - The 27% CI failure rate is mostly caused by entity numericId conflicts from concurrent Claude branches, not workflow issues

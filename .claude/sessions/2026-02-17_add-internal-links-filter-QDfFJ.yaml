@@ -1,0 +1,8 @@
+date: 2026-02-17
+branch: claude/add-internal-links-filter-QDfFJ
+title: Add Internal filter to Field row on /wiki
+pages: []
+summary: Added "Internal" as a filter option in the Field filter row on the /wiki explore page, allowing users to quickly filter for internal pages without scrolling through the Entity type filter.
+learnings:
+  - FIELD_GROUPS now supports an optional `entityType` property for type-based filtering alongside cluster-based filtering
+  - The same pattern can be reused to add other type-based entries to the Field row in the future

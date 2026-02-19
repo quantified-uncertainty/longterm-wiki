@@ -151,7 +151,7 @@ sidebar:
 {/* AUTO-GENERATED FILE - DO NOT EDIT DIRECTLY */}
 {/* Regenerate with: node crux/generate/generate-schema-docs.ts */}
 
-This documentation is auto-generated from \`app/src/data/schema.ts\`.
+This documentation is auto-generated from \`apps/web/src/data/schema.ts\`.
 
 **Last generated:** ${new Date().toISOString().split('T')[0]}
 
@@ -222,7 +222,7 @@ flowchart TD
 node crux/generate/generate-schema-docs.ts
 \`\`\`
 
-This script reads \`app/src/data/schema.ts\` and extracts:
+This script reads \`apps/web/src/data/schema.ts\` and extracts:
 - \`EntityType\` enum values and comments
 - \`RelationshipType\` enum values and comments
 

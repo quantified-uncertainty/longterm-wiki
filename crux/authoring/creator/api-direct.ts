@@ -263,7 +263,7 @@ function buildFixPrompt(content: string, issues: string[], ROOT: string): string
   // Load path registry for EntityLink validation
   let entityIds = '';
   try {
-    const registryPath = path.join(ROOT, 'app/src/data/pathRegistry.json');
+    const registryPath = path.join(ROOT, 'apps/web/src/data/pathRegistry.json');
     if (fs.existsSync(registryPath)) {
       const registry = JSON.parse(fs.readFileSync(registryPath, 'utf-8'));
       entityIds = Object.keys(registry).slice(0, 100).join(', ');

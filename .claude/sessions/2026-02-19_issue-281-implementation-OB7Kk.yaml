@@ -1,0 +1,27 @@
+date: 2026-02-19
+branch: claude/issue-281-implementation-OB7Kk
+title: Rename app/ → apps/web/ to complete monorepo layout
+model: sonnet-4
+duration: ~90min
+pages: []
+summary: >
+  Renamed the Next.js frontend directory from app/ to apps/web/ using git mv (250+ files)
+  to complete the monorepo layout alongside apps/discord-bot/. Fixed path-depth bugs where
+  process.cwd() + "../" references needed to become "../../" for the deeper nesting, updated
+  all CI workflows, crux tooling, scripts, and configuration files, and verified with a full
+  gate check including production build.
+pr: 310
+issues:
+  - First push failed silently due to a path-depth bug in apps/web/src/data/*.ts files (../data
+    should be ../../data); caught via gate check output and fixed with a second commit
+  - crux issues done command failed due to arg ordering bug in crux.mjs — fixed by ensuring
+    positional args come before flags in the remaining array passed to subcommands
+learnings:
+  - When nesting a directory one level deeper, all relative paths that crossed the repo root
+    (e.g., "../content/docs") need an extra "../" prefix — grep for all relative path strings
+    before assuming the rename is complete
+  - crux.mjs parseArgs was putting flags before positionals in the args array, causing
+    commands like "done 281 --pr=URL" to see "--pr=URL" as args[0] instead of "281"
+recommendations:
+  - The crux.mjs arg ordering fix (positionals before flags) should be verified with tests
+    in crux/commands/issues.test.ts

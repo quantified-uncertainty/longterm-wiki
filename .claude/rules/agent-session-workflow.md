@@ -2,9 +2,9 @@
 
 Every session that involves writing or changing code MUST follow this two-step workflow.
 
-## At Session Start — BEFORE writing any code
+## At Session Start — BEFORE taking any action
 
-Run `/agent-session-start` immediately after reading the task description. Do not write any code first.
+Run `/agent-session-start` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
 
 ```bash
 # If working on a GitHub issue:
@@ -30,3 +30,4 @@ See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow
 - The checklist catches issues that are easy to skip under time pressure (security review, no regressions, CI green)
 - It creates a paper trail of decisions for future sessions
 - Skipping it is how things like "forgot to verify CI" or "no tests written" happen
+- Rationalizing "I'll do it after I read a couple files" reliably leads to skipping it — the rule must be unconditional

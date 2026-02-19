@@ -1,0 +1,9 @@
+date: 2026-02-15
+branch: claude/add-code-wiki-2O00g
+title: Add Google Code Wiki to epistemic tools
+pages:
+  - ai-assisted-knowledge-management
+summary: Added Google Code Wiki (Google's Gemini-powered auto-documentation tool, launched Nov 2025) to the AI-Assisted Knowledge Management page — new subsection under Public Knowledge Systems, updated Mermaid diagram, and added to comparison table.
+pr: 135
+issues:
+  - pnpm install failed due to puppeteer postinstall script; resolved with --ignore-scripts

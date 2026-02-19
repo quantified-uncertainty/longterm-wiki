@@ -87,7 +87,7 @@ Read the draft article at: ${draftPath}
    - Use ≈\\$ instead of ~\\$ (tilde + escaped dollar causes errors)
 
 3. **Fix EntityLinks** (verify IDs resolve):
-   - Read app/src/data/pathRegistry.json to see which entity IDs exist
+   - Read apps/web/src/data/pathRegistry.json to see which entity IDs exist
    - For EVERY EntityLink in the draft, verify the id exists as a key in pathRegistry
    - EntityLink IDs must be simple slugs (e.g., "open-philanthropy"), NOT paths (e.g., "organizations/funders/open-philanthropy")
    - If an EntityLink id doesn't exist in pathRegistry:

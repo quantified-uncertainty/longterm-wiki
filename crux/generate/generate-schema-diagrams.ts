@@ -3,7 +3,7 @@
 /**
  * Generate Mermaid diagrams from Zod schemas
  *
- * Reads app/src/data/schema.ts and produces visual diagrams of:
+ * Reads apps/web/src/data/schema.ts and produces visual diagrams of:
  * - Entity types and their relationships
  * - Schema structure (fields, types)
  * - Relationship type taxonomy
@@ -137,7 +137,7 @@ function generateEntityTypesDiagram(): string {
     'Other': ['resource', 'historical', 'events'],
   };
 
-  let diagram = `%% Auto-generated from app/src/data/schema.ts
+  let diagram = `%% Auto-generated from apps/web/src/data/schema.ts
 %% Entity Types grouped by category
 
 flowchart TD
@@ -181,7 +181,7 @@ function generateRelationshipTypesDiagram(): string {
     'Meta': ['supersedes', 'supports', 'increases', 'decreases', 'research', 'vulnerable-technique'],
   };
 
-  let diagram = `%% Auto-generated from app/src/data/schema.ts
+  let diagram = `%% Auto-generated from apps/web/src/data/schema.ts
 %% Relationship Types grouped by semantic category
 
 flowchart LR
@@ -212,7 +212,7 @@ function generateEntitySchemaDiagram(): string {
   const resourceFields = getObjectFields(Resource);
   const publicationFields = getObjectFields(Publication);
 
-  let diagram = `%% Auto-generated from app/src/data/schema.ts
+  let diagram = `%% Auto-generated from apps/web/src/data/schema.ts
 %% Schema structure as ER diagram
 
 erDiagram
@@ -262,7 +262,7 @@ function generateClassDiagram(): string {
   const entityFields = getObjectFields(Entity);
   const relatedEntryFields = getObjectFields(RelatedEntry);
 
-  let diagram = `%% Auto-generated from app/src/data/schema.ts
+  let diagram = `%% Auto-generated from apps/web/src/data/schema.ts
 %% Class diagram showing main schema types
 
 classDiagram
@@ -403,7 +403,7 @@ function main(): void {
   // Generate a combined markdown file with all diagrams
   let combinedMd = `# Schema Visualizations
 
-Auto-generated from \`app/src/data/schema.ts\` using \`crux/generate/generate-schema-diagrams.ts\`
+Auto-generated from \`apps/web/src/data/schema.ts\` using \`crux/generate/generate-schema-diagrams.ts\`
 
 Generated: ${new Date().toISOString()}
 

@@ -99,7 +99,8 @@ client.on(Events.MessageCreate, async (message) => {
     const estimatedCostUsd = calculateCost(
       queryResult.inputTokens,
       queryResult.outputTokens,
-      queryResult.model
+      queryResult.model,
+      queryResult.cacheReadTokens
     );
 
     const queryLog: QueryLog = {

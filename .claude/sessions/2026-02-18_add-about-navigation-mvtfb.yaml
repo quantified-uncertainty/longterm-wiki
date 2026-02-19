@@ -1,0 +1,10 @@
+date: 2026-02-18
+branch: claude/add-about-navigation-mvtfb
+title: Add About navigation section
+model: opus-4-6
+duration: ~20min
+pages: []
+summary: Added an "About" section to the header navigation and sidebar, separating user-facing pages (About This Wiki, Vision, Strategy, Roadmap, Value Proposition) from the developer-focused Internal section. About pages get their own sidebar, breadcrumbs, and are no longer marked as noindex for search engines.
+learnings:
+  - About pages still physically live under `content/docs/internal/` but are detected via `isAboutPage()` slug matching in `wiki-nav.ts`. Future work could move them to a dedicated `content/docs/about/` directory.
+  - The `ABOUT_PAGE_SLUGS` set in `wiki-nav.ts` must be updated when adding new about pages.

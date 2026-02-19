@@ -1,0 +1,9 @@
+date: 2026-02-18
+branch: claude/fact-dashboard-data-tab-T2QMh
+title: Add Data tab to Fact Dashboard
+model: opus-4-6
+duration: ~20min
+pages: []
+summary: Added a "Data" tab to the Fact Dashboard (`/internal/facts`) with a flat, sortable, filterable, paginated TanStack table showing all fact fields. The existing dashboard views (By Entity, By Measure, Timeseries) are now under a "Dashboard" tab. Also exposed additional fact fields (subject, format, formatDivisor, noCompute) from the server component.
+learnings:
+  - The Fact interface in `app/src/data/index.ts` already includes all fields needed (subject, format, formatDivisor, noCompute) but the server page was only passing a subset to the client component. Future additions should check this mapping.

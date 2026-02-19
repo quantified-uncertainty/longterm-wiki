@@ -137,7 +137,7 @@ function extractInternalLinks(content: string, filePath: string): InternalLink[]
 }
 
 // Next.js app directory for standalone pages
-const APP_DIR: string = join(PROJECT_ROOT, 'app/src/app');
+const APP_DIR: string = join(PROJECT_ROOT, 'apps/web/src/app');
 
 /**
  * Check if an internal link resolves to an existing file
@@ -179,7 +179,7 @@ function resolveLink(href: string, sourceFile: string): LinkResolution {
     join(CONTENT_DIR, path + '.md'),
     join(CONTENT_DIR, path, 'index.mdx'),
     join(CONTENT_DIR, path, 'index.md'),
-    // Next.js app routes (app/src/app)
+    // Next.js app routes (apps/web/src/app)
     join(APP_DIR, path, 'page.tsx'),
     join(APP_DIR, path, 'page.jsx'),
   ];

@@ -1,0 +1,16 @@
+date: 2026-02-19
+branch: claude/add-testing-checklist-item-ZfUJl
+title: Add live-data-test item to agent-checklist
+model: sonnet-4
+duration: ~15min
+pages: []
+summary: >
+  Added a new "Tested on live data" checklist item (id: live-data-test) to the
+  agent-checklist review phase, applicable to infrastructure, commands, bugfix,
+  and refactor session types. Also updated the test suite accordingly.
+issues:
+  - The existing "content type has more items than infrastructure" test had to be
+    relaxed to >=, since the new non-content item made the counts equal.
+learnings:
+  - The count-based item test in session-checklist.test.ts is brittle to new
+    items being added; ID-specific tests are more durable.

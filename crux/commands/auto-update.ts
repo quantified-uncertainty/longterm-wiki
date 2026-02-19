@@ -125,7 +125,7 @@ async function plan(args: string[], options: AutoUpdateOptions): Promise<Command
   }
 
   console.log(`Building digest...`);
-  const pagesPath = join(PROJECT_ROOT, 'app/src/data/pages.json');
+  const pagesPath = join(PROJECT_ROOT, 'apps/web/src/data/pages.json');
   let entityIds: string[] = [];
   if (existsSync(pagesPath)) {
     try {
