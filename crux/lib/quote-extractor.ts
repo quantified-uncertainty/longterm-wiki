@@ -8,6 +8,7 @@
  */
 
 import { getApiKey } from './api-keys.ts';
+import { withRetry } from './resilience.ts';
 
 const OPENROUTER_API_KEY = getApiKey('OPENROUTER_API_KEY');
 const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -80,7 +81,7 @@ interface OpenRouterChatResponse {
  * Call OpenRouter chat completions API. Shared by both quote extraction and
  * accuracy checking to avoid duplicating request/error handling logic.
  */
-async function callOpenRouter(
+export async function callOpenRouter(
   systemPrompt: string,
   userPrompt: string,
   opts: { model?: string; maxTokens?: number; title?: string } = {},
@@ -91,39 +92,44 @@ async function callOpenRouter(
 
   const model = opts.model || DEFAULT_CITATION_MODEL;
 
-  const response = await fetch(BASE_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://www.longtermwiki.com',
-      'X-Title': opts.title || 'LongtermWiki Citations',
+  return withRetry(
+    async () => {
+      const response = await fetch(BASE_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://www.longtermwiki.com',
+          'X-Title': opts.title || 'LongtermWiki Citations',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          max_tokens: opts.maxTokens || 2000,
+          temperature: 0,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `OpenRouter API error (${response.status}): ${errorBody.slice(0, 200)}`,
+        );
+      }
+
+      const data = (await response.json()) as OpenRouterChatResponse;
+
+      if (data.error) {
+        throw new Error(`OpenRouter error: ${data.error.message}`);
+      }
+
+      return data.choices?.[0]?.message?.content || '';
     },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      max_tokens: opts.maxTokens || 2000,
-      temperature: 0,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(
-      `OpenRouter API error (${response.status}): ${errorBody.slice(0, 200)}`,
-    );
-  }
-
-  const data = (await response.json()) as OpenRouterChatResponse;
-
-  if (data.error) {
-    throw new Error(`OpenRouter error: ${data.error.message}`);
-  }
-
-  return data.choices?.[0]?.message?.content || '';
+    { maxRetries: 2, label: `OpenRouter ${opts.title || ''}` },
+  );
 }
 
 // ---------------------------------------------------------------------------

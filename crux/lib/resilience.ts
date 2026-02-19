@@ -21,6 +21,7 @@ const RETRYABLE_PATTERNS = [
   'socket hang up',
   'overloaded',
   '529',
+  '429',
   'rate_limit',
 ];
 

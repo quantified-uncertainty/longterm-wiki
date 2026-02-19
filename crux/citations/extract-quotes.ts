@@ -379,25 +379,44 @@ async function main() {
       console.log(`  Processing first ${pages.length} pages\n`);
     }
 
+    const concurrency = Math.max(1, parseInt((args.concurrency as string) || '1', 10));
+    if (concurrency > 1) {
+      console.log(`  Concurrency: ${concurrency}\n`);
+    }
+
     const allResults: ExtractResult[] = [];
 
-    for (let i = 0; i < pages.length; i++) {
-      const page = pages[i];
-      console.log(
-        `${c.dim}[${i + 1}/${pages.length}]${c.reset} ${c.bold}${page.pageId}${c.reset} (${page.citationCount} citations)`,
-      );
+    for (let i = 0; i < pages.length; i += concurrency) {
+      const batch = pages.slice(i, i + concurrency);
+      const batchResults = await Promise.all(
+        batch.map(async (page, batchIdx) => {
+          const globalIdx = i + batchIdx;
+          console.log(
+            `${c.dim}[${globalIdx + 1}/${pages.length}]${c.reset} ${c.bold}${page.pageId}${c.reset} (${page.citationCount} citations)`,
+          );
 
-      try {
-        const raw = readFileSync(page.path, 'utf-8');
-        const body = stripFrontmatter(raw);
-        const result = await extractQuotesForPage(page.pageId, body, {
-          verbose: true,
-          recheck,
-        });
-        allResults.push(result);
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        console.log(`  ${c.red}Error: ${msg}${c.reset}`);
+          try {
+            const raw = readFileSync(page.path, 'utf-8');
+            const body = stripFrontmatter(raw);
+            const result = await extractQuotesForPage(page.pageId, body, {
+              verbose: concurrency === 1,
+              recheck,
+            });
+            if (concurrency > 1) {
+              console.log(
+                `  ${c.green}${page.pageId}:${c.reset} ${result.extracted} extracted, ${result.verified} verified, ${result.skipped} skipped, ${result.errors} errors`,
+              );
+            }
+            return result;
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.log(`  ${c.red}${page.pageId}: Error — ${msg}${c.reset}`);
+            return null;
+          }
+        }),
+      );
+      for (const r of batchResults) {
+        if (r) allResults.push(r);
       }
 
       console.log('');
