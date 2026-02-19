@@ -8,7 +8,7 @@ Built with Next.js 15 (App Router), MDX content, and YAML-driven data.
 
 ```bash
 pnpm install
-cd app && node scripts/build-data.mjs   # Generate database.json from YAML/MDX
+cd apps/web && node scripts/build-data.mjs   # Generate database.json from YAML/MDX
 pnpm dev                                 # Dev server on port 3001
 ```
 
@@ -18,7 +18,7 @@ pnpm dev                                 # Dev server on port 3001
 longterm-wiki/
 ├── content/docs/          # ~625 MDX wiki pages
 ├── data/                  # YAML data (entities, facts, resources, insights, graphs)
-├── app/                   # Next.js 15 frontend
+├── apps/web/              # Next.js 15 frontend
 │   ├── src/               # React components, data layer, pages
 │   ├── scripts/           # Build scripts (build-data.mjs)
 │   └── public/            # Static assets + LLM files
@@ -77,11 +77,11 @@ Run `node crux/crux.mjs --help` for the full command list.
 ```
 data/*.yaml + content/docs/*.mdx
         ↓
-  app/scripts/build-data.mjs       (build time)
+  apps/web/scripts/build-data.mjs       (build time)
         ↓
-  app/src/data/database.json       (631 entities, 587 pages)
+  apps/web/src/data/database.json       (631 entities, 587 pages)
         ↓
-  app/src/data/index.ts            (runtime data access)
+  apps/web/src/data/index.ts            (runtime data access)
         ↓
   Next.js static generation        (1300+ pre-rendered pages)
 ```

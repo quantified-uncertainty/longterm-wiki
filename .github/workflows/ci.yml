@@ -30,16 +30,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build data
-        run: cd app && node --import tsx/esm scripts/build-data.mjs
+        run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
 
       - name: Run tests
-        run: cd app && pnpm test
+        run: cd apps/web && pnpm test
 
       - name: Run discord-bot tests
         run: cd apps/discord-bot && pnpm test
 
       - name: Build Next.js
-        run: cd app && pnpm build
+        run: cd apps/web && pnpm build
 
   validate:
     runs-on: ubuntu-latest
@@ -59,7 +59,7 @@ jobs:
 
       - name: Build data (needed for validation)
         id: build-data
-        run: cd app && node --import tsx/esm scripts/build-data.mjs
+        run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
 
       - name: MDX syntax check (blocking)
         run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
@@ -74,7 +74,7 @@ jobs:
         run: pnpm crux validate unified --rules=numeric-id-integrity --errors-only
 
       - name: TypeScript type check — app (blocking)
-        run: cd app && npx tsc --noEmit
+        run: cd apps/web && npx tsc --noEmit
 
       - name: TypeScript type check — discord-bot (blocking)
         run: cd apps/discord-bot && npx tsc --noEmit

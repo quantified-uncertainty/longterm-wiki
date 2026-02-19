@@ -516,9 +516,9 @@ export type EntityContent = z.infer<typeof EntityContent>;
 // ENTITIES (Generic knowledge base entries with InfoBox data)
 // =============================================================================
 
-// NOTE: This file is copied verbatim to app/src/data/schema.ts during build,
+// NOTE: This file is copied verbatim to apps/web/src/data/schema.ts during build,
 // so it cannot use relative imports to files outside data/.
-// The canonical list of entity type names lives in app/src/data/entity-type-names.ts.
+// The canonical list of entity type names lives in apps/web/src/data/entity-type-names.ts.
 // If you add a type here, also add it there (and vice versa).
 // The validate-entities test checks for drift.
 export const EntityType = z.enum([

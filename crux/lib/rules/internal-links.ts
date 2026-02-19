@@ -14,7 +14,7 @@ import { isInCodeBlock } from '../mdx-utils.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR, PROJECT_ROOT } from '../content-types.ts';
 import { MARKDOWN_LINK_RE } from '../patterns.ts';
 
-const APP_DIR = join(PROJECT_ROOT, 'app/src/app');
+const APP_DIR = join(PROJECT_ROOT, 'apps/web/src/app');
 
 /**
  * Check if an internal link resolves to an existing file

@@ -15,7 +15,7 @@ import path from "path";
 
 const CONTENT_DIR = path.resolve(
   __dirname,
-  "../../../../content/docs",
+  "../../../../../content/docs",
 );
 
 /** Recursively find files matching an extension */
