@@ -1,0 +1,173 @@
+---
+title: "FTX Red Flags: Pre-Collapse Warning Signs That Were Overlooked"
+description: An analysis of the financial, operational, and governance warning
+  signs that preceded the November 2022 collapse of FTX, one of the largest
+  cryptocurrency exchange failures in history.
+entityType: concept
+importance: 50
+lastEdited: "2026-02-19"
+sidebar:
+  order: 50
+ratings:
+  novelty: 3
+  rigor: 6
+  actionability: 5
+  completeness: 7
+readerImportance: 52
+tacticalValue: 28
+quality: 53
+llmSummary: A well-structured retrospective on the FTX collapse identifying six
+  major pre-collapse warning signs (FTT overreliance, fund commingling,
+  governance failures, regulatory vacuum, opaque revenue model, ignored
+  historical precedents) and why they were overlooked; relevant to AI safety
+  mainly through the EA/FTX Future Fund connection and implications for donor
+  due diligence.
+---
+import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Attribute | Details |
+|-----------|---------|
+| **Subject** | Pre-collapse warning signs at <EntityLink id="E856">FTX</EntityLink> cryptocurrency exchange |
+| **Exchange Founded** | By Sam Bankman-Fried (SBF); Bahamas-based |
+| **Peak Valuation** | \$32 billion |
+| **Collapse Date** | November 11, 2022 (Chapter 11 bankruptcy filing) |
+| **Reported Shortfall** | \$8 billion in customer funds |
+| **Outcome** | SBF convicted on all counts; sentenced to 25 years in prison (March 2024) |
+| **Repayment Status** | Approximately 98% of creditors to receive ≈119% of November 2022 claims |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Overview of Collapse | [chargebackgurus.com](https://www.chargebackgurus.com/blog/ftx-collapse) |
+
+## Overview
+
+The November 2022 collapse of <EntityLink id="E856">FTX</EntityLink> stands as one of the most significant financial frauds in the history of cryptocurrency, exposing a range of warning signs that, in retrospect, were either ignored or insufficiently scrutinized. At the time of its failure, FTX was the world's second or third largest cryptocurrency exchange by trading volume, with a peak valuation of \$32 billion and over one million users. Its founder, Sam Bankman-Fried (SBF), had cultivated a public reputation as both a crypto prodigy and an effective altruist, making substantial pledges to philanthropic causes — including donations to the <EntityLink id="E855">FTX Future Fund</EntityLink>, which supported AI risk research — while positioning FTX as a responsible actor in an otherwise chaotic industry.[^1][^2]
+
+Beneath this veneer, however, a cluster of structural vulnerabilities had been accumulating for years. These included a reckless commingling of customer funds with those of FTX's sister trading firm, Alameda Research; a dangerous overreliance on FTT, FTX's own native token, as a primary reserve asset; chronic failures of internal governance; and an almost complete absence of meaningful regulatory oversight. When CoinDesk published a report on November 2, 2022 revealing the extent of Alameda Research's exposure to FTT, the resulting panic triggered a cascade of events — Binance's liquidation of its FTT holdings, a mass customer bank run, and ultimately FTX's bankruptcy filing nine days later — that wiped out billions in customer assets and left the broader cryptocurrency industry badly shaken.[^3][^4]
+
+The FTX collapse has since become a canonical case study in how hype, inadequate due diligence, and regulatory gaps can obscure serious fraud. It has prompted renewed calls for bank-like regulatory frameworks in the crypto sector, independent auditing requirements, and greater scrutiny of related-party transactions between crypto exchanges and affiliated trading firms. The warning signs discussed in this article were largely visible in public data or should have been discoverable through standard due diligence — making the failure not only a story of fraud, but of collective oversight failures across investors, auditors, regulators, and the broader public.[^5][^6]
+
+## History and Timeline
+
+### Founding and Rise
+
+FTX was founded by Sam Bankman-Fried, who had previously established Alameda Research, a cryptocurrency-focused hedge fund. The exchange launched as a Bahamas-based platform offering derivatives, leveraged tokens, and spot trading in cryptocurrencies, and grew rapidly through aggressive marketing — including high-profile Super Bowl advertisements, celebrity endorsements, and SBF's prominent philanthropic persona.[^1] By mid-2021, FTX had become one of the largest crypto exchanges globally, and SBF's personal net worth was estimated at around \$16 billion.[^4]
+
+The close relationship between FTX and Alameda Research was present from the very beginning and would prove to be a central vulnerability. Both entities were effectively under SBF's control, and the financial boundaries between them were blurred in ways that would only become fully apparent after the collapse.[^3]
+
+### The November 2022 Collapse
+
+The proximate trigger of the collapse was a CoinDesk report published on November 2, 2022, which revealed that a large portion of Alameda Research's balance sheet consisted of FTT — the token that FTX itself had created and issued.[^3][^4] This circular arrangement meant that both FTX's exchange reserves and Alameda's trading capital were substantially backed by an asset whose value was dependent on confidence in FTX itself.
+
+On November 6, Binance CEO Changpeng Zhao (CZ) announced that Binance would liquidate its approximately \$580 million in FTT holdings, citing concerns about FTX's financial health.[^3] The announcement triggered a sharp decline in FTT's price and a surge in customer withdrawal requests. Within roughly 72 hours, customers had attempted to withdraw approximately \$6 billion, representing approximately 37% of FTX's customer funds — nearly all in a two-day window.[^7]
+
+FTX froze withdrawals on November 8. On the same day, Binance briefly announced a tentative agreement to acquire FTX, only to withdraw the following day after reviewing FTX's books and concluding that the problems were beyond its ability or willingness to address.[^3][^4] On November 11, FTX, Alameda Research, and more than 100 affiliated entities filed for Chapter 11 bankruptcy in Delaware. SBF resigned as CEO, and John J. Ray III — who had previously overseen the Enron bankruptcy — was appointed as the new CEO.[^3]
+
+Within days, the Wall Street Journal reported that FTX had lent customer deposits to Alameda to cover its liabilities — a practice that top executives had been aware of.[^3] In the early hours after the bankruptcy filing, approximately \$473 million in unauthorized transfers were also reported.[^4] U.S. federal prosecutors in New York launched an investigation on November 14, 2022.
+
+### Legal Aftermath
+
+SBF was convicted on all seven fraud counts in November 2023 and sentenced to 25 years in prison in March 2024. Caroline Ellison (former CEO of Alameda Research) and Gary Wang (FTX co-founder) faced related fraud and money-laundering charges.[^8] Changpeng Zhao was separately sentenced to four months in April 2024 for unrelated Binance violations.[^3]
+
+A debtors' report published on April 9, 2023 formally documented the management, governance, and security failures at FTX. By October 2024, a Delaware judge approved FTX's reorganization plan, under which approximately 98% of creditors were to receive around 119% of the value of their November 2022 claims — funded by the recovery of nearly \$16 billion in assets during the bankruptcy proceedings.[^9]
+
+## Pre-Collapse Warning Signs
+
+### 1. Overreliance on the FTT Token
+
+Perhaps the most structurally significant red flag was the extent to which both FTX and Alameda Research's financial positions depended on FTT, a token that FTX itself had created. Alameda's balance sheet — later revealed by the CoinDesk report — showed approximately \$5.8 billion in FTT assets against \$9 billion in liabilities and only \$900 million in other assets.[^6] In a period of one week following the CoinDesk report, FTT's value collapsed from approximately \$5.9 billion to \$553 million.[^10]
+
+This structure raised a fundamental question that was insufficiently asked: what would happen to FTX and Alameda's solvency if FTT's price declined significantly? Because FTX created FTT and Alameda held large quantities of it, both entities were exposed to the same circular risk. A decline in confidence in FTX would reduce the value of FTT, which would impair Alameda's balance sheet, which would further undermine confidence in FTX. This feedback loop was structurally embedded in the arrangement and visible — at least in outline — to any analyst who reviewed publicly available information about FTT's ownership distribution and Alameda's holdings.[^5][^10]
+
+### 2. Commingling of Customer Funds with Alameda Research
+
+Investigators and post-collapse reporting revealed that FTX had routinely lent customer deposits to Alameda Research, enabling Alameda to make speculative investments and repay third-party lenders. This practice was entirely undisclosed to customers and amounted to treating retail customer funds as a source of corporate financing for a related-party hedge fund.[^1][^3]
+
+The mechanism reportedly worked as follows: FTX granted Alameda a special and essentially unlimited credit line, secured in part by FTT holdings valued at above-market rates. When crypto prices declined sharply in May 2022 following the TerraUSD collapse, Alameda reportedly drew on this credit line — backed by customer funds — to meet its liabilities. The result was that by the time mass withdrawals began in November 2022, FTX did not have sufficient liquid assets to return customer funds, producing the reported \$8 billion shortfall.[^3][^6]
+
+### 3. Poor Governance and Internal Controls
+
+The April 2023 debtors' report described in stark terms the governance vacuum at FTX. According to the report, the FTX Group "lacked appropriate management, governance and organizational structure."[^9] Specific security failures cited included private keys stored in unencrypted files, cryptocurrency assets held in internet-connected "hot" wallets, an absence of multifactor authentication in critical systems, and multiple individuals having unchecked access to accounts controlling billions of dollars in crypto assets.[^9][^5]
+
+FTX used QuickBooks — accounting software designed for small businesses — to manage bookkeeping for an entity with a \$32 billion valuation.[^1] There was no proper audit under U.S. GAAP for FTX's 2021 financials, and the auditors who did review FTX's statements were later criticized for producing unreliable assessments. Post-collapse analysis described the auditors as having acted as "cheerleaders" rather than independent scrutinizers.[^10]
+
+### 4. Lack of Regulatory Oversight
+
+FTX was not a registered bank, brokerage, or regulated financial institution in most jurisdictions where it operated. This meant that customers who deposited assets with FTX had none of the legal protections available to bank depositors or brokerage clients — including deposit insurance, segregation requirements, or regulatory capital rules. FTX's terms of service explicitly disclaimed responsibility for losses resulting from hacks or cyberattacks, a clause that would have been impermissible for a regulated financial institution.[^5][^10]
+
+Notably, FTX's U.S.-based subsidiary, LedgerX, which operated under regulatory oversight from the Commodity Futures Trading Commission (CFTC), survived the collapse intact — illustrating how regulatory frameworks might have constrained or revealed the problems that destroyed the parent exchange.[^1]
+
+### 5. Opaque Business Model and Unstable Revenue Sources
+
+FTX's primary revenue streams included fees on margin trading and leveraged tokens, as well as a mechanism for "burning" FTT tokens (analogous to stock buybacks) using a portion of revenues.[^5] This revenue model was inherently dependent on high trading volumes in a buoyant market, and was particularly vulnerable to the kind of crypto market downturn that began in 2022. Rather than building a sustainable business on stable trading fee revenues, FTX's financial model was tightly coupled to the performance of speculative crypto markets and the perceived value of its own token.
+
+The FTT burning mechanism also meant that FTX was effectively supporting the price of FTT through its own revenues — creating incentives to inflate FTT's apparent value and giving large FTT holders (above all, Alameda) an additional reason to avoid any action that might cause FTT's price to decline.[^5]
+
+### 6. Historical Precedents Ignored
+
+The FTX model bore structural similarities to earlier crypto exchange failures that might have served as cautionary precedents. Mt. Gox, which collapsed in 2014 after hackers stole approximately 800,000 bitcoins, had similarly held customer funds in a shared "hot" wallet rather than in individually segregated accounts.[^5] The TerraUSD/Luna collapse in May 2022 and the subsequent bankruptcies of Celsius Network and Voyager Digital had already demonstrated the fragility of crypto entities that combined speculative asset positions with retail customer obligations — yet these precedents did not prompt the level of scrutiny of FTX that they arguably warranted.[^7][^6]
+
+## Why the Red Flags Were Overlooked
+
+Multiple factors contributed to the failure to act on these warning signs before FTX's collapse.
+
+**Hype and celebrity status**: SBF had cultivated a carefully managed public image as a responsible, regulation-friendly crypto entrepreneur who was also committed to effective altruism and large-scale philanthropy. His high profile made investors and journalists less likely to scrutinize FTX critically — a dynamic that several post-collapse analyses have described as a "halo effect."[^2][^5] His prominent donations, including pledges to the <EntityLink id="E855">FTX Future Fund</EntityLink> and to causes aligned with the <EntityLink id="E517">Centre for Effective Altruism</EntityLink>, amplified his credibility in influential communities.
+
+**Investor FOMO and rapid growth**: The 2020–2021 crypto bull market created intense pressure on venture capital firms to secure stakes in fast-growing crypto exchanges. Major institutional investors — including Sequoia Capital, Paradigm, and SoftBank — invested hundreds of millions of dollars in FTX despite the warning signs that, in retrospect, should have been visible during due diligence. Many of these investors publicly apologized after the collapse.[^6][^2]
+
+**Regulatory vacuum**: Without bank-like regulatory requirements for fund segregation, capital adequacy, or third-party auditing, there was no formal mechanism that would have forced disclosure of the FTX-Alameda relationship or the commingling of customer funds.[^1][^5] The information asymmetry between FTX and its users and investors was extreme, and the existing regulatory framework did not close this gap.
+
+**Bull market masking problems**: As one academic analysis noted, had cryptocurrency prices continued to rise, the structural problems at FTX might have remained hidden indefinitely — because a rising FTT price would have kept Alameda's balance sheet solvent and prevented any liquidity shortfall.[^2] The 2022 market downturn removed this cover.
+
+## Criticisms and Controversies
+
+### Auditor Failures
+
+The auditing firms that reviewed FTX's financial statements have been criticized for failing to identify or report on the fundamental misrepresentations in FTX's accounts. Post-collapse analysis described their work as having been inadequate for detecting the scale of the fraud, with reviewers producing statements that gave an unwarranted impression of legitimacy.[^10] This has prompted broader discussion about whether conventional auditing methods are adequate for crypto entities that hold large positions in their own proprietary tokens.
+
+### Venture Capital Due Diligence
+
+The willingness of sophisticated institutional investors to deploy large sums into FTX without apparent scrutiny of its related-party transactions or governance structure has drawn significant criticism. The suggestion that FOMO (fear of missing out) overrode standard due diligence processes raises questions about the quality of risk management in the venture capital ecosystem during the 2021 crypto boom.[^6][^2]
+
+### Regulatory Capture Concerns
+
+SBF was actively engaged in lobbying for cryptocurrency regulation in Washington at the time of FTX's collapse — advocating for frameworks that some critics argued would have entrenched large established players like FTX while burdening smaller competitors. The simultaneous nature of this lobbying effort and the underlying fraud has raised questions about whether regulatory engagement can serve as a credibility signal in the absence of actual regulatory accountability.[^1]
+
+### EA Community Fallout
+
+The collapse had significant implications for the <EntityLink id="E855">FTX Future Fund</EntityLink> and the broader effective altruism community. SBF had been one of the most prominent donors to EA-aligned causes, and the Foundation had been a major funder of organizations including those focused on AI risk, including institutions with ties to the <EntityLink id="E140">Future of Humanity Institute</EntityLink>. After the collapse, grantees faced potential clawbacks of funds received from FTX-affiliated entities, and the EA community underwent significant public scrutiny over its relationship with SBF and its institutional due diligence processes.[^8][^11]
+
+## Key Uncertainties
+
+- The precise extent to which individual investors or auditors had information sufficient to identify the fraud before November 2022, versus genuinely being deceived, remains contested in ongoing legal proceedings.
+- The degree to which the FTX collapse reflected idiosyncratic fraud by SBF versus systemic vulnerabilities present across the crypto exchange sector is an open question, with implications for how regulatory reform should be designed.
+- The long-term industry impact of post-FTX regulatory proposals — including calls for mandatory fund segregation, third-party auditing, and licensing requirements — remains to be determined as rulemaking proceeds in multiple jurisdictions.
+- Whether the repayment of approximately 119% of creditor claims (in nominal dollar terms) represents genuine recovery, given that Bitcoin prices rose substantially between the bankruptcy filing and the repayment, is a matter of debate.
+
+## Sources
+
+[^1]: [The Early Lessons for Investors from FTX's Collapse - Fisher Investments](https://www.fisherinvestments.com/en-us/insights/market-commentary/the-early-lessons-for-investors-from-ftxs-collapse)
+
+[^2]: [FTX Collapse and the Future of Crypto - Kellogg Insight, Northwestern University](https://insight.kellogg.northwestern.edu/article/ftx-collapse-future-crypto)
+
+[^3]: [FTX Collapse Timeline - Changelly](https://changelly.com/blog/ftx-collapse-timeline/)
+
+[^4]: [FTX Scam Explained: Everything You Need to Know - TechTarget](https://www.techtarget.com/whatis/feature/FTX-scam-explained-Everything-you-need-to-know)
+
+[^5]: [Lessons to Learn from the Fall of FTX - NACD Directorship](https://www.nacdonline.org/all-governance/governance-resources/directorship-magazine/private-company-directorship-newsletter/lessons-to-learn-from-the-fall-of-ftx/)
+
+[^6]: [FTX Collapse - Chargeback Gurus](https://www.chargebackgurus.com/blog/ftx-collapse)
+
+[^7]: [Chicago Fed Letter No. 479: Crypto Runs and the FTX Collapse - Federal Reserve Bank of Chicago](https://www.chicagofed.org/publications/chicago-fed-letter/2023/479)
+
+[^8]: [FTX Collapse - EA Forum topic](https://forum.effectivealtruism.org/topics/ftx-collapse)
+
+[^9]: [FTX Collapse - BDO Canada: Fraud Deconstructed](https://www.bdo.ca/insights/fraud-deconstructed-ftx-cryptocurrency)
+
+[^10]: [FTX Collapse Warning Signs for Crypto Investors - Ainvest](https://www.ainvest.com/news/ftx-collapse-warning-crypto-investors-governance-liquidity-risk-2601/)
+
+[^11]: [Crypto Company's Collapse Strands Scientists - Science Magazine](https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists)
