@@ -1,0 +1,57 @@
+date: "2026-02-19"
+branch: claude/resume-session-U9jXI
+title: "fix(calc-derive): robust JSON parsing, auto-fallback validation, prompt improvements"
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/328
+model: sonnet-4-6
+duration: ~25min
+cost: ~$1.50
+pages:
+  - anthropic-valuation
+
+summary: |
+  Resumed issue #316 (thorough testing of crux facts calc pipeline across more pages).
+  Fixed three issues found through live testing: (1) switched from bare parseJsonResponse
+  to parseJsonFromLlm for resilient JSON parsing — eliminates silent parse failures;
+  (2) added auto-fallback in validateProposal to recover proposals blocked by table pipes
+  or excess-width originalText by retrying with just the match string; (3) tightened
+  system prompt with "ABSOLUTELY FORBIDDEN" language for | characters. Applied 3 ≈25x
+  → <Calc> replacements in anthropic-valuation.mdx. Added 9 new validateOriginalText
+  tests (37 total in calc-derive.test.ts). Batch scan of 20 pages confirmed calc pipeline
+  correctly finds no derivable patterns in capabilities/cruxes pages — capability
+  multiples (compute cost reductions, inference speed) are not in the facts system.
+  All 7 gate checks pass, 609 tests pass.
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-19T07:41:56.510Z"
+  total: 29
+  completed: 25
+  na: 0
+  skipped: 4
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - fix-escaping
+    - typescript-used
+    - correctness
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - no-merge-conflicts
+    - check-recent-merges
+    - crux-typescript
