@@ -9,7 +9,7 @@ import { execFileSync } from 'child_process';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
-  PipelineOptions, PipelineResults, TriageResult,
+  PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
 } from './types.ts';
 import { ROOT, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
@@ -87,6 +87,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   const startTime: number = Date.now();
   let analysis: AnalysisResult | undefined, research: ResearchResult | undefined;
   let improvedContent: string | undefined, review: ReviewResult | undefined;
+  let adversarialLoopResult: AdversarialLoopResult | undefined;
 
   // Run phases based on tier
   for (const phase of tierConfig.phases) {
@@ -135,21 +136,28 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         break;
 
       case 'adversarial-loop': {
-        const loopResult = await adversarialLoopPhase(
-          page,
-          improvedContent!,
-          analysis!,
-          research || { sources: [] },
-          directions,
-          options,
-        );
-        improvedContent = loopResult.finalContent;
-        // Merge any additional research back so gap-fill has full context
-        if (loopResult.additionalResearch.sources.length > 0) {
-          research = {
-            sources: [...(research?.sources || []), ...loopResult.additionalResearch.sources],
-            summary: research?.summary,
-          };
+        try {
+          const loopResult = await adversarialLoopPhase(
+            page,
+            improvedContent!,
+            analysis!,
+            research || { sources: [] },
+            directions,
+            options,
+          );
+          adversarialLoopResult = loopResult;
+          improvedContent = loopResult.finalContent;
+          // Merge any additional research back so gap-fill has full context
+          if (loopResult.additionalResearch.sources.length > 0) {
+            research = {
+              sources: [...(research?.sources || []), ...loopResult.additionalResearch.sources],
+              summary: research?.summary,
+            };
+          }
+        } catch (err: unknown) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          log('adversarial-loop', `⚠ Adversarial loop failed: ${error.message} — continuing with pre-loop content`);
+          // Don't overwrite improvedContent; continue pipeline with the last good state
         }
         break;
       }
@@ -196,13 +204,16 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     fs.copyFileSync(finalPath, filePath);
     console.log(`\nChanges applied to ${filePath}`);
 
+    const adversarialNote = adversarialLoopResult
+      ? ` [adversarial: ${adversarialLoopResult.iterations} iter, ${adversarialLoopResult.adversarialReview.gaps.length} gaps]`
+      : '';
     appendEditLog(page.id, {
       tool: 'crux-improve',
       agency: 'ai-directed',
       requestedBy: getDefaultRequestedBy(),
       note: directions
-        ? `Improved (${tier}): ${directions.slice(0, 120)}`
-        : `Improved (${tier})`,
+        ? `Improved (${tier})${adversarialNote}: ${directions.slice(0, 100)}`
+        : `Improved (${tier})${adversarialNote}`,
     });
 
     // Auto-grade after applying changes (default: on; skip with grade: false)
@@ -228,7 +239,8 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     duration: totalDuration,
     phases: tierConfig.phases,
     review,
-    outputPath: finalPath
+    adversarialLoopResult,
+    outputPath: finalPath,
   };
   writeTemp(page.id, 'pipeline-results.json', results);
 

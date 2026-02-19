@@ -26,5 +26,4 @@ export {
   triagePhase,
 } from './phases/index.ts';
 
-export { adversarialReviewPhase } from './phases/adversarial-review.ts';
-export { adversarialLoopPhase } from './phases/adversarial-loop.ts';
+export { adversarialReviewPhase, adversarialLoopPhase } from './phases/index.ts';

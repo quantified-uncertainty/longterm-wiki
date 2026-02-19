@@ -124,10 +124,16 @@ Output ONLY a JSON object:
   return research;
 }
 
-/** Merge additional research sources into existing research. */
+/** Merge additional research sources into existing research, deduplicating by URL. */
 function mergeResearch(base: ResearchResult, additional: ResearchResult): ResearchResult {
+  const seenUrls = new Set<string>((base.sources || []).map(s => s.url));
+  const newSources = (additional.sources || []).filter(s => {
+    if (seenUrls.has(s.url)) return false;
+    seenUrls.add(s.url);
+    return true;
+  });
   return {
-    sources: [...(base.sources || []), ...(additional.sources || [])],
+    sources: [...(base.sources || []), ...newSources],
     summary: [base.summary, additional.summary].filter(Boolean).join(' '),
   };
 }
@@ -192,8 +198,12 @@ export async function adversarialLoopPhase(
     const totalGaps = adversarialReview.gaps.length;
     const actionableGaps = adversarialReview.gaps.filter(g => g.actionType !== 'none').length;
 
-    if (totalGaps === 0 || actionableGaps === 0) {
-      log('adversarial-loop', `Iteration ${iteration}: No actionable gaps found — stopping loop early`);
+    if (totalGaps === 0) {
+      log('adversarial-loop', `Iteration ${iteration}: No gaps found — page quality meets standards, stopping loop early`);
+      break;
+    }
+    if (actionableGaps === 0) {
+      log('adversarial-loop', `Iteration ${iteration}: ${totalGaps} advisory gap(s) found but none are actionable (all type "none") — stopping loop`);
       break;
     }
 
@@ -213,7 +223,9 @@ export async function adversarialLoopPhase(
     const combinedDirections = [directions, gapDirections].filter(Boolean).join('\n\n');
 
     log('adversarial-loop', `Iteration ${iteration}: Re-improving with ${cumulativeResearch.sources.length} total sources`);
-    currentContent = await improvePhase(page, analysis, cumulativeResearch, combinedDirections, options);
+    // Pass currentContent explicitly so improvePhase works on the previous iteration's
+    // output rather than re-reading the original file from disk.
+    currentContent = await improvePhase(page, analysis, cumulativeResearch, combinedDirections, options, currentContent);
     writeTemp(page.id, `adversarial-loop-iter${iteration}.mdx`, currentContent);
   }
 

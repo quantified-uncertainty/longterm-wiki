@@ -16,30 +16,16 @@
  * so the pipeline knows which tool to invoke.
  */
 
-import { z } from 'zod';
 import { MODELS } from '../../../lib/anthropic.ts';
 import type {
-  PageData, AdversarialReviewResult, AdversarialGap, AdversarialGapType, PipelineOptions,
+  PageData, AdversarialReviewResult, AdversarialGap, PipelineOptions,
 } from '../types.ts';
 import { log, writeTemp } from '../utils.ts';
 import { runAgent } from '../api.ts';
-import { parseJsonFromLlm } from './json-parsing.ts';
+import { parseAndValidate, AdversarialReviewResultSchema } from './json-parsing.ts';
 
-// ── Zod schema ────────────────────────────────────────────────────────────────
-
-const AdversarialGapSchema = z.object({
-  type: z.enum(['fact-density', 'speculation', 'missing-standard-data', 'redundancy', 'source-gap']),
-  description: z.string(),
-  reResearchQuery: z.string().optional(),
-  actionType: z.enum(['re-research', 'edit', 'none']),
-});
-
-export const AdversarialReviewResultSchema = z.object({
-  gaps: z.array(AdversarialGapSchema),
-  needsReResearch: z.boolean(),
-  reResearchQueries: z.array(z.string()),
-  overallAssessment: z.string(),
-}).passthrough();
+// Re-export for callers that only import from adversarial-review.ts
+export { AdversarialReviewResultSchema } from './json-parsing.ts';
 
 // ── Page-type hints ───────────────────────────────────────────────────────────
 
@@ -136,33 +122,38 @@ Rules:
     maxTokens: 6000,
   });
 
-  const review = parseJsonFromLlm<AdversarialReviewResult>(result, 'adversarial-review', (raw, error) => ({
-    gaps: [],
-    needsReResearch: false,
-    reResearchQueries: [],
-    overallAssessment: 'Could not parse adversarial review output.',
-    raw,
-    error,
-  }));
+  const review = parseAndValidate<AdversarialReviewResult>(
+    result,
+    AdversarialReviewResultSchema,
+    'adversarial-review',
+    (raw, error) => ({
+      gaps: [],
+      needsReResearch: false,
+      reResearchQueries: [],
+      overallAssessment: 'Could not parse adversarial review output.',
+      raw,
+      error,
+    }),
+  );
 
-  // Normalize: ensure needsReResearch and reResearchQueries are consistent with gaps
-  const reSearchGaps = (review.gaps as AdversarialGap[] | undefined || []).filter(
-    (g: AdversarialGap) => (g.actionType as string) === 're-research' && g.reResearchQuery,
+  // Normalize: ensure needsReResearch and reResearchQueries are derived from gaps,
+  // not trusted from the LLM (which may have summarized them incorrectly).
+  const reSearchGaps = review.gaps.filter(
+    (g: AdversarialGap) => g.actionType === 're-research' && g.reResearchQuery,
   );
   review.needsReResearch = reSearchGaps.length > 0;
   review.reResearchQueries = reSearchGaps.map((g: AdversarialGap) => g.reResearchQuery as string);
 
   // Log summary
-  const gapsByType = (review.gaps as AdversarialGap[] | undefined || []).reduce((acc: Record<string, number>, g: AdversarialGap) => {
-    const type = g.type as AdversarialGapType;
-    acc[type] = (acc[type] || 0) + 1;
+  const gapsByType = review.gaps.reduce((acc: Record<string, number>, g: AdversarialGap) => {
+    acc[g.type] = (acc[g.type] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
   const gapSummary = Object.entries(gapsByType)
     .map(([type, count]) => `${count} ${type}`)
     .join(', ');
 
-  log('adversarial-review', `Complete — ${(review.gaps as AdversarialGap[]).length} gaps found (${gapSummary || 'none'})`);
+  log('adversarial-review', `Complete — ${review.gaps.length} gaps found (${gapSummary || 'none'})`);
   log('adversarial-review', `Needs re-research: ${review.needsReResearch}`);
   if (review.overallAssessment) {
     log('adversarial-review', `Assessment: ${review.overallAssessment}`);

@@ -102,23 +102,26 @@ Usage:
   node crux/authoring/page-improver/index.ts -- --list
 
 Options:
-  --directions "..."   Specific improvement directions
-  --tier <tier>        polish ($2-3), standard ($5-8), deep ($10-15), or triage (auto)
-  --apply              Apply changes directly (don't just preview)
-  --no-grade           Skip auto-grading after apply (grading runs by default)
-  --triage             Run news-check triage only (no improvement)
-  --list               List pages needing improvement
-  --limit N            Limit list results (default: 20)
+  --directions "..."              Specific improvement directions
+  --tier <tier>                   polish ($2-3), standard ($5-8), deep ($15-25), or triage (auto)
+  --apply                         Apply changes directly (don't just preview)
+  --no-grade                      Skip auto-grading after apply (grading runs by default)
+  --triage                        Run news-check triage only (no improvement)
+  --list                          List pages needing improvement
+  --limit N                       Limit list results (default: 20)
+  --adversarial-model <model>     Override model for adversarial review (deep tier only)
+  --max-adversarial-iterations N  Max adversarial loop iterations, default 2 (deep tier only)
 
 Tiers:
-  polish    Quick single-pass, no research
-  standard  Light research + improve + review (default)
-  deep      Full SCRY + web research, gap filling
+  polish    Quick single-pass, no research (~$2-3)
+  standard  Light research + improve + review (default, ~$5-8)
+  deep      Full SCRY + web research + adversarial review loop + gap filling (~$15-25)
   triage    Auto-select tier via cheap news check (~$0.08)
 
 Examples:
   node crux/authoring/page-improver/index.ts -- open-philanthropy --directions "add 2024 grants"
   node crux/authoring/page-improver/index.ts -- far-ai --tier deep --directions "add publications"
+  node crux/authoring/page-improver/index.ts -- cea --tier deep --max-adversarial-iterations 1
   node crux/authoring/page-improver/index.ts -- cea --tier polish
   node crux/authoring/page-improver/index.ts -- cea --triage
   node crux/authoring/page-improver/index.ts -- --list --limit 30
@@ -161,7 +164,11 @@ Examples:
     tier: (opts.tier as string) || 'standard',
     directions: (opts.directions as string) || '',
     dryRun: !opts.apply,
-    grade: opts['no-grade'] ? false : undefined
+    grade: opts['no-grade'] ? false : undefined,
+    adversarialModel: (opts['adversarial-model'] as string) || undefined,
+    maxAdversarialIterations: opts['max-adversarial-iterations']
+      ? parseInt(opts['max-adversarial-iterations'] as string, 10)
+      : undefined,
   });
 }
 

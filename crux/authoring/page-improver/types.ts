@@ -112,6 +112,8 @@ export interface PipelineResults {
   duration: string;
   phases: string[];
   review: ReviewResult | undefined;
+  /** Set when the deep tier's adversarial-loop phase ran. */
+  adversarialLoopResult?: AdversarialLoopResult;
   outputPath: string;
 }
 
