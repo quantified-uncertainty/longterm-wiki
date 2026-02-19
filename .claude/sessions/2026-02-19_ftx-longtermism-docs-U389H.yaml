@@ -1,0 +1,65 @@
+date: "2026-02-19"
+branch: claude/ftx-longtermism-docs-U389H
+title: Add FTX era pages — Sam Bankman-Fried, FTX, FTX Future Fund
+model: claude-sonnet-4-6
+duration: ~55 min
+cost: ~$15 (3 pages × $5 pipeline each)
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/336
+
+pages:
+  created:
+    - knowledge-base/people/sam-bankman-fried
+    - knowledge-base/organizations/ftx
+    - knowledge-base/organizations/ftx-future-fund
+
+summary: |
+  Created three new wiki pages covering the FTX era's impact on longtermism
+  and AI safety funding. All pages generated via crux content pipeline at
+  standard tier. Added YAML entity definitions (E855-E860) for the new pages
+  and three existing entities whose IDs shifted. Fixed tilde-dollar escaping
+  in the FTX Future Fund page.
+
+decisions:
+  - "**Pages chosen**: Selected Sam Bankman-Fried, FTX, and FTX Future Fund as
+    the three most critical gaps — direct actors in the FTX collapse with no
+    existing dedicated pages."
+  - "**ID stability**: Fixed ID drift for ea-shareholder-diversification-anthropic
+    (E858), state-capacity-ai-governance (E859), recoding-america (E860) by
+    adding explicit numericIds to their YAML entity definitions rather than
+    MDX frontmatter (since they had YAML entities)."
+  - "**Tier**: Used standard tier (~$5 each) for all three pages given the
+    historical significance and research depth needed."
+
+checks:
+  initialized: true
+  type: content
+  initiated_at: "2026-02-19T18:39:53.659Z"
+  total: 29
+  completed: 24
+  na: 4
+  skipped: 1
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - research-content
+    - fix-escaping
+    - crux-pipeline
+    - correctness
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - entitylinks-resolve
+    - numeric-ids-stable
+    - mdx-escaping
+    - content-accuracy
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges

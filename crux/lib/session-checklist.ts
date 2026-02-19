@@ -287,6 +287,23 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     applicableTypes: ['content'],
   },
   {
+    id: 'citations-have-urls',
+    label: 'Citations have URLs',
+    description:
+      'Every `[^N]:` footnote definition contains a markdown link `[Title](https://...)` or bare URL. Run `pnpm crux validate unified --rules=no-url-footnotes,citation-urls` to catch placeholders and missing URLs automatically.',
+    phase: 'review',
+    applicableTypes: ['content'],
+    verifyCommand: 'pnpm crux validate unified --rules=no-url-footnotes,citation-urls --errors-only',
+  },
+  {
+    id: 'citations-verify',
+    label: 'Citations verified (spot check)',
+    description:
+      'For high-importance pages or pages with many new citations: run `pnpm crux citations verify <page-id>` to check URLs return 200 and match claimed titles. Focus on any footnote added in this session.',
+    phase: 'review',
+    applicableTypes: ['content'],
+  },
+  {
     id: 'backward-compatible',
     label: 'Backward compatible',
     description: 'Changes do not break existing consumers, APIs, or data formats.',
@@ -341,9 +358,11 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: 'pr-description',
     label: 'PR description',
-    description: 'Summary, key changes, test plan. All items checked and true.',
+    description:
+      'Summary, key changes, test plan. All items checked and true. Run `pnpm crux pr fix-body` to auto-repair any literal \\n in the PR body.',
     phase: 'ship',
     applicableTypes: 'all',
+    verifyCommand: 'pnpm crux pr fix-body',
   },
   {
     id: 'issue-tracking',

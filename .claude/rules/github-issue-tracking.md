@@ -11,11 +11,14 @@ When the task description references a GitHub issue number (e.g., "resolve issue
 ```bash
 ISSUE_NUM=239   # replace with actual number
 BRANCH=$(git branch --show-current)
+BODY="🤖 Claude Code starting work on this issue (branch: \`${BRANCH}\`).
+
+See branch for progress. This comment will be updated when work is complete."
 curl -s -X POST \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github+json" \
   "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${ISSUE_NUM}/comments" \
-  -d "{\"body\": \"🤖 Claude Code starting work on this issue (branch: \`${BRANCH}\`).\n\nSee branch for progress. This comment will be updated when work is complete.\"}"
+  -d "$(jq -n --arg body "$BODY" '{body: $body}')"
 ```
 
 ### 2. Add the `claude-working` label
@@ -53,11 +56,12 @@ PR_URL="<url of the PR>"
 ISSUE_NUM=239
 
 # Post completion comment
+BODY="🤖 Claude Code has finished working on this. Changes are in ${PR_URL} — please review and merge."
 curl -s -X POST \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github+json" \
   "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${ISSUE_NUM}/comments" \
-  -d "{\"body\": \"🤖 Claude Code has finished working on this. Changes are in ${PR_URL} — please review and merge.\"}"
+  -d "$(jq -n --arg body "$BODY" '{body: $body}')"
 
 # Remove claude-working label
 curl -s -X DELETE \

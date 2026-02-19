@@ -69,6 +69,7 @@ import { evaluativeFlattery } from './evaluative-flattery.ts';
 
 // Citation coverage
 import { footnoteCoverageRule } from './footnote-coverage.ts';
+import { noUrlFootnotesRule } from './no-url-footnotes.ts';
 
 // Citation accuracy
 import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
@@ -120,6 +121,7 @@ export {
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
   footnoteCoverageRule,
+  noUrlFootnotesRule,
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
@@ -165,6 +167,7 @@ export const allRules: Rule[] = [
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
   footnoteCoverageRule,
+  noUrlFootnotesRule,
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,

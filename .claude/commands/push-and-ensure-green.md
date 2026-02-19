@@ -44,11 +44,23 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
    - If no PR exists (empty array), create one:
      ```bash
      PR_TITLE="<descriptive title>"
-     PR_BODY="<summary>"
+     PR_BODY="$(cat <<'BODY'
+## Summary
+
+- <key change 1>
+- <key change 2>
+
+## Test plan
+- [ ] <test step>
+
+https://claude.ai/code/session_019e8FwRtmSEkPFfqZGuVEKi
+BODY
+)"
      curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
        "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls" \
        -d "$(jq -n --arg t "$PR_TITLE" --arg h "$BRANCH" --arg b "$PR_BODY" '{title: $t, head: $h, base: "main", body: $b}')"
      ```
+     **After creating, always run `pnpm crux pr fix-body`** — this detects and repairs any literal `\n` in the PR body automatically.
    - If a PR exists, note its number and move on.
 
 ## Step 3: Verify GitHub is green

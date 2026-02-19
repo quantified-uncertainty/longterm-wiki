@@ -1205,3 +1205,26 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+- id: sam-bankman-fried
+  numericId: E857
+  type: person
+  title: Sam Bankman-Fried
+  website: https://en.wikipedia.org/wiki/Sam_Bankman-Fried
+  description: >-
+    Sam Bankman-Fried (SBF) was the founder of FTX cryptocurrency exchange and
+    Alameda Research, and a prominent funder of effective altruism and longtermist
+    causes. Convicted on all seven counts of fraud and money laundering in
+    November 2023 and sentenced to 25 years in prison, he misappropriated an
+    estimated $8–9 billion in customer funds. His collapse severely damaged the
+    EA community's reputation and disrupted AI safety funding pipelines.
+  relatedEntries:
+    - id: ftx
+      type: organization
+    - id: ftx-future-fund
+      type: organization
+    - id: cea
+      type: organization
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
