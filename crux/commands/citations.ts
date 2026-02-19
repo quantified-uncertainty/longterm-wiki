@@ -57,6 +57,11 @@ const SCRIPTS = {
     passthrough: ['ci', 'json', 'all', 'limit', 'recheck'],
     positional: true,
   },
+  'export-dashboard': {
+    script: 'citations/export-dashboard.ts',
+    description: 'Export accuracy data as JSON for the internal dashboard',
+    passthrough: ['json'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'report');
@@ -94,5 +99,6 @@ Examples:
   crux citations verify-quotes existential-risk    Re-verify stored quotes
   crux citations check-accuracy existential-risk   Check claim accuracy vs sources
   crux citations check-accuracy --all              Batch accuracy check
+  crux citations export-dashboard                  Export data for web dashboard
 `;
 }
