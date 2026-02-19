@@ -17,6 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { citationContent } from './knowledge-db.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -491,21 +492,17 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
 
 /**
  * Store full fetched content in the SQLite knowledge database.
- * Lazy-loaded to avoid pulling in better-sqlite3 for read-only operations.
+ * knowledge-db uses lazy initialization, so this is safe to call without
+ * triggering DB creation until the upsert actually runs.
  */
-let _citationContentModule: typeof import('./knowledge-db.ts') | null = null;
-
-async function storeCitationContent(
+function storeCitationContent(
   url: string,
   pageId: string,
   footnote: number,
   result: FetchResult,
 ) {
   try {
-    if (!_citationContentModule) {
-      _citationContentModule = await import('./knowledge-db.ts');
-    }
-    _citationContentModule.citationContent.upsert({
+    citationContent.upsert({
       url,
       pageId,
       footnote,
@@ -580,7 +577,7 @@ export async function verifyCitationsForPage(
             note: result.error ? `Academic publisher: ${result.error}` : 'Academic publisher — URL accessible',
           };
           // Store whatever content we got from academic publishers
-          await storeCitationContent(ext.url, pageId, ext.footnote, result);
+          storeCitationContent(ext.url, pageId, ext.footnote, result);
         } else {
           const result = await fetchCitationUrl(ext.url);
           const status: VerificationStatus =
@@ -603,7 +600,7 @@ export async function verifyCitationsForPage(
           };
           // Store full HTML + text content in SQLite for deep verification
           if (result.fullHtml || result.fullText) {
-            await storeCitationContent(ext.url, pageId, ext.footnote, result);
+            storeCitationContent(ext.url, pageId, ext.footnote, result);
           }
         }
 

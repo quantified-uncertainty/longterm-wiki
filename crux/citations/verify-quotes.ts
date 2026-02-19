@@ -14,9 +14,8 @@ import { parseCliArgs } from '../lib/cli.ts';
 import {
   citationQuotes,
   citationContent,
-  db,
+  getDb,
 } from '../lib/knowledge-db.ts';
-// Note: db is used for batch queries in the --all codepath below
 import { fetchCitationUrl } from '../lib/citation-archive.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 
@@ -159,7 +158,7 @@ async function main() {
 
   if (all) {
     // Get all pages with stored quotes
-    const pages = db
+    const pages = getDb()
       .prepare(
         `
       SELECT DISTINCT page_id, COUNT(*) as quote_count

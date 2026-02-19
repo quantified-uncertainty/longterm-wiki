@@ -11,7 +11,7 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationQuotes, db } from '../lib/knowledge-db.ts';
+import { citationQuotes, getDb } from '../lib/knowledge-db.ts';
 
 interface PageStats {
   page_id: string;
@@ -25,7 +25,7 @@ interface PageStats {
 }
 
 function getPageStats(): PageStats[] {
-  return db
+  return getDb()
     .prepare(
       `
     SELECT
@@ -52,7 +52,7 @@ interface SourceTypeStats {
 }
 
 function getSourceTypeStats(): SourceTypeStats[] {
-  return db
+  return getDb()
     .prepare(
       `
     SELECT
@@ -76,7 +76,7 @@ interface BrokenQuote {
 }
 
 function getBrokenQuotes(): BrokenQuote[] {
-  return db
+  return getDb()
     .prepare(
       `
     SELECT page_id, footnote, url, claim_text, verification_score
