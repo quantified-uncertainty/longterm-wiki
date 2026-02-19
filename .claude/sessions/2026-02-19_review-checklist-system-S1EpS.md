@@ -14,3 +14,10 @@
 - Checklist fatigue is a human problem, not an AI problem. The real blocker for AI agents is the tool-call cost of editing markdown checkboxes (2-3 calls per item x 28 items = ~60-80 tool calls).
 - The `check` command reduces this to 1 call per batch of items.
 - 7 items in the catalog now have `verifyCommand` for programmatic verification.
+
+**Recommendations:**
+- The CLI arg parser (`crux/lib/cli.ts` `parseCliArgs`) treats `--flag nextArg` as `flag=nextArg` when nextArg doesn't start with `--`. This is a footgun for boolean flags. Consider adding a `booleanFlags` parameter to `parseCliArgs` so flags like `--na`, `--ci`, `--fix` are always treated as booleans.
+- The `verify` command runs verifyCommands sequentially. For items like `gate-passes` (which takes ~50s), this is fine since it includes tests. But if more verifyCommands are added, consider parallelizing independent checks.
+- Old-format checklists (pre-numbered) have ID derivation mismatches for some items (e.g., `mdx-escaping-correct` vs catalog ID `mdx-escaping`). The `verify` command won't auto-check these. Not worth fixing since old checklists are rare, but worth knowing.
+- Consider adding a `crux agent-checklist check-all` shortcut that marks all remaining items as checked — useful for quick-fix sessions where the full checklist is overkill but you still want to signal completion.
+- The `/agent-session-start` and `/agent-session-ready-PR` slash commands should be updated to use `check` and `verify` instead of telling the agent to manually edit the markdown file.

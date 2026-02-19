@@ -32,6 +32,9 @@ Where `<branch-suffix>` is the branch name without the `claude/` prefix (e.g., f
 
 **Learnings/notes:**
 - Anything a future session should know (or "None")
+
+**Recommendations:**
+- Infrastructure improvements discovered during the session (or omit if none)
 ```
 
 ## Rules
