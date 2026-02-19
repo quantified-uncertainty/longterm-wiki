@@ -28,6 +28,7 @@
  *   citations   Citation verification and archival
  *   issues      Track Claude Code work on GitHub issues
  *   agent-checklist  Manage agent checklists (init, check, verify, status, complete)
+ *   facts       Propose new canonical facts from wiki page content
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -62,6 +63,7 @@ import * as citationsCommands from './commands/citations.ts';
 import * as grokipediaCommands from './commands/grokipedia.ts';
 import * as issuesCommands from './commands/issues.ts';
 import * as agentChecklistCommands from './commands/agent-checklist.ts';
+import * as factsCommands from './commands/facts.ts';
 
 const domains = {
   validate: validateCommands,
@@ -83,6 +85,7 @@ const domains = {
   grokipedia: grokipediaCommands,
   issues: issuesCommands,
   'agent-checklist': agentChecklistCommands,
+  facts: factsCommands,
 };
 
 /**
