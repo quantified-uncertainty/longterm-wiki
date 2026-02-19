@@ -51,6 +51,12 @@ const SCRIPTS = {
     passthrough: ['ci', 'json', 'all', 'limit', 'refetch'],
     positional: true,
   },
+  'check-accuracy': {
+    script: 'citations/check-accuracy.ts',
+    description: 'Check if wiki claims accurately represent cited sources',
+    passthrough: ['ci', 'json', 'all', 'limit', 'recheck'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'report');
@@ -86,5 +92,7 @@ Examples:
   crux citations quote-report                      Quote coverage stats
   crux citations quote-report --broken             Show drifted/broken quotes
   crux citations verify-quotes existential-risk    Re-verify stored quotes
+  crux citations check-accuracy existential-risk   Check claim accuracy vs sources
+  crux citations check-accuracy --all              Batch accuracy check
 `;
 }

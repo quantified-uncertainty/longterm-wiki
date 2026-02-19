@@ -22,6 +22,14 @@ export interface QuoteExtractionResult {
   confidence: number;
 }
 
+export type AccuracyVerdict = 'accurate' | 'minor_issues' | 'inaccurate' | 'unsupported' | 'not_verifiable';
+
+export interface AccuracyCheckResult {
+  verdict: AccuracyVerdict;
+  score: number;
+  issues: string[];
+}
+
 /**
  * Extract the specific supporting quote from a source for a given wiki claim.
  *
@@ -130,6 +138,122 @@ Find the specific passage in the source that supports this claim. Return JSON on
       quote: '',
       location: 'unknown',
       confidence: 0,
+    };
+  }
+}
+
+/**
+ * Check whether a wiki claim accurately represents what the source quote says.
+ *
+ * This is the "second pass" — after extracting a supporting quote,
+ * compare the wiki's specific factual claims against the source.
+ */
+export async function checkClaimAccuracy(
+  claimText: string,
+  sourceQuote: string,
+  opts?: { model?: string; sourceTitle?: string },
+): Promise<AccuracyCheckResult> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY not set — required for accuracy checking');
+  }
+
+  const model = opts?.model || DEFAULT_MODEL;
+  const sourceContext = opts?.sourceTitle ? `\nSource title: "${opts.sourceTitle}"` : '';
+
+  const systemPrompt = `You are a fact-checking assistant. Given a claim from a wiki article and the supporting quote from the cited source, determine whether the wiki claim ACCURATELY represents what the source says.
+
+Check for these specific issues:
+1. WRONG NUMBERS: dates, percentages, dollar amounts, counts that differ between claim and source
+2. WRONG ATTRIBUTION: claim attributes a statement to the wrong person/organization
+3. MISLEADING PARAPHRASE: claim distorts the meaning or emphasis of the source
+4. OVERCLAIMS: claim states something more definitively than the source supports
+5. FABRICATED DETAILS: claim includes specific details not present in the source quote
+
+Rules:
+- Compare the claim against the source quote carefully, word by word for factual details
+- Be strict about numbers, dates, and names — even small discrepancies matter
+- "accurate" = claim faithfully represents the source (minor wording differences are OK)
+- "minor_issues" = small discrepancies that don't change the core meaning (e.g., rounding)
+- "inaccurate" = claim misrepresents what the source says in a meaningful way
+- "unsupported" = source quote doesn't actually support this specific claim
+- "not_verifiable" = not enough information in the quote to check the claim
+- For "score", rate 0.0-1.0 (1.0 = perfectly accurate, 0.0 = completely wrong)
+- For "issues", list each specific discrepancy found. Be concise but precise.
+
+Respond in exactly this JSON format:
+{"verdict": "accurate", "score": 0.95, "issues": ["optional issue description"]}`;
+
+  const userPrompt = `WIKI CLAIM:
+${claimText}
+${sourceContext}
+SOURCE QUOTE:
+"${sourceQuote}"
+
+Does the wiki claim accurately represent what the source says? Check all facts, numbers, dates, and attributions. Return JSON only.`;
+
+  const response = await fetch(BASE_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://www.longtermwiki.com',
+      'X-Title': 'LongtermWiki Accuracy Check',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      max_tokens: 1000,
+      temperature: 0,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(
+      `OpenRouter API error (${response.status}): ${errorBody.slice(0, 200)}`,
+    );
+  }
+
+  const data = (await response.json()) as {
+    choices: Array<{ message: { content: string } }>;
+    error?: { message: string };
+  };
+
+  if (data.error) {
+    throw new Error(`OpenRouter error: ${data.error.message}`);
+  }
+
+  const content = data.choices?.[0]?.message?.content || '';
+  const jsonStr = content
+    .replace(/^```json\s*/i, '')
+    .replace(/```\s*$/, '')
+    .trim();
+
+  try {
+    const parsed = JSON.parse(jsonStr) as {
+      verdict?: string;
+      score?: number;
+      issues?: string[];
+    };
+
+    const validVerdicts: AccuracyVerdict[] = ['accurate', 'minor_issues', 'inaccurate', 'unsupported', 'not_verifiable'];
+    const verdict = validVerdicts.includes(parsed.verdict as AccuracyVerdict)
+      ? (parsed.verdict as AccuracyVerdict)
+      : 'not_verifiable';
+
+    return {
+      verdict,
+      score: typeof parsed.score === 'number' ? Math.max(0, Math.min(1, parsed.score)) : 0.5,
+      issues: Array.isArray(parsed.issues) ? parsed.issues.filter((i) => typeof i === 'string' && i.length > 0) : [],
+    };
+  } catch {
+    return {
+      verdict: 'not_verifiable',
+      score: 0.5,
+      issues: ['Failed to parse LLM response'],
     };
   }
 }
