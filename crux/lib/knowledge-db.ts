@@ -5,9 +5,10 @@
  * Designed for scale: 1000+ articles, 10,000+ sources.
  *
  * The database is lazy-initialized on first access via getDb(). Importing
- * this module does NOT create the SQLite file or load native bindings,
- * so modules that transitively depend on this file can be safely imported
- * in test environments without better-sqlite3.
+ * this module loads better-sqlite3 bindings but does NOT create the SQLite
+ * file, run schema setup, or create directories. This means tests that
+ * transitively import this module won't trigger DB side effects as long as
+ * they don't call functions that invoke getDb().
  *
  * Usage:
  *   import { getDb, articles, sources, summaries } from './lib/knowledge-db.ts';

@@ -239,6 +239,8 @@ function assessPage(
 // ---------------------------------------------------------------------------
 
 function loadAccuracyMap(): AccuracyMap | null {
+  // Guard: only query if the DB file already exists. getDb() would create an
+  // empty DB otherwise, returning empty results rather than signaling "no data".
   const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
   if (!existsSync(dbPath)) return null;
 
