@@ -44,6 +44,8 @@ export interface Fact {
   /** Upper bound of range */
   high?: number;
   asOf?: string;
+  /** Short human-readable name (e.g., "Anthropic post-money valuation") */
+  label?: string;
   source?: string;
   sourceResource?: string;
   /** Resolved resource metadata (populated at build time from sourceResource) */
