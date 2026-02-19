@@ -583,6 +583,7 @@ function buildPagesRegistry(urlToResource) {
           quality: currentQuality,
           readerImportance: fm.readerImportance != null ? Number(fm.readerImportance) : null,
           researchImportance: fm.researchImportance != null ? Number(fm.researchImportance) : null,
+          tacticalValue: fm.tacticalValue != null ? Number(fm.tacticalValue) : null,
           // Content format: article (default), table, diagram, index, dashboard
           contentFormat: fm.contentFormat || 'article',
           // ITN framework fields (0-100 scale)

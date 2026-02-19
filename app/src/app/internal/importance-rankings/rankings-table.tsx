@@ -54,6 +54,13 @@ const qualityThresholds: [number, string][] = [
   [0, "text-slate-400/60"],
 ];
 
+const tacticalThresholds: [number, string][] = [
+  [80, "text-teal-500"],
+  [60, "text-cyan-600"],
+  [40, "text-sky-500"],
+  [0, "text-slate-400/60"],
+];
+
 function ScoreBadge({
   value,
   thresholds,
@@ -124,6 +131,19 @@ const columns: ColumnDef<PageRankingItem>[] = [
       <ScoreBadge
         value={row.original.quality}
         thresholds={qualityThresholds}
+      />
+    ),
+  },
+  {
+    accessorKey: "tacticalValue",
+    sortUndefined: "last",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Tactical</SortableHeader>
+    ),
+    cell: ({ row }) => (
+      <ScoreBadge
+        value={row.original.tacticalValue}
+        thresholds={tacticalThresholds}
       />
     ),
   },
