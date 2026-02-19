@@ -41,6 +41,21 @@ export interface AccuracyCheckResult {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
+const VALID_DIFFICULTIES = ['easy', 'medium', 'hard'] as const;
+
+/** Normalize LLM difficulty output to one of the valid categories. */
+function normalizeDifficulty(raw: unknown): string {
+  if (typeof raw !== 'string' || !raw) return '';
+  const lower = raw.toLowerCase().trim();
+  // Exact match
+  if (VALID_DIFFICULTIES.includes(lower as typeof VALID_DIFFICULTIES[number])) return lower;
+  // Fuzzy match — look for keyword in longer descriptions
+  if (lower.includes('easy') || lower.includes('single sentence') || lower.includes('directly stated')) return 'easy';
+  if (lower.includes('hard') || lower.includes('entire') || lower.includes('multiple sections')) return 'hard';
+  if (lower.includes('medium') || lower.includes('combine') || lower.includes('several')) return 'medium';
+  return 'medium'; // default if unrecognizable
+}
+
 /** Truncate source text to MAX_SOURCE_CHARS, adding a truncation marker. */
 export function truncateSource(text: string): string {
   return text.length > MAX_SOURCE_CHARS
@@ -231,10 +246,10 @@ Rules:
 - For "score", rate 0.0-1.0 (1.0 = perfectly accurate, 0.0 = completely wrong)
 - For "issues", list each specific discrepancy found. Be concise but precise.
 - For "supporting_quotes", include the key passages from the source that you used to verify the claim. Include enough context to confirm each factual detail. Multiple quotes are encouraged.
-- For "verification_difficulty", write a brief description of how hard this was to verify and what kind of source access was needed. Examples: "Single sentence confirms the exact number", "Needed to combine author name from intro with statistic from results section", "Claim requires reading the entire methodology section to confirm no mention of X", "The specific date is stated once in a timeline table"
+- For "verification_difficulty", use exactly one of these categories: "easy" (single sentence/paragraph confirms the claim), "medium" (need to combine info from multiple sections), "hard" (need to read most/all of the source, or claim involves subtle interpretation)
 
 Respond in exactly this JSON format:
-{"verdict": "accurate", "score": 0.95, "issues": [], "supporting_quotes": ["passage 1", "passage 2"], "verification_difficulty": "Single paragraph contains all claimed details"}`;
+{"verdict": "accurate", "score": 0.95, "issues": [], "supporting_quotes": ["passage 1", "passage 2"], "verification_difficulty": "easy"}`;
 
   const userPrompt = `WIKI CLAIM:
 ${claimText}
@@ -275,7 +290,7 @@ export function parseAccuracyCheckResponse(content: string): AccuracyCheckResult
       score: typeof parsed.score === 'number' ? Math.max(0, Math.min(1, parsed.score)) : 0.5,
       issues: Array.isArray(parsed.issues) ? parsed.issues.filter((i) => typeof i === 'string' && i.length > 0) : [],
       supportingQuotes: Array.isArray(parsed.supporting_quotes) ? parsed.supporting_quotes.filter((q) => typeof q === 'string' && q.length > 0) : [],
-      verificationDifficulty: typeof parsed.verification_difficulty === 'string' ? parsed.verification_difficulty : '',
+      verificationDifficulty: normalizeDifficulty(parsed.verification_difficulty),
     };
   } catch {
     return {
