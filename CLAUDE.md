@@ -4,6 +4,20 @@ AI safety wiki with ~625 MDX pages, Next.js frontend, YAML data layer, and CLI t
 
 **Keep CLAUDE.md as a routing document** — brief instructions and pointers to detailed guides. Detailed style guidance, checklists, and templates live in `content/docs/internal/` (see Page templates below). Do not expand CLAUDE.md with long explanations; instead add detail to the appropriate internal style guide and reference it from here.
 
+## MANDATORY FIRST ACTION — Do this before anything else
+
+Before reading files, running commands, or writing any code, run:
+
+```bash
+pnpm crux agent-checklist init --issue=N   # if working on a GitHub issue
+# or
+pnpm crux agent-checklist init "Task description" --type=X   # if not on an issue
+```
+
+**"Before writing code" is not good enough** — quick fixes, research, and file reads all count. If you skip this and dive straight in, you will forget it entirely. Run it first, then proceed.
+
+See `## Agent Session Workflow — MANDATORY` below and `.claude/rules/agent-session-workflow.md` for full details.
+
 ## Quick Reference
 
 ```bash
@@ -172,7 +186,7 @@ This adds proper citations, fixes escaping, validates EntityLinks, and syncs fro
 
 ## Agent Session Workflow — MANDATORY
 
-Run `/agent-session-start` **before writing any code**. It generates a typed checklist and signals start on the GitHub issue. See `.claude/rules/agent-session-workflow.md` for full instructions.
+Run `/agent-session-start` **before taking any action** — before reading files, running commands, or writing code. See `## MANDATORY FIRST ACTION` at the top of this file and `.claude/rules/agent-session-workflow.md` for full instructions.
 
 At session end, run `/agent-session-ready-PR` to verify the checklist, polish the PR, and ship.
 
