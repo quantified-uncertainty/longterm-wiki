@@ -126,6 +126,18 @@ describe('getItemsForType', () => {
     }
     expect(getItemsForType('content').some(i => i.id === 'paranoid-review')).toBe(false);
   });
+
+  it('paranoid-review item has correct phase, label, and properties', () => {
+    const item = CHECKLIST_ITEMS.find(i => i.id === 'paranoid-review');
+    expect(item).toBeDefined();
+    expect(item!.phase).toBe('review');
+    expect(item!.label).toBe('Paranoid review done');
+    expect(item!.description).toContain('fresh Task subagent');
+    expect(item!.description).toContain('adversarial prompt');
+    expect(item!.description).toContain('test coverage gap');
+    // Must NOT have a verifyCommand — this item requires human/agent action
+    expect(item!.verifyCommand).toBeUndefined();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -681,5 +693,11 @@ describe('checklist catalog integrity', () => {
     for (const item of verifiable) {
       expect(item.verifyCommand!.length).toBeGreaterThan(0);
     }
+  });
+
+  it('catalog has exactly 43 items (update this when adding/removing items)', () => {
+    // This test locks in the expected catalog size. If you add or remove items,
+    // update this count AND the comment on the CHECKLIST_ITEMS declaration.
+    expect(CHECKLIST_ITEMS.length).toBe(43);
   });
 });
