@@ -35,7 +35,7 @@ pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 
 ## Step 5: Session log
 
-Create `.claude/sessions/YYYY-MM-DD_<branch-suffix>.md` per `.claude/rules/session-logging.md`.
+Create `.claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml` per `.claude/rules/session-logging.md`.
 
 ## Step 6: Validate completion
 

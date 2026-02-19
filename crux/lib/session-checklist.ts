@@ -339,10 +339,10 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: 'session-log',
     label: 'Session log',
-    description: '`.claude/sessions/YYYY-MM-DD_<branch-suffix>.md` created per session-logging rules.',
+    description: '`.claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml` created per session-logging rules.',
     phase: 'ship',
     applicableTypes: 'all',
-    verifyCommand: 'ls .claude/sessions/$(date +%Y-%m-%d)_*.md 2>/dev/null | head -1 | grep -q .',
+    verifyCommand: 'ls .claude/sessions/$(date +%Y-%m-%d)_*.yaml 2>/dev/null | head -1 | grep -q .',
   },
   {
     id: 'push-ci-green',

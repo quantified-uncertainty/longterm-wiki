@@ -1,0 +1,10 @@
+date: 2026-02-18
+branch: claude/fix-issue-284-oXGLu
+title: Extend resilient JSON parsing to visual-review, generate-summaries, reassign-update-frequency
+model: sonnet-4
+duration: ~20min
+pages: []
+summary: Moved `parseJsonFromLlm` from the page-improver-specific `phases/json-parsing.ts` to the shared `crux/lib/json-parsing.ts`, then updated `visual-review.ts`, `generate-summaries.ts`, and `reassign-update-frequency.ts` to use it instead of plain `JSON.parse`.
+learnings:
+  - The phases `json-parsing.ts` now re-exports `parseJsonFromLlm` from `crux/lib/` for backward compatibility with existing phase imports
+  - For `reassign-update-frequency.ts`, fallback throws (not returns) to preserve existing retry behavior

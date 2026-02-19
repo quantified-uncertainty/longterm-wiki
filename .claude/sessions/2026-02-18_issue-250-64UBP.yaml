@@ -1,0 +1,12 @@
+date: 2026-02-18
+branch: claude/issue-250-64UBP
+title: Remove remaining dead components and exports
+model: opus-4-6
+duration: ~20min
+pages: []
+summary: "Removed remaining dead code identified in issue #250: deleted unused `updateFrontmatter` from mdx-utils.ts, removed `parseYamlResponse` and its tests from anthropic.ts, deleted the vestigial sidebar-utils.ts stub (removing sidebar infrastructure from validation-engine.ts too), deleted the `sidebar-coverage` validation rule (permanently broken — always produced 15 false-positive warnings since the sidebar is managed by Next.js), cleaned up a stale comment in component-imports.ts, and deleted the outdated DEAD-CODE-REPORT.md. Most items in the issue had already been cleaned up in prior sessions."
+issues:
+  - "Most dead code listed in issue #250 was already removed in prior cleanup sessions; only ~4 items remained actionable"
+learnings:
+  - The DEAD-CODE-REPORT.md was significantly outdated and tracked items already cleaned up — deleting it reduces confusion
+  - sidebar-utils.ts was a stub file whose only function returned empty data; inlining the empty value directly in validation-engine.ts is cleaner

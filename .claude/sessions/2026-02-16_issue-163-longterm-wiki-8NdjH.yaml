@@ -1,0 +1,11 @@
+date: 2026-02-16
+branch: claude/issue-163-longterm-wiki-8NdjH
+title: Fix CLAUDE.md tier names and entity types
+pages: []
+summary: Fixed incorrect tier names for `content create` across CLAUDE.md, CLI help text (`crux/commands/content.ts`), and architecture docs. Updated entity types list to reference the canonical source (`app/src/data/entity-type-names.ts`) and list all types, not just category-mapped ones.
+issues:
+  - "The same stale tier bug existed in three places: CLAUDE.md, `crux/commands/content.ts:65`, and `content/docs/internal/architecture.mdx:430`"
+learnings:
+  - "`content create` tiers: budget (~$2-3), standard (~$4-6), premium (~$8-12)"
+  - "`content improve` tiers: polish (~$2-3), standard (~$5-8), deep (~$10-15)"
+  - Canonical entity type list lives in `app/src/data/entity-type-names.ts` (30 types); `crux/lib/category-entity-types.ts` is only the category→type mapping (13 types)

@@ -1,0 +1,9 @@
+date: 2026-02-18
+branch: claude/resolve-issue-247-U1zzq
+title: Fix CauseEffectGraph silent layout failure
+model: opus-4-6
+duration: ~15min
+pages: []
+summary: Fixed CauseEffectGraph layout failure handling so the UI no longer gets stuck on "Computing layout..." indefinitely. Added a 10-second timeout, improved error banner styling with proper CSS, and added a retry button.
+learnings:
+  - The component already had basic error handling (catch block, layoutError state), but lacked a timeout for hung computations and had poor error UX (inline styles, no retry option).

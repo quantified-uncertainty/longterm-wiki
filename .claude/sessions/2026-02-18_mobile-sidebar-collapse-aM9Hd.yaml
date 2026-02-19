@@ -1,0 +1,10 @@
+date: 2026-02-18
+branch: claude/mobile-sidebar-collapse-aM9Hd
+title: Mobile sidebar collapse
+model: opus-4-6
+duration: ~20min
+pages: []
+summary: Added mobile sidebar support — on screens below 768px, the static sidebar is hidden and replaced with a hamburger trigger button that opens a slide-out overlay panel with smooth transitions. Auto-closes on route navigation, Escape key, and backdrop click.
+learnings:
+  - "`SidebarTrigger` component existed but was never used — created separate `MobileSidebar` and `MobileSidebarTrigger` components with dedicated mobile context to avoid coupling desktop and mobile state"
+  - No Sheet/Dialog radix primitive was installed, so built the overlay with plain CSS transitions (opacity + transform) to avoid adding dependencies

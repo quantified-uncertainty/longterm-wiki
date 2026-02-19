@@ -1,0 +1,9 @@
+date: 2026-02-16
+branch: claude/fix-human-assigned-label-Rwucx
+title: Fix "Human-assigned" quality label
+pages:
+  - architecture
+summary: Changed "Human-assigned" to "LLM-assigned" in the quality rating tooltip (PageStatus.tsx) and internal architecture docs. Added a crux validation rule (`human-attribution`) and a vitest source-code scan (`no-human-attribution.test.ts`) to prevent this from recurring.
+pr: 159
+learnings:
+  - Validation rules only cover MDX content in `content/docs/`; source code (TSX/TS) needs separate vitest tests for lint-like checks

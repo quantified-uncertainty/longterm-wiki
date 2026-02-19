@@ -1,0 +1,13 @@
+date: 2026-02-18
+branch: claude/fuzzy-search-wiki-UUNLp
+title: Add ID stability check for entity numeric IDs
+model: opus-4-6
+duration: ~45min
+pages: []
+summary: "Implemented pre-build checks in `build-data.mjs` that detect silent entity and page numeric ID reassignments (issue #148). Two stability checks run during each build: one after entity-level ID collection and one after page-level ID collection. When a slug's numeric ID changes or an ID points to a different slug, the build fails with a clear error listing affected EntityLink references. Added `--allow-id-reassignment` flag for explicit opt-in. Extracted core logic into `app/scripts/lib/id-stability.mjs` with 12 unit tests. Refactored check logic into a shared `checkIdStability()` helper to eliminate DRY violation between entity and page phases. Documented the feature in CLAUDE.md."
+issues:
+  - Initial implementation only checked entity-level IDs, missing page-level IDs. This caused false positives because the previous registry contained both entity and page IDs but the check only compared entity-level. Fixed by removing the `id-removed` check (covered by other validation rules) and adding a second stability check after the page-level ID collection phase.
+learnings:
+  - Entity numeric IDs are fundamentally stable because they're stored in source files (YAML/MDX frontmatter), not just the derived registry. The main risk is accidental removal of a `numericId:` field from a source file, which causes build-data to assign a new ID.
+  - "The build has TWO ID assignment phases: entity-level (from YAML + frontmatter entities) and page-level (from MDX pages without YAML entities). Both need separate stability checks because pages aren't available during the entity phase."
+  - There are 203 EntityLink references using numeric IDs (like `id="E42"`) across the content — these are the references at risk if IDs get reassigned.

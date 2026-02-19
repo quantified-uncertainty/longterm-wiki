@@ -1,0 +1,14 @@
+date: 2026-02-18
+branch: claude/resolve-issue-271-Qn7cO
+title: Fix broken auto-update sources and add health check
+model: sonnet-4
+duration: ~30min
+pages: []
+summary: Fixed 4 broken auto-update news sources (navigating-ai-risks 403, anthropic-blog 404, meta-ai-blog 404, the-gradient 502) and replaced the single arxiv web-search source with 3 direct RSS feeds (cs.AI, cs.CL, cs.LG). Implemented `pnpm crux auto-update sources --check` health check command that tests all RSS/Atom source URLs with HEAD-then-GET fallback.
+issues:
+  - Running the health check revealed 3 additional broken sources beyond the ones mentioned in the issue (anthropic-blog, meta-ai-blog, the-gradient) — all fixed in the same PR
+  - navigatingrisks.ai domain is unreachable (connection refused), while the Substack subdomain returns 403 for automated requests — switched to web-search
+learnings:
+  - "`rss.arxiv.org/rss/cs.AI` etc. work well and return 200 reliably"
+  - Anthropic and Meta AI removed their RSS feeds; web-search is the only option
+  - HEAD-then-GET fallback in health check handles servers that block HEAD (e.g., some Substack instances)
