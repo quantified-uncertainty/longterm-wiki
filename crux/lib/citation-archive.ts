@@ -162,7 +162,24 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
       continue;
     }
 
-    // Pattern 2: [^N]: URL (bare URL, no title)
+    // Pattern 2: [^N]: ...text... [Title](URL) ...text...
+    // Academic style: Author, "[Title](URL)," Source, Year.
+    // The link is embedded within descriptive text, not at the start.
+    const embeddedMatch = line.match(/^\[\^(\d+)\]:\s*(.+?)\[([^\]]*)\]\((https?:\/\/[^)]+)\)(.*)/);
+    if (embeddedMatch) {
+      const prefix = embeddedMatch[2].trim();
+      const linkTitle = embeddedMatch[3];
+      const suffix = embeddedMatch[5]?.trim().replace(/^[,.]?\s*/, '') || '';
+      const fullText = [prefix, linkTitle, suffix].filter(Boolean).join(' — ').replace(/\s+/g, ' ').trim();
+      footnoteDefinitions.set(parseInt(embeddedMatch[1], 10), {
+        url: embeddedMatch[4],
+        linkText: fullText || linkTitle,
+        defLine: i,
+      });
+      continue;
+    }
+
+    // Pattern 3: [^N]: URL (bare URL, no title)
     // Captures: (1) footnote number, (2) URL
     const bareMatch = line.match(/^\[\^(\d+)\]:\s*(https?:\/\/[^\s]+)/);
     if (bareMatch) {

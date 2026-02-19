@@ -13,7 +13,7 @@ const OPENROUTER_API_KEY = getApiKey('OPENROUTER_API_KEY');
 const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Default to a cheap but capable model
-const DEFAULT_MODEL = 'google/gemini-flash-1.5';
+const DEFAULT_MODEL = 'google/gemini-2.0-flash-001';
 const MAX_SOURCE_CHARS = 50_000;
 
 export interface QuoteExtractionResult {

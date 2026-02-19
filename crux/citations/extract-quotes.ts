@@ -218,7 +218,7 @@ async function extractQuotesForPage(
           );
           sourceQuote = llmResult.quote;
           sourceLocation = llmResult.location;
-          extractionModel = 'google/gemini-flash-1.5';
+          extractionModel = 'google/gemini-2.0-flash-001';
 
           // Verify the quote exists in the source
           if (sourceQuote) {
