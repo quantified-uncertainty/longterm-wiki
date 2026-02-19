@@ -17,6 +17,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { citationQuotes, citationContent, getDb } from '../lib/knowledge-db.ts';
 import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
+import { exportDashboardData } from './export-dashboard.ts';
 
 interface AccuracyResult {
   pageId: string;
@@ -251,6 +252,12 @@ async function main() {
       printSummary(c, totals, allIssues.map((iss) => ({ ...iss, pageId: iss.pageId })));
     }
 
+    // Auto-export dashboard data after accuracy checks
+    const exportPath = exportDashboardData();
+    if (!exportPath && !json && !ci) {
+      console.log(`${c.yellow}Warning: could not export dashboard data${c.reset}`);
+    }
+
     process.exit(totals.inaccurate > 0 ? 1 : 0);
   }
 
@@ -276,6 +283,12 @@ async function main() {
     verbose: true,
     recheck,
   });
+
+  // Auto-export dashboard data after accuracy checks
+  const exportPath = exportDashboardData();
+  if (!exportPath && !json && !ci) {
+    console.log(`${c.yellow}Warning: could not export dashboard data${c.reset}`);
+  }
 
   if (json || ci) {
     console.log(JSON.stringify(result, null, 2));
