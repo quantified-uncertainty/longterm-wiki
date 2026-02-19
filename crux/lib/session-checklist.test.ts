@@ -3,7 +3,8 @@
  *
  * Focus areas:
  * - buildChecklist includes/excludes correct items per session type
- * - parseChecklist handles [x], [ ], [~] markers correctly
+ * - parseChecklist handles [x], [ ], [~] markers in both formats
+ * - checkItems mutates markdown correctly
  * - detectTypeFromLabels maps labels to session types
  * - formatStatus produces correct terminal output
  * - getItemsForType filters catalog correctly
@@ -13,6 +14,7 @@ import { describe, it, expect } from 'vitest';
 import {
   buildChecklist,
   parseChecklist,
+  checkItems,
   detectTypeFromLabels,
   formatStatus,
   getItemsForType,
@@ -145,8 +147,8 @@ describe('buildChecklist', () => {
 
   it('all items start unchecked', () => {
     const md = buildChecklist('content', BASE_METADATA);
-    const checked = (md.match(/- \[x\]/g) || []).length;
-    const unchecked = (md.match(/- \[ \]/g) || []).length;
+    const checked = (md.match(/\[x\]/g) || []).length;
+    const unchecked = (md.match(/\[ \]/g) || []).length;
     expect(checked).toBe(0);
     expect(unchecked).toBeGreaterThan(0);
   });
@@ -173,14 +175,44 @@ describe('buildChecklist', () => {
     expect(md).toContain('Command registered');
     expect(md).toContain('Command documented');
   });
+
+  it('items are numbered sequentially', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const lines = md.split('\n');
+    const numberedLines = lines.filter(l => /^\d+\. \[ \]/.test(l));
+    expect(numberedLines.length).toBeGreaterThan(0);
+    // First item should be 1
+    expect(numberedLines[0]).toMatch(/^1\. /);
+    // Items should be sequential
+    for (let i = 0; i < numberedLines.length; i++) {
+      expect(numberedLines[i]).toMatch(new RegExp(`^${i + 1}\\.`));
+    }
+  });
+
+  it('items include their catalog ID in backticks', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    expect(md).toContain('`read-issue`');
+    expect(md).toContain('`explore-code`');
+    expect(md).toContain('`gate-passes`');
+  });
+
+  it('auto-verifiable items are tagged', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    // gate-passes has a verifyCommand
+    const gateLine = md.split('\n').find(l => l.includes('`gate-passes`'));
+    expect(gateLine).toContain('*(auto-verify)*');
+    // read-issue does NOT have a verifyCommand
+    const readLine = md.split('\n').find(l => l.includes('`read-issue`'));
+    expect(readLine).not.toContain('*(auto-verify)*');
+  });
 });
 
 // ---------------------------------------------------------------------------
-// parseChecklist
+// parseChecklist — numbered format (new)
 // ---------------------------------------------------------------------------
 
-describe('parseChecklist', () => {
-  it('parses unchecked items', () => {
+describe('parseChecklist (numbered format)', () => {
+  it('parses unchecked items from build output', () => {
     const md = buildChecklist('infrastructure', BASE_METADATA);
     const status = parseChecklist(md);
     expect(status.totalItems).toBeGreaterThan(0);
@@ -188,7 +220,66 @@ describe('parseChecklist', () => {
     expect(status.allPassing).toBe(false);
   });
 
-  it('parses checked items (x marker)', () => {
+  it('parses checked items', () => {
+    const md = `## Phase 1: Understand
+
+1. [x] \`read-issue\` **Read the issue/request**: Read it.
+2. [x] \`explore-code\` **Explore relevant code**: Read files.
+3. [ ] \`plan-approach\` **Plan approach**: Think.
+
+## Phase 4: Ship
+
+4. [x] \`gate-passes\` **Gate passes**: It passes.
+`;
+    const status = parseChecklist(md);
+    expect(status.totalItems).toBe(4);
+    expect(status.totalChecked).toBe(3);
+    expect(status.allPassing).toBe(false);
+  });
+
+  it('preserves exact IDs from markdown', () => {
+    const md = `## Phase 1: Understand
+
+1. [ ] \`read-issue\` **Read the issue/request**: Read it.
+2. [x] \`explore-code\` **Explore relevant code**: Read files.
+`;
+    const status = parseChecklist(md);
+    expect(status.phases[0].items[0].id).toBe('read-issue');
+    expect(status.phases[0].items[1].id).toBe('explore-code');
+  });
+
+  it('treats [~] (N/A) as passing', () => {
+    const md = `## Phase 3: Review
+
+1. [x] \`correctness\` **Correctness verified**: Done.
+2. [~] \`shell-injection\` **No shell injection**: N/A.
+3. [x] \`security\` **Security checked**: Done.
+`;
+    const status = parseChecklist(md);
+    expect(status.totalItems).toBe(3);
+    expect(status.totalChecked).toBe(3);
+    expect(status.allPassing).toBe(true);
+  });
+
+  it('round-trips through build then parse', () => {
+    const md = buildChecklist('bugfix', BASE_METADATA);
+    const status = parseChecklist(md);
+    const expectedCount = getItemsForType('bugfix').length;
+    expect(status.totalItems).toBe(expectedCount);
+    expect(status.totalChecked).toBe(0);
+    // Verify IDs match catalog
+    const allParsedIds = status.phases.flatMap(p => p.items.map(i => i.id));
+    const expectedIds = getItemsForType('bugfix').map(i => i.id);
+    expect(allParsedIds).toEqual(expectedIds);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseChecklist — unnumbered format (backward compat)
+// ---------------------------------------------------------------------------
+
+describe('parseChecklist (unnumbered format)', () => {
+  it('parses old-format checked items', () => {
     const md = `## Phase 1: Understand
 
 - [x] **Read the issue/request**: Read it.
@@ -205,7 +296,7 @@ describe('parseChecklist', () => {
     expect(status.allPassing).toBe(false);
   });
 
-  it('treats [~] (N/A) as passing', () => {
+  it('old-format treats [~] (N/A) as passing', () => {
     const md = `## Phase 3: Review
 
 - [x] **Correctness verified**: Done.
@@ -215,20 +306,6 @@ describe('parseChecklist', () => {
     const status = parseChecklist(md);
     expect(status.totalItems).toBe(3);
     expect(status.totalChecked).toBe(3);
-    expect(status.allPassing).toBe(true);
-  });
-
-  it('reports allPassing when all items are checked or N/A', () => {
-    const md = `## Phase 1: Understand
-
-- [x] **Read the issue/request**: Done.
-- [x] **Explore relevant code**: Done.
-
-## Phase 4: Ship
-
-- [~] **Gate passes**: N/A.
-`;
-    const status = parseChecklist(md);
     expect(status.allPassing).toBe(true);
   });
 
@@ -263,19 +340,17 @@ describe('parseChecklist', () => {
     expect(status.allPassing).toBe(true); // vacuously true
     expect(status.decisions).toHaveLength(0);
   });
+});
 
-  it('round-trips through build then parse', () => {
-    const md = buildChecklist('bugfix', BASE_METADATA);
-    const status = parseChecklist(md);
-    const expectedCount = getItemsForType('bugfix').length;
-    expect(status.totalItems).toBe(expectedCount);
-    expect(status.totalChecked).toBe(0);
-  });
+// ---------------------------------------------------------------------------
+// parseChecklist — decisions (works with both formats)
+// ---------------------------------------------------------------------------
 
+describe('parseChecklist (decisions)', () => {
   it('parses decisions from Key Decisions section', () => {
     const md = `## Phase 1: Understand
 
-- [x] **Read the issue/request**: Done.
+1. [x] \`read-issue\` **Read the issue/request**: Done.
 
 ## Key Decisions
 
@@ -291,7 +366,7 @@ describe('parseChecklist', () => {
   it('ignores HTML comments in Key Decisions section', () => {
     const md = `## Phase 1: Understand
 
-- [x] **Read the issue/request**: Done.
+1. [x] \`read-issue\` **Read the issue/request**: Done.
 
 ## Key Decisions
 
@@ -313,7 +388,7 @@ describe('parseChecklist', () => {
   it('decisions do not count as checklist items', () => {
     const md = `## Phase 1: Understand
 
-- [x] **Read the issue/request**: Done.
+1. [x] \`read-issue\` **Read the issue/request**: Done.
 
 ## Key Decisions
 
@@ -323,6 +398,86 @@ describe('parseChecklist', () => {
     expect(status.totalItems).toBe(1);
     expect(status.totalChecked).toBe(1);
     expect(status.decisions).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkItems
+// ---------------------------------------------------------------------------
+
+describe('checkItems', () => {
+  it('checks off a single item in numbered format', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const result = checkItems(md, ['read-issue']);
+    expect(result.checked).toEqual(['read-issue']);
+    expect(result.notFound).toEqual([]);
+    // Verify the markdown was mutated
+    const status = parseChecklist(result.markdown);
+    const readItem = status.phases[0].items.find(i => i.id === 'read-issue');
+    expect(readItem?.status).toBe('checked');
+  });
+
+  it('checks off multiple items at once', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const result = checkItems(md, ['read-issue', 'explore-code', 'plan-approach']);
+    expect(result.checked).toEqual(['read-issue', 'explore-code', 'plan-approach']);
+    expect(result.notFound).toEqual([]);
+    const status = parseChecklist(result.markdown);
+    expect(status.phases[0].items.every(i => i.status === 'checked')).toBe(true);
+  });
+
+  it('marks items as N/A with ~ marker', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const result = checkItems(md, ['fix-escaping'], '~');
+    expect(result.checked).toEqual(['fix-escaping']);
+    const status = parseChecklist(result.markdown);
+    const item = status.phases.flatMap(p => p.items).find(i => i.id === 'fix-escaping');
+    expect(item?.status).toBe('na');
+  });
+
+  it('reports not-found IDs', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const result = checkItems(md, ['read-issue', 'nonexistent-id']);
+    expect(result.checked).toEqual(['read-issue']);
+    expect(result.notFound).toEqual(['nonexistent-id']);
+  });
+
+  it('handles all not-found IDs', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const result = checkItems(md, ['fake-1', 'fake-2']);
+    expect(result.checked).toEqual([]);
+    expect(result.notFound).toEqual(['fake-1', 'fake-2']);
+  });
+
+  it('does not double-check already-checked items', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const first = checkItems(md, ['read-issue']);
+    const second = checkItems(first.markdown, ['read-issue']);
+    // Still finds and "checks" it (idempotent)
+    expect(second.checked).toEqual(['read-issue']);
+    const status = parseChecklist(second.markdown);
+    const item = status.phases[0].items.find(i => i.id === 'read-issue');
+    expect(item?.status).toBe('checked');
+  });
+
+  it('works with old unnumbered format', () => {
+    const md = `## Phase 1: Understand
+
+- [ ] **Read the issue/request**: Read it carefully.
+- [ ] **Explore relevant code**: Look at files.
+`;
+    const result = checkItems(md, ['read-the-issuerequest']);
+    expect(result.checked).toEqual(['read-the-issuerequest']);
+  });
+
+  it('round-trip: check all items then verify allPassing', () => {
+    const md = buildChecklist('bugfix', BASE_METADATA);
+    const allIds = getItemsForType('bugfix').map(i => i.id);
+    const result = checkItems(md, allIds);
+    expect(result.notFound).toEqual([]);
+    const status = parseChecklist(result.markdown);
+    expect(status.allPassing).toBe(true);
+    expect(status.totalChecked).toBe(status.totalItems);
   });
 });
 
@@ -399,8 +554,8 @@ describe('formatStatus', () => {
   it('shows 100% when all items passing', () => {
     const status = parseChecklist(`## Phase 1: Understand
 
-- [x] **Read the issue/request**: Done.
-- [x] **Explore relevant code**: Done.
+1. [x] \`read-issue\` **Read the issue/request**: Done.
+2. [x] \`explore-code\` **Explore relevant code**: Done.
 `);
     const output = formatStatus(status, NO_COLORS);
     expect(output).toContain('2/2');
@@ -410,7 +565,7 @@ describe('formatStatus', () => {
   it('marks N/A items with tilde', () => {
     const status = parseChecklist(`## Phase 3: Review
 
-- [~] **Shell injection**: N/A.
+1. [~] \`shell-injection\` **No shell injection**: N/A.
 `);
     const output = formatStatus(status, NO_COLORS);
     expect(output).toContain('[~]');
@@ -420,17 +575,25 @@ describe('formatStatus', () => {
   it('marks unchecked items with empty brackets', () => {
     const status = parseChecklist(`## Phase 2: Implement
 
-- [ ] **Tests written**: Not yet.
+1. [ ] \`tests-written\` **Tests written**: Not yet.
 `);
     const output = formatStatus(status, NO_COLORS);
     expect(output).toContain('[ ]');
     expect(output).toContain('Tests written');
   });
 
+  it('shows item IDs in output', () => {
+    const md = buildChecklist('infrastructure', BASE_METADATA);
+    const status = parseChecklist(md);
+    const output = formatStatus(status, NO_COLORS);
+    expect(output).toContain('read-issue');
+    expect(output).toContain('gate-passes');
+  });
+
   it('shows key decisions when present', () => {
     const status = parseChecklist(`## Phase 1: Understand
 
-- [x] **Read the issue/request**: Done.
+1. [x] \`read-issue\` **Read the issue/request**: Done.
 
 ## Key Decisions
 
@@ -446,7 +609,7 @@ describe('formatStatus', () => {
   it('omits key decisions section when empty', () => {
     const status = parseChecklist(`## Phase 1: Understand
 
-- [x] **Read the issue/request**: Done.
+1. [x] \`read-issue\` **Read the issue/request**: Done.
 `);
     const output = formatStatus(status, NO_COLORS);
     expect(output).not.toContain('Key Decisions');
@@ -494,5 +657,13 @@ describe('checklist catalog integrity', () => {
     expect(phases.has('implement')).toBe(true);
     expect(phases.has('review')).toBe(true);
     expect(phases.has('ship')).toBe(true);
+  });
+
+  it('verifyCommand items reference non-empty commands', () => {
+    const verifiable = CHECKLIST_ITEMS.filter(i => i.verifyCommand);
+    expect(verifiable.length).toBeGreaterThan(0);
+    for (const item of verifiable) {
+      expect(item.verifyCommand!.length).toBeGreaterThan(0);
+    }
   });
 });

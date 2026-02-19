@@ -38,6 +38,9 @@ pnpm crux maintain status        # Check when maintenance last ran
 # Agent checklists
 pnpm crux agent-checklist init "Task" --type=X    # Generate typed checklist
 pnpm crux agent-checklist init --issue=N          # Auto-detect type from issue labels
+pnpm crux agent-checklist check <id> [id2...]     # Check off items by ID
+pnpm crux agent-checklist check --na <id>         # Mark items as N/A
+pnpm crux agent-checklist verify                  # Auto-verify items with verifyCommand
 pnpm crux agent-checklist status                  # Show checklist progress
 pnpm crux agent-checklist complete                # Validate all items checked
 
@@ -52,6 +55,10 @@ pnpm crux validate hallucination-risk         # Risk assessment report
 pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
 pnpm crux review mark <id> --reviewer="name"  # Mark page as human-reviewed
 pnpm crux review list                         # List reviewed pages
+
+# Session log validation
+pnpm crux validate session-logs              # Check session log format/fields
+pnpm crux validate session-logs --ci         # JSON output for CI
 
 # Citation verification & archival
 pnpm crux citations verify <id>              # Verify all citations on a page

@@ -32,6 +32,9 @@ Where `<branch-suffix>` is the branch name without the `claude/` prefix (e.g., f
 
 **Learnings/notes:**
 - Anything a future session should know (or "None")
+
+**Recommendations:**
+- Infrastructure improvements discovered during the session (or omit if none)
 ```
 
 ## Rules
@@ -47,4 +50,6 @@ Where `<branch-suffix>` is the branch name without the `claude/` prefix (e.g., f
 - Do NOT skip logging just because the session was small — even one-line fixes are worth tracking
 - The session log file should be part of the same commit as your other changes (not a separate commit)
 - Each session gets its own file — this avoids merge conflicts between parallel sessions
+- **The `Recommendations:` field is optional** — include actionable infrastructure improvement suggestions discovered during the session. Format: "The X system could be improved by Y." These are notes for future sessions, not tasks to do now.
 - **Format is machine-parsed**: The `## date | branch | title` heading, `**Pages:**`, `**PR:**`, `**Model:**`, `**Duration:**`, and `**Cost:**` fields are parsed by `app/scripts/lib/session-log-parser.mjs` to build the `/internal/page-changes` dashboard. If you change the format here, update the parser and its tests too.
+- **Validation**: Run `pnpm crux validate session-logs` to check all session log files for format compliance. Errors (missing heading, missing "What was done") block; warnings (missing Model/Duration) are advisory.

@@ -27,7 +27,7 @@
  *   review      Human review tracking and status
  *   citations   Citation verification and archival
  *   issues      Track Claude Code work on GitHub issues
- *   agent-checklist  Manage agent checklists (init, status, complete)
+ *   agent-checklist  Manage agent checklists (init, check, verify, status, complete)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
