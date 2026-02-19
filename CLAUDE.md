@@ -31,8 +31,8 @@ pnpm dev                         # Start dev server on port 3001
 pnpm build                      # Production build (runs assign-ids + build-data automatically)
 
 # Numeric ID assignment (issue #245)
-node app/scripts/assign-ids.mjs              # Assign numericIds to new entities/pages
-node app/scripts/assign-ids.mjs --dry-run    # Preview assignments without writing files
+node apps/web/scripts/assign-ids.mjs              # Assign numericIds to new entities/pages
+node apps/web/scripts/assign-ids.mjs --dry-run    # Preview assignments without writing files
 
 # Testing
 pnpm test                        # Run vitest tests
@@ -104,7 +104,7 @@ longterm-wiki/
 │   ├── graphs/                 # Cause-effect graph data
 │   ├── edit-logs/              # Per-page edit history (YAML, auto-maintained)
 │   └── id-registry.json        # Derived build artifact (gitignored)
-├── app/                        # Next.js 15 frontend
+├── apps/web/                    # Next.js 15 frontend
 │   ├── src/                    # App source code
 │   ├── scripts/                # Build scripts (build-data.mjs)
 │   └── package.json            # App dependencies
@@ -120,7 +120,7 @@ longterm-wiki/
 ## Data Flow
 
 1. YAML files in `data/` define entities, facts, resources
-2. `app/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json`
+2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json`
 3. Next.js app reads `database.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
 
@@ -130,9 +130,9 @@ When creating or editing wiki pages, **always use the Crux content pipeline**. D
 
 ### Prerequisites
 
-If `app/src/data/pages.json` doesn't exist, generate it first:
+If `apps/web/src/data/pages.json` doesn't exist, generate it first:
 ```bash
-node app/scripts/build-data.mjs
+node apps/web/scripts/build-data.mjs
 ```
 
 ### Creating a new page
@@ -226,7 +226,7 @@ The gate check bundles all CI-blocking checks into one command. It fails fast �
 **Setup (one-time):** `git config core.hooksPath .githooks`
 
 The gate runs these steps sequentially:
-1. Build data layer (`app/scripts/build-data.mjs`) — includes **ID stability check** (see below)
+1. Build data layer (`apps/web/scripts/build-data.mjs`) — includes **ID stability check** (see below)
 2. Run vitest tests
 3. *(with `--fix` only)* Auto-fix escaping and markdown formatting
 4. MDX syntax check (comparison-operators, dollar-signs)
@@ -236,7 +236,7 @@ The gate runs these steps sequentially:
 8. TypeScript type check (`tsc --noEmit`)
 9. *(with `--full` only)* Full Next.js production build
 
-**ID stability check (issue #148):** The build-data step verifies that no entity or page numeric IDs (`numericId: E123`) were silently reassigned between builds. If a `numericId` was removed from a source file and the build would assign a different one, the build fails with a list of affected `<EntityLink>` references. To fix: restore the original `numericId` in the source file. To intentionally reassign IDs (rare): `node app/scripts/build-data.mjs --allow-id-reassignment`.
+**ID stability check (issue #148):** The build-data step verifies that no entity or page numeric IDs (`numericId: E123`) were silently reassigned between builds. If a `numericId` was removed from a source file and the build would assign a different one, the build fails with a list of affected `<EntityLink>` references. To fix: restore the original `numericId` in the source file. To intentionally reassign IDs (rare): `node apps/web/scripts/build-data.mjs --allow-id-reassignment`.
 
 ### After pushing: confirm CI is green
 ```bash
@@ -269,11 +269,11 @@ GitHub Actions workflow (`.github/workflows/auto-update.yml`) runs daily at 06:0
 ## Key Conventions
 
 - **Path aliases**: Use `@/`, `@components/`, `@data/`, `@lib/` in app code
-- **Entity types**: Canonical list in `app/src/data/entity-type-names.ts`. Category-mapped types (used by page creator): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project. Additional types include: risk-factor, safety-agenda, policy, case-study, scenario, resource, funder, historical, analysis, parameter, argument, table, diagram, insight
+- **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`. Category-mapped types (used by page creator): person, organization, risk, approach, model, concept, intelligence-paradigm, capability, crux, debate, event, metric, project. Additional types include: risk-factor, safety-agenda, policy, case-study, scenario, resource, funder, historical, analysis, parameter, argument, table, diagram, insight
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
-- **Squiggle models**: See `app/CLAUDE.md` for SquiggleEstimate style guide
-- **Internal sidebar** (`app/src/lib/internal-nav.ts`): When adding internal pages, place them in the correct section. "Research" is for research reports/proposals only. Schema/architecture/technical docs go in "Architecture & Schema". Check existing section semantics before adding.
+- **Squiggle models**: See `apps/web/CLAUDE.md` for SquiggleEstimate style guide
+- **Internal sidebar** (`apps/web/src/lib/internal-nav.ts`): When adding internal pages, place them in the correct section. "Research" is for research reports/proposals only. Schema/architecture/technical docs go in "Architecture & Schema". Check existing section semantics before adding.
 - **Canonical facts & Calc**: Follow `content/docs/internal/canonical-facts.mdx` style guide — use `<F>` for volatile numbers, `<Calc>` for derived computations, `showDate` for temporal claims. Facts YAML in `data/facts/`.
 - **Mermaid diagrams**: Follow `content/docs/internal/mermaid-diagrams.mdx` style guide — prefer `flowchart TD`, max 3-4 parallel nodes, use tables for taxonomies, max 15-20 nodes per diagram.
 - **Page templates**: Defined in `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
@@ -286,10 +286,10 @@ GitHub Actions workflow (`.github/workflows/auto-update.yml`) runs daily at 06:0
 **When to build a dashboard:** Any feature that produces data over time (run history, discovered items, status tracking, metrics) or that involves a pipeline with multiple stages (where seeing intermediate results aids debugging).
 
 **How to build one:**
-1. Create `app/src/app/internal/<name>/page.tsx` (server component — loads data)
-2. Create `app/src/app/internal/<name>/<name>-table.tsx` (client component — `"use client"` with `DataTable` from `@/components/ui/data-table.tsx`)
-3. Add navigation entry in `app/src/lib/wiki-nav.ts` under "Dashboards & Tools"
+1. Create `apps/web/src/app/internal/<name>/page.tsx` (server component — loads data)
+2. Create `apps/web/src/app/internal/<name>/<name>-table.tsx` (client component — `"use client"` with `DataTable` from `@/components/ui/data-table.tsx`)
+3. Add navigation entry in `apps/web/src/lib/wiki-nav.ts` under "Dashboards & Tools"
 4. Server components can read YAML/JSON files directly via `fs` for operational data
-5. Follow existing patterns in `app/src/app/internal/updates/` or `auto-update-runs/`
+5. Follow existing patterns in `apps/web/src/app/internal/updates/` or `auto-update-runs/`
 
 **Examples:** Update Schedule, Page Changes, Fact Dashboard, Auto-Update Runs, Auto-Update News, Importance Rankings, Page Similarity, Interventions, Proposals.

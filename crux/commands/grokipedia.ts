@@ -21,7 +21,7 @@ const DATA_DIR = join(PROJECT_ROOT, "data");
 const EXTERNAL_LINKS_YAML = join(DATA_DIR, "external-links.yaml");
 const APP_EXTERNAL_LINKS_YAML = join(
   PROJECT_ROOT,
-  "app/src/data/external-links.yaml"
+  "apps/web/src/data/external-links.yaml"
 );
 
 const GROKIPEDIA_BASE = "https://grokipedia.com/page/";
@@ -141,7 +141,7 @@ function loadExternalLinks(): ExternalLinkEntry[] {
 }
 
 /**
- * Save external links to both data/ and app/src/data/
+ * Save external links to both data/ and apps/web/src/data/
  */
 function saveExternalLinks(entries: ExternalLinkEntry[]): void {
   entries.sort((a, b) => a.pageId.localeCompare(b.pageId));

@@ -231,8 +231,8 @@ describe('content-types.ts — constants', () => {
     expect(DATA_DIR).toBe('data');
   });
 
-  it('GENERATED_DATA_DIR is app/src/data', () => {
-    expect(GENERATED_DATA_DIR).toBe('app/src/data');
+  it('GENERATED_DATA_DIR is apps/web/src/data', () => {
+    expect(GENERATED_DATA_DIR).toBe('apps/web/src/data');
   });
 
   it('DEFAULT_STALENESS_THRESHOLD is 180', () => {

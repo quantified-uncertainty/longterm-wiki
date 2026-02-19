@@ -25,7 +25,7 @@ import {
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
 
 // Source YAML data lives at the repo root
-const DATA_DIR = path.resolve(process.cwd(), "../data");
+const DATA_DIR = path.resolve(process.cwd(), "../../data");
 
 // ============================================================================
 // DATABASE LOADING

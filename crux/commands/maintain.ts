@@ -134,7 +134,7 @@ function daysSince(dateStr: string): number {
 // ---------------------------------------------------------------------------
 // Session log parser
 //
-// Note: The canonical parser is in app/scripts/lib/session-log-parser.mjs.
+// Note: The canonical parser is in apps/web/scripts/lib/session-log-parser.mjs.
 // This version extracts additional fields (issues, learnings) needed for
 // maintenance analysis. Keep section terminators aligned with the canonical
 // parser (includes \n--- as a terminator).
@@ -476,7 +476,7 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
   // 1. Find TODO/FIXME/HACK/XXX comments (excluding test files and this file)
   try {
     const todoOutput = execSync(
-      `grep -rn 'TODO\\|FIXME\\|HACK\\|XXX' crux/ app/src/ --include='*.ts' --include='*.tsx' --include='*.mjs' 2>/dev/null || true`,
+      `grep -rn 'TODO\\|FIXME\\|HACK\\|XXX' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' --include='*.mjs' 2>/dev/null || true`,
       execOpts
     );
     for (const line of todoOutput.split('\n').filter(Boolean)) {
@@ -499,7 +499,7 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
   // 2. Find large files (>400 lines)
   try {
     const wcOutput = execSync(
-      `find crux/ app/src/ \\( -name '*.ts' -o -name '*.tsx' -o -name '*.mjs' \\) ! -name '*.test.*' ! -name '*.d.ts' | xargs wc -l 2>/dev/null | sort -rn | head -30`,
+      `find crux/ apps/web/src/ \\( -name '*.ts' -o -name '*.tsx' -o -name '*.mjs' \\) ! -name '*.test.*' ! -name '*.d.ts' | xargs wc -l 2>/dev/null | sort -rn | head -30`,
       execOpts
     );
     for (const line of wcOutput.split('\n').filter(Boolean)) {
@@ -520,7 +520,7 @@ async function detectCruft(_args: string[], options: CommandOptions): Promise<Co
   // 3. Find commented-out code blocks (3+ consecutive comment lines with code syntax)
   try {
     const commentOutput = execSync(
-      `grep -rn '^\\s*//.*[;{}()\\[\\]]' crux/ app/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | head -100 || true`,
+      `grep -rn '^\\s*//.*[;{}()\\[\\]]' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' 2>/dev/null | head -100 || true`,
       execOpts
     );
     const byFile: Record<string, number[]> = {};

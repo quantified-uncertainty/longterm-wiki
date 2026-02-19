@@ -8,7 +8,7 @@ import path from "path";
 import { loadYaml } from "@lib/yaml";
 
 // Source YAML data lives at the repo root
-const DATA_DIR = path.resolve(process.cwd(), "../data");
+const DATA_DIR = path.resolve(process.cwd(), "../../data");
 
 // ============================================================================
 // YAML FILE READING (lazy, cached)

@@ -7,7 +7,7 @@ Recurring problems encountered across Claude Code sessions. When you hit a known
 ## Build & CI
 
 ### Data layer must be built before tests or app build
-`node app/scripts/build-data.mjs` must run before `pnpm test` or `pnpm build`. If tests fail with missing data errors, this is likely why.
+`node apps/web/scripts/build-data.mjs` must run before `pnpm test` or `pnpm build`. If tests fail with missing data errors, this is likely why.
 
 ### API keys are in environment, not .env files
 Check `env | grep -i API` — keys are set as environment variables, not in `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`.
@@ -75,7 +75,7 @@ npx node-gyp rebuild
 ## Network / Proxy
 
 ### Next.js server-side fetch() ignores HTTPS_PROXY by default
-Node.js's built-in `fetch()` (undici) does NOT respect `HTTPS_PROXY`/`HTTP_PROXY` env vars unless `NODE_USE_ENV_PROXY=1` is set. This causes silent failures when any server component makes outbound HTTP calls (e.g. the GitHub Issues dashboard). The flag is a no-op when no proxy is configured, so it's safe to include unconditionally in `dev`/`build`/`start` scripts in `app/package.json`.
+Node.js's built-in `fetch()` (undici) does NOT respect `HTTPS_PROXY`/`HTTP_PROXY` env vars unless `NODE_USE_ENV_PROXY=1` is set. This causes silent failures when any server component makes outbound HTTP calls (e.g. the GitHub Issues dashboard). The flag is a no-op when no proxy is configured, so it's safe to include unconditionally in `dev`/`build`/`start` scripts in `apps/web/package.json`.
 
 The `crux` CLI already sets this via `NODE_USE_ENV_PROXY=1 node ...` in the root `package.json`.
 

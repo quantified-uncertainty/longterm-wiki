@@ -2,7 +2,7 @@
  * Content Type Utilities for Scripts
  *
  * Centralized definitions for content types, their paths, and configurations.
- * Typed loaders for generated JSON files (app/src/data/*.json).
+ * Typed loaders for generated JSON files (apps/web/src/data/*.json).
  */
 
 import { join, dirname } from 'path';
@@ -199,7 +199,7 @@ export const CONTENT_DIR_ABS: string = join(PROJECT_ROOT, CONTENT_DIR);
 export const DATA_DIR_ABS: string = join(PROJECT_ROOT, DATA_DIR);
 
 /** Generated data directory (JSON build artifacts) */
-export const GENERATED_DATA_DIR: string = 'app/src/data';
+export const GENERATED_DATA_DIR: string = 'apps/web/src/data';
 
 /** Absolute path to generated data directory */
 export const GENERATED_DATA_DIR_ABS: string = join(PROJECT_ROOT, GENERATED_DATA_DIR);
@@ -323,7 +323,7 @@ export function ensureDataLayer(): boolean {
   console.error('\x1b[33m⚠ Data layer missing — auto-building...\x1b[0m');
   try {
     execSync('node --import tsx/esm scripts/build-data.mjs', {
-      cwd: join(PROJECT_ROOT, 'app'),
+      cwd: join(PROJECT_ROOT, 'apps/web'),
       stdio: 'inherit',
       timeout: 120_000,
     });
@@ -336,7 +336,7 @@ export function ensureDataLayer(): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Generated JSON loaders (app/src/data/*.json)
+// Generated JSON loaders (apps/web/src/data/*.json)
 // ---------------------------------------------------------------------------
 
 /**

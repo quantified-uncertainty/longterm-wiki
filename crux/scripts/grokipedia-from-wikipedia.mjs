@@ -18,11 +18,11 @@ import { parse, stringify } from "yaml";
 
 const PROJECT_ROOT = join(import.meta.dirname, "../..");
 const DATA_DIR = join(PROJECT_ROOT, "data");
-const PAGES_JSON = join(PROJECT_ROOT, "app/src/data/pages.json");
+const PAGES_JSON = join(PROJECT_ROOT, "apps/web/src/data/pages.json");
 const EXTERNAL_LINKS_YAML = join(DATA_DIR, "external-links.yaml");
 const APP_EXTERNAL_LINKS_YAML = join(
   PROJECT_ROOT,
-  "app/src/data/external-links.yaml"
+  "apps/web/src/data/external-links.yaml"
 );
 const GROKIPEDIA_BASE = "https://grokipedia.com/page/";
 

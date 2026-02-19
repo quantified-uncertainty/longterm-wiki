@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync, readd
 import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
-import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../crux/lib/metrics-extractor.ts';
+import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
@@ -75,7 +75,7 @@ function cleanDecimal(n) {
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
 // Entity type alias map: legacy YAML type names → canonical types
-// Keep in sync with app/src/data/entity-type-names.ts
+// Keep in sync with apps/web/src/data/entity-type-names.ts
 const ENTITY_TYPE_ALIASES = {
   researcher: 'person', lab: 'organization',
   'lab-frontier': 'organization', 'lab-research': 'organization',
@@ -966,7 +966,7 @@ async function main() {
   // Quick scan: collect numericIds already declared in MDX frontmatter across
   // all content directories. This prevents auto-assigned entity IDs from
   // colliding with page-level IDs that haven't been registered as entities yet.
-  const CONTENT_DIR_ROOT = join(PROJECT_ROOT, '..', 'content', 'docs');
+  const CONTENT_DIR_ROOT = CONTENT_DIR; // Uses apps/web/../../content/docs via REPO_ROOT
   function scanFrontmatterNumericIds(dir) {
     if (!existsSync(dir)) return;
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -1604,11 +1604,11 @@ async function main() {
   console.log(`Top types: ${Object.entries(stats.byType).slice(0, 5).map(([t, c]) => `${t}(${c})`).join(', ')}`);
 
   // ==========================================================================
-  // Copy canonical schema.ts to app output directory
+  // Copy canonical schema.ts to apps/web output directory
   // ==========================================================================
   const SCHEMA_SRC = join(DATA_DIR, 'schema.ts');
   copyFileSync(SCHEMA_SRC, join(OUTPUT_DIR, 'schema.ts'));
-  console.log('✓ Copied data/schema.ts → app/src/data/schema.ts');
+  console.log('✓ Copied data/schema.ts → apps/web/src/data/schema.ts');
 
   // ==========================================================================
   // LLM Accessibility Files

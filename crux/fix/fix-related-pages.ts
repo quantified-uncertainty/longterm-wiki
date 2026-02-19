@@ -6,7 +6,7 @@
  * Removes manual "Related Pages", "See Also", and "Related Content" sections
  * from MDX files. These are now redundant because the RelatedPages React
  * component renders automatically at the bottom of every article page
- * (see app/src/app/wiki/[id]/page.tsx).
+ * (see apps/web/src/app/wiki/[id]/page.tsx).
  *
  * Also cleans up unused Backlinks imports when no <Backlinks> usage remains.
  *

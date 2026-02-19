@@ -72,9 +72,9 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 | Domain | Reads | Writes |
 |--------|-------|--------|
 | **validate** | `content/docs/`, `data/` | stdout (reports) |
-| **analyze** | `content/docs/`, `data/`, `app/src/data/` | stdout, `.claude/temp/` |
+| **analyze** | `content/docs/`, `data/`, `apps/web/src/data/` | stdout, `.claude/temp/` |
 | **fix** | `content/docs/` | `content/docs/` (in-place fixes) |
-| **content** | `content/docs/`, `app/src/data/pages.json` | `content/docs/`, `.claude/temp/` |
+| **content** | `content/docs/`, `apps/web/src/data/pages.json` | `content/docs/`, `.claude/temp/` |
 | **generate** | `data/`, `content/docs/` | `data/`, `content/docs/` |
 | **resources** | `data/resources/` | `data/resources/` |
 | **updates** | `content/docs/` frontmatter | invokes `content improve` |

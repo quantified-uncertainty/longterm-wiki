@@ -14,7 +14,7 @@ import { execFileSync } from "child_process";
 
 const PROJECT_ROOT = join(import.meta.dirname, "../..");
 const EXTERNAL_LINKS_YAML = join(PROJECT_ROOT, "data/external-links.yaml");
-const APP_EXTERNAL_LINKS_YAML = join(PROJECT_ROOT, "app/src/data/external-links.yaml");
+const APP_EXTERNAL_LINKS_YAML = join(PROJECT_ROOT, "apps/web/src/data/external-links.yaml");
 
 const apply = process.argv.includes("--apply");
 

@@ -15,12 +15,12 @@ cd "$REPO_ROOT"
 ISSUES=()
 
 # Check if dependencies are installed
-if [ ! -d "node_modules" ] || [ ! -d "app/node_modules" ]; then
+if [ ! -d "node_modules" ] || [ ! -d "apps/web/node_modules" ]; then
   echo "Installing dependencies..." >&2
   # PUPPETEER_SKIP_DOWNLOAD: Chrome binary download fails in sandboxed environments
   # and is only needed for screenshot tests, not core development.
   PUPPETEER_SKIP_DOWNLOAD=1 pnpm install --reporter=silent 2>/dev/null || true
-  if [ -d "node_modules" ] && [ -d "app/node_modules" ]; then
+  if [ -d "node_modules" ] && [ -d "apps/web/node_modules" ]; then
     echo "Dependencies installed." >&2
   else
     ISSUES+=("Dependencies not fully installed. Run: pnpm setup:quick")
@@ -28,9 +28,9 @@ if [ ! -d "node_modules" ] || [ ! -d "app/node_modules" ]; then
 fi
 
 # Check if data layer exists, build if missing
-if [ ! -f "app/src/data/database.json" ] || [ ! -f "app/src/data/pages.json" ]; then
+if [ ! -f "apps/web/src/data/database.json" ] || [ ! -f "apps/web/src/data/pages.json" ]; then
   echo "Building data layer..." >&2
-  if (cd app && node --import tsx/esm scripts/build-data.mjs 2>/dev/null); then
+  if (cd apps/web && node --import tsx/esm scripts/build-data.mjs 2>/dev/null); then
     echo "Data layer built." >&2
   else
     ISSUES+=("Data layer build failed. Run: pnpm setup:quick")
