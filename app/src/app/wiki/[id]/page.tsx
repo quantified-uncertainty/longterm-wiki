@@ -214,12 +214,14 @@ function ContentView({
   entityPath,
   slug,
   fullWidth,
+  hideSidebar,
 }: {
   page: MdxPage;
   pageData: Page | undefined;
   entityPath: string;
   slug: string;
   fullWidth?: boolean;
+  hideSidebar?: boolean;
 }) {
   const entity = getEntityById(slug);
   const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
@@ -244,7 +246,7 @@ function ContentView({
           hallucinationRisk={pageData?.hallucinationRisk}
         />
       )}
-      <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}`}>
+      <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
         {/* PageStatus shown for graded formats or pages with editorial content */}
         <PageStatus
           quality={pageData?.quality ?? undefined}
@@ -283,25 +285,30 @@ function ContentView({
 function WithSidebar({
   entityPath,
   fullWidth,
+  hideSidebar,
   children,
 }: {
   entityPath: string;
   fullWidth?: boolean;
+  hideSidebar?: boolean;
   children: React.ReactNode;
 }) {
   const sidebarType = detectSidebarType(entityPath);
 
-  // Compute content container class once:
-  // - fullWidth: edge-to-edge (for table pages)
+  // Compute content container class:
+  // - hideSidebar + fullWidth: wide centered layout, no sidebar
+  // - fullWidth alone: edge-to-edge (for table pages with sidebar)
   // - with sidebar: narrower max to leave room for sidebar
   // - no sidebar: wider max for standalone articles
-  const contentClass = fullWidth
-    ? "w-full px-3 py-4"
-    : sidebarType
-      ? "max-w-[65rem] mx-auto px-8 py-4"
-      : "max-w-7xl mx-auto px-6 py-8";
+  const contentClass = hideSidebar && fullWidth
+    ? "max-w-[90rem] mx-auto px-8 py-6"
+    : fullWidth
+      ? "w-full px-3 py-4"
+      : sidebarType
+        ? "max-w-[65rem] mx-auto px-8 py-4"
+        : "max-w-7xl mx-auto px-6 py-8";
 
-  if (!sidebarType) {
+  if (!sidebarType || hideSidebar) {
     return <div className={contentClass}>{children}</div>;
   }
 
@@ -335,14 +342,16 @@ export default async function WikiPage({ params }: PageProps) {
     const pageData = getPageById(slug);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
     const fullWidth = isFullWidth(contentFormat, result.frontmatter);
+    const hideSidebar = result.frontmatter.hideSidebar === true;
     return (
-      <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
+      <WithSidebar entityPath={entityPath} fullWidth={fullWidth} hideSidebar={hideSidebar}>
         <ContentView
           page={result}
           pageData={pageData}
           entityPath={entityPath}
           slug={slug}
           fullWidth={fullWidth}
+          hideSidebar={hideSidebar}
         />
       </WithSidebar>
     );
@@ -363,14 +372,16 @@ export default async function WikiPage({ params }: PageProps) {
     const pageData = getPageById(id);
     const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
     const fullWidth = isFullWidth(contentFormat, result.frontmatter);
+    const hideSidebar = result.frontmatter.hideSidebar === true;
     return (
-      <WithSidebar entityPath={entityPath} fullWidth={fullWidth}>
+      <WithSidebar entityPath={entityPath} fullWidth={fullWidth} hideSidebar={hideSidebar}>
         <ContentView
           page={result}
           pageData={pageData}
           entityPath={entityPath}
           slug={id}
           fullWidth={fullWidth}
+          hideSidebar={hideSidebar}
         />
       </WithSidebar>
     );
