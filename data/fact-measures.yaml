@@ -225,3 +225,38 @@ measures:
       prefix: "$"
       suffix: "B"
     applicableTo: [person]
+
+  equity-stake-percent:
+    label: "Equity Stake"
+    unit: percent
+    category: financial
+    direction: higher
+    description: "Percentage equity stake in a company"
+    relatedMeasures: [valuation, net-worth]
+    applicableTo: [organization, person]
+
+  equity-value:
+    label: "Equity Value"
+    unit: USD
+    category: financial
+    direction: higher
+    description: "Market value of an equity pool, stake, or ownership group at current valuation"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [valuation, equity-stake-percent]
+    applicableTo: [organization, person]
+
+  philanthropic-capital:
+    label: "Philanthropic Capital"
+    unit: USD
+    category: financial
+    direction: higher
+    description: "Estimated potential philanthropic giving — pledged or risk-adjusted charitable capital"
+    display:
+      divisor: 1000000000
+      prefix: "$"
+      suffix: "B"
+    relatedMeasures: [net-worth, equity-value]
+    applicableTo: [organization, person]

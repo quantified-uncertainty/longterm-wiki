@@ -18,50 +18,38 @@ clusters:
   - ai-safety
   - governance
 entityType: table
+contentFormat: table
+hideSidebar: true
 ---
-import {EntityLink, F} from '@components/wiki';
+import {EntityLink, F, Calc} from '@components/wiki';
 
 :::note[Data as of February 2026]
-All values at \$380B post-money valuation (<EntityLink id="E22">Anthropic</EntityLink> Series G, Feb 2026). For detailed analysis of EA-aligned capital flows, see <EntityLink id="E406">Anthropic (Funder)</EntityLink>. For valuation scenarios, see <EntityLink id="E405">Anthropic Valuation Analysis</EntityLink>.
+All values at <F e="anthropic" f="6796e194" /> post-money valuation (<EntityLink id="E22">Anthropic</EntityLink> Series G, Feb 2026). For detailed analysis of EA-aligned capital flows, see <EntityLink id="E406">Anthropic (Funder)</EntityLink>. For valuation scenarios, see <EntityLink id="E405">Anthropic Valuation Analysis</EntityLink>.
 :::
 
-## Ownership Overview
+## Stakeholder Ownership & Philanthropy
 
-| Stakeholder | Category | Est. Stake | Value at \$380B | Notes |
-|---|---|---|---|---|
-| **<EntityLink id="E91">Dario Amodei</EntityLink>** | Co-founder, CEO | 2-3% | \$7.6-11.4B | GWWC pledge signatory; pledged 80% to charity |
-| **<EntityLink id="E90">Daniela Amodei</EntityLink>** | Co-founder, President | 2-3% | \$7.6-11.4B | Married to <EntityLink id="E156">Holden Karnofsky</EntityLink>; pledged 80% |
-| **<EntityLink id="E59">Chris Olah</EntityLink>** | Co-founder | 2-3% | \$7.6-11.4B | Interpretability pioneer; pledged 80% |
-| **Jack Clark** | Co-founder | 2-3% | \$7.6-11.4B | Former OpenAI Policy Director; pledged 80% |
-| **Tom Brown** | Co-founder | 2-3% | \$7.6-11.4B | GPT-3 lead author; pledged 80% |
-| **Jared Kaplan** | Co-founder, Chief Scientist | 2-3% | \$7.6-11.4B | Scaling laws pioneer; pledged 80% |
-| **Sam McCandlish** | Co-founder | 2-3% | \$7.6-11.4B | Alignment researcher; pledged 80% |
-| **Google** | Strategic investor | ≈14% | ≈\$53B | \$3.3B total invested across 3 rounds |
-| **Amazon** | Strategic investor | Significant minority | — | \$10.75B total invested; primary cloud partner |
-| **<EntityLink id="E577">Jaan Tallinn</EntityLink>** | Early investor | 0.6-1.7% | \$2-6B | Led Series A; Skype co-founder; major AI safety funder |
-| **<EntityLink id="E436">Dustin Moskovitz</EntityLink>** | Early investor | 0.8-2.5% | \$3-9B | Facebook co-founder; \$500M moved to nonprofit |
-| **Microsoft** | Strategic partner | — | Up to \$5B | Nov 2025 partnership; \$30B Azure compute deal |
-| **Nvidia** | Strategic partner | — | Up to \$10B | Nov 2025 partnership |
-| **Employee equity pool** | Employees | 12-18% | \$46-68B | ≈870-2,847 employees; early hires hold 40-60% of pool |
-| **Series G investors** | Institutional | — | \$30B round | GIC, Coatue (co-leads), D.E. Shaw, Dragoneer, Founders Fund, ICONIQ, MGX |
+The table below shows each stakeholder's estimated equity stake, the fraction pledged to charitable giving ("Pledge %"), the estimated probability those donations go to EA-aligned causes ("EA Align %"), and two derived columns: expected donated dollars and expected EA-effective giving. All values scale automatically with the current valuation.
 
-**Total funding raised**: Over \$67B. **Total valuation**: \$380B (Series G, Feb 2026).
+<AnthropicStakeholdersTable />
+
+**Total funding raised**: <F e="anthropic" f="226cc0eb" /> across 16 rounds. **Current valuation**: <F e="anthropic" f="6796e194" showDate /> (Series G).
 
 ## Founder Donation Pledges
 
-All seven co-founders have pledged to donate 80% of their equity. [Fortune](https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/) At current valuations, that's **\$43-64B** if fully honored.
+All seven co-founders have pledged to donate 80% of their equity. [Fortune](https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/) At current valuations, that's <F e="anthropic" f="d5f91ab0">\$43–64B</F> if fully honored — derived from <F e="anthropic" f="c3e8a742">\$53–80B</F> in combined founder equity.
 
 | Founder | EA Connection | Pledge Fulfillment Likelihood |
 |---|---|---|
 | **Dario Amodei** | **Strong** — GWWC signatory, early GiveWell supporter, former roommate of Holden Karnofsky | High |
 | **Daniela Amodei** | **Strong** — married to Holden Karnofsky (GiveWell co-founder, now at Anthropic) | High |
-| **Chris Olah** | Safety-focused — interpretability pioneer, no documented EA pledge | Medium |
-| **Jack Clark** | Safety-focused — responsible AI advocate, no documented EA connections | Medium |
-| **Tom Brown** | None documented | Low-Medium |
-| **Jared Kaplan** | None documented | Low-Medium |
-| **Sam McCandlish** | None documented | Low-Medium |
+| **Chris Olah** | **Moderate** — interpretability pioneer; has participated in EA events; work closely aligned with EA safety priorities | Medium |
+| **Jack Clark** | **Moderate** — responsible AI advocate; founded Import AI newsletter; EA-adjacent framing in policy work | Medium |
+| **Tom Brown** | Weak/unknown — GPT-3 lead author; chose Anthropic's safety mission; no documented EA pledge | Low-Medium |
+| **Jared Kaplan** | Weak/unknown — scaling laws pioneer; safety-motivated co-founder; no documented EA pledge | Low-Medium |
+| **Sam McCandlish** | Weak/unknown — alignment researcher; no publicly documented EA connections | Low-Medium |
 
-Only **2 of 7 founders** (Dario and Daniela, ~29% of founder equity) have documented strong EA connections. The remaining 5 founders (71% of equity) may direct donations to causes outside traditional EA priorities. Founder pledges are **not legally binding** — enforcement relies on reputational cost. Historical <EntityLink id="E531">Giving Pledge</EntityLink> data shows only 36% of deceased pledgers met their commitment. [IPS](https://ips-dc.org/report-giving-pledge-at-15/)
+Only **2 of 7 founders** have documented strong EA connections. The remaining 5 all chose to leave OpenAI specifically to found a safety-focused lab, suggesting at minimum EA-adjacent motivations — but no documented pledges or EA Forum activity for Brown, Kaplan, and McCandlish. Founder pledges are **not legally binding** — enforcement relies on reputational cost. Historical <EntityLink id="E531">Giving Pledge</EntityLink> data shows only 36% of deceased pledgers met their commitment. [IPS](https://ips-dc.org/report-giving-pledge-at-15/)
 
 ## EA-Aligned Capital Summary
 
@@ -74,9 +62,9 @@ Only **2 of 7 founders** (Dario and Daniela, ~29% of founder equity) have docume
 | **Dustin Moskovitz** | \$3-9B | \$2.7-9B | Certain (already committed) |
 | **Employee pledges + matching** | \$20-40B | \$16-38B | Legally bound (in DAFs) |
 | **Non-pledged EA employees** | ≈\$2B | \$0.4-0.8B | Moderate |
-| **Total** | **\$66-116B** | **\$27-76B** | — |
+| **Total** | **\$66-116B** | <F e="anthropic" f="a8c71e05">**\$27-76B**</F> | — |
 
-Employee capital in donor-advised funds (\$16-38B risk-adjusted) is the **most reliable** source — legally bound, though donors retain discretion over which charities receive grants. The historical 3:1 matching program (employees pledge up to 50%, Anthropic matches 3x) has been **reduced to 1:1 at 25%** for employees hired after 2024. [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) [Anthropic Careers](https://www.anthropic.com/careers)
+Employee capital in donor-advised funds (<F e="anthropic" f="a8c71e05">\$27–76B</F> risk-adjusted) is the **most reliable** source — legally bound, though donors retain discretion over which charities receive grants. The historical 3:1 matching program (employees pledge up to 50%, Anthropic matches 3x) has been **reduced to 1:1 at 25%** for employees hired after 2024. [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors) [Anthropic Careers](https://www.anthropic.com/careers)
 
 ## Funding Timeline
 
@@ -97,9 +85,11 @@ Employee capital in donor-advised funds (\$16-38B risk-adjusted) is the **most r
 | Series E | Mar 2025 | \$3.5B | \$61.5B | Lightspeed |
 | Series F | Sept 2025 | \$13B | \$183B | Altimeter, Baillie Gifford, BlackRock |
 | Microsoft/Nvidia | Nov 2025 | Up to \$15B | \$350B | Microsoft, Nvidia |
-| Series G | Feb 2026 | \$30B | \$380B | GIC, Coatue (co-leads) |
+| Series G | Feb 2026 | <F e="anthropic" f="5b0663a0" /> | <F e="anthropic" f="6796e194" /> | GIC, Coatue (co-leads) |
 
-**Total raised**: Over \$67B across 16 rounds. [Anthropic](https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation)
+**Total raised**: <F e="anthropic" f="226cc0eb" /> across 16 rounds. [Anthropic](https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation)
+
+**Google** has invested <F e="anthropic" f="e7c42d88" /> across 3 rounds for approximately <F e="anthropic" f="b3a9f201">~14%</F> of equity. **Amazon** has invested <F e="anthropic" f="9a1f5c63" /> and serves as Anthropic's primary cloud partner; its exact stake is undisclosed.
 
 ## Capital Deployment Timeline
 
@@ -111,6 +101,31 @@ Employee capital in donor-advised funds (\$16-38B risk-adjusted) is the **most r
 | Founders | 2028-2030 | 2030-2040 | Depends on IPO + pledge timing |
 
 IPO expected 2026-2027 (Kalshi: 72% chance Anthropic IPOs before OpenAI). Lock-up periods typically delay capital 6-12 months post-IPO. See <EntityLink id="E409">Anthropic IPO</EntityLink>.
+
+## Methodology & Assumptions
+
+All figures in this table are estimates with significant uncertainty. Key assumptions:
+
+**Equity stakes:**
+- *Founders (2–3% each)*: Estimated from reported total founder equity (~14–21% for 7 co-founders). No individual founder stakes have been publicly disclosed; range reflects typical dilution across 7 people with differential contributions.
+- *Google (~14%)*: Derived from Google's \$3.3B total investment and Anthropic's \$18B Series D valuation; cross-checked against [Bloomberg reporting](https://www.bloomberg.com/news/articles/2023-10-27/google-commits-to-invest-2-billion-in-openai-rival-anthropic).
+- *Tallinn (0.6–1.7%), Moskovitz (0.8–2.5%)*: Estimated from Series A lead position and subsequent dilution; no public disclosures.
+- *Employee pool (12–18%)*: Typical early-stage AI lab employee equity range; diluted from founding allocations through Series G.
+
+**Pledge rates:**
+- *Founders (80%)*: Documented in [Fortune](https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/) reporting on the public pledge announcement.
+- *Employee pool (25–50%)*: Lower bound from current 1:1 matching at 25% for post-2024 hires; upper bound from historical 3:1 matching program at 50% for pre-2025 hires. See [EA Forum](https://forum.effectivealtruism.org/posts/rRBaP7YbXfZibSn3C/front-load-giving-because-of-anthropic-donors).
+- *Tallinn (90%), Moskovitz (95%)*: Based on documented giving track records and explicit commitments.
+
+**EA alignment estimates (most uncertain column):**
+- Based on: public statements, organizational affiliations, EA Forum activity, documented giving patterns, and whether donations have gone to EA-identified causes.
+- Dario/Daniela: GWWC signatories with documented EA community ties → 80–90%.
+- Chris Olah: Interpretability work is core EA-aligned; EA event participation → 40–60%.
+- Jack Clark: EA-adjacent responsible AI framing, less documented EA cause alignment → 30–50%.
+- Brown/Kaplan/McCandlish: Safety motivation for founding Anthropic but no documented EA cause preferences → 15–30%.
+- Employee pool: Blended estimate across a population with high EA representation at senior levels → 40–70%.
+
+These are Fermi estimates for planning purposes, not verified figures. The "EA-Effective" column represents *expected value* and should be treated with wide error bars.
 
 ## Related Pages
 

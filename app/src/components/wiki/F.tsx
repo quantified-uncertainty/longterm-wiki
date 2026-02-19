@@ -43,7 +43,7 @@ export function F({ e, f, showDate, children, className }: FProps) {
   ) : baseValue;
   const isComputed = Boolean(fact.computed);
   const hasResource = Boolean(fact.sourceTitle);
-  const hasMetadata = fact.asOf || fact.source || fact.note || isComputed || hasResource;
+  const hasMetadata = fact.label || fact.asOf || fact.source || fact.note || isComputed || hasResource;
 
   if (!hasMetadata) {
     return (
@@ -72,6 +72,11 @@ export function F({ e, f, showDate, children, className }: FProps) {
         className="absolute left-0 top-full mt-1 z-50 w-[220px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible group-hover/fact:opacity-100 group-hover/fact:visible transition-opacity text-xs"
         role="tooltip"
       >
+        {fact.label && (
+          <span className="block text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide mb-0.5">
+            {fact.label}
+          </span>
+        )}
         <span className="block font-semibold text-foreground mb-1">
           {fact.value || baseValue}
         </span>

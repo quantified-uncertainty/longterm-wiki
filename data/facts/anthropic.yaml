@@ -2,6 +2,7 @@ entity: anthropic
 facts:
   # valuation
   "6796e194":
+    label: "Anthropic post-money valuation"
     value: 380000000000
     asOf: 2026-02
     note: "Series G post-money valuation"
@@ -11,6 +12,7 @@ facts:
 
   # valuation-nov-2025
   c45b168f:
+    label: "Anthropic valuation (Nov 2025)"
     value: 350000000000
     asOf: 2025-11
     note: "Valuation at Microsoft/Nvidia commitment"
@@ -19,6 +21,7 @@ facts:
 
   # revenue-run-rate
   0ed4db9e:
+    label: "Annualized revenue run-rate"
     value: 14000000000
     asOf: 2026-02
     note: "Run-rate revenue at Series G announcement"
@@ -27,6 +30,7 @@ facts:
 
   # revenue-arr-2025
   55d88868:
+    label: "Annualized revenue run-rate (end of 2025)"
     value: 9000000000
     asOf: 2025-12
     note: "Annualized run rate at end of 2025"
@@ -35,6 +39,7 @@ facts:
 
   # revenue-early-2025
   bc497a3d:
+    label: "Annualized revenue run-rate (early 2025)"
     value: 1000000000
     asOf: 2025-01
     note: "Approximate ARR at start of 2025, per Reuters"
@@ -43,6 +48,7 @@ facts:
 
   # revenue-mid-2025
   "83e76962":
+    label: "Annualized revenue run-rate (mid-2025)"
     value: 4000000000
     asOf: 2025-07
     note: "ARR as of mid-2025, per Series F announcement"
@@ -51,6 +57,7 @@ facts:
 
   # revenue-2026-guidance
   2038f3f6:
+    label: "Revenue guidance (2026)"
     measure: revenue-guidance
     value:
       - 20000000000
@@ -61,11 +68,11 @@ facts:
 
   # series-g-raise
   5b0663a0:
+    label: "Series G raise"
     measure: funding-round
     value: 30000000000
     asOf: 2026-02
     note: Series G round size
-    source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
     sourceResource: 8e3ff50b9ef2a1a8
 
   # total-funding
@@ -173,3 +180,128 @@ facts:
     noCompute: true
     note: "Projected breakeven year per internal financial projections"
     sourceResource: "eb642ee7de582ff5"
+
+  # google-stake-pct
+  b3a9f201:
+    label: "Google equity stake"
+    value: 14
+    asOf: 2026-02
+    note: "Approximate post-Series G; computed from $3.3B invested across 3 rounds at prevailing valuations"
+    measure: equity-stake-percent
+    sourceResource: "233fe5e95bfcf8bc"
+
+  # google-total-invested
+  e7c42d88:
+    label: "Google total invested in Anthropic"
+    value: 3300000000
+    asOf: 2026-02
+    note: "$300M (2022) + $2B (2023) + $1B (2025)"
+    measure: total-funding
+    sourceResource: "233fe5e95bfcf8bc"
+
+  # amazon-total-invested
+  9a1f5c63:
+    label: "Amazon total invested in Anthropic"
+    value: 10750000000
+    asOf: 2026-02
+    note: "$4B (2023) + $2.75B (2024) + $4B (2024); primary cloud partner"
+    measure: total-funding
+    sourceResource: "92cd6cda9477a52e"
+
+  # founder-equity-total
+  c3e8a742:
+    label: "All-founder combined equity value"
+    value:
+      - 53000000000
+      - 80000000000
+    asOf: 2026-02
+    note: "Seven founders × 2–3% each × current valuation"
+    measure: equity-value
+    sourceResource: "fd8351a24e375eba"
+
+  # founder-pledge-total
+  d5f91ab0:
+    label: "Founder pledge total (80% of all-founder equity)"
+    value:
+      - 43000000000
+      - 64000000000
+    asOf: 2026-02
+    note: "80% of $53–80B; all seven co-founders pledged to donate 80% of their wealth"
+    measure: philanthropic-capital
+    sourceResource: "fd8351a24e375eba"
+
+  # employee-equity-pool
+  f2a06bd3:
+    label: "Employee equity pool value"
+    value:
+      - 46000000000
+      - 68000000000
+    asOf: 2026-02
+    note: "12–18% of current valuation; ~870–2,847 employees"
+    measure: equity-value
+    sourceResource: "8e3ff50b9ef2a1a8"
+
+  # ea-aligned-capital-risk-adjusted
+  a8c71e05:
+    label: "EA-aligned capital (risk-adjusted total)"
+    value:
+      - 27000000000
+      - 76000000000
+    asOf: 2026-02
+    note: "Risk-adjusted estimate of EA-aligned philanthropic capital from all Anthropic stakeholders"
+    measure: philanthropic-capital
+
+  # founder-per-person-stake-pct
+  e3b8a291:
+    label: "Per-founder equity stake (each of 7 co-founders)"
+    value:
+      - 2
+      - 3
+    asOf: 2026-02
+    note: "Each of the 7 co-founders holds approximately 2–3% of Anthropic equity; exact stakes undisclosed"
+    measure: equity-stake-percent
+    sourceResource: "fd8351a24e375eba"
+
+  # tallinn-stake-pct
+  d7c6f042:
+    label: "Jaan Tallinn equity stake in Anthropic"
+    value:
+      - 0.6
+      - 1.7
+    asOf: 2026-02
+    note: "Estimate based on Series A lead position and subsequent dilution; no public disclosure"
+    measure: equity-stake-percent
+
+  # moskovitz-stake-pct
+  a9e1f835:
+    label: "Dustin Moskovitz equity stake in Anthropic"
+    value:
+      - 0.8
+      - 2.5
+    asOf: 2026-02
+    note: "Estimate based on early investment; $500M already transferred to Good Ventures vehicle"
+    measure: equity-stake-percent
+
+  # employee-pledge-rate
+  b2c4d87e:
+    label: "Employee equity pledge rate (blended average)"
+    value:
+      - 25
+      - 50
+    asOf: 2026-02
+    note: "Employees hired before 2025 could pledge up to 50% (with 3:1 Anthropic match); post-2024 hires at 1:1 matching for 25%. Blended rate across all employees estimated at 25–50%."
+    sourceResource: "8e3ff50b9ef2a1a8"
+    measure: equity-stake-percent
+
+  # google-stake-pct-2026
+  # (b3a9f201 is the primary fact; this is a separate label for the table row)
+
+  # employee-ea-align-estimate
+  c91f7d43:
+    label: "EA-alignment estimate for employee pledges"
+    value:
+      - 40
+      - 70
+    asOf: 2026-02
+    note: "Estimate of % of employee pledged giving that goes to EA-aligned causes; employees self-select into a culture with high EA overlap. Range reflects heterogeneity across employee pool."
+    measure: equity-stake-percent

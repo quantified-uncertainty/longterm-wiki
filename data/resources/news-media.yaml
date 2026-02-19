@@ -11,8 +11,43 @@
     - anthropic
     - anthropic-valuation
     - anthropic-investors
+    - anthropic-stakeholders
   tags:
     - funding
+    - ai-labs
+
+- id: 233fe5e95bfcf8bc
+  url: https://fortune.com/2023/10/27/google-anthropic-investment-stake/
+  title: "Google has taken a roughly 10% stake in AI startup Anthropic as tech giants circle the space"
+  type: web
+  publication_id: fortune
+  cited_by:
+    - anthropic-stakeholders
+  tags:
+    - funding
+    - ai-labs
+
+- id: 92cd6cda9477a52e
+  url: https://www.reuters.com/technology/anthropic-raises-27-billion-amazon-cloud-deal-2024-11-22/
+  title: "Anthropic raises $4 billion from Amazon in expanded cloud partnership"
+  type: web
+  publication_id: reuters
+  cited_by:
+    - anthropic-stakeholders
+  tags:
+    - funding
+    - ai-labs
+
+- id: fd8351a24e375eba
+  url: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+  title: "Anthropic's billionaire co-founders are giving away 80% of their wealth"
+  type: web
+  publication_id: fortune
+  cited_by:
+    - anthropic-stakeholders
+  tags:
+    - philanthropy
+    - effective-altruism
     - ai-labs
 
 - id: 85ba042a002437a0

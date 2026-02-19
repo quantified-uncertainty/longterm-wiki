@@ -21,6 +21,7 @@ import { FactorSubItemsList, AllFactorsSubItems } from "@/components/wiki/Factor
 import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
+import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -141,6 +142,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Overview banner
   OverviewBanner,
+
+  // Anthropic-specific table
+  AnthropicStakeholdersTable,
 
   // Table view components
   SafetyApproachesTableView,
