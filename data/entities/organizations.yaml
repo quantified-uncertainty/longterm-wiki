@@ -2198,3 +2198,49 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+- id: ftx
+  numericId: E856
+  type: organization
+  title: FTX
+  website: https://en.wikipedia.org/wiki/FTX
+  description: >-
+    FTX was a centralized cryptocurrency exchange founded by Sam Bankman-Fried
+    in 2019 that collapsed in November 2022 after revelations that customer
+    deposits had been misappropriated by its affiliated trading firm Alameda
+    Research. At its peak, FTX held a $32 billion valuation and was the
+    third-largest crypto exchange globally. Through the FTX Future Fund, it
+    committed over $130 million to longtermist causes including AI safety before
+    its bankruptcy rendered those commitments void.
+  relatedEntries:
+    - id: ftx-future-fund
+      type: organization
+    - id: cea
+      type: organization
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
+- id: ftx-future-fund
+  numericId: E855
+  type: organization
+  title: FTX Future Fund
+  website: https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1
+  description: >-
+    The FTX Future Fund was a philanthropic vehicle launched in February 2022
+    by the FTX Foundation, primarily funded by Sam Bankman-Fried. It distributed
+    $132 million in 262 grants within its first four months, with approximately
+    $32 million directed to AI safety research. The fund collapsed abruptly in
+    November 2022 when FTX filed for bankruptcy; its entire team resigned publicly,
+    stating that they believed committed grants could not be honored and raising
+    questions about the legitimacy of the funds' source.
+  relatedEntries:
+    - id: ftx
+      type: organization
+    - id: cea
+      type: organization
+    - id: open-philanthropy
+      type: organization
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
