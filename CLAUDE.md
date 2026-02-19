@@ -56,6 +56,10 @@ pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
 pnpm crux review mark <id> --reviewer="name"  # Mark page as human-reviewed
 pnpm crux review list                         # List reviewed pages
 
+# Session log validation
+pnpm crux validate session-logs              # Check session log format/fields
+pnpm crux validate session-logs --ci         # JSON output for CI
+
 # Citation verification & archival
 pnpm crux citations verify <id>              # Verify all citations on a page
 pnpm crux citations verify --all --limit=20  # Verify top 20 pages with citations

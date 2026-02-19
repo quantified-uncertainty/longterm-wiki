@@ -91,6 +91,11 @@ const SCRIPTS = {
     description: 'Edit log schema and integrity',
     passthrough: ['ci'],
   },
+  'session-logs': {
+    script: 'validate/validate-session-logs.ts',
+    description: 'Session log format and required fields',
+    passthrough: ['ci'],
+  },
   financials: {
     script: 'validate/validate-financials.ts',
     description: 'Financial data staleness and consistency',
