@@ -180,7 +180,22 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
       continue;
     }
 
-    // Pattern 3: [^N]: URL (bare URL, no title)
+    // Pattern 3: [^N]: Descriptive text https://bare-url
+    // Text followed by a bare URL (common in academic citations and informal footnotes)
+    // e.g. [^1]: TransformerLens GitHub repository: https://github.com/...
+    // e.g. [^3]: Author et al. (2021). "Title." Journal. https://example.com/paper
+    const textThenUrlMatch = line.match(/^\[\^(\d+)\]:\s*(.+?)\s+(https?:\/\/[^\s]+)\s*$/);
+    if (textThenUrlMatch) {
+      const description = textThenUrlMatch[2].replace(/[:.]\s*$/, '').trim();
+      footnoteDefinitions.set(parseInt(textThenUrlMatch[1], 10), {
+        url: textThenUrlMatch[3],
+        linkText: description,
+        defLine: i,
+      });
+      continue;
+    }
+
+    // Pattern 4: [^N]: URL (bare URL, no title)
     // Captures: (1) footnote number, (2) URL
     const bareMatch = line.match(/^\[\^(\d+)\]:\s*(https?:\/\/[^\s]+)/);
     if (bareMatch) {

@@ -57,9 +57,15 @@ const SCRIPTS = {
     passthrough: ['ci', 'json', 'all', 'limit', 'recheck'],
     positional: true,
   },
+  'normalize-footnotes': {
+    script: 'citations/normalize-footnotes.ts',
+    description: 'Report/fix inconsistent footnote formats across pages',
+    passthrough: ['json', 'fix'],
+    positional: true,
+  },
   'export-dashboard': {
     script: 'citations/export-dashboard.ts',
-    description: 'Export accuracy data as JSON for the internal dashboard',
+    description: 'Export accuracy data as YAML for the internal dashboard',
     passthrough: ['json'],
   },
 };
@@ -99,6 +105,9 @@ Examples:
   crux citations verify-quotes existential-risk    Re-verify stored quotes
   crux citations check-accuracy existential-risk   Check claim accuracy vs sources
   crux citations check-accuracy --all              Batch accuracy check
+  crux citations normalize-footnotes                Report footnote format issues
+  crux citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
+  crux citations normalize-footnotes --fix <id>     Fix one page
   crux citations export-dashboard                  Export data for web dashboard
 `;
 }

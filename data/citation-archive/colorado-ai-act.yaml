@@ -1,0 +1,216 @@
+pageId: colorado-ai-act
+verifiedAt: 2026-02-19
+totalCitations: 19
+verified: 0
+broken: 19
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://fostergraham.com/2025/12/colorados-artificial-intelligence-act-what-businesses-need-to-know-about-sb-24-205/
+    linkText: "Colorado's Artificial Intelligence Act: What Businesses Need to Know About SB 24-205 — - Foster Graham Law Firm, December 2024"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:37.124Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 2
+    url: https://coag.gov/ai/
+    linkText: Colorado Anti-Discrimination in AI Law (ADAI) Rulemaking — - Colorado Attorney General's Office, December 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:37.124Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 3
+    url: https://www.naag.org/attorney-general-journal/a-deep-dive-into-colorados-artificial-intelligence-act/
+    linkText: A Deep Dive into Colorado's Artificial Intelligence Act — - National Association of Attorneys General, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:37.125Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 4
+    url: https://coloradosun.com/2024/10/22/task-force-talks-revisions-to-colorados-controversial-artificial-intelligence-law/
+    linkText: Google, Microsoft seem OK with Colorado's controversial AI law. Local tech not so much. — - Colorado Sun, October 22, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:37.125Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 5
+    url: https://www.americanbar.org/groups/business_law/resources/business-law-today/2025-november/colorados-ai-act-still-standing/
+    linkText: "Colorado's AI Act: Still Standing — - American Bar Association, November 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:37.125Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 6
+    url: https://www.brookings.edu/articles/how-different-states-are-approaching-ai/
+    linkText: How different states are approaching AI — - Brookings Institution, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:38.132Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 7
+    url: https://iapp.org/news/a/us-state-ai-legislation-reviewing-the-2025-session
+    linkText: "US state AI legislation: Reviewing the 2025 session — - International Association of Privacy Professionals, 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:38.132Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 8
+    url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+    linkText: Ensuring a National Policy Framework for Artificial Intelligence — - The White House, December 11, 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:38.133Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 9
+    url: https://www.lw.com/en/insights/ai-executive-order-targets-state-laws-and-seeks-uniform-federal-standards
+    linkText: AI Executive Order Targets State Laws and Seeks Uniform Federal Standards — - Latham & Watkins, December 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:38.133Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 10
+    url: https://www.nist.gov/publications/towards-standard-identifying-and-managing-bias-artificial-intelligence
+    linkText: "NIST Special Publication 1270: Towards a Standard for Identifying and Managing Bias in AI — - National Institute of Standards and Technology, 2021"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:38.134Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 11
+    url: https://www.schellman.com/blog/ai-services/what-you-need-to-know-about-the-colorado-ai-act
+    linkText: What You Need to Know About the Colorado AI Act — - Schellman, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:39.146Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 12
+    url: https://www.uschamber.com/technology/the-hidden-cost-of-50-state-ai-laws-a-data-driven-breakdown
+    linkText: How Patchwork AI Regulations Threaten Small Businesses — - U.S. Chamber of Commerce, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:39.146Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 13
+    url: https://iapp.org/news/a/the-colorado-ai-act-what-you-need-to-know
+    linkText: "The Colorado AI Act: What You Need to Know — - International Association of Privacy Professionals, 2024"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:39.147Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 14
+    url: https://law.vanderbilt.edu/hal-9000-among-the-several-states-the-irony-of-the-dormant-commerce-clause-and-ai-regulations-after-the-one-big-beautiful-bill-act/
+    linkText: "Hal 9000 'among the Several States': The Irony of the Dormant Commerce Clause and AI Regulations After the One Big Beautiful Bill Act — - Vanderbilt Law School, December 5, 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:39.147Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 15
+    url: https://a16z.com/the-commerce-clause-in-the-age-of-ai-guardrails-and-opportunities-for-state-legislatures/
+    linkText: "The Commerce Clause in the Age of AI: Guardrails and Opportunities for State Legislatures — - Andreessen Horowitz, October 14, 2025"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:39.147Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 16
+    url: https://www.clarkhill.com/news-events/news/what-does-trumps-ai-executive-order-mean-for-colorados-ai-act/
+    linkText: What Does Trump's AI Executive Order Mean for Colorado's AI Act? — - Clark Hill PLC, December 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:40.151Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 17
+    url: https://www.multistate.us/insider/2025/12/19/how-trumps-ai-executive-order-will-impact-states
+    linkText: How Trump's AI Executive Order Will Impact States — - MultiState, December 19, 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:40.151Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 18
+    url: https://www.commonsenseinstituteus.org/colorado/research/jobs-and-our-economy/unintended-costs-the-economic-impact-of-colorados-ai-policy
+    linkText: "Unintended Costs: The Economic Impact of Colorado's AI Policy — - Common Sense Institute, 2024"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:40.151Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 19
+    url: https://www.du.edu/news/colorado-pumping-brakes-first-its-kind-ai-regulation-find-practical-path-forward
+    linkText: Colorado is pumping the brakes on first-of-its-kind AI regulation — - University of Denver, 2024
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-19T18:49:40.151Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
