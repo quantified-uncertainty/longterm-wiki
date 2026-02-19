@@ -57,7 +57,7 @@ export const commands = buildCommands(SCRIPTS, 'report');
 
 export function getHelp(): string {
   const commandList = Object.entries(SCRIPTS)
-    .map(([name, config]) => `  ${name.padEnd(12)} ${config.description}`)
+    .map(([name, config]) => `  ${name.padEnd(16)} ${config.description}`)
     .join('\n');
 
   return `

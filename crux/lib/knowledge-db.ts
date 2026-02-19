@@ -1069,6 +1069,22 @@ export const citationQuotes = {
   },
 
   /**
+   * Mark a quote as unverified (e.g., after re-verification fails).
+   */
+  markUnverified(
+    pageId: string,
+    footnote: number,
+    method: string,
+    score: number,
+  ) {
+    return db.prepare(`
+      UPDATE citation_quotes
+      SET quote_verified = 0, verification_method = ?, verification_score = ?, updated_at = datetime('now')
+      WHERE page_id = ? AND footnote = ?
+    `).run(method, score, pageId, footnote);
+  },
+
+  /**
    * Get a single quote by page and footnote.
    */
   get(pageId: string, footnote: number): CitationQuoteRow | null {

@@ -16,6 +16,7 @@ import {
   citationContent,
   db,
 } from '../lib/knowledge-db.ts';
+// Note: db is used for batch queries in the --all codepath below
 import { fetchCitationUrl } from '../lib/citation-archive.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 
@@ -109,11 +110,12 @@ async function verifyQuotesForPage(
     } else {
       result.drifted++;
       // Mark as unverified
-      db.prepare(`
-        UPDATE citation_quotes
-        SET quote_verified = 0, verification_method = 'reverify-failed', verification_score = ?, updated_at = datetime('now')
-        WHERE page_id = ? AND footnote = ?
-      `).run(verification.score, pageId, q.footnote);
+      citationQuotes.markUnverified(
+        pageId,
+        q.footnote,
+        'reverify-failed',
+        verification.score,
+      );
       if (verbose) {
         console.log(
           `\u2717 DRIFTED (score: ${(verification.score * 100).toFixed(0)}%)`,

@@ -28,7 +28,6 @@ import {
 import {
   citationContent,
   citationQuotes,
-  type CitationContentRow,
 } from '../lib/knowledge-db.ts';
 import { extractSupportingQuote } from '../lib/quote-extractor.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
@@ -196,7 +195,6 @@ async function extractQuotesForPage(
 
     let sourceQuote = '';
     let sourceLocation = '';
-    let confidence = 0;
     let verificationMethod: string | null = null;
     let verificationScore: number | null = null;
     let sourceTitle = cit.linkText || null;
@@ -220,7 +218,6 @@ async function extractQuotesForPage(
           );
           sourceQuote = llmResult.quote;
           sourceLocation = llmResult.location;
-          confidence = llmResult.confidence;
           extractionModel = 'google/gemini-flash-1.5';
 
           // Verify the quote exists in the source
@@ -236,7 +233,6 @@ async function extractQuotesForPage(
           // Source text too short for LLM extraction — use as-is
           sourceQuote = sourceText.slice(0, 500);
           sourceLocation = 'full document (short)';
-          confidence = 0.3;
         }
 
         // Get page title from cache
@@ -256,7 +252,6 @@ async function extractQuotesForPage(
             if (found.abstract) {
               sourceQuote = found.abstract;
               sourceLocation = 'abstract';
-              confidence = 0.3; // Abstract match is low confidence
             }
             if (verbose) {
               process.stdout.write(` [found: ${found.source}]`);
