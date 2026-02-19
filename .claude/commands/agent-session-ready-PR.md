@@ -35,7 +35,9 @@ pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 
 ## Step 5: Session log
 
-Create `.claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml` per `.claude/rules/session-logging.md`.
+Run `pnpm crux agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
+
+Create `.claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml` per `.claude/rules/session-logging.md`. Include the `checks:` block verbatim from the snapshot output. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly; the audit trail should reflect reality.
 
 ## Step 6: Validate completion
 

@@ -30,6 +30,19 @@ learnings:
   - Anything a future session should know
 recommendations:
   - Infrastructure improvements discovered during the session (or omit if none)
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-19T10:00:00.000Z"
+  total: 29
+  completed: 27
+  na: 2
+  skipped: 0
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - ...
 ```
 
 ## Rules
@@ -46,6 +59,7 @@ recommendations:
 - The session log file should be part of the same commit as your other changes (not a separate commit)
 - Each session gets its own file — this avoids merge conflicts between parallel sessions
 - **The `recommendations:` field is optional** — include actionable infrastructure improvement suggestions discovered during the session. These are notes for future sessions, not tasks to do now.
+- **Always include the `checks:` field** — run `pnpm crux agent-checklist snapshot` immediately before creating the session log and paste the output verbatim. This captures the checklist state at ship time as a machine-readable audit trail. The `initiated_at` timestamp reveals whether the checklist was initialized at session start (good) or created at the last minute (red flag). If no checklist was used, the command outputs `checks: {initialized: false}` — include that too, honestly. A missing `checks:` field generates a validation warning.
 - **Format is machine-parsed**: The `date`, `branch`, `title`, `pages`, `pr`, `model`, `duration`, and `cost` fields are parsed by `app/scripts/lib/session-log-parser.mjs` to build the `/internal/page-changes` dashboard. Validated by Zod schema in `crux/validate/validate-session-logs.ts`.
 - **Validation**: Run `pnpm crux validate session-logs` to check all session log files for schema compliance. Errors (missing required fields, invalid YAML) block; warnings (missing model/duration) are advisory.
 - **Migration**: Legacy `.md` session logs are still supported by the parser. Convert them to YAML with `node scripts/migrate-session-logs.mjs --apply`.
