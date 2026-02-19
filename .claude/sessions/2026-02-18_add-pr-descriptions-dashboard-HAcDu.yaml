@@ -1,0 +1,10 @@
+date: 2026-02-18
+branch: claude/add-pr-descriptions-dashboard-HAcDu
+title: Add PR Descriptions dashboard
+pages: []
+summary: Added a new internal dashboard at `/internal/pr-descriptions` that displays all GitHub pull requests with their titles, descriptions, state, author, dates, and diff stats. Expandable rows show full PR descriptions. Extended the build pipeline to fetch and store full PR metadata from the GitHub API.
+issues:
+  - GITHUB_TOKEN not available in dev environment, so PR data is empty locally — handled gracefully with empty state messaging
+learnings:
+  - The GitHub PR list API already returns title, body, state, dates, labels, etc. — no additional API calls needed beyond the existing pagination
+  - Shared the API call between `fetchBranchToPrMap` and `fetchPrItems` via caching to avoid duplicate requests

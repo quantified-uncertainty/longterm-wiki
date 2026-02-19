@@ -1,8 +1,10 @@
 /**
  * Session Log Parser
  *
- * Parses session log entries from both the consolidated .claude/session-log.md
- * and individual session files in .claude/sessions/*.md.
+ * Parses session log entries from:
+ * 1. Individual YAML session files in .claude/sessions/*.yaml (new format)
+ * 2. Individual Markdown session files in .claude/sessions/*.md (legacy format)
+ * 3. The consolidated .claude/session-log.md (legacy format)
  *
  * IMPORTANT: If you change the session entry format, also update:
  *   - .claude/rules/session-logging.md (the format spec for contributors)
@@ -14,6 +16,75 @@
 
 import { readFileSync, readdirSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
+import { parse as parseYaml } from 'yaml';
+
+/**
+ * Parse a single YAML session log file into a map of pageId → ChangeEntry[].
+ *
+ * Expected YAML structure:
+ *   date: 2026-02-19
+ *   branch: claude/fix-something-AbC12
+ *   title: Fix something
+ *   model: opus-4-6        # optional
+ *   duration: ~45min       # optional
+ *   cost: ~$5              # optional
+ *   pages: [page-id-1, page-id-2]  # optional
+ *   summary: >
+ *     What was done...
+ *   pr: 123                # optional (integer)
+ *   issues: [...]          # optional, for human readability
+ *   learnings: [...]       # optional, for human readability
+ *   recommendations: [...] # optional, for human readability
+ */
+export function parseYamlSessionLog(content) {
+  const pageHistory = {};
+
+  let data;
+  try {
+    data = parseYaml(content);
+  } catch {
+    return pageHistory; // Invalid YAML — skip silently
+  }
+
+  if (!data || typeof data !== 'object') return pageHistory;
+
+  const { date, branch, title, summary, pages, pr, model, duration, cost } = data;
+
+  if (!date || !branch || !title) return pageHistory; // Required fields missing
+
+  const pageIds = Array.isArray(pages)
+    ? pages.filter(id => typeof id === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(id))
+    : [];
+
+  if (pageIds.length === 0) return pageHistory; // No pages — infrastructure-only session
+
+  // Extract PR number
+  let prNum;
+  if (typeof pr === 'number') {
+    prNum = pr;
+  } else if (typeof pr === 'string') {
+    const numMatch = pr.match(/^#(\d+)$/) || pr.match(/\/pull\/(\d+)/);
+    if (numMatch) prNum = parseInt(numMatch[1], 10);
+  }
+
+  const changeEntry = {
+    date: String(date),
+    branch: String(branch),
+    title: String(title),
+    summary: typeof summary === 'string' ? summary.trim() : '',
+    ...(prNum !== undefined && { pr: prNum }),
+    ...(model !== undefined && { model: String(model) }),
+    ...(duration !== undefined && { duration: String(duration) }),
+    ...(cost !== undefined && { cost: String(cost) }),
+  };
+
+  for (const pageId of pageIds) {
+    if (!pageHistory[pageId]) pageHistory[pageId] = [];
+    pageHistory[pageId].push(changeEntry);
+  }
+
+  return pageHistory;
+}
 
 /**
  * Parse session log content (a markdown string) and return a map of
@@ -107,41 +178,20 @@ export function parseSessionLogContent(content) {
 }
 
 /**
- * Collect all session log content from both the consolidated session-log.md
- * and individual session files in .claude/sessions/*.md, then parse into
- * a merged pageId → ChangeEntry[] map.
+ * Collect all session log content from:
+ * 1. YAML files in .claude/sessions/*.yaml (new format, parsed directly)
+ * 2. Markdown files in .claude/sessions/*.md (legacy format, regex-parsed)
+ * 3. The consolidated session-log.md (legacy format, regex-parsed)
+ *
+ * Returns a merged pageId → ChangeEntry[] map with deduplication.
  *
  * Deduplicates entries that appear in both sources (same date+branch+title+pageId).
  */
 export function parseAllSessionLogs(consolidatedLogPath, sessionsDir) {
-  const allContent = [];
-
-  // Read consolidated log if it exists
-  if (existsSync(consolidatedLogPath)) {
-    allContent.push(readFileSync(consolidatedLogPath, 'utf-8'));
-  }
-
-  // Read individual session files
-  if (existsSync(sessionsDir)) {
-    const files = readdirSync(sessionsDir)
-      .filter(f => f.endsWith('.md'))
-      .sort();
-    for (const file of files) {
-      const filePath = join(sessionsDir, file);
-      if (statSync(filePath).isFile()) {
-        allContent.push(readFileSync(filePath, 'utf-8'));
-      }
-    }
-  }
-
-  if (allContent.length === 0) return {};
-
-  // Parse each source separately, then merge with deduplication
   const merged = {};
   const seen = new Set(); // Track "date|branch|title|pageId" to deduplicate
 
-  for (const content of allContent) {
-    const partial = parseSessionLogContent(content);
+  function mergePartial(partial) {
     for (const [pageId, entries] of Object.entries(partial)) {
       if (!merged[pageId]) merged[pageId] = [];
       for (const entry of entries) {
@@ -150,6 +200,30 @@ export function parseAllSessionLogs(consolidatedLogPath, sessionsDir) {
           seen.add(key);
           merged[pageId].push(entry);
         }
+      }
+    }
+  }
+
+  // Read consolidated log if it exists (legacy Markdown)
+  if (existsSync(consolidatedLogPath)) {
+    const content = readFileSync(consolidatedLogPath, 'utf-8');
+    mergePartial(parseSessionLogContent(content));
+  }
+
+  // Read individual session files (YAML first, then Markdown legacy)
+  if (existsSync(sessionsDir)) {
+    const files = readdirSync(sessionsDir).sort();
+
+    for (const file of files) {
+      const filePath = join(sessionsDir, file);
+      if (!statSync(filePath).isFile()) continue;
+
+      if (file.endsWith('.yaml') || file.endsWith('.yml')) {
+        const content = readFileSync(filePath, 'utf-8');
+        mergePartial(parseYamlSessionLog(content));
+      } else if (file.endsWith('.md')) {
+        const content = readFileSync(filePath, 'utf-8');
+        mergePartial(parseSessionLogContent(content));
       }
     }
   }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { parseSessionLogContent, parseAllSessionLogs } from '../session-log-parser.mjs';
+import { parseSessionLogContent, parseYamlSessionLog, parseAllSessionLogs } from '../session-log-parser.mjs';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -278,6 +278,154 @@ describe('parseSessionLogContent', () => {
   });
 });
 
+describe('parseYamlSessionLog', () => {
+  it('parses a minimal YAML session with pages', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Fix some bug
+summary: Fixed the thing that was broken.
+pages:
+  - page-one
+  - page-two
+`;
+    const result = parseYamlSessionLog(content);
+
+    expect(Object.keys(result).sort()).toEqual(['page-one', 'page-two']);
+    expect(result['page-one']).toEqual([{
+      date: '2026-02-15',
+      branch: 'claude/my-branch',
+      title: 'Fix some bug',
+      summary: 'Fixed the thing that was broken.',
+    }]);
+  });
+
+  it('returns empty object when pages is empty', () => {
+    const content = `date: 2026-02-15
+branch: claude/infra
+title: Update CI
+summary: Changed CI config.
+pages: []
+`;
+    const result = parseYamlSessionLog(content);
+    expect(Object.keys(result)).toEqual([]);
+  });
+
+  it('returns empty object when pages is missing', () => {
+    const content = `date: 2026-02-15
+branch: claude/infra
+title: Update CI
+summary: Infrastructure only.
+`;
+    const result = parseYamlSessionLog(content);
+    expect(Object.keys(result)).toEqual([]);
+  });
+
+  it('parses integer PR number', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Fix
+summary: Done.
+pages: [page-one]
+pr: 42
+`;
+    const result = parseYamlSessionLog(content);
+    expect(result['page-one'][0].pr).toBe(42);
+  });
+
+  it('parses PR number from #NNN string', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Fix
+summary: Done.
+pages: [page-one]
+pr: "#42"
+`;
+    const result = parseYamlSessionLog(content);
+    expect(result['page-one'][0].pr).toBe(42);
+  });
+
+  it('parses model, duration, cost fields', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Full metadata
+summary: Did everything.
+pages: [page-one]
+model: opus-4-6
+duration: ~2h
+cost: ~$12
+`;
+    const result = parseYamlSessionLog(content);
+    const entry = result['page-one'][0];
+    expect(entry.model).toBe('opus-4-6');
+    expect(entry.duration).toBe('~2h');
+    expect(entry.cost).toBe('~$12');
+  });
+
+  it('omits optional fields when not present', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Minimal
+summary: Bare minimum.
+pages: [page-one]
+`;
+    const result = parseYamlSessionLog(content);
+    const entry = result['page-one'][0];
+    expect(entry.model).toBeUndefined();
+    expect(entry.duration).toBeUndefined();
+    expect(entry.cost).toBeUndefined();
+    expect(entry.pr).toBeUndefined();
+  });
+
+  it('filters non-slug page IDs with spaces or uppercase', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Test
+summary: Done.
+pages:
+  - valid-page
+  - Invalid Page
+  - good-page-2
+`;
+    const result = parseYamlSessionLog(content);
+    // "Invalid Page" is filtered out (has space and uppercase)
+    expect(Object.keys(result).sort()).toEqual(['good-page-2', 'valid-page']);
+  });
+
+  it('returns empty object for invalid YAML', () => {
+    const result = parseYamlSessionLog('not: valid: yaml: [unclosed');
+    expect(Object.keys(result)).toEqual([]);
+  });
+
+  it('returns empty object when required fields are missing', () => {
+    const result = parseYamlSessionLog('pages: [page-one]\nsummary: No date/branch/title.');
+    expect(Object.keys(result)).toEqual([]);
+  });
+
+  it('trims trailing whitespace from summary', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Test
+summary: "  Summary with spaces.  "
+pages: [page-one]
+`;
+    const result = parseYamlSessionLog(content);
+    expect(result['page-one'][0].summary).toBe('Summary with spaces.');
+  });
+
+  it('handles block scalar summary (folded)', () => {
+    const content = `date: 2026-02-15
+branch: claude/my-branch
+title: Test
+summary: >
+  This is a multi-line
+  summary that gets folded.
+pages: [page-one]
+`;
+    const result = parseYamlSessionLog(content);
+    expect(result['page-one'][0].summary).toBe('This is a multi-line summary that gets folded.');
+  });
+});
+
 describe('parseAllSessionLogs', () => {
   let tmpDir;
 
@@ -372,5 +520,71 @@ describe('parseAllSessionLogs', () => {
     const sessionsDir = path.join(tmpDir, 'nonexistent-dir');
     const result = parseAllSessionLogs(logPath, sessionsDir);
     expect(result).toEqual({});
+  });
+
+  it('reads from individual YAML session files', () => {
+    const logPath = path.join(tmpDir, 'session-log.md'); // doesn't exist
+    const sessionsDir = path.join(tmpDir, 'sessions');
+    fs.mkdirSync(sessionsDir);
+    fs.writeFileSync(path.join(sessionsDir, '2026-02-15_branch-a.yaml'), `date: 2026-02-15
+branch: claude/branch-a
+title: YAML session
+summary: Did something in YAML.
+pages:
+  - yaml-page
+`);
+    const result = parseAllSessionLogs(logPath, sessionsDir);
+
+    expect(result['yaml-page']).toHaveLength(1);
+    expect(result['yaml-page'][0].title).toBe('YAML session');
+  });
+
+  it('merges YAML and Markdown session files', () => {
+    const logPath = path.join(tmpDir, 'session-log.md'); // doesn't exist
+    const sessionsDir = path.join(tmpDir, 'sessions');
+    fs.mkdirSync(sessionsDir);
+
+    fs.writeFileSync(path.join(sessionsDir, '2026-02-14_old.md'), `## 2026-02-14 | claude/old | Old MD session
+
+**What was done:** Old work.
+
+**Pages:** old-page
+
+`);
+    fs.writeFileSync(path.join(sessionsDir, '2026-02-15_new.yaml'), `date: 2026-02-15
+branch: claude/new
+title: New YAML session
+summary: New work.
+pages: [new-page]
+`);
+
+    const result = parseAllSessionLogs(logPath, sessionsDir);
+    expect(result['old-page']).toHaveLength(1);
+    expect(result['new-page']).toHaveLength(1);
+  });
+
+  it('deduplicates across YAML and Markdown with same content', () => {
+    const logPath = path.join(tmpDir, 'session-log.md'); // doesn't exist
+    const sessionsDir = path.join(tmpDir, 'sessions');
+    fs.mkdirSync(sessionsDir);
+
+    // Same session data in both formats
+    fs.writeFileSync(path.join(sessionsDir, '2026-02-13_dup.md'), `## 2026-02-13 | claude/dup | Dup session
+
+**What was done:** Duplicate work.
+
+**Pages:** dup-page
+
+`);
+    fs.writeFileSync(path.join(sessionsDir, '2026-02-13_dup.yaml'), `date: 2026-02-13
+branch: claude/dup
+title: Dup session
+summary: Duplicate work.
+pages: [dup-page]
+`);
+
+    const result = parseAllSessionLogs(logPath, sessionsDir);
+    // Should appear only once
+    expect(result['dup-page']).toHaveLength(1);
   });
 });

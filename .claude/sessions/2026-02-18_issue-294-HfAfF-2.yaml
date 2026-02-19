@@ -1,0 +1,14 @@
+date: 2026-02-18
+branch: claude/issue-294-HfAfF
+title: PR polish + frontmatter update
+model: sonnet-4
+duration: ~15min
+pages:
+  - anthropic-stakeholders
+summary: "Updated PR #295 description to check off the already-satisfied CI lint item and annotate remaining test plan items as human-action-required. Updated `anthropic-stakeholders.mdx` frontmatter: raised `readerImportance` and `researchImportance` to 85, set `update_frequency` to 14 days. Ran full gate check (7/7 passed). Marked issue #294 done."
+pr: 295
+issues:
+  - "`pnpm crux issues done` does not accept `--pr=URL` argument (flag silently rejected with usage error); had to run without the flag."
+learnings:
+  - The wip-checklist from a prior session was already 27/27 — the checklist system doesn't distinguish between sessions on the same branch.
+  - Test plan items requiring `workflow_dispatch` and scheduled-run observation are genuinely human-only; worth marking them explicitly in the PR body rather than leaving them ambiguously unchecked.

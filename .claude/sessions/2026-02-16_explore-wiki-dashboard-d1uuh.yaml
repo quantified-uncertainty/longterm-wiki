@@ -1,0 +1,14 @@
+date: 2026-02-16
+branch: claude/explore-wiki-dashboard-d1uuh
+title: Add interventions & proposals dashboards
+pages: []
+summary: "Created rich internal dashboards at `/internal/interventions` and `/internal/proposals`. Features: expandable rows (InterventionCard/ProposalCard), summary stat cards, category/domain filter tabs, cost-effectiveness leverage column with dollar-range parsing. Extracted shared `expandToggleColumn` into `column-helpers.tsx`, shared `FilterTabs` and `TableSearchBar` into `app/internal/shared.tsx` to avoid duplication across both dashboards. Re-added Lead Orgs column to proposals table."
+pr: 167
+issues:
+  - '`computeLeverage` was initially in a `"use client"` file but called from a server component — extracted into `leverage.ts`'
+  - Unused `ColumnFiltersState` import caught in review
+  - Lead Orgs column was accidentally dropped when adding new columns — restored
+learnings:
+  - "`interventions` and `proposals` keys were already being loaded into `database.json` by `build-data.mjs` but the `DatabaseShape` interface and data layer had no corresponding fields or getters — pure dead data until now"
+  - The existing `column-helpers.tsx` is the right place for shared column factories — `expandToggleColumn` fits naturally alongside `levelNoteColumn`, `simpleLevelColumn`, etc.
+  - Compound dollar costs (e.g., "$10-50M firmware dev + $10-100M landmark servers") only parse the first range; this is a known limitation but moot since those proposals also have non-dollar EVs
