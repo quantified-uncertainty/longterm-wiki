@@ -14,7 +14,7 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationQuotes, citationContent, db } from '../lib/knowledge-db.ts';
+import { citationQuotes, citationContent, getDb } from '../lib/knowledge-db.ts';
 import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
 
@@ -198,7 +198,7 @@ async function main() {
   }
 
   if (all) {
-    const pages = db
+    const pages = getDb()
       .prepare(
         `SELECT DISTINCT page_id, COUNT(*) as quote_count
          FROM citation_quotes

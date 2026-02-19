@@ -20,6 +20,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { join, relative, basename } from 'path';
+import { fileURLToPath } from 'url';
 import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatterAndBody } from '../lib/mdx-utils.ts';
@@ -29,6 +30,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { readReviews } from '../lib/review-tracking.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getEntityTypeFromPath } from '../lib/page-analysis.ts';
+import { citationQuotes } from '../lib/knowledge-db.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -236,12 +238,11 @@ function assessPage(
 // Accuracy data loader
 // ---------------------------------------------------------------------------
 
-async function loadAccuracyMap(): Promise<AccuracyMap | null> {
+function loadAccuracyMap(): AccuracyMap | null {
   const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
   if (!existsSync(dbPath)) return null;
 
   try {
-    const { citationQuotes } = await import('../lib/knowledge-db.ts');
     const rows = citationQuotes.getAccuracySummaryAllPages();
     const map: AccuracyMap = new Map();
     for (const row of rows) {
@@ -258,7 +259,7 @@ async function loadAccuracyMap(): Promise<AccuracyMap | null> {
 // Main
 // ---------------------------------------------------------------------------
 
-async function main() {
+function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const ci = args.ci === true;
   const json = args.json === true;
@@ -266,7 +267,7 @@ async function main() {
   const colors = getColors(ci || json);
 
   // Load accuracy data from SQLite (if available)
-  const accuracyMap = await loadAccuracyMap();
+  const accuracyMap = loadAccuracyMap();
 
   // Assess all pages
   const files = findMdxFiles(CONTENT_DIR_ABS);
@@ -401,7 +402,12 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((err: Error) => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+// Only run when executed directly (not when imported in tests)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  try {
+    main();
+  } catch (err: unknown) {
+    console.error('Error:', err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
+}

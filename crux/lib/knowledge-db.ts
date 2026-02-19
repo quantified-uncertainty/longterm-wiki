@@ -4,8 +4,13 @@
  * SQLite-based storage for articles, sources, summaries, and claims.
  * Designed for scale: 1000+ articles, 10,000+ sources.
  *
+ * The database is lazy-initialized on first access via getDb(). Importing
+ * this module does NOT create the SQLite file or load native bindings,
+ * so modules that transitively depend on this file can be safely imported
+ * in test environments without better-sqlite3.
+ *
  * Usage:
- *   import { db, articles, sources, summaries, getResearchContext } from './lib/knowledge-db.ts';
+ *   import { getDb, articles, sources, summaries } from './lib/knowledge-db.ts';
  */
 
 import Database from 'better-sqlite3';
@@ -22,189 +27,202 @@ const CACHE_DIR = join(PROJECT_ROOT, '.cache');
 const DB_PATH = join(CACHE_DIR, 'knowledge.db');
 const SOURCES_DIR = join(CACHE_DIR, 'sources');
 
-// Ensure directories exist
-for (const dir of [CACHE_DIR, SOURCES_DIR, join(SOURCES_DIR, 'pdf'), join(SOURCES_DIR, 'html'), join(SOURCES_DIR, 'text')]) {
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
+// ---------------------------------------------------------------------------
+// Lazy initialization
+// ---------------------------------------------------------------------------
+
+let _db: InstanceType<typeof Database> | null = null;
+
+function ensureDirectories() {
+  for (const dir of [CACHE_DIR, SOURCES_DIR, join(SOURCES_DIR, 'pdf'), join(SOURCES_DIR, 'html'), join(SOURCES_DIR, 'text')]) {
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
   }
 }
 
-// Initialize database
-const db = new Database(DB_PATH);
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+function initSchema(db: InstanceType<typeof Database>) {
+  db.exec(`
+    -- Articles (MDX content files)
+    CREATE TABLE IF NOT EXISTS articles (
+      id TEXT PRIMARY KEY,
+      path TEXT NOT NULL,
+      title TEXT,
+      description TEXT,
+      content TEXT,
+      word_count INTEGER,
+      quality INTEGER,
+      content_hash TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
 
-// =============================================================================
-// SCHEMA
-// =============================================================================
+    -- External sources (papers, blogs, reports)
+    CREATE TABLE IF NOT EXISTS sources (
+      id TEXT PRIMARY KEY,
+      url TEXT,
+      doi TEXT,
+      title TEXT,
+      authors TEXT,
+      year INTEGER,
+      source_type TEXT,
+      content TEXT,
+      content_path TEXT,
+      fetch_status TEXT DEFAULT 'pending',
+      fetch_error TEXT,
+      fetched_at TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
 
-db.exec(`
-  -- Articles (MDX content files)
-  CREATE TABLE IF NOT EXISTS articles (
-    id TEXT PRIMARY KEY,
-    path TEXT NOT NULL,
-    title TEXT,
-    description TEXT,
-    content TEXT,
-    word_count INTEGER,
-    quality INTEGER,
-    content_hash TEXT,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
-  );
+    -- Article -> Source relationships
+    CREATE TABLE IF NOT EXISTS article_sources (
+      article_id TEXT REFERENCES articles(id) ON DELETE CASCADE,
+      source_id TEXT REFERENCES sources(id) ON DELETE CASCADE,
+      citation_context TEXT,
+      PRIMARY KEY (article_id, source_id)
+    );
 
-  -- External sources (papers, blogs, reports)
-  CREATE TABLE IF NOT EXISTS sources (
-    id TEXT PRIMARY KEY,
-    url TEXT,
-    doi TEXT,
-    title TEXT,
-    authors TEXT,
-    year INTEGER,
-    source_type TEXT,
-    content TEXT,
-    content_path TEXT,
-    fetch_status TEXT DEFAULT 'pending',
-    fetch_error TEXT,
-    fetched_at TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
-  );
+    -- Entity relationships (from entities.yaml)
+    CREATE TABLE IF NOT EXISTS entity_relations (
+      from_id TEXT,
+      to_id TEXT,
+      relationship TEXT,
+      PRIMARY KEY (from_id, to_id)
+    );
 
-  -- Article -> Source relationships
-  CREATE TABLE IF NOT EXISTS article_sources (
-    article_id TEXT REFERENCES articles(id) ON DELETE CASCADE,
-    source_id TEXT REFERENCES sources(id) ON DELETE CASCADE,
-    citation_context TEXT,
-    PRIMARY KEY (article_id, source_id)
-  );
+    -- AI-generated summaries
+    CREATE TABLE IF NOT EXISTS summaries (
+      entity_id TEXT PRIMARY KEY,
+      entity_type TEXT NOT NULL,
+      one_liner TEXT,
+      summary TEXT,
+      review TEXT,
+      key_points TEXT,
+      key_claims TEXT,
+      model TEXT,
+      tokens_used INTEGER,
+      generated_at TEXT DEFAULT (datetime('now'))
+    );
 
-  -- Entity relationships (from entities.yaml)
-  CREATE TABLE IF NOT EXISTS entity_relations (
-    from_id TEXT,
-    to_id TEXT,
-    relationship TEXT,
-    PRIMARY KEY (from_id, to_id)
-  );
+    -- Extracted claims (for consistency checking)
+    CREATE TABLE IF NOT EXISTS claims (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      entity_id TEXT NOT NULL,
+      entity_type TEXT NOT NULL,
+      claim_type TEXT NOT NULL,
+      claim_text TEXT NOT NULL,
+      value TEXT,
+      unit TEXT,
+      confidence TEXT,
+      source_quote TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
 
-  -- AI-generated summaries
-  CREATE TABLE IF NOT EXISTS summaries (
-    entity_id TEXT PRIMARY KEY,
-    entity_type TEXT NOT NULL,
-    one_liner TEXT,
-    summary TEXT,
-    review TEXT,
-    key_points TEXT,
-    key_claims TEXT,
-    model TEXT,
-    tokens_used INTEGER,
-    generated_at TEXT DEFAULT (datetime('now'))
-  );
+    -- Indexes for performance
+    CREATE INDEX IF NOT EXISTS idx_sources_url ON sources(url);
+    CREATE INDEX IF NOT EXISTS idx_sources_doi ON sources(doi);
+    CREATE INDEX IF NOT EXISTS idx_sources_status ON sources(fetch_status);
+    CREATE INDEX IF NOT EXISTS idx_summaries_type ON summaries(entity_type);
+    CREATE INDEX IF NOT EXISTS idx_claims_entity ON claims(entity_id);
+    CREATE INDEX IF NOT EXISTS idx_claims_type ON claims(claim_type);
+    CREATE INDEX IF NOT EXISTS idx_entity_relations_from ON entity_relations(from_id);
+    CREATE INDEX IF NOT EXISTS idx_entity_relations_to ON entity_relations(to_id);
+  `);
 
-  -- Extracted claims (for consistency checking)
-  CREATE TABLE IF NOT EXISTS claims (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    entity_id TEXT NOT NULL,
-    entity_type TEXT NOT NULL,
-    claim_type TEXT NOT NULL,
-    claim_text TEXT NOT NULL,
-    value TEXT,
-    unit TEXT,
-    confidence TEXT,
-    source_quote TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
-  );
+  // Migrations
 
-  -- Indexes for performance
-  CREATE INDEX IF NOT EXISTS idx_sources_url ON sources(url);
-  CREATE INDEX IF NOT EXISTS idx_sources_doi ON sources(doi);
-  CREATE INDEX IF NOT EXISTS idx_sources_status ON sources(fetch_status);
-  CREATE INDEX IF NOT EXISTS idx_summaries_type ON summaries(entity_type);
-  CREATE INDEX IF NOT EXISTS idx_claims_entity ON claims(entity_id);
-  CREATE INDEX IF NOT EXISTS idx_claims_type ON claims(claim_type);
-  CREATE INDEX IF NOT EXISTS idx_entity_relations_from ON entity_relations(from_id);
-  CREATE INDEX IF NOT EXISTS idx_entity_relations_to ON entity_relations(to_id);
-`);
-
-// =============================================================================
-// MIGRATIONS (for schema updates)
-// =============================================================================
-
-// Add review column to summaries table if it doesn't exist
-try {
-  db.exec('ALTER TABLE summaries ADD COLUMN review TEXT');
-} catch (e: unknown) {
-  const msg = e instanceof Error ? e.message : String(e);
-  if (!msg.includes('duplicate column') && !msg.includes('already exists')) {
-    console.warn('Warning: ALTER TABLE summaries migration failed:', msg);
+  // Add review column to summaries table if it doesn't exist
+  try {
+    db.exec('ALTER TABLE summaries ADD COLUMN review TEXT');
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!msg.includes('duplicate column') && !msg.includes('already exists')) {
+      console.warn('Warning: ALTER TABLE summaries migration failed:', msg);
+    }
   }
+
+  // Add citation_content table for full article text storage (issue #200)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS citation_content (
+      url TEXT PRIMARY KEY,
+      page_id TEXT NOT NULL,
+      footnote INTEGER NOT NULL,
+      fetched_at TEXT NOT NULL,
+      http_status INTEGER,
+      content_type TEXT,
+      page_title TEXT,
+      full_html TEXT,
+      full_text TEXT,
+      content_length INTEGER,
+      content_hash TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_citation_content_page ON citation_content(page_id);
+  `);
+
+  // Add citation_quotes table for storing extracted supporting quotes
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS citation_quotes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      page_id TEXT NOT NULL,
+      footnote INTEGER NOT NULL,
+      url TEXT,
+      resource_id TEXT,
+      claim_text TEXT NOT NULL,
+      claim_context TEXT,
+      source_quote TEXT,
+      source_location TEXT,
+      quote_verified INTEGER DEFAULT 0,
+      verification_method TEXT,
+      verification_score REAL,
+      verified_at TEXT,
+      source_title TEXT,
+      source_type TEXT,
+      extraction_model TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(page_id, footnote)
+    );
+    CREATE INDEX IF NOT EXISTS idx_citation_quotes_page ON citation_quotes(page_id);
+    CREATE INDEX IF NOT EXISTS idx_citation_quotes_url ON citation_quotes(url);
+    CREATE INDEX IF NOT EXISTS idx_citation_quotes_verified ON citation_quotes(quote_verified);
+  `);
+
+  // Add accuracy columns (migration-safe — only adds if missing)
+  try {
+    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_verdict TEXT`);
+  } catch { /* column already exists */ }
+  try {
+    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_issues TEXT`);
+  } catch { /* column already exists */ }
+  try {
+    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_score REAL`);
+  } catch { /* column already exists */ }
+  try {
+    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_checked_at TEXT`);
+  } catch { /* column already exists */ }
+  try {
+    db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_supporting_quotes TEXT`);
+  } catch { /* column already exists */ }
+  try {
+    db.exec(`ALTER TABLE citation_quotes ADD COLUMN verification_difficulty TEXT`);
+  } catch { /* column already exists */ }
 }
 
-// Add citation_content table for full article text storage (issue #200)
-db.exec(`
-  CREATE TABLE IF NOT EXISTS citation_content (
-    url TEXT PRIMARY KEY,
-    page_id TEXT NOT NULL,
-    footnote INTEGER NOT NULL,
-    fetched_at TEXT NOT NULL,
-    http_status INTEGER,
-    content_type TEXT,
-    page_title TEXT,
-    full_html TEXT,
-    full_text TEXT,
-    content_length INTEGER,
-    content_hash TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
-  );
-  CREATE INDEX IF NOT EXISTS idx_citation_content_page ON citation_content(page_id);
-`);
-
-// Add citation_quotes table for storing extracted supporting quotes
-db.exec(`
-  CREATE TABLE IF NOT EXISTS citation_quotes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    page_id TEXT NOT NULL,
-    footnote INTEGER NOT NULL,
-    url TEXT,
-    resource_id TEXT,
-    claim_text TEXT NOT NULL,
-    claim_context TEXT,
-    source_quote TEXT,
-    source_location TEXT,
-    quote_verified INTEGER DEFAULT 0,
-    verification_method TEXT,
-    verification_score REAL,
-    verified_at TEXT,
-    source_title TEXT,
-    source_type TEXT,
-    extraction_model TEXT,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now')),
-    UNIQUE(page_id, footnote)
-  );
-  CREATE INDEX IF NOT EXISTS idx_citation_quotes_page ON citation_quotes(page_id);
-  CREATE INDEX IF NOT EXISTS idx_citation_quotes_url ON citation_quotes(url);
-  CREATE INDEX IF NOT EXISTS idx_citation_quotes_verified ON citation_quotes(quote_verified);
-`);
-
-// Add accuracy columns (migration-safe — only adds if missing)
-try {
-  db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_verdict TEXT`);
-} catch { /* column already exists */ }
-try {
-  db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_issues TEXT`);
-} catch { /* column already exists */ }
-try {
-  db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_score REAL`);
-} catch { /* column already exists */ }
-try {
-  db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_checked_at TEXT`);
-} catch { /* column already exists */ }
-try {
-  db.exec(`ALTER TABLE citation_quotes ADD COLUMN accuracy_supporting_quotes TEXT`);
-} catch { /* column already exists */ }
-try {
-  db.exec(`ALTER TABLE citation_quotes ADD COLUMN verification_difficulty TEXT`);
-} catch { /* column already exists */ }
+/**
+ * Get the database instance, lazily initializing on first call.
+ * This avoids creating the SQLite file or loading native bindings at import time.
+ */
+export function getDb(): InstanceType<typeof Database> {
+  if (!_db) {
+    ensureDirectories();
+    _db = new Database(DB_PATH);
+    _db.pragma('journal_mode = WAL');
+    _db.pragma('foreign_keys = ON');
+    initSchema(_db);
+  }
+  return _db;
+}
 
 // =============================================================================
 // TYPES
@@ -375,7 +393,7 @@ export const articles = {
    * Insert or update an article
    */
   upsert(article: ArticleUpsertData) {
-    const stmt = db.prepare(`
+    const stmt = getDb().prepare(`
       INSERT INTO articles (id, path, title, description, content, word_count, quality, content_hash, updated_at)
       VALUES (@id, @path, @title, @description, @content, @wordCount, @quality, @contentHash, datetime('now'))
       ON CONFLICT(id) DO UPDATE SET
@@ -395,14 +413,14 @@ export const articles = {
    * Get an article by ID
    */
   get(id: string): ArticleRow | undefined {
-    return db.prepare('SELECT * FROM articles WHERE id = ?').get(id) as ArticleRow | undefined;
+    return getDb().prepare('SELECT * FROM articles WHERE id = ?').get(id) as ArticleRow | undefined;
   },
 
   /**
    * Get article with its summary
    */
   getWithSummary(id: string): ArticleRow | undefined {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT a.*, s.one_liner, s.summary, s.key_points, s.key_claims
       FROM articles a
       LEFT JOIN summaries s ON a.id = s.entity_id AND s.entity_type = 'article'
@@ -414,14 +432,14 @@ export const articles = {
    * Get all articles
    */
   getAll(): ArticleRow[] {
-    return db.prepare('SELECT * FROM articles ORDER BY title').all() as ArticleRow[];
+    return getDb().prepare('SELECT * FROM articles ORDER BY title').all() as ArticleRow[];
   },
 
   /**
    * Get articles that need summaries
    */
   needingSummary(): ArticleRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT a.* FROM articles a
       LEFT JOIN summaries s ON a.id = s.entity_id AND s.entity_type = 'article'
       WHERE s.entity_id IS NULL
@@ -433,7 +451,7 @@ export const articles = {
    * Get articles where content has changed since last summary
    */
   needingResummary(): ArticleRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT a.* FROM articles a
       JOIN summaries s ON a.id = s.entity_id AND s.entity_type = 'article'
       WHERE a.updated_at > s.generated_at
@@ -445,7 +463,7 @@ export const articles = {
    * Check if article content has changed
    */
   hasChanged(id: string, newHash: string): boolean {
-    const existing = db.prepare('SELECT content_hash FROM articles WHERE id = ?').get(id) as { content_hash: string } | undefined;
+    const existing = getDb().prepare('SELECT content_hash FROM articles WHERE id = ?').get(id) as { content_hash: string } | undefined;
     return !existing || existing.content_hash !== newHash;
   },
 
@@ -453,14 +471,14 @@ export const articles = {
    * Get article count
    */
   count(): number {
-    return (db.prepare('SELECT COUNT(*) as count FROM articles').get() as { count: number }).count;
+    return (getDb().prepare('SELECT COUNT(*) as count FROM articles').get() as { count: number }).count;
   },
 
   /**
    * Search articles by content
    */
   search(query: string): ArticleRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT * FROM articles
       WHERE content LIKE '%' || ? || '%' OR title LIKE '%' || ? || '%'
       ORDER BY quality DESC
@@ -479,7 +497,7 @@ export const sources = {
    */
   upsert(source: SourceUpsertData) {
     const id = source.id || hashId(source.url || source.doi || source.title || 'unknown');
-    const stmt = db.prepare(`
+    const stmt = getDb().prepare(`
       INSERT INTO sources (id, url, doi, title, authors, year, source_type, fetch_status, created_at)
       VALUES (@id, @url, @doi, @title, @authors, @year, @sourceType, 'pending', datetime('now'))
       ON CONFLICT(id) DO UPDATE SET
@@ -503,7 +521,7 @@ export const sources = {
    * Get a source by ID
    */
   get(id: string): SourceRow | undefined {
-    const source = db.prepare('SELECT * FROM sources WHERE id = ?').get(id) as SourceRow | undefined;
+    const source = getDb().prepare('SELECT * FROM sources WHERE id = ?').get(id) as SourceRow | undefined;
     if (source && typeof source.authors === 'string') {
       source.authors = JSON.parse(source.authors);
     }
@@ -514,7 +532,7 @@ export const sources = {
    * Get source by URL
    */
   getByUrl(url: string): SourceRow | undefined {
-    const source = db.prepare('SELECT * FROM sources WHERE url = ?').get(url) as SourceRow | undefined;
+    const source = getDb().prepare('SELECT * FROM sources WHERE url = ?').get(url) as SourceRow | undefined;
     if (source && typeof source.authors === 'string') {
       source.authors = JSON.parse(source.authors);
     }
@@ -525,7 +543,7 @@ export const sources = {
    * Get sources pending fetch
    */
   getPending(limit: number = 100): SourceRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT * FROM sources
       WHERE fetch_status = 'pending'
       ORDER BY created_at
@@ -537,7 +555,7 @@ export const sources = {
    * Mark source as fetched
    */
   markFetched(id: string, content: string, contentPath: string) {
-    return db.prepare(`
+    return getDb().prepare(`
       UPDATE sources
       SET content = ?, content_path = ?, fetch_status = 'fetched', fetched_at = datetime('now')
       WHERE id = ?
@@ -548,7 +566,7 @@ export const sources = {
    * Mark source as failed
    */
   markFailed(id: string, error: string) {
-    return db.prepare(`
+    return getDb().prepare(`
       UPDATE sources
       SET fetch_status = 'failed', fetch_error = ?, fetched_at = datetime('now')
       WHERE id = ?
@@ -574,7 +592,7 @@ export const sources = {
     if (updates.length === 0) return;
 
     values.push(id as string);
-    return db.prepare(`
+    return getDb().prepare(`
       UPDATE sources
       SET ${updates.join(', ')}
       WHERE id = ?
@@ -585,7 +603,7 @@ export const sources = {
    * Get failed sources (for retry)
    */
   getFailed(limit: number = 100): SourceRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT * FROM sources
       WHERE fetch_status = 'failed'
       ORDER BY fetched_at DESC
@@ -597,7 +615,7 @@ export const sources = {
    * Get sources for an article
    */
   getForArticle(articleId: string): SourceRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT s.*, sm.summary as source_summary, ars.citation_context
       FROM sources s
       JOIN article_sources ars ON s.id = ars.source_id
@@ -610,7 +628,7 @@ export const sources = {
    * Link a source to an article
    */
   linkToArticle(articleId: string, sourceId: string, citationContext: string | null = null) {
-    const stmt = db.prepare(`
+    const stmt = getDb().prepare(`
       INSERT INTO article_sources (article_id, source_id, citation_context)
       VALUES (?, ?, ?)
       ON CONFLICT DO UPDATE SET citation_context = ?
@@ -622,7 +640,7 @@ export const sources = {
    * Get sources needing summaries
    */
   needingSummary(): SourceRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT s.* FROM sources s
       LEFT JOIN summaries sm ON s.id = sm.entity_id AND sm.entity_type = 'source'
       WHERE s.fetch_status = 'fetched' AND s.content IS NOT NULL AND sm.entity_id IS NULL
@@ -634,7 +652,7 @@ export const sources = {
    * Get source statistics
    */
   stats(): SourceStats {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT
         COUNT(*) as total,
         SUM(CASE WHEN fetch_status = 'pending' THEN 1 ELSE 0 END) as pending,
@@ -649,14 +667,14 @@ export const sources = {
    * Get all sources
    */
   getAll(): SourceRow[] {
-    return db.prepare('SELECT * FROM sources ORDER BY title').all() as SourceRow[];
+    return getDb().prepare('SELECT * FROM sources ORDER BY title').all() as SourceRow[];
   },
 
   /**
    * Count sources
    */
   count(): number {
-    return (db.prepare('SELECT COUNT(*) as count FROM sources').get() as { count: number }).count;
+    return (getDb().prepare('SELECT COUNT(*) as count FROM sources').get() as { count: number }).count;
   }
 };
 
@@ -669,7 +687,7 @@ export const relations = {
    * Set a relationship between entities
    */
   set(fromId: string, toId: string, relationship: string = 'related') {
-    const stmt = db.prepare(`
+    const stmt = getDb().prepare(`
       INSERT INTO entity_relations (from_id, to_id, relationship)
       VALUES (?, ?, ?)
       ON CONFLICT DO UPDATE SET relationship = ?
@@ -681,7 +699,7 @@ export const relations = {
    * Get related entities
    */
   getRelated(entityId: string): RelationRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT to_id as id, relationship FROM entity_relations WHERE from_id = ?
       UNION
       SELECT from_id as id, relationship FROM entity_relations WHERE to_id = ?
@@ -692,13 +710,14 @@ export const relations = {
    * Clear all relations (for rebuild)
    */
   clear() {
-    return db.prepare('DELETE FROM entity_relations').run();
+    return getDb().prepare('DELETE FROM entity_relations').run();
   },
 
   /**
    * Bulk insert relations
    */
   bulkInsert(relationsData: RelationInsertData[]) {
+    const db = getDb();
     const stmt = db.prepare(`
       INSERT OR REPLACE INTO entity_relations (from_id, to_id, relationship)
       VALUES (?, ?, ?)
@@ -721,7 +740,7 @@ export const summaries = {
    * Insert or update a summary
    */
   upsert(entityId: string, entityType: string, data: SummaryUpsertData) {
-    const stmt = db.prepare(`
+    const stmt = getDb().prepare(`
       INSERT INTO summaries (entity_id, entity_type, one_liner, summary, review, key_points, key_claims, model, tokens_used, generated_at)
       VALUES (@entityId, @entityType, @oneLiner, @summary, @review, @keyPoints, @keyClaims, @model, @tokensUsed, datetime('now'))
       ON CONFLICT(entity_id) DO UPDATE SET
@@ -751,7 +770,7 @@ export const summaries = {
    * Get a summary
    */
   get(entityId: string): SummaryRow | undefined {
-    const summary = db.prepare('SELECT * FROM summaries WHERE entity_id = ?').get(entityId) as SummaryRow | undefined;
+    const summary = getDb().prepare('SELECT * FROM summaries WHERE entity_id = ?').get(entityId) as SummaryRow | undefined;
     if (summary) {
       summary.keyPoints = JSON.parse(summary.key_points || '[]');
       summary.keyClaims = JSON.parse(summary.key_claims || '[]');
@@ -763,14 +782,14 @@ export const summaries = {
    * Get all summaries of a type
    */
   getAll(entityType: string): SummaryRow[] {
-    return db.prepare('SELECT * FROM summaries WHERE entity_type = ?').all(entityType) as SummaryRow[];
+    return getDb().prepare('SELECT * FROM summaries WHERE entity_type = ?').all(entityType) as SummaryRow[];
   },
 
   /**
    * Get summary statistics
    */
   stats(): SummaryStats[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT
         entity_type,
         COUNT(*) as count,
@@ -784,7 +803,7 @@ export const summaries = {
    * Export all summaries as a lookup object
    */
   export(): Record<string, { type: string; oneLiner: string | null; summary: string | null; keyPoints: unknown[]; keyClaims: unknown[] }> {
-    const all = db.prepare('SELECT * FROM summaries').all() as SummaryRow[];
+    const all = getDb().prepare('SELECT * FROM summaries').all() as SummaryRow[];
     const result: Record<string, { type: string; oneLiner: string | null; summary: string | null; keyPoints: unknown[]; keyClaims: unknown[] }> = {};
     for (const s of all) {
       result[s.entity_id] = {
@@ -808,7 +827,7 @@ export const claims = {
    * Insert a claim
    */
   insert(claim: ClaimInsertData) {
-    const stmt = db.prepare(`
+    const stmt = getDb().prepare(`
       INSERT INTO claims (entity_id, entity_type, claim_type, claim_text, value, unit, confidence, source_quote)
       VALUES (@entityId, @entityType, @claimType, @claimText, @value, @unit, @confidence, @sourceQuote)
     `);
@@ -819,21 +838,21 @@ export const claims = {
    * Get claims for an entity
    */
   getForEntity(entityId: string): ClaimRow[] {
-    return db.prepare('SELECT * FROM claims WHERE entity_id = ?').all(entityId) as ClaimRow[];
+    return getDb().prepare('SELECT * FROM claims WHERE entity_id = ?').all(entityId) as ClaimRow[];
   },
 
   /**
    * Get claims by type
    */
   getByType(claimType: string): ClaimRow[] {
-    return db.prepare('SELECT * FROM claims WHERE claim_type = ?').all(claimType) as ClaimRow[];
+    return getDb().prepare('SELECT * FROM claims WHERE claim_type = ?').all(claimType) as ClaimRow[];
   },
 
   /**
    * Find similar claims (for consistency checking)
    */
   findSimilar(claimText: string): ClaimRow[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT * FROM claims
       WHERE claim_text LIKE '%' || ? || '%'
       ORDER BY entity_id
@@ -844,14 +863,14 @@ export const claims = {
    * Clear claims for an entity (for regeneration)
    */
   clearForEntity(entityId: string) {
-    return db.prepare('DELETE FROM claims WHERE entity_id = ?').run(entityId);
+    return getDb().prepare('DELETE FROM claims WHERE entity_id = ?').run(entityId);
   },
 
   /**
    * Get claim statistics
    */
   stats(): ClaimStats[] {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT claim_type, COUNT(*) as count
       FROM claims
       GROUP BY claim_type
@@ -895,7 +914,7 @@ export const citationContent = {
     contentLength: number | null;
   }) {
     const hash = data.fullText ? createHash('sha256').update(data.fullText).digest('hex').slice(0, 16) : null;
-    return db.prepare(`
+    return getDb().prepare(`
       INSERT OR REPLACE INTO citation_content
         (url, page_id, footnote, fetched_at, http_status, content_type, page_title, full_html, full_text, content_length, content_hash)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -910,28 +929,28 @@ export const citationContent = {
    * Get stored content for a URL
    */
   getByUrl(url: string): CitationContentRow | null {
-    return db.prepare('SELECT * FROM citation_content WHERE url = ?').get(url) as CitationContentRow | null;
+    return getDb().prepare('SELECT * FROM citation_content WHERE url = ?').get(url) as CitationContentRow | null;
   },
 
   /**
    * Get all stored content for a page
    */
   getByPage(pageId: string): CitationContentRow[] {
-    return db.prepare('SELECT * FROM citation_content WHERE page_id = ? ORDER BY footnote').all(pageId) as CitationContentRow[];
+    return getDb().prepare('SELECT * FROM citation_content WHERE page_id = ? ORDER BY footnote').all(pageId) as CitationContentRow[];
   },
 
   /**
    * Count stored citations
    */
   count(): number {
-    return (db.prepare('SELECT COUNT(*) as count FROM citation_content').get() as { count: number }).count;
+    return (getDb().prepare('SELECT COUNT(*) as count FROM citation_content').get() as { count: number }).count;
   },
 
   /**
    * Get storage stats
    */
   stats(): { totalUrls: number; totalPages: number; totalBytes: number } {
-    const row = db.prepare(`
+    const row = getDb().prepare(`
       SELECT
         COUNT(*) as totalUrls,
         COUNT(DISTINCT page_id) as totalPages,
@@ -1005,7 +1024,7 @@ export const citationQuotes = {
    * Keyed on (page_id, footnote) — one quote per footnote per page.
    */
   upsert(data: CitationQuoteUpsertData) {
-    return db.prepare(`
+    return getDb().prepare(`
       INSERT INTO citation_quotes (
         page_id, footnote, url, resource_id, claim_text, claim_context,
         source_quote, source_location, quote_verified, verification_method,
@@ -1055,7 +1074,7 @@ export const citationQuotes = {
    * Get all quotes for a page.
    */
   getByPage(pageId: string): CitationQuoteRow[] {
-    return db.prepare(
+    return getDb().prepare(
       'SELECT * FROM citation_quotes WHERE page_id = ? ORDER BY footnote',
     ).all(pageId) as CitationQuoteRow[];
   },
@@ -1064,7 +1083,7 @@ export const citationQuotes = {
    * Get quotes by URL (across all pages).
    */
   getByUrl(url: string): CitationQuoteRow[] {
-    return db.prepare(
+    return getDb().prepare(
       'SELECT * FROM citation_quotes WHERE url = ? ORDER BY page_id, footnote',
     ).all(url) as CitationQuoteRow[];
   },
@@ -1073,7 +1092,7 @@ export const citationQuotes = {
    * Get all unverified quotes (quotes extracted but not yet verified).
    */
   getUnverified(limit: number = 100): CitationQuoteRow[] {
-    return db.prepare(
+    return getDb().prepare(
       'SELECT * FROM citation_quotes WHERE source_quote IS NOT NULL AND quote_verified = 0 ORDER BY created_at LIMIT ?',
     ).all(limit) as CitationQuoteRow[];
   },
@@ -1087,7 +1106,7 @@ export const citationQuotes = {
     method: string,
     score: number,
   ) {
-    return db.prepare(`
+    return getDb().prepare(`
       UPDATE citation_quotes
       SET quote_verified = 1, verification_method = ?, verification_score = ?, verified_at = datetime('now'), updated_at = datetime('now')
       WHERE page_id = ? AND footnote = ?
@@ -1103,7 +1122,7 @@ export const citationQuotes = {
     method: string,
     score: number,
   ) {
-    return db.prepare(`
+    return getDb().prepare(`
       UPDATE citation_quotes
       SET quote_verified = 0, verification_method = ?, verification_score = ?, updated_at = datetime('now')
       WHERE page_id = ? AND footnote = ?
@@ -1114,7 +1133,7 @@ export const citationQuotes = {
    * Get a single quote by page and footnote.
    */
   get(pageId: string, footnote: number): CitationQuoteRow | null {
-    return db.prepare(
+    return getDb().prepare(
       'SELECT * FROM citation_quotes WHERE page_id = ? AND footnote = ?',
     ).get(pageId, footnote) as CitationQuoteRow | null;
   },
@@ -1123,7 +1142,7 @@ export const citationQuotes = {
    * Get aggregate statistics.
    */
   stats(): CitationQuoteStats {
-    const row = db.prepare(`
+    const row = getDb().prepare(`
       SELECT
         COUNT(*) as totalQuotes,
         COALESCE(SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END), 0) as withQuotes,
@@ -1140,7 +1159,7 @@ export const citationQuotes = {
    * Delete all quotes for a page (for re-extraction).
    */
   clearPage(pageId: string) {
-    return db.prepare('DELETE FROM citation_quotes WHERE page_id = ?').run(pageId);
+    return getDb().prepare('DELETE FROM citation_quotes WHERE page_id = ?').run(pageId);
   },
 
   /**
@@ -1155,7 +1174,7 @@ export const citationQuotes = {
     supportingQuotes?: string | null,
     verificationDifficulty?: string | null,
   ) {
-    return db.prepare(`
+    return getDb().prepare(`
       UPDATE citation_quotes
       SET accuracy_verdict = ?, accuracy_score = ?, accuracy_issues = ?,
           accuracy_supporting_quotes = ?, verification_difficulty = ?,
@@ -1168,7 +1187,7 @@ export const citationQuotes = {
    * Get citations with quotes that haven't been accuracy-checked yet.
    */
   getUncheckedAccuracy(limit: number = 100): CitationQuoteRow[] {
-    return db.prepare(
+    return getDb().prepare(
       `SELECT * FROM citation_quotes
        WHERE source_quote IS NOT NULL AND source_quote != ''
          AND accuracy_verdict IS NULL
@@ -1182,7 +1201,7 @@ export const citationQuotes = {
    * Returns one row per page with counts of checked and inaccurate citations.
    */
   getAccuracySummaryAllPages(): Array<{ page_id: string; checked: number; inaccurate: number }> {
-    return db.prepare(`
+    return getDb().prepare(`
       SELECT
         page_id,
         COUNT(*) as checked,
@@ -1197,7 +1216,7 @@ export const citationQuotes = {
    * Count total records.
    */
   count(): number {
-    return (db.prepare('SELECT COUNT(*) as count FROM citation_quotes').get() as { count: number }).count;
+    return (getDb().prepare('SELECT COUNT(*) as count FROM citation_quotes').get() as { count: number }).count;
   },
 };
 
@@ -1220,6 +1239,5 @@ export function getStats(): DatabaseStats {
   };
 }
 
-// Export database instance for direct queries if needed
-export { db, CACHE_DIR, SOURCES_DIR, PROJECT_ROOT };
-export default db;
+// Export getDb and path constants for direct queries
+export { CACHE_DIR, SOURCES_DIR, PROJECT_ROOT };
