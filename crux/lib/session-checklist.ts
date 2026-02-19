@@ -358,9 +358,11 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: 'pr-description',
     label: 'PR description',
-    description: 'Summary, key changes, test plan. All items checked and true.',
+    description:
+      'Summary, key changes, test plan. All items checked and true. Run `pnpm crux pr fix-body` to auto-repair any literal \\n in the PR body.',
     phase: 'ship',
     applicableTypes: 'all',
+    verifyCommand: 'pnpm crux pr fix-body',
   },
   {
     id: 'issue-tracking',

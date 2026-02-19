@@ -27,6 +27,7 @@
  *   review      Human review tracking and status
  *   citations   Citation verification and archival
  *   issues      Track Claude Code work on GitHub issues
+ *   pr          GitHub PR utilities (fix-body: repair literal \n in PR descriptions)
  *   agent-checklist  Manage agent checklists (init, check, verify, status, complete)
  *   facts       Propose new canonical facts from wiki page content
  *   entity      Entity ID management (rename with safe word-boundary matching)
@@ -66,6 +67,7 @@ import * as issuesCommands from './commands/issues.ts';
 import * as agentChecklistCommands from './commands/agent-checklist.ts';
 import * as factsCommands from './commands/facts.ts';
 import * as entityCommands from './commands/entity.ts';
+import * as prCommands from './commands/pr.ts';
 
 const domains = {
   validate: validateCommands,
@@ -89,6 +91,7 @@ const domains = {
   'agent-checklist': agentChecklistCommands,
   facts: factsCommands,
   entity: entityCommands,
+  pr: prCommands,
 };
 
 /**
