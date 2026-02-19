@@ -1,0 +1,41 @@
+date: 2026-02-19
+startedAt: 2026-02-19T06:56:17.789Z
+completedAt: 2026-02-19T08:12:19.463Z
+trigger: scheduled
+budget:
+  limit: 30
+  spent: 28.5
+digest:
+  sourcesChecked: 17
+  sourcesFailed: 3
+  itemsFetched: 1679
+  itemsRelevant: 1318
+plan:
+  pagesPlanned: 5
+  newPagesSuggested: 0
+execution:
+  pagesUpdated: 5
+  pagesFailed: 0
+  pagesSkipped: 0
+  results:
+    - pageId: alignment
+      status: success
+      tier: standard
+      durationMs: 1171112
+    - pageId: why-alignment-hard
+      status: success
+      tier: standard
+      durationMs: 1530700
+    - pageId: language-models
+      status: success
+      tier: standard
+      durationMs: 417746
+    - pageId: agentic-ai
+      status: success
+      tier: standard
+      durationMs: 502590
+    - pageId: situational-awareness
+      status: success
+      tier: polish
+      durationMs: 260013
+newPagesCreated: []
