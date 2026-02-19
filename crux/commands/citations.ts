@@ -37,7 +37,7 @@ const SCRIPTS = {
   'extract-quotes': {
     script: 'citations/extract-quotes.ts',
     description: 'Extract supporting quotes from cited sources',
-    passthrough: ['ci', 'json', 'all', 'limit', 'recheck', 'concurrency'],
+    passthrough: ['ci', 'json', 'all', 'limit', 'recheck', 'concurrency', 'dry-run'],
     positional: true,
   },
   'quote-report': {
@@ -54,7 +54,7 @@ const SCRIPTS = {
   'check-accuracy': {
     script: 'citations/check-accuracy.ts',
     description: 'Check if wiki claims accurately represent cited sources',
-    passthrough: ['ci', 'json', 'all', 'limit', 'recheck', 'concurrency'],
+    passthrough: ['ci', 'json', 'all', 'limit', 'recheck', 'concurrency', 'dry-run'],
     positional: true,
   },
   'normalize-footnotes': {
@@ -93,6 +93,7 @@ Options:
   --all             Process all pages with citations
   --limit=N         Limit number of pages to process (with --all)
   --concurrency=N   Process N pages in parallel (default: 1)
+  --dry-run         Show what would be processed without running
   --recheck         Re-process already-handled pages
   --refetch         Re-fetch source URLs (verify-quotes only)
   --broken          Show only broken citations/quotes

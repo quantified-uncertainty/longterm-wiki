@@ -384,10 +384,25 @@ async function main() {
       console.log(`  Concurrency: ${concurrency}\n`);
     }
 
+    const totalCitationCount = pages.reduce((s, p) => s + p.citationCount, 0);
+
+    // Dry-run: show what would be processed and exit
+    if (args['dry-run']) {
+      console.log(`${c.bold}Dry run — would process:${c.reset}`);
+      for (const page of pages) {
+        console.log(`  ${page.pageId} (${page.citationCount} citations)`);
+      }
+      console.log(`\n  Total: ${pages.length} pages, ${totalCitationCount} citations`);
+      console.log(`  Estimated LLM calls: ~${totalCitationCount} (one per citation with a URL)`);
+      process.exit(0);
+    }
+
     const allResults: ExtractResult[] = [];
+    const runStart = Date.now();
 
     for (let i = 0; i < pages.length; i += concurrency) {
       const batch = pages.slice(i, i + concurrency);
+      const batchStart = Date.now();
       const batchResults = await Promise.all(
         batch.map(async (page, batchIdx) => {
           const globalIdx = i + batchIdx;
@@ -419,6 +434,18 @@ async function main() {
         if (r) allResults.push(r);
       }
 
+      // Timing + ETA
+      const pagesCompleted = Math.min(i + concurrency, pages.length);
+      const elapsed = (Date.now() - runStart) / 1000;
+      const batchSec = (Date.now() - batchStart) / 1000;
+      const avgPerPage = elapsed / pagesCompleted;
+      const remaining = avgPerPage * (pages.length - pagesCompleted);
+      const etaStr = remaining > 0
+        ? `ETA ${Math.ceil(remaining / 60)}m ${Math.round(remaining % 60)}s`
+        : 'done';
+      console.log(
+        `${c.dim}  batch ${batchSec.toFixed(0)}s | elapsed ${Math.floor(elapsed / 60)}m ${Math.round(elapsed % 60)}s | ${etaStr}${c.reset}`,
+      );
       console.log('');
     }
 
