@@ -1,18 +1,19 @@
-## 2026-02-19 | claude/enhance-fact-system-aOWsd | Enhanced Anthropic stakeholders table with column toggles and fact refs
+## 2026-02-19 | claude/enhance-fact-system-aOWsd | Enhanced Anthropic stakeholders table with HoverCards, entity previews, full-bleed layout
 
-**What was done:** Continued enhancing the Anthropic stakeholders page fact system. Added 5 new canonical facts (per-founder stake, Tallinn stake, Moskovitz stake, employee pledge rate, employee EA alignment estimate). Refactored `AnthropicStakeholdersTable` into a server+client component split — the server wrapper reads the valuation fact via `getFact()`, while the new `AnthropicStakeholdersTableClient` is a `"use client"` component with column visibility toggles, wider layout, pledge shown as ranges (25–50% for employee pool instead of misleading "50%"), and hoverable canonical fact ID badges for auditability.
+**What was done:** Multi-round enhancement of the Anthropic stakeholders page. Session 1: added 5 canonical facts, refactored table into server+client split, column toggles, pledge ranges. Session 2: replaced FactRef hash badges with Radix HoverCard popovers on values (interactive, stays open); added EntityPreviewLink hover cards on stakeholder names; added live valuation input so users can recalculate at custom valuations; added `contentFormat: table` + `hideSidebar: true` to hide left sidebar and give table full container width; added `prose-constrain-text` CSS to keep text at 65rem while table component uses full 90rem container; fixed EA connections (Chris Olah and Jack Clark upgraded to "Moderate"; Tom/Jared/Sam updated to "Weak/unknown" with reasoning); added Methodology & Assumptions section explaining how all estimates were derived.
 
 **Pages:** anthropic-stakeholders
 
 **Model:** sonnet-4-6
 
-**Duration:** ~45min
+**Duration:** ~2h (two sessions)
 
 **Issues encountered:**
-- `getFact()` uses `fs.readFileSync` so cannot be called in a client component — required server+client split.
-- Previous session had left 5 files modified but uncommitted; continued from that state after pulling rebase.
+- `getFact()` uses `fs.readFileSync` — server/client split required; server wrapper now passes all facts + entity previews as serializable props.
+- Remote branch kept being force-pushed by auto-rebase during long pre-push builds; solved with `git stash && git pull --rebase && git stash pop` then `--force-with-lease`.
+- Dollar signs in new methodology section needed `\$` escaping — caught by `pnpm crux fix escaping`.
 
 **Learnings/notes:**
-- Any component that needs client-side state AND calls `getFact()` must be split: server wrapper passes data as props to client child.
-- When a fact represents a range (like employee pledge rate varying by hire date), use `pledgeMin`/`pledgeMax` in the component rather than a single value — ranges communicate uncertainty honestly.
-- Canonical fact IDs in component data (as `stakeFactRef`, `pledgeFactRef`) provide a lightweight audit trail without adding a full facts-lookup UI.
+- Radix `@radix-ui/react-hover-card` is already installed and is the right component for interactive popovers (unlike CSS `pointer-events-none` tooltips that disappear when cursor moves).
+- `hideSidebar: true` in MDX frontmatter + handling in `page.tsx` `WithSidebar` gives targeted sidebar control per-page.
+- `prose-constrain-text` CSS (max-width: 65rem on `>p/h2/ul/table`) lets text stay narrow while React component `<div>`s use the full container width.
