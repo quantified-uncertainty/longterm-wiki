@@ -97,6 +97,13 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
       sortUndefined: "last",
     },
     {
+      accessorKey: "tacticalValue",
+      header: ({ column }) => <SortableHeader column={column} title="Tactical value — how time-sensitive / news-relevant (0–100)">Tact.</SortableHeader>,
+      cell: ({ row }) => <ScoreBadge value={row.original.tacticalValue} />,
+      size: 60,
+      sortUndefined: "last",
+    },
+    {
       accessorKey: "quality",
       header: ({ column }) => <SortableHeader column={column} title="Page quality score (0–100)">Qual.</SortableHeader>,
       cell: ({ row }) => <ScoreBadge value={row.original.quality} />,

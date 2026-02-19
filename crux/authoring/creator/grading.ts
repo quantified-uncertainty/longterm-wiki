@@ -9,6 +9,7 @@ import path from 'path';
 import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import { appendEditLog } from '../../lib/edit-log.ts';
 import { extractText } from '../../lib/llm.ts';
+import { READER_IMPORTANCE_GUIDELINES, TACTICAL_VALUE_GUIDELINES } from '../../lib/grading-shared.ts';
 import type { TopicPhaseContext } from './types.ts';
 
 type GradingContext = TopicPhaseContext;
@@ -22,6 +23,7 @@ interface GradingRatings {
 
 interface GradingResult {
   readerImportance: number;
+  tacticalValue?: number;
   ratings: GradingRatings;
   llmSummary?: string;
   balanceFlags?: string[];
@@ -32,6 +34,7 @@ interface Frontmatter {
   title?: string;
   description?: string;
   readerImportance?: number;
+  tacticalValue?: number;
   ratings?: GradingRatings;
   quality?: number;
   llmSummary?: string;
@@ -45,40 +48,40 @@ interface Frontmatter {
   [key: string]: unknown;
 }
 
-const GRADING_SYSTEM_PROMPT = `You are an expert evaluator of AI safety content. Score this page on:
+const GRADING_SYSTEM_PROMPT = [
+  'You are an expert evaluator of AI safety content. Score this page on:',
+  '',
+  '- readerImportance (0-100): How significant for understanding AI risk',
+  '- tacticalValue (0-100): How time-sensitive and news-relevant this topic is — how much its content needs updating as events unfold',
+  '- quality dimensions (0-10 each): novelty, rigor, actionability, completeness',
+  '- llmSummary: 1-2 sentence summary with key conclusions',
+  '- balanceFlags: Array of any balance/bias issues detected (see below)',
+  '',
+  'Be harsh but fair. Typical wiki content scores 3-5 on quality dimensions. 7+ is exceptional.',
+  '',
+  'IMPORTANT: This content may describe events after your knowledge cutoff. If the article cites specific sources (URLs, publications, official announcements), assume the described events are real even if you\'re unfamiliar with them. Do NOT mark well-sourced content as "fictional" or "fabricated" just because you haven\'t heard of it. Evaluate based on the quality of sourcing, writing, and relevance to AI safety.',
+  '',
+  'BALANCE CHECK - Flag these issues in balanceFlags array:',
+  '- "no-criticism-section": Article lacks a Criticisms, Concerns, or Limitations section',
+  '- "single-source-dominance": >50% of citations come from one source (e.g., company\'s own blog)',
+  '- "missing-source-incentives": For controversial claims, source\'s incentives aren\'t discussed',
+  '- "one-sided-framing": Article presents only positive OR only negative perspective without balance',
+  '- "uncritical-claims": Major claims presented as fact without attribution ("X is..." vs "X claims...")',
+  '',
+  'BIOGRAPHICAL/ORGANIZATIONAL ACCURACY FLAGS (apply to person & org pages):',
+  '- "unsourced-biographical-details": Specific dates, roles, credentials, or achievements stated without citation',
+  '- "missing-primary-sources": No links to official websites, CVs, LinkedIn, company filings, or direct statements',
+  '- "unverified-quotes": Attributed quotes that may not be verbatim from a cited source',
+  '- "speculative-motivations": Attributing specific motivations or reasoning to a person without a direct quote or source',
+  '',
+  READER_IMPORTANCE_GUIDELINES,
+  '',
+  TACTICAL_VALUE_GUIDELINES,
+  '',
+  'Respond with valid JSON only.',
+].join('\n');
 
-- readerImportance (0-100): How significant for understanding AI risk
-- quality dimensions (0-10 each): novelty, rigor, actionability, completeness
-- llmSummary: 1-2 sentence summary with key conclusions
-- balanceFlags: Array of any balance/bias issues detected (see below)
-
-Be harsh but fair. Typical wiki content scores 3-5 on quality dimensions. 7+ is exceptional.
-
-IMPORTANT: This content may describe events after your knowledge cutoff. If the article cites specific sources (URLs, publications, official announcements), assume the described events are real even if you're unfamiliar with them. Do NOT mark well-sourced content as "fictional" or "fabricated" just because you haven't heard of it. Evaluate based on the quality of sourcing, writing, and relevance to AI safety.
-
-BALANCE CHECK - Flag these issues in balanceFlags array:
-- "no-criticism-section": Article lacks a Criticisms, Concerns, or Limitations section
-- "single-source-dominance": >50% of citations come from one source (e.g., company's own blog)
-- "missing-source-incentives": For controversial claims, source's incentives aren't discussed
-- "one-sided-framing": Article presents only positive OR only negative perspective without balance
-- "uncritical-claims": Major claims presented as fact without attribution ("X is..." vs "X claims...")
-
-BIOGRAPHICAL/ORGANIZATIONAL ACCURACY FLAGS (apply to person & org pages):
-- "unsourced-biographical-details": Specific dates, roles, credentials, or achievements stated without citation
-- "missing-primary-sources": No links to official websites, CVs, LinkedIn, company filings, or direct statements
-- "unverified-quotes": Attributed quotes that may not be verbatim from a cited source
-- "speculative-motivations": Attributing specific motivations or reasoning to a person without a direct quote or source
-
-IMPORTANCE guidelines:
-- 90-100: Essential for prioritization decisions
-- 70-89: High value for practitioners
-- 50-69: Useful context
-- 30-49: Reference material
-- 0-29: Peripheral or stubs
-
-Respond with valid JSON only.`;
-
-export async function runGrading(topic: string, { log, saveResult, getTopicDir }: GradingContext): Promise<{ success: boolean; error?: string; readerImportance?: number; quality?: number; ratings?: GradingRatings; llmSummary?: string }> {
+export async function runGrading(topic: string, { log, saveResult, getTopicDir }: GradingContext): Promise<{ success: boolean; error?: string; readerImportance?: number; tacticalValue?: number; quality?: number; ratings?: GradingRatings; llmSummary?: string }> {
   log('grade', 'Running quality grading on temp file...');
 
   const finalPath = path.join(getTopicDir(topic), 'final.mdx');
@@ -131,6 +134,7 @@ ${body.slice(0, 30000)}
 Respond with JSON:
 {
   "readerImportance": <0-100>,
+  "tacticalValue": <0-100>,
   "ratings": {
     "novelty": <0-10>,
     "rigor": <0-10>,
@@ -179,6 +183,9 @@ Respond with JSON:
 
     // Update frontmatter
     frontmatter.readerImportance = grades.readerImportance;
+    if (grades.tacticalValue != null) {
+      frontmatter.tacticalValue = grades.tacticalValue;
+    }
     frontmatter.ratings = grades.ratings;
     frontmatter.quality = quality;
     frontmatter.llmSummary = grades.llmSummary;
@@ -213,6 +220,7 @@ Respond with JSON:
     return {
       success: true,
       readerImportance: grades.readerImportance,
+      tacticalValue: grades.tacticalValue,
       quality,
       ratings: grades.ratings,
       llmSummary: grades.llmSummary

@@ -65,6 +65,7 @@ export interface ChecklistWarning {
 
 export interface GradeResult {
   readerImportance: number;
+  tacticalValue?: number;
   ratings: Ratings;
   llmSummary?: string;
   reasoning?: string;
