@@ -24,6 +24,8 @@ export interface ChecklistItem {
   description: string;
   phase: ChecklistPhase;
   applicableTypes: SessionType[] | 'all';
+  /** Shell command that can programmatically verify this item. Exit 0 = pass. */
+  verifyCommand?: string;
 }
 
 export interface ParsedItem {
@@ -128,6 +130,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Run `pnpm crux fix escaping` after any MDX or content changes.',
     phase: 'implement',
     applicableTypes: 'all',
+    verifyCommand: 'pnpm crux fix escaping',
   },
   {
     id: 'typescript-used',
@@ -242,6 +245,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'Every `<EntityLink id="X">` has a matching entity in `data/entities/*.yaml`.',
     phase: 'review',
     applicableTypes: ['content'],
+    verifyCommand: 'pnpm crux validate unified --rules=entity-links --errors-only',
   },
   {
     id: 'numeric-ids-stable',
@@ -249,6 +253,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'No `numericId` values were removed or changed in entity YAML.',
     phase: 'review',
     applicableTypes: ['content'],
+    verifyCommand: 'pnpm crux validate unified --rules=numeric-id-integrity --errors-only',
   },
   {
     id: 'mdx-escaping',
@@ -256,6 +261,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: 'No unescaped `$` or `<` in prose. Run `crux validate unified --rules=comparison-operators,dollar-signs`.',
     phase: 'review',
     applicableTypes: ['content'],
+    verifyCommand: 'pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only',
   },
   {
     id: 'content-accuracy',
@@ -314,6 +320,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: '`pnpm crux validate gate --fix` passes. Record exact test count.',
     phase: 'ship',
     applicableTypes: 'all',
+    verifyCommand: 'pnpm crux validate gate --fix',
   },
   {
     id: 'pr-description',
@@ -335,6 +342,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: '`.claude/sessions/YYYY-MM-DD_<branch-suffix>.md` created per session-logging rules.',
     phase: 'ship',
     applicableTypes: 'all',
+    verifyCommand: 'ls .claude/sessions/$(date +%Y-%m-%d)_*.md 2>/dev/null | head -1 | grep -q .',
   },
   {
     id: 'push-ci-green',
@@ -363,6 +371,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     description: '`cd crux && npx tsc --noEmit` passes (if crux/ files changed).',
     phase: 'ship',
     applicableTypes: ['infrastructure', 'commands', 'refactor'],
+    verifyCommand: 'cd crux && npx tsc --noEmit',
   },
 ];
 
@@ -429,6 +438,7 @@ export function buildChecklist(type: SessionType, metadata: ChecklistMetadata): 
   lines.push('');
 
   const phases: ChecklistPhase[] = ['understand', 'implement', 'review', 'ship'];
+  let itemNumber = 0;
   for (const phase of phases) {
     const phaseItems = items.filter(item => item.phase === phase);
     if (phaseItems.length === 0) continue;
@@ -436,7 +446,9 @@ export function buildChecklist(type: SessionType, metadata: ChecklistMetadata): 
     lines.push(`## ${PHASE_LABELS[phase]}`);
     lines.push('');
     for (const item of phaseItems) {
-      lines.push(`- [ ] **${item.label}**: ${item.description}`);
+      itemNumber++;
+      const autoTag = item.verifyCommand ? ' *(auto-verify)*' : '';
+      lines.push(`${itemNumber}. [ ] \`${item.id}\` **${item.label}**: ${item.description}${autoTag}`);
     }
     lines.push('');
   }
@@ -449,6 +461,75 @@ export function buildChecklist(type: SessionType, metadata: ChecklistMetadata): 
   lines.push('');
 
   return lines.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Checklist Mutation
+// ---------------------------------------------------------------------------
+
+/**
+ * Check off one or more items in a checklist markdown string.
+ * Returns the updated markdown, or null if any id was not found.
+ * Supports checking [x] and marking N/A [~].
+ */
+export function checkItems(
+  markdown: string,
+  ids: string[],
+  marker: 'x' | '~' = 'x'
+): { markdown: string; checked: string[]; notFound: string[] } {
+  const lines = markdown.split('\n');
+  const checked: string[] = [];
+  const notFound: string[] = [];
+
+  // Pattern for new numbered format: "1. [ ] `id` **Label**: ..."
+  const numberedPattern = /^(\d+)\. \[([ x~])\] `([^`]+)` \*\*([^*]+)\*\*/;
+  // Pattern for old unnumbered format: "- [ ] **Label**: ..."
+  const unnumberedPattern = /^- \[([ x~])\] \*\*([^*]+)\*\*/;
+
+  for (const id of ids) {
+    const catalogItem = CHECKLIST_ITEMS.find(i => i.id === id);
+    let found = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Try numbered format first
+      const numberedMatch = line.match(numberedPattern);
+      if (numberedMatch) {
+        const lineId = numberedMatch[3];
+        if (lineId === id) {
+          lines[i] = line.replace(/\[([ x~])\]/, `[${marker}]`);
+          checked.push(id);
+          found = true;
+          break;
+        }
+        continue;
+      }
+
+      // Fall back to unnumbered format (backward compat)
+      const unnumberedMatch = line.match(unnumberedPattern);
+      if (!unnumberedMatch) continue;
+
+      const lineLabel = unnumberedMatch[2].replace(/:$/, '');
+      const lineId = lineLabel.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+      if (
+        (catalogItem && lineLabel === catalogItem.label) ||
+        lineId === id
+      ) {
+        lines[i] = line.replace(/^- \[[ x~]\]/, `- [${marker}]`);
+        checked.push(id);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      notFound.push(id);
+    }
+  }
+
+  return { markdown: lines.join('\n'), checked, notFound };
 }
 
 // ---------------------------------------------------------------------------
@@ -468,7 +549,10 @@ export function parseChecklist(markdown: string): ChecklistStatus {
 
   const phasePattern = /^## Phase (\d): (\w+)/;
   const decisionsPattern = /^## Key Decisions/;
-  const itemPattern = /^- \[([ x~])\] \*\*([^*]+)\*\*/;
+  // New numbered format: "1. [ ] `id` **Label**: ..."
+  const numberedItemPattern = /^\d+\. \[([ x~])\] `([^`]+)` \*\*([^*]+)\*\*/;
+  // Old unnumbered format: "- [ ] **Label**: ..."
+  const unnumberedItemPattern = /^- \[([ x~])\] \*\*([^*]+)\*\*/;
   const decisionItemPattern = /^- (.+)/;
 
   const phaseNameMap: Record<string, ChecklistPhase> = {
@@ -520,18 +604,34 @@ export function parseChecklist(markdown: string): ChecklistStatus {
       continue;
     }
 
-    const itemMatch = line.match(itemPattern);
-    if (itemMatch && currentPhase !== null) {
-      const marker = itemMatch[1];
-      const label = itemMatch[2].replace(/:$/, '');
-      let status: CheckStatus;
-      if (marker === 'x') status = 'checked';
-      else if (marker === '~') status = 'na';
-      else status = 'unchecked';
+    if (currentPhase !== null) {
+      // Try numbered format first: "1. [ ] `id` **Label**: ..."
+      const numberedMatch = line.match(numberedItemPattern);
+      if (numberedMatch) {
+        const marker = numberedMatch[1];
+        const id = numberedMatch[2];
+        const label = numberedMatch[3].replace(/:$/, '');
+        let status: CheckStatus;
+        if (marker === 'x') status = 'checked';
+        else if (marker === '~') status = 'na';
+        else status = 'unchecked';
+        currentItems.push({ id, label, status });
+        continue;
+      }
 
-      // Derive an id from the label (lowercase, hyphenated)
-      const id = label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      currentItems.push({ id, label, status });
+      // Fall back to old unnumbered format: "- [ ] **Label**: ..."
+      const unnumberedMatch = line.match(unnumberedItemPattern);
+      if (unnumberedMatch) {
+        const marker = unnumberedMatch[1];
+        const label = unnumberedMatch[2].replace(/:$/, '');
+        let status: CheckStatus;
+        if (marker === 'x') status = 'checked';
+        else if (marker === '~') status = 'na';
+        else status = 'unchecked';
+        // Derive an id from the label (lowercase, hyphenated)
+        const id = label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        currentItems.push({ id, label, status });
+      }
     }
   }
 
@@ -580,11 +680,11 @@ export function formatStatus(status: ChecklistStatus, c: FormatColors): string {
 
     for (const item of phase.items) {
       if (item.status === 'checked') {
-        lines.push(`  ${c.green}[x]${c.reset} ${item.label}`);
+        lines.push(`  ${c.green}[x]${c.reset} ${c.dim}${item.id}${c.reset} ${item.label}`);
       } else if (item.status === 'na') {
-        lines.push(`  ${c.dim}[~]${c.reset} ${c.dim}${item.label} (N/A)${c.reset}`);
+        lines.push(`  ${c.dim}[~]${c.reset} ${c.dim}${item.id}${c.reset} ${c.dim}${item.label} (N/A)${c.reset}`);
       } else {
-        lines.push(`  ${c.red}[ ]${c.reset} ${item.label}`);
+        lines.push(`  ${c.red}[ ]${c.reset} ${c.dim}${item.id}${c.reset} ${item.label}`);
       }
     }
   }

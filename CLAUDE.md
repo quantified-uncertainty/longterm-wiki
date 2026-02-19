@@ -38,6 +38,9 @@ pnpm crux maintain status        # Check when maintenance last ran
 # Agent checklists
 pnpm crux agent-checklist init "Task" --type=X    # Generate typed checklist
 pnpm crux agent-checklist init --issue=N          # Auto-detect type from issue labels
+pnpm crux agent-checklist check <id> [id2...]     # Check off items by ID
+pnpm crux agent-checklist check --na <id>         # Mark items as N/A
+pnpm crux agent-checklist verify                  # Auto-verify items with verifyCommand
 pnpm crux agent-checklist status                  # Show checklist progress
 pnpm crux agent-checklist complete                # Validate all items checked
 
