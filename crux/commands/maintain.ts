@@ -75,6 +75,7 @@ interface CommandOptions {
 interface GitHubPullResponse {
   number: number;
   title: string;
+  body: string | null;
   merged_at: string | null;
   head: { ref: string };
   user: { login: string } | null;
@@ -128,32 +129,6 @@ function daysSince(dateStr: string): number {
   const now = new Date();
   const then = new Date(dateStr);
   return Math.floor((now.getTime() - then.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-/**
- * Tokenize a string into lowercase words for fuzzy matching.
- * More robust than substring slicing — avoids false positives from short prefixes.
- */
-function tokenize(text: string): Set<string> {
-  return new Set(
-    text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(w => w.length > 2)
-  );
-}
-
-/**
- * Check if an issue title is likely referenced by PR/session text.
- * Uses word-overlap ratio rather than naive substring matching.
- * Requires >60% of the issue's significant words to appear in the text.
- */
-function isLikelyReferenced(issueTitle: string, searchText: string): boolean {
-  const issueWords = tokenize(issueTitle);
-  if (issueWords.size < 2) return false; // Too short to match reliably
-  const searchWords = tokenize(searchText);
-  let matches = 0;
-  for (const word of issueWords) {
-    if (searchWords.has(word)) matches++;
-  }
-  return matches / issueWords.size > 0.6;
 }
 
 // ---------------------------------------------------------------------------
@@ -357,7 +332,6 @@ async function reviewPrs(_args: string[], options: CommandOptions): Promise<Comm
 async function triageIssues(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
-  const since = parseSinceOption(options);
 
   let output = '';
   output += `${c.bold}${c.blue}GitHub Issue Triage${c.reset}\n\n`;
@@ -389,18 +363,19 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=100`
   );
 
-  // Build searchable text from PR titles and session logs
-  const prText = (Array.isArray(prsData) ? prsData : [])
-    .filter(p => p.merged_at)
-    .map(p => p.title)
-    .join(' ');
-
-  const sessions = loadSessionLogsSince(since);
-  const sessionText = sessions.map(s =>
-    `${s.whatWasDone} ${s.issues.join(' ')} ${s.learnings.join(' ')}`
-  ).join(' ');
-
-  const combinedSearchText = `${prText} ${sessionText}`;
+  // Build set of issue numbers explicitly closed by merged PRs via "closes/fixes/resolves #N"
+  const mergedPrs = (Array.isArray(prsData) ? prsData : []).filter(p => p.merged_at);
+  const explicitlyClosedByPr = new Map<number, string>(); // issueNum → PR title
+  const closesPattern = /(?:closes|fixes|resolves)\s+#(\d+)/gi;
+  for (const pr of mergedPrs) {
+    const body = pr.body || '';
+    for (const match of body.matchAll(closesPattern)) {
+      const issueNum = parseInt(match[1], 10);
+      if (!explicitlyClosedByPr.has(issueNum)) {
+        explicitlyClosedByPr.set(issueNum, `PR #${pr.number}: ${pr.title}`);
+      }
+    }
+  }
 
   // Categorize issues
   const categories: Record<TriageCategory, Array<GitHubIssue & { reason: string }>> = {
@@ -412,22 +387,14 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
 
   for (const issue of openIssues) {
     const daysInactive = daysSince(issue.updatedAt);
-    const issueNum = `#${issue.number}`;
 
-    // Check by issue number (word-boundary match — high confidence)
-    const referencedByNumber = new RegExp(`#${issue.number}\\b`).test(combinedSearchText);
-    // Check by title word overlap (fuzzy — moderate confidence)
-    const referencedByTitle = isLikelyReferenced(issue.title, combinedSearchText);
+    // High-confidence signal: merged PR body explicitly closes this issue number
+    const closingPr = explicitlyClosedByPr.get(issue.number);
 
-    if (referencedByNumber) {
+    if (closingPr) {
       categories['potentially-resolved'].push({
         ...issue,
-        reason: `Issue ${issueNum} referenced in recent PR or session log`,
-      });
-    } else if (referencedByTitle) {
-      categories['potentially-resolved'].push({
-        ...issue,
-        reason: `Title keywords match recent PR or session log (verify manually)`,
+        reason: `Explicitly closed by merged ${closingPr}`,
       });
     } else if (daysInactive > 30) {
       categories['stale'].push({
@@ -454,7 +421,7 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     'potentially-resolved': {
       label: 'Potentially Resolved',
       color: c.green,
-      desc: 'May have been addressed by recent PRs. Verify and close.',
+      desc: 'A merged PR explicitly closes this issue. Safe to close — verify and confirm.',
     },
     'stale': {
       label: 'Stale',
