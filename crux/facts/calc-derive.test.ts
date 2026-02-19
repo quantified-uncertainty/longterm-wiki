@@ -7,152 +7,14 @@
 
 import { describe, it, expect } from 'vitest';
 import { evalCalcExpr, extractFactRefs } from '../lib/calc-evaluator.ts';
-
-// ---------------------------------------------------------------------------
-// Inline copies of pure utility functions for testing
-// (avoids re-running the full module with its side effects from main())
-// ---------------------------------------------------------------------------
-
-const CALC_PATTERNS: Array<{ regex: RegExp; description: string }> = [
-  {
-    regex: /[≈~∼][\s]*\d+(?:\.\d+)?x\b/g,
-    description: 'approximate multiple (≈Nx)',
-  },
-  {
-    regex: /\b\d+(?:\.\d+)?x\s+(?:revenue|earnings|multiple|valuation|salary|cost|faster|cheaper|more|growth|increase)/gi,
-    description: 'named multiple (Nx revenue/cost/...)',
-  },
-  {
-    regex: /\b\d+(?:\.\d+)?(?:x|-fold)\s+(?:reduction|expansion|increase|improvement|growth|decrease|drop)/gi,
-    description: 'fold change',
-  },
-  {
-    regex: /\b\d+(?:\.\d+)?:\d+\s+(?:ratio|gap|split)/gi,
-    description: 'ratio (N:1)',
-  },
-];
-
-function isInsideCalcOrF(body: string, matchIndex: number): boolean {
-  const before = body.slice(Math.max(0, matchIndex - 500), matchIndex);
-  if (before.includes('<Calc ') && !before.includes('/>') && !before.includes('</Calc>')) return true;
-  const lastF = before.lastIndexOf('<F ');
-  if (lastF !== -1) {
-    const afterF = before.slice(lastF);
-    if (!afterF.includes('</F>') && !afterF.includes('/>')) return true;
-  }
-  return false;
-}
-
-function isInCodeBlock(body: string, index: number): boolean {
-  const before = body.slice(0, index);
-  const fenceCount = (before.match(/^```/gm) || []).length;
-  return fenceCount % 2 !== 0;
-}
-
-function extractNumericValue(matchText: string): number | undefined {
-  const numMatch = matchText.match(/(\d+(?:\.\d+)?)/);
-  if (!numMatch) return undefined;
-  return parseFloat(numMatch[1]);
-}
-
-interface DetectedPattern {
-  match: string;
-  line: number;
-  context: string;
-  approximateValue?: number;
-  patternType: string;
-}
-
-function detectPatterns(body: string): DetectedPattern[] {
-  const patterns: DetectedPattern[] = [];
-  const lines = body.split('\n');
-  const seen = new Set<string>();
-
-  for (const { regex, description } of CALC_PATTERNS) {
-    regex.lastIndex = 0;
-    let match: RegExpExecArray | null;
-
-    while ((match = regex.exec(body)) !== null) {
-      if (isInCodeBlock(body, match.index)) continue;
-      if (isInsideCalcOrF(body, match.index)) continue;
-
-      const beforeMatch = body.slice(0, match.index);
-      const lineNum = (beforeMatch.match(/\n/g) || []).length + 1;
-
-      const line = lines[lineNum - 1] || '';
-      if (/^\|[\s-|]+\|$/.test(line)) continue;
-
-      const key = `${lineNum}:${match[0].trim()}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-
-      const contextStart = Math.max(0, match.index - 300);
-      const contextEnd = Math.min(body.length, match.index + match[0].length + 300);
-      const context = body.slice(contextStart, contextEnd).replace(/\n/g, ' ').slice(0, 600);
-
-      patterns.push({
-        match: match[0].trim(),
-        line: lineNum,
-        context,
-        approximateValue: extractNumericValue(match[0]),
-        patternType: description,
-      });
-    }
-  }
-
-  return patterns;
-}
-
-interface CalcProposal {
-  originalText: string;
-  expr: string;
-  precision?: number;
-  suffix?: string;
-  prefix?: string;
-  format?: string;
-  confidence: 'high' | 'medium' | 'low';
-  explanation: string;
-  computedValue?: number;
-  valid?: boolean;
-  validationError?: string;
-}
-
-function buildCalcComponent(proposal: CalcProposal): string {
-  const props: string[] = [`expr="${proposal.expr}"`];
-  if (proposal.precision !== undefined) props.push(`precision={${proposal.precision}}`);
-  if (proposal.format) props.push(`format="${proposal.format}"`);
-  if (proposal.prefix) props.push(`prefix="${proposal.prefix}"`);
-  if (proposal.suffix) props.push(`suffix="${proposal.suffix}"`);
-  return `<Calc ${props.join(' ')} />`;
-}
-
-function ensureCalcImport(content: string): string {
-  if (/import\s+\{[^}]*\bCalc\b[^}]*\}\s+from\s+['"]@components\/facts['"]/m.test(content)) {
-    return content;
-  }
-
-  const factsImportMatch = content.match(/^(import\s+\{)([^}]+)(\}\s+from\s+['"]@components\/facts['"])/m);
-  if (factsImportMatch) {
-    const [full, open, names, close] = factsImportMatch;
-    const updatedImport = `${open}${names.trim()}, Calc${close}`;
-    return content.replace(full, updatedImport);
-  }
-
-  const wikiImportMatch = content.match(/^(import\s+\{[^}]*\}\s+from\s+['"]@components\/wiki['"])/m);
-  if (wikiImportMatch) {
-    return content.replace(wikiImportMatch[0], `${wikiImportMatch[0]}\nimport {Calc} from '@components/facts';`);
-  }
-
-  const frontmatterEnd = content.indexOf('---', 3);
-  if (frontmatterEnd !== -1) {
-    const insertPos = frontmatterEnd + 3;
-    const before = content.slice(0, insertPos);
-    const after = content.slice(insertPos);
-    return `${before}\nimport {Calc} from '@components/facts';\n${after}`;
-  }
-
-  return `import {Calc} from '@components/facts';\n\n${content}`;
-}
+import {
+  detectPatterns,
+  buildCalcComponent,
+  ensureCalcImport,
+  validateOriginalText,
+  type CalcProposal,
+  type DetectedPattern,
+} from './calc-derive.ts';
 
 // ---------------------------------------------------------------------------
 // Tests: calc-evaluator (evalCalcExpr / extractFactRefs)
@@ -370,49 +232,36 @@ describe('buildCalcComponent', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Tests: ensureCalcImport
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Inline copy of validateOriginalText for testing
-// ---------------------------------------------------------------------------
-
-function validateOriginalText(proposal: { originalText: string; suffix?: string }, matchedPattern: { match: string }): string | null {
-  if (/<[A-Z]|<\/|<F |<Calc |<Entity/i.test(proposal.originalText)) {
-    return 'originalText contains JSX/MDX tags — must be plain text only';
-  }
-  const excess = proposal.originalText.length - matchedPattern.match.length;
-  if (excess > 20) {
-    return `originalText is ${excess} chars wider than the pattern match "${matchedPattern.match}" — keep it narrow`;
-  }
-  if (/\|/.test(proposal.originalText)) {
-    return 'originalText contains a table pipe character — would corrupt markdown table';
-  }
-  if (proposal.suffix && /\s\w{4,}/.test(proposal.suffix)) {
-    return `suffix "${proposal.suffix}" contains prose — must be a unit symbol only`;
-  }
-  return null;
-}
-
-// ---------------------------------------------------------------------------
 // Tests: validateOriginalText
 // ---------------------------------------------------------------------------
 
 describe('validateOriginalText', () => {
-  const pattern = { match: '≈25x' };
+  const pattern: DetectedPattern = {
+    match: '≈25x',
+    line: 1,
+    context: 'test context',
+    patternType: 'approximate multiple (≈Nx)',
+    approximateValue: 25,
+  };
+  const baseProposal: CalcProposal = {
+    originalText: '≈25x',
+    expr: '{a.b} / {a.c}',
+    confidence: 'high',
+    explanation: 'test',
+  };
 
   it('returns null for a valid originalText matching the pattern', () => {
-    expect(validateOriginalText({ originalText: '≈25x' }, pattern)).toBeNull();
+    expect(validateOriginalText({ ...baseProposal, originalText: '≈25x' }, pattern)).toBeNull();
   });
 
   it('returns null when disambiguation adds ≤20 chars', () => {
     // "(current)" is 9 chars — within the 20-char budget
-    expect(validateOriginalText({ originalText: '≈25x (current)' }, pattern)).toBeNull();
+    expect(validateOriginalText({ ...baseProposal, originalText: '≈25x (current)' }, pattern)).toBeNull();
   });
 
   it('rejects originalText containing JSX/MDX tags', () => {
     const error = validateOriginalText(
-      { originalText: '≈25x <F e="openai" f="123">$500B</F>' },
+      { ...baseProposal, originalText: '≈25x <F e="openai" f="123">$500B</F>' },
       pattern
     );
     expect(error).toMatch(/JSX\/MDX tags/);
@@ -421,34 +270,34 @@ describe('validateOriginalText', () => {
   it('rejects originalText wider than 20 chars above match length', () => {
     // "OpenAI's ≈25x. The valuation itself" is 24 chars wider than "≈25x"
     const error = validateOriginalText(
-      { originalText: "OpenAI's ≈25x. The valuation itself" },
+      { ...baseProposal, originalText: "OpenAI's ≈25x. The valuation itself" },
       pattern
     );
     expect(error).toMatch(/chars wider/);
   });
 
   it('rejects originalText containing a table pipe character', () => {
-    const error = validateOriginalText({ originalText: '≈25x |' }, pattern);
+    const error = validateOriginalText({ ...baseProposal, originalText: '≈25x |' }, pattern);
     expect(error).toMatch(/table pipe/);
   });
 
   it('rejects originalText with a single table pipe for disambiguation', () => {
-    const error = validateOriginalText({ originalText: '≈25x |' }, pattern);
+    const error = validateOriginalText({ ...baseProposal, originalText: '≈25x |' }, pattern);
     expect(error).toMatch(/table pipe/);
   });
 
   it('rejects suffix containing prose words', () => {
     const error = validateOriginalText(
-      { originalText: '≈25x', suffix: 'x multiple at the previous' },
+      { ...baseProposal, originalText: '≈25x', suffix: 'x multiple at the previous' },
       pattern
     );
     expect(error).toMatch(/suffix.*prose/);
   });
 
   it('accepts short unit suffixes', () => {
-    expect(validateOriginalText({ originalText: '≈25x', suffix: 'x' }, pattern)).toBeNull();
-    expect(validateOriginalText({ originalText: '≈25x', suffix: '%' }, pattern)).toBeNull();
-    expect(validateOriginalText({ originalText: '≈25x', suffix: ' pp' }, pattern)).toBeNull();
+    expect(validateOriginalText({ ...baseProposal, originalText: '≈25x', suffix: 'x' }, pattern)).toBeNull();
+    expect(validateOriginalText({ ...baseProposal, originalText: '≈25x', suffix: '%' }, pattern)).toBeNull();
+    expect(validateOriginalText({ ...baseProposal, originalText: '≈25x', suffix: ' pp' }, pattern)).toBeNull();
   });
 });
 
