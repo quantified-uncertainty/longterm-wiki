@@ -80,6 +80,14 @@ pnpm crux citations verify --all --limit=20  # Verify top 20 pages with citation
 pnpm crux citations status <id>              # Show verification results for a page
 pnpm crux citations report                   # Summary across all archived pages
 pnpm crux citations report --broken          # List all broken citations
+
+# Citation quote extraction & verification
+pnpm crux citations extract-quotes <id>              # Extract supporting quotes for a page
+pnpm crux citations extract-quotes --all --limit=10  # Batch extract quotes
+pnpm crux citations quote-report                     # Quote coverage statistics
+pnpm crux citations quote-report --broken            # Show broken/drifted quotes
+pnpm crux citations verify-quotes <id>               # Re-verify stored quotes
+pnpm crux citations verify-quotes --all              # Re-verify all stored quotes
 ```
 
 ## Repository Structure

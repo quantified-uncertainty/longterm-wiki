@@ -34,13 +34,30 @@ const SCRIPTS = {
     description: 'Summary report of citation verification across all pages',
     passthrough: ['ci', 'json', 'broken'],
   },
+  'extract-quotes': {
+    script: 'citations/extract-quotes.ts',
+    description: 'Extract supporting quotes from cited sources',
+    passthrough: ['ci', 'json', 'all', 'limit', 'recheck'],
+    positional: true,
+  },
+  'quote-report': {
+    script: 'citations/quote-report.ts',
+    description: 'Report on quote extraction and verification coverage',
+    passthrough: ['ci', 'json', 'broken'],
+  },
+  'verify-quotes': {
+    script: 'citations/verify-quotes.ts',
+    description: 'Re-verify stored quotes against fresh source content',
+    passthrough: ['ci', 'json', 'all', 'limit', 'refetch'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'report');
 
 export function getHelp(): string {
   const commandList = Object.entries(SCRIPTS)
-    .map(([name, config]) => `  ${name.padEnd(12)} ${config.description}`)
+    .map(([name, config]) => `  ${name.padEnd(16)} ${config.description}`)
     .join('\n');
 
   return `
@@ -50,18 +67,24 @@ Commands:
 ${commandList}
 
 Options:
-  --all             Verify all pages with citations (verify only)
-  --limit=N         Limit number of pages to verify (with --all)
-  --recheck         Re-verify already-archived pages
-  --broken          Show only broken citations (status/report)
+  --all             Process all pages with citations
+  --limit=N         Limit number of pages to process (with --all)
+  --recheck         Re-process already-handled pages
+  --refetch         Re-fetch source URLs (verify-quotes only)
+  --broken          Show only broken citations/quotes
   --json            JSON output
   --ci              JSON output for CI pipelines
 
 Examples:
-  crux citations verify existential-risk       Verify one page
-  crux citations verify --all --limit=20       Verify top 20 pages
-  crux citations status existential-risk       Show verification results
-  crux citations report                        Summary across all pages
-  crux citations report --broken               List all broken citations
+  crux citations verify existential-risk           Verify one page
+  crux citations verify --all --limit=20           Verify top 20 pages
+  crux citations status existential-risk           Show verification results
+  crux citations report                            Summary across all pages
+  crux citations report --broken                   List all broken citations
+  crux citations extract-quotes existential-risk   Extract quotes for a page
+  crux citations extract-quotes --all --limit=10   Batch extract quotes
+  crux citations quote-report                      Quote coverage stats
+  crux citations quote-report --broken             Show drifted/broken quotes
+  crux citations verify-quotes existential-risk    Re-verify stored quotes
 `;
 }

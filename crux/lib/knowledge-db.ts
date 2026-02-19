@@ -158,6 +158,34 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_citation_content_page ON citation_content(page_id);
 `);
 
+// Add citation_quotes table for storing extracted supporting quotes
+db.exec(`
+  CREATE TABLE IF NOT EXISTS citation_quotes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    page_id TEXT NOT NULL,
+    footnote INTEGER NOT NULL,
+    url TEXT,
+    resource_id TEXT,
+    claim_text TEXT NOT NULL,
+    claim_context TEXT,
+    source_quote TEXT,
+    source_location TEXT,
+    quote_verified INTEGER DEFAULT 0,
+    verification_method TEXT,
+    verification_score REAL,
+    verified_at TEXT,
+    source_title TEXT,
+    source_type TEXT,
+    extraction_model TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    UNIQUE(page_id, footnote)
+  );
+  CREATE INDEX IF NOT EXISTS idx_citation_quotes_page ON citation_quotes(page_id);
+  CREATE INDEX IF NOT EXISTS idx_citation_quotes_url ON citation_quotes(url);
+  CREATE INDEX IF NOT EXISTS idx_citation_quotes_verified ON citation_quotes(quote_verified);
+`);
+
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -891,6 +919,209 @@ export const citationContent = {
       FROM citation_content
     `).get() as { totalUrls: number; totalPages: number; totalBytes: number };
     return row;
+  },
+};
+
+// =============================================================================
+// CITATION QUOTES (extracted supporting quotes from sources)
+// =============================================================================
+
+export interface CitationQuoteRow {
+  id: number;
+  page_id: string;
+  footnote: number;
+  url: string | null;
+  resource_id: string | null;
+  claim_text: string;
+  claim_context: string | null;
+  source_quote: string | null;
+  source_location: string | null;
+  quote_verified: number;
+  verification_method: string | null;
+  verification_score: number | null;
+  verified_at: string | null;
+  source_title: string | null;
+  source_type: string | null;
+  extraction_model: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CitationQuoteUpsertData {
+  pageId: string;
+  footnote: number;
+  url?: string | null;
+  resourceId?: string | null;
+  claimText: string;
+  claimContext?: string | null;
+  sourceQuote?: string | null;
+  sourceLocation?: string | null;
+  quoteVerified?: boolean;
+  verificationMethod?: string | null;
+  verificationScore?: number | null;
+  sourceTitle?: string | null;
+  sourceType?: string | null;
+  extractionModel?: string | null;
+}
+
+export interface CitationQuoteStats {
+  totalQuotes: number;
+  withQuotes: number;
+  verified: number;
+  unverified: number;
+  totalPages: number;
+  averageScore: number | null;
+}
+
+export const citationQuotes = {
+  /**
+   * Insert or update a citation quote record.
+   * Keyed on (page_id, footnote) — one quote per footnote per page.
+   */
+  upsert(data: CitationQuoteUpsertData) {
+    return db.prepare(`
+      INSERT INTO citation_quotes (
+        page_id, footnote, url, resource_id, claim_text, claim_context,
+        source_quote, source_location, quote_verified, verification_method,
+        verification_score, verified_at, source_title, source_type, extraction_model,
+        updated_at
+      ) VALUES (
+        @pageId, @footnote, @url, @resourceId, @claimText, @claimContext,
+        @sourceQuote, @sourceLocation, @quoteVerified, @verificationMethod,
+        @verificationScore, @verifiedAt, @sourceTitle, @sourceType, @extractionModel,
+        datetime('now')
+      )
+      ON CONFLICT(page_id, footnote) DO UPDATE SET
+        url = @url,
+        resource_id = @resourceId,
+        claim_text = @claimText,
+        claim_context = @claimContext,
+        source_quote = @sourceQuote,
+        source_location = @sourceLocation,
+        quote_verified = @quoteVerified,
+        verification_method = @verificationMethod,
+        verification_score = @verificationScore,
+        verified_at = @verifiedAt,
+        source_title = @sourceTitle,
+        source_type = @sourceType,
+        extraction_model = @extractionModel,
+        updated_at = datetime('now')
+    `).run({
+      pageId: data.pageId,
+      footnote: data.footnote,
+      url: data.url || null,
+      resourceId: data.resourceId || null,
+      claimText: data.claimText,
+      claimContext: data.claimContext || null,
+      sourceQuote: data.sourceQuote || null,
+      sourceLocation: data.sourceLocation || null,
+      quoteVerified: data.quoteVerified ? 1 : 0,
+      verificationMethod: data.verificationMethod || null,
+      verificationScore: data.verificationScore ?? null,
+      verifiedAt: data.quoteVerified ? new Date().toISOString() : null,
+      sourceTitle: data.sourceTitle || null,
+      sourceType: data.sourceType || null,
+      extractionModel: data.extractionModel || null,
+    });
+  },
+
+  /**
+   * Get all quotes for a page.
+   */
+  getByPage(pageId: string): CitationQuoteRow[] {
+    return db.prepare(
+      'SELECT * FROM citation_quotes WHERE page_id = ? ORDER BY footnote',
+    ).all(pageId) as CitationQuoteRow[];
+  },
+
+  /**
+   * Get quotes by URL (across all pages).
+   */
+  getByUrl(url: string): CitationQuoteRow[] {
+    return db.prepare(
+      'SELECT * FROM citation_quotes WHERE url = ? ORDER BY page_id, footnote',
+    ).all(url) as CitationQuoteRow[];
+  },
+
+  /**
+   * Get all unverified quotes (quotes extracted but not yet verified).
+   */
+  getUnverified(limit: number = 100): CitationQuoteRow[] {
+    return db.prepare(
+      'SELECT * FROM citation_quotes WHERE source_quote IS NOT NULL AND quote_verified = 0 ORDER BY created_at LIMIT ?',
+    ).all(limit) as CitationQuoteRow[];
+  },
+
+  /**
+   * Mark a quote as verified with a specific method and score.
+   */
+  markVerified(
+    pageId: string,
+    footnote: number,
+    method: string,
+    score: number,
+  ) {
+    return db.prepare(`
+      UPDATE citation_quotes
+      SET quote_verified = 1, verification_method = ?, verification_score = ?, verified_at = datetime('now'), updated_at = datetime('now')
+      WHERE page_id = ? AND footnote = ?
+    `).run(method, score, pageId, footnote);
+  },
+
+  /**
+   * Mark a quote as unverified (e.g., after re-verification fails).
+   */
+  markUnverified(
+    pageId: string,
+    footnote: number,
+    method: string,
+    score: number,
+  ) {
+    return db.prepare(`
+      UPDATE citation_quotes
+      SET quote_verified = 0, verification_method = ?, verification_score = ?, updated_at = datetime('now')
+      WHERE page_id = ? AND footnote = ?
+    `).run(method, score, pageId, footnote);
+  },
+
+  /**
+   * Get a single quote by page and footnote.
+   */
+  get(pageId: string, footnote: number): CitationQuoteRow | null {
+    return db.prepare(
+      'SELECT * FROM citation_quotes WHERE page_id = ? AND footnote = ?',
+    ).get(pageId, footnote) as CitationQuoteRow | null;
+  },
+
+  /**
+   * Get aggregate statistics.
+   */
+  stats(): CitationQuoteStats {
+    const row = db.prepare(`
+      SELECT
+        COUNT(*) as totalQuotes,
+        COALESCE(SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END), 0) as withQuotes,
+        COALESCE(SUM(CASE WHEN quote_verified = 1 THEN 1 ELSE 0 END), 0) as verified,
+        COALESCE(SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' AND quote_verified = 0 THEN 1 ELSE 0 END), 0) as unverified,
+        COUNT(DISTINCT page_id) as totalPages,
+        AVG(CASE WHEN verification_score IS NOT NULL THEN verification_score END) as averageScore
+      FROM citation_quotes
+    `).get() as CitationQuoteStats;
+    return row;
+  },
+
+  /**
+   * Delete all quotes for a page (for re-extraction).
+   */
+  clearPage(pageId: string) {
+    return db.prepare('DELETE FROM citation_quotes WHERE page_id = ?').run(pageId);
+  },
+
+  /**
+   * Count total records.
+   */
+  count(): number {
+    return (db.prepare('SELECT COUNT(*) as count FROM citation_quotes').get() as { count: number }).count;
   },
 };
 
