@@ -60,7 +60,7 @@ export interface RunRow {
 }
 
 function loadRunReports(): RunRow[] {
-  const runsDir = path.resolve(process.cwd(), "../data/auto-update/runs");
+  const runsDir = path.resolve(process.cwd(), "../../data/auto-update/runs");
   if (!fs.existsSync(runsDir)) return [];
 
   const files = fs

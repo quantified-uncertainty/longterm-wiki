@@ -18,7 +18,7 @@ import type { CauseEffectEdgeData } from '@/components/wiki/CauseEffectGraph/typ
 let _rawYaml: string | null = null;
 function getRawYaml(): string {
   if (!_rawYaml) {
-    const yamlPath = path.join(process.cwd(), '../data/graphs/ai-transition-model-master.yaml');
+    const yamlPath = path.join(process.cwd(), '../../data/graphs/ai-transition-model-master.yaml');
     _rawYaml = fs.readFileSync(yamlPath, 'utf-8');
   }
   return _rawYaml;

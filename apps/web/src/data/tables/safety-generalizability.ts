@@ -11,7 +11,7 @@ import { loadYaml } from '@lib/yaml';
 let _rawYaml: string | null = null;
 function getGraphYaml(): string {
   if (!_rawYaml) {
-    const yamlPath = path.join(process.cwd(), '../data/graphs/safety-research-generalizability.yaml');
+    const yamlPath = path.join(process.cwd(), '../../data/graphs/safety-research-generalizability.yaml');
     _rawYaml = fs.readFileSync(yamlPath, 'utf-8');
   }
   return _rawYaml;

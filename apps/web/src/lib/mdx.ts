@@ -10,7 +10,7 @@ import { mdxComponents } from "@/components/mdx-components";
 import { getIdRegistry } from "@/data";
 import remarkCallouts from "./remark-callouts";
 
-const CONTENT_DIR = path.resolve(process.cwd(), "../content/docs");
+const CONTENT_DIR = path.resolve(process.cwd(), "../../content/docs");
 const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
 
 /**

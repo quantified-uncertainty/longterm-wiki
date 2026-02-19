@@ -97,7 +97,7 @@ export interface SourceRow {
 // ── Data Loading ───────────────────────────────────────────────────────────
 
 function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
-  const runsDir = path.resolve(process.cwd(), "../data/auto-update/runs");
+  const runsDir = path.resolve(process.cwd(), "../../data/auto-update/runs");
   if (!fs.existsSync(runsDir)) return { items: [], runDates: [] };
 
   // Find detail files (most recent first)
@@ -155,11 +155,11 @@ function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
 function loadSources(): SourceRow[] {
   const sourcesPath = path.resolve(
     process.cwd(),
-    "../data/auto-update/sources.yaml"
+    "../../data/auto-update/sources.yaml"
   );
   const statePath = path.resolve(
     process.cwd(),
-    "../data/auto-update/state.yaml"
+    "../../data/auto-update/state.yaml"
   );
 
   if (!fs.existsSync(sourcesPath)) return [];
