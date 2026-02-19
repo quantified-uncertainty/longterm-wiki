@@ -70,6 +70,17 @@ const RecommendationSchema = z.union([
   }),
 ]);
 
+const ChecksSchema = z.object({
+  initialized: z.boolean(),
+  type: z.string().optional(),
+  initiated_at: z.string().optional(),
+  total: z.number().int().nonnegative().optional(),
+  completed: z.number().int().nonnegative().optional(),
+  na: z.number().int().nonnegative().optional(),
+  skipped: z.number().int().nonnegative().optional(),
+  items: z.array(z.string()).optional(),
+});
+
 export const SessionLogSchema = z.object({
   date: z.string().regex(DATE_RE, { message: 'date must be YYYY-MM-DD' }),
   branch: z.string().min(1, { message: 'branch is required' }),
@@ -83,6 +94,7 @@ export const SessionLogSchema = z.object({
   issues: z.array(z.string()).optional(),
   learnings: z.array(z.string()).optional(),
   recommendations: z.array(RecommendationSchema).optional(),
+  checks: ChecksSchema.optional(),
 }).strict();
 
 export type SessionLogEntry = z.infer<typeof SessionLogSchema>;
@@ -207,6 +219,23 @@ function validate(): { passed: boolean; errors: number; warnings: number } {
         file,
         field: 'duration',
         message: 'Missing recommended field "duration" (e.g., ~15min, ~45min)',
+        severity: 'warning',
+      });
+    }
+
+    // 7. Recommended field: checks (checklist compliance audit trail)
+    if (!entry.checks) {
+      issues.push({
+        file,
+        field: 'checks',
+        message: 'Missing checks: field — run `crux agent-checklist snapshot` before creating session log',
+        severity: 'warning',
+      });
+    } else if (!entry.checks.initialized) {
+      issues.push({
+        file,
+        field: 'checks.initialized',
+        message: 'Checklist was not initialized at session start (checks.initialized: false)',
         severity: 'warning',
       });
     }

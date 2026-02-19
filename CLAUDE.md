@@ -57,6 +57,7 @@ pnpm crux agent-checklist check --na <id>         # Mark items as N/A
 pnpm crux agent-checklist verify                  # Auto-verify items with verifyCommand
 pnpm crux agent-checklist status                  # Show checklist progress
 pnpm crux agent-checklist complete                # Validate all items checked
+pnpm crux agent-checklist snapshot                # Output checks: YAML block for session log
 
 # GitHub issue tracking
 pnpm crux issues                 # List open issues ranked by priority

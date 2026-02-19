@@ -26,6 +26,8 @@ import {
   checkItems,
   currentBranch,
   CHECKLIST_ITEMS,
+  buildChecklistSnapshot,
+  formatSnapshotAsYaml,
   type SessionType,
   type ChecklistMetadata,
 } from '../lib/session-checklist.ts';
@@ -385,6 +387,62 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
   return { output, exitCode: 0 };
 }
 
+/**
+ * Output the current checklist state as YAML for inclusion in a session log.
+ *
+ * Usage:
+ *   crux agent-checklist snapshot
+ *
+ * Outputs a `checks:` YAML block that can be pasted directly into the session
+ * log file. When no checklist exists, outputs `checks: {initialized: false}`.
+ *
+ * The `initiated_at` timestamp in the output reveals whether the checklist was
+ * initialized at session start (good) or created at the last minute (red flag).
+ */
+async function snapshot(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  if (!existsSync(CHECKLIST_PATH)) {
+    const yaml = 'checks:\n  initialized: false';
+    if (options.ci) {
+      return {
+        output: JSON.stringify({ initialized: false }),
+        exitCode: 0,
+      };
+    }
+    let output = yaml + '\n';
+    output += `\n${c.yellow}⚠${c.reset}  No checklist found. Run \`crux agent-checklist init\` at session start.\n`;
+    output += `${c.dim}Including this in session logs shows the checklist was skipped.${c.reset}\n`;
+    return { output, exitCode: 0 };
+  }
+
+  const markdown = readFileSync(CHECKLIST_PATH, 'utf-8');
+  const snapshotData = buildChecklistSnapshot(markdown);
+
+  if (options.ci) {
+    return {
+      output: JSON.stringify(snapshotData, null, 2),
+      exitCode: 0,
+    };
+  }
+
+  const yaml = formatSnapshotAsYaml(snapshotData);
+  let output = yaml + '\n';
+
+  // Annotate with guidance
+  const pct = snapshotData.total ? Math.round(((snapshotData.completed ?? 0) / snapshotData.total) * 100) : 0;
+  const statusColor = pct === 100 ? c.green : pct >= 50 ? c.yellow : c.red;
+  output += `\n${statusColor}${snapshotData.completed}/${snapshotData.total} items completed (${pct}%)${c.reset}`;
+  if ((snapshotData.skipped ?? 0) > 0) {
+    output += ` ${c.red}— ${snapshotData.skipped} item(s) skipped${c.reset}`;
+  }
+  output += '\n';
+  output += `${c.dim}Paste the checks: block above into your session log file.${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
@@ -396,6 +454,7 @@ export const commands = {
   verify,
   status,
   complete,
+  snapshot,
 };
 
 export function getHelp(): string {
@@ -408,6 +467,7 @@ Commands:
   verify           Auto-run verifiable items and check off those that pass
   status           Show checklist progress
   complete         Validate all items checked (exit code 1 if incomplete)
+  snapshot         Output checks: YAML block for session log (run before logging)
 
 Options:
   --type=TYPE      Task type: content, infrastructure, bugfix, refactor, commands
@@ -430,6 +490,7 @@ Examples:
   crux agent-checklist verify
   crux agent-checklist status
   crux agent-checklist complete
+  crux agent-checklist snapshot   # Output checks: YAML for session log
 
 Checklist markers:
   [x]  Checked (complete)
