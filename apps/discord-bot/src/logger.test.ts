@@ -1,16 +1,24 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { calculateCost, formatCost } from "./logger.js";
 
 describe("calculateCost", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("uses default pricing when no model is provided", () => {
-    // Default: input $3.0/M, output $15.0/M
+    // Default: input $3.0/M, output $15.0/M, cacheRead $0.30/M
     const cost = calculateCost(1_000_000, 1_000_000);
     expect(cost).toBeCloseTo(18.0);
   });
 
-  it("uses default pricing when unknown model is provided", () => {
+  it("uses default pricing and warns when unknown model is provided", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const cost = calculateCost(1_000_000, 1_000_000, "unknown-model");
     expect(cost).toBeCloseTo(18.0);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Unknown model")
+    );
   });
 
   it("uses claude-opus-4-6 pricing (input $5/M, output $25/M)", () => {
@@ -18,8 +26,8 @@ describe("calculateCost", () => {
     expect(cost).toBeCloseTo(30.0);
   });
 
-  it("uses claude-sonnet-4-20250514 pricing (input $3/M, output $15/M)", () => {
-    const cost = calculateCost(1_000_000, 1_000_000, "claude-sonnet-4-20250514");
+  it("uses claude-sonnet-4-6 pricing (input $3/M, output $15/M)", () => {
+    const cost = calculateCost(1_000_000, 1_000_000, "claude-sonnet-4-6");
     expect(cost).toBeCloseTo(18.0);
   });
 
@@ -47,6 +55,30 @@ describe("calculateCost", () => {
   it("handles output-only tokens correctly", () => {
     const cost = calculateCost(0, 1_000_000, "claude-opus-4-6");
     expect(cost).toBeCloseTo(25.0);
+  });
+
+  it("includes cache read cost (opus: $0.5/M cache read)", () => {
+    // 1M input ($5) + 1M output ($25) + 1M cache read ($0.5)
+    const cost = calculateCost(1_000_000, 1_000_000, "claude-opus-4-6", 1_000_000);
+    expect(cost).toBeCloseTo(30.5);
+  });
+
+  it("includes cache read cost (default: $0.3/M cache read)", () => {
+    // 1M input ($3) + 1M output ($15) + 1M cache read ($0.3)
+    const cost = calculateCost(1_000_000, 1_000_000, undefined, 1_000_000);
+    expect(cost).toBeCloseTo(18.3);
+  });
+
+  it("cache read tokens default to 0 when not provided", () => {
+    const withoutCache = calculateCost(1_000_000, 1_000_000, "claude-opus-4-6");
+    const withZeroCache = calculateCost(1_000_000, 1_000_000, "claude-opus-4-6", 0);
+    expect(withoutCache).toBeCloseTo(withZeroCache);
+  });
+
+  it("includes cache read cost (haiku: $0.08/M cache read)", () => {
+    // 1M input ($0.8) + 1M output ($4) + 1M cache read ($0.08)
+    const cost = calculateCost(1_000_000, 1_000_000, "claude-3-5-haiku-20241022", 1_000_000);
+    expect(cost).toBeCloseTo(4.88);
   });
 });
 

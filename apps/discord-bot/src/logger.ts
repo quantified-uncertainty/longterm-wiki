@@ -1,17 +1,9 @@
 import { appendFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
+import { getPricing } from "./pricing.js";
 
 const LOGS_DIR = join(process.cwd(), "logs");
 const LOG_FILE = join(LOGS_DIR, "queries.jsonl");
-
-// Claude pricing per 1M tokens
-const PRICING: Record<string, { input: number; output: number }> = {
-  "claude-opus-4-6": { input: 5.0, output: 25.0 },
-  "claude-sonnet-4-20250514": { input: 3.0, output: 15.0 },
-  "claude-3-5-sonnet-20241022": { input: 3.0, output: 15.0 },
-  "claude-3-5-haiku-20241022": { input: 0.8, output: 4.0 },
-  default: { input: 3.0, output: 15.0 },
-};
 
 export interface QueryLog {
   timestamp: string;
@@ -40,12 +32,14 @@ export function ensureLogsDir(): void {
 export function calculateCost(
   inputTokens: number,
   outputTokens: number,
-  model?: string
+  model?: string,
+  cacheReadTokens?: number
 ): number {
-  const pricing = (model && PRICING[model]) || PRICING["default"]!;
+  const pricing = getPricing(model);
   const inputCost = (inputTokens / 1_000_000) * pricing.input;
   const outputCost = (outputTokens / 1_000_000) * pricing.output;
-  return inputCost + outputCost;
+  const cacheReadCost = ((cacheReadTokens ?? 0) / 1_000_000) * pricing.cacheRead;
+  return inputCost + outputCost + cacheReadCost;
 }
 
 export function logQuery(log: QueryLog): void {
