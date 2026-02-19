@@ -1,0 +1,20 @@
+date: 2026-02-19
+branch: claude/add-wiki-tables-VhyKT
+title: Add concrete shareable data tables to high-value pages
+model: sonnet-4
+duration: ~45min
+pages:
+  - openai
+  - safety-orgs-overview
+  - ai-talent-market-dynamics
+summary: >
+  Added three concrete, screenshot-worthy data tables to high-value wiki pages: (1) OpenAI ownership/stakeholder table to openai.mdx showing the 2024-2025 PBC restructuring with Foundation ~26%, Microsoft transitioning from 49% profit share to ~2.5% equity, and Sam Altman's proposed 7% grant; (2) Budget and headcount comparison table to safety-orgs-overview.mdx covering MIRI, ARC, METR, Redwood Research, CAIS, Apollo Research, GovAI, Conjecture, and FAR AI with annual budgets, headcounts, and cost-per-researcher; (3) Per-company compensation comparison table to ai-talent-market-dynamics.mdx comparing Anthropic, OpenAI, Google DeepMind, xAI, Meta AI, and Microsoft Research by total comp range, base salary, equity type, and benefits including Anthropic's unique DAF matching program.
+issues:
+  - Some ownership figures for OpenAI are based on reported/estimated numbers and remain subject to final regulatory review
+  - pipeline added NEEDS CITATION comments for some figures that need future verification
+learnings:
+  - The crux improve pipeline with --directions is very effective at adding targeted tables to existing pages
+  - Safety org budget data is hard to pin down precisely; 990 filings lag by 1-2 years
+recommendations:
+  - Consider creating a dedicated OpenAI stakeholders page similar to anthropic-stakeholders.mdx once the restructuring is finalized
+  - The safety-orgs budget table would benefit from linking to individual org 990 filings as citations

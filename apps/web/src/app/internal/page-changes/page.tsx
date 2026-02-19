@@ -1,45 +1,40 @@
-import { getPageChanges } from "@/data";
-import { PageChangesTable } from "./page-changes-table";
+import { getPageChangeSessions } from "@/data";
+import { PageChangesSessions } from "./page-changes-sessions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Page Changes | Longterm Wiki Internal",
   description:
-    "Timeline of page edits from Claude Code sessions, grouped by session.",
+    "Timeline of wiki page edits from Claude Code sessions, grouped by session.",
 };
 
 export default function PageChangesPage() {
-  const items = getPageChanges();
+  const sessions = getPageChangeSessions();
 
-  // Group by session (branch + date) for summary stats
-  const sessions = new Map<string, Set<string>>();
-  for (const item of items) {
-    const key = `${item.date}|${item.branch}`;
-    if (!sessions.has(key)) sessions.set(key, new Set());
-    sessions.get(key)!.add(item.pageId);
-  }
-
-  const uniquePages = new Set(items.map((i) => i.pageId));
+  const totalPageEdits = sessions.reduce((n, s) => n + s.pages.length, 0);
+  const uniquePages = new Set(
+    sessions.flatMap((s) => s.pages.map((p) => p.pageId))
+  );
 
   return (
     <article className="prose max-w-none">
       <h1>Page Changes</h1>
       <p className="text-muted-foreground">
         Timeline of wiki page edits from Claude Code sessions.{" "}
-        <span className="font-medium text-foreground">{items.length}</span>{" "}
-        changes across{" "}
+        <span className="font-medium text-foreground">{sessions.length}</span>{" "}
+        sessions,{" "}
+        <span className="font-medium text-foreground">{totalPageEdits}</span>{" "}
+        page edits across{" "}
         <span className="font-medium text-foreground">{uniquePages.size}</span>{" "}
-        pages from{" "}
-        <span className="font-medium text-foreground">{sessions.size}</span>{" "}
-        sessions.
+        unique pages.
       </p>
-      {items.length === 0 ? (
+      {sessions.length === 0 ? (
         <p className="text-muted-foreground italic">
           No page changes recorded yet. Session log entries with a{" "}
-          <code>Pages:</code> field will appear here.
+          <code>pages</code> field will appear here.
         </p>
       ) : (
-        <PageChangesTable data={items} />
+        <PageChangesSessions sessions={sessions} />
       )}
     </article>
   );
