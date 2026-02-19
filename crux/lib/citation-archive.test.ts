@@ -68,6 +68,20 @@ Some claim here.[^1]
     expect(citations[0].linkText).toBe('Report Title');
   });
 
+  it('extracts academic-style embedded link citations', () => {
+    const body = `
+AI timelines are uncertain.[^1]
+
+[^1]: Holden Karnofsky, "[Some Background on Our Views Regarding Advanced AI](https://example.com/karnofsky)," Open Philanthropy, 2016.
+`;
+    const citations = extractCitationsFromContent(body);
+    expect(citations.length).toBe(1);
+    expect(citations[0].footnote).toBe(1);
+    expect(citations[0].url).toBe('https://example.com/karnofsky');
+    expect(citations[0].linkText).toContain('Some Background on Our Views');
+    expect(citations[0].linkText).toContain('Holden Karnofsky');
+  });
+
   it('extracts bare URL citations', () => {
     const body = `
 Some claim here.[^1]

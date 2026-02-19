@@ -29,7 +29,7 @@ import {
   citationContent,
   citationQuotes,
 } from '../lib/knowledge-db.ts';
-import { extractSupportingQuote } from '../lib/quote-extractor.ts';
+import { extractSupportingQuote, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 import {
   parseBookReference,
@@ -218,7 +218,7 @@ async function extractQuotesForPage(
           );
           sourceQuote = llmResult.quote;
           sourceLocation = llmResult.location;
-          extractionModel = 'google/gemini-flash-1.5';
+          extractionModel = DEFAULT_CITATION_MODEL;
 
           // Verify the quote exists in the source
           if (sourceQuote) {

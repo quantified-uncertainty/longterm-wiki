@@ -19,6 +19,9 @@ interface PageStats {
   with_quotes: number;
   verified: number;
   avg_score: number | null;
+  accuracy_checked: number;
+  accurate: number;
+  inaccurate: number;
 }
 
 function getPageStats(): PageStats[] {
@@ -30,7 +33,10 @@ function getPageStats(): PageStats[] {
       COUNT(*) as total,
       SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END) as with_quotes,
       SUM(CASE WHEN quote_verified = 1 THEN 1 ELSE 0 END) as verified,
-      AVG(CASE WHEN verification_score IS NOT NULL THEN verification_score END) as avg_score
+      AVG(CASE WHEN verification_score IS NOT NULL THEN verification_score END) as avg_score,
+      SUM(CASE WHEN accuracy_verdict IS NOT NULL THEN 1 ELSE 0 END) as accuracy_checked,
+      SUM(CASE WHEN accuracy_verdict = 'accurate' THEN 1 ELSE 0 END) as accurate,
+      SUM(CASE WHEN accuracy_verdict IN ('inaccurate', 'unsupported') THEN 1 ELSE 0 END) as inaccurate
     FROM citation_quotes
     GROUP BY page_id
     ORDER BY total DESC
@@ -99,8 +105,14 @@ async function main() {
   const sourceTypeStats = getSourceTypeStats();
 
   if (json || ci) {
+    const totalChecked = pageStats.reduce((s, p) => s + p.accuracy_checked, 0);
+    const totalAccurate = pageStats.reduce((s, p) => s + p.accurate, 0);
+    const totalInaccurate = pageStats.reduce((s, p) => s + p.inaccurate, 0);
     const data: Record<string, unknown> = {
       ...stats,
+      accuracyChecked: totalChecked,
+      accuracyAccurate: totalAccurate,
+      accuracyInaccurate: totalInaccurate,
       pageStats,
       sourceTypeStats,
     };
@@ -130,6 +142,23 @@ async function main() {
     console.log(
       `  Average verification:     ${(stats.averageScore * 100).toFixed(0)}%`,
     );
+  }
+
+  // Accuracy stats (if any accuracy checks have been run)
+  const totalChecked = pageStats.reduce((s, p) => s + p.accuracy_checked, 0);
+  if (totalChecked > 0) {
+    const totalAccurate = pageStats.reduce((s, p) => s + p.accurate, 0);
+    const totalInaccurate = pageStats.reduce((s, p) => s + p.inaccurate, 0);
+    const totalMinorOrOther = totalChecked - totalAccurate - totalInaccurate;
+    console.log(`\n${c.bold}Accuracy (second pass):${c.reset}`);
+    console.log(`  Claims checked:           ${totalChecked}`);
+    console.log(`  ${c.green}Accurate:${c.reset}               ${totalAccurate} (${totalChecked > 0 ? ((totalAccurate / totalChecked) * 100).toFixed(0) : 0}%)`);
+    if (totalInaccurate > 0) {
+      console.log(`  ${c.red}Inaccurate/unsupported:${c.reset} ${totalInaccurate} (${((totalInaccurate / totalChecked) * 100).toFixed(0)}%)`);
+    }
+    if (totalMinorOrOther > 0) {
+      console.log(`  ${c.yellow}Minor/other:${c.reset}            ${totalMinorOrOther}`);
+    }
   }
 
   // Source type breakdown
