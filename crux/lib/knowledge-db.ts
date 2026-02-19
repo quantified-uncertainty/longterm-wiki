@@ -1178,6 +1178,22 @@ export const citationQuotes = {
   },
 
   /**
+   * Get accuracy summary for all pages that have been accuracy-checked.
+   * Returns one row per page with counts of checked and inaccurate citations.
+   */
+  getAccuracySummaryAllPages(): Array<{ page_id: string; checked: number; inaccurate: number }> {
+    return db.prepare(`
+      SELECT
+        page_id,
+        COUNT(*) as checked,
+        SUM(CASE WHEN accuracy_verdict IN ('inaccurate', 'unsupported') THEN 1 ELSE 0 END) as inaccurate
+      FROM citation_quotes
+      WHERE accuracy_verdict IS NOT NULL
+      GROUP BY page_id
+    `).all() as Array<{ page_id: string; checked: number; inaccurate: number }>;
+  },
+
+  /**
    * Count total records.
    */
   count(): number {

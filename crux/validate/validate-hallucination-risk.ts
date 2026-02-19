@@ -6,6 +6,7 @@
  *   - Entity type (person/org pages are higher risk for biographical claims)
  *   - Quality score (lower quality correlates with less-verified content)
  *   - Structural indicators (unsourced biographical claims, evaluative flattery)
+ *   - Citation accuracy data (from LLM accuracy checking, issue #323)
  *
  * Outputs a ranked list of pages with risk scores and actionable recommendations.
  *
@@ -17,7 +18,7 @@
  * Part of the hallucination risk reduction initiative (issue #200).
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join, relative, basename } from 'path';
 import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
@@ -44,6 +45,8 @@ interface RiskAssessment {
   rComponentCount: number;
   totalCitations: number;
   hasHumanReview: boolean;
+  accuracyChecked: number;
+  accuracyInaccurate: number;
   riskScore: number;
   riskLevel: 'high' | 'medium' | 'low';
   riskFactors: string[];
@@ -68,12 +71,42 @@ const ENTITY_TYPE_RISK: Record<string, number> = {
   crux: 0.7,
 };
 
+/**
+ * Compute the accuracy-based risk contribution.
+ * Exported for unit testing.
+ *
+ * Thresholds (from issue #323):
+ *   >50% inaccurate/unsupported → +20 points
+ *   >30% inaccurate/unsupported → +10 points
+ *   any inaccurate              → +5 points
+ */
+export function computeAccuracyRisk(
+  checked: number,
+  inaccurate: number,
+): { score: number; factor: string | null } {
+  if (!Number.isFinite(checked) || !Number.isFinite(inaccurate) ||
+      checked <= 0 || inaccurate < 0) return { score: 0, factor: null };
+  // Clamp to avoid impossible percentages from bad data
+  const clampedInaccurate = Math.min(inaccurate, checked);
+  const pct = clampedInaccurate / checked;
+  if (pct > 0.5) return { score: 20, factor: 'majority-inaccurate' };
+  if (pct > 0.3) return { score: 10, factor: 'many-inaccurate' };
+  if (clampedInaccurate > 0) return { score: 5, factor: 'some-inaccurate' };
+  return { score: 0, factor: null };
+}
+
+/** Map of pageId → { checked, inaccurate } from citation accuracy data */
+type AccuracyMap = Map<string, { checked: number; inaccurate: number }>;
+
 function countRComponents(body: string): number {
   const matches = body.match(/<R\s+id=/g);
   return matches ? matches.length : 0;
 }
 
-function assessPage(filePath: string): RiskAssessment | null {
+function assessPage(
+  filePath: string,
+  accuracyMap: AccuracyMap | null,
+): RiskAssessment | null {
   const relativePath = relative(join(PROJECT_ROOT, 'content/docs'), filePath);
 
   // Only assess knowledge-base pages
@@ -101,6 +134,9 @@ function assessPage(filePath: string): RiskAssessment | null {
   const rComponentCount = countRComponents(body);
   const totalCitations = citationCount + rComponentCount;
   const hasHumanReview = readReviews(pageId).length > 0;
+
+  // Accuracy data (if available)
+  const accuracy = accuracyMap?.get(pageId) ?? { checked: 0, inaccurate: 0 };
 
   // Calculate risk score (0-100, higher = more at risk)
   const riskFactors: string[] = [];
@@ -155,6 +191,13 @@ function assessPage(filePath: string): RiskAssessment | null {
     riskFactors.push('no-human-review');
   }
 
+  // Factor 7: Citation accuracy issues (from LLM accuracy checking)
+  const accRisk = computeAccuracyRisk(accuracy.checked, accuracy.inaccurate);
+  if (accRisk.factor) {
+    riskScore += accRisk.score;
+    riskFactors.push(accRisk.factor);
+  }
+
   // Apply entity type multiplier
   if (entityType) {
     const multiplier = ENTITY_TYPE_RISK[entityType] ?? 1.0;
@@ -181,10 +224,34 @@ function assessPage(filePath: string): RiskAssessment | null {
     rComponentCount,
     totalCitations,
     hasHumanReview,
+    accuracyChecked: accuracy.checked,
+    accuracyInaccurate: accuracy.inaccurate,
     riskScore,
     riskLevel,
     riskFactors,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Accuracy data loader
+// ---------------------------------------------------------------------------
+
+async function loadAccuracyMap(): Promise<AccuracyMap | null> {
+  const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
+  if (!existsSync(dbPath)) return null;
+
+  try {
+    const { citationQuotes } = await import('../lib/knowledge-db.ts');
+    const rows = citationQuotes.getAccuracySummaryAllPages();
+    const map: AccuracyMap = new Map();
+    for (const row of rows) {
+      map.set(row.page_id, { checked: row.checked, inaccurate: row.inaccurate });
+    }
+    return map;
+  } catch {
+    // DB not available or query failed — skip accuracy data
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -198,13 +265,16 @@ async function main() {
   const topN = parseInt((args.top as string) || '0', 10);
   const colors = getColors(ci || json);
 
+  // Load accuracy data from SQLite (if available)
+  const accuracyMap = await loadAccuracyMap();
+
   // Assess all pages
   const files = findMdxFiles(CONTENT_DIR_ABS);
   const assessments: RiskAssessment[] = [];
 
   for (const f of files) {
     try {
-      const a = assessPage(f);
+      const a = assessPage(f, accuracyMap);
       if (a) assessments.push(a);
     } catch {
       // Skip files that can't be parsed
@@ -235,14 +305,23 @@ async function main() {
     }
   }
 
+  // Accuracy coverage stats
+  const pagesWithAccuracy = assessments.filter(a => a.accuracyChecked > 0);
+  const pagesWithIssues = assessments.filter(a => a.accuracyInaccurate > 0);
+
   if (ci || json) {
-    const output = {
+    const output: Record<string, unknown> = {
       summary: {
         totalAssessed: assessments.length,
         high: high.length,
         medium: medium.length,
         low: low.length,
         zeroCitations: zeroCitations.length,
+        accuracyCoverage: {
+          pagesChecked: pagesWithAccuracy.length,
+          pagesWithIssues: pagesWithIssues.length,
+          dataAvailable: accuracyMap !== null,
+        },
       },
       highByEntityType: highByType,
       riskFactors: factorCounts,
@@ -259,7 +338,19 @@ async function main() {
   console.log(`  ${c.red}High risk:${c.reset}   ${high.length}`);
   console.log(`  ${c.yellow}Medium risk:${c.reset} ${medium.length}`);
   console.log(`  ${c.green}Low risk:${c.reset}    ${low.length}`);
-  console.log(`  Zero citations: ${zeroCitations.length}\n`);
+  console.log(`  Zero citations: ${zeroCitations.length}`);
+
+  // Accuracy coverage
+  if (accuracyMap !== null) {
+    console.log(`\n  ${c.bold}Accuracy data:${c.reset}`);
+    console.log(`    Pages with accuracy checks: ${pagesWithAccuracy.length}`);
+    if (pagesWithIssues.length > 0) {
+      console.log(`    ${c.red}Pages with inaccurate citations:${c.reset} ${pagesWithIssues.length}`);
+    }
+  } else {
+    console.log(`\n  ${c.dim}Accuracy data: not available (run \`pnpm crux citations check-accuracy\` first)${c.reset}`);
+  }
+  console.log('');
 
   // High risk by entity type
   if (Object.keys(highByType).length > 0) {
@@ -275,24 +366,30 @@ async function main() {
     console.log(`${c.bold}Dominant Risk Factors (high-risk pages):${c.reset}`);
     for (const [factor, count] of Object.entries(factorCounts).sort((a, b) => b[1] - a[1])) {
       const pct = Math.round((count / high.length) * 100);
-      console.log(`  ${factor.padEnd(24)} ${String(count).padStart(4)} (${pct}%)`);
+      console.log(`  ${factor.padEnd(28)} ${String(count).padStart(4)} (${pct}%)`);
     }
     console.log('');
   }
 
   // Top pages table
   const display = topN > 0 ? assessments.slice(0, topN) : assessments.slice(0, 30);
+  const hasAccData = pagesWithAccuracy.length > 0;
+  const accHeader = hasAccData ? `  ${'Acc'.padStart(5)}` : '';
   console.log(`${c.bold}Top ${display.length} Highest-Risk Pages:${c.reset}`);
-  console.log(`${'Risk'.padStart(5)}  ${'Cites'.padStart(5)}  ${'Words'.padStart(6)}  ${'Q'.padStart(3)}  ${'Type'.padEnd(14)} Page`);
-  console.log(`${c.dim}${'─'.repeat(75)}${c.reset}`);
+  console.log(`${'Risk'.padStart(5)}  ${'Cites'.padStart(5)}  ${'Words'.padStart(6)}  ${'Q'.padStart(3)}${accHeader}  ${'Type'.padEnd(14)} Page`);
+  console.log(`${c.dim}${'─'.repeat(hasAccData ? 82 : 75)}${c.reset}`);
 
   for (const a of display) {
     const riskColor = a.riskLevel === 'high' ? c.red : a.riskLevel === 'medium' ? c.yellow : c.green;
+    const accStr = hasAccData
+      ? `  ${a.accuracyChecked > 0 ? (a.accuracyInaccurate > 0 ? `${c.red}${String(a.accuracyInaccurate).padStart(2)}/${a.accuracyChecked}${c.reset}` : `${c.green} ${String(a.accuracyChecked).padStart(2)}ok${c.reset}`) : `${c.dim}   -${c.reset}`}`
+      : '';
     console.log(
       `${riskColor}${String(a.riskScore).padStart(5)}${c.reset}  ` +
       `${String(a.totalCitations).padStart(5)}  ` +
       `${String(a.wordCount).padStart(6)}  ` +
-      `${String(a.quality).padStart(3)}  ` +
+      `${String(a.quality).padStart(3)}` +
+      `${accStr}  ` +
       `${(a.entityType || '-').padEnd(14)} ` +
       `${a.pageId}`
     );
