@@ -223,6 +223,73 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
 }
 
 // ---------------------------------------------------------------------------
+// Claim sentence extraction (more precise than claimContext)
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract the specific sentence containing a footnote reference [^N].
+ *
+ * Unlike `extractCitationsFromContent()` which captures ~300 chars of surrounding
+ * context, this function isolates just the sentence(s) containing the footnote
+ * marker. This is better input for LLM quote extraction.
+ */
+export function extractClaimSentence(body: string, footnoteNum: number): string {
+  const lines = body.split('\n');
+  const refPattern = new RegExp(`\\[\\^${footnoteNum}\\](?!:)`);
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Skip footnote definition lines
+    if (line.trim().startsWith(`[^${footnoteNum}]:`)) continue;
+
+    if (refPattern.test(line)) {
+      // Found the reference line — now extract the sentence containing it
+      // Build the paragraph around this line (include adjacent non-empty lines)
+      const paragraphLines: string[] = [];
+
+      // Collect lines in the current paragraph (backward from reference line)
+      for (let j = i; j >= 0; j--) {
+        const l = lines[j].trim();
+        if (l === '' || l.startsWith('#') || l.startsWith('|') || l.startsWith('---') || l.startsWith('```')) break;
+        paragraphLines.unshift(l);
+      }
+      // Collect lines in the current paragraph (forward from reference line)
+      for (let j = i + 1; j < lines.length; j++) {
+        const l = lines[j].trim();
+        if (l === '' || l.startsWith('#') || l.startsWith('|') || l.startsWith('---') || l.startsWith('```')) break;
+        paragraphLines.push(l);
+      }
+
+      const paragraph = paragraphLines.join(' ').replace(/\s+/g, ' ');
+
+      // Split paragraph into sentences (crude but effective)
+      // Use regex to split on period/question mark/exclamation followed by space or end
+      const sentences = paragraph.split(/(?<=[.!?])\s+/);
+
+      // Find the sentence(s) containing the footnote marker
+      const refRegex = new RegExp(`\\[\\^${footnoteNum}\\]`);
+      const matchingSentences = sentences.filter((s) => refRegex.test(s));
+
+      if (matchingSentences.length > 0) {
+        return matchingSentences
+          .join(' ')
+          .replace(/\[\^\d+\]/g, '') // Strip footnote markers for cleaner claim text
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      // Fallback: return the whole reference line
+      return line
+        .replace(/\[\^\d+\]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+  }
+
+  return '';
+}
+
+// ---------------------------------------------------------------------------
 // Content fetching
 // ---------------------------------------------------------------------------
 
