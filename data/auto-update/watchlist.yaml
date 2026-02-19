@@ -1,0 +1,34 @@
+# Auto-Update Watchlist
+#
+# Pages scheduled for regular forced updates regardless of news routing.
+# The auto-update orchestrator checks this list on every run and injects
+# due entries directly into the update plan.
+#
+# Fields:
+#   pageId:         Wiki page ID (must match MDX filename without extension)
+#   frequency_days: Days between forced updates (7 = weekly, 30 = monthly)
+#   expires:        Stop updating after this date (YYYY-MM-DD, inclusive)
+#   tier:           Update quality tier: polish | standard | deep
+#   directions:     Specific instructions passed to the page improver
+#   last_run:       Auto-maintained: ISO date of last forced update (null if never)
+#
+# Adding a page here guarantees it will be refreshed at least once per
+# frequency_days window, independent of whether any news was routed to it.
+# The `expires` field prevents the list from accumulating stale entries.
+
+entries:
+  - pageId: epstein-ai-connections
+    frequency_days: 7
+    expires: "2026-04-16"
+    tier: standard
+    directions: >
+      Search for new developments related to Jeffrey Epstein's connections to
+      AI researchers and organizations. Look for: newly released DOJ documents
+      or court filings mentioning AI-adjacent researchers, newly identified
+      funding relationships, institutional responses and policy changes at MIT,
+      Harvard, Oxford or other universities, ongoing litigation outcomes, and
+      coverage in scientific or ethics publications. Update sections with any
+      confirmed new information and add citations for new sources. Do not
+      speculate beyond confirmed facts. If nothing significant has changed,
+      make only minor polish improvements.
+    last_run: null

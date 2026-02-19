@@ -216,5 +216,20 @@ sources:
     reliability: medium
     enabled: true
 
+  # ── Watchlist-Supporting Searches ─────────────────────────────────────────
+  # Targeted searches that feed news to pages on the auto-update watchlist.
+  # These run weekly to stay in sync with the watchlist's update cadence.
+
+  - id: epstein-ai-connections-news
+    name: Jeffrey Epstein AI Researcher Connections
+    type: web-search
+    query: "Jeffrey Epstein AI researchers funding connections DOJ files 2026"
+    frequency: weekly
+    categories: [safety, funding, history, governance]
+    reliability: medium
+    enabled: true
+    # Supports watchlist entry for epstein-ai-connections page.
+    # Disable when watchlist entry expires (2026-04-16).
+
 # State tracking is stored in data/auto-update/state.yaml (auto-maintained).
 # This file is only for source configuration — it is never rewritten by code.
