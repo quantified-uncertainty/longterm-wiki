@@ -42,6 +42,7 @@ import { externalLinksRule } from './external-links.ts';
 // Schema validation rules
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { numericIdIntegrityRule } from './numeric-id-integrity.ts';
+import { noQuotedSubcategoryRule } from './no-quoted-subcategory.ts';
 
 // Quality validation rules
 import { temporalArtifactsRule } from './temporal-artifacts.ts';
@@ -106,6 +107,7 @@ export {
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
+  noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
@@ -152,6 +154,7 @@ export const allRules: Rule[] = [
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
+  noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,

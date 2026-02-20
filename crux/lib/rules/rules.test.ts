@@ -17,6 +17,7 @@ import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
+import { noQuotedSubcategoryRule } from './no-quoted-subcategory.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
@@ -681,6 +682,90 @@ describe('footnote-coverage rule', () => {
     });
     const issues = footnoteCoverageRule.check(content, {});
     expect(issues.length).toBe(1); // definitions alone don't count
+  });
+});
+
+// =============================================================================
+// no-quoted-subcategory rule
+// =============================================================================
+
+describe('no-quoted-subcategory rule', () => {
+  it('detects double-quoted subcategory values', () => {
+    const raw = '---\ntitle: Test\nsubcategory: "labs"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('labs');
+    expect(issues[0].message).toContain('subcategory: labs');
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('detects single-quoted subcategory values', () => {
+    const raw = "---\ntitle: Test\nsubcategory: 'alignment'\n---\nContent";
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'alignment' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('alignment');
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('allows unquoted subcategory values', () => {
+    const raw = '---\ntitle: Test\nsubcategory: labs\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('allows pages without a subcategory field', () => {
+    const raw = '---\ntitle: Test\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('does not flag subcategory-like text in the page body', () => {
+    const raw = '---\ntitle: Test\n---\nsubcategory: "labs" appears in body text';
+    const content = mockContent('subcategory: "labs" appears in body text', {
+      raw,
+      frontmatter: { title: 'Test' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('detects hyphenated quoted subcategory values', () => {
+    const raw = '---\ntitle: Test\nsubcategory: "factors-ai-capabilities"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'factors-ai-capabilities' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('factors-ai-capabilities');
+  });
+
+  it('reports correct line number for the quoted subcategory', () => {
+    const raw = '---\ntitle: Test\ndescription: A test page\nsubcategory: "labs"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', description: 'A test page', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    // subcategory is on line 4 in this file (after ---, title, description)
+    expect(issues[0].line).toBe(4);
   });
 });
 

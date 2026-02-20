@@ -132,7 +132,7 @@ const STEPS: Step[] = [
     id: 'frontmatter',
     name: 'Frontmatter schema (blocking)',
     command: 'pnpm',
-    args: ['crux', 'validate', 'unified', '--rules=frontmatter-schema', '--errors-only'],
+    args: ['crux', 'validate', 'unified', '--rules=frontmatter-schema,no-quoted-subcategory', '--errors-only'],
     cwd: PROJECT_ROOT,
   },
   {
