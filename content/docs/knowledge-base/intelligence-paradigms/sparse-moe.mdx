@@ -5,18 +5,24 @@ sidebar:
   label: "Sparse/MoE"
   order: 6
 lastEdited: "2026-02-13"
-readerImportance: 74
+readerImportance: 38.5
 researchImportance: 66.5
 update_frequency: 45
-llmSummary: "MoE architectures activate only 3-18% of total parameters per token, achieving 2-7x compute savings while matching dense model performance (Mixtral 8x7B with 12.9B active matches Llama 2 70B). Safety implications remain uncertain - expert-level interpretability tools and routing behavior analysis are in early stages despite increasing adoption (Mixtral, DeepSeek-V3, rumored GPT-4)."
+llmSummary: "Comprehensive reference on Sparse/MoE transformer architectures covering key models (Mixtral, DeepSeek-V3, DBRX, Switch Transformer), efficiency gains (2-18x parameter efficiency ratios), and safety implications; concludes that MoE introduces routing complexity that creates interpretability gaps but existing safety evaluation approaches largely transfer, with expert-level analysis and routing characterization as key open research gaps."
 ratings:
+  focus: 8.5
   novelty: 3.5
-  rigor: 5
-  actionability: 3
-  completeness: 6.5
-clusters: ["ai-safety"]
-entityType: intelligence-paradigm
+  rigor: 6.5
+  completeness: 7.5
+  concreteness: 8
+  actionability: 3.5
+  objectivity: 7
+clusters:
+  - "ai-safety"
+entityType: "intelligence-paradigm"
 subcategory: architectures
+tacticalValue: 72
+quality: 55
 ---
 import {Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 

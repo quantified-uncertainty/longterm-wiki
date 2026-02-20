@@ -36,7 +36,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   'grade-content': {
     script: 'authoring/grading/index.ts',
     description: 'Grade content quality with AI (3-step pipeline)',
-    passthrough: ['ci', 'batch', 'model', 'dryRun', 'skipWarnings', 'warningsOnly'],
+    passthrough: ['ci', 'batch', 'model', 'dryRun', 'apply', 'parallel', 'page', 'limit', 'category', 'skipGraded', 'skipWarnings', 'warningsOnly', 'unscored', 'output'],
   },
   polish: {
     script: 'authoring/post-improve.ts',
@@ -69,6 +69,7 @@ Options:
   --model=<m>       Model to use (grade-content)
   --skip-warnings   Skip Steps 1-2, just rate (grade-content)
   --warnings-only   Run Steps 1-2 only, skip rating (grade-content)
+  --unscored        Only process pages without a quality score (grade-content)
   --api-direct      Use Anthropic API directly instead of Claude CLI (create)
   --dry-run         Preview without changes
   --verbose         Detailed output

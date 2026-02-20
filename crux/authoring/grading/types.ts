@@ -111,6 +111,7 @@ export interface Options {
   limit: number | null;
   category: string | null;
   skipGraded: boolean;
+  unscoredOnly: boolean;
   output: string;
   apply: boolean;
   parallel: number;

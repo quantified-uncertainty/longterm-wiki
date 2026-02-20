@@ -20,3 +20,8 @@
   agency: ai-directed
   requestedBy: runner
   note: "Improved (polish): Remove all {/* NEEDS CITATION */} markers and the content they flag. If a claim cannot be verified f"
+- date: 2026-02-20
+  tool: crux-grade
+  agency: automated
+  requestedBy: system
+  note: "Quality graded: 62, readerImportance: 72.4"

@@ -2,3 +2,8 @@
   tool: crux-fix
   agency: automated
   note: Auto-fixed validation issues (escaping, markdown, etc.)
+- date: 2026-02-20
+  tool: crux-grade
+  agency: automated
+  requestedBy: system
+  note: "Quality graded: 27, readerImportance: 62.0"
