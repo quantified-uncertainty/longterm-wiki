@@ -1,25 +1,16 @@
 - pageId: ai-timelines
-  footnote: 36
-  claimText: '- **2016**: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimated "at least 10% probability" of TAI within 20 years (by 2036) - ...'
-  sourceTitle: Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving
-  url: https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence
-  verdict: inaccurate
-  score: 0.1
-  issues: The source only contains information about the 2016 estimate from Open Philanthropy. All other dates and estimates are unsupported by the source.
-  difficulty: easy
-  checkedAt: '2026-02-20 04:24:35'
-- pageId: ai-timelines
   footnote: 7
-  claimText: Tom Davidson developed a compute-centric forecasting framework that models the relationship between computational resources, algorithmic progress, and...
+  claimText: (footnote definition only, no inline reference found)
   sourceTitle: 'Forecasting transformative AI: the "biological anchors" method in a nutshell'
   url: https://www.cold-takes.com/forecasting-transformative-ai-the-biological-anchors-method-in-a-nutshell/
   verdict: unsupported
   score: 0.3
   issues: |-
-    The source does not mention Tom Davidson or his compute-centric forecasting framework.
-    The source does not provide the specific estimates (3 years from 20% to 100% automation, superintelligence within a year) attributed to the model for Open Philanthropy.
+    The source does not mention Tom Davidson or his model.
+    The source does not mention the estimated time from 20% to 100% automation of cognitive tasks.
+    The source does not mention superintelligence arriving within a year after full automation.
   difficulty: hard
-  checkedAt: '2026-02-20 04:23:45'
+  checkedAt: '2026-02-20 05:23:50'
 - pageId: ai-timelines
   footnote: 28
   claimText: The AI field experienced multiple periods of reduced activity and funding in the 1970s and 1980s following forecasts that proved overly optimistic abo...
@@ -31,40 +22,50 @@
     The source does not discuss periods of reduced activity and funding in the AI field in the 1970s and 1980s.
     The source does not compare long-term forecasts using quantitative trend extrapolation to purely intuitive predictions.
   difficulty: hard
-  checkedAt: '2026-02-20 04:24:17'
+  checkedAt: '2026-02-20 05:28:05'
 - pageId: ai-timelines
-  footnote: 51
-  claimText: '**Google DeepMind.** Demis Hassabis stated in March 2025 that AGI would emerge in the next five to ten years. By January 2026 at Davos, Hassabis gave ...'
-  sourceTitle: Human-level AI will be here in 5 to 10 years, DeepMind CEO says
-  url: https://www.cnbc.com/2025/03/17/human-level-ai-will-be-here-in-5-to-10-years-deepmind-ceo-says.html
+  footnote: 36
+  claimText: '- **2016**: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimated "at least 10% probability" of transformative AI within 20 year...'
+  sourceTitle: Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving
+  url: https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence
   verdict: inaccurate
   score: 0.3
   issues: |-
-    WRONG NUMBERS: The claim states Hassabis made the first statement in March 2025, but the article was published in March 2024 and refers to a statement made on Monday at a briefing in DeepMind's London offices.
-    WRONG NUMBERS: The claim states Hassabis gave a 50% chance of achieving AGI by the end of 2030 at Davos in January 2026, but the article references a statement made by Dario Amodei, CEO of Anthropic, at Davos in January.
-    FABRICATED DETAILS: The claim states Hassabis described his timeline as moving from "as soon as 10 years" in autumn 2025 to "probably three to five years away" by early 2026, but this is not mentioned in the article.
+    The wiki claim contains multiple inaccuracies regarding dates and probabilities for transformative AI and AGI predictions. The source only supports the 2016 Open Philanthropy estimate.
+    The wiki claim includes information from sources other than the one provided.
+  difficulty: hard
+  checkedAt: '2026-02-20 05:28:22'
+- pageId: ai-timelines
+  footnote: 44
+  claimText: As of February 2026, Metaculus forecasters average a 25% chance of AGI by 2029 and a 50% chance by 2033, based on nearly 2,000 responses to its flagsh...
+  sourceTitle: Transformative AI Date
+  url: https://www.metaculus.com/questions/19356/transformative-ai-date/
+  verdict: inaccurate
+  score: 0.5
+  issues: |-
+    WRONG NUMBERS: The source states that there are 168 forecasters for the transformative AI question, but does not mention the number of forecasters for the AGI question or the percentages for AGI by 2029 and 2033.
+    UNSUPPORTED: The source does not mention 80,000 Hours analysis or the shift in Metaculus forecasters' mean estimate for AGI development.
   difficulty: medium
-  checkedAt: '2026-02-20 04:25:00'
+  checkedAt: '2026-02-20 05:28:34'
 - pageId: ai-timelines
   footnote: 53
-  claimText: '- **2016**: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimated "at least 10% probability" of TAI within 20 years (by 2036) - ...'
+  claimText: The AI 2027 scenario also received widespread popular coverage, projecting fully automated AI research and development by 2027 leading to a recursive ...
   sourceTitle: What the hell happened with AGI timelines in 2025? | 80,000 Hours
   url: https://80000hours.org/podcast/episodes/agi-timelines-in-2025/
   verdict: inaccurate
   score: 0.5
   issues: The claim contains multiple unsupported dates and forecasts that are not mentioned in the source text. Specifically, the 2016, 2020, 2021, 2022, and 2023 forecasts are not present in the provided document. The 2024 Metaculus community median is mentioned as July 2031 at the start of 2025, which later moved to November 2033, not 2028-2031 as the claim states. The AI 2027 scenario is mentioned, but the April 2025 publication date is not. The claim about forecasts extending again in late 2025 is supported, but the specific reason is slightly different. The AI Futures Model median at 2032.5 is not mentioned, nor is the Kwa/METR model predicting 99% AI R&D automation by late 2032. The Metaculus flagship question median at approximately early 2028 is also not mentioned.
   difficulty: hard
-  checkedAt: '2026-02-20 04:25:06'
+  checkedAt: '2026-02-20 05:25:10'
 - pageId: ai-timelines
-  footnote: 45
-  claimText: As of early 2026, the community flagship AGI question shows a median estimate of February 1, 2028, based on over 1,700 forecasters, with an interquart...
+  footnote: 12
+  claimText: The survey demonstrated significant variation across questions and methodologies, with median estimates ranging from 2040s to 2070s depending on how q...
   sourceTitle: 'Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours'
   url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
   verdict: inaccurate
   score: 0.7
   issues: |-
-    WRONG DATE: The wiki claim states 'As of early 2026', but the source states 'As of February 2026'.
-    UNSUPPORTED: The wiki claim mentions an interquartile range spanning July 2026 to August 2031, which is not found in the source.
-    UNSUPPORTED: The wiki claim mentions a separate Metaculus question on transformative AI clustering around 2029–2031 for median arrival, which is not found in the source.
+    The claim mentions median estimates ranging from 2040s to 2070s, but the source mentions estimates ranging from 2030s to 2070s.
+    The claim mentions that the range depends on how questions were framed, but the source does not explicitly state this.
   difficulty: medium
-  checkedAt: '2026-02-20 04:24:48'
+  checkedAt: '2026-02-20 05:27:38'

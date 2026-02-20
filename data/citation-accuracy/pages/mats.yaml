@@ -1,42 +1,46 @@
 - pageId: mats
-  footnote: 70
-  claimText: 'Alumni impact analysis reveals mostly positive views but highlights specific challenges:'
-  sourceTitle: MATS Alumni Impact Analysis — EA Forum
-  url: https://forum.effectivealtruism.org/posts/kJA9q3SGycx6TXjcF/mats-alumni-impact-analysis
+  footnote: 59
+  claimText: '- **Marius Hobbhahn**: CEO of Apollo Research, where he also leads the evals team; Apollo focuses on <EntityLink id="scheming">scheming</EntityLink>, ...'
+  sourceTitle: MATS Winter 2023-24 Retrospective — LessWrong
+  url: https://www.lesswrong.com/posts/Z87fSrxQb4yLXKcTk/mats-winter-2023-24-retrospective
   verdict: unsupported
   score: 0
-  issues: The source does not contain a section titled 'Alumni impact analysis reveals mostly positive views but highlights specific challenges:'
+  issues: null
   difficulty: hard
-  checkedAt: '2026-02-20 04:26:34'
+  checkedAt: '2026-02-20 05:31:30'
 - pageId: mats
   footnote: 61
   claimText: '**Primary Funding Sources**: - **AI Safety Support**: Provides the \$15,000 stipend for each fellow completing the full program (prorated for partial ...'
   sourceTitle: MATS Research
   url: https://matsprogram.org
   verdict: unsupported
-  score: 0.2
-  issues: The source does not mention the specific funding sources listed in the claim, such as AI Safety Support, MATS-arranged funding, Coefficient Giving, Foresight Institute, Survival and Flourishing Fund, Long-Term Future Fund, Craig Falls, or Manifund. It only generally mentions that MATS connects fellows with financial support.
+  score: 0
+  issues: null
   difficulty: hard
-  checkedAt: '2026-02-20 04:26:23'
+  checkedAt: '2026-02-20 05:31:33'
 - pageId: mats
-  footnote: 12
-  claimText: Since its first cohort in early 2022, MATS has supported 213 scholars and 47 mentors across its first five seasonal programs, expanding to 98 scholars...
-  sourceTitle: MATS | Effective Altruism
-  url: https://www.effectivealtruism.org/opportunities/recdsVgelkD2qXd3P
-  verdict: inaccurate
-  score: 0.3
-  issues: |-
-    unsupported: The source does not mention the first cohort in early 2022.
-    unsupported: The source does not mention 213 scholars and 47 mentors across its first five seasonal programs.
-    unsupported: The source does not mention expanding to 98 scholars and 57 mentors by MATS 8.0 in Summer 2025.
-    unsupported: The source does not mention the program generating over 160 research publications with more than 8,000 citations.
-    unsupported: The source does not mention advancing agendas in mechanistic interpretability, sparse feature analysis, activation engineering, and AI safety evaluation.
-    unsupported: The source does not mention alumni founding new AI safety organizations like Apollo Research.
+  footnote: 70
+  claimText: 'Alumni feedback highlights specific challenges reported by MATS participants:'
+  sourceTitle: MATS Alumni Impact Analysis — EA Forum
+  url: https://forum.effectivealtruism.org/posts/kJA9q3SGycx6TXjcF/mats-alumni-impact-analysis
+  verdict: unsupported
+  score: 0
+  issues: null
   difficulty: hard
-  checkedAt: '2026-02-20 04:24:41'
+  checkedAt: '2026-02-20 05:31:44'
+- pageId: mats
+  footnote: 60
+  claimText: MATS receives grants from partner organizations to support its fellowship program. Financial support for scholars is coordinated through partner organ...
+  sourceTitle: ML Alignment & Theory Scholars Funding | Complete Analysis | Extruct AI
+  url: https://www.extruct.ai/hub/matsprogram-org-funding/
+  verdict: unsupported
+  score: 0.2
+  issues: The source mentions financial support for scholars but does not specify that it is coordinated through partner organizations rather than directly by MATS.
+  difficulty: medium
+  checkedAt: '2026-02-20 05:31:32'
 - pageId: mats
   footnote: 35
-  claimText: Selected scholars may continue for an additional 6-12 months through extension programs in London, Berkeley, Boston, or Washington D.C., with MATS arr...
+  claimText: (footnote definition only, no inline reference found)
   sourceTitle: MATS Summer 2026
   url: https://matsprogram.org/program/summer-2026
   verdict: inaccurate
@@ -46,72 +50,32 @@
     The source does not mention MATS arranging funding to cover monthly stipends, compute resources, housing, and office rent.
     The source does not mention that approximately 70% of scholars have been accepted for extensions based on research plans and mentor endorsements.
   difficulty: hard
-  checkedAt: '2026-02-20 04:25:26'
+  checkedAt: '2026-02-20 05:25:23'
 - pageId: mats
-  footnote: 24
-  claimText: '**Mentorship**: Scholars receive approximately 1-2 hours per week of one-on-one mentorship from established researchers via Slack or direct communicat...'
-  sourceTitle: My experience applying to MATS 6.0 — EA Forum
-  url: https://forum.effectivealtruism.org/posts/da8MmRPAB55Fepjjk/my-experience-applying-to-mats-6-0
-  verdict: inaccurate
-  score: 0.4
-  issues: |-
-    unsupported: The source does not mention the scholars receiving 1-2 hours per week of one-on-one mentorship.
-    unsupported: The source does not mention the communication being via Slack or direct communication.
-    misleading_paraphrase: The source mentions that some mentors use work tasks and others conduct interviews focused on research ideas, technical machine learning questions, and career plans. The claim distorts this by saying the interviews focus on ML experience, research proposals, and conceptual alignment questions rather than behavioral assessments.
-  difficulty: hard
-  checkedAt: '2026-02-20 04:25:08'
-- pageId: mats
-  footnote: 59
-  claimText: '- **Marius Hobbhahn**: CEO and Director of Apollo Research focusing on evaluations for <EntityLink id="scheming">scheming</EntityLink> and control; Ph...'
-  sourceTitle: MATS Winter 2023-24 Retrospective — LessWrong
-  url: https://www.lesswrong.com/posts/Z87fSrxQb4yLXKcTk/mats-winter-2023-24-retrospective
-  verdict: inaccurate
-  score: 0.6
-  issues: |-
-    **Marius Hobbhahn**: The source mentions Marius Hobbhahn as a guest speaker at a seminar, but does not provide any information about his role as CEO and Director of Apollo Research, his focus on evaluations for scheming and control, his PhD in Bayesian ML, or his previous work on AI forecasting at Epoch.
-    **Sam Bowman**: The source does not mention Sam Bowman.
-    **Joe Benton**: The source does not mention Joe Benton.
-    **Arthur Conmy**: The source does not mention Arthur Conmy.
-    **Evan Hubinger**: The source mentions Evan Hubinger as a mentor in the MATS program, but does not state that he provided mentorship for early SERI MATS trials and multiple cohorts, or that he was formerly at MIRI.
-    **Neel Nanda**: The source mentions Neel Nanda as having created a custom curriculum for MATS, but does not specify that it included sessions on sparse autoencoders and superposition toy models.
-  difficulty: hard
-  checkedAt: '2026-02-20 04:26:18'
-- pageId: mats
-  footnote: 13
-  claimText: MATS originated as SERI MATS, an initiative under the Strategic Research Institute (SERI) focused on AI safety research training, launching its first ...
+  footnote: 17
+  claimText: The program's core mission from inception was to train talented individuals for AI alignment research by addressing risks from unaligned AI through me...
   sourceTitle: MATS Summer 2023 Retrospective — LessWrong
   url: https://www.lesswrong.com/posts/zwf68YaySvXhWYCdh/mats-summer-2023-retrospective
   verdict: inaccurate
-  score: 0.65
+  score: 0.6
   issues: |-
-    WRONG NUMBERS: The claim states the program launched in early 2022, but the source only mentions the Winter 2022-23 program.
-    FABRICATED DETAILS: The claim includes a specific program structure (4-week online phase, 2-week research sprint, 8-week in-person program) that is not described in the source.
-    WRONG ATTRIBUTION: The claim lists early mentors, but the source only lists mentors from the Summer 2023 and Winter 2022-23 programs.
+    The source does not explicitly state that the program's core mission from inception was to train talented individuals for AI alignment research by addressing risks from unaligned AI through mentorship, training, logistics, and community access. It does mention that the program is for emerging AI safety researchers.
+    The source does not explicitly state that the program evolved into an independent organization. It does mention that the program maintains hubs in both Berkeley and London.
   difficulty: medium
-  checkedAt: '2026-02-20 04:24:44'
+  checkedAt: '2026-02-20 05:30:14'
 - pageId: mats
-  footnote: 6
-  claimText: The **ML Alignment & Theory Scholars (MATS) Program** is a 12-week educational and research fellowship designed to develop talented researchers in AI ...
-  sourceTitle: MATS Program — LessWrong
-  url: https://www.lesswrong.com/w/mats-program
+  footnote: 12
+  claimText: Since its founding, MATS has trained over 446 researchers. The program has generated over 160 research publications with more than 9,000 citations, ad...
+  sourceTitle: MATS | Effective Altruism
+  url: https://www.effectivealtruism.org/opportunities/recdsVgelkD2qXd3P
   verdict: inaccurate
-  score: 0.7
+  score: 0.75
   issues: |-
-    The program is described as an "educational seminar and independent research program" rather than a "12-week educational and research fellowship".
-    The source does not mention AI governance or security.
-    The source does not explicitly state that the program became independent by Summer 2023.
-    The source does not mention in-person cohorts in Berkeley, California and London, United Kingdom.
+    unsupported: Number of researchers trained (446)
+    unsupported: Number of research publications (160)
+    unsupported: Number of citations (9,000)
+    unsupported: Advancing agendas in mechanistic interpretability, sparse feature analysis, activation engineering, and AI safety evaluation
+    minor_issues: Google DeepMind instead of DeepMind
+    unsupported: Founded new AI safety organizations like Apollo Research
   difficulty: medium
-  checkedAt: '2026-02-20 04:24:30'
-- pageId: mats
-  footnote: 60
-  claimText: MATS operates as a non-profit fellowship program sustained through grants and donations rather than generating revenue. The program does not coordinat...
-  sourceTitle: ML Alignment & Theory Scholars Funding | Complete Analysis | Extruct AI
-  url: https://www.extruct.ai/hub/matsprogram-org-funding/
-  verdict: inaccurate
-  score: 0.7
-  issues: |-
-    The claim that MATS operates as a non-profit fellowship program sustained through grants and donations rather than generating revenue is not directly supported by the source. The source mentions grants received but doesn't explicitly state that MATS is a non-profit or that it doesn't generate revenue.
-    The claim that the program does not coordinate funding directly but relies on partner organizations is not supported by the source. The source mentions financial support for scholars and grants received, implying direct funding coordination.
-  difficulty: medium
-  checkedAt: '2026-02-20 04:26:21'
+  checkedAt: '2026-02-20 05:30:01'

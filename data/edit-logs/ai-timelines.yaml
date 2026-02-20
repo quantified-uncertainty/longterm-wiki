@@ -12,3 +12,7 @@
   agency: ai-directed
   requestedBy: system
   note: "Improved (standard): Review and incorporate recent developments: Research note: A simpler AI timelines model predicts 99% AI R&D automation i"
+- date: 2026-02-20
+  tool: crux-audit-escalated
+  agency: automated
+  note: "Escalated to Claude: rewrote 4 section(s) to fix citation inaccuracies"
