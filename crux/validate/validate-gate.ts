@@ -14,10 +14,11 @@
  *   5. YAML schema validation
  *   6. Frontmatter schema validation
  *   7. Numeric ID integrity (cross-entity/page duplicate detection)
- *   8. TypeScript type check
+ *   8. EntityLink enforcement (prefer-entitylink)
+ *   9. TypeScript type check
  *
  * With --full:
- *   9. Full Next.js production build
+ *  10. Full Next.js production build
  *
  * Exit codes:
  *   0 = All checks passed

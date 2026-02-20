@@ -420,7 +420,10 @@ export class ValidationEngine {
 
         case FixType.REPLACE_TEXT:
           if (fix.oldText && fix.newText !== undefined) {
-            lines[lineIndex] = lines[lineIndex].replace(fix.oldText, fix.newText);
+            // Escape $ in the replacement to prevent String.replace special patterns
+            // ($&, $`, $', $n) from corrupting the output when link text contains $.
+            const safeReplacement = fix.newText.replace(/\$/g, '$$$$');
+            lines[lineIndex] = lines[lineIndex].replace(fix.oldText, safeReplacement);
           }
           break;
       }

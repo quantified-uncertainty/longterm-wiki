@@ -3,8 +3,6 @@
  *
  * Detects internal markdown links that should use EntityLink component instead:
  * - [text](/knowledge-base/...) → <EntityLink id="...">text</EntityLink>
- * - [text](/responses/...) → <EntityLink id="...">text</EntityLink>
- * - [text](/risks/...) → <EntityLink id="...">text</EntityLink>
  *
  * Severity:
  * - ERROR: Link points to a registered entity (in idRegistry) — blocking in CI
@@ -19,17 +17,10 @@ import { isInCodeBlock, isInComment, getLineNumber, shouldSkipValidation } from 
 import { MARKDOWN_LINK_RE } from '../patterns.ts';
 import { loadPathRegistry } from '../content-types.ts';
 
-// Internal paths that should use EntityLink
-const INTERNAL_PATH_PATTERNS = [
-  /^\/knowledge-base\//,
-  /^\/responses\//,
-  /^\/risks\//,
-  /^\/organizations\//,
-  /^\/people\//,
-  /^\/capabilities\//,
-  /^\/metrics\//,
-  /^\/debates\//,
-];
+// Internal paths that should use EntityLink.
+// All internal entity links use /knowledge-base/ — the other short-form paths
+// do not exist in practice and are kept as a safeguard only.
+const INTERNAL_PATH_PATTERN = /^\/knowledge-base\//;
 
 // Paths to exclude from EntityLink requirement (structural navigation, not semantic entities)
 const EXCLUDED_PATH_PATTERNS = [
@@ -44,6 +35,9 @@ const EXCLUDED_PATH_PATTERNS = [
   /^\/knowledge-base\/organizations\/?$/,
   /^\/knowledge-base\/people\/?$/,
   /^\/knowledge-base\/capabilities\/?$/,
+  /^\/knowledge-base\/debates\/?$/,
+  /^\/knowledge-base\/metrics\/?$/,
+  /^\/knowledge-base\/cruxes\/?$/,
   // Architecture and deployment tables
   /^\/knowledge-base\/architecture-scenarios\/table\/?$/,
   /^\/knowledge-base\/deployment-architectures\/table\/?$/,
@@ -77,10 +71,8 @@ function getReversePathMap(): Record<string, string> {
 function suggestEntityId(path: string): string {
   // Remove leading slash and trailing slash
   let id = path.replace(/^\//, '').replace(/\/$/, '');
-
   // Remove knowledge-base prefix if present
   id = id.replace(/^knowledge-base\//, '');
-
   return id;
 }
 
@@ -115,10 +107,8 @@ export const preferEntityLinkRule = createRule({
       // Remove anchors and query strings for path lookup
       const cleanHref = href.split('#')[0].split('?')[0];
 
-      const isInternalPath = INTERNAL_PATH_PATTERNS.some(pattern => pattern.test(cleanHref));
-      const isExcludedPath = EXCLUDED_PATH_PATTERNS.some(pattern => pattern.test(cleanHref));
-
-      if (!isInternalPath || isExcludedPath) continue;
+      if (!INTERNAL_PATH_PATTERN.test(cleanHref)) continue;
+      if (EXCLUDED_PATH_PATTERNS.some(pattern => pattern.test(cleanHref))) continue;
 
       const lineNum = getLineNumber(body, position);
 

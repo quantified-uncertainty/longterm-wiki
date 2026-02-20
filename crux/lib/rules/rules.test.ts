@@ -686,36 +686,50 @@ describe('footnote-coverage rule', () => {
 });
 
 describe('prefer-entitylink rule', () => {
-  // Mock engine with idRegistry and a reverse path map loaded via loadPathRegistry
-  // For unit tests, we stub idRegistry.bySlug directly.
+  // Engine mock with known slugs from the real pathRegistry.
+  // The rule reads pathRegistry.json from disk and caches the reverse map; tests
+  // that check ERROR path rely on URLs present in the real pathRegistry.json.
   const engineWithRegistry = {
     idRegistry: {
       bySlug: {
+        // 'community-notes-for-everything' maps to /knowledge-base/responses/community-notes-for-everything/
+        // in the real pathRegistry — used to test the ERROR path without mocking disk I/O.
+        'community-notes-for-everything': 'E300',
         'miri': 'E100',
         'deceptive-alignment': 'E200',
-        'community-notes-for-everything': 'E300',
       },
       byNumericId: {
+        'E300': 'community-notes-for-everything',
         'E100': 'miri',
         'E200': 'deceptive-alignment',
-        'E300': 'community-notes-for-everything',
       },
     },
   };
 
-  it('emits ERROR for markdown link to registered entity', () => {
-    // The rule uses loadPathRegistry() to build the reverse map.
-    // Since the actual pathRegistry.json maps slugs to paths, and
-    // 'community-notes-for-everything' IS in both the registry and bySlug,
-    // a link to its path will produce an ERROR.
-    // We test the WARNING path here (unregistered slug) to avoid FS dependency.
+  it('emits ERROR with REPLACE_TEXT fix for markdown link to registered entity', () => {
+    // 'community-notes-for-everything' is in the real pathRegistry.json at
+    // /knowledge-base/responses/community-notes-for-everything/, so the reverse
+    // map lookup returns the slug, and idRegistry.bySlug finds it → ERROR.
     const content = mockContent(
       'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
     );
-    // With no idRegistry, the rule should fall back to WARNING
-    const issuesNoRegistry = preferEntityLinkRule.check(content as any, { idRegistry: null } as any);
-    expect(issuesNoRegistry.length).toBe(1);
-    expect(issuesNoRegistry[0].severity).toBe(Severity.WARNING);
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].fix?.type).toBe(FixType.REPLACE_TEXT);
+    expect(issues[0].fix?.newText).toBe('<EntityLink id="community-notes-for-everything">Community Notes</EntityLink>');
+  });
+
+  it('falls back to WARNING when entity slug is not in idRegistry', () => {
+    // Same URL but engine has no idRegistry — the entity slug is found in the
+    // pathRegistry reverse map but not in idRegistry.bySlug, so falls to WARNING.
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, { idRegistry: null } as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
   });
 
   it('emits WARNING for internal link to unregistered path', () => {
@@ -746,7 +760,7 @@ describe('prefer-entitylink rule', () => {
 
   it('skips links inside code blocks', () => {
     const content = mockContent(
-      '```\n[MIRI](/knowledge-base/organizations/miri/)\n```',
+      '```\n[Community Notes](/knowledge-base/responses/community-notes-for-everything/)\n```',
     );
     const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
     expect(issues.length).toBe(0);
@@ -754,7 +768,7 @@ describe('prefer-entitylink rule', () => {
 
   it('skips stub pages', () => {
     const content = mockContent(
-      'See [MIRI](/knowledge-base/organizations/miri/) for more.',
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
       { frontmatter: { title: 'Test', pageType: 'stub' } },
     );
     const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
@@ -764,7 +778,7 @@ describe('prefer-entitylink rule', () => {
   it('skips internal documentation pages', () => {
     // The rule checks relativePath.includes('/internal/') — needs surrounding slashes
     const content = mockContent(
-      'See [MIRI](/knowledge-base/organizations/miri/) for more.',
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
       { relativePath: 'docs/internal/some-doc.mdx' },
     );
     const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
@@ -779,10 +793,7 @@ describe('prefer-entitylink rule', () => {
     expect(issues.length).toBe(0);
   });
 
-  it('error issue has REPLACE_TEXT fix', () => {
-    // Test that when a registered entity IS found (via real pathRegistry),
-    // the issue has a FixType.REPLACE_TEXT fix. We test this indirectly:
-    // a WARNING issue (unregistered) should have no fix.
+  it('warning issue has no auto-fix', () => {
     const content = mockContent(
       'See [Unknown](/knowledge-base/some-unknown-page/) for more.',
     );
