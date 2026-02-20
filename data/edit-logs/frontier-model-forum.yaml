@@ -6,3 +6,11 @@
   tool: crux-audit
   agency: automated
   note: Fixed 6 flagged citation inaccuracies via audit
+- date: 2026-02-20
+  tool: crux-audit
+  agency: automated
+  note: Fixed 5 flagged citation inaccuracies via audit
+- date: 2026-02-20
+  tool: crux-audit-pass2
+  agency: automated
+  note: "Second pass: fixed 1 remaining citation inaccuracies"

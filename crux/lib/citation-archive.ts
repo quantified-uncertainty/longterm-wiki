@@ -276,8 +276,59 @@ export function extractClaimSentence(body: string, footnoteNum: number): string 
     if (line.trim().startsWith(`[^${footnoteNum}]:`)) continue;
 
     if (refPattern.test(line)) {
-      // Found the reference line — now extract the sentence containing it
-      // Build the paragraph around this line (include adjacent non-empty lines)
+      const trimmed = line.trim();
+
+      // Detect if this line is part of a list item:
+      // - Direct list item (starts with - or * or N.)
+      // - Continuation of a list item (indented, preceded by a list item)
+      const isDirectListItem = /^\s*[-*]\s/.test(line) || /^\s*\d+\.\s/.test(line);
+      let isListContinuation = false;
+      let listItemStartLine = i;
+
+      if (!isDirectListItem && /^\s+/.test(line)) {
+        // Check if this is a continuation line of a list item above
+        for (let j = i - 1; j >= 0; j--) {
+          const above = lines[j];
+          if (above.trim() === '') break;
+          if (/^\s*[-*]\s/.test(above) || /^\s*\d+\.\s/.test(above)) {
+            isListContinuation = true;
+            listItemStartLine = j;
+            break;
+          }
+          // If we hit a non-indented, non-list line, it's not a continuation
+          if (!/^\s+/.test(above)) break;
+        }
+      }
+
+      if (isDirectListItem || isListContinuation) {
+        // Collect the full list item from its start through continuations
+        const itemLines: string[] = [];
+        for (let j = listItemStartLine; j < lines.length; j++) {
+          const l = lines[j];
+          const lt = l.trim();
+          if (j > listItemStartLine) {
+            // Stop at blank lines, headings, new list items, or block elements
+            if (
+              lt === '' ||
+              lt.startsWith('#') ||
+              /^[-*]\s/.test(lt) ||
+              /^\d+\.\s/.test(lt) ||
+              lt.startsWith('|') ||
+              lt.startsWith('---') ||
+              lt.startsWith('```')
+            ) break;
+          }
+          itemLines.push(lt);
+        }
+
+        return itemLines
+          .join(' ')
+          .replace(/\[\^\d+\]/g, '') // Strip footnote markers
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      // For non-list text: build paragraph as before
       const paragraphLines: string[] = [];
 
       // Collect lines in the current paragraph (backward from reference line)

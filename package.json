@@ -14,7 +14,7 @@
     "setup": "bash scripts/setup.sh",
     "setup:quick": "bash scripts/setup.sh --quick",
     "setup:check": "bash scripts/setup.sh --check",
-    "prepare": "git config core.hooksPath .githooks"
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",

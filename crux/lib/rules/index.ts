@@ -43,6 +43,7 @@ import { externalLinksRule } from './external-links.ts';
 // Schema validation rules
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { numericIdIntegrityRule } from './numeric-id-integrity.ts';
+import { noQuotedSubcategoryRule } from './no-quoted-subcategory.ts';
 
 // Quality validation rules
 import { temporalArtifactsRule } from './temporal-artifacts.ts';
@@ -79,6 +80,9 @@ import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 import { citationDensityRule } from './citation-density.ts';
 import { balanceFlagsRule } from './balance-flags.ts';
 
+// Table header consistency (issue #379)
+import { tableHeadersRule } from './table-headers.ts';
+
 // Security / safety checks
 import { urlSafetyRule } from './url-safety.ts';
 import { noExecSyncRule } from './no-exec-sync.ts';
@@ -108,6 +112,7 @@ export {
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
+  noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
@@ -127,6 +132,7 @@ export {
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
+  tableHeadersRule,
   urlSafetyRule,
   noExecSyncRule,
 };
@@ -155,6 +161,7 @@ export const allRules: Rule[] = [
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
+  noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
@@ -174,6 +181,7 @@ export const allRules: Rule[] = [
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
+  tableHeadersRule,
   urlSafetyRule,
   noExecSyncRule,
 ];

@@ -24,7 +24,7 @@ vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/test-branch-ABC'),
 }));
 
-import { commands, scoreIssue, isBlocked } from './issues.ts';
+import { commands, scoreIssue, isBlocked, findPotentialDuplicates } from './issues.ts';
 import * as githubLib from '../lib/github.ts';
 
 const mockGithubApi = vi.mocked(githubLib.githubApi);
@@ -457,5 +457,126 @@ describe('issues next', () => {
     const result = await commands.next([], { scores: true });
     expect(result.output).toContain('score:');
     expect(result.output).toContain('bug:+50');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// findPotentialDuplicates unit tests
+// ---------------------------------------------------------------------------
+
+describe('findPotentialDuplicates', () => {
+  function makeRanked(overrides: Partial<Parameters<typeof makeIssue>[0]> = {}) {
+    const i = makeIssue(overrides);
+    const labels = (overrides.labels ?? []);
+    return {
+      number: i.number,
+      title: i.title,
+      body: i.body ?? '',
+      labels,
+      createdAt: i.created_at.slice(0, 10),
+      updatedAt: i.updated_at.slice(0, 10),
+      url: i.html_url,
+      priority: 99,
+      score: 50,
+      scoreBreakdown: { priority: 50, bugBonus: 0, claudeReadyBonus: 0, effortAdjustment: 0, recencyBonus: 0, ageBonus: 0, total: 50 },
+      inProgress: false,
+      blocked: false,
+    };
+  }
+
+  it('detects issues with very similar titles', () => {
+    const issues = [
+      makeRanked({ number: 1, title: 'Standardize table column formats across page types' }),
+      makeRanked({ number: 2, title: 'Standardize table columns across page types' }),
+    ];
+    const dups = findPotentialDuplicates(issues);
+    expect(dups.length).toBe(1);
+    expect(dups[0].similarity).toBeGreaterThan(0.5);
+  });
+
+  it('does not flag unrelated issues', () => {
+    const issues = [
+      makeRanked({ number: 1, title: 'Add Postgres sync layer for citation data' }),
+      makeRanked({ number: 2, title: 'Interactive knowledge graph explorer' }),
+    ];
+    const dups = findPotentialDuplicates(issues);
+    expect(dups.length).toBe(0);
+  });
+
+  it('detects duplicate with slightly different wording', () => {
+    const issues = [
+      makeRanked({ number: 1, title: 'Clean up legacy frontmatter fields (importance, lastUpdated, todo, entityId)' }),
+      makeRanked({ number: 2, title: 'Clean up legacy frontmatter fields (importance, lastUpdated, todo)' }),
+    ];
+    const dups = findPotentialDuplicates(issues);
+    expect(dups.length).toBe(1);
+  });
+
+  it('returns empty array for single issue', () => {
+    const issues = [makeRanked({ number: 1, title: 'Some issue' })];
+    const dups = findPotentialDuplicates(issues);
+    expect(dups.length).toBe(0);
+  });
+
+  it('returns empty array for no issues', () => {
+    const dups = findPotentialDuplicates([]);
+    expect(dups.length).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// cleanup command
+// ---------------------------------------------------------------------------
+
+describe('issues cleanup', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('reports all clean when no claude-working issues and no duplicates', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 1, title: 'Unique issue A' }),
+      makeIssue({ number: 2, title: 'Completely different B' }),
+    ]);
+    const result = await commands.cleanup([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('No claude-working issues');
+    expect(result.output).toContain('No potential duplicates');
+  });
+
+  it('detects stale claude-working when branch does not exist', async () => {
+    // First call: fetchOpenIssues
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 10, title: 'WIP issue', labels: ['claude-working'] }),
+    ]);
+    // Second call: fetch comments for issue #10
+    mockGithubApi.mockResolvedValueOnce([
+      { body: '🤖 Claude Code starting work.\n\n**Branch:** `claude/test-branch-ABC`', created_at: '2026-02-20' },
+    ]);
+    // Third call: check branch existence — throw to simulate 404
+    mockGithubApi.mockRejectedValueOnce(new Error('GitHub API GET returned 404: not found'));
+
+    const result = await commands.cleanup([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('does not exist');
+    expect(result.output).toContain('stale');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// close command
+// ---------------------------------------------------------------------------
+
+describe('issues close — input validation', () => {
+  it('returns usage error when no args provided', async () => {
+    const result = await commands.close([], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Usage');
+    expect(result.output).toContain('close');
+  });
+
+  it('returns usage error for non-numeric arg', async () => {
+    const result = await commands.close(['abc'], {});
+    expect(result.exitCode).toBe(1);
   });
 });

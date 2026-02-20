@@ -65,6 +65,10 @@ pnpm crux issues next            # Show next highest-priority issue to work on
 pnpm crux issues create "title" --label=tooling  # File a new issue (use during tooling-gaps-actioned)
 pnpm crux issues start <N>       # Signal start: comment + add claude-working label
 pnpm crux issues done <N>        # Signal completion: comment + remove label
+pnpm crux issues cleanup         # Detect stale claude-working labels + potential duplicates
+pnpm crux issues cleanup --fix   # Auto-remove stale labels
+pnpm crux issues close <N> --duplicate=M  # Close issue as duplicate of another
+pnpm crux issues close <N> --reason="..."  # Close with comment
 
 # Hallucination risk & review tracking
 pnpm crux validate hallucination-risk         # Risk assessment report
@@ -159,11 +163,11 @@ pnpm crux fix escaping              # Auto-fix dollar signs, comparisons, tildes
 pnpm crux fix markdown              # Auto-fix list formatting, bold labels
 pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # MUST pass (blocking in CI)
 pnpm crux validate schema           # MUST pass (blocking in CI) — validates YAML entity types, fields
-pnpm crux validate unified --rules=frontmatter-schema --errors-only  # MUST pass (blocking in CI) — validates MDX frontmatter
+pnpm crux validate unified --rules=frontmatter-schema,no-quoted-subcategory --errors-only  # MUST pass (blocking in CI) — validates MDX frontmatter
 pnpm crux validate unified --rules=prefer-entitylink --errors-only   # MUST pass (blocking in CI) — use EntityLink for registered entities (auto-fixable: --fix)
 pnpm crux validate                  # Full validation (advisory)
 ```
-**Five checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, `unified --rules=frontmatter-schema`, `unified --rules=numeric-id-integrity`, and `unified --rules=prefer-entitylink`. All must pass before committing.
+**Six checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, `unified --rules=frontmatter-schema,no-quoted-subcategory`, `unified --rules=numeric-id-integrity`, and `unified --rules=prefer-entitylink`. All must pass before committing.
 
 When you write a markdown link like `[MIRI](/knowledge-base/organizations/miri/)` and `miri` is a registered entity, the gate will fail. Fix with `pnpm crux validate unified --rules=prefer-entitylink --fix`.
 

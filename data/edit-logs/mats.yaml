@@ -6,3 +6,7 @@
   tool: crux-audit-escalated
   agency: automated
   note: "Escalated to Claude: rewrote 7 section(s) to fix citation inaccuracies"
+- date: 2026-02-20
+  tool: crux-audit
+  agency: automated
+  note: Fixed 1 flagged citation inaccuracies via audit

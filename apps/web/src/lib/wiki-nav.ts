@@ -368,6 +368,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Diagram Naming", href: internalHref("diagram-naming-research") },
         { label: "Page Creator Pipeline", href: internalHref("page-creator-pipeline") },
         { label: "Gap Analysis (Feb 2026)", href: internalHref("gap-analysis-2026-02") },
+        { label: "Consistency Audit (Feb 2026)", href: internalHref("website-consistency-audit-2026-02") },
       ],
     },
     {

@@ -1,0 +1,52 @@
+date: "2026-02-20"
+branch: claude/resolve-issue-359-DrdM1
+title: "Add clusters tags to 104 untagged knowledge-base pages (issue #359)"
+pr: "https://github.com/quantified-uncertainty/longterm-wiki/pull/371"
+model: claude-sonnet-4-6
+duration: ~25min
+cost: ~$0.10
+issue: 359
+
+pages: []
+
+summary: |
+  Tagged all 104 untagged knowledge-base pages with 2-4 cluster values from
+  the existing vocabulary (ai-safety, governance, community, epistemics,
+  biorisks, cyber). This makes previously invisible pages discoverable in
+  the tag browser and homepage topic clusters. Also assigned 5 new numericId
+  values to history pages that lacked them.
+
+key_decisions:
+  - "Include index pages: Issue said ~89 pages; tagged 104 total (88 real + 16 index). Index pages were untagged too."
+  - "Cluster assignment based on subcategory, entityType, title keywords, and similarity to already-tagged pages in same directory."
+  - "Used unquoted cluster values consistently (some existing pages had quoted variants like \"ai-safety\")."
+  - "Tooling gap: No automated validator checks that KB pages have a clusters field. A lint rule could catch this at CI time."
+
+checks:
+  initialized: true
+  type: content
+  initiated_at: "2026-02-20T07:19:12.284Z"
+  total: 33
+  completed: 19
+  na: 13
+  skipped: 1
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - research-content
+    - fix-escaping
+    - correctness
+    - no-regressions
+    - mdx-escaping
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned

@@ -1,0 +1,316 @@
+---
+numericId: E885
+title: "Website Consistency Audit (February 2026)"
+description: "Comprehensive audit of page quality, structural consistency, navigation, and cross-linking across the wiki's ~625 pages"
+entityType: internal
+lastEdited: "2026-02-20"
+evergreen: false
+---
+
+# Website Consistency Audit — February 2026
+
+This report documents a systematic audit of the wiki's consistency, quality distribution, navigation structure, and cross-linking completeness. It covers **672 non-internal MDX pages** and identifies specific problems with prioritized recommendations.
+
+---
+
+## Executive Summary
+
+The wiki has strong foundational infrastructure (templates, grading engine, citation tracking, data-driven navigation) but suffers from **inconsistent adoption of its own systems**. The core problems are:
+
+1. **15% of scored pages are stubs or near-stubs**, many covering the wiki's most important topics
+2. **Page structure varies wildly within the same entity type** — section names, table formats, and component usage differ on every page
+3. **Frontmatter fields are inconsistently populated** — critical fields like `numericId` (16%), `subcategory` (71%), and `clusters` (80%) have major gaps
+4. **Navigation has dead zones** — 20+ pages have no sidebar, the homepage omits the entire AI Transition Model section, and 89 KB pages can't appear on the homepage
+5. **Two citation systems coexist** — `<R id="...">` and `[^N]` footnotes are used interchangeably with no clear rule
+
+The wiki is in a state where the *systems* are well-designed but the *content* was created across many sessions with insufficient enforcement of those systems.
+
+---
+
+## 1. Quality Distribution
+
+### Quality Score Breakdown (622 pages with scores)
+
+| Tier | Count | % | Description |
+|------|-------|---|-------------|
+| 0 (stubs) | 71 | 11.4% | Complete placeholders with no prose content |
+| 1–20 | 21 | 3.4% | Near-stubs with minimal content |
+| 21–40 | 57 | 9.2% | Low quality, partial coverage |
+| 41–60 | 243 | 39.1% | Adequate — bulk of the wiki |
+| 61–80 | 191 | 30.7% | Good quality |
+| 81–100 | 39 | 6.3% | Excellent — flagship pages |
+
+**81 additional pages** have no `quality` field at all, including overview/hub pages with importance scores above 90.
+
+### Worst Quality/Importance Mismatches
+
+These pages have the largest gap between how important they are and how little content they have:
+
+| Page | Quality | Importance | Gap |
+|------|---------|------------|-----|
+| existential-catastrophe | 0 | 92 | 92 |
+| transformative-ai | 0 | 92 | 92 |
+| autonomous-replication | 0 | 91 | 91 |
+| compute | 0 | 90 | 90 |
+| ai-governance | 0 | 89 | 89 |
+| alignment-robustness | 0 | 89 | 89 |
+| technical-ai-safety | 0 | 89 | 89 |
+| benchmarking | 0 | 88 | 88 |
+| is-ai-xrisk-real | 12 | 93 | 81 |
+| fast-takeoff | 0 | 81 | 81 |
+| ai-takeover | 0 | 77 | 77 |
+| dan-hendrycks | 19 | 87 | 68 |
+| neel-nanda | 26 | 84 | 58 |
+| nick-bostrom | 25 | 82 | 57 |
+| jan-leike | 27 | 82 | 55 |
+| chris-olah | 27 | 79 | 52 |
+
+**`is-ai-xrisk-real`** has the highest importance score in the entire wiki (93) but only quality 12. This is arguably the single most important page on an AI safety wiki and it barely exists.
+
+**60 total pages** have quality under 30 with importance over 50.
+
+---
+
+## 2. Structural Consistency by Page Type
+
+### Risk Pages (74 pages)
+
+**What's consistent:** All have an Overview section, all use `EntityLink`, all have `DataInfoBox` and `DataExternalLinks`.
+
+**What's inconsistent:**
+- **Section names vary on every page.** The template requires "How It Works" — actual pages use "How AI Could Help Attackers", "Technical Capabilities & Development", "How Racing Dynamics Work", "The Autonomy Spectrum and Human Control", etc.
+- **Risk Assessment table columns differ.** Every sampled page has different headers: `Risk Factor | Assessment | Evidence | Timeline` vs. `Dimension | Assessment | Evidence` vs. `Factor | Severity | Likelihood | Timeline | Trend` vs. `Dimension | Rating | Justification`.
+- **"Responses" section** uses 4 different names across 5 pages.
+- **"Key Uncertainties"** uses 4 different names.
+- Only 1 of 5 sampled pages has a "Quick Assessment" table — this is an emerging pattern that has not been rolled out.
+
+### Response/Approach Pages (162 pages)
+
+**What's consistent:** "Quick Assessment" table appears on most pages. `EntityLink` is universal.
+
+**What's inconsistent:**
+- **Quick Assessment table columns vary:** `Dimension | Assessment | Evidence` vs. `Aspect | Status` vs. `Dimension | Rating | Notes` vs. `Aspect | Details`.
+- **"How It Works"** is required by template but uses 4 different label variants.
+- **"Risks Addressed"** (required) appears on only 3 of 5 sampled pages — policy pages skip it.
+- **Citation style split:** Some pages use `<R id="...">`, others use `[^N]` footnotes, with no clear rule.
+- **`DataInfoBox` presence** varies — only 2 of 5 sampled pages include it.
+
+### Organization Pages (121 pages)
+
+**Widest variation of any type.** The organizations directory contains a mix of:
+- Proper organization profiles (deepmind, miri, openai)
+- Data table pages (`entityType: table`)
+- Concept analyses (`entityType: concept`) about organizational topics
+- Stub redirects
+- Overview aggregation pages (`entityType: overview`)
+
+Among proper organization pages, section count varies from 8 to 20 H2 sections. Section naming is inconsistent ("Historical Evolution" vs. "History" vs. "Organizational Evolution"). Quick Assessment appears on only 1 of 3 sampled proper org pages.
+
+### Person Pages (45 pages)
+
+- 2 of 5 sampled pages lack an "Overview" section, using "Background" instead
+- Risk Assessment tables appear on 3 of 5 (not a template requirement)
+- 21 of ~45 person pages have a manual "Key Links" table, creating redundancy with the `<DataExternalLinks>` component
+- Import sets and component usage vary across every page
+
+### Model Pages (89 pages)
+
+- The highest-quality model pages (scaling-laws quality 92, ai-timelines quality 95) have the **sparsest frontmatter** — they predate the standardized template system
+- `DataInfoBox` presence varies — some include it, some omit it entirely
+- All sampled model pages use `[^N]` footnotes rather than `<R>` references
+
+---
+
+## 3. Frontmatter Consistency
+
+### Field Coverage
+
+| Field | Coverage | Status |
+|-------|----------|--------|
+| title | 100% | Consistent |
+| description | 100% | Consistent |
+| readerImportance | 94.5% | Good |
+| researchImportance | 92.6% | Good |
+| quality | 89.1% | Moderate gap (73 pages missing) |
+| ratings | 87.4% | Moderate gap |
+| lastEdited | 84.1% | Gap — 107 pages missing, mostly ATM section |
+| llmSummary | 83.0% | Gap — 114 pages missing |
+| entityType | 81.0% | Gap — 128 pages missing |
+| clusters | 79.6% | Gap — 137 pages missing |
+| subcategory | 70.8% | Significant gap |
+| update_frequency | 70.8% | Significant gap |
+| tacticalValue | 20.5% | Sparse — selectively applied |
+| numericId | 16.4% | Very sparse — only 110 pages |
+
+### Specific Issues
+
+**Rating dimensions are inconsistent.** The standard 4 dimensions (novelty, rigor, actionability, completeness) are on most rated pages. But 122 pages (21%) have extra dimensions (`concreteness`, `focus`, `objectivity`) introduced around December 2025 and not rolled out to other pages.
+
+**Legacy/duplicate field names exist:**
+- 16 pages use `importance` instead of `readerImportance`/`researchImportance`
+- 1 page uses `lastUpdated` instead of `lastEdited`
+- 2 pages use `todo` (singular) instead of `todos` (plural)
+- 5 pages have a non-standard `entityId` field
+
+**entityType vs. directory mismatches:** 29 pages, including 6 genuine mismatches where `entityType: concept` or `entityType: table` pages live in the `organizations/` directory.
+
+**Subcategory quoting is inconsistent:** 9 pages use quoted values (`"governance-legislation"`) while all others use unquoted. Functionally identical in YAML but a formatting inconsistency.
+
+**8 singleton subcategory values** exist (used by only 1 page each), suggesting incomplete classification.
+
+---
+
+## 4. Navigation and Cross-Linking
+
+### Sidebar Coverage Gaps
+
+| Area | Pages | Sidebar? |
+|------|-------|----------|
+| Knowledge Base | 540 | Yes (data-driven) |
+| AI Transition Model | 68 | Yes (custom structure) |
+| Internal | 31 | Yes (hardcoded) |
+| browse/ | 3 | **No** |
+| dashboard/ | 2 | **No** |
+| guides/ | 2 | **No** |
+| insight-hunting/ | 5 | **No** |
+| project/ | 6 | **No** |
+| Root pages | 2 | **No** |
+
+**~20 pages** have no sidebar navigation. These are reachable only via direct URL or cross-links.
+
+Additionally, 3 pages at the KB root level (`architecture-scenarios-table.mdx`, `deployment-architectures-table.mdx`, `directory.mdx`) don't belong to any section sidebar.
+
+### Homepage Coverage Gaps
+
+The homepage features 4 topic clusters (AI Safety, Governance, Biorisks, Epistemics) that spotlight pages. Key gaps:
+
+- **AI Transition Model** (68 pages) is completely absent from the homepage
+- **Biorisks cluster** has only 4 pages assigned (vs. 116 for AI Safety)
+- **89 KB pages** (16%) have no cluster assignment and can never appear on the homepage
+- **No direct links** to KB section index pages (Risks, Responses, Organizations, People, Models, etc.)
+
+### EntityLink Coverage
+
+- **81% of all MDX files** use `<EntityLink>` — strong overall
+- **93% of KB content pages** have cross-links
+- **40 KB content pages** (7%) have zero EntityLinks — concentrated in organizations, intelligence paradigms, and stub pages
+
+### Related Entries Coverage
+
+| Entity YAML file | Entities with relatedEntries | Coverage |
+|---|---|---|
+| models.yaml | 92% | Strong |
+| misc.yaml | 95% | Strong |
+| risks.yaml | 73% | Moderate |
+| responses.yaml | 65% | Moderate |
+| concepts.yaml | 60% | Moderate |
+| people.yaml | 57% | Moderate |
+| capabilities.yaml | 48% | Weak |
+| organizations.yaml | 34% | **Very weak** |
+| epistemic-orgs-projects.yaml | 0% | **None** |
+
+**66% of organizations** and **100% of epistemic-orgs-projects entities** have zero explicit related entries. The automatic relatedGraph compensates somewhat via tag and similarity matching, but the signal is weaker.
+
+### Index Page Consistency
+
+14 of 15 KB section index pages follow a consistent template (Overview, Categories, EntityLinks, Why This Matters). The **incidents index** is an outlier — only 28 lines, no EntityLinks, no content listings.
+
+---
+
+## 5. Citation and Content Integrity
+
+### Two Citation Systems
+
+The wiki uses two incompatible citation approaches:
+
+1. **`<R id="...">` component references** — structured, linked to the resources YAML layer
+2. **`[^N]` markdown footnotes** — inline, not connected to any data layer
+
+Roughly half the pages use each system, with some pages mixing both. Model pages and policy pages tend toward footnotes; risk and technical response pages tend toward `<R>`. **There is no documented rule for when to use which.**
+
+### Content Confidence System
+
+The three-tier hallucination risk banner is well-designed. However:
+- **Zero human reviews** have been recorded (review tracking infrastructure exists but is empty)
+- **475 total citations** across the wiki; only 279 (59%) checked
+- **6% error rate** among checked citations (17 inaccurate + 13 unsupported)
+- External links on at least one high-importance page contain hallucinated URLs
+
+---
+
+## 6. UX Issues
+
+1. **No table of contents** on long articles (some are thousands of words with many sections)
+2. **No pagination** on the Explore page (625+ cards load at once)
+3. **Search button is small** and keyboard-shortcut-focused (Cmd+K); not immediately discoverable
+4. **Homepage doesn't disclose** that content is AI-generated (individual pages have confidence banners but the homepage does not)
+5. **Browse MDX pages** (`/browse/`) appear to be a legacy layer superseded by the `/wiki` app route — potential confusion
+
+---
+
+## Prioritized Recommendations
+
+### Critical (Highest Impact)
+
+1. **Fill the top 20 quality/importance gaps.** Pages like `is-ai-xrisk-real` (importance 93, quality 12), `existential-catastrophe` (importance 92, quality 0), and `transformative-ai` (importance 92, quality 0) are the wiki's biggest credibility risks. Use `pnpm crux content create` or `pnpm crux content improve` for each.
+
+2. **Standardize section names within each entity type.** The template system defines `alternateLabels` but actual pages use labels not in the list. Options:
+   - Enforce template section names via a new validation rule
+   - Expand `alternateLabels` to cover all observed variants
+   - Run a batch rename across existing pages
+
+3. **Standardize table column formats.** Risk Assessment, Quick Assessment, and Key Links tables should use identical column headers across all pages of the same type.
+
+### High Priority
+
+4. **Populate missing `numericId` values.** Currently 16.4% coverage. Run `node apps/web/scripts/assign-ids.mjs` to assign IDs to all entities/pages. This unblocks reliable `<EntityLink>` resolution.
+
+5. **Add AI Transition Model to the homepage.** 68 pages in a major section are invisible from the homepage.
+
+6. **Complete `clusters` tagging** for the 89 KB pages without assignments, especially organizations (26% untagged) and responses (17% untagged).
+
+7. **Pick one citation system** and migrate. Recommendation: standardize on `<R>` references since they connect to the resources data layer. Create a validation rule that flags `[^N]` footnotes.
+
+### Medium Priority
+
+8. **Add sidebar navigation** to browse, guides, project, and insight-hunting sections. These 20 pages are currently navigational dead ends.
+
+9. **Fix entityType/directory mismatches.** Move 6 misplaced pages to their correct directories or correct their entityType.
+
+10. **Clean up legacy frontmatter fields.** Rename `importance` to `readerImportance` (16 pages), `lastUpdated` to `lastEdited` (1 page), `todo` to `todos` (2 pages). Remove non-standard `entityId` fields (5 pages).
+
+11. **Populate `quality` on the 81 pages missing it**, especially overview/hub pages with high importance scores.
+
+12. **Standardize rating dimensions.** Either roll out the extra dimensions (concreteness, focus, objectivity) to all pages or remove them from the 122 pages that have them.
+
+### Lower Priority
+
+13. **Strengthen organization cross-linking.** 66% of organizations have no explicit `relatedEntries`. Add at least 3-5 related entries per entity.
+
+14. **Add table of contents** to long articles (word count \> 1500).
+
+15. **Merge or redirect** the legacy `/browse/` pages to `/wiki` equivalents.
+
+16. **Fix the incidents index page** — add EntityLinks and content listings.
+
+17. **Review singleton subcategory values** (8 values used by only 1 page each) for consolidation.
+
+---
+
+## Appendix: Pages Missing Quality Scores (Importance \> 80)
+
+| Page | Importance | Section |
+|------|-----------|---------|
+| factors-ai-capabilities-overview | 94 | ATM |
+| factors-civilizational-competence-overview | 94 | ATM |
+| factors-misalignment-potential-overview | 94 | ATM |
+| scenarios-ai-takeover-overview | 94 | ATM |
+| agentic-ai | 94 | ATM |
+| outcomes-overview | 93 | ATM |
+| factors-ai-ownership-overview | 92 | ATM |
+| factors-transition-turbulence-overview | 92 | ATM |
+| scenarios-overview | 92 | ATM |
+| alignment-interpretability-overview | 91 | ATM |
+| factors-ai-uses-overview | 90 | ATM |
+
+These are ATM overview/hub pages that anchor the navigation structure. All lack quality assessment.
