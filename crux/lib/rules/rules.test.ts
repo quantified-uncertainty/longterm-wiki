@@ -122,6 +122,21 @@ describe('tilde-dollar rule', () => {
     expect(issues.length >= 1).toBe(true);
     expect(issues.some((i: any) => i.message.includes('Tilde in table cell'))).toBe(true);
   });
+
+  it('detects \\≈ escaped approximation symbol', () => {
+    const content = mockContent('raises \\≈\\$5M in funding.');
+    const issues = tildeDollarRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues.some((i: any) => i.message.includes('Escaped approximation symbol'))).toBe(true);
+    expect(issues.find((i: any) => i.message.includes('Escaped approximation symbol'))?.severity).toBe(Severity.ERROR);
+  });
+
+  it('allows unescaped ≈ symbol', () => {
+    const content = mockContent('raises ≈\\$5M in funding.');
+    const issues = tildeDollarRule.check(content, {});
+    const escapedApproxIssues = issues.filter((i: any) => i.message.includes('Escaped approximation symbol'));
+    expect(escapedApproxIssues.length).toBe(0);
+  });
 });
 
 describe('fake-urls rule', () => {
