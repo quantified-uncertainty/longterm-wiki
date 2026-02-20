@@ -1,0 +1,57 @@
+date: 2026-02-20
+branch: claude/resolve-issue-379-K2YuZ
+title: "Standardize table column headers across ~120 wiki pages"
+issue: 379
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/392
+model: claude-sonnet-4-6
+pages: []
+
+summary: |
+  Resolved issue #379 by auditing all three standard table types across the wiki,
+  establishing canonical column header formats, and applying them consistently
+  across 118 content pages (120 header changes total). Also added a new
+  `table-headers` validation rule to crux to prevent future regressions.
+  Canonical formats: Risk Assessment: | Dimension | Assessment | Notes |,
+  Quick Assessment: | Dimension | Assessment | Evidence |,
+  Key Links: | Source | Link |. All 8 gate checks pass (229 tests).
+
+key_decisions:
+  - "Canonical Risk Assessment header: | Dimension | Assessment | Notes | (20x most common, matches knowledge-base style guide)"
+  - "Canonical Quick Assessment header: | Dimension | Assessment | Evidence | (187x most common, 55% of all QA tables)"
+  - "Canonical Key Links header: | Source | Link | (157x most common, 98%)"
+  - "Specialized multi-column tables (5-col risk tables, comparison tables) left as-is at info level — cannot compress without losing data"
+  - "Validation rule severity: warning for auto-fixable aliases, info for specialized multi-column variants"
+  - "Added table-headers validation rule to crux to enforce standards going forward"
+
+checks:
+  initialized: true
+  type: content
+  initiated_at: "2026-02-20T16:55:23.642Z"
+  total: 33
+  completed: 23
+  na: 4
+  skipped: 6
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - no-hardcoded
+    - fix-escaping
+    - crux-pipeline
+    - correctness
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - entitylinks-resolve
+    - numeric-ids-stable
+    - mdx-escaping
+    - content-accuracy
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - issue-tracking
+    - tooling-gaps-actioned
