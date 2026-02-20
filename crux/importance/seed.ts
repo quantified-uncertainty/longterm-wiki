@@ -58,9 +58,11 @@ async function main() {
     const titleMatch = content.match(/^title:\s*["']?(.+?)["']?\s*$/m);
     const title = titleMatch ? titleMatch[1] : id;
 
-    // Extract importance
-    const importanceMatch = content.match(/^importance:\s*([\d.]+)\s*$/m);
-    const importance = importanceMatch ? parseFloat(importanceMatch[1]) : 0;
+    // Extract importance (prefer readerImportance, fall back to legacy importance:)
+    const readerImportanceMatch = content.match(/^readerImportance:\s*([\d.]+)\s*$/m);
+    const legacyImportanceMatch = !readerImportanceMatch && content.match(/^importance:\s*([\d.]+)\s*$/m);
+    const importance = readerImportanceMatch ? parseFloat(readerImportanceMatch[1]) :
+                       legacyImportanceMatch ? parseFloat(legacyImportanceMatch[1]) : 0;
 
     pageScores.push({ id, title, importance });
   }

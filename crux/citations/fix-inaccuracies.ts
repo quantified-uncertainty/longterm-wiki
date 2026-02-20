@@ -22,7 +22,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
 import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
@@ -439,6 +439,185 @@ export function applySectionRewrites(
 }
 
 // ---------------------------------------------------------------------------
+// Second opinion check (Haiku) — reduce false positives
+// ---------------------------------------------------------------------------
+
+const SECOND_OPINION_PROMPT = `You are a fact-checking reviewer. A previous AI checker flagged a wiki claim as potentially inaccurate or unsupported by its cited source. Your job is to independently verify: is the claim ACTUALLY inaccurate, or was the original checker being too strict?
+
+Review the claim against the source text carefully. Focus on whether the SUBSTANCE of the claim is correct, even if minor wording differs.
+
+Be lenient with:
+- Rounding differences (e.g., "approximately $100M" when source says "$98M")
+- Minor paraphrase differences that preserve the core meaning
+- Claims where the source provides partial or indirect support
+- Dates/numbers that are close but not exact (e.g., "2015" vs "late 2014")
+
+Be strict with:
+- Clearly wrong numbers, dates, or attributions
+- Claims that genuinely misrepresent or fabricate what the source says
+- Overclaims that significantly exaggerate what the source supports
+
+Respond with JSON only:
+{"agree": true, "verdict": "inaccurate", "reason": "brief explanation"}
+
+Where:
+- "agree": true if you agree with the original verdict, false if you think it's a false positive
+- "verdict": your own assessment — "accurate", "minor_issues", "inaccurate", or "unsupported"
+- "reason": brief explanation of your decision`;
+
+/** Parse the second opinion response. */
+function parseSecondOpinionResponse(text: string): { agree: boolean; verdict: string; reason: string } {
+  try {
+    const cleaned = stripCodeFences(text);
+    const parsed = JSON.parse(cleaned) as { agree?: boolean; verdict?: string; reason?: string };
+    return {
+      agree: parsed.agree !== false,
+      verdict: typeof parsed.verdict === 'string' ? parsed.verdict : 'not_verifiable',
+      reason: typeof parsed.reason === 'string' ? parsed.reason : '',
+    };
+  } catch {
+    return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
+  }
+}
+
+export interface SecondOpinionResult {
+  checked: number;
+  demoted: number;
+  details: Array<{
+    footnote: number;
+    originalVerdict: string;
+    newVerdict: string;
+    reason: string;
+  }>;
+}
+
+/**
+ * Second opinion check using Claude Haiku to reduce false positives.
+ * Re-checks flagged citations with a different model; demotes false positives
+ * by updating SQLite verdicts.
+ */
+export async function secondOpinionCheck(
+  pageId: string,
+  flaggedIssues: Array<{ footnote: number; verdict: string; score: number; issues: string[] }>,
+  opts?: { verbose?: boolean },
+): Promise<SecondOpinionResult> {
+  const client = createClient({ required: false });
+  if (!client) return { checked: 0, demoted: 0, details: [] };
+
+  const toCheck = flaggedIssues.filter(
+    (i) => i.verdict === 'inaccurate' || i.verdict === 'unsupported',
+  );
+  if (toCheck.length === 0) return { checked: 0, demoted: 0, details: [] };
+
+  const result: SecondOpinionResult = { checked: 0, demoted: 0, details: [] };
+
+  for (const issue of toCheck) {
+    try {
+      const row = citationQuotes.get(pageId, issue.footnote);
+      if (!row?.claim_text) continue;
+
+      // Get the best source text available
+      let sourceText = row.source_quote || '';
+      if (row.url) {
+        const cached = citationContent.getByUrl(row.url);
+        if (cached?.full_text && cached.full_text.length > sourceText.length) {
+          sourceText = cached.full_text;
+        }
+      }
+      if (!sourceText || sourceText.length < 20) continue;
+
+      const truncatedSource = sourceText.length > 8000
+        ? sourceText.slice(0, 8000) + '\n[... truncated ...]'
+        : sourceText;
+
+      if (opts?.verbose) {
+        process.stdout.write(`  [^${issue.footnote}] second opinion... `);
+      }
+
+      const llmResult = await callClaude(client, {
+        model: MODELS.haiku,
+        systemPrompt: SECOND_OPINION_PROMPT,
+        userPrompt: [
+          `WIKI CLAIM:\n${row.claim_text}`,
+          `\nORIGINAL VERDICT: ${issue.verdict}`,
+          `ORIGINAL ISSUES: ${issue.issues.join('; ')}`,
+          `\nSOURCE TEXT:\n${truncatedSource}`,
+        ].join('\n'),
+        maxTokens: 200,
+        temperature: 0,
+      });
+
+      result.checked++;
+      const opinion = parseSecondOpinionResponse(llmResult.text);
+
+      if (!opinion.agree && (opinion.verdict === 'accurate' || opinion.verdict === 'minor_issues')) {
+        // Haiku disagrees — demote the flag
+        citationQuotes.markAccuracy(
+          pageId,
+          issue.footnote,
+          opinion.verdict,
+          opinion.verdict === 'accurate' ? 0.9 : 0.7,
+          null,
+          null,
+          null,
+        );
+        result.demoted++;
+        result.details.push({
+          footnote: issue.footnote,
+          originalVerdict: issue.verdict,
+          newVerdict: opinion.verdict,
+          reason: opinion.reason,
+        });
+
+        if (opts?.verbose) {
+          console.log(`demoted to ${opinion.verdict}: ${opinion.reason.slice(0, 60)}`);
+        }
+      } else {
+        if (opts?.verbose) {
+          console.log(`confirmed ${issue.verdict}`);
+        }
+      }
+    } catch (err: unknown) {
+      if (opts?.verbose) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`error: ${msg.slice(0, 60)}`);
+      }
+    }
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// LLM search query generation (Haiku)
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a targeted web search query from a wiki claim using Haiku.
+ * Falls back to buildSearchQuery() if LLM call fails or is unavailable.
+ */
+export async function generateSearchQuery(claimText: string): Promise<string> {
+  const client = createClient({ required: false });
+  if (!client) return buildSearchQuery(claimText);
+
+  try {
+    const result = await callClaude(client, {
+      model: MODELS.haiku,
+      systemPrompt: 'Convert the following wiki claim into a concise web search query (5-12 words) that would find a credible source supporting or containing the specific facts mentioned. Focus on the key factual claims (numbers, dates, names). Return ONLY the search query text, nothing else.',
+      userPrompt: claimText.slice(0, 500),
+      maxTokens: 50,
+      temperature: 0,
+    });
+
+    const query = result.text.trim().replace(/^["']|["']$/g, ''); // strip quotes
+    if (query.length > 5 && query.length < 200) return query;
+    return buildSearchQuery(claimText);
+  } catch {
+    return buildSearchQuery(claimText);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Dashboard YAML reader
 // ---------------------------------------------------------------------------
 
@@ -743,6 +922,313 @@ export async function generateFixesForPage(
 }
 
 // ---------------------------------------------------------------------------
+// Source replacement search
+// ---------------------------------------------------------------------------
+
+export interface SourceReplacement {
+  footnote: number;
+  oldUrl: string;
+  newUrl: string;
+  newTitle: string;
+  confidence: string; // 'high' | 'medium' | 'low'
+  reason: string;
+}
+
+/**
+ * Search for a better source URL for unsupported citations.
+ * Uses the Exa API to find pages that actually contain the claimed information.
+ * Falls back to LLM-based search query generation + Exa search.
+ */
+export async function findReplacementSources(
+  flaggedCitations: EnrichedFlaggedCitation[],
+  opts?: { verbose?: boolean },
+): Promise<SourceReplacement[]> {
+  const exaApiKey = process.env.EXA_API_KEY;
+  if (!exaApiKey) {
+    if (opts?.verbose) {
+      console.log('  (EXA_API_KEY not set — skipping source replacement search)');
+    }
+    return [];
+  }
+
+  // Only consider unsupported citations with score=0 (source genuinely doesn't have the info)
+  const candidates = flaggedCitations.filter(
+    (c) => c.verdict === 'unsupported' && (c.score ?? 1) <= 0.2,
+  );
+
+  if (candidates.length === 0) return [];
+
+  const replacements: SourceReplacement[] = [];
+
+  for (const cit of candidates) {
+    const claimText = cit.fullClaimText || cit.claimText;
+    if (!claimText || claimText.length < 20) continue;
+
+    // Build a targeted search query from the claim (uses Haiku if available)
+    const searchQuery = await generateSearchQuery(claimText);
+
+    try {
+      const results = await searchExa(exaApiKey, searchQuery);
+      if (results.length === 0) continue;
+
+      // Filter out the same domain as the current source
+      const currentDomain = cit.url ? extractDomainFromUrl(cit.url) : null;
+      const filteredResults = results.filter(
+        (r) => !currentDomain || extractDomainFromUrl(r.url) !== currentDomain,
+      );
+
+      if (filteredResults.length === 0) continue;
+
+      // Pick the best result (first one — Exa ranks by relevance)
+      const best = filteredResults[0];
+
+      // Verify the candidate actually supports the claim (improvement B)
+      // Only accept sources that the accuracy checker confirms as supporting the claim
+      let confidence: string = 'low';
+      if (best.text && best.text.length > 100) {
+        try {
+          const verification = await checkClaimAccuracy(claimText, best.text);
+          // Strict: only accept "accurate" verdicts with high scores
+          if (verification.verdict !== 'accurate' || verification.score < 0.85) {
+            if (opts?.verbose) {
+              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${verification.verdict}, ${(verification.score * 100).toFixed(0)}%)`);
+            }
+            continue; // Skip — candidate doesn't clearly support the claim
+          }
+          confidence = verification.score >= 0.95 ? 'high' : 'medium';
+        } catch {
+          // Verification failed — skip (don't accept unverified candidates)
+          if (opts?.verbose) {
+            console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (verification failed)`);
+          }
+          continue;
+        }
+      } else {
+        // Not enough text to verify — skip
+        if (opts?.verbose) {
+          console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (insufficient text for verification)`);
+        }
+        continue;
+      }
+
+      replacements.push({
+        footnote: cit.footnote,
+        oldUrl: cit.url || '',
+        newUrl: best.url,
+        newTitle: best.title,
+        confidence,
+        reason: `Current source doesn't support the claim. Found ${confidence}-confidence match: "${best.title}"`,
+      });
+
+      if (opts?.verbose) {
+        console.log(`  [^${cit.footnote}] Found replacement: ${best.title.slice(0, 60)}...`);
+      }
+
+      // Rate limit between searches
+      await new Promise((r) => setTimeout(r, 500));
+    } catch (err: unknown) {
+      // Swallow search errors — source replacement is best-effort
+      if (opts?.verbose) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`  [^${cit.footnote}] Search error: ${msg.slice(0, 60)}`);
+      }
+    }
+  }
+
+  return replacements;
+}
+
+/** Build a concise search query from a claim text. */
+export function buildSearchQuery(claimText: string): string {
+  // Strip MDX components and footnote markers
+  let clean = claimText
+    .replace(/<[^>]+>/g, '')
+    .replace(/\[\^\d+\]/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Extract just the first sentence for a more targeted search query
+  const sentenceEnd = clean.search(/[.!?]\s/);
+  if (sentenceEnd > 30 && sentenceEnd < 200) {
+    clean = clean.slice(0, sentenceEnd + 1);
+  } else if (clean.length > 200) {
+    // Truncate at word boundary
+    const truncated = clean.slice(0, 200);
+    const lastSpace = truncated.lastIndexOf(' ');
+    clean = lastSpace > 100 ? truncated.slice(0, lastSpace) : truncated;
+  }
+
+  return clean;
+}
+
+/** Extract domain from a URL. */
+function extractDomainFromUrl(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return null;
+  }
+}
+
+interface ExaSearchResult {
+  title: string;
+  url: string;
+  text?: string;
+}
+
+/** Search via Exa API. */
+async function searchExa(apiKey: string, query: string): Promise<ExaSearchResult[]> {
+  const response = await fetch('https://api.exa.ai/search', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query,
+      type: 'auto',
+      numResults: 5,
+      contents: { text: { maxCharacters: 2000 } },
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`Exa API error ${response.status}: ${text.slice(0, 200)}`);
+  }
+
+  const data = (await response.json()) as { results: ExaSearchResult[] };
+  return data.results || [];
+}
+
+/**
+ * Apply source replacements to page content by updating footnote definition URLs.
+ * Handles all footnote definition patterns:
+ *   [^N]: [Title](URL)                          — titled link
+ *   [^N]: Author, "[Title](URL)," Journal.      — academic embedded link
+ *   [^N]: Description text: URL                  — text-then-bare-URL
+ *   [^N]: URL                                    — bare URL
+ */
+export function applySourceReplacements(
+  content: string,
+  replacements: SourceReplacement[],
+): { content: string; applied: number; skipped: number } {
+  let modified = content;
+  let applied = 0;
+  let skipped = 0;
+
+  for (const rep of replacements) {
+    const escapedUrl = escapeRegex(rep.oldUrl);
+
+    // Try patterns in order of specificity:
+    // 1. Titled link: [^N]: [Title](URL) or [^N]: text [Title](URL) text
+    // 2. Text-then-bare-URL: [^N]: Description text URL
+    // 3. Bare URL: [^N]: URL
+    const patterns = [
+      // Pattern: any text before [Title](URL) and optional text after
+      new RegExp(`(\\[\\^${rep.footnote}\\]:\\s*)([^\\n]*?)\\[[^\\]]*?\\]\\(${escapedUrl}\\)([^\\n]*)`),
+      // Pattern: text followed by bare URL
+      new RegExp(`(\\[\\^${rep.footnote}\\]:\\s*)([^\\n]*?)${escapedUrl}([^\\n]*)`),
+    ];
+
+    let matched = false;
+    for (const regex of patterns) {
+      const match = regex.exec(modified);
+      if (match) {
+        const prefix = match[1]; // "[^N]: "
+        const newDef = `${prefix}[${rep.newTitle}](${rep.newUrl})`;
+        modified = modified.slice(0, match.index) + newDef + modified.slice(match.index + match[0].length);
+        applied++;
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) {
+      skipped++;
+    }
+  }
+
+  return { content: modified, applied, skipped };
+}
+
+/** Escape special regex characters in a string. */
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ---------------------------------------------------------------------------
+// Orphaned footnote cleanup
+// ---------------------------------------------------------------------------
+
+/**
+ * Remove footnote definition lines ([^N]: ...) where no corresponding
+ * inline reference [^N] exists in the body text.
+ *
+ * This prevents dangling definitions after section rewrites remove
+ * inline footnote references.
+ */
+export function cleanupOrphanedFootnotes(content: string): { content: string; removed: number[] } {
+  const lines = content.split('\n');
+
+  // Find all inline footnote references (not in definition lines)
+  const inlineRefs = new Set<number>();
+  const defLineIndices: Array<{ lineIdx: number; footnote: number }> = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trimStart();
+
+    // Check if this is a footnote definition line
+    const defMatch = trimmed.match(/^\[\^(\d+)\]:/);
+    if (defMatch) {
+      defLineIndices.push({ lineIdx: i, footnote: parseInt(defMatch[1], 10) });
+      continue;
+    }
+
+    // Otherwise, collect all inline [^N] references on this line
+    const refRe = /\[\^(\d+)\]/g;
+    let m: RegExpExecArray | null;
+    while ((m = refRe.exec(line)) !== null) {
+      inlineRefs.add(parseInt(m[1], 10));
+    }
+  }
+
+  // Find orphaned definitions (no matching inline reference)
+  const orphanedLineIndices = new Set<number>();
+  const removed: number[] = [];
+  for (const def of defLineIndices) {
+    if (!inlineRefs.has(def.footnote)) {
+      orphanedLineIndices.add(def.lineIdx);
+      removed.push(def.footnote);
+    }
+  }
+
+  if (removed.length === 0) {
+    return { content, removed: [] };
+  }
+
+  // Remove orphaned lines (and trailing blank line if it creates a double-blank)
+  const filtered = lines.filter((_, i) => !orphanedLineIndices.has(i));
+
+  // Clean up double-blank lines that might result from removal
+  const cleaned: string[] = [];
+  for (let i = 0; i < filtered.length; i++) {
+    if (i > 0 && filtered[i].trim() === '' && filtered[i - 1].trim() === '') {
+      // Skip consecutive blank lines (keep only one)
+      if (cleaned.length > 0 && cleaned[cleaned.length - 1].trim() === '') {
+        continue;
+      }
+    }
+    cleaned.push(filtered[i]);
+  }
+
+  return { content: cleaned.join('\n'), removed: removed.sort((a, b) => a - b) };
+}
+
+// ---------------------------------------------------------------------------
 // Fix application
 // ---------------------------------------------------------------------------
 
@@ -942,12 +1428,17 @@ async function main() {
             if (sectionRewrites.length > 0 && apply) {
               const rwResult = applySectionRewrites(pageContent, sectionRewrites);
               if (rwResult.applied > 0) {
-                writeFileSync(filePath, rwResult.content, 'utf-8');
+                // Clean up orphaned footnote definitions
+                const orphanResult = cleanupOrphanedFootnotes(rwResult.content);
+                writeFileSync(filePath, orphanResult.content, 'utf-8');
                 appendEditLog(pageId, {
                   tool: 'crux-fix-escalated',
                   agency: 'automated',
                   note: `Escalated to Claude: rewrote ${rwResult.applied} section(s) to fix citation inaccuracies`,
                 });
+                if (!json && orphanResult.removed.length > 0) {
+                  console.log(`  ${c.dim}Cleaned up ${orphanResult.removed.length} orphaned footnote(s): ${orphanResult.removed.map(n => `[^${n}]`).join(', ')}${c.reset}`);
+                }
               }
 
               if (!json) {

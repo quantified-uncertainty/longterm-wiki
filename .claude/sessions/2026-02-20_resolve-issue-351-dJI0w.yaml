@@ -1,0 +1,63 @@
+date: "2026-02-20"
+branch: claude/resolve-issue-351-dJI0w
+title: "Add no-quoted-subcategory validation rule (issue #351)"
+issue: 351
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/373
+model: claude-sonnet-4-6
+duration: "~25 minutes"
+cost: "~$0.50"
+
+summary: |
+  Implemented the `no-quoted-subcategory` validation rule requested in issue #351.
+  The rule detects quoted subcategory frontmatter values (e.g. `subcategory: "labs"`)
+  that cause inconsistent sidebar grouping when mixed with unquoted variants.
+  Added to the CI-blocking frontmatter gate check. Validated against 713 content
+  files with zero violations (PR #350 already cleaned the codebase).
+
+pages: []
+
+key_decisions:
+  - "Rule scope: file-level (not global). Any quoted subcategory is wrong regardless of what other files have."
+  - "Severity: ERROR. Quoted subcategory values cause user-visible sidebar duplication."
+  - "Gate integration: added to existing frontmatter blocking step (--rules=frontmatter-schema,no-quoted-subcategory)."
+  - "No auto-fix: the issue.fix (FixSpec) system offsets line numbers by frontmatterEndLine, making it unsuitable for frontmatter fixes."
+  - "Tooling gaps: none found — this PR IS the tooling gap being filled."
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-20T07:19:36.165Z"
+  total: 32
+  completed: 29
+  na: 0
+  skipped: 3
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned
+    - crux-typescript

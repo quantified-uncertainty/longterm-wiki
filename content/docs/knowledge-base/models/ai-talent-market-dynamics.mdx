@@ -1,6 +1,6 @@
 ---
 title: "AI Talent Market Dynamics"
-description: "Analysis of the AI researcher talent market as a binding constraint on scaling both capabilities and safety, covering compensation dynamics, geographic concentration, pipeline capacity, transitions between academia and industry, and implications for safety research staffing."
+description: "Analysis of the AI researcher talent market as a constraint on scaling both capabilities and safety, covering compensation dynamics, geographic concentration, pipeline capacity, transitions between academia and industry, and implications for safety research staffing."
 sidebar:
   order: 35
 quality: 52
@@ -11,8 +11,8 @@ ratings:
   actionability: 7
 readerImportance: 6
 researchImportance: 6
-lastEdited: "2026-02-19"
-llmSummary: "The AI talent market constrains scaling in both capabilities and safety research. An estimated 5,000-10,000 researchers globally can contribute to frontier AI, with 500-1,000 at the highest level. Senior researcher compensation ranges from $500K to $3M+, creating a 3-8x differential versus academic and safety research positions. The top 3 labs employ 40-50% of the top 100 researchers. The safety research workforce (~2,000-3,500 dedicated) is approximately an order of magnitude smaller than capabilities. The pipeline produces ~200-350 new safety researchers per year. Geographic concentration (35% Bay Area) and organizational concentration create structural dependencies."
+lastEdited: "2026-02-20"
+llmSummary: "An estimated 5,000-10,000 researchers globally can contribute to frontier AI, with 500-1,000 at the highest capability tier. Senior researcher compensation at frontier labs is estimated at $500K to $3M+ total compensation, representing a differential of roughly 3-12x versus academic positions. The top 3 labs are estimated to employ 35-50% of the top 100 researchers. Dedicated safety research workforce estimates range from approximately 2,000 to 3,500, compared to a capabilities workforce estimated at one to two orders of magnitude larger. The pipeline is estimated to produce approximately 200-500 net new safety researchers per year. All figures are author estimates with substantial uncertainty."
 clusters:
   - ai-safety
   - community
@@ -25,9 +25,9 @@ import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
 ## Overview
 
-The AI talent market represents a significant constraint on AI development—both in capabilities and safety. Regardless of capital availability (see <EntityLink id="pre-tai-capital-deployment">Pre-TAI Capital Deployment</EntityLink>), the rate at which frontier AI can advance and the degree to which it can be made safe are partially limited by the number of qualified researchers and engineers available to do the work.
+The AI talent market is one potential constraint on AI development—in both capabilities and safety research. Regardless of capital availability (see <EntityLink id="pre-tai-capital-deployment">Pre-TAI Capital Deployment</EntityLink>), the rate at which frontier AI can advance and the degree to which it can be made safe are partially influenced by the number of qualified researchers and engineers available to do the work.
 
-This page analyzes the current state of the AI talent market, the dynamics that drive concentration, the specific constraints on safety research talent, and strategies for expanding the pipeline. One analytical perspective holds that **talent may constrain progress more than capital** at current and projected funding levels, and that deliberate investment in the talent pipeline—particularly for safety research—may be among the higher-leverage interventions available under certain threat models. This view is debated; see the Alternative Perspectives section for counterarguments.
+This page analyzes the current state of the AI talent market, the dynamics that drive concentration, specific constraints on safety research talent, and strategies for expanding the pipeline. Whether talent constrains progress more than capital, compute, or algorithmic insight at current funding levels is debated; see the Alternative Perspectives section for a fuller treatment of competing views. The analysis relies extensively on author estimates due to the absence of systematic public data; see the Measurement Challenges section for a discussion of limitations.
 
 ## Current Talent Landscape
 
@@ -45,7 +45,7 @@ The following classification represents one analytical framework for understandi
 
 *Source: Author estimates based on conference attendance patterns, publication records, and organizational staff listings. These figures have substantial uncertainty and methodology limitations (see Measurement Challenges section below).*
 
-The frontier AI development that drives the <EntityLink id="pre-tai-capital-deployment">\$100-300B+ capital deployment</EntityLink> primarily depends on Tier 0-2 researchers—a pool of approximately 5,000-10,000 people globally.
+The frontier AI development that drives the <EntityLink id="pre-tai-capital-deployment">\$100-300B+ capital deployment</EntityLink> primarily depends on Tier 0-2 researchers—a pool of approximately 5,000-10,000 people globally by this classification.
 
 ### Organizational Concentration
 
@@ -68,7 +68,7 @@ pie title Estimated Distribution of Top 1,000 AI Researchers
 | **<EntityLink id="deepmind">Google DeepMind</EntityLink>** | 15-20% | 12-18% | 3,000-5,000 | +20%/year |
 | **<EntityLink id="openai">OpenAI</EntityLink>** | 10-15% | 8-12% | 3,000-5,000 | +40%/year |
 | **<EntityLink id="anthropic">Anthropic</EntityLink>** | 8-12% | 6-10% | 1,500-2,500 | +50%/year |
-| **<EntityLink id="ai-talent-market-dynamics">Meta AI</EntityLink>** | 10-15% | 8-12% | 2,000-3,000 | +15%/year |
+| **Meta AI** | 10-15% | 8-12% | 2,000-3,000 | +15%/year |
 | **xAI** | 2-4% | 2-4% | 500-1,000 | +100%/year (est.) |
 | **Top 3 Labs Combined** | **35-50%** | **26-40%** | ≈10,000-12,000 | +30%/year |
 
@@ -87,13 +87,13 @@ pie title Estimated Distribution of Top 1,000 AI Researchers
 
 *Source: Author estimates based on organizational office locations and remote work policy disclosures.*
 
-The Bay Area's concentration, while declining, remains substantial. This geographic concentration creates both network effects (researchers benefit from proximity to other researchers) and structural dependencies (natural disasters, policy changes, or cost-of-living pressures could affect a significant portion of the global talent pool).
+The Bay Area's concentration, while declining relative to earlier periods, remains substantial under these estimates. This geographic concentration creates network effects (researchers benefit from proximity to peers) and structural dependencies (cost-of-living pressures, natural disasters, or policy changes could affect a significant portion of the global talent pool).
 
 ## Compensation Dynamics
 
 ### Compensation Escalation
 
-AI researcher compensation has escalated as labs compete for talent from a relatively fixed pool:
+AI researcher compensation has escalated as labs compete for talent from a relatively constrained pool:
 
 | Role | 2020 | 2023 | 2025 (Est.) | 5-Year CAGR |
 |------|------|------|-------------|-------------|
@@ -108,13 +108,12 @@ AI researcher compensation has escalated as labs compete for talent from a relat
 Total compensation packages at frontier labs frequently include:
 - Base salary: \$200K-500K
 - Stock/equity: \$200K-2M+/year (vesting)
-- Signing bonus: \$100K-500K
 - Annual bonus: 15-30% of base
 - Compute allocation: Access to \$1M+ in compute for personal research
 
 ### Per-Company Compensation Comparison
 
-The table below compares estimated senior researcher compensation structures across major AI labs. Figures represent author estimates based on [levels.fyi Research Scientist role data](https://www.levels.fyi/t/research-scientist), news reporting, and industry surveys; individual packages vary substantially by negotiation, tenure, and performance. {/* NEEDS CITATION */}
+The table below compares estimated senior researcher compensation structures across major AI labs. Figures represent author estimates based on [levels.fyi Research Scientist role data](https://www.levels.fyi/t/research-scientist) and industry surveys; individual packages vary substantially by negotiation, tenure, and performance.
 
 | Lab | Senior Researcher Total Comp Range | Base Salary Range (Est.) | Equity Type | Equity Vesting | Matching / Benefits Program | Notes |
 |-----|------------------------------------|--------------------------|-------------|---------------|----------------------------|-------|
@@ -122,16 +121,14 @@ The table below compares estimated senior researcher compensation structures acr
 | **<EntityLink id="openai">OpenAI</EntityLink>** | \$500K–3M+ | \$250K–500K | RSUs + Profit Participation Units (PPUs) | Typical 4-year vest | Standard tech benefits | PPUs are a non-standard instrument tied to OpenAI's capped-profit structure; value is harder to compare directly to public-company RSUs |
 | **<EntityLink id="deepmind">Google DeepMind</EntityLink>** | \$400K–2M+ | \$250K–450K | RSUs + cash performance bonus | 4-year vest (typical Google) | Standard Google benefits (401(k) match, health) | Publicly traded equity; clearer market value than private-company instruments |
 | **xAI** | \$400K–2M+ | \$200K–450K | Equity-heavy (options/warrants, est.) | Varies; early-stage terms | Limited public disclosure | Private; compensation reportedly skewed toward equity for senior hires; limited public data available |
-| **<EntityLink id="ai-talent-market-dynamics">Meta AI</EntityLink>** | \$400K–1.5M+ | \$250K–450K | RSUs | 4-year vest | Standard Meta benefits (401(k) match, health) | Publicly traded equity |
+| **Meta AI** | \$400K–1.5M+ | \$250K–450K | RSUs | 4-year vest | Standard Meta benefits (401(k) match, health) | Publicly traded equity |
 | **Microsoft Research** | \$300K–800K | \$200K–400K | RSUs | 4-year vest | Standard Microsoft benefits | Compensation generally lower than frontier labs; includes broader Microsoft equity upside |
 
 *Source: Author estimates based on [levels.fyi Research Scientist data](https://www.levels.fyi/t/research-scientist), news reports, and industry benchmarking surveys. Ranges reflect approximate 25th–90th percentile for senior researchers; individual packages vary significantly.*
 
-**Anthropic DAF Matching Program:** <EntityLink id="anthropic">Anthropic</EntityLink> operates a Donor-Advised Fund (DAF) matching program that is atypical among technology companies. Employees hired before 2024 were offered a 3:1 match—meaning Anthropic would contribute \$3 for every \$1 an employee donated to eligible organizations, up to a cap. Employees hired later receive a 1:1 match at a 25% rate. {/* NEEDS CITATION */} This program reflects <EntityLink id="anthropic">Anthropic</EntityLink>'s founding culture, which has significant overlap with the <EntityLink id="cea">effective altruism</EntityLink> community. The matching structure is consistent with the company's status as a public benefit corporation, though the specific terms and eligible organizations are not publicly disclosed in full detail.
+**Anthropic DAF Matching Program:** <EntityLink id="anthropic">Anthropic</EntityLink> operates a Donor-Advised Fund (DAF) matching program that is atypical among technology companies. This program reflects <EntityLink id="anthropic">Anthropic</EntityLink>'s founding culture, which has significant overlap with the <EntityLink id="cea">effective altruism</EntityLink> community. The program is consistent with the company's status as a public benefit corporation, though the specific terms and eligible organizations are not publicly disclosed in full detail.
 
-**Equity valuation caveat:** Raw total compensation comparisons across companies are complicated by differing equity structures. <EntityLink id="anthropic">Anthropic</EntityLink> and xAI are private companies, making equity value illiquid and contingent on a future liquidity event. <EntityLink id="openai">OpenAI</EntityLink>'s profit participation units carry additional complexity given its capped-profit structure, which limits investor and employee returns relative to a conventional corporation. By contrast, <EntityLink id="deepmind">Google DeepMind</EntityLink> and <EntityLink id="ai-talent-market-dynamics">Meta AI</EntityLink> offer publicly traded equity with observable market value. These structural differences mean headline total-compensation figures may not be directly comparable across labs.
-
-**Signing bonuses** are also a meaningful differentiator not captured in the ranges above. Senior hires at frontier labs routinely receive one-time signing packages of \$100K–500K, which can represent a substantial portion of first-year compensation. {/* NEEDS CITATION */}
+**Equity valuation caveat:** Raw total compensation comparisons across companies are complicated by differing equity structures. <EntityLink id="anthropic">Anthropic</EntityLink> and xAI are private companies, making equity value illiquid and contingent on a future liquidity event. <EntityLink id="openai">OpenAI</EntityLink>'s profit participation units carry additional complexity given its capped-profit structure, which limits investor and employee returns relative to a conventional corporation. By contrast, <EntityLink id="deepmind">Google DeepMind</EntityLink> and Meta AI offer publicly traded equity with observable market value. These structural differences mean headline total-compensation figures may not be directly comparable across labs.
 
 ### Academic-Industry Compensation Differential
 
@@ -145,13 +142,13 @@ The table below compares estimated senior researcher compensation structures acr
 
 *Source: Author estimates based on NIH salary databases (for academic), public job postings, and industry benchmarking surveys.*
 
-This differential has correlated with movement of researchers from academia to industry. Based on public announcements and LinkedIn profile changes tracked between 2019 and 2025, an estimated 30-40% of tenured AI professors at top universities either left for industry or took extended leaves or joint appointments during this period.[^1] The remaining faculty face challenges competing for graduate students, who increasingly choose industry internships paying \$150K-200K over academic research assistant positions at \$30-50K.
+This differential has correlated with movement of researchers from academia to industry. Based on public announcements and LinkedIn profile changes tracked between 2019 and 2025, an estimated 30-40% of tenured AI professors at top universities either left for industry or took extended leaves or joint appointments during this period.[^1] The remaining faculty face challenges competing for graduate students, who increasingly choose industry internships at substantially higher rates of pay than academic research assistant positions.
 
 ## Safety Research Talent Landscape
 
 ### Current Safety Research Workforce
 
-The dedicated AI safety research workforce is approximately an order of magnitude smaller than the capabilities workforce:
+Estimates of the dedicated AI safety research workforce suggest it is smaller than the capabilities workforce by an order of magnitude or more, though the precise ratio depends significantly on how "safety research" is classified:
 
 | Category | Count (Est.) | Avg. Compensation | Total Cost | Primary Employers |
 |----------|-------------|-------------------|------------|-----------------|
@@ -161,7 +158,7 @@ The dedicated AI safety research workforce is approximately an order of magnitud
 | **Safety-adjacent** | 2,000-5,000 | \$150K-400K | Not counted | ML robustness, fairness, evals |
 | **Total dedicated** | **≈2,000-3,500** | | **≈\$500M-1.2B** | |
 
-*Source: Author estimates based on organizational staff pages (Anthropic, OpenAI, DeepMind safety teams), safety-focused organization websites (MIRI, ARC, Redwood, CHAI), conference attendance at safety-focused venues (NeurIPS safety workshop, ICML safety workshop), and publication records in safety-relevant areas. Substantial uncertainty exists in these estimates due to difficulty classifying researchers who work on both safety and capabilities.*
+*Source: Author estimates based on organizational staff pages (Anthropic, OpenAI, DeepMind safety teams), safety-focused organization websites (MIRI, ARC, Redwood, <EntityLink id="chai">CHAI</EntityLink>), conference attendance at safety-focused venues (NeurIPS safety workshop, ICML safety workshop), and publication records in safety-relevant areas. Substantial uncertainty exists in these estimates due to difficulty classifying researchers who work on both safety and capabilities.*
 
 ### Pipeline Capacity
 
@@ -177,14 +174,14 @@ flowchart TD
     style NET fill:#ccffcc
 `} />
 
-**Current pipeline capacity: approximately 200-500 net new safety researchers per year.** At this rate:
+**Current pipeline capacity: approximately 200-500 net new safety researchers per year** (author estimate). At this rate:
 
 | Target Workforce Size | Years to Reach | Required Pipeline | Feasibility Assessment |
 |----------------------|----------------|-------------------|-------------|
 | 5,000 (current + 50%) | 3-7 years | 500-700/year | Feasible with investment |
 | 10,000 (3x current) | 5-12 years | 1,000-1,500/year | Requires substantial pipeline expansion |
 | 20,000 (6x current) | 8-20 years | 2,000-3,000/year | Requires fundamental restructuring |
-| 50,000 (parity with capabilities) | 15-30+ years | 5,000+/year | Requires paradigm shift |
+| 50,000 (parity with capabilities est.) | 15-30+ years | 5,000+/year | Requires paradigm shift |
 
 *Source: Author projections based on current PhD program capacities (approximately 50-100 safety-focused PhD positions per year at major programs), bootcamp throughput (MLAB, ARENA: ~100-200 per year), and career transition rates estimated from LinkedIn data.*
 
@@ -196,12 +193,12 @@ flowchart TD
 | **Compute access** | Safety researchers often lack access to frontier models or equivalent compute | Research may be less relevant to frontier systems |
 | **Career prestige** | Capabilities publications appear more frequently in top venues | May influence researcher track selection |
 | **Field maturity** | Safety research directions less standardized than capabilities | Training and mentorship more difficult |
-| **Mission selection** | Safety attracts mission-driven people | Smaller pool, potentially higher retention |
+| **Mission selection** | Safety attracts mission-driven people | Smaller initial pool, potentially higher retention |
 | **Credential uncertainty** | No standard "safety researcher" credential path | Candidate evaluation more difficult |
 
 *Source: Author assessment based on job posting analysis, interviews with safety researchers (2023-2024), and compensation benchmarking. These represent correlations; causal mechanisms remain uncertain.*
 
-One perspective worth noting: high compensation at safety-focused teams may attract researchers motivated primarily by income rather than mission, potentially affecting research culture or team priorities. This concern has been raised in EA-adjacent communities and is relevant to assessments of whether compensation parity fully resolves the talent gap.
+One consideration noted in safety research communities: higher compensation at safety-focused teams may attract researchers motivated primarily by income rather than research mission, potentially affecting team culture or priorities. This concern is relevant to assessments of whether compensation parity fully resolves the talent gap, or whether it changes the composition of the researcher pool in ways that matter for research outcomes.
 
 ## Talent Scaling Strategies
 
@@ -243,19 +240,19 @@ A quality dilution risk applies to rapid scaling strategies: expanding the safet
 
 The competition for AI talent has several observable effects on safety research capacity:
 
-1. **Safety team recruitment by capabilities teams**: Capabilities teams at competing labs recruit safety researchers, who have transferable skills and are often compensated below market rates relative to their capabilities-relevant skills.
+1. **Safety team recruitment by capabilities teams**: Capabilities teams at competing labs recruit safety researchers, who have transferable skills and may be compensated below market rates relative to their capabilities-relevant skills.
 
-2. **Organizational departures and their interpretation**: When groups of safety researchers depart a lab—as occurred with <EntityLink id="openai">OpenAI</EntityLink>'s Superalignment team in 2024[^2]—this can be interpreted in at least two distinct ways: as a loss of institutional knowledge and project continuity, or as a signal of organizational culture or prioritization disagreements that the departing researchers viewed as substantive. Both interpretations appear in reporting on the events, and they carry different implications for assessments of the organizations involved.
+2. **Organizational departures and their interpretation**: When groups of safety researchers depart a lab—as occurred with <EntityLink id="openai">OpenAI</EntityLink>'s Superalignment team in 2024[^2]—this can be interpreted in multiple ways: as a loss of institutional knowledge and project continuity, or as reflecting organizational culture or prioritization disagreements. Both interpretations appear in reporting on the events, and they carry different implications for assessments of the organizations involved. The departures have also been interpreted by some observers as reflecting normal attrition at a rapidly growing organization. The evidence does not clearly distinguish among these explanations.
 
 3. **Hiring standard pressure under rapid scaling**: Labs scaling rapidly may face pressure to lower hiring bars, potentially affecting team composition and research quality.
 
-4. **Fixed budget compression under compensation growth**: If a lab maintains a fixed safety budget while compensation rises 20%/year, effective headcount capacity decreases proportionally unless the budget grows.
+4. **Fixed budget compression under compensation growth**: If a lab maintains a fixed safety budget while compensation rises, effective headcount capacity decreases proportionally unless the budget grows correspondingly.
 
-### One Proposed Alternative Model
+### Illustrative Alternative Structures
 
-The following represents one analytical perspective on what a differently-structured talent market might look like. This model reflects specific assumptions about threat models and priorities that may not be universally shared:
+The following compares current estimated market conditions against an illustrative alternative structure, presented for analytical purposes rather than as a recommended outcome. Different threat models and assessments of safety research effectiveness would support different target ratios:
 
-| Metric | Current State | Proposed Alternative | Differential |
+| Metric | Current State (Est.) | Illustrative Alternative | Differential |
 |--------|--------------|----------------|-----|
 | **Safety:Capabilities researcher ratio** | ≈1:10 to 1:30 | 1:3 to 1:5 | 3-10x |
 | **Safety researcher compensation** | 50-70% of capabilities | 80-100% of capabilities | 1.3-2x |
@@ -264,7 +261,7 @@ The following represents one analytical perspective on what a differently-struct
 | **Career path clarity** | Emerging | Well-defined | Institutional development |
 | **Geographic distribution** | 70%+ in 2 hubs | 50%+ distributed | Moderate change |
 
-*Note: This "alternative model" reflects one perspective on optimal resource allocation. Other perspectives might prioritize different ratios based on different assessments of safety research effectiveness, opportunity costs, or economic considerations. The current market state reflects the aggregate preferences and constraints of many actors.*
+*Note: The "illustrative alternative" reflects one set of assumptions about what a differently-resourced safety research ecosystem might look like. Other configurations are possible. The current market state reflects the aggregate preferences and constraints of many actors, and there is no consensus on what the optimal ratio would be.*
 
 ## Measurement Challenges and Limitations
 
@@ -288,7 +285,7 @@ The following represents one analytical perspective on what a differently-struct
 - Self-reported data on platforms like levels.fyi may not be representative
 - Total compensation depends on equity valuation, which fluctuates
 - Non-monetary benefits (compute access, research freedom) vary significantly
-- Private-company equity (Anthropic, xAI) introduces illiquidity and valuation uncertainty not present in public-company RSU comparisons
+- Private-company equity (<EntityLink id="anthropic">Anthropic</EntityLink>, xAI) introduces illiquidity and valuation uncertainty not present in public-company RSU comparisons
 
 **Pipeline projections:**
 - Current estimates assume stable incentive structures
@@ -300,7 +297,7 @@ The following represents one analytical perspective on what a differently-struct
 
 This analysis relies primarily on:
 - Organizational staff pages and public announcements
-- Conference attendance and publication records  
+- Conference attendance and publication records
 - Industry compensation surveys and self-reported data
 - Author estimates based on LinkedIn profiles and professional networks
 
@@ -324,19 +321,21 @@ More rigorous measurement would require:
 
 **Race dynamics:** Some argue that accelerating capabilities research may be necessary under competitive scenarios where other actors (state or corporate) would develop advanced AI systems regardless. Under this view, being first may enable implementation of safety measures that would not be possible if others reached advanced AI first.
 
-**Economic benefits:** Rapid AI capabilities advancement may generate economic value that could be used to fund safety research, improve living standards, or address other existential risks. The optimal pace of capabilities research depends on one's assessment of these tradeoffs.
+**Economic benefits:** Rapid AI capabilities advancement may generate economic value that could be used to fund safety research, improve living standards, or address other risks. The optimal pace of capabilities research depends on assessments of these tradeoffs that are not settled in the literature.
 
 ### On Talent as the Binding Constraint
 
 **Alternative constraints:** Some analyses suggest that talent is not the primary constraint on AI progress:
 - Research directions and paradigms may matter more than researcher count
-- Compute availability and algorithmic insights may be more limiting
+- Compute availability and algorithmic insights may be more limiting in some periods
 - Organizational coordination and decision-making may constrain productive use of talent
-- Data availability may limit further scaling
+- Data availability may limit further scaling in certain domains
 
-**Substitutability:** The degree to which talent is the binding constraint depends on substitutability. If AI-assisted research, tooling improvements, or organizational innovations can multiply researcher productivity, talent constraints may ease over time.
+**Substitutability:** The degree to which talent is the binding constraint depends on substitutability. If AI-assisted research, tooling improvements, or organizational innovations can multiply researcher productivity, talent constraints may ease over time. This remains an open empirical question.
 
 ## Implications for Planning
+
+The following implications are conditional on assumptions that are contested. Readers who hold different assessments of the underlying threat models or of safety research effectiveness may reach different conclusions.
 
 ### For AI Labs
 
@@ -347,7 +346,7 @@ Under the assumption that safety research reduces risk and that talent expansion
 - **International recruitment**: Domestic-only recruiting likely cannot meet scaling targets
 - **Internal training**: Residency programs and bootcamps may build talent faster than external hiring
 
-*Caveat: These recommendations assume that safety research as currently practiced reduces risk and that rapid scaling does not compromise research quality—assumptions that remain debated.*
+*These considerations assume that safety research as currently practiced reduces risk and that rapid scaling does not compromise research quality—assumptions that remain debated.*
 
 ### For Philanthropic Funders
 
@@ -358,19 +357,19 @@ Under the assumption that expanding the safety research talent pool is net-posit
 - **Early-stage programs**: PhD fellowships and undergraduate programs address root pipeline constraints
 - **Institution building**: Researchers may be more productive in organizations with critical mass
 
-*Caveat: These recommendations reflect one perspective on optimal resource allocation. Alternative views might prioritize different interventions based on different threat models or assessments of safety research effectiveness. Funders who do not share the underlying threat model may reach different conclusions about the value of these interventions.*
+*These considerations reflect one perspective on resource allocation under a specific threat model. Funders who do not share the underlying threat model, or who assess safety research effectiveness differently, may reach different conclusions about the value of these interventions.*
 
 ### For Governments
 
-- **Immigration policy**: AI talent is globally mobile; visa restrictions may redirect talent to other jurisdictions
+- **Immigration policy**: AI talent is globally mobile; visa restrictions may redirect talent to other jurisdictions rather than reducing its overall concentration
 - **Compute infrastructure**: Government-funded compute could enable academic and independent safety research
 - **Education investment**: AI safety curricula at universities and national fellowship programs could expand pipelines
 - **Retention incentives**: Tax benefits, research grants, and other mechanisms might influence career choices
 
-*Note: These implications assume certain policy objectives (e.g., maintaining domestic AI talent, supporting safety research) that may compete with other priorities.*
+*These implications assume certain policy objectives (e.g., maintaining domestic AI talent, supporting safety research) that may compete with other priorities.*
 
 ## Sources
 
-[^1]: The 30-40% figure for faculty departures is an author estimate based on tracking public announcements and LinkedIn profile changes from 2019–2025. No published Epoch AI study has been identified that reports this specific figure; it should be treated as an approximation pending more systematic measurement. See <EntityLink id="epistemic-orgs-epoch-ai">Epoch AI</EntityLink> for related workforce research.
+[^1]: The 30-40% figure for faculty departures is an author estimate based on tracking public announcements and LinkedIn profile changes from 2019–2025. No published study has been identified that reports this specific figure; it should be treated as an approximation pending more systematic measurement. See <EntityLink id="epistemic-orgs-epoch-ai">Epoch AI</EntityLink> for related workforce research.
 
 [^2]: [Reporting on OpenAI Superalignment team departures, May-July 2024](https://www.vox.com/future-perfect/2024/5/17/24158478/openai-departures-sam-altman-employees-chat-gpt-artificial-intelligence), Vox Future Perfect, multiple sources including <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> commentary and team member announcements on social media.
