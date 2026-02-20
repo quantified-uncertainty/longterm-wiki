@@ -1522,7 +1522,7 @@ async function main() {
   // Skip infrastructure categories — only assign IDs to non-content pages
   // Note: 'internal', 'reports', 'schema' removed — internal pages now get entity IDs
   const skipCategories = new Set([
-    'style-guides', 'browse',
+    'style-guides', 'tools',
     'dashboard', 'project', 'guides',
   ]);
   let pageIdAssignments = 0;

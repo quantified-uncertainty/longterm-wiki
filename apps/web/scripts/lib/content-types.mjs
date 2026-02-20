@@ -156,7 +156,7 @@ export const TOP_LEVEL_CONTENT_DIRS = [
   'ai-transition-model',
   'analysis',
   'getting-started',
-  'browse',
+  'tools',
   'internal',
   'style-guides',
   'guides',

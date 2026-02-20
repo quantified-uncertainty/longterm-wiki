@@ -49,6 +49,18 @@ export function middleware(request: NextRequest) {
 
   const segments = path.split("/").filter(Boolean);
 
+  // /browse → /wiki (legacy browse pages merged into wiki)
+  // /browse/resources → /wiki/resources, /browse/tags → /wiki/tags
+  if (segments[0] === "browse") {
+    const url = request.nextUrl.clone();
+    if (segments.length <= 1) {
+      url.pathname = "/wiki";
+    } else {
+      url.pathname = `/wiki/${segments[segments.length - 1]}`;
+    }
+    return NextResponse.redirect(url, 308);
+  }
+
   // /knowledge-base → /wiki (root index page)
   // /knowledge-base/risks → /wiki (category index — no standalone page in new site)
   // /knowledge-base/[category/]slug → /wiki/slug
@@ -100,6 +112,8 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/browse",
+    "/browse/:path+",
     "/knowledge-base",
     "/knowledge-base/:path+",
     "/ai-transition-model",
