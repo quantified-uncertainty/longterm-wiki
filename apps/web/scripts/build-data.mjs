@@ -14,7 +14,7 @@ import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
 import { computeRedundancy } from './lib/redundancy.mjs';
-import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
 import { buildUrlToResourceMap, findUnconvertedLinks, countConvertedLinks } from './lib/unconverted-links.mjs';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
@@ -1469,8 +1469,8 @@ async function main() {
   // Parse .claude/session-log.md and .claude/sessions/*.md, then attach
   // changeHistory to each page.
   // =========================================================================
-  const sessionLogPath = join(PROJECT_ROOT, '..', '.claude', 'session-log.md');
-  const sessionsDir = join(PROJECT_ROOT, '..', '.claude', 'sessions');
+  const sessionLogPath = join(REPO_ROOT, '.claude', 'session-log.md');
+  const sessionsDir = join(REPO_ROOT, '.claude', 'sessions');
   const pageChangeHistory = parseAllSessionLogs(sessionLogPath, sessionsDir);
 
   // Auto-populate PR numbers from GitHub API for entries that don't have them
