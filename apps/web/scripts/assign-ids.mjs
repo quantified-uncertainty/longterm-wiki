@@ -162,6 +162,9 @@ async function allocateOrFallback(slug, useServer, nextIdRef) {
     const result = await allocateId(slug);
     if (result) {
       numId = result.numericId;
+      // Keep nextIdRef in sync so local fallback won't collide with server-assigned IDs
+      const num = parseInt(numId.slice(1), 10);
+      if (num >= nextIdRef.value) nextIdRef.value = num + 1;
     } else {
       console.warn('    ID server failed mid-run — falling back to local assignment');
       useServer = false;
@@ -182,7 +185,7 @@ async function main() {
   // Check if the ID server is available for atomic allocation
   let useServer = await isServerAvailable();
   if (useServer) {
-    console.log(`  Using wiki server at ${process.env.WIKI_SERVER_URL}`);
+    console.log(`  Using wiki server at ${process.env.LONGTERMWIKI_SERVER_URL}`);
   } else {
     console.log('  Wiki server unavailable — using local assignment');
   }

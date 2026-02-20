@@ -24,12 +24,12 @@ export function createApp() {
   app.route("/health", healthRoute);
 
   // API routes — bearer auth required
-  const apiKey = process.env.WIKI_SERVER_API_KEY;
+  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
   if (apiKey) {
     app.use("/api/*", bearerAuth({ token: apiKey }));
   } else {
     console.warn(
-      "WARNING: WIKI_SERVER_API_KEY not set — API routes are unauthenticated"
+      "WARNING: LONGTERMWIKI_SERVER_API_KEY not set — API routes are unauthenticated"
     );
   }
 

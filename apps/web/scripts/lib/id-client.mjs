@@ -5,18 +5,18 @@
  * server is available. Falls back gracefully (returns null) on any failure.
  *
  * Configuration via environment variables:
- *   WIKI_SERVER_URL     — Base URL (e.g. "https://wiki-server.k8s.quantifieduncertainty.org")
- *   WIKI_SERVER_API_KEY — Bearer token for authentication
+ *   LONGTERMWIKI_SERVER_URL     — Base URL (e.g. "https://wiki-server.k8s.quantifieduncertainty.org")
+ *   LONGTERMWIKI_SERVER_API_KEY — Bearer token for authentication
  */
 
 const TIMEOUT_MS = 5000;
 
 function getServerUrl() {
-  return process.env.WIKI_SERVER_URL || "";
+  return process.env.LONGTERMWIKI_SERVER_URL || "";
 }
 
 function getApiKey() {
-  return process.env.WIKI_SERVER_API_KEY || "";
+  return process.env.LONGTERMWIKI_SERVER_API_KEY || "";
 }
 
 /**

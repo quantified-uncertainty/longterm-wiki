@@ -43,7 +43,25 @@ idsRoute.post("/allocate", async (c) => {
   const { slug, description } = parsed.data;
   const db = getDb();
 
-  // Try insert with nextval; on conflict (slug exists), return existing
+  // Check if slug already exists (avoids burning a sequence value on conflict)
+  const existing = await db`
+    SELECT numeric_id, slug, description, created_at
+    FROM entity_ids
+    WHERE slug = ${slug}
+  `;
+
+  if (existing.length > 0) {
+    const row = existing[0];
+    return c.json({
+      numericId: `E${row.numeric_id}`,
+      slug: row.slug,
+      description: row.description,
+      created: false,
+      createdAt: row.created_at,
+    });
+  }
+
+  // Slug is new — allocate next sequence value
   const inserted = await db`
     INSERT INTO entity_ids (numeric_id, slug, description)
     VALUES (nextval('entity_id_seq'), ${slug}, ${description ?? null})
@@ -65,21 +83,22 @@ idsRoute.post("/allocate", async (c) => {
     );
   }
 
-  // Already existed — fetch it
-  const existing = await db`
+  // Race condition: another request inserted between our SELECT and INSERT.
+  // Re-fetch the existing row.
+  const raced = await db`
     SELECT numeric_id, slug, description, created_at
     FROM entity_ids
     WHERE slug = ${slug}
   `;
 
-  if (existing.length === 0) {
+  if (raced.length === 0) {
     return c.json(
       { error: "not_found", message: "Unexpected: slug not found after conflict" },
       500
     );
   }
 
-  const row = existing[0];
+  const row = raced[0];
   return c.json({
     numericId: `E${row.numeric_id}`,
     slug: row.slug,
@@ -121,6 +140,25 @@ idsRoute.post("/allocate-batch", async (c) => {
   await db.begin(async (tx) => {
     const q = tx as unknown as SqlQuery;
     for (const item of items) {
+      // Check existence first to avoid burning sequence values
+      const existing = await q`
+        SELECT numeric_id, slug, description, created_at
+        FROM entity_ids
+        WHERE slug = ${item.slug}
+      `;
+
+      if (existing.length > 0) {
+        const row = existing[0];
+        results.push({
+          numericId: `E${row.numeric_id}`,
+          slug: row.slug,
+          description: row.description,
+          created: false,
+          createdAt: row.created_at,
+        });
+        continue;
+      }
+
       const inserted = await q`
         INSERT INTO entity_ids (numeric_id, slug, description)
         VALUES (nextval('entity_id_seq'), ${item.slug}, ${item.description ?? null})
@@ -137,22 +175,6 @@ idsRoute.post("/allocate-batch", async (c) => {
           created: true,
           createdAt: row.created_at,
         });
-      } else {
-        const existing = await q`
-          SELECT numeric_id, slug, description, created_at
-          FROM entity_ids
-          WHERE slug = ${item.slug}
-        `;
-        if (existing.length > 0) {
-          const row = existing[0];
-          results.push({
-            numericId: `E${row.numeric_id}`,
-            slug: row.slug,
-            description: row.description,
-            created: false,
-            createdAt: row.created_at,
-          });
-        }
       }
     }
   });

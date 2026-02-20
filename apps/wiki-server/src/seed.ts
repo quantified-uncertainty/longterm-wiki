@@ -59,7 +59,7 @@ async function seed() {
       const result = await q`
         INSERT INTO entity_ids (numeric_id, slug)
         VALUES (${numericId}, ${slug})
-        ON CONFLICT (slug) DO NOTHING
+        ON CONFLICT (numeric_id) DO NOTHING
       `;
 
       if (result.count > 0) {
