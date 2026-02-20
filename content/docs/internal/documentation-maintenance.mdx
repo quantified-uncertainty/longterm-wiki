@@ -36,7 +36,7 @@ Technical documentation rots because:
 When code implements behavior documented elsewhere, add a comment:
 
 ```javascript
-// Docs: /wiki/E759#source-fetching
+// Docs: /internal/content-database/#source-fetching
 async function fetchSource(url) {
   // ...
 }
@@ -83,9 +83,9 @@ Schedule quarterly reviews of key docs:
 
 | Doc | Review Focus |
 |-----|--------------|
-| [Architecture](/wiki/E734) | Are diagrams still accurate? |
-| [Automation Tools](/wiki/E757) | Do all commands still work? |
-| [Content Database](/wiki/E759) | Is schema current? |
+| [Architecture](/internal/architecture/) | Are diagrams still accurate? |
+| [Automation Tools](/internal/automation-tools/) | Do all commands still work? |
+| [Content Database](/internal/content-database/) | Is schema current? |
 
 ---
 
@@ -213,17 +213,17 @@ When reviewing a PR that touches `/scripts/`:
 
 | Changed File | Update These Docs |
 |--------------|-------------------|
-| `scripts/content/page-creator.mjs` | [Architecture](/wiki/E734), [Automation Tools](/wiki/E757) |
-| `scripts/lib/knowledge-db.mjs` | [Content Database](/wiki/E759), [Architecture](/wiki/E734) |
-| `scripts/crux.mjs` or `commands/*` | [Automation Tools](/wiki/E757) |
-| `src/content.config.ts` | [Page Types](/wiki/E739) |
-| Any validation script | [Automation Tools](/wiki/E757) |
-| `.env` variables | [Architecture](/wiki/E734#environment-variables) |
+| `scripts/content/page-creator.mjs` | [Architecture](/internal/architecture/), [Automation Tools](/internal/automation-tools/) |
+| `scripts/lib/knowledge-db.mjs` | [Content Database](/internal/content-database/), [Architecture](/internal/architecture/) |
+| `scripts/crux.mjs` or `commands/*` | [Automation Tools](/internal/automation-tools/) |
+| `src/content.config.ts` | [Page Types](/internal/page-types/) |
+| Any validation script | [Automation Tools](/internal/automation-tools/) |
+| `.env` variables | [Architecture](/internal/architecture/#environment-variables) |
 
 ---
 
 ## Related
 
-- [Architecture](/wiki/E734) - System overview
-- [Automation Tools](/wiki/E757) - CLI reference
-- [About This Wiki](/wiki/E755) - Contributor overview
+- [Architecture](/internal/architecture/) - System overview
+- [Automation Tools](/internal/automation-tools/) - CLI reference
+- [About This Wiki](/internal/about-this-wiki/) - Contributor overview
