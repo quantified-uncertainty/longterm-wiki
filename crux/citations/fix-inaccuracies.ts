@@ -305,6 +305,18 @@ export async function escalateWithClaude(
       evidenceParts.push('');
     }
 
+    // Compute which footnotes must be preserved vs. are removable
+    const removableFns = new Set(
+      citations
+        .filter((c) => c.verdict === 'unsupported' || c.verdict === 'inaccurate')
+        .map((c) => c.footnote),
+    );
+    const mustPreserve = allFootnotes.filter((fn) => !removableFns.has(fn));
+
+    const preserveNote = mustPreserve.length > 0
+      ? `\nIMPORTANT: These footnotes MUST appear in your output: ${mustPreserve.map((fn) => `[^${fn}]`).join(', ')}. Do not remove or renumber them.\n`
+      : '';
+
     const userPrompt = [
       `Page: ${pageId}`,
       `Section to rewrite:`,
@@ -314,6 +326,7 @@ export async function escalateWithClaude(
       `Evidence for citations in this section:`,
       '',
       ...evidenceParts,
+      preserveNote,
     ].join('\n');
 
     if (opts?.verbose) {
@@ -349,11 +362,13 @@ export async function escalateWithClaude(
       const newFootnotes = findAllFootnotesInSection(rewritten);
       const missingFootnotes = origFootnotes.filter((fn) => !newFootnotes.includes(fn));
 
-      // Allow removal only for unsupported verdicts
-      const unsupportedFootnotes = new Set(
-        citations.filter((c) => c.verdict === 'unsupported').map((c) => c.footnote),
+      // Allow removal for unsupported/inaccurate verdicts (claims we know are wrong)
+      const removableFootnotes = new Set(
+        citations
+          .filter((c) => c.verdict === 'unsupported' || c.verdict === 'inaccurate')
+          .map((c) => c.footnote),
       );
-      const badlyMissing = missingFootnotes.filter((fn) => !unsupportedFootnotes.has(fn));
+      const badlyMissing = missingFootnotes.filter((fn) => !removableFootnotes.has(fn));
       if (badlyMissing.length > 0) {
         if (opts?.verbose) {
           console.log(`rejected (missing footnotes: ${badlyMissing.join(', ')})`);
