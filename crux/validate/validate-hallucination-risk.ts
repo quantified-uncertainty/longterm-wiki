@@ -1,5 +1,5 @@
 /**
- * Hallucination Risk Report
+ * Hallucination Risk Report (validation-time scorer)
  *
  * Identifies pages most vulnerable to hallucination based on:
  *   - Citation count (fewer citations = higher risk)
@@ -21,6 +21,27 @@
  *   pnpm crux validate hallucination-risk
  *   pnpm crux validate hallucination-risk --json
  *   pnpm crux validate hallucination-risk --top=20
+ *
+ * ## Relationship to build-time scorer (issue #417)
+ *
+ * There are two hallucination risk scorers:
+ *
+ * 1. **Build-time** (`apps/web/scripts/build-data.mjs:computeHallucinationRisk`):
+ *    Starts at baseline 40 with both risk-increasing and risk-decreasing factors.
+ *    Produces the page's `hallucinationRisk` field for the frontend.
+ *    Thresholds: low ≤30, medium ≤60, high >60.
+ *
+ * 2. **Validation-time** (this file, `assessPage`):
+ *    Starts at 0 with penalty accumulation + entity type multiplier.
+ *    Produces a diagnostic report for editors/developers.
+ *    Thresholds: low <25, medium <50, high ≥50.
+ *
+ * Both share the content integrity layer (`assessContentIntegrity` +
+ * `computeIntegrityRisk` from `crux/lib/content-integrity.ts`), which uses
+ * named constants (issue #417). The scorers intentionally differ because they
+ * serve different audiences — the build-time scorer needs a balanced
+ * assessment suitable for reader-facing warnings, while this validation
+ * scorer needs to surface all potential issues for editorial triage.
  *
  * Part of the hallucination risk reduction initiative (issue #200).
  */

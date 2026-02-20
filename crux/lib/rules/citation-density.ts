@@ -22,6 +22,7 @@
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 import { countProseWords, getEntityTypeFromPath } from '../page-analysis.ts';
+import { findFootnoteRefs } from '../content-integrity.ts';
 
 /** Minimum word count before citation density applies */
 const MIN_WORDS = 300;
@@ -45,29 +46,12 @@ const CITATION_MINIMUMS: Record<string, number> = {
 /** Default minimum for entity types not listed above */
 const DEFAULT_MINIMUM = 2;
 
-/** Count all citation types: footnotes [^N], <R id=...>, and inline links */
+/** Count all citation types: footnotes [^N] and <R id=...> components.
+ *  Delegates footnote counting to findFootnoteRefs() (DRY, issue #417). */
 function countCitations(body: string): number {
-  const footnoteRefs = new Set<string>();
-  const footnotePattern = /\[\^(\d+)\]/g;
-  let rComponentCount = 0;
-
-  for (const line of body.split('\n')) {
-    // Skip footnote definition lines
-    if (/^\[\^\d+\]:/.test(line.trim())) continue;
-
-    // Count footnote references
-    footnotePattern.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = footnotePattern.exec(line)) !== null) {
-      footnoteRefs.add(match[1]);
-    }
-
-    // Count <R id=...> citation components
-    const rMatches = line.match(/<R\s+id=/g);
-    if (rMatches) rComponentCount += rMatches.length;
-  }
-
-  return footnoteRefs.size + rComponentCount;
+  const footnoteCount = findFootnoteRefs(body).size;
+  const rMatches = body.match(/<R\s+id=/g);
+  return footnoteCount + (rMatches ? rMatches.length : 0);
 }
 
 export const citationDensityRule = {

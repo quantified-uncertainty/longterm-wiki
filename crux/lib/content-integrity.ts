@@ -106,9 +106,28 @@ export function detectDuplicateFootnoteDefs(body: string): number[] {
 // ---------------------------------------------------------------------------
 
 /**
+ * Test whether a YYMM prefix is a plausible arxiv ID prefix.
+ * Arxiv IDs use YYMM format where YY >= 07 and MM is 01-12.
+ * The upper year bound is dynamic (current year + 1) to avoid expiry.
+ * This eliminates false positives from version numbers, IP fragments,
+ * and other 4-digit.4-or-5-digit patterns.
+ */
+export function isPlausibleArxivPrefix(yymm: string): boolean {
+  if (yymm.length !== 4) return false;
+  const yy = parseInt(yymm.slice(0, 2), 10);
+  const mm = parseInt(yymm.slice(2, 4), 10);
+  // Arxiv new-format IDs started April 2007 (0704.xxxx)
+  const maxYY = (new Date().getFullYear() % 100) + 1;
+  return yy >= 7 && yy <= maxYY && mm >= 1 && mm <= 12;
+}
+
+/**
  * Detect suspicious sequential arxiv IDs that suggest LLM fabrication.
  * Real arxiv IDs are sparse (e.g., 2301.07041, 2305.14314); fabricated ones
  * are often sequential (2506.00001, 2506.00002, ...).
+ *
+ * Only considers IDs with a plausible YYMM prefix (year 07-26, month 01-12)
+ * to avoid false positives from version numbers or other numeric patterns.
  *
  * Returns the longest run of sequential IDs found, if >= minRunLength.
  */
@@ -125,7 +144,11 @@ export function detectSequentialArxivIds(
   const ids: string[] = [];
   let match: RegExpExecArray | null;
   while ((match = arxivPattern.exec(body)) !== null) {
-    ids.push(match[1]);
+    const candidate = match[1];
+    const prefix = candidate.split('.')[0];
+    if (isPlausibleArxivPrefix(prefix)) {
+      ids.push(candidate);
+    }
   }
 
   if (ids.length < minRunLength) {
@@ -234,6 +257,34 @@ export function detectUnsourcedFootnotes(body: string): {
 }
 
 // ---------------------------------------------------------------------------
+// Scoring constants (issue #417)
+// ---------------------------------------------------------------------------
+
+/** Risk score for severe page truncation (>50% orphaned footnotes). */
+export const RISK_SEVERE_TRUNCATION = 30;
+
+/** Risk score for partial orphaned footnotes (some missing definitions). */
+export const RISK_ORPHANED_FOOTNOTES = 15;
+
+/** Risk score for suspicious sequential arxiv IDs (fabrication signal). */
+export const RISK_SEQUENTIAL_ARXIV_IDS = 25;
+
+/** Risk score for duplicate footnote definitions (merge/copy-paste error). */
+export const RISK_DUPLICATE_FOOTNOTE_DEFS = 10;
+
+/** Risk score for majority of footnotes lacking URLs. */
+export const RISK_MOSTLY_UNSOURCED = 10;
+
+/** Risk score for some footnotes lacking URLs. */
+export const RISK_SOME_UNSOURCED = 5;
+
+/** Orphaned ratio above which truncation is considered severe. */
+export const ORPHANED_RATIO_SEVERE = 0.5;
+
+/** Unsourced ratio above which footnotes are considered "mostly unsourced". */
+export const UNSOURCED_RATIO_SEVERE = 0.5;
+
+// ---------------------------------------------------------------------------
 // Composite integrity assessment
 // ---------------------------------------------------------------------------
 
@@ -271,37 +322,35 @@ export function computeIntegrityRisk(integrity: IntegrityResult): {
   // Orphaned footnotes — strong truncation signal
   const { orphanedRatio, orphanedRefs } = integrity.orphanedFootnotes;
   if (orphanedRefs.length > 0) {
-    if (orphanedRatio > 0.5) {
-      // Majority of footnotes are orphaned — page is severely truncated
-      score += 30;
+    if (orphanedRatio > ORPHANED_RATIO_SEVERE) {
+      score += RISK_SEVERE_TRUNCATION;
       factors.push('severe-truncation');
     } else {
-      // Some orphaned footnotes — partial truncation or editing issues
-      score += 15;
+      score += RISK_ORPHANED_FOOTNOTES;
       factors.push('orphaned-footnotes');
     }
   }
 
   // Sequential arxiv IDs — fabrication signal
   if (integrity.sequentialArxivIds.suspicious) {
-    score += 25;
+    score += RISK_SEQUENTIAL_ARXIV_IDS;
     factors.push('suspicious-sequential-ids');
   }
 
   // Duplicate footnote definitions — editing/merge error
   if (integrity.duplicateFootnoteDefs.length > 0) {
-    score += 10;
+    score += RISK_DUPLICATE_FOOTNOTE_DEFS;
     factors.push('duplicate-footnote-defs');
   }
 
   // Unsourced footnotes — unverifiable claims
   const { unsourcedRatio, unsourced } = integrity.unsourcedFootnotes;
   if (unsourced > 0) {
-    if (unsourcedRatio > 0.5) {
-      score += 10;
+    if (unsourcedRatio > UNSOURCED_RATIO_SEVERE) {
+      score += RISK_MOSTLY_UNSOURCED;
       factors.push('mostly-unsourced-footnotes');
     } else {
-      score += 5;
+      score += RISK_SOME_UNSOURCED;
       factors.push('some-unsourced-footnotes');
     }
   }
