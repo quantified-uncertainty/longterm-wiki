@@ -74,6 +74,12 @@ const SCRIPTS = {
     passthrough: ['apply', 'verdict', 'max-score', 'model', 'json', 'concurrency'],
     positional: true,
   },
+  audit: {
+    script: 'citations/audit.ts',
+    description: 'Full pipeline: extract quotes, check accuracy, fix issues for one page',
+    passthrough: ['json', 'apply', 'recheck', 'model'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'report');
@@ -121,5 +127,7 @@ Examples:
   crux citations fix-inaccuracies --apply           Apply fixes to pages
   crux citations fix-inaccuracies <id>              Fix one page
   crux citations fix-inaccuracies --max-score=0.5   Only worst citations
+  crux citations audit existential-risk             Full audit pipeline for one page
+  crux citations audit existential-risk --apply     Audit and auto-fix one page
 `;
 }

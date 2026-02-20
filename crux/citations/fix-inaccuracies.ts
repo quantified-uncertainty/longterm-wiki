@@ -1,8 +1,8 @@
 /**
  * Citation Inaccuracy Auto-Fixer
  *
- * Reads flagged citations from the dashboard YAML, uses an LLM to generate
- * minimal targeted fixes, and applies them to MDX pages.
+ * Reads flagged citations from the dashboard YAML (for discovery), then
+ * enriches each with full source text from SQLite before generating fixes.
  *
  * Usage:
  *   pnpm crux citations fix-inaccuracies                        # Dry run all
@@ -25,6 +25,9 @@ import { findMdxFiles } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
+import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
+import { checkAccuracyForPage } from './check-accuracy.ts';
+import { exportDashboardData } from './export-dashboard.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 
 // ---------------------------------------------------------------------------
@@ -117,6 +120,52 @@ export function loadFlaggedCitations(opts: {
 }
 
 // ---------------------------------------------------------------------------
+// SQLite enrichment — pull full source text for better fix generation
+// ---------------------------------------------------------------------------
+
+export interface EnrichedFlaggedCitation extends FlaggedCitation {
+  fullClaimText: string | null;
+  sourceQuote: string | null;
+  supportingQuotes: string | null;
+  sourceFullText: string | null;
+}
+
+/**
+ * Enrich flagged citations with full data from SQLite.
+ * Falls back gracefully if SQLite is unavailable (e.g., on Vercel).
+ */
+export function enrichFromSqlite(flagged: FlaggedCitation[]): EnrichedFlaggedCitation[] {
+  try {
+    return flagged.map((f) => {
+      const row = citationQuotes.get(f.pageId, f.footnote);
+      let sourceFullText: string | null = null;
+      if (f.url) {
+        const cached = citationContent.getByUrl(f.url);
+        if (cached?.full_text) {
+          sourceFullText = cached.full_text;
+        }
+      }
+      return {
+        ...f,
+        fullClaimText: row?.claim_text ?? null,
+        sourceQuote: row?.source_quote ?? null,
+        supportingQuotes: row?.accuracy_supporting_quotes ?? null,
+        sourceFullText,
+      };
+    });
+  } catch {
+    // SQLite unavailable — return with null enrichments
+    return flagged.map((f) => ({
+      ...f,
+      fullClaimText: null,
+      sourceQuote: null,
+      supportingQuotes: null,
+      sourceFullText: null,
+    }));
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Section context extraction
 // ---------------------------------------------------------------------------
 
@@ -151,11 +200,16 @@ export function extractSectionContext(body: string, footnoteNum: number): string
 
 const SYSTEM_PROMPT = `You are a wiki editor fixing citation inaccuracies. You receive flagged citations where the wiki text misrepresents or is unsupported by the cited source.
 
+You are given:
+- The wiki section context around each flagged citation
+- The issue description explaining what's wrong
+- Source evidence: passages from the cited source showing what it actually says
+
 Your job is to generate MINIMAL, TARGETED fixes. Rules:
 
 1. Make the SMALLEST change possible to fix the issue
 2. Prefer softening language over removal ("X is Y" → "X may be Y", "X reportedly Y")
-3. For wrong facts (dates, numbers): replace with correct value from the issue description
+3. For wrong facts (dates, numbers): replace with the correct value from the SOURCE EVIDENCE provided. Do NOT guess — use the exact values from the source.
 4. For unsupported claims: either soften with "reportedly" / "according to other sources" or remove the specific footnote reference [^N] if the claim itself is reasonable but the source doesn't support it
 5. For fabricated details: remove the specific fabricated parts while keeping accurate parts
 6. NEVER change footnote definitions (lines starting with [^N]:)
@@ -179,9 +233,12 @@ JSON format:
 
 Return ONLY valid JSON, no markdown fences.`;
 
+/** Max source text chars to include in the fixer prompt per citation. */
+const MAX_SOURCE_PER_CITATION = 8_000;
+
 function buildUserPrompt(
   pageId: string,
-  flagged: FlaggedCitation[],
+  flagged: EnrichedFlaggedCitation[],
   pageContent: string,
 ): string {
   const body = stripFrontmatter(pageContent);
@@ -196,13 +253,59 @@ function buildUserPrompt(
       parts.push(`Issues: ${c.issues}`);
     }
     parts.push(`Source: ${c.sourceTitle ?? 'unknown'}`);
+
+    // Use full claim text from SQLite when available (YAML version is truncated)
+    const claimText = c.fullClaimText || c.claimText;
+    parts.push(`\nClaim text: ${claimText}`);
+
     if (context) {
       parts.push(`\nSection context:\n${context}`);
     }
-    parts.push(`\nClaim text: ${c.claimText}\n`);
+
+    // Include source evidence so the LLM can determine the correct values
+    const sourceEvidence = buildSourceEvidence(c);
+    if (sourceEvidence) {
+      parts.push(`\nSource evidence (use this to determine correct values):\n${sourceEvidence}`);
+    }
+
+    parts.push('');
   }
 
   return parts.join('\n');
+}
+
+/**
+ * Build source evidence string from enriched citation data.
+ * Prioritizes: supporting quotes > extracted quote > truncated full text.
+ */
+function buildSourceEvidence(c: EnrichedFlaggedCitation): string | null {
+  const parts: string[] = [];
+
+  // Supporting quotes from accuracy check (most targeted)
+  if (c.supportingQuotes) {
+    parts.push('Key passages from source:');
+    parts.push(c.supportingQuotes);
+  }
+
+  // Extracted quote from the source
+  if (c.sourceQuote && !c.supportingQuotes?.includes(c.sourceQuote.slice(0, 50))) {
+    parts.push('Extracted quote:');
+    parts.push(c.sourceQuote);
+  }
+
+  // If we have supporting quotes, that's usually enough
+  if (parts.length > 0) return parts.join('\n');
+
+  // Fall back to truncated full source text
+  if (c.sourceFullText) {
+    const truncated = c.sourceFullText.length > MAX_SOURCE_PER_CITATION
+      ? c.sourceFullText.slice(0, MAX_SOURCE_PER_CITATION) + '\n[... truncated ...]'
+      : c.sourceFullText;
+    parts.push('Full source text:');
+    parts.push(truncated);
+  }
+
+  return parts.length > 0 ? parts.join('\n') : null;
 }
 
 /** Parse LLM response into fix proposals. */
@@ -235,11 +338,16 @@ export function parseLLMFixResponse(content: string): FixProposal[] {
 /** Generate fixes for all flagged citations on one page (single LLM call). */
 export async function generateFixesForPage(
   pageId: string,
-  flagged: FlaggedCitation[],
+  flagged: FlaggedCitation[] | EnrichedFlaggedCitation[],
   pageContent: string,
   opts?: { model?: string },
 ): Promise<FixProposal[]> {
-  const userPrompt = buildUserPrompt(pageId, flagged, pageContent);
+  // Enrich if not already enriched
+  const enriched: EnrichedFlaggedCitation[] = 'fullClaimText' in (flagged[0] ?? {})
+    ? (flagged as EnrichedFlaggedCitation[])
+    : enrichFromSqlite(flagged);
+
+  const userPrompt = buildUserPrompt(pageId, enriched, pageContent);
 
   const response = await callOpenRouter(SYSTEM_PROMPT, userPrompt, {
     model: opts?.model,
@@ -349,21 +457,22 @@ async function main() {
 
   const c = getColors(json);
 
-  // Load flagged citations
-  let flagged: FlaggedCitation[];
+  // Load flagged citations from YAML, then enrich with SQLite source data
+  let enriched: EnrichedFlaggedCitation[];
   try {
-    flagged = loadFlaggedCitations({
+    const flagged = loadFlaggedCitations({
       pageId: pageIdFilter,
       verdict: verdictFilter,
       maxScore,
     });
+    enriched = enrichFromSqlite(flagged);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`${c.red}Error: ${msg}${c.reset}`);
     process.exit(1);
   }
 
-  if (flagged.length === 0) {
+  if (enriched.length === 0) {
     if (json) {
       console.log(JSON.stringify({ fixesProposed: 0, fixesApplied: 0, pages: [] }));
     } else {
@@ -372,9 +481,14 @@ async function main() {
     process.exit(0);
   }
 
+  // Count how many have source evidence
+  const withSource = enriched.filter(
+    (e) => e.supportingQuotes || e.sourceQuote || e.sourceFullText,
+  ).length;
+
   // Group by page
-  const byPage = new Map<string, FlaggedCitation[]>();
-  for (const f of flagged) {
+  const byPage = new Map<string, EnrichedFlaggedCitation[]>();
+  for (const f of enriched) {
     if (!byPage.has(f.pageId)) byPage.set(f.pageId, []);
     byPage.get(f.pageId)!.push(f);
   }
@@ -384,8 +498,9 @@ async function main() {
       `\n${c.bold}${c.blue}Citation Inaccuracy Fixer${c.reset}${apply ? ` ${c.red}(APPLY MODE)${c.reset}` : ` ${c.dim}(dry run)${c.reset}`}\n`,
     );
     console.log(
-      `  ${flagged.length} flagged citation${flagged.length === 1 ? '' : 's'} across ${byPage.size} page${byPage.size === 1 ? '' : 's'}`,
+      `  ${enriched.length} flagged citation${enriched.length === 1 ? '' : 's'} across ${byPage.size} page${byPage.size === 1 ? '' : 's'}`,
     );
+    console.log(`  Source evidence: ${withSource}/${enriched.length} citations have source text`);
     console.log(`  Model: ${model || DEFAULT_CITATION_MODEL}\n`);
   }
 
@@ -521,12 +636,79 @@ async function main() {
   const totalProposed = allResults.reduce((s, r) => s + r.proposals.length, 0);
   const totalApplied = allResults.reduce((s, r) => s + (r.applyResult?.applied ?? 0), 0);
 
+  // Re-verify fixed pages to confirm improvements
+  const pagesWithAppliedFixes = allResults
+    .filter((r) => r.applyResult && r.applyResult.applied > 0)
+    .map((r) => r.pageId);
+
+  interface ReVerifyResult {
+    pageId: string;
+    before: { inaccurate: number; unsupported: number };
+    after: { inaccurate: number; unsupported: number; accurate: number };
+  }
+  const reVerifyResults: ReVerifyResult[] = [];
+
+  if (apply && pagesWithAppliedFixes.length > 0) {
+    if (!json) {
+      console.log(`${c.bold}${c.blue}Re-verifying fixed pages...${c.reset}\n`);
+    }
+
+    for (const pageId of pagesWithAppliedFixes) {
+      const pageFlagged = byPage.get(pageId) || [];
+      const beforeInaccurate = pageFlagged.filter((f) => f.verdict === 'inaccurate').length;
+      const beforeUnsupported = pageFlagged.filter((f) => f.verdict === 'unsupported').length;
+
+      try {
+        if (!json) {
+          process.stdout.write(`  ${pageId}: re-checking... `);
+        }
+        const result = await checkAccuracyForPage(pageId, {
+          verbose: false,
+          recheck: true,
+        });
+        reVerifyResults.push({
+          pageId,
+          before: { inaccurate: beforeInaccurate, unsupported: beforeUnsupported },
+          after: {
+            inaccurate: result.inaccurate,
+            unsupported: result.unsupported,
+            accurate: result.accurate,
+          },
+        });
+
+        if (!json) {
+          const beforeTotal = beforeInaccurate + beforeUnsupported;
+          const afterTotal = result.inaccurate + result.unsupported;
+          const improved = beforeTotal - afterTotal;
+          if (improved > 0) {
+            console.log(`${c.green}${improved} fixed${c.reset} (${beforeTotal} → ${afterTotal} flagged)`);
+          } else if (improved === 0) {
+            console.log(`${c.yellow}unchanged${c.reset} (${afterTotal} flagged)`);
+          } else {
+            console.log(`${c.red}regression${c.reset} (${beforeTotal} → ${afterTotal} flagged)`);
+          }
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!json) {
+          console.log(`${c.red}error: ${msg.slice(0, 80)}${c.reset}`);
+        }
+      }
+    }
+
+    // Re-export dashboard data with updated verdicts
+    exportDashboardData();
+
+    if (!json) console.log('');
+  }
+
   if (json) {
     console.log(
       JSON.stringify(
         {
           fixesProposed: totalProposed,
           fixesApplied: totalApplied,
+          reVerification: reVerifyResults,
           pages: allResults.map((r) => ({
             pageId: r.pageId,
             proposed: r.proposals.length,
@@ -550,13 +732,21 @@ async function main() {
       console.log(`  Applied:  ${totalApplied}`);
     }
 
-    if (apply && totalApplied > 0) {
-      console.log(`\n${c.dim}Next steps:${c.reset}`);
-      console.log(`  1. pnpm crux fix escaping`);
-      console.log(`  2. pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only`);
-      console.log(`  3. Re-run check-accuracy on fixed pages to verify`);
-    } else if (!apply && totalProposed > 0) {
-      console.log(`\n${c.dim}Run with --apply to write changes.${c.reset}`);
+    if (reVerifyResults.length > 0) {
+      const totalBefore = reVerifyResults.reduce(
+        (s, r) => s + r.before.inaccurate + r.before.unsupported, 0,
+      );
+      const totalAfter = reVerifyResults.reduce(
+        (s, r) => s + r.after.inaccurate + r.after.unsupported, 0,
+      );
+      const improved = totalBefore - totalAfter;
+      console.log(
+        `  Re-verified: ${improved > 0 ? c.green : c.yellow}${improved} citations improved${c.reset} (${totalBefore} → ${totalAfter} flagged)`,
+      );
+    }
+
+    if (!apply && totalProposed > 0) {
+      console.log(`\n${c.dim}Run with --apply to write changes and auto-re-verify.${c.reset}`);
     }
     console.log('');
   }

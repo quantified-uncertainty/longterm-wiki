@@ -15,6 +15,7 @@
 
 import { readFileSync } from 'fs';
 import { basename } from 'path';
+import { fileURLToPath } from 'url';
 import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
@@ -128,7 +129,7 @@ async function getSourceText(
 // Single page extraction
 // ---------------------------------------------------------------------------
 
-interface ExtractResult {
+export interface ExtractResult {
   pageId: string;
   total: number;
   extracted: number;
@@ -137,7 +138,7 @@ interface ExtractResult {
   errors: number;
 }
 
-async function extractQuotesForPage(
+export async function extractQuotesForPage(
   pageId: string,
   body: string,
   opts: { verbose?: boolean; recheck?: boolean; delayMs?: number } = {},
@@ -566,7 +567,10 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((err: Error) => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+// Only run when executed directly (not when imported)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: Error) => {
+    console.error('Error:', err.message);
+    process.exit(1);
+  });
+}

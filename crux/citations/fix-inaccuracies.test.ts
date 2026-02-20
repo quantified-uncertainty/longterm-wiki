@@ -3,7 +3,9 @@ import {
   extractSectionContext,
   parseLLMFixResponse,
   applyFixes,
+  enrichFromSqlite,
 } from './fix-inaccuracies.ts';
+import type { FlaggedCitation } from './export-dashboard.ts';
 
 describe('extractSectionContext', () => {
   const body = [
@@ -173,5 +175,36 @@ describe('applyFixes', () => {
 
     const result = applyFixes(content, proposals);
     expect((result as typeof result & { content?: string }).content).toBeUndefined();
+  });
+});
+
+describe('enrichFromSqlite', () => {
+  it('returns enriched objects with null fields when SQLite is unavailable', () => {
+    // When SQLite is not available (no .cache/knowledge.db), enrichFromSqlite
+    // should gracefully return the original data with null enrichment fields
+    const flagged: FlaggedCitation[] = [
+      {
+        pageId: 'test-page',
+        footnote: 1,
+        claimText: 'truncated claim...',
+        sourceTitle: 'Source',
+        url: 'https://example.com',
+        verdict: 'inaccurate',
+        score: 0.3,
+        issues: 'Wrong date',
+        difficulty: 'easy',
+        checkedAt: '2025-01-01',
+      },
+    ];
+
+    const enriched = enrichFromSqlite(flagged);
+    expect(enriched).toHaveLength(1);
+    expect(enriched[0].pageId).toBe('test-page');
+    expect(enriched[0].claimText).toBe('truncated claim...');
+    // Enrichment fields should be present (null if SQLite unavailable)
+    expect('fullClaimText' in enriched[0]).toBe(true);
+    expect('sourceQuote' in enriched[0]).toBe(true);
+    expect('supportingQuotes' in enriched[0]).toBe(true);
+    expect('sourceFullText' in enriched[0]).toBe(true);
   });
 });
