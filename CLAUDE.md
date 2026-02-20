@@ -65,6 +65,10 @@ pnpm crux issues next            # Show next highest-priority issue to work on
 pnpm crux issues create "title" --label=tooling  # File a new issue (use during tooling-gaps-actioned)
 pnpm crux issues start <N>       # Signal start: comment + add claude-working label
 pnpm crux issues done <N>        # Signal completion: comment + remove label
+pnpm crux issues cleanup         # Detect stale claude-working labels + potential duplicates
+pnpm crux issues cleanup --fix   # Auto-remove stale labels
+pnpm crux issues close <N> --duplicate=M  # Close issue as duplicate of another
+pnpm crux issues close <N> --reason="..."  # Close with comment
 
 # Hallucination risk & review tracking
 pnpm crux validate hallucination-risk         # Risk assessment report
