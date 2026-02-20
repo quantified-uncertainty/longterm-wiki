@@ -1,0 +1,72 @@
+- pageId: frontier-model-forum
+  footnote: 3
+  claimText: Its founding members—<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <Entity...
+  sourceTitle: Weights & Biases
+  url: https://wandb.ai/byyoung3/ml-news/reports/The-Frontier-Model-Forum-For-AI-Safety---Vmlldzo0OTc5MzQ5
+  verdict: unsupported
+  score: 0
+  issues: null
+  difficulty: medium
+  checkedAt: '2026-02-20 01:47:46'
+- pageId: frontier-model-forum
+  footnote: 16
+  claimText: 'According to FMF issue briefs, effective safety frameworks include four core components:'
+  sourceTitle: 'Issue Brief: Components of Frontier AI Safety Frameworks - Frontier Model Forum'
+  url: https://www.frontiermodelforum.org/updates/issue-brief-components-of-frontier-ai-safety-frameworks/
+  verdict: unsupported
+  score: 0
+  issues: null
+  difficulty: hard
+  checkedAt: '2026-02-20 01:48:10'
+- pageId: frontier-model-forum
+  footnote: 20
+  claimText: Subsequent rounds have emphasized "narrowly-scoped" projects targeting urgent bottlenecks in safety research, such as developing better techniques for...
+  sourceTitle: Common Elements of Frontier AI Safety Policies - METR
+  url: https://metr.org/common-elements
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention subsequent rounds emphasizing narrowly-scoped projects targeting urgent bottlenecks in safety research.
+  difficulty: hard
+  checkedAt: '2026-02-20 01:48:16'
+- pageId: frontier-model-forum
+  footnote: 27
+  claimText: The FMF's issue briefs on pre-deployment safety evaluations emphasize that assessments must cover both intended use cases and adversarial exploitation...
+  sourceTitle: 'Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations - Frontier Model Forum'
+  url: https://www.frontiermodelforum.org/updates/issue-brief-preliminary-taxonomy-of-pre-deployment-frontier-ai-safety-evaluations/
+  verdict: unsupported
+  score: 0
+  issues: The document does not contain the claim that the FMF's issue briefs on pre-deployment safety evaluations emphasize that assessments must cover both intended use cases and adversarial exploitation scenarios. The document also does not contain the claim that evaluations should consider multiple threat models.
+  difficulty: easy
+  checkedAt: '2026-02-20 01:48:28'
+- pageId: frontier-model-forum
+  footnote: 36
+  claimText: This approach aligns with initiatives including the G7 Hiroshima AI Process, OECD AI principles, and the establishment of <EntityLink id="ai-safety-in...
+  sourceTitle: Weights & Biases
+  url: https://wandb.ai/byyoung3/ml-news/reports/The-Frontier-Model-Forum-For-AI-Safety---Vmlldzo0OTc5MzQ5
+  verdict: unsupported
+  score: 0
+  issues: The provided source does not contain any information about the G7 Hiroshima AI Process, OECD AI principles, AI Safety Institutes, or the Forum's support for the global network of AI safety institutes.
+  difficulty: hard
+  checkedAt: '2026-02-20 01:48:41'
+- pageId: frontier-model-forum
+  footnote: 51
+  claimText: Critics argue that fixating on what AI systems can do in isolation overlooks the social, economic, and political contexts that shape how capabilities ...
+  sourceTitle: What mistakes has the AI safety movement made? — EA Forum
+  url: https://forum.effectivealtruism.org/posts/tEmQrfMs9qdBPrGKh/what-mistakes-has-the-ai-safety-movement-made
+  verdict: unsupported
+  score: 0
+  issues: The source does not discuss critics arguing that fixating on what AI systems can do in isolation overlooks the social, economic, and political contexts that shape how capabilities translate into actual harms or benefits.
+  difficulty: hard
+  checkedAt: '2026-02-20 01:49:07'
+- pageId: frontier-model-forum
+  footnote: 8
+  claimText: The organization was legally established as a 501(c)(6) non-profit, a structure that allows industry associations to pursue public benefits without en...
+  sourceTitle: Frontier Model Forum — LessWrong
+  url: https://www.lesswrong.com/posts/hcWc76eCan3FF5XBk/frontier-model-forum
+  verdict: inaccurate
+  score: 0.5
+  issues: |-
+    unsupported: The organization was legally established as a 501(c)(6) non-profit, a structure that allows industry associations to pursue public benefits without engaging in lobbying activities.
+    misleading paraphrase: Kent Walker, President of Global Affairs at Google & Alphabet, stated at launch: "We're excited to work together with other leading companies, sharing technical expertise to promote responsible AI innovation."
+  difficulty: medium
+  checkedAt: '2026-02-20 01:47:55'

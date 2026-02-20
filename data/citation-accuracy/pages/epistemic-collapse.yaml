@@ -1,0 +1,22 @@
+- pageId: epistemic-collapse
+  footnote: 16
+  claimText: '**Trust Metrics** - Five key dimensions: competence, integrity, performance, accuracy, and relevance of information provided - 80% of respondents supp...'
+  sourceTitle: 'Online content moderation: What works, and what people want | MIT Sloan'
+  url: https://mitsloan.mit.edu/ideas-made-to-matter/online-content-moderation-what-works-and-what-people-want
+  verdict: inaccurate
+  score: 0.3
+  issues: |-
+    unsupported: The source does not mention the five key dimensions of trust metrics: competence, integrity, performance, accuracy, and relevance of information provided.
+    minor_issues: The source states that 80% of respondents support platforms trying to reduce the spread of misinformation, but the claim does not specify that this is harmful misinformation.
+  difficulty: easy
+  checkedAt: '2026-02-20 01:33:50'
+- pageId: epistemic-collapse
+  footnote: 15
+  claimText: '**Trust Metrics** - Five key dimensions: competence, integrity, performance, accuracy, and relevance of information provided - 80% of respondents supp...'
+  sourceTitle: 'The Drivers of Institutional Trust and Distrust: Exploring Components of Trustworthiness | RAND'
+  url: https://www.rand.org/pubs/research_reports/RRA112-7.html
+  verdict: inaccurate
+  score: 0.7
+  issues: unsupported
+  difficulty: easy
+  checkedAt: '2026-02-20 01:33:48'

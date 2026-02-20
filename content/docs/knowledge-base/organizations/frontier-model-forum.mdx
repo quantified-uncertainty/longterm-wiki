@@ -45,7 +45,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 
 The **Frontier Model Forum (FMF)** is an industry-supported non-profit organization established in July 2023 to promote self-governance in frontier AI safety through collaborative development of best practices, research coordination, and information-sharing among leading AI developers.[^1] Led by Executive Director Chris Meserole, the organization focuses on addressing severe risks to public safety and national security from advanced general-purpose AI models, including biological threats, cybersecurity risks, and catastrophic misuse scenarios.[^2]
 
-The Forum emerged as a response to growing recognition that advanced AI systems require coordinated safety frameworks beyond individual company efforts. Its founding members—<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="openai">OpenAI</EntityLink>—recognized the need to establish shared standards for evaluating and mitigating risks from "frontier models," defined as large-scale machine learning systems that surpass existing capabilities and can perform diverse tasks with potentially high-risk implications.[^3]
+The Forum emerged as a response to growing recognition that advanced AI systems require coordinated safety frameworks beyond individual company efforts. Its founding members—<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="openai">OpenAI</EntityLink>—recognized the need to establish shared standards for evaluating and mitigating risks from frontier AI models.[^3]
 
 The FMF operates through three core mandates: identifying best practices and standards for frontier AI safety and security, advancing scientific research on safety mechanisms, and facilitating information-sharing across industry, government, academia, and civil society.[^4] While positioned as an industry self-governance initiative, the organization has faced questions about whether profit-driven companies can adequately regulate themselves without independent oversight.
 
@@ -98,7 +98,7 @@ The FMF has published a technical report series to detail implementation approac
 
 The AI Safety Fund has distributed two rounds of grants since its October 2023 launch, with a recent cohort of 11 grantees awarded \$5+ million for projects in biosecurity, cybersecurity, AI agent evaluation, and synthetic content.[^19] The fund prioritizes independent research that can inform industry-wide practices rather than company-specific applications.
 
-First-round grants focused on evaluating frontier model capabilities and risks, while subsequent rounds have emphasized "narrowly-scoped" projects targeting urgent bottlenecks in safety research, such as developing better techniques for detecting <EntityLink id="scheming">deceptive alignment</EntityLink> and measuring instrumental reasoning capabilities that could undermine human control.[^20]
+Subsequent rounds have emphasized "narrowly-scoped" projects targeting urgent bottlenecks in safety research, such as developing better techniques for detecting <EntityLink id="scheming">deceptive alignment</EntityLink> and measuring instrumental reasoning capabilities that could undermine human control.[^20]
 
 ### AI-Bio Workstream
 
@@ -112,7 +112,7 @@ The Forum convenes leading cybersecurity experts to develop novel approaches for
 
 ### Threshold Setting Challenges
 
-One of the most technically challenging aspects of frontier AI safety frameworks is establishing appropriate thresholds for when enhanced safeguards should be triggered. The FMF has identified two main types of thresholds:[^24]
+One of the most technically challenging aspects of frontier AI safety frameworks is establishing appropriate thresholds for when enhanced safeguards should be triggered. The FMF has identified several main approaches to establishing thresholds:[^24]
 
 **<EntityLink id="thresholds">Compute Thresholds</EntityLink>**: Using computational resources (measured in FLOPs) as a proxy for identifying potentially high-risk models. While straightforward to measure, the FMF acknowledges this is an "imperfect proxy" since algorithmic advances can enable dangerous capabilities with less compute, and some large models may pose minimal risks while smaller specialized models could be highly dangerous.[^25]
 
@@ -146,7 +146,7 @@ The AI Safety Fund represents the primary funding mechanism through which the FM
 
 Jaan Tallinn, the Estonian programmer and early AI safety philanthropist who co-founded Skype, is among the individual supporters, alongside institutional philanthropies focused on science and technology.[^33] The fund explicitly aims to support research that is independent from member company interests, though questions remain about whether industry-funded research can maintain true independence when evaluating risks posed by the funders themselves.
 
-The FMF operates as a non-profit without revenue streams, relying entirely on member contributions and philanthropic support for its activities beyond the AI Safety Fund.[^34]
+The FMF operates as a non-profit, funded by fees from its member firms.[^34]
 
 ## Cross-Sector Collaboration and Policy Engagement
 
@@ -179,7 +179,7 @@ The term "frontier AI" itself has been criticized as an "undefinable moving-targ
 
 ### Technical Limitations of Safety Cases
 
-The FMF's emphasis on safety frameworks and pre-deployment evaluations faces significant technical challenges. Research on the limitations of **safety cases**—structured arguments for why a system is adequately safe—identifies several problems:[^41]
+The FMF's emphasis on safety frameworks and pre-deployment evaluations faces significant technical challenges. Research suggests that **safety cases**—structured arguments for why a system is adequately safe—may have limitations:[^41]
 
 **<EntityLink id="sandbagging">Sandbagging</EntityLink> and Deception**: Models may deliberately underperform on safety evaluations while retaining dangerous capabilities that emerge during deployment. Recent research on alignment faking has demonstrated that models can learn to behave differently when they detect they are being evaluated versus deployed.
 
@@ -231,7 +231,7 @@ Several fundamental questions remain unresolved about the FMF's approach and eff
 
 **How should tradeoffs between transparency and security be navigated?** The FMF acknowledges tension between making safety evaluations reproducible (requiring detailed disclosure) and avoiding information hazards, gaming of tests, and data leakage that could undermine security.[^50] The optimal balance remains unclear and may vary by risk domain.
 
-**Is the focus on capabilities-based risks missing important sociotechnical factors?** Critics argue that fixating on what AI systems can do in isolation overlooks the social, economic, and political contexts that shape how capabilities translate into actual harms or benefits.[^51]
+Critics argue that fixating on what AI systems can do in isolation overlooks the social, economic, and political contexts that shape how capabilities translate into actual harms or benefits.[^51]
 
 ## Relationship to Broader AI Safety Ecosystem
 
