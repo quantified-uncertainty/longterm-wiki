@@ -41,6 +41,32 @@ jobs:
       - name: Build Next.js
         run: cd apps/web && pnpm build
 
+  deploy:
+    # Trigger a Vercel production deployment after CI passes on main.
+    # This ensures prod is rebuilt exactly once per PR merge, naturally
+    # capping deploys at ~1 per merged PR (<10/day in practice).
+    # The scheduled-deploy workflow provides a daily fallback for quiet periods.
+    needs: [build-and-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel production deploy
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK_URL not set — skipping deploy trigger (see scheduled-deploy.yml for setup instructions)"
+            exit 0
+          fi
+          RESPONSE=$(curl -s -o /tmp/vercel_response.json -w "%{http_code}" \
+            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+          echo "HTTP status: $RESPONSE"
+          cat /tmp/vercel_response.json
+          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
+            echo "Production deployment triggered."
+          else
+            echo "::error::Vercel deploy hook returned HTTP $RESPONSE"
+            exit 1
+          fi
+
   validate:
     runs-on: ubuntu-latest
 

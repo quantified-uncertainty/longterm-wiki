@@ -1,14 +1,11 @@
 name: Scheduled Production Deploy
 
-# Ensures production is deployed at least every 4 hours.
+# Daily fallback to ensure production stays fresh even in quiet periods
+# (no PR merges for a day or more).
 #
-# Context: We disabled automatic Vercel builds for claude/* branches to
-# reduce costs (they were triggering ~$377/month in preview builds).
-# This change also made production deploys less predictable, since they
-# only happen when PRs are merged to main.
-#
-# This workflow guarantees a production deployment floor by hitting the
-# Vercel deploy hook on a fixed schedule, regardless of git activity.
+# Primary deploys are triggered by the CI workflow (deploy job) whenever
+# a PR is merged to main and CI passes — that handles the common case.
+# This workflow is the safety net.
 #
 # Setup (one-time):
 #   1. Go to Vercel Dashboard → Project → Settings → Git → Deploy Hooks
@@ -20,8 +17,8 @@ name: Scheduled Production Deploy
 
 on:
   schedule:
-    - cron: '0 */4 * * *'   # Every 4 hours (00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC)
-  workflow_dispatch:          # Allow manual trigger from GitHub Actions UI
+    - cron: '0 4 * * *'    # Daily at 04:00 UTC (fallback only)
+  workflow_dispatch:         # Allow manual trigger from GitHub Actions UI
 
 jobs:
   trigger-production-deploy:
@@ -45,7 +42,7 @@ jobs:
           cat /tmp/vercel_response.json
 
           if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
-            echo "✓ Production deployment triggered successfully."
+            echo "Production deployment triggered."
           else
             echo "::error::Vercel deploy hook returned HTTP $RESPONSE"
             exit 1
