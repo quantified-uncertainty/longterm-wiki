@@ -41,6 +41,12 @@ describe('extractSectionContext', () => {
     const ctx = extractSectionContext(body, 2);
     expect(ctx).toContain('[^2]');
   });
+
+  it('does not match [^1] inside [^10]', () => {
+    const bodyHighNums = '## Section\n\nSome claim[^10] here.\n';
+    expect(extractSectionContext(bodyHighNums, 1)).toBe('');
+    expect(extractSectionContext(bodyHighNums, 10)).toContain('[^10]');
+  });
 });
 
 describe('parseLLMFixResponse', () => {
@@ -288,6 +294,20 @@ describe('extractSection', () => {
       '[^5]: https://example.com',
     ].join('\n');
     expect(extractSection(bodyOnlyDefs, 5)).toBeNull();
+  });
+
+  it('does not match [^1] inside [^10] or [^12]', () => {
+    const bodyWithHighNums = [
+      '## Section',
+      '',
+      'A claim with footnote[^10] and another[^12].',
+    ].join('\n');
+    // Searching for [^1] should NOT match [^10] or [^12]
+    expect(extractSection(bodyWithHighNums, 1)).toBeNull();
+    // But [^10] should match
+    const result10 = extractSection(bodyWithHighNums, 10);
+    expect(result10).not.toBeNull();
+    expect(result10!.text).toContain('[^10]');
   });
 });
 

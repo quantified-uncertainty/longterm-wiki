@@ -28,8 +28,7 @@ import { appendEditLog } from '../lib/edit-log.ts';
 import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
 import { extractQuotesForPage } from './extract-quotes.ts';
-import { exportDashboardData } from './export-dashboard.ts';
-import { ACCURACY_DIR, ACCURACY_ACCURACY_PAGES_DIR } from './export-dashboard.ts';
+import { exportDashboardData, ACCURACY_DIR, ACCURACY_PAGES_DIR } from './export-dashboard.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 import { logBatchProgress } from './shared.ts';
 
@@ -81,8 +80,9 @@ export interface ExtractedSection {
  * Works on frontmatter-stripped body text.
  */
 export function extractSection(body: string, footnoteNum: number): ExtractedSection | null {
-  const marker = `[^${footnoteNum}]`;
-  if (!body.includes(marker)) return null;
+  // Use regex to match exact footnote number (avoid [^1] matching inside [^10])
+  const markerRe = new RegExp(`\\[\\^${footnoteNum}\\](?!\\d)`);
+  if (!markerRe.test(body)) return null;
 
   const lines = body.split('\n');
 
@@ -92,7 +92,7 @@ export function extractSection(body: string, footnoteNum: number): ExtractedSect
     const line = lines[i];
     // Skip footnote definition lines like [^1]: ...
     if (/^\[\^\d+\]:/.test(line.trimStart())) continue;
-    if (line.includes(marker)) {
+    if (markerRe.test(line)) {
       targetLine = i;
       break;
     }
@@ -252,18 +252,10 @@ export async function escalateWithClaude(
         if (evidence) {
           evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
         }
-      } else {
-        // Try to get evidence from the broader enriched set (for non-flagged footnotes)
-        const anyEnriched = allEnriched.find(
-          (e) => e.pageId === pageId && e.footnote === fn,
-        );
-        if (anyEnriched) {
-          const evidence = buildSourceEvidence(anyEnriched);
-          if (evidence) {
-            evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
-          }
-        }
       }
+      // Note: non-flagged footnotes won't have enriched data since allEnriched
+      // only contains flagged citations. A future enhancement could look up
+      // evidence for neighboring citations directly from the DB.
 
       evidenceParts.push('');
     }
@@ -505,9 +497,11 @@ export function enrichFromSqlite(flagged: FlaggedCitation[]): EnrichedFlaggedCit
  * Returns ~20 lines centered around the first `[^N]` occurrence.
  */
 export function extractSectionContext(body: string, footnoteNum: number): string {
-  const marker = `[^${footnoteNum}]`;
-  const idx = body.indexOf(marker);
-  if (idx === -1) return '';
+  // Use regex to match exact footnote number (avoid [^1] matching inside [^10])
+  const markerRe = new RegExp(`\\[\\^${footnoteNum}\\](?!\\d)`);
+  const match = markerRe.exec(body);
+  if (!match) return '';
+  const idx = match.index;
 
   const lines = body.split('\n');
   let lineIdx = 0;
@@ -904,6 +898,7 @@ async function main() {
               const syntheticApply: ApplyResult = {
                 applied: rwResult.applied,
                 skipped: rwResult.skipped,
+                content: rwResult.content,
                 details: sectionRewrites.map((rw) => ({
                   footnote: 0,
                   status: 'applied' as const,
