@@ -87,6 +87,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cleanup stale claude-working labels
+        run: pnpm crux issues cleanup --fix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run maintenance
         uses: anthropics/claude-code-action@v1
         with:
