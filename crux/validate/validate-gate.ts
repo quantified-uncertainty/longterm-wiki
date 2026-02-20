@@ -143,6 +143,13 @@ const STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'prefer-entitylink',
+    name: 'EntityLink enforcement (blocking)',
+    command: 'pnpm',
+    args: ['crux', 'validate', 'unified', '--rules=prefer-entitylink', '--errors-only'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'typecheck',
     name: 'TypeScript type check',
     command: 'npx',
