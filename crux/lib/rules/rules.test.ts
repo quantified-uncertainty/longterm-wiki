@@ -848,7 +848,6 @@ describe('kb-subcategory-coverage rule', () => {
 // =============================================================================
 // prefer-entitylink rule
 // =============================================================================
-
 describe('prefer-entitylink rule', () => {
   // Engine mock with known slugs from the real pathRegistry.
   // The rule reads pathRegistry.json from disk and caches the reverse map; tests
