@@ -1,23 +1,23 @@
-exportedAt: '2026-02-20T17:14:26.899Z'
+exportedAt: '2026-02-20T17:42:08.886Z'
 summary:
-  totalCitations: 1161
-  checkedCitations: 637
-  accurateCitations: 421
-  inaccurateCitations: 30
-  unsupportedCitations: 18
-  minorIssueCitations: 162
-  uncheckedCitations: 524
+  totalCitations: 1298
+  checkedCitations: 757
+  accurateCitations: 492
+  inaccurateCitations: 38
+  unsupportedCitations: 24
+  minorIssueCitations: 197
+  uncheckedCitations: 541
   averageScore: 0.91
 verdictDistribution:
-  accurate: 421
-  inaccurate: 30
-  minor_issues: 162
+  accurate: 492
+  inaccurate: 38
+  minor_issues: 197
   not_verifiable: 6
-  unsupported: 18
+  unsupported: 24
 difficultyDistribution:
-  easy: 465
-  hard: 20
-  medium: 147
+  easy: 538
+  hard: 29
+  medium: 185
 pages:
   - pageId: biosecurity-overview
     totalCitations: 5
@@ -46,6 +46,15 @@ pages:
     minorIssues: 28
     accuracyRate: 0.8552631578947368
     avgScore: 0.85
+  - pageId: wikipedia-views
+    totalCitations: 70
+    checked: 64
+    accurate: 37
+    inaccurate: 5
+    unsupported: 3
+    minorIssues: 19
+    accuracyRate: 0.875
+    avgScore: 0.86
   - pageId: why-alignment-hard
     totalCitations: 16
     checked: 8
@@ -63,6 +72,15 @@ pages:
     unsupported: 4
     minorIssues: 8
     accuracyRate: 0.8775510204081632
+    avgScore: 0.88
+  - pageId: max-tegmark
+    totalCitations: 67
+    checked: 56
+    accurate: 34
+    inaccurate: 3
+    unsupported: 3
+    minorIssues: 16
+    accuracyRate: 0.8928571428571429
     avgScore: 0.88
   - pageId: nist-ai
     totalCitations: 70
@@ -223,7 +241,21 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 1
+  - domain: vice.com
+    totalCitations: 2
+    checked: 2
+    accurate: 1
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.5
   - domain: cmu.edu
+    totalCitations: 2
+    checked: 2
+    accurate: 1
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.5
+  - domain: ghacks.net
     totalCitations: 2
     checked: 2
     accurate: 1
@@ -251,7 +283,21 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.3333333333333333
+  - domain: poetryinphysics.wordpress.com
+    totalCitations: 3
+    checked: 3
+    accurate: 2
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.3333333333333333
   - domain: governor.ny.gov
+    totalCitations: 3
+    checked: 3
+    accurate: 2
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.3333333333333333
+  - domain: pubmed.ncbi.nlm.nih.gov
     totalCitations: 3
     checked: 3
     accurate: 2
@@ -267,6 +313,13 @@ domainAnalysis:
     inaccuracyRate: 0.3333333333333333
   - domain: redhat.com
     totalCitations: 5
+    checked: 4
+    accurate: 3
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.25
+  - domain: frontiersin.org
+    totalCitations: 4
     checked: 4
     accurate: 3
     inaccurate: 0
@@ -300,11 +353,32 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 1
     inaccuracyRate: 0.2
+  - domain: futureoflife.org
+    totalCitations: 11
+    checked: 11
+    accurate: 9
+    inaccurate: 1
+    unsupported: 1
+    inaccuracyRate: 0.18181818181818182
+  - domain: scottaaronson.blog
+    totalCitations: 6
+    checked: 6
+    accurate: 5
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.16666666666666666
+  - domain: computing.co.uk
+    totalCitations: 6
+    checked: 6
+    accurate: 5
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.16666666666666666
   - domain: en.wikipedia.org
-    totalCitations: 50
-    checked: 13
-    accurate: 11
-    inaccurate: 2
+    totalCitations: 64
+    checked: 26
+    accurate: 22
+    inaccurate: 4
     unsupported: 0
     inaccuracyRate: 0.15384615384615385
   - domain: nelsonmullins.com
@@ -314,6 +388,27 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 1
     inaccuracyRate: 0.14285714285714285
+  - domain: physics.mit.edu
+    totalCitations: 7
+    checked: 7
+    accurate: 6
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.14285714285714285
+  - domain: diff.wikimedia.org
+    totalCitations: 8
+    checked: 8
+    accurate: 7
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.125
+  - domain: issarice.com
+    totalCitations: 11
+    checked: 9
+    accurate: 8
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.1111111111111111
   - domain: frontiermodelforum.org
     totalCitations: 30
     checked: 30
@@ -336,12 +431,12 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: 0.08695652173913043
   - domain: forum.effectivealtruism.org
-    totalCitations: 93
-    checked: 61
-    accurate: 54
+    totalCitations: 98
+    checked: 65
+    accurate: 58
     inaccurate: 3
     unsupported: 2
-    inaccuracyRate: 0.08196721311475409
+    inaccuracyRate: 0.07692307692307693
   - domain: artificialintelligenceact.eu
     totalCitations: 14
     checked: 14
@@ -350,19 +445,19 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: 0.07142857142857142
   - domain: lesswrong.com
-    totalCitations: 35
-    checked: 32
-    accurate: 30
+    totalCitations: 39
+    checked: 36
+    accurate: 34
     inaccurate: 2
     unsupported: 0
-    inaccuracyRate: 0.0625
+    inaccuracyRate: 0.05555555555555555
   - domain: arxiv.org
-    totalCitations: 30
-    checked: 20
-    accurate: 17
+    totalCitations: 31
+    checked: 21
+    accurate: 18
     inaccurate: 1
     unsupported: 0
-    inaccuracyRate: 0.05
+    inaccuracyRate: 0.047619047619047616
   - domain: macfound.org
     totalCitations: 53
     checked: 0
@@ -398,6 +493,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: youtube.com
+    totalCitations: 22
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
   - domain: alignmentforum.org
     totalCitations: 21
     checked: 0
@@ -419,14 +521,14 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
-  - domain: insidephilanthropy.com
-    totalCitations: 10
-    checked: 0
-    accurate: 0
+  - domain: 80000hours.org
+    totalCitations: 11
+    checked: 2
+    accurate: 2
     inaccurate: 0
     unsupported: 0
-    inaccuracyRate: null
-  - domain: youtube.com
+    inaccuracyRate: 0
+  - domain: insidephilanthropy.com
     totalCitations: 10
     checked: 0
     accurate: 0
@@ -447,13 +549,6 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
-  - domain: 80000hours.org
-    totalCitations: 9
-    checked: 0
-    accurate: 0
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: null
   - domain: goodjudgment.substack.com
     totalCitations: 9
     checked: 9
@@ -503,6 +598,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: pmc.ncbi.nlm.nih.gov
+    totalCitations: 7
+    checked: 7
+    accurate: 7
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: capitalresearch.org
     totalCitations: 7
     checked: 0
@@ -517,13 +619,6 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
-  - domain: pmc.ncbi.nlm.nih.gov
-    totalCitations: 6
-    checked: 6
-    accurate: 6
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: 0
   - domain: influencewatch.org
     totalCitations: 6
     checked: 0
@@ -531,6 +626,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: edge.org
+    totalCitations: 6
+    checked: 1
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: nationalacademies.org
     totalCitations: 6
     checked: 0
@@ -587,13 +689,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
-  - domain: edge.org
+  - domain: observer.com
     totalCitations: 5
-    checked: 0
-    accurate: 0
+    checked: 5
+    accurate: 5
     inaccurate: 0
     unsupported: 0
-    inaccuracyRate: null
+    inaccuracyRate: 0
   - domain: drugtargetreview.com
     totalCitations: 4
     checked: 0
@@ -654,6 +756,13 @@ domainAnalysis:
     totalCitations: 4
     checked: 3
     accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: latimes.com
+    totalCitations: 4
+    checked: 4
+    accurate: 4
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
@@ -720,6 +829,20 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: github.com
+    totalCitations: 4
+    checked: 1
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: pageviews.wmcloud.org
+    totalCitations: 4
+    checked: 4
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: netimpact.org
     totalCitations: 3
     checked: 0
@@ -756,13 +879,6 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: null
   - domain: givewell.org
-    totalCitations: 3
-    checked: 3
-    accurate: 3
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: 0
-  - domain: frontiersin.org
     totalCitations: 3
     checked: 3
     accurate: 3
@@ -818,6 +934,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: bigthink.com
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: alphaxiv.org
     totalCitations: 3
     checked: 0
@@ -881,13 +1004,6 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
-  - domain: github.com
-    totalCitations: 3
-    checked: 0
-    accurate: 0
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: null
   - domain: nasdaq.com
     totalCitations: 3
     checked: 0
@@ -909,6 +1025,20 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: datareportal.com
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: almcorp.com
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: international.ucla.edu
     totalCitations: 2
     checked: 0
@@ -1063,6 +1193,27 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: logicism.fandom.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: dynatrace.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: news.ycombinator.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: redwood-af.devpost.com
     totalCitations: 2
     checked: 2
@@ -1154,13 +1305,6 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
-  - domain: pubmed.ncbi.nlm.nih.gov
-    totalCitations: 2
-    checked: 2
-    accurate: 2
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: 0
   - domain: lakera.ai
     totalCitations: 2
     checked: 2
@@ -1210,10 +1354,31 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: dl.acm.org
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
   - domain: ifp.org
     totalCitations: 2
     checked: 1
     accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: meta.wikimedia.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: vipulnaik.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0

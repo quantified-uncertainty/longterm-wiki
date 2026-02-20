@@ -1,0 +1,71 @@
+- pageId: max-tegmark
+  footnote: 50
+  claimText: In 2000, Tegmark published a paper refuting Roger Penrose's quantum consciousness model, concluding that quantum decoherence occurs too rapidly for or...
+  sourceTitle: Disagreeing with &#8220;Our Mathematical Universe&#8221; &#8211; Poetry in Physics
+  url: https://poetryinphysics.wordpress.com/2017/12/14/disagreeing-with-our-mathematical-universe/
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention Tegmark publishing a paper in 2000, Roger Penrose's quantum consciousness model, quantum decoherence, orchestrated objective reduction, or neurons. It also does not mention other scientists arguing about Tegmark's overstretching quantum effects to macroscopic biological scales or 'giving Deepak Chopra ammunition'.
+  difficulty: hard
+  checkedAt: '2026-02-20 17:24:31'
+- pageId: max-tegmark
+  footnote: 59
+  claimText: He warns this environment could enable terrorists to develop <EntityLink id="E42">bioweapons</EntityLink>, facilitate manipulation, or destabilize gov...
+  sourceTitle: 2025 AI Safety Index - Future of Life Institute
+  url: https://futureoflife.org/ai-safety-index-summer-2025/
+  verdict: unsupported
+  score: 0
+  issues: |-
+    The source does not contain the claim that the environment could enable terrorists to develop bioweapons, facilitate manipulation, or destabilize governments.
+    The source does not contain the claim that AI developers underreport risks because they have incentives to select lenient testing or cite 'infohazard' concerns, especially in biosecurity, while lacking independent scrutiny.
+  difficulty: hard
+  checkedAt: '2026-02-20 17:24:49'
+- pageId: max-tegmark
+  footnote: 69
+  claimText: His framework allows him to accommodate both simple and complex physics laws.
+  sourceTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
+  url: https://scottaaronson.blog/?p=1753
+  verdict: unsupported
+  score: 0
+  issues: The source does not contain information about the framework accommodating simple and complex physics laws.
+  difficulty: hard
+  checkedAt: '2026-02-20 17:25:03'
+- pageId: max-tegmark
+  footnote: 5
+  claimText: 'His 2017 book *Life 3.0: Being Human in the Age of Artificial Intelligence* became a New York Times bestseller and helped bring AI safety concerns to ...'
+  sourceTitle: 2025 AI Safety Index - Future of Life Institute
+  url: https://futureoflife.org/ai-safety-index-summer-2025/
+  verdict: inaccurate
+  score: 0.4
+  issues: |-
+    unsupported
+    unsupported
+    wrong_date
+    overclaims
+  difficulty: hard
+  checkedAt: '2026-02-20 17:23:17'
+- pageId: max-tegmark
+  footnote: 1
+  claimText: Born May 5, 1967 in Stockholm, Tegmark spent the first 25 years of his career focused on cosmology and precision measurements of the universe before p...
+  sourceTitle: Max Tegmark &#187; MIT Physics
+  url: https://physics.mit.edu/faculty/max-tegmark/
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    WRONG DATE: The source does not mention Tegmark's birth date.
+    UNSUPPORTED: The source does not mention Tegmark's work on AI safety research in the 2010s.
+    UNSUPPORTED: The source does not mention that Tegmark co-founded the Future of Life Institute in 2014 or that he serves as its president.
+  difficulty: medium
+  checkedAt: '2026-02-20 17:23:10'
+- pageId: max-tegmark
+  footnote: 39
+  claimText: 'Tegmark argues this view is optimistic for physics: if true, it predicts continued discoveries without fundamental roadblocks, whereas if false, physi...'
+  sourceTitle: 'The Mathematical Reality of Reality: An Interview with Cosmologist Max Tegmark'
+  url: https://www.vice.com/en/article/the-mathematical-reality-of-reality-an-interview-with-cosmologist-max-tegmark/
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    The source does not mention Level II, Level III, or Level IV multiverses.
+    The source does not mention tying different levels to falsifiable theories.
+  difficulty: medium
+  checkedAt: '2026-02-20 17:24:18'
