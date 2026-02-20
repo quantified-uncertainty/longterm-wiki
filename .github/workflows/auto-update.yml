@@ -161,6 +161,138 @@ jobs:
           fi
           echo "All NEEDS CITATION markers resolved."
 
+      - name: Extract updated page IDs
+        id: pages
+        if: success()
+        run: |
+          # Find the run report to extract page IDs
+          REPORT=$(ls -t data/auto-update/runs/${DATE}*.yaml 2>/dev/null | grep -v '\-details\.yaml$' | head -1)
+          if [ -z "$REPORT" ] || [ ! -f "$REPORT" ]; then
+            echo "page_ids=" >> $GITHUB_OUTPUT
+            echo "No run report found — skipping quality checks"
+            exit 0
+          fi
+
+          # Extract page IDs with status: success from the run report
+          PAGE_IDS=$(awk '/^    - pageId:/{id=$3} /status: success/{print id}' "$REPORT" | tr '\n' ' ')
+          echo "page_ids=$PAGE_IDS" >> $GITHUB_OUTPUT
+          echo "Updated pages: $PAGE_IDS"
+
+      - name: Verify citations on updated pages
+        id: citations
+        if: success() && steps.pages.outputs.page_ids != ''
+        run: |
+          echo "Verifying citations on updated pages..."
+          PAGE_IDS="${{ steps.pages.outputs.page_ids }}"
+          TMPFILE=$(mktemp)
+          BROKEN_DETAILS=$(mktemp)
+          TOTAL_VERIFIED=0
+          TOTAL_BROKEN=0
+          HAS_BROKEN=false
+
+          echo "| Page | Total | Verified | Broken |" > "$TMPFILE"
+          echo "|------|-------|----------|--------|" >> "$TMPFILE"
+
+          for PAGE_ID in $PAGE_IDS; do
+            echo ""
+            echo "--- Verifying: $PAGE_ID ---"
+            OUTPUT=$(pnpm crux citations verify "$PAGE_ID" --json 2>/dev/null || echo '{"error": true}')
+
+            VERIFIED=$(echo "$OUTPUT" | jq -r '.verified // 0' 2>/dev/null || echo "0")
+            BROKEN=$(echo "$OUTPUT" | jq -r '.broken // 0' 2>/dev/null || echo "0")
+            TOTAL=$(echo "$OUTPUT" | jq -r '.totalCitations // 0' 2>/dev/null || echo "0")
+
+            TOTAL_VERIFIED=$((TOTAL_VERIFIED + VERIFIED))
+            TOTAL_BROKEN=$((TOTAL_BROKEN + BROKEN))
+
+            if [ "$BROKEN" -gt 0 ] 2>/dev/null; then
+              HAS_BROKEN=true
+              echo "| \`${PAGE_ID}\` | ${TOTAL} | ${VERIFIED} | **${BROKEN}** |" >> "$TMPFILE"
+              printf '**%s** broken URLs:\n' "$PAGE_ID" >> "$BROKEN_DETAILS"
+              echo "$OUTPUT" | jq -r '.citations[] | select(.status == "broken") | "- \(.url) (HTTP \(.httpStatus // "error"))"' >> "$BROKEN_DETAILS" 2>/dev/null || true
+              echo "" >> "$BROKEN_DETAILS"
+              echo "::warning::${PAGE_ID}: ${BROKEN} broken citation(s)"
+            else
+              echo "| \`${PAGE_ID}\` | ${TOTAL} | ${VERIFIED} | ${BROKEN} |" >> "$TMPFILE"
+            fi
+          done
+
+          echo "" >> "$TMPFILE"
+          echo "**Totals:** ${TOTAL_VERIFIED} verified, ${TOTAL_BROKEN} broken" >> "$TMPFILE"
+          if [ "$HAS_BROKEN" = true ]; then
+            echo "" >> "$TMPFILE"
+            echo "<details><summary>Broken citation details</summary>" >> "$TMPFILE"
+            echo "" >> "$TMPFILE"
+            cat "$BROKEN_DETAILS" >> "$TMPFILE"
+            echo "</details>" >> "$TMPFILE"
+            echo "" >> "$TMPFILE"
+            echo "> Warning: Broken citations detected — reviewer should check these pages carefully." >> "$TMPFILE"
+          fi
+
+          # Save to env using heredoc delimiter
+          {
+            echo "CITATION_SUMMARY<<CITATION_EOF"
+            cat "$TMPFILE"
+            echo "CITATION_EOF"
+          } >> "$GITHUB_ENV"
+          rm -f "$TMPFILE" "$BROKEN_DETAILS"
+
+      - name: Compute hallucination risk scores
+        id: risk
+        if: success() && steps.pages.outputs.page_ids != ''
+        run: |
+          echo "Computing hallucination risk scores for updated pages..."
+          PAGE_IDS="${{ steps.pages.outputs.page_ids }}"
+
+          # Rebuild data layer so risk scoring sees the updated content
+          cd apps/web && node --import tsx/esm scripts/build-data.mjs 2>/dev/null
+          cd "$GITHUB_WORKSPACE"
+
+          # Run hallucination risk with JSON output (--top=50 to avoid multi-MB output)
+          RISK_JSON=$(pnpm crux validate hallucination-risk --json --top=50 2>/dev/null || echo '{"pages":[]}')
+
+          TMPFILE=$(mktemp)
+          HAS_HIGH_RISK=false
+
+          echo "| Page | Score | Level | Citations | Risk Factors |" > "$TMPFILE"
+          echo "|------|-------|-------|-----------|--------------|" >> "$TMPFILE"
+
+          for PAGE_ID in $PAGE_IDS; do
+            SCORE=$(echo "$RISK_JSON" | jq -r --arg id "$PAGE_ID" '.pages[] | select(.pageId == $id) | .riskScore // empty' 2>/dev/null || true)
+            LEVEL=$(echo "$RISK_JSON" | jq -r --arg id "$PAGE_ID" '.pages[] | select(.pageId == $id) | .riskLevel // empty' 2>/dev/null || true)
+            FACTORS=$(echo "$RISK_JSON" | jq -r --arg id "$PAGE_ID" '.pages[] | select(.pageId == $id) | (.riskFactors | join(", "))' 2>/dev/null || true)
+            CITES=$(echo "$RISK_JSON" | jq -r --arg id "$PAGE_ID" '.pages[] | select(.pageId == $id) | .totalCitations // empty' 2>/dev/null || true)
+
+            # Default to unknown if page not found in risk report
+            SCORE="${SCORE:-?}"
+            LEVEL="${LEVEL:-unknown}"
+            FACTORS="${FACTORS:--}"
+            CITES="${CITES:-?}"
+
+            if [ "$LEVEL" = "high" ]; then
+              HAS_HIGH_RISK=true
+              printf '| `%s` | **%s** | high | %s | %s |\n' "$PAGE_ID" "$SCORE" "$CITES" "$FACTORS" >> "$TMPFILE"
+            elif [ "$LEVEL" = "medium" ]; then
+              printf '| `%s` | **%s** | medium | %s | %s |\n' "$PAGE_ID" "$SCORE" "$CITES" "$FACTORS" >> "$TMPFILE"
+            else
+              printf '| `%s` | %s | %s | %s | %s |\n' "$PAGE_ID" "$SCORE" "$LEVEL" "$CITES" "$FACTORS" >> "$TMPFILE"
+            fi
+          done
+
+          if [ "$HAS_HIGH_RISK" = true ]; then
+            echo "" >> "$TMPFILE"
+            echo "> **High-risk pages detected** — these pages need careful human review before merging." >> "$TMPFILE"
+          fi
+
+          {
+            echo "RISK_SUMMARY<<RISK_EOF"
+            cat "$TMPFILE"
+            echo "RISK_EOF"
+          } >> "$GITHUB_ENV"
+          rm -f "$TMPFILE"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check for changes
         id: changes
         run: |
@@ -177,7 +309,7 @@ jobs:
         if: always()
         run: |
           # Run reports use timestamp filenames (e.g., 2026-02-17T06-00-00.yaml)
-          REPORT=$(ls -t data/auto-update/runs/${DATE}*.yaml 2>/dev/null | head -1)
+          REPORT=$(ls -t data/auto-update/runs/${DATE}*.yaml 2>/dev/null | grep -v '\-details\.yaml$' | head -1)
           if [ -n "$REPORT" ]; then
             echo "path=$REPORT" >> $GITHUB_OUTPUT
             echo "Found report: $REPORT"
@@ -217,9 +349,10 @@ jobs:
               BUDGET_SPENT=$(grep 'spent' "$REPORT" | head -1 | awk '{print $2}')
             fi
 
-            gh pr create \
-              --title "Auto-update: ${DATE} daily wiki refresh" \
-              --body "## Auto-Update Run — ${DATE}
+            # Build PR body in a temp file (avoids multiline YAML issues)
+            BODY_FILE=$(mktemp)
+            cat > "$BODY_FILE" <<PREOF
+          ## Auto-Update Run — ${DATE}
 
           Automated news-driven wiki update.
 
@@ -229,15 +362,38 @@ jobs:
           ### Run Report
           See \`${REPORT:-data/auto-update/runs/}\` for full details.
 
+          PREOF
+
+            if [ -n "$RISK_SUMMARY" ]; then
+              printf '### Hallucination Risk Scores\n\n%s\n\n' "$RISK_SUMMARY" >> "$BODY_FILE"
+            fi
+
+            if [ -n "$CITATION_SUMMARY" ]; then
+              printf '### Citation Verification\n\n%s\n\n' "$CITATION_SUMMARY" >> "$BODY_FILE"
+            fi
+
+            cat >> "$BODY_FILE" <<'PREOF'
           ### Review Checklist
+
+          > **This PR requires the `reviewed` label before it can be merged.**
+          > The review gate CI check will fail until a human reviewer adds the label.
+
           - [ ] Spot-check updated pages for accuracy
-          - [ ] Verify no hallucinated content was added
+          - [ ] Verify no hallucinated content was added (check risk scores above)
+          - [ ] Review any broken citations flagged above
           - [ ] Check that EntityLinks resolve correctly
           - [ ] Confirm validation passes
 
           ---
-          *This PR was created automatically by the auto-update workflow.*" \
+          *This PR was created automatically by the auto-update workflow.*
+          PREOF
+
+            gh pr create \
+              --title "Auto-update: ${DATE} daily wiki refresh" \
+              --body-file "$BODY_FILE" \
               --label "auto-update" || echo "PR creation failed (label may not exist)"
+
+            rm -f "$BODY_FILE"
           fi
 
       - name: Summary

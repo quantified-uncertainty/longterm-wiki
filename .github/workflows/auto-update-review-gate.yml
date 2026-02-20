@@ -1,0 +1,46 @@
+name: Auto-Update Review Gate
+
+# Blocks auto-update PRs from merging until a human adds the "reviewed" label.
+# This prevents AI-generated content from landing without human oversight.
+#
+# How it works:
+# - Runs on PRs labeled "auto-update" (triggered by label events and PR sync)
+# - Checks whether the "reviewed" label is present
+# - Fails if "reviewed" is missing, which blocks merge via branch protection
+#
+# To pass: a human reviewer adds the "reviewed" label after spot-checking the PR.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+# No permissions needed — only reads label data from the event payload
+permissions: {}
+
+jobs:
+  review-gate:
+    # Only run on auto-update PRs
+    if: contains(github.event.pull_request.labels.*.name, 'auto-update')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for reviewed label
+        run: |
+          echo "Auto-update PR detected — checking for 'reviewed' label..."
+          echo ""
+
+          LABELS='${{ toJSON(github.event.pull_request.labels.*.name) }}'
+          echo "Current labels: $LABELS"
+          echo ""
+
+          if echo "$LABELS" | jq -e 'index("reviewed")' > /dev/null 2>&1; then
+            echo "✅ 'reviewed' label found — review gate passed."
+          else
+            echo "❌ 'reviewed' label NOT found."
+            echo ""
+            echo "Auto-update PRs require human review before merging."
+            echo "To pass this check:"
+            echo "  1. Spot-check updated pages for accuracy and hallucinated content"
+            echo "  2. Review the hallucination risk scores and citation verification in the PR description"
+            echo "  3. Add the 'reviewed' label to this PR"
+            exit 1
+          fi

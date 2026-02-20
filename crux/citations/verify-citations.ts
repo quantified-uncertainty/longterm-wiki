@@ -143,19 +143,32 @@ async function main() {
   const citations = extractCitationsFromContent(body);
 
   if (citations.length === 0) {
-    console.log(`${c.dim}No citations found in ${pageId}${c.reset}`);
+    if (json || ci) {
+      console.log(JSON.stringify({
+        pageId,
+        totalCitations: 0,
+        verified: 0,
+        broken: 0,
+        unverifiable: 0,
+        citations: [],
+      }, null, 2));
+    } else {
+      console.log(`${c.dim}No citations found in ${pageId}${c.reset}`);
+    }
     process.exit(0);
+  }
+
+  // In JSON/CI mode, skip human-readable output and disable verbose progress
+  if (json || ci) {
+    const archive = await verifyCitationsForPage(pageId, body, { verbose: false });
+    console.log(JSON.stringify(archive, null, 2));
+    process.exit(archive.broken > 0 ? 1 : 0);
   }
 
   console.log(`\n${c.bold}${c.blue}Citation Verification: ${pageId}${c.reset}`);
   console.log(`  ${citations.length} citations to verify\n`);
 
   const archive = await verifyCitationsForPage(pageId, body, { verbose: true });
-
-  if (json || ci) {
-    console.log(JSON.stringify(archive, null, 2));
-    process.exit(0);
-  }
 
   // Display results
   console.log(`\n${c.bold}Results:${c.reset}`);
