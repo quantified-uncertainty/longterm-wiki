@@ -7,6 +7,10 @@
   agency: automated
   note: Fixed 2 flagged citation inaccuracies via audit
 - date: 2026-02-20
+  tool: crux-audit
+  agency: automated
+  note: Fixed 1 flagged citation inaccuracies via audit
+- date: 2026-02-20
   tool: crux-fix
   agency: automated
   note: Auto-fixed validation issues (escaping, markdown, etc.)

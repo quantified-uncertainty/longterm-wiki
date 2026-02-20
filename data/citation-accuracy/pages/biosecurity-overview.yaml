@@ -1,16 +1,6 @@
 - pageId: biosecurity-overview
-  footnote: 5
-  claimText: '| **Biosecurity Governance** | <EntityLink id="nti-bio">NTI Bio</EntityLink>, CSIS, Council on Strategic Risks | Strengthening the BWC, policy researc...'
-  sourceTitle: 'Opportunities to Strengthen U.S. Biosecurity from AI-Enabled Bioterrorism: What Policymakers Should Know'
-  url: https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should
-  verdict: unsupported
-  score: 0
-  issues: null
-  difficulty: hard
-  checkedAt: '2026-02-20 01:32:24'
-- pageId: biosecurity-overview
   footnote: 3
-  claimText: '| **AI Bio-Capability Evaluations** | SecureBio (VCT), Anthropic, OpenAI, RAND | Testing whether AI systems can troubleshoot complex virology laborato...'
+  claimText: '| **AI Bio-Capability Evaluations** | OpenAI | Testing whether AI systems can troubleshoot complex virology laboratory protocols, including the Virolo...'
   sourceTitle: '[2504.16137] Virology Capabilities Test (VCT): A Multimodal Virology Q&A Benchmark'
   url: https://arxiv.org/abs/2504.16137
   verdict: inaccurate
@@ -19,4 +9,4 @@
     The claim mentions SecureBio (VCT), Anthropic, and RAND as entities involved in AI Bio-Capability Evaluations, but the source only mentions OpenAI.
     The claim mentions red-team studies, which are not mentioned in the source.
   difficulty: easy
-  checkedAt: '2026-02-20 01:32:21'
+  checkedAt: '2026-02-20 08:23:37'

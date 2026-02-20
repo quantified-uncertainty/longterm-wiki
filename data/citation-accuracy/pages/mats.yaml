@@ -1,33 +1,13 @@
 - pageId: mats
-  footnote: 59
-  claimText: '- **Marius Hobbhahn**: CEO of Apollo Research, where he also leads the evals team; Apollo focuses on <EntityLink id="scheming">scheming</EntityLink>, ...'
-  sourceTitle: MATS Winter 2023-24 Retrospective — LessWrong
-  url: https://www.lesswrong.com/posts/Z87fSrxQb4yLXKcTk/mats-winter-2023-24-retrospective
-  verdict: unsupported
-  score: 0
-  issues: null
-  difficulty: hard
-  checkedAt: '2026-02-20 05:31:30'
-- pageId: mats
-  footnote: 61
-  claimText: '**Primary Funding Sources**: - **AI Safety Support**: Provides the \$15,000 stipend for each fellow completing the full program (prorated for partial ...'
-  sourceTitle: MATS Research
-  url: https://matsprogram.org
-  verdict: unsupported
-  score: 0
-  issues: null
-  difficulty: hard
-  checkedAt: '2026-02-20 05:31:33'
-- pageId: mats
   footnote: 70
   claimText: 'Alumni feedback highlights specific challenges reported by MATS participants:'
   sourceTitle: MATS Alumni Impact Analysis — EA Forum
   url: https://forum.effectivealtruism.org/posts/kJA9q3SGycx6TXjcF/mats-alumni-impact-analysis
   verdict: unsupported
   score: 0
-  issues: null
-  difficulty: hard
-  checkedAt: '2026-02-20 05:31:44'
+  issues: The source does not contain any alumni feedback highlighting specific challenges reported by MATS participants.
+  difficulty: easy
+  checkedAt: '2026-02-20 08:14:04'
 - pageId: mats
   footnote: 60
   claimText: MATS receives grants from partner organizations to support its fellowship program. Financial support for scholars is coordinated through partner organ...
@@ -35,22 +15,9 @@
   url: https://www.extruct.ai/hub/matsprogram-org-funding/
   verdict: unsupported
   score: 0.2
-  issues: The source mentions financial support for scholars but does not specify that it is coordinated through partner organizations rather than directly by MATS.
-  difficulty: medium
-  checkedAt: '2026-02-20 05:31:32'
-- pageId: mats
-  footnote: 35
-  claimText: (footnote definition only, no inline reference found)
-  sourceTitle: MATS Summer 2026
-  url: https://matsprogram.org/program/summer-2026
-  verdict: inaccurate
-  score: 0.3
-  issues: |-
-    The source does not mention extension programs in London, Berkeley, Boston, or Washington D.C.
-    The source does not mention MATS arranging funding to cover monthly stipends, compute resources, housing, and office rent.
-    The source does not mention that approximately 70% of scholars have been accepted for extensions based on research plans and mentor endorsements.
-  difficulty: hard
-  checkedAt: '2026-02-20 05:25:23'
+  issues: 'unsupported: The source does not mention that financial support for scholars is coordinated through partner organizations rather than directly by MATS.'
+  difficulty: easy
+  checkedAt: '2026-02-20 08:13:53'
 - pageId: mats
   footnote: 17
   claimText: The program's core mission from inception was to train talented individuals for AI alignment research by addressing risks from unaligned AI through me...
@@ -62,7 +29,7 @@
     The source does not explicitly state that the program's core mission from inception was to train talented individuals for AI alignment research by addressing risks from unaligned AI through mentorship, training, logistics, and community access. It does mention that the program is for emerging AI safety researchers.
     The source does not explicitly state that the program evolved into an independent organization. It does mention that the program maintains hubs in both Berkeley and London.
   difficulty: medium
-  checkedAt: '2026-02-20 05:30:14'
+  checkedAt: '2026-02-20 08:12:52'
 - pageId: mats
   footnote: 12
   claimText: Since its founding, MATS has trained over 446 researchers. The program has generated over 160 research publications with more than 9,000 citations, ad...
@@ -78,4 +45,4 @@
     minor_issues: Google DeepMind instead of DeepMind
     unsupported: Founded new AI safety organizations like Apollo Research
   difficulty: medium
-  checkedAt: '2026-02-20 05:30:01'
+  checkedAt: '2026-02-20 08:12:39'

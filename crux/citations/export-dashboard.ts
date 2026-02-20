@@ -312,11 +312,18 @@ export function exportDashboardData(): { path: string; data: DashboardExport } |
   }
 
   // Write per-page flagged citation files
-  // First, remove stale per-page files
+  // Only touch pages that are in the current SQLite DB — preserve other pages' YAML
+  const pagesInDb = new Set(data.pages.map(p => p.pageId));
+  const pagesWithFlagged = new Set(flaggedByPage.keys());
   try {
     for (const f of readdirSync(ACCURACY_PAGES_DIR)) {
       if (f.endsWith('.yaml')) {
-        unlinkSync(join(ACCURACY_PAGES_DIR, f));
+        const filePageId = f.replace(/\.yaml$/, '');
+        // Remove if page is in DB (either has flagged to rewrite, or was fixed and now has zero)
+        if (pagesInDb.has(filePageId)) {
+          unlinkSync(join(ACCURACY_PAGES_DIR, f));
+        }
+        // Pages NOT in the DB are left untouched (from earlier audit runs)
       }
     }
   } catch { /* dir may not exist yet */ }

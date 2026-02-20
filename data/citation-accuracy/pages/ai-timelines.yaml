@@ -1,17 +1,4 @@
 - pageId: ai-timelines
-  footnote: 7
-  claimText: (footnote definition only, no inline reference found)
-  sourceTitle: 'Forecasting transformative AI: the "biological anchors" method in a nutshell'
-  url: https://www.cold-takes.com/forecasting-transformative-ai-the-biological-anchors-method-in-a-nutshell/
-  verdict: unsupported
-  score: 0.3
-  issues: |-
-    The source does not mention Tom Davidson or his model.
-    The source does not mention the estimated time from 20% to 100% automation of cognitive tasks.
-    The source does not mention superintelligence arriving within a year after full automation.
-  difficulty: hard
-  checkedAt: '2026-02-20 05:23:50'
-- pageId: ai-timelines
   footnote: 28
   claimText: The AI field experienced multiple periods of reduced activity and funding in the 1970s and 1980s following forecasts that proved overly optimistic abo...
   sourceTitle: 'AI Futures Model: Dec 2025 Update'
@@ -22,50 +9,17 @@
     The source does not discuss periods of reduced activity and funding in the AI field in the 1970s and 1980s.
     The source does not compare long-term forecasts using quantitative trend extrapolation to purely intuitive predictions.
   difficulty: hard
-  checkedAt: '2026-02-20 05:28:05'
+  checkedAt: '2026-02-20 07:34:57'
 - pageId: ai-timelines
-  footnote: 36
-  claimText: '- **2016**: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimated "at least 10% probability" of transformative AI within 20 year...'
-  sourceTitle: Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving
-  url: https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence
+  footnote: 43
+  claimText: A separate Metaculus question on transformative AI shows a current median estimate of December 2041, drawn from 168 forecasters.
+  sourceTitle: When Will the First General AI Be Announced?
+  url: https://www.metaculus.com/questions/5121/when-will-the-first-general-ai-system-be-devised-tested-and-publicly-announced/
   verdict: inaccurate
   score: 0.3
   issues: |-
-    The wiki claim contains multiple inaccuracies regarding dates and probabilities for transformative AI and AGI predictions. The source only supports the 2016 Open Philanthropy estimate.
-    The wiki claim includes information from sources other than the one provided.
-  difficulty: hard
-  checkedAt: '2026-02-20 05:28:22'
-- pageId: ai-timelines
-  footnote: 44
-  claimText: As of February 2026, Metaculus forecasters average a 25% chance of AGI by 2029 and a 50% chance by 2033, based on nearly 2,000 responses to its flagsh...
-  sourceTitle: Transformative AI Date
-  url: https://www.metaculus.com/questions/19356/transformative-ai-date/
-  verdict: inaccurate
-  score: 0.5
-  issues: |-
-    WRONG NUMBERS: The source states that there are 168 forecasters for the transformative AI question, but does not mention the number of forecasters for the AGI question or the percentages for AGI by 2029 and 2033.
-    UNSUPPORTED: The source does not mention 80,000 Hours analysis or the shift in Metaculus forecasters' mean estimate for AGI development.
-  difficulty: medium
-  checkedAt: '2026-02-20 05:28:34'
-- pageId: ai-timelines
-  footnote: 53
-  claimText: The AI 2027 scenario also received widespread popular coverage, projecting fully automated AI research and development by 2027 leading to a recursive ...
-  sourceTitle: What the hell happened with AGI timelines in 2025? | 80,000 Hours
-  url: https://80000hours.org/podcast/episodes/agi-timelines-in-2025/
-  verdict: inaccurate
-  score: 0.5
-  issues: The claim contains multiple unsupported dates and forecasts that are not mentioned in the source text. Specifically, the 2016, 2020, 2021, 2022, and 2023 forecasts are not present in the provided document. The 2024 Metaculus community median is mentioned as July 2031 at the start of 2025, which later moved to November 2033, not 2028-2031 as the claim states. The AI 2027 scenario is mentioned, but the April 2025 publication date is not. The claim about forecasts extending again in late 2025 is supported, but the specific reason is slightly different. The AI Futures Model median at 2032.5 is not mentioned, nor is the Kwa/METR model predicting 99% AI R&D automation by late 2032. The Metaculus flagship question median at approximately early 2028 is also not mentioned.
-  difficulty: hard
-  checkedAt: '2026-02-20 05:25:10'
-- pageId: ai-timelines
-  footnote: 12
-  claimText: The survey demonstrated significant variation across questions and methodologies, with median estimates ranging from 2040s to 2070s depending on how q...
-  sourceTitle: 'Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours'
-  url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
-  verdict: inaccurate
-  score: 0.7
-  issues: |-
-    The claim mentions median estimates ranging from 2040s to 2070s, but the source mentions estimates ranging from 2030s to 2070s.
-    The claim mentions that the range depends on how questions were framed, but the source does not explicitly state this.
-  difficulty: medium
-  checkedAt: '2026-02-20 05:27:38'
+    WRONG NUMBERS: The wiki claim states that as of February 2026, Metaculus forecasters average a 25% chance of AGI by 2029 and a 50% chance by 2033, based on nearly 2,000 responses. The source shows the current estimate as of the time it was written is August 2033.
+    FABRICATED DETAILS: The wiki claim mentions a separate Metaculus question on transformative AI shows a current median estimate of December 2041, drawn from 168 forecasters. This information is not found in the source.
+    FABRICATED DETAILS: The wiki claim mentions that the 80,000 Hours analysis of these surveys notes that Metaculus forecasters' mean estimate for AGI development has moved from approximately 50 years out to approximately 5 years out over a four-year period. This information is not found in the source.
+  difficulty: easy
+  checkedAt: '2026-02-20 07:24:47'
