@@ -15,7 +15,7 @@ import MiniSearch from 'minisearch';
  * (apps/web/src/lib/search.ts), not here —
  * constructor-level searchOptions don't survive toJSON/loadJSON.
  */
-const SEARCH_FIELDS = ['title', 'description', 'llmSummary', 'tags', 'entityType', 'id', 'contentFormat'];
+const SEARCH_FIELDS = ['title', 'description', 'llmSummary', 'tags', 'entityType', 'id'];
 
 /**
  * Build search documents from typed entities, pages, and the ID registry.
