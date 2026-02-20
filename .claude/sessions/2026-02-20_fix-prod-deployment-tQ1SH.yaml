@@ -1,0 +1,59 @@
+date: "2026-02-20"
+branch: claude/fix-prod-deployment-tQ1SH
+title: "Fix prod deployment - ensure production deploys at least every few hours"
+pr: "https://github.com/quantified-uncertainty/longterm-wiki/pull/355"
+model: claude-sonnet-4-6
+duration: ~15min
+cost: ~$0.20
+
+summary: |
+  Added a scheduled GitHub Actions workflow that triggers a Vercel production
+  deployment every 4 hours via deploy hook. This ensures a guaranteed
+  deployment floor for production, independent of PR merge cadence or
+  Vercel dashboard settings.
+
+root_cause: |
+  The recent change (8f428be) correctly stopped Vercel from building claude/*
+  branches (which cost ~$377/month due to auto-rebase force-pushes). However,
+  production deployments became dependent solely on PR merges to main, making
+  them unpredictable. The user had also changed Vercel dashboard settings to
+  deploy less often, compounding the issue.
+
+changes:
+  - .github/workflows/scheduled-deploy.yml (new): cron workflow (every 4h) that
+    calls VERCEL_DEPLOY_HOOK_URL secret to trigger a production deployment
+
+setup_required: |
+  Repo owner must add VERCEL_DEPLOY_HOOK_URL GitHub secret:
+  1. Vercel Dashboard → Project → Settings → Git → Deploy Hooks
+  2. Create hook: Name "Scheduled Deploy", Branch "main"
+  3. GitHub → Settings → Secrets → Actions → VERCEL_DEPLOY_HOOK_URL = <URL>
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-20T06:17:05.866Z"
+  total: 32
+  completed: 19
+  na: 10
+  skipped: 3
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - fix-escaping
+    - correctness
+    - security
+    - no-dead-code
+    - no-regressions
+    - multi-environment
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned

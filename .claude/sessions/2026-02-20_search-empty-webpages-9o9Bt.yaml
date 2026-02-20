@@ -1,0 +1,41 @@
+date: "2026-02-20"
+branch: claude/search-empty-webpages-9o9Bt
+title: "Fix empty PR Descriptions dashboard and build-data path bug"
+summary: |
+  Investigated empty internal dashboards (user reported page-changes and
+  pr-descriptions empty). PR #354 (already merged) fixed page-changes by
+  correcting session log path. Found two additional bugs: (1) GITHUB_TOKEN
+  not passed to build-data.mjs in CI workflows, causing prItems to be empty
+  → pr-descriptions dashboard always shows no data; (2) scheduled-maintenance.yml
+  ran build-data from repo root instead of apps/web/, causing REPO_ROOT to
+  resolve to /home instead of the actual repo root. Fixed all three workflows.
+model: claude-sonnet-4-6
+duration: "~20min"
+cost: "~$0.50"
+checks:
+  initiated_at: "2026-02-20T05:59:51.091Z"
+  total: 32
+  completed: 20
+  na: 1
+  skipped: 11
+  items:
+    - no-hardcoded
+    - fix-escaping
+    - typescript-used
+    - correctness
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - crux-typescript
