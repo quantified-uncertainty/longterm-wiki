@@ -71,13 +71,13 @@ const SCRIPTS = {
   'fix-inaccuracies': {
     script: 'citations/fix-inaccuracies.ts',
     description: 'Fix flagged citation inaccuracies using LLM-generated corrections',
-    passthrough: ['apply', 'verdict', 'max-score', 'model', 'json', 'concurrency'],
+    passthrough: ['apply', 'verdict', 'max-score', 'model', 'json', 'concurrency', 'escalate'],
     positional: true,
   },
   audit: {
     script: 'citations/audit.ts',
     description: 'Full pipeline: extract quotes, check accuracy, fix issues for one page',
-    passthrough: ['json', 'apply', 'recheck', 'model'],
+    passthrough: ['json', 'apply', 'recheck', 'model', 'escalate'],
     positional: true,
   },
 };

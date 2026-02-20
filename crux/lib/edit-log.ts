@@ -29,6 +29,9 @@ export type EditTool =
   | 'crux-improve'   // pnpm crux content improve
   | 'crux-grade'     // Crux grading pipeline
   | 'crux-fix'       // Crux fix commands (escaping, markdown, cross-links, etc.)
+  | 'crux-fix-escalated' // Claude escalation for complex citation fixes
+  | 'crux-audit'     // Citation audit pipeline fixes
+  | 'crux-audit-escalated' // Citation audit with Claude escalation
   | 'claude-code'    // Claude Code interactive session
   | 'manual'         // Direct human file edits
   | 'bulk-script';   // Bulk automated scripts

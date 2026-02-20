@@ -18,7 +18,7 @@ import { writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'f
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
-import { citationQuotes, getDb, PROJECT_ROOT, CACHE_DIR } from '../lib/knowledge-db.ts';
+import { citationQuotes, PROJECT_ROOT } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 
@@ -97,10 +97,8 @@ export function buildDashboardExport(): DashboardExport | null {
   const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
   if (!existsSync(dbPath)) return null;
 
-  // Get all citation quotes
-  const allQuotes = getDb().prepare(
-    'SELECT * FROM citation_quotes ORDER BY page_id, footnote',
-  ).all() as Array<Record<string, unknown>>;
+  // Get all citation quotes via DAO
+  const allQuotes = citationQuotes.getAll();
 
   if (allQuotes.length === 0) return null;
 
@@ -140,11 +138,11 @@ export function buildDashboardExport(): DashboardExport | null {
   const flagged: FlaggedCitation[] = [];
 
   for (const q of allQuotes) {
-    const pageId = q.page_id as string;
-    const verdict = q.accuracy_verdict as string | null;
-    const score = q.accuracy_score as number | null;
-    const difficulty = q.verification_difficulty as string | null;
-    const url = q.url as string | null;
+    const pageId = q.page_id;
+    const verdict = q.accuracy_verdict;
+    const score = q.accuracy_score;
+    const difficulty = q.verification_difficulty;
+    const url = q.url;
     const domain = extractDomain(url);
 
     // Page aggregation
@@ -205,15 +203,15 @@ export function buildDashboardExport(): DashboardExport | null {
       if (verdict === 'inaccurate' || verdict === 'unsupported') {
         flagged.push({
           pageId,
-          footnote: q.footnote as number,
-          claimText: q.claim_text as string,
-          sourceTitle: q.source_title as string | null,
+          footnote: q.footnote,
+          claimText: q.claim_text,
+          sourceTitle: q.source_title,
           url,
           verdict,
           score,
-          issues: q.accuracy_issues as string | null,
+          issues: q.accuracy_issues,
           difficulty,
-          checkedAt: q.accuracy_checked_at as string | null,
+          checkedAt: q.accuracy_checked_at,
         });
       }
     }
@@ -287,9 +285,9 @@ export function buildDashboardExport(): DashboardExport | null {
   };
 }
 
-const OUTPUT_DIR = join(PROJECT_ROOT, 'data', 'citation-accuracy');
-const PAGES_DIR = join(OUTPUT_DIR, 'pages');
-const SUMMARY_PATH = join(OUTPUT_DIR, 'summary.yaml');
+export const ACCURACY_DIR = join(PROJECT_ROOT, 'data', 'citation-accuracy');
+export const ACCURACY_PAGES_DIR = join(ACCURACY_DIR, 'pages');
+const SUMMARY_PATH = join(ACCURACY_DIR, 'summary.yaml');
 
 /** Max characters for claimText in exported YAML (dashboard uses line-clamp-2 anyway). */
 const MAX_CLAIM_LENGTH = 150;
@@ -299,11 +297,11 @@ function truncateClaim(text: string): string {
   return text.slice(0, MAX_CLAIM_LENGTH) + '...';
 }
 
-export function exportDashboardData(): string | null {
+export function exportDashboardData(): { path: string; data: DashboardExport } | null {
   const data = buildDashboardExport();
   if (!data) return null;
-  mkdirSync(OUTPUT_DIR, { recursive: true });
-  mkdirSync(PAGES_DIR, { recursive: true });
+  mkdirSync(ACCURACY_DIR, { recursive: true });
+  mkdirSync(ACCURACY_PAGES_DIR, { recursive: true });
 
   // Group flagged citations by page
   const flaggedByPage = new Map<string, FlaggedCitation[]>();
@@ -316,15 +314,15 @@ export function exportDashboardData(): string | null {
   // Write per-page flagged citation files
   // First, remove stale per-page files
   try {
-    for (const f of readdirSync(PAGES_DIR)) {
+    for (const f of readdirSync(ACCURACY_PAGES_DIR)) {
       if (f.endsWith('.yaml')) {
-        unlinkSync(join(PAGES_DIR, f));
+        unlinkSync(join(ACCURACY_PAGES_DIR, f));
       }
     }
   } catch { /* dir may not exist yet */ }
 
   for (const [pageId, citations] of flaggedByPage) {
-    const pagePath = join(PAGES_DIR, `${pageId}.yaml`);
+    const pagePath = join(ACCURACY_PAGES_DIR, `${pageId}.yaml`);
     writeFileSync(pagePath, yaml.dump(citations, { lineWidth: -1, noRefs: true }));
   }
 
@@ -340,10 +338,10 @@ export function exportDashboardData(): string | null {
   writeFileSync(SUMMARY_PATH, yaml.dump(summary, { lineWidth: -1, noRefs: true }));
 
   // Remove old monolithic file if it exists
-  const oldPath = join(OUTPUT_DIR, 'dashboard.yaml');
+  const oldPath = join(ACCURACY_DIR, 'dashboard.yaml');
   try { unlinkSync(oldPath); } catch { /* may not exist */ }
 
-  return SUMMARY_PATH;
+  return { path: SUMMARY_PATH, data };
 }
 
 // ---------------------------------------------------------------------------
@@ -355,9 +353,9 @@ function main() {
   const json = args.json === true;
   const colors = getColors(json);
 
-  const outputPath = exportDashboardData();
+  const result = exportDashboardData();
 
-  if (!outputPath) {
+  if (!result) {
     if (json) {
       console.log(JSON.stringify({ error: 'No citation data available' }));
     } else {
@@ -367,11 +365,11 @@ function main() {
     process.exit(0);
   }
 
+  const { path: outputPath, data } = result;
+
   if (json) {
-    const data = buildDashboardExport();
     console.log(JSON.stringify(data, null, 2));
   } else {
-    const data = buildDashboardExport()!;
     const c = colors;
     console.log(`\n${c.bold}${c.blue}Citation Accuracy Dashboard Export${c.reset}\n`);
     console.log(`  Exported to: ${c.bold}${outputPath}${c.reset}`);

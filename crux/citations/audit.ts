@@ -14,12 +14,10 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import { basename } from 'path';
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { extractCitationsFromContent } from '../lib/citation-archive.ts';
 import { DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
@@ -31,23 +29,18 @@ import {
   enrichFromSqlite,
   generateFixesForPage,
   applyFixes,
+  escalateWithClaude,
+  applySectionRewrites,
 } from './fix-inaccuracies.ts';
 import type { ApplyResult } from './fix-inaccuracies.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
-
-function findPageFile(pageId: string): string | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of files) {
-    if (basename(f, '.mdx') === pageId) return f;
-  }
-  return null;
-}
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const json = args.json === true;
   const apply = args.apply === true;
   const recheck = args.recheck === true;
+  const escalate = args.escalate !== false; // enabled by default, --no-escalate disables
   const model = typeof args.model === 'string' ? args.model : undefined;
   const c = getColors(json);
 
@@ -132,43 +125,90 @@ async function main() {
   const pageContent = readFileSync(filePath, 'utf-8');
   const proposals = await generateFixesForPage(pageId, enriched, pageContent, { model });
 
-  if (proposals.length === 0) {
+  let fixesApplied = false;
+
+  if (proposals.length === 0 && escalate) {
+    // ── Step 3b: Escalate to Claude ─────────────────────────────────────
+    console.log(`  ${c.dim}No string-replacement fixes proposed — escalating to Claude...${c.reset}\n`);
+    console.log(`${c.bold}Step 3b: Escalate to Claude${c.reset} (section-level rewrite)\n`);
+
+    const sectionRewrites = await escalateWithClaude(
+      pageId, body, flagged, enriched,
+      { verbose: true },
+    );
+
+    if (sectionRewrites.length === 0) {
+      console.log(`  ${c.dim}Escalation produced no rewrites — issues may need manual review.${c.reset}\n`);
+      if (!apply) {
+        process.exit(0);
+      }
+    } else if (!apply) {
+      for (const rw of sectionRewrites) {
+        console.log(`  ${c.yellow}Section: ${rw.heading.replace(/^#+\s*/, '')}${c.reset}`);
+        console.log(`    ${c.dim}${rw.originalSection.length} chars → ${rw.rewrittenSection.length} chars${c.reset}`);
+      }
+      console.log(`\n${c.dim}Run with --apply to write changes and re-verify.${c.reset}\n`);
+      process.exit(0);
+    } else {
+      const rwResult = applySectionRewrites(pageContent, sectionRewrites);
+      if (rwResult.applied > 0) {
+        writeFileSync(filePath, rwResult.content, 'utf-8');
+        appendEditLog(pageId, {
+          tool: 'crux-audit-escalated',
+          agency: 'automated',
+          note: `Escalated to Claude: rewrote ${rwResult.applied} section(s) to fix citation inaccuracies`,
+        });
+        console.log(`  ${c.green}${rwResult.applied} section(s) rewritten${c.reset}`);
+        if (rwResult.skipped > 0) {
+          console.log(`  ${c.yellow}${rwResult.skipped} section(s) skipped (text not found)${c.reset}`);
+        }
+        fixesApplied = true;
+      } else {
+        console.log(`  ${c.yellow}No section rewrites could be applied${c.reset}\n`);
+      }
+    }
+  } else if (proposals.length === 0) {
     console.log(`  ${c.dim}No fixes proposed — issues may be with sources, not wiki text.${c.reset}\n`);
     process.exit(0);
-  }
-
-  // Display proposals
-  for (const p of proposals) {
-    console.log(`  ${c.yellow}[^${p.footnote}]${c.reset} ${p.fixType}: ${p.explanation}`);
-    const origOneLine = p.original.replace(/\n/g, ' ');
-    const replOneLine = p.replacement.replace(/\n/g, ' ');
-    console.log(`    ${c.red}- ${origOneLine.length > 120 ? origOneLine.slice(0, 120) + '...' : origOneLine}${c.reset}`);
-    console.log(`    ${c.green}+ ${replOneLine.length > 120 ? replOneLine.slice(0, 120) + '...' : replOneLine}${c.reset}`);
-  }
-
-  if (!apply) {
-    console.log(`\n${c.dim}Run with --apply to write changes and re-verify.${c.reset}\n`);
-    process.exit(0);
-  }
-
-  // Apply fixes
-  console.log('');
-  const applyResult = applyFixes(pageContent, proposals);
-  const modifiedContent = (applyResult as ApplyResult & { content?: string }).content;
-
-  if (applyResult.applied > 0 && modifiedContent) {
-    writeFileSync(filePath, modifiedContent, 'utf-8');
-    appendEditLog(pageId, {
-      tool: 'crux-audit',
-      agency: 'automated',
-      note: `Fixed ${applyResult.applied} flagged citation inaccuracies via audit`,
-    });
-    console.log(`  ${c.green}${applyResult.applied} fixes applied${c.reset}`);
-    if (applyResult.skipped > 0) {
-      console.log(`  ${c.yellow}${applyResult.skipped} skipped (text not found)${c.reset}`);
-    }
   } else {
-    console.log(`  ${c.yellow}No fixes could be applied (text not found in page)${c.reset}\n`);
+    // Display proposals
+    for (const p of proposals) {
+      console.log(`  ${c.yellow}[^${p.footnote}]${c.reset} ${p.fixType}: ${p.explanation}`);
+      const origOneLine = p.original.replace(/\n/g, ' ');
+      const replOneLine = p.replacement.replace(/\n/g, ' ');
+      console.log(`    ${c.red}- ${origOneLine.length > 120 ? origOneLine.slice(0, 120) + '...' : origOneLine}${c.reset}`);
+      console.log(`    ${c.green}+ ${replOneLine.length > 120 ? replOneLine.slice(0, 120) + '...' : replOneLine}${c.reset}`);
+    }
+
+    if (!apply) {
+      console.log(`\n${c.dim}Run with --apply to write changes and re-verify.${c.reset}\n`);
+      process.exit(0);
+    }
+
+    // Apply fixes
+    console.log('');
+    const applyResult = applyFixes(pageContent, proposals);
+    const modifiedContent = applyResult.content;
+
+    if (applyResult.applied > 0 && modifiedContent) {
+      writeFileSync(filePath, modifiedContent, 'utf-8');
+      appendEditLog(pageId, {
+        tool: 'crux-audit',
+        agency: 'automated',
+        note: `Fixed ${applyResult.applied} flagged citation inaccuracies via audit`,
+      });
+      console.log(`  ${c.green}${applyResult.applied} fixes applied${c.reset}`);
+      if (applyResult.skipped > 0) {
+        console.log(`  ${c.yellow}${applyResult.skipped} skipped (text not found)${c.reset}`);
+      }
+      fixesApplied = true;
+    } else {
+      console.log(`  ${c.yellow}No fixes could be applied (text not found in page)${c.reset}\n`);
+      process.exit(0);
+    }
+  }
+
+  if (!fixesApplied) {
     process.exit(0);
   }
 

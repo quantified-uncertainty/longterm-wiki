@@ -11,86 +11,7 @@
 
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationQuotes, getDb } from '../lib/knowledge-db.ts';
-
-interface PageStats {
-  page_id: string;
-  total: number;
-  with_quotes: number;
-  verified: number;
-  avg_score: number | null;
-  accuracy_checked: number;
-  accurate: number;
-  inaccurate: number;
-}
-
-function getPageStats(): PageStats[] {
-  return getDb()
-    .prepare(
-      `
-    SELECT
-      page_id,
-      COUNT(*) as total,
-      SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END) as with_quotes,
-      SUM(CASE WHEN quote_verified = 1 THEN 1 ELSE 0 END) as verified,
-      AVG(CASE WHEN verification_score IS NOT NULL THEN verification_score END) as avg_score,
-      SUM(CASE WHEN accuracy_verdict IS NOT NULL THEN 1 ELSE 0 END) as accuracy_checked,
-      SUM(CASE WHEN accuracy_verdict = 'accurate' THEN 1 ELSE 0 END) as accurate,
-      SUM(CASE WHEN accuracy_verdict IN ('inaccurate', 'unsupported') THEN 1 ELSE 0 END) as inaccurate
-    FROM citation_quotes
-    GROUP BY page_id
-    ORDER BY total DESC
-  `,
-    )
-    .all() as PageStats[];
-}
-
-interface SourceTypeStats {
-  source_type: string;
-  count: number;
-  with_quotes: number;
-}
-
-function getSourceTypeStats(): SourceTypeStats[] {
-  return getDb()
-    .prepare(
-      `
-    SELECT
-      COALESCE(source_type, 'unknown') as source_type,
-      COUNT(*) as count,
-      SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END) as with_quotes
-    FROM citation_quotes
-    GROUP BY source_type
-    ORDER BY count DESC
-  `,
-    )
-    .all() as SourceTypeStats[];
-}
-
-interface BrokenQuote {
-  page_id: string;
-  footnote: number;
-  url: string | null;
-  claim_text: string;
-  verification_score: number | null;
-}
-
-function getBrokenQuotes(): BrokenQuote[] {
-  return getDb()
-    .prepare(
-      `
-    SELECT page_id, footnote, url, claim_text, verification_score
-    FROM citation_quotes
-    WHERE source_quote IS NOT NULL
-      AND source_quote != ''
-      AND quote_verified = 0
-      AND verification_score IS NOT NULL
-      AND verification_score < 0.4
-    ORDER BY verification_score ASC
-  `,
-    )
-    .all() as BrokenQuote[];
-}
+import { citationQuotes } from '../lib/knowledge-db.ts';
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
@@ -101,8 +22,8 @@ async function main() {
   const c = colors;
 
   const stats = citationQuotes.stats();
-  const pageStats = getPageStats();
-  const sourceTypeStats = getSourceTypeStats();
+  const pageStats = citationQuotes.getPageStats();
+  const sourceTypeStats = citationQuotes.getSourceTypeStats();
 
   if (json || ci) {
     const totalChecked = pageStats.reduce((s, p) => s + p.accuracy_checked, 0);
@@ -117,7 +38,7 @@ async function main() {
       sourceTypeStats,
     };
     if (broken) {
-      data.brokenQuotes = getBrokenQuotes();
+      data.brokenQuotes = citationQuotes.getBrokenQuotes();
     }
     console.log(JSON.stringify(data, null, 2));
     process.exit(0);
@@ -195,7 +116,7 @@ async function main() {
 
   // Broken quotes
   if (broken) {
-    const brokenQuotes = getBrokenQuotes();
+    const brokenQuotes = citationQuotes.getBrokenQuotes();
     if (brokenQuotes.length > 0) {
       console.log(
         `\n${c.red}${c.bold}Broken Quotes (extracted but not found in source):${c.reset}`,
@@ -226,7 +147,10 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((err: Error) => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: Error) => {
+    console.error('Error:', err.message);
+    process.exit(1);
+  });
+}

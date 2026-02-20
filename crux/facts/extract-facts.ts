@@ -19,7 +19,7 @@ import { basename, join } from 'path';
 import { randomBytes } from 'crypto';
 import { parse as parseYaml } from 'yaml';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { createClient, MODELS, parseJsonResponse } from '../lib/anthropic.ts';
@@ -152,14 +152,7 @@ function stripAlreadyCoveredContent(content: string): string {
   return stripped;
 }
 
-/** Find the absolute path of a page MDX file by its page-id */
-function findPageFile(pageId: string): string | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of files) {
-    if (basename(f, '.mdx') === pageId) return f;
-  }
-  return null;
-}
+// findPageFile imported from ../lib/file-utils.ts
 
 // ---------------------------------------------------------------------------
 // LLM classification

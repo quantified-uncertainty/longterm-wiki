@@ -15,10 +15,11 @@
 import { fileURLToPath } from 'url';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { citationQuotes, citationContent, getDb } from '../lib/knowledge-db.ts';
+import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
 import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
 import { exportDashboardData } from './export-dashboard.ts';
+import { logBatchProgress } from './shared.ts';
 
 export interface AccuracyResult {
   pageId: string;
@@ -202,15 +203,7 @@ async function main() {
   }
 
   if (all) {
-    const pages = getDb()
-      .prepare(
-        `SELECT DISTINCT page_id, COUNT(*) as quote_count
-         FROM citation_quotes
-         WHERE source_quote IS NOT NULL AND source_quote != ''
-         GROUP BY page_id
-         ORDER BY quote_count DESC`,
-      )
-      .all() as Array<{ page_id: string; quote_count: number }>;
+    const pages = citationQuotes.getPagesWithQuotes();
 
     let pagesToProcess = pages;
     if (limit > 0) {
@@ -275,19 +268,10 @@ async function main() {
         if (r) allResults.push(r);
       }
 
-      // Timing + ETA
-      const pagesCompleted = Math.min(i + concurrency, pagesToProcess.length);
-      const elapsed = (Date.now() - runStart) / 1000;
-      const batchSec = (Date.now() - batchStart) / 1000;
-      const avgPerPage = elapsed / pagesCompleted;
-      const remaining = avgPerPage * (pagesToProcess.length - pagesCompleted);
-      const etaStr = remaining > 0
-        ? `ETA ${Math.ceil(remaining / 60)}m ${Math.round(remaining % 60)}s`
-        : 'done';
-      console.log(
-        `${c.dim}  batch ${batchSec.toFixed(0)}s | elapsed ${Math.floor(elapsed / 60)}m ${Math.round(elapsed % 60)}s | ${etaStr}${c.reset}`,
-      );
-      console.log('');
+      logBatchProgress(c, {
+        batchIndex: i, concurrency, totalPages: pagesToProcess.length,
+        runStartMs: runStart, batchStartMs: batchStart,
+      });
     }
 
     const totals = {
@@ -308,8 +292,8 @@ async function main() {
     }
 
     // Auto-export dashboard data after accuracy checks
-    const exportPath = exportDashboardData();
-    if (!exportPath && !json && !ci) {
+    const exportResult = exportDashboardData();
+    if (!exportResult && !json && !ci) {
       console.log(`${c.yellow}Warning: could not export dashboard data${c.reset}`);
     }
 

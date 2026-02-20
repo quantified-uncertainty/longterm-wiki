@@ -20,16 +20,17 @@ import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
 import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
 import { extractQuotesForPage } from './extract-quotes.ts';
-import { exportDashboardData } from './export-dashboard.ts';
+import { exportDashboardData, ACCURACY_DIR, ACCURACY_PAGES_DIR } from './export-dashboard.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
+import { logBatchProgress } from './shared.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,6 +47,7 @@ export interface FixProposal {
 export interface ApplyResult {
   applied: number;
   skipped: number;
+  content: string | null;
   details: Array<{
     footnote: number;
     status: 'applied' | 'not_found';
@@ -53,12 +55,392 @@ export interface ApplyResult {
   }>;
 }
 
+export interface SectionRewrite {
+  heading: string;
+  originalSection: string;
+  rewrittenSection: string;
+  startLine: number;
+  endLine: number;
+}
+
+export interface ExtractedSection {
+  heading: string;
+  text: string;
+  startLine: number;
+  endLine: number;
+}
+
+// ---------------------------------------------------------------------------
+// Section extraction for escalation
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract the heading-bounded section containing a footnote reference.
+ * Uses ## or ### headings as boundaries. Stops at footnote definitions block.
+ * Works on frontmatter-stripped body text.
+ */
+export function extractSection(body: string, footnoteNum: number): ExtractedSection | null {
+  // Use regex to match exact footnote number (avoid [^1] matching inside [^10])
+  const markerRe = new RegExp(`\\[\\^${footnoteNum}\\](?!\\d)`);
+  if (!markerRe.test(body)) return null;
+
+  const lines = body.split('\n');
+
+  // Find the line containing the footnote reference (not a definition line)
+  let targetLine = -1;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Skip footnote definition lines like [^1]: ...
+    if (/^\[\^\d+\]:/.test(line.trimStart())) continue;
+    if (markerRe.test(line)) {
+      targetLine = i;
+      break;
+    }
+  }
+  if (targetLine === -1) return null;
+
+  // Search backward for the nearest heading (## or ###)
+  let startLine = 0;
+  let heading = '';
+  for (let i = targetLine; i >= 0; i--) {
+    if (/^#{2,3}\s/.test(lines[i])) {
+      startLine = i;
+      heading = lines[i];
+      break;
+    }
+  }
+
+  // Search forward for the next heading or footnote definitions block
+  let endLine = lines.length - 1;
+  for (let i = targetLine + 1; i < lines.length; i++) {
+    // Stop at next heading of same or higher level
+    if (/^#{2,3}\s/.test(lines[i])) {
+      endLine = i - 1;
+      break;
+    }
+    // Stop at footnote definitions block (consecutive [^N]: lines)
+    if (/^\[\^\d+\]:/.test(lines[i].trimStart())) {
+      endLine = i - 1;
+      break;
+    }
+  }
+
+  // Trim trailing blank lines
+  while (endLine > startLine && lines[endLine].trim() === '') {
+    endLine--;
+  }
+
+  const text = lines.slice(startLine, endLine + 1).join('\n');
+  return { heading, text, startLine, endLine };
+}
+
+/**
+ * Group flagged citations by the section they appear in.
+ * Returns a Map keyed by section start line.
+ */
+export function groupFlaggedBySection(
+  body: string,
+  flagged: FlaggedCitation[],
+): Map<number, { section: ExtractedSection; citations: FlaggedCitation[] }> {
+  const groups = new Map<number, { section: ExtractedSection; citations: FlaggedCitation[] }>();
+
+  for (const f of flagged) {
+    const section = extractSection(body, f.footnote);
+    if (!section) continue;
+
+    const existing = groups.get(section.startLine);
+    if (existing) {
+      existing.citations.push(f);
+    } else {
+      groups.set(section.startLine, { section, citations: [f] });
+    }
+  }
+
+  return groups;
+}
+
+/**
+ * Find all footnote references [^N] in a section of text.
+ * Returns unique footnote numbers found (not definition lines).
+ */
+export function findAllFootnotesInSection(sectionText: string): number[] {
+  const seen = new Set<number>();
+  const re = /\[\^(\d+)\]/g;
+  let match: RegExpExecArray | null;
+  const lines = sectionText.split('\n');
+
+  for (const line of lines) {
+    // Skip footnote definition lines
+    if (/^\[\^\d+\]:/.test(line.trimStart())) continue;
+    re.lastIndex = 0;
+    while ((match = re.exec(line)) !== null) {
+      seen.add(parseInt(match[1], 10));
+    }
+  }
+
+  return [...seen].sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// Claude escalation — section-level rewrite
+// ---------------------------------------------------------------------------
+
+const ESCALATION_SYSTEM_PROMPT = `You are a wiki editor fixing citation inaccuracies. You receive a full section of a wiki page where some citations have been flagged as inaccurate or unsupported.
+
+Your job: rewrite the section so all claims accurately reflect their cited sources. You have evidence for ALL citations in the section (not just flagged ones).
+
+Rules:
+1. Use SOURCE EVIDENCE to determine correct values. Replace wrong facts with values from the source.
+2. You may restructure paragraphs, split sentences, and move claims between citations as needed.
+3. For unsupported claims (source doesn't address the topic): remove the claim, or remove just the footnote reference if the claim is likely true from general knowledge.
+4. For overclaims: tone down language to match what the source supports.
+5. PRESERVE the section heading exactly as-is (first line starting with ## or ###).
+6. PRESERVE all footnote references [^N] — do not renumber or remove them unless the verdict is "unsupported" and you're removing the claim.
+7. PRESERVE all MDX components like <EntityLink id="..."> exactly as written.
+8. PRESERVE the overall tone and style of the wiki.
+9. Keep the section roughly the same length — don't add speculation or new claims.
+10. Return ONLY the corrected section text. No explanations, no JSON, no code fences.`;
+
+/** Max source text chars to include per citation in escalation prompt. */
+const MAX_SOURCE_PER_ESCALATION = 6_000;
+
+/**
+ * Look up source evidence for a non-flagged footnote directly from SQLite.
+ * Used in escalation to provide context for neighboring citations.
+ */
+function lookupFootnoteEvidence(pageId: string, footnote: number): string | null {
+  try {
+    const row = citationQuotes.get(pageId, footnote);
+    if (!row) return null;
+
+    const parts: string[] = [];
+
+    // Supporting quotes (best evidence)
+    if (row.accuracy_supporting_quotes) {
+      parts.push('Key passages from source:');
+      parts.push(row.accuracy_supporting_quotes);
+    }
+
+    // Extracted quote
+    if (row.source_quote && !row.accuracy_supporting_quotes?.includes(row.source_quote.slice(0, 50))) {
+      parts.push('Extracted quote:');
+      parts.push(row.source_quote);
+    }
+
+    if (parts.length > 0) return parts.join('\n');
+
+    // Fall back to cached full text
+    if (row.url) {
+      const cached = citationContent.getByUrl(row.url);
+      if (cached?.full_text) {
+        const truncated = cached.full_text.length > MAX_SOURCE_PER_ESCALATION
+          ? cached.full_text.slice(0, MAX_SOURCE_PER_ESCALATION) + '\n[... truncated ...]'
+          : cached.full_text;
+        return `Full source text:\n${truncated}`;
+      }
+    }
+
+    return null;
+  } catch {
+    return null; // SQLite unavailable
+  }
+}
+
+/**
+ * Escalate to Claude Sonnet with section-level rewrites when Gemini Flash
+ * returns 0 proposals for flagged citations.
+ */
+export async function escalateWithClaude(
+  pageId: string,
+  body: string,
+  flaggedCitations: FlaggedCitation[],
+  allEnriched: EnrichedFlaggedCitation[],
+  opts?: { verbose?: boolean },
+): Promise<SectionRewrite[]> {
+  const client = createClient();
+  if (!client) {
+    throw new Error('ANTHROPIC_API_KEY required for Claude escalation');
+  }
+
+  const groups = groupFlaggedBySection(body, flaggedCitations);
+  if (groups.size === 0) return [];
+
+  const rewrites: SectionRewrite[] = [];
+
+  for (const [, { section, citations }] of groups) {
+    // Find ALL footnotes in the section (not just flagged)
+    const allFootnotes = findAllFootnotesInSection(section.text);
+
+    // Build evidence for all footnotes in the section
+    const evidenceParts: string[] = [];
+    for (const fn of allFootnotes) {
+      const enriched = allEnriched.find(
+        (e) => e.pageId === pageId && e.footnote === fn,
+      );
+      const flaggedItem = citations.find((c) => c.footnote === fn);
+
+      evidenceParts.push(`--- Citation [^${fn}] ${flaggedItem ? '(FLAGGED)' : '(context)'} ---`);
+
+      if (flaggedItem) {
+        evidenceParts.push(`Verdict: ${flaggedItem.verdict}`);
+        evidenceParts.push(`Score: ${flaggedItem.score}`);
+        if (flaggedItem.issues) {
+          evidenceParts.push(`Issues: ${flaggedItem.issues}`);
+        }
+      }
+
+      if (enriched) {
+        const evidence = buildSourceEvidence(enriched);
+        if (evidence) {
+          evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
+        }
+      } else {
+        // For non-flagged footnotes, look up evidence directly from SQLite
+        const evidence = lookupFootnoteEvidence(pageId, fn);
+        if (evidence) {
+          evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
+        }
+      }
+
+      evidenceParts.push('');
+    }
+
+    // Compute which footnotes must be preserved vs. are removable
+    const removableFns = new Set(
+      citations
+        .filter((c) => c.verdict === 'unsupported' || c.verdict === 'inaccurate')
+        .map((c) => c.footnote),
+    );
+    const mustPreserve = allFootnotes.filter((fn) => !removableFns.has(fn));
+
+    const preserveNote = mustPreserve.length > 0
+      ? `\nIMPORTANT: These footnotes MUST appear in your output: ${mustPreserve.map((fn) => `[^${fn}]`).join(', ')}. Do not remove or renumber them.\n`
+      : '';
+
+    const userPrompt = [
+      `Page: ${pageId}`,
+      `Section to rewrite:`,
+      '',
+      section.text,
+      '',
+      `Evidence for citations in this section:`,
+      '',
+      ...evidenceParts,
+      preserveNote,
+    ].join('\n');
+
+    if (opts?.verbose) {
+      process.stdout.write(`  Escalating section "${section.heading.replace(/^#+\s*/, '')}" to Claude... `);
+    }
+
+    try {
+      const result = await callClaude(client, {
+        model: MODELS.sonnet,
+        systemPrompt: ESCALATION_SYSTEM_PROMPT,
+        userPrompt,
+        maxTokens: 4000,
+        temperature: 0,
+      });
+
+      const rewritten = result.text.trim();
+
+      // Safety checks
+      const origLen = section.text.length;
+      const newLen = rewritten.length;
+
+      if (newLen < origLen * 0.3) {
+        if (opts?.verbose) console.log('rejected (too short)');
+        continue;
+      }
+      if (newLen > origLen * 3.0) {
+        if (opts?.verbose) console.log('rejected (too long)');
+        continue;
+      }
+
+      // Check footnote preservation
+      const origFootnotes = findAllFootnotesInSection(section.text);
+      const newFootnotes = findAllFootnotesInSection(rewritten);
+      const missingFootnotes = origFootnotes.filter((fn) => !newFootnotes.includes(fn));
+
+      // Allow removal for unsupported/inaccurate verdicts (claims we know are wrong)
+      const removableFootnotes = new Set(
+        citations
+          .filter((c) => c.verdict === 'unsupported' || c.verdict === 'inaccurate')
+          .map((c) => c.footnote),
+      );
+      const badlyMissing = missingFootnotes.filter((fn) => !removableFootnotes.has(fn));
+      if (badlyMissing.length > 0) {
+        if (opts?.verbose) {
+          console.log(`rejected (missing footnotes: ${badlyMissing.join(', ')})`);
+        }
+        continue;
+      }
+
+      // Check EntityLink preservation
+      const origLinks = (section.text.match(/<EntityLink[^>]*>/g) ?? []).sort();
+      const newLinks = (rewritten.match(/<EntityLink[^>]*>/g) ?? []).sort();
+      if (origLinks.join() !== newLinks.join()) {
+        if (opts?.verbose) console.log('rejected (EntityLink mismatch)');
+        continue;
+      }
+
+      if (opts?.verbose) {
+        console.log(`done (${origLen} → ${newLen} chars)`);
+      }
+
+      rewrites.push({
+        heading: section.heading,
+        originalSection: section.text,
+        rewrittenSection: rewritten,
+        startLine: section.startLine,
+        endLine: section.endLine,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (opts?.verbose) {
+        console.log(`error: ${msg.slice(0, 80)}`);
+      }
+    }
+  }
+
+  return rewrites;
+}
+
+/**
+ * Apply section-level rewrites to page content.
+ * Processes bottom-to-top to preserve line offsets.
+ */
+export function applySectionRewrites(
+  content: string,
+  rewrites: SectionRewrite[],
+): { content: string; applied: number; skipped: number } {
+  let modified = content;
+  let applied = 0;
+  let skipped = 0;
+
+  // Sort by startLine descending (bottom-to-top) for safe replacement
+  const sorted = [...rewrites].sort((a, b) => b.startLine - a.startLine);
+
+  for (const rw of sorted) {
+    const idx = modified.indexOf(rw.originalSection);
+    if (idx === -1) {
+      skipped++;
+      continue;
+    }
+
+    modified =
+      modified.slice(0, idx) +
+      rw.rewrittenSection +
+      modified.slice(idx + rw.originalSection.length);
+    applied++;
+  }
+
+  return { content: modified, applied, skipped };
+}
+
 // ---------------------------------------------------------------------------
 // Dashboard YAML reader
 // ---------------------------------------------------------------------------
-
-const ACCURACY_DIR = join(PROJECT_ROOT, 'data', 'citation-accuracy');
-const PAGES_DIR = join(ACCURACY_DIR, 'pages');
 
 /** Read flagged citations from per-page YAML files (with fallback to old monolithic format). */
 export function loadFlaggedCitations(opts: {
@@ -69,12 +451,12 @@ export function loadFlaggedCitations(opts: {
   let flagged: FlaggedCitation[] = [];
 
   // New split format: pages/<pageId>.yaml
-  if (existsSync(PAGES_DIR)) {
-    const files = readdirSync(PAGES_DIR).filter((f) => f.endsWith('.yaml'));
+  if (existsSync(ACCURACY_PAGES_DIR)) {
+    const files = readdirSync(ACCURACY_PAGES_DIR).filter((f) => f.endsWith('.yaml'));
 
     // If filtering to one page, only read that file
     if (opts.pageId) {
-      const pageFile = join(PAGES_DIR, `${opts.pageId}.yaml`);
+      const pageFile = join(ACCURACY_PAGES_DIR, `${opts.pageId}.yaml`);
       if (existsSync(pageFile)) {
         const raw = readFileSync(pageFile, 'utf-8');
         const parsed = yaml.load(raw);
@@ -85,7 +467,7 @@ export function loadFlaggedCitations(opts: {
     } else {
       for (const f of files) {
         try {
-          const raw = readFileSync(join(PAGES_DIR, f), 'utf-8');
+          const raw = readFileSync(join(ACCURACY_PAGES_DIR, f), 'utf-8');
           const parsed = yaml.load(raw);
           if (Array.isArray(parsed)) {
             flagged.push(...(parsed as FlaggedCitation[]));
@@ -175,9 +557,11 @@ export function enrichFromSqlite(flagged: FlaggedCitation[]): EnrichedFlaggedCit
  * Returns ~20 lines centered around the first `[^N]` occurrence.
  */
 export function extractSectionContext(body: string, footnoteNum: number): string {
-  const marker = `[^${footnoteNum}]`;
-  const idx = body.indexOf(marker);
-  if (idx === -1) return '';
+  // Use regex to match exact footnote number (avoid [^1] matching inside [^10])
+  const markerRe = new RegExp(`\\[\\^${footnoteNum}\\](?!\\d)`);
+  const match = markerRe.exec(body);
+  if (!match) return '';
+  const idx = match.index;
 
   const lines = body.split('\n');
   let lineIdx = 0;
@@ -367,7 +751,7 @@ export async function generateFixesForPage(
  * Processes in reverse offset order to preserve positions.
  */
 export function applyFixes(content: string, proposals: FixProposal[]): ApplyResult {
-  const result: ApplyResult = { applied: 0, skipped: 0, details: [] };
+  const result: ApplyResult = { applied: 0, skipped: 0, content: null, details: [] };
 
   // Find offsets and sort descending
   const withOffsets = proposals.map((p) => ({
@@ -415,27 +799,11 @@ export function applyFixes(content: string, proposals: FixProposal[]): ApplyResu
     });
   }
 
-  // Write back only if at least one fix applied
   if (result.applied > 0) {
-    // The caller is responsible for writing the file
-    // We just return the modified content via a side channel
-    (result as ApplyResult & { content: string }).content = modified;
+    result.content = modified;
   }
 
   return result;
-}
-
-// ---------------------------------------------------------------------------
-// Page file lookup
-// ---------------------------------------------------------------------------
-
-function findPageFile(pageId: string): string | null {
-  const allFiles = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of allFiles) {
-    const basename = f.split('/').pop()?.replace(/\.mdx?$/, '');
-    if (basename === pageId) return f;
-  }
-  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -446,6 +814,7 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const apply = args.apply === true;
   const json = args.json === true;
+  const escalate = args.escalate !== false; // enabled by default, --no-escalate disables
   const model = typeof args.model === 'string' ? args.model : undefined;
   const verdictFilter = typeof args.verdict === 'string' ? args.verdict : undefined;
   const maxScore = typeof args['max-score'] === 'string'
@@ -557,7 +926,68 @@ async function main() {
           return null;
         }
 
-        if (proposals.length === 0) {
+        if (proposals.length === 0 && escalate) {
+          // Escalate to Claude Sonnet with section-level rewrites
+          if (!json) {
+            console.log(`  ${c.dim}No string-replacement fixes proposed — escalating to Claude...${c.reset}`);
+          }
+
+          try {
+            const body = stripFrontmatter(pageContent);
+            const sectionRewrites = await escalateWithClaude(
+              pageId, body, pageFlagged, enriched,
+              { verbose: !json },
+            );
+
+            if (sectionRewrites.length > 0 && apply) {
+              const rwResult = applySectionRewrites(pageContent, sectionRewrites);
+              if (rwResult.applied > 0) {
+                writeFileSync(filePath, rwResult.content, 'utf-8');
+                appendEditLog(pageId, {
+                  tool: 'crux-fix-escalated',
+                  agency: 'automated',
+                  note: `Escalated to Claude: rewrote ${rwResult.applied} section(s) to fix citation inaccuracies`,
+                });
+              }
+
+              if (!json) {
+                console.log(`  ${c.green}${pageId}: ${rwResult.applied} section(s) rewritten${c.reset}${rwResult.skipped > 0 ? ` ${c.yellow}(${rwResult.skipped} skipped)${c.reset}` : ''}`);
+              }
+
+              // Create a synthetic ApplyResult for the summary
+              const syntheticApply: ApplyResult = {
+                applied: rwResult.applied,
+                skipped: rwResult.skipped,
+                content: rwResult.content,
+                details: sectionRewrites.map((rw) => ({
+                  footnote: 0,
+                  status: 'applied' as const,
+                  explanation: `Section rewrite: ${rw.heading}`,
+                })),
+              };
+              return { pageId, proposals: [], applyResult: syntheticApply };
+            } else if (sectionRewrites.length > 0 && !apply) {
+              if (!json) {
+                for (const rw of sectionRewrites) {
+                  console.log(`  ${c.yellow}Section: ${rw.heading.replace(/^#+\s*/, '')}${c.reset}`);
+                  console.log(`    ${c.dim}${rw.originalSection.length} chars → ${rw.rewrittenSection.length} chars${c.reset}`);
+                }
+              }
+              return { pageId, proposals: [] };
+            } else {
+              if (verbose) {
+                console.log(`  ${c.dim}Escalation produced no rewrites${c.reset}`);
+              }
+              return { pageId, proposals: [] };
+            }
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            if (!json) {
+              console.log(`  ${c.yellow}Escalation failed: ${msg.slice(0, 80)}${c.reset}`);
+            }
+            return { pageId, proposals: [] };
+          }
+        } else if (proposals.length === 0) {
           if (verbose) {
             console.log(`  ${c.dim}No fixes proposed${c.reset}`);
           } else if (!json) {
@@ -578,7 +1008,7 @@ async function main() {
         // Apply if requested
         if (apply) {
           const applyResult = applyFixes(pageContent, proposals);
-          const modifiedContent = (applyResult as ApplyResult & { content?: string }).content;
+          const modifiedContent = applyResult.content;
 
           if (applyResult.applied > 0 && modifiedContent) {
             writeFileSync(filePath, modifiedContent, 'utf-8');
@@ -614,22 +1044,14 @@ async function main() {
       if (r) allResults.push(r);
     }
 
-    // Timing + ETA
     if (!json && pageEntries.length > concurrency) {
-      const pagesCompleted = Math.min(i + concurrency, pageEntries.length);
-      const elapsed = (Date.now() - runStart) / 1000;
-      const batchSec = (Date.now() - batchStart) / 1000;
-      const avgPerPage = elapsed / pagesCompleted;
-      const remaining = avgPerPage * (pageEntries.length - pagesCompleted);
-      const etaStr = remaining > 0
-        ? `ETA ${Math.ceil(remaining / 60)}m ${Math.round(remaining % 60)}s`
-        : 'done';
-      console.log(
-        `${c.dim}  batch ${batchSec.toFixed(0)}s | elapsed ${Math.floor(elapsed / 60)}m ${Math.round(elapsed % 60)}s | ${etaStr}${c.reset}`,
-      );
+      logBatchProgress(c, {
+        batchIndex: i, concurrency, totalPages: pageEntries.length,
+        runStartMs: runStart, batchStartMs: batchStart,
+      });
+    } else {
+      console.log('');
     }
-
-    console.log('');
   }
 
   // Summary

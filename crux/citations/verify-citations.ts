@@ -14,9 +14,7 @@
  */
 
 import { readFileSync } from 'fs';
-import { basename } from 'path';
-import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
@@ -26,46 +24,7 @@ import {
   readCitationArchive,
   type CitationArchiveFile,
 } from '../lib/citation-archive.ts';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function findPageFile(pageId: string): string | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of files) {
-    if (basename(f, '.mdx') === pageId) return f;
-  }
-  return null;
-}
-
-function findPagesWithCitations(): Array<{ pageId: string; path: string; citationCount: number }> {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  const results: Array<{ pageId: string; path: string; citationCount: number }> = [];
-
-  for (const f of files) {
-    // Only knowledge-base pages
-    if (!f.includes('/knowledge-base/')) continue;
-    if (basename(f).startsWith('index.')) continue;
-
-    try {
-      const raw = readFileSync(f, 'utf-8');
-      const body = stripFrontmatter(raw);
-      const citations = extractCitationsFromContent(body);
-      if (citations.length > 0) {
-        results.push({
-          pageId: basename(f, '.mdx'),
-          path: f,
-          citationCount: citations.length,
-        });
-      }
-    } catch {
-      // Skip unreadable files
-    }
-  }
-
-  return results.sort((a, b) => b.citationCount - a.citationCount);
-}
+import { findPagesWithCitations } from './shared.ts';
 
 // ---------------------------------------------------------------------------
 // Main
@@ -240,7 +199,10 @@ async function main() {
   process.exit(archive.broken > 0 ? 1 : 0);
 }
 
-main().catch((err: Error) => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: Error) => {
+    console.error('Error:', err.message);
+    process.exit(1);
+  });
+}
