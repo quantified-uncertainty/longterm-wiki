@@ -12,6 +12,7 @@
  * Requires: OPENROUTER_API_KEY
  */
 
+import { fileURLToPath } from 'url';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { citationQuotes, citationContent, getDb } from '../lib/knowledge-db.ts';
@@ -19,7 +20,7 @@ import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
 import { exportDashboardData } from './export-dashboard.ts';
 
-interface AccuracyResult {
+export interface AccuracyResult {
   pageId: string;
   total: number;
   accurate: number;
@@ -37,7 +38,7 @@ interface AccuracyResult {
   }>;
 }
 
-async function checkAccuracyForPage(
+export async function checkAccuracyForPage(
   pageId: string,
   opts: { verbose?: boolean; recheck?: boolean; delayMs?: number } = {},
 ): Promise<AccuracyResult> {
@@ -404,7 +405,10 @@ function printSummary(
   console.log('');
 }
 
-main().catch((err: Error) => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+// Only run when executed directly (not when imported)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: Error) => {
+    console.error('Error:', err.message);
+    process.exit(1);
+  });
+}

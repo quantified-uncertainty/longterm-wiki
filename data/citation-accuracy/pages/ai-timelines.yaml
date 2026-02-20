@@ -1,0 +1,105 @@
+- pageId: ai-timelines
+  footnote: 36
+  claimText: '- **2016**: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimated "at least 10% probability" of TAI within 20 years (by 2036) - ...'
+  sourceTitle: Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving
+  url: https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence
+  verdict: inaccurate
+  score: 0.1
+  issues: The claim includes a timeline of AI predictions from 2016-2026, but the source only contains information about the 2016 prediction by Open Philanthropy. The other dates and predictions are not mentioned in this source.
+  difficulty: hard
+  checkedAt: '2026-02-20 01:42:07'
+- pageId: ai-timelines
+  footnote: 4
+  claimText: Ajeya Cotra's 2020 biological anchors framework estimates TAI timelines by comparing required computational resources (measured in FLOP) to biological...
+  sourceTitle: Draft report on AI timelines — LessWrong
+  url: https://www.lesswrong.com/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
+  verdict: unsupported
+  score: 0.3
+  issues: The source mentions Ajeya Cotra's report and discusses the biological anchors framework, but it does not explicitly state that the framework estimates TAI timelines by comparing required computational resources (measured in FLOP) to biological systems. While the report does involve comparing computational resources to biological systems, the claim overstates the explicitness of this comparison as the core method.
+  difficulty: medium
+  checkedAt: '2026-02-20 01:41:16'
+- pageId: ai-timelines
+  footnote: 7
+  claimText: Tom Davidson developed a compute-centric forecasting framework that models the relationship between computational resources, algorithmic progress, and...
+  sourceTitle: 'Forecasting transformative AI: the "biological anchors" method in a nutshell'
+  url: https://www.cold-takes.com/forecasting-transformative-ai-the-biological-anchors-method-in-a-nutshell/
+  verdict: unsupported
+  score: 0.3
+  issues: |-
+    The source does not mention Tom Davidson or his model.
+    The source does not mention the estimated time from 20% to 100% automation of cognitive tasks.
+    The source does not mention superintelligence arriving within a year after full automation.
+  difficulty: hard
+  checkedAt: '2026-02-20 01:41:19'
+- pageId: ai-timelines
+  footnote: 28
+  claimText: The AI field experienced multiple periods of reduced activity and funding in the 1970s and 1980s following forecasts that proved overly optimistic abo...
+  sourceTitle: 'AI Futures Model: Dec 2025 Update'
+  url: https://blog.ai-futures.org/p/ai-futures-model-dec-2025-update
+  verdict: unsupported
+  score: 0.3
+  issues: |-
+    The source does not discuss periods of reduced activity and funding in the AI field in the 1970s and 1980s.
+    The source does not compare long-term forecasts using quantitative trend extrapolation to purely intuitive predictions.
+  difficulty: hard
+  checkedAt: '2026-02-20 01:41:51'
+- pageId: ai-timelines
+  footnote: 51
+  claimText: '**Google DeepMind.** Demis Hassabis stated in March 2025 that AGI would emerge in the next five to ten years. By January 2026 at Davos, Hassabis gave ...'
+  sourceTitle: Human-level AI will be here in 5 to 10 years, DeepMind CEO says
+  url: https://www.cnbc.com/2025/03/17/human-level-ai-will-be-here-in-5-to-10-years-deepmind-ceo-says.html
+  verdict: inaccurate
+  score: 0.3
+  issues: |-
+    WRONG NUMBERS: The claim states Hassabis made the first statement in March 2025, but the article was published in March 2024 and refers to a statement made on Monday at a briefing in DeepMind's London offices.
+    WRONG NUMBERS: The claim states Hassabis gave a 50% chance of achieving AGI by the end of 2030 at Davos in January 2026, but the article references a statement made by Dario Amodei, CEO of Anthropic, at Davos in January.
+    FABRICATED DETAILS: The claim states Hassabis described his timeline as moving from "as soon as 10 years" in autumn 2025 to "probably three to five years away" by early 2026, but this is not mentioned in the article.
+  difficulty: medium
+  checkedAt: '2026-02-20 01:42:36'
+- pageId: ai-timelines
+  footnote: 53
+  claimText: '- **2016**: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimated "at least 10% probability" of TAI within 20 years (by 2036) - ...'
+  sourceTitle: What the hell happened with AGI timelines in 2025? | 80,000 Hours
+  url: https://80000hours.org/podcast/episodes/agi-timelines-in-2025/
+  verdict: inaccurate
+  score: 0.5
+  issues: The claim contains multiple unsupported dates and forecasts that are not mentioned in the source text. Specifically, the 2016, 2020, 2021, 2022, and 2023 forecasts are not present in the provided document. The 2024 Metaculus community median is mentioned as July 2031 at the start of 2025, which later moved to November 2033, not 2028-2031 as the claim states. The AI 2027 scenario is mentioned, but the April 2025 publication date is not. The claim about forecasts extending again in late 2025 is supported, but the specific reason is slightly different. The AI Futures Model median at 2032.5 is not mentioned, nor is the Kwa/METR model predicting 99% AI R&D automation by late 2032. The Metaculus flagship question median at approximately early 2028 is also not mentioned.
+  difficulty: hard
+  checkedAt: '2026-02-20 01:42:41'
+- pageId: ai-timelines
+  footnote: 38
+  claimText: <EntityLink id="metr">METR</EntityLink> researcher Thomas Kwa's 2026 model defines AI R&D automation as a logistic function in log compute, capturing ...
+  sourceTitle: 'Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 — LessWrong'
+  url: https://www.lesswrong.com/posts/uy6B5rEPvcwi55cBK/research-note-a-simpler-ai-timelines-model-predicts-99-ai-r
+  verdict: inaccurate
+  score: 0.6
+  issues: |-
+    WRONG DATE: The claim states the model is from 2026, but the source was published in 2026.
+    FABRICATED DETAILS: The claim states that 95% AI R&D automation corresponds to AI systems achieving a 14-year 'time horizon' on METR's coding task suite, but the source does not mention METR's coding task suite.
+  difficulty: medium
+  checkedAt: '2026-02-20 01:42:12'
+- pageId: ai-timelines
+  footnote: 45
+  claimText: As of early 2026, the community flagship AGI question shows a median estimate of February 1, 2028, based on over 1,700 forecasters, with an interquart...
+  sourceTitle: 'Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours'
+  url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
+  verdict: inaccurate
+  score: 0.6
+  issues: |-
+    WRONG NUMBERS: The wiki claim states a median estimate of February 1, 2028, based on over 1,700 forecasters, with an interquartile range spanning July 2026 to August 2031. The source does not provide this information. Instead, it states that as of February 2026, the forecasters average a 25% chance of AGI by 2029 and 50% by 2033.
+    WRONG NUMBERS: The wiki claim states that a separate Metaculus question on transformative AI clusters around 2029–2031 for median arrival. The source does not provide this information.
+    MISLEADING PARAPHRASE: The wiki claim states that the 80,000 Hours analysis of these surveys notes that Metaculus forecasters' mean estimate for AGI development has moved from approximately 50 years out to approximately 5 years out over a four-year period. The source states that 'In four years, the mean estimate on Metaculus for when AGI will be developed has plummeted from 50 years to five years.' This is not explicitly stated as an 80,000 Hours analysis.
+  difficulty: medium
+  checkedAt: '2026-02-20 01:42:24'
+- pageId: ai-timelines
+  footnote: 12
+  claimText: The survey demonstrated significant variation across questions and methodologies, with median estimates ranging from 2040s to 2070s depending on how q...
+  sourceTitle: 'Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours'
+  url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    The claim mentions median estimates ranging from 2040s to 2070s, but the source mentions estimates ranging from 2030s to 2070s.
+    The claim mentions that the range depends on how questions were framed, but the source does not explicitly state this.
+  difficulty: medium
+  checkedAt: '2026-02-20 01:41:28'
