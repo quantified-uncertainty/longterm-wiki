@@ -19,6 +19,7 @@ ratings:
   actionability_reasoning: "Provides specific tasks (batch content improvement with command-line examples, citation coverage goals) but only relevant to maintainers"
   completeness: 6
   completeness_reasoning: "Comprehensive view of infrastructure state and future work, well-organized with clear status indicators"
+entityType: internal
 ---
 This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the [Enhancement Queue](/wiki/E761).
 
