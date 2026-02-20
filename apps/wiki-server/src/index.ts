@@ -11,7 +11,7 @@ async function main() {
   const app = createApp();
 
   const server = serve({ fetch: app.fetch, port: PORT }, (info) => {
-    console.log(`ID server listening on port ${info.port}`);
+    console.log(`Wiki server listening on port ${info.port}`);
   });
 
   // Graceful shutdown

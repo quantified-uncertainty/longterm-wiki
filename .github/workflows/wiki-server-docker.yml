@@ -1,16 +1,16 @@
-name: ID Server — Build & Push Image
+name: Wiki Server — Build & Push Image
 
 on:
   push:
     branches: [main]
     paths:
-      - "apps/id-server/**"
+      - "apps/wiki-server/**"
       - "pnpm-lock.yaml"
-      - ".github/workflows/id-server-docker.yml"
+      - ".github/workflows/wiki-server-docker.yml"
   workflow_dispatch:
 
 concurrency:
-  group: id-server-docker-${{ github.ref }}
+  group: wiki-server-docker-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/quantified-uncertainty/longterm-wiki-id-server
+          images: ghcr.io/quantified-uncertainty/longterm-wiki-server
           tags: |
             type=raw,value=main,enable={{is_default_branch}}
             type=sha,prefix=sha-,format=long
@@ -47,12 +47,12 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: apps/id-server/Dockerfile
+          file: apps/wiki-server/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=id-server
-          cache-to: type=gha,scope=id-server,mode=max
+          cache-from: type=gha,scope=wiki-server
+          cache-to: type=gha,scope=wiki-server,mode=max
 
       - name: Update ArgoCD image tag
         if: github.ref == 'refs/heads/main'
@@ -68,13 +68,13 @@ jobs:
             "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
           chmod +x /usr/local/bin/argocd
 
-          argocd app set longterm-wiki-id-server \
+          argocd app set longterm-wiki-server \
             --helm-set image.tag="${IMAGE_TAG}" \
             --auth-token "${ARGOCD_AUTH_TOKEN}" \
             --server "${ARGOCD_SERVER}" \
             --grpc-web
 
-          argocd app wait longterm-wiki-id-server \
+          argocd app wait longterm-wiki-server \
             --health \
             --timeout 300 \
             --auth-token "${ARGOCD_AUTH_TOKEN}" \

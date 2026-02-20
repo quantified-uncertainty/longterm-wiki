@@ -7,12 +7,12 @@ let savedEnv;
 beforeEach(() => {
   originalFetch = global.fetch;
   savedEnv = {
-    ID_SERVER_URL: process.env.ID_SERVER_URL,
-    ID_SERVER_API_KEY: process.env.ID_SERVER_API_KEY,
+    WIKI_SERVER_URL: process.env.WIKI_SERVER_URL,
+    WIKI_SERVER_API_KEY: process.env.WIKI_SERVER_API_KEY,
   };
   // Default: no server configured
-  delete process.env.ID_SERVER_URL;
-  delete process.env.ID_SERVER_API_KEY;
+  delete process.env.WIKI_SERVER_URL;
+  delete process.env.WIKI_SERVER_API_KEY;
 });
 
 afterEach(() => {
@@ -26,12 +26,12 @@ afterEach(() => {
 
 describe("id-client", () => {
   describe("isServerAvailable", () => {
-    it("returns false when ID_SERVER_URL is not set", async () => {
+    it("returns false when WIKI_SERVER_URL is not set", async () => {
       expect(await isServerAvailable()).toBe(false);
     });
 
     it("returns true when server responds healthy", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ status: "healthy" }),
@@ -40,7 +40,7 @@ describe("id-client", () => {
     });
 
     it("returns false when server responds unhealthy", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({ status: "degraded" }),
@@ -49,13 +49,13 @@ describe("id-client", () => {
     });
 
     it("returns false when fetch throws (network error)", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockRejectedValue(new Error("ECONNREFUSED"));
       expect(await isServerAvailable()).toBe(false);
     });
 
     it("returns false when server returns non-200", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 503,
@@ -65,12 +65,12 @@ describe("id-client", () => {
   });
 
   describe("allocateId", () => {
-    it("returns null when ID_SERVER_URL is not set", async () => {
+    it("returns null when WIKI_SERVER_URL is not set", async () => {
       expect(await allocateId("test-slug")).toBeNull();
     });
 
     it("returns parsed response on 201 (new ID)", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 201,
@@ -87,7 +87,7 @@ describe("id-client", () => {
     });
 
     it("returns parsed response on 200 (existing ID)", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
@@ -104,13 +104,13 @@ describe("id-client", () => {
     });
 
     it("returns null on network error", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockRejectedValue(new Error("timeout"));
       expect(await allocateId("test-slug")).toBeNull();
     });
 
     it("returns null on 500 response", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
@@ -119,8 +119,8 @@ describe("id-client", () => {
     });
 
     it("sends Authorization header when API key is set", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
-      process.env.ID_SERVER_API_KEY = "my-key";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_API_KEY = "my-key";
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 201,
@@ -139,12 +139,12 @@ describe("id-client", () => {
   });
 
   describe("allocateBatch", () => {
-    it("returns null when ID_SERVER_URL is not set", async () => {
+    it("returns null when WIKI_SERVER_URL is not set", async () => {
       expect(await allocateBatch([{ slug: "a" }])).toBeNull();
     });
 
     it("returns results array on success", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       const mockResults = [
         { numericId: "E886", slug: "a", created: true },
         { numericId: "E887", slug: "b", created: true },
@@ -158,7 +158,7 @@ describe("id-client", () => {
     });
 
     it("returns null on failure", async () => {
-      process.env.ID_SERVER_URL = "http://localhost:3100";
+      process.env.WIKI_SERVER_URL = "http://localhost:3100";
       global.fetch = vi.fn().mockRejectedValue(new Error("network error"));
       expect(await allocateBatch([{ slug: "a" }])).toBeNull();
     });

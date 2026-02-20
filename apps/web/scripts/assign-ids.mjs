@@ -182,9 +182,9 @@ async function main() {
   // Check if the ID server is available for atomic allocation
   let useServer = await isServerAvailable();
   if (useServer) {
-    console.log(`  Using ID server at ${process.env.ID_SERVER_URL}`);
+    console.log(`  Using wiki server at ${process.env.WIKI_SERVER_URL}`);
   } else {
-    console.log('  ID server unavailable — using local assignment');
+    console.log('  Wiki server unavailable — using local assignment');
   }
 
   // -------------------------------------------------------------------------

@@ -1,4 +1,4 @@
 packages:
   - "apps/web"
   - "apps/discord-bot"
-  - "apps/id-server"
+  - "apps/wiki-server"

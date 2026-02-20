@@ -7,16 +7,16 @@ WORKDIR /repo
 
 # Copy workspace manifests and lockfile first for layer caching
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY apps/id-server/package.json ./apps/id-server/
+COPY apps/wiki-server/package.json ./apps/wiki-server/
 
-# Install only id-server dependencies
-RUN pnpm install --frozen-lockfile --filter id-server
+# Install only wiki-server dependencies
+RUN pnpm install --frozen-lockfile --filter wiki-server
 
 # Copy server source
-COPY apps/id-server/ ./apps/id-server/
+COPY apps/wiki-server/ ./apps/wiki-server/
 
 ENV NODE_ENV=production
 
-WORKDIR /repo/apps/id-server
+WORKDIR /repo/apps/wiki-server
 EXPOSE 3100
 CMD ["pnpm", "start"]

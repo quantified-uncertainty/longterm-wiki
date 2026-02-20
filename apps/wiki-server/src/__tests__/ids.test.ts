@@ -128,7 +128,7 @@ describe("ID Server API", () => {
   beforeEach(() => {
     resetStore();
     // Re-create app (no API key set → unauthenticated mode for tests)
-    delete process.env.ID_SERVER_API_KEY;
+    delete process.env.WIKI_SERVER_API_KEY;
     app = createApp();
   });
 
@@ -325,7 +325,7 @@ describe("ID Server API", () => {
 
   describe("Bearer auth", () => {
     it("rejects requests without token when API key is set", async () => {
-      process.env.ID_SERVER_API_KEY = "test-secret-key";
+      process.env.WIKI_SERVER_API_KEY = "test-secret-key";
       const authedApp = createApp();
 
       const res = await authedApp.request("/api/ids/allocate", {
@@ -335,11 +335,11 @@ describe("ID Server API", () => {
       });
       expect(res.status).toBe(401);
 
-      delete process.env.ID_SERVER_API_KEY;
+      delete process.env.WIKI_SERVER_API_KEY;
     });
 
     it("accepts requests with correct token", async () => {
-      process.env.ID_SERVER_API_KEY = "test-secret-key";
+      process.env.WIKI_SERVER_API_KEY = "test-secret-key";
       const authedApp = createApp();
 
       const res = await authedApp.request("/api/ids/allocate", {
@@ -352,17 +352,17 @@ describe("ID Server API", () => {
       });
       expect(res.status).toBe(201);
 
-      delete process.env.ID_SERVER_API_KEY;
+      delete process.env.WIKI_SERVER_API_KEY;
     });
 
     it("allows health check without token", async () => {
-      process.env.ID_SERVER_API_KEY = "test-secret-key";
+      process.env.WIKI_SERVER_API_KEY = "test-secret-key";
       const authedApp = createApp();
 
       const res = await authedApp.request("/health");
       expect(res.status).toBe(200);
 
-      delete process.env.ID_SERVER_API_KEY;
+      delete process.env.WIKI_SERVER_API_KEY;
     });
   });
 });

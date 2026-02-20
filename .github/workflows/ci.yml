@@ -40,8 +40,8 @@ jobs:
       - name: Run discord-bot tests
         run: cd apps/discord-bot && pnpm test
 
-      - name: Run id-server tests
-        run: cd apps/id-server && pnpm test
+      - name: Run wiki-server tests
+        run: cd apps/wiki-server && pnpm test
 
       - name: Build Next.js
         run: cd apps/web && pnpm build
@@ -112,8 +112,8 @@ jobs:
       - name: TypeScript type check — discord-bot (blocking)
         run: cd apps/discord-bot && npx tsc --noEmit
 
-      - name: TypeScript type check — id-server (blocking)
-        run: cd apps/id-server && npx tsc --noEmit
+      - name: TypeScript type check — wiki-server (blocking)
+        run: cd apps/wiki-server && npx tsc --noEmit
 
       - name: Run validation suite (advisory)
         if: "!cancelled()"

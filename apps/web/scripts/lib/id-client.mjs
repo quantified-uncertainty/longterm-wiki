@@ -1,22 +1,22 @@
 /**
- * id-client.mjs — HTTP client for the ID allocation server
+ * id-client.mjs — HTTP client for the wiki server (ID allocation)
  *
  * Used by assign-ids.mjs to allocate numeric IDs atomically when the
  * server is available. Falls back gracefully (returns null) on any failure.
  *
  * Configuration via environment variables:
- *   ID_SERVER_URL     — Base URL (e.g. "https://id-server.k8s.quantifieduncertainty.org")
- *   ID_SERVER_API_KEY — Bearer token for authentication
+ *   WIKI_SERVER_URL     — Base URL (e.g. "https://wiki-server.k8s.quantifieduncertainty.org")
+ *   WIKI_SERVER_API_KEY — Bearer token for authentication
  */
 
 const TIMEOUT_MS = 5000;
 
 function getServerUrl() {
-  return process.env.ID_SERVER_URL || "";
+  return process.env.WIKI_SERVER_URL || "";
 }
 
 function getApiKey() {
-  return process.env.ID_SERVER_API_KEY || "";
+  return process.env.WIKI_SERVER_API_KEY || "";
 }
 
 /**
