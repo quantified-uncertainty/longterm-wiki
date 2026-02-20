@@ -1,0 +1,55 @@
+date: "2026-02-20"
+branch: claude/add-dedicated-pages-Zy1Vx
+title: "Add dedicated pages for Nick Beckstead, Will MacAskill, and Giving What We Can"
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/339
+model: claude-sonnet-4-6
+duration: ~35min
+cost: ~$15
+
+pages:
+  - nick-beckstead
+  - will-macaskill
+  - giving-what-we-can
+
+summary: >
+  Created three new dedicated wiki pages using the crux content pipeline (standard tier):
+  Nick Beckstead (philosopher, longtermist, Secure AI Project founder),
+  Will MacAskill (EA co-founder, Oxford philosopher, "What We Owe the Future" author),
+  and Giving What We Can (EA org promoting the 10% pledge, founded 2009).
+  Also added entity definitions (E861/E862/E863) to people.yaml and organizations.yaml.
+  Fixed a pre-existing numeric ID registry conflict (E858/E859/E860 for
+  ea-shareholder-diversification-anthropic, state-capacity-ai-governance, recoding-america
+  which had been displaced by the newly added epstein-ai-connections page at E851).
+
+key_decisions:
+  - "Used crux content pipeline (standard tier ~$5 each) for all three pages rather than manual authoring"
+  - "Fixed pre-existing ID registry conflict by running build-data --allow-id-reassignment to update id-registry.json"
+  - "Added entity definitions before creating pages to enable proper EntityLink resolution"
+
+checks:
+  type: content
+  initiated_at: "2026-02-20T00:13:20.925Z"
+  total: 31
+  completed: 19
+  na: 0
+  skipped: 12
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - research-content
+    - fix-escaping
+    - crux-pipeline
+    - correctness
+    - security
+    - no-dead-code
+    - entitylinks-resolve
+    - numeric-ids-stable
+    - mdx-escaping
+    - content-accuracy
+    - citations-have-urls
+    - gate-passes
+    - pr-description
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges
