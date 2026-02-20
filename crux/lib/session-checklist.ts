@@ -407,10 +407,15 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   },
   {
     id: 'check-recent-merges',
-    label: 'Check recent merges',
-    description: 'Reviewed commits merged to main since session started. No conflicts or relevant overlapping changes.',
+    label: 'Up to date with origin/main',
+    description:
+      'Run `git fetch origin main && git log HEAD..origin/main --oneline` to see commits merged to main since this session started. ' +
+      'If any exist, merge before pushing: `git merge origin/main --no-edit`. Resolve any conflicts, re-run the gate, then re-verify this item. ' +
+      'Auto-verify passes only when HEAD is fully up to date with origin/main.',
     phase: 'ship',
     applicableTypes: 'all',
+    verifyCommand:
+      'git fetch origin main --quiet 2>/dev/null; test $(git rev-list HEAD..origin/main --count) -eq 0',
   },
   {
     id: 'tooling-gaps-actioned',
