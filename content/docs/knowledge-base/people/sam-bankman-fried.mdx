@@ -3,7 +3,8 @@ title: Sam Bankman-Fried
 description: American cryptocurrency entrepreneur, founder of FTX and Alameda
   Research, convicted of fraud and sentenced to 25 years in prison following the
   collapse of FTX in 2022.
-lastEdited: "2026-02-19"
+readerImportance: 68
+lastEdited: "2026-02-20"
 clusters:
   - community
 subcategory: ea-figures
@@ -14,16 +15,16 @@ ratings:
   rigor: 7
   actionability: 3
   completeness: 8
-readerImportance: 62
 tacticalValue: 55
 quality: 55
 llmSummary: Sam Bankman-Fried, convicted of fraud and sentenced to 25 years for
   misappropriating FTX customer funds, damaged both cryptocurrency markets and
   the effective altruism community, raising substantive questions about whether
   EA's expected-value reasoning enabled or rationalized his risk-taking. The
-  article is well-sourced and comprehensive, though primarily of
-  historical/contextual relevance to AI safety rather than direct technical
-  importance.
+  article covers his biography, the FTX collapse mechanics, trial, EA
+  connections, and ongoing appeal. Primarily of historical and contextual
+  relevance to AI safety funding and EA institutional credibility rather than
+  direct technical importance.
 entityType: person
 ---
 import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
@@ -33,12 +34,12 @@ import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@component
 | Dimension | Assessment |
 |-----------|------------|
 | **Born** | March 6, 1992, Stanford, California |
-| **Education** | Phillips Exeter Academy; MIT |
+| **Education** | Phillips Exeter Academy; MIT (Physics, B.S.) |
 | **Key Roles** | Founder & CEO, FTX (2019–2022); Co-founder, Alameda Research (2017) |
 | **Peak Net Worth** | ≈\$26.5 billion (Forbes 400, ranked 41st-richest American)[^1] |
 | **Conviction** | Guilty on all seven counts (fraud, conspiracy, money laundering), November 2023[^2] |
 | **Sentence** | 25 years federal prison; \$11 billion forfeiture ordered, March 28, 2024[^3] |
-| **EA Affiliation** | Giving What We Can member (2016); Giving Pledge signatory (2022); FTX Future Fund[^1] |
+| **EA Affiliation** | <EntityLink id="giving-what-we-can">Giving What We Can</EntityLink> member (2016); <EntityLink id="giving-pledge">Giving Pledge</EntityLink> signatory (2022); <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>[^1] |
 
 ## Key Links
 
@@ -48,118 +49,124 @@ import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@component
 | Official Image | [commons.wikimedia.org](https://commons.wikimedia.org/wiki/File:Sam_Bankman-Fried.png) |
 | EA Forum Topic | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/topics/sam-bankman-fried) |
 | DOJ Sentencing Press Release | [justice.gov](https://www.justice.gov/archives/opa/pr/samuel-bankman-fried-sentenced-25-years-his-orchestration-multiple-fraudulent-schemes) |
+| SEC Charges | [sec.gov](https://www.sec.gov/newsroom/press-releases/2022-219) |
 
 ## Overview
 
-Sam Bankman-Fried (commonly known as "SBF") is an American entrepreneur and convicted fraudster who founded the cryptocurrency exchange FTX in 2019 and the quantitative trading firm Alameda Research in 2017. At his peak, he was estimated to be worth approximately \$26.5 billion and was celebrated both as a transformative figure in cryptocurrency and as a prominent practitioner of <EntityLink id="E517">Centre for Effective Altruism</EntityLink>-aligned "earning to give" philanthropy.[^1] Forbes included him on its 2021 "30 Under 30" list and later, with bitter irony, on its 2023 "Hall of Shame."[^1]
+Sam Bankman-Fried (commonly known as "SBF") is an American entrepreneur and convicted fraudster who founded the cryptocurrency exchange FTX in 2019 and the quantitative trading firm Alameda Research in 2017. At his peak, he was estimated to be worth approximately \$26.5 billion and was celebrated both as a transformative figure in cryptocurrency and as a prominent practitioner of <EntityLink id="cea">Centre for Effective Altruism</EntityLink>-aligned <EntityLink id="earning-to-give">earning to give</EntityLink> philanthropy — the strategy of maximizing income in order to donate the proceeds to high-impact causes.[^1] Forbes included him on its 2021 "30 Under 30" list and later, with noted irony, on its 2023 "Hall of Shame."[^1]
 
-In November 2022, FTX filed for bankruptcy after revelations that Bankman-Fried had been directing customer deposits to Alameda Research without disclosure, leaving an estimated \$8–9 billion shortfall in customer funds.[^4] The collapse erased an estimated \$1 trillion from cryptocurrency markets.[^5] Bankman-Fried was arrested in December 2022, convicted on all seven counts of fraud and money laundering in November 2023 following roughly four hours of jury deliberation, and sentenced in March 2024 to 25 years in federal prison.[^3] Prosecutors described the case as one of the largest financial crimes in U.S. history.[^6]
+In November 2022, FTX filed for bankruptcy after reporting revealed that Bankman-Fried had been directing customer deposits to Alameda Research without disclosure, leaving an estimated \$8–9 billion shortfall in customer funds.[^4] The collapse erased an estimated \$1 trillion from cryptocurrency markets.[^5] Bankman-Fried was arrested in December 2022, convicted on all seven counts of fraud and money laundering in November 2023 following roughly four hours of jury deliberation, and sentenced in March 2024 to 25 years in federal prison.[^3] The U.S. Department of Justice described the case as among the largest financial crimes in U.S. history.[^3]
 
-Beyond the immediate financial wreckage, Bankman-Fried's collapse had significant ramifications for the <EntityLink id="E517">effective altruism</EntityLink> community, which had celebrated him as a model donor, and prompted renewed debate about whether effective altruism's emphasis on expected-value reasoning had enabled or encouraged his risk-taking. His FTX Future Fund had planned to distribute \$100 million in 2022 toward AI safety, pandemic prevention, and other EA-priority causes before the collapse rendered those commitments void.[^7]
+Beyond the immediate financial losses, Bankman-Fried's collapse had significant ramifications for the <EntityLink id="cea">effective altruism</EntityLink> community, which had celebrated him as a model donor, and prompted renewed debate about whether EA's emphasis on expected-value reasoning had enabled or encouraged his risk-taking. His <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> had planned to distribute \$100 million in 2022 toward AI safety, pandemic prevention, and other EA-priority causes before the collapse rendered those commitments void.[^7]
 
 ## Early Life and Professional Beginnings
 
-Bankman-Fried was born on March 6, 1992, in Stanford, California, to Barbara Fried and Joe Bankman, both academics.[^8] He attended Phillips Exeter Academy and later MIT, where he developed interests in mathematics and finance.[^1] After graduating, he worked as a trader on the international ETF desk at Jane Street Capital, where he developed expertise in automated trading systems.[^1]
+Bankman-Fried was born on March 6, 1992, in Stanford, California, to Barbara Fried and Joe Bankman, both law professors at Stanford University.[^8] He attended Phillips Exeter Academy and later MIT, where he studied physics and mathematics.[^1] After graduating, he worked as a trader on the international ETF desk at Jane Street Capital, where he developed expertise in automated trading systems and quantitative finance.[^1]
 
-In 2017, Bankman-Fried left Jane Street and briefly joined the <EntityLink id="E517">Centre for Effective Altruism</EntityLink>, where he began identifying arbitrage opportunities in Bitcoin trading across exchanges.[^8] He co-founded Alameda Research in late 2017, initially operating out of a basement with five or six colleagues. The firm exploited price discrepancies in Bitcoin between exchanges—most notably between Japan and the United States, moving as much as \$25 million daily—and at peak generated up to \$1 million per day in profit before price differences narrowed.[^8][^9] Initial funding came in part from Jaan Tallinn and Luke Ding; Bankman-Fried came to own approximately 90% of Alameda by 2021.[^1]
+In 2017, Bankman-Fried left Jane Street and briefly joined the <EntityLink id="cea">Centre for Effective Altruism</EntityLink>, where he encountered the <EntityLink id="earning-to-give">earning to give</EntityLink> framework and began identifying arbitrage opportunities in Bitcoin trading across exchanges.[^8] He co-founded Alameda Research in late 2017, initially operating out of a shared workspace with five or six colleagues. The firm exploited price discrepancies in Bitcoin between exchanges — most notably between Japan and the United States, moving as much as \$25 million daily — and at peak generated up to \$1 million per day in profit before price differences narrowed.[^8][^9] Initial funding came in part from <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink> and Luke Ding; Bankman-Fried came to own approximately 90% of Alameda by 2021.[^1]
 
-Alameda's early success created both the capital and the credibility for Bankman-Fried's next venture. However, the firm was not without internal controversy: co-founder Tara Mac Aulay and other early employees departed citing concerns about risk management and ethics, warnings that would later prove prescient.[^10]
+Alameda's early success created both the capital and the credibility for Bankman-Fried's next venture. However, the firm experienced internal discord from early on: co-founder Tara Mac Aulay and other early employees departed citing concerns about risk management and ethics, warnings that would later prove consistent with the patterns identified at trial.[^10]
+
+### Public Philosophy and Persona
+
+Before the FTX collapse, Bankman-Fried cultivated a distinctive public identity centered on EA philosophy. He publicly described his decision to pursue finance rather than direct charitable work as a calculated expected-value calculation — reasoning that earning and donating substantial sums would produce more good than working directly for a nonprofit.[^7] He was known for an unconventional presentation style: appearing at congressional hearings in shorts and a T-shirt, living in a shared house in the Bahamas with colleagues, and professing indifference to personal consumption. In interviews, he articulated a philosophy of risk tolerance and scale — expressing willingness to accept large downside risks in pursuit of outsized positive outcomes — framing this explicitly in EA terms.[^7]
+
+He engaged publicly with the <EntityLink id="80000-hours">80,000 Hours</EntityLink> community and EA forums, and was mentored by William MacAskill, one of EA's founding figures, who promoted Bankman-Fried's approach as an exemplar of high-impact career strategy.[^19] During this period, Bankman-Fried was also a regular presence in Washington, D.C., lobbying on cryptocurrency regulation and positioning himself as a responsible actor in an industry often criticized for regulatory evasion.[^5]
 
 ## FTX: Rise and Collapse
 
 ### Founding and Growth
 
-In April 2019, Bankman-Fried co-founded FTX Trading Ltd. in Hong Kong as a cryptocurrency derivatives exchange. FTX distinguished itself with user-friendly tools, leveraged trading, futures contracts, and a native token—FTT—that offered trading discounts to holders.[^8] Alameda Research served as FTX's primary market maker and held large quantities of FTT, creating deep structural entanglement between the exchange and the trading firm.[^9]
+In April 2019, Bankman-Fried co-founded FTX Trading Ltd. in Hong Kong as a cryptocurrency derivatives exchange. FTX distinguished itself with user-friendly tools, leveraged trading, futures contracts, and a native token — FTT — that offered trading discounts to holders.[^8] Alameda Research served as FTX's primary market maker and held large quantities of FTT, creating deep structural entanglement between the exchange and the trading firm.[^9]
 
 FTX grew rapidly, relocating to the Bahamas in 2021 to take advantage of a more permissive regulatory environment.[^8] The exchange was valued at \$25 billion in October 2021 with investment from major institutions including Temasek, Tiger Global, Sequoia Capital, and BlackRock.[^11] By early 2022 it carried a \$32 billion valuation.[^4] FTX acquired LedgerX, a U.S.-regulated derivatives exchange, for \$300 million in 2021, and signed a \$135 million naming-rights deal for the Miami Heat's NBA arena.[^1] Celebrity endorsements from Tom Brady, Gisele Bündchen, Steph Curry, and a prominent Super Bowl advertisement featuring Larry David reinforced FTX's public profile.[^8]
 
-Bankman-Fried became a prominent Washington presence during this period, testifying before Congress on cryptocurrency regulation and making significant political donations—reportedly \$5.2 million to a pro-Biden committee in 2020 and hundreds of millions more across the political spectrum, including alleged use of \$100 million in FTX customer funds for 2022 U.S. election contributions.[^5][^12] He was described by some commentators as the "J.P. Morgan of crypto."[^5]
+Bankman-Fried became a significant Washington presence during this period, testifying before Congress on cryptocurrency regulation and making substantial political donations — reportedly \$5.2 million to a pro-Biden committee in 2020, with prosecutors later alleging the use of approximately \$100 million in FTX customer funds for 2022 U.S. election contributions across multiple parties.[^5][^12] He was described by some commentators at the time as the "J.P. Morgan of crypto."[^5]
 
 ### The Structural Problem
 
-Underlying FTX's public success was a dangerous and undisclosed arrangement. According to the SEC's charges and subsequent trial evidence, Bankman-Fried had provided Alameda Research with a virtually unlimited line of credit funded by FTX customer deposits, and had exempted Alameda from the risk management controls applied to other traders on the platform.[^12] Alameda held large positions in FTT and other illiquid assets, making the entire structure dependent on FTT maintaining its value.
+Underlying FTX's public growth was an undisclosed arrangement that formed the basis of prosecutors' fraud charges. According to the SEC's charges and subsequent trial evidence, Bankman-Fried had provided Alameda Research with a virtually unlimited line of credit funded by FTX customer deposits, and had exempted Alameda from the risk controls applied to other traders on the platform.[^12] Alameda held large, illiquid positions in FTT and other assets issued or influenced by FTX entities, making the structure dependent on those tokens maintaining their market value.
 
-FTX operated under essentially no meaningful governance. John Ray, the bankruptcy administrator who also oversaw Enron's collapse, described the situation as stemming from "the absolute concentration of control in the hands of a very small group of grossly inexperienced and unsophisticated individuals who failed to implement virtually any of the systems or controls that are necessary for a company that is entrusted with other people's money."[^13] FTX used QuickBooks rather than enterprise-grade accounting software, had no independent board of directors, and had a corporate structure spanning approximately 100 affiliated entities with unclear asset locations and employee records.[^13][^14]
+The mechanism worked as follows: FTX customers deposited funds expecting them to be held in segregated accounts for trading purposes. Instead, Alameda accessed those funds via a special account configuration that allowed it to maintain a negative balance on FTX's internal ledger — effectively an undisclosed, uncollateralized loan backed by customer assets. Trial testimony from Caroline Ellison and Adam Yedidia described this arrangement as having been in place from early in FTX's operation, and prosecution expert Professor Peter Easton testified that customer funds had been diverted to Bahamian real estate (including a \$30 million penthouse), crypto venture investments, and political contributions.[^4]
 
-Brett Harrison, former CEO of FTX US, later described Bankman-Fried as someone who responded to challenge with what Harrison characterized as dysregulated hostility, gaslighting, and manipulation, and who treated experienced professionals' judgment as irrelevant.[^15]
+FTX operated under minimal formal governance. John Ray, the restructuring administrator who also oversaw Enron's bankruptcy, described the situation as stemming from "the absolute concentration of control in the hands of a very small group of grossly inexperienced and unsophisticated individuals who failed to implement virtually any of the systems or controls that are necessary for a company that is entrusted with other people's money."[^13] FTX used QuickBooks rather than enterprise-grade accounting software, had no independent board of directors, and had a corporate structure spanning approximately 100 affiliated entities with unclear asset locations and incomplete employee records.[^13][^14]
+
+Brett Harrison, former CEO of FTX US, later described Bankman-Fried as someone who responded to challenge with what Harrison characterized as hostility and manipulation, and who dismissed the judgment of experienced professionals.[^15]
 
 ### Collapse
 
-In November 2022, reporting on Alameda's balance sheet—which showed that a large portion of its assets consisted of FTT tokens—triggered a crisis of confidence. A withdrawal run on FTX exposed the underlying insolvency. On November 6, 2022, Bankman-Fried created an internal document stating FTX had enough to process only a fraction of remaining client asset requests; by November 7, he estimated a \$3.9 billion asset base against an \$8.1 billion shortfall in customer liabilities.[^4] FTX filed for bankruptcy with less than \$1 billion in liquid assets against \$9 billion in liabilities.[^1] Bankman-Fried resigned as CEO and was replaced by John Ray.[^8]
+In November 2022, a CoinDesk report on Alameda's balance sheet — which showed that a large portion of its assets consisted of FTT tokens issued by FTX's own corporate family — triggered a crisis of confidence. Binance CEO Changpeng Zhao subsequently announced that Binance would liquidate its FTT holdings, accelerating a withdrawal run on FTX that exposed its underlying insolvency. On November 6, 2022, Bankman-Fried created an internal document indicating FTX had sufficient liquidity to process only a fraction of remaining client withdrawal requests; by November 7, he estimated a \$3.9 billion asset base against an \$8.1 billion shortfall in customer liabilities.[^4] FTX filed for bankruptcy with less than \$1 billion in liquid assets against \$9 billion in liabilities.[^1] Bankman-Fried resigned as CEO and was replaced by John Ray.[^8]
 
-An independent examiner subsequently found that many FTX investments had involved limited due diligence and were based on unsupported valuations.[^16] Prosecution expert Professor Peter Easton testified at trial that customer funds had been diverted to Bahamian real estate (including a \$30 million penthouse for Bankman-Fried), crypto startups, and political contributions.[^4]
+An independent examiner subsequently found that many FTX investments had involved limited due diligence and were based on unsupported valuations.[^16] The speed of the collapse — from reported concern to bankruptcy filing in under two weeks — reflected both the illiquidity of Alameda's asset base and the absence of any segregated reserve for customer withdrawals.
 
 ## Trial and Sentencing
 
-Bankman-Fried was arrested in December 2022 and extradited to the United States. His trial began in 2023. Key witnesses against him included Caroline Ellison, former CEO of Alameda Research and Bankman-Fried's ex-girlfriend, and Adam Yedidia, a former MIT acquaintance and FTX employee, both of whom testified for the prosecution after pleading guilty to related charges.[^17]
+Bankman-Fried was arrested in the Bahamas in December 2022 and extradited to the United States. His trial began in October 2023 in the Southern District of New York before Judge Lewis Kaplan. Key witnesses against him included Caroline Ellison, former CEO of Alameda Research, and Adam Yedidia, a former MIT acquaintance and FTX software engineer, both of whom testified for the prosecution after pleading guilty to related charges.[^17] Ryan Salame and Nishad Singh, other senior FTX executives, also pleaded guilty and cooperated with prosecutors.[^17]
 
-Bankman-Fried chose to testify in his own defense, a decision widely regarded as damaging. His cross-examination exposed numerous contradictions with prior public statements, and his testimony was largely dismantled by the prosecution.[^17] The jury deliberated for approximately four hours before returning guilty verdicts on all seven counts of wire fraud, conspiracy, and money laundering.[^2]
+Bankman-Fried chose to testify in his own defense — a decision widely regarded as counterproductive. His cross-examination exposed numerous contradictions with prior public statements and depositions, and his frequent invocations of not recalling specific facts drew skeptical notice.[^17] The jury deliberated for approximately four hours before returning guilty verdicts on all seven counts of wire fraud, securities fraud, commodities fraud, conspiracy, and money laundering.[^2]
 
-On March 28, 2024, Judge Lewis Kaplan sentenced Bankman-Fried to 25 years in federal prison and ordered \$11 billion in forfeiture.[^3] The judge noted that Bankman-Fried had not expressed substantial remorse.[^6] Bankman-Fried has maintained that he did not commit fraud, and filed an appeal of his conviction in September 2024.[^18]
+On March 28, 2024, Judge Lewis Kaplan sentenced Bankman-Fried to 25 years in federal prison and ordered \$11 billion in forfeiture.[^3] In sentencing remarks, Judge Kaplan observed that Bankman-Fried had not demonstrated substantial remorse and noted the risk that he could commit future offenses.[^27] Bankman-Fried has maintained that he did not commit fraud, and filed an appeal of his conviction in September 2024 alleging that Judge Kaplan improperly excluded evidence that could have supported a good-faith reliance defense.[^28]
 
-By October 2025, bankruptcy CEO John Ray had recovered at least \$16 billion in assets for the FTX estate, aided in part by surging cryptocurrency prices and the sale of assets including LedgerX.[^16] Ray has characterized Bankman-Fried's claims of FTX solvency as categorically false.[^16]
+Caroline Ellison, who provided substantial cooperation with prosecutors, was sentenced to two years in prison on September 24, 2024.[^29] Ryan Salame was sentenced to 7.5 years; Nishad Singh's sentencing was deferred in recognition of his cooperation.[^29]
 
 ## Effective Altruism and AI Safety Involvement
 
-Bankman-Fried was a prominent and influential figure in the <EntityLink id="E517">effective altruism</EntityLink> community before his arrest. He joined Giving What We Can in 2016, signed the Giving Pledge in 2022, donated half his salary to charity in his early career, and built his entire public entrepreneurial narrative around the "earning to give" framework—the idea that maximizing income and donating the proceeds could produce more good than direct charitable work.[^1]
+Bankman-Fried was a prominent and influential figure in the <EntityLink id="cea">effective altruism</EntityLink> community before his arrest. He joined <EntityLink id="giving-what-we-can">Giving What We Can</EntityLink> in 2016, signed the <EntityLink id="giving-pledge">Giving Pledge</EntityLink> in 2022, donated half his salary to charity in his early career, and built his public entrepreneurial narrative around the <EntityLink id="earning-to-give">earning to give</EntityLink> framework — the idea that maximizing income and donating the proceeds could produce more good than direct charitable work.[^1]
 
-Through the FTX Foundation's Future Fund, Bankman-Fried planned to distribute \$100 million in 2022 toward AI safety, pandemic risk reduction, and other EA-priority causes.[^7][^25] EA community leaders including William MacAskill had mentored him and publicly amplified his philosophy of large-scale expected-value reasoning and risk tolerance.[^19] EA forums celebrated his approach, including his reasoning for launching FTX even after Alameda's success—framed as maximizing expected value by pursuing a larger platform.[^19]
+Through the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>, Bankman-Fried planned to distribute \$100 million in 2022 toward AI safety, pandemic risk reduction, and other EA-priority causes.[^7][^25] EA community leaders including William MacAskill had mentored him and publicly promoted his philosophy of large-scale expected-value reasoning and risk tolerance.[^19] EA forums celebrated his approach, including his reasoning for launching FTX — framed as maximizing expected value by pursuing a larger philanthropic platform after Alameda's success.[^19]
 
-On AI safety specifically, Bankman-Fried viewed preventing risks from misaligned artificial general intelligence as a priority cause, consistent with the EA community's emphasis on long-term existential risks. His fund explicitly targeted AI safety as part of its portfolio alongside pandemic preparedness.[^7]
+On AI safety specifically, Bankman-Fried had publicly identified the risk of misaligned artificial general intelligence as a priority cause, consistent with the EA community's focus on long-term existential risks. The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> explicitly targeted AI safety as part of its grantmaking portfolio alongside pandemic preparedness and other global catastrophic risk areas.[^7] The fund's collapse created a substantial funding gap in AI safety and biosecurity for the 2022–2023 period, as commitments that had been made or anticipated were voided. The degree to which other funders filled this gap is not fully documented in available sources.
 
 ### Impact on the EA Community
 
-The FTX collapse produced immediate and significant damage to EA's reputation. William MacAskill publicly disavowed Bankman-Fried following the collapse, estimating at the time that there was approximately a 20% chance the EA movement would not recover.[^19] Rob Wiblin and other prominent EA figures similarly distanced themselves publicly.[^19] The FTX Future Fund's board resigned en masse.
+The FTX collapse produced immediate and significant reputational damage to EA. William MacAskill publicly disavowed Bankman-Fried following the collapse, estimating at the time that there was approximately a 20% chance the EA movement would not recover.[^19] Rob Wiblin and other prominent EA figures similarly distanced themselves publicly.[^19] The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>'s board resigned en masse.
 
-On <EntityLink id="E538">LessWrong</EntityLink>, the community response was characterized by clear condemnation of fraud committed in the name of effective altruism, with posts explicitly rejecting the notion that fraud could be justified by altruistic ends.[^20] EA Forum discussions reflected substantial self-criticism, with posters questioning whether the community's emphasis on expected-value maximization and linear utility in money had validated or encouraged Bankman-Fried's willingness to take catastrophic risks, and regretting that early warning signs—including high employee turnover at Alameda and explicit concerns raised by figures such as Oliver Habryka—had been dismissed.[^19][^21]
+On <EntityLink id="lesswrong">LessWrong</EntityLink>, the community response was characterized by explicit condemnation of fraud committed in the name of effective altruism, with posts rejecting the notion that fraud could be justified by altruistic ends.[^20] EA Forum discussions reflected substantial self-criticism, with contributors questioning whether the community's emphasis on expected-value maximization and the assumption of linear utility in money had validated or encouraged Bankman-Fried's willingness to accept catastrophic risks, and noting that early warning signs — including high employee turnover at Alameda and explicit concerns raised by figures such as Oliver Habryka — had been dismissed or ignored.[^19][^21]
 
-External critics went further, arguing that EA's deference to wealthy donors, including Bankman-Fried's \$160 million in commitments and Dustin Moskovitz's \$440 million or more, had compromised the movement's intellectual honesty and moral independence.[^22]
+External critics went further, arguing that EA's deference to wealthy donors — including Bankman-Fried's \$160 million in commitments and <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>-associated funding — had compromised the movement's intellectual independence and its capacity to critically evaluate major funders.[^22]
 
 ## Criticisms and Controversies
 
 ### Fraud and Governance Failures
 
-The core criminal findings against Bankman-Fried are that he misappropriated billions in FTX customer deposits, channeled them to Alameda Research without disclosure, and used those funds for personal enrichment, political donations, and speculative investments. The jury found these facts proven beyond reasonable doubt on all counts.
+The core criminal findings against Bankman-Fried are that he misappropriated billions in FTX customer deposits, channeled them to Alameda Research without disclosure, and used those funds for personal enrichment, political donations, and speculative investments. The jury found these facts proven beyond reasonable doubt on all seven counts.
 
-Independent of the fraud itself, the governance failures at FTX were exceptional in scale. John Ray's assessment—drawing on his experience with Enron—characterized FTX's collapse as among the worst examples of corporate control failures he had encountered.[^13] The absence of basic accounting controls, independent oversight, or professional risk management at a company entrusted with billions in customer assets represented a systemic failure enabled by Bankman-Fried's concentration of authority and dismissal of experienced advisors.[^13][^15]
+Independent of the fraud itself, the governance failures at FTX were extensive in scale. John Ray's assessment — drawing on his prior experience administering the Enron bankruptcy — characterized FTX's collapse as among the most severe corporate control failures he had encountered.[^13] The absence of basic accounting controls, independent oversight, or professional risk management at a company entrusted with billions in customer assets reflected a systemic failure enabled by Bankman-Fried's concentration of authority and his documented dismissal of experienced advisors' input.[^13][^15]
 
 ### Expected Value Reasoning and EA
 
-Several critics have argued that the specific philosophical framework Bankman-Fried embraced—EA-influenced expected-value maximization with linear (rather than logarithmic) utility for money—provided both the motivation and the self-justification for his risk-taking. Under such reasoning, a sufficiently positive expected outcome can justify actions that most ethical frameworks would prohibit, including accepting catastrophic downside risks.[^23] Scott Aaronson, among others, has observed that Bankman-Fried's errors may have stemmed from a genuine but catastrophically misapplied commitment to expected-value reasoning—treating the possibility of funding world-saving causes as justifying unlimited financial risk-taking—rather than from simple greed.[^23]
+Several critics have argued that the specific philosophical framework Bankman-Fried embraced — EA-influenced expected-value maximization with linear (rather than logarithmic) utility for money — provided both the motivation and the self-justification for his risk-taking. Under such reasoning, a sufficiently positive expected outcome can justify actions that many ethical frameworks would prohibit, including accepting large downside risks.[^23] Scott Aaronson has argued that Bankman-Fried's errors may have stemmed from a genuine but catastrophically misapplied commitment to expected-value reasoning — treating the possibility of funding transformative causes as justifying unlimited financial risk-taking — rather than from straightforward greed.[^23]
 
-Others have noted that the money-focused environment at Alameda and FTX may itself have eroded ethical reasoning among those involved, consistent with research on how financial incentives can crowd out moral judgment.[^24]
+Others have noted that the money-focused environment at Alameda and FTX may itself have progressively eroded ethical reasoning among those involved, consistent with research on how financial incentives can affect moral judgment.[^24]
 
-### EA's "Moral Equilibrium" Problem
+Defenders of EA have offered several responses to these critiques. First, they contend that SBF's actions were not representative of core EA empiricism or consequentialism, and that the overwhelming majority of EA practitioners have not engaged in fraud; the logical structure of expected-value reasoning does not entail or endorse misappropriation. Second, they argue that Bankman-Fried applied a corrupted version of EA reasoning that omitted both the actual probabilities involved and the rule-consequentialist considerations that most sophisticated consequentialists incorporate — such as the systemic value of maintaining trust and property rights. Third, some EA-aligned analysts have noted that EA's institutional framework explicitly emphasizes honesty and epistemic integrity as foundational, and that Bankman-Fried's actions violated these norms directly.[^19][^20] The debate over whether EA's philosophical framework has structural vulnerabilities to this kind of motivated reasoning — or whether Bankman-Fried's actions were simply fraud dressed in philosophical language — remained active in EA intellectual circles as of 2025.
 
-A recurring critique in post-FTX analysis is that EA's framework enabled a form of "moral equilibrium" in which Bankman-Fried treated his philanthropic ambitions as offsetting or justifying fraud. Critics note that the mathematical structure of EA—maximizing expected good across possible outcomes—is susceptible to motivated reasoning when the individual doing the calculation stands to benefit, particularly absent institutional checks.[^24] Defenders of EA counter that SBF's actions were not representative of core EA empiricism or consequentialism, and that thousands of EA practitioners have not committed fraud.[^19]
+### The "Moral Equilibrium" Critique
+
+A recurring critique in post-FTX analysis is that EA's framework can enable a form of motivated moral accounting in which an individual treats anticipated philanthropic benefits as offsetting or justifying harmful actions in the present. Critics note that the mathematical structure of EA — maximizing expected good across possible outcomes — is susceptible to motivated reasoning when the individual doing the calculation stands to benefit personally, particularly absent institutional checks.[^24] The critique is not simply that Bankman-Fried did wrong, but that the framework he used did not provide adequate resistance to his rationalizations.
+
+EA defenders respond that this critique applies with equal or greater force to any framework permitting tradeoffs — including most forms of institutional consequentialism — and that the solution is stronger institutional constraints and epistemic norms, not the abandonment of expected-value thinking.[^19] They also note that Bankman-Fried was documented as misrepresenting facts to colleagues and investors, which is deception rather than a failure of philosophical reasoning per se.
 
 ### Lack of Remorse
 
-Judge Kaplan's sentencing comments noted that Bankman-Fried had not expressed substantial remorse for his actions.[^6] Bankman-Fried has continued to claim he did not commit fraud and to assert that FTX was solvent at the time of its collapse—a claim John Ray has explicitly rejected.[^16]
+Judge Kaplan's sentencing remarks noted that Bankman-Fried had not demonstrated substantial remorse for his actions, and identified this as a factor in the sentencing decision.[^27] Bankman-Fried has continued to maintain that he did not commit fraud and to assert that FTX was solvent at the time of its collapse — a claim John Ray has explicitly and repeatedly rejected.[^16]
 
 ## Recent Developments
 
-Bankman-Fried is serving his sentence at a federal correctional facility. News reports indicate he was transferred to a low-security facility in California by early 2025.[^18] He has filed an appeal of his conviction, in part alleging that Judge Kaplan improperly excluded evidence that could have supported a good-faith reliance defense.[^18]
+Bankman-Fried is serving his sentence at a federal correctional facility. According to news reporting, he was transferred to a medium-security facility in California by early 2025.[^28] He has filed an appeal of his conviction in the Second Circuit, arguing in part that Judge Kaplan improperly excluded evidence that could have supported a good-faith reliance on counsel defense.[^28] The Second Circuit had previously vacated convictions in a separate case before Judge Kaplan on related evidentiary grounds, which Bankman-Fried's appellate team has cited as relevant precedent.[^28]
 
-News reports have also indicated that Bankman-Fried and his family explored the possibility of a presidential pardon, citing Donald Trump's stated interest in pro-crypto policy, though Trump reportedly stated he had no intention of granting clemency.[^18] Reports indicate that Bankman-Fried has become active as an informal legal advisor to other high-profile inmates.[^26]
+News reports have also indicated that Bankman-Fried and his family explored the possibility of a presidential pardon, citing Donald Trump's stated interest in pro-cryptocurrency policy, though Trump reportedly indicated he had no intention of granting clemency to Bankman-Fried specifically.[^28] Reports have indicated that Bankman-Fried has offered informal legal guidance to other high-profile inmates.[^30]
 
-The FTX bankruptcy estate, administered by John Ray, had recovered at least \$16 billion by October 2025, exceeding initial expectations substantially, in part because cryptocurrency prices rose sharply after the bankruptcy filing.[^16]
+The FTX bankruptcy estate, administered by John Ray, had recovered at least \$16 billion by October 2025, substantially exceeding initial expectations, in part because cryptocurrency prices rose sharply after the bankruptcy filing and because asset sales — including LedgerX — yielded more than projected.[^16] Ray has characterized Bankman-Fried's claims of FTX solvency as factually false.[^16]
 
-Caroline Ellison, Bankman-Fried's former co-conspirator and Alameda CEO, was sentenced to two years in prison on September 24, 2024.[^18]
+Caroline Ellison, Bankman-Fried's former co-conspirator and Alameda CEO, was sentenced to two years in prison on September 24, 2024, with credit for substantial cooperation.[^29]
 
 ## Key Uncertainties
 
-- **Appeal outcome**: Bankman-Fried's appeal, which raises evidentiary objections to Judge Kaplan's rulings, was pending as of late 2025. The Second Circuit had previously vacated convictions in a separate Kaplan case on related grounds.[^18]
+- **Appeal outcome**: Bankman-Fried's appeal, which raises evidentiary objections to Judge Kaplan's rulings, was pending in the Second Circuit as of late 2025. The outcome turns in part on whether the excluded evidence was prejudicial to the defense.[^28]
 - **Long-term EA impact**: The extent to which the FTX collapse durably affects the effective altruism movement's funding, reputation, and philosophical development remains contested and unclear.[^19]
-- **AI safety funding gap**: The collapse of FTX Future Fund created a significant anticipated gap in AI safety and biosecurity funding that had been planned for 2022–2023. The degree to which this gap was filled by other funders is not fully documented in available sources.
-- **Motivations**: Whether Bankman-Fried's actions were primarily motivated by greed, by self-serving application of expected-value reasoning, by genuine belief that ends justified means, or by some combination, remains genuinely debated among analysts.[^23][^24]
-
-## See Also
-
-- <EntityLink id="E862">EA Epistemic Failures in the FTX Era</EntityLink> — The community-wide reckoning triggered by SBF's fraud
-- <EntityLink id="E863">EA Institutions' Response to the FTX Collapse</EntityLink> — How EA leaders and organizations responded
-- <EntityLink id="E864">Earning to Give: The EA Strategy and Its Limits</EntityLink> — The fundraising strategy SBF embodied and damaged
-- <EntityLink id="E855">FTX Future Fund</EntityLink> — His philanthropic vehicle that distributed (and later clawed back) tens of millions
+- **AI safety funding gap**: The collapse of the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> created a significant anticipated gap in AI safety and biosecurity funding planned for 2022–2023. The degree to which this gap was filled by other funders, including <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>, is not fully documented in available sources.
+- **Motivations**: Whether Bankman-Fried's actions were primarily motivated by financial self-interest, by self-serving application of expected-value reasoning, by a genuine belief that ends justified means, or by some combination, remains contested among analysts and commentators.[^23][^24]
 
 ## Sources
 
@@ -168,7 +175,7 @@ Caroline Ellison, Bankman-Fried's former co-conspirator and Alameda CEO, was sen
 [^3]: [U.S. Department of Justice - Samuel Bankman-Fried Sentenced 25 Years](https://www.justice.gov/archives/opa/pr/samuel-bankman-fried-sentenced-25-years-his-orchestration-multiple-fraudulent-schemes)
 [^4]: [Time - SBF Trial Biggest Bombshells](https://time.com/6330323/sbf-trial-biggest-bombshells/)
 [^5]: [InfluenceWatch - Sam Bankman-Fried](https://www.influencewatch.org/person/sam-bankman-fried/)
-[^6]: [YouTube - SBF Sentencing Coverage](https://www.youtube.com/watch?v=8FGOI8Ve2ow)
+[^6]: [Scott Aaronson Blog - SBF Trial Coverage](https://scottaaronson.blog/?p=7605)
 [^7]: [Dwarkesh Patel - SBF Interview](https://www.dwarkesh.com/p/sbf)
 [^8]: [Britannica - Sam Bankman-Fried](https://www.britannica.com/money/Sam-Bankman-Fried)
 [^9]: [Seven Pillars Institute - Case Study: FTX and Sam Bankman-Fried](https://www.sevenpillarsinstitute-org.sevenpillarsconsulting.com/case-study-ftx-and-sam-bankman-fried/)
@@ -180,7 +187,7 @@ Caroline Ellison, Bankman-Fried's former co-conspirator and Alameda CEO, was sen
 [^15]: [Business Insider - Brett Harrison on Sam Bankman-Fried](https://markets.businessinsider.com/news/currencies/crypto-ftx-us-ex-boss-sam-bankman-fried-brett-harrison-2023-1)
 [^16]: [Mother Jones - FTX Sam Bankman-Fried Bankruptcy Sullivan Cromwell Fraud](https://www.motherjones.com/politics/2025/10/ftx-sam-bankman-fried-crypto-bankruptcy-sullivan-cromwell-fraud/)
 [^17]: [Scott Aaronson Blog - SBF Trial](https://scottaaronson.blog/?p=7605)
-[^18]: [ABC News - Sam Bankman-Fried (ongoing coverage)](https://abcnews.com/alerts/SamBankmanFried) — news alerts aggregation page; specific claims are from multiple individual articles collected here
+[^18]: [ABC News - Sam Bankman-Fried coverage](https://abcnews.go.com/alerts/SamBankmanFried)
 [^19]: [EA Forum - Sam Bankman-Fried Topic](https://forum.effectivealtruism.org/topics/sam-bankman-fried)
 [^20]: [LessWrong - We Must Be Very Clear: Fraud in the Service of Effective Altruism](https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective)
 [^21]: [EA Forum - A Personal Reflection on SBF](https://forum.effectivealtruism.org/posts/BNKBJs4RJsA8FtdWE/a-personal-reflection-on-sbf)
@@ -189,3 +196,7 @@ Caroline Ellison, Bankman-Fried's former co-conspirator and Alameda CEO, was sen
 [^24]: [Ethics Unwrapped - Crypto Ethics: FTX and Sam Bankman-Fried](https://ethicsunwrapped.utexas.edu/crypto-ethics-ftx-and-sam-bankman-fried/)
 [^25]: [Fortune - SBF FTX Collapse AI Safety Research EA Debacle](https://fortune.com/2022/11/15/sam-bankman-fried-ftx-collapse-a-i-safety-research-effective-altruism-debacle/)
 [^26]: [CBS News - Sam Bankman-Fried Tag](https://www.cbsnews.com/tag/sam-bankman-fried/)
+[^27]: [U.S. Department of Justice - Samuel Bankman-Fried Sentenced 25 Years](https://www.justice.gov/archives/opa/pr/samuel-bankman-fried-sentenced-25-years-his-orchestration-multiple-fraudulent-schemes)
+[^28]: [ABC News - Sam Bankman-Fried appeal and transfer reporting](https://abcnews.go.com/alerts/SamBankmanFried)
+[^29]: [Time - SBF Trial Biggest Bombshells and Sentencing](https://time.com/6330323/sbf-trial-biggest-bombshells/)
+[^30]: [CBS News - Sam Bankman-Fried coverage](https://www.cbsnews.com/tag/sam-bankman-fried/)

@@ -155,6 +155,13 @@ jobs:
         if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
         run: pnpm install --frozen-lockfile
 
+      - name: "Tier 1: Auto-fix escaping and markdown after merge"
+        if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
+        run: |
+          echo "Running auto-fix for MDX escaping and markdown formatting..."
+          pnpm crux fix escaping || true
+          pnpm crux fix markdown || true
+
       - name: "Tier 1: Validate resolved code"
         if: always() && steps.fingerprint.outputs.skip != 'true' && steps.resolve.outcome == 'success'
         id: validate
@@ -217,9 +224,18 @@ jobs:
              - TypeScript/JS files with type errors from combining incompatible changes
              - Build-data failures from mismatched entity/fact references between files
              - MDX files with broken EntityLink references
-          3. After fixing, verify by running: pnpm crux validate gate --fix
-          4. Only fix what's needed to pass validation — do not make unrelated changes
-          5. Stage your changes with git add but do NOT commit or push
+             - Numeric ID reassignment errors (e.g. "Numeric ID reassignment detected"):
+               These happen when a numericId (like E696) was removed from a source YAML/MDX
+               file during the merge and build-data would assign a different one. Fix by
+               restoring the original numericId value in the source file. Check both
+               data/entities/*.yaml and content/docs/**/*.mdx frontmatter for numericId fields.
+               Do NOT use --allow-id-reassignment.
+             - Unescaped dollar signs in MDX files (e.g. "$100" should be "\\$100")
+             - Deprecated frontmatter fields (e.g. "importance" should be "readerImportance")
+          3. Run auto-fixers first: pnpm crux fix escaping && pnpm crux fix markdown
+          4. After fixing, verify by running: pnpm crux validate gate --fix
+          5. Only fix what's needed to pass validation — do not make unrelated changes
+          6. Stage your changes with git add but do NOT commit or push
           PROMPT_EOF
           )"
 
