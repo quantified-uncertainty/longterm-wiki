@@ -255,7 +255,7 @@ export async function runCheck(options: ValidatorOptions = {}): Promise<Validato
         results.push({
           path: relative(CONTENT_DIR, file),
           title: (frontmatter.title as string) || pageEntityId || '',
-          importance: (frontmatter.importance as number) || 0,
+          importance: ((frontmatter.readerImportance ?? frontmatter.importance) as number) || 0,
           unlinkedCount: unlinked.length,
           unlinked: unlinked.slice(0, 5),
         });
@@ -312,7 +312,7 @@ async function main(): Promise<void> {
         results.push({
           path: relative(CONTENT_DIR, file),
           title: (frontmatter.title as string) || pageEntityId || '',
-          importance: (frontmatter.importance as number) || 0,
+          importance: ((frontmatter.readerImportance ?? frontmatter.importance) as number) || 0,
           unlinkedCount: unlinked.length,
           unlinked: unlinked.slice(0, 5), // Top 5
         });

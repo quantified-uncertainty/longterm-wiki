@@ -92,6 +92,12 @@ function fixLastUpdated(fm) {
 function fixTodo(fm) {
   if (!/^todo:/m.test(fm)) return { fm, changed: false };
 
+  // If todos: already exists, skip to avoid duplicate YAML keys
+  if (/^todos:/m.test(fm)) {
+    console.warn('  WARNING: Both todo: and todos: found — skipping todo: conversion to avoid duplicate key');
+    return { fm, changed: false };
+  }
+
   // Match: todo: "quoted value" or todo: unquoted value
   const quotedMatch = fm.match(/^todo: "(.+)"\s*$/m);
   const unquotedMatch = !quotedMatch && fm.match(/^todo: (.+)\s*$/m);
@@ -107,7 +113,6 @@ function fixTodo(fm) {
   }
 
   const replacement = `todos:\n  - ${rawValue}`;
-  const original = quotedMatch ? `todo: "${rawValue}"` : `todo: ${rawValue}`;
   return {
     fm: fm.replace(/^todo: .+\s*$/m, replacement),
     changed: true,
