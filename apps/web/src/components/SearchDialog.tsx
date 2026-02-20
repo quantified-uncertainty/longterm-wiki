@@ -423,7 +423,7 @@ function HighlightedSnippet({ result }: { result: SearchResult }) {
   );
 }
 
-/** Extract the query terms that matched in the description field. */
+/** Extract the query terms that matched in the description or llmSummary field. */
 function getDescriptionTerms(
   match: MatchInfo | undefined,
   terms: string[],
@@ -431,7 +431,7 @@ function getDescriptionTerms(
   if (!match) return [];
   const descTerms: string[] = [];
   for (const [term, fields] of Object.entries(match)) {
-    if (fields.includes("description")) {
+    if (fields.includes("description") || fields.includes("llmSummary")) {
       descTerms.push(term);
     }
   }

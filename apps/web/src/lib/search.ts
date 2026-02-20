@@ -28,10 +28,11 @@ export interface SearchResult extends SearchDoc {
   terms: string[];
 }
 
-const SEARCH_FIELDS = ["title", "description", "tags", "entityType", "id"];
+const SEARCH_FIELDS = ["title", "description", "llmSummary", "tags", "entityType", "id"];
 const FIELD_BOOSTS: Record<string, number> = {
   title: 3.0,
   description: 2.0,
+  llmSummary: 1.5,
   tags: 1.5,
   entityType: 1.0,
   id: 1.0,
