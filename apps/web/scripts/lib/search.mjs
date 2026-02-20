@@ -12,10 +12,10 @@ import MiniSearch from 'minisearch';
 /**
  * Fields indexed by MiniSearch.
  * Boost weights are configured at search time in the consumers
- * (app/src/lib/search.ts and crux/lib/search.mjs), not here —
+ * (apps/web/src/lib/search.ts), not here —
  * constructor-level searchOptions don't survive toJSON/loadJSON.
  */
-const SEARCH_FIELDS = ['title', 'description', 'tags', 'entityType', 'id', 'contentFormat'];
+const SEARCH_FIELDS = ['title', 'description', 'llmSummary', 'tags', 'entityType', 'id', 'contentFormat'];
 
 /**
  * Build search documents from typed entities, pages, and the ID registry.
@@ -41,7 +41,8 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
     documents.push({
       id: entity.id,
       title: entity.title,
-      description: page.llmSummary || page.description || entity.description || '',
+      description: page.description || entity.description || '',
+      llmSummary: page.llmSummary || '',
       tags: (entity.tags || []).join(' '),
       entityType: entity.entityType || '',
       contentFormat: page.contentFormat || 'article',
@@ -63,7 +64,8 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
     documents.push({
       id: page.id,
       title: page.title,
-      description: page.llmSummary || page.description || '',
+      description: page.description || '',
+      llmSummary: page.llmSummary || '',
       tags: (page.tags || []).join(' '),
       entityType: page.category || '',
       contentFormat: page.contentFormat || 'article',
@@ -83,10 +85,11 @@ export function buildSearchIndex(typedEntities, pages, idRegistry) {
   miniSearch.addAll(documents);
 
   // 4. Build compact docs lookup (id → display info)
+  // Use llmSummary for display when available — it's more informative than description.
   const docs = documents.map(d => ({
     id: d.id,
     title: d.title,
-    description: truncate(d.description, 300),
+    description: truncate(d.llmSummary || d.description, 300),
     numericId: d._numericId,
     type: d._type,
     readerImportance: d._readerImportance,
