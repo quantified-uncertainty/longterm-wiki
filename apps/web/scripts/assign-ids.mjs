@@ -30,7 +30,7 @@ const ID_REGISTRY_FILE = join(DATA_DIR, 'id-registry.json');
 
 // Categories to skip when assigning page IDs (mirrors build-data.mjs)
 const SKIP_CATEGORIES = new Set([
-  'style-guides', 'browse',
+  'style-guides', 'tools',
   'dashboard', 'project', 'guides',
 ]);
 

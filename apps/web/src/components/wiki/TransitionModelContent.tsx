@@ -467,9 +467,9 @@ function InfluencesSection({ parentFactor }: { parentFactor: string }) {
 function preprocessYamlContent(content: string): string {
   let result = content;
 
-  // Convert <R id="...">text</R> to markdown links
+  // Convert <R id="...">text</R> to plain text (resource links can't be resolved in markdown context)
   // Matches: <R id="abc123">Link Text</R>
-  result = result.replace(/<R\s+id="([^"]+)"[^>]*>([^<]+)<\/R>/g, '[$2](/browse/resources/$1/)');
+  result = result.replace(/<R\s+id="([^"]+)"[^>]*>([^<]+)<\/R>/g, '$2');
 
   // Remove self-closing JSX components that shouldn't be in YAML content
   // DataInfoBox, ImpactList, FactorRelationshipDiagram, ParameterDistinctions

@@ -188,7 +188,7 @@ describe('computeNextId', () => {
 // ---------------------------------------------------------------------------
 
 describe('filterEligiblePages', () => {
-  const SKIP_CATEGORIES = new Set(['style-guides', 'browse', 'dashboard', 'project', 'guides']);
+  const SKIP_CATEGORIES = new Set(['style-guides', 'tools', 'dashboard', 'project', 'guides']);
 
   function makePage(id, category = 'knowledge-base', contentFormat = 'article') {
     return { id, category, contentFormat };
@@ -217,7 +217,7 @@ describe('filterEligiblePages', () => {
 
   it('excludes pages in skip categories', () => {
     const pages = [
-      makePage('tags', 'browse'),
+      makePage('tags', 'tools'),
       makePage('getting-started-guide', 'guides'),
       makePage('ai-risks', 'knowledge-base'),
     ];
@@ -241,7 +241,7 @@ describe('filterEligiblePages', () => {
   it('applies all three filters together', () => {
     const pages = [
       makePage('anthropic', 'knowledge-base'),        // entity match → excluded
-      makePage('tags', 'browse'),                     // skip category → excluded
+      makePage('tags', 'tools'),                     // skip category → excluded
       makePage('dash', 'knowledge-base', 'dashboard'), // dashboard format → excluded
       makePage('ai-risks', 'knowledge-base'),          // eligible
     ];
@@ -253,7 +253,7 @@ describe('filterEligiblePages', () => {
 
   it('returns empty array when all pages are excluded', () => {
     const pages = [
-      makePage('tags', 'browse'),
+      makePage('tags', 'tools'),
       makePage('anthropic', 'knowledge-base'),
     ];
     const result = filterEligiblePages(pages, new Set(['anthropic']), SKIP_CATEGORIES);
@@ -265,7 +265,7 @@ describe('filterEligiblePages', () => {
   });
 
   it('does not mutate the input pages array', () => {
-    const pages = [makePage('ai-risks'), makePage('tags', 'browse')];
+    const pages = [makePage('ai-risks'), makePage('tags', 'tools')];
     const originalLength = pages.length;
     filterEligiblePages(pages, new Set(), SKIP_CATEGORIES);
     expect(pages).toHaveLength(originalLength);
@@ -279,7 +279,7 @@ describe('filterEligiblePages', () => {
   });
 
   it('index pages in skip categories are excluded', () => {
-    const pages = [makePage('__index__/browse', 'browse')];
+    const pages = [makePage('__index__/browse', 'tools')];
     const result = filterEligiblePages(pages, new Set(), SKIP_CATEGORIES);
     expect(result).toHaveLength(0);
   });
