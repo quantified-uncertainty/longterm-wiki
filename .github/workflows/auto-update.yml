@@ -67,6 +67,8 @@ jobs:
 
       - name: Build data layer
         run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create auto-update branch
         run: |

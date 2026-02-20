@@ -83,7 +83,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build data layer
-        run: node --import tsx/esm apps/web/scripts/build-data.mjs
+        run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run maintenance
         uses: anthropics/claude-code-action@v1
