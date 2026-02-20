@@ -44,7 +44,7 @@ import { assessContentIntegrity, computeIntegrityRisk } from '../lib/content-int
 // Types
 // ---------------------------------------------------------------------------
 
-interface RiskAssessment {
+export interface RiskAssessment {
   pageId: string;
   path: string;
   title: string;
@@ -106,14 +106,14 @@ export function computeAccuracyRisk(
 }
 
 /** Map of pageId → { checked, inaccurate } from citation accuracy data */
-type AccuracyMap = Map<string, { checked: number; inaccurate: number }>;
+export type AccuracyMap = Map<string, { checked: number; inaccurate: number }>;
 
 function countRComponents(body: string): number {
   const matches = body.match(/<R\s+id=/g);
   return matches ? matches.length : 0;
 }
 
-function assessPage(
+export function assessPage(
   filePath: string,
   accuracyMap: AccuracyMap | null,
 ): RiskAssessment | null {
@@ -254,7 +254,7 @@ function assessPage(
 // Accuracy data loader
 // ---------------------------------------------------------------------------
 
-function loadAccuracyMap(): AccuracyMap | null {
+export function loadAccuracyMap(): AccuracyMap | null {
   // Guard: only query if the DB file already exists. getDb() would create an
   // empty DB otherwise, returning empty results rather than signaling "no data".
   const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');

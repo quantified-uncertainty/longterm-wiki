@@ -8,6 +8,10 @@ export { fetchAllSources, loadSources, loadFetchTimes, loadSeenItems, saveSeenIt
 export { buildDigest, normalizeTitle } from './digest.ts';
 export { routeDigest } from './page-router.ts';
 export { runPipeline } from './orchestrator.ts';
+export { runAuditGate } from './ci-audit.ts';
+export { verifyCitationsForPages, buildCitationSummary, extractPageIdsFromReport, findRunReport } from './ci-verify-citations.ts';
+export { computeRiskScores, buildRiskSummary } from './ci-risk-scores.ts';
+export { buildPrBody, readRunReport } from './ci-pr-body.ts';
 export type {
   NewsSource, SourcesConfig,
   FeedItem, DigestItem, NewsDigest,

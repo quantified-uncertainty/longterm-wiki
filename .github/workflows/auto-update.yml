@@ -161,6 +161,62 @@ jobs:
           fi
           echo "All NEEDS CITATION markers resolved."
 
+      - name: Find run report
+        id: report
+        if: always()
+        run: |
+          # Run reports use timestamp filenames (e.g., 2026-02-17T06-00-00.yaml)
+          REPORT=$(ls -t data/auto-update/runs/${DATE}*.yaml 2>/dev/null | grep -v '\-details\.yaml$' | head -1)
+          if [ -n "$REPORT" ]; then
+            echo "path=$REPORT" >> $GITHUB_OUTPUT
+            echo "Found report: $REPORT"
+          else
+            echo "path=" >> $GITHUB_OUTPUT
+            echo "No report found"
+          fi
+
+      - name: Verify citations on updated pages
+        id: citations
+        if: success() && steps.report.outputs.path != ''
+        run: |
+          RESULT=$(pnpm crux auto-update verify-citations --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
+          SUMMARY=$(echo "$RESULT" | jq -r '.markdownSummary // ""')
+          HAS_BROKEN=$(echo "$RESULT" | jq -r '.hasBroken // false')
+
+          {
+            echo "CITATION_SUMMARY<<CITATION_EOF"
+            echo "$SUMMARY"
+            echo "CITATION_EOF"
+          } >> "$GITHUB_ENV"
+
+          if [ "$HAS_BROKEN" = "true" ]; then
+            echo "::warning::Broken citations detected"
+          fi
+
+      - name: Compute hallucination risk scores
+        id: risk
+        if: success() && steps.report.outputs.path != ''
+        run: |
+          # Rebuild data layer so risk scoring sees the updated content
+          cd apps/web && node --import tsx/esm scripts/build-data.mjs 2>/dev/null
+          cd "$GITHUB_WORKSPACE"
+
+          RESULT=$(pnpm crux auto-update risk-scores --from-report="${{ steps.report.outputs.path }}" --json 2>/dev/null || echo '{}')
+          SUMMARY=$(echo "$RESULT" | jq -r '.markdownSummary // ""')
+          HAS_HIGH=$(echo "$RESULT" | jq -r '.hasHighRisk // false')
+
+          {
+            echo "RISK_SUMMARY<<RISK_EOF"
+            echo "$SUMMARY"
+            echo "RISK_EOF"
+          } >> "$GITHUB_ENV"
+
+          if [ "$HAS_HIGH" = "true" ]; then
+            echo "::warning::High-risk pages detected"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check for changes
         id: changes
         run: |
@@ -170,20 +226,6 @@ jobs:
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
             echo "Changes detected"
-          fi
-
-      - name: Find run report
-        id: report
-        if: always()
-        run: |
-          # Run reports use timestamp filenames (e.g., 2026-02-17T06-00-00.yaml)
-          REPORT=$(ls -t data/auto-update/runs/${DATE}*.yaml 2>/dev/null | head -1)
-          if [ -n "$REPORT" ]; then
-            echo "path=$REPORT" >> $GITHUB_OUTPUT
-            echo "Found report: $REPORT"
-          else
-            echo "path=" >> $GITHUB_OUTPUT
-            echo "No report found"
           fi
 
       - name: Commit and push
@@ -209,35 +251,22 @@ jobs:
           if [ -n "$EXISTING_PR" ]; then
             echo "PR #$EXISTING_PR already exists, changes pushed to branch"
           else
-            REPORT="${{ steps.report.outputs.path }}"
-            PAGES_UPDATED=0
-            BUDGET_SPENT=0
-            if [ -n "$REPORT" ] && [ -f "$REPORT" ]; then
-              PAGES_UPDATED=$(grep 'pagesUpdated' "$REPORT" | head -1 | awk '{print $2}')
-              BUDGET_SPENT=$(grep 'spent' "$REPORT" | head -1 | awk '{print $2}')
-            fi
+            # Build PR body via TS script, with citation/risk summaries
+            BODY=$(pnpm crux auto-update pr-body \
+              --report="${{ steps.report.outputs.path }}" \
+              --date="$DATE" \
+              --citations="$CITATION_SUMMARY" \
+              --risk="$RISK_SUMMARY" 2>/dev/null || echo "## Auto-Update Run — ${DATE}")
+
+            BODY_FILE=$(mktemp)
+            echo "$BODY" > "$BODY_FILE"
 
             gh pr create \
               --title "Auto-update: ${DATE} daily wiki refresh" \
-              --body "## Auto-Update Run — ${DATE}
-
-          Automated news-driven wiki update.
-
-          - **Pages updated:** ${PAGES_UPDATED:-0}
-          - **Budget spent:** \$${BUDGET_SPENT:-0}
-
-          ### Run Report
-          See \`${REPORT:-data/auto-update/runs/}\` for full details.
-
-          ### Review Checklist
-          - [ ] Spot-check updated pages for accuracy
-          - [ ] Verify no hallucinated content was added
-          - [ ] Check that EntityLinks resolve correctly
-          - [ ] Confirm validation passes
-
-          ---
-          *This PR was created automatically by the auto-update workflow.*" \
+              --body-file "$BODY_FILE" \
               --label "auto-update" || echo "PR creation failed (label may not exist)"
+
+            rm -f "$BODY_FILE"
           fi
 
       - name: Summary
