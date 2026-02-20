@@ -1,0 +1,57 @@
+date: "2026-02-20"
+branch: claude/resolve-issue-352-MhuG2
+title: "Add kb-subcategory-coverage validation rule (issue #352)"
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/376
+model: claude-sonnet-4-6
+duration: ~30min
+cost: ~$0.50
+
+summary: |
+  Added a new global warning-level validation rule `kb-subcategory-coverage` that
+  reports KB sections where >20% of non-index pages lack a `subcategory` frontmatter
+  field. On current content, 6 sections are flagged: cruxes, forecasting,
+  future-projections, incidents, metrics, worldviews.
+
+key_decisions:
+  - "**Global scope**: Rule needs all files to compute per-section ratios, so scope='global' is correct."
+  - "**Threshold >20% (not >=)**: The issue says '>20%' — used strict greater-than. One test verifies the exact boundary (1/5=20% does not warn)."
+  - "**startsWith not includes**: Fixed bug from paranoid review — used `startsWith('knowledge-base/')` to avoid false matches."
+  - "**Named constant for rule ID**: Used `RULE_ID` constant to avoid the hardcoded string in Issue constructor diverging from the rule's id field."
+  - "**thresholdPct hoisted to module scope**: Avoids recomputing on every loop iteration and keeps description string in sync."
+  - "**Warning not error**: This is advisory/non-blocking per the issue's intent."
+
+pages: []
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-20T07:26:29.947Z"
+  total: 32
+  completed: 24
+  na: 5
+  skipped: 3
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges

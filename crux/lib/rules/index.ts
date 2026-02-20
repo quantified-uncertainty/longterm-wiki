@@ -21,6 +21,7 @@ import { preferEntityLinkRule } from './prefer-entitylink.ts';
 
 // Sidebar/structure rules
 import { sidebarIndexRule } from './sidebar-index.ts';
+import { kbSubcategoryCoverageRule } from './kb-subcategory-coverage.ts';
 
 // File-level rules
 import { jsxInMdRule } from './jsx-in-md.ts';
@@ -42,6 +43,7 @@ import { externalLinksRule } from './external-links.ts';
 // Schema validation rules
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { numericIdIntegrityRule } from './numeric-id-integrity.ts';
+import { noQuotedSubcategoryRule } from './no-quoted-subcategory.ts';
 
 // Quality validation rules
 import { temporalArtifactsRule } from './temporal-artifacts.ts';
@@ -95,6 +97,7 @@ export {
   componentRefsRule,
   preferEntityLinkRule,
   sidebarIndexRule,
+  kbSubcategoryCoverageRule,
   jsxInMdRule,
   cruftFilesRule,
   markdownListsRule,
@@ -106,6 +109,7 @@ export {
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
+  noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,
@@ -141,6 +145,7 @@ export const allRules: Rule[] = [
   componentRefsRule,
   preferEntityLinkRule,
   sidebarIndexRule,
+  kbSubcategoryCoverageRule,
   jsxInMdRule,
   cruftFilesRule,
   markdownListsRule,
@@ -152,6 +157,7 @@ export const allRules: Rule[] = [
   externalLinksRule,
   frontmatterSchemaRule,
   numericIdIntegrityRule,
+  noQuotedSubcategoryRule,
   temporalArtifactsRule,
   editorialArtifactsRule,
   outdatedNamesRule,

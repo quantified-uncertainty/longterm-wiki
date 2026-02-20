@@ -1,0 +1,133 @@
+- pageId: good-judgment
+  footnote: 37
+  claimText: During the ACE tournament, teams of 12 superforecasters consistently outperformed larger groups of regular forecasters, suggesting that high-skill agg...
+  sourceTitle: About Superforecasting | Unprecedented Accurate & Precise Forecasting
+  url: https://goodjudgment.com/about/
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention the ACE tournament, the comparison of teams of 12 superforecasters to larger groups of regular forecasters, or the typical assignment of approximately 40 superforecasters to each client question.
+  difficulty: hard
+  checkedAt: '2026-02-20 08:49:26'
+- pageId: good-judgment
+  footnote: 70
+  claimText: Coefficient Giving funded a forecasting review on power-seeking AI in January 2023, though the specific amount and detailed findings were not publicly...
+  sourceTitle: Forecasting | Coefficient Giving
+  url: https://coefficientgiving.org/funds/forecasting/
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention a forecasting review on power-seeking AI in January 2023, nor does it mention Good Judgment engaging with AI safety questions.
+  difficulty: easy
+  checkedAt: '2026-02-20 08:50:22'
+- pageId: good-judgment
+  footnote: 74
+  claimText: The EA community has also debated whether good judgment and forecasting skill represent distinct capabilities. Good Judgment's track record—with super...
+  sourceTitle: How can good generalist judgment be differentiated from skill at forecasting? — EA Forum
+  url: https://forum.effectivealtruism.org/posts/4HLmE5eTHBsC3FDt3/how-can-good-generalist-judgment-be-differentiated-from
+  verdict: unsupported
+  score: 0
+  issues: The source does not contain any information about Good Judgment's track record, superforecasters outperforming prediction markets or intelligence analysts, or forecasting accuracy on geopolitical questions translating to sound judgment on complex strategic questions like AI risk trajectories or optimal intervention strategies.
+  difficulty: hard
+  checkedAt: '2026-02-20 08:50:29'
+- pageId: good-judgment
+  footnote: 45
+  claimText: In 2023, Good Judgment superforecasters earned full marks on 8 out of 9 resolved forecasts in *The Economist*, correctly predicting global economic gr...
+  sourceTitle: 'Superforecasters vs FT Readers: Results of an Informal Contest in the Financial Times - Good Judgment'
+  url: https://goodjudgment.com/superforecasters-financial-times-2023/
+  verdict: inaccurate
+  score: 0.4
+  issues: |-
+    unsupported: The source does not mention that Good Judgment superforecasters earned full marks on 8 out of 9 resolved forecasts in *The Economist*.
+    unsupported: The source does not mention that Good Judgment superforecasters correctly predicting global economic growth at 3%, China's growth at 5%, and that Putin would not be ousted from power.
+    unsupported: The source does not mention that Good Judgment proved 30% more accurate than futures markets on central bank interest rate decisions during 2024-2025.
+  difficulty: hard
+  checkedAt: '2026-02-20 08:49:42'
+- pageId: good-judgment
+  footnote: 15
+  claimText: launched as a commercial entity. The company began hiring professional superforecasters like Jean-Pierre Beugoms, who transitioned from volunteer fore...
+  sourceTitle: Jean-Pierre Beugoms - Good Judgment
+  url: https://goodjudgment.com/about/our-team/superforecaster-profiles/jean-pierre-beugoms/
+  verdict: inaccurate
+  score: 0.5
+  issues: |-
+    unsupported: The source does not mention Good Judgment Open (GJ Open) or that it serves as a recruitment pipeline or training ground.
+    minor_issues: The claim states the company began hiring professional superforecasters, while the source says Jean-Pierre Beugoms was invited to become a professional Superforecaster when the commercial enterprise began.
+  difficulty: medium
+  checkedAt: '2026-02-20 08:48:44'
+- pageId: good-judgment
+  footnote: 27
+  claimText: '**Barbara Mellers**, also a co-founder, is a decision scientist at the University of Pennsylvania who co-led the Good Judgment Project with Tetlock. H...'
+  sourceTitle: 'The Good Judgment Project and Geopolitical Forecasting : Networks Course blog for INFO 2040/CS 2850/Econ 2040/SOC 2090'
+  url: https://blogs.cornell.edu/info2040/2015/11/23/the-good-judgment-project-and-geopolitical-forecasting/
+  verdict: inaccurate
+  score: 0.5
+  issues: |-
+    unsupported: Barbara Mellers' affiliation with the University of Pennsylvania
+    unsupported: Mellers co-led the Good Judgment Project with Tetlock
+    unsupported: Mellers' research contributions focused on the psychological strategies that improve forecasting accuracy, including the role of cognitive ability, training interventions, and team collaboration in enhancing predictions.
+  difficulty: hard
+  checkedAt: '2026-02-20 08:49:10'
+- pageId: good-judgment
+  footnote: 17
+  claimText: The commercial organization expanded beyond geopolitics to address questions in finance, energy, public health, and organizational strategy. Good Judg...
+  sourceTitle: About Superforecasting | Unprecedented Accurate & Precise Forecasting
+  url: https://goodjudgment.com/about/
+  verdict: inaccurate
+  score: 0.65
+  issues: |-
+    unsupported: The source does not mention the commercial organization expanding beyond geopolitics to address questions in finance, energy, public health, and organizational strategy.
+    unsupported: The source does not state that Good Judgment developed proprietary tools like FutureFirst™.
+    unsupported: The source does not state that FutureFirst™ provides clients with continuous forecasting insights by assigning approximately 40 superforecasters to each client question.
+    unsupported: The source does not state that the company built a training business, offering workshops and seminars on probabilistic thinking, bias correction, and forecasting methodology to government agencies, corporations, and nonprofits across the United States, United Kingdom, Netherlands, and Turkey.
+  difficulty: hard
+  checkedAt: '2026-02-20 08:48:48'
+- pageId: good-judgment
+  footnote: 18
+  claimText: The commercial organization expanded beyond geopolitics to address questions in finance, energy, public health, and organizational strategy. Good Judg...
+  sourceTitle: About Superforecasting | Unprecedented Accurate & Precise Forecasting
+  url: https://goodjudgment.com/about/
+  verdict: inaccurate
+  score: 0.65
+  issues: |-
+    unsupported: The source does not mention the commercial organization expanding beyond geopolitics to address questions in finance, energy, public health, and organizational strategy.
+    unsupported: The source does not state that Good Judgment developed proprietary tools like FutureFirst™.
+    unsupported: The source does not state that FutureFirst™ provides clients with continuous forecasting insights by assigning approximately 40 superforecasters to each client question.
+    unsupported: The source does not state that the company built a training business, offering workshops and seminars on probabilistic thinking, bias correction, and forecasting methodology to government agencies, corporations, and nonprofits across the United States, United Kingdom, Netherlands, and Turkey.
+  difficulty: hard
+  checkedAt: '2026-02-20 08:48:50'
+- pageId: good-judgment
+  footnote: 22
+  claimText: Superforecasters have continued to beat the market when it comes to anticipating Federal Reserve decisions, as they had also in 2023 and 2024. In 2025...
+  sourceTitle: See the future sooner with Superforecasting | Good Judgment
+  url: https://goodjudgment.com
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    unsupported: Good Judgment won an Honorable Mention in the IF Awards from the Association of Professional Futurists for its work with UK partner ForgeFront on the Future.Ctrl methodology.
+    unsupported: The organization also launched Advanced Judgment & Modeling as a next-level training program for graduates of its two-day workshops and began experimenting with hybrid AI-superforecasting integration.
+  difficulty: medium
+  checkedAt: '2026-02-20 08:48:59'
+- pageId: good-judgment
+  footnote: 36
+  claimText: During the ACE tournament, teams of 12 superforecasters consistently outperformed larger groups of regular forecasters, suggesting that high-skill agg...
+  sourceTitle: The first championship season - Good Judgment
+  url: https://goodjudgment.com/resources/the-superforecasters-track-record/the-first-championship-season/
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    unsupported
+    wrong numbers
+  difficulty: easy
+  checkedAt: '2026-02-20 08:49:24'
+- pageId: good-judgment
+  footnote: 58
+  claimText: The organization conducts forecasting training workshops, seminars, and presentations for hundreds of participants across government, nonprofit, and p...
+  sourceTitle: Good Judgment’s 2024 in Review - Good Judgment
+  url: https://goodjudgment.com/good-judgment-2024-in-review/
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    WRONG YEAR: The source mentions training workshops in 2024, not 2025.
+    UNSUPPORTED: The source does not mention the launch of an executive education program in Superforecasting Workshops for decision-makers, with clients including a major technology company, an oil multinational, and multiple investment funds.
+    UNSUPPORTED: The source does not mention the introduction of Advanced Judgment & Modeling as a next-level training program for graduates of its two-day workshop.
+  difficulty: medium
+  checkedAt: '2026-02-20 08:50:01'

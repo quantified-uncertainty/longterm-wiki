@@ -52,6 +52,60 @@ Many experts believe that transformative AI could arrive within decades.[^3] How
     const claim2 = extractClaimSentence(body, 2);
     expect(claim2).toContain('another fact');
   });
+
+  it('extracts only the specific list item, not sibling items', () => {
+    const body = `## Timeline
+
+- **2016**: Open Philanthropy estimated 10% probability of transformative AI within 20 years[^1]
+- **2020**: Metaculus community median moved from 2040 to 2030[^2]
+- **2023**: Average forecast shifted to 25% by 2030[^3]
+
+[^1]: [OP Report](https://example.com/op)
+[^2]: [Metaculus](https://example.com/meta)
+[^3]: [Survey](https://example.com/survey)`;
+
+    const claim1 = extractClaimSentence(body, 1);
+    // Should only contain the 2016 item
+    expect(claim1).toContain('Open Philanthropy estimated 10%');
+    // Should NOT contain sibling list items
+    expect(claim1).not.toContain('Metaculus');
+    expect(claim1).not.toContain('2023');
+
+    const claim2 = extractClaimSentence(body, 2);
+    expect(claim2).toContain('Metaculus community median');
+    expect(claim2).not.toContain('Open Philanthropy');
+    expect(claim2).not.toContain('2023');
+  });
+
+  it('handles list items with continuation lines', () => {
+    const body = `## Mentors
+
+- **Alice**: Researcher at Lab A, focuses on
+  alignment and interpretability[^1]
+- **Bob**: Researcher at Lab B[^2]
+
+[^1]: [Source](https://example.com/1)
+[^2]: [Source](https://example.com/2)`;
+
+    const claim1 = extractClaimSentence(body, 1);
+    expect(claim1).toContain('Alice');
+    expect(claim1).toContain('alignment and interpretability');
+    expect(claim1).not.toContain('Bob');
+  });
+
+  it('handles numbered list items', () => {
+    const body = `## Steps
+
+1. First step with a claim[^1]
+2. Second step with another[^2]
+
+[^1]: [Source](https://example.com/1)
+[^2]: [Source](https://example.com/2)`;
+
+    const claim1 = extractClaimSentence(body, 1);
+    expect(claim1).toContain('First step');
+    expect(claim1).not.toContain('Second step');
+  });
 });
 
 describe('extractCitationsFromContent', () => {

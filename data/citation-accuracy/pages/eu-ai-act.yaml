@@ -1,0 +1,57 @@
+- pageId: eu-ai-act
+  footnote: 86
+  claimText: (footnote definition only, no inline reference found)
+  sourceTitle: EDPB and EDPS Issue Joint Opinion on EU AI Act Implementation
+  url: https://www.hunton.com/privacy-and-information-security-law/edpb-and-edps-issue-joint-opinion-on-eu-ai-act-implementation
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention that the Act intersects with multiple existing EU regulations, creating potential overlap and confusion.
+  difficulty: easy
+  checkedAt: '2026-02-20 08:08:25'
+- pageId: eu-ai-act
+  footnote: 96
+  claimText: The legislators understand that AI tools and systems can be strong drivers of innovation in business, and do not want companies, especially SMEs, to b...
+  sourceTitle: European approach to artificial intelligence | Shaping Europe’s digital future
+  url: https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence
+  verdict: unsupported
+  score: 0
+  issues: null
+  difficulty: hard
+  checkedAt: '2026-02-20 08:22:53'
+- pageId: eu-ai-act
+  footnote: 50
+  claimText: (footnote definition only, no inline reference found)
+  sourceTitle: 'The EU AI Act Newsletter #86: Concerns Around GPT-5 Compliance'
+  url: https://artificialintelligenceact.substack.com/p/the-eu-ai-act-newsletter-86-concerns
+  verdict: inaccurate
+  score: 0.5
+  issues: |-
+    WRONG DATE: GPAI obligations take effect August 2, 2026, not 2025
+    WRONG DATE: Existing GPAI models must achieve full compliance by 2027, which is accurate, but the models must be placed on the market before August 2025, not August 2026
+    UNSUPPORTED: The source does not mention May 2, 2025 as the date when Commission codes of practice are ready for voluntary compliance.
+  difficulty: easy
+  checkedAt: '2026-02-20 08:16:42'
+- pageId: eu-ai-act
+  footnote: 59
+  claimText: The **AI Office**, established within the European Commission's Directorate-General for Communication Networks, Content and Technology (DG CNECT), ser...
+  sourceTitle: Historic Timeline | EU Artificial Intelligence Act
+  url: https://artificialintelligenceact.eu/developments/
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    unsupported: The source does not state that the AI Office serves as the primary enforcement body for GPAI models.
+    unsupported: The source does not state that the AI Office became operational for enforcement purposes on August 2, 2025.
+  difficulty: medium
+  checkedAt: '2026-02-20 08:22:03'
+- pageId: eu-ai-act
+  footnote: 8
+  claimText: Originally proposed by the European Commission in April 2021, the Act underwent intense negotiations before political agreement was reached on Decembe...
+  sourceTitle: 'EU AI Act Timeline: Key Compliance Dates & Deadlines Explained'
+  url: https://www.dataguard.com/eu-ai-act/timeline
+  verdict: inaccurate
+  score: 0.75
+  issues: |-
+    unsupported: The claim that the Act was originally proposed in April 2021 and underwent intense negotiations before political agreement was reached on December 9, 2023 is not mentioned in the source.
+    minor_issues: The claim states that prohibitions on unacceptable-risk systems took effect February 2, 2025, but the source only mentions that as of February 2025, the EU AI Act has banned AI systems that could threaten people’s safety.
+  difficulty: medium
+  checkedAt: '2026-02-20 08:20:45'

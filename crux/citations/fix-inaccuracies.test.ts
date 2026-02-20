@@ -5,6 +5,10 @@ import {
   groupFlaggedBySection,
   findAllFootnotesInSection,
   applySectionRewrites,
+  cleanupOrphanedFootnotes,
+  applySourceReplacements,
+  buildSearchQuery,
+  generateSearchQuery,
   parseLLMFixResponse,
   applyFixes,
   enrichFromSqlite,
@@ -453,5 +457,268 @@ describe('applySectionRewrites', () => {
     expect(result.applied).toBe(0);
     expect(result.skipped).toBe(1);
     expect(result.content).toBe(content);
+  });
+});
+
+describe('cleanupOrphanedFootnotes', () => {
+  it('removes footnote definitions with no inline references', () => {
+    const content = [
+      '## Section',
+      '',
+      'Some text with a reference[^1].',
+      '',
+      '[^1]: [Source One](https://example.com/1)',
+      '[^2]: [Source Two](https://example.com/2)',
+    ].join('\n');
+
+    const result = cleanupOrphanedFootnotes(content);
+    expect(result.removed).toEqual([2]);
+    expect(result.content).toContain('[^1]: [Source One]');
+    expect(result.content).not.toContain('[^2]');
+  });
+
+  it('keeps all definitions when all have inline references', () => {
+    const content = [
+      '## Section',
+      '',
+      'A claim[^1] and another[^2].',
+      '',
+      '[^1]: https://example.com/1',
+      '[^2]: https://example.com/2',
+    ].join('\n');
+
+    const result = cleanupOrphanedFootnotes(content);
+    expect(result.removed).toEqual([]);
+    expect(result.content).toBe(content);
+  });
+
+  it('removes multiple orphaned definitions', () => {
+    const content = [
+      '## Section',
+      '',
+      'Only one reference[^3].',
+      '',
+      '[^1]: https://example.com/1',
+      '[^2]: https://example.com/2',
+      '[^3]: https://example.com/3',
+    ].join('\n');
+
+    const result = cleanupOrphanedFootnotes(content);
+    expect(result.removed).toEqual([1, 2]);
+    expect(result.content).toContain('[^3]: https://');
+    expect(result.content).not.toContain('[^1]:');
+    expect(result.content).not.toContain('[^2]:');
+  });
+
+  it('handles content with no footnotes at all', () => {
+    const content = '## Section\n\nJust plain text.';
+    const result = cleanupOrphanedFootnotes(content);
+    expect(result.removed).toEqual([]);
+    expect(result.content).toBe(content);
+  });
+
+  it('does not count definition-line refs as inline refs', () => {
+    // [^5] only appears in the definition line, not in body text
+    const content = [
+      '## Section',
+      '',
+      'No inline ref here.',
+      '',
+      '[^5]: [Title](https://example.com)',
+    ].join('\n');
+
+    const result = cleanupOrphanedFootnotes(content);
+    expect(result.removed).toEqual([5]);
+  });
+
+  it('cleans up double-blank lines after removal', () => {
+    const content = [
+      '## Section',
+      '',
+      'Text here.',
+      '',
+      '[^1]: https://example.com',
+      '',
+      '## Next',
+    ].join('\n');
+
+    const result = cleanupOrphanedFootnotes(content);
+    expect(result.removed).toEqual([1]);
+    // Should not have triple+ blank lines
+    expect(result.content).not.toMatch(/\n\n\n/);
+  });
+});
+
+describe('applySourceReplacements', () => {
+  it('replaces URL in titled link definition', () => {
+    const content = [
+      '## Section',
+      '',
+      'A claim[^1].',
+      '',
+      '[^1]: [Old Title](https://old.example.com/page)',
+    ].join('\n');
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 1,
+        oldUrl: 'https://old.example.com/page',
+        newUrl: 'https://new.example.com/better',
+        newTitle: 'Better Source',
+        confidence: 'medium',
+        reason: 'Found better match',
+      },
+    ]);
+
+    expect(result.applied).toBe(1);
+    expect(result.content).toContain('[^1]: [Better Source](https://new.example.com/better)');
+    expect(result.content).not.toContain('old.example.com');
+  });
+
+  it('replaces bare URL definition', () => {
+    const content = [
+      'A claim[^2].',
+      '',
+      '[^2]: https://bare.example.com/old',
+    ].join('\n');
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 2,
+        oldUrl: 'https://bare.example.com/old',
+        newUrl: 'https://new.example.com/better',
+        newTitle: 'New Source',
+        confidence: 'medium',
+        reason: 'test',
+      },
+    ]);
+
+    expect(result.applied).toBe(1);
+    expect(result.content).toContain('[^2]: [New Source](https://new.example.com/better)');
+  });
+
+  it('skips when footnote definition not found', () => {
+    const content = 'A claim[^1].\n\n[^1]: [Title](https://example.com)';
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 99,
+        oldUrl: 'https://nonexistent.com',
+        newUrl: 'https://new.com',
+        newTitle: 'New',
+        confidence: 'low',
+        reason: 'test',
+      },
+    ]);
+
+    expect(result.applied).toBe(0);
+    expect(result.skipped).toBe(1);
+  });
+
+  it('handles URLs with special regex characters', () => {
+    const content = '[^1]: [Title](https://example.com/path?q=test&page=1)';
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 1,
+        oldUrl: 'https://example.com/path?q=test&page=1',
+        newUrl: 'https://better.com/page',
+        newTitle: 'Better',
+        confidence: 'medium',
+        reason: 'test',
+      },
+    ]);
+
+    expect(result.applied).toBe(1);
+    expect(result.content).toContain('[Better](https://better.com/page)');
+  });
+
+  it('replaces URL in academic embedded-link definition', () => {
+    const content = [
+      'A claim[^1].',
+      '',
+      '[^1]: Karnofsky, H., "[Some Background](https://old.example.com/article)," Open Phil, 2016.',
+    ].join('\n');
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 1,
+        oldUrl: 'https://old.example.com/article',
+        newUrl: 'https://new.example.com/better',
+        newTitle: 'Better Source',
+        confidence: 'medium',
+        reason: 'test',
+      },
+    ]);
+
+    expect(result.applied).toBe(1);
+    expect(result.content).toContain('[^1]: [Better Source](https://new.example.com/better)');
+    expect(result.content).not.toContain('old.example.com');
+  });
+
+  it('replaces URL in text-then-bare-URL definition', () => {
+    const content = [
+      'A claim[^1].',
+      '',
+      '[^1]: TransformerLens GitHub repository: https://old.example.com/repo',
+    ].join('\n');
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 1,
+        oldUrl: 'https://old.example.com/repo',
+        newUrl: 'https://new.example.com/better',
+        newTitle: 'Better Repo',
+        confidence: 'medium',
+        reason: 'test',
+      },
+    ]);
+
+    expect(result.applied).toBe(1);
+    expect(result.content).toContain('[^1]: [Better Repo](https://new.example.com/better)');
+    expect(result.content).not.toContain('old.example.com');
+  });
+});
+
+describe('buildSearchQuery', () => {
+  it('extracts first sentence when available', () => {
+    const claim = 'The organization was founded in 2015. It grew rapidly over the next decade.';
+    const query = buildSearchQuery(claim);
+    expect(query).toBe('The organization was founded in 2015.');
+    expect(query).not.toContain('grew rapidly');
+  });
+
+  it('strips MDX components and footnote markers', () => {
+    const claim = '<EntityLink id="openai">OpenAI</EntityLink> was founded[^1] in 2015.';
+    const query = buildSearchQuery(claim);
+    expect(query).toContain('OpenAI');
+    expect(query).not.toContain('<EntityLink');
+    expect(query).not.toContain('[^1]');
+  });
+
+  it('truncates long text without sentence breaks to max 200 chars', () => {
+    const claim = 'A ' + 'very long claim with many words and details about different topics that goes on '.repeat(5);
+    const query = buildSearchQuery(claim);
+    expect(query.length).toBeLessThanOrEqual(200);
+    expect(query.length).toBeGreaterThan(100);
+    // Should be trimmed (no trailing whitespace)
+    expect(query).toBe(query.trim());
+  });
+
+  it('returns short claims as-is', () => {
+    const claim = 'AI safety is important';
+    expect(buildSearchQuery(claim)).toBe('AI safety is important');
+  });
+});
+
+describe('generateSearchQuery', () => {
+  it('falls back to buildSearchQuery when no Anthropic client available', async () => {
+    // Without ANTHROPIC_API_KEY, generateSearchQuery should gracefully
+    // fall back to the static buildSearchQuery function
+    const claim = 'The organization was founded in 2015. It grew rapidly.';
+    const query = await generateSearchQuery(claim);
+    // Should return a non-empty string (either from LLM or fallback)
+    expect(query.length).toBeGreaterThan(5);
+    expect(typeof query).toBe('string');
   });
 });
