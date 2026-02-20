@@ -1,24 +1,42 @@
-exportedAt: '2026-02-20T08:22:56.628Z'
+exportedAt: '2026-02-20T08:33:57.275Z'
 summary:
-  totalCitations: 171
-  checkedCitations: 147
-  accurateCitations: 104
-  inaccurateCitations: 5
-  unsupportedCitations: 4
-  minorIssueCitations: 33
-  uncheckedCitations: 24
-  averageScore: 0.93
+  totalCitations: 229
+  checkedCitations: 200
+  accurateCitations: 142
+  inaccurateCitations: 8
+  unsupportedCitations: 8
+  minorIssueCitations: 41
+  uncheckedCitations: 29
+  averageScore: 0.91
 verdictDistribution:
-  minor_issues: 33
-  accurate: 104
-  inaccurate: 5
-  unsupported: 4
+  accurate: 142
+  inaccurate: 8
+  minor_issues: 41
+  unsupported: 8
   not_verifiable: 1
 difficultyDistribution:
-  medium: 33
-  easy: 111
-  hard: 1
+  easy: 152
+  medium: 43
+  hard: 3
 pages:
+  - pageId: biosecurity-overview
+    totalCitations: 5
+    checked: 4
+    accurate: 3
+    inaccurate: 1
+    unsupported: 0
+    minorIssues: 0
+    accuracyRate: 0.75
+    avgScore: 0.93
+  - pageId: frontier-model-forum
+    totalCitations: 53
+    checked: 49
+    accurate: 35
+    inaccurate: 2
+    unsupported: 4
+    minorIssues: 8
+    accuracyRate: 0.8775510204081632
+    avgScore: 0.88
   - pageId: mats
     totalCitations: 72
     checked: 57
@@ -47,6 +65,13 @@ pages:
     accuracyRate: 1
     avgScore: 0.9
 domainAnalysis:
+  - domain: wandb.ai
+    totalCitations: 2
+    checked: 2
+    accurate: 0
+    inaccurate: 0
+    unsupported: 2
+    inaccuracyRate: 1
   - domain: hunton.com
     totalCitations: 2
     checked: 2
@@ -68,13 +93,20 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.3333333333333333
+  - domain: frontiermodelforum.org
+    totalCitations: 30
+    checked: 30
+    accurate: 27
+    inaccurate: 1
+    unsupported: 2
+    inaccuracyRate: 0.1
   - domain: forum.effectivealtruism.org
-    totalCitations: 7
-    checked: 6
-    accurate: 5
+    totalCitations: 11
+    checked: 10
+    accurate: 9
     inaccurate: 0
     unsupported: 1
-    inaccuracyRate: 0.16666666666666666
+    inaccuracyRate: 0.1
   - domain: digital-strategy.ec.europa.eu
     totalCitations: 11
     checked: 11
@@ -82,6 +114,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 1
     inaccuracyRate: 0.09090909090909091
+  - domain: lesswrong.com
+    totalCitations: 26
+    checked: 23
+    accurate: 21
+    inaccurate: 2
+    unsupported: 0
+    inaccuracyRate: 0.08695652173913043
   - domain: artificialintelligenceact.eu
     totalCitations: 14
     checked: 14
@@ -89,13 +128,6 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.07142857142857142
-  - domain: lesswrong.com
-    totalCitations: 20
-    checked: 18
-    accurate: 17
-    inaccurate: 1
-    unsupported: 0
-    inaccuracyRate: 0.05555555555555555
   - domain: matsprogram.org
     totalCitations: 30
     checked: 28
@@ -145,6 +177,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: metr.org
+    totalCitations: 4
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: idealist.org
     totalCitations: 4
     checked: 3
@@ -180,6 +219,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: alignmentforum.org
+    totalCitations: 3
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
   - domain: modelop.com
     totalCitations: 2
     checked: 2
@@ -222,14 +268,14 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
-  - domain: manifund.org
+  - domain: infosecurity-magazine.com
     totalCitations: 2
-    checked: 0
-    accurate: 0
+    checked: 2
+    accurate: 2
     inaccurate: 0
     unsupported: 0
-    inaccuracyRate: null
-  - domain: alignmentforum.org
+    inaccuracyRate: 0
+  - domain: manifund.org
     totalCitations: 2
     checked: 0
     accurate: 0
