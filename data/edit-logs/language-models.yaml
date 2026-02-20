@@ -20,3 +20,7 @@
   agency: ai-directed
   requestedBy: runner
   note: "Improved (standard): Review and incorporate recent developments: Learning to Stay Safe: Adaptive Regularization Against S"
+- date: 2026-02-20
+  tool: crux-fix
+  agency: automated
+  note: "Reordered frontmatter fields to canonical order (issue #398)"

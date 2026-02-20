@@ -1,9 +1,11 @@
 ---
 title: RLHF / Constitutional AI
 description: RLHF and Constitutional AI are the dominant techniques for aligning language models with human preferences. InstructGPT (1.3B) is preferred over GPT-3 (175B) 85% of the time, and Constitutional AI reduces adversarial attack success by 40.8%. However, fundamental limitations—reward hacking, sycophancy, and the scalable oversight problem—prevent these techniques from reliably scaling to superhuman systems.
+entityType: approach
+subcategory: alignment-training
+quality: 63
 readerImportance: 22.5
 researchImportance: 28
-quality: 63
 lastEdited: "2026-01-29"
 update_frequency: 45
 llmSummary: "RLHF/Constitutional AI achieves 82-85% preference improvements and 40.8% adversarial attack reduction for current systems, but faces fundamental scalability limits: weak-to-strong supervision shows 10-20% performance gaps, sycophancy worsens with scale, and the approach cannot detect deceptive alignment. DPO variants reduce compute costs by 40-60% while matching performance, enabling widespread deployment across all frontier models (ChatGPT's 200M+ users)."
@@ -14,8 +16,6 @@ ratings:
   completeness: 7.5
 clusters:
   - ai-safety
-subcategory: alignment-training
-entityType: approach
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

@@ -2,21 +2,21 @@
 numericId: E721
 title: "AI Transition Model Style Guide"
 description: "Style guide for AI Transition Model factor, scenario, and parameter pages"
-entityType: internal
 sidebar:
   order: 12
+entityType: internal
+quality: 32
 readerImportance: 39
 researchImportance: 61.5
-quality: 32
+lastEdited: "2026-02-17"
+update_frequency: 90
+evergreen: true
 llmSummary: "Internal style guide documenting YAML-first architecture for AI Transition Model pages, specifying that ratings and metadata live in YAML while MDX contains only custom prose. Provides validation workflows and anti-patterns for maintaining consistency across factor, parameter, and scenario entities."
 ratings:
   novelty: 0.5
   rigor: 4
   actionability: 5
   completeness: 6
-lastEdited: "2026-02-17"
-evergreen: true
-update_frequency: 90
 ---
 # AI Transition Model Style Guide
 

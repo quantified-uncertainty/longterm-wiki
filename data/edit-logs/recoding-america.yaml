@@ -2,3 +2,7 @@
   tool: crux-grade
   agency: automated
   note: "Initial creation grading: quality=60, importance=62"
+- date: 2026-02-20
+  tool: crux-fix
+  agency: automated
+  note: "Reordered frontmatter fields to canonical order (issue #398)"

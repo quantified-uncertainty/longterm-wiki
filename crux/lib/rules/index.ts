@@ -83,6 +83,9 @@ import { balanceFlagsRule } from './balance-flags.ts';
 // Table header consistency (issue #379)
 import { tableHeadersRule } from './table-headers.ts';
 
+// Frontmatter field order (issue #398)
+import { frontmatterOrderRule } from './frontmatter-order.ts';
+
 // Security / safety checks
 import { urlSafetyRule } from './url-safety.ts';
 import { noExecSyncRule } from './no-exec-sync.ts';
@@ -133,6 +136,7 @@ export {
   citationDensityRule,
   balanceFlagsRule,
   tableHeadersRule,
+  frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
 };
@@ -182,6 +186,7 @@ export const allRules: Rule[] = [
   citationDensityRule,
   balanceFlagsRule,
   tableHeadersRule,
+  frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
 ];

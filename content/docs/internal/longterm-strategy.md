@@ -2,20 +2,20 @@
 numericId: E732
 title: "LongtermWiki Strategy Brainstorm"
 description: "Strategic planning and brainstorming for LongtermWiki development"
-pageType: "documentation"
 entityType: internal
+pageType: "documentation"
+quality: 4
 readerImportance: 47.5
 researchImportance: 15.5
-quality: 4
+lastEdited: "2026-02-17"
+update_frequency: 90
+evergreen: true
 llmSummary: "Internal strategic planning document for LongtermWiki project development, exploring five failure modes (becoming just another wiki, generating non-insights, building unwanted features, maintenance hell, being too unusual) and five strategic options (narrow/deep focus, broad/shallow wiki, opinionated synthesis, crux laboratory, living assessment). Proposes four 2-week validation tests (user interviews, crux prototype, page quality test, insight generation) before committing resources."
 ratings:
   novelty: 0
   rigor: 0
   actionability: 0
   completeness: 0
-lastEdited: "2026-02-17"
-evergreen: true
-update_frequency: 90
 ---
 # LongtermWiki Strategy Brainstorm
 

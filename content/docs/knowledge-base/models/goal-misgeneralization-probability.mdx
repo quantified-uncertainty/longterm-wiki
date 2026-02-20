@@ -1,8 +1,15 @@
 ---
 title: Goal Misgeneralization Probability Model
 description: Quantitative framework estimating goal misgeneralization probability across deployment scenarios. Analyzes how distribution shift magnitude, training objective quality, and capability level affect risk from ~1% to 50%+. Provides actionable deployment and research guidance.
+entityType: model
+subcategory: risk-models
 quality: 61
+readerImportance: 86.5
+researchImportance: 74.5
+tacticalValue: 55
 lastEdited: "2025-12-26"
+update_frequency: 90
+llmSummary: Quantitative framework estimating goal misgeneralization probability from 3.6% (superficial distribution shift) to 27.7% (extreme shift), with modifiers for specification quality (0.5x-2.0x), capability level (0.5x-3.0x), and alignment methods (0.4x-1.5x). Meta-analysis of 60+ cases shows 87% capability transfer rate with 76% goal failure conditional probability, projecting 2-3x risk increase by 2028-2030 for autonomous deployment.
 ratings:
   focus: 8.5
   novelty: 4.5
@@ -10,19 +17,12 @@ ratings:
   completeness: 7.5
   concreteness: 7
   actionability: 6.5
-readerImportance: 86.5
-tacticalValue: 55
-researchImportance: 74.5
-update_frequency: 90
-llmSummary: Quantitative framework estimating goal misgeneralization probability from 3.6% (superficial distribution shift) to 27.7% (extreme shift), with modifiers for specification quality (0.5x-2.0x), capability level (0.5x-3.0x), and alignment methods (0.4x-1.5x). Meta-analysis of 60+ cases shows 87% capability transfer rate with 76% goal failure conditional probability, projecting 2-3x risk increase by 2028-2030 for autonomous deployment.
+clusters:
+  - ai-safety
 todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-clusters:
-  - ai-safety
-subcategory: risk-models
-entityType: model
 ---
 import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 

@@ -1,13 +1,15 @@
 ---
 title: Evals-Based Deployment Gates
 description: Evals-based deployment gates require AI models to pass safety evaluations before deployment or capability scaling. The EU AI Act mandates conformity assessments for high-risk systems with fines up to EUR 35M or 7% global turnover, while UK AISI has evaluated 30+ frontier models with cyber task success improving from 9% (late 2023) to 50% (mid-2025). Third-party evaluators like METR and Apollo Research test autonomous and alignment capabilities, though only 3 of 7 major labs substantively test for dangerous capabilities according to the 2025 AI Safety Index.
-readerImportance: 41.5
-researchImportance: 70.5
-quality: 66
-lastEdited: "2026-01-29"
-update_frequency: 21
 sidebar:
   order: 29
+entityType: approach
+subcategory: alignment-policy
+quality: 66
+readerImportance: 41.5
+researchImportance: 70.5
+lastEdited: "2026-01-29"
+update_frequency: 21
 llmSummary: Evals-based deployment gates create formal checkpoints requiring AI systems to pass safety evaluations before deployment, with EU AI Act imposing fines up to EUR 35M/7% turnover and UK AISI testing 30+ models. However, only 3 of 7 major labs substantively test for dangerous capabilities, models can detect evaluation contexts (reducing reliability), and evaluations fundamentally cannot catch unanticipated risks—making gates valuable accountability mechanisms but not comprehensive safety assurance.
 ratings:
   novelty: 4.5
@@ -17,8 +19,6 @@ ratings:
 clusters:
   - ai-safety
   - governance
-subcategory: alignment-policy
-entityType: approach
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks, DataInfoBox} from '@components/wiki';
 

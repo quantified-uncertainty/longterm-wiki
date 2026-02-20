@@ -4,12 +4,13 @@ title: "Project Roadmap"
 description: "Future work, infrastructure improvements, and project tracking"
 sidebar:
   order: 10
-lastEdited: "2026-01-02"
-evergreen: true
-update_frequency: 30
+entityType: internal
+quality: 29
 readerImportance: 14
 researchImportance: 8.5
-quality: 29
+lastEdited: "2026-01-02"
+update_frequency: 30
+evergreen: true
 llmSummary: "Internal project roadmap tracking wiki infrastructure status (14 validators, quality grading, dashboard all complete as of Jan 2026) and future priorities including batch content improvement for high-importance/low-quality pages and increased citation coverage. Emphasizes pragmatic approach: avoid over-engineering, adapt style guidelines to content."
 ratings:
   novelty: 0
@@ -19,7 +20,6 @@ ratings:
   actionability_reasoning: "Provides specific tasks (batch content improvement with command-line examples, citation coverage goals) but only relevant to maintainers"
   completeness: 6
   completeness_reasoning: "Comprehensive view of infrastructure state and future work, well-organized with clear status indicators"
-entityType: internal
 ---
 This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the [Enhancement Queue](/wiki/E761).
 

@@ -3,8 +3,14 @@ title: Autonomous Weapons Escalation Model
 description: This model analyzes how autonomous weapons create escalation risks through speed mismatches between human decision-making (5-30 minutes) and machine action cycles (0.2-0.7 seconds). It estimates 1-5% annual probability of catastrophic escalation once systems are deployed, with 10-40% cumulative risk over a decade during competitive deployment scenarios.
 sidebar:
   order: 23
+entityType: model
+subcategory: domain-models
 quality: 62
+readerImportance: 44.5
+researchImportance: 69
 lastEdited: "2025-12-27"
+update_frequency: 90
+llmSummary: Analyzes autonomous weapons escalation risk through 10,000x speed differential between human decision-making (5-30 minutes) and machine cycles (0.2-0.7 seconds), estimating 1-5% annual catastrophic escalation probability during competitive deployment scenarios, with 10-40% cumulative decade risk. Provides quantitative model showing 6.3-45.4% per-incident escalation risk depending on doctrine, and recommends $2B annual safety investment (vs current $200M) with circuit breakers as highest-value near-term intervention.
 ratings:
   focus: 8.5
   novelty: 5
@@ -12,20 +18,14 @@ ratings:
   completeness: 7.5
   concreteness: 7
   actionability: 6
-readerImportance: 44.5
-researchImportance: 69
-update_frequency: 90
-llmSummary: Analyzes autonomous weapons escalation risk through 10,000x speed differential between human decision-making (5-30 minutes) and machine cycles (0.2-0.7 seconds), estimating 1-5% annual catastrophic escalation probability during competitive deployment scenarios, with 10-40% cumulative decade risk. Provides quantitative model showing 6.3-45.4% per-incident escalation risk depending on doctrine, and recommends $2B annual safety investment (vs current $200M) with circuit breakers as highest-value near-term intervention.
+clusters:
+  - ai-safety
+  - governance
 todos:
   - Complete 'Conceptual Framework' section
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-clusters:
-  - ai-safety
-  - governance
-subcategory: domain-models
-entityType: model
 ---
 import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 

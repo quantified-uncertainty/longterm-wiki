@@ -1,9 +1,14 @@
 ---
 title: Technical Pathway Decomposition
 description: This model maps technical pathways from capability advances to catastrophic risk outcomes. It finds that accident risks (deceptive alignment, goal misgeneralization, instrumental convergence) account for 45% of total technical risk, with safety techniques currently degrading relative to capabilities at frontier scale.
-tableOfContents: false
+entityType: model
+subcategory: analysis-models
 quality: 62
+readerImportance: 53.5
+researchImportance: 85.5
 lastEdited: "2025-12-28"
+update_frequency: 90
+llmSummary: Decomposes AI risk into three pathways (accident 45%, misuse 30%, structural 25% of total 25% x-risk) by mapping 60+ technical variables through causal chains. Finds safety techniques degrading relative to capabilities at frontier scale, with interpretability coverage declining from 25% to 15% and RLHF effectiveness from 55% to 40% at GPT-5 level.
 ratings:
   focus: 8.5
   novelty: 4.2
@@ -11,17 +16,12 @@ ratings:
   completeness: 7.5
   concreteness: 6.8
   actionability: 6.5
-readerImportance: 53.5
-researchImportance: 85.5
-update_frequency: 90
-llmSummary: Decomposes AI risk into three pathways (accident 45%, misuse 30%, structural 25% of total 25% x-risk) by mapping 60+ technical variables through causal chains. Finds safety techniques degrading relative to capabilities at frontier scale, with interpretability coverage declining from 25% to 15% and RLHF effectiveness from 55% to 40% at GPT-5 level.
-todos:
-  - Complete 'Quantitative Analysis' section (8 placeholders)
 clusters:
   - ai-safety
   - governance
-subcategory: analysis-models
-entityType: model
+todos:
+  - Complete 'Quantitative Analysis' section (8 placeholders)
+tableOfContents: false
 ---
 import CauseEffectGraph from '@components/CauseEffectGraph';
 import {Mermaid, R, EntityLink} from '@components/wiki';

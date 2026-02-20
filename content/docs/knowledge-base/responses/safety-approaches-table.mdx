@@ -2,12 +2,14 @@
 numericId: E657
 title: "Safety Approaches Table"
 description: "Interactive comparison table of AI safety approaches, evaluating safety uplift vs capability uplift tradeoffs."
+entityType: approach
+subcategory: alignment
 contentFormat: table
+quality: 20
 readerImportance: 19
 researchImportance: 27.5
-update_frequency: 30
 lastEdited: "2026-02-10"
-quality: 20
+update_frequency: 30
 llmSummary: "An interactive sortable table comparing 42 AI safety approaches on dimensions including safety uplift, capability uplift, net world safety, scalability to superintelligence, and differential progress. Includes grouped and unified views."
 ratings:
   novelty: 3
@@ -15,8 +17,6 @@ ratings:
   actionability: 4
   completeness: 3
 clusters: ["ai-safety"]
-entityType: approach
-subcategory: alignment
 ---
 import SafetyApproachesTableView from '@components/tables/views/SafetyApproachesTableView';
 

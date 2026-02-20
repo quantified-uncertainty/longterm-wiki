@@ -1,13 +1,15 @@
 ---
 title: Circuit Breakers / Inference Interventions
 description: Circuit breakers are runtime safety interventions that detect and halt harmful AI outputs during inference. Gray Swan's representation rerouting achieves 87-90% rejection rates with only 1% capability loss, while Anthropic's Constitutional Classifiers block 95.6% of jailbreaks. However, the UK AISI challenge found all 22 tested models could eventually be broken, highlighting the need for defense-in-depth approaches.
-readerImportance: 42.5
-researchImportance: 38
-quality: 64
-lastEdited: "2026-01-28"
-update_frequency: 21
 sidebar:
   order: 25
+entityType: approach
+subcategory: alignment-interpretability
+quality: 64
+readerImportance: 42.5
+researchImportance: 38
+lastEdited: "2026-01-28"
+update_frequency: 21
 llmSummary: Circuit breakers are runtime safety interventions that detect and halt harmful AI outputs during inference. Gray Swan's representation rerouting achieves 87-90% rejection rates with 1% capability loss, while Anthropic's Constitutional Classifiers block 95.6% of jailbreaks with 0.38% over-refusal increase. However, the UK AISI challenge found all 22 tested models eventually broken (62K/1.8M attempts succeeded), and novel token-forcing attacks achieve 25% success rates, highlighting fundamental limitations of reactive defenses.
 ratings:
   novelty: 4.5
@@ -16,8 +18,6 @@ ratings:
   completeness: 7.5
 clusters:
   - ai-safety
-subcategory: alignment-interpretability
-entityType: approach
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

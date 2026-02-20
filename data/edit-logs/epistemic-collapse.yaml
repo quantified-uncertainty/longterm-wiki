@@ -6,3 +6,7 @@
   tool: crux-audit
   agency: automated
   note: Fixed 3 flagged citation inaccuracies via audit
+- date: 2026-02-20
+  tool: crux-fix
+  agency: automated
+  note: "Reordered frontmatter fields to canonical order (issue #398)"

@@ -1,17 +1,16 @@
 ---
 title: Scalable Eval Approaches
 description: "Practical approaches for scaling AI evaluation to keep pace with capability growth, including LLM-as-judge (40% production adoption but theoretically capped at 2x sample efficiency per ICLR 2025), automated behavioral evals (Anthropic Bloom, Spearman 0.86), AI-assisted red teaming (Petri 2.0 with 47.3% eval-awareness reduction), CoT monitoring (near-perfect recall but vulnerable to obfuscated reward hacking), METR Time Horizon (Opus 4.5 at 4h49m, doubling every ~131 days), sandbagging detection (UK AISI auditing games: black-box methods 'very little success'), and debate-based evaluation (ICML 2024 Best Paper: 76-88% accuracy). Third-party audit ecosystem remains severely capacity-constrained."
-contentType: analysis
+sidebar:
+  order: 21
+entityType: approach
+subcategory: alignment-evaluation
+quality: 65
 readerImportance: 40
 researchImportance: 31.5
 lastEdited: "2026-02-07"
 update_frequency: 21
 llmSummary: "Survey of practical approaches for scaling AI evaluation. LLM-as-judge has reached ~40% production adoption with 80%+ human agreement, but Dorner et al. (ICLR 2025 oral) proved a theoretical ceiling: at best 2x sample efficiency at the frontier (tau_max <= 2), meaning judges cannot meaningfully replace human evaluation of models stronger than themselves. Anthropic's Bloom framework (Dec 2025) generates automated behavioral evals achieving 0.86 Spearman correlation across 16 models. METR's Time Horizon 1.1 (Jan 2026) shows Opus 4.5 at 4h49m (highest), GPT-5 at 3h34m, with capability doubling every ~131 days across 14 models. Chain-of-thought monitoring (OpenAI, Dec 2025) achieves near-perfect recall for detecting reward hacking but is fragile—penalizing 'bad thoughts' produces obfuscated reward hacking. UK AISI sandbagging auditing games found black-box detection methods had 'very little success'; white-box methods were more promising but 'fragile.' Debate-based evaluation (ICML 2024 Best Paper) achieves 76-88% accuracy, moving from theoretical to practical. Petri 2.0 (Jan 2026) achieves 47.3% reduction in eval awareness via realism classifier. Despite these advances, the third-party audit ecosystem (METR + Apollo Research) remains severely capacity-constrained relative to frontier lab development."
-sidebar:
-  order: 21
-todos:
-  - Add cost comparison matrix once additional lab cost disclosures are available
-quality: 65
 ratings:
   focus: 7
   novelty: 7
@@ -23,8 +22,9 @@ ratings:
 clusters:
   - ai-safety
   - governance
-subcategory: alignment-evaluation
-entityType: approach
+todos:
+  - Add cost comparison matrix once additional lab cost disclosures are available
+contentType: analysis
 ---
 import {EntityLink, R, Mermaid, DataExternalLinks} from '@components/wiki';
 

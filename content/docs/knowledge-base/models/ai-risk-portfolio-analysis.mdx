@@ -3,8 +3,14 @@ title: AI Risk Portfolio Analysis
 description: A quantitative framework for resource allocation across AI risk categories. Analysis estimates misalignment accounts for 40-70% of existential risk, misuse 15-35%, and structural risks 10-25%, with timeline-dependent recommendations. Based on 2024 funding data ($110-130M total external funding), recommends rebalancing toward governance (currently underfunded by ~$15-20M) and interpretability research.
 sidebar:
   order: 50
+entityType: model
+subcategory: analysis-models
 quality: 64
+readerImportance: 47
+researchImportance: 67.5
 lastEdited: "2025-12-28"
+update_frequency: 90
+llmSummary: "Quantitative portfolio framework recommending AI safety resource allocation: 40-70% to misalignment, 15-35% to misuse, 10-25% to structural risks, varying by timeline. Based on 2024 funding analysis ($110-130M total), identifies specific gaps including governance (underfunded by $15-20M), agent safety ($7-12M gap), and international capacity ($11-16M gap)."
 ratings:
   focus: 8.5
   novelty: 4.5
@@ -12,20 +18,14 @@ ratings:
   completeness: 7.5
   concreteness: 8
   actionability: 7.5
-readerImportance: 47
-researchImportance: 67.5
-update_frequency: 90
-llmSummary: "Quantitative portfolio framework recommending AI safety resource allocation: 40-70% to misalignment, 15-35% to misuse, 10-25% to structural risks, varying by timeline. Based on 2024 funding analysis ($110-130M total), identifies specific gaps including governance (underfunded by $15-20M), agent safety ($7-12M gap), and international capacity ($11-16M gap)."
+clusters:
+  - ai-safety
+  - governance
 todos:
   - Complete 'Conceptual Framework' section
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-clusters:
-  - ai-safety
-  - governance
-subcategory: analysis-models
-entityType: model
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 

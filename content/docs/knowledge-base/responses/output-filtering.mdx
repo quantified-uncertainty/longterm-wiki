@@ -1,13 +1,15 @@
 ---
 title: AI Output Filtering
 description: Output filtering screens AI outputs through classifiers before delivery to users. Detection rates range from 70-98% depending on content category, with OpenAI's Moderation API achieving 98% for sexual content but only 70-85% for dangerous information. The UK AI Security Institute found universal jailbreaks in 100% of tested models, though Anthropic's Constitutional Classifiers blocked 95.6% of attacks in 3,000+ hours of red-teaming. Market valued at $1.24B in 2025, growing 20% annually.
-readerImportance: 62.5
-researchImportance: 47.5
-quality: 63
-lastEdited: "2026-01-28"
-update_frequency: 21
 sidebar:
   order: 20
+entityType: approach
+subcategory: alignment-deployment
+quality: 63
+readerImportance: 62.5
+researchImportance: 47.5
+lastEdited: "2026-01-28"
+update_frequency: 21
 llmSummary: Comprehensive analysis of AI output filtering showing detection rates of 70-98% depending on content type, with 100% of models vulnerable to jailbreaks per UK AISI testing, though Anthropic's Constitutional Classifiers blocked 95.6% of attacks. Concludes filtering provides marginal safety benefits for catastrophic risk while imposing capability taxes through 2-15% false positive rates.
 ratings:
   novelty: 4.5
@@ -17,8 +19,6 @@ ratings:
 clusters:
   - ai-safety
   - governance
-subcategory: alignment-deployment
-entityType: approach
 ---
 import {Mermaid, R, EntityLink} from '@components/wiki';
 

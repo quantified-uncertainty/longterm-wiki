@@ -72,6 +72,11 @@ const SCRIPTS = {
     description: 'Remove redundant manual Related Pages / See Also sections',
     passthrough: ['apply', 'verbose', 'file', 'ci', 'dryRun'],
   },
+  'frontmatter-order': {
+    script: 'fix/fix-frontmatter-order.ts',
+    description: 'Reorder frontmatter fields to canonical order (identity first, volatile last)',
+    passthrough: ['apply', 'verbose', 'file', 'ci'],
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'all');
@@ -101,6 +106,7 @@ Examples:
   crux fix escaping                 Fix all escaping issues
   crux fix markdown                 Fix markdown formatting
   crux fix related-pages            Remove redundant Related Pages sections
+  crux fix frontmatter-order        Reorder frontmatter fields to canonical order
   crux fix dollars                  Escape dollar signs only
 `;
 }

@@ -3,9 +3,15 @@ title: Intervention Effectiveness Matrix
 description: "This model maps 15+ AI safety interventions to specific risk categories with quantitative effectiveness estimates derived from empirical research and expert elicitation. Analysis reveals critical resource misallocation: 40% of 2024 funding ($400M+) went to RLHF-based methods showing only 10-20% effectiveness against deceptive alignment, while interpretability research ($52M, demonstrating 40-50% effectiveness) remains severely underfunded relative to gap severity."
 sidebar:
   order: 35
-contentType: analysis
+entityType: model
+subcategory: intervention-models
 quality: 73
+readerImportance: 89.5
+researchImportance: 7
+tacticalValue: 58
 lastEdited: "2026-02-02"
+update_frequency: 90
+llmSummary: "Quantitative analysis mapping 15+ AI safety interventions to specific risks reveals critical misallocation: 40% of 2024 funding ($400M+) flows to RLHF methods showing only 10-20% effectiveness against deceptive alignment, while interpretability research ($52M total, 40-50% effectiveness) and AI Control (70-80% theoretical effectiveness, $10M funding) remain severely underfunded. Provides explicit reallocation recommendations: reduce RLHF from 40% to 25%, increase interpretability from 15% to 30%, and establish AI Control at 20% of technical safety budgets."
 ratings:
   focus: 8.5
   novelty: 6.5
@@ -13,22 +19,16 @@ ratings:
   completeness: 8
   concreteness: 8.5
   actionability: 9
-readerImportance: 89.5
-tacticalValue: 58
-researchImportance: 7
-update_frequency: 90
-llmSummary: "Quantitative analysis mapping 15+ AI safety interventions to specific risks reveals critical misallocation: 40% of 2024 funding ($400M+) flows to RLHF methods showing only 10-20% effectiveness against deceptive alignment, while interpretability research ($52M total, 40-50% effectiveness) and AI Control (70-80% theoretical effectiveness, $10M funding) remain severely underfunded. Provides explicit reallocation recommendations: reduce RLHF from 40% to 25%, increase interpretability from 15% to 30%, and establish AI Control at 20% of technical safety budgets."
+clusters:
+  - ai-safety
+  - governance
+  - community
 todos:
   - Complete 'Conceptual Framework' section
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Strategic Importance' section
   - Complete 'Limitations' section (6 placeholders)
-clusters:
-  - ai-safety
-  - governance
-  - community
-subcategory: intervention-models
-entityType: model
+contentType: analysis
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, R, EntityLink} from '@components/wiki';
 

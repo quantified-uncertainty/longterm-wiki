@@ -2,14 +2,15 @@
 numericId: E675
 title: "Parameter Table"
 description: "Sortable tables showing all parameters in the AI Transition Model with ratings for changeability, uncertainty, and impact."
-contentFormat: table
 sidebar:
   order: 5
+entityType: table
+contentFormat: table
+quality: 24
 readerImportance: 69
 researchImportance: 85.5
-update_frequency: 45
 lastEdited: "2026-01-28"
-quality: 24
+update_frequency: 45
 llmSummary: "An interactive sortable table displaying parameters from the AI Transition Model with ratings for changeability, uncertainty, and impact. Links to similar frameworks from Open Philanthropy and other sources for comparison."
 ratings:
   novelty: 2
@@ -17,7 +18,6 @@ ratings:
   actionability: 4
   completeness: 3
 clusters: ["ai-safety"]
-entityType: table
 ---
 import TransitionModelTable from '@components/TransitionModelTable';
 import { EntityLink } from '@components/wiki';

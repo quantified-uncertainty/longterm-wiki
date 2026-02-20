@@ -1,6 +1,14 @@
 ---
 title: Reward Hacking Taxonomy and Severity Model
 description: This model classifies 12 reward hacking failure modes by mechanism, likelihood (20-90%), and severity. It finds that proxy exploitation affects 80-95% of current systems (low severity), while deceptive hacking and meta-hacking (5-40% likelihood) pose catastrophic risks requiring fundamentally different mitigations.
+entityType: model
+subcategory: risk-models
+quality: 71
+readerImportance: 44.5
+researchImportance: 88
+lastEdited: "2025-12-28"
+update_frequency: 90
+llmSummary: Taxonomizes 12 reward hacking modes with likelihood (20-90%) and severity scores, finding proxy exploitation affects 80-95% of current systems (low severity) while deceptive hacking (5-40% likelihood in advanced systems) and meta-hacking pose catastrophic risks. Analysis shows severe reward hacking probability increases from 5-15% (current) to 30-60% (advanced systems), with no single mitigation effective across all modes—requiring defense-in-depth combining specification improvement, diverse oversight, interpretability, and AI control.
 ratings:
   focus: 8.5
   novelty: 5.2
@@ -8,20 +16,12 @@ ratings:
   completeness: 8
   concreteness: 7.5
   actionability: 6.5
-quality: 71
-readerImportance: 44.5
-researchImportance: 88
-lastEdited: "2025-12-28"
-update_frequency: 90
-llmSummary: Taxonomizes 12 reward hacking modes with likelihood (20-90%) and severity scores, finding proxy exploitation affects 80-95% of current systems (low severity) while deceptive hacking (5-40% likelihood in advanced systems) and meta-hacking pose catastrophic risks. Analysis shows severe reward hacking probability increases from 5-15% (current) to 30-60% (advanced systems), with no single mitigation effective across all modes—requiring defense-in-depth combining specification improvement, diverse oversight, interpretability, and AI control.
+clusters:
+  - ai-safety
 todos:
   - Complete 'Conceptual Framework' section
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Limitations' section (6 placeholders)
-clusters:
-  - ai-safety
-subcategory: risk-models
-entityType: model
 ---
 import { DataInfoBox, Mermaid, R, EntityLink } from '@components/wiki';
 

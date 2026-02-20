@@ -1,19 +1,17 @@
 ---
 title: Institutional Adaptation Speed Model
 description: This model analyzes institutional adaptation rates to AI. It finds institutions change at 10-30% of needed rate per year while AI creates 50-200% annual gaps, with regulatory lag historically spanning 15-70 years.
-relatedRisks:
-  - lock-in
-  - concentration-of-power
-  - erosion-of-agency
-  - institutional-capture
-relatedModels:
-  - post-incident-recovery
-  - trust-cascade-model
-  - racing-dynamics
 sidebar:
   order: 51
+entityType: model
+subcategory: governance-models
 quality: 59
+readerImportance: 78
+researchImportance: 7
+tacticalValue: 65
 lastEdited: "2026-01-28"
+update_frequency: 90
+llmSummary: Analyzes institutional adaptation rates to AI, finding institutions change at 10-30% of needed rate per year while AI creates 50-200% annual gaps. Historical regulatory lag spans 15-70 years; quantitative model shows crisis-driven national regulation achieves 7.5% annual progress (10-15 years to adequacy) versus business-as-usual 0.26% (200+ years), with coordination costs and opposition being most sensitive parameters.
 ratings:
   focus: 8.5
   novelty: 5
@@ -21,18 +19,20 @@ ratings:
   completeness: 7.5
   concreteness: 7
   actionability: 6
-readerImportance: 78
-tacticalValue: 65
-researchImportance: 7
-update_frequency: 90
-llmSummary: Analyzes institutional adaptation rates to AI, finding institutions change at 10-30% of needed rate per year while AI creates 50-200% annual gaps. Historical regulatory lag spans 15-70 years; quantitative model shows crisis-driven national regulation achieves 7.5% annual progress (10-15 years to adequacy) versus business-as-usual 0.26% (200+ years), with coordination costs and opposition being most sensitive parameters.
-todos:
-  - Add more empirical case studies of regulatory adaptation
 clusters:
   - ai-safety
   - governance
-subcategory: governance-models
-entityType: model
+todos:
+  - Add more empirical case studies of regulatory adaptation
+relatedModels:
+  - post-incident-recovery
+  - trust-cascade-model
+  - racing-dynamics
+relatedRisks:
+  - lock-in
+  - concentration-of-power
+  - erosion-of-agency
+  - institutional-capture
 ---
 import {DataInfoBox, KeyQuestions, EntityLink, Mermaid} from '@components/wiki';
 

@@ -3,15 +3,14 @@ title: Scalable Oversight
 description: Methods for supervising AI systems on tasks too complex for direct human evaluation, including debate, recursive reward modeling, and process supervision. Process supervision achieves 78.2% accuracy on MATH benchmarks (vs 72.4% outcome-based), while debate shows 60-80% accuracy on factual questions with +4% improvement from self-play training. Critical for maintaining oversight as AI capabilities exceed human expertise.
 sidebar:
   order: 3
+entityType: approach
+subcategory: alignment-theoretical
 quality: 68
-llmSummary: Process supervision achieves 78.2% accuracy on MATH benchmarks (vs 72.4% outcome-based) and is deployed in OpenAI's o1 models, while debate shows 60-80% accuracy on factual questions with +4% improvement from self-play training. However, effectiveness against sophisticated deception remains unproven, with debate accuracy dropping to 50-65% on complex reasoning tasks.
-lastEdited: "2025-12-28"
 readerImportance: 51.5
 researchImportance: 30
+lastEdited: "2025-12-28"
 update_frequency: 90
-todos:
-  - Complete 'How It Works' section
-  - Complete 'Limitations' section (6 placeholders)
+llmSummary: Process supervision achieves 78.2% accuracy on MATH benchmarks (vs 72.4% outcome-based) and is deployed in OpenAI's o1 models, while debate shows 60-80% accuracy on factual questions with +4% improvement from self-play training. However, effectiveness against sophisticated deception remains unproven, with debate accuracy dropping to 50-65% on complex reasoning tasks.
 ratings:
   novelty: 4.2
   rigor: 6.8
@@ -19,8 +18,9 @@ ratings:
   completeness: 7.1
 clusters:
   - ai-safety
-subcategory: alignment-theoretical
-entityType: approach
+todos:
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
 ---
 import {DataInfoBox, KeyPeople, Section, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

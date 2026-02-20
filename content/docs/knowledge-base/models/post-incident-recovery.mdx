@@ -1,19 +1,16 @@
 ---
 title: Post-Incident Recovery Model
 description: This model analyzes recovery pathways from AI incidents. It finds clear attribution enables 3-5x faster recovery, and recommends 5-10% of safety resources for recovery capacity, particularly trust and skill preservation.
-relatedRisks:
-  - corrigibility-failure
-  - distributional-shift
-  - emergent-capabilities
-  - trust-cascade
-relatedModels:
-  - trust-cascade-model
-  - expertise-atrophy-cascade
-  - institutional-adaptation-speed
 sidebar:
   order: 50
+entityType: model
+subcategory: societal-models
 quality: 52
+readerImportance: 42.5
+researchImportance: 86
 lastEdited: "2025-12-27"
+update_frequency: 90
+llmSummary: Analyzes recovery pathways from AI incidents across five types (technical failures, trust collapse, expertise loss, alignment failures). Finds clear attribution enables 3-5x faster detection, preserved expertise reduces recovery time by 2-100x depending on degradation level, and recommends allocating 5-10% of safety resources to recovery capacity, particularly for neglected trust/epistemic recovery and skill preservation.
 ratings:
   focus: 8.5
   novelty: 4.5
@@ -21,19 +18,22 @@ ratings:
   completeness: 7.5
   concreteness: 6.5
   actionability: 5.5
-readerImportance: 42.5
-researchImportance: 86
-update_frequency: 90
-llmSummary: Analyzes recovery pathways from AI incidents across five types (technical failures, trust collapse, expertise loss, alignment failures). Finds clear attribution enables 3-5x faster detection, preserved expertise reduces recovery time by 2-100x depending on degradation level, and recommends allocating 5-10% of safety resources to recovery capacity, particularly for neglected trust/epistemic recovery and skill preservation.
+clusters:
+  - ai-safety
+  - governance
 todos:
   - Complete 'Conceptual Framework' section
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Limitations' section (6 placeholders)
-clusters:
-  - ai-safety
-  - governance
-subcategory: societal-models
-entityType: model
+relatedModels:
+  - trust-cascade-model
+  - expertise-atrophy-cascade
+  - institutional-adaptation-speed
+relatedRisks:
+  - corrigibility-failure
+  - distributional-shift
+  - emergent-capabilities
+  - trust-cascade
 ---
 import {DataInfoBox, KeyQuestions, Mermaid, EntityLink} from '@components/wiki';
 

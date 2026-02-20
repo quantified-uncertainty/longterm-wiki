@@ -2,20 +2,20 @@
 numericId: E733
 title: "LongtermWiki Vision"
 description: "Strategic vision and scope for the LongtermWiki project"
-pageType: "documentation"
 entityType: internal
+pageType: "documentation"
+quality: 2
 readerImportance: 58.5
 researchImportance: 12.5
-quality: 2
+lastEdited: "2026-02-17"
+update_frequency: 90
+evergreen: true
 llmSummary: "Internal strategic planning document for the LongtermWiki project itself, outlining a 2-person-year scope to build a knowledge platform focused on AI safety prioritization cruxes. Proposes ~250 pages across risks, interventions, and causal models with worldview-based priority mapping."
 ratings:
   novelty: 0
   rigor: 0
   actionability: 0
   completeness: 0
-lastEdited: "2026-02-17"
-evergreen: true
-update_frequency: 90
 ---
 # LongtermWiki: Comprehensive AI Impact & Risk Navigator
 
