@@ -517,6 +517,60 @@ function buildTagIndex(entities) {
 }
 
 /**
+ * Normalize a YAML date value (string or Date object) to a YYYY-MM-DD string.
+ * Returns null if the value is falsy.
+ */
+function toDateString(val) {
+  if (!val) return null;
+  if (typeof val === 'string') return val;
+  if (val instanceof Date) return val.toISOString().slice(0, 10);
+  return String(val);
+}
+
+/**
+ * Return the later of two YYYY-MM-DD date strings (null-safe).
+ */
+function maxDate(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  return a > b ? a : b;
+}
+
+/**
+ * Pre-read all edit logs and return a Map<pageId, latestDateString>.
+ * Used to supplement frontmatter lastEdited with actual edit history.
+ */
+function buildEditLogDateMap() {
+  const editLogDir = join(DATA_DIR, 'edit-logs');
+  const dateMap = new Map();
+
+  if (!existsSync(editLogDir)) return dateMap;
+
+  const files = readdirSync(editLogDir);
+  for (const file of files) {
+    if (!file.endsWith('.yaml')) continue;
+    const pageId = basename(file, '.yaml');
+    try {
+      const content = readFileSync(join(editLogDir, file), 'utf-8');
+      const entries = parse(content);
+      if (!Array.isArray(entries) || entries.length === 0) continue;
+      let latestDate = '';
+      for (const entry of entries) {
+        if (entry.date) {
+          const dateStr = toDateString(entry.date);
+          if (dateStr && dateStr > latestDate) latestDate = dateStr;
+        }
+      }
+      if (latestDate) dateMap.set(pageId, latestDate);
+    } catch {
+      // Skip malformed edit logs
+    }
+  }
+
+  return dateMap;
+}
+
+/**
  * Extract frontmatter from MDX/MD content using YAML parser
  * Properly handles nested objects like ratings
  */
@@ -539,6 +593,7 @@ function extractFrontmatter(content) {
  */
 function buildPagesRegistry(urlToResource) {
   const pages = [];
+  const editLogDates = buildEditLogDateMap();
 
   function scanDirectory(dir, urlPrefix = '') {
     if (!existsSync(dir)) return;
@@ -591,7 +646,11 @@ function buildPagesRegistry(urlToResource) {
           neglectedness: fm.neglectedness != null ? Number(fm.neglectedness) : null,
           uncertainty: fm.uncertainty != null ? Number(fm.uncertainty) : null,
           causalLevel: fm.causalLevel || null,
-          lastUpdated: fm.lastUpdated || fm.lastEdited || null,
+          lastUpdated: maxDate(
+            toDateString(fm.lastUpdated),
+            maxDate(toDateString(fm.lastEdited), editLogDates.get(isIndexFile ? null : id) || null)
+          ),
+          dateCreated: toDateString(fm.createdAt) || toDateString(fm.dateCreated) || null,
           llmSummary: fm.llmSummary || null,
           structuredSummary: fm.structuredSummary || null,
           description: fm.description || null,
