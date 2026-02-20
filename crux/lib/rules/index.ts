@@ -80,6 +80,9 @@ import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 import { citationDensityRule } from './citation-density.ts';
 import { balanceFlagsRule } from './balance-flags.ts';
 
+// Table header consistency (issue #379)
+import { tableHeadersRule } from './table-headers.ts';
+
 // Security / safety checks
 import { urlSafetyRule } from './url-safety.ts';
 import { noExecSyncRule } from './no-exec-sync.ts';
@@ -129,6 +132,7 @@ export {
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
+  tableHeadersRule,
   urlSafetyRule,
   noExecSyncRule,
 };
@@ -177,6 +181,7 @@ export const allRules: Rule[] = [
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
+  tableHeadersRule,
   urlSafetyRule,
   noExecSyncRule,
 ];
