@@ -1,0 +1,66 @@
+date: "2026-02-20"
+branch: claude/longtermist-wins-losses-page-EmIJn
+title: "Create EA and longtermist wins/losses impact ledger page"
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/342
+model: claude-sonnet-4-6
+duration: ~3h
+cost: ~$50
+
+pages:
+  - ea-longtermist-wins-losses
+
+summary: >
+  Created a comprehensive 350-line wiki page tracking EA and longtermist wins and losses,
+  broken down by year and topic (2006–2025), with cumulative organization statistics,
+  a Notable Policy Record table, counterfactual attribution analysis, and documented
+  wins/losses across global health, AI safety, animal welfare, and community building.
+  Used crux content create (premium tier) followed by crux content improve (deep tier,
+  2 adversarial iterations, ~58 research sources). Fixed multiple rounds of numeric ID
+  stability issues affecting existing YAML entities. Fixed file truncation after improve
+  pipeline. Completed paranoid review and corrected: Anthropic founding year (2022→2021),
+  GiveWell $1.45B wrong citation, duplicate/orphaned footnotes, FTX dollar inconsistency
+  ($130M→$160M), MIRI pivot year (2023→2024 in table), Nathan Robinson article date (2022→2023),
+  GiveWell founding year (2007→2006), AMF grant figure ($97M→$96.3M). Pinned numericId: E868
+  in frontmatter to prevent future ID stability issues.
+
+key_decisions:
+  - "Used crux content create (premium) + crux content improve (deep, 2 iterations) pipeline"
+  - "Fixed numeric ID stability failures caused by YAML entities with stale id-registry.json"
+  - "Fixed file truncation by appending missing footnotes [^29]-[^53] from intermediate pipeline file"
+  - "Ran paranoid review to identify and fix 4 critical + 8 warning factual issues"
+  - "Pinned numericId in ftx-red-flags frontmatter to prevent page ID shift from E865→E864"
+
+issues:
+  - "crux content improve output was truncated mid-footnote; fixed by manual append from intermediate file"
+  - "YAML entity numericIds were out of sync with id-registry.json; resolved with --allow-id-reassignment"
+  - "Deleted draft page ea-and-longtermist-wins-and-losses.mdx caused ftx-red-flags to shift from E865→E864; fixed by pinning E865 in frontmatter"
+
+checks:
+  initialized: true
+  type: content
+  initiated_at: "2026-02-20T00:55:51.338Z"
+  total: 31
+  completed: 20
+  na: 8
+  skipped: 3
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - research-content
+    - no-hardcoded
+    - fix-escaping
+    - crux-pipeline
+    - correctness
+    - full-integration
+    - no-regressions
+    - entitylinks-resolve
+    - numeric-ids-stable
+    - mdx-escaping
+    - content-accuracy
+    - citations-have-urls
+    - citations-verify
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
