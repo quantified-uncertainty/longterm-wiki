@@ -14,6 +14,7 @@ import {
   countVisuals,
 } from './visual-detection.ts';
 import { stripFrontmatter } from './patterns.ts';
+import { findFootnoteRefs } from './content-integrity.ts';
 
 export type { VisualCounts } from './visual-detection.ts';
 export { countVisuals, countDiagrams, countTables } from './visual-detection.ts';
@@ -164,20 +165,11 @@ export function countExternalLinks(content: string): number {
 }
 
 /**
- * Count unique GFM footnote references [^N] (excluding definitions)
+ * Count unique GFM footnote references [^N] (excluding definitions).
+ * Delegates to findFootnoteRefs() from content-integrity.ts (DRY, issue #417).
  */
 export function countFootnoteRefs(content: string): number {
-  const refs = new Set<string>();
-  const pattern = /\[\^(\d+)\]/g;
-  for (const line of content.split('\n')) {
-    if (/^\[\^\d+\]:/.test(line.trim())) continue; // Skip definitions
-    pattern.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(line)) !== null) {
-      refs.add(match[1]);
-    }
-  }
-  return refs.size;
+  return findFootnoteRefs(content).size;
 }
 
 /**

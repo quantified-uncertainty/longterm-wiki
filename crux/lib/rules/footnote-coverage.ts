@@ -17,29 +17,10 @@
 import { Severity, Issue, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 import { countProseWords } from '../page-analysis.ts';
+import { findFootnoteRefs } from '../content-integrity.ts';
 
 /** Minimum word count to expect citations */
 const MIN_WORDS_FOR_CITATIONS = 300;
-
-/** Count unique footnote references in the body (e.g. [^1], [^2]) */
-function countFootnoteRefs(body: string): number {
-  const refs = new Set<string>();
-  const pattern = /\[\^(\d+)\]/g;
-  let match: RegExpExecArray | null;
-
-  // Only count references in prose, not definitions
-  for (const line of body.split('\n')) {
-    // Skip footnote definition lines ([^1]: ...)
-    if (/^\[\^\d+\]:/.test(line.trim())) continue;
-
-    pattern.lastIndex = 0;
-    while ((match = pattern.exec(line)) !== null) {
-      refs.add(match[1]);
-    }
-  }
-
-  return refs.size;
-}
 
 /** Check if a page is under the knowledge-base directory */
 function isKnowledgeBasePage(relativePath: string): boolean {
@@ -75,7 +56,7 @@ export const footnoteCoverageRule = {
       return issues;
     }
 
-    const footnoteCount = countFootnoteRefs(body);
+    const footnoteCount = findFootnoteRefs(body).size;
 
     if (footnoteCount === 0) {
       issues.push(new Issue({

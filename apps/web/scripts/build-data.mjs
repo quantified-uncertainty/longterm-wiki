@@ -798,13 +798,22 @@ function buildPathRegistry() {
 
 
 /**
- * Compute hallucination risk score for a page.
+ * Compute hallucination risk score for a page (build-time scorer).
  *
  * Returns { level: 'low'|'medium'|'high', score: 0-100, factors: string[] }
  *
  * The factors array explains WHY the risk is at its level, making this useful
  * for both reader-facing warnings and AI agents that need to prioritize pages
  * for verification. Higher score = higher risk.
+ *
+ * ## Relationship to validation-time scorer (issue #417)
+ *
+ * This build-time scorer starts at baseline 40 with both risk-increasing and
+ * risk-decreasing factors — it's a balanced assessment for frontend display.
+ * The validation-time scorer (`crux/validate/validate-hallucination-risk.ts`)
+ * starts at 0 with penalty accumulation + entity type multiplier — it's a
+ * diagnostic tool for editors. Both share the content integrity layer
+ * (assessContentIntegrity + computeIntegrityRisk from content-integrity.ts).
  *
  * @param {object} page  – page object from buildPagesRegistry (with metrics, ratings, etc.)
  * @param {Map}    entityMap – Map<entityId, entity> from YAML data
