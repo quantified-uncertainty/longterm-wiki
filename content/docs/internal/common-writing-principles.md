@@ -18,6 +18,8 @@ ratings:
   actionability: 7
   completeness: 6
 ---
+import {EntityLink} from '@components/wiki';
+
 # Common Writing Principles
 
 These principles apply to **all content types** across the wiki. Domain-specific style guides (risk, response, models, ATM) build on these foundations. When scoring pages, the **objectivity** rating dimension measures adherence to these principles.
@@ -179,4 +181,4 @@ These principles are measured by the **objectivity** rating dimension (0-10):
 - **5-6**: Mostly neutral language; some uncertainty acknowledgment; mostly analytical
 - **7+**: Fully accessible to outsiders; all estimates properly hedged with ranges and caveats; analytical throughout; honest counter-arguments included
 
-See the [Rating System](/wiki/E741) for how objectivity fits into derived quality scores.
+See the <EntityLink id="rating-system">Rating System</EntityLink> for how objectivity fits into derived quality scores.

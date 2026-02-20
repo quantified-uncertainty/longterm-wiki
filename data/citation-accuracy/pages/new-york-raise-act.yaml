@@ -1,0 +1,44 @@
+- pageId: new-york-raise-act
+  footnote: 33
+  claimText: '- Access safety protocols and incident reports to investigate potential violations'
+  sourceTitle: New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP
+  url: https://www.skadden.com/insights/publications/2026/01/new-york-enacts-ai-transparency-law
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention accessing safety protocols and incident reports to investigate potential violations.
+  difficulty: hard
+  checkedAt: '2026-02-20 17:13:24'
+- pageId: new-york-raise-act
+  footnote: 35
+  claimText: The Act includes whistleblower protections for employees who report safety concerns or violations to state authorities. It also voids contractual prov...
+  sourceTitle: 'Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models'
+  url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+  verdict: unsupported
+  score: 0.3
+  issues: |-
+    The source mentions whistleblower protections but does not specify that these protections extend to employees who report safety concerns or violations to state authorities.
+    The source does not mention anything about voiding contractual provisions that would shift liability away from developers or attempt to structure corporate entities in bad faith to evade the law's requirements, allowing courts to pierce the corporate veil in such cases.
+  difficulty: medium
+  checkedAt: '2026-02-20 17:13:27'
+- pageId: new-york-raise-act
+  footnote: 3
+  claimText: The Act applies specifically to "large developers" training frontier models—defined as AI systems trained with over \$100 million in compute resources...
+  sourceTitle: Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models | Governor Kathy Hochul
+  url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+  verdict: inaccurate
+  score: 0.7
+  issues: |-
+    unsupported: The Act applies specifically to "large developers" training frontier models—defined as AI systems trained with over $100 million in compute resources or 10²⁶+ FLOPs.
+    unsupported: conduct annual third-party audits
+  difficulty: medium
+  checkedAt: '2026-02-20 17:12:30'
+- pageId: new-york-raise-act
+  footnote: 42
+  claimText: However, it does not specify particular technical approaches to ensuring AI systems behave safely and in accordance with human values.
+  sourceTitle: 'Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models'
+  url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+  verdict: inaccurate
+  score: 0.75
+  issues: 'OVERCLAIMS: The source does not explicitly state that the RAISE Act does not specify particular technical approaches.'
+  difficulty: medium
+  checkedAt: '2026-02-20 17:13:41'

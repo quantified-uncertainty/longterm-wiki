@@ -30,7 +30,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 |-----------|------------|
 | **What it is** | Analytics tools and data infrastructure for tracking Wikipedia article pageviews, including both official Wikimedia tools and independent projects |
 | **Primary tools** | Pageviews Analysis (pageviews.wmcloud.org), stats.grok.se, Wikipedia Views (wikipediaviews.org) |
-| **Data coverage** | Desktop views from December 2007; mobile and bot-filtered data from July 2015; updated with 24-hour delay |
+| **Data coverage** | Desktop views from December 2007; mobile and bot-filtered data from August 2015; updated with 24-hour delay |
 | **Key applications** | Research (health trends, public interest), content optimization, event impact detection, Wikipedia editor analytics |
 | **Recent challenges** | 8% decline in human pageviews (2024-2025) attributed to AI summaries and sophisticated bots; bot detection increasingly expensive |
 | **Limitations** | Bot contamination, mobile undercounting pre-2015, redirect inflation, no per-page geographic or referrer data |
@@ -48,7 +48,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 
 **Wikipedia Views** refers to both the concept of Wikipedia pageview statistics and the suite of tools developed to analyze them. At its core, a Wikipedia pageview measures a single request to load an HTML page on Wikipedia, distinct from "hits" which count every file (images, CSS) loaded by the page.[^1] The Wikimedia Foundation provides official analytics through tools like Pageviews Analysis, while independent researchers have created complementary systems, most notably Vipul Naik's Wikipedia Views website.
 
-These tools serve multiple constituencies: Wikipedia editors tracking article impact, researchers studying public interest patterns, and analysts monitoring societal trends. The data reveals dramatic patterns—the Main Page has accumulated over 46.8 billion views as of January 2022, exceeding the rest of the top-100 combined,[^2] while breaking news events can spike obscure articles from 1,000 monthly views to over 1 million overnight.[^3] Studies have leveraged pageview data to predict disease outbreaks, gauge climate change engagement across 213 countries using 517 million pageviews, and track wildlife conservation interest across 40,000 species.[^4]
+These tools serve multiple constituencies: Wikipedia editors tracking article impact, researchers studying public interest patterns, and analysts monitoring societal trends. The data reveals dramatic patterns—[^2] while breaking news events can spike obscure articles from 1,000 monthly views to over 1 million overnight[^3] Studies have leveraged pageview data to predict disease outbreaks, and track wildlife conservation interest across 40,000 species.[^4]
 
 However, the ecosystem faces mounting challenges. Human pageviews declined 8% between March-August 2025 compared to 2024, with Wikimedia attributing the drop to AI-generated summaries that provide answers without directing users to Wikipedia, plus increasingly sophisticated bots designed to evade detection.[^5] The data infrastructure itself has significant limitations: pre-2015 metrics excluded mobile traffic (which became larger than desktop by 2015), bot contamination inflates counts by up to 40%, and redirect handling creates systematic undercounting of target articles.[^6]
 
@@ -58,7 +58,7 @@ However, the ecosystem faces mounting challenges. Human pageviews declined 8% be
 
 The Wikimedia Foundation's pageview analytics evolved alongside Wikipedia itself, though comprehensive documentation focuses primarily on tool features rather than development history. Desktop pageview data became available starting December 1, 2007, initially through the stats.grok.se service.[^7] This early system counted all requests, including identifiable bots and spiders, which significantly inflated numbers.
 
-A major infrastructure shift occurred in July 2015 when Wikimedia introduced the REST API-based Pageviews Analysis tool at pageviews.wmcloud.org.[^8] This new system filtered out identifiable bots and spiders for more accurate human readership metrics, though many bot views still slip through as they're designed to mimic legitimate traffic. The 2015 transition also brought mobile web and mobile app data, addressing a critical blind spot as mobile traffic had been growing rapidly but remained uncounted.
+A major infrastructure shift occurred in July 2015 when Wikimedia introduced the REST API-based Pageviews Analysis tool at pageviews.wmcloud.org.[^8] By default, the tool shows data only from users, though many bot views still slip through as they're designed to mimic legitimate traffic. The 2015 transition also brought mobile web and mobile app data, addressing a critical blind spot as mobile traffic had been growing rapidly but remained uncounted.
 
 The Pageviews Analysis toolset expanded to include specialized features: Langviews for comparing views across Wikipedia language editions, Topviews for ranking most-viewed pages by project and date, Siteviews for tracking total site pageviews or unique devices, and additional tools for redirects, user pages, and media files.[^9] The toolset won the 2019 Coolest Tool Award in the Reusable category, reflecting its adoption by the Wikipedia community.[^10]
 
@@ -199,7 +199,7 @@ The May 2025 Brazil bot traffic incident illustrates how classification changes 
 
 ### AI Quality Concerns May Drive Verification Traffic
 
-A counterintuitive argument suggests that AI-generated summaries, often plagued by inaccuracies and hallucinations, might actually increase Wikipedia traffic as users seek to verify dubious AI claims.[^64] AI systems drawing from low-effort or fabricated sources could drive skeptical users back to authoritative sources like Wikipedia for fact-checking.
+A counterintuitive argument suggests that AI-generated summaries might actually increase Wikipedia traffic.[^64] AI systems drawing from low-effort or fabricated sources could drive users back to authoritative sources like Wikipedia.
 
 However, available evidence suggests few users actually verify AI-provided information. The 1% click-through rate on links within AI summaries indicates that most users accept AI responses without source verification.[^65] Wikimedia's own 2025 AI summary experiment drew editor backlash as "unethical," suggesting even Wikipedia's community doubts that AI summaries benefit the encyclopedia.[^66]
 
@@ -310,7 +310,7 @@ Several fundamental questions about Wikipedia pageviews remain unresolved:
 [^61]: [Revisiting the Great Decline in Wikipedia Pageviews](https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews)
 [^62]: [Vipul Naik - The Great Decline in Wikipedia Pageviews](https://vipulnaik.com/blog/the-great-decline-in-wikipedia-pageviews-full-version/)
 [^63]: [New User Trends on Wikipedia - Wikimedia Diff](https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/)
-[^64]: [Wikipedia reports traffic drop](https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop)
+[^64]: [Wikimedia and the new knowledge loop – report from a Wikimedia CH roundtable  – Diff](https://diff.wikimedia.org/2026/02/20/wikimedia-and-the-new-knowledge-loop-report-from-a-wikimedia-ch-roundtable-2/)
 [^65]: [Observer - Wikipedia AI eating traffic](https://observer.com/2025/10/wikipedia-ai-eating-traffic/)
 [^66]: [Wikipedia reports traffic drop](https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop)
 [^67]: [LessWrong - The Great Decline in Wikipedia Pageviews](https://www.lesswrong.com/posts/8SFPgPgdNzx2gLxxi/the-great-decline-in-wikipedia-pageviews-condensed-version)

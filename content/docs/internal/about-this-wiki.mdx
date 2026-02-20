@@ -76,12 +76,12 @@ Templates determine expected structure and applicable style guide:
 
 | Template | Style Guide |
 |----------|-------------|
-| `knowledge-base-risk` | [Knowledge Base Style Guide](/wiki/E763) |
-| `knowledge-base-response` | [Knowledge Base Style Guide](/wiki/E763) |
-| `knowledge-base-model` | [Model Style Guide](/wiki/E736) |
-| `ai-transition-model-factor` | [ATM Style Guide](/wiki/E721) |
+| `knowledge-base-risk` | <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> |
+| `knowledge-base-response` | <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> |
+| `knowledge-base-model` | <EntityLink id="models-style-guide">Model Style Guide</EntityLink> |
+| `ai-transition-model-factor` | <EntityLink id="ai-transition-model-style-guide">ATM Style Guide</EntityLink> |
 
-**For complete details, see [Page Type System](/wiki/E739).**
+**For complete details, see <EntityLink id="page-types">Page Type System</EntityLink>.**
 
 ---
 
@@ -114,7 +114,7 @@ npm run crux -- content grade --page scheming --apply
 node scripts/content/grade-content.mjs --skip-graded --apply
 ```
 
-**For grading criteria and workflows, see [Content Quality](/wiki/E741).**
+**For grading criteria and workflows, see <EntityLink id="rating-system">Content Quality</EntityLink>.**
 
 ---
 
@@ -148,7 +148,7 @@ Running `npm run build:data` generates:
 
 Components pull from YAML databases to display structured information. For example, `EntityLink` provides stable cross-references, while `DataInfoBox` displays expert or organization profiles from YAML.
 
-**For database details and component usage, see [Content Database](/wiki/E759).**
+**For database details and component usage, see <EntityLink id="content-database">Content Database</EntityLink>.**
 
 ---
 
@@ -205,7 +205,7 @@ flowchart LR
     C -->|No| E[Misalignment Risk]
 ```
 
-**See [Mermaid Diagrams](/wiki/E735) for guidelines.**
+**See <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> for guidelines.**
 
 ### Cause-Effect Graphs
 
@@ -223,7 +223,7 @@ import {CauseEffectGraph} from '@components/CauseEffectGraph';
 
 Features: zoom, pan, minimap, node highlighting, path tracing, entity linking.
 
-**See [Cause-Effect Diagrams](/wiki/E758) for schema and examples.**
+**See <EntityLink id="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> for schema and examples.**
 
 ---
 
@@ -268,7 +268,7 @@ The validation suite includes 20+ rules:
 | `quality-source` | Quality set by pipeline, not manually |
 | `mermaid` | Diagram syntax validation |
 
-**For complete tool reference, see [Automation Tools](/wiki/E757).**
+**For complete tool reference, see <EntityLink id="automation-tools">Automation Tools</EntityLink>.**
 
 ---
 
@@ -352,11 +352,11 @@ npm run validate         # Full validation
 
 ### Creating New Content
 
-1. **New pages**: Follow the appropriate [style guide](/wiki/E763)
+1. **New pages**: Follow the appropriate <EntityLink id="knowledge-base">style guide</EntityLink>
 2. **New entities**: Add to relevant YAML in `src/data/`, run `npm run build:data`
 3. **New components**: Add to `src/components/wiki/`, use path aliases
 
-**For content generation workflows, see [Research Reports](/wiki/E748).**
+**For content generation workflows, see <EntityLink id="research-reports">Research Reports</EntityLink>.**
 
 ---
 
@@ -369,17 +369,17 @@ npm run validate         # Full validation
 - [Strategy Brainstorm](/project/strategy-brainstorm/) — Failure modes and strategic options
 
 ### Style Guides
-- [Knowledge Base Style Guide](/wiki/E763) — For risk and response pages
-- [Model Style Guide](/wiki/E736) — For analytical model pages
-- [ATM Style Guide](/wiki/E721) — For AI Transition Model pages
-- [Stub Style Guide](/wiki/E753) — For minimal reference pages
+- <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> — For risk and response pages
+- <EntityLink id="models-style-guide">Model Style Guide</EntityLink> — For analytical model pages
+- <EntityLink id="ai-transition-model-style-guide">ATM Style Guide</EntityLink> — For AI Transition Model pages
+- <EntityLink id="stub-style-guide">Stub Style Guide</EntityLink> — For minimal reference pages
 
 ### Technical Documentation
-- [System Architecture](/wiki/E734) — Data flow, pipelines, design decisions
-- [Page Type System](/wiki/E739) — Complete classification reference
-- [Rating System](/wiki/E741) — Quality scoring system
-- [Content Database](/wiki/E759) — SQLite caching, source fetching, AI summaries
-- [Automation Tools](/wiki/E757) — All scripts and workflows
-- [Cause-Effect Diagrams](/wiki/E758) — Graph schema and examples
-- [Mermaid Diagrams](/wiki/E735) — Diagram guidelines
-- [Documentation Maintenance](/wiki/E760) — Keeping docs updated
+- <EntityLink id="architecture">System Architecture</EntityLink> — Data flow, pipelines, design decisions
+- <EntityLink id="page-types">Page Type System</EntityLink> — Complete classification reference
+- <EntityLink id="rating-system">Rating System</EntityLink> — Quality scoring system
+- <EntityLink id="content-database">Content Database</EntityLink> — SQLite caching, source fetching, AI summaries
+- <EntityLink id="automation-tools">Automation Tools</EntityLink> — All scripts and workflows
+- <EntityLink id="cause-effect-diagrams">Cause-Effect Diagrams</EntityLink> — Graph schema and examples
+- <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> — Diagram guidelines
+- <EntityLink id="documentation-maintenance">Documentation Maintenance</EntityLink> — Keeping docs updated

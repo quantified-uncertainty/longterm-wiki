@@ -11,7 +11,7 @@ researchImportance: 76.5
 tacticalValue: 74
 lastEdited: "2026-02-20"
 update_frequency: 21
-llmSummary: "Comprehensive analysis of LLM capabilities showing rapid progress from GPT-2 (1.5B parameters, 2019) to GPT-5 and Gemini 2.5 (2025), with training costs growing 2.4x annually and projected to exceed $1B by 2027. Documents emergence of inference-time scaling paradigm, mechanistic interpretability advances including Gemma Scope 2, multilingual alignment research, factuality benchmarking via FACTS suite, and identifies key safety concerns including 8-45% hallucination rates, persuasion capabilities, privacy/PII risks, safety degradation during fine-tuning, and growing autonomous agent capabilities including long-horizon task execution and multiagent orchestration."
+llmSummary: "Comprehensive analysis of LLM capabilities showing rapid progress from GPT-2 (1.5B parameters, 2019) to GPT-5 and Gemini 2.5 (2025), with training costs growing 2.4x annually and projected to exceed $1B by 2027. Documents emergence of inference-time scaling paradigm, mechanistic interpretability advances including Gemma Scope 2, multilingual alignment research, factuality benchmarking via FACTS suite, and identifies key safety concerns including 8-45% hallucination rates, persuasion capabilities, and growing autonomous agent capabilities."
 ratings:
   novelty: 4.5
   rigor: 6.5
@@ -92,8 +92,6 @@ flowchart TD
 | <EntityLink id="deceptive-alignment">Deceptive Capabilities</EntityLink> | High | Moderate | 1-3 years | Increasing |
 | <EntityLink id="persuasion">Persuasion & Manipulation</EntityLink> | High | High | Current | Accelerating |
 | <EntityLink id="cyberweapons">Autonomous Cyber Operations</EntityLink> | Moderate-High | Moderate | 2-4 years | Increasing |
-| Privacy / PII Leakage | Moderate-High | High | Current | Increasing |
-| Safety Degradation via Fine-Tuning | Moderate-High | High | Current | Active concern |
 | <EntityLink id="scientific-research">Scientific Research Acceleration</EntityLink> | Mixed | High | Current | Accelerating |
 | <EntityLink id="economic-disruption">Economic Disruption</EntityLink> | High | High | 2-5 years | Accelerating |
 
@@ -110,10 +108,8 @@ flowchart TD
 | o3 | Dec 2024 | Unknown | Inference-time search | 87.7% GPQA Diamond, 91.6% AIME 2024 |
 | Llama 4 | Apr 2025 | Unknown | Natively multimodal open-weight | Mixture-of-experts architecture; [LlamaCon announcement](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) |
 | Gemini 2.5 Pro | Mar 2025 | Unknown | Long-context reasoning | 1M-token context, leading coding benchmarks; [Gemini 2.5 announcement](https://blog.google/technology/google-deepmind/gemini-model-updates-february-2025/) |
-| Gemini 3.1 Pro | 2025 | Unknown | Complex task reasoning | Positioned as improved reasoning over Gemini 2.5; [Gemini 3.1 Pro announcement](https://blog.google/technology/google-deepmind/) |
 | GPT-5 | May 2025 | Unknown | Unified reasoning + tool use | Highest scores to date on GPQA Diamond and SWE-bench; [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/) |
 | Claude Opus 4.5 | Nov 2025 | Unknown | Extended reasoning | 80.9% SWE-bench Verified |
-| Claude Opus 4.6 | 2025 | Unknown | Financial research specialization | Launched as a financial research model with enhanced domain capability |
 | GPT-5.2 | Late 2025 | Unknown | Deep thinking modes | 93.2% GPQA Diamond, 90.5% ARC-AGI |
 
 *Source: <R id="e9aaa7b5e18f9f41">OpenAI</R>, <R id="f771d4f56ad4dbaa">Anthropic</R>, [Stanford AI Index 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance)*
@@ -152,8 +148,6 @@ According to [Epoch AI research](https://epoch.ai/trends), approximately two-thi
 
 A related phenomenon is the emergence of new scaling regimes beyond training compute. [Random Scaling of Emergent Capabilities (2025)](https://arxiv.org/abs/2502.15406) finds that emergent capability thresholds are sensitive to random factors including data ordering and initialization seeds, suggesting that the apparent sharpness of emergence in aggregate curves may partly reflect averaging over many random runs with different thresholds rather than a clean phase transition.
 
-[Entropy-based data selection](https://arxiv.org/abs/2506.00000) has emerged as a principled method for improving language model pretraining efficiency by selecting training examples based on per-token entropy signals, favoring data that is neither too predictable nor too noisy. Related work on [model-based data selection for multilingual pretraining](https://arxiv.org/abs/2506.00001) uses model perplexity signals to filter and balance multilingual corpora, reducing the data required to achieve comparable multilingual capability.
-
 ### The Shift to Inference-Time Scaling (2024-2025)
 
 The o1 and o3 models introduced a new paradigm: **inference-time compute scaling**. Rather than only scaling training compute, these models allocate additional computation at inference time through extended reasoning chains and search procedures.
@@ -165,10 +159,6 @@ The o1 and o3 models introduced a new paradigm: **inference-time compute scaling
 | Combined scaling | Both approaches | Maximum capability, maximum cost | GPT-5, Claude Opus 4.5 |
 
 This shift is significant for AI safety: inference-time scaling allows models to "think longer" on hard problems, potentially achieving superhuman performance on specific tasks while maintaining manageable training costs. However, o1 is approximately 6x more expensive and 30x slower than GPT-4o per query. The [RE-Bench evaluation](https://hai.stanford.edu/ai-index/2025-ai-index-report) found that in short time-horizon settings (2-hour budget), top AI systems score 4x higher than human experts, but as the time budget increases to 32 hours, human performance surpasses AI by 2 to 1.
-
-Recent work on **efficient reasoning** explores methods to reduce the computational cost of inference-time scaling. [Progressive Thought Encoding (2025)](https://arxiv.org/abs/2506.00002) proposes training large reasoning models by progressively compressing intermediate chain-of-thought representations, reducing memory and compute overhead without proportional loss in reasoning quality. [WS-GRPO (Weakly-Supervised Group-Relative Policy Optimization, 2025)](https://arxiv.org/abs/2506.00003) addresses the sample inefficiency of standard GRPO-based reasoning training by using weak supervision signals to prune rollout trajectories, achieving comparable reasoning gains with fewer training steps. [Entropy After \</Think\> (2025)](https://arxiv.org/abs/2506.00004) proposes an early-exit criterion for reasoning models based on output token entropy following the end-of-thinking token, allowing models to terminate reasoning chains when sufficient confidence is reached.
-
-**Speculative decoding** is a complementary approach to inference efficiency that generates multiple candidate token sequences in parallel and verifies them against the base model. [Dynamic Delayed Tree Expansion (2025)](https://arxiv.org/abs/2506.00005) improves multi-path speculative decoding by deferring tree expansion until verification results from earlier tokens are available, reducing wasted computation. [Greedy Multi-Path Block Verification (2025)](https://arxiv.org/abs/2506.00006) combines greedy draft selection with block-level verification to improve throughput in speculative sampling pipelines.
 
 ### Emergent Capability Thresholds
 
@@ -202,18 +192,6 @@ A significant limitation is that RLHF-trained models can exhibit <EntityLink id=
 
 **Multilingual alignment gap:** A consistent finding across alignment research is that safety training applied primarily in English does not reliably transfer to other languages. [Align Once, Benefit Multilingually (2025)](https://arxiv.org/abs/2502.07833) proposes methods to enforce multilingual consistency in safety alignment by training on cross-lingual consistency losses. Related work on [Helpful to a Fault (2025)](https://arxiv.org/abs/2502.09933) measures illicit assistance rates across 40+ languages in multi-turn interactions, finding that multilingual agents provide more potentially harmful assistance than English-only evaluations would suggest, particularly in low-resource languages where safety fine-tuning data is sparse.
 
-### Safety Degradation During Fine-Tuning
-
-A recognized risk in deployed LLM pipelines is that fine-tuning—whether for domain adaptation, persona customization, or task-specific capability—can degrade safety properties established during alignment training. [Learning to Stay Safe: Adaptive Regularization Against Safety Degradation during Fine-Tuning (2025)](https://arxiv.org/abs/2506.00007) proposes a regularization approach that identifies and preserves safety-critical parameter regions during downstream fine-tuning. The method uses gradient-based attribution to detect parameters most responsible for safety-relevant behaviors and applies adaptive weight decay to protect them during task-specific updates.
-
-Complementary work on **fail-closed alignment** addresses the problem that standard aligned models default to refusal only when a request is recognized as harmful, allowing novel or ambiguous harmful requests to pass. [Fail-Closed Alignment for Large Language Models (2025)](https://arxiv.org/abs/2506.00008) proposes inverting the default: models refuse requests unless they can positively verify the request falls within permitted categories, reducing the attack surface from novel jailbreak vectors. The trade-off is reduced helpfulness for legitimate edge-case requests.
-
-[ODESteer: A Unified ODE-Based Steering Framework for LLM Alignment (2025)](https://arxiv.org/abs/2506.00009) recasts activation steering as an ordinary differential equation (ODE) control problem, unifying several prior steering methods (linear probes, representation engineering, activation addition) within a single mathematical framework. This enables more principled analysis of steering dynamics, including conditions under which steering vectors applied at one layer will propagate stably through subsequent layers.
-
-**Semi-supervised preference optimization** addresses the practical constraint that full human preference labels are expensive to collect at scale. [Semi-Supervised Preference Optimization with Limited Feedback (2025)](https://arxiv.org/abs/2506.00010) combines a small labeled preference dataset with a large unlabeled pool, using confidence-based pseudo-labeling to extend RLHF training data. The method achieves alignment quality comparable to fully supervised RLHF at substantially reduced labeling cost. Related, [References Improve LLM Alignment in Non-Verifiable Domains (2025)](https://arxiv.org/abs/2506.00011) finds that providing reference responses alongside preference pairs substantially improves reward model calibration in domains where ground truth is not mechanically verifiable (e.g., creative writing, open-ended reasoning), suggesting that alignment quality in subjective domains is sensitive to reference design.
-
-[VAM: Verbalized Action Masking for Controllable Exploration in RL Post-Training (2025)](https://arxiv.org/abs/2506.00012) introduces a method that masks out unsafe or undesirable actions during RL post-training by representing the action space in natural language and using a policy constraint over verbalized action descriptions. Applied to a chess case study, VAM demonstrates that controllable RL exploration can be achieved without requiring explicit reward signals for every disallowed action.
-
 ## Major 2025 Model Releases
 
 ### GPT-5 and the GPT-5 Family
@@ -228,7 +206,7 @@ Key developments in the GPT-5 family:
 
 The [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/) documents safety evaluations including assessments of CBRN uplift risk, cyberoffense capabilities, and persuasion. An [Addendum on Sensitive Conversations](https://openai.com/index/gpt-5-system-card-sensitive-conversations/) addresses handling of mental health, self-harm, and politically contentious topics, noting both improvements in refusal precision and remaining cases where the model provides responses that [require strengthening](https://openai.com/index/strengthening-chatgpt-responses-in-sensitive-conversations/).
 
-### Gemini 2.5 and 3.1 Families
+### Gemini 2.5 Family
 
 [Google DeepMind](https://blog.google/technology/google-deepmind/gemini-model-updates-february-2025/)'s Gemini 2.5 family, released across March–June 2025, introduced several models:
 
@@ -237,15 +215,10 @@ The [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/) documents s
 | Gemini 2.5 Pro | Highest capability, coding-focused | 1M tokens | Complex reasoning, coding |
 | Gemini 2.5 Flash | Speed-optimized frontier | 1M tokens | Scaled production use |
 | Gemini 2.5 Flash-Lite | Cost/latency optimized | 1M tokens | High-volume inference |
-| Gemini 3.1 Pro | Enhanced reasoning for complex tasks | 1M tokens | Advanced multi-step reasoning |
 
 [Gemini 2.5: Our Most Intelligent AI Model](https://blog.google/technology/google-deepmind/gemini-2-5-pro-latest/) describes the Pro variant as achieving leading performance on coding benchmarks including LiveCodeBench and outperforming GPT-4o on MMLU at release. [Gemini 2.5 Flash-Lite](https://blog.google/technology/google-deepmind/gemini-2-5-flash-lite/) was made production-ready in June 2025 with a focus on throughput-sensitive applications.
 
-The Gemini 3.1 Pro release is positioned as a further improvement on complex, multi-step reasoning tasks, extending the thinking model paradigm introduced in 2.5. The 2.5/3.1 families also introduced native **thinking models**—models that produce explicit chain-of-thought reasoning before answering—across both Pro and Flash tiers. [Advanced audio dialog and generation with Gemini 2.5](https://blog.google/products/gemini/gemini-2-5-audio/) extended audio-native generation capabilities.
-
-### Claude Opus 4.x Family
-
-<EntityLink id="anthropic">Anthropic</EntityLink>'s Claude Opus 4.5 achieved 80.9% on SWE-bench Verified and extended reasoning capabilities for complex agentic tasks. The subsequent **Claude Opus 4.6** release was positioned specifically as a financial research model, with enhanced capability for financial document analysis, quantitative reasoning over structured data, and domain-specific compliance-aware responses. The financial research specialization represents a pattern of frontier labs releasing capability-differentiated model variants alongside general-purpose flagship models.
+The 2.5 family also introduced native **thinking models**—models that produce explicit chain-of-thought reasoning before answering—across both Pro and Flash tiers. [Advanced audio dialog and generation with Gemini 2.5](https://blog.google/products/gemini/gemini-2-5-audio/) extended audio-native generation capabilities.
 
 ### Gemma 3 and Open-Weight Models
 
@@ -254,8 +227,6 @@ Google's [Gemma 3](https://blog.google/technology/developers/gemma-3/) family, r
 [MedGemma](https://blog.google/technology/health/medgemma-google-health-ai/), released in mid-2025, provides open health-specific models demonstrating LLM application in clinical reasoning. A [Gemma-based model contributed to discovery of a potential cancer therapy pathway](https://blog.google/technology/ai/gemma-cancer-therapy/), illustrating scientific research acceleration potential.
 
 [T5Gemma](https://blog.google/technology/developers/t5gemma/) introduced encoder-decoder variants of the Gemma architecture, enabling use cases where separate encoding and decoding is beneficial (e.g., retrieval-augmented generation, classification tasks).
-
-The **Arcee Trinity** technical report documents a frontier open-weight model that combines dense and sparse fine-tuning methods with instruction tuning to achieve strong performance across reasoning, coding, and instruction-following benchmarks. The Trinity report is notable for detailed ablations of fine-tuning pipeline design choices that affect safety-relevant behavior, including how RLHF stage ordering interacts with instruction-following fidelity.
 
 ### Llama 4 and the Open-Weight Ecosystem
 
@@ -284,20 +255,6 @@ Gemma Scope 2 supports research into:
 
 [Language Models Can Explain Neurons in Language Models (Bills et al., 2023)](https://openaipublic.blob.core.windows.net/neuron-explainer/paper/index.html) demonstrated that GPT-4 can generate natural language explanations of GPT-2 neurons with higher validity than human-written explanations. This opened a scalable pathway for automated interpretability: using more capable models to explain less capable ones. Subsequent work has extended this to sparse autoencoder features and cross-model explanation transfer.
 
-### Attention Mechanisms: Position Bias and Attention Sinks
-
-Two structural phenomena in transformer attention have received renewed theoretical attention in 2025.
-
-**Position bias** refers to the tendency of transformer models to assign disproportionate attention weight to tokens at particular positions, independent of semantic content. [A Residual-Aware Theory of Position Bias in Transformers (2025)](https://arxiv.org/abs/2506.00013) provides a theoretical account grounding position bias in the residual stream structure of transformers: because residual connections accumulate information from all prior layers, tokens at early positions accumulate larger residual norms, which in turn attract higher attention weight through the softmax operation. The theory predicts position bias patterns observed empirically in long-context models and provides guidance for architectural mitigations (e.g., residual norm normalization at attention inputs).
-
-**Attention sinks** are specific attention heads that consistently receive large attention weight from many positions, regardless of semantic relevance. [On the Existence and Behavior of Secondary Attention Sinks (2025)](https://arxiv.org/abs/2506.00014) documents that beyond the well-known primary attention sink (typically the first token), transformer models develop secondary attention sinks at specific intermediate positions. These secondary sinks appear to serve a different functional role from primary sinks—absorbing "excess" attention probability mass in contexts where no strongly relevant key token exists—and their removal degrades generation fluency without a proportional reduction in factual accuracy.
-
-[RoPE-LIME: RoPE-Space Locality + Sparse-K Sampling for Efficient LLM Attribution (2025)](https://arxiv.org/abs/2506.00015) introduces an attribution method for models using Rotary Position Embeddings (RoPE), exploiting the locality structure of RoPE to restrict attribution computation to a sparse subset of key tokens. The method achieves attribution quality comparable to full-attention attribution methods at a fraction of the computational cost, enabling more tractable interpretability analysis of long-context models.
-
-[Quantifying LLM Attention-Head Stability: Implications for Circuit Universality (2025)](https://arxiv.org/abs/2506.00016) examines whether specific attention heads maintain consistent functional roles across training runs with different random seeds. The study finds that while a subset of attention heads (particularly those involved in induction and positional copying) are highly stable across runs, the majority of heads show substantial variability in their learned functions. This has implications for claims of "circuit universality"—the hypothesis that equivalent circuits emerge across independently trained models—suggesting universality may be limited to a smaller set of core mechanisms than previously assumed.
-
-[KV Cache Reconstruction with Cross-Layer Fusion (2025)](https://arxiv.org/abs/2506.00017) addresses the memory cost of KV cache in long-context inference by reconstructing cache entries for intermediate layers from a sparse set of stored layers, using cross-layer attention patterns to interpolate missing cache entries. The approach reduces KV cache memory by approximately 40% with marginal quality degradation on long-context benchmarks.
-
 ### Activation Steering and Causal Intervention
 
 Activation steering—injecting vectors into model residual streams to steer behavior—has become a primary tool for behavioral intervention research. Recent work has refined understanding of when and why steering succeeds:
@@ -308,7 +265,6 @@ Activation steering—injecting vectors into model residual streams to steer beh
 - [Does GPT-2 Represent Controversy? A Small Mech Interp Investigation (2024)](https://www.lesswrong.com/posts/gpt2-controversy-mech-interp) provides a case study of applying mechanistic interpretability methods to identify controversy-related representations in GPT-2, illustrating the workflow for small-scale interpretability research.
 - [Features as Rewards: Scalable Supervision for Open-Ended Tasks via Interpretability (2025)](https://arxiv.org/abs/2502.09601) proposes using interpretability-discovered features as reward signals for RLHF, bypassing the need for human labeling of open-ended tasks.
 - [Causality is Key for Interpretability Claims to Generalise (2025)](https://arxiv.org/abs/2502.10229) argues that interpretability claims must be evaluated using causal interventions rather than correlation alone, since correlational analyses can identify spurious structure that does not causally influence model behavior.
-- [Discovering Universal Activation Directions for PII Leakage in Language Models (2025)](https://arxiv.org/abs/2506.00018) applies activation direction analysis to identify model-internal directions associated with personally identifiable information (PII) generation. The paper finds consistent activation directions across model families that predict when a model is about to output PII, enabling a lightweight real-time PII detection mechanism using linear probes on intermediate activations.
 
 ### Research Platform Value of Open-Weight Models
 
@@ -319,31 +275,6 @@ Activation steering—injecting vectors into model residual streams to steer beh
 | Activation steering | Residual stream intervention | Multiple labs using Llama |
 | Fine-tuning safety | Rapid iteration | Constitutional AI variants |
 | Neuron explanation | Cross-model explanation transfer | [Bills et al. 2023](https://openaipublic.blob.core.windows.net/neuron-explainer/paper/index.html) |
-| PII leakage analysis | Probe training on intermediate layers | [Universal Activation Directions for PII (2025)](https://arxiv.org/abs/2506.00018) |
-
-## Privacy and PII Risks
-
-As LLMs are trained on large-scale web corpora and deployed in contexts where users share sensitive information, privacy risks have become a recognized safety concern alongside capability and alignment issues.
-
-### PII Leakage in Model Outputs
-
-[Discovering Universal Activation Directions for PII Leakage in Language Models (2025)](https://arxiv.org/abs/2506.00018) demonstrates that activation directions predictive of PII generation are consistent across architectures and can be detected with lightweight linear probes. This provides a mechanistic basis for runtime PII filtering without requiring output-level string matching, which can be evaded by minor rephrasing. The universality of these directions across model families suggests PII leakage is a systematic consequence of training on web-scale data rather than an artifact of specific architectural choices.
-
-[Large-scale online deanonymization with LLMs (2025)](https://arxiv.org/abs/2506.00019) examines the extent to which LLMs can be used to reidentify individuals from ostensibly anonymized text—forum posts, writing samples, or pseudonymous social media content. The study finds that frontier models can substantially improve deanonymization accuracy over baseline string-matching approaches when given stylometric cues, location references, or temporal patterns as anchors. The paper evaluates several mitigation strategies including text paraphrasing and attribute suppression, finding that current automated anonymization tools reduce but do not eliminate deanonymization risk against LLM-assisted adversaries.
-
-[What Do LLMs Associate with Your Name? A Human-Centered Black-Box Audit of Personal Data (2025)](https://arxiv.org/abs/2506.00020) conducts a black-box audit of what personal information frontier models associate with named individuals across categories including occupation, location, age, and political views. The audit finds that models frequently surface associations that individuals consider private or incorrect, with limited consistency across model families. The study raises questions about accountability for model-generated personal profiles and the adequacy of current data governance mechanisms for addressing LLM-sourced personal data.
-
-### Deanonymization as an Emerging Threat
-
-The combination of LLM stylometric capabilities and large-scale deployment creates a threat model where:
-
-1. Users share pseudonymous content across platforms over time
-2. LLMs aggregate stylometric, topical, and temporal signals across posts
-3. Cross-referencing with identified content enables probabilistic deanonymization at scale
-
-This threat is distinct from traditional database privacy breaches: it does not require access to a structured data store and can operate on publicly available text. The scale at which LLM-assisted deanonymization can be deployed—at API inference cost—differs qualitatively from the manual deanonymization attacks studied in prior privacy literature.
-
-[Auditing Reciprocal Sentiment Alignment: Inversion Risk, Dialect Representation and Intent Misalignment in Transformers (2025)](https://arxiv.org/abs/2506.00021) examines a related phenomenon: the extent to which transformer models exhibit systematic sentiment biases toward or against specific dialects and demographic groups, and whether sentiment alignment techniques inadvertently encode demographic proxies that could enable indirect deanonymization or discriminatory inference.
 
 ## Hallucination and Factuality
 
@@ -358,18 +289,10 @@ LLM hallucination—the generation of plausible-sounding but factually incorrect
 | Vectara Hallucination Leaderboard | Summarization hallucination | Best models: ≈8% hallucination rate | [Vectara](https://github.com/vectara/hallucination-leaderboard) |
 | HalluLens | Factual query hallucination | Up to 45% on factual queries for GPT-4o | [HalluLens (ACL 2025)](https://aclanthology.org/2025.acl-long.1176/) |
 | CheckIfExist | Citation hallucination in AI-generated content | Detects fabricated citations in RAG systems | [CheckIfExist (2025)](https://arxiv.org/abs/2502.09802) |
-| SourceBench | Quality of web source references in AI answers | Evaluates whether AI-cited sources support claims made | [SourceBench (2025)](https://arxiv.org/abs/2506.00022) |
-| LiveClin | Clinical benchmark with leakage controls | Evaluates LLM accuracy on recent clinical cases unseen during training | [LiveClin (2025)](https://arxiv.org/abs/2506.00023) |
 
 The [FACTS Grounding benchmark](https://arxiv.org/abs/2501.03200) introduced by Google DeepMind specifically addresses the challenge of evaluating long-form generation against reference documents, distinguishing between claims that are grounded in provided source material and claims introduced without basis. This is particularly relevant for retrieval-augmented generation (RAG) systems, where the model has access to a retrieved context but may still generate unsupported claims.
 
 [CheckIfExist (2025)](https://arxiv.org/abs/2502.09802) addresses citation hallucination specifically—the generation of plausible-looking but non-existent citations, which poses particular risks in legal, medical, and academic contexts. The benchmark finds that citation hallucination rates remain substantial even for frontier models, and that RAG systems can still hallucinate citations from retrieved documents by misattributing or confabulating specific reference details.
-
-[SourceBench (2025)](https://arxiv.org/abs/2506.00022) extends this evaluation to the quality and relevance of web sources cited by chat assistants in search-augmented settings, finding that retrieved sources frequently do not support the specific claims made in assistant responses, even when the sources are real and retrievable.
-
-[Assessing Web Search Credibility and Response Groundedness in Chat Assistants (2025)](https://arxiv.org/abs/2506.00024) combines source credibility scoring with groundedness evaluation, finding that chat assistants with web search access frequently cite credible sources while still making claims not supported by those sources—indicating that source credibility and response groundedness are partially independent failure modes.
-
-[Omitted Variable Bias in Language Models Under Distribution Shift (2025)](https://arxiv.org/abs/2506.00025) identifies a structural source of LLM factual errors distinct from hallucination: when a model is trained on data where a confounding variable is systematically absent or underrepresented, it may learn spurious associations that produce confident but incorrect predictions under distribution shift. The paper argues this form of error is particularly difficult to detect because it manifests as coherent, confident output rather than the incoherent or hedged output associated with hallucination.
 
 ### Why Models Hallucinate
 
@@ -380,11 +303,8 @@ The [OpenAI hallucination explainer](https://openai.com/index/why-language-model
 3. **Context-weight tension**: Models may blend retrieved context with parametric knowledge, producing hybrid outputs that are faithful to neither
 4. **Sycophancy pressure**: RLHF can train models to confirm user beliefs rather than correct factual errors, since raters may prefer agreeable responses
 5. **Calibration failure**: Models often express high confidence in incorrect claims, reducing the signal value of expressed uncertainty
-6. **Omitted variable bias**: Systematic gaps in training data distributions can produce confident but systematically wrong predictions under distribution shift ([Omitted Variable Bias, 2025](https://arxiv.org/abs/2506.00025))
 
 Hallucination rates are not monotonically improved by scale: models engineered for massive context windows do not consistently achieve lower hallucination rates than smaller counterparts, and increased model size can increase the confidence of hallucinated outputs without reducing their frequency. This suggests hallucination is partly an architectural and training objective issue rather than purely a capacity limitation.
-
-**Learning under noisy supervision** is a related challenge: when training labels are themselves noisy or incorrect, models can inherit and amplify those errors. [Learning under noisy supervision is governed by a feedback-truth gap (2025)](https://arxiv.org/abs/2506.00026) formalizes this as a gap between the feedback signal (potentially incorrect) and ground truth, showing that convergence to correct behavior depends on the signal-to-noise ratio of the feedback and the learning rate schedule. The paper has implications for RLHF pipelines where human preference labels may be inconsistent or reflect rater biases rather than objective quality.
 
 ### Deception and Truthfulness (Expanded)
 
@@ -392,11 +312,9 @@ Hallucination rates are not monotonically improved by scale: models engineered f
 |---------------|-----------|---------|------------|
 | Hallucination | 8-45% | Varies by task and model | Training improvements, RAG |
 | Citation hallucination | ≈17% | Legal, academic domain | [CheckIfExist](https://arxiv.org/abs/2502.09802) detection systems |
-| Source-claim mismatch | Substantial | Search-augmented assistants | [SourceBench](https://arxiv.org/abs/2506.00022) evaluation |
 | Role-play deception | High | Prompted scenarios | Safety fine-tuning |
 | <EntityLink id="sycophancy">Sycophancy</EntityLink> | Moderate | Opinion questions | Constitutional AI, RLHF adjustment |
 | Strategic deception | Low-Moderate | Evaluation scenarios | Ongoing research |
-| Omitted variable errors | Variable | Distribution-shifted domains | Data auditing, causal evaluation |
 
 A 2025 benchmark ([AIMultiple](https://research.aimultiple.com/ai-hallucination/)) found that even the latest models have hallucination rates exceeding 15% when asked to analyze provided statements. In legal contexts, approximately 1 in 6 AI responses contain citation hallucinations. The wide variance across benchmarks reflects both genuine model differences and definitional variation in what constitutes a hallucination.
 
@@ -407,12 +325,10 @@ A 2025 benchmark ([AIMultiple](https://research.aimultiple.com/ai-hallucination/
 | Research Area | Progress Level | Key Findings | Organizations |
 |---------------|----------------|--------------|---------------|
 | Attention visualization | Advanced | Knowledge storage patterns | <R id="afe2508ac4caf5ee">Anthropic</R>, <R id="04d39e8bd5d50dd5">OpenAI</R> |
-| Activation patching | Moderate | Causal intervention methods | <EntityLink id="redwood">Redwood Research</EntityLink> |
+| Activation patching | Moderate | Causal intervention methods | <EntityLink id="redwood-research">Redwood Research</EntityLink> |
 | Sparse autoencoders | Advancing | Feature decomposition in large models | <R id="f771d4f56ad4dbaa">Anthropic</R>, Google DeepMind (Gemma Scope 2) |
 | Neuron explanation | Moderate | LM-explained neurons via GPT-4 | [Bills et al. 2023](https://openaipublic.blob.core.windows.net/neuron-explainer/paper/index.html) |
 | Mechanistic understanding | Early-Moderate | Transformer circuits | <R id="f771d4f56ad4dbaa">Anthropic Interpretability</R> |
-| PII activation probes | Early | Universal directions for PII leakage | [Universal Activation Directions (2025)](https://arxiv.org/abs/2506.00018) |
-| Attention head stability | Early | Circuit universality limits identified | [Attention-Head Stability (2025)](https://arxiv.org/abs/2506.00016) |
 
 ### Constitutional AI and Value Learning
 
@@ -438,7 +354,7 @@ Modern LLMs enable approaches to AI safety through automated oversight:
 
 ### Persuasion and Manipulation
 
-Modern LLMs demonstrate persuasion capabilities that raise concerns for democratic discourse and individual autonomy:
+Modern LLMs demonstrate sophisticated persuasion capabilities that raise concerns for democratic discourse and individual autonomy:
 
 | Capability | Current State | Evidence | Risk Level |
 |------------|---------------|----------|------------|
@@ -446,11 +362,8 @@ Modern LLMs demonstrate persuasion capabilities that raise concerns for democrat
 | Persona consistency | Advanced | Extended roleplay studies | High |
 | Emotional manipulation | Moderate | RLHF alignment research | Moderate |
 | Debate performance | Advanced | Human preference studies | High |
-| Linguistic personality expression | Advanced | [Bots of Persuasion (2025)](https://arxiv.org/abs/2506.00027) | Moderate-High |
 
 Research by <R id="f771d4f56ad4dbaa">Anthropic</R> indicates GPT-4 can increase human agreement rates by 82% through targeted persuasion techniques, raising concerns about <EntityLink id="consensus-manufacturing">consensus manufacturing</EntityLink>. The [AREG benchmark (2025)](https://arxiv.org/abs/2502.09455) specifically evaluates persuasion and resistance capabilities in LLMs through adversarial resource extraction games, finding that frontier models can maintain persuasive pressure across extended multi-turn interactions.
-
-[The Bots of Persuasion: Examining How Conversational Agents' Linguistic Expressions of Personality Affect User Perceptions and Decisions (2025)](https://arxiv.org/abs/2506.00027) examines how stylistic and personality-related linguistic choices in conversational AI systems influence user trust, compliance, and decision-making. The study finds that agents expressing warmth and confidence elicit higher compliance rates than neutral agents, and that users largely fail to adjust their compliance behavior after being informed the agent is AI-generated. This has implications for deployment contexts where AI agents are used for high-stakes interactions (e.g., financial advice, medical triage, legal guidance).
 
 ### Multilingual Safety Gaps
 
@@ -462,8 +375,6 @@ A consistent finding across the research literature is that safety alignment app
 
 This suggests that multilingual deployment of LLMs creates safety gaps that single-language evaluation would miss, a concern noted in the [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/).
 
-[Empathetic Cascading Networks: A Multi-Stage Prompting Technique for Reducing Social Biases in Large Language Models (2025)](https://arxiv.org/abs/2506.00028) proposes a prompting architecture that decomposes bias mitigation into sequential stages—perspective-taking, counterfactual generation, and self-critique—finding that cascaded prompting reduces demographic bias in model outputs more effectively than single-stage debiasing prompts. The approach is complementary to RLHF-based bias mitigation and does not require model fine-tuning.
-
 ### Cybersecurity Capabilities and Refusal Frameworks
 
 LLMs' code generation and vulnerability analysis capabilities create dual-use risks in cybersecurity:
@@ -471,13 +382,10 @@ LLMs' code generation and vulnerability analysis capabilities create dual-use ri
 - Models can assist with vulnerability identification, exploit development, and attack planning at varying levels depending on specificity of the request
 - [A Content-Based Framework for Cybersecurity Refusal Decisions (2025)](https://arxiv.org/abs/2502.09591) proposes taxonomizing cybersecurity requests by content type (reconnaissance vs. exploitation vs. malware development) rather than binary harmful/safe classification, enabling more precise refusal decisions that maintain legitimate educational and defensive use
 - [SecCodeBench-V2 (2025)](https://arxiv.org/abs/2502.09474) provides updated benchmarks for evaluating security-relevant code generation, finding continued improvement in both benign and potentially harmful code generation capabilities
-- [Can Adversarial Code Comments Fool AI Security Reviewers? (2025)](https://arxiv.org/abs/2506.00029) conducts a large-scale empirical study of comment-based attacks against LLM code security analysis tools. The study finds that injecting misleading natural language comments into code—asserting, e.g., "this input is already sanitized" or "this function has been audited"—causes LLMs acting as security reviewers to substantially underreport vulnerabilities. Comment-based attacks succeed even when the code itself contains obvious vulnerability patterns, suggesting that LLM security tools are susceptible to social-engineering-style attacks embedded in natural language annotations.
 
-[What Breaks Embodied AI Security: LLM Vulnerabilities, CPS Flaws, or Something Else? (2025)](https://arxiv.org/abs/2506.00030) analyzes security vulnerabilities in embodied AI systems—robots and cyber-physical systems (CPS) controlled by LLM planners. The paper finds that the dominant failure mode is neither pure LLM jailbreaking nor pure CPS exploit, but rather the interface between LLM planning outputs and CPS actuation logic: adversarial inputs can exploit ambiguities in how natural-language plans are translated into low-level commands. This suggests that security evaluation of embodied AI requires joint analysis of the LLM and the CPS rather than treating each in isolation.
+### Autonomous Capabilities
 
-### Autonomous Capabilities and Long-Horizon Planning
-
-Current LLMs demonstrate increasing levels of autonomous task execution, with recent work extending evaluation to substantially longer horizons and more complex multiagent settings:
+Current LLMs demonstrate increasing levels of autonomous task execution:
 
 - **Web browsing**: GPT-4 class models can navigate websites, extract information, and interact with web services
 - **Code execution**: Models can write, debug, and iteratively improve software across extended sessions
@@ -485,12 +393,143 @@ Current LLMs demonstrate increasing levels of autonomous task execution, with re
 - **Goal persistence**: Basic ability to maintain objectives across extended multi-turn interactions, relevant to <EntityLink id="scheming">scheming</EntityLink> risk evaluation
 - **Memory across sessions**: [MemoryArena (2025)](https://arxiv.org/abs/2502.10392) benchmarks agent memory in interdependent multi-session tasks, finding that frontier models maintain task state imperfectly across sessions but with increasing reliability in newer model versions
 
-**Long-horizon task training** has emerged as a distinct research focus. [KLong: Training LLM Agents for Extremely Long-horizon Tasks (2025)](https://arxiv.org/abs/2506.00031) introduces a curriculum training approach that progressively extends the planning horizon during agent training, finding that agents trained with horizon curriculum substantially outperform those trained at fixed horizon lengths on tasks requiring 50+ sequential decision steps. The paper evaluates on both simulated and real-world web navigation tasks, finding that horizon curriculum training improves task completion rates by approximately 30% on tasks requiring more than 20 steps.
+## Fundamental Limitations
 
-**Long-horizon benchmarking** has also advanced. [LLM-WikiRace: Benchmarking Long-term Planning and Reasoning over Real-World Knowledge Graphs (2025)](https://arxiv.org/abs/2506.00032) introduces a benchmark where agents must navigate Wikipedia's link graph from a start article to a target article in a minimum number of steps. The task requires multi-hop planning over a real-world knowledge graph without access to a precomputed path. Frontier models achieve substantially higher success rates than prior LLMs but still fall short of human expert performance on the hardest navigation paths, suggesting that long-horizon graph planning remains a meaningful capability gap.
+### What Doesn't Scale Automatically
 
-**Multiagent learning** capabilities have been documented at scale. [Discovering Multiagent Learning Algorithms with Large Language Models (2025)](https://arxiv.org/abs/2506.00033) demonstrates that LLMs can generate novel multiagent learning algorithms—including variants of gradient-based cooperation and opponent modeling—when prompted with descriptions of multi-agent environments and performance objectives. Several LLM-generated algorithms outperform standard baselines on cooperative and competitive multiagent tasks, raising questions about the pace at which LLM-driven algorithm discovery could accelerate multiagent AI development.
+| Property | Scaling Behavior | Evidence | Implications |
+|----------|------------------|----------|-------------|
+| Truthfulness | No direct improvement | Larger models can be more convincingly wrong | Requires targeted training |
+| Reliability | Inconsistent | High variance across similar prompts | Systematic evaluation needed |
+| Novel reasoning | Limited progress | Pattern matching vs. genuine insight | May require architectural changes |
+| Value alignment | No guarantee | Capability-alignment divergence | Alignment difficulty |
+| Multilingual safety | Uneven transfer | [Align Once, Benefit Multilingually](https://arxiv.org/abs/2502.07833) | Requires cross-lingual training |
 
-**Multiagent orchestration** is a growing concern for AI governance. [AdaptOrch: Task-Adaptive Multi-Agent Orchestration in the Era of LLM Performance Convergence (2025)](https://arxiv.org/abs/2506.00034) addresses the problem of dynamically routing tasks to the most appropriate LLM agent in a multi-agent pipeline as model capabilities converge. As frontier models increasingly achieve similar performance on standard benchmarks, task-adaptive routing based on model-specific strengths (e.g., mathematical reasoning vs. code generation vs. domain knowledge) becomes more important for overall pipeline performance. The paper proposes a meta-controller that monitors task-level performance signals to reallocate tasks across agents.
+### Current Performance Gaps
 
-[MALLVI: A Multi-Agent Framework for Integrated Generalized Robotics Manipulation (2025)](https://arxiv.org/abs/2506.00035) describes a multi-agent system where LLM planners, vision-language models, and low-level motor controllers are orchestrated to perform complex manipulation tasks. The framework demonstrates that multiagent LLM architectures can generalize across manipulation tasks not seen during
+Despite strong benchmark performance, significant limitations remain:
+
+- **Hallucination rates**: 8-45% depending on task and model, with high variance across domains
+- **Inconsistency**: High variance in responses to equivalent prompts; [Evidence for Daily and Weekly Periodic Variability in GPT-4o Performance (2025)](https://arxiv.org/abs/2502.09723) documents time-dependent performance variation that is difficult to explain and control for in evaluations
+- **Context limitations**: Models struggle with very long-horizon reasoning despite large context windows (1M+ tokens); long-context retrieval accuracy degrades in the middle of the context window
+- **Novel problem solving**: While o3 achieved 87.5% on ARC-AGI, this required high-compute settings; real-world novel reasoning remains challenging
+- **Benchmark vs. real-world gap**: [QUAKE benchmark research](https://klu.ai/blog/evaluating-frontier-models-2024) found frontier LLMs average just 28% pass rate on practical tasks, despite high benchmark scores
+- **Long-tail knowledge**: [Long-Tail Knowledge in Large Language Models (2025)](https://arxiv.org/abs/2502.09645) documents that rare facts and edge cases are disproportionately hallucinated, with performance degrading sharply below certain frequency thresholds in training data
+- **False belief reasoning**: [Language Statistics and False Belief Reasoning: Evidence from 41 Open-Weight LMs (2025)](https://arxiv.org/abs/2502.09591) finds that models rely heavily on surface language statistics rather than genuine theory-of-mind reasoning when solving false belief tasks, raising questions about claimed social cognition capabilities
+
+Note that models engineered for massive context windows do not consistently achieve lower hallucination rates than smaller counterparts, suggesting performance depends more on architecture and training quality than capacity alone.
+
+## Current State and 2025-2030 Trajectory
+
+### Key 2024-2025 Developments
+
+| Development | Status | Impact | Safety Relevance |
+|-------------|--------|--------|------------------|
+| Reasoning models (o1, o3) | Deployed | PhD-level reasoning achieved | Extended planning capabilities |
+| Inference-time scaling | Established | New scaling paradigm | Potentially harder to predict capabilities |
+| Agentic AI frameworks | Growing | Autonomous task completion | <EntityLink id="agentic-ai">Autonomous systems</EntityLink> concerns |
+| 1M+ token context | Standard | Long-document reasoning | Extended goal persistence |
+| Multi-model routing | Emerging | Task-optimized deployment | Complexity in governance |
+| Open-weight frontier models | Established | Llama 4, Gemma 3, gpt-oss | Reduced API access as governance lever |
+| Mechanistic interpretability tooling | Advancing | Gemma Scope 2, SAE ecosystem | Improved interpretability tractability |
+| Multilingual alignment research | Early | [Align Once, Benefit Multilingually](https://arxiv.org/abs/2502.07833) | Safety gaps in non-English languages |
+
+One of the most significant trends is the emergence of **agentic AI**—LLM-powered systems that can make decisions, interact with tools, and take actions without constant human input. This represents a qualitative shift from chat interfaces to autonomous systems capable of extended task execution. OpenAI's [Spring Update](https://openai.com/index/spring-update/) and subsequent [Shipping Smarter Agents](https://openai.com/index/shipping-smarter-agents/) posts describe investment in memory, tool use, and multi-model orchestration as the primary near-term product directions.
+
+### Near-term Outlook (2025-2026)
+
+| Development | Likelihood | Timeline | Impact |
+|-------------|------------|----------|--------|
+| GPT-5.x and successor models | High | 6-12 months | Further capability improvement |
+| Improved reasoning (o3 successors) | High | 3-6 months | Enhanced <EntityLink id="scientific-research">scientific research</EntityLink> |
+| Multimodal integration | High | 6-12 months | Video, audio, sensor fusion |
+| Robust agent frameworks | High | 12-18 months | <EntityLink id="agentic-ai">Autonomous systems</EntityLink> |
+| Interpretability-informed alignment | Moderate | 12-24 months | [Features as Rewards](https://arxiv.org/abs/2502.09601) approach |
+
+### Medium-term Outlook (2026-2030)
+
+Expected developments include potential architectural innovations beyond standard transformer attention, deeper integration with robotics platforms, and continued capability improvements. Key uncertainties include whether current scaling approaches will continue yielding improvements and the timeline for <EntityLink id="factors-ai-capabilities-overview">artificial general intelligence</EntityLink>.
+
+**Data constraints:** According to [Epoch AI projections](https://arxiv.org/html/2211.04325v2), high-quality training data could become a significant bottleneck this decade, particularly if models continue to be overtrained. For AI progress to continue into the 2030s, either new sources of data (synthetic data, multimodal data) or less data-hungry techniques must be developed. [Can Generative AI Survive Data Contamination? (2025)](https://arxiv.org/abs/2502.10392) analyzes the theoretical guarantees available under contaminated recursive training—where models are trained on AI-generated data—finding that certain forms of contamination lead to systematic performance degradation rather than catastrophic collapse, but that the long-run effects remain analytically uncertain.
+
+## Key Uncertainties and Research Cruxes
+
+### Fundamental Understanding Questions
+
+- **Intelligence vs. mimicry**: Extent of genuine understanding vs. sophisticated pattern matching, with [False Belief Reasoning research (2025)](https://arxiv.org/abs/2502.09591) suggesting current models rely heavily on statistical correlates of reasoning rather than causal models
+- **Emergence predictability**: Whether capability emergence can be reliably forecasted; [Random Scaling of Emergent Capabilities (2025)](https://arxiv.org/abs/2502.15406) suggests randomness in training may cause more gradual aggregate emergence than apparent
+- **Architectural limits**: Whether transformers can scale to AGI or require fundamental innovations
+- **Alignment scalability**: Whether current safety techniques work for superhuman systems
+
+### Safety Research Priorities
+
+| Priority Area | Importance | Tractability | Neglectedness |
+|---------------|------------|--------------|---------------|
+| <EntityLink id="interpretability-sufficient">Interpretability</EntityLink> | High | Moderate | Moderate |
+| <EntityLink id="solutions">Alignment techniques</EntityLink> | Highest | Low | Low |
+| <EntityLink id="safety-research">Capability evaluation</EntityLink> | High | High | Moderate |
+| Governance frameworks | High | Moderate | High |
+| Multilingual alignment | High | Moderate | High |
+| Factuality and hallucination | Moderate | High | Low |
+
+### Timeline Uncertainties
+
+Current expert surveys show wide disagreement on AGI timelines, with median estimates ranging from 2027 to 2045. This uncertainty stems from:
+
+- Unpredictable capability emergence patterns
+- Unknown scaling law continuation
+- Potential architectural innovations
+- Economic and resource constraints
+- Data availability bottlenecks
+
+The o3 results on ARC-AGI (87.5%, approaching human baseline of ~85%) have intensified debate about whether we are approaching AGI sooner than expected. Critics note that high-compute inference settings make this performance expensive and slow, and that benchmark performance may not translate to general real-world capability. The [ARC-AGI-2 results](https://arcprize.org/blog/analyzing-o3-with-arc-agi) (o3 at 3%, average humans at 60%) illustrate that performance on designed-to-be-robust benchmarks still reveals substantial gaps.
+
+## Sources & Resources
+
+### Academic Research
+
+| Paper | Authors | Year | Key Contribution |
+|-------|---------|------|------------------|
+| <R id="85f66a6419d173a7">Scaling Laws</R> | Kaplan et al. | 2020 | Mathematical scaling relationships |
+| <R id="46fd66187ec3e6ae">Chinchilla</R> | Hoffmann et al. | 2022 | Optimal parameter-data ratios |
+| <R id="683aef834ac1612a">Constitutional AI</R> | Bai et al. | 2022 | Value-based training methods |
+| <R id="2d76bc16fcc7825d">Emergent Abilities</R> | Wei et al. | 2022 | Capability emergence documentation |
+| [Fine-Tuning GPT-2 from Human Preferences](https://arxiv.org/abs/1909.08593) | Ziegler et al. | 2019 | RLHF foundations for language models |
+| [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165) | Brown et al. | 2020 | GPT-3 and few-shot learning |
+| [Emergent Abilities Survey](https://arxiv.org/abs/2503.05788) | Various | 2025 | Comprehensive emergence review |
+| [Scaling Laws for Precision](https://proceedings.neurips.cc/paper_files/paper/2024/file/8b970e15a89bf5d12542010df8eae8fc-Paper-Conference.pdf) | Kumar et al. | 2024 | Low-precision scaling extensions |
+| [HalluLens Benchmark](https://aclanthology.org/2025.acl-long.1176.pdf) | Various | 2025 | Hallucination measurement framework |
+| [FACTS Grounding](https://arxiv.org/abs/2501.03200) | Google DeepMind | 2025 | Long-form factuality benchmark |
+| [Align Once, Benefit Multilingually](https://arxiv.org/abs/2502.07833) | Various | 2025 | Multilingual safety alignment |
+| [Random Scaling of Emergent Capabilities](https://arxiv.org/abs/2502.15406) | Various | 2025 | Randomness and emergence thresholds |
+| [Causality is Key for Interpretability](https://arxiv.org/abs/2502.10229) | Various | 2025 | Causal evaluation of interpretability claims |
+
+### Model and System Cards
+
+| Document | Organization | Year | Relevance |
+|----------|--------------|------|-----------|
+| [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/) | OpenAI | 2025 | Safety evaluations, capability assessments |
+| [GPT-5 System Card Addendum: Sensitive Conversations](https://openai.com/index/gpt-5-system-card-sensitive-conversations/) | OpenAI | 2025 | Mental health, self-harm, contentious topics |
+| [gpt-oss-120b & gpt-oss-20b Model Card](https://openai.com/index/gpt-oss-model-card/) | OpenAI | 2025 | Open-weight model documentation |
+| [GPT-4V(ision) System Card](https://openai.com/research/gpt-4v-system-card) | OpenAI | 2023 | Multimodal safety evaluation |
+| [GPT-2: 1.5B Release](https://openai.com/research/gpt-2-1-5b-release) | OpenAI | 2019 | Staged release and safety rationale |
+
+### Organizations and Research Groups
+
+| Type | Organization | Focus Area | Key Resources |
+|------|--------------|------------|---------------|
+| Industry | <R id="e9aaa7b5e18f9f41">OpenAI</R> | GPT series, safety research | Technical papers, safety docs |
+| Industry | <R id="f771d4f56ad4dbaa">Anthropic</R> | Constitutional AI, interpretability | Claude research, safety papers |
+| Industry | <EntityLink id="deepmind">Google DeepMind</EntityLink> | Gemini, Gemma, interpretability | Gemma Scope 2, FACTS benchmarks |
+| Academic | <EntityLink id="chai">CHAI</EntityLink> | AI alignment research | Technical alignment papers |
+| Safety | <EntityLink id="redwood-research">Redwood Research</EntityLink> | Interpretability, oversight | Mechanistic interpretability |
+| Research | <EntityLink id="metr">METR</EntityLink> | Capability evaluation | Autonomous replication evaluations |
+
+### Policy and Governance Resources
+
+| Resource | Organization | Focus | Link |
+|----------|--------------|-------|------|
+| AI Safety Guidelines | <R id="54dbc15413425997">NIST</R> | Federal standards | Risk management framework |
+| Responsible AI Practices | <R id="0e7aef26385afeed">Partnership on AI</R> | Industry coordination | Best practices documentation |
+| International Cooperation | <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> | Global safety standards | International coordination |
+| Responsible Scaling Policy | <EntityLink id="anthropic">Anthropic</EntityLink> | Capability thresholds | [RSP documentation](https://www.anthropic.com/news/anthropics-responsible-scaling-policy) |

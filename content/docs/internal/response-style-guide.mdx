@@ -24,7 +24,7 @@ import {EntityLink} from '@components/wiki';
 
 Response pages describe interventions, policies, and technical approaches that address AI risks. They explain how something works and assess its effectiveness.
 
-**Prerequisite**: All response pages must follow the [Common Writing Principles](/wiki/E726) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
+**Prerequisite**: All response pages must follow the <EntityLink id="common-writing-principles">Common Writing Principles</EntityLink> — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
 
 ## Page Type Detection
 
@@ -114,7 +114,7 @@ Task({
   subagent_type: 'general-purpose',
   prompt: `Create a response page for [RESPONSE_NAME].
 
-  FIRST: Read /wiki/E749 (Response Style Guide).
+  FIRST: Read /internal/response-style-guide/ (Response Style Guide).
 
   THEN: Research using WebSearch:
   - Academic papers on the technique
@@ -141,7 +141,7 @@ Task({
   subagent_type: 'general-purpose',
   prompt: `Improve response page at [PATH].
 
-  Read /wiki/E749 (Response Style Guide) first.
+  Read /internal/response-style-guide/ (Response Style Guide) first.
 
   Add:
   1. Quick Assessment table (if missing)

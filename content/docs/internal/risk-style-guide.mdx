@@ -24,7 +24,7 @@ import {EntityLink} from '@components/wiki';
 
 This guide defines standards for risk analysis pages in the LongtermWiki knowledge base. Risk pages analyze potential negative outcomes from AI development.
 
-**Prerequisite**: All risk pages must follow the [Common Writing Principles](/wiki/E726) — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
+**Prerequisite**: All risk pages must follow the <EntityLink id="common-writing-principles">Common Writing Principles</EntityLink> — epistemic honesty, language neutrality, and analytical tone. The **objectivity** rating dimension measures this.
 
 ## Page Type Detection
 
@@ -166,7 +166,7 @@ Task({
   subagent_type: 'general-purpose',
   prompt: `Create a new risk page for [RISK_NAME].
 
-  FIRST: Read /wiki/E750 (Risk Style Guide) for requirements.
+  FIRST: Read /internal/risk-style-guide/ (Risk Style Guide) for requirements.
 
   THEN: Research the risk using WebSearch to find:
   - Academic papers on the mechanism
@@ -193,7 +193,7 @@ Task({
   subagent_type: 'general-purpose',
   prompt: `Improve the risk page at [PATH].
 
-  FIRST: Read /wiki/E750 (Risk Style Guide) and the current page.
+  FIRST: Read /internal/risk-style-guide/ (Risk Style Guide) and the current page.
 
   THEN: Use WebSearch to find citations for:
   - Quantitative estimates (likelihood, severity)
@@ -246,7 +246,7 @@ Pages are scored on seven dimensions (0-10 scale). **Scoring is harsh** - a 7 is
 4. **Bullet-heavy**: Use tables and prose instead
 5. **Table-only sections**: Every section needs explanatory paragraphs, not just data tables
 5. **No uncertainty acknowledgment**: Always include what we don't know
-6. **Insider language**: "EA organizations", "non-EA causes" — use descriptive terms per [Common Writing Principles](/wiki/E726)
+6. **Insider language**: "EA organizations", "non-EA causes" — use descriptive terms per <EntityLink id="common-writing-principles">Common Writing Principles</EntityLink>
 7. **False certainty in estimates**: "Risk is 30%" without ranges or sources — always use ranges and label confidence
 
 ---

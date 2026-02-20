@@ -17,7 +17,9 @@ import { getFieldSortIndex } from '../frontmatter-order.ts';
  * preserving their source order.
  */
 function extractFieldOrder(raw: string): string[] {
-  const lines = raw.split('\n');
+  // Strip BOM and normalize CRLF so delimiter checks work on all platforms
+  const normalized = raw.replace(/^\ufeff/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = normalized.split('\n');
   if (lines[0] !== '---') return [];
 
   const fields: string[] = [];

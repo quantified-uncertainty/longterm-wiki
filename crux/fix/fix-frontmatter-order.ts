@@ -84,7 +84,9 @@ interface FrontmatterBlock {
  * column 0, word characters, followed by colon).
  */
 function parseFrontmatterBlocks(content: string): FrontmatterBlock | null {
-  const lines = content.split('\n');
+  // Strip BOM and normalize CRLF to LF so delimiter checks work on all platforms
+  const normalized = content.replace(/^\ufeff/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = normalized.split('\n');
 
   // Find opening ---
   if (lines[0] !== '---') return null;

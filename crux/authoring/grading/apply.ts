@@ -7,6 +7,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { FRONTMATTER_RE } from '../../lib/patterns.ts';
+import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
 import type { PageInfo, GradeResult, Metrics } from './types.ts';
 
 /** Apply grades to frontmatter YAML in the source file. */
@@ -44,7 +45,11 @@ export function applyGradesToFile(
     fm.lastEdited = fm.lastEdited.toISOString().split('T')[0];
   }
 
-  let newFm: string = stringifyYaml(fm, {
+  // Reorder keys to canonical order before serialization so newly-added
+  // fields (e.g. tacticalValue) land in the correct position.
+  const orderedFm = reorderFrontmatterObject(fm);
+
+  let newFm: string = stringifyYaml(orderedFm, {
     defaultStringType: 'QUOTE_DOUBLE',
     defaultKeyType: 'PLAIN',
     lineWidth: 0,
