@@ -118,12 +118,9 @@ export const preferEntityLinkRule = createRule({
 
       if (entitySlug && idRegistry?.bySlug[entitySlug]) {
         // Registered entity — blocking error with auto-fix
-        // Use numeric+name format when numeric ID is available
+        // Use numeric+name format (numericId is always truthy here since bySlug check passed above)
         const numericId = idRegistry.bySlug[entitySlug];
-        const idAttr = numericId
-          ? `id="${numericId}" name="${entitySlug}"`
-          : `id="${entitySlug}"`;
-        const replacement = `<EntityLink ${idAttr}>${text}</EntityLink>`;
+        const replacement = `<EntityLink id="${numericId}" name="${entitySlug}">${text}</EntityLink>`;
         issues.push(new Issue({
           rule: this.id,
           file: content.path,

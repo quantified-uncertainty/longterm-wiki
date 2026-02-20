@@ -29,9 +29,23 @@ import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.ts';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, loadPathRegistry, loadOrganizations, loadExperts } from '../lib/content-types.ts';
 import { logBulkFixes } from '../lib/edit-log.ts';
-import { ENTITY_LINK_RE } from '../lib/patterns.ts';
+import { ENTITY_LINK_RE, NUMERIC_ID_RE } from '../lib/patterns.ts';
+
+// Cached numeric-ID → slug mapping for deduplication
+let _numericIdToSlug: Record<string, string> | null = null;
+function getNumericIdToSlug(): Record<string, string> {
+  if (_numericIdToSlug) return _numericIdToSlug;
+  try {
+    const raw = readFileSync(join(DATA_DIR, 'id-registry.json'), 'utf-8');
+    const registry = JSON.parse(raw) as { entities?: Record<string, string> };
+    _numericIdToSlug = registry.entities ?? {};
+  } catch {
+    _numericIdToSlug = {};
+  }
+  return _numericIdToSlug;
+}
 
 const args: string[] = process.argv.slice(2);
 const APPLY_MODE: boolean = args.includes('--apply');
@@ -450,9 +464,16 @@ function processFile(filePath: string, entities: Map<string, EntityEntry>, pageE
   let offset = 0;
 
   // Find existing EntityLinks to avoid duplicates
+  // Resolve numeric IDs (E42) to slugs so dedup works against entity.id (always a slug)
   const existingLinks = new Set<string>();
+  const numericIdMap = getNumericIdToSlug();
   for (const linkMatch of content.matchAll(ENTITY_LINK_RE)) {
-    existingLinks.add(linkMatch[1]);
+    const rawId = linkMatch[1];
+    existingLinks.add(rawId);
+    if (NUMERIC_ID_RE.test(rawId)) {
+      const slug = numericIdMap[rawId.toUpperCase()];
+      if (slug) existingLinks.add(slug);
+    }
   }
 
   // Process each entity
