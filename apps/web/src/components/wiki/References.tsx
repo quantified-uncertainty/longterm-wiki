@@ -65,9 +65,9 @@ export function References({ ids }: { ids: string[] }) {
   return (
     <section className="mt-8 pt-6 border-t border-border">
       <h2 className="text-lg font-semibold mb-3 text-foreground">References</h2>
-      <ol className="list-none space-y-1 pl-0">
+      <ul className="list-none space-y-1 pl-0" role="list">
         {uniqueIds.map((id, i) => formatCitation(id, i + 1))}
-      </ol>
+      </ul>
     </section>
   );
 }
