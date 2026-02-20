@@ -177,6 +177,34 @@ describe('agent-checklist init', () => {
     expect(result.output).toContain('Failed to fetch');
   });
 
+  it('auto-marks issue-tracking as N/A with reason when no issue provided', async () => {
+    const result = await commands.init(['Build a feature'], { type: 'infrastructure' });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('issue-tracking auto-marked N/A');
+
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(writtenContent).toContain('[~]');
+    expect(writtenContent).toContain('issue-tracking');
+    expect(writtenContent).toContain('<!-- N/A: no GitHub issue for this session -->');
+  });
+
+  it('does NOT auto-mark issue-tracking as N/A when issue is provided', async () => {
+    mockGithubApi.mockResolvedValueOnce({
+      number: 5,
+      title: 'Add feature',
+      labels: [],
+      html_url: 'https://github.com/test/repo/issues/5',
+    });
+
+    const result = await commands.init([], { issue: '5' });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain('issue-tracking auto-marked N/A');
+
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    // issue-tracking should still be unchecked [ ], not [~]
+    expect(writtenContent).toMatch(/\[ \] `issue-tracking`/);
+  });
+
   it('uses issue title as task when no task arg provided', async () => {
     mockGithubApi.mockResolvedValueOnce({
       number: 10,
@@ -367,5 +395,70 @@ describe('agent-checklist complete', () => {
     expect(result.output).toContain('Correctness verified');
     expect(result.output).toContain('implement');
     expect(result.output).toContain('review');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// check command
+// ---------------------------------------------------------------------------
+
+describe('agent-checklist check --na', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns error when --na is used without --reason', async () => {
+    const metadata: ChecklistMetadata = {
+      task: 'Test',
+      branch: 'test-branch',
+      timestamp: '2026-02-18T12:00:00Z',
+    };
+    const md = buildChecklist('infrastructure', metadata);
+
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const result = await commands.check(['fix-escaping'], { na: true });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('--reason is required');
+    expect(result.output).toContain('--na');
+    expect(mockWriteFileSync).not.toHaveBeenCalled();
+  });
+
+  it('embeds reason in markdown when --na --reason is used', async () => {
+    const metadata: ChecklistMetadata = {
+      task: 'Test',
+      branch: 'test-branch',
+      timestamp: '2026-02-18T12:00:00Z',
+    };
+    const md = buildChecklist('infrastructure', metadata);
+
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const result = await commands.check(['fix-escaping'], { na: true, reason: 'pure TypeScript, no MDX' });
+    expect(result.exitCode).toBe(0);
+    expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+
+    const written = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(written).toContain('[~]');
+    expect(written).toContain('fix-escaping');
+    expect(written).toContain('<!-- N/A: pure TypeScript, no MDX -->');
+  });
+
+  it('does not require --reason for regular [x] checks', async () => {
+    const metadata: ChecklistMetadata = {
+      task: 'Test',
+      branch: 'test-branch',
+      timestamp: '2026-02-18T12:00:00Z',
+    };
+    const md = buildChecklist('infrastructure', metadata);
+
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const result = await commands.check(['read-issue'], {});
+    expect(result.exitCode).toBe(0);
+    expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
   });
 });

@@ -32,6 +32,8 @@ export interface ParsedItem {
   id: string;
   label: string;
   status: CheckStatus;
+  /** Reason provided when the item was marked N/A. */
+  naReason?: string;
 }
 
 export interface PhaseStatus {
@@ -510,7 +512,8 @@ export function buildChecklist(type: SessionType, metadata: ChecklistMetadata): 
 export function checkItems(
   markdown: string,
   ids: string[],
-  marker: 'x' | '~' = 'x'
+  marker: 'x' | '~' = 'x',
+  reason?: string
 ): { markdown: string; checked: string[]; notFound: string[] } {
   const lines = markdown.split('\n');
   const checked: string[] = [];
@@ -533,7 +536,12 @@ export function checkItems(
       if (numberedMatch) {
         const lineId = numberedMatch[3];
         if (lineId === id) {
-          lines[i] = line.replace(/\[([ x~])\]/, `[${marker}]`);
+          let newLine = line.replace(/\[([ x~])\]/, `[${marker}]`);
+          if (marker === '~' && reason) {
+            newLine = newLine.replace(/\s*<!-- N\/A:.*?-->/g, '');
+            newLine = newLine + ` <!-- N/A: ${reason} -->`;
+          }
+          lines[i] = newLine;
           checked.push(id);
           found = true;
           break;
@@ -552,7 +560,12 @@ export function checkItems(
         (catalogItem && lineLabel === catalogItem.label) ||
         lineId === id
       ) {
-        lines[i] = line.replace(/^- \[[ x~]\]/, `- [${marker}]`);
+        let newLine = line.replace(/^- \[[ x~]\]/, `- [${marker}]`);
+        if (marker === '~' && reason) {
+          newLine = newLine.replace(/\s*<!-- N\/A:.*?-->/g, '');
+          newLine = newLine + ` <!-- N/A: ${reason} -->`;
+        }
+        lines[i] = newLine;
         checked.push(id);
         found = true;
         break;
@@ -650,7 +663,9 @@ export function parseChecklist(markdown: string): ChecklistStatus {
         if (marker === 'x') status = 'checked';
         else if (marker === '~') status = 'na';
         else status = 'unchecked';
-        currentItems.push({ id, label, status });
+        const naReasonMatch = line.match(/<!-- N\/A: (.+?) -->/);
+        const naReason = naReasonMatch ? naReasonMatch[1] : undefined;
+        currentItems.push({ id, label, status, ...(naReason ? { naReason } : {}) });
         continue;
       }
 
@@ -665,7 +680,9 @@ export function parseChecklist(markdown: string): ChecklistStatus {
         else status = 'unchecked';
         // Derive an id from the label (lowercase, hyphenated)
         const id = label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        currentItems.push({ id, label, status });
+        const naReasonMatch = line.match(/<!-- N\/A: (.+?) -->/);
+        const naReason = naReasonMatch ? naReasonMatch[1] : undefined;
+        currentItems.push({ id, label, status, ...(naReason ? { naReason } : {}) });
       }
     }
   }
@@ -717,7 +734,8 @@ export function formatStatus(status: ChecklistStatus, c: FormatColors): string {
       if (item.status === 'checked') {
         lines.push(`  ${c.green}[x]${c.reset} ${c.dim}${item.id}${c.reset} ${item.label}`);
       } else if (item.status === 'na') {
-        lines.push(`  ${c.dim}[~]${c.reset} ${c.dim}${item.id}${c.reset} ${c.dim}${item.label} (N/A)${c.reset}`);
+        const reasonSuffix = item.naReason ? ` (N/A: ${item.naReason})` : ' (N/A)';
+        lines.push(`  ${c.dim}[~]${c.reset} ${c.dim}${item.id}${c.reset} ${c.dim}${item.label}${reasonSuffix}${c.reset}`);
       } else {
         lines.push(`  ${c.red}[ ]${c.reset} ${c.dim}${item.id}${c.reset} ${item.label}`);
       }
