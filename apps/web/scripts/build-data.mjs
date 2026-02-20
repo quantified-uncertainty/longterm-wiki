@@ -162,7 +162,7 @@ function countEntries(data) {
 }
 
 // Directory scanned for broken EntityLink refs during stability checks
-const CONTENT_SCAN_DIR = join(PROJECT_ROOT, '..', 'content', 'docs');
+const CONTENT_SCAN_DIR = CONTENT_DIR;
 
 /**
  * Compute backlinks for all entities

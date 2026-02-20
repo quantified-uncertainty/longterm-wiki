@@ -2,11 +2,15 @@
  * Tests for ID stability check (issue #148)
  *
  * Verifies that detectReassignments correctly identifies when entity
- * numeric IDs are silently reassigned between builds.
+ * numeric IDs are silently reassigned between builds, and that
+ * scanEntityLinkRefs correctly scans content files for broken refs.
  */
 
-import { describe, it, expect } from 'vitest';
-import { detectReassignments, formatReassignments } from '../id-stability.mjs';
+import { describe, it, expect, afterEach } from 'vitest';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import { detectReassignments, formatReassignments, scanEntityLinkRefs } from '../id-stability.mjs';
 
 describe('detectReassignments', () => {
   it('returns empty array when no previous registry exists', () => {
@@ -194,5 +198,109 @@ describe('formatReassignments', () => {
     expect(affectedIds.has('E1')).toBe(true);
     expect(affectedIds.has('E2')).toBe(true);
     expect(affectedIds.size).toBe(2);
+  });
+});
+
+describe('scanEntityLinkRefs', () => {
+  let tmpDir;
+
+  afterEach(() => {
+    if (tmpDir) {
+      rmSync(tmpDir, { recursive: true, force: true });
+      tmpDir = null;
+    }
+  });
+
+  it('returns empty array when directory does not exist', () => {
+    const result = scanEntityLinkRefs('/nonexistent/path/that/does/not/exist', new Set(['E1']));
+    expect(result).toEqual([]);
+  });
+
+  it('returns empty array when no matching IDs found in files', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    writeFileSync(join(tmpDir, 'page.mdx'), `---
+title: Test
+---
+<EntityLink id="E2">Some entity</EntityLink>
+`);
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E999']));
+    expect(result).toEqual([]);
+  });
+
+  it('finds EntityLink refs with matching IDs', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    writeFileSync(join(tmpDir, 'page.mdx'), `---
+title: Test
+---
+<EntityLink id="E694">Diversification</EntityLink>
+`);
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E694']));
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe('E694');
+    expect(result[0].line).toBe(4);
+    expect(result[0].file).toContain('page.mdx');
+  });
+
+  it('finds multiple refs to the same ID across lines', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    writeFileSync(join(tmpDir, 'page.mdx'), `---
+title: Test
+---
+<EntityLink id="E694">First</EntityLink>
+Some text.
+<EntityLink id="E694">Second</EntityLink>
+`);
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E694']));
+    expect(result).toHaveLength(2);
+    expect(result[0].line).toBe(4);
+    expect(result[1].line).toBe(6);
+  });
+
+  it('finds refs to multiple different IDs', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    writeFileSync(join(tmpDir, 'page.mdx'), `<EntityLink id="E1">A</EntityLink>
+<EntityLink id="E2">B</EntityLink>
+<EntityLink id="E3">C</EntityLink>
+`);
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E1', 'E3']));
+    expect(result).toHaveLength(2);
+    expect(result.map(r => r.id).sort()).toEqual(['E1', 'E3']);
+  });
+
+  it('scans recursively through subdirectories', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    const subDir = join(tmpDir, 'knowledge-base', 'risks');
+    mkdirSync(subDir, { recursive: true });
+    writeFileSync(join(subDir, 'nested.mdx'), `<EntityLink id="E694">Deep</EntityLink>
+`);
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E694']));
+    expect(result).toHaveLength(1);
+    expect(result[0].file).toContain('nested.mdx');
+  });
+
+  it('ignores non-MDX files', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    writeFileSync(join(tmpDir, 'data.json'), '{"id": "E694"}');
+    writeFileSync(join(tmpDir, 'readme.txt'), '<EntityLink id="E694">Test</EntityLink>');
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E694']));
+    expect(result).toEqual([]);
+  });
+
+  it('matches .md files as well as .mdx', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    writeFileSync(join(tmpDir, 'page.md'), `<EntityLink id="E10">Entity</EntityLink>
+`);
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E10']));
+    expect(result).toHaveLength(1);
+    expect(result[0].file).toContain('page.md');
+  });
+
+  it('does not match IDs that appear in different attributes', () => {
+    tmpDir = mkdtempSync(join(tmpdir(), 'id-stability-test-'));
+    // This should NOT match because the id attribute value is E999, not E694
+    writeFileSync(join(tmpDir, 'page.mdx'), `<EntityLink id="E999" data-old="E694">Test</EntityLink>
+`);
+    const result = scanEntityLinkRefs(tmpDir, new Set(['E694']));
+    expect(result).toEqual([]);
   });
 });
