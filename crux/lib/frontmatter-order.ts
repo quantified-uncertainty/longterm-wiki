@@ -125,3 +125,22 @@ export function sortFields(fields: string[]): string[] {
     return a.localeCompare(b);
   });
 }
+
+/**
+ * Reorder a frontmatter object's keys to canonical order.
+ *
+ * Use this when a code path modifies a parsed frontmatter object and then
+ * re-serializes it with yaml.stringify(). JS object property order follows
+ * insertion order, so newly added fields (e.g. tacticalValue from grading)
+ * would otherwise end up at the bottom instead of their canonical position.
+ *
+ * Returns a new object with keys in canonical order.
+ */
+export function reorderFrontmatterObject<T extends Record<string, unknown>>(obj: T): T {
+  const sorted = sortFields(Object.keys(obj));
+  const result = {} as Record<string, unknown>;
+  for (const key of sorted) {
+    result[key] = obj[key];
+  }
+  return result as T;
+}

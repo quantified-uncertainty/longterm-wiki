@@ -55,6 +55,11 @@ const fixers: Fixer[] = [
     description: 'Fix markdown lists and bold labels',
     command: 'node --import tsx/esm crux/validate/validate-unified.ts --rules=markdown-lists,consecutive-bold-labels --fix',
   },
+  {
+    name: 'Frontmatter Field Order',
+    description: 'Reorder frontmatter fields to canonical order (identity first, volatile last)',
+    command: 'node --import tsx/esm crux/fix/fix-frontmatter-order.ts --apply',
+  },
 ];
 
 function runFixer(fixer: Fixer): FixerResult {

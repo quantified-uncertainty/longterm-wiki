@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { createClient, MODELS, parseJsonResponse } from '../../lib/anthropic.ts';
 import { appendEditLog } from '../../lib/edit-log.ts';
+import { reorderFrontmatterObject } from '../../lib/frontmatter-order.ts';
 import { extractText } from '../../lib/llm.ts';
 import { READER_IMPORTANCE_GUIDELINES, TACTICAL_VALUE_GUIDELINES } from '../../lib/grading-shared.ts';
 import type { TopicPhaseContext } from './types.ts';
@@ -197,9 +198,10 @@ Respond with JSON:
     // by crux/lib/metrics-extractor.ts — not stored in frontmatter.
     delete frontmatter.metrics;
 
-    // Write updated file
+    // Write updated file — reorder keys to canonical order before serialization
+    const orderedFrontmatter = reorderFrontmatterObject(frontmatter);
     const { stringify: stringifyYaml } = await import('yaml');
-    let yamlStr = stringifyYaml(frontmatter);
+    let yamlStr = stringifyYaml(orderedFrontmatter);
     yamlStr = yamlStr.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');
     const newContent = `---\n${yamlStr}---\n${body}`;
     fs.writeFileSync(finalPath, newContent);
