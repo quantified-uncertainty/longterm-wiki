@@ -22,6 +22,7 @@ import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS } from './lib/content-typ
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { runStabilityCheck } from './lib/id-stability.mjs';
 import { buildIdMaps, computeNextId, filterEligiblePages } from './lib/id-assignment.mjs';
+import { isServerAvailable, allocateId } from './lib/id-client.mjs';
 
 const ALLOW_ID_REASSIGNMENT = process.argv.includes('--allow-id-reassignment');
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -151,9 +152,42 @@ const CONTENT_SCAN_DIR = CONTENT_DIR;
 // Main
 // ============================================================================
 
+/**
+ * Try to allocate an ID from the server; fall back to local assignment.
+ * Returns { numId, useServer } — useServer may flip to false on failure.
+ */
+async function allocateOrFallback(slug, useServer, nextIdRef) {
+  let numId;
+  if (useServer && !DRY_RUN) {
+    const result = await allocateId(slug);
+    if (result) {
+      numId = result.numericId;
+      // Keep nextIdRef in sync so local fallback won't collide with server-assigned IDs
+      const num = parseInt(numId.slice(1), 10);
+      if (num >= nextIdRef.value) nextIdRef.value = num + 1;
+    } else {
+      console.warn('    ID server failed mid-run — falling back to local assignment');
+      useServer = false;
+    }
+  }
+  if (!numId) {
+    numId = `E${nextIdRef.value}`;
+    nextIdRef.value++;
+  }
+  return { numId, useServer };
+}
+
 async function main() {
   if (DRY_RUN) {
     console.log('[dry-run] Checking which IDs would be assigned (no files written)\n');
+  }
+
+  // Check if the ID server is available for atomic allocation
+  let useServer = await isServerAvailable();
+  if (useServer) {
+    console.log(`  Using wiki server at ${process.env.LONGTERMWIKI_SERVER_URL}`);
+  } else {
+    console.log('  Wiki server unavailable — using local assignment');
   }
 
   // -------------------------------------------------------------------------
@@ -190,7 +224,7 @@ async function main() {
   // so auto-assigned entity IDs don't collide with them.
   // -------------------------------------------------------------------------
   const reservedIds = collectFrontmatterNumericIds(CONTENT_DIR);
-  let nextId = computeNextId(numericIdToSlug, reservedIds);
+  const nextIdRef = { value: computeNextId(numericIdToSlug, reservedIds) };
 
   // -------------------------------------------------------------------------
   // Stability check (entity-level) — detect silent reassignments (#148)
@@ -218,11 +252,13 @@ async function main() {
         continue;
       }
 
-      const numId = `E${nextId}`;
+      const alloc = await allocateOrFallback(entity.id, useServer, nextIdRef);
+      useServer = alloc.useServer;
+      const numId = alloc.numId;
+
       entity.numericId = numId;
       numericIdToSlug[numId] = entity.id;
       slugToNumericId[entity.id] = numId;
-      nextId++;
       entityAssignments++;
 
       if (DRY_RUN) {
@@ -242,7 +278,7 @@ async function main() {
   if (!DRY_RUN) {
     writeFileSync(
       ID_REGISTRY_FILE,
-      JSON.stringify({ _nextId: nextId, entities: numericIdToSlug }, null, 2)
+      JSON.stringify({ _nextId: nextIdRef.value, entities: numericIdToSlug }, null, 2)
     );
   }
 
@@ -290,11 +326,13 @@ async function main() {
   for (const page of eligiblePages) {
     if (slugToNumericId[page.id]) continue; // already has an ID
 
-    const numId = `E${nextId}`;
+    const alloc = await allocateOrFallback(page.id, useServer, nextIdRef);
+    useServer = alloc.useServer;
+    const numId = alloc.numId;
+
     numericIdToSlug[numId] = page.id;
     slugToNumericId[page.id] = numId;
     page.numericId = numId;
-    nextId++;
     pageAssignments++;
 
     if (DRY_RUN) {
@@ -311,7 +349,7 @@ async function main() {
   if (!DRY_RUN) {
     writeFileSync(
       ID_REGISTRY_FILE,
-      JSON.stringify({ _nextId: nextId, entities: numericIdToSlug }, null, 2)
+      JSON.stringify({ _nextId: nextIdRef.value, entities: numericIdToSlug }, null, 2)
     );
   }
 
