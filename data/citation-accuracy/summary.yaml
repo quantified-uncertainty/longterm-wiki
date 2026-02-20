@@ -1,22 +1,22 @@
-exportedAt: '2026-02-20T08:33:57.275Z'
+exportedAt: '2026-02-20T08:37:42.380Z'
 summary:
-  totalCitations: 229
-  checkedCitations: 200
-  accurateCitations: 142
+  totalCitations: 303
+  checkedCitations: 266
+  accurateCitations: 196
   inaccurateCitations: 8
   unsupportedCitations: 8
-  minorIssueCitations: 41
-  uncheckedCitations: 29
-  averageScore: 0.91
+  minorIssueCitations: 53
+  uncheckedCitations: 37
+  averageScore: 0.93
 verdictDistribution:
-  accurate: 142
+  accurate: 196
   inaccurate: 8
-  minor_issues: 41
+  minor_issues: 53
   unsupported: 8
   not_verifiable: 1
 difficultyDistribution:
-  easy: 152
-  medium: 43
+  easy: 211
+  medium: 50
   hard: 3
 pages:
   - pageId: biosecurity-overview
@@ -55,6 +55,24 @@ pages:
     minorIssues: 18
     accuracyRate: 0.9325842696629213
     avgScore: 0.94
+  - pageId: rethink-priorities
+    totalCitations: 58
+    checked: 55
+    accurate: 44
+    inaccurate: 0
+    unsupported: 0
+    minorIssues: 11
+    accuracyRate: 1
+    avgScore: 0.97
+  - pageId: epistemic-collapse
+    totalCitations: 16
+    checked: 11
+    accurate: 10
+    inaccurate: 0
+    unsupported: 0
+    minorIssues: 1
+    accuracyRate: 1
+    avgScore: 0.99
   - pageId: p1
     totalCitations: 1
     checked: 1
@@ -100,13 +118,6 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 2
     inaccuracyRate: 0.1
-  - domain: forum.effectivealtruism.org
-    totalCitations: 11
-    checked: 10
-    accurate: 9
-    inaccurate: 0
-    unsupported: 1
-    inaccuracyRate: 0.1
   - domain: digital-strategy.ec.europa.eu
     totalCitations: 11
     checked: 11
@@ -128,6 +139,20 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.07142857142857142
+  - domain: forum.effectivealtruism.org
+    totalCitations: 32
+    checked: 31
+    accurate: 30
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.03225806451612903
+  - domain: rethinkpriorities.org
+    totalCitations: 33
+    checked: 31
+    accurate: 31
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: matsprogram.org
     totalCitations: 30
     checked: 28
@@ -198,6 +223,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: frontiersin.org
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: alexanderthamm.com
     totalCitations: 3
     checked: 3
@@ -226,6 +258,20 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: en.wikipedia.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: mitsloan.mit.edu
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: modelop.com
     totalCitations: 2
     checked: 2
@@ -282,3 +328,10 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: charitynavigator.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
