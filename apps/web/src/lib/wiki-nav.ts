@@ -435,13 +435,10 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     }
   }
 
-  // Top-level sections with their own sidebar nav
-  if (
-    entityPath.startsWith("/browse/") || entityPath === "/browse" ||
-    entityPath.startsWith("/guides/") || entityPath === "/guides" ||
-    entityPath.startsWith("/project/") || entityPath === "/project" ||
-    entityPath.startsWith("/insight-hunting/") || entityPath === "/insight-hunting"
-  ) {
+  // Any other top-level path with child pages gets a generic section sidebar.
+  // No hardcoded list — buildSectionNav discovers pages from the data layer.
+  const firstSegment = entityPath.split("/").filter(Boolean)[0];
+  if (firstSegment) {
     return "section";
   }
 
@@ -468,8 +465,9 @@ function extractSection(entityPath: string): string | null {
 }
 
 /**
- * Build sidebar navigation for a top-level section (browse, guides, project, insight-hunting).
+ * Build sidebar navigation for any top-level section.
  * Uses the generic buildSectionNav which reads page data and groups by subcategory.
+ * Returns empty array if the section has no pages (no sidebar will render).
  */
 function getSectionNav(sectionKey: string): NavSection[] {
   return buildSectionNav(sectionKey, sectionKey);
