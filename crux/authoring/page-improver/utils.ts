@@ -31,6 +31,7 @@ export const CRITICAL_RULES: string[] = [
   'comparison-operators',
   'frontmatter-schema',
   'entitylink-ids',
+  'prefer-entitylink',
   'internal-links',
   'fake-urls',
   'component-props',
