@@ -17,6 +17,7 @@ import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
+import { kbSubcategoryCoverageRule } from './kb-subcategory-coverage.ts';
 import { preferEntityLinkRule } from './prefer-entitylink.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
@@ -685,6 +686,168 @@ describe('footnote-coverage rule', () => {
   });
 });
 
+// =============================================================================
+// kb-subcategory-coverage rule
+// =============================================================================
+
+describe('kb-subcategory-coverage rule', () => {
+  /** Build a minimal mock KB page */
+  function kbPage(
+    section: string,
+    slug: string,
+    opts: { subcategory?: string; isIndex?: boolean } = {},
+  ): Record<string, unknown> {
+    const isIndex = opts.isIndex ?? false;
+    const filename = isIndex ? 'index.mdx' : `${slug}.mdx`;
+    const relativePath = `knowledge-base/${section}/${filename}`;
+    return {
+      path: `/content/docs/${relativePath}`,
+      relativePath,
+      body: 'Body text.',
+      raw: `---\ntitle: ${slug}\n---\nBody text.`,
+      frontmatter: {
+        title: slug,
+        ...(opts.subcategory ? { subcategory: opts.subcategory } : {}),
+      },
+      isIndex,
+    };
+  }
+
+  it('emits no issues when all non-index pages have a subcategory', () => {
+    const files = [
+      kbPage('risks', 'index', { isIndex: true }),
+      kbPage('risks', 'bio-risk', { subcategory: 'misuse' }),
+      kbPage('risks', 'ai-takeover', { subcategory: 'accident' }),
+      kbPage('risks', 'compute-concentration', { subcategory: 'structural' }),
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('emits no issues when missing ratio is exactly at the threshold (20%)', () => {
+    // 1 missing out of 5 = 20%, not > 20%
+    const files = [
+      kbPage('capabilities', 'index', { isIndex: true }),
+      kbPage('capabilities', 'page-a', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-b', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-c', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-d', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-e'), // missing — 1/5 = 20%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('warns when >20% of non-index pages lack subcategory', () => {
+    // 3 missing out of 5 = 60% — well above threshold
+    const files = [
+      kbPage('people', 'index', { isIndex: true }),
+      kbPage('people', 'alice', { subcategory: 'researchers' }),
+      kbPage('people', 'bob', { subcategory: 'researchers' }),
+      kbPage('people', 'carol'), // missing
+      kbPage('people', 'dave'), // missing
+      kbPage('people', 'eve'), // missing
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].rule).toBe('kb-subcategory-coverage');
+    expect(issues[0].severity).toBe('warning');
+    expect(issues[0].message).toContain('"people"');
+    expect(issues[0].message).toContain('3/5');
+  });
+
+  it('lists the filenames of pages missing subcategory in the warning message', () => {
+    const files = [
+      kbPage('debates', 'index', { isIndex: true }),
+      kbPage('debates', 'page-x', { subcategory: 'alignment' }),
+      kbPage('debates', 'page-y'), // missing
+      kbPage('debates', 'page-z'), // missing
+      kbPage('debates', 'page-w'), // missing — 3/4 = 75%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('page-y.mdx');
+    expect(issues[0].message).toContain('page-z.mdx');
+    expect(issues[0].message).toContain('page-w.mdx');
+  });
+
+  it('reports on the section index page when one exists', () => {
+    const indexFile = kbPage('history', 'index', { isIndex: true });
+    const files = [
+      indexFile,
+      kbPage('history', 'hist-a'), // missing
+      kbPage('history', 'hist-b'), // missing
+      kbPage('history', 'hist-c'), // missing — 3/3 = 100%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].file).toBe(indexFile.path);
+  });
+
+  it('does not count the index page itself as missing subcategory', () => {
+    // If the index page has no subcategory (normal — indices don't need one),
+    // it should not inflate the missing count.
+    const files = [
+      kbPage('incidents', 'index', { isIndex: true }), // no subcategory on index
+      kbPage('incidents', 'page-a', { subcategory: 'natural' }),
+      kbPage('incidents', 'page-b', { subcategory: 'natural' }),
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('ignores non-knowledge-base pages entirely', () => {
+    const files = [
+      {
+        path: '/content/docs/internal/guide.mdx',
+        relativePath: 'internal/guide.mdx',
+        body: 'Body.',
+        raw: '---\ntitle: Guide\n---\nBody.',
+        frontmatter: { title: 'Guide' },
+        isIndex: false,
+      },
+      {
+        path: '/content/docs/guides/intro.mdx',
+        relativePath: 'guides/intro.mdx',
+        body: 'Body.',
+        raw: '---\ntitle: Intro\n---\nBody.',
+        frontmatter: { title: 'Intro' },
+        isIndex: false,
+      },
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips sections with no non-index pages', () => {
+    // A section that only has an index page should not cause a division-by-zero warning
+    const files = [
+      kbPage('metrics', 'index', { isIndex: true }),
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('handles multiple sections independently', () => {
+    // "risks" is fine, "debates" is over threshold
+    const files = [
+      kbPage('risks', 'index', { isIndex: true }),
+      kbPage('risks', 'risk-a', { subcategory: 'accident' }),
+      kbPage('risks', 'risk-b', { subcategory: 'misuse' }),
+      kbPage('debates', 'index', { isIndex: true }),
+      kbPage('debates', 'debate-a'), // missing
+      kbPage('debates', 'debate-b'), // missing
+      kbPage('debates', 'debate-c'), // missing — 3/3 = 100%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('"debates"');
+  });
+});
+
+// =============================================================================
+// prefer-entitylink rule
+// =============================================================================
 describe('prefer-entitylink rule', () => {
   // Engine mock with known slugs from the real pathRegistry.
   // The rule reads pathRegistry.json from disk and caches the reverse map; tests
