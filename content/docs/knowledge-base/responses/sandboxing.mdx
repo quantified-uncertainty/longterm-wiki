@@ -1,13 +1,15 @@
 ---
 title: Sandboxing / Containment
 description: Sandboxing limits AI system access to resources, networks, and capabilities as a defense-in-depth measure. METR's August 2025 evaluation found GPT-5's time horizon at ~2 hours—insufficient for autonomous replication. AI boxing experiments show 60-70% social engineering escape rates. Critical CVEs (CVE-2024-0132, CVE-2025-23266) demonstrate container escapes, while the IDEsaster disclosure revealed 30+ vulnerabilities in AI coding tools. Firecracker microVMs provide 85% native performance with hardware isolation; gVisor offers ~10% I/O performance but better compatibility.
-readerImportance: 57.5
-researchImportance: 28.5
-quality: 91
-lastEdited: "2026-01-30"
-update_frequency: 21
 sidebar:
   order: 22
+entityType: approach
+subcategory: alignment-deployment
+quality: 91
+readerImportance: 57.5
+researchImportance: 28.5
+lastEdited: "2026-01-30"
+update_frequency: 21
 llmSummary: Comprehensive analysis of AI sandboxing as defense-in-depth, synthesizing METR's 2025 evaluations (GPT-5 time horizon ~2h, capabilities doubling every 7 months), AI boxing experiments (60-70% escape rates), and 2024-2025 container vulnerabilities (CVE-2024-0132, NVIDIAScape, IDEsaster). Quantifies isolation technology tradeoffs (gVisor ~10% I/O, Firecracker ~85%) with market context (\$7.6B AI agent market, 85% enterprise adoption, \$3.8B 2024 investment). Includes Anthropic's Sabotage Risk Report findings and CVE-Bench benchmark (13% AI exploit success rate).
 ratings:
   novelty: 5
@@ -17,8 +19,6 @@ ratings:
 clusters:
   - ai-safety
   - cyber
-subcategory: alignment-deployment
-entityType: approach
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

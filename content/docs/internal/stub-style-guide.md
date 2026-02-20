@@ -2,21 +2,21 @@
 numericId: E753
 title: "Stub Pages Style Guide"
 description: "Guidelines for minimal placeholder pages"
-entityType: internal
 sidebar:
   order: 13
+entityType: internal
+quality: 19
 readerImportance: 14
 researchImportance: 9.5
-quality: 19
+lastEdited: "2026-02-17"
+update_frequency: 90
+evergreen: true
 llmSummary: "Internal documentation providing guidelines for creating minimal placeholder pages (stubs) in the knowledge base, including when to use them, required formatting, and when to convert them to full pages. Covers basic content structure and validation procedures."
 ratings:
   novelty: 0.5
   rigor: 2
   actionability: 3
   completeness: 4
-lastEdited: "2026-02-17"
-evergreen: true
-update_frequency: 90
 ---
 # Stub Pages Style Guide
 

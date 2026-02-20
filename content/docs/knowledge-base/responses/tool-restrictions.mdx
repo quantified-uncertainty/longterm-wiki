@@ -1,13 +1,15 @@
 ---
 title: Tool-Use Restrictions
 description: Tool-use restrictions limit what actions and APIs AI systems can access, directly constraining their potential for harm. This approach is critical for agentic AI systems, providing hard limits on capabilities regardless of model intentions. The UK AI Safety Institute reports container isolation alone is insufficient, requiring defense-in-depth combining OS primitives, hardware virtualization, and network segmentation. Major labs like Anthropic and OpenAI have implemented tiered permission systems, with METR evaluations showing agentic task completion horizons doubling every 7 months, making robust tool restrictions increasingly urgent.
-readerImportance: 57.5
-researchImportance: 26
-quality: 91
-lastEdited: "2026-01-29"
-update_frequency: 21
 sidebar:
   order: 23
+entityType: approach
+subcategory: alignment-deployment
+quality: 91
+readerImportance: 57.5
+researchImportance: 26
+lastEdited: "2026-01-29"
+update_frequency: 21
 llmSummary: Tool-use restrictions provide hard limits on AI agent capabilities through defense-in-depth approaches combining permissions, sandboxing, and human-in-the-loop controls. Empirical evidence shows METR task horizons doubling every 7 months and incident data (EchoLeak CVE-2025-32711, Shai-Hulud campaign) demonstrating real-world exploitation, with security effectiveness ranging 60-95% across threat categories depending on control type.
 ratings:
   novelty: 4.5
@@ -18,8 +20,6 @@ clusters:
   - ai-safety
   - governance
   - cyber
-subcategory: alignment-deployment
-entityType: approach
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

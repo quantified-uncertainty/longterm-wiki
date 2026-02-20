@@ -3,17 +3,14 @@ title: Compute Monitoring
 description: This framework analyzes compute monitoring approaches for AI governance, finding that cloud KYC (targeting 10^26 FLOP threshold) is implementable now via the three major providers controlling 60%+ of cloud infrastructure, while hardware-level governance faces 3-5 year development timelines. The EU AI Act uses a lower 10^25 FLOP threshold. Evasion through on-premise compute and jurisdictional arbitrage remains the primary limitation.
 sidebar:
   order: 3
+entityType: approach
+subcategory: governance-compute-governance
 quality: 69
-llmSummary: "Analyzes two compute monitoring approaches: cloud KYC (implementable in 1-2 years, covers ~60% of frontier training via AWS/Azure/Google) and hardware governance (3-5 year timeline). Cloud KYC targets 10^26 FLOP threshold (~$10-100M training cost), but on-premise compute and jurisdictional arbitrage enable evasion; hardware-level monitoring could address this but faces substantial technical challenges."
-lastEdited: "2025-12-28"
-styleGuideVersion: kb-2.0
 readerImportance: 63
 researchImportance: 49
+lastEdited: "2025-12-28"
 update_frequency: 21
-todos:
-  - Complete 'Quick Assessment' section (4 placeholders)
-  - Complete 'How It Works' section
-  - Complete 'Limitations' section (6 placeholders)
+llmSummary: "Analyzes two compute monitoring approaches: cloud KYC (implementable in 1-2 years, covers ~60% of frontier training via AWS/Azure/Google) and hardware governance (3-5 year timeline). Cloud KYC targets 10^26 FLOP threshold (~$10-100M training cost), but on-premise compute and jurisdictional arbitrage enable evasion; hardware-level monitoring could address this but faces substantial technical challenges."
 ratings:
   novelty: 4.5
   rigor: 6.5
@@ -22,8 +19,11 @@ ratings:
 clusters:
   - ai-safety
   - governance
-subcategory: governance-compute-governance
-entityType: approach
+todos:
+  - Complete 'Quick Assessment' section (4 placeholders)
+  - Complete 'How It Works' section
+  - Complete 'Limitations' section (6 placeholders)
+styleGuideVersion: kb-2.0
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

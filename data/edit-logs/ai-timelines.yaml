@@ -28,3 +28,7 @@
   tool: crux-audit-pass2
   agency: automated
   note: "Second pass: fixed 1 remaining citation inaccuracies"
+- date: 2026-02-20
+  tool: crux-fix
+  agency: automated
+  note: "Reordered frontmatter fields to canonical order (issue #398)"

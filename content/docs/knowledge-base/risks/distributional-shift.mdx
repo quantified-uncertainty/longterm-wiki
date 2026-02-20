@@ -3,14 +3,16 @@ title: AI Distributional Shift
 description: When AI systems fail due to differences between training and deployment contexts. Research shows 40-45% accuracy drops when models encounter novel distributions (ObjectNet vs ImageNet), with failures affecting autonomous vehicles, medical AI, and deployed ML systems at scale.
 sidebar:
   order: 16
-maturity: Mature
+entityType: risk
+subcategory: accident
 quality: 91
-llmSummary: Comprehensive analysis of distributional shift showing 40-45% accuracy drops when models encounter novel distributions (ObjectNet vs ImageNet), with 5,202 autonomous vehicle accidents and 15-30% medical AI degradation across hospitals documented through 2025. Current OOD detection achieves 60-92% accuracy depending on method, with benchmark gaps persisting despite significant research investment (\$50-100M annually). Fundamental uncertainties remain about whether scale solves robustness, with MIT 2024 research showing fairness debiasing fails to transfer across institutions.
-lastEdited: "2026-01-30"
+maturity: Mature
 readerImportance: 17
 researchImportance: 86
-update_frequency: 45
 causalLevel: amplifier
+lastEdited: "2026-01-30"
+update_frequency: 45
+llmSummary: Comprehensive analysis of distributional shift showing 40-45% accuracy drops when models encounter novel distributions (ObjectNet vs ImageNet), with 5,202 autonomous vehicle accidents and 15-30% medical AI degradation across hospitals documented through 2025. Current OOD detection achieves 60-92% accuracy depending on method, with benchmark gaps persisting despite significant research investment (\$50-100M annually). Fundamental uncertainties remain about whether scale solves robustness, with MIT 2024 research showing fairness debiasing fails to transfer across institutions.
 ratings:
   novelty: 4.5
   rigor: 7
@@ -18,8 +20,6 @@ ratings:
   completeness: 7.5
 clusters:
   - ai-safety
-subcategory: accident
-entityType: risk
 ---
 import {DataInfoBox, R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 

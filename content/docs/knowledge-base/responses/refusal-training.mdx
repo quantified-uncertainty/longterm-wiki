@@ -1,13 +1,15 @@
 ---
 title: Refusal Training
 description: Refusal training teaches AI models to decline harmful requests rather than comply. While universally deployed and achieving 99%+ refusal rates on explicit violations, jailbreak techniques bypass defenses with 1.5-6.5% success rates (UK AISI 2025), and over-refusal blocks 12-43% of legitimate queries. The technique represents necessary deployment hygiene but should not be confused with genuine safety.
-readerImportance: 21
-researchImportance: 28.5
-quality: 63
-lastEdited: "2026-01-28"
-update_frequency: 45
 sidebar:
   order: 21
+entityType: approach
+subcategory: alignment-training
+quality: 63
+readerImportance: 21
+researchImportance: 28.5
+lastEdited: "2026-01-28"
+update_frequency: 45
 llmSummary: Refusal training achieves 99%+ refusal rates on explicit harmful requests but faces 1.5-6.5% jailbreak success rates (UK AISI 2025) and 12-43% over-refusal on legitimate queries. While necessary for deployment hygiene, it addresses behavior rather than goals, providing no defense against deceptive alignment or scheming.
 ratings:
   novelty: 4.2
@@ -16,8 +18,6 @@ ratings:
   completeness: 7.3
 clusters:
   - ai-safety
-subcategory: alignment-training
-entityType: approach
 ---
 import {Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

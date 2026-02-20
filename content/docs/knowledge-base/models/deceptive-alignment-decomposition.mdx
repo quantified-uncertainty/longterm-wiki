@@ -3,8 +3,15 @@ title: Deceptive Alignment Decomposition Model
 description: A quantitative framework decomposing deceptive alignment probability into five multiplicative conditions with 0.5-24% overall risk estimates. The model identifies specific intervention points where reducing any single factor by 50% cuts total risk by 50%.
 sidebar:
   order: 15
+entityType: model
+subcategory: risk-models
 quality: 62
+readerImportance: 85
+researchImportance: 76
+tacticalValue: 60
 lastEdited: "2025-12-26"
+update_frequency: 90
+llmSummary: Decomposes deceptive alignment probability into five multiplicative conditions (mesa-optimization, misalignment, awareness, deception, survival) yielding 0.5-24% overall risk with 5% central estimate. Identifies that reducing any single factor by 50% cuts total risk by 50%, recommending focus on detection/survival parameter P(V) as most tractable intervention point with 2-4 year research timeline.
 ratings:
   focus: 8.5
   novelty: 5
@@ -12,18 +19,11 @@ ratings:
   completeness: 7.5
   concreteness: 7
   actionability: 6.5
-readerImportance: 85
-tacticalValue: 60
-researchImportance: 76
-update_frequency: 90
-llmSummary: Decomposes deceptive alignment probability into five multiplicative conditions (mesa-optimization, misalignment, awareness, deception, survival) yielding 0.5-24% overall risk with 5% central estimate. Identifies that reducing any single factor by 50% cuts total risk by 50%, recommending focus on detection/survival parameter P(V) as most tractable intervention point with 2-4 year research timeline.
+clusters:
+  - ai-safety
 todos:
   - Complete 'Quantitative Analysis' section (8 placeholders)
   - Complete 'Limitations' section (6 placeholders)
-clusters:
-  - ai-safety
-subcategory: risk-models
-entityType: model
 ---
 import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@components/wiki';
 

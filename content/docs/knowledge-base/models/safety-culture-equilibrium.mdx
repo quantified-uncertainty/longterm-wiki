@@ -3,8 +3,15 @@ title: Safety Culture Equilibrium
 description: "This model analyzes stable states for AI lab safety culture under competitive pressure. It identifies three equilibria: racing-dominant (current), safety-competitive, and regulation-imposed, with transition conditions requiring coordinated commitment or major incident."
 sidebar:
   order: 36
+entityType: model
+subcategory: safety-models
 quality: 65
+readerImportance: 87.5
+researchImportance: 86.5
+tacticalValue: 55
 lastEdited: "2026-01-28"
+update_frequency: 90
+llmSummary: "Game-theoretic model identifying three equilibria for AI lab safety culture: racing-dominant (current state, S=0.25), safety-competitive (S>0.6), and regulation-imposed (S=0.15-0.25). Key finding: transitions require either coordinated commitment raising β (safety reputation value) above α (capability value), or major incidents increasing γ (accident weight), with 40-60% probability of incident-driven regulation within 5 years."
 ratings:
   focus: 8.5
   novelty: 6
@@ -12,18 +19,11 @@ ratings:
   completeness: 7.5
   concreteness: 7
   actionability: 6.5
-readerImportance: 87.5
-tacticalValue: 55
-researchImportance: 86.5
-update_frequency: 90
-llmSummary: "Game-theoretic model identifying three equilibria for AI lab safety culture: racing-dominant (current state, S=0.25), safety-competitive (S>0.6), and regulation-imposed (S=0.15-0.25). Key finding: transitions require either coordinated commitment raising β (safety reputation value) above α (capability value), or major incidents increasing γ (accident weight), with 40-60% probability of incident-driven regulation within 5 years."
-todos:
-  - Add Strategic Importance section with magnitude estimates
 clusters:
   - ai-safety
   - governance
-subcategory: safety-models
-entityType: model
+todos:
+  - Add Strategic Importance section with magnitude estimates
 ---
 import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
