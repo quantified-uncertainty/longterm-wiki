@@ -23,7 +23,7 @@ async function seed() {
   const __dirname = dirname(fileURLToPath(import.meta.url));
   const registryPath =
     process.env.ID_REGISTRY_PATH ||
-    resolve(__dirname, "../../data/id-registry.json");
+    resolve(__dirname, "../../../data/id-registry.json");
 
   console.log(`Reading registry from: ${registryPath}`);
 
