@@ -22,6 +22,7 @@ import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
+import { References } from "@/components/wiki/References";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -102,6 +103,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   MultiEntityLinks,
   ResourceLink,
   R,
+  References,
   F,
   Calc,
   DataInfoBox,
