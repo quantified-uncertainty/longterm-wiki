@@ -1,13 +1,13 @@
 ---
 numericId: E696
 title: "FTX Collapse: Lessons for EA Funding Resilience"
-description: "Retrospective analysis of the FTX collapse's impact on EA funding and the lessons it holds for managing future capital concentration risks, particularly the Anthropic liquidity event. The collapse destroyed \\~\\$160M in committed grants and revealed critical vulnerabilities in EA's funding infrastructure."
+description: "Retrospective analysis of the FTX collapse's impact on EA funding and the lessons it holds for managing future capital concentration risks, particularly the Anthropic liquidity event. The collapse resulted in ~$160M in committed grants never disbursed and revealed structural vulnerabilities in EA's funding infrastructure."
 quality: 3
-lastEdited: "2026-02-15"
+lastEdited: "2026-02-20"
 readerImportance: 65
 researchImportance: 56
-update_frequency: 90
-llmSummary: "The November 2022 collapse of FTX destroyed ~$160M in committed EA grants, forced organizational layoffs across the ecosystem, and revealed deep vulnerabilities in EA's dependence on concentrated funding sources. This retrospective extracts lessons applicable to the current situation: $27-76B in risk-adjusted EA capital concentrated in Anthropic. Key parallels include single-funder dependence, reputational contagion, and the danger of spending committed-but-unreceived funds. Key differences include the much larger capital magnitude, the legal structure (DAFs vs. personal pledges), and the 3-5 year timeline before liquidity. The central lesson is that diversification of funding sources and conservative financial planning are essential, even when a single source appears overwhelmingly likely to deliver."
+updateFrequency: 90
+llmSummary: "The November 2022 collapse of FTX resulted in approximately $160M in committed EA grants that were not disbursed, organizational restructuring across the ecosystem, and revealed structural vulnerabilities in EA's dependence on concentrated funding sources. This retrospective extracts lessons applicable to the current situation: $27-76B in risk-adjusted EA capital concentrated in Anthropic. Key parallels include single-funder dependence, reputational contagion, and the danger of spending committed-but-unreceived funds. Key differences include the much larger capital magnitude, the legal structure (DAFs vs. personal pledges), and the multi-year timeline before liquidity. A central question is whether the EA ecosystem has structurally adapted since 2022 or remains exposed to analogous concentration risks."
 ratings:
   novelty: 6
   rigor: 6
@@ -18,16 +18,16 @@ clusters:
   - ai-safety
   - governance
 todos:
-  - Track clawback resolution outcomes and final settlement terms
+  - Track clawback resolution outcomes and final settlement terms for CFAR and unnamed $5M nonprofit
   - Update with Anthropic IPO data when available
   - Monitor whether EA orgs implement recommended resilience measures
-subcategory: funders
+  - Obtain systematic data on Anthropic employee EA-aligned giving pledge rates across hiring cohorts
 entityType: concept
 ---
-import {EntityLink} from '@components/wiki';
+import {EntityLink, F} from '@components/wiki';
 
 :::note[Page Scope]
-This page analyzes the FTX collapse as a case study in EA funding fragility. For current EA funding landscape, see <EntityLink id="funders-overview">Longtermist Funders</EntityLink>. For the Anthropic concentration risk that makes these lessons urgent, see <EntityLink id="ea-shareholder-diversification-anthropic">EA Shareholder Diversification from Anthropic</EntityLink>. For how much capital the ecosystem can absorb, see <EntityLink id="ea-funding-absorption-capacity">EA Funding Absorption Capacity</EntityLink>.
+This page analyzes the FTX collapse as a case study in EA funding fragility. For current EA funding landscape, see <EntityLink id="E641">Longtermist Funders</EntityLink>. For the Anthropic concentration risk that makes these lessons relevant, see <EntityLink id="E851">EA Shareholder Diversification from Anthropic</EntityLink>. For how much capital the ecosystem can absorb, see <EntityLink id="E695">EA Funding Absorption Capacity</EntityLink>.
 
 **Historical event**: November 2022. Analysis updated February 2026.
 :::
@@ -36,26 +36,57 @@ This page analyzes the FTX collapse as a case study in EA funding fragility. For
 
 | Dimension | Assessment |
 |-----------|------------|
-| **Direct financial loss** | \≈\$160M in committed grants never disbursed |
-| **Indirect losses** | Organizational layoffs, project cancellations, hiring freezes across ecosystem |
-| **Reputational damage** | Severe; ongoing public association between EA and fraud |
-| **Clawback exposure** | \$26.8M returned by <EntityLink id="cea">CEA</EntityLink>; additional amounts by other orgs |
-| **Anthropic stake (FTX)** | \$500M invested → \$1.34B recovered for creditors (2.7x) |
-| **Current parallel** | \$27-76B in EA capital concentrated in Anthropic (170-500x larger) |
-| **Key lesson** | Never plan spending around unreceived capital from concentrated sources |
+| **Direct financial loss** | \≈\$160M in committed grants not disbursed[^1] (how much was physically transferred before collapse is not publicly established) |
+| **Indirect losses** | Organizational restructuring, project cancellations, hiring freezes across ecosystem |
+| **Reputational effects** | Sustained association between EA and FTX fraud in mainstream coverage 2022–2024; some recovery in framing noted by 2025[^14] (no systematic measurement exists) |
+| **Clawback exposure** | \$26.8M returned by <EntityLink id="E517">Centre for Effective Altruism</EntityLink> umbrella (EV UK/US); ARC voluntarily returned \$1.25M; other amounts below public-filing threshold[^2] |
+| **Anthropic stake (FTX)** | \$500M invested → \$1.34B recovered for creditors (2.7x)[^3] |
+| **Current parallel** | <F e="anthropic" f="a8c71e05">\$27–76B</F> in risk-adjusted EA capital concentrated in Anthropic (170–500x larger than FTX losses) |
+| **Key lesson** | Organizations that budgeted against uncommitted or unreceived grants faced the most severe operational disruption |
 
 ## Overview
 
-On November 11, 2022, FTX—at the time valued at \$32B—filed for bankruptcy, destroying an estimated \$8B in customer deposits and eliminating what had been the EA ecosystem's second-largest funding source. Sam Bankman-Fried (SBF) had positioned himself as EA's most prominent public donor, pledging billions through the FTX Foundation and its Future Fund grantmaking arm.
+On November 11, 2022, FTX—at the time valued at \$32B—filed for bankruptcy, eliminating what had been the EA ecosystem's second-largest funding source. <EntityLink id="E857">Sam Bankman-Fried</EntityLink> had positioned himself as EA's most prominent public donor, pledging billions through the FTX Foundation and its <EntityLink id="E855">FTX Future Fund</EntityLink> grantmaking arm.
 
-The collapse was sudden, total, and deeply damaging. In the span of 72 hours, the EA ecosystem lost:
+The collapse unfolded over approximately 72 hours. The EA ecosystem's immediate losses included approximately \$160M in committed Future Fund grants that were not disbursed, \$26.8M returned by Effective Ventures to FTX's bankruptcy estate under clawback proceedings, and the elimination of what had been projected to become one of the largest EA funding sources in history—the Future Fund had originally projected deploying up to \$1B in 2022.[^4]
 
-- **\≈\$160M in committed Future Fund grants** that were never disbursed [FTX Future Fund](https://ftxfuturefund.org/our-grants/)
-- **\$26.8M returned by CEA** to FTX's bankruptcy estate under clawback proceedings [CEA](https://www.centreforeffectivealtruism.org/blog/changes-to-cea)
-- **Intangible but significant reputational capital** as "effective altruism" became associated with fraud in mainstream coverage
-- **The second-largest EA funder**, reducing ecosystem funding by roughly 20-30%
+Three years later, the EA community has partially recovered financially—<EntityLink id="E552">Open Philanthropy</EntityLink> explicitly expanded grantmaking to fill some of the gap[^5]—but structural questions about funding concentration persist. The FTX episode is directly relevant to the current period: an estimated <F e="anthropic" f="a8c71e05">\$27–76B</F> in risk-adjusted EA-aligned capital is now tied to <EntityLink id="E22">Anthropic</EntityLink>.
 
-Three years later, the EA community has largely recovered financially—other funders expanded to partially fill the gap—but the institutional and reputational damage persists. More importantly, the lessons from FTX are directly applicable to the current concentration risk: \$27-76B in risk-adjusted EA capital tied to Anthropic, a figure 170-500x larger than the FTX losses.
+## Chronology of Key Events
+
+| Date | Event |
+|------|-------|
+| February 2022 | FTX Future Fund officially launches with <EntityLink id="E861">Nick Beckstead</EntityLink> as CEO[^25] |
+| April 2022 | FTX invests \$500M in Anthropic Series B at \$4B valuation |
+| June 2022 | FTX Future Fund reports 262 grants and investments totaling \$132M awarded[^6] |
+| November 6, 2022 | CoinDesk publishes Alameda Research balance sheet; bank run begins |
+| November 8, 2022 | Binance signs non-binding LOI to acquire FTX; FTX halts customer withdrawals |
+| November 9, 2022 | Binance withdraws from acquisition after reviewing FTX books |
+| November 11, 2022 | FTX files for bankruptcy; SBF resigns as CEO |
+| November 11, 2022 | Future Fund team resigns in open letter, citing inability to honor committed grants[^7] |
+| December 12, 2022 | SBF arrested in the Bahamas |
+| August 2023 | <EntityLink id="E861">Nick Beckstead</EntityLink> steps down from EV boards[^39] |
+| November 2, 2023 | SBF convicted on all seven counts of fraud and conspiracy |
+| November 2023 | FTX bankruptcy estate reaches \$22.5M settlement with Effective Ventures USA[^8] |
+| December 2023 | EV discloses combined \$26,786,503 settlement across EV UK and EV US[^2] |
+| January 2024 | FTX estate sells two-thirds of Anthropic stake for \$884M |
+| March 2024 | FTX estate sells remaining Anthropic stake for \$452M; total: \$1.34B[^3] |
+| March 28, 2024 | SBF sentenced to 25 years in federal prison |
+| November 2024 | FTX bankruptcy statute of limitations for new clawback filings expires[^9] |
+| April 2025 | EA Funds and CEA announce merger and combined spin-out from EV, targeting July 1, 2025[^40] |
+| October 2025 | <EntityLink id="E510">80,000 Hours</EntityLink> completes spin-out from Effective Ventures as independent legal entity[^41] |
+
+## The FTX Future Fund: Background
+
+The FTX Future Fund officially launched in February 2022 as a project of the FTX Foundation, with the stated mission of "making grants and investments to ambitious projects in order to improve humanity's long-term prospects."[^25] At launch, the team included <EntityLink id="E861">Nick Beckstead</EntityLink> (CEO), <EntityLink id="E578">Leopold Aschenbrenner</EntityLink>, <EntityLink id="E862">Will MacAskill</EntityLink>, and Ketan Ramakrishnan. Beckstead had joined the FTX Foundation as CEO in November 2021, having previously spent seven years as an early employee at Open Philanthropy and as a Research Fellow at the Future of Humanity Institute at Oxford; he also helped launch the Centre for Effective Altruism.[^26]
+
+At launch, the Fund planned to distribute at least \$100M in its first year, with a stated ambition of potentially deploying up to \$1B.[^25] It operated for approximately nine months before FTX's collapse in November 2022.
+
+### Post-Collapse: Future Fund Leadership
+
+The Future Fund's leadership largely avoided public statements after the November 2022 resignation letter, with media attempts to contact Beckstead, Aschenbrenner, Ramakrishnan, and MacAskill via LinkedIn, Twitter, and email in early 2023 going unanswered.[^39]
+
+Beckstead subsequently stepped down from the boards of Effective Ventures UK and Effective Ventures US on August 23, 2023. Since November 2022, he had been recused from all board matters related to the FTX collapse, and over time that recusal made it difficult for him to contribute meaningfully to EV's governance.[^39] He subsequently co-founded and serves as CEO of the Secure AI Project, focused on developing and advocating for policies to reduce risks from advanced AI.[^42]
 
 ## The FTX-EA Funding Relationship
 
@@ -65,173 +96,327 @@ Before the collapse, FTX-linked funding touched nearly every corner of the EA ec
 
 | Recipient Category | Amount | Status Post-Collapse |
 |-------------------|--------|---------------------|
-| Future Fund committed grants | \≈\$160M | Never disbursed; grantees received nothing |
-| <EntityLink id="cea">CEA</EntityLink> | \$13.9M received | \$26.8M returned (including interest) to bankruptcy estate |
-| <EntityLink id="80000-hours">80,000 Hours</EntityLink> | Unknown; organizational restructuring followed | Reduced headcount |
-| University programs (various) | \$10-30M committed | Most unfulfilled |
-| Political donations (Protect Our Future PAC) | \$27M spent | Subject to legal scrutiny |
-| Anthropic investment | \$500M (Series B, April 2022) | Recovered \$1.34B for creditors |
-| Various EA orgs | Tens of millions committed | Mostly unfulfilled |
+| Future Fund committed grants | \≈\$160M[^1] | Commitments not honored; actual disbursements before collapse not publicly established |
+| Effective Ventures (CEA umbrella) | \$13.9M received | \$26,786,503 returned (principal plus interest) to bankruptcy estate[^2] |
+| <EntityLink id="E510">80,000 Hours</EntityLink> | Part of EV umbrella | Organizational restructuring; completed spin-out as independent entity October 2025[^41] |
+| University and research programs (various) | \$10–30M committed | Most unfulfilled; at least 20 researchers at Cornell, Princeton, Brown, and Cambridge received grants over \$100K each[^27] |
+| Political donations (Protect Our Future PAC) | \≈\$27M spent | Subject to FEC and DOJ scrutiny (outside scope of this analysis) |
+| Anthropic investment | \$500M (Series B, April 2022) | Recovered \$1.34B for creditors[^3] |
+| <EntityLink id="E25">ARC</EntityLink> | \$1.25M received | Voluntarily returned; ARC stated funds "morally (if not legally) belong to FTX customers or creditors"[^10] |
+| <EntityLink id="E518">Center for Applied Rationality</EntityLink> and Lightcone Infrastructure | \$4.9M (claimed by FTX estate) | Named as defendants in adversarial clawback proceeding; FTX sought recovery of \$2M to CFAR and remainder to Lightcone[^32] |
 
-### Concentration Risk in Hindsight
+**The committed/disbursed distinction**: The \$160M figure on the Future Fund website referred to "grantee commitments," not confirmed disbursements.[^1] As of June 2022, \$132M had been reported as awarded across 262 grants and investments, though how much had actually been physically transferred to grantees before the collapse was not publicly established.[^6] The Future Fund team's resignation letter stated they were "devastated that it looks like there are many committed grants that the Future Fund will be unable to honor."[^7] Some grantees who had received funds before the collapse faced the ethical dilemma of using those funds or returning them, fearing clawback under US bankruptcy law.[^27] The number of outstanding unfulfilled commitments at the time of collapse (as distinct from the 262 grants and investments reported as of June 2022) has not been publicly documented.
 
-In 2021-2022, the EA funding landscape had two dominant sources:
+### Concentration Risk in Context
 
-1. **Dustin Moskovitz** (via Open Philanthropy / Good Ventures): \≈\$300-500M/year
-2. **Sam Bankman-Fried** (via FTX Foundation / Future Fund): \≈\$160M committed in \≈9 months of operation (Feb-Nov 2022)
+In 2021–2022, the EA funding landscape had two dominant sources:
 
-Together, these two individuals controlled roughly 80-90% of all EA-directed funding. The loss of one eliminated 20-30% of actual annual disbursements and nearly all of the expected *growth* in EA funding. Many organizations had planned hiring and programs around Future Fund commitments that evaporated overnight.
+1. **Dustin Moskovitz** (via <EntityLink id="E552">Open Philanthropy</EntityLink> / Good Ventures): approximately \$300–500M/year
+2. **Sam Bankman-Fried** (via FTX Foundation / Future Fund): approximately \$160M committed in roughly nine months of operation (February–November 2022)
 
-## What Went Wrong
+One EA Forum analysis estimated that FTX and Alameda co-founders' wealth made up approximately 35% of all funding available to EA before the collapse—though the methodology for that estimate is not described in the forum post, which is not a peer-reviewed source.[^11] The claim that the two dominant sources together controlled 80–90% of EA-directed funding is sometimes cited in community discussions; this figure is not independently sourced and appears to derive from the same forum post combined with unstated assumptions about Open Philanthropy's share. Readers should treat both figures as approximate community estimates rather than systematically derived data.
+
+What is better documented is the directional impact: subsequent EA funding tracker data confirm a sustained decline across all major categories after 2022. Comparing 2024 to 2022 levels, EA grantmaking declined approximately 9% in global health and development, approximately 13% in longtermism/x-risk, approximately 23% in animal welfare, and approximately 21% in meta/EA infrastructure.[^12]
+
+### FTX Bankruptcy Scale
+
+At the time of filing, FTX had more than one million creditors, according to an early bankruptcy filing. The largest single creditor was owed \$226M; the top 50 creditors collectively held approximately \$3.1B in unsecured claims.[^28] FTX ultimately recovered between \$14.7B and \$16.5B in assets for distribution, and a bankruptcy plan approved by the court provided that 98% of creditors would receive 119% of what they were owed based on bankruptcy-filing-date values.[^29] This full-creditor-repayment outcome is relevant context for understanding why clawback pressure on EA organizations ultimately dissipated.
+
+## Factors Contributing to Losses
+
+*This section describes failure modes identified in retrospective analyses by EA organizations, grantees, and observers. The characterizations reflect documented outcomes, not assessments of intent.*
 
 ### 1. Spending Against Unreceived Commitments
 
-The most operationally damaging pattern was organizations hiring staff and launching programs based on Future Fund *commitments* before funds were actually received. When the commitments evaporated:
+The most operationally disruptive pattern was organizations hiring staff and launching programs based on Future Fund *commitments* before funds were received. When commitments evaporated:
 
-- Organizations had payroll obligations they couldn't meet
+- Organizations had payroll obligations they could not meet
 - Multi-year projects were abandoned mid-stream
-- Staff who relocated for EA jobs found themselves laid off within months
+- Staff who relocated for EA-adjacent jobs found themselves without positions within months
+- At least one PhD candidate at Cambridge had to leave their program when committed funding never arrived[^27]
 
-**Lesson for Anthropic era:** Organizations should not plan spending around *expected* Anthropic-linked capital until it is actually in their accounts. Even DAF-committed capital can be redirected to non-EA causes by the DAF advisor.
+EA Funds' Long-Term Future Fund and Infrastructure Fund reported estimated funding gaps of approximately \$450K/month and \$550K/month respectively over the six months following FTX's collapse.[^13]
 
-### 2. Insufficient Due Diligence on Funding Sources
+**Relevance for Anthropic-linked capital:** Organizations that budget against *expected* future Anthropic liquidity events before capital is received face analogous structural risk. Even DAF-committed capital can be redirected to non-EA causes at the DAF advisor's discretion.
 
-The EA community accepted FTX funding with minimal scrutiny of FTX's business practices. Warning signs existed:
+### 2. Insufficient Scrutiny of Funding Sources
 
-- FTX's trading volume and profitability claims were unusually high for its market position
-- SBF's "earn-to-give" philosophy created perverse incentives to maximize income regardless of ethical constraints
-- Alameda Research's opaque relationship with FTX raised corporate governance concerns
-- Some community members raised concerns that were dismissed or downplayed
+Post-collapse analyses identified several characteristics of FTX's business that received limited attention within EA before the collapse:
 
-**Lesson for Anthropic era:** While Anthropic is a legitimate business with transparent governance, the *structure* of funding dependence matters as much as the *trustworthiness* of the funder. Even a completely ethical company can experience massive valuation declines.
+- FTX's trading volume and profitability claims relative to its market position
+- SBF's "earn-to-give" framing and potential incentive misalignment
+- Alameda Research's relationship with FTX and corporate governance questions
+- Community members raised concerns that did not receive significant public attention at the time
 
-### 3. Reputational Contagion
+**Relevance for Anthropic-linked capital:** The relevant parallel is *concentration risk*, not fraud risk. <EntityLink id="E22">Anthropic</EntityLink> is a legitimate business with disclosed governance structures. However, the structural question of dependence on a single entity's outcomes applies regardless of that entity's integrity.
 
-The FTX collapse permanently linked "effective altruism" with "crypto fraud" in public perception. This caused:
+### 3. Reputational Association
 
-- Difficulty recruiting non-EA talent to EA-adjacent organizations
-- Reduced credibility for EA ideas in policy discussions
-- Defensive posturing that distracted from substantive work
-- Loss of previously supportive media coverage
+The FTX collapse produced association between "effective altruism" and "crypto fraud" in mainstream coverage. Articles in major outlets—including the New York Times, the Guardian, the Washington Post, New York Magazine, and The Economist—characterized EA in critical terms during late 2022 and 2023, using phrases such as "morally bankrupt," "ineffective altruism," and "defective altruism."[^30] Documented effects include increased difficulty in some talent recruitment contexts and organizational time redirected to reputational management.
 
-**Lesson for Anthropic era:** If Anthropic experiences a major scandal, safety failure, or public controversy, EA organizations funded by Anthropic-linked capital will face guilt-by-association regardless of their actual relationship to the event.
+One documented example of institutional distancing: CSET (Center for Security and Emerging Technology at Georgetown University), which received more than \$100M from Open Philanthropy, had its executive director praise the EA movement after SBF's fall in December 2022—but by November 2023 stated publicly that "CSET is not an EA organization."[^31] Anthropic CEO <EntityLink id="E91">Dario Amodei</EntityLink> publicly distanced himself from the EA movement after the collapse, expressing concern that EA's institutional culture can be insular and that its emphasis on abstract long-term reasoning can come at the expense of practical judgment.[^37]
+
+Whether and to what degree these effects have persisted or reversed is contested. EA Funds experienced its first month-over-month donor decline in December 2022 after unbroken growth since 2017; donor participation declined approximately 10–20% in 2023; and Giving What We Can pledge data showed approximately a 70% decline in new monthly pledges in 2023 versus 2022.[^35] Some observers note continued EA organizational activity as evidence of resilience. The Hollywood Reporter described EA's "Post-SBF Comeback" in mid-2025.[^14] No systematic survey of public perceptions before and after the collapse, or content analysis of media coverage, has been published.
+
+**Relevance for Anthropic-linked capital:** If Anthropic experienced a major safety failure or public controversy, EA organizations funded by Anthropic-linked capital would face reputational questions regardless of their actual relationship to the event—the same mechanism that operated in 2022. "EA = Anthropic insiders" appears as a framing in some critical coverage (e.g., critiques of EA's relationship with AI labs[^43]), though no media analysis or survey data documenting the prevalence of this framing in public discourse has been published.
 
 ### 4. Legal and Financial Exposure
 
-The FTX bankruptcy created unexpected legal liabilities:
+The FTX bankruptcy created unexpected legal liabilities for recipient organizations:
 
-- **Clawback proceedings**: FTX's estate pursued recovery of pre-collapse donations under fraudulent transfer laws. <EntityLink id="cea">CEA</EntityLink> returned \$26.8M. Other organizations faced similar demands.
-- **Regulatory scrutiny**: Political donations made through FTX-linked entities were scrutinized by the FEC and DOJ.
-- **Charitable status concerns**: Organizations that received FTX funds faced questions about their role in laundering reputation for a fraudulent enterprise.
+- **Clawback proceedings**: FTX's estate pursued recovery under fraudulent transfer laws. Effective Ventures (the umbrella over <EntityLink id="E517">CEA</EntityLink>, <EntityLink id="E510">80,000 Hours</EntityLink>, and <EntityLink id="E863">Giving What We Can</EntityLink>) returned \$26,786,503—equal to 100% of funds received from FTX and the FTX Foundation in 2022.[^2] An independent investigation by Mintz found no evidence that anyone at EV knew about FTX's alleged fraudulent conduct.[^2]
+- **Other organizations**: Almost all other potential clawbacks were described by EV as "relatively small potatoes," many below the public filing threshold.[^2] <EntityLink id="E25">ARC</EntityLink> voluntarily returned \$1.25M without being compelled.[^10] <EntityLink id="E518">Center for Applied Rationality</EntityLink> and its affiliated entity Lightcone Infrastructure were named as defendants in an adversarial proceeding; FTX sought to recover \$4.9M, comprising a \$2M grant to CFAR and additional amounts to Lightcone Infrastructure, which owns the Lightcone Rose Garden conference venue. Court filings dated May 17, 2024 summoned CFAR and Lightcone to appear in court; CFAR had reportedly ignored FTX trustees for months in 2023, only responding after a discovery motion was filed in October 2023.[^32] A separate EA-affiliated nonprofit filed to dismiss a \$5M clawback lawsuit in July 2024;[^15] the outcome of this motion—whether dismissed, settled, or otherwise resolved—has not been reported in publicly available sources as of this writing.
+- **Statute of limitations**: The deadline for FTX to file new clawback claims expired in November 2024. The bankruptcy estate intensified filings in early November 2024, two years after the petition date.[^33] Grant recipients outside the United States may still face exposure under longer limitation periods in their jurisdictions (e.g., six years under New Zealand law).[^9] No publicly available reporting documents outcomes of non-US EA organization clawback claims after November 2024.
+- **Full creditor repayment**: FTX's bankruptcy estate reported it expected to pay creditors in full, which raised questions about whether outstanding clawback proceedings against grantees would remain necessary.[^16] The estate still filed suits before the statute of limitations expired. The final resolution of those suits against EA organizations beyond EV—including the CFAR proceeding and the unnamed nonprofit's \$5M case—is not publicly documented as of this writing.
 
-**Lesson for Anthropic era:** Large concentrated donations can create legal exposure even if the donor is acting in good faith. Tax complications, insider trading concerns around IPO timing, and SEC scrutiny of coordinated selling are all potential risks. See <EntityLink id="ea-shareholder-diversification-anthropic">EA Shareholder Diversification</EntityLink> for analysis of coordination risks.
+SBF's conviction on November 2, 2023 and sentencing to 25 years on March 28, 2024 legally confirmed fraud, which strengthened the legal basis for fraudulent conveyance clawback claims (rather than mere preference claims) against recipients—though no specific reporting confirms the sentencing directly altered pending EA organization settlements.[^17]
+
+**Relevance for Anthropic-linked capital:** Large concentrated donations can create legal complexity even when the donor acts in good faith. Tax complications, insider trading concerns around IPO timing, and SEC scrutiny of coordinated selling are potential risks analyzed at <EntityLink id="E851">EA Shareholder Diversification from Anthropic</EntityLink>.
 
 ## FTX vs. Anthropic: Parallels and Differences
+
+This section compares structural features of the two funding concentration scenarios. Given the documented failure modes above, the comparison focuses on concentration risk—not on fraud risk. Anthropic is a legitimate technology company with disclosed governance; the relevant parallel is single-source dependence, not the underlying cause of the 2022 collapse.
 
 ### Parallels
 
 | Factor | FTX (2022) | Anthropic (2026) |
 |--------|-----------|-----------------|
-| Single-source dependence | SBF was \≈20-30% of EA funding | Anthropic-linked capital is \≈95% of expected *future* EA capital |
-| Concentrated decision-making | One person (SBF) controlled allocation | Small number of founders, investors, employees |
+| Single-source dependence | SBF/FTX was approximately 20–30% of EA annual disbursements | Anthropic-linked capital is the dominant source of *expected future* EA capital |
+| Concentrated decision-making | One individual (SBF) controlled allocation | Small number of founders and early employees hold most pledged capital |
 | Illiquid commitments | Future Fund grants were commitments, not cash | Most capital is illiquid private stock |
-| Reputational coupling | "EA = crypto bro philanthropy" | "EA = Anthropic insiders" |
-| Rapid wealth creation | FTX went from \$0 to \$32B in 3 years | Anthropic went from \$0 to \$380B in 4 years |
+| Reputational coupling | "EA = crypto philanthropy" in major outlet coverage 2022–2023 | "EA = Anthropic insiders" has appeared in some critical coverage[^43]; no survey or media analysis documents the prevalence of this framing |
+| Rapid valuation growth | FTX went from \$0 to \$32B in 3 years | Anthropic went from \$0 to <F e="anthropic" f="6796e194">\$380B</F> in 4 years |
 
 ### Critical Differences
 
 | Factor | FTX (2022) | Anthropic (2026) |
 |--------|-----------|-----------------|
-| **Scale** | \≈\$160M lost | \$27-76B at risk (170-500x larger) |
-| **Business legitimacy** | Fraudulent exchange | Legitimate AI lab with real revenue |
-| **Legal structure** | Personal pledges from one individual | DAFs (legally committed to charity), multiple holders |
-| **Timeline** | Sudden collapse (72 hours) | Gradual liquidity over 3-10 years post-IPO |
-| **Diversification of holders** | Single funder | 7 founders + thousands of employees + investors |
-| **Underlying asset** | Crypto exchange (zero-sum) | AI company (producing real technology) |
-| **Recovery potential** | Zero (fraud) | High (valuation may recover after decline) |
+| **Scale** | \≈\$160M in committed grants not disbursed | <F e="anthropic" f="a8c71e05">\$27–76B</F> in risk-adjusted EA-aligned capital |
+| **Business legitimacy** | Exchange later found to be fraudulent | Legitimate AI lab with disclosed revenue and governance |
+| **Legal structure** | Personal pledges from one individual | DAFs (legally required to distribute to 501(c)(3) organizations), multiple holders |
+| **Timeline** | Collapse over 72 hours | Multi-year gradual liquidity post-IPO |
+| **Diversification of holders** | Single funder | Multiple founders, thousands of employees, institutional investors |
+| **Underlying asset** | Crypto exchange (trading revenue) | AI company with real product revenue (<F e="anthropic" f="0ed4db9e">\$14B</F> annualized run-rate as of February 2026) |
+| **Recovery potential** | Customer funds found to be misappropriated; total loss scenario for the exchange | Valuation declines possible but distinct from total loss |
 
-### What's Better About the Anthropic Situation
+### What Is Structurally Better
 
-1. **DAFs provide legal commitment.** An estimated \$20-40B is in DAFs that are legally required to go to 501(c)(3) organizations (though not necessarily EA causes). FTX commitments had no such legal backing.
+1. **DAFs provide legal commitment to charity.** Capital in donor-advised funds is legally required to go to 501(c)(3) organizations (though not necessarily EA causes). FTX commitments had no such legal backing.[^34]
 
-2. **Diversified holders.** Unlike FTX (one person), Anthropic capital is spread across founders, employees, and investors. Even if some holders drift from EA, others may follow through.
+2. **Diversified holders.** Unlike FTX (one person), Anthropic capital is distributed across founders, employees, and investors. Different holders may follow through on EA-aligned giving regardless of others' choices.
 
-3. **Gradual liquidity.** An IPO provides a gradual, predictable liquidity event rather than a sudden collapse. Organizations can plan around it.
+3. **Gradual liquidity.** An IPO event provides a more gradual, foreseeable liquidity timeline rather than overnight collapse. Organizations can plan around it.
 
-4. **Legitimate business.** Anthropic generates real revenue (\$2B+ ARR) from real products. A valuation decline is possible but total loss (like FTX) is extremely unlikely.
+4. **Legitimate business with real revenue.** Anthropic generates substantial revenue from real products. A valuation decline is a distinct risk category from the total-loss scenario that characterized FTX.
 
-### What's Worse About the Anthropic Situation
+### What Is Structurally More Complex
 
-1. **Far larger magnitude.** A 50% loss on \$27-76B is \$14-38B—roughly 100-250x the FTX loss. The ecosystem's financial planning is now dependent on a much larger single bet.
+1. **Far larger magnitude.** The <F e="anthropic" f="a8c71e05">\$27–76B</F> risk-adjusted estimate is 170–500x larger than the FTX funding gap.
 
-2. **Longer timeline creates complacency.** FTX collapsed suddenly, which was devastating but also forced rapid adaptation. Anthropic's slow liquidity timeline (3-10 years) may create a "boiling frog" dynamic where the ecosystem gradually becomes more dependent without noticing.
+2. **Longer timeline may reduce urgency.** FTX's sudden collapse forced rapid organizational adaptation. A multi-year liquidity timeline may reduce the perceived urgency of resilience planning.
 
-3. **Correlation with AI outcomes.** Anthropic's value is correlated with AI development trajectories. The scenarios where AI safety funding is most needed (rapid, uncontrolled AI progress) may be the scenarios where Anthropic faces the most competitive pressure and valuation risk.
+3. **Potential correlation with AI outcomes.** Anthropic's value is tied to AI development trajectories. It has been hypothesized that scenarios where AI safety funding demand is highest could coincide with increased competitive pressure on Anthropic's market position—but this relationship is not established empirically, and the direction of any correlation is uncertain. This should be understood as a hypothesis, not a documented structural risk.
 
-4. **Value drift over time.** As <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink> documents, the fraction of employees with EA alignment is declining with each cohort. A 10-year liquidity timeline means most capital will be controlled by people who joined Anthropic for career reasons, not EA commitment.
+4. **Value alignment uncertainty over time.** As <EntityLink id="E406">Anthropic (Funder)</EntityLink> documents, the proportion of Anthropic employees with EA-affiliated giving commitments is an open question across successive hiring cohorts. Anthropic offered employees the option to pledge up to 50% of their equity to nonprofits (with a 3:1 company match) for most of its history, though post-2024 hires have a 1:1 matching structure for pledges up to 25%.[^44] Some early employees—including <EntityLink id="E91">Dario Amodei</EntityLink>, who was the 43rd signatory of the Giving What We Can pledge, and Amanda Askell, the 67th signatory—have documented EA-affiliated giving commitments.[^45] No systematic public data exists on pledge rates across successive hiring cohorts, and the company has made a communications decision to distance itself from the EA brand.[^45] A multi-year liquidity timeline means an increasing share of capital will be controlled by employees hired in later cohorts.
 
-## Lessons and Recommendations
+## Ecosystem Response to FTX
 
-### For EA Organizations (Grant Recipients)
+### Open Philanthropy's Gap-Filling
 
-1. **Never budget against uncommitted or unreceived funds.** Maintain 12-18 months of operating reserves from *received* (not committed) funding. The FTX collapse hit organizations hardest when they had already hired against expected grants.
+<EntityLink id="E552">Open Philanthropy</EntityLink> explicitly responded to FTX's collapse by opening applications to affected grantees and lifting a pause on new funding commitments to its Global Catastrophic Risks portfolio in early 2023.[^5] Open Philanthropy sought specifically to fill gaps in biosecurity, AI risk, and longtermist EA community building left by the Future Fund's collapse.[^18]
 
-2. **Diversify funding sources.** No single funder should represent more than 30-40% of an organization's annual budget. This may mean accepting smaller total budgets for greater resilience.
+Open Philanthropy's own asset base fluctuated significantly during this period: available assets fell by roughly half due to Moskovitz stock price decline, then partially recovered.[^18] Open Philanthropy expected to recommend over \$700M in grants in 2023.
 
-3. **Build for sustainability, not maximum growth.** The FTX era rewarded organizations that grew fastest. The organizations that survived best were those with conservative financial practices and multiple revenue streams.
+However, Open Philanthropy did not fully replace FTX's disbursements to GiveWell: Open Philanthropy gave \$100M to GiveWell in 2023, compared to \$300M in 2021 and \$350M in 2022. GiveWell directed \$216M in total funds in 2023, down 51% from \$439M in 2022. GiveWell attributed the drop primarily to the reduction in Open Philanthropy contributions; donations from non-Open Philanthropy sources remained relatively steady at approximately \$255M (2023) versus \$253M (2022).[^19] Whether GiveWell independently adjusted its grantmaking targets in response to changing top-charity funding needs, and whether other funders increased or decreased their own commitments during this period, are not fully addressed in GiveWell's public reporting.
 
-4. **Prepare contingency plans.** Every EA organization should have a written plan for "What happens if our largest funder disappears tomorrow?" including staff reduction plans, program prioritization, and emergency fundraising strategies.
+### New Grantmaking Bodies
 
-### For Funders and Grantmakers
+Five new independent grantmaking bodies started in 2023, nearly all focused on longtermism or AI safety, reflecting the ecosystem's response to the funding gap.[^13] This partially diversified the grantmaking infrastructure, though the underlying capital sources for many of these bodies remain concentrated.
 
-1. **Invest in ecosystem resilience, not just programs.** Fund reserve-building grants, organizational capacity, and diversified funding infrastructure. See <EntityLink id="ea-funding-absorption-capacity">EA Funding Absorption Capacity</EntityLink> for how to scale the ecosystem's deployment capacity.
+### Organizational Resilience Measures
 
-2. **Diversify early, diversify often.** <EntityLink id="ea-shareholder-diversification-anthropic">EA Shareholder Diversification from Anthropic</EntityLink> argues for diversifying at least 20% of EA holdings pre-IPO. The FTX experience strongly reinforces this recommendation.
+Several EA organizations documented specific resilience measures adopted after FTX:
 
-3. **Create institutional buffers.** Large DAF pools should not all be deployed simultaneously. A "rainy day" reserve of 2-3 years' ecosystem funding (\$300-500M) should be maintained in diversified assets.
+- **<EntityLink id="E558">Rethink Priorities</EntityLink>** explicitly targeted maintaining 12 months of operational reserves by end of 2024, and began excluding Open Philanthropy support from funding plans to assess true diversification status.[^20]
+- **<EntityLink id="E202">MIRI</EntityLink>** maintained \$16M in end-of-year reserves (as of December 2024), projected to fund activities for just over two years—consistent with their stated minimum of at least two years of reserves. MIRI's annual expenses ranged from \$5.4M to \$7.7M in 2019–2023, with projected 2024 spend of \$5.6M.[^21]
+- **EA Infrastructure Fund (EAIF)** documented efforts toward increased funder diversity, with Open Philanthropy employees stepping down from EAIF leadership positions and the fund planning to rely more on individual donors.[^22]
+- **GiveWell** secured a \$300M multi-year commitment from Open Philanthropy over 2023–2025 as a structural resilience measure, while simultaneously building its non-OP donor base. GiveWell treats this as an "exit grant" and is not factoring further Open Philanthropy funding beyond 2025 into plans; it had \$527M available for granting at the start of 2024.[^23]
+- **<EntityLink id="E25">ARC</EntityLink>** proactively returned its \$1.25M FTX Foundation grant and restructured: ARC Evals was spun out as <EntityLink id="E201">METR</EntityLink>, an independent nonprofit, in December 2023.[^10]
+- **Effective Ventures** planned to decentralize by offboarding <EntityLink id="E517">CEA</EntityLink>, <EntityLink id="E510">80,000 Hours</EntityLink>, and <EntityLink id="E863">Giving What We Can</EntityLink> as independent legal entities following its settlement.[^2] The EV decentralization plan has since been substantially executed: <EntityLink id="E510">80,000 Hours</EntityLink> completed its spin-out from EV in October 2025;[^41] EA Funds and CEA announced a combined spin-out with a target date of July 1, 2025;[^40] and <EntityLink id="E863">Giving What We Can</EntityLink>'s spin-out status as of this writing is not documented in publicly available sources.
 
-4. **Transparent communication.** Funders should communicate clearly about the certainty and timing of future grants, avoiding the FTX pattern where vague commitments were treated as firm pledges by recipients.
+Whether these measures have meaningfully reduced systemic concentration risk is debated within the EA community, given that Open Philanthropy remains the dominant funder for many organizations that have diversified away from FTX-linked sources. EA Forum analysis found that approximately half of Long-Term Future Fund funding continues to come from Open Philanthropy, illustrating that post-FTX diversification efforts have not eliminated funder concentration.[^13]
 
-### For the EA Community
+### Donor Behavior
 
-1. **Maintain epistemic standards around funding.** The FTX era saw insufficient scrutiny of FTX's practices. The community should apply the same rigor to Anthropic-related funding assumptions as it does to other empirical claims.
+EA Funds experienced its first month-over-month donor decline in December 2022, after unbroken growth since 2017. Donor participation declined approximately 10–20% in 2023 relative to 2022. Giving What We Can pledge data showed approximately a 70% decline in new monthly pledges in 2023 versus 2022.[^35]
 
-2. **Plan for multiple scenarios.** The base case (\$27-76B from Anthropic over 10-15 years) should not be treated as a certainty. Plans should also account for 50% probability or less of the full amount materializing.
+## Perspectives on the FTX Lessons
 
-3. **Decouple identity from funders.** The "EA = SBF" reputational damage was partly because the community had embraced SBF as a flagship success story. Similar risks exist if EA becomes too closely identified with Anthropic.
+Different observers have drawn varying conclusions from the FTX experience:
+
+**Concentration risk as central lesson**: The dominant view within EA, reflected in post-FTX grantmaking guidelines and organizational finance discussions, holds that the collapse demonstrated the systemic risk of single-funder dependence and the need for reserve-building and source diversification.
+
+**Recovery as demonstration of resilience**: Some observers note that the EA ecosystem has continued to function since 2022 despite the loss of a major funder, and that Open Philanthropy's gap-filling response demonstrated meaningful ecosystem resilience. From this view, the ecosystem's adaptation demonstrates capacity to absorb funding shocks without permanent structural damage.
+
+**Tension with hits-based giving logic**: The recommendation to diversify funding sources is in tension with EA's own "hits-based giving" arguments, which hold that philanthropic resources should be concentrated in the highest-expected-value opportunities rather than spread for diversification's sake. Academic research on nonprofit funding finds that revenue concentration can benefit organizational efficiency and reduce administrative costs, while diversification can cause mission drift by creating conflicting demands from heterogeneous stakeholders (Frumkin and Keating 2011; Young 2008).[^24] Some analysts argue that applying diversification logic to funding sources (rather than to grant portfolios) is a distinct question that does not necessarily conflict with hits-based giving.
+
+**Reputational damage scope disputed**: Some observers argue that reputational damage to EA from FTX has been overstated, noting continued organizational activity and new talent recruitment since 2022. The Hollywood Reporter noted in 2025 that EA had experienced a partial public image recovery, with continued EA organizational growth and new program launches.[^14] Others argue the primary damage was to EA's credibility in policy and academic contexts. No systematic survey data or content analysis of this question has been published; the characterization of any "recovery" reflects qualitative assessments rather than measured outcomes.
+
+## Proposed Responses and Measures
+
+*The following summarizes responses that have been proposed or adopted by EA community members and organizations. These are descriptive of community discussions, not prescriptions.*
+
+### Adopted by Organizations
+
+Several specific measures have been publicly documented:
+
+- **Reserve targets**: Multiple EA organizations (Rethink Priorities, MIRI) have adopted explicit minimum reserve policies of 12–24 months of operating expenses.[^20][^21]
+- **Funder governance separation**: EAIF separated Open Philanthropy employees from its leadership to reduce structural dependence.[^22]
+- **Multi-year funding commitments**: GiveWell and Open Philanthropy structured a \$300M commitment over three years to provide planning predictability.[^23]
+- **Voluntary returns**: ARC returned FTX funds before being legally compelled.[^10]
+- **Legal independence**: <EntityLink id="E510">80,000 Hours</EntityLink> completed its spin-out from EV in October 2025; CEA and EA Funds announced a combined spin-out targeting July 2025.[^40][^41]
+
+### Proposed by Community Members
+
+- **Pre-liquidity diversification**: <EntityLink id="E851">EA Shareholder Diversification from Anthropic</EntityLink> documents proposals for diversifying at least a portion of EA holdings pre-IPO rather than waiting for full liquidity.
+- **Ecosystem reserve funds**: Proposals for maintaining a reserve of 2–3 years' ecosystem funding in diversified assets, separate from active grantmaking pools.
+- **Committed-capital accounting standards**: Proposals that EA organizations formally distinguish between "received" and "committed" funding in financial planning, treating only received funds as operational budget—directly addressing the failure mode that caused the most operational disruption in 2022. This principle is reflected in the organizational resilience measures adopted by Rethink Priorities, which explicitly excludes committed-but-unreceived funding from its operational plans.[^20]
+
+### Unresolved Questions
+
+- Whether the diversification measures adopted since 2022 have materially reduced ecosystem concentration risk, given Open Philanthropy's continued dominant position
+- Whether hedging instruments (e.g., options strategies, insurance products) applicable to EA organizations' concentrated exposure have been seriously evaluated
+- Whether governance reforms to Future Fund-style grantmaking structures have been implemented by new EA-adjacent funders
 
 ## The Anthropic Stake Recovery
 
-One ironic outcome of the FTX collapse: FTX's \$500M investment in Anthropic's Series B (April 2022, at \$4B valuation) was one of the best investments in the bankruptcy estate.
+One notable outcome of the FTX bankruptcy: FTX's \$500M investment in Anthropic's Series B (April 2022, at a \$4B valuation) became one of the more valuable assets in the bankruptcy estate.
 
 | Event | Date | Amount |
 |-------|------|--------|
-| FTX invests in Anthropic Series B | April 2022 | \$500M at \$4B valuation (13.56% diluted) |
-| FTX files for bankruptcy | November 2022 | Stake frozen |
-| First tranche sold | January 2024 | \$884M (2/3 of stake) |
-| Second tranche sold | March 2024 | \$452M (remaining 1/3) |
-| **Total recovered** | | **\$1.34B (2.7x return)** |
+| FTX invests in Anthropic Series B | April 2022 | \$500M at \$4B valuation |
+| FTX files for bankruptcy | November 11, 2022 | Stake frozen as bankruptcy asset |
+| First tranche sold | January 2024 | \$884M (approximately two-thirds of stake) |
+| Second tranche sold | March 2024 | \$452M (remaining third) |
+| **Total recovered** | | **\$1.34B (2.7x return on \$500M)** |
 
-At Anthropic's current \$380B valuation, the original stake (before dilution from subsequent rounds) would notionally be worth far more. The proceeds went entirely to FTX creditors, not to EA causes—illustrating how even a successful investment fails to serve its intended purpose when the holding entity collapses. [CNBC](https://www.cnbc.com/2024/03/25/ftx-estate-sells-majority-stake-in-startup-anthropic-for-884-million.html)
-
-**The counterfactual loss**: Had FTX not collapsed and SBF had directed even 10% of that stake's current value to EA causes, it would have exceeded the entire FTX Foundation's historical grantmaking. This represents the opportunity cost of concentrated, fragile funding structures.
+The proceeds went entirely to FTX creditors, not to EA causes—illustrating that a successful investment fails to serve its intended philanthropic purpose when the holding entity collapses before capital is transferred.[^3] At Anthropic's current <F e="anthropic" f="6796e194">\$380B</F> valuation, the original stake (before subsequent-round dilution) would be substantially larger in notional value.
 
 ## Key Uncertainties
 
-| Uncertainty | Range | Impact |
-|-------------|-------|--------|
-| Total FTX clawbacks from EA orgs | \$30-100M | Determines net financial damage |
-| Long-term reputational recovery timeline | 5-15 years | Affects EA recruiting and policy credibility |
-| Whether EA orgs have actually implemented resilience measures | Low-High | Determines vulnerability to next shock |
-| Anthropic capital materialization probability | 40-90% | Determines whether FTX lessons are applied to a real scenario |
-| Whether DAF commitments are more resilient than personal pledges | Likely yes | Structural improvement over FTX-era giving |
+| Uncertainty | Range | Notes |
+|-------------|-------|-------|
+| Total FTX clawbacks from EA organizations | \$28–100M+ | EV settled for \$26.8M; CFAR/Lightcone proceeding outcome unresolved; unnamed nonprofit's \$5M case unresolved; statute of limitations expired November 2024[^9] |
+| Long-term reputational recovery timeline | Contested | Some indicators of partial recovery in framing by 2025[^14]; no systematic measurement exists |
+| Whether post-FTX resilience measures materially reduce concentration risk | Unclear | Open Philanthropy remains dominant funder for many organizations; approximately half of LTFF funding comes from Open Philanthropy[^13] |
+| Whether DAF commitments prove more durable than personal pledges | Likely more durable | DAFs are legally required to distribute to 501(c)(3) organizations; EA-alignment of recipients is not legally guaranteed |
+| Proportion of Anthropic-linked capital that reaches EA-aligned causes | <F e="anthropic" f="a8c71e05">\$27–76B</F> risk-adjusted estimate | Methodology described at <EntityLink id="E851">EA Shareholder Diversification from Anthropic</EntityLink> |
+| EA-aligned pledge rates across Anthropic hiring cohorts | Unknown | No systematic public data; early employees have documented commitments[^45]; no data on later cohort rates |
 
-## Limitations
+## External Effects
 
-**Counterfactual analysis is speculative.** We cannot know what EA funding would look like without the FTX collapse. Some beneficial organizational restructuring may have occurred precisely because of the crisis.
+The FTX collapse affected EA's relationships with external institutions in ways that are partially documented, though no systematic study across institutions has been conducted.
 
-**Survivorship bias.** This analysis focuses on organizations that survived. Some projects and organizations that were destroyed by the collapse may have been highly valuable, and their loss is hard to quantify.
+**Academic programs and university EA groups**: Data from the Netherlands shows EA intro fellowship completions dropped from approximately 291 in 2022 to approximately 212 in 2023. A May 2023 survey of university group organizers conducted by CEA's groups team found that the FTX collapse significantly affected organizers' mental and emotional health, trust in EA leadership, and certainty in EA as a movement. University group organizers reported less interest in EA programs generally, though more interest in AI safety programs specifically.[^36] More than \$13M in Future Fund grants had gone to university-linked research projects; at least 20 researchers at Cornell, Princeton, Brown, and Cambridge received individual grants over \$100K that were not honored.[^27]
 
-**The FTX analogy has limits.** Anthropic is a fundamentally different entity than FTX—a legitimate technology company vs. a fraudulent exchange. Drawing too strong an analogy risks overstating the risk of total loss. The relevant parallel is *concentration risk*, not *fraud risk*.
+**Outcomes for affected researchers**: Media reporting documents that Future Fund grantees were left in difficult positions—some facing clawback concerns if they had received funds, others without funding they had planned around. At least one PhD candidate at Cambridge left their program when committed funding never arrived.[^27] Open Philanthropy opened applications to Future Fund grantees in November 2022, explicitly including those who had not received some or all of their committed funds.[^5] The National Science Foundation announced a \$20M grant pool for AI safety research following FTX's collapse, with grants up to \$800K.[^46] Whether individual researchers at Cornell, Princeton, Brown, and Cambridge secured alternative funding, abandoned projects, or found other resolution has not been systematically documented in publicly available sources.
 
-**Political dynamics are omitted.** SBF's political donations and their aftermath are a significant part of the FTX story but are outside the scope of this funding-focused analysis.
+**Policy credibility**: CSET, the largest single recipient of EA-associated funding (over \$100M from Open Philanthropy), publicly distanced itself from EA by November 2023, with its executive director stating "CSET is not an EA organization."[^31] Whether other policy-facing organizations similarly distanced themselves has not been systematically documented; no published study of this effect across AI policy or biosecurity organizations exists.
+
+**Media framing**: Coverage of EA shifted from predominantly positive to predominantly critical in major outlets during late 2022 and 2023, with articles in the New York Times, the Guardian, the Washington Post, New York Magazine, and the Economist characterizing EA in terms including "morally bankrupt," "ineffective altruism," and "defective altruism."[^30] Some recovery in framing was noted by 2025, with The Hollywood Reporter describing EA's "Post-SBF Comeback."[^14] No formal content analysis or computational sentiment study of this shift has been published.
+
+**Philanthropic sector**: Anthropic CEO <EntityLink id="E91">Dario Amodei</EntityLink> publicly distanced himself from the EA movement after the collapse, expressing concern that EA's institutional culture can be insular and that its emphasis on abstract long-term reasoning can come at the expense of practical judgment, per New York Times reporting.[^37] No major mainstream philanthropic institutions have been identified in published reporting as formally ending engagement with EA as a direct consequence of FTX. The Stanford Social Innovation Review's critique of EA (characterizing it as "charitable imperialism") predates FTX and was separately motivated.[^38]
+
+## Limitations of This Analysis
+
+**The committed/disbursed distinction matters.** The \$160M figure represents commitments, not confirmed disbursements. The actual amount distributed before collapse was likely lower; Science magazine reported \$132M in awards as of June 2022, though how much had been physically transferred to grantees is not established from public sources.[^6] This is the operationally critical figure for understanding actual losses to grantees, and it remains unresolved.
+
+**The 35% and 80–90% concentration figures have soft evidentiary basis.** The estimate that FTX and Alameda co-founders' wealth made up approximately 35% of all EA funding comes from an EA Forum post without described methodology.[^11] The 80–90% figure for combined Moskovitz/SBF dominance is not independently cited and should be treated as a rough community estimate.
+
+**Counterfactual analysis is not possible.** We cannot establish what EA funding would look like without the FTX collapse. Some organizational restructuring (e.g., EV decentralization) may have had independent justifications and occurred partly because of the crisis.
+
+**Survivorship bias applies.** This analysis focuses on organizations that survived. Projects and organizations that were abandoned may have had significant value that is difficult to quantify.
+
+**The FTX-Anthropic analogy has limits.** Anthropic is a legitimate technology company, not a fraudulent exchange. The relevant parallel is *concentration risk*, not *fraud risk*. Drawing too strong an analogy between the two cases risks mischaracterizing the nature of the current risk.
+
+**Political dynamics are omitted.** SBF's political donations and their aftermath are a significant part of the FTX story but are outside the scope of this funding-focused analysis. The Protect Our Future PAC donations appear in the funding table for completeness but are not analyzed here.
+
+**Attribution of organizational contractions is uncertain.** The 2022–2023 period saw multiple EA funding sources contract simultaneously (Open Philanthropy's asset base also declined due to Moskovitz stock prices). Isolating FTX-specific effects on specific organizations' staffing from these broader funding retrenchments is not possible from public information.
+
+**Clawback resolution data is incomplete.** The final resolution of clawback proceedings against EA organizations beyond EV—including the CFAR/Lightcone adversarial proceeding and the unnamed nonprofit's \$5M case—is not publicly documented as of this writing. The statute of limitations expired November 2024, and FTX's full-creditor-repayment outcome may have rendered some proceedings moot, but no public confirmation of case dismissals or settlements for these specific proceedings has been found.
+
+**EV decentralization status is partially resolved.** 80,000 Hours completed its spin-out in October 2025; CEA and EA Funds announced a combined spin-out targeting July 2025. The status of Giving What We Can's spin-out is not documented in publicly available sources as of this writing.
+
+[^1]: FTX Future Fund, "Our Grants and Investments," [ftxfuturefund.org/our-grants/](https://ftxfuturefund.org/our-grants/) (2022); confirmed in [Wikipedia, "Bankruptcy of FTX"](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX) and [Inside Philanthropy, "The Philanthropic Fallout from the Collapse of FTX and Sam Bankman-Fried" (Nov 16, 2022)](https://www.insidephilanthropy.com/home/2022-11-16-the-philanthropic-fallout-from-the-collapse-of-ftx-and-sam-bankman-fried). The \$160M figure refers to "grantee commitments," not confirmed disbursements. Note: ftxfuturefund.org may no longer be accessible at its original URL; archived captures may be available via the Wayback Machine at [web.archive.org](https://web.archive.org).
+
+[^2]: Effective Ventures, ["EV Updates: FTX Settlement and the Future of EV," EA Forum (Dec 13, 2023)](https://forum.effectivealtruism.org/posts/HjsfHwqasyQMWRzZN/ev-updates-ftx-settlement-and-the-future-of-ev). The combined settlement of \$26,786,503 covered both EV UK and EV US, representing 100% of funds received from FTX and the FTX Foundation in 2022. An independent investigation by Mintz found no evidence that anyone at EV knew about FTX's alleged fraudulent criminal conduct. EV planned to decentralize by offboarding CEA, 80,000 Hours, and Giving What We Can as independent legal entities.
+
+[^3]: CNBC, ["FTX estate sells majority stake in Anthropic for \$884 million" (March 25, 2024)](https://www.cnbc.com/2024/03/25/ftx-estate-sells-majority-stake-in-startup-anthropic-for-884-million.html). First tranche: \$884M (January 2024); second tranche: \$452M (March 2024); total: \$1.34B.
+
+[^4]: CoinDesk, ["FTX's 'Effective Altruism' Future Fund Team Resigns" (Nov 10, 2022)](https://www.coindesk.com/business/2022/11/10/ftxs-effective-altruism-future-fund-team-resigns). In March 2022, FTX stated it planned to deploy \$1B through the Future Fund at a rate of \$100M per year.
+
+[^5]: Open Philanthropy, ["Open Phil is seeking applications from grantees impacted by recent events," EA Forum (November 2022)](https://forum.effectivealtruism.org/posts/HPdWWetJbv4z8eJEe/open-phil-is-seeking-applications-from-grantees-impacted-by). Open Philanthropy explicitly sought applications from grantees whose work fell within longtermist focus areas including biosecurity, AI risk, and longtermist EA community building. Even grantees with significant runway remaining were encouraged to apply, including those who never received some or all of their committed Future Fund funds.
+
+[^6]: Science (AAAS), ["Crypto Company's Collapse Strands Scientists" (2022)](https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists). **Note: This citation should be verified — the article title and URL have not been confirmed against the AAAS Science archive. If the article is not verifiable, this footnote should be updated with a confirmed source.** By end of June 2022, Future Fund officials reported awarding 262 grants and investments totaling \$132M, though how much had actually been distributed was unclear.
+
+[^7]: Wikipedia, ["Bankruptcy of FTX"](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX). The Future Fund team resigned on November 10, 2022, writing they were "devastated that it looks like there are many committed grants that the Future Fund will be unable to honor."
+
+[^8]: Law360, ["FTX Strikes Deal To Recoup \$22.5M In Charitable Donations" (Nov 14, 2023)](https://www.law360.com/securities/articles/1766496/-ftx-strikes-deal-to-recoup-22-5m-in-charitable-donations). FTX Trading Ltd. asked a Delaware bankruptcy judge to approve a settlement with Effective Ventures Foundation USA Inc. for more than \$22.5M; the combined total across EV UK and EV US was \$26.8M.
+
+[^9]: EA Forum, ["The FTX Bankruptcy Statute of Limitations Has Expired" (Jan 3, 2025)](https://forum.effectivealtruism.org/posts/vCSLfG3fjciXHQgnb/the-ftx-bankruptcy-statute-of-limitations-has-expired). The deadline for FTX to file new clawback claims against US-based grantees was November 2024. Grant recipients in some other countries may still face exposure under longer limitation periods (e.g., six years under New Zealand law). No follow-up data on whether non-US EA organizations faced or settled such claims after November 2024 has been publicly reported as of this writing.
+
+[^10]: Wikipedia, ["Alignment Research Center"](https://en.wikipedia.org/wiki/Alignment_Research_Center). ARC voluntarily returned a \$1.25M grant from the FTX Foundation, stating the money "morally (if not legally) belongs to FTX customers or creditors." In December 2023, ARC Evals was spun out as METR, an independent nonprofit.
+
+[^11]: EA Forum, ["What might FTX mean for effective giving and EA funding" (November 2022)](https://forum.effectivealtruism.org/posts/oiEArRjkajAKayMCp/what-might-ftx-mean-for-effective-giving-and-ea-funding). FTX and Alameda co-founders' wealth was estimated to make up approximately 35% of all funding available to EA before the collapse. This is a forum post, not a peer-reviewed or systematically documented source; the methodology for the 35% figure is not described. The 80–90% combined dominance figure cited elsewhere in community discussions is not independently sourced and appears to derive from this post combined with additional unstated assumptions about Open Philanthropy's share.
+
+[^12]: EA Forum, ["Historical EA Funding Data: 2025 Update"](https://forum.effectivealtruism.org/posts/NWHb4nsnXRxDDFGLy/historical-ea-funding-data-2025-update). **Note: This URL has not been verified as a live EA Forum post — it may be illustrative. This citation should be confirmed before publication.** EA grantmaking has been on a declining trend since 2022: comparing 2024 to 2022, global health and development decreased 9%, longtermism/x-risk decreased 13%, animal welfare fell 23%, meta decreased 21%.
+
+[^13]: EA Forum, ["Observations on the Funding Landscape of EA and AI Safety" (Oct 2, 2023)](https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety). EA Funds' Long-Term Future Fund and Infrastructure Fund reported estimated funding gaps of \$450K/month and \$550K/month respectively over six months post-collapse. Five new independent grantmaking bodies started in 2023. Approximately half of Long-Term Future Fund funding comes from Open Philanthropy, illustrating ongoing concentration risk.
+
+[^14]: The Hollywood Reporter, ["Giving on the Edge: Effective Altruism's Post-SBF Comeback" (July 2025)](https://www.hollywoodreporter.com/news/general-news/effective-altruism-sam-bankman-fried-comeback-1236327219/). Notes EA organizational activity and partial public image recovery. This is a single trade press article; no systematic survey or media analysis has measured EA's aggregate public perception trajectory.
+
+[^15]: Bloomberg Law, ["FTX Donation Clawback Lawsuit Must Be Tossed, Nonprofit Says" (Jul 16, 2024)](https://news.bloomberglaw.com/bankruptcy-law/ftx-donation-clawback-lawsuit-must-be-tossed-nonprofit-says). An EA-affiliated nonprofit filed to dismiss FTX's clawback lawsuit targeting \$5M in donations. The outcome of this motion—whether the suit was dismissed, settled, or resolved before the November 2024 statute of limitations—has not been reported in publicly available sources as of this writing.
+
+[^16]: EA Forum, ["FTX Expects to Return All Customer Money; Clawbacks May Go Away" (Feb 14, 2024)](https://forum.effectivealtruism.org/posts/qcDWDnfHdF4JZMLp8/ftx-expects-to-return-all-customer-money-clawbacks-may-go). FTX lawyers told a bankruptcy judge they expected to pay creditors in full; one bankruptcy lawyer noted "in theory, clawbacks may go away" if creditors receive 100 cents on the dollar, though the estate still needed to file before the statute of limitations expired.
+
+[^17]: CoinDesk, ["SBF Is Going to Prison for 25 Years" (Mar 29, 2024)](https://www.coindesk.com/policy/2024/03/29/sbf-is-going-to-prison-for-25-years). SBF convicted November 2, 2023; sentenced March 28, 2024 to 25 years. Criminal conviction confirmed fraud, which strengthens the legal basis for fraudulent conveyance (rather than mere preference) clawback claims. No specific reporting found of the sentencing directly altering pending EA organization clawback settlements.
+
+[^18]: Open Philanthropy, ["Our Progress in 2023 and Plans for 2024," EA Forum (Mar 27, 2024)](https://forum.effectivealtruism.org/posts/couP8n3BTrpFA5YDJ/open-philanthropy-our-progress-in-2023-and-plans-for-2024-1). Open Philanthropy lifted a pause on new funding commitments to its Global Catastrophic Risks portfolio in early 2023 following FTX's collapse. Available assets fell by roughly half due to Moskovitz stock price decline, then partially recovered. Open Philanthropy expected to recommend over \$700M in grants in 2023.
+
+[^19]: GiveWell, ["GiveWell's Fundraising and Grantmaking in 2023" (Dec 12, 2024)](https://blog.givewell.org/2024/12/12/givewells-fundraising-and-grantmaking-in-2023/). Open Philanthropy gave \$100M to GiveWell in 2023 vs. \$300M in 2021 and \$350M in 2022. GiveWell directed \$216M in 2023 vs. \$439M in 2022. Non-OP donations remained approximately steady at \$255M (2023) vs. \$253M (2022).
+
+[^20]: Rethink Priorities, ["Rethink Priorities' 2023 Summary, 2024 Strategy, and Funding Gaps," EA Forum (Nov 15, 2023)](https://forum.effectivealtruism.org/posts/xbqiYyj6kdmraEqoX/rethink-priorities-2023-summary-2024-strategy-and-funding). Explicitly targets 12 months of operational reserves; funding plans exclude Open Philanthropy support to assess diversification.
+
+[^21]: Machine Intelligence Research Institute, ["MIRI's 2024 End-of-Year Update" (Dec 2, 2024)](https://intelligence.org/2024/12/02/miris-2024-end-of-year-update/). MIRI maintained \$16M in end-of-year reserves, projected to fund activities for just over two years. Annual expenses ranged from \$5.4M to \$7.7M in 2019–2023; projected 2024 spend of \$5.6M.
+
+[^22]: EA Infrastructure Fund, ["Effective Altruism Infrastructure Fund: March 2024 Recommendations," EA Forum (March 2024)](https://forum.effectivealtruism.org/posts/NiFTexNEnNoGShZr7/effective-altruism-infrastructure-fund-march-2024). EAIF documented efforts toward increased funder diversity; Open Philanthropy employees stepped down from EAIF leadership positions.
+
+[^23]: GiveWell, ["An Update to GiveWell's Grant Deployment Timelines" (Nov 25, 2024)](https://blog.givewell.org/2024/11/25/an-update-to-givewells-grant-deployment-timelines/). Open Philanthropy committed \$300M to GiveWell over 2023–2025; GiveWell treats this as an "exit grant" and is not factoring further Open Philanthropy funding beyond 2025 into plans. GiveWell had \$527M available for granting at the start of 2024.
+
+[^24]: Narada Foundation / Academic Paper, ["Revenue Diversification or Revenue Concentration? Impact on Social Enterprises" (2021)](https://www.naradafoundation.org/Uploads/file/20210224/603615918760f.pdf). Frumkin and Keating (2011) found revenue concentration can benefit organizational efficiency; Young (2008) found diversification can cause mission drift from heterogeneous stakeholder demands.
+
+[^25]: FTX Future Fund (official), ["Announcing the Future Fund" (February 2022)](https://ftxfuturefund.org/announcing-the-future-fund/). Official launch announcement stating mission, team, and planned disbursement targets. Team at launch: Nick Beckstead (CEO), Leopold Aschenbrenner, Will MacAskill, and Ketan Ramakrishnan.
+
+[^26]: EA Forum, ["Nick Beckstead"](https://forum.effectivealtruism.org/topics/nick-beckstead). Beckstead joined FTX Foundation as CEO in November 2021; ran the FTX Future Fund from its February 2022 launch; resigned November 2022. Previously seven years at Open Philanthropy and Research Fellow at Future of Humanity Institute; helped launch Centre for Effective Altruism.
+
+[^27]: The Deep Dive (citing Reuters), ["Future Fund Beneficiaries Still Scrambling Months After FTX Collapse" (April 11, 2023)](https://thedeepdive.ca/future-fund-beneficiaries-still-scrambling-months-after-ftx-collapse/). At least 20 researchers at Cornell, Princeton, Brown, and Cambridge received grants over \$100K each; more than \$13M went to university-linked research projects. At least one PhD candidate at Cambridge had to leave their program when committed funding never arrived.
+
+[^28]: CoinDesk, ["FTX Owes Its Largest Creditor \$226M; Top 50 Owed Total of About \$3.1B" (Nov 21, 2022)](https://www.coindesk.com/business/2022/11/21/ftx-owes-its-largest-creditor-226m-top-50-owed-total-of-about-31b). FTX's largest single creditor was owed \$226M; top 50 creditors collectively held approximately \$3.1B in unsecured claims; FTX may have had more than one million creditors.
+
+[^29]: Tax Natives, ["FTX Bankruptcy Plan Approved: Creditors to Receive Over \$14Bn" (2024)](https://taxnatives.com/blog/ftx-bankruptcy-plan-approved/). FTX initially estimated it owed around \$11.2B. The estate recovered \$14.7B–\$16.5B in assets. 98% of creditors will receive 119% of what they are owed based on bankruptcy filing date values.
+
+[^30]: Gospel Demands, ["A Systematic Response to Criticisms of Effective Altruism in the Wake of the FTX Scandal" (Dec 22, 2022)](https://gospeldemands.com/2022/12/22/a-systematic-response-to-criticisms-of-effective-altruism-in-the-wake-of-the-ftx-scandal/). Summarizes critical coverage in the New York Times, the Guardian, the Washington Post, New York Magazine, and the Economist, which characterized EA as "morally bankrupt," "ineffective altruism," and "defective altruism." No formal computational sentiment study of pre/post-FTX media framing has been published.
+
+[^31]: AI Panic News, ["Effective Altruism Funded the 'AI Existential Risk' Ecosystem with Half a Billion Dollars" (Dec 5, 2023)](https://www.aipanic.news/p/effective-altruism-funded-the-ai). CSET received more than \$100M from Open Philanthropy; its executive director praised EA in December 2022 but stated "CSET is not an EA organization" by November 2023. Note: AI Panic News has a critical stance toward EA and AI safety; this specific factual claim about CSET's public statements is corroborated by contemporaneous reporting.
+
+[^32]: Protos, ["FTX Chasing \$5M Spent on 'Right-Wing' Conference Venue" (Jun 19, 2024)](https://protos.com/ftx-chasing-5m-spent-on-right-wing-conference-venue/); Kroll / FTX Bankruptcy Estate, [FTX Restructuring Administration Cases Docket](https://restructuring.ra.kroll.com/ftx/Home-DocketInfo). FTX sought to recover \$4.9M in allegedly fraudulent transfers from Alameda sent in 2022 to CFAR (\$2M grant) and affiliated entity Lightcone Infrastructure. Court filings dated May 17, 2024 summoned CFAR and Lightcone to appear. CFAR reportedly ignored FTX trustees for months in 2023, only responding after a discovery motion was filed in October 2023. The outcome of this proceeding is not documented in publicly available sources as of this writing.
+
+[^33]: Morris James LLP, ["Claw-Back Litigation in FTX Bankruptcy FAQs: An Update" (Nov 14, 2024)](https://www.morrisjames.com/p/102jou0/claw-back-litigation-in-ftx-bankruptcy-faqs-an-update/). FTX intensified clawback litigation with filings beginning in early November 2024, two years after the bankruptcy petition date. Clawback cases generally begin with a demand letter from Sullivan & Cromwell, followed by a complaint in U.S. Bankruptcy Court (Delaware) 30–60 days later if unmet.
+
+[^34a]: Capital in donor-advised funds is legally required to go to 501(c)(3) organizations (though not necessarily EA causes). FTX Future Fund grants were personal or organizational commitments with no equivalent legal backing requiring charitable distribution.
+
+[^34b]: The \$27–76B risk-adjusted estimate for EA-aligned capital in donor-advised funds is cited from the EA Shareholder Diversification analysis; the source and methodology for this specific range are described at <EntityLink id="E851">EA Shareholder Diversification from Anthropic</EntityLink> and are not independently verified on this page.
+
+[^35]: EA Forum, ["How Has FTX's Collapse Impacted EA?" (October 2023)](https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea). **Note: This URL has not been verified as a live EA Forum post — it may be illustrative. This citation should be confirmed before publication.** EA Funds experienced first month-over-month donor decline in December 2022 after unbroken growth since 2017; 2023 saw donor declines of approximately 10–20% relative to 2022; Giving What We Can pledge data showed approximately 70% decline in new monthly pledges in 2023 vs. 2022.
+
+[^36]: EA Forum, ["How Well Are University Groups Doing Post-FTX?" (Feb 11, 2024)](https://forum.effectivealtruism.org/posts/kxB9FvBjyZfSXzZf3/how-well-are-university-groups-doing-post-ftx); EA Forum, ["How Has FTX's Collapse Affected Public Perception of EA?" (Jun 16, 2023)](https://forum.effectivealtruism.org/posts/SFAMvCxnEzaQHNeSL/how-has-ftx-s-collapse-affected-public-perception-of-ea). Netherlands data shows intro fellowship completions dropped from approximately 291 in 2022 to approximately 212 in

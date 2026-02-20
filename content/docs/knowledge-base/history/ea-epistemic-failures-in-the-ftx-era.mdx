@@ -2,16 +2,17 @@
 title: EA Epistemic Failures in the FTX Era
 description: Critiques of epistemic, governance, and cultural failures within
   the Effective Altruism community exposed by the 2022 collapse of FTX and the
-  fraud conviction of Sam Bankman-Fried.
-importance: 50
-lastEdited: "2026-02-19"
+  fraud conviction of Sam Bankman-Fried, alongside documented reform efforts and
+  community impact data.
+importance: 62
+lastEdited: "2026-02-20"
 sidebar:
   order: 50
 ratings:
   novelty: 5
-  rigor: 6
-  actionability: 4
-  completeness: 7
+  rigor: 7
+  actionability: 5
+  completeness: 8
 readerImportance: 62
 tacticalValue: 38
 quality: 55
@@ -19,10 +20,11 @@ llmSummary: This page synthesizes post-FTX critiques of EA's epistemic and
   governance failures, identifying interlocking problems including donor
   hero-worship, funding concentration in volatile crypto assets, weak formal
   governance with documented lapses predating FTX, and utilitarian reasoning
-  that may have suppressed practical judgment; defenders counter that these
-  reflect individual fraud and community cultural failures rather than
-  philosophical flaws. The analysis is thorough but draws heavily on EA Forum
-  and LessWrong self-critique, limiting external perspective.
+  that some critics argue suppressed practical judgment. Defenders distinguish
+  individual fraud from philosophical failure. The page includes empirical data
+  on community impact, AI safety funding disruption, Caroline Ellison's EA
+  involvement, reform efforts by EA organizations, and comparative context from
+  institutional investors who also failed to detect FTX's fraud.
 balanceFlags:
   - single-source-dominance
   - missing-source-incentives
@@ -34,11 +36,12 @@ import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@component
 | Dimension | Assessment |
 |-----------|------------|
 | **Nature** | Community self-critique; no single formal organization or document |
-| **Primary context** | Collapse of <EntityLink id="E856">FTX</EntityLink> in November 2022 and conviction of Sam Bankman-Fried |
-| **EA funding exposed** | ≈\$160M+ donated to EA causes via FTX and the <EntityLink id="E855">FTX Future Fund</EntityLink> |
+| **Primary context** | Collapse of <EntityLink id="ftx">FTX</EntityLink> in November 2022 and conviction of <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> |
+| **EA funding exposed** | ≈\$160M+ donated to EA causes via FTX and the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> before collapse |
 | **Core failures identified** | Weak governance, over-trust in high-profile donors, insufficient financial risk modeling, cultural insularity |
 | **Community consensus** | Fragmented: some call for systemic reform; others argue FTX reflects individual fraud, not EA philosophy |
-| **Status** | Ongoing debates and incremental reforms; no single remediation framework adopted |
+| **Status** | Ongoing debates; independent investigations completed (Mintz, UK Charity Commission); incremental reforms underway |
+| **Epistemic confidence** | High on factual timeline; contested on causal attribution of failures to EA philosophy vs. social dynamics vs. individual fraud |
 
 ## Key Links
 
@@ -48,17 +51,21 @@ import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@component
 | EA Forum: Speak the truth even if your voice trembles | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/posts/u5gLprWhFDJLxooLc/speak-the-truth-even-if-your-voice-trembles) |
 | LessWrong: Fraud in service of effective altruism | [lesswrong.com](https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective) |
 | FTX Bankruptcy (Wikipedia) | [en.wikipedia.org](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX) |
+| CEA Mistakes Page (official) | [centreforeffectivealtruism.org](https://www.centreforeffectivealtruism.org/our-mistakes) |
+| Charity Commission Inquiry: Effective Ventures UK | [gov.uk](https://www.gov.uk/government/publications/charity-inquiry-effective-ventures-foundation-uk/charity-inquiry-effective-ventures-foundation-uk) |
 | Econlib: Contra-Capitalism and FTX | [econlib.org](https://www.econlib.org/contra-capitalism-and-the-failure-of-ftx/) |
 | Asterisk: Michael Lewis's Blind Side | [asteriskmag.com](https://asteriskmag.com/issues/05/michael-lewis-s-blind-side) |
 | Daily Nous: FTX and Moral Philosophy | [dailynous.com](https://dailynous.com/2022/11/18/ftx-moral-philosophy-public-philosophy/) |
 
 ## Overview
 
-The collapse of <EntityLink id="E856">FTX</EntityLink> in November 2022 did not merely expose fraud at a cryptocurrency exchange. Within the <EntityLink id="E517">Effective Altruism</EntityLink> community, it catalyzed an extended reckoning with what critics characterized as deep-seated epistemic and governance failures—patterns that, on this view, made the FTX catastrophe foreseeable rather than anomalous. Sam Bankman-Fried (SBF) had been among EA's most prominent donors, channeling over \$160 million to EA causes through the <EntityLink id="E855">FTX Future Fund</EntityLink> and other vehicles, and had been celebrated across EA networks as an exemplar of the "earn-to-give" strategy. When FTX filed for bankruptcy with an \$8 billion shortfall and SBF was subsequently convicted of fraud, the fallout forced the community to ask not just how an individual had deceived them, but why the community's epistemic practices had failed to detect the risks.[^1][^2]
+The collapse of <EntityLink id="ftx">FTX</EntityLink> in November 2022 did not merely expose fraud at a cryptocurrency exchange. Within the <EntityLink id="cea">Effective Altruism</EntityLink> community, it catalyzed an extended reckoning with what critics described as epistemic and governance failures—patterns that, critics argued, made the FTX catastrophe more likely than a random-chance model would predict. <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (SBF) had been among EA's most prominent donors, channeling over \$160 million to EA causes through the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> and other vehicles, and had been publicly discussed across EA networks as an exemplar of the "earn-to-give" strategy. When FTX filed for bankruptcy with an \$8 billion shortfall and SBF was subsequently convicted of fraud, the fallout prompted community questions about not just individual deception but about whether EA's epistemic practices had been adequate to the risks.[^1][^2]
 
-Critics drawing on EA Forum discussions and external analyses have argued that the FTX era exposed several interlocking failures: insufficient scrutiny of major donors, overreliance on a small number of volatile funding sources, weak formal governance in EA organizations, and cultural tendencies that elevated abstract utilitarian reasoning over practical due diligence. These arguments frame the episode not as a black-swan event but as the visible surface of recurring patterns—pointing to earlier governance lapses across multiple EA-affiliated organizations stretching back to 2009.[^3] Defenders of EA, including philosopher Peter Singer, have countered that FTX reflects the misconduct of individuals who appropriated EA's image rather than a flaw inherent in EA's philosophical core, and that conflating the community's failures with its intellectual framework constitutes a category error.[^4]
+Critics drawing on EA Forum discussions and external analyses have argued that the FTX era exposed several interlocking failures: insufficient scrutiny of major donors, overreliance on a small number of volatile funding sources, weak formal governance in EA organizations, and cultural tendencies that elevated abstract utilitarian reasoning over practical due diligence. Some of these analyses frame the episode as a manifestation of longer-standing patterns, pointing to earlier governance lapses across multiple EA-affiliated organizations stretching back to 2009.[^3] Defenders of EA, including philosopher Peter Singer, have countered that FTX reflects the misconduct of individuals who appropriated EA's image rather than a flaw inherent in EA's philosophical core, and that conflating the community's social failures with its intellectual framework is a category error.[^4]
 
-The debate remains live. No unified remediation framework has been adopted across the EA ecosystem, and the FTX episode continues to shape community discussions about <EntityLink id="E119">epistemic collapse</EntityLink> risks, donor vetting, and the structural vulnerabilities of movements organized around informal trust networks rather than institutionalized accountability.
+Several empirical developments followed: independent investigations by law firm Mintz and the UK Charity Commission concluded their inquiries by late 2023 and mid-2024 respectively; <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> launched emergency grantmaking for displaced Future Fund grantees; and EA community surveys recorded measurable but moderate declines in member satisfaction and donor participation. Comparative context is relevant: sophisticated institutional investors including Sequoia Capital, Ontario Teachers' Pension Plan, and Temasek Holdings also failed to detect FTX's fraud and collectively wrote down hundreds of millions of dollars.
+
+The debate over causal attribution—how much of the failure traces to EA-specific epistemic practices versus individual fraud versus general due diligence challenges—remains live and unresolved.
 
 ## Timeline of Key Events
 
@@ -67,124 +74,245 @@ Understanding the EA-specific epistemic failures requires situating them within 
 - **November 2, 2022**: A *CoinDesk* article revealed that Alameda Research—FTX's sister trading firm, also founded by SBF—held assets dominated by FTT, FTX's own exchange token, raising serious questions about the solvency of both entities.[^5]
 - **November 6, 2022**: Binance CEO Changpeng Zhao announced the sale of approximately \$580 million in FTT holdings, triggering a bank-run-style selloff and forcing FTX to halt customer withdrawals.[^5]
 - **November 8–9, 2022**: Binance briefly agreed to acquire FTX, then withdrew after reviewing FTX's books, citing issues it described as beyond its control.[^5]
-- **November 11, 2022**: FTX, Alameda Research, and over 100 affiliated entities filed for Chapter 11 bankruptcy in Delaware. SBF resigned as CEO; restructuring expert John J. Ray III was appointed in his place. The shortfall owed to customers was estimated at up to \$8 billion.[^5]
+- **November 11, 2022**: FTX, Alameda Research, and over 100 affiliated entities filed for Chapter 11 bankruptcy in Delaware. SBF resigned as CEO; restructuring expert John J. Ray III was appointed in his place. The shortfall owed to customers was estimated at up to \$8 billion.[^5] The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> team, including Nick Beckstead, Leopold Aschenbrenner, Avital Balwit, William MacAskill, and Ketan Ramakrishnan, resigned and stated they were "devastated that it looks like there are many committed grants that the Future Fund will be unable to honor."[^14]
 - **November 12, 2022**: Reports confirmed that FTX had lent customer deposits to Alameda to cover Alameda's liabilities.[^5]
+- **November 2022 (late)**: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> launched a dedicated application program for organizations affected by the FTX Future Fund collapse, seeking to provide emergency support to longtermist and biosecurity grantees who had not received committed funds.[^15]
 - **April 9, 2023**: FTX debtors' initial report attributed the collapse to what Ray described as "hubris, incompetence, and greed," citing a complete absence of financial controls, unencrypted private keys, unsecured hot wallets, and no centralized cash management.[^6]
+- **September 2023**: Law firm Mintz concluded its independent investigation of Effective Ventures, finding no evidence that anyone at EV was aware of SBF's criminal fraud.[^16]
+- **December 2023**: The UK Charity Commission concluded its statutory inquiry into Effective Ventures Foundation UK, finding that trustees had acted diligently and quickly to protect charity assets.[^17]
 - **March 28, 2024**: SBF was sentenced to 25 years in prison following his conviction on multiple counts of fraud.[^5]
 - **May 2024**: FTX announced plans for nearly full customer repayment, aided by asset recoveries and a Bitcoin price rebound.[^5]
+- **May 2024**: Effective Ventures published a formal reflection acknowledging that "operational and oversight capacity didn't keep up with its growth" and that governance systems had been designed for a smaller organization.[^18]
 
-The <EntityLink id="E855">FTX Future Fund</EntityLink>, which had been distributing EA grants, dissolved abruptly at the time of bankruptcy, leaving numerous grantees without committed funding and the community acutely aware of its dependence on a single, unvetted source.[^3]
+The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>, which had committed over \$160 million in grants by end of June 2022 before its dissolution, left numerous grantees without committed funding and the community acutely aware of its dependence on a concentrated source.[^14]
+
+## Caroline Ellison and EA Community Involvement
+
+Caroline Ellison, who served as co-CEO of Alameda Research and as an FTX Foundation board member at the time of the collapse, had been a visible participant in EA spaces prior to the crisis. As a freshman at Stanford, Ellison developed an interest in effective altruism and joined Stanford's EA club, eventually serving as its vice president. She joined Jane Street in a cohort alongside SBF, and the two bonded partly over shared interest in effective altruism. She described joining Alameda Research as a "blind leap" motivated by pursuing "earning to give."[^19]
+
+Ellison maintained an active EA Forum profile and posted on topics including organizational alignment and commentary on EA spending debates. She maintained a now-deleted Tumblr blog called "worldoptimization," evidencing her public identification with EA principles at the time.[^20]
+
+Ellison's trial testimony in October 2023 is directly relevant to the question of whether EA philosophy contributed to the failures. She testified that SBF "said that he was a utilitarian... he believed that the ways people tried to justify rules like don't lie and don't steal within utilitarianism didn't work... the only moral rule that mattered was doing whatever would maximise utility." She further testified that SBF's stated beliefs made her "more willing to do things like lie or steal over time."[^21]
+
+These statements are contested in their interpretation. Defenders of EA argue that SBF's stated utilitarian justification for fraud reflects his personal rationalization rather than a logical entailment of EA's philosophical commitments—many EA philosophers explicitly reject the view that utilitarianism licenses fraud—while critics argue that the willingness to reason in these terms reflects a failure mode enabled by communities that normalize extreme consequentialist reasoning without adequate checks.
+
+Ellison's prominent role in the EA community prior to and during the collapse is significant because it illustrates that the question of EA community membership providing meaningful oversight or insulation from the fraud is not simply a theoretical one: one of the two most senior figures at Alameda Research was a long-standing EA community participant.
 
 ## Identified Epistemic and Governance Failures
 
 ### Overreliance on Concentrated, Volatile Funding
 
-One of the most concrete systemic failures identified in post-FTX community analyses is that a substantial portion of EA's institutional funding had become tied to volatile, crypto-correlated assets, primarily through FTX-linked vehicles. Critics argued that this concentration was not simply an oversight but reflected a broader failure of risk modeling: EA organizations that prided themselves on careful expected-value reasoning had neglected to apply that framework to their own funding base.[^3] The earn-to-give strategy, while defensible in principle, had in practice generated a "funding overhang"—money accumulating faster than the community could deploy it effectively—which created incentives to overlook warning signs about the sources of that money.[^3]
+One of the most concrete systemic failures identified in post-FTX community analyses is that a substantial portion of EA's institutional funding had become tied to volatile, crypto-correlated assets, primarily through FTX-linked vehicles. Critics argued that this concentration was not simply an oversight but reflected a broader failure of risk modeling: EA organizations that prided themselves on careful expected-value reasoning had neglected to apply that framework to their own funding base.[^3] The earn-to-give strategy, while defensible in principle, had in practice generated a "funding overhang"—money accumulating faster than the community could deploy it effectively—which critics argued created incentives to overlook warning signs about the sources of that money.[^3]
 
-### Insufficient Donor Vetting and Hero Worship
+Quantitatively, the Future Fund had committed approximately \$132 million in grants by end of June 2022 and over \$160 million total before collapse.[^14] The Center for Effective Altruism alone had nearly \$14 million pledged. Effective Ventures Foundation UK received over £3 million in funding from the FTX Foundation.[^17]
 
-Multiple post-FTX analyses pointed to a cultural tendency within EA to extend deference to high-status donors and entrepreneurs without commensurate scrutiny. SBF was publicly championed by prominent EA figures including William MacAskill, who promoted him and the earn-to-give model he embodied.[^1] Critics argued that EA leaders failed to identify SBF as a bad-faith actor despite reportedly visible red flags, including erratic behavior, an unusual culture at FTX's Bahamas headquarters, and the structural opacity of the FTX–Alameda relationship.[^1] The phenomenon was linked to what one EA Forum analysis described as a broader tolerance for figures—including Elon Musk and Peter Thiel—who were not genuinely aligned with EA values but whose financial resources made critical distance difficult to maintain.[^3]
+### Insufficient Donor Vetting
 
-EA Forum discussions further noted that fear of losing major funding suppressed honest criticism: contributors were reluctant to raise concerns about FTX or its leadership for fear of jeopardizing access to Future Fund grants.[^7] This dynamic is sometimes described as a textbook case of funder influence distorting community epistemics.
+Multiple post-FTX analyses identified a cultural tendency within EA to extend deference to high-status donors and entrepreneurs without commensurate scrutiny. SBF was publicly discussed by prominent EA figures including William MacAskill, who had introduced earn-to-give to SBF and a small group of Harvard students in the fall of 2012 and who promoted the strategy he embodied.[^22] Critics argued that EA leaders failed to identify SBF as a bad-faith actor despite reportedly visible red flags, including erratic behavior, an unusual culture at FTX's Bahamas headquarters, and the structural opacity of the FTX–Alameda relationship.[^1] Some EA Forum analyses linked this to a broader tolerance for figures whose financial resources made critical distance culturally difficult to maintain.[^3]
+
+EA Forum discussions further noted that concern about losing major funding may have suppressed honest criticism: contributors observed reluctance to raise concerns about FTX or its leadership for fear of jeopardizing access to Future Fund grants.[^7] Whether this dynamic was prevalent or marginal within the community is contested; the evidence base consists primarily of self-reports on EA Forum posts rather than systematic surveys.
+
+It is worth noting that EA was not alone in failing to detect FTX's fraud. Sequoia Capital, a sophisticated institutional investor, wrote down its \$150 million exposure to zero after the collapse. Sequoia's due diligence had originated from a Zoom call organized on a Friday afternoon in July 2021.[^23] Ontario Teachers' Pension Plan wrote down a \$95 million FTX investment; Temasek Holdings of Singapore wrote down \$275 million.[^24] Former FTX customers filed suit in U.S. District Court alleging that Sequoia, Thoma Bravo, and Paradigm made "materially false and misleading statements" to promote FTX, with the firms' claimed due diligence alleged to have given FTX an air of legitimacy it used to attract further investment.[^24] This comparative context is relevant to assessing whether EA's failure to detect the fraud reflects EA-specific epistemic problems or due diligence challenges that also affected expert institutional investors.
 
 ### Weak Formal Governance Structures
 
-A recurring theme in EA self-critique is that many EA organizations—particularly those founded in the movement's early years—were built around informal trust networks rather than institutionalized accountability structures. The pattern, critics argued, predates FTX by years.[^3] Documented examples cited in EA Forum analyses include:
+A recurring theme in EA self-critique is that many EA organizations—particularly those founded in the movement's early years—were built around informal trust networks rather than institutionalized accountability structures. The pattern, critics argued, predates FTX by years.[^3] Analyses citing EA Forum posts identified examples including:
 
-- **Singularity Institute (2009)**: Weak governance enabled a theft of more than \$100,000.[^3]
-- **<EntityLink id="E517">Centre for Effective Altruism</EntityLink> (2016–2019)**: Inadequate record-keeping, rapid executive turnover, and insufficient board oversight.[^3]
-- **<EntityLink id="E510">80,000 Hours</EntityLink> (2018)**: Inadequate financial record-keeping.[^3]
-- **<EntityLink id="E202">MIRI</EntityLink> and CFAR (2015–2017)**: Insufficient oversight, unhealthy power dynamics, and harmful organizational practices.[^3]
+- **Singularity Institute (2009)**: Weak governance was associated with a theft of more than \$100,000.[^3]
+- **<EntityLink id="cea">Centre for Effective Altruism</EntityLink> (2016–2019)**: Inadequate record-keeping, rapid executive turnover, and insufficient board oversight.[^3]
+- **<EntityLink id="80000-hours">80,000 Hours</EntityLink> (2018)**: Inadequate financial record-keeping.[^3]
+- **<EntityLink id="miri">MIRI</EntityLink> and CFAR (2015–2017)**: Insufficient oversight, unhealthy power dynamics, and harmful organizational practices as described in EA Forum analyses.[^3]
 - **Leverage Research (2017–2019)**: Similar oversight failures and power dynamic concerns in an EA-adjacent organization.[^3]
 - **FTX Future Fund (2021–2022)**: Loose norms around boards of directors and conflicts of interest between the funding organization and its grantees.[^3]
 
-This pattern suggests that governance lapses were not isolated to FTX but reflected a broader cultural reluctance within EA to adopt what critics described as conventional organizational best practices—auditing, diverse board oversight, clear conflict-of-interest policies—perhaps because such practices were perceived as insufficiently "rational" or too associated with conventional institutions.[^8]
+These examples are drawn primarily from community self-reports and EA Forum posts rather than independent audits or legal findings. Characterizing them as "documented examples" overstates their epistemic status in most cases; they are better understood as widely cited community-level accounts.
 
-### Quantification Bias and Utilitarian Overconfidence
+The structural governance concerns at the Effective Ventures level were independently verified. An official EA Forum post from November 2022 noted that three of CEA's five board members were employed by either Open Philanthropy or the FTX Foundation, illustrating board capture concerns.[^1] The Effective Ventures board carried oversight responsibility for CEA, 80,000 Hours, EA Funds, GWWC, and other projects simultaneously, with a five-person board.[^1] The UK Charity Commission's statutory inquiry, which opened December 19, 2022 under s46 of the Charities Act 2011, found that one trustee was CEO of the FTX Foundation and another was an unpaid advisor to the FTX Future Fund, creating what the Commission described as a "lack of clarity" about dual roles—though the Commission also concluded that "in practice no issues arose" regarding conflicts of interest and that trustees acted diligently to protect charity assets.[^17]
 
-Philosophical critiques of EA's epistemic culture extend beyond governance to the movement's characteristic reasoning style. Some critics argue that EA's strong emphasis on quantifiable impact metrics—evidence from randomized controlled trials, expected-value calculations, scope-insensitivity corrections—can crowd out qualitative judgment and practical wisdom. By this account, EA practitioners skilled in abstract utilitarian reasoning may be systematically underequipped to detect the kinds of interpersonal and organizational red flags that a more experientially grounded judgment would register.[^9]
+### Quantification Bias and Utilitarian Reasoning
 
-One analysis cited psychologist Simon Baron-Cohen's work on "high systematizers" as a framework for understanding why EA, which tends to attract people strong in systematic and abstract reasoning, might also have characteristic blind spots in social and cognitive empathy—creating communities able to model large-scale consequences but slower to recognize bad-faith actors in their immediate environment.[^3]
+Some critics argue that EA's characteristic emphasis on quantifiable impact metrics—expected-value calculations, scope-insensitivity corrections—can crowd out qualitative judgment and practical wisdom. By this account, practitioners skilled in abstract utilitarian reasoning may be systematically less attentive to interpersonal and organizational signals that more experientially grounded judgment would register.[^9]
 
-Critics in the philosophy community have also questioned whether EA's popularized form of utilitarian reasoning—particularly "bullet-biting" approaches that are willing to accept counterintuitive conclusions if the math demands it—may have provided ideological cover for reckless risk-taking. The critique is not that utilitarianism causes fraud, but that communities that normalize extreme consequentialist reasoning may lower the activation energy for catastrophically bad decisions when the expected-value framing is manipulated.[^10]
+One EA Forum analysis cited psychologist Simon Baron-Cohen's work on "high systematizers" as a speculative framework for understanding why EA, which tends to attract people oriented toward systematic and abstract reasoning, might have characteristic blind spots in social perception—creating communities able to model large-scale consequences but potentially slower to recognize bad-faith actors in their immediate environment.[^3] This framing is presented in community discussions as one hypothesis among several rather than an established empirical finding; it has not been validated through systematic research on EA members, and critics note that it risks overgeneralizing from a contested psychological construct.
+
+Critics in the philosophy community have also raised the question of whether EA's popularized form of utilitarian reasoning—particularly approaches willing to accept counterintuitive conclusions if the expected-value calculation demands it—may have provided ideological cover for reckless risk-taking. The argument is not that utilitarianism causes fraud, but that communities that normalize extreme consequentialist reasoning may lower the threshold for catastrophically bad decisions when the expected-value framing is manipulated or applied without adequate grounding.[^10] The counterargument, raised by EA defenders, is that fraud occurs in communities across philosophical orientations, suggesting the reasoning style may not be causally distinguishing.[^4]
+
+SBF's own trial statements are relevant here. Caroline Ellison testified that SBF articulated a view in which "the only moral rule that mattered was doing whatever would maximise utility" and that standard deontological constraints "didn't work" within his version of utilitarianism.[^21] Whether this represents a logical entailment of utilitarian philosophy, a personal distortion of it, or a post-hoc rationalization is disputed among philosophers and EA community members.
 
 ### Funder-Driven Suppression of Criticism
 
-EA Forum discussions in the immediate aftermath of the FTX collapse described a community in which honest criticism of major funders had become culturally difficult. Contributors argued that EA's funding concentration meant that public criticism of SBF or FTX could result in being cut off from significant resources—and that this risk, even if rarely actualized, was sufficient to create a chilling effect on critical discourse.[^7] One EA Forum post urged community members to speak the truth even when funding relationships made that uncomfortable, framing the suppression of criticism as itself an epistemic failure that compounded the material risks of funding concentration.[^7]
+EA Forum discussions in the immediate aftermath of the FTX collapse described a community in which honest criticism of major funders had become culturally difficult. Contributors argued that EA's funding concentration meant that public criticism of SBF or FTX could result in loss of significant resources—and that this risk, even if rarely actualized, was sufficient to create a chilling effect on critical discourse.[^7] One EA Forum post urged community members to speak the truth even when funding relationships made that uncomfortable, framing the suppression of criticism as itself an epistemic failure that compounded the material risks of funding concentration.[^7] The prevalence of this dynamic is difficult to assess empirically; the evidence is primarily qualitative and self-reported.
+
+## Comparative Context: Institutional Investor Due Diligence
+
+The FTX collapse is sometimes framed as an EA-specific epistemic failure, but the full picture includes parallel failures by professional investors who applied different epistemic standards. Sequoia Capital's due diligence process for its \$150 million FTX investment originated from a Friday afternoon Zoom call in July 2021; it ignored the complete absence of internal controls, waved off the absence of credible external auditors, and proceeded despite SBF's refusal to give the firm a board seat.[^25] Sequoia subsequently commissioned an "adoring article" about SBF that critics cited as inconsistent with claims of thorough due diligence.[^23] Ontario Teachers' Pension Plan and Singapore's Temasek Holdings also marked their combined \$370 million in FTX investments down to zero.[^24]
+
+This context does not resolve the question of whether EA's epistemic failures were distinctive or severe, but it is relevant to any causal claim that EA's philosophical commitments were the primary driver of the failure to detect the fraud. Critics of this comparison note that EA's relationship to FTX was not purely financial—FTX was embedded in EA institutional structures, EA leaders actively championed SBF publicly, and EA grants depended on FTX—making the comparison with passive institutional investors imperfect.
 
 ## Responses and Defenses
 
-Not all community responses to the FTX crisis accepted the systemic critique. Several prominent voices argued that the failures were primarily attributable to SBF's individual misconduct rather than to structural features of EA. Peter Singer, one of the movement's founding philosophical figures, downplayed the likelihood of lasting reputational damage to EA from the FTX scandal, suggesting that the community's core principles remained sound and that critics were overgeneralizing from a single bad actor.[^1]
+Not all community responses to the FTX crisis accepted the systemic critique. Several prominent voices argued that the failures were primarily attributable to SBF's individual misconduct rather than to structural features of EA. Peter Singer, one of the movement's founding philosophical figures, argued that the community's core principles remained sound and that critics were overgeneralizing from a single bad actor.[^1]
 
-A systematic rebuttal published in EA community spaces distinguished between EA as a philosophical framework—roughly, the commitment to doing as much good as possible using evidence and reason—and EA as a social community with its own cultural pathologies. On this view, criticisms that treat FTX as invalidating EA's philosophical commitments commit a motte-and-bailey fallacy: retreating from the defensible claim that the community failed to the indefensible claim that the philosophy failed.[^11] Critics of utilitarianism were reminded that EA does not logically entail utilitarianism, and that longtermism functions as an auxiliary hypothesis rather than a core commitment.[^4]
+A systematic rebuttal published in EA community spaces distinguished between EA as a philosophical framework—roughly, the commitment to doing as much good as possible using evidence and reason—and EA as a social community with its own cultural pathologies. On this view, criticisms that treat FTX as invalidating EA's philosophical commitments conflate the motte (the defensible claim that the community failed) with the bailey (the stronger claim that the philosophy failed).[^11] Defenders note that EA does not logically entail utilitarianism, and that longtermism functions as an auxiliary hypothesis rather than a core commitment.[^4]
 
-Defenders also emphasized the continuing value of the earn-to-give model even in the wake of FTX. They argued that the collapse of one high-profile earn-to-give practitioner did not negate the marginal value of individuals in finance or industry choosing to donate significant portions of their income to high-impact causes, and that drawing this inference would cause unnecessary harm to EA-aligned donors who had no connection to FTX.[^12]
+Defenders also emphasized the continuing defensibility of the earn-to-give model even in the wake of FTX. They argued that the collapse of one high-profile earn-to-give practitioner does not negate the expected value of individuals in finance or industry choosing to donate significant portions of their income to high-impact causes, and that drawing this inference would cause unwarranted harm to EA-aligned donors with no connection to FTX.[^12]
 
-## AI Safety Implications
+Michael Lewis's 2023 book *Going Infinite* offered a narrative that diverged from both the systemic-critique and individual-fraud framings. Lewis used "the effective altruists" as shorthand specifically for Caroline Ellison, Nishad Singh, Gary Wang, and SBF—his inner circle—suggesting EA mentality as a core feature of SBF's worldview rather than an incidental association. EA Forum reviewers responded that Lewis was "so far in the tank of SBF" that his account was distorted, and disputed that SBF's mentality was representative of EA.[^22] The book also quoted SBF writing: "I did damage to the EA community... I made people hate each other a little more and trust each other a little less... my net impact on the world has, so far, been negative."[^22] Lewis's focus on SBF's psychology rather than FTX's business failures, and his extended criticism of bankruptcy manager John J. Ray III, drew criticism from EA-adjacent reviewers as a distorting bias in the narrative.[^22]
 
-The FTX collapse had direct material consequences for AI safety research funding. SBF had directed substantial resources toward AI existential risk mitigation through the <EntityLink id="E855">FTX Future Fund</EntityLink>, and the abrupt dissolution of that fund left a number of AI safety organizations and grantees without committed resources. The episode prompted renewed concern about the concentration of AI safety funding in a small number of sources, and about whether the field's epistemic practices were sufficiently robust to vet donors whose resources might be entangled with ethically or legally problematic enterprises.[^6]
+## AI Safety Implications and Funding Disruption
 
-More broadly, commentators noted a structural irony: a community focused on reducing the probability of catastrophic failures driven by misaligned incentives had itself exhibited a pattern of misaligned incentives, accepting funding from a source whose financial model turned out to be fraudulent. This has been cited in discussions of <EntityLink id="E121">epistemic health</EntityLink> within the AI safety ecosystem as a cautionary example of how funding dynamics can compromise the independence and rigor of research communities.[^3]
+The FTX collapse had direct material consequences for AI safety research funding. The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> had donated approximately \$32 million to AI safety projects from February to August 2022; the abrupt dissolution of that fund left AI safety organizations and grantees without committed resources.[^26]
+
+Specific documented cases include:
+
+- **<EntityLink id="redwood-research">Redwood Research</EntityLink>**: Was promised \$6.6 million from the FTX Future Fund but never received it. The organization had received \$20 million from <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> across two grants (2021 and 2022) and received a further \$5.3 million general support grant from Open Philanthropy in 2023, suggesting it found alternative funding.[^27]
+- **<EntityLink id="arc">ARC</EntityLink> (Alignment Research Center)**: Had received a \$1.25 million grant from the FTX Foundation in 2022 and elected to return it, stating the money "morally (if not legally) belongs to FTX customers or creditors." A 2024 update confirmed the grant was returned to the FTX bankruptcy estate, less legal and administrative expenses. ARC noted the decision was "particularly straightforward" because they had not spent most of the money and had other supporters available.[^28]
+- **LTFF and EAIF**: Donations to the Long-Term Future Fund and EA Infrastructure Fund were described as "unusually low relative to the quality of applications received" following the FTX collapse, with the shortfall attributed partly to the FTX crash and to increased funding gaps across longtermist organizations.[^29]
+
+At the ecosystem level, <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> spent approximately \$46 million on AI safety in 2023, making it the largest funder of AI safety. The Survival and Flourishing Fund spent approximately \$30 million on AI safety in 2023. Five new independent grantmaking bodies started in 2023, focused on longtermism or AI safety, partly to reduce funding concentration risk. Alignment grantmaking was described as "funding-constrained since the FTX collapse" in EA Forum analyses.[^26]
+
+The funding disruption affected not only AI safety but also pandemic defense, biosecurity, and science funding. The Future Fund had awarded 262 grants and investments totaling \$132 million by end of June 2022, including recipients such as Sherlock Biosciences (\$2M for CRISPR-based diagnostics), HelixNano (\$10M for coronavirus vaccine research), and SecureBio (\$1.2M for pandemic defense).[^30] Organizations that received awards after August 11, 2022 faced potential clawback under bankruptcy provisions.
+
+The episode prompted renewed concern within EA and AI safety about whether research communities focused on long-term catastrophic risk had applied adequate rigor to the near-term institutional risks in their own funding structures.[^3]
+
+## Post-FTX Reforms and Investigations
+
+### Independent Investigations
+
+CEA commissioned an independent investigation from law firm Mintz, involving dozens of interviews and tens of thousands of documents. The Mintz investigation concluded in September 2023, finding no evidence that anyone at Effective Ventures was aware of SBF's criminal fraud before the collapse.[^16] The UK Charity Commission opened a statutory inquiry into Effective Ventures Foundation UK on December 19, 2022 under s46 of the Charities Act 2011; it concluded its inquiry with a report published in May 2024, finding that trustees acted diligently and quickly to protect charity assets and that no trustee acted contrary to the charity's interests.[^17]
+
+A July 2024 EA Forum post argued that the Mintz investigation had a narrow mandate—only establishing that EV had no prior awareness of fraud—and did not address warnings about SBF allegedly shared in an EA leaders Slack channel prior to the collapse, nor did it lead to any public acknowledgment from EA leadership of those warnings.[^31] This post called for a genuinely independent investigation with broader scope. The post also disputed the characterization that CEA "replaced leadership" as a result of FTX, describing this claim as "straightforwardly false."[^31]
+
+### Organizational Structure Changes
+
+Following the FTX collapse, Effective Ventures acknowledged that its "operational and oversight capacity didn't keep up with its growth" and that governance systems had been designed for a much smaller organization with fewer projects and less financial resources.[^18]
+
+EA Funds and <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> announced in August 2023 that they were aiming to become more structurally independent of each other. Over the preceding two years, the EA Infrastructure Fund (EAIF) and Long-Term Future Fund (LTFF) had used overlapping resources with Open Philanthropy, which contributed a substantial proportion of those funds' budgets.[^32] EA Funds had been spun out of CEA in 2020 but both remained part of Effective Ventures Foundation at the time of the announcement.
+
+A structured reform project was launched in 2023 involving Julia Wise (CEA), Ozzie Gooen (QURI), and Sam Donald (Open Philanthropy strategy fellow), aimed at producing specific reform recommendations including basic governance practices for smaller organizations.[^33] The reform effort was prompted both by FTX fallout and by sexual misconduct allegations reported in a TIME magazine article.
+
+### Adequacy of Reforms
+
+Community assessments of the reform efforts have been mixed. The Mintz and Charity Commission investigations are cited by some as evidence that EA institutions engaged seriously with accountability concerns, while critics note that neither investigation addressed the pre-collapse warnings or the cultural dynamics that enabled the failures.[^31] The EA Forum post calling for further investigation argues that the completed inquiries, while providing some accountability, leave key questions about leadership responses to warning signs unaddressed.
+
+## Community Impact: Empirical Data
+
+### Member Satisfaction
+
+In December 2022, Rethink Priorities collaborated with CEA to add FTX-related questions to the annual EA Survey. Of 3,567 respondents, 1,012 answered the FTX section and 300 completed a separate FTX survey. The FTX crisis decreased community satisfaction, but the reduction was described as "significant but small"—approximately 0.5–1 points on a 10-point scale. Overall average community sentiment remained at approximately 7.5 out of 10 despite the crisis.[^34]
+
+A Rethink Priorities analysis of US general-public awareness surveys conducted before and after FTX found that awareness of EA remained low overall, and that approximately 99% of people who were aware of EA did not mention FTX when asked about it.[^35] This suggests the reputational impact of FTX was concentrated within EA-adjacent audiences rather than broadly distributed in public perception.
+
+### Donor and Newsletter Trends
+
+Data from the EA Forum's October 2023 analysis showed that the EA newsletter lost an average of 153 subscribers per month from December 2022 through September 2023, with no sign of recovery as of that date. EA Funds saw approximately 10% fewer donors in early 2023 compared to 2022, deteriorating to approximately 20% fewer by September 2023. Top-of-funnel growth for EA slowed from 73% year-over-year in 2022 versus 2021, to 30% year-over-year in 2023 versus 2022. Google search interest for "EA" spiked at the time of the FTX bankruptcy and then declined to levels essentially indistinguishable from the first half of 2022 by March 2023.[^36]
+
+### EA Group Formation
+
+As of January 2023, there were 362 active EA groups and 20 cause-specific groups in CEA's database. Fewer new groups were expected to be founded in 2023 than in 2022, largely due to decreased funding availability post-FTX. The EA group growth rate of approximately 55% over the two years to January 2023 was expected to slow significantly.[^37]
 
 ## Criticisms and Controversies
 
 ### The Fraud Condemnation Question
 
-One of the more pointed debates in EA circles concerned whether the community was sufficiently unequivocal in condemning the FTX fraud. Some posts argued that any framing that attempted to balance condemnation of the fraud against appreciation for the philanthropic resources it generated was morally confused: fraud harms real people, and no expected-value calculation should be allowed to soften that conclusion.[^13] The concern was that EA's utilitarian framing created space for reasoning that treated the harm to FTX customers as a regrettable but potentially acceptable cost—a pattern of reasoning critics found deeply troubling regardless of whether any individual EA thinker actually endorsed it.
+One of the more pointed debates in EA circles concerned whether the community was sufficiently unequivocal in condemning the FTX fraud. Some posts argued that any framing that attempted to balance condemnation of the fraud against appreciation for the philanthropic resources it generated was morally confused: fraud harms real people, and no expected-value calculation should be allowed to soften that conclusion.[^13] The concern was that EA's utilitarian framing created space for reasoning that treated the harm to FTX customers as a regrettable but potentially acceptable cost—a pattern of reasoning critics found troubling regardless of whether any individual EA thinker actually endorsed it. EA Forum discussions show that responses ranged from unequivocal condemnation to more hedged assessments; the distribution of these responses is not systematically documented.
 
 ### Youth-Focused Recruitment and Governance Gaps
 
-One EA Forum analysis criticized <EntityLink id="E552">Open Philanthropy</EntityLink>'s EA Community Growth priorities for focusing predominantly on recruiting young people, arguing that this emphasis—while understandable as a movement-building strategy—had come at the cost of developing sustainable professional networks, mature governance structures, and experienced leadership.[^3] The critique suggested that EA's organizational culture reflected the norms of student clubs rather than institutions capable of stewarding hundreds of millions of dollars responsibly.
+One EA Forum analysis criticized <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>'s EA Community Growth priorities for focusing predominantly on recruiting young people, arguing that this emphasis had come at the cost of developing sustainable professional networks, mature governance structures, and experienced leadership.[^3] Critics suggested that EA's organizational culture had norms better suited to student clubs than to institutions stewarding hundreds of millions of dollars. Defenders of this approach argued that younger recruitment serves legitimate movement-building purposes and that professional governance can be developed in parallel.
 
 ### Communication and Insularity
 
-Several critics noted that EA's characteristic communication style—dense, technical, and oriented toward internal discourse norms—tended to exclude people without extensive familiarity with EA jargon, including non-native English speakers and people from professional backgrounds outside academia and technology. This insularity was linked to the epistemic failures of the FTX era: a community that communicates primarily with itself is less likely to receive or internalize external warnings about the risks it is incurring.[^7]
+Several critics noted that EA's characteristic communication style—dense, technical, and oriented toward internal discourse norms—tended to exclude people without extensive familiarity with EA jargon, including non-native English speakers and people from professional backgrounds outside academia and technology. This insularity was linked to the epistemic failures of the FTX era: a community that communicates primarily with itself may be less likely to receive or internalize external warnings about the risks it is incurring.[^7]
 
 ## Key Uncertainties
 
 Several important questions about the EA epistemic failures in the FTX era remain contested or underspecified:
 
-1. **Causal attribution**: To what extent did EA's philosophical commitments (utilitarianism, longtermism) causally contribute to the failures, versus EA's social and cultural dynamics (deference to high-status donors, funding concentration), versus simple individual fraud that any community might have failed to detect?
+1. **Causal attribution**: To what extent did EA's philosophical commitments (utilitarianism, longtermism) causally contribute to the failures, versus EA's social and cultural dynamics (deference to high-status donors, funding concentration), versus individual fraud that any community might have failed to detect? The fact that sophisticated institutional investors with no EA connection also failed to detect FTX's fraud is relevant to this question but does not resolve it.
 
 2. **Counterfactual governance**: Whether stronger formal governance structures would have detected FTX's fraud earlier, or whether the fraud was sufficiently well-concealed that even robust due diligence would have failed, remains unclear.
 
-3. **Funding impact on AI safety**: The precise effect of the FTX Future Fund's dissolution on AI safety research timelines and organizational capacity is difficult to assess, both because some organizations found alternative funding and because counterfactual impact is hard to measure.
+3. **Funding impact on AI safety**: The precise effect of the FTX Future Fund's dissolution on AI safety research timelines and organizational capacity is difficult to assess, because some organizations found alternative funding (including Redwood Research and ARC) while others faced funding constraints. The LTFF and EAIF described themselves as unusually funding-constrained as of 2023.
 
-4. **Reform effectiveness**: EA community discussions have generated numerous proposals for improved due diligence, funding diversification, and governance reform, but evidence on whether these reforms have been implemented and whether they are effective is limited.
+4. **Reform effectiveness**: EA community discussions have generated numerous proposals for improved due diligence, funding diversification, and governance reform, and some structural changes have been announced (EA Funds/Open Philanthropy distancing; Effective Ventures governance review). Evidence on whether these reforms have been implemented across the broader EA ecosystem and whether they are effective is limited.
 
 5. **Selection bias in critique**: Post-collapse analyses are subject to hindsight bias and may overstate the predictability of FTX's failure. Critics who now find the warning signs obvious may be reasoning backward from the outcome.
 
-## See Also
-
-- <EntityLink id="E863">EA Institutions' Response to the FTX Collapse</EntityLink> — How EA organizations responded operationally and what survey data showed
-- <EntityLink id="E866">Longtermism's Philosophical Credibility After FTX</EntityLink> — Broader philosophical consequences for the longtermist project
-- <EntityLink id="E861">FTX Red Flags: Pre-Collapse Warning Signs</EntityLink> — The specific governance and financial warning signs that were missed
-- <EntityLink id="E864">Earning to Give: The EA Strategy and Its Limits</EntityLink> — The fundraising philosophy at the center of the controversy
+6. **Warning sign access**: Whether EA leaders had access to warnings about SBF prior to the collapse—and what, if anything, was done with those warnings—remains disputed. The Mintz investigation's narrow mandate (establishing absence of prior knowledge of fraud) did not address this question; the July 2024 EA Forum post calling for further investigation argues this is unresolved.
 
 ## Sources
 
-[^1]: [The FTX Crisis Highlights a Deeper Cultural Problem Within EA](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within) — EA Forum post on governance failures and SBF's reception within EA
+[^1]: [The FTX Crisis Highlights a Deeper Cultural Problem Within EA](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within) — EA Forum (community post), November 14, 2022; primary source for governance failures, board capture documentation, and SBF's reception within EA
 
 [^2]: [Did Crypto Cause the FTX Collapse?](https://insights.som.yale.edu/insights/did-crypto-cause-the-ftx-collapse) — Yale School of Management analysis of FTX's structural and governance failures
 
-[^3]: [The FTX Crisis Highlights a Deeper Cultural Problem Within EA](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within) — EA Forum (primary source for governance pattern analysis and funding concentration figures)
+[^3]: [The FTX Crisis Highlights a Deeper Cultural Problem Within EA](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within) — EA Forum (community post), November 14, 2022; primary source for governance pattern analysis and funding concentration figures. Note: This is a community self-report and analysis rather than an independent external audit.
 
 [^4]: [The Case Against Overgeneralized EA Critiques](https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective) — LessWrong, on distinguishing EA philosophy from EA community failures; also Peter Singer's defense cited in EA Forum analyses
 
 [^5]: [Bankruptcy of FTX](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX) — Wikipedia, timeline of FTX collapse and key events
 
-[^6]: [Governance Causes of the FTX Collapse](https://www.thecorporategovernanceinstitute.com/insights/news-analysis/governance-causes-ftx-collapse/) — Corporate Governance Institute analysis, citing John J. Ray III's characterization of FTX's control failures
+[^6]: [Governance Causes of the FTX Collapse](https://www.thecorporategovernanceinstitute.com/insights/news-analysis/governance-causes-ftx-collapse/) — Corporate Governance Institute analysis, citing John J. Ray III's characterization of FTX's control failures; April 2023
 
 [^7]: [Speak the Truth Even If Your Voice Trembles](https://forum.effectivealtruism.org/posts/u5gLprWhFDJLxooLc/speak-the-truth-even-if-your-voice-trembles) — EA Forum post on funder influence and suppression of criticism
 
 [^8]: [Contra-Capitalism and the Failure of FTX](https://www.econlib.org/contra-capitalism-and-the-failure-of-ftx/) — Econlib analysis of EA organizational culture's rejection of conventional governance norms
 
-[^9]: [FTX, Moral Philosophy, and Public Philosophy](https://dailynous.com/2022/11/18/ftx-moral-philosophy-public-philosophy/) — Daily Nous, philosophical critiques of EA's applied utilitarianism in the FTX context
+[^9]: [FTX, Moral Philosophy, and Public Philosophy](https://dailynous.com/2022/11/18/ftx-moral-philosophy-public-philosophy/) — Daily Nous, November 18, 2022; philosophical critiques of EA's applied utilitarianism in the FTX context
 
-[^10]: [FTX, Moral Philosophy, and Public Philosophy](https://dailynous.com/2022/11/18/ftx-moral-philosophy-public-philosophy/) — Daily Nous, on utilitarianism's role and the tu quoque response
+[^10]: [FTX, Moral Philosophy, and Public Philosophy](https://dailynous.com/2022/11/18/ftx-moral-philosophy-public-philosophy/) — Daily Nous, November 18, 2022; on utilitarianism's role and the tu quoque response
 
 [^11]: [We Must Be Very Clear: Fraud in the Service of Effective Altruism Is Still Fraud](https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective) — LessWrong post on the obligation to condemn FTX fraud unequivocally
 
-[^12]: [We Must Be Very Clear: Fraud in the Service of Effective Altruism Is Still Fraud](https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective) — LessWrong, on continued validity of earn-to-give reasoning post-FTX
+[^12]: [We Must Be Very Clear: Fraud in the Service of Effective Altruism Is Still Fraud](https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective) — LessWrong, on continued defensibility of earn-to-give reasoning post-FTX
 
 [^13]: [We Must Be Very Clear: Fraud in the Service of Effective Altruism Is Still Fraud](https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective) — LessWrong, argument that EA must condemn fraud without utilitarian hedging
+
+[^14]: [The FTX Future Fund Team Has Resigned](https://forum.effectivealtruism.org/posts/xafpj3on76uRDoBja/the-ftx-future-fund-team-has-resigned-1) — EA Forum, November 11, 2022; resignation statement from Nick Beckstead, Leopold Aschenbrenner, Avital Balwit, William MacAskill, and Ketan Ramakrishnan
+
+[^15]: [Open Phil is Seeking Applications from Grantees Impacted by Recent Events](https://forum.effectivealtruism.org/posts/HPdWWetJbv4z8eJEe/open-phil-is-seeking-applications-from-grantees-impacted-by) — Open Philanthropy, EA Forum post, November 2022
+
+[^16]: [Mistakes We've Made](https://www.centreforeffectivealtruism.org/our-mistakes) — Centre for Effective Altruism official page (ongoing, last updated post-2023); describes Mintz investigation scope and conclusions
+
+[^17]: [Charity Inquiry: Effective Ventures Foundation UK](https://www.gov.uk/government/publications/charity-inquiry-effective-ventures-foundation-uk/charity-inquiry-effective-ventures-foundation-uk) — Charity Commission for England and Wales, official inquiry report, May 22, 2024
+
+[^18]: [Reflections and Lessons from Effective Ventures](https://forum.effectivealtruism.org/posts/AuSah98NtR5qv8zQA/reflections-and-lessons-from-effective-ventures-1) — Effective Ventures leadership, EA Forum, October 28, 2024
+
+[^19]: [Caroline Ellison — Wikipedia](https://en.wikipedia.org/wiki/Caroline_Ellison) — Wikipedia contributors; background on Ellison's EA involvement, Stanford EA club role, and trajectory to Alameda Research
+
+[^20]: [CarolineEllison — EA Forum Profile](https://forum.effectivealtruism.org/users/carolineellison) — EA Forum profile; active 2021–2022; includes posts on organizational alignment and EA spending
+
+[^21]: [FTX Founder Sam Bankman-Fried Didn't Think Rules Applied to Him, Ex-Girlfriend Says](https://abcnews.go.com/Business/ftx-founder-sam-bankman-fried-rules-applied-girlfriend/story?id=103898272) — ABC News, October 11, 2023; summary of Caroline Ellison's trial testimony
+
+[^22]: [How EA is Portrayed in 'Going Infinite'](https://forum.effectivealtruism.org/posts/oXgbkSwTSeJajvpjo/how-ea-is-portrayed-in-going-infinite) — EA Forum, October 7, 2023; community analysis of Michael Lewis's *Going Infinite* and its framing of EA; see also [Book Review: Going Infinite — Zvi Mowshowitz](https://thezvi.substack.com/p/book-review-going-infinite), October 24, 2023
+
+[^23]: [Column: Silicon Valley VCs Wanted to Believe SBF's Lies](https://finance.yahoo.com/news/column-silicon-valley-vcs-wanted-110021949.html) — LA Times (via Yahoo Finance), November 8, 2023; analysis of institutional investor due diligence failures on FTX
+
+[^24]: [Sequoia Capital, Thoma Bravo, Paradigm Sued for Touting FTX](https://www.ai-cio.com/news/sequoia-capital-thoma-bravo-paradigm-sued-for-touting-ftx/) — Chief Investment Officer, February 22, 2023; describes investor losses and legal proceedings
+
+[^25]: [Who Are the Real Villains in the FTX Scandal?](https://thehill.com/opinion/finance/3791562-sequoia-capital-is-the-real-villain-in-the-ftx-scandal/) — The Hill, December 29, 2022; cites WSJ reporting on Sequoia's due diligence process and ignored red flags
+
+[^26]: [An Overview of the AI Safety Funding Situation](https://forum.effectivealtruism.org/posts/XdhwXppfqrpPL2YDX/an-overview-of-the-ai-safety-funding-situation) — EA Forum/LessWrong, 2023; includes FTX Future Fund AI safety grant totals and post-FTX funding landscape
+
+[^27]: [Critiques of Prominent AI Safety Labs: Redwood Research](https://www.lesswrong.com/posts/SuZ6Guuos7CjfwRQb/critiques-of-prominent-ai-safety-labs-redwood-research) — LessWrong community, 2023; documents promised FTX Future Fund grant and Open Philanthropy funding history
+
+[^28]: [Funding from FTX — Alignment Research Center](https://www.alignment.org/funding-from-ftx/) — Alignment Research Center official statement, 2022 (updated 2024); describes grant receipt, return decision, and final disposition
+
+[^29]: [LTFF and EAIF Are Unusually Funding-Constrained Right Now](https://www.lesswrong.com/posts/gRfy2Q2Pg25a2cHyY/ltff-and-eaif-are-unusually-funding-constrained-right-now) — LessWrong (fund managers), 2023; describes post-FTX funding shortfalls and grant totals
+
+[^30]: [Crypto Company's Collapse Strands Scientists](https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists) — *Science*/AAAS, 2022; documents Future Fund grant totals and affected science recipients
+
+[^31]: [We Need an Independent Investigation into How EA Leadership Has Handled SBF and FTX](https://forum.effectivealtruism.org/posts/P9phn7uhjiCvaCPDZ/we-need-an-independent-investigation-into-how-ea-leadership) — EA Forum, July 24, 2024; argues for broader inquiry scope than Mintz investigation
+
+[^32]: [EA Funds Organisational Update: Open Philanthropy Matching and Distancing](https://forum.effectivealtruism.org/posts/zt6MsCCDStm74HFwo/ea-funds-organisational-update-open-philanthropy-matching) — EA Funds team, EA Forum, August 2, 2023
+
+[^33]: [Update on Project on Reforms at EA Organizations](https://forum.effectivealtruism.org/posts/73mAv8m3PjsXzJ4Ad/update-on-project-on-reforms-at-ea-organizations) — EA Forum, June 17, 2023; describes structured reform project and participants
+
+[^34]: [FTX Community Response Survey Results](https://forum.effectivealtruism.org/posts/g5uKzBLjiEuC5k46A/ftx-community-response-survey-results) — Rethink Priorities/CEA, EA Forum, March 15, 2023; n=3,567 (survey), n=1,312 (FTX section)
+
+[^35]: [How has FTX's Collapse Affected Public Perception of EA?](https://forum.effectivealtruism.org/posts/SFAMvCxnEzaQHNeSL/how-has-ftx-s-collapse-affected-public-perception-of-ea) — EA Forum/Rethink Priorities, June 16, 2023; US general-public awareness survey results
+
+[^36]: [How has FTX's Collapse Impacted EA?](https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea) — EA Forum, October 17, 2023; newsletter, donor, and search interest data
+
+[^37]: [Growth and Engagement in EA Groups: 2022 Groups Census Results](https://forum.effectivealtruism.org/posts/aetatCMGqcAPsNbLs/growth-and-engagement-in-ea-groups-2022-groups-census) — CEA/Rethink Priorities, EA Forum, June 23, 2023; group count and growth rate data
