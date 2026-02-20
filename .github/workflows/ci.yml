@@ -31,6 +31,8 @@ jobs:
 
       - name: Build data
         run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run tests
         run: cd apps/web && pnpm test
@@ -86,6 +88,8 @@ jobs:
       - name: Build data (needed for validation)
         id: build-data
         run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: MDX syntax check (blocking)
         run: pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
