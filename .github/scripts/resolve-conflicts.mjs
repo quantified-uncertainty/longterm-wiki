@@ -341,6 +341,29 @@ async function resolveLargeFile(filePath, content) {
   return lines.join("\n");
 }
 
+// ── Canonical frontmatter field order (mirrors crux/lib/frontmatter-order.ts) ─
+
+/**
+ * Canonical ordering for MDX frontmatter fields. Stable identity fields first,
+ * volatile metadata last. Keep in sync with crux/lib/frontmatter-order.ts.
+ */
+const FRONTMATTER_FIELD_ORDER = [
+  'numericId', 'title', 'description',
+  'sidebar', 'entityType', 'subcategory', 'pageType', 'contentFormat', 'pageTemplate', 'draft', 'fullWidth',
+  'quality', 'maturity', 'readerImportance', 'researchImportance', 'tacticalValue', 'tractability', 'neglectedness', 'uncertainty', 'causalLevel',
+  'lastEdited', 'lastUpdated', 'createdAt', 'update_frequency', 'evergreen',
+  'llmSummary', 'structuredSummary',
+  'ratings',
+  'clusters', 'roles', 'todos', 'balanceFlags',
+  'seeAlso', 'todo', 'entityId',
+  'template', 'hero', 'tableOfContents', 'editUrl', 'head', 'prev', 'next', 'banner',
+];
+
+function getFieldSortIndex(field) {
+  const idx = FRONTMATTER_FIELD_ORDER.indexOf(field);
+  return idx === -1 ? FRONTMATTER_FIELD_ORDER.length : idx;
+}
+
 // ── Frontmatter-only conflict resolution (no API call) ─────────────────
 
 /**
@@ -456,21 +479,33 @@ function tryResolveFrontmatterOnly(filePath, content) {
     const head = parseYamlBlocks(headLines);
     const main = parseYamlBlocks(mainLines);
 
-    // Merge: take HEAD's order as base, then append any keys only in MAIN
-    const mergedLines = [];
-    const seen = new Set();
+    // Merge: collect all unique keys, preferring HEAD's value for duplicates
+    const mergedBlocks = new Map();
+    const allKeys = new Set();
 
     for (const key of head.order) {
-      seen.add(key);
-      // Prefer HEAD's value for this key
-      mergedLines.push(...(head.blocks.get(key) || []));
+      allKeys.add(key);
+      mergedBlocks.set(key, head.blocks.get(key) || []);
     }
 
     for (const key of main.order) {
-      if (!seen.has(key)) {
-        // New key from main — add it
-        mergedLines.push(...(main.blocks.get(key) || []));
+      if (!allKeys.has(key)) {
+        allKeys.add(key);
+        mergedBlocks.set(key, main.blocks.get(key) || []);
       }
+    }
+
+    // Sort merged keys by canonical frontmatter field order (MDX files only)
+    const sortedKeys = [...allKeys].sort((a, b) => {
+      const aIdx = getFieldSortIndex(a);
+      const bIdx = getFieldSortIndex(b);
+      if (aIdx !== bIdx) return aIdx - bIdx;
+      return a.localeCompare(b);
+    });
+
+    const mergedLines = [];
+    for (const key of sortedKeys) {
+      mergedLines.push(...(mergedBlocks.get(key) || []));
     }
 
     // Replace the conflict block with merged lines
