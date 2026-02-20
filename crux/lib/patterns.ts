@@ -19,6 +19,13 @@ export const ENTITY_LINK_RE = /<EntityLink\s+[^>]*id=["']([^"']+)["'][^>]*>/g;
 /** Match numeric entity IDs like `E35`, `E710`. Case-insensitive. */
 export const NUMERIC_ID_RE = /^E\d+$/i;
 
+/** Extract `name` attribute value from an EntityLink tag string. */
+export function extractEntityLinkName(tag: string): string | undefined {
+  // (?<=\s) ensures we match standalone `name=` (not `className=` or `data-name=`)
+  const match = tag.match(/(?<=\s)name=["']([^"']+)["']/);
+  return match?.[1];
+}
+
 // ---------------------------------------------------------------------------
 // JSX / MDX component patterns
 // ---------------------------------------------------------------------------

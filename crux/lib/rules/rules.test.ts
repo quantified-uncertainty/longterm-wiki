@@ -982,7 +982,7 @@ describe('prefer-entitylink rule', () => {
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.ERROR);
     expect(issues[0].fix?.type).toBe(FixType.REPLACE_TEXT);
-    expect(issues[0].fix?.newText).toBe('<EntityLink id="community-notes-for-everything">Community Notes</EntityLink>');
+    expect(issues[0].fix?.newText).toBe('<EntityLink id="E300" name="community-notes-for-everything">Community Notes</EntityLink>');
   });
 
   it('falls back to WARNING when entity slug is not in idRegistry', () => {
@@ -1066,6 +1066,128 @@ describe('prefer-entitylink rule', () => {
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].fix).toBeNull();
+  });
+
+  it('auto-fix uses numeric+name format for registered entities', () => {
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe(
+      '<EntityLink id="E300" name="community-notes-for-everything">Community Notes</EntityLink>'
+    );
+  });
+});
+
+// =============================================================================
+// entitylink-ids rule
+// =============================================================================
+
+import { entityLinkIdsRule } from './entitylink-ids.ts';
+
+describe('entitylink-ids rule', () => {
+  const engineWithRegistry = {
+    idRegistry: {
+      bySlug: {
+        'anthropic': 'E42',
+        'nick-bostrom': 'E140',
+        'miri': 'E100',
+      },
+      byNumericId: {
+        'E42': 'anthropic',
+        'E140': 'nick-bostrom',
+        'E100': 'miri',
+      },
+    },
+    pathRegistry: {
+      'anthropic': '/knowledge-base/organizations/anthropic/',
+      'nick-bostrom': '/knowledge-base/people/nick-bostrom/',
+      'miri': '/knowledge-base/organizations/miri/',
+    },
+    entities: {
+      'anthropic': { type: 'organization' },
+      'nick-bostrom': { type: 'person' },
+      'miri': { type: 'organization' },
+    },
+  };
+
+  it('warns when slug ID used instead of numeric ID, with auto-fix to numeric+name', () => {
+    const content = mockContent(
+      '<EntityLink id="anthropic">Anthropic</EntityLink>',
+    );
+    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].message).toContain('use numeric format');
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.oldText).toBe('id="anthropic"');
+    expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
+  });
+
+  it('passes for numeric ID with correct name', () => {
+    const content = mockContent(
+      '<EntityLink id="E42" name="anthropic">Anthropic</EntityLink>',
+    );
+    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('errors when numeric ID has wrong name (hallucination catch)', () => {
+    const content = mockContent(
+      '<EntityLink id="E42" name="miri">MIRI</EntityLink>',
+    );
+    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].message).toContain('name mismatch');
+    expect(issues[0].message).toContain('"anthropic"');
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.oldText).toBe('name="miri"');
+    expect(issues[0].fix!.newText).toBe('name="anthropic"');
+  });
+
+  it('warns when numeric ID used without name, with auto-fix to add name', () => {
+    const content = mockContent(
+      '<EntityLink id="E140">Nick Bostrom</EntityLink>',
+    );
+    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].message).toContain('add name="nick-bostrom"');
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.oldText).toBe('id="E140"');
+    expect(issues[0].fix!.newText).toBe('id="E140" name="nick-bostrom"');
+  });
+
+  it('warns for unregistered numeric ID', () => {
+    const content = mockContent(
+      '<EntityLink id="E9999">Unknown</EntityLink>',
+    );
+    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].message).toContain('not a registered numeric ID');
+  });
+
+  it('warns for slug ID that does not resolve', () => {
+    const content = mockContent(
+      '<EntityLink id="nonexistent-entity">Ghost</EntityLink>',
+    );
+    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].message).toContain('does not resolve');
+  });
+
+  it('skips internal documentation pages', () => {
+    const content = mockContent(
+      '<EntityLink id="anthropic">Anthropic</EntityLink>',
+      { relativePath: 'docs/internal/some-guide.mdx' },
+    );
+    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
   });
 });
 
