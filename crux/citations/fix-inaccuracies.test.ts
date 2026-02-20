@@ -1,11 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import {
   extractSectionContext,
+  extractSection,
+  groupFlaggedBySection,
+  findAllFootnotesInSection,
+  applySectionRewrites,
   parseLLMFixResponse,
   applyFixes,
   enrichFromSqlite,
 } from './fix-inaccuracies.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
+import type { SectionRewrite } from './fix-inaccuracies.ts';
 
 describe('extractSectionContext', () => {
   const body = [
@@ -206,5 +211,227 @@ describe('enrichFromSqlite', () => {
     expect('sourceQuote' in enriched[0]).toBe(true);
     expect('supportingQuotes' in enriched[0]).toBe(true);
     expect('sourceFullText' in enriched[0]).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Section extraction (escalation support)
+// ---------------------------------------------------------------------------
+
+describe('extractSection', () => {
+  const body = [
+    '## Overview',
+    '',
+    'First paragraph about the topic.',
+    '',
+    'Second paragraph with a claim[^1] that is cited.',
+    '',
+    'Third paragraph with more claims[^2] here.',
+    '',
+    '## History',
+    '',
+    'The organization was founded in 2015[^3].',
+    '',
+    '### Early Days',
+    '',
+    'During early days, they achieved[^4] a lot.',
+    '',
+    '## Footnotes',
+    '',
+    '[^1]: https://example.com/source1',
+    '[^2]: https://example.com/source2',
+    '[^3]: https://example.com/source3',
+    '[^4]: https://example.com/source4',
+  ].join('\n');
+
+  it('extracts section bounded by headings', () => {
+    const result = extractSection(body, 1);
+    expect(result).not.toBeNull();
+    expect(result!.heading).toBe('## Overview');
+    expect(result!.text).toContain('## Overview');
+    expect(result!.text).toContain('claim[^1]');
+    expect(result!.text).toContain('[^2]');
+    expect(result!.text).not.toContain('## History');
+  });
+
+  it('extracts section for footnote in second section', () => {
+    const result = extractSection(body, 3);
+    expect(result).not.toBeNull();
+    expect(result!.heading).toBe('## History');
+    expect(result!.text).toContain('founded in 2015[^3]');
+  });
+
+  it('handles subsections', () => {
+    const result = extractSection(body, 4);
+    expect(result).not.toBeNull();
+    expect(result!.heading).toBe('### Early Days');
+    expect(result!.text).toContain('achieved[^4]');
+    expect(result!.text).not.toContain('## Footnotes');
+  });
+
+  it('excludes footnote definition lines', () => {
+    const result = extractSection(body, 1);
+    expect(result).not.toBeNull();
+    expect(result!.text).not.toContain('[^1]: https://');
+  });
+
+  it('returns null for missing footnote', () => {
+    expect(extractSection(body, 99)).toBeNull();
+  });
+
+  it('returns null when footnote only appears in definitions', () => {
+    const bodyOnlyDefs = [
+      '## Section',
+      '',
+      'No references in text.',
+      '',
+      '[^5]: https://example.com',
+    ].join('\n');
+    expect(extractSection(bodyOnlyDefs, 5)).toBeNull();
+  });
+});
+
+describe('groupFlaggedBySection', () => {
+  const body = [
+    '## Overview',
+    '',
+    'A claim[^1] and another[^2] in same section.',
+    '',
+    '## Details',
+    '',
+    'A different claim[^3] here.',
+  ].join('\n');
+
+  const makeFlagged = (fn: number): FlaggedCitation => ({
+    pageId: 'test',
+    footnote: fn,
+    claimText: `claim ${fn}`,
+    sourceTitle: 'Source',
+    url: 'https://example.com',
+    verdict: 'inaccurate',
+    score: 0.3,
+    issues: 'Wrong',
+    difficulty: 'easy',
+    checkedAt: '2025-01-01',
+  });
+
+  it('groups citations in the same section together', () => {
+    const groups = groupFlaggedBySection(body, [makeFlagged(1), makeFlagged(2)]);
+    expect(groups.size).toBe(1);
+    const [entry] = [...groups.values()];
+    expect(entry.citations).toHaveLength(2);
+    expect(entry.section.heading).toBe('## Overview');
+  });
+
+  it('separates citations across different sections', () => {
+    const groups = groupFlaggedBySection(body, [makeFlagged(1), makeFlagged(3)]);
+    expect(groups.size).toBe(2);
+  });
+
+  it('skips citations with no matching section', () => {
+    const groups = groupFlaggedBySection(body, [makeFlagged(99)]);
+    expect(groups.size).toBe(0);
+  });
+});
+
+describe('findAllFootnotesInSection', () => {
+  it('finds all footnote references', () => {
+    const text = 'Some text[^1] and more[^3] and also[^2].';
+    expect(findAllFootnotesInSection(text)).toEqual([1, 2, 3]);
+  });
+
+  it('deduplicates footnotes appearing multiple times', () => {
+    const text = 'A claim[^1] confirmed by[^1] the same source.';
+    expect(findAllFootnotesInSection(text)).toEqual([1]);
+  });
+
+  it('excludes footnote definition lines', () => {
+    const text = [
+      'Some text[^1] in the section.',
+      '',
+      '[^1]: https://example.com',
+      '[^2]: https://other.com',
+    ].join('\n');
+    expect(findAllFootnotesInSection(text)).toEqual([1]);
+  });
+
+  it('returns empty array for no footnotes', () => {
+    expect(findAllFootnotesInSection('Just plain text.')).toEqual([]);
+  });
+});
+
+describe('applySectionRewrites', () => {
+  const content = [
+    '---',
+    'title: Test Page',
+    '---',
+    '',
+    '## Overview',
+    '',
+    'The project started in 2015[^1] and grew rapidly.',
+    '',
+    '## Details',
+    '',
+    'It has 500 members[^2] worldwide.',
+  ].join('\n');
+
+  it('applies a single section rewrite', () => {
+    const rewrites: SectionRewrite[] = [
+      {
+        heading: '## Overview',
+        originalSection: '## Overview\n\nThe project started in 2015[^1] and grew rapidly.',
+        rewrittenSection: '## Overview\n\nThe project started in 2016[^1] and grew steadily.',
+        startLine: 4,
+        endLine: 6,
+      },
+    ];
+
+    const result = applySectionRewrites(content, rewrites);
+    expect(result.applied).toBe(1);
+    expect(result.skipped).toBe(0);
+    expect(result.content).toContain('started in 2016[^1]');
+    expect(result.content).toContain('grew steadily');
+    expect(result.content).toContain('500 members[^2]'); // unchanged
+  });
+
+  it('applies multiple rewrites bottom-to-top', () => {
+    const rewrites: SectionRewrite[] = [
+      {
+        heading: '## Overview',
+        originalSection: '## Overview\n\nThe project started in 2015[^1] and grew rapidly.',
+        rewrittenSection: '## Overview\n\nThe project launched in 2016[^1].',
+        startLine: 4,
+        endLine: 6,
+      },
+      {
+        heading: '## Details',
+        originalSection: '## Details\n\nIt has 500 members[^2] worldwide.',
+        rewrittenSection: '## Details\n\nIt has approximately 500 members[^2] globally.',
+        startLine: 8,
+        endLine: 10,
+      },
+    ];
+
+    const result = applySectionRewrites(content, rewrites);
+    expect(result.applied).toBe(2);
+    expect(result.content).toContain('launched in 2016[^1]');
+    expect(result.content).toContain('approximately 500 members[^2]');
+  });
+
+  it('skips rewrites where original section is not found', () => {
+    const rewrites: SectionRewrite[] = [
+      {
+        heading: '## Missing',
+        originalSection: '## Missing\n\nThis section does not exist.',
+        rewrittenSection: '## Missing\n\nRewritten.',
+        startLine: 0,
+        endLine: 2,
+      },
+    ];
+
+    const result = applySectionRewrites(content, rewrites);
+    expect(result.applied).toBe(0);
+    expect(result.skipped).toBe(1);
+    expect(result.content).toBe(content);
   });
 });
