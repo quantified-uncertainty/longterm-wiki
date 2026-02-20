@@ -1,23 +1,23 @@
-exportedAt: '2026-02-20T08:37:42.380Z'
+exportedAt: '2026-02-20T08:52:39.291Z'
 summary:
-  totalCitations: 303
-  checkedCitations: 266
-  accurateCitations: 196
-  inaccurateCitations: 8
-  unsupportedCitations: 8
-  minorIssueCitations: 53
-  uncheckedCitations: 37
-  averageScore: 0.93
+  totalCitations: 456
+  checkedCitations: 402
+  accurateCitations: 279
+  inaccurateCitations: 16
+  unsupportedCitations: 14
+  minorIssueCitations: 92
+  uncheckedCitations: 54
+  averageScore: 0.91
 verdictDistribution:
-  accurate: 196
-  inaccurate: 8
-  minor_issues: 53
-  unsupported: 8
+  accurate: 279
+  inaccurate: 16
+  minor_issues: 92
+  unsupported: 14
   not_verifiable: 1
 difficultyDistribution:
-  easy: 211
-  medium: 50
-  hard: 3
+  easy: 298
+  medium: 90
+  hard: 12
 pages:
   - pageId: biosecurity-overview
     totalCitations: 5
@@ -28,6 +28,15 @@ pages:
     minorIssues: 0
     accuracyRate: 0.75
     avgScore: 0.93
+  - pageId: good-judgment
+    totalCitations: 82
+    checked: 76
+    accurate: 37
+    inaccurate: 8
+    unsupported: 3
+    minorIssues: 28
+    accuracyRate: 0.8552631578947368
+    avgScore: 0.85
   - pageId: frontier-model-forum
     totalCitations: 53
     checked: 49
@@ -55,6 +64,15 @@ pages:
     minorIssues: 18
     accuracyRate: 0.9325842696629213
     avgScore: 0.94
+  - pageId: reducing-hallucinations
+    totalCitations: 71
+    checked: 60
+    accurate: 46
+    inaccurate: 0
+    unsupported: 3
+    minorIssues: 11
+    accuracyRate: 0.95
+    avgScore: 0.92
   - pageId: rethink-priorities
     totalCitations: 58
     checked: 55
@@ -90,6 +108,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 2
     inaccuracyRate: 1
+  - domain: coefficientgiving.org
+    totalCitations: 3
+    checked: 2
+    accurate: 1
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.5
   - domain: hunton.com
     totalCitations: 2
     checked: 2
@@ -104,6 +129,13 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.3333333333333333
+  - domain: arxiv.org
+    totalCitations: 5
+    checked: 3
+    accurate: 2
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.3333333333333333
   - domain: dataguard.com
     totalCitations: 3
     checked: 3
@@ -111,6 +143,34 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.3333333333333333
+  - domain: gptzero.me
+    totalCitations: 3
+    checked: 3
+    accurate: 2
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.3333333333333333
+  - domain: redhat.com
+    totalCitations: 5
+    checked: 4
+    accurate: 3
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.25
+  - domain: goodjudgment.com
+    totalCitations: 35
+    checked: 34
+    accurate: 26
+    inaccurate: 7
+    unsupported: 1
+    inaccuracyRate: 0.23529411764705882
+  - domain: freethink.com
+    totalCitations: 5
+    checked: 5
+    accurate: 4
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.2
   - domain: frontiermodelforum.org
     totalCitations: 30
     checked: 30
@@ -140,12 +200,12 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: 0.07142857142857142
   - domain: forum.effectivealtruism.org
-    totalCitations: 32
-    checked: 31
-    accurate: 30
+    totalCitations: 36
+    checked: 35
+    accurate: 33
     inaccurate: 0
-    unsupported: 1
-    inaccuracyRate: 0.03225806451612903
+    unsupported: 2
+    inaccuracyRate: 0.05714285714285714
   - domain: rethinkpriorities.org
     totalCitations: 33
     checked: 31
@@ -160,6 +220,20 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: en.wikipedia.org
+    totalCitations: 9
+    checked: 7
+    accurate: 7
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: goodjudgment.substack.com
+    totalCitations: 9
+    checked: 9
+    accurate: 9
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: softwareimprovementgroup.com
     totalCitations: 7
     checked: 7
@@ -168,6 +242,13 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: 0
   - domain: ibm.com
+    totalCitations: 6
+    checked: 6
+    accurate: 6
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: pmc.ncbi.nlm.nih.gov
     totalCitations: 6
     checked: 6
     accurate: 6
@@ -209,6 +290,27 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: aiimpacts.org
+    totalCitations: 4
+    checked: 4
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: zoominfo.com
+    totalCitations: 4
+    checked: 4
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: builtin.com
+    totalCitations: 4
+    checked: 4
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: idealist.org
     totalCitations: 4
     checked: 3
@@ -223,6 +325,27 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: voiceflow.com
+    totalCitations: 4
+    checked: 4
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: the-learning-agency.com
+    totalCitations: 4
+    checked: 4
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: aws.amazon.com
+    totalCitations: 4
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: frontiersin.org
     totalCitations: 3
     checked: 3
@@ -258,10 +381,38 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
-  - domain: en.wikipedia.org
-    totalCitations: 2
-    checked: 2
-    accurate: 2
+  - domain: knostic.ai
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: getzep.com
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: hai.stanford.edu
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: mobihealthnews.com
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: openai.com
+    totalCitations: 3
+    checked: 3
+    accurate: 3
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
@@ -321,6 +472,27 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
+  - domain: thejennyproject.com
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: gjopen.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: givewell.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: manifund.org
     totalCitations: 2
     checked: 0
@@ -328,6 +500,62 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: nngroup.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: grammarly.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: pubmed.ncbi.nlm.nih.gov
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: lakera.ai
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: cdn.openai.com
+    totalCitations: 2
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
+  - domain: tredence.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: misinforeview.hks.harvard.edu
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: kcl.ac.uk
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: charitynavigator.org
     totalCitations: 2
     checked: 2

@@ -73,7 +73,7 @@ Common hallucination patterns for wiki content include:
 - **False historical claims**: Creating events that never occurred or misattributing actions and statements
 - **Nonexistent entities**: Generating articles about fictional organizations, products, or concepts presented as real
 
-The Galactica AI model famously demonstrated this problem by generating citations to fictitious papers attributed to real researchers,[^11] illustrating how hallucinations can blend real and invented information in ways that appear credible at first glance.
+One example of this problem occurred when a language model generated a "Summer Reading List for 2025" that included fake books attributed to real authors,[^11] illustrating how hallucinations can blend real and invented information in ways that appear credible at first glance.
 
 ## Primary Mitigation Techniques
 
@@ -88,7 +88,7 @@ Rather than relying solely on an LLM's parametric memory (information encoded in
 3. **Context integration**: Retrieved documents are provided as context to the LLM
 4. **Grounded generation**: The model generates content based on both the prompt and the verified information
 
-For wiki content, RAG can query existing verified articles, academic databases like PubMed, or curated reference materials to ensure generated content aligns with established facts.[^13] This approach has demonstrated substantial improvements: one NIH study showed RAG-based medical chatbots achieved 0% (GPT-4) to 6% (GPT-3.5) hallucination rates when using reliable cancer information sources, compared to 19-35% when using Google searches and 40% for conventional chatbots without retrieval.[^14] The odds ratio for hallucinations was 16.1 times lower with quality RAG sources compared to conventional approaches (95% CI 3.7-50.0, P\<.001).
+For wiki content, RAG can query existing verified articles, academic databases like PubMed, or curated reference materials to ensure generated content aligns with established facts.[^13] This approach can reduce hallucinations by grounding responses in factual data.
 
 A 2024 Stanford study combining RAG with other techniques reported achieving up to 96% reduction in hallucinations,[^15] though this figure represents an upper bound under optimal conditions rather than typical performance.
 
@@ -96,7 +96,7 @@ A 2024 Stanford study combining RAG with other techniques reported achieving up 
 
 Despite its effectiveness, RAG introduces complexity:
 
-- **Source quality dependence**: RAG is only as good as its knowledge base—using low-quality or biased sources can perpetuate misinformation[^16]
+- **Source quality dependence**: RAG is only as good as its knowledge base—using low-quality or biased sources can perpetuate misinformation
 - **Retrieval accuracy**: Systems must retrieve relevant documents; irrelevant context can confuse models
 - **Computational overhead**: Real-time database queries add latency and infrastructure requirements
 - **Context window limits**: Retrieved documents must fit within model context windows, requiring careful chunk selection
@@ -145,7 +145,7 @@ Multiple verification techniques identify and correct hallucinations after initi
 
 **Chain of Verification (CoVe)** prompts the LLM to verify each generated statement and correct inconsistencies.[^29] The system asks the model follow-up questions about its own claims: "What evidence supports this date?" or "Which source confirms this affiliation?"
 
-**RealTime Verification and Rectification (EVER)** applies verification during the generation process itself,[^30] checking low-confidence statements against external sources like web search APIs and using hierarchical relevance rankings to assess retrieved information quality.
+**RealTime Verification and Rectification (EVER)** applies verification during the generation process itself,[^30] identifying and rectifying hallucinations through validation prompts.
 
 Research indicates verification techniques can provide an additional 20% reduction in hallucinations when combined with RAG.[^31]
 
@@ -275,7 +275,7 @@ Mitigation effectiveness varies significantly by domain:[^50]
 
 ### Source Quality Challenges
 
-RAG systems inherit the limitations of their knowledge bases:[^51]
+RAG systems inherit the limitations of their knowledge bases:
 
 - **Wikipedia limitations**: While generally reliable, Wikipedia contains errors, biases, and gaps, particularly for non-English topics or recent events
 - **Database currency**: Static knowledge bases become outdated without continuous updating
@@ -297,7 +297,7 @@ The 2025 AI Index Report noted that hallucination benchmarks continue to struggl
 
 ### Multimodal RAG Systems
 
-Enterprise-grade RAG implementations have evolved to support multimodal inputs and provide enhanced transparency. Morphik introduced open-source multimodal RAG kits for finance, healthcare, and legal applications in 2024-2025, featuring:[^54]
+Enterprise-grade RAG implementations have evolved to support multimodal inputs and provide enhanced transparency. Morphik's open-source approach enables organizations to implement enterprise-grade multimodal RAG for applications across finance, healthcare, and legal sectors, featuring:[^54]
 
 - Full-page context processing (not just extracted text)
 - Traceable citations linking generated claims to source documents
@@ -340,11 +340,11 @@ The probabilistic nature of LLMs and corporate opacity around training data limi
 
 ### Wikipedia Ecosystem Concerns
 
-The broader impact of AI-generated content on Wikipedia itself presents concerns. Research from King's College London found that while "fears of Wikipedia's end" from AI are "overblown," challenges remain in detecting and managing AI-generated articles.[^63] Some fully hallucinated articles generated by AI have been flagged for deletion under Wikipedia's PROD (proposed deletion) process, though some were subsequently restored after editor review, highlighting community disagreement about handling AI content.[^64]
+The broader impact of AI-generated content on Wikipedia itself presents concerns. Research from King's College London found that while "fears of Wikipedia's end" from AI are "overblown," challenges remain in detecting and managing AI-generated articles.[^63][^64]
 
 ### Training Data Contamination
 
-As AI-generated content proliferates online, future LLMs trained on web data risk ingesting AI hallucinations as training material, potentially creating feedback loops that amplify rather than reduce misinformation.[^65] This presents a long-term challenge for maintaining content quality across the internet ecosystem.
+As AI-generated content proliferates online, this presents a long-term challenge for maintaining content quality across the internet ecosystem.[^65]
 
 ## Key Uncertainties
 
@@ -417,7 +417,7 @@ For <EntityLink id="E384">LongtermWiki</EntityLink> and similar AI safety knowle
 [^13]: [Getzep: Reducing LLM Hallucinations](https://www.getzep.com/ai-agents/reducing-llm-hallucinations/)
 [^14]: [NIH PMC: RAG for Cancer Information](https://pmc.ncbi.nlm.nih.gov/articles/PMC12425422/)
 [^15]: [Voiceflow: Prevent LLM Hallucinations](https://www.voiceflow.com/blog/prevent-llm-hallucinations)
-[^16]: [Red Hat: When LLMs Daydream](https://www.redhat.com/en/blog/when-llms-day-dream-hallucinations-how-prevent-them)
+
 [^17]: [Stanford HAI: WikiChat Research](https://hai.stanford.edu/research/wikichat-stopping-the-hallucination-of-large-language-model-chatbots-by-few-shot-grounding-on-wikipedia)
 [^18]: [ACL Anthology: WikiChat Paper](https://aclanthology.org/2023.findings-emnlp.157.pdf)
 [^19]: [Lakera: Guide to Hallucinations in LLMs](https://www.lakera.ai/blog/guide-to-hallucinations-in-large-language-models)
@@ -450,9 +450,9 @@ For <EntityLink id="E384">LongtermWiki</EntityLink> and similar AI safety knowle
 [^46]: [OpenAI: Why Language Models Hallucinate](https://openai.com/index/why-language-models-hallucinate/)
 [^47]: [Red Hat: When LLMs Daydream](https://www.redhat.com/en/blog/when-llms-day-dream-hallucinations-how-prevent-them)
 [^48]: [AWS: Reducing Hallucinations with Bedrock Agents](https://aws.amazon.com/blogs/machine-learning/reducing-hallucinations-in-large-language-models-with-custom-intervention-using-amazon-bedrock-agents/)
-[^49]: [OpenAI: Why Language Models Hallucinate](https://openai.com/index/why-language-models-hallucinate/)
+[^49]: [The Unintended Trade-off of AI Alignment: Balancing Hallucination ...](https://arxiv.org/html/2510.07775v2)
 [^50]: [arXiv: Survey of Hallucination Mitigation](https://arxiv.org/abs/2401.01313)
-[^51]: [Free Think: AI Hallucinations](https://www.freethink.com/robots-ai/ai-hallucinations)
+
 [^52]: [arXiv: Survey of Hallucination Mitigation](https://arxiv.org/abs/2401.01313)
 [^53]: [OpenAI: Why Language Models Hallucinate PDF](https://cdn.openai.com/pdf/d04913be-3f6f-4d2b-b283-ff432ef4aaa5/why-language-models-hallucinate.pdf)
 [^54]: [Morphik: Eliminate Hallucinations Guide](https://www.morphik.ai/blog/eliminate-hallucinations-guide)
@@ -465,7 +465,7 @@ For <EntityLink id="E384">LongtermWiki</EntityLink> and similar AI safety knowle
 [^61]: [Harvard Misinforeview: New Sources of Inaccuracy](https://misinforeview.hks.harvard.edu/article/new-sources-of-inaccuracy-a-conceptual-framework-for-studying-ai-hallucinations/)
 [^62]: [Harvard Misinforeview: New Sources of Inaccuracy](https://misinforeview.hks.harvard.edu/article/new-sources-of-inaccuracy-a-conceptual-framework-for-studying-ai-hallucinations/)
 [^63]: [King's College London: Fears of Wikipedia's End](https://www.kcl.ac.uk/news/fears-of-wikipedias-end-overblown-but-challenges-remain-warn-researchers)
-[^64]: [Wiki Education: GenAI and Wikipedia Editing](https://wikiedu.org/blog/2026/01/29/generative-ai-and-wikipedia-editing-what-we-learned-in-2025/)
+[^64]: [Fears of Wikipedia's end overblown, but challenges remain warn ...](https://www.kcl.ac.uk/news/fears-of-wikipedias-end-overblown-but-challenges-remain-warn-researchers)
 [^65]: [GPTZero: AI Hallucinations Definition](https://gptzero.me/news/ai-hallucinations-definition-examples/)
 [^66]: [Free Think: AI Hallucinations](https://www.freethink.com/robots-ai/ai-hallucinations)
 [^67]: [Free Think: AI Hallucinations](https://www.freethink.com/robots-ai/ai-hallucinations)

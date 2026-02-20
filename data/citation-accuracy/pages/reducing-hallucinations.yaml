@@ -1,0 +1,30 @@
+- pageId: reducing-hallucinations
+  footnote: 16
+  claimText: (footnote definition only, no inline reference found)
+  sourceTitle: 'When LLMs day dream: Hallucinations and how to prevent them'
+  url: https://www.redhat.com/en/blog/when-llms-day-dream-hallucinations-how-prevent-them
+  verdict: unsupported
+  score: 0
+  issues: null
+  difficulty: hard
+  checkedAt: '2026-02-20 08:40:50'
+- pageId: reducing-hallucinations
+  footnote: 51
+  claimText: (footnote definition only, no inline reference found)
+  sourceTitle: Can we stop AI hallucinations? And do we even want to?
+  url: https://www.freethink.com/robots-ai/ai-hallucinations
+  verdict: unsupported
+  score: 0
+  issues: null
+  difficulty: hard
+  checkedAt: '2026-02-20 08:41:35'
+- pageId: reducing-hallucinations
+  footnote: 65
+  claimText: As AI-generated content proliferates online, this presents a long-term challenge for maintaining content quality across the internet ecosystem.
+  sourceTitle: 'AI Hallucinations: Definition, Examples & How To Prevent'
+  url: https://gptzero.me/news/ai-hallucinations-definition-examples/
+  verdict: unsupported
+  score: 0
+  issues: The source does not discuss the long-term challenge of maintaining content quality across the internet ecosystem as AI-generated content proliferates.
+  difficulty: hard
+  checkedAt: '2026-02-20 08:52:29'
