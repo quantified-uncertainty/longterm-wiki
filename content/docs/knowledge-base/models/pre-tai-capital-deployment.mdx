@@ -26,9 +26,9 @@ import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
 ## Overview
 
-The frontier AI industry is deploying capital at historically large scales. In 2025 alone, the five largest AI-adjacent companies (Microsoft, Google, Amazon, Meta, and Oracle) guided for \$355-400 billion in combined capital expenditure, with an estimated 50-80% directed toward AI infrastructure.[^1][^2] Individual AI labs are raising and spending at levels that would have seemed implausible two years earlier: <EntityLink id="E218">OpenAI</EntityLink> anchors the \$500 billion Stargate project, <EntityLink id="E22">Anthropic</EntityLink> has raised \$37B+ at a \$350B valuation on \$9B ARR, and Google has committed \$75B in 2025 capex largely for AI.[^3][^4][^5]
+The frontier AI industry is deploying capital at historically large scales. In 2025 alone, the five largest AI-adjacent companies (Microsoft, Google, Amazon, Meta, and Oracle) guided for \$355-400 billion in combined capital expenditure, with an estimated 50-80% directed toward AI infrastructure.[^1][^2] Individual AI labs are raising and spending at levels that would have seemed implausible two years earlier: <EntityLink id="E218" name="openai">OpenAI</EntityLink> anchors the \$500 billion Stargate project, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> has raised \$37B+ at a \$350B valuation on \$9B ARR, and Google has committed \$75B in 2025 capex largely for AI.[^3][^4][^5]
 
-This analysis examines: **How could frontier AI labs collectively deploy \$100-300B+ before <EntityLink id="E357">transformative AI (TAI)</EntityLink> arrives, and what does this spending pattern mean for organizations trying to plan around it?**
+This analysis examines: **How could frontier AI labs collectively deploy \$100-300B+ before <EntityLink id="E357" name="transformative-ai">transformative AI (TAI)</EntityLink> arrives, and what does this spending pattern mean for organizations trying to plan around it?**
 
 This question matters because the allocation decisions—how much goes to compute vs. safety, infrastructure vs. talent, proprietary development vs. open research—will shape the trajectory of AI development and the landscape in which every other actor (governments, philanthropies, startups, academia, civil society) must operate.
 
@@ -51,8 +51,8 @@ For historical context, the Manhattan Project cost approximately \$30 billion in
 
 | Lab | Total Raised / Available | Annual Revenue | Annual Burn Rate | Projected Spending (2025-2030) |
 |-----|--------------------------|----------------|------------------|-------------------------------|
-| **<EntityLink id="E218">OpenAI</EntityLink>** | \$37B+ raised; Stargate \$500B committed | [\$20B ARR](https://www.cnbc.com/2025/openai-revenue/) | [\$9B/year (2025)](https://www.cnbc.com/2025/openai-revenue/) | \$100-200B+ |
-| **<EntityLink id="E22">Anthropic</EntityLink>** | \$37B+ raised; Amazon \$8B anchor | [\$9B ARR](https://www.cnbc.com/2025/anthropic-valuation/) | \$5-7B/year est. | \$50-100B+ |
+| **<EntityLink id="E218" name="openai">OpenAI</EntityLink>** | \$37B+ raised; Stargate \$500B committed | [\$20B ARR](https://www.cnbc.com/2025/openai-revenue/) | [\$9B/year (2025)](https://www.cnbc.com/2025/openai-revenue/) | \$100-200B+ |
+| **<EntityLink id="E22" name="anthropic">Anthropic</EntityLink>** | \$37B+ raised; Amazon \$8B anchor | [\$9B ARR](https://www.cnbc.com/2025/anthropic-valuation/) | \$5-7B/year est. | \$50-100B+ |
 | **Google DeepMind** | Internal (Alphabet [\$75B capex 2025](https://abc.xyz/investor/)) | N/A (internal) | Substantial | \$100-200B+ |
 | **Meta AI** | Internal ([\$60-65B capex 2025](https://investor.fb.com/home/default.aspx)) | N/A (internal) | Substantial | \$80-150B+ |
 | **xAI** | [\$12B raised (Dec 2024)](https://www.reuters.com/technology/xai-funding-2024/) | Early stage | Aggressive | \$20-50B+ |
@@ -96,7 +96,7 @@ The majority of capital goes to building and operating data centers at frontier 
 
 | Component | Cost Share | Key Constraint | Key Supplier |
 |-----------|-----------|----------------|--------------|
-| **GPUs/Accelerators** | 40-50% | TSMC fab capacity, HBM supply | <EntityLink id="E693">NVIDIA</EntityLink> (80-90% share) |
+| **GPUs/Accelerators** | 40-50% | TSMC fab capacity, HBM supply | <EntityLink id="E693" name="nvidia">NVIDIA</EntityLink> (80-90% share) |
 | **Networking** | 10-15% | InfiniBand/Ethernet at scale | NVIDIA (InfiniBand), Broadcom |
 | **Power Infrastructure** | 15-20% | Grid connections, generation | Utilities, nuclear (SMR) |
 | **Construction/Land** | 10-15% | Permitting, water cooling | Regional |
@@ -104,11 +104,11 @@ The majority of capital goes to building and operating data centers at frontier 
 
 **Power Requirements**: Frontier AI data centers require 100MW-1GW+ of power each. Current U.S. data center power consumption is approximately 40 TWh/year, projected by Goldman Sachs to reach 945 TWh by 2030.[^7] This is driving investment in dedicated power generation, including nuclear small modular reactors (SMRs), natural gas plants, and large-scale solar/battery installations.
 
-See <EntityLink id="E707">AI Megaproject Infrastructure</EntityLink> for deeper analysis of infrastructure buildout economics.
+See <EntityLink id="E707" name="ai-megaproject-infrastructure">AI Megaproject Infrastructure</EntityLink> for deeper analysis of infrastructure buildout economics.
 
 ### Category 2: Model Training (10-20%)
 
-Training costs scale with each model generation, though <EntityLink id="E65">algorithmic efficiency improvements</EntityLink> (approximately doubling every 8 months according to [Epoch AI's analysis](https://epoch.ai/blog/algorithmic-progress)) partially offset raw compute scaling:
+Training costs scale with each model generation, though <EntityLink id="E65" name="compute-hardware">algorithmic efficiency improvements</EntityLink> (approximately doubling every 8 months according to [Epoch AI's analysis](https://epoch.ai/blog/algorithmic-progress)) partially offset raw compute scaling:
 
 | Generation | Training Cost | Compute (FLOP) | Timeline | Examples |
 |------------|--------------|-----------------|----------|----------|
@@ -136,7 +136,7 @@ The AI talent market is concentrated and compensation-intensive. Research by [St
 
 At 5,000-10,000 employees per major lab and \$400K-1M+ average total compensation for technical staff, talent costs of \$5-10B/year per lab are plausible at scale.
 
-See <EntityLink id="E704">AI Talent Market Dynamics</EntityLink> for detailed analysis of talent constraints and scaling.
+See <EntityLink id="E704" name="ai-talent-market-dynamics">AI Talent Market Dynamics</EntityLink> for detailed analysis of talent constraints and scaling.
 
 ### Category 4: Safety & Alignment (1-5%)
 
@@ -144,16 +144,16 @@ Current safety spending across the industry is approximately \$700M-1.25B/year, 
 
 | Lab | Estimated Safety Spend | % of Total | Safety Researchers | Focus Areas |
 |-----|------------------------|------------|--------------------|----|
-| **<EntityLink id="E22">Anthropic</EntityLink>** | \$400-700M/year | 5-8% | 100-200+ | <EntityLink id="E451">Constitutional AI</EntityLink>, <EntityLink id="E174">interpretability</EntityLink>, evals |
-| **<EntityLink id="E218">OpenAI</EntityLink>** | \$100-200M/year | 1-3% | Reduced (post-2024 departures) | Superalignment (defunded), evals |
-| **<EntityLink id="E98">Google DeepMind</EntityLink>** | \$150-300M/year | 2-4% | 200-300 | <EntityLink id="E271">Scalable oversight</EntityLink>, robustness |
+| **<EntityLink id="E22" name="anthropic">Anthropic</EntityLink>** | \$400-700M/year | 5-8% | 100-200+ | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E174" name="interpretability">interpretability</EntityLink>, evals |
+| **<EntityLink id="E218" name="openai">OpenAI</EntityLink>** | \$100-200M/year | 1-3% | Reduced (post-2024 departures) | Superalignment (defunded), evals |
+| **<EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>** | \$150-300M/year | 2-4% | 200-300 | <EntityLink id="E271" name="scalable-oversight">Scalable oversight</EntityLink>, robustness |
 | **Others** | \$50-100M/year | Variable | Variable | Various |
 
-*Sources: Safety spending estimates based on [public team sizes](https://www.anthropic.com/team), [average compensation data](https://www.levels.fyi/), and analysis of [published safety research output](https://www.alignmentforum.org/). Anthropic's allocation discussed in <EntityLink id="E405">Anthropic Valuation Analysis</EntityLink>.*
+*Sources: Safety spending estimates based on [public team sizes](https://www.anthropic.com/team), [average compensation data](https://www.levels.fyi/), and analysis of [published safety research output](https://www.alignmentforum.org/). Anthropic's allocation discussed in <EntityLink id="E405" name="anthropic-valuation">Anthropic Valuation Analysis</EntityLink>.*
 
 The difference between a 1% allocation and a 5% allocation on a \$200B budget represents \$8 billion in additional safety investment—16x the current global total. Whether this difference represents under-investment, optimal allocation, or over-investment relative to research tractability remains uncertain and depends on absorptive capacity analysis.
 
-See <EntityLink id="E708">Safety Spending at Scale</EntityLink> for analysis of what these budget levels could accomplish.
+See <EntityLink id="E708" name="safety-spending-at-scale">Safety Spending at Scale</EntityLink> for analysis of what these budget levels could accomplish.
 
 ## Historical Megaproject Comparison
 
@@ -242,14 +242,14 @@ The ratio of capabilities spending to safety spending varies substantially acros
 | Safety % | On \$100B Budget | On \$300B Budget | Potential Activities |
 |----------|-----------------|-----------------|-------------------|
 | **1%** (current baseline at some labs) | \$1B | \$3B | Existing safety teams, basic evaluations |
-| **3%** (Anthropic's approximate level) | \$3B | \$9B | Expanded <EntityLink id="E174">interpretability</EntityLink>, red-teaming, governance research |
+| **3%** (Anthropic's approximate level) | \$3B | \$9B | Expanded <EntityLink id="E174" name="interpretability">interpretability</EntityLink>, red-teaming, governance research |
 | **5%** (increased allocation scenario) | \$5B | \$15B | Dedicated safety labs, academic partnerships, talent pipeline development |
 | **10%** (substantial increase scenario) | \$10B | \$30B | Comprehensive safety research ecosystem, public infrastructure |
 | **20%** (research parity scenario) | \$20B | \$60B | Safety research funding approaching capabilities investment |
 
 Even a shift from 1% to 5% safety allocation on a \$200B budget represents \$8 billion in additional safety investment—16x the current global total. Arguments for increasing allocation include potential high leverage of safety research; arguments for current allocation include uncertainty about tractability and limited absorptive capacity in the near term.
 
-See <EntityLink id="E708">Safety Spending at Scale</EntityLink> for analysis of what these budgets could accomplish and <EntityLink id="E267">AI Safety Research Value Model</EntityLink> for economic analysis of marginal returns on safety investment.
+See <EntityLink id="E708" name="safety-spending-at-scale">Safety Spending at Scale</EntityLink> for analysis of what these budgets could accomplish and <EntityLink id="E267" name="safety-research-value">AI Safety Research Value Model</EntityLink> for economic analysis of marginal returns on safety investment.
 
 ## Implications for Other Organizations
 
@@ -264,7 +264,7 @@ The scale of AI lab spending creates planning challenges for every other actor i
 | Speed of change | Funding cycles (6-12 months) lag industry shifts (weeks to months) | Pre-committed flexible funding; rapid response mechanisms |
 | Influence window | Pre-TAI period may represent key opportunity for external influence | Prioritize policy work, governance research, and allocation advocacy |
 
-*Sources: Philanthropic funding estimates from [Open Philanthropy grants database](https://www.openphilanthropy.org/grants/) and <EntityLink id="E510">80,000 Hours</EntityLink> [analysis](https://80000hours.org/problem-profiles/artificial-intelligence/).*
+*Sources: Philanthropic funding estimates from [Open Philanthropy grants database](https://www.openphilanthropy.org/grants/) and <EntityLink id="E510" name="80000-hours">80,000 Hours</EntityLink> [analysis](https://80000hours.org/problem-profiles/artificial-intelligence/).*
 
 ### For Governments
 
@@ -284,7 +284,7 @@ The scale of AI lab spending creates planning challenges for every other actor i
 | Publication velocity | Academic timelines (12-24 months) lag industry (weeks to months) | Preprint culture; closer industry collaboration; focus on foundational research |
 | Training pipeline | Growing demand for AI researchers at all levels | Expand programs; interdisciplinary training; industry curriculum partnerships |
 
-See <EntityLink id="E705">Planning for Frontier Lab Scaling</EntityLink> for comprehensive strategic frameworks for each actor type.
+See <EntityLink id="E705" name="planning-for-frontier-lab-scaling">Planning for Frontier Lab Scaling</EntityLink> for comprehensive strategic frameworks for each actor type.
 
 ## Key Uncertainties
 
@@ -327,7 +327,7 @@ If an AI investment correction occurs, it could reduce capital available for dep
 
 **Key Assumptions**:
 1. No major regulatory intervention limiting spending (uncertain)
-2. <EntityLink id="E65">Scaling laws</EntityLink> continue at historical rates (uncertain, 2-3 year resolution)
+2. <EntityLink id="E65" name="compute-hardware">Scaling laws</EntityLink> continue at historical rates (uncertain, 2-3 year resolution)
 3. No major geopolitical disruption to supply chains (uncertain)
 4. TAI timeline in 2027-2035 range (highly uncertain)
 
@@ -359,4 +359,4 @@ Based on current commitments and trajectories, spending of \$100-300B+ per major
 [^10]: [CNBC - OpenAI chair Bret Taylor says AI is 'probably' a bubble](https://www.cnbc.com/2026/01/22/openai-chair-bret-taylor-ai-bubble-correction.html) (January 2026)
 [^11]: [Fortune - HSBC Analysis: OpenAI \$207B funding shortfall](https://fortune.com/2025/11/26/is-openai-profitable-forecast-data-center-200-billion-shortfall-hsbc/) (November 2025)
 [^12]: [Carnegie Investments - Risks Facing OpenAI](https://blog.carnegieinvest.com/the-risks-facing-openai-and-its-1.4t-in-spending-commitments) (2025)
-[^13]: See <EntityLink id="E405">Anthropic Valuation Analysis</EntityLink> for customer concentration details
+[^13]: See <EntityLink id="E405" name="anthropic-valuation">Anthropic Valuation Analysis</EntityLink> for customer concentration details

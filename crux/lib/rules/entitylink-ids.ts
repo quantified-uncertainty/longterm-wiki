@@ -2,21 +2,22 @@
  * Rule: EntityLink ID Validation
  *
  * Checks that all <EntityLink id="..."> components reference valid IDs
- * that exist in either the pathRegistry or entities database.
+ * and follow the preferred format: numeric ID primary, optional name cross-check.
  *
- * Supports two ID formats:
- * 1. Simple entity IDs: "deceptive-alignment", "anthropic"
- *    → Resolved via pathRegistry or entities database
- * 2. Path-style IDs: "capabilities/agentic-ai", "risks/accident/scheming"
- *    → Resolved by checking if /knowledge-base/{id}/ maps to a real content file
+ * Preferred format:
+ *   <EntityLink id="E42" name="anthropic">Anthropic</EntityLink>
  *
- * The EntityLink component at runtime falls back to `/knowledge-base/${id}/`
- * for unrecognized IDs, so path-style IDs work if the content exists.
+ * Checks:
+ * 1. ID resolves to a known entity (via pathRegistry, entities DB, or content file)
+ * 2. Slug IDs should use numeric format instead (WARNING, auto-fixable)
+ * 3. Numeric ID + name: validates name matches the entity's slug (ERROR if mismatch)
+ * 4. Numeric ID without name: advisory (WARNING, auto-fixable)
+ * 5. Unknown numeric ID: warning
  */
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
 import { CONTENT_DIR_ABS as CONTENT_DIR } from '../content-types.ts';
-import { ENTITY_LINK_RE, NUMERIC_ID_RE } from '../patterns.ts';
+import { ENTITY_LINK_RE, NUMERIC_ID_RE, extractEntityLinkName } from '../patterns.ts';
 import { existsSync } from 'fs';
 import { join } from 'path';
 
@@ -62,7 +63,7 @@ function pathStyleIdResolvesToFile(id: string): boolean {
 export const entityLinkIdsRule = createRule({
   id: 'entitylink-ids',
   name: 'EntityLink ID Validation',
-  description: 'Verify EntityLink IDs resolve to valid paths or entities',
+  description: 'Verify EntityLink IDs resolve to valid entities and use numeric+name format',
 
   check(content: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
@@ -72,7 +73,7 @@ export const entityLinkIdsRule = createRule({
       return issues;
     }
 
-    // Match <EntityLink id="..."> patterns
+    // Match <EntityLink id="..."> patterns — use the full tag match for name extraction
     const regex = new RegExp(ENTITY_LINK_RE.source, 'g');
     let match: RegExpExecArray | null;
     let lineNum = 0;
@@ -83,30 +84,50 @@ export const entityLinkIdsRule = createRule({
       regex.lastIndex = 0;
 
       while ((match = regex.exec(line)) !== null) {
+        const fullTag = match[0];
         const rawId = match[1];
+        const nameAttr = extractEntityLinkName(fullTag);
 
-        // Resolve numeric IDs (E35 → slug) before validation
-        let id = rawId;
+        // --- Numeric ID (E35) ---
         if (NUMERIC_ID_RE.test(rawId) && engine.idRegistry) {
           const slug = engine.idRegistry.byNumericId[rawId.toUpperCase()];
           if (slug) {
-            id = slug;
-            // Warn: prefer slug IDs over numeric IDs for readability and
-            // to avoid build-time resolution issues in related-pages graph
-            issues.push(new Issue({
-              rule: this.id,
-              file: content.path,
-              line: lineNum,
-              message: `EntityLink uses numeric ID "${rawId}" — prefer slug "${slug}"`,
-              severity: Severity.WARNING,
-              fix: {
-                type: FixType.REPLACE_TEXT,
-                oldText: `id="${rawId}"`,
-                newText: `id="${slug}"`,
-              },
-            }));
-            continue; // Slug is known-valid; skip path/entity resolution check
+            // Numeric ID resolves — check name attribute
+            if (nameAttr) {
+              if (nameAttr !== slug) {
+                // Name mismatch — ERROR (hallucination or stale reference)
+                issues.push(new Issue({
+                  rule: this.id,
+                  file: content.path,
+                  line: lineNum,
+                  message: `EntityLink id="${rawId}" name="${nameAttr}" — name mismatch: ${rawId} is "${slug}", not "${nameAttr}"`,
+                  severity: Severity.ERROR,
+                  fix: {
+                    type: FixType.REPLACE_TEXT,
+                    oldText: `name="${nameAttr}"`,
+                    newText: `name="${slug}"`,
+                  },
+                }));
+              }
+              // else: name matches — perfect, no issue
+            } else {
+              // Numeric ID without name — advisory warning with auto-fix
+              issues.push(new Issue({
+                rule: this.id,
+                file: content.path,
+                line: lineNum,
+                message: `EntityLink id="${rawId}" — add name="${slug}" for cross-check`,
+                severity: Severity.WARNING,
+                fix: {
+                  type: FixType.REPLACE_TEXT,
+                  oldText: `id="${rawId}"`,
+                  newText: `id="${rawId}" name="${slug}"`,
+                },
+              }));
+            }
+            continue; // Numeric ID is valid; skip path/entity resolution check
           } else {
+            // Unknown numeric ID
             issues.push(new Issue({
               rule: this.id,
               file: content.path,
@@ -118,7 +139,9 @@ export const entityLinkIdsRule = createRule({
           }
         }
 
-        // Check if ID exists in pathRegistry or entities
+        // --- Slug ID ---
+        // Check if it resolves to an entity
+        const id = rawId;
         const inPathRegistry = engine.pathRegistry && (
           engine.pathRegistry[id] ||
           engine.pathRegistry[`__index__/${id}`] ||
@@ -135,6 +158,26 @@ export const entityLinkIdsRule = createRule({
             message: `EntityLink id="${rawId}" does not resolve to any known path or entity`,
             severity: Severity.WARNING,
           }));
+          continue;
+        }
+
+        // Slug resolves — suggest numeric+name format if numeric ID is available
+        if (engine.idRegistry) {
+          const numericId = engine.idRegistry.bySlug[id];
+          if (numericId) {
+            issues.push(new Issue({
+              rule: this.id,
+              file: content.path,
+              line: lineNum,
+              message: `EntityLink id="${rawId}" — use numeric format: id="${numericId}" name="${id}"`,
+              severity: Severity.WARNING,
+              fix: {
+                type: FixType.REPLACE_TEXT,
+                oldText: `id="${rawId}"`,
+                newText: `id="${numericId}" name="${rawId}"`,
+              },
+            }));
+          }
         }
       }
     }

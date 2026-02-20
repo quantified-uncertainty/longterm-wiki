@@ -118,16 +118,19 @@ export const preferEntityLinkRule = createRule({
 
       if (entitySlug && idRegistry?.bySlug[entitySlug]) {
         // Registered entity — blocking error with auto-fix
+        // Use numeric+name format (numericId is always truthy here since bySlug check passed above)
+        const numericId = idRegistry.bySlug[entitySlug];
+        const replacement = `<EntityLink id="${numericId}" name="${entitySlug}">${text}</EntityLink>`;
         issues.push(new Issue({
           rule: this.id,
           file: content.path,
           line: lineNum,
-          message: `Use EntityLink instead of markdown link: [${text}](${href}) — replace with <EntityLink id="${entitySlug}">${text}</EntityLink>`,
+          message: `Use EntityLink instead of markdown link: [${text}](${href}) — replace with ${replacement}`,
           severity: Severity.ERROR,
           fix: {
             type: FixType.REPLACE_TEXT,
             oldText: fullMatch,
-            newText: `<EntityLink id="${entitySlug}">${text}</EntityLink>`,
+            newText: replacement,
           },
         }));
       } else {

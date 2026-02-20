@@ -25,7 +25,7 @@ import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
 ## Overview
 
-This page analyzes the financial structure of frontier AI labs—<EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, and <EntityLink id="E98">Google DeepMind</EntityLink>—examining revenue sources, cost structures, profitability timelines, and how financial incentives affect resource allocation decisions including safety spending.
+This page analyzes the financial structure of frontier AI labs—<EntityLink id="E218" name="openai">OpenAI</EntityLink>, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, and <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>—examining revenue sources, cost structures, profitability timelines, and how financial incentives affect resource allocation decisions including safety spending.
 
 Frontier AI development requires substantial capital investment, creating dependencies on investors and customers whose priorities may differ from safety objectives. Understanding this financial structure provides context for predicting lab behavior and identifying potential intervention points.
 
@@ -95,7 +95,7 @@ Cost allocations are derived from industry benchmarks for AI companies and parti
 - HSBC estimates a \$207B funding shortfall between current resources and spending commitments through 2030.[^12]
 - The [Stargate partnership (\$500B committed)](https://www.whitehouse.gov/briefing-room/statements-releases/2025/01/21/fact-sheet-president-donald-j-trump-announces-the-stargate-project/)[^13] shifts infrastructure costs partially off-balance-sheet through joint venture structure.
 - IPO filing expected H2 2026 based on market reports,[^14] creating new reporting requirements and public market accountability.
-- The <EntityLink id="E421">OpenAI Foundation</EntityLink>'s 26% equity stake (valued at approximately \$130B at \$500B valuation)[^15] represents theoretical resources that could fund safety initiatives.
+- The <EntityLink id="E421" name="openai-foundation">OpenAI Foundation</EntityLink>'s 26% equity stake (valued at approximately \$130B at \$500B valuation)[^15] represents theoretical resources that could fund safety initiatives.
 
 ### Anthropic
 
@@ -126,7 +126,7 @@ Revenue estimates based on financial journalism and analyst reports on Anthropic
 | **Compute (Training)** | 25-30% (est.) | \$2-3B | Claude model training, experiments |
 | **Compute (Inference)** | 20-25% (est.) | \$1.5-2.5B | API serving, Claude.ai |
 | **Talent** | 20-25% (est.) | \$1.5-2.5B | ≈2,500 employees, competitive compensation |
-| **Safety & Alignment** | 5-8% (est.) | \$400-700M | <EntityLink id="E451">Constitutional AI</EntityLink>, <EntityLink id="E174">interpretability</EntityLink>, evaluations |
+| **Safety & Alignment** | 5-8% (est.) | \$400-700M | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E174" name="interpretability">interpretability</EntityLink>, evaluations |
 | **Infrastructure** | 10-15% (est.) | \$700M-1.5B | Data center partnerships |
 | **Other** | 5-10% (est.) | \$350-1B | Research, partnerships, administration |
 
@@ -134,7 +134,7 @@ Revenue estimates based on financial journalism and analyst reports on Anthropic
 - Anthropic allocates an estimated 5-8% to safety-related research compared to 1-3% at other labs, based on public statements about team composition and research priorities.[^24]
 - Revenue growth (approximately 1000%+ year-over-year)[^17] is substantial but customer concentration presents risk: reports suggest approximately 25% of revenue comes from Cursor/GitHub-related usage.[^25]
 - [Amazon's \$8B investment](https://techcrunch.com/2024/11/22/amazon-pumps-another-4b-into-anthropic/)[^21] provides cloud infrastructure access but creates strategic dependency.
-- The <EntityLink id="E407">Long-Term Benefit Trust</EntityLink> governance structure and <EntityLink id="E406">co-founder equity pledges</EntityLink> (estimated \$25-70B risk-adjusted value) represent potential safety-aligned capital, though deployment depends on IPO timing and pledge fulfillment.[^26]
+- The <EntityLink id="E407" name="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> governance structure and <EntityLink id="E406" name="anthropic-investors">co-founder equity pledges</EntityLink> (estimated \$25-70B risk-adjusted value) represent potential safety-aligned capital, though deployment depends on IPO timing and pledge fulfillment.[^26]
 - Valuation at 39x revenue (\$350B/\$9B) exceeds OpenAI's 25x, indicating high market expectations for growth.[^22]
 
 ### Google DeepMind
@@ -147,7 +147,7 @@ Revenue estimates based on financial journalism and analyst reports on Anthropic
 | **Revenue Attribution** | Indirect | Indirect | AI enhances Search, Cloud, etc. |
 
 **Key Financial Dynamics:**
-- <EntityLink id="E98">Google DeepMind</EntityLink> operates as a cost center within Alphabet, insulated from direct market revenue pressure but subject to internal budget allocation processes.
+- <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> operates as a cost center within Alphabet, insulated from direct market revenue pressure but subject to internal budget allocation processes.
 - Alphabet's [\$75B 2025 capex guidance](https://www.cnbc.com/2025/01/30/alphabet-earnings-q4-2024.html)[^28] represents substantial increase, with CEO Sundar Pichai stating "the risk of underinvesting is dramatically greater than the risk of overinvesting" on the Q4 2024 earnings call.[^28]
 - Safety research is embedded within DeepMind's organizational structure rather than tracked as a separate budget line, making precise allocation estimates particularly uncertain.
 - The internal cost center model provides more stability for research investment but reduces external transparency and accountability compared to independent labs.
@@ -231,7 +231,7 @@ While pre-profitability financial pressure creates incentives to prioritize reve
 
 **Regulatory and structural incentives:**
 - **Regulatory compliance**: Emerging AI regulations in the EU, UK, and US create mandatory safety requirements.[^31]
-- **Governance structures**: Mechanisms like Anthropic's <EntityLink id="E407">Long-Term Benefit Trust</EntityLink> can create structural incentives for safety investment independent of short-term financial pressure.[^26]
+- **Governance structures**: Mechanisms like Anthropic's <EntityLink id="E407" name="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> can create structural incentives for safety investment independent of short-term financial pressure.[^26]
 - **Government partnerships**: National security and government contracts increasingly require safety evaluations and red-teaming.[^32]
 
 **Limitations of market incentives:**
@@ -398,8 +398,8 @@ Advocacy for mandatory transparency standards (through regulation or industry co
 [^22]: [Reuters - Anthropic \$350B Valuation Talks](https://www.reuters.com/technology/artificial-intelligence/anthropic-fundraising-talks-value-it-350-billion-report-says-2025-01-22/) (January 2025)
 [^23]: [Wall Street Journal - Anthropic \$61B Valuation](https://www.wsj.com/tech/ai/anthropic-funding-investors-amazon-b3126fd0) (March 2024)
 [^24]: Author estimate based on public statements about research priorities and team composition from Anthropic blog posts and conference presentations
-[^25]: See <EntityLink id="E405">Anthropic Valuation Analysis</EntityLink> for customer concentration discussion (based on industry reports)
-[^26]: See <EntityLink id="E406">Anthropic (Funder)</EntityLink> for equity pledge analysis
+[^25]: See <EntityLink id="E405" name="anthropic-valuation">Anthropic Valuation Analysis</EntityLink> for customer concentration discussion (based on industry reports)
+[^26]: See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for equity pledge analysis
 [^27]: [CNBC - Alphabet Q3 2024 Earnings](https://www.cnbc.com/2024/10/29/alphabet-earnings-q3-2024.html) (October 2024)
 [^28]: [CNBC - Alphabet Q4 2024 Earnings and Capex Guidance](https://www.cnbc.com/2025/01/30/alphabet-earnings-q4-2024.html) (January 2025)
 [^29]: [Insurance Journal - AI Liability Insurance Market Emerges](https://www.insurancejournal.com/news/national/2024/09/15/ai-liability-insurance/) (September 2024)

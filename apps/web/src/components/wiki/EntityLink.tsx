@@ -7,6 +7,8 @@ import styles from "./tooltip.module.css";
 
 interface EntityLinkProps {
   id: string;
+  /** Optional cross-check: entity slug that id should resolve to. Validated at build time. */
+  name?: string;
   label?: string;
   children?: React.ReactNode;
   showIcon?: boolean;
@@ -36,6 +38,7 @@ function formatIdAsTitle(id: string): string {
 
 export function EntityLink({
   id,
+  name: _name,
   label,
   children,
   showIcon = false,
