@@ -25,3 +25,8 @@
   agency: ai-directed
   requestedBy: runner
   note: "Improved (standard): Review and incorporate recent developments: The Emergence of Lab-Driven Alignment Signatures: A Psyc"
+- date: 2026-02-20
+  tool: crux-grade
+  agency: automated
+  requestedBy: system
+  note: "Quality graded: 68, readerImportance: 72.5"

@@ -18,6 +18,7 @@
  *   --parallel N       Process N pages concurrently (default: 1)
  *   --category X       Only process pages in category
  *   --skip-graded      Skip pages that already have readerImportance set
+ *   --unscored         Only process pages without a quality score (currentQuality === null)
  *   --output FILE      Write results to JSON file
  *   --apply            Apply grades directly to frontmatter
  *   --skip-warnings    Skip Steps 1-2, just rate (backward compat)
@@ -60,6 +61,7 @@ function parseOptions(argv: string[]): Options {
     limit: parsed.limit ? parseInt(parsed.limit as string) : null,
     category: (parsed.category as string) || null,
     skipGraded: parsed['skip-graded'] === true,
+    unscoredOnly: parsed['unscored'] === true,
     output: (parsed.output as string) || OUTPUT_FILE,
     apply: parsed.apply === true,
     parallel: parsed.parallel ? parseInt(parsed.parallel as string) : 1,
@@ -227,13 +229,19 @@ async function main(): Promise<void> {
     console.log(`Filtered to ${pages.length} pages without readerImportance`);
   }
 
+  if (options.unscoredOnly) {
+    pages = pages.filter(p => p.currentQuality === null);
+    console.log(`Filtered to ${pages.length} pages without quality score`);
+  }
+
   // Skip overview pages, stubs, non-graded formats, and internal files
   const skippedOverview: number = pages.filter(p => p.pageType === 'overview').length;
   const skippedStub: number = pages.filter(p => p.pageType === 'stub').length;
   const nonGradedFormats = ['index', 'dashboard'];
   const skippedFormat: number = pages.filter(p => nonGradedFormats.includes(p.contentFormat)).length;
-  pages = pages.filter(p => p.pageType === 'content' && !p.id.startsWith('_') && !nonGradedFormats.includes(p.contentFormat));
-  console.log(`Filtered to ${pages.length} content pages (skipped ${skippedOverview} overview, ${skippedStub} stub, ${skippedFormat} non-graded format)`);
+  const skippedInternal: number = pages.filter(p => p.category === 'internal').length;
+  pages = pages.filter(p => p.pageType === 'content' && !p.id.startsWith('_') && !nonGradedFormats.includes(p.contentFormat) && p.category !== 'internal');
+  console.log(`Filtered to ${pages.length} content pages (skipped ${skippedOverview} overview, ${skippedStub} stub, ${skippedFormat} non-graded format, ${skippedInternal} internal)`);
 
   if (options.limit) {
     pages = pages.slice(0, options.limit);
