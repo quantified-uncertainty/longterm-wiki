@@ -13,6 +13,8 @@ lastEdited: "2026-02-04"
 update_frequency: 60
 evergreen: true
 ---
+import {EntityLink} from '@components/wiki';
+
 
 Internal documentation becomes stale quickly. This page outlines strategies for keeping internal pages (served at `/wiki/E<id>`) accurate.
 
@@ -36,7 +38,7 @@ Technical documentation rots because:
 When code implements behavior documented elsewhere, add a comment:
 
 ```javascript
-// Docs: /wiki/E759#source-fetching
+// Docs: /internal/content-database/#source-fetching
 async function fetchSource(url) {
   // ...
 }
@@ -83,9 +85,9 @@ Schedule quarterly reviews of key docs:
 
 | Doc | Review Focus |
 |-----|--------------|
-| [Architecture](/wiki/E734) | Are diagrams still accurate? |
-| [Automation Tools](/wiki/E757) | Do all commands still work? |
-| [Content Database](/wiki/E759) | Is schema current? |
+| <EntityLink id="architecture">Architecture</EntityLink> | Are diagrams still accurate? |
+| <EntityLink id="automation-tools">Automation Tools</EntityLink> | Do all commands still work? |
+| <EntityLink id="content-database">Content Database</EntityLink> | Is schema current? |
 
 ---
 
@@ -213,17 +215,17 @@ When reviewing a PR that touches `/scripts/`:
 
 | Changed File | Update These Docs |
 |--------------|-------------------|
-| `scripts/content/page-creator.mjs` | [Architecture](/wiki/E734), [Automation Tools](/wiki/E757) |
-| `scripts/lib/knowledge-db.mjs` | [Content Database](/wiki/E759), [Architecture](/wiki/E734) |
-| `scripts/crux.mjs` or `commands/*` | [Automation Tools](/wiki/E757) |
-| `src/content.config.ts` | [Page Types](/wiki/E739) |
-| Any validation script | [Automation Tools](/wiki/E757) |
-| `.env` variables | [Architecture](/wiki/E734#environment-variables) |
+| `scripts/content/page-creator.mjs` | <EntityLink id="architecture">Architecture</EntityLink>, <EntityLink id="automation-tools">Automation Tools</EntityLink> |
+| `scripts/lib/knowledge-db.mjs` | <EntityLink id="content-database">Content Database</EntityLink>, <EntityLink id="architecture">Architecture</EntityLink> |
+| `scripts/crux.mjs` or `commands/*` | <EntityLink id="automation-tools">Automation Tools</EntityLink> |
+| `src/content.config.ts` | <EntityLink id="page-types">Page Types</EntityLink> |
+| Any validation script | <EntityLink id="automation-tools">Automation Tools</EntityLink> |
+| `.env` variables | <EntityLink id="architecture">Architecture</EntityLink> |
 
 ---
 
 ## Related
 
-- [Architecture](/wiki/E734) - System overview
-- [Automation Tools](/wiki/E757) - CLI reference
-- [About This Wiki](/wiki/E755) - Contributor overview
+- <EntityLink id="architecture">Architecture</EntityLink> - System overview
+- <EntityLink id="automation-tools">Automation Tools</EntityLink> - CLI reference
+- <EntityLink id="about-this-wiki">About This Wiki</EntityLink> - Contributor overview

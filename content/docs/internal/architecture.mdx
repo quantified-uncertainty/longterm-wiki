@@ -133,7 +133,7 @@ Resolution at runtime supports both numeric IDs and slugs, so `<EntityLink id="E
 
 The system merges two backlink sources intelligently:
 - **Explicit YAML** `relatedEntries` (semantic, directional)
-- **MDX content scans** for `<EntityLink id="X">` (implicit, extracted by regex)
+- **MDX content scans** for EntityLink components (implicit, extracted by regex)
 
 Content scanning happens before raw MDX is stripped from the build output, creating an inbound-link map that's deduplicated by ID. This means every entity knows both who links to it and who it links to, without manual maintenance.
 
@@ -383,7 +383,7 @@ erDiagram
     }
 `} />
 
-**See**: [Content Database](/wiki/E759) for full schema and API reference.
+**See**: <EntityLink id="content-database">Content Database</EntityLink> for full schema and API reference.
 
 ### Page Creation Pipeline
 
@@ -434,7 +434,7 @@ flowchart LR
 
 **Cost tiers**: budget (\$2-3), standard (\$4-6), premium (\$8-12) for create; polish (\$2-3), standard (\$5-8), deep (\$10-15) for improve.
 
-**See**: [Page Creator Pipeline](/wiki/E747) for experiment results.
+**See**: <EntityLink id="page-creator-pipeline">Page Creator Pipeline</EntityLink> for experiment results.
 
 ### Crux CLI
 
@@ -625,9 +625,9 @@ This architecture documentation should be updated when:
 
 ## Related Documentation
 
-- [About This Wiki](/wiki/E755) — Contributor overview
-- [Content Database](/wiki/E759) — SQLite schema and API
-- [Automation Tools](/wiki/E757) — CLI reference
-- [Page Creator Pipeline](/wiki/E747) — Generation experiments
-- [Schema Overview](/wiki/E781) — Entity types and data relationships
-- [Entity Reference](/wiki/E752) — Complete entity type catalog
+- <EntityLink id="about-this-wiki">About This Wiki</EntityLink> — Contributor overview
+- <EntityLink id="content-database">Content Database</EntityLink> — SQLite schema and API
+- <EntityLink id="automation-tools">Automation Tools</EntityLink> — CLI reference
+- <EntityLink id="page-creator-pipeline">Page Creator Pipeline</EntityLink> — Generation experiments
+- [Schema Overview](/internal/schema/) — Entity types and data relationships
+- <EntityLink id="entities">Entity Reference</EntityLink> — Complete entity type catalog

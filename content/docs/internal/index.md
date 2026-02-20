@@ -8,33 +8,35 @@ sidebar:
 entityType: internal
 evergreen: true
 ---
+import {EntityLink} from '@components/wiki';
+
 
 This section contains internal documentation for maintaining and contributing to the knowledge base.
 
 ## Getting Started
 
-- [About This Wiki](/wiki/E755) - Comprehensive overview of how the wiki works, technical architecture, and content organization
+- <EntityLink id="about-this-wiki">About This Wiki</EntityLink> - Comprehensive overview of how the wiki works, technical architecture, and content organization
 
 ## Automation and Tools
 
-- [Automation Tools](/wiki/E757) - Complete reference for all scripts and CLI workflows
-- [Content Database](/wiki/E759) - SQLite-based system for indexing and AI summaries
+- <EntityLink id="automation-tools">Automation Tools</EntityLink> - Complete reference for all scripts and CLI workflows
+- <EntityLink id="content-database">Content Database</EntityLink> - SQLite-based system for indexing and AI summaries
 
 ## Style Guides
 
-- [Knowledge Base Style Guide](/wiki/E763) - Guidelines for risk and response pages (kb-2.0)
-- [Model Style Guide](/wiki/E737) - Guidelines for analytical model pages
-- [Mermaid Diagrams](/wiki/E735) - How to create diagrams
+- <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> - Guidelines for risk and response pages (kb-2.0)
+- <EntityLink id="models">Model Style Guide</EntityLink> - Guidelines for analytical model pages
+- <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> - How to create diagrams
 
 ## Project Management
 
-- [Enhancement Queue](/wiki/E761) - Track content enhancement progress across all page types
-- [Project Roadmap](/wiki/E810) - Future work, infrastructure improvements, and tracking
+- <EntityLink id="enhancement-queue">Enhancement Queue</EntityLink> - Track content enhancement progress across all page types
+- <EntityLink id="project-roadmap">Project Roadmap</EntityLink> - Future work, infrastructure improvements, and tracking
 
 ## Technical Reports
 
-- [Internal Reports](/wiki/E780) - Technical research and design decisions
-  - [Causal Diagram Visualization](/wiki/E743) - Tools, literature, and best practices
+- [Internal Reports](/internal/reports/) - Technical research and design decisions
+  - <EntityLink id="causal-diagram-visualization">Causal Diagram Visualization</EntityLink> - Tools, literature, and best practices
 
 ---
 
@@ -56,4 +58,4 @@ npm run build:data
 npm run dev
 ```
 
-See [Automation Tools](/wiki/E757) for complete command reference.
+See <EntityLink id="automation-tools">Automation Tools</EntityLink> for complete command reference.
