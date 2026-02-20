@@ -285,11 +285,17 @@ OpenAI and Apollo Research's joint work on anti-scheming training highlights fun
 
 ## Who Works on This
 
+### The Benchmarks-to-Real-World Gap
+
+A persistent challenge in evaluation is that benchmarks consistently overestimate real-world performance because they are "clean and contained" while the real world is "messy and open-ended." <EntityLink id="ajeya-cotra">Ajeya Cotra</EntityLink>'s \$25M agent benchmarks RFP at <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (late 2023) explicitly pushed grantees to create harder, more realistic tasks, producing benchmarks like Cybench. A companion \$2--3M RFP funded non-benchmark evidence including the LEAP (Longitudinal Experts on AI Panel) at the Forecasting Research Institute, which tracks predictions from 100--200 AI experts, economists, and superforecasters.
+
+<EntityLink id="metr">METR</EntityLink>'s developer productivity RCT (July 2025) exemplifies the benchmarks-vs-reality gap: experienced open-source developers given AI tools actually performed *slower* than the control group, despite strong benchmark results for AI coding assistants. Cotra argues the field needs more such real-world measures, particularly tracking AI adoption and observed productivity improvements across the full hardware-software stack.
+
 ### Third-Party Evaluators
 
 | Organization | Focus | Key Work |
 |--------------|-------|----------|
-| **METR** | Autonomous capabilities, AI R&D acceleration | Pre-deployment evals for Anthropic, OpenAI; prototyped RSP approach |
+| **METR** | Autonomous capabilities, AI R&D acceleration | Pre-deployment evals for Anthropic, OpenAI; prototyped RSP approach; developer productivity RCT |
 | **Apollo Research** | Scheming, deception, strategic misalignment | In-context scheming evaluations; partnership with OpenAI |
 | **UK AI Security Institute** | Comprehensive frontier model testing | Joint evaluations with US AISI; Frontier AI Trends Report |
 | **US AI Safety Institute (NIST)** | Standards, benchmarks, red-teaming | AISIC consortium; agent hijacking research |

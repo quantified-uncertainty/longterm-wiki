@@ -366,6 +366,38 @@
     - regulation
     - autonomous-weapons
   lastUpdated: 2025-12
+- id: ajeya-cotra
+  numericId: E864
+  type: researcher
+  title: Ajeya Cotra
+  website: https://metr.org
+  relatedEntries:
+    - id: metr
+      type: organization
+    - id: coefficient-giving
+      type: organization
+    - id: holden-karnofsky
+      type: researcher
+    - id: paul-christiano
+      type: researcher
+  customFields:
+    - label: Role
+      value: Member of Technical Staff at METR (formerly Senior Advisor at Coefficient Giving)
+    - label: Known For
+      value: Bio Anchors AI timelines report, AI safety grantmaking, intelligence explosion analysis, crunch time framework
+  sources:
+    - title: 80,000 Hours Podcast - Ajeya Cotra on transformative AI crunch time
+      url: https://80000hours.org/podcast/episodes/ajeya-cotra-transformative-ai-crunch-time/
+    - title: METR - About
+      url: https://metr.org/about
+    - title: Ajeya Cotra's Bio Anchors Report
+      url: https://www.lesswrong.com/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
+  description: >
+    Ajeya Cotra is a member of technical staff at METR (Model Evaluation and Threat Research) and formerly a senior advisor at
+    Coefficient Giving (Open Philanthropy), where she led technical AI safety grantmaking and authored the influential Bio Anchors
+    report on AI timelines. She is among the most respected commentators on AI development trajectories, intelligence explosion
+    dynamics, and the strategic use of early transformative AI for safety work during what she terms "crunch time."
+
 - id: holden-karnofsky
   numericId: E156
   type: researcher
