@@ -48,6 +48,7 @@ interface CommandOptions {
   ci?: boolean;
   type?: string;
   issue?: string;
+  reason?: string;
   [key: string]: unknown;
 }
 
@@ -132,7 +133,13 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   };
 
   // Generate checklist
-  const markdown = buildChecklist(type, metadata);
+  let markdown = buildChecklist(type, metadata);
+
+  // If no issue number, auto-mark issue-tracking as N/A so it's explicit rather than silently unchecked
+  if (!issue) {
+    const naResult = checkItems(markdown, ['issue-tracking'], '~', 'no GitHub issue for this session');
+    markdown = naResult.markdown;
+  }
 
   // Write to file
   writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
@@ -144,6 +151,8 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Branch: ${c.cyan}${metadata.branch}${c.reset}\n`;
   if (issue) {
     output += `  Issue: ${c.cyan}#${issue}${c.reset}\n`;
+  } else {
+    output += `  ${c.dim}issue-tracking auto-marked N/A (no GitHub issue)${c.reset}\n`;
   }
 
   // Count items
@@ -256,7 +265,7 @@ async function complete(_args: string[], options: CommandOptions): Promise<Comma
  *
  * Usage:
  *   crux agent-checklist check read-issue explore-code plan-approach
- *   crux agent-checklist check --na fix-escaping   (mark as N/A)
+ *   crux agent-checklist check --na fix-escaping --reason "pure TypeScript change"   (mark as N/A)
  */
 async function check(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -282,8 +291,17 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   const marker = options.na ? '~' as const : 'x' as const;
+  const reason = typeof options.reason === 'string' ? options.reason.trim() : undefined;
+
+  if (options.na && !reason) {
+    return {
+      output: `${c.red}--reason is required when marking N/A.\n  Example: crux agent-checklist check --na issue-tracking --reason "no GitHub issue for this session"${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
   const markdown = readFileSync(CHECKLIST_PATH, 'utf-8');
-  const result = checkItems(markdown, ids, marker);
+  const result = checkItems(markdown, ids, marker, reason);
 
   if (result.checked.length > 0) {
     writeFileSync(CHECKLIST_PATH, result.markdown, 'utf-8');
@@ -473,6 +491,7 @@ Options:
   --type=TYPE      Task type: content, infrastructure, bugfix, refactor, commands
   --issue=N        Auto-detect type from GitHub issue labels
   --na             Mark items as N/A [~] instead of checked [x] (for \`check\`)
+  --reason=TEXT    Required with --na: short explanation why the item is not applicable
   --ci             JSON output
 
 Type detection from issue labels:
@@ -486,7 +505,7 @@ Examples:
   crux agent-checklist init "Add checklist CLI" --type=commands
   crux agent-checklist init --issue=42
   crux agent-checklist check read-issue explore-code plan-approach
-  crux agent-checklist check --na fix-escaping
+  crux agent-checklist check --na fix-escaping --reason "pure TypeScript change, no MDX files"
   crux agent-checklist verify
   crux agent-checklist status
   crux agent-checklist complete
