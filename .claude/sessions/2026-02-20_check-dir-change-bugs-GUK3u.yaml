@@ -1,0 +1,59 @@
+date: 2026-02-20
+branch: claude/check-dir-change-bugs-GUK3u
+title: Fix CONTENT_SCAN_DIR path bug and add scanEntityLinkRefs tests
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/367
+model: claude-sonnet-4-6
+duration: ~25min
+cost: ~$0.50
+
+summary: |
+  Investigated directory-related bugs following PR #354 (session log path fix).
+  Found that CONTENT_SCAN_DIR in build-data.mjs was computing the wrong path:
+  join(PROJECT_ROOT, '..', 'content', 'docs') resolved to apps/content/docs
+  (non-existent) instead of content/docs. This caused scanEntityLinkRefs to
+  silently return [] for all stability check violations, meaning broken EntityLink
+  refs were never reported during ID stability checks since the feature was introduced.
+  Fixed both scripts to use CONTENT_DIR directly. Also added 9 tests for
+  scanEntityLinkRefs which had zero prior coverage.
+
+pages: []
+
+checks:
+  initialized: true
+  type: bugfix
+  initiated_at: "2026-02-20T07:11:33.575Z"
+  total: 30
+  completed: 24
+  na: 1
+  skipped: 5
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - root-cause
+    - tests-written
+    - no-hardcoded
+    - fix-escaping
+    - fix-minimal
+    - regression-test
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - tooling-gaps-actioned
+
+key_decisions:
+  - "Root cause: build-data.mjs used join(PROJECT_ROOT, '..') which goes to apps/, not repo root. Should be CONTENT_DIR (already imported)."
+  - "assign-ids.mjs was accidentally correct via join(DATA_DIR, '..', 'content', 'docs') = data/../content/docs = content/docs. Unified to CONTENT_DIR."
+  - "Added 9 tests for scanEntityLinkRefs (the I/O layer with zero prior coverage where the bug lived)."
+  - "Benign issues not fixed: CONTENT_DIR_ROOT alias in build-data.mjs:1028 (harmless), PAGES_DIR Astro remnant in validate-internal-links.mjs (existsSync makes it safe)."
