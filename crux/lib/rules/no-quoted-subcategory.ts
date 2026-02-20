@@ -1,12 +1,13 @@
 /**
  * Rule: No Quoted Subcategory Values
  *
- * Subcategory frontmatter values should not be quoted. YAML scalar strings
- * for simple identifiers (like subcategory slugs) don't need quotes, and
- * quoted variants cause inconsistent sidebar grouping when they coexist
- * with unquoted variants of the same value. Starlight reads the raw
- * frontmatter string value, so `subcategory: "labs"` and `subcategory: labs`
- * are treated as different keys and produce separate sidebar sections.
+ * Subcategory frontmatter values should not be quoted. Simple YAML string
+ * scalars (like subcategory slugs) don't need quotes — both `subcategory: labs`
+ * and `subcategory: "labs"` produce the identical parsed value `labs`. Quoting
+ * unnecessarily causes style inconsistency across the codebase, and mixed
+ * quoted/unquoted values have caused sidebar grouping bugs in the past due to
+ * caching or build-pipeline issues where the raw frontmatter text was used
+ * rather than the parsed value.
  *
  * Bad:  subcategory: "labs"
  * Good: subcategory: labs
@@ -41,11 +42,15 @@ export const noQuotedSubcategoryRule = createRule({
 
     const quoteChar = quotedMatch[1]; // " or '
     const unquotedValue = quotedMatch[2]; // the actual value without quotes
-    const matchedText = quotedMatch[0]; // full matched line e.g. "subcategory: \"labs\""
 
-    // Find line number in full file (1-indexed)
-    const matchIndex = raw.indexOf(matchedText);
-    const lineNum = raw.slice(0, matchIndex).split('\n').length;
+    // Compute absolute position of the match using quotedMatch.index (relative to
+    // frontmatterText) plus the offset of frontmatterText within raw. Using the
+    // regex index avoids the raw.indexOf() pitfall where an identical string
+    // earlier in the file would produce a wrong line number.
+    const headerLen = raw.startsWith('---\r\n') ? 5 : 4; // "---\r\n" or "---\n"
+    const frontmatterStart = (fmMatch.index ?? 0) + headerLen;
+    const matchAbsoluteIndex = frontmatterStart + quotedMatch.index;
+    const lineNum = raw.slice(0, matchAbsoluteIndex).split('\n').length;
 
     issues.push(new Issue({
       rule: this.id,
@@ -58,5 +63,3 @@ export const noQuotedSubcategoryRule = createRule({
     return issues;
   },
 });
-
-export default noQuotedSubcategoryRule;

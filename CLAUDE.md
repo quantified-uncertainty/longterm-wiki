@@ -159,10 +159,10 @@ pnpm crux fix escaping              # Auto-fix dollar signs, comparisons, tildes
 pnpm crux fix markdown              # Auto-fix list formatting, bold labels
 pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only  # MUST pass (blocking in CI)
 pnpm crux validate schema           # MUST pass (blocking in CI) — validates YAML entity types, fields
-pnpm crux validate unified --rules=frontmatter-schema --errors-only  # MUST pass (blocking in CI) — validates MDX frontmatter
+pnpm crux validate unified --rules=frontmatter-schema,no-quoted-subcategory --errors-only  # MUST pass (blocking in CI) — validates MDX frontmatter
 pnpm crux validate                  # Full validation (advisory)
 ```
-**Four checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, `unified --rules=frontmatter-schema`, and `unified --rules=numeric-id-integrity`. All must pass before committing.
+**Five checks are blocking CI gates:** `unified --rules=comparison-operators,dollar-signs`, `schema`, `unified --rules=frontmatter-schema,no-quoted-subcategory`, and `unified --rules=numeric-id-integrity`. All must pass before committing.
 
 ### Self-review checklist (before committing any page)
 

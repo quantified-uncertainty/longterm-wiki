@@ -711,7 +711,7 @@ describe('no-quoted-subcategory rule', () => {
     });
     const issues = noQuotedSubcategoryRule.check(content, {});
     expect(issues.length).toBe(1);
-    expect(issues[0].message).toContain('alignment');
+    expect(issues[0].message).toContain("subcategory: 'alignment'");
     expect(issues[0].severity).toBe(Severity.ERROR);
   });
 
@@ -736,7 +736,9 @@ describe('no-quoted-subcategory rule', () => {
   });
 
   it('does not flag subcategory-like text in the page body', () => {
-    const raw = '---\ntitle: Test\n---\nsubcategory: "labs" appears in body text';
+    // Proper frontmatter (no subcategory field) + body text that looks like subcategory.
+    // The closing --- ensures frontmatter extraction actually runs and excludes the body.
+    const raw = '---\ntitle: Test\n---\n\nHere subcategory: "labs" appears in body text';
     const content = mockContent('subcategory: "labs" appears in body text', {
       raw,
       frontmatter: { title: 'Test' },
@@ -765,6 +767,20 @@ describe('no-quoted-subcategory rule', () => {
     const issues = noQuotedSubcategoryRule.check(content, {});
     expect(issues.length).toBe(1);
     // subcategory is on line 4 in this file (after ---, title, description)
+    expect(issues[0].line).toBe(4);
+  });
+
+  it('reports correct line number even when the matched text appears earlier in the file', () => {
+    // Edge case: description field contains text identical to the subcategory line.
+    // With raw.indexOf() this would return the wrong (earlier) line; with quotedMatch.index it's correct.
+    const raw = '---\ntitle: Test\ndescription: subcategory: "labs"\nsubcategory: "labs"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', description: 'subcategory: "labs"', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    // subcategory is on line 4, NOT line 3 (where description contains identical text)
     expect(issues[0].line).toBe(4);
   });
 });
