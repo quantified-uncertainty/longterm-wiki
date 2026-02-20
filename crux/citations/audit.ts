@@ -172,8 +172,16 @@ async function main() {
     process.exit(0);
   }
 
-  // ── Step 4: Re-verify ─────────────────────────────────────────────────
-  console.log(`\n${c.bold}Step 4: Re-verify${c.reset}\n`);
+  // ── Step 4: Re-extract + Re-verify ─────────────────────────────────────
+  // After fixing the page, claim_text in SQLite is stale (from Step 1).
+  // Re-extract quotes to update claim_text before re-verifying accuracy.
+  console.log(`\n${c.bold}Step 4: Re-extract & Re-verify${c.reset}\n`);
+
+  const updatedRaw = readFileSync(filePath, 'utf-8');
+  const updatedBody = stripFrontmatter(updatedRaw);
+  console.log(`  Re-extracting claims from updated page...`);
+  await extractQuotesForPage(pageId, updatedBody, { verbose: false, recheck: true });
+  console.log(`  Re-checking accuracy...\n`);
 
   const reVerify = await checkAccuracyForPage(pageId, {
     verbose: true,

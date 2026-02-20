@@ -27,6 +27,7 @@ import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/
 import { appendEditLog } from '../lib/edit-log.ts';
 import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
+import { extractQuotesForPage } from './extract-quotes.ts';
 import { exportDashboardData } from './export-dashboard.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 
@@ -205,18 +206,17 @@ You are given:
 - The issue description explaining what's wrong
 - Source evidence: passages from the cited source showing what it actually says
 
-Your job is to generate MINIMAL, TARGETED fixes. Rules:
+Generate fixes that make the wiki text accurately reflect the cited source. Rules:
 
-1. Make the SMALLEST change possible to fix the issue
-2. Prefer softening language over removal ("X is Y" → "X may be Y", "X reportedly Y")
-3. For wrong facts (dates, numbers): replace with the correct value from the SOURCE EVIDENCE provided. Do NOT guess — use the exact values from the source.
-4. For unsupported claims: either soften with "reportedly" / "according to other sources" or remove the specific footnote reference [^N] if the claim itself is reasonable but the source doesn't support it
-5. For fabricated details: remove the specific fabricated parts while keeping accurate parts
+1. Use the SOURCE EVIDENCE to determine what's correct. Replace wrong facts, names, numbers, and dates with the correct values from the source. Do NOT guess — use the exact values the source provides.
+2. If the source says something substantially different from the wiki, rewrite the claim to match the source. Larger rewrites are fine when the original is substantially wrong.
+3. For unsupported claims (source doesn't address the topic at all): either remove the footnote reference [^N] if the claim might still be true from other sources, or remove/rewrite the claim if it appears fabricated.
+4. For overclaims: tone down the language to match what the source actually supports.
+5. Keep accurate parts of claims intact — only change what's wrong.
 6. NEVER change footnote definitions (lines starting with [^N]:)
 7. NEVER add new footnotes or alter MDX components like <EntityLink>
-8. NEVER rewrite whole sections — fix only the specific problematic text
-9. The "original" text must be an EXACT substring of the page content
-10. Keep "original" as short as possible while being unique in the page
+8. The "original" text must be an EXACT substring of the page content
+9. Keep "original" as short as possible while being unique in the page
 
 Return a JSON array of fix objects. If no fix is needed (e.g., the issue is with the source, not the wiki), return an empty array.
 
@@ -227,7 +227,7 @@ JSON format:
     "original": "exact text from the page",
     "replacement": "fixed text",
     "explanation": "brief reason for the change",
-    "fix_type": "soften|correct|remove_ref|remove_detail"
+    "fix_type": "rewrite|correct|soften|remove_ref|remove_detail"
   }
 ]
 
@@ -660,7 +660,19 @@ async function main() {
 
       try {
         if (!json) {
-          process.stdout.write(`  ${pageId}: re-checking... `);
+          process.stdout.write(`  ${pageId}: re-extracting claims... `);
+        }
+
+        // Re-extract claims from the updated page to update claim_text in SQLite
+        const filePath = findPageFile(pageId);
+        if (filePath) {
+          const updatedRaw = readFileSync(filePath, 'utf-8');
+          const updatedBody = stripFrontmatter(updatedRaw);
+          await extractQuotesForPage(pageId, updatedBody, { verbose: false, recheck: true });
+        }
+
+        if (!json) {
+          process.stdout.write(`re-checking... `);
         }
         const result = await checkAccuracyForPage(pageId, {
           verbose: false,
