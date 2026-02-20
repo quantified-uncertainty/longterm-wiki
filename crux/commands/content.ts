@@ -43,6 +43,12 @@ const SCRIPTS: Record<string, ScriptConfig> = {
     description: 'Post-improvement cleanup and polish',
     passthrough: ['ci'],
   },
+  'suggest-links': {
+    script: 'authoring/suggest-links.ts',
+    description: 'Suggest relatedEntries cross-links for entities',
+    passthrough: ['type', 'entity', 'minScore', 'limit', 'apply', 'json', 'ci', 'help'],
+    positional: true,
+  },
 };
 
 export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = buildCommands(SCRIPTS);
@@ -71,7 +77,11 @@ Options:
   --warnings-only   Run Steps 1-2 only, skip rating (grade-content)
   --unscored        Only process pages without a quality score (grade-content)
   --api-direct      Use Anthropic API directly instead of Claude CLI (create)
+  --type=<t>        Entity type filter (suggest-links)
+  --entity=<id>     Analyze specific entity (suggest-links)
+  --min-score=<n>   Minimum suggestion score, default 2 (suggest-links)
   --dry-run         Preview without changes
+  --apply           Apply changes (suggest-links, improve)
   --verbose         Detailed output
 
 Examples:
@@ -82,5 +92,7 @@ Examples:
   crux content grade-content --page my-page --warnings-only
   crux content grade-content --page my-page --apply
   crux content polish
+  crux content suggest-links --type=organization
+  crux content suggest-links --type=organization --min-score=3 --apply
 `;
 }
