@@ -3,8 +3,8 @@ title: OpenAI
 description: Leading AI lab that developed GPT models and ChatGPT, analyzing organizational evolution from non-profit research to commercial AGI development amid safety-commercialization tensions
 sidebar:
   order: 2
-llmSummary: Comprehensive organizational profile of OpenAI documenting evolution from 2015 non-profit to Public Benefit Corporation, with detailed analysis of governance crisis, 2024-2025 ownership restructuring (non-profit retaining ~26% equity stake, Microsoft transitioning to direct equity, Sam Altman seeking 7% equity), key leadership departures, and capability advancement (o1/o3 reasoning models). Updated with 2025 developments including o3-mini release, 800M weekly active users, and Altman's AGI timeline statements.
-lastEdited: "2026-02-19"
+llmSummary: Comprehensive organizational profile of OpenAI documenting evolution from 2015 non-profit to Public Benefit Corporation, with detailed analysis of governance crisis, 2024-2025 ownership restructuring (conversion from capped-profit LLC to PBC, with specific post-conversion equity percentages subject to regulatory finalization), key leadership departures, and capability advancement (o1/o3 reasoning models). Updated with 2025 developments including o3-mini release, 800M weekly active users, and Altman's AGI timeline statements.
+lastEdited: "2026-02-20"
 readerImportance: 33.5
 researchImportance: 44.5
 update_frequency: 3
@@ -28,28 +28,26 @@ import {DataInfoBox, DisagreementMap, KeyPeople, KeyQuestions, Section, R, Entit
 
 ## Overview
 
-OpenAI is the AI research company that catalyzed mainstream artificial intelligence adoption through ChatGPT and the GPT model series. Founded in 2015 as a non-profit with the mission to ensure AGI benefits humanity, OpenAI has undergone significant organizational evolution: from open research lab to secretive commercial entity, from safety-focused non-profit to product-driven corporation racing toward AGI.
+OpenAI is the AI research company that catalyzed mainstream artificial intelligence adoption through ChatGPT and the GPT model series. Founded in 2015 as a non-profit with the mission to ensure AGI benefits humanity, OpenAI has undergone significant organizational evolution: from open research lab to commercial entity, and from a non-profit governance structure to a Public Benefit Corporation pursuing stated AGI development goals.
 
-The company achieved breakthrough capabilities through massive scale (<F e="openai" f="7c9b9073">175B parameters</F> for GPT-3), pioneered <EntityLink id="rlhf">Reinforcement Learning from Human Feedback</EntityLink> as a practical alignment technique, and launched ChatGPT—reaching 800 million weekly active users by October 2025[^1] and maintaining 81.13% market share in generative AI[^2]. However, OpenAI's trajectory has involved contested tensions between commercial pressures and safety priorities, exemplified by the November 2023 board crisis that temporarily ousted CEO <EntityLink id="sam-altman">Sam Altman</EntityLink> and the 2024 departures of key safety researchers including co-founder <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink>.
+The company achieved capability advances through massive scale (<F e="openai" f="7c9b9073">175B parameters</F> for GPT-3), pioneered <EntityLink id="rlhf">Reinforcement Learning from Human Feedback</EntityLink> as a practical alignment technique, and launched ChatGPT—reaching 800 million weekly active users by October 2025[^1] and maintaining 81.13% market share in generative AI[^2]. OpenAI's trajectory has involved ongoing tensions between commercial pressures and safety priorities, exemplified by the November 2023 board crisis that temporarily ousted CEO <EntityLink id="sam-altman">Sam Altman</EntityLink> and the 2024 departures of key safety researchers including co-founder <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink>.
 
-With over \$13 billion in <EntityLink id="microsoft">Microsoft</EntityLink> investment and aggressive capability advancement through reasoning models like o1 and the recent o3-mini release[^3], OpenAI sits at the center of debates about AI safety governance, racing dynamics, and whether commercial incentives can align with existential risk mitigation. In 2024–2025, the company undertook a formal legal restructuring from a capped-profit LLC to a Public Benefit Corporation (PBC), a transition with significant implications for ownership, governance, and mission accountability.
+With over \$13 billion in <EntityLink id="microsoft">Microsoft</EntityLink> investment and capability advancement through reasoning models like o1 and the recent o3-mini release[^3], OpenAI sits at the center of debates about AI safety governance, racing dynamics, and whether commercial incentives can align with existential risk mitigation. In 2024–2025, the company undertook a formal legal restructuring from a capped-profit LLC to a Public Benefit Corporation (PBC), a transition with significant implications for ownership, governance, and mission accountability.
 
 ## Ownership Structure
 
-OpenAI's 2024–2025 conversion from a capped-profit LLC to a Public Benefit Corporation (PBC) substantially altered how equity and economic interests are distributed among stakeholders. Under the previous structure, Microsoft held approximately 49% of capped profits in exchange for its multi-billion-dollar investment, while the non-profit board nominally controlled the organization's mission. The PBC restructuring replaced profit-share arrangements with direct equity stakes and introduced new stakeholder claims—most notably, a proposed equity grant to CEO Sam Altman, who held no equity under the original charter. The terms below reflect reported figures as of early 2025; some details remain subject to regulatory review, including oversight by the California Attorney General. {/* NEEDS CITATION */}
+OpenAI's 2024–2025 conversion from a capped-profit LLC to a Public Benefit Corporation (PBC) substantially altered how equity and economic interests are distributed among stakeholders. Under the previous structure, Microsoft held approximately 49% of capped profits in exchange for its multi-billion-dollar investment, while the non-profit board nominally controlled the organization's mission. The PBC restructuring replaced profit-share arrangements with direct equity stakes and introduced new stakeholder claims—most notably, a proposed equity grant to CEO Sam Altman, who held no equity under the original charter. The restructuring requires approval from the California Attorney General, given OpenAI's non-profit origins and California incorporation, and specific post-conversion equity percentages remain subject to regulatory finalization.
 
-| Stakeholder | Interest Type | Ownership % (Reported) | Estimated Value (at ≈\$300B valuation) | Notes |
-|-------------|--------------|------------------------|----------------------------------------|-------|
-| **OpenAI Non-Profit Foundation** | Direct equity stake (post-PBC conversion) | ≈26% | ≈\$78B | Retained equity stake to fund charitable mission; exact governance rights over equity management under review. Reported by Bloomberg and Financial Times. {/* NEEDS CITATION */} |
-| **Microsoft** | Transitioning from 49% capped-profit share to direct equity | ≈2.5% direct equity (post-restructuring) | ≈\$7.5B direct equity; \$13B+ total invested | Original structure gave Microsoft 49% of profits up to a return cap; PBC restructuring converts this to a smaller direct equity stake. Terms reflect reported figures. {/* NEEDS CITATION */} |
-| **Sam Altman** | Proposed equity grant (not yet finalized) | 0% current (per original charter); seeking ≈7% | ≈\$21B if granted at ≈\$300B valuation | Under OpenAI's original non-profit charter, Altman received no equity. The 7% figure was reported by the Financial Times as part of restructuring negotiations. {/* NEEDS CITATION */} |
-| **Employee equity pool** | Equity compensation | ≈10–15% (estimated) | ≈\$30–45B | Vesting schedules and total pool size subject to board approval as part of restructuring; estimates based on industry norms and reporting. {/* NEEDS CITATION */} |
-| **SoftBank** | Structured investment / equity | Terms not fully disclosed | Investment reported at \$500M+ | SoftBank's Masayoshi Son has engaged with OpenAI as a strategic investor; equity stake terms not publicly confirmed as of early 2025. {/* NEEDS CITATION */} |
-| **Other institutional investors** | Equity (2024 funding round) | Collectively ~remaining cap table | Proportional to stakes | October 2024 funding round led by Thrive Capital at \$157B valuation; Tiger Global, Khosla Ventures among participants. {/* NEEDS CITATION */} |
+| Stakeholder | Interest Type | Notes |
+|-------------|--------------|-------|
+| **OpenAI Non-Profit Foundation** | Direct equity stake (post-PBC conversion) | Retains an equity stake to fund charitable mission; exact percentage and governance rights over equity management subject to regulatory review |
+| **Microsoft** | Transitioning from capped-profit share to direct equity | Original structure gave Microsoft 49% of profits up to a return cap; PBC restructuring converts this to a direct equity stake. Final terms subject to ongoing negotiation and regulatory approval |
+| **Sam Altman** | No equity under original charter; proposed equity grant under discussion | Under OpenAI's original non-profit charter, Altman received no equity. A proposed equity grant is reported to be part of restructuring negotiations; terms not finalized |
+| **October 2024 funding round investors** | Equity (primary round) | October 2024 funding round led by Thrive Capital at <F e="openai" f="6ce1d805">\$157B valuation</F>; Tiger Global, Khosla Ventures among reported participants |
 
-**Valuation context:** OpenAI's October 2024 funding round valued the company at <F e="openai" f="6ce1d805">\$157B</F>. Secondary market transactions in late 2025 suggested valuations approaching \$300B, though this figure had not been confirmed via a primary funding round as of early 2025. {/* NEEDS CITATION */}
+**Valuation context:** OpenAI's October 2024 funding round valued the company at <F e="openai" f="6ce1d805">\$157B</F>. Secondary market activity has suggested higher valuations in subsequent months, though no primary funding round had confirmed those figures as of early 2025.
 
-**Regulatory context:** The restructuring requires approval from the California Attorney General, given OpenAI's non-profit origins and California incorporation. Elon Musk filed a lawsuit seeking to block the conversion, arguing it would improperly redirect charitable assets to private benefit; the legal status of both the lawsuit and the restructuring remained ongoing as of early 2025. {/* NEEDS CITATION */}
+**Regulatory context:** The restructuring requires approval from the California Attorney General, given OpenAI's non-profit origins. Legal challenges to the conversion have been filed by outside parties; the status of those proceedings remained ongoing as of early 2025.
 
 ## Recent Developments (2024-2025)
 
@@ -58,9 +56,8 @@ OpenAI's 2024–2025 conversion from a capped-profit LLC to a Public Benefit Cor
 | Model | Release Date | Key Capabilities | Performance | Strategic Impact |
 |-------|--------------|------------------|-------------|------------------|
 | **o1 (December 2024)** | December 2024 | Full reasoning model release | Advanced mathematical/scientific reasoning | Demonstrated test-time compute scaling |
-| **GPT-5.2** | December 2025 | Professional task optimization | Better at spreadsheets, presentations, image perception[^4] | Enhanced enterprise value proposition |
 | **o3-mini** | January 31, 2025 | Latest reasoning model | More efficient reasoning capabilities[^5] | Broader reasoning model availability |
-| **Sora 2** | 2025 | Video and audio generation | Enhanced video creation with audio[^6] | Multimodal generation leadership |
+| **Sora 2** | 2025 | Video generation | Enhanced video creation[^6] | Multimodal generation |
 
 ### Market Dominance and Financial Performance
 
@@ -102,11 +99,11 @@ In January 2025, CEO Sam Altman made notably confident statements about AGI deve
 - Capability to "materially change the output of companies"
 - Acknowledgment that "AGI has become a very sloppy term"
 
-**Strategic Implications:**
-- Represents an acceleration in OpenAI's public AGI timeline relative to prior statements
-- Suggests internal confidence in current technical trajectory
-- May influence competitive dynamics and regulatory responses
-- Contrasts with more cautious statements from other industry voices
+**Context:**
+- These statements are among the most specific public predictions Altman has made regarding AGI timelines
+- Some observers interpret this as an acceleration relative to prior public statements; Altman has made optimistic statements at various points and his characterization of what "AGI" means has evolved over time
+- The statements may influence competitive dynamics and regulatory responses
+- Other industry voices have offered more cautious assessments of near-term AGI timelines
 
 ## Risk Assessment
 
@@ -176,18 +173,17 @@ The following risk assessments synthesize published views from safety researcher
 
 ### Capability Comparison (Late 2025)
 
-| Company | Latest Model | Key Strengths | Market Position | Competitive Response |
-|---------|--------------|---------------|-----------------|---------------------|
-| **OpenAI** | GPT-5.2, o3-mini | Reasoning (100% AIME 2025), broad capabilities | Market leader (81% share) | Continuous releases, AGI timeline statements |
-| **<EntityLink id="anthropic">Anthropic</EntityLink>** | Claude Opus 4.5 | Safety research, coding (80.9% SWE-bench) | Strong challenger (32% enterprise LLM share) | Enterprise coding focus (42% market share) |
-| **Google** | Gemini 2.5 | Research depth, multimodal, integration | Significant technology position | Increased deployment urgency |
-| **<EntityLink id="meta-ai">Meta AI</EntityLink>** | Llama 4 | Open source approach | Alternative paradigm | Democratizing access |
+| Company | Latest Model | Key Strengths | Market Position |
+|---------|--------------|---------------|-----------------|
+| **OpenAI** | o3-mini, o1 | Reasoning capabilities, broad deployment | Market leader (81% generative AI share) |
+| **<EntityLink id="anthropic">Anthropic</EntityLink>** | Claude (current series) | Safety research emphasis, coding benchmarks | Strong challenger in enterprise segment |
+| **Google** | Gemini 2.5 | Research depth, multimodal, integration | Significant technology position |
+| **<EntityLink id="meta-ai">Meta AI</EntityLink>** | Llama 4 | Open source approach | Alternative paradigm |
 
-**Performance Benchmarks:**
-- Claude Opus 4.5 leads coding benchmarks (80.9% SWE-bench Verified, 42% enterprise coding share)
-- GPT-5.2 leads mathematical reasoning (100% AIME 2025, 40.3% FrontierMath)
-- Enterprise LLM market has shifted: Anthropic at 32%, OpenAI at 25% (Menlo Ventures)
-- Context length and safety remain key Anthropic differentiators
+**Performance Benchmarks (o1 series):**
+- o1 leads mathematical reasoning: <F e="openai" f="84af6115">83%</F> on AIME math competition
+- o1 on SWE-bench Verified: <F e="openai" f="25d2308f">71.7%</F>
+- Context length and safety remain key differentiators across providers
 
 ## Developer Ecosystem and Business Strategy
 
@@ -213,18 +209,16 @@ The following risk assessments synthesize published views from safety researcher
 - Projected 2024 revenue: \$3.4 billion (ChatGPT subscriptions + API)[^32]
 - Growth rate: <F e="openai" f="be463d29">1,700%</F> from early 2023 to September 2024
 - Operating losses: \$5 billion in 2024 despite revenue growth[^33]
-- Primary cost drivers: compute infrastructure, talent acquisition, research investment
+- Primary cost drivers: compute infrastructure, talent acquisition, research investment. OpenAI leadership has characterized these losses as reflecting deliberate investment in infrastructure and talent rather than financial distress.
 
 ### Microsoft Partnership
 
 | Component | Details | Strategic Implications |
 |-----------|---------|----------------------|
-| **Investment** | <F e="openai" f="931278d9">\$13B+</F> total; 49% profit share under original structure (transitioning to ≈2.5% direct equity under PBC) | Creates commercial pressure for rapid deployment; restructuring alters long-term alignment |
+| **Investment** | <F e="openai" f="931278d9">\$13B+</F> total; 49% profit share under original structure (transitioning to direct equity under PBC restructuring; final terms subject to regulatory approval) | Creates commercial pressure for rapid deployment; restructuring alters long-term economic alignment |
 | **Compute Access** | Exclusive Azure partnership | Enables massive model training but creates infrastructure dependency |
 | **Product Integration** | Bing, Office 365, GitHub Copilot | Drives revenue but requires consumer-ready systems |
 | **API Monetization** | Enterprise and developer access | Success depends on maintaining capability lead |
-
-The transition from a profit-share arrangement to direct equity under the PBC structure changes Microsoft's long-term economic position: rather than receiving up to 49% of profits until a return cap is reached, Microsoft would hold a smaller permanent equity stake with corresponding governance rights. The practical implications for Microsoft's influence over operational decisions remain subject to the final restructuring terms. {/* NEEDS CITATION */}
 
 ## Governance Crisis Analysis
 
@@ -239,7 +233,7 @@ The transition from a profit-share arrangement to direct equity under the PBC st
 **Structural observations (contested interpretations):**
 - The episode demonstrated that employee and investor sentiment significantly constrained the non-profit board's practical authority
 - Critics argue the reconstituted board has reduced independence from commercial leadership; OpenAI leadership contends the new board has greater relevant expertise
-- The Microsoft partnership's scale creates financial interdependencies that influence operational decisions; the degree to which this constitutes a "veto" over safety-motivated decisions is disputed
+- The Microsoft partnership's scale creates financial interdependencies that influence operational decisions; the degree to which this constitutes a constraint over safety-motivated decisions is disputed
 - The episode is cited by governance scholars as a case study in the practical limits of non-profit oversight of commercial AI operations
 
 ## Key Leadership Departures (2024)
@@ -359,14 +353,14 @@ The following departures occurred in 2024. Stated reasons varied across individu
 ### External Safety Community Assessment
 
 **Academic and Safety Researcher Views:**
-- <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>: Has raised concerns about commercial mission drift from original safety focus
-- <EntityLink id="stuart-russell">Stuart Russell</EntityLink>: Has warned about commercial capture of safety research priorities
-- Former OpenAI safety researchers (Leike, Schulman): Cited systematic deprioritization of safety relative to capabilities in public departure statements
+- <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>: Has publicly expressed concern about commercial mission drift from original safety focus
+- <EntityLink id="stuart-russell">Stuart Russell</EntityLink>: Has publicly warned about commercial capture of safety research priorities
+- Former OpenAI safety researchers (Leike, Schulman): Cited systematic deprioritization of safety relative to capabilities in public departure statements[^34]
 
 **Policy and Governance Experts:**
 - External oversight mechanisms beyond self-regulation have been advocated by multiple governance researchers
 - Concentration of AGI development in a single organization raises questions about democratic accountability
-- The PBC restructuring has been assessed by legal scholars as a structural improvement over the capped-profit LLC for mission preservation, though critics argue it remains insufficient
+- Legal scholars have assessed the PBC structure as a formal improvement over the capped-profit LLC for mission preservation; critics argue it remains an insufficient safeguard without stronger enforcement mechanisms
 
 ## Future Trajectories and Critical Decisions
 
@@ -420,7 +414,7 @@ The following departures occurred in 2024. Stated reasons varied across individu
 ### Recent Announcements and Performance
 | Source | Type | Key Content | Link |
 |--------|------|-------------|------|
-| Sora 2 Release | Product announcement | Video and audio generation capabilities | [Sora 2 Launch](https://openai.com/index/sora-2/) |
+| Sora 2 Release | Product announcement | Video generation capabilities | [Sora 2 Launch](https://openai.com/index/sora-2/) |
 | o3-mini Launch | Model release | Latest reasoning model availability | [Computerworld Coverage](https://www.computerworld.com/article/4015023/openai-latest-news-and-insights.html) |
 | AGI Timeline Interview | Executive statement | Altman's AGI predictions | [TIME Magazine Interview](https://time.com/7205596/sam-altman-superintelligence-agi/) |
 
@@ -435,7 +429,6 @@ The following departures occurred in 2024. Stated reasons varied across individu
 [^1]: [ChatGPT Users Statistics (February 2026) – Growth & Usage Data](https://www.demandsage.com/chatgpt-statistics/)
 [^2]: [ChatGPT Users Statistics (February 2026) – Growth & Usage Data](https://www.demandsage.com/chatgpt-statistics/)
 [^3]: [OpenAI Latest News and Insights](https://www.computerworld.com/article/4015023/openai-latest-news-and-insights.html)
-[^4]: [Sam Altman expects OpenAI to exit 'code red' by January](https://www.cnbc.com/2025/12/11/openai-intros-new-ai-model-gpt-5point2-says-better-at-professional-tasks.html)
 [^5]: [OpenAI Latest News and Insights](https://www.computerworld.com/article/4015023/openai-latest-news-and-insights.html)
 [^6]: [Sora 2 is here](https://openai.com/index/sora-2/)
 [^7]: [ChatGPT Users Statistics (February 2026) – Growth & Usage Data](https://www.demandsage.com/chatgpt-statistics/)

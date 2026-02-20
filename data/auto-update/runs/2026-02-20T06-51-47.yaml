@@ -1,0 +1,44 @@
+date: 2026-02-20
+startedAt: 2026-02-20T06:51:47.638Z
+completedAt: 2026-02-20T07:48:38.254Z
+trigger: scheduled
+budget:
+  limit: 30
+  spent: 28.5
+digest:
+  sourcesChecked: 18
+  sourcesFailed: 3
+  itemsFetched: 672
+  itemsRelevant: 368
+plan:
+  pagesPlanned: 6
+  newPagesSuggested: 0
+execution:
+  pagesUpdated: 5
+  pagesFailed: 0
+  pagesSkipped: 1
+  results:
+    - pageId: epstein-ai-connections
+      status: success
+      tier: standard
+      durationMs: 263050
+    - pageId: agentic-ai
+      status: success
+      tier: standard
+      durationMs: 526030
+    - pageId: language-models
+      status: success
+      tier: standard
+      durationMs: 490047
+    - pageId: solutions
+      status: success
+      tier: standard
+      durationMs: 1300658
+    - pageId: accident-risks
+      status: skipped
+      tier: standard
+    - pageId: alignment-progress
+      status: success
+      tier: polish
+      durationMs: 418915
+newPagesCreated: []

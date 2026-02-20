@@ -1,0 +1,59 @@
+date: 2026-02-20
+branch: claude/add-checklist-tool-j5qJq
+title: "Clean up legacy frontmatter fields (importance, lastUpdated, todo, entityId)"
+issue: 361
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/368
+model: claude-sonnet-4-6
+pages: []
+
+summary: |
+  Automated cleanup of four legacy frontmatter fields across 30 MDX pages,
+  resolving issue #361. Built scripts/fix-legacy-frontmatter.mjs to perform
+  the transformation mechanically: importance→readerImportance (or removed),
+  lastUpdated→lastEdited (quoted), todo→todos (array), entityId removed.
+  All CI-blocking validations pass (220 tests, frontmatter schema, MDX syntax,
+  YAML schema, numeric ID integrity, TypeScript).
+
+key_decisions:
+  - "Used automated script (fix-legacy-frontmatter.mjs) rather than manual edits — safer, reproducible, and leaves a reusable tool for future migrations"
+  - "importance: renamed to readerImportance: on 5 pages that lacked it; removed on 13 pages that already had readerImportance:"
+  - "research-reports.mdx had lastUpdated at line 107 in body content, not frontmatter — correctly left untouched by script"
+  - "Script uses splitFrontmatter() to operate only within --- delimiters, preventing false positives in body content"
+
+checks:
+  initialized: true
+  type: content
+  initiated_at: "2026-02-20T07:18:48.329Z"
+  total: 33
+  completed: 28
+  na: 3
+  skipped: 2
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - fix-escaping
+    - crux-pipeline
+    - correctness
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - entitylinks-resolve
+    - numeric-ids-stable
+    - mdx-escaping
+    - content-accuracy
+    - citations-have-urls
+    - citations-verify
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - no-merge-conflicts
+    - check-recent-merges
