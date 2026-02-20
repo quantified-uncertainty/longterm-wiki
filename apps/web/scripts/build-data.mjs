@@ -13,6 +13,7 @@ import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
+import { assessContentIntegrity, computeIntegrityRisk } from '../../../crux/lib/content-integrity.ts';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
@@ -916,6 +917,19 @@ function computeHallucinationRisk(page, entityMap) {
     factors.push('high-quality');
   }
 
+  // === CONTENT INTEGRITY SIGNALS ===
+  // Detect structural corruption, truncation, and fabrication from raw content.
+  // Strip frontmatter first — it contains YAML that could trigger false positives.
+  if (page.rawContent) {
+    const bodyOnly = page.rawContent.replace(/^---\n[\s\S]*?\n---\n?/, '');
+    const integrity = assessContentIntegrity(bodyOnly);
+    const integrityRisk = computeIntegrityRisk(integrity);
+    if (integrityRisk.score > 0) {
+      score += integrityRisk.score;
+      factors.push(...integrityRisk.factors);
+    }
+  }
+
   // Clamp to 0-100
   score = Math.max(0, Math.min(100, score));
 
@@ -1411,7 +1425,30 @@ async function main() {
     page.backlinkCount = pageBacklinks.length;
   }
 
-  // Compute redundancy scores
+  // =========================================================================
+  // HALLUCINATION RISK — compute per-page risk score from structural signals.
+  // Used by both reader-facing banners and AI agents for verification triage.
+  // Must run BEFORE rawContent is deleted (integrity checks need the body).
+  // =========================================================================
+  console.log('  Computing hallucination risk scores...');
+  let riskHigh = 0, riskMedium = 0, riskLow = 0;
+  for (const page of pages) {
+    const risk = computeHallucinationRisk(page, entityMap);
+    page.hallucinationRisk = risk;
+
+    // Also attach resolved entityType for frontend use
+    const entity = entityMap.get(page.id);
+    if (entity?.type) {
+      page.entityType = ENTITY_TYPE_ALIASES[entity.type] || entity.type;
+    }
+
+    if (risk.level === 'high') riskHigh++;
+    else if (risk.level === 'medium') riskMedium++;
+    else riskLow++;
+  }
+  console.log(`  hallucinationRisk: ${riskHigh} high, ${riskMedium} medium, ${riskLow} low`);
+
+  // Compute redundancy scores (needs rawContent)
   console.log('  Computing redundancy scores...');
   const { pageRedundancy, pairs: redundancyPairs } = computeRedundancy(pages);
 
@@ -1433,28 +1470,6 @@ async function main() {
   // Store redundancy pairs for analysis
   database.redundancyPairs = redundancyPairs.slice(0, 100); // Top 100 pairs
   console.log(`  redundancy: ${redundancyPairs.length} similar pairs found`);
-
-  // =========================================================================
-  // HALLUCINATION RISK — compute per-page risk score from structural signals.
-  // Used by both reader-facing banners and AI agents for verification triage.
-  // =========================================================================
-  console.log('  Computing hallucination risk scores...');
-  let riskHigh = 0, riskMedium = 0, riskLow = 0;
-  for (const page of pages) {
-    const risk = computeHallucinationRisk(page, entityMap);
-    page.hallucinationRisk = risk;
-
-    // Also attach resolved entityType for frontend use
-    const entity = entityMap.get(page.id);
-    if (entity?.type) {
-      page.entityType = ENTITY_TYPE_ALIASES[entity.type] || entity.type;
-    }
-
-    if (risk.level === 'high') riskHigh++;
-    else if (risk.level === 'medium') riskMedium++;
-    else riskLow++;
-  }
-  console.log(`  hallucinationRisk: ${riskHigh} high, ${riskMedium} medium, ${riskLow} low`);
 
   // =========================================================================
   // RELATED GRAPH — unified bidirectional graph combining all signals:

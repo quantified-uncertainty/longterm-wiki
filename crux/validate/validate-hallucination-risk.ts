@@ -7,6 +7,13 @@
  *   - Quality score (lower quality correlates with less-verified content)
  *   - Structural indicators (unsourced biographical claims, evaluative flattery)
  *   - Citation accuracy data (from LLM accuracy checking, issue #323)
+ *   - Content integrity signals (truncation, fabrication, corruption — issue #404)
+ *
+ * Content integrity checks detect:
+ *   - Orphaned footnote references (truncated pages missing footnote definitions)
+ *   - Sequential arxiv IDs (fabricated citation identifiers)
+ *   - Duplicate footnote definitions (merge/copy-paste errors)
+ *   - Unsourced footnotes (definitions without URLs)
  *
  * Outputs a ranked list of pages with risk scores and actionable recommendations.
  *
@@ -31,6 +38,7 @@ import { readReviews } from '../lib/review-tracking.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getEntityTypeFromPath } from '../lib/page-analysis.ts';
 import { citationQuotes } from '../lib/knowledge-db.ts';
+import { assessContentIntegrity, computeIntegrityRisk } from '../lib/content-integrity.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -198,6 +206,14 @@ function assessPage(
   if (accRisk.factor) {
     riskScore += accRisk.score;
     riskFactors.push(accRisk.factor);
+  }
+
+  // Factor 8: Content integrity signals (truncation, fabrication, etc.)
+  const integrity = assessContentIntegrity(bodyContent);
+  const integrityRisk = computeIntegrityRisk(integrity);
+  if (integrityRisk.score > 0) {
+    riskScore += integrityRisk.score;
+    riskFactors.push(...integrityRisk.factors);
   }
 
   // Apply entity type multiplier
