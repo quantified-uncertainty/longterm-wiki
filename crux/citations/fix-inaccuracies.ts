@@ -786,7 +786,7 @@ export async function findReplacementSources(
     if (!claimText || claimText.length < 20) continue;
 
     // Build a targeted search query from the claim
-    const searchQuery = buildSearchQuery(claimText, cit.sourceTitle);
+    const searchQuery = buildSearchQuery(claimText);
 
     try {
       const results = await searchExa(exaApiKey, searchQuery);
@@ -831,7 +831,7 @@ export async function findReplacementSources(
 }
 
 /** Build a concise search query from a claim text. */
-function buildSearchQuery(claimText: string, sourceTitle: string | null): string {
+export function buildSearchQuery(claimText: string): string {
   // Strip MDX components and footnote markers
   let clean = claimText
     .replace(/<[^>]+>/g, '')
@@ -840,9 +840,15 @@ function buildSearchQuery(claimText: string, sourceTitle: string | null): string
     .replace(/\s+/g, ' ')
     .trim();
 
-  // Truncate to reasonable search length
-  if (clean.length > 200) {
-    clean = clean.slice(0, 200);
+  // Extract just the first sentence for a more targeted search query
+  const sentenceEnd = clean.search(/[.!?]\s/);
+  if (sentenceEnd > 30 && sentenceEnd < 200) {
+    clean = clean.slice(0, sentenceEnd + 1);
+  } else if (clean.length > 200) {
+    // Truncate at word boundary
+    const truncated = clean.slice(0, 200);
+    const lastSpace = truncated.lastIndexOf(' ');
+    clean = lastSpace > 100 ? truncated.slice(0, lastSpace) : truncated;
   }
 
   return clean;
@@ -891,7 +897,11 @@ async function searchExa(apiKey: string, query: string): Promise<ExaSearchResult
 
 /**
  * Apply source replacements to page content by updating footnote definition URLs.
- * Only replaces the URL inside [^N]: [Title](URL) definitions.
+ * Handles all footnote definition patterns:
+ *   [^N]: [Title](URL)                          — titled link
+ *   [^N]: Author, "[Title](URL)," Journal.      — academic embedded link
+ *   [^N]: Description text: URL                  — text-then-bare-URL
+ *   [^N]: URL                                    — bare URL
  */
 export function applySourceReplacements(
   content: string,
@@ -902,21 +912,35 @@ export function applySourceReplacements(
   let skipped = 0;
 
   for (const rep of replacements) {
-    // Match footnote definition pattern: [^N]: [Title](URL) or [^N]: URL
-    const defRegex = new RegExp(
-      `(\\[\\^${rep.footnote}\\]:\\s*)(?:\\[([^\\]]*?)\\]\\((${escapeRegex(rep.oldUrl)})\\)|(${escapeRegex(rep.oldUrl)}))`,
-    );
+    const escapedUrl = escapeRegex(rep.oldUrl);
 
-    const match = defRegex.exec(modified);
-    if (!match) {
-      skipped++;
-      continue;
+    // Try patterns in order of specificity:
+    // 1. Titled link: [^N]: [Title](URL) or [^N]: text [Title](URL) text
+    // 2. Text-then-bare-URL: [^N]: Description text URL
+    // 3. Bare URL: [^N]: URL
+    const patterns = [
+      // Pattern: any text before [Title](URL) and optional text after
+      new RegExp(`(\\[\\^${rep.footnote}\\]:\\s*)([^\\n]*?)\\[[^\\]]*?\\]\\(${escapedUrl}\\)([^\\n]*)`),
+      // Pattern: text followed by bare URL
+      new RegExp(`(\\[\\^${rep.footnote}\\]:\\s*)([^\\n]*?)${escapedUrl}([^\\n]*)`),
+    ];
+
+    let matched = false;
+    for (const regex of patterns) {
+      const match = regex.exec(modified);
+      if (match) {
+        const prefix = match[1]; // "[^N]: "
+        const newDef = `${prefix}[${rep.newTitle}](${rep.newUrl})`;
+        modified = modified.slice(0, match.index) + newDef + modified.slice(match.index + match[0].length);
+        applied++;
+        matched = true;
+        break;
+      }
     }
 
-    const prefix = match[1]; // "[^N]: "
-    const newDef = `${prefix}[${rep.newTitle}](${rep.newUrl})`;
-    modified = modified.slice(0, match.index) + newDef + modified.slice(match.index + match[0].length);
-    applied++;
+    if (!matched) {
+      skipped++;
+    }
   }
 
   return { content: modified, applied, skipped };

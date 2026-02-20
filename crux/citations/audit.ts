@@ -218,6 +218,7 @@ async function main() {
 
   // ── Step 3c: Source replacement for unsupported citations ──────────────
   // After text rewrites, try to find better sources for still-unsupported claims
+  let step3cRanRecheck = false;
   if (apply && process.env.EXA_API_KEY) {
     // Re-load flagged citations to reflect any changes from Steps 3/3b
     const currentContent = readFileSync(filePath, 'utf-8');
@@ -225,8 +226,9 @@ async function main() {
 
     // Quick re-check to find remaining unsupported citations
     await extractQuotesForPage(pageId, currentBody, { verbose: false, recheck: true });
-    const reCheck = await checkAccuracyForPage(pageId, { verbose: false, recheck: true });
+    await checkAccuracyForPage(pageId, { verbose: false, recheck: true });
     exportDashboardData();
+    step3cRanRecheck = true;
 
     const remainingFlagged = loadFlaggedCitations({ pageId });
     const remainingUnsupported = remainingFlagged.filter(
@@ -258,6 +260,7 @@ async function main() {
           });
           console.log(`\n  ${c.green}${repResult.applied} source(s) replaced${c.reset}`);
           fixesApplied = true;
+          step3cRanRecheck = false; // Source URLs changed — need fresh re-verify
         }
       } else {
         console.log(`  ${c.dim}No replacement sources found.${c.reset}`);
@@ -272,12 +275,17 @@ async function main() {
   // ── Step 4: Re-extract + Re-verify ─────────────────────────────────────
   // After fixing the page, claim_text in SQLite is stale (from Step 1).
   // Re-extract quotes to update claim_text before re-verifying accuracy.
+  // Skip re-extract if Step 3c already did it and no further changes were made.
   console.log(`\n${c.bold}Step 4: Re-extract & Re-verify${c.reset}\n`);
 
-  const updatedRaw = readFileSync(filePath, 'utf-8');
-  const updatedBody = stripFrontmatter(updatedRaw);
-  console.log(`  Re-extracting claims from updated page...`);
-  await extractQuotesForPage(pageId, updatedBody, { verbose: false, recheck: true });
+  if (!step3cRanRecheck) {
+    const updatedRaw = readFileSync(filePath, 'utf-8');
+    const updatedBody = stripFrontmatter(updatedRaw);
+    console.log(`  Re-extracting claims from updated page...`);
+    await extractQuotesForPage(pageId, updatedBody, { verbose: false, recheck: true });
+  } else {
+    console.log(`  ${c.dim}(Using claims from Step 3c re-check)${c.reset}`);
+  }
   console.log(`  Re-checking accuracy...\n`);
 
   const reVerify = await checkAccuracyForPage(pageId, {

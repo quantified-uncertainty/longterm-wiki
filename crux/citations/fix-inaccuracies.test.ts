@@ -7,6 +7,7 @@ import {
   applySectionRewrites,
   cleanupOrphanedFootnotes,
   applySourceReplacements,
+  buildSearchQuery,
   parseLLMFixResponse,
   applyFixes,
   enrichFromSqlite,
@@ -629,5 +630,82 @@ describe('applySourceReplacements', () => {
 
     expect(result.applied).toBe(1);
     expect(result.content).toContain('[Better](https://better.com/page)');
+  });
+
+  it('replaces URL in academic embedded-link definition', () => {
+    const content = [
+      'A claim[^1].',
+      '',
+      '[^1]: Karnofsky, H., "[Some Background](https://old.example.com/article)," Open Phil, 2016.',
+    ].join('\n');
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 1,
+        oldUrl: 'https://old.example.com/article',
+        newUrl: 'https://new.example.com/better',
+        newTitle: 'Better Source',
+        confidence: 'medium',
+        reason: 'test',
+      },
+    ]);
+
+    expect(result.applied).toBe(1);
+    expect(result.content).toContain('[^1]: [Better Source](https://new.example.com/better)');
+    expect(result.content).not.toContain('old.example.com');
+  });
+
+  it('replaces URL in text-then-bare-URL definition', () => {
+    const content = [
+      'A claim[^1].',
+      '',
+      '[^1]: TransformerLens GitHub repository: https://old.example.com/repo',
+    ].join('\n');
+
+    const result = applySourceReplacements(content, [
+      {
+        footnote: 1,
+        oldUrl: 'https://old.example.com/repo',
+        newUrl: 'https://new.example.com/better',
+        newTitle: 'Better Repo',
+        confidence: 'medium',
+        reason: 'test',
+      },
+    ]);
+
+    expect(result.applied).toBe(1);
+    expect(result.content).toContain('[^1]: [Better Repo](https://new.example.com/better)');
+    expect(result.content).not.toContain('old.example.com');
+  });
+});
+
+describe('buildSearchQuery', () => {
+  it('extracts first sentence when available', () => {
+    const claim = 'The organization was founded in 2015. It grew rapidly over the next decade.';
+    const query = buildSearchQuery(claim);
+    expect(query).toBe('The organization was founded in 2015.');
+    expect(query).not.toContain('grew rapidly');
+  });
+
+  it('strips MDX components and footnote markers', () => {
+    const claim = '<EntityLink id="openai">OpenAI</EntityLink> was founded[^1] in 2015.';
+    const query = buildSearchQuery(claim);
+    expect(query).toContain('OpenAI');
+    expect(query).not.toContain('<EntityLink');
+    expect(query).not.toContain('[^1]');
+  });
+
+  it('truncates long text without sentence breaks to max 200 chars', () => {
+    const claim = 'A ' + 'very long claim with many words and details about different topics that goes on '.repeat(5);
+    const query = buildSearchQuery(claim);
+    expect(query.length).toBeLessThanOrEqual(200);
+    expect(query.length).toBeGreaterThan(100);
+    // Should be trimmed (no trailing whitespace)
+    expect(query).toBe(query.trim());
+  });
+
+  it('returns short claims as-is', () => {
+    const claim = 'AI safety is important';
+    expect(buildSearchQuery(claim)).toBe('AI safety is important');
   });
 });
