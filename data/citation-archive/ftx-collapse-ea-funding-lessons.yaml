@@ -1,0 +1,502 @@
+pageId: ftx-collapse-ea-funding-lessons
+verifiedAt: 2026-02-20
+totalCitations: 45
+verified: 33
+broken: 12
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://ftxfuturefund.org/our-grants/
+    linkText: 'FTX Future Fund, "Our Grants and Investments," — ftxfuturefund.org/our-grants/ — (2022); confirmed in [Wikipedia, "Bankruptcy of FTX"](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX) and [Inside Philanthropy, "The Philanthropic Fallout from the Collapse of FTX and Sam Bankman-Fried" (Nov 16, 2022)](https://www.insidephilanthropy.com/home/2022-11-16-the-philanthropic-fallout-from-the-collapse-of-ftx-and-sam-bankman-fried). The \$160M figure refers to "grantee commitments," not confirmed disbursements. Note: ftxfuturefund.org may no longer be accessible at its original URL; archived captures may be available via the Wayback Machine at [web.archive.org](https://web.archive.org).'
+    claimContext: "|-----------|------------| | **Direct financial loss** | \\≈\\$160M in committed grants not disbursed[^1] (how much was physically transferred before collapse is not publicly established) | | **Indirect losses** | Organizational restructuring, project cancellations, hiring freezes across ecosystem |"
+    fetchedAt: 2026-02-20T08:05:38.312Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 2
+    url: https://forum.effectivealtruism.org/posts/HjsfHwqasyQMWRzZN/ev-updates-ftx-settlement-and-the-future-of-ev
+    linkText: "Effective Ventures, — \"EV Updates: FTX Settlement and the Future of EV,\" EA Forum (Dec 13, 2023) — The combined settlement of \\$26,786,503 covered both EV UK and EV US, representing 100% of funds received from FTX and the FTX Foundation in 2022. An independent investigation by Mintz found no evidence that anyone at EV knew about FTX's alleged fraudulent criminal conduct. EV planned to decentralize by offboarding CEA, 80,000 Hours, and Giving What We Can as independent legal entities."
+    claimContext: '| **Reputational effects** | Sustained association between EA and FTX fraud in mainstream coverage 2022–2024; some recovery in framing noted by 2025[^14] (no systematic measurement exists) | | **Clawback exposure** | \$26.8M returned by <EntityLink id="E517">Centre for Effective Altruism</EntityLink'
+    fetchedAt: 2026-02-20T08:05:31.912Z
+    httpStatus: 200
+    pageTitle: "EV updates: FTX settlement and the future of EV — EA Forum"
+    contentSnippet: "EV updates: FTX settlement and the future of EV — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EV updates: FTX settlement and the future of EV by Zachary Robinson🔸 Dec 13 2023 3 min read 39 436 Community Building effective altruism FTX collapse Organization updates Announcements and updates Effective Ventures Frontpage EV updates: FTX settlement and the future of EV FTX updates Futu"
+    contentLength: 757102
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.cnbc.com/2024/03/25/ftx-estate-sells-majority-stake-in-startup-anthropic-for-884-million.html
+    linkText: 'CNBC, — "FTX estate sells majority stake in Anthropic for \$884 million" (March 25, 2024) — First tranche: \$884M (January 2024); second tranche: \$452M (March 2024); total: \$1.34B.'
+    claimContext: '| **Clawback exposure** | \$26.8M returned by <EntityLink id="E517">Centre for Effective Altruism</EntityLink> umbrella (EV UK/US); ARC voluntarily returned \$1.25M; other amounts below public-filing threshold[^2] | | **Anthropic stake (FTX)** | \$500M invested → \$1.34B recovered for creditors (2.7'
+    fetchedAt: 2026-02-20T08:05:33.454Z
+    httpStatus: 200
+    pageTitle: FTX estate sells majority stake in startup Anthropic for $884 million
+    contentSnippet: FTX estate sells majority stake in startup Anthropic for $884 million Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points FTX, the crypto exchange founded by Sam Bankman-Fried, reached an agreement to sell the majority of its stake in artificial intelligence startup Anthropic for $884 million. The top buyer is a group aligned with Mubadala, a sovereign wealth fund in the United Arab Emirates. Additional investors include Jane Str
+    contentLength: 813286
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.coindesk.com/business/2022/11/10/ftxs-effective-altruism-future-fund-team-resigns
+    linkText: CoinDesk, — "FTX's 'Effective Altruism' Future Fund Team Resigns" (Nov 10, 2022) — In March 2022, FTX stated it planned to deploy \$1B through the Future Fund at a rate of \$100M per year.
+    claimContext: "The collapse unfolded over approximately 72 hours. The EA ecosystem's immediate losses included approximately \\$160M in committed Future Fund grants that were not disbursed, \\$26.8M returned by Effective Ventures to FTX's bankruptcy estate under clawback proceedings, and the elimination of what had "
+    fetchedAt: 2026-02-20T08:05:32.559Z
+    httpStatus: 200
+    pageTitle: FTX&#x27;s &#x27;Effective Altruism&#x27; Future Fund Team Resigns
+    contentSnippet: FTX&#x27;s &#x27;Effective Altruism&#x27; Future Fund Team Resigns Finance Share Share this article Copy link X icon X (Twitter) LinkedIn Facebook Email FTX&#x27;s &#x27;Effective Altruism&#x27; Future Fund Team Resigns In an open letter, the team said it was unable to perform their work or process grants and have "fundamental questions" about the legitimacy and integrity of business operations. By Sam Reynolds Updated May 9, 2023, 4:02 a.m. Published Nov 11, 2022, 3:45 a.m. Make us preferred on
+    contentLength: 534864
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://forum.effectivealtruism.org/posts/HPdWWetJbv4z8eJEe/open-phil-is-seeking-applications-from-grantees-impacted-by
+    linkText: Open Philanthropy, — "Open Phil is seeking applications from grantees impacted by recent events," EA Forum (November 2022) — Open Philanthropy explicitly sought applications from grantees whose work fell within longtermist focus areas including biosecurity, AI risk, and longtermist EA community building. Even grantees with significant runway remaining were encouraged to apply, including those who never received some or all of their committed Future Fund funds.
+    claimContext: Three years later, the EA community has partially recovered financially—<EntityLink id="E552">Open Philanthropy</EntityLink> explicitly expanded grantmaking to fill some of the gap[^5]—but structural questions about funding concentration persist. The FTX episode is directly relevant to the current p
+    fetchedAt: 2026-02-20T08:05:32.089Z
+    httpStatus: 200
+    pageTitle: Open Phil is seeking applications from grantees impacted by recent events — EA Forum
+    contentSnippet: Open Phil is seeking applications from grantees impacted by recent events — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Open Phil is seeking applications from grantees impacted by recent events by Bastian_Stern Nov 16 2022 2 min read 20 415 Community Building effective altruism FTX-collapse-related resources Coefficient Giving Effective altruism funding FTX collapse Frontpage We (Open Phil) are seeking ap
+    contentLength: 449173
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists
+    linkText: "Science (AAAS), — \"Crypto Company's Collapse Strands Scientists\" (2022) — **Note: This citation should be verified — the article title and URL have not been confirmed against the AAAS Science archive. If the article is not verifiable, this footnote should be updated with a confirmed source.** By end of June 2022, Future Fund officials reported awarding 262 grants and investments totaling \\$132M, though how much had actually been distributed was unclear."
+    claimContext: "| April 2022 | FTX invests \\$500M in Anthropic Series B at \\$4B valuation | | June 2022 | FTX Future Fund reports 262 grants and investments totaling \\$132M awarded[^6] | | November 6, 2022 | CoinDesk publishes Alameda Research balance sheet; bank run begins |"
+    fetchedAt: 2026-02-20T08:05:39.730Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://en.wikipedia.org/wiki/Bankruptcy_of_FTX
+    linkText: Wikipedia, — "Bankruptcy of FTX" — The Future Fund team resigned on November 10, 2022, writing they were "devastated that it looks like there are many committed grants that the Future Fund will be unable to honor."
+    claimContext: "| November 11, 2022 | FTX files for bankruptcy; SBF resigns as CEO | | November 11, 2022 | Future Fund team resigns in open letter, citing inability to honor committed grants[^7] | | December 12, 2022 | SBF arrested in the Bahamas |"
+    fetchedAt: 2026-02-20T08:05:39.365Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://www.law360.com/securities/articles/1766496/-ftx-strikes-deal-to-recoup-22-5m-in-charitable-donations
+    linkText: Law360, — "FTX Strikes Deal To Recoup \$22.5M In Charitable Donations" (Nov 14, 2023) — FTX Trading Ltd. asked a Delaware bankruptcy judge to approve a settlement with Effective Ventures Foundation USA Inc. for more than \$22.5M; the combined total across EV UK and EV US was \$26.8M.
+    claimContext: "| November 2, 2023 | SBF convicted on all seven counts of fraud and conspiracy | | November 2023 | FTX bankruptcy estate reaches \\$22.5M settlement with Effective Ventures USA[^8] | | December 2023 | EV discloses combined \\$26,786,503 settlement across EV UK and EV US[^2] |"
+    fetchedAt: 2026-02-20T08:05:39.903Z
+    httpStatus: 200
+    pageTitle: FTX Strikes Deal To Recoup $22.5M In Charitable Donations - Law360
+    contentSnippet: FTX Strikes Deal To Recoup $22.5M In Charitable Donations - Law360 Try our Advanced Search for more refined results Law360 | The Practice of Law Access to Justice Aerospace & Defense Appellate Asset Management Banking Bankruptcy Benefits California Cannabis Capital Markets Class Action Colorado Commercial Contracts Competition Compliance Connecticut Construction Consumer Protection Corporate Criminal Practice Cybersecurity & Privacy Delaware Employment Energy Environmental Fintech Florida Food &
+    contentLength: 159679
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://forum.effectivealtruism.org/posts/vCSLfG3fjciXHQgnb/the-ftx-bankruptcy-statute-of-limitations-has-expired
+    linkText: EA Forum, — "The FTX Bankruptcy Statute of Limitations Has Expired" (Jan 3, 2025) — The deadline for FTX to file new clawback claims against US-based grantees was November 2024. Grant recipients in some other countries may still face exposure under longer limitation periods (e.g., six years under New Zealand law). No follow-up data on whether non-US EA organizations faced or settled such claims after November 2024 has been publicly reported as of this writing.
+    claimContext: "| March 28, 2024 | SBF sentenced to 25 years in federal prison | | November 2024 | FTX bankruptcy statute of limitations for new clawback filings expires[^9] | | April 2025 | EA Funds and CEA announce merger and combined spin-out from EV, targeting July 1, 2025[^40] |"
+    fetchedAt: 2026-02-20T08:05:39.591Z
+    httpStatus: 200
+    pageTitle: The FTX Bankruptcy Statute of Limitations Has Expired — EA Forum
+    contentSnippet: The FTX Bankruptcy Statute of Limitations Has Expired — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The FTX Bankruptcy Statute of Limitations Has Expired by Molly Jan 3 2025 1 min read 3 104 Community FTX collapse Frontpage The deadline for FTX to file clawback claims against grantees was November 2024. The bankruptcy estate could have filed a plan to extend the two-year statute of limitations, but it app
+    contentLength: 129260
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Alignment_Research_Center
+    linkText: Wikipedia, — "Alignment Research Center" — ARC voluntarily returned a \$1.25M grant from the FTX Foundation, stating the money "morally (if not legally) belongs to FTX customers or creditors." In December 2023, ARC Evals was spun out as METR, an independent nonprofit.
+    claimContext: '| Anthropic investment | \$500M (Series B, April 2022) | Recovered \$1.34B for creditors[^3] | | <EntityLink id="E25">ARC</EntityLink> | \$1.25M received | Voluntarily returned; ARC stated funds "morally (if not legally) belong to FTX customers or creditors"[^10] | | <EntityLink id="E518">Center for'
+    fetchedAt: 2026-02-20T08:05:39.364Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://forum.effectivealtruism.org/posts/oiEArRjkajAKayMCp/what-might-ftx-mean-for-effective-giving-and-ea-funding
+    linkText: EA Forum, — "What might FTX mean for effective giving and EA funding" (November 2022) — FTX and Alameda co-founders' wealth was estimated to make up approximately 35% of all funding available to EA before the collapse. This is a forum post, not a peer-reviewed or systematically documented source; the methodology for the 35% figure is not described. The 80–90% combined dominance figure cited elsewhere in community discussions is not independently sourced and appears to derive from this post combined with additional unstated assumptions about Open Philanthropy's share.
+    claimContext: One EA Forum analysis estimated that FTX and Alameda co-founders' wealth made up approximately 35% of all funding available to EA before the collapse—though the methodology for that estimate is not described in the forum post, which is not a peer-reviewed source.[^11] The claim that the two dominant
+    fetchedAt: 2026-02-20T08:05:40.984Z
+    httpStatus: 200
+    pageTitle: What might FTX mean for effective giving and EA funding — EA Forum
+    contentSnippet: What might FTX mean for effective giving and EA funding — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents What might FTX mean for effective giving and EA funding by Jack Lewars Nov 15 2022 11 min read 26 204 Community Effective giving Building effective altruism Criticism of effective altruism Criticism of the effective altruism community FTX collapse FTX Foundation Future Fund Sam Bank
+    contentLength: 722922
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://forum.effectivealtruism.org/posts/NWHb4nsnXRxDDFGLy/historical-ea-funding-data-2025-update
+    linkText: 'EA Forum, — "Historical EA Funding Data: 2025 Update" — **Note: This URL has not been verified as a live EA Forum post — it may be illustrative. This citation should be confirmed before publication.** EA grantmaking has been on a declining trend since 2022: comparing 2024 to 2022, global health and development decreased 9%, longtermism/x-risk decreased 13%, animal welfare fell 23%, meta decreased 21%.'
+    claimContext: "What is better documented is the directional impact: subsequent EA funding tracker data confirm a sustained decline across all major categories after 2022. Comparing 2024 to 2022 levels, EA grantmaking declined approximately 9% in global health and development, approximately 13% in longtermism/x-ris"
+    fetchedAt: 2026-02-20T08:05:41.093Z
+    httpStatus: 200
+    pageTitle: "Historical EA funding data: 2025 update — EA Forum"
+    contentSnippet: "Historical EA funding data: 2025 update — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Historical EA funding data: 2025 update by Jacco Rubens🔸 Nov 14 2025 2 min read 25 228 Building effective altruism Animal Charity Evaluators Effective Altruism Funds Funding Strategy Week (2025) GiveWell Giving Season (2025) Survival and Flourishing Data on the EA community Effective altruism fund"
+    contentLength: 603454
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety
+    linkText: EA Forum, — "Observations on the Funding Landscape of EA and AI Safety" (Oct 2, 2023) — EA Funds' Long-Term Future Fund and Infrastructure Fund reported estimated funding gaps of \$450K/month and \$550K/month respectively over six months post-collapse. Five new independent grantmaking bodies started in 2023. Approximately half of Long-Term Future Fund funding comes from Open Philanthropy, illustrating ongoing concentration risk.
+    claimContext: EA Funds' Long-Term Future Fund and Infrastructure Fund reported estimated funding gaps of approximately \$450K/month and \$550K/month respectively over the six months following FTX's collapse.[^13]
+    fetchedAt: 2026-02-20T08:05:41.040Z
+    httpStatus: 200
+    pageTitle: Observations on the funding landscape of EA and AI safety — EA Forum
+    contentSnippet: Observations on the funding landscape of EA and AI safety — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Observations on the funding landscape of EA and AI safety by Vilhelm Skoglund , Jona Oct 2 2023 17 min read 12 136 AI safety Community Building effective altruism Effective giving Fundraising Effective altruism funding Building the field of AI safety Funding opportunities Grantmak
+    contentLength: 609532
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.hollywoodreporter.com/news/general-news/effective-altruism-sam-bankman-fried-comeback-1236327219/
+    linkText: "The Hollywood Reporter, — \"Giving on the Edge: Effective Altruism's Post-SBF Comeback\" (July 2025) — Notes EA organizational activity and partial public image recovery. This is a single trade press article; no systematic survey or media analysis has measured EA's aggregate public perception trajectory."
+    claimContext: "| **Indirect losses** | Organizational restructuring, project cancellations, hiring freezes across ecosystem | | **Reputational effects** | Sustained association between EA and FTX fraud in mainstream coverage 2022–2024; some recovery in framing noted by 2025[^14] (no systematic measurement exists) "
+    fetchedAt: 2026-02-20T08:05:41.903Z
+    httpStatus: 200
+    pageTitle: Effective Altruism’s Post-Sam Bankman-Fried Comeback
+    contentSnippet: Effective Altruism’s Post-Sam Bankman-Fried Comeback &times; Skip to main content By Steven Zeitchik Plus Icon Steven Zeitchik Senior Editor, Technology and Politics View All July 24, 2025 6:15am Share on Facebook Share on X Google Preferred Share to Flipboard Show additional share options Share on LinkedIn Share on Pinterest Share on Reddit Share on Tumblr Share on Whats App Send an Email Print the Article Post a Comment Australian moral philosopher Peter Singer, the intellectual architect of E
+    contentLength: 617206
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://news.bloomberglaw.com/bankruptcy-law/ftx-donation-clawback-lawsuit-must-be-tossed-nonprofit-says
+    linkText: Bloomberg Law, — "FTX Donation Clawback Lawsuit Must Be Tossed, Nonprofit Says" (Jul 16, 2024) — An EA-affiliated nonprofit filed to dismiss FTX's clawback lawsuit targeting \$5M in donations. The outcome of this motion—whether the suit was dismissed, settled, or resolved before the November 2024 statute of limitations—has not been reported in publicly available sources as of this writing.
+    claimContext: "- **Clawback proceedings**: FTX's estate pursued recovery under fraudulent transfer laws. Effective Ventures (the umbrella over <EntityLink id=\"E517\">CEA</EntityLink>, <EntityLink id=\"E510\">80,000 Hours</EntityLink>, and <EntityLink id=\"E863\">Giving What We Can</EntityLink>) returned \\$26,786,503—eq"
+    fetchedAt: 2026-02-20T08:05:42.429Z
+    httpStatus: 200
+    pageTitle: FTX Donation Clawback Lawsuit Must Be Tossed, Nonprofit Says
+    contentSnippet: "FTX Donation Clawback Lawsuit Must Be Tossed, Nonprofit Says Bankruptcy Print Email Share To: Facebook LinkedIn FTX Foundation gave $5M to Center for Applied Rationality Firm has aggressively sought to boost money for creditors A nonprofit with connections to the “effective altruism” movement took steps to dismiss FTX’s lawsuit aiming to claw back $5 million in donations from the bankrupt crypto firm and related entities. The lawsuit, filed by FTX in the US Bankruptcy Court for the District of D"
+    contentLength: 120249
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://forum.effectivealtruism.org/posts/qcDWDnfHdF4JZMLp8/ftx-expects-to-return-all-customer-money-clawbacks-may-go
+    linkText: EA Forum, — "FTX Expects to Return All Customer Money; Clawbacks May Go Away" (Feb 14, 2024) — FTX lawyers told a bankruptcy judge they expected to pay creditors in full; one bankruptcy lawyer noted "in theory, clawbacks may go away" if creditors receive 100 cents on the dollar, though the estate still needed to file before the statute of limitations expired.
+    claimContext: "- **Statute of limitations**: The deadline for FTX to file new clawback claims expired in November 2024. The bankruptcy estate intensified filings in early November 2024, two years after the petition date.[^33] Grant recipients outside the United States may still face exposure under longer limitatio"
+    fetchedAt: 2026-02-20T08:05:44.018Z
+    httpStatus: 200
+    pageTitle: FTX expects to return all customer money; clawbacks may go away — EA Forum
+    contentSnippet: FTX expects to return all customer money; clawbacks may go away — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. FTX expects to return all customer money; clawbacks may go away by MikhailSamin Feb 14 2024 2 min read 23 38 Community FTX collapse FTX-collapse-related resources News relevant to effective altruism Frontpage This is a linkpost for https://www.nytimes.com/2024/02/03/business/dealbook/what-happens-
+    contentLength: 419453
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.coindesk.com/policy/2024/03/29/sbf-is-going-to-prison-for-25-years
+    linkText: CoinDesk, — "SBF Is Going to Prison for 25 Years" (Mar 29, 2024) — SBF convicted November 2, 2023; sentenced March 28, 2024 to 25 years. Criminal conviction confirmed fraud, which strengthens the legal basis for fraudulent conveyance (rather than mere preference) clawback claims. No specific reporting found of the sentencing directly altering pending EA organization clawback settlements.
+    claimContext: SBF's conviction on November 2, 2023 and sentencing to 25 years on March 28, 2024 legally confirmed fraud, which strengthened the legal basis for fraudulent conveyance clawback claims (rather than mere preference claims) against recipients—though no specific reporting confirms the sentencing directl
+    fetchedAt: 2026-02-20T08:05:44.551Z
+    httpStatus: 200
+    pageTitle: SBF Is Going to Prison for 25 Years
+    contentSnippet: SBF Is Going to Prison for 25 Years Policy | SBF Trial Share Share this article Copy link X icon X (Twitter) LinkedIn Facebook Email SBF Is Going to Prison for 25 Years A judge sentenced Bankman-Fried to a quarter century after a brief hearing. By Cheyenne Ligon , Nikhilesh De | Edited by Nikhilesh De Mar 29, 2024, 10:00 a.m. Make us preferred on Google Sam Bankman-Fried is going to prison. He won&#x27;t be spending time in a maximum security facility, and he&#x27;ll be placed as close to his fa
+    contentLength: 552867
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://forum.effectivealtruism.org/posts/couP8n3BTrpFA5YDJ/open-philanthropy-our-progress-in-2023-and-plans-for-2024-1
+    linkText: Open Philanthropy, — "Our Progress in 2023 and Plans for 2024," EA Forum (Mar 27, 2024) — Open Philanthropy lifted a pause on new funding commitments to its Global Catastrophic Risks portfolio in early 2023 following FTX's collapse. Available assets fell by roughly half due to Moskovitz stock price decline, then partially recovered. Open Philanthropy expected to recommend over \$700M in grants in 2023.
+    claimContext: "<EntityLink id=\"E552\">Open Philanthropy</EntityLink> explicitly responded to FTX's collapse by opening applications to affected grantees and lifting a pause on new funding commitments to its Global Catastrophic Risks portfolio in early 2023.[^5] Open Philanthropy sought specifically to fill gaps in "
+    fetchedAt: 2026-02-20T08:05:43.501Z
+    httpStatus: 200
+    pageTitle: "Open Philanthropy: Our Progress in 2023 and Plans for 2024 — EA Forum"
+    contentSnippet: "Open Philanthropy: Our Progress in 2023 and Plans for 2024 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Open Philanthropy: Our Progress in 2023 and Plans for 2024 by Alexander_Berger Mar 27 2024 3 min read 24 139 Building effective altruism Coefficient Giving Organization updates Good things & impact stories Postmortems & retrospectives Announcements and updates Frontpage This is a linkpost for https://w"
+    contentLength: 532249
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://blog.givewell.org/2024/12/12/givewells-fundraising-and-grantmaking-in-2023/
+    linkText: GiveWell, — "GiveWell's Fundraising and Grantmaking in 2023" (Dec 12, 2024) — Open Philanthropy gave \$100M to GiveWell in 2023 vs. \$300M in 2021 and \$350M in 2022. GiveWell directed \$216M in 2023 vs. \$439M in 2022. Non-OP donations remained approximately steady at \$255M (2023) vs. \$253M (2022).
+    claimContext: "However, Open Philanthropy did not fully replace FTX's disbursements to GiveWell: Open Philanthropy gave \\$100M to GiveWell in 2023, compared to \\$300M in 2021 and \\$350M in 2022. GiveWell directed \\$216M in total funds in 2023, down 51% from \\$439M in 2022. GiveWell attributed the drop primarily to"
+    fetchedAt: 2026-02-20T08:05:44.114Z
+    httpStatus: 200
+    pageTitle: GiveWell’s Fundraising and Grantmaking in 2023 - The GiveWell Blog
+    contentSnippet: GiveWell’s Fundraising and Grantmaking in 2023 - The GiveWell Blog Home The GiveWell Blog GiveWell is dedicated to finding outstanding giving opportunities and publishing the full details of our analysis to help donors decide where to give. The table below describes our financial performance in 2022 and 2023. 1 GiveWell’s metrics year runs from February 1 through January 31, so metrics year 2023 ran from February 1, 2023, through January 31, 2024. Our metrics report is typically published at lea
+    contentLength: 111378
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://forum.effectivealtruism.org/posts/xbqiYyj6kdmraEqoX/rethink-priorities-2023-summary-2024-strategy-and-funding
+    linkText: Rethink Priorities, — "Rethink Priorities' 2023 Summary, 2024 Strategy, and Funding Gaps," EA Forum (Nov 15, 2023) — Explicitly targets 12 months of operational reserves; funding plans exclude Open Philanthropy support to assess diversification.
+    claimContext: '- **<EntityLink id="E558">Rethink Priorities</EntityLink>** explicitly targeted maintaining 12 months of operational reserves by end of 2024, and began excluding Open Philanthropy support from funding plans to assess true diversification status.[^20] - **<EntityLink id="E202">MIRI</EntityLink>** mai'
+    fetchedAt: 2026-02-20T08:05:43.488Z
+    httpStatus: 200
+    pageTitle: Rethink Priorities’ 2023 Summary, 2024 Strategy, and Funding Gaps — EA Forum
+    contentSnippet: Rethink Priorities’ 2023 Summary, 2024 Strategy, and Funding Gaps — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Rethink Priorities’ 2023 Summary, 2024 Strategy, and Funding Gaps by kierangreig🔸 , Rethink Priorities Nov 15 2023 4 min read 7 86 Cause prioritization Effective giving AI safety Animal welfare Building effective altruism Global health & development Existential risk Donat
+    contentLength: 472028
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://intelligence.org/2024/12/02/miris-2024-end-of-year-update/
+    linkText: Machine Intelligence Research Institute, — "MIRI's 2024 End-of-Year Update" (Dec 2, 2024) — MIRI maintained \$16M in end-of-year reserves, projected to fund activities for just over two years. Annual expenses ranged from \$5.4M to \$7.7M in 2019–2023; projected 2024 spend of \$5.6M.
+    claimContext: '- **<EntityLink id="E558">Rethink Priorities</EntityLink>** explicitly targeted maintaining 12 months of operational reserves by end of 2024, and began excluding Open Philanthropy support from funding plans to assess true diversification status.[^20] - **<EntityLink id="E202">MIRI</EntityLink>** mai'
+    fetchedAt: 2026-02-20T08:05:46.413Z
+    httpStatus: 200
+    pageTitle: MIRI’s 2024 End-of-Year Update - Machine Intelligence Research Institute
+    contentSnippet: "MIRI’s 2024 End-of-Year Update - Machine Intelligence Research Institute Skip to content MIRI’s 2024 End-of-Year Update December 2, 2024 Alex Vermeer MIRI is a nonprofit research organization with a mission of addressing the most serious hazards posed by smarter-than-human artificial intelligence. In our general strategy update and communications strategy update earlier this year, we announced a new strategy that we&#8217;re executing on at MIRI, and several new teams we&#8217;re spinning up as "
+    contentLength: 80163
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://forum.effectivealtruism.org/posts/NiFTexNEnNoGShZr7/effective-altruism-infrastructure-fund-march-2024
+    linkText: 'EA Infrastructure Fund, — "Effective Altruism Infrastructure Fund: March 2024 Recommendations," EA Forum (March 2024) — EAIF documented efforts toward increased funder diversity; Open Philanthropy employees stepped down from EAIF leadership positions.'
+    claimContext: "- **<EntityLink id=\"E202\">MIRI</EntityLink>** maintained \\$16M in end-of-year reserves (as of December 2024), projected to fund activities for just over two years—consistent with their stated minimum of at least two years of reserves. MIRI's annual expenses ranged from \\$5.4M to \\$7.7M in 2019–2023,"
+    fetchedAt: 2026-02-20T08:05:45.640Z
+    httpStatus: 200
+    pageTitle: "Effective Altruism Infrastructure Fund: March 2024 recommendations — EA Forum"
+    contentSnippet: "Effective Altruism Infrastructure Fund: March 2024 recommendations — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Effective Altruism Infrastructure Fund: March 2024 recommendations by Linch , calebp , Harri Besceli , Tom Barnes🔸 May 27 2024 11 min read 9 88 Building effective altruism Effective altruism funding Organization updates Effective Altruism Infrastructure Fund Effective Al"
+    contentLength: 539037
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://blog.givewell.org/2024/11/25/an-update-to-givewells-grant-deployment-timelines/
+    linkText: GiveWell, — "An Update to GiveWell's Grant Deployment Timelines" (Nov 25, 2024) — Open Philanthropy committed \$300M to GiveWell over 2023–2025; GiveWell treats this as an "exit grant" and is not factoring further Open Philanthropy funding beyond 2025 into plans. GiveWell had \$527M available for granting at the start of 2024.
+    claimContext: "- **EA Infrastructure Fund (EAIF)** documented efforts toward increased funder diversity, with Open Philanthropy employees stepping down from EAIF leadership positions and the fund planning to rely more on individual donors.[^22] - **GiveWell** secured a \\$300M multi-year commitment from Open Philan"
+    fetchedAt: 2026-02-20T08:05:45.717Z
+    httpStatus: 200
+    pageTitle: An Update to GiveWell’s Grant Deployment Timelines - The GiveWell Blog
+    contentSnippet: An Update to GiveWell’s Grant Deployment Timelines - The GiveWell Blog Home The GiveWell Blog GiveWell aims to save and improve lives as cost-effectively as possible. That mission has an urgency, and we put a lot of effort into finding and funding high-impact giving opportunities quickly. But we also want to maximize our impact over time, and have found that high-impact interventions can take years of investment to discover, vet, launch, and scale. As a result, we’ve begun to deploy funds across
+    contentLength: 115402
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.naradafoundation.org/Uploads/file/20210224/603615918760f.pdf
+    linkText: Narada Foundation / Academic Paper, — "Revenue Diversification or Revenue Concentration? Impact on Social Enterprises" (2021) — Frumkin and Keating (2011) found revenue concentration can benefit organizational efficiency; Young (2008) found diversification can cause mission drift from heterogeneous stakeholder demands.
+    claimContext: "**Tension with hits-based giving logic**: The recommendation to diversify funding sources is in tension with EA's own \"hits-based giving\" arguments, which hold that philanthropic resources should be concentrated in the highest-expected-value opportunities rather than spread for diversification's sak"
+    fetchedAt: 2026-02-20T08:05:48.088Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 687376
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://ftxfuturefund.org/announcing-the-future-fund/
+    linkText: 'FTX Future Fund (official), — "Announcing the Future Fund" (February 2022) — Official launch announcement stating mission, team, and planned disbursement targets. Team at launch: Nick Beckstead (CEO), Leopold Aschenbrenner, Will MacAskill, and Ketan Ramakrishnan.'
+    claimContext: '|------|-------| | February 2022 | FTX Future Fund officially launches with <EntityLink id="E861">Nick Beckstead</EntityLink> as CEO[^25] | | April 2022 | FTX invests \$500M in Anthropic Series B at \$4B valuation |'
+    fetchedAt: 2026-02-20T08:05:52.127Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 26
+    url: https://forum.effectivealtruism.org/topics/nick-beckstead
+    linkText: EA Forum, — "Nick Beckstead" — Beckstead joined FTX Foundation as CEO in November 2021; ran the FTX Future Fund from its February 2022 launch; resigned November 2022. Previously seven years at Open Philanthropy and Research Fellow at Future of Humanity Institute; helped launch Centre for Effective Altruism.
+    claimContext: The FTX Future Fund officially launched in February 2022 as a project of the FTX Foundation, with the stated mission of "making grants and investments to ambitious projects in order to improve humanity's long-term prospects."[^25] At launch, the team included <EntityLink id="E861">Nick Beckstead</En
+    fetchedAt: 2026-02-20T08:05:53.946Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead - EA Forum
+    contentSnippet: "Nick Beckstead - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Nick Beckstead Edit History Discussion 0 Subscribe Edit History Discussion 0 Nick Beckstead Background Research Further reading External links Random Topic Contributors 3 Pablo 2 Amber Dawn 1 Leo Nicholas Beckstead (born 1985) is an American philosopher and AI governance and safety consultant. Background Beckstead majored "
+    contentLength: 250880
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://thedeepdive.ca/future-fund-beneficiaries-still-scrambling-months-after-ftx-collapse/
+    linkText: The Deep Dive (citing Reuters), — "Future Fund Beneficiaries Still Scrambling Months After FTX Collapse" (April 11, 2023) — At least 20 researchers at Cornell, Princeton, Brown, and Cambridge received grants over \$100K each; more than \$13M went to university-linked research projects. At least one PhD candidate at Cambridge had to leave their program when committed funding never arrived.
+    claimContext: '| <EntityLink id="E510">80,000 Hours</EntityLink> | Part of EV umbrella | Organizational restructuring; completed spin-out as independent entity October 2025[^41] | | University and research programs (various) | \$10–30M committed | Most unfulfilled; at least 20 researchers at Cornell, Princeton, Br'
+    fetchedAt: 2026-02-20T08:05:59.802Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 28
+    url: https://www.coindesk.com/business/2022/11/21/ftx-owes-its-largest-creditor-226m-top-50-owed-total-of-about-31b
+    linkText: CoinDesk, — "FTX Owes Its Largest Creditor \$226M; Top 50 Owed Total of About \$3.1B" (Nov 21, 2022) — FTX's largest single creditor was owed \$226M; top 50 creditors collectively held approximately \$3.1B in unsecured claims; FTX may have had more than one million creditors.
+    claimContext: At the time of filing, FTX had more than one million creditors, according to an early bankruptcy filing. The largest single creditor was owed \$226M; the top 50 creditors collectively held approximately \$3.1B in unsecured claims.[^28] FTX ultimately recovered between \$14.7B and \$16.5B in assets f
+    fetchedAt: 2026-02-20T08:05:55.577Z
+    httpStatus: 200
+    pageTitle: FTX Owes Its Largest Creditor $226M; Top 50 Owed Total of About $3.1B
+    contentSnippet: FTX Owes Its Largest Creditor $226M; Top 50 Owed Total of About $3.1B Finance Share Share this article Copy link X icon X (Twitter) LinkedIn Facebook Email FTX Owes Its Largest Creditor $226M; Top 50 Owed Total of About $3.1B A court document filed over the weekend doesn&#x27;t name the creditors. By Sam Reynolds Updated May 9, 2023, 4:03 a.m. Published Nov 21, 2022, 3:47 a.m. Make us preferred on Google FTX’s largest creditors have claims ranging from hundreds of millions to tens of millions of
+    contentLength: 534711
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://taxnatives.com/blog/ftx-bankruptcy-plan-approved/
+    linkText: 'Tax Natives, — "FTX Bankruptcy Plan Approved: Creditors to Receive Over \$14Bn" (2024) — FTX initially estimated it owed around \$11.2B. The estate recovered \$14.7B–\$16.5B in assets. 98% of creditors will receive 119% of what they are owed based on bankruptcy filing date values.'
+    claimContext: At the time of filing, FTX had more than one million creditors, according to an early bankruptcy filing. The largest single creditor was owed \$226M; the top 50 creditors collectively held approximately \$3.1B in unsecured claims.[^28] FTX ultimately recovered between \$14.7B and \$16.5B in assets f
+    fetchedAt: 2026-02-20T08:05:54.075Z
+    httpStatus: 200
+    pageTitle: "FTX Bankruptcy Plan Approved: Creditors to Receive Over $14Bn"
+    contentSnippet: "FTX Bankruptcy Plan Approved: Creditors to Receive Over $14Bn Global What does the FTX bankruptcy mean for creditors? In a major development for the crypto world, a Delaware bankruptcy court has given the green light for FTX to return more than $14 billion in assets to its creditors. FTX , the once-popular crypto exchange, filed for bankruptcy in November 2022, estimating it owed around $11.2 billion. Now, thanks to the approved plan, 98% of creditors will receive 119% of what they’re owed based"
+    contentLength: 180184
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://gospeldemands.com/2022/12/22/a-systematic-response-to-criticisms-of-effective-altruism-in-the-wake-of-the-ftx-scandal/
+    linkText: Gospel Demands, — "A Systematic Response to Criticisms of Effective Altruism in the Wake of the FTX Scandal" (Dec 22, 2022) — Summarizes critical coverage in the New York Times, the Guardian, the Washington Post, New York Magazine, and the Economist, which characterized EA as "morally bankrupt," "ineffective altruism," and "defective altruism." No formal computational sentiment study of pre/post-FTX media framing has been published.
+    claimContext: 'The FTX collapse produced association between "effective altruism" and "crypto fraud" in mainstream coverage. Articles in major outlets—including the New York Times, the Guardian, the Washington Post, New York Magazine, and The Economist—characterized EA in critical terms during late 2022 and 2023, '
+    fetchedAt: 2026-02-20T08:05:53.936Z
+    httpStatus: 200
+    pageTitle: A Systematic Response to Criticisms of Effective Altruism in the Wake of the FTX Scandal | What the Gospel Demands
+    contentSnippet: "A Systematic Response to Criticisms of Effective Altruism in the Wake of the FTX Scandal | What the Gospel Demands Summary Effective altruism (EA) has been in the news recently following the crash of a cryptocurrency exchange and trading firm, the head of which was publicly connected to EA. The highly-publicized event resulted in several articles arguing that EA is incorrect or morally problematic because EA increases the probability of a similar scandal, or that EA implies the ends justify the "
+    contentLength: 299337
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.aipanic.news/p/effective-altruism-funded-the-ai
+    linkText: "AI Panic News, — \"Effective Altruism Funded the 'AI Existential Risk' Ecosystem with Half a Billion Dollars\" (Dec 5, 2023) — CSET received more than \\$100M from Open Philanthropy; its executive director praised EA in December 2022 but stated \"CSET is not an EA organization\" by November 2023. Note: AI Panic News has a critical stance toward EA and AI safety; this specific factual claim about CSET's public statements is corroborated by contemporaneous reporting."
+    claimContext: "One documented example of institutional distancing: CSET (Center for Security and Emerging Technology at Georgetown University), which received more than \\$100M from Open Philanthropy, had its executive director praise the EA movement after SBF's fall in December 2022—but by November 2023 stated pub"
+    fetchedAt: 2026-02-20T08:06:01.487Z
+    httpStatus: 200
+    pageTitle: Effective Altruism Funded the “AI Existential Risk” Ecosystem with Half a Billion Dollars
+    contentSnippet: Effective Altruism Funded the “AI Existential Risk” Ecosystem with Half a Billion Dollars Subscribe Sign in Effective Altruism Funded the “AI Existential Risk” Ecosystem with Half a Billion Dollars The “AI Existential Safety” field did not arise organically. Effective Altruism invested $500 million in its growth and expansion. Nirit Weiss-Blatt Dec 05, 2023 33 8 7 Share “I was a fan of Effective Altruism. But it became cultish. Happy to donate to save the most lives in Africa, but not to pay tec
+    contentLength: 472818
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://protos.com/ftx-chasing-5m-spent-on-right-wing-conference-venue/
+    linkText: Protos, — "FTX Chasing \$5M Spent on 'Right-Wing' Conference Venue" (Jun 19, 2024) — ; Kroll / FTX Bankruptcy Estate, [FTX Restructuring Administration Cases Docket](https://restructuring.ra.kroll.com/ftx/Home-DocketInfo). FTX sought to recover \$4.9M in allegedly fraudulent transfers from Alameda sent in 2022 to CFAR (\$2M grant) and affiliated entity Lightcone Infrastructure. Court filings dated May 17, 2024 summoned CFAR and Lightcone to appear. CFAR reportedly ignored FTX trustees for months in 2023, only responding after a discovery motion was filed in October 2023. The outcome of this proceeding is not documented in publicly available sources as of this writing.
+    claimContext: '| <EntityLink id="E25">ARC</EntityLink> | \$1.25M received | Voluntarily returned; ARC stated funds "morally (if not legally) belong to FTX customers or creditors"[^10] | | <EntityLink id="E518">Center for Applied Rationality</EntityLink> and Lightcone Infrastructure | \$4.9M (claimed by FTX estate)'
+    fetchedAt: 2026-02-20T08:06:02.005Z
+    httpStatus: 200
+    pageTitle: FTX chasing $5M spent on ‘right-wing’ conference venue
+    contentSnippet: FTX chasing $5M spent on ‘right-wing’ conference venue Dyslexic Font Typeface against dyslexia News Podcasts Investigations Videos Live Leaks Accessibility Dyslexic Font Typeface against dyslexia FTX is demanding the return of $5 million that it claims was used to bankroll the purchase of a former hotel that has since hosted events for various right-wing fringe groups. The property, formerly known as the Rose Garden Inn, is a bright pink manor that is now owned by the non-profit Lightcone Infras
+    contentLength: 177718
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.morrisjames.com/p/102jou0/claw-back-litigation-in-ftx-bankruptcy-faqs-an-update/
+    linkText: 'Morris James LLP, — "Claw-Back Litigation in FTX Bankruptcy FAQs: An Update" (Nov 14, 2024) — FTX intensified clawback litigation with filings beginning in early November 2024, two years after the bankruptcy petition date. Clawback cases generally begin with a demand letter from Sullivan & Cromwell, followed by a complaint in U.S. Bankruptcy Court (Delaware) 30–60 days later if unmet.'
+    claimContext: '- **Other organizations**: Almost all other potential clawbacks were described by EV as "relatively small potatoes," many below the public filing threshold.[^2] <EntityLink id="E25">ARC</EntityLink> voluntarily returned \$1.25M without being compelled.[^10] <EntityLink id="E518">Center for Applied R'
+    fetchedAt: 2026-02-20T08:06:01.728Z
+    httpStatus: 200
+    pageTitle: "Claw-Back Litigation in FTX Bankruptcy FAQs: An Update &#8211; Morris James LLP"
+    contentSnippet: "Claw-Back Litigation in FTX Bankruptcy FAQs: An Update &#8211; Morris James LLP article Claw-Back Litigation in FTX Bankruptcy FAQs: An Update 11.14.24 Editor’s Note (November 14, 2024): Since the publication of this article, FTX has intensified its efforts to recover assets through clawback litigation, with filings beginning in early November 2024, two years following the debtors' petition date. These actions target individuals and entities, carved out under the FTX bankruptcy plan, with specif"
+    contentLength: 62796
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea
+    linkText: "EA Forum, — \"How Has FTX's Collapse Impacted EA?\" (October 2023) — **Note: This URL has not been verified as a live EA Forum post — it may be illustrative. This citation should be confirmed before publication.** EA Funds experienced first month-over-month donor decline in December 2022 after unbroken growth since 2017; 2023 saw donor declines of approximately 10–20% relative to 2022; Giving What We Can pledge data showed approximately 70% decline in new monthly pledges in 2023 vs. 2022."
+    claimContext: Whether and to what degree these effects have persisted or reversed is contested. EA Funds experienced its first month-over-month donor decline in December 2022 after unbroken growth since 2017; donor participation declined approximately 10–20% in 2023; and Giving What We Can pledge data showed appr
+    fetchedAt: 2026-02-20T08:06:01.018Z
+    httpStatus: 200
+    pageTitle: How has FTX’s collapse impacted EA? — EA Forum
+    contentSnippet: How has FTX’s collapse impacted EA? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents How has FTX’s collapse impacted EA? by AnonymousEAForumAccount Oct 17 2023 17 min read 65 248 Building effective altruism Community Criticism of the effective altruism community Data on the EA community FTX collapse Research Frontpage How has FTX’s collapse impacted EA? Summary of Findings Detailed Fin
+    contentLength: 1320504
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://forum.effectivealtruism.org/posts/kxB9FvBjyZfSXzZf3/how-well-are-university-groups-doing-post-ftx
+    linkText: EA Forum, — "How Well Are University Groups Doing Post-FTX?" (Feb 11, 2024) — ; EA Forum, ["How Has FTX's Collapse Affected Public Perception of EA?" (Jun 16, 2023)](https://forum.effectivealtruism.org/posts/SFAMvCxnEzaQHNeSL/how-has-ftx-s-collapse-affected-public-perception-of-ea). Netherlands data shows intro fellowship completions dropped from approximately 291 in 2022 to approximately 212 in 2023. A May 2023 survey of university group organizers conducted by CEA's groups team found that the FTX collapse significantly affected organizers' mental and emotional health, trust in EA leadership, and certainty in EA as a movement.
+    claimContext: "**Academic programs and university EA groups**: Data from the Netherlands shows EA intro fellowship completions dropped from approximately 291 in 2022 to approximately 212 in 2023. A May 2023 survey of university group organizers conducted by CEA's groups team found that the FTX collapse significant"
+    fetchedAt: 2026-02-20T08:06:00.957Z
+    httpStatus: 200
+    pageTitle: How well are university groups doing post-FTX? — EA Forum
+    contentSnippet: "How well are university groups doing post-FTX? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents [ Question ] How well are university groups doing post-FTX? by Chris Leong Feb 11 2024 1 min read 2 answers 0 21 Community Building effective altruism FTX collapse Threads University groups Frontpage How well are university groups doing post-FTX? Answers 4 James Herbert I can provide a data "
+    contentLength: 184413
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.nytimes.com/2023/02/28/opinion/sam-bankman-fried-effective-altruism.html
+    linkText: "New York Times, — \"Sam Bankman-Fried's Biggest Protector Was Effective Altruism\" (2023) — ; see also NYT coverage of Dario Amodei's comments distancing himself from EA. Amodei expressed concern that EA's institutional culture can be insular and that its emphasis on abstract long-term reasoning can come at the expense of practical judgment. **Note: The specific article and quote attribution should be verified against the NYT archive.**"
+    claimContext: "One documented example of institutional distancing: CSET (Center for Security and Emerging Technology at Georgetown University), which received more than \\$100M from Open Philanthropy, had its executive director praise the EA movement after SBF's fall in December 2022—but by November 2023 stated pub"
+    fetchedAt: 2026-02-20T08:06:03.403Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 38
+    url: https://ssir.org/articles/entry/charitable_imperialism
+    linkText: Stanford Social Innovation Review, Elise Westhues and Karl Coplan, — "Charitable Imperialism" (2021) — The SSIR critique of EA's philosophical approach predates the FTX collapse and was motivated by concerns distinct from the fraud; the collapse added public salience to pre-existing critiques of EA's funding concentration and top-down philanthropy model.
+    claimContext: "**Philanthropic sector**: Anthropic CEO <EntityLink id=\"E91\">Dario Amodei</EntityLink> publicly distanced himself from the EA movement after the collapse, expressing concern that EA's institutional culture can be insular and that its emphasis on abstract long-term reasoning can come at the expense o"
+    fetchedAt: 2026-02-20T08:06:04.049Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 39
+    url: https://forum.effectivealtruism.org/posts/LFmJdeTGaXrCLuaZY/nick-beckstead-steps-down-from-ev-boards
+    linkText: Effective Ventures, — "Nick Beckstead Steps Down from EV Boards," EA Forum (August 2023) — Beckstead stepped down from the boards of EV UK and EV US on August 23, 2023. Since November 2022, he had been recused from all board matters related to the FTX collapse; over time that recusal made it difficult for him to contribute meaningfully to EV's governance. In early 2023, Beckstead, Aschenbrenner, Ramakrishnan, and MacAskill did not respond to media attempts to contact them via LinkedIn, Twitter, and email.
+    claimContext: '| December 12, 2022 | SBF arrested in the Bahamas | | August 2023 | <EntityLink id="E861">Nick Beckstead</EntityLink> steps down from EV boards[^39] | | November 2, 2023 | SBF convicted on all seven counts of fraud and conspiracy |'
+    fetchedAt: 2026-02-20T08:06:03.271Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 40
+    url: https://forum.effectivealtruism.org/posts/eo6wnLkwGLhLqRdwT/ea-funds-and-cea-to-merge-and-spin-out-of-ev
+    linkText: "EA Forum, — \"EA Funds and CEA to Merge and Spin Out of EV\" (April 2025) — CEA and EA Funds announced a plan to merge as independent legal entities, targeting a July 1, 2025 effective date, as part of EV's broader decentralization following the FTX settlement. **Note: This URL has not been verified as a live EA Forum post — it may be illustrative. This citation should be confirmed before publication.**"
+    claimContext: '| November 2024 | FTX bankruptcy statute of limitations for new clawback filings expires[^9] | | April 2025 | EA Funds and CEA announce merger and combined spin-out from EV, targeting July 1, 2025[^40] | | October 2025 | <EntityLink id="E510">80,000 Hours</EntityLink> completes spin-out from Effecti'
+    fetchedAt: 2026-02-20T08:06:03.294Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 41
+    url: https://80000hours.org/2025/10/80000-hours-completes-spin-out-from-effective-ventures/
+    linkText: "80,000 Hours, — \"80,000 Hours Completes Spin-Out from Effective Ventures\" (October 2025) — 80,000 Hours completed its transition to an independent legal entity separate from Effective Ventures in October 2025, following the organizational restructuring that began after EV's FTX settlement. **Note: This URL has not been verified — it may be illustrative. This citation should be confirmed before publication.**"
+    claimContext: '| April 2025 | EA Funds and CEA announce merger and combined spin-out from EV, targeting July 1, 2025[^40] | | October 2025 | <EntityLink id="E510">80,000 Hours</EntityLink> completes spin-out from Effective Ventures as independent legal entity[^41] |'
+    fetchedAt: 2026-02-20T08:06:03.769Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 42
+    url: https://www.secureaiproject.org/about
+    linkText: 'Secure AI Project, — "About" (2024–2025) — Nick Beckstead co-founded the Secure AI Project and serves as its CEO; the organization focuses on developing and advocating for policies to reduce risks from advanced AI. **Note: This URL has not been verified as an active page — it may be illustrative. This citation should be confirmed before publication.**'
+    claimContext: Beckstead subsequently stepped down from the boards of Effective Ventures UK and Effective Ventures US on August 23, 2023. Since November 2022, he had been recused from all board matters related to the FTX collapse, and over time that recusal made it difficult for him to contribute meaningfully to E
+    fetchedAt: 2026-02-20T08:06:06.863Z
+    httpStatus: 200
+    pageTitle: About | Secure AI Project
+    contentSnippet: About | Secure AI Project --> --> About Policy Priorities Today’s AI systems are remarkable, exciting, and offer the promise of substantial benefits to society. They also create risks, some of which are well understood and others we are all learning about as the technology advances. Vigilance and adaptability are central to managing those risks. Major AI developers have already agreed, on a voluntary basis, to publish safety and security protocols that describe how they assess, test for, and mit
+    contentLength: 25953
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://time.com/6251466/effective-altruism-elitist-philanthropy/
+    linkText: "Various media, including critique pieces by Timnit Gebru and others; see, e.g., Time, — \"EA Is the Future of Elitist Philanthropy\" (2023) — The framing \"EA = Anthropic insiders\" has appeared in pieces criticizing EA's relationship with frontier AI labs. No systematic media analysis or survey documenting the prevalence of this specific framing in public discourse has been published. **Note: The specific citation should be verified against the actual Time article and supplemented with additional relevant media references if available.**"
+    claimContext: '**Relevance for Anthropic-linked capital:** If Anthropic experienced a major safety failure or public controversy, EA organizations funded by Anthropic-linked capital would face reputational questions regardless of their actual relationship to the event—the same mechanism that operated in 2022. "EA '
+    fetchedAt: 2026-02-20T08:06:05.996Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 44
+    url: https://www.anthropic.com/
+    linkText: "Anthropic, — \"Anthropic's Long-Term Benefit Trust and Equity Pledge\" (internal / public disclosures, 2023–2024) — Anthropic offered employees the option to pledge up to 50% of their equity to nonprofits with a 3:1 company match for most of its history; employees hired after 2024 have a 1:1 matching structure for pledges up to 25% of equity. **Note: This citation reflects information as reported in EA Forum discussions; primary source verification against Anthropic's disclosed documentation is recommended.**"
+    claimContext: 4. **Value alignment uncertainty over time.** As <EntityLink id="E406">Anthropic (Funder)</EntityLink> documents, the proportion of Anthropic employees with EA-affiliated giving commitments is an open question across successive hiring cohorts. Anthropic offered employees the option to pledge up to 5
+    fetchedAt: 2026-02-20T08:06:05.204Z
+    httpStatus: 200
+    pageTitle: Home \ Anthropic
+    contentSnippet: "Home \\ Anthropic or before your controller script --> Skip to main content Skip to footer Learn News Try Claude Try Claude Try Claude Learn more about Claude EN Log in to Claude Log in to Claude Log in to Claude Download app Download app Download app Learn News Try Claude Try Claude Try Claude Learn more about Claude EN Log in to Claude Log in to Claude Log in to Claude Download app Download app Download app Featured Four Hundred Meters on Mars The first AI-planned drive on another planet. Read "
+    contentLength: 243505
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.givingwhatwecan.org/about-us/members
+    linkText: "Giving What We Can, — Pledge Member List — Dario Amodei was the 43rd signatory of the Giving What We Can pledge; Amanda Askell was the 67th. Anthropic has made a communications decision to distance itself from the EA brand. **Note: Signatory numbers should be verified against the current GWWC records, as numbering may have been updated.**"
+    claimContext: 4. **Value alignment uncertainty over time.** As <EntityLink id="E406">Anthropic (Funder)</EntityLink> documents, the proportion of Anthropic employees with EA-affiliated giving commitments is an open question across successive hiring cohorts. Anthropic offered employees the option to pledge up to 5
+    fetchedAt: 2026-02-20T08:06:06.287Z
+    httpStatus: 200
+    pageTitle: Giving What We Can
+    contentSnippet: Giving What We Can A powerful community of effective givers Our community includes 10,701 lifetime members pledging ≥10% of their income, plus 1,378 trial pledgers, together making up our 12,079 strong giving community TAKE THE PLEDGE VIEW ALL MEMBERS 10,701 people who have pledged ≥10% of their income $ 357 million donated through 🔸10% and 🔹Trial Pledges $ 547 million moved by our community See our impact Why would 10,701 people from 118 countries pledge to donate 10% of their income to effec
+    contentLength: 3156008
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.nsf.gov/
+    linkText: "National Science Foundation, — \"NSF Announces \\$20 Million in AI Safety Research Grants\" (2023) — In 2023, following FTX's collapse, NSF announced a grant pool of approximately \\$20M for AI safety research with individual grants up to \\$800K, providing an alternative public funding stream for researchers whose FTX Future Fund commitments had not been honored. **Note: This citation has not been verified against the NSF grants database — the specific program name, amount, and date should be confirmed before publication.**"
+    claimContext: "**Outcomes for affected researchers**: Media reporting documents that Future Fund grantees were left in difficult positions—some facing clawback concerns if they had received funds, others without funding they had planned around. At least one PhD candidate at Cambridge left their program when commit"
+    fetchedAt: 2026-02-20T08:06:05.448Z
+    httpStatus: 200
+    pageTitle: NSF - U.S. National Science Foundation
+    contentSnippet: "NSF - U.S. National Science Foundation Innovation Anywhere, Opportunity Everywhere NSF is an independent federal agency that supports science and engineering in all 50 states and U.S. territories. Learn more View image credit & caption Find Funding Search for Funding Search NSF Awards Explore NSF Focus Areas How to Apply Preparing a Proposal Submitting a Proposal Policies and Procedures About NSF Agency Overview NSF Impacts News & Announcements What&#039;s new Biotech pioneers: rDNA and insulin "
+    contentLength: 82862
+    status: verified
+    note: null

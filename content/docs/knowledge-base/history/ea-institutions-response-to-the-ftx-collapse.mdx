@@ -4,7 +4,8 @@ title: EA Institutions' Response to the FTX Collapse
 description: How effective altruism organizations, leaders, and the broader
   community responded to the November 2022 collapse of FTX and the revelations
   surrounding Sam Bankman-Fried.
-lastEdited: "2026-02-19"
+readerImportance: 62
+lastEdited: "2026-02-20"
 clusters:
   - community
   - governance
@@ -16,7 +17,6 @@ ratings:
   rigor: 7
   actionability: 3
   completeness: 7
-readerImportance: 62
 tacticalValue: 35
 quality: 53
 llmSummary: EA institutions responded to the FTX collapse through public
@@ -25,8 +25,11 @@ llmSummary: EA institutions responded to the FTX collapse through public
   survey data showed trust in EA leadership dropped significantly (~30%+
   substantially lost trust) while philosophical commitments remained
   comparatively resilient. The crisis exposed structural vulnerabilities in EA's
-  donor concentration model and governance practices, though long-term impacts
-  on funding and reputation remain uncertain.
+  donor concentration model and governance practices; subsequent developments
+  included SBF's 2023 conviction on all seven counts of fraud, a 25-year prison
+  sentence, and a comprehensive restructuring of Effective Ventures that
+  dissolved its umbrella model and spun out its major projects as independent
+  organizations.
 entityType: historical
 ---
 import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
@@ -36,11 +39,13 @@ import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@component
 | Attribute | Details |
 |-----------|---------|
 | **Event** | FTX collapse (November 2022) and EA institutional response |
-| **Key Figures** | Will MacAskill, Nick Beckstead, Peter Singer, Sam Bankman-Fried |
-| **Primary Institutions** | <EntityLink id="E517">Centre for Effective Altruism</EntityLink>, <EntityLink id="E855">FTX Future Fund</EntityLink>, <EntityLink id="E552">Open Philanthropy</EntityLink> |
-| **Funding Lost** | \$160M+ in committed Future Fund grants halted |
-| **Trust Impact** | >30% of EA community substantially lost trust in EA public figures |
-| **Community Sentiment** | Satisfaction declined 0.5–1 points on a 10-point scale |
+| **Key Figures** | <EntityLink id="will-macaskill">Will MacAskill</EntityLink>, <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, Peter Singer, <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> |
+| **Primary Institutions** | <EntityLink id="cea">Centre for Effective Altruism</EntityLink>, <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>, <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> |
+| **Funding Committed** | \$160M+ in Future Fund grants and investments, the majority halted or subject to clawback |
+| **Trust Impact** | >30% of EA community survey respondents reported substantially losing trust in EA public figures |
+| **Community Sentiment** | Satisfaction declined approximately 0.5–1 points on a 10-point scale (n=1,312) |
+| **Criminal Outcome** | SBF convicted on all 7 counts (November 2, 2023); sentenced to 25 years (March 28, 2024) |
+| **Institutional Restructuring** | Effective Ventures paid \$26.8M FTX settlement; decentralized into independent organizations (2024) |
 
 ## Key Links
 
@@ -49,40 +54,49 @@ import {EntityLink, R, F, Calc, DataInfoBox, DataExternalLinks} from '@component
 | Official EA Forum coverage | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/topics/ftx-collapse) |
 | EA Forum: Community Impact Survey | [How has FTX's collapse impacted EA?](https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea) |
 | Rethink Priorities Survey Results | [ftx-community-response-survey-results](https://rethinkpriorities.org/research-area/ftx-community-response-survey-results/) |
-| EA Forum | [forum.effectivealtruism.org](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within) |
-| Official site (philanthropy context) | [philanthropynewsdigest.org](https://philanthropynewsdigest.org/news/ftx-s-collapse-expected-to-impact-effective-altruism-movement) |
+| EA Forum: FTX Cultural Critique | [The FTX crisis highlights a deeper cultural problem within EA](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within) |
+| Philanthropy News Digest | [FTX's collapse expected to impact effective altruism movement](https://philanthropynewsdigest.org/news/ftx-s-collapse-expected-to-impact-effective-altruism-movement) |
+| EV Updates: FTX Settlement | [EV Updates: FTX Settlement and the Future of EV](https://forum.effectivealtruism.org/posts/HjsfHwqasyQMWRzZN/ev-updates-ftx-settlement-and-the-future-of-ev) |
+| SBF Trial — Wikipedia | [Trial of Sam Bankman-Fried](https://en.wikipedia.org/wiki/Trial_of_Sam_Bankman-Fried) |
+| TIME investigation | [EA Leaders Were Warned About SBF](https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/) |
 
 ## Overview
 
-The collapse of <EntityLink id="E856">FTX</EntityLink> in November 2022 was a defining crisis for the effective altruism (EA) movement. Sam Bankman-Fried (SBF), the founder of FTX, had been one of EA's most prominent and financially significant members, pledging the majority of his wealth to effective causes and channeling hundreds of millions of dollars through the <EntityLink id="E855">FTX Future Fund</EntityLink>. When FTX imploded following revelations about the entanglement of Alameda Research's finances with customer funds, the shock rippled immediately through EA institutions, damaging trust, disrupting funding pipelines, and prompting deep community self-examination.[^1]
+The collapse of <EntityLink id="ftx">FTX</EntityLink> in November 2022 was a crisis for the effective altruism (EA) movement with consequences that unfolded over the following two years. <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (SBF), the founder of FTX, had been one of EA's most prominent and financially significant members, pledging the majority of his wealth to effective causes and channeling hundreds of millions of dollars through the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>. When FTX imploded following revelations about the entanglement of Alameda Research's finances with customer funds, the shock rippled immediately through EA institutions, damaging trust, disrupting funding pipelines, and prompting extensive community self-examination.[^1]
 
-EA institutions responded through a combination of public condemnation of SBF's alleged fraud, operational pauses on grant-making, emergency funding efforts to support affected organizations, and community surveys to assess the damage. The response was complicated by subsequent reporting indicating that EA leaders had received warnings about SBF's behavior and business practices as early as 2018—warnings that, according to sources interviewed by TIME, were downplayed or rationalized rather than acted upon.[^2] This revelation added a layer of institutional accountability questions to what might otherwise have been a straightforward case of external fraud.
+EA institutions responded through a combination of public condemnation of SBF's alleged fraud, operational pauses on grant-making, emergency funding efforts to support affected organizations, and community surveys to assess the damage. The response was complicated by subsequent reporting indicating that EA leaders had received warnings about SBF's behavior and business practices as early as 2018—warnings that, according to sources interviewed by TIME, were downplayed or rationalized rather than acted upon.[^2] This revelation added a layer of institutional accountability questions to the crisis beyond those raised by the fraud itself.
 
 Despite significant erosion of trust in EA leadership, survey data suggested that the EA community's attachment to its underlying philosophical principles remained comparatively resilient. The crisis nonetheless exposed structural vulnerabilities in EA's reliance on a small number of extremely wealthy donors, prompted calls for governance reform, and left a lasting mark on EA's public reputation and funding landscape.
 
+Subsequent developments extended well beyond the initial months of crisis management. SBF was convicted on all seven counts of fraud and conspiracy in November 2023 and sentenced to 25 years in federal prison in March 2024. Effective Ventures—the UK/US umbrella entity that housed the <EntityLink id="cea">Centre for Effective Altruism</EntityLink> and numerous other EA projects—paid \$26.8 million to settle with FTX's bankruptcy estate, underwent a complete board turnover, and announced a comprehensive decentralization plan under which its major projects would spin out as independent organizations.
+
 ## Background: EA's Ties to FTX
 
-Prior to November 2022, SBF and other senior FTX and Alameda Research leaders collectively represented the second-largest group of benefactors to the EA movement, surpassed only by <EntityLink id="E552">Open Philanthropy</EntityLink> and Good Ventures (the philanthropic vehicle of Cari Tuna and Dustin Moskovitz).[^3] SBF had become publicly associated with EA's "earning to give" ethos—the idea that accumulating wealth through a high-impact career to donate aggressively could be more effective than direct nonprofit work.
+Prior to November 2022, SBF and other senior FTX and <EntityLink id="ftx">FTX</EntityLink>/Alameda Research leaders collectively represented the second-largest group of benefactors to the EA movement, surpassed only by <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> and Good Ventures (the philanthropic vehicle of Cari Tuna and Dustin Moskovitz).[^3] SBF had become publicly associated with EA's "earning to give" strategy—the idea that accumulating wealth through a high-income career in order to donate aggressively could produce more impact than direct nonprofit work.
 
-The <EntityLink id="E855">FTX Future Fund</EntityLink>, a charitable organization bankrolled by SBF, had committed approximately \$160 million in grants and investments by September 2022 across a range of EA-aligned causes, including global health, biosecurity, and AI safety.[^3] This made it one of the most significant new philanthropic actors in the EA ecosystem in a very short time. Organizations ranging from university research centers to small nonprofits in the developing world had built multiyear plans around expected Future Fund support.
+The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>, a charitable organization bankrolled by SBF, had committed approximately \$160 million in grants and investments by September 2022 across a range of EA-aligned causes, including global health, biosecurity, and AI safety—all in under nine months of operation.[^3] This made it one of the most significant new philanthropic actors in the EA ecosystem in a very short time. Organizations ranging from university research centers to small nonprofits in the developing world had built multiyear plans around expected Future Fund support.
 
-SBF's personal profile within EA was significant. Will MacAskill, the Oxford moral philosopher and co-founder of the <EntityLink id="E517">Centre for Effective Altruism</EntityLink>, had publicly promoted SBF as an exemplar of EA principles. The FTX collapse therefore implicated not just a peripheral donor but a central figure whose elevation had been sanctioned at the highest levels of EA's intellectual and organizational leadership.[^2]
+SBF's personal profile within EA was significant. <EntityLink id="will-macaskill">Will MacAskill</EntityLink>, the Oxford moral philosopher and co-founder of the <EntityLink id="cea">Centre for Effective Altruism</EntityLink>, had publicly endorsed SBF in media appearances, tweets, and interviews as an exemplary practitioner of EA's earning-to-give approach. MacAskill's personal promotion of SBF—distinct from any formal institutional endorsement by CEA—meant that the FTX collapse implicated not just a peripheral donor but a figure whose credibility had been publicly vouched for by EA's most prominent intellectual leader.[^2] It is worth distinguishing this individual promotion from the earning-to-give strategy itself: the strategy was developed and endorsed by many EA thinkers independently of SBF, and critics and defenders alike have debated whether SBF's conduct reflects on the strategy or primarily on the individuals who promoted him specifically.
+
+<EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, who had spent over seven years at <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> and served as a board member of Effective Ventures, left Open Philanthropy to become CEO of the FTX Foundation and executive director of the FTX Future Fund in November 2021.[^12] His dual role—running the Future Fund while sitting on the boards of EA's central umbrella organization—made him a key figure in the crisis that followed.
 
 ## Immediate Institutional Response
 
-The day FTX declared bankruptcy—November 11, 2022—the FTX Future Fund team announced their resignation, citing fundamental questions about FTX's legitimacy and integrity. The fund halted all grant processing. This left committed grants in limbo and forced recipient organizations to scramble for alternative funding.[^4] For example, Rajalakshmi Children Foundation, which had been expecting multiyear support from the Future Fund, received no communication from the FTX Foundation and had to seek emergency donors elsewhere.[^4]
+The day FTX declared bankruptcy—November 11, 2022—the FTX Future Fund team, including <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, announced their resignation. Their public statement said they were "now unable to perform our work or process grants," that they were "devastated that it looks like there are many committed grants that the Future Fund will be unable to honor," and that they had "fundamental questions about the legitimacy and integrity of the business operations that were funding the FTX Foundation and the Future Fund."[^12] The fund halted all grant processing. This left committed grants in limbo and forced recipient organizations to scramble for alternative funding.[^4] For example, Rajalakshmi Children Foundation, which had been expecting multiyear support from the Future Fund, received no communication from the FTX Foundation and had to seek emergency donors elsewhere.[^4]
 
-MacAskill was among the EA leaders who responded publicly within days of the collapse. In statements circulated on social media, he expressed what he described as a combination of rage at SBF for allegedly deceiving him and self-criticism for having trusted SBF. He also emphasized that EA principles are fundamentally opposed to "ends justify the means" reasoning, positioning the alleged fraud as a violation of—rather than a product of—EA's philosophical commitments.[^5]
+MacAskill was among the EA leaders who responded publicly within days of the collapse. In statements circulated on social media, he described experiencing a combination of anger at SBF for allegedly deceiving him and self-criticism for having trusted SBF. He also emphasized that EA principles are fundamentally opposed to "ends justify the means" reasoning, positioning the alleged fraud as a violation of—rather than a product of—EA's philosophical commitments.[^5]
 
-Peter Singer, widely regarded as the intellectual founder of the EA movement, defended EA in an interview with The Guardian in December 2022 while acknowledging the harm caused. According to the interview, Singer stated that "wise, effective altruists and utilitarians know that honesty is the best policy," and argued that the broader record of EA's "earning to give" approach remained net positive despite the FTX collapse.[^6]
+Peter Singer, widely regarded as the intellectual founder of the EA movement, addressed the collapse in an interview published in The Guardian in December 2022, in which he stated that "wise, effective altruists and utilitarians know that honesty is the best policy," and argued that the broader record of EA's "earning to give" approach remained net positive despite the FTX collapse.[^6]
 
-<EntityLink id="E552">Open Philanthropy</EntityLink> announced via the EA Forum that it was prepared to support charitable organizations impacted by FTX's collapse, stepping into the gap left by the Future Fund's sudden disappearance.[^4]
+<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> announced via the EA Forum on November 16, 2022 that it was seeking applications from grantees affected by the FTX Future Fund collapse who fell within its longtermist focus areas—biosecurity, AI risk, and EA community-building. Eligibility included organizations that never received some or all of their committed funds, and those that had received funds but wished to set them aside to return to creditors. Open Philanthropy clarified at the time that it had never received any donations from FTX, the Future Fund, or individuals who worked there.[^17] The only publicly documented specific disbursement from Open Philanthropy's emergency program was \$753,162 to support career transition plans for a number of FTX Future Fund grantees.[^16]
 
 ## Community Impact: Survey Data
 
-A December 2022 survey conducted by Rethink Priorities in collaboration with the <EntityLink id="E517">Centre for Effective Altruism</EntityLink> provided the most systematic picture of how the collapse affected the EA community.[^7]
+A December 2022 survey conducted by <EntityLink id="rethink-priorities">Rethink Priorities</EntityLink> in collaboration with the <EntityLink id="cea">Centre for Effective Altruism</EntityLink> provided the most systematic picture of how the collapse affected the EA community.[^7]
 
-The headline finding was that community satisfaction declined by approximately 0.5–1 points on a 10-point scale, with overall sentiment remaining on the positive side at roughly 7.5 out of 10. However, the distribution of specific concerns was striking:
+**Methodology**: The survey was added as a section to the 2022 EA Survey. A total of 3,567 respondents completed the broader EA Survey; of these, 1,012 agreed to answer the FTX section. An additional 300 respondents completed a separate FTX survey link provided for those who had already completed the EA Survey, bringing the total sample for FTX-related questions to 1,312 respondents. Surveys closed on January 1, 2023. The survey was authored by David Moss and Willem Sleegers of <EntityLink id="rethink-priorities">Rethink Priorities</EntityLink>. Because respondents were recruited through EA-affiliated channels, results are most representative of already-engaged EA community members rather than the general public or casual followers.[^22]
+
+The headline finding was that community satisfaction declined by approximately 0.5–1 points on a 10-point scale, with overall sentiment remaining on the positive side at roughly 7.5 out of 10. The distribution of specific concerns was as follows:
 
 - 58% of respondents reported the crisis gave them concerns about EA meta-organizations
 - 55% reported concerns about the EA community and its norms
@@ -91,73 +105,132 @@ The headline finding was that community satisfaction declined by approximately 0
 
 The data also captured responses related to behavior change. Approximately 31% of respondents reported that they stopped referring to "EA" by name while continuing to promote EA ideas and projects, and 15% temporarily paused EA promotion entirely. Only 6% reported permanently ceasing EA promotion.[^8]
 
-Notably, the philosophical core of EA appeared more insulated from the damage. Only 25% of respondents agreed that the crisis gave them concerns about EA principles or philosophy, compared to 66% who disagreed.[^7] This suggested that the damage was concentrated at the institutional and leadership level rather than the level of EA's foundational arguments.
+The philosophical core of EA appeared more insulated from the damage than its institutional layer. Only 25% of respondents agreed that the crisis gave them concerns about EA principles or philosophy, compared to 66% who disagreed.[^7] On the question of whether EA had responded well to the crisis, 47% agreed and 21% disagreed, with the remainder neutral or ambivalent.[^7]
 
-On the question of whether EA had responded well to the crisis, 47% agreed and 21% disagreed, with the remainder neutral or ambivalent.[^7]
+A separate strand of the Rethink Priorities research examined university students (not EA-affiliated) surveyed from November 2022 to February 2023. Most of these respondents had not previously encountered EA. Only 13 of 233 (5.6%) university students who had encountered EA found FTX or SBF salient enough to mention unprompted, and among those aware of EA but not additionally aware of FTX, attitudes toward EA may have been unaffected or slightly positive post-collapse.[^22]
 
 ## Funding Consequences
 
-The financial consequences of the collapse were significant. EA Funds donation inflows reportedly declined substantially in the period following the collapse. Some donors who had planned movement-building grants became more cautious, while a smaller number consciously increased their giving to compensate for the loss of FTX-linked funding.[^9]
+The financial consequences of the collapse were significant across multiple dimensions.
 
-Stanford's Center for Innovation in Global Health, which had received \$1.5 million from the Future Fund, removed public mention of the grant from its communications following the collapse.[^4] Across the broader EA ecosystem, organizations that had built multiyear plans around Future Fund commitments faced abrupt uncertainty. The collapse illustrated what critics described as a structural vulnerability in EA's funding model: excessive concentration of financial resources in a small number of donors whose wealth was tied to volatile and opaque asset classes.
+**Committed grants halted or clawed back**: The FTX Future Fund had committed more than \$160 million to over 110 nonprofits by the time of the collapse.[^20] FTX's new bankruptcy management demanded return of funds by end of February 2023, threatening legal action against non-compliant recipients. The Alignment Research Center voluntarily returned its \$1.25 million FTX Foundation grant, stating the money "morally (if not legally) belongs to FTX customers or creditors."[^20] ProPublica returned the initial \$1.6 million of what was to have been a three-year, \$5 million grant.[^19] FTX paid the Center for AI Safety \$6.5 million between May and September 2022; the FTX bankruptcy estate subsequently probed this payment.[^21] Stanford's Center for Innovation in Global Health had received \$1.5 million from the Future Fund for pandemic-prevention seed grants and removed public mention of the grant from its communications following the collapse; Stanford has not publicly explained this decision.[^20]
 
-New Giving What We Can pledges reportedly dropped by approximately 70% in the period following the collapse, and EA Forum metrics—posts and engagement levels—peaked around the time of the collapse before declining or reversing prior growth trends.[^9]
+**Impact on individual researchers and small organizations**: PhD student Korbinian Kettnaker at Cambridge was among those forced to drop out when his FTX funding did not materialize. Researchers at Cambridge, Princeton, Brown, and Cornell had received or expected Future Fund support.[^19] Josh Morrison, head of 1Day Sooner (a pandemic preparedness research nonprofit), described the situation as "definitely a mess" after receiving \$375,000 from the Future Fund and FTX Foundation.[^21]
+
+**Broader funding landscape effects**: The collapse caused a substantial contraction in expected longtermist funding. EA Funds' Long-Term Future Fund and Infrastructure Fund reported funding gaps of roughly \$450,000 and \$550,000 per month respectively following FTX's implosion.[^18] Open Philanthropy paused most new longtermist funding commitments in Potential Risks from Advanced AI, Biosecurity and Pandemic Preparedness, and EA Community Growth in the immediate aftermath.[^23]
+
+New <EntityLink id="giving-what-we-can">Giving What We Can</EntityLink> pledges reportedly dropped by approximately 70% in the period following the collapse, and EA Forum metrics—posts and engagement levels—peaked around the time of the collapse before declining from prior growth trends.[^9]
+
+## Nick Beckstead: Role, Recusal, and Departure
+
+<EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>'s role in the crisis occupied a particular position in subsequent accountability discussions. As CEO of the FTX Foundation and executive director of the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>, he oversaw the disbursement of over \$160 million in grants and investments during the fund's nine-month existence. He was simultaneously a board member of both Effective Ventures UK and Effective Ventures US—the umbrella entity housing the <EntityLink id="cea">Centre for Effective Altruism</EntityLink> and other major EA projects.[^12][^13]
+
+According to TIME's March 2023 investigation, Beckstead was among EA leaders personally notified about SBF's questionable behavior and business ethics by 2019. When TIME sought detailed responses from him about these warnings and what steps were taken, he declined to answer, citing an independent investigation that had been commissioned.[^2]
+
+Following the collapse, Beckstead was recused from all board matters related to FTX beginning in November 2022. On August 23, 2023—nearly a year after the collapse—he stepped down from both EV boards. The announcement stated that the recusal "made it difficult for him to add sufficient value to EV and its projects," which both Beckstead and other trustees agreed was sufficient reason for him to step down.[^13] EA Forum commenters raised pointed questions about governance: why he had remained on the boards for nearly a year after the collapse while recused from the central crisis-related matters.[^13]
+
+EA Forum discussion at the time of the TIME article publication debated "whether Nick did the right thing ex ante when he chose to run the Future Fund" and what standard of evidence or argument would be needed to hold board members accountable in such circumstances.[^14]
 
 ## Prior Warnings and Institutional Accountability
 
-Perhaps the most damaging element of the post-collapse reckoning was the emergence of reporting indicating that EA leaders had received serious warnings about SBF's behavior years before the collapse. According to sources who spoke to TIME, concerns about Bankman-Fried's conduct at Alameda Research—including allegations of pervasive dishonesty, sloppy accounting, and rejection of corporate controls—had been raised within EA circles as early as 2018.[^2]
+Perhaps the most contested element of the post-collapse reckoning was the emergence of reporting indicating that EA leaders had received serious warnings about SBF's behavior years before the collapse. According to sources who spoke to TIME, concerns about Bankman-Fried's conduct at Alameda Research—including allegations of pervasive dishonesty, sloppy accounting, and rejection of corporate controls—had been raised within EA circles as early as 2018.[^2]
 
-According to these sources, the concerns were characterized as typical startup disputes or dismissed as "he said-she said" rather than prompting substantive action. EA leaders declined or did not respond to requests from TIME to explain their reaction to these warnings and what steps, if any, they took in response.[^2] Sources familiar with the EA community at the time suggested it was implausible that prominent EA leaders were unaware of quite a lot of the details regarding Alameda's internal problems, describing the situation as a significant event within the EA community.[^2]
+According to these sources, the concerns were characterized as typical startup disputes or dismissed as "he said-she said" rather than prompting substantive action. Sources familiar with the EA community at the time suggested it was implausible that prominent EA leaders were unaware of quite a lot of the details regarding Alameda's internal problems, describing the situation as a significant event within the EA community.[^2] The TIME investigation also reported that CEA had conducted an internal investigation relating to CEA and Alameda sometime in 2019, conducted in part by MacAskill himself, though the full findings and conclusions of that investigation have not been made public.[^2]
 
-Federal prosecutors identified 2019 as the start of Bankman-Fried's alleged criminal fraud—after the initial warnings had been raised—and no sources alleged that EA leaders had advance knowledge of specific criminal conduct. Nevertheless, the pattern of downplaying credible concerns about a major donor raised serious questions about EA institutions' willingness to apply critical scrutiny to powerful figures within the movement.[^2]
+EA leaders who were contacted by TIME declined or did not respond to requests to explain their reactions to these warnings or what steps they took. Federal prosecutors identified 2019 as the start of Bankman-Fried's alleged criminal fraud—after the initial warnings had been raised—and no sources alleged that EA leaders had advance knowledge of specific criminal conduct. The TIME reporting represented one account, drawing on sources sympathetic to those raising concerns; EA leaders' own characterizations of what was known and when have not been set out in detail publicly, meaning the full record remains incomplete.
 
-MacAskill publicly acknowledged in the aftermath that the movement needed to engage in serious self-examination and that EA needed to make clear it does not see itself as above common-sense ethical norms.[^5]
+MacAskill publicly acknowledged in the aftermath that the movement needed to engage in serious self-examination and that EA needed to make clear it does not see itself as above common-sense ethical norms.[^5] As of November 2023, following SBF's conviction, MacAskill declined to be interviewed by the New Statesman and had offered no further detailed public account of the events.[^24]
+
+## SBF's Criminal Trial, Conviction, and Sentencing
+
+On November 2, 2023, <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> was convicted by a federal jury in the U.S. District Court for the Southern District of New York on all seven counts he faced: wire fraud against FTX customers, wire fraud against Alameda Research lenders, conspiracy to commit securities fraud against FTX investors, conspiracy to commit commodities fraud, and conspiracy to commit money laundering. Co-operators Caroline Ellison and Gary Wang had pleaded guilty and cooperated with prosecutors.[^25]
+
+On March 28, 2024, Judge Lewis Kaplan sentenced SBF to 25 years in federal prison, three years of supervised release, and required him to forfeit \$11.2 billion in illegal proceeds. Prosecutors had requested 40–50 years; the defense requested a substantially shorter sentence. Judge Kaplan specifically addressed SBF's "expected value" reasoning during sentencing, citing testimony from Caroline Ellison that SBF would take a coin-flip bet between "destroying the world" and doubling its goodness. Kaplan stated that SBF "will be in a position to do something very bad in the future, and it's not a trivial risk."[^26]
+
+No major EA institution—including CEA or Open Philanthropy—issued a formal public statement specifically addressing the conviction or the sentencing. EA Forum community discussion at the time of sentencing noted that SBF "did terrible acts from many different moral viewpoints, including that of consequentialism" and "harmed the EA movement," while some commenters observed that, for those who believed he had acted from a sincere desire to do good, the situation felt like "a tragedy, though a necessary one."[^27]
+
+## Effective Ventures Restructuring
+
+One of the most concrete institutional consequences of the FTX collapse was the comprehensive restructuring of Effective Ventures (EV)—the UK/US umbrella entity that served as fiscal sponsor and legal host for the <EntityLink id="cea">Centre for Effective Altruism</EntityLink>, <EntityLink id="80000-hours">80,000 Hours</EntityLink>, <EntityLink id="giving-what-we-can">Giving What We Can</EntityLink>, and numerous other EA projects.
+
+**UK Charity Commission inquiry**: The UK Charity Commission opened a statutory inquiry into EV UK in December 2022, triggered by the collapse. In May 2024, the Commission published its report, finding that trustees had taken appropriate steps to protect the charity's funds and complied with their legal duties—concluding there was no evidence of mismanagement warranting intervention.[^15]
+
+**Independent investigation**: EV commissioned an independent investigation from the law firm Mintz, which reviewed tens of thousands of documents and conducted dozens of witness interviews. The investigation concluded in September 2023 with no evidence that anyone at EV knew about FTX's criminal fraud.[^11]
+
+**FTX settlement**: In December 2023, EV announced settlements with the FTX bankruptcy estate. EV UK and EV US together paid \$26,786,503—equal to 100% of funds received from FTX in 2022.[^11]
+
+**Decentralization**: EV simultaneously announced a plan to decentralize the EA ecosystem by offboarding its projects into independent legal entities over a 1–2 year period. In January 2024, CEA formally announced it was spinning out from EV to become an independent organization.[^28]
+
+**Governance changes**: EV underwent 100% board turnover on both its UK and US boards following the collapse. New CEOs were hired: Zach Robinson for EV US and Rob Gledhill for EV UK. Finance and legal teams were strengthened, and policies were updated with more robust controls. Tasha McCauley and Claire Zabel, who had stayed on the EV UK board beyond when they had originally planned to step down in order to guide EV through the crisis, stepped down in February 2024.[^29] EV adopted a communications policy requiring central approval for all FTX-related public communications.[^11]
+
+**Lessons identified**: In a October 2024 retrospective published on the EA Forum, EV US CEO Zach Robinson described how the FTX collapse prompted EV to recognize how much the organization needed to mature—particularly in needing empowered CEO and chief-of-staff roles that could make cross-entity decisions faster than a board could.[^11]
 
 ## Governance and Structural Critiques
 
-Beyond the specific failures related to SBF, critics argued that the FTX collapse reflected broader governance weaknesses within EA institutions. These included the use of small, homogeneous boards with limited independence from major donors, the absence of meaningful community input into major institutional decisions, and a broader cultural pattern of tolerating risks when the potential philanthropic payoff appeared large enough.[^10]
+Beyond the specific failures related to SBF, critics argued that the FTX collapse reflected broader governance weaknesses within EA institutions. These included the use of small, homogeneous boards with limited independence from major donors, the absence of meaningful community input into major institutional decisions, and a broader cultural pattern that some argued involved tolerating risks when the potential philanthropic payoff appeared large enough.[^10]
 
-One framework applied to <EntityLink id="E517">Centre for Effective Altruism</EntityLink>'s parent entity, Effective Ventures, placed its board governance at an early "start-up" stage despite the organization running programs of considerably greater scale and maturity. Critics argued that advisory panels established to provide oversight had in practice been ineffective, with at least one notable panel dissolving without meaningful output.[^10]
+One framework applied to <EntityLink id="cea">Centre for Effective Altruism</EntityLink>'s parent entity, Effective Ventures, characterized its board governance as operating at an early "start-up" stage despite the organization running programs of considerably greater scale and maturity. Critics argued that advisory panels established to provide oversight had in practice been ineffective, with at least one notable panel dissolving without meaningful output.[^10]
 
-The collapse was also cited as illustrating the risks of what some critics characterized as EA's role as a "playground for wealthy donors"—a dynamic in which EA's allocative and philosophical frameworks gave legitimacy to large concentrations of donor-controlled capital without adequate accountability mechanisms. The FTX Future Fund had grown extremely rapidly, committing \$160 million in under nine months, with limited external oversight.[^4]
+Some critics characterized the rapid growth of the FTX Future Fund—committing \$160 million in under nine months with limited external oversight—as illustrating a broader risk in how large concentrations of donor-controlled capital can receive legitimacy from EA's allocative frameworks without adequate accountability mechanisms. EA defenders have responded that the fraud originated entirely in SBF's criminal conduct and that the governance of EA institutions is a separate question from the criminal liability of a donor.[^4]
+
+A cross-organizational reform project involving Julia Wise (CEA/GiveWell), Ozzie Gooen (QURI), and Sam Donald (Open Philanthropy) was launched in mid-2023, aimed at having people from across different organizations examine questions of governance and cultural reform to prevent similar issues from recurring.[^30]
+
+On funding concentration, EA Funds and Open Philanthropy worked to increase separation. Chairs of the Long-Term Future Fund and EA Infrastructure Fund who had also joined as Open Philanthropy staff planned to step down from their fund chair positions. The stated goals included increasing diversity of perspectives in the funding ecosystem, decreasing reliance on a single funder, and increasing willingness to disagree with Open Philanthropy. Open Philanthropy committed to matching small-donor contributions to the Long-Term Future Fund at a 2:1 ratio for up to \$3.5 million total; that matching commitment was fully utilized by December 21, 2023.[^31]
 
 ## Criticisms and Controversies
 
 Several distinct lines of criticism emerged from EA's response to the FTX collapse.
 
-**Failure to act on warnings**: The most pointed criticism concerned the gap between EA's self-presentation as a movement committed to rigorous, evidence-based reasoning and its apparent failure to apply that standard to one of its most prominent funders. Critics argued that the downplaying of early warnings about SBF reflected either naivety unbecoming of professional ethicists or a more troubling willingness to overlook ethical concerns in exchange for access to large sums of money.[^2]
+**Failure to act on warnings**: The most pointed criticism concerned the gap between EA's self-presentation as a movement committed to rigorous, evidence-based reasoning and the reported pattern of downplaying early warnings about SBF. Critics argued that this pattern reflected either insufficient due diligence or a willingness to overlook ethical concerns in exchange for access to large sums of money.[^2] EA defenders have argued that the warnings at the time were ambiguous, that no evidence of specific criminal conduct was available until much later, and that acting on unsubstantiated allegations about a donor could itself raise ethical concerns.
 
-**Reputational damage and damage control**: Some observers characterized EA leaders' post-collapse public statements as belated damage control. MacAskill's emphasis that "earning to give" does not mean "ends justify the means" was seen by critics as addressing a concern that EA's own earlier promotion of SBF had helped to create.[^5]
+**Public statements after the collapse**: Some critics characterized EA leaders' post-collapse public statements as responses driven primarily by reputational concerns. MacAskill's emphasis that "earning to give" does not mean "ends justify the means" was interpreted by critics as addressing a concern that EA's own earlier promotion of SBF had helped to create.[^5] EA defenders noted that the substance of his statements was accurate and that clarifying what EA principles actually hold is an appropriate response to public mischaracterization.
 
-**Broader EA cultural critique**: A strand of criticism argued that the FTX collapse was not an isolated aberration but a symptom of systemic issues—including EA's impartial utilitarian framework, its concentration of influence in a small intellectual elite, and its tendency to prioritize quantifiable impact metrics over more diffuse concerns about institutional culture, power dynamics, and governance.[^11]
+**Broader EA cultural critique**: A strand of criticism argued that the FTX collapse was not an isolated aberration but symptomatic of systemic issues—including concentration of influence in a small intellectual elite, and a tendency to prioritize quantifiable impact metrics over concerns about institutional culture, power dynamics, and governance.[^11] EA philosophers have specifically contested the claim that EA's philosophical framework contributed causally to the fraud, distinguishing the institutional critique (which many EA insiders accept) from the philosophical critique (which most contest).[^32]
 
 **Counterarguments**: EA defenders noted that no criminal allegations were made against EA leaders, and that the underlying philosophical commitments of EA—rigorous reasoning, impartial concern for wellbeing, evidence-based giving—were not themselves implicated in the fraud. Survey data supported the view that EA community members largely distinguished between leadership failures and philosophical failures. Charlie Bresler of The Life You Can Save argued that the causes EA supports—global health, poverty alleviation, animal welfare—would not be durably harmed by the reputational fallout.[^4]
 
 ## Key Uncertainties
 
-Several important questions about EA institutions' response to the FTX collapse remain unsettled or difficult to assess from available evidence:
+Several important questions about EA institutions' response to the FTX collapse remain unsettled or are only partially addressed by available evidence:
 
-- **Extent of prior knowledge**: The full picture of what EA leaders knew about SBF's conduct and when they knew it has not been definitively established. Leaders' own accounts have been limited, and independent investigation has been constrained by the absence of formal inquiries into EA institutions specifically.
-- **Long-term funding impact**: While short-term metrics showed significant declines, the long-term trajectory of EA funding—and whether alternative donors fully compensated for the loss of FTX-linked giving—is not yet clear from available data.
-- **Governance reform outcomes**: Calls for improved governance at EA institutions were widespread in the aftermath, but the extent to which concrete structural changes were implemented is not well-documented in available sources.
-- **Reputational recovery**: Whether the EA brand has recovered among key audiences—academics, potential donors, students, policymakers—or whether the reputational damage has proved lasting is difficult to assess from sources available through early 2023.
-
-## See Also
-
-- <EntityLink id="E862">EA Epistemic Failures in the FTX Era</EntityLink> — Deeper analysis of EA's cultural and governance failures
-- <EntityLink id="E865">FTX Collapse and EA's Public Credibility</EntityLink> — Broader reputational and financial consequences
-- <EntityLink id="E864">Earning to Give: The EA Strategy and Its Limits</EntityLink> — The fundraising strategy whose high-profile failure drove the crisis
+- **Extent of prior knowledge**: The full picture of what EA leaders knew about SBF's conduct and when they knew it has not been definitively established. Leaders' own accounts have been limited, and no formal independent inquiry specifically into EA institutions has been publicly reported as having concluded with detailed findings. The TIME reporting represents one account; EA leaders have not provided detailed public counter-narratives.
+- **Long-term funding impact**: While short-term metrics showed significant declines in GWWC pledges and EA Forum engagement following the collapse, and the funding landscape for longtermist causes contracted substantially, the degree to which alternative funders compensated for the loss is only partially documented. Five new independent grantmaking bodies started in 2023, though most focused on longtermism or AI rather than biosecurity.[^18]
+- **Reputational recovery**: Whether the EA brand has recovered among key audiences—academics, potential donors, students, policymakers—is difficult to assess comprehensively. The Rethink Priorities student survey found limited FTX salience among non-EA-affiliated university students (5.6% mentioned it unprompted), suggesting that among those unfamiliar with EA, the collapse may have had limited impact on impressions of the movement.[^22] Some EA leaders claimed the movement was "back and more relevant than ever" by 2024, citing new donations.[^33] Critics noted that EA "still has major blind spots" as of that time.[^33]
+- **Governance reform depth**: The EV restructuring and cross-organizational reform project represent documented institutional responses, but the depth and durability of cultural reforms—particularly around due diligence on major donors and internal dissent—are not fully assessable from available public sources.
+- **EA-academic and policy relationships**: The effect on EA's relationships with academic partners (Oxford, Cambridge, and others whose researchers received Future Fund grants that were subsequently clawed back) and with policymakers who had engaged with EA-adjacent institutions has not been comprehensively documented.
 
 ## Sources
 
-[^1]: [Bankruptcy of FTX - Wikipedia](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX)
-[^2]: [Sam Bankman-Fried, Effective Altruism, and Alameda - TIME](https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/)
-[^3]: [Bankruptcy of FTX - Wikipedia](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX)
-[^4]: [What will FTX's collapse mean for global health and development? - Devex](https://www.devex.com/news/what-will-ftx-s-collapse-mean-for-global-health-and-development-104480)
-[^5]: [FTX, Effective Altruism, and Ends Justifying Means - Prindle Institute](https://www.prindleinstitute.org/2022/11/ftx-effective-altruism-and-ends-justifying-means/)
-[^6]: [Effective Altruism: How it started, how it's going after FTX collapse - Business Insider](https://www.businessinsider.com/effective-altruism-how-started-how-its-going-after-ftx-collapse-2023-1)
-[^7]: [FTX Community Response Survey Results - Rethink Priorities](https://rethinkpriorities.org/research-area/ftx-community-response-survey-results/)
-[^8]: [Updates on Community Health Survey Results - EA Forum](https://forum.effectivealtruism.org/posts/aF6nh4LW6sSbgMLzL/updates-on-community-health-survey-results)
-[^9]: [How has FTX's collapse impacted EA? - EA Forum](https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea)
-[^10]: [The FTX Crisis Highlights a Deeper Cultural Problem Within EA - EA Forum](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within)
-[^11]: [The Predictably Grievous Harms of Effective Altruism - OUP Blog](https://blog.oup.com/2022/12/the-predictably-grievous-harms-of-effective-altruism/)
+[^1]: [Bankruptcy of FTX — Wikipedia](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX)
+[^2]: [Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapsed — TIME](https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/) (March 15, 2023)
+[^3]: [Bankruptcy of FTX — Wikipedia](https://en.wikipedia.org/wiki/Bankruptcy_of_FTX)
+[^4]: [What will FTX's collapse mean for global health and development? — Devex](https://www.devex.com/news/what-will-ftx-s-collapse-mean-for-global-health-and-development-104480)
+[^5]: [FTX, Effective Altruism, and Ends Justifying Means — Prindle Institute](https://www.prindleinstitute.org/2022/11/ftx-effective-altruism-and-ends-justifying-means/)
+[^6]: Peter Singer, interview with The Guardian (December 2022), as reported in [Effective Altruism: How it started, how it's going after FTX collapse — Business Insider](https://www.businessinsider.com/effective-altruism-how-started-how-its-going-after-ftx-collapse-2023-1)
+[^7]: [FTX Community Response Survey Results — Rethink Priorities](https://rethinkpriorities.org/research-area/ftx-community-response-survey-results/) (David Moss and Willem Sleegers, early 2023)
+[^8]: [Updates on Community Health Survey Results — EA Forum](https://forum.effectivealtruism.org/posts/aF6nh4LW6sSbgMLzL/updates-on-community-health-survey-results)
+[^9]: [How has FTX's collapse impacted EA? — EA Forum](https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea)
+[^10]: [The FTX Crisis Highlights a Deeper Cultural Problem Within EA — EA Forum](https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within)
+[^11]: [Reflections and Lessons from Effective Ventures — EA Forum](https://forum.effectivealtruism.org/posts/AuSah98NtR5qv8zQA/reflections-and-lessons-from-effective-ventures-1) (Zach Robinson, October 28, 2024)
+[^12]: [The FTX Future Fund team has resigned — EA Forum](https://forum.effectivealtruism.org/posts/xafpj3on76uRDoBja/the-ftx-future-fund-team-has-resigned-1) (Nick Beckstead et al., November 11, 2022)
+[^13]: [Nick Beckstead is Leaving the Effective Ventures Boards — EA Forum](https://forum.effectivealtruism.org/posts/Defu3jkejb7pmLjeN/nick-beckstead-is-leaving-the-effective-ventures-boards) (September 6, 2023)
+[^14]: [Time Article Discussion — 'EA Leaders Were Warned About SBF' — EA Forum](https://forum.effectivealtruism.org/posts/b83Zkz4amoaQC5Hpd/time-article-discussion-effective-altruist-leaders-were) (March 15, 2023)
+[^15]: [Regulatory Inquiry into Effective Ventures Foundation UK — EA Forum](https://forum.effectivealtruism.org/posts/C89mZ5T5MTYBu8ZFR/regulatory-inquiry-into-effective-ventures-foundation-uk) (January 30, 2023, with May 2024 Commission update)
+[^16]: [Support for Career Transition Plans — Open Philanthropy](https://www.openphilanthropy.org/grants/support-for-career-transition-plans/) (2022–2023)
+[^17]: [Open Phil is seeking applications from grantees impacted by recent events — EA Forum](https://forum.effectivealtruism.org/posts/HPdWWetJbv4z8eJEe/open-phil-is-seeking-applications-from-grantees-impacted-by) (Open Philanthropy, November 16, 2022)
+[^18]: [Observations on the Funding Landscape of EA and AI Safety — EA Forum](https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety) (October 2, 2023)
+[^19]: [FTX Collapse Robs Researchers of Funding — PYMNTS.com](https://www.pymnts.com/legal/2023/ftx-collapse-robs-researchers-of-funding/) (2023)
+[^20]: [Nonprofits Worry About FTX Charitable Donation Clawbacks — Nonprofit Law Prof Blog](https://lawprofessors.typepad.com/nonprofit/2023/01/nonprofits-worry-about-ftx-charitable-donation-clawbacks.html) (January 2023)
+[^21]: [Crypto Company's Collapse Strands Scientists — Science/AAAS](https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists) (2022–2023)
+[^22]: [FTX Community Response Survey Results — EA Forum](https://forum.effectivealtruism.org/posts/g5uKzBLjiEuC5k46A/ftx-community-response-survey-results) (David Moss and Willem Sleegers, early 2023)
+[^23]: [Some Comments on Recent FTX-Related Events — EA Forum](https://forum.effectivealtruism.org/posts/mCCutDxCavtnhxhBR/some-comments-on-recent-ftx-related-events) (November 10, 2022)
+[^24]: [Sam Bankman-Fried and the Effective Altruism Delusion — New Statesman](https://www.newstatesman.com/long-reads/2023/11/sam-bankman-fried-crypto-king-effective-altruism) (November 2023)
+[^25]: [Trial of Sam Bankman-Fried — Wikipedia](https://en.wikipedia.org/wiki/Trial_of_Sam_Bankman-Fried)
+[^26]: [Sam Bankman-Fried Sentenced to 25 Years in Prison for His FTX Crimes — NPR](https://www.npr.org/2024/03/28/1241210300/sam-bankman-fried-ftx-sentencing-crimes-crypto-mogul-greed) (March 28, 2024)
+[^27]: [Linkpost: SBF Sentenced to 25 Years Jail — EA Forum](https://forum.effectivealtruism.org/posts/bNWgMHAsXdpwiSphN/linkpost-sbf-sentenced-to-25-years-jail) (March 28, 2024)
+[^28]: [CEA is Spinning Out of Effective Ventures — EA Forum](https://forum.effectivealtruism.org/posts/abs8xsBDyCzR83YzY/cea-is-spinning-out-of-effective-ventures) (Centre for Effective Altruism, January 18, 2024)
+[^29]: [Upcoming Changes to the EV US and EV UK Leadership Teams — EA Forum](https://forum.effectivealtruism.org/posts/wHugJrfG9fL3bk47M/upcoming-changes-to-the-ev-us-and-ev-uk-leadership-teams) (Effective Ventures, February 7, 2024)
+[^30]: [Update on Project on Reforms at EA Organizations — EA Forum](https://forum.effectivealtruism.org/posts/73mAv8m3PjsXzJ4Ad/update-on-project-on-reforms-at-ea-organizations) (Julia Wise, Ozzie Gooen, Sam Donald, June 17, 2023)
+[^31]: [EA Funds Organisational Update: Open Philanthropy Matching and Distancing — EA Forum](https://forum.effectivealtruism.org/posts/zt6MsCCDStm74HFwo/ea-funds-organisational-update-open-philanthropy-matching) (EA Funds team, August 2023)
+[^32]: [The Predictably Grievous Harms of Effective Altruism — OUP Blog](https://blog.oup.com/2022/12/the-predictably-grievous-harms-of-effective-altruism/) (December 2022)
+[^33]: [Giving on the Edge: Effective Altruism's Post-SBF Comeback — Hollywood Reporter](https://www.hollywoodreporter.com/news/general-news/effective-altruism-sam-bankman-fried-comeback-1236327219/) (2024)
