@@ -34,6 +34,7 @@ import {
   cleanupOrphanedFootnotes,
   findReplacementSources,
   applySourceReplacements,
+  secondOpinionCheck,
 } from './fix-inaccuracies.ts';
 import type { ApplyResult } from './fix-inaccuracies.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
@@ -100,6 +101,33 @@ async function main() {
 
   // Export dashboard data after accuracy check
   exportDashboardData();
+
+  // ── Step 2b: Second opinion (Haiku) ──────────────────────────────────
+  // Re-check flagged citations with a different model to reduce false positives
+  const flaggedIssues = accuracyResult.issues.filter(
+    (i) => i.verdict === 'inaccurate' || i.verdict === 'unsupported',
+  );
+
+  if (flaggedIssues.length > 0) {
+    console.log(`\n${c.bold}Step 2b: Second Opinion (Haiku)${c.reset}\n`);
+    console.log(`  ${flaggedIssues.length} flagged citation(s) — getting second opinion...\n`);
+
+    const soResult = await secondOpinionCheck(pageId, flaggedIssues, { verbose: true });
+
+    if (soResult.demoted > 0) {
+      // Adjust in-memory counts
+      for (const d of soResult.details) {
+        if (d.originalVerdict === 'inaccurate') accuracyResult.inaccurate--;
+        if (d.originalVerdict === 'unsupported') accuracyResult.unsupported--;
+        if (d.newVerdict === 'accurate') accuracyResult.accurate++;
+        else accuracyResult.minorIssues++;
+      }
+      exportDashboardData(); // Re-export with corrected verdicts
+      console.log(`\n  ${c.green}${soResult.demoted} false positive(s) demoted${c.reset}`);
+    } else {
+      console.log(`\n  ${c.dim}All flags confirmed — no false positives found.${c.reset}`);
+    }
+  }
 
   const problemCount = accuracyResult.inaccurate + accuracyResult.unsupported;
 
@@ -296,8 +324,59 @@ async function main() {
   exportDashboardData();
 
   const beforeProblems = accuracyResult.inaccurate + accuracyResult.unsupported;
-  const afterProblems = reVerify.inaccurate + reVerify.unsupported;
-  const improved = beforeProblems - afterProblems;
+  let afterProblems = reVerify.inaccurate + reVerify.unsupported;
+  let improved = beforeProblems - afterProblems;
+
+  // ── Step 5: Second fix pass (if making progress) ──────────────────────
+  if (apply && afterProblems > 0 && improved > 0) {
+    console.log(`\n${c.bold}Step 5: Second Fix Pass${c.reset}\n`);
+    console.log(`  ${afterProblems} citation(s) still flagged — attempting second pass...\n`);
+
+    const pass2Flagged = loadFlaggedCitations({ pageId });
+    if (pass2Flagged.length > 0) {
+      const pass2Enriched = enrichFromSqlite(pass2Flagged);
+      const pass2Content = readFileSync(filePath, 'utf-8');
+      const pass2Proposals = await generateFixesForPage(pageId, pass2Enriched, pass2Content, { model });
+
+      if (pass2Proposals.length > 0) {
+        for (const p of pass2Proposals) {
+          console.log(`  ${c.yellow}[^${p.footnote}]${c.reset} ${p.fixType}: ${p.explanation}`);
+        }
+
+        const pass2Apply = applyFixes(pass2Content, pass2Proposals);
+        if (pass2Apply.applied > 0 && pass2Apply.content) {
+          writeFileSync(filePath, pass2Apply.content, 'utf-8');
+          appendEditLog(pageId, {
+            tool: 'crux-audit-pass2',
+            agency: 'automated',
+            note: `Second pass: fixed ${pass2Apply.applied} remaining citation inaccuracies`,
+          });
+
+          // Final re-verify
+          const finalRaw = readFileSync(filePath, 'utf-8');
+          const finalBody = stripFrontmatter(finalRaw);
+          await extractQuotesForPage(pageId, finalBody, { verbose: false, recheck: true });
+          const finalVerify = await checkAccuracyForPage(pageId, { verbose: false, recheck: true });
+          exportDashboardData();
+
+          const finalProblems = finalVerify.inaccurate + finalVerify.unsupported;
+          const pass2Improved = afterProblems - finalProblems;
+
+          console.log(`\n  ${c.green}${pass2Apply.applied} additional fix(es) applied${c.reset}`);
+          if (pass2Improved > 0) {
+            console.log(`  ${c.green}${pass2Improved} more citation(s) improved${c.reset} (${afterProblems} -> ${finalProblems} flagged)`);
+          }
+
+          afterProblems = finalProblems;
+          improved = beforeProblems - finalProblems;
+        } else {
+          console.log(`  ${c.dim}No additional fixes could be applied.${c.reset}`);
+        }
+      } else {
+        console.log(`  ${c.dim}No additional fixes proposed.${c.reset}`);
+      }
+    }
+  }
 
   console.log(`\n${c.bold}Audit Complete${c.reset}`);
   console.log(`  Before: ${c.red}${beforeProblems} flagged${c.reset} (${accuracyResult.inaccurate} inaccurate, ${accuracyResult.unsupported} unsupported)`);

@@ -8,6 +8,7 @@ import {
   cleanupOrphanedFootnotes,
   applySourceReplacements,
   buildSearchQuery,
+  generateSearchQuery,
   parseLLMFixResponse,
   applyFixes,
   enrichFromSqlite,
@@ -707,5 +708,17 @@ describe('buildSearchQuery', () => {
   it('returns short claims as-is', () => {
     const claim = 'AI safety is important';
     expect(buildSearchQuery(claim)).toBe('AI safety is important');
+  });
+});
+
+describe('generateSearchQuery', () => {
+  it('falls back to buildSearchQuery when no Anthropic client available', async () => {
+    // Without ANTHROPIC_API_KEY, generateSearchQuery should gracefully
+    // fall back to the static buildSearchQuery function
+    const claim = 'The organization was founded in 2015. It grew rapidly.';
+    const query = await generateSearchQuery(claim);
+    // Should return a non-empty string (either from LLM or fallback)
+    expect(query.length).toBeGreaterThan(5);
+    expect(typeof query).toBe('string');
   });
 });

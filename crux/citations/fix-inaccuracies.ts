@@ -22,7 +22,7 @@ import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
-import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
+import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
 import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
@@ -439,6 +439,185 @@ export function applySectionRewrites(
 }
 
 // ---------------------------------------------------------------------------
+// Second opinion check (Haiku) — reduce false positives
+// ---------------------------------------------------------------------------
+
+const SECOND_OPINION_PROMPT = `You are a fact-checking reviewer. A previous AI checker flagged a wiki claim as potentially inaccurate or unsupported by its cited source. Your job is to independently verify: is the claim ACTUALLY inaccurate, or was the original checker being too strict?
+
+Review the claim against the source text carefully. Focus on whether the SUBSTANCE of the claim is correct, even if minor wording differs.
+
+Be lenient with:
+- Rounding differences (e.g., "approximately $100M" when source says "$98M")
+- Minor paraphrase differences that preserve the core meaning
+- Claims where the source provides partial or indirect support
+- Dates/numbers that are close but not exact (e.g., "2015" vs "late 2014")
+
+Be strict with:
+- Clearly wrong numbers, dates, or attributions
+- Claims that genuinely misrepresent or fabricate what the source says
+- Overclaims that significantly exaggerate what the source supports
+
+Respond with JSON only:
+{"agree": true, "verdict": "inaccurate", "reason": "brief explanation"}
+
+Where:
+- "agree": true if you agree with the original verdict, false if you think it's a false positive
+- "verdict": your own assessment — "accurate", "minor_issues", "inaccurate", or "unsupported"
+- "reason": brief explanation of your decision`;
+
+/** Parse the second opinion response. */
+function parseSecondOpinionResponse(text: string): { agree: boolean; verdict: string; reason: string } {
+  try {
+    const cleaned = stripCodeFences(text);
+    const parsed = JSON.parse(cleaned) as { agree?: boolean; verdict?: string; reason?: string };
+    return {
+      agree: parsed.agree !== false,
+      verdict: typeof parsed.verdict === 'string' ? parsed.verdict : 'not_verifiable',
+      reason: typeof parsed.reason === 'string' ? parsed.reason : '',
+    };
+  } catch {
+    return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
+  }
+}
+
+export interface SecondOpinionResult {
+  checked: number;
+  demoted: number;
+  details: Array<{
+    footnote: number;
+    originalVerdict: string;
+    newVerdict: string;
+    reason: string;
+  }>;
+}
+
+/**
+ * Second opinion check using Claude Haiku to reduce false positives.
+ * Re-checks flagged citations with a different model; demotes false positives
+ * by updating SQLite verdicts.
+ */
+export async function secondOpinionCheck(
+  pageId: string,
+  flaggedIssues: Array<{ footnote: number; verdict: string; score: number; issues: string[] }>,
+  opts?: { verbose?: boolean },
+): Promise<SecondOpinionResult> {
+  const client = createClient({ required: false });
+  if (!client) return { checked: 0, demoted: 0, details: [] };
+
+  const toCheck = flaggedIssues.filter(
+    (i) => i.verdict === 'inaccurate' || i.verdict === 'unsupported',
+  );
+  if (toCheck.length === 0) return { checked: 0, demoted: 0, details: [] };
+
+  const result: SecondOpinionResult = { checked: 0, demoted: 0, details: [] };
+
+  for (const issue of toCheck) {
+    try {
+      const row = citationQuotes.get(pageId, issue.footnote);
+      if (!row?.claim_text) continue;
+
+      // Get the best source text available
+      let sourceText = row.source_quote || '';
+      if (row.url) {
+        const cached = citationContent.getByUrl(row.url);
+        if (cached?.full_text && cached.full_text.length > sourceText.length) {
+          sourceText = cached.full_text;
+        }
+      }
+      if (!sourceText || sourceText.length < 20) continue;
+
+      const truncatedSource = sourceText.length > 8000
+        ? sourceText.slice(0, 8000) + '\n[... truncated ...]'
+        : sourceText;
+
+      if (opts?.verbose) {
+        process.stdout.write(`  [^${issue.footnote}] second opinion... `);
+      }
+
+      const llmResult = await callClaude(client, {
+        model: MODELS.haiku,
+        systemPrompt: SECOND_OPINION_PROMPT,
+        userPrompt: [
+          `WIKI CLAIM:\n${row.claim_text}`,
+          `\nORIGINAL VERDICT: ${issue.verdict}`,
+          `ORIGINAL ISSUES: ${issue.issues.join('; ')}`,
+          `\nSOURCE TEXT:\n${truncatedSource}`,
+        ].join('\n'),
+        maxTokens: 200,
+        temperature: 0,
+      });
+
+      result.checked++;
+      const opinion = parseSecondOpinionResponse(llmResult.text);
+
+      if (!opinion.agree && (opinion.verdict === 'accurate' || opinion.verdict === 'minor_issues')) {
+        // Haiku disagrees — demote the flag
+        citationQuotes.markAccuracy(
+          pageId,
+          issue.footnote,
+          opinion.verdict,
+          opinion.verdict === 'accurate' ? 0.9 : 0.7,
+          null,
+          null,
+          null,
+        );
+        result.demoted++;
+        result.details.push({
+          footnote: issue.footnote,
+          originalVerdict: issue.verdict,
+          newVerdict: opinion.verdict,
+          reason: opinion.reason,
+        });
+
+        if (opts?.verbose) {
+          console.log(`demoted to ${opinion.verdict}: ${opinion.reason.slice(0, 60)}`);
+        }
+      } else {
+        if (opts?.verbose) {
+          console.log(`confirmed ${issue.verdict}`);
+        }
+      }
+    } catch (err: unknown) {
+      if (opts?.verbose) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`error: ${msg.slice(0, 60)}`);
+      }
+    }
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// LLM search query generation (Haiku)
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a targeted web search query from a wiki claim using Haiku.
+ * Falls back to buildSearchQuery() if LLM call fails or is unavailable.
+ */
+export async function generateSearchQuery(claimText: string): Promise<string> {
+  const client = createClient({ required: false });
+  if (!client) return buildSearchQuery(claimText);
+
+  try {
+    const result = await callClaude(client, {
+      model: MODELS.haiku,
+      systemPrompt: 'Convert the following wiki claim into a concise web search query (5-12 words) that would find a credible source supporting or containing the specific facts mentioned. Focus on the key factual claims (numbers, dates, names). Return ONLY the search query text, nothing else.',
+      userPrompt: claimText.slice(0, 500),
+      maxTokens: 50,
+      temperature: 0,
+    });
+
+    const query = result.text.trim().replace(/^["']|["']$/g, ''); // strip quotes
+    if (query.length > 5 && query.length < 200) return query;
+    return buildSearchQuery(claimText);
+  } catch {
+    return buildSearchQuery(claimText);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Dashboard YAML reader
 // ---------------------------------------------------------------------------
 
@@ -785,8 +964,8 @@ export async function findReplacementSources(
     const claimText = cit.fullClaimText || cit.claimText;
     if (!claimText || claimText.length < 20) continue;
 
-    // Build a targeted search query from the claim
-    const searchQuery = buildSearchQuery(claimText);
+    // Build a targeted search query from the claim (uses Haiku if available)
+    const searchQuery = await generateSearchQuery(claimText);
 
     try {
       const results = await searchExa(exaApiKey, searchQuery);
@@ -803,13 +982,30 @@ export async function findReplacementSources(
       // Pick the best result (first one — Exa ranks by relevance)
       const best = filteredResults[0];
 
+      // Verify the candidate actually supports the claim (improvement B)
+      let confidence = best.text && best.text.length > 200 ? 'medium' : 'low';
+      if (best.text && best.text.length > 100) {
+        try {
+          const verification = await checkClaimAccuracy(claimText, best.text);
+          if (verification.verdict === 'unsupported' || verification.verdict === 'inaccurate') {
+            if (opts?.verbose) {
+              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${verification.verdict})`);
+            }
+            continue; // Skip — candidate doesn't actually support the claim
+          }
+          confidence = verification.score >= 0.8 ? 'high' : 'medium';
+        } catch {
+          // Verification failed — keep the candidate with lower confidence
+        }
+      }
+
       replacements.push({
         footnote: cit.footnote,
         oldUrl: cit.url || '',
         newUrl: best.url,
         newTitle: best.title,
-        confidence: best.text && best.text.length > 200 ? 'medium' : 'low',
-        reason: `Current source doesn't support the claim. Found potentially relevant: "${best.title}"`,
+        confidence,
+        reason: `Current source doesn't support the claim. Found ${confidence}-confidence match: "${best.title}"`,
       });
 
       if (opts?.verbose) {
@@ -881,7 +1077,7 @@ async function searchExa(apiKey: string, query: string): Promise<ExaSearchResult
       query,
       type: 'auto',
       numResults: 5,
-      contents: { text: { maxCharacters: 500 } },
+      contents: { text: { maxCharacters: 2000 } },
     }),
     signal: AbortSignal.timeout(15_000),
   });
