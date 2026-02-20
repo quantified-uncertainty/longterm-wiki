@@ -105,12 +105,18 @@ function buildSectionNav(
     }));
   }
 
-  // Top section with overview link
+  // Top section — include Overview link only if an index page exists
+  const indexSlug = `__index__/${filePathPrefix}`;
+  const hasIndexPage = !!getPageById(indexSlug);
+  const topItems = hasIndexPage
+    ? [{ label: "Overview", href: indexHref(filePathPrefix) }]
+    : [];
+
   const sections: NavSection[] = [
     {
       title: sectionTitle,
       defaultOpen: true,
-      items: [{ label: "Overview", href: indexHref(filePathPrefix) }],
+      items: topItems,
     },
   ];
 
@@ -388,7 +394,7 @@ export function getInternalNav(): NavSection[] {
 // DETECT WHICH SIDEBAR TO SHOW
 // ============================================================================
 
-export type WikiSidebarType = "models" | "atm" | "internal" | "about" | "kb" | null;
+export type WikiSidebarType = "models" | "atm" | "internal" | "about" | "kb" | "section" | null;
 
 /**
  * Determine which sidebar to show based on the entity path.
@@ -429,6 +435,16 @@ export function detectSidebarType(entityPath: string): WikiSidebarType {
     }
   }
 
+  // Top-level sections with their own sidebar nav
+  if (
+    entityPath.startsWith("/browse/") || entityPath === "/browse" ||
+    entityPath.startsWith("/guides/") || entityPath === "/guides" ||
+    entityPath.startsWith("/project/") || entityPath === "/project" ||
+    entityPath.startsWith("/insight-hunting/") || entityPath === "/insight-hunting"
+  ) {
+    return "section";
+  }
+
   return null;
 }
 
@@ -440,6 +456,23 @@ export function extractKbSection(entityPath: string): string | null {
   if (!entityPath.startsWith("/knowledge-base/")) return null;
   const parts = entityPath.split("/").filter(Boolean);
   return parts.length >= 2 ? parts[1] : null;
+}
+
+/**
+ * Extract the top-level section key from an entity path.
+ * e.g., "/project/changelog/" → "project"
+ */
+function extractSection(entityPath: string): string | null {
+  const parts = entityPath.split("/").filter(Boolean);
+  return parts.length >= 1 ? parts[0] : null;
+}
+
+/**
+ * Build sidebar navigation for a top-level section (browse, guides, project, insight-hunting).
+ * Uses the generic buildSectionNav which reads page data and groups by subcategory.
+ */
+function getSectionNav(sectionKey: string): NavSection[] {
+  return buildSectionNav(sectionKey, sectionKey);
 }
 
 /**
@@ -466,6 +499,10 @@ export function getWikiNav(
     case "kb": {
       const section = entityPath ? extractKbSection(entityPath) : null;
       return section ? getKbSectionNav(section) : [];
+    }
+    case "section": {
+      const section = entityPath ? extractSection(entityPath) : null;
+      return section ? getSectionNav(section) : [];
     }
     default:
       return [];
