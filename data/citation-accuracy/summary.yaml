@@ -1,23 +1,23 @@
-exportedAt: '2026-02-20T16:59:13.477Z'
+exportedAt: '2026-02-20T17:14:26.899Z'
 summary:
-  totalCitations: 1099
-  checkedCitations: 577
-  accurateCitations: 383
-  inaccurateCitations: 28
-  unsupportedCitations: 16
-  minorIssueCitations: 144
-  uncheckedCitations: 522
+  totalCitations: 1161
+  checkedCitations: 637
+  accurateCitations: 421
+  inaccurateCitations: 30
+  unsupportedCitations: 18
+  minorIssueCitations: 162
+  uncheckedCitations: 524
   averageScore: 0.91
 verdictDistribution:
-  accurate: 383
-  inaccurate: 28
-  minor_issues: 144
+  accurate: 421
+  inaccurate: 30
+  minor_issues: 162
   not_verifiable: 6
-  unsupported: 16
+  unsupported: 18
 difficultyDistribution:
-  easy: 423
-  hard: 19
-  medium: 130
+  easy: 465
+  hard: 20
+  medium: 147
 pages:
   - pageId: biosecurity-overview
     totalCitations: 5
@@ -82,6 +82,15 @@ pages:
     minorIssues: 15
     accuracyRate: 0.9298245614035088
     avgScore: 0.91
+  - pageId: new-york-raise-act
+    totalCitations: 62
+    checked: 60
+    accurate: 38
+    inaccurate: 2
+    unsupported: 2
+    minorIssues: 18
+    accuracyRate: 0.9333333333333333
+    avgScore: 0.92
   - pageId: eu-ai-act
     totalCitations: 98
     checked: 89
@@ -214,13 +223,6 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 1
-  - domain: hunton.com
-    totalCitations: 2
-    checked: 2
-    accurate: 1
-    inaccurate: 0
-    unsupported: 1
-    inaccuracyRate: 0.5
   - domain: cmu.edu
     totalCitations: 2
     checked: 2
@@ -249,6 +251,13 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.3333333333333333
+  - domain: governor.ny.gov
+    totalCitations: 3
+    checked: 3
+    accurate: 2
+    inaccurate: 1
+    unsupported: 0
+    inaccuracyRate: 0.3333333333333333
   - domain: gptzero.me
     totalCitations: 3
     checked: 3
@@ -263,6 +272,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 1
     inaccuracyRate: 0.25
+  - domain: hunton.com
+    totalCitations: 4
+    checked: 4
+    accurate: 3
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.25
   - domain: goodjudgment.com
     totalCitations: 38
     checked: 34
@@ -270,6 +286,13 @@ domainAnalysis:
     inaccurate: 7
     unsupported: 1
     inaccuracyRate: 0.23529411764705882
+  - domain: skadden.com
+    totalCitations: 5
+    checked: 5
+    accurate: 4
+    inaccurate: 0
+    unsupported: 1
+    inaccuracyRate: 0.2
   - domain: freethink.com
     totalCitations: 5
     checked: 5
@@ -284,6 +307,13 @@ domainAnalysis:
     inaccurate: 2
     unsupported: 0
     inaccuracyRate: 0.15384615384615385
+  - domain: nelsonmullins.com
+    totalCitations: 15
+    checked: 14
+    accurate: 12
+    inaccurate: 1
+    unsupported: 1
+    inaccuracyRate: 0.14285714285714285
   - domain: frontiermodelforum.org
     totalCitations: 30
     checked: 30
@@ -403,6 +433,20 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: assembly.state.ny.us
+    totalCitations: 10
+    checked: 10
+    accurate: 10
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: mofo.com
+    totalCitations: 10
+    checked: 9
+    accurate: 9
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: 80000hours.org
     totalCitations: 9
     checked: 0
@@ -617,6 +661,20 @@ domainAnalysis:
     totalCitations: 4
     checked: 3
     accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: joneswalker.com
+    totalCitations: 4
+    checked: 4
+    accurate: 4
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: fpf.org
+    totalCitations: 4
+    checked: 4
+    accurate: 4
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
@@ -1013,6 +1071,20 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: 0
   - domain: alignment.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: harrisbeachmurtha.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: bestlawfirms.com
     totalCitations: 2
     checked: 2
     accurate: 2
