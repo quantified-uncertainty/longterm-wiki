@@ -67,14 +67,47 @@ export interface DomainSummary {
 }
 
 function loadDashboardData(): DashboardData | null {
-  const yamlPath = path.resolve(
+  const baseDir = path.resolve(
     process.cwd(),
-    "../../data/citation-accuracy/dashboard.yaml"
+    "../../data/citation-accuracy"
   );
-  if (!fs.existsSync(yamlPath)) return null;
 
+  // Try new split format first (summary.yaml + pages/*.yaml)
+  const summaryPath = path.join(baseDir, "summary.yaml");
+  if (fs.existsSync(summaryPath)) {
+    try {
+      const raw = fs.readFileSync(summaryPath, "utf-8");
+      const summary = loadYaml<Omit<DashboardData, "flaggedCitations">>(raw);
+
+      // Load per-page flagged citations
+      const pagesDir = path.join(baseDir, "pages");
+      const flaggedCitations: FlaggedCitation[] = [];
+      if (fs.existsSync(pagesDir)) {
+        for (const file of fs.readdirSync(pagesDir)) {
+          if (!file.endsWith(".yaml")) continue;
+          try {
+            const pageRaw = fs.readFileSync(path.join(pagesDir, file), "utf-8");
+            const pageCitations = loadYaml<FlaggedCitation[]>(pageRaw);
+            if (Array.isArray(pageCitations)) {
+              flaggedCitations.push(...pageCitations);
+            }
+          } catch { /* skip malformed files */ }
+        }
+      }
+      // Sort by score (worst first), matching the old export order
+      flaggedCitations.sort((a, b) => (a.score ?? 0) - (b.score ?? 0));
+
+      return { ...summary, flaggedCitations };
+    } catch {
+      return null;
+    }
+  }
+
+  // Fall back to old monolithic format
+  const oldPath = path.join(baseDir, "dashboard.yaml");
+  if (!fs.existsSync(oldPath)) return null;
   try {
-    const raw = fs.readFileSync(yamlPath, "utf-8");
+    const raw = fs.readFileSync(oldPath, "utf-8");
     return loadYaml<DashboardData>(raw);
   } catch {
     return null;
