@@ -1,0 +1,59 @@
+date: "2026-02-20"
+branch: claude/resolve-issue-389-Sj57h
+title: "Fix incidents index page — add EntityLinks and content listings"
+issue: 389
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/391
+model: claude-sonnet-4-6
+duration: ~20min
+cost: ~$0.10
+
+pages:
+  - id: __index__/knowledge-base/incidents
+    numericId: E839
+    action: edited
+
+summary: |
+  Added EntityLink import and a categorized "Documented Incidents" section to the
+  incidents index page. Two incident pages are now discoverable from the index:
+  Claude Code Espionage (2025) under "Cyber Operations & Security" and OpenClaw
+  Matplotlib Incident (2026) under "Autonomous Agent Behavior". Follows the same
+  pattern as other section index pages (capabilities, risks, history).
+
+key_decisions:
+  - "EntityLink IDs: used page slugs (claude-code-espionage-2025, openclaw-matplotlib-incident-2026) rather than numericIds — consistent with other index pages."
+  - "Categorization: split into two subsections based on clearly distinct incident types."
+  - "Tooling gap: no automated check detects section index pages that don't link to their child pages. Discovered via manual website consistency audit (PR #349 item 16)."
+
+checks:
+  initialized: true
+  type: content
+  initiated_at: "2026-02-20T16:57:30.869Z"
+  total: 33
+  completed: 24
+  na: 7
+  skipped: 2
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - research-content
+    - no-hardcoded
+    - fix-escaping
+    - correctness
+    - security
+    - no-dead-code
+    - full-integration
+    - no-regressions
+    - entitylinks-resolve
+    - numeric-ids-stable
+    - mdx-escaping
+    - content-accuracy
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - no-merge-conflicts
+    - check-recent-merges
