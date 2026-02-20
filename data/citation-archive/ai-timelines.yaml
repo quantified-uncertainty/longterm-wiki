@@ -1,0 +1,590 @@
+pageId: ai-timelines
+verifiedAt: 2026-02-20
+totalCitations: 53
+verified: 47
+broken: 6
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence
+    linkText: Holden Karnofsky, " — Some Background on Our Views Regarding Advanced Artificial Intelligence — " Open Philanthropy, 2016.
+    claimContext: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> defines <EntityLink id="transformative-ai">transformative AI</EntityLink> (TAI) as "AI powerful enough to bring us into a new, qualitatively different future" comparable to the agricultural or industrial revolutions.[^1] This definiti
+    fetchedAt: 2026-02-20T04:21:18.326Z
+    httpStatus: 200
+    pageTitle: Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving
+    contentSnippet: 'Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving Skip to Content *+*]:mt-5"> May 6, 2016 Some Background on Our Views Regarding Advanced Artificial Intelligence By Holden Karnofsky We&#8217;re planning to make potential risks from advanced artificial intelligence a major priority in 2016. A future post will discuss why; this post gives some background. Summary: I first give our definition of &#8220;transformative artificial intelligence,&#8221; our ter'
+    contentLength: 173565
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://arxiv.org/pdf/1705.08807
+    linkText: Katja Grace et al., " — When Will AI Exceed Human Performance? Evidence from AI Experts — " arXiv:1705.08807, 2017.
+    claimContext: Expert surveys typically use "High-Level Machine Intelligence" (HLMI), defined as "when unaided machines can accomplish every task better and more cheaply than human workers."[^2] This operationalization allows researchers to elicit comparable forecasts across different survey waves.
+    fetchedAt: 2026-02-20T04:21:17.392Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1413178
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://arxiv.org/pdf/2311.02462
+    linkText: 'Meredith Ringel Morris et al., " — Levels of AGI: Operationalizing Progress on the Path to AGI — " arXiv:2311.02462, 2023.'
+    claimContext: 'The term "Artificial General Intelligence" (AGI) lacks a single agreed-upon definition. Google DeepMind researchers proposed defining AGI "in terms of capabilities, rather than processes" and suggested a levels-based framework distinguishing between performance (Narrow to Superhuman) and generality '
+    fetchedAt: 2026-02-20T04:21:17.390Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 295341
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.lesswrong.com/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
+    linkText: Ajeya Cotra, " — Draft report on AI timelines — " LessWrong, 2020.
+    claimContext: "Ajeya Cotra's 2020 biological anchors framework estimates TAI timelines by comparing required computational resources (measured in FLOP) to biological systems.[^4] The method involves:"
+    fetchedAt: 2026-02-20T04:21:18.313Z
+    httpStatus: 200
+    pageTitle: Draft report on AI timelines — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Draft report on AI timelines — LessWrong Best of LessWrong 2020 AI Timelines AI Frontpage 215 Draft report on AI timelines by Ajeya Cotra 18th Sep 2020 AI Alignment Forum 1 min read 56 215 Ω 75 Hi all, I&#x27;ve been working on some AI forecasting research and have prepared a draft report on timelines to transformative AI . I would love feedback from this community, so
+    contentLength: 1298359
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.astralcodexten.com/p/biological-anchors-a-trick-that-might
+    linkText: 'Scott Alexander, " — Biological Anchors: A Trick That Might Or Might Not Work — " Astral Codex Ten, 2021.'
+    claimContext: Scott Alexander's analysis of the framework reported probability distributions of 10% chance of TAI by 2031, 50% by 2052, and approximately 80% by 2100.[^5]
+    fetchedAt: 2026-02-20T04:21:17.767Z
+    httpStatus: 200
+    pageTitle: "Biological Anchors: A Trick That Might Or Might Not Work"
+    contentSnippet: "Biological Anchors: A Trick That Might Or Might Not Work Astral Codex Ten Subscribe Sign in Biological Anchors: A Trick That Might Or Might Not Work ... Feb 23, 2022 141 369 4 Share Introduction I've been trying to review and summarize Eliezer Yudkowksy's recent dialogues on AI safety. Previously in sequence: Yudkowsky Contra Ngo On Agents . Now we’re up to Yudkowsky contra Cotra on biological anchors, but before we get there we need to figure out what Cotra's talking about and what's going on. "
+    contentLength: 451834
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.alignmentforum.org/posts/AfH2oPHCApdKicM4m/two-year-update-on-my-personal-ai-timelines
+    linkText: Ajeya Cotra, " — Two-year update on my personal AI timelines — " Alignment Forum, 2022.
+    claimContext: In a 2022 update, Cotra shortened her timeline estimates based on recent progress, shifting her median from ~2050 to ~2040, with updated distributions of 15% by 2030, 35% by 2036, 50% by 2040, and 60% by 2050.[^6]
+    fetchedAt: 2026-02-20T04:21:25.419Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 7
+    url: https://www.cold-takes.com/forecasting-transformative-ai-the-biological-anchors-method-in-a-nutshell/
+    linkText: "Holden Karnofsky, \" — Forecasting transformative AI: the 'biological anchors' method in a nutshell — \" Cold Takes, 2021."
+    claimContext: Tom Davidson developed a compute-centric forecasting framework that models the relationship between computational resources, algorithmic progress, and economic growth.[^7] His model for <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimates a median time of approximately 3 years
+    fetchedAt: 2026-02-20T04:21:19.446Z
+    httpStatus: 200
+    pageTitle: 'Forecasting transformative AI: the "biological anchors" method in a nutshell'
+    contentSnippet: 'Forecasting transformative AI: the "biological anchors" method in a nutshell --> --> --> --> --> Subscribe (free) Audio also available by searching Stitcher, Spotify, Google Podcasts, etc. for "Cold Takes Audio" --> Today&#x2019;s world Transformative AI Digital people World of Misaligned AI World run by Something else or or Stable, galaxy-wide&#10; civilization This is one of 4 posts summarizing hundreds of pages of technical reports focused almost entirely on forecasting one number: the year b'
+    contentLength: 98961
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.astralcodexten.com/p/davidson-on-takeoff-speeds
+    linkText: Scott Alexander, " — Davidson On Takeoff Speeds — " Astral Codex Ten, June 2023.
+    claimContext: Tom Davidson developed a compute-centric forecasting framework that models the relationship between computational resources, algorithmic progress, and economic growth.[^7] His model for <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> estimates a median time of approximately 3 years
+    fetchedAt: 2026-02-20T04:21:19.622Z
+    httpStatus: 200
+    pageTitle: Davidson On Takeoff Speeds - by Scott Alexander
+    contentSnippet: Davidson On Takeoff Speeds - by Scott Alexander Astral Codex Ten Subscribe Sign in Davidson On Takeoff Speeds Machine Alignment Monday 6/19/23 Jun 20, 2023 107 421 5 Share The face of Mt. Everest is gradual and continuous; for each point on the mountain, the points 1 mm away aren’t too much higher or lower. But you still wouldn’t want to ski down it. I thought about this when reading What A Compute-Centric Framework Says About Takeoff Speeds , by Tom Davidson. Davidson tries to model what some p
+    contentLength: 332389
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.openphilanthropy.org/research/semi-informative-priors-over-ai-timelines/
+    linkText: Tom Davidson, " — Semi-Informative Priors Over AI Timelines — " Open Philanthropy, 2021.
+    claimContext: Davidson's earlier work on semi-informative priors used reference class forecasting to estimate AGI probability. His 2021 analysis suggested a central estimate of approximately 4% probability of AGI by 2036, with a preferred range of 1-10%.[^9]
+    fetchedAt: 2026-02-20T04:21:19.656Z
+    httpStatus: 200
+    pageTitle: Semi-Informative Priors Over AI Timelines | Coefficient Giving
+    contentSnippet: 'Semi-Informative Priors Over AI Timelines | Coefficient Giving Skip to Content *+*]:mt-5"> March 25, 2021 Semi-Informative Priors Over AI Timelines By Tom Davidson Editor’s note : This article was published under our former name, Open Philanthropy. Some content may be outdated. You can see our latest writing here . One of Open Phil’s major focus areas is technical research and policy work aimed at reducing potential risks from advanced AI . As part of this, we aim to anticipate and influence the'
+    contentLength: 863166
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/
+    linkText: Katja Grace and Ben Weinstein-Raun, " — 2022 Expert Survey on Progress in AI — " AI Impacts, 2022.
+    claimContext: The 2022 Expert Survey on Progress in AI contacted 4,271 researchers who published at NeurIPS or ICML 2021, receiving 738 responses (17% response rate).[^10] The aggregate forecast estimated 36.6 years until HLMI from the survey date.
+    fetchedAt: 2026-02-20T04:21:19.685Z
+    httpStatus: 200
+    pageTitle: 2022 Expert Survey on Progress in AI &#8211; AI Impacts
+    contentSnippet: 2022 Expert Survey on Progress in AI &#8211; AI Impacts Published 3 August 2022; last updated 3 August 2022 This page is out-of-date. Visit the updated version of this page on our wiki . The 2022 Expert Survey on Progress in AI (2022 ESPAI) is a survey of machine learning researchers that AI Impacts ran in June-August 2022. Contents Details Background The 2022 ESPAI is a rerun of the 2016 Expert Survey on Progress in AI that researchers at AI Impacts previously collaborated on with others. Almos
+    contentLength: 77889
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://arxiv.org/abs/2401.02843
+    linkText: Katja Grace et al., " — Thousands of AI Authors on the Future of AI — " arXiv:2401.02843, January 2024.
+    claimContext: A 2023 survey of 2,778 AI researchers found:[^11]
+    fetchedAt: 2026-02-20T04:21:26.445Z
+    httpStatus: 200
+    pageTitle: "[2401.02843] Thousands of AI Authors on the Future of AI"
+    contentSnippet: "[2401.02843] Thousands of AI Authors on the Future of AI --> Computer Science > Computers and Society arXiv:2401.02843 (cs) [Submitted on 5 Jan 2024 ( v1 ), last revised 8 Oct 2025 (this version, v3)] Title: Thousands of AI Authors on the Future of AI Authors: Katja Grace , Harlan Stewart , Julia Fabienne Sandkühler , Stephen Thomas , Ben Weinstein-Raun , Jan Brauner , Richard C. Korzekwa View a PDF of the paper titled Thousands of AI Authors on the Future of AI, by Katja Grace and 6 other autho"
+    contentLength: 50694
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
+    linkText: '" — Shrinking AGI timelines: a review of expert forecasts — " 80,000 Hours, March 2025.'
+    claimContext: The survey demonstrated significant variation across questions and methodologies, with median estimates ranging from 2040s to 2070s depending on how questions were framed.[^12]
+    fetchedAt: 2026-02-20T04:21:26.669Z
+    httpStatus: 200
+    pageTitle: "Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours"
+    contentSnippet: "Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours Search for: On this page: 1 AI experts 1.1 1. Leaders of AI companies 1.2 2. AI researchers in general 2 Expert forecasters 2.1 3. Metaculus 2.2 4. Superforecasters in 2022 (XPT survey) 2.3 5. Samotsvety in 2023 3 Summary of expert views on when AGI will arrive 4 Learn more As a non-expert, it would be great if there were experts who could tell us when we should expect artificial general intelligence (AGI) to arrive. Unfortunat"
+    contentLength: 124387
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.metaculus.com/questions/3479/date-weakly-general-ai-is-publicly-known/
+    linkText: '" — When Will Weakly General AI Arrive? — " Metaculus, accessed 2024.'
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-20T04:21:26.519Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 14
+    url: https://agi.goodheartlabs.com/
+    linkText: '" — AGI Timelines Dashboard — " Goodheart Labs, accessed January 5, 2026.'
+    claimContext: An aggregated AGI timeline dashboard drawing from multiple Metaculus questions estimated a combined forecast of 2031 for AGI arrival as of January 5, 2026, with an 80% confidence interval of 2027–2045.[^14] Manifold Markets uses different resolution criteria than Metaculus, which observers attribute
+    fetchedAt: 2026-02-20T04:21:26.553Z
+    httpStatus: 200
+    pageTitle: When Will We Get AGI? | AGI Timelines Dashboard
+    contentSnippet: 'When Will We Get AGI? | AGI Timelines Dashboard AGI Timeline Forecasts Median year predictions from multiple forecasting sources. Data sources: Metaculus , Manifold , Kalshi Download data 2060 Full Log Linear Individual Forecasts: Date of "weakly general AI" - Metaculus From the forecasting site Metaculus, full title: "When will the first weakly general AI system be devised, tested, and publicly announced?" Metaculus Prediction (Year) Source: Metaculus Download data 2060 Full Log Linear Date of '
+    contentLength: 1026465
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.lesswrong.com/posts/dRbvHfEwb6Cuf6xn3/forecasting-agi-insights-from-prediction-markets-and-1
+    linkText: '" — Forecasting AGI: Insights from Prediction Markets — " LessWrong, 2023.'
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-20T04:21:26.886Z
+    httpStatus: 200
+    pageTitle: "Forecasting AGI: Insights from Prediction Markets and Metaculus — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Forecasting AGI: Insights from Prediction Markets and Metaculus — LessWrong AI Timelines Forecasts (Specific Predictions) Metaculus Prediction Markets AI Frontpage 13 Forecasting AGI: Insights from Prediction Markets and Metaculus by Alvin Ånestrand 4th Feb 2025 AI Alignment Forum Linkpost from forecastingaifutures.substack.com 5 min read 0 13 Ω 4 I have tried to find "
+    contentLength: 309316
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://arxiv.org/html/2511.23455v1
+    linkText: '" — The Price of Progress: Algorithmic Efficiency and the Falling Cost of AI Inference — " MIT researchers, November 2025.'
+    claimContext: <EntityLink id="epoch-ai">Epoch AI</EntityLink> analysis of 231 language models found that algorithmic improvements reduce the compute required to reach given performance levels, with efficiency gains contributing approximately 3× per year after controlling for hardware improvements.[^16] The rate o
+    fetchedAt: 2026-02-20T04:21:27.914Z
+    httpStatus: 200
+    pageTitle: The Price of Progress Algorithmic Efficiency and the Falling Cost of AI Inference
+    contentSnippet: "The Price of Progress Algorithmic Efficiency and the Falling Cost of AI Inference The Price of Progress Algorithmic Efficiency and the Falling Cost of AI Inference Hans Gundlach MIT CSAIL, MIT FutureTech hansgund@mit.edu &Jayson Lynch MIT CSAIL, MIT FutureTech jaysonl@mit.edu &Matthias Mertens MIT Sloan, MIT FutureTech mmertens@mit.edu &Neil Thompson 1 1 footnotemark: 1 MIT CSAIL, MIT FutureTech neil_t@mit.edu Corresponding authors. hansgund@mit.edu, neil_t@mit.edu Abstract Language models have "
+    contentLength: 81800
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://cfg.eu/context/
+    linkText: '" — Context: Current AI trends and uncertainties — " Centre for Future Generations, 2024.'
+    claimContext: Training compute for state-of-the-art models increased by a factor of 4–5× per year from 2010 to 2024.[^17] <EntityLink id="epoch-ai">Epoch AI</EntityLink> analysis suggests training runs of 2×10²⁹ FLOP may be feasible by 2030, though constraints include power availability, chip manufacturing capaci
+    fetchedAt: 2026-02-20T04:21:28.903Z
+    httpStatus: 200
+    pageTitle: "Context: Current AI trends and uncertainties - Centre for Future Generations"
+    contentSnippet: "Context: Current AI trends and uncertainties - Centre for Future Generations Skip to content &#13; &#13; &#13; &#13; Home Context: Current AI trends and uncertainties &#13; &#13; Context: Current AI trends and uncertainties &#13; &#13; &#13; &#13; &#13; &#13; &#13; -->&#13; -->&#13; -->&#13; &#13; &#13; &#13; This section outlines the technical, social and geopolitical trends and developments underlying our scenarios. It presents the key trends, assumptions, and uncertainties that shape our view"
+    contentLength: 217215
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://epoch.ai/blog/can-ai-scaling-continue-through-2030
+    linkText: '" — Can AI scaling continue through 2030? — " Epoch AI, 2024.'
+    claimContext: Training compute for state-of-the-art models increased by a factor of 4–5× per year from 2010 to 2024.[^17] <EntityLink id="epoch-ai">Epoch AI</EntityLink> analysis suggests training runs of 2×10²⁹ FLOP may be feasible by 2030, though constraints include power availability, chip manufacturing capaci
+    fetchedAt: 2026-02-20T04:21:28.058Z
+    httpStatus: 200
+    pageTitle: Can AI scaling continue through 2030? | Epoch AI
+    contentSnippet: Can AI scaling continue through 2030? | Epoch AI Latest Publications & Commentary Papers & Reports Newsletter Podcast Data & Resources Datasets Overview Benchmarking Models Frontier Data Centers Hardware Companies Chip Sales Polling Resources AI Trends & Statistics Data Insights Projects FrontierMath GATE Playground Distributed Training Model Counts About About Us Our Team Careers Consultations Our Funding Donate Contact Search epoch.ai Search Enter a query to search for results Placeholder Arti
+    contentLength: 516351
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://epoch.ai/blog/data-movement-bottlenecks-scaling-past-1e28-flop
+    linkText: '" — Data movement bottlenecks to large-scale model training — " Epoch AI, 2024.'
+    claimContext: A "latency wall" at approximately 2×10³¹ FLOP may be reached within 3 years, where data movement between chips dominates arithmetic computation time.[^19]
+    fetchedAt: 2026-02-20T04:21:28.112Z
+    httpStatus: 200
+    pageTitle: "Data movement bottlenecks to large-scale model training: Scaling past 1e28 FLOP | Epoch AI"
+    contentSnippet: "Data movement bottlenecks to large-scale model training: Scaling past 1e28 FLOP | Epoch AI Latest Publications & Commentary Papers & Reports Newsletter Podcast Data & Resources Datasets Overview Benchmarking Models Frontier Data Centers Hardware Companies Chip Sales Polling Resources AI Trends & Statistics Data Insights Projects FrontierMath GATE Playground Distributed Training Model Counts About About Us Our Team Careers Consultations Our Funding Donate Contact Search epoch.ai Search Enter a qu"
+    contentLength: 284649
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://arxiv.org/html/2211.04325v2
+    linkText: '" — Will we run out of data? Limits of LLM scaling based on human-generated data — " arXiv:2211.04325, 2022.'
+    claimContext: Research suggests that available human-generated training data could become a bottleneck this decade.[^20] For continued progress into the 2030s, methods may need to rely on synthetic data generation, data efficiency improvements, or alternative training paradigms.
+    fetchedAt: 2026-02-20T04:21:27.928Z
+    httpStatus: 200
+    pageTitle: Will we run out of data? Limits of LLM scaling based on human-generated data
+    contentSnippet: "Will we run out of data? Limits of LLM scaling based on human-generated data Will we run out of data? Limits of LLM scaling based on human-generated data Pablo Villalobos Anson Ho Jaime Sevilla Tamay Besiroglu Lennart Heim Marius Hobbhahn Abstract We investigate the potential constraints on LLM scaling posed by the availability of public human-generated text data. We forecast the growing demand for training data based on current trends and estimate the total stock of public human text data. Our "
+    contentLength: 273947
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://aiimpacts.org/conversation-with-robin-hanson/
+    linkText: '" — Conversation with Robin Hanson — " AI Impacts, 2019.'
+    claimContext: <EntityLink id="robin-hanson">Robin Hanson</EntityLink>'s outside view analysis estimated "at least a century" to human-level AI based on expert estimates of progress rates, arguing that most technologies develop more slowly than initial expert predictions.[^21] This contrasts with inside-view model
+    fetchedAt: 2026-02-20T04:21:30.155Z
+    httpStatus: 200
+    pageTitle: Conversation with Robin Hanson &#8211; AI Impacts
+    contentSnippet: "Conversation with Robin Hanson &#8211; AI Impacts AI Impacts talked to economist Robin Hanson about his views on AI risk and timelines. With his permission, we have posted and transcribed this interview. Contents Participants Robin Hanson &#8212; Associate Professor of Economics, George Mason University Asya Bergal &#8211; AI Impacts Robert Long – AI Impacts Summary We spoke with Robin Hanson on September 5, 2019. Here is a brief summary of that conversation: Hanson thinks that now is the wrong "
+    contentLength: 162980
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines
+    linkText: '" — Literature review of transformative artificial intelligence timelines — " Epoch AI, January 2023.'
+    claimContext: <EntityLink id="epoch-ai">Epoch AI</EntityLink>'s literature review noted that inside-view models tend to predict shorter timelines than outside-view approaches, with heavier tails and more probability mass on long-horizon outcomes in outside-view frameworks.[^22] The review identified Cotra's biolo
+    fetchedAt: 2026-02-20T04:21:30.066Z
+    httpStatus: 200
+    pageTitle: Literature review of transformative artificial intelligence timelines | Epoch AI
+    contentSnippet: Literature review of transformative artificial intelligence timelines | Epoch AI Latest Publications & Commentary Papers & Reports Newsletter Podcast Data & Resources Datasets Overview Benchmarking Models Frontier Data Centers Hardware Companies Chip Sales Polling Resources AI Trends & Statistics Data Insights Projects FrontierMath GATE Playground Distributed Training Model Counts About About Us Our Team Careers Consultations Our Funding Donate Contact Search epoch.ai Search Enter a query to sea
+    contentLength: 177787
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://sideways-view.com/2018/02/24/takeoff-speeds/
+    linkText: Paul Christiano, " — Takeoff speeds — " Sideways View, February 24, 2018.
+    claimContext: <EntityLink id="paul-christiano">Paul Christiano</EntityLink> argued in 2018 for "slow takeoff," predicting that AGI development would appear as continuous economic acceleration rather than a breakthrough within a small group.[^23] He operationalized "slow takeoff" as the economy doubling over a 4-y
+    fetchedAt: 2026-02-20T04:21:29.990Z
+    httpStatus: 200
+    pageTitle: Takeoff speeds &#8211; The sideways view
+    contentSnippet: Takeoff speeds &#8211; The sideways view Skip to content The sideways view Looking askance at reality Futurists have argued for years about whether the development of AGI will look more like a breakthrough within a small group (&#8220;fast takeoff&#8221;), or a continuous acceleration distributed across the broader economy or a large firm (&#8220;slow takeoff&#8221;). I currently think a slow takeoff is significantly more likely. This post explains some of my reasoning and why I think it matters
+    contentLength: 180762
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://intelligence.org/files/IEM.pdf
+    linkText: Eliezer Yudkowsky, " — Intelligence Explosion Microeconomics — " MIRI Technical Report, 2013.
+    claimContext: <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> advocated for "fast takeoff" scenarios involving rapid recursive self-improvement.[^24] The 2008 Hanson-Yudkowsky debate and subsequent discussions examined whether AI systems could rapidly improve their own capabilities once reaching
+    fetchedAt: 2026-02-20T04:21:30.035Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 769885
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://intelligence.org/ai-foom-debate/
+    linkText: '" — The Hanson-Yudkowsky AI-Foom Debate — " Machine Intelligence Research Institute, 2008.'
+    claimContext: <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> advocated for "fast takeoff" scenarios involving rapid recursive self-improvement.[^24] The 2008 Hanson-Yudkowsky debate and subsequent discussions examined whether AI systems could rapidly improve their own capabilities once reaching
+    fetchedAt: 2026-02-20T04:21:30.170Z
+    httpStatus: 200
+    pageTitle: The Hanson-Yudkowsky AI-Foom Debate - Machine Intelligence Research Institute
+    contentSnippet: The Hanson-Yudkowsky AI-Foom Debate - Machine Intelligence Research Institute Skip to content The Hanson-Yudkowsky AI-Foom Debate eBook by Robin Hanson and Eliezer Yudkowsky In late 2008, economist Robin Hanson and AI theorist Eliezer Yudkowsky conducted an online debate about the future of artificial intelligence, and in particular about whether generally intelligent AIs will be able to improve their own capabilities very quickly (a.k.a. “foom”). James Miller and Carl Shulman also contributed g
+    contentLength: 63797
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.openphilanthropy.org/research/what-a-compute-centric-framework-says-about-takeoff-speeds/
+    linkText: Tom Davidson, " — What a Compute-Centric Framework Says About Takeoff Speeds — " Open Philanthropy, June 27, 2023.
+    claimContext: Tom Davidson's 2023 compute-centric framework estimated approximately 3 years from 20% to 100% cognitive task automation, representing a middle position between very fast (months) and very slow (decades) scenarios.[^26]
+    fetchedAt: 2026-02-20T04:21:31.528Z
+    httpStatus: 200
+    pageTitle: What a Compute-Centric Framework Says About Takeoff Speeds | Coefficient Giving
+    contentSnippet: 'What a Compute-Centric Framework Says About Takeoff Speeds | Coefficient Giving Skip to Content *+*]:mt-5"> June 27, 2023 What a Compute-Centric Framework Says About Takeoff Speeds By Tom Davidson Editor’s note: This article was published under our former name, Open Philanthropy. Some content may be outdated. You can see our latest writing here . This is Part 0 of a four-part report — see links to Part 1 . Part 2. Part 3 , and a folder with more materials . Abstract In the next few decades we ma'
+    contentLength: 380062
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://en.wikipedia.org/wiki/AI_winter
+    linkText: '" — AI winter — " Wikipedia, accessed 2024.'
+    claimContext: Historical AI predictions have varied in accuracy. The AI field experienced multiple periods of reduced activity and funding in the 1970s and 1980s following forecasts that proved overly optimistic about near-term capabilities.[^27] Some long-term forecasts using quantitative trend extrapolation, su
+    fetchedAt: 2026-02-20T04:21:31.245Z
+    httpStatus: 200
+    pageTitle: AI winter - Wikipedia
+    contentSnippet: AI winter - Wikipedia Jump to content From Wikipedia, the free encyclopedia Period of reduced funding and interest in AI research Part of a series on Artificial intelligence (AI) Major goals Artificial general intelligence Intelligent agent Recursive self-improvement Planning Computer vision General game playing Knowledge representation Natural language processing Robotics AI safety Approaches Machine learning Symbolic Deep learning Bayesian networks Evolutionary algorithms Hybrid intelligent sy
+    contentLength: 231084
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://blog.ai-futures.org/p/ai-futures-model-dec-2025-update
+    linkText: '" — AI Futures Model: Dec 2025 Update — " AI Futures, December 2025.'
+    claimContext: Historical AI predictions have varied in accuracy. The AI field experienced multiple periods of reduced activity and funding in the 1970s and 1980s following forecasts that proved overly optimistic about near-term capabilities.[^27] Some long-term forecasts using quantitative trend extrapolation, su
+    fetchedAt: 2026-02-20T04:21:31.352Z
+    httpStatus: 200
+    pageTitle: "AI Futures Model: Dec 2025 Update"
+    contentSnippet: "AI Futures Model: Dec 2025 Update AI Futures Project Subscribe Sign in AI Futures Model: Dec 2025 Update We've significantly improved our model of AI timelines and takeoff speeds! Daniel Kokotajlo , Eli Lifland , Brendan Halstead , and Alex Kastner Dec 31, 2025 175 53 17 Share We’ve significantly upgraded our timelines and takeoff model! Our new unified model predicts when AIs will reach key capability milestones: for example, Automated Coder / AC (full automation of coding) and superintelligenc"
+    contentLength: 505039
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
+    linkText: '" — Shrinking AGI timelines: a review of expert forecasts — " 80,000 Hours, March 2025.'
+    claimContext: This historical record cuts in both directions. Failures like the AI winters suggest systematic overconfidence among AI researchers, while cases where quantitative trend extrapolations proved accurate suggest that inside-view methods can sometimes produce reliable predictions. The 2022 expert survey
+    fetchedAt: 2026-02-20T04:21:31.268Z
+    httpStatus: 200
+    pageTitle: "Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours"
+    contentSnippet: "Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours Search for: On this page: 1 AI experts 1.1 1. Leaders of AI companies 1.2 2. AI researchers in general 2 Expert forecasters 2.1 3. Metaculus 2.2 4. Superforecasters in 2022 (XPT survey) 2.3 5. Samotsvety in 2023 3 Summary of expert views on when AGI will arrive 4 Learn more As a non-expert, it would be great if there were experts who could tell us when we should expect artificial general intelligence (AGI) to arrive. Unfortunat"
+    contentLength: 124387
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.lesswrong.com/posts/ax695frGJEzGxFBK4/biology-inspired-agi-timelines-the-trick-that-never-works
+    linkText: 'Eliezer Yudkowsky, " — Biology-Inspired AGI Timelines: The Trick That Never Works — " LessWrong, 2021.'
+    claimContext: Critics of biological anchors note that the framework requires estimating numerous uncertain parameters, some of which critics characterize as arbitrarily chosen.[^30] Yudkowsky specifically argued that biological analogies may not capture the relevant algorithmic structure of AI capability gains.[^
+    fetchedAt: 2026-02-20T04:21:32.250Z
+    httpStatus: 200
+    pageTitle: "Biology-Inspired AGI Timelines: The Trick That Never Works — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Biology-Inspired AGI Timelines: The Trick That Never Works — LessWrong 2021 MIRI Conversations AI Timelines Dialogue (format) Forecasting & Prediction History Technological Forecasting AI Curated 160 Biology-Inspired AGI Timelines: The Trick That Never Works by Eliezer Yudkowsky 1st Dec 2021 AI Alignment Forum 78 min read 151 160 Ω 50 - 1988 - Hans Moravec: Behold my b"
+    contentLength: 2437792
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://futurescouting.substack.com/p/the-methodological-limits-of-the
+    linkText: '" — The methodological limits of the AI 2027 forecast — " Future Scouting, 2025.'
+    claimContext: "- Biological anchors involve numerous uncertain parameters with values that critics describe as arbitrary[^30] - Models lack empirical validation of core assumptions[^31] - Reference class forecasting struggles with unprecedented technologies[^32]"
+    fetchedAt: 2026-02-20T04:21:33.425Z
+    httpStatus: 200
+    pageTitle: "The methodological limits of the AI 2027 forecast #54"
+    contentSnippet: "The methodological limits of the AI 2027 forecast #54 Future Scouting & Innovation Subscribe Sign in The methodological limits of the AI 2027 forecast #54 The AI 2027 report presents a dramatic scenario of imminent superhuman AI and societal collapse, attracting widespread attention. However, not everything is as it seems on the surface. Massimo Canducci Jul 28, 2025 3 Share (Service Announcement) This newsletter (which now has over 5,000 subscribers and many more readers, as it’s also published"
+    contentLength: 212497
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.lesswrong.com/posts/PAYfmG2aRbdb74mEp/a-deep-critique-of-ai-2027-s-bad-timeline-models
+    linkText: Titotal, " — A deep critique of AI 2027's bad timeline models — " LessWrong, 2025.
+    claimContext: "- Models lack empirical validation of core assumptions[^31] - Reference class forecasting struggles with unprecedented technologies[^32] - Expert predictions may be influenced by availability bias and anchoring effects"
+    fetchedAt: 2026-02-20T04:21:33.919Z
+    httpStatus: 200
+    pageTitle: A deep critique of AI 2027’s bad timeline models — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. A deep critique of AI 2027’s bad timeline models — LessWrong AI Timelines Has Diagram Simulation AI Frontpage 2025 Top Fifty: 18 % 375 A deep critique of AI 2027’s bad timeline models by titotal 19th Jun 2025 Linkpost from titotal.substack.com 47 min read 40 375 Thank you to Arepo and Eli Lifland for looking over this article for errors. I am sorry that this article is"
+    contentLength: 1189398
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.lesswrong.com/posts/ax695frGJEzGxFBK4/biology-inspired-agi-timelines-the-trick-that-never-works
+    linkText: 'Eliezer Yudkowsky, " — Biology-Inspired AGI Timelines: The Trick That Never Works — " LessWrong, 2021.'
+    claimContext: Critics of biological anchors note that the framework requires estimating numerous uncertain parameters, some of which critics characterize as arbitrarily chosen.[^30] Yudkowsky specifically argued that biological analogies may not capture the relevant algorithmic structure of AI capability gains.[^
+    fetchedAt: 2026-02-20T04:21:34.259Z
+    httpStatus: 200
+    pageTitle: "Biology-Inspired AGI Timelines: The Trick That Never Works — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Biology-Inspired AGI Timelines: The Trick That Never Works — LessWrong 2021 MIRI Conversations AI Timelines Dialogue (format) Forecasting & Prediction History Technological Forecasting AI Curated 160 Biology-Inspired AGI Timelines: The Trick That Never Works by Eliezer Yudkowsky 1st Dec 2021 AI Alignment Forum 78 min read 151 160 Ω 50 - 1988 - Hans Moravec: Behold my b"
+    contentLength: 2437793
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://forum.effectivealtruism.org/posts/XnnfPC2gsgRFZezkE/linkpost-what-are-reasonable-ai-fears-by-robin-hanson-2023
+    linkText: Robin Hanson, " — What Are Reasonable AI Fears? — " Effective Altruism Forum, 2023.
+    claimContext: All forecasting methodologies face challenges from potential discontinuities, breakthrough insights, or constraint violations not captured in trend extrapolations. <EntityLink id="robin-hanson">Robin Hanson</EntityLink> noted that scenarios involving "very lumpy tech advances, broadly-improving tech
+    fetchedAt: 2026-02-20T04:21:33.373Z
+    httpStatus: 200
+    pageTitle: '[linkpost] "What Are Reasonable AI Fears?" by Robin Hanson, 2023-04-23 — EA Forum'
+    contentSnippet: '[linkpost] "What Are Reasonable AI Fears?" by Robin Hanson, 2023-04-23 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. [linkpost] "What Are Reasonable AI Fears?" by Robin Hanson, 2023-04-23 by Arjun Panickssery Apr 14 2023 4 min read 3 41 AI safety Existential risk Forecasting AI risk skepticism AI alignment AI forecasting Robin Hanson Criticism of longtermism and existential risk studies Public communicati'
+    contentLength: 241645
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://80000hours.org/podcast/episodes/agi-timelines-in-2025/
+    linkText: '" — What the hell happened with AGI timelines in 2025? — " 80,000 Hours podcast, February 10, 2026.'
+    claimContext: <EntityLink id="80000-hours">80,000 Hours</EntityLink> analysis noted that expert timeline estimates shortened significantly between 2022 and 2023 surveys, with implications for career planning and research prioritization in AI safety.[^35]
+    fetchedAt: 2026-02-20T04:21:33.810Z
+    httpStatus: 200
+    pageTitle: What the hell happened with AGI timelines in 2025? | 80,000 Hours
+    contentSnippet: "What the hell happened with AGI timelines in 2025? | 80,000 Hours Search for: On this page: Introduction 1 Articles, books, and other media discussed in the show 2 Transcript 2.1 Making sense of the timelines madness in 2025 [00:00:00] 2.2 The great timelines contraction [00:00:46] 2.3 Why timelines went back out again [00:02:10] 2.4 Other longstanding reasons AGI could take a good while [00:11:13] 2.5 So what's the upshot of all of these updates? [00:14:47] 2.6 5 reasons the radical pessimists "
+    contentLength: 161650
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.openphilanthropy.org/blog/some-background-our-views-regarding-advanced-artificial-intelligence
+    linkText: Holden Karnofsky, " — Some Background on Our Views Regarding Advanced Artificial Intelligence — " Open Philanthropy, 2016.
+    claimContext: "- **2016**: <EntityLink id=\"open-philanthropy\">Open Philanthropy</EntityLink> estimated \"at least 10% probability\" of TAI within 20 years (by 2036)[^36] - **2020**: Cotra's biological anchors: 50% probability by 2052"
+    fetchedAt: 2026-02-20T04:21:35.800Z
+    httpStatus: 200
+    pageTitle: Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving
+    contentSnippet: 'Some Background on Our Views Regarding Advanced Artificial Intelligence | Coefficient Giving Skip to Content *+*]:mt-5"> May 6, 2016 Some Background on Our Views Regarding Advanced Artificial Intelligence By Holden Karnofsky We&#8217;re planning to make potential risks from advanced artificial intelligence a major priority in 2016. A future post will discuss why; this post gives some background. Summary: I first give our definition of &#8220;transformative artificial intelligence,&#8221; our ter'
+    contentLength: 173565
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://metr.org/notes/2026-02-10-simpler-ai-timelines-model/
+    linkText: 'Thomas Kwa, " — Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 — " METR, February 10, 2026.'
+    claimContext: "<EntityLink id=\"metr\">METR</EntityLink> researcher Thomas Kwa's 2026 model defines AI R&D automation as a logistic function in log compute, capturing the fraction of AI R&D labor that AI systems can replace at a given level of effective compute.[^37] The logistic form is described as conservative: a"
+    fetchedAt: 2026-02-20T04:21:35.462Z
+    httpStatus: 200
+    pageTitle: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 - METR
+    contentSnippet: "A simpler AI timelines model predicts 99% AI R&D automation in ~2032 - METR Research Notes Updates About Donate Careers Search --> Research Notes Updates About Donate Careers Menu Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 CONTRIBUTORS Thomas Kwa DATE February 10, 2026 SHARE Copy Link Citation BibTeX Citation &times; @misc { a-simpler-ai-timelines-model-predicts-99-ai-r-d-automation-in-2032 , title = {A simpler AI timelines model predicts 99% AI R&D autom"
+    contentLength: 51666
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.lesswrong.com/posts/uy6B5rEPvcwi55cBK/research-note-a-simpler-ai-timelines-model-predicts-99-ai-r
+    linkText: 'Thomas Kwa, " — Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 — " LessWrong cross-post, February 10, 2026.'
+    claimContext: "<EntityLink id=\"metr\">METR</EntityLink> researcher Thomas Kwa's 2026 model defines AI R&D automation as a logistic function in log compute, capturing the fraction of AI R&D labor that AI systems can replace at a given level of effective compute.[^37] The logistic form is described as conservative: a"
+    fetchedAt: 2026-02-20T04:21:35.852Z
+    httpStatus: 200
+    pageTitle: "Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 — LessWrong AI World Modeling Frontpage 67 Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 by Thomas Kwa 12th Feb 2026 AI Alignment Forum Linkpost from metr.org 10 min read 15 67 Ω 27 In this post, I describe a simple model for forecasting when AI wil"
+    contentLength: 952461
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.alignmentforum.org/posts/uy6B5rEPvcwi55cBK/research-note-a-simpler-ai-timelines-model-predicts-99-ai-r
+    linkText: 'Thomas Kwa, " — Research note: A simpler AI timelines model predicts 99% AI R&D automation in ~2032 — " Alignment Forum cross-post, February 10, 2026.'
+    claimContext: "<EntityLink id=\"metr\">METR</EntityLink> researcher Thomas Kwa's 2026 model defines AI R&D automation as a logistic function in log compute, capturing the fraction of AI R&D labor that AI systems can replace at a given level of effective compute.[^37] The logistic form is described as conservative: a"
+    fetchedAt: 2026-02-20T04:21:41.436Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 40
+    url: https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion
+    linkText: Tom Davidson and Daniel Eth, " — Will AI R&D Automation Cause a Software Intelligence Explosion? — " Forethought, March 26, 2025.
+    claimContext: The AI Futures Project's more detailed model (AIFM) uses a related milestone it calls "Automated Coder" (AC) and "Superhuman AI Researcher" (SAR) as intermediate steps, and Davidson and Eth (2025) analyze "AI Systems for AI R&D Automation" (ASARA) as a potential trigger for a feedback loop in AI cap
+    fetchedAt: 2026-02-20T04:21:36.288Z
+    httpStatus: 200
+    pageTitle: Will AI R&D Automation Cause a Software Intelligence Explosion?
+    contentSnippet: Will AI R&D Automation Cause a Software Intelligence Explosion? Will AI R&D Automation Cause a Software Intelligence Explosion? Daniel Eth Tom Davidson Authors Citations Cite Citations PDF Contact 26th March 2025 Will AI R&D Automation Cause a Software Intelligence Explosion? Summary Key Points Introduction Where AI progress comes from Improvements in AI software are already driving fast AI progress AI progress will likely speed up as we approach ASARA What happens when we reach ASARA? A toy mod
+    contentLength: 562384
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.lesswrong.com/posts/YABG5JmztGGPwNFq2/ai-futures-timelines-and-takeoff-model-dec-2025-update
+    linkText: 'Eli Lifland, Brendan Halstead, Alex Kastner, and Daniel Kokotajlo, " — AI Futures Timelines and Takeoff Model: Dec 2025 Update — " LessWrong, December 30, 2025.'
+    claimContext: The AI Futures Project (Eli Lifland, Brendan Halstead, Alex Kastner, and Daniel Kokotajlo) published the AI Futures Model in December 2025, a 33-parameter quantitative framework modeling AI capability growth and the transition through key milestones including Automated Coder (AC), Superhuman AI Rese
+    fetchedAt: 2026-02-20T04:21:43.181Z
+    httpStatus: 200
+    pageTitle: "AI Futures Timelines and Takeoff Model: Dec 2025 Update — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI Futures Timelines and Takeoff Model: Dec 2025 Update — LessWrong AI Frontpage 2025 Top Fifty: 14 % 143 AI Futures Timelines and Takeoff Model: Dec 2025 Update by elifland , bhalstead , Alex Kastner , Daniel Kokotajlo 31st Dec 2025 AI Alignment Forum 30 min read 34 143 Ω 47 We’ve significantly upgraded our timelines and takeoff model! It predicts when AIs will reach "
+    contentLength: 1410256
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://blog.ai-futures.org/p/clarifying-how-our-ai-timelines-forecasts
+    linkText: AI Futures Project, " — Clarifying How Our AI Timelines Forecasts Have Changed Since AI 2027 — " AI Futures Blog, January 2026.
+    claimContext: A January 2026 update from the AI Futures team clarified that their all-things-considered median for the Automated Coder milestone is approximately January 2035—about 1.5 years later than raw model output—and that the team was never confident an AGI milestone would occur in 2027 specifically.[^42]
+    fetchedAt: 2026-02-20T04:21:42.583Z
+    httpStatus: 200
+    pageTitle: Clarifying how our AI timelines forecasts have changed since AI 2027
+    contentSnippet: Clarifying how our AI timelines forecasts have changed since AI 2027 AI Futures Project Subscribe Sign in Clarifying how our AI timelines forecasts have changed since AI 2027 Correcting common misunderstandings Eli Lifland , Daniel Kokotajlo , and Brendan Halstead Jan 27, 2026 53 10 7 Share Some recent news articles discuss updates to our AI timelines since AI 2027, most notably our new timelines and takeoff model, the AI Futures Model (see blog post announcement ). 1 While we’re glad to see bro
+    contentLength: 247794
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.metaculus.com/questions/5121/when-will-the-first-general-ai-system-be-devised-tested-and-publicly-announced/
+    linkText: '" — When Will the First General AI Be Announced? — " Metaculus, accessed February 2026.'
+    claimContext: <EntityLink id="metaculus">Metaculus</EntityLink> aggregates predictions from thousands of forecasters. As of early 2026, the community flagship AGI question shows a median estimate of February 1, 2028, based on over 1,700 forecasters, with an interquartile range spanning July 2026 to August 2031.[^
+    fetchedAt: 2026-02-20T04:21:42.509Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 44
+    url: https://www.metaculus.com/questions/19356/transformative-ai-date/
+    linkText: '" — Transformative AI Date — " Metaculus, accessed February 2026.'
+    claimContext: <EntityLink id="metaculus">Metaculus</EntityLink> aggregates predictions from thousands of forecasters. As of early 2026, the community flagship AGI question shows a median estimate of February 1, 2028, based on over 1,700 forecasters, with an interquartile range spanning July 2026 to August 2031.[^
+    fetchedAt: 2026-02-20T04:21:42.515Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 45
+    url: https://80000hours.org/2025/03/when-do-experts-expect-agi-to-arrive/
+    linkText: '" — Shrinking AGI Timelines: A Review of Expert Forecasts — " 80,000 Hours, March 21, 2025.'
+    claimContext: <EntityLink id="metaculus">Metaculus</EntityLink> aggregates predictions from thousands of forecasters. As of early 2026, the community flagship AGI question shows a median estimate of February 1, 2028, based on over 1,700 forecasters, with an interquartile range spanning July 2026 to August 2031.[^
+    fetchedAt: 2026-02-20T04:21:42.570Z
+    httpStatus: 200
+    pageTitle: "Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours"
+    contentSnippet: "Shrinking AGI timelines: a review of expert forecasts | 80,000 Hours Search for: On this page: 1 AI experts 1.1 1. Leaders of AI companies 1.2 2. AI researchers in general 2 Expert forecasters 2.1 3. Metaculus 2.2 4. Superforecasters in 2022 (XPT survey) 2.3 5. Samotsvety in 2023 3 Summary of expert views on when AGI will arrive 4 Learn more As a non-expert, it would be great if there were experts who could tell us when we should expect artificial general intelligence (AGI) to arrive. Unfortunat"
+    contentLength: 124387
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://forecastingaifutures.substack.com/p/forecasting-agi-insights-from-prediction-markets
+    linkText: '" — Forecasting AGI: Insights from Prediction Markets and Metaculus — " Forecasting AI Futures (Substack), 2025–2026.'
+    claimContext: An aggregated AGI timeline dashboard drawing from multiple Metaculus questions estimated a combined forecast of 2031 for AGI arrival as of January 5, 2026, with an 80% confidence interval of 2027–2045.[^14] Manifold Markets uses different resolution criteria than Metaculus, which observers attribute
+    fetchedAt: 2026-02-20T04:21:44.266Z
+    httpStatus: 200
+    pageTitle: "Forecasting AGI: Insights from Prediction Markets and Metaculus"
+    contentSnippet: "Forecasting AGI: Insights from Prediction Markets and Metaculus Forecasting AI Futures Subscribe Sign in Forecasting AGI: Insights from Prediction Markets and Metaculus Examining what the forecasting communities think about AGI arrival Alvin Ånestrand Feb 04, 2025 5 6 Share I have tried to find all prediction market and Metaculus questions related to AGI timelines. Here I examine how they compare to each other, and what they actually say about when AGI might arrive. If you know of a market that "
+    contentLength: 197184
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://time.com/7205596/sam-altman-superintelligence-agi/
+    linkText: "\" — How OpenAI's Sam Altman Is Thinking About AGI and Superintelligence in 2025 — \" TIME Magazine, 2025."
+    claimContext: '**OpenAI.** Sam Altman published a blog post stating: "We are now confident we know how to build AGI as we have traditionally understood it," and indicated OpenAI was beginning to focus on superintelligence.[^47] In a Bloomberg interview, Altman stated he believes "AGI will probably get developed du'
+    fetchedAt: 2026-02-20T04:21:44.331Z
+    httpStatus: 200
+    pageTitle: How OpenAI’s Sam Altman Is Thinking About AGI and Superintelligence in 2025 | TIME
+    contentSnippet: How OpenAI’s Sam Altman Is Thinking About AGI and Superintelligence in 2025 | TIME Tech AI How OpenAI’s Sam Altman Is Thinking About AGI and Superintelligence in 2025 ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Tharin Pillay Pillay is an editorial fellow at TIME. Loading... Sam Altman, co-founder and C.E.O. of OpenAI, speaks during the New York Times annual DealBook summit in New York City in December. Sam Altman, co-founder and C.E.O. of OpenAI, speaks during the New Y
+    contentLength: 371371
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.techradar.com/ai-platforms-assistants/chatgpt/openai-roadmap-revealed-ai-research-interns-by-2026-full-blown-agi-researchers-by-2028
+    linkText: '" — OpenAI Roadmap: AI Research Interns by 2026, Full-Blown AGI Researchers by 2028 — " TechRadar, 2025–2026.'
+    claimContext: '**OpenAI.** Sam Altman published a blog post stating: "We are now confident we know how to build AGI as we have traditionally understood it," and indicated OpenAI was beginning to focus on superintelligence.[^47] In a Bloomberg interview, Altman stated he believes "AGI will probably get developed du'
+    fetchedAt: 2026-02-20T04:21:44.320Z
+    httpStatus: 200
+    pageTitle: "OpenAI roadmap revealed: AI research interns by 2026, full-blown AGI researchers by 2028 | TechRadar"
+    contentSnippet: "OpenAI roadmap revealed: AI research interns by 2026, full-blown AGI researchers by 2028 | TechRadar Skip to main content Don't miss these AI Platforms & Assistants 5 alarming signs of an AI apocalypse on the way AI Platforms & Assistants I tried to tell you about living in AI Time &mdash; this essay nails its harsh reality, and here's why we're not truly screwed AI Platforms & Assistants ChatGPT&rsquo;s ads are giving Gemini an opening to scoop up new users Pro 'I think we&rsquo;re going to hav"
+    contentLength: 1754519
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://blog.redwoodresearch.org/p/whats-up-with-anthropic-predicting
+    linkText: "\" — What's up with Anthropic predicting AGI by early 2027? — \" Redwood Research Blog, November 3, 2025."
+    claimContext: "**Anthropic.** In March 2025 recommendations to the White House Office of Science and Technology Policy, Anthropic stated it expects \"powerful AI systems will emerge in late 2026 or early 2027.\"[^49] Dario Amodei's essay \"Machines of Loving Grace\" offered a more hedged version: \"I think it could com"
+    fetchedAt: 2026-02-20T04:21:44.350Z
+    httpStatus: 200
+    pageTitle: What&#x27;s up with Anthropic predicting AGI by early 2027?
+    contentSnippet: "What&#x27;s up with Anthropic predicting AGI by early 2027? Redwood Research blog Subscribe Sign in What's up with Anthropic predicting AGI by early 2027? I operationalize Anthropic's prediction of \"powerful AI\" and explain why I'm skeptical Ryan Greenblatt Nov 03, 2025 21 2 Share As far as I’m aware, Anthropic is the only AI company with official AGI timelines 1 : they expect AGI by early 2027. In their recommendations (from March 2025) to the OSTP for the AI action plan they say: As our CEO Da"
+    contentLength: 387357
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://venturebeat.com/ai/anthropic-ceo-dario-amodei-warns-ai-will-match-country-of-geniuses-by-2026
+    linkText: "\" — Anthropic CEO Dario Amodei warns: AI will match 'country of geniuses' by 2026 — \" VentureBeat, December 24, 2025."
+    claimContext: "**Anthropic.** In March 2025 recommendations to the White House Office of Science and Technology Policy, Anthropic stated it expects \"powerful AI systems will emerge in late 2026 or early 2027.\"[^49] Dario Amodei's essay \"Machines of Loving Grace\" offered a more hedged version: \"I think it could com"
+    fetchedAt: 2026-02-20T04:21:50.346Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 51
+    url: https://www.cnbc.com/2025/03/17/human-level-ai-will-be-here-in-5-to-10-years-deepmind-ceo-says.html
+    linkText: '" — AI That Can Match Humans at Any Task Will Be Here in 5–10 Years, Google DeepMind CEO Says — " CNBC, March 17, 2025.'
+    claimContext: '**Google DeepMind.** Demis Hassabis stated in March 2025 that AGI would emerge in the next five to ten years.[^51] By January 2026 at Davos, Hassabis gave approximately a 50% chance of achieving AGI by the end of the decade (2030), and described his timeline as moving from "as soon as 10 years" in a'
+    fetchedAt: 2026-02-20T04:21:53.380Z
+    httpStatus: 200
+    pageTitle: Human-level AI will be here in 5 to 10 years, DeepMind CEO says
+    contentSnippet: Human-level AI will be here in 5 to 10 years, DeepMind CEO says Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Google DeepMind CEO Demis Hassabis said he thinks artificial general intelligence, or AGI, will emerge in the next five or 10 years. AGI broadly relates to AI that is as smart or smarter than humans. "We&#x27;re not quite there yet. These systems are very impressive at certain things. But there are other things they
+    contentLength: 809412
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://ai-2027.com/
+    linkText: Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, and Romeo Dean, " — AI 2027 — " AI Futures Project, April 3, 2025.
+    claimContext: The AI 2027 report, published April 3, 2025 by the AI Futures Project (Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, and Romeo Dean), presents a detailed scenario analysis of AI development through 2027 and beyond.[^52] The scenario was informed by trend extrapolations, wargames, ex
+    fetchedAt: 2026-02-20T04:21:51.517Z
+    httpStatus: 200
+    pageTitle: AI 2027
+    contentSnippet: AI 2027 April 3rd 2025 PDF Listen Watch Daniel Kokotajlo, Scott Alexander, Thomas Larsen, Eli Lifland, Romeo Dean We predict that the impact of superhuman AI over the next decade will be enormous, exceeding that of the Industrial Revolution. We wrote a scenario that represents our best guess about what that might look like. 1 It’s informed by trend extrapolations, wargames, expert feedback, experience at OpenAI, and previous forecasting successes. 2 (Added Nov 22 2025, to prevent misunderstandin
+    contentLength: 1900943
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://80000hours.org/podcast/episodes/agi-timelines-in-2025/
+    linkText: '" — What the Hell Happened with AGI Timelines in 2025? — " 80,000 Hours podcast, February 10, 2026.'
+    claimContext: "- **2024**: Metaculus community median approximately 2028–2031; AI 2027 scenario published April 2025 projecting Automated Coder milestone around 2027 - **Early 2025**: Following OpenAI's release of reasoning models o1 and o3, median estimates shortened further across multiple forecasting platforms["
+    fetchedAt: 2026-02-20T04:21:51.453Z
+    httpStatus: 200
+    pageTitle: What the hell happened with AGI timelines in 2025? | 80,000 Hours
+    contentSnippet: "What the hell happened with AGI timelines in 2025? | 80,000 Hours Search for: On this page: Introduction 1 Articles, books, and other media discussed in the show 2 Transcript 2.1 Making sense of the timelines madness in 2025 [00:00:00] 2.2 The great timelines contraction [00:00:46] 2.3 Why timelines went back out again [00:02:10] 2.4 Other longstanding reasons AGI could take a good while [00:11:13] 2.5 So what's the upshot of all of these updates? [00:14:47] 2.6 5 reasons the radical pessimists "
+    contentLength: 161650
+    status: verified
+    note: null

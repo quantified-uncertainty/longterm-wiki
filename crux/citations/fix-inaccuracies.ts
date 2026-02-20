@@ -983,20 +983,32 @@ export async function findReplacementSources(
       const best = filteredResults[0];
 
       // Verify the candidate actually supports the claim (improvement B)
-      let confidence = best.text && best.text.length > 200 ? 'medium' : 'low';
+      // Only accept sources that the accuracy checker confirms as supporting the claim
+      let confidence: string = 'low';
       if (best.text && best.text.length > 100) {
         try {
           const verification = await checkClaimAccuracy(claimText, best.text);
-          if (verification.verdict === 'unsupported' || verification.verdict === 'inaccurate') {
+          // Strict: only accept "accurate" verdicts with high scores
+          if (verification.verdict !== 'accurate' || verification.score < 0.85) {
             if (opts?.verbose) {
-              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${verification.verdict})`);
+              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${verification.verdict}, ${(verification.score * 100).toFixed(0)}%)`);
             }
-            continue; // Skip — candidate doesn't actually support the claim
+            continue; // Skip — candidate doesn't clearly support the claim
           }
-          confidence = verification.score >= 0.8 ? 'high' : 'medium';
+          confidence = verification.score >= 0.95 ? 'high' : 'medium';
         } catch {
-          // Verification failed — keep the candidate with lower confidence
+          // Verification failed — skip (don't accept unverified candidates)
+          if (opts?.verbose) {
+            console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (verification failed)`);
+          }
+          continue;
         }
+      } else {
+        // Not enough text to verify — skip
+        if (opts?.verbose) {
+          console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (insufficient text for verification)`);
+        }
+        continue;
       }
 
       replacements.push({
