@@ -16,13 +16,13 @@ clusters:
 
 import { EntityLink } from '@components/wiki';
 
-<EntityLink id="E273">AI Scaling Laws</EntityLink> describe empirical power-law relationships that govern how neural network performance improves with increases in model size, dataset size, and computational resources. These relationships have become foundational to modern AI development, enabling researchers to predict model capabilities and optimize resource allocation during training.
+<EntityLink id="E273" name="scaling-laws">AI Scaling Laws</EntityLink> describe empirical power-law relationships that govern how neural network performance improves with increases in model size, dataset size, and computational resources. These relationships have become foundational to modern AI development, enabling researchers to predict model capabilities and optimize resource allocation during training.
 
 ## Overview
 
 Scaling laws characterize how test loss decreases as key factors increase. The relationships follow predictable mathematical patterns across multiple orders of magnitude, allowing organizations to forecast performance improvements and make strategic decisions about model architecture and training approaches.
 
-The discovery of these patterns in 2020 fundamentally changed AI development strategy, leading labs to prioritize scaling as a primary path to capability improvements. <EntityLink id="E91">Dario Amodei</EntityLink> and Ilya Sutskever have stated that the discovery of scaling laws led them to pursue the current large language model paradigm.[^ea-forum-scaling]
+The discovery of these patterns in 2020 fundamentally changed AI development strategy, leading labs to prioritize scaling as a primary path to capability improvements. <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> and Ilya Sutskever have stated that the discovery of scaling laws led them to pursue the current large language model paradigm.[^ea-forum-scaling]
 
 ## Key Variables
 
@@ -34,7 +34,7 @@ Scaling laws examine the relationship between model performance (typically measu
 
 ## Kaplan Scaling Laws (2020)
 
-In January 2020, researchers at <EntityLink id="E218">OpenAI</EntityLink> published foundational work demonstrating that loss scales as a power-law with model size, dataset size, and training compute across more than seven orders of magnitude.[^kaplan-2020]
+In January 2020, researchers at <EntityLink id="E218" name="openai">OpenAI</EntityLink> published foundational work demonstrating that loss scales as a power-law with model size, dataset size, and training compute across more than seven orders of magnitude.[^kaplan-2020]
 
 ### Mathematical Formulation
 
@@ -68,7 +68,7 @@ This approach influenced GPT-3's development, which was trained on 175 billion p
 
 ## Chinchilla Scaling Laws (2022)
 
-In March 2022, <EntityLink id="E98">Google DeepMind</EntityLink> researchers published revised scaling laws that fundamentally changed understanding of optimal training strategies.[^hoffmann-2022]
+In March 2022, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> researchers published revised scaling laws that fundamentally changed understanding of optimal training strategies.[^hoffmann-2022]
 
 ### Revised Compute-Optimal Training
 
@@ -141,7 +141,7 @@ Scaling laws enable prediction of model performance before expensive training ru
 - Estimate capabilities of future models given projected compute availability
 - Make informed decisions about architecture choices and training duration
 
-<EntityLink id="E22">Anthropic</EntityLink> used this predictive capability when scaling sparse autoencoders to production models, tuning methods at affordable scale before deploying on Claude Sonnet.[^anthropic-mapping]
+<EntityLink id="E22" name="anthropic">Anthropic</EntityLink> used this predictive capability when scaling sparse autoencoders to production models, tuning methods at affordable scale before deploying on Claude Sonnet.[^anthropic-mapping]
 
 ### Model Design Decisions
 
@@ -180,7 +180,7 @@ Caballero et al. (2022) proposed "smoothly broken power laws" to better model co
 
 ### Double Descent
 
-<EntityLink id="E218">OpenAI</EntityLink> documented the double descent phenomenon in 2019: as parameters increase, test error initially decreases, increases (overfitting), then undergoes a second descent.[^openai-double-descent] This contradicts classical assumptions about overfitting and reveals non-monotonic scaling behavior.
+<EntityLink id="E218" name="openai">OpenAI</EntityLink> documented the double descent phenomenon in 2019: as parameters increase, test error initially decreases, increases (overfitting), then undergoes a second descent.[^openai-double-descent] This contradicts classical assumptions about overfitting and reveals non-monotonic scaling behavior.
 
 ### Hierarchy Loss
 
@@ -190,7 +190,7 @@ Bahri et al. (2021) observed breakdown of predicted scaling behavior when model 
 
 ### Inference-Time Reasoning
 
-<EntityLink id="E218">OpenAI</EntityLink>'s o1 model introduced a new scaling dimension: performance improvements from increased test-time compute. The model's accuracy on AIME 2024 demonstrates this effect:[^openai-o1]
+<EntityLink id="E218" name="openai">OpenAI</EntityLink>'s o1 model introduced a new scaling dimension: performance improvements from increased test-time compute. The model's accuracy on AIME 2024 demonstrates this effect:[^openai-o1]
 
 - Single sample: 74% accuracy
 - Consensus among 64 samples: 83% accuracy  
@@ -252,7 +252,7 @@ Test error scaling depends on properties of the data distribution. Below a criti
 
 ### Economic Implications
 
-While training costs are incurred once, inference costs accumulate over a model's deployment lifetime. <EntityLink id="E125">Epoch AI</EntityLink> analysis indicates:[^epoch-inference]
+While training costs are incurred once, inference costs accumulate over a model's deployment lifetime. <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> analysis indicates:[^epoch-inference]
 
 - Inference latency scales with the square root of model size and cube root of memory bandwidth
 - Cumulative inference costs can equal or exceed initial training costs for widely deployed models
@@ -264,15 +264,15 @@ This means compute-optimal training must consider not just training efficiency b
 
 ### OpenAI
 
-<EntityLink id="E218">OpenAI</EntityLink>'s 2020 scaling laws research directly influenced GPT-3's development and established the foundation for subsequent large language model development.[^openai-scaling] The organization continues researching test-time compute scaling with the o1 series.[^openai-o1]
+<EntityLink id="E218" name="openai">OpenAI</EntityLink>'s 2020 scaling laws research directly influenced GPT-3's development and established the foundation for subsequent large language model development.[^openai-scaling] The organization continues researching test-time compute scaling with the o1 series.[^openai-o1]
 
 ### Google DeepMind
 
-<EntityLink id="E98">Google DeepMind</EntityLink>'s Chinchilla research (2022) revised understanding of compute-optimal training, showing that model parameters and training tokens should scale equally.[^hoffmann-2022] This work analyzed over 400 models and demonstrated substantial efficiency gains.
+<EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>'s Chinchilla research (2022) revised understanding of compute-optimal training, showing that model parameters and training tokens should scale equally.[^hoffmann-2022] This work analyzed over 400 models and demonstrated substantial efficiency gains.
 
 ### Anthropic
 
-<EntityLink id="E22">Anthropic</EntityLink> has applied scaling law principles to interpretability research, using them to guide sparse autoencoder training for Claude 3 Sonnet.[^anthropic-scaling] The organization used scaling laws to extrapolate from smaller experiments to production-grade models, successfully extracting interpretable features from a frontier model.[^anthropic-mapping]
+<EntityLink id="E22" name="anthropic">Anthropic</EntityLink> has applied scaling law principles to interpretability research, using them to guide sparse autoencoder training for Claude 3 Sonnet.[^anthropic-scaling] The organization used scaling laws to extrapolate from smaller experiments to production-grade models, successfully extracting interpretable features from a frontier model.[^anthropic-mapping]
 
 ### Meta
 

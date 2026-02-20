@@ -26,7 +26,7 @@ import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 
 ## Overview
 
-Current global AI safety spending is approximately \$700M-1.25B per year, while AI capabilities investment exceeds \$100B annually—a ratio of roughly 100:1 to 150:1, though these figures depend heavily on how "safety spending" is defined.[^1] The <EntityLink id="E267">AI Safety Research Value Model</EntityLink> suggests scaling safety funding 3-10x to \$2-5B/year. The <EntityLink id="E706">Pre-TAI Capital Deployment</EntityLink> analysis shows that frontier labs alone may spend \$100-300B+ over the coming years. This page examines what different levels of safety spending—\$5B, \$10B, or \$50B annually—could accomplish given current field constraints.
+Current global AI safety spending is approximately \$700M-1.25B per year, while AI capabilities investment exceeds \$100B annually—a ratio of roughly 100:1 to 150:1, though these figures depend heavily on how "safety spending" is defined.[^1] The <EntityLink id="E267" name="safety-research-value">AI Safety Research Value Model</EntityLink> suggests scaling safety funding 3-10x to \$2-5B/year. The <EntityLink id="E706" name="pre-tai-capital-deployment">Pre-TAI Capital Deployment</EntityLink> analysis shows that frontier labs alone may spend \$100-300B+ over the coming years. This page examines what different levels of safety spending—\$5B, \$10B, or \$50B annually—could accomplish given current field constraints.
 
 This analysis models the absorptive capacity problem: the gap between theoretical safety spending and what the field can productively deploy. It provides portfolio recommendations at different funding levels and identifies bottlenecks that constrain effective scaling.
 
@@ -38,7 +38,7 @@ This analysis models the absorptive capacity problem: the gap between theoretica
 
 | Source | Annual Spending | Growth Rate | Primary Focus |
 |--------|----------------|-------------|---------------|
-| **Frontier AI labs** (internal) | \$400-700M | +40-50%/year | <EntityLink id="E174">Interpretability</EntityLink>, <EntityLink id="E259">RLHF</EntityLink>, evaluations, red-teaming |
+| **Frontier AI labs** (internal) | \$400-700M | +40-50%/year | <EntityLink id="E174" name="interpretability">Interpretability</EntityLink>, <EntityLink id="E259" name="rlhf">RLHF</EntityLink>, evaluations, red-teaming |
 | **Philanthropic funders** | \$150-250M | +20-30%/year | Academic research, field building, policy |
 | **Government** | \$100-200M | +50-100%/year | Standards (NIST), evaluation (UK AISI), military |
 | **Academia** (dedicated safety) | \$50-100M | +15-20%/year | Theoretical alignment, robustness, fairness |
@@ -98,11 +98,11 @@ This funding level could be absorbed with moderate efficiency given current fiel
 
 | Category | Allocation | Annual Spend | What It Funds |
 |----------|------------|--------------|---------------|
-| **Expand existing orgs** | 30% | \$300-600M | Double safety teams at <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E98">DeepMind</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>; expand <EntityLink id="E26">ARC Evaluations</EntityLink>, <EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E557">Redwood Research</EntityLink> |
+| **Expand existing orgs** | 30% | \$300-600M | Double safety teams at <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E98" name="deepmind">DeepMind</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>; expand <EntityLink id="E26" name="arc-evals">ARC Evaluations</EntityLink>, <EntityLink id="E202" name="miri">MIRI</EntityLink>, <EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink> |
 | **Talent pipeline** | 25% | \$250-500M | PhD fellowships (500+), postdoc programs, bootcamps, career transitions |
 | **Academic programs** | 20% | \$200-400M | 20-30 university safety research centers; endowed chairs |
 | **Evaluations & red-teaming** | 15% | \$150-300M | Independent eval orgs; bug bounties; adversarial testing infrastructure |
-| **Governance research** | 10% | \$100-200M | Policy research; regulatory frameworks; <EntityLink id="E171">international coordination</EntityLink> |
+| **Governance research** | 10% | \$100-200M | Policy research; regulatory frameworks; <EntityLink id="E171" name="international-coordination">international coordination</EntityLink> |
 
 **Projected outcomes (3-5 year horizon)**:
 - Safety researcher workforce: 2,500-3,500 → 5,000-7,000
@@ -121,9 +121,9 @@ At this level, safety research could develop organizational infrastructure compa
 | **Dedicated safety labs** | 25% | \$1.25-2.5B | 3-5 new independent safety research institutes at scale |
 | **Safety compute** | 20% | \$1-2B | Dedicated compute clusters for safety research; model access |
 | **Expanded talent pipeline** | 15% | \$750M-1.5B | 1,000+ new PhD positions; global training programs |
-| **Interpretability at scale** | 15% | \$750M-1.5B | Large-scale <EntityLink id="E477">mechanistic interpretability</EntityLink>; automated tools |
+| **Interpretability at scale** | 15% | \$750M-1.5B | Large-scale <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink>; automated tools |
 | **Evaluation infrastructure** | 10% | \$500M-1B | National-scale evaluation facilities; continuous monitoring |
-| **Governance & institutions** | 10% | \$500M-1B | <EntityLink id="E470">International coordination mechanisms</EntityLink>; <EntityLink id="E249">regulatory capacity</EntityLink> building |
+| **Governance & institutions** | 10% | \$500M-1B | <EntityLink id="E470" name="coordination-mechanisms">International coordination mechanisms</EntityLink>; <EntityLink id="E249" name="regulatory-capacity">regulatory capacity</EntityLink> building |
 | **Exploratory research** | 5% | \$250-500M | High-variance fundamental research; novel approaches |
 
 **Projected outcomes (3-5 year horizon)**:
@@ -146,7 +146,7 @@ At this scale, efficiency concerns increase substantially. The constraint shifts
 | **Human capital** | 15% | \$1.5-4.5B | Global researcher pipeline; competitive compensation |
 | **Interpretability** | 15% | \$1.5-4.5B | Automated interpretability tools; comprehensive model understanding |
 | **Governance & policy** | 10% | \$1-3B | International institutions; regulatory implementation; standards |
-| **Applied safety** | 10% | \$1-3B | Deployment safety; incident response; <EntityLink id="E284">societal resilience</EntityLink> |
+| **Applied safety** | 10% | \$1-3B | Deployment safety; incident response; <EntityLink id="E284" name="societal-resilience">societal resilience</EntityLink> |
 | **Exploratory approaches** | 5% | \$500M-1.5B | High-risk/high-reward approaches; formal verification at scale |
 
 ### Level 4: \$30-50B+/year (Maximum Plausible Scale)
@@ -178,7 +178,7 @@ flowchart LR
     style TOTAL fill:#ccffcc
 `} />
 
-The current pipeline produces approximately 200-500 new safety researchers per year (see <EntityLink id="E704">AI Talent Market Dynamics</EntityLink> for detailed pipeline analysis). To productively absorb \$5-10B/year would require 10,000-15,000 researchers—implying a 3-5x increase in the pipeline sustained over several years.
+The current pipeline produces approximately 200-500 new safety researchers per year (see <EntityLink id="E704" name="ai-talent-market-dynamics">AI Talent Market Dynamics</EntityLink> for detailed pipeline analysis). To productively absorb \$5-10B/year would require 10,000-15,000 researchers—implying a 3-5x increase in the pipeline sustained over several years.
 
 ### Pipeline Expansion Strategies
 
@@ -238,9 +238,9 @@ Different types of safety work address different categories of risk. Understandi
 ### Technical Alignment Research
 **Focus**: Ensuring AI systems reliably pursue intended objectives
 
-**Examples**: <EntityLink id="E271">Scalable oversight</EntityLink>, <EntityLink id="E174">interpretability</EntityLink>, value learning
+**Examples**: <EntityLink id="E271" name="scalable-oversight">Scalable oversight</EntityLink>, <EntityLink id="E174" name="interpretability">interpretability</EntityLink>, value learning
 
-**Primary risk addressed**: <EntityLink id="E93">Deceptive alignment</EntityLink>, <EntityLink id="E274">scheming</EntityLink>, goal misgeneralization
+**Primary risk addressed**: <EntityLink id="E93" name="deceptive-alignment">Deceptive alignment</EntityLink>, <EntityLink id="E274" name="scheming">scheming</EntityLink>, goal misgeneralization
 
 **Estimated current spending**: \$300-500M/year
 
@@ -256,7 +256,7 @@ Different types of safety work address different categories of risk. Understandi
 ### Evaluation and Monitoring
 **Focus**: Detecting dangerous capabilities and behaviors
 
-**Examples**: <EntityLink id="E26">ARC Evaluations</EntityLink>, <EntityLink id="E201">METR</EntityLink>, <EntityLink id="E252">Responsible Scaling Policies</EntityLink>
+**Examples**: <EntityLink id="E26" name="arc-evals">ARC Evaluations</EntityLink>, <EntityLink id="E201" name="metr">METR</EntityLink>, <EntityLink id="E252" name="responsible-scaling-policies">Responsible Scaling Policies</EntityLink>
 
 **Primary risk addressed**: Surprise capability gains, deployment of unsafe systems
 
@@ -265,7 +265,7 @@ Different types of safety work address different categories of risk. Understandi
 ### Governance and Policy
 **Focus**: Institutional mechanisms for managing AI risk
 
-**Examples**: <EntityLink id="E171">International coordination</EntityLink>, regulatory frameworks, standards development
+**Examples**: <EntityLink id="E171" name="international-coordination">International coordination</EntityLink>, regulatory frameworks, standards development
 
 **Primary risk addressed**: Race dynamics, inadequate oversight, coordination failures
 
@@ -287,7 +287,7 @@ Some work announced as "safety" primarily serves branding or regulatory complian
 - Lack of independent oversight or publication of negative results
 - Evaluation programs that test user-facing features rather than dangerous capabilities
 
-The <EntityLink id="E421">OpenAI Foundation</EntityLink> page documents related concerns in the philanthropic context. Whether public communication and trust-building constitute legitimate safety investments depends on whether institutional legitimacy is necessary for effective safety regulation—a question with reasonable disagreement.
+The <EntityLink id="E421" name="openai-foundation">OpenAI Foundation</EntityLink> page documents related concerns in the philanthropic context. Whether public communication and trust-building constitute legitimate safety investments depends on whether institutional legitimacy is necessary for effective safety regulation—a question with reasonable disagreement.
 
 ## Spending Efficiency Concerns
 
@@ -345,7 +345,7 @@ If timelines are longer (≈20+ years), emphasis shifts toward:
 1. **Publish safety spending** — Verifiable figures in annual reports would enable external assessment
 2. **Fund independent safety research** — External researchers provide complementary perspectives
 3. **Provide model access to safety researchers** — Safety research requires access to frontier systems
-4. **Consider minimum safety allocation commitments** — Some labs (e.g., <EntityLink id="E22">Anthropic</EntityLink>) allocate 5-8% of budgets to safety; whether this should be an industry norm remains debated
+4. **Consider minimum safety allocation commitments** — Some labs (e.g., <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>) allocate 5-8% of budgets to safety; whether this should be an industry norm remains debated
 
 ### For Philanthropic Funders
 
@@ -359,7 +359,7 @@ If timelines are longer (≈20+ years), emphasis shifts toward:
 1. **Fund public safety evaluation infrastructure** — Independent testing capacity comparable to FDA drug approval
 2. **Invest in academic safety programs** through research grants, center funding, and fellowship programs
 3. **Consider safety spending disclosure requirements** — Transparency as precondition for informed regulation
-4. **Support <EntityLink id="E171">international coordination</EntityLink> mechanisms** to enable consistent standards
+4. **Support <EntityLink id="E171" name="international-coordination">international coordination</EntityLink> mechanisms** to enable consistent standards
 
 ## Key Uncertainties
 
@@ -373,8 +373,8 @@ If timelines are longer (≈20+ years), emphasis shifts toward:
 
 ## Sources
 
-[^1]: Estimates based on published safety team sizes from <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E218">OpenAI</EntityLink>, and <EntityLink id="E98">Google DeepMind</EntityLink> public reporting, and philanthropic grant databases including <EntityLink id="E552">Open Philanthropy</EntityLink> grants database (2024).
+[^1]: Estimates based on published safety team sizes from <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>, and <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> public reporting, and philanthropic grant databases including <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink> grants database (2024).
 [^2]: [Institute for AI Policy and Strategy - AI Safety Funding Landscape](https://www.iaps.ai/) (2024)
-[^3]: <EntityLink id="E510">80,000 Hours</EntityLink> [AI Safety Career Guide](https://80000hours.org/problem-profiles/artificial-intelligence/) (2024); researcher count estimates from AI Safety Support surveys and <EntityLink id="E476">field building analysis</EntityLink>
+[^3]: <EntityLink id="E510" name="80000-hours">80,000 Hours</EntityLink> [AI Safety Career Guide](https://80000hours.org/problem-profiles/artificial-intelligence/) (2024); researcher count estimates from AI Safety Support surveys and <EntityLink id="E476" name="field-building-analysis">field building analysis</EntityLink>
 [^4]: Nuclear safety spending estimates from NRC Annual Reports (1975-2024), DOE Budget Authority Historical Tables, and Wellock, T.R. "A Figure of Merit: Quantifying the Probability of a Nuclear Reactor Accident" (NRC Historical Office, 2017)
 [^5]: Pharmaceutical safety spending from FDA Budget Authority reports, PhRMA Industry Profile (2024), and Peltzman, S. "An Evaluation of Consumer Protection Legislation: The 1962 Drug Amendments" (Journal of Political Economy, 1973)

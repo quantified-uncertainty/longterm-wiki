@@ -29,7 +29,7 @@ import {DataInfoBox, Mermaid, EntityLink} from '@components/wiki';
 import {F, Calc} from '@components/facts';
 
 :::note[Page Scope]
-This page covers Anthropic valuation analysis. For company overview, see <EntityLink id="E22">Anthropic</EntityLink>. For IPO timeline, see <EntityLink id="E409">Anthropic IPO</EntityLink>. For EA capital analysis, see <EntityLink id="E406">Anthropic (Funder)</EntityLink>.
+This page covers Anthropic valuation analysis. For company overview, see <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>. For IPO timeline, see <EntityLink id="E409" name="anthropic-ipo">Anthropic IPO</EntityLink>. For EA capital analysis, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>.
 
 **Data as of**: February 2026. Key figures: Anthropic <F e="anthropic" f="6796e194">\$380B</F> valuation (Series G), <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate revenue; OpenAI <F e="openai" f="39d6868e">\$500B</F> valuation, <F e="openai" f="609b9796">\$20B</F> ARR.
 :::
@@ -47,7 +47,7 @@ This page covers Anthropic valuation analysis. For company overview, see <Entity
 
 ## Overview
 
-<EntityLink id="E22">Anthropic</EntityLink>'s <F e="anthropic" f="6796e194">\$380 billion</F> valuation (February 2026 Series G) reflects rapid revenue growth from <F e="anthropic" f="55d88868">\$9B</F> at end of 2025 to <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate by the time of the funding round. At <Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" /> current revenue, Anthropic now trades at a multiple closer to <EntityLink id="E218">OpenAI</EntityLink>'s <Calc expr="{openai.39d6868e} / {openai.609b9796}" precision={0} prefix="≈" suffix="x" /> (at <F e="openai" f="39d6868e">\$500B</F> with <F e="openai" f="609b9796">\$20B</F> ARR)—a convergence from the <Calc expr="{anthropic.c45b168f} / {anthropic.55d88868}" precision={0} prefix="≈" suffix="x" /> multiple at the previous <F e="anthropic" f="c45b168f">\$350B</F> valuation with <F e="anthropic" f="55d88868">\$9B</F> revenue.
+<EntityLink id="E22" name="anthropic">Anthropic</EntityLink>'s <F e="anthropic" f="6796e194">\$380 billion</F> valuation (February 2026 Series G) reflects rapid revenue growth from <F e="anthropic" f="55d88868">\$9B</F> at end of 2025 to <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate by the time of the funding round. At <Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" /> current revenue, Anthropic now trades at a multiple closer to <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s <Calc expr="{openai.39d6868e} / {openai.609b9796}" precision={0} prefix="≈" suffix="x" /> (at <F e="openai" f="39d6868e">\$500B</F> with <F e="openai" f="609b9796">\$20B</F> ARR)—a convergence from the <Calc expr="{anthropic.c45b168f} / {anthropic.55d88868}" precision={0} prefix="≈" suffix="x" /> multiple at the previous <F e="anthropic" f="c45b168f">\$350B</F> valuation with <F e="anthropic" f="55d88868">\$9B</F> revenue.
 
 This page provides an investment-grade analysis of scenarios across different outcomes, incorporating data on customer concentration, margin pressure, and competitive dynamics.[^1]
 
@@ -136,19 +136,19 @@ This dual-cloud strategy reduces infrastructure risk and provides leverage in ch
 
 ### 4. Technical Leadership Team
 
-Anthropic's founding team includes researchers from <EntityLink id="E218">OpenAI</EntityLink>:
+Anthropic's founding team includes researchers from <EntityLink id="E218" name="openai">OpenAI</EntityLink>:
 
 **Founding Team (7 ex-OpenAI researchers):**
-- <EntityLink id="E91">Dario Amodei</EntityLink> (CEO) - Former VP Research at OpenAI
-- <EntityLink id="E90">Daniela Amodei</EntityLink> (President) - Former VP Operations at OpenAI
-- <EntityLink id="E59">Chris Olah</EntityLink> - <EntityLink id="E174">Interpretability</EntityLink> researcher
+- <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (CEO) - Former VP Research at OpenAI
+- <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink> (President) - Former VP Operations at OpenAI
+- <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink> - <EntityLink id="E174" name="interpretability">Interpretability</EntityLink> researcher
 - Tom Brown - Lead author of GPT-3
 - Jared Kaplan - Scaling laws researcher
 
 **Key Acquisitions:**
-- <EntityLink id="E182">Jan Leike</EntityLink> (2024) - Former OpenAI Superalignment co-lead
+- <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> (2024) - Former OpenAI Superalignment co-lead
 - John Schulman (2024) - OpenAI co-founder, invented PPO algorithm
-- <EntityLink id="E156">Holden Karnofsky</EntityLink> (2025) - <EntityLink id="E521">Coefficient Giving</EntityLink> co-founder
+- <EntityLink id="E156" name="holden-karnofsky">Holden Karnofsky</EntityLink> (2025) - <EntityLink id="E521" name="coefficient-giving">Coefficient Giving</EntityLink> co-founder
 
 **Team Scale:**
 - Interpretability team: <F e="anthropic" f="28a43350">40-60</F> researchers (largest globally)
@@ -199,9 +199,9 @@ Multiple sources have characterized current AI valuations as elevated:
 
 | Source | Statement | Date |
 |--------|---------|------|
-| **<EntityLink id="E269">Sam Altman</EntityLink> (OpenAI CEO)** | "AI bubble is ongoing" | 2025 |
+| **<EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> (OpenAI CEO)** | "AI bubble is ongoing" | 2025 |
 | **Jamie Dimon (JPMorgan)** | "Higher chance of meaningful drop" than markets reflect | 2025 |
-| **DeepSeek launch impact** | <EntityLink id="E693">Nvidia</EntityLink> dropped 17% in one day | Jan 2025 |
+| **DeepSeek launch impact** | <EntityLink id="E693" name="nvidia">Nvidia</EntityLink> dropped 17% in one day | Jan 2025 |
 | **Market concentration** | 30% of S&P 500 in 5 companies—highest concentration in half a century | Late 2025 |
 
 When the CEO of OpenAI characterizes the market as experiencing bubble conditions, valuations across the sector face uncertainty.[^15][^16]
@@ -294,7 +294,7 @@ The risk/reward profile has shifted since Anthropic's revenue multiple compresse
 
 ### For EA-Aligned Capital
 
-See <EntityLink id="E406">Anthropic (Funder)</EntityLink> for detailed philanthropic capital analysis:
+See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for detailed philanthropic capital analysis:
 
 | Valuation | Risk-Adjusted EA Capital |
 |-----------|-------------------------|
@@ -309,7 +309,7 @@ Anthropic's trajectory affects the field regardless of exact valuation:
 
 1. **Talent attraction**: Valuations at current levels attract safety researchers
 2. **Model legitimacy**: Demonstrates "safety lab" can compete commercially
-3. **Research funding**: Higher valuations fund more <EntityLink id="E265">safety research</EntityLink>
+3. **Research funding**: Higher valuations fund more <EntityLink id="E265" name="safety-research">safety research</EntityLink>
 4. **Industry influence**: Commercial success encourages competitors to adopt safety practices
 
 ## Key Uncertainties
