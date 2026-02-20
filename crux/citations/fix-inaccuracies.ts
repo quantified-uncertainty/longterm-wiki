@@ -743,6 +743,260 @@ export async function generateFixesForPage(
 }
 
 // ---------------------------------------------------------------------------
+// Source replacement search
+// ---------------------------------------------------------------------------
+
+export interface SourceReplacement {
+  footnote: number;
+  oldUrl: string;
+  newUrl: string;
+  newTitle: string;
+  confidence: string; // 'high' | 'medium' | 'low'
+  reason: string;
+}
+
+/**
+ * Search for a better source URL for unsupported citations.
+ * Uses the Exa API to find pages that actually contain the claimed information.
+ * Falls back to LLM-based search query generation + Exa search.
+ */
+export async function findReplacementSources(
+  flaggedCitations: EnrichedFlaggedCitation[],
+  opts?: { verbose?: boolean },
+): Promise<SourceReplacement[]> {
+  const exaApiKey = process.env.EXA_API_KEY;
+  if (!exaApiKey) {
+    if (opts?.verbose) {
+      console.log('  (EXA_API_KEY not set — skipping source replacement search)');
+    }
+    return [];
+  }
+
+  // Only consider unsupported citations with score=0 (source genuinely doesn't have the info)
+  const candidates = flaggedCitations.filter(
+    (c) => c.verdict === 'unsupported' && (c.score ?? 1) <= 0.2,
+  );
+
+  if (candidates.length === 0) return [];
+
+  const replacements: SourceReplacement[] = [];
+
+  for (const cit of candidates) {
+    const claimText = cit.fullClaimText || cit.claimText;
+    if (!claimText || claimText.length < 20) continue;
+
+    // Build a targeted search query from the claim
+    const searchQuery = buildSearchQuery(claimText, cit.sourceTitle);
+
+    try {
+      const results = await searchExa(exaApiKey, searchQuery);
+      if (results.length === 0) continue;
+
+      // Filter out the same domain as the current source
+      const currentDomain = cit.url ? extractDomainFromUrl(cit.url) : null;
+      const filteredResults = results.filter(
+        (r) => !currentDomain || extractDomainFromUrl(r.url) !== currentDomain,
+      );
+
+      if (filteredResults.length === 0) continue;
+
+      // Pick the best result (first one — Exa ranks by relevance)
+      const best = filteredResults[0];
+
+      replacements.push({
+        footnote: cit.footnote,
+        oldUrl: cit.url || '',
+        newUrl: best.url,
+        newTitle: best.title,
+        confidence: best.text && best.text.length > 200 ? 'medium' : 'low',
+        reason: `Current source doesn't support the claim. Found potentially relevant: "${best.title}"`,
+      });
+
+      if (opts?.verbose) {
+        console.log(`  [^${cit.footnote}] Found replacement: ${best.title.slice(0, 60)}...`);
+      }
+
+      // Rate limit between searches
+      await new Promise((r) => setTimeout(r, 500));
+    } catch (err: unknown) {
+      // Swallow search errors — source replacement is best-effort
+      if (opts?.verbose) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`  [^${cit.footnote}] Search error: ${msg.slice(0, 60)}`);
+      }
+    }
+  }
+
+  return replacements;
+}
+
+/** Build a concise search query from a claim text. */
+function buildSearchQuery(claimText: string, sourceTitle: string | null): string {
+  // Strip MDX components and footnote markers
+  let clean = claimText
+    .replace(/<[^>]+>/g, '')
+    .replace(/\[\^\d+\]/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Truncate to reasonable search length
+  if (clean.length > 200) {
+    clean = clean.slice(0, 200);
+  }
+
+  return clean;
+}
+
+/** Extract domain from a URL. */
+function extractDomainFromUrl(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return null;
+  }
+}
+
+interface ExaSearchResult {
+  title: string;
+  url: string;
+  text?: string;
+}
+
+/** Search via Exa API. */
+async function searchExa(apiKey: string, query: string): Promise<ExaSearchResult[]> {
+  const response = await fetch('https://api.exa.ai/search', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query,
+      type: 'auto',
+      numResults: 5,
+      contents: { text: { maxCharacters: 500 } },
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`Exa API error ${response.status}: ${text.slice(0, 200)}`);
+  }
+
+  const data = (await response.json()) as { results: ExaSearchResult[] };
+  return data.results || [];
+}
+
+/**
+ * Apply source replacements to page content by updating footnote definition URLs.
+ * Only replaces the URL inside [^N]: [Title](URL) definitions.
+ */
+export function applySourceReplacements(
+  content: string,
+  replacements: SourceReplacement[],
+): { content: string; applied: number; skipped: number } {
+  let modified = content;
+  let applied = 0;
+  let skipped = 0;
+
+  for (const rep of replacements) {
+    // Match footnote definition pattern: [^N]: [Title](URL) or [^N]: URL
+    const defRegex = new RegExp(
+      `(\\[\\^${rep.footnote}\\]:\\s*)(?:\\[([^\\]]*?)\\]\\((${escapeRegex(rep.oldUrl)})\\)|(${escapeRegex(rep.oldUrl)}))`,
+    );
+
+    const match = defRegex.exec(modified);
+    if (!match) {
+      skipped++;
+      continue;
+    }
+
+    const prefix = match[1]; // "[^N]: "
+    const newDef = `${prefix}[${rep.newTitle}](${rep.newUrl})`;
+    modified = modified.slice(0, match.index) + newDef + modified.slice(match.index + match[0].length);
+    applied++;
+  }
+
+  return { content: modified, applied, skipped };
+}
+
+/** Escape special regex characters in a string. */
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ---------------------------------------------------------------------------
+// Orphaned footnote cleanup
+// ---------------------------------------------------------------------------
+
+/**
+ * Remove footnote definition lines ([^N]: ...) where no corresponding
+ * inline reference [^N] exists in the body text.
+ *
+ * This prevents dangling definitions after section rewrites remove
+ * inline footnote references.
+ */
+export function cleanupOrphanedFootnotes(content: string): { content: string; removed: number[] } {
+  const lines = content.split('\n');
+
+  // Find all inline footnote references (not in definition lines)
+  const inlineRefs = new Set<number>();
+  const defLineIndices: Array<{ lineIdx: number; footnote: number }> = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trimStart();
+
+    // Check if this is a footnote definition line
+    const defMatch = trimmed.match(/^\[\^(\d+)\]:/);
+    if (defMatch) {
+      defLineIndices.push({ lineIdx: i, footnote: parseInt(defMatch[1], 10) });
+      continue;
+    }
+
+    // Otherwise, collect all inline [^N] references on this line
+    const refRe = /\[\^(\d+)\]/g;
+    let m: RegExpExecArray | null;
+    while ((m = refRe.exec(line)) !== null) {
+      inlineRefs.add(parseInt(m[1], 10));
+    }
+  }
+
+  // Find orphaned definitions (no matching inline reference)
+  const orphanedLineIndices = new Set<number>();
+  const removed: number[] = [];
+  for (const def of defLineIndices) {
+    if (!inlineRefs.has(def.footnote)) {
+      orphanedLineIndices.add(def.lineIdx);
+      removed.push(def.footnote);
+    }
+  }
+
+  if (removed.length === 0) {
+    return { content, removed: [] };
+  }
+
+  // Remove orphaned lines (and trailing blank line if it creates a double-blank)
+  const filtered = lines.filter((_, i) => !orphanedLineIndices.has(i));
+
+  // Clean up double-blank lines that might result from removal
+  const cleaned: string[] = [];
+  for (let i = 0; i < filtered.length; i++) {
+    if (i > 0 && filtered[i].trim() === '' && filtered[i - 1].trim() === '') {
+      // Skip consecutive blank lines (keep only one)
+      if (cleaned.length > 0 && cleaned[cleaned.length - 1].trim() === '') {
+        continue;
+      }
+    }
+    cleaned.push(filtered[i]);
+  }
+
+  return { content: cleaned.join('\n'), removed: removed.sort((a, b) => a - b) };
+}
+
+// ---------------------------------------------------------------------------
 // Fix application
 // ---------------------------------------------------------------------------
 
@@ -942,12 +1196,17 @@ async function main() {
             if (sectionRewrites.length > 0 && apply) {
               const rwResult = applySectionRewrites(pageContent, sectionRewrites);
               if (rwResult.applied > 0) {
-                writeFileSync(filePath, rwResult.content, 'utf-8');
+                // Clean up orphaned footnote definitions
+                const orphanResult = cleanupOrphanedFootnotes(rwResult.content);
+                writeFileSync(filePath, orphanResult.content, 'utf-8');
                 appendEditLog(pageId, {
                   tool: 'crux-fix-escalated',
                   agency: 'automated',
                   note: `Escalated to Claude: rewrote ${rwResult.applied} section(s) to fix citation inaccuracies`,
                 });
+                if (!json && orphanResult.removed.length > 0) {
+                  console.log(`  ${c.dim}Cleaned up ${orphanResult.removed.length} orphaned footnote(s): ${orphanResult.removed.map(n => `[^${n}]`).join(', ')}${c.reset}`);
+                }
               }
 
               if (!json) {

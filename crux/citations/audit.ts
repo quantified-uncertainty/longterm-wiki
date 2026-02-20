@@ -31,6 +31,9 @@ import {
   applyFixes,
   escalateWithClaude,
   applySectionRewrites,
+  cleanupOrphanedFootnotes,
+  findReplacementSources,
+  applySourceReplacements,
 } from './fix-inaccuracies.ts';
 import type { ApplyResult } from './fix-inaccuracies.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
@@ -152,7 +155,9 @@ async function main() {
     } else {
       const rwResult = applySectionRewrites(pageContent, sectionRewrites);
       if (rwResult.applied > 0) {
-        writeFileSync(filePath, rwResult.content, 'utf-8');
+        // Clean up orphaned footnote definitions left by removed inline refs
+        const orphanResult = cleanupOrphanedFootnotes(rwResult.content);
+        writeFileSync(filePath, orphanResult.content, 'utf-8');
         appendEditLog(pageId, {
           tool: 'crux-audit-escalated',
           agency: 'automated',
@@ -161,6 +166,9 @@ async function main() {
         console.log(`  ${c.green}${rwResult.applied} section(s) rewritten${c.reset}`);
         if (rwResult.skipped > 0) {
           console.log(`  ${c.yellow}${rwResult.skipped} section(s) skipped (text not found)${c.reset}`);
+        }
+        if (orphanResult.removed.length > 0) {
+          console.log(`  ${c.dim}Cleaned up ${orphanResult.removed.length} orphaned footnote definition(s): ${orphanResult.removed.map(n => `[^${n}]`).join(', ')}${c.reset}`);
         }
         fixesApplied = true;
       } else {
@@ -205,6 +213,55 @@ async function main() {
     } else {
       console.log(`  ${c.yellow}No fixes could be applied (text not found in page)${c.reset}\n`);
       process.exit(0);
+    }
+  }
+
+  // ── Step 3c: Source replacement for unsupported citations ──────────────
+  // After text rewrites, try to find better sources for still-unsupported claims
+  if (apply && process.env.EXA_API_KEY) {
+    // Re-load flagged citations to reflect any changes from Steps 3/3b
+    const currentContent = readFileSync(filePath, 'utf-8');
+    const currentBody = stripFrontmatter(currentContent);
+
+    // Quick re-check to find remaining unsupported citations
+    await extractQuotesForPage(pageId, currentBody, { verbose: false, recheck: true });
+    const reCheck = await checkAccuracyForPage(pageId, { verbose: false, recheck: true });
+    exportDashboardData();
+
+    const remainingFlagged = loadFlaggedCitations({ pageId });
+    const remainingUnsupported = remainingFlagged.filter(
+      (f) => f.verdict === 'unsupported' && (f.score ?? 1) <= 0.2,
+    );
+
+    if (remainingUnsupported.length > 0) {
+      console.log(`\n${c.bold}Step 3c: Source Replacement Search${c.reset}\n`);
+      console.log(`  ${remainingUnsupported.length} unsupported citation(s) — searching for better sources...\n`);
+
+      const remainingEnriched = enrichFromSqlite(remainingUnsupported);
+      const replacements = await findReplacementSources(remainingEnriched, { verbose: true });
+
+      if (replacements.length > 0) {
+        console.log('');
+        for (const rep of replacements) {
+          console.log(`  ${c.yellow}[^${rep.footnote}]${c.reset} ${rep.confidence}: ${rep.reason.slice(0, 80)}`);
+          console.log(`    ${c.red}- ${rep.oldUrl}${c.reset}`);
+          console.log(`    ${c.green}+ ${rep.newUrl}${c.reset}`);
+        }
+
+        const repResult = applySourceReplacements(currentContent, replacements);
+        if (repResult.applied > 0) {
+          writeFileSync(filePath, repResult.content, 'utf-8');
+          appendEditLog(pageId, {
+            tool: 'crux-audit-source-replace',
+            agency: 'automated',
+            note: `Replaced ${repResult.applied} unsupported source URL(s) with better matches`,
+          });
+          console.log(`\n  ${c.green}${repResult.applied} source(s) replaced${c.reset}`);
+          fixesApplied = true;
+        }
+      } else {
+        console.log(`  ${c.dim}No replacement sources found.${c.reset}`);
+      }
     }
   }
 
