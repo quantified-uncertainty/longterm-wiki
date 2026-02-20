@@ -28,6 +28,13 @@ import {
   loadSeenItems,
 } from '../auto-update/index.ts';
 import { runAuditGate } from '../auto-update/ci-audit.ts';
+import {
+  verifyCitationsForPages,
+  extractPageIdsFromReport,
+  findRunReport as findRunReportFile,
+} from '../auto-update/ci-verify-citations.ts';
+import { computeRiskScores } from '../auto-update/ci-risk-scores.ts';
+import { buildPrBody } from '../auto-update/ci-pr-body.ts';
 import type { AutoUpdateOptions, RunReport } from '../auto-update/types.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
@@ -453,6 +460,75 @@ async function auditGate(args: string[], options: AutoUpdateOptions): Promise<Co
   return { output: result.markdownSummary, exitCode: result.passed ? 0 : 1 };
 }
 
+/**
+ * Verify citations for auto-update pages (replaces shell in auto-update.yml).
+ */
+async function verifyCitations(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
+  const pageIds = args.filter(a => !a.startsWith('--'));
+  const fromReport = typeof options['from-report'] === 'string' ? options['from-report'] : null;
+
+  let ids = pageIds;
+  if (ids.length === 0 && fromReport) {
+    ids = extractPageIdsFromReport(fromReport);
+  }
+
+  if (ids.length === 0) {
+    return { output: 'No page IDs provided. Use positional args or --from-report=<path>.', exitCode: 0 };
+  }
+
+  const result = await verifyCitationsForPages(ids);
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify(result, null, 2), exitCode: result.hasBroken ? 1 : 0 };
+  }
+
+  return { output: result.markdownSummary, exitCode: result.hasBroken ? 1 : 0 };
+}
+
+/**
+ * Compute hallucination risk scores for auto-update pages (replaces shell in auto-update.yml).
+ */
+async function riskScores(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
+  const pageIds = args.filter(a => !a.startsWith('--'));
+  const fromReport = typeof options['from-report'] === 'string' ? options['from-report'] : null;
+
+  let ids = pageIds;
+  if (ids.length === 0 && fromReport) {
+    ids = extractPageIdsFromReport(fromReport);
+  }
+
+  if (ids.length === 0) {
+    return { output: 'No page IDs provided. Use positional args or --from-report=<path>.', exitCode: 0 };
+  }
+
+  const result = computeRiskScores(ids);
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify(result, null, 2), exitCode: 0 };
+  }
+
+  return { output: result.markdownSummary, exitCode: 0 };
+}
+
+/**
+ * Build PR body for auto-update PRs (replaces shell heredoc in auto-update.yml).
+ */
+async function prBody(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
+  const reportPath = typeof options.report === 'string' ? options.report : null;
+  const date = typeof options.date === 'string' ? options.date : new Date().toISOString().slice(0, 10);
+  const citationSummary = typeof options.citations === 'string' ? options.citations : undefined;
+  const riskSummary = typeof options.risk === 'string' ? options.risk : undefined;
+
+  const body = buildPrBody({
+    reportPath,
+    date,
+    citationSummary,
+    riskSummary,
+  });
+
+  return { output: body, exitCode: 0 };
+}
+
 // ── Command Registry ────────────────────────────────────────────────────────
 
 export const commands = {
@@ -463,6 +539,9 @@ export const commands = {
   sources,
   history,
   'audit-gate': auditGate,
+  'verify-citations': verifyCitations,
+  'risk-scores': riskScores,
+  'pr-body': prBody,
 };
 
 export function getHelp(): string {
@@ -481,6 +560,9 @@ Commands:
   sources              List configured news sources
   history [count]      Show past auto-update runs
   audit-gate           Run citation audit gate on changed pages (CI)
+  verify-citations     Verify citation URLs for specific pages (CI)
+  risk-scores          Compute hallucination risk for specific pages (CI)
+  pr-body              Build PR body from run report + summaries (CI)
 
 Options:
   --budget=N           Max dollars to spend per run (default: 50)
@@ -491,6 +573,11 @@ Options:
   --diff               (audit-gate) Auto-detect changed pages from git diff
   --apply              (audit-gate) Auto-fix inaccurate citations
   --base=BRANCH        (audit-gate) Base branch for diff (default: main)
+  --from-report=PATH   (verify-citations, risk-scores) Extract page IDs from run report
+  --report=PATH        (pr-body) Path to run report YAML
+  --date=YYYY-MM-DD    (pr-body) Date string for PR title (default: today)
+  --citations=MD       (pr-body) Citation summary markdown to include
+  --risk=MD            (pr-body) Risk summary markdown to include
   --verbose            Show detailed progress
   --json               Output as JSON
   --ci                 JSON output for CI pipelines

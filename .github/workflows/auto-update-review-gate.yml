@@ -1,16 +1,11 @@
 name: Auto-Update Review Gate
 
 # Automated citation audit gate for auto-update PRs.
-# Replaces the manual "reviewed" label gate with a thorough citation
-# accuracy pipeline: extract quotes, check accuracy, fix inaccuracies.
-#
-# How it works:
-# - Runs on PRs labeled "auto-update" (triggered on open/sync/label)
-# - Identifies changed MDX pages from the PR diff
-# - Runs `crux citations audit --apply` on each changed page
-# - Passes if no inaccurate citations remain after fixing
-# - Pushes any auto-fixes back to the PR branch
-# - Posts audit summary as a PR comment
+# Runs the crux audit-gate command which handles:
+#   - Detecting changed MDX pages from the PR diff
+#   - Running citation audit (extract quotes, check accuracy, fix inaccuracies)
+#   - Producing a structured summary
+# This workflow just orchestrates: install → audit → commit fixes → post summary.
 
 on:
   pull_request:
@@ -49,99 +44,39 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Find changed pages
-        id: pages
-        run: |
-          BASE="${{ github.event.pull_request.base.ref }}"
-          CHANGED=$(git diff --name-only "origin/${BASE}...HEAD" -- 'content/docs/**/*.mdx' | while read f; do
-            ID=$(basename "$f" .mdx)
-            if [ "$ID" != "index" ]; then
-              echo "$ID"
-            fi
-          done | tr '\n' ' ')
-
-          echo "page_ids=$CHANGED" >> $GITHUB_OUTPUT
-          echo "Changed pages: $CHANGED"
-
-          if [ -z "$CHANGED" ]; then
-            echo "No MDX pages changed — audit gate passes automatically."
-          fi
-
       - name: Run citation audit
         id: audit
-        if: steps.pages.outputs.page_ids != ''
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
         run: |
-          PAGE_IDS="${{ steps.pages.outputs.page_ids }}"
-          AUDIT_PASSED=true
-          TOTAL_INACCURATE=0
-          TOTAL_UNSUPPORTED=0
-          SUMMARY_FILE=$(mktemp)
+          BASE="${{ github.event.pull_request.base.ref }}"
 
-          echo "## Citation Audit Results" > "$SUMMARY_FILE"
-          echo "" >> "$SUMMARY_FILE"
-          echo "| Page | Audit | Status |" >> "$SUMMARY_FILE"
-          echo "|------|-------|--------|" >> "$SUMMARY_FILE"
+          # Run the audit gate — handles page detection, auditing, and summary generation
+          # Exit code 0 = passed, 1 = inaccurate citations remain
+          RESULT=$(pnpm crux auto-update audit-gate --diff --apply --base="$BASE" --json 2>&1) || true
+          echo "$RESULT" > /tmp/audit-result.json
 
-          for PAGE_ID in $PAGE_IDS; do
-            echo ""
-            echo "=== Auditing: $PAGE_ID ==="
-            echo ""
+          # Extract fields from JSON for downstream steps
+          PASSED=$(echo "$RESULT" | jq -r '.passed // false')
+          INACCURATE=$(echo "$RESULT" | jq -r '.totalInaccurate // 0')
+          UNSUPPORTED=$(echo "$RESULT" | jq -r '.totalUnsupported // 0')
+          SUMMARY=$(echo "$RESULT" | jq -r '.markdownSummary // ""')
 
-            # Run the full audit pipeline with --apply to fix issues
-            if pnpm crux citations audit "$PAGE_ID" --apply 2>&1; then
-              # Check final accuracy state
-              RESULT=$(pnpm crux citations check-accuracy "$PAGE_ID" --json 2>/dev/null || echo '{}')
-              INACC=$(echo "$RESULT" | jq -r '.inaccurate // 0' 2>/dev/null || echo "0")
-              UNSUPP=$(echo "$RESULT" | jq -r '.unsupported // 0' 2>/dev/null || echo "0")
+          echo "audit_passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "total_inaccurate=$INACCURATE" >> $GITHUB_OUTPUT
+          echo "total_unsupported=$UNSUPPORTED" >> $GITHUB_OUTPUT
 
-              TOTAL_INACCURATE=$((TOTAL_INACCURATE + INACC))
-              TOTAL_UNSUPPORTED=$((TOTAL_UNSUPPORTED + UNSUPP))
-
-              if [ "$INACC" -gt 0 ] 2>/dev/null; then
-                AUDIT_PASSED=false
-                echo "| \`$PAGE_ID\` | ${INACC} inaccurate, ${UNSUPP} unsupported | FAIL |" >> "$SUMMARY_FILE"
-              else
-                echo "| \`$PAGE_ID\` | ${UNSUPP} unsupported | PASS |" >> "$SUMMARY_FILE"
-              fi
-            else
-              echo "::warning::Audit failed for $PAGE_ID (process error)"
-              echo "| \`$PAGE_ID\` | Error running audit | WARN |" >> "$SUMMARY_FILE"
-            fi
-          done
-
-          echo "" >> "$SUMMARY_FILE"
-          echo "**Totals:** ${TOTAL_INACCURATE} inaccurate, ${TOTAL_UNSUPPORTED} unsupported" >> "$SUMMARY_FILE"
-
-          if [ "$AUDIT_PASSED" = true ]; then
-            echo "" >> "$SUMMARY_FILE"
-            echo "> All pages passed the citation accuracy audit." >> "$SUMMARY_FILE"
-          else
-            echo "" >> "$SUMMARY_FILE"
-            echo "> **Inaccurate citations remain after auto-fix.** Manual review may be needed." >> "$SUMMARY_FILE"
-          fi
-
-          echo "" >> "$SUMMARY_FILE"
-          echo "---" >> "$SUMMARY_FILE"
-          echo "*Automated citation audit gate*" >> "$SUMMARY_FILE"
-
-          # Save summary for PR comment
+          # Save markdown summary for PR comment
           {
             echo "AUDIT_SUMMARY<<AUDIT_EOF"
-            cat "$SUMMARY_FILE"
+            echo "$SUMMARY"
             echo "AUDIT_EOF"
           } >> "$GITHUB_ENV"
 
-          echo "audit_passed=$AUDIT_PASSED" >> $GITHUB_OUTPUT
-          echo "total_inaccurate=$TOTAL_INACCURATE" >> $GITHUB_OUTPUT
-          echo "total_unsupported=$TOTAL_UNSUPPORTED" >> $GITHUB_OUTPUT
-          rm -f "$SUMMARY_FILE"
-
       - name: Commit audit fixes
-        if: steps.pages.outputs.page_ids != ''
+        if: success()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -157,7 +92,7 @@ jobs:
           fi
 
       - name: Post audit summary
-        if: steps.pages.outputs.page_ids != '' && env.AUDIT_SUMMARY != ''
+        if: env.AUDIT_SUMMARY != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -174,24 +109,19 @@ jobs:
           fi
 
       - name: Gate decision
-        if: steps.pages.outputs.page_ids != ''
         run: |
           PASSED="${{ steps.audit.outputs.audit_passed }}"
           INACCURATE="${{ steps.audit.outputs.total_inaccurate }}"
-          UNSUPPORTED="${{ steps.audit.outputs.total_unsupported }}"
 
           echo ""
           echo "=== Audit Gate Decision ==="
           echo "  Inaccurate: $INACCURATE"
-          echo "  Unsupported: $UNSUPPORTED"
+          echo "  Unsupported: ${{ steps.audit.outputs.total_unsupported }}"
           echo ""
 
           if [ "$PASSED" = "true" ]; then
             echo "Audit gate PASSED — no inaccurate citations found."
           else
             echo "Audit gate FAILED — $INACCURATE inaccurate citation(s) remain."
-            echo ""
-            echo "The audit pipeline attempted to fix these automatically but some"
-            echo "inaccuracies persist. A human should review the flagged citations."
             exit 1
           fi
