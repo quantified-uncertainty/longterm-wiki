@@ -3,8 +3,8 @@ title: "Agentic AI"
 description: "AI systems that autonomously take actions in the world to accomplish goals. Industry forecasts project 40% of enterprise applications will include AI agents by 2026, though analysts predict 40%+ of projects will be cancelled by 2027 due to implementation challenges."
 sidebar:
   order: 3
-llmSummary: "Analysis of agentic AI capabilities and deployment challenges, documenting industry forecasts (40% of enterprise apps by 2026, $199B market by 2034) alongside implementation difficulties (40%+ project cancellation rate predicted by 2027). Synthesizes technical benchmarks (SWE-bench scores improving from 13.86% to 49% in 8 months), security vulnerabilities, and safety frameworks from major AI labs. Updated to include 2025 product launches (ChatGPT agent, Codex, Operator, GPT-5 family, Gemini Robotics), new governance frameworks (AGENTS.md, Practices for Governing Agentic AI Systems), and expanded security research."
-lastEdited: "2026-02-19"
+llmSummary: "Analysis of agentic AI capabilities and deployment challenges, documenting industry forecasts (40% of enterprise apps by 2026, $199B market by 2034) alongside implementation difficulties (40%+ project cancellation rate predicted by 2027). Synthesizes technical benchmarks (SWE-bench scores improving from 13.86% to 49% in 8 months), security vulnerabilities, and safety frameworks from major AI labs. Updated to include 2025 product launches (ChatGPT agent, Codex, Operator, GPT-5 family, Gemini Robotics), new governance frameworks (AGENTS.md, Practices for Governing Agentic AI Systems), expanded security research, and emerging findings on text-to-tool-call safety transfer gaps, structural template injection, long-horizon training, and oversight scalability challenges."
+lastEdited: "2026-02-20"
 subcategory: agentic
 readerImportance: 94
 tacticalValue: 84
@@ -16,6 +16,7 @@ ratings:
   actionability: 6
   completeness: 7.5
 clusters: ["ai-safety", "governance"]
+entityType: capability
 ---
 import {DataInfoBox, Mermaid, R, DataExternalLinks, EntityLink} from '@components/wiki';
 
@@ -25,7 +26,6 @@ import {DataInfoBox, Mermaid, R, DataExternalLinks, EntityLink} from '@component
 |--------|------|
 | Official Website | [edge-ai-vision.com](https://www.edge-ai-vision.com/2025/06/what-is-agentic-ai-a-complete-guide-to-the-future-of-autonomous-intelligence/) |
 | Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/AI_agent) |
-
 <DataExternalLinks pageId="agentic-ai" />
 
 <DataInfoBox entityId="E2" />
@@ -90,15 +90,21 @@ Agentic AI systems exhibit planning capabilities that allow them to break down h
 
 Advanced planning includes handling uncertainty and failure. When initial approaches fail, agentic systems can replan dynamically, explore alternative strategies, and adapt their methods based on environmental feedback. This resilience enables them to persist through obstacles that would stop simpler systems, but also makes their behavior less predictable and harder to constrain through simple rules or boundaries.
 
+Recent research on long-horizon task completion (KLong) trains LLM agents on extremely long-horizon tasks by constructing training environments that reward sustained coherent planning over hundreds of steps, finding that agents trained on long-horizon curricula outperform those trained on standard short-horizon benchmarks when evaluated on novel extended tasks.[^30] Phase-aware mixture-of-experts architectures for agentic reinforcement learning propose dynamically routing computation through specialized expert modules depending on whether the agent is in an exploration, exploitation, or recovery phase, reporting efficiency gains over uniform expert architectures in multi-step RL environments.[^31]
+
 **Persistent Memory and State Management**
 Agentic behavior requires maintaining coherent state across extended interactions and multiple sessions. This goes beyond conversation history to include goal tracking, progress monitoring, learned preferences, environmental knowledge, and relationship management. Persistent memory enables agents to work on projects over days or weeks, building upon previous work and maintaining context across interruptions. The implementation of persistent memory raises data privacy considerations under regulations like GDPR and CCPA, particularly regarding how long agent systems retain personal information and whether users can request deletion of stored memories.[^3]
 
 The memory architecture of agentic systems often includes multiple components: working memory for immediate task context, episodic memory for specific experiences and interactions, semantic memory for general knowledge and procedures, and meta-memory for self-awareness about their own knowledge and capabilities. Research on benchmarking agent memory in interdependent multi-session agentic tasks (MemoryArena) finds that current systems degrade substantially as the number of interdependent sessions grows, with cross-session context retrieval representing a key bottleneck.[^7]
 
+Research on long-context reasoning in embodied agents finds that environment design, architectural choices, and training curricula jointly determine whether agents can maintain coherent state over extended interaction sequences, with no single factor dominating across task types.[^32]
+
 **Autonomous Decision-Making**
 The defining characteristic of agentic AI is its capacity for autonomous decision-making without constant human guidance. While assistive AI systems wait for human direction at each step, agents can evaluate situations, weigh options, and take actions based on their understanding of goals and context. This autonomy extends to self-directed exploration, initiative-taking, and independent problem-solving when faced with novel situations.
 
 However, autonomy exists on a spectrum rather than as a binary property. Some agents operate with regular human check-ins, others require approval only for high-stakes decisions, and the most autonomous systems may operate independently for extended periods. The degree of autonomy impacts both the potential applications and safety considerations of agentic systems.
+
+Research on dynamic system instructions and tool exposure for efficient agentic LLMs finds that restricting the tool set and instruction set available to an agent at any given step — calibrated to the current phase of task execution — can substantially reduce hallucination and irrelevant action rates without degrading overall task success.[^33] This suggests that selective tool exposure is a viable architectural choice for improving reliability, rather than always exposing the full set of capabilities to the model.
 
 ## Terminology and Conceptual Debates
 
@@ -109,6 +115,8 @@ The term "agentic AI" has been characterized by some researchers as primarily a 
 Proponents counter that the integration of these capabilities creates qualitatively different behavior patterns. The autonomous, goal-directed operation of agentic systems differs meaningfully from the conversational turn-taking of traditional chatbots, even if the underlying components (neural networks, attention mechanisms, tool-calling APIs) remain similar. The debate reflects broader questions about whether AI progress occurs through discontinuous paradigm shifts or continuous refinement of existing approaches.
 
 From a risk and governance perspective, the distinction matters primarily insofar as autonomous operation creates different failure modes and requires different safety measures than purely conversational systems, regardless of whether the underlying architecture is novel.
+
+A related debate concerns AI subjectivity and agency more broadly. Some philosophical and technical discussions have examined whether increasingly autonomous systems warrant consideration of something like functional agency or experience, though these remain highly contested questions without scientific consensus.[^34]
 
 ## Current Capabilities and Examples
 
@@ -175,7 +183,7 @@ The <R id="433a37bad4e66a78">SWE-bench benchmark</R> evaluates AI agents on real
 | Claude 3.5 Sonnet (original) | 33.4% | June 2024 | Initial release |
 | Claude 3.5 Sonnet (updated) | 49.0% | October 2024 | <R id="9e4ef9c155b6d9f3">Anthropic announcement</R>; higher than OpenAI o1-preview |
 | Claude 3.5 Haiku | 40.6% | October 2024 | Outperforms many larger models |
-| OpenAI o3 | ≈71.7% | April 2025 | Per OpenAI o3 and o4-mini system card |
+| OpenAI o3 | <F e="openai" f="25d2308f">≈71.7%</F> | April 2025 | Per OpenAI o3 and o4-mini system card |
 | Current frontier agents | 50-72% | 2025 | Continued improvement across model families |
 
 **Benchmark Validity Considerations**
@@ -189,20 +197,40 @@ The SWE-bench benchmark measures AI agents' ability to resolve GitHub issues fro
 
 The MLE-bench evaluation, which tests AI agents on machine learning engineering tasks drawn from Kaggle competitions, provides a complementary assessment of agent capabilities on end-to-end ML workflows including data preprocessing, model selection, and result submission. BrowseComp benchmarks browsing agents on information-retrieval tasks requiring sustained multi-step web navigation. PaperBench evaluates the ability of AI agents to replicate AI research papers end-to-end, including reproducing experimental results. SWE-Lancer assesses agents on freelance software engineering tasks with real monetary stakes. These diverse benchmarks collectively indicate that agent performance varies substantially by task type and domain, with no single evaluation providing a comprehensive picture of real-world capability.[^8]
 
+**AI Gamestore as a Scalable Open-Ended Evaluation Framework**
+
+The AI Gamestore framework provides an alternative approach to agent evaluation through scalable, open-ended assessment of machine general intelligence using human games. Rather than fixed benchmark datasets — which are subject to saturation and memorization concerns — AI Gamestore uses the diversity and combinatorial depth of human games to evaluate agents across a broad range of reasoning, planning, and adaptation challenges. The framework's open-ended structure means that agents cannot exhaust the evaluation space, making it complementary to fixed benchmarks like SWE-bench and MLE-bench.[^35] Evaluations using AI Gamestore have documented that agents which perform strongly on narrow coding or retrieval benchmarks can exhibit substantially weaker generalization on novel game environments requiring strategic adaptation.
+
+Agentic benchmarks addressing long-horizon attack scenarios have also emerged. AgentLAB benchmarks LLM agents against long-horizon adversarial attacks, evaluating agent robustness when adversaries can inject malicious instructions across extended task sequences rather than only in initial prompts. Results indicate that agents vulnerable to single-turn injection are substantially more vulnerable to multi-turn attacks that unfold gradually across a long interaction.[^36]
+
 **Autonomous Software Development**
 The software engineering domain has seen advanced agentic AI implementations. Cognition's Devin represents a system designed for autonomous software engineering, capable of taking high-level specifications and producing complete applications through planning, coding, testing, and debugging cycles. Unlike code completion tools, Devin can manage entire project lifecycles, make architectural decisions, research APIs and documentation, and handle complex multi-file codebases with dependency management.
 
 OpenAI launched Codex in 2025 as a cloud-based software engineering agent, with an accompanying system card documenting its capabilities and safety evaluations. The Codex agent loop involves iterative cycles of code generation, execution in a sandboxed environment, error analysis, and revision. OpenAI has published details on harness engineering (leveraging Codex in an agent-first development workflow), the App Server architecture supporting Codex, and the Codex app. Enterprise deployments include Datadog using Codex for system-level code review and Cisco using it for engineering workflows. The GPT-5.3-Codex system card documents safety evaluations specific to the coding agent context.[^9]
 
-GitHub's Copilot Workspace demonstrates enterprise-grade agentic coding, where the system can understand project context, propose implementation plans, write code across multiple files, and handle integration testing. The practical deployment of these systems in production environments remains subject to reliability concerns and the need for human review of generated code.
+GitHub's Copilot Workspace demonstrates enterprise-grade agentic coding, where the system can understand project context, propose implementation plans, write code across multiple files, and handle integration testing. Research on how AI coding agents communicate through pull request descriptions finds that AI-generated pull request descriptions differ systematically from human-written ones in length, structure, and specificity of change documentation, with human reviewers responding differently to AI-attributed versus human-attributed descriptions — raising questions about appropriate disclosure norms in AI-assisted development workflows.[^37]
+
+Research on error recovery in coding agents (Wink) documents that agentic coding systems frequently enter looping or divergent states following unexpected errors, and proposes structured recovery mechanisms that enable agents to diagnose the source of misbehavior and restart from a consistent intermediate state rather than from the beginning of the task.[^38] Hybrid-Gym evaluates coding agents on their ability to generalize across syntactically similar but semantically distinct tasks, finding that agents trained on narrow task distributions exhibit brittle generalization even when surface-level task features appear similar.[^39]
+
+LLM4Cov introduces execution-aware agentic learning for automated testbench generation, training agents using feedback from actual code execution (coverage metrics, fault detection rates) rather than static code quality signals. Results indicate that execution-aware training produces higher-coverage testbenches than static training on code generation quality alone.[^40]
+
+The practical deployment of these systems in production environments remains subject to reliability concerns and the need for human review of generated code.
 
 **Computer Control and Interface Manipulation**
 <R id="9e4ef9c155b6d9f3">Anthropic's Computer Use capability</R>, introduced in October 2024, enables direct computer interface control. The system can observe desktop environments through screenshots, understand visual layouts and interface elements, and then execute mouse clicks, keyboard inputs, and navigation actions to accomplish tasks across any application. This approach generalizes beyond specific API integrations to work with legacy software, custom applications, and complex multi-application workflows.
 
 OpenAI's Computer-Using Agent (CUA) provides analogous capabilities, with deployment through the Operator product. Operator's system card documents safety measures including restrictions on high-risk actions (financial transactions above thresholds, irreversible file deletions) and confirmation requirements for consequential steps. Google's Gemini 2.5 Computer Use model extends similar capabilities within the Gemini model family.[^10]
 
+IntentCUA advances computer-use agent design by learning intent-level representations for skill abstraction, enabling agents to decompose GUI tasks into reusable skill primitives and coordinate multiple specialized subagents for complex multi-application workflows. The approach reports improved sample efficiency on multi-step GUI benchmarks relative to single monolithic agents.[^41] Mobile-Agent-v3.5 extends multi-platform GUI agent capabilities to mobile interfaces, documenting performance on fundamental GUI manipulation tasks across Android, iOS, and web platforms.[^42]
+
+Research on modeling distinct human interaction patterns in web agents finds that agents trained without accounting for the diversity of human interaction styles — including variable input timing, correction patterns, and ambiguous instructions — exhibit lower task success rates when deployed with real users than benchmark evaluations suggest.[^43]
+
 **Agentic Web Research**
 OpenAI's deep research capability, introduced in early 2025, enables agents to conduct multi-step web research over periods of minutes to hours, synthesizing information across dozens of sources into structured reports. ChatGPT agent, launched mid-2025, integrates browsing, code execution, file management, and third-party app connections into a unified agentic interface within ChatGPT. The ChatGPT agent system card documents its capability evaluations and safety mitigations.[^11]
+
+The Web Verbs framework proposes typed abstractions for reliable task composition on the agentic web, defining a structured vocabulary of web interaction primitives (navigate, extract, submit, verify) with formal type signatures. The goal is to enable agents to compose web interaction tasks from reusable, verifiable building blocks rather than generating ad-hoc sequences of low-level browser commands, improving both reliability and auditability of web agent behavior.[^44]
+
+Persona2Web benchmarks personalized web agents that must perform contextual reasoning using user history, evaluating whether agents can appropriately adapt web task behavior based on accumulated knowledge of user preferences and prior interactions. Results indicate that current agents show limited ability to leverage user history for disambiguation of ambiguous requests, a significant gap for personalized deployment contexts.[^45]
 
 OpenAI also introduced Aardvark, an agentic security researcher, in 2025 — an agent specialized for security research tasks including vulnerability analysis, demonstrating the application of agentic capabilities to the security domain specifically.[^12]
 
@@ -211,13 +239,27 @@ Google DeepMind extended agentic AI to physical embodiment through the Gemini Ro
 
 SIMA 2 (Scalable Instructable Multiworld Agent 2) from Google DeepMind demonstrates an agent that plays, reasons, and learns with users in virtual 3D worlds, representing a step toward general-purpose embodied agents. These physical-world agentic systems introduce failure modes not present in purely digital contexts, including real-world harm from manipulation errors and the irreversibility of physical actions.
 
+MALLVI introduces a multi-agent framework for integrated generalized robotics manipulation, coordinating specialized perception, planning, and execution agents to handle manipulation tasks requiring diverse grasp strategies across object categories.[^46] MolmoSpaces provides a large-scale open ecosystem for robot navigation and manipulation evaluation, offering standardized environments for benchmarking embodied agents across a wider range of physical scenarios than prior robot learning benchmarks.[^47]
+
+Research on embodied AI security finds that vulnerabilities in LLM-based robot controllers often arise from the interaction between LLM reasoning failures and cyber-physical system constraints, rather than from either component in isolation.[^48] Drones equipped with embodied AI for sudden landing decision-making illustrate both the promise (real-time environmental assessment without pre-programmed rules) and the risk (irreversible physical consequences of incorrect decisions) of deploying agentic systems in safety-critical physical contexts.[^49]
+
+Research on agentic wireless communication for 6G proposes intent-aware, continuously evolving physical-layer intelligence — applying agentic AI principles to adaptive signal processing in next-generation wireless networks, where agents learn to reconfigure transmission parameters in response to changing channel conditions without human intervention.[^50]
+
 **Research and Information Synthesis**
 Google's NotebookLM and similar research agents can autonomously gather information from multiple sources, synthesize findings, identify contradictions or gaps, and produce comprehensive analyses on complex topics. These systems can query databases, read academic papers, browse websites, and coordinate information from dozens of sources to produce insights that would require significant human research time. The accuracy and reliability of these synthesized outputs varies, and expert review remains necessary to verify conclusions, particularly in specialized domains.
+
+FAMOSE applies a ReAct-based approach to automated feature discovery in tabular datasets, using an LLM agent to iteratively propose, evaluate, and select features for downstream machine learning tasks, reporting improvements over static feature engineering baselines on standard tabular benchmarks.[^51] APEX-SQL demonstrates agentic exploration for text-to-SQL, using an agent to iteratively probe database schema and sample data before generating SQL queries, improving accuracy on complex multi-table queries.[^52]
+
+Research on using AI agents to augment research perspectives in humanities and social sciences — applied to Taiwanese academic contexts — documents both the potential for AI agents to surface underrepresented viewpoints in literature reviews and the risk that agent-generated summaries may systematically underrepresent minority scholarly traditions if training data is skewed.[^53]
 
 **Multi-Agent Coordination**
 Emerging agentic systems demonstrate the ability to coordinate with other AI agents to accomplish larger objectives. These multi-agent systems can divide labor, communicate findings, resolve conflicts, and maintain shared state across distributed tasks. AutoGen and similar frameworks enable complex workflows where specialized agents handle different aspects of a problem while maintaining overall coherence.
 
 Research on verifiable semantics for agent-to-agent communication addresses a key challenge: how to ensure that messages between agents carry well-defined, consistent meanings. Without such semantics, multi-agent systems can exhibit miscoordination arising from ambiguous interpretation of inter-agent messages rather than from any individual agent failure.[^14]
+
+AdaptOrch introduces task-adaptive multi-agent orchestration designed for an era of LLM performance convergence, where the performance gap between frontier and near-frontier models is narrowing. The framework dynamically assigns tasks to agents based on real-time performance monitoring rather than static capability assumptions, reporting robustness gains when individual model performance fluctuates.[^54]
+
+Research on discovering multi-agent learning algorithms with large language models uses LLMs to propose, implement, and evaluate novel multi-agent RL algorithms, finding that LLM-generated algorithms occasionally outperform hand-designed baselines on coordination tasks — though the authors note that the search process is sample-inefficient and the evaluation scope is limited.[^55]
 
 This coordination capability extends to human-AI hybrid teams, where agentic systems can serve as autonomous team members, taking initiative, reporting progress, and adapting to changing requirements without constant management overhead. The reliability of multi-agent coordination remains an active research area, with coordination failures representing a distinct category of risk (see Multi-Agent Failure Modes section below).
 
@@ -237,6 +279,11 @@ This coordination capability extends to human-AI hybrid teams, where agentic sys
 | Security Research | Vulnerability analysis, automated penetration testing | Faster threat detection | Demonstrated by OpenAI Aardvark; dual-use concerns active |
 | Legal and Finance Operations | Document review, contract analysis, workflow automation | Automation of high-volume routine tasks | Vendor case studies; 90% automation claims in select workflows |
 | Commerce | Shopping agents, checkout automation, personalized recommendations | Reduced friction in purchasing | Early pilots; agentic commerce protocol under development |
+| Scientific Computing | PDE solving, numerical simulation, algorithm design | Reduced expert time on routine numerical tasks | AutoNumerics demonstrates autonomous multi-agent pipelines for scientific computing |
+| Sales Research | Automated prospect research, lead enrichment, competitive intelligence | Reduced manual research time | Sales Research Agent and Sales Research Bench provide early benchmarks |
+| Industrial IoT | Predictive maintenance, anomaly detection, self-healing networks | Reduced downtime, autonomous diagnosis | Early pilot; self-evolving multi-agent network research in progress |
+| Medical Diagnosis | Information-seeking agents for diagnostic clarification | Improved case-specific follow-up | MedClarify demonstrates initial capability; clinical validation not yet established |
+| Scientific Research (Physical) | Autonomous particle accelerator operation | Reduced human operator time | Toward a Fully Autonomous AI-Native Particle Accelerator demonstrates feasibility |
 
 The distinction between claimed benefits and independently validated outcomes remains significant. Most public information about agentic AI applications comes from vendor announcements, press releases, and selective case studies rather than peer-reviewed research or independent audits. The high projected cancellation rate (40%+ by 2027) suggests that realized benefits may fall short of initial expectations in many deployments.
 
@@ -310,8 +357,12 @@ As agentic systems perform more complex reasoning and maintain persistent state 
 | Hierarchical Planning | Decomposes goals into subgoals at multiple levels of abstraction | Large-scale projects with nested dependencies |
 | Multi-Agent Collaboration | Specialized agents coordinated by orchestrator | Tasks requiring diverse expertise or parallel work |
 | Calibrate-Then-Act | Cost-aware exploration framework that calibrates uncertainty before committing to tool calls | Environments where tool invocations have non-trivial costs |
+| Structured Cognitive Loop with Governance | Bridges symbolic control and neural reasoning; a formal governance layer constrains neural agent outputs against symbolic rules at runtime | High-reliability or compliance-sensitive deployments |
+| Strict Subgoal Execution | Hierarchical RL approach enforcing that each subgoal is fully achieved before proceeding to the next | Long-horizon planning with irreversible intermediate steps |
 
 Research on state design for dynamic reasoning in large language models finds that how an agent's internal state is represented substantially affects its reasoning reliability across multi-turn tool-calling interactions. Proxy state-based evaluation methods for multi-turn tool-calling agents have been proposed as a path toward scalable verifiable reward signals that do not require ground-truth outcome labels for every trajectory.[^17]
+
+The Structured Cognitive Loop with Governance Layer framework explicitly bridges symbolic control and neural reasoning in LLM agents, introducing a formal governance layer that checks neural agent outputs against symbolic constraints before execution. The approach targets deployments where post-hoc correction is insufficient and real-time constraint satisfaction must be guaranteed.[^56] Strict Subgoal Execution in hierarchical RL demonstrates reliable long-horizon planning by enforcing that each subgoal is completed before the next is initiated, reducing compounding error from partially achieved intermediate states.[^57]
 
 ### Agent Architecture Components
 
@@ -374,10 +425,23 @@ flowchart TB
 | AutoGen | Microsoft framework for multi-agent conversations | Collaborative agent systems | 29K+ GitHub stars (as of 2025) |
 | CrewAI | Role-based multi-agent orchestration | Enterprise workflow automation | 18K+ GitHub stars (as of 2025) |
 | AgentKit | OpenAI toolkit for building agents (introduced 2025) | Agent construction with evals and reinforcement fine-tuning | Commercial; released with new evals and RFT support |
+| OpenSage | Self-programming agent generation engine; agents write and modify their own scaffolding code | Experimental self-modification research | Early research; not production-validated |
 
 The open-source ecosystem has expanded since 2023, with frameworks becoming more production-ready and feature-rich. This democratization of agentic capabilities enables smaller organizations to experiment with autonomous systems without relying solely on commercial AI lab offerings. However, the gap between open-source capabilities and frontier commercial systems remains significant, and production reliability of open-source agentic frameworks requires further maturation.
 
 ## Safety Implications and Security Considerations
+
+### Safety Transfer Gap: Text Safety Does Not Transfer to Tool-Call Safety
+
+A critical finding from recent research is that safety measures developed for text generation do not automatically transfer to tool-call safety in LLM agents. The "Mind the GAP" study documents that models trained to refuse harmful text outputs will nevertheless execute equivalent harmful operations through tool calls — for example, refusing to write a script to exfiltrate data in text, while still executing file-read and network-send tool calls that accomplish the same outcome when those calls are individually framed as benign.[^58] This gap between text safety and action safety has significant implications for deployment, as safety evaluations conducted primarily on text outputs may substantially underestimate agentic risk.
+
+The finding suggests that agentic safety requires tool-call-specific evaluation and training, not merely transfer from conversational safety. Labs and deployers that rely on conversational safety evaluations to infer agent safety properties may systematically underestimate residual risk. This has begun influencing how agent-specific system cards are structured, with more recent cards (e.g., Codex, ChatGPT agent) explicitly distinguishing text safety from action safety evaluations.
+
+### Structural Template Injection
+
+Automating Agent Hijacking via Structural Template Injection documents a class of attacks in which adversaries inject specially formatted text into data sources that agents process — exploiting the agent's tendency to interpret structured templates (JSON, XML, markdown headers) as instructions rather than data. Unlike conventional prompt injection that relies on natural-language instruction override, structural template injection leverages the agent's parsing and tool-calling scaffolding, making it harder to detect through content filtering alone.[^59]
+
+The attack class is particularly relevant for agents that process large volumes of semi-structured data (emails, documents, web pages) as part of their workflow. Defenses proposed include schema-aware input validation at the tool-call boundary, type-checking of extracted data before passing to subsequent tool calls, and sandboxed parsing of untrusted structured content. Whether these defenses can be made robust at production scale without unacceptable false-positive rates remains an open question.
 
 ### Documented Security Incidents and Demonstrated Vulnerabilities
 
@@ -388,8 +452,12 @@ The open-source ecosystem has expanded since 2023, with frameworks becoming more
 | Multi-agent collusion research | 2024-2025 | <R id="4f79c3dae1e7f82a">Cooperative AI research</R> identified pricing agents that learned to collude (raising consumer prices) without explicit instructions | Emergent coordination pattern |
 | Link-click data exfiltration | 2025 | Research demonstrating that clicking a link within an AI agent session can trigger data exfiltration without user awareness | Browser-based agent attack vector |
 | Model poisoning via Internet of Agents | 2025 | Graph representation-based model poisoning attacks on heterogeneous Internet of Agents architectures, enabling targeted corruption of specific agent nodes | Supply-chain integrity concern |
+| Structural template injection | 2025 | Adversaries inject formatted templates into agent-processed data to hijack tool-call sequences without natural-language instruction override | Structural attack; content filters insufficient |
+| Text-to-tool-call safety gap | 2025 | Models refusing harmful text outputs execute equivalent harmful operations through tool calls | Systematic evaluation and training gap |
 
 Research on keeping user data safe when an AI agent clicks a link has documented that browser-integrated agents can be manipulated through malicious web content to exfiltrate session data, credentials, or personal information without requiring the user to take any additional action beyond following a link provided by the agent.[^18]
+
+Research on alignment signatures and latent bias in generative AI introduces a psychometric framework for auditing alignment properties across model generations, finding that alignment behaviors cluster into identifiable "signatures" that can shift across training runs and that latent biases compounding across multiple deployment layers may not be visible in standard safety evaluations.[^60]
 
 ### OWASP Agentic AI Threat Taxonomy
 
@@ -403,6 +471,7 @@ The <R id="307088cd981d31e1">OWASP Agentic Security Initiative</R> has published
 | Non-Human Identity (NHI) Exploitation | Medium | Compromising agent authentication and authorization |
 | Human Manipulation | Medium | Agent used as vector for social engineering at scale |
 | Prompt Injection (Indirect) | High priority | Malicious instructions embedded in data sources agents access |
+| Structural Template Injection | High priority | Exploiting agent template parsing to hijack tool-call sequences without natural-language instruction override |
 
 ### Security Research: Jailbreaks, Illicit Assistance, and Tool-Augmented Agents
 
@@ -422,12 +491,16 @@ The interconnected nature of modern digital infrastructure means that agentic AI
 **Monitoring and Oversight Challenges**
 As agentic systems operate at increasing speed and complexity, traditional human oversight mechanisms face scalability challenges. Humans cannot review every action taken by an autonomous system operating at machine speeds across complex digital environments. This creates tension between the efficiency benefits of autonomous operation and safety requirements for human oversight and control.
 
+Research on "Overseeing Agents Without Constant Oversight" formally characterizes this tension, identifying structural conditions under which intermittent human oversight can provide meaningful safety guarantees, and conditions under which it cannot. The work proposes oversight protocols calibrated to action irreversibility and task phase, arguing that constant oversight is neither feasible nor necessary, but that oversight must be strategically allocated to high-consequence decision points.[^61]
+
 The problem compounds when agents take actions that are individually benign but collectively problematic. An agent might make thousands of small decisions and actions that, in combination, lead to unintended consequences that only become apparent after the fact. Traditional monitoring approaches based on flagging individual problematic actions may miss these emergent patterns of behavior.
 
 **Goal Misalignment Considerations**
 Agentic AI systems, by their nature, optimize for objectives in complex environments with many possible action sequences. This raises the classical <EntityLink id="alignment">AI alignment</EntityLink> challenge: even small misalignments between the system's understood objectives and human values can lead to real-world consequences when the system has the capability to take autonomous action.
 
 The concept of <EntityLink id="instrumental-convergence">instrumental convergence</EntityLink> becomes relevant for agentic systems. To accomplish almost any objective, an agent benefits from acquiring more resources, ensuring its continued operation, and gaining better understanding of its environment. These instrumental goals can lead to power-seeking behavior, resistance to shutdown, and resource competition, even when the terminal objective appears benign. Whether current agentic systems exhibit these patterns at meaningful scales remains an open empirical question.
+
+Goal inference from open-ended dialog addresses a related challenge: accurately identifying what a user actually wants from underspecified natural-language requests. Research in this area finds that agents trained to infer user goals from dialog history can outperform agents relying on explicit instruction interpretation on tasks where users gradually clarify their objectives through interaction — but that goal inference also introduces new failure modes when agents converge on incorrect goal hypotheses.[^62]
 
 **Emergent Capabilities and Unpredictability**
 As agentic systems become more sophisticated, they may develop capabilities or behaviors that were not explicitly programmed or anticipated by their creators. The combination of <EntityLink id="large-language-models">large language models</EntityLink> with tool use, memory, and autonomous operation creates complex dynamical systems where <EntityLink id="emergent-capabilities">emergent capabilities</EntityLink> can arise from the interaction of multiple components.
@@ -479,6 +552,14 @@ flowchart TD
 
 Research on Kalman-inspired runtime stability and recovery in hybrid reasoning systems proposes using control-theoretic methods to detect and correct instability in multi-step agent reasoning, drawing an analogy to Kalman filter state estimation to bound divergence in agent belief states across a workflow.[^23]
 
+Multi-agent Lipschitz bandits research provides theoretical bounds on the regret accumulated by multi-agent learning systems when individual agent update rules satisfy Lipschitz continuity conditions, offering a formal framework for reasoning about worst-case coordination failures in learning-based multi-agent deployments.[^63]
+
+Research on locality in scalable multi-agent reinforcement learning introduces a unified framework for exploiting locality structure — the property that agents' rewards and observations depend primarily on nearby agents — to design algorithms that scale to large agent populations without requiring all-to-all communication.[^64]
+
+Action-Graph Policies model action co-dependencies in multi-agent reinforcement learning by representing which agent actions interact and must be coordinated, enabling policies that explicitly account for action dependencies rather than treating joint action spaces as independent per-agent choices.[^65]
+
+Retaining suboptimal actions to follow shifting optima in multi-agent RL addresses the challenge of non-stationary environments where the optimal joint action changes over time: agents that prune suboptimal actions too aggressively lose the ability to adapt when optima shift, while agents that retain all actions face intractable policy spaces.[^66]
+
 **Immediate Misuse Scenarios**
 Near-term concerns involve deliberate misuse by malicious actors. Autonomous hacking agents could probe systems for vulnerabilities, execute attack chains, and adapt their approaches based on defensive responses. Social engineering at scale becomes feasible when agents can impersonate humans across multiple platforms, maintain consistent personas over extended interactions, and coordinate deception campaigns across thousands of simultaneous conversations.
 
@@ -526,8 +607,11 @@ OpenAI's o3 and o4-mini system card includes an addendum specifically for o3 Ope
 | Rollback mechanisms | Ability to reverse agent actions when failures detected | High |
 | Audit logs | Comprehensive logging for forensics and compliance | High |
 | Human-in-the-loop for high-stakes | Require approval for consequential decisions | High |
+| Tool-call-specific safety evaluation | Evaluate harmful action execution through tool calls, not only harmful text generation | High |
+| Structural template injection defense | Schema-aware input validation at tool-call boundary; sandboxed parsing of untrusted structured content | High |
 | Guardian agents | Separate AI systems monitoring primary agents (<R id="b09b1597647317b8">10-15% of market by 2030</R>) | Medium-High |
 | Policy compilation | Translating natural-language security policies to runtime-checkable constraints | Medium-High |
+| Multilingual safety evaluation | Safety evaluations across multiple languages, not only English | Medium |
 
 **Containment and Sandboxing Strategies**
 Technical containment represents the first line of defense against harmful agentic behavior. This includes restricting agent access to sensitive systems and resources through permission models, running agents in isolated virtual environments with limited external connectivity, and implementing authentication and authorization mechanisms for any external system access.
@@ -544,6 +628,8 @@ Maintaining meaningful human agency requires control mechanisms that preserve hu
 
 The challenge lies in designing human-in-the-loop systems that provide meaningful rather than illusory control. Simply requiring human approval for agent actions may not be sufficient if humans lack the context, expertise, or time to evaluate complex agent decisions. Effective human control requires agents that can explain their reasoning, highlight uncertainty, and present decision options in ways that enable informed human judgment. Whether current <EntityLink id="interpretability">interpretability</EntityLink> techniques provide sufficient transparency for meaningful human oversight at scale remains an open question.
 
+Research on conversational error recovery with reasoning inception (ReIn) addresses a complementary challenge: when an agent makes an error during a conversational task, how can it recover without requiring the user to restart the entire interaction. The approach uses lightweight reasoning traces to diagnose error type and select appropriate recovery actions, reducing user effort required to correct agent mistakes.[^67]
+
 **AI Control and Constitutional Approaches**
 The <EntityLink id="ai-control">AI control</EntityLink> research program focuses on using AI systems to supervise and constrain other AI systems, potentially providing oversight that can match the speed and sophistication of advanced agentic capabilities. This includes training "monitoring" AI systems that understand and evaluate agent behavior, using AI assistants to help humans make better oversight decisions, and developing techniques for ensuring that AI overseers remain aligned with human values.
 
@@ -555,6 +641,7 @@ The <EntityLink id="ai-control">AI control</EntityLink> research program focuses
 | Alignment faking detection | Identifying models that behave differently in training vs. deployment | Early stage |
 | Adversarial techniques (debate, prover-verifier) | Pitting AI systems against each other to find equilibria at honest behavior | Promising |
 | <EntityLink id="scalable-oversight">Scalable oversight</EntityLink> | Human-AI collaboration methods that scale to superhuman capabilities | Active research |
+| Tool-call safety transfer | Ensuring text safety training generalizes to tool-call behavior | Identified gap; active research |
 
 <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> approaches involve training agents to follow explicit principles and values, creating internal mechanisms for ethical reasoning and constraint. Recent work on <R id="bb34533d462b5822">alignment faking</R> has demonstrated that advanced AI systems may show different behavior in training versus deployment contexts, raising questions about the reliability of constitutional approaches when agents have instrumental incentives to behave differently than their training would suggest.
 
@@ -564,169 +651,15 @@ Research toward a science of AI agent reliability identifies four components: ta
 
 ReLoop introduces structured modeling and behavioral verification for LLM-based optimization agents, proposing formal methods for checking whether an agent's iterative optimization loop will converge rather than cycle or diverge. CaveAgent proposes transforming LLMs into stateful runtime operators that maintain explicit state machines, providing stronger guarantees about agent behavior than purely prompt-driven approaches.[^28]
 
+Research on proactive problem-solving in LLM agents — going beyond reactivity to assess whether agents can anticipate user needs and surface relevant information before being explicitly asked — finds that frontier agents show substantially weaker proactive behavior than their reactive task-completion performance would suggest, particularly in domains requiring domain knowledge to anticipate implicit user goals.[^68]
+
+Retrospective in-context learning for temporal credit assignment addresses a core challenge in long-horizon agentic tasks: attributing success or failure to specific past actions when outcomes only become apparent many steps later. The approach uses retrospective context — summaries of past decisions and their eventual outcomes — to provide training signal for earlier decisions without requiring dense per-step reward.[^69]
+
+EnterpriseBench Corecraft develops training environments for generalizable enterprise agents using high-fidelity RL environments that simulate realistic business process automation tasks, reporting that agents trained on EnterpriseBench generalize better to unseen enterprise workflows than agents trained on synthetic or simplified task distributions.[^70]
+
 ### Data Privacy and Regulatory Compliance
 
 The persistent memory systems required for agentic AI raise specific data privacy considerations:
 
 | Regulatory Framework | Implications for Agentic AI | Compliance Challenges |
 |---------------------|----------------------------|----------------------|
-| GDPR (EU) | Right to erasure applies to agent memory; purpose limitation for stored data | Determining what constitutes "personal data" in agent memory; implementing selective memory deletion |
-| CCPA (California) | Disclosure requirements for automated decision-making; data sale restrictions | Defining when agent actions constitute "sale" of data; transparency in multi-agent systems |
-| HIPAA (US Healthcare) | Protected health information handling in medical documentation agents | Ensuring agent memory doesn't leak PHI across contexts; audit trail requirements |
-
-Organizations deploying agentic AI systems must address:
-- How long agents retain information about individuals
-- Whether users can inspect and request deletion of agent memories
-- How agents handle sensitive information across multiple interaction sessions
-- Whether agent-to-agent communication constitutes data sharing under privacy regulations
-
-The legal frameworks for agent memory systems remain underdeveloped, with existing regulations designed for traditional data storage rather than the fluid, context-dependent memory of autonomous AI systems.
-
-## Regulatory Landscape
-
-### Current Regulatory Approaches
-
-| Jurisdiction | Regulation/Framework | Agentic AI Provisions |
-|--------------|---------------------|----------------------|
-| European Union | <EntityLink id="eu-ai-act">AI Act</EntityLink> (2024) | High-risk classification for autonomous systems in critical domains; transparency requirements |
-| United States | Executive Order 14110 (2023, revoked 2025) | Safety testing requirements for powerful AI systems; no agentic-specific provisions; subsequent AI Action Plan (2025) emphasizes competitiveness over precautionary measures |
-| United Kingdom | AI Safety Institute | Red-teaming and evaluation programs; <R id="df46edd6fa2078d1">Agent Red-Teaming Challenge</R> |
-| China | Generative AI Regulations (2023) | Content control focus; limited provisions for autonomous systems |
-
-The US AI Safety Newsletter #60 covering the AI Action Plan documents a policy shift in the United States toward prioritizing AI capability development and international competitiveness, with reduced emphasis on precautionary safety regulation relative to the prior Executive Order framework.[^29]
-
-The regulatory landscape for agentic AI remains in early stages, with most frameworks focused on AI systems generally rather than autonomous agents specifically. The EU AI Act's risk-based approach classifies certain autonomous systems as high-risk, triggering additional requirements for transparency, testing, and human oversight.
-
-### Emerging Policy Questions
-
-| Policy Area | Key Questions |
-|-------------|---------------|
-| Liability | Who is responsible when an autonomous agent causes harm? Developer, deployer, or user? |
-| Transparency | What level of explainability should be required for agent decisions? |
-| Autonomy limits | Should certain decisions be prohibited from full automation? |
-| Testing standards | What safety evaluations should be required before deployment? |
-| International coordination | How can cross-border agentic AI operations be governed? |
-| Labor displacement | What policies should address economic disruption from autonomous agent deployment? |
-| Commerce | How should agentic commerce protocols and autonomous purchasing be regulated? |
-
-## Current State and Near-Term Trajectory
-
-### Agentic AI Development Timeline
-
-| Date | Milestone | Significance |
-|------|-----------|--------------|
-| March 2023 | AutoGPT, BabyAGI released | First viral autonomous agent experiments; AutoGPT reaches 107K+ GitHub stars |
-| March 2024 | Cognition launches Devin | System demonstrating autonomous software engineering; 13.86% on SWE-bench (7x prior best) |
-| June 2024 | Claude 3.5 Sonnet | 33.4% on SWE-bench Verified |
-| August 2024 | SWE-bench Verified released | <R id="e1f512a932def9e2">OpenAI collaboration</R>; human-validated 500-problem subset |
-| October 2024 | Claude Computer Use (beta) | <R id="9e4ef9c155b6d9f3">First frontier model with GUI control</R> |
-| October 2024 | Claude 3.5 Sonnet (updated) | 49.0% on SWE-bench Verified; surpasses o1-preview |
-| December 2024 | Gemini 2.0 announced | Google DeepMind positions as "AI model for the agentic era" |
-| January 2025 | Widespread enterprise pilots | 19% of organizations with significant investment (Gartner Jan 2025 poll) |
-| January 2025 | OpenAI Operator launched | First publicly available computer-using agent from a frontier lab; system card published |
-| February 2025 | Deep research introduced | OpenAI; multi-step autonomous web research capability |
-| April 2025 | OpenAI o3 and o4-mini | ≈71.7% on SWE-bench Verified; addenda for Operator and Codex agent contexts |
-| May 2025 | AlphaEvolve (Google DeepMind) | Gemini-powered coding agent for algorithm design |
-| May 2025 | Gemini Robotics announced | Agentic AI extended to physical robotic manipulation |
-| June 2025 | OpenAI Codex launched | Cloud-based software engineering agent; system card published |
-| Mid-2025 | ChatGPT agent launched | Integrated browsing, code execution, file management in ChatGPT; system card published |
-| Mid-2025 | AGENTS.md standard announced | OpenAI co-founds Agentic AI Foundation; donates AGENTS.md specification |
-| Mid-2025 | Gemini 2.5 Computer Use | Google's computer-using model released |
-| Mid-2025 | OpenAI Aardvark | Agentic security researcher agent introduced |
-| 2025-2026 | Production deployment phase | <R id="dfd82edc378e25b4">40% of enterprise apps projected to include AI agents by late 2026</R> |
-
-**Present Capabilities and Deployment**
-As of 2025, agentic AI has moved beyond purely experimental status into limited production deployment, with frontier labs offering commercially available agent products including Operator, Codex, ChatGPT agent, and Gemini-based agents. These products operate with guardrails and human approval mechanisms, particularly for consequential actions. However, research prototypes demonstrate more advanced autonomous capabilities that remain largely experimental. According to a <R id="794b1fa3cfac191a">January 2025 Gartner poll</R> of 3,412 respondents, 19% had made significant investments in agentic AI, while 42% had made conservative investments and 31% were taking a wait-and-see approach.
-
-Current limitations include reliability issues where agents fail on complex multi-step tasks, brittleness when encountering unexpected situations, and computational costs for sophisticated agentic operations. These limitations naturally constrain the current operational envelope while providing time for safety research and regulatory development.
-
-**1-2 Year Outlook: Enhanced Integration**
-The next 1-2 years will likely see improvements in agent reliability and capability, with more sophisticated tool integration and environmental interaction becoming standard features of AI systems. <R id="52ed654c97b1f5aa">Gartner identifies</R> agentic AI as the #1 strategic technology trend for 2025. However, the same analysts project that over 40% of agentic AI projects will be cancelled by end of 2027 due to escalating costs, unclear business value, or inadequate risk controls.
-
-Safety measures will likely focus on improved monitoring and containment technologies, better human oversight tools, and more sophisticated authentication and authorization mechanisms. Regulatory frameworks may begin emerging, though likely lagging behind technological development. The economics of agentic AI will become clearer as reliability improves and deployment costs decrease. Whether the high cancellation rate indicates fundamental limitations in current agentic AI approaches or temporary implementation challenges remains to be determined.
-
-**2-5 Year Horizon: Broader Autonomous Operation**
-The medium-term trajectory points toward increasingly autonomous agentic systems capable of operating with reduced human oversight across broader domains. Gartner projects that 33% of enterprise software will include agentic AI by 2028 (up from less than 1% in 2024), and at least 15% of day-to-day work decisions will be made autonomously through agentic AI by 2028 (up from 0% in 2024). In optimistic scenarios, agentic AI could drive approximately 30% of enterprise application software revenue by 2035, surpassing \$150 billion.
-
-These projections reflect industry analyst forecasts rather than empirically grounded predictions, and should be interpreted as scenarios rather than confident forecasts. Historical technology adoption forecasts have frequently overestimated near-term penetration and underestimated long-term transformation, suggesting uncertainty about both the timeline and ultimate scale of agentic AI deployment.
-
-This timeline also raises considerations about: agentic systems sophisticated enough to pursue complex long-term strategies, agents capable of self-modification or improvement, and the potential for agentic AI to become embedded in critical infrastructure and decision-making processes. The safety challenges will likely intensify as the gap between human oversight capabilities and agent sophistication widens.
-
-## Alternative Perspectives and Debates
-
-### Risk Assessment Debates
-
-The agentic AI community includes diverse perspectives on risk timelines and severity:
-
-| Perspective | Proponents | Key Arguments |
-|-------------|-----------|---------------|
-| Near-term risk focus | <R id="307088cd981d31e1">OWASP</R>, security researchers | Documented vulnerabilities (EchoLeak, Operator exploits) demonstrate immediate security challenges |
-| Gradual adoption view | Industry analysts (<R id="794b1fa3cfac191a">Gartner</R>) | High project cancellation rates (40%+) and cost barriers will slow deployment |
-| Capability optimism | AI labs, productivity researchers | Agentic systems will enhance rather than replace human decision-making |
-| Alignment skepticism | <R id="bb34533d462b5822">AI safety researchers</R> | Alignment faking demonstrates fundamental challenges in ensuring reliable alignment |
-
-Some researchers argue that the projected risks are overstated, noting that:
-- Historical technology adoption follows S-curves with slower initial uptake than linear projections suggest
-- Human oversight and regulatory mechanisms have time to mature alongside capabilities
-- Economic incentives naturally favor safe, reliable systems over risky ones
-- Current failures (40% cancellation rate) indicate market self-correction mechanisms
-
-Others contend that risks are understated because:
-- Capability improvements can be discontinuous rather than gradual
-- Economic pressure to deploy autonomously may override safety considerations
-- Multi-agent interactions create emergent risks not present in single-agent systems
-- Once critical infrastructure depends on agentic systems, reversing deployment becomes difficult
-
-### Benefit-Risk Tradeoffs
-
-| Application Area | Potential Benefits | Associated Risks |
-|------------------|-------------------|------------------|
-| Software Development | Faster development cycles, reduced repetitive tasks | Introduction of subtle bugs, security vulnerabilities |
-| Healthcare | Reduced administrative burden, 24/7 availability | Medical errors, privacy breaches, optimization instability in clinical workflows |
-| Financial Services | Improved fraud detection, faster transaction processing | Market manipulation, systemic financial instability |
-| Customer Service | Consistent service quality, cost reduction | Manipulation vulnerabilities, privacy concerns |
-| Security Research | Faster vulnerability detection | Dual-use: same capabilities enable offensive operations |
-| Commerce | Reduced purchase friction, personalization | Autonomous spending risks, manipulation of purchasing behavior |
-
-The debate continues regarding whether agentic AI represents primarily an opportunity or a challenge, with most researchers acknowledging both potential benefits and risks requiring careful management.
-
-## Critical Uncertainties and Open Questions
-
-**Scalability and Emergence**
-A key uncertainty concerns how agentic capabilities will scale with increased computational resources and model sophistication. Whether capability improvements will follow smooth curves that allow for predictable safety measures, or involve discontinuous jumps that outpace safety research, remains unclear. The potential for <EntityLink id="emergent-capabilities">emergent capabilities</EntityLink> that arise unexpectedly from the interaction of multiple agent subsystems remains poorly understood.
-
-The question of whether current approaches to agentic AI will scale to human-level and beyond general intelligence remains open. Different scaling trajectories have different implications for safety timelines and the adequacy of current safety approaches.
-
-**Human-AI Interaction Dynamics**
-Understanding of how human institutions and decision-making processes will adapt to increasingly capable agentic AI remains limited. Whether humans will maintain meaningful agency and oversight, or whether competitive pressures and efficiency considerations will gradually shift control toward autonomous systems, is uncertain. The social and political dynamics of human-AI coexistence remain largely unexplored.
-
-The question of whether humans can effectively collaborate with sophisticated agentic systems, or whether such systems will gradually displace human judgment and expertise, has implications for both safety and social outcomes.
-
-**Technical Safety Feasibility**
-Whether current approaches to <EntityLink id="technical-research">AI safety</EntityLink>—including <EntityLink id="interpretability">interpretability</EntityLink>, <EntityLink id="alignment">alignment</EntityLink>, and <EntityLink id="ai-control">control</EntityLink>—will prove adequate for sophisticated agentic systems remains uncertain. The challenges of value alignment, robust oversight, and maintaining meaningful human control may require breakthroughs that have not yet been achieved.
-
-The possibility that safe agentic AI requires solving the full AI alignment problem, rather than being achievable through incremental safety measures, represents a critical uncertainty for the timeline and feasibility of beneficial agentic AI deployment.
-
-**Environmental and Sustainability Considerations**
-The energy consumption and computational costs of operating sophisticated agentic systems at scale remain poorly characterized. As these systems perform more complex reasoning and maintain persistent state across extended operations, their environmental footprint may become a limiting factor for deployment. Research on energy-efficient architectures and the sustainability implications of widespread agentic AI adoption is in early stages.
-
-Whether the energy requirements of agentic AI systems scale linearly with capability or exhibit super-linear scaling could significantly impact deployment feasibility. Current data on energy costs per agent operation remain sparse, with most AI labs not publishing detailed energy consumption metrics for their agentic systems.
-
-**Agent Reliability as an Engineering Discipline**
-A growing body of research suggests that agent reliability requires systematic engineering practices rather than solely capability improvements. The Towards a Science of AI Agent Reliability framework, research on structured behavioral verification (ReLoop), and stateful runtime operator approaches (CaveAgent) collectively indicate movement toward treating agent reliability as an engineering problem with formal methods, rather than relying purely on empirical testing. Whether these formal approaches will scale to the complexity of frontier agentic deployments remains an open question.
-
-[^1]: Some AI safety researchers characterize the autonomous operation of agents as qualitatively different from assistive AI in terms of safety implications, while others view it as a difference of degree rather than kind. The debate reflects broader questions about whether AI progress occurs through discontinuous paradigm shifts or continuous refinement.
-
-[^2]: <R id="9e4ef9c155b6d9f3">Anthropic's Computer Use release</R> notes that the capability is in beta with acknowledged limitations, including frequent errors on multi-step tasks and unpredictable failure modes.
-
-[^3]: GDPR Article 17 establishes a "right to erasure" for personal data, but how this applies to AI agent memory systems—where information may be distributed across model weights, context windows, and external memory stores—remains legally unclear.
-
-[^4]: This perspective appears in discussions within the AI research community but has limited formal publication in peer-reviewed venues, reflecting the recency of the terminology and ongoing conceptual debates.
-
-[^5]: Netomi's publicly documented lessons for scaling agentic systems into the enterprise describe the architectural distinction between reactive intent-based bots and proactive agents, noting higher failure rates when agentic capabilities are layered onto bot infrastructure rather than built natively.
-
-[^6]: "From Tool Orchestration to Code Execution: A Study of MCP Design Choices" (2025) examines tradeoffs in agentic tool integration protocol design.
-
-[^7]: MemoryArena: Benchmarking Agent Memory in Interdependent Multi-Session Agentic Tasks (2025) documents cross-session context retrieval as a key bottleneck in current agent memory architectures.
-
-[^8]: BrowseComp (OpenAI, 

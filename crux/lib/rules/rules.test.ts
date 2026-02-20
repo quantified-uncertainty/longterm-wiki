@@ -17,6 +17,8 @@ import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
+import { kbSubcategoryCoverageRule } from './kb-subcategory-coverage.ts';
+import { preferEntityLinkRule } from './prefer-entitylink.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
@@ -681,6 +683,287 @@ describe('footnote-coverage rule', () => {
     });
     const issues = footnoteCoverageRule.check(content, {});
     expect(issues.length).toBe(1); // definitions alone don't count
+  });
+});
+
+// =============================================================================
+// kb-subcategory-coverage rule
+// =============================================================================
+
+describe('kb-subcategory-coverage rule', () => {
+  /** Build a minimal mock KB page */
+  function kbPage(
+    section: string,
+    slug: string,
+    opts: { subcategory?: string; isIndex?: boolean } = {},
+  ): Record<string, unknown> {
+    const isIndex = opts.isIndex ?? false;
+    const filename = isIndex ? 'index.mdx' : `${slug}.mdx`;
+    const relativePath = `knowledge-base/${section}/${filename}`;
+    return {
+      path: `/content/docs/${relativePath}`,
+      relativePath,
+      body: 'Body text.',
+      raw: `---\ntitle: ${slug}\n---\nBody text.`,
+      frontmatter: {
+        title: slug,
+        ...(opts.subcategory ? { subcategory: opts.subcategory } : {}),
+      },
+      isIndex,
+    };
+  }
+
+  it('emits no issues when all non-index pages have a subcategory', () => {
+    const files = [
+      kbPage('risks', 'index', { isIndex: true }),
+      kbPage('risks', 'bio-risk', { subcategory: 'misuse' }),
+      kbPage('risks', 'ai-takeover', { subcategory: 'accident' }),
+      kbPage('risks', 'compute-concentration', { subcategory: 'structural' }),
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('emits no issues when missing ratio is exactly at the threshold (20%)', () => {
+    // 1 missing out of 5 = 20%, not > 20%
+    const files = [
+      kbPage('capabilities', 'index', { isIndex: true }),
+      kbPage('capabilities', 'page-a', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-b', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-c', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-d', { subcategory: 'core' }),
+      kbPage('capabilities', 'page-e'), // missing — 1/5 = 20%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('warns when >20% of non-index pages lack subcategory', () => {
+    // 3 missing out of 5 = 60% — well above threshold
+    const files = [
+      kbPage('people', 'index', { isIndex: true }),
+      kbPage('people', 'alice', { subcategory: 'researchers' }),
+      kbPage('people', 'bob', { subcategory: 'researchers' }),
+      kbPage('people', 'carol'), // missing
+      kbPage('people', 'dave'), // missing
+      kbPage('people', 'eve'), // missing
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].rule).toBe('kb-subcategory-coverage');
+    expect(issues[0].severity).toBe('warning');
+    expect(issues[0].message).toContain('"people"');
+    expect(issues[0].message).toContain('3/5');
+  });
+
+  it('lists the filenames of pages missing subcategory in the warning message', () => {
+    const files = [
+      kbPage('debates', 'index', { isIndex: true }),
+      kbPage('debates', 'page-x', { subcategory: 'alignment' }),
+      kbPage('debates', 'page-y'), // missing
+      kbPage('debates', 'page-z'), // missing
+      kbPage('debates', 'page-w'), // missing — 3/4 = 75%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('page-y.mdx');
+    expect(issues[0].message).toContain('page-z.mdx');
+    expect(issues[0].message).toContain('page-w.mdx');
+  });
+
+  it('reports on the section index page when one exists', () => {
+    const indexFile = kbPage('history', 'index', { isIndex: true });
+    const files = [
+      indexFile,
+      kbPage('history', 'hist-a'), // missing
+      kbPage('history', 'hist-b'), // missing
+      kbPage('history', 'hist-c'), // missing — 3/3 = 100%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].file).toBe(indexFile.path);
+  });
+
+  it('does not count the index page itself as missing subcategory', () => {
+    // If the index page has no subcategory (normal — indices don't need one),
+    // it should not inflate the missing count.
+    const files = [
+      kbPage('incidents', 'index', { isIndex: true }), // no subcategory on index
+      kbPage('incidents', 'page-a', { subcategory: 'natural' }),
+      kbPage('incidents', 'page-b', { subcategory: 'natural' }),
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('ignores non-knowledge-base pages entirely', () => {
+    const files = [
+      {
+        path: '/content/docs/internal/guide.mdx',
+        relativePath: 'internal/guide.mdx',
+        body: 'Body.',
+        raw: '---\ntitle: Guide\n---\nBody.',
+        frontmatter: { title: 'Guide' },
+        isIndex: false,
+      },
+      {
+        path: '/content/docs/guides/intro.mdx',
+        relativePath: 'guides/intro.mdx',
+        body: 'Body.',
+        raw: '---\ntitle: Intro\n---\nBody.',
+        frontmatter: { title: 'Intro' },
+        isIndex: false,
+      },
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips sections with no non-index pages', () => {
+    // A section that only has an index page should not cause a division-by-zero warning
+    const files = [
+      kbPage('metrics', 'index', { isIndex: true }),
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('handles multiple sections independently', () => {
+    // "risks" is fine, "debates" is over threshold
+    const files = [
+      kbPage('risks', 'index', { isIndex: true }),
+      kbPage('risks', 'risk-a', { subcategory: 'accident' }),
+      kbPage('risks', 'risk-b', { subcategory: 'misuse' }),
+      kbPage('debates', 'index', { isIndex: true }),
+      kbPage('debates', 'debate-a'), // missing
+      kbPage('debates', 'debate-b'), // missing
+      kbPage('debates', 'debate-c'), // missing — 3/3 = 100%
+    ];
+    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('"debates"');
+  });
+});
+
+// =============================================================================
+// prefer-entitylink rule
+// =============================================================================
+describe('prefer-entitylink rule', () => {
+  // Engine mock with known slugs from the real pathRegistry.
+  // The rule reads pathRegistry.json from disk and caches the reverse map; tests
+  // that check ERROR path rely on URLs present in the real pathRegistry.json.
+  const engineWithRegistry = {
+    idRegistry: {
+      bySlug: {
+        // 'community-notes-for-everything' maps to /knowledge-base/responses/community-notes-for-everything/
+        // in the real pathRegistry — used to test the ERROR path without mocking disk I/O.
+        'community-notes-for-everything': 'E300',
+        'miri': 'E100',
+        'deceptive-alignment': 'E200',
+      },
+      byNumericId: {
+        'E300': 'community-notes-for-everything',
+        'E100': 'miri',
+        'E200': 'deceptive-alignment',
+      },
+    },
+  };
+
+  it('emits ERROR with REPLACE_TEXT fix for markdown link to registered entity', () => {
+    // 'community-notes-for-everything' is in the real pathRegistry.json at
+    // /knowledge-base/responses/community-notes-for-everything/, so the reverse
+    // map lookup returns the slug, and idRegistry.bySlug finds it → ERROR.
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].fix?.type).toBe(FixType.REPLACE_TEXT);
+    expect(issues[0].fix?.newText).toBe('<EntityLink id="community-notes-for-everything">Community Notes</EntityLink>');
+  });
+
+  it('falls back to WARNING when entity slug is not in idRegistry', () => {
+    // Same URL but engine has no idRegistry — the entity slug is found in the
+    // pathRegistry reverse map but not in idRegistry.bySlug, so falls to WARNING.
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, { idRegistry: null } as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('emits WARNING for internal link to unregistered path', () => {
+    const content = mockContent(
+      'See [Unknown Page](/knowledge-base/some-unknown-path/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].rule).toBe('prefer-entitylink');
+  });
+
+  it('emits no issue for external links', () => {
+    const content = mockContent(
+      'See [External](https://example.com/page) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('emits no issue for links already using EntityLink', () => {
+    const content = mockContent(
+      '<EntityLink id="miri">MIRI</EntityLink> is an organization.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips links inside code blocks', () => {
+    const content = mockContent(
+      '```\n[Community Notes](/knowledge-base/responses/community-notes-for-everything/)\n```',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips stub pages', () => {
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+      { frontmatter: { title: 'Test', pageType: 'stub' } },
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips internal documentation pages', () => {
+    // The rule checks relativePath.includes('/internal/') — needs surrounding slashes
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+      { relativePath: 'docs/internal/some-doc.mdx' },
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('excludes top-level section index paths', () => {
+    const content = mockContent(
+      'Browse [all risks](/knowledge-base/risks/) here.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('warning issue has no auto-fix', () => {
+    const content = mockContent(
+      'See [Unknown](/knowledge-base/some-unknown-page/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
   });
 });
 
