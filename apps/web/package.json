@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "NODE_USE_ENV_PROXY=1 next dev --port 3001",
     "build": "NODE_USE_ENV_PROXY=1 next build",
+    "build:cloudflare": "NODE_USE_ENV_PROXY=1 node --import tsx/esm scripts/build-data.mjs && npx opennextjs-cloudflare build",
     "start": "NODE_USE_ENV_PROXY=1 next start --port 3001",
     "assign-ids": "node scripts/assign-ids.mjs",
     "sync:data": "node scripts/assign-ids.mjs && NODE_USE_ENV_PROXY=1 node --import tsx/esm scripts/build-data.mjs",
@@ -15,11 +16,9 @@
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.8",
+    "@opennextjs/cloudflare": "^1.16.5",
     "@quri/squiggle-components": "^0.10.0",
     "@quri/squiggle-lang": "^0.10.0",
-    "d3-force": "^3.0.0",
-    "d3-selection": "^3.0.0",
-    "d3-zoom": "^3.0.0",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-hover-card": "^1.1.15",
     "@radix-ui/react-select": "^2.2.6",
@@ -31,6 +30,9 @@
     "@xyflow/react": "^12.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "d3-force": "^3.0.0",
+    "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.1",
     "lucide-react": "^0.562.0",
@@ -67,6 +69,7 @@
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
     "vitest": "^4.0.18",
+    "wrangler": "^4.67.0",
     "yaml": "^2.8.2"
   }
 }

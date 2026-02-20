@@ -23,3 +23,6 @@ public/wiki/*.txt
 
 # Vercel
 .vercel
+
+# OpenNext / Cloudflare
+.open-next/
