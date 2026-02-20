@@ -1,0 +1,67 @@
+date: 2026-02-20
+branch: claude/resolve-issue-343-PVY5n
+title: Add blocking EntityLink validation rule (issue #343)
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/375
+model: claude-sonnet-4-6
+duration: ~25min
+cost: ~$2
+
+summary: |
+  Upgraded the prefer-entitylink validation rule from advisory WARNING to
+  blocking ERROR for markdown links pointing to registered entities (cross-
+  referenced via idRegistry.bySlug + pathRegistry reverse-lookup). Added
+  auto-fix capability (FixType.REPLACE_TEXT). Integrated as the 5th blocking
+  gate check in validate-gate.ts. Fixed 32 existing violations in 10 content
+  files using the auto-fix. Added 9 new test cases. Fixed a pre-existing
+  session-checklist.test.ts count mismatch (43→47).
+
+key_decisions:
+  - "Used pathRegistry reverse-lookup (not naive path-segment heuristic) for accurate URL→slug mapping"
+  - "Module-level cache for reversePathMap (built once per process from loadPathRegistry())"
+  - "Severity.ERROR for registered entities, Severity.WARNING for unregistered internal paths"
+  - "Ran auto-fix to clear all 32 existing violations before adding gate block"
+  - "Fixed pre-existing session-checklist.test.ts count failure (unrelated to this PR)"
+
+tooling_gaps_found:
+  - "None identified — this PR itself was the tooling gap being actioned"
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-20T07:19:49.355Z"
+  total: 32
+  completed: 31
+  na: 0
+  skipped: 1
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - fix-escaping
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned
+    - crux-typescript
