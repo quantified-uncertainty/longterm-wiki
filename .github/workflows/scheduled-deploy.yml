@@ -1,0 +1,64 @@
+name: Scheduled Production Deploy
+
+# Ensures production is deployed at least every 4 hours.
+#
+# Context: We disabled automatic Vercel builds for claude/* branches to
+# reduce costs (they were triggering ~$377/month in preview builds).
+# This change also made production deploys less predictable, since they
+# only happen when PRs are merged to main.
+#
+# This workflow guarantees a production deployment floor by hitting the
+# Vercel deploy hook on a fixed schedule, regardless of git activity.
+#
+# Setup (one-time):
+#   1. Go to Vercel Dashboard → Project → Settings → Git → Deploy Hooks
+#   2. Create a hook: Name "Scheduled Deploy", Branch "main"
+#   3. Copy the generated URL (looks like https://api.vercel.com/v1/integrations/deploy/...)
+#   4. Add it as a GitHub secret: Settings → Secrets → Actions → New secret
+#      Name: VERCEL_DEPLOY_HOOK_URL
+#      Value: <paste URL>
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'   # Every 4 hours (00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC)
+  workflow_dispatch:          # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  trigger-production-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Trigger Vercel production deployment
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
+            echo "::error::VERCEL_DEPLOY_HOOK_URL secret is not set."
+            echo "See setup instructions in the workflow file comments."
+            exit 1
+          fi
+
+          RESPONSE=$(curl -s -o /tmp/vercel_response.json -w "%{http_code}" \
+            -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
+
+          echo "HTTP status: $RESPONSE"
+          echo "Response body:"
+          cat /tmp/vercel_response.json
+
+          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 300 ]; then
+            echo "✓ Production deployment triggered successfully."
+          else
+            echo "::error::Vercel deploy hook returned HTTP $RESPONSE"
+            exit 1
+          fi
+
+      - name: Log deploy trigger
+        if: always()
+        run: |
+          echo "## Scheduled Production Deploy" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f /tmp/vercel_response.json ]; then
+            JOB_ID=$(cat /tmp/vercel_response.json | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4 || echo "unknown")
+            echo "- **Vercel job:** $JOB_ID" >> $GITHUB_STEP_SUMMARY
+          fi
