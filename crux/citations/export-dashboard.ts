@@ -18,7 +18,7 @@ import { writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'f
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
-import { citationQuotes, getDb, PROJECT_ROOT } from '../lib/knowledge-db.ts';
+import { citationQuotes, PROJECT_ROOT } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 
@@ -97,10 +97,8 @@ export function buildDashboardExport(): DashboardExport | null {
   const dbPath = join(PROJECT_ROOT, '.cache', 'knowledge.db');
   if (!existsSync(dbPath)) return null;
 
-  // Get all citation quotes
-  const allQuotes = getDb().prepare(
-    'SELECT * FROM citation_quotes ORDER BY page_id, footnote',
-  ).all() as Array<Record<string, unknown>>;
+  // Get all citation quotes via DAO
+  const allQuotes = citationQuotes.getAll();
 
   if (allQuotes.length === 0) return null;
 
@@ -140,11 +138,11 @@ export function buildDashboardExport(): DashboardExport | null {
   const flagged: FlaggedCitation[] = [];
 
   for (const q of allQuotes) {
-    const pageId = q.page_id as string;
-    const verdict = q.accuracy_verdict as string | null;
-    const score = q.accuracy_score as number | null;
-    const difficulty = q.verification_difficulty as string | null;
-    const url = q.url as string | null;
+    const pageId = q.page_id;
+    const verdict = q.accuracy_verdict;
+    const score = q.accuracy_score;
+    const difficulty = q.verification_difficulty;
+    const url = q.url;
     const domain = extractDomain(url);
 
     // Page aggregation
@@ -205,15 +203,15 @@ export function buildDashboardExport(): DashboardExport | null {
       if (verdict === 'inaccurate' || verdict === 'unsupported') {
         flagged.push({
           pageId,
-          footnote: q.footnote as number,
-          claimText: q.claim_text as string,
-          sourceTitle: q.source_title as string | null,
+          footnote: q.footnote,
+          claimText: q.claim_text,
+          sourceTitle: q.source_title,
           url,
           verdict,
           score,
-          issues: q.accuracy_issues as string | null,
+          issues: q.accuracy_issues,
           difficulty,
-          checkedAt: q.accuracy_checked_at as string | null,
+          checkedAt: q.accuracy_checked_at,
         });
       }
     }

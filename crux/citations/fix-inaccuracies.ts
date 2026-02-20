@@ -205,6 +205,48 @@ Rules:
 const MAX_SOURCE_PER_ESCALATION = 6_000;
 
 /**
+ * Look up source evidence for a non-flagged footnote directly from SQLite.
+ * Used in escalation to provide context for neighboring citations.
+ */
+function lookupFootnoteEvidence(pageId: string, footnote: number): string | null {
+  try {
+    const row = citationQuotes.get(pageId, footnote);
+    if (!row) return null;
+
+    const parts: string[] = [];
+
+    // Supporting quotes (best evidence)
+    if (row.accuracy_supporting_quotes) {
+      parts.push('Key passages from source:');
+      parts.push(row.accuracy_supporting_quotes);
+    }
+
+    // Extracted quote
+    if (row.source_quote && !row.accuracy_supporting_quotes?.includes(row.source_quote.slice(0, 50))) {
+      parts.push('Extracted quote:');
+      parts.push(row.source_quote);
+    }
+
+    if (parts.length > 0) return parts.join('\n');
+
+    // Fall back to cached full text
+    if (row.url) {
+      const cached = citationContent.getByUrl(row.url);
+      if (cached?.full_text) {
+        const truncated = cached.full_text.length > MAX_SOURCE_PER_ESCALATION
+          ? cached.full_text.slice(0, MAX_SOURCE_PER_ESCALATION) + '\n[... truncated ...]'
+          : cached.full_text;
+        return `Full source text:\n${truncated}`;
+      }
+    }
+
+    return null;
+  } catch {
+    return null; // SQLite unavailable
+  }
+}
+
+/**
  * Escalate to Claude Sonnet with section-level rewrites when Gemini Flash
  * returns 0 proposals for flagged citations.
  */
@@ -252,10 +294,13 @@ export async function escalateWithClaude(
         if (evidence) {
           evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
         }
+      } else {
+        // For non-flagged footnotes, look up evidence directly from SQLite
+        const evidence = lookupFootnoteEvidence(pageId, fn);
+        if (evidence) {
+          evidenceParts.push(`Source evidence:\n${evidence.slice(0, MAX_SOURCE_PER_ESCALATION)}`);
+        }
       }
-      // Note: non-flagged footnotes won't have enriched data since allEnriched
-      // only contains flagged citations. A future enhancement could look up
-      // evidence for neighboring citations directly from the DB.
 
       evidenceParts.push('');
     }

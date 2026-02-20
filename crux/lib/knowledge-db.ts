@@ -1081,6 +1081,15 @@ export const citationQuotes = {
   },
 
   /**
+   * Get all citation quotes, ordered by page and footnote.
+   */
+  getAll(): CitationQuoteRow[] {
+    return getDb().prepare(
+      'SELECT * FROM citation_quotes ORDER BY page_id, footnote',
+    ).all() as CitationQuoteRow[];
+  },
+
+  /**
    * Get quotes by URL (across all pages).
    */
   getByUrl(url: string): CitationQuoteRow[] {

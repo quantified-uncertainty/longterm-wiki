@@ -19,7 +19,7 @@ import { basename, join } from 'path';
 import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { createClient, MODELS, callClaude } from '../lib/anthropic.ts';
@@ -625,17 +625,7 @@ function applyProposals(
   return { content: modified, applied, skipped };
 }
 
-// ---------------------------------------------------------------------------
-// Page file finder
-// ---------------------------------------------------------------------------
-
-function findPageFile(pageId: string): string | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of files) {
-    if (basename(f, '.mdx') === pageId) return f;
-  }
-  return null;
-}
+// findPageFile imported from ../lib/file-utils.ts
 
 // ---------------------------------------------------------------------------
 // Single page processor
