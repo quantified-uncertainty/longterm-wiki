@@ -144,6 +144,17 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
       sortUndefined: "last",
     },
     {
+      accessorKey: "dateCreated",
+      header: ({ column }) => <SortableHeader column={column}>Created</SortableHeader>,
+      cell: ({ row }) => (
+        <span className="text-muted-foreground text-xs whitespace-nowrap">
+          {formatDate(row.original.dateCreated ?? null)}
+        </span>
+      ),
+      size: 110,
+      sortUndefined: "last",
+    },
+    {
       accessorKey: "category",
       header: ({ column }) => <SortableHeader column={column}>Category</SortableHeader>,
       cell: ({ row }) => {

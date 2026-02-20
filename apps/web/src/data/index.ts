@@ -363,6 +363,7 @@ export interface Page {
   uncertainty: number | null;
   causalLevel: string | null;
   lastUpdated: string | null;
+  dateCreated?: string | null;
   llmSummary: string | null;
   structuredSummary: StructuredSummary | null;
   description: string | null;
@@ -1298,6 +1299,7 @@ export interface ExploreItem {
   category: string | null;
   riskCategory: string | null;
   lastUpdated: string | null;
+  dateCreated?: string | null;
   contentFormat?: ContentFormat;
   href?: string;
   meta?: string;
@@ -1353,6 +1355,7 @@ export function getExploreItems(): ExploreItem[] {
       category: page?.category ?? null,
       riskCategory: isRisk(entity) ? (entity.riskCategory || null) : null,
       lastUpdated: page?.lastUpdated ?? null,
+      dateCreated: page?.dateCreated ?? null,
       contentFormat: page?.contentFormat,
     };
   });
@@ -1378,6 +1381,7 @@ export function getExploreItems(): ExploreItem[] {
       category: page.category ?? null,
       riskCategory: null,
       lastUpdated: page.lastUpdated ?? null,
+      dateCreated: page.dateCreated ?? null,
       contentFormat: page.contentFormat,
     }));
 
@@ -1435,6 +1439,7 @@ export function getExploreItems(): ExploreItem[] {
         category: null,
         riskCategory: null,
         lastUpdated: e.lastUpdated || null,
+        dateCreated: null,
         contentFormat: "diagram" as ContentFormat,
         href: resolveDiagramHref(e)!,
         meta: `${nodeCount} nodes`,

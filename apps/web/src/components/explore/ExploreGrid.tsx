@@ -48,7 +48,7 @@ const RISK_CATEGORY_GROUPS: { label: string; value: string | null }[] = [
   { label: "Epistemic", value: "epistemic" },
 ];
 
-type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "tacticalValue" | "quality" | "wordCount" | "recentlyEdited";
+type SortKey = "recommended" | "relevance" | "title" | "readerImportance" | "researchImportance" | "tacticalValue" | "quality" | "wordCount" | "recentlyEdited" | "recentlyCreated";
 
 /** Compute a blended "recommended" score that favors recent, high-quality content. */
 function recommendedScore(item: ExploreItem): number {
@@ -191,6 +191,10 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const rawView = searchParams.get("view");
   const initialView: ViewMode = rawView === "table" ? "table" : "cards";
 
+  const VALID_SORT_KEYS: SortKey[] = ["recommended", "recentlyEdited", "recentlyCreated", "quality", "readerImportance", "researchImportance", "tacticalValue", "relevance", "wordCount", "title"];
+  const rawSort = searchParams.get("sort");
+  const initialSort: SortKey = rawSort && VALID_SORT_KEYS.includes(rawSort as SortKey) ? (rawSort as SortKey) : "recommended";
+
   const [viewMode, setViewMode] = useState<ViewMode>(initialView);
   const [search, setSearch] = useState(initialTag);
   const [activeField, setActiveField] = useState(0);
@@ -199,7 +203,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     initialRiskCat ? 1 : initialEntityIndex
   );
   const [activeRiskCat, setActiveRiskCat] = useState(initialRiskCatIndex);
-  const [sortKey, setSortKey] = useState<SortKey>("recommended");
+  const [sortKey, setSortKey] = useState<SortKey>(initialSort);
   const [visibleCount, setVisibleCount] = useState(60);
 
   // MiniSearch scores: id → relevance score (null = no active search or not yet loaded)
@@ -296,6 +300,12 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   function handleViewChange(mode: ViewMode) {
     setViewMode(mode);
     updateUrlParams({ view: mode === "cards" ? null : mode });
+  }
+
+  function handleSortChange(key: SortKey) {
+    setSortKey(key);
+    setVisibleCount(60);
+    updateUrlParams({ sort: key === "recommended" ? null : key });
   }
 
   // Filter out AI transition model subitems (internal model data, not articles)
@@ -401,6 +411,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
             return (b.wordCount || 0) - (a.wordCount || 0);
           case "recentlyEdited":
             return (b.lastUpdated || "").localeCompare(a.lastUpdated || "");
+          case "recentlyCreated":
+            return (b.dateCreated || "").localeCompare(a.dateCreated || "");
           case "relevance": {
             if (searchScores) {
               const scoreA = searchScores.get(a.id) || 0;
@@ -521,11 +533,12 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
             {viewMode === "cards" && (
               <select
                 value={sortKey}
-                onChange={(e) => setSortKey(e.target.value as SortKey)}
+                onChange={(e) => handleSortChange(e.target.value as SortKey)}
                 className="text-sm px-3 py-1.5 border border-border rounded-md bg-background text-foreground"
               >
                 <option value="recommended">Recommended</option>
                 <option value="recentlyEdited">Recently Edited</option>
+                <option value="recentlyCreated">Recently Created</option>
                 <option value="quality">Quality</option>
                 <option value="readerImportance">Reader Importance</option>
                 <option value="researchImportance">Research Importance</option>
