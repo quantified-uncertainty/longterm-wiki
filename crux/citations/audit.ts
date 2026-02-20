@@ -14,12 +14,10 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import { basename } from 'path';
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { extractCitationsFromContent } from '../lib/citation-archive.ts';
 import { DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
@@ -36,14 +34,6 @@ import {
 } from './fix-inaccuracies.ts';
 import type { ApplyResult } from './fix-inaccuracies.ts';
 import { appendEditLog } from '../lib/edit-log.ts';
-
-function findPageFile(pageId: string): string | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of files) {
-    if (basename(f, '.mdx') === pageId) return f;
-  }
-  return null;
-}
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
@@ -198,7 +188,7 @@ async function main() {
     // Apply fixes
     console.log('');
     const applyResult = applyFixes(pageContent, proposals);
-    const modifiedContent = (applyResult as ApplyResult & { content?: string }).content;
+    const modifiedContent = applyResult.content;
 
     if (applyResult.applied > 0 && modifiedContent) {
       writeFileSync(filePath, modifiedContent, 'utf-8');

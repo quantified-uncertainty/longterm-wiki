@@ -120,7 +120,7 @@ describe('applyFixes', () => {
     const result = applyFixes(content, proposals);
     expect(result.applied).toBe(1);
     expect(result.skipped).toBe(0);
-    const modified = (result as typeof result & { content: string }).content;
+    const modified = result.content;
     expect(modified).toContain('costs approximately $45[^1]');
     expect(modified).not.toContain('costs $50[^1]');
   });
@@ -145,7 +145,7 @@ describe('applyFixes', () => {
 
     const result = applyFixes(content, proposals);
     expect(result.applied).toBe(2);
-    const modified = (result as typeof result & { content: string }).content;
+    const modified = result.content;
     expect(modified).toContain('costs about $50[^1]');
     expect(modified).toContain('approximately 500 employees[^2]');
   });
@@ -179,7 +179,7 @@ describe('applyFixes', () => {
     ];
 
     const result = applyFixes(content, proposals);
-    expect((result as typeof result & { content?: string }).content).toBeUndefined();
+    expect(result.content).toBeNull();
   });
 });
 

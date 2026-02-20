@@ -20,8 +20,7 @@ import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { createClient, callClaude, MODELS } from '../lib/anthropic.ts';
@@ -30,7 +29,9 @@ import { citationQuotes, citationContent } from '../lib/knowledge-db.ts';
 import { checkAccuracyForPage } from './check-accuracy.ts';
 import { extractQuotesForPage } from './extract-quotes.ts';
 import { exportDashboardData } from './export-dashboard.ts';
+import { ACCURACY_DIR, ACCURACY_ACCURACY_PAGES_DIR } from './export-dashboard.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
+import { logBatchProgress } from './shared.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,6 +48,7 @@ export interface FixProposal {
 export interface ApplyResult {
   applied: number;
   skipped: number;
+  content: string | null;
   details: Array<{
     footnote: number;
     status: 'applied' | 'not_found';
@@ -388,9 +390,6 @@ export function applySectionRewrites(
 // Dashboard YAML reader
 // ---------------------------------------------------------------------------
 
-const ACCURACY_DIR = join(PROJECT_ROOT, 'data', 'citation-accuracy');
-const PAGES_DIR = join(ACCURACY_DIR, 'pages');
-
 /** Read flagged citations from per-page YAML files (with fallback to old monolithic format). */
 export function loadFlaggedCitations(opts: {
   pageId?: string;
@@ -400,12 +399,12 @@ export function loadFlaggedCitations(opts: {
   let flagged: FlaggedCitation[] = [];
 
   // New split format: pages/<pageId>.yaml
-  if (existsSync(PAGES_DIR)) {
-    const files = readdirSync(PAGES_DIR).filter((f) => f.endsWith('.yaml'));
+  if (existsSync(ACCURACY_PAGES_DIR)) {
+    const files = readdirSync(ACCURACY_PAGES_DIR).filter((f) => f.endsWith('.yaml'));
 
     // If filtering to one page, only read that file
     if (opts.pageId) {
-      const pageFile = join(PAGES_DIR, `${opts.pageId}.yaml`);
+      const pageFile = join(ACCURACY_PAGES_DIR, `${opts.pageId}.yaml`);
       if (existsSync(pageFile)) {
         const raw = readFileSync(pageFile, 'utf-8');
         const parsed = yaml.load(raw);
@@ -416,7 +415,7 @@ export function loadFlaggedCitations(opts: {
     } else {
       for (const f of files) {
         try {
-          const raw = readFileSync(join(PAGES_DIR, f), 'utf-8');
+          const raw = readFileSync(join(ACCURACY_PAGES_DIR, f), 'utf-8');
           const parsed = yaml.load(raw);
           if (Array.isArray(parsed)) {
             flagged.push(...(parsed as FlaggedCitation[]));
@@ -698,7 +697,7 @@ export async function generateFixesForPage(
  * Processes in reverse offset order to preserve positions.
  */
 export function applyFixes(content: string, proposals: FixProposal[]): ApplyResult {
-  const result: ApplyResult = { applied: 0, skipped: 0, details: [] };
+  const result: ApplyResult = { applied: 0, skipped: 0, content: null, details: [] };
 
   // Find offsets and sort descending
   const withOffsets = proposals.map((p) => ({
@@ -746,27 +745,11 @@ export function applyFixes(content: string, proposals: FixProposal[]): ApplyResu
     });
   }
 
-  // Write back only if at least one fix applied
   if (result.applied > 0) {
-    // The caller is responsible for writing the file
-    // We just return the modified content via a side channel
-    (result as ApplyResult & { content: string }).content = modified;
+    result.content = modified;
   }
 
   return result;
-}
-
-// ---------------------------------------------------------------------------
-// Page file lookup
-// ---------------------------------------------------------------------------
-
-function findPageFile(pageId: string): string | null {
-  const allFiles = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of allFiles) {
-    const basename = f.split('/').pop()?.replace(/\.mdx?$/, '');
-    if (basename === pageId) return f;
-  }
-  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -970,7 +953,7 @@ async function main() {
         // Apply if requested
         if (apply) {
           const applyResult = applyFixes(pageContent, proposals);
-          const modifiedContent = (applyResult as ApplyResult & { content?: string }).content;
+          const modifiedContent = applyResult.content;
 
           if (applyResult.applied > 0 && modifiedContent) {
             writeFileSync(filePath, modifiedContent, 'utf-8');
@@ -1006,22 +989,14 @@ async function main() {
       if (r) allResults.push(r);
     }
 
-    // Timing + ETA
     if (!json && pageEntries.length > concurrency) {
-      const pagesCompleted = Math.min(i + concurrency, pageEntries.length);
-      const elapsed = (Date.now() - runStart) / 1000;
-      const batchSec = (Date.now() - batchStart) / 1000;
-      const avgPerPage = elapsed / pagesCompleted;
-      const remaining = avgPerPage * (pageEntries.length - pagesCompleted);
-      const etaStr = remaining > 0
-        ? `ETA ${Math.ceil(remaining / 60)}m ${Math.round(remaining % 60)}s`
-        : 'done';
-      console.log(
-        `${c.dim}  batch ${batchSec.toFixed(0)}s | elapsed ${Math.floor(elapsed / 60)}m ${Math.round(elapsed % 60)}s | ${etaStr}${c.reset}`,
-      );
+      logBatchProgress(c, {
+        batchIndex: i, concurrency, totalPages: pageEntries.length,
+        runStartMs: runStart, batchStartMs: batchStart,
+      });
+    } else {
+      console.log('');
     }
-
-    console.log('');
   }
 
   // Summary

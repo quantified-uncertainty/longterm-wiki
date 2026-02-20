@@ -1157,10 +1157,92 @@ export const citationQuotes = {
   },
 
   /**
-   * Delete all quotes for a page (for re-extraction).
+   * Get per-page aggregated statistics for the quote report.
    */
-  clearPage(pageId: string) {
-    return getDb().prepare('DELETE FROM citation_quotes WHERE page_id = ?').run(pageId);
+  getPageStats(): Array<{
+    page_id: string;
+    total: number;
+    with_quotes: number;
+    verified: number;
+    avg_score: number | null;
+    accuracy_checked: number;
+    accurate: number;
+    inaccurate: number;
+  }> {
+    return getDb().prepare(`
+      SELECT
+        page_id,
+        COUNT(*) as total,
+        SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END) as with_quotes,
+        SUM(CASE WHEN quote_verified = 1 THEN 1 ELSE 0 END) as verified,
+        AVG(CASE WHEN verification_score IS NOT NULL THEN verification_score END) as avg_score,
+        SUM(CASE WHEN accuracy_verdict IS NOT NULL THEN 1 ELSE 0 END) as accuracy_checked,
+        SUM(CASE WHEN accuracy_verdict = 'accurate' THEN 1 ELSE 0 END) as accurate,
+        SUM(CASE WHEN accuracy_verdict IN ('inaccurate', 'unsupported') THEN 1 ELSE 0 END) as inaccurate
+      FROM citation_quotes
+      GROUP BY page_id
+      ORDER BY total DESC
+    `).all() as Array<{
+      page_id: string; total: number; with_quotes: number; verified: number;
+      avg_score: number | null; accuracy_checked: number; accurate: number; inaccurate: number;
+    }>;
+  },
+
+  /**
+   * Get aggregated statistics by source type.
+   */
+  getSourceTypeStats(): Array<{
+    source_type: string;
+    count: number;
+    with_quotes: number;
+  }> {
+    return getDb().prepare(`
+      SELECT
+        COALESCE(source_type, 'unknown') as source_type,
+        COUNT(*) as count,
+        SUM(CASE WHEN source_quote IS NOT NULL AND source_quote != '' THEN 1 ELSE 0 END) as with_quotes
+      FROM citation_quotes
+      GROUP BY source_type
+      ORDER BY count DESC
+    `).all() as Array<{ source_type: string; count: number; with_quotes: number }>;
+  },
+
+  /**
+   * Get broken quotes (extracted but not verified, low score).
+   */
+  getBrokenQuotes(): Array<{
+    page_id: string;
+    footnote: number;
+    url: string | null;
+    claim_text: string;
+    verification_score: number | null;
+  }> {
+    return getDb().prepare(`
+      SELECT page_id, footnote, url, claim_text, verification_score
+      FROM citation_quotes
+      WHERE source_quote IS NOT NULL
+        AND source_quote != ''
+        AND quote_verified = 0
+        AND verification_score IS NOT NULL
+        AND verification_score < 0.4
+      ORDER BY verification_score ASC
+    `).all() as Array<{
+      page_id: string; footnote: number; url: string | null;
+      claim_text: string; verification_score: number | null;
+    }>;
+  },
+
+  /**
+   * Get all pages that have stored quotes (for batch operations).
+   */
+  getPagesWithQuotes(): Array<{ page_id: string; quote_count: number }> {
+    return getDb().prepare(`
+      SELECT DISTINCT page_id, COUNT(*) as quote_count
+      FROM citation_quotes
+      WHERE source_quote IS NOT NULL AND source_quote != ''
+      GROUP BY page_id
+      ORDER BY quote_count DESC
+    `).all() as Array<{ page_id: string; quote_count: number }>;
   },
 
   /**
@@ -1182,35 +1264,6 @@ export const citationQuotes = {
           accuracy_checked_at = datetime('now'), updated_at = datetime('now')
       WHERE page_id = ? AND footnote = ?
     `).run(verdict, score, issues, supportingQuotes ?? null, verificationDifficulty ?? null, pageId, footnote);
-  },
-
-  /**
-   * Get citations with quotes that haven't been accuracy-checked yet.
-   */
-  getUncheckedAccuracy(limit: number = 100): CitationQuoteRow[] {
-    return getDb().prepare(
-      `SELECT * FROM citation_quotes
-       WHERE source_quote IS NOT NULL AND source_quote != ''
-         AND accuracy_verdict IS NULL
-       ORDER BY page_id, footnote
-       LIMIT ?`,
-    ).all(limit) as CitationQuoteRow[];
-  },
-
-  /**
-   * Get accuracy summary for all pages that have been accuracy-checked.
-   * Returns one row per page with counts of checked and inaccurate citations.
-   */
-  getAccuracySummaryAllPages(): Array<{ page_id: string; checked: number; inaccurate: number }> {
-    return getDb().prepare(`
-      SELECT
-        page_id,
-        COUNT(*) as checked,
-        SUM(CASE WHEN accuracy_verdict IN ('inaccurate', 'unsupported') THEN 1 ELSE 0 END) as inaccurate
-      FROM citation_quotes
-      WHERE accuracy_verdict IS NOT NULL
-      GROUP BY page_id
-    `).all() as Array<{ page_id: string; checked: number; inaccurate: number }>;
   },
 
   /**

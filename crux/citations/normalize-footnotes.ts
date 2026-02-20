@@ -190,7 +190,7 @@ function analyzePageFootnotes(filePath: string): PageReport {
   return { pageId, filePath, footnotes, fixable, alreadyNormalized, noUrl };
 }
 
-function applyFixes(filePath: string, footnotes: FootnoteInfo[]): number {
+function applyFootnoteFixes(filePath: string, footnotes: FootnoteInfo[]): number {
   const content = readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
   let fixCount = 0;
@@ -254,7 +254,7 @@ function main() {
     totalNoUrl += report.noUrl;
 
     if (fix && report.fixable > 0) {
-      const fixed = applyFixes(f, report.footnotes);
+      const fixed = applyFootnoteFixes(f, report.footnotes);
       totalFixed += fixed;
     }
   }

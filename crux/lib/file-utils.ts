@@ -5,7 +5,8 @@
  */
 
 import { existsSync, readdirSync, statSync } from 'fs';
-import { join } from 'path';
+import { basename, join } from 'path';
+import { CONTENT_DIR_ABS } from './content-types.ts';
 
 /**
  * Find all MDX/MD files recursively in a directory
@@ -51,6 +52,18 @@ export function findFiles(dir: string, extensions: string[], results: string[] =
     // Skip directories that can't be read
   }
   return results;
+}
+
+/**
+ * Find the absolute path of a page's MDX file by its page ID.
+ * Returns null if the page is not found.
+ */
+export function findPageFile(pageId: string): string | null {
+  const files = findMdxFiles(CONTENT_DIR_ABS);
+  for (const f of files) {
+    if (basename(f, '.mdx') === pageId) return f;
+  }
+  return null;
 }
 
 /**

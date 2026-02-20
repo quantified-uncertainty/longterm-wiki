@@ -14,7 +14,6 @@ import { parseCliArgs } from '../lib/cli.ts';
 import {
   citationQuotes,
   citationContent,
-  getDb,
 } from '../lib/knowledge-db.ts';
 import { fetchCitationUrl } from '../lib/citation-archive.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
@@ -157,18 +156,7 @@ async function main() {
   }
 
   if (all) {
-    // Get all pages with stored quotes
-    const pages = getDb()
-      .prepare(
-        `
-      SELECT DISTINCT page_id, COUNT(*) as quote_count
-      FROM citation_quotes
-      WHERE source_quote IS NOT NULL AND source_quote != ''
-      GROUP BY page_id
-      ORDER BY quote_count DESC
-    `,
-      )
-      .all() as Array<{ page_id: string; quote_count: number }>;
+    const pages = citationQuotes.getPagesWithQuotes();
 
     let pagesToProcess = pages;
     if (limit > 0) {
@@ -279,7 +267,10 @@ async function main() {
   process.exit(result.drifted > 0 ? 1 : 0);
 }
 
-main().catch((err: Error) => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+import { fileURLToPath } from 'url';
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: Error) => {
+    console.error('Error:', err.message);
+    process.exit(1);
+  });
+}

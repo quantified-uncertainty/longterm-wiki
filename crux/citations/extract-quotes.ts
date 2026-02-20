@@ -14,10 +14,8 @@
  */
 
 import { readFileSync } from 'fs';
-import { basename } from 'path';
 import { fileURLToPath } from 'url';
-import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
-import { findMdxFiles } from '../lib/file-utils.ts';
+import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
@@ -36,53 +34,7 @@ import {
   parseBookReference,
   findSourceOnline,
 } from '../lib/source-lookup.ts';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function findPageFile(pageId: string): string | null {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  for (const f of files) {
-    if (basename(f, '.mdx') === pageId) return f;
-  }
-  return null;
-}
-
-function findPagesWithCitations(): Array<{
-  pageId: string;
-  path: string;
-  citationCount: number;
-}> {
-  const files = findMdxFiles(CONTENT_DIR_ABS);
-  const results: Array<{
-    pageId: string;
-    path: string;
-    citationCount: number;
-  }> = [];
-
-  for (const f of files) {
-    if (!f.includes('/knowledge-base/')) continue;
-    if (basename(f).startsWith('index.')) continue;
-
-    try {
-      const raw = readFileSync(f, 'utf-8');
-      const body = stripFrontmatter(raw);
-      const citations = extractCitationsFromContent(body);
-      if (citations.length > 0) {
-        results.push({
-          pageId: basename(f, '.mdx'),
-          path: f,
-          citationCount: citations.length,
-        });
-      }
-    } catch {
-      // Skip unreadable files
-    }
-  }
-
-  return results.sort((a, b) => b.citationCount - a.citationCount);
-}
+import { findPagesWithCitations, logBatchProgress } from './shared.ts';
 
 /** Detect if a footnote is a book/paper reference (no URL). */
 function isBookReference(footnoteText: string): boolean {
@@ -435,19 +387,10 @@ async function main() {
         if (r) allResults.push(r);
       }
 
-      // Timing + ETA
-      const pagesCompleted = Math.min(i + concurrency, pages.length);
-      const elapsed = (Date.now() - runStart) / 1000;
-      const batchSec = (Date.now() - batchStart) / 1000;
-      const avgPerPage = elapsed / pagesCompleted;
-      const remaining = avgPerPage * (pages.length - pagesCompleted);
-      const etaStr = remaining > 0
-        ? `ETA ${Math.ceil(remaining / 60)}m ${Math.round(remaining % 60)}s`
-        : 'done';
-      console.log(
-        `${c.dim}  batch ${batchSec.toFixed(0)}s | elapsed ${Math.floor(elapsed / 60)}m ${Math.round(elapsed % 60)}s | ${etaStr}${c.reset}`,
-      );
-      console.log('');
+      logBatchProgress(c, {
+        batchIndex: i, concurrency, totalPages: pages.length,
+        runStartMs: runStart, batchStartMs: batchStart,
+      });
     }
 
     // Summary
