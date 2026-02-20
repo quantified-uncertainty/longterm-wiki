@@ -117,7 +117,8 @@ async function main(): Promise<void> {
     const frontmatter = parseFrontmatter(content);
     const title = (frontmatter.title as string) || slug;
     const quality = typeof frontmatter.quality === 'number' ? frontmatter.quality : undefined;
-    const importance = typeof frontmatter.importance === 'number' ? frontmatter.importance : undefined;
+    const importance = typeof frontmatter.readerImportance === 'number' ? frontmatter.readerImportance :
+                       typeof frontmatter.importance === 'number' ? frontmatter.importance : undefined;
 
     const visualCounts = countVisuals(content);
     const totalVisuals = visualCounts.total;

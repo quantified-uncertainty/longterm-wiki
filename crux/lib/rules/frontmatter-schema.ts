@@ -178,6 +178,35 @@ export const frontmatterSchemaRule = {
       }));
     }
 
+    // Deprecated fields — flag as errors to prevent regression
+    if (frontmatter.importance !== undefined) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: 'importance: is deprecated — use readerImportance: or researchImportance: instead',
+        severity: Severity.ERROR,
+      }));
+    }
+    if (frontmatter.todo !== undefined) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: 'todo: is deprecated — use todos: (array) instead',
+        severity: Severity.ERROR,
+      }));
+    }
+    if (frontmatter.entityId !== undefined) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: 'entityId: is deprecated — remove it; entity linking is handled via numericId: or filename-based ID',
+        severity: Severity.ERROR,
+      }));
+    }
+
     // Validate against Zod schema
     const result = frontmatterSchema.safeParse(frontmatter);
 
