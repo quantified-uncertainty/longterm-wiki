@@ -47,7 +47,9 @@ async function checkAccuracyForPage(
 
   const quotes = citationQuotes.getByPage(pageId);
   const withQuotes = quotes.filter(
-    (q) => q.source_quote && q.source_quote.length > 0,
+    (q) => q.source_quote && q.source_quote.length > 0
+      // Skip quotes with very low verification scores — likely bad extractions
+      && (q.verification_score === null || q.verification_score >= 0.4),
   );
 
   const result: AccuracyResult = {
@@ -219,19 +221,71 @@ async function main() {
     );
     console.log(`  ${pages.length} pages with quotes, processing ${pagesToProcess.length}\n`);
 
+    const concurrency = Math.max(1, parseInt((args.concurrency as string) || '1', 10));
+    if (concurrency > 1) {
+      console.log(`  Concurrency: ${concurrency}\n`);
+    }
+
+    const totalQuoteCount = pagesToProcess.reduce((s, p) => s + p.quote_count, 0);
+
+    // Dry-run: show what would be processed and exit
+    if (args['dry-run']) {
+      console.log(`${c.bold}Dry run — would process:${c.reset}`);
+      for (const page of pagesToProcess) {
+        console.log(`  ${page.page_id} (${page.quote_count} quotes)`);
+      }
+      console.log(`\n  Total: ${pagesToProcess.length} pages, ${totalQuoteCount} quotes`);
+      console.log(`  Estimated LLM calls: ~${totalQuoteCount} (one per quote)`);
+      process.exit(0);
+    }
+
     const allResults: AccuracyResult[] = [];
+    const runStart = Date.now();
 
-    for (let i = 0; i < pagesToProcess.length; i++) {
-      const page = pagesToProcess[i];
-      console.log(
-        `${c.dim}[${i + 1}/${pagesToProcess.length}]${c.reset} ${c.bold}${page.page_id}${c.reset} (${page.quote_count} quotes)`,
+    for (let i = 0; i < pagesToProcess.length; i += concurrency) {
+      const batch = pagesToProcess.slice(i, i + concurrency);
+      const batchStart = Date.now();
+      const batchResults = await Promise.all(
+        batch.map(async (page, batchIdx) => {
+          const globalIdx = i + batchIdx;
+          console.log(
+            `${c.dim}[${globalIdx + 1}/${pagesToProcess.length}]${c.reset} ${c.bold}${page.page_id}${c.reset} (${page.quote_count} quotes)`,
+          );
+
+          try {
+            const result = await checkAccuracyForPage(page.page_id, {
+              verbose: concurrency === 1,
+              recheck,
+            });
+            if (concurrency > 1) {
+              console.log(
+                `  ${c.green}${page.page_id}:${c.reset} ${result.accurate} accurate, ${result.minorIssues} minor, ${result.inaccurate} inaccurate, ${result.errors} errors`,
+              );
+            }
+            return result;
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.log(`  ${c.red}${page.page_id}: Error — ${msg}${c.reset}`);
+            return null;
+          }
+        }),
       );
+      for (const r of batchResults) {
+        if (r) allResults.push(r);
+      }
 
-      const result = await checkAccuracyForPage(page.page_id, {
-        verbose: true,
-        recheck,
-      });
-      allResults.push(result);
+      // Timing + ETA
+      const pagesCompleted = Math.min(i + concurrency, pagesToProcess.length);
+      const elapsed = (Date.now() - runStart) / 1000;
+      const batchSec = (Date.now() - batchStart) / 1000;
+      const avgPerPage = elapsed / pagesCompleted;
+      const remaining = avgPerPage * (pagesToProcess.length - pagesCompleted);
+      const etaStr = remaining > 0
+        ? `ETA ${Math.ceil(remaining / 60)}m ${Math.round(remaining % 60)}s`
+        : 'done';
+      console.log(
+        `${c.dim}  batch ${batchSec.toFixed(0)}s | elapsed ${Math.floor(elapsed / 60)}m ${Math.round(elapsed % 60)}s | ${etaStr}${c.reset}`,
+      );
       console.log('');
     }
 

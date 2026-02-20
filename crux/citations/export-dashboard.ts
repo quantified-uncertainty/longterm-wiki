@@ -1,18 +1,20 @@
 /**
  * Export Citation Accuracy Dashboard Data
  *
- * Reads accuracy data from the SQLite DB and exports a YAML file
- * to data/citation-accuracy/dashboard.yaml so it's available in
- * production (SQLite is not available on Vercel).
+ * Reads accuracy data from the SQLite DB and exports YAML files
+ * to data/citation-accuracy/ so they're available in production
+ * (SQLite is not available on Vercel).
  *
- * Output: data/citation-accuracy/dashboard.yaml
+ * Output:
+ *   data/citation-accuracy/summary.yaml          — global stats, page summaries, domain analysis
+ *   data/citation-accuracy/pages/<pageId>.yaml    — per-page flagged citations
  *
  * Usage:
  *   pnpm crux citations export-dashboard
  *   pnpm crux citations export-dashboard --json
  */
 
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
@@ -286,14 +288,62 @@ export function buildDashboardExport(): DashboardExport | null {
 }
 
 const OUTPUT_DIR = join(PROJECT_ROOT, 'data', 'citation-accuracy');
-const OUTPUT_PATH = join(OUTPUT_DIR, 'dashboard.yaml');
+const PAGES_DIR = join(OUTPUT_DIR, 'pages');
+const SUMMARY_PATH = join(OUTPUT_DIR, 'summary.yaml');
+
+/** Max characters for claimText in exported YAML (dashboard uses line-clamp-2 anyway). */
+const MAX_CLAIM_LENGTH = 150;
+
+function truncateClaim(text: string): string {
+  if (text.length <= MAX_CLAIM_LENGTH) return text;
+  return text.slice(0, MAX_CLAIM_LENGTH) + '...';
+}
 
 export function exportDashboardData(): string | null {
   const data = buildDashboardExport();
   if (!data) return null;
   mkdirSync(OUTPUT_DIR, { recursive: true });
-  writeFileSync(OUTPUT_PATH, yaml.dump(data, { lineWidth: -1, noRefs: true }));
-  return OUTPUT_PATH;
+  mkdirSync(PAGES_DIR, { recursive: true });
+
+  // Group flagged citations by page
+  const flaggedByPage = new Map<string, FlaggedCitation[]>();
+  for (const fc of data.flaggedCitations) {
+    const list = flaggedByPage.get(fc.pageId) || [];
+    list.push({ ...fc, claimText: truncateClaim(fc.claimText) });
+    flaggedByPage.set(fc.pageId, list);
+  }
+
+  // Write per-page flagged citation files
+  // First, remove stale per-page files
+  try {
+    for (const f of readdirSync(PAGES_DIR)) {
+      if (f.endsWith('.yaml')) {
+        unlinkSync(join(PAGES_DIR, f));
+      }
+    }
+  } catch { /* dir may not exist yet */ }
+
+  for (const [pageId, citations] of flaggedByPage) {
+    const pagePath = join(PAGES_DIR, `${pageId}.yaml`);
+    writeFileSync(pagePath, yaml.dump(citations, { lineWidth: -1, noRefs: true }));
+  }
+
+  // Write summary (without flaggedCitations — those are in per-page files)
+  const summary = {
+    exportedAt: data.exportedAt,
+    summary: data.summary,
+    verdictDistribution: data.verdictDistribution,
+    difficultyDistribution: data.difficultyDistribution,
+    pages: data.pages,
+    domainAnalysis: data.domainAnalysis,
+  };
+  writeFileSync(SUMMARY_PATH, yaml.dump(summary, { lineWidth: -1, noRefs: true }));
+
+  // Remove old monolithic file if it exists
+  const oldPath = join(OUTPUT_DIR, 'dashboard.yaml');
+  try { unlinkSync(oldPath); } catch { /* may not exist */ }
+
+  return SUMMARY_PATH;
 }
 
 // ---------------------------------------------------------------------------

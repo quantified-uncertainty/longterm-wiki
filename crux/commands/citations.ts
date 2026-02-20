@@ -37,7 +37,7 @@ const SCRIPTS = {
   'extract-quotes': {
     script: 'citations/extract-quotes.ts',
     description: 'Extract supporting quotes from cited sources',
-    passthrough: ['ci', 'json', 'all', 'limit', 'recheck'],
+    passthrough: ['ci', 'json', 'all', 'limit', 'recheck', 'concurrency', 'dry-run'],
     positional: true,
   },
   'quote-report': {
@@ -54,7 +54,7 @@ const SCRIPTS = {
   'check-accuracy': {
     script: 'citations/check-accuracy.ts',
     description: 'Check if wiki claims accurately represent cited sources',
-    passthrough: ['ci', 'json', 'all', 'limit', 'recheck'],
+    passthrough: ['ci', 'json', 'all', 'limit', 'recheck', 'concurrency', 'dry-run'],
     positional: true,
   },
   'normalize-footnotes': {
@@ -67,6 +67,12 @@ const SCRIPTS = {
     script: 'citations/export-dashboard.ts',
     description: 'Export accuracy data as YAML for the internal dashboard',
     passthrough: ['json'],
+  },
+  'fix-inaccuracies': {
+    script: 'citations/fix-inaccuracies.ts',
+    description: 'Fix flagged citation inaccuracies using LLM-generated corrections',
+    passthrough: ['apply', 'verdict', 'max-score', 'model', 'json'],
+    positional: true,
   },
 };
 
@@ -86,6 +92,8 @@ ${commandList}
 Options:
   --all             Process all pages with citations
   --limit=N         Limit number of pages to process (with --all)
+  --concurrency=N   Process N pages in parallel (default: 1)
+  --dry-run         Show what would be processed without running
   --recheck         Re-process already-handled pages
   --refetch         Re-fetch source URLs (verify-quotes only)
   --broken          Show only broken citations/quotes
@@ -109,5 +117,9 @@ Examples:
   crux citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
   crux citations normalize-footnotes --fix <id>     Fix one page
   crux citations export-dashboard                  Export data for web dashboard
+  crux citations fix-inaccuracies                   Dry-run fix proposals for all flagged
+  crux citations fix-inaccuracies --apply           Apply fixes to pages
+  crux citations fix-inaccuracies <id>              Fix one page
+  crux citations fix-inaccuracies --max-score=0.5   Only worst citations
 `;
 }

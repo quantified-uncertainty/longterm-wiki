@@ -1,0 +1,24 @@
+exportedAt: '2026-02-20T00:11:32.074Z'
+summary:
+  totalCitations: 1
+  checkedCitations: 1
+  accurateCitations: 1
+  inaccurateCitations: 0
+  unsupportedCitations: 0
+  minorIssueCitations: 0
+  uncheckedCitations: 0
+  averageScore: 0.9
+verdictDistribution:
+  accurate: 1
+difficultyDistribution: {}
+pages:
+  - pageId: p1
+    totalCitations: 1
+    checked: 1
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    minorIssues: 0
+    accuracyRate: 1
+    avgScore: 0.9
+domainAnalysis: []

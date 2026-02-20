@@ -420,89 +420,116 @@ export async function fetchCitationUrl(url: string): Promise<FetchResult> {
     };
   }
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': FETCH_USER_AGENT,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      redirect: 'follow',
-    });
+  const MAX_RETRIES = 2;
 
-    const status = response.status;
-    const contentType = response.headers.get('content-type') || '';
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': FETCH_USER_AGENT,
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        redirect: 'follow',
+      });
 
-    if (!response.ok) {
+      const status = response.status;
+      const contentType = response.headers.get('content-type') || '';
+
+      // Retry on 5xx server errors and 429 rate limits
+      if ((status >= 500 || status === 429) && attempt < MAX_RETRIES) {
+        const delay = Math.pow(2, attempt + 1) * 1000;
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+
+      if (!response.ok) {
+        return {
+          httpStatus: status,
+          pageTitle: null,
+          contentSnippet: null,
+          contentLength: 0,
+          contentType,
+          fullHtml: null,
+          fullText: null,
+          error: `HTTP ${status}`,
+        };
+      }
+
+      const isHtml = contentType.includes('text/html') || contentType.includes('application/xhtml');
+      const isPdf = contentType.includes('application/pdf');
+
+      if (isPdf) {
+        return {
+          httpStatus: status,
+          pageTitle: '(PDF document)',
+          contentSnippet: null,
+          contentLength: parseInt(response.headers.get('content-length') || '0', 10),
+          contentType,
+          fullHtml: null,
+          fullText: null,
+          error: null,
+        };
+      }
+
+      if (!isHtml) {
+        return {
+          httpStatus: status,
+          pageTitle: null,
+          contentSnippet: `(non-HTML content: ${contentType})`,
+          contentLength: parseInt(response.headers.get('content-length') || '0', 10),
+          contentType,
+          fullHtml: null,
+          fullText: null,
+          error: null,
+        };
+      }
+
+      const html = await response.text();
+      const title = extractTitle(html);
+      const text = extractTextContent(html);
+      const snippet = text.slice(0, 500);
+
       return {
         httpStatus: status,
+        pageTitle: title,
+        contentSnippet: snippet || null,
+        contentLength: html.length,
+        contentType,
+        fullHtml: html,
+        fullText: text,
+        error: null,
+      };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      const isTransient = message.includes('abort') || message.includes('ECONNRESET')
+        || message.includes('socket hang up') || message.includes('timeout');
+
+      // Retry transient network errors
+      if (isTransient && attempt < MAX_RETRIES) {
+        const delay = Math.pow(2, attempt + 1) * 1000;
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+
+      return {
+        httpStatus: 0,
         pageTitle: null,
         contentSnippet: null,
         contentLength: 0,
-        contentType,
+        contentType: null,
         fullHtml: null,
         fullText: null,
-        error: `HTTP ${status}`,
+        error: message.includes('abort') ? 'timeout' : message,
       };
     }
-
-    const isHtml = contentType.includes('text/html') || contentType.includes('application/xhtml');
-    const isPdf = contentType.includes('application/pdf');
-
-    if (isPdf) {
-      return {
-        httpStatus: status,
-        pageTitle: '(PDF document)',
-        contentSnippet: null,
-        contentLength: parseInt(response.headers.get('content-length') || '0', 10),
-        contentType,
-        fullHtml: null,
-        fullText: null,
-        error: null,
-      };
-    }
-
-    if (!isHtml) {
-      return {
-        httpStatus: status,
-        pageTitle: null,
-        contentSnippet: `(non-HTML content: ${contentType})`,
-        contentLength: parseInt(response.headers.get('content-length') || '0', 10),
-        contentType,
-        fullHtml: null,
-        fullText: null,
-        error: null,
-      };
-    }
-
-    const html = await response.text();
-    const title = extractTitle(html);
-    const text = extractTextContent(html);
-    const snippet = text.slice(0, 500);
-
-    return {
-      httpStatus: status,
-      pageTitle: title,
-      contentSnippet: snippet || null,
-      contentLength: html.length,
-      contentType,
-      fullHtml: html,
-      fullText: text,
-      error: null,
-    };
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    return {
-      httpStatus: 0,
-      pageTitle: null,
-      contentSnippet: null,
-      contentLength: 0,
-      contentType: null,
-      fullHtml: null,
-      fullText: null,
-      error: message.includes('abort') ? 'timeout' : message,
-    };
   }
+
+  // Unreachable, but TypeScript needs it
+  return {
+    httpStatus: 0, pageTitle: null, contentSnippet: null, contentLength: 0,
+    contentType: null, fullHtml: null, fullText: null, error: 'max retries exceeded',
+  };
 }
 
 /**
