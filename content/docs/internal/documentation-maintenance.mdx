@@ -13,6 +13,8 @@ readerImportance: 9.5
 researchImportance: 8.5
 entityType: internal
 ---
+import {EntityLink} from '@components/wiki';
+
 
 Internal documentation becomes stale quickly. This page outlines strategies for keeping internal pages (served at `/wiki/E<id>`) accurate.
 
@@ -83,9 +85,9 @@ Schedule quarterly reviews of key docs:
 
 | Doc | Review Focus |
 |-----|--------------|
-| [Architecture](/internal/architecture/) | Are diagrams still accurate? |
-| [Automation Tools](/internal/automation-tools/) | Do all commands still work? |
-| [Content Database](/internal/content-database/) | Is schema current? |
+| <EntityLink id="architecture">Architecture</EntityLink> | Are diagrams still accurate? |
+| <EntityLink id="automation-tools">Automation Tools</EntityLink> | Do all commands still work? |
+| <EntityLink id="content-database">Content Database</EntityLink> | Is schema current? |
 
 ---
 
@@ -213,17 +215,17 @@ When reviewing a PR that touches `/scripts/`:
 
 | Changed File | Update These Docs |
 |--------------|-------------------|
-| `scripts/content/page-creator.mjs` | [Architecture](/internal/architecture/), [Automation Tools](/internal/automation-tools/) |
-| `scripts/lib/knowledge-db.mjs` | [Content Database](/internal/content-database/), [Architecture](/internal/architecture/) |
-| `scripts/crux.mjs` or `commands/*` | [Automation Tools](/internal/automation-tools/) |
-| `src/content.config.ts` | [Page Types](/internal/page-types/) |
-| Any validation script | [Automation Tools](/internal/automation-tools/) |
-| `.env` variables | [Architecture](/internal/architecture/#environment-variables) |
+| `scripts/content/page-creator.mjs` | <EntityLink id="architecture">Architecture</EntityLink>, <EntityLink id="automation-tools">Automation Tools</EntityLink> |
+| `scripts/lib/knowledge-db.mjs` | <EntityLink id="content-database">Content Database</EntityLink>, <EntityLink id="architecture">Architecture</EntityLink> |
+| `scripts/crux.mjs` or `commands/*` | <EntityLink id="automation-tools">Automation Tools</EntityLink> |
+| `src/content.config.ts` | <EntityLink id="page-types">Page Types</EntityLink> |
+| Any validation script | <EntityLink id="automation-tools">Automation Tools</EntityLink> |
+| `.env` variables | <EntityLink id="architecture">Architecture</EntityLink> |
 
 ---
 
 ## Related
 
-- [Architecture](/internal/architecture/) - System overview
-- [Automation Tools](/internal/automation-tools/) - CLI reference
-- [About This Wiki](/internal/about-this-wiki/) - Contributor overview
+- <EntityLink id="architecture">Architecture</EntityLink> - System overview
+- <EntityLink id="automation-tools">Automation Tools</EntityLink> - CLI reference
+- <EntityLink id="about-this-wiki">About This Wiki</EntityLink> - Contributor overview

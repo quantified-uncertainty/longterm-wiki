@@ -21,7 +21,9 @@ ratings:
   completeness_reasoning: "Comprehensive view of infrastructure state and future work, well-organized with clear status indicators"
 entityType: internal
 ---
-This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the [Enhancement Queue](/internal/enhancement-queue/).
+import {EntityLink} from '@components/wiki';
+
+This file tracks future infrastructure improvements and project priorities. For content-specific tasks, see the <EntityLink id="enhancement-queue">Enhancement Queue</EntityLink>.
 
 ## Current State (January 2026)
 

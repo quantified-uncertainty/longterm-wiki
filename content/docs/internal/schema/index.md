@@ -9,7 +9,7 @@ sidebar:
 evergreen: true
 ---
 
-import {Mermaid} from '@components/wiki';
+import {Mermaid, EntityLink} from '@components/wiki';
 
 This wiki is backed by a typed data layer defined in `data/schema.ts` using [Zod](https://zod.dev). All YAML data files are validated against these schemas at build time. This section documents the full schema, how data flows through the system, and how entity types relate to each other.
 
@@ -62,7 +62,7 @@ Each entity stores its `numericId` directly in its source file (YAML `numericId:
 
 ### Entity Types (24 canonical + aliases)
 
-Entities are the primary data objects. Each has a `type` field from a controlled vocabulary of **24 canonical types**, plus legacy aliases for backward compatibility. See [Entity Type Reference](/internal/schema/entities/) for full details.
+Entities are the primary data objects. Each has a `type` field from a controlled vocabulary of **24 canonical types**, plus legacy aliases for backward compatibility. See <EntityLink id="entities">Entity Type Reference</EntityLink> for full details.
 
 **Core groupings:**
 
@@ -89,8 +89,8 @@ The build script merges both sources into the final database.
 
 ## Schema Sections
 
-- **[Entity Type Reference](/internal/schema/entities/)** — Every entity type with its fields, enums, and usage
-- **[Diagrams](/internal/schema/diagrams/)** — Visual ER diagrams, class diagrams, and relationship maps
+- **<EntityLink id="entities">Entity Type Reference</EntityLink>** — Every entity type with its fields, enums, and usage
+- **<EntityLink id="diagrams">Diagrams</EntityLink>** — Visual ER diagrams, class diagrams, and relationship maps
 - **[Fact Dashboard](/internal/facts/)** — Browse canonical facts by entity
 
 ## Validation
@@ -133,4 +133,4 @@ Every entity shares these base fields:
 }
 ```
 
-See [Entity Type Reference](/internal/schema/entities/) for type-specific fields like `severity`, `likelihood`, `orgType`, `positions`, etc.
+See <EntityLink id="entities">Entity Type Reference</EntityLink> for type-specific fields like `severity`, `likelihood`, `orgType`, `positions`, etc.

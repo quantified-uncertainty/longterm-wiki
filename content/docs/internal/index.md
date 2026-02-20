@@ -8,33 +8,35 @@ sidebar:
   label: Overview
 evergreen: true
 ---
+import {EntityLink} from '@components/wiki';
+
 
 This section contains internal documentation for maintaining and contributing to the knowledge base.
 
 ## Getting Started
 
-- [About This Wiki](/internal/about-this-wiki/) - Comprehensive overview of how the wiki works, technical architecture, and content organization
+- <EntityLink id="about-this-wiki">About This Wiki</EntityLink> - Comprehensive overview of how the wiki works, technical architecture, and content organization
 
 ## Automation and Tools
 
-- [Automation Tools](/internal/automation-tools/) - Complete reference for all scripts and CLI workflows
-- [Content Database](/internal/content-database/) - SQLite-based system for indexing and AI summaries
+- <EntityLink id="automation-tools">Automation Tools</EntityLink> - Complete reference for all scripts and CLI workflows
+- <EntityLink id="content-database">Content Database</EntityLink> - SQLite-based system for indexing and AI summaries
 
 ## Style Guides
 
-- [Knowledge Base Style Guide](/internal/knowledge-base/) - Guidelines for risk and response pages (kb-2.0)
-- [Model Style Guide](/internal/models/) - Guidelines for analytical model pages
-- [Mermaid Diagrams](/internal/mermaid-diagrams/) - How to create diagrams
+- <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> - Guidelines for risk and response pages (kb-2.0)
+- <EntityLink id="models">Model Style Guide</EntityLink> - Guidelines for analytical model pages
+- <EntityLink id="mermaid-diagrams">Mermaid Diagrams</EntityLink> - How to create diagrams
 
 ## Project Management
 
-- [Enhancement Queue](/internal/enhancement-queue/) - Track content enhancement progress across all page types
-- [Project Roadmap](/internal/project-roadmap/) - Future work, infrastructure improvements, and tracking
+- <EntityLink id="enhancement-queue">Enhancement Queue</EntityLink> - Track content enhancement progress across all page types
+- <EntityLink id="project-roadmap">Project Roadmap</EntityLink> - Future work, infrastructure improvements, and tracking
 
 ## Technical Reports
 
 - [Internal Reports](/internal/reports/) - Technical research and design decisions
-  - [Causal Diagram Visualization](/internal/reports/causal-diagram-visualization/) - Tools, literature, and best practices
+  - <EntityLink id="causal-diagram-visualization">Causal Diagram Visualization</EntityLink> - Tools, literature, and best practices
 
 ---
 
@@ -56,4 +58,4 @@ npm run build:data
 npm run dev
 ```
 
-See [Automation Tools](/internal/automation-tools/) for complete command reference.
+See <EntityLink id="automation-tools">Automation Tools</EntityLink> for complete command reference.

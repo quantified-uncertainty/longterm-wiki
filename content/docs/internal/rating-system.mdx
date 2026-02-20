@@ -18,6 +18,8 @@ lastEdited: "2026-02-17"
 evergreen: true
 update_frequency: 60
 ---
+import {EntityLink} from '@components/wiki';
+
 # Rating System
 
 LongtermWiki uses a multi-dimensional rating system combining LLM-graded subscores with automated metrics to produce a derived quality score (0-100).
@@ -118,7 +120,7 @@ How comprehensive is the coverage?
 
 #### Objectivity
 
-Epistemic honesty, language neutrality, and analytical (not prescriptive) tone. See [Common Writing Principles](/internal/common-writing-principles/) for full guidance.
+Epistemic honesty, language neutrality, and analytical (not prescriptive) tone. See <EntityLink id="common-writing-principles">Common Writing Principles</EntityLink> for full guidance.
 
 | Score | Meaning |
 |-------|---------|
@@ -234,14 +236,14 @@ npm run crux -- validate templates    # Template structure
 npm run crux -- validate unified --rules=placeholders  # Incomplete content
 ```
 
-See [Page Types](/internal/page-types/) for which pages are validated.
+See <EntityLink id="page-types">Page Types</EntityLink> for which pages are validated.
 
 ---
 
 ## Related Documentation
 
-- [Common Writing Principles](/internal/common-writing-principles/) - Cross-cutting writing standards (objectivity dimension)
-- [Models Style Guide](/internal/models-style-guide/) - Requirements for analytical model pages
-- [Risk Style Guide](/internal/risk-style-guide/) - Requirements for risk analysis pages
-- [Response Style Guide](/internal/response-style-guide/) - Requirements for intervention pages
-- [Page Types](/internal/page-types/) - How page types affect validation
+- <EntityLink id="common-writing-principles">Common Writing Principles</EntityLink> - Cross-cutting writing standards (objectivity dimension)
+- <EntityLink id="models-style-guide">Models Style Guide</EntityLink> - Requirements for analytical model pages
+- <EntityLink id="risk-style-guide">Risk Style Guide</EntityLink> - Requirements for risk analysis pages
+- <EntityLink id="response-style-guide">Response Style Guide</EntityLink> - Requirements for intervention pages
+- <EntityLink id="page-types">Page Types</EntityLink> - How page types affect validation
