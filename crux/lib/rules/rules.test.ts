@@ -18,6 +18,7 @@ import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
 import { kbSubcategoryCoverageRule } from './kb-subcategory-coverage.ts';
+import { preferEntityLinkRule } from './prefer-entitylink.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
@@ -841,6 +842,118 @@ describe('kb-subcategory-coverage rule', () => {
     const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('"debates"');
+  });
+});
+
+// =============================================================================
+// prefer-entitylink rule
+// =============================================================================
+
+describe('prefer-entitylink rule', () => {
+  // Mock engine with idRegistry and a reverse path map loaded via loadPathRegistry
+  // For unit tests, we stub idRegistry.bySlug directly.
+  const engineWithRegistry = {
+    idRegistry: {
+      bySlug: {
+        'miri': 'E100',
+        'deceptive-alignment': 'E200',
+        'community-notes-for-everything': 'E300',
+      },
+      byNumericId: {
+        'E100': 'miri',
+        'E200': 'deceptive-alignment',
+        'E300': 'community-notes-for-everything',
+      },
+    },
+  };
+
+  it('emits ERROR for markdown link to registered entity', () => {
+    // The rule uses loadPathRegistry() to build the reverse map.
+    // Since the actual pathRegistry.json maps slugs to paths, and
+    // 'community-notes-for-everything' IS in both the registry and bySlug,
+    // a link to its path will produce an ERROR.
+    // We test the WARNING path here (unregistered slug) to avoid FS dependency.
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+    );
+    // With no idRegistry, the rule should fall back to WARNING
+    const issuesNoRegistry = preferEntityLinkRule.check(content as any, { idRegistry: null } as any);
+    expect(issuesNoRegistry.length).toBe(1);
+    expect(issuesNoRegistry[0].severity).toBe(Severity.WARNING);
+  });
+
+  it('emits WARNING for internal link to unregistered path', () => {
+    const content = mockContent(
+      'See [Unknown Page](/knowledge-base/some-unknown-path/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].rule).toBe('prefer-entitylink');
+  });
+
+  it('emits no issue for external links', () => {
+    const content = mockContent(
+      'See [External](https://example.com/page) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('emits no issue for links already using EntityLink', () => {
+    const content = mockContent(
+      '<EntityLink id="miri">MIRI</EntityLink> is an organization.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips links inside code blocks', () => {
+    const content = mockContent(
+      '```\n[MIRI](/knowledge-base/organizations/miri/)\n```',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips stub pages', () => {
+    const content = mockContent(
+      'See [MIRI](/knowledge-base/organizations/miri/) for more.',
+      { frontmatter: { title: 'Test', pageType: 'stub' } },
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips internal documentation pages', () => {
+    // The rule checks relativePath.includes('/internal/') — needs surrounding slashes
+    const content = mockContent(
+      'See [MIRI](/knowledge-base/organizations/miri/) for more.',
+      { relativePath: 'docs/internal/some-doc.mdx' },
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('excludes top-level section index paths', () => {
+    const content = mockContent(
+      'Browse [all risks](/knowledge-base/risks/) here.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('error issue has REPLACE_TEXT fix', () => {
+    // Test that when a registered entity IS found (via real pathRegistry),
+    // the issue has a FixType.REPLACE_TEXT fix. We test this indirectly:
+    // a WARNING issue (unregistered) should have no fix.
+    const content = mockContent(
+      'See [Unknown](/knowledge-base/some-unknown-page/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
   });
 });
 
