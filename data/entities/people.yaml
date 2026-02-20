@@ -1228,3 +1228,80 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+
+- id: nick-beckstead
+  numericId: E861
+  type: researcher
+  title: Nick Beckstead
+  website: https://www.nickbeckstead.com/
+  relatedEntries:
+    - id: open-philanthropy
+      type: organization
+    - id: ftx-future-fund
+      type: organization
+    - id: toby-ord
+      type: researcher
+  customFields:
+    - label: Role
+      value: Philosopher, longtermist philanthropist, former Open Philanthropy program officer
+    - label: Known For
+      value: Longtermism, existential risk, FTX Future Fund leadership, Secure AI Project
+  sources:
+    - title: Nick Beckstead's website
+      url: https://www.nickbeckstead.com/
+    - title: Nick Beckstead's PhD thesis - On the Overwhelming Importance of Shaping the Far Future
+      url: https://rucore.libraries.rutgers.edu/rutgers-lib/40469/
+  description: >-
+    Nick Beckstead is a philosopher and philanthropist who completed his PhD at Rutgers University in 2013
+    with a dissertation arguing for the overwhelming importance of shaping the far future—one of the first
+    rigorous academic defenses of longtermism. He served as a program officer at Open Philanthropy, where
+    he managed a substantial longtermism portfolio focusing on existential risk reduction and global catastrophic
+    risk. He later became a founding team member of the FTX Future Fund before its collapse in November 2022
+    when FTX filed for bankruptcy. He subsequently founded the Secure AI Project, a policy advocacy organization
+    focused on legislative requirements for AI safety protocols and whistleblower protections.
+  clusters:
+    - ai-safety
+    - community
+    - governance
+  lastUpdated: 2026-02
+
+- id: will-macaskill
+  numericId: E862
+  type: researcher
+  title: Will MacAskill
+  website: https://www.willmacaskill.com/
+  relatedEntries:
+    - id: giving-what-we-can
+      type: organization
+    - id: cea
+      type: organization
+    - id: toby-ord
+      type: researcher
+    - id: open-philanthropy
+      type: organization
+  customFields:
+    - label: Role
+      value: Associate Professor of Philosophy at Oxford, co-founder of effective altruism movement
+    - label: Known For
+      value: Effective altruism, longtermism, "What We Owe the Future", Giving What We Can
+  sources:
+    - title: Will MacAskill's website
+      url: https://www.willmacaskill.com/
+    - title: What We Owe the Future (book)
+      url: https://www.basicbooks.com/titles/william-macaskill/what-we-owe-the-future/9781541618626/
+    - title: Doing Good Better (book)
+      url: https://www.goodreads.com/book/show/23398748-doing-good-better
+  description: >-
+    Will MacAskill is an Associate Professor of Philosophy at Oxford University and a central figure in
+    the effective altruism (EA) movement. In 2009, he co-founded Giving What We Can with Toby Ord, an
+    organization that encourages members to pledge 10% of their income to highly effective charities.
+    He also co-founded the Centre for Effective Altruism. His 2015 book "Doing Good Better" popularized
+    EA principles to a mainstream audience. His 2022 book "What We Owe the Future" made the case for
+    longtermism—the view that we should give significant weight to the wellbeing of future generations—
+    and brought widespread attention to existential risk and AI safety. He coined the term "effective
+    altruism" and has been instrumental in directing billions of dollars toward high-impact causes including
+    global health, animal welfare, and existential risk reduction.
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02
