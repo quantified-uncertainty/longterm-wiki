@@ -307,6 +307,8 @@ function WithSidebar({
   children: React.ReactNode;
 }) {
   const sidebarType = detectSidebarType(entityPath);
+  const sections = sidebarType && !hideSidebar ? getWikiNav(sidebarType, entityPath) : [];
+  const hasSidebar = sections.length > 0;
 
   // Compute content container class:
   // - hideSidebar + fullWidth: wide centered layout, no sidebar
@@ -317,15 +319,14 @@ function WithSidebar({
     ? "max-w-[90rem] mx-auto px-8 py-6"
     : fullWidth
       ? "w-full px-3 py-4"
-      : sidebarType
+      : hasSidebar
         ? "max-w-[65rem] mx-auto px-8 py-4"
         : "max-w-7xl mx-auto px-6 py-8";
 
-  if (!sidebarType || hideSidebar) {
+  if (!sections.length) {
     return <div className={contentClass}>{children}</div>;
   }
 
-  const sections = getWikiNav(sidebarType, entityPath);
   return (
     <SidebarProvider>
       <WikiSidebar sections={sections} />
