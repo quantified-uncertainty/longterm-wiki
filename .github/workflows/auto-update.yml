@@ -373,16 +373,15 @@ jobs:
             fi
 
             cat >> "$BODY_FILE" <<'PREOF'
-          ### Review Checklist
+          ### Automated Review
 
-          > **This PR requires the `reviewed` label before it can be merged.**
-          > The review gate CI check will fail until a human reviewer adds the label.
+          The **citation audit gate** will automatically:
+          1. Extract and verify citations on all changed pages
+          2. Check claim accuracy against source material
+          3. Auto-fix inaccurate citations where possible
+          4. Report remaining issues
 
-          - [ ] Spot-check updated pages for accuracy
-          - [ ] Verify no hallucinated content was added (check risk scores above)
-          - [ ] Review any broken citations flagged above
-          - [ ] Check that EntityLinks resolve correctly
-          - [ ] Confirm validation passes
+          The audit gate CI check will pass if no inaccurate citations remain.
 
           ---
           *This PR was created automatically by the auto-update workflow.*

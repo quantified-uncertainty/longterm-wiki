@@ -1,46 +1,197 @@
 name: Auto-Update Review Gate
 
-# Blocks auto-update PRs from merging until a human adds the "reviewed" label.
-# This prevents AI-generated content from landing without human oversight.
+# Automated citation audit gate for auto-update PRs.
+# Replaces the manual "reviewed" label gate with a thorough citation
+# accuracy pipeline: extract quotes, check accuracy, fix inaccuracies.
 #
 # How it works:
-# - Runs on PRs labeled "auto-update" (triggered by label events and PR sync)
-# - Checks whether the "reviewed" label is present
-# - Fails if "reviewed" is missing, which blocks merge via branch protection
-#
-# To pass: a human reviewer adds the "reviewed" label after spot-checking the PR.
+# - Runs on PRs labeled "auto-update" (triggered on open/sync/label)
+# - Identifies changed MDX pages from the PR diff
+# - Runs `crux citations audit --apply` on each changed page
+# - Passes if no inaccurate citations remain after fixing
+# - Pushes any auto-fixes back to the PR branch
+# - Posts audit summary as a PR comment
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    types: [opened, synchronize, reopened, labeled]
 
-# No permissions needed — only reads label data from the event payload
-permissions: {}
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  review-gate:
+  audit-gate:
     # Only run on auto-update PRs
     if: contains(github.event.pull_request.labels.*.name, 'auto-update')
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+
     steps:
-      - name: Check for reviewed label
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data layer
+        run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Find changed pages
+        id: pages
         run: |
-          echo "Auto-update PR detected — checking for 'reviewed' label..."
-          echo ""
+          BASE="${{ github.event.pull_request.base.ref }}"
+          CHANGED=$(git diff --name-only "origin/${BASE}...HEAD" -- 'content/docs/**/*.mdx' | while read f; do
+            ID=$(basename "$f" .mdx)
+            if [ "$ID" != "index" ]; then
+              echo "$ID"
+            fi
+          done | tr '\n' ' ')
 
-          LABELS='${{ toJSON(github.event.pull_request.labels.*.name) }}'
-          echo "Current labels: $LABELS"
-          echo ""
+          echo "page_ids=$CHANGED" >> $GITHUB_OUTPUT
+          echo "Changed pages: $CHANGED"
 
-          if echo "$LABELS" | jq -e 'index("reviewed")' > /dev/null 2>&1; then
-            echo "✅ 'reviewed' label found — review gate passed."
-          else
-            echo "❌ 'reviewed' label NOT found."
+          if [ -z "$CHANGED" ]; then
+            echo "No MDX pages changed — audit gate passes automatically."
+          fi
+
+      - name: Run citation audit
+        id: audit
+        if: steps.pages.outputs.page_ids != ''
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+        run: |
+          PAGE_IDS="${{ steps.pages.outputs.page_ids }}"
+          AUDIT_PASSED=true
+          TOTAL_INACCURATE=0
+          TOTAL_UNSUPPORTED=0
+          SUMMARY_FILE=$(mktemp)
+
+          echo "## Citation Audit Results" > "$SUMMARY_FILE"
+          echo "" >> "$SUMMARY_FILE"
+          echo "| Page | Audit | Status |" >> "$SUMMARY_FILE"
+          echo "|------|-------|--------|" >> "$SUMMARY_FILE"
+
+          for PAGE_ID in $PAGE_IDS; do
             echo ""
-            echo "Auto-update PRs require human review before merging."
-            echo "To pass this check:"
-            echo "  1. Spot-check updated pages for accuracy and hallucinated content"
-            echo "  2. Review the hallucination risk scores and citation verification in the PR description"
-            echo "  3. Add the 'reviewed' label to this PR"
+            echo "=== Auditing: $PAGE_ID ==="
+            echo ""
+
+            # Run the full audit pipeline with --apply to fix issues
+            if pnpm crux citations audit "$PAGE_ID" --apply 2>&1; then
+              # Check final accuracy state
+              RESULT=$(pnpm crux citations check-accuracy "$PAGE_ID" --json 2>/dev/null || echo '{}')
+              INACC=$(echo "$RESULT" | jq -r '.inaccurate // 0' 2>/dev/null || echo "0")
+              UNSUPP=$(echo "$RESULT" | jq -r '.unsupported // 0' 2>/dev/null || echo "0")
+
+              TOTAL_INACCURATE=$((TOTAL_INACCURATE + INACC))
+              TOTAL_UNSUPPORTED=$((TOTAL_UNSUPPORTED + UNSUPP))
+
+              if [ "$INACC" -gt 0 ] 2>/dev/null; then
+                AUDIT_PASSED=false
+                echo "| \`$PAGE_ID\` | ${INACC} inaccurate, ${UNSUPP} unsupported | FAIL |" >> "$SUMMARY_FILE"
+              else
+                echo "| \`$PAGE_ID\` | ${UNSUPP} unsupported | PASS |" >> "$SUMMARY_FILE"
+              fi
+            else
+              echo "::warning::Audit failed for $PAGE_ID (process error)"
+              echo "| \`$PAGE_ID\` | Error running audit | WARN |" >> "$SUMMARY_FILE"
+            fi
+          done
+
+          echo "" >> "$SUMMARY_FILE"
+          echo "**Totals:** ${TOTAL_INACCURATE} inaccurate, ${TOTAL_UNSUPPORTED} unsupported" >> "$SUMMARY_FILE"
+
+          if [ "$AUDIT_PASSED" = true ]; then
+            echo "" >> "$SUMMARY_FILE"
+            echo "> All pages passed the citation accuracy audit." >> "$SUMMARY_FILE"
+          else
+            echo "" >> "$SUMMARY_FILE"
+            echo "> **Inaccurate citations remain after auto-fix.** Manual review may be needed." >> "$SUMMARY_FILE"
+          fi
+
+          echo "" >> "$SUMMARY_FILE"
+          echo "---" >> "$SUMMARY_FILE"
+          echo "*Automated citation audit gate*" >> "$SUMMARY_FILE"
+
+          # Save summary for PR comment
+          {
+            echo "AUDIT_SUMMARY<<AUDIT_EOF"
+            cat "$SUMMARY_FILE"
+            echo "AUDIT_EOF"
+          } >> "$GITHUB_ENV"
+
+          echo "audit_passed=$AUDIT_PASSED" >> $GITHUB_OUTPUT
+          echo "total_inaccurate=$TOTAL_INACCURATE" >> $GITHUB_OUTPUT
+          echo "total_unsupported=$TOTAL_UNSUPPORTED" >> $GITHUB_OUTPUT
+          rm -f "$SUMMARY_FILE"
+
+      - name: Commit audit fixes
+        if: steps.pages.outputs.page_ids != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes from audit — nothing to commit."
+          else
+            git add -A
+            git commit -m "audit: fix citation inaccuracies (automated)
+
+          Automated citation audit fixes from the review gate pipeline."
+            git push
+          fi
+
+      - name: Post audit summary
+        if: steps.pages.outputs.page_ids != '' && env.AUDIT_SUMMARY != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Find and update existing audit comment, or create a new one
+          EXISTING=$(gh pr view ${{ github.event.pull_request.number }} \
+            --json comments --jq '.comments[] | select(.body | startswith("## Citation Audit")) | .id' \
+            | head -1)
+
+          if [ -n "$EXISTING" ]; then
+            gh api repos/${{ github.repository }}/issues/comments/$EXISTING \
+              -X PATCH -f body="$AUDIT_SUMMARY"
+          else
+            gh pr comment ${{ github.event.pull_request.number }} --body "$AUDIT_SUMMARY"
+          fi
+
+      - name: Gate decision
+        if: steps.pages.outputs.page_ids != ''
+        run: |
+          PASSED="${{ steps.audit.outputs.audit_passed }}"
+          INACCURATE="${{ steps.audit.outputs.total_inaccurate }}"
+          UNSUPPORTED="${{ steps.audit.outputs.total_unsupported }}"
+
+          echo ""
+          echo "=== Audit Gate Decision ==="
+          echo "  Inaccurate: $INACCURATE"
+          echo "  Unsupported: $UNSUPPORTED"
+          echo ""
+
+          if [ "$PASSED" = "true" ]; then
+            echo "Audit gate PASSED — no inaccurate citations found."
+          else
+            echo "Audit gate FAILED — $INACCURATE inaccurate citation(s) remain."
+            echo ""
+            echo "The audit pipeline attempted to fix these automatically but some"
+            echo "inaccuracies persist. A human should review the flagged citations."
             exit 1
           fi

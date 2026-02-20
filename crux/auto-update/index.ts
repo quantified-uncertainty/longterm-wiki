@@ -8,6 +8,7 @@ export { fetchAllSources, loadSources, loadFetchTimes, loadSeenItems, saveSeenIt
 export { buildDigest, normalizeTitle } from './digest.ts';
 export { routeDigest } from './page-router.ts';
 export { runPipeline } from './orchestrator.ts';
+export { runAuditGate } from './ci-audit.ts';
 export type {
   NewsSource, SourcesConfig,
   FeedItem, DigestItem, NewsDigest,

@@ -27,6 +27,7 @@ import {
   loadFetchTimes,
   loadSeenItems,
 } from '../auto-update/index.ts';
+import { runAuditGate } from '../auto-update/ci-audit.ts';
 import type { AutoUpdateOptions, RunReport } from '../auto-update/types.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
@@ -424,6 +425,34 @@ async function history(args: string[], options: AutoUpdateOptions): Promise<Comm
   return { output, exitCode: 0 };
 }
 
+/**
+ * Run the citation audit gate on auto-update PR pages.
+ * Replaces the manual "reviewed" label gate.
+ */
+async function auditGate(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
+  const diff = args.includes('--diff') || options.diff === true;
+  const apply = options.apply === true;
+  const verbose = options.verbose || false;
+  const baseBranch = typeof options.base === 'string' ? options.base : 'main';
+
+  // Page IDs from positional args (excluding flags)
+  const pageIds = args.filter(a => !a.startsWith('--'));
+
+  const result = await runAuditGate({
+    pageIds: diff ? undefined : pageIds.length > 0 ? pageIds : undefined,
+    baseBranch,
+    apply,
+    verbose,
+    json: options.json || options.ci,
+  });
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify(result, null, 2), exitCode: result.passed ? 0 : 1 };
+  }
+
+  return { output: result.markdownSummary, exitCode: result.passed ? 0 : 1 };
+}
+
 // ── Command Registry ────────────────────────────────────────────────────────
 
 export const commands = {
@@ -433,6 +462,7 @@ export const commands = {
   plan,
   sources,
   history,
+  'audit-gate': auditGate,
 };
 
 export function getHelp(): string {
@@ -450,6 +480,7 @@ Commands:
   digest               Fetch sources and show news digest only
   sources              List configured news sources
   history [count]      Show past auto-update runs
+  audit-gate           Run citation audit gate on changed pages (CI)
 
 Options:
   --budget=N           Max dollars to spend per run (default: 50)
@@ -457,6 +488,9 @@ Options:
   --sources=a,b,c      Only fetch these source IDs
   --dry-run            Run pipeline but skip page improvements
   --check              (sources only) Test all RSS/Atom source URLs for reachability
+  --diff               (audit-gate) Auto-detect changed pages from git diff
+  --apply              (audit-gate) Auto-fix inaccurate citations
+  --base=BRANCH        (audit-gate) Base branch for diff (default: main)
   --verbose            Show detailed progress
   --json               Output as JSON
   --ci                 JSON output for CI pipelines
@@ -487,5 +521,7 @@ Examples:
   crux auto-update sources --check               Test all source URLs for reachability
   crux auto-update history                       Show recent runs
   crux auto-update run --dry-run                 Full pipeline without executing
+  crux auto-update audit-gate --diff --apply     Audit changed pages and fix issues
+  crux auto-update audit-gate existential-risk   Audit a specific page
 `;
 }
