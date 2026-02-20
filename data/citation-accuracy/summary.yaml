@@ -1,23 +1,23 @@
-exportedAt: '2026-02-20T16:49:13.897Z'
+exportedAt: '2026-02-20T16:59:13.477Z'
 summary:
-  totalCitations: 1053
-  checkedCitations: 548
-  accurateCitations: 375
-  inaccurateCitations: 21
+  totalCitations: 1099
+  checkedCitations: 577
+  accurateCitations: 383
+  inaccurateCitations: 28
   unsupportedCitations: 16
-  minorIssueCitations: 131
-  uncheckedCitations: 505
-  averageScore: 0.92
+  minorIssueCitations: 144
+  uncheckedCitations: 522
+  averageScore: 0.91
 verdictDistribution:
-  accurate: 375
-  inaccurate: 21
-  minor_issues: 131
+  accurate: 383
+  inaccurate: 28
+  minor_issues: 144
+  not_verifiable: 6
   unsupported: 16
-  not_verifiable: 5
 difficultyDistribution:
-  easy: 414
-  medium: 117
-  hard: 13
+  easy: 423
+  hard: 19
+  medium: 130
 pages:
   - pageId: biosecurity-overview
     totalCitations: 5
@@ -28,6 +28,15 @@ pages:
     minorIssues: 0
     accuracyRate: 0.75
     avgScore: 0.93
+  - pageId: ea-longtermist-wins-losses
+    totalCitations: 46
+    checked: 29
+    accurate: 8
+    inaccurate: 7
+    unsupported: 0
+    minorIssues: 13
+    accuracyRate: 0.7241379310344828
+    avgScore: 0.79
   - pageId: good-judgment
     totalCitations: 82
     checked: 76
@@ -205,13 +214,6 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 1
-  - domain: coefficientgiving.org
-    totalCitations: 3
-    checked: 2
-    accurate: 1
-    inaccurate: 0
-    unsupported: 1
-    inaccuracyRate: 0.5
   - domain: hunton.com
     totalCitations: 2
     checked: 2
@@ -232,6 +234,13 @@ domainAnalysis:
     accurate: 2
     inaccurate: 1
     unsupported: 0
+    inaccuracyRate: 0.3333333333333333
+  - domain: coefficientgiving.org
+    totalCitations: 4
+    checked: 3
+    accurate: 2
+    inaccurate: 0
+    unsupported: 1
     inaccuracyRate: 0.3333333333333333
   - domain: dataguard.com
     totalCitations: 3
@@ -268,6 +277,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 1
     inaccuracyRate: 0.2
+  - domain: en.wikipedia.org
+    totalCitations: 50
+    checked: 13
+    accurate: 11
+    inaccurate: 2
+    unsupported: 0
+    inaccuracyRate: 0.15384615384615385
   - domain: frontiermodelforum.org
     totalCitations: 30
     checked: 30
@@ -289,6 +305,13 @@ domainAnalysis:
     inaccurate: 2
     unsupported: 0
     inaccuracyRate: 0.08695652173913043
+  - domain: forum.effectivealtruism.org
+    totalCitations: 93
+    checked: 61
+    accurate: 54
+    inaccurate: 3
+    unsupported: 2
+    inaccuracyRate: 0.08196721311475409
   - domain: artificialintelligenceact.eu
     totalCitations: 14
     checked: 14
@@ -297,12 +320,12 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: 0.07142857142857142
   - domain: lesswrong.com
-    totalCitations: 34
-    checked: 31
-    accurate: 29
+    totalCitations: 35
+    checked: 32
+    accurate: 30
     inaccurate: 2
     unsupported: 0
-    inaccuracyRate: 0.06451612903225806
+    inaccuracyRate: 0.0625
   - domain: arxiv.org
     totalCitations: 30
     checked: 20
@@ -310,13 +333,6 @@ domainAnalysis:
     inaccurate: 1
     unsupported: 0
     inaccuracyRate: 0.05
-  - domain: forum.effectivealtruism.org
-    totalCitations: 81
-    checked: 51
-    accurate: 48
-    inaccurate: 0
-    unsupported: 2
-    inaccuracyRate: 0.0392156862745098
   - domain: macfound.org
     totalCitations: 53
     checked: 0
@@ -324,13 +340,6 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
-  - domain: en.wikipedia.org
-    totalCitations: 45
-    checked: 10
-    accurate: 10
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: 0
   - domain: samotsvety.org
     totalCitations: 37
     checked: 0
@@ -339,7 +348,7 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: null
   - domain: rethinkpriorities.org
-    totalCitations: 33
+    totalCitations: 34
     checked: 31
     accurate: 31
     inaccurate: 0
@@ -360,7 +369,7 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: 0
   - domain: alignmentforum.org
-    totalCitations: 20
+    totalCitations: 21
     checked: 0
     accurate: 0
     inaccurate: 0
@@ -380,6 +389,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: insidephilanthropy.com
+    totalCitations: 10
+    checked: 0
+    accurate: 0
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: null
   - domain: youtube.com
     totalCitations: 10
     checked: 0
@@ -387,7 +403,7 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
-  - domain: insidephilanthropy.com
+  - domain: 80000hours.org
     totalCitations: 9
     checked: 0
     accurate: 0
@@ -415,13 +431,6 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
-  - domain: 80000hours.org
-    totalCitations: 8
-    checked: 0
-    accurate: 0
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: null
   - domain: blog.redwoodresearch.org
     totalCitations: 8
     checked: 3
@@ -506,6 +515,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: time.com
+    totalCitations: 5
+    checked: 5
+    accurate: 5
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: ai-regulation.com
     totalCitations: 5
     checked: 5
@@ -541,6 +557,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: openphilanthropy.org
+    totalCitations: 4
+    checked: 1
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: eyreact.com
     totalCitations: 4
     checked: 4
@@ -552,13 +575,6 @@ domainAnalysis:
     totalCitations: 4
     checked: 3
     accurate: 3
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: 0
-  - domain: time.com
-    totalCitations: 4
-    checked: 4
-    accurate: 4
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: 0
@@ -681,6 +697,13 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: givewell.org
+    totalCitations: 3
+    checked: 3
+    accurate: 3
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: frontiersin.org
     totalCitations: 3
     checked: 3
@@ -856,6 +879,27 @@ domainAnalysis:
     inaccurate: 0
     unsupported: 0
     inaccuracyRate: null
+  - domain: quillette.com
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: cambridge.org
+    totalCitations: 2
+    checked: 2
+    accurate: 2
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
+  - domain: givingwhatwecan.org
+    totalCitations: 2
+    checked: 1
+    accurate: 1
+    inaccurate: 0
+    unsupported: 0
+    inaccuracyRate: 0
   - domain: mitsloan.mit.edu
     totalCitations: 2
     checked: 2
@@ -920,13 +964,6 @@ domainAnalysis:
     unsupported: 0
     inaccuracyRate: null
   - domain: gjopen.com
-    totalCitations: 2
-    checked: 2
-    accurate: 2
-    inaccurate: 0
-    unsupported: 0
-    inaccuracyRate: 0
-  - domain: givewell.org
     totalCitations: 2
     checked: 2
     accurate: 2
