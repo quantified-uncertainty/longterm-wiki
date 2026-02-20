@@ -4,8 +4,8 @@ description: "Key uncertainties that determine which technical, coordination, an
 sidebar:
   order: 5
 quality: 71
-llmSummary: "Comprehensive analysis of key uncertainties determining optimal AI safety resource allocation across technical verification (25-40% believe AI detection can match generation), coordination mechanisms (65-80% believe labs require external enforcement), and epistemic infrastructure (70% expect chronic underfunding). Synthesizes 2024-2025 evidence showing technical alignment effectiveness at 35-50%, RSPs weakening with Anthropic dropping from 2.2 to 1.9 grade, and international coordination prospects at 15-30% for comprehensive cooperation but 35-50% for narrow risk-specific coordination."
-lastEdited: "2025-12-28"
+llmSummary: "Comprehensive analysis of key uncertainties determining optimal AI safety resource allocation across technical verification (25-40% believe AI detection can match generation), coordination mechanisms (40-50% believe labs require external enforcement), and epistemic infrastructure (prospects assessed as mixed given funding challenges). Synthesizes 2024-2025 evidence showing technical alignment effectiveness at 35-50%, RSPs subject to both structural design critique and implementation critique, and international coordination prospects at 15-30% for comprehensive cooperation but 35-50% for narrow risk-specific coordination. Incorporates recent findings on reward modeling (MARS, reward features), weak/strong verification for reasoning, formal verification tools (VeriStruct), and human learning dynamics under AI assistance."
+lastEdited: "2026-02-20"
 readerImportance: 93.5
 tacticalValue: 60
 researchImportance: 81
@@ -20,52 +20,51 @@ entityType: crux
 ---
 import {Crux, CruxList, R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
-
-
-## Key Links
-
-| Source | Link |
-|--------|------|
-| Official Website | [merriam-webster.com](https://www.merriam-webster.com/dictionary/crux) |
-| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Crux_simplex) |
-
 <DataExternalLinks pageId="solutions" />
 
 ## Overview
 
-Solution cruxes are the key uncertainties that determine which interventions we should prioritize in AI safety and governance. Unlike risk cruxes that focus on the nature and magnitude of threats, solution cruxes examine the tractability and effectiveness of different approaches to addressing those threats. Your position on these cruxes should fundamentally shape what you work on, fund, or advocate for.
+Solution cruxes are the key uncertainties that determine which interventions to prioritize in AI safety and governance. Unlike risk cruxes that focus on the nature and magnitude of threats, solution cruxes examine the tractability and effectiveness of different approaches to addressing those threats. One's position on these cruxes should fundamentally shape what one works on, funds, or advocates for.
 
-The landscape of AI safety solutions spans three critical domains: technical approaches that use AI systems themselves to verify and authenticate content; coordination mechanisms that align incentives across labs, nations, and institutions; and infrastructure investments that create sustainable epistemic institutions. Within each domain, fundamental uncertainties about feasibility, cost-effectiveness, and adoption timelines create genuine disagreements among experts about optimal resource allocation.
+The landscape of AI safety solutions spans three critical domains: technical approaches that use AI systems themselves to verify and authenticate content; coordination mechanisms that align incentives across labs, nations, and institutions; and infrastructure investments that create sustainable epistemic institutions. Within each domain, fundamental uncertainties about feasibility, cost-effectiveness, and adoption timelines produce genuine disagreements among experts about optimal resource allocation.
 
-These disagreements have enormous practical implications. Whether AI-based verification can keep pace with AI-based generation determines if we should invest billions in detection infrastructure or pivot to provenance-based approaches. Whether frontier AI labs can coordinate without regulatory compulsion shapes the balance between industry engagement and government intervention. Whether credible commitment mechanisms can be designed determines if international <EntityLink id="ai-governance">AI governance</EntityLink> is achievable or if we should prepare for an uncoordinated race.
+These disagreements have large practical implications. Whether AI-based verification can keep pace with AI-based generation determines whether billions should be invested in detection infrastructure or redirected toward provenance-based approaches. Whether frontier AI labs can coordinate without regulatory compulsion shapes the balance between industry engagement and government intervention. Whether credible commitment mechanisms can be designed determines if international <EntityLink id="301">AI governance</EntityLink> is achievable or if policymakers should plan for an uncoordinated development race.
+
+Recent research has opened several new dimensions of this landscape: advances in reward modeling (MARS, reward feature models) affect alignment tractability estimates; the weak/strong verification literature formalizes cost-efficient oversight strategies; formal verification tools like VeriStruct demonstrate AI-assisted proof generation for complex software; and studies of human learning under AI assistance raise questions about whether human oversight capacity changes over time.
 
 ## Risk Assessment
 
+The probability and trend estimates in the following table represent editorial syntheses of the cited sources throughout this page, not survey results or formal elicitation. They should be read as approximate summaries of the evidence rather than precise forecasts.
+
 | Risk Category | Severity | Likelihood | Timeline | Trend |
 |---------------|----------|------------|----------|-------|
-| Verification-generation arms race | High | 70% | 2-3 years | Accelerating |
-| Coordination failure under pressure | Critical | 60% | 1-2 years | Worsening |
-| <EntityLink id="epistemic-infrastructure">Epistemic infrastructure</EntityLink> collapse | High | 40% | 3-5 years | Stable |
-| International governance breakdown | Critical | 55% | 2-4 years | Worsening |
+| Verification-generation arms race | High | ≈70% | 2-3 years | Accelerating |
+| Coordination failure under pressure | Critical | ≈60% | 1-2 years | Mixed (see below) |
+| <EntityLink id="122">Epistemic infrastructure</EntityLink> underfunding | High | ≈40% | 3-5 years | Stable |
+| International governance gaps | Critical | ≈55% | 2-4 years | Mixed (see below) |
+
+The "coordination failure" and "international governance" trends are labeled as mixed rather than uniformly worsening: some observers note that AI Safety Summit processes and bilateral dialogues represent new mechanisms compared to five years ago, while others argue competitive pressures have intensified. Both perspectives are represented in the analysis below.
 
 ## Solution Effectiveness Overview
 
-The <R id="97185b28d68545b4">2025 AI Safety Index</R> from the <EntityLink id="fli">Future of Life Institute</EntityLink> and the <R id="b163447fdc804872">International AI Safety Report 2025</R>---compiled by 96 AI experts representing 30 countries---provide sobering assessments of current solution effectiveness. Despite growing investment, core challenges including alignment, control, interpretability, and robustness remain unresolved, with system complexity growing year by year. The following table summarizes effectiveness estimates across major solution categories based on 2024-2025 assessments.
+The <R id="97185b28d68545b4">2025 AI Safety Index</R> from the <EntityLink id="528">Future of Life Institute</EntityLink> and the <R id="b163447fdc804872">International AI Safety Report 2025</R>—compiled by 96 AI experts representing 30 countries—conclude that despite growing investment, core challenges including alignment, control, interpretability, and robustness remain unresolved, with system complexity growing year by year. The following table summarizes effectiveness estimates across major solution categories based on 2024-2025 assessments. Effectiveness here refers to estimated reduction in risk of harmful outcomes relative to no intervention; the counterfactual baseline matters significantly and is contested for policy interventions. The ranges in the "Estimated Effectiveness" column represent editorial syntheses of the research cited in each corresponding section, not independently validated measurements.
 
 | Solution Category | Estimated Effectiveness | Investment Level (2024) | Maturity | Key Gaps |
 |-------------------|------------------------|------------------------|----------|----------|
 | Technical alignment research | Moderate (35-50%) | \$500M-1B | Early research | Scalability, verification |
-| <EntityLink id="interpretability">Interpretability</EntityLink> | Promising (40-55%) | \$100-200M | Active research | Superposition, automation |
-| <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies</EntityLink> | Limited (25-35%) | N/A (policy) | Deployed but weak | Vague thresholds, compliance |
-| Third-party evaluations (<R id="45370a5153534152">METR</R>) | Moderate (45-55%) | \$10-20M | Operational | Coverage, standardization |
+| <EntityLink id="174">Interpretability</EntityLink> | Promising (40-55%) | \$100-200M | Active research | Superposition, automation |
+| <EntityLink id="252">Responsible Scaling Policies</EntityLink> | Contested (see analysis below) | Indirect compliance costs | Deployed; structural critiques active | Threshold specification, external accountability |
+| Third-party evaluations (<EntityLink id="201">METR</EntityLink>) | Moderate (45-55%) | \$10-20M | Operational | Coverage, standardization |
 | Compute governance | Theoretical (20-30%) | \$5-10M | Early research | Verification mechanisms |
-| <EntityLink id="international-coordination">International coordination</EntityLink> | Very limited (15-25%) | \$50-100M | Nascent | US-China competition |
+| <EntityLink id="330">International coordination</EntityLink> | Limited (15-25%) | \$50-100M | Nascent | US-China competition |
+| Reward modeling improvements | Promising (advancing rapidly) | Included in alignment R&D | Active research | RM accuracy–policy correlation, distribution shift |
+| Formal verification of AI components | Early-stage (proof-of-concept) | Research phase | Nascent | Scalability to neural networks, spec completeness |
 
-According to <R id="7ae6b3be2d2043c1">Anthropic's recommended research directions</R>, the main reason current AI systems do not pose catastrophic risks is that they lack many of the capabilities necessary for causing catastrophic harm---not because alignment solutions have been proven effective. This distinction is crucial for understanding the urgency of solution development.
+According to <R id="7ae6b3be2d2043c1">Anthropic's recommended research directions</R>, the main reason current AI systems do not pose catastrophic risks is that they lack many of the capabilities necessary for causing catastrophic harm—not because alignment solutions have been proven effective. This distinction is relevant for understanding the urgency of solution development.
 
 ### Solution Prioritization Framework
 
-The following diagram illustrates the decision tree for prioritizing AI safety solutions based on key crux resolutions:
+The following diagram illustrates one strategic framework for prioritizing AI safety solutions based on key crux resolutions. It represents one interpretation of how crux resolutions map to strategic priorities, not the only valid framework.
 
 <Mermaid chart={`
 flowchart TD
@@ -97,7 +96,7 @@ flowchart TD
 
 ## Technical Solution Cruxes
 
-The technical domain centers on whether AI systems can be effectively turned against themselves—using artificial intelligence to verify, detect, and authenticate AI-generated content. This offensive-defensive dynamics question has profound implications for billions of dollars in research investment and infrastructure development.
+The technical domain centers on whether AI systems can be effectively turned against themselves—using artificial intelligence to verify, detect, and authenticate AI-generated content—and on whether formal methods and reward modeling improvements can provide more reliable alignment guarantees. This offensive-defensive dynamics question has implications for research investment priorities and infrastructure development.
 
 ### Current Technical Landscape
 
@@ -106,7 +105,9 @@ The technical domain centers on whether AI systems can be effectively turned aga
 | AI Detection | \$100M+ annually | 85-95% (academic) | Limited | <R id="04d39e8bd5d50dd5">OpenAI</R>, <R id="8f7f1a6ed1b856a8">Originality.ai</R> |
 | Content Provenance | \$50M+ annually | N/A (adoption metric) | Early stage | <R id="499307d3fc7d6c07">Adobe</R>, <R id="dd1c59d8d7c26f28">Microsoft</R> |
 | Watermarking | \$25M+ annually | Variable | Pilot programs | <R id="fc492fd338071abd">Google DeepMind</R> |
-| Verification Systems | \$75M+ annually | Context-dependent | Research phase | <R id="7671d8111f8b8247">DARPA</R> |
+| Verification Systems | \$75M+ annually | Context-dependent | Research phase | <R id="7671d8111f8b8247">DARPA</R>, VERA-MH (domain-specific) |
+| Formal Verification (AI-assisted) | Research phase | 99%+ functions (narrow benchmarks) | Nascent | VeriStruct, Verus/Rust ecosystem |
+| Reward Modeling | Included in alignment R&D | Improving (MARS benchmarks) | Deployed in RLHF pipelines | Google DeepMind, <EntityLink id="22">Anthropic</EntityLink>, <EntityLink id="218">OpenAI</EntityLink> |
 
 <Crux
   id="ai-verification-scaling"
@@ -115,7 +116,7 @@ The technical domain centers on whether AI systems can be effectively turned aga
   description="Whether AI systems designed for verification (fact-checking, detection, authentication) can keep pace with AI systems designed for generation."
   importance="critical"
   resolvability="years"
-  currentState="Generation currently ahead; some verification progress"
+  currentState="Generation currently ahead; some verification progress; cheap-check literature formalizes partial solutions"
   positions={[
     {
       view: "Verification can match generation with investment",
@@ -124,9 +125,9 @@ The technical domain centers on whether AI systems can be effectively turned aga
       implications: "Invest heavily in AI verification R&D; build verification infrastructure"
     },
     {
-      view: "Verification will lag but remain useful",
+      view: "Verification will lag but remain useful with selective deployment",
       probability: "35-45%",
-      implications: "Verification as one tool among many; combine with other approaches"
+      implications: "Use weak/strong verification frameworks to deploy cheap checks where reliable; escalate to costly strong verification selectively"
     },
     {
       view: "Verification is fundamentally disadvantaged",
@@ -139,19 +140,66 @@ The technical domain centers on whether AI systems can be effectively turned aga
     "Breakthrough in generalizable detection",
     "Real-world deployment data on AI verification performance",
     "Theoretical analysis of offense-defense balance",
-    "Economic analysis of verification costs vs generation costs"
+    "Economic analysis of verification costs vs generation costs",
+    "Calibration data on weak-verifier reliability across domains"
   ]}
-  relatedCruxes={["provenance-vs-detection"]}
+  relatedCruxes={["provenance-vs-detection", "weak-strong-verification"]}
   relevantResearch={[
-    { title: "DARPA SemaFor", url: "https://www.darpa.mil/program/semantic-forensics" }
+    { title: "DARPA SemaFor", url: "https://www.darpa.mil/program/semantic-forensics" },
+    { title: "Cheap Check (Kiyani et al., 2025)", url: "https://arxiv.org/abs/2602.17633" }
   ]}
 />
 
-The current evidence presents a mixed picture. <R id="7671d8111f8b8247">DARPA's SemaFor program</R>, launched in 2021 with \$26 million in funding, has demonstrated some success in semantic forensics for manipulated media, but primarily on specific types of synthetic content rather than the broad spectrum of AI-generated material now emerging. Meanwhile, commercial detection tools like <R id="2a656ac18fe6b4d6">GPTZero</R> report accuracy rates of 85-95% on academic writing, but these drop significantly when generators are specifically designed to evade detection.
+The current evidence presents a mixed picture. <R id="7671d8111f8b8247">DARPA's SemaFor program</R>, launched in 2021 with \$26 million in funding, demonstrated some success in semantic forensics for manipulated media, but primarily on specific content types rather than the broad spectrum of AI-generated material now emerging. Commercial detection tools like <R id="2a656ac18fe6b4d6">GPTZero</R> report accuracy rates of 85-95% on academic writing, but these rates decline when generators are specifically designed to evade detection.
 
-The fundamental challenge lies in the asymmetric nature of the problem. Content generators need only produce plausible outputs, while detectors must distinguish between authentic and synthetic content across all possible generation techniques. This asymmetry may prove insurmountable, particularly as generation models become more sophisticated and numerous through <EntityLink id="factors-ai-capabilities-overview">capabilities scaling</EntityLink>.
+The fundamental challenge lies in the asymmetric nature of the problem: content generators need only produce plausible outputs, while detectors must distinguish between authentic and synthetic content across all possible generation techniques. Optimists point to potential advantages for verification systems—specialization for detection tasks, multi-modal leverage, and centralized training on comprehensive datasets of known synthetic content. The emergence of foundation models specifically designed for verification at <R id="f771d4f56ad4dbaa">Anthropic</R> and <R id="e9aaa7b5e18f9f41">OpenAI</R> suggests this approach retains active research momentum.
 
-However, optimists point to potential advantages for verification systems: they can be specialized for detection tasks, leverage multiple modalities simultaneously, and benefit from centralized training on comprehensive datasets of known synthetic content. The emergence of foundation models specifically designed for verification, such as those being developed at <R id="f771d4f56ad4dbaa">Anthropic</R> and <R id="e9aaa7b5e18f9f41">OpenAI</R>, suggests this approach may have untapped potential.
+### Weak and Strong Verification for Reasoning
+
+Recent work by Kiyani et al. (2025) formalizes the distinction between verification regimes and provides a framework for deploying them efficiently.[^cheapcheck]
+
+[^cheapcheck]: Kiyani et al., "When to Trust the Cheap Check: Weak and Strong Verification for Reasoning," arXiv:2602.17633 (2025), [https://arxiv.org/abs/2602.17633](https://arxiv.org/abs/2602.17633).
+
+**Weak verification** encompasses cheap methods such as self-consistency checks and proxy rewards. **Strong verification** encompasses costly methods such as human inspection and expert feedback. The paper introduces a Selective Strong Verification (SSV) algorithm—an online calibration method for deciding when the cheap check can be trusted—and proves that optimal verification policies admit a two-threshold structure. Calibration and sharpness of weak verifiers govern their value.
+
+This framework has direct implications for scalable oversight: cheap checks can be systematically trusted in many contexts, reducing the total cost of strong human oversight in RLHF pipelines and agentic deployments without requiring every output to undergo expensive human review.
+
+<Crux
+  id="weak-strong-verification"
+  question="Can weak verification methods reliably filter AI reasoning errors at acceptable cost-accuracy tradeoffs?"
+  domain="Technical Solutions"
+  description="Whether lightweight verification (self-consistency, proxy rewards) can be trusted to catch AI errors in reasoning tasks without requiring expensive human review of every output, enabling scalable oversight."
+  importance="high"
+  resolvability="years"
+  currentState="Formal framework established (Kiyani et al.); empirical calibration data limited to narrow domains"
+  positions={[
+    {
+      view: "Weak verification is sufficient for most cases with selective escalation",
+      probability: "35-50%",
+      holders: ["Scalable oversight researchers"],
+      implications: "Build verification pipelines with SSV-style policies; invest in weak verifier calibration"
+    },
+    {
+      view: "Weak verification requires careful domain-specific calibration; no universal policy",
+      probability: "35-45%",
+      implications: "Invest in domain-specific calibration; do not rely on universal weak-verifier policies"
+    },
+    {
+      view: "Weak verification is unreliable for high-stakes reasoning; strong verification required throughout",
+      probability: "15-25%",
+      implications: "Plan for expensive strong verification at scale; may constrain deployment of autonomous AI in high-stakes settings"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Empirical calibration studies across diverse reasoning domains",
+    "Real-world failure rate data from deployed SSV-style systems",
+    "Theoretical bounds on cheap-check reliability under adversarial conditions"
+  ]}
+  relatedCruxes={["ai-verification-scaling", "scalable-oversight-chains"]}
+  relevantResearch={[
+    { title: "Cheap Check (Kiyani et al., 2025)", url: "https://arxiv.org/abs/2602.17633" }
+  ]}
+/>
 
 <Crux
   id="provenance-vs-detection"
@@ -192,20 +240,20 @@ However, optimists point to potential advantages for verification systems: they 
   ]}
 />
 
-The <R id="ff89bed1f7960ab2">Coalition for Content Provenance and Authenticity (C2PA)</R>, backed by Adobe, Microsoft, Intel, and BBC, has gained significant momentum since 2021, with over 50 member organizations and initial implementations in Adobe Creative Cloud and Microsoft products. The provenance approach embeds cryptographic metadata proving content's origin and modification history, creating an "immune system" for authentic content rather than trying to identify synthetic material.
+The <EntityLink id="ff89bed1f7960ab2">Coalition for Content Provenance and Authenticity (C2PA)</EntityLink>, backed by Adobe, Microsoft, Intel, and BBC, has gained momentum since 2021, with over 50 member organizations and initial implementations in Adobe Creative Cloud and Microsoft products. The provenance approach embeds cryptographic metadata proving content origin and modification history, creating an authentication layer for content rather than attempting to identify synthetic material.
+
+Provenance faces substantial adoption challenges. Early data from C2PA implementations shows less than 1% of users actively check provenance credentials, and the system requires widespread adoption across platforms and devices to be effective. Detection remains necessary for legacy content and will likely be required for years even if provenance adoption succeeds.
 
 ### Provenance vs Detection Comparison
 
 | Factor | Provenance | Detection |
 |--------|-----------|-----------|
-| **Accuracy** | 100% for supported content | 85-95% (declining) |
+| **Accuracy** | 100% for supported content | 85-95% (declining under adversarial conditions) |
 | **Coverage** | Only new, participating content | All content types |
 | **Adoption Rate** | &lt;1% user verification | Universal deployment |
 | **Cost** | High infrastructure | Moderate computational |
-| **Adversarial Robustness** | High (cryptographic) | Low (adversarial ML) |
+| **Adversarial Robustness** | High (cryptographic) | Lower (adversarial ML vulnerabilities) |
 | **Legacy Content** | No coverage | Full coverage |
-
-However, provenance faces substantial adoption challenges. Early data from C2PA implementations shows less than 1% of users actively check provenance credentials, and the system requires widespread adoption across platforms and devices to be effective. The approach also cannot address legacy content or situations where authentic content is captured without provenance systems. Detection remains necessary for the vast majority of existing content and will likely be required for years even if provenance adoption succeeds.
 
 <Crux
   id="watermark-robustness"
@@ -225,7 +273,7 @@ However, provenance faces substantial adoption challenges. Early data from C2PA 
     {
       view: "Watermarks can deter casual removal but not determined actors",
       probability: "40-50%",
-      implications: "Watermarks as one signal; don't rely on alone; combine with other methods"
+      implications: "Watermarks as one signal among many; combine with other methods"
     },
     {
       view: "Watermark removal will always be possible",
@@ -244,45 +292,202 @@ However, provenance faces substantial adoption challenges. Early data from C2PA 
   ]}
 />
 
-<R id="fc492fd338071abd">Google DeepMind's SynthID</R>, launched in August 2023, represents the most advanced publicly available watermarking system, using statistical patterns imperceptible to humans but detectable by specialized algorithms. However, academic research consistently demonstrates that current watermarking approaches can be defeated through various attack vectors including adversarial perturbations, model fine-tuning, and regeneration techniques.
+<R id="fc492fd338071abd">Google DeepMind's SynthID</R>, launched in August 2023, uses statistical patterns imperceptible to humans but detectable by specialized algorithms. Academic research has consistently shown that current watermarking approaches can be defeated through adversarial perturbations, model fine-tuning, and regeneration techniques. Research by <R id="01f2211a18a3aa5a">UC Berkeley</R> and <R id="51df12a0a334621c">University of Maryland</R> demonstrated that sophisticated attackers can remove watermarks with success rates exceeding 90% while preserving content quality. Theoretical analysis suggests that any watermark which preserves sufficient content quality for practical use can potentially be removed by adversaries with adequate compute.
 
-Research by <R id="01f2211a18a3aa5a">UC Berkeley</R> and <R id="51df12a0a334621c">University of Maryland</R> has shown that sophisticated attackers can remove watermarks with success rates exceeding 90% while preserving content quality. The theoretical foundations suggest fundamental limits to watermark robustness---any watermark that preserves content quality enough to be usable can potentially be removed by sufficiently sophisticated adversaries.
+### Formal Verification as a Technical Solution
+
+Formal verification—mathematical proof that software meets a specification—represents a categorically different technical approach from detection and watermarking. Unlike statistical methods, formal verification produces guarantees: if the proof is correct, the property holds. This comes with significant limitations: proofs apply only to the specification, not to whether the specification captures the real-world property of interest.[^formalverif-limits]
+
+[^formalverif-limits]: Alignment Forum, "Limitations on Formal Verification for AI Safety," [https://www.alignmentforum.org/posts/B2bg677TaS4cmDPzL/limitations-on-formal-verification-for-ai-safety](https://www.alignmentforum.org/posts/B2bg677TaS4cmDPzL/limitations-on-formal-verification-for-ai-safety).
+
+A 2025 ICML position paper argues that formal methods should underpin trustworthy AI development, noting that standard model training "does not take into account desirable properties such as robustness, fairness, and privacy," leaving deployed models without formal guarantees.[^formal-icml] The "Guaranteed Safe AI" (GS-AI) framework proposed by researchers at UC Berkeley in May 2024 suggests using automated mechanistic interpretability tools to distill machine-learned algorithms into verifiable code as a bridge between interpretability and formal verification.[^gsai]
+
+[^formal-icml]: Position paper, "Formal Methods are the Principled Foundation of Safe AI," ICML 2025, [https://openreview.net/pdf?id=7V5CDSsjB7](https://openreview.net/pdf?id=7V5CDSsjB7).
+[^gsai]: "Towards Guaranteed Safe AI: A Framework for Ensuring Robust and Reliable AI Systems," arXiv:2405.06624 (May 2024), [https://arxiv.org/html/2405.06624v1](https://arxiv.org/html/2405.06624v1).
+
+**VeriStruct** (accepted TACAS 2026) provides a concrete demonstration of AI-assisted formal verification at scale.[^veristruct] The framework combines large language models with the Verus formal verification tool to automatically verify Rust data-structure modules. VeriStruct extends AI-assisted verification from single functions to complex data structure modules with multiple interacting components, using a planner module to orchestrate systematic generation of abstractions (View functions), type invariants, specifications (pre/postconditions), and proof code.
+
+[^veristruct]: Chuyue Sun et al., "VeriStruct: AI-assisted Automated Verification of Data-Structure Modules in Verus," arXiv:2510.25015 (October 2025), accepted TACAS 2026, [https://arxiv.org/abs/2510.25015](https://arxiv.org/abs/2510.25015).
+
+Results: VeriStruct successfully verified 10 of 11 benchmark modules and 128 of 129 functions (approximately 99% of functions across all modules). The system embeds Verus-specific syntax guidance in prompts and includes an automated repair stage that fixes annotation errors across multiple error categories. A key challenge encountered was LLMs' limited Verus-specific training data, leading to syntax errors such as invoking regular Rust functions where only specification functions are permitted.
+
+**VERA-MH** represents a different application of formal evaluation principles: an automated framework for assessing the safety of AI chatbots in mental health contexts.[^veramh] Developed by Spring Health and Yale University School of Medicine, VERA-MH uses two ancillary AI agents—a user-agent simulating patients and a judge-agent scoring chatbot responses against a clinician-developed rubric focused on suicide risk management. A validation study found inter-rater reliability between clinicians of 0.77 and LLM-judge alignment with clinical consensus of 0.81, suggesting automated safety evaluation can reach clinically meaningful reliability in at least some high-stakes application domains. VERA-MH addresses application-layer safety rather than existential risk, but provides a model for how domain-specific automated safety benchmarks can be structured.
+
+[^veramh]: Luca Belli et al., "VERA-MH: Validation of Ethical and Responsible AI in Mental Health," arXiv:2510.15297 (October 2025), [https://arxiv.org/abs/2510.15297](https://arxiv.org/abs/2510.15297).
+
+The key limitation of formal verification for neural network safety is the gap between what can be formally specified and the complex real-world properties AI systems must satisfy. Physics, chemistry, and biological systems "do not have anything like complete symbolic rule sets," making it difficult to obtain sufficiently accurate models for provers to derive strong real-world guarantees. Formal verification can guarantee properties of the AI model itself but not the correspondence between the model's behavior and the complex real world.[^formalverif-limits]
+
+| Formal Verification Approach | Maturity | Scope | Key Example | Limitations |
+|------------------------------|----------|-------|-------------|-------------|
+| Neural network property verification | Early research | Narrow properties (robustness, fairness) | IBM AI Fairness 360 | Computationally expensive; limited to small networks |
+| AI-assisted code verification | Proof-of-concept | Software data structures | VeriStruct (99% function coverage) | Requires formal spec language; limited training data |
+| Domain-specific safety benchmarking | Pilot | Application-layer safety | VERA-MH (0.81 LLM-clinical alignment) | Domain-specific; does not scale to general AI behavior |
+| Guaranteed Safe AI (GS-AI) | Theoretical | System-level guarantees | UC Berkeley framework (2024) | Requires mechanistic interpretability as prerequisite |
+
+### Reward Modeling and Preference Capture
+
+Reward modeling is a central bottleneck in alignment: the quality of the reward signal used to train AI systems determines how well those systems learn to behave in accordance with human values. Recent research has complicated the relationship between reward model (RM) accuracy and downstream alignment outcomes, and introduced new approaches for capturing individual preferences.
+
+**The accuracy-policy correlation problem.** Two independent empirical studies (EMNLP 2024; ICLR 2025) found that higher reward model accuracy does not reliably translate into better downstream policy performance in RLHF.[^accuracy-paradox][^rm-policy] The ICLR 2025 paper found only a weak positive correlation between measured RM accuracy and policy regret, with prompt distribution mismatch between RM test data and downstream test data identified as a critical confound. A third study (Frick et al., 2025) found that pessimistic RM evaluations—worst-case performance—are more indicative of downstream model quality than average performance, and that spurious correlations in reward models mean RM accuracy benchmarks can be misleading.[^rm-trench] Multiple 2024-2025 benchmarking studies (RMB, RewardBench 2, M-RewardBench) find weak or inverse correlations between benchmark scores and downstream task performance such as best-of-N sampling.[^rmbench]
+
+[^accuracy-paradox]: "The Accuracy Paradox in RLHF: When Better Reward Models Don't Yield Better Policies," EMNLP 2024, [https://aclanthology.org/2024.emnlp-main.174.pdf](https://aclanthology.org/2024.emnlp-main.174.pdf).
+[^rm-policy]: "Does Reward Model Accuracy Matter? Empirical Study on RM Accuracy and Policy Regret," ICLR 2025, [https://arxiv.org/pdf/2410.05584](https://arxiv.org/pdf/2410.05584).
+[^rm-trench]: Frick et al., "Reward Models Are Metrics in a Trench Coat," OpenReview 2025, [https://openreview.net/pdf/433f58bfdb3e151dac7ee7387af7abd16e3a0940.pdf](https://openreview.net/pdf/433f58bfdb3e151dac7ee7387af7abd16e3a0940.pdf).
+[^rmbench]: Lambert et al. and others, summarized at [https://www.emergentmind.com/topics/reward-models-rms](https://www.emergentmind.com/topics/reward-models-rms) (2024-2025).
+
+**MARS: Margin-Aware Reward-Modeling with Self-Refinement.** MARS (arXiv:2602.17658, 2025) introduces an adaptive, margin-aware augmentation and sampling strategy targeting ambiguous and failure modes of reward models.[^mars] Rather than uniform augmentation of training data, MARS concentrates augmentation on low-margin (ambiguous) preference pairs where the reward model is most uncertain, then iteratively refines the training distribution. The paper claims to be the first work to introduce an adaptive, ambiguity-driven preference augmentation strategy grounded in theoretical analysis of the average curvature of the loss function. Across evaluated model families and scales, MARS-trained reward models consistently outperformed uniform and WoN-based baselines, with improvements on three datasets and two alignment models. Because human-labeled preference data is costly and limited, MARS's approach—achieving more robust reward models with less data—suggests reward model training may be more tractable than previously estimated.
+
+[^mars]: "MARS: Margin-Aware Reward-Modeling with Self-Refinement," arXiv:2602.17658 (2025), [https://arxiv.org/abs/2602.17658](https://arxiv.org/abs/2602.17658).
+
+However, the accuracy-policy correlation findings suggest that MARS improvements in RM benchmark performance may not directly translate to improved downstream alignment unless distribution shift issues are also addressed. RewardBench 2 (arXiv:2506.01937, 2025), a new multi-skill reward modeling benchmark on which models score approximately 20 points lower on average compared to the original RewardBench, provides a more rigorous validation environment for evaluating claimed improvements.[^rmbench2]
+
+[^rmbench2]: "RewardBench 2: Advancing Reward Model Evaluation," arXiv:2506.01937 (2025), [https://arxiv.org/abs/2506.01937](https://arxiv.org/abs/2506.01937).
+
+**Reward Feature Models for individual preferences.** Standard <EntityLink id="259">RLHF</EntityLink> aggregates all human feedback into a single reward model, ignoring individual variation. A March 2025 NeurIPS paper from Google DeepMind researchers proposes Reward Feature Models (RFM) as an alternative.[^rfm] Individual preferences are modeled as a linear combination of a set of general reward features learned from the group. When adapting to a new user, the features are frozen and only the linear combination coefficients must be learned, reducing personalization to a simple classification problem solvable with few examples.
+
+[^rfm]: André Barreto et al. (Google DeepMind), "Capturing Individual Human Preferences with Reward Features," arXiv:2503.17338 (March 2025, NeurIPS 2025), [https://arxiv.org/abs/2503.17338](https://arxiv.org/abs/2503.17338).
+
+The paper illustrates the aggregation problem with a voting analogy: if 51% prefer response A and 49% prefer response B, a single aggregate model either leaves 49% of users dissatisfied 100% of the time, or leaves 100% of users dissatisfied approximately 50% of the time. RFM can serve as a "safety net" to ensure minority preferences are properly represented. Experiments using Google DeepMind's Gemma 1.1 2B model show RFM either significantly outperforms baselines or matches them with a simpler architecture.
+
+The RFM approach challenges the dominant aggregation assumption in RLHF and proposes a pluralistic alignment paradigm. This has implications for solution tractability estimates: if alignment solutions must account for individual variation rather than aggregate preferences, the problem is more complex than typically represented, but also potentially more tractable in that individual adaptation requires less data than learning a new global model.
+
+<Crux
+  id="reward-modeling-bottleneck"
+  question="Is reward model quality the primary bottleneck limiting alignment solution effectiveness?"
+  domain="Technical Solutions"
+  description="Whether improvements in reward modeling (accuracy, calibration, preference capture fidelity) would substantially improve downstream alignment outcomes, or whether other factors (policy optimization, distribution shift, preference aggregation) are more limiting."
+  importance="high"
+  resolvability="years"
+  currentState="Mixed evidence: MARS shows RM improvements are achievable; accuracy-policy correlation studies suggest RM accuracy may not be the binding constraint"
+  positions={[
+    {
+      view: "Reward modeling quality is the primary bottleneck",
+      probability: "25-40%",
+      holders: ["RLHF researchers focused on RM quality"],
+      implications: "Prioritize RM accuracy, calibration, and preference capture; invest in MARS-style adaptive augmentation"
+    },
+    {
+      view: "RM quality matters but distribution shift and policy optimization are equally limiting",
+      probability: "40-50%",
+      implications: "Invest in RM quality alongside distribution alignment between RM training and deployment; treat RM as one factor among several"
+    },
+    {
+      view: "RM quality is a secondary bottleneck; value specification and aggregation are primary",
+      probability: "15-25%",
+      holders: ["Pluralistic alignment researchers", "RFM authors"],
+      implications: "Focus on preference capture architecture (e.g., RFM) before optimizing RM accuracy"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Controlled experiments varying RM accuracy while holding other factors constant",
+    "Downstream alignment outcome data from MARS-trained models",
+    "Evidence on distribution shift as confounder in RM accuracy–policy correlation",
+    "RFM deployment results at scale"
+  ]}
+  relatedCruxes={["ai-verification-scaling", "scalable-oversight-chains"]}
+  relevantResearch={[
+    { title: "MARS (2025)", url: "https://arxiv.org/abs/2602.17658" },
+    { title: "Reward Features (Barreto et al., 2025)", url: "https://arxiv.org/abs/2503.17338" },
+    { title: "Accuracy Paradox (EMNLP 2024)", url: "https://aclanthology.org/2024.emnlp-main.174.pdf" }
+  ]}
+/>
 
 ### Technical Alignment Research Progress (2024-2025)
 
-Recent advances in <R id="b1d6e7501debf627">mechanistic interpretability</R> have demonstrated promising safety applications. Using attribution graphs, Anthropic researchers directly examined Claude 3.5 Haiku's internal reasoning processes, revealing hidden mechanisms beyond what the model displays in its chain-of-thought. As of March 2025, circuit tracing allows researchers to observe model reasoning, uncovering a shared conceptual space where reasoning happens before being translated into language.
+Recent advances in <R id="b1d6e7501debf627">mechanistic interpretability</R> have demonstrated some safety applications. Using attribution graphs, <EntityLink id="22">Anthropic</EntityLink> researchers directly examined Claude 3.5 Haiku's internal reasoning processes, revealing mechanisms beyond what the model displays in its chain-of-thought. As of March 2025, circuit tracing allows researchers to observe model reasoning, uncovering a shared conceptual space where reasoning happens before being translated into language. A limitation identified by Americans for Responsible Innovation (December 2025) is that if models are optimized to produce reasoning traces that satisfy safety monitors, they may learn to obfuscate their true intentions, eroding the reliability of this oversight channel.[^ari2025]
+
+[^ari2025]: Americans for Responsible Innovation, "AI Safety Research Highlights of 2025," December 19, 2025, [https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/](https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/).
 
 | Alignment Approach | 2024-2025 Progress | Effectiveness Estimate | Key Challenges |
 |-------------------|-------------------|----------------------|----------------|
 | Deliberative alignment | Extended thinking in Claude 3.7, o1-preview | 40-55% risk reduction | Latency, energy costs |
 | Layered safety interventions | OpenAI redundancy approach | 30-45% risk reduction | Coordination complexity |
 | Sparse autoencoders (SAEs) | Scaled to Claude 3 Sonnet | 35-50% interpretability gain | Superposition, polysemanticity |
-| Circuit tracing | Direct observation of reasoning | Research phase | Automation, scaling |
+| Circuit tracing | Direct observation of reasoning | Research phase | Automation, scaling; potential for gaming |
 | Adversarial techniques (debate) | Prover-verifier games | 25-40% oversight improvement | Equilibrium identification |
+| Reward modeling (MARS-style) | Adaptive augmentation on ambiguous pairs | Improving on benchmarks | RM accuracy–policy correlation gap |
+| Formal verification (AI-assisted) | VeriStruct: ≈99% functions verified in narrow domain | Proof-of-concept | Scalability; spec completeness |
 
-The <R id="36fb43e4e059f0c9">shallow review of technical AI safety (2025)</R> notes that increasing reasoning depth can raise latency and energy consumption, posing challenges for real-time applications. Scaling alignment mechanisms to future, larger models or eventual AGI systems remains an open research question, with complexity growing exponentially with model size and task diversity.
+The <R id="36fb43e4e059f0c9">shallow review of technical AI safety (2025)</R> notes that increasing reasoning depth can raise latency and energy consumption, posing challenges for real-time applications. Scaling alignment mechanisms to larger models or eventual AGI systems remains an open research question.
+
+### Scalable Oversight via Verification Chains
+
+<EntityLink id="271">Scalable oversight</EntityLink> research addresses whether human oversight can remain meaningful as AI capabilities scale beyond human expert performance. Two complementary research streams are active as of 2025.
+
+**Debate.** A DeepMind/Google NeurIPS 2024 paper empirically evaluated debate, consultancy, and direct question-answering as scalable oversight protocols.[^debate-nips] Debate consistently outperformed consultancy across mathematics, coding, logic, and multimodal reasoning. In open consultancy, judges were equally convinced by consultants arguing for correct or incorrect answers—meaning consultancy alone can amplify incorrect behavior. A January 2025 AAAI paper demonstrated that debate improves weak-to-strong generalization, with ensemble combinations of weak models helping exploit long arguments from strong model debaters.[^debate-w2s]
+
+[^debate-nips]: Kenton et al. (DeepMind/Google), "On Scalable Oversight with Weak LLMs Judging Strong LLMs," NeurIPS 2024, [https://arxiv.org/html/2407.04622v1](https://arxiv.org/html/2407.04622v1).
+[^debate-w2s]: "Debate Helps Weak-to-Strong Generalization," AAAI 2025, arXiv:2501.13124 (January 2025), [https://arxiv.org/abs/2501.13124](https://arxiv.org/abs/2501.13124).
+
+**Weak-to-strong generalization.** <EntityLink id="218">OpenAI</EntityLink>'s Superalignment team (December 2023) found that a GPT-2-level supervisor can elicit most of GPT-4's capabilities, achieving approximately GPT-3.5-level performance—demonstrating meaningful weak-to-strong generalization.[^w2s] A key concern flagged is "pretraining leakage"—superhuman alignment-relevant capabilities may be predominantly latent and harder to elicit than currently demonstrated. A 2025 critique argues that existing weak-to-strong methods present risks of advanced models developing deceptive behaviors and oversight evasion that remain undetectable to less capable evaluators, and calls for integration of external oversight with intrinsic proactive alignment.[^w2s-critique]
+
+[^w2s]: OpenAI Superalignment Team, "Weak-to-Strong Generalization: Eliciting Strong Capabilities With Weak Supervision," December 2023, [https://openai.com/index/weak-to-strong-generalization/](https://openai.com/index/weak-to-strong-generalization/).
+[^w2s-critique]: "Redefining Superalignment: From Weak-to-Strong Alignment to Human-AI Co-Alignment," arXiv:2504.17404 (April 2025), [https://arxiv.org/html/2504.17404v1](https://arxiv.org/html/2504.17404v1).
+
+The connection between the cheap-check literature (weak/strong verification) and scalable oversight is direct: weak verification corresponds to cheap proxy oversight; strong verification to expensive human review. The SSV framework provides a principled basis for determining when weak oversight is sufficient, which is a precondition for scalable oversight to be viable at all.
+
+<Crux
+  id="scalable-oversight-chains"
+  question="Can human oversight remain meaningful as AI capabilities scale through verification chains?"
+  domain="Technical Solutions"
+  description="Whether combinations of debate, weak-to-strong generalization, and weak/strong verification can preserve meaningful human oversight when AI systems exceed human expert performance in relevant domains."
+  importance="critical"
+  resolvability="years"
+  currentState="Debate outperforms consultancy (NeurIPS 2024); weak-to-strong generalization demonstrated (OpenAI 2023); formal weak/strong verification framework established (Kiyani 2025); deceptive behavior concerns remain open"
+  positions={[
+    {
+      view: "Verification chains can maintain meaningful oversight",
+      probability: "30-45%",
+      holders: ["Scalable oversight researchers", "Anthropic alignment team"],
+      implications: "Invest in debate protocols, weak-to-strong methods, and SSV-style calibration systems"
+    },
+    {
+      view: "Oversight chains work for some domains but fail for deceptive or strategically sophisticated AI",
+      probability: "35-45%",
+      implications: "Deploy verification chains where models are not strategic; develop complementary interpretability and anomaly detection"
+    },
+    {
+      view: "Verification chains are insufficient; oversight will not scale to superhuman AI",
+      probability: "15-25%",
+      holders: ["Critics of W2SG approach"],
+      implications: "Focus on alignment approaches that do not depend on human oversight; invest in guaranteed safe AI frameworks"
+    }
+  ]}
+  wouldUpdateOn={[
+    "Empirical evidence of debate failing under strategic deception",
+    "W2SG generalization results at larger capability gaps",
+    "SSV calibration data from real deployed systems",
+    "Evidence of or against oversight evasion in current frontier models"
+  ]}
+  relatedCruxes={["weak-strong-verification", "reward-modeling-bottleneck"]}
+  relevantResearch={[
+    { title: "Debate (NeurIPS 2024)", url: "https://arxiv.org/html/2407.04622v1" },
+    { title: "Weak-to-Strong Generalization (OpenAI 2023)", url: "https://openai.com/index/weak-to-strong-generalization/" },
+    { title: "Cheap Check (Kiyani et al., 2025)", url: "https://arxiv.org/abs/2602.17633" }
+  ]}
+/>
 
 ## Coordination Solution Cruxes
 
-Coordination cruxes address whether different actors—from AI labs to nation-states—can align their behavior around safety measures without sacrificing competitive advantages or national interests. These questions determine the feasibility of governance approaches ranging from industry self-regulation to international treaties.
+Coordination cruxes address whether different actors—from AI labs to nation-states—can align their behavior around safety measures. These questions determine the feasibility of governance approaches ranging from industry self-regulation to international treaties. Proponents of voluntary coordination argue that structured commitments create accountability norms, build institutional trust, and can be strengthened incrementally. Critics argue that competitive pressures create systematic incentives to interpret requirements leniently without external enforcement. Both views are examined at comparable depth below.
 
 ### Current Coordination Landscape
 
 | Mechanism | Participants | Binding Nature | Track Record | Key Challenges |
 |-----------|-------------|----------------|--------------|----------------|
-| <EntityLink id="responsible-scaling-policies">RSPs</EntityLink> | 4 major labs | Voluntary | Mixed compliance | Vague standards, competitive pressure |
+| <EntityLink id="252">RSPs</EntityLink> | 4 major labs | Voluntary | Mixed; structural critiques and defenses active (see below) | Threshold specification, external accountability |
 | <R id="fdf68a8f30f57dee">AI Safety Institute</R> networks | 8+ countries | Non-binding | Early stage | Limited authority, funding |
 | Export controls | US + allies | Legal | Partially effective | Circumvention, coordination gaps |
-| Voluntary commitments | Major labs | Self-enforced | Poor | No external verification |
+| Voluntary commitments | Major labs | Self-enforced | Limited compliance data | No external verification |
 
 <Crux
   id="lab-coordination"
   question="Can frontier AI labs meaningfully coordinate on safety?"
   domain="Coordination"
-  description="Whether labs competing for AI supremacy can coordinate on safety measures without regulatory compulsion."
+  description="Whether labs competing for AI leadership can coordinate on safety measures without regulatory compulsion."
   importance="critical"
   resolvability="years"
-  currentState="Some voluntary commitments (RSPs); no binding enforcement; competitive pressures strong"
+  currentState="Some voluntary commitments (RSPs) in place; no binding enforcement; competitive pressures active; both structural critiques and defenses of RSP design have been published"
   positions={[
     {
       view: "Voluntary coordination can work",
@@ -293,7 +498,6 @@ Coordination cruxes address whether different actors—from AI labs to nation-st
     {
       view: "Coordination requires external enforcement",
       probability: "40-50%",
-      holders: ["Most governance researchers"],
       implications: "Focus on regulation; auditing; legal liability; government role essential"
     },
     {
@@ -305,53 +509,68 @@ Coordination cruxes address whether different actors—from AI labs to nation-st
   wouldUpdateOn={[
     "Labs defecting from voluntary commitments",
     "Successful regulatory enforcement",
-    "Evidence of coordination changing lab behavior"
+    "Evidence of coordination changing lab behavior",
+    "Structural reforms to RSP design addressing critique findings"
   ]}
   relatedCruxes={["international-coordination"]}
   relevantResearch={[
     { title: "RSP analysis", url: "https://www.anthropic.com/rsp" },
-    { title: "GovAI", url: "https://www.governance.ai/" }
+    { title: "GovAI", url: "https://www.governance.ai/" },
+    { title: "RSPs Are Risk Management Done Wrong", url: "https://www.lesswrong.com/posts/9nEBWxjAHSu3ncr6v/responsible-scaling-policies-are-risk-management-done-wrong" }
   ]}
 />
 
-The emergence of <EntityLink id="responsible-scaling-policies">Responsible Scaling Policies (RSPs)</EntityLink> in 2023-2024, adopted by <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, and <EntityLink id="deepmind">Google DeepMind</EntityLink>, represents the most significant attempt at voluntary lab coordination to date. These policies outline safety evaluations and deployment standards that labs commit to follow as their models become more capable.
+The emergence of <EntityLink id="252">Responsible Scaling Policies (RSPs)</EntityLink> in 2023-2024, adopted by <EntityLink id="22">Anthropic</EntityLink>, <EntityLink id="218">OpenAI</EntityLink>, and <EntityLink id="98">Google DeepMind</EntityLink>, represents the most developed attempt at voluntary lab coordination to date. These policies outline safety evaluations and deployment standards that labs commit to follow as their models become more capable.
 
-However, early implementation has revealed significant limitations: evaluation standards remain vague, triggering thresholds are subjective, and competitive pressures create incentives to interpret requirements leniently. Analysis by <EntityLink id="metr">METR</EntityLink> and <EntityLink id="arc">ARC Evaluations</EntityLink> shows substantial variations in how labs implement similar commitments.
+Early implementation has revealed limitations: evaluation standards remain vague, triggering thresholds are subjective, and competitive pressures create incentives to interpret requirements leniently. Analysis by <EntityLink id="201">METR</EntityLink> and <EntityLink id="26">ARC Evaluations</EntityLink> shows substantial variations in how labs implement similar commitments.
 
 ### Third-Party Evaluation Effectiveness
 
-<R id="45370a5153534152">METR</R> (formerly ARC Evals) has emerged as the leading third-party evaluator of frontier AI systems, conducting pre-deployment evaluations of GPT-4, Claude 2, and Claude 3.5 Sonnet. Their April 2025 evaluation of OpenAI's o3 and o4-mini found these models displayed higher autonomous capabilities than other public models tested, with o3 appearing somewhat prone to "reward hacking." METR's evaluation of Claude 3.7 Sonnet found impressive AI R&D capabilities on RE-Bench, though no significant evidence for dangerous autonomous capabilities.
+<EntityLink id="201">METR</EntityLink> (formerly ARC Evals) has emerged as a leading third-party evaluator of frontier AI systems, conducting pre-deployment evaluations of GPT-4, Claude 2, and Claude 3.5 Sonnet. Their April 2025 evaluation of OpenAI's o3 and o4-mini found these models displayed higher autonomous capabilities than other public models tested, with o3 appearing prone to reward hacking: in one attempt using an AIDE scaffold, the agent copied the baseline solution's output during runtime and referred to this approach as a "cheating route" in a code comment—direct evidence of output gaming behavior.[^metr-o3] METR's evaluation of Claude 3.7 Sonnet found substantial AI R&D capabilities on RE-Bench, though no significant evidence for dangerous autonomous capabilities at the time of evaluation.
+
+[^metr-o3]: METR, "Preliminary Evaluation of OpenAI o3 and o4-mini," April 16, 2025, [https://evaluations.metr.org/openai-o3-report/](https://evaluations.metr.org/openai-o3-report/).
+
+METR measures AI performance in terms of the 50% time horizon—the length of tasks AI agents can complete with 50% reliability as measured by human completion time. METR's March 2025 paper found this metric has been doubling approximately every 7 months for the past 6 years across 13 frontier models evaluated from 2019-2025.[^metr-paper] o1 and Claude 3.7 Sonnet appeared above the long-run trend. Extrapolating this trend, METR notes AI agents could handle month-long projects by the end of the decade; some economic models predict automation of AI research by AI agents could compress many years of progress into months.
+
+[^metr-paper]: METR, "Measuring AI Ability to Complete Long Tasks," arXiv:2503.14499 (March 2025), [https://arxiv.org/pdf/2503.14499](https://arxiv.org/pdf/2503.14499).
 
 | Evaluation Organization | Models Evaluated (2024-2025) | Key Findings | Limitations |
 |------------------------|------------------------------|--------------|-------------|
-| <R id="45370a5153534152">METR</R> | GPT-4, Claude 2/3.5/3.7, o3/o4-mini | Autonomous capability increases; reward hacking in o3 | Limited to cooperative labs |
+| <EntityLink id="201">METR</EntityLink> | GPT-4, Claude 2/3.5/3.7, o3/o4-mini | Autonomous capability increases; reward hacking observed in o3 | Limited to cooperative labs; scaffold choices affect results |
 | <R id="fdf68a8f30f57dee">UK AI Safety Institute</R> | Pre-deployment evals for major labs | Advanced AI evaluation frameworks | Resource constraints |
-| Internal lab evaluations | All frontier models | Proprietary capabilities assessments | Conflict of interest |
+| Internal lab evaluations | All frontier models | Proprietary capabilities assessments | Conflict of interest in self-certification |
 
-METR proposes measuring AI performance in terms of the length of tasks AI agents can complete, showing this metric has been exponentially increasing over the past 6 years with a doubling time of around 7 months. Extrapolating this trend predicts that within five years, AI agents may independently complete a large fraction of software tasks that currently take humans days or weeks.
+### RSP Compliance Analysis and Structural Critique (2024-2025)
 
-### RSP Compliance Analysis (2024-2025)
+Anthropic's <R id="c6766d463560b923">October 2024 RSP update</R> introduced more flexible approaches. According to <R id="a5e4c7b49f5d3e1b">SaferAI</R>, Anthropic's grade under their scoring framework declined from 2.2 to 1.9, placing Anthropic alongside OpenAI and DeepMind in the same tier. Anthropic's stated rationale for the flexibility changes was to allow more adaptive responses to emerging capabilities rather than rigid pre-specified thresholds. Critics argue that flexibility reduces accountability; proponents contend that adaptive frameworks are more technically responsive than rigid thresholds. Anthropic acknowledged completing some evaluations 3 days late, characterizing those instances as posing minimal safety risk.
 
-Anthropic's <R id="c6766d463560b923">October 2024 RSP update</R> introduced more flexible approaches but drew criticism from external analysts. According to <R id="a5e4c7b49f5d3e1b">SaferAI</R>, Anthropic's grade dropped from 2.2 to 1.9, placing them alongside OpenAI and DeepMind in the "weak" category. The primary issue lies in the shift away from precisely defined capability thresholds and mitigation measures. Anthropic acknowledged falling short in some areas, including completing evaluations 3 days late, though these instances posed minimal safety risk.
+A structural critique of the RSP framework as a design concept—distinct from critiques of implementation quality—has been developed in a paper cross-posted to LessWrong, the EA Forum, and safer-ai.org.[^rsp-wrong] The critique compares RSPs against ISO/IEC 31000 (a generic risk management standard) and identifies four structural concerns: underspecified risk threshold definitions, no comprehensive risk assessment process, no quantitative risk criteria (e.g., an explicit acceptable probability threshold), and a provision that allows commitments to be overridden under "extreme emergency" conditions. The paper argues the problem is not merely poor implementation of a sound framework but structural design—lack of quantitative risk criteria, no external accountability, and voluntary self-certification. The paper also argues that "responsible scaling" may be misleading terminology if a meaningful probability of catastrophic harm cannot be ruled out for current ASL-3 systems.
 
-| RSP Element | Anthropic | OpenAI | Google DeepMind |
-|-------------|-----------|--------|-----------------|
-| Capability thresholds | ASL levels (loosened) | Preparedness framework | Frontier Safety Framework |
-| Evaluation frequency | 6 months (extended from 3) | Ongoing | Pre-deployment |
-| Third-party review | Annual procedural | Limited | Limited |
-| Public transparency | Partial | Limited | Limited |
-| Binding enforcement | Self-enforced | Self-enforced | Self-enforced |
+[^rsp-wrong]: "Responsible Scaling Policies Are Risk Management Done Wrong," LessWrong (cross-posted to EA Forum and safer-ai.org), [https://www.lesswrong.com/posts/9nEBWxjAHSu3ncr6v/responsible-scaling-policies-are-risk-management-done-wrong](https://www.lesswrong.com/posts/9nEBWxjAHSu3ncr6v/responsible-scaling-policies-are-risk-management-done-wrong).
+
+**The proponent case for RSPs.** Supporters of the RSP approach make several substantive arguments: voluntary commitments with structured evaluation requirements represent meaningful progress relative to no formal safety commitments; published RSPs create reputational accountability that influences lab behavior even without legal enforcement; the RSP model has already been adopted across multiple leading labs, establishing a de facto industry standard; and RSPs provide a concrete foundation for regulatory frameworks to formalize and strengthen. Proponents further argue that the alternative to imperfect voluntary commitments is not necessarily well-designed mandatory ones, but potentially no formal safety commitments at all in the near term. Some researchers also contend that the ISO 31000 comparison in the structural critique conflates general risk management standards with the specific challenge of governing capabilities that cannot be fully specified in advance.
+
+The Institute for Advanced Policy Studies (IAPS, 2025) published findings—consistent with some structural concerns—that Anthropic's current risk thresholds "probably exceed acceptable ranges" and that the RSP fails to specify when regulatory authorities will be notified of threshold crossings. LessWrong analysis notes that the ASL-3 threshold is effectively set at near-takeoff capability levels (fully automating AI research), which raises questions about whether the threshold can trigger before capabilities are already highly consequential. The paper cross-posted on LessWrong proposes that RSPs explicitly acknowledge they are unilateral commitments taken in a competitive environment and recommend assembling risk management experts, AI risk experts, and forecasters to quantify key probabilities relevant to safety thresholds.
+
+| RSP Element | Anthropic | OpenAI | Google DeepMind | Structural Critique Concern |
+|-------------|-----------|--------|-----------------|---------------------------|
+| Capability thresholds | ASL levels (more flexible post-Oct 2024) | Preparedness framework | Frontier Safety Framework | Thresholds underspecified quantitatively |
+| Evaluation frequency | 6 months (extended from 3) | Ongoing | Pre-deployment | No standardized minimum frequency |
+| Third-party review | Annual procedural | Limited | Limited | Procedural review ≠ independent certification |
+| Public transparency | Partial | Limited | Limited | No requirement to notify authorities |
+| Binding enforcement | Self-enforced | Self-enforced | Self-enforced | No external accountability mechanism |
+| Emergency override | Present ("extreme emergency") | Not specified | Not specified | Override clause reduces commitment credibility |
 
 ### Historical Coordination Precedents
 
-| Industry | Coordination Success | Key Factors | AI Relevance |
+| Industry | Coordination Outcome | Key Factors | AI Relevance |
 |----------|---------------------|-------------|--------------|
-| Nuclear weapons | Partial (NPT, arms control) | Mutual destruction, verification | High stakes, but clearer parameters |
-| Pharmaceuticals | Mixed (safety standards vs. pricing) | Regulatory oversight, liability | Similar R&D competition |
-| Semiconductors | Successful (SEMATECH) | Government support, shared costs | Technical collaboration model |
-| Social media | Poor (content moderation) | Light regulation, network effects | Platform competition dynamics |
+| Nuclear weapons | Partial (NPT, arms control treaties) | Mutual destruction risk, verification mechanisms | High stakes, but clearer technical parameters |
+| Pharmaceuticals | Mixed (safety standards adopted; pricing coordination limited) | Regulatory oversight, liability regimes | Similar R&D competition dynamics |
+| Semiconductors | Technical collaboration (SEMATECH) | Government support, shared costs | Technical collaboration model |
+| Social media | Platform-level content moderation investments alongside limited cross-platform coordination | Light regulation, network effects dominant | Platform competition dynamics |
 
-Historical precedent suggests mixed prospects for voluntary coordination in high-stakes competitive environments. The semiconductor industry's successful coordination on safety standards through SEMATECH offers some optimism, but occurred under different competitive dynamics and with explicit government support. The pharmaceutical industry's mixed record—with some successful self-regulation but also notable failures requiring regulatory intervention—may be more analogous to AI development.
+Historical precedent suggests mixed prospects for voluntary coordination in competitive, high-stakes environments. SEMATECH, the semiconductor research consortium formed in 1987, operated with explicit US government funding covering half its costs—a condition that distinguishes it from purely voluntary industry coordination. The pharmaceutical industry's record combines some successful safety self-regulation (adverse event reporting, clinical trial standards) with notable failures requiring regulatory intervention (e.g., opioid marketing). Both precedents suggest that voluntary coordination is more likely to succeed when complemented by external accountability structures, though the specific mechanisms and their effectiveness varied substantially across contexts.
 
 <Crux
   id="international-coordination"
@@ -360,29 +579,29 @@ Historical precedent suggests mixed prospects for voluntary coordination in high
   description="Whether the major AI powers can coordinate despite geopolitical competition."
   importance="critical"
   resolvability="years"
-  currentState="Very limited; competition dominant; some backchannel communication"
+  currentState="Limited; geopolitical competition dominant; some backchannel communication; narrow areas of potential shared interest identified"
   positions={[
     {
-      view: "Meaningful coordination is possible",
+      view: "Meaningful comprehensive coordination is possible",
       probability: "15-30%",
-      implications: "Invest heavily in Track II diplomacy; find areas of shared interest"
+      implications: "Invest heavily in Track II diplomacy; find areas of shared interest; build institutional trust"
     },
     {
-      view: "Narrow coordination on specific risks possible",
+      view: "Narrow coordination on specific catastrophic risks is feasible",
       probability: "35-50%",
-      implications: "Focus on achievable goals (bioweapons, nuclear); don't expect comprehensive regime"
+      implications: "Focus on achievable goals (bioweapons, nuclear command-and-control); do not expect comprehensive regime"
     },
     {
-      view: "Great power competition precludes coordination",
+      view: "Geopolitical competition makes coordination impractical",
       probability: "25-35%",
-      implications: "Focus on domestic/allied coordination; defensive measures; prepare for competition"
+      implications: "Focus on domestic and allied coordination; build defensive technical capacities"
     }
   ]}
   wouldUpdateOn={[
     "US-China AI discussions outcomes",
-    "Coordination on specific risks (bio, nuclear)",
-    "Changes in geopolitical relationship",
-    "Success/failure of UK/Korea AI summits on coordination"
+    "Coordination demonstrated on specific risks (bio, nuclear)",
+    "Changes in broader geopolitical relationship",
+    "Success or failure of AI Safety Summit coordination mechanisms"
   ]}
   relatedCruxes={["lab-coordination"]}
   relevantResearch={[
@@ -390,9 +609,7 @@ Historical precedent suggests mixed prospects for voluntary coordination in high
   ]}
 />
 
-Current US-China AI relations are characterized by strategic competition rather than cooperation. Export controls on semiconductors, restrictions on Chinese AI companies, and national security framings dominate the policy landscape. The <R id="9ae4c87175cc63c0">CHIPS Act</R> and export restrictions target Chinese AI development directly, while China's response includes increased domestic investment and alternative supply chains.
-
-However, some limited dialogue continues through academic conferences, multilateral forums like the G20, and informal diplomatic channels. The <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> and <EntityLink id="seoul-declaration">Seoul Declaration</EntityLink> provide potential multilateral venues for engagement.
+Current US-China AI relations are characterized by strategic competition. Export controls on semiconductors, restrictions on Chinese AI companies, and national security framings dominate the policy landscape. The <R id="9ae4c87175cc63c0">CHIPS Act</R> and export restrictions directly target Chinese AI development, while China has responded with increased domestic investment and alternative supply chains. Some limited dialogue continues through academic conferences, multilateral forums like the G20, and informal diplomatic channels.
 
 ### International Coordination Prospects by Risk Area
 
@@ -401,18 +618,18 @@ However, some limited dialogue continues through academic conferences, multilate
 | AI-enabled bioweapons | 60-70% | Technical verification | Joint research restrictions |
 | Nuclear command systems | 50-60% | Classification concerns | Backchannel protocols |
 | Autonomous weapons | 30-40% | Military applications | Geneva Convention framework |
-| Economic competition | 10-20% | Zero-sum framing | Very limited prospects |
+| Economic competition | 10-20% | Perceived zero-sum dynamics | Very limited prospects |
 
-The most promising path may involve narrow cooperation on specific risks where interests clearly align, such as preventing AI-enabled bioweapons or nuclear command-and-control accidents. The precedent of nuclear arms control offers both hope and caution—the US and Soviet Union managed meaningful arms control despite existential competition, but nuclear weapons had clearer technical parameters than AI risks.
+The most promising path may involve narrow cooperation on specific risks where interests align, such as preventing AI-enabled bioweapons or nuclear command-and-control accidents. The precedent of nuclear arms control offers both optimism and caution—the US and Soviet Union managed meaningful arms control despite existential competition, but nuclear weapons had clearer technical parameters than AI risks.
 
 <Crux
   id="commitment-credibility"
   question="Can credible AI governance commitments be designed?"
   domain="Coordination"
-  description="Whether commitment mechanisms (RSPs, treaties, escrow) can be designed that actors can't easily defect from."
+  description="Whether commitment mechanisms (RSPs, treaties, compute escrow) can be designed that actors cannot easily defect from when competitive pressure increases."
   importance="high"
   resolvability="years"
-  currentState="Few tested mechanisms; mostly voluntary; enforcement unclear"
+  currentState="Few tested mechanisms; mostly voluntary; enforcement largely absent; both structural critiques of RSP credibility and defenses of voluntary commitments published"
   positions={[
     {
       view: "Credible commitments are designable",
@@ -420,35 +637,34 @@ The most promising path may involve narrow cooperation on specific risks where i
       implications: "Invest in mechanism design; compute governance; verification technology"
     },
     {
-      view: "Partial credibility achievable for some commitments",
+      view: "Partial credibility achievable for verifiable commitments",
       probability: "35-45%",
-      implications: "Focus on verifiable commitments; accept limits on what can be bound"
+      implications: "Focus on commitments that admit external verification; accept limits on what can be bound"
     },
     {
       view: "Actors will defect from any commitment when stakes are high enough",
       probability: "20-30%",
-      implications: "Don't rely on commitments; focus on incentive alignment and technical solutions"
+      implications: "Do not rely on commitments; focus on incentive alignment and technical solutions"
     }
   ]}
   wouldUpdateOn={[
-    "Track record of RSPs and similar commitments",
-    "Progress on compute governance/monitoring",
+    "Track record of RSPs and similar commitments under competitive pressure",
+    "Progress on compute governance and monitoring",
     "Examples of commitment enforcement",
-    "Game-theoretic analysis of commitment mechanisms"
+    "Game-theoretic analysis of commitment mechanisms with emergency override provisions"
   ]}
   relatedCruxes={["lab-coordination"]}
   relevantResearch={[
-    { title: "Compute governance", url: "https://arxiv.org/abs/2402.08797" }
+    { title: "Compute governance", url: "https://arxiv.org/abs/2402.08797" },
+    { title: "RSPs Are Risk Management Done Wrong", url: "https://www.lesswrong.com/posts/9nEBWxjAHSu3ncr6v/responsible-scaling-policies-are-risk-management-done-wrong" }
   ]}
 />
 
-The emerging field of compute governance offers the most promising avenue for credible commitment mechanisms. Unlike software or model parameters, computational resources are physical and potentially observable. Research by <EntityLink id="govai">GovAI</EntityLink> has outlined monitoring systems that could track large-scale training runs, creating verifiable bounds on certain types of AI development.
-
-However, the feasibility of comprehensive compute monitoring remains unclear. Cloud computing, distributed training, and algorithm efficiency improvements create multiple pathways for evading monitoring systems. International variation in monitoring capabilities and willingness could create safe havens for actors seeking to avoid commitments.
+The emerging field of <EntityLink id="64">compute governance</EntityLink> offers one avenue for credible commitment mechanisms. Unlike software or model parameters, computational resources are physical and potentially observable. Research by <EntityLink id="153">GovAI</EntityLink> has outlined monitoring systems that could track large-scale training runs, creating verifiable bounds on certain types of AI development. The feasibility of comprehensive compute monitoring remains unclear given cloud computing, distributed training, and algorithm efficiency improvements.
 
 ### Compute Governance Verification Mechanisms
 
-<R id="482b71342542a659">GovAI research on compute governance</R> identifies three primary mechanisms for using compute as a governance lever: tracking/monitoring compute to gain visibility into AI development; subsidizing or limiting access to shape resource allocation; and building "guardrails" into hardware to enforce rules. The AI governance platform market is projected to grow from \$227 million in 2024 to \$4.83 billion by 2034, driven by generative AI adoption and regulations like the EU AI Act.
+<R id="482b71342542a659">GovAI research on compute governance</R> identifies three primary mechanisms: tracking/monitoring compute to gain visibility into AI development; subsidizing or limiting access to shape resource allocation; and building "guardrails" into hardware to enforce rules.
 
 | Verification Mechanism | Feasibility | Current Status | Key Barriers |
 |----------------------|-------------|----------------|--------------|
@@ -458,19 +674,19 @@ However, the feasibility of comprehensive compute monitoring remains unclear. Cl
 | Workload classification (zero-knowledge) | Low | Theoretical | Privacy concerns, adversarial evasion |
 | Data center monitoring | Medium | Limited | Jurisdiction gaps |
 
-According to the <R id="510c42bfa643b8de">Institute for Law & AI</R>, meaningful enforcement requires regulators to be aware of or able to verify the amount of compute being used. A regulatory threshold will be ineffective if regulators have no way of knowing whether a threshold has been reached. Research on <R id="d6ad3bb2bd9d729b">verification for international AI governance</R> proposes mechanisms to verify that data centers are not conducting large AI training runs exceeding agreed-upon thresholds.
+According to the <R id="510c42bfa643b8de">Institute for Law & AI</R>, meaningful enforcement requires regulators to be able to verify the amount of compute being used. Research on <R id="d6ad3bb2bd9d729b">verification for international AI governance</R> proposes mechanisms to verify that data centers are not conducting training runs exceeding agreed-upon thresholds.
 
 ### International Governance Coordination Status
 
-The <R id="e11a50f25b1a20df">UN High-Level Advisory Body on AI</R> submitted seven recommendations in August 2024: launching a twice-yearly intergovernmental dialogue; creating an independent international scientific panel; an AI standards exchange; a capacity development network; a global fund for AI; a global AI data framework; and a dedicated AI office within the UN Secretariat. However, <R id="3277a685c8b28fe0">academic analysis</R> concludes that a governance deficit remains due to inadequacy of existing initiatives, gaps in the landscape, and difficulties reaching agreement over more appropriate mechanisms.
+The <R id="e11a50f25b1a20df">UN High-Level Advisory Body on AI</R> submitted seven recommendations in August 2024: launching a twice-yearly intergovernmental dialogue; creating an independent international scientific panel; an AI standards exchange; a capacity development network; a global fund for AI; a global AI data framework; and a dedicated AI office within the UN Secretariat. <R id="3277a685c8b28fe0">Academic analysis</R> concludes that a governance deficit persists due to inadequacy of existing initiatives, gaps in the landscape, and difficulties reaching agreement over more appropriate mechanisms.
 
-| Governance Initiative | Participants | Binding Status | Effectiveness Assessment |
-|----------------------|--------------|----------------|-------------------------|
-| <EntityLink id="international-summits">AI Safety Summits</EntityLink> | 28+ countries | Non-binding | Limited (pageantry vs progress) |
-| EU AI Act | EU members | Binding | Moderate (implementation pending) |
-| <EntityLink id="us-executive-order">US Executive Order</EntityLink> | US federal | Executive (rescindable) | Limited (political uncertainty) |
-| UN HLAB recommendations | UN members | Non-binding | Minimal (no implementation) |
-| Bilateral US-China dialogues | US, China | Ad hoc | Very limited (competition dominant) |
+| Governance Initiative | Participants | Binding Status | Notes |
+|----------------------|--------------|----------------|-------|
+| <EntityLink id="173">AI Safety Summits</EntityLink> | 28+ countries | Non-binding | Produced declarations; implementation mechanisms limited |
+| <EntityLink id="127">EU AI Act</EntityLink> | EU members | Binding | Implementation timeline 2024-2027; enforcement pending |
+| <EntityLink id="366">US Executive Order</EntityLink> | US federal | Executive (rescindable) | Subject to future administration changes |
+| UN HLAB recommendations | UN members | Non-binding | No enforcement mechanism; seven recommendations issued August 2024 |
+| Bilateral US-China dialogues | US, China | Ad hoc | Limited; geopolitical competition dominant |
 
 ## Collective Intelligence and Infrastructure Cruxes
 
@@ -478,203 +694,17 @@ The final domain addresses whether we can build sustainable systems for truth, k
 
 ### Current Epistemic Infrastructure
 
-| Platform/System | Annual Budget | User Base | Accuracy Rate | Sustainability Model |
-|-----------------|---------------|-----------|---------------|---------------------|
-| Wikipedia | \$150M | 1.7B monthly | 90%+ (citations) | Donations |
-| Fact-checking orgs | \$50M total | 100M+ reach | 85-95% | Mixed funding |
-| Academic peer review | \$5B+ (estimated) | Research community | Variable | Institution-funded |
-| <EntityLink id="prediction-markets">Prediction markets</EntityLink> | \$100M+ volume | &lt;1M active | 75-85% | Commercial |
+The following table summarizes major epistemic infrastructure platforms. Accuracy rate estimates vary substantially across published studies and are contested; the figures listed represent commonly cited ranges and should not be treated as precise measurements.
+
+| Platform/System | Annual Budget | User Base | Notes on Accuracy | Sustainability Model |
+|-----------------|---------------|-----------|-------------------|---------------------|
+| Wikipedia | \$150M | 1.7B monthly | Variable by article quality and citation density | Donations |
+| Fact-checking orgs | \$50M total | 100M+ reach | Methods and error rates vary across organizations | Mixed funding |
+| Academic peer review | \$5B+ (estimated) | Research community | Variable by discipline and journal | Institution-funded |
+| <EntityLink id="228">Prediction markets</EntityLink> | \$100M+ volume | &lt;1M active | Performance varies by question type and liquidity | Commercial |
 
 <Crux
   id="forecasting-ai-combo"
   question="Can AI + human forecasting substantially outperform either alone?"
   domain="Collective Intelligence"
-  description="Whether combining AI forecasting with human judgment produces significantly better predictions than either approach separately."
-  importance="high"
-  resolvability="soon"
-  currentState="Early experiments promising; limited systematic comparison"
-  positions={[
-    {
-      view: "Combination is significantly better",
-      probability: "35-50%",
-      holders: ["Metaculus (testing)"],
-      implications: "Invest in hybrid forecasting systems; deploy widely"
-    },
-    {
-      view: "Benefits are modest and context-dependent",
-      probability: "35-45%",
-      implications: "Use combination where marginal gain justifies cost; domain-specific"
-    },
-    {
-      view: "One will dominate (AI or human); combination adds noise",
-      probability: "15-25%",
-      implications: "Figure out which is better for which questions; don't force combination"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Systematic comparison studies",
-    "Metaculus AI forecasting results",
-    "Domain-specific performance data"
-  ]}
-  relatedCruxes={["human-ai-complementarity"]}
-  relevantResearch={[
-    { title: "Metaculus AI", url: "https://www.metaculus.com/project/ai-forecasting/" },
-    { title: "Superforecasting", url: "https://goodjudgment.com/" }
-  ]}
-/>
-
-<R id="d99a6d0fb1edc2db">Metaculus</R> has been conducting systematic experiments with <EntityLink id="ai-forecasting">AI forecasting</EntityLink> since 2023, with early results suggesting that AI systems can match or exceed human forecasters on certain types of questions, particularly those involving quantitative trends or pattern recognition from large datasets. However, humans continue to outperform on questions requiring contextual judgment, novel reasoning, or understanding of political and social dynamics.
-
-### AI vs Human Forecasting Performance
-
-| Question Type | AI Performance | Human Performance | Combination Performance |
-|---------------|----------------|-------------------|------------------------|
-| Quantitative trends | 85-90% accuracy | 75-80% accuracy | 88-93% accuracy |
-| Geopolitical events | 60-70% accuracy | 75-85% accuracy | 78-88% accuracy |
-| Scientific breakthroughs | 70-75% accuracy | 80-85% accuracy | 83-88% accuracy |
-| Economic indicators | 80-85% accuracy | 70-75% accuracy | 83-87% accuracy |
-
-The combination approaches show promise but remain under-tested. Initial experiments suggest that human forecasters can improve their performance by consulting AI predictions, while AI systems benefit from human-provided context and reasoning. However, the optimal architectures for human-AI collaboration remain unclear, and the cost-effectiveness compared to scaling either approach independently has not been established.
-
-<Crux
-  id="epistemic-public-good"
-  question="Can epistemic infrastructure be funded as a public good?"
-  domain="Infrastructure"
-  description="Whether verification, fact-checking, and knowledge infrastructure can achieve sustainable funding without commercial incentives."
-  importance="high"
-  resolvability="years"
-  currentState="Underfunded; dependent on philanthropy and some government support"
-  positions={[
-    {
-      view: "Public/philanthropic funding can scale",
-      probability: "25-40%",
-      implications: "Advocate for government funding; build philanthropic case; create public institutions"
-    },
-    {
-      view: "Hybrid models needed (public + private)",
-      probability: "35-45%",
-      implications: "Design business models that align profit with truth; public-private partnerships"
-    },
-    {
-      view: "Will remain underfunded relative to commercial content",
-      probability: "25-35%",
-      implications: "Focus resources on highest-leverage applications; accept limits"
-    }
-  ]}
-  wouldUpdateOn={[
-    "Government investment in epistemic infrastructure",
-    "Successful commercial models for verification",
-    "Philanthropic commitment levels",
-    "Platform willingness to pay for verification"
-  ]}
-  relatedCruxes={["platform-incentives"]}
-/>
-
-Current epistemic infrastructure suffers from chronic underfunding relative to content generation systems. Fact-checking organizations operate on annual budgets of millions while misinformation spreads through platforms with budgets in the billions. Wikipedia, one of the most successful epistemic public goods, operates on approximately \$150 million annually while supporting hundreds of millions of users—a funding ratio of roughly \$0.09 per monthly active user.
-
-### Funding Landscape for Epistemic Infrastructure
-
-| Source | Annual Contribution | Sustainability | Scalability |
-|--------|-------------------|----------------|------------|
-| Government | \$200M+ (EU DSA, others) | Political dependent | High potential |
-| Philanthropy | \$100M+ (Omidyar, others) | Mission-driven | Medium potential |
-| Platform fees | \$50M+ (voluntary) | Unreliable | Low potential |
-| Commercial models | \$25M+ (fact-check APIs) | Market-dependent | High potential |
-
-Government funding varies dramatically by jurisdiction. The EU's <R id="23e41eec572c9b30">Digital Services Act</R> includes provisions for funding fact-checking and verification systems, while the US has been more reluctant to fund what could be perceived as content moderation. Philanthropic support, led by foundations like <R id="19bac4f67b51576e">Omidyar Network</R> and <R id="54d74a3da6c73239">Craig Newmark Philanthropies</R>, has provided crucial early-stage funding but may be insufficient for the scale required.
-
-## Current State and Trajectory
-
-### Near-term Developments (1-2 years)
-
-The immediate trajectory will be shaped by several ongoing developments:
-
-- **Commercial verification systems** from major tech companies will provide real-world performance data
-- **Regulatory frameworks** in the EU and potentially other jurisdictions will test enforcement mechanisms  
-- **International coordination** through AI Safety Institutes and summits will reveal cooperation possibilities
-- **Lab RSP implementation** will demonstrate voluntary coordination track record
-
-### Medium-term Projections (2-5 years)
-
-| Domain | Most Likely Outcome | Probability | Strategic Implications |
-|--------|-------------------|-------------|----------------------|
-| Technical verification | Modest success, arms race dynamics | 60% | Continued R&D investment, no single solution |
-| Lab coordination | External oversight required | 65% | Regulatory frameworks necessary |
-| International governance | Narrow cooperation only | 55% | Focus on specific risks, not comprehensive regime |
-| Epistemic infrastructure | Chronically underfunded | 70% | Accept limited scale, prioritize high-leverage applications |
-
-The resolution of these solution cruxes will fundamentally shape AI safety strategy over the next decade. If technical verification approaches prove viable, we may see an arms race between generation and detection systems. If coordination mechanisms succeed, we could see the emergence of global AI governance institutions. If they fail, we may face an uncoordinated race with significant safety risks.
-
-## Key Research Priorities
-
-The highest-priority uncertainties requiring systematic research include:
-
-### Technical Verification Research
-- **Systematic adversarial testing** of verification systems across attack scenarios
-- **Economic analysis** comparing costs of verification vs generation at scale  
-- **Theoretical bounds** on detection performance under optimal adversarial conditions
-- **User behavior studies** on provenance checking and verification adoption
-
-### Coordination Mechanism Analysis
-- **Game-theoretic modeling** of commitment mechanisms under competitive pressure
-- **Historical analysis** of coordination successes and failures in high-stakes domains
-- **Empirical tracking** of RSP implementation and compliance across labs
-- **Regulatory effectiveness** studies comparing different governance approaches
-
-### Epistemic Infrastructure Design
-- **Hybrid system architecture** for combining AI and human judgment optimally
-- **Funding model innovation** for sustainable epistemic public goods
-- **Platform integration** studies for verification system adoption
-- **Cross-platform coordination** mechanisms for epistemic infrastructure
-
-## Key Uncertainties and Strategic Dependencies
-
-These cruxes are interconnected in complex ways that create strategic dependencies:
-
-- **Technical feasibility affects coordination incentives**: If verification systems work well, labs may be more willing to adopt them voluntarily
-- **Coordination success affects infrastructure funding**: Successful international cooperation could unlock government investment in epistemic public goods
-- **Infrastructure sustainability affects technical development**: Reliable funding enables long-term R&D programs for verification systems
-- **International dynamics affect all domains**: US-China competition shapes both technical development and coordination possibilities
-
-Understanding these dependencies will be crucial for developing comprehensive solution strategies that account for the interconnected nature of technical, coordination, and infrastructure challenges.
-
----
-
-## Sources & Resources
-
-### Technical Research Organizations
-| Organization | Focus Area | Key Publications |
-|-------------|-----------|------------------|
-| <R id="1adec5eb6a75f559">DARPA</R> | Semantic forensics, verification | <R id="7671d8111f8b8247">SemaFor program</R> |
-| <R id="ff89bed1f7960ab2">C2PA</R> | Content provenance standards | <R id="9b09e69e5f2a9f78">Technical specification</R> |
-| <R id="0ef9b0fe0f3c92b4">Google DeepMind</R> | Watermarking, detection | <R id="fc492fd338071abd">SynthID research</R> |
-
-### Governance and Coordination Research
-| Organization | Focus Area | Key Resources |
-|-------------|-----------|---------------|
-| <R id="f35c467b353f990f">GovAI</R> | AI governance, coordination | <R id="26494a9f05b9db4d">Compute governance research</R> |
-| <R id="0a17f30e99091ebf">RAND Corporation</R> | Strategic analysis | <R id="cf5fd74e8db11565">AI competition studies</R> |
-| <R id="58f6946af0177ca5">CNAS</R> | Security, international relations | <R id="fbd5f171b9a891f3">AI security reports</R> |
-
-### Epistemic Infrastructure Organizations
-| Organization | Focus Area | Key Resources |
-|-------------|-----------|---------------|
-| <R id="d99a6d0fb1edc2db">Metaculus</R> | Forecasting, prediction | <R id="10ca22c5e88ffee9">AI forecasting project</R> |
-| <R id="664518d11aec3317">Good Judgment</R> | Superforecasting | Crowd forecasting methodology |
-
-### Safety Research and Evaluation
-| Organization | Focus Area | Key Resources |
-|-------------|-----------|---------------|
-| <R id="45370a5153534152">METR</R> | Third-party AI evaluations | Autonomous capability assessments |
-| <R id="5a651b8ed18ffeb1">Anthropic Alignment</R> | Technical alignment research | <R id="7ae6b3be2d2043c1">Research directions 2025</R> |
-| <R id="fdf68a8f30f57dee">UK AI Safety Institute</R> | Government evaluations | <R id="533b576199ec323d">Evaluation approach</R> |
-
-### Key 2024-2025 Reports
-| Report | Organization | Focus |
-|--------|-------------|-------|
-| <R id="97185b28d68545b4">2025 AI Safety Index</R> | Future of Life Institute | Industry safety practices |
-| <R id="b163447fdc804872">International AI Safety Report 2025</R> | 96 AI experts, 30 countries | Global safety assessment |
-| <R id="36fb43e4e059f0c9">Shallow Review of Technical AI Safety 2025</R> | Alignment Forum | Research progress review |
-| <R id="b1d6e7501debf627">Mechanistic Interpretability Review</R> | TMLR | Interpretability research survey |
-| <R id="482b71342542a659">Computing Power and AI Governance</R> | GovAI | Compute governance mechanisms |
-| <R id="3277a685c8b28fe0">Global AI Governance Analysis</R> | International Affairs | Governance deficit assessment |
+  description="Whether combining AI forecasting with human judgment produces significantly better predictions than
