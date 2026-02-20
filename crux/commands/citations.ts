@@ -71,7 +71,7 @@ const SCRIPTS = {
   'fix-inaccuracies': {
     script: 'citations/fix-inaccuracies.ts',
     description: 'Fix flagged citation inaccuracies using LLM-generated corrections',
-    passthrough: ['apply', 'verdict', 'max-score', 'model', 'json'],
+    passthrough: ['apply', 'verdict', 'max-score', 'model', 'json', 'concurrency'],
     positional: true,
   },
 };
