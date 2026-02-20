@@ -77,7 +77,7 @@ const SCRIPTS = {
   audit: {
     script: 'citations/audit.ts',
     description: 'Full pipeline: extract quotes, check accuracy, fix issues for one page',
-    passthrough: ['json', 'apply', 'recheck', 'model', 'escalate'],
+    passthrough: ['json', 'apply', 'recheck', 'model', 'escalate', 'second-opinion'],
     positional: true,
   },
 };

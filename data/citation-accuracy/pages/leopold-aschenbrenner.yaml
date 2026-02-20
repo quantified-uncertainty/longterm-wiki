@@ -1,0 +1,89 @@
+- pageId: leopold-aschenbrenner
+  footnote: 2
+  claimText: government action.
+  sourceTitle: 'Introduction - SITUATIONAL AWARENESS: The Decade Ahead'
+  url: https://situational-awareness.ai
+  verdict: unsupported
+  score: 0
+  issues: null
+  difficulty: hard
+  checkedAt: '2026-02-20 07:47:07'
+- pageId: leopold-aschenbrenner
+  footnote: 9
+  claimText: Backed by prominent tech figures including Stripe founders Patrick and John Collison, as well as investor Nat Friedman and his partner Daniel Gross, t...
+  sourceTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+  url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+  verdict: unsupported
+  score: 0
+  issues: |-
+    The source does not mention any of the tech figures backing the fund, the fund managing over $1.5 billion, or the fund achieving approximately 47% returns in the first half of 2025.
+    The source does not mention Aschenbrenner being praised or criticized in AI safety circles.
+  difficulty: hard
+  checkedAt: '2026-02-20 07:47:21'
+- pageId: leopold-aschenbrenner
+  footnote: 13
+  claimText: Kennedy School in Berlin. At age 17, he received a grant from economist Tyler Cowen's Emergent Ventures program, and Cowen described him as an "econom...
+  sourceTitle: Leopold Aschenbrenner - Wikipedia
+  url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention that Leopold Aschenbrenner received a grant from Tyler Cowen's Emergent Ventures program, nor does it mention Cowen describing him as an "economics prodigy."
+  difficulty: hard
+  checkedAt: '2026-02-20 07:47:25'
+- pageId: leopold-aschenbrenner
+  footnote: 63
+  claimText: must accelerate development to maintain a lead, critics argue he creates the very dynamics he warns about. An EA Forum post notes that many in the com...
+  sourceTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+  url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+  verdict: unsupported
+  score: 0
+  issues: The source does not mention that critics argue Aschenbrenner creates the dynamics he warns about, nor does it mention that many in the community are annoyed with him for stoking an AGI arms race prophecy while personally profiting through his hedge fund.
+  difficulty: hard
+  checkedAt: '2026-02-20 07:48:55'
+- pageId: leopold-aschenbrenner
+  footnote: 53
+  claimText: He argues for dedicating massive compute resources to alignment research and potentially offering billion-dollar prizes for breakthroughs. However, he...
+  sourceTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+  url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+  verdict: unsupported
+  score: 0.2
+  issues: The source does not mention dedicating massive compute resources to alignment research, offering billion-dollar prizes, or supervising systems that become smarter than humans.
+  difficulty: hard
+  checkedAt: '2026-02-20 07:48:39'
+- pageId: leopold-aschenbrenner
+  footnote: 11
+  claimText: Kennedy School in Berlin. He demonstrated early intellectual promise, receiving a grant from economist Tyler Cowen's Emergent Ventures program at age ...
+  sourceTitle: Leopold Aschenbrenner - Wikipedia
+  url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+  verdict: unsupported
+  score: 0.3
+  issues: |-
+    The source mentions Kennedy School in Berlin, but does not say that he demonstrated early intellectual promise there.
+    The source does not mention that he received a grant from Tyler Cowen's Emergent Ventures program at age 17.
+  difficulty: medium
+  checkedAt: '2026-02-20 07:47:22'
+- pageId: leopold-aschenbrenner
+  footnote: 44
+  claimText: The fund secured anchor investments from prominent Silicon Valley figures including Patrick Collison and John Collison (co-founders of Stripe), Daniel...
+  sourceTitle: About - SITUATIONAL AWARENESS
+  url: https://situational-awareness.ai/leopold-aschenbrenner/
+  verdict: inaccurate
+  score: 0.6
+  issues: |-
+    unsupported: The source does not mention that the fund manages over $1.5 billion in assets.
+    unsupported: The source does not mention that the fund has a diverse investor base including West Coast tech founders, family offices, institutions, and endowments.
+    wrong_attribution: The source does not mention that Nat Friedman is the former GitHub CEO.
+  difficulty: easy
+  checkedAt: '2026-02-20 07:48:23'
+- pageId: leopold-aschenbrenner
+  footnote: 8
+  claimText: Backed by prominent tech figures including Stripe founders Patrick and John Collison, as well as investor Nat Friedman and his partner Daniel Gross, t...
+  sourceTitle: $1.5B AI Hedge Fund Launches, Surges 47% in First Year - Litquidity
+  url: https://litquidity.co/1-5b-ai-hedge-fund-launches-surges-in-first-year/
+  verdict: inaccurate
+  score: 0.8
+  issues: |-
+    The source does not mention Patrick and John Collison, Nat Friedman, or Daniel Gross as backers of the fund.
+    The source states the fund achieved 47% returns in the first half of 2025, not 'approximately' 47% returns.
+  difficulty: medium
+  checkedAt: '2026-02-20 07:47:19'

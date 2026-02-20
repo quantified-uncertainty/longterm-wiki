@@ -45,7 +45,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 
 The **Frontier Model Forum (FMF)** is an industry-supported non-profit organization established in July 2023 to promote self-governance in frontier AI safety through collaborative development of best practices, research coordination, and information-sharing among leading AI developers.[^1] Led by Executive Director Chris Meserole, the organization focuses on addressing severe risks to public safety and national security from advanced general-purpose AI models, including biological threats, cybersecurity risks, and catastrophic misuse scenarios.[^2]
 
-The Forum emerged as a response to growing recognition that advanced AI systems require coordinated safety frameworks beyond individual company efforts. Its founding members—<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="openai">OpenAI</EntityLink>—recognized the need to establish shared standards for evaluating and mitigating risks from frontier AI models.[^3]
+The Forum emerged as a response to growing recognition that advanced AI systems require coordinated safety frameworks beyond individual company efforts. Its founding members—<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <EntityLink id="openai">OpenAI</EntityLink>—[^3]
 
 The FMF operates through three core mandates: identifying best practices and standards for frontier AI safety and security, advancing scientific research on safety mechanisms, and facilitating information-sharing across industry, government, academia, and civil society.[^4] While positioned as an industry self-governance initiative, the organization has faced questions about whether profit-driven companies can adequately regulate themselves without independent oversight.
 
@@ -75,7 +75,7 @@ The FMF is governed by an operating board composed of representatives from membe
 
 The centerpiece of the FMF's approach is the development of **frontier AI safety frameworks**—prespecified guidelines that integrate capability assessments, risk thresholds, and mitigation measures into structured risk management processes.[^15] These frameworks emerged as the primary tool for industry self-regulation following the May 2024 Frontier AI Safety Commitments.
 
-According to FMF issue briefs, effective safety frameworks include four core components:[^16]
+Effective safety frameworks include the following components:[^16]
 
 1. **Risk Identification**: Defining clear capability or risk thresholds that specify when heightened safeguards are needed and when risks become unacceptable, with documented rationale for threshold selection
 
@@ -98,7 +98,7 @@ The FMF has published a technical report series to detail implementation approac
 
 The AI Safety Fund has distributed two rounds of grants since its October 2023 launch, with a recent cohort of 11 grantees awarded \$5+ million for projects in biosecurity, cybersecurity, AI agent evaluation, and synthetic content.[^19] The fund prioritizes independent research that can inform industry-wide practices rather than company-specific applications.
 
-Subsequent rounds have emphasized "narrowly-scoped" projects targeting urgent bottlenecks in safety research, such as developing better techniques for detecting <EntityLink id="scheming">deceptive alignment</EntityLink> and measuring instrumental reasoning capabilities that could undermine human control.[^20]
+Subsequent rounds have emphasized projects targeting urgent bottlenecks in safety research, such as measuring instrumental reasoning capabilities that could undermine human control.[^20]
 
 ### AI-Bio Workstream
 
@@ -123,7 +123,7 @@ One of the most technically challenging aspects of frontier AI safety frameworks
 The FMF's issue briefs on pre-deployment safety evaluations emphasize that assessments must cover both intended use cases and adversarial exploitation scenarios.[^27] Evaluations should consider multiple threat models, including:
 
 - **API abuse**: Misuse through normal model access interfaces
-- **Weight theft without fine-tuning**: Adversaries obtaining and deploying model weights as-is
+- **Weight theft without significant fine-tuning**: Adversaries obtaining and deploying model weights as-is
 - **Limited adversarial budgets**: Realistic resource constraints on attackers rather than assuming unlimited capabilities
 
 The Forum cautions against designing evaluations solely for "unlimited adversaries," as this can make threat modeling intractable and lead to overly conservative restrictions that limit beneficial applications.[^28]
@@ -231,7 +231,7 @@ Several fundamental questions remain unresolved about the FMF's approach and eff
 
 **How should tradeoffs between transparency and security be navigated?** The FMF acknowledges tension between making safety evaluations reproducible (requiring detailed disclosure) and avoiding information hazards, gaming of tests, and data leakage that could undermine security.[^50] The optimal balance remains unclear and may vary by risk domain.
 
-Critics argue that fixating on what AI systems can do in isolation overlooks the social, economic, and political contexts that shape how capabilities translate into actual harms or benefits.[^51]
+Critics have pointed to mistakes including an overreliance on theoretical argumentation, being too insular, and ignoring policy as a potential route to safety.[^51]
 
 ## Relationship to Broader AI Safety Ecosystem
 
