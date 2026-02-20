@@ -25,6 +25,7 @@ import {
 } from "@/components/wiki/InfoBoxVisibility";
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 import { ContentConfidenceBanner } from "@/components/wiki/ContentConfidenceBanner";
+import { TableOfContents } from "@/components/wiki/TableOfContents";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -230,6 +231,17 @@ function ContentView({
   const isInternal = entityPath.startsWith("/internal");
   const isAbout = isAboutPage(entityPath);
 
+  // Show TOC for non-internal articles with enough words and headings.
+  // Opt-out via frontmatter: toc: false
+  const wordCount = pageData?.wordCount ?? 0;
+  const tocHeadings = page.headings.filter((h) => h.depth <= 3);
+  const showToc =
+    isArticle &&
+    !isInternal &&
+    page.frontmatter.toc !== false &&
+    wordCount > 1500 &&
+    tocHeadings.length >= 3;
+
   return (
     <InfoBoxVisibilityProvider>
       {!isInternal && <JsonLd pageData={pageData} title={page.frontmatter.title} slug={slug} />}
@@ -274,6 +286,7 @@ function ContentView({
         />
         {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
         {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
+        {showToc && <TableOfContents headings={tocHeadings} />}
         {page.content}
       </article>
       {/* Related pages rendered outside prose to avoid inherited link styles */}

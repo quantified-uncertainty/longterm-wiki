@@ -1,0 +1,56 @@
+date: "2026-02-20"
+branch: claude/resolve-issue-387-UFYru
+title: "Add auto-generated table of contents for long articles (issue #387)"
+issue: 387
+model: claude-sonnet-4-6
+duration: ~45min
+cost: ~$0.50
+
+pages: []
+
+pr: pending
+
+summary: |
+  Implemented auto-generated table of contents for articles with wordCount > 1500
+  and at least 3 headings. Added rehype-slug to MDX pipeline for stable heading IDs,
+  updated extractHeadings to match github-slugger behavior, and created a
+  Wikipedia-style TableOfContents client component with scroll tracking.
+
+key_decisions:
+  - "rehype-slug added to MDX pipeline: Adds id attributes to h2/h3 headings in compiled MDX so TOC anchor links resolve correctly."
+  - "extractHeadings updated to match github-slugger: Handle duplicate headings with -1, -2 suffixes."
+  - "TOC threshold: wordCount > 1500 AND >= 3 headings: Avoids TOC on short pages."
+  - "Float-right on desktop, inline-collapsible on mobile: Wikipedia-style TOC within prose flow."
+  - "Opt-out via toc: false frontmatter."
+  - "Tooling gaps: None. The slug matching is sufficient for typical wiki headings."
+
+checks:
+  initialized: true
+  type: content
+  initiated_at: "2026-02-20T16:56:25.111Z"
+  total: 33
+  completed: 21
+  na: 7
+  skipped: 5
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - correctness
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - entitylinks-resolve
+    - numeric-ids-stable
+    - mdx-escaping
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - check-recent-merges
+    - tooling-gaps-actioned

@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkDirective from "remark-directive";
 import rehypeKatex from "rehype-katex";
+import rehypeSlug from "rehype-slug";
 import { mdxComponents } from "@/components/mdx-components";
 import { getIdRegistry } from "@/data";
 import remarkCallouts from "./remark-callouts";
@@ -122,20 +123,35 @@ export function isMdxError(result: MdxResult): result is MdxError {
 }
 
 /**
+ * Generate a heading slug matching rehype-slug / github-slugger behavior.
+ * Lowercases, removes non-alphanumeric chars (except hyphens), replaces spaces/underscores with hyphens.
+ */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
  * Extract headings (h2, h3) from raw MDX/markdown source.
+ * Slug generation matches rehype-slug so TOC links resolve to heading anchors.
  */
 function extractHeadings(source: string): TocHeading[] {
   const headings: TocHeading[] = [];
+  const slugCounts: Record<string, number> = {};
   const lines = source.split("\n");
   for (const line of lines) {
     const match = line.match(/^(#{2,3})\s+(.+)$/);
     if (match) {
       const depth = match[1].length;
       const text = match[2].replace(/\{[^}]*\}/g, "").trim(); // strip {#custom-id}
-      const slug = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-");
+      const base = slugify(text);
+      // Handle duplicate headings the same way github-slugger does
+      const count = slugCounts[base] ?? 0;
+      slugCounts[base] = count + 1;
+      const slug = count === 0 ? base : `${base}-${count}`;
       headings.push({ depth, text, slug });
     }
   }
@@ -165,7 +181,7 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
         mdxOptions: {
           remarkPlugins: [remarkGfm, remarkMath, remarkDirective, remarkCallouts],
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- rehype plugin type incompatibility with next-mdx-remote
-          rehypePlugins: [rehypeKatex as any],
+          rehypePlugins: [rehypeSlug as any, rehypeKatex as any],
         },
       },
     });
