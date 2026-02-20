@@ -16,7 +16,7 @@ ratings:
 clusters:
   - epistemics
   - ai-safety
-subcategory: epistemic-tools-approaches
+subcategory: epistemic-approaches
 entityType: approach
 ---
 import {Mermaid, KeyQuestions, EntityLink} from '@components/wiki';
@@ -33,11 +33,11 @@ The five proposed technologies are designed to work synergistically, each reinfo
 
 | Tool | Core Function | Maturity | Estimated Impact |
 |------|--------------|----------|-----------------|
-| [Community Notes for Everything](/knowledge-base/responses/community-notes-for-everything/) | Cross-platform AI-generated context annotations | Medium (builds on X Community Notes, 500K+ contributors) | High (billions of internet users) |
-| [Rhetoric Highlighting](/knowledge-base/responses/rhetoric-highlighting/) | Automated detection of misleading rhetoric | Low-Medium (GPT-4 at 79-90% fallacy detection) | Medium (high-stakes content first) |
-| [Reliability Tracking](/knowledge-base/responses/reliability-tracking/) | Topic-specific track record scoring | Low-Medium (prediction platforms exist; general system conceptual) | High (addresses accountability gap) |
-| [Epistemic Virtue Evals](/knowledge-base/responses/epistemic-virtue-evals/) | AI honesty and calibration benchmarks | Medium-High (TruthfulQA, SimpleQA, HELM exist) | High (benchmarks drive industry behavior) |
-| [Provenance Tracing](/knowledge-base/responses/provenance-tracing/) | Transparent claim origin and evidence chains | Low (mostly conceptual; citation infra exists) | Very High (foundational if built) |
+| <EntityLink id="community-notes-for-everything">Community Notes for Everything</EntityLink> | Cross-platform AI-generated context annotations | Medium (builds on X Community Notes, 500K+ contributors) | High (billions of internet users) |
+| <EntityLink id="rhetoric-highlighting">Rhetoric Highlighting</EntityLink> | Automated detection of misleading rhetoric | Low-Medium (GPT-4 at 79-90% fallacy detection) | Medium (high-stakes content first) |
+| <EntityLink id="reliability-tracking">Reliability Tracking</EntityLink> | Topic-specific track record scoring | Low-Medium (prediction platforms exist; general system conceptual) | High (addresses accountability gap) |
+| <EntityLink id="epistemic-virtue-evals">Epistemic Virtue Evals</EntityLink> | AI honesty and calibration benchmarks | Medium-High (TruthfulQA, SimpleQA, HELM exist) | High (benchmarks drive industry behavior) |
+| <EntityLink id="provenance-tracing">Provenance Tracing</EntityLink> | Transparent claim origin and evidence chains | Low (mostly conceptual; citation infra exists) | Very High (foundational if built) |
 
 <Mermaid chart={`
 flowchart TD

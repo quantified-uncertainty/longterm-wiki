@@ -145,7 +145,7 @@ function collectFrontmatterNumericIds(dir) {
 }
 
 // Directory scanned for broken EntityLink refs when a stability violation is found
-const CONTENT_SCAN_DIR = join(DATA_DIR, '..', 'content', 'docs');
+const CONTENT_SCAN_DIR = CONTENT_DIR;
 
 // ============================================================================
 // Main

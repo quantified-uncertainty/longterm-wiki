@@ -17,6 +17,7 @@ import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
+import { preferEntityLinkRule } from './prefer-entitylink.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
@@ -121,6 +122,21 @@ describe('tilde-dollar rule', () => {
     const issues = tildeDollarRule.check(content, {});
     expect(issues.length >= 1).toBe(true);
     expect(issues.some((i: any) => i.message.includes('Tilde in table cell'))).toBe(true);
+  });
+
+  it('detects \\≈ escaped approximation symbol', () => {
+    const content = mockContent('raises \\≈\\$5M in funding.');
+    const issues = tildeDollarRule.check(content, {});
+    expect(issues.length >= 1).toBe(true);
+    expect(issues.some((i: any) => i.message.includes('Escaped approximation symbol'))).toBe(true);
+    expect(issues.find((i: any) => i.message.includes('Escaped approximation symbol'))?.severity).toBe(Severity.ERROR);
+  });
+
+  it('allows unescaped ≈ symbol', () => {
+    const content = mockContent('raises ≈\\$5M in funding.');
+    const issues = tildeDollarRule.check(content, {});
+    const escapedApproxIssues = issues.filter((i: any) => i.message.includes('Escaped approximation symbol'));
+    expect(escapedApproxIssues.length).toBe(0);
   });
 });
 
@@ -666,6 +682,125 @@ describe('footnote-coverage rule', () => {
     });
     const issues = footnoteCoverageRule.check(content, {});
     expect(issues.length).toBe(1); // definitions alone don't count
+  });
+});
+
+describe('prefer-entitylink rule', () => {
+  // Engine mock with known slugs from the real pathRegistry.
+  // The rule reads pathRegistry.json from disk and caches the reverse map; tests
+  // that check ERROR path rely on URLs present in the real pathRegistry.json.
+  const engineWithRegistry = {
+    idRegistry: {
+      bySlug: {
+        // 'community-notes-for-everything' maps to /knowledge-base/responses/community-notes-for-everything/
+        // in the real pathRegistry — used to test the ERROR path without mocking disk I/O.
+        'community-notes-for-everything': 'E300',
+        'miri': 'E100',
+        'deceptive-alignment': 'E200',
+      },
+      byNumericId: {
+        'E300': 'community-notes-for-everything',
+        'E100': 'miri',
+        'E200': 'deceptive-alignment',
+      },
+    },
+  };
+
+  it('emits ERROR with REPLACE_TEXT fix for markdown link to registered entity', () => {
+    // 'community-notes-for-everything' is in the real pathRegistry.json at
+    // /knowledge-base/responses/community-notes-for-everything/, so the reverse
+    // map lookup returns the slug, and idRegistry.bySlug finds it → ERROR.
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].fix?.type).toBe(FixType.REPLACE_TEXT);
+    expect(issues[0].fix?.newText).toBe('<EntityLink id="community-notes-for-everything">Community Notes</EntityLink>');
+  });
+
+  it('falls back to WARNING when entity slug is not in idRegistry', () => {
+    // Same URL but engine has no idRegistry — the entity slug is found in the
+    // pathRegistry reverse map but not in idRegistry.bySlug, so falls to WARNING.
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, { idRegistry: null } as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('emits WARNING for internal link to unregistered path', () => {
+    const content = mockContent(
+      'See [Unknown Page](/knowledge-base/some-unknown-path/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].rule).toBe('prefer-entitylink');
+  });
+
+  it('emits no issue for external links', () => {
+    const content = mockContent(
+      'See [External](https://example.com/page) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('emits no issue for links already using EntityLink', () => {
+    const content = mockContent(
+      '<EntityLink id="miri">MIRI</EntityLink> is an organization.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips links inside code blocks', () => {
+    const content = mockContent(
+      '```\n[Community Notes](/knowledge-base/responses/community-notes-for-everything/)\n```',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips stub pages', () => {
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+      { frontmatter: { title: 'Test', pageType: 'stub' } },
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips internal documentation pages', () => {
+    // The rule checks relativePath.includes('/internal/') — needs surrounding slashes
+    const content = mockContent(
+      'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
+      { relativePath: 'docs/internal/some-doc.mdx' },
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('excludes top-level section index paths', () => {
+    const content = mockContent(
+      'Browse [all risks](/knowledge-base/risks/) here.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('warning issue has no auto-fix', () => {
+    const content = mockContent(
+      'See [Unknown](/knowledge-base/some-unknown-page/) for more.',
+    );
+    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
   });
 });
 

@@ -1,12 +1,16 @@
 /**
  * Rule: Tilde-Dollar Validation
  *
- * Checks for tilde (~) characters adjacent to escaped dollar signs (\$) in MDX content.
+ * Checks for tilde (~) characters adjacent to escaped dollar signs (\$) in MDX content,
+ * and for incorrectly escaped approximation symbols (\≈).
  *
  * The issue: In LaTeX context, ~ is a non-breaking space. When combined with \$ (escaped dollar),
  * the rendering can be incorrect:
  * - `~\$29M` might render as `-$29M` (tilde becomes hyphen)
  * - `~86%` followed by `(~\$29M)` can render as `86%-($29M)`
+ *
+ * Also catches \≈ which renders literally as a backslash + ≈ instead of just ≈.
+ * The ≈ symbol does not need escaping in MDX.
  *
  * The fix: Use the Unicode approximately symbol ≈ instead of tilde for approximations.
  * - `≈\$29M` renders correctly as `≈$29M`
@@ -24,10 +28,13 @@ const TILDE_DOLLAR_PATTERN = /~\\\$/g;
 // Matches: | ~86% | or | ~1986 | etc.
 const TILDE_NUMBER_IN_TABLE_PATTERN = /\|[^|]*~\d+[^|]*\|/g;
 
+// Pattern: backslash-escaped approximation symbol (≈ does not need escaping in MDX)
+const ESCAPED_APPROX_PATTERN = /\\≈/g;
+
 export const tildeDollarRule = createRule({
   id: 'tilde-dollar',
   name: 'Tilde-Dollar Escaping',
-  description: 'Detect tilde characters that render incorrectly with escaped dollar signs',
+  description: 'Detect tilde characters that render incorrectly with escaped dollar signs, and escaped ≈ symbols',
 
   check(content: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
@@ -69,6 +76,23 @@ export const tildeDollarRule = createRule({
           }));
         }
       }
+    });
+
+    // Check for \≈ pattern (escaped approximation symbol — ≈ does not need escaping in MDX)
+    matchLinesOutsideCode(content.body, ESCAPED_APPROX_PATTERN, ({ match, line, lineNum }: { match: RegExpExecArray; line: string; lineNum: number }) => {
+      const context = line.slice(Math.max(0, match.index - 10), match.index + 15);
+      issues.push(new Issue({
+        rule: this.id,
+        file: content.path,
+        line: lineNum,
+        message: `Escaped approximation symbol "\\≈" renders as a literal backslash. Use "≈" without backslash (context: ...${context}...)`,
+        severity: Severity.ERROR,
+        fix: {
+          type: FixType.REPLACE_TEXT,
+          oldText: '\\≈',
+          newText: '≈',
+        },
+      }));
     });
 
     return issues;
