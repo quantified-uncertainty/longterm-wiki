@@ -17,6 +17,7 @@ import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
+import { noQuotedSubcategoryRule } from './no-quoted-subcategory.ts';
 import { kbSubcategoryCoverageRule } from './kb-subcategory-coverage.ts';
 import { preferEntityLinkRule } from './prefer-entitylink.ts';
 import { matchLinesOutsideCode } from '../mdx-utils.ts';
@@ -687,6 +688,106 @@ describe('footnote-coverage rule', () => {
 });
 
 // =============================================================================
+// no-quoted-subcategory rule
+// =============================================================================
+
+describe('no-quoted-subcategory rule', () => {
+  it('detects double-quoted subcategory values', () => {
+    const raw = '---\ntitle: Test\nsubcategory: "labs"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('labs');
+    expect(issues[0].message).toContain('subcategory: labs');
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('detects single-quoted subcategory values', () => {
+    const raw = "---\ntitle: Test\nsubcategory: 'alignment'\n---\nContent";
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'alignment' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain("subcategory: 'alignment'");
+    expect(issues[0].severity).toBe(Severity.ERROR);
+  });
+
+  it('allows unquoted subcategory values', () => {
+    const raw = '---\ntitle: Test\nsubcategory: labs\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('allows pages without a subcategory field', () => {
+    const raw = '---\ntitle: Test\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('does not flag subcategory-like text in the page body', () => {
+    // Proper frontmatter (no subcategory field) + body text that looks like subcategory.
+    // The closing --- ensures frontmatter extraction actually runs and excludes the body.
+    const raw = '---\ntitle: Test\n---\n\nHere subcategory: "labs" appears in body text';
+    const content = mockContent('subcategory: "labs" appears in body text', {
+      raw,
+      frontmatter: { title: 'Test' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(0);
+  });
+
+  it('detects hyphenated quoted subcategory values', () => {
+    const raw = '---\ntitle: Test\nsubcategory: "factors-ai-capabilities"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', subcategory: 'factors-ai-capabilities' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    expect(issues[0].message).toContain('factors-ai-capabilities');
+  });
+
+  it('reports correct line number for the quoted subcategory', () => {
+    const raw = '---\ntitle: Test\ndescription: A test page\nsubcategory: "labs"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', description: 'A test page', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    // subcategory is on line 4 in this file (after ---, title, description)
+    expect(issues[0].line).toBe(4);
+  });
+
+  it('reports correct line number even when the matched text appears earlier in the file', () => {
+    // Edge case: description field contains text identical to the subcategory line.
+    // With raw.indexOf() this would return the wrong (earlier) line; with quotedMatch.index it's correct.
+    const raw = '---\ntitle: Test\ndescription: subcategory: "labs"\nsubcategory: "labs"\n---\nContent';
+    const content = mockContent('Content', {
+      raw,
+      frontmatter: { title: 'Test', description: 'subcategory: "labs"', subcategory: 'labs' },
+    });
+    const issues = noQuotedSubcategoryRule.check(content, {});
+    expect(issues.length).toBe(1);
+    // subcategory is on line 4, NOT line 3 (where description contains identical text)
+    expect(issues[0].line).toBe(4);
+  });
+});
+
+// =============================================================================
 // kb-subcategory-coverage rule
 // =============================================================================
 
@@ -848,6 +949,7 @@ describe('kb-subcategory-coverage rule', () => {
 // =============================================================================
 // prefer-entitylink rule
 // =============================================================================
+
 describe('prefer-entitylink rule', () => {
   // Engine mock with known slugs from the real pathRegistry.
   // The rule reads pathRegistry.json from disk and caches the reverse map; tests
