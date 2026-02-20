@@ -107,7 +107,8 @@ export function detectDuplicateFootnoteDefs(body: string): number[] {
 
 /**
  * Test whether a YYMM prefix is a plausible arxiv ID prefix.
- * Arxiv IDs use YYMM format where YY is 01-26 and MM is 01-12.
+ * Arxiv IDs use YYMM format where YY >= 07 and MM is 01-12.
+ * The upper year bound is dynamic (current year + 1) to avoid expiry.
  * This eliminates false positives from version numbers, IP fragments,
  * and other 4-digit.4-or-5-digit patterns.
  */
@@ -116,7 +117,8 @@ export function isPlausibleArxivPrefix(yymm: string): boolean {
   const yy = parseInt(yymm.slice(0, 2), 10);
   const mm = parseInt(yymm.slice(2, 4), 10);
   // Arxiv new-format IDs started April 2007 (0704.xxxx)
-  return yy >= 7 && yy <= 26 && mm >= 1 && mm <= 12;
+  const maxYY = (new Date().getFullYear() % 100) + 1;
+  return yy >= 7 && yy <= maxYY && mm >= 1 && mm <= 12;
 }
 
 /**

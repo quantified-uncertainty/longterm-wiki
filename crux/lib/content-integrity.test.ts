@@ -318,8 +318,11 @@ describe('isPlausibleArxivPrefix', () => {
   });
 
   it('rejects years far in the future', () => {
-    expect(isPlausibleArxivPrefix('2701')).toBe(false); // year 27
+    // Upper bound is dynamic: current year + 1. Year 99 is always invalid.
     expect(isPlausibleArxivPrefix('9901')).toBe(false); // year 99
+    // Current year + 2 should be rejected
+    const farFutureYY = String((new Date().getFullYear() % 100) + 2).padStart(2, '0');
+    expect(isPlausibleArxivPrefix(`${farFutureYY}01`)).toBe(false);
   });
 
   it('rejects non-4-char strings', () => {
@@ -421,7 +424,7 @@ describe('integration: integrity signals in risk scoring', () => {
     expect(risk.factors).toContain('suspicious-sequential-ids');
     // duplicate [^1]: +10
     expect(risk.factors).toContain('duplicate-footnote-defs');
-    // unsourced: 1/1 unique def has no URL → +10
+    // unsourced: 2/2 defs have no URL (ratio 1.0 > 0.5) → +10
     expect(risk.factors).toContain('mostly-unsourced-footnotes');
 
     expect(risk.score).toBe(30 + 25 + 10 + 10);
