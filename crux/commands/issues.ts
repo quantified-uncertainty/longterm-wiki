@@ -9,6 +9,8 @@
  *   crux issues next                 Show the single next issue to work on
  *   crux issues start <N>            Signal start: comment + add claude-working label
  *   crux issues done <N> [--pr=URL]  Signal completion: comment + remove label
+ *   crux issues cleanup              Detect stale claude-working labels + potential duplicates
+ *   crux issues close <N> [--reason] Close an issue with an optional comment
  */
 
 import { createLogger } from '../lib/output.ts';
@@ -582,6 +584,235 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   return { output, exitCode: 0 };
 }
 
+/**
+ * Detect stale claude-working labels and potential duplicate issues.
+ *
+ * Checks:
+ * 1. Issues with `claude-working` whose associated branches don't exist on remote
+ * 2. Issues with very similar titles (potential duplicates)
+ */
+async function cleanup(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const fix = Boolean(options.fix);
+
+  const issues = await fetchOpenIssues();
+  let output = '';
+  let problemCount = 0;
+
+  // --- 1. Stale claude-working labels ---
+  const inProgress = issues.filter(i => i.inProgress);
+  if (inProgress.length > 0) {
+    output += `${c.bold}Checking ${inProgress.length} claude-working issue(s) for stale labels...${c.reset}\n\n`;
+
+    for (const issue of inProgress) {
+      // Look for a branch reference in comments
+      const comments = await githubApi<Array<{ body: string; created_at: string }>>(
+        `/repos/${REPO}/issues/${issue.number}/comments?per_page=10&sort=created&direction=desc`
+      );
+
+      // Extract branch name from the start comment pattern
+      const branchPattern = /\*\*Branch:\*\*\s*`([^`]+)`/;
+      let branchName: string | null = null;
+      for (const comment of comments) {
+        const match = comment.body.match(branchPattern);
+        if (match) {
+          branchName = match[1];
+          break;
+        }
+      }
+
+      if (!branchName) {
+        output += `  ${c.yellow}⚠${c.reset} #${issue.number}: ${issue.title}\n`;
+        output += `    ${c.dim}No branch reference found in comments — may be stale${c.reset}\n`;
+        problemCount++;
+        continue;
+      }
+
+      // Check if branch exists on remote
+      try {
+        await githubApi(`/repos/${REPO}/branches/${encodeURIComponent(branchName)}`);
+        output += `  ${c.green}✓${c.reset} #${issue.number}: ${issue.title}\n`;
+        output += `    ${c.dim}Branch ${branchName} exists${c.reset}\n`;
+      } catch {
+        output += `  ${c.red}✗${c.reset} #${issue.number}: ${issue.title}\n`;
+        output += `    ${c.dim}Branch ${branchName} does not exist — label is stale${c.reset}\n`;
+        problemCount++;
+
+        if (fix) {
+          // Remove the stale label
+          try {
+            await githubApi(
+              `/repos/${REPO}/issues/${issue.number}/labels/${encodeURIComponent(CLAUDE_WORKING_LABEL)}`,
+              { method: 'DELETE' }
+            );
+          } catch { /* 404 is fine */ }
+
+          // Post a comment
+          await githubApi(`/repos/${REPO}/issues/${issue.number}/comments`, {
+            method: 'POST',
+            body: {
+              body: `Removing stale \`claude-working\` label — branch \`${branchName}\` no longer exists on remote. Issue is ready to be picked up again.`,
+            },
+          });
+          output += `    ${c.green}→ Fixed: removed label and posted comment${c.reset}\n`;
+        }
+      }
+    }
+    output += '\n';
+  } else {
+    output += `${c.green}✓${c.reset} No claude-working issues found.\n\n`;
+  }
+
+  // --- 2. Duplicate detection ---
+  output += `${c.bold}Checking for potential duplicates...${c.reset}\n\n`;
+
+  const duplicates = findPotentialDuplicates(issues);
+  if (duplicates.length === 0) {
+    output += `  ${c.green}✓${c.reset} No potential duplicates detected.\n`;
+  } else {
+    for (const dup of duplicates) {
+      output += `  ${c.yellow}⚠${c.reset} Potential duplicate pair:\n`;
+      output += `    #${dup.a.number}: ${dup.a.title}\n`;
+      output += `    #${dup.b.number}: ${dup.b.title}\n`;
+      output += `    ${c.dim}Similarity: ${(dup.similarity * 100).toFixed(0)}%${c.reset}\n\n`;
+      problemCount++;
+    }
+  }
+
+  // --- Summary ---
+  output += '\n';
+  if (problemCount === 0) {
+    output += `${c.green}✓ All clean — no stale labels or duplicates found.${c.reset}\n`;
+  } else {
+    output += `${c.yellow}Found ${problemCount} issue(s) to review.${c.reset}\n`;
+    if (!fix && inProgress.length > 0) {
+      output += `${c.dim}Run with --fix to auto-remove stale claude-working labels.${c.reset}\n`;
+    }
+  }
+
+  return { output, exitCode: 0 };
+}
+
+/**
+ * Find issue pairs with similar titles using word overlap (Jaccard similarity).
+ */
+function findPotentialDuplicates(issues: RankedIssue[]): Array<{ a: RankedIssue; b: RankedIssue; similarity: number }> {
+  const THRESHOLD = 0.55;
+  const results: Array<{ a: RankedIssue; b: RankedIssue; similarity: number }> = [];
+
+  // Stopwords to exclude from comparison
+  const stopwords = new Set([
+    'a', 'an', 'the', 'and', 'or', 'to', 'for', 'of', 'in', 'on', 'is', 'are',
+    'add', 'fix', 'update', 'all', 'with', 'from', 'new', '--', '—', '-',
+  ]);
+
+  function tokenize(title: string): Set<string> {
+    return new Set(
+      title.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !stopwords.has(w))
+    );
+  }
+
+  function jaccard(a: Set<string>, b: Set<string>): number {
+    if (a.size === 0 && b.size === 0) return 0;
+    const intersection = new Set([...a].filter(x => b.has(x)));
+    const union = new Set([...a, ...b]);
+    return intersection.size / union.size;
+  }
+
+  const tokenized = issues.map(i => ({ issue: i, tokens: tokenize(i.title) }));
+
+  for (let i = 0; i < tokenized.length; i++) {
+    for (let j = i + 1; j < tokenized.length; j++) {
+      const sim = jaccard(tokenized[i].tokens, tokenized[j].tokens);
+      if (sim >= THRESHOLD) {
+        results.push({
+          a: tokenized[i].issue,
+          b: tokenized[j].issue,
+          similarity: sim,
+        });
+      }
+    }
+  }
+
+  return results.sort((a, b) => b.similarity - a.similarity);
+}
+
+/**
+ * Close an issue with an optional comment and reason.
+ */
+async function close(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const issueNum = parseInt(args[0], 10);
+  if (!issueNum || isNaN(issueNum)) {
+    return {
+      output: `${c.red}Usage: crux issues close <issue-number> [--reason="..."] [--duplicate=N]${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const reason = (options.reason as string) || '';
+  const duplicateOf = options.duplicate ? parseInt(options.duplicate as string, 10) : null;
+
+  // Fetch issue details
+  const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
+
+  // Post a closing comment if reason or duplicate provided
+  if (reason || duplicateOf) {
+    let body = '';
+    if (duplicateOf) {
+      body = `Closing as duplicate of #${duplicateOf}.`;
+      if (reason) body += ` ${reason}`;
+    } else {
+      body = reason;
+    }
+    await githubApi(`/repos/${REPO}/issues/${issueNum}/comments`, {
+      method: 'POST',
+      body: { body },
+    });
+  }
+
+  // Add duplicate label if closing as duplicate
+  if (duplicateOf) {
+    await githubApi(`/repos/${REPO}/issues/${issueNum}/labels`, {
+      method: 'POST',
+      body: { labels: ['duplicate'] },
+    });
+  }
+
+  // Close the issue
+  await githubApi(`/repos/${REPO}/issues/${issueNum}`, {
+    method: 'PATCH',
+    body: {
+      state: 'closed',
+      state_reason: duplicateOf ? 'not_planned' : 'completed',
+    },
+  });
+
+  // Remove claude-working label if present
+  const labels = (issue.labels || []).map(l => l.name);
+  if (labels.includes(CLAUDE_WORKING_LABEL)) {
+    try {
+      await githubApi(
+        `/repos/${REPO}/issues/${issueNum}/labels/${encodeURIComponent(CLAUDE_WORKING_LABEL)}`,
+        { method: 'DELETE' }
+      );
+    } catch { /* 404 is fine */ }
+  }
+
+  let output = '';
+  output += `${c.green}✓${c.reset} Closed issue #${issueNum}: ${issue.title}\n`;
+  if (duplicateOf) output += `  Marked as duplicate of #${duplicateOf}\n`;
+  if (reason) output += `  Comment: ${reason}\n`;
+
+  return { output, exitCode: 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
@@ -593,6 +824,8 @@ export const commands = {
   create,
   start,
   done,
+  cleanup,
+  close,
 };
 
 export function getHelp(): string {
@@ -605,6 +838,8 @@ Commands:
   create <title>  Create a new GitHub issue
   start <N>       Signal start: post comment + add \`claude-working\` label
   done <N>        Signal completion: post comment + remove label
+  cleanup         Detect stale claude-working labels + potential duplicates
+  close <N>       Close an issue with optional comment
 
 Options:
   --limit=N       Max issues to show in list (default: 30)
@@ -613,6 +848,9 @@ Options:
   --label=X,Y     Comma-separated labels to apply (for 'create')
   --body="..."    Issue body text (for 'create')
   --json          JSON output
+  --fix           Auto-fix stale labels (for 'cleanup')
+  --reason="..."  Closing comment (for 'close')
+  --duplicate=N   Close as duplicate of issue N (for 'close')
 
 Scoring (weighted):
   Issues are ranked by a composite score combining:
@@ -637,6 +875,12 @@ Examples:
   crux issues start 239              Announce start on issue #239
   crux issues done 239 --pr=https://github.com/.../pull/42
                                      Announce completion with PR link
+  crux issues cleanup                Check for stale labels and duplicates
+  crux issues cleanup --fix          Auto-remove stale claude-working labels
+  crux issues close 42 --duplicate=10
+                                     Close #42 as duplicate of #10
+  crux issues close 42 --reason="Already done in PR #100"
+                                     Close with comment
 
 Slash command:
   /next-issue    Claude Code command for the full "pick up next issue" workflow
@@ -647,4 +891,4 @@ Slash command:
 // Exported for testing
 // ---------------------------------------------------------------------------
 
-export { scoreIssue, isBlocked };
+export { scoreIssue, isBlocked, findPotentialDuplicates };
