@@ -62,6 +62,7 @@ pnpm crux agent-checklist snapshot                # Output checks: YAML block fo
 # GitHub issue tracking
 pnpm crux issues                 # List open issues ranked by priority
 pnpm crux issues next            # Show next highest-priority issue to work on
+pnpm crux issues create "title" --label=tooling  # File a new issue (use during tooling-gaps-actioned)
 pnpm crux issues start <N>       # Signal start: comment + add claude-working label
 pnpm crux issues done <N>        # Signal completion: comment + remove label
 

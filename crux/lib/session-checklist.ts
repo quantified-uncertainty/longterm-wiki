@@ -324,6 +324,16 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     phase: 'review',
     applicableTypes: ['infrastructure', 'commands', 'refactor'],
   },
+  {
+    id: 'tooling-gaps-found',
+    label: 'Tooling gaps identified',
+    description:
+      'Before shipping: ask "what did I catch or fix manually in this session that a linter/validator could have caught automatically?" ' +
+      'List each gap in the Key Decisions section below (even if the answer is "none"). ' +
+      'Examples: patterns caught at PR review, fixes applied by hand that could be automated, CI checks that are missing.',
+    phase: 'review',
+    applicableTypes: 'all',
+  },
 
   // Phase 4: Ship
   {
@@ -397,6 +407,15 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     id: 'check-recent-merges',
     label: 'Check recent merges',
     description: 'Reviewed commits merged to main since session started. No conflicts or relevant overlapping changes.',
+    phase: 'ship',
+    applicableTypes: 'all',
+  },
+  {
+    id: 'tooling-gaps-actioned',
+    label: 'Tooling gaps actioned',
+    description:
+      'Review the gaps listed under `tooling-gaps-found` in Key Decisions. For each: implement now if easy (<1hr). ' +
+      'For harder ones: `pnpm crux issues create "Add validation: <desc>" --label=tooling` — then paste the URL in Key Decisions.',
     phase: 'ship',
     applicableTypes: 'all',
   },

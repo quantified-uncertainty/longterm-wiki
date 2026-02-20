@@ -441,6 +441,51 @@ async function next(_args: string[], options: CommandOptions): Promise<CommandRe
 }
 
 /**
+ * Create a new GitHub issue.
+ */
+async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const title = args[0];
+  if (!title) {
+    return {
+      output: `${c.red}Usage: crux issues create <title> [--label=X,Y] [--body="..."]${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const labels = options.label
+    ? (options.label as string).split(',').map(l => l.trim()).filter(Boolean)
+    : [];
+  const body = (options.body as string) || '';
+
+  interface CreateIssueResponse {
+    number: number;
+    html_url: string;
+    title: string;
+  }
+
+  const issue = await githubApi<CreateIssueResponse>(`/repos/${REPO}/issues`, {
+    method: 'POST',
+    body: {
+      title,
+      ...(body ? { body } : {}),
+      ...(labels.length > 0 ? { labels } : {}),
+    },
+  });
+
+  let output = '';
+  output += `${c.green}✓${c.reset} Created issue #${issue.number}: ${issue.title}\n`;
+  output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
+  if (labels.length > 0) {
+    output += `  Labels: ${labels.join(', ')}\n`;
+  }
+
+  return { output, exitCode: 0 };
+}
+
+/**
  * Signal start of work: post a comment and add the claude-working label.
  */
 async function start(args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -545,6 +590,7 @@ export const commands = {
   default: list,
   list,
   next,
+  create,
   start,
   done,
 };
@@ -556,6 +602,7 @@ Issues Domain - Track Claude Code work on GitHub issues
 Commands:
   list            List open issues ranked by priority (default)
   next            Show the single next issue to pick up
+  create <title>  Create a new GitHub issue
   start <N>       Signal start: post comment + add \`claude-working\` label
   done <N>        Signal completion: post comment + remove label
 
@@ -563,6 +610,8 @@ Options:
   --limit=N       Max issues to show in list (default: 30)
   --scores        Show score breakdown for each issue
   --pr=URL        PR URL to include in the completion comment (for 'done')
+  --label=X,Y     Comma-separated labels to apply (for 'create')
+  --body="..."    Issue body text (for 'create')
   --json          JSON output
 
 Scoring (weighted):
@@ -581,6 +630,10 @@ Examples:
   crux issues --scores               List with score breakdowns visible
   crux issues next                   Show next issue to pick up
   crux issues next --scores          Show next issue with score breakdown
+  crux issues create "Add validation rule for X" --label=tooling
+                                     File a new issue with label 'tooling'
+  crux issues create "Bug: X breaks Y" --label=bug --body="Steps to reproduce..."
+                                     File a bug with body text
   crux issues start 239              Announce start on issue #239
   crux issues done 239 --pr=https://github.com/.../pull/42
                                      Announce completion with PR link
