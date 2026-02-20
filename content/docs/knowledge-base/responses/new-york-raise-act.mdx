@@ -43,7 +43,7 @@ import {EntityLink, KeyPeople, KeyQuestions, Section} from '@components/wiki';
 
 The **New York Responsible Artificial Intelligence Safety and Education (RAISE) Act** (S6953B/A6453B) is state legislation signed by Governor Kathy Hochul on December 19, 2025, that establishes comprehensive safety and transparency requirements for developers of frontier AI models.[^1] The law takes effect January 1, 2027, and represents one of the first state-level attempts to mandate enforceable safety measures for the most powerful AI systems.
 
-The Act applies specifically to "large developers" training frontier models—defined as AI systems trained with over \$100 million in compute resources or 10²⁶+ FLOPs.[^2] It requires these developers (including companies like Meta, <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, and DeepSeek) to develop written safety protocols before deployment, conduct annual third-party audits, and report safety incidents to state authorities within 72 hours.[^3]
+The Act applies specifically to "large developers" training frontier models—defined as AI systems trained with over \$100 million in compute resources or 10²⁶+ FLOPs.[^2] It requires these developers to develop written safety protocols before deployment, conduct annual third-party audits, and report safety incidents to state authorities within 72 hours.[^3]
 
 The legislation emerged from bipartisan concern about AI risks such as biological weapon design assistance, self-replication, deception, automated crime, and model theft, amid what legislators described as a lack of adequate federal regulation.[^4] After passing the New York State Legislature in June 2025 with overwhelming support (backed by 84% of New Yorkers according to sponsors), the bill was amended to align more closely with California's TFAIA before being signed into law.[^5]
 
@@ -101,15 +101,11 @@ These ongoing evaluation requirements are intended to ensure that safety measure
 
 ### Incident Reporting
 
-Developers must report "critical safety incidents" to state authorities within 72 hours of discovery.[^24] Reportable incidents include:
+Developers must report "safety incidents" relating to frontier models to the New York attorney general and DHSES within 72 hours of discovery.[^24] Reportable incidents include examples such as unauthorized access, model misuse, and critical control failures. Developers must also report cases where they reasonably believe an incident has occurred.[^24]
 
-- Events causing or risking critical harm
-- Autonomous model behavior increasing the risk of harm without user involvement
-- Model theft, unauthorized access, or "model escape" scenarios
-- Control failures where safety measures fail to prevent dangerous outputs
-- Discovery of deception capabilities that could subvert safety controls[^25]
+The RAISE Act's legislative memo outlined key concerns that informed these provisions, including testing that revealed models attempting self-replication and deception, risks related to biological weapon design assistance, and industry concerns about the lack of federal regulation.[^25]
 
-Reports must include the date of the incident, a summary of what occurred, and qualifications of personnel investigating the incident.[^26]
+Reports must include the date of the incident, the reasons the incident qualifies as a safety incident, and a short and plain statement describing what occurred.[^26]
 
 ### Prohibition on High-Risk Deployment
 
@@ -133,10 +129,9 @@ The choice of NYDFS reflects the department's established expertise in cybersecu
 
 The New York Attorney General has exclusive enforcement authority under the RAISE Act, with no private right of action for individuals or organizations.[^32] The AG can:
 
-- Bring civil actions against non-compliant developers
+- Bring civil actions against non-compliant developers for failing to comply with reporting obligations or for making false statements
 - Seek injunctive relief to prevent deployment of dangerous models
-- Impose civil penalties of up to \$1 million for first violations and \$3 million for subsequent violations
-- Access safety protocols and incident reports to investigate potential violations[^33]
+- Impose civil penalties of up to \$1 million for first violations and \$3 million for subsequent violations[^34]
 
 Developers may defend against enforcement actions by demonstrating that critical harm was caused by third-party misuse rather than inherent model deficiencies.[^34]
 
@@ -162,7 +157,7 @@ The transparency requirements enable state authorities, researchers, and the pub
 
 ### Limitations for Alignment Research
 
-While the RAISE Act establishes important safety requirements, it does not directly fund or mandate technical <EntityLink id="alignment">AI alignment</EntityLink> research. The law focuses on requiring developers to implement best practices and report risks, but it does not specify particular technical approaches to ensuring AI systems behave safely and in accordance with human values.[^42]
+While the RAISE Act establishes important safety requirements, it does not directly fund or mandate technical <EntityLink id="alignment">AI alignment</EntityLink> research. The law requires developers to implement transparency and disclosure requirements, including making their safety and security protocols measures available to relevant authorities, and conduct annual safety reviews and independent third-party audits. However, it does not specify particular technical approaches to ensuring AI systems behave safely and in accordance with human values.[^42]
 
 The Act's effectiveness therefore depends substantially on the state of the art in AI safety research—if effective methods for preventing catastrophic AI risks do not exist or remain uncertain, compliance with the law's procedural requirements may not guarantee safety outcomes.
 
@@ -207,7 +202,7 @@ Legal analysts have noted that the Act may also face First Amendment challenges 
 
 ### Limited Scope
 
-By focusing exclusively on the largest developers spending over \$100 million on compute, the RAISE Act exempts many AI systems that could still pose significant risks.[^55] Critics note that dangerous capabilities could emerge from smaller models, fine-tuned systems, or open-source projects not covered by the law's thresholds.
+By focusing on the largest AI companies that have spent over \$100 million in computational resources to train advanced AI models, the RAISE Act targets only the most urgent, severe risks.[^55] This means many AI systems outside these thresholds are not covered by the law's requirements, and dangerous capabilities could potentially emerge from smaller models, fine-tuned systems, or open-source projects that fall below the law's criteria.
 
 Additionally, the law does not address risks from AI deployment and use by entities other than the original developers, potentially creating gaps in coverage for scenarios where critical harm arises from downstream applications.
 
@@ -218,10 +213,9 @@ The RAISE Act takes effect January 1, 2027, giving developers approximately one 
 - Reviewing existing AI governance structures and safety practices
 - Establishing cross-functional teams spanning legal, technical development, and incident response functions
 - Developing protocols for the 72-hour incident reporting requirement
-- Identifying which models meet the frontier model definition and compute thresholds
-- Preparing for potential third-party audit requirements[^57]
+- Identifying which models meet the frontier model definition and compute thresholds[^57]
 
-The Department of Financial Services is expected to issue implementing regulations and guidance during 2026 to clarify compliance expectations before the effective date.[^58] As of early 2026, the final text incorporating all chapter amendments had not yet been fully published, creating some uncertainty about precise requirements.[^59]
+A DFS oversight office is expected to be established through chapter amendments to evaluate large frontier developers and promote transparency, with those amendments set to be enacted in January 2026 to clarify compliance expectations before the effective date.[^58] As of early 2026, the final text incorporating all chapter amendments had not yet been fully published, creating some uncertainty about precise requirements.[^59]
 
 ## Significance for AI Policy
 
@@ -275,7 +269,6 @@ Several important questions about the RAISE Act remain unresolved:
 [^30]: [Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety](https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models)
 [^31]: [Jones Walker - New York's RAISE Act: What Frontier Model Developers Need to Know](https://www.joneswalker.com/en/insights/blogs/ai-law-blog/new-yorks-raise-act-what-frontier-model-developers-need-to-know.html?id=102lzd6)
 [^32]: [Morrison Foerster - New York Enacts the RAISE Act](https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models)
-[^33]: [Skadden - New York Enacts AI Transparency Law](https://www.skadden.com/insights/publications/2026/01/new-york-enacts-ai-transparency-law)
 [^34]: [Morrison Foerster - New York Enacts the RAISE Act](https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models)
 [^35]: [Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety](https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models)
 [^36]: [Harris Beach - New York's RAISE Act's Implications for AI Companies](https://www.harrisbeachmurtha.com/insights/new-yorks-raise-acts-implications-for-ai-companies/)
@@ -305,4 +298,3 @@ Several important questions about the RAISE Act remain unresolved:
 [^60]: [Morrison Foerster - New York Enacts the RAISE Act](https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models)
 [^61]: [NY Assembly - Assemblymember Bores Statement](https://assembly.state.ny.us/mem/Alex-Bores/story/114363)
 [^62]: [NY Assembly - Assemblymember Bores Statement](https://assembly.state.ny.us/mem/Alex-Bores/story/114363)
-

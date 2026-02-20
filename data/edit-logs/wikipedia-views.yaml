@@ -6,3 +6,15 @@
   tool: crux-fix
   agency: automated
   note: "Reordered frontmatter fields to canonical order (issue #398)"
+- date: 2026-02-20
+  tool: crux-audit
+  agency: automated
+  note: Fixed 4 flagged citation inaccuracies via audit
+- date: 2026-02-20
+  tool: crux-audit-source-replace
+  agency: automated
+  note: Replaced 1 unsupported source URL(s) with better matches
+- date: 2026-02-20
+  tool: crux-audit-pass2
+  agency: automated
+  note: "Second pass: fixed 4 remaining citation inaccuracies"

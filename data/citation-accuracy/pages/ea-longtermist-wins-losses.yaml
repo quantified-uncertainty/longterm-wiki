@@ -1,0 +1,101 @@
+- pageId: ea-longtermist-wins-losses
+  footnote: 7
+  claimText: The collapse of FTX and fraud conviction of <EntityLink id="E857">Sam Bankman-Fried</EntityLink> — who had publicly framed his financial activities in...
+  sourceTitle: 'EA and Longtermism: not a crux for saving the world — EA Forum'
+  url: https://forum.effectivealtruism.org/posts/cP7gkDFxgJqHDGdfJ/ea-and-longtermism-not-a-crux-for-saving-the-world
+  verdict: inaccurate
+  score: 0.3
+  issues: |-
+    unsupported
+    unsupported
+    unsupported
+    unsupported
+  difficulty: hard
+  checkedAt: '2026-02-20 16:58:13'
+- pageId: ea-longtermist-wins-losses
+  footnote: 8
+  claimText: The collapse of FTX and fraud conviction of <EntityLink id="E857">Sam Bankman-Fried</EntityLink> — who had publicly framed his financial activities in...
+  sourceTitle: Sensitive assumptions in longtermist modeling — EA Forum
+  url: https://forum.effectivealtruism.org/posts/2eYxQDbPbqHypFihe/sensitive-assumptions-in-longtermist-modeling
+  verdict: inaccurate
+  score: 0.3
+  issues: |-
+    unsupported: The source does not mention the collapse of FTX or the fraud conviction of Sam Bankman-Fried.
+    unsupported: The source does not mention the closure of the Future of Humanity Institute at Oxford in April 2024.
+    unsupported: The source does not mention internal tensions between neartermist and longtermist factions.
+    misleading_paraphrase: The source discusses criticisms of longtermism's modeling assumptions, but does not explicitly state that critics challenge its epistemological foundations or that its calculations are highly sensitive to speculative assumptions about the far future. It focuses on specific modeling assumptions related to existential risk reduction.
+  difficulty: hard
+  checkedAt: '2026-02-20 16:58:15'
+- pageId: ea-longtermist-wins-losses
+  footnote: 3
+  claimText: 'The movement has achieved substantial concrete wins: GiveWell raised $415 million and directed $397 million to cost-effective programs in metrics year...'
+  sourceTitle: Impact
+  url: https://www.againstmalaria.com/Impact.aspx
+  verdict: inaccurate
+  score: 0.5
+  issues: |-
+    WRONG NUMBERS: GiveWell's funds raised and directed are not mentioned in the source.
+    WRONG NUMBERS: The source does not mention the number of people protected by the Against Malaria Foundation in 2024, but it does say that 667,705,212 people have been protected.
+    WRONG NUMBERS: The source does not mention CEA's engagement growth in 2025.
+    UNSUPPORTED: The source does not mention longtermist side, existential risk research, AI safety work, or California bills regulating AI risk.
+  difficulty: hard
+  checkedAt: '2026-02-20 16:58:01'
+- pageId: ea-longtermist-wins-losses
+  footnote: 43
+  claimText: The collapse of FTX and fraud conviction of <EntityLink id="E857">Sam Bankman-Fried</EntityLink> — who had publicly framed his financial activities in...
+  sourceTitle: Future of Humanity Institute - Wikipedia
+  url: https://en.wikipedia.org/wiki/Future_of_Humanity_Institute
+  verdict: inaccurate
+  score: 0.5
+  issues: |-
+    WRONG DATE: The article states the closure date was April 16, 2024, not simply April 2024.
+    MISLEADING PARAPHRASE: The claim that the closure of the Future of Humanity Institute marked the largest single institutional loss in the longtermist research ecosystem is an overclaim. The article only states that the University of Oxford closed the Institute.
+    UNSUPPORTED: The source does not mention the collapse of FTX, the fraud conviction of Sam Bankman-Fried, internal tensions between neartermist and longtermist factions, or critics challenging longtermism's epistemological foundations.
+  difficulty: hard
+  checkedAt: '2026-02-20 16:59:09'
+- pageId: ea-longtermist-wins-losses
+  footnote: 31
+  claimText: '**Community size and demographics:** As of January 2023, there were 362 known active EA groups worldwide — up from 233 in late 2020 (approximately 55%...'
+  sourceTitle: What Has the CEA Uni Groups Team Been up To? – Our 2023/2024 Review — EA Forum
+  url: https://forum.effectivealtruism.org/posts/FTbTfpR7txzzb9akm/what-has-the-cea-uni-groups-team-been-up-to-our-2023-2024
+  verdict: inaccurate
+  score: 0.65
+  issues: |-
+    unsupported: The claim that there were 362 known active EA groups worldwide as of January 2023 is not supported by the source.
+    unsupported: The claim that the number of active EA groups increased from 233 in late 2020 is not supported by the source.
+    unsupported: The claim that the growth rate of active EA groups was approximately 55% over two years is not supported by the source.
+    unsupported: The claim that active EA groups were in 56 countries is not supported by the source.
+    minor_issues: The claim that 189 organizers from 34 countries participated in CEA's Organizer Support Programme in 2024 is slightly inaccurate. The source specifies that this participation was in OSP Fall 2024.
+    unsupported: The claim about the 2024 EA Survey findings regarding the proportions of EA respondents from the USA, UK, Europe, and the rest of the world is not supported by the source.
+    unsupported: The claim about local group membership rates varying substantially by country, specifically mentioning US and UK respondents having the lowest rates and other countries showing 40-80% rates, is not supported by the source.
+  difficulty: hard
+  checkedAt: '2026-02-20 16:58:40'
+- pageId: ea-longtermist-wins-losses
+  footnote: 44
+  claimText: EA emerged from proto-communities in the late 2000s and early 2010s, coalescing around organizations like GiveWell (founded 2006), <EntityLink id="E86...
+  sourceTitle: Centre for Effective Altruism - Wikipedia
+  url: https://en.wikipedia.org/wiki/Centre_for_Effective_Altruism
+  verdict: inaccurate
+  score: 0.65
+  issues: |-
+    WRONG NUMBERS: The source does not mention that GWWC had welcomed its 300th member by January 2013.
+    WRONG NUMBERS: The source does not mention that by 2022, more than 7,000 people from 95 countries had taken a pledge, collectively representing over $2.5 billion in pledged lifetime donations.
+    WRONG NUMBERS: The source does not mention that an estimated $416 million was donated to effective charities identified by the movement in 2019, representing approximately 37% annual growth since 2015.
+    MISLEADING PARAPHRASE: The claim states that CEA was founded in 2012 as an umbrella organization for GWWC and 80,000 Hours. The source states that CEA's founding was prompted by the need to set up an umbrella organization under which Giving What We Can and 80,000 Hours could be incorporated.
+  difficulty: medium
+  checkedAt: '2026-02-20 16:59:13'
+- pageId: ea-longtermist-wins-losses
+  footnote: 28
+  claimText: 'The movement has achieved substantial concrete wins: GiveWell raised $415 million and directed $397 million to cost-effective programs in metrics year...'
+  sourceTitle: GiveWell’s 2024 Metrics and Impact - The GiveWell Blog
+  url: https://blog.givewell.org/2025/08/13/givewells-2024-metrics-and-impact/
+  verdict: inaccurate
+  score: 0.75
+  issues: |-
+    unsupported: The claim that the Against Malaria Foundation has protected over 667 million people is not supported by the source.
+    unsupported: The claim that CEA reports strong engagement growth in 2025 after post-FTX declines is not supported by the source.
+    unsupported: The claim that hundreds of millions of dollars have flowed to existential risk research is not supported by the source.
+    unsupported: The claim that AI safety work has gained mainstream policy traction is not supported by the source.
+    unsupported: The claim that California has signed bills directly regulating AI risk is not supported by the source.
+  difficulty: hard
+  checkedAt: '2026-02-20 16:58:34'
