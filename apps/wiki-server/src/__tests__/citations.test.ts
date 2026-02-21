@@ -25,58 +25,65 @@ function quoteKey(pageId: string, footnote: number) {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
-  // --- citation_quotes: INSERT ... ON CONFLICT DO UPDATE ---
+  // --- citation_quotes: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_quotes") && q.includes("do update")) {
-    const pageId = params[0] as string;
-    const footnote = params[1] as number;
-    const url = params[2];
-    const resourceId = params[3];
-    const claimText = params[4] as string;
-    const claimContext = params[5];
-    const sourceQuote = params[6];
-    const sourceLocation = params[7];
-    const quoteVerified = params[8] ?? false;
-    const verificationMethod = params[9];
-    const verificationScore = params[10];
-    const sourceTitle = params[11];
-    const sourceType = params[12];
-    const extractionModel = params[13];
-
-    const key = quoteKey(pageId, footnote);
+    const COLS = 14;
+    const numRows = params.length / COLS;
+    const rows: Record<string, unknown>[] = [];
     const now = new Date();
-    const existing = quotesStore.get(key);
+    for (let i = 0; i < numRows; i++) {
+      const o = i * COLS;
+      const pageId = params[o] as string;
+      const footnote = params[o + 1] as number;
+      const url = params[o + 2];
+      const resourceId = params[o + 3];
+      const claimText = params[o + 4] as string;
+      const claimContext = params[o + 5];
+      const sourceQuote = params[o + 6];
+      const sourceLocation = params[o + 7];
+      const quoteVerified = params[o + 8] ?? false;
+      const verificationMethod = params[o + 9];
+      const verificationScore = params[o + 10];
+      const sourceTitle = params[o + 11];
+      const sourceType = params[o + 12];
+      const extractionModel = params[o + 13];
 
-    if (existing) {
-      const updated = {
-        ...existing,
-        page_id: pageId, footnote, url, resource_id: resourceId,
-        claim_text: claimText, claim_context: claimContext,
-        source_quote: sourceQuote, source_location: sourceLocation,
-        quote_verified: quoteVerified, verification_method: verificationMethod,
-        verification_score: verificationScore, source_title: sourceTitle,
-        source_type: sourceType, extraction_model: extractionModel,
-        updated_at: now,
-      };
-      quotesStore.set(key, updated);
-      return [updated];
+      const key = quoteKey(pageId, footnote);
+      const existing = quotesStore.get(key);
+
+      if (existing) {
+        const updated = {
+          ...existing,
+          page_id: pageId, footnote, url, resource_id: resourceId,
+          claim_text: claimText, claim_context: claimContext,
+          source_quote: sourceQuote, source_location: sourceLocation,
+          quote_verified: quoteVerified, verification_method: verificationMethod,
+          verification_score: verificationScore, source_title: sourceTitle,
+          source_type: sourceType, extraction_model: extractionModel,
+          updated_at: now,
+        };
+        quotesStore.set(key, updated);
+        rows.push(updated);
+      } else {
+        const row: Record<string, unknown> = {
+          id: nextQuoteId++,
+          page_id: pageId, footnote, url, resource_id: resourceId,
+          claim_text: claimText, claim_context: claimContext,
+          source_quote: sourceQuote, source_location: sourceLocation,
+          quote_verified: quoteVerified, verification_method: verificationMethod,
+          verification_score: verificationScore,
+          verified_at: null, source_title: sourceTitle, source_type: sourceType,
+          extraction_model: extractionModel,
+          accuracy_verdict: null, accuracy_issues: null, accuracy_score: null,
+          accuracy_checked_at: null, accuracy_supporting_quotes: null,
+          verification_difficulty: null,
+          created_at: now, updated_at: now,
+        };
+        quotesStore.set(key, row);
+        rows.push(row);
+      }
     }
-
-    const row: Record<string, unknown> = {
-      id: nextQuoteId++,
-      page_id: pageId, footnote, url, resource_id: resourceId,
-      claim_text: claimText, claim_context: claimContext,
-      source_quote: sourceQuote, source_location: sourceLocation,
-      quote_verified: quoteVerified, verification_method: verificationMethod,
-      verification_score: verificationScore,
-      verified_at: null, source_title: sourceTitle, source_type: sourceType,
-      extraction_model: extractionModel,
-      accuracy_verdict: null, accuracy_issues: null, accuracy_score: null,
-      accuracy_checked_at: null, accuracy_supporting_quotes: null,
-      verification_difficulty: null,
-      created_at: now, updated_at: now,
-    };
-    quotesStore.set(key, row);
-    return [row];
+    return rows;
   }
 
   // --- citation_quotes: UPDATE ... accuracy_verdict ---
@@ -226,33 +233,31 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .sort((a, b) => a.page_id.localeCompare(b.page_id));
   }
 
-  // --- citation_accuracy_snapshots: INSERT ---
+  // --- citation_accuracy_snapshots: INSERT (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_accuracy_snapshots")) {
-    const pageId = params[0] as string;
-    const totalCitations = params[1] as number;
-    const checkedCitations = params[2] as number;
-    const accurateCount = params[3] as number;
-    const minorIssuesCount = params[4] as number;
-    const inaccurateCount = params[5] as number;
-    const unsupportedCount = params[6] as number;
-    const notVerifiableCount = params[7] as number;
-    const averageScore = params[8];
+    const COLS = 9;
+    const numRows = params.length / COLS;
+    const rows: Record<string, unknown>[] = [];
     const now = new Date();
-    const row = {
-      id: nextSnapshotId++,
-      page_id: pageId,
-      total_citations: totalCitations,
-      checked_citations: checkedCitations,
-      accurate_count: accurateCount,
-      minor_issues_count: minorIssuesCount,
-      inaccurate_count: inaccurateCount,
-      unsupported_count: unsupportedCount,
-      not_verifiable_count: notVerifiableCount,
-      average_score: averageScore,
-      snapshot_at: now,
-    };
-    snapshotStore.push(row);
-    return [row];
+    for (let i = 0; i < numRows; i++) {
+      const o = i * COLS;
+      const row = {
+        id: nextSnapshotId++,
+        page_id: params[o] as string,
+        total_citations: params[o + 1] as number,
+        checked_citations: params[o + 2] as number,
+        accurate_count: params[o + 3] as number,
+        minor_issues_count: params[o + 4] as number,
+        inaccurate_count: params[o + 5] as number,
+        unsupported_count: params[o + 6] as number,
+        not_verifiable_count: params[o + 7] as number,
+        average_score: params[o + 8],
+        snapshot_at: now,
+      };
+      snapshotStore.push(row);
+      rows.push(row);
+    }
+    return rows;
   }
 
   // --- citation_accuracy_snapshots: SELECT with WHERE ---

@@ -204,40 +204,53 @@ pagesRoute.post("/sync", async (c) => {
   let upserted = 0;
 
   await db.transaction(async (tx) => {
-    for (const page of pages) {
-      const vals = {
-        id: page.id,
-        numericId: page.numericId ?? null,
-        title: page.title,
-        description: page.description ?? null,
-        llmSummary: page.llmSummary ?? null,
-        category: page.category ?? null,
-        subcategory: page.subcategory ?? null,
-        entityType: page.entityType ?? null,
-        tags: page.tags ?? null,
-        quality: page.quality ?? null,
-        readerImportance: page.readerImportance ?? null,
-        hallucinationRiskLevel: page.hallucinationRiskLevel ?? null,
-        hallucinationRiskScore: page.hallucinationRiskScore ?? null,
-        contentPlaintext: page.contentPlaintext ?? null,
-        wordCount: page.wordCount ?? null,
-        lastUpdated: page.lastUpdated ?? null,
-        contentFormat: page.contentFormat ?? null,
-      };
+    const allVals = pages.map((page) => ({
+      id: page.id,
+      numericId: page.numericId ?? null,
+      title: page.title,
+      description: page.description ?? null,
+      llmSummary: page.llmSummary ?? null,
+      category: page.category ?? null,
+      subcategory: page.subcategory ?? null,
+      entityType: page.entityType ?? null,
+      tags: page.tags ?? null,
+      quality: page.quality ?? null,
+      readerImportance: page.readerImportance ?? null,
+      hallucinationRiskLevel: page.hallucinationRiskLevel ?? null,
+      hallucinationRiskScore: page.hallucinationRiskScore ?? null,
+      contentPlaintext: page.contentPlaintext ?? null,
+      wordCount: page.wordCount ?? null,
+      lastUpdated: page.lastUpdated ?? null,
+      contentFormat: page.contentFormat ?? null,
+    }));
 
-      await tx
-        .insert(wikiPages)
-        .values(vals)
-        .onConflictDoUpdate({
-          target: wikiPages.id,
-          set: {
-            ...vals,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-      upserted++;
-    }
+    await tx
+      .insert(wikiPages)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: wikiPages.id,
+        set: {
+          numericId: sql`excluded.numeric_id`,
+          title: sql`excluded.title`,
+          description: sql`excluded.description`,
+          llmSummary: sql`excluded.llm_summary`,
+          category: sql`excluded.category`,
+          subcategory: sql`excluded.subcategory`,
+          entityType: sql`excluded.entity_type`,
+          tags: sql`excluded.tags`,
+          quality: sql`excluded.quality`,
+          readerImportance: sql`excluded.reader_importance`,
+          hallucinationRiskLevel: sql`excluded.hallucination_risk_level`,
+          hallucinationRiskScore: sql`excluded.hallucination_risk_score`,
+          contentPlaintext: sql`excluded.content_plaintext`,
+          wordCount: sql`excluded.word_count`,
+          lastUpdated: sql`excluded.last_updated`,
+          contentFormat: sql`excluded.content_format`,
+          syncedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      });
+    upserted = allVals.length;
   });
 
   // Update search vectors for synced pages

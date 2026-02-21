@@ -98,29 +98,36 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [row];
   }
 
-  // ---- INSERT INTO auto_update_results ----
+  // ---- INSERT INTO auto_update_results (supports multi-row) ----
   if (q.includes("insert into") && q.includes("auto_update_results")) {
-    const row = {
-      id: nextResultId++,
-      run_id: params[0] as number,
-      page_id: params[1] as string,
-      status: params[2] as string,
-      tier: params[3] as string | null,
-      duration_ms: params[4] as number | null,
-      error_message: params[5] as string | null,
-    };
-    resultStore.push(row);
-    return [row];
+    const COLS = 6;
+    const numRows = params.length / COLS;
+    const rows = [];
+    for (let i = 0; i < numRows; i++) {
+      const o = i * COLS;
+      const row = {
+        id: nextResultId++,
+        run_id: params[o] as number,
+        page_id: params[o + 1] as string,
+        status: params[o + 2] as string,
+        tier: params[o + 3] as string | null,
+        duration_ms: params[o + 4] as number | null,
+        error_message: params[o + 5] as string | null,
+      };
+      resultStore.push(row);
+      rows.push(row);
+    }
+    return rows;
   }
 
-  // ---- SELECT ... FROM auto_update_results WHERE run_id = $1 ----
+  // ---- SELECT ... FROM auto_update_results WHERE run_id IN (...) ----
   if (
     q.includes("auto_update_results") &&
     q.includes("where") &&
     q.includes("run_id")
   ) {
-    const runId = params[0] as number;
-    return resultStore.filter((r) => r.run_id === runId);
+    const runIds = params.map(Number);
+    return resultStore.filter((r) => runIds.includes(r.run_id));
   }
 
   // ---- SELECT count(*) FROM auto_update_runs (not GROUP BY) ----

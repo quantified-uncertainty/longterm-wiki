@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, notFoundError } from "./utils.js";
@@ -138,17 +138,17 @@ autoUpdateRunsRoute.post("/", async (c) => {
     let resultsInserted = 0;
 
     if (d.results && d.results.length > 0) {
-      for (const r of d.results) {
-        await tx.insert(autoUpdateResults).values({
+      await tx.insert(autoUpdateResults).values(
+        d.results.map((r) => ({
           runId: run.id,
           pageId: r.pageId,
           status: r.status,
           tier: r.tier ?? null,
           durationMs: r.durationMs ?? null,
           errorMessage: r.errorMessage ?? null,
-        });
-        resultsInserted++;
-      }
+        }))
+      );
+      resultsInserted = d.results.length;
     }
 
     return { ...run, resultsInserted };
@@ -178,16 +178,25 @@ autoUpdateRunsRoute.get("/all", async (c) => {
     .from(autoUpdateRuns);
   const total = countResult[0].count;
 
-  // For each run, fetch its results
-  const entries = await Promise.all(
-    rows.map(async (r) => {
-      const results = await db
-        .select()
-        .from(autoUpdateResults)
-        .where(eq(autoUpdateResults.runId, r.id));
+  // Fetch all results for the page of runs in a single query
+  const runIds = rows.map((r) => r.id);
+  const resultsByRun = new Map<number, (typeof autoUpdateResults.$inferSelect)[]>();
 
-      return formatRunEntry(r, results);
-    })
+  if (runIds.length > 0) {
+    const allResults = await db
+      .select()
+      .from(autoUpdateResults)
+      .where(inArray(autoUpdateResults.runId, runIds));
+
+    for (const result of allResults) {
+      const existing = resultsByRun.get(result.runId) || [];
+      existing.push(result);
+      resultsByRun.set(result.runId, existing);
+    }
+  }
+
+  const entries = rows.map((r) =>
+    formatRunEntry(r, resultsByRun.get(r.id) || [])
   );
 
   return c.json({ entries, total, limit, offset });

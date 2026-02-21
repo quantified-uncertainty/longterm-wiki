@@ -13,7 +13,9 @@ import { readdirSync, readFileSync } from "fs";
 import { resolve, dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
-import { getDb, initDb, closeDb, type SqlQuery } from "./db.js";
+import { sql } from "drizzle-orm";
+import { getDrizzleDb, initDb, closeDb } from "./db.js";
+import { sessions, sessionPages } from "./schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -101,9 +103,9 @@ async function seedSessions() {
     cost: string | null;
     prUrl: string | null;
     checksYaml: string | null;
-    issuesJson: string | null;
-    learningsJson: string | null;
-    recommendationsJson: string | null;
+    issuesJson: unknown | null;
+    learningsJson: unknown | null;
+    recommendationsJson: unknown | null;
     pages: string[];
   }> = [];
 
@@ -144,15 +146,15 @@ async function seedSessions() {
         checksYaml: serializeChecks(parsed.checks),
         issuesJson:
           parsed.issues && Array.isArray(parsed.issues)
-            ? JSON.stringify(parsed.issues)
+            ? parsed.issues
             : null,
         learningsJson:
           parsed.learnings && Array.isArray(parsed.learnings)
-            ? JSON.stringify(parsed.learnings)
+            ? parsed.learnings
             : null,
         recommendationsJson:
           parsed.recommendations && Array.isArray(parsed.recommendations)
-            ? JSON.stringify(parsed.recommendations)
+            ? parsed.recommendations
             : null,
         pages,
       });
@@ -187,42 +189,65 @@ async function seedSessions() {
     return;
   }
 
-  // Insert into database
-  const db = getDb();
+  // Insert into database using Drizzle batch inserts
   await initDb();
+  const db = getDrizzleDb();
 
+  const BATCH_SIZE = 500;
   let insertedSessions = 0;
   let insertedPages = 0;
 
-  await db.begin(async (tx) => {
-    const q = tx as unknown as SqlQuery;
-
+  await db.transaction(async (tx) => {
     // Truncate for idempotent re-runs (session_pages has ON DELETE CASCADE)
-    await q`TRUNCATE sessions RESTART IDENTITY CASCADE`;
+    await tx.execute(sql`TRUNCATE sessions RESTART IDENTITY CASCADE`);
     console.log("Truncated sessions + session_pages tables");
 
-    for (const s of allSessions) {
-      const rows = await q`
-        INSERT INTO sessions (date, branch, title, summary, model, duration, cost, pr_url, checks_yaml, issues_json, learnings_json, recommendations_json)
-        VALUES (${s.date}::date, ${s.branch}, ${s.title}, ${s.summary}, ${s.model}, ${s.duration}, ${s.cost}, ${s.prUrl}, ${s.checksYaml}, ${s.issuesJson ? JSON.parse(s.issuesJson) : null}::jsonb, ${s.learningsJson ? JSON.parse(s.learningsJson) : null}::jsonb, ${s.recommendationsJson ? JSON.parse(s.recommendationsJson) : null}::jsonb)
-        RETURNING id
-      `;
-      const sessionId = (rows as unknown as Array<{ id: number }>)[0].id;
-      insertedSessions++;
+    // Batch insert sessions, collecting page associations
+    const allPageAssocs: Array<{ sessionId: number; pageId: string }> = [];
 
-      for (const pageId of s.pages) {
-        await q`
-          INSERT INTO session_pages (session_id, page_id)
-          VALUES (${sessionId}, ${pageId})
-        `;
-        insertedPages++;
+    for (let i = 0; i < allSessions.length; i += BATCH_SIZE) {
+      const batch = allSessions.slice(i, i + BATCH_SIZE);
+      const rows = await tx
+        .insert(sessions)
+        .values(
+          batch.map((s) => ({
+            date: s.date,
+            branch: s.branch,
+            title: s.title,
+            summary: s.summary,
+            model: s.model,
+            duration: s.duration,
+            cost: s.cost,
+            prUrl: s.prUrl,
+            checksYaml: s.checksYaml,
+            issuesJson: s.issuesJson,
+            learningsJson: s.learningsJson,
+            recommendationsJson: s.recommendationsJson,
+          }))
+        )
+        .returning({ id: sessions.id });
+
+      insertedSessions += rows.length;
+
+      // Match returned IDs to input sessions (insertion order is preserved)
+      for (let j = 0; j < rows.length; j++) {
+        for (const pageId of batch[j].pages) {
+          allPageAssocs.push({ sessionId: rows[j].id, pageId });
+        }
       }
 
-      if (insertedSessions % 50 === 0) {
+      if (insertedSessions % 50 === 0 && i + BATCH_SIZE < allSessions.length) {
         console.log(
           `  Inserted ${insertedSessions} / ${allSessions.length} sessions...`
         );
       }
+    }
+
+    // Batch insert all page associations
+    for (let i = 0; i < allPageAssocs.length; i += BATCH_SIZE) {
+      const batch = allPageAssocs.slice(i, i + BATCH_SIZE);
+      await tx.insert(sessionPages).values(batch);
+      insertedPages += batch.length;
     }
   });
 

@@ -14,7 +14,9 @@ import { readdirSync, readFileSync } from "fs";
 import { resolve, dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
-import { getDb, initDb, closeDb, type SqlQuery } from "./db.js";
+import { sql } from "drizzle-orm";
+import { getDrizzleDb, initDb, closeDb } from "./db.js";
+import { editLogs } from "./schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -106,31 +108,23 @@ async function seedEditLogs() {
     return;
   }
 
-  // Insert into database
-  const db = getDb();
+  // Insert into database using Drizzle batch inserts
   await initDb();
+  const db = getDrizzleDb();
 
   const BATCH_SIZE = 500;
   let inserted = 0;
 
-  await db.begin(async (tx) => {
-    const q = tx as unknown as SqlQuery;
-
+  await db.transaction(async (tx) => {
     // Truncate for idempotent re-runs
-    await q`TRUNCATE edit_logs RESTART IDENTITY`;
+    await tx.execute(sql`TRUNCATE edit_logs RESTART IDENTITY`);
     console.log("Truncated edit_logs table");
 
-    // Insert in batches
+    // Insert in batches of 500
     for (let i = 0; i < allEntries.length; i += BATCH_SIZE) {
       const batch = allEntries.slice(i, i + BATCH_SIZE);
-
-      for (const e of batch) {
-        await q`
-          INSERT INTO edit_logs (page_id, date, tool, agency, requested_by, note)
-          VALUES (${e.pageId}, ${e.date}::date, ${e.tool}, ${e.agency}, ${e.requestedBy}, ${e.note})
-        `;
-        inserted++;
-      }
+      await tx.insert(editLogs).values(batch);
+      inserted += batch.length;
 
       if (i + BATCH_SIZE < allEntries.length) {
         console.log(`  Inserted ${inserted} / ${allEntries.length}...`);

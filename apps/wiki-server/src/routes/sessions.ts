@@ -108,11 +108,9 @@ sessionsRoute.post("/", async (c) => {
 
     // Insert page associations
     if (d.pages.length > 0) {
-      for (const pageId of d.pages) {
-        await tx
-          .insert(sessionPages)
-          .values({ sessionId: session.id, pageId });
-      }
+      await tx
+        .insert(sessionPages)
+        .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
     }
 
     return { ...session, pages: d.pages };
@@ -158,11 +156,9 @@ sessionsRoute.post("/batch", async (c) => {
       const session = rows[0];
 
       if (d.pages.length > 0) {
-        for (const pageId of d.pages) {
-          await tx
-            .insert(sessionPages)
-            .values({ sessionId: session.id, pageId });
-        }
+        await tx
+          .insert(sessionPages)
+          .values(d.pages.map((pageId) => ({ sessionId: session.id, pageId })));
       }
 
       created.push({

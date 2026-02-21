@@ -138,12 +138,10 @@ async function upsertResource(db: DbClient, d: ResourceInput) {
     await db
       .delete(resourceCitations)
       .where(eq(resourceCitations.resourceId, d.id));
-    for (const pageId of d.citedBy) {
-      await db
-        .insert(resourceCitations)
-        .values({ resourceId: d.id, pageId })
-        .onConflictDoNothing();
-    }
+    await db
+      .insert(resourceCitations)
+      .values(d.citedBy.map((pageId) => ({ resourceId: d.id, pageId })))
+      .onConflictDoNothing();
   }
 
   return rows[0];

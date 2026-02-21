@@ -14,7 +14,9 @@ import { readdirSync, readFileSync } from "fs";
 import { resolve, dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
-import { getDb, initDb, closeDb, type SqlQuery } from "./db.js";
+import { sql } from "drizzle-orm";
+import { getDrizzleDb, initDb, closeDb } from "./db.js";
+import { resources, resourceCitations } from "./schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -47,18 +49,18 @@ function normalizeDate(d: string | Date | undefined): string | null {
   return null;
 }
 
-function normalizeTimestamp(d: string | Date | undefined): string | null {
+function normalizeTimestamp(d: string | Date | undefined): Date | null {
   if (!d) return null;
-  if (d instanceof Date) return d.toISOString();
+  if (d instanceof Date) return d;
   // Handle "YYYY-MM-DD HH:MM:SS" format
   const str = String(d);
   if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(str)) {
-    return str.replace(" ", "T") + "Z";
+    return new Date(str.replace(" ", "T") + "Z");
   }
   if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
-    return str + "T00:00:00Z";
+    return new Date(str + "T00:00:00Z");
   }
-  return str;
+  return new Date(str);
 }
 
 async function seedResources() {
@@ -136,69 +138,66 @@ async function seedResources() {
     return;
   }
 
-  // Insert into database
-  const db = getDb();
+  // Insert into database using Drizzle batch inserts
   await initDb();
+  const db = getDrizzleDb();
 
-  const BATCH_SIZE = 100;
+  const BATCH_SIZE = 500;
   let insertedResources = 0;
   let insertedCitations = 0;
 
-  await db.begin(async (tx) => {
-    const q = tx as unknown as SqlQuery;
-
+  await db.transaction(async (tx) => {
     // Truncate for idempotent re-runs
-    await q`TRUNCATE resource_citations`;
-    await q`TRUNCATE resources CASCADE`;
+    await tx.execute(sql`TRUNCATE resource_citations`);
+    await tx.execute(sql`TRUNCATE resources CASCADE`);
     console.log("Truncated resources and resource_citations tables");
 
-    // Insert resources in batches
+    // Batch insert resources
     for (let i = 0; i < allResources.length; i += BATCH_SIZE) {
       const batch = allResources.slice(i, i + BATCH_SIZE);
-
-      for (const r of batch) {
-        const publishedDate = normalizeDate(r.published_date);
-        const fetchedAt = normalizeTimestamp(r.fetched_at);
-
-        await q`
-          INSERT INTO resources (
-            id, url, title, type, summary, review, abstract,
-            key_points, publication_id, authors, published_date,
-            tags, local_filename, credibility_override, fetched_at, content_hash
-          ) VALUES (
-            ${r.id}, ${r.url}, ${r.title || null}, ${r.type || null},
-            ${r.summary || null}, ${r.review || null}, ${r.abstract || null},
-            ${r.key_points ? JSON.stringify(r.key_points) : null}::jsonb,
-            ${r.publication_id || null},
-            ${r.authors ? JSON.stringify(r.authors) : null}::jsonb,
-            ${publishedDate}::date,
-            ${r.tags ? JSON.stringify(r.tags) : null}::jsonb,
-            ${r.local_filename || null},
-            ${r.credibility_override ?? null},
-            ${fetchedAt}::timestamptz,
-            ${r.content_hash || null}
-          )
-        `;
-        insertedResources++;
-
-        // Insert citations
-        if (r.cited_by) {
-          for (const pageId of r.cited_by) {
-            await q`
-              INSERT INTO resource_citations (resource_id, page_id)
-              VALUES (${r.id}, ${pageId})
-              ON CONFLICT DO NOTHING
-            `;
-            insertedCitations++;
-          }
-        }
-      }
+      await tx.insert(resources).values(
+        batch.map((r) => ({
+          id: r.id,
+          url: r.url,
+          title: r.title || null,
+          type: r.type || null,
+          summary: r.summary || null,
+          review: r.review || null,
+          abstract: r.abstract || null,
+          keyPoints: r.key_points ?? null,
+          publicationId: r.publication_id || null,
+          authors: r.authors ?? null,
+          publishedDate: normalizeDate(r.published_date),
+          tags: r.tags ?? null,
+          localFilename: r.local_filename || null,
+          credibilityOverride: r.credibility_override ?? null,
+          fetchedAt: normalizeTimestamp(r.fetched_at),
+          contentHash: r.content_hash || null,
+        }))
+      );
+      insertedResources += batch.length;
 
       if (i + BATCH_SIZE < allResources.length) {
         console.log(
           `  Inserted ${insertedResources} / ${allResources.length} resources...`
         );
       }
+    }
+
+    // Collect and batch insert all citations
+    const allCitations: Array<{ resourceId: string; pageId: string }> = [];
+    for (const r of allResources) {
+      if (r.cited_by) {
+        for (const pageId of r.cited_by) {
+          allCitations.push({ resourceId: r.id, pageId });
+        }
+      }
+    }
+
+    for (let i = 0; i < allCitations.length; i += BATCH_SIZE) {
+      const batch = allCitations.slice(i, i + BATCH_SIZE);
+      await tx.insert(resourceCitations).values(batch);
+      insertedCitations += batch.length;
     }
   });
 
