@@ -8,4 +8,4 @@ export const WIKI_BASE_URL =
     ""
   );
 
-export const TIMEOUT_MS = 60_000;
+export const TIMEOUT_MS = 90_000;

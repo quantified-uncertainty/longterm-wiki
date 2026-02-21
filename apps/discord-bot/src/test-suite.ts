@@ -73,6 +73,43 @@ const TEST_CASES: TestCase[] = [
     expectedKeywords: [WIKI_BASE_URL],
     shouldFind: true,
   },
+  // New test cases exercising knowledge graph tools
+  {
+    name: "Related pages - deceptive alignment",
+    question: "What topics are related to deceptive alignment?",
+    expectedKeywords: ["scheming", "alignment", "related", "deceptive"],
+    shouldFind: true,
+  },
+  {
+    name: "Entity lookup - organization",
+    question: "Tell me about MIRI — what kind of organization is it and what does it do?",
+    expectedKeywords: ["miri", "machine intelligence", "research"],
+    shouldFind: true,
+  },
+  {
+    name: "Entity search - AI safety organizations",
+    question: "Which organizations work on AI safety?",
+    expectedKeywords: ["anthropic", "openai", "deepmind", "miri", "organization"],
+    shouldFind: true,
+  },
+  {
+    name: "Quantitative facts - Anthropic",
+    question: "How many employees does Anthropic have or what is their funding?",
+    expectedKeywords: ["anthropic", "billion", "million", "funding", "employee"],
+    shouldFind: true,
+  },
+  {
+    name: "Related topics - RLHF backlinks",
+    question: "What wiki pages mention or reference RLHF?",
+    expectedKeywords: ["rlhf", "reinforcement", "page", "mention"],
+    shouldFind: true,
+  },
+  {
+    name: "Resource search - interpretability papers",
+    question: "Are there any good papers or resources on mechanistic interpretability?",
+    expectedKeywords: ["interpretability", "paper", "mechanistic", "resource"],
+    shouldFind: true,
+  },
 ];
 
 function checkKeywords(
