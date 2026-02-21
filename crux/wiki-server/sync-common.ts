@@ -10,7 +10,7 @@
  * then delegates the actual sync loop to batchSync().
  */
 
-import { buildHeaders } from "../lib/wiki-server-client.ts";
+import { buildHeaders } from "../lib/wiki-server/client.ts";
 
 // --- Configuration ---
 const HEALTH_CHECK_RETRIES = 5;

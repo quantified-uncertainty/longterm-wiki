@@ -1,30 +1,17 @@
 /**
  * Facts API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { batchedRequest, getServerUrl, apiRequest, unwrap, type ApiResult } from './client.ts';
+import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
+import type { SyncFact } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface SyncFactItem {
-  entityId: string;
-  factId: string;
-  label?: string | null;
-  value?: string | null;
-  numeric?: number | null;
-  low?: number | null;
-  high?: number | null;
-  asOf?: string | null;
-  measure?: string | null;
-  subject?: string | null;
-  note?: string | null;
-  source?: string | null;
-  sourceResource?: string | null;
-  format?: string | null;
-  formatDivisor?: number | null;
-}
+export type SyncFactItem = SyncFact;
 
 export interface SyncFactsResult {
   upserted: number;
@@ -166,26 +153,3 @@ export async function getFactStats(): Promise<ApiResult<FactStatsResult>> {
   return apiRequest<FactStatsResult>('GET', '/api/facts/stats');
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const syncFacts_compat = async (items: SyncFactItem[]) =>
-  unwrap(await syncFacts(items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getFactsByEntity_compat = async (entityId: string, limit = 100, offset = 0, measure?: string) =>
-  unwrap(await getFactsByEntity(entityId, limit, offset, measure));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getFactTimeseries_compat = async (entityId: string, measure: string, limit = 100) =>
-  unwrap(await getFactTimeseries(entityId, measure, limit));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getStaleFacts_compat = async (olderThan?: string, limit = 50, offset = 0) =>
-  unwrap(await getStaleFacts(olderThan, limit, offset));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getFactStats_compat = async () =>
-  unwrap(await getFactStats());

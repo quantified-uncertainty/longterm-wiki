@@ -20,10 +20,8 @@ import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
 import { exportDashboardData } from './export-dashboard.ts';
 import { logBatchProgress } from './shared.ts';
-import {
-  isServerAvailable,
-  createAccuracySnapshot,
-} from '../lib/wiki-server-client.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { createAccuracySnapshot } from '../lib/wiki-server/citations.ts';
 
 export interface AccuracyResult {
   pageId: string;
@@ -305,8 +303,8 @@ async function main() {
     const serverUp = await isServerAvailable();
     if (serverUp) {
       const snapshot = await createAccuracySnapshot();
-      if (snapshot && !json && !ci) {
-        console.log(`${c.dim}Accuracy snapshot created for ${snapshot.snapshotCount} pages${c.reset}`);
+      if (snapshot.ok && !json && !ci) {
+        console.log(`${c.dim}Accuracy snapshot created for ${snapshot.data.snapshotCount} pages${c.reset}`);
       }
     }
 

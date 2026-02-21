@@ -20,7 +20,8 @@ import { readdirSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
-import { getServerUrl, getApiKey, type SessionApiEntry } from '../lib/wiki-server-client.ts';
+import { getServerUrl, getApiKey } from '../lib/wiki-server/client.ts';
+import type { SessionApiEntry } from '../lib/wiki-server/sessions.ts';
 import { waitForHealthy, batchSync } from './sync-common.ts';
 import { parseSessionYaml } from './sync-session.ts';
 

@@ -36,7 +36,7 @@ describe('wiki-server-client', () => {
   });
 
   describe('appendEditLogToServer', () => {
-    it('returns null when server URL is not set', async () => {
+    it('returns ApiResult error when server URL is not set', async () => {
       delete process.env.LONGTERMWIKI_SERVER_URL;
       const result = await client.appendEditLogToServer({
         pageId: 'test-page',
@@ -44,33 +44,37 @@ describe('wiki-server-client', () => {
         tool: 'crux-fix',
         agency: 'automated',
       });
-      expect(result).toBeNull();
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBe('unavailable');
     });
   });
 
   describe('getEditLogsForPage', () => {
-    it('returns null when server URL is not set', async () => {
+    it('returns ApiResult error when server URL is not set', async () => {
       delete process.env.LONGTERMWIKI_SERVER_URL;
       const result = await client.getEditLogsForPage('test-page');
-      expect(result).toBeNull();
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBe('unavailable');
     });
   });
 
   describe('getEditLogStats', () => {
-    it('returns null when server URL is not set', async () => {
+    it('returns ApiResult error when server URL is not set', async () => {
       delete process.env.LONGTERMWIKI_SERVER_URL;
       const result = await client.getEditLogStats();
-      expect(result).toBeNull();
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBe('unavailable');
     });
   });
 
   describe('appendEditLogBatch', () => {
-    it('returns null when server URL is not set', async () => {
+    it('returns ApiResult error when server URL is not set', async () => {
       delete process.env.LONGTERMWIKI_SERVER_URL;
       const result = await client.appendEditLogBatch([
         { pageId: 'p1', date: '2026-02-20', tool: 'crux-fix', agency: 'automated' },
       ]);
-      expect(result).toBeNull();
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBe('unavailable');
     });
   });
 });

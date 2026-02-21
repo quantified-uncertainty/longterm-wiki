@@ -19,7 +19,7 @@ import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import { parseCliArgs } from '../lib/cli.ts';
-import { createSession, type SessionApiEntry } from '../lib/wiki-server-client.ts';
+import { createSession, type SessionApiEntry } from '../lib/wiki-server/sessions.ts';
 
 const PAGE_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -116,7 +116,7 @@ export async function syncSessionFile(filePath: string): Promise<boolean> {
   if (!entry) return false;
 
   const result = await createSession(entry);
-  return result !== null;
+  return result.ok;
 }
 
 // ---------------------------------------------------------------------------
@@ -152,8 +152,8 @@ async function main() {
   console.log(`  Pages: ${entry.pages?.length || 0}`);
 
   const result = await createSession(entry);
-  if (result) {
-    console.log(`\u2713 Session synced to wiki-server (id: ${result.id})`);
+  if (result.ok) {
+    console.log(`\u2713 Session synced to wiki-server (id: ${result.data.id})`);
   } else {
     console.log('Warning: could not sync session to wiki-server (server unavailable or error)');
     // Not a hard failure — YAML is authoritative

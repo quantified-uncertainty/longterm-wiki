@@ -1,20 +1,19 @@
 /**
  * Page Links API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { batchedRequest, getServerUrl, unwrap, type ApiResult } from './client.ts';
+import type { z } from 'zod';
+import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
+import type { PageLinkSchema } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface PageLinkItem {
-  sourceId: string;
-  targetId: string;
-  linkType: 'yaml_related' | 'entity_link' | 'name_prefix' | 'similarity' | 'shared_tag';
-  relationship?: string | null;
-  weight: number;
-}
+/** Uses z.input (not z.infer) because the schema has .default(1.0) on weight. */
+export type PageLinkItem = z.input<typeof PageLinkSchema>;
 
 export interface SyncLinksResult {
   upserted: number;
@@ -64,10 +63,3 @@ export async function syncPageLinks(
   return { ok: true, data: { upserted: totalUpserted } };
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrapper
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const syncPageLinks_compat = async (links: PageLinkItem[]) =>
-  unwrap(await syncPageLinks(links));

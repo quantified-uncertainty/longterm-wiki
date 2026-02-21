@@ -12,7 +12,7 @@
 
 import type { CommandResult } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
-import { getEditLogsForPage, getEditLogStats } from '../lib/wiki-server-client.ts';
+import { getEditLogsForPage, getEditLogStats } from '../lib/wiki-server/edit-logs.ts';
 
 /**
  * View edit history for a specific page
@@ -27,11 +27,11 @@ export async function view(args: string[], options: Record<string, unknown>): Pr
   }
 
   const result = await getEditLogsForPage(pageId);
-  if (!result) {
-    return { output: `${c.red}Error: wiki-server not available. Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
+  if (!result.ok) {
+    return { output: `${c.red}Error: wiki-server not available (${result.error}). Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
   }
 
-  const entries = result.entries;
+  const entries = result.data.entries;
 
   if (options.ci || options.json) {
     return { output: JSON.stringify(entries, null, 2), exitCode: 0 };
@@ -78,12 +78,12 @@ export async function list(args: string[], options: Record<string, unknown>): Pr
 
   // Use the stats endpoint to get a page-level overview, then list individual pages
   const serverStats = await getEditLogStats();
-  if (!serverStats) {
-    return { output: `${c.red}Error: wiki-server not available. Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
+  if (!serverStats.ok) {
+    return { output: `${c.red}Error: wiki-server not available (${serverStats.error}). Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
   }
 
   // For list, we query the /all endpoint and group by page
-  const { getServerUrl, buildHeaders } = await import('../lib/wiki-server-client.ts');
+  const { getServerUrl, buildHeaders } = await import('../lib/wiki-server/client.ts');
   const serverUrl = getServerUrl();
   if (!serverUrl) {
     return { output: `${c.red}Error: wiki-server not available. Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
@@ -179,10 +179,12 @@ export async function stats(_args: string[], options: Record<string, unknown>): 
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
 
-  const serverStats = await getEditLogStats();
-  if (!serverStats) {
-    return { output: `${c.red}Error: wiki-server not available. Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
+  const statsResult = await getEditLogStats();
+  if (!statsResult.ok) {
+    return { output: `${c.red}Error: wiki-server not available (${statsResult.error}). Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
   }
+
+  const serverStats = statsResult.data;
 
   if (options.ci || options.json) {
     return { output: JSON.stringify(serverStats, null, 2), exitCode: 0 };

@@ -3,7 +3,7 @@ import { loadSessionYamls, syncSessions } from './sync-sessions.ts';
 import { mkdtempSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import type { SessionApiEntry } from '../lib/wiki-server-client.ts';
+import type { SessionApiEntry } from '../lib/wiki-server/sessions.ts';
 
 const noSleep = async () => {};
 

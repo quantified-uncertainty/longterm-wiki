@@ -1,20 +1,17 @@
 /**
  * Hallucination Risk API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { batchedRequest, getServerUrl, unwrap, type ApiResult } from './client.ts';
+import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
+import type { RiskSnapshotInput } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface RiskSnapshot {
-  pageId: string;
-  score: number;
-  level: string;
-  factors: string[];
-  integrityIssues?: string[];
-}
+export type RiskSnapshot = RiskSnapshotInput;
 
 interface RiskBatchResult {
   inserted: number;
@@ -61,10 +58,3 @@ export async function recordRiskSnapshots(
   return { ok: true, data: { inserted: totalInserted } };
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrapper
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const recordRiskSnapshots_compat = async (snapshots: RiskSnapshot[]) =>
-  unwrap(await recordRiskSnapshots(snapshots));

@@ -23,7 +23,7 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey } from "../lib/wiki-server-client.ts";
+import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
 import { batchSync, waitForHealthy } from "./sync-common.ts";
 
 // Re-export for backward compatibility — other sync scripts and tests import these from here
