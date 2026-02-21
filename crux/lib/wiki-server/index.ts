@@ -8,6 +8,18 @@
  *
  * The _compat wrappers call `unwrap()` on the new typed results, preserving
  * the original behavior of returning `null` on any failure.
+ *
+ * ## Migration note (tech-debt #540)
+ *
+ * The _compat wrappers in this barrel are slated for removal once all call
+ * sites are updated to use the `ApiResult<T>`-returning functions directly.
+ * Until then they remain exported here under their original names so existing
+ * callers do not need to change import paths.
+ *
+ * Migration steps for any _compat function:
+ *   1. Import the typed function from its sub-module instead of this barrel.
+ *   2. Unwrap the result explicitly: check `result.ok` rather than `!= null`.
+ *   3. Delete the corresponding `_compat` wrapper and its re-export here.
  */
 
 // ---------------------------------------------------------------------------
@@ -52,7 +64,6 @@ export {
   appendEditLogBatch_compat as appendEditLogBatch,
   getEditLogsForPage_compat as getEditLogsForPage,
   getEditLogStats_compat as getEditLogStats,
-  getEditLogLatestDates_compat as getEditLogLatestDates,
 } from './edit-logs.ts';
 
 // Citations
@@ -81,7 +92,6 @@ export {
   getAutoUpdateRuns_compat as getAutoUpdateRuns,
   getAutoUpdateStats_compat as getAutoUpdateStats,
   insertAutoUpdateNewsItems_compat as insertAutoUpdateNewsItems,
-  getAutoUpdateNewsDashboard_compat as getAutoUpdateNewsDashboard,
 } from './auto-update.ts';
 
 // Hallucination Risk
@@ -102,9 +112,6 @@ export {
 
 // Page Links
 export { syncPageLinks_compat as syncPageLinks } from './links.ts';
-
-// Resources
-export { upsertResource_compat as upsertResource } from './resources.ts';
 
 // Entities
 export {

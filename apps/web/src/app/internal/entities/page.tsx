@@ -1,4 +1,4 @@
-import { getAllEntities, getEntityHref, getPageById } from "@/data";
+import { getTypedEntities, getEntityHref, getPageById } from "@/data";
 import { EntitiesDataTable } from "./entities-data-table";
 import type { EntityDataRow } from "./entities-data-table";
 import type { Metadata } from "next";
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default function EntitiesPage() {
-  const entities = getAllEntities();
+  const entities = getTypedEntities();
 
   const rows: EntityDataRow[] = entities.map((e) => ({
     id: e.id,
