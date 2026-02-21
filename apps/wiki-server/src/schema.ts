@@ -12,6 +12,7 @@ import {
   jsonb,
   uniqueIndex,
   index,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const entityIdSeq = pgSequence("entity_id_seq", { startWith: 1 });
@@ -135,6 +136,29 @@ export const citationContent = pgTable(
   (table) => [index("idx_cc_page_id").on(table.pageId)]
 );
 
+export const citationAccuracySnapshots = pgTable(
+  "citation_accuracy_snapshots",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    pageId: text("page_id").notNull(),
+    totalCitations: integer("total_citations").notNull(),
+    checkedCitations: integer("checked_citations").notNull(),
+    accurateCount: integer("accurate_count").notNull().default(0),
+    minorIssuesCount: integer("minor_issues_count").notNull().default(0),
+    inaccurateCount: integer("inaccurate_count").notNull().default(0),
+    unsupportedCount: integer("unsupported_count").notNull().default(0),
+    notVerifiableCount: integer("not_verifiable_count").notNull().default(0),
+    averageScore: real("average_score"),
+    snapshotAt: timestamp("snapshot_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_cas_page_id").on(table.pageId),
+    index("idx_cas_snapshot_at").on(table.snapshotAt),
+  ]
+);
+
 export const editLogs = pgTable(
   "edit_logs",
   {
@@ -202,5 +226,45 @@ export const autoUpdateResults = pgTable(
     index("idx_aures_run_id").on(table.runId),
     index("idx_aures_page_id").on(table.pageId),
     index("idx_aures_status").on(table.status),
+  ]
+);
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    date: date("date").notNull(),
+    branch: text("branch"),
+    title: text("title").notNull(),
+    summary: text("summary"),
+    model: text("model"),
+    duration: text("duration"),
+    cost: text("cost"),
+    prUrl: text("pr_url"),
+    checksYaml: text("checks_yaml"),
+    issuesJson: jsonb("issues_json"),
+    learningsJson: jsonb("learnings_json"),
+    recommendationsJson: jsonb("recommendations_json"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_sess_date").on(table.date),
+    index("idx_sess_branch").on(table.branch),
+  ]
+);
+
+export const sessionPages = pgTable(
+  "session_pages",
+  {
+    sessionId: bigint("session_id", { mode: "number" })
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    pageId: text("page_id").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.sessionId, table.pageId] }),
+    index("idx_sp_page_id").on(table.pageId),
   ]
 );

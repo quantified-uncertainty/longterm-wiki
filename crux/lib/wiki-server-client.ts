@@ -275,3 +275,250 @@ export async function getAutoUpdateRuns(
 export async function getAutoUpdateStats(): Promise<AutoUpdateStatsResult | null> {
   return apiRequest<AutoUpdateStatsResult>('GET', '/api/auto-update-runs/stats');
 }
+
+// ---------------------------------------------------------------------------
+// Citation Accuracy API
+// ---------------------------------------------------------------------------
+
+export type AccuracyVerdict = 'accurate' | 'inaccurate' | 'unsupported' | 'minor_issues' | 'not_verifiable';
+
+export interface MarkAccuracyItem {
+  pageId: string;
+  footnote: number;
+  verdict: AccuracyVerdict;
+  score: number;
+  issues?: string | null;
+  supportingQuotes?: string | null;
+  verificationDifficulty?: 'easy' | 'moderate' | 'hard' | null;
+}
+
+interface MarkAccuracyResult {
+  updated: true;
+  pageId: string;
+  footnote: number;
+  verdict: string;
+}
+
+interface MarkAccuracyBatchResult {
+  updated: number;
+  results: Array<{ pageId: string; footnote: number; verdict: string }>;
+}
+
+interface SnapshotResult {
+  snapshotCount: number;
+  pages: string[];
+}
+
+export interface AccuracyDashboardData {
+  exportedAt: string;
+  summary: {
+    totalCitations: number;
+    checkedCitations: number;
+    accurateCitations: number;
+    inaccurateCitations: number;
+    unsupportedCitations: number;
+    minorIssueCitations: number;
+    uncheckedCitations: number;
+    averageScore: number | null;
+  };
+  verdictDistribution: Record<string, number>;
+  difficultyDistribution: Record<string, number>;
+  pages: Array<{
+    pageId: string;
+    totalCitations: number;
+    checked: number;
+    accurate: number;
+    inaccurate: number;
+    unsupported: number;
+    minorIssues: number;
+    accuracyRate: number | null;
+    avgScore: number | null;
+  }>;
+  flaggedCitations: Array<{
+    pageId: string;
+    footnote: number;
+    claimText: string;
+    sourceTitle: string | null;
+    url: string | null;
+    verdict: string;
+    score: number | null;
+    issues: string | null;
+    difficulty: string | null;
+    checkedAt: string | null;
+  }>;
+  domainAnalysis: Array<{
+    domain: string;
+    totalCitations: number;
+    checked: number;
+    accurate: number;
+    inaccurate: number;
+    unsupported: number;
+    inaccuracyRate: number | null;
+  }>;
+}
+
+/**
+ * Mark accuracy verdict for a single citation.
+ */
+export async function markCitationAccuracy(
+  item: MarkAccuracyItem,
+): Promise<MarkAccuracyResult | null> {
+  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item);
+}
+
+/**
+ * Mark accuracy verdicts for multiple citations in a single batch.
+ */
+export async function markCitationAccuracyBatch(
+  items: MarkAccuracyItem[],
+): Promise<MarkAccuracyBatchResult | null> {
+  return apiRequest<MarkAccuracyBatchResult>(
+    'POST',
+    '/api/citations/quotes/mark-accuracy-batch',
+    { items },
+  );
+}
+
+/**
+ * Create accuracy snapshots for all pages with accuracy data.
+ */
+export async function createAccuracySnapshot(): Promise<SnapshotResult | null> {
+  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {});
+}
+
+/**
+ * Get accuracy dashboard data (replaces YAML export).
+ */
+export async function getAccuracyDashboard(): Promise<AccuracyDashboardData | null> {
+  return apiRequest<AccuracyDashboardData>('GET', '/api/citations/accuracy-dashboard');
+}
+
+// ---------------------------------------------------------------------------
+// Sessions API
+// ---------------------------------------------------------------------------
+
+export interface SessionApiEntry {
+  date: string;
+  branch?: string | null;
+  title: string;
+  summary?: string | null;
+  model?: string | null;
+  duration?: string | null;
+  cost?: string | null;
+  prUrl?: string | null;
+  checksYaml?: string | null;
+  issuesJson?: unknown;
+  learningsJson?: unknown;
+  recommendationsJson?: unknown;
+  pages?: string[];
+}
+
+interface CreateSessionResult {
+  id: number;
+  date: string;
+  title: string;
+  pages: string[];
+  createdAt: string;
+}
+
+interface SessionBatchResult {
+  inserted: number;
+  results: Array<{ id: number; title: string; pageCount: number }>;
+}
+
+export interface SessionEntry {
+  id: number;
+  date: string;
+  branch: string | null;
+  title: string;
+  summary: string | null;
+  model: string | null;
+  duration: string | null;
+  cost: string | null;
+  prUrl: string | null;
+  checksYaml: string | null;
+  issuesJson: unknown;
+  learningsJson: unknown;
+  recommendationsJson: unknown;
+  pages: string[];
+  createdAt: string;
+}
+
+interface SessionListResult {
+  sessions: SessionEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+interface SessionByPageResult {
+  sessions: SessionEntry[];
+}
+
+interface SessionStatsResult {
+  totalSessions: number;
+  uniquePages: number;
+  totalPageEdits: number;
+  byModel: Record<string, number>;
+}
+
+interface SessionPageChangesResult {
+  sessions: SessionEntry[];
+}
+
+/**
+ * Create a single session log entry in the database.
+ */
+export async function createSession(
+  entry: SessionApiEntry,
+): Promise<CreateSessionResult | null> {
+  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry);
+}
+
+/**
+ * Create multiple session log entries in a single batch.
+ */
+export async function createSessionBatch(
+  items: SessionApiEntry[],
+): Promise<SessionBatchResult | null> {
+  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items });
+}
+
+/**
+ * List sessions (paginated, newest first).
+ */
+export async function listSessions(
+  limit = 100,
+  offset = 0,
+): Promise<SessionListResult | null> {
+  return apiRequest<SessionListResult>(
+    'GET',
+    `/api/sessions?limit=${limit}&offset=${offset}`,
+  );
+}
+
+/**
+ * Get sessions that modified a specific page.
+ */
+export async function getSessionsByPage(
+  pageId: string,
+): Promise<SessionByPageResult | null> {
+  return apiRequest<SessionByPageResult>(
+    'GET',
+    `/api/sessions/by-page?page_id=${encodeURIComponent(pageId)}`,
+  );
+}
+
+/**
+ * Get aggregate session statistics.
+ */
+export async function getSessionStats(): Promise<SessionStatsResult | null> {
+  return apiRequest<SessionStatsResult>('GET', '/api/sessions/stats');
+}
+
+/**
+ * Get all sessions with page associations (for page-changes dashboard).
+ */
+export async function getSessionPageChanges(): Promise<SessionPageChangesResult | null> {
+  return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes');
+}

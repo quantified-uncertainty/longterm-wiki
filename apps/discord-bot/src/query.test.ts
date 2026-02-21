@@ -12,20 +12,14 @@ describe("buildPrompt", () => {
     expect(prompt).toContain('"What is AI safety?"');
   });
 
-  it("references the wiki content path", () => {
+  it("instructs to use search_wiki tool", () => {
     const prompt = buildPrompt("test question");
-    expect(prompt).toContain("/content/docs");
+    expect(prompt).toContain("search_wiki");
   });
 
-  it("instructs to use Grep to search .mdx files", () => {
-    const prompt = buildPrompt("test");
-    expect(prompt).toContain("Grep");
-    expect(prompt).toContain(".mdx");
-  });
-
-  it("instructs to use Read for relevant files", () => {
-    const prompt = buildPrompt("test");
-    expect(prompt).toContain("Read");
+  it("instructs to use get_page tool", () => {
+    const prompt = buildPrompt("test question");
+    expect(prompt).toContain("get_page");
   });
 
   it("includes the wiki base URL for link formatting", () => {
@@ -41,6 +35,20 @@ describe("buildPrompt", () => {
   it("includes fallback instruction for missing information", () => {
     const prompt = buildPrompt("test");
     expect(prompt).toContain("couldn't find information");
+  });
+
+  it("does not reference local file paths or .mdx files", () => {
+    const prompt = buildPrompt("test");
+    expect(prompt).not.toContain("/content/docs");
+    expect(prompt).not.toContain(".mdx");
+    expect(prompt).not.toContain("Grep");
+    expect(prompt).not.toContain("Read");
+  });
+
+  it("uses /wiki/ URL format (not /knowledge-base/)", () => {
+    const prompt = buildPrompt("test");
+    expect(prompt).toContain("/wiki/");
+    expect(prompt).not.toMatch(/knowledge-base\/\{id\}/);
   });
 
   it("produces consistent output for the same input", () => {
