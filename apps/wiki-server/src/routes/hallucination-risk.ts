@@ -7,6 +7,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  firstOrThrow,
 } from "./utils.js";
 
 export const hallucinationRiskRoute = new Hono();
@@ -73,7 +74,7 @@ hallucinationRiskRoute.post("/", async (c) => {
       computedAt: hallucinationRiskSnapshots.computedAt,
     });
 
-  return c.json(rows[0], 201);
+  return c.json(firstOrThrow(rows, "hallucination risk snapshot insert"), 201);
 });
 
 // ---- POST /batch (record multiple snapshots) ----
@@ -104,7 +105,7 @@ hallucinationRiskRoute.post("/batch", async (c) => {
           id: hallucinationRiskSnapshots.id,
           pageId: hallucinationRiskSnapshots.pageId,
         });
-      rows.push(inserted[0]);
+      rows.push(firstOrThrow(inserted, `hallucination risk batch insert ${d.pageId}`));
     }
     return rows;
   });

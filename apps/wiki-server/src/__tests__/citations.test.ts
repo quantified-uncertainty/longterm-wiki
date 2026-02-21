@@ -298,19 +298,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // --- citation_content: INSERT ... ON CONFLICT DO UPDATE ---
   if (q.includes("insert into") && q.includes("citation_content")) {
     const url = params[0] as string;
-    const pageId = params[1];
-    const footnote = params[2];
-    const fetchedAt = params[3];
-    const httpStatus = params[4];
-    const contentType = params[5];
-    const pageTitle = params[6];
-    const fullTextPreview = params[7];
-    const contentLength = params[8];
-    const contentHash = params[9];
+    const fetchedAt = params[1];
+    const httpStatus = params[2];
+    const contentType = params[3];
+    const pageTitle = params[4];
+    const fullTextPreview = params[5];
+    const contentLength = params[6];
+    const contentHash = params[7];
     const now = new Date();
     const existing = contentStore.get(url);
     const row: Record<string, unknown> = {
-      url, page_id: pageId, footnote, fetched_at: fetchedAt,
+      url, fetched_at: fetchedAt,
       http_status: httpStatus, content_type: contentType,
       page_title: pageTitle, full_text_preview: fullTextPreview,
       content_length: contentLength, content_hash: contentHash,
@@ -635,8 +633,6 @@ describe("Citation Server API", () => {
     it("creates content entry", async () => {
       const res = await postJson(app, "/api/citations/content/upsert", {
         url: "https://example.com/article",
-        pageId: "test-page",
-        footnote: 1,
         fetchedAt: "2025-01-01T00:00:00Z",
         httpStatus: 200,
         contentType: "text/html",
@@ -648,13 +644,10 @@ describe("Citation Server API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.url).toBe("https://example.com/article");
-      expect(body.pageId).toBe("test-page");
     });
 
     it("rejects missing url", async () => {
       const res = await postJson(app, "/api/citations/content/upsert", {
-        pageId: "test-page",
-        footnote: 1,
         fetchedAt: "2025-01-01T00:00:00Z",
       });
       expect(res.status).toBe(400);
@@ -667,8 +660,6 @@ describe("Citation Server API", () => {
     it("returns content for a URL", async () => {
       await postJson(app, "/api/citations/content/upsert", {
         url: "https://example.com/article",
-        pageId: "test-page",
-        footnote: 1,
         fetchedAt: "2025-01-01T00:00:00Z",
         httpStatus: 200,
         pageTitle: "Test Article",

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, count, sql, asc, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { editLogs } from "../schema.js";
-import { parseJsonBody, validationError, invalidJsonError } from "./utils.js";
+import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
 
 export const editLogsRoute = new Hono();
 
@@ -77,7 +77,7 @@ editLogsRoute.post("/", async (c) => {
       createdAt: editLogs.createdAt,
     });
 
-  return c.json(rows[0], 201);
+  return c.json(firstOrThrow(rows, "edit log insert"), 201);
 });
 
 // ---- POST /batch (append multiple entries) ----
@@ -106,7 +106,7 @@ editLogsRoute.post("/batch", async (c) => {
           note: d.note ?? null,
         })
         .returning({ id: editLogs.id, pageId: editLogs.pageId });
-      rows.push(inserted[0]);
+      rows.push(firstOrThrow(inserted, `edit log batch insert ${d.pageId}`));
     }
     return rows;
   });

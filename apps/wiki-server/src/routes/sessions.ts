@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { sessions, sessionPages } from "../schema.js";
-import { parseJsonBody, validationError, invalidJsonError } from "./utils.js";
+import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
 
 export const sessionsRoute = new Hono();
 
@@ -104,7 +104,7 @@ sessionsRoute.post("/", async (c) => {
         createdAt: sessions.createdAt,
       });
 
-    const session = rows[0];
+    const session = firstOrThrow(rows, "session insert");
 
     // Insert page associations
     if (d.pages.length > 0) {
@@ -155,7 +155,7 @@ sessionsRoute.post("/batch", async (c) => {
         })
         .returning({ id: sessions.id, title: sessions.title });
 
-      const session = rows[0];
+      const session = firstOrThrow(rows, `session batch insert "${d.title}"`);
 
       if (d.pages.length > 0) {
         for (const pageId of d.pages) {

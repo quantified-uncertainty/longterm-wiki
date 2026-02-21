@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
-import { parseJsonBody, validationError, invalidJsonError, notFoundError } from "./utils.js";
+import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow } from "./utils.js";
 
 export const autoUpdateRunsRoute = new Hono();
 
@@ -134,7 +134,7 @@ autoUpdateRunsRoute.post("/", async (c) => {
         createdAt: autoUpdateRuns.createdAt,
       });
 
-    const run = runRow[0];
+    const run = firstOrThrow(runRow, "auto-update run insert");
     let resultsInserted = 0;
 
     if (d.results && d.results.length > 0) {

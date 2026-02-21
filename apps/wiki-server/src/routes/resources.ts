@@ -18,6 +18,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
 
 export const resourcesRoute = new Hono();
@@ -146,7 +147,7 @@ async function upsertResource(db: DbClient, d: ResourceInput) {
     }
   }
 
-  return rows[0];
+  return firstOrThrow(rows, `resource upsert ${d.id}`);
 }
 
 function formatResource(r: typeof resources.$inferSelect) {
