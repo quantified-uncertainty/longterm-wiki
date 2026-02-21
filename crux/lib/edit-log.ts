@@ -130,7 +130,7 @@ export async function appendEditLog(
   entry: Omit<EditLogEntry, 'date'> & { date?: string },
 ): Promise<ApiResult<AppendResult>> {
   const fullEntry: EditLogEntry = {
-    date: entry.date || new Date().toISOString().split('T')[0],
+    date: entry.date ?? new Date().toISOString().split('T')[0],
     tool: entry.tool,
     agency: entry.agency,
     ...(entry.requestedBy != null && { requestedBy: entry.requestedBy }),

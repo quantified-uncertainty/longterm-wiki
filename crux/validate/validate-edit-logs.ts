@@ -42,7 +42,7 @@ async function validate(): Promise<{ passed: boolean; errors: number; warnings: 
     return { passed: true, errors: 0, warnings: 1 };
   }
 
-  const { totalEntries, pagesWithLogs } = result.data;
+  const { totalEntries, pagesWithLogs, byTool, byAgency } = result.data;
 
   if (CI_MODE) {
     console.log(
@@ -51,7 +51,7 @@ async function validate(): Promise<{ passed: boolean; errors: number; warnings: 
           errors: 0,
           warnings: 0,
           issues: [],
-          stats: { totalEntries, pagesWithLogs },
+          stats: { totalEntries, pagesWithLogs, byTool, byAgency },
         },
         null,
         2,
@@ -61,7 +61,6 @@ async function validate(): Promise<{ passed: boolean; errors: number; warnings: 
     console.log(`${colors.green}  ✓ Edit log store healthy${colors.reset}`);
     console.log(`${colors.dim}    Total entries: ${totalEntries}  |  Pages with logs: ${pagesWithLogs}${colors.reset}`);
 
-    const { byTool, byAgency } = result.data;
     const topTools = Object.entries(byTool)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
