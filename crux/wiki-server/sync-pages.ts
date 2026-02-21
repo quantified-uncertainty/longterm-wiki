@@ -285,7 +285,7 @@ function transformPage(page: PageData): SyncPage {
     entityType: page.entityType ?? null,
     tags: page.tags ? JSON.stringify(page.tags) : null,
     quality: page.quality ?? null,
-    readerImportance: page.readerImportance ?? null,
+    readerImportance: page.readerImportance != null ? Math.round(page.readerImportance) : null,
     hallucinationRiskLevel: page.hallucinationRisk?.level ?? null,
     hallucinationRiskScore: page.hallucinationRisk?.score ?? null,
     contentPlaintext: content,
