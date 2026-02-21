@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { count, sql } from "drizzle-orm";
+import { count } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import { entityIds, wikiPages, entities, facts } from "../schema.js";
 

@@ -7,7 +7,6 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-  firstOrThrow,
 } from "./utils.js";
 
 export const autoUpdateNewsRoute = new Hono();
