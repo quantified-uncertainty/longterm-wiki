@@ -95,7 +95,7 @@ describe('syncSessions', () => {
 
   it('inserts all sessions successfully', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
-      new Response(JSON.stringify({ inserted: 2 }), { status: 200 }),
+      new Response(JSON.stringify({ upserted: 2 }), { status: 200 }),
     );
 
     const items = [
@@ -114,7 +114,7 @@ describe('syncSessions', () => {
   it('counts errors for failed batches', async () => {
     vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(
-        new Response(JSON.stringify({ inserted: 2 }), { status: 200 }),
+        new Response(JSON.stringify({ upserted: 2 }), { status: 200 }),
       )
       .mockResolvedValueOnce(new Response('Bad Request', { status: 400 }));
 
@@ -158,7 +158,7 @@ describe('syncSessions', () => {
 
   it('sends correct payload to /api/sessions/batch', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      new Response(JSON.stringify({ inserted: 1 }), { status: 200 }),
+      new Response(JSON.stringify({ upserted: 1 }), { status: 200 }),
     );
 
     const items = [makeSession('Test Session')];

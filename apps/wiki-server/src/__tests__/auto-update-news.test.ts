@@ -60,9 +60,17 @@ function resetStores() {
   nextNewsId = 1;
 }
 
+function resetNewsStore() {
+  newsStore = [];
+  nextNewsId = 1;
+}
+
 function makeRun(overrides: Partial<RunRow> = {}): RunRow {
   const { id: overrideId, ...rest } = overrides;
   const id = overrideId ?? nextRunId++;
+  // Ensure auto-id counter stays ahead of any explicitly-supplied id so that
+  // future auto-id calls never collide with explicit ones.
+  if (overrideId !== undefined) nextRunId = Math.max(nextRunId, overrideId + 1);
   return {
     id,
     date: "2026-02-21",
@@ -195,10 +203,11 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT FROM auto_update_news_items WHERE run_id IN ($1, $2, ...)  ----
-  // Used by GET /dashboard (Drizzle inArray spreads params individually).
+  // Used by GET /dashboard (Drizzle inArray() generates `in (` syntax, not `any(`;
+  // the `any(` branch is omitted deliberately as it is dead code with inArray).
   if (
     q.includes("auto_update_news_items") &&
-    (q.includes(" in (") || q.includes("any(")) &&
+    q.includes(" in (") &&
     q.includes("run_id")
   ) {
     const ids = params.map(Number);
@@ -415,8 +424,7 @@ describe("Auto-Update News API", () => {
     });
 
     it("maps topics and entities to arrays (not null)", async () => {
-      newsStore.length = 0;
-      nextNewsId = 1;
+      resetNewsStore();
       newsStore.push(
         makeNews(1, {
           topics_json: ["alignment", "safety"],
@@ -434,8 +442,7 @@ describe("Auto-Update News API", () => {
     });
 
     it("returns empty arrays for null topics/entities", async () => {
-      newsStore.length = 0;
-      nextNewsId = 1;
+      resetNewsStore();
       newsStore.push(makeNews(1, { topics_json: null, entities_json: null }));
       const res = await app.request("/api/auto-update-news/by-run/1");
       const body = await res.json();
@@ -586,6 +593,11 @@ describe("Auto-Update News API", () => {
     it("rejects runs=abc (NaN guard via Zod)", async () => {
       const res = await app.request("/api/auto-update-news/dashboard?runs=abc");
       expect(res.status).toBe(400);
+    });
+
+    it("accepts runs=50 (boundary of maximum)", async () => {
+      const res = await app.request("/api/auto-update-news/dashboard?runs=50");
+      expect(res.status).toBe(200);
     });
 
     it("rejects runs above the maximum of 50", async () => {

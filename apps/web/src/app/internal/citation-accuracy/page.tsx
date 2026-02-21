@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import {
-  fetchFromWikiServer,
+  fetchDetailed,
   withApiFallback,
-  dataSourceLabel,
 } from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { CitationAccuracyDashboard } from "./citation-accuracy-dashboard";
 import { VERDICT_COLORS } from "./verdict-colors";
 import type { Metadata } from "next";
@@ -75,8 +75,8 @@ export interface DomainSummary {
  * Try loading dashboard data from the wiki-server API (PostgreSQL source of truth).
  * Returns null if the server is unavailable or returns no data.
  */
-async function loadDashboardDataFromApi(): Promise<DashboardData | null> {
-  return fetchFromWikiServer<DashboardData>(
+async function loadDashboardDataFromApi() {
+  return fetchDetailed<DashboardData>(
     "/api/citations/accuracy-dashboard",
     { revalidate: 300 }
   );
@@ -160,7 +160,7 @@ function StatCard({
 }
 
 export default async function CitationAccuracyPage() {
-  const { data, source } = await loadDashboardData();
+  const { data, source, apiError } = await loadDashboardData();
 
   if (!data) {
     return (
@@ -303,13 +303,14 @@ export default async function CitationAccuracyPage() {
         domainAnalysis={data.domainAnalysis}
       />
 
-      <p className="text-xs text-muted-foreground mt-4">
+      <DataSourceBanner source={source} apiError={apiError} />
+      <p className="text-xs text-muted-foreground mt-1">
         Data exported{" "}
         {new Date(data.exportedAt).toLocaleString("en-US", {
           dateStyle: "medium",
           timeStyle: "short",
         })}
-        . Source: {dataSourceLabel(source)}. Regenerate with{" "}
+        . Regenerate with{" "}
         <code className="text-[11px]">pnpm crux citations export-dashboard</code>
       </p>
     </article>

@@ -81,6 +81,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 | **visual** | `content/docs/` | `content/docs/` (diagrams, charts) |
 | **check-links** | `data/resources/`, URLs | stdout (health reports) |
 | **edit-log** | PostgreSQL (wiki-server) | stdout (history) |
+| **edit-log** | wiki-server PostgreSQL DB | stdout (history) |
 | **importance** | `content/docs/`, `data/` | `content/docs/` frontmatter |
 | **ci** | GitHub API | stdout (check-run status) |
 | **maintain** | GitHub API, `.claude/sessions/`, codebase | stdout, GitHub issues |
