@@ -12,6 +12,12 @@ const SCRIPTS = {
     description: 'Sync wiki page content and metadata to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size', 'ci'],
   },
+  'sync-session': {
+    script: 'wiki-server/sync-session.ts',
+    description: 'Sync a single session YAML file to wiki-server',
+    passthrough: [],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'sync');
@@ -39,5 +45,6 @@ Examples:
   crux wiki-server sync                  Sync all pages
   crux wiki-server sync --dry-run        Preview sync
   crux wiki-server sync --batch-size=25  Use smaller batches
+  crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
 `;
 }

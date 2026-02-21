@@ -40,6 +40,12 @@ Run `pnpm crux agent-checklist snapshot` and capture the output — this is the 
 
 Create `.claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml` per `.claude/rules/session-logging.md`. Include the `checks:` block verbatim from the snapshot output. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly; the audit trail should reflect reality.
 
+After writing the YAML file, sync it to the wiki-server database:
+```bash
+pnpm crux wiki-server sync-session .claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml
+```
+This is fire-and-forget — if the server is unavailable, the sync silently skips. YAML remains authoritative.
+
 ## Step 6: Validate completion
 
 Run `pnpm crux agent-checklist complete` — must exit 0 (all items checked or N/A).
