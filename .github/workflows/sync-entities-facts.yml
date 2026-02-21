@@ -1,4 +1,4 @@
-name: Sync Content
+name: Sync Entities & Facts
 
 on:
   push:
@@ -12,11 +12,11 @@ on:
 
 # Cancel superseded runs for the same trigger
 concurrency:
-  group: sync-content-${{ github.sha }}
+  group: sync-entities-facts-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  sync-content:
+  sync-entities-facts:
     runs-on: ubuntu-latest
 
     steps:
