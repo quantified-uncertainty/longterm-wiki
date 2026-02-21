@@ -68,6 +68,47 @@ export const citationQuotes = pgTable(
   ]
 );
 
+export const wikiPages = pgTable(
+  "wiki_pages",
+  {
+    id: text("id").primaryKey(),
+    numericId: text("numeric_id"),
+    title: text("title").notNull(),
+    description: text("description"),
+    llmSummary: text("llm_summary"),
+    category: text("category"),
+    subcategory: text("subcategory"),
+    entityType: text("entity_type"),
+    tags: text("tags"),
+    quality: integer("quality"),
+    readerImportance: integer("reader_importance"),
+    hallucinationRiskLevel: text("hallucination_risk_level"),
+    hallucinationRiskScore: integer("hallucination_risk_score"),
+    contentPlaintext: text("content_plaintext"),
+    wordCount: integer("word_count"),
+    lastUpdated: text("last_updated"),
+    contentFormat: text("content_format"),
+    // search_vector tsvector column is managed via raw SQL migration
+    // (Drizzle doesn't have native tsvector support)
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_wp_numeric_id").on(table.numericId),
+    index("idx_wp_category").on(table.category),
+    index("idx_wp_entity_type").on(table.entityType),
+    index("idx_wp_reader_importance").on(table.readerImportance),
+    // GIN index on search_vector is created in migration SQL
+  ]
+);
+
 export const citationContent = pgTable(
   "citation_content",
   {

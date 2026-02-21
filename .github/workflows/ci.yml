@@ -51,6 +51,37 @@ jobs:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
+  sync-content:
+    # Sync wiki page content to wiki-server after build succeeds on main.
+    needs: [build-and-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build data
+        run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+
+      - name: Sync pages to wiki-server
+        run: pnpm crux wiki-server sync
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+
   deploy:
     # Trigger a Vercel production deployment after CI passes on main.
     # This ensures prod is rebuilt exactly once per PR merge, naturally

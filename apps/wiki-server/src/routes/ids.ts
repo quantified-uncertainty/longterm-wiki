@@ -3,8 +3,42 @@ import { z } from "zod";
 import { eq, count, sql, asc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { entityIds } from "../schema.js";
+import {
+  parseJsonBody,
+  validationError,
+  invalidJsonError,
+  notFoundError,
+} from "./utils.js";
 
 export const idsRoute = new Hono();
+
+// ---- Helpers ----
+
+type EntityIdRow = {
+  numericId: number;
+  slug: string;
+  description: string | null;
+  createdAt: Date;
+};
+
+function formatIdResponse(row: EntityIdRow, created: boolean) {
+  return {
+    numericId: `E${row.numericId}`,
+    slug: row.slug,
+    description: row.description,
+    created,
+    createdAt: row.createdAt,
+  };
+}
+
+function formatIdSummary(row: EntityIdRow) {
+  return {
+    numericId: `E${row.numericId}`,
+    slug: row.slug,
+    description: row.description,
+    createdAt: row.createdAt,
+  };
+}
 
 // ---- Schemas ----
 
@@ -28,19 +62,11 @@ const AllocateBatchSchema = z.object({
 // ---- POST /allocate ----
 
 idsRoute.post("/allocate", async (c) => {
-  let body: unknown;
-  try {
-    body = await c.req.json();
-  } catch {
-    return c.json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
-  }
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
   const parsed = AllocateSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json(
-      { error: "validation_error", message: parsed.error.message },
-      400
-    );
-  }
+  if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { slug, description } = parsed.data;
   const db = getDrizzleDb();
@@ -52,14 +78,7 @@ idsRoute.post("/allocate", async (c) => {
     .where(eq(entityIds.slug, slug));
 
   if (existing.length > 0) {
-    const row = existing[0];
-    return c.json({
-      numericId: `E${row.numericId}`,
-      slug: row.slug,
-      description: row.description,
-      created: false,
-      createdAt: row.createdAt,
-    });
+    return c.json(formatIdResponse(existing[0], false));
   }
 
   // Slug is new — allocate next sequence value
@@ -74,17 +93,7 @@ idsRoute.post("/allocate", async (c) => {
     .returning();
 
   if (inserted.length > 0) {
-    const row = inserted[0];
-    return c.json(
-      {
-        numericId: `E${row.numericId}`,
-        slug: row.slug,
-        description: row.description,
-        created: true,
-        createdAt: row.createdAt,
-      },
-      201
-    );
+    return c.json(formatIdResponse(inserted[0], true), 201);
   }
 
   // Race condition: another request inserted between our SELECT and INSERT.
@@ -96,47 +105,26 @@ idsRoute.post("/allocate", async (c) => {
 
   if (raced.length === 0) {
     return c.json(
-      { error: "not_found", message: "Unexpected: slug not found after conflict" },
+      { error: "internal_error", message: "Unexpected: slug not found after conflict" },
       500
     );
   }
 
-  const row = raced[0];
-  return c.json({
-    numericId: `E${row.numericId}`,
-    slug: row.slug,
-    description: row.description,
-    created: false,
-    createdAt: row.createdAt,
-  });
+  return c.json(formatIdResponse(raced[0], false));
 });
 
 // ---- POST /allocate-batch ----
 
 idsRoute.post("/allocate-batch", async (c) => {
-  let body: unknown;
-  try {
-    body = await c.req.json();
-  } catch {
-    return c.json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
-  }
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
   const parsed = AllocateBatchSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json(
-      { error: "validation_error", message: parsed.error.message },
-      400
-    );
-  }
+  if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
-  const results: Array<{
-    numericId: string;
-    slug: string;
-    description: string | null;
-    created: boolean;
-    createdAt: Date;
-  }> = [];
+  const results: ReturnType<typeof formatIdResponse>[] = [];
 
   // Run all allocations in a single transaction
   await db.transaction(async (tx) => {
@@ -148,14 +136,7 @@ idsRoute.post("/allocate-batch", async (c) => {
         .where(eq(entityIds.slug, item.slug));
 
       if (existing.length > 0) {
-        const row = existing[0];
-        results.push({
-          numericId: `E${row.numericId}`,
-          slug: row.slug,
-          description: row.description,
-          created: false,
-          createdAt: row.createdAt,
-        });
+        results.push(formatIdResponse(existing[0], false));
         continue;
       }
 
@@ -170,14 +151,7 @@ idsRoute.post("/allocate-batch", async (c) => {
         .returning();
 
       if (inserted.length > 0) {
-        const row = inserted[0];
-        results.push({
-          numericId: `E${row.numericId}`,
-          slug: row.slug,
-          description: row.description,
-          created: true,
-          createdAt: row.createdAt,
-        });
+        results.push(formatIdResponse(inserted[0], true));
       }
     }
   });
@@ -194,12 +168,7 @@ const ListQuerySchema = z.object({
 
 idsRoute.get("/", async (c) => {
   const parsed = ListQuerySchema.safeParse(c.req.query());
-  if (!parsed.success) {
-    return c.json(
-      { error: "validation_error", message: parsed.error.message },
-      400
-    );
-  }
+  if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { limit, offset } = parsed.data;
   const db = getDrizzleDb();
@@ -215,12 +184,7 @@ idsRoute.get("/", async (c) => {
   const total = countResult[0].count;
 
   return c.json({
-    ids: rows.map((r) => ({
-      numericId: `E${r.numericId}`,
-      slug: r.slug,
-      description: r.description,
-      createdAt: r.createdAt,
-    })),
+    ids: rows.map(formatIdSummary),
     total,
     limit,
     offset,
@@ -231,12 +195,7 @@ idsRoute.get("/", async (c) => {
 
 idsRoute.get("/by-slug", async (c) => {
   const slug = c.req.query("slug");
-  if (!slug) {
-    return c.json(
-      { error: "validation_error", message: "slug query parameter is required" },
-      400
-    );
-  }
+  if (!slug) return validationError(c, "slug query parameter is required");
 
   const db = getDrizzleDb();
   const rows = await db
@@ -245,14 +204,8 @@ idsRoute.get("/by-slug", async (c) => {
     .where(eq(entityIds.slug, slug));
 
   if (rows.length === 0) {
-    return c.json({ error: "not_found", message: `No ID for slug: ${slug}` }, 404);
+    return notFoundError(c, `No ID for slug: ${slug}`);
   }
 
-  const row = rows[0];
-  return c.json({
-    numericId: `E${row.numericId}`,
-    slug: row.slug,
-    description: row.description,
-    createdAt: row.createdAt,
-  });
+  return c.json(formatIdSummary(rows[0]));
 });

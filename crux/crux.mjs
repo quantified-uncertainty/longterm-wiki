@@ -68,6 +68,7 @@ import * as agentChecklistCommands from './commands/agent-checklist.ts';
 import * as factsCommands from './commands/facts.ts';
 import * as entityCommands from './commands/entity.ts';
 import * as prCommands from './commands/pr.ts';
+import * as wikiServerCommands from './commands/wiki-server.ts';
 
 const domains = {
   validate: validateCommands,
@@ -92,6 +93,7 @@ const domains = {
   facts: factsCommands,
   entity: entityCommands,
   pr: prCommands,
+  'wiki-server': wikiServerCommands,
 };
 
 /**
