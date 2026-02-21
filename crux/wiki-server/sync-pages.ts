@@ -23,7 +23,11 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server-client.ts";
+import { getServerUrl, getApiKey } from "../lib/wiki-server-client.ts";
+import { batchSync, waitForHealthy } from "./sync-common.ts";
+
+// Re-export for backward compatibility — other sync scripts and tests import these from here
+export { waitForHealthy, fetchWithRetry } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const PAGES_JSON_PATH = join(
@@ -34,12 +38,6 @@ const WIKI_DIR = join(PROJECT_ROOT, "apps/web/public/wiki");
 
 // --- Configuration ---
 const HEALTH_CHECK_RETRIES = 5;
-const HEALTH_CHECK_DELAY_MS = 10_000;
-const HEALTH_CHECK_TIMEOUT_MS = 5_000;
-const BATCH_RETRY_ATTEMPTS = 3;
-const BATCH_RETRY_BASE_DELAY_MS = 2_000;
-const BATCH_TIMEOUT_MS = 30_000;
-const MAX_CONSECUTIVE_FAILURES = 3;
 
 interface PageData {
   id: string;
@@ -82,191 +80,6 @@ interface SyncPage {
   contentFormat: string | null;
 }
 
-/**
- * Wait for the server to become healthy before syncing.
- * Retries up to `maxRetries` times with a fixed delay between attempts.
- * Exported for testing.
- */
-export async function waitForHealthy(
-  serverUrl: string,
-  options: {
-    maxRetries?: number;
-    delayMs?: number;
-    timeoutMs?: number;
-    _sleep?: (ms: number) => Promise<void>;
-  } = {}
-): Promise<boolean> {
-  const maxRetries = options.maxRetries ?? HEALTH_CHECK_RETRIES;
-  const delayMs = options.delayMs ?? HEALTH_CHECK_DELAY_MS;
-  const timeoutMs = options.timeoutMs ?? HEALTH_CHECK_TIMEOUT_MS;
-  const sleep = options._sleep ?? ((ms: number) => new Promise((r) => setTimeout(r, ms)));
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const res = await fetch(`${serverUrl}/health`, {
-        signal: AbortSignal.timeout(timeoutMs),
-      });
-
-      if (res.ok) {
-        const body = await res.json();
-        if (body.status === "healthy") {
-          console.log(`  Health check passed (attempt ${attempt}/${maxRetries})`);
-          return true;
-        }
-      }
-      console.warn(
-        `  Health check attempt ${attempt}/${maxRetries}: not healthy (HTTP ${res.status})`
-      );
-    } catch (err) {
-      console.warn(
-        `  Health check attempt ${attempt}/${maxRetries}: ${err instanceof Error ? err.message : err}`
-      );
-    }
-
-    if (attempt < maxRetries) {
-      console.log(`  Retrying in ${delayMs / 1000}s...`);
-      await sleep(delayMs);
-    }
-  }
-
-  return false;
-}
-
-/**
- * Fetch with retry and exponential backoff.
- * Only retries on 5xx status codes or network errors.
- * Returns the Response on success, or throws on exhausted retries.
- * Exported for testing.
- */
-export async function fetchWithRetry(
-  url: string,
-  init: RequestInit,
-  options: {
-    maxAttempts?: number;
-    baseDelayMs?: number;
-    timeoutMs?: number;
-    _sleep?: (ms: number) => Promise<void>;
-  } = {}
-): Promise<Response> {
-  const maxAttempts = options.maxAttempts ?? BATCH_RETRY_ATTEMPTS;
-  const baseDelayMs = options.baseDelayMs ?? BATCH_RETRY_BASE_DELAY_MS;
-  const timeoutMs = options.timeoutMs ?? BATCH_TIMEOUT_MS;
-  const sleep = options._sleep ?? ((ms: number) => new Promise((r) => setTimeout(r, ms)));
-
-  let lastError: unknown;
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      // Strip caller's signal to avoid conflicts with our timeout signal
-      const { signal: _callerSignal, ...initWithoutSignal } = init;
-      const res = await fetch(url, {
-        ...initWithoutSignal,
-        signal: AbortSignal.timeout(timeoutMs),
-      });
-
-      // Don't retry client errors (4xx) — they won't resolve on their own
-      if (res.ok || (res.status >= 400 && res.status < 500)) {
-        return res;
-      }
-
-      // 5xx — retry
-      const body = await res.text().catch(() => "");
-      lastError = new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
-    } catch (err) {
-      lastError = err;
-    }
-
-    if (attempt < maxAttempts) {
-      const delay = baseDelayMs * Math.pow(2, attempt - 1);
-      console.warn(
-        `    Attempt ${attempt + 1}/${maxAttempts}: retrying in ${delay / 1000}s...`
-      );
-      await sleep(delay);
-    }
-  }
-
-  throw lastError;
-}
-
-/** @internal — exported for testing */
-export async function syncPages(
-  serverUrl: string,
-  _apiKey: string,
-  pages: SyncPage[],
-  batchSize: number,
-  options: {
-    _sleep?: (ms: number) => Promise<void>;
-  } = {}
-): Promise<{ upserted: number; errors: number }> {
-  let totalCreated = 0;
-  let totalErrors = 0;
-  let consecutiveFailures = 0;
-
-  for (let i = 0; i < pages.length; i += batchSize) {
-    const batch = pages.slice(i, i + batchSize);
-    const batchNum = Math.floor(i / batchSize) + 1;
-    const totalBatches = Math.ceil(pages.length / batchSize);
-
-    try {
-      const res = await fetchWithRetry(
-        `${serverUrl}/api/pages/sync`,
-        {
-          method: "POST",
-          headers: buildHeaders(),
-          body: JSON.stringify({ pages: batch }),
-        },
-        { _sleep: options._sleep }
-      );
-
-      if (!res.ok) {
-        const body = await res.text();
-        console.error(
-          `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — ${body}`
-        );
-        // Surface the server's error message if available (JSON body from improved error handler)
-        try {
-          const parsed = JSON.parse(body);
-          if (parsed.message) {
-            console.error(`    Server error: ${parsed.message}`);
-          }
-        } catch {
-          // Not JSON — raw body already printed above
-        }
-        totalErrors += batch.length;
-        consecutiveFailures++;
-      } else {
-        const result = (await res.json()) as { upserted: number };
-        totalCreated += result.upserted;
-        consecutiveFailures = 0;
-
-        console.log(
-          `  Batch ${batchNum}/${totalBatches}: ${result.upserted} upserted`
-        );
-      }
-    } catch (err) {
-      console.error(
-        `  Batch ${batchNum}/${totalBatches}: Failed after retries — ${err}`
-      );
-      totalErrors += batch.length;
-      consecutiveFailures++;
-    }
-
-    if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-      const remaining = pages.length - (i + batchSize);
-      if (remaining > 0) {
-        console.error(
-          `\n  Aborting: ${MAX_CONSECUTIVE_FAILURES} consecutive batch failures. ` +
-            `Skipping ${remaining} remaining pages.`
-        );
-        totalErrors += remaining;
-      }
-      break;
-    }
-  }
-
-  return { upserted: totalCreated, errors: totalErrors };
-}
-
 function loadContent(numericId: string | undefined): string | null {
   if (!numericId) return null;
 
@@ -302,6 +115,41 @@ function transformPage(page: PageData): SyncPage {
     lastUpdated: page.lastUpdated ?? null,
     contentFormat: page.contentFormat ?? null,
   };
+}
+
+/** @internal — exported for testing */
+export async function syncPages(
+  serverUrl: string,
+  _apiKey: string,
+  pages: SyncPage[],
+  batchSize: number,
+  options: {
+    _sleep?: (ms: number) => Promise<void>;
+  } = {}
+): Promise<{ upserted: number; errors: number }> {
+  const result = await batchSync(
+    `${serverUrl}/api/pages/sync`,
+    pages,
+    batchSize,
+    {
+      bodyKey: "pages",
+      responseCountKey: "upserted",
+      itemLabel: "pages",
+      onBatchError: (body) => {
+        try {
+          const parsed = JSON.parse(body);
+          if (parsed.message) {
+            console.error(`    Server error: ${parsed.message}`);
+          }
+        } catch {
+          // Not JSON — raw body already printed by batchSync
+        }
+      },
+      _sleep: options._sleep,
+    },
+  );
+
+  return { upserted: result.count, errors: result.errors };
 }
 
 async function main() {

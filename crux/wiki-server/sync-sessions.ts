@@ -4,7 +4,7 @@
  * Reads all .claude/sessions/*.yaml files and bulk-upserts them to the
  * wiki-server's /api/sessions/batch endpoint.
  *
- * Reuses the retry + health-check pattern from sync-pages.ts.
+ * Reuses the shared batch sync infrastructure from sync-common.ts.
  *
  * Usage:
  *   pnpm crux wiki-server sync-sessions
@@ -20,8 +20,8 @@ import { readdirSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
-import { getServerUrl, getApiKey, buildHeaders, type SessionApiEntry } from '../lib/wiki-server-client.ts';
-import { waitForHealthy, fetchWithRetry } from './sync-pages.ts';
+import { getServerUrl, getApiKey, type SessionApiEntry } from '../lib/wiki-server-client.ts';
+import { waitForHealthy, batchSync } from './sync-common.ts';
 import { parseSessionYaml } from './sync-session.ts';
 
 const PROJECT_ROOT = join(import.meta.dirname!, '../..');
@@ -29,7 +29,6 @@ const SESSIONS_DIR = join(PROJECT_ROOT, '.claude/sessions');
 
 // --- Configuration ---
 const DEFAULT_BATCH_SIZE = 50;
-const MAX_CONSECUTIVE_FAILURES = 3;
 
 /**
  * Read all .claude/sessions/*.yaml files and return parsed session entries.
@@ -73,64 +72,19 @@ export async function syncSessions(
     _sleep?: (ms: number) => Promise<void>;
   } = {},
 ): Promise<{ inserted: number; errors: number }> {
-  let totalInserted = 0;
-  let totalErrors = 0;
-  let consecutiveFailures = 0;
+  const result = await batchSync(
+    `${serverUrl}/api/sessions/batch`,
+    items,
+    batchSize,
+    {
+      bodyKey: 'items',
+      responseCountKey: 'inserted',
+      itemLabel: 'sessions',
+      _sleep: options._sleep,
+    },
+  );
 
-  for (let i = 0; i < items.length; i += batchSize) {
-    const batch = items.slice(i, i + batchSize);
-    const batchNum = Math.floor(i / batchSize) + 1;
-    const totalBatches = Math.ceil(items.length / batchSize);
-
-    try {
-      const res = await fetchWithRetry(
-        `${serverUrl}/api/sessions/batch`,
-        {
-          method: 'POST',
-          headers: buildHeaders(),
-          body: JSON.stringify({ items: batch }),
-        },
-        { _sleep: options._sleep },
-      );
-
-      if (!res.ok) {
-        const body = await res.text();
-        console.error(
-          `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — ${body}`,
-        );
-        totalErrors += batch.length;
-        consecutiveFailures++;
-      } else {
-        const result = (await res.json()) as { inserted: number };
-        totalInserted += result.inserted;
-        consecutiveFailures = 0;
-
-        console.log(
-          `  Batch ${batchNum}/${totalBatches}: ${result.inserted} inserted`,
-        );
-      }
-    } catch (err) {
-      console.error(
-        `  Batch ${batchNum}/${totalBatches}: Failed after retries — ${err}`,
-      );
-      totalErrors += batch.length;
-      consecutiveFailures++;
-    }
-
-    if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-      const remaining = items.length - (i + batchSize);
-      if (remaining > 0) {
-        console.error(
-          `\n  Aborting: ${MAX_CONSECUTIVE_FAILURES} consecutive batch failures. ` +
-            `Skipping ${remaining} remaining sessions.`,
-        );
-        totalErrors += remaining;
-      }
-      break;
-    }
-  }
-
-  return { inserted: totalInserted, errors: totalErrors };
+  return { inserted: result.count, errors: result.errors };
 }
 
 // --- CLI ---

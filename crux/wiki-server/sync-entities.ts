@@ -4,7 +4,7 @@
  * Reads all data/entities/*.yaml files and bulk-upserts them to the
  * wiki-server's /api/entities/sync endpoint.
  *
- * Reuses the retry + health-check pattern from sync-pages.ts.
+ * Reuses the shared batch sync infrastructure from sync-common.ts.
  *
  * Usage:
  *   pnpm crux wiki-server sync-entities
@@ -21,16 +21,15 @@ import { join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
 import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server-client.ts";
+import { getServerUrl, getApiKey } from "../lib/wiki-server-client.ts";
 import { resolveEntityType } from "../lib/hallucination-risk.ts";
-import { waitForHealthy, fetchWithRetry } from "./sync-pages.ts";
+import { waitForHealthy, batchSync } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
 
 // --- Configuration ---
 const DEFAULT_BATCH_SIZE = 100;
-const MAX_CONSECUTIVE_FAILURES = 3;
 
 // --- Types ---
 
@@ -139,64 +138,19 @@ export async function syncEntities(
     _sleep?: (ms: number) => Promise<void>;
   } = {}
 ): Promise<{ upserted: number; errors: number }> {
-  let totalUpserted = 0;
-  let totalErrors = 0;
-  let consecutiveFailures = 0;
+  const result = await batchSync(
+    `${serverUrl}/api/entities/sync`,
+    items,
+    batchSize,
+    {
+      bodyKey: "entities",
+      responseCountKey: "upserted",
+      itemLabel: "entities",
+      _sleep: options._sleep,
+    },
+  );
 
-  for (let i = 0; i < items.length; i += batchSize) {
-    const batch = items.slice(i, i + batchSize);
-    const batchNum = Math.floor(i / batchSize) + 1;
-    const totalBatches = Math.ceil(items.length / batchSize);
-
-    try {
-      const res = await fetchWithRetry(
-        `${serverUrl}/api/entities/sync`,
-        {
-          method: "POST",
-          headers: buildHeaders(),
-          body: JSON.stringify({ entities: batch }),
-        },
-        { _sleep: options._sleep }
-      );
-
-      if (!res.ok) {
-        const body = await res.text();
-        console.error(
-          `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — ${body}`
-        );
-        totalErrors += batch.length;
-        consecutiveFailures++;
-      } else {
-        const result = (await res.json()) as { upserted: number };
-        totalUpserted += result.upserted;
-        consecutiveFailures = 0;
-
-        console.log(
-          `  Batch ${batchNum}/${totalBatches}: ${result.upserted} upserted`
-        );
-      }
-    } catch (err) {
-      console.error(
-        `  Batch ${batchNum}/${totalBatches}: Failed after retries — ${err}`
-      );
-      totalErrors += batch.length;
-      consecutiveFailures++;
-    }
-
-    if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-      const remaining = items.length - (i + batchSize);
-      if (remaining > 0) {
-        console.error(
-          `\n  Aborting: ${MAX_CONSECUTIVE_FAILURES} consecutive batch failures. ` +
-            `Skipping ${remaining} remaining entities.`
-        );
-        totalErrors += remaining;
-      }
-      break;
-    }
-  }
-
-  return { upserted: totalUpserted, errors: totalErrors };
+  return { upserted: result.count, errors: result.errors };
 }
 
 // --- CLI ---
