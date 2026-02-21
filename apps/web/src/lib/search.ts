@@ -36,8 +36,35 @@ export interface SearchResult extends SearchDoc {
 // Server-side search
 // ---------------------------------------------------------------------------
 
-/** Whether we've confirmed the server is unavailable this session. */
-let _serverUnavailable = false;
+/**
+ * Simple circuit breaker: after MAX_FAILURES consecutive failures,
+ * skip the server for BACKOFF_MS before retrying.
+ */
+let _serverFailures = 0;
+let _serverBackoffUntil = 0;
+const MAX_SERVER_FAILURES = 3;
+const SERVER_BACKOFF_MS = 60_000;
+
+function isServerAvailable(): boolean {
+  if (_serverFailures < MAX_SERVER_FAILURES) return true;
+  if (Date.now() > _serverBackoffUntil) {
+    _serverFailures = 0;
+    return true;
+  }
+  return false;
+}
+
+function recordServerFailure(): void {
+  _serverFailures++;
+  if (_serverFailures >= MAX_SERVER_FAILURES) {
+    _serverBackoffUntil = Date.now() + SERVER_BACKOFF_MS;
+  }
+}
+
+function resetServerFailures(): void {
+  _serverFailures = 0;
+  _serverBackoffUntil = 0;
+}
 
 interface ServerSearchResponse {
   results: Array<{
@@ -63,7 +90,7 @@ async function searchServer(
   query: string,
   limit: number,
 ): Promise<SearchResult[] | null> {
-  if (_serverUnavailable) return null;
+  if (!isServerAvailable()) return null;
 
   try {
     const url = `/api/search?q=${encodeURIComponent(query)}&limit=${limit}`;
@@ -72,32 +99,42 @@ async function searchServer(
     });
 
     if (!res.ok) {
-      if (res.status === 503) _serverUnavailable = true;
+      recordServerFailure();
       return null;
     }
 
     const data: ServerSearchResponse = await res.json();
+    resetServerFailures();
+
     const queryTerms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
 
-    return data.results.map((r) => ({
-      id: r.id,
-      title: r.title,
-      description: r.description ?? "",
-      numericId: r.numericId ?? r.id,
-      type: r.entityType ?? "",
-      readerImportance: r.readerImportance,
-      quality: r.quality,
-      score: r.score,
-      // Server doesn't provide per-field match info; synthesize from query terms
-      // so highlighting still works (terms are matched against description text)
-      match: Object.fromEntries(
-        queryTerms.map((t) => [t, ["title", "description"]]),
-      ),
-      terms: queryTerms,
-    }));
+    return data.results.map((r) => {
+      const titleLower = r.title?.toLowerCase() ?? "";
+      const descLower = (r.description ?? "").toLowerCase();
+
+      return {
+        id: r.id,
+        title: r.title,
+        description: r.description ?? "",
+        numericId: r.numericId ?? r.id,
+        type: r.entityType ?? "",
+        readerImportance: r.readerImportance,
+        quality: r.quality,
+        score: r.score,
+        // Synthesize per-field match info from query terms for highlighting
+        match: Object.fromEntries(
+          queryTerms.map((t) => {
+            const fields: string[] = [];
+            if (titleLower.includes(t)) fields.push("title");
+            if (descLower.includes(t)) fields.push("description");
+            return [t, fields.length > 0 ? fields : ["title", "description"]];
+          }),
+        ),
+        terms: queryTerms,
+      };
+    });
   } catch {
-    // Network error or timeout — mark server as unavailable for this session
-    _serverUnavailable = true;
+    recordServerFailure();
     return null;
   }
 }

@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 
 describe("GET /api/search", () => {
   const originalEnv = { ...process.env };
+  const originalFetch = global.fetch;
 
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -13,6 +14,7 @@ describe("GET /api/search", () => {
 
   afterEach(() => {
     process.env = { ...originalEnv };
+    global.fetch = originalFetch;
   });
 
   it("returns empty results for missing query", async () => {
@@ -113,6 +115,36 @@ describe("GET /api/search", () => {
       expect.objectContaining({
         headers: {},
       }),
+    );
+  });
+
+  it("clamps limit to valid range", async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce(
+      new Response(JSON.stringify({ results: [], query: "x", total: 0 }), { status: 200 }),
+    );
+
+    // limit=999 should be clamped to 100
+    const req = new NextRequest("http://localhost:3001/api/search?q=test&limit=999");
+    await GET(req);
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3100/api/pages/search?q=test&limit=100",
+      expect.any(Object),
+    );
+  });
+
+  it("handles non-numeric limit gracefully", async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce(
+      new Response(JSON.stringify({ results: [], query: "x", total: 0 }), { status: 200 }),
+    );
+
+    const req = new NextRequest("http://localhost:3001/api/search?q=test&limit=abc");
+    await GET(req);
+
+    // NaN should default to 20
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://localhost:3100/api/pages/search?q=test&limit=20",
+      expect.any(Object),
     );
   });
 });

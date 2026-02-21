@@ -10,7 +10,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const q = searchParams.get("q");
-  const limit = searchParams.get("limit") ?? "20";
+  const rawLimit = parseInt(searchParams.get("limit") ?? "20", 10);
+  const limit = Math.min(Math.max(isNaN(rawLimit) ? 20 : rawLimit, 1), 100);
 
   if (!q || !q.trim()) {
     return NextResponse.json({ results: [], query: "", total: 0 });
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
       headers["Authorization"] = `Bearer ${apiKey}`;
     }
 
-    const url = `${serverUrl}/api/pages/search?q=${encodeURIComponent(q)}&limit=${encodeURIComponent(limit)}`;
+    const url = `${serverUrl}/api/pages/search?q=${encodeURIComponent(q)}&limit=${limit}`;
     const res = await fetch(url, {
       headers,
       signal: AbortSignal.timeout(3000),

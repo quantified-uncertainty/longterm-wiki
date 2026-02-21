@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock MiniSearch before importing the search module
 vi.mock("minisearch", () => {
@@ -16,9 +16,15 @@ vi.mock("minisearch", () => {
 });
 
 describe("search", () => {
+  const originalFetch = global.fetch;
+
   beforeEach(() => {
     vi.resetModules();
     vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
   });
 
   describe("searchWiki", () => {
@@ -119,14 +125,14 @@ describe("search", () => {
       expect(global.fetch).toHaveBeenCalledTimes(3);
     });
 
-    it("synthesizes match info from query terms for server results", async () => {
+    it("synthesizes accurate match info from query terms", async () => {
       const serverResponse = {
         results: [
           {
             id: "test-page",
             numericId: "E1",
             title: "Test Page",
-            description: "Some description",
+            description: "Some description about testing",
             entityType: "concept",
             category: null,
             readerImportance: null,
@@ -134,7 +140,7 @@ describe("search", () => {
             score: 2.0,
           },
         ],
-        query: "test page",
+        query: "test xyz",
         total: 1,
       };
 
@@ -143,13 +149,54 @@ describe("search", () => {
       );
 
       const { searchWiki } = await import("../search");
-      const results = await searchWiki("test page");
+      const results = await searchWiki("test xyz");
 
-      expect(results[0].terms).toEqual(["test", "page"]);
-      expect(results[0].match).toEqual({
-        test: ["title", "description"],
-        page: ["title", "description"],
-      });
+      expect(results[0].terms).toEqual(["test", "xyz"]);
+      // "test" appears in both title and description
+      expect(results[0].match["test"]).toEqual(
+        expect.arrayContaining(["title", "description"]),
+      );
+      // "xyz" doesn't appear in title or description, falls back to both
+      expect(results[0].match["xyz"]).toEqual(["title", "description"]);
+    });
+
+    it("skips server after circuit breaker threshold", async () => {
+      const fetchMock = vi.fn();
+      global.fetch = fetchMock;
+
+      const { searchWiki } = await import("../search");
+
+      // Failure 1: server 503 + MiniSearch loads for the first time
+      fetchMock
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({}), { status: 200 }),
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify([]), { status: 200 }),
+        );
+      await searchWiki("q1");
+
+      // Failure 2: server 503 (MiniSearch already loaded, no extra fetches)
+      fetchMock.mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
+      );
+      await searchWiki("q2");
+
+      // Failure 3: server 503 -> triggers circuit breaker (3 consecutive failures)
+      fetchMock.mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
+      );
+      await searchWiki("q3");
+
+      // Clear call history, then verify circuit breaker skips server
+      fetchMock.mockClear();
+      await searchWiki("skipped");
+
+      // No fetch calls at all: server was skipped, MiniSearch was already loaded
+      expect(fetchMock).not.toHaveBeenCalled();
     });
   });
 
