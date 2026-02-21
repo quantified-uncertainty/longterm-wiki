@@ -16,7 +16,7 @@ import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts
 import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest } from './page-router.ts';
 import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
-import { recordAutoUpdateRun } from '../lib/wiki-server-client.ts';
+import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-server-client.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
@@ -53,7 +53,11 @@ function saveRunDetails(startedAt: string, digest: NewsDigest, plan: UpdatePlan)
 
 // ── Database Persistence (best-effort) ──────────────────────────────────────
 
-async function persistRunToDb(report: RunReport): Promise<void> {
+async function persistRunToDb(
+  report: RunReport,
+  digest?: NewsDigest,
+  plan?: UpdatePlan,
+): Promise<void> {
   try {
     const result = await recordAutoUpdateRun({
       date: report.date,
@@ -81,6 +85,45 @@ async function persistRunToDb(report: RunReport): Promise<void> {
     });
     if (result) {
       console.log(`  Run persisted to database (id: ${result.id})`);
+
+      // Persist news items if digest is available
+      if (digest && digest.items.length > 0) {
+        // Build routing lookup: news title → page routing info
+        const routingMap = new Map<string, { pageId: string; pageTitle: string; tier: string }>();
+        if (plan) {
+          for (const update of plan.pageUpdates) {
+            for (const news of update.relevantNews) {
+              routingMap.set(news.title, {
+                pageId: update.pageId,
+                pageTitle: update.pageTitle,
+                tier: update.suggestedTier,
+              });
+            }
+          }
+        }
+
+        const newsItems = digest.items.map(item => {
+          const routing = routingMap.get(item.title);
+          return {
+            title: item.title,
+            url: item.url,
+            sourceId: item.sourceId,
+            publishedAt: item.publishedAt || null,
+            summary: item.summary || null,
+            relevanceScore: item.relevanceScore ?? null,
+            topics: Array.isArray(item.topics) ? item.topics : [],
+            entities: Array.isArray(item.entities) ? item.entities : [],
+            routedToPageId: routing?.pageId ?? null,
+            routedToPageTitle: routing?.pageTitle ?? null,
+            routedTier: routing?.tier ?? null,
+          };
+        });
+
+        const newsResult = await insertAutoUpdateNewsItems(result.id, newsItems);
+        if (newsResult) {
+          console.log(`  News items persisted to database (${newsResult.inserted} items)`);
+        }
+      }
     }
   } catch {
     // Best-effort: YAML is the primary store; DB is supplemental
@@ -328,7 +371,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       newPagesCreated: [],
     };
     const reportPath = saveRunReport(report);
-    await persistRunToDb(report);
+    await persistRunToDb(report, digest, plan);
     return { report, reportPath };
   }
 
@@ -418,7 +461,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
   };
 
   const reportPath = saveRunReport(report);
-  await persistRunToDb(report);
+  await persistRunToDb(report, digest, plan);
 
   // Summary
   console.log(`\n=== Auto-Update Complete ===`);

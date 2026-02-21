@@ -604,6 +604,16 @@ function toDateString(val) {
 }
 
 /**
+ * Extract PR number from a URL like "https://github.com/.../pull/123".
+ */
+function extractPrNumber(prUrl) {
+  if (!prUrl) return undefined;
+  if (typeof prUrl === 'number') return prUrl;
+  const m = String(prUrl).match(/\/pull\/(\d+)/);
+  return m ? parseInt(m[1], 10) : undefined;
+}
+
+/**
  * Return the later of two YYYY-MM-DD date strings (null-safe).
  */
 function maxDate(a, b) {
@@ -613,37 +623,42 @@ function maxDate(a, b) {
 }
 
 /**
- * Pre-read all edit logs and return a Map<pageId, latestDateString>.
- * Used to supplement frontmatter lastEdited with actual edit history.
+ * Fetch latest edit dates per page from the wiki-server API.
+ * Falls back to an empty map if the server is unavailable.
  */
-function buildEditLogDateMap() {
-  const editLogDir = join(DATA_DIR, 'edit-logs');
-  const dateMap = new Map();
-
-  if (!existsSync(editLogDir)) return dateMap;
-
-  const files = readdirSync(editLogDir);
-  for (const file of files) {
-    if (!file.endsWith('.yaml')) continue;
-    const pageId = basename(file, '.yaml');
-    try {
-      const content = readFileSync(join(editLogDir, file), 'utf-8');
-      const entries = parse(content);
-      if (!Array.isArray(entries) || entries.length === 0) continue;
-      let latestDate = '';
-      for (const entry of entries) {
-        if (entry.date) {
-          const dateStr = toDateString(entry.date);
-          if (dateStr && dateStr > latestDate) latestDate = dateStr;
-        }
-      }
-      if (latestDate) dateMap.set(pageId, latestDate);
-    } catch {
-      // Skip malformed edit logs
-    }
+async function buildEditLogDateMap() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  editLogDates: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return new Map();
   }
 
-  return dateMap;
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+    const res = await fetch(`${serverUrl}/api/edit-logs/latest-dates`, {
+      headers,
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!res.ok) {
+      console.log(`  editLogDates: skipped (server returned ${res.status})`);
+      return new Map();
+    }
+
+    const data = await res.json();
+    const dateMap = new Map();
+    for (const [pageId, dateStr] of Object.entries(data.dates)) {
+      dateMap.set(pageId, dateStr);
+    }
+    console.log(`  editLogDates: ${dateMap.size} pages fetched from API`);
+    return dateMap;
+  } catch (err) {
+    console.log(`  editLogDates: skipped (${err.message || 'server unavailable'})`);
+    return new Map();
+  }
 }
 
 /**
@@ -667,9 +682,8 @@ function extractFrontmatter(content) {
  * Extracts frontmatter including quality, lastUpdated, title, etc.
  * Also detects unconverted links (markdown links with matching resources)
  */
-function buildPagesRegistry(urlToResource) {
+function buildPagesRegistry(urlToResource, editLogDates) {
   const pages = [];
-  const editLogDates = buildEditLogDateMap();
 
   function scanDirectory(dir, urlPrefix = '') {
     if (!existsSync(dir)) return;
@@ -1265,8 +1279,11 @@ async function main() {
   const urlToResource = buildUrlToResourceMap(resources);
   console.log(`  urlToResource: ${urlToResource.size} URL variations mapped`);
 
+  // Fetch edit log dates from wiki-server (async)
+  const editLogDates = await buildEditLogDateMap();
+
   // Build pages registry with frontmatter data (quality, etc.)
-  const pages = buildPagesRegistry(urlToResource);
+  const pages = buildPagesRegistry(urlToResource, editLogDates);
 
   // =========================================================================
   // CONTENT ENTITY LINKS — scan MDX for <EntityLink> references
@@ -1420,18 +1437,63 @@ async function main() {
 
   // =========================================================================
   // SESSION LOG → PAGE CHANGE HISTORY
-  // Parse .claude/session-log.md and .claude/sessions/*.md, then attach
-  // changeHistory to each page.
+  // Try fetching from wiki-server API first, fall back to parsing YAML files.
   // =========================================================================
-  const sessionLogPath = join(REPO_ROOT, '.claude', 'session-log.md');
-  const sessionsDir = join(REPO_ROOT, '.claude', 'sessions');
-  const pageChangeHistory = parseAllSessionLogs(sessionLogPath, sessionsDir);
+  let pageChangeHistory = null;
+  let changeHistorySource = 'yaml';
 
-  // Auto-populate PR numbers from GitHub API for entries that don't have them
-  const branchToPr = await fetchBranchToPrMap();
-  const prEnriched = enrichWithPrNumbers(pageChangeHistory, branchToPr);
-  if (branchToPr.size > 0) {
-    console.log(`  changeHistory: enriched ${prEnriched} entries with PR numbers (${branchToPr.size} PRs fetched)`);
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (serverUrl) {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+      if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+      const res = await fetch(`${serverUrl}/api/sessions/page-changes`, {
+        headers,
+        signal: AbortSignal.timeout(15_000),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Transform API response into pageId → ChangeEntry[] map
+        pageChangeHistory = {};
+        for (const session of data.sessions) {
+          const entry = {
+            date: session.date,
+            branch: session.branch || '',
+            title: session.title,
+            summary: session.summary || '',
+            ...(session.prUrl && { pr: extractPrNumber(session.prUrl) }),
+            ...(session.model && { model: session.model }),
+            ...(session.duration && { duration: session.duration }),
+            ...(session.cost && { cost: session.cost }),
+          };
+          for (const pageId of session.pages) {
+            if (!pageChangeHistory[pageId]) pageChangeHistory[pageId] = [];
+            pageChangeHistory[pageId].push(entry);
+          }
+        }
+        changeHistorySource = 'api';
+        console.log(`  changeHistory: fetched ${data.sessions.length} sessions from API`);
+      }
+    } catch {
+      // Fall through to YAML
+    }
+  }
+
+  if (!pageChangeHistory) {
+    // Fallback: parse YAML/Markdown session files
+    const sessionLogPath = join(REPO_ROOT, '.claude', 'session-log.md');
+    const sessionsDir = join(REPO_ROOT, '.claude', 'sessions');
+    pageChangeHistory = parseAllSessionLogs(sessionLogPath, sessionsDir);
+
+    // Auto-populate PR numbers from GitHub API for entries that don't have them
+    const branchToPr = await fetchBranchToPrMap();
+    const prEnriched = enrichWithPrNumbers(pageChangeHistory, branchToPr);
+    if (branchToPr.size > 0) {
+      console.log(`  changeHistory: enriched ${prEnriched} entries with PR numbers (${branchToPr.size} PRs fetched)`);
+    }
   }
 
   let pagesWithHistory = 0;
@@ -1442,7 +1504,7 @@ async function main() {
       pagesWithHistory++;
     }
   }
-  console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history`);
+  console.log(`  changeHistory: ${Object.keys(pageChangeHistory).length} pages have session history (source: ${changeHistorySource})`);
 
   // =========================================================================
   // PR DESCRIPTIONS — full PR metadata for the dashboard

@@ -1,39 +1,44 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import fs from 'fs';
 import path from 'path';
 
 // Mock wiki-server-client to prevent real HTTP requests in tests
 vi.mock('./wiki-server-client.ts', () => ({
-  appendEditLogToServer: vi.fn().mockResolvedValue(null),
+  appendEditLogToServer: vi.fn().mockResolvedValue({ id: 1, pageId: 'test', date: '2026-02-13', createdAt: '2026-02-13T00:00:00Z' }),
+  getEditLogsForPage: vi.fn().mockResolvedValue(null),
 }));
 
 import { appendEditLog, readEditLog, pageIdFromPath, logBulkFixes, getDefaultRequestedBy } from './edit-log.ts';
-import { appendEditLogToServer } from './wiki-server-client.ts';
+import { appendEditLogToServer, getEditLogsForPage } from './wiki-server-client.ts';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
-const EDIT_LOGS_DIR = path.join(ROOT, 'data/edit-logs');
 const TEST_PAGE_ID = '__test-edit-log-page__';
-const TEST_FILE = path.join(EDIT_LOGS_DIR, `${TEST_PAGE_ID}.yaml`);
 
 describe('edit-log', () => {
   beforeEach(() => {
-    // Clean up test file before each test
-    if (fs.existsSync(TEST_FILE)) fs.unlinkSync(TEST_FILE);
-  });
-
-  afterEach(() => {
-    // Clean up after each test
-    if (fs.existsSync(TEST_FILE)) fs.unlinkSync(TEST_FILE);
+    vi.mocked(appendEditLogToServer).mockClear();
+    vi.mocked(getEditLogsForPage).mockClear();
+    vi.mocked(getEditLogsForPage).mockResolvedValue(null);
   });
 
   describe('readEditLog', () => {
-    it('returns empty array for non-existent page', () => {
-      expect(readEditLog('nonexistent-page-xyz')).toEqual([]);
+    it('returns empty array when server returns null', async () => {
+      vi.mocked(getEditLogsForPage).mockResolvedValue(null);
+      expect(await readEditLog('nonexistent-page-xyz')).toEqual([]);
     });
 
-    it('reads entries from an existing file', () => {
-      fs.writeFileSync(TEST_FILE, `- date: "2026-01-15"\n  tool: crux-create\n  agency: ai-directed\n  requestedBy: ozzie\n  note: "Test entry"\n`);
-      const entries = readEditLog(TEST_PAGE_ID);
+    it('reads entries from the server', async () => {
+      vi.mocked(getEditLogsForPage).mockResolvedValue({
+        entries: [{
+          id: 1,
+          pageId: TEST_PAGE_ID,
+          date: '2026-01-15',
+          tool: 'crux-create',
+          agency: 'ai-directed',
+          requestedBy: 'ozzie',
+          note: 'Test entry',
+          createdAt: '2026-01-15T00:00:00Z',
+        }],
+      });
+      const entries = await readEditLog(TEST_PAGE_ID);
       expect(entries).toHaveLength(1);
       expect(entries[0].tool).toBe('crux-create');
       expect(entries[0].agency).toBe('ai-directed');
@@ -42,7 +47,7 @@ describe('edit-log', () => {
   });
 
   describe('appendEditLog', () => {
-    it('creates a new file for a page with no log', () => {
+    it('writes to the wiki-server API', () => {
       appendEditLog(TEST_PAGE_ID, {
         date: '2026-02-13',
         tool: 'crux-create',
@@ -51,36 +56,15 @@ describe('edit-log', () => {
         note: 'Test creation',
       });
 
-      expect(fs.existsSync(TEST_FILE)).toBe(true);
-      const entries = readEditLog(TEST_PAGE_ID);
-      expect(entries).toHaveLength(1);
-      expect(entries[0].date).toBe('2026-02-13');
-      expect(entries[0].tool).toBe('crux-create');
-      expect(entries[0].agency).toBe('ai-directed');
-      expect(entries[0].note).toBe('Test creation');
-    });
-
-    it('appends to an existing log', () => {
-      appendEditLog(TEST_PAGE_ID, {
-        date: '2026-01-01',
+      expect(appendEditLogToServer).toHaveBeenCalledOnce();
+      expect(appendEditLogToServer).toHaveBeenCalledWith({
+        pageId: TEST_PAGE_ID,
+        date: '2026-02-13',
         tool: 'crux-create',
         agency: 'ai-directed',
-        note: 'First entry',
+        requestedBy: 'system',
+        note: 'Test creation',
       });
-
-      appendEditLog(TEST_PAGE_ID, {
-        date: '2026-02-13',
-        tool: 'crux-improve',
-        agency: 'ai-directed',
-        requestedBy: 'ozzie',
-        note: 'Second entry',
-      });
-
-      const entries = readEditLog(TEST_PAGE_ID);
-      expect(entries).toHaveLength(2);
-      expect(entries[0].tool).toBe('crux-create');
-      expect(entries[1].tool).toBe('crux-improve');
-      expect(entries[1].requestedBy).toBe('ozzie');
     });
 
     it('defaults date to today if not provided', () => {
@@ -89,9 +73,8 @@ describe('edit-log', () => {
         agency: 'human',
       });
 
-      const entries = readEditLog(TEST_PAGE_ID);
-      expect(entries).toHaveLength(1);
-      expect(entries[0].date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      const call = vi.mocked(appendEditLogToServer).mock.calls[0][0];
+      expect(call.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
     it('omits optional fields when not provided', () => {
@@ -100,10 +83,9 @@ describe('edit-log', () => {
         agency: 'automated',
       });
 
-      const entries = readEditLog(TEST_PAGE_ID);
-      expect(entries).toHaveLength(1);
-      expect(entries[0].requestedBy).toBeUndefined();
-      expect(entries[0].note).toBeUndefined();
+      const call = vi.mocked(appendEditLogToServer).mock.calls[0][0];
+      expect(call.requestedBy).toBeNull();
+      expect(call.note).toBeNull();
     });
 
     it('preserves empty string values for optional fields', () => {
@@ -114,47 +96,21 @@ describe('edit-log', () => {
         note: '',
       });
 
-      const entries = readEditLog(TEST_PAGE_ID);
-      expect(entries).toHaveLength(1);
-      expect(entries[0].requestedBy).toBe('');
-      expect(entries[0].note).toBe('');
+      const call = vi.mocked(appendEditLogToServer).mock.calls[0][0];
+      expect(call.requestedBy).toBe('');
+      expect(call.note).toBe('');
     });
 
-    it('fires a dual-write to the wiki-server API', () => {
-      const mockFn = vi.mocked(appendEditLogToServer);
-      mockFn.mockClear();
-
-      appendEditLog(TEST_PAGE_ID, {
-        date: '2026-02-20',
-        tool: 'crux-fix',
-        agency: 'automated',
-        note: 'Test dual-write',
-      });
-
-      expect(mockFn).toHaveBeenCalledOnce();
-      expect(mockFn).toHaveBeenCalledWith({
-        pageId: TEST_PAGE_ID,
-        date: '2026-02-20',
-        tool: 'crux-fix',
-        agency: 'automated',
-        requestedBy: null,
-        note: 'Test dual-write',
-      });
-    });
-
-    it('does not fail if server write rejects', () => {
-      const mockFn = vi.mocked(appendEditLogToServer);
-      mockFn.mockRejectedValueOnce(new Error('server down'));
+    it('does not throw if server write rejects', () => {
+      vi.mocked(appendEditLogToServer).mockRejectedValueOnce(new Error('server down'));
 
       // Should not throw
-      appendEditLog(TEST_PAGE_ID, {
-        tool: 'crux-fix',
-        agency: 'automated',
-      });
-
-      // YAML file should still be written
-      const entries = readEditLog(TEST_PAGE_ID);
-      expect(entries).toHaveLength(1);
+      expect(() => {
+        appendEditLog(TEST_PAGE_ID, {
+          tool: 'crux-fix',
+          agency: 'automated',
+        });
+      }).not.toThrow();
     });
   });
 
@@ -206,32 +162,22 @@ describe('edit-log', () => {
   });
 
   describe('logBulkFixes', () => {
-    const BULK_PAGE_1 = '__test-bulk-1__';
-    const BULK_PAGE_2 = '__test-bulk-2__';
-    const BULK_FILE_1 = path.join(EDIT_LOGS_DIR, `${BULK_PAGE_1}.yaml`);
-    const BULK_FILE_2 = path.join(EDIT_LOGS_DIR, `${BULK_PAGE_2}.yaml`);
-
-    afterEach(() => {
-      if (fs.existsSync(BULK_FILE_1)) fs.unlinkSync(BULK_FILE_1);
-      if (fs.existsSync(BULK_FILE_2)) fs.unlinkSync(BULK_FILE_2);
-    });
-
     it('creates entries for multiple pages', () => {
       const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
       logBulkFixes(
         [
-          `${root}/content/docs/test/${BULK_PAGE_1}.mdx`,
-          `${root}/content/docs/test/${BULK_PAGE_2}.mdx`,
+          `${root}/content/docs/test/__test-bulk-1__.mdx`,
+          `${root}/content/docs/test/__test-bulk-2__.mdx`,
         ],
         { tool: 'crux-fix', agency: 'automated', note: 'Test bulk fix' },
       );
 
-      const entries1 = readEditLog(BULK_PAGE_1);
-      const entries2 = readEditLog(BULK_PAGE_2);
-      expect(entries1).toHaveLength(1);
-      expect(entries2).toHaveLength(1);
-      expect(entries1[0].tool).toBe('crux-fix');
-      expect(entries2[0].note).toBe('Test bulk fix');
+      expect(appendEditLogToServer).toHaveBeenCalledTimes(2);
+      const calls = vi.mocked(appendEditLogToServer).mock.calls;
+      expect(calls[0][0].pageId).toBe('__test-bulk-1__');
+      expect(calls[1][0].pageId).toBe('__test-bulk-2__');
+      expect(calls[0][0].tool).toBe('crux-fix');
+      expect(calls[1][0].note).toBe('Test bulk fix');
     });
   });
 });

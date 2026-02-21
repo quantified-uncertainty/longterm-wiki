@@ -94,9 +94,80 @@ export interface SourceRow {
   lastFetched: string | null;
 }
 
-// ── Data Loading ───────────────────────────────────────────────────────────
+// ── API Types ────────────────────────────────────────────────────────────
 
-function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
+interface ApiNewsItem {
+  id: number;
+  runId: number;
+  title: string;
+  url: string;
+  sourceId: string;
+  publishedAt: string | null;
+  summary: string | null;
+  relevanceScore: number | null;
+  topics: string[];
+  entities: string[];
+  routedToPageId: string | null;
+  routedToPageTitle: string | null;
+  routedTier: string | null;
+  runDate: string | null;
+}
+
+// ── API Data Loading ─────────────────────────────────────────────────────
+
+async function loadNewsItemsFromApi(): Promise<{
+  items: NewsRow[];
+  runDates: string[];
+} | null> {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  if (!serverUrl) return null;
+
+  try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (apiKey) {
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    }
+
+    const res = await fetch(
+      `${serverUrl}/api/auto-update-news/dashboard?runs=10`,
+      {
+        headers,
+        next: { revalidate: 60 },
+      }
+    );
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as {
+      items: ApiNewsItem[];
+      runDates: string[];
+    };
+
+    return {
+      items: data.items.map((item) => ({
+        title: item.title,
+        url: item.url,
+        sourceId: item.sourceId,
+        publishedAt: item.publishedAt ?? "",
+        summary: item.summary ?? "",
+        relevanceScore: item.relevanceScore ?? 0,
+        topics: item.topics ?? [],
+        routedTo: item.routedToPageTitle ?? null,
+        routedTier: item.routedTier ?? null,
+        runDate: item.runDate ?? "",
+      })),
+      runDates: data.runDates,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ── YAML Fallback ────────────────────────────────────────────────────────
+
+function loadNewsItemsFromYaml(): { items: NewsRow[]; runDates: string[] } {
   const runsDir = path.resolve(process.cwd(), "../../data/auto-update/runs");
   if (!fs.existsSync(runsDir)) return { items: [], runDates: [] };
 
@@ -152,6 +223,8 @@ function loadNewsItems(): { items: NewsRow[]; runDates: string[] } {
   return { items: allItems, runDates: [...new Set(runDates)] };
 }
 
+// ── Sources Loading ──────────────────────────────────────────────────────
+
 function loadSources(): SourceRow[] {
   const sourcesPath = path.resolve(
     process.cwd(),
@@ -198,8 +271,10 @@ function loadSources(): SourceRow[] {
 
 // ── Page Component ─────────────────────────────────────────────────────────
 
-export default function AutoUpdateNewsPage() {
-  const { items, runDates } = loadNewsItems();
+export default async function AutoUpdateNewsPage() {
+  // Try API first, fall back to YAML
+  const { items, runDates } =
+    (await loadNewsItemsFromApi()) ?? loadNewsItemsFromYaml();
   const sources = loadSources();
 
   const routedCount = items.filter((i) => i.routedTo).length;
