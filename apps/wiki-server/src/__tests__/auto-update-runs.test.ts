@@ -283,6 +283,71 @@ describe("Auto-Update Runs API", () => {
     });
   });
 
+  describe("newPagesCreated format handling", () => {
+    it("stores newPagesCreated as JSON and parses it back", async () => {
+      const res = await postJson(app, "/api/auto-update-runs", {
+        ...sampleRun,
+        newPagesCreated: ["new-page-1", "new-page-2"],
+        results: [],
+      });
+      expect(res.status).toBe(201);
+
+      // Verify stored as JSON string internally
+      expect(runStore[0].new_pages_created).toBe(
+        '["new-page-1","new-page-2"]'
+      );
+
+      // Verify parsed back to array in GET response
+      const getRes = await app.request("/api/auto-update-runs/1");
+      const body = await getRes.json();
+      expect(body.newPagesCreated).toEqual(["new-page-1", "new-page-2"]);
+    });
+
+    it("returns empty array when newPagesCreated is empty", async () => {
+      const res = await postJson(app, "/api/auto-update-runs", {
+        ...sampleRun,
+        newPagesCreated: [],
+        results: [],
+      });
+      expect(res.status).toBe(201);
+
+      // Empty array should be stored as null in the DB
+      expect(runStore[0].new_pages_created).toBeNull();
+
+      const getRes = await app.request("/api/auto-update-runs/1");
+      const body = await getRes.json();
+      expect(body.newPagesCreated).toEqual([]);
+    });
+
+    it("handles legacy comma-separated format gracefully", async () => {
+      // Simulate legacy data by directly inserting a comma-separated string
+      runStore.push({
+        id: nextRunId++,
+        date: "2026-02-19",
+        started_at: new Date("2026-02-19T06:00:00Z"),
+        completed_at: new Date("2026-02-19T07:00:00Z"),
+        trigger: "manual",
+        budget_limit: null,
+        budget_spent: null,
+        sources_checked: null,
+        sources_failed: null,
+        items_fetched: null,
+        items_relevant: null,
+        pages_planned: null,
+        pages_updated: null,
+        pages_failed: null,
+        pages_skipped: null,
+        new_pages_created: "page-a,page-b,page-c",
+        details_json: null,
+        created_at: new Date(),
+      });
+
+      const res = await app.request("/api/auto-update-runs/1");
+      const body = await res.json();
+      expect(body.newPagesCreated).toEqual(["page-a", "page-b", "page-c"]);
+    });
+  });
+
   describe("GET /api/auto-update-runs/all", () => {
     it("returns paginated runs", async () => {
       // Insert 3 runs

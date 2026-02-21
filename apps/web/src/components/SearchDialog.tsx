@@ -40,8 +40,9 @@ const SEARCH_FILTER_GROUPS = ENTITY_GROUPS.filter(
 const UNFILTERED_LIMIT = 30;
 
 /**
- * Cmd+K search dialog with live MiniSearch results,
- * faceted entity-type filtering, highlighted snippets, and sort toggle.
+ * Cmd+K search dialog with live results (server-side PostgreSQL FTS
+ * with MiniSearch fallback), faceted entity-type filtering, highlighted
+ * snippets, and sort toggle.
  */
 export function SearchDialog() {
   const [open, setOpen] = useState(false);
@@ -114,7 +115,7 @@ export function SearchDialog() {
       } finally {
         setLoading(false);
       }
-    }, 80);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [query]);

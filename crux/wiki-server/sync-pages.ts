@@ -223,6 +223,15 @@ export async function syncPages(
         console.error(
           `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — ${body}`
         );
+        // Surface the server's error message if available (JSON body from improved error handler)
+        try {
+          const parsed = JSON.parse(body);
+          if (parsed.message) {
+            console.error(`    Server error: ${parsed.message}`);
+          }
+        } catch {
+          // Not JSON — raw body already printed above
+        }
         totalErrors += batch.length;
         consecutiveFailures++;
       } else {
@@ -378,6 +387,10 @@ async function main() {
   console.log(`  Upserted: ${result.upserted}`);
   if (result.errors > 0) {
     console.log(`  Errors:  ${result.errors}`);
+    console.error(
+      `\nSync failed with ${result.errors} page errors. Check the batch error messages above for details.` +
+        `\nIf errors show "internal_error", check the wiki-server pod logs: kubectl logs -l app=longterm-wiki-server --tail=100`
+    );
     process.exit(1);
   }
 }
