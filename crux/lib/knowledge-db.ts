@@ -1323,6 +1323,9 @@ export const citationQuotes = {
       }).catch(() => {
         // Silently ignore — SQLite is authoritative during migration period
       });
+    } else {
+      // Verdict not in recognized set — skip server write but warn
+      console.warn(`  WARN: markAccuracy verdict "${verdict}" not in recognized set, skipping server dual-write`);
     }
 
     return result;

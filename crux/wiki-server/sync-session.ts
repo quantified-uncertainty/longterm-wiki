@@ -16,6 +16,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { createSession, type SessionApiEntry } from '../lib/wiki-server-client.ts';
@@ -159,7 +160,10 @@ async function main() {
   }
 }
 
-main().catch((err: Error) => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+// Only run when executed directly (not when imported)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: Error) => {
+    console.error('Error:', err.message);
+    process.exit(1);
+  });
+}
