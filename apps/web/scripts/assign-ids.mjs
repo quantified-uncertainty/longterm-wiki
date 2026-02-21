@@ -2,15 +2,18 @@
  * assign-ids.mjs — Pre-build ID assignment step
  *
  * Scans source files (YAML entities + MDX frontmatter) for entities and pages
- * without numericIds, assigns new IDs, and writes them back to source files.
+ * without numericIds, assigns new IDs via the wiki server, and writes them
+ * back to source files.
  *
  * This runs as a dedicated pre-build step before build-data.mjs, ensuring:
  *   1. All source file mutations complete before the main build starts
  *   2. If this step fails midway, re-running it is safe (idempotent)
  *   3. The main build (build-data.mjs) is purely read-only w.r.t. source files
  *
+ * Requires the wiki server to be running (LONGTERMWIKI_SERVER_URL).
+ *
  * Usage:
- *   node scripts/assign-ids.mjs [--allow-id-reassignment] [--dry-run]
+ *   node scripts/assign-ids.mjs [--dry-run]
  *
  * Resolves: https://github.com/quantified-uncertainty/longterm-wiki/issues/245
  */
@@ -20,14 +23,10 @@ import { join, basename } from 'path';
 import { parse } from 'yaml';
 import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
-import { runStabilityCheck } from './lib/id-stability.mjs';
-import { buildIdMaps, computeNextId, filterEligiblePages } from './lib/id-assignment.mjs';
+import { buildIdMaps, filterEligiblePages } from './lib/id-assignment.mjs';
 import { isServerAvailable, allocateId } from './lib/id-client.mjs';
 
-const ALLOW_ID_REASSIGNMENT = process.argv.includes('--allow-id-reassignment');
 const DRY_RUN = process.argv.includes('--dry-run');
-
-const ID_REGISTRY_FILE = join(DATA_DIR, 'id-registry.json');
 
 // Categories to skip when assigning page IDs (mirrors build-data.mjs)
 const SKIP_CATEGORIES = new Set([
@@ -125,81 +124,28 @@ function scanPages() {
   return pages;
 }
 
-/**
- * Collect all "E###" numericId values declared in MDX/MD frontmatter within a
- * directory tree. Used to reserve page-level IDs before assigning entity IDs,
- * so the two namespaces don't collide.
- */
-function collectFrontmatterNumericIds(dir) {
-  if (!existsSync(dir)) return [];
-  const ids = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isDirectory()) {
-      ids.push(...collectFrontmatterNumericIds(join(dir, entry.name)));
-    } else if (entry.name.endsWith('.mdx') || entry.name.endsWith('.md')) {
-      const content = readFileSync(join(dir, entry.name), 'utf-8');
-      const match = content.match(/^numericId:\s*(E\d+)/m);
-      if (match) ids.push(match[1]);
-    }
-  }
-  return ids;
-}
-
-// Directory scanned for broken EntityLink refs when a stability violation is found
-const CONTENT_SCAN_DIR = CONTENT_DIR;
-
 // ============================================================================
 // Main
 // ============================================================================
-
-/**
- * Try to allocate an ID from the server; fall back to local assignment.
- * Returns { numId, useServer } — useServer may flip to false on failure.
- */
-async function allocateOrFallback(slug, useServer, nextIdRef) {
-  let numId;
-  if (useServer && !DRY_RUN) {
-    const result = await allocateId(slug);
-    if (result) {
-      numId = result.numericId;
-      // Keep nextIdRef in sync so local fallback won't collide with server-assigned IDs
-      const num = parseInt(numId.slice(1), 10);
-      if (num >= nextIdRef.value) nextIdRef.value = num + 1;
-    } else {
-      console.warn('    ID server failed mid-run — falling back to local assignment');
-      useServer = false;
-    }
-  }
-  if (!numId) {
-    numId = `E${nextIdRef.value}`;
-    nextIdRef.value++;
-  }
-  return { numId, useServer };
-}
 
 async function main() {
   if (DRY_RUN) {
     console.log('[dry-run] Checking which IDs would be assigned (no files written)\n');
   }
 
-  // Check if the ID server is available for atomic allocation
-  let useServer = await isServerAvailable();
-  if (useServer) {
-    console.log(`  Using wiki server at ${process.env.LONGTERMWIKI_SERVER_URL}`);
-  } else {
-    console.log('  Wiki server unavailable — using local assignment');
-  }
-
-  // -------------------------------------------------------------------------
-  // Load previous registry for stability checks
-  // -------------------------------------------------------------------------
-  let prevRegistry = null;
-  if (existsSync(ID_REGISTRY_FILE)) {
-    try {
-      prevRegistry = JSON.parse(readFileSync(ID_REGISTRY_FILE, 'utf-8'));
-    } catch {
-      // Corrupted — will be regenerated
+  // Require the wiki server for ID allocation
+  const serverAvailable = await isServerAvailable();
+  if (!serverAvailable) {
+    if (DRY_RUN) {
+      console.log('  Wiki server unavailable — dry-run will show entities needing IDs but cannot preview assignments');
+    } else {
+      console.error('  ERROR: Wiki server is not available.');
+      console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
+      console.error('  ID assignment requires the server for atomic, consistent allocation.');
+      process.exit(1);
     }
+  } else {
+    console.log(`  Using wiki server at ${process.env.LONGTERMWIKI_SERVER_URL}`);
   }
 
   // -------------------------------------------------------------------------
@@ -219,27 +165,9 @@ async function main() {
   }
 
   // -------------------------------------------------------------------------
-  // Compute next available ID.
-  // Scan MDX frontmatter to reserve page-level IDs already declared there,
-  // so auto-assigned entity IDs don't collide with them.
-  // -------------------------------------------------------------------------
-  const reservedIds = collectFrontmatterNumericIds(CONTENT_DIR);
-  const nextIdRef = { value: computeNextId(numericIdToSlug, reservedIds) };
-
-  // -------------------------------------------------------------------------
-  // Stability check (entity-level) — detect silent reassignments (#148)
-  // -------------------------------------------------------------------------
-  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
-    allowReassignment: ALLOW_ID_REASSIGNMENT,
-    phase: 'entity',
-    contentDir: CONTENT_SCAN_DIR,
-  });
-
-  // -------------------------------------------------------------------------
-  // Assign IDs to entities without one, write back to source files.
+  // Assign IDs to entities without one via the server.
   // YAML entities without numericIds are skipped — they cannot be written
   // back automatically and must be updated in the source YAML manually.
-  // Skipping them keeps the registry stable across runs.
   // -------------------------------------------------------------------------
   let entityAssignments = 0;
   let yamlSkipped = 0;
@@ -252,34 +180,29 @@ async function main() {
         continue;
       }
 
-      const alloc = await allocateOrFallback(entity.id, useServer, nextIdRef);
-      useServer = alloc.useServer;
-      const numId = alloc.numId;
+      if (DRY_RUN) {
+        console.log(`    [dry-run] Would assign ID → ${entity.id} (MDX frontmatter)`);
+        entityAssignments++;
+        continue;
+      }
 
+      const result = await allocateId(entity.id);
+      if (!result) {
+        console.error(`    ERROR: Failed to allocate ID for entity "${entity.id}" — server returned null`);
+        process.exit(1);
+      }
+
+      const numId = result.numericId;
       entity.numericId = numId;
       numericIdToSlug[numId] = entity.id;
       slugToNumericId[entity.id] = numId;
       entityAssignments++;
 
-      if (DRY_RUN) {
-        console.log(`    [dry-run] Would assign ${numId} → ${entity.id} (MDX frontmatter)`);
-      } else {
-        const content = readFileSync(entity._filePath, 'utf-8');
-        const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
-        writeFileSync(entity._filePath, updated);
-        console.log(`    Assigned ${numId} → ${entity.id} (wrote to MDX frontmatter)`);
-      }
+      const content = readFileSync(entity._filePath, 'utf-8');
+      const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+      writeFileSync(entity._filePath, updated);
+      console.log(`    Assigned ${numId} → ${entity.id} (wrote to MDX frontmatter)`);
     }
-  }
-
-  // Write intermediate registry (entity-level assignments complete).
-  // Only includes IDs that are actually persisted in source files — YAML
-  // entities without numericIds are excluded to keep the registry stable.
-  if (!DRY_RUN) {
-    writeFileSync(
-      ID_REGISTRY_FILE,
-      JSON.stringify({ _nextId: nextIdRef.value, entities: numericIdToSlug }, null, 2)
-    );
   }
 
   if (entityAssignments > 0) {
@@ -289,7 +212,7 @@ async function main() {
   }
 
   // -------------------------------------------------------------------------
-  // Scan pages and collect/assign page-level numericIds
+  // Scan pages and assign page-level numericIds
   // -------------------------------------------------------------------------
   const pages = scanPages();
   const entityIds = new Set(entities.map(e => e.id));
@@ -302,9 +225,6 @@ async function main() {
     if (page.numericId) {
       const existingOwner = numericIdToSlug[page.numericId];
       if (existingOwner && existingOwner !== page.id) {
-        // Generated MDX stubs may share a numericId with their parent entity
-        // (e.g. page "epistemics" inherits E319 from entity "tmc-epistemics").
-        // That's expected — warn and keep the entity's ownership.
         console.warn(`    WARNING: ${page.numericId} claimed by "${existingOwner}" and page "${page.id}" — keeping "${existingOwner}"`);
       }
       if (!numericIdToSlug[page.numericId]) {
@@ -314,47 +234,37 @@ async function main() {
     }
   }
 
-  // Stability check (page-level) — full check now that all IDs are collected
-  runStabilityCheck(prevRegistry, numericIdToSlug, slugToNumericId, {
-    allowReassignment: ALLOW_ID_REASSIGNMENT,
-    phase: 'page',
-    contentDir: CONTENT_SCAN_DIR,
-  });
-
   // Pass 2: assign new IDs to pages that don't have one yet
   let pageAssignments = 0;
   for (const page of eligiblePages) {
     if (slugToNumericId[page.id]) continue; // already has an ID
 
-    const alloc = await allocateOrFallback(page.id, useServer, nextIdRef);
-    useServer = alloc.useServer;
-    const numId = alloc.numId;
+    if (DRY_RUN) {
+      console.log(`    [dry-run] Would assign ID → ${page.id} (MDX frontmatter)`);
+      pageAssignments++;
+      continue;
+    }
 
+    const result = await allocateId(page.id);
+    if (!result) {
+      console.error(`    ERROR: Failed to allocate ID for page "${page.id}" — server returned null`);
+      process.exit(1);
+    }
+
+    const numId = result.numericId;
     numericIdToSlug[numId] = page.id;
     slugToNumericId[page.id] = numId;
     page.numericId = numId;
     pageAssignments++;
 
-    if (DRY_RUN) {
-      console.log(`    [dry-run] Would assign ${numId} → ${page.id} (MDX frontmatter)`);
-    } else {
-      const content = readFileSync(page._fullPath, 'utf-8');
-      const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
-      writeFileSync(page._fullPath, updated);
-      console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
-    }
-  }
-
-  // Write final registry (all assignments complete)
-  if (!DRY_RUN) {
-    writeFileSync(
-      ID_REGISTRY_FILE,
-      JSON.stringify({ _nextId: nextIdRef.value, entities: numericIdToSlug }, null, 2)
-    );
+    const content = readFileSync(page._fullPath, 'utf-8');
+    const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+    writeFileSync(page._fullPath, updated);
+    console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
   }
 
   if (pageAssignments > 0) {
-    console.log(`  pages: assigned ${pageAssignments} new page IDs (total: ${Object.keys(numericIdToSlug).length})`);
+    console.log(`  pages: assigned ${pageAssignments} new page IDs`);
   } else {
     console.log(`  pages: all eligible pages have IDs`);
   }

@@ -18,7 +18,7 @@ import { parse as parseYaml } from 'yaml';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { getColors } from '../lib/output.ts';
-import { CONTENT_DIR, DATA_DIR } from '../lib/content-types.ts';
+import { CONTENT_DIR, DATA_DIR, loadIdRegistry } from '../lib/content-types.ts';
 import { parseFrontmatter, shouldSkipValidation } from '../lib/mdx-utils.ts';
 import type { ValidatorResult, ValidatorOptions } from './types.ts';
 import type { Colors } from '../lib/output.ts';
@@ -148,16 +148,15 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const expertIds = new Set<string>(experts.map((e: ExpertData) => e.id));
   const orgIds = new Set<string>(organizations.map((o: OrganizationData) => o.id));
 
-  // Build numeric ID → slug mapping from id-registry.json
+  // Build numeric ID → slug mapping from database.json
   const numericToSlug = new Map<string, string>();
-  const registryPath = join(DATA_DIR, 'id-registry.json');
-  if (existsSync(registryPath)) {
-    const registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
-    if (registry.entities) {
-      for (const [numId, slug] of Object.entries(registry.entities)) {
-        numericToSlug.set(numId, slug as string);
-      }
+  try {
+    const reg = loadIdRegistry();
+    for (const [numId, slug] of Object.entries(reg.byNumericId)) {
+      numericToSlug.set(numId, slug);
     }
+  } catch {
+    // Registry unavailable — proceed without numeric ID resolution
   }
 
   // Find all MDX files

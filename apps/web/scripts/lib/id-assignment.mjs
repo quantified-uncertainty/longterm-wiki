@@ -6,7 +6,7 @@
  *
  * Used by:
  *   - app/scripts/assign-ids.mjs (pre-build ID assignment step)
- *   - app/scripts/build-data.mjs (in-memory fallback assignment)
+ *   - app/scripts/build-data.mjs (entity/page filtering)
  */
 
 /**
@@ -37,32 +37,6 @@ export function buildIdMaps(entities) {
   }
 
   return { numericIdToSlug, slugToNumericId, conflicts };
-}
-
-/**
- * Compute the next available numeric ID (as an integer) from existing maps.
- *
- * Scans all current assignments (numericIdToSlug keys) and any additional
- * reserved IDs to find the smallest unused integer above all current ones.
- *
- * @param {Object} numericIdToSlug  Current mapping: "E123" → slug
- * @param {Iterable<string>} [additionalReserved=[]]  Extra "E###" IDs to reserve
- * @returns {number}  Next integer N such that "E{N}" is available
- */
-export function computeNextId(numericIdToSlug, additionalReserved = []) {
-  let nextId = 1;
-
-  for (const numId of Object.keys(numericIdToSlug)) {
-    const n = parseInt(numId.slice(1), 10);
-    if (!isNaN(n) && n >= nextId) nextId = n + 1;
-  }
-
-  for (const numId of additionalReserved) {
-    const n = parseInt(numId.slice(1), 10);
-    if (!isNaN(n) && n >= nextId) nextId = n + 1;
-  }
-
-  return nextId;
 }
 
 /**

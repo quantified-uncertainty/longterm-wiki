@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { buildIdMaps, computeNextId, filterEligiblePages } from '../id-assignment.mjs';
+import { buildIdMaps, filterEligiblePages } from '../id-assignment.mjs';
 
 // ---------------------------------------------------------------------------
 // buildIdMaps
@@ -116,70 +116,6 @@ describe('buildIdMaps', () => {
     expect(Object.keys(numericIdToSlug)).toHaveLength(1);
     expect(numericIdToSlug['E1']).toBe('c');
     expect(conflicts).toHaveLength(0);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// computeNextId
-// ---------------------------------------------------------------------------
-
-describe('computeNextId', () => {
-  it('returns 1 for empty map', () => {
-    expect(computeNextId({})).toBe(1);
-  });
-
-  it('returns 2 when only E1 is taken', () => {
-    expect(computeNextId({ E1: 'anthropic' })).toBe(2);
-  });
-
-  it('returns next after the highest existing ID', () => {
-    const map = { E1: 'a', E2: 'b', E5: 'c', E10: 'd' };
-    expect(computeNextId(map)).toBe(11);
-  });
-
-  it('handles non-contiguous IDs — gaps are NOT filled', () => {
-    // Gap filling would be fragile; we always extend past the max
-    const map = { E1: 'a', E100: 'b' };
-    expect(computeNextId(map)).toBe(101);
-  });
-
-  it('factors in additionalReserved IDs', () => {
-    const map = { E1: 'a', E2: 'b' };
-    const reserved = ['E5', 'E10'];
-    expect(computeNextId(map, reserved)).toBe(11);
-  });
-
-  it('additionalReserved alone works when map is empty', () => {
-    expect(computeNextId({}, ['E50'])).toBe(51);
-  });
-
-  it('additionalReserved below existing max has no effect', () => {
-    const map = { E100: 'a' };
-    const reserved = ['E5', 'E10']; // below max E100
-    expect(computeNextId(map, reserved)).toBe(101);
-  });
-
-  it('handles single-digit IDs correctly', () => {
-    const map = { E1: 'a' };
-    expect(computeNextId(map)).toBe(2);
-  });
-
-  it('handles large IDs without overflow', () => {
-    const map = { E999: 'a' };
-    expect(computeNextId(map)).toBe(1000);
-  });
-
-  it('ignores malformed keys that are not valid E### format', () => {
-    // Should not throw; malformed keys return NaN from parseInt and are skipped
-    const map = { E1: 'a', notAnId: 'b', E: 'c' };
-    // E1 is valid → nextId should be 2
-    expect(computeNextId(map)).toBe(2);
-  });
-
-  it('accepts Set as additionalReserved (iterable)', () => {
-    const map = { E1: 'a' };
-    const reserved = new Set(['E3', 'E7']);
-    expect(computeNextId(map, reserved)).toBe(8);
   });
 });
 

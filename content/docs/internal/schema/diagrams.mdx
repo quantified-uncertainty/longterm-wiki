@@ -510,7 +510,6 @@ flowchart TD
 
     subgraph Output["Output"]
         DB["database.json"]
-        Reg["id-registry.json"]
     end
 
     Input --> Parse
@@ -530,9 +529,9 @@ flowchart TD
 | Phase | Steps |
 |-------|-------|
 | **Parse** | Parse all YAML files, scan MDX frontmatter, auto-create entities for MDX pages without YAML |
-| **Transform** | Assign stable numeric IDs (E1, E2...), type and validate against Zod, compute backlinks (invert relatedEntries) |
+| **Transform** | Collect numeric IDs from source files, type and validate against Zod, compute backlinks (invert relatedEntries) |
 | **Enrich** | Build tag index, build path registry, resolve computed facts (topological sort), generate search index, generate MDX stubs from YAML ContentSections |
-| **Output** | Write `database.json`, `id-registry.json`, individual JSON files, search index |
+| **Output** | Write `database.json`, individual JSON files, search index |
 
 ---
 

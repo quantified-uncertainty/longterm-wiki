@@ -46,7 +46,6 @@ flowchart TB
 
     subgraph Artifacts["Build Artifacts"]
         JSON[("database.json\nAll entities + pages")]
-        REGISTRY[("id-registry.json\nStable numeric IDs")]
         SEARCHIDX[("search-index.json\nMiniSearch data")]
     end
 
@@ -118,12 +117,11 @@ The output uses **type-diverse selection**: at least 2 entries from each entity 
 
 Every entity gets a stable numeric ID (E1, E42, E552) that enables canonical URLs surviving slug renames.
 
-The key insight: **IDs are assigned at build time and written back to source files**. This means:
+The key insight: **IDs are allocated atomically by the wiki server and written back to source files**. This means:
 - YAML entities and MDX frontmatter are the single source of truth
-- New entities get auto-assigned IDs on their first build
-- The `id-registry.json` is a derived artifact (gitignored), not a source of truth
+- New entities get auto-assigned IDs from the server on their first build
+- The server's PostgreSQL database prevents race conditions and ID reassignment
 - ID conflicts are detected at build time and fail the build
-- No coordination overhead — just add a new entity and build
 
 Resolution at runtime supports both numeric IDs and slugs, so `<EntityLink id="E552" name="open-philanthropy">` and path-based lookups both work.
 
@@ -338,8 +336,7 @@ A tag shared by 3 entities is more informative than one shared by 300. This prev
 | Components | `app/src/components/wiki/` | Display entity data |
 
 **Key files generated**:
-- `database.json` — All entities, pages, relations, facts, search data, statistics
-- `id-registry.json` — Numeric ID ↔ slug mappings (derived, gitignored)
+- `database.json` — All entities, pages, relations, facts, search data, statistics (includes ID registry)
 - `search-index.json` + `search-docs.json` — Client-side search data
 
 ### Knowledge Database (SQLite)
