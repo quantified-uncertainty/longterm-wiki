@@ -33,7 +33,6 @@ describe('wiki-server-client backward compatibility', () => {
     expect(typeof oldClient.appendEditLogBatch).toBe('function');
     expect(typeof oldClient.getEditLogsForPage).toBe('function');
     expect(typeof oldClient.getEditLogStats).toBe('function');
-    expect(typeof oldClient.getEditLogLatestDates).toBe('function');
   });
 
   it('exports all citation functions', () => {
@@ -59,7 +58,6 @@ describe('wiki-server-client backward compatibility', () => {
     expect(typeof oldClient.getAutoUpdateRuns).toBe('function');
     expect(typeof oldClient.getAutoUpdateStats).toBe('function');
     expect(typeof oldClient.insertAutoUpdateNewsItems).toBe('function');
-    expect(typeof oldClient.getAutoUpdateNewsDashboard).toBe('function');
   });
 
   it('exports risk, summary, claims, links, resource, entity, and fact functions', () => {
@@ -70,7 +68,6 @@ describe('wiki-server-client backward compatibility', () => {
     expect(typeof oldClient.insertClaimBatch).toBe('function');
     expect(typeof oldClient.clearClaimsForEntity).toBe('function');
     expect(typeof oldClient.syncPageLinks).toBe('function');
-    expect(typeof oldClient.upsertResource).toBe('function');
     expect(typeof oldClient.syncEntities).toBe('function');
     expect(typeof oldClient.getEntity).toBe('function');
     expect(typeof oldClient.listEntities).toBe('function');

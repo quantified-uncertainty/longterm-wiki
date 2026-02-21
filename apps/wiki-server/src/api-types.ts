@@ -41,6 +41,8 @@ export const VALID_TOOLS = [
   "crux-fix-escalated",
   "crux-audit",
   "crux-audit-escalated",
+  "crux-audit-source-replace",
+  "crux-audit-pass2",
   "claude-code",
   "manual",
   "bulk-script",

@@ -2,8 +2,10 @@ import { getAllPages } from "@/data";
 import {
   getWikiServerConfig,
   withApiFallback,
-  dataSourceLabel,
+  type ApiErrorReason,
+  type FetchResult,
 } from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { HallucinationRiskDashboard } from "./hallucination-risk-dashboard";
 import type { Metadata } from "next";
 
@@ -42,9 +44,9 @@ interface ApiRiskPage {
  * Paginates through all results since the API has a max page size of 200.
  * Returns null if the server is unavailable.
  */
-async function loadRiskDataFromApi(): Promise<RiskPageData[] | null> {
+async function loadRiskDataFromApi(): Promise<FetchResult<RiskPageData[]>> {
   const config = getWikiServerConfig();
-  if (!config) return null;
+  if (!config) return { ok: false, error: { type: "not-configured" } };
 
   try {
     // Paginate to fetch all risk scores (guard against infinite loop)
@@ -58,7 +60,16 @@ async function loadRiskDataFromApi(): Promise<RiskPageData[] | null> {
         `${config.serverUrl}/api/hallucination-risk/latest?limit=${pageSize}&offset=${offset}`,
         { headers: config.headers, next: { revalidate: 300 } }
       );
-      if (!res.ok) return null;
+      if (!res.ok) {
+        return {
+          ok: false,
+          error: {
+            type: "server-error",
+            status: res.status,
+            statusText: res.statusText,
+          },
+        };
+      }
 
       const data = (await res.json()) as { pages: ApiRiskPage[] };
       allApiPages.push(...data.pages);
@@ -67,7 +78,7 @@ async function loadRiskDataFromApi(): Promise<RiskPageData[] | null> {
       offset += pageSize;
     }
 
-    if (allApiPages.length === 0) return null;
+    if (allApiPages.length === 0) return { ok: true, data: [] };
 
     // Build page metadata lookup from local database.json
     const pages = getAllPages();
@@ -83,21 +94,30 @@ async function loadRiskDataFromApi(): Promise<RiskPageData[] | null> {
       ])
     );
 
-    return allApiPages.map((r) => {
-      const meta = pageMap.get(r.pageId);
-      return {
-        id: r.pageId,
-        title: meta?.title || r.pageId,
-        entityType: meta?.entityType,
-        quality: meta?.quality ?? null,
-        wordCount: meta?.wordCount,
-        level: r.level,
-        score: r.score,
-        factors: r.factors || [],
-      };
-    });
-  } catch {
-    return null;
+    return {
+      ok: true,
+      data: allApiPages.map((r) => {
+        const meta = pageMap.get(r.pageId);
+        return {
+          id: r.pageId,
+          title: meta?.title || r.pageId,
+          entityType: meta?.entityType,
+          quality: meta?.quality ?? null,
+          wordCount: meta?.wordCount,
+          level: r.level,
+          score: r.score,
+          factors: r.factors || [],
+        };
+      }),
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error: {
+        type: "connection-error",
+        message: err instanceof Error ? err.message : String(err),
+      },
+    };
   }
 }
 
@@ -141,7 +161,7 @@ function StatCard({
 
 export default async function HallucinationRiskPage() {
   // Try wiki-server API first, fall back to database.json
-  const { data: riskPages, source } = await withApiFallback(
+  const { data: riskPages, source, apiError } = await withApiFallback(
     loadRiskDataFromApi,
     loadRiskDataFromDatabase
   );
@@ -272,10 +292,10 @@ export default async function HallucinationRiskPage() {
       {/* Interactive table */}
       <HallucinationRiskDashboard data={riskPages} />
 
-      <p className="text-xs text-muted-foreground mt-4">
+      <DataSourceBanner source={source} apiError={apiError} />
+      <p className="text-xs text-muted-foreground mt-1">
         Scores computed at build time by the canonical scorer (
         <code className="text-[11px]">crux/lib/hallucination-risk.ts</code>).
-        Data source: {dataSourceLabel(source)}.
         Run{" "}
         <code className="text-[11px]">
           pnpm crux validate hallucination-risk

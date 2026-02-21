@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
+import {
+  fetchDetailed,
+  withApiFallback,
+  type FetchResult,
+} from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { NewsTable } from "./news-table";
 import { SourcesTable } from "./sources-table";
 import type { Metadata } from "next";
@@ -115,38 +121,20 @@ interface ApiNewsItem {
 
 // ── API Data Loading ─────────────────────────────────────────────────────
 
-async function loadNewsItemsFromApi(): Promise<{
-  items: NewsRow[];
-  runDates: string[];
-} | null> {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (!serverUrl) return null;
+type NewsData = { items: NewsRow[]; runDates: string[] };
 
-  try {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
+async function loadNewsItemsFromApi(): Promise<FetchResult<NewsData>> {
+  const result = await fetchDetailed<{
+    items: ApiNewsItem[];
+    runDates: string[];
+  }>("/api/auto-update-news/dashboard?runs=10", { revalidate: 60 });
 
-    const res = await fetch(
-      `${serverUrl}/api/auto-update-news/dashboard?runs=10`,
-      {
-        headers,
-        next: { revalidate: 60 },
-      }
-    );
-    if (!res.ok) return null;
+  if (!result.ok) return result;
 
-    const data = (await res.json()) as {
-      items: ApiNewsItem[];
-      runDates: string[];
-    };
-
-    return {
-      items: data.items.map((item) => ({
+  return {
+    ok: true,
+    data: {
+      items: result.data.items.map((item) => ({
         title: item.title,
         url: item.url,
         sourceId: item.sourceId,
@@ -158,11 +146,9 @@ async function loadNewsItemsFromApi(): Promise<{
         routedTier: item.routedTier ?? null,
         runDate: item.runDate ?? "",
       })),
-      runDates: data.runDates,
-    };
-  } catch {
-    return null;
-  }
+      runDates: result.data.runDates,
+    },
+  };
 }
 
 // ── YAML Fallback ────────────────────────────────────────────────────────
@@ -273,8 +259,11 @@ function loadSources(): SourceRow[] {
 
 export default async function AutoUpdateNewsPage() {
   // Try API first, fall back to YAML
-  const { items, runDates } =
-    (await loadNewsItemsFromApi()) ?? loadNewsItemsFromYaml();
+  const { data: newsData, source, apiError } = await withApiFallback(
+    loadNewsItemsFromApi,
+    loadNewsItemsFromYaml
+  );
+  const { items, runDates } = newsData;
   const sources = loadSources();
 
   const routedCount = items.filter((i) => i.routedTo).length;
@@ -307,6 +296,8 @@ export default async function AutoUpdateNewsPage() {
           </>
         )}
       </p>
+
+      <DataSourceBanner source={source} apiError={apiError} />
 
       {items.length === 0 ? (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground">

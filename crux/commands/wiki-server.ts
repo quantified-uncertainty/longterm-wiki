@@ -33,11 +33,6 @@ const SCRIPTS = {
     passthrough: [],
     positional: true,
   },
-  'sync-edit-logs': {
-    script: 'wiki-server/sync-edit-logs.ts',
-    description: 'Sync data/edit-logs/*.yaml to wiki-server (legacy — exits if dir missing)',
-    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
-  },
   'sync-sessions': {
     script: 'wiki-server/sync-sessions.ts',
     description: 'Sync all .claude/sessions/*.yaml to wiki-server',

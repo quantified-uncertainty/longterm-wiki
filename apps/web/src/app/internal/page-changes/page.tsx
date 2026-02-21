@@ -5,10 +5,10 @@ import {
   type PageChangesSession,
 } from "@/data";
 import {
-  fetchFromWikiServer,
+  fetchDetailed,
   withApiFallback,
-  dataSourceLabel,
 } from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { PageChangesSessions } from "./page-changes-sessions";
 import type { Metadata } from "next";
 
@@ -46,12 +46,12 @@ function extractPrNumber(prUrl: string | null): number | undefined {
  * Load page-changes data from the wiki-server API.
  * Returns null if the server is unavailable.
  */
-async function loadSessionsFromApi(): Promise<PageChangesSession[] | null> {
-  const data = await fetchFromWikiServer<{ sessions: ApiSession[] }>(
+async function loadSessionsFromApi() {
+  const result = await fetchDetailed<{ sessions: ApiSession[] }>(
     "/api/sessions/page-changes?limit=500",
     { revalidate: 300 }
   );
-  if (!data) return null;
+  if (!result.ok) return result;
 
   // Build a page metadata lookup from local database.json
   const pages = getAllPages();
@@ -68,7 +68,10 @@ async function loadSessionsFromApi(): Promise<PageChangesSession[] | null> {
     ])
   );
 
-  return data.sessions
+  const data = result.data;
+  return {
+    ok: true as const,
+    data: data.sessions
     .filter((s) => s.pages.length > 0)
     .map((s) => {
       const pr = extractPrNumber(s.prUrl);
@@ -93,12 +96,13 @@ async function loadSessionsFromApi(): Promise<PageChangesSession[] | null> {
           };
         }),
       };
-    });
+    }),
+  };
 }
 
 export default async function PageChangesPage() {
   // Try wiki-server API first, fall back to database.json
-  const { data: sessions, source } = await withApiFallback(
+  const { data: sessions, source, apiError } = await withApiFallback(
     loadSessionsFromApi,
     getPageChangeSessions
   );
@@ -129,9 +133,7 @@ export default async function PageChangesPage() {
         <PageChangesSessions sessions={sessions} />
       )}
 
-      <p className="text-xs text-muted-foreground mt-4">
-        Data source: {dataSourceLabel(source)}
-      </p>
+      <DataSourceBanner source={source} apiError={apiError} />
     </article>
   );
 }

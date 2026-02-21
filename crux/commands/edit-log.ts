@@ -12,7 +12,6 @@
 
 import type { CommandResult } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
-import { readEditLog } from '../lib/edit-log.ts';
 import { getEditLogsForPage, getEditLogStats } from '../lib/wiki-server-client.ts';
 
 /**

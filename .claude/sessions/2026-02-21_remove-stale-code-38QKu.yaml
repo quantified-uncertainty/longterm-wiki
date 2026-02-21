@@ -1,0 +1,71 @@
+date: "2026-02-21"
+branch: claude/remove-stale-code-38QKu
+title: "cleanup: remove stale code per issues #532, #539, #540"
+issues: [532, 539, 540]
+model: claude-sonnet-4-6
+duration: ~35min
+cost: ~$1.50
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/550
+
+summary: |
+  Addressed three stale-code cleanup issues in the wiki-server client module
+  and related infrastructure.
+
+  #532: Deleted crux/wiki-server/sync-edit-logs.ts (superseded since PR #502
+  removed data/edit-logs/ YAML files). Removed its CLI registration from
+  commands/wiki-server.ts. sync-data.yml already had no data/edit-logs/**
+  path trigger.
+
+  #539: Removed three _compat wrappers with no callers — getEditLogLatestDates_compat,
+  getAutoUpdateNewsDashboard_compat, upsertResource_compat — plus their barrel
+  re-exports in wiki-server/index.ts. Also removed the getAllEntities() passthrough
+  in apps/web/src/data/index.ts (exported getTypedEntities() directly and updated
+  its single caller in entities/page.tsx).
+
+  #540: Expanded the index.ts header comment with explicit migration steps for
+  converting remaining _compat call sites to the ApiResult<T>-returning API.
+  All existing _compat functions already had @deprecated JSDoc — nothing to add.
+  Issue #540 itself serves as the tech-debt tracking entry.
+
+pages: []
+
+key_decisions:
+  - "Exported getTypedEntities() directly rather than keeping getAllEntities() wrapper — cleaner API, one less indirection"
+  - "No test for sync-edit-logs.ts existed (it was never created); nothing to delete"
+  - "sync-data.yml already lacked data/edit-logs/** path trigger — pre-existing cleanup"
+  - "upsertResource (non-_compat) remains in resources.ts and accessible by direct import; only the barrel alias was removed"
+  - "Pre-existing crux TypeScript errors (unrelated to changed files) — marked N/A for crux-typescript check"
+  - "Paranoid review found double blank line + missing JSDoc on getTypedEntities — both fixed in follow-up commit"
+  - "Tooling gaps: none identified (manual search confirmed no callers before deletion — could be automated via a dead-export linter)"
+
+checks:
+  initialized: true
+  type: refactor
+  initiated_at: "2026-02-21T21:27:52.754Z"
+  total: 33
+  completed: 22
+  na: 6
+  skipped: 5
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - no-hardcoded
+    - typescript-used
+    - behavior-unchanged
+    - callers-updated
+    - correctness
+    - paranoid-review
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - backward-compatible
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - no-merge-conflicts
+    - check-recent-merges

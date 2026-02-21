@@ -208,7 +208,3 @@ export const getAutoUpdateStats_compat = async () =>
 /** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
 export const insertAutoUpdateNewsItems_compat = async (runId: number, items: AutoUpdateNewsItem[]) =>
   unwrap(await insertAutoUpdateNewsItems(runId, items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getAutoUpdateNewsDashboard_compat = async (maxRuns = 10) =>
-  unwrap(await getAutoUpdateNewsDashboard(maxRuns));
