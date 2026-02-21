@@ -89,26 +89,21 @@ hallucinationRiskRoute.post("/batch", async (c) => {
   const { snapshots } = parsed.data;
   const db = getDrizzleDb();
 
-  const results = await db.transaction(async (tx) => {
-    const rows: Array<{ id: number; pageId: string }> = [];
-    for (const d of snapshots) {
-      const inserted = await tx
-        .insert(hallucinationRiskSnapshots)
-        .values({
-          pageId: d.pageId,
-          score: d.score,
-          level: d.level,
-          factors: d.factors ?? null,
-          integrityIssues: d.integrityIssues ?? null,
-        })
-        .returning({
-          id: hallucinationRiskSnapshots.id,
-          pageId: hallucinationRiskSnapshots.pageId,
-        });
-      rows.push(firstOrThrow(inserted, `hallucination risk batch insert ${d.pageId}`));
-    }
-    return rows;
-  });
+  const allVals = snapshots.map((d) => ({
+    pageId: d.pageId,
+    score: d.score,
+    level: d.level,
+    factors: d.factors ?? null,
+    integrityIssues: d.integrityIssues ?? null,
+  }));
+
+  const results = await db
+    .insert(hallucinationRiskSnapshots)
+    .values(allVals)
+    .returning({
+      id: hallucinationRiskSnapshots.id,
+      pageId: hallucinationRiskSnapshots.pageId,
+    });
 
   return c.json({ inserted: results.length }, 201);
 });
