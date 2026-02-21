@@ -43,6 +43,13 @@
       "when": 1771649895182,
       "tag": "0005_careful_hammerhead",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1771649456311,
+      "tag": "0006_lethal_hairball",
+      "breakpoints": true
     }
   ]
 }

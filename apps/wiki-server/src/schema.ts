@@ -239,3 +239,52 @@ export const sessionPages = pgTable(
     index("idx_sp_page_id").on(table.pageId),
   ]
 );
+
+export const autoUpdateRuns = pgTable(
+  "auto_update_runs",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    date: date("date").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    trigger: text("trigger").notNull(),
+    budgetLimit: real("budget_limit"),
+    budgetSpent: real("budget_spent"),
+    sourcesChecked: integer("sources_checked"),
+    sourcesFailed: integer("sources_failed"),
+    itemsFetched: integer("items_fetched"),
+    itemsRelevant: integer("items_relevant"),
+    pagesPlanned: integer("pages_planned"),
+    pagesUpdated: integer("pages_updated"),
+    pagesFailed: integer("pages_failed"),
+    pagesSkipped: integer("pages_skipped"),
+    newPagesCreated: text("new_pages_created"),
+    detailsJson: jsonb("details_json"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_aur_date").on(table.date),
+    index("idx_aur_trigger").on(table.trigger),
+    index("idx_aur_started_at").on(table.startedAt),
+  ]
+);
+
+export const autoUpdateResults = pgTable(
+  "auto_update_results",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    runId: bigint("run_id", { mode: "number" }).notNull(),
+    pageId: text("page_id").notNull(),
+    status: text("status").notNull(),
+    tier: text("tier"),
+    durationMs: integer("duration_ms"),
+    errorMessage: text("error_message"),
+  },
+  (table) => [
+    index("idx_aures_run_id").on(table.runId),
+    index("idx_aures_page_id").on(table.pageId),
+    index("idx_aures_status").on(table.status),
+  ]
+);

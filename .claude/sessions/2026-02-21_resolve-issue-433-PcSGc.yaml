@@ -1,0 +1,46 @@
+date: "2026-02-21"
+branch: claude/resolve-issue-433-PcSGc
+title: "Migrate auto-update run history to PostgreSQL"
+pages: []
+pr: "https://github.com/quantified-uncertainty/longterm-wiki/pull/442"
+model: claude-opus-4-6
+duration: ~45min
+cost: ~$12
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-21T04:20:26.894Z"
+  total: 32
+  completed: 23
+  na: 7
+  skipped: 2
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - no-regressions
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - no-merge-conflicts
+summary: |
+  Step 4 of the DB migration series (#430 Edit Logs → #431 Citations → #432 Wiki Pages → #433 Auto-Update Runs).
+
+  Added auto_update_runs and auto_update_results tables to the wiki-server Drizzle schema. Created API endpoints at /api/auto-update-runs with POST (record run with results), GET /all (paginated), GET /stats (aggregates), GET /:id (single run). Added seed script to import existing YAML run files. Updated the auto-update orchestrator with best-effort DB persistence. Updated the dashboard to try API first with 60s revalidation, falling back to YAML.
+
+  Paranoid review caught and fixed: bigserial→bigint for FK column, DRY violation in response mapping, durationMs ||→?? for preserving 0 values.
