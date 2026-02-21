@@ -16,6 +16,13 @@
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------
+// Shared constants
+// ---------------------------------------------------------------------------
+
+/** Default maximum items per batch for most endpoints. */
+export const MAX_BATCH_SIZE = 200;
+
+// ---------------------------------------------------------------------------
 // Common patterns
 // ---------------------------------------------------------------------------
 
@@ -52,7 +59,7 @@ export const EditLogEntrySchema = z.object({
 export type EditLogEntry = z.infer<typeof EditLogEntrySchema>;
 
 export const EditLogBatchSchema = z.object({
-  items: z.array(EditLogEntrySchema).min(1).max(200),
+  items: z.array(EditLogEntrySchema).min(1).max(MAX_BATCH_SIZE),
 });
 export type EditLogBatch = z.infer<typeof EditLogBatchSchema>;
 
@@ -139,7 +146,7 @@ export const CreateSessionSchema = z.object({
 export type CreateSession = z.infer<typeof CreateSessionSchema>;
 
 export const CreateSessionBatchSchema = z.object({
-  items: z.array(CreateSessionSchema).min(1).max(200),
+  items: z.array(CreateSessionSchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 // ---------------------------------------------------------------------------
@@ -234,7 +241,7 @@ export const UpsertSummarySchema = z.object({
 export type UpsertSummary = z.infer<typeof UpsertSummarySchema>;
 
 export const UpsertSummaryBatchSchema = z.object({
-  items: z.array(UpsertSummarySchema).min(1).max(200),
+  items: z.array(UpsertSummarySchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 // ---------------------------------------------------------------------------
@@ -313,7 +320,7 @@ export const UpsertResourceSchema = z.object({
 export type UpsertResource = z.infer<typeof UpsertResourceSchema>;
 
 export const UpsertResourceBatchSchema = z.object({
-  items: z.array(UpsertResourceSchema).min(1).max(200),
+  items: z.array(UpsertResourceSchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 // ---------------------------------------------------------------------------
@@ -369,7 +376,7 @@ export const SyncEntitySchema = z.object({
 export type SyncEntity = z.infer<typeof SyncEntitySchema>;
 
 export const SyncEntitiesBatchSchema = z.object({
-  entities: z.array(SyncEntitySchema).min(1).max(200),
+  entities: z.array(SyncEntitySchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 // ---------------------------------------------------------------------------

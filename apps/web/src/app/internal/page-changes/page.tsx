@@ -48,7 +48,7 @@ function extractPrNumber(prUrl: string | null): number | undefined {
  */
 async function loadSessionsFromApi(): Promise<PageChangesSession[] | null> {
   const data = await fetchFromWikiServer<{ sessions: ApiSession[] }>(
-    "/api/sessions/page-changes",
+    "/api/sessions/page-changes?limit=500",
     { revalidate: 300 }
   );
   if (!data) return null;

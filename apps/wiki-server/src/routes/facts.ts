@@ -8,15 +8,21 @@ import {
   validationError,
   invalidJsonError,
 } from "./utils.js";
+import {
+  SyncFactSchema as SharedSyncFactSchema,
+  SyncFactsBatchSchema,
+} from "../api-types.js";
 
 export const factsRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 500;
 const MAX_PAGE_SIZE = 200;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
+
+const SyncFactSchema = SharedSyncFactSchema;
+const SyncBatchSchema = SyncFactsBatchSchema;
 
 const ByEntityQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
@@ -33,28 +39,6 @@ const StalenessQuery = z.object({
   olderThan: z.string().max(20).optional(), // e.g. "2025-01" — facts with asOf before this
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
-});
-
-const SyncFactSchema = z.object({
-  entityId: z.string().min(1).max(300),
-  factId: z.string().min(1).max(100),
-  label: z.string().max(500).nullable().optional(),
-  value: z.string().max(5000).nullable().optional(),
-  numeric: z.number().nullable().optional(),
-  low: z.number().nullable().optional(),
-  high: z.number().nullable().optional(),
-  asOf: z.string().max(20).nullable().optional(),
-  measure: z.string().max(100).nullable().optional(),
-  subject: z.string().max(300).nullable().optional(),
-  note: z.string().max(5000).nullable().optional(),
-  source: z.string().max(2000).nullable().optional(),
-  sourceResource: z.string().max(200).nullable().optional(),
-  format: z.string().max(100).nullable().optional(),
-  formatDivisor: z.number().nullable().optional(),
-});
-
-const SyncBatchSchema = z.object({
-  facts: z.array(SyncFactSchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 // ---- Helpers ----

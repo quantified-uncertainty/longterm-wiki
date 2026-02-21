@@ -9,16 +9,22 @@ import {
   invalidJsonError,
   notFoundError,
 } from "./utils.js";
+import {
+  SyncPageSchema as SharedSyncPageSchema,
+  SyncPagesBatchSchema,
+} from "../api-types.js";
 
 export const pagesRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 100;
 const MAX_PAGE_SIZE = 200;
-const MAX_CONTENT_LENGTH = 500_000; // ~500KB per page
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
+
+// Re-exported so external consumers (e.g. tests) can import them by name.
+export const SyncPageSchema = SharedSyncPageSchema;
+export const SyncBatchSchema = SyncPagesBatchSchema;
 
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
@@ -30,30 +36,6 @@ const PaginationQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   category: z.string().max(100).optional(),
   entityType: z.string().max(100).optional(),
-});
-
-export const SyncPageSchema = z.object({
-  id: z.string().min(1).max(300),
-  numericId: z.string().max(20).nullable().optional(),
-  title: z.string().min(1).max(500),
-  description: z.string().max(5000).nullable().optional(),
-  llmSummary: z.string().max(10000).nullable().optional(),
-  category: z.string().max(100).nullable().optional(),
-  subcategory: z.string().max(100).nullable().optional(),
-  entityType: z.string().max(100).nullable().optional(),
-  tags: z.string().max(5000).nullable().optional(),
-  quality: z.number().int().min(0).max(100).nullable().optional(),
-  readerImportance: z.number().int().min(0).max(100).nullable().optional(),
-  hallucinationRiskLevel: z.string().max(50).nullable().optional(),
-  hallucinationRiskScore: z.number().int().min(0).max(100).nullable().optional(),
-  contentPlaintext: z.string().max(MAX_CONTENT_LENGTH).nullable().optional(),
-  wordCount: z.number().int().min(0).nullable().optional(),
-  lastUpdated: z.string().max(50).nullable().optional(),
-  contentFormat: z.string().max(50).nullable().optional(),
-});
-
-export const SyncBatchSchema = z.object({
-  pages: z.array(SyncPageSchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 // ---- GET /search?q=...&limit=20 ----

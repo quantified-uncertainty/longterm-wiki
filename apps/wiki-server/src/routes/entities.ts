@@ -9,15 +9,21 @@ import {
   invalidJsonError,
   notFoundError,
 } from "./utils.js";
+import {
+  SyncEntitySchema as SharedSyncEntitySchema,
+  SyncEntitiesBatchSchema,
+} from "../api-types.js";
 
 export const entitiesRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 200;
 const MAX_PAGE_SIZE = 200;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
+
+const SyncEntitySchema = SharedSyncEntitySchema;
+const SyncBatchSchema = SyncEntitiesBatchSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
@@ -28,57 +34,6 @@ const PaginationQuery = z.object({
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
   limit: z.coerce.number().int().min(1).max(100).default(20),
-});
-
-const SyncEntitySchema = z.object({
-  id: z.string().min(1).max(300),
-  numericId: z.string().max(20).nullable().optional(),
-  entityType: z.string().min(1).max(100),
-  title: z.string().min(1).max(500),
-  description: z.string().max(50000).nullable().optional(),
-  website: z.string().max(2000).nullable().optional(),
-  tags: z.array(z.string().max(200)).max(100).nullable().optional(),
-  clusters: z.array(z.string().max(200)).max(50).nullable().optional(),
-  status: z.string().max(100).nullable().optional(),
-  lastUpdated: z.string().max(50).nullable().optional(),
-  customFields: z
-    .array(
-      z.object({
-        label: z.string().max(200),
-        value: z.string().max(5000),
-        link: z.string().max(2000).optional(),
-      })
-    )
-    .max(50)
-    .nullable()
-    .optional(),
-  relatedEntries: z
-    .array(
-      z.object({
-        id: z.string().max(300),
-        type: z.string().max(100),
-        relationship: z.string().max(100).optional(),
-      })
-    )
-    .max(200)
-    .nullable()
-    .optional(),
-  sources: z
-    .array(
-      z.object({
-        title: z.string().max(500),
-        url: z.string().max(2000).optional(),
-        author: z.string().max(300).optional(),
-        date: z.string().max(50).optional(),
-      })
-    )
-    .max(100)
-    .nullable()
-    .optional(),
-});
-
-const SyncBatchSchema = z.object({
-  entities: z.array(SyncEntitySchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 // ---- Helpers ----

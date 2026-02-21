@@ -9,34 +9,20 @@ import {
   invalidJsonError,
   firstOrThrow,
 } from "./utils.js";
+import {
+  AutoUpdateNewsItemSchema as SharedNewsItemSchema,
+  AutoUpdateNewsBatchSchema,
+} from "../api-types.js";
 
 export const autoUpdateNewsRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 500;
 const MAX_PAGE_SIZE = 1000;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const NewsItemSchema = z.object({
-  title: z.string().min(1).max(2000),
-  url: z.string().min(1).max(5000),
-  sourceId: z.string().min(1).max(200),
-  publishedAt: z.string().max(100).nullable().optional(),
-  summary: z.string().max(5000).nullable().optional(),
-  relevanceScore: z.number().int().min(0).max(100).nullable().optional(),
-  topics: z.array(z.string().max(200)).optional().default([]),
-  entities: z.array(z.string().max(200)).optional().default([]),
-  routedToPageId: z.string().max(200).nullable().optional(),
-  routedToPageTitle: z.string().max(500).nullable().optional(),
-  routedTier: z.string().max(50).nullable().optional(),
-});
-
-const CreateBatchSchema = z.object({
-  runId: z.number().int().positive(),
-  items: z.array(NewsItemSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const CreateBatchSchema = AutoUpdateNewsBatchSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),

@@ -10,31 +10,21 @@ import {
   notFoundError,
   firstOrThrow,
 } from "./utils.js";
+import {
+  UpsertSummarySchema as SharedUpsertSummarySchema,
+  UpsertSummaryBatchSchema,
+} from "../api-types.js";
 
 export const summariesRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 200;
 const MAX_PAGE_SIZE = 200;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const UpsertSummarySchema = z.object({
-  entityId: z.string().min(1).max(300),
-  entityType: z.string().min(1).max(100),
-  oneLiner: z.string().max(1000).nullable().optional(),
-  summary: z.string().max(50000).nullable().optional(),
-  review: z.string().max(50000).nullable().optional(),
-  keyPoints: z.array(z.string().max(2000)).max(50).nullable().optional(),
-  keyClaims: z.array(z.string().max(2000)).max(50).nullable().optional(),
-  model: z.string().max(200).nullable().optional(),
-  tokensUsed: z.number().int().min(0).nullable().optional(),
-});
-
-const UpsertBatchSchema = z.object({
-  items: z.array(UpsertSummarySchema).min(1).max(MAX_BATCH_SIZE),
-});
+const UpsertSummarySchema = SharedUpsertSummarySchema;
+const UpsertBatchSchema = UpsertSummaryBatchSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
@@ -151,7 +141,7 @@ summariesRoute.post("/batch", async (c) => {
       entityType: summaries.entityType,
     });
 
-  return c.json({ inserted: results.length, results }, 201);
+  return c.json({ upserted: results.length, results }, 201);
 });
 
 // ---- GET /stats ----
