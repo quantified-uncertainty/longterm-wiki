@@ -327,7 +327,9 @@ export const resources = pgTable(
 export const resourceCitations = pgTable(
   "resource_citations",
   {
-    resourceId: text("resource_id").notNull(),
+    resourceId: text("resource_id")
+      .notNull()
+      .references(() => resources.id, { onDelete: "cascade" }),
     pageId: text("page_id").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
