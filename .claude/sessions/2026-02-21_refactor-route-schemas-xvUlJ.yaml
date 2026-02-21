@@ -1,0 +1,85 @@
+date: "2026-02-21"
+branch: claude/refactor-route-schemas-xvUlJ
+title: "refactor: centralize route schemas in api-types, bulk search_vector, page-changes params (#534 #536 #537)"
+issues:
+  - 534
+  - 536
+  - 537
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/552
+model: claude-sonnet-4-6
+pages: []
+
+summary: |
+  Implemented three related wiki-server issues in a single session to avoid merge
+  conflicts on shared route files.
+
+  #534 — Centralize Zod schemas in api-types.ts:
+  Added `export const MAX_BATCH_SIZE = 200` to api-types.ts and used it in 5 batch
+  schemas. Removed local duplicate Zod schema definitions from 8 route files (entities,
+  facts, summaries, auto-update-news, hallucination-risk, links, pages, resources),
+  replacing them with imports from api-types.ts using the `SharedXxx` alias pattern
+  from claims.ts. pages.ts keeps re-exports for test consumers. Fixed `inserted` →
+  `upserted` in summaries.ts and resources.ts batch responses; updated test assertions
+  and crux client interfaces. Paranoid review caught a critical silent-NaN bug in
+  sync-resources.ts where responseCountKey still said "inserted" — fixed.
+
+  #536 — Bulk search_vector UPDATE in resources batch:
+  Added `options?: { skipSearchVector?: boolean }` to `upsertResource()`. The POST /
+  single endpoint continues updating per-row. POST /batch skips per-row updates and
+  runs one bulk `UPDATE resources SET search_vector = ... WHERE id IN (...)` at end
+  of the transaction, matching the pages.ts pattern.
+
+  #537 — limit/since params on GET /page-changes:
+  Added `PageChangesQuery` schema (limit 1–2000, default 500; optional `since` date
+  filter using YYYY-MM-DD format). Rewrote the handler to use an efficient JOIN+GROUP BY
+  to push limit/since filtering into SQL in step 1, then parallel-fetch full session
+  rows and page associations for the limited ID set in step 2. Updated page-changes
+  dashboard and crux client to pass explicit `?limit=500`. Also removed unused `and`
+  import from sessions.ts and dead `NewsItemSchema` alias from auto-update-news.ts.
+
+key_decisions:
+  - "#534 MAX_BATCH_SIZE: Added to api-types.ts, used in 5 schemas. Routes with other limits (100/500/700/5000) retain their own values in canonical schemas."
+  - "#534 pages.ts re-exports: SyncPageSchema/SyncBatchSchema kept as re-exports since smoke-test-fixture.test.ts imports them by name from pages.ts."
+  - "#534 inserted→upserted: Fixed in summaries.ts and resources.ts batch responses. Paranoid review found sync-resources.ts (critical: silent NaN) and two crux client interfaces (high: type lies) — all fixed."
+  - "#536 skipSearchVector option: Cleaner than splitting into two functions; single endpoint behavior unchanged."
+  - "#537 JOIN+GROUP BY: INNER JOIN session_pages in step 1 pushes the limit/since filter into SQL without fetching all rows first."
+  - "#537 test mock: Added new dispatch handler for JOIN+GROUP BY queries before the old fallback to fix test mock routing."
+  - "Tooling gaps: None found. Local schema duplication eliminated at source; no automated enforcement needed beyond TypeScript."
+
+checks:
+  initialized: true
+  type: refactor
+  initiated_at: "2026-02-21T21:27:49.999Z"
+  total: 33
+  completed: 28
+  na: 1
+  skipped: 4
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - fix-escaping
+    - typescript-used
+    - behavior-unchanged
+    - callers-updated
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - ci-coverage
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned

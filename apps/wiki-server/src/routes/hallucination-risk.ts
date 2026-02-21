@@ -9,28 +9,22 @@ import {
   invalidJsonError,
   firstOrThrow,
 } from "./utils.js";
+import {
+  RiskSnapshotSchema as SharedSnapshotSchema,
+  RiskSnapshotBatchSchema,
+} from "../api-types.js";
 
 export const hallucinationRiskRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 700; // one batch per full build (~625 pages)
 const MAX_PAGE_SIZE = 200;
 const VALID_LEVELS = ["low", "medium", "high"] as const;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const SnapshotSchema = z.object({
-  pageId: z.string().min(1).max(300),
-  score: z.number().int().min(0).max(100),
-  level: z.enum(VALID_LEVELS),
-  factors: z.array(z.string()).nullable().optional(),
-  integrityIssues: z.array(z.string()).nullable().optional(),
-});
-
-const BatchSchema = z.object({
-  snapshots: z.array(SnapshotSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const SnapshotSchema = SharedSnapshotSchema;
+const BatchSchema = RiskSnapshotBatchSchema;
 
 const HistoryQuery = z.object({
   page_id: z.string().min(1).max(300),

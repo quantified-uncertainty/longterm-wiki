@@ -213,7 +213,21 @@ vi.mock("../db.js", async () => {
       return [{ page_id: unique.size }];
     }
 
-    // ---- SELECT all FROM session_pages (no WHERE — page-changes endpoint) ----
+    // ---- SELECT sessions.id, sessions.date FROM sessions INNER JOIN session_pages ... GROUP BY ... LIMIT (page-changes step 1) ----
+    if (q.includes('"sessions"') && q.includes("session_pages") && q.includes("inner join") && q.includes("group by") && q.includes("limit")) {
+      const sessionIdsWithPages = new Set(sessionPageStore.map((r) => r.session_id));
+      let matched = sessionStore.filter((s) => sessionIdsWithPages.has(s.id));
+      // Apply optional since filter: if first param looks like a date string, it's the since value
+      const limitParam = params[params.length - 1] as number;
+      if (params.length > 1 && typeof params[0] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(params[0] as string)) {
+        const since = params[0] as string;
+        matched = matched.filter((s) => s.date >= since);
+      }
+      const sorted = matched.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+      return sorted.slice(0, limitParam ?? 500).map((s) => ({ id: s.id, date: s.date }));
+    }
+
+    // ---- SELECT all FROM session_pages (no WHERE — legacy fallback) ----
     if (q.includes("session_pages") && q.includes("select") && !q.includes("where") && !q.includes("count") && !q.includes("insert")) {
       return [...sessionPageStore];
     }

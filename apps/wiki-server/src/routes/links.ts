@@ -8,12 +8,15 @@ import {
   validationError,
   invalidJsonError,
 } from "./utils.js";
+import {
+  PageLinkSchema as SharedLinkSchema,
+  SyncLinksBatchSchema,
+} from "../api-types.js";
 
 export const linksRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 5000; // Links are small rows; builds produce many
 const MAX_RELATED = 25;
 const MIN_SCORE = 1.0;
 const MIN_PER_TYPE = 2;
@@ -56,27 +59,10 @@ const INVERSE_LABEL: Record<string, string> = {
   models: "modeled by",
 };
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const LinkSchema = z.object({
-  sourceId: z.string().min(1).max(300),
-  targetId: z.string().min(1).max(300),
-  linkType: z.enum([
-    "yaml_related",
-    "entity_link",
-    "name_prefix",
-    "similarity",
-    "shared_tag",
-  ]),
-  relationship: z.string().max(100).nullable().optional(),
-  weight: z.number().min(0).max(100).default(1.0),
-});
-
-const SyncBatchSchema = z.object({
-  links: z.array(LinkSchema).min(1).max(MAX_BATCH_SIZE),
-  /** If true, delete all existing links before inserting (full replace). */
-  replace: z.boolean().optional().default(false),
-});
+const LinkSchema = SharedLinkSchema;
+const SyncBatchSchema = SyncLinksBatchSchema;
 
 const BacklinksQuery = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),

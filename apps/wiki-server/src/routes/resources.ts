@@ -18,43 +18,21 @@ import {
   notFoundError,
   firstOrThrow,
 } from "./utils.js";
+import {
+  UpsertResourceSchema as SharedUpsertResourceSchema,
+  UpsertResourceBatchSchema,
+} from "../api-types.js";
 
 export const resourcesRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 200;
 const MAX_PAGE_SIZE = 200;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const UpsertResourceSchema = z.object({
-  id: z.string().min(1).max(200),
-  url: z.string().url().max(2000),
-  title: z.string().max(1000).nullable().optional(),
-  type: z.string().max(50).nullable().optional(),
-  summary: z.string().max(50000).nullable().optional(),
-  review: z.string().max(50000).nullable().optional(),
-  abstract: z.string().max(50000).nullable().optional(),
-  keyPoints: z.array(z.string().max(2000)).max(50).nullable().optional(),
-  publicationId: z.string().max(200).nullable().optional(),
-  authors: z.array(z.string().max(500)).max(5000).nullable().optional(),
-  publishedDate: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .nullable()
-    .optional(),
-  tags: z.array(z.string().max(200)).max(50).nullable().optional(),
-  localFilename: z.string().max(500).nullable().optional(),
-  credibilityOverride: z.number().min(0).max(1).nullable().optional(),
-  fetchedAt: z.string().datetime().nullable().optional(),
-  contentHash: z.string().max(200).nullable().optional(),
-  citedBy: z.array(z.string().min(1).max(200)).max(500).nullable().optional(),
-});
-
-const UpsertBatchSchema = z.object({
-  items: z.array(UpsertResourceSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const UpsertResourceSchema = SharedUpsertResourceSchema;
+const UpsertBatchSchema = UpsertResourceBatchSchema;
 
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
@@ -93,7 +71,11 @@ function resourceValues(d: ResourceInput) {
   };
 }
 
-async function upsertResource(db: DbClient, d: ResourceInput) {
+async function upsertResource(
+  db: DbClient,
+  d: ResourceInput,
+  options?: { skipSearchVector?: boolean }
+) {
   const vals = resourceValues(d);
 
   const rows = await db
@@ -128,15 +110,17 @@ async function upsertResource(db: DbClient, d: ResourceInput) {
 
   const result = firstOrThrow(rows, `resource upsert ${d.id}`);
 
-  // Update search_vector for this resource
-  await db.execute(sql`
-    UPDATE resources SET search_vector =
-      setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
-      setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
-      setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
-      setweight(to_tsvector('english', coalesce(review, '')), 'D')
-    WHERE id = ${d.id}
-  `);
+  if (!options?.skipSearchVector) {
+    // Update search_vector for this resource (single-row update)
+    await db.execute(sql`
+      UPDATE resources SET search_vector =
+        setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+        setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(review, '')), 'D')
+      WHERE id = ${d.id}
+    `);
+  }
 
   // Upsert citations (cited_by)
   if (d.citedBy && d.citedBy.length > 0) {
@@ -205,12 +189,29 @@ resourcesRoute.post("/batch", async (c) => {
   const db = getDrizzleDb();
   await db.transaction(async (tx) => {
     for (const item of items) {
-      const result = await upsertResource(tx as unknown as DbClient, item);
+      // Skip per-row search_vector update; handled in bulk below
+      const result = await upsertResource(tx as unknown as DbClient, item, {
+        skipSearchVector: true,
+      });
       results.push({ id: result.id, url: result.url });
     }
+
+    // Bulk search_vector update for all upserted resources (one query)
+    const idList = sql.join(
+      results.map((r) => sql`${r.id}`),
+      sql`, `
+    );
+    await tx.execute(sql`
+      UPDATE resources SET search_vector =
+        setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+        setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(review, '')), 'D')
+      WHERE id IN (${idList})
+    `);
   });
 
-  return c.json({ inserted: results.length, results }, 201);
+  return c.json({ upserted: results.length, results }, 201);
 });
 
 // ---- GET /search?q=X (full-text search by title/summary/abstract/review) ----

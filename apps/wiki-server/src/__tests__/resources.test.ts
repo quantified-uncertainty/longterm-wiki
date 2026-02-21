@@ -324,7 +324,7 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(201);
       const body = await res.json();
-      expect(body.inserted).toBe(2);
+      expect(body.upserted).toBe(2);
       expect(body.results).toHaveLength(2);
     });
 
@@ -342,7 +342,7 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(201);
       const body = await res.json();
-      expect(body.inserted).toBe(1);
+      expect(body.upserted).toBe(1);
     });
   });
 

@@ -183,7 +183,7 @@ export async function syncResources(
     batchSize,
     {
       bodyKey: "items",
-      responseCountKey: "inserted",
+      responseCountKey: "upserted",
       itemLabel: "resources",
       _sleep: options._sleep,
     },

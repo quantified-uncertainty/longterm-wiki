@@ -33,7 +33,7 @@ export interface CreateSessionResult {
 }
 
 export interface SessionBatchResult {
-  inserted: number;
+  upserted: number;
   results: Array<{ id: number; title: string; pageCount: number }>;
 }
 
@@ -117,7 +117,7 @@ export async function getSessionStats(): Promise<ApiResult<SessionStatsResult>> 
 }
 
 export async function getSessionPageChanges(): Promise<ApiResult<SessionPageChangesResult>> {
-  return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes');
+  return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes?limit=500');
 }
 
 // ---------------------------------------------------------------------------

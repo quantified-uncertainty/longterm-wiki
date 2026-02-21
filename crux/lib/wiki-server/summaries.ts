@@ -26,7 +26,7 @@ export interface UpsertSummaryResult {
 }
 
 export interface UpsertSummaryBatchResult {
-  inserted: number;
+  upserted: number;
   results: Array<{ entityId: string; entityType: string }>;
 }
 
