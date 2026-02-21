@@ -5,12 +5,10 @@ import {
   count,
   sql,
   desc,
-  or,
-  ilike,
   type SQL,
 } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { getDrizzleDb } from "../db.js";
+import { getDrizzleDb, getDb } from "../db.js";
 import { resources, resourceCitations } from "../schema.js";
 import type * as schema from "../schema.js";
 import {
@@ -95,11 +93,6 @@ function resourceValues(d: ResourceInput) {
   };
 }
 
-/** Escape ILIKE wildcard characters so user input is matched literally. */
-function escapeIlike(s: string): string {
-  return s.replace(/[%_\\]/g, "\\$&");
-}
-
 async function upsertResource(db: DbClient, d: ResourceInput) {
   const vals = resourceValues(d);
 
@@ -133,6 +126,18 @@ async function upsertResource(db: DbClient, d: ResourceInput) {
       title: resources.title,
     });
 
+  const result = firstOrThrow(rows, `resource upsert ${d.id}`);
+
+  // Update search_vector for this resource
+  await db.execute(sql`
+    UPDATE resources SET search_vector =
+      setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+      setweight(to_tsvector('english', coalesce(summary, '')), 'B') ||
+      setweight(to_tsvector('english', coalesce(abstract, '')), 'C') ||
+      setweight(to_tsvector('english', coalesce(review, '')), 'D')
+    WHERE id = ${d.id}
+  `);
+
   // Upsert citations (cited_by)
   if (d.citedBy && d.citedBy.length > 0) {
     // Delete existing citations for this resource, then re-insert
@@ -145,7 +150,7 @@ async function upsertResource(db: DbClient, d: ResourceInput) {
       .onConflictDoNothing();
   }
 
-  return firstOrThrow(rows, `resource upsert ${d.id}`);
+  return result;
 }
 
 function formatResource(r: typeof resources.$inferSelect) {
@@ -208,25 +213,52 @@ resourcesRoute.post("/batch", async (c) => {
   return c.json({ inserted: results.length, results }, 201);
 });
 
-// ---- GET /search?q=X (search by title/summary) ----
+// ---- GET /search?q=X (full-text search by title/summary/abstract/review) ----
 
 resourcesRoute.get("/search", async (c) => {
   const parsed = SearchQuery.safeParse(c.req.query());
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { q, limit } = parsed.data;
-  const db = getDrizzleDb();
-  const pattern = `%${escapeIlike(q)}%`;
+  const rawDb = getDb();
 
-  const rows = await db
-    .select()
-    .from(resources)
-    .where(or(ilike(resources.title, pattern), ilike(resources.summary, pattern)))
-    .limit(limit);
+  // Full-text search with ranking (same pattern as wiki_pages search)
+  const rows = await rawDb`
+    SELECT
+      id, url, title, type, summary, review, abstract,
+      key_points, publication_id, authors, published_date,
+      tags, local_filename, credibility_override,
+      fetched_at, content_hash, created_at, updated_at,
+      ts_rank_cd(search_vector, plainto_tsquery('english', ${q}), 1) AS rank
+    FROM resources
+    WHERE search_vector @@ plainto_tsquery('english', ${q})
+    ORDER BY rank DESC
+    LIMIT ${limit}
+  `;
 
   return c.json({
-    results: rows.map(formatResource),
+    results: rows.map((r: any) => ({
+      id: r.id,
+      url: r.url,
+      title: r.title,
+      type: r.type,
+      summary: r.summary,
+      review: r.review,
+      abstract: r.abstract,
+      keyPoints: r.key_points,
+      publicationId: r.publication_id,
+      authors: r.authors,
+      publishedDate: r.published_date,
+      tags: r.tags,
+      localFilename: r.local_filename,
+      credibilityOverride: r.credibility_override,
+      fetchedAt: r.fetched_at,
+      contentHash: r.content_hash,
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+    })),
     count: rows.length,
+    query: q,
   });
 });
 
