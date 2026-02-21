@@ -2,7 +2,7 @@ name: Wiki Server — Health Monitor
 
 on:
   schedule:
-    - cron: "*/15 * * * *" # every 15 minutes
+    - cron: "*/5 * * * *" # every 5 minutes
   workflow_dispatch:
 
 jobs:
@@ -18,23 +18,37 @@ jobs:
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
         run: |
-          RESPONSE=$(curl -sf --max-time 10 "${LONGTERMWIKI_SERVER_URL}/health" 2>&1) || {
+          HTTP_CODE=$(curl -s -o /tmp/health_response.json -w "%{http_code}" \
+            --max-time 10 "${LONGTERMWIKI_SERVER_URL}/health" 2>/dev/null) || HTTP_CODE="000"
+
+          echo "http_code=$HTTP_CODE" >> "$GITHUB_OUTPUT"
+
+          if [ "$HTTP_CODE" = "000" ]; then
             echo "healthy=false" >> "$GITHUB_OUTPUT"
-            echo "error=Connection failed or timed out" >> "$GITHUB_OUTPUT"
+            echo "error=Connection failed or timed out (no HTTP response)" >> "$GITHUB_OUTPUT"
             echo "response=" >> "$GITHUB_OUTPUT"
             exit 0
-          }
+          fi
+
+          RESPONSE=$(cat /tmp/health_response.json 2>/dev/null || echo "")
+          echo "response<<HEREDOC_EOF" >> "$GITHUB_OUTPUT"
+          echo "$RESPONSE" >> "$GITHUB_OUTPUT"
+          echo "HEREDOC_EOF" >> "$GITHUB_OUTPUT"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+            echo "error=HTTP $HTTP_CODE" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           STATUS=$(echo "$RESPONSE" | jq -r '.status // "unknown"')
-          echo "response<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$RESPONSE" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          DB_STATUS=$(echo "$RESPONSE" | jq -r '.database // "unknown"')
 
-          if [ "$STATUS" = "healthy" ]; then
+          if [ "$STATUS" = "healthy" ] && [ "$DB_STATUS" = "ok" ]; then
             echo "healthy=true" >> "$GITHUB_OUTPUT"
           else
             echo "healthy=false" >> "$GITHUB_OUTPUT"
-            echo "error=Status: $STATUS" >> "$GITHUB_OUTPUT"
+            echo "error=status=$STATUS, database=$DB_STATUS" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check for existing open issue
@@ -56,29 +70,60 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue create \
-            --repo "${{ github.repository }}" \
-            --title "Wiki server is unhealthy" \
-            --label "server-health,bug" \
-            --body "$(cat <<'EOF'
+          cat <<'ISSUE_EOF' > /tmp/issue_body.md
           ## Wiki server health check failed
 
-          **Error:** ${{ steps.health.outputs.error }}
+          | Field | Value |
+          |-------|-------|
+          | **Status** | :red_circle: Unhealthy |
+          | **Error** | PLACEHOLDER_ERROR |
+          | **HTTP status** | PLACEHOLDER_HTTP_CODE |
+          | **Detected at** | PLACEHOLDER_TIMESTAMP |
 
-          **Health response:**
+          ### Health endpoint response
+
           ```json
-          ${{ steps.health.outputs.response }}
+          PLACEHOLDER_RESPONSE
           ```
 
-          **Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          ### Possible causes
 
-          **Health endpoint:** ${{ secrets.LONGTERMWIKI_SERVER_URL }}/health
+          - **HTTP 503 / connection refused** — Pod is crashing or not running. Check `kubectl get pods -n longtermwiki` and `kubectl logs -n longtermwiki -l app=longterm-wiki-server-wiki-server --previous`
+          - **`database: "error"`** — Database connection or query failure. Could be a bad migration, permission issue, or DB cluster is down.
+          - **`status: "degraded"`** — Server is running but some queries are failing. Check the server logs for SQL errors.
+          - **Connection timeout** — DNS, ingress, or networking issue. Check `kubectl get ingress -n longtermwiki`.
+
+          ### Useful commands
+
+          ```bash
+          # Pod status
+          kubectl get pods -n longtermwiki
+
+          # Current logs
+          kubectl logs -n longtermwiki -l app=longterm-wiki-server-wiki-server --tail=50
+
+          # Previous crash logs
+          kubectl logs -n longtermwiki -l app=longterm-wiki-server-wiki-server --previous
+
+          # Restart the deployment
+          kubectl rollout restart deployment -n longtermwiki longterm-wiki-server-wiki-server
+          ```
 
           ---
-          This issue was created automatically by the health monitor workflow.
-          It will be closed automatically when the server returns to healthy status.
-          EOF
-          )"
+          *This issue was created automatically by the [health monitor workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). It will be closed automatically when the server recovers.*
+          ISSUE_EOF
+
+          # Fill in placeholders (avoids issues with special characters in GH expressions)
+          sed -i "s|PLACEHOLDER_ERROR|${{ steps.health.outputs.error }}|g" /tmp/issue_body.md
+          sed -i "s|PLACEHOLDER_HTTP_CODE|${{ steps.health.outputs.http_code }}|g" /tmp/issue_body.md
+          sed -i "s|PLACEHOLDER_TIMESTAMP|$(date -u '+%Y-%m-%d %H:%M:%S UTC')|g" /tmp/issue_body.md
+          sed -i "s|PLACEHOLDER_RESPONSE|${{ steps.health.outputs.response }}|g" /tmp/issue_body.md
+
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "Wiki server is unhealthy (${{ steps.health.outputs.error }})" \
+            --label "server-health,bug" \
+            --body-file /tmp/issue_body.md
 
       - name: Comment on existing issue
         if: steps.health.outputs.healthy == 'false' && steps.existing.outputs.issue != ''
@@ -87,7 +132,7 @@ jobs:
         run: |
           gh issue comment "${{ steps.existing.outputs.issue }}" \
             --repo "${{ github.repository }}" \
-            --body "Still unhealthy at $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            --body "Still unhealthy at $(date -u '+%Y-%m-%d %H:%M:%S UTC') — **${{ steps.health.outputs.error }}** (HTTP ${{ steps.health.outputs.http_code }})
           \`\`\`json
           ${{ steps.health.outputs.response }}
           \`\`\`"
@@ -107,7 +152,10 @@ jobs:
           if [ -n "$ISSUE" ]; then
             gh issue comment "$ISSUE" \
               --repo "${{ github.repository }}" \
-              --body "Server is healthy again at $(date -u '+%Y-%m-%d %H:%M:%S UTC'). Auto-closing."
+              --body "Server is healthy again at $(date -u '+%Y-%m-%d %H:%M:%S UTC'). Auto-closing.
+          \`\`\`json
+          ${{ steps.health.outputs.response }}
+          \`\`\`"
             gh issue close "$ISSUE" \
               --repo "${{ github.repository }}"
           fi
