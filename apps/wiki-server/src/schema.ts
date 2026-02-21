@@ -314,11 +314,18 @@ export const summaries = pgTable(
   ]
 );
 
+/**
+ * Claims extracted from wiki pages.
+ *
+ * `entityId` is a logical reference to a wiki entity (page or data entity)
+ * but is NOT enforced via FK — claims may reference entities from multiple
+ * source tables (wikiPages, summaries, etc.) or entities not yet synced.
+ */
 export const claims = pgTable(
   "claims",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    entityId: text("entity_id").notNull(),
+    entityId: text("entity_id").notNull(), // logical FK — see table comment above
     entityType: text("entity_type").notNull(),
     claimType: text("claim_type").notNull(),
     claimText: text("claim_text").notNull(),

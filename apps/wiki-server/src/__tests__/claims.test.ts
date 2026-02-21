@@ -26,22 +26,30 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // ---- INSERT INTO claims ----
   if (q.includes("insert into") && q.includes('"claims"')) {
     const now = new Date();
-    const id = nextId++;
-    const row: Record<string, unknown> = {
-      id,
-      entity_id: params[0],
-      entity_type: params[1],
-      claim_type: params[2],
-      claim_text: params[3],
-      value: params[4],
-      unit: params[5],
-      confidence: params[6],
-      source_quote: params[7],
-      created_at: now,
-      updated_at: now,
-    };
-    claimStore.set(id, row);
-    return [row];
+    const PARAMS_PER_ROW = 8;
+    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
+    const results: Record<string, unknown>[] = [];
+
+    for (let i = 0; i < rowCount; i++) {
+      const off = i * PARAMS_PER_ROW;
+      const id = nextId++;
+      const row: Record<string, unknown> = {
+        id,
+        entity_id: params[off],
+        entity_type: params[off + 1],
+        claim_type: params[off + 2],
+        claim_text: params[off + 3],
+        value: params[off + 4],
+        unit: params[off + 5],
+        confidence: params[off + 6],
+        source_quote: params[off + 7],
+        created_at: now,
+        updated_at: now,
+      };
+      claimStore.set(id, row);
+      results.push(row);
+    }
+    return results;
   }
 
   // ---- DELETE FROM claims WHERE entity_id = $1 ----
