@@ -17,5 +17,10 @@ export default defineConfig({
       'wiki-server/**/*.test.ts',
     ],
     root: __dirname,
+    // Run test files sequentially to prevent SQLite cross-file contamination.
+    // Multiple test files share a single on-disk SQLite DB (knowledge.db); parallel
+    // execution causes one worker's beforeEach/afterEach cleanup to race with
+    // another worker's seed step, producing flaky failures.
+    fileParallelism: false,
   },
 });
