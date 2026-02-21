@@ -50,7 +50,7 @@ interface YamlRunReport {
     pagesSkipped: number;
     results: YamlRunResult[];
   };
-  newPagesCreated: string[];
+  newPagesCreated?: string[];
 }
 
 function normalizeDate(d: string | Date): string {
@@ -89,7 +89,7 @@ async function seedAutoUpdateRuns() {
       pagesUpdated: number;
       pagesFailed: number;
       pagesSkipped: number;
-      newPagesCreated: string;
+      newPagesCreated: string | null;
     };
     results: YamlRunResult[];
   }> = [];
@@ -116,7 +116,9 @@ async function seedAutoUpdateRuns() {
           pagesUpdated: report.execution?.pagesUpdated ?? 0,
           pagesFailed: report.execution?.pagesFailed ?? 0,
           pagesSkipped: report.execution?.pagesSkipped ?? 0,
-          newPagesCreated: (report.newPagesCreated || []).join(","),
+          newPagesCreated: report.newPagesCreated?.length
+            ? JSON.stringify(report.newPagesCreated)
+            : null,
         },
         results: report.execution?.results || [],
       });
