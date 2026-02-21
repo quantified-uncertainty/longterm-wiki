@@ -133,19 +133,15 @@ async function main() {
     console.log('[dry-run] Checking which IDs would be assigned (no files written)\n');
   }
 
-  // Require the wiki server for ID allocation
+  // Check server availability upfront, but don't fail yet —
+  // only fail if we actually need to allocate new IDs.
   const serverAvailable = await isServerAvailable();
-  if (!serverAvailable) {
-    if (DRY_RUN) {
-      console.log('  Wiki server unavailable — dry-run will show entities needing IDs but cannot preview assignments');
-    } else {
-      console.error('  ERROR: Wiki server is not available.');
-      console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
-      console.error('  ID assignment requires the server for atomic, consistent allocation.');
-      process.exit(1);
-    }
-  } else {
+  if (serverAvailable) {
     console.log(`  Using wiki server at ${process.env.LONGTERMWIKI_SERVER_URL}`);
+  } else if (DRY_RUN) {
+    console.log('  Wiki server unavailable — dry-run will show entities needing IDs but cannot preview assignments');
+  } else {
+    console.log('  Wiki server not available — will skip if no new IDs are needed');
   }
 
   // -------------------------------------------------------------------------
@@ -184,6 +180,13 @@ async function main() {
         console.log(`    [dry-run] Would assign ID → ${entity.id} (MDX frontmatter)`);
         entityAssignments++;
         continue;
+      }
+
+      if (!serverAvailable) {
+        console.error('  ERROR: Wiki server is not available but new entities need IDs.');
+        console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
+        console.error('  ID assignment requires the server for atomic, consistent allocation.');
+        process.exit(1);
       }
 
       const result = await allocateId(entity.id);
@@ -243,6 +246,13 @@ async function main() {
       console.log(`    [dry-run] Would assign ID → ${page.id} (MDX frontmatter)`);
       pageAssignments++;
       continue;
+    }
+
+    if (!serverAvailable) {
+      console.error('  ERROR: Wiki server is not available but new pages need IDs.');
+      console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
+      console.error('  ID assignment requires the server for atomic, consistent allocation.');
+      process.exit(1);
     }
 
     const result = await allocateId(page.id);
