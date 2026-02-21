@@ -189,8 +189,8 @@ async function seedAutoUpdateRuns() {
           INSERT INTO auto_update_results (run_id, page_id, status, tier, duration_ms, error_message)
           VALUES (
             ${runId}, ${result.pageId}, ${result.status},
-            ${result.tier || null}, ${result.durationMs || null},
-            ${result.error || null}
+            ${result.tier ?? null}, ${result.durationMs ?? null},
+            ${result.error ?? null}
           )
         `;
         resultsInserted++;

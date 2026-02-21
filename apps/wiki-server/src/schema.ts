@@ -3,6 +3,7 @@ import {
   pgSequence,
   text,
   integer,
+  bigint,
   bigserial,
   boolean,
   real,
@@ -190,7 +191,7 @@ export const autoUpdateResults = pgTable(
   "auto_update_results",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    runId: bigserial("run_id", { mode: "number" }).notNull(),
+    runId: bigint("run_id", { mode: "number" }).notNull(),
     pageId: text("page_id").notNull(),
     status: text("status").notNull(),
     tier: text("tier"),

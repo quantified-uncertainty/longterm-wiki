@@ -1,6 +1,6 @@
 CREATE TABLE "auto_update_results" (
 	"id" bigserial PRIMARY KEY NOT NULL,
-	"run_id" bigserial NOT NULL,
+	"run_id" bigint NOT NULL,
 	"page_id" text NOT NULL,
 	"status" text NOT NULL,
 	"tier" text,

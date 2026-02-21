@@ -1,7 +1,7 @@
 import { Hono, type Context } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
-import { getDrizzleDb } from "../db.js";
+import { getDb, getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
 
 export const autoUpdateRunsRoute = new Hono();
@@ -58,6 +58,41 @@ function validationError(c: Context, message: string) {
   return c.json({ error: "validation_error", message }, 400);
 }
 
+/** Map a run row + its result rows to the API response shape. */
+function formatRunEntry(
+  r: typeof autoUpdateRuns.$inferSelect,
+  results: (typeof autoUpdateResults.$inferSelect)[]
+) {
+  return {
+    id: r.id,
+    date: r.date,
+    startedAt: r.startedAt,
+    completedAt: r.completedAt,
+    trigger: r.trigger,
+    budgetLimit: r.budgetLimit,
+    budgetSpent: r.budgetSpent,
+    sourcesChecked: r.sourcesChecked,
+    sourcesFailed: r.sourcesFailed,
+    itemsFetched: r.itemsFetched,
+    itemsRelevant: r.itemsRelevant,
+    pagesPlanned: r.pagesPlanned,
+    pagesUpdated: r.pagesUpdated,
+    pagesFailed: r.pagesFailed,
+    pagesSkipped: r.pagesSkipped,
+    newPagesCreated: r.newPagesCreated
+      ? r.newPagesCreated.split(",").filter(Boolean)
+      : [],
+    results: results.map((entry) => ({
+      pageId: entry.pageId,
+      status: entry.status,
+      tier: entry.tier,
+      durationMs: entry.durationMs,
+      errorMessage: entry.errorMessage,
+    })),
+    createdAt: r.createdAt,
+  };
+}
+
 // ---- POST / (record a complete run with results) ----
 
 autoUpdateRunsRoute.post("/", async (c) => {
@@ -72,52 +107,59 @@ autoUpdateRunsRoute.post("/", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const d = parsed.data;
-  const db = getDrizzleDb();
+  const rawDb = getDb();
 
-  const runRow = await db
-    .insert(autoUpdateRuns)
-    .values({
-      date: d.date,
-      startedAt: new Date(d.startedAt),
-      completedAt: d.completedAt ? new Date(d.completedAt) : null,
-      trigger: d.trigger,
-      budgetLimit: d.budgetLimit ?? null,
-      budgetSpent: d.budgetSpent ?? null,
-      sourcesChecked: d.sourcesChecked ?? null,
-      sourcesFailed: d.sourcesFailed ?? null,
-      itemsFetched: d.itemsFetched ?? null,
-      itemsRelevant: d.itemsRelevant ?? null,
-      pagesPlanned: d.pagesPlanned ?? null,
-      pagesUpdated: d.pagesUpdated ?? null,
-      pagesFailed: d.pagesFailed ?? null,
-      pagesSkipped: d.pagesSkipped ?? null,
-      newPagesCreated: d.newPagesCreated?.join(",") || null,
-    })
-    .returning({
-      id: autoUpdateRuns.id,
-      date: autoUpdateRuns.date,
-      startedAt: autoUpdateRuns.startedAt,
-      createdAt: autoUpdateRuns.createdAt,
-    });
+  // Use a transaction to ensure atomicity of run + results insert
+  const result = await rawDb.begin(async (tx) => {
+    const db = getDrizzleDb();
 
-  const run = runRow[0];
-  let resultsInserted = 0;
-
-  if (d.results && d.results.length > 0) {
-    for (const r of d.results) {
-      await db.insert(autoUpdateResults).values({
-        runId: run.id,
-        pageId: r.pageId,
-        status: r.status,
-        tier: r.tier ?? null,
-        durationMs: r.durationMs ?? null,
-        errorMessage: r.errorMessage ?? null,
+    const runRow = await db
+      .insert(autoUpdateRuns)
+      .values({
+        date: d.date,
+        startedAt: new Date(d.startedAt),
+        completedAt: d.completedAt ? new Date(d.completedAt) : null,
+        trigger: d.trigger,
+        budgetLimit: d.budgetLimit ?? null,
+        budgetSpent: d.budgetSpent ?? null,
+        sourcesChecked: d.sourcesChecked ?? null,
+        sourcesFailed: d.sourcesFailed ?? null,
+        itemsFetched: d.itemsFetched ?? null,
+        itemsRelevant: d.itemsRelevant ?? null,
+        pagesPlanned: d.pagesPlanned ?? null,
+        pagesUpdated: d.pagesUpdated ?? null,
+        pagesFailed: d.pagesFailed ?? null,
+        pagesSkipped: d.pagesSkipped ?? null,
+        newPagesCreated: d.newPagesCreated?.join(",") || null,
+      })
+      .returning({
+        id: autoUpdateRuns.id,
+        date: autoUpdateRuns.date,
+        startedAt: autoUpdateRuns.startedAt,
+        createdAt: autoUpdateRuns.createdAt,
       });
-      resultsInserted++;
-    }
-  }
 
-  return c.json({ ...run, resultsInserted }, 201);
+    const run = runRow[0];
+    let resultsInserted = 0;
+
+    if (d.results && d.results.length > 0) {
+      for (const r of d.results) {
+        await db.insert(autoUpdateResults).values({
+          runId: run.id,
+          pageId: r.pageId,
+          status: r.status,
+          tier: r.tier ?? null,
+          durationMs: r.durationMs ?? null,
+          errorMessage: r.errorMessage ?? null,
+        });
+        resultsInserted++;
+      }
+    }
+
+    return { ...run, resultsInserted };
+  });
+
+  return c.json(result, 201);
 });
 
 // ---- GET /all (paginated list of runs) ----
@@ -149,34 +191,7 @@ autoUpdateRunsRoute.get("/all", async (c) => {
         .from(autoUpdateResults)
         .where(eq(autoUpdateResults.runId, r.id));
 
-      return {
-        id: r.id,
-        date: r.date,
-        startedAt: r.startedAt,
-        completedAt: r.completedAt,
-        trigger: r.trigger,
-        budgetLimit: r.budgetLimit,
-        budgetSpent: r.budgetSpent,
-        sourcesChecked: r.sourcesChecked,
-        sourcesFailed: r.sourcesFailed,
-        itemsFetched: r.itemsFetched,
-        itemsRelevant: r.itemsRelevant,
-        pagesPlanned: r.pagesPlanned,
-        pagesUpdated: r.pagesUpdated,
-        pagesFailed: r.pagesFailed,
-        pagesSkipped: r.pagesSkipped,
-        newPagesCreated: r.newPagesCreated
-          ? r.newPagesCreated.split(",").filter(Boolean)
-          : [],
-        results: results.map((res) => ({
-          pageId: res.pageId,
-          status: res.status,
-          tier: res.tier,
-          durationMs: res.durationMs,
-          errorMessage: res.errorMessage,
-        })),
-        createdAt: r.createdAt,
-      };
+      return formatRunEntry(r, results);
     })
   );
 
@@ -256,32 +271,5 @@ autoUpdateRunsRoute.get("/:id", async (c) => {
     .from(autoUpdateResults)
     .where(eq(autoUpdateResults.runId, r.id));
 
-  return c.json({
-    id: r.id,
-    date: r.date,
-    startedAt: r.startedAt,
-    completedAt: r.completedAt,
-    trigger: r.trigger,
-    budgetLimit: r.budgetLimit,
-    budgetSpent: r.budgetSpent,
-    sourcesChecked: r.sourcesChecked,
-    sourcesFailed: r.sourcesFailed,
-    itemsFetched: r.itemsFetched,
-    itemsRelevant: r.itemsRelevant,
-    pagesPlanned: r.pagesPlanned,
-    pagesUpdated: r.pagesUpdated,
-    pagesFailed: r.pagesFailed,
-    pagesSkipped: r.pagesSkipped,
-    newPagesCreated: r.newPagesCreated
-      ? r.newPagesCreated.split(",").filter(Boolean)
-      : [],
-    results: results.map((res) => ({
-      pageId: res.pageId,
-      status: res.status,
-      tier: res.tier,
-      durationMs: res.durationMs,
-      errorMessage: res.errorMessage,
-    })),
-    createdAt: r.createdAt,
-  });
+  return c.json(formatRunEntry(r, results));
 });

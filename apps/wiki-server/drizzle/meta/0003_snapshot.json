@@ -1,5 +1,5 @@
 {
-  "id": "c0688acf-99ba-43bd-8830-6e0bf849dd66",
+  "id": "32b5213c-23f6-41cb-a5bf-188f0d0f1355",
   "prevId": "b01faf88-7b2b-45f5-8f46-e7d548cc171b",
   "version": "7",
   "dialect": "postgresql",
@@ -16,7 +16,7 @@
         },
         "run_id": {
           "name": "run_id",
-          "type": "bigserial",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
