@@ -22,6 +22,7 @@ import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
 import { parseCliArgs } from "../lib/cli.ts";
 import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server-client.ts";
+import { resolveEntityType } from "../lib/hallucination-risk.ts";
 import { waitForHealthy, fetchWithRetry } from "./sync-pages.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
@@ -71,7 +72,7 @@ export function transformEntity(e: YamlEntity): SyncEntity {
   return {
     id: e.id,
     numericId: e.numericId ?? null,
-    entityType: e.type,
+    entityType: resolveEntityType(e.type) ?? e.type,
     title: e.title,
     description: e.description ?? null,
     website: e.website ?? null,

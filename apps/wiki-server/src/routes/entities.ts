@@ -23,7 +23,6 @@ const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
   entityType: z.string().max(100).optional(),
-  category: z.string().max(100).optional(),
 });
 
 const SearchQuery = z.object({

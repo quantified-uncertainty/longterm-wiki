@@ -391,16 +391,6 @@ export const resourceCitations = pgTable(
 );
 
 /**
- * Page links — stores directional links between entities/pages.
- *
- * Populated during build-data sync. Each row represents a signal that
- * source_id relates to target_id, with a link_type indicating the origin
- * of the signal and an optional relationship label.
- *
- * Used to compute backlinks (reverse lookup) and the related-pages graph
- * (weighted aggregation across all link types).
- */
-/**
  * Entities — read mirror of data/entities/*.yaml files.
  *
  * Stores the full entity metadata (type, title, description, tags, etc.)
@@ -491,6 +481,16 @@ export const facts = pgTable(
   ]
 );
 
+/**
+ * Page links — stores directional links between entities/pages.
+ *
+ * Populated during build-data sync. Each row represents a signal that
+ * source_id relates to target_id, with a link_type indicating the origin
+ * of the signal and an optional relationship label.
+ *
+ * Used to compute backlinks (reverse lookup) and the related-pages graph
+ * (weighted aggregation across all link types).
+ */
 export const pageLinks = pgTable(
   "page_links",
   {

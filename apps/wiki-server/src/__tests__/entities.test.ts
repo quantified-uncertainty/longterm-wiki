@@ -426,4 +426,49 @@ describe("Entities API", () => {
       expect(body.upserted).toBe(1);
     });
   });
+
+  // ---- Auth ----
+
+  describe("Bearer auth", () => {
+    it("rejects unauthenticated sync when API key is set", async () => {
+      process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
+      const authedApp = createApp();
+
+      const res = await postJson(authedApp, "/api/entities/sync", {
+        entities: [
+          {
+            id: "anthropic",
+            title: "Anthropic",
+            entityType: "organization",
+          },
+        ],
+      });
+
+      expect(res.status).toBe(401);
+    });
+
+    it("accepts sync with correct Bearer token", async () => {
+      process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
+      const authedApp = createApp();
+
+      const res = await authedApp.request("/api/entities/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer test-secret",
+        },
+        body: JSON.stringify({
+          entities: [
+            {
+              id: "anthropic",
+              title: "Anthropic",
+              entityType: "organization",
+            },
+          ],
+        }),
+      });
+
+      expect(res.status).toBe(200);
+    });
+  });
 });

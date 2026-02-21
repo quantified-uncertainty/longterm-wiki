@@ -60,6 +60,64 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
+  // Discriminator: stale queries don't filter by entity_id, while
+  // timeseries and by-entity queries always have entity_id = $N.
+  const hasEntityIdFilter = q.includes('entity_id" =');
+
+  // --- facts: STALE SELECT (is not null + order by, NO entity_id filter) ---
+  if (
+    q.includes('"facts"') &&
+    q.includes("is not null") &&
+    q.includes("order by") &&
+    !hasEntityIdFilter &&
+    !q.includes("count(*)")
+  ) {
+    let results = Array.from(factsStore.values()).filter(
+      (r) => r.as_of !== null
+    );
+    // olderThan filter — first string param is the date threshold
+    const dateParam = params.find((p) => typeof p === "string") as string | undefined;
+    if (dateParam) {
+      results = results.filter((r) => String(r.as_of) <= dateParam);
+    }
+    results.sort((a, b) =>
+      String(a.as_of || "").localeCompare(String(b.as_of || ""))
+    );
+    const limitIdx = params.findIndex((p) => typeof p === "number");
+    const limit = limitIdx >= 0 ? (params[limitIdx] as number) : 50;
+    const offsetIdx = limitIdx >= 0 ? limitIdx + 1 : -1;
+    const offset =
+      offsetIdx >= 0 && offsetIdx < params.length
+        ? (params[offsetIdx] as number)
+        : 0;
+    return results.slice(offset, offset + limit).map((r) => ({
+      entityId: r.entity_id,
+      factId: r.fact_id,
+      label: r.label,
+      asOf: r.as_of,
+      measure: r.measure,
+      value: r.value,
+      numeric: r.numeric,
+    }));
+  }
+
+  // --- facts: STALE COUNT (count + is not null, NO entity_id filter) ---
+  if (
+    q.includes("count(*)") &&
+    q.includes('"facts"') &&
+    q.includes("is not null") &&
+    !hasEntityIdFilter
+  ) {
+    let results = Array.from(factsStore.values()).filter(
+      (r) => r.as_of !== null
+    );
+    const dateParam = params.find((p) => typeof p === "string") as string | undefined;
+    if (dateParam) {
+      results = results.filter((r) => String(r.as_of) <= dateParam);
+    }
+    return [{ count: results.length }];
+  }
+
   // --- facts: SELECT by entity_id + measure + as_of IS NOT NULL (timeseries) ---
   if (
     q.includes('"facts"') &&
@@ -124,7 +182,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(offset, offset + limit);
   }
 
-  // --- facts: COUNT(*) ---
+  // --- facts: COUNT(*) with entity_id filter (by-entity count) ---
   if (q.includes("count(*)") && q.includes('"facts"')) {
     if (q.includes("where")) {
       const entityId = params[0] as string;
@@ -159,18 +217,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (row.measure) unique.add(row.measure as string);
     }
     return [{ count: unique.size }];
-  }
-
-  // --- facts: stale facts query (is not null + lte + order by as_of) ---
-  if (q.includes('"facts"') && q.includes("is not null") && !q.includes("order by")) {
-    // Staleness query with count
-    let results = Array.from(factsStore.values()).filter(
-      (r) => r.as_of !== null
-    );
-    if (params.length > 0 && typeof params[0] === "string") {
-      results = results.filter((r) => String(r.as_of) <= params[0]!);
-    }
-    return [{ count: results.length }];
   }
 
   // --- entity_ids: COUNT (for health check) ---
@@ -384,6 +430,44 @@ describe("Facts API", () => {
     });
   });
 
+  // ---- Stale ----
+
+  describe("GET /api/facts/stale", () => {
+    it("returns stale facts ordered by asOf", async () => {
+      await seedFact(app, "anthropic", "old-fact", {
+        asOf: "2023-01",
+        measure: "revenue",
+      });
+      await seedFact(app, "anthropic", "recent-fact", {
+        asOf: "2025-12",
+        measure: "revenue",
+      });
+
+      const res = await app.request("/api/facts/stale?olderThan=2024-01");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.facts.length).toBeGreaterThan(0);
+      expect(body.total).toBeGreaterThan(0);
+    });
+
+    it("returns all facts with asOf when no olderThan given", async () => {
+      await seedFact(app, "anthropic", "f1", { asOf: "2025-06" });
+
+      const res = await app.request("/api/facts/stale");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.facts.length).toBeGreaterThan(0);
+    });
+
+    it("returns empty when no stale facts", async () => {
+      const res = await app.request("/api/facts/stale");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.facts).toHaveLength(0);
+      expect(body.total).toBe(0);
+    });
+  });
+
   // ---- Range values ----
 
   describe("Range value facts", () => {
@@ -406,6 +490,51 @@ describe("Facts API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.upserted).toBe(1);
+    });
+  });
+
+  // ---- Auth ----
+
+  describe("Bearer auth", () => {
+    it("rejects unauthenticated sync when API key is set", async () => {
+      process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
+      const authedApp = createApp();
+
+      const res = await postJson(authedApp, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "abc",
+            label: "Test",
+          },
+        ],
+      });
+
+      expect(res.status).toBe(401);
+    });
+
+    it("accepts sync with correct Bearer token", async () => {
+      process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
+      const authedApp = createApp();
+
+      const res = await authedApp.request("/api/facts/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer test-secret",
+        },
+        body: JSON.stringify({
+          facts: [
+            {
+              entityId: "anthropic",
+              factId: "abc",
+              label: "Test",
+            },
+          ],
+        }),
+      });
+
+      expect(res.status).toBe(200);
     });
   });
 });
