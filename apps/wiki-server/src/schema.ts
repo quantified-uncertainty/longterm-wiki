@@ -113,25 +113,22 @@ export const wikiPages = pgTable(
   ]
 );
 
-export const citationContent = pgTable(
-  "citation_content",
-  {
-    url: text("url").primaryKey(),
-    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
-    httpStatus: integer("http_status"),
-    contentType: text("content_type"),
-    pageTitle: text("page_title"),
-    fullTextPreview: text("full_text_preview"),
-    contentLength: integer("content_length"),
-    contentHash: text("content_hash"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  }
-);
+export const citationContent = pgTable("citation_content", {
+  url: text("url").primaryKey(),
+  fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+  httpStatus: integer("http_status"),
+  contentType: text("content_type"),
+  pageTitle: text("page_title"),
+  fullTextPreview: text("full_text_preview"),
+  contentLength: integer("content_length"),
+  contentHash: text("content_hash"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
