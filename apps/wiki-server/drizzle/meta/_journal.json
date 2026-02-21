@@ -71,6 +71,13 @@
       "when": 1771800000000,
       "tag": "0009_add_resource_citations_fk",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1771900000000,
+      "tag": "0010_drop_citation_content_page_columns",
+      "breakpoints": true
     }
   ]
 }

@@ -69,8 +69,6 @@ const MarkAccuracyBatchSchema = z.object({
 
 const UpsertContentSchema = z.object({
   url: z.string().min(1).max(2000),
-  pageId: z.string().min(1).max(200),
-  footnote: z.number().int().min(0),
   fetchedAt: z.string().datetime(),
   httpStatus: z.number().int().nullable().optional(),
   contentType: z.string().max(200).nullable().optional(),
@@ -445,8 +443,6 @@ citationsRoute.post("/content/upsert", async (c) => {
 
   const vals = {
     url: d.url,
-    pageId: d.pageId,
-    footnote: d.footnote,
     fetchedAt: new Date(d.fetchedAt),
     httpStatus: d.httpStatus ?? null,
     contentType: d.contentType ?? null,
@@ -464,7 +460,7 @@ citationsRoute.post("/content/upsert", async (c) => {
       set: { ...vals, updatedAt: sql`now()` },
     });
 
-  return c.json({ url: d.url, pageId: d.pageId, footnote: d.footnote });
+  return c.json({ url: d.url });
 });
 
 // ---- POST /quotes/mark-accuracy-batch ----
