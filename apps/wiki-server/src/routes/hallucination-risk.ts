@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql, and } from "drizzle-orm";
-import { getDrizzleDb } from "../db.js";
+import { eq, count, desc, sql } from "drizzle-orm";
+import { getDrizzleDb, getDb } from "../db.js";
 import { hallucinationRiskSnapshots } from "../schema.js";
 import {
   parseJsonBody,
@@ -89,26 +89,21 @@ hallucinationRiskRoute.post("/batch", async (c) => {
   const { snapshots } = parsed.data;
   const db = getDrizzleDb();
 
-  const results = await db.transaction(async (tx) => {
-    const rows: Array<{ id: number; pageId: string }> = [];
-    for (const d of snapshots) {
-      const inserted = await tx
-        .insert(hallucinationRiskSnapshots)
-        .values({
-          pageId: d.pageId,
-          score: d.score,
-          level: d.level,
-          factors: d.factors ?? null,
-          integrityIssues: d.integrityIssues ?? null,
-        })
-        .returning({
-          id: hallucinationRiskSnapshots.id,
-          pageId: hallucinationRiskSnapshots.pageId,
-        });
-      rows.push(firstOrThrow(inserted, `hallucination risk batch insert ${d.pageId}`));
-    }
-    return rows;
-  });
+  const allVals = snapshots.map((d) => ({
+    pageId: d.pageId,
+    score: d.score,
+    level: d.level,
+    factors: d.factors ?? null,
+    integrityIssues: d.integrityIssues ?? null,
+  }));
+
+  const results = await db
+    .insert(hallucinationRiskSnapshots)
+    .values(allVals)
+    .returning({
+      id: hallucinationRiskSnapshots.id,
+      pageId: hallucinationRiskSnapshots.pageId,
+    });
 
   return c.json({ inserted: results.length }, 201);
 });
@@ -149,6 +144,7 @@ hallucinationRiskRoute.get("/stats", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
+  const rawDb = getDb();
 
   // Total snapshots
   const totalResult = await db
@@ -164,25 +160,22 @@ hallucinationRiskRoute.get("/stats", async (c) => {
     .from(hallucinationRiskSnapshots);
   const uniquePages = Number(pagesResult[0].count);
 
-  // Level distribution (from latest snapshot per page)
-  const levelDist = await db
-    .select({
-      level: hallucinationRiskSnapshots.level,
-      count: count(),
-    })
-    .from(hallucinationRiskSnapshots)
-    .where(
-      sql`(${hallucinationRiskSnapshots.pageId}, ${hallucinationRiskSnapshots.computedAt}) IN (
-        SELECT page_id, MAX(computed_at) FROM hallucination_risk_snapshots GROUP BY page_id
-      )`
-    )
-    .groupBy(hallucinationRiskSnapshots.level);
+  // Level distribution (from latest snapshot per page) using DISTINCT ON
+  const levelDist = await rawDb`
+    SELECT level, count(*)::int AS count
+    FROM (
+      SELECT DISTINCT ON (page_id) level
+      FROM hallucination_risk_snapshots
+      ORDER BY page_id, computed_at DESC
+    ) latest
+    GROUP BY level
+  `;
 
   return c.json({
     totalSnapshots,
     uniquePages,
     levelDistribution: Object.fromEntries(
-      levelDist.map((r) => [r.level, r.count])
+      levelDist.map((r: any) => [r.level, r.count])
     ),
   });
 });
@@ -194,35 +187,108 @@ hallucinationRiskRoute.get("/latest", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { limit, offset, level } = parsed.data;
-  const db = getDrizzleDb();
+  const rawDb = getDb();
 
-  // Use a subquery to get the most recent snapshot per page
-  const conditions = [
-    sql`(${hallucinationRiskSnapshots.pageId}, ${hallucinationRiskSnapshots.computedAt}) IN (
-      SELECT page_id, MAX(computed_at) FROM hallucination_risk_snapshots GROUP BY page_id
-    )`,
-  ];
-
-  if (level) {
-    conditions.push(eq(hallucinationRiskSnapshots.level, level));
-  }
-
-  const rows = await db
-    .select()
-    .from(hallucinationRiskSnapshots)
-    .where(and(...conditions))
-    .orderBy(desc(hallucinationRiskSnapshots.score))
-    .limit(limit)
-    .offset(offset);
+  // Use DISTINCT ON for efficient "latest per page" query
+  const rows = level
+    ? await rawDb`
+        SELECT page_id, score, level, factors, integrity_issues, computed_at
+        FROM (
+          SELECT DISTINCT ON (page_id) *
+          FROM hallucination_risk_snapshots
+          ORDER BY page_id, computed_at DESC
+        ) latest
+        WHERE level = ${level}
+        ORDER BY score DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `
+    : await rawDb`
+        SELECT page_id, score, level, factors, integrity_issues, computed_at
+        FROM (
+          SELECT DISTINCT ON (page_id) *
+          FROM hallucination_risk_snapshots
+          ORDER BY page_id, computed_at DESC
+        ) latest
+        ORDER BY score DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `;
 
   return c.json({
-    pages: rows.map((r) => ({
-      pageId: r.pageId,
+    pages: rows.map((r: any) => ({
+      pageId: r.page_id,
       score: r.score,
       level: r.level,
       factors: r.factors,
-      integrityIssues: r.integrityIssues,
-      computedAt: r.computedAt,
+      integrityIssues: r.integrity_issues,
+      computedAt: r.computed_at,
     })),
   });
+});
+
+// ---- DELETE /cleanup (retention: keep latest N snapshots per page) ----
+
+const CleanupQuery = z.object({
+  keep: z.coerce.number().int().min(1).max(1000).default(30),
+  dry_run: z
+    .enum(["true", "false", "1", "0"])
+    .transform((v) => v === "true" || v === "1")
+    .default("false"),
+});
+
+hallucinationRiskRoute.delete("/cleanup", async (c) => {
+  const parsed = CleanupQuery.safeParse(c.req.query());
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { keep, dry_run } = parsed.data;
+  const rawDb = getDb();
+
+  if (dry_run) {
+    // Count how many rows would be deleted
+    const result = await rawDb`
+      SELECT count(*)::int AS count
+      FROM hallucination_risk_snapshots hrs
+      WHERE id NOT IN (
+        SELECT id FROM (
+          SELECT id, ROW_NUMBER() OVER (
+            PARTITION BY page_id ORDER BY computed_at DESC
+          ) AS rn
+          FROM hallucination_risk_snapshots
+        ) ranked
+        WHERE rn <= ${keep}
+      )
+    `;
+    const wouldDelete = result[0]?.count ?? 0;
+
+    // Total count
+    const totalResult = await rawDb`
+      SELECT count(*)::int AS total FROM hallucination_risk_snapshots
+    `;
+    const total = totalResult[0]?.total ?? 0;
+
+    return c.json({
+      dryRun: true,
+      keep,
+      totalSnapshots: total,
+      wouldDelete,
+      wouldRetain: total - wouldDelete,
+    });
+  }
+
+  // Actually delete old snapshots, keeping latest `keep` per page
+  const result = await rawDb`
+    DELETE FROM hallucination_risk_snapshots
+    WHERE id NOT IN (
+      SELECT id FROM (
+        SELECT id, ROW_NUMBER() OVER (
+          PARTITION BY page_id ORDER BY computed_at DESC
+        ) AS rn
+        FROM hallucination_risk_snapshots
+      ) ranked
+      WHERE rn <= ${keep}
+    )
+  `;
+
+  const deleted = result.count;
+
+  return c.json({ deleted, keep });
 });

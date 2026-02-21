@@ -124,37 +124,31 @@ summariesRoute.post("/batch", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { items } = parsed.data;
-  const results: Array<{ entityId: string; entityType: string }> = [];
-
   const db = getDrizzleDb();
-  await db.transaction(async (tx) => {
-    for (const item of items) {
-      const vals = summaryValues(item);
-      const rows = await tx
-        .insert(summaries)
-        .values(vals)
-        .onConflictDoUpdate({
-          target: summaries.entityId,
-          set: {
-            entityType: vals.entityType,
-            oneLiner: vals.oneLiner,
-            summary: vals.summary,
-            review: vals.review,
-            keyPoints: vals.keyPoints,
-            keyClaims: vals.keyClaims,
-            model: vals.model,
-            tokensUsed: vals.tokensUsed,
-            generatedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        })
-        .returning({
-          entityId: summaries.entityId,
-          entityType: summaries.entityType,
-        });
-      results.push(rows[0]);
-    }
-  });
+  const allVals = items.map(summaryValues);
+
+  const results = await db
+    .insert(summaries)
+    .values(allVals)
+    .onConflictDoUpdate({
+      target: summaries.entityId,
+      set: {
+        entityType: sql`excluded."entity_type"`,
+        oneLiner: sql`excluded."one_liner"`,
+        summary: sql`excluded."summary"`,
+        review: sql`excluded."review"`,
+        keyPoints: sql`excluded."key_points"`,
+        keyClaims: sql`excluded."key_claims"`,
+        model: sql`excluded."model"`,
+        tokensUsed: sql`excluded."tokens_used"`,
+        generatedAt: sql`now()`,
+        updatedAt: sql`now()`,
+      },
+    })
+    .returning({
+      entityId: summaries.entityId,
+      entityType: summaries.entityType,
+    });
 
   return c.json({ inserted: results.length, results }, 201);
 });

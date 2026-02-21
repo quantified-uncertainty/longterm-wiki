@@ -112,23 +112,17 @@ claimsRoute.post("/batch", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { items } = parsed.data;
-  const results: Array<{ id: number; entityId: string; claimType: string }> = [];
-
   const db = getDrizzleDb();
-  await db.transaction(async (tx) => {
-    for (const item of items) {
-      const vals = claimValues(item);
-      const rows = await tx
-        .insert(claims)
-        .values(vals)
-        .returning({
-          id: claims.id,
-          entityId: claims.entityId,
-          claimType: claims.claimType,
-        });
-      results.push(rows[0]);
-    }
-  });
+  const allVals = items.map(claimValues);
+
+  const results = await db
+    .insert(claims)
+    .values(allVals)
+    .returning({
+      id: claims.id,
+      entityId: claims.entityId,
+      claimType: claims.claimType,
+    });
 
   return c.json({ inserted: results.length, results }, 201);
 });

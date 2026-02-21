@@ -914,3 +914,41 @@ export async function syncPageLinks(
 
   return { upserted: totalUpserted };
 }
+
+// ---------------------------------------------------------------------------
+// Resources API (single upsert for fire-and-forget dual-write)
+// ---------------------------------------------------------------------------
+
+export interface UpsertResourceItem {
+  id: string;
+  url: string;
+  title?: string | null;
+  type?: string | null;
+  summary?: string | null;
+  review?: string | null;
+  abstract?: string | null;
+  keyPoints?: string[] | null;
+  publicationId?: string | null;
+  authors?: string[] | null;
+  publishedDate?: string | null;
+  tags?: string[] | null;
+  localFilename?: string | null;
+  credibilityOverride?: number | null;
+  fetchedAt?: string | null;
+  contentHash?: string | null;
+  citedBy?: string[] | null;
+}
+
+interface UpsertResourceResult {
+  id: string;
+  url: string;
+}
+
+/**
+ * Upsert a single resource to the wiki-server database.
+ */
+export async function upsertResource(
+  item: UpsertResourceItem,
+): Promise<UpsertResourceResult | null> {
+  return apiRequest<UpsertResourceResult>('POST', '/api/resources', item);
+}

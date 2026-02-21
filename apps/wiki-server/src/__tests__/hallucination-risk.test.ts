@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
+import { mockDbModule, postJson } from "./test-utils.js";
 
 // ---- In-memory store simulating the hallucination_risk_snapshots table ----
 
@@ -19,181 +20,206 @@ function resetStore() {
   nextId = 1;
 }
 
-function createMockSql() {
-  function dispatch(query: string, params: unknown[]): unknown[] {
-    const q = query.toLowerCase();
-
-    // ---- entity_ids (for health check) ----
-    if (q.includes("count(*)") && q.includes("entity_ids")) {
-      return [{ count: 0 }];
+/** Get latest snapshot per page (shared logic for stats/latest mock queries). */
+function getLatestByPage() {
+  const latestByPage = new Map<string, (typeof riskStore)[0]>();
+  for (const r of riskStore) {
+    const existing = latestByPage.get(r.page_id);
+    if (!existing || r.computed_at > existing.computed_at) {
+      latestByPage.set(r.page_id, r);
     }
-    if (q.includes("last_value")) {
-      return [{ last_value: 0, is_called: false }];
-    }
+  }
+  return latestByPage;
+}
 
-    // ---- INSERT INTO hallucination_risk_snapshots ----
-    if (q.includes("insert into") && q.includes("hallucination_risk_snapshots")) {
+function dispatch(query: string, params: unknown[]): unknown[] {
+  const q = query.toLowerCase();
+
+  // ---- entity_ids (for health check) ----
+  if (q.includes("count(*)") && q.includes("entity_ids")) {
+    return [{ count: 0 }];
+  }
+  if (q.includes("last_value")) {
+    return [{ last_value: 0, is_called: false }];
+  }
+
+  // ---- INSERT INTO hallucination_risk_snapshots ----
+  if (
+    q.includes("insert into") &&
+    q.includes("hallucination_risk_snapshots")
+  ) {
+    const PARAMS_PER_ROW = 5; // pageId, score, level, factors, integrityIssues
+    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
+    const results: (typeof riskStore)[number][] = [];
+
+    for (let i = 0; i < rowCount; i++) {
+      const off = i * PARAMS_PER_ROW;
       const row = {
         id: nextId++,
-        page_id: params[0] as string,
-        score: params[1] as number,
-        level: params[2] as string,
-        factors: params[3] as string[] | null,
-        integrity_issues: params[4] as string[] | null,
+        page_id: params[off] as string,
+        score: params[off + 1] as number,
+        level: params[off + 2] as string,
+        factors: params[off + 3] as string[] | null,
+        integrity_issues: params[off + 4] as string[] | null,
         computed_at: new Date(),
       };
       riskStore.push(row);
-      return [row];
+      results.push(row);
+    }
+    return results;
+  }
+
+  // ---- SELECT count(distinct page_id) FROM hallucination_risk_snapshots ----
+  if (
+    q.includes("count(distinct") &&
+    q.includes("page_id") &&
+    q.includes("hallucination_risk_snapshots")
+  ) {
+    const uniquePages = new Set(riskStore.map((e) => e.page_id));
+    return [{ page_id: uniquePages.size }];
+  }
+
+  // ---- Cleanup dry-run: total count (SELECT count(*)::int AS total) ----
+  if (
+    q.includes("count(*)") &&
+    q.includes("as total") &&
+    q.includes("hallucination_risk_snapshots")
+  ) {
+    return [{ total: riskStore.length }];
+  }
+
+  // ---- SELECT count(*) FROM hallucination_risk_snapshots (not GROUP BY) ----
+  if (
+    q.includes("count(*)") &&
+    q.includes("hallucination_risk_snapshots") &&
+    !q.includes("group by") &&
+    !q.includes("not in")
+  ) {
+    return [{ count: riskStore.length }];
+  }
+
+  // ---- Stats: DISTINCT ON level distribution (raw SQL tagged template) ----
+  // Matches: SELECT level, count(*)::int AS count FROM (SELECT DISTINCT ON ...
+  if (
+    q.includes("distinct on") &&
+    q.includes("group by") &&
+    q.includes("level")
+  ) {
+    const latestByPage = getLatestByPage();
+    const counts: Record<string, number> = {};
+    for (const r of latestByPage.values()) {
+      counts[r.level] = (counts[r.level] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .map(([level, count]) => ({ level, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  // ---- Latest: DISTINCT ON per page (raw SQL tagged template) ----
+  // Matches: SELECT page_id, score, level, ... FROM (SELECT DISTINCT ON (page_id) ...
+  if (
+    q.includes("distinct on") &&
+    q.includes("order by") &&
+    q.includes("score") &&
+    !q.includes("group by")
+  ) {
+    const latestByPage = getLatestByPage();
+    let results = [...latestByPage.values()];
+
+    // Check for level filter
+    const levelParam = params.find(
+      (p) => p === "high" || p === "medium" || p === "low"
+    );
+    if (levelParam) {
+      results = results.filter((r) => r.level === levelParam);
     }
 
-    // ---- SELECT count(distinct page_id) FROM hallucination_risk_snapshots ----
-    if (q.includes("count(distinct") && q.includes("page_id") && q.includes("hallucination_risk_snapshots")) {
-      const uniquePages = new Set(riskStore.map((e) => e.page_id));
-      return [{ page_id: uniquePages.size }];
+    results.sort((a, b) => b.score - a.score);
+
+    // Extract limit/offset from params (numbers)
+    const numParams = params.filter((p) => typeof p === "number") as number[];
+    const limit = numParams[0] || 50;
+    const offset = numParams[1] || 0;
+    return results.slice(offset, offset + limit);
+  }
+
+  // ---- SELECT ... WHERE page_id = $1 ORDER BY computed_at DESC LIMIT ----
+  if (
+    q.includes("hallucination_risk_snapshots") &&
+    q.includes("where") &&
+    q.includes("page_id") &&
+    !q.includes("distinct on") &&
+    !q.includes("not in")
+  ) {
+    const pageId = params[0] as string;
+    const limit = (params[1] as number) || 50;
+    return riskStore
+      .filter((e) => e.page_id === pageId)
+      .sort((a, b) => b.computed_at.getTime() - a.computed_at.getTime())
+      .slice(0, limit);
+  }
+
+  // ---- Cleanup dry-run: count rows that would be deleted ----
+  if (
+    q.includes("count(*)") &&
+    q.includes("not in") &&
+    q.includes("row_number")
+  ) {
+    const keep = params[0] as number;
+    // Group by page_id, count rows beyond the keep threshold
+    const byPage = new Map<string, typeof riskStore>();
+    for (const r of riskStore) {
+      const arr = byPage.get(r.page_id) || [];
+      arr.push(r);
+      byPage.set(r.page_id, arr);
     }
-
-    // ---- SELECT count(*) FROM hallucination_risk_snapshots (not GROUP BY) ----
-    if (q.includes("count(*)") && q.includes("hallucination_risk_snapshots") && !q.includes("group by")) {
-      return [{ count: riskStore.length }];
-    }
-
-    // ---- SELECT level, count FROM hallucination_risk_snapshots GROUP BY level ----
-    if (q.includes("hallucination_risk_snapshots") && q.includes("group by") && q.includes('"level"')) {
-      // This is for stats — latest snapshot per page
-      // Simplified: just group all entries by level
-      const latestByPage = new Map<string, typeof riskStore[0]>();
-      for (const r of riskStore) {
-        const existing = latestByPage.get(r.page_id);
-        if (!existing || r.computed_at > existing.computed_at) {
-          latestByPage.set(r.page_id, r);
-        }
-      }
-      const counts: Record<string, number> = {};
-      for (const r of latestByPage.values()) {
-        counts[r.level] = (counts[r.level] || 0) + 1;
-      }
-      return Object.entries(counts)
-        .map(([level, count]) => ({ level, count }))
-        .sort((a, b) => b.count - a.count);
-    }
-
-    // ---- SELECT ... WHERE page_id = $1 ORDER BY computed_at DESC LIMIT ----
-    if (q.includes("hallucination_risk_snapshots") && q.includes("where") && q.includes("page_id") && !q.includes("in (")) {
-      const pageId = params[0] as string;
-      const limit = params[1] as number || 50;
-      return riskStore
-        .filter((e) => e.page_id === pageId)
-        .sort((a, b) => b.computed_at.getTime() - a.computed_at.getTime())
-        .slice(0, limit);
-    }
-
-    // ---- SELECT ... (latest per page, for /latest endpoint) ORDER BY score DESC ----
-    if (q.includes("hallucination_risk_snapshots") && q.includes("in (") && q.includes("order by")) {
-      const latestByPage = new Map<string, typeof riskStore[0]>();
-      for (const r of riskStore) {
-        const existing = latestByPage.get(r.page_id);
-        if (!existing || r.computed_at > existing.computed_at) {
-          latestByPage.set(r.page_id, r);
-        }
-      }
-      let results = [...latestByPage.values()];
-
-      // Check for level filter
-      const levelParamIndex = params.findIndex(
-        (p) => p === "high" || p === "medium" || p === "low"
+    let wouldDelete = 0;
+    for (const rows of byPage.values()) {
+      rows.sort(
+        (a, b) => b.computed_at.getTime() - a.computed_at.getTime()
       );
-      if (levelParamIndex >= 0) {
-        const level = params[levelParamIndex] as string;
-        results = results.filter((r) => r.level === level);
+      if (rows.length > keep) {
+        wouldDelete += rows.length - keep;
       }
-
-      results.sort((a, b) => b.score - a.score);
-      const limit = (params.find((p) => typeof p === "number" && p <= 200) as number) || 50;
-      const offset = (params.find((p, i) => typeof p === "number" && i > 0 && p !== limit) as number) || 0;
-      return results.slice(offset, offset + limit);
     }
-
-    return [];
+    return [{ count: wouldDelete }];
   }
 
-  const mockSql: any = (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const query = strings.join("$").trim();
-    return dispatch(query, values);
-  };
-
-  // ---- Shared helpers ----
-
-  function extractColumns(query: string): (string | null)[] {
-    const q = query.trim();
-    let clauseMatch = q.match(/returning\s+(.+?)$/is);
-    if (!clauseMatch) clauseMatch = q.match(/^select\s+(.+?)\s+from\s/is);
-    if (!clauseMatch) return [];
-    const clause = clauseMatch[1];
-    const parts: string[] = [];
-    let depth = 0;
-    let current = "";
-    for (const ch of clause) {
-      if (ch === "(") depth++;
-      else if (ch === ")") depth--;
-      else if (ch === "," && depth === 0) { parts.push(current.trim()); current = ""; continue; }
-      current += ch;
+  // ---- Cleanup actual delete ----
+  if (
+    q.includes("delete") &&
+    q.includes("hallucination_risk_snapshots") &&
+    q.includes("not in") &&
+    q.includes("row_number")
+  ) {
+    const keep = params[0] as number;
+    const byPage = new Map<string, typeof riskStore>();
+    for (const r of riskStore) {
+      const arr = byPage.get(r.page_id) || [];
+      arr.push(r);
+      byPage.set(r.page_id, arr);
     }
-    if (current.trim()) parts.push(current.trim());
-    return parts.map((part) => {
-      const matches = [...part.matchAll(/"([^"]+)"/g)];
-      return matches.length > 0 ? matches[matches.length - 1][1] : null;
-    });
+    const toDelete = new Set<number>();
+    for (const rows of byPage.values()) {
+      rows.sort(
+        (a, b) => b.computed_at.getTime() - a.computed_at.getTime()
+      );
+      for (let i = keep; i < rows.length; i++) {
+        toDelete.add(rows[i].id);
+      }
+    }
+    const deletedCount = toDelete.size;
+    riskStore = riskStore.filter((r) => !toDelete.has(r.id));
+    // Tagged template handler sets result.count = rows.length,
+    // so return an array with length equal to deleted count
+    return new Array(deletedCount).fill({});
   }
 
-  function createQueryResult(rows: unknown[], query: string): any {
-    const promise = Promise.resolve(rows);
-    return {
-      then: promise.then.bind(promise),
-      catch: promise.catch.bind(promise),
-      finally: promise.finally.bind(promise),
-      [Symbol.toStringTag]: "Promise",
-      count: rows.length,
-      values: () => {
-        const cols = extractColumns(query);
-        const arrayRows = rows.map((row: any) => {
-          if (cols.length > 0 && cols.some((c) => c !== null)) {
-            return cols.map((col, i) => col !== null ? row[col] : Object.values(row)[i]);
-          }
-          return Object.values(row);
-        });
-        return createQueryResult(arrayRows, query);
-      },
-    };
-  }
-
-  mockSql.unsafe = (query: string, params: unknown[] = []) => {
-    return createQueryResult(dispatch(query, params), query);
-  };
-
-  mockSql.begin = async (fn: (tx: typeof mockSql) => Promise<any>) => {
-    return await fn(mockSql);
-  };
-
-  mockSql.reserve = () => Promise.resolve(mockSql);
-  mockSql.release = () => {};
-  mockSql.options = { parsers: {}, serializers: {} };
-
-  return mockSql;
+  return [];
 }
 
 // Mock the db module before importing routes
-vi.mock("../db.js", async () => {
-  const { drizzle } = await import("drizzle-orm/postgres-js");
-  const schema = await import("../schema.js");
-  const mockSql = createMockSql();
-  const mockDrizzle = drizzle(mockSql, { schema });
-  return {
-    getDb: () => mockSql,
-    getDrizzleDb: () => mockDrizzle,
-    initDb: vi.fn(),
-    closeDb: vi.fn(),
-  };
-});
+vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { createApp } = await import("../app.js");
 
@@ -210,15 +236,11 @@ describe("Hallucination Risk API", () => {
 
   describe("POST /api/hallucination-risk", () => {
     it("records a single snapshot and returns 201", async () => {
-      const res = await app.request("/api/hallucination-risk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageId: "open-philanthropy",
-          score: 55,
-          level: "medium",
-          factors: ["biographical-claims", "low-citation-density"],
-        }),
+      const res = await postJson(app, "/api/hallucination-risk", {
+        pageId: "open-philanthropy",
+        score: 55,
+        level: "medium",
+        factors: ["biographical-claims", "low-citation-density"],
       });
       expect(res.status).toBe(201);
       const body = await res.json();
@@ -229,41 +251,29 @@ describe("Hallucination Risk API", () => {
     });
 
     it("rejects invalid level", async () => {
-      const res = await app.request("/api/hallucination-risk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageId: "test",
-          score: 50,
-          level: "critical",
-          factors: [],
-        }),
+      const res = await postJson(app, "/api/hallucination-risk", {
+        pageId: "test",
+        score: 50,
+        level: "critical",
+        factors: [],
       });
       expect(res.status).toBe(400);
     });
 
     it("rejects score out of range", async () => {
-      const res = await app.request("/api/hallucination-risk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageId: "test",
-          score: 150,
-          level: "high",
-        }),
+      const res = await postJson(app, "/api/hallucination-risk", {
+        pageId: "test",
+        score: 150,
+        level: "high",
       });
       expect(res.status).toBe(400);
     });
 
     it("accepts entries without optional fields", async () => {
-      const res = await app.request("/api/hallucination-risk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pageId: "test-page",
-          score: 30,
-          level: "low",
-        }),
+      const res = await postJson(app, "/api/hallucination-risk", {
+        pageId: "test-page",
+        score: 30,
+        level: "low",
       });
       expect(res.status).toBe(201);
     });
@@ -271,15 +281,21 @@ describe("Hallucination Risk API", () => {
 
   describe("POST /api/hallucination-risk/batch", () => {
     it("inserts multiple snapshots", async () => {
-      const res = await app.request("/api/hallucination-risk/batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          snapshots: [
-            { pageId: "page-a", score: 70, level: "high", factors: ["no-citations"] },
-            { pageId: "page-b", score: 25, level: "low", factors: ["well-cited"] },
-          ],
-        }),
+      const res = await postJson(app, "/api/hallucination-risk/batch", {
+        snapshots: [
+          {
+            pageId: "page-a",
+            score: 70,
+            level: "high",
+            factors: ["no-citations"],
+          },
+          {
+            pageId: "page-b",
+            score: 25,
+            level: "low",
+            factors: ["well-cited"],
+          },
+        ],
       });
       expect(res.status).toBe(201);
       const body = await res.json();
@@ -287,10 +303,8 @@ describe("Hallucination Risk API", () => {
     });
 
     it("rejects empty batch", async () => {
-      const res = await app.request("/api/hallucination-risk/batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ snapshots: [] }),
+      const res = await postJson(app, "/api/hallucination-risk/batch", {
+        snapshots: [],
       });
       expect(res.status).toBe(400);
     });
@@ -298,20 +312,27 @@ describe("Hallucination Risk API", () => {
 
   describe("GET /api/hallucination-risk/history?page_id=X", () => {
     it("returns history for a page", async () => {
-      // Insert some snapshots
       for (const entry of [
-        { pageId: "my-page", score: 60, level: "medium", factors: ["no-citations"] },
-        { pageId: "my-page", score: 45, level: "medium", factors: ["low-citation-density"] },
+        {
+          pageId: "my-page",
+          score: 60,
+          level: "medium",
+          factors: ["no-citations"],
+        },
+        {
+          pageId: "my-page",
+          score: 45,
+          level: "medium",
+          factors: ["low-citation-density"],
+        },
         { pageId: "other-page", score: 20, level: "low" },
       ]) {
-        await app.request("/api/hallucination-risk", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(entry),
-        });
+        await postJson(app, "/api/hallucination-risk", entry);
       }
 
-      const res = await app.request("/api/hallucination-risk/history?page_id=my-page");
+      const res = await app.request(
+        "/api/hallucination-risk/history?page_id=my-page"
+      );
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.pageId).toBe("my-page");
@@ -319,7 +340,9 @@ describe("Hallucination Risk API", () => {
     });
 
     it("returns empty for unknown page", async () => {
-      const res = await app.request("/api/hallucination-risk/history?page_id=nonexistent");
+      const res = await app.request(
+        "/api/hallucination-risk/history?page_id=nonexistent"
+      );
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.snapshots).toHaveLength(0);
@@ -338,11 +361,7 @@ describe("Hallucination Risk API", () => {
         { pageId: "page-b", score: 25, level: "low" },
         { pageId: "page-c", score: 45, level: "medium" },
       ]) {
-        await app.request("/api/hallucination-risk", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(entry),
-        });
+        await postJson(app, "/api/hallucination-risk", entry);
       }
 
       const res = await app.request("/api/hallucination-risk/stats");
@@ -364,14 +383,20 @@ describe("Hallucination Risk API", () => {
   describe("GET /api/hallucination-risk/latest", () => {
     it("returns 200 with pages array", async () => {
       for (const entry of [
-        { pageId: "page-a", score: 70, level: "high", factors: ["no-citations"] },
-        { pageId: "page-b", score: 25, level: "low", factors: ["well-cited"] },
+        {
+          pageId: "page-a",
+          score: 70,
+          level: "high",
+          factors: ["no-citations"],
+        },
+        {
+          pageId: "page-b",
+          score: 25,
+          level: "low",
+          factors: ["well-cited"],
+        },
       ]) {
-        await app.request("/api/hallucination-risk", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(entry),
-        });
+        await postJson(app, "/api/hallucination-risk", entry);
       }
 
       const res = await app.request("/api/hallucination-risk/latest");
@@ -379,6 +404,72 @@ describe("Hallucination Risk API", () => {
       const body = await res.json();
       expect(body.pages).toBeDefined();
       expect(Array.isArray(body.pages)).toBe(true);
+    });
+  });
+
+  describe("DELETE /api/hallucination-risk/cleanup", () => {
+    it("dry run reports what would be deleted", async () => {
+      // Insert 5 snapshots for page-a (should keep latest 2)
+      for (let i = 0; i < 5; i++) {
+        await postJson(app, "/api/hallucination-risk", {
+          pageId: "page-a",
+          score: 50 + i,
+          level: "medium",
+        });
+      }
+
+      const res = await app.request(
+        "/api/hallucination-risk/cleanup?keep=2&dry_run=true",
+        { method: "DELETE" }
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.dryRun).toBe(true);
+      expect(body.keep).toBe(2);
+      expect(body.totalSnapshots).toBe(5);
+      expect(body.wouldDelete).toBe(3);
+      expect(body.wouldRetain).toBe(2);
+    });
+
+    it("actually deletes old snapshots", async () => {
+      // Insert 4 snapshots for page-a
+      for (let i = 0; i < 4; i++) {
+        await postJson(app, "/api/hallucination-risk", {
+          pageId: "page-a",
+          score: 50 + i,
+          level: "medium",
+        });
+      }
+      // Insert 2 for page-b
+      for (let i = 0; i < 2; i++) {
+        await postJson(app, "/api/hallucination-risk", {
+          pageId: "page-b",
+          score: 30 + i,
+          level: "low",
+        });
+      }
+
+      const res = await app.request(
+        "/api/hallucination-risk/cleanup?keep=2",
+        { method: "DELETE" }
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // page-a: 4 snapshots, keep 2 → delete 2
+      // page-b: 2 snapshots, keep 2 → delete 0
+      expect(body.deleted).toBe(2);
+      expect(body.keep).toBe(2);
+      expect(riskStore).toHaveLength(4); // 2 + 2 remaining
+    });
+
+    it("defaults to keeping 30 snapshots per page", async () => {
+      const res = await app.request(
+        "/api/hallucination-risk/cleanup?dry_run=true",
+        { method: "DELETE" }
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.keep).toBe(30);
     });
   });
 });

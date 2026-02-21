@@ -20,15 +20,18 @@ export function createApp() {
 
   // Error handler — re-throw HTTPExceptions (auth failures etc.) so Hono
   // returns the proper status code; only catch unexpected errors as 500.
+  // For /api/* routes (already behind bearer auth), include the real error
+  // message so authenticated callers get actionable diagnostics.
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
       return err.getResponse();
     }
     console.error("Unhandled error:", err);
-    return c.json(
-      { error: "internal_error", message: "An unexpected error occurred" },
-      500
-    );
+    const message =
+      c.req.path.startsWith("/api/") && err instanceof Error
+        ? err.message
+        : "An unexpected error occurred";
+    return c.json({ error: "internal_error", message }, 500);
   });
 
   // Health endpoint — unauthenticated

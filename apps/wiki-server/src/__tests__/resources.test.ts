@@ -33,6 +33,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
+  // ---- UPDATE resources SET search_vector (no-op in tests) ----
+  // Must check for "update resources" to avoid matching SELECT queries that contain
+  // "updated_at" + "search_vector" (e.g., the full-text search query)
+  if (q.includes("update resources") && q.includes("set search_vector")) {
+    return [];
+  }
+
   // ---- INSERT INTO resources ... ON CONFLICT ----
   if (q.includes("insert into") && q.includes('"resources"') && !q.includes("resource_citations")) {
     const now = new Date();
@@ -158,17 +165,20 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .map((c) => ({ page_id: c.page_id }));
   }
 
-  // ---- SELECT ... FROM resources WHERE ilike (search) ----
-  // Must come before url/id checks since all SELECT queries include "url" and "id" columns
-  if (q.includes('"resources"') && q.includes("ilike")) {
-    const pattern = (params[0] as string).replace(/%/g, "").toLowerCase();
+  // ---- Full-text search (raw SQL with plainto_tsquery) ----
+  // params: [q, q, limit] — q appears twice in the SQL (rank + WHERE)
+  if (q.includes("plainto_tsquery") && q.includes("resources")) {
+    const searchTerm = (params[0] as string).toLowerCase();
     const limit = (params[2] as number) || 20;
     const results: Record<string, unknown>[] = [];
     for (const r of resourceStore.values()) {
       const title = ((r.title as string) || "").toLowerCase();
       const summary = ((r.summary as string) || "").toLowerCase();
-      if (title.includes(pattern) || summary.includes(pattern)) {
-        results.push(r);
+      const abstract = ((r.abstract as string) || "").toLowerCase();
+      const review = ((r.review as string) || "").toLowerCase();
+      if (title.includes(searchTerm) || summary.includes(searchTerm) ||
+          abstract.includes(searchTerm) || review.includes(searchTerm)) {
+        results.push({ ...r, rank: 1.0 });
       }
     }
     return results.slice(0, limit);
@@ -321,6 +331,18 @@ describe("Resources API", () => {
     it("rejects empty batch", async () => {
       const res = await postJson(app, "/api/resources/batch", { items: [] });
       expect(res.status).toBe(400);
+    });
+
+    it("accepts resources with >100 authors", async () => {
+      const manyAuthors = Array.from({ length: 150 }, (_, i) => `Author ${i + 1}`);
+      const res = await postJson(app, "/api/resources/batch", {
+        items: [
+          { id: "big-collab", url: "https://example.com/collab", authors: manyAuthors },
+        ],
+      });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.inserted).toBe(1);
     });
   });
 
