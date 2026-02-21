@@ -190,6 +190,26 @@ pagesRoute.get("/", async (c) => {
   return c.json({ pages: rows, total, limit, offset });
 });
 
+// ---- DELETE /:id ----
+
+pagesRoute.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) return validationError(c, "Page ID is required");
+
+  const db = getDrizzleDb();
+
+  const deleted = await db
+    .delete(wikiPages)
+    .where(eq(wikiPages.id, id))
+    .returning({ id: wikiPages.id });
+
+  if (deleted.length === 0) {
+    return notFoundError(c, `No page found for id: ${id}`);
+  }
+
+  return c.json({ deleted: deleted.length });
+});
+
 // ---- POST /sync ----
 
 pagesRoute.post("/sync", async (c) => {
