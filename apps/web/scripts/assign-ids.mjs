@@ -134,18 +134,29 @@ async function main() {
   }
 
   // Require the wiki server for ID allocation
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    // No server URL configured — skip ID assignment gracefully.
+    // This is expected in CI environments (conflict resolver, PR validation)
+    // where the wiki server is not available. ID assignment is only needed
+    // when new entities/pages are added; existing IDs are already in source files.
+    console.log('  LONGTERMWIKI_SERVER_URL not set — skipping ID assignment (server not configured).');
+    console.log('  Run `node scripts/assign-ids.mjs` with the server running to assign IDs to new entities/pages.');
+    return;
+  }
+
   const serverAvailable = await isServerAvailable();
   if (!serverAvailable) {
     if (DRY_RUN) {
       console.log('  Wiki server unavailable — dry-run will show entities needing IDs but cannot preview assignments');
     } else {
       console.error('  ERROR: Wiki server is not available.');
-      console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
-      console.error('  ID assignment requires the server for atomic, consistent allocation.');
+      console.error(`  Server URL is set to ${serverUrl} but the server is not responding.`);
+      console.error('  Ensure the server is running and LONGTERMWIKI_SERVER_URL is correct.');
       process.exit(1);
     }
   } else {
-    console.log(`  Using wiki server at ${process.env.LONGTERMWIKI_SERVER_URL}`);
+    console.log(`  Using wiki server at ${serverUrl}`);
   }
 
   // -------------------------------------------------------------------------
