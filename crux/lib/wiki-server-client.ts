@@ -288,3 +288,128 @@ export async function createAccuracySnapshot(): Promise<SnapshotResult | null> {
 export async function getAccuracyDashboard(): Promise<AccuracyDashboardData | null> {
   return apiRequest<AccuracyDashboardData>('GET', '/api/citations/accuracy-dashboard');
 }
+
+// ---------------------------------------------------------------------------
+// Sessions API
+// ---------------------------------------------------------------------------
+
+export interface SessionApiEntry {
+  date: string;
+  branch?: string | null;
+  title: string;
+  summary?: string | null;
+  model?: string | null;
+  duration?: string | null;
+  cost?: string | null;
+  prUrl?: string | null;
+  checksYaml?: string | null;
+  issuesJson?: unknown;
+  learningsJson?: unknown;
+  pages?: string[];
+}
+
+interface CreateSessionResult {
+  id: number;
+  date: string;
+  title: string;
+  pages: string[];
+  createdAt: string;
+}
+
+interface SessionBatchResult {
+  inserted: number;
+  results: Array<{ id: number; title: string; pageCount: number }>;
+}
+
+export interface SessionEntry {
+  id: number;
+  date: string;
+  branch: string | null;
+  title: string;
+  summary: string | null;
+  model: string | null;
+  duration: string | null;
+  cost: string | null;
+  prUrl: string | null;
+  pages: string[];
+  createdAt: string;
+}
+
+interface SessionListResult {
+  sessions: SessionEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+interface SessionByPageResult {
+  sessions: SessionEntry[];
+}
+
+interface SessionStatsResult {
+  totalSessions: number;
+  uniquePages: number;
+  totalPageEdits: number;
+  byModel: Record<string, number>;
+}
+
+interface SessionPageChangesResult {
+  sessions: SessionEntry[];
+}
+
+/**
+ * Create a single session log entry in the database.
+ */
+export async function createSession(
+  entry: SessionApiEntry,
+): Promise<CreateSessionResult | null> {
+  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry);
+}
+
+/**
+ * Create multiple session log entries in a single batch.
+ */
+export async function createSessionBatch(
+  items: SessionApiEntry[],
+): Promise<SessionBatchResult | null> {
+  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items });
+}
+
+/**
+ * List sessions (paginated, newest first).
+ */
+export async function listSessions(
+  limit = 100,
+  offset = 0,
+): Promise<SessionListResult | null> {
+  return apiRequest<SessionListResult>(
+    'GET',
+    `/api/sessions?limit=${limit}&offset=${offset}`,
+  );
+}
+
+/**
+ * Get sessions that modified a specific page.
+ */
+export async function getSessionsByPage(
+  pageId: string,
+): Promise<SessionByPageResult | null> {
+  return apiRequest<SessionByPageResult>(
+    'GET',
+    `/api/sessions/by-page?page_id=${encodeURIComponent(pageId)}`,
+  );
+}
+
+/**
+ * Get aggregate session statistics.
+ */
+export async function getSessionStats(): Promise<SessionStatsResult | null> {
+  return apiRequest<SessionStatsResult>('GET', '/api/sessions/stats');
+}
+
+/**
+ * Get all sessions with page associations (for page-changes dashboard).
+ */
+export async function getSessionPageChanges(): Promise<SessionPageChangesResult | null> {
+  return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes');
+}
