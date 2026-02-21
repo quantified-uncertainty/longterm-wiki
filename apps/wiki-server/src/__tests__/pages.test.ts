@@ -141,6 +141,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered.slice(offset, offset + limit);
   }
 
+  // --- wiki_pages: DELETE WHERE id = ? RETURNING id ---
+  if (q.includes("delete from") && q.includes("wiki_pages") && q.includes("returning")) {
+    const id = params[0] as string;
+    if (pagesStore.has(id)) {
+      pagesStore.delete(id);
+      return [{ id }];
+    }
+    return [];
+  }
+
   // --- entity_ids: COUNT (for health check) ---
   if (q.includes("count(*)") && !q.includes("wiki_pages")) {
     return [{ count: 0 }];
@@ -387,6 +397,62 @@ describe("Pages API", () => {
       expect(res.status).toBe(200);
 
       delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    });
+  });
+
+  // ---- Delete by ID ----
+
+  describe("DELETE /api/pages/:id", () => {
+    it("deletes an existing page and returns deleted count", async () => {
+      await seedPage(app, "to-delete", "Page To Delete");
+
+      const res = await app.request("/api/pages/to-delete", { method: "DELETE" });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+
+      // Confirm it's gone
+      const getRes = await app.request("/api/pages/to-delete");
+      expect(getRes.status).toBe(404);
+    });
+
+    it("returns 404 when page does not exist", async () => {
+      const res = await app.request("/api/pages/nonexistent-page", { method: "DELETE" });
+      expect(res.status).toBe(404);
+      const body = await res.json();
+      expect(body.error).toBe("not_found");
+    });
+
+    it("deletes smoke-test page (mirrors workflow cleanup step)", async () => {
+      // Seed the smoke-test page the same way the workflow does
+      await postJson(app, "/api/pages/sync", {
+        pages: [
+          {
+            id: "__smoke-test__",
+            numericId: null,
+            title: "Smoke Test",
+            description: null,
+            llmSummary: null,
+            category: null,
+            subcategory: null,
+            entityType: null,
+            tags: null,
+            quality: null,
+            readerImportance: null,
+            hallucinationRiskLevel: null,
+            hallucinationRiskScore: null,
+            contentPlaintext: null,
+            wordCount: null,
+            lastUpdated: null,
+            contentFormat: null,
+          },
+        ],
+      });
+
+      const res = await app.request("/api/pages/__smoke-test__", { method: "DELETE" });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
     });
   });
 
