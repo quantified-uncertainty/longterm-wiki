@@ -6,8 +6,9 @@
  *
  * Unlike edit-logs and sessions which have batch endpoints, auto-update runs
  * are POSTed individually (each run is a complex object with nested results).
+ * Uses batchSync with batchSize=1 and bodyKey=null to send each item directly.
  *
- * Reuses the retry + health-check pattern from sync-pages.ts.
+ * Reuses the shared batch sync infrastructure from sync-common.ts.
  *
  * Usage:
  *   pnpm crux wiki-server sync-auto-update-runs
@@ -26,17 +27,13 @@ import { parseCliArgs } from '../lib/cli.ts';
 import {
   getServerUrl,
   getApiKey,
-  buildHeaders,
   type RecordAutoUpdateRunInput,
   type AutoUpdateRunResultEntry,
 } from '../lib/wiki-server-client.ts';
-import { waitForHealthy, fetchWithRetry } from './sync-pages.ts';
+import { waitForHealthy, batchSync } from './sync-common.ts';
 
 const PROJECT_ROOT = join(import.meta.dirname!, '../..');
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
-
-// --- Configuration ---
-const MAX_CONSECUTIVE_FAILURES = 3;
 
 // --- Types ---
 
@@ -171,6 +168,7 @@ export function loadRunYamls(
 
 /**
  * Sync auto-update runs to the wiki-server one at a time.
+ * Uses batchSync with batchSize=1 and bodyKey=null to send each run directly.
  * Exported for testing.
  */
 export async function syncAutoUpdateRuns(
@@ -180,62 +178,26 @@ export async function syncAutoUpdateRuns(
     _sleep?: (ms: number) => Promise<void>;
   } = {},
 ): Promise<{ inserted: number; errors: number }> {
-  let totalInserted = 0;
-  let totalErrors = 0;
-  let consecutiveFailures = 0;
-
-  for (let i = 0; i < runs.length; i++) {
-    const run = runs[i];
-
-    try {
-      const res = await fetchWithRetry(
-        `${serverUrl}/api/auto-update-runs`,
-        {
-          method: 'POST',
-          headers: buildHeaders(),
-          body: JSON.stringify(run),
-        },
-        { _sleep: options._sleep },
-      );
-
-      if (!res.ok) {
-        const body = await res.text();
-        console.error(
-          `  Run ${i + 1}/${runs.length} (${run.date}): HTTP ${res.status} — ${body}`,
-        );
-        totalErrors++;
-        consecutiveFailures++;
-      } else {
-        const result = (await res.json()) as { id: number; resultsInserted: number };
-        totalInserted++;
-        consecutiveFailures = 0;
-
+  const result = await batchSync(
+    `${serverUrl}/api/auto-update-runs`,
+    runs,
+    1,
+    {
+      bodyKey: null,
+      responseCountKey: null,
+      itemLabel: 'runs',
+      onBatchSuccess: (responseJson, batch, batchNum, totalBatches) => {
+        const run = batch[0];
+        const r = responseJson as { id: number; resultsInserted: number };
         console.log(
-          `  Run ${i + 1}/${runs.length} (${run.date}): inserted (id: ${result.id}, ${result.resultsInserted} results)`,
+          `  Run ${batchNum}/${totalBatches} (${run.date}): inserted (id: ${r.id}, ${r.resultsInserted} results)`,
         );
-      }
-    } catch (err) {
-      console.error(
-        `  Run ${i + 1}/${runs.length} (${run.date}): Failed after retries — ${err}`,
-      );
-      totalErrors++;
-      consecutiveFailures++;
-    }
+      },
+      _sleep: options._sleep,
+    },
+  );
 
-    if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-      const remaining = runs.length - (i + 1);
-      if (remaining > 0) {
-        console.error(
-          `\n  Aborting: ${MAX_CONSECUTIVE_FAILURES} consecutive failures. ` +
-            `Skipping ${remaining} remaining runs.`,
-        );
-        totalErrors += remaining;
-      }
-      break;
-    }
-  }
-
-  return { inserted: totalInserted, errors: totalErrors };
+  return { inserted: result.count, errors: result.errors };
 }
 
 // --- CLI ---
