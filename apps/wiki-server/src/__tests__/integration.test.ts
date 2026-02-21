@@ -26,6 +26,50 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const migrationsFolder = path.resolve(__dirname, "../../drizzle");
 
+/**
+ * Drop ALL tables created by migrations 0000-0009, in reverse dependency order.
+ * Uses CASCADE so FK ordering is handled automatically, but we list children
+ * first for clarity.
+ */
+async function dropAllTables(conn: ReturnType<typeof postgres>) {
+  // Children with FKs first
+  await conn`DROP TABLE IF EXISTS resource_citations CASCADE`;
+  await conn`DROP TABLE IF EXISTS auto_update_results CASCADE`;
+  await conn`DROP TABLE IF EXISTS session_pages CASCADE`;
+  // Parent tables
+  await conn`DROP TABLE IF EXISTS resources CASCADE`;
+  await conn`DROP TABLE IF EXISTS auto_update_runs CASCADE`;
+  await conn`DROP TABLE IF EXISTS sessions CASCADE`;
+  await conn`DROP TABLE IF EXISTS hallucination_risk_snapshots CASCADE`;
+  await conn`DROP TABLE IF EXISTS citation_accuracy_snapshots CASCADE`;
+  await conn`DROP TABLE IF EXISTS edit_logs CASCADE`;
+  await conn`DROP TABLE IF EXISTS wiki_pages CASCADE`;
+  await conn`DROP TABLE IF EXISTS citation_content CASCADE`;
+  await conn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
+  await conn`DROP TABLE IF EXISTS entity_ids CASCADE`;
+  await conn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
+  // Drizzle metadata
+  await conn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+  await conn`DROP SCHEMA IF EXISTS drizzle CASCADE`;
+}
+
+/** All tables that should exist after running all migrations. */
+const ALL_EXPECTED_TABLES = [
+  "entity_ids",
+  "citation_quotes",
+  "citation_content",
+  "wiki_pages",
+  "edit_logs",
+  "citation_accuracy_snapshots",
+  "session_pages",
+  "sessions",
+  "hallucination_risk_snapshots",
+  "auto_update_runs",
+  "auto_update_results",
+  "resources",
+  "resource_citations",
+];
+
 describeWithDb("Integration: Drizzle migrations", () => {
   let sqlConn: ReturnType<typeof postgres>;
   let db: ReturnType<typeof drizzle<typeof schema>>;
@@ -33,40 +77,47 @@ describeWithDb("Integration: Drizzle migrations", () => {
   beforeAll(async () => {
     sqlConn = postgres(DATABASE_URL!, { max: 3 });
     db = drizzle(sqlConn, { schema });
-
-    // Clean slate: drop tables if they exist (reverse dependency order)
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
   });
 
   afterAll(async () => {
-    // Clean up
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await sqlConn.end();
   });
 
   it("applies migration on a fresh database", async () => {
     await migrate(db, { migrationsFolder });
 
-    // Verify tables exist
+    // Verify ALL tables from migrations 0000-0009 exist
     const tables = await sqlConn`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema = 'public'
-      AND table_name IN ('entity_ids', 'citation_quotes', 'citation_content', '__drizzle_migrations')
+      AND table_type = 'BASE TABLE'
       ORDER BY table_name
     `;
     const tableNames = tables.map((r) => r.table_name);
-    expect(tableNames).toContain("entity_ids");
-    expect(tableNames).toContain("citation_quotes");
-    expect(tableNames).toContain("citation_content");
+    for (const expected of ALL_EXPECTED_TABLES) {
+      expect(tableNames, `Missing table: ${expected}`).toContain(expected);
+    }
     expect(tableNames).toContain("__drizzle_migrations");
+  });
+
+  it("creates all expected foreign key constraints", async () => {
+    const fks = await sqlConn`
+      SELECT constraint_name, table_name
+      FROM information_schema.table_constraints
+      WHERE constraint_type = 'FOREIGN KEY'
+        AND table_schema = 'public'
+      ORDER BY constraint_name
+    `;
+    const fkNames = fks.map((r) => r.constraint_name);
+
+    // FK from session_pages.session_id → sessions.id (migration 0004)
+    expect(fkNames).toContain("session_pages_session_id_sessions_id_fk");
+    // FK from auto_update_results.run_id → auto_update_runs.id (migration 0008)
+    expect(fkNames).toContain("auto_update_results_run_id_auto_update_runs_id_fk");
+    // FK from resource_citations.resource_id → resources.id (migration 0009)
+    expect(fkNames).toContain("resource_citations_resource_id_resources_id_fk");
   });
 
   it("is idempotent — running migrate() again succeeds", async () => {
@@ -91,22 +142,12 @@ describeWithDb("Integration: Entity IDs CRUD", () => {
   beforeAll(async () => {
     sqlConn = postgres(DATABASE_URL!, { max: 3 });
     db = drizzle(sqlConn, { schema });
-
-    // Clean slate
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await migrate(db, { migrationsFolder });
   });
 
   afterAll(async () => {
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await sqlConn.end();
   });
 
@@ -209,21 +250,12 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
   beforeAll(async () => {
     sqlConn = postgres(DATABASE_URL!, { max: 3 });
     db = drizzle(sqlConn, { schema });
-
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await migrate(db, { migrationsFolder });
   });
 
   afterAll(async () => {
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await sqlConn.end();
   });
 
@@ -348,21 +380,12 @@ describeWithDb("Integration: Citation Content CRUD", () => {
   beforeAll(async () => {
     sqlConn = postgres(DATABASE_URL!, { max: 3 });
     db = drizzle(sqlConn, { schema });
-
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await migrate(db, { migrationsFolder });
   });
 
   afterAll(async () => {
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await sqlConn.end();
   });
 
@@ -454,12 +477,7 @@ describeWithDb("Integration: Route handlers against real DB", () => {
   beforeAll(async () => {
     sqlConn = postgres(DATABASE_URL!, { max: 3 });
     const db = drizzle(sqlConn, { schema });
-
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await migrate(db, { migrationsFolder });
 
     // Set DATABASE_URL for the app's getDb/getDrizzleDb
@@ -471,11 +489,7 @@ describeWithDb("Integration: Route handlers against real DB", () => {
   });
 
   afterAll(async () => {
-    await sqlConn`DROP TABLE IF EXISTS citation_content CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS citation_quotes CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS entity_ids CASCADE`;
-    await sqlConn`DROP SEQUENCE IF EXISTS entity_id_seq CASCADE`;
-    await sqlConn`DROP TABLE IF EXISTS __drizzle_migrations CASCADE`;
+    await dropAllTables(sqlConn);
     await sqlConn.end();
   });
 
