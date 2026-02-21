@@ -97,8 +97,15 @@ jobs:
       - name: Trigger Vercel production deploy
         run: |
           if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}" ]; then
-            echo "::warning::VERCEL_DEPLOY_HOOK_URL not set — skipping deploy trigger (see scheduled-deploy.yml for setup instructions)"
-            exit 0
+            echo "::error::VERCEL_DEPLOY_HOOK_URL secret is not set — production will NOT be deployed."
+            echo ""
+            echo "Setup (one-time):"
+            echo "  1. Vercel Dashboard → Project → Settings → Git → Deploy Hooks"
+            echo "  2. Create a hook: Name 'GitHub CI Deploy', Branch 'main'"
+            echo "  3. Copy the URL"
+            echo "  4. GitHub repo → Settings → Secrets → Actions → New secret"
+            echo "     Name: VERCEL_DEPLOY_HOOK_URL  Value: <paste URL>"
+            exit 1
           fi
           RESPONSE=$(curl -s -o /tmp/vercel_response.json -w "%{http_code}" \
             -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}")
