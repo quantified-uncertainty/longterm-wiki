@@ -1,0 +1,113 @@
+name: Wiki Server — Health Monitor
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Check wiki-server health
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Check health endpoint
+        id: health
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+        run: |
+          RESPONSE=$(curl -sf --max-time 10 "${LONGTERMWIKI_SERVER_URL}/health" 2>&1) || {
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+            echo "error=Connection failed or timed out" >> "$GITHUB_OUTPUT"
+            echo "response=" >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+
+          STATUS=$(echo "$RESPONSE" | jq -r '.status // "unknown"')
+          echo "response<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$RESPONSE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          if [ "$STATUS" = "healthy" ]; then
+            echo "healthy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+            echo "error=Status: $STATUS" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for existing open issue
+        if: steps.health.outputs.healthy == 'false'
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --label "server-health" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+          echo "issue=$ISSUE" >> "$GITHUB_OUTPUT"
+
+      - name: Create issue
+        if: steps.health.outputs.healthy == 'false' && steps.existing.outputs.issue == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "Wiki server is unhealthy" \
+            --label "server-health,bug" \
+            --body "$(cat <<'EOF'
+          ## Wiki server health check failed
+
+          **Error:** ${{ steps.health.outputs.error }}
+
+          **Health response:**
+          ```json
+          ${{ steps.health.outputs.response }}
+          ```
+
+          **Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          **Health endpoint:** ${{ secrets.LONGTERMWIKI_SERVER_URL }}/health
+
+          ---
+          This issue was created automatically by the health monitor workflow.
+          It will be closed automatically when the server returns to healthy status.
+          EOF
+          )"
+
+      - name: Comment on existing issue
+        if: steps.health.outputs.healthy == 'false' && steps.existing.outputs.issue != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ steps.existing.outputs.issue }}" \
+            --repo "${{ github.repository }}" \
+            --body "Still unhealthy at $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          \`\`\`json
+          ${{ steps.health.outputs.response }}
+          \`\`\`"
+
+      - name: Close resolved issue
+        if: steps.health.outputs.healthy == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --label "server-health" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -n "$ISSUE" ]; then
+            gh issue comment "$ISSUE" \
+              --repo "${{ github.repository }}" \
+              --body "Server is healthy again at $(date -u '+%Y-%m-%d %H:%M:%S UTC'). Auto-closing."
+            gh issue close "$ISSUE" \
+              --repo "${{ github.repository }}"
+          fi
