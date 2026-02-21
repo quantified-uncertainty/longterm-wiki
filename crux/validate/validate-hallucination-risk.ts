@@ -1,19 +1,10 @@
 /**
- * Hallucination Risk Report (validation-time scorer)
+ * Hallucination Risk Report
  *
- * Identifies pages most vulnerable to hallucination based on:
- *   - Citation count (fewer citations = higher risk)
- *   - Entity type (person/org pages are higher risk for biographical claims)
- *   - Quality score (lower quality correlates with less-verified content)
- *   - Structural indicators (unsourced biographical claims, evaluative flattery)
- *   - Citation accuracy data (from LLM accuracy checking, issue #323)
- *   - Content integrity signals (truncation, fabrication, corruption — issue #404)
- *
- * Content integrity checks detect:
- *   - Orphaned footnote references (truncated pages missing footnote definitions)
- *   - Sequential arxiv IDs (fabricated citation identifiers)
- *   - Duplicate footnote definitions (merge/copy-paste errors)
- *   - Unsourced footnotes (definitions without URLs)
+ * Uses the canonical scorer (crux/lib/hallucination-risk.ts) to assess all
+ * knowledge-base pages and produce a ranked risk report. The canonical scorer
+ * unified the previously separate build-time and validation-time algorithms
+ * (issue #438).
  *
  * Outputs a ranked list of pages with risk scores and actionable recommendations.
  *
@@ -21,27 +12,6 @@
  *   pnpm crux validate hallucination-risk
  *   pnpm crux validate hallucination-risk --json
  *   pnpm crux validate hallucination-risk --top=20
- *
- * ## Relationship to build-time scorer (issue #417)
- *
- * There are two hallucination risk scorers:
- *
- * 1. **Build-time** (`apps/web/scripts/build-data.mjs:computeHallucinationRisk`):
- *    Starts at baseline 40 with both risk-increasing and risk-decreasing factors.
- *    Produces the page's `hallucinationRisk` field for the frontend.
- *    Thresholds: low ≤30, medium ≤60, high >60.
- *
- * 2. **Validation-time** (this file, `assessPage`):
- *    Starts at 0 with penalty accumulation + entity type multiplier.
- *    Produces a diagnostic report for editors/developers.
- *    Thresholds: low <25, medium <50, high ≥50.
- *
- * Both share the content integrity layer (`assessContentIntegrity` +
- * `computeIntegrityRisk` from `crux/lib/content-integrity.ts`), which uses
- * named constants (issue #417). The scorers intentionally differ because they
- * serve different audiences — the build-time scorer needs a balanced
- * assessment suitable for reader-facing warnings, while this validation
- * scorer needs to surface all potential issues for editorial triage.
  *
  * Part of the hallucination risk reduction initiative (issue #200).
  */
@@ -52,14 +22,18 @@ import { fileURLToPath } from 'url';
 import { PROJECT_ROOT, CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatterAndBody } from '../lib/mdx-utils.ts';
-import { countFootnoteRefs, countWords } from '../lib/metrics-extractor.ts';
+import { countFootnoteRefs, countExternalLinks, countWords } from '../lib/metrics-extractor.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { readReviews } from '../lib/review-tracking.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { getEntityTypeFromPath } from '../lib/page-analysis.ts';
 import { citationQuotes } from '../lib/knowledge-db.ts';
-import { assessContentIntegrity, computeIntegrityRisk } from '../lib/content-integrity.ts';
+import {
+  computeHallucinationRisk,
+  computeAccuracyRisk,
+  resolveEntityType,
+} from '../lib/hallucination-risk.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -83,48 +57,8 @@ export interface RiskAssessment {
   riskFactors: string[];
 }
 
-// ---------------------------------------------------------------------------
-// Risk scoring
-// ---------------------------------------------------------------------------
-
-/** Entity type risk multipliers — higher = more sensitive to hallucination */
-const ENTITY_TYPE_RISK: Record<string, number> = {
-  person: 1.5,       // Biographical claims about real people
-  organization: 1.4, // Organizational facts (funding, headcount, etc.)
-  historical: 1.3,   // Historical dates and events
-  risk: 1.0,
-  response: 0.9,
-  model: 0.9,
-  concept: 0.8,
-  overview: 0.8,
-  metric: 0.7,
-  debate: 0.8,
-  crux: 0.7,
-};
-
-/**
- * Compute the accuracy-based risk contribution.
- * Exported for unit testing.
- *
- * Thresholds (from issue #323):
- *   >50% inaccurate/unsupported → +20 points
- *   >30% inaccurate/unsupported → +10 points
- *   any inaccurate              → +5 points
- */
-export function computeAccuracyRisk(
-  checked: number,
-  inaccurate: number,
-): { score: number; factor: string | null } {
-  if (!Number.isFinite(checked) || !Number.isFinite(inaccurate) ||
-      checked <= 0 || inaccurate < 0) return { score: 0, factor: null };
-  // Clamp to avoid impossible percentages from bad data
-  const clampedInaccurate = Math.min(inaccurate, checked);
-  const pct = clampedInaccurate / checked;
-  if (pct > 0.5) return { score: 20, factor: 'majority-inaccurate' };
-  if (pct > 0.3) return { score: 10, factor: 'many-inaccurate' };
-  if (clampedInaccurate > 0) return { score: 5, factor: 'some-inaccurate' };
-  return { score: 0, factor: null };
-}
+// Re-export computeAccuracyRisk for existing test compatibility
+export { computeAccuracyRisk } from '../lib/hallucination-risk.ts';
 
 /** Map of pageId → { checked, inaccurate } from citation accuracy data */
 export type AccuracyMap = Map<string, { checked: number; inaccurate: number }>;
@@ -169,88 +103,21 @@ export function assessPage(
   // Accuracy data (if available)
   const accuracy = accuracyMap?.get(pageId) ?? { checked: 0, inaccurate: 0 };
 
-  // Calculate risk score (0-100, higher = more at risk)
-  const riskFactors: string[] = [];
-  let riskScore = 0;
-
-  // Factor 1: No citations (biggest risk)
-  if (totalCitations === 0) {
-    riskScore += 40;
-    riskFactors.push('no-citations');
-  } else if (totalCitations < 3) {
-    riskScore += 20;
-    riskFactors.push('few-citations');
-  } else if (totalCitations < 5) {
-    riskScore += 10;
-    riskFactors.push('below-target-citations');
-  }
-
-  // Factor 2: Entity type sensitivity
-  if (entityType) {
-    const multiplier = ENTITY_TYPE_RISK[entityType] ?? 1.0;
-    if (multiplier >= 1.3) {
-      riskScore += 15;
-      riskFactors.push(`biographical-claims`);
-    }
-  }
-
-  // Factor 3: Low quality score
-  if (quality < 40) {
-    riskScore += 15;
-    riskFactors.push('low-quality-score');
-  } else if (quality < 60) {
-    riskScore += 5;
-  }
-
-  // Factor 4: Few external sources relative to page length
-  const citationsPerKWords = wordCount > 0 ? (totalCitations / wordCount) * 1000 : 0;
-  if (citationsPerKWords < 2 && wordCount >= 500) {
-    riskScore += 10;
-    riskFactors.push('few-external-sources');
-  }
-
-  // Factor 5: Low rigor score
-  const rigor = frontmatter.ratings?.rigor;
-  if (typeof rigor === 'number' && rigor < 40) {
-    riskScore += 10;
-    riskFactors.push('low-rigor-score');
-  }
-
-  // Factor 6: No human review
-  if (!hasHumanReview) {
-    riskScore += 5;
-    riskFactors.push('no-human-review');
-  }
-
-  // Factor 7: Citation accuracy issues (from LLM accuracy checking)
-  const accRisk = computeAccuracyRisk(accuracy.checked, accuracy.inaccurate);
-  if (accRisk.factor) {
-    riskScore += accRisk.score;
-    riskFactors.push(accRisk.factor);
-  }
-
-  // Factor 8: Content integrity signals (truncation, fabrication, etc.)
-  const integrity = assessContentIntegrity(bodyContent);
-  const integrityRisk = computeIntegrityRisk(integrity);
-  if (integrityRisk.score > 0) {
-    riskScore += integrityRisk.score;
-    riskFactors.push(...integrityRisk.factors);
-  }
-
-  // Apply entity type multiplier
-  if (entityType) {
-    const multiplier = ENTITY_TYPE_RISK[entityType] ?? 1.0;
-    riskScore = Math.round(riskScore * multiplier);
-  }
-
-  // Cap at 100
-  riskScore = Math.min(100, riskScore);
-
-  // Classify risk level
-  const riskLevel: 'high' | 'medium' | 'low' =
-    riskScore >= 50 ? 'high' :
-    riskScore >= 25 ? 'medium' :
-    'low';
+  // Use the canonical scorer
+  const rigor = (frontmatter.ratings as Record<string, unknown>)?.rigor;
+  const externalLinks = countExternalLinks(bodyContent);
+  const result = computeHallucinationRisk({
+    entityType: resolveEntityType(entityType),
+    wordCount,
+    footnoteCount: citationCount,
+    rComponentCount,
+    externalLinks,
+    rigor: typeof rigor === 'number' ? rigor : null,
+    quality,
+    hasHumanReview,
+    accuracy: accuracy.checked > 0 ? accuracy : null,
+    contentBody: bodyContent,
+  });
 
   return {
     pageId,
@@ -265,9 +132,9 @@ export function assessPage(
     hasHumanReview,
     accuracyChecked: accuracy.checked,
     accuracyInaccurate: accuracy.inaccurate,
-    riskScore,
-    riskLevel,
-    riskFactors,
+    riskScore: result.score,
+    riskLevel: result.level,
+    riskFactors: result.factors,
   };
 }
 
