@@ -4,6 +4,11 @@
  * Reads all data/edit-logs/*.yaml files and bulk-upserts them to the
  * wiki-server's /api/edit-logs/batch endpoint.
  *
+ * NOTE: As of PR #502, edit logs are written directly to Postgres via the
+ * wiki-server API (data/edit-logs/ YAML files were removed). This script
+ * is only useful for one-time historical migration if you restore the YAML
+ * files from git history. It exits gracefully if the directory is missing.
+ *
  * Reuses the shared batch sync infrastructure from sync-common.ts.
  *
  * Usage:
@@ -16,7 +21,7 @@
  *   LONGTERMWIKI_SERVER_API_KEY - Bearer token for authentication
  */
 
-import { readdirSync, readFileSync } from 'fs';
+import { readdirSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { parse as parseYaml } from 'yaml';
@@ -55,6 +60,9 @@ function normalizeDate(d: string | Date): string {
 export function loadEditLogYamls(
   dir: string = EDIT_LOGS_DIR,
 ): { entries: EditLogApiEntry[]; fileCount: number; errorFiles: number } {
+  if (!existsSync(dir)) {
+    return { entries: [], fileCount: 0, errorFiles: 0 };
+  }
   const files = readdirSync(dir).filter((f) => f.endsWith('.yaml'));
   const entries: EditLogApiEntry[] = [];
   let errorFiles = 0;
@@ -144,6 +152,12 @@ async function main() {
   // Load edit logs
   console.log(`Reading edit logs from: ${EDIT_LOGS_DIR}`);
   const { entries, fileCount, errorFiles } = loadEditLogYamls();
+
+  if (fileCount === 0) {
+    console.log('  No edit log YAML files found (data/edit-logs/ removed in PR #502).');
+    console.log('  Edit logs are now written directly to Postgres. Nothing to sync.');
+    process.exit(0);
+  }
 
   console.log(`  Found ${entries.length} entries across ${fileCount} files`);
   if (errorFiles > 0) {

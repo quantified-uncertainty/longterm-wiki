@@ -15,11 +15,13 @@ summary: >
 issues:
   - None
 learnings:
-  - The issue was identified as a recommendation in the session log for issue #203,
+  - >-
+    The issue was identified as a recommendation in the session log for issue #203,
     which itself noted that the inline-copy pattern was used to avoid main() side effects.
     The fileURLToPath guard is the correct fix, matching the pattern used by other
     crux scripts (analyze-all.ts, etc.).
-  - validateOriginalText test fixtures required full CalcProposal and DetectedPattern
+  - >-
+    validateOriginalText test fixtures required full CalcProposal and DetectedPattern
     objects (with all required fields) rather than the structural subsets the inline
     copy used — the spread operator pattern `{ ...baseProposal, originalText: '...' }`
     makes this clean.

@@ -20,7 +20,8 @@ root_cause: |
   deploy less often, compounding the issue.
 
 changes:
-  - .github/workflows/scheduled-deploy.yml (new): cron workflow (every 4h) that
+  - >-
+    .github/workflows/scheduled-deploy.yml (new): cron workflow (every 4h) that
     calls VERCEL_DEPLOY_HOOK_URL secret to trigger a production deployment
 
 setup_required: |
