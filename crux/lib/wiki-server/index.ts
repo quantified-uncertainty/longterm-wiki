@@ -37,6 +37,14 @@ export type { PageLinkItem } from './links.ts';
 export type { UpsertResourceItem } from './resources.ts';
 export type { SyncEntityItem, EntityEntry } from './entities.ts';
 export type { SyncFactItem, FactEntry } from './facts.ts';
+export type {
+  JobEntry,
+  CreateJobInput,
+  ListJobsResult,
+  ClaimResult,
+  JobStatsResult,
+  SweepResult,
+} from './jobs.ts';
 
 // ---------------------------------------------------------------------------
 // API functions (all return ApiResult<T>)
@@ -120,3 +128,18 @@ export {
   getStaleFacts,
   getFactStats,
 } from './facts.ts';
+
+// Jobs
+export {
+  createJob,
+  createJobBatch,
+  listJobs,
+  getJob,
+  claimJob,
+  startJob,
+  completeJob,
+  failJob,
+  cancelJob,
+  getJobStats,
+  sweepJobs,
+} from './jobs.ts';

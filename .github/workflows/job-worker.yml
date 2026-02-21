@@ -1,0 +1,165 @@
+name: Job Worker
+
+# Processes background jobs from the job queue.
+#
+# Two triggers:
+# 1. workflow_dispatch — called by the server when a new job is created
+# 2. schedule — polls every 5 minutes for unclaimed jobs
+#
+# The worker claims a job atomically via the /api/jobs/claim endpoint,
+# executes it, and reports results back via /complete or /fail.
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      job_type:
+        description: 'Job type to claim (empty = any)'
+        required: false
+        default: ''
+        type: string
+
+# Limit concurrent workers
+concurrency:
+  group: job-worker-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+  LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+
+jobs:
+  process-jobs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        worker: [1, 2, 3]
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Claim and process job
+        id: worker
+        run: |
+          set -euo pipefail
+
+          WORKER_ID="gha-${GITHUB_RUN_ID}-worker-${{ matrix.worker }}"
+          JOB_TYPE="${{ inputs.job_type || '' }}"
+
+          echo "Worker: $WORKER_ID"
+          echo "Job type filter: ${JOB_TYPE:-any}"
+
+          # Build the claim payload
+          if [ -n "$JOB_TYPE" ]; then
+            CLAIM_BODY=$(jq -n --arg wid "$WORKER_ID" --arg type "$JOB_TYPE" '{workerId: $wid, type: $type}')
+          else
+            CLAIM_BODY=$(jq -n --arg wid "$WORKER_ID" '{workerId: $wid}')
+          fi
+
+          # Claim a job
+          CLAIM_RESPONSE=$(curl -sf \
+            -X POST \
+            -H "Authorization: Bearer $LONGTERMWIKI_SERVER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$CLAIM_BODY" \
+            "${LONGTERMWIKI_SERVER_URL}/api/jobs/claim" || echo '{"job":null}')
+
+          JOB_ID=$(echo "$CLAIM_RESPONSE" | jq -r '.job.id // empty')
+
+          if [ -z "$JOB_ID" ]; then
+            echo "No pending jobs available"
+            echo "claimed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          JOB_TYPE_ACTUAL=$(echo "$CLAIM_RESPONSE" | jq -r '.job.type')
+          JOB_PARAMS=$(echo "$CLAIM_RESPONSE" | jq -c '.job.params // {}')
+
+          echo "Claimed job #$JOB_ID (type: $JOB_TYPE_ACTUAL)"
+          echo "claimed=true" >> "$GITHUB_OUTPUT"
+          echo "job_id=$JOB_ID" >> "$GITHUB_OUTPUT"
+          echo "job_type=$JOB_TYPE_ACTUAL" >> "$GITHUB_OUTPUT"
+
+          # Mark as running
+          curl -sf \
+            -X POST \
+            -H "Authorization: Bearer $LONGTERMWIKI_SERVER_API_KEY" \
+            -H "Content-Type: application/json" \
+            "${LONGTERMWIKI_SERVER_URL}/api/jobs/${JOB_ID}/start" > /dev/null
+
+          echo "Job #$JOB_ID marked as running"
+
+          # Execute job based on type
+          set +e
+          case "$JOB_TYPE_ACTUAL" in
+            ping)
+              echo "Executing ping job..."
+              RESULT='{"ok":true,"worker":"'"$WORKER_ID"'"}'
+              EXIT_CODE=0
+              ;;
+            citation-verify)
+              PAGE_ID=$(echo "$JOB_PARAMS" | jq -r '.pageId // empty')
+              if [ -z "$PAGE_ID" ]; then
+                RESULT='{"error":"missing pageId param"}'
+                EXIT_CODE=1
+              else
+                echo "Verifying citations for page: $PAGE_ID"
+                OUTPUT=$(pnpm crux citations verify "$PAGE_ID" --json 2>&1) || true
+                EXIT_CODE=$?
+                RESULT=$(echo "$OUTPUT" | jq -c '.' 2>/dev/null || jq -n --arg out "$OUTPUT" '{output: $out}')
+              fi
+              ;;
+            *)
+              echo "Unknown job type: $JOB_TYPE_ACTUAL"
+              RESULT='{"error":"unknown job type"}'
+              EXIT_CODE=1
+              ;;
+          esac
+          set -e
+
+          # Report result
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "Job #$JOB_ID completed successfully"
+            curl -sf \
+              -X POST \
+              -H "Authorization: Bearer $LONGTERMWIKI_SERVER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --argjson result "$RESULT" '{result: $result}')" \
+              "${LONGTERMWIKI_SERVER_URL}/api/jobs/${JOB_ID}/complete" > /dev/null
+          else
+            echo "Job #$JOB_ID failed"
+            ERROR_MSG=$(echo "$RESULT" | jq -r '.error // "Job execution failed with exit code '"$EXIT_CODE"'"' 2>/dev/null || echo "Job execution failed")
+            curl -sf \
+              -X POST \
+              -H "Authorization: Bearer $LONGTERMWIKI_SERVER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg error "$ERROR_MSG" '{error: $error}')" \
+              "${LONGTERMWIKI_SERVER_URL}/api/jobs/${JOB_ID}/fail" > /dev/null
+          fi
+
+      - name: Summary
+        if: steps.worker.outputs.claimed == 'true'
+        run: |
+          echo "### Job Worker Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Job ID: #${{ steps.worker.outputs.job_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Type: ${{ steps.worker.outputs.job_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Worker: ${{ matrix.worker }}" >> $GITHUB_STEP_SUMMARY
