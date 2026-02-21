@@ -144,7 +144,7 @@ export function HallucinationRiskDashboard({
         })}
       </div>
 
-      <DataTable columns={columns} data={sorted} searchColumn="title" />
+      <DataTable columns={columns} data={sorted} />
     </div>
   );
 }

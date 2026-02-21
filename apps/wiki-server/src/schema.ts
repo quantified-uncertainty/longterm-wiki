@@ -288,3 +288,51 @@ export const autoUpdateResults = pgTable(
     index("idx_aures_status").on(table.status),
   ]
 );
+
+export const resources = pgTable(
+  "resources",
+  {
+    id: text("id").primaryKey(),
+    url: text("url").notNull(),
+    title: text("title"),
+    type: text("type"),
+    summary: text("summary"),
+    review: text("review"),
+    abstract: text("abstract"),
+    keyPoints: jsonb("key_points").$type<string[]>(),
+    publicationId: text("publication_id"),
+    authors: jsonb("authors").$type<string[]>(),
+    publishedDate: date("published_date"),
+    tags: jsonb("tags").$type<string[]>(),
+    localFilename: text("local_filename"),
+    credibilityOverride: real("credibility_override"),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }),
+    contentHash: text("content_hash"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_res_url").on(table.url),
+    index("idx_res_type").on(table.type),
+    index("idx_res_publication_id").on(table.publicationId),
+  ]
+);
+
+export const resourceCitations = pgTable(
+  "resource_citations",
+  {
+    resourceId: text("resource_id").notNull(),
+    pageId: text("page_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.resourceId, table.pageId] }),
+    index("idx_rc_page_id").on(table.pageId),
+  ]
+);
