@@ -32,6 +32,8 @@ export type EditTool =
   | 'crux-fix-escalated' // Claude escalation for complex citation fixes
   | 'crux-audit'     // Citation audit pipeline fixes
   | 'crux-audit-escalated' // Citation audit with Claude escalation
+  | 'crux-audit-source-replace' // Citation audit source URL replacement
+  | 'crux-audit-pass2' // Citation audit second pass
   | 'claude-code'    // Claude Code interactive session
   | 'manual'         // Direct human file edits
   | 'bulk-script';   // Bulk automated scripts

@@ -11,7 +11,7 @@
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
-import type { CommandOptions, CommandResult } from '../lib/cli.ts';
+import type { CommandResult } from '../lib/cli.ts';
 
 interface GitHubPR {
   number: number;
@@ -32,7 +32,7 @@ interface GitHubPR {
  *
  * Exit codes: 0 = clean or fixed, 1 = error (API failure, no token, no PR)
  */
-async function fixBody(args: string[], options: CommandOptions): Promise<CommandResult> {
+async function fixBody(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
 

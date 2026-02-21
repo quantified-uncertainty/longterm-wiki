@@ -1,13 +1,12 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, sql, count, gte } from "drizzle-orm";
+import { eq, desc, count, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateNewsItems, autoUpdateRuns } from "../schema.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-  firstOrThrow,
 } from "./utils.js";
 
 export const autoUpdateNewsRoute = new Hono();
@@ -206,9 +205,7 @@ autoUpdateNewsRoute.get("/dashboard", async (c) => {
   const rows = await db
     .select()
     .from(autoUpdateNewsItems)
-    .where(
-      sql`${autoUpdateNewsItems.runId} = ANY(${sql.raw(`ARRAY[${runIds.join(",")}]`)})`
-    )
+    .where(inArray(autoUpdateNewsItems.runId, runIds))
     .orderBy(desc(autoUpdateNewsItems.relevanceScore));
 
   return c.json({
