@@ -1,0 +1,67 @@
+date: 2026-02-21
+branch: claude/path-completion-dual-write-x3v0q
+title: "Add dual-write to wiki-server for citation quotes, accuracy, and session logs"
+model: claude-opus-4-6
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/475
+issue: 452
+pages: []
+duration: ~35min
+cost: ~$8
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-21T06:48:51.826Z"
+  total: 32
+  completed: 26
+  na: 6
+  skipped: 0
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - no-hardcoded
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - backward-compatible
+    - multi-environment
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - session-log
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges
+    - crux-typescript
+issues:
+  - 452
+  - 453
+  - 463
+summary: |
+  Added dual-write to wiki-server for three data paths, following the
+  edit-log.ts pattern (local write first, fire-and-forget POST to server).
+
+  #452: Citation quotes — added upsertCitationQuote() to wiki-server-client.ts,
+  wired into citationQuotes.upsert() in knowledge-db.ts.
+
+  #453: Citation accuracy — wired markAccuracy() in knowledge-db.ts to call
+  markCitationAccuracy() on server. Removed redundant direct call from
+  check-accuracy.ts since the data layer now handles it.
+
+  #463: Session logs — created crux wiki-server sync-session command that
+  reads session YAML and POSTs to /api/sessions. Updated agent-session-ready-PR
+  workflow to call it.
+
+  Paranoid review caught and fixed: missing import guard in sync-session.ts,
+  added console.warn for unrecognized verdict types.
+
+  All 211 tests pass, all 8 gate checks pass, no new TypeScript errors.
