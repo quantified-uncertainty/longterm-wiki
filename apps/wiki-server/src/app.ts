@@ -7,6 +7,7 @@ import { citationsRoute } from "./routes/citations.js";
 import { pagesRoute } from "./routes/pages.js";
 import { editLogsRoute } from "./routes/edit-logs.js";
 import { hallucinationRiskRoute } from "./routes/hallucination-risk.js";
+import { sessionsRoute } from "./routes/sessions.js";
 
 export function createApp() {
   const app = new Hono();
@@ -42,6 +43,7 @@ export function createApp() {
   app.route("/api/pages", pagesRoute);
   app.route("/api/edit-logs", editLogsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
+  app.route("/api/sessions", sessionsRoute);
 
   return app;
 }
