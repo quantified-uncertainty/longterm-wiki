@@ -1,4 +1,4 @@
-CREATE TABLE "citation_accuracy_snapshots" (
+CREATE TABLE IF NOT EXISTS "citation_accuracy_snapshots" (
 	"id" bigserial PRIMARY KEY NOT NULL,
 	"page_id" text NOT NULL,
 	"total_citations" integer NOT NULL,
@@ -12,5 +12,5 @@ CREATE TABLE "citation_accuracy_snapshots" (
 	"snapshot_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX "idx_cas_page_id" ON "citation_accuracy_snapshots" USING btree ("page_id");--> statement-breakpoint
-CREATE INDEX "idx_cas_snapshot_at" ON "citation_accuracy_snapshots" USING btree ("snapshot_at");
+CREATE INDEX IF NOT EXISTS "idx_cas_page_id" ON "citation_accuracy_snapshots" USING btree ("page_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_cas_snapshot_at" ON "citation_accuracy_snapshots" USING btree ("snapshot_at");
