@@ -8,6 +8,7 @@ import {
   real,
   date,
   timestamp,
+  jsonb,
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
@@ -151,5 +152,25 @@ export const editLogs = pgTable(
     index("idx_el_page_id").on(table.pageId),
     index("idx_el_date").on(table.date),
     index("idx_el_tool").on(table.tool),
+  ]
+);
+
+export const hallucinationRiskSnapshots = pgTable(
+  "hallucination_risk_snapshots",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    pageId: text("page_id").notNull(),
+    score: integer("score").notNull(),
+    level: text("level").notNull(), // 'low' | 'medium' | 'high'
+    factors: jsonb("factors").$type<string[]>(),
+    integrityIssues: jsonb("integrity_issues").$type<string[]>(),
+    computedAt: timestamp("computed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_hrs_page_id").on(table.pageId),
+    index("idx_hrs_computed_at").on(table.computedAt),
+    index("idx_hrs_level").on(table.level),
   ]
 );
