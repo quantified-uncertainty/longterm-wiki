@@ -14,6 +14,7 @@ export default defineConfig({
       'entity/**/*.test.ts',
       'citations/**/*.test.ts',
       'validate/**/*.test.ts',
+      'wiki-server/**/*.test.ts',
     ],
     root: __dirname,
   },

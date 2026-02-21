@@ -4,6 +4,11 @@
  * Reads pages.json metadata and per-page .txt content files,
  * then bulk-upserts them to the wiki-server's /api/pages/sync endpoint.
  *
+ * Includes:
+ *   - Pre-sync health check with retries (waits for server to be ready)
+ *   - Per-batch retry with exponential backoff (handles transient 5xx errors)
+ *   - Fast-fail after N consecutive batch failures (avoids wasting time on dead server)
+ *
  * Usage:
  *   pnpm crux wiki-server sync
  *   pnpm crux wiki-server sync --dry-run
@@ -16,6 +21,7 @@
 
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
+import { fileURLToPath } from "url";
 import { parseCliArgs } from "../lib/cli.ts";
 import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server-client.ts";
 
@@ -25,6 +31,15 @@ const PAGES_JSON_PATH = join(
   "apps/web/src/data/pages.json"
 );
 const WIKI_DIR = join(PROJECT_ROOT, "apps/web/public/wiki");
+
+// --- Configuration ---
+const HEALTH_CHECK_RETRIES = 5;
+const HEALTH_CHECK_DELAY_MS = 10_000;
+const HEALTH_CHECK_TIMEOUT_MS = 5_000;
+const BATCH_RETRY_ATTEMPTS = 3;
+const BATCH_RETRY_BASE_DELAY_MS = 2_000;
+const BATCH_TIMEOUT_MS = 30_000;
+const MAX_CONSECUTIVE_FAILURES = 3;
 
 interface PageData {
   id: string;
@@ -67,14 +82,125 @@ interface SyncPage {
   contentFormat: string | null;
 }
 
-async function syncPages(
+/**
+ * Wait for the server to become healthy before syncing.
+ * Retries up to `maxRetries` times with a fixed delay between attempts.
+ * Exported for testing.
+ */
+export async function waitForHealthy(
+  serverUrl: string,
+  options: {
+    maxRetries?: number;
+    delayMs?: number;
+    timeoutMs?: number;
+    _sleep?: (ms: number) => Promise<void>;
+  } = {}
+): Promise<boolean> {
+  const maxRetries = options.maxRetries ?? HEALTH_CHECK_RETRIES;
+  const delayMs = options.delayMs ?? HEALTH_CHECK_DELAY_MS;
+  const timeoutMs = options.timeoutMs ?? HEALTH_CHECK_TIMEOUT_MS;
+  const sleep = options._sleep ?? ((ms: number) => new Promise((r) => setTimeout(r, ms)));
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(`${serverUrl}/health`, {
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      if (res.ok) {
+        const body = await res.json();
+        if (body.status === "healthy") {
+          console.log(`  Health check passed (attempt ${attempt}/${maxRetries})`);
+          return true;
+        }
+      }
+      console.warn(
+        `  Health check attempt ${attempt}/${maxRetries}: not healthy (HTTP ${res.status})`
+      );
+    } catch (err) {
+      console.warn(
+        `  Health check attempt ${attempt}/${maxRetries}: ${err instanceof Error ? err.message : err}`
+      );
+    }
+
+    if (attempt < maxRetries) {
+      console.log(`  Retrying in ${delayMs / 1000}s...`);
+      await sleep(delayMs);
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Fetch with retry and exponential backoff.
+ * Only retries on 5xx status codes or network errors.
+ * Returns the Response on success, or throws on exhausted retries.
+ * Exported for testing.
+ */
+export async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  options: {
+    maxAttempts?: number;
+    baseDelayMs?: number;
+    timeoutMs?: number;
+    _sleep?: (ms: number) => Promise<void>;
+  } = {}
+): Promise<Response> {
+  const maxAttempts = options.maxAttempts ?? BATCH_RETRY_ATTEMPTS;
+  const baseDelayMs = options.baseDelayMs ?? BATCH_RETRY_BASE_DELAY_MS;
+  const timeoutMs = options.timeoutMs ?? BATCH_TIMEOUT_MS;
+  const sleep = options._sleep ?? ((ms: number) => new Promise((r) => setTimeout(r, ms)));
+
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      // Strip caller's signal to avoid conflicts with our timeout signal
+      const { signal: _callerSignal, ...initWithoutSignal } = init;
+      const res = await fetch(url, {
+        ...initWithoutSignal,
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      // Don't retry client errors (4xx) — they won't resolve on their own
+      if (res.ok || (res.status >= 400 && res.status < 500)) {
+        return res;
+      }
+
+      // 5xx — retry
+      const body = await res.text().catch(() => "");
+      lastError = new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
+    } catch (err) {
+      lastError = err;
+    }
+
+    if (attempt < maxAttempts) {
+      const delay = baseDelayMs * Math.pow(2, attempt - 1);
+      console.warn(
+        `    Attempt ${attempt + 1}/${maxAttempts}: retrying in ${delay / 1000}s...`
+      );
+      await sleep(delay);
+    }
+  }
+
+  throw lastError;
+}
+
+/** @internal — exported for testing */
+export async function syncPages(
   serverUrl: string,
   _apiKey: string,
   pages: SyncPage[],
-  batchSize: number
+  batchSize: number,
+  options: {
+    _sleep?: (ms: number) => Promise<void>;
+  } = {}
 ): Promise<{ upserted: number; errors: number }> {
   let totalCreated = 0;
   let totalErrors = 0;
+  let consecutiveFailures = 0;
 
   for (let i = 0; i < pages.length; i += batchSize) {
     const batch = pages.slice(i, i + batchSize);
@@ -82,12 +208,15 @@ async function syncPages(
     const totalBatches = Math.ceil(pages.length / batchSize);
 
     try {
-      const res = await fetch(`${serverUrl}/api/pages/sync`, {
-        method: "POST",
-        headers: buildHeaders(),
-        body: JSON.stringify({ pages: batch }),
-        signal: AbortSignal.timeout(30_000),
-      });
+      const res = await fetchWithRetry(
+        `${serverUrl}/api/pages/sync`,
+        {
+          method: "POST",
+          headers: buildHeaders(),
+          body: JSON.stringify({ pages: batch }),
+        },
+        { _sleep: options._sleep }
+      );
 
       if (!res.ok) {
         const body = await res.text();
@@ -95,20 +224,34 @@ async function syncPages(
           `  Batch ${batchNum}/${totalBatches}: HTTP ${res.status} — ${body}`
         );
         totalErrors += batch.length;
-        continue;
+        consecutiveFailures++;
+      } else {
+        const result = (await res.json()) as { upserted: number };
+        totalCreated += result.upserted;
+        consecutiveFailures = 0;
+
+        console.log(
+          `  Batch ${batchNum}/${totalBatches}: ${result.upserted} upserted`
+        );
       }
-
-      const result = (await res.json()) as { upserted: number };
-      totalCreated += result.upserted;
-
-      console.log(
-        `  Batch ${batchNum}/${totalBatches}: ${result.upserted} upserted`
-      );
     } catch (err) {
       console.error(
-        `  Batch ${batchNum}/${totalBatches}: Network error — ${err}`
+        `  Batch ${batchNum}/${totalBatches}: Failed after retries — ${err}`
       );
       totalErrors += batch.length;
+      consecutiveFailures++;
+    }
+
+    if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+      const remaining = pages.length - (i + batchSize);
+      if (remaining > 0) {
+        console.error(
+          `\n  Aborting: ${MAX_CONSECUTIVE_FAILURES} consecutive batch failures. ` +
+            `Skipping ${remaining} remaining pages.`
+        );
+        totalErrors += remaining;
+      }
+      break;
     }
   }
 
@@ -218,6 +361,16 @@ async function main() {
     process.exit(0);
   }
 
+  // Pre-sync health check
+  console.log("\nChecking server health...");
+  const healthy = await waitForHealthy(serverUrl);
+  if (!healthy) {
+    console.error(
+      `Error: Server at ${serverUrl} is not healthy after ${HEALTH_CHECK_RETRIES} attempts. Aborting sync.`
+    );
+    process.exit(1);
+  }
+
   // Sync
   const result = await syncPages(serverUrl, apiKey, syncPayloads, batchSize);
 
@@ -229,7 +382,9 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error("Sync failed:", err);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error("Sync failed:", err);
+    process.exit(1);
+  });
+}
