@@ -4,39 +4,18 @@ import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { sessions, sessionPages } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
+import { CreateSessionSchema as SharedCreateSessionSchema, CreateSessionBatchSchema } from "../api-types.js";
 
 export const sessionsRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 200;
 const MAX_PAGE_SIZE = 500;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const CreateSessionSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  branch: z.string().max(500).nullable().optional(),
-  title: z.string().min(1).max(1000),
-  summary: z.string().max(10000).nullable().optional(),
-  model: z.string().max(100).nullable().optional(),
-  duration: z.string().max(100).nullable().optional(),
-  cost: z.string().max(100).nullable().optional(),
-  prUrl: z.string().max(1000).nullable().optional(),
-  checksYaml: z.string().max(10000).nullable().optional(),
-  issuesJson: z.unknown().nullable().optional(),
-  learningsJson: z.unknown().nullable().optional(),
-  recommendationsJson: z.unknown().nullable().optional(),
-  pages: z
-    .array(z.string().min(1).max(200))
-    .optional()
-    .default([])
-    .transform((arr) => [...new Set(arr)]),
-});
-
-const CreateBatchSchema = z.object({
-  items: z.array(CreateSessionSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const CreateSessionSchema = SharedCreateSessionSchema;
+const CreateBatchSchema = CreateSessionBatchSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
