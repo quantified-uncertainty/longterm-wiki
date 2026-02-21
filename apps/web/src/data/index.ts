@@ -212,7 +212,7 @@ function getDatabase(): DatabaseShape {
   return _database;
 }
 
-function getTypedEntities(): AnyEntity[] {
+export function getTypedEntities(): AnyEntity[] {
   if (_typedEntities) return _typedEntities;
 
   const db = getDatabase();
@@ -482,10 +482,6 @@ function pageIndex() {
 // LOOKUP FUNCTIONS
 // ============================================================================
 
-/** Get all typed entities */
-export function getAllEntities(): AnyEntity[] {
-  return getTypedEntities();
-}
 
 /** Get a typed entity by ID — accepts numeric (E35) or slug (deepmind) */
 export function getTypedEntityById(id: string): AnyEntity | undefined {

@@ -105,7 +105,3 @@ export const getEditLogsForPage_compat = async (pageId: string) =>
 /** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
 export const getEditLogStats_compat = async () =>
   unwrap(await getEditLogStats());
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getEditLogLatestDates_compat = async () =>
-  unwrap(await getEditLogLatestDates());

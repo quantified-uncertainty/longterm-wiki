@@ -2,7 +2,7 @@
  * Resources API — wiki-server client module
  */
 
-import { apiRequest, unwrap, type ApiResult } from './client.ts';
+import { apiRequest, type ApiResult } from './client.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -43,10 +43,3 @@ export async function upsertResource(
   return apiRequest<UpsertResourceResult>('POST', '/api/resources', item);
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrapper
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const upsertResource_compat = async (item: UpsertResourceItem) =>
-  unwrap(await upsertResource(item));
