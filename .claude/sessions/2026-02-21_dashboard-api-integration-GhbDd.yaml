@@ -1,0 +1,58 @@
+date: "2026-02-21"
+branch: claude/dashboard-api-integration-GhbDd
+title: "Convert dashboards to wiki-server API (#459, #460, #461)"
+model: claude-opus-4-6
+pr: 480
+issues: [459, 460, 461]
+duration: ~30min
+cost: ~$5
+pages: []
+
+summary: |
+  Converted page-changes and hallucination-risk dashboards from reading
+  database.json to fetching from wiki-server API endpoints, with graceful
+  fallback. Verified citation-accuracy dashboard already uses API correctly.
+
+key_decisions:
+  - "API-first with fallback: Both dashboards try wiki-server API first (5-minute cache), falling back to database.json when server is unavailable"
+  - "Page metadata enrichment: API returns only page IDs; local database.json provides titles, paths, entity types for display"
+  - "Pagination safety: Hallucination risk API uses for-loop with maxPages=20 guard instead of while(true)"
+  - "No shared helper extracted: Auth/fetch pattern is duplicated across 4 dashboards, matching existing codebase convention"
+  - "Tooling gaps: None identified — straightforward refactor"
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-21T08:29:04.706Z"
+  total: 32
+  completed: 27
+  na: 4
+  skipped: 1
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - no-hardcoded
+    - fix-escaping
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - backward-compatible
+    - multi-environment
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - push-ci-green
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned
