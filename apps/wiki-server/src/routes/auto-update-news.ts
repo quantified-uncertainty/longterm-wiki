@@ -1,13 +1,12 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, sql, count, gte } from "drizzle-orm";
+import { eq, desc, sql, count } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateNewsItems, autoUpdateRuns } from "../schema.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
-  firstOrThrow,
 } from "./utils.js";
 
 export const autoUpdateNewsRoute = new Hono();

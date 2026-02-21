@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - "data/edit-logs/**"
       - ".claude/sessions/**"
       - "data/auto-update/runs/**"
 
@@ -32,12 +31,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Sync edit logs to wiki-server
-        run: pnpm crux wiki-server sync-edit-logs
-        env:
-          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
-          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
       - name: Sync sessions to wiki-server
         run: pnpm crux wiki-server sync-sessions

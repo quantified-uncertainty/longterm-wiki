@@ -45,6 +45,9 @@ jobs:
       - name: Run wiki-server tests
         run: cd apps/wiki-server && pnpm test
 
+      - name: Run crux tests
+        run: pnpm test:crux
+
       - name: Build Next.js
         run: cd apps/web && pnpm build
         env:

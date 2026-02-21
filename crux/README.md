@@ -80,7 +80,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 | **updates** | `content/docs/` frontmatter | invokes `content improve` |
 | **visual** | `content/docs/` | `content/docs/` (diagrams, charts) |
 | **check-links** | `data/resources/`, URLs | stdout (health reports) |
-| **edit-log** | `data/edit-logs/` | stdout (history) |
+| **edit-log** | PostgreSQL (wiki-server) | stdout (history) |
 | **importance** | `content/docs/`, `data/` | `content/docs/` frontmatter |
 | **ci** | GitHub API | stdout (check-run status) |
 | **maintain** | GitHub API, `.claude/sessions/`, codebase | stdout, GitHub issues |
@@ -96,7 +96,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 - **updates** — Schedule-aware update queue using `update_frequency` frontmatter
 - **visual** — Create, review, audit, and improve diagrams/charts/models
 - **check-links** — Check external URL health and find broken links
-- **edit-log** — View and query per-page edit history from `data/edit-logs/`
+- **edit-log** — View and query per-page edit history from PostgreSQL (via wiki-server API)
 - **importance** — Ranking-based importance scoring for pages
 - **ci** — GitHub CI check-run status monitoring with optional polling
 - **maintain** — Periodic maintenance: PR review, issue triage, cruft detection
