@@ -54,16 +54,17 @@ If the `edit_logs` table is corrupted or accidentally dropped:
 psql -U <db_user> -d <db_name> -c "DROP TABLE IF EXISTS edit_logs CASCADE;"
 
 # 2. Restore from the most recent dump
+# The custom-format (-F c) dump includes table DDL, so -t works correctly
 pg_restore -U <db_user> -d <db_name> -t edit_logs edit_logs_YYYYMMDD.dump
 
 # 3. Verify row count
 psql -U <db_user> -d <db_name> -c "SELECT COUNT(*) FROM edit_logs;"
 ```
 
-If the sequence is out of sync after restore:
+If the sequence is out of sync after restore (use `COALESCE` to handle an empty table):
 
 ```bash
-psql -U <db_user> -d <db_name> -c "SELECT setval('edit_logs_id_seq', (SELECT MAX(id) FROM edit_logs));"
+psql -U <db_user> -d <db_name> -c "SELECT setval('edit_logs_id_seq', (SELECT COALESCE(MAX(id), 1) FROM edit_logs));"
 ```
 
 ## Rollback: reconstruct from git history (no backup)
