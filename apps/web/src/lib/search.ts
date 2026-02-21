@@ -1,11 +1,15 @@
 /**
  * Client-side Search
  *
- * Lazily loads the pre-built MiniSearch index and document metadata,
- * then exposes a search function for the SearchDialog component.
+ * Primary: server-side PostgreSQL full-text search via /api/search proxy.
+ * Fallback: lazily-loaded MiniSearch index (for when the server is unreachable).
+ *
+ * The MiniSearch index (~685KB) is only fetched when a server request fails,
+ * keeping the default bundle lean. Once loaded, MiniSearch stays cached for
+ * the remainder of the session.
  */
 
-import MiniSearch from "minisearch";
+import type MiniSearchType from "minisearch";
 
 export interface SearchDoc {
   id: string;
@@ -28,7 +32,88 @@ export interface SearchResult extends SearchDoc {
   terms: string[];
 }
 
-const SEARCH_FIELDS = ["title", "description", "llmSummary", "tags", "entityType", "id"];
+// ---------------------------------------------------------------------------
+// Server-side search
+// ---------------------------------------------------------------------------
+
+/** Whether we've confirmed the server is unavailable this session. */
+let _serverUnavailable = false;
+
+interface ServerSearchResponse {
+  results: Array<{
+    id: string;
+    numericId: string | null;
+    title: string;
+    description: string | null;
+    entityType: string | null;
+    category: string | null;
+    readerImportance: number | null;
+    quality: number | null;
+    score: number;
+  }>;
+  query: string;
+  total: number;
+}
+
+/**
+ * Search via the server-side PostgreSQL FTS proxy.
+ * Returns null if the server is unavailable (triggers MiniSearch fallback).
+ */
+async function searchServer(
+  query: string,
+  limit: number,
+): Promise<SearchResult[] | null> {
+  if (_serverUnavailable) return null;
+
+  try {
+    const url = `/api/search?q=${encodeURIComponent(query)}&limit=${limit}`;
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(4000),
+    });
+
+    if (!res.ok) {
+      if (res.status === 503) _serverUnavailable = true;
+      return null;
+    }
+
+    const data: ServerSearchResponse = await res.json();
+    const queryTerms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+
+    return data.results.map((r) => ({
+      id: r.id,
+      title: r.title,
+      description: r.description ?? "",
+      numericId: r.numericId ?? r.id,
+      type: r.entityType ?? "",
+      readerImportance: r.readerImportance,
+      quality: r.quality,
+      score: r.score,
+      // Server doesn't provide per-field match info; synthesize from query terms
+      // so highlighting still works (terms are matched against description text)
+      match: Object.fromEntries(
+        queryTerms.map((t) => [t, ["title", "description"]]),
+      ),
+      terms: queryTerms,
+    }));
+  } catch {
+    // Network error or timeout — mark server as unavailable for this session
+    _serverUnavailable = true;
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// MiniSearch fallback (lazy-loaded)
+// ---------------------------------------------------------------------------
+
+const SEARCH_FIELDS = [
+  "title",
+  "description",
+  "llmSummary",
+  "tags",
+  "entityType",
+  "id",
+];
 const FIELD_BOOSTS: Record<string, number> = {
   title: 3.0,
   description: 2.0,
@@ -38,14 +123,13 @@ const FIELD_BOOSTS: Record<string, number> = {
   id: 1.0,
 };
 
-let _miniSearch: MiniSearch | null = null;
+let _miniSearch: MiniSearchType | null = null;
 let _docs: Map<string, SearchDoc> | null = null;
 let _loadPromise: Promise<void> | null = null;
 
 /**
- * Lazily load the search index and docs from pre-built JSON files.
- * The JSON files are placed in public/ at build time via next.config.
- * We fetch them at runtime so they're not included in the JS bundle.
+ * Lazily load the MiniSearch index and docs from pre-built JSON files.
+ * Only called when the server-side search is unavailable.
  */
 async function ensureLoaded(): Promise<void> {
   if (_miniSearch && _docs) return;
@@ -54,7 +138,8 @@ async function ensureLoaded(): Promise<void> {
 
   _loadPromise = (async () => {
     try {
-      const [indexRes, docsRes] = await Promise.all([
+      const [MiniSearch, indexRes, docsRes] = await Promise.all([
+        import("minisearch").then((m) => m.default),
         fetch("/search-index.json"),
         fetch("/search-docs.json"),
       ]);
@@ -84,12 +169,11 @@ async function ensureLoaded(): Promise<void> {
 }
 
 /**
- * Search the index. Returns up to `limit` results.
- * Automatically loads the index on first call.
+ * Search using the local MiniSearch index (fallback path).
  */
-export async function searchWiki(
+async function searchMiniSearch(
   query: string,
-  limit = 20
+  limit: number,
 ): Promise<SearchResult[]> {
   await ensureLoaded();
 
@@ -109,9 +193,7 @@ export async function searchWiki(
     const title = (doc?.title ?? "").toLowerCase();
 
     let boost = 1.0;
-    // Exact title match — strongest signal that this is THE page
     if (title === q) boost *= 3.0;
-    // Mild importance tiebreaker (0–33% boost)
     boost *= 1 + (doc?.readerImportance ?? 0) / 300;
 
     return {
@@ -132,12 +214,37 @@ export async function searchWiki(
   return scored.slice(0, limit);
 }
 
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+/**
+ * Search the wiki. Tries server-side PostgreSQL FTS first, falls back to
+ * the local MiniSearch index if the server is unreachable.
+ */
+export async function searchWiki(
+  query: string,
+  limit = 20,
+): Promise<SearchResult[]> {
+  if (!query.trim()) return [];
+
+  // Try server-side search first
+  const serverResults = await searchServer(query, limit);
+  if (serverResults !== null) return serverResults;
+
+  // Fall back to local MiniSearch
+  return searchMiniSearch(query, limit);
+}
+
 /**
  * Search returning a Map of id → score for all matching documents.
  * Used by the Explore page to filter and rank items via MiniSearch.
+ *
+ * Always uses MiniSearch since this needs scores for ALL matching docs
+ * (not just top-N results), which is the local index's strength.
  */
 export async function searchWikiScores(
-  query: string
+  query: string,
 ): Promise<Map<string, number>> {
   await ensureLoaded();
 
@@ -167,8 +274,9 @@ export async function searchWikiScores(
 }
 
 /**
- * Preload the search index in the background.
- * Call this early (e.g., on hover over the search button) for instant results.
+ * Preload the MiniSearch index in the background.
+ * Call this early (e.g., on hover over the search button) for instant
+ * fallback if the server is unavailable.
  */
 export function preloadSearchIndex(): void {
   ensureLoaded().catch(() => {
