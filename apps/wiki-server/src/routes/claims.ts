@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, sql, desc, asc } from "drizzle-orm";
+import { eq, and, count, desc, asc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { claims } from "../schema.js";
 import {
