@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
-import { getDb, getDrizzleDb } from "../db.js";
+import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, notFoundError } from "./utils.js";
 
@@ -73,7 +73,13 @@ function formatRunEntry(
     pagesFailed: r.pagesFailed,
     pagesSkipped: r.pagesSkipped,
     newPagesCreated: r.newPagesCreated
-      ? (JSON.parse(r.newPagesCreated) as string[])
+      ? (() => {
+          try {
+            return JSON.parse(r.newPagesCreated) as string[];
+          } catch {
+            return [];
+          }
+        })()
       : [],
     results: results.map((entry) => ({
       pageId: entry.pageId,
@@ -96,13 +102,11 @@ autoUpdateRunsRoute.post("/", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const d = parsed.data;
-  const rawDb = getDb();
+  const db = getDrizzleDb();
 
-  // Use a transaction to ensure atomicity of run + results insert
-  const result = await rawDb.begin(async (tx) => {
-    const db = getDrizzleDb();
-
-    const runRow = await db
+  // Use a Drizzle transaction to ensure atomicity of run + results insert
+  const result = await db.transaction(async (tx) => {
+    const runRow = await tx
       .insert(autoUpdateRuns)
       .values({
         date: d.date,
@@ -135,7 +139,7 @@ autoUpdateRunsRoute.post("/", async (c) => {
 
     if (d.results && d.results.length > 0) {
       for (const r of d.results) {
-        await db.insert(autoUpdateResults).values({
+        await tx.insert(autoUpdateResults).values({
           runId: run.id,
           pageId: r.pageId,
           status: r.status,

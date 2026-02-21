@@ -703,7 +703,6 @@ citationsRoute.get("/accuracy-dashboard", async (c) => {
         if (domain) domainMap.get(domain)!.unsupported++;
       } else if (verdict === 'minor_issues') {
         minorIssueCount++; page.minorIssues++;
-        if (domain) domainMap.get(domain)!.accurate++;
       }
 
       // Flag problematic citations

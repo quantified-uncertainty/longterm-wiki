@@ -1,0 +1,1 @@
+ALTER TABLE "resource_citations" ADD CONSTRAINT "resource_citations_resource_id_resources_id_fk" FOREIGN KEY ("resource_id") REFERENCES "public"."resources"("id") ON DELETE cascade ON UPDATE no action;

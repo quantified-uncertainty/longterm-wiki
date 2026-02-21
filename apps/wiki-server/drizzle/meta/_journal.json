@@ -64,6 +64,13 @@
       "when": 1771700000000,
       "tag": "0008_add_auto_update_results_fk",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1771800000000,
+      "tag": "0009_add_resource_citations_fk",
+      "breakpoints": true
     }
   ]
 }

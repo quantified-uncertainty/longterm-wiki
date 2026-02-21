@@ -123,7 +123,7 @@ async function upsertResource(db: DbClient, d: ResourceInput) {
         credibilityOverride: vals.credibilityOverride,
         fetchedAt: vals.fetchedAt,
         contentHash: vals.contentHash,
-        updatedAt: new Date(),
+        updatedAt: sql`now()`,
       },
     })
     .returning({

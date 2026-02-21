@@ -1,8 +1,9 @@
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, asc, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { editLogs } from "../schema.js";
+import { parseJsonBody, validationError, invalidJsonError } from "./utils.js";
 
 export const editLogsRoute = new Hono();
 
@@ -47,25 +48,11 @@ const PaginationQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-// ---- Helpers ----
-
-function parseJsonBody(c: Context) {
-  return c.req.json().catch(() => null);
-}
-
-function validationError(c: Context, message: string) {
-  return c.json({ error: "validation_error", message }, 400);
-}
-
 // ---- POST / (append single entry) ----
 
 editLogsRoute.post("/", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body)
-    return c.json(
-      { error: "invalid_json", message: "Request body must be valid JSON" },
-      400
-    );
+  if (!body) return invalidJsonError(c);
 
   const parsed = AppendSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -97,11 +84,7 @@ editLogsRoute.post("/", async (c) => {
 
 editLogsRoute.post("/batch", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body)
-    return c.json(
-      { error: "invalid_json", message: "Request body must be valid JSON" },
-      400
-    );
+  if (!body) return invalidJsonError(c);
 
   const parsed = AppendBatchSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);

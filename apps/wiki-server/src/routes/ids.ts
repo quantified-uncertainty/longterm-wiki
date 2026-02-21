@@ -152,6 +152,16 @@ idsRoute.post("/allocate-batch", async (c) => {
 
       if (inserted.length > 0) {
         results.push(formatIdResponse(inserted[0], true));
+      } else {
+        // Race condition: another request inserted between our SELECT and INSERT.
+        // Re-fetch the existing row.
+        const raced = await tx
+          .select()
+          .from(entityIds)
+          .where(eq(entityIds.slug, item.slug));
+        if (raced.length > 0) {
+          results.push(formatIdResponse(raced[0], false));
+        }
       }
     }
   });
