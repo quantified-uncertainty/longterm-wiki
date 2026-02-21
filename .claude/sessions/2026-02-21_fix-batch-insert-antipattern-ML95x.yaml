@@ -1,0 +1,56 @@
+date: "2026-02-21"
+branch: claude/fix-batch-insert-antipattern-ML95x
+title: "Fix batch insert antipattern, extract shared dashboard utility"
+model: claude-opus-4-6
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/498
+issues:
+  - 481
+  - 483
+summary: |
+  Resolved two post-merge cleanup issues for the wiki-server:
+  (1) Replaced per-row INSERT loops with multi-row .values() in summaries
+  and claims batch routes, eliminating N round-trips per batch request.
+  (2) Extracted the repeated "try wiki-server API, fallback to local files"
+  pattern from 4 internal dashboard pages into a shared utility at
+  apps/web/src/lib/wiki-server.ts. Also added data source indicators to
+  dashboard footers, documenting comment on claims.entityId, and fixed
+  integration test migration comments.
+pages: []
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-21T16:01:40.223Z"
+  total: 32
+  completed: 24
+  na: 6
+  skipped: 2
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - backward-compatible
+    - multi-environment
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - no-merge-conflicts
+    - check-recent-merges
+key_decisions:
+  - "Used excluded pseudo-table for multi-row upsert in summaries batch route: allows referencing per-row values in ON CONFLICT SET clause without needing a transaction wrapper"
+  - "Kept hallucination-risk dashboard using getWikiServerConfig() instead of fetchFromWikiServer() because it needs custom pagination logic"
+  - "No FK constraint on claims.entityId: claims reference entities from multiple source tables, so a logical FK with documenting comment is more appropriate"
+  - "No tooling gaps identified: all issues caught by existing validation pipeline"
