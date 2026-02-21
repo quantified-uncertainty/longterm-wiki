@@ -288,6 +288,61 @@ export const autoUpdateResults = pgTable(
   ]
 );
 
+export const summaries = pgTable(
+  "summaries",
+  {
+    entityId: text("entity_id").primaryKey(),
+    entityType: text("entity_type").notNull(),
+    oneLiner: text("one_liner"),
+    summary: text("summary"),
+    review: text("review"),
+    keyPoints: jsonb("key_points").$type<string[]>(),
+    keyClaims: jsonb("key_claims").$type<string[]>(),
+    model: text("model"),
+    tokensUsed: integer("tokens_used"),
+    generatedAt: timestamp("generated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_sum_entity_type").on(table.entityType),
+    index("idx_sum_model").on(table.model),
+    index("idx_sum_generated_at").on(table.generatedAt),
+  ]
+);
+
+export const claims = pgTable(
+  "claims",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: text("entity_id").notNull(),
+    entityType: text("entity_type").notNull(),
+    claimType: text("claim_type").notNull(),
+    claimText: text("claim_text").notNull(),
+    value: text("value"),
+    unit: text("unit"),
+    confidence: text("confidence"),
+    sourceQuote: text("source_quote"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_cl_entity_id").on(table.entityId),
+    index("idx_cl_entity_type").on(table.entityType),
+    index("idx_cl_claim_type").on(table.claimType),
+  ]
+);
+
 export const resources = pgTable(
   "resources",
   {
