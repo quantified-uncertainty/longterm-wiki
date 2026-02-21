@@ -634,3 +634,116 @@ export async function recordRiskSnapshots(
 
   return { inserted: totalInserted };
 }
+
+// ---------------------------------------------------------------------------
+// Summaries API
+// ---------------------------------------------------------------------------
+
+export interface UpsertSummaryItem {
+  entityId: string;
+  entityType: string;
+  oneLiner?: string | null;
+  summary?: string | null;
+  review?: string | null;
+  keyPoints?: string[] | null;
+  keyClaims?: string[] | null;
+  model?: string | null;
+  tokensUsed?: number | null;
+}
+
+interface UpsertSummaryResult {
+  entityId: string;
+  entityType: string;
+}
+
+interface UpsertSummaryBatchResult {
+  inserted: number;
+  results: Array<{ entityId: string; entityType: string }>;
+}
+
+/**
+ * Upsert a single summary to the wiki-server database.
+ */
+export async function upsertSummary(
+  item: UpsertSummaryItem,
+): Promise<UpsertSummaryResult | null> {
+  return apiRequest<UpsertSummaryResult>('POST', '/api/summaries', item);
+}
+
+/**
+ * Upsert multiple summaries in a single batch.
+ */
+export async function upsertSummaryBatch(
+  items: UpsertSummaryItem[],
+): Promise<UpsertSummaryBatchResult | null> {
+  return apiRequest<UpsertSummaryBatchResult>(
+    'POST',
+    '/api/summaries/batch',
+    { items },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Claims API
+// ---------------------------------------------------------------------------
+
+export interface InsertClaimItem {
+  entityId: string;
+  entityType: string;
+  claimType: string;
+  claimText: string;
+  value?: string | null;
+  unit?: string | null;
+  confidence?: string | null;
+  sourceQuote?: string | null;
+}
+
+interface InsertClaimResult {
+  id: number;
+  entityId: string;
+  claimType: string;
+}
+
+interface InsertClaimBatchResult {
+  inserted: number;
+  results: Array<{ id: number; entityId: string; claimType: string }>;
+}
+
+interface ClearClaimsResult {
+  deleted: number;
+}
+
+/**
+ * Insert a single claim to the wiki-server database.
+ */
+export async function insertClaim(
+  item: InsertClaimItem,
+): Promise<InsertClaimResult | null> {
+  return apiRequest<InsertClaimResult>('POST', '/api/claims', item);
+}
+
+/**
+ * Insert multiple claims in a single batch.
+ */
+export async function insertClaimBatch(
+  items: InsertClaimItem[],
+): Promise<InsertClaimBatchResult | null> {
+  return apiRequest<InsertClaimBatchResult>(
+    'POST',
+    '/api/claims/batch',
+    { items },
+  );
+}
+
+/**
+ * Delete all claims for a given entity on the wiki-server.
+ */
+export async function clearClaimsForEntity(
+  entityId: string,
+): Promise<ClearClaimsResult | null> {
+  return apiRequest<ClearClaimsResult>(
+    'POST',
+    '/api/claims/clear',
+    { entityId },
+  );
+}

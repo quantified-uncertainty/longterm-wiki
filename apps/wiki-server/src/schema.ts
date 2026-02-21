@@ -113,22 +113,25 @@ export const wikiPages = pgTable(
   ]
 );
 
-export const citationContent = pgTable("citation_content", {
-  url: text("url").primaryKey(),
-  fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
-  httpStatus: integer("http_status"),
-  contentType: text("content_type"),
-  pageTitle: text("page_title"),
-  fullTextPreview: text("full_text_preview"),
-  contentLength: integer("content_length"),
-  contentHash: text("content_hash"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const citationContent = pgTable(
+  "citation_content",
+  {
+    url: text("url").primaryKey(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+    httpStatus: integer("http_status"),
+    contentType: text("content_type"),
+    pageTitle: text("page_title"),
+    fullTextPreview: text("full_text_preview"),
+    contentLength: integer("content_length"),
+    contentHash: text("content_hash"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  }
+);
 
 export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
@@ -282,6 +285,61 @@ export const autoUpdateResults = pgTable(
     index("idx_aures_run_id").on(table.runId),
     index("idx_aures_page_id").on(table.pageId),
     index("idx_aures_status").on(table.status),
+  ]
+);
+
+export const summaries = pgTable(
+  "summaries",
+  {
+    entityId: text("entity_id").primaryKey(),
+    entityType: text("entity_type").notNull(),
+    oneLiner: text("one_liner"),
+    summary: text("summary"),
+    review: text("review"),
+    keyPoints: jsonb("key_points").$type<string[]>(),
+    keyClaims: jsonb("key_claims").$type<string[]>(),
+    model: text("model"),
+    tokensUsed: integer("tokens_used"),
+    generatedAt: timestamp("generated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_sum_entity_type").on(table.entityType),
+    index("idx_sum_model").on(table.model),
+    index("idx_sum_generated_at").on(table.generatedAt),
+  ]
+);
+
+export const claims = pgTable(
+  "claims",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: text("entity_id").notNull(),
+    entityType: text("entity_type").notNull(),
+    claimType: text("claim_type").notNull(),
+    claimText: text("claim_text").notNull(),
+    value: text("value"),
+    unit: text("unit"),
+    confidence: text("confidence"),
+    sourceQuote: text("source_quote"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_cl_entity_id").on(table.entityId),
+    index("idx_cl_entity_type").on(table.entityType),
+    index("idx_cl_claim_type").on(table.claimType),
   ]
 );
 

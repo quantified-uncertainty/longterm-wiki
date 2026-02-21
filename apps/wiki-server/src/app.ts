@@ -10,6 +10,8 @@ import { autoUpdateRunsRoute } from "./routes/auto-update-runs.js";
 import { hallucinationRiskRoute } from "./routes/hallucination-risk.js";
 import { sessionsRoute } from "./routes/sessions.js";
 import { resourcesRoute } from "./routes/resources.js";
+import { summariesRoute } from "./routes/summaries.js";
+import { claimsRoute } from "./routes/claims.js";
 
 export function createApp() {
   const app = new Hono();
@@ -48,6 +50,8 @@ export function createApp() {
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
   app.route("/api/sessions", sessionsRoute);
   app.route("/api/resources", resourcesRoute);
+  app.route("/api/summaries", summariesRoute);
+  app.route("/api/claims", claimsRoute);
 
   return app;
 }

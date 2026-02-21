@@ -203,6 +203,8 @@ pagesRoute.post("/sync", async (c) => {
   const db = getDrizzleDb();
   let upserted = 0;
 
+  const pageIds = pages.map((p) => p.id);
+
   await db.transaction(async (tx) => {
     const allVals = pages.map((page) => ({
       id: page.id,
@@ -251,20 +253,18 @@ pagesRoute.post("/sync", async (c) => {
         },
       });
     upserted = allVals.length;
-  });
 
-  // Update search vectors for synced pages
-  const rawDb = getDb();
-  const pageIds = pages.map((p) => p.id);
-  await rawDb`
-    UPDATE wiki_pages SET search_vector =
-      setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
-      setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
-      setweight(to_tsvector('english', coalesce(llm_summary, '')), 'C') ||
-      setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
-      setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
-    WHERE id = ANY(${pageIds})
-  `;
+    // Update search vectors inside the same transaction
+    await tx.execute(sql`
+      UPDATE wiki_pages SET search_vector =
+        setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+        setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(llm_summary, '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
+        setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
+      WHERE id = ANY(${pageIds})
+    `);
+  });
 
   return c.json({ upserted });
 });

@@ -27,7 +27,7 @@ const __dirname = path.dirname(__filename);
 const migrationsFolder = path.resolve(__dirname, "../../drizzle");
 
 /**
- * Drop ALL tables created by migrations 0000-0009, in reverse dependency order.
+ * Drop ALL tables created by migrations 0000-0011, in reverse dependency order.
  * Uses CASCADE so FK ordering is handled automatically, but we list children
  * first for clarity.
  */
@@ -36,7 +36,9 @@ async function dropAllTables(conn: ReturnType<typeof postgres>) {
   await conn`DROP TABLE IF EXISTS resource_citations CASCADE`;
   await conn`DROP TABLE IF EXISTS auto_update_results CASCADE`;
   await conn`DROP TABLE IF EXISTS session_pages CASCADE`;
+  await conn`DROP TABLE IF EXISTS claims CASCADE`;
   // Parent tables
+  await conn`DROP TABLE IF EXISTS summaries CASCADE`;
   await conn`DROP TABLE IF EXISTS resources CASCADE`;
   await conn`DROP TABLE IF EXISTS auto_update_runs CASCADE`;
   await conn`DROP TABLE IF EXISTS sessions CASCADE`;
@@ -68,6 +70,8 @@ const ALL_EXPECTED_TABLES = [
   "auto_update_results",
   "resources",
   "resource_citations",
+  "summaries",
+  "claims",
 ];
 
 describeWithDb("Integration: Drizzle migrations", () => {

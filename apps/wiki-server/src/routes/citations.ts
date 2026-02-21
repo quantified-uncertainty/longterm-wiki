@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
 
 export const citationsRoute = new Hono();
@@ -139,7 +140,7 @@ citationsRoute.post("/quotes/upsert", async (c) => {
   const db = getDrizzleDb();
   const rows = await upsertQuote(db, parsed.data);
 
-  const row = rows[0];
+  const row = firstOrThrow(rows, "citation quote upsert");
   return c.json({
     id: row.id,
     pageId: row.pageId,

@@ -12,6 +12,11 @@ const SCRIPTS = {
     description: 'Sync wiki page content and metadata to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size', 'ci'],
   },
+  'sync-resources': {
+    script: 'wiki-server/sync-resources.ts',
+    description: 'Sync data/resources/*.yaml to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'sync-session': {
     script: 'wiki-server/sync-session.ts',
     description: 'Sync a single session YAML file to wiki-server',
@@ -35,16 +40,18 @@ ${commandList}
 
 Options:
   --dry-run          Preview what would be synced without making changes
-  --batch-size=N     Number of pages per batch (default: 50)
+  --batch-size=N     Number of items per batch (default: 50 pages, 100 resources)
 
 Environment:
   LONGTERMWIKI_SERVER_URL     Base URL of the wiki server
   LONGTERMWIKI_SERVER_API_KEY Bearer token for authentication
 
 Examples:
-  crux wiki-server sync                  Sync all pages
-  crux wiki-server sync --dry-run        Preview sync
-  crux wiki-server sync --batch-size=25  Use smaller batches
+  crux wiki-server sync                    Sync all pages
+  crux wiki-server sync --dry-run          Preview page sync
+  crux wiki-server sync --batch-size=25    Use smaller batches
+  crux wiki-server sync-resources          Sync all resources
+  crux wiki-server sync-resources --dry-run  Preview resource sync
   crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
 `;
 }
