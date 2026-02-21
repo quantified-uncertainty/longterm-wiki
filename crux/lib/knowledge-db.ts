@@ -22,6 +22,9 @@ import { fileURLToPath } from 'url';
 import {
   upsertCitationQuote as upsertCitationQuoteOnServer,
   markCitationAccuracy as markAccuracyOnServer,
+  upsertSummary as upsertSummaryOnServer,
+  insertClaim as insertClaimOnServer,
+  clearClaimsForEntity as clearClaimsOnServer,
   type UpsertCitationQuoteItem,
 } from './wiki-server-client.ts';
 
@@ -759,7 +762,7 @@ export const summaries = {
         tokens_used = @tokensUsed,
         generated_at = datetime('now')
     `);
-    return stmt.run({
+    const result = stmt.run({
       entityId,
       entityType,
       oneLiner: data.oneLiner,
@@ -770,6 +773,23 @@ export const summaries = {
       model: data.model,
       tokensUsed: data.tokensUsed
     });
+
+    // Fire-and-forget write to wiki-server DB
+    upsertSummaryOnServer({
+      entityId,
+      entityType,
+      oneLiner: data.oneLiner,
+      summary: data.summary,
+      review: data.review ?? null,
+      keyPoints: (data.keyPoints as string[]) ?? null,
+      keyClaims: (data.keyClaims as string[]) ?? null,
+      model: data.model,
+      tokensUsed: data.tokensUsed,
+    }).catch(() => {
+      // Silently ignore — SQLite is authoritative during migration period
+    });
+
+    return result;
   },
 
   /**
@@ -837,7 +857,23 @@ export const claims = {
       INSERT INTO claims (entity_id, entity_type, claim_type, claim_text, value, unit, confidence, source_quote)
       VALUES (@entityId, @entityType, @claimType, @claimText, @value, @unit, @confidence, @sourceQuote)
     `);
-    return stmt.run(claim);
+    const result = stmt.run(claim);
+
+    // Fire-and-forget write to wiki-server DB
+    insertClaimOnServer({
+      entityId: claim.entityId,
+      entityType: claim.entityType,
+      claimType: claim.claimType,
+      claimText: claim.claimText,
+      value: claim.value ?? null,
+      unit: claim.unit ?? null,
+      confidence: claim.confidence ?? null,
+      sourceQuote: claim.sourceQuote ?? null,
+    }).catch(() => {
+      // Silently ignore — SQLite is authoritative during migration period
+    });
+
+    return result;
   },
 
   /**
@@ -869,7 +905,14 @@ export const claims = {
    * Clear claims for an entity (for regeneration)
    */
   clearForEntity(entityId: string) {
-    return getDb().prepare('DELETE FROM claims WHERE entity_id = ?').run(entityId);
+    const result = getDb().prepare('DELETE FROM claims WHERE entity_id = ?').run(entityId);
+
+    // Fire-and-forget write to wiki-server DB
+    clearClaimsOnServer(entityId).catch(() => {
+      // Silently ignore — SQLite is authoritative during migration period
+    });
+
+    return result;
   },
 
   /**
