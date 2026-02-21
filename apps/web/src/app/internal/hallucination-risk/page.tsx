@@ -1,4 +1,9 @@
 import { getAllPages } from "@/data";
+import {
+  getWikiServerConfig,
+  withApiFallback,
+  dataSourceLabel,
+} from "@lib/wiki-server";
 import { HallucinationRiskDashboard } from "./hallucination-risk-dashboard";
 import type { Metadata } from "next";
 
@@ -38,16 +43,10 @@ interface ApiRiskPage {
  * Returns null if the server is unavailable.
  */
 async function loadRiskDataFromApi(): Promise<RiskPageData[] | null> {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) return null;
+  const config = getWikiServerConfig();
+  if (!config) return null;
 
   try {
-    const headers: Record<string, string> = {};
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
     // Paginate to fetch all risk scores (guard against infinite loop)
     const allApiPages: ApiRiskPage[] = [];
     let offset = 0;
@@ -56,8 +55,8 @@ async function loadRiskDataFromApi(): Promise<RiskPageData[] | null> {
 
     for (let page = 0; page < maxPages; page++) {
       const res = await fetch(
-        `${serverUrl}/api/hallucination-risk/latest?limit=${pageSize}&offset=${offset}`,
-        { headers, next: { revalidate: 300 } }
+        `${config.serverUrl}/api/hallucination-risk/latest?limit=${pageSize}&offset=${offset}`,
+        { headers: config.headers, next: { revalidate: 300 } }
       );
       if (!res.ok) return null;
 
@@ -142,9 +141,10 @@ function StatCard({
 
 export default async function HallucinationRiskPage() {
   // Try wiki-server API first, fall back to database.json
-  const apiData = await loadRiskDataFromApi();
-  const riskPages = apiData ?? loadRiskDataFromDatabase();
-  const dataSource = apiData ? "wiki-server" : "local fallback";
+  const { data: riskPages, source } = await withApiFallback(
+    loadRiskDataFromApi,
+    loadRiskDataFromDatabase
+  );
 
   const highCount = riskPages.filter((p) => p.level === "high").length;
   const mediumCount = riskPages.filter((p) => p.level === "medium").length;
@@ -273,10 +273,9 @@ export default async function HallucinationRiskPage() {
       <HallucinationRiskDashboard data={riskPages} />
 
       <p className="text-xs text-muted-foreground mt-4">
-        Data source: {dataSource}.{" "}
         Scores computed at build time by the canonical scorer (
         <code className="text-[11px]">crux/lib/hallucination-risk.ts</code>).
-        Historical trends stored in PostgreSQL when wiki server is configured.
+        Data source: {dataSourceLabel(source)}.
         Run{" "}
         <code className="text-[11px]">
           pnpm crux validate hallucination-risk

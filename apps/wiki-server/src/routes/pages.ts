@@ -32,7 +32,7 @@ const PaginationQuery = z.object({
   entityType: z.string().max(100).optional(),
 });
 
-const SyncPageSchema = z.object({
+export const SyncPageSchema = z.object({
   id: z.string().min(1).max(300),
   numericId: z.string().max(20).nullable().optional(),
   title: z.string().min(1).max(500),
@@ -52,7 +52,7 @@ const SyncPageSchema = z.object({
   contentFormat: z.string().max(50).nullable().optional(),
 });
 
-const SyncBatchSchema = z.object({
+export const SyncBatchSchema = z.object({
   pages: z.array(SyncPageSchema).min(1).max(MAX_BATCH_SIZE),
 });
 

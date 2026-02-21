@@ -80,3 +80,34 @@ jobs:
             --auth-token "${ARGOCD_AUTH_TOKEN}" \
             --server "${ARGOCD_SERVER}" \
             --grpc-web
+
+      - name: Post-deploy smoke test
+        if: github.ref == 'refs/heads/main'
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+        run: |
+          echo "Running post-deploy smoke test..."
+
+          # 1. Health check
+          HEALTH=$(curl -sf "${LONGTERMWIKI_SERVER_URL}/health")
+          STATUS=$(echo "$HEALTH" | jq -r '.status')
+          if [ "$STATUS" != "healthy" ]; then
+            echo "::error::Health check failed: $HEALTH"
+            exit 1
+          fi
+          echo "Health check passed: $HEALTH"
+
+          # 2. Sync smoke test — send a single dummy page to verify the sync endpoint works end-to-end
+          SYNC_BODY='{"pages":[{"id":"__smoke-test__","numericId":null,"title":"Smoke Test","description":null,"llmSummary":null,"category":null,"subcategory":null,"entityType":null,"tags":null,"quality":null,"readerImportance":null,"hallucinationRiskLevel":null,"hallucinationRiskScore":null,"contentPlaintext":null,"wordCount":null,"lastUpdated":null,"contentFormat":null}]}'
+          SYNC_RESPONSE=$(curl -sf -X POST \
+            -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$SYNC_BODY" \
+            "${LONGTERMWIKI_SERVER_URL}/api/pages/sync")
+          UPSERTED=$(echo "$SYNC_RESPONSE" | jq -r '.upserted')
+          if [ "$UPSERTED" != "1" ]; then
+            echo "::error::Sync smoke test failed: $SYNC_RESPONSE"
+            exit 1
+          fi
+          echo "Sync smoke test passed: upserted=$UPSERTED"

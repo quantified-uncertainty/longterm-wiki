@@ -113,11 +113,12 @@ claimsRoute.post("/batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+  const allVals = items.map(claimValues);
 
   const results = await db.transaction(async (tx) => {
     return await tx
       .insert(claims)
-      .values(items.map((item) => claimValues(item)))
+      .values(allVals)
       .returning({
         id: claims.id,
         entityId: claims.entityId,

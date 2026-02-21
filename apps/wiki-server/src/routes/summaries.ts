@@ -125,22 +125,23 @@ summariesRoute.post("/batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
+  const allVals = items.map(summaryValues);
 
   const results = await db.transaction(async (tx) => {
     return await tx
       .insert(summaries)
-      .values(items.map((item) => summaryValues(item)))
+      .values(allVals)
       .onConflictDoUpdate({
         target: summaries.entityId,
         set: {
-          entityType: sql`excluded.entity_type`,
-          oneLiner: sql`excluded.one_liner`,
-          summary: sql`excluded.summary`,
-          review: sql`excluded.review`,
-          keyPoints: sql`excluded.key_points`,
-          keyClaims: sql`excluded.key_claims`,
-          model: sql`excluded.model`,
-          tokensUsed: sql`excluded.tokens_used`,
+          entityType: sql`excluded."entity_type"`,
+          oneLiner: sql`excluded."one_liner"`,
+          summary: sql`excluded."summary"`,
+          review: sql`excluded."review"`,
+          keyPoints: sql`excluded."key_points"`,
+          keyClaims: sql`excluded."key_claims"`,
+          model: sql`excluded."model"`,
+          tokensUsed: sql`excluded."tokens_used"`,
           generatedAt: sql`now()`,
           updatedAt: sql`now()`,
         },

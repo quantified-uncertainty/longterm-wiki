@@ -1,6 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
+import {
+  fetchFromWikiServer,
+  withApiFallback,
+  dataSourceLabel,
+} from "@lib/wiki-server";
 import { CitationAccuracyDashboard } from "./citation-accuracy-dashboard";
 import { VERDICT_COLORS } from "./verdict-colors";
 import type { Metadata } from "next";
@@ -71,26 +76,10 @@ export interface DomainSummary {
  * Returns null if the server is unavailable or returns no data.
  */
 async function loadDashboardDataFromApi(): Promise<DashboardData | null> {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  if (!serverUrl) return null;
-
-  try {
-    const headers: Record<string, string> = {};
-    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
-    const res = await fetch(`${serverUrl}/api/citations/accuracy-dashboard`, {
-      headers,
-      next: { revalidate: 300 }, // Cache for 5 minutes
-    });
-    if (!res.ok) return null;
-
-    return (await res.json()) as DashboardData;
-  } catch {
-    return null;
-  }
+  return fetchFromWikiServer<DashboardData>(
+    "/api/citations/accuracy-dashboard",
+    { revalidate: 300 }
+  );
 }
 
 /**
@@ -148,16 +137,8 @@ function loadDashboardDataFromYaml(): DashboardData | null {
  * Load dashboard data: tries wiki-server API first, falls back to YAML files.
  * Returns the data and the source it came from.
  */
-async function loadDashboardData(): Promise<{
-  data: DashboardData | null;
-  source: "wiki-server" | "local fallback";
-}> {
-  // Try API first (real-time data from PostgreSQL)
-  const apiData = await loadDashboardDataFromApi();
-  if (apiData) return { data: apiData, source: "wiki-server" };
-
-  // Fall back to YAML files on disk
-  return { data: loadDashboardDataFromYaml(), source: "local fallback" };
+async function loadDashboardData() {
+  return withApiFallback(loadDashboardDataFromApi, loadDashboardDataFromYaml);
 }
 
 function StatCard({
@@ -180,7 +161,7 @@ function StatCard({
 }
 
 export default async function CitationAccuracyPage() {
-  const { data, source: dataSource } = await loadDashboardData();
+  const { data, source } = await loadDashboardData();
 
   if (!data) {
     return (
@@ -324,7 +305,7 @@ export default async function CitationAccuracyPage() {
       />
 
       <p className="text-xs text-muted-foreground mt-4">
-        Data source: {dataSource}. Exported{" "}
+        Data source: {dataSourceLabel(source)}. Exported{" "}
         {new Date(data.exportedAt).toLocaleString("en-US", {
           dateStyle: "medium",
           timeStyle: "short",

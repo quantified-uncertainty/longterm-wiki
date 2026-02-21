@@ -26,30 +26,30 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // ---- INSERT INTO claims (supports multi-row) ----
   if (q.includes("insert into") && q.includes('"claims"')) {
     const now = new Date();
-    const fieldsPerRow = 8; // entity_id..source_quote
-    // Count value tuples from SQL: N tuples have N-1 "), (" separators
-    const rowCount = (query.match(/\), \(/g) || []).length + 1;
-    const rows: Record<string, unknown>[] = [];
+    const PARAMS_PER_ROW = 8;
+    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
+    const results: Record<string, unknown>[] = [];
+
     for (let i = 0; i < rowCount; i++) {
-      const offset = i * fieldsPerRow;
+      const off = i * PARAMS_PER_ROW;
       const id = nextId++;
       const row: Record<string, unknown> = {
         id,
-        entity_id: params[offset],
-        entity_type: params[offset + 1],
-        claim_type: params[offset + 2],
-        claim_text: params[offset + 3],
-        value: params[offset + 4],
-        unit: params[offset + 5],
-        confidence: params[offset + 6],
-        source_quote: params[offset + 7],
+        entity_id: params[off],
+        entity_type: params[off + 1],
+        claim_type: params[off + 2],
+        claim_text: params[off + 3],
+        value: params[off + 4],
+        unit: params[off + 5],
+        confidence: params[off + 6],
+        source_quote: params[off + 7],
         created_at: now,
         updated_at: now,
       };
       claimStore.set(id, row);
-      rows.push(row);
+      results.push(row);
     }
-    return rows;
+    return results;
   }
 
   // ---- DELETE FROM claims WHERE entity_id = $1 ----
