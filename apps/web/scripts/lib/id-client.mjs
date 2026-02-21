@@ -4,9 +4,9 @@
  * Used by assign-ids.mjs to allocate numeric IDs atomically when the
  * server is available. Falls back gracefully (returns null) on any failure.
  *
- * Configuration via environment variables:
- *   LONGTERMWIKI_SERVER_URL     — Base URL (e.g. "https://wiki-server.k8s.quantifieduncertainty.org")
- *   LONGTERMWIKI_SERVER_API_KEY — Bearer token for authentication
+ * NOTE: This file runs under plain `node` (no tsx), so it cannot import
+ * from .ts files. The helpers below mirror crux/lib/wiki-server-client.ts.
+ * If you change the shared client, update these too.
  */
 
 const TIMEOUT_MS = 5000;
@@ -19,6 +19,15 @@ function getApiKey() {
   return process.env.LONGTERMWIKI_SERVER_API_KEY || "";
 }
 
+function buildHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  const apiKey = getApiKey();
+  if (apiKey) {
+    headers["Authorization"] = `Bearer ${apiKey}`;
+  }
+  return headers;
+}
+
 /**
  * Check if the ID server is reachable and healthy.
  * @returns {Promise<boolean>}
@@ -28,13 +37,9 @@ export async function isServerAvailable() {
   if (!serverUrl) return false;
 
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
     const res = await fetch(`${serverUrl}/health`, {
-      signal: controller.signal,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    clearTimeout(timer);
 
     if (!res.ok) return false;
 
@@ -58,25 +63,15 @@ export async function allocateId(slug, description) {
   if (!serverUrl) return null;
 
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-    const headers = { "Content-Type": "application/json" };
-    const apiKey = getApiKey();
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
     const body = { slug };
     if (description) body.description = description;
 
     const res = await fetch(`${serverUrl}/api/ids/allocate`, {
       method: "POST",
-      headers,
+      headers: buildHeaders(),
       body: JSON.stringify(body),
-      signal: controller.signal,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    clearTimeout(timer);
 
     if (!res.ok) return null;
 
@@ -102,22 +97,12 @@ export async function allocateBatch(items) {
   if (!serverUrl) return null;
 
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-    const headers = { "Content-Type": "application/json" };
-    const apiKey = getApiKey();
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
     const res = await fetch(`${serverUrl}/api/ids/allocate-batch`, {
       method: "POST",
-      headers,
+      headers: buildHeaders(),
       body: JSON.stringify({ items }),
-      signal: controller.signal,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    clearTimeout(timer);
 
     if (!res.ok) return null;
 

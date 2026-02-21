@@ -1,8 +1,9 @@
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { sessions, sessionPages } from "../schema.js";
+import { parseJsonBody, validationError, invalidJsonError } from "./utils.js";
 
 export const sessionsRoute = new Hono();
 
@@ -44,14 +45,6 @@ const PaginationQuery = z.object({
 
 // ---- Helpers ----
 
-function parseJsonBody(c: Context) {
-  return c.req.json().catch(() => null);
-}
-
-function validationError(c: Context, message: string) {
-  return c.json({ error: "validation_error", message }, 400);
-}
-
 function mapSessionRow(
   r: typeof sessions.$inferSelect,
   pages: string[]
@@ -79,11 +72,7 @@ function mapSessionRow(
 
 sessionsRoute.post("/", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body)
-    return c.json(
-      { error: "invalid_json", message: "Request body must be valid JSON" },
-      400
-    );
+  if (!body) return invalidJsonError(c);
 
   const parsed = CreateSessionSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -136,11 +125,7 @@ sessionsRoute.post("/", async (c) => {
 
 sessionsRoute.post("/batch", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body)
-    return c.json(
-      { error: "invalid_json", message: "Request body must be valid JSON" },
-      400
-    );
+  if (!body) return invalidJsonError(c);
 
   const parsed = CreateBatchSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);

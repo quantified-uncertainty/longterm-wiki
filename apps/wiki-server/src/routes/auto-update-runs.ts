@@ -1,8 +1,9 @@
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { getDb, getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
+import { parseJsonBody, validationError, invalidJsonError, notFoundError } from "./utils.js";
 
 export const autoUpdateRunsRoute = new Hono();
 
@@ -50,14 +51,6 @@ const PaginationQuery = z.object({
 
 // ---- Helpers ----
 
-function parseJsonBody(c: Context) {
-  return c.req.json().catch(() => null);
-}
-
-function validationError(c: Context, message: string) {
-  return c.json({ error: "validation_error", message }, 400);
-}
-
 /** Map a run row + its result rows to the API response shape. */
 function formatRunEntry(
   r: typeof autoUpdateRuns.$inferSelect,
@@ -80,7 +73,7 @@ function formatRunEntry(
     pagesFailed: r.pagesFailed,
     pagesSkipped: r.pagesSkipped,
     newPagesCreated: r.newPagesCreated
-      ? r.newPagesCreated.split(",").filter(Boolean)
+      ? (JSON.parse(r.newPagesCreated) as string[])
       : [],
     results: results.map((entry) => ({
       pageId: entry.pageId,
@@ -97,11 +90,7 @@ function formatRunEntry(
 
 autoUpdateRunsRoute.post("/", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body)
-    return c.json(
-      { error: "invalid_json", message: "Request body must be valid JSON" },
-      400
-    );
+  if (!body) return invalidJsonError(c);
 
   const parsed = RecordRunSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -130,7 +119,9 @@ autoUpdateRunsRoute.post("/", async (c) => {
         pagesUpdated: d.pagesUpdated ?? null,
         pagesFailed: d.pagesFailed ?? null,
         pagesSkipped: d.pagesSkipped ?? null,
-        newPagesCreated: d.newPagesCreated?.join(",") || null,
+        newPagesCreated: d.newPagesCreated?.length
+          ? JSON.stringify(d.newPagesCreated)
+          : null,
       })
       .returning({
         id: autoUpdateRuns.id,
@@ -262,7 +253,7 @@ autoUpdateRunsRoute.get("/:id", async (c) => {
     .where(eq(autoUpdateRuns.id, id));
 
   if (rows.length === 0) {
-    return c.json({ error: "not_found", message: "Run not found" }, 404);
+    return notFoundError(c, "Run not found");
   }
 
   const r = rows[0];

@@ -17,6 +17,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { parseCliArgs } from "../lib/cli.ts";
+import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server-client.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const PAGES_JSON_PATH = join(
@@ -68,7 +69,7 @@ interface SyncPage {
 
 async function syncPages(
   serverUrl: string,
-  apiKey: string,
+  _apiKey: string,
   pages: SyncPage[],
   batchSize: number
 ): Promise<{ upserted: number; errors: number }> {
@@ -83,11 +84,9 @@ async function syncPages(
     try {
       const res = await fetch(`${serverUrl}/api/pages/sync`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: buildHeaders(),
         body: JSON.stringify({ pages: batch }),
+        signal: AbortSignal.timeout(30_000),
       });
 
       if (!res.ok) {
@@ -158,8 +157,8 @@ async function main() {
   const dryRun = args["dry-run"] === true;
   const batchSize = Number(args["batch-size"]) || 50;
 
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  const serverUrl = getServerUrl();
+  const apiKey = getApiKey();
 
   if (!serverUrl) {
     console.error(
