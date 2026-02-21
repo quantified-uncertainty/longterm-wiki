@@ -5,13 +5,17 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory stores simulating Postgres tables ----
 
 let nextQuoteId = 1;
+let nextSnapshotId = 1;
 let quotesStore: Map<string, Record<string, unknown>>; // key: `${page_id}:${footnote}`
 let contentStore: Map<string, Record<string, unknown>>; // key: url
+let snapshotStore: Array<Record<string, unknown>>;
 
 function resetStores() {
   nextQuoteId = 1;
+  nextSnapshotId = 1;
   quotesStore = new Map();
   contentStore = new Map();
+  snapshotStore = [];
 }
 
 function quoteKey(pageId: string, footnote: number) {
@@ -220,6 +224,75 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         inaccurate: rows.filter((r) => r.accuracy_verdict === "inaccurate").length,
       }))
       .sort((a, b) => a.page_id.localeCompare(b.page_id));
+  }
+
+  // --- citation_accuracy_snapshots: INSERT ---
+  if (q.includes("insert into") && q.includes("citation_accuracy_snapshots")) {
+    const pageId = params[0] as string;
+    const totalCitations = params[1] as number;
+    const checkedCitations = params[2] as number;
+    const accurateCount = params[3] as number;
+    const minorIssuesCount = params[4] as number;
+    const inaccurateCount = params[5] as number;
+    const unsupportedCount = params[6] as number;
+    const notVerifiableCount = params[7] as number;
+    const averageScore = params[8];
+    const now = new Date();
+    const row = {
+      id: nextSnapshotId++,
+      page_id: pageId,
+      total_citations: totalCitations,
+      checked_citations: checkedCitations,
+      accurate_count: accurateCount,
+      minor_issues_count: minorIssuesCount,
+      inaccurate_count: inaccurateCount,
+      unsupported_count: unsupportedCount,
+      not_verifiable_count: notVerifiableCount,
+      average_score: averageScore,
+      snapshot_at: now,
+    };
+    snapshotStore.push(row);
+    return [row];
+  }
+
+  // --- citation_accuracy_snapshots: SELECT with WHERE ---
+  if (q.includes("citation_accuracy_snapshots") && q.includes("where") && !q.includes("group by")) {
+    const pageId = params[0] as string;
+    return snapshotStore
+      .filter((r) => r.page_id === pageId)
+      .sort((a, b) => new Date(b.snapshot_at as string).getTime() - new Date(a.snapshot_at as string).getTime());
+  }
+
+  // --- citation_accuracy_snapshots: SELECT with GROUP BY (global trends) ---
+  if (q.includes("citation_accuracy_snapshots") && q.includes("group by")) {
+    // Group by snapshot_at
+    const byTime = new Map<string, Record<string, unknown>[]>();
+    for (const r of snapshotStore) {
+      const key = String(r.snapshot_at);
+      const arr = byTime.get(key) || [];
+      arr.push(r);
+      byTime.set(key, arr);
+    }
+    return Array.from(byTime.entries()).map(([key, rows]) => ({
+      snapshot_at: rows[0].snapshot_at,
+      count: rows.length,
+      total_citations: rows.reduce((s, r) => s + (r.total_citations as number), 0),
+      checked_citations: rows.reduce((s, r) => s + (r.checked_citations as number), 0),
+      accurate_count: rows.reduce((s, r) => s + (r.accurate_count as number), 0),
+      minor_issues_count: rows.reduce((s, r) => s + (r.minor_issues_count as number), 0),
+      inaccurate_count: rows.reduce((s, r) => s + (r.inaccurate_count as number), 0),
+      unsupported_count: rows.reduce((s, r) => s + (r.unsupported_count as number), 0),
+      not_verifiable_count: rows.reduce((s, r) => s + (r.not_verifiable_count as number), 0),
+      average_score: null,
+    }));
+  }
+
+  // --- citation_quotes: SELECT * ORDER BY ... (no LIMIT, no WHERE — for accuracy-dashboard) ---
+  if (q.includes("citation_quotes") && q.includes("order by") && !q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("limit")) {
+    return Array.from(quotesStore.values()).sort((a, b) => {
+      const pc = (a.page_id as string).localeCompare(b.page_id as string);
+      return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
+    });
   }
 
   // --- citation_content: INSERT ... ON CONFLICT DO UPDATE ---
@@ -621,6 +694,133 @@ describe("Citation Server API", () => {
     it("requires url parameter", async () => {
       const res = await app.request("/api/citations/content");
       expect(res.status).toBe(400);
+    });
+  });
+
+  // ---- Mark Accuracy Batch ----
+
+  describe("POST /api/citations/quotes/mark-accuracy-batch", () => {
+    it("marks accuracy for multiple citations", async () => {
+      await upsertQuote(app, "batch-acc", 1);
+      await upsertQuote(app, "batch-acc", 2);
+      await upsertQuote(app, "batch-acc", 3);
+
+      const res = await postJson(app, "/api/citations/quotes/mark-accuracy-batch", {
+        items: [
+          { pageId: "batch-acc", footnote: 1, verdict: "accurate", score: 0.95 },
+          { pageId: "batch-acc", footnote: 2, verdict: "inaccurate", score: 0.3, issues: "Wrong number" },
+          { pageId: "batch-acc", footnote: 3, verdict: "minor_issues", score: 0.7, verificationDifficulty: "easy" },
+        ],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.updated).toBe(3);
+      expect(body.results).toHaveLength(3);
+      expect(body.results[1].verdict).toBe("inaccurate");
+    });
+
+    it("rejects invalid verdict in batch", async () => {
+      const res = await postJson(app, "/api/citations/quotes/mark-accuracy-batch", {
+        items: [
+          { pageId: "batch-acc", footnote: 1, verdict: "maybe", score: 0.5 },
+        ],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects empty batch", async () => {
+      const res = await postJson(app, "/api/citations/quotes/mark-accuracy-batch", {
+        items: [],
+      });
+      expect(res.status).toBe(400);
+    });
+  });
+
+  // ---- Accuracy Snapshot ----
+
+  describe("POST /api/citations/accuracy-snapshot", () => {
+    it("creates snapshots for pages with accuracy data", async () => {
+      await upsertQuote(app, "snap-page", 1);
+      await upsertQuote(app, "snap-page", 2);
+
+      await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "snap-page", footnote: 1, verdict: "accurate", score: 0.9,
+      });
+      await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "snap-page", footnote: 2, verdict: "inaccurate", score: 0.3,
+      });
+
+      const res = await postJson(app, "/api/citations/accuracy-snapshot", {});
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.snapshotCount).toBe(1);
+      expect(body.pages).toContain("snap-page");
+    });
+  });
+
+  // ---- Accuracy Trends ----
+
+  describe("GET /api/citations/accuracy-trends", () => {
+    it("returns trends for a specific page", async () => {
+      await upsertQuote(app, "trend-page", 1);
+      await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "trend-page", footnote: 1, verdict: "accurate", score: 0.9,
+      });
+      await postJson(app, "/api/citations/accuracy-snapshot", {});
+
+      const res = await app.request("/api/citations/accuracy-trends?page_id=trend-page");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.pageId).toBe("trend-page");
+      expect(body.snapshots).toHaveLength(1);
+    });
+
+    it("returns global trends when no page_id", async () => {
+      const res = await app.request("/api/citations/accuracy-trends");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.snapshots).toBeDefined();
+    });
+  });
+
+  // ---- Accuracy Dashboard ----
+
+  describe("GET /api/citations/accuracy-dashboard", () => {
+    it("returns full dashboard data", async () => {
+      await upsertQuote(app, "dash-page", 1, "First claim");
+      await upsertQuote(app, "dash-page", 2, "Second claim");
+
+      await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "dash-page", footnote: 1, verdict: "accurate", score: 0.9,
+      });
+      await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "dash-page", footnote: 2, verdict: "inaccurate", score: 0.3,
+        issues: "Wrong number",
+      });
+
+      const res = await app.request("/api/citations/accuracy-dashboard");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.summary).toBeDefined();
+      expect(body.summary.totalCitations).toBe(2);
+      expect(body.summary.checkedCitations).toBe(2);
+      expect(body.summary.accurateCitations).toBe(1);
+      expect(body.summary.inaccurateCitations).toBe(1);
+
+      expect(body.pages).toHaveLength(1);
+      expect(body.pages[0].pageId).toBe("dash-page");
+
+      expect(body.flaggedCitations).toHaveLength(1);
+      expect(body.flaggedCitations[0].verdict).toBe("inaccurate");
+    });
+
+    it("returns empty dashboard when no quotes", async () => {
+      const res = await app.request("/api/citations/accuracy-dashboard");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.summary.totalCitations).toBe(0);
+      expect(body.pages).toHaveLength(0);
     });
   });
 

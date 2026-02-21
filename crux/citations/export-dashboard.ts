@@ -21,6 +21,7 @@ import yaml from 'js-yaml';
 import { citationQuotes, PROJECT_ROOT } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
+import { isServerAvailable, getAccuracyDashboard } from '../lib/wiki-server-client.ts';
 
 // ---------------------------------------------------------------------------
 // Types (shared with the dashboard — keep in sync)
@@ -297,8 +298,12 @@ function truncateClaim(text: string): string {
   return text.slice(0, MAX_CLAIM_LENGTH) + '...';
 }
 
-export function exportDashboardData(): { path: string; data: DashboardExport } | null {
-  const data = buildDashboardExport();
+/**
+ * Export dashboard data to YAML files.
+ * @param fromDbData - If provided, uses this data instead of building from SQLite
+ */
+export function exportDashboardData(fromDbData?: DashboardExport | null): { path: string; data: DashboardExport } | null {
+  const data = fromDbData ?? buildDashboardExport();
   if (!data) return null;
   mkdirSync(ACCURACY_DIR, { recursive: true });
   mkdirSync(ACCURACY_PAGES_DIR, { recursive: true });
@@ -355,12 +360,30 @@ export function exportDashboardData(): { path: string; data: DashboardExport } |
 // CLI
 // ---------------------------------------------------------------------------
 
-function main() {
+async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const json = args.json === true;
+  const fromDb = args['from-db'] === true;
   const colors = getColors(json);
 
-  const result = exportDashboardData();
+  let dbData: DashboardExport | null = null;
+  if (fromDb) {
+    const serverUp = await isServerAvailable();
+    if (!serverUp) {
+      console.log(`${colors.red}Wiki server not available. Set LONGTERMWIKI_SERVER_URL and LONGTERMWIKI_SERVER_API_KEY.${colors.reset}`);
+      process.exit(1);
+    }
+    dbData = await getAccuracyDashboard();
+    if (!dbData) {
+      console.log(`${colors.yellow}No accuracy data returned from wiki server.${colors.reset}`);
+      process.exit(0);
+    }
+    if (!json) {
+      console.log(`${colors.dim}Using data from wiki-server DB${colors.reset}`);
+    }
+  }
+
+  const result = exportDashboardData(dbData);
 
   if (!result) {
     if (json) {
