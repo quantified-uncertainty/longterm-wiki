@@ -1,5 +1,5 @@
 CREATE TABLE "session_pages" (
-	"session_id" bigserial NOT NULL,
+	"session_id" bigint NOT NULL,
 	"page_id" text NOT NULL,
 	CONSTRAINT "session_pages_session_id_page_id_pk" PRIMARY KEY("session_id","page_id")
 );
@@ -17,6 +17,7 @@ CREATE TABLE "sessions" (
 	"checks_yaml" text,
 	"issues_json" jsonb,
 	"learnings_json" jsonb,
+	"recommendations_json" jsonb,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint

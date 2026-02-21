@@ -18,6 +18,7 @@ let sessionStore: Array<{
   checks_yaml: string | null;
   issues_json: unknown;
   learnings_json: unknown;
+  recommendations_json: unknown;
   created_at: Date;
 }> = [];
 
@@ -137,6 +138,7 @@ vi.mock("../db.js", async () => {
         checks_yaml: params[8] as string | null,
         issues_json: params[9] ?? null,
         learnings_json: params[10] ?? null,
+        recommendations_json: params[11] ?? null,
         created_at: new Date(),
       };
       sessionStore.push(row);

@@ -305,6 +305,7 @@ export interface SessionApiEntry {
   checksYaml?: string | null;
   issuesJson?: unknown;
   learningsJson?: unknown;
+  recommendationsJson?: unknown;
   pages?: string[];
 }
 
@@ -331,6 +332,10 @@ export interface SessionEntry {
   duration: string | null;
   cost: string | null;
   prUrl: string | null;
+  checksYaml: string | null;
+  issuesJson: unknown;
+  learningsJson: unknown;
+  recommendationsJson: unknown;
   pages: string[];
   createdAt: string;
 }

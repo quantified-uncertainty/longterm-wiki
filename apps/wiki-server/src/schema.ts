@@ -3,6 +3,7 @@ import {
   pgSequence,
   text,
   integer,
+  bigint,
   bigserial,
   boolean,
   real,
@@ -194,6 +195,7 @@ export const sessions = pgTable(
     checksYaml: text("checks_yaml"),
     issuesJson: jsonb("issues_json"),
     learningsJson: jsonb("learnings_json"),
+    recommendationsJson: jsonb("recommendations_json"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -207,7 +209,7 @@ export const sessions = pgTable(
 export const sessionPages = pgTable(
   "session_pages",
   {
-    sessionId: bigserial("session_id", { mode: "number" })
+    sessionId: bigint("session_id", { mode: "number" })
       .notNull()
       .references(() => sessions.id, { onDelete: "cascade" }),
     pageId: text("page_id").notNull(),

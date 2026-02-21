@@ -822,7 +822,7 @@
       "columns": {
         "session_id": {
           "name": "session_id",
-          "type": "bigserial",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
@@ -951,6 +951,12 @@
         },
         "learnings_json": {
           "name": "learnings_json",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recommendations_json": {
+          "name": "recommendations_json",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false

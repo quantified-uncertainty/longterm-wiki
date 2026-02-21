@@ -25,7 +25,12 @@ const CreateSessionSchema = z.object({
   checksYaml: z.string().max(10000).nullable().optional(),
   issuesJson: z.unknown().nullable().optional(),
   learningsJson: z.unknown().nullable().optional(),
-  pages: z.array(z.string().min(1).max(200)).optional().default([]),
+  recommendationsJson: z.unknown().nullable().optional(),
+  pages: z
+    .array(z.string().min(1).max(200))
+    .optional()
+    .default([])
+    .transform((arr) => [...new Set(arr)]),
 });
 
 const CreateBatchSchema = z.object({
@@ -45,6 +50,29 @@ function parseJsonBody(c: Context) {
 
 function validationError(c: Context, message: string) {
   return c.json({ error: "validation_error", message }, 400);
+}
+
+function mapSessionRow(
+  r: typeof sessions.$inferSelect,
+  pages: string[]
+) {
+  return {
+    id: r.id,
+    date: r.date,
+    branch: r.branch,
+    title: r.title,
+    summary: r.summary,
+    model: r.model,
+    duration: r.duration,
+    cost: r.cost,
+    prUrl: r.prUrl,
+    checksYaml: r.checksYaml,
+    issuesJson: r.issuesJson,
+    learningsJson: r.learningsJson,
+    recommendationsJson: r.recommendationsJson,
+    pages,
+    createdAt: r.createdAt,
+  };
 }
 
 // ---- POST / (create single session) ----
@@ -78,6 +106,7 @@ sessionsRoute.post("/", async (c) => {
         checksYaml: d.checksYaml ?? null,
         issuesJson: d.issuesJson ?? null,
         learningsJson: d.learningsJson ?? null,
+        recommendationsJson: d.recommendationsJson ?? null,
       })
       .returning({
         id: sessions.id,
@@ -137,6 +166,7 @@ sessionsRoute.post("/batch", async (c) => {
           checksYaml: d.checksYaml ?? null,
           issuesJson: d.issuesJson ?? null,
           learningsJson: d.learningsJson ?? null,
+          recommendationsJson: d.recommendationsJson ?? null,
         })
         .returning({ id: sessions.id, title: sessions.title });
 
@@ -200,22 +230,7 @@ sessionsRoute.get("/", async (c) => {
   }
 
   return c.json({
-    sessions: rows.map((r) => ({
-      id: r.id,
-      date: r.date,
-      branch: r.branch,
-      title: r.title,
-      summary: r.summary,
-      model: r.model,
-      duration: r.duration,
-      cost: r.cost,
-      prUrl: r.prUrl,
-      checksYaml: r.checksYaml,
-      issuesJson: r.issuesJson,
-      learningsJson: r.learningsJson,
-      pages: pageMap.get(r.id) || [],
-      createdAt: r.createdAt,
-    })),
+    sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
     total,
     limit,
     offset,
@@ -262,19 +277,7 @@ sessionsRoute.get("/by-page", async (c) => {
   }
 
   return c.json({
-    sessions: rows.map((r) => ({
-      id: r.id,
-      date: r.date,
-      branch: r.branch,
-      title: r.title,
-      summary: r.summary,
-      model: r.model,
-      duration: r.duration,
-      cost: r.cost,
-      prUrl: r.prUrl,
-      pages: pageMap.get(r.id) || [],
-      createdAt: r.createdAt,
-    })),
+    sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
   });
 });
 
@@ -354,18 +357,6 @@ sessionsRoute.get("/page-changes", async (c) => {
     .orderBy(desc(sessions.date), desc(sessions.id));
 
   return c.json({
-    sessions: rows.map((r) => ({
-      id: r.id,
-      date: r.date,
-      branch: r.branch,
-      title: r.title,
-      summary: r.summary,
-      model: r.model,
-      duration: r.duration,
-      cost: r.cost,
-      prUrl: r.prUrl,
-      pages: pageMap.get(r.id) || [],
-      createdAt: r.createdAt,
-    })),
+    sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])),
   });
 });

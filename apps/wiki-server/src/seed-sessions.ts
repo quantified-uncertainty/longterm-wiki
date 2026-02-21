@@ -103,6 +103,7 @@ async function seedSessions() {
     checksYaml: string | null;
     issuesJson: string | null;
     learningsJson: string | null;
+    recommendationsJson: string | null;
     pages: string[];
   }> = [];
 
@@ -148,6 +149,10 @@ async function seedSessions() {
         learningsJson:
           parsed.learnings && Array.isArray(parsed.learnings)
             ? JSON.stringify(parsed.learnings)
+            : null,
+        recommendationsJson:
+          parsed.recommendations && Array.isArray(parsed.recommendations)
+            ? JSON.stringify(parsed.recommendations)
             : null,
         pages,
       });
@@ -198,8 +203,8 @@ async function seedSessions() {
 
     for (const s of allSessions) {
       const rows = await q`
-        INSERT INTO sessions (date, branch, title, summary, model, duration, cost, pr_url, checks_yaml, issues_json, learnings_json)
-        VALUES (${s.date}::date, ${s.branch}, ${s.title}, ${s.summary}, ${s.model}, ${s.duration}, ${s.cost}, ${s.prUrl}, ${s.checksYaml}, ${s.issuesJson ? JSON.parse(s.issuesJson) : null}::jsonb, ${s.learningsJson ? JSON.parse(s.learningsJson) : null}::jsonb)
+        INSERT INTO sessions (date, branch, title, summary, model, duration, cost, pr_url, checks_yaml, issues_json, learnings_json, recommendations_json)
+        VALUES (${s.date}::date, ${s.branch}, ${s.title}, ${s.summary}, ${s.model}, ${s.duration}, ${s.cost}, ${s.prUrl}, ${s.checksYaml}, ${s.issuesJson ? JSON.parse(s.issuesJson) : null}::jsonb, ${s.learningsJson ? JSON.parse(s.learningsJson) : null}::jsonb, ${s.recommendationsJson ? JSON.parse(s.recommendationsJson) : null}::jsonb)
         RETURNING id
       `;
       const sessionId = (rows as unknown as Array<{ id: number }>)[0].id;
