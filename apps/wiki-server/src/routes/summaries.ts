@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
 
 export const summariesRoute = new Hono();
@@ -111,7 +112,7 @@ summariesRoute.post("/", async (c) => {
       entityType: summaries.entityType,
     });
 
-  return c.json(rows[0], 201);
+  return c.json(firstOrThrow(rows, "summary upsert"), 201);
 });
 
 // ---- POST /batch (upsert multiple summaries) ----
