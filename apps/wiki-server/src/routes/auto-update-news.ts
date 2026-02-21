@@ -42,6 +42,10 @@ const PaginationQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+const DashboardQuery = z.object({
+  runs: z.coerce.number().int().min(1).max(50).default(10),
+});
+
 // ---- Helpers ----
 
 function mapNewsRow(r: typeof autoUpdateNewsItems.$inferSelect) {
@@ -180,11 +184,10 @@ autoUpdateNewsRoute.get("/by-page/:pageId", async (c) => {
 // ---- GET /dashboard (optimized endpoint for news dashboard, last N runs) ----
 
 autoUpdateNewsRoute.get("/dashboard", async (c) => {
-  const maxRuns = Math.min(
-    parseInt(c.req.query("runs") || "10", 10),
-    50
-  );
+  const parsed = DashboardQuery.safeParse(c.req.query());
+  if (!parsed.success) return validationError(c, parsed.error.message);
 
+  const { runs: maxRuns } = parsed.data;
   const db = getDrizzleDb();
 
   // Get the last N run IDs

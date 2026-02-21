@@ -8,9 +8,58 @@
 
 export type DataSource = "api" | "local";
 
+export type ApiErrorReason =
+  | { type: "not-configured" }
+  | { type: "connection-error"; message: string }
+  | { type: "server-error"; status: number; statusText: string };
+
+export type FetchResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: ApiErrorReason };
+
 export interface WithSource<T> {
   data: T;
   source: DataSource;
+  apiError?: ApiErrorReason;
+}
+
+/**
+ * Fetch JSON from the wiki-server API with detailed error information.
+ * Returns a discriminated union so callers can distinguish between
+ * "not configured", "connection failed", and "server error".
+ */
+export async function fetchDetailed<T>(
+  path: string,
+  options?: { revalidate?: number }
+): Promise<FetchResult<T>> {
+  const config = getWikiServerConfig();
+  if (!config) return { ok: false, error: { type: "not-configured" } };
+
+  try {
+    const res = await fetch(`${config.serverUrl}${path}`, {
+      headers: config.headers,
+      next: { revalidate: options?.revalidate ?? 300 },
+    });
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: {
+          type: "server-error",
+          status: res.status,
+          statusText: res.statusText,
+        },
+      };
+    }
+    return { ok: true, data: (await res.json()) as T };
+  } catch (err) {
+    return {
+      ok: false,
+      error: {
+        type: "connection-error",
+        message: err instanceof Error ? err.message : String(err),
+      },
+    };
+  }
 }
 
 /**
@@ -21,19 +70,8 @@ export async function fetchFromWikiServer<T>(
   path: string,
   options?: { revalidate?: number }
 ): Promise<T | null> {
-  const config = getWikiServerConfig();
-  if (!config) return null;
-
-  try {
-    const res = await fetch(`${config.serverUrl}${path}`, {
-      headers: config.headers,
-      next: { revalidate: options?.revalidate ?? 300 },
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
+  const result = await fetchDetailed<T>(path, options);
+  return result.ok ? result.data : null;
 }
 
 /**
@@ -58,22 +96,37 @@ export function getWikiServerConfig(): {
 /**
  * Try loading data from the wiki-server API, falling back to a local loader.
  * Returns the data along with its source ("api" or "local").
+ *
+ * The apiLoader can return either:
+ * - `FetchResult<T>` (error-aware) — apiError is threaded through
+ * - `T | null` (legacy) — no error detail available
  */
 export async function withApiFallback<T>(
-  apiLoader: () => Promise<T | null>,
+  apiLoader: () => Promise<FetchResult<T> | T | null>,
   localLoader: () => T
 ): Promise<WithSource<T>>;
 export async function withApiFallback<T>(
-  apiLoader: () => Promise<T | null>,
+  apiLoader: () => Promise<FetchResult<T> | T | null>,
   localLoader: () => T | null
 ): Promise<WithSource<T | null>>;
 export async function withApiFallback<T>(
-  apiLoader: () => Promise<T | null>,
+  apiLoader: () => Promise<FetchResult<T> | T | null>,
   localLoader: () => T | null
 ): Promise<WithSource<T | null>> {
-  const apiData = await apiLoader();
-  if (apiData !== null) {
-    return { data: apiData, source: "api" };
+  const result = await apiLoader();
+
+  // Error-aware FetchResult path
+  if (result !== null && typeof result === "object" && "ok" in result) {
+    const fetchResult = result as FetchResult<T>;
+    if (fetchResult.ok) {
+      return { data: fetchResult.data, source: "api" };
+    }
+    return { data: localLoader(), source: "local", apiError: fetchResult.error };
+  }
+
+  // Legacy path: T | null
+  if (result !== null) {
+    return { data: result as T, source: "api" };
   }
   return { data: localLoader(), source: "local" };
 }
