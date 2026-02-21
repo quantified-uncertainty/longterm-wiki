@@ -11,7 +11,7 @@ let seqIsCalled = true;
 // In-memory store simulating the entity_ids table
 let store: Map<
   string,
-  { numeric_id: number; slug: string; description: string | null; created_at: string }
+  { numeric_id: number; slug: string; description: string | null; created_at: Date }
 >;
 
 function resetStore() {
@@ -22,34 +22,105 @@ function resetStore() {
 }
 
 /**
- * Minimal tagged-template SQL mock. Inspects the first chunk of the query
- * string to decide which "query" is being run, then operates on the
- * in-memory store.
+ * Extract column names from SELECT or RETURNING clauses in Drizzle-generated SQL.
+ * Returns array of column names (snake_case) or null for expression positions.
+ */
+function extractColumns(query: string): (string | null)[] {
+  const q = query.trim();
+
+  // Try RETURNING first (at end of INSERT/UPDATE)
+  let clauseMatch = q.match(/returning\s+(.+?)$/is);
+  if (!clauseMatch) {
+    // Try SELECT
+    clauseMatch = q.match(/^select\s+(.+?)\s+from\s/is);
+  }
+  if (!clauseMatch) return [];
+
+  const clause = clauseMatch[1];
+
+  // Split by commas, respecting parentheses
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of clause) {
+    if (ch === "(") depth++;
+    else if (ch === ")") depth--;
+    else if (ch === "," && depth === 0) {
+      parts.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim()) parts.push(current.trim());
+
+  // Extract the last quoted identifier from each part
+  return parts.map((part) => {
+    const matches = [...part.matchAll(/"([^"]+)"/g)];
+    if (matches.length > 0) {
+      return matches[matches.length - 1][1];
+    }
+    return null; // expression without quoted name (e.g., count(*))
+  });
+}
+
+/**
+ * Create a thenable result that supports .values() for Drizzle's query builder.
+ *
+ * Drizzle's postgres-js adapter calls:
+ * - client.unsafe(query, params) for raw SQL → expects row objects
+ * - client.unsafe(query, params).values() for query builder → expects positional arrays
+ */
+function createQueryResult(rows: unknown[], query: string): any {
+  const promise = Promise.resolve(rows);
+  return {
+    then: promise.then.bind(promise),
+    catch: promise.catch.bind(promise),
+    finally: promise.finally.bind(promise),
+    [Symbol.toStringTag]: "Promise",
+    count: rows.length,
+    values: () => {
+      const cols = extractColumns(query);
+      const arrayRows = rows.map((row: any) => {
+        if (cols.length > 0 && cols.some((c) => c !== null)) {
+          return cols.map((col, i) => {
+            if (col !== null) return row[col];
+            // Fallback for expressions without quoted names (like count(*))
+            return Object.values(row)[i];
+          });
+        }
+        return Object.values(row);
+      });
+      return createQueryResult(arrayRows, query);
+    },
+  };
+}
+
+/**
+ * Mock SQL handler for Drizzle's `unsafe()` calls and raw tagged-template queries.
+ * Drizzle generates SQL with quoted identifiers and $N placeholders.
  */
 function createMockSql() {
-  const mockSql = (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const query = strings.join("?").trim();
+  function dispatch(query: string, params: unknown[]): unknown[] {
+    const q = query.toLowerCase();
 
     // SELECT COUNT(*)
-    if (query.includes("SELECT COUNT(*)")) {
+    if (q.includes("count(*)") && q.includes("entity_ids")) {
       return [{ count: store.size }];
     }
 
     // SELECT last_value (sequence health check)
-    if (query.includes("last_value")) {
+    if (q.includes("last_value")) {
       return [{ last_value: lastSeqVal, is_called: seqIsCalled }];
     }
 
-    // INSERT INTO entity_ids ... ON CONFLICT (slug) DO NOTHING RETURNING ...
-    if (query.includes("INSERT INTO entity_ids")) {
-      const slug = values[0] as string;
-      const description = (values[1] as string) ?? null;
+    // INSERT INTO entity_ids ... ON CONFLICT ... DO NOTHING ... RETURNING
+    if (q.includes("insert into") && q.includes("entity_ids") && q.includes("do nothing")) {
+      const slug = params[0] as string;
+      const description = (params[1] as string) ?? null;
 
       if (store.has(slug)) {
-        // ON CONFLICT — return empty (DO NOTHING)
-        const result: unknown[] = [];
-        Object.defineProperty(result, "count", { value: 0 });
-        return result;
+        return [];
       }
 
       const numeric_id = nextSeqVal++;
@@ -58,60 +129,78 @@ function createMockSql() {
         numeric_id,
         slug,
         description,
-        created_at: new Date().toISOString(),
+        created_at: new Date(),
       };
       store.set(slug, row);
-      const result = [row];
-      Object.defineProperty(result, "count", { value: 1 });
-      return result;
+      return [row];
     }
 
-    // SELECT ... WHERE slug = ?
-    if (query.includes("WHERE slug =")) {
-      const slug = values[0] as string;
+    // SELECT ... WHERE ... slug = $1
+    if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
+      const slug = params[0] as string;
       const row = store.get(slug);
       return row ? [row] : [];
     }
 
-    // SELECT ... ORDER BY numeric_id LIMIT ? OFFSET ?
-    if (query.includes("ORDER BY numeric_id")) {
-      const limit = values[0] as number;
-      const offset = values[1] as number;
+    // SELECT ... ORDER BY ... LIMIT ... OFFSET
+    if (q.includes("entity_ids") && q.includes("order by") && q.includes("limit")) {
+      // Drizzle may send limit/offset as params or inline them
+      // Drizzle omits OFFSET when 0, so params[1] may be undefined
+      const limit = (params[0] as number) || 100;
+      const offset = (params[1] as number) || 0;
       const all = Array.from(store.values()).sort(
         (a, b) => a.numeric_id - b.numeric_id
       );
       return all.slice(offset, offset + limit);
     }
 
-    // CREATE TABLE / DO $$ (init)
-    if (query.includes("CREATE TABLE") || query.includes("DO $$")) {
-      return [];
-    }
-
     // setval
-    if (query.includes("setval")) {
-      const val = values[0] as number;
+    if (q.includes("setval")) {
+      const val = params[0] as number;
       lastSeqVal = val;
       nextSeqVal = val + 1;
       return [];
     }
 
     return [];
+  }
+
+  // Tagged-template handler (for raw SQL like health check sequence query)
+  const mockSql: any = (strings: TemplateStringsArray, ...values: unknown[]) => {
+    const query = strings.join("$").trim();
+    return dispatch(query, values);
   };
 
-  // Transaction support: pass through to the same mock
-  mockSql.begin = async (fn: (tx: typeof mockSql) => Promise<void>) => {
-    await fn(mockSql);
+  // Drizzle calls client.unsafe(query, params) for all query-builder operations.
+  // The result must be a thenable with a .values() method that returns positional arrays.
+  mockSql.unsafe = (query: string, params: unknown[] = []) => {
+    return createQueryResult(dispatch(query, params), query);
   };
+
+  // Transaction support: Drizzle calls client.begin(fn) with a transaction client
+  mockSql.begin = async (fn: (tx: typeof mockSql) => Promise<any>) => {
+    return await fn(mockSql);
+  };
+
+  // Reserve/release connection (drizzle internals)
+  mockSql.reserve = () => Promise.resolve(mockSql);
+  mockSql.release = () => {};
+
+  // Drizzle's postgres-js driver reads client.options.parsers/serializers
+  mockSql.options = { parsers: {}, serializers: {} };
 
   return mockSql;
 }
 
 // Mock the db module before importing routes
-vi.mock("../db.js", () => {
+vi.mock("../db.js", async () => {
+  const { drizzle } = await import("drizzle-orm/postgres-js");
+  const schema = await import("../schema.js");
   const mockSql = createMockSql();
+  const mockDrizzle = drizzle(mockSql, { schema });
   return {
     getDb: () => mockSql,
+    getDrizzleDb: () => mockDrizzle,
     initDb: vi.fn(),
     closeDb: vi.fn(),
   };

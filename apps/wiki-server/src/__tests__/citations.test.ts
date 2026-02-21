@@ -21,43 +21,125 @@ function quoteKey(pageId: string, footnote: number) {
 }
 
 /**
- * Mock tagged-template SQL that dispatches based on query text.
- * Handles citation_quotes, citation_content, and entity_ids tables.
+ * Extract column names from SELECT or RETURNING clauses in Drizzle-generated SQL.
+ * Only extracts top-level quoted identifiers (not those inside function calls).
+ */
+function extractColumns(query: string): (string | null)[] {
+  const q = query.trim();
+
+  // Try RETURNING first (at end of INSERT/UPDATE)
+  let clauseMatch = q.match(/returning\s+(.+?)$/is);
+  if (!clauseMatch) {
+    // Try SELECT
+    clauseMatch = q.match(/^select\s+(.+?)\s+from\s/is);
+  }
+  if (!clauseMatch) return [];
+
+  const clause = clauseMatch[1];
+
+  // Split by commas, respecting parentheses
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of clause) {
+    if (ch === "(") depth++;
+    else if (ch === ")") depth--;
+    else if (ch === "," && depth === 0) {
+      parts.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim()) parts.push(current.trim());
+
+  // Extract the last top-level quoted identifier from each part
+  return parts.map((part) => {
+    let d = 0;
+    let lastTopLevel: string | null = null;
+    let i = 0;
+    while (i < part.length) {
+      if (part[i] === "(") { d++; i++; }
+      else if (part[i] === ")") { d--; i++; }
+      else if (part[i] === '"' && d === 0) {
+        const close = part.indexOf('"', i + 1);
+        if (close > i) {
+          lastTopLevel = part.substring(i + 1, close);
+          i = close + 1;
+        } else { i++; }
+      } else { i++; }
+    }
+    return lastTopLevel;
+  });
+}
+
+/**
+ * Create a thenable result that supports .values() for Drizzle's query builder.
+ */
+function createQueryResult(rows: unknown[], query: string): any {
+  const promise = Promise.resolve(rows);
+  return {
+    then: promise.then.bind(promise),
+    catch: promise.catch.bind(promise),
+    finally: promise.finally.bind(promise),
+    [Symbol.toStringTag]: "Promise",
+    count: rows.length,
+    values: () => {
+      const cols = extractColumns(query);
+      const arrayRows = rows.map((row: any) => {
+        if (cols.length > 0 && cols.some((c) => c !== null)) {
+          return cols.map((col, i) => {
+            if (col !== null) return row[col];
+            return Object.values(row)[i];
+          });
+        }
+        return Object.values(row);
+      });
+      return createQueryResult(arrayRows, query);
+    },
+  };
+}
+
+/**
+ * Mock SQL handler for Drizzle's `unsafe()` calls.
+ * Dispatches based on query text patterns.
  */
 function createMockSql() {
-  const mockSql = (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const query = strings.join("?").trim();
+  function dispatch(query: string, params: unknown[]): unknown[] {
+    const q = query.toLowerCase();
 
-    // --- Schema creation (initDb) ---
-    if (
-      query.includes("CREATE TABLE") ||
-      query.includes("CREATE INDEX") ||
-      query.includes("CREATE SEQUENCE") ||
-      query.includes("DO $$")
-    ) {
-      return [];
-    }
+    // --- citation_quotes: INSERT ... ON CONFLICT DO UPDATE ---
+    if (q.includes("insert into") && q.includes("citation_quotes") && q.includes("do update")) {
+      // Drizzle params order: VALUES columns (page_id, footnote, url, ...), then SET columns
+      const pageId = params[0] as string;
+      const footnote = params[1] as number;
+      const url = params[2];
+      const resourceId = params[3];
+      const claimText = params[4] as string;
+      const claimContext = params[5];
+      const sourceQuote = params[6];
+      const sourceLocation = params[7];
+      const quoteVerified = params[8] ?? false;
+      const verificationMethod = params[9];
+      const verificationScore = params[10];
+      const sourceTitle = params[11];
+      const sourceType = params[12];
+      const extractionModel = params[13];
 
-    // --- citation_quotes: INSERT ... ON CONFLICT ---
-    if (query.includes("INSERT INTO citation_quotes")) {
-      const [pageId, footnote, url, resourceId, claimText, claimContext,
-        sourceQuote, sourceLocation, quoteVerified, verificationMethod,
-        verificationScore, sourceTitle, sourceType, extractionModel] = values;
-
-      const key = quoteKey(pageId as string, footnote as number);
-      const now = new Date().toISOString();
+      const key = quoteKey(pageId, footnote);
+      const now = new Date();
       const existing = quotesStore.get(key);
 
       if (existing) {
-        // ON CONFLICT DO UPDATE
         const updated = {
           ...existing,
-          url, resource_id: resourceId, claim_text: claimText,
-          claim_context: claimContext, source_quote: sourceQuote,
-          source_location: sourceLocation, quote_verified: quoteVerified ?? false,
-          verification_method: verificationMethod, verification_score: verificationScore,
-          source_title: sourceTitle, source_type: sourceType,
-          extraction_model: extractionModel, updated_at: now,
+          page_id: pageId, footnote, url, resource_id: resourceId,
+          claim_text: claimText, claim_context: claimContext,
+          source_quote: sourceQuote, source_location: sourceLocation,
+          quote_verified: quoteVerified, verification_method: verificationMethod,
+          verification_score: verificationScore, source_title: sourceTitle,
+          source_type: sourceType, extraction_model: extractionModel,
+          updated_at: now,
         };
         quotesStore.set(key, updated);
         return [updated];
@@ -68,8 +150,8 @@ function createMockSql() {
         page_id: pageId, footnote, url, resource_id: resourceId,
         claim_text: claimText, claim_context: claimContext,
         source_quote: sourceQuote, source_location: sourceLocation,
-        quote_verified: quoteVerified ?? false,
-        verification_method: verificationMethod, verification_score: verificationScore,
+        quote_verified: quoteVerified, verification_method: verificationMethod,
+        verification_score: verificationScore,
         verified_at: null, source_title: sourceTitle, source_type: sourceType,
         extraction_model: extractionModel,
         accuracy_verdict: null, accuracy_issues: null, accuracy_score: null,
@@ -81,10 +163,18 @@ function createMockSql() {
       return [row];
     }
 
-    // --- citation_quotes: UPDATE ... mark-accuracy ---
-    if (query.includes("UPDATE citation_quotes") && query.includes("accuracy_verdict")) {
-      const [verdict, score, issues, supportingQuotes, difficulty, pageId, footnote] = values;
-      const key = quoteKey(pageId as string, footnote as number);
+    // --- citation_quotes: UPDATE ... accuracy_verdict ---
+    // Use startsWith to avoid matching SELECT queries that contain "updated_at"
+    if (q.startsWith("update") && q.includes("citation_quotes") && q.includes("accuracy_verdict")) {
+      // Drizzle SET order: verdict, score, issues, supportingQuotes, difficulty, then WHERE: pageId, footnote
+      const verdict = params[0];
+      const score = params[1];
+      const issues = params[2];
+      const supportingQuotes = params[3];
+      const difficulty = params[4];
+      const pageId = params[5] as string;
+      const footnote = params[6] as number;
+      const key = quoteKey(pageId, footnote);
       const existing = quotesStore.get(key);
       if (!existing) return [];
       existing.accuracy_verdict = verdict;
@@ -92,37 +182,68 @@ function createMockSql() {
       existing.accuracy_issues = issues;
       existing.accuracy_supporting_quotes = supportingQuotes;
       existing.verification_difficulty = difficulty;
-      existing.accuracy_checked_at = new Date().toISOString();
-      existing.updated_at = new Date().toISOString();
+      existing.accuracy_checked_at = new Date();
+      existing.updated_at = new Date();
       return [existing];
     }
 
-    // --- citation_quotes: UPDATE ... mark-verified ---
-    if (query.includes("UPDATE citation_quotes") && query.includes("quote_verified")) {
-      const [method, score, pageId, footnote] = values;
-      const key = quoteKey(pageId as string, footnote as number);
+    // --- citation_quotes: UPDATE ... quote_verified ---
+    if (q.startsWith("update") && q.includes("citation_quotes") && q.includes("quote_verified")) {
+      // Drizzle SET: quoteVerified=true ($1), method ($2), score ($3), then WHERE: pageId ($4), footnote ($5)
+      // params[0] = true (quoteVerified value)
+      const method = params[1];
+      const score = params[2];
+      const pageId = params[3] as string;
+      const footnote = params[4] as number;
+      const key = quoteKey(pageId, footnote);
       const existing = quotesStore.get(key);
       if (!existing) return [];
       existing.quote_verified = true;
       existing.verification_method = method;
       existing.verification_score = score;
-      existing.verified_at = new Date().toISOString();
-      existing.updated_at = new Date().toISOString();
+      existing.verified_at = new Date();
+      existing.updated_at = new Date();
       return [existing];
     }
 
-    // --- citation_quotes: SELECT * WHERE page_id ---
-    if (query.includes("FROM citation_quotes") && query.includes("WHERE page_id")) {
-      const pageId = values[0] as string;
+    // --- citation_quotes: Broken quotes (WHERE quote_verified AND verification_score IS NOT NULL AND < threshold) ---
+    // Must be before the generic WHERE+ORDER BY pattern. Distinguished by "is not null" from isNotNull().
+    if (q.includes("citation_quotes") && q.includes("is not null") && q.includes("where") && !q.includes("update") && !q.includes("insert")) {
+      // Drizzle params: [true, 0.5] from eq(quoteVerified, true) and lt(verificationScore, threshold)
+      const threshold = (params[1] as number) ?? 0.5;
+      return Array.from(quotesStore.values())
+        .filter((r) => r.quote_verified === true && r.verification_score != null && (r.verification_score as number) < threshold)
+        .sort((a, b) => (a.verification_score as number) - (b.verification_score as number))
+        .map((r) => ({
+          page_id: r.page_id, footnote: r.footnote, url: r.url,
+          claim_text: r.claim_text, verification_score: r.verification_score,
+        }));
+    }
+
+    // --- citation_quotes: SELECT * ... WHERE ... ORDER BY footnote ---
+    if (q.includes("citation_quotes") && q.includes("where") && q.includes("order by") && !q.includes("group by")) {
+      const pageId = params[0] as string;
       return Array.from(quotesStore.values())
         .filter((r) => r.page_id === pageId)
         .sort((a, b) => (a.footnote as number) - (b.footnote as number));
     }
 
-    // --- citation_quotes: SELECT * ORDER BY (all, paginated — has LIMIT) ---
-    if (query.includes("FROM citation_quotes") && query.includes("ORDER BY page_id") && query.includes("LIMIT")) {
-      const limit = values[0] as number;
-      const offset = values[1] as number;
+    // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY) ---
+    if (q.includes("citation_quotes") && q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("order by") && !q.includes("limit")) {
+      if (params.length === 1) {
+        const pageId = params[0] as string;
+        return Array.from(quotesStore.values())
+          .filter((r) => r.page_id === pageId)
+          .sort((a, b) => (a.footnote as number) - (b.footnote as number));
+      }
+      return [];
+    }
+
+    // --- citation_quotes: SELECT * ORDER BY ... LIMIT (paginated all) ---
+    if (q.includes("citation_quotes") && q.includes("order by") && q.includes("limit") && !q.includes("where") && !q.includes("count(*)") && !q.includes("group by")) {
+      // Drizzle omits OFFSET when 0, so params[1] may be undefined
+      const limit = (params[0] as number) || 100;
+      const offset = (params[1] as number) || 0;
       const all = Array.from(quotesStore.values()).sort((a, b) => {
         const pc = (a.page_id as string).localeCompare(b.page_id as string);
         return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
@@ -130,13 +251,8 @@ function createMockSql() {
       return all.slice(offset, offset + limit);
     }
 
-    // --- citation_quotes: SELECT COUNT(*) ---
-    if (query.includes("SELECT COUNT(*)") && query.includes("citation_quotes")) {
-      return [{ count: quotesStore.size }];
-    }
-
-    // --- citation_quotes: Stats aggregation ---
-    if (query.includes("FROM citation_quotes") && query.includes("total_quotes")) {
+    // --- citation_quotes: Stats aggregation (count + count(case) without group by) ---
+    if (q.includes("citation_quotes") && q.includes("count") && q.includes("case") && !q.includes("group by")) {
       const all = Array.from(quotesStore.values());
       const withQuotes = all.filter((r) => r.source_quote != null).length;
       const verified = all.filter((r) => r.quote_verified === true).length;
@@ -144,17 +260,22 @@ function createMockSql() {
       const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
       const pages = new Set(all.map((r) => r.page_id));
       return [{
-        total_quotes: all.length,
+        count: all.length,
         with_quotes: withQuotes,
         verified,
         unverified: all.length - verified,
         total_pages: pages.size,
-        average_score: avgScore,
+        avg: avgScore,
       }];
     }
 
-    // --- citation_quotes: Accuracy summary (check before page-stats since both have GROUP BY) ---
-    if (query.includes("GROUP BY page_id") && query.includes("HAVING")) {
+    // --- citation_quotes: COUNT(*) (simple count, no group by) ---
+    if (q.includes("count(*)") && q.includes("citation_quotes") && !q.includes("group by")) {
+      return [{ count: quotesStore.size }];
+    }
+
+    // --- citation_quotes: Accuracy summary (GROUP BY + HAVING) ---
+    if (q.includes("citation_quotes") && q.includes("group by") && q.includes("having")) {
       const byPage = new Map<string, Record<string, unknown>[]>();
       for (const r of quotesStore.values()) {
         if (r.accuracy_verdict != null) {
@@ -174,8 +295,8 @@ function createMockSql() {
         .sort((a, b) => a.page_id.localeCompare(b.page_id));
     }
 
-    // --- citation_quotes: Page stats aggregation ---
-    if (query.includes("GROUP BY page_id") && query.includes("with_quotes")) {
+    // --- citation_quotes: Page stats (GROUP BY without HAVING) ---
+    if (q.includes("citation_quotes") && q.includes("group by") && !q.includes("having")) {
       const byPage = new Map<string, Record<string, unknown>[]>();
       for (const r of quotesStore.values()) {
         const arr = byPage.get(r.page_id as string) || [];
@@ -185,10 +306,10 @@ function createMockSql() {
       return Array.from(byPage.entries())
         .map(([pageId, rows]) => ({
           page_id: pageId,
-          total: rows.length,
+          count: rows.length,
           with_quotes: rows.filter((r) => r.source_quote != null).length,
           verified: rows.filter((r) => r.quote_verified === true).length,
-          avg_score: null,
+          avg: null,
           accuracy_checked: rows.filter((r) => r.accuracy_verdict != null).length,
           accurate: rows.filter((r) => r.accuracy_verdict === "accurate").length,
           inaccurate: rows.filter((r) => r.accuracy_verdict === "inaccurate").length,
@@ -196,24 +317,20 @@ function createMockSql() {
         .sort((a, b) => a.page_id.localeCompare(b.page_id));
     }
 
-    // --- citation_quotes: Broken quotes (verification_score < threshold) ---
-    if (query.includes("verification_score <") && !query.includes("LIMIT")) {
-      const threshold = (values[0] as number) ?? 0.5;
-      return Array.from(quotesStore.values())
-        .filter((r) => r.quote_verified === true && r.verification_score != null && (r.verification_score as number) < threshold)
-        .sort((a, b) => (a.verification_score as number) - (b.verification_score as number))
-        .map((r) => ({
-          page_id: r.page_id, footnote: r.footnote, url: r.url,
-          claim_text: r.claim_text, verification_score: r.verification_score,
-        }));
-    }
-
-    // --- citation_content: INSERT ... ON CONFLICT ---
-    if (query.includes("INSERT INTO citation_content")) {
-      const [url, pageId, footnote, fetchedAt, httpStatus, contentType,
-        pageTitle, fullTextPreview, contentLength, contentHash] = values;
-      const now = new Date().toISOString();
-      const existing = contentStore.get(url as string);
+    // --- citation_content: INSERT ... ON CONFLICT DO UPDATE ---
+    if (q.includes("insert into") && q.includes("citation_content")) {
+      const url = params[0] as string;
+      const pageId = params[1];
+      const footnote = params[2];
+      const fetchedAt = params[3];
+      const httpStatus = params[4];
+      const contentType = params[5];
+      const pageTitle = params[6];
+      const fullTextPreview = params[7];
+      const contentLength = params[8];
+      const contentHash = params[9];
+      const now = new Date();
+      const existing = contentStore.get(url);
       const row: Record<string, unknown> = {
         url, page_id: pageId, footnote, fetched_at: fetchedAt,
         http_status: httpStatus, content_type: contentType,
@@ -222,37 +339,64 @@ function createMockSql() {
         created_at: existing?.created_at ?? now,
         updated_at: now,
       };
-      contentStore.set(url as string, row);
+      contentStore.set(url, row);
       return [row];
     }
 
     // --- citation_content: SELECT * WHERE url ---
-    if (query.includes("FROM citation_content") && query.includes("WHERE url")) {
-      const url = values[0] as string;
+    if (q.includes("citation_content") && q.includes("where")) {
+      const url = params[0] as string;
       const row = contentStore.get(url);
       return row ? [row] : [];
     }
 
-    // --- entity_ids fallbacks (from ids.test patterns) ---
-    if (query.includes("SELECT COUNT(*)")) {
+    // --- entity_ids fallbacks (for health check count) ---
+    if (q.includes("count(*)")) {
       return [{ count: 0 }];
     }
 
+    // --- sequence health check ---
+    if (q.includes("last_value")) {
+      return [{ last_value: 0, is_called: true }];
+    }
+
     return [];
+  }
+
+  // Tagged-template handler (for raw SQL like health check sequence query)
+  const mockSql: any = (strings: TemplateStringsArray, ...values: unknown[]) => {
+    const query = strings.join("$").trim();
+    return dispatch(query, values);
   };
 
-  mockSql.begin = async (fn: (tx: typeof mockSql) => Promise<void>) => {
-    await fn(mockSql);
+  // Drizzle calls client.unsafe(query, params).values() for query builder operations
+  mockSql.unsafe = (query: string, params: unknown[] = []) => {
+    return createQueryResult(dispatch(query, params), query);
   };
+
+  // Transaction support
+  mockSql.begin = async (fn: (tx: typeof mockSql) => Promise<any>) => {
+    return await fn(mockSql);
+  };
+
+  mockSql.reserve = () => Promise.resolve(mockSql);
+  mockSql.release = () => {};
+
+  // Drizzle's postgres-js driver reads client.options.parsers/serializers
+  mockSql.options = { parsers: {}, serializers: {} };
 
   return mockSql;
 }
 
 // Mock the db module
-vi.mock("../db.js", () => {
+vi.mock("../db.js", async () => {
+  const { drizzle } = await import("drizzle-orm/postgres-js");
+  const schema = await import("../schema.js");
   const mockSql = createMockSql();
+  const mockDrizzle = drizzle(mockSql, { schema });
   return {
     getDb: () => mockSql,
+    getDrizzleDb: () => mockDrizzle,
     initDb: vi.fn(),
     closeDb: vi.fn(),
   };
