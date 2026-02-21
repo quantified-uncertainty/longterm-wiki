@@ -24,25 +24,33 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // ---- INSERT INTO summaries ... ON CONFLICT ----
   if (q.includes("insert into") && q.includes('"summaries"')) {
     const now = new Date();
-    const entityId = params[0] as string;
-    const existing = summaryStore.get(entityId);
+    const PARAMS_PER_ROW = 9;
+    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
+    const results: Record<string, unknown>[] = [];
 
-    const row: Record<string, unknown> = {
-      entity_id: entityId,
-      entity_type: params[1],
-      one_liner: params[2],
-      summary: params[3],
-      review: params[4],
-      key_points: params[5],
-      key_claims: params[6],
-      model: params[7],
-      tokens_used: params[8],
-      generated_at: now,
-      created_at: existing?.created_at ?? now,
-      updated_at: now,
-    };
-    summaryStore.set(entityId, row);
-    return [row];
+    for (let i = 0; i < rowCount; i++) {
+      const off = i * PARAMS_PER_ROW;
+      const entityId = params[off] as string;
+      const existing = summaryStore.get(entityId);
+
+      const row: Record<string, unknown> = {
+        entity_id: entityId,
+        entity_type: params[off + 1],
+        one_liner: params[off + 2],
+        summary: params[off + 3],
+        review: params[off + 4],
+        key_points: params[off + 5],
+        key_claims: params[off + 6],
+        model: params[off + 7],
+        tokens_used: params[off + 8],
+        generated_at: now,
+        created_at: existing?.created_at ?? now,
+        updated_at: now,
+      };
+      summaryStore.set(entityId, row);
+      results.push(row);
+    }
+    return results;
   }
 
   // ---- SELECT count(*) FROM summaries with GROUP BY entity_type ----

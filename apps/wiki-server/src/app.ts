@@ -14,21 +14,26 @@ import { summariesRoute } from "./routes/summaries.js";
 import { claimsRoute } from "./routes/claims.js";
 import { linksRoute } from "./routes/links.js";
 import { autoUpdateNewsRoute } from "./routes/auto-update-news.js";
+import { entitiesRoute } from "./routes/entities.js";
+import { factsRoute } from "./routes/facts.js";
 
 export function createApp() {
   const app = new Hono();
 
   // Error handler — re-throw HTTPExceptions (auth failures etc.) so Hono
   // returns the proper status code; only catch unexpected errors as 500.
+  // For /api/* routes (already behind bearer auth), include the real error
+  // message so authenticated callers get actionable diagnostics.
   app.onError((err, c) => {
     if (err instanceof HTTPException) {
       return err.getResponse();
     }
     console.error("Unhandled error:", err);
-    return c.json(
-      { error: "internal_error", message: "An unexpected error occurred" },
-      500
-    );
+    const message =
+      c.req.path.startsWith("/api/") && err instanceof Error
+        ? err.message
+        : "An unexpected error occurred";
+    return c.json({ error: "internal_error", message }, 500);
   });
 
   // Health endpoint — unauthenticated
@@ -56,6 +61,8 @@ export function createApp() {
   app.route("/api/claims", claimsRoute);
   app.route("/api/links", linksRoute);
   app.route("/api/auto-update-news", autoUpdateNewsRoute);
+  app.route("/api/entities", entitiesRoute);
+  app.route("/api/facts", factsRoute);
 
   return app;
 }

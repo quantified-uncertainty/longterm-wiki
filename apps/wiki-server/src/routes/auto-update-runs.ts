@@ -77,7 +77,8 @@ function formatRunEntry(
           try {
             return JSON.parse(r.newPagesCreated) as string[];
           } catch {
-            return [];
+            // Legacy format: comma-separated string from old seed script
+            return r.newPagesCreated.split(",").map(s => s.trim()).filter(Boolean);
           }
         })()
       : [],
