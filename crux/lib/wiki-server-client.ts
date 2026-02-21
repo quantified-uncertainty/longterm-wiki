@@ -815,7 +815,6 @@ export async function syncPageLinks(
   return { upserted: totalUpserted };
 }
 
-// ---------------------------------------------------------------------------
 // Resources API (single upsert for fire-and-forget dual-write)
 // ---------------------------------------------------------------------------
 
@@ -851,4 +850,329 @@ export async function upsertResource(
   item: UpsertResourceItem,
 ): Promise<UpsertResourceResult | null> {
   return apiRequest<UpsertResourceResult>('POST', '/api/resources', item);
+}
+
+// ---------------------------------------------------------------------------
+// Entities API
+// ---------------------------------------------------------------------------
+
+export interface SyncEntityItem {
+  id: string;
+  numericId?: string | null;
+  entityType: string;
+  title: string;
+  description?: string | null;
+  website?: string | null;
+  tags?: string[] | null;
+  clusters?: string[] | null;
+  status?: string | null;
+  lastUpdated?: string | null;
+  customFields?: Array<{ label: string; value: string; link?: string }> | null;
+  relatedEntries?: Array<{ id: string; type: string; relationship?: string }> | null;
+  sources?: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
+}
+
+interface SyncEntitiesResult {
+  upserted: number;
+}
+
+export interface EntityEntry {
+  id: string;
+  numericId: string | null;
+  entityType: string;
+  title: string;
+  description: string | null;
+  website: string | null;
+  tags: string[] | null;
+  clusters: string[] | null;
+  status: string | null;
+  lastUpdated: string | null;
+  customFields: Array<{ label: string; value: string; link?: string }> | null;
+  relatedEntries: Array<{ id: string; type: string; relationship?: string }> | null;
+  sources: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
+  syncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface EntityListResult {
+  entities: EntityEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+interface EntitySearchResult {
+  results: EntityEntry[];
+  query: string;
+  total: number;
+}
+
+interface EntityStatsResult {
+  total: number;
+  byType: Record<string, number>;
+}
+
+const ENTITY_BATCH_SIZE = 200;
+
+/**
+ * Sync entities to the wiki-server.
+ * Splits into batches for large entity sets.
+ */
+export async function syncEntities(
+  items: SyncEntityItem[],
+): Promise<SyncEntitiesResult | null> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  let totalUpserted = 0;
+
+  for (let i = 0; i < items.length; i += ENTITY_BATCH_SIZE) {
+    const batch = items.slice(i, i + ENTITY_BATCH_SIZE);
+
+    try {
+      const res = await fetch(`${serverUrl}/api/entities/sync`, {
+        method: 'POST',
+        headers: buildHeaders(),
+        body: JSON.stringify({ entities: batch }),
+        signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.warn(
+          `  WARNING: Entity sync batch failed (${res.status}): ${text.slice(0, 200)}`,
+        );
+        return null;
+      }
+
+      const data = (await res.json()) as SyncEntitiesResult;
+      totalUpserted += data.upserted;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`  WARNING: Entity sync batch failed: ${message}`);
+      return null;
+    }
+  }
+
+  return { upserted: totalUpserted };
+}
+
+/**
+ * Get a single entity by ID (slug or numeric ID).
+ */
+export async function getEntity(
+  id: string,
+): Promise<EntityEntry | null> {
+  return apiRequest<EntityEntry>('GET', `/api/entities/${encodeURIComponent(id)}`);
+}
+
+/**
+ * List entities (paginated).
+ */
+export async function listEntities(
+  limit = 50,
+  offset = 0,
+  entityType?: string,
+): Promise<EntityListResult | null> {
+  let path = `/api/entities?limit=${limit}&offset=${offset}`;
+  if (entityType) path += `&entityType=${encodeURIComponent(entityType)}`;
+  return apiRequest<EntityListResult>('GET', path);
+}
+
+/**
+ * Search entities by title/description.
+ */
+export async function searchEntities(
+  q: string,
+  limit = 20,
+): Promise<EntitySearchResult | null> {
+  return apiRequest<EntitySearchResult>(
+    'GET',
+    `/api/entities/search?q=${encodeURIComponent(q)}&limit=${limit}`,
+  );
+}
+
+/**
+ * Get entity statistics.
+ */
+export async function getEntityStats(): Promise<EntityStatsResult | null> {
+  return apiRequest<EntityStatsResult>('GET', '/api/entities/stats');
+}
+
+// ---------------------------------------------------------------------------
+// Facts API
+// ---------------------------------------------------------------------------
+
+export interface SyncFactItem {
+  entityId: string;
+  factId: string;
+  label?: string | null;
+  value?: string | null;
+  numeric?: number | null;
+  low?: number | null;
+  high?: number | null;
+  asOf?: string | null;
+  measure?: string | null;
+  subject?: string | null;
+  note?: string | null;
+  source?: string | null;
+  sourceResource?: string | null;
+  format?: string | null;
+  formatDivisor?: number | null;
+}
+
+interface SyncFactsResult {
+  upserted: number;
+}
+
+export interface FactEntry {
+  id: number;
+  entityId: string;
+  factId: string;
+  label: string | null;
+  value: string | null;
+  numeric: number | null;
+  low: number | null;
+  high: number | null;
+  asOf: string | null;
+  measure: string | null;
+  subject: string | null;
+  note: string | null;
+  source: string | null;
+  sourceResource: string | null;
+  format: string | null;
+  formatDivisor: number | null;
+  syncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface FactsByEntityResult {
+  entityId: string;
+  facts: FactEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+interface TimeseriesResult {
+  entityId: string;
+  measure: string;
+  points: FactEntry[];
+  total: number;
+}
+
+interface StaleFactsResult {
+  facts: Array<{
+    entityId: string;
+    factId: string;
+    label: string | null;
+    asOf: string | null;
+    measure: string | null;
+    value: string | null;
+    numeric: number | null;
+  }>;
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+interface FactStatsResult {
+  total: number;
+  uniqueEntities: number;
+  uniqueMeasures: number;
+}
+
+const FACT_BATCH_SIZE = 500;
+
+/**
+ * Sync facts to the wiki-server.
+ * Splits into batches for large fact sets.
+ */
+export async function syncFacts(
+  items: SyncFactItem[],
+): Promise<SyncFactsResult | null> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  let totalUpserted = 0;
+
+  for (let i = 0; i < items.length; i += FACT_BATCH_SIZE) {
+    const batch = items.slice(i, i + FACT_BATCH_SIZE);
+
+    try {
+      const res = await fetch(`${serverUrl}/api/facts/sync`, {
+        method: 'POST',
+        headers: buildHeaders(),
+        body: JSON.stringify({ facts: batch }),
+        signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.warn(
+          `  WARNING: Facts sync batch failed (${res.status}): ${text.slice(0, 200)}`,
+        );
+        return null;
+      }
+
+      const data = (await res.json()) as SyncFactsResult;
+      totalUpserted += data.upserted;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`  WARNING: Facts sync batch failed: ${message}`);
+      return null;
+    }
+  }
+
+  return { upserted: totalUpserted };
+}
+
+/**
+ * Get all facts for a specific entity.
+ */
+export async function getFactsByEntity(
+  entityId: string,
+  limit = 100,
+  offset = 0,
+  measure?: string,
+): Promise<FactsByEntityResult | null> {
+  let path = `/api/facts/by-entity/${encodeURIComponent(entityId)}?limit=${limit}&offset=${offset}`;
+  if (measure) path += `&measure=${encodeURIComponent(measure)}`;
+  return apiRequest<FactsByEntityResult>('GET', path);
+}
+
+/**
+ * Get timeseries data for an entity and measure.
+ */
+export async function getFactTimeseries(
+  entityId: string,
+  measure: string,
+  limit = 100,
+): Promise<TimeseriesResult | null> {
+  return apiRequest<TimeseriesResult>(
+    'GET',
+    `/api/facts/timeseries/${encodeURIComponent(entityId)}?measure=${encodeURIComponent(measure)}&limit=${limit}`,
+  );
+}
+
+/**
+ * Get stale facts (oldest asOf dates).
+ */
+export async function getStaleFacts(
+  olderThan?: string,
+  limit = 50,
+  offset = 0,
+): Promise<StaleFactsResult | null> {
+  let path = `/api/facts/stale?limit=${limit}&offset=${offset}`;
+  if (olderThan) path += `&olderThan=${encodeURIComponent(olderThan)}`;
+  return apiRequest<StaleFactsResult>('GET', path);
+}
+
+/**
+ * Get fact statistics.
+ */
+export async function getFactStats(): Promise<FactStatsResult | null> {
+  return apiRequest<FactStatsResult>('GET', '/api/facts/stats');
 }

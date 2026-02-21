@@ -33,6 +33,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: 0 }];
   }
 
+  // SELECT COUNT(*) for entities (health check)
+  if (q.includes("count(*)") && q.includes('"entities"')) {
+    return [{ count: 0 }];
+  }
+
+  // SELECT COUNT(*) for facts (health check)
+  if (q.includes("count(*)") && q.includes('"facts"')) {
+    return [{ count: 0 }];
+  }
+
   // SELECT last_value (sequence health check)
   if (q.includes("last_value")) {
     return [{ last_value: lastSeqVal, is_called: seqIsCalled }];
