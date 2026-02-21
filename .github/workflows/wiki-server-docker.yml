@@ -89,14 +89,28 @@ jobs:
         run: |
           echo "Running post-deploy smoke test..."
 
-          # 1. Health check
-          HEALTH=$(curl -sf "${LONGTERMWIKI_SERVER_URL}/health")
-          STATUS=$(echo "$HEALTH" | jq -r '.status')
+          # 1. Health check — retry up to 6 times (90s total) to allow for
+          #    pod startup, migration execution, and K8s readiness propagation.
+          MAX_ATTEMPTS=6
+          DELAY=15
+          HEALTH=""
+          STATUS=""
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            HEALTH=$(curl -sf "${LONGTERMWIKI_SERVER_URL}/health" 2>&1 || true)
+            STATUS=$(echo "$HEALTH" | jq -r '.status // empty' 2>/dev/null || true)
+            if [ "$STATUS" = "healthy" ]; then
+              echo "Health check passed on attempt $i: $HEALTH"
+              break
+            fi
+            echo "Health check attempt $i/$MAX_ATTEMPTS: ${HEALTH:-no response}"
+            if [ "$i" -lt "$MAX_ATTEMPTS" ]; then
+              sleep $DELAY
+            fi
+          done
           if [ "$STATUS" != "healthy" ]; then
-            echo "::error::Health check failed: $HEALTH"
+            echo "::error::Health check failed after $MAX_ATTEMPTS attempts: $HEALTH"
             exit 1
           fi
-          echo "Health check passed: $HEALTH"
 
           # 2. Sync smoke test — send a single dummy page to verify the sync endpoint works end-to-end
           SYNC_BODY='{"pages":[{"id":"__smoke-test__","numericId":null,"title":"Smoke Test","description":null,"llmSummary":null,"category":null,"subcategory":null,"entityType":null,"tags":null,"quality":null,"readerImportance":null,"hallucinationRiskLevel":null,"hallucinationRiskScore":null,"contentPlaintext":null,"wordCount":null,"lastUpdated":null,"contentFormat":null}]}'
