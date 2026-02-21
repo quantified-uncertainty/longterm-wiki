@@ -88,7 +88,7 @@ jobs:
     timeout-minutes: 45
     strategy:
       matrix: ${{ fromJson(needs.find-conflicted-prs.outputs.matrix) }}
-      max-parallel: 1 # Resolve one at a time to avoid push races
+      max-parallel: 4 # Each job resolves a different PR branch — no push races
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
