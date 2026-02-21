@@ -1,9 +1,8 @@
 import { Hono, type Context } from "hono";
 import { z } from "zod";
 import { eq, or, and, count, asc, sql } from "drizzle-orm";
-import { getDrizzleDb } from "../db.js";
+import { getDrizzleDb, getDb } from "../db.js";
 import { wikiPages } from "../schema.js";
-import { search, rebuildSearchIndex } from "../search.js";
 
 export const pagesRoute = new Hono();
 
@@ -68,9 +67,37 @@ pagesRoute.get("/search", async (c) => {
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { q, limit } = parsed.data;
-  const results = search(q, limit);
+  const rawDb = getDb();
 
-  return c.json({ results, query: q, total: results.length });
+  // Use plainto_tsquery for simple user queries (handles spaces naturally).
+  // Weighted ranking: title (A=1.0), description (B=0.4), llm_summary (C=0.2), tags+entityType (D=0.1).
+  // Boost by reader_importance for tiebreaking.
+  const results = await rawDb`
+    SELECT
+      id, numeric_id, title, description, entity_type, category,
+      reader_importance, quality,
+      ts_rank_cd(search_vector, plainto_tsquery('english', ${q}), 1) AS rank
+    FROM wiki_pages
+    WHERE search_vector @@ plainto_tsquery('english', ${q})
+    ORDER BY rank DESC, reader_importance DESC NULLS LAST
+    LIMIT ${limit}
+  `;
+
+  return c.json({
+    results: results.map((r: any) => ({
+      id: r.id,
+      numericId: r.numeric_id,
+      title: r.title,
+      description: r.description,
+      entityType: r.entity_type,
+      category: r.category,
+      readerImportance: r.reader_importance,
+      quality: r.quality,
+      score: parseFloat(r.rank),
+    })),
+    query: q,
+    total: results.length,
+  });
 });
 
 // ---- GET /:id ----
@@ -225,8 +252,18 @@ pagesRoute.post("/sync", async (c) => {
     }
   });
 
-  // Rebuild search index after sync
-  const indexed = await rebuildSearchIndex();
+  // Update search vectors for synced pages
+  const rawDb = getDb();
+  const pageIds = pages.map((p) => p.id);
+  await rawDb`
+    UPDATE wiki_pages SET search_vector =
+      setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+      setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+      setweight(to_tsvector('english', coalesce(llm_summary, '')), 'C') ||
+      setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
+      setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
+    WHERE id = ANY(${pageIds})
+  `;
 
-  return c.json({ upserted, totalIndexed: indexed });
+  return c.json({ upserted });
 });

@@ -81,9 +81,20 @@ function createQueryResult(rows: unknown[], query: string): any {
   };
 }
 
+/**
+ * Simple in-memory text search to simulate PostgreSQL tsvector matching.
+ * Searches title, description, entity_type, and tags fields.
+ */
+function simpleTextMatch(row: Record<string, unknown>, query: string): boolean {
+  const q = query.toLowerCase();
+  const fields = [row.title, row.description, row.entity_type, row.tags, row.llm_summary];
+  return fields.some((f) => typeof f === "string" && f.toLowerCase().includes(q));
+}
+
 function createMockSql() {
   function dispatch(query: string, params: unknown[]): unknown[] {
     const q = query.toLowerCase();
+
     // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE ---
     if (q.includes("insert into") && q.includes("wiki_pages")) {
       const now = new Date();
@@ -116,8 +127,36 @@ function createMockSql() {
       return [row];
     }
 
+    // --- wiki_pages: UPDATE search_vector (after sync) ---
+    if (q.includes("update wiki_pages") && q.includes("search_vector")) {
+      // No-op in tests — tsvector is a Postgres feature
+      return [];
+    }
+
+    // --- wiki_pages: Full-text search via search_vector ---
+    if (q.includes("search_vector") && q.includes("plainto_tsquery") && !q.includes("update")) {
+      const searchQuery = params[0] as string;
+      const limit = (params[2] as number) || 20;
+      const results: Record<string, unknown>[] = [];
+      for (const row of pagesStore.values()) {
+        if (simpleTextMatch(row, searchQuery)) {
+          results.push({
+            id: row.id,
+            numeric_id: row.numeric_id,
+            title: row.title,
+            description: row.description,
+            entity_type: row.entity_type,
+            category: row.category,
+            reader_importance: row.reader_importance,
+            quality: row.quality,
+            rank: 1.0,
+          });
+        }
+      }
+      return results.slice(0, limit);
+    }
+
     // --- wiki_pages: SELECT with WHERE + OR (get by id or numeric_id) ---
-    // Query: select ... from "wiki_pages" where ("wiki_pages"."id" = $1 or "wiki_pages"."numeric_id" = $2)
     if (q.includes("wiki_pages") && q.includes("where") && q.includes(" or ") && !q.includes("count(*)")) {
       const id = params[0] as string;
       const numericId = params[1] as string;
@@ -147,7 +186,6 @@ function createMockSql() {
     }
 
     // --- wiki_pages: SELECT ORDER BY LIMIT (paginated listing) ---
-    // Query: select ... from "wiki_pages" order by ... limit $1
     if (q.includes("wiki_pages") && q.includes("order by") && q.includes("limit") && !q.includes("count(*)")) {
       const allRows = Array.from(pagesStore.values()).sort((a, b) =>
         (a.id as string).localeCompare(b.id as string)
@@ -169,12 +207,6 @@ function createMockSql() {
       return filtered.slice(offset, offset + limit);
     }
 
-    // --- wiki_pages: SELECT all (search index rebuild) ---
-    // Query: select ... from "wiki_pages" (no WHERE, no ORDER BY, no LIMIT)
-    if (q.includes("wiki_pages") && !q.includes("where") && !q.includes("order by") && !q.includes("count(*)") && !q.includes("insert") && !q.includes("update")) {
-      return Array.from(pagesStore.values());
-    }
-
     // --- entity_ids: COUNT (for health check) ---
     if (q.includes("count(*)") && !q.includes("wiki_pages")) {
       return [{ count: 0 }];
@@ -190,7 +222,11 @@ function createMockSql() {
 
   const mockSql: any = (strings: TemplateStringsArray, ...values: unknown[]) => {
     const query = strings.join("$").trim();
-    return dispatch(query, values);
+    const rows = dispatch(query, values);
+    // Wrap in a postgres-compatible result (array-like thenable with .count)
+    const result: any = [...rows];
+    result.count = rows.length;
+    return result;
   };
 
   mockSql.unsafe = (query: string, params: unknown[] = []) => {
@@ -296,7 +332,6 @@ describe("Pages API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.upserted).toBe(2);
-      expect(body.totalIndexed).toBeGreaterThanOrEqual(0);
     });
 
     it("updates existing pages", async () => {
@@ -419,7 +454,8 @@ describe("Pages API", () => {
       const body = await res.json();
       expect(body.query).toBe("anthropic");
       expect(body.results).toBeDefined();
-      // MiniSearch results depend on index state
+      expect(body.results.length).toBeGreaterThan(0);
+      expect(body.results[0].id).toBe("anthropic");
     });
 
     it("requires q parameter", async () => {
@@ -466,12 +502,11 @@ describe("Pages API", () => {
   // ---- Health check includes totalPages ----
 
   describe("Health check", () => {
-    it("includes totalPages and searchIndexed", async () => {
+    it("includes totalPages", async () => {
       const res = await app.request("/health");
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.totalPages).toBeDefined();
-      expect(body.searchIndexed).toBeDefined();
     });
   });
 });

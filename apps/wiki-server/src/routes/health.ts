@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { count, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import { entityIds, wikiPages } from "../schema.js";
-import { getIndexedCount } from "../search.js";
 
 const startTime = Date.now();
 
@@ -43,7 +42,6 @@ healthRoute.get("/", async (c) => {
     database: dbStatus,
     totalIds,
     totalPages,
-    searchIndexed: getIndexedCount(),
     nextId,
     uptime: Math.floor((Date.now() - startTime) / 1000),
   });

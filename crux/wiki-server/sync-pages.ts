@@ -99,14 +99,11 @@ async function syncPages(
         continue;
       }
 
-      const result = (await res.json()) as {
-        upserted: number;
-        totalIndexed: number;
-      };
+      const result = (await res.json()) as { upserted: number };
       totalCreated += result.upserted;
 
       console.log(
-        `  Batch ${batchNum}/${totalBatches}: ${result.upserted} upserted (${result.totalIndexed} indexed)`
+        `  Batch ${batchNum}/${totalBatches}: ${result.upserted} upserted`
       );
     } catch (err) {
       console.error(

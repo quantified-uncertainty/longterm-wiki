@@ -88,6 +88,8 @@ export const wikiPages = pgTable(
     wordCount: integer("word_count"),
     lastUpdated: text("last_updated"),
     contentFormat: text("content_format"),
+    // search_vector tsvector column is managed via raw SQL migration
+    // (Drizzle doesn't have native tsvector support)
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -103,6 +105,7 @@ export const wikiPages = pgTable(
     index("idx_wp_category").on(table.category),
     index("idx_wp_entity_type").on(table.entityType),
     index("idx_wp_reader_importance").on(table.readerImportance),
+    // GIN index on search_vector is created in migration SQL
   ]
 );
 
