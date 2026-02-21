@@ -322,6 +322,18 @@ describe("Resources API", () => {
       const res = await postJson(app, "/api/resources/batch", { items: [] });
       expect(res.status).toBe(400);
     });
+
+    it("accepts resources with >100 authors", async () => {
+      const manyAuthors = Array.from({ length: 150 }, (_, i) => `Author ${i + 1}`);
+      const res = await postJson(app, "/api/resources/batch", {
+        items: [
+          { id: "big-collab", url: "https://example.com/collab", authors: manyAuthors },
+        ],
+      });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.inserted).toBe(1);
+    });
   });
 
   describe("GET /api/resources/search", () => {
