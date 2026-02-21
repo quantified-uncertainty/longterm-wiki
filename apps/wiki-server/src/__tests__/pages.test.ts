@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
+import { mockDbModule, postJson } from "./test-utils.js";
 
-// ---- In-memory stores simulating Postgres tables ----
+// ---- In-memory store simulating Postgres wiki_pages table ----
 
 let pagesStore: Map<string, Record<string, unknown>>;
 
@@ -10,80 +11,8 @@ function resetStores() {
 }
 
 /**
- * Extract column names from SELECT or RETURNING clauses in Drizzle-generated SQL.
- */
-function extractColumns(query: string): (string | null)[] {
-  const q = query.trim();
-
-  let clauseMatch = q.match(/returning\s+(.+?)$/is);
-  if (!clauseMatch) {
-    clauseMatch = q.match(/^select\s+(.+?)\s+from\s/is);
-  }
-  if (!clauseMatch) return [];
-
-  const clause = clauseMatch[1];
-
-  const parts: string[] = [];
-  let depth = 0;
-  let current = "";
-  for (const ch of clause) {
-    if (ch === "(") depth++;
-    else if (ch === ")") depth--;
-    else if (ch === "," && depth === 0) {
-      parts.push(current.trim());
-      current = "";
-      continue;
-    }
-    current += ch;
-  }
-  if (current.trim()) parts.push(current.trim());
-
-  return parts.map((part) => {
-    let d = 0;
-    let lastTopLevel: string | null = null;
-    let i = 0;
-    while (i < part.length) {
-      if (part[i] === "(") { d++; i++; }
-      else if (part[i] === ")") { d--; i++; }
-      else if (part[i] === '"' && d === 0) {
-        const close = part.indexOf('"', i + 1);
-        if (close > i) {
-          lastTopLevel = part.substring(i + 1, close);
-          i = close + 1;
-        } else { i++; }
-      } else { i++; }
-    }
-    return lastTopLevel;
-  });
-}
-
-function createQueryResult(rows: unknown[], query: string): any {
-  const promise = Promise.resolve(rows);
-  return {
-    then: promise.then.bind(promise),
-    catch: promise.catch.bind(promise),
-    finally: promise.finally.bind(promise),
-    [Symbol.toStringTag]: "Promise",
-    count: rows.length,
-    values: () => {
-      const cols = extractColumns(query);
-      const arrayRows = rows.map((row: any) => {
-        if (cols.length > 0 && cols.some((c) => c !== null)) {
-          return cols.map((col, i) => {
-            if (col !== null) return row[col];
-            return Object.values(row)[i];
-          });
-        }
-        return Object.values(row);
-      });
-      return createQueryResult(arrayRows, query);
-    },
-  };
-}
-
-/**
  * Simple in-memory text search to simulate PostgreSQL tsvector matching.
- * Searches title, description, entity_type, and tags fields.
+ * Searches title, description, entity_type, tags, and llm_summary fields.
  */
 function simpleTextMatch(row: Record<string, unknown>, query: string): boolean {
   const q = query.toLowerCase();
@@ -91,184 +20,139 @@ function simpleTextMatch(row: Record<string, unknown>, query: string): boolean {
   return fields.some((f) => typeof f === "string" && f.toLowerCase().includes(q));
 }
 
-function createMockSql() {
-  function dispatch(query: string, params: unknown[]): unknown[] {
-    const q = query.toLowerCase();
+function dispatch(query: string, params: unknown[]): unknown[] {
+  const q = query.toLowerCase();
 
-    // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE ---
-    if (q.includes("insert into") && q.includes("wiki_pages")) {
-      const now = new Date();
-      const id = params[0] as string;
-      const existing = pagesStore.get(id);
+  // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE ---
+  if (q.includes("insert into") && q.includes("wiki_pages")) {
+    const now = new Date();
+    const id = params[0] as string;
+    const existing = pagesStore.get(id);
 
-      const row: Record<string, unknown> = {
-        id,
-        numeric_id: params[1],
-        title: params[2],
-        description: params[3],
-        llm_summary: params[4],
-        category: params[5],
-        subcategory: params[6],
-        entity_type: params[7],
-        tags: params[8],
-        quality: params[9],
-        reader_importance: params[10],
-        hallucination_risk_level: params[11],
-        hallucination_risk_score: params[12],
-        content_plaintext: params[13],
-        word_count: params[14],
-        last_updated: params[15],
-        content_format: params[16],
-        synced_at: now,
-        created_at: existing?.created_at ?? now,
-        updated_at: now,
-      };
-      pagesStore.set(id, row);
-      return [row];
-    }
-
-    // --- wiki_pages: UPDATE search_vector (after sync) ---
-    if (q.includes("update wiki_pages") && q.includes("search_vector")) {
-      // No-op in tests — tsvector is a Postgres feature
-      return [];
-    }
-
-    // --- wiki_pages: Full-text search via search_vector ---
-    if (q.includes("search_vector") && q.includes("plainto_tsquery") && !q.includes("update")) {
-      const searchQuery = params[0] as string;
-      const limit = (params[2] as number) || 20;
-      const results: Record<string, unknown>[] = [];
-      for (const row of pagesStore.values()) {
-        if (simpleTextMatch(row, searchQuery)) {
-          results.push({
-            id: row.id,
-            numeric_id: row.numeric_id,
-            title: row.title,
-            description: row.description,
-            entity_type: row.entity_type,
-            category: row.category,
-            reader_importance: row.reader_importance,
-            quality: row.quality,
-            rank: 1.0,
-          });
-        }
-      }
-      return results.slice(0, limit);
-    }
-
-    // --- wiki_pages: SELECT with WHERE + OR (get by id or numeric_id) ---
-    if (q.includes("wiki_pages") && q.includes("where") && q.includes(" or ") && !q.includes("count(*)")) {
-      const id = params[0] as string;
-      const numericId = params[1] as string;
-      const results: Record<string, unknown>[] = [];
-      for (const row of pagesStore.values()) {
-        if (row.id === id || row.numeric_id === numericId) {
-          results.push(row);
-        }
-      }
-      return results;
-    }
-
-    // --- wiki_pages: COUNT(*) with or without WHERE ---
-    if (q.includes("count(*)") && q.includes("wiki_pages")) {
-      if (q.includes("where")) {
-        let count = 0;
-        for (const row of pagesStore.values()) {
-          if (params.length > 0) {
-            if (row.category === params[0] || row.entity_type === params[0]) {
-              count++;
-            }
-          }
-        }
-        return [{ count }];
-      }
-      return [{ count: pagesStore.size }];
-    }
-
-    // --- wiki_pages: SELECT ORDER BY LIMIT (paginated listing) ---
-    if (q.includes("wiki_pages") && q.includes("order by") && q.includes("limit") && !q.includes("count(*)")) {
-      const allRows = Array.from(pagesStore.values()).sort((a, b) =>
-        (a.id as string).localeCompare(b.id as string)
-      );
-
-      let filtered = allRows;
-      if (q.includes("where")) {
-        const filterVal = params[0] as string;
-        if (q.includes("category")) {
-          filtered = allRows.filter((r) => r.category === filterVal);
-        } else if (q.includes("entity_type")) {
-          filtered = allRows.filter((r) => r.entity_type === filterVal);
-        }
-      }
-
-      const limitIdx = q.includes("where") ? 1 : 0;
-      const limit = (params[limitIdx] as number) || 50;
-      const offset = (params[limitIdx + 1] as number) || 0;
-      return filtered.slice(offset, offset + limit);
-    }
-
-    // --- entity_ids: COUNT (for health check) ---
-    if (q.includes("count(*)") && !q.includes("wiki_pages")) {
-      return [{ count: 0 }];
-    }
-
-    // --- sequence health check ---
-    if (q.includes("last_value")) {
-      return [{ last_value: 0, is_called: true }];
-    }
-
-    return [];
+    const row: Record<string, unknown> = {
+      id,
+      numeric_id: params[1],
+      title: params[2],
+      description: params[3],
+      llm_summary: params[4],
+      category: params[5],
+      subcategory: params[6],
+      entity_type: params[7],
+      tags: params[8],
+      quality: params[9],
+      reader_importance: params[10],
+      hallucination_risk_level: params[11],
+      hallucination_risk_score: params[12],
+      content_plaintext: params[13],
+      word_count: params[14],
+      last_updated: params[15],
+      content_format: params[16],
+      synced_at: now,
+      created_at: existing?.created_at ?? now,
+      updated_at: now,
+    };
+    pagesStore.set(id, row);
+    return [row];
   }
 
-  const mockSql: any = (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const query = strings.join("$").trim();
-    const rows = dispatch(query, values);
-    // Wrap in a postgres-compatible result (array-like thenable with .count)
-    const result: any = [...rows];
-    result.count = rows.length;
-    return result;
-  };
+  // --- wiki_pages: UPDATE search_vector (after sync) ---
+  if (q.includes("update wiki_pages") && q.includes("search_vector")) {
+    return []; // No-op in tests — tsvector is a Postgres feature
+  }
 
-  mockSql.unsafe = (query: string, params: unknown[] = []) => {
-    return createQueryResult(dispatch(query, params), query);
-  };
+  // --- wiki_pages: Full-text search via search_vector ---
+  if (q.includes("search_vector") && q.includes("plainto_tsquery") && !q.includes("update")) {
+    const searchQuery = params[0] as string;
+    const limit = (params[2] as number) || 20;
+    const results: Record<string, unknown>[] = [];
+    for (const row of pagesStore.values()) {
+      if (simpleTextMatch(row, searchQuery)) {
+        results.push({
+          id: row.id,
+          numeric_id: row.numeric_id,
+          title: row.title,
+          description: row.description,
+          entity_type: row.entity_type,
+          category: row.category,
+          reader_importance: row.reader_importance,
+          quality: row.quality,
+          rank: 1.0,
+        });
+      }
+    }
+    return results.slice(0, limit);
+  }
 
-  mockSql.begin = async (fn: (tx: typeof mockSql) => Promise<any>) => {
-    return await fn(mockSql);
-  };
+  // --- wiki_pages: SELECT with WHERE + OR (get by id or numeric_id) ---
+  if (q.includes("wiki_pages") && q.includes("where") && q.includes(" or ") && !q.includes("count(*)")) {
+    const id = params[0] as string;
+    const numericId = params[1] as string;
+    const results: Record<string, unknown>[] = [];
+    for (const row of pagesStore.values()) {
+      if (row.id === id || row.numeric_id === numericId) {
+        results.push(row);
+      }
+    }
+    return results;
+  }
 
-  mockSql.reserve = () => Promise.resolve(mockSql);
-  mockSql.release = () => {};
-  mockSql.options = { parsers: {}, serializers: {} };
+  // --- wiki_pages: COUNT(*) with or without WHERE ---
+  if (q.includes("count(*)") && q.includes("wiki_pages")) {
+    if (q.includes("where")) {
+      let count = 0;
+      for (const row of pagesStore.values()) {
+        if (params.length > 0) {
+          if (row.category === params[0] || row.entity_type === params[0]) {
+            count++;
+          }
+        }
+      }
+      return [{ count }];
+    }
+    return [{ count: pagesStore.size }];
+  }
 
-  return mockSql;
+  // --- wiki_pages: SELECT ORDER BY LIMIT (paginated listing) ---
+  if (q.includes("wiki_pages") && q.includes("order by") && q.includes("limit") && !q.includes("count(*)")) {
+    const allRows = Array.from(pagesStore.values()).sort((a, b) =>
+      (a.id as string).localeCompare(b.id as string)
+    );
+
+    let filtered = allRows;
+    if (q.includes("where")) {
+      const filterVal = params[0] as string;
+      if (q.includes("category")) {
+        filtered = allRows.filter((r) => r.category === filterVal);
+      } else if (q.includes("entity_type")) {
+        filtered = allRows.filter((r) => r.entity_type === filterVal);
+      }
+    }
+
+    const limitIdx = q.includes("where") ? 1 : 0;
+    const limit = (params[limitIdx] as number) || 50;
+    const offset = (params[limitIdx + 1] as number) || 0;
+    return filtered.slice(offset, offset + limit);
+  }
+
+  // --- entity_ids: COUNT (for health check) ---
+  if (q.includes("count(*)") && !q.includes("wiki_pages")) {
+    return [{ count: 0 }];
+  }
+
+  // --- sequence health check ---
+  if (q.includes("last_value")) {
+    return [{ last_value: 0, is_called: true }];
+  }
+
+  return [];
 }
 
 // Mock the db module
-vi.mock("../db.js", async () => {
-  const { drizzle } = await import("drizzle-orm/postgres-js");
-  const schema = await import("../schema.js");
-  const mockSql = createMockSql();
-  const mockDrizzle = drizzle(mockSql, { schema });
-  return {
-    getDb: () => mockSql,
-    getDrizzleDb: () => mockDrizzle,
-    initDb: vi.fn(),
-    closeDb: vi.fn(),
-  };
-});
+vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { createApp } = await import("../app.js");
 
 // ---- Helpers ----
-
-function postJson(app: Hono, path: string, body: unknown) {
-  return app.request(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-}
 
 function seedPage(
   app: Hono,

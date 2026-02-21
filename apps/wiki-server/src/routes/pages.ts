@@ -1,8 +1,14 @@
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import { z } from "zod";
 import { eq, or, and, count, asc, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
 import { wikiPages } from "../schema.js";
+import {
+  parseJsonBody,
+  validationError,
+  invalidJsonError,
+  notFoundError,
+} from "./utils.js";
 
 export const pagesRoute = new Hono();
 
@@ -49,16 +55,6 @@ const SyncPageSchema = z.object({
 const SyncBatchSchema = z.object({
   pages: z.array(SyncPageSchema).min(1).max(MAX_BATCH_SIZE),
 });
-
-// ---- Helpers ----
-
-function parseJsonBody(c: Context) {
-  return c.req.json().catch(() => null);
-}
-
-function validationError(c: Context, message: string) {
-  return c.json({ error: "validation_error", message }, 400);
-}
 
 // ---- GET /search?q=...&limit=20 ----
 
@@ -115,10 +111,7 @@ pagesRoute.get("/:id", async (c) => {
     .where(or(eq(wikiPages.id, id), eq(wikiPages.numericId, id)));
 
   if (rows.length === 0) {
-    return c.json(
-      { error: "not_found", message: `No page found for id: ${id}` },
-      404
-    );
+    return notFoundError(c, `No page found for id: ${id}`);
   }
 
   const page = rows[0];
@@ -201,12 +194,7 @@ pagesRoute.get("/", async (c) => {
 
 pagesRoute.post("/sync", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body) {
-    return c.json(
-      { error: "invalid_json", message: "Request body must be valid JSON" },
-      400
-    );
-  }
+  if (!body) return invalidJsonError(c);
 
   const parsed = SyncBatchSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);

@@ -1,8 +1,14 @@
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { citationQuotes, citationContent } from "../schema.js";
+import {
+  parseJsonBody,
+  validationError,
+  invalidJsonError,
+  notFoundError,
+} from "./utils.js";
 
 export const citationsRoute = new Hono();
 
@@ -75,14 +81,6 @@ const PaginationQuery = z.object({
 
 // ---- Helpers ----
 
-function parseJsonBody(c: Context) {
-  return c.req.json().catch(() => null);
-}
-
-function validationError(c: Context, message: string) {
-  return c.json({ error: "validation_error", message }, 400);
-}
-
 /** Build the values object for a citation quote upsert. */
 function quoteValues(d: UpsertQuoteData) {
   return {
@@ -129,7 +127,7 @@ function upsertQuote(
 
 citationsRoute.post("/quotes/upsert", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body) return c.json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
+  if (!body) return invalidJsonError(c);
 
   const parsed = UpsertQuoteSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -151,7 +149,7 @@ citationsRoute.post("/quotes/upsert", async (c) => {
 
 citationsRoute.post("/quotes/upsert-batch", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body) return c.json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
+  if (!body) return invalidJsonError(c);
 
   const parsed = UpsertBatchSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -212,7 +210,7 @@ citationsRoute.get("/quotes/all", async (c) => {
 
 citationsRoute.post("/quotes/mark-verified", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body) return c.json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
+  if (!body) return invalidJsonError(c);
 
   const parsed = MarkVerifiedSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -242,7 +240,7 @@ citationsRoute.post("/quotes/mark-verified", async (c) => {
     });
 
   if (rows.length === 0) {
-    return c.json({ error: "not_found", message: `No quote for page=${pageId} footnote=${footnote}` }, 404);
+    return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
   }
 
   return c.json({ updated: true, pageId, footnote });
@@ -252,7 +250,7 @@ citationsRoute.post("/quotes/mark-verified", async (c) => {
 
 citationsRoute.post("/quotes/mark-accuracy", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body) return c.json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
+  if (!body) return invalidJsonError(c);
 
   const parsed = MarkAccuracySchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -284,7 +282,7 @@ citationsRoute.post("/quotes/mark-accuracy", async (c) => {
     });
 
   if (rows.length === 0) {
-    return c.json({ error: "not_found", message: `No quote for page=${pageId} footnote=${footnote}` }, 404);
+    return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
   }
 
   return c.json({ updated: true, pageId, footnote, verdict });
@@ -410,7 +408,7 @@ citationsRoute.get("/broken", async (c) => {
 
 citationsRoute.post("/content/upsert", async (c) => {
   const body = await parseJsonBody(c);
-  if (!body) return c.json({ error: "invalid_json", message: "Request body must be valid JSON" }, 400);
+  if (!body) return invalidJsonError(c);
 
   const parsed = UpsertContentSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
@@ -455,7 +453,7 @@ citationsRoute.get("/content", async (c) => {
     .where(eq(citationContent.url, url));
 
   if (rows.length === 0) {
-    return c.json({ error: "not_found", message: `No content for url: ${url}` }, 404);
+    return notFoundError(c, `No content for url: ${url}`);
   }
 
   return c.json(rows[0]);
