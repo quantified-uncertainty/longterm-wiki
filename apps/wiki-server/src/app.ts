@@ -5,6 +5,7 @@ import { healthRoute } from "./routes/health.js";
 import { idsRoute } from "./routes/ids.js";
 import { citationsRoute } from "./routes/citations.js";
 import { pagesRoute } from "./routes/pages.js";
+import { editLogsRoute } from "./routes/edit-logs.js";
 
 export function createApp() {
   const app = new Hono();
@@ -38,6 +39,7 @@ export function createApp() {
   app.route("/api/ids", idsRoute);
   app.route("/api/citations", citationsRoute);
   app.route("/api/pages", pagesRoute);
+  app.route("/api/edit-logs", editLogsRoute);
 
   return app;
 }

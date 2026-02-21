@@ -1,7 +1,9 @@
 /**
  * Edit Log Command Handlers
  *
- * View and query the per-page edit history stored in data/edit-logs/.
+ * View and query the per-page edit history. Reads from YAML files by default.
+ * When --source=db is passed (and the wiki-server is available), queries the
+ * PostgreSQL database via API instead.
  *
  * Usage:
  *   crux edit-log view <page-id>      Show edit history for a page
@@ -15,6 +17,7 @@ import type { CommandResult } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
 import { readEditLog } from '../lib/edit-log.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { getEditLogsForPage, getEditLogStats } from '../lib/wiki-server-client.ts';
 
 const EDIT_LOGS_DIR = join(PROJECT_ROOT, 'data/edit-logs');
 
@@ -29,6 +32,10 @@ function getAllLoggedPageIds(): string[] {
   }
 }
 
+function useDb(options: Record<string, unknown>): boolean {
+  return options.source === 'db';
+}
+
 /**
  * View edit history for a specific page
  */
@@ -41,6 +48,47 @@ export async function view(args: string[], options: Record<string, unknown>): Pr
     return { output: `${c.red}Error: page ID required. Usage: crux edit-log view <page-id>${c.reset}`, exitCode: 1 };
   }
 
+  // Try DB source if requested
+  if (useDb(options)) {
+    const result = await getEditLogsForPage(pageId);
+    if (result) {
+      const entries = result.entries;
+
+      if (options.ci || options.json) {
+        return { output: JSON.stringify(entries, null, 2), exitCode: 0 };
+      }
+
+      if (entries.length === 0) {
+        return { output: `${c.dim}No edit log found for "${pageId}" (source: db)${c.reset}`, exitCode: 0 };
+      }
+
+      let output = '';
+      output += `${c.bold}${c.blue}Edit History: ${pageId}${c.reset} ${c.dim}(source: db)${c.reset}\n`;
+      output += `${c.dim}${entries.length} entries${c.reset}\n\n`;
+
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        const agencyIcon = e.agency === 'human' ? 'H' : e.agency === 'ai-directed' ? 'A' : 'S';
+        const agencyColor = e.agency === 'human' ? c.green : e.agency === 'ai-directed' ? c.cyan : c.dim;
+
+        output += `${c.dim}${String(i + 1).padStart(3)}.${c.reset} `;
+        output += `${c.bold}${e.date}${c.reset} `;
+        output += `[${agencyColor}${agencyIcon}${c.reset}] `;
+        output += `${e.tool}`;
+        if (e.requestedBy) output += ` ${c.dim}by ${e.requestedBy}${c.reset}`;
+        output += '\n';
+        if (e.note) {
+          output += `       ${c.dim}${e.note}${c.reset}\n`;
+        }
+      }
+
+      output += `\n${c.dim}Agency: [H]=human [A]=ai-directed [S]=automated${c.reset}`;
+      return { output, exitCode: 0 };
+    }
+    return { output: `${c.red}Error: wiki-server not available. Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
+  }
+
+  // Default: YAML source
   const entries = readEditLog(pageId);
 
   if (options.ci || options.json) {
@@ -155,6 +203,35 @@ export async function stats(_args: string[], options: Record<string, unknown>): 
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
 
+  // Try DB source if requested
+  if (useDb(options)) {
+    const serverStats = await getEditLogStats();
+    if (serverStats) {
+      if (options.ci || options.json) {
+        return { output: JSON.stringify(serverStats, null, 2), exitCode: 0 };
+      }
+
+      let output = '';
+      output += `${c.bold}${c.blue}Edit Log Statistics${c.reset} ${c.dim}(source: db)${c.reset}\n\n`;
+      output += `  Pages with logs: ${c.bold}${serverStats.pagesWithLogs}${c.reset}\n`;
+      output += `  Total entries:   ${c.bold}${serverStats.totalEntries}${c.reset}\n\n`;
+
+      output += `${c.bold}By Tool:${c.reset}\n`;
+      for (const [tool, cnt] of Object.entries(serverStats.byTool).sort((a, b) => b[1] - a[1])) {
+        output += `  ${tool.padEnd(18)} ${String(cnt).padStart(5)}\n`;
+      }
+
+      output += `\n${c.bold}By Agency:${c.reset}\n`;
+      for (const [agency, cnt] of Object.entries(serverStats.byAgency).sort((a, b) => b[1] - a[1])) {
+        output += `  ${agency.padEnd(18)} ${String(cnt).padStart(5)}\n`;
+      }
+
+      return { output, exitCode: 0 };
+    }
+    return { output: `${c.red}Error: wiki-server not available. Check LONGTERMWIKI_SERVER_URL.${c.reset}`, exitCode: 1 };
+  }
+
+  // Default: YAML source
   const pageIds = getAllLoggedPageIds();
 
   const toolCounts: Record<string, number> = {};
@@ -227,11 +304,13 @@ Options:
   --tool=<tool>        Filter by tool (crux-create, crux-improve, crux-grade, crux-fix, etc.)
   --agency=<agency>    Filter by agency (human, ai-directed, automated)
   --limit=N            Number of results for list (default: 50)
+  --source=db          Query wiki-server database instead of YAML files
 
 Examples:
   crux edit-log view open-philanthropy
   crux edit-log list --tool=crux-improve
   crux edit-log stats
+  crux edit-log stats --source=db
   crux edit-log list --agency=human --limit=10
 `;
 }

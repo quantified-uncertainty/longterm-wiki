@@ -1,7 +1,14 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+
+// Mock wiki-server-client to prevent real HTTP requests in tests
+vi.mock('./wiki-server-client.ts', () => ({
+  appendEditLogToServer: vi.fn().mockResolvedValue(null),
+}));
+
 import { appendEditLog, readEditLog, pageIdFromPath, logBulkFixes, getDefaultRequestedBy } from './edit-log.ts';
+import { appendEditLogToServer } from './wiki-server-client.ts';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const EDIT_LOGS_DIR = path.join(ROOT, 'data/edit-logs');
@@ -111,6 +118,43 @@ describe('edit-log', () => {
       expect(entries).toHaveLength(1);
       expect(entries[0].requestedBy).toBe('');
       expect(entries[0].note).toBe('');
+    });
+
+    it('fires a dual-write to the wiki-server API', () => {
+      const mockFn = vi.mocked(appendEditLogToServer);
+      mockFn.mockClear();
+
+      appendEditLog(TEST_PAGE_ID, {
+        date: '2026-02-20',
+        tool: 'crux-fix',
+        agency: 'automated',
+        note: 'Test dual-write',
+      });
+
+      expect(mockFn).toHaveBeenCalledOnce();
+      expect(mockFn).toHaveBeenCalledWith({
+        pageId: TEST_PAGE_ID,
+        date: '2026-02-20',
+        tool: 'crux-fix',
+        agency: 'automated',
+        requestedBy: null,
+        note: 'Test dual-write',
+      });
+    });
+
+    it('does not fail if server write rejects', () => {
+      const mockFn = vi.mocked(appendEditLogToServer);
+      mockFn.mockRejectedValueOnce(new Error('server down'));
+
+      // Should not throw
+      appendEditLog(TEST_PAGE_ID, {
+        tool: 'crux-fix',
+        agency: 'automated',
+      });
+
+      // YAML file should still be written
+      const entries = readEditLog(TEST_PAGE_ID);
+      expect(entries).toHaveLength(1);
     });
   });
 
