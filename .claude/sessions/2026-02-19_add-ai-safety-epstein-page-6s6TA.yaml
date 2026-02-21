@@ -24,7 +24,8 @@ issues:
   - Paranoid review subagent called `crux agent-checklist init` internally, which
     overwrote wip-checklist.md with a fresh infrastructure checklist. Manually restored
     the content checklist by rewriting the file.
-  - Byline Times source (fn8, Dec 2025) pre-dates DOJ file release (Jan 2026) — claims
+  - >-
+    Byline Times source (fn8, Dec 2025) pre-dates DOJ file release (Jan 2026) — claims
     sourced from it may draw on earlier reporting rather than DOJ documents directly.
     Noted in page via `balanceFlags: single-source-dominance`.
 learnings:

@@ -12,7 +12,8 @@ pages: []
 model: sonnet-4
 duration: ~30min
 issues:
-  - PR #302 (YAML session format migration) had just been merged to main —
+  - >-
+    PR #302 (YAML session format migration) had just been merged to main —
     needed to fetch and merge before starting to ensure compliance
 learnings:
   - The flat DataTable gets very noisy with many sessions; session-grouped cards

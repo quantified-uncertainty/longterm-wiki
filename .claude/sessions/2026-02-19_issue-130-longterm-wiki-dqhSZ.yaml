@@ -1,6 +1,6 @@
 date: 2026-02-19
 branch: claude/issue-130-longterm-wiki-dqhSZ
-title: Add adversarial reviewer with re-research feedback loop (issue #130)
+title: "Add adversarial reviewer with re-research feedback loop (issue #130)"
 model: sonnet-4
 duration: ~2h
 pages: []
@@ -16,15 +16,18 @@ summary: >
   GitHub issues #317 and #318 opened for deferred improvements.
 issues:
   - Pre-existing TypeScript errors in crux/ (327 lines, not introduced by this PR).
-  - Critical bug caught post-initial-implementation: improvePhase read from disk unconditionally,
+  - >-
+    Critical bug caught post-initial-implementation: improvePhase read from disk unconditionally,
     so adversarial loop iterations all re-improved from original file instead of previous output.
     Fixed with contentOverride optional parameter.
 learnings:
   - Always pass in-memory content explicitly when chaining phases that can read from disk — never
     assume the phase will use the right source just because it's called with the same PageData.
-  - Schema SSOT: all Zod schemas for LLM responses belong in phases/json-parsing.ts. Defining
+  - >-
+    Schema SSOT: all Zod schemas for LLM responses belong in phases/json-parsing.ts. Defining
     them elsewhere creates drift and duplicate type casts.
-  - Testing private functions: re-implement module-private pure functions inline in test files
+  - >-
+    Testing private functions: re-implement module-private pure functions inline in test files
     rather than exporting them just for testing. Document this in the test file header.
   - The adversarial reviewer must use a separate model call from synthesis — prevents the model
     from defending its own output (as noted in the original issue).

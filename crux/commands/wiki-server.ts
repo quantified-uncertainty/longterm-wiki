@@ -35,7 +35,7 @@ const SCRIPTS = {
   },
   'sync-edit-logs': {
     script: 'wiki-server/sync-edit-logs.ts',
-    description: 'Sync data/edit-logs/*.yaml to wiki-server',
+    description: 'Sync data/edit-logs/*.yaml to wiki-server (legacy — exits if dir missing)',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
   'sync-sessions': {
@@ -83,7 +83,6 @@ Examples:
   crux wiki-server sync-facts                Sync all facts
   crux wiki-server sync-facts --dry-run      Preview fact sync
   crux wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
-  crux wiki-server sync-edit-logs          Sync all edit logs
   crux wiki-server sync-sessions           Sync all session logs
   crux wiki-server sync-auto-update-runs   Sync all auto-update runs
 `;

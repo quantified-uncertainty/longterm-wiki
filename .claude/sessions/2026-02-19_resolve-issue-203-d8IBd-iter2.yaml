@@ -13,7 +13,8 @@ summary: >
   values, (3) over-wide originalText proposals including JSX tags or prose. Applied
   validated Calc replacements to two pages (openai.39d6868e/$500B valuation now computes correctly).
 issues:
-  - Range facts like {value: {min: 500000000000}} returned null from both formatFactsForPrompt
+  - >-
+    Range facts like {value: {min: 500000000000}} returned null from both formatFactsForPrompt
     and buildFactLookup — added extractNumericFromFact() helper that handles {min}, {max},
     {min+max} range objects
   - Proposal validation was index-based (proposals[i] vs patterns[i]) but LLM filters null
@@ -22,11 +23,13 @@ issues:
     validation guards (JSX tags, table pipes, excess width, prose in suffix) and improved
     prompt guidance
 learnings:
-  - Facts with {value: {min: N}} are common for valuations — easy to miss since they
+  - >-
+    Facts with {value: {min: N}} are common for valuations — easy to miss since they
     look like numbers but fail the typeof === 'number' check
   - When identical patterns appear multiple times, disambiguation via widening originalText
     is error-prone; better to replace first occurrence per run and let the tool iterate
-  - Named-multiple patterns ("39x multiple") need special guidance: replace only the
+  - >-
+    Named-multiple patterns ("39x multiple") need special guidance: replace only the
     number portion in originalText, leave the word "multiple" as surrounding prose
 recommendations:
   - The extractNumericFromFact helper is now in calc-derive.ts but also needed in
