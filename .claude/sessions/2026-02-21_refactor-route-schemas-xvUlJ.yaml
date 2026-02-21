@@ -5,7 +5,7 @@ issues:
   - 534
   - 536
   - 537
-pr: ""
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/552
 model: claude-sonnet-4-6
 pages: []
 
