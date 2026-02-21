@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
 
 export const citationsRoute = new Hono();
@@ -69,8 +70,6 @@ const MarkAccuracyBatchSchema = z.object({
 
 const UpsertContentSchema = z.object({
   url: z.string().min(1).max(2000),
-  pageId: z.string().min(1).max(200),
-  footnote: z.number().int().min(0),
   fetchedAt: z.string().datetime(),
   httpStatus: z.number().int().nullable().optional(),
   contentType: z.string().max(200).nullable().optional(),
@@ -141,7 +140,7 @@ citationsRoute.post("/quotes/upsert", async (c) => {
   const db = getDrizzleDb();
   const rows = await upsertQuote(db, parsed.data);
 
-  const row = rows[0];
+  const row = firstOrThrow(rows, "citation quote upsert");
   return c.json({
     id: row.id,
     pageId: row.pageId,
@@ -445,8 +444,6 @@ citationsRoute.post("/content/upsert", async (c) => {
 
   const vals = {
     url: d.url,
-    pageId: d.pageId,
-    footnote: d.footnote,
     fetchedAt: new Date(d.fetchedAt),
     httpStatus: d.httpStatus ?? null,
     contentType: d.contentType ?? null,
@@ -464,7 +461,7 @@ citationsRoute.post("/content/upsert", async (c) => {
       set: { ...vals, updatedAt: sql`now()` },
     });
 
-  return c.json({ url: d.url, pageId: d.pageId, footnote: d.footnote });
+  return c.json({ url: d.url });
 });
 
 // ---- POST /quotes/mark-accuracy-batch ----

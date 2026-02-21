@@ -402,8 +402,6 @@ describeWithDb("Integration: Citation Content CRUD", () => {
       .insert(citationContent)
       .values({
         url: "https://example.com/article",
-        pageId: "test-page",
-        footnote: 1,
         fetchedAt: new Date(),
         httpStatus: 200,
         pageTitle: "Test Article",
@@ -419,16 +417,12 @@ describeWithDb("Integration: Citation Content CRUD", () => {
     const fetchedAt = new Date();
     await db.insert(citationContent).values({
       url: "https://example.com/upsert",
-      pageId: "page-a",
-      footnote: 1,
       fetchedAt,
       pageTitle: "Original",
     });
 
     const vals = {
       url: "https://example.com/upsert",
-      pageId: "page-b",
-      footnote: 2,
       fetchedAt: new Date(),
       httpStatus: 200,
       contentType: null,
@@ -453,14 +447,11 @@ describeWithDb("Integration: Citation Content CRUD", () => {
 
     expect(rows).toHaveLength(1);
     expect(rows[0].pageTitle).toBe("Updated");
-    expect(rows[0].pageId).toBe("page-b");
   });
 
   it("selects by URL", async () => {
     await db.insert(citationContent).values({
       url: "https://example.com/find",
-      pageId: "test-page",
-      footnote: 1,
       fetchedAt: new Date(),
     });
 
@@ -470,7 +461,7 @@ describeWithDb("Integration: Citation Content CRUD", () => {
       .where(eq(citationContent.url, "https://example.com/find"));
 
     expect(rows).toHaveLength(1);
-    expect(rows[0].pageId).toBe("test-page");
+    expect(rows[0].url).toBe("https://example.com/find");
   });
 });
 

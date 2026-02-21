@@ -24,7 +24,7 @@ import { parse } from 'yaml';
 import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildIdMaps, filterEligiblePages } from './lib/id-assignment.mjs';
-import { isServerAvailable, allocateId } from './lib/id-client.mjs';
+import { isServerAvailable, allocateIds } from './lib/id-client.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -165,41 +165,48 @@ async function main() {
   // YAML entities without numericIds are skipped — they cannot be written
   // back automatically and must be updated in the source YAML manually.
   // -------------------------------------------------------------------------
-  let entityAssignments = 0;
   let yamlSkipped = 0;
+  const entitiesNeedingIds = [];
+
   for (const entity of entities) {
-    if (!entity.numericId) {
-      if (entity._source !== 'frontmatter' || !entity._filePath) {
-        // YAML entity without numericId — can't write back, skip
-        console.warn(`    WARNING: ${entity.id} (YAML entity) has no numericId — add it manually to the source YAML`);
-        yamlSkipped++;
-        continue;
-      }
+    if (entity.numericId) continue;
 
-      if (DRY_RUN) {
-        console.log(`    [dry-run] Would assign ID → ${entity.id} (MDX frontmatter)`);
-        entityAssignments++;
-        continue;
-      }
+    if (entity._source !== 'frontmatter' || !entity._filePath) {
+      // YAML entity without numericId — can't write back, skip
+      console.warn(`    WARNING: ${entity.id} (YAML entity) has no numericId — add it manually to the source YAML`);
+      yamlSkipped++;
+      continue;
+    }
 
-      if (!serverAvailable) {
-        console.error('  ERROR: Wiki server is not available but new entities need IDs.');
-        console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
-        console.error('  ID assignment requires the server for atomic, consistent allocation.');
+    entitiesNeedingIds.push(entity);
+  }
+
+  if (entitiesNeedingIds.length > 0 && DRY_RUN) {
+    for (const entity of entitiesNeedingIds) {
+      console.log(`    [dry-run] Would assign ID → ${entity.id} (MDX frontmatter)`);
+    }
+  } else if (entitiesNeedingIds.length > 0) {
+    if (!serverAvailable) {
+      console.error('  ERROR: Wiki server is not available but new entities need IDs.');
+      console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
+      console.error('  ID assignment requires the server for atomic, consistent allocation.');
+      process.exit(1);
+    }
+
+    const slugs = entitiesNeedingIds.map(e => e.id);
+    console.log(`  Allocating ${slugs.length} entity IDs in batch...`);
+    const allocated = await allocateIds(slugs);
+
+    for (const entity of entitiesNeedingIds) {
+      const numId = allocated.get(entity.id);
+      if (!numId) {
+        console.error(`    ERROR: Batch allocation did not return ID for entity "${entity.id}"`);
         process.exit(1);
       }
 
-      const result = await allocateId(entity.id);
-      if (!result) {
-        console.error(`    ERROR: Failed to allocate ID for entity "${entity.id}" — server returned null`);
-        process.exit(1);
-      }
-
-      const numId = result.numericId;
       entity.numericId = numId;
       numericIdToSlug[numId] = entity.id;
       slugToNumericId[entity.id] = numId;
-      entityAssignments++;
 
       const content = readFileSync(entity._filePath, 'utf-8');
       const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
@@ -208,7 +215,10 @@ async function main() {
     }
   }
 
-  if (entityAssignments > 0) {
+  const entityAssignments = entitiesNeedingIds.length;
+  if (entityAssignments > 0 && DRY_RUN) {
+    console.log(`  entities: would assign ${entityAssignments} new IDs`);
+  } else if (entityAssignments > 0) {
     console.log(`  entities: assigned ${entityAssignments} new IDs (total: ${Object.keys(numericIdToSlug).length})`);
   } else {
     console.log(`  entities: ${Object.keys(numericIdToSlug).length} entities all have IDs${yamlSkipped > 0 ? ` (${yamlSkipped} YAML entities need manual numericId)` : ''}`);
@@ -238,16 +248,13 @@ async function main() {
   }
 
   // Pass 2: assign new IDs to pages that don't have one yet
-  let pageAssignments = 0;
-  for (const page of eligiblePages) {
-    if (slugToNumericId[page.id]) continue; // already has an ID
+  const pagesNeedingIds = eligiblePages.filter(p => !slugToNumericId[p.id]);
 
-    if (DRY_RUN) {
+  if (pagesNeedingIds.length > 0 && DRY_RUN) {
+    for (const page of pagesNeedingIds) {
       console.log(`    [dry-run] Would assign ID → ${page.id} (MDX frontmatter)`);
-      pageAssignments++;
-      continue;
     }
-
+  } else if (pagesNeedingIds.length > 0) {
     if (!serverAvailable) {
       console.error('  ERROR: Wiki server is not available but new pages need IDs.');
       console.error('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running.');
@@ -255,25 +262,32 @@ async function main() {
       process.exit(1);
     }
 
-    const result = await allocateId(page.id);
-    if (!result) {
-      console.error(`    ERROR: Failed to allocate ID for page "${page.id}" — server returned null`);
-      process.exit(1);
+    const slugs = pagesNeedingIds.map(p => p.id);
+    console.log(`  Allocating ${slugs.length} page IDs in batch...`);
+    const allocated = await allocateIds(slugs);
+
+    for (const page of pagesNeedingIds) {
+      const numId = allocated.get(page.id);
+      if (!numId) {
+        console.error(`    ERROR: Batch allocation did not return ID for page "${page.id}"`);
+        process.exit(1);
+      }
+
+      numericIdToSlug[numId] = page.id;
+      slugToNumericId[page.id] = numId;
+      page.numericId = numId;
+
+      const content = readFileSync(page._fullPath, 'utf-8');
+      const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
+      writeFileSync(page._fullPath, updated);
+      console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
     }
-
-    const numId = result.numericId;
-    numericIdToSlug[numId] = page.id;
-    slugToNumericId[page.id] = numId;
-    page.numericId = numId;
-    pageAssignments++;
-
-    const content = readFileSync(page._fullPath, 'utf-8');
-    const updated = content.replace(/^---\n/, `---\nnumericId: ${numId}\n`);
-    writeFileSync(page._fullPath, updated);
-    console.log(`    Assigned ${numId} → ${page.id} (wrote to MDX frontmatter)`);
   }
 
-  if (pageAssignments > 0) {
+  const pageAssignments = pagesNeedingIds.length;
+  if (pageAssignments > 0 && DRY_RUN) {
+    console.log(`  pages: would assign ${pageAssignments} new page IDs`);
+  } else if (pageAssignments > 0) {
     console.log(`  pages: assigned ${pageAssignments} new page IDs`);
   } else {
     console.log(`  pages: all eligible pages have IDs`);

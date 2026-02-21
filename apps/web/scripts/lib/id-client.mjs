@@ -10,6 +10,7 @@
  */
 
 const TIMEOUT_MS = 5000;
+const BATCH_TIMEOUT_MS = 30000;
 
 function getServerUrl() {
   return process.env.LONGTERMWIKI_SERVER_URL || "";
@@ -101,7 +102,7 @@ export async function allocateBatch(items) {
       method: "POST",
       headers: buildHeaders(),
       body: JSON.stringify({ items }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
     });
 
     if (!res.ok) return null;
@@ -111,4 +112,40 @@ export async function allocateBatch(items) {
   } catch {
     return null;
   }
+}
+
+// Max items per batch request (must match server-side limit in
+// apps/wiki-server/src/routes/ids.ts AllocateBatchSchema .max(50))
+const BATCH_CHUNK_SIZE = 50;
+
+/**
+ * Allocate IDs for a list of slugs, automatically chunking into
+ * BATCH_CHUNK_SIZE groups to respect server limits.
+ *
+ * @param {string[]} slugs — Slugs to allocate IDs for
+ * @returns {Promise<Map<string, string>>} Map of slug → numericId
+ * @throws {Error} If any batch request fails
+ */
+export async function allocateIds(slugs) {
+  const resultMap = new Map();
+
+  for (let i = 0; i < slugs.length; i += BATCH_CHUNK_SIZE) {
+    const batch = slugs.slice(i, i + BATCH_CHUNK_SIZE);
+    const items = batch.map(slug => ({ slug }));
+    const results = await allocateBatch(items);
+    if (!results) {
+      throw new Error(`Batch allocation failed for slugs: ${batch.join(', ')}`);
+    }
+    for (const r of results) {
+      resultMap.set(r.slug, r.numericId);
+    }
+  }
+
+  // Post-condition: every requested slug must have a result
+  const missing = slugs.filter(s => !resultMap.has(s));
+  if (missing.length > 0) {
+    throw new Error(`Batch allocation missing results for slugs: ${missing.slice(0, 5).join(', ')}${missing.length > 5 ? ` (and ${missing.length - 5} more)` : ''}`);
+  }
+
+  return resultMap;
 }

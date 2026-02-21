@@ -117,8 +117,6 @@ export const citationContent = pgTable(
   "citation_content",
   {
     url: text("url").primaryKey(),
-    pageId: text("page_id").notNull(),
-    footnote: integer("footnote").notNull(),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
     httpStatus: integer("http_status"),
     contentType: text("content_type"),
@@ -132,8 +130,7 @@ export const citationContent = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-  },
-  (table) => [index("idx_cc_page_id").on(table.pageId)]
+  }
 );
 
 export const citationAccuracySnapshots = pgTable(

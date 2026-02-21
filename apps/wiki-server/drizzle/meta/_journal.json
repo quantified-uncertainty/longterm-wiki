@@ -76,14 +76,21 @@
       "idx": 10,
       "version": "7",
       "when": 1771900000000,
-      "tag": "0010_add_summaries",
+      "tag": "0010_drop_citation_content_page_footnote",
       "breakpoints": true
     },
     {
       "idx": 11,
       "version": "7",
       "when": 1771900100000,
-      "tag": "0011_add_claims",
+      "tag": "0011_add_summaries",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1771900200000,
+      "tag": "0012_add_claims",
       "breakpoints": true
     }
   ]
