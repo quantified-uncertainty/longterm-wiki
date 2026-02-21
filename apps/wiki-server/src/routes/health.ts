@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { count, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../db.js";
-import { entityIds, wikiPages } from "../schema.js";
+import { entityIds, wikiPages, entities, facts } from "../schema.js";
 
 const startTime = Date.now();
 
@@ -14,6 +14,8 @@ healthRoute.get("/", async (c) => {
   let totalIds = 0;
   let nextId = 0;
   let totalPages = 0;
+  let totalEntities = 0;
+  let totalFacts = 0;
 
   try {
     const countResult = await db.select({ count: count() }).from(entityIds);
@@ -23,6 +25,14 @@ healthRoute.get("/", async (c) => {
       .select({ count: count() })
       .from(wikiPages);
     totalPages = pagesCountResult[0].count;
+
+    const entitiesCountResult = await db
+      .select({ count: count() })
+      .from(entities);
+    totalEntities = entitiesCountResult[0].count;
+
+    const factsCountResult = await db.select({ count: count() }).from(facts);
+    totalFacts = factsCountResult[0].count;
 
     // Sequence query — no Drizzle equivalent, use raw SQL
     const rawDb = getDb();
@@ -42,6 +52,8 @@ healthRoute.get("/", async (c) => {
     database: dbStatus,
     totalIds,
     totalPages,
+    totalEntities,
+    totalFacts,
     nextId,
     uptime: Math.floor((Date.now() - startTime) / 1000),
   });

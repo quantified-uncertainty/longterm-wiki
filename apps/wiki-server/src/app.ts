@@ -14,6 +14,8 @@ import { summariesRoute } from "./routes/summaries.js";
 import { claimsRoute } from "./routes/claims.js";
 import { linksRoute } from "./routes/links.js";
 import { autoUpdateNewsRoute } from "./routes/auto-update-news.js";
+import { entitiesRoute } from "./routes/entities.js";
+import { factsRoute } from "./routes/facts.js";
 
 export function createApp() {
   const app = new Hono();
@@ -59,6 +61,8 @@ export function createApp() {
   app.route("/api/claims", claimsRoute);
   app.route("/api/links", linksRoute);
   app.route("/api/auto-update-news", autoUpdateNewsRoute);
+  app.route("/api/entities", entitiesRoute);
+  app.route("/api/facts", factsRoute);
 
   return app;
 }

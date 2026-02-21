@@ -111,7 +111,21 @@
       "idx": 15,
       "version": "7",
       "when": 1771900500000,
-      "tag": "0015_add_auto_update_news_items",
+      "tag": "0015_add_entities",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1771900600000,
+      "tag": "0016_add_facts",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1771900700000,
+      "tag": "0017_add_auto_update_news_items",
       "breakpoints": true
     }
   ]

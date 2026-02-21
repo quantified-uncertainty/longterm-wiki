@@ -401,6 +401,97 @@ export const resourceCitations = pgTable(
 );
 
 /**
+ * Entities — read mirror of data/entities/*.yaml files.
+ *
+ * Stores the full entity metadata (type, title, description, tags, etc.)
+ * synced from the YAML source files during build. YAML stays authoritative;
+ * this table is a queryable read mirror for the API.
+ */
+export const entities = pgTable(
+  "entities",
+  {
+    id: text("id").primaryKey(),
+    numericId: text("numeric_id"),
+    entityType: text("entity_type").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    website: text("website"),
+    tags: jsonb("tags").$type<string[]>(),
+    clusters: jsonb("clusters").$type<string[]>(),
+    status: text("status"),
+    lastUpdated: text("last_updated"),
+    customFields: jsonb("custom_fields").$type<
+      Array<{ label: string; value: string; link?: string }>
+    >(),
+    relatedEntries: jsonb("related_entries").$type<
+      Array<{ id: string; type: string; relationship?: string }>
+    >(),
+    sources: jsonb("sources").$type<
+      Array<{ title: string; url?: string; author?: string; date?: string }>
+    >(),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ent_numeric_id").on(table.numericId),
+    index("idx_ent_entity_type").on(table.entityType),
+    index("idx_ent_title").on(table.title),
+  ]
+);
+
+/**
+ * Facts — read mirror of data/facts/*.yaml files.
+ *
+ * Stores individual facts tied to entities, including timeseries data
+ * (grouped by measure). YAML stays authoritative; this table is a queryable
+ * read mirror for the API.
+ */
+export const facts = pgTable(
+  "facts",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: text("entity_id").notNull(),
+    factId: text("fact_id").notNull(),
+    label: text("label"),
+    value: text("value"), // String representation of the value
+    numeric: real("numeric"), // Parsed numeric value (null for non-numeric)
+    low: real("low"), // Lower bound for range values
+    high: real("high"), // Upper bound for range values
+    asOf: text("as_of"), // Point-in-time (YYYY-MM, YYYY, or ISO date)
+    measure: text("measure"), // Measure ID for timeseries grouping
+    subject: text("subject"), // Entity override (defaults to parent entity)
+    note: text("note"),
+    source: text("source"), // URL to source
+    sourceResource: text("source_resource"), // Resource ID
+    format: text("format"),
+    formatDivisor: real("format_divisor"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_facts_entity_fact").on(table.entityId, table.factId),
+    index("idx_facts_entity_id").on(table.entityId),
+    index("idx_facts_measure").on(table.measure),
+    index("idx_facts_as_of").on(table.asOf),
+    index("idx_facts_subject").on(table.subject),
+  ]
+);
+
+/**
  * Page links — stores directional links between entities/pages.
  *
  * Populated during build-data sync. Each row represents a signal that
