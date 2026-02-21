@@ -66,7 +66,12 @@ const SCRIPTS = {
   'export-dashboard': {
     script: 'citations/export-dashboard.ts',
     description: 'Export accuracy data as YAML for the internal dashboard',
-    passthrough: ['json'],
+    passthrough: ['json', 'from-db'],
+  },
+  'migrate-accuracy': {
+    script: 'citations/migrate-accuracy-to-db.ts',
+    description: 'Migrate citation accuracy data from SQLite to PostgreSQL',
+    passthrough: ['dry-run'],
   },
   'fix-inaccuracies': {
     script: 'citations/fix-inaccuracies.ts',
@@ -123,6 +128,9 @@ Examples:
   crux citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
   crux citations normalize-footnotes --fix <id>     Fix one page
   crux citations export-dashboard                  Export data for web dashboard
+  crux citations export-dashboard --from-db        Export from PostgreSQL instead of SQLite
+  crux citations migrate-accuracy                   Migrate accuracy data to PostgreSQL
+  crux citations migrate-accuracy --dry-run         Preview migration
   crux citations fix-inaccuracies                   Dry-run fix proposals for all flagged
   crux citations fix-inaccuracies --apply           Apply fixes to pages
   crux citations fix-inaccuracies <id>              Fix one page
