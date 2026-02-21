@@ -1,6 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
+import {
+  fetchFromWikiServer,
+  withApiFallback,
+  dataSourceLabel,
+} from "@lib/wiki-server";
 import { RunsTable } from "./runs-table";
 import type { Metadata } from "next";
 
@@ -87,56 +92,40 @@ interface ApiRunEntry {
 }
 
 async function loadRunsFromApi(): Promise<RunRow[] | null> {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (!serverUrl) return null;
+  const data = await fetchFromWikiServer<{ entries: ApiRunEntry[] }>(
+    "/api/auto-update-runs/all?limit=200",
+    { revalidate: 60 }
+  );
+  if (!data) return null;
 
-  try {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+  return data.entries.map((r) => {
+    const startMs = new Date(r.startedAt).getTime();
+    const endMs = r.completedAt ? new Date(r.completedAt).getTime() : startMs;
+
+    return {
+      date: r.date,
+      startedAt: r.startedAt,
+      trigger: r.trigger || "manual",
+      sourcesChecked: r.sourcesChecked ?? 0,
+      sourcesFailed: r.sourcesFailed ?? 0,
+      itemsFetched: r.itemsFetched ?? 0,
+      itemsRelevant: r.itemsRelevant ?? 0,
+      pagesPlanned: r.pagesPlanned ?? 0,
+      pagesUpdated: r.pagesUpdated ?? 0,
+      pagesFailed: r.pagesFailed ?? 0,
+      pagesSkipped: r.pagesSkipped ?? 0,
+      budgetLimit: r.budgetLimit ?? 0,
+      budgetSpent: r.budgetSpent ?? 0,
+      durationMinutes: Math.round((endMs - startMs) / 60000),
+      results: r.results.map((res) => ({
+        pageId: res.pageId,
+        status: res.status as "success" | "failed" | "skipped",
+        tier: res.tier || "",
+        error: res.errorMessage ?? undefined,
+        durationMs: res.durationMs ?? undefined,
+      })),
     };
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
-    const res = await fetch(`${serverUrl}/api/auto-update-runs/all?limit=200`, {
-      headers,
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as { entries: ApiRunEntry[] };
-    return data.entries.map((r) => {
-      const startMs = new Date(r.startedAt).getTime();
-      const endMs = r.completedAt ? new Date(r.completedAt).getTime() : startMs;
-
-      return {
-        date: r.date,
-        startedAt: r.startedAt,
-        trigger: r.trigger || "manual",
-        sourcesChecked: r.sourcesChecked ?? 0,
-        sourcesFailed: r.sourcesFailed ?? 0,
-        itemsFetched: r.itemsFetched ?? 0,
-        itemsRelevant: r.itemsRelevant ?? 0,
-        pagesPlanned: r.pagesPlanned ?? 0,
-        pagesUpdated: r.pagesUpdated ?? 0,
-        pagesFailed: r.pagesFailed ?? 0,
-        pagesSkipped: r.pagesSkipped ?? 0,
-        budgetLimit: r.budgetLimit ?? 0,
-        budgetSpent: r.budgetSpent ?? 0,
-        durationMinutes: Math.round((endMs - startMs) / 60000),
-        results: r.results.map((res) => ({
-          pageId: res.pageId,
-          status: res.status as "success" | "failed" | "skipped",
-          tier: res.tier || "",
-          error: res.errorMessage ?? undefined,
-          durationMs: res.durationMs ?? undefined,
-        })),
-      };
-    });
-  } catch {
-    return null;
-  }
+  });
 }
 
 // ── YAML Fallback ─────────────────────────────────────────────────────────
@@ -187,8 +176,10 @@ function loadRunReportsFromYaml(): RunRow[] {
 // ── Page Component ────────────────────────────────────────────────────────
 
 export default async function AutoUpdateRunsPage() {
-  // Try API first, fall back to YAML
-  const runs = (await loadRunsFromApi()) ?? loadRunReportsFromYaml();
+  const { data: runs, source } = await withApiFallback(
+    loadRunsFromApi,
+    loadRunReportsFromYaml
+  );
 
   const totalSpent = runs.reduce((sum, r) => sum + r.budgetSpent, 0);
   const totalUpdated = runs.reduce((sum, r) => sum + r.pagesUpdated, 0);
@@ -237,6 +228,10 @@ export default async function AutoUpdateRunsPage() {
       ) : (
         <RunsTable data={runs} />
       )}
+
+      <p className="text-xs text-muted-foreground mt-4">
+        Data source: {dataSourceLabel(source)}
+      </p>
     </article>
   );
 }
