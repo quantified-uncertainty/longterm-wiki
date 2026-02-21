@@ -109,6 +109,11 @@ function createMockSql() {
       return [{ count: store.size }];
     }
 
+    // SELECT COUNT(*) for wiki_pages (health check)
+    if (q.includes("count(*)") && q.includes("wiki_pages")) {
+      return [{ count: 0 }];
+    }
+
     // SELECT last_value (sequence health check)
     if (q.includes("last_value")) {
       return [{ last_value: lastSeqVal, is_called: seqIsCalled }];

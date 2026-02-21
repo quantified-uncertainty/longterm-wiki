@@ -4,6 +4,7 @@ import { bearerAuth } from "hono/bearer-auth";
 import { healthRoute } from "./routes/health.js";
 import { idsRoute } from "./routes/ids.js";
 import { citationsRoute } from "./routes/citations.js";
+import { pagesRoute } from "./routes/pages.js";
 
 export function createApp() {
   const app = new Hono();
@@ -36,6 +37,7 @@ export function createApp() {
 
   app.route("/api/ids", idsRoute);
   app.route("/api/citations", citationsRoute);
+  app.route("/api/pages", pagesRoute);
 
   return app;
 }

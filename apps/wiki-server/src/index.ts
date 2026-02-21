@@ -1,12 +1,14 @@
 import { serve } from "@hono/node-server";
 import { createApp } from "./app.js";
 import { initDb, closeDb } from "./db.js";
+import { initSearch } from "./search.js";
 
 const PORT = parseInt(process.env.PORT || "3100", 10);
 
 async function main() {
   console.log("Initializing database...");
   await initDb();
+  await initSearch();
 
   const app = createApp();
 
