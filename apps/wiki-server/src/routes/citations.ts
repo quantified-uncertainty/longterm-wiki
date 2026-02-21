@@ -431,6 +431,9 @@ citationsRoute.get("/broken", async (c) => {
 });
 
 // ---- POST /content/upsert ----
+// BREAKING CHANGE (PR #476): This endpoint no longer accepts `pageId` or
+// `footnote` fields. Citation content is now keyed by URL only. External
+// scripts that previously sent pageId/footnote need updating.
 
 citationsRoute.post("/content/upsert", async (c) => {
   const body = await parseJsonBody(c);

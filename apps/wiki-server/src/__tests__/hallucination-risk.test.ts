@@ -48,17 +48,25 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("insert into") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    const row = {
-      id: nextId++,
-      page_id: params[0] as string,
-      score: params[1] as number,
-      level: params[2] as string,
-      factors: params[3] as string[] | null,
-      integrity_issues: params[4] as string[] | null,
-      computed_at: new Date(),
-    };
-    riskStore.push(row);
-    return [row];
+    const PARAMS_PER_ROW = 5; // pageId, score, level, factors, integrityIssues
+    const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
+    const results: (typeof riskStore)[number][] = [];
+
+    for (let i = 0; i < rowCount; i++) {
+      const off = i * PARAMS_PER_ROW;
+      const row = {
+        id: nextId++,
+        page_id: params[off] as string,
+        score: params[off + 1] as number,
+        level: params[off + 2] as string,
+        factors: params[off + 3] as string[] | null,
+        integrity_issues: params[off + 4] as string[] | null,
+        computed_at: new Date(),
+      };
+      riskStore.push(row);
+      results.push(row);
+    }
+    return results;
   }
 
   // ---- SELECT count(distinct page_id) FROM hallucination_risk_snapshots ----
