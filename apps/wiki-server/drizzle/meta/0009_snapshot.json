@@ -1,6 +1,6 @@
 {
-  "id": "f8a2c3d1-9e5b-4f6a-b7c8-d2e1f3a4b5c6",
-  "prevId": "9043fd47-01e1-4fc1-865e-2c29e1a5b175",
+  "id": "1501517a-8a42-4f5c-9122-6af57b57159e",
+  "prevId": "42ad93bf-de3b-4f54-b26c-f6cd735ad4c4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1180,7 +1180,21 @@
           "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "auto_update_results_run_id_auto_update_runs_id_fk": {
+          "name": "auto_update_results_run_id_auto_update_runs_id_fk",
+          "tableFrom": "auto_update_results",
+          "tableTo": "auto_update_runs",
+          "columnsFrom": [
+            "run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1589,7 +1603,21 @@
           "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "resource_citations_resource_id_resources_id_fk": {
+          "name": "resource_citations_resource_id_resources_id_fk",
+          "tableFrom": "resource_citations",
+          "tableTo": "resources",
+          "columnsFrom": [
+            "resource_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "resource_citations_resource_id_page_id_pk": {
           "name": "resource_citations_resource_id_page_id_pk",
