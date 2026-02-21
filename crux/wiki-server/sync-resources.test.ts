@@ -161,7 +161,7 @@ describe("syncResources", () => {
 
   it("upserts all resources successfully", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
-      new Response(JSON.stringify({ inserted: 2 }), { status: 200 })
+      new Response(JSON.stringify({ upserted: 2 }), { status: 200 })
     );
 
     const items = [makeResource("a"), makeResource("b"), makeResource("c"), makeResource("d")];
@@ -175,7 +175,7 @@ describe("syncResources", () => {
   it("counts errors for failed batches", async () => {
     vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(
-        new Response(JSON.stringify({ inserted: 2 }), { status: 200 })
+        new Response(JSON.stringify({ upserted: 2 }), { status: 200 })
       )
       .mockResolvedValueOnce(
         new Response("Bad Request", { status: 400 })
@@ -214,7 +214,7 @@ describe("syncResources", () => {
       .mockResolvedValueOnce(new Response("err", { status: 503 }));
     // Batch 2: succeeds
     fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify({ inserted: 1 }), { status: 200 })
+      new Response(JSON.stringify({ upserted: 1 }), { status: 200 })
     );
     // Batch 3: fails
     fetchSpy
@@ -223,7 +223,7 @@ describe("syncResources", () => {
       .mockResolvedValueOnce(new Response("err", { status: 503 }));
     // Batch 4: succeeds
     fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify({ inserted: 1 }), { status: 200 })
+      new Response(JSON.stringify({ upserted: 1 }), { status: 200 })
     );
 
     const items = [makeResource("a"), makeResource("b"), makeResource("c"), makeResource("d")];
@@ -247,7 +247,7 @@ describe("syncResources", () => {
 
   it("handles batchSize larger than items array", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify({ inserted: 3 }), { status: 200 })
+      new Response(JSON.stringify({ upserted: 3 }), { status: 200 })
     );
 
     const items = [makeResource("a"), makeResource("b"), makeResource("c")];
@@ -260,7 +260,7 @@ describe("syncResources", () => {
 
   it("sends correct payload to /api/resources/batch", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify({ inserted: 1 }), { status: 200 })
+      new Response(JSON.stringify({ upserted: 1 }), { status: 200 })
     );
 
     const items = [makeResource("test-id")];
