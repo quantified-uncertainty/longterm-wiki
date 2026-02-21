@@ -1,9 +1,0 @@
-date: 2026-02-18
-branch: claude/convert-proposed-issues-kJbvc
-title: Convert proposed issues to real GitHub issues
-model: sonnet-4-6
-duration: ~10min
-pages: []
-summary: Converted 4 proposed issues from `.claude/proposed-issues/` into real GitHub issues (#237–#240) and removed the source files.
-issues:
-  - "`gh` CLI not available; used GitHub REST API via curl instead"

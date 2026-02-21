@@ -1,9 +1,0 @@
-date: 2026-02-15
-branch: claude/check-considerations-index-tBtzY
-title: Remove dead Experiments sidebar links
-pages: []
-summary: Removed the "Experiments" section from the internal sidebar nav, which contained two dead links (insight-grid-experiments and risk-trajectory-experiments) whose MDX pages had been previously deleted.
-pr: 137
-learnings:
-  - The wiki uses "Cruxes" (not "Crucial Considerations") as the canonical entity type for key uncertainties. There is no dedicated Crucial Considerations index page.
-  - Both experiment pages were identified as "walls of gray boxes" in the STUB_AUDIT plan and recommended for deletion; the pages were removed but the nav entries were not cleaned up.

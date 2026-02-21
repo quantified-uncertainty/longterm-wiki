@@ -436,3 +436,30 @@ export type SyncPage = z.infer<typeof SyncPageSchema>;
 export const SyncPagesBatchSchema = z.object({
   pages: z.array(SyncPageSchema).min(1).max(100),
 });
+
+// ---------------------------------------------------------------------------
+// Agent Sessions
+// ---------------------------------------------------------------------------
+
+const VALID_SESSION_TYPES = [
+  "content",
+  "infrastructure",
+  "bugfix",
+  "refactor",
+  "commands",
+] as const;
+
+export const CreateAgentSessionSchema = z.object({
+  branch: z.string().min(1).max(500),
+  task: z.string().min(1).max(2000),
+  sessionType: z.enum(VALID_SESSION_TYPES),
+  issueNumber: z.number().int().positive().nullable().optional(),
+  checklistMd: z.string().min(1).max(50000),
+});
+export type CreateAgentSession = z.infer<typeof CreateAgentSessionSchema>;
+
+export const UpdateAgentSessionSchema = z.object({
+  checklistMd: z.string().min(1).max(50000).optional(),
+  status: z.enum(["active", "completed"]).optional(),
+});
+export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;

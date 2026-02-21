@@ -386,10 +386,9 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: 'session-log',
     label: 'Session log',
-    description: '`.claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml` created per session-logging rules.',
+    description: 'Session log synced to wiki-server DB (via `/agent-session-ready-PR` or `crux wiki-server sync-session`).',
     phase: 'ship',
     applicableTypes: 'all',
-    verifyCommand: 'ls .claude/sessions/$(date +%Y-%m-%d)_*.yaml 2>/dev/null | head -1 | grep -q .',
   },
   {
     id: 'push-ci-green',

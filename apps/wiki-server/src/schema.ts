@@ -528,6 +528,42 @@ export const pageLinks = pgTable(
 );
 
 /**
+ * Agent sessions — tracks active Claude Code sessions and their checklist state.
+ *
+ * Each row represents a single agent session (identified by branch name).
+ * The checklist Markdown is stored as text and updated as the session progresses.
+ * This replaces the previous pattern of committing `.claude/wip-checklist.md` to git.
+ */
+export const agentSessions = pgTable(
+  "agent_sessions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    branch: text("branch").notNull(),
+    task: text("task").notNull(),
+    sessionType: text("session_type").notNull(),
+    issueNumber: integer("issue_number"),
+    checklistMd: text("checklist_md").notNull(),
+    status: text("status").notNull().default("active"),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_as_branch").on(table.branch),
+    index("idx_as_status").on(table.status),
+    index("idx_as_issue").on(table.issueNumber),
+    index("idx_as_started_at").on(table.startedAt),
+  ]
+);
+
+/**
  * Auto-update news items — individual news items discovered during auto-update runs.
  *
  * Each item represents a news article/post found by the feed fetcher, enriched with

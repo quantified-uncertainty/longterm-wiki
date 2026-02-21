@@ -32,6 +32,11 @@ import {
   type ChecklistMetadata,
 } from '../lib/session-checklist.ts';
 import type { CommandResult } from '../lib/cli.ts';
+import {
+  upsertAgentSession,
+  updateAgentSession,
+  getAgentSessionByBranch,
+} from '../lib/wiki-server/agent-sessions.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -57,6 +62,26 @@ interface GitHubIssueResponse {
   title: string;
   labels: Array<{ name: string }>;
   html_url: string;
+}
+
+// ---------------------------------------------------------------------------
+// DB Sync Helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Best-effort sync of the current checklist to the wiki-server DB.
+ * Looks up the session by current branch and updates the checklist_md.
+ */
+async function syncChecklistToDb(markdown: string): Promise<void> {
+  try {
+    const branch = currentBranch();
+    const sessionResult = await getAgentSessionByBranch(branch);
+    if (sessionResult.ok) {
+      await updateAgentSession(sessionResult.data.id, { checklistMd: markdown });
+    }
+  } catch {
+    // Best-effort — local file is always the primary cache
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -141,8 +166,23 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     markdown = naResult.markdown;
   }
 
-  // Write to file
+  // Write to local file (cache/fallback)
   writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
+
+  // Sync to DB (best-effort — local file is the fallback)
+  let dbSynced = false;
+  try {
+    const result = await upsertAgentSession({
+      branch: metadata.branch,
+      task,
+      sessionType: type,
+      issueNumber: issue ?? null,
+      checklistMd: markdown,
+    });
+    dbSynced = result.ok;
+  } catch {
+    // DB sync is best-effort; local file is always written
+  }
 
   let output = '';
   output += `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
@@ -158,6 +198,9 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   // Count items
   const status = parseChecklist(markdown);
   output += `  Items: ${status.totalItems}\n`;
+  if (dbSynced) {
+    output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
+  }
   output += `\n${c.dim}Work through the checklist as you go. Run \`crux agent-checklist status\` to check progress.${c.reset}\n`;
 
   return { output, exitCode: 0 };
@@ -305,6 +348,9 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
 
   if (result.checked.length > 0) {
     writeFileSync(CHECKLIST_PATH, result.markdown, 'utf-8');
+
+    // Sync updated checklist to DB (best-effort)
+    syncChecklistToDb(result.markdown).catch(() => {});
   }
 
   let output = '';
@@ -390,6 +436,9 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
     const result = checkItems(markdown, passed, 'x');
     markdown = result.markdown;
     writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
+
+    // Sync to DB (best-effort)
+    syncChecklistToDb(markdown).catch(() => {});
   }
 
   output += `\n${c.green}${passed.length} passed${c.reset}`;

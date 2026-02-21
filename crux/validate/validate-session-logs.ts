@@ -118,7 +118,7 @@ function validate(): { passed: boolean; errors: number; warnings: number } {
   const issues: ValidationIssue[] = [];
 
   if (!existsSync(SESSIONS_DIR)) {
-    console.log(`${colors.dim}No sessions directory found — skipping${colors.reset}`);
+    console.log(`${colors.dim}No local sessions directory — session logs are stored in the wiki-server DB${colors.reset}`);
     return { passed: true, errors: 0, warnings: 0 };
   }
 
@@ -127,7 +127,7 @@ function validate(): { passed: boolean; errors: number; warnings: number } {
   const mdFiles = allFiles.filter(f => f.endsWith('.md'));
 
   if (yamlFiles.length === 0 && mdFiles.length === 0) {
-    console.log(`${colors.dim}No session log files found — skipping${colors.reset}`);
+    console.log(`${colors.dim}No local session log files — session logs are stored in the wiki-server DB${colors.reset}`);
     return { passed: true, errors: 0, warnings: 0 };
   }
 
