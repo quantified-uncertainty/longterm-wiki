@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateRuns, autoUpdateResults } from "../schema.js";
-import { parseJsonBody, validationError, invalidJsonError, notFoundError } from "./utils.js";
+import { parseJsonBody, validationError, invalidJsonError, notFoundError, firstOrThrow } from "./utils.js";
 
 export const autoUpdateRunsRoute = new Hono();
 
@@ -134,7 +134,7 @@ autoUpdateRunsRoute.post("/", async (c) => {
         createdAt: autoUpdateRuns.createdAt,
       });
 
-    const run = runRow[0];
+    const run = firstOrThrow(runRow, "insert autoUpdateRuns");
     let resultsInserted = 0;
 
     if (d.results && d.results.length > 0) {
@@ -178,16 +178,25 @@ autoUpdateRunsRoute.get("/all", async (c) => {
     .from(autoUpdateRuns);
   const total = countResult[0].count;
 
-  // For each run, fetch its results
-  const entries = await Promise.all(
-    rows.map(async (r) => {
-      const results = await db
+  // Batch-fetch all results for the returned runs (avoids N+1)
+  const runIds = rows.map((r) => r.id);
+  const allResults = runIds.length > 0
+    ? await db
         .select()
         .from(autoUpdateResults)
-        .where(eq(autoUpdateResults.runId, r.id));
+        .where(inArray(autoUpdateResults.runId, runIds))
+    : [];
 
-      return formatRunEntry(r, results);
-    })
+  // Group results by runId
+  const resultsByRun = new Map<number, (typeof autoUpdateResults.$inferSelect)[]>();
+  for (const r of allResults) {
+    const existing = resultsByRun.get(r.runId) || [];
+    existing.push(r);
+    resultsByRun.set(r.runId, existing);
+  }
+
+  const entries = rows.map((r) =>
+    formatRunEntry(r, resultsByRun.get(r.id) || [])
   );
 
   return c.json({ entries, total, limit, offset });

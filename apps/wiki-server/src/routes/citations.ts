@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
 
 export const citationsRoute = new Hono();
@@ -141,7 +142,7 @@ citationsRoute.post("/quotes/upsert", async (c) => {
   const db = getDrizzleDb();
   const rows = await upsertQuote(db, parsed.data);
 
-  const row = rows[0];
+  const row = firstOrThrow(rows, "upsert citationQuote");
   return c.json({
     id: row.id,
     pageId: row.pageId,
@@ -167,7 +168,8 @@ citationsRoute.post("/quotes/upsert-batch", async (c) => {
   await db.transaction(async (tx) => {
     for (const d of items) {
       const rows = await upsertQuote(tx, d);
-      results.push({ id: rows[0].id, pageId: rows[0].pageId, footnote: rows[0].footnote });
+      const row = firstOrThrow(rows, "upsert citationQuote batch");
+      results.push({ id: row.id, pageId: row.pageId, footnote: row.footnote });
     }
   });
 
@@ -534,7 +536,7 @@ citationsRoute.post("/accuracy-snapshot", async (c) => {
           id: citationAccuracySnapshots.id,
           pageId: citationAccuracySnapshots.pageId,
         });
-      inserted.push(rows[0]);
+      inserted.push(firstOrThrow(rows, "insert citationAccuracySnapshot"));
     }
   });
 

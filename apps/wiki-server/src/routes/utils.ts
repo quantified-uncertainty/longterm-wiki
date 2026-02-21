@@ -22,3 +22,11 @@ export function invalidJsonError(c: Context) {
 export function notFoundError(c: Context, message: string) {
   return c.json({ error: "not_found", message }, 404);
 }
+
+/** Extract the first row or throw — guards against empty .returning() results. */
+export function firstOrThrow<T>(rows: T[], context: string): T {
+  if (rows.length === 0) {
+    throw new Error(`Expected at least one row from ${context}`);
+  }
+  return rows[0];
+}
