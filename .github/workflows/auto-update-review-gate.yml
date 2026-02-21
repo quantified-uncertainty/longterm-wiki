@@ -43,6 +43,8 @@ jobs:
         run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
       - name: Run citation audit
         id: audit

@@ -1,4 +1,9 @@
 import postgres, { type Row } from "postgres";
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import * as schema from "./schema.js";
 
 export type Sql = ReturnType<typeof postgres>;
 
@@ -16,6 +21,7 @@ export interface SqlQuery {
 }
 
 let sql: Sql | null = null;
+let drizzleDb: PostgresJsDatabase<typeof schema> | null = null;
 
 export function getDb() {
   if (!sql) {
@@ -32,34 +38,27 @@ export function getDb() {
   return sql;
 }
 
+export function getDrizzleDb() {
+  if (!drizzleDb) {
+    drizzleDb = drizzle(getDb(), { schema });
+  }
+  return drizzleDb;
+}
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export async function initDb() {
-  const db = getDb();
-
-  await db`
-    CREATE TABLE IF NOT EXISTS entity_ids (
-      numeric_id  INTEGER PRIMARY KEY,
-      slug        TEXT NOT NULL UNIQUE,
-      description TEXT,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-
-  // Sequence starts at 1 but seed.ts will advance it to max(existing) + 1.
-  // Using IF NOT EXISTS so this is safe to re-run.
-  await db`
-    DO $$
-    BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_sequences WHERE sequencename = 'entity_id_seq') THEN
-        CREATE SEQUENCE entity_id_seq START WITH 1;
-      END IF;
-    END
-    $$
-  `;
+  const db = getDrizzleDb();
+  await migrate(db, {
+    migrationsFolder: path.resolve(__dirname, "../drizzle"),
+  });
 }
 
 export async function closeDb() {
   if (sql) {
     await sql.end();
     sql = null;
+    drizzleDb = null;
   }
 }

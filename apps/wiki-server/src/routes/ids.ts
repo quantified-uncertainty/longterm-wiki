@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { getDb, type SqlQuery } from "../db.js";
+import { eq, count, sql, asc } from "drizzle-orm";
+import { getDrizzleDb } from "../db.js";
+import { entityIds } from "../schema.js";
 
 export const idsRoute = new Hono();
 
@@ -41,43 +43,45 @@ idsRoute.post("/allocate", async (c) => {
   }
 
   const { slug, description } = parsed.data;
-  const db = getDb();
+  const db = getDrizzleDb();
 
   // Check if slug already exists (avoids burning a sequence value on conflict)
-  const existing = await db`
-    SELECT numeric_id, slug, description, created_at
-    FROM entity_ids
-    WHERE slug = ${slug}
-  `;
+  const existing = await db
+    .select()
+    .from(entityIds)
+    .where(eq(entityIds.slug, slug));
 
   if (existing.length > 0) {
     const row = existing[0];
     return c.json({
-      numericId: `E${row.numeric_id}`,
+      numericId: `E${row.numericId}`,
       slug: row.slug,
       description: row.description,
       created: false,
-      createdAt: row.created_at,
+      createdAt: row.createdAt,
     });
   }
 
   // Slug is new — allocate next sequence value
-  const inserted = await db`
-    INSERT INTO entity_ids (numeric_id, slug, description)
-    VALUES (nextval('entity_id_seq'), ${slug}, ${description ?? null})
-    ON CONFLICT (slug) DO NOTHING
-    RETURNING numeric_id, slug, description, created_at
-  `;
+  const inserted = await db
+    .insert(entityIds)
+    .values({
+      numericId: sql`nextval('entity_id_seq')`,
+      slug,
+      description: description ?? null,
+    })
+    .onConflictDoNothing({ target: entityIds.slug })
+    .returning();
 
   if (inserted.length > 0) {
     const row = inserted[0];
     return c.json(
       {
-        numericId: `E${row.numeric_id}`,
+        numericId: `E${row.numericId}`,
         slug: row.slug,
         description: row.description,
         created: true,
-        createdAt: row.created_at,
+        createdAt: row.createdAt,
       },
       201
     );
@@ -85,11 +89,10 @@ idsRoute.post("/allocate", async (c) => {
 
   // Race condition: another request inserted between our SELECT and INSERT.
   // Re-fetch the existing row.
-  const raced = await db`
-    SELECT numeric_id, slug, description, created_at
-    FROM entity_ids
-    WHERE slug = ${slug}
-  `;
+  const raced = await db
+    .select()
+    .from(entityIds)
+    .where(eq(entityIds.slug, slug));
 
   if (raced.length === 0) {
     return c.json(
@@ -100,11 +103,11 @@ idsRoute.post("/allocate", async (c) => {
 
   const row = raced[0];
   return c.json({
-    numericId: `E${row.numeric_id}`,
+    numericId: `E${row.numericId}`,
     slug: row.slug,
     description: row.description,
     created: false,
-    createdAt: row.created_at,
+    createdAt: row.createdAt,
   });
 });
 
@@ -126,54 +129,54 @@ idsRoute.post("/allocate-batch", async (c) => {
   }
 
   const { items } = parsed.data;
-  const db = getDb();
+  const db = getDrizzleDb();
   const results: Array<{
     numericId: string;
     slug: string;
     description: string | null;
     created: boolean;
-    createdAt: string;
+    createdAt: Date;
   }> = [];
 
   // Run all allocations in a single transaction
-  // Cast tx: TransactionSql's Omit drops Sql's call signatures (TS limitation)
-  await db.begin(async (tx) => {
-    const q = tx as unknown as SqlQuery;
+  await db.transaction(async (tx) => {
     for (const item of items) {
       // Check existence first to avoid burning sequence values
-      const existing = await q`
-        SELECT numeric_id, slug, description, created_at
-        FROM entity_ids
-        WHERE slug = ${item.slug}
-      `;
+      const existing = await tx
+        .select()
+        .from(entityIds)
+        .where(eq(entityIds.slug, item.slug));
 
       if (existing.length > 0) {
         const row = existing[0];
         results.push({
-          numericId: `E${row.numeric_id}`,
+          numericId: `E${row.numericId}`,
           slug: row.slug,
           description: row.description,
           created: false,
-          createdAt: row.created_at,
+          createdAt: row.createdAt,
         });
         continue;
       }
 
-      const inserted = await q`
-        INSERT INTO entity_ids (numeric_id, slug, description)
-        VALUES (nextval('entity_id_seq'), ${item.slug}, ${item.description ?? null})
-        ON CONFLICT (slug) DO NOTHING
-        RETURNING numeric_id, slug, description, created_at
-      `;
+      const inserted = await tx
+        .insert(entityIds)
+        .values({
+          numericId: sql`nextval('entity_id_seq')`,
+          slug: item.slug,
+          description: item.description ?? null,
+        })
+        .onConflictDoNothing({ target: entityIds.slug })
+        .returning();
 
       if (inserted.length > 0) {
         const row = inserted[0];
         results.push({
-          numericId: `E${row.numeric_id}`,
+          numericId: `E${row.numericId}`,
           slug: row.slug,
           description: row.description,
           created: true,
-          createdAt: row.created_at,
+          createdAt: row.createdAt,
         });
       }
     }
@@ -199,24 +202,24 @@ idsRoute.get("/", async (c) => {
   }
 
   const { limit, offset } = parsed.data;
-  const db = getDb();
+  const db = getDrizzleDb();
 
-  const rows = await db`
-    SELECT numeric_id, slug, description, created_at
-    FROM entity_ids
-    ORDER BY numeric_id
-    LIMIT ${limit} OFFSET ${offset}
-  `;
+  const rows = await db
+    .select()
+    .from(entityIds)
+    .orderBy(asc(entityIds.numericId))
+    .limit(limit)
+    .offset(offset);
 
-  const countResult = await db`SELECT COUNT(*) AS count FROM entity_ids`;
-  const total = Number(countResult[0].count);
+  const countResult = await db.select({ count: count() }).from(entityIds);
+  const total = countResult[0].count;
 
   return c.json({
     ids: rows.map((r) => ({
-      numericId: `E${r.numeric_id}`,
+      numericId: `E${r.numericId}`,
       slug: r.slug,
       description: r.description,
-      createdAt: r.created_at,
+      createdAt: r.createdAt,
     })),
     total,
     limit,
@@ -235,12 +238,11 @@ idsRoute.get("/by-slug", async (c) => {
     );
   }
 
-  const db = getDb();
-  const rows = await db`
-    SELECT numeric_id, slug, description, created_at
-    FROM entity_ids
-    WHERE slug = ${slug}
-  `;
+  const db = getDrizzleDb();
+  const rows = await db
+    .select()
+    .from(entityIds)
+    .where(eq(entityIds.slug, slug));
 
   if (rows.length === 0) {
     return c.json({ error: "not_found", message: `No ID for slug: ${slug}` }, 404);
@@ -248,9 +250,9 @@ idsRoute.get("/by-slug", async (c) => {
 
   const row = rows[0];
   return c.json({
-    numericId: `E${row.numeric_id}`,
+    numericId: `E${row.numericId}`,
     slug: row.slug,
     description: row.description,
-    createdAt: row.created_at,
+    createdAt: row.createdAt,
   });
 });

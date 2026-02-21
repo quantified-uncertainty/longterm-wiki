@@ -57,7 +57,7 @@ jobs:
       - name: Update ArgoCD image tag
         if: github.ref == 'refs/heads/main'
         env:
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_SERVER: argo.k8s.quantifieduncertainty.org
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
         run: |
           IMAGE_TAG="sha-${{ github.sha }}"
