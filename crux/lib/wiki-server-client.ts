@@ -174,6 +174,18 @@ export async function getEditLogStats(): Promise<StatsResult | null> {
   return apiRequest<StatsResult>('GET', '/api/edit-logs/stats');
 }
 
+interface LatestDatesResult {
+  dates: Record<string, string>;
+}
+
+/**
+ * Get the latest edit date for every page (for build-data.mjs).
+ * Returns a map of pageId → YYYY-MM-DD.
+ */
+export async function getEditLogLatestDates(): Promise<LatestDatesResult | null> {
+  return apiRequest<LatestDatesResult>('GET', '/api/edit-logs/latest-dates');
+}
+
 // ---------------------------------------------------------------------------
 // Citation Quotes API
 // ---------------------------------------------------------------------------
@@ -578,6 +590,94 @@ export async function getAutoUpdateRuns(
  */
 export async function getAutoUpdateStats(): Promise<AutoUpdateStatsResult | null> {
   return apiRequest<AutoUpdateStatsResult>('GET', '/api/auto-update-runs/stats');
+}
+
+// ---------------------------------------------------------------------------
+// Auto-Update News Items API
+// ---------------------------------------------------------------------------
+
+export interface AutoUpdateNewsItem {
+  title: string;
+  url: string;
+  sourceId: string;
+  publishedAt?: string | null;
+  summary?: string | null;
+  relevanceScore?: number | null;
+  topics?: string[];
+  entities?: string[];
+  routedToPageId?: string | null;
+  routedToPageTitle?: string | null;
+  routedTier?: string | null;
+}
+
+interface NewsItemBatchResult {
+  inserted: number;
+}
+
+export interface AutoUpdateNewsItemEntry {
+  id: number;
+  runId: number;
+  title: string;
+  url: string;
+  sourceId: string;
+  publishedAt: string | null;
+  summary: string | null;
+  relevanceScore: number | null;
+  topics: string[];
+  entities: string[];
+  routedToPageId: string | null;
+  routedToPageTitle: string | null;
+  routedTier: string | null;
+  runDate?: string | null;
+  createdAt: string;
+}
+
+interface NewsDashboardResult {
+  items: AutoUpdateNewsItemEntry[];
+  runDates: string[];
+}
+
+/**
+ * Insert a batch of news items for a specific run.
+ */
+export async function insertAutoUpdateNewsItems(
+  runId: number,
+  items: AutoUpdateNewsItem[],
+): Promise<NewsItemBatchResult | null> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  // Split into batches of 500
+  let totalInserted = 0;
+  const BATCH_SIZE = 500;
+
+  for (let i = 0; i < items.length; i += BATCH_SIZE) {
+    const batch = items.slice(i, i + BATCH_SIZE);
+    const result = await apiRequest<NewsItemBatchResult>(
+      'POST',
+      '/api/auto-update-news/batch',
+      { runId, items: batch },
+    );
+    if (result) {
+      totalInserted += result.inserted;
+    } else {
+      return null;
+    }
+  }
+
+  return { inserted: totalInserted };
+}
+
+/**
+ * Get news dashboard data (last N runs of news items).
+ */
+export async function getAutoUpdateNewsDashboard(
+  maxRuns = 10,
+): Promise<NewsDashboardResult | null> {
+  return apiRequest<NewsDashboardResult>(
+    'GET',
+    `/api/auto-update-news/dashboard?runs=${maxRuns}`,
+  );
 }
 
 // ---------------------------------------------------------------------------

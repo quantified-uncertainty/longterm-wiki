@@ -525,3 +525,40 @@ export const pageLinks = pgTable(
     index("idx_pl_link_type").on(table.linkType),
   ]
 );
+
+/**
+ * Auto-update news items — individual news items discovered during auto-update runs.
+ *
+ * Each item represents a news article/post found by the feed fetcher, enriched with
+ * LLM-based relevance scoring and optional routing to a wiki page.
+ */
+export const autoUpdateNewsItems = pgTable(
+  "auto_update_news_items",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    runId: bigint("run_id", { mode: "number" })
+      .notNull()
+      .references(() => autoUpdateRuns.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    url: text("url").notNull(),
+    sourceId: text("source_id").notNull(),
+    publishedAt: text("published_at"),
+    summary: text("summary"),
+    relevanceScore: integer("relevance_score"),
+    topicsJson: jsonb("topics_json").$type<string[]>(),
+    entitiesJson: jsonb("entities_json").$type<string[]>(),
+    routedToPageId: text("routed_to_page_id"),
+    routedToPageTitle: text("routed_to_page_title"),
+    routedTier: text("routed_tier"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_auni_run_id").on(table.runId),
+    index("idx_auni_source_id").on(table.sourceId),
+    index("idx_auni_relevance").on(table.relevanceScore),
+    index("idx_auni_routed_page").on(table.routedToPageId),
+    index("idx_auni_published_at").on(table.publishedAt),
+  ]
+);

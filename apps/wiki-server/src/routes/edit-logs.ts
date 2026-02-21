@@ -174,6 +174,27 @@ editLogsRoute.get("/all", async (c) => {
   });
 });
 
+// ---- GET /latest-dates (latest edit date per page, for build-data) ----
+
+editLogsRoute.get("/latest-dates", async (c) => {
+  const db = getDrizzleDb();
+
+  const rows = await db
+    .select({
+      pageId: editLogs.pageId,
+      latestDate: sql<string>`max(${editLogs.date})`,
+    })
+    .from(editLogs)
+    .groupBy(editLogs.pageId);
+
+  const dateMap: Record<string, string> = {};
+  for (const row of rows) {
+    dateMap[row.pageId] = row.latestDate;
+  }
+
+  return c.json({ dates: dateMap });
+});
+
 // ---- GET /stats ----
 
 editLogsRoute.get("/stats", async (c) => {

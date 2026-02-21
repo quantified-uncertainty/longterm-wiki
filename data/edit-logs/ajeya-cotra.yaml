@@ -1,4 +1,0 @@
-- date: 2026-02-20
-  tool: crux-fix
-  agency: automated
-  note: Auto-fixed validation issues (escaping, markdown, etc.)
