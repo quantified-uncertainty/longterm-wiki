@@ -23,36 +23,43 @@ function simpleTextMatch(row: Record<string, unknown>, query: string): boolean {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
-  // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE ---
+  // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
+    const COLS = 17;
+    const numRows = params.length / COLS;
+    const rows: Record<string, unknown>[] = [];
     const now = new Date();
-    const id = params[0] as string;
-    const existing = pagesStore.get(id);
+    for (let i = 0; i < numRows; i++) {
+      const o = i * COLS;
+      const id = params[o] as string;
+      const existing = pagesStore.get(id);
 
-    const row: Record<string, unknown> = {
-      id,
-      numeric_id: params[1],
-      title: params[2],
-      description: params[3],
-      llm_summary: params[4],
-      category: params[5],
-      subcategory: params[6],
-      entity_type: params[7],
-      tags: params[8],
-      quality: params[9],
-      reader_importance: params[10],
-      hallucination_risk_level: params[11],
-      hallucination_risk_score: params[12],
-      content_plaintext: params[13],
-      word_count: params[14],
-      last_updated: params[15],
-      content_format: params[16],
-      synced_at: now,
-      created_at: existing?.created_at ?? now,
-      updated_at: now,
-    };
-    pagesStore.set(id, row);
-    return [row];
+      const row: Record<string, unknown> = {
+        id,
+        numeric_id: params[o + 1],
+        title: params[o + 2],
+        description: params[o + 3],
+        llm_summary: params[o + 4],
+        category: params[o + 5],
+        subcategory: params[o + 6],
+        entity_type: params[o + 7],
+        tags: params[o + 8],
+        quality: params[o + 9],
+        reader_importance: params[o + 10],
+        hallucination_risk_level: params[o + 11],
+        hallucination_risk_score: params[o + 12],
+        content_plaintext: params[o + 13],
+        word_count: params[o + 14],
+        last_updated: params[o + 15],
+        content_format: params[o + 16],
+        synced_at: now,
+        created_at: existing?.created_at ?? now,
+        updated_at: now,
+      };
+      pagesStore.set(id, row);
+      rows.push(row);
+    }
+    return rows;
   }
 
   // --- wiki_pages: UPDATE search_vector (after sync) ---

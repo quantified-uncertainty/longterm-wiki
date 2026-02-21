@@ -100,21 +100,28 @@ function createMockSql() {
       return [];
     }
 
-    // ---- INSERT INTO edit_logs ----
+    // ---- INSERT INTO edit_logs (supports multi-row) ----
     if (q.includes("insert into") && q.includes("edit_logs")) {
-      // Drizzle sends positional params: page_id, date, tool, agency, requested_by, note
-      const row = {
-        id: nextId++,
-        page_id: params[0] as string,
-        date: String(params[1]),
-        tool: params[2] as string,
-        agency: params[3] as string,
-        requested_by: (params[4] as string) ?? null,
-        note: (params[5] as string) ?? null,
-        created_at: new Date(),
-      };
-      editStore.push(row);
-      return [row];
+      // Drizzle sends positional params: page_id, date, tool, agency, requested_by, note per row
+      const COLS = 6;
+      const numRows = params.length / COLS;
+      const rows = [];
+      for (let i = 0; i < numRows; i++) {
+        const o = i * COLS;
+        const row = {
+          id: nextId++,
+          page_id: params[o] as string,
+          date: String(params[o + 1]),
+          tool: params[o + 2] as string,
+          agency: params[o + 3] as string,
+          requested_by: (params[o + 4] as string) ?? null,
+          note: (params[o + 5] as string) ?? null,
+          created_at: new Date(),
+        };
+        editStore.push(row);
+        rows.push(row);
+      }
+      return rows;
     }
 
     // ---- SELECT count(distinct page_id) FROM edit_logs ----
