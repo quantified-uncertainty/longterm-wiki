@@ -27,7 +27,7 @@ const __dirname = path.dirname(__filename);
 const migrationsFolder = path.resolve(__dirname, "../../drizzle");
 
 /**
- * Drop ALL tables created by migrations 0000-0011, in reverse dependency order.
+ * Drop ALL tables created by migrations 0000-0012, in reverse dependency order.
  * Uses CASCADE so FK ordering is handled automatically, but we list children
  * first for clarity.
  */
@@ -92,7 +92,7 @@ describeWithDb("Integration: Drizzle migrations", () => {
   it("applies migration on a fresh database", async () => {
     await migrate(db, { migrationsFolder });
 
-    // Verify ALL tables from migrations 0000-0009 exist
+    // Verify ALL tables from migrations 0000-0012 exist
     const tables = await sqlConn`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema = 'public'

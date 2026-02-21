@@ -318,6 +318,8 @@ export const claims = pgTable(
   "claims",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    // No FK to entityIds: claims reference entity slugs, but not all entities
+    // have been assigned numeric IDs or synced to wiki-server yet.
     entityId: text("entity_id").notNull(),
     entityType: text("entity_type").notNull(),
     claimType: text("claim_type").notNull(),
@@ -333,6 +335,8 @@ export const claims = pgTable(
       .notNull()
       .defaultNow(),
   },
+  // No unique constraint: duplicates are prevented by the clear-then-insert
+  // workflow (POST /clear wipes all claims for an entity before re-extraction).
   (table) => [
     index("idx_cl_entity_id").on(table.entityId),
     index("idx_cl_entity_type").on(table.entityType),

@@ -146,14 +146,18 @@ function loadDashboardDataFromYaml(): DashboardData | null {
 
 /**
  * Load dashboard data: tries wiki-server API first, falls back to YAML files.
+ * Returns the data and the source it came from.
  */
-async function loadDashboardData(): Promise<DashboardData | null> {
+async function loadDashboardData(): Promise<{
+  data: DashboardData | null;
+  source: "wiki-server" | "local fallback";
+}> {
   // Try API first (real-time data from PostgreSQL)
   const apiData = await loadDashboardDataFromApi();
-  if (apiData) return apiData;
+  if (apiData) return { data: apiData, source: "wiki-server" };
 
   // Fall back to YAML files on disk
-  return loadDashboardDataFromYaml();
+  return { data: loadDashboardDataFromYaml(), source: "local fallback" };
 }
 
 function StatCard({
@@ -176,7 +180,7 @@ function StatCard({
 }
 
 export default async function CitationAccuracyPage() {
-  const data = await loadDashboardData();
+  const { data, source: dataSource } = await loadDashboardData();
 
   if (!data) {
     return (
@@ -320,7 +324,7 @@ export default async function CitationAccuracyPage() {
       />
 
       <p className="text-xs text-muted-foreground mt-4">
-        Data exported{" "}
+        Data source: {dataSource}. Exported{" "}
         {new Date(data.exportedAt).toLocaleString("en-US", {
           dateStyle: "medium",
           timeStyle: "short",

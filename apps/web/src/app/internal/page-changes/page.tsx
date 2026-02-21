@@ -108,8 +108,9 @@ async function loadSessionsFromApi(): Promise<PageChangesSession[] | null> {
 
 export default async function PageChangesPage() {
   // Try wiki-server API first, fall back to database.json
-  const sessions =
-    (await loadSessionsFromApi()) ?? getPageChangeSessions();
+  const apiSessions = await loadSessionsFromApi();
+  const sessions = apiSessions ?? getPageChangeSessions();
+  const dataSource = apiSessions ? "wiki-server" : "local fallback";
 
   const totalPageEdits = sessions.reduce((n, s) => n + s.pages.length, 0);
   const uniquePages = new Set(
@@ -127,6 +128,9 @@ export default async function PageChangesPage() {
         page edits across{" "}
         <span className="font-medium text-foreground">{uniquePages.size}</span>{" "}
         unique pages.
+      </p>
+      <p className="text-xs text-muted-foreground">
+        Data source: {dataSource}.
       </p>
       {sessions.length === 0 ? (
         <p className="text-muted-foreground italic">

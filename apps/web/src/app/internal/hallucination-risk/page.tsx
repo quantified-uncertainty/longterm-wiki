@@ -142,8 +142,9 @@ function StatCard({
 
 export default async function HallucinationRiskPage() {
   // Try wiki-server API first, fall back to database.json
-  const riskPages =
-    (await loadRiskDataFromApi()) ?? loadRiskDataFromDatabase();
+  const apiData = await loadRiskDataFromApi();
+  const riskPages = apiData ?? loadRiskDataFromDatabase();
+  const dataSource = apiData ? "wiki-server" : "local fallback";
 
   const highCount = riskPages.filter((p) => p.level === "high").length;
   const mediumCount = riskPages.filter((p) => p.level === "medium").length;
@@ -272,6 +273,7 @@ export default async function HallucinationRiskPage() {
       <HallucinationRiskDashboard data={riskPages} />
 
       <p className="text-xs text-muted-foreground mt-4">
+        Data source: {dataSource}.{" "}
         Scores computed at build time by the canonical scorer (
         <code className="text-[11px]">crux/lib/hallucination-risk.ts</code>).
         Historical trends stored in PostgreSQL when wiki server is configured.
