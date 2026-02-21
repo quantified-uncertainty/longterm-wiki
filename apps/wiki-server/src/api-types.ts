@@ -29,9 +29,6 @@ export const MAX_BATCH_SIZE = 200;
 export const DateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 export const PageIdSchema = z.string().min(1).max(200);
 
-/** Default maximum items per batch request. Individual endpoints may override. */
-export const MAX_BATCH_SIZE = 200;
-
 // ---------------------------------------------------------------------------
 // Edit Logs
 // ---------------------------------------------------------------------------
