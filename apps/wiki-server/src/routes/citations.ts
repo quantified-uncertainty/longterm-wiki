@@ -10,40 +10,27 @@ import {
   notFoundError,
   firstOrThrow,
 } from "./utils.js";
+import {
+  UpsertCitationQuoteSchema,
+  UpsertCitationQuoteBatchSchema,
+  MarkAccuracySchema as SharedMarkAccuracySchema,
+  MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
+} from "../api-types.js";
 
 export const citationsRoute = new Hono();
 
 // ---- Constants ----
 
 const BROKEN_SCORE_THRESHOLD = 0.5;
-const MAX_BATCH_SIZE = 100;
 const MAX_PAGE_SIZE = 1000;
 const MAX_PREVIEW_LENGTH = 50 * 1024; // 50KB
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const UpsertQuoteSchema = z.object({
-  pageId: z.string().min(1).max(200),
-  footnote: z.number().int().min(0),
-  url: z.string().max(2000).nullable().optional(),
-  resourceId: z.string().max(200).nullable().optional(),
-  claimText: z.string().min(1).max(10000),
-  claimContext: z.string().max(10000).nullable().optional(),
-  sourceQuote: z.string().max(10000).nullable().optional(),
-  sourceLocation: z.string().max(1000).nullable().optional(),
-  quoteVerified: z.boolean().optional(),
-  verificationMethod: z.string().max(200).nullable().optional(),
-  verificationScore: z.number().min(0).max(1).nullable().optional(),
-  sourceTitle: z.string().max(1000).nullable().optional(),
-  sourceType: z.string().max(100).nullable().optional(),
-  extractionModel: z.string().max(200).nullable().optional(),
-});
-
+const UpsertQuoteSchema = UpsertCitationQuoteSchema;
 type UpsertQuoteData = z.infer<typeof UpsertQuoteSchema>;
 
-const UpsertBatchSchema = z.object({
-  items: z.array(UpsertQuoteSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const UpsertBatchSchema = UpsertCitationQuoteBatchSchema;
 
 const MarkVerifiedSchema = z.object({
   pageId: z.string().min(1).max(200),
@@ -52,21 +39,8 @@ const MarkVerifiedSchema = z.object({
   score: z.number().min(0).max(1),
 });
 
-const VALID_VERDICTS = ["accurate", "inaccurate", "unsupported", "minor_issues", "not_verifiable"] as const;
-
-const MarkAccuracySchema = z.object({
-  pageId: z.string().min(1).max(200),
-  footnote: z.number().int().min(0),
-  verdict: z.enum(VALID_VERDICTS),
-  score: z.number().min(0).max(1),
-  issues: z.string().max(10000).nullable().optional(),
-  supportingQuotes: z.string().max(10000).nullable().optional(),
-  verificationDifficulty: z.enum(["easy", "moderate", "hard"]).nullable().optional(),
-});
-
-const MarkAccuracyBatchSchema = z.object({
-  items: z.array(MarkAccuracySchema).min(1).max(MAX_BATCH_SIZE),
-});
+const MarkAccuracySchema = SharedMarkAccuracySchema;
+const MarkAccuracyBatchSchema = SharedMarkAccuracyBatchSchema;
 
 const UpsertContentSchema = z.object({
   url: z.string().min(1).max(2000),

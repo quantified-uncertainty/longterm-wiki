@@ -4,44 +4,18 @@ import { eq, count, sql, asc, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { editLogs } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
+import { EditLogEntrySchema, EditLogBatchSchema } from "../api-types.js";
 
 export const editLogsRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 200;
 const MAX_PAGE_SIZE = 1000;
 
-// Canonical tool and agency values (mirrors crux/lib/edit-log.ts EditTool/EditAgency)
-const VALID_TOOLS = [
-  "crux-create",
-  "crux-improve",
-  "crux-grade",
-  "crux-fix",
-  "crux-fix-escalated",
-  "crux-audit",
-  "crux-audit-escalated",
-  "claude-code",
-  "manual",
-  "bulk-script",
-] as const;
+// ---- Schemas (from shared api-types) ----
 
-const VALID_AGENCIES = ["human", "ai-directed", "automated"] as const;
-
-// ---- Schemas ----
-
-const AppendSchema = z.object({
-  pageId: z.string().min(1).max(200),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  tool: z.enum(VALID_TOOLS),
-  agency: z.enum(VALID_AGENCIES),
-  requestedBy: z.string().max(200).nullable().optional(),
-  note: z.string().max(5000).nullable().optional(),
-});
-
-const AppendBatchSchema = z.object({
-  items: z.array(AppendSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const AppendSchema = EditLogEntrySchema;
+const AppendBatchSchema = EditLogBatchSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
