@@ -127,6 +127,13 @@
       "when": 1771900700000,
       "tag": "0017_add_auto_update_news_items",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1771900800000,
+      "tag": "0018_session_dedup_unique",
+      "breakpoints": true
     }
   ]
 }

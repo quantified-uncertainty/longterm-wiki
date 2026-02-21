@@ -123,10 +123,9 @@ vi.mock("../db.js", async () => {
       return [];
     }
 
-    // ---- INSERT INTO sessions (not session_pages) ----
+    // ---- INSERT INTO sessions (upsert — ON CONFLICT DO UPDATE) ----
     if (q.includes("insert into") && q.includes('"sessions"') && !q.includes("session_pages")) {
-      const row = {
-        id: nextSessionId++,
+      const incoming = {
         date: String(params[0]),
         branch: params[1] as string | null,
         title: params[2] as string,
@@ -139,10 +138,46 @@ vi.mock("../db.js", async () => {
         issues_json: params[9] ?? null,
         learnings_json: params[10] ?? null,
         recommendations_json: params[11] ?? null,
+      };
+
+      // Check for conflict on (date, title)
+      const existing = sessionStore.find(
+        (s) => s.date === incoming.date && s.title === incoming.title
+      );
+
+      if (existing && q.includes("on conflict")) {
+        // Update existing row
+        Object.assign(existing, {
+          branch: incoming.branch,
+          summary: incoming.summary,
+          model: incoming.model,
+          duration: incoming.duration,
+          cost: incoming.cost,
+          pr_url: incoming.pr_url,
+          checks_yaml: incoming.checks_yaml,
+          issues_json: incoming.issues_json,
+          learnings_json: incoming.learnings_json,
+          recommendations_json: incoming.recommendations_json,
+        });
+        return [existing];
+      }
+
+      const row = {
+        ...incoming,
+        id: nextSessionId++,
         created_at: new Date(),
       };
       sessionStore.push(row);
       return [row];
+    }
+
+    // ---- DELETE FROM session_pages WHERE session_id = $1 ----
+    if (q.includes("delete") && q.includes("session_pages")) {
+      const sessionId = params[0] as number;
+      sessionPageStore = sessionPageStore.filter(
+        (r) => r.session_id !== sessionId
+      );
+      return [];
     }
 
     // ---- INSERT INTO session_pages (supports multi-row) ----
@@ -352,7 +387,7 @@ describe("Sessions API", () => {
       });
       expect(res.status).toBe(201);
       const body = await res.json();
-      expect(body.inserted).toBe(2);
+      expect(body.upserted).toBe(2);
       expect(body.results).toHaveLength(2);
       expect(body.results[0].pageCount).toBe(1);
       expect(body.results[1].pageCount).toBe(2);
@@ -363,6 +398,82 @@ describe("Sessions API", () => {
         items: [],
       });
       expect(res.status).toBe(400);
+    });
+  });
+
+  describe("Upsert behavior (deduplication)", () => {
+    it("updates existing session on same date+title (single)", async () => {
+      // First insert
+      const res1 = await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "My Session",
+        summary: "Original summary",
+        pages: ["page-a"],
+      });
+      expect(res1.status).toBe(201);
+      const body1 = await res1.json();
+      const originalId = body1.id;
+
+      // Same date+title should update, not duplicate
+      const res2 = await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "My Session",
+        summary: "Updated summary",
+        model: "opus-4-6",
+        pages: ["page-a", "page-b"],
+      });
+      expect(res2.status).toBe(201);
+      const body2 = await res2.json();
+      expect(body2.id).toBe(originalId);
+      expect(body2.pages).toEqual(["page-a", "page-b"]);
+
+      // Total sessions should still be 1
+      const listRes = await app.request("/api/sessions");
+      const listBody = await listRes.json();
+      expect(listBody.total).toBe(1);
+    });
+
+    it("updates existing sessions on batch re-sync", async () => {
+      // Initial sync
+      await postJson(app, "/api/sessions/batch", {
+        items: [
+          { date: "2026-02-19", title: "Session A", pages: ["page-1"] },
+          { date: "2026-02-20", title: "Session B", pages: ["page-2"] },
+        ],
+      });
+
+      // Re-sync same sessions (should update, not duplicate)
+      const res = await postJson(app, "/api/sessions/batch", {
+        items: [
+          { date: "2026-02-19", title: "Session A", summary: "Updated A", pages: ["page-1", "page-3"] },
+          { date: "2026-02-20", title: "Session B", summary: "Updated B", pages: ["page-2"] },
+        ],
+      });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.upserted).toBe(2);
+
+      // Total sessions should still be 2
+      const listRes = await app.request("/api/sessions");
+      const listBody = await listRes.json();
+      expect(listBody.total).toBe(2);
+    });
+
+    it("different titles on same date create separate sessions", async () => {
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Session A",
+        pages: [],
+      });
+      await postJson(app, "/api/sessions", {
+        date: "2026-02-20",
+        title: "Session B",
+        pages: [],
+      });
+
+      const listRes = await app.request("/api/sessions");
+      const listBody = await listRes.json();
+      expect(listBody.total).toBe(2);
     });
   });
 
