@@ -2,6 +2,13 @@
  * Resource Manager — YAML I/O
  *
  * Reading and writing resource YAML files, publication loading.
+ *
+ * Note: Resources are NOT dual-written to the wiki-server here because the
+ * server's upsert endpoint does a full column replacement. The in-memory
+ * Resource type lacks fields like review, keyPoints, localFilename, etc.
+ * that exist in the YAML files, so a fire-and-forget upsert from here would
+ * overwrite valid data with nulls. Instead, `crux wiki-server sync-resources`
+ * (which reads the full YAML) handles syncing to Postgres.
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
