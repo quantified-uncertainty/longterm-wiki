@@ -224,6 +224,7 @@ export function getDb(): InstanceType<typeof Database> {
     ensureDirectories();
     _db = new Database(DB_PATH);
     _db.pragma('journal_mode = WAL');
+    _db.pragma('busy_timeout = 5000');
     _db.pragma('foreign_keys = ON');
     initSchema(_db);
   }
