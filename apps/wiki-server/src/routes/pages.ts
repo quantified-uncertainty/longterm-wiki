@@ -255,6 +255,7 @@ pagesRoute.post("/sync", async (c) => {
     upserted = allVals.length;
 
     // Update search vectors inside the same transaction
+    const idList = sql.join(pageIds.map(id => sql`${id}`), sql`, `);
     await tx.execute(sql`
       UPDATE wiki_pages SET search_vector =
         setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
@@ -262,7 +263,7 @@ pagesRoute.post("/sync", async (c) => {
         setweight(to_tsvector('english', coalesce(llm_summary, '')), 'C') ||
         setweight(to_tsvector('english', coalesce(tags, '')), 'D') ||
         setweight(to_tsvector('english', coalesce(entity_type, '')), 'D')
-      WHERE id = ANY(${pageIds})
+      WHERE id IN (${idList})
     `);
   });
 

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { sessions, sessionPages } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
@@ -201,7 +201,7 @@ sessionsRoute.get("/", async (c) => {
     const pageRows = await db
       .select()
       .from(sessionPages)
-      .where(sql`${sessionPages.sessionId} = ANY(${sessionIds})`);
+      .where(inArray(sessionPages.sessionId, sessionIds));
 
     for (const row of pageRows) {
       const existing = pageMap.get(row.sessionId) || [];
@@ -241,14 +241,14 @@ sessionsRoute.get("/by-page", async (c) => {
   const rows = await db
     .select()
     .from(sessions)
-    .where(sql`${sessions.id} = ANY(${sessionIds})`)
+    .where(inArray(sessions.id, sessionIds))
     .orderBy(desc(sessions.date), desc(sessions.id));
 
   // Also fetch all pages for these sessions
   const allPageRows = await db
     .select()
     .from(sessionPages)
-    .where(sql`${sessionPages.sessionId} = ANY(${sessionIds})`);
+    .where(inArray(sessionPages.sessionId, sessionIds));
 
   const pageMap = new Map<number, string[]>();
   for (const row of allPageRows) {
@@ -334,7 +334,7 @@ sessionsRoute.get("/page-changes", async (c) => {
   const rows = await db
     .select()
     .from(sessions)
-    .where(sql`${sessions.id} = ANY(${sessionIdArray})`)
+    .where(inArray(sessions.id, sessionIdArray))
     .orderBy(desc(sessions.date), desc(sessions.id));
 
   return c.json({

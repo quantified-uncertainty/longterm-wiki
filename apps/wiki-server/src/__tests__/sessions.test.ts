@@ -195,22 +195,22 @@ vi.mock("../db.js", async () => {
         .sort((a, b) => b.count - a.count);
     }
 
-    // ---- SELECT FROM session_pages WHERE session_id = ANY(($1, $2, ...)) ----
-    if (q.includes("session_pages") && q.includes("any(")) {
-      // Drizzle spreads array elements as $1, $2, ... — all params are individual IDs
+    // ---- SELECT FROM session_pages WHERE session_id IN ($1, $2, ...) ----
+    if (q.includes("session_pages") && (q.includes("any(") || q.includes(" in ("))) {
+      // Drizzle inArray spreads array elements as $1, $2, ... — all params are individual IDs
       const ids = params.map(Number);
       return sessionPageStore.filter((r) => ids.includes(r.session_id));
     }
 
     // ---- SELECT FROM session_pages WHERE page_id = $1 ----
-    if (q.includes("session_pages") && q.includes("where") && q.includes("page_id") && !q.includes("any(")) {
+    if (q.includes("session_pages") && q.includes("where") && q.includes("page_id") && !q.includes("any(") && !q.includes(" in (")) {
       const pageId = params[0] as string;
       return sessionPageStore.filter((r) => r.page_id === pageId);
     }
 
-    // ---- SELECT FROM sessions WHERE id = ANY(($1, $2, ...)) ORDER BY ... ----
-    if (q.includes('"sessions"') && q.includes("any(") && q.includes("order by")) {
-      // Drizzle spreads array elements as $1, $2, ... — all params are individual IDs
+    // ---- SELECT FROM sessions WHERE id IN ($1, $2, ...) ORDER BY ... ----
+    if (q.includes('"sessions"') && (q.includes("any(") || q.includes(" in (")) && q.includes("order by")) {
+      // Drizzle inArray spreads array elements as $1, $2, ... — all params are individual IDs
       const ids = params.map(Number);
       return sessionStore
         .filter((s) => ids.includes(s.id))
@@ -218,7 +218,7 @@ vi.mock("../db.js", async () => {
     }
 
     // ---- SELECT ... FROM sessions ORDER BY ... LIMIT ... (paginated list) ----
-    if (q.includes('"sessions"') && q.includes("order by") && q.includes("limit") && !q.includes("any(")) {
+    if (q.includes('"sessions"') && q.includes("order by") && q.includes("limit") && !q.includes("any(") && !q.includes(" in (")) {
       const limit = (params[0] as number) || 100;
       const offset = (params[1] as number) || 0;
       const sorted = [...sessionStore].sort(
