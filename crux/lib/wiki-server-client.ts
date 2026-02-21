@@ -175,6 +175,61 @@ export async function getEditLogStats(): Promise<StatsResult | null> {
 }
 
 // ---------------------------------------------------------------------------
+// Citation Quotes API
+// ---------------------------------------------------------------------------
+
+export interface UpsertCitationQuoteItem {
+  pageId: string;
+  footnote: number;
+  url?: string | null;
+  resourceId?: string | null;
+  claimText: string;
+  claimContext?: string | null;
+  sourceQuote?: string | null;
+  sourceLocation?: string | null;
+  quoteVerified?: boolean;
+  verificationMethod?: string | null;
+  verificationScore?: number | null;
+  sourceTitle?: string | null;
+  sourceType?: string | null;
+  extractionModel?: string | null;
+}
+
+interface UpsertCitationQuoteResult {
+  id: number;
+  pageId: string;
+  footnote: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface UpsertCitationQuoteBatchResult {
+  results: Array<{ id: number; pageId: string; footnote: number }>;
+}
+
+/**
+ * Upsert a single citation quote to the wiki-server database.
+ */
+export async function upsertCitationQuote(
+  item: UpsertCitationQuoteItem,
+): Promise<UpsertCitationQuoteResult | null> {
+  return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item);
+}
+
+/**
+ * Upsert multiple citation quotes in a single batch.
+ */
+export async function upsertCitationQuoteBatch(
+  items: UpsertCitationQuoteItem[],
+): Promise<UpsertCitationQuoteBatchResult | null> {
+  return apiRequest<UpsertCitationQuoteBatchResult>(
+    'POST',
+    '/api/citations/quotes/upsert-batch',
+    { items },
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Citation Accuracy API
 // ---------------------------------------------------------------------------
 

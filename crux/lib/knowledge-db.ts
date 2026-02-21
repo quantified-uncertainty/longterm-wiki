@@ -19,6 +19,11 @@ import { createHash } from 'crypto';
 import { existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import {
+  upsertCitationQuote as upsertCitationQuoteOnServer,
+  markCitationAccuracy as markAccuracyOnServer,
+  type UpsertCitationQuoteItem,
+} from './wiki-server-client.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -1025,7 +1030,7 @@ export const citationQuotes = {
    * Keyed on (page_id, footnote) — one quote per footnote per page.
    */
   upsert(data: CitationQuoteUpsertData) {
-    return getDb().prepare(`
+    const result = getDb().prepare(`
       INSERT INTO citation_quotes (
         page_id, footnote, url, resource_id, claim_text, claim_context,
         source_quote, source_location, quote_verified, verification_method,
@@ -1069,6 +1074,29 @@ export const citationQuotes = {
       sourceType: data.sourceType || null,
       extractionModel: data.extractionModel || null,
     });
+
+    // Fire-and-forget write to wiki-server DB
+    const serverItem: UpsertCitationQuoteItem = {
+      pageId: data.pageId,
+      footnote: data.footnote,
+      claimText: data.claimText,
+      url: data.url ?? null,
+      resourceId: data.resourceId ?? null,
+      claimContext: data.claimContext ?? null,
+      sourceQuote: data.sourceQuote ?? null,
+      sourceLocation: data.sourceLocation ?? null,
+      quoteVerified: data.quoteVerified ?? false,
+      verificationMethod: data.verificationMethod ?? null,
+      verificationScore: data.verificationScore ?? null,
+      sourceTitle: data.sourceTitle ?? null,
+      sourceType: data.sourceType ?? null,
+      extractionModel: data.extractionModel ?? null,
+    };
+    upsertCitationQuoteOnServer(serverItem).catch(() => {
+      // Silently ignore — SQLite is authoritative during migration period
+    });
+
+    return result;
   },
 
   /**
@@ -1266,13 +1294,40 @@ export const citationQuotes = {
     supportingQuotes?: string | null,
     verificationDifficulty?: string | null,
   ) {
-    return getDb().prepare(`
+    const result = getDb().prepare(`
       UPDATE citation_quotes
       SET accuracy_verdict = ?, accuracy_score = ?, accuracy_issues = ?,
           accuracy_supporting_quotes = ?, verification_difficulty = ?,
           accuracy_checked_at = datetime('now'), updated_at = datetime('now')
       WHERE page_id = ? AND footnote = ?
     `).run(verdict, score, issues, supportingQuotes ?? null, verificationDifficulty ?? null, pageId, footnote);
+
+    // Fire-and-forget write to wiki-server DB
+    const validVerdicts = ['accurate', 'inaccurate', 'unsupported', 'minor_issues', 'not_verifiable'] as const;
+    const typedVerdict = validVerdicts.includes(verdict as typeof validVerdicts[number])
+      ? verdict as typeof validVerdicts[number]
+      : null;
+    if (typedVerdict) {
+      const validDifficulties = ['easy', 'moderate', 'hard'] as const;
+      markAccuracyOnServer({
+        pageId,
+        footnote,
+        verdict: typedVerdict,
+        score,
+        issues: issues ?? null,
+        supportingQuotes: supportingQuotes ?? null,
+        verificationDifficulty: validDifficulties.includes(verificationDifficulty as typeof validDifficulties[number])
+          ? verificationDifficulty as 'easy' | 'moderate' | 'hard'
+          : null,
+      }).catch(() => {
+        // Silently ignore — SQLite is authoritative during migration period
+      });
+    } else {
+      // Verdict not in recognized set — skip server write but warn
+      console.warn(`  WARN: markAccuracy verdict "${verdict}" not in recognized set, skipping server dual-write`);
+    }
+
+    return result;
   },
 
   /**

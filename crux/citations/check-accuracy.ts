@@ -22,9 +22,7 @@ import { exportDashboardData } from './export-dashboard.ts';
 import { logBatchProgress } from './shared.ts';
 import {
   isServerAvailable,
-  markCitationAccuracy as markAccuracyOnServer,
   createAccuracySnapshot,
-  type MarkAccuracyItem,
 } from '../lib/wiki-server-client.ts';
 
 export interface AccuracyResult {
@@ -121,7 +119,7 @@ export async function checkAccuracyForPage(
         { sourceTitle: q.source_title ?? undefined },
       );
 
-      // Store result in local SQLite
+      // Store result in local SQLite (also dual-writes to wiki-server via fire-and-forget)
       citationQuotes.markAccuracy(
         pageId,
         q.footnote,
@@ -131,19 +129,6 @@ export async function checkAccuracyForPage(
         check.supportingQuotes.length > 0 ? check.supportingQuotes.join('\n---\n') : null,
         check.verificationDifficulty || null,
       );
-
-      // Also push to wiki-server DB if available
-      await markAccuracyOnServer({
-        pageId,
-        footnote: q.footnote,
-        verdict: check.verdict as MarkAccuracyItem['verdict'],
-        score: check.score,
-        issues: check.issues.length > 0 ? check.issues.join('\n') : null,
-        supportingQuotes: check.supportingQuotes.length > 0 ? check.supportingQuotes.join('\n---\n') : null,
-        verificationDifficulty: (['easy', 'moderate', 'hard'].includes(check.verificationDifficulty || '')
-          ? check.verificationDifficulty as 'easy' | 'moderate' | 'hard'
-          : null),
-      });
 
       switch (check.verdict) {
         case 'accurate': result.accurate++; break;
