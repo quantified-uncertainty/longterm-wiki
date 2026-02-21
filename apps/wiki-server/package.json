@@ -6,10 +6,6 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "seed": "tsx src/seed.ts",
-    "seed:auto-update-runs": "tsx src/seed-auto-update-runs.ts",
-    "seed:sessions": "tsx src/seed-sessions.ts",
-    "seed:resources": "tsx src/seed-resources.ts",
     "test": "vitest run",
     "test:integration": "DATABASE_URL=$DATABASE_URL vitest run --config vitest.integration.config.ts",
     "typecheck": "tsc --noEmit",
