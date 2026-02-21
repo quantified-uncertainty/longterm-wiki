@@ -2,6 +2,8 @@ import "dotenv/config";
 import { runQuery } from "./query.js";
 import { WIKI_BASE_URL } from "./config.js";
 
+// Requires LONGTERMWIKI_SERVER_URL and LONGTERMWIKI_SERVER_API_KEY env vars to be set
+
 interface TestCase {
   name: string;
   question: string;

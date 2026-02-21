@@ -12,12 +12,9 @@ COPY apps/discord-bot/package.json ./apps/discord-bot/
 # Install only discord-bot dependencies
 RUN pnpm install --frozen-lockfile --filter discord-bot
 
-# Copy bot source and wiki content (bot reads content/docs/ at runtime)
+# Copy bot source (bot reads wiki content from wiki-server API, not local files)
 COPY apps/discord-bot/ ./apps/discord-bot/
-COPY content/ ./content/
 
-# WIKI_ROOT defaults to three levels up from apps/discord-bot/src/ = /repo
-# Override via env var if needed
 ENV NODE_ENV=production
 
 WORKDIR /repo/apps/discord-bot
