@@ -212,6 +212,7 @@ function getDatabase(): DatabaseShape {
   return _database;
 }
 
+/** Get all typed entities from the database */
 export function getTypedEntities(): AnyEntity[] {
   if (_typedEntities) return _typedEntities;
 
@@ -481,7 +482,6 @@ function pageIndex() {
 // ============================================================================
 // LOOKUP FUNCTIONS
 // ============================================================================
-
 
 /** Get a typed entity by ID — accepts numeric (E35) or slug (deepmind) */
 export function getTypedEntityById(id: string): AnyEntity | undefined {
