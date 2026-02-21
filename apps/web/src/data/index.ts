@@ -482,6 +482,11 @@ function pageIndex() {
 // LOOKUP FUNCTIONS
 // ============================================================================
 
+/** Get all typed entities */
+export function getAllEntities(): AnyEntity[] {
+  return getTypedEntities();
+}
+
 /** Get a typed entity by ID — accepts numeric (E35) or slug (deepmind) */
 export function getTypedEntityById(id: string): AnyEntity | undefined {
   return typedEntityIndex().get(resolveId(id));
