@@ -6,6 +6,7 @@ import {
   bigserial,
   boolean,
   real,
+  date,
   timestamp,
   uniqueIndex,
   index,
@@ -130,4 +131,25 @@ export const citationContent = pgTable(
       .defaultNow(),
   },
   (table) => [index("idx_cc_page_id").on(table.pageId)]
+);
+
+export const editLogs = pgTable(
+  "edit_logs",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    pageId: text("page_id").notNull(),
+    date: date("date").notNull(),
+    tool: text("tool").notNull(),
+    agency: text("agency").notNull(),
+    requestedBy: text("requested_by"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_el_page_id").on(table.pageId),
+    index("idx_el_date").on(table.date),
+    index("idx_el_tool").on(table.tool),
+  ]
 );

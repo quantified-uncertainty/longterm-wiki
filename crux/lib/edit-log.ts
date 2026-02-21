@@ -1,9 +1,12 @@
 /**
- * Edit Log — per-page edit history stored in data/edit-logs/<page-id>.yaml
+ * Edit Log — per-page edit history
  *
- * Each page gets a YAML file tracking every creation, improvement, grading,
- * or manual edit. Stored outside frontmatter so LLM-generated content can't
- * corrupt the log, and the log can grow without cluttering page metadata.
+ * Dual-write strategy:
+ * - YAML files in data/edit-logs/<page-id>.yaml (always written, backward-compatible)
+ * - PostgreSQL via wiki-server API (written when server is available, fire-and-forget)
+ *
+ * Reads come from YAML by default. The CLI commands can optionally read from the
+ * server API for cross-page queries when the server is available.
  *
  * Usage:
  *   import { appendEditLog } from '../lib/edit-log.ts';
@@ -18,6 +21,7 @@
 import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { appendEditLogToServer } from './wiki-server-client.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -100,7 +104,7 @@ export function getDefaultRequestedBy(): string {
 // Read / Write
 // ---------------------------------------------------------------------------
 
-/** Read the edit log for a page. Returns [] if no log exists. */
+/** Read the edit log for a page from YAML. Returns [] if no log exists. */
 export function readEditLog(pageId: string): EditLogEntry[] {
   const filePath = logFilePath(pageId);
   if (!fs.existsSync(filePath)) return [];
@@ -119,7 +123,13 @@ export function readEditLog(pageId: string): EditLogEntry[] {
   })) as EditLogEntry[];
 }
 
-/** Append a single entry to a page's edit log. Creates the file if needed. */
+/**
+ * Append a single entry to a page's edit log.
+ *
+ * Dual-write: always writes to YAML, then attempts to write to the wiki-server
+ * database via API. The API write is fire-and-forget — failures are silently
+ * ignored since YAML is the authoritative source during the migration period.
+ */
 export function appendEditLog(pageId: string, entry: Omit<EditLogEntry, 'date'> & { date?: string }): void {
   const existing = readEditLog(pageId);
 
@@ -141,6 +151,18 @@ export function appendEditLog(pageId: string, entry: Omit<EditLogEntry, 'date'> 
     logFilePath(pageId),
     stringifyYaml(existing, { lineWidth: 0 }),
   );
+
+  // Fire-and-forget write to wiki-server DB
+  appendEditLogToServer({
+    pageId,
+    date: fullEntry.date,
+    tool: fullEntry.tool,
+    agency: fullEntry.agency,
+    requestedBy: fullEntry.requestedBy ?? null,
+    note: fullEntry.note ?? null,
+  }).catch(() => {
+    // Silently ignore — YAML is authoritative during migration period
+  });
 }
 
 /**
