@@ -1,11 +1,11 @@
-CREATE TABLE "resource_citations" (
+CREATE TABLE IF NOT EXISTS "resource_citations" (
 	"resource_id" text NOT NULL,
 	"page_id" text NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "resource_citations_resource_id_page_id_pk" PRIMARY KEY("resource_id","page_id")
 );
 --> statement-breakpoint
-CREATE TABLE "resources" (
+CREATE TABLE IF NOT EXISTS "resources" (
 	"id" text PRIMARY KEY NOT NULL,
 	"url" text NOT NULL,
 	"title" text,
@@ -26,7 +26,7 @@ CREATE TABLE "resources" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX "idx_rc_page_id" ON "resource_citations" USING btree ("page_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "idx_res_url" ON "resources" USING btree ("url");--> statement-breakpoint
-CREATE INDEX "idx_res_type" ON "resources" USING btree ("type");--> statement-breakpoint
-CREATE INDEX "idx_res_publication_id" ON "resources" USING btree ("publication_id");
+CREATE INDEX IF NOT EXISTS "idx_rc_page_id" ON "resource_citations" USING btree ("page_id");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "idx_res_url" ON "resources" USING btree ("url");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_res_type" ON "resources" USING btree ("type");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_res_publication_id" ON "resources" USING btree ("publication_id");
