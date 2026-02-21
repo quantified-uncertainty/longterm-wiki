@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
 import {
   InsertClaimSchema as SharedInsertClaimSchema,
@@ -89,7 +90,7 @@ claimsRoute.post("/", async (c) => {
       claimType: claims.claimType,
     });
 
-  return c.json(rows[0], 201);
+  return c.json(firstOrThrow(rows, "claim insert"), 201);
 });
 
 // ---- POST /batch (insert multiple claims) ----
