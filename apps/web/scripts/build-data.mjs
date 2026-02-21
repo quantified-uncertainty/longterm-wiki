@@ -15,6 +15,7 @@ import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
 import { computeHallucinationRisk as computeCanonicalRisk, resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
 import { recordRiskSnapshots } from './lib/risk-client.mjs';
+import { syncPageLinks } from './lib/links-client.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
@@ -506,6 +507,89 @@ function buildTagIndex(entities) {
   }
 
   return sortedIndex;
+}
+
+/**
+ * Collect all link signals into a flat array for syncing to the wiki-server.
+ * Mirrors the 5 signals used by computeRelatedGraph:
+ *   1. YAML relatedEntries (weight 10)
+ *   2. Name/prefix matching (weight 6)
+ *   3. Content EntityLinks (weight 5)
+ *   4. Content similarity (weight 0-3, scaled)
+ *   5. Shared tags (weight varies by specificity)
+ */
+function collectLinkSignals(entities, pages, contentInbound, tagIndex) {
+  const links = [];
+  const seen = new Set(); // Deduplicate (source, target, type)
+
+  function addLink(sourceId, targetId, linkType, weight, relationship) {
+    if (sourceId === targetId) return;
+    const key = `${sourceId}|${targetId}|${linkType}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    links.push({ sourceId, targetId, linkType, weight, relationship: relationship || null });
+  }
+
+  // 1. Explicit YAML relatedEntries
+  for (const entity of entities) {
+    if (entity.relatedEntries) {
+      for (const ref of entity.relatedEntries) {
+        addLink(entity.id, ref.id, 'yaml_related', 10, ref.relationship);
+      }
+    }
+  }
+
+  // 2. Name/prefix matching
+  const sortedIds = entities.map(e => e.id).sort();
+  for (let i = 0; i < sortedIds.length; i++) {
+    const a = sortedIds[i];
+    const prefix = a + '-';
+    for (let j = i + 1; j < sortedIds.length; j++) {
+      const b = sortedIds[j];
+      if (b.startsWith(prefix)) {
+        addLink(a, b, 'name_prefix', 6, null);
+      } else {
+        break;
+      }
+    }
+  }
+
+  // 3. Content EntityLinks
+  for (const [targetId, sources] of Object.entries(contentInbound)) {
+    for (const source of sources) {
+      addLink(source.id, targetId, 'entity_link', 5, null);
+    }
+  }
+
+  // 4. Content similarity from redundancy scores
+  for (const page of pages) {
+    if (!page.redundancy?.similarPages) continue;
+    for (const sp of page.redundancy.similarPages) {
+      const weight = (sp.similarity / 100) * 3;
+      if (weight > 0) {
+        addLink(page.id, sp.id, 'similarity', Math.round(weight * 100) / 100, null);
+      }
+    }
+  }
+
+  // 5. Shared tags
+  for (const entity of entities) {
+    if (!entity.tags?.length) continue;
+    for (const tag of entity.tags) {
+      const tagEntities = tagIndex[tag] || [];
+      const specificity = 1 / Math.log2(tagEntities.length + 2);
+      const weight = Math.round(specificity * 2 * 100) / 100;
+      if (weight > 0) {
+        for (const te of tagEntities) {
+          if (te.id !== entity.id) {
+            addLink(entity.id, te.id, 'shared_tag', weight, null);
+          }
+        }
+      }
+    }
+  }
+
+  return links;
 }
 
 /**
@@ -1321,6 +1405,18 @@ async function main() {
   const relatedGraph = computeRelatedGraph(entities, pages, contentInbound, tagIndex);
   database.relatedGraph = relatedGraph;
   console.log(`  relatedGraph: ${Object.keys(relatedGraph).length} entities have connections`);
+
+  // Sync page links to wiki-server (optional — skips if server unavailable)
+  if (process.env.LONGTERMWIKI_SERVER_URL) {
+    const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex);
+    console.log(`  linkSignals: ${linkSignals.length} link signals collected for server sync`);
+    const linkResult = await syncPageLinks(linkSignals);
+    if (linkResult) {
+      console.log(`  linkSync: synced ${linkResult.upserted} links to wiki server`);
+    } else {
+      console.log('  linkSync: skipped (server unavailable or error)');
+    }
+  }
 
   // =========================================================================
   // SESSION LOG → PAGE CHANGE HISTORY

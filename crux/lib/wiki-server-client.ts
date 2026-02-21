@@ -747,3 +747,70 @@ export async function clearClaimsForEntity(
     { entityId },
   );
 }
+
+// ---------------------------------------------------------------------------
+// Page Links API (backlinks & related-page graph)
+// ---------------------------------------------------------------------------
+
+export interface PageLinkItem {
+  sourceId: string;
+  targetId: string;
+  linkType: 'yaml_related' | 'entity_link' | 'name_prefix' | 'similarity' | 'shared_tag';
+  relationship?: string | null;
+  weight: number;
+}
+
+interface SyncLinksResult {
+  upserted: number;
+}
+
+const LINK_BATCH_SIZE = 2000;
+
+/**
+ * Sync page links to the wiki-server.
+ * Replaces all existing links with the provided set (full sync).
+ * Splits into batches for large link sets.
+ */
+export async function syncPageLinks(
+  links: PageLinkItem[],
+): Promise<SyncLinksResult | null> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  let totalUpserted = 0;
+
+  for (let i = 0; i < links.length; i += LINK_BATCH_SIZE) {
+    const batch = links.slice(i, i + LINK_BATCH_SIZE);
+    const isFirst = i === 0;
+
+    try {
+      const res = await fetch(`${serverUrl}/api/links/sync`, {
+        method: 'POST',
+        headers: buildHeaders(),
+        body: JSON.stringify({
+          links: batch,
+          // Only replace on the first batch to clear old data
+          replace: isFirst,
+        }),
+        signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.warn(
+          `  WARNING: Link sync batch failed (${res.status}): ${text.slice(0, 200)}`,
+        );
+        return null;
+      }
+
+      const data = (await res.json()) as SyncLinksResult;
+      totalUpserted += data.upserted;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`  WARNING: Link sync batch failed: ${message}`);
+      return null;
+    }
+  }
+
+  return { upserted: totalUpserted };
+}

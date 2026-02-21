@@ -389,3 +389,38 @@ export const resourceCitations = pgTable(
     index("idx_rc_page_id").on(table.pageId),
   ]
 );
+
+/**
+ * Page links — stores directional links between entities/pages.
+ *
+ * Populated during build-data sync. Each row represents a signal that
+ * source_id relates to target_id, with a link_type indicating the origin
+ * of the signal and an optional relationship label.
+ *
+ * Used to compute backlinks (reverse lookup) and the related-pages graph
+ * (weighted aggregation across all link types).
+ */
+export const pageLinks = pgTable(
+  "page_links",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    sourceId: text("source_id").notNull(),
+    targetId: text("target_id").notNull(),
+    linkType: text("link_type").notNull(), // 'yaml_related' | 'entity_link' | 'name_prefix' | 'similarity' | 'shared_tag'
+    relationship: text("relationship"), // e.g. 'causes', 'mitigates' — only for yaml_related
+    weight: real("weight").notNull().default(1.0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_pl_source_target_type").on(
+      table.sourceId,
+      table.targetId,
+      table.linkType
+    ),
+    index("idx_pl_source_id").on(table.sourceId),
+    index("idx_pl_target_id").on(table.targetId),
+    index("idx_pl_link_type").on(table.linkType),
+  ]
+);

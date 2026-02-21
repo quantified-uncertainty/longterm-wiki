@@ -12,6 +12,7 @@ import { sessionsRoute } from "./routes/sessions.js";
 import { resourcesRoute } from "./routes/resources.js";
 import { summariesRoute } from "./routes/summaries.js";
 import { claimsRoute } from "./routes/claims.js";
+import { linksRoute } from "./routes/links.js";
 
 export function createApp() {
   const app = new Hono();
@@ -52,6 +53,7 @@ export function createApp() {
   app.route("/api/resources", resourcesRoute);
   app.route("/api/summaries", summariesRoute);
   app.route("/api/claims", claimsRoute);
+  app.route("/api/links", linksRoute);
 
   return app;
 }
