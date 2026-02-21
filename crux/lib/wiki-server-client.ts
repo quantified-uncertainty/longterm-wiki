@@ -171,3 +171,107 @@ export async function getEditLogsForPage(
 export async function getEditLogStats(): Promise<StatsResult | null> {
   return apiRequest<StatsResult>('GET', '/api/edit-logs/stats');
 }
+
+// ---------------------------------------------------------------------------
+// Auto-Update Runs API
+// ---------------------------------------------------------------------------
+
+export interface AutoUpdateRunResultEntry {
+  pageId: string;
+  status: 'success' | 'failed' | 'skipped';
+  tier?: string | null;
+  durationMs?: number | null;
+  errorMessage?: string | null;
+}
+
+export interface RecordAutoUpdateRunInput {
+  date: string;
+  startedAt: string;
+  completedAt?: string | null;
+  trigger: 'scheduled' | 'manual';
+  budgetLimit?: number | null;
+  budgetSpent?: number | null;
+  sourcesChecked?: number | null;
+  sourcesFailed?: number | null;
+  itemsFetched?: number | null;
+  itemsRelevant?: number | null;
+  pagesPlanned?: number | null;
+  pagesUpdated?: number | null;
+  pagesFailed?: number | null;
+  pagesSkipped?: number | null;
+  newPagesCreated?: string[];
+  results?: AutoUpdateRunResultEntry[];
+}
+
+interface RecordRunResult {
+  id: number;
+  date: string;
+  startedAt: string;
+  createdAt: string;
+  resultsInserted: number;
+}
+
+export interface AutoUpdateRunEntry {
+  id: number;
+  date: string;
+  startedAt: string;
+  completedAt: string | null;
+  trigger: string;
+  budgetLimit: number | null;
+  budgetSpent: number | null;
+  sourcesChecked: number | null;
+  sourcesFailed: number | null;
+  itemsFetched: number | null;
+  itemsRelevant: number | null;
+  pagesPlanned: number | null;
+  pagesUpdated: number | null;
+  pagesFailed: number | null;
+  pagesSkipped: number | null;
+  newPagesCreated: string[];
+  results: AutoUpdateRunResultEntry[];
+  createdAt: string;
+}
+
+interface GetRunsResult {
+  entries: AutoUpdateRunEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+interface AutoUpdateStatsResult {
+  totalRuns: number;
+  totalBudgetSpent: number;
+  totalPagesUpdated: number;
+  totalPagesFailed: number;
+  byTrigger: Record<string, number>;
+}
+
+/**
+ * Record a complete auto-update run with per-page results.
+ */
+export async function recordAutoUpdateRun(
+  run: RecordAutoUpdateRunInput,
+): Promise<RecordRunResult | null> {
+  return apiRequest<RecordRunResult>('POST', '/api/auto-update-runs', run);
+}
+
+/**
+ * Get paginated list of auto-update runs with results.
+ */
+export async function getAutoUpdateRuns(
+  limit = 50,
+  offset = 0,
+): Promise<GetRunsResult | null> {
+  return apiRequest<GetRunsResult>(
+    'GET',
+    `/api/auto-update-runs/all?limit=${limit}&offset=${offset}`,
+  );
+}
+
+/**
+ * Get aggregate auto-update statistics.
+ */
+export async function getAutoUpdateStats(): Promise<AutoUpdateStatsResult | null> {
+  return apiRequest<AutoUpdateStatsResult>('GET', '/api/auto-update-runs/stats');
+}

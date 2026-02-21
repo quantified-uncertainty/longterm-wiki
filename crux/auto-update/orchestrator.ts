@@ -16,6 +16,7 @@ import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts
 import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest } from './page-router.ts';
 import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
+import { recordAutoUpdateRun } from '../lib/wiki-server-client.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
@@ -48,6 +49,42 @@ function saveRunDetails(startedAt: string, digest: NewsDigest, plan: UpdatePlan)
   const timestamp = startedAt.replace(/[:.]/g, '-').slice(0, 19);
   const filepath = join(RUNS_DIR, `${timestamp}-details.yaml`);
   writeFileSync(filepath, stringifyYaml({ digest, plan }, { lineWidth: 120 }));
+}
+
+// ── Database Persistence (best-effort) ──────────────────────────────────────
+
+async function persistRunToDb(report: RunReport): Promise<void> {
+  try {
+    const result = await recordAutoUpdateRun({
+      date: report.date,
+      startedAt: report.startedAt,
+      completedAt: report.completedAt || null,
+      trigger: report.trigger,
+      budgetLimit: report.budget.limit,
+      budgetSpent: report.budget.spent,
+      sourcesChecked: report.digest.sourcesChecked,
+      sourcesFailed: report.digest.sourcesFailed,
+      itemsFetched: report.digest.itemsFetched,
+      itemsRelevant: report.digest.itemsRelevant,
+      pagesPlanned: report.plan.pagesPlanned,
+      pagesUpdated: report.execution.pagesUpdated,
+      pagesFailed: report.execution.pagesFailed,
+      pagesSkipped: report.execution.pagesSkipped,
+      newPagesCreated: report.newPagesCreated,
+      results: report.execution.results.map(r => ({
+        pageId: r.pageId,
+        status: r.status,
+        tier: r.tier,
+        durationMs: r.durationMs,
+        errorMessage: r.error,
+      })),
+    });
+    if (result) {
+      console.log(`  Run persisted to database (id: ${result.id})`);
+    }
+  } catch {
+    // Best-effort: YAML is the primary store; DB is supplemental
+  }
 }
 
 // ── Page Improvement Execution ──────────────────────────────────────────────
@@ -203,6 +240,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       newPagesCreated: [],
     };
     const reportPath = saveRunReport(report);
+    await persistRunToDb(report);
     return { report, reportPath };
   }
 
@@ -290,6 +328,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       newPagesCreated: [],
     };
     const reportPath = saveRunReport(report);
+    await persistRunToDb(report);
     return { report, reportPath };
   }
 
@@ -379,6 +418,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
   };
 
   const reportPath = saveRunReport(report);
+  await persistRunToDb(report);
 
   // Summary
   console.log(`\n=== Auto-Update Complete ===`);
