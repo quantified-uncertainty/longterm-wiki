@@ -2653,7 +2653,7 @@
   title: Autonomous Replication
   description: Risk of AI systems copying themselves to new hardware or cloud instances without authorization.
   status: stub
-  severity: High
+  severity: high
   likelihood:
     level: medium
     status: emerging
@@ -2676,7 +2676,7 @@
   title: AI-Enabled Cyberattacks
   description: Risk of AI systems being used to discover vulnerabilities, craft exploits, or conduct sophisticated cyberattacks.
   status: stub
-  severity: High
+  severity: high
   likelihood:
     level: high
     status: occurring
@@ -2694,7 +2694,7 @@
   title: AI-Enabled Biological Risks
   description: Risk of AI systems enabling creation or enhancement of biological weapons or dangerous pathogens.
   status: stub
-  severity: Catastrophic
+  severity: catastrophic
   likelihood:
     level: medium
     status: emerging
