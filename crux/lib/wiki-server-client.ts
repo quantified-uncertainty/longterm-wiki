@@ -173,6 +173,123 @@ export async function getEditLogStats(): Promise<StatsResult | null> {
 }
 
 // ---------------------------------------------------------------------------
+// Citation Accuracy API
+// ---------------------------------------------------------------------------
+
+export type AccuracyVerdict = 'accurate' | 'inaccurate' | 'unsupported' | 'minor_issues' | 'not_verifiable';
+
+export interface MarkAccuracyItem {
+  pageId: string;
+  footnote: number;
+  verdict: AccuracyVerdict;
+  score: number;
+  issues?: string | null;
+  supportingQuotes?: string | null;
+  verificationDifficulty?: 'easy' | 'moderate' | 'hard' | null;
+}
+
+interface MarkAccuracyResult {
+  updated: true;
+  pageId: string;
+  footnote: number;
+  verdict: string;
+}
+
+interface MarkAccuracyBatchResult {
+  updated: number;
+  results: Array<{ pageId: string; footnote: number; verdict: string }>;
+}
+
+interface SnapshotResult {
+  snapshotCount: number;
+  pages: string[];
+}
+
+export interface AccuracyDashboardData {
+  exportedAt: string;
+  summary: {
+    totalCitations: number;
+    checkedCitations: number;
+    accurateCitations: number;
+    inaccurateCitations: number;
+    unsupportedCitations: number;
+    minorIssueCitations: number;
+    uncheckedCitations: number;
+    averageScore: number | null;
+  };
+  verdictDistribution: Record<string, number>;
+  difficultyDistribution: Record<string, number>;
+  pages: Array<{
+    pageId: string;
+    totalCitations: number;
+    checked: number;
+    accurate: number;
+    inaccurate: number;
+    unsupported: number;
+    minorIssues: number;
+    accuracyRate: number | null;
+    avgScore: number | null;
+  }>;
+  flaggedCitations: Array<{
+    pageId: string;
+    footnote: number;
+    claimText: string;
+    sourceTitle: string | null;
+    url: string | null;
+    verdict: string;
+    score: number | null;
+    issues: string | null;
+    difficulty: string | null;
+    checkedAt: string | null;
+  }>;
+  domainAnalysis: Array<{
+    domain: string;
+    totalCitations: number;
+    checked: number;
+    accurate: number;
+    inaccurate: number;
+    unsupported: number;
+    inaccuracyRate: number | null;
+  }>;
+}
+
+/**
+ * Mark accuracy verdict for a single citation.
+ */
+export async function markCitationAccuracy(
+  item: MarkAccuracyItem,
+): Promise<MarkAccuracyResult | null> {
+  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item);
+}
+
+/**
+ * Mark accuracy verdicts for multiple citations in a single batch.
+ */
+export async function markCitationAccuracyBatch(
+  items: MarkAccuracyItem[],
+): Promise<MarkAccuracyBatchResult | null> {
+  return apiRequest<MarkAccuracyBatchResult>(
+    'POST',
+    '/api/citations/quotes/mark-accuracy-batch',
+    { items },
+  );
+}
+
+/**
+ * Create accuracy snapshots for all pages with accuracy data.
+ */
+export async function createAccuracySnapshot(): Promise<SnapshotResult | null> {
+  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {});
+}
+
+/**
+ * Get accuracy dashboard data (replaces YAML export).
+ */
+export async function getAccuracyDashboard(): Promise<AccuracyDashboardData | null> {
+  return apiRequest<AccuracyDashboardData>('GET', '/api/citations/accuracy-dashboard');
+}
+
+// ---------------------------------------------------------------------------
 // Auto-Update Runs API
 // ---------------------------------------------------------------------------
 

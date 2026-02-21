@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, avg, sql, asc, isNotNull, lt } from "drizzle-orm";
+import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { citationQuotes, citationContent } from "../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots } from "../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -51,14 +51,20 @@ const MarkVerifiedSchema = z.object({
   score: z.number().min(0).max(1),
 });
 
+const VALID_VERDICTS = ["accurate", "inaccurate", "unsupported", "minor_issues", "not_verifiable"] as const;
+
 const MarkAccuracySchema = z.object({
   pageId: z.string().min(1).max(200),
   footnote: z.number().int().min(0),
-  verdict: z.enum(["accurate", "inaccurate", "unsupported"]),
+  verdict: z.enum(VALID_VERDICTS),
   score: z.number().min(0).max(1),
   issues: z.string().max(10000).nullable().optional(),
   supportingQuotes: z.string().max(10000).nullable().optional(),
   verificationDifficulty: z.enum(["easy", "moderate", "hard"]).nullable().optional(),
+});
+
+const MarkAccuracyBatchSchema = z.object({
+  items: z.array(MarkAccuracySchema).min(1).max(MAX_BATCH_SIZE),
 });
 
 const UpsertContentSchema = z.object({
@@ -438,6 +444,343 @@ citationsRoute.post("/content/upsert", async (c) => {
     });
 
   return c.json({ url: d.url, pageId: d.pageId, footnote: d.footnote });
+});
+
+// ---- POST /quotes/mark-accuracy-batch ----
+
+citationsRoute.post("/quotes/mark-accuracy-batch", async (c) => {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = MarkAccuracyBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+  const results: Array<{ pageId: string; footnote: number; verdict: string }> = [];
+
+  await db.transaction(async (tx) => {
+    for (const d of items) {
+      const rows = await tx
+        .update(citationQuotes)
+        .set({
+          accuracyVerdict: d.verdict,
+          accuracyScore: d.score,
+          accuracyIssues: d.issues ?? null,
+          accuracySupportingQuotes: d.supportingQuotes ?? null,
+          verificationDifficulty: d.verificationDifficulty ?? null,
+          accuracyCheckedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        })
+        .where(
+          and(
+            eq(citationQuotes.pageId, d.pageId),
+            eq(citationQuotes.footnote, d.footnote)
+          )
+        )
+        .returning({
+          pageId: citationQuotes.pageId,
+          footnote: citationQuotes.footnote,
+        });
+
+      if (rows.length > 0) {
+        results.push({ pageId: rows[0].pageId, footnote: rows[0].footnote, verdict: d.verdict });
+      }
+    }
+  });
+
+  return c.json({ updated: results.length, results });
+});
+
+// ---- POST /accuracy-snapshot ----
+
+citationsRoute.post("/accuracy-snapshot", async (c) => {
+  const db = getDrizzleDb();
+
+  // Compute per-page accuracy stats from current citation_quotes data
+  const pageStats = await db.select({
+    pageId: citationQuotes.pageId,
+    totalCitations: count(),
+    checkedCitations: sql<number>`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end)`,
+    accurateCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+    minorIssuesCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+    inaccurateCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+    unsupportedCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+    notVerifiableCount: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'not_verifiable' then 1 end)`,
+    averageScore: avg(citationQuotes.accuracyScore),
+  })
+    .from(citationQuotes)
+    .groupBy(citationQuotes.pageId)
+    .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`);
+
+  // Insert snapshots for all pages with accuracy data
+  const inserted: Array<{ id: number; pageId: string }> = [];
+  await db.transaction(async (tx) => {
+    for (const ps of pageStats) {
+      const rows = await tx
+        .insert(citationAccuracySnapshots)
+        .values({
+          pageId: ps.pageId,
+          totalCitations: ps.totalCitations,
+          checkedCitations: Number(ps.checkedCitations),
+          accurateCount: Number(ps.accurateCount),
+          minorIssuesCount: Number(ps.minorIssuesCount),
+          inaccurateCount: Number(ps.inaccurateCount),
+          unsupportedCount: Number(ps.unsupportedCount),
+          notVerifiableCount: Number(ps.notVerifiableCount),
+          averageScore: ps.averageScore != null ? Number(ps.averageScore) : null,
+        })
+        .returning({
+          id: citationAccuracySnapshots.id,
+          pageId: citationAccuracySnapshots.pageId,
+        });
+      inserted.push(rows[0]);
+    }
+  });
+
+  return c.json({
+    snapshotCount: inserted.length,
+    pages: inserted.map((r) => r.pageId),
+  }, 201);
+});
+
+// ---- GET /accuracy-trends?page_id=X&limit=N ----
+
+citationsRoute.get("/accuracy-trends", async (c) => {
+  const pageId = c.req.query("page_id");
+  const limitStr = c.req.query("limit");
+  const limit = limitStr ? Math.min(Math.max(parseInt(limitStr, 10) || 50, 1), 500) : 50;
+
+  const db = getDrizzleDb();
+
+  if (pageId) {
+    // Trends for a specific page
+    const rows = await db
+      .select()
+      .from(citationAccuracySnapshots)
+      .where(eq(citationAccuracySnapshots.pageId, pageId))
+      .orderBy(desc(citationAccuracySnapshots.snapshotAt))
+      .limit(limit);
+
+    return c.json({ pageId, snapshots: rows });
+  }
+
+  // Global trends: aggregate all snapshots by timestamp
+  const rows = await db
+    .select({
+      snapshotAt: citationAccuracySnapshots.snapshotAt,
+      totalPages: sql<number>`count(distinct ${citationAccuracySnapshots.pageId})`,
+      totalCitations: sql<number>`sum(${citationAccuracySnapshots.totalCitations})`,
+      checkedCitations: sql<number>`sum(${citationAccuracySnapshots.checkedCitations})`,
+      accurateCount: sql<number>`sum(${citationAccuracySnapshots.accurateCount})`,
+      minorIssuesCount: sql<number>`sum(${citationAccuracySnapshots.minorIssuesCount})`,
+      inaccurateCount: sql<number>`sum(${citationAccuracySnapshots.inaccurateCount})`,
+      unsupportedCount: sql<number>`sum(${citationAccuracySnapshots.unsupportedCount})`,
+      notVerifiableCount: sql<number>`sum(${citationAccuracySnapshots.notVerifiableCount})`,
+      averageScore: avg(citationAccuracySnapshots.averageScore),
+    })
+    .from(citationAccuracySnapshots)
+    .groupBy(citationAccuracySnapshots.snapshotAt)
+    .orderBy(desc(citationAccuracySnapshots.snapshotAt))
+    .limit(limit);
+
+  return c.json({
+    snapshots: rows.map((r) => ({
+      ...r,
+      totalPages: Number(r.totalPages),
+      totalCitations: Number(r.totalCitations),
+      checkedCitations: Number(r.checkedCitations),
+      accurateCount: Number(r.accurateCount),
+      minorIssuesCount: Number(r.minorIssuesCount),
+      inaccurateCount: Number(r.inaccurateCount),
+      unsupportedCount: Number(r.unsupportedCount),
+      notVerifiableCount: Number(r.notVerifiableCount),
+      averageScore: r.averageScore != null ? Number(r.averageScore) : null,
+    })),
+  });
+});
+
+// ---- GET /accuracy-dashboard ----
+
+citationsRoute.get("/accuracy-dashboard", async (c) => {
+  const db = getDrizzleDb();
+
+  // Get all quotes with accuracy data
+  const allQuotes = await db
+    .select()
+    .from(citationQuotes)
+    .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote));
+
+  // Compute summary stats
+  let checkedCount = 0;
+  let accurateCount = 0;
+  let inaccurateCount = 0;
+  let unsupportedCount = 0;
+  let minorIssueCount = 0;
+  let scoreSum = 0;
+  let scoreCount = 0;
+
+  const verdictDist: Record<string, number> = {};
+  const difficultyDist: Record<string, number> = {};
+
+  // Page aggregation
+  const pageMap = new Map<string, {
+    total: number; checked: number; accurate: number;
+    inaccurate: number; unsupported: number; minorIssues: number;
+    scoreSum: number; scoreCount: number;
+  }>();
+
+  // Domain aggregation
+  const domainMap = new Map<string, {
+    total: number; checked: number; accurate: number;
+    inaccurate: number; unsupported: number;
+  }>();
+
+  // Flagged citations
+  const flagged: Array<{
+    pageId: string; footnote: number; claimText: string;
+    sourceTitle: string | null; url: string | null;
+    verdict: string; score: number | null;
+    issues: string | null; difficulty: string | null;
+    checkedAt: string | null;
+  }> = [];
+
+  for (const q of allQuotes) {
+    const pageId = q.pageId;
+    const verdict = q.accuracyVerdict;
+    const score = q.accuracyScore;
+    const difficulty = q.verificationDifficulty;
+    const url = q.url;
+
+    // Extract domain
+    let domain: string | null = null;
+    if (url) {
+      try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch { /* invalid URL */ }
+    }
+
+    // Page aggregation
+    if (!pageMap.has(pageId)) {
+      pageMap.set(pageId, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0, scoreSum: 0, scoreCount: 0 });
+    }
+    const page = pageMap.get(pageId)!;
+    page.total++;
+
+    // Domain aggregation
+    if (domain) {
+      if (!domainMap.has(domain)) {
+        domainMap.set(domain, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0 });
+      }
+      const d = domainMap.get(domain)!;
+      d.total++;
+    }
+
+    if (verdict) {
+      checkedCount++;
+      page.checked++;
+      verdictDist[verdict] = (verdictDist[verdict] || 0) + 1;
+
+      if (domain) domainMap.get(domain)!.checked++;
+
+      if (score !== null) {
+        scoreSum += score;
+        scoreCount++;
+        page.scoreSum += score;
+        page.scoreCount++;
+      }
+
+      if (difficulty) {
+        difficultyDist[difficulty] = (difficultyDist[difficulty] || 0) + 1;
+      }
+
+      if (verdict === 'accurate') {
+        accurateCount++; page.accurate++;
+        if (domain) domainMap.get(domain)!.accurate++;
+      } else if (verdict === 'inaccurate') {
+        inaccurateCount++; page.inaccurate++;
+        if (domain) domainMap.get(domain)!.inaccurate++;
+      } else if (verdict === 'unsupported') {
+        unsupportedCount++; page.unsupported++;
+        if (domain) domainMap.get(domain)!.unsupported++;
+      } else if (verdict === 'minor_issues') {
+        minorIssueCount++; page.minorIssues++;
+        if (domain) domainMap.get(domain)!.accurate++;
+      }
+
+      // Flag problematic citations
+      if (verdict === 'inaccurate' || verdict === 'unsupported') {
+        const claimText = q.claimText.length > 150 ? q.claimText.slice(0, 150) + '...' : q.claimText;
+        flagged.push({
+          pageId, footnote: q.footnote, claimText,
+          sourceTitle: q.sourceTitle, url,
+          verdict, score,
+          issues: q.accuracyIssues,
+          difficulty,
+          checkedAt: q.accuracyCheckedAt?.toISOString() ?? null,
+        });
+      }
+    }
+  }
+
+  // Build page summaries
+  const pages = Array.from(pageMap.entries()).map(([pageId, p]) => ({
+    pageId,
+    totalCitations: p.total,
+    checked: p.checked,
+    accurate: p.accurate,
+    inaccurate: p.inaccurate,
+    unsupported: p.unsupported,
+    minorIssues: p.minorIssues,
+    accuracyRate: p.checked > 0 ? Math.round(((p.accurate + p.minorIssues) / p.checked) * 100) / 100 : null,
+    avgScore: p.scoreCount > 0 ? Math.round((p.scoreSum / p.scoreCount) * 100) / 100 : null,
+  }));
+  pages.sort((a, b) => {
+    const aInacc = a.checked > 0 ? (a.inaccurate + a.unsupported) / a.checked : 0;
+    const bInacc = b.checked > 0 ? (b.inaccurate + b.unsupported) / b.checked : 0;
+    if (bInacc !== aInacc) return bInacc - aInacc;
+    return b.totalCitations - a.totalCitations;
+  });
+
+  // Build domain summaries
+  const MIN_DOMAIN_CITATIONS = 2;
+  const domainAnalysis = Array.from(domainMap.entries())
+    .filter(([, d]) => d.total >= MIN_DOMAIN_CITATIONS)
+    .map(([domain, d]) => ({
+      domain,
+      totalCitations: d.total,
+      checked: d.checked,
+      accurate: d.accurate,
+      inaccurate: d.inaccurate,
+      unsupported: d.unsupported,
+      inaccuracyRate: d.checked > 0 ? Math.round(((d.inaccurate + d.unsupported) / d.checked) * 100) / 100 : null,
+    }));
+  domainAnalysis.sort((a, b) => {
+    const aRate = a.inaccuracyRate ?? 0;
+    const bRate = b.inaccuracyRate ?? 0;
+    if (bRate !== aRate) return bRate - aRate;
+    return b.totalCitations - a.totalCitations;
+  });
+
+  // Sort flagged by score (worst first)
+  flagged.sort((a, b) => (a.score ?? 0) - (b.score ?? 0));
+
+  return c.json({
+    exportedAt: new Date().toISOString(),
+    summary: {
+      totalCitations: allQuotes.length,
+      checkedCitations: checkedCount,
+      accurateCitations: accurateCount,
+      inaccurateCitations: inaccurateCount,
+      unsupportedCitations: unsupportedCount,
+      minorIssueCitations: minorIssueCount,
+      uncheckedCitations: allQuotes.length - checkedCount,
+      averageScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 100) / 100 : null,
+    },
+    verdictDistribution: verdictDist,
+    difficultyDistribution: difficultyDist,
+    pages,
+    flaggedCitations: flagged,
+    domainAnalysis,
+  });
 });
 
 // ---- GET /content?url=X ----

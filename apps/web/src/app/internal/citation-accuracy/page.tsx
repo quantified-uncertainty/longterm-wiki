@@ -66,7 +66,37 @@ export interface DomainSummary {
   inaccuracyRate: number | null;
 }
 
-function loadDashboardData(): DashboardData | null {
+/**
+ * Try loading dashboard data from the wiki-server API (PostgreSQL source of truth).
+ * Returns null if the server is unavailable or returns no data.
+ */
+async function loadDashboardDataFromApi(): Promise<DashboardData | null> {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) return null;
+
+  try {
+    const headers: Record<string, string> = {};
+    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (apiKey) {
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    }
+
+    const res = await fetch(`${serverUrl}/api/citations/accuracy-dashboard`, {
+      headers,
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
+    if (!res.ok) return null;
+
+    return (await res.json()) as DashboardData;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Load dashboard data from YAML files on disk (fallback for production builds).
+ */
+function loadDashboardDataFromYaml(): DashboardData | null {
   const baseDir = path.resolve(
     process.cwd(),
     "../../data/citation-accuracy"
@@ -114,6 +144,18 @@ function loadDashboardData(): DashboardData | null {
   }
 }
 
+/**
+ * Load dashboard data: tries wiki-server API first, falls back to YAML files.
+ */
+async function loadDashboardData(): Promise<DashboardData | null> {
+  // Try API first (real-time data from PostgreSQL)
+  const apiData = await loadDashboardDataFromApi();
+  if (apiData) return apiData;
+
+  // Fall back to YAML files on disk
+  return loadDashboardDataFromYaml();
+}
+
 function StatCard({
   label,
   value,
@@ -133,8 +175,8 @@ function StatCard({
   );
 }
 
-export default function CitationAccuracyPage() {
-  const data = loadDashboardData();
+export default async function CitationAccuracyPage() {
+  const data = await loadDashboardData();
 
   if (!data) {
     return (
