@@ -10,16 +10,18 @@
  */
 
 const TIMEOUT_MS = 5_000;
+const BATCH_TIMEOUT_MS = 30_000;
+const RISK_BATCH_SIZE = 100;
 
-function getServerUrl(): string {
+export function getServerUrl(): string {
   return process.env.LONGTERMWIKI_SERVER_URL || '';
 }
 
-function getApiKey(): string {
+export function getApiKey(): string {
   return process.env.LONGTERMWIKI_SERVER_API_KEY || '';
 }
 
-function buildHeaders(): Record<string, string> {
+export function buildHeaders(): Record<string, string> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   const apiKey = getApiKey();
   if (apiKey) {
@@ -521,4 +523,59 @@ export async function getAutoUpdateRuns(
  */
 export async function getAutoUpdateStats(): Promise<AutoUpdateStatsResult | null> {
   return apiRequest<AutoUpdateStatsResult>('GET', '/api/auto-update-runs/stats');
+}
+
+// ---------------------------------------------------------------------------
+// Hallucination Risk API
+// ---------------------------------------------------------------------------
+
+export interface RiskSnapshot {
+  pageId: string;
+  score: number;
+  level: string;
+  factors: string[];
+  integrityIssues?: string[];
+}
+
+/**
+ * Record hallucination risk snapshots for multiple pages.
+ * Splits into batches of 100 with a 30s timeout per batch.
+ * Returns null on failure.
+ */
+export async function recordRiskSnapshots(
+  snapshots: RiskSnapshot[],
+): Promise<{ inserted: number } | null> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  let totalInserted = 0;
+
+  for (let i = 0; i < snapshots.length; i += RISK_BATCH_SIZE) {
+    const batch = snapshots.slice(i, i + RISK_BATCH_SIZE);
+    try {
+      const res = await fetch(`${serverUrl}/api/hallucination-risk/batch`, {
+        method: 'POST',
+        headers: buildHeaders(),
+        body: JSON.stringify({ snapshots: batch }),
+        signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.warn(
+          `  WARNING: Risk snapshot batch failed (${res.status}): ${text.slice(0, 200)}`,
+        );
+        return null;
+      }
+
+      const data = (await res.json()) as { inserted: number };
+      totalInserted += data.inserted;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`  WARNING: Risk snapshot batch failed: ${message}`);
+      return null;
+    }
+  }
+
+  return { inserted: totalInserted };
 }

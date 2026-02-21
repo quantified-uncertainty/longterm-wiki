@@ -1,0 +1,1 @@
+ALTER TABLE "auto_update_results" ADD CONSTRAINT "auto_update_results_run_id_auto_update_runs_id_fk" FOREIGN KEY ("run_id") REFERENCES "public"."auto_update_runs"("id") ON DELETE cascade ON UPDATE no action;
