@@ -1,39 +1,24 @@
 /**
  * Auto-Update Runs & News Items API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { apiRequest, unwrap, getServerUrl, type ApiResult } from './client.ts';
+import { apiRequest, getServerUrl, type ApiResult } from './client.ts';
+import type { z } from 'zod';
+import type {
+  AutoUpdateResult,
+  RecordAutoUpdateRun,
+} from '../../../apps/wiki-server/src/api-types.ts';
+import type { AutoUpdateNewsItemSchema } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Auto-Update Runs Types
+// Auto-Update Runs Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface AutoUpdateRunResultEntry {
-  pageId: string;
-  status: 'success' | 'failed' | 'skipped';
-  tier?: string | null;
-  durationMs?: number | null;
-  errorMessage?: string | null;
-}
+export type AutoUpdateRunResultEntry = AutoUpdateResult;
 
-export interface RecordAutoUpdateRunInput {
-  date: string;
-  startedAt: string;
-  completedAt?: string | null;
-  trigger: 'scheduled' | 'manual';
-  budgetLimit?: number | null;
-  budgetSpent?: number | null;
-  sourcesChecked?: number | null;
-  sourcesFailed?: number | null;
-  itemsFetched?: number | null;
-  itemsRelevant?: number | null;
-  pagesPlanned?: number | null;
-  pagesUpdated?: number | null;
-  pagesFailed?: number | null;
-  pagesSkipped?: number | null;
-  newPagesCreated?: string[];
-  results?: AutoUpdateRunResultEntry[];
-}
+export type RecordAutoUpdateRunInput = RecordAutoUpdateRun;
 
 export interface RecordRunResult {
   id: number;
@@ -83,19 +68,8 @@ export interface AutoUpdateStatsResult {
 // Auto-Update News Items Types
 // ---------------------------------------------------------------------------
 
-export interface AutoUpdateNewsItem {
-  title: string;
-  url: string;
-  sourceId: string;
-  publishedAt?: string | null;
-  summary?: string | null;
-  relevanceScore?: number | null;
-  topics?: string[];
-  entities?: string[];
-  routedToPageId?: string | null;
-  routedToPageTitle?: string | null;
-  routedTier?: string | null;
-}
+/** Uses z.input (not z.infer) because the schema has .default([]) on topics/entities. */
+export type AutoUpdateNewsItem = z.input<typeof AutoUpdateNewsItemSchema>;
 
 export interface NewsItemBatchResult {
   inserted: number;
@@ -189,22 +163,3 @@ export async function getAutoUpdateNewsDashboard(
   );
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers (return T | null)
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const recordAutoUpdateRun_compat = async (run: RecordAutoUpdateRunInput) =>
-  unwrap(await recordAutoUpdateRun(run));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getAutoUpdateRuns_compat = async (limit = 50, offset = 0) =>
-  unwrap(await getAutoUpdateRuns(limit, offset));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getAutoUpdateStats_compat = async () =>
-  unwrap(await getAutoUpdateStats());
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const insertAutoUpdateNewsItems_compat = async (runId: number, items: AutoUpdateNewsItem[]) =>
-  unwrap(await insertAutoUpdateNewsItems(runId, items));

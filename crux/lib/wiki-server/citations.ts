@@ -1,29 +1,21 @@
 /**
  * Citation Quotes & Accuracy API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { apiRequest, unwrap, type ApiResult } from './client.ts';
+import { apiRequest, type ApiResult } from './client.ts';
+import type {
+  UpsertCitationQuote,
+  AccuracyVerdict as AccuracyVerdictType,
+  MarkAccuracy,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Citation Quotes Types
+// Citation Quotes Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface UpsertCitationQuoteItem {
-  pageId: string;
-  footnote: number;
-  url?: string | null;
-  resourceId?: string | null;
-  claimText: string;
-  claimContext?: string | null;
-  sourceQuote?: string | null;
-  sourceLocation?: string | null;
-  quoteVerified?: boolean;
-  verificationMethod?: string | null;
-  verificationScore?: number | null;
-  sourceTitle?: string | null;
-  sourceType?: string | null;
-  extractionModel?: string | null;
-}
+export type UpsertCitationQuoteItem = UpsertCitationQuote;
 
 export interface UpsertCitationQuoteResult {
   id: number;
@@ -38,20 +30,12 @@ export interface UpsertCitationQuoteBatchResult {
 }
 
 // ---------------------------------------------------------------------------
-// Citation Accuracy Types
+// Citation Accuracy Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export type AccuracyVerdict = 'accurate' | 'inaccurate' | 'unsupported' | 'minor_issues' | 'not_verifiable';
+export type AccuracyVerdict = AccuracyVerdictType;
 
-export interface MarkAccuracyItem {
-  pageId: string;
-  footnote: number;
-  verdict: AccuracyVerdict;
-  score: number;
-  issues?: string | null;
-  supportingQuotes?: string | null;
-  verificationDifficulty?: 'easy' | 'moderate' | 'hard' | null;
-}
+export type MarkAccuracyItem = MarkAccuracy;
 
 export interface MarkAccuracyResult {
   updated: true;
@@ -166,30 +150,3 @@ export async function getAccuracyDashboard(): Promise<ApiResult<AccuracyDashboar
   return apiRequest<AccuracyDashboardData>('GET', '/api/citations/accuracy-dashboard');
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers (return T | null)
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const upsertCitationQuote_compat = async (item: UpsertCitationQuoteItem) =>
-  unwrap(await upsertCitationQuote(item));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const upsertCitationQuoteBatch_compat = async (items: UpsertCitationQuoteItem[]) =>
-  unwrap(await upsertCitationQuoteBatch(items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const markCitationAccuracy_compat = async (item: MarkAccuracyItem) =>
-  unwrap(await markCitationAccuracy(item));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const markCitationAccuracyBatch_compat = async (items: MarkAccuracyItem[]) =>
-  unwrap(await markCitationAccuracyBatch(items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const createAccuracySnapshot_compat = async () =>
-  unwrap(await createAccuracySnapshot());
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getAccuracyDashboard_compat = async () =>
-  unwrap(await getAccuracyDashboard());

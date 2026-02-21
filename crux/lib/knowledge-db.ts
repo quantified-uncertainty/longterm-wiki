@@ -22,11 +22,13 @@ import { fileURLToPath } from 'url';
 import {
   upsertCitationQuote as upsertCitationQuoteOnServer,
   markCitationAccuracy as markAccuracyOnServer,
-  upsertSummary as upsertSummaryOnServer,
+  type UpsertCitationQuoteItem,
+} from './wiki-server/citations.ts';
+import { upsertSummary as upsertSummaryOnServer } from './wiki-server/summaries.ts';
+import {
   insertClaim as insertClaimOnServer,
   clearClaimsForEntity as clearClaimsOnServer,
-  type UpsertCitationQuoteItem,
-} from './wiki-server-client.ts';
+} from './wiki-server/claims.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

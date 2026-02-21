@@ -21,7 +21,8 @@ import yaml from 'js-yaml';
 import { citationQuotes, PROJECT_ROOT } from '../lib/knowledge-db.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
-import { isServerAvailable, getAccuracyDashboard } from '../lib/wiki-server-client.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { getAccuracyDashboard } from '../lib/wiki-server/citations.ts';
 
 // ---------------------------------------------------------------------------
 // Types (shared with the dashboard — keep in sync)
@@ -373,11 +374,12 @@ async function main() {
       console.log(`${colors.red}Wiki server not available. Set LONGTERMWIKI_SERVER_URL and LONGTERMWIKI_SERVER_API_KEY.${colors.reset}`);
       process.exit(1);
     }
-    dbData = await getAccuracyDashboard();
-    if (!dbData) {
-      console.log(`${colors.yellow}No accuracy data returned from wiki server.${colors.reset}`);
+    const dashboardResult = await getAccuracyDashboard();
+    if (!dashboardResult.ok) {
+      console.log(`${colors.yellow}No accuracy data returned from wiki server (${dashboardResult.error}).${colors.reset}`);
       process.exit(0);
     }
+    dbData = dashboardResult.data;
     if (!json) {
       console.log(`${colors.dim}Using data from wiki-server DB${colors.reset}`);
     }

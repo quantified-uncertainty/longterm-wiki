@@ -1,28 +1,19 @@
 /**
  * Sessions API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { apiRequest, unwrap, type ApiResult } from './client.ts';
+import type { z } from 'zod';
+import { apiRequest, type ApiResult } from './client.ts';
+import type { CreateSessionSchema } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface SessionApiEntry {
-  date: string;
-  branch?: string | null;
-  title: string;
-  summary?: string | null;
-  model?: string | null;
-  duration?: string | null;
-  cost?: string | null;
-  prUrl?: string | null;
-  checksYaml?: string | null;
-  issuesJson?: unknown;
-  learningsJson?: unknown;
-  recommendationsJson?: unknown;
-  pages?: string[];
-}
+/** Uses z.input (not z.infer) because the schema has .default() and .transform() on pages. */
+export type SessionApiEntry = z.input<typeof CreateSessionSchema>;
 
 export interface CreateSessionResult {
   id: number;
@@ -120,30 +111,3 @@ export async function getSessionPageChanges(): Promise<ApiResult<SessionPageChan
   return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes?limit=500');
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers (return T | null)
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const createSession_compat = async (entry: SessionApiEntry) =>
-  unwrap(await createSession(entry));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const createSessionBatch_compat = async (items: SessionApiEntry[]) =>
-  unwrap(await createSessionBatch(items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const listSessions_compat = async (limit = 100, offset = 0) =>
-  unwrap(await listSessions(limit, offset));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getSessionsByPage_compat = async (pageId: string) =>
-  unwrap(await getSessionsByPage(pageId));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getSessionStats_compat = async () =>
-  unwrap(await getSessionStats());
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getSessionPageChanges_compat = async () =>
-  unwrap(await getSessionPageChanges());

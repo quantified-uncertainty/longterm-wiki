@@ -16,7 +16,7 @@ import { fetchAllSources, loadSeenItems, saveSeenItems } from './feed-fetcher.ts
 import { buildDigest, normalizeTitle } from './digest.ts';
 import { routeDigest } from './page-router.ts';
 import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
-import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-server-client.ts';
+import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-server/auto-update.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
@@ -83,8 +83,8 @@ async function persistRunToDb(
         errorMessage: r.error,
       })),
     });
-    if (result) {
-      console.log(`  Run persisted to database (id: ${result.id})`);
+    if (result.ok) {
+      console.log(`  Run persisted to database (id: ${result.data.id})`);
 
       // Persist news items if digest is available
       if (digest && digest.items.length > 0) {
@@ -119,9 +119,9 @@ async function persistRunToDb(
           };
         });
 
-        const newsResult = await insertAutoUpdateNewsItems(result.id, newsItems);
-        if (newsResult) {
-          console.log(`  News items persisted to database (${newsResult.inserted} items)`);
+        const newsResult = await insertAutoUpdateNewsItems(result.data.id, newsItems);
+        if (newsResult.ok) {
+          console.log(`  News items persisted to database (${newsResult.data.inserted} items)`);
         }
       }
     }

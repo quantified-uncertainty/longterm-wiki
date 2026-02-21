@@ -1,23 +1,17 @@
 /**
  * Claims API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { apiRequest, unwrap, type ApiResult } from './client.ts';
+import { apiRequest, type ApiResult } from './client.ts';
+import type { InsertClaim } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface InsertClaimItem {
-  entityId: string;
-  entityType: string;
-  claimType: string;
-  claimText: string;
-  value?: string | null;
-  unit?: string | null;
-  confidence?: string | null;
-  sourceQuote?: string | null;
-}
+export type InsertClaimItem = InsertClaim;
 
 export interface InsertClaimResult {
   id: number;
@@ -64,18 +58,3 @@ export async function clearClaimsForEntity(
   );
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const insertClaim_compat = async (item: InsertClaimItem) =>
-  unwrap(await insertClaim(item));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const insertClaimBatch_compat = async (items: InsertClaimItem[]) =>
-  unwrap(await insertClaimBatch(items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const clearClaimsForEntity_compat = async (entityId: string) =>
-  unwrap(await clearClaimsForEntity(entityId));

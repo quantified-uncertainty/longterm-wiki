@@ -1,28 +1,17 @@
 /**
  * Entities API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { batchedRequest, getServerUrl, apiRequest, unwrap, type ApiResult } from './client.ts';
+import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
+import type { SyncEntity } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface SyncEntityItem {
-  id: string;
-  numericId?: string | null;
-  entityType: string;
-  title: string;
-  description?: string | null;
-  website?: string | null;
-  tags?: string[] | null;
-  clusters?: string[] | null;
-  status?: string | null;
-  lastUpdated?: string | null;
-  customFields?: Array<{ label: string; value: string; link?: string }> | null;
-  relatedEntries?: Array<{ id: string; type: string; relationship?: string }> | null;
-  sources?: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
-}
+export type SyncEntityItem = SyncEntity;
 
 export interface SyncEntitiesResult {
   upserted: number;
@@ -69,6 +58,10 @@ export interface EntityStatsResult {
 // Constants
 // ---------------------------------------------------------------------------
 
+/**
+ * Must match MAX_BATCH_SIZE in apps/wiki-server/src/api-types.ts.
+ * The server enforces this limit via Zod validation on batch endpoints.
+ */
 const ENTITY_BATCH_SIZE = 200;
 
 // ---------------------------------------------------------------------------
@@ -137,26 +130,3 @@ export async function getEntityStats(): Promise<ApiResult<EntityStatsResult>> {
   return apiRequest<EntityStatsResult>('GET', '/api/entities/stats');
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const syncEntities_compat = async (items: SyncEntityItem[]) =>
-  unwrap(await syncEntities(items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getEntity_compat = async (id: string) =>
-  unwrap(await getEntity(id));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const listEntities_compat = async (limit = 50, offset = 0, entityType?: string) =>
-  unwrap(await listEntities(limit, offset, entityType));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const searchEntities_compat = async (q: string, limit = 20) =>
-  unwrap(await searchEntities(q, limit));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getEntityStats_compat = async () =>
-  unwrap(await getEntityStats());

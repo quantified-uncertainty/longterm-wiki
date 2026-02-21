@@ -65,22 +65,4 @@ describe('wiki-server/edit-logs', () => {
     });
   });
 
-  describe('backward-compatible wrappers', () => {
-    it('appendEditLogToServer_compat returns null when server URL is not set', async () => {
-      delete process.env.LONGTERMWIKI_SERVER_URL;
-      const result = await editLogs.appendEditLogToServer_compat({
-        pageId: 'test-page',
-        date: '2026-02-20',
-        tool: 'crux-fix',
-        agency: 'automated',
-      });
-      expect(result).toBeNull();
-    });
-
-    it('getEditLogsForPage_compat returns null when server URL is not set', async () => {
-      delete process.env.LONGTERMWIKI_SERVER_URL;
-      const result = await editLogs.getEditLogsForPage_compat('test-page');
-      expect(result).toBeNull();
-    });
-  });
 });

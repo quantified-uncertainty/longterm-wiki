@@ -1,32 +1,17 @@
 /**
  * Resources API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
+import type { UpsertResource } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface UpsertResourceItem {
-  id: string;
-  url: string;
-  title?: string | null;
-  type?: string | null;
-  summary?: string | null;
-  review?: string | null;
-  abstract?: string | null;
-  keyPoints?: string[] | null;
-  publicationId?: string | null;
-  authors?: string[] | null;
-  publishedDate?: string | null;
-  tags?: string[] | null;
-  localFilename?: string | null;
-  credibilityOverride?: number | null;
-  fetchedAt?: string | null;
-  contentHash?: string | null;
-  citedBy?: string[] | null;
-}
+export type UpsertResourceItem = UpsertResource;
 
 export interface UpsertResourceResult {
   id: string;

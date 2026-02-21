@@ -17,12 +17,12 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { citationQuotes, PROJECT_ROOT } from '../lib/knowledge-db.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
-  isServerAvailable,
   markCitationAccuracyBatch,
   createAccuracySnapshot,
   type MarkAccuracyItem,
-} from '../lib/wiki-server-client.ts';
+} from '../lib/wiki-server/citations.ts';
 import { getColors } from '../lib/output.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 
@@ -126,8 +126,8 @@ async function main() {
     const batch = items.slice(i, i + BATCH_SIZE);
     const result = await markCitationAccuracyBatch(batch);
 
-    if (result) {
-      migrated += result.updated;
+    if (result.ok) {
+      migrated += result.data.updated;
     } else {
       failed += batch.length;
       console.log(`  ${colors.red}Batch ${Math.floor(i / BATCH_SIZE) + 1} failed${colors.reset}`);
@@ -142,8 +142,8 @@ async function main() {
   // Create an accuracy snapshot
   console.log(`\n  Creating accuracy snapshot...`);
   const snapshot = await createAccuracySnapshot();
-  if (snapshot) {
-    console.log(`  ${colors.green}Snapshot created for ${snapshot.snapshotCount} pages${colors.reset}`);
+  if (snapshot.ok) {
+    console.log(`  ${colors.green}Snapshot created for ${snapshot.data.snapshotCount} pages${colors.reset}`);
   } else {
     console.log(`  ${colors.yellow}Snapshot creation failed${colors.reset}`);
   }

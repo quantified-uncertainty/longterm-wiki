@@ -1,24 +1,17 @@
 /**
  * Summaries API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { apiRequest, unwrap, type ApiResult } from './client.ts';
+import { apiRequest, type ApiResult } from './client.ts';
+import type { UpsertSummary } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface UpsertSummaryItem {
-  entityId: string;
-  entityType: string;
-  oneLiner?: string | null;
-  summary?: string | null;
-  review?: string | null;
-  keyPoints?: string[] | null;
-  keyClaims?: string[] | null;
-  model?: string | null;
-  tokensUsed?: number | null;
-}
+export type UpsertSummaryItem = UpsertSummary;
 
 export interface UpsertSummaryResult {
   entityId: string;
@@ -50,14 +43,3 @@ export async function upsertSummaryBatch(
   );
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const upsertSummary_compat = async (item: UpsertSummaryItem) =>
-  unwrap(await upsertSummary(item));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const upsertSummaryBatch_compat = async (items: UpsertSummaryItem[]) =>
-  unwrap(await upsertSummaryBatch(items));

@@ -1,21 +1,17 @@
 /**
  * Edit Logs API — wiki-server client module
+ *
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { apiRequest, unwrap, type ApiResult } from './client.ts';
+import { apiRequest, type ApiResult } from './client.ts';
+import type { EditLogEntry } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
-export interface EditLogApiEntry {
-  pageId: string;
-  date: string;
-  tool: string;
-  agency: string;
-  requestedBy?: string | null;
-  note?: string | null;
-}
+export type EditLogApiEntry = EditLogEntry;
 
 export interface AppendResult {
   id: number;
@@ -86,22 +82,3 @@ export async function getEditLogLatestDates(): Promise<ApiResult<LatestDatesResu
   return apiRequest<LatestDatesResult>('GET', '/api/edit-logs/latest-dates');
 }
 
-// ---------------------------------------------------------------------------
-// Backward-compatible wrappers (return T | null)
-// ---------------------------------------------------------------------------
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const appendEditLogToServer_compat = async (entry: EditLogApiEntry) =>
-  unwrap(await appendEditLogToServer(entry));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const appendEditLogBatch_compat = async (items: EditLogApiEntry[]) =>
-  unwrap(await appendEditLogBatch(items));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getEditLogsForPage_compat = async (pageId: string) =>
-  unwrap(await getEditLogsForPage(pageId));
-
-/** @deprecated Use the ApiResult-returning version and handle errors explicitly. */
-export const getEditLogStats_compat = async () =>
-  unwrap(await getEditLogStats());

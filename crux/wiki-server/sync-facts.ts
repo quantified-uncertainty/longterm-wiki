@@ -23,7 +23,7 @@ import { join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
 import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey } from "../lib/wiki-server-client.ts";
+import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
 import { waitForHealthy, batchSync } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");

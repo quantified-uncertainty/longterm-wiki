@@ -3,7 +3,7 @@ import { parseRunYaml, loadRunYamls, syncAutoUpdateRuns } from './sync-auto-upda
 import { mkdtempSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import type { RecordAutoUpdateRunInput } from '../lib/wiki-server-client.ts';
+import type { RecordAutoUpdateRunInput } from '../lib/wiki-server/auto-update.ts';
 
 const noSleep = async () => {};
 
