@@ -306,6 +306,30 @@ describe("syncPages", () => {
     expect(result.errors).toBe(2);
   });
 
+  it("surfaces parsed server error message from JSON 4xx/5xx response", async () => {
+    const errorBody = JSON.stringify({
+      error: "internal_error",
+      message: "column \"nonexistent\" does not exist",
+    });
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(errorBody, { status: 400 })
+    );
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const pages = [makePage("a")];
+    await syncPages("http://localhost:3000", "key", pages, 10, {
+      _sleep: noSleep,
+    });
+
+    // Should print both the raw body and the parsed server error message
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining("HTTP 400")
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `    Server error: column "nonexistent" does not exist`
+    );
+  });
+
   it("fast-fails after 3 consecutive batch failures", async () => {
     // All fetches return 503 (after fetchWithRetry exhausts its retries, it throws)
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
