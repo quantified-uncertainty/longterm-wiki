@@ -1,0 +1,52 @@
+date: "2026-02-20"
+branch: claude/wiki-pages-api
+title: "Add wiki pages API with search, sync, and content endpoints"
+pages: []
+pr: "https://github.com/quantified-uncertainty/longterm-wiki/pull/428"
+model: claude-opus-4-6
+duration: ~90min
+cost: ~$15
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-21T01:55:02.525Z"
+  total: 32
+  completed: 24
+  na: 6
+  skipped: 2
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - no-merge-conflicts
+    - check-recent-merges
+    - crux-typescript
+summary: |
+  Implemented Phase 1 of the wiki content API plan. Added wiki_pages PostgreSQL table with Drizzle
+  schema and migration, MiniSearch-powered in-memory search module (same config as frontend),
+  REST API endpoints (search, get by ID, paginated listing, bulk sync), crux wiki-server sync
+  CLI command, sync-content CI job, and comprehensive unit tests (16 new tests).
+
+  Paranoid review found and fixed 3 critical issues: PROJECT_ROOT path resolution in sync script,
+  and() usage for multi-filter WHERE clauses, and tags JSON-to-space-joined conversion for
+  MiniSearch indexing.
+
+  Branch was rebased onto main via cherry-pick to avoid conflicts with already-merged Drizzle/citations PRs.
