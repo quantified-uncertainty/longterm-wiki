@@ -6,16 +6,18 @@
  *
  * Usage:
  *   import { appendEditLog } from '../lib/edit-log.ts';
- *   appendEditLog('open-philanthropy', {
+ *   const result = await appendEditLog('open-philanthropy', {
  *     tool: 'crux-improve',
  *     agency: 'ai-directed',
  *     requestedBy: 'ozzie',
  *     note: 'Added 2024 funding data',
  *   });
+ *   if (!result.ok) console.error('Edit log write failed:', result.message);
  */
 
 import path from 'path';
-import { appendEditLogToServer } from './wiki-server-client.ts';
+import { appendEditLogToServer, getEditLogsForPage, type AppendResult } from './wiki-server/edit-logs.ts';
+import type { ApiResult } from './wiki-server/client.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,6 +49,9 @@ export interface EditLogEntry {
   requestedBy?: string;   // Who initiated (person name, "system", etc.)
   note?: string;          // Free-text description of what changed
 }
+
+// Re-export for callers that want to type the return value
+export type { AppendResult, ApiResult };
 
 // ---------------------------------------------------------------------------
 // Paths
@@ -98,11 +103,10 @@ export function getDefaultRequestedBy(): string {
  * Returns [] if the server is unavailable or no log exists.
  */
 export async function readEditLog(pageId: string): Promise<EditLogEntry[]> {
-  const { getEditLogsForPage } = await import('./wiki-server-client.ts');
   const result = await getEditLogsForPage(pageId);
-  if (!result) return [];
+  if (!result.ok) return [];
 
-  return result.entries.map((e) => ({
+  return result.data.entries.map((e) => ({
     date: e.date,
     tool: e.tool as EditTool,
     agency: e.agency as EditAgency,
@@ -115,40 +119,53 @@ export async function readEditLog(pageId: string): Promise<EditLogEntry[]> {
  * Append a single entry to a page's edit log.
  *
  * Writes to the wiki-server PostgreSQL database (authoritative source).
- * Failures are logged to stderr but do not throw.
+ * Returns an ApiResult so callers can detect and handle failures.
+ * A warning is logged to stderr on failure regardless of whether the caller checks.
+ *
+ * Callers that do not need to detect failures can ignore the returned Promise.
+ * Callers that require confirmation should `await` and check `result.ok`.
  */
-export function appendEditLog(pageId: string, entry: Omit<EditLogEntry, 'date'> & { date?: string }): void {
+export async function appendEditLog(
+  pageId: string,
+  entry: Omit<EditLogEntry, 'date'> & { date?: string },
+): Promise<ApiResult<AppendResult>> {
   const fullEntry: EditLogEntry = {
-    date: entry.date || new Date().toISOString().split('T')[0],
+    date: entry.date ?? new Date().toISOString().split('T')[0],
     tool: entry.tool,
     agency: entry.agency,
     ...(entry.requestedBy != null && { requestedBy: entry.requestedBy }),
     ...(entry.note != null && { note: entry.note }),
   };
 
-  // Write to wiki-server DB (authoritative)
-  appendEditLogToServer({
+  const result = await appendEditLogToServer({
     pageId,
     date: fullEntry.date,
     tool: fullEntry.tool,
     agency: fullEntry.agency,
     requestedBy: fullEntry.requestedBy ?? null,
     note: fullEntry.note ?? null,
-  }).catch((err) => {
-    console.error(`  WARNING: Failed to write edit log for "${pageId}" to wiki-server: ${err}`);
   });
+
+  if (!result.ok) {
+    console.error(`  WARNING: Failed to write edit log for "${pageId}" to wiki-server: ${result.message}`);
+  }
+
+  return result;
 }
 
 /**
  * Log a bulk fix operation that modified multiple files.
- * Appends one entry per affected page.
+ * Appends one entry per affected page, running all writes in parallel.
+ * Returns an array of ApiResults — one per file — so callers can inspect failures.
  */
-export function logBulkFixes(
+export async function logBulkFixes(
   filePaths: string[],
   entry: Omit<EditLogEntry, 'date'> & { date?: string },
-): void {
-  for (const fp of filePaths) {
-    const pageId = pageIdFromPath(fp);
-    appendEditLog(pageId, entry);
-  }
+): Promise<ApiResult<AppendResult>[]> {
+  return Promise.all(
+    filePaths.map((fp) => {
+      const pageId = pageIdFromPath(fp);
+      return appendEditLog(pageId, entry);
+    }),
+  );
 }

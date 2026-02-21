@@ -215,6 +215,7 @@ export const sessions = pgTable(
       .defaultNow(),
   },
   (table) => [
+    uniqueIndex("idx_sess_date_title").on(table.date, table.title),
     index("idx_sess_date").on(table.date),
     index("idx_sess_branch").on(table.branch),
   ]

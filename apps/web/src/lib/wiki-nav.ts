@@ -333,6 +333,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Page Changes", href: "/internal/page-changes" },
         { label: "PR Descriptions", href: "/internal/pr-descriptions" },
         { label: "Fact Dashboard", href: "/internal/facts" },
+        { label: "Entities Dashboard", href: "/internal/entities" },
         { label: "Automation Tools", href: internalHref("automation-tools") },
         { label: "Content Database", href: internalHref("content-database") },
         { label: "Importance Rankings", href: "/internal/importance-rankings" },

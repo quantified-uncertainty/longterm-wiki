@@ -111,3 +111,14 @@ jobs:
             exit 1
           fi
           echo "Sync smoke test passed: upserted=$UPSERTED"
+
+          # 3. Cleanup — delete the smoke-test row so it does not persist in the database
+          DELETE_RESPONSE=$(curl -sf -X DELETE \
+            -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
+            "${LONGTERMWIKI_SERVER_URL}/api/pages/__smoke-test__")
+          DELETED=$(echo "$DELETE_RESPONSE" | jq -r '.deleted')
+          if [ "$DELETED" != "1" ]; then
+            echo "::error::Smoke test cleanup failed: $DELETE_RESPONSE"
+            exit 1
+          fi
+          echo "Smoke test cleanup passed: deleted=$DELETED"

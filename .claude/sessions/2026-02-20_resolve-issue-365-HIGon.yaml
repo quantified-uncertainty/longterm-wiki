@@ -6,34 +6,20 @@ pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/370
 model: claude-sonnet-4-6
 duration: ~15 minutes
 cost: ~$0.50
+summary: |
+  Added llmSummary as a separate indexed field in the MiniSearch search index.
+  Previously, llmSummary was used as a fallback for description (one replaced the other).
+  Now both are indexed independently, and both contribute to search ranking.
 
-## Summary
+  Files changed: apps/web/scripts/lib/search.mjs (added llmSummary to SEARCH_FIELDS;
+  separated it from description in document objects) and apps/web/src/lib/search.ts
+  (added llmSummary to SEARCH_FIELDS and FIELD_BOOSTS with boost 1.5).
 
-Added `llmSummary` as a separate indexed field in the MiniSearch search index.
-Previously, `llmSummary` was used as a fallback *for* `description` (one replaced the other).
-Now both are indexed independently, and both contribute to search ranking.
+  Key decisions: Changed from fallback pattern (description: llmSummary || description)
+  to both being indexed as independent fields. Boost weight 1.5 places llmSummary between
+  description (2.0) and tags (1.5). Display still prefers llmSummary for search snippets.
 
-## Files Changed
-
-- `apps/web/scripts/lib/search.mjs` — added `llmSummary` to SEARCH_FIELDS; separated it
-  from `description` in document objects; display description still prefers `llmSummary || description`
-- `apps/web/src/lib/search.ts` — added `llmSummary` to SEARCH_FIELDS and FIELD_BOOSTS (boost: 1.5)
-
-## Key Decisions
-
-- **Separate field vs. fallback**: Changed from `description: llmSummary || description` (only one
-  indexed) to both being indexed as independent fields. This ensures pages can be discovered via
-  either their human-written description or AI-generated summary.
-- **Boost weight 1.5**: Placed llmSummary between description (2.0) and tags (1.5). The field
-  contains richer content than tags but is less authoritative than the curated description.
-- **Display still uses llmSummary || description**: The search result snippet continues to prefer
-  llmSummary for display (more informative), even though both are now indexed.
-- **Tooling gaps**: None identified — simple config change following established pattern.
-
-## Test Results
-
-- Gate: all 7 CI-blocking checks passed (220 tests)
-- CI: build-and-test ✓, validate ✓ — all green
+  Gate: all 7 CI-blocking checks passed (220 tests). CI: build-and-test and validate green.
 
 checks:
   initialized: true

@@ -4,39 +4,18 @@ import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { sessions, sessionPages } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
+import { CreateSessionSchema as SharedCreateSessionSchema, CreateSessionBatchSchema } from "../api-types.js";
 
 export const sessionsRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 200;
 const MAX_PAGE_SIZE = 500;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const CreateSessionSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  branch: z.string().max(500).nullable().optional(),
-  title: z.string().min(1).max(1000),
-  summary: z.string().max(10000).nullable().optional(),
-  model: z.string().max(100).nullable().optional(),
-  duration: z.string().max(100).nullable().optional(),
-  cost: z.string().max(100).nullable().optional(),
-  prUrl: z.string().max(1000).nullable().optional(),
-  checksYaml: z.string().max(10000).nullable().optional(),
-  issuesJson: z.unknown().nullable().optional(),
-  learningsJson: z.unknown().nullable().optional(),
-  recommendationsJson: z.unknown().nullable().optional(),
-  pages: z
-    .array(z.string().min(1).max(200))
-    .optional()
-    .default([])
-    .transform((arr) => [...new Set(arr)]),
-});
-
-const CreateBatchSchema = z.object({
-  items: z.array(CreateSessionSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const CreateSessionSchema = SharedCreateSessionSchema;
+const CreateBatchSchema = CreateSessionBatchSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
@@ -68,7 +47,38 @@ function mapSessionRow(
   };
 }
 
-// ---- POST / (create single session) ----
+function sessionValues(d: z.infer<typeof CreateSessionSchema>) {
+  return {
+    date: d.date,
+    branch: d.branch ?? null,
+    title: d.title,
+    summary: d.summary ?? null,
+    model: d.model ?? null,
+    duration: d.duration ?? null,
+    cost: d.cost ?? null,
+    prUrl: d.prUrl ?? null,
+    checksYaml: d.checksYaml ?? null,
+    issuesJson: d.issuesJson ?? null,
+    learningsJson: d.learningsJson ?? null,
+    recommendationsJson: d.recommendationsJson ?? null,
+  };
+}
+
+/** Fields to update on conflict (everything except date/title which form the unique key) */
+const sessionConflictSet = {
+  branch: sql`excluded.branch`,
+  summary: sql`excluded.summary`,
+  model: sql`excluded.model`,
+  duration: sql`excluded.duration`,
+  cost: sql`excluded.cost`,
+  prUrl: sql`excluded.pr_url`,
+  checksYaml: sql`excluded.checks_yaml`,
+  issuesJson: sql`excluded.issues_json`,
+  learningsJson: sql`excluded.learnings_json`,
+  recommendationsJson: sql`excluded.recommendations_json`,
+};
+
+// ---- POST / (create or update single session) ----
 
 sessionsRoute.post("/", async (c) => {
   const body = await parseJsonBody(c);
@@ -83,19 +93,10 @@ sessionsRoute.post("/", async (c) => {
   const result = await db.transaction(async (tx) => {
     const rows = await tx
       .insert(sessions)
-      .values({
-        date: d.date,
-        branch: d.branch ?? null,
-        title: d.title,
-        summary: d.summary ?? null,
-        model: d.model ?? null,
-        duration: d.duration ?? null,
-        cost: d.cost ?? null,
-        prUrl: d.prUrl ?? null,
-        checksYaml: d.checksYaml ?? null,
-        issuesJson: d.issuesJson ?? null,
-        learningsJson: d.learningsJson ?? null,
-        recommendationsJson: d.recommendationsJson ?? null,
+      .values(sessionValues(d))
+      .onConflictDoUpdate({
+        target: [sessions.date, sessions.title],
+        set: sessionConflictSet,
       })
       .returning({
         id: sessions.id,
@@ -104,9 +105,13 @@ sessionsRoute.post("/", async (c) => {
         createdAt: sessions.createdAt,
       });
 
-    const session = firstOrThrow(rows, "session insert");
+    const session = firstOrThrow(rows, "session upsert");
 
-    // Insert page associations
+    // Replace page associations: delete old, insert new
+    await tx
+      .delete(sessionPages)
+      .where(eq(sessionPages.sessionId, session.id));
+
     if (d.pages.length > 0) {
       await tx
         .insert(sessionPages)
@@ -119,7 +124,7 @@ sessionsRoute.post("/", async (c) => {
   return c.json(result, 201);
 });
 
-// ---- POST /batch (create multiple sessions) ----
+// ---- POST /batch (create or update multiple sessions) ----
 
 sessionsRoute.post("/batch", async (c) => {
   const body = await parseJsonBody(c);
@@ -137,23 +142,19 @@ sessionsRoute.post("/batch", async (c) => {
     for (const d of items) {
       const rows = await tx
         .insert(sessions)
-        .values({
-          date: d.date,
-          branch: d.branch ?? null,
-          title: d.title,
-          summary: d.summary ?? null,
-          model: d.model ?? null,
-          duration: d.duration ?? null,
-          cost: d.cost ?? null,
-          prUrl: d.prUrl ?? null,
-          checksYaml: d.checksYaml ?? null,
-          issuesJson: d.issuesJson ?? null,
-          learningsJson: d.learningsJson ?? null,
-          recommendationsJson: d.recommendationsJson ?? null,
+        .values(sessionValues(d))
+        .onConflictDoUpdate({
+          target: [sessions.date, sessions.title],
+          set: sessionConflictSet,
         })
         .returning({ id: sessions.id, title: sessions.title });
 
-      const session = firstOrThrow(rows, `session batch insert "${d.title}"`);
+      const session = firstOrThrow(rows, `session batch upsert "${d.title}"`);
+
+      // Replace page associations: delete old, insert new
+      await tx
+        .delete(sessionPages)
+        .where(eq(sessionPages.sessionId, session.id));
 
       if (d.pages.length > 0) {
         await tx
@@ -171,7 +172,7 @@ sessionsRoute.post("/batch", async (c) => {
     return created;
   });
 
-  return c.json({ inserted: results.length, results }, 201);
+  return c.json({ upserted: results.length, results }, 201);
 });
 
 // ---- GET / (list sessions, paginated) ----

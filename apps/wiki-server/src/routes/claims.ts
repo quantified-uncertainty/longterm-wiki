@@ -8,31 +8,24 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
+import {
+  InsertClaimSchema as SharedInsertClaimSchema,
+  InsertClaimBatchSchema,
+  ClearClaimsSchema,
+} from "../api-types.js";
 
 export const claimsRoute = new Hono();
 
 // ---- Constants ----
 
-const MAX_BATCH_SIZE = 500;
 const MAX_PAGE_SIZE = 200;
 
-// ---- Schemas ----
+// ---- Schemas (from shared api-types) ----
 
-const InsertClaimSchema = z.object({
-  entityId: z.string().min(1).max(300),
-  entityType: z.string().min(1).max(100),
-  claimType: z.string().min(1).max(100),
-  claimText: z.string().min(1).max(10000),
-  value: z.string().max(1000).nullable().optional(),
-  unit: z.string().max(100).nullable().optional(),
-  confidence: z.string().max(100).nullable().optional(),
-  sourceQuote: z.string().max(10000).nullable().optional(),
-});
-
-const InsertBatchSchema = z.object({
-  items: z.array(InsertClaimSchema).min(1).max(MAX_BATCH_SIZE),
-});
+const InsertClaimSchema = SharedInsertClaimSchema;
+const InsertBatchSchema = InsertClaimBatchSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
@@ -41,9 +34,7 @@ const PaginationQuery = z.object({
   claimType: z.string().max(100).optional(),
 });
 
-const DeleteByEntitySchema = z.object({
-  entityId: z.string().min(1).max(300),
-});
+const DeleteByEntitySchema = ClearClaimsSchema;
 
 // ---- Helpers ----
 
@@ -99,7 +90,7 @@ claimsRoute.post("/", async (c) => {
       claimType: claims.claimType,
     });
 
-  return c.json(rows[0], 201);
+  return c.json(firstOrThrow(rows, "claim insert"), 201);
 });
 
 // ---- POST /batch (insert multiple claims) ----

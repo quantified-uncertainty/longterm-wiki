@@ -38,7 +38,7 @@ const UpsertResourceSchema = z.object({
   abstract: z.string().max(50000).nullable().optional(),
   keyPoints: z.array(z.string().max(2000)).max(50).nullable().optional(),
   publicationId: z.string().max(200).nullable().optional(),
-  authors: z.array(z.string().max(500)).max(1000).nullable().optional(),
+  authors: z.array(z.string().max(500)).max(5000).nullable().optional(),
   publishedDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)

@@ -78,7 +78,7 @@ export async function syncSessions(
     batchSize,
     {
       bodyKey: 'items',
-      responseCountKey: 'inserted',
+      responseCountKey: 'upserted',
       itemLabel: 'sessions',
       _sleep: options._sleep,
     },

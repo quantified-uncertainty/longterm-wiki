@@ -1,14 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import path from 'path';
 
-// Mock wiki-server-client to prevent real HTTP requests in tests
-vi.mock('./wiki-server-client.ts', () => ({
-  appendEditLogToServer: vi.fn().mockResolvedValue({ id: 1, pageId: 'test', date: '2026-02-13', createdAt: '2026-02-13T00:00:00Z' }),
-  getEditLogsForPage: vi.fn().mockResolvedValue(null),
+// Mock wiki-server/edit-logs.ts to prevent real HTTP requests in tests
+vi.mock('./wiki-server/edit-logs.ts', () => ({
+  appendEditLogToServer: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { id: 1, pageId: 'test', date: '2026-02-13', createdAt: '2026-02-13T00:00:00Z' },
+  }),
+  getEditLogsForPage: vi.fn().mockResolvedValue({ ok: false, error: 'unavailable', message: 'not set' }),
 }));
 
 import { appendEditLog, readEditLog, pageIdFromPath, logBulkFixes, getDefaultRequestedBy } from './edit-log.ts';
-import { appendEditLogToServer, getEditLogsForPage } from './wiki-server-client.ts';
+import { appendEditLogToServer, getEditLogsForPage } from './wiki-server/edit-logs.ts';
 
 const TEST_PAGE_ID = '__test-edit-log-page__';
 
@@ -16,27 +19,30 @@ describe('edit-log', () => {
   beforeEach(() => {
     vi.mocked(appendEditLogToServer).mockClear();
     vi.mocked(getEditLogsForPage).mockClear();
-    vi.mocked(getEditLogsForPage).mockResolvedValue(null);
+    vi.mocked(getEditLogsForPage).mockResolvedValue({ ok: false, error: 'unavailable', message: 'not set' });
   });
 
   describe('readEditLog', () => {
-    it('returns empty array when server returns null', async () => {
-      vi.mocked(getEditLogsForPage).mockResolvedValue(null);
+    it('returns empty array when server is unavailable', async () => {
+      vi.mocked(getEditLogsForPage).mockResolvedValue({ ok: false, error: 'unavailable', message: 'not set' });
       expect(await readEditLog('nonexistent-page-xyz')).toEqual([]);
     });
 
     it('reads entries from the server', async () => {
       vi.mocked(getEditLogsForPage).mockResolvedValue({
-        entries: [{
-          id: 1,
-          pageId: TEST_PAGE_ID,
-          date: '2026-01-15',
-          tool: 'crux-create',
-          agency: 'ai-directed',
-          requestedBy: 'ozzie',
-          note: 'Test entry',
-          createdAt: '2026-01-15T00:00:00Z',
-        }],
+        ok: true,
+        data: {
+          entries: [{
+            id: 1,
+            pageId: TEST_PAGE_ID,
+            date: '2026-01-15',
+            tool: 'crux-create',
+            agency: 'ai-directed',
+            requestedBy: 'ozzie',
+            note: 'Test entry',
+            createdAt: '2026-01-15T00:00:00Z',
+          }],
+        },
       });
       const entries = await readEditLog(TEST_PAGE_ID);
       expect(entries).toHaveLength(1);
@@ -47,8 +53,8 @@ describe('edit-log', () => {
   });
 
   describe('appendEditLog', () => {
-    it('writes to the wiki-server API', () => {
-      appendEditLog(TEST_PAGE_ID, {
+    it('writes to the wiki-server API', async () => {
+      await appendEditLog(TEST_PAGE_ID, {
         date: '2026-02-13',
         tool: 'crux-create',
         agency: 'ai-directed',
@@ -67,8 +73,8 @@ describe('edit-log', () => {
       });
     });
 
-    it('defaults date to today if not provided', () => {
-      appendEditLog(TEST_PAGE_ID, {
+    it('defaults date to today if not provided', async () => {
+      await appendEditLog(TEST_PAGE_ID, {
         tool: 'manual',
         agency: 'human',
       });
@@ -77,8 +83,8 @@ describe('edit-log', () => {
       expect(call.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
-    it('omits optional fields when not provided', () => {
-      appendEditLog(TEST_PAGE_ID, {
+    it('omits optional fields when not provided', async () => {
+      await appendEditLog(TEST_PAGE_ID, {
         tool: 'crux-grade',
         agency: 'automated',
       });
@@ -88,8 +94,8 @@ describe('edit-log', () => {
       expect(call.note).toBeNull();
     });
 
-    it('preserves empty string values for optional fields', () => {
-      appendEditLog(TEST_PAGE_ID, {
+    it('preserves empty string values for optional fields', async () => {
+      await appendEditLog(TEST_PAGE_ID, {
         tool: 'manual',
         agency: 'human',
         requestedBy: '',
@@ -101,16 +107,41 @@ describe('edit-log', () => {
       expect(call.note).toBe('');
     });
 
-    it('does not throw if server write rejects', () => {
-      vi.mocked(appendEditLogToServer).mockRejectedValueOnce(new Error('server down'));
+    it('returns the ApiResult from the server', async () => {
+      const result = await appendEditLog(TEST_PAGE_ID, {
+        tool: 'crux-fix',
+        agency: 'automated',
+      });
 
-      // Should not throw
-      expect(() => {
-        appendEditLog(TEST_PAGE_ID, {
-          tool: 'crux-fix',
-          agency: 'automated',
-        });
-      }).not.toThrow();
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.data.id).toBe(1);
+        expect(result.data.pageId).toBe('test');
+      }
+    });
+
+    it('returns error ApiResult and logs warning when server write fails', async () => {
+      vi.mocked(appendEditLogToServer).mockResolvedValueOnce({
+        ok: false,
+        error: 'unavailable',
+        message: 'LONGTERMWIKI_SERVER_URL not set',
+      });
+
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+      const result = await appendEditLog(TEST_PAGE_ID, {
+        tool: 'crux-fix',
+        agency: 'automated',
+      });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe('unavailable');
+      }
+
+      stderrSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -162,9 +193,9 @@ describe('edit-log', () => {
   });
 
   describe('logBulkFixes', () => {
-    it('creates entries for multiple pages', () => {
+    it('creates entries for multiple pages', async () => {
       const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
-      logBulkFixes(
+      const results = await logBulkFixes(
         [
           `${root}/content/docs/test/__test-bulk-1__.mdx`,
           `${root}/content/docs/test/__test-bulk-2__.mdx`,
@@ -178,6 +209,11 @@ describe('edit-log', () => {
       expect(calls[1][0].pageId).toBe('__test-bulk-2__');
       expect(calls[0][0].tool).toBe('crux-fix');
       expect(calls[1][0].note).toBe('Test bulk fix');
+
+      // Results array has one entry per file
+      expect(results).toHaveLength(2);
+      expect(results[0].ok).toBe(true);
+      expect(results[1].ok).toBe(true);
     });
   });
 });
