@@ -19,6 +19,108 @@ export interface RiskPageData {
   factors: string[];
 }
 
+// ── API types ────────────────────────────────────────────────────────────────
+
+interface ApiRiskPage {
+  pageId: string;
+  score: number;
+  level: "low" | "medium" | "high";
+  factors: string[] | null;
+  integrityIssues: string[] | null;
+  computedAt: string;
+}
+
+// ── Data loading ─────────────────────────────────────────────────────────────
+
+/**
+ * Load hallucination risk data from the wiki-server API.
+ * Paginates through all results since the API has a max page size of 200.
+ * Returns null if the server is unavailable.
+ */
+async function loadRiskDataFromApi(): Promise<RiskPageData[] | null> {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) return null;
+
+  try {
+    const headers: Record<string, string> = {};
+    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (apiKey) {
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    }
+
+    // Paginate to fetch all risk scores (guard against infinite loop)
+    const allApiPages: ApiRiskPage[] = [];
+    let offset = 0;
+    const pageSize = 200;
+    const maxPages = 20; // Safety limit: 20 × 200 = 4000 pages max
+
+    for (let page = 0; page < maxPages; page++) {
+      const res = await fetch(
+        `${serverUrl}/api/hallucination-risk/latest?limit=${pageSize}&offset=${offset}`,
+        { headers, next: { revalidate: 300 } }
+      );
+      if (!res.ok) return null;
+
+      const data = (await res.json()) as { pages: ApiRiskPage[] };
+      allApiPages.push(...data.pages);
+
+      if (data.pages.length < pageSize) break;
+      offset += pageSize;
+    }
+
+    if (allApiPages.length === 0) return null;
+
+    // Build page metadata lookup from local database.json
+    const pages = getAllPages();
+    const pageMap = new Map(
+      pages.map((p) => [
+        p.id,
+        {
+          title: p.title,
+          entityType: p.entityType,
+          quality: p.quality ?? null,
+          wordCount: p.metrics?.wordCount,
+        },
+      ])
+    );
+
+    return allApiPages.map((r) => {
+      const meta = pageMap.get(r.pageId);
+      return {
+        id: r.pageId,
+        title: meta?.title || r.pageId,
+        entityType: meta?.entityType,
+        quality: meta?.quality ?? null,
+        wordCount: meta?.wordCount,
+        level: r.level,
+        score: r.score,
+        factors: r.factors || [],
+      };
+    });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Load hallucination risk data from local database.json (fallback).
+ */
+function loadRiskDataFromDatabase(): RiskPageData[] {
+  const pages = getAllPages();
+  return pages
+    .filter((p) => p.hallucinationRisk)
+    .map((p) => ({
+      id: p.id,
+      title: p.title,
+      entityType: p.entityType,
+      quality: p.quality ?? null,
+      wordCount: p.metrics?.wordCount,
+      level: p.hallucinationRisk!.level,
+      score: p.hallucinationRisk!.score,
+      factors: p.hallucinationRisk!.factors,
+    }));
+}
+
 function StatCard({
   label,
   value,
@@ -38,21 +140,10 @@ function StatCard({
   );
 }
 
-export default function HallucinationRiskPage() {
-  const pages = getAllPages();
-
-  const riskPages: RiskPageData[] = pages
-    .filter((p) => p.hallucinationRisk)
-    .map((p) => ({
-      id: p.id,
-      title: p.title,
-      entityType: p.entityType,
-      quality: p.quality ?? null,
-      wordCount: p.metrics?.wordCount,
-      level: p.hallucinationRisk!.level,
-      score: p.hallucinationRisk!.score,
-      factors: p.hallucinationRisk!.factors,
-    }));
+export default async function HallucinationRiskPage() {
+  // Try wiki-server API first, fall back to database.json
+  const riskPages =
+    (await loadRiskDataFromApi()) ?? loadRiskDataFromDatabase();
 
   const highCount = riskPages.filter((p) => p.level === "high").length;
   const mediumCount = riskPages.filter((p) => p.level === "medium").length;
