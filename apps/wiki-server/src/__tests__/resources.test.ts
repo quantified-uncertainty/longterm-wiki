@@ -70,19 +70,24 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // ---- INSERT INTO resource_citations ----
+  // ---- INSERT INTO resource_citations (supports multi-row) ----
   if (q.includes("insert into") && q.includes("resource_citations")) {
-    const resourceId = params[0] as string;
-    const pageId = params[1] as string;
-    const exists = citationStore.some(
-      (c) => c.resource_id === resourceId && c.page_id === pageId
-    );
-    if (!exists) {
-      citationStore.push({
-        resource_id: resourceId,
-        page_id: pageId,
-        created_at: new Date(),
-      });
+    const COLS = 2; // resource_id, page_id
+    const numRows = params.length / COLS;
+    for (let i = 0; i < numRows; i++) {
+      const o = i * COLS;
+      const resourceId = params[o] as string;
+      const pageId = params[o + 1] as string;
+      const exists = citationStore.some(
+        (c) => c.resource_id === resourceId && c.page_id === pageId
+      );
+      if (!exists) {
+        citationStore.push({
+          resource_id: resourceId,
+          page_id: pageId,
+          created_at: new Date(),
+        });
+      }
     }
     return [];
   }

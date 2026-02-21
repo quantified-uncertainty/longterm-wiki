@@ -14,7 +14,9 @@ import { readdirSync, readFileSync } from "fs";
 import { resolve, dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
-import { getDb, initDb, closeDb, type SqlQuery } from "./db.js";
+import { sql } from "drizzle-orm";
+import { getDrizzleDb, initDb, closeDb } from "./db.js";
+import { autoUpdateRuns, autoUpdateResults } from "./schema.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -143,58 +145,77 @@ async function seedAutoUpdateRuns() {
     return;
   }
 
-  // Insert into database
-  const db = getDb();
+  // Insert into database using Drizzle batch inserts
   await initDb();
+  const db = getDrizzleDb();
 
+  const BATCH_SIZE = 500;
   let runsInserted = 0;
   let resultsInserted = 0;
 
-  await db.begin(async (tx) => {
-    const q = tx as unknown as SqlQuery;
-
+  await db.transaction(async (tx) => {
     // Truncate for idempotent re-runs
-    await q`TRUNCATE auto_update_results RESTART IDENTITY`;
-    await q`TRUNCATE auto_update_runs RESTART IDENTITY CASCADE`;
+    await tx.execute(sql`TRUNCATE auto_update_results RESTART IDENTITY`);
+    await tx.execute(sql`TRUNCATE auto_update_runs RESTART IDENTITY CASCADE`);
     console.log("Truncated auto_update_runs and auto_update_results tables");
 
-    for (const { run, results } of allRuns) {
-      const rows = await q`
-        INSERT INTO auto_update_runs (
-          date, started_at, completed_at, trigger,
-          budget_limit, budget_spent,
-          sources_checked, sources_failed, items_fetched, items_relevant,
-          pages_planned, pages_updated, pages_failed, pages_skipped,
-          new_pages_created
-        )
-        VALUES (
-          ${run.date}::date,
-          ${run.startedAt}::timestamptz,
-          ${run.completedAt}::timestamptz,
-          ${run.trigger},
-          ${run.budgetLimit}, ${run.budgetSpent},
-          ${run.sourcesChecked}, ${run.sourcesFailed},
-          ${run.itemsFetched}, ${run.itemsRelevant},
-          ${run.pagesPlanned}, ${run.pagesUpdated},
-          ${run.pagesFailed}, ${run.pagesSkipped},
-          ${run.newPagesCreated || null}
-        )
-        RETURNING id
-      `;
-      const runId = (rows as any)[0].id;
-      runsInserted++;
+    // Batch insert runs, collecting results for second pass
+    const allResults: Array<{
+      runId: number;
+      pageId: string;
+      status: string;
+      tier: string | null;
+      durationMs: number | null;
+      errorMessage: string | null;
+    }> = [];
 
-      for (const result of results) {
-        await q`
-          INSERT INTO auto_update_results (run_id, page_id, status, tier, duration_ms, error_message)
-          VALUES (
-            ${runId}, ${result.pageId}, ${result.status},
-            ${result.tier ?? null}, ${result.durationMs ?? null},
-            ${result.error ?? null}
-          )
-        `;
-        resultsInserted++;
+    for (let i = 0; i < allRuns.length; i += BATCH_SIZE) {
+      const batch = allRuns.slice(i, i + BATCH_SIZE);
+      const rows = await tx
+        .insert(autoUpdateRuns)
+        .values(
+          batch.map(({ run }) => ({
+            date: run.date,
+            startedAt: new Date(run.startedAt),
+            completedAt: new Date(run.completedAt),
+            trigger: run.trigger,
+            budgetLimit: run.budgetLimit,
+            budgetSpent: run.budgetSpent,
+            sourcesChecked: run.sourcesChecked,
+            sourcesFailed: run.sourcesFailed,
+            itemsFetched: run.itemsFetched,
+            itemsRelevant: run.itemsRelevant,
+            pagesPlanned: run.pagesPlanned,
+            pagesUpdated: run.pagesUpdated,
+            pagesFailed: run.pagesFailed,
+            pagesSkipped: run.pagesSkipped,
+            newPagesCreated: run.newPagesCreated || null,
+          }))
+        )
+        .returning({ id: autoUpdateRuns.id });
+
+      runsInserted += rows.length;
+
+      // Match returned IDs to input runs (insertion order is preserved)
+      for (let j = 0; j < rows.length; j++) {
+        for (const result of batch[j].results) {
+          allResults.push({
+            runId: rows[j].id,
+            pageId: result.pageId,
+            status: result.status,
+            tier: result.tier ?? null,
+            durationMs: result.durationMs ?? null,
+            errorMessage: result.error ?? null,
+          });
+        }
       }
+    }
+
+    // Batch insert all results
+    for (let i = 0; i < allResults.length; i += BATCH_SIZE) {
+      const batch = allResults.slice(i, i + BATCH_SIZE);
+      await tx.insert(autoUpdateResults).values(batch);
+      resultsInserted += batch.length;
     }
   });
 

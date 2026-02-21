@@ -161,14 +161,34 @@ citationsRoute.post("/quotes/upsert-batch", async (c) => {
 
   const { items } = parsed.data;
   const db = getDrizzleDb();
-  const results: Array<{ id: number; pageId: string; footnote: number }> = [];
 
-  await db.transaction(async (tx) => {
-    for (const d of items) {
-      const rows = await upsertQuote(tx, d);
-      const row = firstOrThrow(rows, `citation quote batch upsert ${d.pageId}:${d.footnote}`);
-      results.push({ id: row.id, pageId: row.pageId, footnote: row.footnote });
-    }
+  const results = await db.transaction(async (tx) => {
+    return await tx
+      .insert(citationQuotes)
+      .values(items.map((d) => quoteValues(d)))
+      .onConflictDoUpdate({
+        target: [citationQuotes.pageId, citationQuotes.footnote],
+        set: {
+          url: sql`excluded.url`,
+          resourceId: sql`excluded.resource_id`,
+          claimText: sql`excluded.claim_text`,
+          claimContext: sql`excluded.claim_context`,
+          sourceQuote: sql`excluded.source_quote`,
+          sourceLocation: sql`excluded.source_location`,
+          quoteVerified: sql`excluded.quote_verified`,
+          verificationMethod: sql`excluded.verification_method`,
+          verificationScore: sql`excluded.verification_score`,
+          sourceTitle: sql`excluded.source_title`,
+          sourceType: sql`excluded.source_type`,
+          extractionModel: sql`excluded.extraction_model`,
+          updatedAt: sql`now()`,
+        },
+      })
+      .returning({
+        id: citationQuotes.id,
+        pageId: citationQuotes.pageId,
+        footnote: citationQuotes.footnote,
+      });
   });
 
   return c.json({ results });
@@ -512,12 +532,12 @@ citationsRoute.post("/accuracy-snapshot", async (c) => {
     .having(sql`count(case when ${citationQuotes.accuracyVerdict} is not null then 1 end) > 0`);
 
   // Insert snapshots for all pages with accuracy data
-  const inserted: Array<{ id: number; pageId: string }> = [];
-  await db.transaction(async (tx) => {
-    for (const ps of pageStats) {
-      const rows = await tx
-        .insert(citationAccuracySnapshots)
-        .values({
+  let inserted: Array<{ id: number; pageId: string }> = [];
+  if (pageStats.length > 0) {
+    inserted = await db
+      .insert(citationAccuracySnapshots)
+      .values(
+        pageStats.map((ps) => ({
           pageId: ps.pageId,
           totalCitations: ps.totalCitations,
           checkedCitations: Number(ps.checkedCitations),
@@ -527,14 +547,13 @@ citationsRoute.post("/accuracy-snapshot", async (c) => {
           unsupportedCount: Number(ps.unsupportedCount),
           notVerifiableCount: Number(ps.notVerifiableCount),
           averageScore: ps.averageScore != null ? Number(ps.averageScore) : null,
-        })
-        .returning({
-          id: citationAccuracySnapshots.id,
-          pageId: citationAccuracySnapshots.pageId,
-        });
-      inserted.push(firstOrThrow(rows, `accuracy snapshot insert ${ps.pageId}`));
-    }
-  });
+        }))
+      )
+      .returning({
+        id: citationAccuracySnapshots.id,
+        pageId: citationAccuracySnapshots.pageId,
+      });
+  }
 
   return c.json({
     snapshotCount: inserted.length,

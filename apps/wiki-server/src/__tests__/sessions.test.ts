@@ -145,14 +145,21 @@ vi.mock("../db.js", async () => {
       return [row];
     }
 
-    // ---- INSERT INTO session_pages ----
+    // ---- INSERT INTO session_pages (supports multi-row) ----
     if (q.includes("insert into") && q.includes("session_pages")) {
-      const row = {
-        session_id: params[0] as number,
-        page_id: params[1] as string,
-      };
-      sessionPageStore.push(row);
-      return [row];
+      const COLS = 2;
+      const numRows = params.length / COLS;
+      const rows = [];
+      for (let i = 0; i < numRows; i++) {
+        const o = i * COLS;
+        const row = {
+          session_id: params[o] as number,
+          page_id: params[o + 1] as string,
+        };
+        sessionPageStore.push(row);
+        rows.push(row);
+      }
+      return rows;
     }
 
     // ---- SELECT count(*) FROM sessions (no group by) ----

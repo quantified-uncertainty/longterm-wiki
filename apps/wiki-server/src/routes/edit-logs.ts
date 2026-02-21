@@ -93,22 +93,19 @@ editLogsRoute.post("/batch", async (c) => {
   const db = getDrizzleDb();
 
   const results = await db.transaction(async (tx) => {
-    const rows: Array<{ id: number; pageId: string }> = [];
-    for (const d of items) {
-      const inserted = await tx
-        .insert(editLogs)
-        .values({
+    return await tx
+      .insert(editLogs)
+      .values(
+        items.map((d) => ({
           pageId: d.pageId,
           date: d.date,
           tool: d.tool,
           agency: d.agency,
           requestedBy: d.requestedBy ?? null,
           note: d.note ?? null,
-        })
-        .returning({ id: editLogs.id, pageId: editLogs.pageId });
-      rows.push(firstOrThrow(inserted, `edit log batch insert ${d.pageId}`));
-    }
-    return rows;
+        }))
+      )
+      .returning({ id: editLogs.id, pageId: editLogs.pageId });
   });
 
   return c.json({ inserted: results.length, results }, 201);
