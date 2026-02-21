@@ -9,6 +9,7 @@ import { editLogsRoute } from "./routes/edit-logs.js";
 import { autoUpdateRunsRoute } from "./routes/auto-update-runs.js";
 import { hallucinationRiskRoute } from "./routes/hallucination-risk.js";
 import { sessionsRoute } from "./routes/sessions.js";
+import { resourcesRoute } from "./routes/resources.js";
 
 export function createApp() {
   const app = new Hono();
@@ -46,6 +47,7 @@ export function createApp() {
   app.route("/api/auto-update-runs", autoUpdateRunsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
   app.route("/api/sessions", sessionsRoute);
+  app.route("/api/resources", resourcesRoute);
 
   return app;
 }
