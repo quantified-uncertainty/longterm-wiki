@@ -399,6 +399,21 @@ export function loadDatabase(): DatabaseSchema {
   return loadGeneratedJson<DatabaseSchema>('database.json', {});
 }
 
+export interface IdRegistryData {
+  byNumericId: Record<string, string>; // E## → slug
+  bySlug: Record<string, string>;      // slug → E##
+}
+
+/**
+ * Load the ID registry (E## ↔ slug mappings) from database.json.
+ * Requires build-data.mjs to have been run first.
+ */
+export function loadIdRegistry(): IdRegistryData {
+  const db = loadDatabase();
+  const reg = (db as Record<string, unknown>).idRegistry as IdRegistryData | undefined;
+  return reg || { byNumericId: {}, bySlug: {} };
+}
+
 // ---------------------------------------------------------------------------
 // Validation rule sets
 // ---------------------------------------------------------------------------

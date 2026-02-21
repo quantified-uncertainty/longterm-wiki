@@ -20,7 +20,7 @@ import { parse as parseYaml } from 'yaml';
 import { findMdxFiles } from './file-utils.ts';
 import { getColors, type Colors } from './output.ts';
 import { parseFrontmatterAndBody } from './mdx-utils.ts';
-import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter } from './content-types.ts';
+import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR, type Frontmatter, loadIdRegistry } from './content-types.ts';
 import { logBulkFixes } from './edit-log.ts';
 
 // ---------------------------------------------------------------------------
@@ -247,16 +247,15 @@ export class ValidationEngine {
     this.pathRegistry = (loadJSON('data/pathRegistry.json') as Record<string, string>) || {};
     this.entities = loadYAML('data/entities.yaml') || {};
 
-    // Load id-registry for numeric ID resolution
-    const rawRegistry = loadJSON('data/id-registry.json') as { entities?: Record<string, string> } | null;
-    if (rawRegistry?.entities) {
-      const byNumericId = rawRegistry.entities;
-      const bySlug: Record<string, string> = {};
-      for (const [eid, slug] of Object.entries(byNumericId)) {
-        bySlug[slug] = eid;
+    // Load id-registry for numeric ID resolution (from database.json)
+    try {
+      const reg = loadIdRegistry();
+      if (Object.keys(reg.byNumericId).length > 0) {
+        this.idRegistry = reg;
+      } else {
+        this.idRegistry = null;
       }
-      this.idRegistry = { byNumericId, bySlug };
-    } else {
+    } catch {
       this.idRegistry = null;
     }
 

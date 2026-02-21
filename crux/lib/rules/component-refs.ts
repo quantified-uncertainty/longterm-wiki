@@ -12,7 +12,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation-engine.ts';
-import { loadDatabase, loadPathRegistry, DATA_DIR_ABS, type Entity } from '../content-types.ts';
+import { loadDatabase, loadPathRegistry, loadIdRegistry as loadIdReg, DATA_DIR_ABS, type Entity } from '../content-types.ts';
 import { NUMERIC_ID_RE, ENTITY_LINK_RE } from '../patterns.ts';
 
 const DATA_DIR = DATA_DIR_ABS;
@@ -23,13 +23,11 @@ let externalLinksCache: Set<string> | null = null;
 let safetyApproachesCache: Set<string> | null = null;
 let idRegistryCache: Record<string, string> | null = null;
 
-/** Load numeric-ID → slug mapping from id-registry.json */
+/** Load numeric-ID → slug mapping from database.json */
 function loadIdRegistry(): Record<string, string> {
   if (idRegistryCache) return idRegistryCache;
   try {
-    const raw = readFileSync(join(DATA_DIR, 'id-registry.json'), 'utf-8');
-    const registry = JSON.parse(raw);
-    idRegistryCache = registry.entities || {};
+    idRegistryCache = loadIdReg().byNumericId;
     return idRegistryCache;
   } catch {
     idRegistryCache = {};

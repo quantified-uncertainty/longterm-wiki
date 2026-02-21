@@ -10,21 +10,21 @@ import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
 import { ENTITY_LINK_RE, NUMERIC_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
 
-interface IdRegistry {
-  _nextId: number;
-  entities: Record<string, string>;
-}
-
 let _slugToNumeric: Record<string, string> | null = null;
 
-/** Load slug→E## mapping from id-registry.json (lazy, cached) */
+/**
+ * Load slug→E## mapping from the built database.json (lazy, cached).
+ * Requires build-data.mjs to have been run first.
+ */
 function getSlugToNumericMap(ROOT: string): Record<string, string> {
   if (_slugToNumeric) return _slugToNumeric;
   try {
-    const raw = fs.readFileSync(path.join(ROOT, 'data/id-registry.json'), 'utf-8');
-    const registry: IdRegistry = JSON.parse(raw);
+    const dbPath = path.join(ROOT, 'apps/web/src/data/database.json');
+    const raw = fs.readFileSync(dbPath, 'utf-8');
+    const db = JSON.parse(raw);
+    const byNumericId: Record<string, string> = db.idRegistry?.byNumericId || {};
     _slugToNumeric = {};
-    for (const [eid, slug] of Object.entries(registry.entities)) {
+    for (const [eid, slug] of Object.entries(byNumericId)) {
       _slugToNumeric[slug] = eid;
     }
     return _slugToNumeric;

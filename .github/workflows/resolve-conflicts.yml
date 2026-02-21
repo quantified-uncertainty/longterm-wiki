@@ -224,12 +224,8 @@ jobs:
              - TypeScript/JS files with type errors from combining incompatible changes
              - Build-data failures from mismatched entity/fact references between files
              - MDX files with broken EntityLink references
-             - Numeric ID reassignment errors (e.g. "Numeric ID reassignment detected"):
-               These happen when a numericId (like E696) was removed from a source YAML/MDX
-               file during the merge and build-data would assign a different one. Fix by
-               restoring the original numericId value in the source file. Check both
-               data/entities/*.yaml and content/docs/**/*.mdx frontmatter for numericId fields.
-               Do NOT use --allow-id-reassignment.
+             - Numeric ID conflicts: if two entities/pages claim the same numericId, fix by
+               giving one of them a unique ID. IDs are allocated by the wiki server.
              - Unescaped dollar signs in MDX files (e.g. "$100" should be "\\$100")
              - Deprecated frontmatter fields (e.g. "importance" should be "readerImportance")
           3. Run auto-fixers first: pnpm crux fix escaping && pnpm crux fix markdown

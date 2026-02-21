@@ -1,11 +1,12 @@
 /**
- * seed.ts — Populate the entity_ids table from an existing id-registry.json
+ * seed.ts — One-time migration: populate entity_ids table from a legacy id-registry.json
  *
- * Reads the registry file, inserts all entries, and advances the sequence
- * so nextval() returns maxId + 1.
+ * This was used to bootstrap the wiki server's database from the old file-based
+ * ID registry. Now that the server is the authoritative source of truth,
+ * id-registry.json is no longer generated. This script is kept for reference
+ * but should not need to be run again.
  *
  * Usage:
- *   DATABASE_URL=... tsx src/seed.ts
  *   DATABASE_URL=... ID_REGISTRY_PATH=/path/to/id-registry.json tsx src/seed.ts
  */
 

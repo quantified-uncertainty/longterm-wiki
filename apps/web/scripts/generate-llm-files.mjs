@@ -46,20 +46,16 @@ const CONTENT_DIR = LONGTERM_CONTENT_DIR;  // Read MDX from longterm
 const OUTPUT_DIR = join(PROJECT_ROOT, 'public');
 
 /**
- * Load id-registry.json to map page slugs to numeric IDs (E1, E2, ...)
+ * Load ID registry from database.json to map page slugs to numeric IDs (E1, E2, ...)
  */
 function loadIdRegistry() {
-  const registryPath = join(YAML_DATA_DIR, 'id-registry.json');
-  if (!existsSync(registryPath)) {
+  const dbPath = join(DATA_DIR, 'database.json');
+  if (!existsSync(dbPath)) {
     return {};
   }
-  const registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
-  // Build reverse map: slug → numericId
-  const slugToNumericId = {};
-  for (const [numId, slug] of Object.entries(registry.entities || {})) {
-    slugToNumericId[slug] = numId;
-  }
-  return slugToNumericId;
+  const db = JSON.parse(readFileSync(dbPath, 'utf-8'));
+  // database.json has idRegistry.bySlug (slug → E##)
+  return db.idRegistry?.bySlug || {};
 }
 
 // Loaded once and reused across all generators

@@ -22,7 +22,6 @@ interface EntityEntry {
 }
 
 interface IdRegistry {
-  _nextId: number;
   entities: Record<string, string>; // E## → slug
 }
 
@@ -31,10 +30,17 @@ let _entities: EntityEntry[] | null = null;
 let _entityById: Map<string, EntityEntry> | null = null;
 let _slugToEid: Record<string, string> | null = null;
 
+/**
+ * Load the ID registry from the built database.json.
+ * Extracts the idRegistry.byNumericId map (E## → slug).
+ * Requires build-data.mjs to have been run first.
+ */
 function loadRegistry(ROOT: string): IdRegistry {
   if (_registry) return _registry;
-  const raw = fs.readFileSync(path.join(ROOT, 'data/id-registry.json'), 'utf-8');
-  _registry = JSON.parse(raw);
+  const dbPath = path.join(ROOT, 'apps/web/src/data/database.json');
+  const raw = fs.readFileSync(dbPath, 'utf-8');
+  const db = JSON.parse(raw);
+  _registry = { entities: db.idRegistry?.byNumericId || {} };
   return _registry!;
 }
 

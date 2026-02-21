@@ -62,8 +62,7 @@ longterm-wiki/
 │   ├── facts/                 # Canonical facts
 │   ├── resources/             # External resource links
 │   ├── insights/              # Extracted insights
-│   ├── graphs/                # Causal graph YAML
-│   └── id-registry.json       # Derived build artifact (gitignored)
+│   └── graphs/                # Causal graph YAML
 ├── app/                       # Next.js 15 frontend (this directory)
 │   ├── src/
 │   │   ├── app/               # App Router pages
