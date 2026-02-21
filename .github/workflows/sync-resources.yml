@@ -1,0 +1,41 @@
+name: Sync Resources
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/resources/**"
+
+  # Allow manual trigger for full re-sync
+  workflow_dispatch:
+
+# Cancel superseded runs for the same trigger
+concurrency:
+  group: sync-resources-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  sync-resources:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate resource schemas
+        run: pnpm crux validate schema
+
+      - name: Sync resources to wiki-server
+        run: pnpm crux wiki-server sync-resources
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
