@@ -20,6 +20,12 @@ import { checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import type { AccuracyVerdict } from '../lib/quote-extractor.ts';
 import { exportDashboardData } from './export-dashboard.ts';
 import { logBatchProgress } from './shared.ts';
+import {
+  isServerAvailable,
+  markCitationAccuracy as markAccuracyOnServer,
+  createAccuracySnapshot,
+  type MarkAccuracyItem,
+} from '../lib/wiki-server-client.ts';
 
 export interface AccuracyResult {
   pageId: string;
@@ -115,7 +121,7 @@ export async function checkAccuracyForPage(
         { sourceTitle: q.source_title ?? undefined },
       );
 
-      // Store result
+      // Store result in local SQLite
       citationQuotes.markAccuracy(
         pageId,
         q.footnote,
@@ -125,6 +131,19 @@ export async function checkAccuracyForPage(
         check.supportingQuotes.length > 0 ? check.supportingQuotes.join('\n---\n') : null,
         check.verificationDifficulty || null,
       );
+
+      // Also push to wiki-server DB if available
+      await markAccuracyOnServer({
+        pageId,
+        footnote: q.footnote,
+        verdict: check.verdict as MarkAccuracyItem['verdict'],
+        score: check.score,
+        issues: check.issues.length > 0 ? check.issues.join('\n') : null,
+        supportingQuotes: check.supportingQuotes.length > 0 ? check.supportingQuotes.join('\n---\n') : null,
+        verificationDifficulty: (['easy', 'moderate', 'hard'].includes(check.verificationDifficulty || '')
+          ? check.verificationDifficulty as 'easy' | 'moderate' | 'hard'
+          : null),
+      });
 
       switch (check.verdict) {
         case 'accurate': result.accurate++; break;
@@ -297,6 +316,15 @@ async function main() {
       console.log(`${c.yellow}Warning: could not export dashboard data${c.reset}`);
     }
 
+    // Create accuracy snapshot in the DB for trend tracking
+    const serverUp = await isServerAvailable();
+    if (serverUp) {
+      const snapshot = await createAccuracySnapshot();
+      if (snapshot && !json && !ci) {
+        console.log(`${c.dim}Accuracy snapshot created for ${snapshot.snapshotCount} pages${c.reset}`);
+      }
+    }
+
     process.exit(totals.inaccurate > 0 ? 1 : 0);
   }
 
@@ -327,6 +355,15 @@ async function main() {
   const exportPath = exportDashboardData();
   if (!exportPath && !json && !ci) {
     console.log(`${c.yellow}Warning: could not export dashboard data${c.reset}`);
+  }
+
+  // Create accuracy snapshot in the DB for trend tracking
+  const serverUp = await isServerAvailable();
+  if (serverUp) {
+    const snapshot = await createAccuracySnapshot();
+    if (snapshot && !json && !ci) {
+      console.log(`${c.dim}Accuracy snapshot created for ${snapshot.snapshotCount} pages${c.reset}`);
+    }
   }
 
   if (json || ci) {

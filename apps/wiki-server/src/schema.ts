@@ -134,6 +134,29 @@ export const citationContent = pgTable(
   (table) => [index("idx_cc_page_id").on(table.pageId)]
 );
 
+export const citationAccuracySnapshots = pgTable(
+  "citation_accuracy_snapshots",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    pageId: text("page_id").notNull(),
+    totalCitations: integer("total_citations").notNull(),
+    checkedCitations: integer("checked_citations").notNull(),
+    accurateCount: integer("accurate_count").notNull().default(0),
+    minorIssuesCount: integer("minor_issues_count").notNull().default(0),
+    inaccurateCount: integer("inaccurate_count").notNull().default(0),
+    unsupportedCount: integer("unsupported_count").notNull().default(0),
+    notVerifiableCount: integer("not_verifiable_count").notNull().default(0),
+    averageScore: real("average_score"),
+    snapshotAt: timestamp("snapshot_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_cas_page_id").on(table.pageId),
+    index("idx_cas_snapshot_at").on(table.snapshotAt),
+  ]
+);
+
 export const editLogs = pgTable(
   "edit_logs",
   {
