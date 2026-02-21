@@ -1,0 +1,58 @@
+date: "2026-02-21"
+branch: claude/issue-494-1WNkW
+title: "Add bulk sync commands for edit-logs, sessions, and auto-update runs"
+pages: []
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/500
+model: claude-opus-4-6
+duration: ~30min
+cost: ~$8
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-21T16:09:01.843Z"
+  total: 31
+  completed: 30
+  na: 0
+  skipped: 1
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - typescript-used
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - ci-coverage
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - session-log
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned
+    - crux-typescript
+issues:
+  - number: 494
+    title: "Populate empty server tables + wire remaining dual-writes"
+    action: fixed
+key_decisions:
+  - decision: "Removed resource dual-write from saveResources()"
+    rationale: "Server UPSERT replaces all columns; in-memory Resource type lacks fields like review, keyPoints. Fire-and-forget upserts would overwrite valid data with nulls."
+  - decision: "Batch loop DRY violation acknowledged but not refactored"
+    rationale: "Pre-existing pattern across 5 sync scripts. Refactoring into generic batchSync<T>() helper is separate concern."
+  - decision: "Added upsertResource() to wiki-server-client despite removing dual-write"
+    rationale: "Valid client API method for future consumers; the issue was using it in saveResources() with partial data."
