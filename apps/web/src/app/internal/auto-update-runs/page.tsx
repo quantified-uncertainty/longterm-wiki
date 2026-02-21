@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import {
-  fetchFromWikiServer,
+  fetchDetailed,
   withApiFallback,
-  dataSourceLabel,
 } from "@lib/wiki-server";
+import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { RunsTable } from "./runs-table";
 import type { Metadata } from "next";
 
@@ -91,14 +91,14 @@ interface ApiRunEntry {
   }>;
 }
 
-async function loadRunsFromApi(): Promise<RunRow[] | null> {
-  const data = await fetchFromWikiServer<{ entries: ApiRunEntry[] }>(
+async function loadRunsFromApi() {
+  const result = await fetchDetailed<{ entries: ApiRunEntry[] }>(
     "/api/auto-update-runs/all?limit=200",
     { revalidate: 60 }
   );
-  if (!data) return null;
+  if (!result.ok) return result;
 
-  return data.entries.map((r) => {
+  return { ok: true as const, data: result.data.entries.map((r) => {
     const startMs = new Date(r.startedAt).getTime();
     const endMs = r.completedAt ? new Date(r.completedAt).getTime() : startMs;
 
@@ -125,7 +125,7 @@ async function loadRunsFromApi(): Promise<RunRow[] | null> {
         durationMs: res.durationMs ?? undefined,
       })),
     };
-  });
+  }) };
 }
 
 // ── YAML Fallback ─────────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ function loadRunReportsFromYaml(): RunRow[] {
 // ── Page Component ────────────────────────────────────────────────────────
 
 export default async function AutoUpdateRunsPage() {
-  const { data: runs, source } = await withApiFallback(
+  const { data: runs, source, apiError } = await withApiFallback(
     loadRunsFromApi,
     loadRunReportsFromYaml
   );
@@ -229,9 +229,7 @@ export default async function AutoUpdateRunsPage() {
         <RunsTable data={runs} />
       )}
 
-      <p className="text-xs text-muted-foreground mt-4">
-        Data source: {dataSourceLabel(source)}
-      </p>
+      <DataSourceBanner source={source} apiError={apiError} />
     </article>
   );
 }
