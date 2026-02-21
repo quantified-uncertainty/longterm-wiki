@@ -23,25 +23,33 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ last_value: 0, is_called: false }];
   }
 
-  // ---- INSERT INTO claims ----
+  // ---- INSERT INTO claims (supports multi-row) ----
   if (q.includes("insert into") && q.includes('"claims"')) {
     const now = new Date();
-    const id = nextId++;
-    const row: Record<string, unknown> = {
-      id,
-      entity_id: params[0],
-      entity_type: params[1],
-      claim_type: params[2],
-      claim_text: params[3],
-      value: params[4],
-      unit: params[5],
-      confidence: params[6],
-      source_quote: params[7],
-      created_at: now,
-      updated_at: now,
-    };
-    claimStore.set(id, row);
-    return [row];
+    const fieldsPerRow = 8; // entity_id..source_quote
+    // Count value tuples from SQL: N tuples have N-1 "), (" separators
+    const rowCount = (query.match(/\), \(/g) || []).length + 1;
+    const rows: Record<string, unknown>[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      const offset = i * fieldsPerRow;
+      const id = nextId++;
+      const row: Record<string, unknown> = {
+        id,
+        entity_id: params[offset],
+        entity_type: params[offset + 1],
+        claim_type: params[offset + 2],
+        claim_text: params[offset + 3],
+        value: params[offset + 4],
+        unit: params[offset + 5],
+        confidence: params[offset + 6],
+        source_quote: params[offset + 7],
+        created_at: now,
+        updated_at: now,
+      };
+      claimStore.set(id, row);
+      rows.push(row);
+    }
+    return rows;
   }
 
   // ---- DELETE FROM claims WHERE entity_id = $1 ----

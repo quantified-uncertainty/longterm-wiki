@@ -21,28 +21,36 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ last_value: 0, is_called: false }];
   }
 
-  // ---- INSERT INTO summaries ... ON CONFLICT ----
+  // ---- INSERT INTO summaries ... ON CONFLICT (supports multi-row) ----
   if (q.includes("insert into") && q.includes('"summaries"')) {
     const now = new Date();
-    const entityId = params[0] as string;
-    const existing = summaryStore.get(entityId);
+    const fieldsPerRow = 9; // entity_id..tokens_used
+    // Count value tuples from SQL: N tuples have N-1 "), (" separators
+    const rowCount = (query.match(/\), \(/g) || []).length + 1;
+    const rows: Record<string, unknown>[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      const offset = i * fieldsPerRow;
+      const entityId = params[offset] as string;
+      const existing = summaryStore.get(entityId);
 
-    const row: Record<string, unknown> = {
-      entity_id: entityId,
-      entity_type: params[1],
-      one_liner: params[2],
-      summary: params[3],
-      review: params[4],
-      key_points: params[5],
-      key_claims: params[6],
-      model: params[7],
-      tokens_used: params[8],
-      generated_at: now,
-      created_at: existing?.created_at ?? now,
-      updated_at: now,
-    };
-    summaryStore.set(entityId, row);
-    return [row];
+      const row: Record<string, unknown> = {
+        entity_id: entityId,
+        entity_type: params[offset + 1],
+        one_liner: params[offset + 2],
+        summary: params[offset + 3],
+        review: params[offset + 4],
+        key_points: params[offset + 5],
+        key_claims: params[offset + 6],
+        model: params[offset + 7],
+        tokens_used: params[offset + 8],
+        generated_at: now,
+        created_at: existing?.created_at ?? now,
+        updated_at: now,
+      };
+      summaryStore.set(entityId, row);
+      rows.push(row);
+    }
+    return rows;
   }
 
   // ---- SELECT count(*) FROM summaries with GROUP BY entity_type ----
