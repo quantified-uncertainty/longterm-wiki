@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, sql, count, gte } from "drizzle-orm";
+import { eq, desc, count, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { autoUpdateNewsItems, autoUpdateRuns } from "../schema.js";
 import {
@@ -41,6 +41,10 @@ const CreateBatchSchema = z.object({
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
   offset: z.coerce.number().int().min(0).default(0),
+});
+
+const DashboardQuery = z.object({
+  runs: z.coerce.number().int().min(1).max(50).default(10),
 });
 
 // ---- Helpers ----
@@ -181,11 +185,10 @@ autoUpdateNewsRoute.get("/by-page/:pageId", async (c) => {
 // ---- GET /dashboard (optimized endpoint for news dashboard, last N runs) ----
 
 autoUpdateNewsRoute.get("/dashboard", async (c) => {
-  const maxRuns = Math.min(
-    parseInt(c.req.query("runs") || "10", 10),
-    50
-  );
+  const parsed = DashboardQuery.safeParse(c.req.query());
+  if (!parsed.success) return validationError(c, parsed.error.message);
 
+  const { runs: maxRuns } = parsed.data;
   const db = getDrizzleDb();
 
   // Get the last N run IDs
@@ -206,9 +209,7 @@ autoUpdateNewsRoute.get("/dashboard", async (c) => {
   const rows = await db
     .select()
     .from(autoUpdateNewsItems)
-    .where(
-      sql`${autoUpdateNewsItems.runId} = ANY(${sql.raw(`ARRAY[${runIds.join(",")}]`)})`
-    )
+    .where(inArray(autoUpdateNewsItems.runId, runIds))
     .orderBy(desc(autoUpdateNewsItems.relevanceScore));
 
   return c.json({
