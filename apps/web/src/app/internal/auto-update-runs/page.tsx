@@ -188,7 +188,9 @@ function loadRunReportsFromYaml(): RunRow[] {
 
 export default async function AutoUpdateRunsPage() {
   // Try API first, fall back to YAML
-  const runs = (await loadRunsFromApi()) ?? loadRunReportsFromYaml();
+  const apiRuns = await loadRunsFromApi();
+  const runs = apiRuns ?? loadRunReportsFromYaml();
+  const dataSource = apiRuns ? "wiki-server" : "local fallback";
 
   const totalSpent = runs.reduce((sum, r) => sum + r.budgetSpent, 0);
   const totalUpdated = runs.reduce((sum, r) => sum + r.pagesUpdated, 0);
@@ -219,6 +221,9 @@ export default async function AutoUpdateRunsPage() {
             the pipeline.
           </>
         )}
+      </p>
+      <p className="text-xs text-muted-foreground">
+        Data source: {dataSource}.
       </p>
 
       {runs.length === 0 ? (
