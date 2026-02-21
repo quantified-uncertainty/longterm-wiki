@@ -343,6 +343,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Auto-Update News", href: "/internal/auto-update-news" },
         { label: "GitHub Issues", href: "/internal/github-issues" },
         { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
+        { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
       ],
     },
     {

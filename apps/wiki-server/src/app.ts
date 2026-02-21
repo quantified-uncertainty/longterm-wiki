@@ -7,6 +7,7 @@ import { citationsRoute } from "./routes/citations.js";
 import { pagesRoute } from "./routes/pages.js";
 import { editLogsRoute } from "./routes/edit-logs.js";
 import { autoUpdateRunsRoute } from "./routes/auto-update-runs.js";
+import { hallucinationRiskRoute } from "./routes/hallucination-risk.js";
 import { sessionsRoute } from "./routes/sessions.js";
 
 export function createApp() {
@@ -43,6 +44,7 @@ export function createApp() {
   app.route("/api/pages", pagesRoute);
   app.route("/api/edit-logs", editLogsRoute);
   app.route("/api/auto-update-runs", autoUpdateRunsRoute);
+  app.route("/api/hallucination-risk", hallucinationRiskRoute);
   app.route("/api/sessions", sessionsRoute);
 
   return app;

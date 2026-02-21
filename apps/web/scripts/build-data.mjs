@@ -13,7 +13,8 @@ import { spawnSync } from 'child_process';
 import { join, basename, relative } from 'path';
 import { parse } from 'yaml';
 import { extractMetrics, suggestQuality, getQualityDiscrepancy } from '../../../crux/lib/metrics-extractor.ts';
-import { assessContentIntegrity, computeIntegrityRisk } from '../../../crux/lib/content-integrity.ts';
+import { computeHallucinationRisk as computeCanonicalRisk, resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
+import { recordRiskSnapshots } from './lib/risk-client.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, PROJECT_ROOT, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
@@ -76,13 +77,7 @@ const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
 
 // Entity type alias map: legacy YAML type names → canonical types
 // Keep in sync with apps/web/src/data/entity-type-names.ts
-const ENTITY_TYPE_ALIASES = {
-  researcher: 'person', lab: 'organization',
-  'lab-frontier': 'organization', 'lab-research': 'organization',
-  'lab-academic': 'organization', 'lab-startup': 'organization',
-  'safety-approaches': 'safety-agenda', policies: 'policy',
-  concepts: 'concept', events: 'event', models: 'model',
-};
+// Entity type alias resolution now handled by resolveEntityType from hallucination-risk.ts
 
 // Files to combine
 const DATA_FILES = [
@@ -794,157 +789,33 @@ function buildPathRegistry() {
 
 
 /**
- * Compute hallucination risk score for a page (build-time scorer).
+ * Compute hallucination risk score for a page (build-time wrapper).
  *
- * Returns { level: 'low'|'medium'|'high', score: 0-100, factors: string[] }
- *
- * The factors array explains WHY the risk is at its level, making this useful
- * for both reader-facing warnings and AI agents that need to prioritize pages
- * for verification. Higher score = higher risk.
- *
- * ## Relationship to validation-time scorer (issue #417)
- *
- * This build-time scorer starts at baseline 40 with both risk-increasing and
- * risk-decreasing factors — it's a balanced assessment for frontend display.
- * The validation-time scorer (`crux/validate/validate-hallucination-risk.ts`)
- * starts at 0 with penalty accumulation + entity type multiplier — it's a
- * diagnostic tool for editors. Both share the content integrity layer
- * (assessContentIntegrity + computeIntegrityRisk from content-integrity.ts).
+ * Delegates to the canonical scorer in crux/lib/hallucination-risk.ts.
+ * See that module for scoring details and factor weights.
  *
  * @param {object} page  – page object from buildPagesRegistry (with metrics, ratings, etc.)
  * @param {Map}    entityMap – Map<entityId, entity> from YAML data
  */
 function computeHallucinationRisk(page, entityMap) {
-  let score = 40; // baseline: medium risk (all content is AI-generated)
-  const factors = [];
-
-  // Resolve entity type (YAML entity takes precedence, then page frontmatter)
   const entity = entityMap.get(page.id);
   const rawType = entity?.type || null;
 
-  // Normalize legacy type aliases → canonical types
-  const entityType = ENTITY_TYPE_ALIASES[rawType] || rawType;
+  // Strip frontmatter from raw content for integrity checks
+  const contentBody = page.rawContent
+    ? page.rawContent.replace(/^---\n[\s\S]*?\n---\n?/, '')
+    : null;
 
-  // Type categories for risk assessment
-  const BIOGRAPHICAL_TYPES = new Set(['person', 'organization', 'funder']);
-  const FACTUAL_TYPES = new Set(['event', 'historical', 'case-study']);
-  const STRUCTURAL_TYPES = new Set([
-    'concept', 'approach', 'safety-agenda', 'intelligence-paradigm',
-    'crux', 'debate', 'argument',
-  ]);
-  const LOW_RISK_FORMATS = new Set(['table', 'diagram', 'index', 'dashboard']);
-
-  // === RISK-INCREASING FACTORS ===
-
-  // Biographical pages: specific claims about real people/orgs are highly hallucination-prone
-  if (entityType && BIOGRAPHICAL_TYPES.has(entityType)) {
-    score += 20;
-    factors.push('biographical-claims');
-  }
-
-  // Factual/historical pages: specific dates, events, numbers
-  if (entityType && FACTUAL_TYPES.has(entityType)) {
-    score += 15;
-    factors.push('specific-factual-claims');
-  }
-
-  // Citation density analysis
-  const wordCount = page.metrics?.wordCount || 0;
-  const footnoteCount = page.metrics?.footnoteCount || 0;
-  const citationDensity = wordCount > 0 ? (footnoteCount / wordCount) * 1000 : 0;
-
-  if (footnoteCount === 0 && wordCount > 300) {
-    score += 15;
-    factors.push('no-citations');
-  } else if (citationDensity < 2 && wordCount > 500) {
-    score += 10;
-    factors.push('low-citation-density');
-  }
-
-  // Low rigor score
-  const rigor = page.ratings?.rigor;
-  if (rigor != null && rigor < 4) {
-    score += 10;
-    factors.push('low-rigor-score');
-  }
-
-  // Low quality score
-  if (page.quality != null && page.quality < 40) {
-    score += 5;
-    factors.push('low-quality-score');
-  }
-
-  // Few external sources
-  const externalLinks = page.metrics?.externalLinks || 0;
-  if (externalLinks < 2 && wordCount > 500) {
-    score += 5;
-    factors.push('few-external-sources');
-  }
-
-  // === RISK-DECREASING FACTORS ===
-
-  // High citation density
-  if (citationDensity > 8) {
-    score -= 15;
-    factors.push('well-cited');
-  } else if (citationDensity > 4) {
-    score -= 10;
-    factors.push('moderately-cited');
-  }
-
-  // High rigor
-  if (rigor != null && rigor >= 7) {
-    score -= 15;
-    factors.push('high-rigor');
-  }
-
-  // Structural/conceptual content: less prone to specific factual errors
-  if (entityType && STRUCTURAL_TYPES.has(entityType)) {
-    score -= 10;
-    factors.push('conceptual-content');
-  }
-
-  // Low-risk content formats (tables, diagrams, indices)
-  if (LOW_RISK_FORMATS.has(page.contentFormat)) {
-    score -= 15;
-    factors.push('structured-format');
-  }
-
-  // Minimal content (stubs have less room for errors)
-  if (wordCount < 300) {
-    score -= 10;
-    factors.push('minimal-content');
-  }
-
-  // High quality suggests more care during generation
-  if (page.quality != null && page.quality >= 80) {
-    score -= 5;
-    factors.push('high-quality');
-  }
-
-  // === CONTENT INTEGRITY SIGNALS ===
-  // Detect structural corruption, truncation, and fabrication from raw content.
-  // Strip frontmatter first — it contains YAML that could trigger false positives.
-  if (page.rawContent) {
-    const bodyOnly = page.rawContent.replace(/^---\n[\s\S]*?\n---\n?/, '');
-    const integrity = assessContentIntegrity(bodyOnly);
-    const integrityRisk = computeIntegrityRisk(integrity);
-    if (integrityRisk.score > 0) {
-      score += integrityRisk.score;
-      factors.push(...integrityRisk.factors);
-    }
-  }
-
-  // Clamp to 0-100
-  score = Math.max(0, Math.min(100, score));
-
-  // Bucket into levels
-  let level;
-  if (score <= 30) level = 'low';
-  else if (score <= 60) level = 'medium';
-  else level = 'high';
-
-  return { level, score, factors };
+  return computeCanonicalRisk({
+    entityType: resolveEntityType(rawType),
+    wordCount: page.metrics?.wordCount || 0,
+    footnoteCount: page.metrics?.footnoteCount || 0,
+    externalLinks: page.metrics?.externalLinks || 0,
+    rigor: page.ratings?.rigor ?? null,
+    quality: page.quality ?? null,
+    contentBody,
+    contentFormat: page.contentFormat || null,
+  });
 }
 
 async function main() {
@@ -1392,7 +1263,7 @@ async function main() {
     // Also attach resolved entityType for frontend use
     const entity = entityMap.get(page.id);
     if (entity?.type) {
-      page.entityType = ENTITY_TYPE_ALIASES[entity.type] || entity.type;
+      page.entityType = resolveEntityType(entity.type);
     }
 
     if (risk.level === 'high') riskHigh++;
@@ -1400,6 +1271,25 @@ async function main() {
     else riskLow++;
   }
   console.log(`  hallucinationRisk: ${riskHigh} high, ${riskMedium} medium, ${riskLow} low`);
+
+  // Record risk snapshots to wiki server (optional — skips if server unavailable)
+  if (process.env.LONGTERMWIKI_SERVER_URL) {
+    const snapshots = pages
+      .filter(p => p.hallucinationRisk)
+      .map(p => ({
+        pageId: p.id,
+        score: p.hallucinationRisk.score,
+        level: p.hallucinationRisk.level,
+        factors: p.hallucinationRisk.factors,
+        integrityIssues: p.hallucinationRisk.integrityIssues || null,
+      }));
+    const result = await recordRiskSnapshots(snapshots);
+    if (result) {
+      console.log(`  riskSnapshots: recorded ${result.inserted} snapshots to wiki server`);
+    } else {
+      console.log('  riskSnapshots: skipped (server unavailable or error)');
+    }
+  }
 
   // Compute redundancy scores (needs rawContent)
   console.log('  Computing redundancy scores...');
