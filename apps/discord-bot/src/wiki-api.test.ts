@@ -596,6 +596,19 @@ describe("getWikiStats", () => {
     expect(result).toBeNull();
   });
 
+  it("returns null if citations request fails", async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "healthy", totalPages: 625 }),
+      })
+      .mockResolvedValueOnce({ ok: false, status: 503, statusText: "Service Unavailable" });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const result = await getWikiStats();
+    expect(result).toBeNull();
+  });
+
   it("returns null on network error", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Network error")));
     const result = await getWikiStats();

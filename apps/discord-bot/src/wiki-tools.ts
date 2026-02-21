@@ -302,7 +302,7 @@ const riskReportTool = tool(
       .describe("Max pages to return (default 10)"),
   },
   async (args) => {
-    const data = await getRiskReport(args.level ?? "high", args.limit);
+    const data = await getRiskReport(args.level, args.limit);
     if (!data) {
       return {
         content: [{ type: "text" as const, text: "Could not retrieve risk report" }],

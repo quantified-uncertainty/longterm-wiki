@@ -482,7 +482,7 @@ describe("wiki MCP tools", () => {
 
       const result = await handler("risk_report")({});
 
-      expect(getRiskReport).toHaveBeenCalledWith("high", undefined);
+      expect(getRiskReport).toHaveBeenCalledWith(undefined, undefined);
       expect(JSON.parse(result.content[0].text)).toEqual(mockData);
     });
 

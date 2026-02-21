@@ -461,8 +461,12 @@ export async function getWikiStats(): Promise<WikiStats | null> {
       }),
     ]);
 
-    if (!healthRes.ok || !citationsRes.ok) {
-      console.error("getWikiStats: one or more requests failed");
+    if (!healthRes.ok) {
+      console.error(`getWikiStats /health failed: ${healthRes.status} ${healthRes.statusText}`);
+      return null;
+    }
+    if (!citationsRes.ok) {
+      console.error(`getWikiStats /api/citations/stats failed: ${citationsRes.status} ${citationsRes.statusText}`);
       return null;
     }
 
@@ -538,7 +542,7 @@ export async function getCitationHealth(): Promise<CitationHealthResponse | null
 }
 
 export async function getRiskReport(
-  level: "low" | "medium" | "high" = "high",
+  level: "low" | "medium" | "high" | undefined = "high",
   limit = 10
 ): Promise<RiskReportResponse | null> {
   const url = new URL("/api/hallucination-risk/latest", WIKI_SERVER_URL);
