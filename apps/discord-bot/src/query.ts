@@ -1,5 +1,6 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
-import { WIKI_ROOT, WIKI_CONTENT_PATH, WIKI_BASE_URL, TIMEOUT_MS } from "./config.js";
+import { WIKI_BASE_URL, TIMEOUT_MS } from "./config.js";
+import { wikiMcpServer } from "./wiki-tools.js";
 
 export interface QueryResult {
   result: string;
@@ -14,19 +15,15 @@ export interface QueryResult {
 export function buildPrompt(question: string): string {
   return `Answer this question about the LongtermWiki AI safety wiki: "${question}"
 
-The wiki content is at: ${WIKI_CONTENT_PATH}/
-
 Instructions:
-1. Use Grep with path="${WIKI_CONTENT_PATH}/" to search .mdx files
-2. Use Read to read specific files you find relevant
+1. Use search_wiki to find relevant pages matching the question
+2. Use get_page to read the full content of the most relevant pages
 3. If you can't find info after 2-3 searches, say "I couldn't find information about this topic"
 4. Be concise (2-3 paragraphs max)
-5. Include links to relevant pages. Convert file paths to URLs:
-   - Strip the prefix: ${WIKI_CONTENT_PATH}
-   - Strip the .mdx extension
-   - Prepend: ${WIKI_BASE_URL}
-   - Example: ${WIKI_CONTENT_PATH}/knowledge-base/risks/scheming.mdx → ${WIKI_BASE_URL}/knowledge-base/risks/scheming
-   - Format as markdown: [Page Title](${WIKI_BASE_URL}/knowledge-base/...)
+5. Include links to relevant pages using the page ID:
+   - URL format: ${WIKI_BASE_URL}/wiki/{id}
+   - Example: ${WIKI_BASE_URL}/wiki/scheming
+   - Format as markdown: [Page Title](${WIKI_BASE_URL}/wiki/...)
    - Always use the full URL starting with https://`;
 }
 
@@ -47,8 +44,8 @@ export async function runQuery(question: string): Promise<QueryResult> {
     for await (const msg of query({
       prompt: buildPrompt(question),
       options: {
-        allowedTools: ["Read", "Glob", "Grep"],
-        workingDirectory: WIKI_ROOT,
+        allowedTools: [],
+        mcpServers: { wiki: wikiMcpServer },
         permissionMode: "bypassPermissions",
       } as any,
     })) {
@@ -72,9 +69,8 @@ export async function runQuery(question: string): Promise<QueryResult> {
           for (const block of content) {
             if (block.type === "tool_use") {
               const detail =
-                block.input?.pattern ||
-                block.input?.file_path ||
-                block.input?.command ||
+                block.input?.query ||
+                block.input?.id ||
                 "";
               toolCalls.push(`${block.name}: ${detail}`);
               console.log(`${elapsed()} 🔧 Tool: ${block.name}`, detail);

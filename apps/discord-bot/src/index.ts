@@ -19,6 +19,16 @@ if (!process.env.ANTHROPIC_API_KEY) {
   process.exit(1);
 }
 
+if (!process.env.LONGTERMWIKI_SERVER_URL) {
+  console.error("Missing LONGTERMWIKI_SERVER_URL in environment");
+  process.exit(1);
+}
+
+if (!process.env.LONGTERMWIKI_SERVER_API_KEY) {
+  console.error("Missing LONGTERMWIKI_SERVER_API_KEY in environment");
+  process.exit(1);
+}
+
 const RATE_LIMIT_MS = 30_000; // 30 second per-user cooldown
 const MAX_CONCURRENT_REQUESTS = 3; // global concurrency cap
 

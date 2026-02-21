@@ -12,6 +12,7 @@ import {
   jsonb,
   uniqueIndex,
   index,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const entityIdSeq = pgSequence("entity_id_seq", { startWith: 1 });
@@ -176,6 +177,46 @@ export const editLogs = pgTable(
     index("idx_el_page_id").on(table.pageId),
     index("idx_el_date").on(table.date),
     index("idx_el_tool").on(table.tool),
+  ]
+);
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    date: date("date").notNull(),
+    branch: text("branch"),
+    title: text("title").notNull(),
+    summary: text("summary"),
+    model: text("model"),
+    duration: text("duration"),
+    cost: text("cost"),
+    prUrl: text("pr_url"),
+    checksYaml: text("checks_yaml"),
+    issuesJson: jsonb("issues_json"),
+    learningsJson: jsonb("learnings_json"),
+    recommendationsJson: jsonb("recommendations_json"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_sess_date").on(table.date),
+    index("idx_sess_branch").on(table.branch),
+  ]
+);
+
+export const sessionPages = pgTable(
+  "session_pages",
+  {
+    sessionId: bigint("session_id", { mode: "number" })
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    pageId: text("page_id").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.sessionId, table.pageId] }),
+    index("idx_sp_page_id").on(table.pageId),
   ]
 );
 

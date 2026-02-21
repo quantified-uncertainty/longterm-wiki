@@ -5,17 +5,17 @@ The bot runs as a Kubernetes Deployment managed by ArgoCD in the
 
 ## How updates work
 
-Every push to `main` that touches `apps/discord-bot/`, `content/`, or
-`pnpm-lock.yaml` triggers the GitHub Actions workflow
-`.github/workflows/discord-bot-docker.yml`, which:
+Every push to `main` that touches `apps/discord-bot/` or `pnpm-lock.yaml`
+triggers the GitHub Actions workflow `.github/workflows/discord-bot-docker.yml`,
+which:
 
-1. Builds a Docker image with the bot source **and wiki content baked in**
+1. Builds a Docker image with the bot source
 2. Pushes it to `ghcr.io/quantified-uncertainty/longterm-wiki-discord-bot:sha-<commit>`
 3. Updates the ArgoCD app (`longterm-wiki-discord-bot`) via CLI to the new tag
 4. Waits for the rollout to go healthy
 
-Because wiki content (`content/`) is baked into the image, every wiki page
-update automatically produces a fresh deployment — no manual pull needed.
+The bot reads wiki content from the wiki-server API at runtime (not baked into
+the image), so wiki content updates do not trigger Docker rebuilds.
 
 ## First-time setup (ops repo)
 
@@ -39,10 +39,11 @@ image:
   tag: main   # ArgoCD CI updates this to sha-<commit> on each push
 
 env:
-  DISCORD_TOKEN: ""         # injected from k8s secret
-  ANTHROPIC_API_KEY: ""     # injected from k8s secret
+  DISCORD_TOKEN: ""                    # injected from k8s secret
+  ANTHROPIC_API_KEY: ""                # injected from k8s secret
+  LONGTERMWIKI_SERVER_URL: ""          # injected from k8s secret
+  LONGTERMWIKI_SERVER_API_KEY: ""      # injected from k8s secret
   WIKI_BASE_URL: "https://www.longtermwiki.com"
-  # WIKI_ROOT is not needed — defaults to /repo inside the image
 ```
 
 ### `templates/deployment.yaml` (sketch)
@@ -93,5 +94,7 @@ Create a secret `longterm-wiki-discord-bot-secrets` in the bot's namespace:
 kubectl create secret generic longterm-wiki-discord-bot-secrets \
   --from-literal=DISCORD_TOKEN=<token> \
   --from-literal=ANTHROPIC_API_KEY=<key> \
+  --from-literal=LONGTERMWIKI_SERVER_URL=<wiki-server-url> \
+  --from-literal=LONGTERMWIKI_SERVER_API_KEY=<api-key> \
   -n <namespace>
 ```
