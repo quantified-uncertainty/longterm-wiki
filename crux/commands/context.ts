@@ -6,31 +6,55 @@
  * for a given task. Saves 5-15 tool calls per session by gathering context upfront.
  *
  * Usage:
- *   crux context for-page scheming
- *   crux context for-entity anthropic
- *   crux context for-issue 563
- *   crux context for-topic "compute governance trends 2025"
+ *   crux context for-issue <N>          Context bundle for a GitHub issue
+ *   crux context for-page <page-id>     Context bundle for a wiki page
+ *   crux context for-entity <id>        Context bundle for an entity
+ *   crux context for-topic "topic"      Context bundle for a free-text topic
  *
- * Output defaults to .claude/wip-context.md. Override with --output=<path>.
+ * All commands write a markdown bundle to .claude/wip-context.md by default.
+ * Use --output=<path> to override. Use --print to write to stdout instead.
  *
- * Requires LONGTERMWIKI_SERVER_URL (set in environment).
+ * Requires LONGTERMWIKI_SERVER_URL for wiki-server queries.
+ * Requires GITHUB_TOKEN for for-issue (to fetch issue details).
  */
 
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
-import type { CommandResult } from '../lib/cli.ts';
-import { parseIntOpt } from '../lib/cli.ts';
+import { writeFileSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { createLogger } from '../lib/output.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import { getEntity } from '../lib/wiki-server/entities.ts';
+import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
+import type { EntityEntry, EntitySearchResult } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
-import { findPageById } from '../lib/page-resolution.ts';
+import type { FactEntry, FactsByEntityResult } from '../lib/wiki-server/facts.ts';
 import { githubApi, REPO } from '../lib/github.ts';
-import { PROJECT_ROOT, DATA_DIR_ABS } from '../lib/content-types.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
+import type { CommandResult } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Constants
 // ---------------------------------------------------------------------------
+
+const DEFAULT_OUTPUT = join(PROJECT_ROOT, '.claude/wip-context.md');
+
+// ---------------------------------------------------------------------------
+// Local API response types
+// ---------------------------------------------------------------------------
+
+interface PageSearchResult {
+  results: Array<{
+    id: string;
+    numericId: string | null;
+    title: string;
+    description: string | null;
+    entityType: string | null;
+    category: string | null;
+    readerImportance: number | null;
+    quality: number | null;
+    score: number;
+  }>;
+  query: string;
+  total: number;
+}
 
 interface PageDetail {
   id: string;
@@ -46,38 +70,35 @@ interface PageDetail {
   readerImportance: number | null;
   hallucinationRiskLevel: string | null;
   hallucinationRiskScore: number | null;
+  contentPlaintext: string | null;
   wordCount: number | null;
   lastUpdated: string | null;
   contentFormat: string | null;
   syncedAt: string;
 }
 
-interface RelatedItem {
-  id: string;
-  type: string;
-  title: string;
-  score: number;
-  label?: string;
-}
-
 interface RelatedResult {
   entityId: string;
-  related: RelatedItem[];
+  related: Array<{
+    id: string;
+    type: string;
+    title: string;
+    score: number;
+    label?: string;
+  }>;
   total: number;
-}
-
-interface BacklinkItem {
-  id: string;
-  type: string;
-  title: string;
-  relationship?: string;
-  linkType: string;
-  weight: number;
 }
 
 interface BacklinksResult {
   targetId: string;
-  backlinks: BacklinkItem[];
+  backlinks: Array<{
+    id: string;
+    type: string;
+    title: string;
+    relationship?: string;
+    linkType: string;
+    weight: number;
+  }>;
   total: number;
 }
 
@@ -101,649 +122,593 @@ interface CitationQuotesResult {
   total: number;
 }
 
-interface SearchResult {
-  results: Array<{
-    id: string;
-    numericId: string | null;
-    title: string;
-    description: string | null;
-    entityType: string | null;
-    category: string | null;
-    readerImportance: number | null;
-    quality: number | null;
-    score: number;
-  }>;
-  query: string;
-  total: number;
-}
-
-interface EntitySearchResult {
-  results: Array<{
-    id: string;
-    entityType: string;
-    title: string;
-    description: string | null;
-  }>;
-  query: string;
-  total: number;
-}
-
-interface GitHubIssue {
+interface GitHubIssueResponse {
   number: number;
   title: string;
   body: string | null;
   labels: Array<{ name: string }>;
-  html_url: string;
   created_at: string;
   updated_at: string;
+  html_url: string;
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Markdown generation helpers
 // ---------------------------------------------------------------------------
 
-/** Default output path for context bundles */
-const DEFAULT_OUTPUT = path.join(PROJECT_ROOT, '.claude/wip-context.md');
+function formatDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
-/** Write context to file and return success message */
-function writeContext(content: string, outputPath: string): void {
-  const dir = path.dirname(outputPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+function mdHeader(title: string, subcommand: string, argList: string[]): string {
+  return (
+    `# Research Context: ${title}\n\n` +
+    `> Generated ${formatDate()} | \`crux context ${subcommand} ${argList.join(' ')}\`\n\n`
+  );
+}
+
+function writeBundle(outputPath: string, content: string): void {
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, content, 'utf8');
+}
+
+function pageDetailBlock(p: PageDetail): string {
+  const meta: string[] = [];
+  if (p.quality !== null) meta.push(`Quality: ${p.quality}/10`);
+  if (p.readerImportance !== null) meta.push(`Importance: ${p.readerImportance}/100`);
+  if (p.lastUpdated) meta.push(`Last updated: ${p.lastUpdated}`);
+  if (p.wordCount) meta.push(`~${p.wordCount.toLocaleString()} words`);
+
+  let md = `## Page: ${p.title} (\`${p.id}\`)\n\n`;
+  if (meta.length) md += `**${meta.join(' | ')}**\n\n`;
+
+  if (p.hallucinationRiskLevel) {
+    const score =
+      p.hallucinationRiskScore !== null ? ` (score: ${p.hallucinationRiskScore.toFixed(2)})` : '';
+    md += `**Risk**: ${p.hallucinationRiskLevel}${score}\n\n`;
   }
-  fs.writeFileSync(outputPath, content, 'utf-8');
+
+  if (p.category) {
+    md += `**Category**: ${p.category}${p.subcategory ? ` / ${p.subcategory}` : ''}`;
+    if (p.entityType) md += ` | **Type**: ${p.entityType}`;
+    md += '\n';
+  }
+  if (p.tags) md += `**Tags**: ${p.tags}\n`;
+  md += '\n';
+
+  if (p.description) {
+    md += `${p.description}\n\n`;
+  }
+  if (p.llmSummary) {
+    md += `### LLM Summary\n\n${p.llmSummary}\n\n`;
+  }
+
+  return md;
 }
 
-/** Format a number or null as a string with fallback */
-function fmt(val: number | null | undefined, decimals = 0): string {
-  if (val === null || val === undefined) return 'N/A';
-  return decimals > 0 ? val.toFixed(decimals) : String(val);
+function relatedPagesBlock(items: RelatedResult['related'], total: number, limit = 12): string {
+  if (items.length === 0) return '';
+  let md = `## Related Pages\n\n`;
+  for (let i = 0; i < Math.min(items.length, limit); i++) {
+    const r = items[i];
+    const labelStr = r.label ? ` (${r.label})` : '';
+    md += `${i + 1}. \`${r.id}\` — **${r.title}**${labelStr} \`[${r.type}]\` (score: ${r.score.toFixed(1)})\n`;
+  }
+  const remaining = total - Math.min(items.length, limit);
+  if (remaining > 0) {
+    md += `\n_…and ${remaining} more related pages_\n`;
+  }
+  return md + '\n';
 }
 
-/** Find entity YAML snippet for a given entity ID by scanning data/entities/ */
-function findEntityYaml(entityId: string): string | null {
-  const entitiesDir = path.join(DATA_DIR_ABS, 'entities');
-  if (!fs.existsSync(entitiesDir)) return null;
+function backlinksBlock(items: BacklinksResult['backlinks'], total: number, limit = 8): string {
+  if (items.length === 0) return '';
+  let md = `## Backlinks (pages that link here)\n\n`;
+  for (const b of items.slice(0, limit)) {
+    const relStr = b.relationship ? ` — ${b.relationship}` : '';
+    md += `- \`${b.id}\` — **${b.title}**${relStr}\n`;
+  }
+  const remaining = total - Math.min(items.length, limit);
+  if (remaining > 0) {
+    md += `- _…and ${remaining} more_\n`;
+  }
+  return md + '\n';
+}
 
-  const files = fs.readdirSync(entitiesDir).filter(f => f.endsWith('.yaml'));
-  for (const file of files) {
-    try {
-      const raw = fs.readFileSync(path.join(entitiesDir, file), 'utf-8');
-      const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA });
-      if (!Array.isArray(parsed)) continue;
-      const entity = parsed.find((e: unknown) => (e as { id?: string })?.id === entityId);
-      if (entity) {
-        // Serialize just this entity back to YAML
-        return yaml.dump([entity], { indent: 2, lineWidth: 120 });
-      }
-    } catch {
-      // Skip malformed files
+function citationHealthBlock(quotes: CitationQuote[], total: number): string {
+  if (total === 0) return '';
+  const verified = quotes.filter((q) => q.quoteVerified).length;
+  // Single filter — reuse for both count and iteration
+  const problems = quotes.filter(
+    (q) => q.accuracyVerdict === 'inaccurate' || q.accuracyVerdict === 'unsupported',
+  );
+  const broken = problems.length;
+
+  let md = `## Citation Health\n\n`;
+  md += `${total} citation${total !== 1 ? 's' : ''} total`;
+  const showing = quotes.length < total ? ` (showing ${quotes.length}; counts below apply to shown citations only)` : '';
+  md += `${showing}. ${verified} verified, ${broken} broken/inaccurate.\n\n`;
+
+  if (problems.length > 0) {
+    md += `### Problems\n\n`;
+    for (const q of problems.slice(0, 5)) {
+      const claim = q.claimText.slice(0, 120);
+      md += `- **[${q.footnote}]** ${q.accuracyVerdict}: ${claim}${claim.length < q.claimText.length ? '…' : ''}\n`;
+    }
+    md += '\n';
+  }
+
+  return md;
+}
+
+function pageSearchBlock(results: PageSearchResult['results'], query: string, limit = 10): string {
+  if (results.length === 0) return `_No pages found matching "${query}"._\n\n`;
+  let md = '';
+  for (let i = 0; i < Math.min(results.length, limit); i++) {
+    const r = results[i];
+    const q = r.quality !== null ? `Quality: ${r.quality}/10` : null;
+    const imp = r.readerImportance !== null ? `Importance: ${r.readerImportance}/100` : null;
+    const meta = [q, imp, r.entityType ? `Type: ${r.entityType}` : null]
+      .filter(Boolean)
+      .join(' | ');
+    md += `${i + 1}. \`${r.id}\` — **${r.title}** (score: ${r.score.toFixed(3)})\n`;
+    if (meta) md += `   ${meta}\n`;
+    if (r.description) {
+      const desc = r.description.slice(0, 120);
+      md += `   _${desc}${desc.length < r.description.length ? '…' : ''}_\n`;
     }
   }
-  return null;
+  if (results.length > limit) {
+    md += `\n_…and ${results.length - limit} more results_\n`;
+  }
+  return md + '\n';
 }
 
-/** Extract page IDs and keywords from text (issue body, etc.) */
-function extractKeywords(text: string): string[] {
-  // Remove URLs, markdown links, code blocks
-  const cleaned = text
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/`[^`]+`/g, ' ')
-    .replace(/https?:\/\/\S+/g, ' ')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, ' $1 ');
+function entityBlock(e: EntityEntry): string {
+  let md = `### ${e.title} (\`${e.id}\`)\n\n`;
+  const meta: string[] = [`Type: ${e.entityType}`];
+  if (e.status) meta.push(`Status: ${e.status}`);
+  if (e.website) meta.push(`Website: ${e.website}`);
+  md += `**${meta.join(' | ')}**\n\n`;
 
-  // Extract slug-like words that look like page IDs (kebab-case, 3+ chars)
-  const slugPattern = /\b([a-z][a-z0-9]{2,}(?:-[a-z0-9]+)+)\b/g;
-  const slugCandidates = [...cleaned.matchAll(slugPattern)].map(m => m[1]);
+  if (e.description) {
+    const desc = e.description.slice(0, 300);
+    md += `${desc}${desc.length < e.description.length ? '…' : ''}\n\n`;
+  }
 
-  // Extract meaningful nouns/phrases (capitalized words, multi-word phrases)
-  const words = cleaned
-    .split(/[\s\n\r,;:!?()[\]{}"']+/)
-    .filter(w => w.length >= 4 && /^[a-zA-Z]/.test(w))
-    .map(w => w.toLowerCase());
+  if (e.tags?.length) {
+    md += `**Tags**: ${e.tags.join(', ')}\n\n`;
+  }
 
-  return [...new Set([...slugCandidates, ...words])].slice(0, 30);
+  if (e.customFields?.length) {
+    md += `**Key fields**: ${e.customFields
+      .slice(0, 5)
+      .map((f) => `${f.label}: ${f.value}`)
+      .join(', ')}\n\n`;
+  }
+
+  return md;
 }
 
-/** Format a markdown table row */
-function tableRow(...cells: string[]): string {
-  return `| ${cells.join(' | ')} |`;
-}
-
-/** Format a citation status summary */
-function formatCitationSummary(quotes: CitationQuote[], total: number | undefined): string {
-  const verified = quotes.filter(q => q.quoteVerified).length;
-  const broken = quotes.filter(q => q.accuracyVerdict === 'inaccurate' || q.accuracyVerdict === 'unsupported').length;
-  const unchecked = quotes.filter(q => !q.accuracyVerdict).length;
-  const totalStr = (total !== undefined && total !== null) ? String(total) : String(quotes.length);
-  return `${totalStr} total, ${verified} verified, ${broken} broken, ${unchecked} unchecked`;
+function factsBlock(facts: FactEntry[], limit = 10): string {
+  if (facts.length === 0) return '';
+  let md = `## Key Facts\n\n`;
+  md += `| Measure / Label | Value | As Of |\n`;
+  md += `|-----------------|-------|-------|\n`;
+  for (const f of facts.slice(0, limit)) {
+    const label = (f.label || f.measure || f.factId || '').slice(0, 30);
+    let value = f.value || '';
+    if (f.numeric !== null && f.numeric !== undefined) {
+      value = String(f.numeric);
+      if (f.low !== null && f.high !== null) value += ` [${f.low}–${f.high}]`;
+      if (f.format) value += ` ${f.format}`;
+    }
+    const asOf = f.asOf ? f.asOf.slice(0, 10) : '';
+    md += `| ${label} | ${value} | ${asOf} |\n`;
+  }
+  if (facts.length > limit) {
+    md += `\n_…and ${facts.length - limit} more facts_\n`;
+  }
+  return md + '\n';
 }
 
 // ---------------------------------------------------------------------------
-// for-page — context bundle for editing a specific wiki page
+// for-page — bundle for a specific wiki page
 // ---------------------------------------------------------------------------
 
-export async function forPage(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const pageId = args.find(a => !a.startsWith('-'));
+async function forPage(
+  args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
+  const c = log.colors;
+
+  const pageId = args.find((a) => !a.startsWith('-'));
   if (!pageId) {
-    return { output: `Error: page ID required. Usage: crux context for-page <page-id>`, exitCode: 1 };
+    return {
+      output: `${c.red}Error: page ID required.\n  Usage: crux context for-page <page-id>${c.reset}`,
+      exitCode: 1,
+    };
   }
 
   const outputPath = (options.output as string) || DEFAULT_OUTPUT;
-  const relatedLimit = parseIntOpt(options.related, 10);
-  const backlinkLimit = parseIntOpt(options.backlinks, 10);
 
   // Fetch all data in parallel
   const [pageResult, relatedResult, backlinksResult, citationsResult] = await Promise.all([
     apiRequest<PageDetail>('GET', `/api/pages/${encodeURIComponent(pageId)}`),
-    apiRequest<RelatedResult>('GET', `/api/links/related/${encodeURIComponent(pageId)}?limit=${relatedLimit}`),
-    apiRequest<BacklinksResult>('GET', `/api/links/backlinks/${encodeURIComponent(pageId)}?limit=${backlinkLimit}`),
-    apiRequest<CitationQuotesResult>('GET', `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=50`),
+    apiRequest<RelatedResult>('GET', `/api/links/related/${encodeURIComponent(pageId)}?limit=15`),
+    apiRequest<BacklinksResult>(
+      'GET',
+      `/api/links/backlinks/${encodeURIComponent(pageId)}?limit=10`,
+    ),
+    apiRequest<CitationQuotesResult>(
+      'GET',
+      `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=20`,
+    ),
   ]);
 
   if (!pageResult.ok) {
-    return { output: `Error: could not fetch page "${pageId}": ${pageResult.message}`, exitCode: 1 };
+    if (pageResult.error === 'bad_request') {
+      return {
+        output: `${c.yellow}Page not found: ${pageId}\n  Check the page ID is correct.${c.reset}`,
+        exitCode: 1,
+      };
+    }
+    const bundle =
+      mdHeader(`Page: ${pageId}`, 'for-page', [pageId]) +
+      `> ⚠️ Wiki-server unavailable: ${pageResult.message}\n\n` +
+      `Unable to fetch page data. Check \`LONGTERMWIKI_SERVER_URL\` is set.\n`;
+    writeBundle(outputPath, bundle);
+    return {
+      output: `${c.yellow}Wiki-server unavailable. Minimal bundle written to ${outputPath}${c.reset}`,
+      exitCode: 1,
+    };
   }
 
   const p = pageResult.data;
+  let bundle = mdHeader(`Page: ${p.title}`, 'for-page', [pageId]);
+  bundle += pageDetailBlock(p);
+  bundle += '---\n\n';
 
-  // Read frontmatter from filesystem
-  const pageInfo = findPageById(pageId);
-  const frontmatter = pageInfo?.frontmatter || {};
-
-  // Find entity YAML if the page is linked to an entity
-  const entityId = (frontmatter.entityId as string) || pageId;
-  const entityYaml = findEntityYaml(entityId);
-
-  // Fetch entity facts if entity exists
-  let factsSection = '';
-  if (entityYaml) {
-    const factsResult = await getFactsByEntity(entityId, 15, 0);
-    if (factsResult.ok && factsResult.data.facts.length > 0) {
-      const facts = factsResult.data.facts;
-      factsSection = `## Key Facts (${entityId})\n\n`;
-      factsSection += tableRow('Label/Measure', 'Value', 'Date', 'Note') + '\n';
-      factsSection += tableRow('---', '---', '---', '---') + '\n';
-      for (const f of facts) {
-        const label = (f.label || f.measure || f.factId || '').slice(0, 40);
-        let value = typeof f.value === 'object' && f.value !== null ? JSON.stringify(f.value) : (f.value || '');
-        if (f.numeric !== null && f.numeric !== undefined) {
-          value = String(f.numeric);
-          if (f.low !== null && f.high !== null) value += ` [${f.low}–${f.high}]`;
-          if (f.format) value += ` ${f.format}`;
-        }
-        const date = f.asOf ? f.asOf.slice(0, 10) : '';
-        const note = (f.note || '').slice(0, 60);
-        factsSection += tableRow(label, value, date, note) + '\n';
-      }
-      factsSection += '\n';
-    }
-  }
-
-  // Assemble markdown
-  const title = p.title || pageId;
-  const typeStr = p.entityType ? ` (${p.entityType})` : '';
-  let md = `# Context: ${title}${typeStr}\n\n`;
-  md += `> Generated by \`crux context for-page ${pageId}\` on ${new Date().toISOString().slice(0, 10)}\n\n`;
-
-  // Page Metadata
-  md += `## Page Metadata\n\n`;
-  md += `- **ID**: \`${p.id}\`\n`;
-  if (p.numericId) md += `- **Numeric ID**: ${p.numericId}\n`;
-  if (p.entityType) md += `- **Type**: ${p.entityType}\n`;
-  if (p.category) md += `- **Category**: ${p.category}${p.subcategory ? ` / ${p.subcategory}` : ''}\n`;
-  if (p.quality !== null) md += `- **Quality**: ${fmt(p.quality)}/100\n`;
-  if (p.readerImportance !== null) md += `- **Reader Importance**: ${fmt(p.readerImportance)}/100\n`;
-  if (p.hallucinationRiskLevel) {
-    md += `- **Hallucination Risk**: ${p.hallucinationRiskLevel}`;
-    if (p.hallucinationRiskScore !== null) md += ` (score: ${fmt(p.hallucinationRiskScore, 2)})`;
-    md += '\n';
-  }
-  if (p.wordCount) md += `- **Word Count**: ${p.wordCount.toLocaleString()}\n`;
-  if (p.lastUpdated) md += `- **Last Updated**: ${p.lastUpdated}\n`;
-  if (p.tags) md += `- **Tags**: ${p.tags}\n`;
-  md += '\n';
-
-  if (p.description) {
-    md += `### Description\n\n${p.description}\n\n`;
-  }
-
-  if (p.llmSummary) {
-    md += `### Summary\n\n${p.llmSummary}\n\n`;
-  }
-
-  // Facts
-  if (factsSection) {
-    md += factsSection;
-  }
-
-  // Related Pages
   if (relatedResult.ok && relatedResult.data.related.length > 0) {
-    const items = relatedResult.data.related;
-    md += `## Related Pages (top ${items.length})\n\n`;
-    md += tableRow('Page ID', 'Title', 'Type', 'Relationship', 'Score') + '\n';
-    md += tableRow('---', '---', '---', '---', '---') + '\n';
-    for (const r of items) {
-      md += tableRow(r.id, r.title, r.type, r.label || '', r.score.toFixed(1)) + '\n';
-    }
-    md += '\n';
+    bundle += relatedPagesBlock(relatedResult.data.related, relatedResult.data.total);
   }
 
-  // Backlinks
   if (backlinksResult.ok && backlinksResult.data.backlinks.length > 0) {
-    const items = backlinksResult.data.backlinks;
-    md += `## Backlinks (${backlinksResult.data.total} pages link here)\n\n`;
-    md += tableRow('Page ID', 'Title', 'Link Type', 'Weight') + '\n';
-    md += tableRow('---', '---', '---', '---') + '\n';
-    for (const r of items) {
-      md += tableRow(r.id, r.title, r.linkType, String(r.weight)) + '\n';
-    }
-    md += '\n';
+    bundle += backlinksBlock(backlinksResult.data.backlinks, backlinksResult.data.total);
   }
 
-  // Citation Health
   if (citationsResult.ok) {
-    const { quotes, total } = citationsResult.data;
-    md += `## Citation Health\n\n`;
-    md += `- **Summary**: ${formatCitationSummary(quotes, total)}\n`;
-    const broken = quotes.filter(q => q.accuracyVerdict === 'inaccurate' || q.accuracyVerdict === 'unsupported');
-    if (broken.length > 0) {
-      md += `- **Broken Citations**:\n`;
-      for (const b of broken) {
-        md += `  - Footnote ${b.footnote}: ${b.claimText.slice(0, 100)}`;
-        if (b.sourceTitle) md += ` (${b.sourceTitle})`;
-        md += '\n';
-      }
-    }
-    md += '\n';
+    bundle += citationHealthBlock(citationsResult.data.quotes, citationsResult.data.total);
   }
 
-  // Entity YAML
-  if (entityYaml) {
-    md += `## Entity YAML (\`${entityId}\`)\n\n`;
-    md += '```yaml\n';
-    md += entityYaml;
-    md += '```\n\n';
+  const print = options.print as boolean;
+  if (print) {
+    return { output: bundle, exitCode: 0 };
   }
 
-  // Frontmatter
-  if (pageInfo && Object.keys(frontmatter).length > 0) {
-    md += `## MDX Frontmatter\n\n`;
-    md += '```yaml\n';
-    md += yaml.dump(frontmatter, { indent: 2, lineWidth: 120 });
-    md += '```\n\n';
-    if (pageInfo.filePath) {
-      md += `> File: \`${path.relative(PROJECT_ROOT, pageInfo.filePath)}\`\n\n`;
-    }
-  }
+  writeBundle(outputPath, bundle);
 
-  // Write output
-  writeContext(md, outputPath);
+  const summary = [
+    `${c.green}✓${c.reset} Context bundle written to ${c.cyan}${outputPath}${c.reset}`,
+    `  Page: ${p.title} (${pageId})`,
+    relatedResult.ok ? `  Related pages: ${relatedResult.data.related.length}` : '',
+    backlinksResult.ok ? `  Backlinks: ${backlinksResult.data.backlinks.length}` : '',
+    citationsResult.ok ? `  Citations: ${citationsResult.data.total} total` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
 
-  const relPath = path.relative(process.cwd(), outputPath);
-  return {
-    output: `✓ Context bundle written to ${relPath}\n  Page: ${title}\n  Related: ${relatedResult.ok ? relatedResult.data.related.length : 0} pages, Backlinks: ${backlinksResult.ok ? backlinksResult.data.total : 0}, Citations: ${citationsResult.ok ? citationsResult.data.total : 0}`,
-    exitCode: 0,
-  };
+  return { output: summary, exitCode: 0 };
 }
 
 // ---------------------------------------------------------------------------
-// for-entity — context bundle for working with a specific entity
+// for-entity — bundle for a specific entity
 // ---------------------------------------------------------------------------
 
-export async function forEntity(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const entityId = args.find(a => !a.startsWith('-'));
+async function forEntity(
+  args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
+  const c = log.colors;
+
+  const entityId = args.find((a) => !a.startsWith('-'));
   if (!entityId) {
-    return { output: `Error: entity ID required. Usage: crux context for-entity <entity-id>`, exitCode: 1 };
+    return {
+      output: `${c.red}Error: entity ID required.\n  Usage: crux context for-entity <id>${c.reset}`,
+      exitCode: 1,
+    };
   }
 
   const outputPath = (options.output as string) || DEFAULT_OUTPUT;
 
-  // Fetch entity data and facts in parallel
-  const [entityResult, factsResult, backlinksResult] = await Promise.all([
+  // Fetch entity, facts, and pages mentioning this entity in parallel
+  const [entityResult, factsResult, pageSearchResult] = await Promise.all([
     getEntity(entityId),
-    getFactsByEntity(entityId, 30, 0),
-    apiRequest<BacklinksResult>('GET', `/api/links/backlinks/${encodeURIComponent(entityId)}?limit=15`),
+    getFactsByEntity(entityId, 20),
+    apiRequest<PageSearchResult>(
+      'GET',
+      `/api/pages/search?q=${encodeURIComponent(entityId)}&limit=10`,
+    ),
   ]);
 
   if (!entityResult.ok) {
     if (entityResult.error === 'bad_request') {
-      return { output: `Error: entity not found: ${entityId}`, exitCode: 1 };
+      return {
+        output: `${c.yellow}Entity not found: ${entityId}\n  Check the entity ID is correct.${c.reset}`,
+        exitCode: 1,
+      };
     }
-    return { output: `Error: ${entityResult.message}`, exitCode: 1 };
+    const bundle =
+      mdHeader(`Entity: ${entityId}`, 'for-entity', [entityId]) +
+      `> ⚠️ Wiki-server unavailable: ${entityResult.message}\n\n` +
+      `Unable to fetch entity data. Check \`LONGTERMWIKI_SERVER_URL\` is set.\n`;
+    writeBundle(outputPath, bundle);
+    return {
+      output: `${c.yellow}Wiki-server unavailable. Minimal bundle written to ${outputPath}${c.reset}`,
+      exitCode: 1,
+    };
   }
 
   const e = entityResult.data;
+  let bundle = mdHeader(`Entity: ${e.title}`, 'for-entity', [entityId]);
+  bundle += entityBlock(e);
+  bundle += '---\n\n';
 
-  // Find entity YAML from filesystem
-  const entityYaml = findEntityYaml(entityId);
-
-  // Assemble markdown
-  let md = `# Context: Entity — ${e.title}\n\n`;
-  md += `> Generated by \`crux context for-entity ${entityId}\` on ${new Date().toISOString().slice(0, 10)}\n\n`;
-
-  // Entity Metadata
-  md += `## Entity Metadata\n\n`;
-  md += `- **ID**: \`${e.id}\`\n`;
-  if (e.numericId) md += `- **Numeric ID**: ${e.numericId}\n`;
-  md += `- **Type**: ${e.entityType}\n`;
-  if (e.status) md += `- **Status**: ${e.status}\n`;
-  if (e.website) md += `- **Website**: ${e.website}\n`;
-  if (e.lastUpdated) md += `- **Last Updated**: ${e.lastUpdated}\n`;
-  if (e.tags?.length) md += `- **Tags**: ${e.tags.join(', ')}\n`;
-  md += '\n';
-
-  if (e.description) {
-    md += `### Description\n\n${e.description}\n\n`;
-  }
-
-  // Custom Fields
-  if (e.customFields?.length) {
-    md += `### Custom Fields\n\n`;
-    for (const f of e.customFields) {
-      md += `- **${f.label}**: ${f.value}${f.link ? ` ([link](${f.link}))` : ''}\n`;
-    }
-    md += '\n';
-  }
-
-  // Related Entities
-  if (e.relatedEntries?.length) {
-    md += `## Related Entities\n\n`;
-    md += tableRow('ID', 'Type', 'Relationship') + '\n';
-    md += tableRow('---', '---', '---') + '\n';
-    for (const r of e.relatedEntries) {
-      md += tableRow(r.id, r.type, r.relationship || '') + '\n';
-    }
-    md += '\n';
-  }
-
-  // Facts
   if (factsResult.ok && factsResult.data.facts.length > 0) {
-    const facts = factsResult.data.facts;
-    md += `## Numeric Facts (${factsResult.data.total} total)\n\n`;
-    md += tableRow('Label/Measure', 'Value', 'Date', 'Note') + '\n';
-    md += tableRow('---', '---', '---', '---') + '\n';
-    for (const f of facts.slice(0, 20)) {
-      const label = (f.label || f.measure || f.factId || '').slice(0, 40);
-      let value = typeof f.value === 'object' && f.value !== null ? JSON.stringify(f.value) : (f.value || '');
-      if (f.numeric !== null && f.numeric !== undefined) {
-        value = String(f.numeric);
-        if (f.low !== null && f.high !== null) value += ` [${f.low}–${f.high}]`;
-        if (f.format) value += ` ${f.format}`;
-      }
-      const date = f.asOf ? f.asOf.slice(0, 10) : '';
-      const note = (f.note || '').slice(0, 60);
-      md += tableRow(label, value, date, note) + '\n';
-    }
-    md += '\n';
+    bundle += factsBlock(factsResult.data.facts);
   }
 
-  // Pages linking to this entity
-  if (backlinksResult.ok && backlinksResult.data.backlinks.length > 0) {
-    const items = backlinksResult.data.backlinks;
-    md += `## Pages Referencing This Entity (${backlinksResult.data.total} total)\n\n`;
-    md += tableRow('Page ID', 'Title', 'Link Type') + '\n';
-    md += tableRow('---', '---', '---') + '\n';
-    for (const r of items) {
-      md += tableRow(r.id, r.title, r.linkType) + '\n';
+  if (e.relatedEntries?.length) {
+    bundle += `## Related Entities\n\n`;
+    for (const r of e.relatedEntries.slice(0, 10)) {
+      bundle += `- \`${r.id}\` \`[${r.type}]\`${r.relationship ? ` — ${r.relationship}` : ''}\n`;
     }
-    md += '\n';
+    if (e.relatedEntries.length > 10) {
+      bundle += `- _…and ${e.relatedEntries.length - 10} more_\n`;
+    }
+    bundle += '\n';
   }
 
-  // Sources
+  if (pageSearchResult.ok && pageSearchResult.data.results.length > 0) {
+    bundle += `## Pages Mentioning "${e.title}"\n\n`;
+    bundle += pageSearchBlock(pageSearchResult.data.results, entityId);
+  }
+
   if (e.sources?.length) {
-    md += `## Sources\n\n`;
-    for (const s of e.sources) {
-      md += `- ${s.title}`;
-      if (s.author) md += ` — ${s.author}`;
-      if (s.date) md += ` (${s.date})`;
-      if (s.url) md += ` — [link](${s.url})`;
-      md += '\n';
+    bundle += `## Sources\n\n`;
+    for (const s of e.sources.slice(0, 5)) {
+      bundle += `- **${s.title}**`;
+      if (s.author) bundle += ` (${s.author})`;
+      if (s.date) bundle += ` — ${s.date}`;
+      if (s.url) bundle += `\n  ${s.url}`;
+      bundle += '\n';
     }
-    md += '\n';
+    bundle += '\n';
   }
 
-  // Entity YAML
-  if (entityYaml) {
-    md += `## Entity YAML\n\n`;
-    md += '```yaml\n';
-    md += entityYaml;
-    md += '```\n\n';
+  const print = options.print as boolean;
+  if (print) {
+    return { output: bundle, exitCode: 0 };
   }
 
-  writeContext(md, outputPath);
+  writeBundle(outputPath, bundle);
 
-  const relPath = path.relative(process.cwd(), outputPath);
-  return {
-    output: `✓ Context bundle written to ${relPath}\n  Entity: ${e.title} (${e.entityType})\n  Facts: ${factsResult.ok ? factsResult.data.total : 0}, Backlinks: ${backlinksResult.ok ? backlinksResult.data.total : 0}`,
-    exitCode: 0,
-  };
+  const summary = [
+    `${c.green}✓${c.reset} Context bundle written to ${c.cyan}${outputPath}${c.reset}`,
+    `  Entity: ${e.title} (${entityId}) [${e.entityType}]`,
+    factsResult.ok ? `  Facts: ${factsResult.data.facts.length}` : '',
+    pageSearchResult.ok ? `  Pages mentioning entity: ${pageSearchResult.data.results.length}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return { output: summary, exitCode: 0 };
 }
 
 // ---------------------------------------------------------------------------
-// for-issue — context bundle assembled from a GitHub issue
+// for-topic — bundle for a free-text research topic
 // ---------------------------------------------------------------------------
 
-export async function forIssue(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const issueNumStr = args.find(a => !a.startsWith('-'));
-  if (!issueNumStr) {
-    return { output: `Error: issue number required. Usage: crux context for-issue <N>`, exitCode: 1 };
-  }
+async function forTopic(
+  args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
+  const c = log.colors;
 
-  const issueNum = parseInt(issueNumStr, 10);
-  if (isNaN(issueNum)) {
-    return { output: `Error: invalid issue number: ${issueNumStr}`, exitCode: 1 };
-  }
-
-  const outputPath = (options.output as string) || DEFAULT_OUTPUT;
-
-  // Fetch issue from GitHub
-  let issue: GitHubIssue;
-  try {
-    issue = await githubApi<GitHubIssue>(`/repos/${REPO}/issues/${issueNum}`);
-  } catch (err) {
-    return { output: `Error: could not fetch issue #${issueNum}: ${(err as Error).message}`, exitCode: 1 };
-  }
-
-  const body = issue.body || '';
-  const fullText = `${issue.title}\n\n${body}`;
-
-  // Extract keywords and search the wiki
-  const keywords = extractKeywords(fullText);
-  const searchQuery = keywords.slice(0, 8).join(' ');
-
-  // Find explicit page ID references in the issue body (slug-like patterns).
-  // Strip URLs first to avoid false positives from URL path segments.
-  const bodyWithoutUrls = body.replace(/https?:\/\/\S+/g, ' ');
-  const pageRefs = [...bodyWithoutUrls.matchAll(/\b([a-z][a-z0-9-]{3,})\b/g)]
-    .map(m => m[1])
-    .filter(s => s.includes('-'))
-    .slice(0, 5);
-
-  // Run searches in parallel
-  const [searchResult, entitySearchResult, ...pageResults] = await Promise.all([
-    apiRequest<SearchResult>('GET', `/api/pages/search?q=${encodeURIComponent(searchQuery)}&limit=10`),
-    apiRequest<EntitySearchResult>('GET', `/api/entities/search?q=${encodeURIComponent(searchQuery)}&limit=8`),
-    ...pageRefs.map(ref => apiRequest<PageDetail>('GET', `/api/pages/${encodeURIComponent(ref)}`)),
-  ]);
-
-  // Assemble markdown
-  let md = `# Context: Issue #${issueNum} — ${issue.title}\n\n`;
-  md += `> Generated by \`crux context for-issue ${issueNum}\` on ${new Date().toISOString().slice(0, 10)}\n`;
-  md += `> GitHub: ${issue.html_url}\n\n`;
-
-  // Issue Details
-  md += `## Issue Details\n\n`;
-  md += `- **Number**: #${issueNum}\n`;
-  md += `- **Title**: ${issue.title}\n`;
-  md += `- **Labels**: ${issue.labels.map(l => l.name).join(', ') || 'none'}\n`;
-  md += `- **Created**: ${issue.created_at.slice(0, 10)}\n`;
-  md += `- **Updated**: ${issue.updated_at.slice(0, 10)}\n\n`;
-
-  md += `### Issue Body\n\n`;
-  md += body + '\n\n';
-
-  // Specific pages referenced in the issue
-  const resolvedPages = pageResults
-    .map((r) => r)
-    .filter((r): r is Extract<typeof r, { ok: true }> => r.ok);
-
-  if (resolvedPages.length > 0) {
-    md += `## Referenced Wiki Pages\n\n`;
-    for (const result of resolvedPages) {
-      const p = result.data;
-      md += `### ${p.title} (\`${p.id}\`)\n\n`;
-      md += `- **Type**: ${p.entityType || 'N/A'}\n`;
-      md += `- **Category**: ${p.category || 'N/A'}${p.subcategory ? ` / ${p.subcategory}` : ''}\n`;
-      if (p.quality !== null) md += `- **Quality**: ${fmt(p.quality)}/100\n`;
-      if (p.hallucinationRiskLevel) md += `- **Risk**: ${p.hallucinationRiskLevel}\n`;
-      if (p.wordCount) md += `- **Words**: ${p.wordCount.toLocaleString()}\n`;
-      if (p.lastUpdated) md += `- **Last Updated**: ${p.lastUpdated}\n`;
-      if (p.description) md += `\n${p.description.slice(0, 300)}\n`;
-      md += '\n';
-    }
-  }
-
-  // Search results
-  if (searchResult.ok && searchResult.data.results.length > 0) {
-    const results = searchResult.data.results;
-    md += `## Related Wiki Pages (search: "${searchQuery}")\n\n`;
-    md += tableRow('Page ID', 'Title', 'Type', 'Importance', 'Score') + '\n';
-    md += tableRow('---', '---', '---', '---', '---') + '\n';
-    for (const r of results) {
-      md += tableRow(r.id, r.title, r.entityType || '', fmt(r.readerImportance), r.score.toFixed(3)) + '\n';
-    }
-    md += '\n';
-  }
-
-  // Related entities
-  if (entitySearchResult.ok && entitySearchResult.data.results.length > 0) {
-    const results = entitySearchResult.data.results;
-    md += `## Related Entities\n\n`;
-    md += tableRow('Entity ID', 'Type', 'Title', 'Description') + '\n';
-    md += tableRow('---', '---', '---', '---') + '\n';
-    for (const e of results) {
-      const desc = (e.description || '').slice(0, 80);
-      md += tableRow(e.id, e.entityType, e.title, desc) + '\n';
-    }
-    md += '\n';
-  }
-
-  writeContext(md, outputPath);
-
-  const relPath = path.relative(process.cwd(), outputPath);
-  return {
-    output: `✓ Context bundle written to ${relPath}\n  Issue: #${issueNum} — ${issue.title}\n  Search results: ${searchResult.ok ? searchResult.data.results.length : 0} pages, ${entitySearchResult.ok ? entitySearchResult.data.results.length : 0} entities`,
-    exitCode: 0,
-  };
-}
-
-// ---------------------------------------------------------------------------
-// for-topic — context bundle for a free-text topic
-// ---------------------------------------------------------------------------
-
-export async function forTopic(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const topic = args.filter(a => !a.startsWith('-')).join(' ');
+  const topic = args.filter((a) => !a.startsWith('-')).join(' ').trim();
   if (!topic) {
-    return { output: `Error: topic required. Usage: crux context for-topic "topic description"`, exitCode: 1 };
+    return {
+      output: `${c.red}Error: topic required.\n  Usage: crux context for-topic "topic phrase"${c.reset}`,
+      exitCode: 1,
+    };
   }
 
   const outputPath = (options.output as string) || DEFAULT_OUTPUT;
-  const searchLimit = parseIntOpt(options.limit, 12);
+  const parsedLimit = parseInt(String(options.limit ?? '10'), 10);
+  const limit = Math.min(Math.max(1, Number.isNaN(parsedLimit) ? 10 : parsedLimit), 20);
 
-  // Run page search and entity search in parallel
+  // Search pages and entities in parallel
   const [pageSearchResult, entitySearchResult] = await Promise.all([
-    apiRequest<SearchResult>('GET', `/api/pages/search?q=${encodeURIComponent(topic)}&limit=${searchLimit}`),
-    apiRequest<EntitySearchResult>('GET', `/api/entities/search?q=${encodeURIComponent(topic)}&limit=10`),
+    apiRequest<PageSearchResult>(
+      'GET',
+      `/api/pages/search?q=${encodeURIComponent(topic)}&limit=${limit}`,
+    ),
+    searchEntities(topic, 8),
   ]);
 
-  if (!pageSearchResult.ok) {
-    return { output: `Error: search failed: ${pageSearchResult.message}`, exitCode: 1 };
-  }
+  let bundle = mdHeader(`Topic: "${topic}"`, 'for-topic', [`"${topic}"`]);
 
-  const topPages = pageSearchResult.data.results.slice(0, 5);
-
-  // Fetch related pages for the top result (to expand context)
-  const expandedRelated = topPages.length > 0
-    ? await apiRequest<RelatedResult>('GET', `/api/links/related/${encodeURIComponent(topPages[0].id)}?limit=8`)
-    : null;
-
-  // Assemble markdown
-  let md = `# Context: Topic — ${topic}\n\n`;
-  md += `> Generated by \`crux context for-topic "${topic}"\` on ${new Date().toISOString().slice(0, 10)}\n\n`;
-
-  // Search Results
-  if (pageSearchResult.data.results.length === 0) {
-    md += `No wiki pages found for topic: "${topic}"\n\n`;
+  // Pages section
+  bundle += `## Top Pages Matching "${topic}"\n\n`;
+  if (pageSearchResult.ok) {
+    const { results, total } = pageSearchResult.data;
+    if (results.length > 0) {
+      bundle += `_${total} result${total !== 1 ? 's' : ''} found, showing top ${results.length}._\n\n`;
+      bundle += pageSearchBlock(results, topic, limit);
+    } else {
+      bundle += `_No pages found matching "${topic}"._\n\n`;
+    }
   } else {
-    const results = pageSearchResult.data.results;
-    md += `## Matching Wiki Pages (${pageSearchResult.data.total} total)\n\n`;
-    md += tableRow('Page ID', 'Title', 'Type', 'Importance', 'Score') + '\n';
-    md += tableRow('---', '---', '---', '---', '---') + '\n';
-    for (const r of results) {
-      md += tableRow(r.id, r.title, r.entityType || '', fmt(r.readerImportance), r.score.toFixed(3)) + '\n';
-    }
-    md += '\n';
+    bundle += `> ⚠️ Wiki-server unavailable: ${pageSearchResult.message}\n\n`;
+    bundle += `Check \`LONGTERMWIKI_SERVER_URL\` is set.\n\n`;
+  }
 
-    // Brief summaries for top 3
-    md += `## Top Page Details\n\n`;
-    for (const r of results.slice(0, 3)) {
-      md += `### ${r.title} (\`${r.id}\`)\n\n`;
-      md += `- **Type**: ${r.entityType || 'N/A'}\n`;
-      md += `- **Category**: ${r.category || 'N/A'}\n`;
-      if (r.readerImportance !== null) md += `- **Importance**: ${fmt(r.readerImportance)}/100\n`;
-      if (r.quality !== null) md += `- **Quality**: ${fmt(r.quality)}/100\n`;
-      if (r.description) md += `\n${r.description.slice(0, 300)}\n`;
-      md += '\n';
+  // Entities section
+  if (entitySearchResult.ok && entitySearchResult.data.results.length > 0) {
+    bundle += `## Related Entities\n\n`;
+    for (const e of entitySearchResult.data.results.slice(0, 6)) {
+      bundle += entityBlock(e);
     }
   }
 
-  // Related pages (expanded from top result)
-  if (expandedRelated?.ok && expandedRelated.data.related.length > 0) {
-    md += `## Pages Related to "${topPages[0].title}"\n\n`;
-    md += tableRow('Page ID', 'Title', 'Type', 'Score') + '\n';
-    md += tableRow('---', '---', '---', '---') + '\n';
-    for (const r of expandedRelated.data.related) {
-      md += tableRow(r.id, r.title, r.type, r.score.toFixed(1)) + '\n';
+  const print = options.print as boolean;
+  if (print) {
+    return { output: bundle, exitCode: 0 };
+  }
+
+  writeBundle(outputPath, bundle);
+
+  const pageCount = pageSearchResult.ok ? pageSearchResult.data.results.length : 0;
+  const entityCount = entitySearchResult.ok ? entitySearchResult.data.results.length : 0;
+
+  const summary = [
+    `${c.green}✓${c.reset} Context bundle written to ${c.cyan}${outputPath}${c.reset}`,
+    `  Topic: "${topic}"`,
+    `  Pages found: ${pageCount}`,
+    `  Entities found: ${entityCount}`,
+  ].join('\n');
+
+  return { output: summary, exitCode: 0 };
+}
+
+// ---------------------------------------------------------------------------
+// for-issue — bundle for a GitHub issue
+// ---------------------------------------------------------------------------
+
+async function forIssue(
+  args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
+  const c = log.colors;
+
+  const issueNumStr = args.find((a) => !a.startsWith('-'));
+  const issueNum = issueNumStr ? parseInt(issueNumStr, 10) : NaN;
+
+  if (!issueNumStr || isNaN(issueNum)) {
+    return {
+      output: `${c.red}Error: issue number required.\n  Usage: crux context for-issue <N>${c.reset}`,
+      exitCode: 1,
+    };
+  }
+
+  const outputPath = (options.output as string) || DEFAULT_OUTPUT;
+
+  // Fetch GitHub issue
+  let issue: GitHubIssueResponse;
+  try {
+    issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      output: `${c.red}Error fetching issue #${issueNum}: ${msg}${c.reset}`,
+      exitCode: 1,
+    };
+  }
+
+  // Use issue title as the primary search query, then run page + entity search in parallel
+  const searchQuery = issue.title;
+
+  const [pageSearchResult, entitySearchResult] = await Promise.all([
+    apiRequest<PageSearchResult>(
+      'GET',
+      `/api/pages/search?q=${encodeURIComponent(searchQuery)}&limit=10`,
+    ),
+    searchEntities(searchQuery, 6),
+  ]);
+
+  const labels = (issue.labels || []).map((l) => l.name);
+  const createdAt = issue.created_at.slice(0, 10);
+  const body = (issue.body || '').trim();
+
+  let bundle = mdHeader(
+    `Issue #${issue.number}: ${issue.title}`,
+    'for-issue',
+    [String(issueNum)],
+  );
+
+  // Issue metadata and body
+  bundle += `## Issue #${issue.number}: ${issue.title}\n\n`;
+  bundle += `**URL**: ${issue.html_url}\n`;
+  if (labels.length > 0) bundle += `**Labels**: ${labels.join(', ')}\n`;
+  bundle += `**Created**: ${createdAt} | **Updated**: ${issue.updated_at.slice(0, 10)}\n\n`;
+
+  if (body) {
+    // Truncate very long issue bodies to avoid overwhelming the bundle
+    const bodyPreview = body.length > 3000 ? body.slice(0, 3000) + '\n\n_…(body truncated)_' : body;
+    bundle += `### Description\n\n${bodyPreview}\n\n`;
+  }
+
+  bundle += '---\n\n';
+
+  // Related wiki pages
+  bundle += `## Related Wiki Pages\n\n`;
+  bundle += `_Search query: "${searchQuery}"_\n\n`;
+
+  if (pageSearchResult.ok) {
+    if (pageSearchResult.data.results.length > 0) {
+      bundle += pageSearchBlock(pageSearchResult.data.results, searchQuery);
+    } else {
+      bundle += `_No pages found matching the issue title._\n\n`;
     }
-    md += '\n';
+  } else {
+    bundle += `> ⚠️ Wiki-server unavailable: ${pageSearchResult.message}\n\n`;
+    bundle += `Check \`LONGTERMWIKI_SERVER_URL\` is set.\n\n`;
   }
 
   // Related entities
   if (entitySearchResult.ok && entitySearchResult.data.results.length > 0) {
-    const results = entitySearchResult.data.results;
-    md += `## Related Entities\n\n`;
-    md += tableRow('Entity ID', 'Type', 'Title', 'Description') + '\n';
-    md += tableRow('---', '---', '---', '---') + '\n';
-    for (const e of results) {
-      const desc = (e.description || '').slice(0, 80);
-      md += tableRow(e.id, e.entityType, e.title, desc) + '\n';
+    bundle += `## Related Entities\n\n`;
+    for (const e of entitySearchResult.data.results) {
+      bundle += entityBlock(e);
     }
-    md += '\n';
   }
 
-  writeContext(md, outputPath);
+  const print = options.print as boolean;
+  if (print) {
+    return { output: bundle, exitCode: 0 };
+  }
 
-  const relPath = path.relative(process.cwd(), outputPath);
-  return {
-    output: `✓ Context bundle written to ${relPath}\n  Topic: "${topic}"\n  Found: ${pageSearchResult.data.total} pages, ${entitySearchResult.ok ? entitySearchResult.data.results.length : 0} entities`,
-    exitCode: 0,
-  };
+  writeBundle(outputPath, bundle);
+
+  const pageCount = pageSearchResult.ok ? pageSearchResult.data.results.length : 0;
+  const entityCount = entitySearchResult.ok ? entitySearchResult.data.results.length : 0;
+
+  const summary = [
+    `${c.green}✓${c.reset} Context bundle written to ${c.cyan}${outputPath}${c.reset}`,
+    `  Issue: #${issue.number} — ${issue.title}`,
+    `  Related pages found: ${pageCount}`,
+    `  Related entities found: ${entityCount}`,
+  ].join('\n');
+
+  return { output: summary, exitCode: 0 };
 }
 
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
-export const commands: Record<string, (args: string[], options: Record<string, unknown>) => Promise<CommandResult>> = {
+export const commands: Record<
+  string,
+  (args: string[], options: Record<string, unknown>) => Promise<CommandResult>
+> = {
+  'for-issue': forIssue,
   'for-page': forPage,
   'for-entity': forEntity,
-  'for-issue': forIssue,
   'for-topic': forTopic,
-  default: async (_args, _options) => ({
-    output: getHelp(),
-    exitCode: 0,
-  }),
 };
 
 // ---------------------------------------------------------------------------
@@ -752,30 +717,42 @@ export const commands: Record<string, (args: string[], options: Record<string, u
 
 export function getHelp(): string {
   return `
-Context Domain — Assemble research bundles for Claude Code sessions
+Context Domain - Assemble research bundles for Claude Code sessions
 
-Queries the wiki-server and local files to produce a structured markdown
-file with everything needed for a given task. Saves 5-15 tool calls per
-session by gathering context upfront.
+Eliminates the 5-15 manual tool calls needed to gather background context
+at the start of a session. Each command queries the wiki-server and GitHub
+to produce a single structured markdown file.
 
 Commands:
-  for-page <page-id>       Context for editing a specific wiki page
-  for-entity <entity-id>   Context for working with a specific entity
-  for-issue <N>            Context assembled from GitHub issue #N
-  for-topic "query"        Context for a free-text topic (search-based)
+  for-issue <N>         Context bundle for GitHub issue N
+  for-page <page-id>    Context bundle for a wiki page
+  for-entity <id>       Context bundle for an entity
+  for-topic "topic"     Context bundle for a free-text topic
 
 Options:
-  --output=<path>          Output file (default: .claude/wip-context.md)
-  --related=N              Number of related pages (for-page, default: 10)
-  --backlinks=N            Number of backlinks (for-page, default: 10)
-  --limit=N                Search result limit (for-topic, default: 12)
+  --output=<path>       Output file path (default: .claude/wip-context.md)
+  --print               Write to stdout instead of a file
+  --limit=N             Max search results for for-topic (default: 10, max: 20)
+
+Notes:
+  - for-page, for-entity, for-topic require LONGTERMWIKI_SERVER_URL
+  - for-issue requires GITHUB_TOKEN and optionally LONGTERMWIKI_SERVER_URL
+  - All commands degrade gracefully when the wiki-server is unavailable
+
+Output includes:
+  for-issue:   Issue body, related wiki pages, related entities
+  for-page:    Page metadata + LLM summary, related pages, backlinks, citations
+  for-entity:  Entity profile, key facts, related entities, pages mentioning it
+  for-topic:   Top matching pages (ranked), related entities
 
 Examples:
+  crux context for-issue 580
+  crux context for-issue 580 --output=my-context.md
   crux context for-page scheming
-  crux context for-page scheming --output=.claude/scheming-context.md
+  crux context for-page deceptive-alignment --print
   crux context for-entity anthropic
-  crux context for-issue 563
-  crux context for-topic "compute governance trends 2025"
-  crux context for-topic "deceptive alignment" --limit=20
+  crux context for-entity openai --output=openai-context.md
+  crux context for-topic "AI safety compute governance"
+  crux context for-topic "RLHF alignment tax" --limit=15
 `;
 }

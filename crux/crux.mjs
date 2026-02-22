@@ -33,7 +33,7 @@
  *   entity      Entity ID management (rename with safe word-boundary matching)
  *   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
  *   jobs        Job queue management (list, stats, create, claim, sweep)
- *   context     Assemble research bundles (for-page, for-entity, for-issue, for-topic)
+ *   context     Assemble research bundles for Claude Code sessions (for-page, for-issue, for-entity, for-topic)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -176,7 +176,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   entity      Entity ID management (safe rename)
   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
   jobs        Background job queue management
-  context     Assemble research bundles (for-page, for-entity, for-issue, for-topic)
+  context     Assemble research bundles (for-page, for-issue, for-entity, for-topic)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
