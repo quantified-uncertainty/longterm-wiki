@@ -85,6 +85,12 @@ const SCRIPTS = {
     passthrough: ['json', 'apply', 'recheck', 'model', 'escalate', 'second-opinion'],
     positional: true,
   },
+  'audit-check': {
+    script: 'citations/audit-check.ts',
+    description: 'Independent post-hoc verification: check claims against source content',
+    passthrough: ['json', 'no-fetch', 'threshold', 'model', 'delay'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'report');
@@ -139,5 +145,10 @@ Examples:
   crux citations fix-inaccuracies --max-score=0.5   Only worst citations
   crux citations audit existential-risk             Full audit pipeline for one page
   crux citations audit existential-risk --apply     Audit and auto-fix one page
+  crux citations audit-check existential-risk       Independent verification (no DB, no fixes)
+  crux citations audit-check existential-risk --no-fetch  Use cached sources only
+  crux citations audit-check existential-risk --threshold=0.9  Require 90% verified
+  crux citations audit-check existential-risk --model=google/gemini-flash-lite  Use a different model
+  crux citations audit-check existential-risk --delay=500  Slow down between LLM calls
 `;
 }
