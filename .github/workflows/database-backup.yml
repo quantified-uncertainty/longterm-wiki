@@ -36,6 +36,11 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set"
+            exit 1
+          fi
+
           # Parse DATABASE_URL
           PROTO="$(echo "$DATABASE_URL" | grep :// | sed -e 's,^\(.*://\).*,\1,g')"
           URL="${DATABASE_URL/$PROTO/}"
@@ -60,8 +65,11 @@ jobs:
             -d "${DB_NAME}" \
             --no-owner \
             --no-privileges \
-            --verbose \
-            2>&1 | gzip > "${FILENAME}"
+            --verbose 2>/tmp/pg_dump.log \
+            | gzip > "${FILENAME}"
+
+          echo "pg_dump output:"
+          cat /tmp/pg_dump.log
 
           FILE_SIZE=$(du -h "${FILENAME}" | cut -f1)
           echo "Backup completed: ${FILENAME} (${FILE_SIZE})"

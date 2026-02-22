@@ -23,12 +23,6 @@ jobs:
     if: github.event.inputs.confirm == 'RESTORE'
 
     steps:
-      - name: Validate confirmation
-        if: github.event.inputs.confirm != 'RESTORE'
-        run: |
-          echo "::error::You must type RESTORE to confirm the restore operation."
-          exit 1
-
       - uses: actions/checkout@v4
 
       - name: Install PostgreSQL client
@@ -45,7 +39,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --filter wiki-server
 
       - name: Download backup artifact
         uses: actions/download-artifact@v4
@@ -59,6 +53,11 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set"
+            exit 1
+          fi
+
           # Parse DATABASE_URL
           PROTO="$(echo "$DATABASE_URL" | grep :// | sed -e 's,^\(.*://\).*,\1,g')"
           URL="${DATABASE_URL/$PROTO/}"
@@ -82,7 +81,7 @@ jobs:
             -d "${DB_NAME}" \
             --no-owner \
             --no-privileges \
-            2>&1 | gzip > "${SAFETY_FILENAME}"
+            | gzip > "${SAFETY_FILENAME}"
 
           FILE_SIZE=$(du -h "${SAFETY_FILENAME}" | cut -f1)
           echo "Safety backup completed: ${SAFETY_FILENAME} (${FILE_SIZE})"

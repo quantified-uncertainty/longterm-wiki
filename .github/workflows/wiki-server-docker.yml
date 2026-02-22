@@ -7,6 +7,7 @@ on:
       - "apps/wiki-server/**"
       - "pnpm-lock.yaml"
       - ".github/workflows/wiki-server-docker.yml"
+      - ".github/workflows/database-backup.yml"
   workflow_dispatch:
 
 concurrency:
@@ -72,7 +73,7 @@ jobs:
     steps:
       - name: Update ArgoCD image tag
         env:
-          ARGOCD_SERVER: argo.k8s.quantifieduncertainty.org
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
         run: |
           IMAGE_TAG="sha-${{ github.sha }}"
@@ -98,7 +99,7 @@ jobs:
 
       - name: Verify deployed SHA
         env:
-          ARGOCD_SERVER: argo.k8s.quantifieduncertainty.org
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
         run: |
           EXPECTED_TAG="sha-${{ github.sha }}"
@@ -194,7 +195,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           image-ref: ghcr.io/quantified-uncertainty/longterm-wiki-server:sha-${{ github.sha }}
           format: sarif
