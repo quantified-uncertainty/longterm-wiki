@@ -6,6 +6,7 @@
  * - Idempotency: running twice doesn't double-link
  * - Skip ranges: code blocks, frontmatter, existing EntityLinks
  * - First-mention-only linking
+ * - buildEnrichmentChunks: sectional chunking for long pages (#721)
  */
 
 import { describe, it, expect } from 'vitest';
