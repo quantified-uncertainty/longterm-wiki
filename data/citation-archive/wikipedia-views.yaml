@@ -1,0 +1,777 @@
+pageId: wikipedia-views
+verifiedAt: 2026-02-22
+totalCitations: 70
+verified: 42
+broken: 28
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Pageview
+    linkText: Pageview - Wikipedia
+    claimContext: '**Wikipedia Views** refers to both the concept of Wikipedia pageview statistics and the suite of tools developed to analyze them. At its core, a Wikipedia pageview measures a single request to load an HTML page on Wikipedia, distinct from "hits" which count every file (images, CSS) loaded by the pag'
+    fetchedAt: 2026-02-22T01:56:26.751Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://en.wikipedia.org/wiki/Wikipedia:Pageview_statistics
+    linkText: Wikipedia:Pageview statistics
+    claimContext: "These tools serve multiple constituencies: Wikipedia editors tracking article impact, researchers studying public interest patterns, and analysts monitoring societal trends. The data reveals dramatic patterns—[^2] while breaking news events can spike obscure articles from 1,000 monthly views to over"
+    fetchedAt: 2026-02-22T01:56:26.752Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://en.wikipedia.org/wiki/Wikipedia:Pageview_statistics
+    linkText: Wikipedia:Pageview statistics
+    claimContext: "These tools serve multiple constituencies: Wikipedia editors tracking article impact, researchers studying public interest patterns, and analysts monitoring societal trends. The data reveals dramatic patterns—[^2] while breaking news events can spike obscure articles from 1,000 monthly views to over"
+    fetchedAt: 2026-02-22T01:56:26.753Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://www.frontiersin.org/journals/big-data/articles/10.3389/fdata.2023.1199060/full
+    linkText: Frontiers in Big Data - Wikipedia page views for health research
+    claimContext: "These tools serve multiple constituencies: Wikipedia editors tracking article impact, researchers studying public interest patterns, and analysts monitoring societal trends. The data reveals dramatic patterns—[^2] while breaking news events can spike obscure articles from 1,000 monthly views to over"
+    fetchedAt: 2026-02-22T01:56:27.895Z
+    httpStatus: 200
+    pageTitle: "Frontiers | Wikipedia page views for health research: a review"
+    contentSnippet: "Frontiers | Wikipedia page views for health research: a review MINI REVIEW article Front. Big Data , 04 July 2023 Sec. Medicine and Public Health Volume 6 - 2023 | https://doi.org/10.3389/fdata.2023.1199060 Published in Frontiers in Big Data Medicine and Public Health 2.3 impact factor 6.1 citescore Part of a Research Topic Utilizing Big Data and Deep Learning to improve Healthcare Intelligence and Biomedical Service Delivery 38k views 8 articles Reviewers Reviewed by D P Dhavalkumar Patel IBM R"
+    contentLength: 535302
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.ghacks.net/2025/10/20/wikipedia-sees-decline-in-human-pageviews-says-ai-is-to-blame/
+    linkText: Wikipedia sees decline in human pageviews, says AI is to blame
+    claimContext: However, the ecosystem faces mounting challenges. Human pageviews declined 8% between March-August 2025 compared to 2024, with Wikimedia attributing the drop to AI-generated summaries that provide answers without directing users to Wikipedia, plus increasingly sophisticated bots designed to evade de
+    fetchedAt: 2026-02-22T01:56:27.589Z
+    httpStatus: 200
+    pageTitle: Wikipedia sees decline in human pageviews, says AI is to blame - gHacks Tech News
+    contentSnippet: "Wikipedia sees decline in human pageviews, says AI is to blame - gHacks Tech News Wikipedia has revealed that it is seeing a decline in web traffic from human users. And the reason for it is, unsurprisingly, AI search. An article posted by Wikimedia Foundation 's Marshall Miller highlights how global trends have negatively impacted Wikipedia. The article says that Wikimedia Foundation's algorithms classify traffic from humans and bots. In May 2025, the foundation observed unusually high amounts "
+    contentLength: 70990
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: However, the ecosystem faces mounting challenges. Human pageviews declined 8% between March-August 2025 compared to 2024, with Wikimedia attributing the drop to AI-generated summaries that provide answers without directing users to Wikipedia, plus increasingly sophisticated bots designed to evade de
+    fetchedAt: 2026-02-22T01:56:29.534Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://en.wikipedia.org/wiki/Wikipedia:Pageview_statistics
+    linkText: Wikipedia:Pageview statistics
+    claimContext: "The Wikimedia Foundation's pageview analytics evolved alongside Wikipedia itself, though comprehensive documentation focuses primarily on tool features rather than development history. Desktop pageview data became available starting December 1, 2007, initially through the stats.grok.se service.[^7] "
+    fetchedAt: 2026-02-22T01:56:28.907Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://pageviews.wmcloud.org/pageviews/faq/
+    linkText: Pageviews Analysis FAQ
+    claimContext: A major infrastructure shift occurred in July 2015 when Wikimedia introduced the REST API-based Pageviews Analysis tool at pageviews.wmcloud.org.[^8] By default, the tool shows data only from users, though many bot views still slip through as they're designed to mimic legitimate traffic. The 2015 tr
+    fetchedAt: 2026-02-22T01:56:29.379Z
+    httpStatus: 200
+    pageTitle: Pageviews Analysis - Vrae
+    contentSnippet: Pageviews Analysis - Vrae Why can't I view data older than July 2015? The Wikimedia pageviews API was introduced in August 2015 and has backfilled data to July 2015. You will have to rely on other tools such as stats.grok.se to view data older than this. Whether or not they work is unfortunately outside the scope of this tool, and beyond the control of the maintainers. Why can't I view data for today's date? The Wikimedia pageviews API generally takes a full 24 hours to populate, sometimes longe
+    contentLength: 27635
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://meta.wikimedia.org/wiki/Pageviews_Analysis
+    linkText: Meta:Pageviews Analysis
+    claimContext: "The Pageviews Analysis toolset expanded to include specialized features: Langviews for comparing views across Wikipedia language editions, Topviews for ranking most-viewed pages by project and date, Siteviews for tracking total site pageviews or unique devices, and additional tools for redirects, us"
+    fetchedAt: 2026-02-22T01:56:29.186Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 10
+    url: https://meta.wikimedia.org/wiki/Pageviews_Analysis
+    linkText: Meta:Pageviews Analysis
+    claimContext: "The Pageviews Analysis toolset expanded to include specialized features: Langviews for comparing views across Wikipedia language editions, Topviews for ranking most-viewed pages by project and date, Siteviews for tracking total site pageviews or unique devices, and additional tools for redirects, us"
+    fetchedAt: 2026-02-22T01:56:29.206Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 12
+    url: https://github.com/vipulnaik/wikipediaviews
+    linkText: GitHub - vipulnaik/wikipediaviews
+    claimContext: <EntityLink id="vipul-naik">Vipul Naik</EntityLink> created Wikipedia Views (wikipediaviews.org) as part of his broader data infrastructure projects, which also include the <EntityLink id="donations-list-website">Donations List Website</EntityLink>.[^11] The tool provides an alternative interface fo
+    fetchedAt: 2026-02-22T01:56:31.283Z
+    httpStatus: 200
+    pageTitle: "GitHub - vipulnaik/wikipediaviews: Underlying code of https://wikipediaviews.org with sensitive parts redacted"
+    contentSnippet: "GitHub - vipulnaik/wikipediaviews: Underlying code of https://wikipediaviews.org with sensitive parts redacted Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} vipulnaik / wikipediaviews Public Notifications You must be signed in to change notification settings Fork 1 Star 8 Un"
+    contentLength: 301573
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop
+    linkText: Wikipedia reports traffic drop
+    claimContext: In October 2025, Marshall Miller, Senior Director of Product at the Wikimedia Foundation, published analysis revealing an 8% decline in human pageviews between March-August 2025 compared to the same period in 2024.[^14] The investigation uncovered sophisticated bots mimicking human behavior, particu
+    fetchedAt: 2026-02-22T01:56:31.012Z
+    httpStatus: 200
+    pageTitle: Wikipedia reports traffic drop, blames AI search and social media
+    contentSnippet: Wikipedia reports traffic drop, blames AI search and social media Wikipedia reports traffic drop, blames AI search and social media Wikipedia has reported a reduction in readership, blaming the dip on rise in search engines’ AI summaries, bot traffic and a new information environment. Between March and August this year, human pageviews decreased by 8% compared with the same period in 2024. At the same time aggressive bots and crawlers have been bombarding the online encyclopaedia, putting a stra
+    contentLength: 9229
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/
+    linkText: New User Trends on Wikipedia - Wikimedia Diff
+    claimContext: In October 2025, Marshall Miller, Senior Director of Product at the Wikimedia Foundation, published analysis revealing an 8% decline in human pageviews between March-August 2025 compared to the same period in 2024.[^14] The investigation uncovered sophisticated bots mimicking human behavior, particu
+    fetchedAt: 2026-02-22T01:56:30.838Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop
+    linkText: Wikipedia reports traffic drop
+    claimContext: "Wikimedia attributed the decline to two primary factors: generative AI summaries from search engines that provide direct answers without requiring Wikipedia visits, and the rising cost of detecting increasingly sophisticated bots.[^16] This analysis prompted updates to bot detection systems and spar"
+    fetchedAt: 2026-02-22T01:56:31.044Z
+    httpStatus: 200
+    pageTitle: Wikipedia reports traffic drop, blames AI search and social media
+    contentSnippet: Wikipedia reports traffic drop, blames AI search and social media Wikipedia reports traffic drop, blames AI search and social media Wikipedia has reported a reduction in readership, blaming the dip on rise in search engines’ AI summaries, bot traffic and a new information environment. Between March and August this year, human pageviews decreased by 8% compared with the same period in 2024. At the same time aggressive bots and crawlers have been bombarding the online encyclopaedia, putting a stra
+    contentLength: 9229
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://pageviews.wmcloud.org/pageviews/faq/
+    linkText: Pageviews Analysis FAQ
+    claimContext: Wikipedia pageviews track the number of times an HTML page is requested and loaded, with each unique page load counting as one view. The process begins when a user's browser requests a Wikipedia article, which generates a log entry in Wikimedia's infrastructure. After a 24-hour delay (sometimes long
+    fetchedAt: 2026-02-22T01:56:30.578Z
+    httpStatus: 200
+    pageTitle: Pageviews Analysis - Vrae
+    contentSnippet: Pageviews Analysis - Vrae Why can't I view data older than July 2015? The Wikimedia pageviews API was introduced in August 2015 and has backfilled data to July 2015. You will have to rely on other tools such as stats.grok.se to view data older than this. Whether or not they work is unfortunately outside the scope of this tool, and beyond the control of the maintainers. Why can't I view data for today's date? The Wikimedia pageviews API generally takes a full 24 hours to populate, sometimes longe
+    contentLength: 27635
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.youtube.com/watch?v=F-Z09W89Y24
+    linkText: How to check Wikipedia page views - YouTube
+    claimContext: Users can access view statistics for any article by clicking "View history" at the top of the page, then selecting the "Page views" button to see graphs, totals, and date-range statistics including daily averages and lifetime view counts.[^18] This simple interface masks considerable technical compl
+    fetchedAt: 2026-02-22T01:56:32.661Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 19
+    url: https://pageviews.wmcloud.org/pageviews/faq/
+    linkText: Pageviews Analysis FAQ
+    claimContext: 'By default, tools like Pageviews Analysis exclude "spiders"—automated crawlers from search engines and other services—to show only "user" views from human readers, editors, and anonymous users for more accurate readership metrics.[^19] The system categorizes views into several types:'
+    fetchedAt: 2026-02-22T01:56:32.328Z
+    httpStatus: 200
+    pageTitle: Pageviews Analysis - Vrae
+    contentSnippet: Pageviews Analysis - Vrae Why can't I view data older than July 2015? The Wikimedia pageviews API was introduced in August 2015 and has backfilled data to July 2015. You will have to rely on other tools such as stats.grok.se to view data older than this. Whether or not they work is unfortunately outside the scope of this tool, and beyond the control of the maintainers. Why can't I view data for today's date? The Wikimedia pageviews API generally takes a full 24 hours to populate, sometimes longe
+    contentLength: 27635
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: However, this filtering has significant limitations. Sophisticated bots designed to evade detection can successfully masquerade as human users, with some estimates suggesting up to 40% of recorded pageviews may come from undetected bots.[^20] The May 2025 Brazil traffic spike exemplified this proble
+    fetchedAt: 2026-02-22T01:56:32.397Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/
+    linkText: New User Trends on Wikipedia - Wikimedia Diff
+    claimContext: However, this filtering has significant limitations. Sophisticated bots designed to evade detection can successfully masquerade as human users, with some estimates suggesting up to 40% of recorded pageviews may come from undetected bots.[^20] The May 2025 Brazil traffic spike exemplified this proble
+    fetchedAt: 2026-02-22T01:56:32.290Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 22
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: The system tracks views of redirect pages separately from their targets, creating a persistent source of undercounting. When a user navigates to "Seattle, Washington" (a redirect to "Seattle"), the system logs a view for the redirect rather than the target article, even though the user only sees the
+    fetchedAt: 2026-02-22T01:56:32.833Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.youtube.com/watch?v=F-Z09W89Y24
+    linkText: How to check Wikipedia page views - YouTube
+    claimContext: "Editors use pageview data to assess their work's impact and prioritize improvements. An article receiving 37 daily views represents modest traffic, while 60+ views daily indicates noticeable readership where edits may have broader impact.[^23] Low-traffic articles (under 1 view per day) signal that "
+    fetchedAt: 2026-02-22T01:56:34.072Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 24
+    url: http://colinmorris.github.io/blog/unpopular-wiki-articles
+    linkText: The most unpopular articles on Wikipedia
+    claimContext: The median article receives approximately 1,000 annual views based on 2021 samples, but the distribution is extremely skewed.[^24] Nearly 100 articles had single-digit annual views, often obscure stub articles like moth species pages with under 200 annual views. This data drives Wikipedia quality in
+    fetchedAt: 2026-02-22T01:56:34.858Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 25
+    url: https://en.wikipedia.org/wiki/Wikipedia:Popular_pages
+    linkText: Wikipedia:Popular pages
+    claimContext: Featured articles—those promoted to Wikipedia's main page—see dramatic traffic spikes, averaging 109,000 daily views or 2 million monthly during their featured period.[^25] This provides clear evidence of the Main Page's power to drive readership and helps editors understand the impact of quality im
+    fetchedAt: 2026-02-22T01:56:33.855Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://pubmed.ncbi.nlm.nih.gov/37469441/
+    linkText: PubMed - Wikipedia page views for health research
+    claimContext: Academic researchers have embraced Wikipedia pageviews as a proxy for public interest and information-seeking behavior. A 2023 review of health research identified 29 studies using Wikipedia views to describe changes in health information usage, assess public events' impact, estimate disease inciden
+    fetchedAt: 2026-02-22T01:56:34.209Z
+    httpStatus: 200
+    pageTitle: "Wikipedia page views for health research: a review - PubMed"
+    contentSnippet: "Wikipedia page views for health research: a review - PubMed This site needs JavaScript to work properly. Please enable it to take advantage of the complete set of features! Clipboard, Search History, and several other advanced features are temporarily unavailable. Skip to main page content The .gov means it’s official. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site. The site is secure. The https:// ensure"
+    contentLength: 118865
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10353851/
+    linkText: PMC - Wikipedia page views for health research
+    claimContext: Academic researchers have embraced Wikipedia pageviews as a proxy for public interest and information-seeking behavior. A 2023 review of health research identified 29 studies using Wikipedia views to describe changes in health information usage, assess public events' impact, estimate disease inciden
+    fetchedAt: 2026-02-22T01:56:34.001Z
+    httpStatus: 200
+    pageTitle: "Wikipedia page views for health research: a review - PMC"
+    contentSnippet: "Wikipedia page views for health research: a review - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM provides access to"
+    contentLength: 166888
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://dl.acm.org/doi/fullHtml/10.1145/3614419.3644007
+    linkText: ACM Digital Library - Public interest in climate change
+    claimContext: Climate change research provides another application. A 2023-2024 study analyzed 517 million pageviews from 2017-2022 across 213 countries using WikiProject Climate Change articles, finding stagnant engagement despite increasing societal concern—evidence of an attitude-behavior gap.[^28] The study u
+    fetchedAt: 2026-02-22T01:56:36.138Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 29
+    url: https://phys.org/news/2023-05-tool-wikipedia-page-views-aid.html
+    linkText: Phys.org - Wikipedia page views aid wildlife conservation
+    claimContext: Conservation biology has adopted pageviews as well. The Species Attention Index (SAI) tracks monthly changes in average daily page views for approximately 40,000 species across 10 Wikipedia languages (reptiles, fishes, mammals, birds, insects, amphibians), focusing on rate of change to avoid skew fr
+    fetchedAt: 2026-02-22T01:56:36.756Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 30
+    url: https://arxiv.org/abs/1903.10670
+    linkText: arXiv - Detecting and Gauging Impact on Wikipedia Page Views
+    claimContext: A 2019 study by Xiaoxi Chelsy Xie, Isaac Johnson, and Anne Gomez developed time-series models to predict page views and detect significant changes from events.[^30] They tested these models on a Hindi Wikipedia video campaign (no significant impact detected) and a page preview rollout on English and
+    fetchedAt: 2026-02-22T01:56:35.989Z
+    httpStatus: 200
+    pageTitle: "[1903.10670] Detecting and Gauging Impact on Wikipedia Page Views"
+    contentSnippet: "[1903.10670] Detecting and Gauging Impact on Wikipedia Page Views --> Computer Science > Computers and Society arXiv:1903.10670 (cs) [Submitted on 26 Mar 2019] Title: Detecting and Gauging Impact on Wikipedia Page Views Authors: Xiaoxi Chelsy Xie , Isaac Johnson , Anne Gomez View a PDF of the paper titled Detecting and Gauging Impact on Wikipedia Page Views, by Xiaoxi Chelsy Xie and 2 other authors View PDF Abstract: Understanding how various external campaigns or events affect readership on Wik"
+    contentLength: 46475
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://en.wikipedia.org/wiki/Wikipedia:Pageview_statistics
+    linkText: Wikipedia:Pageview statistics
+    claimContext: Breaking news events create dramatic pageview spikes that reveal public attention patterns. The Costa Concordia article saw approximately 1,000 monthly views before 2012, then surged to over 1,000,000 hits in January 2012 after the cruise ship sinking.[^31] These spikes help researchers identify whi
+    fetchedAt: 2026-02-22T01:56:35.865Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 32
+    url: https://en.wikipedia.org/wiki/Wikipedia:Popular_pages
+    linkText: Wikipedia:Popular pages
+    claimContext: "Popular pages rankings show consistent patterns: YouTube leads actual articles with 5,934,993 views, followed by Wikipedia itself (1,769,555), US Open tennis (1,099,859), Donald Trump (901,511), and Celine Dion.[^32] The Main Page dominates overall with 46.8 billion lifetime views. Weekend traffic r"
+    fetchedAt: 2026-02-22T01:56:35.875Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 33
+    url: https://pageviews.wmcloud.org/pageviews/faq/
+    linkText: Pageviews Analysis FAQ
+    claimContext: "Popular pages rankings show consistent patterns: YouTube leads actual articles with 5,934,993 views, followed by Wikipedia itself (1,769,555), US Open tennis (1,099,859), Donald Trump (901,511), and Celine Dion.[^32] The Main Page dominates overall with 46.8 billion lifetime views. Weekend traffic r"
+    fetchedAt: 2026-02-22T01:56:38.172Z
+    httpStatus: 200
+    pageTitle: Pageviews Analysis - Vrae
+    contentSnippet: Pageviews Analysis - Vrae Why can't I view data older than July 2015? The Wikimedia pageviews API was introduced in August 2015 and has backfilled data to July 2015. You will have to rely on other tools such as stats.grok.se to view data older than this. Whether or not they work is unfortunately outside the scope of this tool, and beyond the control of the maintainers. Why can't I view data for today's date? The Wikimedia pageviews API generally takes a full 24 hours to populate, sometimes longe
+    contentLength: 27635
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.pewresearch.org/short-reads/2026/01/13/wikipedia-at-25-what-the-data-tells-us/
+    linkText: Pew Research - Wikipedia at 25
+    claimContext: Between 2015 and 2025, 46% of monthly top pages covered individuals, 31% covered movies and TV shows, and 14% covered events.[^34] Evergreen topics like "dogs" maintain steady traffic, while seasonal spikes occur predictably (Mariah Carey in December). These patterns help content strategists and res
+    fetchedAt: 2026-02-22T01:56:38.284Z
+    httpStatus: 200
+    pageTitle: What the data says about Wikipedia on its 25th anniversary | Pew Research Center
+    contentSnippet: "What the data says about Wikipedia on its 25th anniversary | Pew Research Center Search Read Our Research On: Short Reads | January 13, 2026 Wikipedia at 25: What the data tells us X Facebook Threads LinkedIn WhatsApp Mail Print Add Us On Google By Skyler Seets , Anna Lieb and Aaron Smith (Photo illustration by Thomas Fuller/SOPA Images/LightRocket via Getty Images) On Jan. 15, 2001, the earliest edit found on Wikipedia’s homepage announced, “This is the new WikiPedia!” Twenty-five years later, "
+    contentLength: 790680
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/
+    linkText: New User Trends on Wikipedia - Wikimedia Diff
+    claimContext: Bot traffic represents the most significant threat to data quality. Despite filtering efforts, sophisticated bots designed to evade detection contribute substantially to recorded pageviews. Wikimedia's October 2025 analysis revealed that the May-June 2025 traffic surge from Brazil initially appeared
+    fetchedAt: 2026-02-22T01:56:38.059Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 36
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: Estimates suggest up to 40% of recorded pageviews may come from bots, though this varies considerably depending on the detection methods employed.[^36] The Wikimedia REST API applies stricter filtering than stats.grok.se, creating inconsistencies even when analyzing overlapping time periods. Bot det
+    fetchedAt: 2026-02-22T01:56:38.596Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop
+    linkText: Wikipedia reports traffic drop
+    claimContext: Estimates suggest up to 40% of recorded pageviews may come from bots, though this varies considerably depending on the detection methods employed.[^36] The Wikimedia REST API applies stricter filtering than stats.grok.se, creating inconsistencies even when analyzing overlapping time periods. Bot det
+    fetchedAt: 2026-02-22T01:56:37.867Z
+    httpStatus: 200
+    pageTitle: Wikipedia reports traffic drop, blames AI search and social media
+    contentSnippet: Wikipedia reports traffic drop, blames AI search and social media Wikipedia reports traffic drop, blames AI search and social media Wikipedia has reported a reduction in readership, blaming the dip on rise in search engines’ AI summaries, bot traffic and a new information environment. Between March and August this year, human pageviews decreased by 8% compared with the same period in 2024. At the same time aggressive bots and crawlers have been bombarding the online encyclopaedia, putting a stra
+    contentLength: 9229
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: Traditional pageview metrics from stats.grok.se counted only desktop Wikipedia site views, ignoring mobile sites and Wikipedia Zero (a low-bandwidth mobile version for developing countries).[^38] Mobile data became available through pagecounts-all-sites in September 2014, creating a structural break
+    fetchedAt: 2026-02-22T01:56:39.708Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.lesswrong.com/posts/8SFPgPgdNzx2gLxxi/the-great-decline-in-wikipedia-pageviews-condensed-version
+    linkText: LessWrong - The Great Decline in Wikipedia Pageviews
+    claimContext: Traditional pageview metrics from stats.grok.se counted only desktop Wikipedia site views, ignoring mobile sites and Wikipedia Zero (a low-bandwidth mobile version for developing countries).[^38] Mobile data became available through pagecounts-all-sites in September 2014, creating a structural break
+    fetchedAt: 2026-02-22T01:56:40.460Z
+    httpStatus: 200
+    pageTitle: The great decline in Wikipedia pageviews (condensed version) — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The great decline in Wikipedia pageviews (condensed version) — LessWrong Software Tools Personal Blog 27 The great decline in Wikipedia pageviews (condensed version) by VipulNaik 27th Mar 2015 33 min read 11 27 To keep this post manageable in length, I have only included a small subset of the illustrative examples and discussion. I have published a longer version of th
+    contentLength: 1076831
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://vipulnaik.com/blog/the-great-decline-in-wikipedia-pageviews-full-version/
+    linkText: Vipul Naik - The Great Decline in Wikipedia Pageviews
+    claimContext: This gap significantly distorts trend analysis. Desktop declines from 2013-2014 appeared steeper than they actually were because growing mobile usage went unmeasured. Analysts like <EntityLink id="issa-rice">Issa Rice</EntityLink> and <EntityLink id="vipul-naik">Vipul Naik</EntityLink> emphasized th
+    fetchedAt: 2026-02-22T01:56:40.819Z
+    httpStatus: 200
+    pageTitle: The great decline in Wikipedia pageviews (full version) | Vipul Naik
+    contentSnippet: The great decline in Wikipedia pageviews (full version) | Vipul Naik Skip to content A shorter version of this post is available on LessWrong . The LessWrong post will remain static whereas this version will be updated with more examples as they occur to me. Last year, during the months of June and July, as my work for MIRI was wrapping up and I hadn&#8217;t started my full-time job , I worked on the Wikipedia Views website , aimed at easier tabulation of the pageviews for multiple Wikipedia pag
+    contentLength: 408925
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: This gap significantly distorts trend analysis. Desktop declines from 2013-2014 appeared steeper than they actually were because growing mobile usage went unmeasured. Analysts like <EntityLink id="issa-rice">Issa Rice</EntityLink> and <EntityLink id="vipul-naik">Vipul Naik</EntityLink> emphasized th
+    fetchedAt: 2026-02-22T01:56:39.868Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: Views of redirect pages are counted separately from their targets, systematically undercounting popular articles with many redirects.[^42] A user navigating to "Seattle, Washington" sees the Seattle article but generates a view count for the redirect, not the target. Over time, this creates substant
+    fetchedAt: 2026-02-22T01:56:40.051Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: New page creation masks underlying trends in aggregate statistics. Overall pageview declines appear more moderate than per-page drops because newly created articles add views that weren't previously counted.[^43] This makes Wikipedia-wide trends misleading for understanding engagement with establish
+    fetchedAt: 2026-02-22T01:56:41.929Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: Infrastructure limitations add further noise. Unknown data loss occurs due to incomplete logging, though Wikimedia has not quantified this loss.[^44] Weekend versus weekday patterns and event-driven fluctuations complicate trend analysis—Saturday traffic routinely drops, while news mentions create s
+    fetchedAt: 2026-02-22T01:56:41.933Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://en.wikipedia.org/wiki/Wikipedia:Article_traffic_jumps
+    linkText: Wikipedia:Article traffic jumps
+    claimContext: Infrastructure limitations add further noise. Unknown data loss occurs due to incomplete logging, though Wikimedia has not quantified this loss.[^44] Weekend versus weekday patterns and event-driven fluctuations complicate trend analysis—Saturday traffic routinely drops, while news mentions create s
+    fetchedAt: 2026-02-22T01:56:41.837Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 46
+    url: https://www.ghacks.net/2025/10/20/wikipedia-sees-decline-in-human-pageviews-says-ai-is-to-blame/
+    linkText: Wikipedia sees decline in human pageviews, says AI is to blame
+    claimContext: "Wikipedia experienced an approximately 8% drop in human pageviews from March to August 2025 compared to the same period in 2024, according to Wikimedia Foundation analysis published by Marshall Miller in October 2025.[^46] This represents the culmination of longer-term trends: average monthly unique"
+    fetchedAt: 2026-02-22T01:56:42.314Z
+    httpStatus: 200
+    pageTitle: Wikipedia sees decline in human pageviews, says AI is to blame - gHacks Tech News
+    contentSnippet: "Wikipedia sees decline in human pageviews, says AI is to blame - gHacks Tech News Wikipedia has revealed that it is seeing a decline in web traffic from human users. And the reason for it is, unsurprisingly, AI search. An article posted by Wikimedia Foundation 's Marshall Miller highlights how global trends have negatively impacted Wikipedia. The article says that Wikimedia Foundation's algorithms classify traffic from humans and bots. In May 2025, the foundation observed unusually high amounts "
+    contentLength: 70990
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://datareportal.com/reports/digital-2025-exploring-trends-in-wikipedia-traffic
+    linkText: "DataReportal - Digital 2025: Exploring trends in Wikipedia traffic"
+    claimContext: "Wikipedia experienced an approximately 8% drop in human pageviews from March to August 2025 compared to the same period in 2024, according to Wikimedia Foundation analysis published by Marshall Miller in October 2025.[^46] This represents the culmination of longer-term trends: average monthly unique"
+    fetchedAt: 2026-02-22T01:56:42.375Z
+    httpStatus: 200
+    pageTitle: "Digital 2025: exploring trends in Wikipedia traffic &mdash; DataReportal – Global Digital Insights"
+    contentSnippet: "Digital 2025: exploring trends in Wikipedia traffic &mdash; DataReportal – Global Digital Insights Back HOME REPORTS ABOUT CONTACT NEWSLETTER Digital 2025: exploring trends in Wikipedia traffic ADVERTISEMENT Wikipedia has been an integral part of the internet for almost a quarter of a century, providing free, democratised access to knowledge. Since its launch in 2001, the site’s community of volunteers has contributed 64 million distinct articles, offering in-depth information on a huge variety "
+    contentLength: 251578
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://datareportal.com/reports/digital-2025-exploring-trends-in-wikipedia-traffic
+    linkText: "DataReportal - Digital 2025: Exploring trends in Wikipedia traffic"
+    claimContext: "Despite these drops, Wikipedia.org attracted roughly 2.5 times as many unique visitors as ChatGPT in March 2025, even with half a billion fewer total site visits.[^48] This suggests Wikipedia retains significant direct readership even as AI systems increasingly mediate access to its content. Unique "
+    fetchedAt: 2026-02-22T01:56:43.425Z
+    httpStatus: 200
+    pageTitle: "Digital 2025: exploring trends in Wikipedia traffic &mdash; DataReportal – Global Digital Insights"
+    contentSnippet: "Digital 2025: exploring trends in Wikipedia traffic &mdash; DataReportal – Global Digital Insights Back HOME REPORTS ABOUT CONTACT NEWSLETTER Digital 2025: exploring trends in Wikipedia traffic ADVERTISEMENT Wikipedia has been an integral part of the internet for almost a quarter of a century, providing free, democratised access to knowledge. Since its launch in 2001, the site’s community of volunteers has contributed 64 million distinct articles, offering in-depth information on a huge variety "
+    contentLength: 251578
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://datareportal.com/reports/digital-2025-exploring-trends-in-wikipedia-traffic
+    linkText: "DataReportal - Digital 2025: Exploring trends in Wikipedia traffic"
+    claimContext: "Despite these drops, Wikipedia.org attracted roughly 2.5 times as many unique visitors as ChatGPT in March 2025, even with half a billion fewer total site visits.[^48] This suggests Wikipedia retains significant direct readership even as AI systems increasingly mediate access to its content. Unique "
+    fetchedAt: 2026-02-22T01:56:43.918Z
+    httpStatus: 200
+    pageTitle: "Digital 2025: exploring trends in Wikipedia traffic &mdash; DataReportal – Global Digital Insights"
+    contentSnippet: "Digital 2025: exploring trends in Wikipedia traffic &mdash; DataReportal – Global Digital Insights Back HOME REPORTS ABOUT CONTACT NEWSLETTER Digital 2025: exploring trends in Wikipedia traffic ADVERTISEMENT Wikipedia has been an integral part of the internet for almost a quarter of a century, providing free, democratised access to knowledge. Since its launch in 2001, the site’s community of volunteers has contributed 64 million distinct articles, offering in-depth information on a huge variety "
+    contentLength: 251578
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.searchengineworld.com/wikipedia-traffic-shifts-highlight-big-impact-of-googles-ai-overviews
+    linkText: Search Engine World - Wikipedia traffic shifts highlight big impact of Google's AI Overviews
+    claimContext: The decline appears concentrated in information-seeking rather than collaborative editing, though reduced readership may eventually impact editor recruitment. Total traffic from Google to Wikipedia fell sharply since early 2024, aligning with Google's AI Overviews rollout.[^50]
+    fetchedAt: 2026-02-22T01:56:44.725Z
+    httpStatus: 200
+    pageTitle: Wikipedia Traffic Shifts Highlight Big Impact of Google’s AI Overviews
+    contentSnippet: "Wikipedia Traffic Shifts Highlight Big Impact of Google’s AI Overviews Skip to content &times; Search for: Wikimedia’s latest report on new user trends paints a stark picture of how internet traffic is being reshaped by AI search. The analysis shows that Wikipedia is seeing fewer new editors, a slowdown in organic visits, and a pattern that mirrors what many site owners have reported throughout 2024 and 2025. Wikipedia Traffic Down as AIO Infects Serps According to Wikimedia’s metrics, total tra"
+    contentLength: 88455
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://observer.com/2025/10/wikipedia-ai-eating-traffic/
+    linkText: Observer - Wikipedia AI eating traffic
+    claimContext: "Wikimedia Foundation officials identified generative AI summaries from search engines as a primary driver of declining pageviews.[^51] When Google provides direct answers from Wikipedia content in AI Overviews, users often forgo clicking through to the source. A survey of 900 U.S. adults found that "
+    fetchedAt: 2026-02-22T01:56:44.100Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 52
+    url: https://observer.com/2025/10/wikipedia-ai-eating-traffic/
+    linkText: Observer - Wikipedia AI eating traffic
+    claimContext: "Wikimedia Foundation officials identified generative AI summaries from search engines as a primary driver of declining pageviews.[^51] When Google provides direct answers from Wikipedia content in AI Overviews, users often forgo clicking through to the source. A survey of 900 U.S. adults found that "
+    fetchedAt: 2026-02-22T01:56:43.742Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 53
+    url: https://almcorp.com/blog/wikipedia-traffic-decline-ai-impact-analysis/
+    linkText: ALM Corp - Wikipedia traffic decline AI impact analysis
+    claimContext: This creates what researchers call "zero-click searches"—queries satisfied without visiting the source website. AI-powered features may reduce organic traffic to informational sites by 10-20% or more according to some estimates.[^53] Wikipedia content accounts for 15% of AI content and 17% of standa
+    fetchedAt: 2026-02-22T01:56:46.508Z
+    httpStatus: 200
+    pageTitle: "Wikipedia Traffic Decline: AI's Impact on Information Access"
+    contentSnippet: "Wikipedia Traffic Decline: AI&#039;s Impact on Information Access Skip to content Home » Blog » The Decline of Wikipedia Traffic: How AI is Reshaping Digital Information Discovery October 21, 2025 4 mins read Blog The Decline of Wikipedia Traffic: How AI is Reshaping Digital Information Discovery ALM Corp The digital landscape is undergoing a seismic transformation. Wikipedia, the internet&#8217;s most trusted free encyclopedia serving billions since 2001, now faces an unprecedented challenge: h"
+    contentLength: 595599
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://observer.com/2025/10/wikipedia-ai-eating-traffic/
+    linkText: Observer - Wikipedia AI eating traffic
+    claimContext: This creates what researchers call "zero-click searches"—queries satisfied without visiting the source website. AI-powered features may reduce organic traffic to informational sites by 10-20% or more according to some estimates.[^53] Wikipedia content accounts for 15% of AI content and 17% of standa
+    fetchedAt: 2026-02-22T01:56:45.733Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 55
+    url: https://almcorp.com/blog/wikipedia-traffic-decline-ai-impact-analysis/
+    linkText: ALM Corp - Wikipedia traffic decline AI impact analysis
+    claimContext: "Citation patterns in AI systems reveal Wikipedia's centrality: Wikipedia comprises 47.9% of ChatGPT's top-10 cited sources, though only 5.7% in Google AI Overviews (behind Reddit at 21.0% and YouTube at 18.8%).[^55] This discrepancy suggests different AI systems rely on Wikipedia to varying degrees,"
+    fetchedAt: 2026-02-22T01:56:46.300Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 222
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop
+    linkText: Wikipedia reports traffic drop
+    claimContext: A March 2025 study of 160 websites found publishers broadly experienced reduced referral traffic from AI-enhanced search compared to traditional Google search.[^56] Wikipedia's experience mirrors broader patterns affecting online publishers, though Wikipedia's nonprofit status and reliance on donati
+    fetchedAt: 2026-02-22T01:56:46.034Z
+    httpStatus: 200
+    pageTitle: Wikipedia reports traffic drop, blames AI search and social media
+    contentSnippet: Wikipedia reports traffic drop, blames AI search and social media Wikipedia reports traffic drop, blames AI search and social media Wikipedia has reported a reduction in readership, blaming the dip on rise in search engines’ AI summaries, bot traffic and a new information environment. Between March and August this year, human pageviews decreased by 8% compared with the same period in 2024. At the same time aggressive bots and crawlers have been bombarding the online encyclopaedia, putting a stra
+    contentLength: 9229
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/
+    linkText: New User Trends on Wikipedia - Wikimedia Diff
+    claimContext: "Beyond AI summaries, Wikimedia attributed some pageview decline to shifts toward social media and video platforms as primary information sources, particularly among younger users.[^57] TikTok and YouTube increasingly serve as first destinations for curiosity-driven queries that previously led users "
+    fetchedAt: 2026-02-22T01:56:46.114Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 58
+    url: https://www.lesswrong.com/posts/8SFPgPgdNzx2gLxxi/the-great-decline-in-wikipedia-pageviews-condensed-version
+    linkText: LessWrong - The Great Decline in Wikipedia Pageviews
+    claimContext: Critics of the AI-centric explanation for pageview declines argue that significant drops began well before recent generative AI systems emerged. Declines started as early as 2013-2014, primarily due to mobile traffic dominance (larger than desktop since 2015) and Google Knowledge Graph snippets that
+    fetchedAt: 2026-02-22T01:56:48.851Z
+    httpStatus: 200
+    pageTitle: The great decline in Wikipedia pageviews (condensed version) — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The great decline in Wikipedia pageviews (condensed version) — LessWrong Software Tools Personal Blog 27 The great decline in Wikipedia pageviews (condensed version) by VipulNaik 27th Mar 2015 33 min read 11 27 To keep this post manageable in length, I have only included a small subset of the illustrative examples and discussion. I have published a longer version of th
+    contentLength: 1076830
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://www.lesswrong.com/posts/8SFPgPgdNzx2gLxxi/the-great-decline-in-wikipedia-pageviews-condensed-version
+    linkText: LessWrong - The Great Decline in Wikipedia Pageviews
+    claimContext: According to this interpretation, what appears as an AI-driven decline actually reflects measurement artifacts from the transition to comprehensive mobile tracking and long-standing changes in search behavior. The "wiki binge" phenomenon—users clicking through multiple related articles in sequence—w
+    fetchedAt: 2026-02-22T01:56:48.550Z
+    httpStatus: 200
+    pageTitle: The great decline in Wikipedia pageviews (condensed version) — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The great decline in Wikipedia pageviews (condensed version) — LessWrong Software Tools Personal Blog 27 The great decline in Wikipedia pageviews (condensed version) by VipulNaik 27th Mar 2015 33 min read 11 27 To keep this post manageable in length, I have only included a small subset of the illustrative examples and discussion. I have published a longer version of th
+    contentLength: 1076833
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: Desktop traffic fell approximately one-third overall between 2013 and 2015, but per-page drops were sharper for mature topics while new page creation moderated aggregate declines.[^60] This suggests the decline reflects shifts in how users access information rather than reduced interest in Wikipedia
+    fetchedAt: 2026-02-22T01:56:47.819Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://issarice.com/revisiting-the-great-decline-in-wikipedia-pageviews
+    linkText: Revisiting the Great Decline in Wikipedia Pageviews
+    claimContext: Skeptics of the decline narrative emphasize that pageview data quality issues make firm conclusions difficult. Bot contamination, mobile undercounting before 2015, redirect handling problems, and infrastructure losses from incomplete logging all distort trend analysis.[^61] The discontinuity between
+    fetchedAt: 2026-02-22T01:56:47.809Z
+    httpStatus: 200
+    pageTitle: Revisiting the “great decline” in Wikipedia pageviews - Issa Rice
+    contentSnippet: "Revisiting the “great decline” in Wikipedia pageviews - Issa Rice Summary In March 2015 one of us (Vipul Naik) wrote “The great decline in Wikipedia pageviews” (called “the original post” in this post). This post is intended as an update to some of the points from that article, along with some graphs. The central puzzle The central puzzle has not changed much since the original post, but to be explicit, here are the questions we originally had and hope to answer to some extent in this post: Have"
+    contentLength: 87586
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://vipulnaik.com/blog/the-great-decline-in-wikipedia-pageviews-full-version/
+    linkText: Vipul Naik - The Great Decline in Wikipedia Pageviews
+    claimContext: <EntityLink id="vipul-naik">Vipul Naik</EntityLink> and <EntityLink id="issa-rice">Issa Rice</EntityLink>, who conducted extensive analysis of Wikipedia pageview trends in the 2010s, consistently emphasized that measurement flaws and data source changes explain more of the observed decline than genu
+    fetchedAt: 2026-02-22T01:56:48.697Z
+    httpStatus: 200
+    pageTitle: The great decline in Wikipedia pageviews (full version) | Vipul Naik
+    contentSnippet: The great decline in Wikipedia pageviews (full version) | Vipul Naik Skip to content A shorter version of this post is available on LessWrong . The LessWrong post will remain static whereas this version will be updated with more examples as they occur to me. Last year, during the months of June and July, as my work for MIRI was wrapping up and I hadn&#8217;t started my full-time job , I worked on the Wikipedia Views website , aimed at easier tabulation of the pageviews for multiple Wikipedia pag
+    contentLength: 408925
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/
+    linkText: New User Trends on Wikipedia - Wikimedia Diff
+    claimContext: The May 2025 Brazil bot traffic incident illustrates how classification changes can dramatically shift apparent trends.[^63] What initially appeared as a surge in human interest was reclassified as bot activity after detection improvements, suggesting that prior periods may similarly include substan
+    fetchedAt: 2026-02-22T01:56:49.864Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 64
+    url: https://diff.wikimedia.org/2026/02/20/wikimedia-and-the-new-knowledge-loop-report-from-a-wikimedia-ch-roundtable-2/
+    linkText: Wikimedia and the new knowledge loop – report from a Wikimedia CH roundtable  – Diff
+    claimContext: A counterintuitive argument suggests that AI-generated summaries might actually increase Wikipedia traffic.[^64] AI systems drawing from low-effort or fabricated sources could drive users back to authoritative sources like Wikipedia.
+    fetchedAt: 2026-02-22T01:56:50.050Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 65
+    url: https://observer.com/2025/10/wikipedia-ai-eating-traffic/
+    linkText: Observer - Wikipedia AI eating traffic
+    claimContext: However, available evidence suggests few users actually verify AI-provided information. The 1% click-through rate on links within AI summaries indicates that most users accept AI responses without source verification.[^65] Wikimedia's own 2025 AI summary experiment drew editor backlash as "unethical
+    fetchedAt: 2026-02-22T01:56:50.178Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 66
+    url: https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop
+    linkText: Wikipedia reports traffic drop
+    claimContext: However, available evidence suggests few users actually verify AI-provided information. The 1% click-through rate on links within AI summaries indicates that most users accept AI responses without source verification.[^65] Wikimedia's own 2025 AI summary experiment drew editor backlash as "unethical
+    fetchedAt: 2026-02-22T01:56:49.907Z
+    httpStatus: 200
+    pageTitle: Wikipedia reports traffic drop, blames AI search and social media
+    contentSnippet: Wikipedia reports traffic drop, blames AI search and social media Wikipedia reports traffic drop, blames AI search and social media Wikipedia has reported a reduction in readership, blaming the dip on rise in search engines’ AI summaries, bot traffic and a new information environment. Between March and August this year, human pageviews decreased by 8% compared with the same period in 2024. At the same time aggressive bots and crawlers have been bombarding the online encyclopaedia, putting a stra
+    contentLength: 9229
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://www.lesswrong.com/posts/8SFPgPgdNzx2gLxxi/the-great-decline-in-wikipedia-pageviews-condensed-version
+    linkText: LessWrong - The Great Decline in Wikipedia Pageviews
+    claimContext: "Some commentary on pageview declines takes a deliberately non-serious approach, with claims that individual editor bans caused traffic drops or other satirical attributions of responsibility.[^67] While these don't constitute genuine counterarguments, they reflect some community members' skepticism "
+    fetchedAt: 2026-02-22T01:56:50.532Z
+    httpStatus: 200
+    pageTitle: The great decline in Wikipedia pageviews (condensed version) — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The great decline in Wikipedia pageviews (condensed version) — LessWrong Software Tools Personal Blog 27 The great decline in Wikipedia pageviews (condensed version) by VipulNaik 27th Mar 2015 33 min read 11 27 To keep this post manageable in length, I have only included a small subset of the illustrative examples and discussion. I have published a longer version of th
+    contentLength: 1076831
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://almcorp.com/blog/wikipedia-traffic-decline-ai-impact-analysis/
+    linkText: ALM Corp - Wikipedia traffic decline AI impact analysis
+    claimContext: Wikipedia's role as training data for <EntityLink id="language-models">large language models</EntityLink> connects pageview analysis to broader AI safety concerns. The encyclopedia's comprehensive, relatively reliable, and freely available content makes it indispensable for AI training, with Wikiped
+    fetchedAt: 2026-02-22T01:56:51.623Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 222
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://observer.com/2025/10/wikipedia-ai-eating-traffic/
+    linkText: Observer - Wikipedia AI eating traffic
+    claimContext: According to Wikimedia officials, generative AI uses Wikipedia datasets for training but often fails to link back, causing users to forgo site visits.[^69] This raises sustainability questions—if fewer users visit Wikipedia, volunteer editor recruitment may decline, potentially degrading the content
+    fetchedAt: 2026-02-22T01:56:51.566Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 70
+    url: https://www.computing.co.uk/news/2025/ai/wikipedia-reports-traffic-drop
+    linkText: Wikipedia reports traffic drop
+    claimContext: According to Wikimedia officials, generative AI uses Wikipedia datasets for training but often fails to link back, causing users to forgo site visits.[^69] This raises sustainability questions—if fewer users visit Wikipedia, volunteer editor recruitment may decline, potentially degrading the content
+    fetchedAt: 2026-02-22T01:56:51.610Z
+    httpStatus: 200
+    pageTitle: Wikipedia reports traffic drop, blames AI search and social media
+    contentSnippet: Wikipedia reports traffic drop, blames AI search and social media Wikipedia reports traffic drop, blames AI search and social media Wikipedia has reported a reduction in readership, blaming the dip on rise in search engines’ AI summaries, bot traffic and a new information environment. Between March and August this year, human pageviews decreased by 8% compared with the same period in 2024. At the same time aggressive bots and crawlers have been bombarding the online encyclopaedia, putting a stra
+    contentLength: 9229
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/
+    linkText: New User Trends on Wikipedia - Wikimedia Diff
+    claimContext: The sophisticated bot traffic surge in May 2025, designed to scrape content for AI training while evading detection, exemplifies the infrastructure strain that AI development places on Wikipedia.[^71] As bot detection becomes more expensive and complex, Wikipedia faces escalating costs to protect da
+    fetchedAt: 2026-02-22T01:56:51.568Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 72
+    url: https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/
+    linkText: New User Trends on Wikipedia - Wikimedia Diff
+    claimContext: The limitations of Wikipedia pageview data—bot contamination, mobile gaps, redirect issues—parallel broader measurement challenges in AI safety. Just as Wikimedia struggles to distinguish legitimate human interest from bot scraping, AI safety researchers face difficulties measuring genuine system ca
+    fetchedAt: 2026-02-22T01:56:51.567Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403

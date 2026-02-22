@@ -1,0 +1,172 @@
+pageId: lab-behavior
+verifiedAt: 2026-02-22
+totalCitations: 15
+verified: 11
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://futureoflife.org/ai-safety-index-summer-2025/
+    linkText: 2025 AI Safety Index (Future of Life Institute, Summer 2025)
+    claimContext: "The [G7 Hiroshima AI Process (HAIP) Reporting Framework](https://futureoflife.org/ai-safety-index-summer-2025/) launched in February 2025 as a voluntary transparency mechanism. Organizations complete comprehensive questionnaires covering seven areas of AI safety and governance, with all submissions "
+    fetchedAt: 2026-02-22T02:24:51.724Z
+    httpStatus: 200
+    pageTitle: 2025 AI Safety Index - Future of Life Institute
+    contentSnippet: "2025 AI Safety Index - Future of Life Institute Skip to content AI Safety Index - Winter 2025 Latest edition Featured in: Semafor, Reuters, Axios, Quartz, NBC News, Mashable, Euro News, LA Times, and more. December 2025 Future of Life Institute AI Safety Index Summer 2025 AI experts rate leading AI companies on key safety and security domains. 17 July 2025 Full report PDF 2-Page Summary Coverage Scorecard Company Company grade & score Anthropic C+ 2.64 OpenAI C 2.10 Google Deepmind C- 1.76 x.AI "
+    contentLength: 840552
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/
+    linkText: Common Elements of Frontier AI Safety Policies (December 2025 Update) (METR, December 9, 2025)
+    claimContext: 'As of [December 2025, twelve companies have published frontier AI safety policies](https://metr.org/blog/2025-12-09-common-elements-of-frontier-ai-safety-policies/), with four additional companies joining since May 2024: <EntityLink id="xai">xAI</EntityLink>, Meta, Amazon, and Nvidia.[^2]'
+    fetchedAt: 2026-02-22T02:24:51.820Z
+    httpStatus: 200
+    pageTitle: Common Elements of Frontier AI Safety Policies (December 2025 Update) - METR
+    contentSnippet: "Common Elements of Frontier AI Safety Policies (December 2025 Update) - METR Research Notes Updates About Donate Careers Search --> Research Notes Updates About Donate Careers Menu Common Elements of Frontier AI Safety Policies (December 2025 Update) DATE December 9, 2025 SHARE Copy Link Citation BibTeX Citation &times; @misc { common-elements-of-frontier-ai-safety-policies-december-2025-update , title = {Common Elements of Frontier AI Safety Policies (December 2025 Update)} , author = {METR} , "
+    contentLength: 30659
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.safer-ai.org/anthropics-responsible-scaling-policy-update-makes-a-step-backwards
+    linkText: Anthropic's Responsible Scaling Policy Update Makes a Step Backwards (SaferAI, 2025)
+    claimContext: "**Grade Decline:** According to [SaferAI's analysis](https://www.safer-ai.org/anthropics-responsible-scaling-policy-update-makes-a-step-backwards), Anthropic's safety grade dropped from 2.2 to 1.9, placing them in the \"weak\" category alongside OpenAI and <EntityLink id=\"deepmind\">Google DeepMind</En"
+    fetchedAt: 2026-02-22T02:24:52.243Z
+    httpStatus: 200
+    pageTitle: Anthropic’s Responsible Scaling Policy Update Makes a Step Backwards &#8211; SaferAI
+    contentSnippet: Anthropic’s Responsible Scaling Policy Update Makes a Step Backwards &#8211; SaferAI We use cookies to make your experience on this website better. Agree Disagree Anthropic’s Responsible Scaling Policy Update Makes a Step Backwards Publication date October 23, 2024 share A week ago, Anthropic released an updated version of their Responsible Scaling Policy (RSP), prompting us to reassess their score in our ratings. We were initially expecting an improvement. Unfortunately, the results are disconc
+    contentLength: 58031
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.nist.gov/news-events/news/2024/12/nist-releases-pre-deployment-safety-evaluation-openais-o1-model
+    linkText: Pre-Deployment Evaluation of OpenAI's o1 Model (NIST, December 2024)
+    claimContext: The [joint US AISI and UK AISI evaluation](https://www.nist.gov/news-events/news/2024/12/nist-releases-pre-deployment-safety-evaluation-openais-o1-model) of OpenAI's o1 model noted that testing was "conducted in a limited time period with finite resources, which if extended could expand the scope of
+    fetchedAt: 2026-02-22T02:24:51.652Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 8
+    url: https://metr.org/blog/2024-11-13-ai-models-can-be-dangerous-before-public-deployment/
+    linkText: AI models can be dangerous before public deployment (METR, November 13, 2024)
+    claimContext: "- More time than companies typically provide - Information about technical methodologies that companies often withhold[^8]"
+    fetchedAt: 2026-02-22T02:24:51.930Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 9
+    url: https://www.hackerone.com/ai-red-teaming
+    linkText: AI Red Teaming | Offensive Testing for AI Models (HackerOne, 2025)
+    claimContext: External red teaming has become standard practice at major labs, with over [750 AI-focused researchers contributing through HackerOne](https://www.hackerone.com/ai-red-teaming) across 1,700+ AI assets tested.[^9]
+    fetchedAt: 2026-02-22T02:24:53.804Z
+    httpStatus: 200
+    pageTitle: AI Red Teaming | Offensive Testing for AI Models | HackerOne
+    contentSnippet: AI Red Teaming | Offensive Testing for AI Models | HackerOne Skip to main content HackerOne AI Red Teaming Strengthen AI safety, security, and trust before you ship Expose jailbreaks, misalignment, and policy violations through real-world attacks run by top-ranked AI security researchers. Get Started Speak with a Security Expert Key Benefits How it Works Resources Key Benefits Human-led testing that uncovers critical AI vulnerabilities HackerOne AI Red Teaming applies adversarial testing to your
+    contentLength: 245745
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.anthropic.com/news/jailbreak-challenge
+    linkText: Jailbreak Challenge Results (Anthropic, 2025)
+    claimContext: "- **Borderline-universal jailbreak:** Another team achieved near-complete bypass - **Multiple pathway exploitation:** Two teams passed all eight levels using various individual jailbreaks[^10]"
+    fetchedAt: 2026-02-22T02:24:53.530Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 11
+    url: https://www.cisa.gov/sites/default/files/2024-11/CISA_AI_Red_Teaming_Guide.pdf
+    linkText: "AI Red Teaming: Applying Software TEVV for AI Evaluations (CISA, November 2024)"
+    claimContext: "[CISA defines AI red teaming](https://www.cisa.gov/sites/default/files/2024-11/CISA_AI_Red_Teaming_Guide.pdf) as a subset of AI Testing, Evaluation, Verification and Validation (TEVV), with NIST operationalizing this through programs like Assessing Risks and Impacts of AI (ARIA) and the GenAI Challe"
+    fetchedAt: 2026-02-22T02:24:53.939Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 14
+    url: https://www.dwt.com/blogs/artificial-intelligence-law-advisor/2025/12/new-york-raise-act-ai-safety-rules-developers
+    linkText: New York Enacts RAISE Act for AI Transparency Amid Federal Preemption Debate (Davis Wright Tremaine, December 19, 2025)
+    claimContext: "**New York RAISE Act:** Governor Kathy Hochul [signed the Responsible AI Safety and Education Act](https://www.dwt.com/blogs/artificial-intelligence-law-advisor/2025/12/new-york-raise-act-ai-safety-rules-developers) in December 2025, establishing the nation's first comprehensive reporting and safety"
+    fetchedAt: 2026-02-22T02:24:53.837Z
+    httpStatus: 200
+    pageTitle: New York Enacts RAISE Act for AI Transparency Amid Federal Preemption Debate | Davis Wright Tremaine
+    contentSnippet: "New York Enacts RAISE Act for AI Transparency Amid Federal Preemption Debate | Davis Wright Tremaine Skip to content People Services Insights About Offices Careers Menu Search Search Perform Search Insights Artificial Intelligence New York Enacts RAISE Act for AI Transparency Amid Federal Preemption Debate New reporting and safety act applicable for large developers of significant models is likely to be challenged by the Trump Administration By Wendy Kearns , Apurva Dharia , and Andrew M. Lewis "
+    contentLength: 54391
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+    linkText: Ensuring a National Policy Framework for Artificial Intelligence (The White House, December 11, 2025)
+    claimContext: "**Federal Preemption Conflict:** The RAISE Act highlights tension between state and federal AI regulation following President Trump's [December 2025 executive order](https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/)"
+    fetchedAt: 2026-02-22T02:24:53.615Z
+    httpStatus: 200
+    pageTitle: Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House
+    contentSnippet: "Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House Presidential Actions ENSURING A NATIONAL POLICY FRAMEWORK FOR ARTIFICIAL INTELLIGENCE Executive Orders December 11, 2025 By the authority vested in me as President by the Constitution and the laws of the United States of America, it is hereby ordered: Section 1 . Purpose . United States leadership in Artificial Intelligence (AI) will promote United States national and economic security and dominance across m"
+    contentLength: 287718
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.getpassionfruit.com/blog/gpt-5-1-vs-claude-4-5-sonnet-vs-gemini-3-pro-vs-deepseek-v3-2-the-definitive-2025-ai-model-comparison
+    linkText: "GPT 5.1 vs Claude 4.5 vs Gemini 3: 2025 AI Comparison (PassionFruit, 2025)"
+    claimContext: "**Claude 4.5 Achievement:** The model achieved a [98.7% safety score](https://www.getpassionfruit.com/blog/gpt-5-1-vs-claude-4-5-sonnet-vs-gemini-3-pro-vs-deepseek-v3-2-the-definitive-2025-ai-model-comparison) and became the first model to never engage in blackmail during alignment testing scenarios"
+    fetchedAt: 2026-02-22T02:24:55.616Z
+    httpStatus: 200
+    pageTitle: "GPT 5.1 vs Claude 4.5 vs Gemini 3: 2025 AI Comparison"
+    contentSnippet: "GPT 5.1 vs Claude 4.5 vs Gemini 3: 2025 AI Comparison AI AI AI GPT 5.1 vs Claude 4.5 Sonnet vs Gemini 3 Pro vs DeepSeek-V3.2: The definitive 2025 AI model comparison December 3, 2025 Summarize this article with Summarize this article with ChatGPT Perplexity Google AI Grok Claude Table of Contents Don’t Just Read About SEO & GEO Experience The Future. Don’t Just Read About SEO & GEO Experience The Future. Join 500+ brands growing with Passionfruit! Book a Call Book a Call Book a Call Gemini 3 Pro"
+    contentLength: 812170
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://fourweekmba.com/the-open-model-convergence-how-the-frontier-gap-collapsed-to-6-months/
+    linkText: "The Open Model Convergence: How the Frontier Gap Collapsed to 6 Months (FourWeekMBA, 2025)"
+    claimContext: "**Industry Impact:** DeepSeek R1's performance parity with closed models while operating at [1/27th the token cost](https://fourweekmba.com/the-open-model-convergence-how-the-frontier-gap-collapsed-to-6-months/) fundamentally altered competitive dynamics.[^19]"
+    fetchedAt: 2026-02-22T02:24:57.523Z
+    httpStatus: 200
+    pageTitle: "The Open Model Convergence: How the Frontier Gap Collapsed to 6 Months - FourWeekMBA"
+    contentSnippet: "The Open Model Convergence: How the Frontier Gap Collapsed to 6 Months - FourWeekMBA Skip to content The gap between proprietary frontier models and open-weight alternatives has collapsed. Open models now reach frontier performance within six months of closed releases — a timeline that seemed impossible just two years ago. Table of Contents Toggle The Inflection Point: DeepSeek R1 The moment everything changed came in early 2025 when DeepSeek R1 dropped — a Chinese lab releasing an open reasonin"
+    contentLength: 357635
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.lesswrong.com/posts/8QjAnWyuE9fktPRgS/ai-safety-field-growth-analysis-2025
+    linkText: AI Safety Field Growth Analysis 2025 (LessWrong, 2025)
+    claimContext: "- **Anthropic:** Grew >3x since 2022 - **Google DeepMind:** Grew >3x since 2022[^21]"
+    fetchedAt: 2026-02-22T02:24:55.708Z
+    httpStatus: 200
+    pageTitle: AI Safety Field Growth Analysis 2025 — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI Safety Field Growth Analysis 2025 — LessWrong AI Alignment Fieldbuilding AI Frontpage 30 AI Safety Field Growth Analysis 2025 by Stephen McAleese 27th Sep 2025 3 min read 14 30 Summary The goal of this post is to analyze the growth of the technical and non-technical AI safety fields in terms of the number of organizations and number of FTEs working in these fields. "
+    contentLength: 789934
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.congress.gov/bill/119th-congress/senate-bill/1792/text
+    linkText: S.1792 - AI Whistleblower Protection Act (U.S. Congress, May 2025)
+    claimContext: '- Shields against retaliation for reporting violations - Addresses restrictive severance and NDAs creating "chilling effect"[^23]'
+    fetchedAt: 2026-02-22T02:24:55.520Z
+    httpStatus: 200
+    pageTitle: "Text - S.1792 - 119th Congress (2025-2026): AI Whistleblower Protection Act | Congress.gov | Library of Congress"
+    contentSnippet: "Text - S.1792 - 119th Congress (2025-2026): AI Whistleblower Protection Act | Congress.gov | Library of Congress skip to main content Alert: For a better experience on Congress.gov, please enable JavaScript in your browser. Citation Subscribe Share/Save Site Feedback Home > Legislation > 119th Congress > S.1792 S.1792 - AI Whistleblower Protection Act 119th Congress (2025-2026) | Bill Hide Overview Sponsor: Sen. Grassley, Chuck [R-IA] (Introduced 05/15/2025) Committees: Senate - Health, Educatio"
+    contentLength: 377073
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.sfpublicpress.org/californias-new-ai-safety-law-created-the-illusion-of-whistleblower-protections/
+    linkText: California AI Law Created Illusion of Whistleblower Protections (SF Public Press, 2025)
+    claimContext: '- **Three of four types** require injury or death has already occurred - Fourth requires accurate prediction of "catastrophic mass casualty event"[^24]'
+    fetchedAt: 2026-02-22T02:24:56.497Z
+    httpStatus: 200
+    pageTitle: California AI Law Created Illusion of Whistleblower Protections
+    contentSnippet: "California AI Law Created Illusion of Whistleblower Protections Close Search for: Search Close Skip to content Three AI whistleblowers and a researcher warned in a congressional hearing last year that tech firms would use financial pressure and threats to squelch complaints about their safety practices. Credit: C-SPAN For two years, state Sen. Scott Wiener worked to enact regulation to limit the risk of accidents, cybercrimes and other catastrophes posed by technologies emerging in San Francisco"
+    contentLength: 305532
+    status: verified
+    note: null

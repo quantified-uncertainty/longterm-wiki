@@ -1,0 +1,139 @@
+pageId: short-timeline-policy-implications
+verifiedAt: 2026-02-22
+totalCitations: 12
+verified: 8
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.alignmentforum.org/posts/bb5Tnjdrptu89rcyY/what-s-the-short-timeline-plan
+    linkText: What's the Short Timeline Plan — - <EntityLink id="alignment">AI Alignment</EntityLink> Forum
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:04.431Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 2
+    url: https://www.forethought.org/research/short-timelines-arent-obviously-higher-leverage
+    linkText: Short Timelines Aren't Obviously Higher Leverage — - Forethought Foundation
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:26:58.743Z
+    httpStatus: 200
+    pageTitle: Short AI Timelines Aren’t Always Higher-Leverage
+    contentSnippet: Short AI Timelines Aren’t Always Higher-Leverage Short Timelines Aren&#x27;t Obviously Higher-Leverage William MacAskill Mia Taylor Citations Cite Citations PDF Contact 22nd January 2026 Short Timelines Aren&#x27;t Obviously Higher-Leverage Summary Timelines scenarios and why they’re action-relevant Understanding leverage Takeover impact The default value of the future is higher on medium timelines than short or long timelines Shorter timelines allow for larger AI takeover risk reduction Whether
+    contentLength: 229666
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://helentoner.substack.com/p/long-timelines-to-advanced-ai-have
+    linkText: Long Timelines to Advanced AI Have Changed My Mind — - <EntityLink id="helen-toner">Helen Toner</EntityLink>
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:26:58.096Z
+    httpStatus: 200
+    pageTitle: '"Long" timelines to advanced AI have gotten crazy short'
+    contentSnippet: '"Long" timelines to advanced AI have gotten crazy short Rising Tide Subscribe Sign in "Long" timelines to advanced AI have gotten crazy short The prospect of reaching human-level AI in the 2030s should be jarring Helen Toner Apr 01, 2025 155 20 19 Share Welcome to Rising Tide! I’m publishing 3 posts this week to celebrate the launch of this Substack—this is post #1. New posts will be more intermittent after this week. Subscribe to get them straight in your inbox: Subscribe Source It used to be a'
+    contentLength: 190098
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://fortune.com/2025/04/15/ai-timelines-agi-safety/
+    linkText: AI Timelines and AGI Safety — - Fortune
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:26:58.225Z
+    httpStatus: 200
+    pageTitle: AI industry &#x27;timelines&#x27; to human-like AGI are getting shorter. But AI safety is becoming less of a focus at top labs | Fortune
+    contentSnippet: "AI industry &#x27;timelines&#x27; to human-like AGI are getting shorter. But AI safety is becoming less of a focus at top labs | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Newsletters Eye on AI AI industry ‘timelines’ to human-like AGI are getting shorter. But AI safety is getting increasingly short shrift By Jeremy Kahn Jeremy Kahn Editor, AI Down Arrow Button Icon By Jeremy Kahn Jeremy Kahn Editor, AI Down Arrow Button Icon April 15, 2025, 1:00 PM ET "
+    contentLength: 495526
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://artificialintelligenceact.eu/implementation-timeline/
+    linkText: EU AI Act Implementation Timeline — - AI Act Portal
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:26:58.255Z
+    httpStatus: 200
+    pageTitle: Implementation Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Implementation Timeline | EU Artificial Intelligence Act 🔔 Alert: The Future of Life Institute (owner of this website) is hiring an EU Policy Lead to spearhead our work on AI Act enforcement and translate our outputs for non-Brussels audiences; Salary up to €135,000/yr | Apply by 30 Nov Implementation Timeline This page lists all of the key dates you need to be aware of relating to the implementation of the EU AI Act. Related resources  Tasks and Responbilities For a summary of all tasks and r"
+    contentLength: 161362
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.alignmentforum.org/posts/xnJDHGCkcKcmtHs5y/ai-control-improving-safety-despite-intentional-subversion
+    linkText: AI Control Agenda — - AI Alignment Forum
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:11.646Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 7
+    url: https://www.governance.ai/research-paper/computing-power-and-the-governance-of-ai
+    linkText: Compute Governance and International Security — - <EntityLink id="govai">GovAI</EntityLink>
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:06.235Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 8
+    url: https://techpolicy.press/expert-predictions-on-whats-at-stake-in-ai-policy-in-2026
+    linkText: Expert Predictions on What's at Stake in AI Policy in 2026 — - Tech Policy Press
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:07.393Z
+    httpStatus: 200
+    pageTitle: Expert Predictions on What’s at Stake in AI Policy in 2026 | TechPolicy.Press
+    contentSnippet: Expert Predictions on What’s at Stake in AI Policy in 2026 | TechPolicy.Press Perspective Expert Predictions on What’s at Stake in AI Policy in 2026 J.B. Branch, Ilana Beller / Jan 6, 2026 J.B. Branch is the Big Tech accountability advocate for Public Citizen’s Congress Watch division, and Ilana Beller leads Public Citizen’s state legislative work relating to artificial intelligence. US President Donald Trump displays a signed executive order as (L-R) Sen. Ted Cruz (R-TX), Commerce Secretary How
+    contentLength: 187649
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.alignmentforum.org/posts/6Xgy6CAf2jqHhynHL/what-2026-looks-like
+    linkText: What 2026 Looks Like — - AI Alignment Forum
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:12.111Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 10
+    url: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
+    linkText: Responsible Scaling Policies — - <EntityLink id="anthropic">Anthropic</EntityLink>
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:05.737Z
+    httpStatus: 200
+    pageTitle: Anthropic&#x27;s Responsible Scaling Policy \ Anthropic
+    contentSnippet: Announcements Anthropic&#x27;s Responsible Scaling Policy Sep 19, 2023 Today, we’re publishing our Responsible Scaling Policy (RSP) – a series of technical and organizational protocols that we’re adopting to help us manage the risks of developing increasingly capable AI systems. As AI models become more capable, we believe that they will create major economic and social value, but will also present increasingly severe risks. Our RSP focuses on catastrophic risks – those where an AI model directl
+    contentLength: 135366
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.matsprogram.org/
+    linkText: MATS Program — - ML Alignment Theory Scholars
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:15.108Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.frontiermodelforum.org/
+    linkText: Frontier Model Forum — - Frontier Model Forum
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:27:13.646Z
+    httpStatus: 200
+    pageTitle: Frontier Model Forum
+    contentSnippet: "Frontier Model Forum Frontier Model Forum: Advancing frontier AI safety and security The Frontier Model Forum draws on the technical and operational expertise of its member companies to ensure that the most advanced AI systems remain safe and secure, so that they can meet society’s most pressing needs. What the Frontier Model Forum does The Frontier Model Forum is an industry-supported non-profit focused on addressing significant risks to public safety and national security. We have three core m"
+    contentLength: 116882
+    status: verified
+    note: null

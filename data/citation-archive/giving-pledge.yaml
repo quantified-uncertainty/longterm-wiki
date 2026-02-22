@@ -1,0 +1,403 @@
+pageId: giving-pledge
+verifiedAt: 2026-02-22
+totalCitations: 36
+verified: 31
+broken: 5
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://ips-dc.org/report-giving-pledge-at-15/
+    linkText: Institute for Policy Studies - The Giving Pledge at 15
+    claimContext: "| **Binding Nature** | Voluntary, non-binding public pledge | | **Fulfillment Rate** | Only 36% of deceased original pledgers met the 50% commitment[^1] | | **Wealth Growth** | Original U.S. pledgers saw 166% inflation-adjusted wealth increase since 2010[^1] |"
+    fetchedAt: 2026-02-22T02:15:01.314Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge at 15 - Institute for Policy Studies
+    contentSnippet: "The Giving Pledge at 15 - Institute for Policy Studies Skip to content In this report Introduction Key Findings Recommendations See press release Download report To speak with an expert, contact IPS Deputy Communications Director Olivia Alperstein olivia@ips-dc.org . For recent press statements, visit our Press page . Share: Introduction “There’s never been a greater need for philanthropy — and there has never been a greater opportunity to have an impact in our own lifetimes,” said Bill Gates wh"
+    contentLength: 111767
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.givingpledge.org/about-the-giving-pledge/
+    linkText: Giving Pledge - About
+    claimContext: "The **Giving Pledge** is a philanthropic initiative founded in 2010 by Bill Gates, Melinda French Gates, and Warren Buffett that commits the world's wealthiest individuals to donate the majority of their wealth to charitable causes during their lifetime or through their wills[^2][^3]. As of October "
+    fetchedAt: 2026-02-22T02:15:01.138Z
+    httpStatus: 200
+    pageTitle: About the Giving Pledge
+    contentSnippet: About the Giving Pledge Skip to content About the Giving Pledge Joining the Giving Pledge is more than a one-time event—it means becoming part of an energized community of some of the world’s most engaged philanthropists. Fifteen years since its founding, the Giving Pledge has created new norms of generosity and evolved into a connected, forward-thinking, and active global learning community. How it began Founded by Bill Gates, Melinda French Gates, and Warren Buffett, the Giving Pledge launched
+    contentLength: 81278
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.givingpledge.org/about-the-giving-pledge/
+    linkText: Giving Pledge - About the Giving Pledge
+    claimContext: "The **Giving Pledge** is a philanthropic initiative founded in 2010 by Bill Gates, Melinda French Gates, and Warren Buffett that commits the world's wealthiest individuals to donate the majority of their wealth to charitable causes during their lifetime or through their wills[^2][^3]. As of October "
+    fetchedAt: 2026-02-22T02:15:00.882Z
+    httpStatus: 200
+    pageTitle: About the Giving Pledge
+    contentSnippet: About the Giving Pledge Skip to content About the Giving Pledge Joining the Giving Pledge is more than a one-time event—it means becoming part of an energized community of some of the world’s most engaged philanthropists. Fifteen years since its founding, the Giving Pledge has created new norms of generosity and evolved into a connected, forward-thinking, and active global learning community. How it began Founded by Bill Gates, Melinda French Gates, and Warren Buffett, the Giving Pledge launched
+    contentLength: 81278
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://en.wikipedia.org/wiki/The_Giving_Pledge
+    linkText: Wikipedia - The Giving Pledge
+    claimContext: "The **Giving Pledge** is a philanthropic initiative founded in 2010 by Bill Gates, Melinda French Gates, and Warren Buffett that commits the world's wealthiest individuals to donate the majority of their wealth to charitable causes during their lifetime or through their wills[^2][^3]. As of October "
+    fetchedAt: 2026-02-22T02:14:59.991Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 5
+    url: https://www.givingpledge.org/wp-content/uploads/2025/08/The-Giving-Pledge-Fact-Sheet-August-2025.pdf
+    linkText: Giving Pledge - Fact Sheet August 2025
+    claimContext: Rather than pooling or directing funds, the initiative creates a public commitment framework where signatories pursue their philanthropy independently while connecting with a global community of like-minded philanthropists[^5]. The pledge is not legally binding—it is a moral promise accompanied by a
+    fetchedAt: 2026-02-22T02:15:00.660Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 461459
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.britannica.com/money/the-Giving-Pledge
+    linkText: Britannica - The Giving Pledge
+    claimContext: Rather than pooling or directing funds, the initiative creates a public commitment framework where signatories pursue their philanthropy independently while connecting with a global community of like-minded philanthropists[^5]. The pledge is not legally binding—it is a moral promise accompanied by a
+    fetchedAt: 2026-02-22T02:15:02.992Z
+    httpStatus: 200
+    pageTitle: Giving Pledge | Bill Gates, Warren Buffett, Billionaire Philanthropy, Criticism, & Impact | Britannica Money
+    contentSnippet: "Giving Pledge | Bill Gates, Warren Buffett, Billionaire Philanthropy, Criticism, & Impact | Britannica Money Table of Contents Introduction How does the Giving Pledge work? Who has signed the Giving Pledge? Impact and criticism of the Giving Pledge Charles Feeney’s legacy References Read More relief entitlement social security Table Of Contents Billionaires giving it all away: How the Giving Pledge works (and doesn’t work) Print Cite Share Written by Tracy Grant Tracy Grant Tracy Grant is a seni"
+    contentLength: 146042
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://nonprofitquarterly.org/the-giving-pledge-at-15-philanthropic-catalyst-empty-promise-or-both/
+    linkText: Nonprofit Quarterly - The Giving Pledge at 15
+    claimContext: However, a 2025 analysis by the Institute for Policy Studies revealed significant gaps between pledges and actual giving. Among the 22 original pledgers who have died, only 8 gave away enough to meet the "half of wealth" commitment by the time of their death[^1]. The 32 original U.S. pledgers who re
+    fetchedAt: 2026-02-22T02:15:03.689Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge at 15—Philanthropic Catalyst, Empty Promise, or Both? | Nonprofit Quarterly | Civic News. Empowering Nonprofits. Advancing Justice.
+    contentSnippet: "The Giving Pledge at 15—Philanthropic Catalyst, Empty Promise, or Both? | Nonprofit Quarterly | Civic News. Empowering Nonprofits. Advancing Justice. Donate --> The Giving Pledge at 15—Philanthropic Catalyst, Empty Promise, or Both? Steve Dubb October 27, 2025 Image Credit: Kjetil Ree on wikimedia Commons At the time, The New York Times called the 2010 creation of what became known as The Giving Pledge , “The biggest event in philanthropy this year…a commitment by 40 of the wealthiest Americans "
+    contentLength: 152254
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.givingpledge.org/frequently-asked-questions/
+    linkText: Giving Pledge - FAQ
+    claimContext: The Giving Pledge was formally announced in June 2010, with Bill Gates, Melinda French Gates, and Warren Buffett beginning to recruit members[^8]. The initiative was inspired by philanthropist Chuck Feeney's "giving while living" ethic—Feeney gave away over \$8 billion during his lifetime, surrender
+    fetchedAt: 2026-02-22T02:15:02.788Z
+    httpStatus: 200
+    pageTitle: Frequently asked questions - The Giving Pledge
+    contentSnippet: Frequently asked questions - The Giving Pledge Skip to content Frequently asked questions Questions and answers about the Giving Pledge General questions What is the Giving Pledge? The Giving Pledge is a promise by the world’s wealthiest philanthropists to give the majority of their wealth to charitable causes in their lifetime or wills. Today, building on that promise, the Giving Pledge has grown into a global community that actively connects to each other and to changemakers across critical se
+    contentLength: 102525
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.atlanticphilanthropies.org/wp-content/uploads/2017/05/History_of_the_Giving_While_Living_Ethic.pdf
+    linkText: Atlantic Philanthropies - History of the Giving While Living Ethic
+    claimContext: The Giving Pledge was formally announced in June 2010, with Bill Gates, Melinda French Gates, and Warren Buffett beginning to recruit members[^8]. The initiative was inspired by philanthropist Chuck Feeney's "giving while living" ethic—Feeney gave away over \$8 billion during his lifetime, surrender
+    fetchedAt: 2026-02-22T02:15:02.872Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 265174
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://ips-dc.org/report-giving-pledge-at-15/
+    linkText: IPS Report - Giving Pledge at 15
+    claimContext: The Giving Pledge was formally announced in June 2010, with Bill Gates, Melinda French Gates, and Warren Buffett beginning to recruit members[^8]. The initiative was inspired by philanthropist Chuck Feeney's "giving while living" ethic—Feeney gave away over \$8 billion during his lifetime, surrender
+    fetchedAt: 2026-02-22T02:15:03.265Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge at 15 - Institute for Policy Studies
+    contentSnippet: "The Giving Pledge at 15 - Institute for Policy Studies Skip to content In this report Introduction Key Findings Recommendations See press release Download report To speak with an expert, contact IPS Deputy Communications Director Olivia Alperstein olivia@ips-dc.org . For recent press statements, visit our Press page . Share: Introduction “There’s never been a greater need for philanthropy — and there has never been a greater opportunity to have an impact in our own lifetimes,” said Bill Gates wh"
+    contentLength: 111766
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.britannica.com/money/the-Giving-Pledge
+    linkText: Britannica - Giving Pledge History
+    claimContext: "The first 40 signatories were confirmed in August 2010, all from the United States, with an aggregate wealth of \\$125 billion[^8][^11]. By April 2011, 69 billionaires had joined, and by 2012, the total reached 81[^12]. The pledge expanded internationally over time, growing to 158 signatories by May "
+    fetchedAt: 2026-02-22T02:15:05.011Z
+    httpStatus: 200
+    pageTitle: Giving Pledge | Bill Gates, Warren Buffett, Billionaire Philanthropy, Criticism, & Impact | Britannica Money
+    contentSnippet: "Giving Pledge | Bill Gates, Warren Buffett, Billionaire Philanthropy, Criticism, & Impact | Britannica Money Table of Contents Introduction How does the Giving Pledge work? Who has signed the Giving Pledge? Impact and criticism of the Giving Pledge Charles Feeney’s legacy References Read More relief entitlement social security Table Of Contents Billionaires giving it all away: How the Giving Pledge works (and doesn’t work) Print Cite Share Written by Tracy Grant Tracy Grant Tracy Grant is a seni"
+    contentLength: 146042
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://en.wikipedia.org/wiki/The_Giving_Pledge
+    linkText: Wikipedia - Giving Pledge History
+    claimContext: "The first 40 signatories were confirmed in August 2010, all from the United States, with an aggregate wealth of \\$125 billion[^8][^11]. By April 2011, 69 billionaires had joined, and by 2012, the total reached 81[^12]. The pledge expanded internationally over time, growing to 158 signatories by May "
+    fetchedAt: 2026-02-22T02:15:04.711Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 13
+    url: https://ips-dc.org/report-giving-pledge-at-15/
+    linkText: IPS - Giving Pledge at 15 Analysis
+    claimContext: 'Notable milestones include: - **2010**: Launch with 40 U.S. signatories representing about 14% of U.S. billionaires at the time[^13] - **2014**: Launch of "Next Gen" group for children and grandchildren of pledgers to connect and support family philanthropy[^2][^3]'
+    fetchedAt: 2026-02-22T02:15:05.609Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge at 15 - Institute for Policy Studies
+    contentSnippet: "The Giving Pledge at 15 - Institute for Policy Studies Skip to content In this report Introduction Key Findings Recommendations See press release Download report To speak with an expert, contact IPS Deputy Communications Director Olivia Alperstein olivia@ips-dc.org . For recent press statements, visit our Press page . Share: Introduction “There’s never been a greater need for philanthropy — and there has never been a greater opportunity to have an impact in our own lifetimes,” said Bill Gates wh"
+    contentLength: 111767
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://observer.com/2025/12/billionaire-families-join-giving-pledge-2025/
+    linkText: Observer - Billionaire Families Join Giving Pledge 2025
+    claimContext: "In 2025, 14 new billionaires joined the pledge, including founders of Moderna, Canva, and Craigslist[^14]. Notable new signatories include:"
+    fetchedAt: 2026-02-22T02:15:05.059Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 15
+    url: https://www.insidephilanthropy.com/home/heres-who-signed-the-giving-pledge-in-2025
+    linkText: Inside Philanthropy - Who Signed the Giving Pledge in 2025
+    claimContext: "- **Cameron Adams and Lisa Miller** (Canva co-founders): Directing wealth toward biodiversity protection through the Wedgetail Foundation[^15] - **Glen Tullman** (CEO of Transcarent): Focusing on education, health, and diabetes research[^15]"
+    fetchedAt: 2026-02-22T02:15:05.760Z
+    httpStatus: 200
+    pageTitle: Who signed the Giving Pledge in 2025? | Inside Philanthropy
+    contentSnippet: "Who signed the Giving Pledge in 2025? | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer Credit: New Africa/Shutterstock Fifteen years ago, megabillionaires Bill Gates, Melinda French Gates and Warren Buffett launched the Giving Pledge, in which the richest philanthropists in the world promise to give away most of their wealth to charitable causes either during their lifetimes or upon death. This year, 14 new pledgers have signed on. Although"
+    contentLength: 305314
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://prospect.org/2019/11/08/billionaire-class-created-failed-wealth-tax-giving-pledge/
+    linkText: The Prospect - Billionaire Class Created Failed Wealth Tax
+    claimContext: '- Of the 22 original pledgers who have died, only 8 (36%) actually gave away enough to meet the "half of wealth" commitment by the time of their death[^1] - Examples of non-fulfillment include Paul Allen, who pledged in 2010 with a \$13.5 billion net worth, donated \$2 billion during his lifetime, b'
+    fetchedAt: 2026-02-22T02:15:07.338Z
+    httpStatus: 200
+    pageTitle: The Billionaire Class Created Their Own Wealth Tax. It Failed. - The American Prospect
+    contentSnippet: The Billionaire Class Created Their Own Wealth Tax. It Failed. - The American Prospect Get the latest stories from The Prospect delivered right to your inbox for the in-depth analysis you need. The Daily Prospect Today On TAP Weekend Reads Pop-up newsletters Sign up The latest stories from the Prospect —delivered straight to your inbox for the in-depth analysis you need. The Daily Prospect A daily dose of the ideas, politics and power that shape our world, in your inbox weekday mornings. Today O
+    contentLength: 219628
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://capitalresearch.org/article/a-report-on-the-giving-pledge-wealth-is-growing-faster-than-its-given-away/
+    linkText: Capital Research - Report on the Giving Pledge
+    claimContext: "- In absolute terms, these pledgers saw a 283% increase in wealth (non-inflation-adjusted)[^1] - Approximately 75% of living original U.S. pledgers remain billionaires and are wealthier than when they signed[^17]"
+    fetchedAt: 2026-02-22T02:15:07.198Z
+    httpStatus: 200
+    pageTitle: "A report on the Giving Pledge: Wealth is growing faster than it’s given away -Capital Research Center"
+    contentSnippet: "A report on the Giving Pledge: Wealth is growing faster than it’s given away -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Philanthropy A report on the Giving Pledge: W"
+    contentLength: 105964
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.cummingsfoundation.org/about/giving-pledge.html
+    linkText: Cummings Foundation - Giving Pledge
+    claimContext: "2. **Individual Autonomy**: Members give at their own pace in multiple ways, with no requirement to support specific causes[^5] 3. **Community Learning**: The initiative holds learning sessions throughout the year, including an annual two-day conference where members discuss experiences and learn fr"
+    fetchedAt: 2026-02-22T02:15:07.645Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge | Cummings Foundation
+    contentSnippet: The Giving Pledge | Cummings Foundation All Profits to Nonprofits &#8220;We have never particularly liked the expression about &#8216;giving until it hurts,&#8217; but rather we suggest that the better standard might be&#8212;&#8216;Give until it feels good.&#8217;&#8221; &#8212; From the closing of Bill and Joyce Cummings&#8217; Giving Pledge Letter Bill and Joyce Cummings visit the White House Give Until it Feels Good As of 2020, 210 prominent people or couples from 23 countries have joined Th
+    contentLength: 6688
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.givingpledge.org/wp-content/uploads/2025/08/The-Giving-Pledge-Fact-Sheet-August-2025.pdf
+    linkText: Giving Pledge Fact Sheet
+    claimContext: "The pledge primarily targets individuals with net worths of at least \\$1 billion (or equivalent after prior giving)[^19]. As of 2025, most signatories are billionaires, though not all pledgers meet this threshold[^12]. The demographic profile of signatories has been described as predominantly male, "
+    fetchedAt: 2026-02-22T02:15:06.837Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 461459
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8147574/
+    linkText: PMC - Billionaires in Global Philanthropy
+    claimContext: "The pledge primarily targets individuals with net worths of at least \\$1 billion (or equivalent after prior giving)[^19]. As of 2025, most signatories are billionaires, though not all pledgers meet this threshold[^12]. The demographic profile of signatories has been described as predominantly male, "
+    fetchedAt: 2026-02-22T02:15:06.929Z
+    httpStatus: 200
+    pageTitle: "Billionaires in Global Philanthropy: a Decade of the Giving Pledge - PMC"
+    contentSnippet: "Billionaires in Global Philanthropy: a Decade of the Giving Pledge - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM pr"
+    contentLength: 179213
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.founderspledge.com/research/building-global-resilience-to-ai-risks
+    linkText: Founders Pledge - Building Global Resilience to AI Risks
+    claimContext: '1. **Affiliated Giving Organizations**: Organizations like Founders Pledge and Giving What We Can have emphasized AI safety as a priority cause area, with Founders Pledge funding projects building "global resilience to AI risks"[^21]'
+    fetchedAt: 2026-02-22T02:15:09.460Z
+    httpStatus: 200
+    pageTitle: Building global resilience to AI risks
+    contentSnippet: "Building global resilience to AI risks Many philanthropists interested in reducing AI-related risks have focused on interventions that could help prevent the deployment of unsafe AI. Fewer funders are investing in resilience : defenses that help prepare us for scenarios after deployment, with the goal of preventing advanced AI from becoming an existential threat. Funding opportunities that boost global resilience to AI risks, such as by developing better warning systems and incident response pla"
+    contentLength: 174107
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.givingwhatwecan.org/cause-areas/reducing-global-catastrophic-risks/artificial-intelligence
+    linkText: Giving What We Can - Artificial Intelligence
+    claimContext: '2. **Effective Altruism Connections**: The pledge has influenced EA-focused giving initiatives, which have in turn supported AI safety research through organizations like <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="redwood-research">Redwood Research</EntityLink>, and <EntityLink id="ant'
+    fetchedAt: 2026-02-22T02:15:09.562Z
+    httpStatus: 200
+    pageTitle: Beneficial artificial intelligence · Giving What We Can
+    contentSnippet: "Beneficial artificial intelligence · Giving What We Can Beneficial artificial intelligence Why is ensuring beneficial AI important? Beneficial artificial intelligence Why is ensuring beneficial AI important? What is the potential scale of AI&#x27;s impact? Transformative AI AI as an existential risk Is promoting beneficial AI neglected? Is promoting beneficial AI tractable? How can we promote beneficial AI? Technical challenge: Ensuring AI systems are safe Political challenge: Promoting benefici"
+    contentLength: 268093
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://perlmanandperlman.com/charitable-pledge/
+    linkText: Perlman & Perlman - Charitable Pledge
+    claimContext: "- **Public Recognition Without Action**: Commentators note that some signatories may gain positive public recognition without necessarily donating the pledged share[^7] - **Non-Binding Promise**: As a moral promise rather than a legal contract (lacking elements like consideration), the pledge relies"
+    fetchedAt: 2026-02-22T02:15:09.310Z
+    httpStatus: 200
+    pageTitle: What Makes a Charitable Pledge Enforceable? - Perlman & Perlman
+    contentSnippet: What Makes a Charitable Pledge Enforceable? - Perlman & Perlman Skip to content What Makes a Charitable Pledge Enforceable? Courtney Darts April 17, 2024 📄 DOWNLOAD PDF Charitable pledges are powerful fundraising tools that enable donors to make meaningful contributions to causes they support over an extended period. However, if a donor fails to meet their commitment, and their pledge is not legally enforceable, it can have significant repercussions for the charity relying on that pledge to fun
+    contentLength: 184209
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://katiecouric.com/news/social-impact/billionaire-philanthropy-giving-pledge-failure/
+    linkText: Katie Couric - Billionaire Philanthropy Giving Pledge Failure
+    claimContext: "- **Wealth Growth Outpacing Giving**: For the original pledgers still alive, wealth has grown 166% (inflation-adjusted) since 2010, suggesting that fortunes are compounding faster than they're being given away[^1][^7] - **Examples of Tax Optimization**: Cases like Elon Musk's stock transfers and \"do"
+    fetchedAt: 2026-02-22T02:15:09.061Z
+    httpStatus: 200
+    pageTitle: Billionaire Philanthropy — How the Giving Pledge Fell Short
+    contentSnippet: Billionaire Philanthropy — How the Giving Pledge Fell Short Skip to content Search Search Share --> “‘Quiet luxury’ has been replaced by loud, proud, and flashy,” Katie Couric recently proclaimed , analyzing the June 2025 Bezos-Sanchez nuptials amid the shifting sands of billionaire etiquette. America’s wealthiest used to feel a sense of obligation to the public that toned down their largesse, or at least compelled them to give back more abundantly, she reasoned — which protected robber barons a
+    contentLength: 1018552
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://fortune.com/videos/watch/warren-buffett-admits-his-giving-pledge-philanthropy-was-not-%E2%80%9Cfeasible%E2%80%9D/369fb27f-1731-4f84-b68c-c686390cb129
+    linkText: Fortune - Warren Buffett Admits Giving Pledge Not Feasible
+    claimContext: "- Warren Buffett himself admitted in November 2025 that his Giving Pledge philanthropy approach was not \"feasible,\" indicating a rethinking of his fortune's allocation[^25] - Melinda French Gates, who left the Gates Foundation in 2024, has been critical of the billionaire class's giving patterns[^26"
+    fetchedAt: 2026-02-22T02:15:09.139Z
+    httpStatus: 200
+    pageTitle: Warren Buffett admits his Giving Pledge philanthropy was not “feasible”
+    contentSnippet: Warren Buffett admits his Giving Pledge philanthropy was not “feasible” Skip to Content Loading Video... News Warren Buffett admits his Giving Pledge philanthropy was not “feasible” November 12, 2025 22:00 PM UTC Warren Buffett—long known as one of the world’s most successful investors and committed philanthropists—is rethinking how his fortune will be spent. Sections Leadership Tags
+    contentLength: 80092
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://fortune.com/2025/12/04/melinda-french-gates-rips-billionaire-class-giving-pledge/
+    linkText: Fortune - Melinda French Gates Rips Billionaire Class
+    claimContext: "- Warren Buffett himself admitted in November 2025 that his Giving Pledge philanthropy approach was not \"feasible,\" indicating a rethinking of his fortune's allocation[^25] - Melinda French Gates, who left the Gates Foundation in 2024, has been critical of the billionaire class's giving patterns[^26"
+    fetchedAt: 2026-02-22T02:15:10.605Z
+    httpStatus: 200
+    pageTitle: Melinda French Gates rips into billionaire class, saying Giving Pledge has fallen short | Fortune
+    contentSnippet: "Melinda French Gates rips into billionaire class, saying Giving Pledge has fallen short | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Success philanthropy ‘Have they given enough? No’: Melinda French Gates rips into billionaire class, saying Giving Pledge has fallen short By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon December 4, 2025, 11:51 AM ET Add us on Melinda Fre"
+    contentLength: 467298
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://billhigh.com/generosity/what-happened-to-the-giving-pledge/
+    linkText: Bill High - What Happened to the Giving Pledge
+    claimContext: "- Melinda French Gates, who left the Gates Foundation in 2024, has been critical of the billionaire class's giving patterns[^26] - Despite the pledge, U.S. charitable giving has remained stagnant at approximately 2% of GDP for decades, failing to \"turbocharge\" donations as hoped[^27] - Fewer than 1 "
+    fetchedAt: 2026-02-22T02:15:11.612Z
+    httpStatus: 200
+    pageTitle: What Happened to the Giving Pledge? 10 Years Later | Bill High
+    contentSnippet: "What Happened to the Giving Pledge? 10 Years Later | Bill High The Giving Pledge. Bill Gates and Warren Buffett made it famous ten years ago. The idea was that billionaires would pledge half of their wealth to charitable causes during their lifetime or at death. The list was noteworthy. People like Ted Turner, Michael Bloomberg, Charles Feeney, George Soros and Oprah Winfrey all showed up. Marc Gunther, in his article “Good Intentions” in June’s Chronicle of Philanthropy, noted that while there "
+    contentLength: 154197
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.youtube.com/watch?v=1e4SdZqceGg
+    linkText: YouTube - Tim Schwab Talk on Gates Foundation
+    claimContext: "- **Tech-Heavy Focus**: The Bill & Melinda Gates Foundation has been criticized for a tech-centric approach that neglects social determinants of health, with controversies including vaccine inequity during COVID-19[^28][^29] - **Perpetuating Inequality**: The Institute for Policy Studies characteriz"
+    fetchedAt: 2026-02-22T02:15:10.870Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 29
+    url: https://247wallst.com/investing/2020/12/02/a-closer-look-failures-of-philanthropy/
+    linkText: 247 Wall St - Failures of Philanthropy
+    claimContext: "- **Tech-Heavy Focus**: The Bill & Melinda Gates Foundation has been criticized for a tech-centric approach that neglects social determinants of health, with controversies including vaccine inequity during COVID-19[^28][^29] - **Perpetuating Inequality**: The Institute for Policy Studies characteriz"
+    fetchedAt: 2026-02-22T02:15:12.327Z
+    httpStatus: 200
+    pageTitle: "A CLOSER LOOK: Failures of philanthropy - 24/7 Wall St."
+    contentSnippet: "A CLOSER LOOK: Failures of philanthropy - 24/7 Wall St. Skip to content S&P 500 6,914.00 +0.78% Dow Jones 49,633.70 +0.54% Nasdaq 100 25,028.00 +0.99% Russell 2000 2,665.63 +0.12% FTSE 100 10,735.40 +0.51% Nikkei 225 57,120.50 +0.05% Investing A CLOSER LOOK: Failures of philanthropy Follow 24/7 Wall St. on Google By Trey Thoelcke Updated Dec 2, 9:45AM EST · Published Dec 2, 7:10AM EST --> This post may contain links from our sponsors and affiliates, and Flywheel Publishing may receive compensati"
+    contentLength: 261537
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.alliancemagazine.org/blog/giving-pledge-billionaires-impoverish-public-life-and-leave-philanthropy-promise-unfulfilled-study-reveals/
+    linkText: Alliance Magazine - Giving Pledge Billionaires Impoverish Public Life
+    claimContext: "- **Tech-Heavy Focus**: The Bill & Melinda Gates Foundation has been criticized for a tech-centric approach that neglects social determinants of health, with controversies including vaccine inequity during COVID-19[^28][^29] - **Perpetuating Inequality**: The Institute for Policy Studies characteriz"
+    fetchedAt: 2026-02-22T02:15:12.101Z
+    httpStatus: 200
+    pageTitle: Giving Pledge billionaires ‘impoverish public life’ and leave philanthropy promise ‘unfulfilled’, study reveals - Alliance magazine
+    contentSnippet: Giving Pledge billionaires ‘impoverish public life’ and leave philanthropy promise ‘unfulfilled’, study reveals - Alliance magazine Donate --> Giving Pledge billionaires ‘impoverish public life’ and leave philanthropy promise ‘unfulfilled’, study reveals Shafi Musaddique 13 August 2025 0 Enjoying the Alliance blog? Subscribe to receive full access to all of our content. Find out more about Alliance subscriptions here Latest from Alliance Daily, free-to-view philanthropy content providing a space
+    contentLength: 122932
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://fortune.com/2025/12/04/melinda-french-gates-rips-billionaire-class-giving-pledge/
+    linkText: Fortune - Melinda French Gates December 2025
+    claimContext: '- In November 2025, Buffett admitted that his early "grand philanthropic plans" proved "not feasible"[^31][^27] - He noted he dislikes "preaching" about philanthropy[^27]'
+    fetchedAt: 2026-02-22T02:15:13.359Z
+    httpStatus: 200
+    pageTitle: Melinda French Gates rips into billionaire class, saying Giving Pledge has fallen short | Fortune
+    contentSnippet: "Melinda French Gates rips into billionaire class, saying Giving Pledge has fallen short | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Success philanthropy ‘Have they given enough? No’: Melinda French Gates rips into billionaire class, saying Giving Pledge has fallen short By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon December 4, 2025, 11:51 AM ET Add us on Melinda Fre"
+    contentLength: 467341
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://ips-dc.org/report-giving-pledge-at-15/
+    linkText: IPS - Giving Pledge at 15 Report
+    claimContext: "Bill Gates has remained the most vocal supporter of the pledge. In 2025, he announced a new class of pledgers and emphasized: \"There's never been a greater need for philanthropy — and there has never been a greater opportunity to have an impact in our own lifetimes.\"[^32][^26]"
+    fetchedAt: 2026-02-22T02:15:14.869Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge at 15 - Institute for Policy Studies
+    contentSnippet: "The Giving Pledge at 15 - Institute for Policy Studies Skip to content In this report Introduction Key Findings Recommendations See press release Download report To speak with an expert, contact IPS Deputy Communications Director Olivia Alperstein olivia@ips-dc.org . For recent press statements, visit our Press page . Share: Introduction “There’s never been a greater need for philanthropy — and there has never been a greater opportunity to have an impact in our own lifetimes,” said Bill Gates wh"
+    contentLength: 111766
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://forum.effectivealtruism.org/posts/74gbLxsFAiG33T8EL/why-i-donate-and-why-i-m-committing-to-a-dynamic-pledge
+    linkText: EA Forum - Why I Donate and Dynamic Pledge
+    claimContext: "- **GWWC 10% Pledge**: Lifetime commitment to donate 10% of income, targeting average earners rather than billionaires[^33][^34] - **Trial Pledges**: GWWC offers flexible 1-10% pledges for 6 months to 5 years[^34]"
+    fetchedAt: 2026-02-22T02:15:13.473Z
+    httpStatus: 200
+    pageTitle: Why I donate - and why I&#x27;m committing to a dynamic pledge — EA Forum
+    contentSnippet: Why I donate - and why I&#x27;m committing to a dynamic pledge — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Why I donate - and why I&#x27;m committing to a dynamic pledge by Tristan Katz Dec 9 2025 4 min read 9 53 Effective giving Donation pledge ‘Why I donate’ week (2025) Giving Season (2025) Frontpage Why I donate - and why I&#x27;m committing to a dynamic pledge My reasons for d
+    contentLength: 245476
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://forum.effectivealtruism.org/users/giving-what-we-can
+    linkText: EA Forum - Giving What We Can Users
+    claimContext: "- **GWWC 10% Pledge**: Lifetime commitment to donate 10% of income, targeting average earners rather than billionaires[^33][^34] - **Trial Pledges**: GWWC offers flexible 1-10% pledges for 6 months to 5 years[^34]"
+    fetchedAt: 2026-02-22T02:15:13.905Z
+    httpStatus: 200
+    pageTitle: Giving What We Can🔸 - EA Forum
+    contentSnippet: "Giving What We Can🔸 - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Giving What We Can 🔸 @ Giving What We Can 5916 karma Joined Nov 2021 givingwhatwecan.org Message Get notified Interests: Effective giving Participation 1 Organizer of Giving What We Can Posts 139 Sorted by New 7 Giving What We Can&#x27;s Quick takes Giving What We Can🔸 Giving What We Can🔸 · 1y ago · 1 m read 2 2 16 Hiring: Partnerships "
+    contentLength: 363266
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://forum.effectivealtruism.org/posts/8vdthvfNXc7J9MB6Q/rethinking-the-10-giving-pledge-questions-from-a-recent-grad
+    linkText: EA Forum - Rethinking the 10% Giving Pledge
+    claimContext: "- **Trial Pledges**: GWWC offers flexible 1-10% pledges for 6 months to 5 years[^34] - **Community Norms**: The 10% pledge is seen as an EA community standard, with discussions around income-scaled or dynamic pledges to address fairness concerns[^33][^35]"
+    fetchedAt: 2026-02-22T02:15:13.451Z
+    httpStatus: 200
+    pageTitle: "Rethinking the 10% Giving Pledge: Questions from a Recent Grad — EA Forum"
+    contentSnippet: "Rethinking the 10% Giving Pledge: Questions from a Recent Grad — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Rethinking the 10% Giving Pledge: Questions from a Recent Grad by satelliteprocess Apr 19 2025 2 min read 8 9 Career choice Effective giving 10% Pledge Career advising Donation pledge Frontpage Rethinking the 10% Giving Pledge: Questions from a Recent Grad Hi, 8 comments Hi, "
+    contentLength: 345310
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-ai-governance/
+    linkText: Coefficient Giving - AI Governance RFP
+    claimContext: "- **Founders Pledge**: Targets startup founders and has explicitly funded AI safety and governance work[^21] - **Coefficient Giving**: Operates an AI Governance Fund for proposals aimed at reducing global catastrophic risks[^36] - **Jewish Future Pledge**: Launched in 2020, inspired by the Giving Pl"
+    fetchedAt: 2026-02-22T02:15:22.498Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503

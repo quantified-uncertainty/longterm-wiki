@@ -1,0 +1,95 @@
+pageId: ai-impacts
+verifiedAt: 2026-02-22
+totalCitations: 8
+verified: 8
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://aiimpacts.org/about/
+    linkText: About - AI Impacts
+    claimContext: AI Impacts is a research organization dedicated to improving understanding of the likely impacts of human-level artificial intelligence (HLAI), particularly examining how contemporary choices affect long-term outcomes.[^1] The project organizes and presents considerations informing views on AI's soc
+    fetchedAt: 2026-02-22T02:28:05.837Z
+    httpStatus: 200
+    pageTitle: About &#8211; AI Impacts
+    contentSnippet: About &#8211; AI Impacts Thanks for visiting! This project aims to improve our understanding of the likely impacts of human-level artificial intelligence. The intended audience includes researchers doing work related to artificial intelligence, philanthropists involved in funding research related to artificial intelligence, and policy-makers whose decisions may be influenced by their expectations about artificial intelligence. The focus is particularly on the long-term impacts of sophisticated a
+    contentLength: 55146
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://eto.tech/blog/state-of-global-ai-safety-research/
+    linkText: State of Global AI Safety Research - ETO
+    claimContext: AI Impacts' work exists within a rapidly evolving landscape of AI safety research. Between 2017 and 2022, AI safety research grew by 315%, though it still comprises only approximately 2% of all AI research.[^2] Despite this small proportion, safety papers receive notably high citation rates—an avera
+    fetchedAt: 2026-02-22T02:28:05.861Z
+    httpStatus: 200
+    pageTitle: The state of global AI safety research – Emerging Technology Observatory
+    contentSnippet: The state of global AI safety research – Emerging Technology Observatory Back to blog The state of global AI safety research Originally published 2024-04-03 Topics Map of Science , Research Almanac , artificial intelligence , AI safety Share Insights from ETO&#x27;s Research Almanac and Map of Science 🔔 Attention Substack users! ETO blog posts are also available on Substack . Over the past several months, we&#x27;ve been busy improving and updating the research data that powers many of our tool
+    contentLength: 168714
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://aiimpacts.org/about/
+    linkText: About - AI Impacts
+    claimContext: AI Impacts was founded in the 2010s by Katja Grace, who serves as the organization's Lead Researcher.[^3] Grace's motivation stemmed from a desire to organize empirical evidence on AI outcomes and provide more rigorous analysis of questions about AI's future impacts.[^3] Her background spans philoso
+    fetchedAt: 2026-02-22T02:28:05.957Z
+    httpStatus: 200
+    pageTitle: About &#8211; AI Impacts
+    contentSnippet: About &#8211; AI Impacts Thanks for visiting! This project aims to improve our understanding of the likely impacts of human-level artificial intelligence. The intended audience includes researchers doing work related to artificial intelligence, philanthropists involved in funding research related to artificial intelligence, and policy-makers whose decisions may be influenced by their expectations about artificial intelligence. The focus is particularly on the long-term impacts of sophisticated a
+    contentLength: 55146
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://catalyze-impact.org/the-program
+    linkText: The Program - Catalyze Impact
+    claimContext: A 2024-2025 survey of 135 researchers at AI safety and governance organizations, which included AI Impacts, examined views on risk levels across the field.[^9] More broadly, recent surveys of 2,778 AI researchers found that nearly half estimate at least a 10% chance of catastrophic outcomes, includi
+    fetchedAt: 2026-02-22T02:28:05.821Z
+    httpStatus: 200
+    pageTitle: The Program | Catalyze
+    contentSnippet: "The Program | Catalyze The ai safety incubation program Join the next program Duration: 10 weeks (March-May) Cohort: ~20 Fellows Stipend: Up to $2,000/month Location: London, UK or the San Francisco Bay Area Our incubation program brings together founders, advisors, and funders to enable them to advance the AI safety field together. Our program is open to incubating both non-profit and for-profit companies.​ The information below is about our last program. We are currently not accepting applicat"
+    contentLength: 66786
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://aiimpacts.org/what-do-ml-researchers-think-about-ai-in-2022/
+    linkText: What do ML researchers think about AI in 2022? - AI Impacts
+    claimContext: AI Impacts has become a notable contributor to conversations about AI existential risk within the Effective Altruism and rationalist communities, conducting influential surveys of machine learning researchers about AI risk probabilities and timelines for human-level AI development.[^5]
+    fetchedAt: 2026-02-22T02:28:05.857Z
+    httpStatus: 200
+    pageTitle: What do ML researchers think about AI in 2022? &#8211; AI Impacts
+    contentSnippet: "What do ML researchers think about AI in 2022? &#8211; AI Impacts Katja Grace, 4 August 2022 AI Impacts just finished collecting data from a new survey of ML researchers, as similar to the 2016 one as practical, aside from a couple of new questions that seemed too interesting not to add. This page reports on it preliminarily, and we&#8217;ll be adding more details there. But so far, some things that might interest you: 37 years until a 50% chance of HLMI according to a complicated aggregate fore"
+    contentLength: 75543
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://safe.ai/work/press-release-ai-risk
+    linkText: "Press Release: AI Risk - Center for AI Safety"
+    claimContext: The <EntityLink id="cais">Center for AI Safety</EntityLink>, under director <EntityLink id="dan-hendrycks">Dan Hendrycks</EntityLink>, released a statement equating AI extinction risk to threats from pandemics and nuclear war, signed by researchers across multiple disciplines.[^7] A public poll foun
+    fetchedAt: 2026-02-22T02:28:07.314Z
+    httpStatus: 200
+    pageTitle: AI Extinction Statement Press Release | CAIS
+    contentSnippet: "AI Extinction Statement Press Release | CAIS AI risk Resources Contact Careers Donate Resources AI Risk Contact Careers Donate Careers Donate CAIS 2024 Impact Report CAIS 2024 Impact Report Top AI Scientists Warn: Risk of Extinction from AI on Scale with Nuclear War San Francisco, CA – Distinguished AI scientists, including Turing Award winners Geoffrey Hinton and Yoshua Bengio, and leaders of the major AI labs, including Sam Altman of OpenAI and Demis Hassabis of Google DeepMind, have signed a "
+    contentLength: 37627
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://aiimpacts.org/why-work-at-ai-impacts/
+    linkText: Why work at AI Impacts? - AI Impacts
+    claimContext: The organization positions AI risk as a top cause area due to what it characterizes as plausible existential threats from advanced AI.[^8] However, rather than focusing primarily on theoretical arguments about risk, AI Impacts emphasizes gathering empirical data about <EntityLink id="expert-opinion"
+    fetchedAt: 2026-02-22T02:28:07.118Z
+    httpStatus: 200
+    pageTitle: Why work at AI Impacts? &#8211; AI Impacts
+    contentSnippet: "Why work at AI Impacts? &#8211; AI Impacts Katja Grace, 6 March 2022 AI Impacts is beginning a serious hiring round (see here for job postings), so I’d like to explain a bit why it has been my own best guess at the highest impact place for me to work for me. (As in, this is a personal blog post by Katja on the AI Impacts blog, not some kind of officialesque missive from the organization.) But first— What is AI Impacts? AI Impacts is a few things: An online library of best-guess answers to questi"
+    contentLength: 69990
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://wiki.aiimpacts.org/uncategorized/ai_risk_surveys
+    linkText: AI Risk Surveys - AI Impacts Wiki
+    claimContext: Recent surveys conducted across AI safety and governance organizations have explored researcher views on various risk scenarios, contributing to broader understanding of how those working directly on these issues assess the severity and probability of different outcomes.[^9]
+    fetchedAt: 2026-02-22T02:28:07.531Z
+    httpStatus: 200
+    pageTitle: Surveys of experts on levels of AI Risk [AI Impacts Wiki]
+    contentSnippet: "Surveys of experts on levels of AI Risk [AI Impacts Wiki] skip to content AI Impacts Wiki User Tools Log In Site Tools Search Tools Show pagesource Old revisions Backlinks Recent Changes Media Manager Sitemap Log In > Recent Changes Media Manager Sitemap You are here: Welcome to the AI Impacts Wiki! » uncategorized » Surveys of experts on levels of AI Risk uncategorized:ai_risk_surveys Table of Contents Surveys of experts on levels of AI Risk Surveys of AI experts 2016 Expert Survey on Progress "
+    contentLength: 31937
+    status: verified
+    note: null

@@ -1,0 +1,557 @@
+pageId: goodfire
+verifiedAt: 2026-02-22
+totalCitations: 50
+verified: 47
+broken: 2
+unverifiable: 1
+citations:
+  - footnote: 1
+    url: https://www.cbinsights.com/company/goodfire-ai
+    linkText: Goodfire company overview
+    claimContext: Goodfire is an AI interpretability research lab and public benefit corporation specializing in mechanistic interpretability—the science of reverse-engineering neural networks to understand and control their internal workings.[^1] Founded in June 2024 by Eric Ho (CEO), Dan Balsam (CTO), and Tom McGra
+    fetchedAt: 2026-02-22T02:06:33.743Z
+    httpStatus: 200
+    pageTitle: Goodfire - Products, Competitors, Financials, Employees, Headquarters Locations
+    contentSnippet: Goodfire - Products, Competitors, Financials, Employees, Headquarters Locations Founded Year 2024 Stage Series B | Alive Total Raised $207.25M Valuation $0000 View Last Raised $150M | 17 days ago Mosaic Score The Mosaic Score is an algorithm that measures the overall financial health and market potential of private companies. +106 points in the past 30 days About Goodfire Goodfire focuses on the study and design of AI systems within the technology sector. The company provides a mechanistic inter
+    contentLength: 140584
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.goodfire.ai/company
+    linkText: Goodfire company website
+    claimContext: Goodfire is an AI interpretability research lab and public benefit corporation specializing in mechanistic interpretability—the science of reverse-engineering neural networks to understand and control their internal workings.[^1] Founded in June 2024 by Eric Ho (CEO), Dan Balsam (CTO), and Tom McGra
+    fetchedAt: 2026-02-22T02:06:33.248Z
+    httpStatus: 200
+    pageTitle: Company
+    contentSnippet: "Company Company About Goodfire Goodfire is a research company using interpretability to understand, learn from, and design AI systems. Our mission is to build the next generation of safe and powerful AI—not by scaling alone, but by understanding the intelligence we&#x27;re building. Scaling has proven powerful, but today&#x27;s approach is fundamentally limited: we can&#x27;t meaningfully understand, debug, or shape what models learn. Every engineering discipline has been gated by fundamental sc"
+    contentLength: 40407
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The company's flagship product, Ember, is the first hosted mechanistic interpretability API, providing researchers and developers with programmable access to AI model internals.[^3] Rather than treating models as black boxes, Ember enables users to examine individual "features" (interpretable patter
+    fetchedAt: 2026-02-22T02:06:33.894Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The company's flagship product, Ember, is the first hosted mechanistic interpretability API, providing researchers and developers with programmable access to AI model internals.[^3] Rather than treating models as black boxes, Ember enables users to examine individual "features" (interpretable patter
+    fetchedAt: 2026-02-22T02:06:33.782Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: Goodfire's rapid ascent reflects growing industry recognition that interpretability is foundational to AI safety. The company raised \$50 million in Series A funding less than one year after founding, led by Menlo Ventures with participation from <EntityLink id="anthropic">Anthropic</EntityLink>—mar
+    fetchedAt: 2026-02-22T02:06:33.667Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.prnewswire.com/news-releases/goodfire-raises-50m-series-a-to-advance-ai-interpretability-research-302431030.html
+    linkText: "PRNewswire: Goodfire Raises \\$50M Series A"
+    claimContext: Goodfire's rapid ascent reflects growing industry recognition that interpretability is foundational to AI safety. The company raised \$50 million in Series A funding less than one year after founding, led by Menlo Ventures with participation from <EntityLink id="anthropic">Anthropic</EntityLink>—mar
+    fetchedAt: 2026-02-22T02:06:35.404Z
+    httpStatus: 200
+    pageTitle: Goodfire Raises $50M Series A to Advance AI Interpretability Research
+    contentSnippet: Goodfire Raises $50M Series A to Advance AI Interpretability Research Accessibility Statement Skip Navigation Funding from Menlo Ventures powers Goodfire's mission to decode the neurons of AI models, reshaping how they're understood and designed SAN FRANCISCO , April 17, 2025 /PRNewswire/ -- Today, Goodfire, the leading AI interpretability research company, announced a $50 million Series A funding round led by Menlo Ventures with participation from Lightspeed Venture Partners, Anthropic, B Capit
+    contentLength: 204190
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The founding team brought complementary expertise from both entrepreneurship and frontier AI research. Eric Ho and Dan Balsam had previously co-founded RippleMatch in 2016, an AI-powered hiring platform that Ho scaled to over \$10 million in annual recurring revenue.[^7] Ho's work at RippleMatch ear
+    fetchedAt: 2026-02-22T02:06:35.228Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The founding team brought complementary expertise from both entrepreneurship and frontier AI research. Eric Ho and Dan Balsam had previously co-founded RippleMatch in 2016, an AI-powered hiring platform that Ho scaled to over \$10 million in annual recurring revenue.[^7] Ho's work at RippleMatch ear
+    fetchedAt: 2026-02-22T02:06:35.125Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: Tom McGrath, the company's Chief Scientist, is recognized as a pioneering figure in mechanistic interpretability. He completed his PhD in 2016 and co-founded the Interpretability team at Google DeepMind, where he served as a Senior Research Scientist.[^9] In March 2024, McGrath left Google to join S
+    fetchedAt: 2026-02-22T02:06:35.160Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: Tom McGrath, the company's Chief Scientist, is recognized as a pioneering figure in mechanistic interpretability. He completed his PhD in 2016 and co-founded the Interpretability team at Google DeepMind, where he served as a Senior Research Scientist.[^9] In March 2024, McGrath left Google to join S
+    fetchedAt: 2026-02-22T02:06:35.600Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The company's founding in June 2024 was followed quickly by a \$7 million seed round in August 2024, led by Lightspeed Venture Partners with participation from Menlo Ventures, South Park Commons, Work-Bench, and others.[^11] Less than one year later, in April 2025, Goodfire announced its \$50 millio
+    fetchedAt: 2026-02-22T02:06:36.860Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The company's founding in June 2024 was followed quickly by a \$7 million seed round in August 2024, led by Lightspeed Venture Partners with participation from Menlo Ventures, South Park Commons, Work-Bench, and others.[^11] Less than one year later, in April 2025, Goodfire announced its \$50 millio
+    fetchedAt: 2026-02-22T02:06:37.376Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://menlovc.com/perspective/leading-goodfires-50m-series-a-to-interpret-how-ai-models-think/
+    linkText: "Menlo Ventures: Leading Goodfire's \\$50M Series A"
+    claimContext: Beyond the three founders, Goodfire has assembled a team of leading researchers from <EntityLink id="openai">OpenAI</EntityLink> and <EntityLink id="deepmind">DeepMind</EntityLink>. The team includes:[^13]
+    fetchedAt: 2026-02-22T02:06:37.174Z
+    httpStatus: 200
+    pageTitle: Leading Goodfire’s $50M Series A to Interpret How AI Models Think | Menlo Ventures
+    contentSnippet: Leading Goodfire’s $50M Series A to Interpret How AI Models Think | Menlo Ventures Skip to Main Content All Perspectives All Perspectives Portfolio Funding Leading Goodfire’s $50M Series A to Interpret How AI Models Think April 17, 2025 Deedy Das Facebook Linkedin Twitter Envelope Copy link Copied to clipboard! Computer science professor and founder of modern reinforcement learning Rich Sutton said in his essay “ The Bitter Lesson ” about AI, “Breakthrough progress eventually arrives by an oppos
+    contentLength: 107259
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The team's collective contributions include authoring the three most-cited papers in mechanistic interpretability and pioneering techniques like sparse autoencoders (SAEs) for feature discovery, auto-interpretability methods, and knowledge extraction from models like AlphaZero.[^14]
+    fetchedAt: 2026-02-22T02:06:36.812Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.superbcrew.com/goodfire-raises-50m-to-make-ai-models-transparent-steerable-and-safer-to-use/
+    linkText: "Super B Crew: Goodfire Raises \\$50M"
+    claimContext: "Ember is Goodfire's core product—a mechanistic interpretability API that provides direct, programmable access to AI model internals.[^15] Unlike traditional approaches that treat models as black boxes accessible only through prompts, Ember allows users to:"
+    fetchedAt: 2026-02-22T02:06:37.815Z
+    httpStatus: 200
+    pageTitle: Goodfire Raises $50M To Make AI Models Transparent, Steerable, And Safer to Use - SuperbCrew
+    contentSnippet: "Goodfire Raises $50M To Make AI Models Transparent, Steerable, And Safer to Use - SuperbCrew x Search for: S The community for designers Dribbble helps you hire designer, grow and look for design inspiration! Listen to this article Goodfire secures $50 million in Series A funding to expand its work in AI interpretability, aiming to make neural networks more transparent and controllable. Its platform, Ember, offers direct access to a model’s internal structure, enabling users to analyze and guide"
+    contentLength: 49459
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://forum.effectivealtruism.org/posts/2k8jdysns2HF3FeKC/goodfire-the-startup-trying-to-decode-how-ai-thinks
+    linkText: "EA Forum: Goodfire — The Startup Trying to Decode How AI Thinks"
+    claimContext: '- **Examine features**: Identify interpretable patterns in neural activations (e.g., features representing "professionalism," "sarcasm," or specific knowledge domains) - **Steer behavior**: Adjust feature activations to control model outputs without retraining or complex prompt engineering (e.g., ma'
+    fetchedAt: 2026-02-22T02:06:39.120Z
+    httpStatus: 200
+    pageTitle: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum
+    contentSnippet: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Goodfire — The Startup Trying to Decode How AI Thinks by Strad Slater Nov 23 2025 6 min read 1 2 AI safety AI interpretability Building the field of AI safety Frontpage Goodfire — The Startup Trying to Decode How AI Thinks Goodfire’s Rationale For Interpretability How Does Goodfire Wo
+    contentLength: 157725
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://forum.effectivealtruism.org/posts/2k8jdysns2HF3FeKC/goodfire-the-startup-trying-to-decode-how-ai-thinks
+    linkText: "EA Forum: Goodfire — The Startup Trying to Decode How AI Thinks"
+    claimContext: "- **Debug and audit**: Trace decision pathways, detect biases, identify vulnerabilities, and uncover hidden knowledge - **Model diffing**: Track changes across training checkpoints to understand why problematic behaviors emerge[^17]"
+    fetchedAt: 2026-02-22T02:06:39.149Z
+    httpStatus: 200
+    pageTitle: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum
+    contentSnippet: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Goodfire — The Startup Trying to Decode How AI Thinks by Strad Slater Nov 23 2025 6 min read 1 2 AI safety AI interpretability Building the field of AI safety Frontpage Goodfire — The Startup Trying to Decode How AI Thinks Goodfire’s Rationale For Interpretability How Does Goodfire Wo
+    contentLength: 157725
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The platform is model-agnostic and currently supports models including Llama 3.3 70B and Llama 3.1 8B. Token processing has tripled monthly since launch, with hundreds of researchers using the platform.[^18]
+    fetchedAt: 2026-02-22T02:06:39.013Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.alignmentforum.org/posts/6dpKhtniqR3rnstnL/mind-the-coherence-gap-lessons-from-steering-llama-with-1
+    linkText: "Alignment Forum: Mind the Coherence Gap"
+    claimContext: 'Goodfire developed an "Auto Steer" method for automated behavioral adjustments. Independent evaluation found it effective for certain behavioral objectives (like "be professional") but noted a coherence gap—outputs sometimes became less coherent compared to traditional prompt engineering.[^19] This '
+    fetchedAt: 2026-02-22T02:06:45.530Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 20
+    url: https://www.goodfire.ai/blog/our-approach-to-safety
+    linkText: "Goodfire blog: Our Approach to Safety"
+    claimContext: Goodfire emphasizes safety-first applications of interpretability:[^20]
+    fetchedAt: 2026-02-22T02:06:39.233Z
+    httpStatus: 200
+    pageTitle: Our Approach to Safety at Goodfire
+    contentSnippet: Our Approach to Safety at Goodfire Blog Our Approach to Safety at Goodfire Authors Affiliations Goodfire Team Goodfire Research Published Dec. 23, 2024 At Goodfire, safety is fundamental to our mission. As a public benefit corporation developing powerful interpretability tools, we believe we have a responsibility to ensure our technology advances the field of AI safety while preventing potential misuse. Advancing Safety Research One of the most promising applications of our technology is in adva
+    contentLength: 43921
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.goodfire.ai/customer-stories/rakuten
+    linkText: "Goodfire customer story: Rakuten"
+    claimContext: "- **Model diffing**: Detecting how and why unsafe behaviors emerge during training or fine-tuning - **PII detection**: Partnering with Rakuten to use sparse autoencoder probes to prevent personally identifiable information leakage[^21]"
+    fetchedAt: 2026-02-22T02:06:46.925Z
+    httpStatus: 200
+    pageTitle: Goodfire
+    contentSnippet: Goodfire Customer Story How Rakuten secures reliable AI experiences for 44M+ monthly users How Rakuten and Goodfire used Ember to develop lightweight, robust PII guardails Goodfire Services Provided Ember Platform Outcomes Minimizes sensitive user data leakage Real-time, cost-efficient detection Reliable across languages, formats, and real-world edge cases ‍ ‍ ETC Context Founded in Tokyo in 1997, Rakuten is a global technology leader in services that empower individuals, communities, businesses
+    contentLength: 33057
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.goodfire.ai/blog/our-approach-to-safety
+    linkText: "Goodfire blog: Our Approach to Safety"
+    claimContext: Pre-release safety measures for Ember include feature moderation (removing harmful/explicit/malicious features), input/<EntityLink id="output-filtering">output filtering</EntityLink>, and controlled access for researchers.[^22]
+    fetchedAt: 2026-02-22T02:06:46.663Z
+    httpStatus: 200
+    pageTitle: Our Approach to Safety at Goodfire
+    contentSnippet: Our Approach to Safety at Goodfire Blog Our Approach to Safety at Goodfire Authors Affiliations Goodfire Team Goodfire Research Published Dec. 23, 2024 At Goodfire, safety is fundamental to our mission. As a public benefit corporation developing powerful interpretability tools, we believe we have a responsibility to ensure our technology advances the field of AI safety while preventing potential misuse. Advancing Safety Research One of the most promising applications of our technology is in adva
+    contentLength: 43921
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.prnewswire.com/news-releases/goodfire-raises-50m-series-a-to-advance-ai-interpretability-research-302431030.html
+    linkText: "PRNewswire: Goodfire Raises \\$50M Series A"
+    claimContext: "- **Arc Institute**: Early collaboration using Ember on Evo 2, a DNA foundation model, to uncover biological concepts and accelerate scientific discovery in genomics.[^23] - **Mayo Clinic**: Announced in September 2025, focusing on genomic medicine, reverse-engineering genomics models for insights i"
+    fetchedAt: 2026-02-22T02:06:46.714Z
+    httpStatus: 200
+    pageTitle: Goodfire Raises $50M Series A to Advance AI Interpretability Research
+    contentSnippet: Goodfire Raises $50M Series A to Advance AI Interpretability Research Accessibility Statement Skip Navigation Funding from Menlo Ventures powers Goodfire's mission to decode the neurons of AI models, reshaping how they're understood and designed SAN FRANCISCO , April 17, 2025 /PRNewswire/ -- Today, Goodfire, the leading AI interpretability research company, announced a $50 million Series A funding round led by Menlo Ventures with participation from Lightspeed Venture Partners, Anthropic, B Capit
+    contentLength: 204190
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.goodfire.ai/blog/mayo-clinic-collaboration
+    linkText: "Goodfire blog: Mayo Clinic collaboration"
+    claimContext: "- **Arc Institute**: Early collaboration using Ember on Evo 2, a DNA foundation model, to uncover biological concepts and accelerate scientific discovery in genomics.[^23] - **Mayo Clinic**: Announced in September 2025, focusing on genomic medicine, reverse-engineering genomics models for insights i"
+    fetchedAt: 2026-02-22T02:06:46.794Z
+    httpStatus: 200
+    pageTitle: Goodfire Announces Collaboration to Advance Genomic Medicine with AI Interpretability
+    contentSnippet: Goodfire Announces Collaboration to Advance Genomic Medicine with AI Interpretability Blog Goodfire Announces Collaboration to Advance Genomic Medicine with AI Interpretability Published September 9, 2025 Goodfire is excited to announce a collaboration with Mayo Clinic seeking to unlock new frontiers in genomic medicine through AI interpretability. This collaboration aims to combine Goodfire's work in interpretability of AI models with Mayo Clinic's medical expertise and investment in AI. AI int
+    contentLength: 45721
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.goodfire.ai/customer-stories/rakuten
+    linkText: "Goodfire customer story: Rakuten"
+    claimContext: "- **Mayo Clinic**: Announced in September 2025, focusing on genomic medicine, reverse-engineering genomics models for insights into disease mechanisms while emphasizing data privacy and bias reduction.[^24] - **Rakuten**: Enhancing reliability for Rakuten AI, which serves over 44 million monthly use"
+    fetchedAt: 2026-02-22T02:06:46.995Z
+    httpStatus: 200
+    pageTitle: Goodfire
+    contentSnippet: Goodfire Customer Story How Rakuten secures reliable AI experiences for 44M+ monthly users How Rakuten and Goodfire used Ember to develop lightweight, robust PII guardails Goodfire Services Provided Ember Platform Outcomes Minimizes sensitive user data leakage Real-time, cost-efficient detection Reliable across languages, formats, and real-world edge cases ‍ ‍ ETC Context Founded in Tokyo in 1997, Rakuten is a global technology leader in services that empower individuals, communities, businesses
+    contentLength: 33057
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.goodfire.ai/blog/our-approach-to-safety
+    linkText: "Goodfire blog: Our Approach to Safety"
+    claimContext: "- **Rakuten**: Enhancing reliability for Rakuten AI, which serves over 44 million monthly users in Japan and 2 billion customers worldwide, focusing on preventing PII leakage using frontier interpretability techniques.[^25] - **Haize Labs**: Joint work on feature steering for AI safety auditing, red"
+    fetchedAt: 2026-02-22T02:06:48.034Z
+    httpStatus: 200
+    pageTitle: Our Approach to Safety at Goodfire
+    contentSnippet: Our Approach to Safety at Goodfire Blog Our Approach to Safety at Goodfire Authors Affiliations Goodfire Team Goodfire Research Published Dec. 23, 2024 At Goodfire, safety is fundamental to our mission. As a public benefit corporation developing powerful interpretability tools, we believe we have a responsibility to ensure our technology advances the field of AI safety while preventing potential misuse. Advancing Safety Research One of the most promising applications of our technology is in adva
+    contentLength: 43921
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.goodfire.ai/blog/announcing-goodfire-ember
+    linkText: "Goodfire blog: Announcing Goodfire Ember"
+    claimContext: "- **Haize Labs**: Joint work on feature steering for AI safety auditing, red-teaming, and identifying failure modes in generative models.[^26] - **Apollo Research**: Using Goodfire tools for safety benchmarks and research.[^27] - **Microsoft**: Partnership announced alongside the Series B funding ro"
+    fetchedAt: 2026-02-22T02:06:48.040Z
+    httpStatus: 200
+    pageTitle: "Goodfire Ember: Scaling Interpretability for Frontier Model Alignment"
+    contentSnippet: "Goodfire Ember: Scaling Interpretability for Frontier Model Alignment Blog Update (Feb 2026): Ember now refers to our general-purpose platform for interpretability that we deploy with select partners. The demo interface and API have been deprecated. Goodfire Ember: Scaling Interpretability for Frontier Model Alignment Ember is the first hosted mechanistic interpretability API, with inference support for generative models like Llama 3.3 70B. Authors Affiliations Daniel Balsam Goodfire Research My"
+    contentLength: 51954
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: In November 2024, Goodfire powered the "Reprogramming AI Models" hackathon in partnership with Apart Research, with over 200 researchers across 15 countries prototyping safety applications like adversarial attack detection and "unlearning" harmful capabilities while preserving beneficial behaviors.[
+    fetchedAt: 2026-02-22T02:06:48.408Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://forum.effectivealtruism.org/posts/2k8jdysns2HF3FeKC/goodfire-the-startup-trying-to-decode-how-ai-thinks
+    linkText: "EA Forum: Goodfire — The Startup Trying to Decode How AI Thinks"
+    claimContext: Traditional alignment methods like reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>) can produce unintended side effects, such as excessive refusal of benign requests or sycophantic behavior.[^29] Goodfire's feature steering offers an alternative by enabling precis
+    fetchedAt: 2026-02-22T02:06:48.278Z
+    httpStatus: 200
+    pageTitle: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum
+    contentSnippet: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Goodfire — The Startup Trying to Decode How AI Thinks by Strad Slater Nov 23 2025 6 min read 1 2 AI safety AI interpretability Building the field of AI safety Frontpage Goodfire — The Startup Trying to Decode How AI Thinks Goodfire’s Rationale For Interpretability How Does Goodfire Wo
+    contentLength: 154930
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.goodfire.ai/research/model-diff-amplification
+    linkText: "Goodfire research: Model Diff Amplification"
+    claimContext: One of the central challenges in AI safety is detecting deceptive or <EntityLink id="scheming">scheming</EntityLink> behavior in advanced AI systems. Goodfire's model diffing and auditing tools aim to identify rare, undesired behaviors—such as a model encouraging self-harm—that might emerge during t
+    fetchedAt: 2026-02-22T02:06:48.042Z
+    httpStatus: 200
+    pageTitle: Discovering Undesired Rare Behaviors via Model Diff Amplification
+    contentSnippet: "Discovering Undesired Rare Behaviors via Model Diff Amplification Research Update (November 2025): Since this post was published, the method it describes has also come to be called logit diff amplification (LDA) . Discovering Undesired Rare Behaviors via Model Diff Amplification Authors Santiago Aranguri * Thomas McGrath † * NYU, work done while visiting Goodfire † Goodfire Correspondence to santi@goodfire.ai Published August 21, 2025 One of the biggest issues with LLMs is that training can caus"
+    contentLength: 60762
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: One of the central challenges in AI safety is detecting deceptive or <EntityLink id="scheming">scheming</EntityLink> behavior in advanced AI systems. Goodfire's model diffing and auditing tools aim to identify rare, undesired behaviors—such as a model encouraging self-harm—that might emerge during t
+    fetchedAt: 2026-02-22T02:06:49.587Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://ae.studio/alignment/
+    linkText: "AE Studio: AI Alignment"
+    claimContext: Interpretability tools like Ember may become essential for regulatory compliance. The <EntityLink id="eu-ai-act">EU AI Act</EntityLink> mandates transparency for high-risk AI systems, with fines up to €20 million for violations.[^32] Goodfire's auditing and documentation capabilities could help orga
+    fetchedAt: 2026-02-22T02:06:50.601Z
+    httpStatus: 200
+    pageTitle: AE and AI Alignment
+    contentSnippet: "AE and AI Alignment Hover over lines to ALIGN them. Then scroll down for more ALIGNMENT! Tap text to ALIGN. Then scroll down for more ALIGNMENT! Alignment is solvable. The real problem? No one&#x27;s really tried yet. We are, and we&#x27;re focused where the leverage is highest: the neglected approaches that science forgot. Explore AI Alignment ↓ If you don&#x27;t give a sh*t, click here → Why Alignment Matters AI development is advancing at an exponential pace. Every leap forward escalates both"
+    contentLength: 80018
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.goodfire.ai/blog/fellowship-fall-25
+    linkText: "Goodfire blog: Fellowship Fall 25"
+    claimContext: In October 2025, Goodfire announced a Fellowship Program for early- and mid-career researchers and engineers, matched with senior researchers to work on scientific discovery, interpretable models, and new interpretability methods.[^33]
+    fetchedAt: 2026-02-22T02:06:49.464Z
+    httpStatus: 200
+    pageTitle: Announcing Goodfire’s Fellowship Program for Interpretability Research
+    contentSnippet: Announcing Goodfire’s Fellowship Program for Interpretability Research Blog Announcing Goodfire's Fellowship Program for Interpretability Research Published October 9, 2025 We're excited to announce that we'll be bringing on several Research Fellows and Research Engineering Fellows this fall for our fellowship program. Fellows will collaborate with senior members of our technical staff, contribute to core projects, and work full time in person in our San Francisco office. For exceptional candida
+    contentLength: 49437
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: There is substantial debate about whether mechanistic interpretability can reliably detect deception in advanced AI systems. Researcher <EntityLink id="neel-nanda">Neel Nanda</EntityLink> has noted that interpretability lacks "ground truth" for what concepts AI models actually use, making it difficu
+    fetchedAt: 2026-02-22T02:06:50.123Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://web.stanford.edu/~cgpotts/blog/interp/
+    linkText: "Stanford CGPotts blog: Interpretability"
+    claimContext: "A concrete example of interpretability's limitations emerged with GPT-4o's \"extreme <EntityLink id=\"sycophancy\">sycophancy</EntityLink>\" issue, which was detected behaviorally rather than through mechanistic analysis—no circuit was discovered, no particular weights or activations were identified as "
+    fetchedAt: 2026-02-22T02:06:50.239Z
+    httpStatus: 200
+    pageTitle: Assessing skeptical views of interpretability research | Christopher Potts
+    contentSnippet: "Assessing skeptical views of interpretability research | Christopher Potts Credit: Tom Brink By Christopher Potts – August 8, 2025 Goodfire and Anthropic have jointly organized a meet-up of academic and industry researchers called “Interpretability: the next 5 years”, to be held later this month. Participants have been invited to contribute short discussion documents. This is a draft of my document, which I am posting publicly to try to stimulate discussion in the broader community. It’s an awkw"
+    contentLength: 19118
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: Leading AI labs like <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, and <EntityLink id="deepmind">DeepMind</EntityLink> have the resources to develop interpretability tools internally. Anthropic has publicly committed to investing significantly in rel
+    fetchedAt: 2026-02-22T02:06:51.833Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: Goodfire's pricing model is heavily compute-bound, with strict rate limits that may limit accessibility.[^37] The platform enforces a 50,000 token/minute global cap shared across all API methods. Advanced interpretability functions like AutoSteer and AutoConditional are limited to just 30 requests/m
+    fetchedAt: 2026-02-22T02:06:51.772Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://forum.effectivealtruism.org/posts/2k8jdysns2HF3FeKC/goodfire-the-startup-trying-to-decode-how-ai-thinks
+    linkText: "EA Forum: Goodfire — The Startup Trying to Decode How AI Thinks"
+    claimContext: Third-hand reports indicate that Goodfire leadership has pitched interpretability work as "capabilities-enhancing" (improving AI performance) rather than primarily safety-focused when fundraising.[^38] This framing raises questions about whether commercial incentives might prioritize performance imp
+    fetchedAt: 2026-02-22T02:06:51.630Z
+    httpStatus: 200
+    pageTitle: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum
+    contentSnippet: Goodfire — The Startup Trying to Decode How AI Thinks — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Goodfire — The Startup Trying to Decode How AI Thinks by Strad Slater Nov 23 2025 6 min read 1 2 AI safety AI interpretability Building the field of AI safety Frontpage Goodfire — The Startup Trying to Decode How AI Thinks Goodfire’s Rationale For Interpretability How Does Goodfire Wo
+    contentLength: 154927
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: Goodfire has raised approximately \$209 million across three rounds:[^39]
+    fetchedAt: 2026-02-22T02:06:52.292Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: "The Series A round marked <EntityLink id=\"anthropic\">Anthropic</EntityLink>'s first direct investment in another company, signaling significant industry validation.[^40] The Series B, closing less than a year later, valued Goodfire at \\$1.25 billion—making it one of the fastest AI startups to reach "
+    fetchedAt: 2026-02-22T02:06:52.001Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: Goodfire operates on a usage-based pricing model, charging per million tokens processed (input + output), with pricing tiered by model size:[^41]
+    fetchedAt: 2026-02-22T02:06:53.504Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://research.contrary.com/company/goodfire
+    linkText: "Contrary Research: Goodfire"
+    claimContext: The company is positioned to capture value in a rapidly growing market. The explainable AI market was valued at approximately \$10 billion in 2025 and is projected to reach \$25 billion by 2030.[^42]
+    fetchedAt: 2026-02-22T02:06:53.571Z
+    httpStatus: 200
+    pageTitle: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: Goodfire Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept Goodfire AI / ML Software Goodfire, founded in 2024, has emerged as the leading AI interpretability research company. The compan"
+    contentLength: 2279873
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.goodfire.ai/blog/our-series-b
+    linkText: "Goodfire blog: Understanding, Learning From, and Designing AI: Our Series B"
+    claimContext: Goodfire's rapid ascent reflects growing industry recognition that interpretability is foundational to AI safety. The company raised \$50 million in Series A funding less than one year after founding, led by Menlo Ventures with participation from <EntityLink id="anthropic">Anthropic</EntityLink>—mar
+    fetchedAt: 2026-02-22T02:06:53.371Z
+    httpStatus: 200
+    pageTitle: "Understanding, Learning From, and Designing AI: Our Series B"
+    contentSnippet: "Understanding, Learning From, and Designing AI: Our Series B Blog Understanding, Learning From, and Designing AI: Our Series B February 5, 2026 Contents What we believe What we're building Intentional design Scientific discovery Foundational research Towards alignment Our team Build with us Today, we're excited to announce a &#36;150 million Series B funding round at a &#36;1.25 billion valuation. The round was led by B Capital, with participation from Juniper Ventures, DFJ Growth, Salesforce Ve"
+    contentLength: 55503
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.goodfire.ai/blog/intentional-design
+    linkText: "Goodfire blog: Intentionally Designing the Future of AI"
+    claimContext: In February 2026, Goodfire announced a broader vision called "intentional design"—using interpretability to guide model training rather than merely analyzing models post-hoc.[^44] The approach involves decomposing what a model learns from each datapoint into semantic components, then selectively app
+    fetchedAt: 2026-02-22T02:06:53.442Z
+    httpStatus: 200
+    pageTitle: Intentionally Designing the Future of AI
+    contentSnippet: Intentionally Designing the Future of AI Blog Intentionally designing the future of AI Author Thomas McGrath Published February 5, 2026 Contents The dawn of intentional design What does intentional design enable? What do we need to do to develop intentional design? Developing intentional design responsibly Progress in technology typically goes hand-in-hand with progress in fundamental science. Throughout history, understanding of the scientific foundations of our technologies has led to revoluti
+    contentLength: 81550
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://thezvi.substack.com/p/the-most-forbidden-technique
+    linkText: "Zvi Mowshowitz: The Most Forbidden Technique"
+    claimContext: In February 2026, Goodfire Chief Scientist Thomas McGrath published "Intentionally Designing the Future of AI," proposing the use of interpretability tools to shape model training by decomposing gradients into semantic components and selectively applying them on a per-datapoint basis.[^44] This reig
+    fetchedAt: 2026-02-22T02:06:53.986Z
+    httpStatus: 200
+    pageTitle: The Most Forbidden Technique - by Zvi Mowshowitz
+    contentSnippet: The Most Forbidden Technique - by Zvi Mowshowitz Don't Worry About the Vase Subscribe Sign in The Most Forbidden Technique Zvi Mowshowitz Mar 12, 2025 64 19 8 Share The Most Forbidden Technique is training an AI using interpretability techniques. An AI produces a final output [X] via some method [M]. You can analyze [M] using technique [T], to learn what the AI is up to. You could train on that. Never do that. You train on [X]. Only [X]. Never [M], never [T]. Why? Because [T] is how you figure o
+    contentLength: 293893
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.lesswrong.com/posts/mpmsK8KKysgSKDm2T/the-most-forbidden-technique
+    linkText: "LessWrong: The Most Forbidden Technique"
+    claimContext: 'Critics argue that optimizing against interpretability signals during training teaches models to obfuscate their internal representations, ultimately degrading the very tools needed to detect misalignment.[^46] As Mowshowitz summarized: if you train against technique [T], "you are training the AI to'
+    fetchedAt: 2026-02-22T02:06:55.754Z
+    httpStatus: 200
+    pageTitle: The Most Forbidden Technique — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The Most Forbidden Technique — LessWrong Orthogonality Thesis AI Frontpage 2025 Top Fifty: 27 % 166 The Most Forbidden Technique by Zvi 12th Mar 2025 Don&#x27;t Worry About the Vase 20 min read 9 166 The Most Forbidden Technique is training an AI using interpretability techniques. An AI produces a final output [X] via some method [M]. You can analyze [M] using techniqu"
+    contentLength: 631168
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://www.lesswrong.com/posts/B3DQvjCD6gp2JEKaY/goodfire-and-training-on-interpretability
+    linkText: "LessWrong: Goodfire and Training on Interpretability"
+    claimContext: 'Critics argue that optimizing against interpretability signals during training teaches models to obfuscate their internal representations, ultimately degrading the very tools needed to detect misalignment.[^46] As Mowshowitz summarized: if you train against technique [T], "you are training the AI to'
+    fetchedAt: 2026-02-22T02:06:55.653Z
+    httpStatus: 200
+    pageTitle: Goodfire and Training on Interpretability — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Goodfire and Training on Interpretability — LessWrong Interpretability (ML & AI) Optimization AI Personal Blog 32 [ Question ] Goodfire and Training on Interpretability by Satya Benson 6th Feb 2026 1 min read A 0 5 32 Goodfire wrote Intentionally designing the future of AI about training on interpretability. This seems like an instance of The Most Forbidden Technique w
+    contentLength: 321376
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.alignmentforum.org/posts/G9HdpyREaCbFJjKu5/it-is-reasonable-to-research-how-to-use-model-internals-in
+    linkText: "Alignment Forum: It Is Reasonable To Research How To Use Model Internals In Training"
+    claimContext: 'Defenders, including <EntityLink id="neel-nanda">Neel Nanda</EntityLink>, argued that this research direction is both legitimate and potentially critical for safety. Nanda noted that multiple researchers including Anthropic Fellows have worked on interpretability-in-training, and that understanding '
+    fetchedAt: 2026-02-22T02:07:01.525Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 49
+    url: https://x.com/ilex_ulmus/status/2016778354352136212
+    linkText: "Holly Elmore on X: Liv Gorton departure from Goodfire"
+    claimContext: The debate took a personal dimension when founding research scientist Liv Gorton departed Goodfire in early 2026, with AI safety advocate Holly Elmore publicly speculating the departure was "for reasons of conscience."[^49] Gorton's departure—she had co-authored key research including the first spar
+    fetchedAt: 2026-02-22T02:06:54.991Z
+    httpStatus: null
+    pageTitle: null
+    contentSnippet: null
+    contentLength: null
+    status: unverifiable
+    note: Social media domain — cannot verify automatically
+  - footnote: 50
+    url: https://svdaily.com/2026/02/05/ai-research-lab-goodfire-scores-125-million/
+    linkText: "Silicon Valley Daily: AI Research Lab Goodfire Scores \\$125 Million"
+    claimContext: "A notable scientific achievement came from Goodfire's partnership with Arc Institute: by reverse-engineering a biological foundation model, the team identified a novel class of Alzheimer's biomarkers—described as \"the first major finding in the natural sciences obtained from reverse-engineering a fo"
+    fetchedAt: 2026-02-22T02:06:57.564Z
+    httpStatus: 200
+    pageTitle: AI Research Lab Goodfire Scores $150 Million &#8211; Silicon Valley Daily
+    contentSnippet: AI Research Lab Goodfire Scores $150 Million &#8211; Silicon Valley Daily Skip to content AI News Venture Capital Editor February 5, 2026 February 7, 2026 SAN FRANCISCO &#8212; Goodfire —the AI research lab using interpretability to understand, learn from, and design models—announced a $150 million Series B funding round at a $1.25 billion valuation. The round was led by B Capital, with participation from existing investors Juniper Ventures, Menlo Ventures, Lightspeed Venture Partners, South Par
+    contentLength: 51691
+    status: verified
+    note: null

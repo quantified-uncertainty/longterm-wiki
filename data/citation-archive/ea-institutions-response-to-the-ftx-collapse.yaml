@@ -1,0 +1,370 @@
+pageId: ea-institutions-response-to-the-ftx-collapse
+verifiedAt: 2026-02-22
+totalCitations: 33
+verified: 28
+broken: 5
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Bankruptcy_of_FTX
+    linkText: Bankruptcy of FTX — Wikipedia
+    claimContext: The collapse of <EntityLink id="ftx">FTX</EntityLink> in November 2022 was a crisis for the effective altruism (EA) movement with consequences that unfolded over the following two years. <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (SBF), the founder of FTX, had been one of EA's
+    fetchedAt: 2026-02-22T02:16:36.019Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/
+    linkText: Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapsed — TIME — (March 15, 2023)
+    claimContext: "EA institutions responded through a combination of public condemnation of SBF's alleged fraud, operational pauses on grant-making, emergency funding efforts to support affected organizations, and community surveys to assess the damage. The response was complicated by subsequent reporting indicating "
+    fetchedAt: 2026-02-22T02:16:37.558Z
+    httpStatus: 200
+    pageTitle: Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME
+    contentSnippet: "Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME Politics Exclusive: Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed ADD TIME ON GOOGLE Show me more content from TIME on Google Search Loading... Photo Illustration by Neil Jamieson from TIME by Charlotte Alter Senior Correspondent Loading... Leaders of the Effective Altruism movement were repeatedly warned beginning in 2018 that Sam Bankman-Fried w"
+    contentLength: 474703
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://en.wikipedia.org/wiki/Bankruptcy_of_FTX
+    linkText: Bankruptcy of FTX — Wikipedia
+    claimContext: Prior to November 2022, SBF and other senior FTX and <EntityLink id="ftx">FTX</EntityLink>/Alameda Research leaders collectively represented the second-largest group of benefactors to the EA movement, surpassed only by <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> and Good Ventur
+    fetchedAt: 2026-02-22T02:16:36.018Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://www.devex.com/news/what-will-ftx-s-collapse-mean-for-global-health-and-development-104480
+    linkText: What will FTX's collapse mean for global health and development? — Devex
+    claimContext: The day FTX declared bankruptcy—November 11, 2022—the FTX Future Fund team, including <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, announced their resignation. Their public statement said they were "now unable to perform our work or process grants," that they were "devastated that it
+    fetchedAt: 2026-02-22T02:16:36.645Z
+    httpStatus: 200
+    pageTitle: What will FTX&#39;s collapse mean for global health and development? | Devex
+    contentSnippet: What will FTX&#39;s collapse mean for global health and development? | Devex News Philanthropy What will FTX&#39;s collapse mean for global health and development? Sam Bankman-Fried, the founder of the cryptocurrency exchange FTX, has lost his fortune, destroyed his reputation, and dealt a blow to the effective altruism community, which funds many global health and international development causes. By Catherine Cheney // 18 November 2022 Related Stories Is MrBeast a force for good in development
+    contentLength: 78375
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.prindleinstitute.org/2022/11/ftx-effective-altruism-and-ends-justifying-means/
+    linkText: FTX, Effective Altruism, and Ends Justifying Means — Prindle Institute
+    claimContext: MacAskill was among the EA leaders who responded publicly within days of the collapse. In statements circulated on social media, he described experiencing a combination of anger at SBF for allegedly deceiving him and self-criticism for having trusted SBF. He also emphasized that EA principles are fu
+    fetchedAt: 2026-02-22T02:16:36.584Z
+    httpStatus: 200
+    pageTitle: FTX, Effective Altruism, and Ends Justifying Means - The Prindle Institute for Ethics
+    contentSnippet: --> FTX, Effective Altruism, and Ends Justifying Means - The Prindle Institute for Ethics &larr; Return to search results &otimes; Business FTX, Effective Altruism, and Ends Justifying Means By Jeff Dunn 15 Nov 2022 SHARE Until a week ago, Future Exchange (FTX) was one of the largest and most respected cryptocurrency exchanges in the world. Then, in spectacular fashion, it all collapsed . The collapse didn’t just wipe out the billions of dollars that users had invested in the platform. It also w
+    contentLength: 157896
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.businessinsider.com/effective-altruism-how-started-how-its-going-after-ftx-collapse-2023-1
+    linkText: "Peter Singer, interview with The Guardian (December 2022), as reported in — Effective Altruism: How it started, how it's going after FTX collapse — Business Insider"
+    claimContext: Peter Singer, widely regarded as the intellectual founder of the EA movement, addressed the collapse in an interview published in The Guardian in December 2022, in which he stated that "wise, effective altruists and utilitarians know that honesty is the best policy," and argued that the broader reco
+    fetchedAt: 2026-02-22T02:16:38.910Z
+    httpStatus: 200
+    pageTitle: "Effective Altruism: How It Started, How It's Going After FTX Collapse - Business Insider"
+    contentSnippet: "Effective Altruism: How It Started, How It's Going After FTX Collapse - Business Insider Tech &#x27;Effective Altruism&#x27; has been touted by tech stars from Sam Bankman-Fried to Elon Musk. Here&#x27;s how it started and how it&#x27;s going after FTX&#x27;s implosion. By Lakshmi Varanasi You're currently following this author! Want to unfollow? Unsubscribe via the link in your email. Follow Follow Lakshmi Varanasi Every time Lakshmi publishes a story, you’ll get an alert straight to your inbox"
+    contentLength: 573718
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://rethinkpriorities.org/research-area/ftx-community-response-survey-results/
+    linkText: FTX Community Response Survey Results — Rethink Priorities — (David Moss and Willem Sleegers, early 2023)
+    claimContext: A December 2022 survey conducted by <EntityLink id="rethink-priorities">Rethink Priorities</EntityLink> in collaboration with the <EntityLink id="cea">Centre for Effective Altruism</EntityLink> provided the most systematic picture of how the collapse affected the EA community.[^7]
+    fetchedAt: 2026-02-22T02:16:40.006Z
+    httpStatus: 200
+    pageTitle: FTX Community Response Survey Results &#x2d; Rethink Priorities
+    contentSnippet: "FTX Community Response Survey Results &#x2d; Rethink Priorities FTX Community Response Survey Results &#x2d; Rethink Priorities Skip to content Newsletter Research Database Donate Search Search for: Animal Welfare Identifying the most effective ways to reduce animal suffering, improve welfare standards, and influence positive change for trillions of animals worldwide. Learn more Surveys and Data Analysis Conducting polls, experiments, and focus groups and analyzing data to help organizations and"
+    contentLength: 161049
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://forum.effectivealtruism.org/posts/aF6nh4LW6sSbgMLzL/updates-on-community-health-survey-results
+    linkText: Updates on Community Health Survey Results — EA Forum
+    claimContext: The data also captured responses related to behavior change. Approximately 31% of respondents reported that they stopped referring to "EA" by name while continuing to promote EA ideas and projects, and 15% temporarily paused EA promotion entirely. Only 6% reported permanently ceasing EA promotion.[^
+    fetchedAt: 2026-02-22T02:16:38.709Z
+    httpStatus: 200
+    pageTitle: Updates on Community Health Survey Results — EA Forum
+    contentSnippet: Updates on Community Health Survey Results — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Updates on Community Health Survey Results by David_Moss , Jamie E , Willem Sleegers Mar 20 2024 10 min read 19 149 Community Building effective altruism Data on the EA community Effective Altruism Survey Research Rethink Priorities Surveys Community epistemic health FTX collapse Frontpage Updat
+    contentLength: 769368
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea
+    linkText: How has FTX's collapse impacted EA? — EA Forum
+    claimContext: New <EntityLink id="giving-what-we-can">Giving What We Can</EntityLink> pledges reportedly dropped by approximately 70% in the period following the collapse, and EA Forum metrics—posts and engagement levels—peaked around the time of the collapse before declining from prior growth trends.[^9]
+    fetchedAt: 2026-02-22T02:16:38.829Z
+    httpStatus: 200
+    pageTitle: How has FTX’s collapse impacted EA? — EA Forum
+    contentSnippet: How has FTX’s collapse impacted EA? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents How has FTX’s collapse impacted EA? by AnonymousEAForumAccount Oct 17 2023 17 min read 65 248 Building effective altruism Community Criticism of the effective altruism community Data on the EA community FTX collapse Research Frontpage How has FTX’s collapse impacted EA? Summary of Findings Detailed Fin
+    contentLength: 1317707
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://forum.effectivealtruism.org/posts/sEpWkCvvJfoEbhnsd/the-ftx-crisis-highlights-a-deeper-cultural-problem-within
+    linkText: The FTX Crisis Highlights a Deeper Cultural Problem Within EA — EA Forum
+    claimContext: Beyond the specific failures related to SBF, critics argued that the FTX collapse reflected broader governance weaknesses within EA institutions. These included the use of small, homogeneous boards with limited independence from major donors, the absence of meaningful community input into major inst
+    fetchedAt: 2026-02-22T02:16:38.643Z
+    httpStatus: 200
+    pageTitle: The FTX crisis highlights a deeper cultural problem within EA - we don&#x27;t sufficiently value good governance — EA Forum
+    contentSnippet: The FTX crisis highlights a deeper cultural problem within EA - we don&#x27;t sufficiently value good governance — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The FTX crisis highlights a deeper cultural problem within EA - we don&#x27;t sufficiently value good governance by James Fodor Nov 14 2022 5 min read 55 452 Building effective altruism Community Criticism of the effective alt
+    contentLength: 1081047
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://forum.effectivealtruism.org/posts/AuSah98NtR5qv8zQA/reflections-and-lessons-from-effective-ventures-1
+    linkText: Reflections and Lessons from Effective Ventures — EA Forum — (Zach Robinson, October 28, 2024)
+    claimContext: "**Independent investigation**: EV commissioned an independent investigation from the law firm Mintz, which reviewed tens of thousands of documents and conducted dozens of witness interviews. The investigation concluded in September 2023 with no evidence that anyone at EV knew about FTX's criminal fr"
+    fetchedAt: 2026-02-22T02:16:41.096Z
+    httpStatus: 200
+    pageTitle: Reflections and lessons from Effective Ventures — EA Forum
+    contentSnippet: Reflections and lessons from Effective Ventures — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Reflections and lessons from Effective Ventures by Zachary Robinson🔸 Oct 28 2024 56 min read 19 191 Community Announcements and updates Effective Ventures FTX collapse Nonprofit governance Organization strategy Organization updates Postmortems & retrospectives Frontpage Reflections and les
+    contentLength: 921790
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://forum.effectivealtruism.org/posts/xafpj3on76uRDoBja/the-ftx-future-fund-team-has-resigned-1
+    linkText: The FTX Future Fund team has resigned — EA Forum — (Nick Beckstead et al., November 11, 2022)
+    claimContext: <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, who had spent over seven years at <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> and served as a board member of Effective Ventures, left Open Philanthropy to become CEO of the FTX Foundation and executive director of th
+    fetchedAt: 2026-02-22T02:16:41.152Z
+    httpStatus: 200
+    pageTitle: The FTX Future Fund team has resigned — EA Forum
+    contentSnippet: "The FTX Future Fund team has resigned — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The FTX Future Fund team has resigned by Nick_Beckstead , leopold , ab , ketanrama Nov 11 2022 1 min read 288 680 Community FTX collapse FTX Foundation Future Fund Organization updates Argentina Frontpage We were shocked and immensely saddened to learn of the recent events at FTX. Our hearts go out to the thousands of FTX "
+    contentLength: 2832059
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/Defu3jkejb7pmLjeN/nick-beckstead-is-leaving-the-effective-ventures-boards
+    linkText: Nick Beckstead is Leaving the Effective Ventures Boards — EA Forum — (September 6, 2023)
+    claimContext: <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>'s role in the crisis occupied a particular position in subsequent accountability discussions. As CEO of the FTX Foundation and executive director of the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>, he oversaw the disbursem
+    fetchedAt: 2026-02-22T02:16:41.077Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead is leaving the Effective Ventures boards — EA Forum
+    contentSnippet: Nick Beckstead is leaving the Effective Ventures boards — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Nick Beckstead is leaving the Effective Ventures boards by Eli Rose🔸 , lincolnq Sep 6 2023 2 min read 7 130 Community Announcements and updates Nick Beckstead Effective Ventures Frontpage On 23rd August, Nick Beckstead stepped down from the boards of Effective Ventures UK and Effective Ventures US. For c
+    contentLength: 220782
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://forum.effectivealtruism.org/posts/b83Zkz4amoaQC5Hpd/time-article-discussion-effective-altruist-leaders-were
+    linkText: Time Article Discussion — 'EA Leaders Were Warned About SBF' — EA Forum — (March 15, 2023)
+    claimContext: EA Forum discussion at the time of the TIME article publication debated "whether Nick did the right thing ex ante when he chose to run the Future Fund" and what standard of evidence or argument would be needed to hold board members accountable in such circumstances.[^14]
+    fetchedAt: 2026-02-22T02:16:41.412Z
+    httpStatus: 200
+    pageTitle: Time Article Discussion - "Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed" — EA Forum
+    contentSnippet: Time Article Discussion - "Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Time Article Discussion - "Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed" by Nathan Young Mar 15 2023 5 min read 175 241 Community Building effective altru
+    contentLength: 2173575
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://forum.effectivealtruism.org/posts/C89mZ5T5MTYBu8ZFR/regulatory-inquiry-into-effective-ventures-foundation-uk
+    linkText: Regulatory Inquiry into Effective Ventures Foundation UK — EA Forum — (January 30, 2023, with May 2024 Commission update)
+    claimContext: "**UK Charity Commission inquiry**: The UK Charity Commission opened a statutory inquiry into EV UK in December 2022, triggered by the collapse. In May 2024, the Commission published its report, finding that trustees had taken appropriate steps to protect the charity's funds and complied with their l"
+    fetchedAt: 2026-02-22T02:16:41.440Z
+    httpStatus: 200
+    pageTitle: Regulatory inquiry into Effective Ventures Foundation UK — EA Forum
+    contentSnippet: Regulatory inquiry into Effective Ventures Foundation UK — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Regulatory inquiry into Effective Ventures Foundation UK by Howie_Lempel Jan 30 2023 4 min read 15 183 Community Effective Ventures Nonprofit governance Organization updates FTX collapse Frontpage Regulatory inquiry into Effective Ventures Foundation UK Summary What is Effective Ve
+    contentLength: 370298
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.openphilanthropy.org/grants/support-for-career-transition-plans/
+    linkText: Support for Career Transition Plans — Open Philanthropy — (2022–2023)
+    claimContext: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> announced via the EA Forum on November 16, 2022 that it was seeking applications from grantees affected by the FTX Future Fund collapse who fell within its longtermist focus areas—biosecurity, AI risk, and EA community-building. Eligi
+    fetchedAt: 2026-02-22T02:16:50.493Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 17
+    url: https://forum.effectivealtruism.org/posts/HPdWWetJbv4z8eJEe/open-phil-is-seeking-applications-from-grantees-impacted-by
+    linkText: Open Phil is seeking applications from grantees impacted by recent events — EA Forum — (Open Philanthropy, November 16, 2022)
+    claimContext: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> announced via the EA Forum on November 16, 2022 that it was seeking applications from grantees affected by the FTX Future Fund collapse who fell within its longtermist focus areas—biosecurity, AI risk, and EA community-building. Eligi
+    fetchedAt: 2026-02-22T02:16:42.485Z
+    httpStatus: 200
+    pageTitle: Open Phil is seeking applications from grantees impacted by recent events — EA Forum
+    contentSnippet: Open Phil is seeking applications from grantees impacted by recent events — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Open Phil is seeking applications from grantees impacted by recent events by Bastian_Stern Nov 16 2022 2 min read 20 415 Community Building effective altruism FTX-collapse-related resources Coefficient Giving Effective altruism funding FTX collapse Frontpage We (Open Phil) are seeking ap
+    contentLength: 446361
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety
+    linkText: Observations on the Funding Landscape of EA and AI Safety — EA Forum — (October 2, 2023)
+    claimContext: "**Broader funding landscape effects**: The collapse caused a substantial contraction in expected longtermist funding. EA Funds' Long-Term Future Fund and Infrastructure Fund reported funding gaps of roughly \\$450,000 and \\$550,000 per month respectively following FTX's implosion.[^18] Open Philanthr"
+    fetchedAt: 2026-02-22T02:16:42.512Z
+    httpStatus: 200
+    pageTitle: Observations on the funding landscape of EA and AI safety — EA Forum
+    contentSnippet: Observations on the funding landscape of EA and AI safety — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Observations on the funding landscape of EA and AI safety by Vilhelm Skoglund , Jona Oct 2 2023 17 min read 12 136 AI safety Community Building effective altruism Effective giving Fundraising Effective altruism funding Building the field of AI safety Funding opportunities Grantmak
+    contentLength: 606740
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.pymnts.com/legal/2023/ftx-collapse-robs-researchers-of-funding/
+    linkText: FTX Collapse Robs Researchers of Funding — PYMNTS.com — (2023)
+    claimContext: "**Committed grants halted or clawed back**: The FTX Future Fund had committed more than \\$160 million to over 110 nonprofits by the time of the collapse.[^20] FTX's new bankruptcy management demanded return of funds by end of February 2023, threatening legal action against non-compliant recipients. "
+    fetchedAt: 2026-02-22T02:16:43.330Z
+    httpStatus: 200
+    pageTitle: FTX Collapse Robs Researchers of Funding
+    contentSnippet: "FTX Collapse Robs Researchers of Funding --> --> --> FTX Collapse Robs Researchers of Funding FTX Collapse Robs Researchers of Funding By PYMNTS | April 6, 2023 Share: --> | The collapse of crypto exchange FTX has many victims. Add to the list: university researchers. Get the Full Story Complete the form to unlock this article and enjoy unlimited free access to all PYMNTS content — no additional logins required. yes Subscribe to our daily newsletter, PYMNTS Today. By completing this form, you ag"
+    contentLength: 186791
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://lawprofessors.typepad.com/nonprofit/2023/01/nonprofits-worry-about-ftx-charitable-donation-clawbacks.html
+    linkText: Nonprofits Worry About FTX Charitable Donation Clawbacks — Nonprofit Law Prof Blog — (January 2023)
+    claimContext: "**Committed grants halted or clawed back**: The FTX Future Fund had committed more than \\$160 million to over 110 nonprofits by the time of the collapse.[^20] FTX's new bankruptcy management demanded return of funds by end of February 2023, threatening legal action against non-compliant recipients. "
+    fetchedAt: 2026-02-22T02:16:43.509Z
+    httpStatus: 200
+    pageTitle: Typepad | Network Solutions
+    contentSnippet: "Typepad | Network Solutions close How can we help you today? Business Consultants Let our experts help you find the right solution for your unique needs. 855-834-8495 +1-570-708-8400 Hours: Mon-Fri 8am-11pm ET Chat Now Hours 24/7 Product Support We're here to help with setup, technical questions, and more. Chat Now Hours 24/7 Typepad has closed—your next chapter starts here Your previous provider has shut down, but your online presence can still thrive. Partner with Network Solutions to keep you"
+    contentLength: 304202
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists
+    linkText: Crypto Company's Collapse Strands Scientists — Science/AAAS — (2022–2023)
+    claimContext: "**Committed grants halted or clawed back**: The FTX Future Fund had committed more than \\$160 million to over 110 nonprofits by the time of the collapse.[^20] FTX's new bankruptcy management demanded return of funds by end of February 2023, threatening legal action against non-compliant recipients. "
+    fetchedAt: 2026-02-22T02:16:51.689Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 22
+    url: https://forum.effectivealtruism.org/posts/g5uKzBLjiEuC5k46A/ftx-community-response-survey-results
+    linkText: FTX Community Response Survey Results — EA Forum — (David Moss and Willem Sleegers, early 2023)
+    claimContext: "**Methodology**: The survey was added as a section to the 2022 EA Survey. A total of 3,567 respondents completed the broader EA Survey; of these, 1,012 agreed to answer the FTX section. An additional 300 respondents completed a separate FTX survey link provided for those who had already completed th"
+    fetchedAt: 2026-02-22T02:16:51.847Z
+    httpStatus: 200
+    pageTitle: FTX Community Response Survey Results — EA Forum
+    contentSnippet: FTX Community Response Survey Results — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents FTX Community Response Survey Results by Willem Sleegers , David_Moss Mar 15 2023 9 min read 33 181 Community Building effective altruism Rethink Priorities Data on the EA community Effective Altruism Survey FTX collapse Frontpage FTX Community Response Survey Results Summary EA satisfaction Recalled
+    contentLength: 789783
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://forum.effectivealtruism.org/posts/mCCutDxCavtnhxhBR/some-comments-on-recent-ftx-related-events
+    linkText: Some Comments on Recent FTX-Related Events — EA Forum — (November 10, 2022)
+    claimContext: "**Broader funding landscape effects**: The collapse caused a substantial contraction in expected longtermist funding. EA Funds' Long-Term Future Fund and Infrastructure Fund reported funding gaps of roughly \\$450,000 and \\$550,000 per month respectively following FTX's implosion.[^18] Open Philanthr"
+    fetchedAt: 2026-02-22T02:16:51.637Z
+    httpStatus: 200
+    pageTitle: Some comments on recent FTX-related events — EA Forum
+    contentSnippet: Some comments on recent FTX-related events — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Some comments on recent FTX-related events by Holden Karnofsky Nov 10 2022 5 min read 80 644 Building effective altruism Community FTX collapse Coefficient Giving FTX Foundation Effective altruism funding Organization updates Argentina Holden Karnofsky Writing advice Frontpage Some comments on r
+    contentLength: 1094688
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.newstatesman.com/long-reads/2023/11/sam-bankman-fried-crypto-king-effective-altruism
+    linkText: Sam Bankman-Fried and the Effective Altruism Delusion — New Statesman — (November 2023)
+    claimContext: MacAskill publicly acknowledged in the aftermath that the movement needed to engage in serious self-examination and that EA needed to make clear it does not see itself as above common-sense ethical norms.[^5] As of November 2023, following SBF's conviction, MacAskill declined to be interviewed by th
+    fetchedAt: 2026-02-22T02:16:51.895Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried and the effective altruism delusion - New Statesman
+    contentSnippet: "Sam Bankman-Fried and the effective altruism delusion - New Statesman Editor ’ s note: This article was originally published on 20 September. On 3 November, “Crypto King ” Sam Bankman-Fried was found guilty of fraud and money laundering. Sophie McBain looks at whether the idealist effective altruism philosophy will survive his conviction. The moral philosopher met a brilliant American maths student who wanted to know how he could do the most good in the world. How about becoming a banker, the ph"
+    contentLength: 227927
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://en.wikipedia.org/wiki/Trial_of_Sam_Bankman-Fried
+    linkText: Trial of Sam Bankman-Fried — Wikipedia
+    claimContext: 'On November 2, 2023, <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> was convicted by a federal jury in the U.S. District Court for the Southern District of New York on all seven counts he faced: wire fraud against FTX customers, wire fraud against Alameda Research lenders, conspir'
+    fetchedAt: 2026-02-22T02:16:51.509Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://www.npr.org/2024/03/28/1241210300/sam-bankman-fried-ftx-sentencing-crimes-crypto-mogul-greed
+    linkText: Sam Bankman-Fried Sentenced to 25 Years in Prison for His FTX Crimes — NPR — (March 28, 2024)
+    claimContext: On March 28, 2024, Judge Lewis Kaplan sentenced SBF to 25 years in federal prison, three years of supervised release, and required him to forfeit \$11.2 billion in illegal proceeds. Prosecutors had requested 40–50 years; the defense requested a substantially shorter sentence. Judge Kaplan specifical
+    fetchedAt: 2026-02-22T02:16:54.492Z
+    httpStatus: 200
+    pageTitle: "Sam Bankman-Fried sentenced to 25 years for his FTX crimes. : NPR"
+    contentSnippet: "Sam Bankman-Fried sentenced to 25 years for his FTX crimes. : NPR Accessibility links Skip to main content Keyboard shortcuts for audio player Sam Bankman-Fried sentenced to 25 years for his FTX crimes. The sentence marks a stunning fall for the 32-year-old former crypto executive who was once seen as the future of finance. Business Sam Bankman-Fried sentenced to 25 years in prison for his FTX crimes Updated March 28, 2024 11:55 AM ET Originally published March 28, 2024 5:41 AM ET By Rafael Nam "
+    contentLength: 110132
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://forum.effectivealtruism.org/posts/bNWgMHAsXdpwiSphN/linkpost-sbf-sentenced-to-25-years-jail
+    linkText: "Linkpost: SBF Sentenced to 25 Years Jail — EA Forum — (March 28, 2024)"
+    claimContext: No major EA institution—including CEA or Open Philanthropy—issued a formal public statement specifically addressing the conviction or the sentencing. EA Forum community discussion at the time of sentencing noted that SBF "did terrible acts from many different moral viewpoints, including that of cons
+    fetchedAt: 2026-02-22T02:16:54.887Z
+    httpStatus: 200
+    pageTitle: "Linkpost: SBF sentenced to 25 years jail — EA Forum"
+    contentSnippet: "Linkpost: SBF sentenced to 25 years jail — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Linkpost: SBF sentenced to 25 years jail by Deborah W.A. Foulkes Mar 28 2024 1 min read 41 33 Community FTX collapse Sam Bankman-Fried Frontpage This is a linkpost for https://www.theguardian.com/business/2024/mar/28/sam-bankman-fried-sentenced-prison-ftx-fraud 33 0 2 Reactions 0 2 Comments 41 Comment Sorted by New & up"
+    contentLength: 760506
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://forum.effectivealtruism.org/posts/abs8xsBDyCzR83YzY/cea-is-spinning-out-of-effective-ventures
+    linkText: CEA is Spinning Out of Effective Ventures — EA Forum — (Centre for Effective Altruism, January 18, 2024)
+    claimContext: "**Decentralization**: EV simultaneously announced a plan to decentralize the EA ecosystem by offboarding its projects into independent legal entities over a 1–2 year period. In January 2024, CEA formally announced it was spinning out from EV to become an independent organization.[^28]"
+    fetchedAt: 2026-02-22T02:16:52.950Z
+    httpStatus: 200
+    pageTitle: CEA is spinning out of Effective Ventures — EA Forum
+    contentSnippet: CEA is spinning out of Effective Ventures — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. CEA is spinning out of Effective Ventures by Eli_Nathan , Ben_West🔸 Jan 18 2024 1 min read 0 69 Community Announcements and updates Centre for Effective Altruism Organization updates Frontpage The Centre for Effective Altruism (CEA) is spinning out as a project of Effective Ventures Foundation UK and Effective Venture
+    contentLength: 155157
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://forum.effectivealtruism.org/posts/wHugJrfG9fL3bk47M/upcoming-changes-to-the-ev-us-and-ev-uk-leadership-teams
+    linkText: Upcoming Changes to the EV US and EV UK Leadership Teams — EA Forum — (Effective Ventures, February 7, 2024)
+    claimContext: "**Governance changes**: EV underwent 100% board turnover on both its UK and US boards following the collapse. New CEOs were hired: Zach Robinson for EV US and Rob Gledhill for EV UK. Finance and legal teams were strengthened, and policies were updated with more robust controls. Tasha McCauley and Cl"
+    fetchedAt: 2026-02-22T02:16:53.407Z
+    httpStatus: 200
+    pageTitle: Upcoming changes to the EV US and EV UK leadership teams — EA Forum
+    contentSnippet: Upcoming changes to the EV US and EV UK leadership teams — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Upcoming changes to the EV US and EV UK leadership teams by Rob Gledhill Feb 7 2024 2 min read 10 48 Community Effective Ventures Announcements and updates Nonprofit governance Organization updates Frontpage I wanted to provide an update about the leadership teams of Effective Ventures Foundation USA, In
+    contentLength: 302356
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://forum.effectivealtruism.org/posts/73mAv8m3PjsXzJ4Ad/update-on-project-on-reforms-at-ea-organizations
+    linkText: Update on Project on Reforms at EA Organizations — EA Forum — (Julia Wise, Ozzie Gooen, Sam Donald, June 17, 2023)
+    claimContext: A cross-organizational reform project involving Julia Wise (CEA/GiveWell), Ozzie Gooen (QURI), and Sam Donald (Open Philanthropy) was launched in mid-2023, aimed at having people from across different organizations examine questions of governance and cultural reform to prevent similar issues from re
+    fetchedAt: 2026-02-22T02:16:53.028Z
+    httpStatus: 200
+    pageTitle: Update on project on reforms at EA organizations — EA Forum
+    contentSnippet: 'Update on project on reforms at EA organizations — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Update on project on reforms at EA organizations by Julia_Wise🔸 , Sam Donald , Ozzie Gooen Jun 17 2023 2 min read 11 89 Community EA Strategy Fortnight CEA Community Health Team Nonprofit governance Organization strategy Frontpage [Edited, November 2023: finished materials here .] [Edited, June 2023: the name "'
+    contentLength: 316218
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://forum.effectivealtruism.org/posts/zt6MsCCDStm74HFwo/ea-funds-organisational-update-open-philanthropy-matching
+    linkText: "EA Funds Organisational Update: Open Philanthropy Matching and Distancing — EA Forum — (EA Funds team, August 2023)"
+    claimContext: On funding concentration, EA Funds and Open Philanthropy worked to increase separation. Chairs of the Long-Term Future Fund and EA Infrastructure Fund who had also joined as Open Philanthropy staff planned to step down from their fund chair positions. The stated goals included increasing diversity o
+    fetchedAt: 2026-02-22T02:16:55.994Z
+    httpStatus: 200
+    pageTitle: "EA Funds organisational update: Open Philanthropy matching and distancing — EA Forum"
+    contentSnippet: "EA Funds organisational update: Open Philanthropy matching and distancing — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA Funds organisational update: Open Philanthropy matching and distancing by calebp Aug 2 2023 6 min read 40 126 Building effective altruism Community Effective giving Effective Altruism Funds Announcements and updates Coefficient Giving Donation matching Effective"
+    contentLength: 875161
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://blog.oup.com/2022/12/the-predictably-grievous-harms-of-effective-altruism/
+    linkText: The Predictably Grievous Harms of Effective Altruism — OUP Blog — (December 2022)
+    claimContext: "**Broader EA cultural critique**: A strand of criticism argued that the FTX collapse was not an isolated aberration but symptomatic of systemic issues—including concentration of influence in a small intellectual elite, and a tendency to prioritize quantifiable impact metrics over concerns about inst"
+    fetchedAt: 2026-02-22T02:16:56.922Z
+    httpStatus: 200
+    pageTitle: The predictably grievous harms of Effective Altruism | OUPblog
+    contentSnippet: The predictably grievous harms of Effective Altruism | OUPblog The Good It Promises, the Harm It Does Buy Now By Alice Crary , Lori Gruen , and Carol J. Adams December 12 th 2022 Over the past decade the philanthropic ideology of Effective Altruism (EA) has grown massively both in attracting funds and in influencing young people to try to make as much money as they can and give most of it away. EA offers adherents a philosophy of charitable giving that promises to do the “most good” per dollar d
+    contentLength: 71769
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.hollywoodreporter.com/news/general-news/effective-altruism-sam-bankman-fried-comeback-1236327219/
+    linkText: "Giving on the Edge: Effective Altruism's Post-SBF Comeback — Hollywood Reporter — (2024)"
+    claimContext: "- **Long-term funding impact**: While short-term metrics showed significant declines in GWWC pledges and EA Forum engagement following the collapse, and the funding landscape for longtermist causes contracted substantially, the degree to which alternative funders compensated for the loss is only par"
+    fetchedAt: 2026-02-22T02:16:56.854Z
+    httpStatus: 200
+    pageTitle: Effective Altruism’s Post-Sam Bankman-Fried Comeback
+    contentSnippet: Effective Altruism’s Post-Sam Bankman-Fried Comeback &times; Skip to main content By Steven Zeitchik Plus Icon Steven Zeitchik Senior Editor, Technology and Politics View All July 24, 2025 6:15am Share on Facebook Share on X Google Preferred Share to Flipboard Show additional share options Share on LinkedIn Share on Pinterest Share on Reddit Share on Tumblr Share on Whats App Send an Email Print the Article Post a Comment Australian moral philosopher Peter Singer, the intellectual architect of E
+    contentLength: 617288
+    status: verified
+    note: null

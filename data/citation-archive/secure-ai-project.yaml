@@ -1,0 +1,172 @@
+pageId: secure-ai-project
+verifiedAt: 2026-02-22
+totalCitations: 15
+verified: 9
+broken: 5
+unverifiable: 1
+citations:
+  - footnote: 1
+    url: https://nickbeckstead.com/
+    linkText: Nick Beckstead personal website
+    claimContext: The **Secure AI Project** is a San Francisco-based organization that develops and advocates for pragmatic policies to reduce risks from advanced AI systems. Co-founded and led by Nick Beckstead as CEO, the organization distinguishes itself by focusing on legislative and regulatory interventions rath
+    fetchedAt: 2026-02-22T02:25:48.535Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: unverifiable
+    note: timeout
+  - footnote: 2
+    url: https://secureaiproject.org/
+    linkText: Secure AI Project website - About
+    claimContext: The organization operates on the premise that the AI ecosystem will be stronger and more secure if large AI developers are legally required to publish safety and security protocols, if whistleblowers are protected from retaliation, and if developers have clear incentives to mitigate risk in accordan
+    fetchedAt: 2026-02-22T02:24:58.252Z
+    httpStatus: 200
+    pageTitle: Secure AI Project | AI Policy & Safety Advocacy
+    contentSnippet: "Secure AI Project | AI Policy & Safety Advocacy --> --> We develop and advocate for pragmatic policies to reduce risks of severe harm from advanced AI. Learn More About Us Learn More About Us Secure AI Project 584 Castro Street #3160 San Francisco, CA 94114 &copy; 2026 Secure AI Project Privacy Policy"
+    contentLength: 9868
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://forum.effectivealtruism.org/topics/nick-beckstead
+    linkText: Nick Beckstead - EA Forum Topic
+    claimContext: Secure AI Project explicitly does not accept corporate funding or funds from foreign governments, instead relying on individual donors and nonprofit institutions aligned with its mission.[^2] According to a 2025 nonprofit review by Zvi Mowshowitz, the organization has achieved "big wins" including e
+    fetchedAt: 2026-02-22T02:24:58.350Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead - EA Forum
+    contentSnippet: "Nick Beckstead - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Nick Beckstead Edit History Discussion 0 Subscribe Edit History Discussion 0 Nick Beckstead Background Research Further reading External links Random Topic Contributors 3 Pablo 2 Amber Dawn 1 Leo Nicholas Beckstead (born 1985) is an American philosopher and AI governance and safety consultant. Background Beckstead majored "
+    contentLength: 248087
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/users/nick_beckstead
+    linkText: Nick Beckstead EA Forum Profile
+    claimContext: Nick Beckstead brings extensive experience in AI safety, governance, and effective altruism philanthropy to his role as Secure AI Project's co-founder and CEO. Born in 1985, he earned a bachelor's degree in mathematics and philosophy from the University of Minnesota before completing a Ph.D. in Phil
+    fetchedAt: 2026-02-22T02:24:59.166Z
+    httpStatus: 200
+    pageTitle: Nick_Beckstead - EA Forum
+    contentSnippet: "Nick_Beckstead - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. NB Nick_Beckstead 3591 karma Joined Aug 2014 Message Get notified Posts 19 Sorted by New 80 Updates to the Effective Ventures US board Zachary Robinson🔸 Zachary Robinson🔸 , Nicole_Ross , Nick_Beckstead + 0 more · 3y ago · 1 m read 12 12 680 The FTX Future Fund team has resigned Nick_Beckstead Nick_Beckstead , leopold , ab , ketanrama + 0 more "
+    contentLength: 302200
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.openphilanthropy.org/grants/redwood-research-general-support-2023/
+    linkText: Redwood Research Grant - Coefficient Giving
+    claimContext: Beckstead served as a Research Fellow at Oxford University's <EntityLink id="fhi">Future of Humanity Institute</EntityLink> before joining <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> as a Program Officer in 2014.[^1] At Coefficient Giving, he oversaw research and grantmaking r
+    fetchedAt: 2026-02-22T02:25:03.925Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 6
+    url: https://www.openphilanthropy.org/research/our-progress-in-2017-and-plans-for-2018/
+    linkText: Coefficient Giving Progress 2017
+    claimContext: During his time at Coefficient Giving, Beckstead co-authored sections on <EntityLink id="alignment">AI alignment</EntityLink> risks and noted ongoing challenges in finding qualified people to work on "the strategic aspect of potential risks from advanced AI," indicating significant funding availabil
+    fetchedAt: 2026-02-22T02:25:57.769Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 7
+    url: https://www.openphilanthropy.org/request-for-proposals-for-projects-in-ai-alignment-that-work-with-deep-learning-systems/
+    linkText: Coefficient Giving AI Alignment RFP
+    claimContext: During his time at Coefficient Giving, Beckstead co-authored sections on <EntityLink id="alignment">AI alignment</EntityLink> risks and noted ongoing challenges in finding qualified people to work on "the strategic aspect of potential risks from advanced AI," indicating significant funding availabil
+    fetchedAt: 2026-02-22T02:25:57.330Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 8
+    url: https://forum.effectivealtruism.org/posts/XtgDaunRKtCPzyCWg/open-philanthropy-technical-ai-safety-rfp-usd40m-available
+    linkText: Coefficient Giving Technical AI Safety RFP - EA Forum
+    claimContext: The organization's work aligns with broader <EntityLink id="ai-governance">AI governance</EntityLink> discussions about model weight security, access controls, and screening procedures to prevent bad actors from exploiting powerful AI systems.[^8] Their 2024 reports and scenario planning work have b
+    fetchedAt: 2026-02-22T02:25:49.839Z
+    httpStatus: 200
+    pageTitle: Open Philanthropy Technical AI Safety RFP - $40M Available Across 21 Research Areas — EA Forum
+    contentSnippet: Open Philanthropy Technical AI Safety RFP - $40M Available Across 21 Research Areas — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Open Philanthropy Technical AI Safety RFP - $40M Available Across 21 Research Areas by Jake Mendel , Max Nadeau , Peter Favaloro Feb 6 2025 1 min read 3 95 AI safety Opportunities to take action Announcements and updates Coefficient Giving Grantmaking Res
+    contentLength: 193130
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://en.wikipedia.org/wiki/Safe_and_Secure_Innovation_for_Frontier_Artificial_Intelligence_Models_Act
+    linkText: California SB 1047 - Wikipedia
+    claimContext: Secure AI Project's advocacy appears to have influenced legislative developments. California approved an AI safety law in 2025, effective January 1, 2026, that requires AI developers to implement safeguards—directly aligned with the organization's push for mandatory safety and security protocols, th
+    fetchedAt: 2026-02-22T02:25:49.553Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 10
+    url: https://www.alignmentforum.org/posts/26SHhxK2yYQbh7ors/research-directions-open-phil-wants-to-fund-in-technical-ai
+    linkText: Research directions Open Phil wants to fund - Alignment Forum
+    claimContext: At Coefficient Giving, Beckstead co-authored views on <EntityLink id="alignment">AI alignment</EntityLink> risks and loss of control scenarios, citing work by <EntityLink id="nick-bostrom">Nick Bostrom</EntityLink> on potential large-scale harms from advanced AI.[^10] He advocated for "AI for AI saf
+    fetchedAt: 2026-02-22T02:25:56.142Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 11
+    url: https://www.effectivealtruism.org/articles/ea-global-2018-beckstead-fireside-chat
+    linkText: Nick Beckstead Fireside Chat 2018 - EA Global
+    claimContext: In public discussions, Beckstead has acknowledged challenges in mainstream AI researcher engagement with technical safety work, noting "Kuhnian barriers" in the machine learning field that favor empirical results over philosophical safety motivations.[^11] He described how work that doesn't resemble
+    fetchedAt: 2026-02-22T02:25:59.540Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead Fireside Chat (2018) | Effective Altruism
+    contentSnippet: "Nick Beckstead Fireside Chat (2018) | Effective Altruism Nick Beckstead Fireside Chat (2018) In this fireside chat from EA Global 2018: San Francisco, Rob Wiblin asks Nick Beckstead questions about the long-term future, epistemic humility, and which careers effective altruists may not be exploring enough. A transcript of their chat is below, which we have lightly edited for readability. Rob : How many people heard the podcast interview I did with Beckstead a couple months ago? I&#x27;m going to "
+    contentLength: 129762
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://80000hours.org/podcast/episodes/nick-beckstead-giving-billions/
+    linkText: Nick Beckstead podcast - 80,000 Hours
+    claimContext: Within the effective altruism community, Beckstead has been featured positively on platforms like the EA Forum and in <EntityLink id="80000-hours">80,000 Hours</EntityLink> podcasts discussing high-impact career paths in AI safety.[^4] He has recommended paths such as deep learning residencies (like
+    fetchedAt: 2026-02-22T02:25:59.115Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead on how to spend billions of dollars preventing human extinction | 80,000 Hours
+    contentSnippet: "Nick Beckstead on how to spend billions of dollars preventing human extinction | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 4 Related episodes Credit: ESA. Read transcript See all episodes What if you were in a position to give away billions of dollars to improve the world? What would you do with it? This is the problem facing Program Officers at Open Philanthropy – people like Dr Nick Beckstead. Followin"
+    contentLength: 249881
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/Defu3jkejb7pmLjeN/nick-beckstead-is-leaving-the-effective-ventures-boards
+    linkText: Nick Beckstead leaving EV boards - EA Forum
+    claimContext: While no direct criticisms of Secure AI Project itself appear in available sources, Beckstead's career has intersected with some controversial areas within effective altruism. In 2017, while serving as a trustee of the <EntityLink id="cea">Centre for Effective Altruism</EntityLink> (CEA), he approve
+    fetchedAt: 2026-02-22T02:25:59.221Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead is leaving the Effective Ventures boards — EA Forum
+    contentSnippet: Nick Beckstead is leaving the Effective Ventures boards — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Nick Beckstead is leaving the Effective Ventures boards by Eli Rose🔸 , lincolnq Sep 6 2023 2 min read 7 130 Community Announcements and updates Nick Beckstead Effective Ventures Frontpage On 23rd August, Nick Beckstead stepped down from the boards of Effective Ventures UK and Effective Ventures US. For c
+    contentLength: 220783
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://forum.effectivealtruism.org/posts/xwDG64qAjGjQeXwfd/nick-beckstead-ea-community-building
+    linkText: Nick Beckstead on EA community building - EA Forum
+    claimContext: Some critics of effective altruism have questioned the movement's shift toward longtermism and existential risk focus, including AI risk, as a core priority.[^14] Beckstead's defense of AI and biosecurity funding as cost-effective drew scrutiny in 2018 discussions about whether such focus might harm
+    fetchedAt: 2026-02-22T02:25:59.166Z
+    httpStatus: 200
+    pageTitle: "Nick Beckstead: EA community building — EA Forum"
+    contentSnippet: "Nick Beckstead: EA community building — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Nick Beckstead: EA community building by EA Global Aug 11 2017 20 min read 0 7 Building effective altruism Community Summer Program on Applied Rationality and Cognition Frontpage Nick Beckstead: EA community building The Talk Q&A No comments This is a linkpost for https://www.youtube.com/watch?v=bDhl"
+    contentLength: 251985
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://forum.effectivealtruism.org/posts/mCSmr6LNNQD4AKj4z/kerry-vaughan-nick-beckstead-and-lewis-bollard-ea-funds
+    linkText: "Kerry Vaughan, Nick Beckstead, and Lewis Bollard: EA Funds - EA Forum"
+    claimContext: Additionally, during his time managing the Long-Term Future Fund, Beckstead made one small AI safety grant but conserved 96% of available funds, drawing indirect critique in AI safety funding reviews.[^15]
+    fetchedAt: 2026-02-22T02:25:59.347Z
+    httpStatus: 200
+    pageTitle: "Kerry Vaughan, Nick Beckstead, and Lewis Bollard: EA Funds — EA Forum"
+    contentSnippet: "Kerry Vaughan, Nick Beckstead, and Lewis Bollard: EA Funds — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Kerry Vaughan, Nick Beckstead, and Lewis Bollard: EA Funds by EA Global Aug 11 2017 1 min read 0 7 Building effective altruism Effective altruism funding Effective Altruism Funds Frontpage This is a linkpost for https://www.youtube.com/watch?v=QudFciXt6L0&list=PLwp9xeoX5p8NnWYsybl_ZRMtaK7uBr4sN&index=1"
+    contentLength: 102040
+    status: verified
+    note: null

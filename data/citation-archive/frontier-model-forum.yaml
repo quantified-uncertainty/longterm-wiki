@@ -1,0 +1,590 @@
+pageId: frontier-model-forum
+verifiedAt: 2026-02-22
+totalCitations: 53
+verified: 52
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.frontiermodelforum.org/about-us/
+    linkText: Frontier Model Forum - About Us
+    claimContext: The **Frontier Model Forum (FMF)** is an industry-supported non-profit organization established in July 2023 to promote self-governance in frontier AI safety through collaborative development of best practices, research coordination, and information-sharing among leading AI developers.[^1] Led by Ex
+    fetchedAt: 2026-02-22T02:05:27.996Z
+    httpStatus: 200
+    pageTitle: About - Frontier Model Forum
+    contentSnippet: "About - Frontier Model Forum Our mission The Frontier Model Forum (FMF) is an industry-supported non-profit dedicated to advancing frontier AI safety and security. The FMF has three core mandates: Identify best practices and support standards development for frontier AI safety and security. Advance the science of frontier AI safety and security. Facilitate information sharing about frontier AI safety and security among government, academia, civil society and industry. The FMF focuses primarily o"
+    contentLength: 105470
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.frontiermodelforum.org
+    linkText: Frontier Model Forum - Home
+    claimContext: The **Frontier Model Forum (FMF)** is an industry-supported non-profit organization established in July 2023 to promote self-governance in frontier AI safety through collaborative development of best practices, research coordination, and information-sharing among leading AI developers.[^1] Led by Ex
+    fetchedAt: 2026-02-22T02:05:28.045Z
+    httpStatus: 200
+    pageTitle: Frontier Model Forum
+    contentSnippet: "Frontier Model Forum Frontier Model Forum: Advancing frontier AI safety and security The Frontier Model Forum draws on the technical and operational expertise of its member companies to ensure that the most advanced AI systems remain safe and secure, so that they can meet society’s most pressing needs. What the Frontier Model Forum does The Frontier Model Forum is an industry-supported non-profit focused on addressing significant risks to public safety and national security. We have three core m"
+    contentLength: 116882
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://wandb.ai/byyoung3/ml-news/reports/The-Frontier-Model-Forum-For-AI-Safety---Vmlldzo0OTc5MzQ5
+    linkText: Weights & Biases - The Frontier Model Forum For AI Safety
+    claimContext: The Forum emerged as a response to growing recognition that advanced AI systems require coordinated safety frameworks beyond individual company efforts. Its founding members—<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink>, Microsoft, and <Ent
+    fetchedAt: 2026-02-22T02:05:27.941Z
+    httpStatus: 200
+    pageTitle: Weights & Biases
+    contentSnippet: Weights & Biases
+    contentLength: 5757
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.frontiermodelforum.org/about-us/
+    linkText: Frontier Model Forum - About Us
+    claimContext: "The FMF operates through three core mandates: identifying best practices and standards for frontier AI safety and security, advancing scientific research on safety mechanisms, and facilitating information-sharing across industry, government, academia, and civil society.[^4] While positioned as an in"
+    fetchedAt: 2026-02-22T02:05:28.035Z
+    httpStatus: 200
+    pageTitle: About - Frontier Model Forum
+    contentSnippet: "About - Frontier Model Forum Our mission The Frontier Model Forum (FMF) is an industry-supported non-profit dedicated to advancing frontier AI safety and security. The FMF has three core mandates: Identify best practices and support standards development for frontier AI safety and security. Advance the science of frontier AI safety and security. Facilitate information sharing about frontier AI safety and security among government, academia, civil society and industry. The FMF focuses primarily o"
+    contentLength: 105365
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://blog.google/company-news/outreach-and-initiatives/public-policy/google-microsoft-openai-anthropic-frontier-model-forum/
+    linkText: Google Blog - Frontier Model Forum announcement
+    claimContext: The Frontier Model Forum was officially announced on July 26, 2023, through coordinated blog posts from its four founding companies.[^5] The announcement emphasized the urgency of establishing unified safety standards amid rapid AI advancement, with founding members agreeing to pool technical expert
+    fetchedAt: 2026-02-22T02:05:27.766Z
+    httpStatus: 200
+    pageTitle: Anthropic, Google, Microsoft and OpenAI launch Frontier Model Forum
+    contentSnippet: "Anthropic, Google, Microsoft and OpenAI launch Frontier Model Forum Frontier Model Forum: A new partnership to promote responsible AI Jul 26, 2023 · Share x.com Facebook LinkedIn Mail Copy link Anthropic, Google, Microsoft and OpenAI are launching the Frontier Model Forum, an industry body focused on ensuring safe and responsible development of frontier AI models. Share x.com Facebook LinkedIn Mail Copy link Editor’s note: Today, Google, Microsoft, OpenAI and Anthropic published the following jo"
+    contentLength: 348401
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://blogs.microsoft.com/on-the-issues/2023/07/26/anthropic-google-microsoft-openai-launch-frontier-model-forum/
+    linkText: Microsoft Blog - Anthropic, Google, Microsoft, OpenAI launch Frontier Model Forum
+    claimContext: The Frontier Model Forum was officially announced on July 26, 2023, through coordinated blog posts from its four founding companies.[^5] The announcement emphasized the urgency of establishing unified safety standards amid rapid AI advancement, with founding members agreeing to pool technical expert
+    fetchedAt: 2026-02-22T02:05:29.573Z
+    httpStatus: 200
+    pageTitle: Microsoft, Anthropic, Google, and OpenAI launch Frontier Model Forum - Microsoft On the Issues
+    contentSnippet: Microsoft, Anthropic, Google, and OpenAI launch Frontier Model Forum - Microsoft On the Issues Skip to content Skip to main content Microsoft, Anthropic, Google , and OpenAI are launching the Frontier Model Forum, an industry body focused on ensuring safe and responsible development of frontier AI models. The Forum aims to help (i) advance AI safety research to promote responsible development of frontier models and minimize potential risks, (ii) identify safety best practices for frontier models
+    contentLength: 165005
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.frontiermodelforum.org/about-us/
+    linkText: Frontier Model Forum - About Us
+    claimContext: "The organization was legally established as a 501(c)(6) non-profit, a structure that allows industry associations to pursue public benefits without engaging in lobbying activities.[^7] Kent Walker, President of Global Affairs at Google & Alphabet, stated at launch: \"We're excited to work together wi"
+    fetchedAt: 2026-02-22T02:05:29.079Z
+    httpStatus: 200
+    pageTitle: About - Frontier Model Forum
+    contentSnippet: "About - Frontier Model Forum Our mission The Frontier Model Forum (FMF) is an industry-supported non-profit dedicated to advancing frontier AI safety and security. The FMF has three core mandates: Identify best practices and support standards development for frontier AI safety and security. Advance the science of frontier AI safety and security. Facilitate information sharing about frontier AI safety and security among government, academia, civil society and industry. The FMF focuses primarily o"
+    contentLength: 105365
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.lesswrong.com/posts/hcWc76eCan3FF5XBk/frontier-model-forum
+    linkText: LessWrong - Frontier Model Forum
+    claimContext: "The organization was legally established as a 501(c)(6) non-profit, a structure that allows industry associations to pursue public benefits without engaging in lobbying activities.[^7] Kent Walker, President of Global Affairs at Google & Alphabet, stated at launch: \"We're excited to work together wi"
+    fetchedAt: 2026-02-22T02:05:29.743Z
+    httpStatus: 200
+    pageTitle: Frontier Model Forum — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Frontier Model Forum — LessWrong Anthropic (org) DeepMind OpenAI AI Frontpage 27 Frontier Model Forum by Zach Stein-Perlman 26th Jul 2023 Linkpost from blog.google 4 min read 0 27 Posted by Anthropic , Google , Microsoft , and OpenAI : Today, Anthropic, Google, Microsoft and OpenAI are announcing the formation of the Frontier Model Forum, a new industry body focused on"
+    contentLength: 280282
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.frontiermodelforum.org/ai-safety-fund/
+    linkText: Frontier Model Forum - AI Safety Fund
+    claimContext: '**October 2023**: The FMF launched the AI Safety Fund (AISF), a collaborative \$10+ million initiative funded by the founding members plus philanthropic partners including the Patrick J. McGovern Foundation, David and Lucile Packard Foundation, Schmidt Sciences, and <EntityLink id="jaan-tallinn">Jaa'
+    fetchedAt: 2026-02-22T02:05:29.245Z
+    httpStatus: 200
+    pageTitle: AI Safety Fund - Frontier Model Forum
+    contentSnippet: AI Safety Fund - Frontier Model Forum AI Safety Fund The AI Safety Fund (AISF) is a collaborative $10 million+ initiative established in October 2023 to accelerate and expand the field of AI safety and security research. Support for the fund has come from the founding members of the Frontier Model Forum, including Anthropic, Google, Microsoft, and OpenAI, as well as philanthropic partners such as the Patrick J. McGovern Foundation, the David and Lucile Packard Foundation, Schmidt Sciences, and J
+    contentLength: 103610
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.frontiermodelforum.org/updates/introducing-the-fmfs-technical-report-series-on-frontier-ai-safety-frameworks/
+    linkText: Frontier Model Forum - Technical Report Series on Frontier AI Safety Frameworks
+    claimContext: "**May 2024**: At the AI Seoul Summit, FMF members signed the **Frontier AI Safety Commitments**, pledging to develop and publish individual safety frameworks before the February 2025 AI Action Summit in Paris.[^10] This marked a shift from high-level principles to concrete, actionable commitments wi"
+    fetchedAt: 2026-02-22T02:05:29.284Z
+    httpStatus: 200
+    pageTitle: Introducing the FMF’s Technical Report Series on Frontier AI Frameworks - Frontier Model Forum
+    contentSnippet: "Introducing the FMF’s Technical Report Series on Frontier AI Frameworks - Frontier Model Forum Introducing the FMF’s Technical Report Series on Frontier AI Frameworks Posted on: 22nd April 2025 WORKSTREAM Frontier AI Frameworks TECHNICAL REPORTS Risk Taxonomy and Thresholds for Frontier AI Frameworks Frontier Capability Assessments Frontier Mitigations Third-Party Assessments for Frontier AI Frameworks As AI systems advance in capability, they have the potential to accelerate scientific discover"
+    contentLength: 129911
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.frontiermodelforum.org/updates/introducing-the-fmfs-technical-report-series-on-frontier-ai-safety-frameworks/
+    linkText: Frontier Model Forum - Technical Report Series on Frontier AI Safety Frameworks
+    claimContext: "**May 2024**: At the AI Seoul Summit, FMF members signed the **Frontier AI Safety Commitments**, pledging to develop and publish individual safety frameworks before the February 2025 AI Action Summit in Paris.[^10] This marked a shift from high-level principles to concrete, actionable commitments wi"
+    fetchedAt: 2026-02-22T02:05:30.783Z
+    httpStatus: 200
+    pageTitle: Introducing the FMF’s Technical Report Series on Frontier AI Frameworks - Frontier Model Forum
+    contentSnippet: "Introducing the FMF’s Technical Report Series on Frontier AI Frameworks - Frontier Model Forum Introducing the FMF’s Technical Report Series on Frontier AI Frameworks Posted on: 22nd April 2025 WORKSTREAM Frontier AI Frameworks TECHNICAL REPORTS Risk Taxonomy and Thresholds for Frontier AI Frameworks Frontier Capability Assessments Frontier Mitigations Third-Party Assessments for Frontier AI Frameworks As AI systems advance in capability, they have the potential to accelerate scientific discover"
+    contentLength: 129911
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.frontiermodelforum.org/ai-safety-fund/
+    linkText: Frontier Model Forum - AI Safety Fund
+    claimContext: "**June 2025**: Following the closure of the Meridian Institute, the FMF assumed direct management of the AI Safety Fund.[^12] This transition gave the Forum more control over grant distribution and research priorities."
+    fetchedAt: 2026-02-22T02:05:30.780Z
+    httpStatus: 200
+    pageTitle: AI Safety Fund - Frontier Model Forum
+    contentSnippet: AI Safety Fund - Frontier Model Forum AI Safety Fund The AI Safety Fund (AISF) is a collaborative $10 million+ initiative established in October 2023 to accelerate and expand the field of AI safety and security research. Support for the fund has come from the founding members of the Frontier Model Forum, including Anthropic, Google, Microsoft, and OpenAI, as well as philanthropic partners such as the Patrick J. McGovern Foundation, the David and Lucile Packard Foundation, Schmidt Sciences, and J
+    contentLength: 103610
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.lesswrong.com/posts/hcWc76eCan3FF5XBk/frontier-model-forum
+    linkText: LessWrong - Frontier Model Forum
+    claimContext: The FMF is governed by an operating board composed of representatives from member organizations, with plans for an Advisory Board to provide guidance from diverse stakeholder perspectives.[^13] The organization emphasized at launch that membership would be open to firms capable of developing frontie
+    fetchedAt: 2026-02-22T02:05:31.132Z
+    httpStatus: 200
+    pageTitle: Frontier Model Forum — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Frontier Model Forum — LessWrong Anthropic (org) DeepMind OpenAI AI Frontpage 27 Frontier Model Forum by Zach Stein-Perlman 26th Jul 2023 Linkpost from blog.google 4 min read 0 27 Posted by Anthropic , Google , Microsoft , and OpenAI : Today, Anthropic, Google, Microsoft and OpenAI are announcing the formation of the Frontier Model Forum, a new industry body focused on"
+    contentLength: 280282
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.frontiermodelforum.org/membership/
+    linkText: Frontier Model Forum - Membership
+    claimContext: The FMF is governed by an operating board composed of representatives from member organizations, with plans for an Advisory Board to provide guidance from diverse stakeholder perspectives.[^13] The organization emphasized at launch that membership would be open to firms capable of developing frontie
+    fetchedAt: 2026-02-22T02:05:30.953Z
+    httpStatus: 200
+    pageTitle: Membership - Frontier Model Forum
+    contentSnippet: Membership - Frontier Model Forum Membership The Frontier Model Forum is an industry non-profit dedicated to advancing the safe development and deployment of frontier AI systems. The FMF draws on the technical and operational expertise of its member firms to benefit the broader AI safety ecosystem. We seek to admit members with a clear ability to develop and deploy frontier AI systems at scale, a proven commitment to AI safety and security, and a willingness to contribute to the mission of the F
+    contentLength: 103778
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.frontiermodelforum.org/updates/issue-brief-components-of-frontier-ai-safety-frameworks/
+    linkText: "Frontier Model Forum - Issue Brief: Components of Frontier AI Safety Frameworks"
+    claimContext: The centerpiece of the FMF's approach is the development of **frontier AI safety frameworks**—prespecified guidelines that integrate capability assessments, risk thresholds, and mitigation measures into structured risk management processes.[^15] These frameworks emerged as the primary tool for indus
+    fetchedAt: 2026-02-22T02:05:31.247Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Components of Frontier AI Safety Frameworks - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Components of Frontier AI Safety Frameworks - Frontier Model Forum Issue Brief: Components of Frontier AI Safety Frameworks By: Frontier Model Forum Posted on: 8th November 2024 Safety frameworks have recently emerged as an important tool for frontier AI safety. By specifying capability and/or risk thresholds, safety evaluations and mitigation strategies for frontier AI models in advance of their development, safety frameworks position frontier AI developers to be able to address po"
+    contentLength: 135658
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.frontiermodelforum.org/updates/issue-brief-components-of-frontier-ai-safety-frameworks/
+    linkText: "Frontier Model Forum - Issue Brief: Components of Frontier AI Safety Frameworks"
+    claimContext: Effective safety frameworks include the following components:[^16]
+    fetchedAt: 2026-02-22T02:05:32.284Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Components of Frontier AI Safety Frameworks - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Components of Frontier AI Safety Frameworks - Frontier Model Forum Issue Brief: Components of Frontier AI Safety Frameworks By: Frontier Model Forum Posted on: 8th November 2024 Safety frameworks have recently emerged as an important tool for frontier AI safety. By specifying capability and/or risk thresholds, safety evaluations and mitigation strategies for frontier AI models in advance of their development, safety frameworks position frontier AI developers to be able to address po"
+    contentLength: 135658
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://metr.org/common-elements
+    linkText: METR - Common Elements of Frontier AI Safety Protocols
+    claimContext: Example implementations from member companies include:[^17]
+    fetchedAt: 2026-02-22T02:05:33.526Z
+    httpStatus: 200
+    pageTitle: Common Elements of Frontier AI Safety Policies - METR
+    contentSnippet: Common Elements of Frontier AI Safety Policies - METR Research Notes Updates About Donate Careers Search --> Research Notes Updates About Donate Careers Menu Common Elements of Frontier AI Safety Policies Common Elements of Frontier AI Safety Policies Summary A number of developers of large foundation models have committed to corporate protocols that lay out how they will evaluate their models for severe risks and mitigate these risks with information security measures, deployment safeguards, an
+    contentLength: 309949
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.frontiermodelforum.org/updates/introducing-the-fmfs-technical-report-series-on-frontier-ai-safety-frameworks/
+    linkText: Frontier Model Forum - Technical Report Series on Frontier AI Safety Frameworks
+    claimContext: The FMF has published a technical report series to detail implementation approaches and harmonize practices across firms, emphasizing the need for standardized evaluation protocols, capability assessment metrics, and safeguard testing methodologies.[^18]
+    fetchedAt: 2026-02-22T02:05:32.273Z
+    httpStatus: 200
+    pageTitle: Introducing the FMF’s Technical Report Series on Frontier AI Frameworks - Frontier Model Forum
+    contentSnippet: "Introducing the FMF’s Technical Report Series on Frontier AI Frameworks - Frontier Model Forum Introducing the FMF’s Technical Report Series on Frontier AI Frameworks Posted on: 22nd April 2025 WORKSTREAM Frontier AI Frameworks TECHNICAL REPORTS Risk Taxonomy and Thresholds for Frontier AI Frameworks Frontier Capability Assessments Frontier Mitigations Third-Party Assessments for Frontier AI Frameworks As AI systems advance in capability, they have the potential to accelerate scientific discover"
+    contentLength: 129911
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.frontiermodelforum.org/updates/announcement-of-new-ai-safety-fund-grantees/
+    linkText: Frontier Model Forum - New AI Safety Fund Grantees
+    claimContext: The AI Safety Fund has distributed two rounds of grants since its October 2023 launch, with a recent cohort of 11 grantees awarded \$5+ million for projects in biosecurity, cybersecurity, AI agent evaluation, and synthetic content.[^19] The fund prioritizes independent research that can inform indus
+    fetchedAt: 2026-02-22T02:05:32.526Z
+    httpStatus: 200
+    pageTitle: Announcement of New AI Safety Fund Grantees - Frontier Model Forum
+    contentSnippet: "Announcement of New AI Safety Fund Grantees - Frontier Model Forum Announcement of New AI Safety Fund Grantees By: Frontier Model Forum Posted on: 11th December 2025 Today we are announcing a new cohort of 11 grantees who have received more than $5 million through the AI Safety Fund (AISF). As frontier AI systems become more powerful and widely deployed, advancing our understanding of them and building robust safety tools is essential – which is why the AISF issued several requests for proposals"
+    contentLength: 119417
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://metr.org/common-elements
+    linkText: METR - Common Elements of Frontier AI Safety Protocols
+    claimContext: Subsequent rounds have emphasized projects targeting urgent bottlenecks in safety research, such as measuring instrumental reasoning capabilities that could undermine human control.[^20]
+    fetchedAt: 2026-02-22T02:05:33.411Z
+    httpStatus: 200
+    pageTitle: Common Elements of Frontier AI Safety Policies - METR
+    contentSnippet: Common Elements of Frontier AI Safety Policies - METR Research Notes Updates About Donate Careers Search --> Research Notes Updates About Donate Careers Menu Common Elements of Frontier AI Safety Policies Common Elements of Frontier AI Safety Policies Summary A number of developers of large foundation models have committed to corporate protocols that lay out how they will evaluate their models for severe risks and mitigate these risks with information security measures, deployment safeguards, an
+    contentLength: 309949
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.frontiermodelforum.org/workstreams/ai-bio-workstream/
+    linkText: Frontier Model Forum - AI-Bio Workstream
+    claimContext: The AI-Bio workstream focuses specifically on AI-enabled biological threats, developing shared threat models, safety evaluations, and mitigation strategies.[^21] This workstream addresses concerns that advanced AI models could amplify biological risks by enabling non-experts to design dangerous path
+    fetchedAt: 2026-02-22T02:05:34.754Z
+    httpStatus: 200
+    pageTitle: AI-Bio Workstream - Frontier Model Forum
+    contentSnippet: AI-Bio Workstream - Frontier Model Forum AI-Bio Workstream The Frontier Model Forum’s AI-Bio workstream aims to advance the biosafety of leading AI models and systems. Although frontier AI holds significant promise for medicine and the life sciences, it also risks amplifying existing biological threats and introducing novel ones. Understanding how to safely manage those risks is an urgent challenge. The AI-Bio workstream was established to address that challenge. The workstream aims to develop s
+    contentLength: 104172
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.frontiermodelforum.org/updates/issue-brief-preliminary-taxonomy-of-ai-bio-safety-evaluations/
+    linkText: "Frontier Model Forum - Issue Brief: Preliminary Taxonomy of AI-Bio Safety Evaluations"
+    claimContext: The AI-Bio workstream focuses specifically on AI-enabled biological threats, developing shared threat models, safety evaluations, and mitigation strategies.[^21] This workstream addresses concerns that advanced AI models could amplify biological risks by enabling non-experts to design dangerous path
+    fetchedAt: 2026-02-22T02:05:34.830Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Preliminary Taxonomy of AI-Bio Safety Evaluations - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Preliminary Taxonomy of AI-Bio Safety Evaluations - Frontier Model Forum Issue Brief: Preliminary Taxonomy of AI-Bio Safety Evaluations By: Frontier Model Forum Posted on: 20th December 2024 Frontier AI-bio safety evaluations aim to test the biological capabilities and, by extension, the potential biosafety implications of frontier AI. As the science of AI safety evaluations is still nascent, the evaluations themselves can vary widely in both purpose and methodology. As such, a key "
+    contentLength: 138051
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.frontiermodelforum.org/updates/progress-update-advancing-frontier-ai-safety-in-2024-and-beyond/
+    linkText: "Frontier Model Forum - Progress Update: Advancing Frontier AI Safety in 2024 and Beyond"
+    claimContext: The Forum convenes leading cybersecurity experts to develop novel approaches for securing frontier AI models against theft, tampering, and misuse.[^23] This workstream recognizes that traditional cybersecurity frameworks require adaptation for AI systems, which face unique vulnerabilities such as mo
+    fetchedAt: 2026-02-22T02:05:34.887Z
+    httpStatus: 200
+    pageTitle: "Progress Update: Advancing Frontier AI Safety in 2024 and Beyond - Frontier Model Forum"
+    contentSnippet: "Progress Update: Advancing Frontier AI Safety in 2024 and Beyond - Frontier Model Forum Progress Update: Advancing Frontier AI Safety in 2024 and Beyond By: Frontier Model Forum Posted on: 29th August 2024 The core mission of the Frontier Model Forum is to advance frontier AI safety. By identifying best practices, supporting scientific research, and facilitating greater information-sharing about frontier AI safety, we aim to meaningfully improve the safe development and deployment of the most ad"
+    contentLength: 125904
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.frontiermodelforum.org/updates/issue-brief-thresholds-for-frontier-ai-safety-frameworks/
+    linkText: "Frontier Model Forum - Issue Brief: Thresholds for Frontier AI Safety Frameworks"
+    claimContext: One of the most technically challenging aspects of frontier AI safety frameworks is establishing appropriate thresholds for when enhanced safeguards should be triggered. The FMF has identified several main approaches to establishing thresholds:[^24]
+    fetchedAt: 2026-02-22T02:05:34.772Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Thresholds for Frontier AI Safety Frameworks - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Thresholds for Frontier AI Safety Frameworks - Frontier Model Forum Issue Brief: Thresholds for Frontier AI Safety Frameworks By: Frontier Model Forum Posted on: 7th February 2025 Although frontier AI holds enormous promise for society, advanced AI systems may also pose significant risks to national security and public safety. Frontier AI safety frameworks have recently emerged as a method for frontier AI developers to demonstrate how they manage those risks effectively. By establis"
+    contentLength: 118735
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.frontiermodelforum.org/updates/issue-brief-thresholds-for-frontier-ai-safety-frameworks/
+    linkText: "Frontier Model Forum - Issue Brief: Thresholds for Frontier AI Safety Frameworks"
+    claimContext: '**<EntityLink id="thresholds">Compute Thresholds</EntityLink>**: Using computational resources (measured in FLOPs) as a proxy for identifying potentially high-risk models. While straightforward to measure, the FMF acknowledges this is an "imperfect proxy" since algorithmic advances can enable danger'
+    fetchedAt: 2026-02-22T02:05:34.919Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Thresholds for Frontier AI Safety Frameworks - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Thresholds for Frontier AI Safety Frameworks - Frontier Model Forum Issue Brief: Thresholds for Frontier AI Safety Frameworks By: Frontier Model Forum Posted on: 7th February 2025 Although frontier AI holds enormous promise for society, advanced AI systems may also pose significant risks to national security and public safety. Frontier AI safety frameworks have recently emerged as a method for frontier AI developers to demonstrate how they manage those risks effectively. By establis"
+    contentLength: 118630
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.frontiermodelforum.org/updates/issue-brief-thresholds-for-frontier-ai-safety-frameworks/
+    linkText: "Frontier Model Forum - Issue Brief: Thresholds for Frontier AI Safety Frameworks"
+    claimContext: '**Risk Thresholds**: Defining specific unacceptable outcomes or threat scenarios (e.g., models that could assist in creating novel <EntityLink id="bioweapons">bioweapons</EntityLink>, conduct sophisticated cyber attacks, or autonomously pursue misaligned goals). Setting these thresholds is complicat'
+    fetchedAt: 2026-02-22T02:05:35.959Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Thresholds for Frontier AI Safety Frameworks - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Thresholds for Frontier AI Safety Frameworks - Frontier Model Forum Issue Brief: Thresholds for Frontier AI Safety Frameworks By: Frontier Model Forum Posted on: 7th February 2025 Although frontier AI holds enormous promise for society, advanced AI systems may also pose significant risks to national security and public safety. Frontier AI safety frameworks have recently emerged as a method for frontier AI developers to demonstrate how they manage those risks effectively. By establis"
+    contentLength: 118630
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.frontiermodelforum.org/updates/issue-brief-preliminary-taxonomy-of-pre-deployment-frontier-ai-safety-evaluations/
+    linkText: "Frontier Model Forum - Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations"
+    claimContext: "The FMF's issue briefs on pre-deployment safety evaluations emphasize that assessments must cover both intended use cases and adversarial exploitation scenarios.[^27] Evaluations should consider multiple threat models, including:"
+    fetchedAt: 2026-02-22T02:05:36.127Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations - Frontier Model Forum Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations By: Frontier Model Forum Posted on: 20th December 2024 As frontier AI systems continue to advance, rigorous and scientifically grounded safety evaluations will be increasingly essential. Although frontier AI holds immense promise for society, the growing capabilities of advanced AI systems may also introduce r"
+    contentLength: 130168
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.frontiermodelforum.org/updates/issue-brief-preliminary-taxonomy-of-pre-deployment-frontier-ai-safety-evaluations/
+    linkText: "Frontier Model Forum - Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations"
+    claimContext: The Forum cautions against designing evaluations solely for "unlimited adversaries," as this can make threat modeling intractable and lead to overly conservative restrictions that limit beneficial applications.[^28]
+    fetchedAt: 2026-02-22T02:05:36.186Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations - Frontier Model Forum Issue Brief: Preliminary Taxonomy of Pre-Deployment Frontier AI Safety Evaluations By: Frontier Model Forum Posted on: 20th December 2024 As frontier AI systems continue to advance, rigorous and scientifically grounded safety evaluations will be increasingly essential. Although frontier AI holds immense promise for society, the growing capabilities of advanced AI systems may also introduce r"
+    contentLength: 130063
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.frontiermodelforum.org/technical-reports/frontier-mitigations/
+    linkText: "Frontier Model Forum - Technical Report: Frontier Mitigations"
+    claimContext: The FMF acknowledges significant robustness challenges in current safety measures. Research supported by the Forum has identified that existing safety training methods often modify only surface-level behaviors without altering underlying model capabilities, and adversarial prompts ("jailbreaks") can
+    fetchedAt: 2026-02-22T02:05:36.202Z
+    httpStatus: 200
+    pageTitle: Frontier Mitigations - Frontier Model Forum
+    contentSnippet: "Frontier Mitigations - Frontier Model Forum TECHNICAL REPORT Frontier Mitigations Posted on: 30th June 2025 REPORT SERIES Implementing Frontier AI Frameworks TABLE OF CONTENTS Executive Summary Overview of Frontier Mitigations Capability Limitation Mitigations Behavioral Alignment Mitigations Detection and Intervention Mitigations Access Control Mitigations Supporting Ecosystem Mitigations Effectiveness Assessments for Frontier Mitigations Continuing Work DOWNLOAD REPORT PDF Executive Summary Fr"
+    contentLength: 164915
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.alignmentforum.org/posts/JvYF5kosLeYGvvLpP/evaluating-and-monitoring-for-ai-scheming
+    linkText: Alignment Forum - Evaluating and Monitoring for AI Scheming
+    claimContext: Advanced safety concerns addressed by FMF-supported research include:[^30]
+    fetchedAt: 2026-02-22T02:05:42.804Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 31
+    url: https://metr.org/common-elements
+    linkText: METR - Common Elements of Frontier AI Safety Protocols
+    claimContext: The organization supports research on chain-of-thought monitoring to oversee models that might develop scheming capabilities, and instrumental reasoning evaluation to detect when models acquire <EntityLink id="situational-awareness">situational awareness</EntityLink> and stealth capabilities that co
+    fetchedAt: 2026-02-22T02:05:44.358Z
+    httpStatus: 200
+    pageTitle: Common Elements of Frontier AI Safety Policies - METR
+    contentSnippet: Common Elements of Frontier AI Safety Policies - METR Research Notes Updates About Donate Careers Search --> Research Notes Updates About Donate Careers Menu Common Elements of Frontier AI Safety Policies Common Elements of Frontier AI Safety Policies Summary A number of developers of large foundation models have committed to corporate protocols that lay out how they will evaluate their models for severe risks and mitigate these risks with information security measures, deployment safeguards, an
+    contentLength: 309949
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.frontiermodelforum.org/ai-safety-fund/
+    linkText: Frontier Model Forum - AI Safety Fund
+    claimContext: 'The AI Safety Fund represents the primary funding mechanism through which the FMF supports the broader research ecosystem. The \$10+ million total includes contributions from all four founding members (<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google</EntityLink>, '
+    fetchedAt: 2026-02-22T02:05:43.891Z
+    httpStatus: 200
+    pageTitle: AI Safety Fund - Frontier Model Forum
+    contentSnippet: AI Safety Fund - Frontier Model Forum AI Safety Fund The AI Safety Fund (AISF) is a collaborative $10 million+ initiative established in October 2023 to accelerate and expand the field of AI safety and security research. Support for the fund has come from the founding members of the Frontier Model Forum, including Anthropic, Google, Microsoft, and OpenAI, as well as philanthropic partners such as the Patrick J. McGovern Foundation, the David and Lucile Packard Foundation, Schmidt Sciences, and J
+    contentLength: 103610
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.frontiermodelforum.org/ai-safety-fund/
+    linkText: Frontier Model Forum - AI Safety Fund
+    claimContext: Jaan Tallinn, the Estonian programmer and early AI safety philanthropist who co-founded Skype, is among the individual supporters, alongside institutional philanthropies focused on science and technology.[^33] The fund explicitly aims to support research that is independent from member company inter
+    fetchedAt: 2026-02-22T02:05:44.153Z
+    httpStatus: 200
+    pageTitle: AI Safety Fund - Frontier Model Forum
+    contentSnippet: AI Safety Fund - Frontier Model Forum AI Safety Fund The AI Safety Fund (AISF) is a collaborative $10 million+ initiative established in October 2023 to accelerate and expand the field of AI safety and security research. Support for the fund has come from the founding members of the Frontier Model Forum, including Anthropic, Google, Microsoft, and OpenAI, as well as philanthropic partners such as the Patrick J. McGovern Foundation, the David and Lucile Packard Foundation, Schmidt Sciences, and J
+    contentLength: 103610
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.frontiermodelforum.org/about-us/
+    linkText: Frontier Model Forum - About Us
+    claimContext: The FMF operates as a non-profit, funded by fees from its member firms.[^34]
+    fetchedAt: 2026-02-22T02:05:43.887Z
+    httpStatus: 200
+    pageTitle: About - Frontier Model Forum
+    contentSnippet: "About - Frontier Model Forum Our mission The Frontier Model Forum (FMF) is an industry-supported non-profit dedicated to advancing frontier AI safety and security. The FMF has three core mandates: Identify best practices and support standards development for frontier AI safety and security. Advance the science of frontier AI safety and security. Facilitate information sharing about frontier AI safety and security among government, academia, civil society and industry. The FMF focuses primarily o"
+    contentLength: 105365
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.frontiermodelforum.org/about-us/
+    linkText: Frontier Model Forum - About Us
+    claimContext: The FMF positions itself as a connector between industry technical expertise and broader stakeholder communities. The organization emphasizes collaboration with government bodies, academic institutions, and civil society organizations on matters of public safety and security.[^35]
+    fetchedAt: 2026-02-22T02:05:43.893Z
+    httpStatus: 200
+    pageTitle: About - Frontier Model Forum
+    contentSnippet: "About - Frontier Model Forum Our mission The Frontier Model Forum (FMF) is an industry-supported non-profit dedicated to advancing frontier AI safety and security. The FMF has three core mandates: Identify best practices and support standards development for frontier AI safety and security. Advance the science of frontier AI safety and security. Facilitate information sharing about frontier AI safety and security among government, academia, civil society and industry. The FMF focuses primarily o"
+    contentLength: 105365
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://wandb.ai/byyoung3/ml-news/reports/The-Frontier-Model-Forum-For-AI-Safety---Vmlldzo0OTc5MzQ5
+    linkText: Weights & Biases - The Frontier Model Forum For AI Safety
+    claimContext: This approach aligns with initiatives including the G7 Hiroshima AI Process, OECD AI principles, and the establishment of <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> in multiple countries.[^36] The Forum has supported the global network of AI safety institutes as they shi
+    fetchedAt: 2026-02-22T02:05:45.469Z
+    httpStatus: 200
+    pageTitle: Weights & Biases
+    contentSnippet: Weights & Biases
+    contentLength: 5757
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.lesswrong.com/posts/hcWc76eCan3FF5XBk/frontier-model-forum
+    linkText: LessWrong - Frontier Model Forum
+    claimContext: Anna Makanju, Vice President of Global Affairs at <EntityLink id="openai">OpenAI</EntityLink>, described the FMF's role in aligning companies on "thoughtful and adaptable safety practices" for powerful models, emphasizing the urgency of establishing shared standards before more capable systems are d
+    fetchedAt: 2026-02-22T02:05:46.439Z
+    httpStatus: 200
+    pageTitle: Frontier Model Forum — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Frontier Model Forum — LessWrong Anthropic (org) DeepMind OpenAI AI Frontpage 27 Frontier Model Forum by Zach Stein-Perlman 26th Jul 2023 Linkpost from blog.google 4 min read 0 27 Posted by Anthropic , Google , Microsoft , and OpenAI : Today, Anthropic, Google, Microsoft and OpenAI are announcing the formation of the Frontier Model Forum, a new industry body focused on"
+    contentLength: 280282
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.reworked.co/information-management/can-we-trust-tech-companies-to-regulate-generative-ai/
+    linkText: Reworked - Can We Trust Tech Companies to Regulate Generative AI?
+    claimContext: 'The most fundamental criticism of the FMF centers on the inherent limitations of industry self-governance. Andrew Rogoyski of the Institute for People-Centred AI at the University of Surrey characterized the initiative as "putting the foxes in charge of the chicken coop," arguing that profit-driven '
+    fetchedAt: 2026-02-22T02:05:45.882Z
+    httpStatus: 200
+    pageTitle: Can the Frontier Model Forum Really Regulate Generative AI?
+    contentSnippet: Can the Frontier Model Forum Really Regulate Generative AI? Latest Coverage Reworked TV Webinars Research Podcast Events Calendar Editorial Calendar IMPACT Awards Advertising YOUR GUIDE TO THE R/EVOLUTION OF WORK Join us By David Barry August 16, 2023 Information Management Share Share Copy link Email LinkedIn Twitter Facebook Telegram Save SAVED The Frontier Model Forum was created by tech companies to try to regulate the development of generative AI. But can these companies do this effectively
+    contentLength: 652016
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.infosecurity-magazine.com/news-features/ai-safety-summit-criticisms-narrow/
+    linkText: "Infosecurity Magazine - AI Safety Summit Criticisms: Narrow Focus"
+    claimContext: The FMF's explicit focus on "frontier" models—defined as state-of-the-art systems at the capabilities boundary—has drawn criticism for potentially delaying regulations on existing AI systems that already cause measurable harms.[^39] Critics argue that the emphasis on hypothetical future risks from c
+    fetchedAt: 2026-02-22T02:05:46.074Z
+    httpStatus: 200
+    pageTitle: AI Safety Summit Faces Criticisms for Narrow Focus - Infosecurity Magazine
+    contentSnippet: AI Safety Summit Faces Criticisms for Narrow Focus - Infosecurity Magazine Infosecurity Magazine Home » News Features » AI Safety Summit Faces Criticisms for Narrow Focus AI Safety Summit Faces Criticisms for Narrow Focus News Feature 29 September 2023 Written by Kevin Poireault Reporter , Infosecurity Magazine Follow @Kpoireault Connect on LinkedIn The UK government&rsquo;s AI Safety Summit is already under scrutiny weeks before the event begins at the historic Bletchley Park. In an introductio
+    contentLength: 108553
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.infosecurity-magazine.com/news-features/ai-safety-summit-criticisms-narrow/
+    linkText: "Infosecurity Magazine - AI Safety Summit Criticisms: Narrow Focus"
+    claimContext: The term "frontier AI" itself has been criticized as an "undefinable moving-target" that allows companies to continuously exclude their current deployed systems from the most stringent safety requirements by claiming those systems are no longer at the frontier.[^40]
+    fetchedAt: 2026-02-22T02:05:46.078Z
+    httpStatus: 200
+    pageTitle: AI Safety Summit Faces Criticisms for Narrow Focus - Infosecurity Magazine
+    contentSnippet: AI Safety Summit Faces Criticisms for Narrow Focus - Infosecurity Magazine Infosecurity Magazine Home » News Features » AI Safety Summit Faces Criticisms for Narrow Focus AI Safety Summit Faces Criticisms for Narrow Focus News Feature 29 September 2023 Written by Kevin Poireault Reporter , Infosecurity Magazine Follow @Kpoireault Connect on LinkedIn The UK government&rsquo;s AI Safety Summit is already under scrutiny weeks before the event begins at the historic Bletchley Park. In an introductio
+    contentLength: 108553
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://forum.effectivealtruism.org/posts/HgbBwx3nSHc2S5vXg/should-the-ai-safety-community-prioritize-safety-cases
+    linkText: EA Forum - Should the AI Safety Community Prioritize Safety Cases?
+    claimContext: The FMF's emphasis on safety frameworks and pre-deployment evaluations faces significant technical challenges. Research suggests that **safety cases**—structured arguments for why a system is adequately safe—may have limitations:[^41]
+    fetchedAt: 2026-02-22T02:05:47.596Z
+    httpStatus: 200
+    pageTitle: Should the AI Safety Community Prioritize Safety Cases? — EA Forum
+    contentSnippet: Should the AI Safety Community Prioritize Safety Cases? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Should the AI Safety Community Prioritize Safety Cases? by Jan Wehner🔸 Jan 11 16 min read 9 19 AI safety Policy AI evaluations and standards AI governance Risk assessment Transformative artificial intelligence Frontpage Should the AI Safety Community Prioritize Safety Cases? Questi
+    contentLength: 388020
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.lesswrong.com/posts/bzYJCXicmwDHDpLZa/reframing-ai-safety-as-a-neverending-institutional-challenge
+    linkText: LessWrong - Reframing AI Safety as a Neverending Institutional Challenge
+    claimContext: Some researchers frame AI safety as a "neverending institutional challenge" rather than a purely technical problem that can be solved through better evaluations and frameworks.[^42] From this perspective, the FMF's focus on technical solutions may be insufficient without addressing deeper institutio
+    fetchedAt: 2026-02-22T02:05:47.867Z
+    httpStatus: 200
+    pageTitle: Reframing AI Safety as a Neverending Institutional Challenge — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Reframing AI Safety as a Neverending Institutional Challenge — LessWrong AI Governance AI Frontpage 53 Reframing AI Safety as a Neverending Institutional Challenge by scasper 23rd Mar 2025 AI Alignment Forum 6 min read 12 53 Ω 18 Crossposed from https://stephencasper.com/reframing-ai-safety-as-a-neverending-institutional-challenge/ Stephen Casper “They are wrong who th
+    contentLength: 473272
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://forum.effectivealtruism.org/posts/HgbBwx3nSHc2S5vXg/should-the-ai-safety-community-prioritize-safety-cases
+    linkText: EA Forum - Should the AI Safety Community Prioritize Safety Cases?
+    claimContext: Additionally, safety frameworks face political obstacles. In the United States in particular, detailed pre-deployment review requirements have been characterized by some policymakers as overregulation that could hamper American AI leadership, limiting the political viability of mandating the types o
+    fetchedAt: 2026-02-22T02:05:47.607Z
+    httpStatus: 200
+    pageTitle: Should the AI Safety Community Prioritize Safety Cases? — EA Forum
+    contentSnippet: Should the AI Safety Community Prioritize Safety Cases? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Should the AI Safety Community Prioritize Safety Cases? by Jan Wehner🔸 Jan 11 16 min read 9 19 AI safety Policy AI evaluations and standards AI governance Risk assessment Transformative artificial intelligence Frontpage Should the AI Safety Community Prioritize Safety Cases? Questi
+    contentLength: 388020
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.lesswrong.com/posts/hcWc76eCan3FF5XBk/frontier-model-forum
+    linkText: LessWrong - Frontier Model Forum
+    claimContext: The FMF's emphasis on information-sharing through "secure channels" following cybersecurity responsible disclosure practices may limit public and academic scrutiny of safety decisions, even as those decisions affect broad populations who use or are affected by AI systems.[^44]
+    fetchedAt: 2026-02-22T02:05:48.102Z
+    httpStatus: 200
+    pageTitle: Frontier Model Forum — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Frontier Model Forum — LessWrong Anthropic (org) DeepMind OpenAI AI Frontpage 27 Frontier Model Forum by Zach Stein-Perlman 26th Jul 2023 Linkpost from blog.google 4 min read 0 27 Posted by Anthropic , Google , Microsoft , and OpenAI : Today, Anthropic, Google, Microsoft and OpenAI are announcing the formation of the Frontier Model Forum, a new industry body focused on"
+    contentLength: 280283
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.frontiermodelforum.org/publications/
+    linkText: Frontier Model Forum - Publications
+    claimContext: As of late 2024 and early 2025, the FMF has released several technical publications including:[^45]
+    fetchedAt: 2026-02-22T02:05:47.643Z
+    httpStatus: 200
+    pageTitle: Publications - Frontier Model Forum
+    contentSnippet: Publications - Frontier Model Forum Publications Issue Briefs Chain of Thought Monitorability . January 27, 2026. Preliminary Taxonomy of AI-Bio Misuse Mitigations . July 30, 2025. Frontier AI Biosafety Thresholds . May 12, 2025. Preliminary Reporting Tiers for AI-Bio Safety Evaluations. March 18, 2025. Thresholds for Frontier AI Safety Frameworks . February 7, 2025. Preliminary Taxonomy of AI-Bio Safety Evaluations . December 20, 2024. Preliminary Taxonomy of Pre-Deployment Frontier AI Safety E
+    contentLength: 110002
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://metr.org/common-elements
+    linkText: METR - Common Elements of Frontier AI Safety Protocols
+    claimContext: Four additional companies joined the Frontier AI Safety Commitments since the initial May 2024 announcement, bringing total participation to 20 companies.[^46] Notably, xAI published a comprehensive framework in December 2024 outlining quantitative thresholds, metrics, and procedures for managing si
+    fetchedAt: 2026-02-22T02:05:49.889Z
+    httpStatus: 200
+    pageTitle: Common Elements of Frontier AI Safety Policies - METR
+    contentSnippet: Common Elements of Frontier AI Safety Policies - METR Research Notes Updates About Donate Careers Search --> Research Notes Updates About Donate Careers Menu Common Elements of Frontier AI Safety Policies Common Elements of Frontier AI Safety Policies Summary A number of developers of large foundation models have committed to corporate protocols that lay out how they will evaluate their models for severe risks and mitigate these risks with information security measures, deployment safeguards, an
+    contentLength: 309949
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://data.x.ai/2025-12-31-xai-frontier-artificial-intelligence-framework.pdf
+    linkText: xAI - Frontier Artificial Intelligence Framework PDF
+    claimContext: Four additional companies joined the Frontier AI Safety Commitments since the initial May 2024 announcement, bringing total participation to 20 companies.[^46] Notably, xAI published a comprehensive framework in December 2024 outlining quantitative thresholds, metrics, and procedures for managing si
+    fetchedAt: 2026-02-22T02:05:50.055Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 251686
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.frontiermodelforum.org/updates/progress-update-advancing-frontier-ai-safety-in-2024-and-beyond/
+    linkText: "Frontier Model Forum - Progress Update: Advancing Frontier AI Safety in 2024 and Beyond"
+    claimContext: The Forum has indicated plans to host additional workshops on open AI safety questions, publish more primers on frontier AI safety best practices, and support the work of national and international AI safety institutes as they develop evaluation and oversight capacities.[^48]
+    fetchedAt: 2026-02-22T02:05:49.139Z
+    httpStatus: 200
+    pageTitle: "Progress Update: Advancing Frontier AI Safety in 2024 and Beyond - Frontier Model Forum"
+    contentSnippet: "Progress Update: Advancing Frontier AI Safety in 2024 and Beyond - Frontier Model Forum Progress Update: Advancing Frontier AI Safety in 2024 and Beyond By: Frontier Model Forum Posted on: 29th August 2024 The core mission of the Frontier Model Forum is to advance frontier AI safety. By identifying best practices, supporting scientific research, and facilitating greater information-sharing about frontier AI safety, we aim to meaningfully improve the safe development and deployment of the most ad"
+    contentLength: 125904
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.frontiermodelforum.org/updates/issue-brief-components-of-frontier-ai-safety-frameworks/
+    linkText: "Frontier Model Forum - Issue Brief: Components of Frontier AI Safety Frameworks"
+    claimContext: "**Can industry self-governance adequately manage existential risks?** While the FMF frames its work around severe public safety threats rather than explicitly invoking existential risk, its safety frameworks address loss-of-control scenarios where advanced AI systems might circumvent human oversight"
+    fetchedAt: 2026-02-22T02:05:49.596Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Components of Frontier AI Safety Frameworks - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Components of Frontier AI Safety Frameworks - Frontier Model Forum Issue Brief: Components of Frontier AI Safety Frameworks By: Frontier Model Forum Posted on: 8th November 2024 Safety frameworks have recently emerged as an important tool for frontier AI safety. By specifying capability and/or risk thresholds, safety evaluations and mitigation strategies for frontier AI models in advance of their development, safety frameworks position frontier AI developers to be able to address po"
+    contentLength: 135658
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.frontiermodelforum.org/updates/early-best-practices-for-frontier-ai-safety-evaluations/
+    linkText: Frontier Model Forum - Early Best Practices for Frontier AI Safety Evaluations
+    claimContext: "**How should tradeoffs between transparency and security be navigated?** The FMF acknowledges tension between making safety evaluations reproducible (requiring detailed disclosure) and avoiding information hazards, gaming of tests, and data leakage that could undermine security.[^50] The optimal bal"
+    fetchedAt: 2026-02-22T02:05:49.352Z
+    httpStatus: 200
+    pageTitle: "Issue Brief: Early Best Practices for Frontier AI Safety Evaluations - Frontier Model Forum"
+    contentSnippet: "Issue Brief: Early Best Practices for Frontier AI Safety Evaluations - Frontier Model Forum Issue Brief: Early Best Practices for Frontier AI Safety Evaluations By: Frontier Model Forum Posted on: 31st July 2024 Frontier AI holds enormous promise for society. From renewable energy to personalized medicine, the most advanced AI models and systems have the potential to power breakthroughs that benefit everyone. Yet they also have the potential to exacerbate societal harms, and introduce or elevate"
+    contentLength: 126173
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://forum.effectivealtruism.org/posts/tEmQrfMs9qdBPrGKh/what-mistakes-has-the-ai-safety-movement-made
+    linkText: EA Forum - What Mistakes Has the AI Safety Movement Made?
+    claimContext: Critics have pointed to mistakes including an overreliance on theoretical argumentation, being too insular, and ignoring policy as a potential route to safety.[^51]
+    fetchedAt: 2026-02-22T02:05:51.085Z
+    httpStatus: 200
+    pageTitle: What mistakes has the AI safety movement made? — EA Forum
+    contentSnippet: What mistakes has the AI safety movement made? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Big Picture AI Safety What mistakes has the AI safety movement made? by EuanMcLean May 23 2024 14 min read 3 66 AI safety Cause prioritization Existential risk Collections and resources Criticism of effective altruism Opinion Frontpage What mistakes has the AI safety movement made? How to re
+    contentLength: 347775
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.lesswrong.com/posts/hcWc76eCan3FF5XBk/frontier-model-forum
+    linkText: LessWrong - Frontier Model Forum
+    claimContext: Within online AI safety communities like <EntityLink id="lesswrong">LessWrong</EntityLink> and the EA Forum, opinions on the FMF's value vary. Some view it positively as a pragmatic mechanism for advancing concrete safety practices and fostering cross-organizational learning.[^52] Others express ske
+    fetchedAt: 2026-02-22T02:05:51.595Z
+    httpStatus: 200
+    pageTitle: Frontier Model Forum — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Frontier Model Forum — LessWrong Anthropic (org) DeepMind OpenAI AI Frontpage 27 Frontier Model Forum by Zach Stein-Perlman 26th Jul 2023 Linkpost from blog.google 4 min read 0 27 Posted by Anthropic , Google , Microsoft , and OpenAI : Today, Anthropic, Google, Microsoft and OpenAI are announcing the formation of the Frontier Model Forum, a new industry body focused on"
+    contentLength: 280282
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://forum.effectivealtruism.org/posts/vCZxmMP2dDjxFByrD/reasons-for-and-against-working-on-technical-ai-safety-at-a
+    linkText: EA Forum - Reasons For and Against Working on Technical AI Safety at a Frontier Lab
+    claimContext: Within online AI safety communities like <EntityLink id="lesswrong">LessWrong</EntityLink> and the EA Forum, opinions on the FMF's value vary. Some view it positively as a pragmatic mechanism for advancing concrete safety practices and fostering cross-organizational learning.[^52] Others express ske
+    fetchedAt: 2026-02-22T02:05:51.114Z
+    httpStatus: 200
+    pageTitle: Reasons for and against working on technical AI safety at a frontier AI lab — EA Forum
+    contentSnippet: Reasons for and against working on technical AI safety at a frontier AI lab — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Reasons for and against working on technical AI safety at a frontier AI lab by bilalchughtai Jan 7 2025 14 min read 3 16 AI safety Career choice Building the field of AI safety Working at EA vs. non-EA orgs Frontpage Reasons for and against working on technical A
+    contentLength: 275440
+    status: verified
+    note: null

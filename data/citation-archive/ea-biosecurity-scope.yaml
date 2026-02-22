@@ -1,0 +1,249 @@
+pageId: ea-biosecurity-scope
+verifiedAt: 2026-02-22
+totalCitations: 22
+verified: 18
+broken: 3
+unverifiable: 1
+citations:
+  - footnote: 1
+    url: https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/
+    linkText: Coefficient Giving — Biosecurity & Pandemic Preparedness Fund
+    claimContext: '|-----------|------------|----------| | **Total EA Biosecurity Funding** | \$230M+ from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> alone | 140+ grants across Biosecurity & Pandemic Preparedness fund[^1] | | **Intervention Categories** | 6+ distinct categories | DNA screening,'
+    fetchedAt: 2026-02-22T02:22:07.650Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 2
+    url: https://securedna.org/
+    linkText: SecureDNA platform
+    claimContext: '- **<EntityLink id="securedna">SecureDNA</EntityLink>** — A Swiss nonprofit foundation co-founded by Kevin Esvelt, providing free, privacy-preserving screening software to DNA synthesis providers. Uses cryptographic protocols so that neither the order contents nor the hazard database are revealed du'
+    fetchedAt: 2026-02-22T02:22:01.469Z
+    httpStatus: 200
+    pageTitle: "SecureDNA: Free, Secure DNA Synthesis Screening Platform"
+    contentSnippet: "SecureDNA: Free, Secure DNA Synthesis Screening Platform Safeguarding DNA synthesis A free, cryptographically secure, and verifiably up-to-date system to screen all DNA synthesis for potential hazards Learn More System Demo What We Do SecureDNA provides free, privacy-preserving DNA synthesis screening to detect security-relevant, controlled, or regulated sequences. Our advanced system helps researchers and companies ensure biosecurity and regulatory compliance without compromising data confident"
+    contentLength: 222995
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://ibbis.bio/our-work/common-mechanism/
+    linkText: IBBIS Common Mechanism
+    claimContext: '- **<EntityLink id="ibbis">IBBIS (International Biosecurity and Biosafety Initiative for Science)</EntityLink>** — Launched by NTI in 2024, headquartered in Geneva, led by Piers Millett (former Deputy Head of the BWC Implementation Support Unit). Develops the **Common Mechanism** for international D'
+    fetchedAt: 2026-02-22T02:22:01.089Z
+    httpStatus: 200
+    pageTitle: Common Mechanism - IBBIS
+    contentSnippet: "Common Mechanism - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Common Mechanism A free, open-source, globally-available tool for synthesis screening The Common "
+    contentLength: 57683
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://bidenwhitehouse.archives.gov/ostp/news-updates/2024/04/29/framework-for-nucleic-acid-synthesis-screening/
+    linkText: OSTP Framework
+    claimContext: "- **OSTP Synthesis Screening Framework** — The Biden administration's April 2024 framework requiring federally funded researchers to procure synthetic nucleic acids only from screened providers. Implementation began April 2025 (200nt minimum), with 50nt minimum from October 2026. The Trump administr"
+    fetchedAt: 2026-02-22T02:22:01.557Z
+    httpStatus: 200
+    pageTitle: Framework for Nucleic Acid Synthesis Screening | OSTP | The White House
+    contentSnippet: Framework for Nucleic Acid Synthesis Screening | OSTP | The White House Skip to content This is historical material “frozen in time”. The website is no longer updated and links to external websites and some internal pages may not work. Today, as directed by President Biden’s Executive Order on the Safe, Secure, and Trustworthy Development of Artificial Intelligence (AI), the White House Office of Science and Technology Policy (OSTP) is releasing a Framework on Nucleic Acid Synthesis Screening to
+    contentLength: 138401
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.nature.com/articles/s41467-025-67955-3
+    linkText: Edison, Toner & Esvelt 2026, Nature Communications
+    claimContext: "**Critical gap:** A January 2026 *Nature Communications* paper by Edison, Toner, and Esvelt demonstrated that unregulated DNA fragments can be assembled to bypass synthesis screening entirely—they acquired fragments sufficient to reconstruct the 1918 influenza virus from dozens of providers. The pap"
+    fetchedAt: 2026-02-22T02:22:02.704Z
+    httpStatus: 200
+    pageTitle: "Assembling unregulated DNA segments bypasses synthesis screening: regulate fragments as select agents | Nature Communications"
+    contentSnippet: "Assembling unregulated DNA segments bypasses synthesis screening: regulate fragments as select agents | Nature Communications Skip to main content Thank you for visiting nature.com. You are using a browser version with limited support for CSS. To obtain the best experience, we recommend you use a more up to date browser (or turn off compatibility mode in Internet Explorer). In the meantime, to ensure continued support, we are displaying the site without styles and JavaScript. Advertisement Assem"
+    contentLength: 246053
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026
+    linkText: 2026 International AI Safety Report
+    claimContext: "- **Anthropic's ASL-3**: Activated for Claude Opus 4 specifically due to CBRN capability concerns. Involves increased internal security (preventing model theft) and deployment restrictions limiting misuse for weapons development.[^6] - **OpenAI's Preparedness Framework**: GPT-5 and ChatGPT Agent dep"
+    fetchedAt: 2026-02-22T02:22:10.367Z
+    httpStatus: 200
+    pageTitle: International AI Safety Report 2026 | International AI Safety Report
+    contentSnippet: International AI Safety Report 2026 | International AI Safety Report Skip to main content Open Table of contents Contributors Chair Prof. Yoshua Bengio , Université de Montreal / LawZero / Mila – Quebec AI Institute Expert Advisory Panel The Expert Advisory Panel is an international advisory body that advises the Chair on the content of the Report. The Expert Advisory Panel provided technical feedback only. The Report – and its Expert Advisory Panel – does not endorse any particular policy or re
+    contentLength: 3958097
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026
+    linkText: 2026 International AI Safety Report
+    claimContext: "- **Anthropic's ASL-3**: Activated for Claude Opus 4 specifically due to CBRN capability concerns. Involves increased internal security (preventing model theft) and deployment restrictions limiting misuse for weapons development.[^6] - **OpenAI's Preparedness Framework**: GPT-5 and ChatGPT Agent dep"
+    fetchedAt: 2026-02-22T02:22:10.046Z
+    httpStatus: 200
+    pageTitle: International AI Safety Report 2026 | International AI Safety Report
+    contentSnippet: International AI Safety Report 2026 | International AI Safety Report Skip to main content Open Table of contents Contributors Chair Prof. Yoshua Bengio , Université de Montreal / LawZero / Mila – Quebec AI Institute Expert Advisory Panel The Expert Advisory Panel is an international advisory body that advises the Chair on the content of the Report. The Expert Advisory Panel provided technical feedback only. The Report – and its Expert Advisory Panel – does not endorse any particular policy or re
+    contentLength: 3958097
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.nti.org/news/nti-bio-offers-biosecurity-solutions-at-the-biological-weapons-convention-review-conference/
+    linkText: NTI Bio BWC work
+    claimContext: '- **Biological Weapons Convention (BWC)**: The primary international treaty, though lacking a verification protocol. EA-adjacent organizations (NTI Bio, Council on Strategic Risks) actively push for strengthening.[^9] - **CSIS 2025 Report**: Found current measures "ill-equipped" for AI-enabled biote'
+    fetchedAt: 2026-02-22T02:22:09.331Z
+    httpStatus: 200
+    pageTitle: NTI | bio Proposes Safeguards at BWC Review Conference
+    contentSnippet: NTI | bio Proposes Safeguards at BWC Review Conference Close News Dec 14, 2022 NTI | bio Offers Biosecurity Solutions at the Biological Weapons Convention Review Conference Share --> Twitter Facebook Linkedin Email In late November and early December, the NTI | bio team participated in the 9th Review Conference of the Biological Weapons Convention (BWC) in Geneva, Switzerland. The 2022 BWC Review Conference comes at a critical period as Russia’s ongoing disinformation campaign seeks to weaken gl
+    contentLength: 58903
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should
+    linkText: CSIS 2025 report
+    claimContext: '- **Biological Weapons Convention (BWC)**: The primary international treaty, though lacking a verification protocol. EA-adjacent organizations (NTI Bio, Council on Strategic Risks) actively push for strengthening.[^9] - **CSIS 2025 Report**: Found current measures "ill-equipped" for AI-enabled biote'
+    fetchedAt: 2026-02-22T02:22:59.662Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: unverifiable
+    note: timeout
+  - footnote: 11
+    url: https://naobservatory.org/
+    linkText: NAO methodology
+    claimContext: "**How it works:** Unlike traditional PCR-based surveillance (which can only detect known pathogens), the NAO performs **untargeted metagenomic sequencing** of wastewater—sequencing *all* genetic material in a sample. This means it can detect completely novel, engineered, or unknown pathogens, includ"
+    fetchedAt: 2026-02-22T02:22:09.117Z
+    httpStatus: 200
+    pageTitle: Nucleic Acid Observatory - Reliable early warning for catastrophic pandemics
+    contentSnippet: Nucleic Acid Observatory - Reliable early warning for catastrophic pandemics Towards reliable early warning for catastrophic pandemics The world is demonstrably vulnerable to biological threats. COVID-19 was a disaster, but future pandemics could be far worse. To protect society from future catastrophe, we need reliable early warning for any future pandemic pathogen – including those we have never seen before. The Nucleic Acid Observatory project was founded to solve this problem in 2021, as a p
+    contentLength: 183141
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://securebio.substack.com/p/nao-updates-november-2025
+    linkText: NAO Updates November 2025
+    claimContext: "- ≈60 billion read pairs sequenced weekly - Demonstrated detections: measles in Kauai County wastewater, West Nile Virus in Missouri[^12]"
+    fetchedAt: 2026-02-22T02:23:01.237Z
+    httpStatus: 200
+    pageTitle: NAO Updates, November 2025 - SecureBio
+    contentSnippet: NAO Updates, November 2025 - SecureBio SecureBio Subscribe Sign in NAO Updates, November 2025 SecureBio Nov 12, 2025 4 Share Since July , we’ve made major strides in scaling CASPER , expanding Zephyr , and automating our analysis systems. As always, if you have questions or see opportunities to collaborate, please let us know; we’re eager to work with others thinking along similar lines. Wastewater Sequencing Our collaboration with Marc Johnson , Dave O’Connor , Rachel Poretsky , Jason Rothman ,
+    contentLength: 157563
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://naobservatory.org/blog/biothreat_radar/
+    linkText: Biothreat Radar proposal
+    claimContext: "**Government adoption:** The President's FY2026 Budget proposes **\\$52 million** for **Biothreat Radar**, a national pathogen detection system at CDC drawing directly on NAO's pilot findings. Designed to detect novel pathogens before 12 in 100,000 Americans are infected.[^13]"
+    fetchedAt: 2026-02-22T02:23:01.381Z
+    httpStatus: 200
+    pageTitle: Scaling US pathogen detection
+    contentSnippet: "Scaling US pathogen detection Scaling US pathogen detection Authors Simon Grimm, Lennart Justen & Jeff Kaufman Date September 23, 2025 We thank Mike McLaren for input and feedback on drafts of this post. Summary The President’s FY 2026 Budget proposes a $52M allocation to CDC for Biothreat Radar, a new pathogen detection system. Drawing on findings from the Nucleic Acid Observatory’s metagenomic biosurveillance pilots, we model the expected performance of a pathogen-agnostic surveillance system "
+    contentLength: 141231
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://kfor.com/business/press-releases/ein-presswire/781027758/phc-global-to-deploy-waste-water-surveillance-system-for-u-s-military-facilities/
+    linkText: PHC Global ANTI-DOTE program
+    claimContext: "**Military adoption:** Through the **ANTI-DOTE** program (Defense Innovation Unit), the NAO performs metagenomic sequencing at 5 US military facilities in the Indo-Pacific region.[^14]"
+    fetchedAt: 2026-02-22T02:23:00.980Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 15
+    url: https://arxiv.org/abs/2504.16137
+    linkText: VCT paper
+    claimContext: "- **Virology Capabilities Test (VCT)**: Developed by SecureBio, CAIS, and MIT. 322 multimodal questions testing practical virology laboratory knowledge. Key finding: leading AI models outperform the vast majority of practicing virologists sampled. Now adopted by major AI labs for pre-deployment test"
+    fetchedAt: 2026-02-22T02:23:00.759Z
+    httpStatus: 200
+    pageTitle: "[2504.16137] Virology Capabilities Test (VCT): A Multimodal Virology Q&A Benchmark"
+    contentSnippet: "[2504.16137] Virology Capabilities Test (VCT): A Multimodal Virology Q&A Benchmark --> Computer Science > Computers and Society arXiv:2504.16137 (cs) [Submitted on 21 Apr 2025 ( v1 ), last revised 29 Apr 2025 (this version, v2)] Title: Virology Capabilities Test (VCT): A Multimodal Virology Q&A Benchmark Authors: Jasper Götting , Pedro Medeiros , Jon G Sanders , Nathaniel Li , Long Phan , Karam Elabd , Lennart Justen , Dan Hendrycks , Seth Donoughe View a PDF of the paper titled Virology Capabil"
+    contentLength: 46995
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.rand.org/pubs/research_reports/RRA2977-2.html
+    linkText: RAND 2024 study
+    claimContext: "- **Virology Capabilities Test (VCT)**: Developed by SecureBio, CAIS, and MIT. 322 multimodal questions testing practical virology laboratory knowledge. Key finding: leading AI models outperform the vast majority of practicing virologists sampled. Now adopted by major AI labs for pre-deployment test"
+    fetchedAt: 2026-02-22T02:23:01.257Z
+    httpStatus: 200
+    pageTitle: "The Operational Risks of AI in Large-Scale Biological Attacks: Results of a Red-Team Study | RAND"
+    contentSnippet: "The Operational Risks of AI in Large-Scale Biological Attacks: Results of a Red-Team Study | RAND Skip to page content The authors of this report share final results of a study of potential risks of artificial intelligence (AI) in the context of biological weapon attacks. The authors sought to identify potential risks posed by AI misuse, generate policy insights to mitigate any risks, and contribute to responsible AI development. The findings indicate that using the existing generation of large "
+    contentLength: 38499
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://openai.com/index/building-an-early-warning-system-for-llm-aided-biological-threat-creation/
+    linkText: OpenAI biological threat study
+    claimContext: "- **RAND Red-Team Study (2024)**: 12 teams of 3 people given 80 hours over 7 weeks to plan biological attacks with/without LLM access. Found **no statistically significant difference** in plan viability—but this was with 2024-era models.[^16] - **OpenAI 100-Person Study**: 50 biology PhDs + 50 stude"
+    fetchedAt: 2026-02-22T02:23:02.771Z
+    httpStatus: 200
+    pageTitle: Building an early warning system for LLM-aided biological threat creation | OpenAI
+    contentSnippet: Building an early warning system for LLM-aided biological threat creation | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI January 31, 2024 Publication Building an early warning system for LLM-aided biological threat creation View data Loading… Share We’re developing a blueprint for evaluating the risk that a large language model (LLM) could aid someone in creating a biological threat. In an evaluation involving both biol
+    contentLength: 555500
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://forecastingresearch.org/ai-enabled-biorisk
+    linkText: FRI AI-enabled biorisk survey
+    claimContext: '- **OpenAI 100-Person Study**: 50 biology PhDs + 50 students, assessed across 5 stages (ideation, acquisition, magnification, formulation, release). Found GPT-4 provided "at most a mild uplift."[^17] - **FRI Expert Survey**: Forecasting Research Institute survey estimated AI capabilities matching ex'
+    fetchedAt: 2026-02-22T02:23:02.829Z
+    httpStatus: 200
+    pageTitle: Forecasting Biosecurity Risks from LLMs &mdash; Forecasting Research Institute
+    contentSnippet: Forecasting Biosecurity Risks from LLMs &mdash; Forecasting Research Institute 0 Forecasting Biosecurity Risks from LLMs Forecasting LLM-enabled biorisk and the efficacy of safeguards As AI capabilities improve, concerns have grown about the potential biosecurity risks posed by frontier large language models (LLMs). This study systematically assesses expert beliefs about these risks through surveys of 46 domain experts in biosecurity and biology, along with 22 expert forecasters (superforecaster
+    contentLength: 155510
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.redqueen.bio
+    linkText: Red Queen Bio
+    claimContext: '- **<EntityLink id="red-queen-bio">Red Queen Bio</EntityLink>** — Spun out of HelixNano (clinical-stage mRNA therapeutics), raised a **\$15M seed round led by OpenAI** in 2025. Core thesis: "defensive co-scaling"—coupling defensive compute and funding to the same forces driving the AI capability rac'
+    fetchedAt: 2026-02-22T02:23:03.089Z
+    httpStatus: 200
+    pageTitle: Red Queen Bio
+    contentSnippet: Red Queen Bio 0 Red Queen Bio Today, we are launching Red Queen Bio, an AI biosecurity company. The Red Queen hypothesis describes a species’ co-evolution with ever-evolving opponents. As AI capabilities advance, biological risks grow exponentially. Our mission is to scale biological defenses at the same rate to ensure continuous human flourishing. We, the founders of Red Queen Bio (Nikolai and Hannu) have worked together for almost a decade as co-founders of HelixNano, a clinical-stage mRNA com
+    contentLength: 84054
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.nature.com/articles/s41598-024-57441-z
+    linkText: Far-UVC efficacy - Scientific Reports
+    claimContext: "- Far-UVC light (222nm) can **inactivate 99.8% of airborne pathogens** in occupied spaces while remaining safe for human exposure—the light is absorbed by dead skin cells before reaching living tissue.[^20] - Columbia University research (David Brenner) demonstrated effectiveness; technology license"
+    fetchedAt: 2026-02-22T02:23:03.817Z
+    httpStatus: 200
+    pageTitle: 222 nm far-UVC light markedly reduces the level of infectious airborne virus in an occupied room | Scientific Reports
+    contentSnippet: 222 nm far-UVC light markedly reduces the level of infectious airborne virus in an occupied room | Scientific Reports Skip to main content Thank you for visiting nature.com. You are using a browser version with limited support for CSS. To obtain the best experience, we recommend you use a more up to date browser (or turn off compatibility mode in Internet Explorer). In the meantime, to ensure continued support, we are displaying the site without styles and JavaScript. Advertisement 222 nm far-UV
+    contentLength: 520742
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.cuimc.columbia.edu/news/far-uvc-light-can-virtually-eliminate-airborne-virus-occupied-room
+    linkText: Columbia University far-UVC research
+    claimContext: "- Far-UVC light (222nm) can **inactivate 99.8% of airborne pathogens** in occupied spaces while remaining safe for human exposure—the light is absorbed by dead skin cells before reaching living tissue.[^20] - Columbia University research (David Brenner) demonstrated effectiveness; technology license"
+    fetchedAt: 2026-02-22T02:23:03.081Z
+    httpStatus: 200
+    pageTitle: Far-UVC Light Can Virtually Eliminate Airborne Virus in an Occupied Room | Columbia University Irving Medical Center
+    contentSnippet: "Far-UVC Light Can Virtually Eliminate Airborne Virus in an Occupied Room | Columbia University Irving Medical Center Skip to content Far-UVC Light Can Virtually Eliminate Airborne Virus in an Occupied Room April 2, 2024 Share this page Share on Facebook Share on X (formerly Twitter) Share on LinkedIn Share by email Far-UVC light is a promising new technology for reducing airborne virus levels in occupied indoor spaces, but its effectiveness has not been evaluated in real-life scenarios. A study "
+    contentLength: 173905
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://blueprintbiosecurity.org/works/far-uvc/
+    linkText: Blueprint Biosecurity far-UVC program
+    claimContext: "- Columbia University research (David Brenner) demonstrated effectiveness; technology licensed to Ushio Inc. (Care222 product line).[^21] - Blueprint's **EXHALE Program**: ≈\\$1M in grants to evaluate far-UVC against real human-generated respiratory aerosols (Emory, Virginia Tech, University of Nebra"
+    fetchedAt: 2026-02-22T02:23:05.419Z
+    httpStatus: 200
+    pageTitle: Far-UVC &#8211; Blueprint Biosecurity
+    contentSnippet: Far-UVC &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Far-UVC is an emerging type of germicidal ultraviolet light. It can inactivate a wide range of pathogens with minimal effects on human tissues because it is strongly absorbed by proteins in the outer layer of human skin and eyes. It offers immense promise for conti
+    contentLength: 91460
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://en.wikipedia.org/wiki/Far-UVC
+    linkText: Far-UVC regulatory status
+    claimContext: "- Blueprint's **Project AIR**: Launched to address three bottlenecks—global health agency endorsements, real-world implementation guidance, and multinational funding.[^22] - **Key limitation**: No binding regulatory standards exist worldwide for safe far-UVC dosage as of 2025.[^23]"
+    fetchedAt: 2026-02-22T02:23:04.864Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403

@@ -1,0 +1,1140 @@
+pageId: chan-zuckerberg-initiative
+verifiedAt: 2026-02-22
+totalCitations: 103
+verified: 81
+broken: 22
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: The **Chan Zuckerberg Initiative (CZI)** is a philanthropic organization founded in December 2015 by Meta co-founder Mark Zuckerberg and pediatrician Priscilla Chan. Structured as a limited liability company rather than a traditional nonprofit foundation, CZI pledged 99% of the couple's Facebook sha
+    fetchedAt: 2026-02-22T01:43:31.924Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: CZI's original mission encompassed diverse areas including health, education, scientific research, criminal justice reform, immigration, and housing affordability. However, the organization underwent a dramatic strategic shift in 2025-2026, refocusing almost exclusively on AI-powered biological rese
+    fetchedAt: 2026-02-22T01:43:31.917Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    linkText: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' - Science.org
+    claimContext: CZI's original mission encompassed diverse areas including health, education, scientific research, criminal justice reform, immigration, and housing affordability. However, the organization underwent a dramatic strategic shift in 2025-2026, refocusing almost exclusively on AI-powered biological rese
+    fetchedAt: 2026-02-22T01:43:31.995Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://stratuslive.com/blog/chan-zuckerberg-philanthropy/
+    linkText: "Chan Zuckerberg Philanthropy: Is It About Tax Deduction? - StratusLive"
+    claimContext: The initiative operates through multiple entities including the CZI LLC, CZI Foundation, donor-advised funds, and CZI Advocacy. Its LLC structure enables flexibility for both grants to nonprofits and investments in for-profit companies, though this approach has drawn criticism regarding accountabili
+    fetchedAt: 2026-02-22T01:43:32.466Z
+    httpStatus: 200
+    pageTitle: The Chan Zuckerberg Initiative & Philanthropy - StratusLIVE
+    contentSnippet: "The Chan Zuckerberg Initiative & Philanthropy - StratusLIVE Skip to content The Chan Zuckerberg Initiative &#038; Philanthropy By StratusLive November 30, 2021 When Mark Zuckerberg and his wife Dr. Priscilla Chan welcomed their first child, Maxima Chan Zuckerberg, into the world last month it was not only a momentous occasion for the famous young family, but the presumed catalyst for another recent Zuckerberg-Chan collaboration that will change the direction of American philanthropy for decades "
+    contentLength: 892810
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    linkText: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' - Science.org
+    claimContext: The initiative operates through multiple entities including the CZI LLC, CZI Foundation, donor-advised funds, and CZI Advocacy. Its LLC structure enables flexibility for both grants to nonprofits and investments in for-profit companies, though this approach has drawn criticism regarding accountabili
+    fetchedAt: 2026-02-22T01:43:32.271Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.dl1.en-us.nina.az/Chan_Zuckerberg_Initiative.html
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: CZI launched on December 1, 2015, coinciding with the birth of Mark Zuckerberg and Priscilla Chan's first daughter.[^6] The announcement came in the form of a letter to their newborn, pledging to donate 99% of their Facebook shares over their lifetimes to advance human potential and equality. Chan's
+    fetchedAt: 2026-02-22T01:43:34.553Z
+    httpStatus: 200
+    pageTitle: Chan Zuckerberg Initiative
+    contentSnippet: Chan Zuckerberg Initiative Home Page | Chan Zuckerberg Initiative The Chan Zuckerberg Initiative ( CZI ) is an organization established and owned by Facebook founder Mark Zuckerberg and his wife Priscilla Chan with an investment of 99 percent of the couple's wealth from their Facebook shares over their lifetime. The CZI is legally set up as a limited liability company (LLC) that can be seen as a for-profit charity and is an example of philanthrocapitalism. CZI has been deemed likely to be "one o
+    contentLength: 32460
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.international.ucla.edu/gcpi/profiles/177467
+    linkText: Priscilla Chan - UCLA Global Citizenship Project
+    claimContext: CZI launched on December 1, 2015, coinciding with the birth of Mark Zuckerberg and Priscilla Chan's first daughter.[^6] The announcement came in the form of a letter to their newborn, pledging to donate 99% of their Facebook shares over their lifetimes to advance human potential and equality. Chan's
+    fetchedAt: 2026-02-22T01:43:34.494Z
+    httpStatus: 200
+    pageTitle: Profiles
+    contentSnippet: Profiles English 简体中文 繁體中文 English 简体中文 繁體中文 Menu Priscilla Chan and Mark Zuckerberg "Education is an incredibly personal issue for me…If you are the first generation to go to college, sometimes you do not realize your potential until others point it out.” BACKGROUND In December of 2015, Dr. Priscilla Chan and Mark Zuckerberg announced the Chan Zuckerberg Initiative and pledged to give 99% of their Facebook shares over their lifetimes to supports its mission. The initiative seeks to advance huma
+    contentLength: 70668
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.netimpact.org/blog/criticism-of-chan-zuckerberg-initiative-and-implications-for-impact-investing-industry-the
+    linkText: Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - Net Impact
+    claimContext: The decision to structure CZI as an LLC rather than a traditional charitable foundation was controversial from the outset. According to critics, this structure allowed the founders to retain control over Facebook shares, make political contributions, invest in for-profit companies, and avoid the dis
+    fetchedAt: 2026-02-22T01:43:33.826Z
+    httpStatus: 200
+    pageTitle: Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good - Net Impact - Impactful Careers for Impactful Lives
+    contentSnippet: "Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good - Net Impact - Impactful Careers for Impactful Lives Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good Facebook co-founder and CEO, Mark Zuckerberg, announced earlier this week that he and his partner, Dr. Priscilla Chan, would devote 99% of their wealth, approximately $45 "
+    contentLength: 243274
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.teachshare.com/gallery/overview-of-the-chan-zuckerberg-initiative-AZl9GBzycxOQLlb3N5U9DA
+    linkText: Overview of the Chan Zuckerberg Initiative - TeachShare
+    claimContext: The decision to structure CZI as an LLC rather than a traditional charitable foundation was controversial from the outset. According to critics, this structure allowed the founders to retain control over Facebook shares, make political contributions, invest in for-profit companies, and avoid the dis
+    fetchedAt: 2026-02-22T01:43:34.861Z
+    httpStatus: 200
+    pageTitle: TeachShare
+    contentSnippet: TeachShare Home Gallery TeachShare span]:rotate-180 cursor-pointer h-16 bg-lighter hover:bg-light outline-none w-full data-[expanded]:bg-lighter data-[closed]:text-fg-secondary data-[closed]:no-underline data-[expanded]:no-underline rounded-[6px] data-[expanded]:text-brand-primary data-[closed]:bg-lighter px-6 flex items-center " > Home span]:rotate-180 cursor-pointer h-16 bg-lighter hover:bg-light outline-none w-full data-[expanded]:bg-lighter data-[closed]:text-fg-secondary data-[closed]:no-un
+    contentLength: 865211
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: "**2016** marked CZI's first major initiatives. The organization co-founded The Primary School, a nonprofit offering free K-12 education, prenatal care, early childhood education, and primary health care in East Palo Alto, California, with Priscilla Chan serving as emeritus board chair.[^10] In Septe"
+    fetchedAt: 2026-02-22T01:43:33.521Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: "**2016** marked CZI's first major initiatives. The organization co-founded The Primary School, a nonprofit offering free K-12 education, prenatal care, early childhood education, and primary health care in East Palo Alto, California, with Priscilla Chan serving as emeritus board chair.[^10] In Septe"
+    fetchedAt: 2026-02-22T01:43:35.903Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 12
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: "**2017** saw CZI's first acquisition: Meta, a Toronto-based AI scientific literature search engine designed to help scientists discover and share research (the service was later shut down in March 2022).[^12] CZI also became a founding sponsor of the Vector Institute for Artificial Intelligence in T"
+    fetchedAt: 2026-02-22T01:43:35.903Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 13
+    url: https://chanzuckerberg.com/blog/10-year-look-back/
+    linkText: 10-Year Look Back - Chan Zuckerberg Initiative
+    claimContext: "**2017** saw CZI's first acquisition: Meta, a Toronto-based AI scientific literature search engine designed to help scientists discover and share research (the service was later shut down in March 2022).[^12] CZI also became a founding sponsor of the Vector Institute for Artificial Intelligence in T"
+    fetchedAt: 2026-02-22T01:43:36.320Z
+    httpStatus: 200
+    pageTitle: 10 Years of Big Bets and Big Breakthroughs - CZI Blog
+    contentSnippet: "10 Years of Big Bets and Big Breakthroughs - CZI Blog Skip to content Dec 1, 2025 &middot; 15 min read Celebrating 10 Years of Big Bets and Big Breakthroughs Tags: Community , COVID-19 , Education , Science , Technology Share M ark Zuckerberg and Priscilla Chan started the Chan Zuckerberg Initiative in 2016 to advance science, improve education, and support local communities. Driving progress on these goals required big bets — on the scientists asking bold questions, the technology that could ac"
+    contentLength: 78342
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: "**2018** brought the launch of Opportunity Insights, an economic mobility research initiative led by economists Raj Chetty, John Friedman, and Nathaniel Hendren.[^14] The same period saw substantial investments in personalized learning platforms and education technology, including the Summit Learnin"
+    fetchedAt: 2026-02-22T01:43:35.916Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 15
+    url: https://www.philanthropyroundtable.org/donor-intent-at-the-chan-zuckerberg-initiative/
+    linkText: Donor Intent at the Chan Zuckerberg Initiative - Philanthropy Roundtable
+    claimContext: "**2020** was marked by significant challenges and controversies. In June, a group of Black employees sent a letter to Priscilla Chan accusing the organization of failing to uphold commitments to diversity, inclusion, and equity.[^15] Former employee Gerardo Holgado filed a formal complaint alleging "
+    fetchedAt: 2026-02-22T01:43:36.274Z
+    httpStatus: 200
+    pageTitle: Donor Intent at the Chan Zuckerberg Initiative
+    contentSnippet: Donor Intent at the Chan Zuckerberg Initiative Skip to content Donor Intent at the Chan Zuckerberg Initiative Joanne Florino Donor Intent Governance Philanthropic Excellence December 4, 2020 You may have read in the past few months that the Chan Zuckerberg Initiative (CZI) is under fire for its allegedly inadequate response to the call for racial justice. In June a group of the organization’s black employees sent a letter to Priscilla Chan (who runs the operations of CZI) accusing her and her hu
+    contentLength: 156599
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://techcrunch.com/2020/11/10/chan-zuckerberg-initiative-faces-racial-discrimination-allegations-from-former-employee/
+    linkText: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee - TechCrunch
+    claimContext: "**2020** was marked by significant challenges and controversies. In June, a group of Black employees sent a letter to Priscilla Chan accusing the organization of failing to uphold commitments to diversity, inclusion, and equity.[^15] Former employee Gerardo Holgado filed a formal complaint alleging "
+    fetchedAt: 2026-02-22T01:43:38.617Z
+    httpStatus: 200
+    pageTitle: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee | TechCrunch
+    contentSnippet: "Chan Zuckerberg Initiative faces racial discrimination allegations from former employee | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Florian Gaertner Chan Zuckerberg Initiative faces racial discrimination allegations from former employee Megan Rose Dickey 6:26 PM PST · November 10, 2020 Ray Holgado, a former employee of the Chan"
+    contentLength: 232903
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://chanzuckerberg.com/about/annual-letter/year-2020/
+    linkText: Year 2020 - Chan Zuckerberg Initiative Annual Letter
+    claimContext: "**2020** was marked by significant challenges and controversies. In June, a group of Black employees sent a letter to Priscilla Chan accusing the organization of failing to uphold commitments to diversity, inclusion, and equity.[^15] Former employee Gerardo Holgado filed a formal complaint alleging "
+    fetchedAt: 2026-02-22T01:43:37.880Z
+    httpStatus: 200
+    pageTitle: Annual Letter 2020 - Chan Zuckerberg Initiative
+    contentSnippet: Annual Letter 2020 - Chan Zuckerberg Initiative Skip to content 2020 Annual Letter What We’re Learning Share Dear Friends, Our daughter Max turned five years old just a few days ago. And so did the Chan Zuckerberg Initiative. We didn’t know it back in 2015 but becoming new parents and starting a philanthropy actually have a lot in common. You’re simultaneously exhausted, overjoyed, and full of adrenaline. You stress over every little detail and decision. When you’re up in the middle of the night
+    contentLength: 326398
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: The Chan Zuckerberg Biohub represents CZI's flagship scientific initiative. Launched in 2016 with an initial \$600 million investment from a \$3 billion science pledge, the Biohub fosters collaboration between UC San Francisco, UC Berkeley, and Stanford researchers.[^18] The network has since expand
+    fetchedAt: 2026-02-22T01:43:37.329Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://chanzuckerberg.com/blog/2024-look-back/
+    linkText: 2024 Look Back - Chan Zuckerberg Initiative
+    claimContext: The Chan Zuckerberg Biohub represents CZI's flagship scientific initiative. Launched in 2016 with an initial \$600 million investment from a \$3 billion science pledge, the Biohub fosters collaboration between UC San Francisco, UC Berkeley, and Stanford researchers.[^18] The network has since expand
+    fetchedAt: 2026-02-22T01:43:38.361Z
+    httpStatus: 200
+    pageTitle: "2024 Look Back: How AI Shaped a Year of Impact - CZI Blog"
+    contentSnippet: "2024 Look Back: How AI Shaped a Year of Impact - CZI Blog Skip to content Dec 12, 2024 &middot; 11 min read 2024 in Review: How AI Shaped a Year of Impact at CZI Explore how advances in AI are transforming biomedical research and enhancing education tools alongside our efforts to support communities and drive progress across our work. Tags: Community , Education , Science , Technology Advances in AI shaped a year of impact at CZI — driving efforts to build AI-powered virtual cell models and enab"
+    contentLength: 81766
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://biohub.org/research/
+    linkText: Research - CZ Biohub
+    claimContext: CZI's science program has supported more than 8,000 publications since its founding.[^20] Key research areas include neurodegenerative disease mechanisms through the Neurodegeneration Challenge Network, single-cell biology and data science, and open source software for scientific computing.[^21] Not
+    fetchedAt: 2026-02-22T01:43:37.773Z
+    httpStatus: 200
+    pageTitle: Scientific research publications - Biohub
+    contentSnippet: Scientific research publications - Biohub Research We believe in sharing the research findings of our teams and partners openly to accelerate understanding of human health and disease. We strongly encourage researchers to deposit manuscripts as preprints before peer review to increase access to research findings and to communicate results more quickly. Since 2015, we have supported more than 8,000 publications. Filter 76 Results Filter Close Topic Imaging Immune cell reprogramming Technology Tis
+    contentLength: 112221
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://chanzuckerberg.com/science/programs-resources/neurodegeneration-challenge/projects/
+    linkText: Neurodegeneration Challenge Projects - Chan Zuckerberg Initiative
+    claimContext: CZI's science program has supported more than 8,000 publications since its founding.[^20] Key research areas include neurodegenerative disease mechanisms through the Neurodegeneration Challenge Network, single-cell biology and data science, and open source software for scientific computing.[^21] Not
+    fetchedAt: 2026-02-22T01:43:39.670Z
+    httpStatus: 200
+    pageTitle: NDCN Projects - Chan Zuckerberg Initiative
+    contentSnippet: NDCN Projects - Chan Zuckerberg Initiative Skip to content Neuroscience Projects The Neuroscience program was launched in 2018 with a focus on neurodegenerative disease and centered on the CZI Neurodegeneration Challenge Network (NDCN). The Challenge Network model is built on the vision that progress in solving neurodegenerative diseases will come from bringing new talent and ideas from diverse disciplines and expertise into the neurodegeneration field, building interdisciplinary collaborations,
+    contentLength: 251387
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://chanzuckerberg.com/blog/preprints-race-covid-breakthroughs/
+    linkText: Preprints Race COVID Breakthroughs - Chan Zuckerberg Initiative
+    claimContext: CZI's science program has supported more than 8,000 publications since its founding.[^20] Key research areas include neurodegenerative disease mechanisms through the Neurodegeneration Challenge Network, single-cell biology and data science, and open source software for scientific computing.[^21] Not
+    fetchedAt: 2026-02-22T01:43:40.184Z
+    httpStatus: 200
+    pageTitle: Preprints & COVID-19 Scientific Breakthroughs- CZI Blog
+    contentSnippet: "Preprints & COVID-19 Scientific Breakthroughs- CZI Blog Skip to content Nov 2, 2021 &middot; 2 min read How Open, Early Sharing of Scientific Results Proved Crucial to COVID-19 Response Preprints, or scientific papers shared prior to peer review, accelerate the pace of scientific discovery across the globe and will aid in future pandemic responses. Patricia Flores Tags: COVID-19 , Science , Technology Share S cience moves faster when it’s open and scientists, patients, and public health official"
+    contentLength: 57086
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://chanzuckerberg.com/blog/10-year-look-back/
+    linkText: 10-Year Look Back - Chan Zuckerberg Initiative
+    claimContext: CZI's science program has supported more than 8,000 publications since its founding.[^20] Key research areas include neurodegenerative disease mechanisms through the Neurodegeneration Challenge Network, single-cell biology and data science, and open source software for scientific computing.[^21] Not
+    fetchedAt: 2026-02-22T01:43:39.937Z
+    httpStatus: 200
+    pageTitle: 10 Years of Big Bets and Big Breakthroughs - CZI Blog
+    contentSnippet: "10 Years of Big Bets and Big Breakthroughs - CZI Blog Skip to content Dec 1, 2025 &middot; 15 min read Celebrating 10 Years of Big Bets and Big Breakthroughs Tags: Community , COVID-19 , Education , Science , Technology Share M ark Zuckerberg and Priscilla Chan started the Chan Zuckerberg Initiative in 2016 to advance science, improve education, and support local communities. Driving progress on these goals required big bets — on the scientists asking bold questions, the technology that could ac"
+    contentLength: 78342
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://chanzuckerberg.com/blog/scientific-milestones-learnings-2024/
+    linkText: Scientific Milestones and Learnings 2024 - Chan Zuckerberg Initiative
+    claimContext: In 2024, the Biohub Chicago team published breakthrough research in *Science* on an implantable device capable of tracking protein levels in real-time in animals, enabling early disease detection and prevention.[^24] The same year saw the launch of the Center for Pediatric CRISPR Cures in collaborat
+    fetchedAt: 2026-02-22T01:43:40.476Z
+    httpStatus: 200
+    pageTitle: Our Scientific Achievements, Learnings and Future Vision
+    contentSnippet: "Our Scientific Achievements, Learnings and Future Vision Skip to content Jan 16, 2025 &middot; 1 min read Watch: Priscilla Chan on CZI’s Science Milestones and What’s Next Tags: Science , Technology Share A s we welcome the new year, CZI Co-Founder and Co-CEO Priscilla Chan sat down with Patricia Brennan, vice president of science technology and general manager for science at CZI, and Shana Kelley, president of the Chan Zuckerberg Biohub Chicago, to reflect on the progress made over the past yea"
+    contentLength: 54840
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://chanzuckerberg.com/newsroom/
+    linkText: Newsroom - Chan Zuckerberg Initiative
+    claimContext: In 2024, the Biohub Chicago team published breakthrough research in *Science* on an implantable device capable of tracking protein levels in real-time in animals, enabling early disease detection and prevention.[^24] The same year saw the launch of the Center for Pediatric CRISPR Cures in collaborat
+    fetchedAt: 2026-02-22T01:43:40.010Z
+    httpStatus: 200
+    pageTitle: Newsroom - Chan Zuckerberg Initiative
+    contentSnippet: Newsroom - Chan Zuckerberg Initiative Skip to content Newsroom Check out the latest news about our work in science, education, and within our communities. For media inquiries, please contact us at press@chanzuckerberg.com . Newsroom Stories Videos Media Gallery Filter By Category Filter By Category All Announcements Science Education Community Climate CZI in the News Technology Ventures Grants COVID-19 Year Filter By Year 2025 2024 2023 2022 2021 2020 2019 2018 2017 2016 2015 Sort By Latest Sort
+    contentLength: 94165
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    linkText: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' - Science.org
+    claimContext: '- **Mission refinement**: Dropped "managing disease" from the goal of curing, managing, or preventing all diseases by 2100, focusing exclusively on cures and prevention accelerated by AI advances[^26] - **Funding expansion**: Commitment to spend at least \$10 billion on basic scientific research ove'
+    fetchedAt: 2026-02-22T01:43:41.728Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 27
+    url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    linkText: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' - Science.org
+    claimContext: '- **Mission refinement**: Dropped "managing disease" from the goal of curing, managing, or preventing all diseases by 2100, focusing exclusively on cures and prevention accelerated by AI advances[^26] - **Funding expansion**: Commitment to spend at least \$10 billion on basic scientific research ove'
+    fetchedAt: 2026-02-22T01:43:41.594Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 28
+    url: https://www.insidephilanthropy.com/toplines/toplines-may-17-2025-priscilla-chan-philanthropy
+    linkText: "Toplines May 17, 2025: Priscilla Chan Philanthropy - Inside Philanthropy"
+    claimContext: "- **Funding expansion**: Commitment to spend at least \\$10 billion on basic scientific research over the next decade (2026-2036), more than double the \\$4-4.5 billion spent in the first decade[^27] - **Social program wind-down**: Ended grantmaking on social inequities, immigration reform, and commun"
+    fetchedAt: 2026-02-22T01:43:42.488Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 229
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.insidephilanthropy.com/toplines/toplines-may-17-2025-priscilla-chan-philanthropy
+    linkText: "Toplines May 17, 2025: Priscilla Chan Philanthropy - Inside Philanthropy"
+    claimContext: "- **Social program wind-down**: Ended grantmaking on social inequities, immigration reform, and community development initiatives that had characterized the organization's first decade[^28] - **DEI team elimination**: Cancelled the Diverse Slate Practice aimed at ensuring diverse job candidates and "
+    fetchedAt: 2026-02-22T01:43:42.490Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 229
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
+    linkText: "Chan Zuckerberg Initiative Layoffs: All In on AI Biomedical Research - Fortune"
+    claimContext: "- **DEI team elimination**: Cancelled the Diverse Slate Practice aimed at ensuring diverse job candidates and cut the diversity, equity, and inclusion team[^29] - **Workforce restructuring**: Cut approximately 70 jobs (≈8% of workforce) in early 2026 to refocus on AI-biomedical research[^30]"
+    fetchedAt: 2026-02-22T01:43:41.950Z
+    httpStatus: 200
+    pageTitle: Chan Zuckerberg Initiative cut 70 jobs to go all in on mission to &#x27;cure or prevent all disease&#x27; | Fortune
+    contentSnippet: Chan Zuckerberg Initiative cut 70 jobs to go all in on mission to &#x27;cure or prevent all disease&#x27; | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Big Tech Mark Zuckerberg The Chan Zuckerberg Initiative cut 70 jobs as the Meta CEO’s philanthropy goes all in on mission to ‘cure or prevent all disease’ By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon February 1, 2026,
+    contentLength: 451781
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    linkText: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' - Science.org
+    claimContext: 'Priscilla Chan, age 40 with three daughters, has articulated a sense of urgency driving these changes: "As I get older, the faster I personally want it to be."[^31] The organization expressed optimism that the "marriage" of AI and biology could achieve disease prevention and cure goals "much sooner"'
+    fetchedAt: 2026-02-22T01:43:43.525Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 32
+    url: https://www.drugtargetreview.com/news/190328/zuckerbergs-biohub-announces-ai-powered-biology-to-accelerate-drug-discovery/
+    linkText: Zuckerberg's Biohub Announces AI-Powered Biology to Accelerate Drug Discovery - Drug Target Review
+    claimContext: 'Priscilla Chan, age 40 with three daughters, has articulated a sense of urgency driving these changes: "As I get older, the faster I personally want it to be."[^31] The organization expressed optimism that the "marriage" of AI and biology could achieve disease prevention and cure goals "much sooner"'
+    fetchedAt: 2026-02-22T01:43:44.148Z
+    httpStatus: 200
+    pageTitle: Zuckerberg's Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review
+    contentSnippet: Zuckerberg&#039;s Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review Recommended What it takes to automate high-content imaging at scale | Register for the free webinar! | 25 March 2026 ACCESS THE FREE RECORDING | Top cancer researchers explore advances transforming early discovery, from new targets and models to the therapies of tomorrow NEW REPORT | Explore how data-driven systems improve reproducibility, speed decisions and make scale achievable across resea
+    contentLength: 267776
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://chanzuckerberg.com/rfa/ai-computing-gpu/
+    linkText: AI Computing GPU RFA - Chan Zuckerberg Initiative
+    claimContext: CZI has built substantial AI computing infrastructure to support its biological research mission. In 2023-2025, the organization constructed a compute cluster featuring 1,024 NVIDIA H100 GPUs in an NVIDIA DGX SuperPOD configuration, optimized specifically for nonprofit life sciences AI and machine l
+    fetchedAt: 2026-02-22T01:43:43.529Z
+    httpStatus: 200
+    pageTitle: Accelerating and Scaling Biological Sciences via AI RFA
+    contentSnippet: Accelerating and Scaling Biological Sciences via AI RFA Skip to content This RFA closed May 12, 2025 Accelerating and Scaling Biological Sciences With AI The Chan Zuckerberg Initiative (CZI) invites proposals to build large-scale AI/ML models that cannot be created with conventional university resources. CZI is the only philanthropic organization to fund and build one of the largest computing systems dedicated to nonprofit life sciences research in the world. CZI’s cluster is optimized for AI an
+    contentLength: 88491
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    linkText: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' - Science.org
+    claimContext: CZI has built substantial AI computing infrastructure to support its biological research mission. In 2023-2025, the organization constructed a compute cluster featuring 1,024 NVIDIA H100 GPUs in an NVIDIA DGX SuperPOD configuration, optimized specifically for nonprofit life sciences AI and machine l
+    fetchedAt: 2026-02-22T01:43:43.519Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 35
+    url: https://chanzuckerberg.com/rfa/ai-computing-gpu/
+    linkText: AI Computing GPU RFA - Chan Zuckerberg Initiative
+    claimContext: CZI offers computational resources through competitive research funding announcements, requiring proposals to use at least 96 GPUs and prioritizing work on virtual cells and disease-related applications.[^35] Meta (Facebook) employees are explicitly barred from applying to these programs.[^36]
+    fetchedAt: 2026-02-22T01:43:43.544Z
+    httpStatus: 200
+    pageTitle: Accelerating and Scaling Biological Sciences via AI RFA
+    contentSnippet: Accelerating and Scaling Biological Sciences via AI RFA Skip to content This RFA closed May 12, 2025 Accelerating and Scaling Biological Sciences With AI The Chan Zuckerberg Initiative (CZI) invites proposals to build large-scale AI/ML models that cannot be created with conventional university resources. CZI is the only philanthropic organization to fund and build one of the largest computing systems dedicated to nonprofit life sciences research in the world. CZI’s cluster is optimized for AI an
+    contentLength: 88491
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://chanzuckerberg.com/rfa/ai-computing-gpu/
+    linkText: AI Computing GPU RFA - Chan Zuckerberg Initiative
+    claimContext: CZI offers computational resources through competitive research funding announcements, requiring proposals to use at least 96 GPUs and prioritizing work on virtual cells and disease-related applications.[^35] Meta (Facebook) employees are explicitly barred from applying to these programs.[^36]
+    fetchedAt: 2026-02-22T01:43:45.188Z
+    httpStatus: 200
+    pageTitle: Accelerating and Scaling Biological Sciences via AI RFA
+    contentSnippet: Accelerating and Scaling Biological Sciences via AI RFA Skip to content This RFA closed May 12, 2025 Accelerating and Scaling Biological Sciences With AI The Chan Zuckerberg Initiative (CZI) invites proposals to build large-scale AI/ML models that cannot be created with conventional university resources. CZI is the only philanthropic organization to fund and build one of the largest computing systems dedicated to nonprofit life sciences research in the world. CZI’s cluster is optimized for AI an
+    contentLength: 88491
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.drugtargetreview.com/news/190328/zuckerbergs-biohub-announces-ai-powered-biology-to-accelerate-drug-discovery/
+    linkText: Zuckerberg's Biohub Announces AI-Powered Biology to Accelerate Drug Discovery - Drug Target Review
+    claimContext: "In November 2025, CZI's Biohub announced a major AI-powered biology initiative including the development of a Virtual Immune System—an AI model designed to simulate immune system function for drug development and disease prevention.[^37] The organization released several AI models including:"
+    fetchedAt: 2026-02-22T01:43:45.331Z
+    httpStatus: 200
+    pageTitle: Zuckerberg's Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review
+    contentSnippet: Zuckerberg&#039;s Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review Recommended What it takes to automate high-content imaging at scale | Register for the free webinar! | 25 March 2026 ACCESS THE FREE RECORDING | Top cancer researchers explore advances transforming early discovery, from new targets and models to the therapies of tomorrow NEW REPORT | Explore how data-driven systems improve reproducibility, speed decisions and make scale achievable across resea
+    contentLength: 267776
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.drugtargetreview.com/news/190328/zuckerbergs-biohub-announces-ai-powered-biology-to-accelerate-drug-discovery/
+    linkText: Zuckerberg's Biohub Announces AI-Powered Biology to Accelerate Drug Discovery - Drug Target Review
+    claimContext: "- **CryoLens**: For cryo-electron microscopy image processing - **scLDM**: For single-cell data modeling[^38]"
+    fetchedAt: 2026-02-22T01:43:45.595Z
+    httpStatus: 200
+    pageTitle: Zuckerberg's Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review
+    contentSnippet: Zuckerberg&#039;s Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review Recommended What it takes to automate high-content imaging at scale | Register for the free webinar! | 25 March 2026 ACCESS THE FREE RECORDING | Top cancer researchers explore advances transforming early discovery, from new targets and models to the therapies of tomorrow NEW REPORT | Explore how data-driven systems improve reproducibility, speed decisions and make scale achievable across resea
+    contentLength: 267776
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.liebertpub.com/doi/full/10.1089/genbio.2025.0007
+    linkText: First Virtual Cells - Genetic Engineering & Biotechnology News
+    claimContext: In February 2025, CZI published research on developing "Virtual Cells" using what they characterized as "safe, ethical, and reliable AI" for biological discovery.[^39] A 2024 preprint in *Cell* outlined a roadmap for virtual cell models with an emphasis on open science principles, developed in colla
+    fetchedAt: 2026-02-22T01:43:45.904Z
+    httpStatus: 200
+    pageTitle: ""
+    contentSnippet: "--> Login to your account Username Password Forgot password? Keep me logged in OpenAthens New User Institutional Login Change Password Old Password New Password Too Short Weak Medium Strong Very Strong Too Long Your password must have 8 characters or more and contain 3 of the following: a lower case character, an upper case character, a special character or a digit Too Short Password Changed Successfully Your password has been changed Create a new account Email Returning user Can't sign in? Forg"
+    contentLength: 50381
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://chanzuckerberg.com/newsroom/
+    linkText: Newsroom - Chan Zuckerberg Initiative
+    claimContext: In February 2025, CZI published research on developing "Virtual Cells" using what they characterized as "safe, ethical, and reliable AI" for biological discovery.[^39] A 2024 preprint in *Cell* outlined a roadmap for virtual cell models with an emphasis on open science principles, developed in colla
+    fetchedAt: 2026-02-22T01:43:45.194Z
+    httpStatus: 200
+    pageTitle: Newsroom - Chan Zuckerberg Initiative
+    contentSnippet: Newsroom - Chan Zuckerberg Initiative Skip to content Newsroom Check out the latest news about our work in science, education, and within our communities. For media inquiries, please contact us at press@chanzuckerberg.com . Newsroom Stories Videos Media Gallery Filter By Category Filter By Category All Announcements Science Education Community Climate CZI in the News Technology Ventures Grants COVID-19 Year Filter By Year 2025 2024 2023 2022 2021 2020 2019 2018 2017 2016 2015 Sort By Latest Sort
+    contentLength: 94165
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://chanzuckerberg.com/newsroom/
+    linkText: Newsroom - Chan Zuckerberg Initiative
+    claimContext: Additional AI initiatives include the **GREmLN AI model** for cancer genetics, which analyzes key networks to pinpoint cancer cell signatures,[^41] and **rBio**, which uses virtual cells to train AI models without requiring laboratory experiments.[^42]
+    fetchedAt: 2026-02-22T01:43:46.942Z
+    httpStatus: 200
+    pageTitle: Newsroom - Chan Zuckerberg Initiative
+    contentSnippet: Newsroom - Chan Zuckerberg Initiative Skip to content Newsroom Check out the latest news about our work in science, education, and within our communities. For media inquiries, please contact us at press@chanzuckerberg.com . Newsroom Stories Videos Media Gallery Filter By Category Filter By Category All Announcements Science Education Community Climate CZI in the News Technology Ventures Grants COVID-19 Year Filter By Year 2025 2024 2023 2022 2021 2020 2019 2018 2017 2016 2015 Sort By Latest Sort
+    contentLength: 94165
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://chanzuckerberg.com/newsroom/
+    linkText: Newsroom - Chan Zuckerberg Initiative
+    claimContext: Additional AI initiatives include the **GREmLN AI model** for cancer genetics, which analyzes key networks to pinpoint cancer cell signatures,[^41] and **rBio**, which uses virtual cells to train AI models without requiring laboratory experiments.[^42]
+    fetchedAt: 2026-02-22T01:43:46.946Z
+    httpStatus: 200
+    pageTitle: Newsroom - Chan Zuckerberg Initiative
+    contentSnippet: Newsroom - Chan Zuckerberg Initiative Skip to content Newsroom Check out the latest news about our work in science, education, and within our communities. For media inquiries, please contact us at press@chanzuckerberg.com . Newsroom Stories Videos Media Gallery Filter By Category Filter By Category All Announcements Science Education Community Climate CZI in the News Technology Ventures Grants COVID-19 Year Filter By Year 2025 2024 2023 2022 2021 2020 2019 2018 2017 2016 2015 Sort By Latest Sort
+    contentLength: 94165
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://chanzuckerberg.com/science/programs-resources/neurodegeneration-challenge/projects/
+    linkText: Neurodegeneration Challenge Projects - Chan Zuckerberg Initiative
+    claimContext: "CZI's Neurodegeneration Challenge Network funds projects investigating multiple aspects of brain disease, including brain waste clearance during sleep, TDP-43 proteinopathy and immune dysregulation, and microglia protective functions.[^43] The organization also supports single-cell biology and data "
+    fetchedAt: 2026-02-22T01:43:47.949Z
+    httpStatus: 200
+    pageTitle: NDCN Projects - Chan Zuckerberg Initiative
+    contentSnippet: NDCN Projects - Chan Zuckerberg Initiative Skip to content Neuroscience Projects The Neuroscience program was launched in 2018 with a focus on neurodegenerative disease and centered on the CZI Neurodegeneration Challenge Network (NDCN). The Challenge Network model is built on the vision that progress in solving neurodegenerative diseases will come from bringing new talent and ideas from diverse disciplines and expertise into the neurodegeneration field, building interdisciplinary collaborations,
+    contentLength: 251387
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://chanzuckerberg.com/rfa/single-cell-data-insights/
+    linkText: Single-Cell Data Insights RFA - Chan Zuckerberg Initiative
+    claimContext: "CZI's Neurodegeneration Challenge Network funds projects investigating multiple aspects of brain disease, including brain waste clearance during sleep, TDP-43 proteinopathy and immune dysregulation, and microglia protective functions.[^43] The organization also supports single-cell biology and data "
+    fetchedAt: 2026-02-22T01:43:47.062Z
+    httpStatus: 200
+    pageTitle: Single-Cell Biology Data Insights RFA | CZI Science
+    contentSnippet: Single-Cell Biology Data Insights RFA | CZI Science Skip to content This RFA closed on December 5, 2023 SCIENCE GRANT RESOURCES PAGE Data Insights Cycle 3 The Chan Zuckerberg Initiative invites applications for the third of three cycles for 18-month projects focused on advancing tools and resources that make it possible to gain greater insights into health and disease from single-cell biology datasets. Learn about our grantees from Cycle 1 and view the RFA . Learn about our grantees from Cycle 2
+    contentLength: 117416
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://chanzuckerberg.com/blog/2024-look-back/
+    linkText: 2024 Look Back - Chan Zuckerberg Initiative
+    claimContext: The Essential Open Source Software for Science program, developed in partnership with the Kavli Foundation and Wellcome Trust, funds tools designed to make research more accessible.[^45] CZI's support for preprint repositories proved particularly valuable during the COVID-19 pandemic by enabling rap
+    fetchedAt: 2026-02-22T01:43:47.611Z
+    httpStatus: 200
+    pageTitle: "2024 Look Back: How AI Shaped a Year of Impact - CZI Blog"
+    contentSnippet: "2024 Look Back: How AI Shaped a Year of Impact - CZI Blog Skip to content Dec 12, 2024 &middot; 11 min read 2024 in Review: How AI Shaped a Year of Impact at CZI Explore how advances in AI are transforming biomedical research and enhancing education tools alongside our efforts to support communities and drive progress across our work. Tags: Community , Education , Science , Technology Advances in AI shaped a year of impact at CZI — driving efforts to build AI-powered virtual cell models and enab"
+    contentLength: 81766
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://chanzuckerberg.com/blog/preprints-race-covid-breakthroughs/
+    linkText: Preprints Race COVID Breakthroughs - Chan Zuckerberg Initiative
+    claimContext: The Essential Open Source Software for Science program, developed in partnership with the Kavli Foundation and Wellcome Trust, funds tools designed to make research more accessible.[^45] CZI's support for preprint repositories proved particularly valuable during the COVID-19 pandemic by enabling rap
+    fetchedAt: 2026-02-22T01:43:48.985Z
+    httpStatus: 200
+    pageTitle: Preprints & COVID-19 Scientific Breakthroughs- CZI Blog
+    contentSnippet: "Preprints & COVID-19 Scientific Breakthroughs- CZI Blog Skip to content Nov 2, 2021 &middot; 2 min read How Open, Early Sharing of Scientific Results Proved Crucial to COVID-19 Response Preprints, or scientific papers shared prior to peer review, accelerate the pace of scientific discovery across the globe and will aid in future pandemic responses. Patricia Flores Tags: COVID-19 , Science , Technology Share S cience moves faster when it’s open and scientists, patients, and public health official"
+    contentLength: 57086
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://chanzuckerberg.com/blog/2024-look-back/
+    linkText: 2024 Look Back - Chan Zuckerberg Initiative
+    claimContext: The Rare As One Project has grown from 30 to 94 patient-led rare disease organizations since 2020, with a 2024 report highlighting scientific progress enabled by this network approach.[^47]
+    fetchedAt: 2026-02-22T01:43:49.000Z
+    httpStatus: 200
+    pageTitle: "2024 Look Back: How AI Shaped a Year of Impact - CZI Blog"
+    contentSnippet: "2024 Look Back: How AI Shaped a Year of Impact - CZI Blog Skip to content Dec 12, 2024 &middot; 11 min read 2024 in Review: How AI Shaped a Year of Impact at CZI Explore how advances in AI are transforming biomedical research and enhancing education tools alongside our efforts to support communities and drive progress across our work. Tags: Community , Education , Science , Technology Advances in AI shaped a year of impact at CZI — driving efforts to build AI-powered virtual cell models and enab"
+    contentLength: 81766
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.edweek.org/leadership/chan-zuckerberg-to-push-ambitious-new-vision-for-personalized-learning/2017/06
+    linkText: Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning - EdWeek
+    claimContext: CZI's early education work centered on "personalized learning" approaches, with substantial investments in the Summit Learning Platform—a computer-based education program intended to accelerate learning and raise test scores. The organization provided funding to educational startups including Byju's
+    fetchedAt: 2026-02-22T01:43:49.894Z
+    httpStatus: 200
+    pageTitle: Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning
+    contentSnippet: Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning Menu Search Sign In Subscribe Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning Subscribe Reset Search School & District Management Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning Former deputy secretary of education to head expanded initiative By Benjamin Herold — June 29, 2017 12 min read James H. Shelton, head of the Chan Zuckerberg Initiative's education division, at the organiz
+    contentLength: 224249
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.edweek.org/leadership/chan-zuckerberg-to-push-ambitious-new-vision-for-personalized-learning/2017/06
+    linkText: Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning - EdWeek
+    claimContext: In June 2017, CZI announced an ambitious vision to launch a "meaningful number" of schools within five years (by 2022) that would demonstrate dramatically better student performance, engagement, and teacher involvement, with plans for hundreds of millions of dollars in annual education grants.[^49]
+    fetchedAt: 2026-02-22T01:43:49.836Z
+    httpStatus: 200
+    pageTitle: Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning
+    contentSnippet: Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning Menu Search Sign In Subscribe Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning Subscribe Reset Search School & District Management Chan-Zuckerberg to Push Ambitious New Vision for Personalized Learning Former deputy secretary of education to head expanded initiative By Benjamin Herold — June 29, 2017 12 min read James H. Shelton, head of the Chan Zuckerberg Initiative's education division, at the organiz
+    contentLength: 224249
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://dianeravitch.net/2023/10/16/matt-barnum-mark-zuckerberg-and-the-failure-of-personalized-learning/
+    linkText: "Matt Barnum: Mark Zuckerberg and the Failure of Personalized Learning - Diane Ravitch"
+    claimContext: However, by August 2023, CZI acknowledged that Summit Learning had failed to deliver large learning gains or achieve widespread adoption as hoped. The organization laid off dozens of education team staff and pivoted its strategy, with education head Sandra Liu Huang admitting that prior efforts fell
+    fetchedAt: 2026-02-22T01:43:49.678Z
+    httpStatus: 200
+    pageTitle: "Matt Barnum: Mark Zuckerberg and the Failure of “Personalized Learning” | Diane Ravitch's blog"
+    contentSnippet: "Matt Barnum: Mark Zuckerberg and the Failure of “Personalized Learning” | Diane Ravitch&#039;s blog Home About Follow Diane&#8217;s Posts NPE Blog Posts Of The Day Blog Topics Accountability Administrators, superintendents Alabama ALEC Alternate Route To Certification Arts Education Black Alliance for Educational Options Blended Learning Bloomberg, Michael Boston Consulting Group Broad Foundation Budget Cuts Bush, Jeb California Campbell&#8217;s Law Catholic Schools Cerf, Chris Charter Schools C"
+    contentLength: 202029
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.insidehighered.com/blogs/just-visiting/chan-zuckerberg-initiatives-skewed-values
+    linkText: Chan Zuckerberg Initiative's Skewed Values - Inside Higher Ed
+    claimContext: However, by August 2023, CZI acknowledged that Summit Learning had failed to deliver large learning gains or achieve widespread adoption as hoped. The organization laid off dozens of education team staff and pivoted its strategy, with education head Sandra Liu Huang admitting that prior efforts fell
+    fetchedAt: 2026-02-22T01:43:51.670Z
+    httpStatus: 200
+    pageTitle: The Chan Zuckerberg Initiative's Skewed Values
+    contentSnippet: "The Chan Zuckerberg Initiative&#039;s Skewed Values --> Skip to main content Opinion Columns Just Visiting Advertisement July 12, 2018 The Chan Zuckerberg Initiative's Skewed Values You can&#39;t define your goals if you don&#39;t understand your values. By John Warner You have / 3 articles left. Sign up for a free account or log in. Sign Up, It&rsquo;s FREE Login Stipulated: Everyone involved in education wants what’s best for students. Priscilla Chan and Mark Zuckerberg are among those who hav"
+    contentLength: 137637
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://chanzuckerberg.com/blog/education-technology-2025-czi-journey/
+    linkText: "Education Technology 2025: CZI Journey - Chan Zuckerberg Initiative"
+    claimContext: Despite the shift away from social causes, CZI maintains some education programs focused on AI integration. In 2024, the organization launched **Render**, an innovation studio designed to co-build EdTech tools with educators.[^52] CZI continues to provide grants for open-access datasets aimed at imp
+    fetchedAt: 2026-02-22T01:43:51.454Z
+    httpStatus: 200
+    pageTitle: "Learning Science for EdTech: Our Work in Education for 2025"
+    contentSnippet: "Learning Science for EdTech: Our Work in Education for 2025 Skip to content Dec 16, 2024 &middot; 5 min read Learning Science for EdTech: Next Steps in Our Work in Education Sandra Liu Huang, CZI’s head of education, discusses our exciting journey into 2025 at the intersection of education and technology. Sandra Liu Huang Tags: Education , Technology Sandra Liu Huang, CZI’s head of education joins educators in a co-building exercise. Share A s 2024 comes to a close, I want to take a moment to re"
+    contentLength: 61292
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://chanzuckerberg.com/blog/10-year-look-back/
+    linkText: 10-Year Look Back - Chan Zuckerberg Initiative
+    claimContext: Despite the shift away from social causes, CZI maintains some education programs focused on AI integration. In 2024, the organization launched **Render**, an innovation studio designed to co-build EdTech tools with educators.[^52] CZI continues to provide grants for open-access datasets aimed at imp
+    fetchedAt: 2026-02-22T01:43:50.937Z
+    httpStatus: 200
+    pageTitle: 10 Years of Big Bets and Big Breakthroughs - CZI Blog
+    contentSnippet: "10 Years of Big Bets and Big Breakthroughs - CZI Blog Skip to content Dec 1, 2025 &middot; 15 min read Celebrating 10 Years of Big Bets and Big Breakthroughs Tags: Community , COVID-19 , Education , Science , Technology Share M ark Zuckerberg and Priscilla Chan started the Chan Zuckerberg Initiative in 2016 to advance science, improve education, and support local communities. Driving progress on these goals required big bets — on the scientists asking bold questions, the technology that could ac"
+    contentLength: 78342
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: The Primary School, co-founded by Priscilla Chan in 2016, was scheduled to close in 2026. Chan did not attend closure announcement meetings, leaving parents uncertain about the transition. CZI pledged \$50 million over five years to support parent engagement, early childhood education, and health ca
+    fetchedAt: 2026-02-22T01:43:50.916Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 55
+    url: https://www.insidephilanthropy.com/find-a-grant/grants-z/the-chan-zuckerberg-initiative
+    linkText: The Chan Zuckerberg Initiative - Inside Philanthropy
+    claimContext: "CZI operates through multiple legal entities including the CZI LLC (primary entity), CZI Foundation, donor-advised funds at the Silicon Valley Community Foundation, and CZI Advocacy.[^55] This structure differs fundamentally from traditional philanthropic foundations in several ways:"
+    fetchedAt: 2026-02-22T01:43:51.297Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 224
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://www.teachshare.com/gallery/overview-of-the-chan-zuckerberg-initiative-AZl9GBzycxOQLlb3N5U9DA
+    linkText: Overview of the Chan Zuckerberg Initiative - TeachShare
+    claimContext: "- **Profit motive**: Can pursue both nonprofit grants and for-profit investments, with profits reinvested into the mission rather than distributed to owners[^56] - **Control retention**: Mark Zuckerberg retains control over Facebook shares held by CZI, though the organization publicly lists its gran"
+    fetchedAt: 2026-02-22T01:43:53.660Z
+    httpStatus: 200
+    pageTitle: TeachShare
+    contentSnippet: TeachShare Home Gallery TeachShare span]:rotate-180 cursor-pointer h-16 bg-lighter hover:bg-light outline-none w-full data-[expanded]:bg-lighter data-[closed]:text-fg-secondary data-[closed]:no-underline data-[expanded]:no-underline rounded-[6px] data-[expanded]:text-brand-primary data-[closed]:bg-lighter px-6 flex items-center " > Home span]:rotate-180 cursor-pointer h-16 bg-lighter hover:bg-light outline-none w-full data-[expanded]:bg-lighter data-[closed]:text-fg-secondary data-[closed]:no-un
+    contentLength: 865227
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: "- **Profit motive**: Can pursue both nonprofit grants and for-profit investments, with profits reinvested into the mission rather than distributed to owners[^56] - **Control retention**: Mark Zuckerberg retains control over Facebook shares held by CZI, though the organization publicly lists its gran"
+    fetchedAt: 2026-02-22T01:43:52.677Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 58
+    url: https://www.teachshare.com/gallery/overview-of-the-chan-zuckerberg-initiative-AZl9GBzycxOQLlb3N5U9DA
+    linkText: Overview of the Chan Zuckerberg Initiative - TeachShare
+    claimContext: "- **Control retention**: Mark Zuckerberg retains control over Facebook shares held by CZI, though the organization publicly lists its grants[^57] - **Policy advocacy**: Can engage in policy debates and political contributions without the restrictions that apply to 501(c)(3) organizations[^58] - **Di"
+    fetchedAt: 2026-02-22T01:43:53.997Z
+    httpStatus: 200
+    pageTitle: TeachShare
+    contentSnippet: TeachShare Home Gallery TeachShare span]:rotate-180 cursor-pointer h-16 bg-lighter hover:bg-light outline-none w-full data-[expanded]:bg-lighter data-[closed]:text-fg-secondary data-[closed]:no-underline data-[expanded]:no-underline rounded-[6px] data-[expanded]:text-brand-primary data-[closed]:bg-lighter px-6 flex items-center " > Home span]:rotate-180 cursor-pointer h-16 bg-lighter hover:bg-light outline-none w-full data-[expanded]:bg-lighter data-[closed]:text-fg-secondary data-[closed]:no-un
+    contentLength: 865227
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://www.netimpact.org/blog/criticism-of-chan-zuckerberg-initiative-and-implications-for-impact-investing-industry-the
+    linkText: Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - Net Impact
+    claimContext: "- **Policy advocacy**: Can engage in policy debates and political contributions without the restrictions that apply to 501(c)(3) organizations[^58] - **Disclosure obligations**: Faces fewer transparency requirements than traditional foundations[^59]"
+    fetchedAt: 2026-02-22T01:43:53.122Z
+    httpStatus: 200
+    pageTitle: Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good - Net Impact - Impactful Careers for Impactful Lives
+    contentSnippet: "Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good - Net Impact - Impactful Careers for Impactful Lives Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good Facebook co-founder and CEO, Mark Zuckerberg, announced earlier this week that he and his partner, Dr. Priscilla Chan, would devote 99% of their wealth, approximately $45 "
+    contentLength: 243274
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://chanzuckerberg.com/about/annual-letter/
+    linkText: Annual Letter - Chan Zuckerberg Initiative
+    claimContext: CZI characterizes itself as taking a "long-term approach" with a "technology mindset" focused on decade-scale challenges.[^60] The organization emphasizes collaboration, building the Chan Zuckerberg Biohub as a partnership model bringing together multiple universities rather than funding isolated re
+    fetchedAt: 2026-02-22T01:43:52.707Z
+    httpStatus: 200
+    pageTitle: Annual Letters - Chan Zuckerberg Initiative
+    contentSnippet: "Annual Letters - Chan Zuckerberg Initiative Skip to content 2024 Year in Review: How AI Shaped a Year of Impact Read More Annual Letters Chan Zuckerberg Initiative In 2015, with the birth of their first daughter, Mark Zuckerberg and Priscilla Chan wrote a letter about the world they hoped she and all children would grow up in. In that letter, they also shared their plans to give 99% of their Meta (formerly Facebook) shares to help make that world a reality. Each year, the Chan Zuckerberg Initiat"
+    contentLength: 57167
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
+    linkText: "Chan Zuckerberg Initiative Layoffs: All In on AI Biomedical Research - Fortune"
+    claimContext: The initiative's annual operating budget is approximately \$1 billion.[^61] Beyond basic research, CZI supports infrastructure including preprint servers, open-source software tools, and open data platforms like CELL×GENE and contributions to the Human Cell Atlas.[^62] The organization also funded E
+    fetchedAt: 2026-02-22T01:43:56.369Z
+    httpStatus: 200
+    pageTitle: Chan Zuckerberg Initiative cut 70 jobs to go all in on mission to &#x27;cure or prevent all disease&#x27; | Fortune
+    contentSnippet: Chan Zuckerberg Initiative cut 70 jobs to go all in on mission to &#x27;cure or prevent all disease&#x27; | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Big Tech Mark Zuckerberg The Chan Zuckerberg Initiative cut 70 jobs as the Meta CEO’s philanthropy goes all in on mission to ‘cure or prevent all disease’ By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon By Sydney Lake Sydney Lake Associate Editor Down Arrow Button Icon February 1, 2026,
+    contentLength: 451781
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://chanzuckerberg.com/blog/10-year-look-back/
+    linkText: 10-Year Look Back - Chan Zuckerberg Initiative
+    claimContext: The initiative's annual operating budget is approximately \$1 billion.[^61] Beyond basic research, CZI supports infrastructure including preprint servers, open-source software tools, and open data platforms like CELL×GENE and contributions to the Human Cell Atlas.[^62] The organization also funded E
+    fetchedAt: 2026-02-22T01:43:55.067Z
+    httpStatus: 200
+    pageTitle: 10 Years of Big Bets and Big Breakthroughs - CZI Blog
+    contentSnippet: "10 Years of Big Bets and Big Breakthroughs - CZI Blog Skip to content Dec 1, 2025 &middot; 15 min read Celebrating 10 Years of Big Bets and Big Breakthroughs Tags: Community , COVID-19 , Education , Science , Technology Share M ark Zuckerberg and Priscilla Chan started the Chan Zuckerberg Initiative in 2016 to advance science, improve education, and support local communities. Driving progress on these goals required big bets — on the scientists asking bold questions, the technology that could ac"
+    contentLength: 78342
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://chanzuckerberg.com/blog/10-year-look-back/
+    linkText: 10-Year Look Back - Chan Zuckerberg Initiative
+    claimContext: The initiative's annual operating budget is approximately \$1 billion.[^61] Beyond basic research, CZI supports infrastructure including preprint servers, open-source software tools, and open data platforms like CELL×GENE and contributions to the Human Cell Atlas.[^62] The organization also funded E
+    fetchedAt: 2026-02-22T01:43:55.495Z
+    httpStatus: 200
+    pageTitle: 10 Years of Big Bets and Big Breakthroughs - CZI Blog
+    contentSnippet: "10 Years of Big Bets and Big Breakthroughs - CZI Blog Skip to content Dec 1, 2025 &middot; 15 min read Celebrating 10 Years of Big Bets and Big Breakthroughs Tags: Community , COVID-19 , Education , Science , Technology Share M ark Zuckerberg and Priscilla Chan started the Chan Zuckerberg Initiative in 2016 to advance science, improve education, and support local communities. Driving progress on these goals required big bets — on the scientists asking bold questions, the technology that could ac"
+    contentLength: 78342
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://en.wikipedia.org/wiki/Priscilla_Chan
+    linkText: Priscilla Chan - Wikipedia
+    claimContext: "**Priscilla Chan** (Co-Founder, Co-CEO) leads biomedical research and technology initiatives, drawing on her background as a pediatrician who worked at San Francisco General Hospital until 2017. She earned her BA in Biology from Harvard University in 2007 and her MD from UC San Francisco in 2012.[^6"
+    fetchedAt: 2026-02-22T01:43:55.036Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 65
+    url: https://www.international.ucla.edu/gcpi/profiles/177467
+    linkText: Priscilla Chan - UCLA Global Citizenship Project
+    claimContext: "**Priscilla Chan** (Co-Founder, Co-CEO) leads biomedical research and technology initiatives, drawing on her background as a pediatrician who worked at San Francisco General Hospital until 2017. She earned her BA in Biology from Harvard University in 2007 and her MD from UC San Francisco in 2012.[^6"
+    fetchedAt: 2026-02-22T01:43:56.226Z
+    httpStatus: 200
+    pageTitle: Profiles
+    contentSnippet: Profiles English 简体中文 繁體中文 English 简体中文 繁體中文 Menu Priscilla Chan and Mark Zuckerberg "Education is an incredibly personal issue for me…If you are the first generation to go to college, sometimes you do not realize your potential until others point it out.” BACKGROUND In December of 2015, Dr. Priscilla Chan and Mark Zuckerberg announced the Chan Zuckerberg Initiative and pledged to give 99% of their Facebook shares over their lifetimes to supports its mission. The initiative seeks to advance huma
+    contentLength: 70668
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://en.wikipedia.org/wiki/Mark_Zuckerberg
+    linkText: Mark Zuckerberg - Wikipedia
+    claimContext: "**Mark Zuckerberg** (Co-Founder, Co-CEO) provides technical expertise and community-building experience from his role as Meta co-founder, chairman, and CEO. He studied computer science at Harvard University starting in 2002, dropping out in his second year (2004) to focus on Facebook.[^66]"
+    fetchedAt: 2026-02-22T01:43:57.379Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 67
+    url: https://chanzuckerberg.com/about/leaders/
+    linkText: Leaders - Chan Zuckerberg Initiative
+    claimContext: "**Marc Malandro** (Chief Operating Officer) previously built CZI's science program and served as VP at the University of Pittsburgh Innovation Institute.[^67]"
+    fetchedAt: 2026-02-22T01:43:57.411Z
+    httpStatus: 200
+    pageTitle: Leadership Team at CZI, Biohub and Learning Commons
+    contentSnippet: Leadership Team at CZI, Biohub and Learning Commons Skip to content Executive Leadership Photograph by Jessica Chou Photograph by Jessica Chou Priscilla Chan Co-Founder and Co-CEO Priscilla Chan is the co-founder and co-CEO of the Chan Zuckerberg Initiative, where she leads efforts to advance biomedical research and technology to help scientists cure, prevent, or manage all disease by the end of this century. As a pediatrician, her firsthand experience caring for patients has fueled her commitme
+    contentLength: 98592
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://chanzuckerberg.com/about/leaders/
+    linkText: Leaders - Chan Zuckerberg Initiative
+    claimContext: "**Mark Kim** (General Counsel) structured CZI and the Biohub network, bringing experience from his partnership at Munger, Tolles & Olson.[^68]"
+    fetchedAt: 2026-02-22T01:43:57.426Z
+    httpStatus: 200
+    pageTitle: Leadership Team at CZI, Biohub and Learning Commons
+    contentSnippet: Leadership Team at CZI, Biohub and Learning Commons Skip to content Executive Leadership Photograph by Jessica Chou Photograph by Jessica Chou Priscilla Chan Co-Founder and Co-CEO Priscilla Chan is the co-founder and co-CEO of the Chan Zuckerberg Initiative, where she leads efforts to advance biomedical research and technology to help scientists cure, prevent, or manage all disease by the end of this century. As a pediatrician, her firsthand experience caring for patients has fueled her commitme
+    contentLength: 98592
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://chanzuckerberg.com/blog/scientific-milestones-learnings-2024/
+    linkText: Scientific Milestones and Learnings 2024 - Chan Zuckerberg Initiative
+    claimContext: "**Shana Kelley** (President, Chan Zuckerberg Biohub Chicago) leads development of implantable biosensor technology for real-time inflammation monitoring.[^69]"
+    fetchedAt: 2026-02-22T01:43:57.504Z
+    httpStatus: 200
+    pageTitle: Our Scientific Achievements, Learnings and Future Vision
+    contentSnippet: "Our Scientific Achievements, Learnings and Future Vision Skip to content Jan 16, 2025 &middot; 1 min read Watch: Priscilla Chan on CZI’s Science Milestones and What’s Next Tags: Science , Technology Share A s we welcome the new year, CZI Co-Founder and Co-CEO Priscilla Chan sat down with Patricia Brennan, vice president of science technology and general manager for science at CZI, and Shana Kelley, president of the Chan Zuckerberg Biohub Chicago, to reflect on the progress made over the past yea"
+    contentLength: 54840
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+    linkText: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' - Science.org
+    claimContext: "**Matthias Haury** (Chief Operating Officer, Biohub and Imaging Institute) oversees the planned 10-fold computing power expansion over the next three years and emphasizes AI's role in scientific collaboration.[^70]"
+    fetchedAt: 2026-02-22T01:43:57.598Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 71
+    url: https://www.drugtargetreview.com/news/190328/zuckerbergs-biohub-announces-ai-powered-biology-to-accelerate-drug-discovery/
+    linkText: Zuckerberg's Biohub Announces AI-Powered Biology to Accelerate Drug Discovery - Drug Target Review
+    claimContext: Despite substantial investments in artificial intelligence for biological research and education, no evidence indicates CZI has engaged with AI safety, AI alignment, or existential risk concerns. The organization's AI work focuses exclusively on biomedical applications including large-scale AI model
+    fetchedAt: 2026-02-22T01:43:59.342Z
+    httpStatus: 200
+    pageTitle: Zuckerberg's Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review
+    contentSnippet: Zuckerberg&#039;s Biohub announces AI-powered biology to accelerate drug discovery - Drug Target Review Recommended What it takes to automate high-content imaging at scale | Register for the free webinar! | 25 March 2026 ACCESS THE FREE RECORDING | Top cancer researchers explore advances transforming early discovery, from new targets and models to the therapies of tomorrow NEW REPORT | Explore how data-driven systems improve reproducibility, speed decisions and make scale achievable across resea
+    contentLength: 267776
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://www.liebertpub.com/doi/full/10.1089/genbio.2025.0007
+    linkText: First Virtual Cells - Genetic Engineering & Biotechnology News
+    claimContext: CZI emphasizes building "safe, ethical, and reliable AI" in the context of virtual cells, but this language refers to biomedical reliability and research ethics rather than concerns about superintelligence, catastrophic risks, or alignment of advanced AI systems with human values.[^72] The organizat
+    fetchedAt: 2026-02-22T01:44:00.899Z
+    httpStatus: 200
+    pageTitle: ""
+    contentSnippet: "--> Login to your account Username Password Forgot password? Keep me logged in OpenAthens New User Institutional Login Change Password Old Password New Password Too Short Weak Medium Strong Very Strong Too Long Your password must have 8 characters or more and contain 3 of the following: a lower case character, an upper case character, a special character or a digit Too Short Password Changed Successfully Your password has been changed Create a new account Email Returning user Can't sign in? Forg"
+    contentLength: 50381
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://chanzuckerberg.com/blog/10-year-look-back/
+    linkText: 10-Year Look Back - Chan Zuckerberg Initiative
+    claimContext: CZI emphasizes building "safe, ethical, and reliable AI" in the context of virtual cells, but this language refers to biomedical reliability and research ethics rather than concerns about superintelligence, catastrophic risks, or alignment of advanced AI systems with human values.[^72] The organizat
+    fetchedAt: 2026-02-22T01:43:58.635Z
+    httpStatus: 200
+    pageTitle: 10 Years of Big Bets and Big Breakthroughs - CZI Blog
+    contentSnippet: "10 Years of Big Bets and Big Breakthroughs - CZI Blog Skip to content Dec 1, 2025 &middot; 15 min read Celebrating 10 Years of Big Bets and Big Breakthroughs Tags: Community , COVID-19 , Education , Science , Technology Share M ark Zuckerberg and Priscilla Chan started the Chan Zuckerberg Initiative in 2016 to advance science, improve education, and support local communities. Driving progress on these goals required big bets — on the scientists asking bold questions, the technology that could ac"
+    contentLength: 78342
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://forum.effectivealtruism.org/posts/xY5hyHXXam7bF9BQA/ea-s-biggest-missed-opportunity-mark-zuckerberg
+    linkText: "EA's Biggest Missed Opportunity: Mark Zuckerberg - EA Forum"
+    claimContext: Within the Effective Altruism community, CZI's cause prioritization has been criticized for showing "virtually no sign" of deep engagement with EA principles, particularly causes emphasized by major EA funders. According to EA Forum discussions, CZI appears only "moderately convinced" of core EA cau
+    fetchedAt: 2026-02-22T01:43:59.153Z
+    httpStatus: 200
+    pageTitle: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum"
+    contentSnippet: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. EA’s Biggest Missed Opportunity: Mark Zuckerberg by Trappist Jan 16 2025 8 min read 8 17 Building effective altruism Community Effective giving Philosophy Criticism of effective altruism Effective altruism culture Opinion Frontpage Much has been said about SBF having been EA’s biggest blunder. This was an error "
+    contentLength: 345884
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://manifold.umn.edu/read/untitled-85740014-9b15-46f2-be8c-5d261d587877/section/a02cf404-b9ee-42e5-9312-e7119cab4d32
+    linkText: Philanthrocapitalism and the Dispossession of Public Education - Manifold
+    claimContext: CZI's LLC structure has generated sustained criticism from multiple perspectives. Critics argue this arrangement circumvents public accountability through reduced disclosure requirements compared to traditional foundations, enables secrecy around decision-making processes, and may prioritize extract
+    fetchedAt: 2026-02-22T01:43:59.450Z
+    httpStatus: 200
+    pageTitle: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress"
+    contentSnippet: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress Skip to main content table of contents “Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative I N 2017, Mark Zuckerberg gave the commencement address at Harvard University, his alma mater, which he famously quit in his sophomore year to create Facebook. Zuckerberg, the fifth richest person in the w"
+    contentLength: 779344
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://www.netimpact.org/blog/criticism-of-chan-zuckerberg-initiative-and-implications-for-impact-investing-industry-the
+    linkText: Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - Net Impact
+    claimContext: CZI's LLC structure has generated sustained criticism from multiple perspectives. Critics argue this arrangement circumvents public accountability through reduced disclosure requirements compared to traditional foundations, enables secrecy around decision-making processes, and may prioritize extract
+    fetchedAt: 2026-02-22T01:44:02.213Z
+    httpStatus: 200
+    pageTitle: Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good - Net Impact - Impactful Careers for Impactful Lives
+    contentSnippet: "Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good - Net Impact - Impactful Careers for Impactful Lives Criticism of Chan Zuckerberg Initiative and Implications for Impact Investing Industry - The Challenges in Using Market Forces to Do Good Facebook co-founder and CEO, Mark Zuckerberg, announced earlier this week that he and his partner, Dr. Priscilla Chan, would devote 99% of their wealth, approximately $45 "
+    contentLength: 243274
+    status: verified
+    note: null
+  - footnote: 77
+    url: https://manifold.umn.edu/read/untitled-85740014-9b15-46f2-be8c-5d261d587877/section/a02cf404-b9ee-42e5-9312-e7119cab4d32
+    linkText: Philanthrocapitalism and the Dispossession of Public Education - Manifold
+    claimContext: Some commentators view the LLC model as designed to extend patterns seen in Zuckerberg's earlier education reform efforts in Newark, which faced criticism for "actively excluding the public from policy planning" and decision-making.[^77] Broader critiques suggest elite philanthropy of this scale all
+    fetchedAt: 2026-02-22T01:44:02.242Z
+    httpStatus: 200
+    pageTitle: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress"
+    contentSnippet: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress Skip to main content table of contents “Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative I N 2017, Mark Zuckerberg gave the commencement address at Harvard University, his alma mater, which he famously quit in his sophomore year to create Facebook. Zuckerberg, the fifth richest person in the w"
+    contentLength: 779344
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://scholarship.law.ufl.edu/cgi/viewcontent.cgi?article=1423&context=flr
+    linkText: "The Chan Zuckerberg Initiative: The Limits of Technocentric Solutionism - Florida Law Review"
+    claimContext: Some commentators view the LLC model as designed to extend patterns seen in Zuckerberg's earlier education reform efforts in Newark, which faced criticism for "actively excluding the public from policy planning" and decision-making.[^77] Broader critiques suggest elite philanthropy of this scale all
+    fetchedAt: 2026-02-22T01:44:02.881Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2618
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://techcrunch.com/2020/11/10/chan-zuckerberg-initiative-faces-racial-discrimination-allegations-from-former-employee/
+    linkText: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee - TechCrunch
+    claimContext: In 2020, former employee Gerardo Holgado filed a complaint alleging CZI fostered a non-inclusive environment where Black employees were underpaid, undervalued, denied growth opportunities, and marginalized. According to the complaint, Black staff who raised concerns were labeled "too assertive" whil
+    fetchedAt: 2026-02-22T01:44:02.070Z
+    httpStatus: 200
+    pageTitle: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee | TechCrunch
+    contentSnippet: "Chan Zuckerberg Initiative faces racial discrimination allegations from former employee | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Florian Gaertner Chan Zuckerberg Initiative faces racial discrimination allegations from former employee Megan Rose Dickey 6:26 PM PST · November 10, 2020 Ray Holgado, a former employee of the Chan"
+    contentLength: 232903
+    status: verified
+    note: null
+  - footnote: 80
+    url: https://techcrunch.com/2020/11/10/chan-zuckerberg-initiative-faces-racial-discrimination-allegations-from-former-employee/
+    linkText: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee - TechCrunch
+    claimContext: In 2020, former employee Gerardo Holgado filed a complaint alleging CZI fostered a non-inclusive environment where Black employees were underpaid, undervalued, denied growth opportunities, and marginalized. According to the complaint, Black staff who raised concerns were labeled "too assertive" whil
+    fetchedAt: 2026-02-22T01:44:02.115Z
+    httpStatus: 200
+    pageTitle: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee | TechCrunch
+    contentSnippet: "Chan Zuckerberg Initiative faces racial discrimination allegations from former employee | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Florian Gaertner Chan Zuckerberg Initiative faces racial discrimination allegations from former employee Megan Rose Dickey 6:26 PM PST · November 10, 2020 Ray Holgado, a former employee of the Chan"
+    contentLength: 232903
+    status: verified
+    note: null
+  - footnote: 81
+    url: https://www.philanthropyroundtable.org/donor-intent-at-the-chan-zuckerberg-initiative/
+    linkText: Donor Intent at the Chan Zuckerberg Initiative - Philanthropy Roundtable
+    claimContext: When Holgado raised concerns about CZI's grantmaking operating "devoid of racial analysis," including warnings against centering racial equity in criminal justice reform strategies, his input was dismissed. His 2019 proposals to bring philanthropy executive Edgar Villanueva to speak at CZI were decl
+    fetchedAt: 2026-02-22T01:44:04.407Z
+    httpStatus: 200
+    pageTitle: Donor Intent at the Chan Zuckerberg Initiative
+    contentSnippet: Donor Intent at the Chan Zuckerberg Initiative Skip to content Donor Intent at the Chan Zuckerberg Initiative Joanne Florino Donor Intent Governance Philanthropic Excellence December 4, 2020 You may have read in the past few months that the Chan Zuckerberg Initiative (CZI) is under fire for its allegedly inadequate response to the call for racial justice. In June a group of the organization’s black employees sent a letter to Priscilla Chan (who runs the operations of CZI) accusing her and her hu
+    contentLength: 156599
+    status: verified
+    note: null
+  - footnote: 82
+    url: https://ncrp.org/2020/11/chan-zuckerberg-initiative-faces-racial-discrimination-allegations-from-former-employee/
+    linkText: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee - NCRP
+    claimContext: When Holgado raised concerns about CZI's grantmaking operating "devoid of racial analysis," including warnings against centering racial equity in criminal justice reform strategies, his input was dismissed. His 2019 proposals to bring philanthropy executive Edgar Villanueva to speak at CZI were decl
+    fetchedAt: 2026-02-22T01:44:05.667Z
+    httpStatus: 200
+    pageTitle: Chan Zuckerberg Initiative faces racial discrimination allegations from former employee - NCRP
+    contentSnippet: "Chan Zuckerberg Initiative faces racial discrimination allegations from former employee - NCRP Skip to main content Chan Zuckerberg Initiative faces racial discrimination allegations from former employee Published: November 12, 2020 “Unfortunately, Chan once again failed to grasp the seriousness of the issues the letter raised, refusing to meet several of the group’s requests, most notably declining to provide transparency into CZI’s pay equity data as it related to Black employees,” Holgado wro"
+    contentLength: 637984
+    status: verified
+    note: null
+  - footnote: 83
+    url: https://www.philanthropyroundtable.org/donor-intent-at-the-chan-zuckerberg-initiative/
+    linkText: Donor Intent at the Chan Zuckerberg Initiative - Philanthropy Roundtable
+    claimContext: In June 2020, a group of Black employees sent a letter directly to Priscilla Chan reiterating accusations that the organization was failing to uphold commitments to diversity, inclusion, and equity.[^83]
+    fetchedAt: 2026-02-22T01:44:04.382Z
+    httpStatus: 200
+    pageTitle: Donor Intent at the Chan Zuckerberg Initiative
+    contentSnippet: Donor Intent at the Chan Zuckerberg Initiative Skip to content Donor Intent at the Chan Zuckerberg Initiative Joanne Florino Donor Intent Governance Philanthropic Excellence December 4, 2020 You may have read in the past few months that the Chan Zuckerberg Initiative (CZI) is under fire for its allegedly inadequate response to the call for racial justice. In June a group of the organization’s black employees sent a letter to Priscilla Chan (who runs the operations of CZI) accusing her and her hu
+    contentLength: 156599
+    status: verified
+    note: null
+  - footnote: 84
+    url: https://www.insidephilanthropy.com/toplines/toplines-may-17-2025-priscilla-chan-philanthropy
+    linkText: "Toplines May 17, 2025: Priscilla Chan Philanthropy - Inside Philanthropy"
+    claimContext: In 2025, CZI eliminated its diversity, equity, and inclusion team and cancelled its Diverse Slate Practice, which aimed to ensure diverse candidates for job openings. The organization also informed San Mateo County partners associated with DEI initiatives that their funding would end.[^84] These mov
+    fetchedAt: 2026-02-22T01:44:04.110Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 229
+    status: verified
+    note: null
+  - footnote: 85
+    url: https://www.insidephilanthropy.com/toplines/toplines-may-17-2025-priscilla-chan-philanthropy
+    linkText: "Toplines May 17, 2025: Priscilla Chan Philanthropy - Inside Philanthropy"
+    claimContext: In 2025, CZI eliminated its diversity, equity, and inclusion team and cancelled its Diverse Slate Practice, which aimed to ensure diverse candidates for job openings. The organization also informed San Mateo County partners associated with DEI initiatives that their funding would end.[^84] These mov
+    fetchedAt: 2026-02-22T01:44:04.411Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 228
+    status: verified
+    note: null
+  - footnote: 86
+    url: https://www.insidephilanthropy.com/toplines/toplines-may-17-2025-priscilla-chan-philanthropy
+    linkText: "Toplines May 17, 2025: Priscilla Chan Philanthropy - Inside Philanthropy"
+    claimContext: CZI's broader wind-down of grantmaking on social inequities, housing, criminal justice reform, immigration, and education—a process that began before 2025 but accelerated dramatically—has been interpreted by some observers as distancing the organization from social justice to curry favor with conser
+    fetchedAt: 2026-02-22T01:44:06.728Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 229
+    status: verified
+    note: null
+  - footnote: 87
+    url: https://www.insidephilanthropy.com/toplines/toplines-may-17-2025-priscilla-chan-philanthropy
+    linkText: "Toplines May 17, 2025: Priscilla Chan Philanthropy - Inside Philanthropy"
+    claimContext: Grantees described the funding cuts as reflecting poorly on Chan and Zuckerberg's character, particularly given the organization's continued willingness to expand science spending dramatically while eliminating relatively modest social programs.[^87]
+    fetchedAt: 2026-02-22T01:44:06.727Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 228
+    status: verified
+    note: null
+  - footnote: 88
+    url: https://www.insidehighered.com/blogs/just-visiting/chan-zuckerberg-initiatives-skewed-values
+    linkText: Chan Zuckerberg Initiative's Skewed Values - Inside Higher Ed
+    claimContext: "**Philosophical objections**: Critics argue CZI's \"personalized learning\" approach embodies skewed values that define student potential narrowly through standardized test performance, prioritize individual competition over collaborative learning and broader child development, and operate without cle"
+    fetchedAt: 2026-02-22T01:44:06.893Z
+    httpStatus: 200
+    pageTitle: The Chan Zuckerberg Initiative's Skewed Values
+    contentSnippet: "The Chan Zuckerberg Initiative&#039;s Skewed Values --> Skip to main content Opinion Columns Just Visiting Advertisement July 12, 2018 The Chan Zuckerberg Initiative's Skewed Values You can&#39;t define your goals if you don&#39;t understand your values. By John Warner You have / 3 articles left. Sign up for a free account or log in. Sign Up, It&rsquo;s FREE Login Stipulated: Everyone involved in education wants what’s best for students. Priscilla Chan and Mark Zuckerberg are among those who hav"
+    contentLength: 137637
+    status: verified
+    note: null
+  - footnote: 89
+    url: https://manifold.umn.edu/read/untitled-85740014-9b15-46f2-be8c-5d261d587877/section/a02cf404-b9ee-42e5-9312-e7119cab4d32
+    linkText: Philanthrocapitalism and the Dispossession of Public Education - Manifold
+    claimContext: "**Displacement concerns**: Education scholars have criticized CZI's technology-centered model for displacing teachers, undermining democratic education, prioritizing data extraction and software development over human labor, and recasting teachers as \"mentors\" while machines quantify student learnin"
+    fetchedAt: 2026-02-22T01:44:07.364Z
+    httpStatus: 200
+    pageTitle: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress"
+    contentSnippet: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress Skip to main content table of contents “Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative I N 2017, Mark Zuckerberg gave the commencement address at Harvard University, his alma mater, which he famously quit in his sophomore year to create Facebook. Zuckerberg, the fifth richest person in the w"
+    contentLength: 779344
+    status: verified
+    note: null
+  - footnote: 90
+    url: https://www.insidehighered.com/blogs/just-visiting/chan-zuckerberg-initiatives-skewed-values
+    linkText: Chan Zuckerberg Initiative's Skewed Values - Inside Higher Ed
+    claimContext: "**Effectiveness questions**: The acknowledged failure of Summit Learning to deliver learning gains or achieve widespread adoption undermines CZI's core education theory of change. Critics note there was little evidence the programs were achieving stated goals even before the 2023 pivot.[^90]"
+    fetchedAt: 2026-02-22T01:44:07.133Z
+    httpStatus: 200
+    pageTitle: The Chan Zuckerberg Initiative's Skewed Values
+    contentSnippet: "The Chan Zuckerberg Initiative&#039;s Skewed Values --> Skip to main content Opinion Columns Just Visiting Advertisement July 12, 2018 The Chan Zuckerberg Initiative's Skewed Values You can&#39;t define your goals if you don&#39;t understand your values. By John Warner You have / 3 articles left. Sign up for a free account or log in. Sign Up, It&rsquo;s FREE Login Stipulated: Everyone involved in education wants what’s best for students. Priscilla Chan and Mark Zuckerberg are among those who hav"
+    contentLength: 137637
+    status: verified
+    note: null
+  - footnote: 91
+    url: https://manifold.umn.edu/read/untitled-85740014-9b15-46f2-be8c-5d261d587877/section/a02cf404-b9ee-42e5-9312-e7119cab4d32
+    linkText: Philanthrocapitalism and the Dispossession of Public Education - Manifold
+    claimContext: "**Public participation**: Like Zuckerberg's earlier Newark school reforms, CZI education projects have been criticized for excluding public participation and community input from design and implementation decisions.[^91]"
+    fetchedAt: 2026-02-22T01:44:08.666Z
+    httpStatus: 200
+    pageTitle: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress"
+    contentSnippet: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress Skip to main content table of contents “Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative I N 2017, Mark Zuckerberg gave the commencement address at Harvard University, his alma mater, which he famously quit in his sophomore year to create Facebook. Zuckerberg, the fifth richest person in the w"
+    contentLength: 779344
+    status: verified
+    note: null
+  - footnote: 92
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: CZI supported failed 2020 California Proposition 15 (which would have raised large commercial property taxes) and opposed failed Proposition 20 (stricter sentencing and parole laws).[^92] Following these electoral defeats, CZI restructured in 2020 to no longer fund political campaigns directly, thou
+    fetchedAt: 2026-02-22T01:44:08.389Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 93
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: CZI supported failed 2020 California Proposition 15 (which would have raised large commercial property taxes) and opposed failed Proposition 20 (stricter sentencing and parole laws).[^92] Following these electoral defeats, CZI restructured in 2020 to no longer fund political campaigns directly, thou
+    fetchedAt: 2026-02-22T01:44:08.391Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 94
+    url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+    linkText: Chan Zuckerberg Initiative - Wikipedia
+    claimContext: Critics note a tension in CZI addressing social problems—including misinformation, polarization, and mental health issues—that are partly caused or exacerbated by Facebook, the source of the Zuckerberg-Chan fortune.[^94] This dynamic raises questions about whether the philanthropy serves partly to r
+    fetchedAt: 2026-02-22T01:44:08.387Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 95
+    url: https://manifold.umn.edu/read/untitled-85740014-9b15-46f2-be8c-5d261d587877/section/a02cf404-b9ee-42e5-9312-e7119cab4d32
+    linkText: Philanthrocapitalism and the Dispossession of Public Education - Manifold
+    claimContext: "Questions have been raised about whether CZI's education activities, particularly \"personalized learning\" platforms, serve to commercialize user data, embed advertising in educational applications, or direct users toward Facebook and its advertising ecosystem.[^95] The organization's research grant "
+    fetchedAt: 2026-02-22T01:44:08.996Z
+    httpStatus: 200
+    pageTitle: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress"
+    contentSnippet: "“Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative | The Swindle of Innovative Educational Finance | Manifold@UMinnPress Skip to main content table of contents “Philanthrocapitalism” and Personalized Learning: The Case of the Chan Zuckerberg Initiative I N 2017, Mark Zuckerberg gave the commencement address at Harvard University, his alma mater, which he famously quit in his sophomore year to create Facebook. Zuckerberg, the fifth richest person in the w"
+    contentLength: 779344
+    status: verified
+    note: null
+  - footnote: 96
+    url: https://chanzuckerberg.com/rfa/ai-computing-gpu/
+    linkText: AI Computing GPU RFA - Chan Zuckerberg Initiative
+    claimContext: "Questions have been raised about whether CZI's education activities, particularly \"personalized learning\" platforms, serve to commercialize user data, embed advertising in educational applications, or direct users toward Facebook and its advertising ecosystem.[^95] The organization's research grant "
+    fetchedAt: 2026-02-22T01:44:10.155Z
+    httpStatus: 200
+    pageTitle: Accelerating and Scaling Biological Sciences via AI RFA
+    contentSnippet: Accelerating and Scaling Biological Sciences via AI RFA Skip to content This RFA closed May 12, 2025 Accelerating and Scaling Biological Sciences With AI The Chan Zuckerberg Initiative (CZI) invites proposals to build large-scale AI/ML models that cannot be created with conventional university resources. CZI is the only philanthropic organization to fund and build one of the largest computing systems dedicated to nonprofit life sciences research in the world. CZI’s cluster is optimized for AI an
+    contentLength: 88491
+    status: verified
+    note: null
+  - footnote: 97
+    url: https://forum.effectivealtruism.org/posts/xY5hyHXXam7bF9BQA/ea-s-biggest-missed-opportunity-mark-zuckerberg
+    linkText: "EA's Biggest Missed Opportunity: Mark Zuckerberg - EA Forum"
+    claimContext: Within the Effective Altruism community, CZI represents a notable case of substantial wealth directed toward philanthropic goals without apparent deep engagement with EA frameworks. EA Forum participants have debated whether Zuckerberg could have maximized impact by donating to established high-impa
+    fetchedAt: 2026-02-22T01:44:10.502Z
+    httpStatus: 200
+    pageTitle: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum"
+    contentSnippet: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. EA’s Biggest Missed Opportunity: Mark Zuckerberg by Trappist Jan 16 2025 8 min read 8 17 Building effective altruism Community Effective giving Philosophy Criticism of effective altruism Effective altruism culture Opinion Frontpage Much has been said about SBF having been EA’s biggest blunder. This was an error "
+    contentLength: 345884
+    status: verified
+    note: null
+  - footnote: 98
+    url: https://forum.effectivealtruism.org/posts/xY5hyHXXam7bF9BQA/ea-s-biggest-missed-opportunity-mark-zuckerberg
+    linkText: "EA's Biggest Missed Opportunity: Mark Zuckerberg - EA Forum"
+    claimContext: A significant criticism centers on cause selection. According to EA Forum analyses, CZI's priorities show "virtually no sign" that its cause selection reflects engagement with effective altruism principles, particularly regarding causes emphasized by major EA funders like Dustin Moskovitz through Go
+    fetchedAt: 2026-02-22T01:44:10.853Z
+    httpStatus: 200
+    pageTitle: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum"
+    contentSnippet: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. EA’s Biggest Missed Opportunity: Mark Zuckerberg by Trappist Jan 16 2025 8 min read 8 17 Building effective altruism Community Effective giving Philosophy Criticism of effective altruism Effective altruism culture Opinion Frontpage Much has been said about SBF having been EA’s biggest blunder. This was an error "
+    contentLength: 343092
+    status: verified
+    note: null
+  - footnote: 99
+    url: https://forum.effectivealtruism.org/posts/xY5hyHXXam7bF9BQA/ea-s-biggest-missed-opportunity-mark-zuckerberg
+    linkText: "EA's Biggest Missed Opportunity: Mark Zuckerberg - EA Forum"
+    claimContext: A significant criticism centers on cause selection. According to EA Forum analyses, CZI's priorities show "virtually no sign" that its cause selection reflects engagement with effective altruism principles, particularly regarding causes emphasized by major EA funders like Dustin Moskovitz through Go
+    fetchedAt: 2026-02-22T01:44:10.491Z
+    httpStatus: 200
+    pageTitle: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum"
+    contentSnippet: "EA’s Biggest Missed Opportunity: Mark Zuckerberg — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. EA’s Biggest Missed Opportunity: Mark Zuckerberg by Trappist Jan 16 2025 8 min read 8 17 Building effective altruism Community Effective giving Philosophy Criticism of effective altruism Effective altruism culture Opinion Frontpage Much has been said about SBF having been EA’s biggest blunder. This was an error "
+    contentLength: 345884
+    status: verified
+    note: null
+  - footnote: 100
+    url: https://www.weforum.org/stories/2015/12/why-chan-and-zuckerberg-are-modern-altruists/
+    linkText: Why Chan and Zuckerberg Are Modern Altruists - World Economic Forum
+    claimContext: The decision to structure CZI as an LLC rather than a traditional foundation drew particular skepticism within EA circles, with some viewing it primarily as a public relations move that reduces accountability while claiming philanthropic intent.[^100]
+    fetchedAt: 2026-02-22T01:44:10.483Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 101
+    url: https://chanzuckerberg.com/ethics-policies/community-participation-guidelines/
+    linkText: Community Participation Guidelines - Chan Zuckerberg Initiative
+    claimContext: CZI's stated organizational commitment to "diversity, equity, and inclusion" as outlined in its Community Participation Guidelines reflects values that have created internal tensions within the organization.[^101] EA Forum discussions reference the 70+ employee letter requesting more DEI initiatives
+    fetchedAt: 2026-02-22T01:44:12.390Z
+    httpStatus: 200
+    pageTitle: Community Participation Guidelines - Chan Zuckerberg Initiative
+    contentSnippet: "Community Participation Guidelines - Chan Zuckerberg Initiative Skip to content Community Participation Guidelines The Chan Zuckerberg Initiative hosts and participates in many different communities in service of our mission to build a better future for everyone. Within these communities, CZI is committed to supporting an environment where everyone is welcome, and communication is direct, kind, and honest. CZI employees, grantees, partners, and vendors should have an opportunity to participate, "
+    contentLength: 53454
+    status: verified
+    note: null
+  - footnote: 102
+    url: https://forum.effectivealtruism.org/posts/s38brRDm7sG8JgHxB/oliver-habryka-on-openphil-and-goodventures
+    linkText: Oliver Habryka on OpenPhil and GoodVentures - EA Forum
+    claimContext: CZI's stated organizational commitment to "diversity, equity, and inclusion" as outlined in its Community Participation Guidelines reflects values that have created internal tensions within the organization.[^101] EA Forum discussions reference the 70+ employee letter requesting more DEI initiatives
+    fetchedAt: 2026-02-22T01:44:11.897Z
+    httpStatus: 200
+    pageTitle: Oliver Habryka on OpenPhil and GoodVentures — EA Forum
+    contentSnippet: Oliver Habryka on OpenPhil and GoodVentures — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Oliver Habryka on OpenPhil and GoodVentures by TimothyTelleenLawton May 2 2025 1 min read 1 34 Community Building effective altruism Coefficient Giving Criticism of effective altruist organizations Criticism of work in effective altruism Effective altruism funding Podcasts Frontpage In this episode of our podcast, El
+    contentLength: 177045
+    status: verified
+    note: null
+  - footnote: 103
+    url: https://forum.effectivealtruism.org/posts/s38brRDm7sG8JgHxB/oliver-habryka-on-openphil-and-goodventures
+    linkText: Oliver Habryka on OpenPhil and GoodVentures - EA Forum
+    claimContext: CZI's stated organizational commitment to "diversity, equity, and inclusion" as outlined in its Community Participation Guidelines reflects values that have created internal tensions within the organization.[^101] EA Forum discussions reference the 70+ employee letter requesting more DEI initiatives
+    fetchedAt: 2026-02-22T01:44:11.894Z
+    httpStatus: 200
+    pageTitle: Oliver Habryka on OpenPhil and GoodVentures — EA Forum
+    contentSnippet: Oliver Habryka on OpenPhil and GoodVentures — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Oliver Habryka on OpenPhil and GoodVentures by TimothyTelleenLawton May 2 2025 1 min read 1 34 Community Building effective altruism Coefficient Giving Criticism of effective altruist organizations Criticism of work in effective altruism Effective altruism funding Podcasts Frontpage In this episode of our podcast, El
+    contentLength: 177045
+    status: verified
+    note: null

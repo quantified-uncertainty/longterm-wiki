@@ -1,0 +1,128 @@
+pageId: ftx-collapse-and-ea-public-credibility
+verifiedAt: 2026-02-22
+totalCitations: 11
+verified: 10
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://abcnews.com/Business/timeline-cryptocurrency-exchange-ftxs-historic-collapse/story?id=93337035
+    linkText: ABC News – Timeline of FTX's historic collapse
+    claimContext: 'The FTX collapse refers to the rapid and catastrophic failure of FTX, once the third-largest cryptocurrency exchange by trading volume, which filed for Chapter 11 bankruptcy on November 11, 2022. Founded by <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (widely known as SBF), FTX '
+    fetchedAt: 2026-02-22T02:27:32.518Z
+    httpStatus: 200
+    pageTitle: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News
+    contentSnippet: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News A timeline of cryptocurrency exchange FTX's historic collapse Bankman-Fried received a sentence of 25 years in prison on Thursday. By Max Zahn March 28, 2024, 12:08 PM 2:36 In this May 12, 2022, file photo, Terrence A. Duffy, CEO of the Chicago Mercantile Exchange, Sam Bankman-Fried, CEO of FTX US Derivatives, Christopher Edmonds, chief development officer of the Intercontinental Exchange, and Christopher Perkins, pres
+    contentLength: 228370
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.techtarget.com/whatis/feature/FTX-scam-explained-Everything-you-need-to-know
+    linkText: TechTarget – FTX scam explained
+    claimContext: 'The FTX collapse refers to the rapid and catastrophic failure of FTX, once the third-largest cryptocurrency exchange by trading volume, which filed for Chapter 11 bankruptcy on November 11, 2022. Founded by <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (widely known as SBF), FTX '
+    fetchedAt: 2026-02-22T02:27:32.447Z
+    httpStatus: 200
+    pageTitle: "FTX scam explained: Everything you need to know"
+    contentSnippet: "FTX scam explained: Everything you need to know Home Security Getty Images/iStockphoto Share this item with your network: By Amanda Hetler, Senior Editor Published: 02 Jan 2025 The popularity of cryptocurrency exchange platform FTX rose rapidly after it was launched in 2019. However, FTX came crashing down in November 2022. Cryptocurrency has become popular for investments and sending payments to other people and merchants. Cryptocurrencies differ from other digital currencies because they are e"
+    contentLength: 385223
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.saverilawfirm.com/ftx-cryptocurrency-exchange-collapse-litigation
+    linkText: Saveri Law Firm – FTX cryptocurrency exchange collapse litigation
+    claimContext: 'The FTX collapse refers to the rapid and catastrophic failure of FTX, once the third-largest cryptocurrency exchange by trading volume, which filed for Chapter 11 bankruptcy on November 11, 2022. Founded by <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (widely known as SBF), FTX '
+    fetchedAt: 2026-02-22T02:27:32.805Z
+    httpStatus: 200
+    pageTitle: FTX Cryptocurrency Exchange Collapse Litigation
+    contentSnippet: FTX Cryptocurrency Exchange Collapse Litigation Case FTX Cryptocurrency Exchange Collapse Litigation AN "UNPRECEDENTED" SITUATION OF FRAUD AND DECEIT The FTX Entities imploded in early November 2022 when they filed for bankruptcy in the aftermath of a massive and nearly unprecedented liquidity crisis. The FTX Entities and their billionaire co-founder and CEO, Sam Bankman-Fried, are now under investigation by the US Department of Justice and the Securities and Exchange Commission for severely mis
+    contentLength: 35715
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.goodmorningamerica.com/news/story/timeline-cryptocurrency-exchange-ftxs-historic-collapse-93337035
+    linkText: Good Morning America – Timeline of FTX's historic collapse
+    claimContext: "FTX's downfall was precipitated by a structural vulnerability that had existed throughout its operation: the exchange's deep financial entanglement with Alameda Research, a cryptocurrency trading firm also founded by Bankman-Fried. Both entities relied heavily on FTT, a token created and issued by F"
+    fetchedAt: 2026-02-22T02:27:32.915Z
+    httpStatus: 200
+    pageTitle: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - Good Morning America
+    contentSnippet: "A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - Good Morning America News A timeline of cryptocurrency exchange FTX's historic collapse 2:36 File Timeline: FTX's historic collapse Tom Williams/CQ-Roll Call via Getty Images, FILE By Max Zahn March 28, 2024, 4:08 PM Sam Bankman-Fried , the former CEO of FTX, was a 30-year-old crypto wunderkind who for years garnered goodwill as a philanthropist and leading proponent of industry regulation. Now, his ex-firm is bankrupt and he h"
+    contentLength: 174965
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/Bankruptcy_of_FTX
+    linkText: Wikipedia – Bankruptcy of FTX
+    claimContext: The situation escalated sharply on November 6, 2022, when Changpeng Zhao, CEO of rival exchange Binance, publicly announced that Binance would liquidate its FTT holdings, then valued at approximately \$580 million.[^4] This announcement triggered a surge in withdrawal requests that FTX was unable to
+    fetchedAt: 2026-02-22T02:27:32.061Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.euronews.com/next/2024/05/09/ftxs-collapse-a-timeline-of-how-the-crypto-giant-imploded
+    linkText: "Euronews – FTX's collapse: a timeline of how the crypto giant imploded"
+    claimContext: "On November 8, Binance briefly announced a nonbinding letter of intent to acquire FTX, citing a significant liquidity crunch. However, after reviewing FTX's financial records during due diligence, Binance withdrew from the deal on November 9, stating that the issues it found were beyond its ability "
+    fetchedAt: 2026-02-22T02:27:34.757Z
+    httpStatus: 200
+    pageTitle: "FTX's collapse: A timeline of how the crypto giant imploded | Euronews"
+    contentSnippet: "FTX&#039;s collapse: A timeline of how the crypto giant imploded | Euronews Advertisement By&nbsp Euronews and AP Published on 09/05/2024 - 8:54 GMT+2 &bull; Updated 8:54 Share Comments Share Facebook Twitter Flipboard Send Reddit Linkedin Messenger Telegram VK Bluesky Threads Whatsapp FTX has announced it will be paid back most of its customers two years after it collapsed. Here&#039;s how we got to that point. Once one of the largest cryptocurrency exchanges in the world before its monumental "
+    contentLength: 418137
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.cointracker.io/blog/what-is-happening-with-ftx
+    linkText: CoinTracker – What is happening with FTX
+    claimContext: The bankruptcy proceedings uncovered an \$8.9 billion shortfall between what FTX owed customers and the assets available to repay them.[^7] Bankman-Fried had secretly transferred approximately \$10 billion in customer funds to Alameda, with at least \$1 billion disappearing entirely and \$4.1 billio
+    fetchedAt: 2026-02-22T02:27:34.553Z
+    httpStatus: 200
+    pageTitle: "The FTX collapse explained: What you need to know"
+    contentSnippet: "The FTX collapse explained: What you need to know Are you confident in accurately reporting cryptocurrency earnings on your tax returns? Yes, I&#x27;m confident No, It&#x27;s challenging I use an accountant I haven&#x27;t reported crypto earnings yet Select answer Jump to section Jump to Jump to section Jump to FTX wasn’t the first cryptocurrency centralized exchange (CEX) to go bankrupt, but its 2022 collapse was one of the most devastating. Once a top trading platform backed by celebrity endor"
+    contentLength: 139647
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://law.rutgers.edu/news/significance-and-consequences-ftx-crypto-collapse
+    linkText: Rutgers Law – Significance and consequences of the FTX crypto collapse
+    claimContext: The bankruptcy proceedings uncovered an \$8.9 billion shortfall between what FTX owed customers and the assets available to repay them.[^7] Bankman-Fried had secretly transferred approximately \$10 billion in customer funds to Alameda, with at least \$1 billion disappearing entirely and \$4.1 billio
+    fetchedAt: 2026-02-22T02:27:34.600Z
+    httpStatus: 200
+    pageTitle: The Significance and Consequences of the FTX Crypto Collapse | Rutgers Law School
+    contentSnippet: The Significance and Consequences of the FTX Crypto Collapse | Rutgers Law School Skip to main content News Explore Topics Thought Leadership The Significance and Consequences of the FTX Crypto Collapse By Shanida Carter Date December 13, 2022 Media Contact Shanida Carter Array shanida.carter@rutgers.edu Share Facebook Twitter LinkedIn Reddit Whatsapp Email Print The bankruptcy of major cryptocurrency platform FTX is causing massive fallout in this evolving financial industry. On Monday, U.S. pr
+    contentLength: 135101
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://assets.kpmg.com/content/dam/kpmg/cn/pdf/en/2022/11/the-collapse-of-ftx.pdf
+    linkText: KPMG – The collapse of FTX
+    claimContext: The bankruptcy proceedings uncovered an \$8.9 billion shortfall between what FTX owed customers and the assets available to repay them.[^7] Bankman-Fried had secretly transferred approximately \$10 billion in customer funds to Alameda, with at least \$1 billion disappearing entirely and \$4.1 billio
+    fetchedAt: 2026-02-22T02:27:35.094Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 737694
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://rethinkpriorities.org/research-area/ftx-community-response-survey-results/
+    linkText: FTX Community Response Survey Results – Rethink Priorities — – primary survey source for EA community trust and satisfaction data post-FTX; conducted with a self-selected sample of engaged EA community members
+    claimContext: <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> had become one of EA's most prominent public figures. He publicly described his strategy of pursuing a high-earning career in finance or crypto in order to donate large sums to effective causes—a practice the EA community calls <Entit
+    fetchedAt: 2026-02-22T02:27:34.207Z
+    httpStatus: 200
+    pageTitle: FTX Community Response Survey Results &#x2d; Rethink Priorities
+    contentSnippet: "FTX Community Response Survey Results &#x2d; Rethink Priorities FTX Community Response Survey Results &#x2d; Rethink Priorities Skip to content Newsletter Research Database Donate Search Search for: Animal Welfare Identifying the most effective ways to reduce animal suffering, improve welfare standards, and influence positive change for trillions of animals worldwide. Learn more Surveys and Data Analysis Conducting polls, experiments, and focus groups and analyzing data to help organizations and"
+    contentLength: 161049
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://forum.effectivealtruism.org/posts/vXzEnBcG7BipkRSrF/how-has-ftx-s-collapse-impacted-ea
+    linkText: How has FTX's collapse impacted EA? – EA Forum — – community-generated discussion of EA impact; not an independent assessment
+    claimContext: According to that survey data, satisfaction with EA as a whole declined by approximately 0.5 to 1 point on a 10-point scale, settling at around 7.5/10.[^10] Roughly 30% of survey respondents reported that they had substantially lost trust in EA public figures or leadership as a result of the crisis.
+    fetchedAt: 2026-02-22T02:27:36.627Z
+    httpStatus: 200
+    pageTitle: How has FTX’s collapse impacted EA? — EA Forum
+    contentSnippet: How has FTX’s collapse impacted EA? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents How has FTX’s collapse impacted EA? by AnonymousEAForumAccount Oct 17 2023 17 min read 65 248 Building effective altruism Community Criticism of the effective altruism community Data on the EA community FTX collapse Research Frontpage How has FTX’s collapse impacted EA? Summary of Findings Detailed Fin
+    contentLength: 1317706
+    status: verified
+    note: null

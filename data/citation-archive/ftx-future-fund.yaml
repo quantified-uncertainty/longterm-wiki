@@ -1,0 +1,260 @@
+pageId: ftx-future-fund
+verifiedAt: 2026-02-22
+totalCitations: 23
+verified: 20
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1
+    linkText: Announcing the Future Fund — - EA Forum, February 2022
+    claimContext: The FTX Future Fund was a philanthropic initiative launched in February 2022 by the FTX Foundation, a charitable arm of the FTX cryptocurrency exchange. The fund was primarily financed by FTX founder <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink>, with additional contributions fro
+    fetchedAt: 2026-02-22T02:21:16.601Z
+    httpStatus: 200
+    pageTitle: Announcing the Future Fund — EA Forum
+    contentSnippet: Announcing the Future Fund — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Announcing the Future Fund by Nick_Beckstead , leopold , William_MacAskill , ketanrama Feb 28 2022 4 min read 185 372 Building effective altruism Career choice Existential risk Effective altruism funding Future Fund FTX Foundation Funding opportunities Longtermism Organization updates Frontpage Announcing the F
+    contentLength: 2141815
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.investing.com/news/cryptocurrency-news/ftx-to-deploy-1b-through-future-fund-for-safer-ai-reduced-biorisk-2776124
+    linkText: FTX Future Fund plans to deploy \$1B for safer AI and reduced biorisk — - Investing.com, 2022
+    claimContext: At its launch, the fund announced plans to distribute at least \$100 million in 2022 and potentially up to \$1 billion, positioning itself as a transformative new source of funding for existential risk research and related causes.[^2] It supported work on safe artificial intelligence development, ca
+    fetchedAt: 2026-02-22T02:21:17.623Z
+    httpStatus: 200
+    pageTitle: FTX to deploy $1B through Future Fund for safer AI, reduced biorisk By Cointelegraph
+    contentSnippet: FTX to deploy $1B through Future Fund for safer AI, reduced biorisk By Cointelegraph Please try another search Popular News More Trump to raise global tariff rate to 15% after Supreme Court ruling 10% market drop could meaningfully dent U.S. consumption, BCA says BCA flags rising risk of Trump trade escalation by 2027 Is now time to double down on diversification? Get 50% Off Sign In Free Sign Up English (UK) English (India) English (Canada) English (Australia) English (South Africa) English (Ph
+    contentLength: 963135
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists
+    linkText: Crypto company's collapse strands scientists — - Science, November 2022
+    claimContext: At its launch, the fund announced plans to distribute at least \$100 million in 2022 and potentially up to \$1 billion, positioning itself as a transformative new source of funding for existential risk research and related causes.[^2] It supported work on safe artificial intelligence development, ca
+    fetchedAt: 2026-02-22T02:21:16.692Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/posts/xafpj3on76uRDoBja/the-ftx-future-fund-team-has-resigned-1
+    linkText: The FTX Future Fund team has resigned — - EA Forum, November 10, 2022
+    claimContext: "The fund collapsed abruptly in November 2022 when FTX filed for bankruptcy following revelations that the exchange had allegedly misused customer deposits. Five senior Future Fund officials resigned on November 10, 2022, stating that it appeared likely many committed grants would go unfulfilled and "
+    fetchedAt: 2026-02-22T02:21:16.722Z
+    httpStatus: 200
+    pageTitle: The FTX Future Fund team has resigned — EA Forum
+    contentSnippet: "The FTX Future Fund team has resigned — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The FTX Future Fund team has resigned by Nick_Beckstead , leopold , ab , ketanrama Nov 11 2022 1 min read 288 680 Community FTX collapse FTX Foundation Future Fund Organization updates Argentina Frontpage We were shocked and immensely saddened to learn of the recent events at FTX. Our hearts go out to the thousands of FTX "
+    contentLength: 2832059
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1
+    linkText: Announcing the Future Fund — - EA Forum, February 2022 (application details and priority areas described in original announcement)
+    claimContext: "The FTX Future Fund was publicly announced in early 2022, with an initial open application deadline of March 21, 2022.[^5] The fund emphasized bold and decisive grantmaking, explicitly seeking projects capable of deploying tens or hundreds of millions of dollars annually. Its priorities reflected a "
+    fetchedAt: 2026-02-22T02:21:21.214Z
+    httpStatus: 200
+    pageTitle: Announcing the Future Fund — EA Forum
+    contentSnippet: Announcing the Future Fund — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Announcing the Future Fund by Nick_Beckstead , leopold , William_MacAskill , ketanrama Feb 28 2022 4 min read 185 372 Building effective altruism Career choice Existential risk Effective altruism funding Future Fund FTX Foundation Funding opportunities Longtermism Organization updates Frontpage Announcing the F
+    contentLength: 2139015
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://forum.effectivealtruism.org/posts/CQQtKkMGeGLxbgLjP/the-future-fund-s-regranting-program
+    linkText: The Future Fund's regranting program — - EA Forum, 2022
+    claimContext: "In addition to direct grants to nonprofits and investments in for-profit organizations, the fund operated a regranting program, in which selected individuals received allocations to distribute to projects they identified independently.[^6] This structure was intended to extend the fund's reach into "
+    fetchedAt: 2026-02-22T02:21:22.302Z
+    httpStatus: 200
+    pageTitle: The Future Fund’s Regranting Program — EA Forum
+    contentSnippet: The Future Fund’s Regranting Program — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Future Fund’s Regranting Program by leopold , Nick_Beckstead Feb 28 2022 3 min read 11 120 FTX Foundation Future Fund Grantmaking Frontpage The Future Fund’s Regranting Program Become a regrantor About the role What we’re looking for 11 comments This is a linkpost for https://ftxfuturefund.org/ann
+    contentLength: 311077
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.devex.com/news/what-will-ftx-s-collapse-mean-for-global-health-and-development-104480
+    linkText: What will FTX's collapse mean for global health and development? — - Devex, November 2022
+    claimContext: By June 2022, the fund had awarded 262 grants totaling \$132 million—a notably rapid pace for a newly launched philanthropic organization.[^3] Notable recipients included HelixNano (\$10 million for coronavirus vaccine research), <EntityLink id="securebio">SecureBio</EntityLink> (\$1.2 million for p
+    fetchedAt: 2026-02-22T02:21:22.947Z
+    httpStatus: 200
+    pageTitle: What will FTX&#39;s collapse mean for global health and development? | Devex
+    contentSnippet: What will FTX&#39;s collapse mean for global health and development? | Devex News Philanthropy What will FTX&#39;s collapse mean for global health and development? Sam Bankman-Fried, the founder of the cryptocurrency exchange FTX, has lost his fortune, destroyed his reputation, and dealt a blow to the effective altruism community, which funds many global health and international development causes. By Catherine Cheney // 18 November 2022 Related Stories Is MrBeast a force for good in development
+    contentLength: 78375
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.deeplearning.ai/the-batch/how-ftxs-collapse-impacts-ai/
+    linkText: How FTX's collapse impacts AI — - DeepLearning.AI, November 2022
+    claimContext: By June 2022, the fund had awarded 262 grants totaling \$132 million—a notably rapid pace for a newly launched philanthropic organization.[^3] Notable recipients included HelixNano (\$10 million for coronavirus vaccine research), <EntityLink id="securebio">SecureBio</EntityLink> (\$1.2 million for p
+    fetchedAt: 2026-02-22T02:21:22.847Z
+    httpStatus: 200
+    pageTitle: How FTX&#x27;s Collapse Impacts AI | AI News & Insights
+    contentSnippet: "How FTX&#x27;s Collapse Impacts AI | AI News & Insights ✨ New course! Enroll in A2A: The Agent2Agent Protocol Share The demise of cryptocurrency exchange FTX threatens funding for some teams devoted to AI safety. What’s new: FTX, the $32 billion exchange that plunged into bankruptcy last month amid allegations of fraud, had given or promised more than $530 million to over 70 AI-related organizations, The New York Times reported . Much of that money may have to be returned. What happened: FTX fou"
+    contentLength: 76563
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1
+    linkText: Announcing the Future Fund — grants list — - EA Forum, February 2022 (Redwood Research grant described in original announcement and grant registry)
+    claimContext: By June 2022, the fund had awarded 262 grants totaling \$132 million—a notably rapid pace for a newly launched philanthropic organization.[^3] Notable recipients included HelixNano (\$10 million for coronavirus vaccine research), <EntityLink id="securebio">SecureBio</EntityLink> (\$1.2 million for p
+    fetchedAt: 2026-02-22T02:21:22.713Z
+    httpStatus: 200
+    pageTitle: Announcing the Future Fund — EA Forum
+    contentSnippet: Announcing the Future Fund — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Announcing the Future Fund by Nick_Beckstead , leopold , William_MacAskill , ketanrama Feb 28 2022 4 min read 185 372 Building effective altruism Career choice Existential risk Effective altruism funding Future Fund FTX Foundation Funding opportunities Longtermism Organization updates Frontpage Announcing the F
+    contentLength: 2139015
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
+    linkText: An overview of the AI safety funding situation — - LessWrong
+    claimContext: AI safety represented one of the fund's most prominent areas of focus. Between February and August 2022, the fund awarded approximately \$32 million to AI safety projects.[^10] Beyond direct AI safety grants, FTX-affiliated funding had reportedly reached or been promised to more than 70 AI-related o
+    fetchedAt: 2026-02-22T02:21:22.939Z
+    httpStatus: 200
+    pageTitle: An Overview of the AI Safety Funding Situation — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. An Overview of the AI Safety Funding Situation — LessWrong Community AI Personal Blog 74 An Overview of the AI Safety Funding Situation by Stephen McAleese 12th Jul 2023 18 min read 10 74 Note: this post was updated in January 2025 to reflect all available data from 2024. Introduction AI safety is a field concerned with preventing negative outcomes from AI systems and "
+    contentLength: 640848
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://forum.effectivealtruism.org/posts/fDLmDe8HQq2ueCxk6/ftx-future-fund-and-longtermism
+    linkText: FTX Future Fund and longtermism — - EA Forum, 2022
+    claimContext: "The fund's rapid entry into AI safety funding was significant in scale: one analysis noted that if the fund had met its \\$100 million annual target, longtermist giving would have grown from roughly 30% of all effective altruism donations to approximately 50%.[^11] To provide additional context, <Ent"
+    fetchedAt: 2026-02-22T02:21:24.005Z
+    httpStatus: 200
+    pageTitle: FTX Future Fund and Longtermism — EA Forum
+    contentSnippet: "FTX Future Fund and Longtermism — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents FTX Future Fund and Longtermism by rhys_lindmark Mar 17 2022 3 min read 6 145 Building effective altruism Career choice Effective altruism funding FTX Foundation Future Fund Funding opportunities Frontpage FTX Future Fund and Longtermism I. EA Funding Right Now II. FTX Future Fund and Longtermism Notes: 6 "
+    contentLength: 321596
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.euronews.com/next/2022/11/11/fintech-crypto-ftx-timeline
+    linkText: FTX timeline — - Euronews, November 2022
+    claimContext: On November 2, 2022, CoinDesk reported that Alameda Research—FTX's affiliated trading firm—held a large position in FTX's native FTT token, triggering a crisis of confidence in the exchange. On November 11, 2022, FTX filed for Chapter 11 bankruptcy, and <EntityLink id="sam-bankman-fried">Sam Bankman
+    fetchedAt: 2026-02-22T02:21:25.007Z
+    httpStatus: 200
+    pageTitle: Rise and fall of crypto exchange FTX | Euronews
+    contentSnippet: Rise and fall of crypto exchange FTX | Euronews Advertisement By&nbsp Reuters Published on 11/11/2022 - 17:20 GMT+1 Share Comments Share Facebook Twitter Flipboard Send Reddit Linkedin Messenger Telegram VK Bluesky Threads Whatsapp - FTX was commencing bankruptcy proceedings in the United States and its Chief Executive Officer Sam Bankman-Fried has resigned, the crypto exchange said on Friday, in a spectacular collapse that will likely send shivers through the industry. ADVERTISEMENT ADVERTISEME
+    contentLength: 408221
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/xafpj3on76uRDoBja/the-ftx-future-fund-team-has-resigned-1
+    linkText: The FTX Future Fund team has resigned — - EA Forum, November 10, 2022 (team statement on lack of prior knowledge; the characterization of funds as "looted" reflects the FTX bankruptcy estate's subsequent filings, not the resignation post itself)
+    claimContext: Post-collapse investigations revealed that the fund had effectively been financed using money looted from FTX account holders, though available evidence indicated that Future Fund staff members had no knowledge that the funding source was compromised.[^13] Bankruptcy proceedings raised the possibili
+    fetchedAt: 2026-02-22T02:21:24.071Z
+    httpStatus: 200
+    pageTitle: The FTX Future Fund team has resigned — EA Forum
+    contentSnippet: "The FTX Future Fund team has resigned — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The FTX Future Fund team has resigned by Nick_Beckstead , leopold , ab , ketanrama Nov 11 2022 1 min read 288 680 Community FTX collapse FTX Foundation Future Fund Organization updates Argentina Frontpage We were shocked and immensely saddened to learn of the recent events at FTX. Our hearts go out to the thousands of FTX "
+    contentLength: 2832056
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://forum.effectivealtruism.org/posts/xafpj3on76uRDoBja/the-ftx-future-fund-team-has-resigned-1
+    linkText: The FTX Future Fund team has resigned — - EA Forum, November 2022 (MacAskill's advisory role and non-signatory status noted in post and comments)
+    claimContext: Leadership of the fund included <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, a former <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> program officer, who served as the fund's primary leader before resigning following the FTX collapse.[^7] <EntityLink id="will-macas
+    fetchedAt: 2026-02-22T02:21:24.163Z
+    httpStatus: 200
+    pageTitle: The FTX Future Fund team has resigned — EA Forum
+    contentSnippet: "The FTX Future Fund team has resigned — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The FTX Future Fund team has resigned by Nick_Beckstead , leopold , ab , ketanrama Nov 11 2022 1 min read 288 680 Community FTX collapse FTX Foundation Future Fund Organization updates Argentina Frontpage We were shocked and immensely saddened to learn of the recent events at FTX. Our hearts go out to the thousands of FTX "
+    contentLength: 2832056
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://trevorklee.substack.com/p/the-ftx-future-fund-needs-to-slow
+    linkText: The FTX Future Fund needs to slow down — - Trevor Klee Substack, 2022
+    claimContext: Even before the FTX collapse, critics within the effective altruism community raised concerns about the fund's pace and oversight. One analysis described the fund as distributing unusually large sums without sufficient long-term evaluation, and argued that the emphasis on AI risk—premised on assumpt
+    fetchedAt: 2026-02-22T02:21:24.397Z
+    httpStatus: 200
+    pageTitle: The FTX Future Fund needs to slow its charitable spending way down
+    contentSnippet: "The FTX Future Fund needs to slow its charitable spending way down Trevor Klee’s Newsletter Subscribe Sign in The FTX Future Fund needs to slow its charitable spending way down Alt title: I'm just a guy, standing in front of a multibillion dollar, crypto-funded, longtermist organization, asking them to please think about the second order consequences of philanthropy Trevor Klee Sep 30, 2022 26 18 Share I wrote this post in response to a growing trend in the EA community that I’ve seen, where get"
+    contentLength: 227684
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://trevorklee.substack.com/p/the-ftx-future-fund-needs-to-slow
+    linkText: The FTX Future Fund needs to slow down — - Trevor Klee Substack, 2022 (630 applications / 37 high-quality figure reported in the same post)
+    claimContext: A review of applications conducted by one grantmaker found that of 630 applications reviewed, only 37 were selected as high-quality, which critics interpreted as indicating that the fund's speed may have outpaced the supply of genuinely strong projects.[^16]
+    fetchedAt: 2026-02-22T02:21:26.060Z
+    httpStatus: 200
+    pageTitle: The FTX Future Fund needs to slow its charitable spending way down
+    contentSnippet: "The FTX Future Fund needs to slow its charitable spending way down Trevor Klee’s Newsletter Subscribe Sign in The FTX Future Fund needs to slow its charitable spending way down Alt title: I'm just a guy, standing in front of a multibillion dollar, crypto-funded, longtermist organization, asking them to please think about the second order consequences of philanthropy Trevor Klee Sep 30, 2022 26 18 Share I wrote this post in response to a growing trend in the EA community that I’ve seen, where get"
+    contentLength: 227684
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://restructuring.ra.kroll.com/FTX/
+    linkText: FTX bankruptcy filings and estate litigation — - Kroll (FTX Restructuring), ongoing; supplemented by contemporaneous reporting on lawsuit specifics including the \$71.6M suit against an employee for investment diligence failures
+    claimContext: "The most severe criticism of the fund stems from its ultimate association with fraud at FTX. The FTX estate later filed lawsuits alleging that insiders had funneled funds taken from creditors toward charitable giving in ways that served reputational purposes.[^17] One employee faced a lawsuit of up "
+    fetchedAt: 2026-02-22T02:21:26.667Z
+    httpStatus: 200
+    pageTitle: Kroll Restructuring Administration
+    contentSnippet: Kroll Restructuring Administration &times; Docket Subscription Scheduler Create a recurring email based on criteria you specify below Repeats Daily Weekly Monthly Repeat Every 1 2 3 4 5 Days Weeks Months Repeat Every S M T W T F S Repeat By day of the month Day Of Every Month(s) Starts On Time 00:00 00:30 01:00 01:30 02:00 02:30 03:00 03:30 04:00 04:30 05:00 05:30 06:00 06:30 07:00 07:30 08:00 08:30 09:00 09:30 10:00 10:30 11:00 11:30 12:00 12:30 13:00 13:30 14:00 14:30 15:00 15:30 16:00 16:30 1
+    contentLength: 412873
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.eaforchristians.org/blog/thoughts-on-the-ftx-situation
+    linkText: Thoughts on the FTX situation — - EA for Christians, November 2022
+    claimContext: "The most severe criticism of the fund stems from its ultimate association with fraud at FTX. The FTX estate later filed lawsuits alleging that insiders had funneled funds taken from creditors toward charitable giving in ways that served reputational purposes.[^17] One employee faced a lawsuit of up "
+    fetchedAt: 2026-02-22T02:21:26.679Z
+    httpStatus: 200
+    pageTitle: "Sam Bankman-Fried and the FTX Scandal: Implications for Effective Altruism &mdash; Effective Altruism for Christians"
+    contentSnippet: "Sam Bankman-Fried and the FTX Scandal: Implications for Effective Altruism &mdash; Effective Altruism for Christians 0 Thoughts on the FTX situation EA Movement 14 Nov Written By Vesa Hautala by Vesa Hautala . Note: this post does not present a stance by Effective Altruism for Christians. This blog publishes posts by multiple authors. The views contained in the posts may sometimes be contradictory and do not necessarily reflect the views of Effective Altruism for Christians. The Effective Altrui"
+    contentLength: 348520
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/
+    linkText: Sam Bankman-Fried Had a Savior Complex. It Blew Up in His Face — - Time, November 2022 (documents accounts from former Alameda employees describing management and financial-control concerns dating to 2018–2019, some of which were known to EA-connected individuals)
+    claimContext: Concerns about Bankman-Fried's conduct had reportedly circulated within EA-adjacent communities before the collapse. A November 2022 *Time* investigation documented that concerns about management practices and financial controls at Alameda Research were raised among people who had worked there as ea
+    fetchedAt: 2026-02-22T02:21:26.316Z
+    httpStatus: 200
+    pageTitle: Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME
+    contentSnippet: "Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME Politics Exclusive: Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed ADD TIME ON GOOGLE Show me more content from TIME on Google Search Loading... Photo Illustration by Neil Jamieson from TIME by Charlotte Alter Senior Correspondent Loading... Leaders of the Effective Altruism movement were repeatedly warned beginning in 2018 that Sam Bankman-Fried w"
+    contentLength: 474703
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.jefftk.com/p/if-professional-investors-missed-this
+    linkText: If professional investors missed this — - Jeff Kaufman, November 2022
+    claimContext: The collapse substantially affected the effective altruism movement's reputation and funding landscape. The Future Fund had grown to represent a significant portion of EA-adjacent philanthropy in a short period, and many organizations had structured plans around anticipated FTX funding. Jeff Kaufman
+    fetchedAt: 2026-02-22T02:21:26.419Z
+    httpStatus: 200
+    pageTitle: If Professional Investors Missed This...
+    contentSnippet: "If Professional Investors Missed This... Jeff Kaufman Posts RSS &#9666;&#9666;RSS Contact If Professional Investors Missed This... November 16th, 2022 ea , money One of the largest cryptocurrency exchanges, FTX , recently imploded after apparently transferring customer funds to cover losses at their affiliated hedge fund. Matt Levine has good coverage , especially his recent post on their balance sheet . Normally a crypto exchange going bust isn't something I'd pay that much attention to, aside "
+    contentLength: 28303
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://forum.effectivealtruism.org/posts/sEpWkCvvJMbbdohZv/the-ftx-crisis-highlights-a-deeper-cultural-problem-within
+    linkText: The FTX crisis highlights a deeper cultural problem within EA — - EA Forum, 2022
+    claimContext: The episode prompted reflection within the EA community about the risks of the "earn to give" model—wherein individuals pursue high-earning careers in order to donate proceeds to effective causes—and whether the model creates structural pressures that may compromise ethical behavior. The EA Forum re
+    fetchedAt: 2026-02-22T02:21:27.868Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 22
+    url: https://manifund.org/projects/the-ai-safety-research-fund
+    linkText: "Manifund: The AI Safety Research Fund — - Manifund (note: Manifund is itself an EA-adjacent organization; this citation documents the existence of the fund as a post-FTX diversification effort, not an independent analysis of funding landscape changes)"
+    claimContext: Observers noted that the concentration of resources from a single source with no institutional independence from a for-profit exchange represented a structural fragility. Discussions followed within the AI safety and EA communities about the need for more diversified and resilient funding mechanisms
+    fetchedAt: 2026-02-22T02:21:34.289Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 23
+    url: https://manifold.markets/EgeErdil/will-substantial-evidence-emerge-by
+    linkText: Will substantial evidence emerge by end of 2025 showing FTX Future Fund team had strong suspicions of fraud? — - Manifold Markets (cited to indicate the state of genuine uncertainty about this question, not as a primary factual source; prediction markets reflect aggregated probabilistic assessments, not evidentiary findings)
+    claimContext: "- The full extent of grant clawbacks from the bankruptcy estate remains unclear as of the page's last edit date (February 2026). Creditors had the legal basis to attempt recovery of funds distributed in the months before the bankruptcy filing, and grants after August 11, 2022 were formally required "
+    fetchedAt: 2026-02-22T02:21:28.779Z
+    httpStatus: 200
+    pageTitle: Will substantial evidence emerge by 2025 that the FTX Future Fund team had strong suspicions of fraudulent activities at FTX before November 2022? | Manifold
+    contentSnippet: "Will substantial evidence emerge by 2025 that the FTX Future Fund team had strong suspicions of fraudulent activities at FTX before November 2022? | Manifold MANIFOLD Sign up Open options Will substantial evidence emerge by 2025 that the FTX Future Fund team had strong suspicions of fraudulent activities at FTX before November 2022? Ege Erdil 100 Ṁ2.6k Ṁ150k resolved Dec 31 Resolved NO 1H 6H 1D 1W 1M ALL The FTX Future Fund team had five members: Nick Beckstead, Leopold Aschenbrenner, Avital Bal"
+    contentLength: 259990
+    status: verified
+    note: null

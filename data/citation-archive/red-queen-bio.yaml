@@ -1,0 +1,183 @@
+pageId: red-queen-bio
+verifiedAt: 2026-02-22
+totalCitations: 16
+verified: 10
+broken: 5
+unverifiable: 1
+citations:
+  - footnote: 1
+    url: https://www.redqueen.bio
+    linkText: Red Queen Bio Website — - Mission, thesis, approach
+    claimContext: "|-----------|------------|----------| | **Focus Area** | AI-enabled biothreat countermeasures | Maps AI-enabled biothreats with frontier labs and pre-builds medical countermeasures[^1] | | **Founded** | 2025 (launched November 2025) | Spun out of HelixNano, a clinical-stage mRNA therapeutics company"
+    fetchedAt: 2026-02-22T02:24:37.560Z
+    httpStatus: 200
+    pageTitle: Red Queen Bio
+    contentSnippet: Red Queen Bio 0 Red Queen Bio Today, we are launching Red Queen Bio, an AI biosecurity company. The Red Queen hypothesis describes a species’ co-evolution with ever-evolving opponents. As AI capabilities advance, biological risks grow exponentially. Our mission is to scale biological defenses at the same rate to ensure continuous human flourishing. We, the founders of Red Queen Bio (Nikolai and Hannu) have worked together for almost a decade as co-founders of HelixNano, a clinical-stage mRNA com
+    contentLength: 84054
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://techinformed.com/openai-leads-15-million-seed-in-red-queen-bio-for-ai-biosecurity/
+    linkText: TechInformed - OpenAI leads \$15M seed in Red Queen Bio — - Funding announcement and context
+    claimContext: "| **Focus Area** | AI-enabled biothreat countermeasures | Maps AI-enabled biothreats with frontier labs and pre-builds medical countermeasures[^1] | | **Founded** | 2025 (launched November 2025) | Spun out of HelixNano, a clinical-stage mRNA therapeutics company[^2] | | **Structure** | Public Benefi"
+    fetchedAt: 2026-02-22T02:24:38.800Z
+    httpStatus: 200
+    pageTitle: OpenAI leads $15 million seed in Red Queen Bio for AI biosecurity - TechInformed
+    contentSnippet: "OpenAI leads $15 million seed in Red Queen Bio for AI biosecurity - TechInformed Advertisement Breaking News November 14, 2025 OpenAI leads $15 million seed in Red Queen Bio for AI biosecurity Aman Gupta November 14, 2025 1 Minutes Read --> Red Queen Bio announced it raised a $15 million seed round led by OpenAI, launching an AI biosecurity company that aims to “scale biological defenses” as AI capabilities advance. The founders wrote that the company was spun out of HelixNano and that the seed "
+    contentLength: 122036
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://longevc.com/insights/tpost/f97x5o9ac1-longevc-portfolio-company-red-queen-bio
+    linkText: LongeVC - Red Queen Bio Raises \$15M — - Investor details
+    claimContext: '| **Structure** | Public Benefit Corporation (PBC) | Governance ensures mission precedence over individual partnerships[^1] | | **Funding** | \$15M seed round led by <EntityLink id="openai">OpenAI</EntityLink> | Additional investors: Cerberus Ventures, Fifty Years, Halcyon Futures, Dhuna Ventures, L'
+    fetchedAt: 2026-02-22T02:24:38.311Z
+    httpStatus: 200
+    pageTitle: LongeVC Portfolio Company Red Queen Bio Raises $15M to Strengthen AI-Driven Biosecurity
+    contentSnippet: LongeVC Portfolio Company Red Queen Bio Raises $15M to Strengthen AI-Driven Biosecurity Blog 2025-11-17 11:53 LongeVC Portfolio Company Red Queen Bio Raises $15M to Strengthen AI-Driven Biosecurity As AI systems accelerate both biological discovery and potential misuse, the core challenge is no longer identifying risks, but keeping pace with how quickly those risks can evolve. That requires defensive platforms that merge computational models with experimental validation and continuous threat map
+    contentLength: 39188
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://pitchbook.com/profiles/company/1162046-98
+    linkText: PitchBook - Red Queen Bio Profile — - Company details
+    claimContext: '| **Core Thesis** | "Defensive co-scaling" | Scale biological defenses proportionally with advancing AI capabilities[^1] | | **Headquarters** | Boston, MA | Co-located with HelixNano operations[^4] |'
+    fetchedAt: 2026-02-22T02:24:37.400Z
+    httpStatus: 200
+    pageTitle: "Red Queen Bio 2026 Company Profile: Valuation, Funding & Investors | PitchBook"
+    contentSnippet: "Red Queen Bio 2026 Company Profile: Valuation, Funding & Investors | PitchBook Red Queen Bio This is a profile preview from the PitchBook Platform. Request a free trial Red Queen Bio Overview Update this profile Year Founded 2025 Status Private Latest Deal Type Seed Latest Deal Amount $15M Investors 8 Red Queen Bio General Information Description Developer of biosecurity technology designed to defend against emerging biological threats enabled by artificial intelligence proactively. The company "
+    contentLength: 231232
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/Red_Queen_hypothesis
+    linkText: Red Queen hypothesis - Wikipedia — - Name origin
+    claimContext: "The company's core thesis is **defensive co-scaling for biology**: rather than merely using AI for biodefense, Red Queen Bio aims to couple \"defensive compute and funding to the same technological and financial forces that drive the capability race.\"[^1] The name derives from the **Red Queen hypothe"
+    fetchedAt: 2026-02-22T02:24:36.927Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.helixnano.com/
+    linkText: HelixNano Website — - Company history
+    claimContext: HelixNano was founded in 2013 by Hannu Rajaniemi and Nikolai Eroshenko to develop next-generation mRNA technologies, initially focused on cancer vaccines.[^6] The company pivoted to COVID-19 vaccine development in March 2020 and advanced to clinical-stage mRNA therapeutics.[^7]
+    fetchedAt: 2026-02-22T02:24:40.416Z
+    httpStatus: 200
+    pageTitle: HelixNano
+    contentSnippet: HelixNano 0 What if a drug could design itself? What if it got better with every patient? What if you only ever needed one? More soon.
+    contentLength: 391010
+    status: verified
+    note: null
+  - footnote: 7
+    url: http://www.startuplessonslearned.com/2020/06/out-of-crisis-10-helix-nano-founder.html
+    linkText: Lean Startup - HelixNano founder interview — - COVID pivot and mRNA technology
+    claimContext: HelixNano was founded in 2013 by Hannu Rajaniemi and Nikolai Eroshenko to develop next-generation mRNA technologies, initially focused on cancer vaccines.[^6] The company pivoted to COVID-19 vaccine development in March 2020 and advanced to clinical-stage mRNA therapeutics.[^7]
+    fetchedAt: 2026-02-22T02:24:40.878Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 8
+    url: https://www.investing.com/news/company-news/openai-invests-in-red-queen-bio-to-counter-aipowered-bioweapons-93CH-4356083
+    linkText: Investing.com - OpenAI invests in Red Queen Bio — - Business model details
+    claimContext: 2. Defensive biological infrastructure (countermeasures, surveillance, response) lags behind 3. The business model for biosecurity needed innovation -- borrowing from frameworks like catastrophic risk insurance[^8] 4. Defensive capabilities needed to be structurally linked to the same scaling dynami
+    fetchedAt: 2026-02-22T02:24:40.235Z
+    httpStatus: 200
+    pageTitle: OpenAI invests in Red Queen Bio to counter AI-powered bioweapons By Investing.com
+    contentSnippet: OpenAI invests in Red Queen Bio to counter AI-powered bioweapons By Investing.com Please try another search Popular News More Trump to raise global tariff rate to 15% after Supreme Court ruling 10% market drop could meaningfully dent U.S. consumption, BCA says BCA flags rising risk of Trump trade escalation by 2027 Is now time to double down on diversification? Get 50% Off Sign In Free Sign Up English (UK) English (India) English (Canada) English (Australia) English (South Africa) English (Phili
+    contentLength: 963981
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://x.com/jasonkwon/status/1989134714905481572
+    linkText: Jason Kwon on X — - Defensive co-scaling endorsement
+    claimContext: The concept of **defensive co-scaling** represents Red Queen Bio's central strategic framework. OpenAI Chief Strategy Officer Jason Kwon described it as "scaling the defensive capabilities of complementary technologies by linking them to the scaling of AI."[^9]
+    fetchedAt: 2026-02-22T02:24:39.805Z
+    httpStatus: null
+    pageTitle: null
+    contentSnippet: null
+    contentLength: null
+    status: unverifiable
+    note: Social media domain — cannot verify automatically
+  - footnote: 10
+    url: https://www.dagens.com/technology/openai-funds-new-biotech-startup-to-counter-ai-enabled-bio-threats
+    linkText: Dagens - OpenAI funds biotech startup — - Pipeline expansion plans
+    claimContext: The company is expanding into an integrated AI-wet lab pipeline aimed at detecting vulnerabilities earlier, validating them experimentally, and strengthening the broader biodefense ecosystem.[^10]
+    fetchedAt: 2026-02-22T02:24:40.904Z
+    httpStatus: 200
+    pageTitle: OpenAI funds new biotech startup to counter AI-enabled bio threats
+    contentSnippet: "OpenAI funds new biotech startup to counter AI-enabled bio threats Homepage Technology OpenAI funds new biotech startup to counter AI-enabled bio threats OpenAI funds new biotech startup to counter AI-enabled bio threats Asger Risom • Photo Agency / Shutterstock.com OpenAI is expanding its efforts to contain emerging risks posed by artificial intelligence, backing a new biotech spinoff aimed at stopping malicious actors from using advanced models to create biological weapons. Others are reading "
+    contentLength: 97891
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.pharmiweb.com/press-release/2026-01-08/abtherx-and-red-queen-bio-partner-on-therapeutic-antibody-discovery
+    linkText: PharmiWeb - AbTherx and Red Queen Bio Partnership — - January 2026 partnership announcement
+    claimContext: On January 8, 2026, Red Queen Bio announced a therapeutic antibody discovery partnership with AbTherx, combining AbTherx's Atlas Full Human Diversity Transgenic Mouse platform with Red Queen Bio's vaccination and AI-driven antibody development pipeline.[^11]
+    fetchedAt: 2026-02-22T02:24:42.751Z
+    httpStatus: 200
+    pageTitle: AbTherx and Red Queen Bio Partner on Therapeutic Antibody Discovery - PharmiWeb.com
+    contentSnippet: "AbTherx and Red Queen Bio Partner on Therapeutic Antibody Discovery - PharmiWeb.com Search jobs 08-Jan-2026 AbTherx and Red Queen Bio Partner on Therapeutic Antibody Discovery Partnership has already generated high-quality, AI-ready data in less than three months MOUNTAIN VIEW, CA / ACCESS Newswire / January 8, 2026 / AbTherx today announced a therapeutic antibody discovery and development partnership with Red Queen Bio, combining AbTherx's Atlas ™ Full Human Diversity Transgenic Mouse platform "
+    contentLength: 39687
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://ca.finance.yahoo.com/news/openai-backs-startup-aiming-block-160408034.html
+    linkText: Yahoo Finance - OpenAI backs startup — - Investment governance details
+    claimContext: The OpenAI investment is notable for several reasons. It represents a direct financial commitment by a frontier AI lab to building defensive biological infrastructure against risks that its own technology could create. Jason Kwon and other OpenAI executives with prior exposure to the founders throug
+    fetchedAt: 2026-02-22T02:24:42.835Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 13
+    url: https://www.goodwinlaw.com/en/news-and-events/news/2025/12/announcements-lifesciences-goodwin-advises-red-queen-bio
+    linkText: Goodwin - Red Queen Bio Seed Financing — - Legal counsel announcement
+    claimContext: Legal counsel for the round was provided by Goodwin Procter LLP.[^13]
+    fetchedAt: 2026-02-22T02:24:42.543Z
+    httpStatus: 200
+    pageTitle: Goodwin Advises Red Queen Bio on its $15 Million Seed Financing Led by OpenAI | News & Events | Goodwin
+    contentSnippet: Goodwin Advises Red Queen Bio on its $15 Million Seed Financing Led by OpenAI | News & Events | Goodwin Press Release December 22, 2025 Goodwin Advises Red Queen Bio on its $15 Million Seed Financing Led by OpenAI Professionals Shoaib Ghias Sam Zucker Shane Albright Daniel S. Karelitz Bartek Sudol Candace Hagey View PDF Share The Life Sciences team advised Red Queen Bio in connection with its spin out from HelixNano and $15 million seed financing round led by OpenAI. Red Queen Bio, a biosecurity
+    contentLength: 114652
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.crunchbase.com/person/nikolai-eroshenko
+    linkText: Nikolai Eroshenko - Crunchbase — - Education and background
+    claimContext: Nikolai Eroshenko studied biomedical engineering at Virginia Commonwealth University (2005-2008) and earned his PhD in bioengineering from Harvard University (2008-2014), where he worked in George Church's lab on novel DNA synthesis technologies and genome engineering tools beyond CRISPR.[^14] He co
+    fetchedAt: 2026-02-22T02:24:42.345Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 15
+    url: https://en.wikipedia.org/wiki/Hannu_Rajaniemi
+    linkText: Hannu Rajaniemi - Wikipedia — - Biography
+    claimContext: Hannu Rajaniemi (born March 9, 1978, in Ylivieska, Finland) is a Finnish-American scientist, entrepreneur, and science fiction author.[^15] He holds a PhD in Mathematical Physics from the University of Edinburgh, a Certificate of Advanced Study in Mathematics from Cambridge, and a BSc in Mathematics
+    fetchedAt: 2026-02-22T02:24:41.920Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://techcrunch.com/2023/03/23/plural-vc-lures-mrna-vaccine-and-ai-pioneer-to-become-its-newest-partner/
+    linkText: TechCrunch - Plural VC recruits Rajaniemi — - VC role
+    claimContext: "Rajaniemi is known in literary circles for the Jean le Flambeur trilogy, beginning with *The Quantum Thief* (2010), which was nominated for the 2011 Locus Award for Best First Novel.[^15] He founded ThinkTank Maths, a commercial research organization, and co-founded HelixNano in 2013.[^15] In 2023, "
+    fetchedAt: 2026-02-22T02:24:44.763Z
+    httpStatus: 200
+    pageTitle: Plural lures mRNA vaccine and AI pioneer to become its newest partner | TechCrunch
+    contentSnippet: "Plural lures mRNA vaccine and AI pioneer to become its newest partner | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: courtesy of Carina Namih Venture Plural lures mRNA vaccine and AI pioneer to become its newest partner Mike Butcher 6:50 AM PDT · March 23, 2023 Some say the European tech startup ecosystem lacks investors who have "
+    contentLength: 232288
+    status: verified
+    note: null

@@ -1,0 +1,205 @@
+pageId: nick-beckstead
+verifiedAt: 2026-02-22
+totalCitations: 18
+verified: 14
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://forum.effectivealtruism.org/topics/nick-beckstead
+    linkText: EA Forum – Nick Beckstead topic page
+    claimContext: <EntityLink id="E861" name="nick-beckstead">Nick Beckstead</EntityLink> is an American philosopher whose work has been central to the development of longtermism as a philosophical and philanthropic framework. His 2013 Rutgers University PhD dissertation, *On the Overwhelming Importance of Shaping th
+    fetchedAt: 2026-02-22T02:23:48.917Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead - EA Forum
+    contentSnippet: "Nick Beckstead - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Nick Beckstead Edit History Discussion 0 Subscribe Edit History Discussion 0 Nick Beckstead Background Research Further reading External links Random Topic Contributors 3 Pablo 2 Amber Dawn 1 Leo Nicholas Beckstead (born 1985) is an American philosopher and AI governance and safety consultant. Background Beckstead majored "
+    contentLength: 248088
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://sites.google.com/site/nbeckstead/research
+    linkText: Nick Beckstead – Research page
+    claimContext: <EntityLink id="E861" name="nick-beckstead">Nick Beckstead</EntityLink> is an American philosopher whose work has been central to the development of longtermism as a philosophical and philanthropic framework. His 2013 Rutgers University PhD dissertation, *On the Overwhelming Importance of Shaping th
+    fetchedAt: 2026-02-22T02:23:48.195Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 3
+    url: https://80000hours.org/podcast/episodes/nick-beckstead-giving-billions/
+    linkText: 80,000 Hours Podcast – Nick Beckstead on giving billions
+    claimContext: Beyond academic philosophy, Beckstead has played a significant operational role in the effective altruism ecosystem. He was among the earliest employees at <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, serving as a Program Officer overseeing grantmaking in global cat
+    fetchedAt: 2026-02-22T02:23:48.946Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead on how to spend billions of dollars preventing human extinction | 80,000 Hours
+    contentSnippet: "Nick Beckstead on how to spend billions of dollars preventing human extinction | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 4 Related episodes Credit: ESA. Read transcript See all episodes What if you were in a position to give away billions of dollars to improve the world? What would you do with it? This is the problem facing Program Officers at Open Philanthropy – people like Dr Nick Beckstead. Followin"
+    contentLength: 249881
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.nickbeckstead.com
+    linkText: Nick Beckstead – Personal website
+    claimContext: Beyond academic philosophy, Beckstead has played a significant operational role in the effective altruism ecosystem. He was among the earliest employees at <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, serving as a Program Officer overseeing grantmaking in global cat
+    fetchedAt: 2026-02-22T02:23:48.702Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead
+    contentSnippet: Nick Beckstead Search this site Embedded Files Skip to main content Skip to navigation About Me I am co-founder and CEO of Secure AI Project, where we develop and advocate for pragmatic policies to reduce risks of severe harm from advanced AI. Previously, I was an early employee at Open Philanthropy, where I served as a Program Officer in a variety of areas, including science philanthropy and machine learning, starting in 2014. More recently, I worked as Policy Lead at the Center for AI Safety a
+    contentLength: 109968
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://forum.effectivealtruism.org/posts/Defu3jkejb7pmLjeN/nick-beckstead-is-leaving-the-effective-ventures-boards
+    linkText: EA Forum – Nick Beckstead is leaving the Effective Ventures boards
+    claimContext: Beckstead also has deep roots in the effective altruism movement's organizational history. As a graduate student, he co-founded the first US chapter of Giving What We Can and was one of three founding trustees of the <EntityLink id="E517" name="cea">Centre for Effective Altruism</EntityLink>.[^5] Th
+    fetchedAt: 2026-02-22T02:23:48.515Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead is leaving the Effective Ventures boards — EA Forum
+    contentSnippet: Nick Beckstead is leaving the Effective Ventures boards — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Nick Beckstead is leaving the Effective Ventures boards by Eli Rose🔸 , lincolnq Sep 6 2023 2 min read 7 130 Community Announcements and updates Nick Beckstead Effective Ventures Frontpage On 23rd August, Nick Beckstead stepped down from the boards of Effective Ventures UK and Effective Ventures US. For c
+    contentLength: 220782
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://timelines.issarice.com/wiki/Timeline_of_Future_of_Humanity_Institute
+    linkText: Timeline of Future of Humanity Institute – Issa Rice
+    claimContext: Following his PhD, Beckstead was a Research Fellow at the <EntityLink id="E140" name="fhi">Future of Humanity Institute</EntityLink> at Oxford University, where he worked on long-term priorities in effective altruism and existential risk. He held this position from June 2013 until November 2014.[^6]
+    fetchedAt: 2026-02-22T02:23:50.162Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 618
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://sites.google.com/site/nbeckstead/research
+    linkText: Nick Beckstead – Research publications list
+    claimContext: Beckstead's central academic contribution is his 2013 dissertation, *On the Overwhelming Importance of Shaping the Far Future*. The core argument holds that, from a global perspective, what matters most in expectation is doing what is best for the general trajectory along which humanity develops ove
+    fetchedAt: 2026-02-22T02:23:49.955Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 8
+    url: https://80000hours.org/podcast/episodes/nick-beckstead-giving-billions/
+    linkText: 80,000 Hours Podcast – Nick Beckstead on giving billions
+    claimContext: The dissertation includes substantive chapters on empirical and normative defenses of longtermism, rebuttals to population ethics objections (including critiques of person-affecting views and diminishing marginal value arguments), and early discussion of decision theory under extreme uncertainty. Be
+    fetchedAt: 2026-02-22T02:23:50.060Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead on how to spend billions of dollars preventing human extinction | 80,000 Hours
+    contentSnippet: "Nick Beckstead on how to spend billions of dollars preventing human extinction | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 4 Related episodes Credit: ESA. Read transcript See all episodes What if you were in a position to give away billions of dollars to improve the world? What would you do with it? This is the problem facing Program Officers at Open Philanthropy – people like Dr Nick Beckstead. Followin"
+    contentLength: 249881
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.globalprioritiesinstitute.org/wp-content/uploads/Nick-Beckstead-and-Teruji-Thomas_A-paradox-for-tiny-probabilities-and-enormous-values.pdf
+    linkText: Global Priorities Institute – A Paradox for Tiny Probabilities and Enormous Values (working paper)
+    claimContext: A more recent academic contribution, co-authored with philosopher Teruji Thomas, is "A Paradox for Tiny Probabilities and Enormous Values," which appeared as a Global Priorities Institute working paper in 2020 and was later published in the journal *Noûs* in 2023–2024.[^9] The paper argues that ever
+    fetchedAt: 2026-02-22T02:23:50.575Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 245572
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://forum.effectivealtruism.org/posts/xwDG64qAjGjQeXwfd/nick-beckstead-ea-community-building
+    linkText: "EA Forum – Nick Beckstead: EA Community Building (2017 talk)"
+    claimContext: In an EA Global 2017 talk, Beckstead described his approach to community grantmaking as oriented toward empowering talented individuals in career choices rather than scaling a mass movement, on the grounds that EA had succeeded in attracting funds and that the marginal need was for high-quality inte
+    fetchedAt: 2026-02-22T02:23:50.007Z
+    httpStatus: 200
+    pageTitle: "Nick Beckstead: EA community building — EA Forum"
+    contentSnippet: "Nick Beckstead: EA community building — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Nick Beckstead: EA community building by EA Global Aug 11 2017 20 min read 0 7 Building effective altruism Community Summer Program on Applied Rationality and Cognition Frontpage Nick Beckstead: EA community building The Talk Q&A No comments This is a linkpost for https://www.youtube.com/watch?v=bDhl"
+    contentLength: 254776
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://thezvi.substack.com/p/the-big-nonprofits-post-2025
+    linkText: Zvi Mowshowitz – The Big Nonprofits Post 2025
+    claimContext: After leaving FTX, Beckstead took on a role as Policy Lead at the <EntityLink id="E47" name="cais">CAIS</EntityLink> (Center for AI Safety) and undertook various AI safety and governance consulting projects.[^4] He subsequently co-founded the Secure AI Project, where he serves as CEO. According to t
+    fetchedAt: 2026-02-22T02:23:52.104Z
+    httpStatus: 200
+    pageTitle: The Big Nonprofits Post 2025 - by Zvi Mowshowitz
+    contentSnippet: The Big Nonprofits Post 2025 - by Zvi Mowshowitz Don't Worry About the Vase Subscribe Sign in The Big Nonprofits Post 2025 Zvi Mowshowitz Nov 26, 2025 25 15 2 Share There remain lots of great charitable giving opportunities out there. I have now had three opportunities to be a recommender for the Survival and Flourishing Fund (SFF). I wrote in detail about my first experienc e back in 2021, where I struggled to find worthy applications. The second time around in 2024, there was an abundance of w
+    contentLength: 545819
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://forum.effectivealtruism.org/posts/Defu3jkejb7pmLjeN/nick-beckstead-is-leaving-the-effective-ventures-boards
+    linkText: EA Forum – Nick Beckstead is leaving the Effective Ventures boards
+    claimContext: Beckstead also stepped down from the boards of Effective Ventures UK and Effective Ventures US on August 23, 2023.[^12]
+    fetchedAt: 2026-02-22T02:23:51.615Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead is leaving the Effective Ventures boards — EA Forum
+    contentSnippet: Nick Beckstead is leaving the Effective Ventures boards — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Nick Beckstead is leaving the Effective Ventures boards by Eli Rose🔸 , lincolnq Sep 6 2023 2 min read 7 130 Community Announcements and updates Nick Beckstead Effective Ventures Frontpage On 23rd August, Nick Beckstead stepped down from the boards of Effective Ventures UK and Effective Ventures US. For c
+    contentLength: 220783
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.alignmentforum.org/posts/uFNgRumrDTpBfQGrs/let-s-think-about-slowing-down-ai
+    linkText: AI Alignment Forum – Let's think about slowing down AI
+    claimContext: On AI development strategy specifically, Beckstead has argued that racing to build AI capabilities without a viable alignment solution in place is strategically unsound, even if the developers have pro-safety intentions.[^13] He has also noted the challenge of gaining mainstream AI researcher buy-in
+    fetchedAt: 2026-02-22T02:23:58.472Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 14
+    url: https://www.effectivealtruism.org/articles/ea-global-2018-beckstead-fireside-chat
+    linkText: EA Global 2018 – Nick Beckstead fireside chat
+    claimContext: On AI development strategy specifically, Beckstead has argued that racing to build AI capabilities without a viable alignment solution in place is strategically unsound, even if the developers have pro-safety intentions.[^13] He has also noted the challenge of gaining mainstream AI researcher buy-in
+    fetchedAt: 2026-02-22T02:23:52.374Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead Fireside Chat (2018) | Effective Altruism
+    contentSnippet: "Nick Beckstead Fireside Chat (2018) | Effective Altruism Nick Beckstead Fireside Chat (2018) In this fireside chat from EA Global 2018: San Francisco, Rob Wiblin asks Nick Beckstead questions about the long-term future, epistemic humility, and which careers effective altruists may not be exploring enough. A transcript of their chat is below, which we have lightly edited for readability. Rob : How many people heard the podcast interview I did with Beckstead a couple months ago? I&#x27;m going to "
+    contentLength: 129762
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/
+    linkText: Time Magazine – Sam Bankman-Fried, Effective Altruism, Alameda, FTX
+    claimContext: The most significant controversy surrounding Beckstead concerns his role in leading the FTX Future Fund despite prior warnings about Sam Bankman-Fried's conduct. Reporting in *Time* magazine described how multiple EA leaders, including Beckstead, were warned as early as 2018–2019 about concerns rega
+    fetchedAt: 2026-02-22T02:23:53.069Z
+    httpStatus: 200
+    pageTitle: Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME
+    contentSnippet: "Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME Politics Exclusive: Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed ADD TIME ON GOOGLE Show me more content from TIME on Google Search Loading... Photo Illustration by Neil Jamieson from TIME by Charlotte Alter Senior Correspondent Loading... Leaders of the Effective Altruism movement were repeatedly warned beginning in 2018 that Sam Bankman-Fried w"
+    contentLength: 474703
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://jacobin.com/2023/01/effective-altruism-longtermism-nick-bostrom-racism
+    linkText: Jacobin – Effective Altruism, Longtermism, Nick Bostrom, racism
+    claimContext: "A passage from Beckstead's 2013 PhD dissertation attracted public criticism: he wrote that it seemed more plausible to him that saving a life in a rich country is substantially more important than saving a life in a poor country, other things being equal, due to the greater potential \"ripple effects"
+    fetchedAt: 2026-02-22T02:24:00.781Z
+    httpStatus: 200
+    pageTitle: Elite Universities Gave Us Effective Altruism, the Dumbest Idea of the Century
+    contentSnippet: Elite Universities Gave Us Effective Altruism, the Dumbest Idea of the Century Our special spring issue is out soon. Get a discounted subscription to our print magazine today. Your support keeps us publishing! Jacobin &#8216;s special spring issue is out soon. Follow this link to get a discounted subscription to our beautiful print quarterly. What Zohran Can Learn From the Sewer Socialists Chris Maisano When the Leaning Tower Leaned Left David Broder No War but Artisanal Doughnut War Amber A’Lee
+    contentLength: 65587
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://aeon.co/essays/why-longtermism-is-the-worlds-most-dangerous-secular-credo
+    linkText: Aeon – Why longtermism is the world's most dangerous secular credo
+    claimContext: Beckstead's broader longtermist framework has been critiqued by philosophers and journalists as potentially justifying neglect of present harms in pursuit of speculative long-run gains, with some critics characterizing longtermism as a dangerous ideological framework when operationalized at scale.[^
+    fetchedAt: 2026-02-22T02:24:06.299Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 18
+    url: https://www.simonknutsson.com/problems-in-effective-altruism-and-existential-risk-and-what-to-do-about-them/
+    linkText: Simon Knutsson – Problems in Effective Altruism and Existential Risk
+    claimContext: Philosopher Simon Knutsson has reported that managers associated with the Effective Altruism Foundation (EAF), in cooperation with Beckstead in his capacity as a grant investigator and CEA trustee, pressured him to modify his paper "The World Destruction Argument"—which critiqued views associated wi
+    fetchedAt: 2026-02-22T02:24:02.182Z
+    httpStatus: 200
+    pageTitle: Problems in effective altruism and existential risk and what to do about them &#8211; Simon Knutsson
+    contentSnippet: Problems in effective altruism and existential risk and what to do about them &#8211; Simon Knutsson Skip to content By Simon Knutsson Published October 16, 2019. Last update July 1, 2022. I started writing this text in 2017 Some in the effective altruism (EA) and existential risk circles seem to behave in problematic ways. The pattern that I think I see is that they want to have influence and therefore act in problematic and unusual ways. I bring up things that I would have wanted to be aware o
+    contentLength: 124573
+    status: verified
+    note: null

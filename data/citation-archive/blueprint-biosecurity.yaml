@@ -1,0 +1,150 @@
+pageId: blueprint-biosecurity
+verifiedAt: 2026-02-22
+totalCitations: 13
+verified: 10
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://blueprintbiosecurity.org/programs/
+    linkText: Blueprint Biosecurity Programs
+    claimContext: "|-----------|------------|----------| | **Focus Area** | Pandemic prevention technologies | Far-UVC light, next-generation PPE, glycol vapor air disinfection[^1] | | **Founded** | 2023 | 501(c)(3) nonprofit; Washington, DC[^2] |"
+    fetchedAt: 2026-02-22T02:26:32.433Z
+    httpStatus: 200
+    pageTitle: Our Programs &#8211; Blueprint Biosecurity
+    contentSnippet: "Our Programs &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Our Approach The Problem Despite the tremendous strides we have made against water-borne, food-borne, and vector-borne diseases, airborne infectious diseases remain one of humanity&#8217;s biggest challenges: The COVID-19 pandemic has claimed an estimated 27 m"
+    contentLength: 111398
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://blueprintbiosecurity.org/team/
+    linkText: Blueprint Biosecurity Team
+    claimContext: '| **Focus Area** | Pandemic prevention technologies | Far-UVC light, next-generation PPE, glycol vapor air disinfection[^1] | | **Founded** | 2023 | 501(c)(3) nonprofit; Washington, DC[^2] | | **Funding** | Moderate, growing | ≈\$1.85M from <EntityLink id="open-philanthropy">Coefficient Giving</Enti'
+    fetchedAt: 2026-02-22T02:26:32.498Z
+    httpStatus: 200
+    pageTitle: Team &#8211; Blueprint Biosecurity
+    contentSnippet: Team &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Blueprint's Team Jake Swett Executive Director read bio + Dr. Jacob Swett serves as Executive Director and founder of Blueprint Biosecurity, a nonprofit dedicated to achieving breakthroughs in humanity’s ability to suppress pathogens. Drawing from a diverse background
+    contentLength: 216410
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.openphilanthropy.org/grants/blueprint-biosecurity-general-support/
+    linkText: Coefficient Giving — Blueprint Biosecurity General Support (2023)
+    claimContext: '| **Founded** | 2023 | 501(c)(3) nonprofit; Washington, DC[^2] | | **Funding** | Moderate, growing | ≈\$1.85M from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>; additional grants from Founders Pledge[^3][^4] | | **Team** | ≈16 staff | Growing from 4 employees in 2023; dedicated'
+    fetchedAt: 2026-02-22T02:26:39.055Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 4
+    url: https://www.openphilanthropy.org/grants/blueprint-biosecurity-general-support-2024/
+    linkText: Coefficient Giving — Blueprint Biosecurity General Support (2024)
+    claimContext: '| **Founded** | 2023 | 501(c)(3) nonprofit; Washington, DC[^2] | | **Funding** | Moderate, growing | ≈\$1.85M from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>; additional grants from Founders Pledge[^3][^4] | | **Team** | ≈16 staff | Growing from 4 employees in 2023; dedicated'
+    fetchedAt: 2026-02-22T02:26:38.823Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 5
+    url: https://www.causeiq.com/organizations/blueprint-biosecurity,932385426/
+    linkText: Cause IQ — Blueprint Biosecurity 990
+    claimContext: '| **Funding** | Moderate, growing | ≈\$1.85M from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>; additional grants from Founders Pledge[^3][^4] | | **Team** | ≈16 staff | Growing from 4 employees in 2023; dedicated directors for each program area[^5] | | **Policy Influence** | G'
+    fetchedAt: 2026-02-22T02:26:32.645Z
+    httpStatus: 200
+    pageTitle: Blueprint Biosecurity | Washington, DC | Cause IQ
+    contentSnippet: Blueprint Biosecurity | Washington, DC | Cause IQ Nonprofits Nonprofits by category Nonprofits by location Product Prospect for nonprofits Research opportunities Benchmark clients Enrich information Plans and pricing Customers Accounting firms Technology companies Financial services firms Nonprofit organizations Fundraising firms Consulting firms Other organizations About Insights Better data Purpose-built tools Integrations About us Sign in Directory District of Columbia Washington Blueprint Bi
+    contentLength: 164331
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2025&id=F331368
+    linkText: OpenSecrets — Blueprint Biosecurity Action Lobbying
+    claimContext: "| **Team** | ≈16 staff | Growing from 4 employees in 2023; dedicated directors for each program area[^5] | | **Policy Influence** | Growing | Federal lobbying through Blueprint Biosecurity Action (\\$170K in 2025); Coalition to Stop Flu member[^6] | | **Key Output** | Blueprint for Far-UVC (266 pages"
+    fetchedAt: 2026-02-22T02:26:40.613Z
+    httpStatus: 200
+    pageTitle: OpenSecrets
+    contentSnippet: OpenSecrets --> --> Donate We follow the money. You make it possible. $35 $50 $100 Other Donate Today &times; Skip to Navigation Skip to Main Content Skip to Footer $1 for transparency Our work depends on donors like you. Just $1 from each visitor would sustain us for a year. Will you give in 2026? Donate Now Donate to OpenSecrets to help strengthen our democracy If every user donated $1 we could sustain our work forever. --> $35 $50 $100 Custom Help sustain our work Politicians Back Federal Mem
+    contentLength: 242624
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://blueprintbiosecurity.org/works/blueprint-for-far-uvc/
+    linkText: Blueprint for Far-UVC
+    claimContext: "| **Policy Influence** | Growing | Federal lobbying through Blueprint Biosecurity Action (\\$170K in 2025); Coalition to Stop Flu member[^6] | | **Key Output** | Blueprint for Far-UVC (266 pages) | Comprehensive investigation of far-UVC technology for airborne pathogen elimination[^7] |"
+    fetchedAt: 2026-02-22T02:26:40.580Z
+    httpStatus: 200
+    pageTitle: Blueprint for Far-UVC &#8211; Blueprint Biosecurity
+    contentSnippet: "Blueprint for Far-UVC &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Publication: Blueprint for Far-UVC Our Blueprint for Far-UVC report contains a comprehensive overview of the current state of knowledge for far-UVC, as well as a series of recommendations for advancing the technology’s development. The Far-UVC Bluepri"
+    contentLength: 94767
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.founderspledge.com/research/blueprint-biosecurity
+    linkText: Founders Pledge — Blueprint Biosecurity
+    claimContext: The organization is recommended by Founders Pledge as a top biosecurity charity, with evaluators noting its "significant ability to absorb more funding" and focus on neglected defensive technologies.[^8] See the Biosecurity Interventions overview for how Blueprint fits within the broader interventio
+    fetchedAt: 2026-02-22T02:26:40.784Z
+    httpStatus: 200
+    pageTitle: Blueprint Biosecurity
+    contentSnippet: Blueprint Biosecurity Blueprint Biosecurity is a nonprofit organization that moves the most promising pandemic prevention interventions from concept to reality by providing resources to researchers and strategic guidance for policymakers and philanthropists to address global catastrophic biological risks. What problem are they trying to solve? Blueprint Bio is among the best organizations we have found tackling the problem of global catastrophic biological risks . As described in our recent repo
+    contentLength: 156612
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://blueprintbiosecurity.org/calls-for-proposals/exhale-rfp/
+    linkText: EXHALE RFP
+    claimContext: "**EXHALE Program** (Exposure of Human Aerosols to far-UVC Light for pathogen Elimination): Up to \\$1M in grants to quantify far-UVC effectiveness against viral pathogens in real human-generated respiratory aerosols. Awards of ≈\\$100K each distributed through milestone-based contracts.[^9]"
+    fetchedAt: 2026-02-22T02:26:40.754Z
+    httpStatus: 200
+    pageTitle: Exposure of Human Aerosols to far-UVC Light for pathogen Elimination (EXHALE) &#8211; Blueprint Biosecurity
+    contentSnippet: "Exposure of Human Aerosols to far-UVC Light for pathogen Elimination (EXHALE) &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Call for Proposals: EXHALE RFP Know a team that could be a great fit for EXHALE? We offer a $200 referral bonus if we fund them. Refer a team here . Funding opportunity: Exposure of Human Aerosol"
+    contentLength: 196124
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://blueprintbiosecurity.org/introducing-project-air/
+    linkText: Introducing Project AIR
+    claimContext: "**AIR Program** (Airborne Infection Resilience): An ambitious five-year research initiative announced March 2025, with three workstreams:[^10] 1. **Efficacy and Effectiveness** — Bioaerosol chamber studies, computational modeling, and the first large-scale RCT across ≈50 real-world settings"
+    fetchedAt: 2026-02-22T02:26:40.624Z
+    httpStatus: 200
+    pageTitle: Introducing the AIR Program &#8211; Blueprint Biosecurity
+    contentSnippet: "Introducing the AIR Program &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Back 03/31/25 Introducing the AIR Program Delivering a breakthrough against airborne disease Written by The AIR Team far-UVC Project AIR Share on : The Airborne Infection Resilience (AIR) program is a five-year research initiative focused on spe"
+    contentLength: 96424
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://blueprintbiosecurity.org/works/ppe/
+    linkText: PPE Blueprint
+    claimContext: The **PPE Blueprint** (June 2024), produced in partnership with Gryphon Scientific (now Deloitte), found that "the PPE ecosystem cannot produce a sufficient amount of high quality respiratory PPE to stand up to future pandemics." Focuses on reusable respirators, stockpiling strategies, and supply ch
+    fetchedAt: 2026-02-22T02:26:41.973Z
+    httpStatus: 200
+    pageTitle: PPE &#8211; Blueprint Biosecurity
+    contentSnippet: "PPE &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Personal protective equipment (PPE) is a critical defense against pathogens. In an airborne pandemic, PPE—especially respiratory PPE—is needed to physically protect the critical infrastructure workers who maintain core societal functions. In June 2024, we released our "
+    contentLength: 138574
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://blueprintbiosecurity.org/glycol-vapors/
+    linkText: Glycol Vapors Program
+    claimContext: "Blueprint evaluates propylene glycol, dipropylene glycol, and triethylene glycol as emergency air disinfection tools. Key findings from historical research: 1,000+ fold pathogen reduction in an hour in lab studies; a 1941-1944 healthcare study showed 90% infection reduction in glycol-treated wards. "
+    fetchedAt: 2026-02-22T02:26:41.909Z
+    httpStatus: 200
+    pageTitle: Glycol vapors for pathogen suppression &#8211; Blueprint Biosecurity
+    contentSnippet: "Glycol vapors for pathogen suppression &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Back 05/06/25 Glycol vapors for pathogen suppression Derisking a Neglected Tool for Preventing Pandemics Written by The Blueprint Team Glycols Share on : Air disinfection is an important part of the biological threat mitigation portfo"
+    contentLength: 102159
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://en.wikipedia.org/wiki/Far-UVC
+    linkText: Far-UVC regulatory status
+    claimContext: "- **Far-UVC regulatory gap**: No binding regulatory standards exist worldwide for safe far-UVC dosage as of 2025—a significant barrier to deployment[^13] - **Young organization**: Founded 2023, still building track record and institutional capacity"
+    fetchedAt: 2026-02-22T02:26:41.860Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403

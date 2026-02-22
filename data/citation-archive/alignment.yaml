@@ -1,0 +1,139 @@
+pageId: alignment
+verifiedAt: 2026-02-22
+totalCitations: 12
+verified: 12
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 2
+    url: https://openreview.net/pdf?id=6Mxhg9PtDE
+    linkText: '"Safety Alignment Should Be Made More Than Skin-Deep"'
+    claimContext: "**Safety Alignment Depth**: Research published at OpenReview (2024) found that shallowly aligned models' generative distributions of harmful tokens remain \"largely unaffected compared to unaligned counterparts\" — harmful outputs can still be induced by bypassing refusal prefixes, demonstrating that "
+    fetchedAt: 2026-02-22T02:27:27.793Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 759450
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://arxiv.org/html/2512.10150v1
+    linkText: '"Unforgotten Safety: Preserving Safety Alignment of LLMs with Continual Learning"'
+    claimContext: "**Safety Alignment Depth**: Research published at OpenReview (2024) found that shallowly aligned models' generative distributions of harmful tokens remain \"largely unaffected compared to unaligned counterparts\" — harmful outputs can still be induced by bypassing refusal prefixes, demonstrating that "
+    fetchedAt: 2026-02-22T02:27:27.733Z
+    httpStatus: 200
+    pageTitle: "Unforgotten Safety: Preserving Safety Alignment of Large Language Models with Continual Learning"
+    contentSnippet: "Unforgotten Safety: Preserving Safety Alignment of Large Language Models with Continual Learning Unforgotten Safety: Preserving Safety Alignment of Large Language Models with Continual Learning Lama Alssum †,1,* Hani Itani 1,* Hasan Abed Al Kader Hammoud 1 Philip Torr 2 Adel Bibi 2 Bernard Ghanem 1 Abstract The safety alignment of large language models (LLMs) is becoming increasingly important with their democratization. In this paper, we study the safety degradation that comes with adapting LLM"
+    contentLength: 150989
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://arxiv.org/abs/2501.16534
+    linkText: '"Targeting Alignment: Extracting Safety Classifiers of Aligned LLMs"'
+    claimContext: "**Safety Classifier Extraction**: Noirot Ferrand et al. (2025) demonstrated that alignment in LLMs embeds an implicit safety classifier, with decision-relevant representations concentrated in earlier architectural layers.[^4] By constructing surrogate classifiers from subsets of model weights, attac"
+    fetchedAt: 2026-02-22T02:27:27.706Z
+    httpStatus: 200
+    pageTitle: "[2501.16534] Targeting Alignment: Extracting Safety Classifiers of Aligned LLMs"
+    contentSnippet: "[2501.16534] Targeting Alignment: Extracting Safety Classifiers of Aligned LLMs --> Computer Science > Cryptography and Security arXiv:2501.16534 (cs) [Submitted on 27 Jan 2025 ( v1 ), last revised 18 Feb 2026 (this version, v5)] Title: Targeting Alignment: Extracting Safety Classifiers of Aligned LLMs Authors: Jean-Charles Noirot Ferrand , Yohan Beugin , Eric Pauley , Ryan Sheatsley , Patrick McDaniel View a PDF of the paper titled Targeting Alignment: Extracting Safety Classifiers of Aligned L"
+    contentLength: 48055
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.ndss-symposium.org/wp-content/uploads/2025-1089-paper.pdf
+    linkText: '"Safety Misalignment Against Large Language Models"'
+    claimContext: "**Safety Misalignment Attacks**: Research published at NDSS 2025 identified three categories of post-deployment safety misalignment attack: system-prompt modification, model fine-tuning, and model editing. Supervised fine-tuning was identified as the most potent vector. The paper also introduced a S"
+    fetchedAt: 2026-02-22T02:27:27.966Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1559053
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://openreview.net/forum?id=AEKji3PwD9
+    linkText: '"To Distill or Not to Distill: Knowledge Transfer Undermines Safety of LLMs"'
+    claimContext: "**Alignment Depth and Fine-Tuning Attacks**: Research shows that safety alignment can be erased by subsequent fine-tuning on as few harmful data points, with up to 50% greater safety degradation observed in distillation-trained models relative to fine-tuned equivalents.[^6] Continual learning approa"
+    fetchedAt: 2026-02-22T02:27:27.753Z
+    httpStatus: 200
+    pageTitle: "To Distill or Not to Distill: Knowledge Transfer Undermines Safety of LLMs | OpenReview"
+    contentSnippet: "To Distill or Not to Distill: Knowledge Transfer Undermines Safety of LLMs | OpenReview Go to ICLR 2026 Conference homepage To Distill or Not to Distill: Knowledge Transfer Undermines Safety of LLMs Shreyansh Padarha , Yushi Yang , Adel Bibi , Chris Russell , Adam Mahdi 20 Sept 2025 (modified: 15 Jan 2026) ICLR 2026 Conference Withdrawn Submission Everyone Revisions BibTeX CC BY 4.0 Keywords : Knowledge Distillation, Safety evaluations, Post-training Robustness TL;DR : Knowledge distillation yie"
+    contentLength: 47253
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://arxiv.org/html/2512.10150v1
+    linkText: '"Unforgotten Safety: Preserving Safety Alignment of LLMs with Continual Learning"'
+    claimContext: "**Alignment Depth and Fine-Tuning Attacks**: Research shows that safety alignment can be erased by subsequent fine-tuning on as few harmful data points, with up to 50% greater safety degradation observed in distillation-trained models relative to fine-tuned equivalents.[^6] Continual learning approa"
+    fetchedAt: 2026-02-22T02:27:28.997Z
+    httpStatus: 200
+    pageTitle: "Unforgotten Safety: Preserving Safety Alignment of Large Language Models with Continual Learning"
+    contentSnippet: "Unforgotten Safety: Preserving Safety Alignment of Large Language Models with Continual Learning Unforgotten Safety: Preserving Safety Alignment of Large Language Models with Continual Learning Lama Alssum †,1,* Hani Itani 1,* Hasan Abed Al Kader Hammoud 1 Philip Torr 2 Adel Bibi 2 Bernard Ghanem 1 Abstract The safety alignment of large language models (LLMs) is becoming increasingly important with their democratization. In this paper, we study the safety degradation that comes with adapting LLM"
+    contentLength: 150989
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.lesswrong.com/posts/8bLSDMWnL4BcHgA6k/ai-safety-at-the-frontier-paper-highlights-of-november-2025
+    linkText: '"AI Safety at the Frontier: Paper Highlights of November 2025"'
+    claimContext: "**Defense Research**: Bias-Augmented Consistency Training (BCT) reduced attack success rates on Gemini 2.5 Flash from 67.8% to 2.9% on the ClearHarm benchmark, though with measurable increases in over-refusals on benign prompts — illustrating the safety-utility tradeoff inherent in alignment defense"
+    fetchedAt: 2026-02-22T02:27:29.562Z
+    httpStatus: 200
+    pageTitle: "AI Safety at the Frontier: Paper Highlights of November 2025 — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI Safety at the Frontier: Paper Highlights of November 2025 — LessWrong AI Frontpage 6 AI Safety at the Frontier: Paper Highlights of November 2025 by gasteigerjo 2nd Dec 2025 Linkpost from aisafetyfrontier.substack.com 9 min read 0 6 tl;dr Paper of the month: Reward hacking in production RL can naturally induce broad misalignment including alignment faking and sabota"
+    contentLength: 377263
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.akingump.com/en/insights/alerts/congress-moves-forward-with-ai-measures-in-key-defense-legislation
+    linkText: '"Congress Moves Forward with AI Measures in Key Defense Legislation"'
+    claimContext: "**Legislative developments**: The FY2025 National Defense Authorization Act (NDAA) directed the Department of Defense to establish a cross-functional team led by the Chief Digital and AI Officer (CDAO) to create a Department-wide framework for assessing, governing, and approving AI model development"
+    fetchedAt: 2026-02-22T02:27:29.788Z
+    httpStatus: 200
+    pageTitle: Congress Moves Forward with AI Measures in Key Defense Legislation | Akin
+    contentSnippet: Congress Moves Forward with AI Measures in Key Defense Legislation | Akin What We Do Who We Are Insights Join Us Subscribe Opportunity & Inclusion Environmental Sustainability Pro Bono About Us About Akin Leadership Client Value Awards & Accolades Alumni Locations All Locations North America Boston Chicago Dallas Fort Worth Houston Irvine Los Angeles New York Philadelphia San Antonio San Francisco Washington, D.C. Asia Hong Kong Singapore Europe Geneva London Middle East Abu Dhabi Dubai Riyadh C
+    contentLength: 1359656
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.congress.gov/crs-product/IF13151
+    linkText: '"Agentic AI and Cyberattacks"'
+    claimContext: "**Legislative developments**: The FY2025 National Defense Authorization Act (NDAA) directed the Department of Defense to establish a cross-functional team led by the Chief Digital and AI Officer (CDAO) to create a Department-wide framework for assessing, governing, and approving AI model development"
+    fetchedAt: 2026-02-22T02:27:29.478Z
+    httpStatus: 200
+    pageTitle: Agentic Artificial Intelligence and Cyberattacks | Congress.gov | Library of Congress
+    contentSnippet: "Agentic Artificial Intelligence and Cyberattacks | Congress.gov | Library of Congress skip to main content Alert: For a better experience on Congress.gov, please enable JavaScript in your browser. Citation Subscribe Share/Save Site Feedback Home > CRS Products (Library of Congress) > IF13151 Agentic Artificial Intelligence and Cyberattacks CRS PRODUCT (LIBRARY OF CONGRESS) Hide Overview CRS Product Type: In Focus CRS Product Number: IF13151 Referenced Legislation: P.L.114-113 ; P.L.119-37 ; P.L."
+    contentLength: 364149
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.atlanticcouncil.org/in-depth-research-reports/report/second-order-impacts-of-civil-artificial-intelligence-regulation-on-defense-why-the-national-security-community-must-engage/
+    linkText: '"Second-Order Impacts of Civil AI Regulation on Defense"'
+    claimContext: '**Regulatory carve-outs**: Atlantic Council research notes that most wide-ranging civilian AI regulatory frameworks include carve-outs that exclude military use cases, and that the boundaries of these carve-outs are "at best porous when the technology is inherently dual-use in nature." Governance ef'
+    fetchedAt: 2026-02-22T02:27:29.379Z
+    httpStatus: 200
+    pageTitle: "Second-order impacts of civil artificial intelligence regulation on defense: Why the national security community must engage - Atlantic Council"
+    contentSnippet: "Second-order impacts of civil artificial intelligence regulation on defense: Why the national security community must engage - Atlantic Council Share Close Mail Facebook Twitter / X LinkedIn DOWNLOAD PDF Table of contents Executive summary Introduction Definitions National and supranational regulatory initiatives International regulatory initiatives Analysis Conclusion Executive summary Civil regulation of artificial intelligence (AI) is hugely complex and evolving quickly, with even otherwise w"
+    contentLength: 448832
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.congress.gov/crs-product/IF13151
+    linkText: Congressional Research Service, — "Agentic AI and Cyberattacks" — 2025-2026.
+    claimContext: '**Agentic AI governance gap**: As of early 2026, the Congressional Research Service notes "there are no known official government guidance or policies yet specifically on agentic AI" within the Department of Defense. Agentic systems operating with autonomy in intelligence or cyber contexts represent'
+    fetchedAt: 2026-02-22T02:27:30.867Z
+    httpStatus: 200
+    pageTitle: Agentic Artificial Intelligence and Cyberattacks | Congress.gov | Library of Congress
+    contentSnippet: "Agentic Artificial Intelligence and Cyberattacks | Congress.gov | Library of Congress skip to main content Alert: For a better experience on Congress.gov, please enable JavaScript in your browser. Citation Subscribe Share/Save Site Feedback Home > CRS Products (Library of Congress) > IF13151 Agentic Artificial Intelligence and Cyberattacks CRS PRODUCT (LIBRARY OF CONGRESS) Hide Overview CRS Product Type: In Focus CRS Product Number: IF13151 Referenced Legislation: P.L.114-113 ; P.L.119-37 ; P.L."
+    contentLength: 364149
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.sipri.org/commentary/essay/2025/its-too-late-why-world-interacting-ai-agents-demands-new-safeguards
+    linkText: "\"Before It's Too Late: Why a World of Interacting AI Agents Demands New Safeguards\""
+    claimContext: "**Multi-agent risk**: SIPRI (2025) argues that if AI agents are deployed in government services, critical infrastructure, and military operations, misalignment could impact international peace and security, and calls for new international safeguards specifically addressing multi-agent AI in high-sta"
+    fetchedAt: 2026-02-22T02:27:32.041Z
+    httpStatus: 200
+    pageTitle: "Before it’s too late: Why a world of interacting AI agents demands new safeguards | SIPRI"
+    contentSnippet: "Before it’s too late: Why a world of interacting AI agents demands new safeguards | SIPRI Skip to main content Before it’s too late: Why a world of interacting AI agents demands new safeguards Image: Shutterstock. 1 October 2025 Dr Vincent Boulanin , Dr Alexander Blanchard and Dr Diego Lopes da Silva Last year, Dario Amodei, the CEO of Anthropic, published an essay on how artificial intelligence (AI) could change the world. He predicts that—‘ if everything goes right’—AI models will, in the long"
+    contentLength: 69296
+    status: verified
+    note: null

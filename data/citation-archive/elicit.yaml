@@ -1,0 +1,359 @@
+pageId: elicit
+verifiedAt: 2026-02-22
+totalCitations: 32
+verified: 28
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://elicit.com
+    linkText: Elicit Homepage
+    claimContext: Elicit is an AI-powered research assistant designed to automate scientific research tasks including literature search, summarization, data extraction, and synthesis across over 125 million academic papers.[^1][^2] The platform distinguishes itself through its emphasis on scale (analyzing up to 1,000
+    fetchedAt: 2026-02-22T02:16:57.842Z
+    httpStatus: 200
+    pageTitle: "Elicit: AI for scientific research"
+    contentSnippet: "Elicit: AI for scientific research Sign in Sign up Sign up Sign in Sign up AI for Scientiﬁc Research AI for Scientiﬁc Research Elicit helps researchers be 10x more evidence-based Elicit helps researchers be 10x more evidence-based Try now Try now Try now Solutions Industries Resources Customers Pricing Sign in Sign up TRUSTED BY OVER 5 MILLION RESEARCHERS, INCLUDING AT Read our customer stories TRUSTED BY OVER 5 MILLION RESEARCHERS, INCLUDING AT Read our customer stories TRUSTED BY OVER 5 MILLIO"
+    contentLength: 2548102
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.builtinsf.com/company/elicit
+    linkText: Built In SF - Elicit Company Profile
+    claimContext: Elicit is an AI-powered research assistant designed to automate scientific research tasks including literature search, summarization, data extraction, and synthesis across over 125 million academic papers.[^1][^2] The platform distinguishes itself through its emphasis on scale (analyzing up to 1,000
+    fetchedAt: 2026-02-22T02:16:58.370Z
+    httpStatus: 200
+    pageTitle: "Elicit San Francisco Office: Careers, Perks &#x2B; Culture | Built In San Francisco"
+    contentSnippet: "Elicit San Francisco Office: Careers, Perks &#x2B; Culture | Built In San Francisco Companies Elicit Elicit Save Saved Oakland, California, USA 15 Total Employees Year Founded: 2023 View Website Similar Companies Hiring Domino Data Lab Artificial Intelligence &#x2022; Machine Learning 3 Offices 200 Employees GRAIL Artificial Intelligence &#x2022; Big Data &#x2022; Healthtech &#x2022; Machine Learning &#x2022; Software &#x2022; Biotech 4 Offices 918 Employees Smartly AdTech &#x2022; Artificial In"
+    contentLength: 70559
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://elicit.com/industries/edu
+    linkText: Elicit for Education
+    claimContext: Elicit is an AI-powered research assistant designed to automate scientific research tasks including literature search, summarization, data extraction, and synthesis across over 125 million academic papers.[^1][^2] The platform distinguishes itself through its emphasis on scale (analyzing up to 1,000
+    fetchedAt: 2026-02-22T02:16:57.517Z
+    httpStatus: 200
+    pageTitle: "AI for Academic Research |&nbsp;Elicit: Al for scientific research"
+    contentSnippet: "AI for Academic Research | Elicit: Al for scientific research AI for academic research Elicit automates research so that you can make novel contributions to your field Try now Talk to Sales AI for academic research Elicit automates research so that you can make novel contributions to your field Try now Talk to Sales AI for academic research Elicit automates research so that you can make novel contributions to your field Try now Talk to Sales Solutions Industries Resources Customers Pricing Sign "
+    contentLength: 1883852
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://nbt.substack.com/p/elicit
+    linkText: Elicit - NBT Substack Profile
+    claimContext: Elicit is an AI-powered research assistant designed to automate scientific research tasks including literature search, summarization, data extraction, and synthesis across over 125 million academic papers.[^1][^2] The platform distinguishes itself through its emphasis on scale (analyzing up to 1,000
+    fetchedAt: 2026-02-22T02:16:57.626Z
+    httpStatus: 200
+    pageTitle: Elicit - by Nikhil Basu Trivedi and Mike Smith
+    contentSnippet: Elicit - by Nikhil Basu Trivedi and Mike Smith next big thing Subscribe Sign in Elicit Footwork co-leads the Series A in the trusted AI platform for evidence-based decisions. Nikhil Basu Trivedi and Mike Smith Feb 26, 2025 12 Share The majority of Footwork’s portfolio companies are building with AI as a core why now (such as WindBorne in weather forecasting, GPTZero in content detection, ReflexAI in high stakes contact center training and QA, and several we have yet to announce), but there’s a c
+    contentLength: 172839
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://canvasbusinessmodel.com/blogs/brief-history/elicit-brief-history
+    linkText: Canvas Business Model - Brief History of Elicit
+    claimContext: Elicit emerged from Ought, a non-profit AI alignment research organization founded in 2017 to explore how machine learning could scale up good reasoning.[^5][^6] The transition from alignment research tool to commercial product reflects the founders' belief that making good reasoning cheaper and mor
+    fetchedAt: 2026-02-22T02:16:57.728Z
+    httpStatus: 200
+    pageTitle: What is Brief History of Elicit Company? &ndash; CanvasBusinessModel.com
+    contentSnippet: "What is Brief History of Elicit Company? &ndash; CanvasBusinessModel.com Skip to content What is the Brief History of Elicit Company? July 11, 2025 ELICIT BUNDLE Get the Full Package: 5 Forces $15 $10 BCG Matrix $15 $10 Canvas $15 $10 Marketing Mix $15 $10 PESTLE $15 $10 SWOT Analysis $15 $10 TOTAL: ADD TO CART How Did Elicit Revolutionize Research? Imagine an AI that can sift through mountains of research papers, instantly extracting key insights. That's the power of Elicit, an AI research tool"
+    contentLength: 304773
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://substack.fiftyyears.com/p/elicit
+    linkText: Fifty Years - Elicit Investment
+    claimContext: Elicit emerged from Ought, a non-profit AI alignment research organization founded in 2017 to explore how machine learning could scale up good reasoning.[^5][^6] The transition from alignment research tool to commercial product reflects the founders' belief that making good reasoning cheaper and mor
+    fetchedAt: 2026-02-22T02:17:00.081Z
+    httpStatus: 200
+    pageTitle: Elicit - AI to accelerate science - Fifty Years News
+    contentSnippet: Elicit - AI to accelerate science - Fifty Years News Fifty Years News Subscribe Sign in Elicit Fifty Years partners with Elicit to supercharge research with AI Fifty Years Sep 25, 2023 12 2 Share Tomás Saraceno's sculpture Algo-r(h)i(y)thms The world is drowning in scientific research. Over 2 million scientific papers are published each year. That’s 5,500 per day! If you worked 24 hours a day with no breaks, you’d have to read 1 paper every 16 seconds just to keep up. That’s a new theory on sola
+    contentLength: 195370
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://forum.effectivealtruism.org/posts/raFAKyw7ofSo9mRQ3/ought-s-theory-of-change
+    linkText: EA Forum - Ought's Theory of Change
+    claimContext: Elicit emerged from Ought, a non-profit AI alignment research organization founded in 2017 to explore how machine learning could scale up good reasoning.[^5][^6] The transition from alignment research tool to commercial product reflects the founders' belief that making good reasoning cheaper and mor
+    fetchedAt: 2026-02-22T02:16:59.425Z
+    httpStatus: 200
+    pageTitle: Ought&#x27;s theory of change — EA Forum
+    contentSnippet: Ought&#x27;s theory of change — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Ought&#x27;s theory of change by stuhlmueller , jungofthewon Apr 12 2022 3 min read 4 43 AI safety AI alignment Ought Theory of change Frontpage Ought&#x27;s theory of change In short Our mission The case for process-based ML systems How we think about success Progress in 2021 Roadmap for 2022+ 4 comments Ou
+    contentLength: 213465
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://support.elicit.com/en/articles/553025
+    linkText: Elicit Support - Data Sources
+    claimContext: "The platform draws from three major academic databases: Semantic Scholar (200+ million publications with partnerships to 50+ major publishers), OpenAlex (243 million publications from 260,000+ sources, approximately twice the coverage of Web of Science or Scopus), and PubMed (biomedical and life sci"
+    fetchedAt: 2026-02-22T02:16:59.859Z
+    httpStatus: 200
+    pageTitle: Elicit&#x27;s source for papers
+    contentSnippet: Elicit&#x27;s source for papers Elicit Help Center Return to Elicit Information and advice from the Elicit team Results No results found More results We use cookies to analyze website traffic and help improve our visitor experience. Privacy Policy Reject Accept In this article Our Data Sources What Publishers and Journals Does Elicit Cover? How Does Elicit Compare to Other Databases? Comprehensive Database Comparison Biomedical Research Coverage Disciplinary Coverage Patterns How Elicit Compares
+    contentLength: 103666
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://elicit.com/blog/series-a/
+    linkText: Elicit Blog - Series A Announcement
+    claimContext: "The platform draws from three major academic databases: Semantic Scholar (200+ million publications with partnerships to 50+ major publishers), OpenAlex (243 million publications from 260,000+ sources, approximately twice the coverage of Web of Science or Scopus), and PubMed (biomedical and life sci"
+    fetchedAt: 2026-02-22T02:16:59.604Z
+    httpStatus: 200
+    pageTitle: Elicit Raises $22M to Build the Most Trusted AI Platform for Evidence-Backed Decisions - Elicit
+    contentSnippet: "Elicit Raises $22M to Build the Most Trusted AI Platform for Evidence-Backed Decisions - Elicit Sign in Sign up Sign in Sign up Sign up Solutions Industries Resources Customers Pricing Sign in Sign up Elicit Raises $22M to Build the Most Trusted AI Platform for Evidence-Backed Decisions Andreas Stuhlmüller Cofounder & CEO Company Feb 26, 2025 Feb 26, 2025 1 min read Elicit has raised $22M in Series A funding at a $100M valuation led by Spark Capital and Footwork. Existing investors Fifty Years, "
+    contentLength: 415310
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.ithistory.org/db/companies/elicit
+    linkText: IT History - Elicit
+    claimContext: "Elicit was co-founded in 2018 by Andreas Stuhlmüller and Jungwon Byun, emerging from Ought, a non-profit organization Stuhlmüller had initiated in 2017 to explore how machine learning could assist with thinking, reflection, and evidence-based decision-making.[^5][^10] Stuhlmüller, who holds a Ph.D. "
+    fetchedAt: 2026-02-22T02:16:59.918Z
+    httpStatus: 200
+    pageTitle: elicit | IT History Society
+    contentSnippet: "elicit | IT History Society Home elicit Learn about supporting IT History Society 2011 --> Company Description elicit develops onsite search software solutions for the internet, mobile devices, and social media. elicit gives marketers control over the single most-used feature on a website: the search box. A drag and drop interface lets you prioritize and target results by context, time, keyword, location or any way you need. You curate the results, so you can better plan, promote and market your"
+    contentLength: 50883
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://elicit.com/team
+    linkText: Elicit Team Page
+    claimContext: "Elicit was co-founded in 2018 by Andreas Stuhlmüller and Jungwon Byun, emerging from Ought, a non-profit organization Stuhlmüller had initiated in 2017 to explore how machine learning could assist with thinking, reflection, and evidence-based decision-making.[^5][^10] Stuhlmüller, who holds a Ph.D. "
+    fetchedAt: 2026-02-22T02:17:01.203Z
+    httpStatus: 200
+    pageTitle: "Team |&nbsp;Elicit: The AI Research Assistant"
+    contentSnippet: "Team | Elicit: The AI Research Assistant Sign in Sign up Sign in Sign up Sign up Solutions Industries Resources Customers Pricing Sign in Sign up Interested in joining our team? Explore opportunities to work with us. See open roles Interested in joining our team? Explore opportunities to work with us. See open roles Interested in joining our team? Explore opportunities to work with us. See open roles Our team Leadership Andreas Stuhlmüller Cofounder & CEO Before starting Elicit, Andreas was a po"
+    contentLength: 587997
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.cognitiverevolution.ai/unbounded-ai-assisted-research-with-elicit-founders-andreas-stuhlmuller-and-jungwon-byun/
+    linkText: Cognitive Revolution - Unbounded AI-Assisted Research with Elicit Founders
+    claimContext: "Elicit was co-founded in 2018 by Andreas Stuhlmüller and Jungwon Byun, emerging from Ought, a non-profit organization Stuhlmüller had initiated in 2017 to explore how machine learning could assist with thinking, reflection, and evidence-based decision-making.[^5][^10] Stuhlmüller, who holds a Ph.D. "
+    fetchedAt: 2026-02-22T02:17:01.629Z
+    httpStatus: 200
+    pageTitle: Unbounded AI-Assisted Research with Elicit Founders Andreas Stuhlmüller and Jungwon Byun
+    contentSnippet: "Unbounded AI-Assisted Research with Elicit Founders Andreas Stuhlmüller and Jungwon Byun Latest news Episode Mathematical Superintelligence: Harmonic&#x27;s Vlad & Tudor on IMO Gold & Theories of Everything Episode Approaching the AI Event Horizon? Part 2, w/ Abhi Mahajan, Helen Toner, Jeremie Harris, @8teAPi Episode Approaching the AI Event Horizon? Part 1, w/ James Zou, Sam Hammond, Shoshannah Tekofsky, @8teAPi Log in Subscribe Follow Facebook --> Twitter Download more icon variants from https"
+    contentLength: 160395
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.alignmentforum.org/posts/C4tR3BEpuWviT7Sje/2021-ai-alignment-literature-review-and-charity-comparison
+    linkText: Alignment Forum - 2021 AI Alignment Literature Review
+    claimContext: The initial focus centered on transforming research processes using language models to automate workflows like literature reviews, with the project incubated within Ought's broader mission to scale good reasoning through machine learning.[^5][^10] The founders' approach emphasized task decomposition
+    fetchedAt: 2026-02-22T02:17:07.808Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 14
+    url: https://elicit.com/blog/ai-for-human-reasoning
+    linkText: Elicit Blog - AI for Human Reasoning
+    claimContext: The initial focus centered on transforming research processes using language models to automate workflows like literature reviews, with the project incubated within Ought's broader mission to scale good reasoning through machine learning.[^5][^10] The founders' approach emphasized task decomposition
+    fetchedAt: 2026-02-22T02:17:01.252Z
+    httpStatus: 200
+    pageTitle: Will We Get Wise Enough Fast Enough? - Elicit
+    contentSnippet: Will We Get Wise Enough Fast Enough? - Elicit Sign in Sign up Sign in Sign up Sign up Solutions Industries Resources Customers Pricing Sign in Sign up Will We Get Wise Enough Fast Enough? On AI for Human Reasoning Andreas Stuhlmüller Cofounder & CEO Mission Nov 26, 2025 Nov 26, 2025 1 min read This post is based on a talk I gave at The Curve in October 2025. You can watch it below or at this link . I gave this talk to an audience that generally expects AI to become powerful quite soon. If you're
+    contentLength: 471793
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://elicit.com/blog/tag/features
+    linkText: Elicit Blog - Features Tag
+    claimContext: "- Integration of Claude Opus 4.5, which Elicit evaluated as outperforming peer models in data extraction and report generation (December 17, 2025)[^15] - Introduction of Research Agents for competitive landscape analysis and topic exploration (December 9, 2025)[^15]"
+    fetchedAt: 2026-02-22T02:17:01.681Z
+    httpStatus: 200
+    pageTitle: "Elicit: AI for scientific research"
+    contentSnippet: "Elicit: AI for scientific research Elicit Blog / Features Dec 19, 2025 Introducing Strict Screening and 80-Paper Reports Strict screening criteria are now available in Systematic Review. Reports can now contain up to 80 papers. Features Dec 17, 2025 Evaluating Claude Opus 4.5 Claude Opus 4.5 is better than Sonnet 4.5, Google Gemini 3 Pro, and OpenAI GPT 5 at data extraction and writing reports with fewer hallucinations. Features Dec 9, 2025 New in Elicit: Research Agents Elicit Research Agent po"
+    contentLength: 544882
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://elicit.com/blog/tag/company
+    linkText: Elicit Blog - Company Tag
+    claimContext: "- Integration of ClinicalTrials.gov, making 545,000 clinical studies searchable through the platform[^15] - Achievement of SOC 2 Type II certification (October 30, 2025), demonstrating security and privacy controls[^16]"
+    fetchedAt: 2026-02-22T02:17:09.411Z
+    httpStatus: 200
+    pageTitle: "Elicit: AI for scientific research"
+    contentSnippet: "Elicit: AI for scientific research Elicit Blog / Company Oct 30, 2025 Elicit Achieves SOC 2 Elicit achieves SOC 2 Type II certification. Company Feb 26, 2025 Elicit Raises $22M to Build the Most Trusted AI Platform for Evidence-Backed Decisions Elicit has raised $22M in Series A to expand beyond academia, building AI infrastructure for evidence-based reasoning across multiple industries. Company Jun 25, 2024 Scaling your impact: A polynomial model of career growth Beyond ladders: a polynomial mo"
+    contentLength: 432228
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://elicit.com/solutions/search
+    linkText: Elicit Solutions - Search
+    claimContext: The platform's feature set emphasizes interactive workflows with large tables, multi-step processes, customizable reports, and the ability to upload custom documents or integrate company subscriptions for additional full-text access.[^3][^17] Elicit's positioning as a systematic review tool with key
+    fetchedAt: 2026-02-22T02:17:09.230Z
+    httpStatus: 200
+    pageTitle: "Paper Search |&nbsp;Elicit: Al for scientific research"
+    contentSnippet: "Paper Search | Elicit: Al for scientific research Sign in Sign up Sign up Sign in Sign up Solutions Industries Resources Customers Pricing Sign in Sign up AI search AI-powered search for researchers Save time finding scientific papers and evidence with Elicit Try now AI search AI-powered search for researchers Save time finding scientific papers and evidence with Elicit Try now AI search AI-powered search for researchers Save time finding scientific papers and evidence with Elicit Try now Latest"
+    contentLength: 1204063
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://elicit.com/solutions/systematic-review
+    linkText: Elicit Solutions - Systematic Review
+    claimContext: The platform's feature set emphasizes interactive workflows with large tables, multi-step processes, customizable reports, and the ability to upload custom documents or integrate company subscriptions for additional full-text access.[^3][^17] Elicit's positioning as a systematic review tool with key
+    fetchedAt: 2026-02-22T02:17:09.354Z
+    httpStatus: 200
+    pageTitle: "Systematic Literature Reviews |&nbsp;Elicit: Al for scientific research"
+    contentSnippet: "Systematic Literature Reviews | Elicit: Al for scientific research Sign in Sign up Sign in Sign up Sign up Solutions Industries Resources Customers Pricing Sign in Sign up AI for evidence synthesis Systematic Literature Reviews Use AI to synthesize more evidence faster Try now See those asterisks? They’re magical quotation tools. Try them for yourself → AI for evidence synthesis Systematic Literature Reviews Use AI to synthesize more evidence faster Try now See those asterisks? They’re magical q"
+    contentLength: 1376725
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://techcrunch.com/2023/09/25/elicit-is-building-a-tool-to-automate-scientific-literature-review/
+    linkText: TechCrunch - Elicit Building Tool to Automate Scientific Literature Review
+    claimContext: "**Jungwon Byun** serves as Co-founder and COO, responsible for operational strategy and growth. Before joining Ought in 2019, she led growth at Upstart, where she scaled revenue and loan originations fivefold prior to the company's IPO.[^11][^12] Her background also includes management consulting at"
+    fetchedAt: 2026-02-22T02:17:09.035Z
+    httpStatus: 200
+    pageTitle: Elicit is building a tool to automate scientific literature review | TechCrunch
+    contentSnippet: "Elicit is building a tool to automate scientific literature review | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Evgeny Gromov / Getty Images Startups Elicit is building a tool to automate scientific literature review Kyle Wiggers 6:00 AM PDT · September 25, 2023 For researchers, reading scientific papers can be immensely time-co"
+    contentLength: 236159
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://nbt.substack.com/p/elicit
+    linkText: NBT Substack - Elicit (Team Details)
+    claimContext: "**James Brady** (also referred to as James Barry in some sources) heads engineering, bringing extensive experience from his role as VP of Technology at Spring, a creator commerce platform.[^11][^20] He previously founded startups in personal knowledge management and developer tools and built the Pay"
+    fetchedAt: 2026-02-22T02:17:09.141Z
+    httpStatus: 200
+    pageTitle: Elicit - by Nikhil Basu Trivedi and Mike Smith
+    contentSnippet: Elicit - by Nikhil Basu Trivedi and Mike Smith next big thing Subscribe Sign in Elicit Footwork co-leads the Series A in the trusted AI platform for evidence-based decisions. Nikhil Basu Trivedi and Mike Smith Feb 26, 2025 12 Share The majority of Footwork’s portfolio companies are building with AI as a core why now (such as WindBorne in weather forecasting, GPTZero in content detection, ReflexAI in high stakes contact center training and QA, and several we have yet to announce), but there’s a c
+    contentLength: 172839
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://elicit.com/team
+    linkText: Elicit Team Page - Spruce Bondera
+    claimContext: The team includes **Spruce Bondera**, an AI Engineer who previously founded Continuum and worked on vehicle motion planning at Waymo.[^21] The company maintains a high hiring bar and emphasizes values aligned with scaling reasoning for science, rapid product shipping, and organic growth through prod
+    fetchedAt: 2026-02-22T02:17:10.517Z
+    httpStatus: 200
+    pageTitle: "Team |&nbsp;Elicit: The AI Research Assistant"
+    contentSnippet: "Team | Elicit: The AI Research Assistant Sign in Sign up Sign in Sign up Sign up Solutions Industries Resources Customers Pricing Sign in Sign up Interested in joining our team? Explore opportunities to work with us. See open roles Interested in joining our team? Explore opportunities to work with us. See open roles Interested in joining our team? Explore opportunities to work with us. See open roles Our team Leadership Andreas Stuhlmüller Cofounder & CEO Before starting Elicit, Andreas was a po"
+    contentLength: 587997
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://elicit.com/solutions/reports
+    linkText: Elicit Solutions - Reports
+    claimContext: "The platform's research reports follow a mini systematic review process, capable of synthesizing up to 40-80 papers into a single report with sentence-level citations backing every claim.[^2][^22][^15] This citation approach distinguishes Elicit from chat-based AI tools that only link to references "
+    fetchedAt: 2026-02-22T02:17:10.647Z
+    httpStatus: 200
+    pageTitle: "Reports |&nbsp;Elicit: Al for scientific research"
+    contentSnippet: "Reports | Elicit: Al for scientific research Sign in Sign up Sign in Sign up Sign up Infrastructure Elicit Reports AI-generated literature reviews to help you understand the state of science Try now Infrastructure Elicit Reports AI-generated literature reviews to help you understand the state of science Try now Infrastructure Elicit Reports AI-generated literature reviews to help you understand the state of science Try now Latest update Introducing Strict Screening and 80-Paper Reports Read more"
+    contentLength: 552162
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.alignmentforum.org/posts/5rsa37pBjo4Cf9fkE/a-newcomer-s-guide-to-the-technical-ai-safety-field
+    linkText: Alignment Forum - Newcomer's Guide to Technical AI Safety Field
+    claimContext: Elicit's development is deeply rooted in AI alignment research conducted at Ought, the non-profit organization founded by Andreas Stuhlmüller in 2017.[^5][^6] Ought's research program explored how machine learning could scale up good reasoning, with a particular focus on "<EntityLink id="scalable-ov
+    fetchedAt: 2026-02-22T02:17:16.668Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 24
+    url: https://openai.com/safety/how-we-think-about-safety-alignment/
+    linkText: OpenAI - How We Think About Safety Alignment
+    claimContext: Elicit's development is deeply rooted in AI alignment research conducted at Ought, the non-profit organization founded by Andreas Stuhlmüller in 2017.[^5][^6] Ought's research program explored how machine learning could scale up good reasoning, with a particular focus on "<EntityLink id="scalable-ov
+    fetchedAt: 2026-02-22T02:17:10.714Z
+    httpStatus: 200
+    pageTitle: How we think about safety and alignment | OpenAI
+    contentSnippet: How we think about safety and alignment | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI How we think about safety and alignment The mission of OpenAI is to ensure artificial general intelligence (AGI) benefits all of humanity. Safety—the practice of enabling AI’s positive impacts by mitigating the negative ones—is thus core to our mission. Our understanding of how to advance safety has evolved a lot over time, and this p
+    contentLength: 355663
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.alignmentforum.org/posts/5rsa37pBjo4Cf9fkE/a-newcomer-s-guide-to-the-technical-ai-safety-field
+    linkText: Alignment Forum - Newcomer's Guide to Technical AI Safety Field (Funding Details)
+    claimContext: The founders acknowledged potential downsides, noting that making reasoning more accessible could benefit "less careful actors" and that scaling research automation could accelerate AI capabilities development without proportional safety work.[^7][^25] However, they argued that the approach of makin
+    fetchedAt: 2026-02-22T02:17:17.212Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 26
+    url: https://www.openphilanthropy.org/focus/scientific-research/other-scientific-research-areas/
+    linkText: Coefficient Giving - Other Scientific Research Areas
+    claimContext: The founders acknowledged potential downsides, noting that making reasoning more accessible could benefit "less careful actors" and that scaling research automation could accelerate AI capabilities development without proportional safety work.[^7][^25] However, they argued that the approach of makin
+    fetchedAt: 2026-02-22T02:17:18.928Z
+    httpStatus: 200
+    pageTitle: Other Scientific Research Areas | Open Philanthropy
+    contentSnippet: Other Scientific Research Areas | Open Philanthropy Other Scientific Research Areas Some important scientific research falls outside our thematic areas. We aim to support the most promising projects we find. Open Philanthropy takes an opportunistic approach to its science giving. We support the most promising projects we find, including those that do not fit clearly into our other thematic areas within science. We also support scientific research that furthers other Open Philanthropy focuses, su
+    contentLength: 109018
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://en.wikipedia.org/wiki/AI_alignment
+    linkText: Wikipedia - AI Alignment
+    claimContext: In practice, Elicit incorporates several alignment techniques that have become standard in language model deployment. The platform uses reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>) to ensure outputs align with researcher intentions and avoid harmful content.[^
+    fetchedAt: 2026-02-22T02:17:18.229Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 28
+    url: https://www.tigera.io/learn/guides/llm-security/ai-safety/
+    linkText: Tigera - AI Safety Guide
+    claimContext: In practice, Elicit incorporates several alignment techniques that have become standard in language model deployment. The platform uses reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>) to ensure outputs align with researcher intentions and avoid harmful content.[^
+    fetchedAt: 2026-02-22T02:17:18.718Z
+    httpStatus: 200
+    pageTitle: "Understanding AI Safety: Principles, Frameworks, and Best Practices"
+    contentSnippet: "Understanding AI Safety: Principles, Frameworks, and Best Practices Project Calico Products Calico Open Source eBPF-based networking and security Calico Commercial Editions Calico Cloud and Calico Enterprise Compare Calico Editions Calico Pricing Why Calico Solutions Use Cases Kubernetes Network Security Ingress Gateway Egress Gateway Universal Firewall Integration Cluster Mesh Istio Ambient Mode Calico for AI Workloads Workload Access Controls Microsegmentation High-Availability Kubernetes Obse"
+    contentLength: 121532
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://witness.ai/blog/ai-alignment/
+    linkText: Witness.ai - AI Alignment Blog
+    claimContext: In practice, Elicit incorporates several alignment techniques that have become standard in language model deployment. The platform uses reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>) to ensure outputs align with researcher intentions and avoid harmful content.[^
+    fetchedAt: 2026-02-22T02:17:19.539Z
+    httpStatus: 200
+    pageTitle: What Is AI Alignment? Principles, Challenges & Solutions - WitnessAI
+    contentSnippet: "What Is AI Alignment? Principles, Challenges & Solutions - WitnessAI Solutions WitnessAI for Applications WitnessAI for Employees WitnessAI for Developers WitnessAI for Compliance Product Overview Observe Control Protect Attack Company About WitnessAI Careers News and Events Contact Us Blog Resources Case Studies Podcasts Reports Solution Briefs Webinars Whitepapers Blog AI Alignment: Ensuring AI Systems Reflect Human Values WitnessAI | August 15, 2025 As artificial intelligence (AI) systems bec"
+    contentLength: 138465
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://arxiv.org/abs/2310.19852
+    linkText: arXiv - AI Alignment Paper (2310.19852)
+    claimContext: "Elicit's accuracy validation, which the company claims makes it the most accurate AI for scientific research, includes rigorous testing of data extraction and summarization against ground truth research findings.[^1] This emphasis on verifiability and accuracy serves dual purposes: ensuring the tool"
+    fetchedAt: 2026-02-22T02:17:18.321Z
+    httpStatus: 200
+    pageTitle: "[2310.19852] AI Alignment: A Comprehensive Survey"
+    contentSnippet: "[2310.19852] AI Alignment: A Comprehensive Survey --> Computer Science > Artificial Intelligence arXiv:2310.19852 (cs) [Submitted on 30 Oct 2023 ( v1 ), last revised 4 Apr 2025 (this version, v6)] Title: AI Alignment: A Comprehensive Survey Authors: Jiaming Ji , Tianyi Qiu , Boyuan Chen , Borong Zhang , Hantao Lou , Kaile Wang , Yawen Duan , Zhonghao He , Lukas Vierling , Donghai Hong , Jiayi Zhou , Zhaowei Zhang , Fanzhi Zeng , Juntao Dai , Xuehai Pan , Kwan Yee Ng , Aidan O&#39;Gara , Hua Xu ,"
+    contentLength: 49312
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://stanfordaialignment.org/what-is-ai-safety
+    linkText: Stanford AI Alignment - What is AI Safety
+    claimContext: Critics within the AI safety community note that Elicit's reliance on frontier <EntityLink id="language-models">large language models</EntityLink> (such as GPT variants and Claude) means the platform inherits the general alignment risks present in those underlying systems.[^25][^30][^31] These risks
+    fetchedAt: 2026-02-22T02:17:21.047Z
+    httpStatus: 200
+    pageTitle: What is AI Safety? &mdash; SAIA
+    contentSnippet: "What is AI Safety? &mdash; SAIA 0 What is AI Alignment? As an emerging field, there are many definitions of the field AI Alignment. Broadly AI Alignment is a research field aimed at tackling the questions “how do we ensure the development of advanced artificial intelligence benefits humanity? and how do we avoid catastrophic failures while building advanced AI systems?” Starter resources Short Article: The case for taking AI seriously as a threat to humanity by Kelsey Piper, Vox Article: Prevent"
+    contentLength: 93659
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://libguides.library.arizona.edu/ai-researchers/elicit
+    linkText: "University of Arizona LibGuides - AI for Researchers: Elicit"
+    claimContext: The platform's accuracy claims, while validated through internal testing showing 90%+ accuracy in paper extraction, lack comprehensive independent validation published in peer-reviewed venues.[^32] The December 2025 evaluation of Claude Opus 4.5 showing superior performance was conducted by Elicit i
+    fetchedAt: 2026-02-22T02:17:21.435Z
+    httpStatus: 200
+    pageTitle: Elicit - Integration of AI tools into your research - LibGuides at University of Arizona
+    contentSnippet: "Elicit - Integration of AI tools into your research - LibGuides at University of Arizona Skip to Main Content Jump to navigation Search this Guide Search Integration of AI tools into your research Ethics of AI for researchers Keeping up to date with AI Elicit SciSpace Scite Connected Papers What is Elicit? Elicit: The AI Research Assistant Elicit, developed by Ought, is an AI tool to find &#39;seed articles&#39; and to mine for keywords/subject headings. When you enter a question, it returns alt"
+    contentLength: 64672
+    status: verified
+    note: null

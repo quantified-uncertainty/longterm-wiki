@@ -1,0 +1,678 @@
+pageId: new-york-raise-act
+verifiedAt: 2026-02-22
+totalCitations: 61
+verified: 61
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: The **New York Responsible Artificial Intelligence Safety and Education (RAISE) Act** (S6953B/A6453B) is state legislation signed by Governor Kathy Hochul on December 19, 2025, that establishes comprehensive safety and transparency requirements for developers of frontier AI models.[^1] The law takes
+    fetchedAt: 2026-02-22T02:00:07.142Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.joneswalker.com/en/insights/blogs/ai-law-blog/new-yorks-raise-act-what-frontier-model-developers-need-to-know.html?id=102lzd6
+    linkText: "Jones Walker - New York's RAISE Act: What Frontier Model Developers Need to Know"
+    claimContext: The Act applies specifically to "large developers" training frontier models—defined as AI systems trained with over \$100 million in compute resources or 10²⁶+ FLOPs.[^2] It requires these developers to develop written safety protocols before deployment, conduct annual third-party audits, and report
+    fetchedAt: 2026-02-22T02:00:07.041Z
+    httpStatus: 200
+    pageTitle: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP"
+    contentSnippet: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP Search Menu What can we help you find? Search Menu AI Law and Policy Navigator New York's RAISE Act: What Frontier Model Developers Need to Know By Jason M. Loring January 2, 2026 [ Note : This analysis reflects the RAISE Act as it will be implemented following chapter amendments that Governor Hochul and legislative leaders agreed to when the bill was signed on December 19, 2025. The statute as literally enacted"
+    contentLength: 289836
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+    linkText: NY Governor's Office - Governor Hochul Signs Nation-Leading Legislation
+    claimContext: The Act applies specifically to "large developers" training frontier models—defined as AI systems trained with over \$100 million in compute resources or 10²⁶+ FLOPs.[^2] It requires these developers to develop written safety protocols before deployment, conduct annual third-party audits, and report
+    fetchedAt: 2026-02-22T02:00:06.798Z
+    httpStatus: 200
+    pageTitle: Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models | Governor Kathy Hochul
+    contentSnippet: Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models | Governor Kathy Hochul Skip to main content Technology Legislation December 19, 2025 Albany, NY Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models The RAISE Act Requires Transparency, Reporting by Powerful Frontier AI Model Developers for Incidents of Critica
+    contentLength: 52636
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: The legislation emerged from bipartisan concern about AI risks such as biological weapon design assistance, self-replication, deception, automated crime, and model theft, amid what legislators described as a lack of adequate federal regulation.[^4] After passing the New York State Legislature in Jun
+    fetchedAt: 2026-02-22T02:00:07.178Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: The legislation emerged from bipartisan concern about AI risks such as biological weapon design assistance, self-replication, deception, automated crime, and model theft, amid what legislators described as a lack of adequate federal regulation.[^4] After passing the New York State Legislature in Jun
+    fetchedAt: 2026-02-22T02:00:06.964Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: The RAISE Act was sponsored by State Senator Andrew Gounardes and Assemblymember Alex Bores, who introduced the legislation to address safety risks from frontier AI models.[^6] The sponsors emphasized that the bill targeted only the largest AI developers—those spending over \$100 million on training
+    fetchedAt: 2026-02-22T02:00:08.488Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: The RAISE Act was sponsored by State Senator Andrew Gounardes and Assemblymember Alex Bores, who introduced the legislation to address safety risks from frontier AI models.[^6] The sponsors emphasized that the bill targeted only the largest AI developers—those spending over \$100 million on training
+    fetchedAt: 2026-02-22T02:00:09.069Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: Assemblymember Bores highlighted the strong public support for the legislation, noting that 84% of New Yorkers backed the commonsense safeguards and that AI safety experts had been calling urgently for such regulation.[^8] Senator Gounardes framed the bill as prioritizing safety over Big Tech profit
+    fetchedAt: 2026-02-22T02:00:08.663Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+    linkText: NY Governor's Office - Governor Hochul Signs Nation-Leading Legislation
+    claimContext: Assemblymember Bores highlighted the strong public support for the legislation, noting that 84% of New Yorkers backed the commonsense safeguards and that AI safety experts had been calling urgently for such regulation.[^8] Senator Gounardes framed the bill as prioritizing safety over Big Tech profit
+    fetchedAt: 2026-02-22T02:00:08.231Z
+    httpStatus: 200
+    pageTitle: Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models | Governor Kathy Hochul
+    contentSnippet: Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models | Governor Kathy Hochul Skip to main content Technology Legislation December 19, 2025 Albany, NY Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models The RAISE Act Requires Transparency, Reporting by Powerful Frontier AI Model Developers for Incidents of Critica
+    contentLength: 52636
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: The bill was introduced in early 2025 and passed the New York State Legislature in June 2025 with overwhelming bipartisan support.[^10] However, the original version contained significantly stronger provisions and penalties than what was ultimately enacted.
+    fetchedAt: 2026-02-22T02:00:08.309Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: '- A deployment prohibition that would have barred models posing "unreasonable risk of critical harm" - Stricter compliance requirements[^11]'
+    fetchedAt: 2026-02-22T02:00:10.401Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://fpf.org/blog/the-raise-act-vs-sb-53-a-tale-of-two-frontier-ai-laws/
+    linkText: "Future of Privacy Forum - The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    claimContext: Following the bill's passage, Governor Hochul negotiated amendments with legislative sponsors to reduce the regulatory burden and align New York's approach with California's recently enacted TFAIA (SB 53), which was signed into law in September 2025.[^12] The final amended version scaled back penalt
+    fetchedAt: 2026-02-22T02:00:10.437Z
+    httpStatus: 200
+    pageTitle: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    contentSnippet: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws FILTER January 8, 2026 Share on Facebook Share on LinkedIn Share on Twitter Share on Google+ --> Share through Email Justine Gluck Policy Analyst, AI Policy and Legislation About Justine Blogs by Justine What the enactment of New York’s RAISE Act reveals compared to California’s SB 53, the nation’s first frontier AI law On December 19, New York Governor Hochul (D) signed the Responsibl"
+    contentLength: 129037
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: Following the bill's passage, Governor Hochul negotiated amendments with legislative sponsors to reduce the regulatory burden and align New York's approach with California's recently enacted TFAIA (SB 53), which was signed into law in September 2025.[^12] The final amended version scaled back penalt
+    fetchedAt: 2026-02-22T02:00:10.212Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+    linkText: NY Governor's Office - Governor Hochul Signs Nation-Leading Legislation
+    claimContext: Governor Hochul signed the amended RAISE Act into law on December 19, 2025, calling it "nation-leading legislation" that establishes a strong and sensible standard for AI transparency and safety amid federal inaction.[^14]
+    fetchedAt: 2026-02-22T02:00:10.112Z
+    httpStatus: 200
+    pageTitle: Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models | Governor Kathy Hochul
+    contentSnippet: Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models | Governor Kathy Hochul Skip to main content Technology Legislation December 19, 2025 Albany, NY Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models The RAISE Act Requires Transparency, Reporting by Powerful Frontier AI Model Developers for Incidents of Critica
+    contentLength: 52636
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: "1. **Compute threshold**: Models trained using more than 10²⁶ floating point operations (FLOPs) with aggregate compute costs exceeding \\$100 million[^15] 2. **Revenue threshold**: Developers with annual revenue exceeding \\$500 million (added in post-passage amendments)[^16]"
+    fetchedAt: 2026-02-22T02:00:10.724Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.joneswalker.com/en/insights/blogs/ai-law-blog/new-yorks-raise-act-what-frontier-model-developers-need-to-know.html?id=102lzd6
+    linkText: "Jones Walker - New York's RAISE Act: What Frontier Model Developers Need to Know"
+    claimContext: "1. **Compute threshold**: Models trained using more than 10²⁶ floating point operations (FLOPs) with aggregate compute costs exceeding \\$100 million[^15] 2. **Revenue threshold**: Developers with annual revenue exceeding \\$500 million (added in post-passage amendments)[^16]"
+    fetchedAt: 2026-02-22T02:00:12.410Z
+    httpStatus: 200
+    pageTitle: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP"
+    contentSnippet: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP Search Menu What can we help you find? Search Menu AI Law and Policy Navigator New York's RAISE Act: What Frontier Model Developers Need to Know By Jason M. Loring January 2, 2026 [ Note : This analysis reflects the RAISE Act as it will be implemented following chapter amendments that Governor Hochul and legislative leaders agreed to when the bill was signed on December 19, 2025. The statute as literally enacted"
+    contentLength: 289836
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: The law explicitly exempts accredited universities from compliance requirements, focusing enforcement exclusively on commercial AI developers.[^17]
+    fetchedAt: 2026-02-22T02:00:11.863Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: "Large developers must develop, publish, and continuously maintain written safety and security protocols before deploying frontier models.[^18] These protocols must address:"
+    fetchedAt: 2026-02-22T02:00:12.093Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.harrisbeachmurtha.com/insights/new-yorks-raise-acts-implications-for-ai-companies/
+    linkText: Harris Beach - New York's RAISE Act's Implications for AI Companies
+    claimContext: '- **Risk identification and mitigation** for "critical harm"—defined as incidents causing death or serious bodily injury to 100+ people, damage exceeding \$1 billion, assistance in creating weapons of mass destruction, or autonomous dangerous behavior[^19] - **Cybersecurity measures** to protect mod'
+    fetchedAt: 2026-02-22T02:00:12.117Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 232
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: "- **Cybersecurity measures** to protect models from theft, unauthorized access, or model escape - **Testing procedures** to evaluate model capabilities and potential risks, including self-replication, deception, biological weapon design assistance, and large-scale automated criminal activity[^20] - "
+    fetchedAt: 2026-02-22T02:00:12.075Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.bestlawfirms.com/articles/new-york-s-raise-act-s-implications-for-ai/7260
+    linkText: Best Law Firms - New York's RAISE Act's Implications for AI
+    claimContext: "- **Testing procedures** to evaluate model capabilities and potential risks, including self-replication, deception, biological weapon design assistance, and large-scale automated criminal activity[^20] - **Internal governance structures**, including designation of a senior compliance officer respons"
+    fetchedAt: 2026-02-22T02:00:14.579Z
+    httpStatus: 200
+    pageTitle: New York’s RAISE Act’s Implications for AI | Best Law Firms
+    contentSnippet: New York’s RAISE Act’s Implications for AI | Best Law Firms This website requires JavaScript in order to bring you the best user experience possible. Please enable the use of scripts in your browser and reload the page. INSIGHTS New York&#x2019;s RAISE Act&#x2019;s Implications for AI Companies In-house legal teams should begin aligning development, compliance, and incident response functions now to ensure readiness ahead of the law&#x2019;s 2026 effective date. Brendan Palfreyman Harris Beach M
+    contentLength: 55388
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: Developers must publish their safety protocols with appropriate redactions for trade secrets and privacy concerns, while providing full access to the New York Attorney General and Division of Homeland Security and Emergency Services.[^22]
+    fetchedAt: 2026-02-22T02:00:13.744Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: "- **Annual safety reviews** of their protocols, updating them as needed based on new risks or capabilities - **Independent third-party audits** to verify compliance with safety requirements and assess the effectiveness of risk mitigation measures[^23]"
+    fetchedAt: 2026-02-22T02:00:13.751Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.skadden.com/insights/publications/2026/01/new-york-enacts-ai-transparency-law
+    linkText: Skadden - New York Enacts AI Transparency Law
+    claimContext: 'Developers must report "safety incidents" relating to frontier models to the New York attorney general and DHSES within 72 hours of discovery.[^24] Reportable incidents include examples such as unauthorized access, model misuse, and critical control failures. Developers must also report cases where '
+    fetchedAt: 2026-02-22T02:00:14.027Z
+    httpStatus: 200
+    pageTitle: New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP
+    contentSnippet: "New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP Skip to content Executive Summary What&rsquo;s new: New York&rsquo;s Responsible AI Safety and Education Act (RAISE Act) was signed into law on December 19, 2025, imposing transparency, compliance, safety and reporting requirements on certain developers of large frontier artificial intelligence (AI) models, as well as penalties for viola"
+    contentLength: 49695
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: The RAISE Act's legislative memo outlined key concerns that informed these provisions, including testing that revealed models attempting self-replication and deception, risks related to biological weapon design assistance, and industry concerns about the lack of federal regulation.[^25]
+    fetchedAt: 2026-02-22T02:00:13.970Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.hunton.com/privacy-and-information-security-law/new-york-passes-the-responsible-ai-safety-and-education-act
+    linkText: Hunton Privacy - New York Passes the Responsible AI Safety and Education Act
+    claimContext: Reports must include the date of the incident, the reasons the incident qualifies as a safety incident, and a short and plain statement describing what occurred.[^26]
+    fetchedAt: 2026-02-22T02:00:16.338Z
+    httpStatus: 200
+    pageTitle: New York Passes the Responsible AI Safety and Education Act
+    contentSnippet: "New York Passes the Responsible AI Safety and Education Act Privacy & Cybersecurity Law Blog Global Privacy and Cybersecurity Law Updates and Analysis Home > Insights > Blogs New York Passes the Responsible AI Safety and Education Act Time 4 Minute Read July 10, 2025 Categories: U.S. State Law , Cybersecurity The New York legislature recently passed the Responsible AI Safety and Education Act ( SB6953B ) (&ldquo;RAISE Act&rdquo;). The bill awaits signature by New York Governor Kathy Hochul. Appl"
+    contentLength: 89429
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: While the final version removed the original deployment ban, developers are still prohibited from deploying models that pose an "unreasonable risk of critical harm" based on their testing and safety evaluations.[^27] The law also bans the use of knowledge distillation techniques to create smaller mo
+    fetchedAt: 2026-02-22T02:00:15.885Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.hunton.com/privacy-and-information-security-law/new-york-passes-the-responsible-ai-safety-and-education-act
+    linkText: Hunton Privacy - New York Passes the Responsible AI Safety and Education Act
+    claimContext: While the final version removed the original deployment ban, developers are still prohibited from deploying models that pose an "unreasonable risk of critical harm" based on their testing and safety evaluations.[^27] The law also bans the use of knowledge distillation techniques to create smaller mo
+    fetchedAt: 2026-02-22T02:00:16.617Z
+    httpStatus: 200
+    pageTitle: New York Passes the Responsible AI Safety and Education Act
+    contentSnippet: "New York Passes the Responsible AI Safety and Education Act Privacy & Cybersecurity Law Blog Global Privacy and Cybersecurity Law Updates and Analysis Home > Insights > Blogs New York Passes the Responsible AI Safety and Education Act Time 4 Minute Read July 10, 2025 Categories: U.S. State Law , Cybersecurity The New York legislature recently passed the Responsible AI Safety and Education Act ( SB6953B ) (&ldquo;RAISE Act&rdquo;). The bill awaits signature by New York Governor Kathy Hochul. Appl"
+    contentLength: 89427
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.skadden.com/insights/publications/2026/01/new-york-enacts-ai-transparency-law
+    linkText: Skadden - New York Enacts AI Transparency Law
+    claimContext: "The RAISE Act creates a new oversight office within the New York Department of Financial Services (NYDFS) to implement and enforce the legislation.[^29] This office is responsible for:"
+    fetchedAt: 2026-02-22T02:00:15.698Z
+    httpStatus: 200
+    pageTitle: New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP
+    contentSnippet: "New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP Skip to content Executive Summary What&rsquo;s new: New York&rsquo;s Responsible AI Safety and Education Act (RAISE Act) was signed into law on December 19, 2025, imposing transparency, compliance, safety and reporting requirements on certain developers of large frontier artificial intelligence (AI) models, as well as penalties for viola"
+    contentLength: 49695
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: "- **Publishing annual reports** on AI safety in New York, including information about incidents, compliance, and emerging risks - **Broad rulemaking authority** to require additional disclosures or safety measures as AI technology evolves[^30]"
+    fetchedAt: 2026-02-22T02:00:15.901Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.joneswalker.com/en/insights/blogs/ai-law-blog/new-yorks-raise-act-what-frontier-model-developers-need-to-know.html?id=102lzd6
+    linkText: "Jones Walker - New York's RAISE Act: What Frontier Model Developers Need to Know"
+    claimContext: The choice of NYDFS reflects the department's established expertise in cybersecurity enforcement, particularly through its aggressive implementation of Part 500 cybersecurity regulations for financial institutions.[^31]
+    fetchedAt: 2026-02-22T02:00:18.179Z
+    httpStatus: 200
+    pageTitle: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP"
+    contentSnippet: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP Search Menu What can we help you find? Search Menu AI Law and Policy Navigator New York's RAISE Act: What Frontier Model Developers Need to Know By Jason M. Loring January 2, 2026 [ Note : This analysis reflects the RAISE Act as it will be implemented following chapter amendments that Governor Hochul and legislative leaders agreed to when the bill was signed on December 19, 2025. The statute as literally enacted"
+    contentLength: 289836
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: "The New York Attorney General has exclusive enforcement authority under the RAISE Act, with no private right of action for individuals or organizations.[^32] The AG can:"
+    fetchedAt: 2026-02-22T02:00:18.506Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: "- Seek injunctive relief to prevent deployment of dangerous models - Impose civil penalties of up to \\$1 million for first violations and \\$3 million for subsequent violations[^34]"
+    fetchedAt: 2026-02-22T02:00:18.125Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: The Act includes whistleblower protections for employees who report safety concerns or violations to state authorities.[^35] It also voids contractual provisions that would shift liability away from developers or attempt to structure corporate entities in bad faith to evade the law's requirements, a
+    fetchedAt: 2026-02-22T02:00:18.303Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.harrisbeachmurtha.com/insights/new-yorks-raise-acts-implications-for-ai-companies/
+    linkText: Harris Beach - New York's RAISE Act's Implications for AI Companies
+    claimContext: The Act includes whistleblower protections for employees who report safety concerns or violations to state authorities.[^35] It also voids contractual provisions that would shift liability away from developers or attempt to structure corporate entities in bad faith to evade the law's requirements, a
+    fetchedAt: 2026-02-22T02:00:19.944Z
+    httpStatus: 200
+    pageTitle: "New York’s RAISE Act: Key Implications for AI Companies | Harris Beach Murtha"
+    contentSnippet: "New York’s RAISE Act: Key Implications for AI Companies | Harris Beach Murtha Legal Alert January 6, 2026 New York’s RAISE Act&#8217;s Implications for AI Companies Authors and Contacts Brendan M. Palfreyman Share Facebook (Twitter) LinkedIn Email Copy Page Link New York Governor Kathy Hochul recently signed into law the Responsible AI Safety and Education Act (RAISE Act). The law is aimed at regulating the deployment of highly capable artificial intelligence (AI) systems, the so-called &#8220;f"
+    contentLength: 212735
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: The legislation's focus on "critical harm"—including biological weapons, large-scale damage, and autonomous dangerous behavior—aligns with long-standing concerns about catastrophic risks from advanced AI systems.[^37] By requiring developers to proactively assess and mitigate risks before deployment
+    fetchedAt: 2026-02-22T02:00:21.416Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: The Act's specific mention of risks like self-replication and deception reflects emerging technical concerns about AI systems that could resist human control or pursue goals contrary to human values.[^38] Legislative memos supporting the bill cited industry testing that revealed models exhibiting th
+    fetchedAt: 2026-02-22T02:00:21.215Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: The Act's specific mention of risks like self-replication and deception reflects emerging technical concerns about AI systems that could resist human control or pursue goals contrary to human values.[^38] Legislative memos supporting the bill cited industry testing that revealed models exhibiting th
+    fetchedAt: 2026-02-22T02:00:21.724Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.skadden.com/insights/publications/2026/01/new-york-enacts-ai-transparency-law
+    linkText: Skadden - New York Enacts AI Transparency Law
+    claimContext: By mandating publication of safety protocols and requiring incident reporting, the RAISE Act addresses the opacity problem in frontier AI development.[^40] Many leading AI companies had made voluntary commitments to safety practices, but the law makes these commitments legally enforceable and subjec
+    fetchedAt: 2026-02-22T02:00:21.489Z
+    httpStatus: 200
+    pageTitle: New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP
+    contentSnippet: "New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP Skip to content Executive Summary What&rsquo;s new: New York&rsquo;s Responsible AI Safety and Education Act (RAISE Act) was signed into law on December 19, 2025, imposing transparency, compliance, safety and reporting requirements on certain developers of large frontier artificial intelligence (AI) models, as well as penalties for viola"
+    contentLength: 49695
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: By mandating publication of safety protocols and requiring incident reporting, the RAISE Act addresses the opacity problem in frontier AI development.[^40] Many leading AI companies had made voluntary commitments to safety practices, but the law makes these commitments legally enforceable and subjec
+    fetchedAt: 2026-02-22T02:00:21.626Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: While the RAISE Act establishes important safety requirements, it does not directly fund or mandate technical <EntityLink id="alignment">AI alignment</EntityLink> research. The law requires developers to implement transparency and disclosure requirements, including making their safety and security p
+    fetchedAt: 2026-02-22T02:00:22.991Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://fpf.org/blog/the-raise-act-vs-sb-53-a-tale-of-two-frontier-ai-laws/
+    linkText: "Future of Privacy Forum - The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    claimContext: "The RAISE Act was explicitly amended to align with California's Transparency in Frontier AI Act (TFAIA, formerly SB 53), which was enacted in September 2025.[^43] Both laws target frontier AI developers with similar transparency and reporting requirements, but with notable differences:"
+    fetchedAt: 2026-02-22T02:00:22.854Z
+    httpStatus: 200
+    pageTitle: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    contentSnippet: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws FILTER January 8, 2026 Share on Facebook Share on LinkedIn Share on Twitter Share on Google+ --> Share through Email Justine Gluck Policy Analyst, AI Policy and Legislation About Justine Blogs by Justine What the enactment of New York’s RAISE Act reveals compared to California’s SB 53, the nation’s first frontier AI law On December 19, New York Governor Hochul (D) signed the Responsibl"
+    contentLength: 129037
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://fpf.org/blog/the-raise-act-vs-sb-53-a-tale-of-two-frontier-ai-laws/
+    linkText: "Future of Privacy Forum - The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    claimContext: "- Both require written safety protocols and incident reporting - Both establish civil penalties for non-compliance (California caps at \\$1 million per violation)[^44] - Both are enforced by state attorneys general with no private right of action"
+    fetchedAt: 2026-02-22T02:00:23.087Z
+    httpStatus: 200
+    pageTitle: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    contentSnippet: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws FILTER January 8, 2026 Share on Facebook Share on LinkedIn Share on Twitter Share on Google+ --> Share through Email Justine Gluck Policy Analyst, AI Policy and Legislation About Justine Blogs by Justine What the enactment of New York’s RAISE Act reveals compared to California’s SB 53, the nation’s first frontier AI law On December 19, New York Governor Hochul (D) signed the Responsibl"
+    contentLength: 129037
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.alstonprivacy.com/new-york-regulates-large-artificial-intelligence-models/
+    linkText: Alston Privacy - New York Regulates Large Artificial Intelligence Models
+    claimContext: "- **Reporting timeline**: New York requires 72-hour incident reporting, while California allows 15 days for general incidents and 24 hours for imminent harm[^45] - **Oversight structure**: New York creates a dedicated office in the Department of Financial Services with broad rulemaking authority, wh"
+    fetchedAt: 2026-02-22T02:00:23.384Z
+    httpStatus: 200
+    pageTitle: New York Regulates Large Artificial Intelligence Models | Alston & Bird Privacy, Cyber & Data Strategy Blog
+    contentSnippet: New York Regulates Large Artificial Intelligence Models | Alston & Bird Privacy, Cyber & Data Strategy Blog Skip to primary navigation Skip to main content Skip to primary sidebar Skip to secondary sidebar On December 19, 2025, just eight days after President Trump issued an executive order titled “ Ensuring a National Policy Framework for Artificial Intelligence ” to challenge burdensome state laws that regulate artificial intelligence (the “December 2025 EO”), New York Governor Kathy Hochul si
+    contentLength: 112801
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: "- **Reporting timeline**: New York requires 72-hour incident reporting, while California allows 15 days for general incidents and 24 hours for imminent harm[^45] - **Oversight structure**: New York creates a dedicated office in the Department of Financial Services with broad rulemaking authority, wh"
+    fetchedAt: 2026-02-22T02:00:23.097Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://www.skadden.com/insights/publications/2026/01/new-york-enacts-ai-transparency-law
+    linkText: Skadden - New York Enacts AI Transparency Law
+    claimContext: "- **Oversight structure**: New York creates a dedicated office in the Department of Financial Services with broad rulemaking authority, while California has a different implementation structure[^46] - **Revenue threshold**: New York's final amendments included a \\$500 million revenue threshold not p"
+    fetchedAt: 2026-02-22T02:00:24.493Z
+    httpStatus: 200
+    pageTitle: New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP
+    contentSnippet: "New York Enacts AI Transparency Law on Heels of White House Executive Order Aiming to Curb Such State Laws | Insights | Skadden, Arps, Slate, Meagher & Flom LLP Skip to content Executive Summary What&rsquo;s new: New York&rsquo;s Responsible AI Safety and Education Act (RAISE Act) was signed into law on December 19, 2025, imposing transparency, compliance, safety and reporting requirements on certain developers of large frontier artificial intelligence (AI) models, as well as penalties for viola"
+    contentLength: 49695
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: The amendments to bring New York's law closer to California's approach reflect a stated goal of creating a "unified benchmark" among major technology states, rather than imposing conflicting requirements on AI developers.[^48]
+    fetchedAt: 2026-02-22T02:00:24.517Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://progresschamber.org/insights/attack-of-the-clones-ca-sb-1047-ai-raise/
+    linkText: "Progress Chamber - Attack of the Clones: CA SB 1047 & AI RAISE"
+    claimContext: The RAISE Act's focus on regulating the development process rather than post-deployment harms has drawn criticism from some industry groups and commentators. Critics have compared it to California's failed SB 1047 (vetoed by Governor Newsom in September 2024), arguing that mandating pre-deployment s
+    fetchedAt: 2026-02-22T02:00:25.358Z
+    httpStatus: 200
+    pageTitle: "Attack of the Clones: NY’s AI RAISE Act is a Knockoff of California’s SB 1047 - Chamber of Progress"
+    contentSnippet: "Attack of the Clones: NY’s AI RAISE Act is a Knockoff of California’s SB 1047 - Chamber of Progress Skip to the content Insights &bull; Technology Policy &bull; Artificial Intelligence Attack of the Clones NY’s AI RAISE Act is a Knockoff of California’s SB 1047 Published Apr 15, 2025 Issue Area Artificial Intelligence Time to Read 5mins Author Todd O&#039;Boyle Share x-twitter bluesky linkedin-fill Remember California’s SB 1047 , Sen. Scott Wiener&#8217;s ambitious proposal to regulate AI models"
+    contentLength: 133832
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.aei.org/op-eds/why-new-yorks-new-ai-legislation-is-problematic/
+    linkText: American Enterprise Institute - Why New York's New AI Legislation is Problematic
+    claimContext: Some critics contend that attempting to regulate transparency, safety, and liability in a single framework creates a problematic concentration of authority in a single regulator (the Department of Financial Services).[^50] They argue this approach lacks the specialization and nuance needed for effec
+    fetchedAt: 2026-02-22T02:00:26.126Z
+    httpStatus: 200
+    pageTitle: Why New York’s New AI Legislation Is Problematic | American Enterprise Institute - AEI
+    contentSnippet: Why New York’s New AI Legislation Is Problematic | American Enterprise Institute - AEI Why New York’s New AI Legislation Is Problematic Will Rinehart by Will Rinehart Senior Fellow June 11, 2025 Op-Ed | City Journal Technology, Science, and Energy Latest Work 02.19.2026 | The Political Backlash to Data Centers 02.13.2026 | Why Mandating Social Graph Interoperability Is Risky:Written Testimony on HB 1589 02.12.2026 | The Coming Fight to Define the Agentic Web 01.23.2026 | Jagged Intelligence, Jag
+    contentLength: 76361
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: AI safety advocates and some legislators viewed the post-passage amendments as significantly weakening the law's effectiveness. The removal of the deployment ban for high-risk models and the reduction of penalties from \$10 million/\$30 million to \$1 million/\$3 million were seen as industry-influe
+    fetchedAt: 2026-02-22T02:00:24.651Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://fpf.org/blog/the-raise-act-vs-sb-53-a-tale-of-two-frontier-ai-laws/
+    linkText: "Future of Privacy Forum - The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    claimContext: The shift in focus from prohibition to transparency and reporting led some supporters of the original bill to characterize the final version as more of a disclosure regime than a robust safety framework.[^52]
+    fetchedAt: 2026-02-22T02:00:27.248Z
+    httpStatus: 200
+    pageTitle: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws"
+    contentSnippet: "The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws The RAISE Act vs. SB 53: A Tale of Two Frontier AI Laws FILTER January 8, 2026 Share on Facebook Share on LinkedIn Share on Twitter Share on Google+ --> Share through Email Justine Gluck Policy Analyst, AI Policy and Legislation About Justine Blogs by Justine What the enactment of New York’s RAISE Act reveals compared to California’s SB 53, the nation’s first frontier AI law On December 19, New York Governor Hochul (D) signed the Responsibl"
+    contentLength: 129037
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://truyo.com/new-yorks-raise-act-and-the-future-of-u-s-ai-governance/
+    linkText: Truyo - New York's RAISE Act and the Future of U.S. AI Governance
+    claimContext: 'The RAISE Act was signed just days after President Trump issued a December 2025 executive order titled "Ensuring a National Policy Framework for Artificial Intelligence," which challenged state AI laws and called for federal preeminence in AI regulation.[^53] This raises questions about whether New '
+    fetchedAt: 2026-02-22T02:00:28.069Z
+    httpStatus: 200
+    pageTitle: New York’s RAISE Act and the Future of U.S. AI Governance
+    contentSnippet: "New York’s RAISE Act and the Future of U.S. AI Governance Artificial Intelligence New York’s RAISE Act and the Future of U.S. AI Governance New York’s Responsible AI Safety and Education (RAISE) Act was signed on December 19, 2025, days after President Trump issued an executive order aimed at deterring or challenging state AI laws. That sequencing is the story: regardless of federal discomfort with “patchwork” rules, AI governance is still advancing at the state level, especially through disclos"
+    contentLength: 78883
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://www.dwt.com/blogs/artificial-intelligence-law-advisor/2025/12/new-york-raise-act-ai-safety-rules-developers
+    linkText: "Davis Wright Tremaine - New York RAISE Act: AI Safety Rules for Developers"
+    claimContext: 'Legal analysts have noted that the Act may also face First Amendment challenges based on "compelled speech" doctrines, as it requires developers to publish information about their safety protocols and practices.[^54] The ultimate constitutional status of these requirements remains uncertain pending '
+    fetchedAt: 2026-02-22T02:00:27.673Z
+    httpStatus: 200
+    pageTitle: New York Enacts RAISE Act for AI Transparency Amid Federal Preemption Debate | Davis Wright Tremaine
+    contentSnippet: "New York Enacts RAISE Act for AI Transparency Amid Federal Preemption Debate | Davis Wright Tremaine Skip to content People Services Insights About Offices Careers Menu Search Search Perform Search Insights Artificial Intelligence New York Enacts RAISE Act for AI Transparency Amid Federal Preemption Debate New reporting and safety act applicable for large developers of significant models is likely to be challenged by the Trump Administration By Wendy Kearns , Apurva Dharia , and Andrew M. Lewis "
+    contentLength: 54391
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: By focusing on the largest AI companies that have spent over \$100 million in computational resources to train advanced AI models, the RAISE Act targets only the most urgent, severe risks.[^55] This means many AI systems outside these thresholds are not covered by the law's requirements, and dangero
+    fetchedAt: 2026-02-22T02:00:27.781Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://www.nelsonmullins.com/insights/alerts/privacy_and_data_security_alert/all/new-york-laws-raise-the-bar-in-addressing-ai-safety-the-raise-act-and-ai-companion-models
+    linkText: Nelson Mullins - New York Laws RAISE the Bar in Addressing AI Safety
+    claimContext: "The RAISE Act takes effect January 1, 2027, giving developers approximately one year from the signing date to establish compliance programs.[^56] Legal analysts have advised companies potentially subject to the law to begin preparation immediately, including:"
+    fetchedAt: 2026-02-22T02:00:27.431Z
+    httpStatus: 200
+    pageTitle: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models"
+    contentSnippet: "Nelson Mullins - New York Laws “RAISE” the Bar in Addressing AI Safety: The RAISE Act and AI Companion Models Insights Subscribe Insights Subscribe Search Alerts Awards & Recognitions Blogs, Videos & Podcasts Events Features Insights News Service Affordable and Workforce Housing Antitrust Corporate & Securities Cybersecurity & Data Privacy Economic Development Energy Environmental, Health & Safety Government Contracts & Grants Healthcare International Mergers & Acquisitions Real Estate Real Esta"
+    contentLength: 74353
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://www.bestlawfirms.com/articles/new-york-s-raise-act-s-implications-for-ai/7260
+    linkText: Best Law Firms - New York's RAISE Act's Implications for AI
+    claimContext: "- Developing protocols for the 72-hour incident reporting requirement - Identifying which models meet the frontier model definition and compute thresholds[^57]"
+    fetchedAt: 2026-02-22T02:00:30.609Z
+    httpStatus: 200
+    pageTitle: New York’s RAISE Act’s Implications for AI | Best Law Firms
+    contentSnippet: New York’s RAISE Act’s Implications for AI | Best Law Firms This website requires JavaScript in order to bring you the best user experience possible. Please enable the use of scripts in your browser and reload the page. INSIGHTS New York&#x2019;s RAISE Act&#x2019;s Implications for AI Companies In-house legal teams should begin aligning development, compliance, and incident response functions now to ensure readiness ahead of the law&#x2019;s 2026 effective date. Brendan Palfreyman Harris Beach M
+    contentLength: 55388
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://www.joneswalker.com/en/insights/blogs/ai-law-blog/new-yorks-raise-act-what-frontier-model-developers-need-to-know.html?id=102lzd6
+    linkText: "Jones Walker - New York's RAISE Act: What Frontier Model Developers Need to Know"
+    claimContext: "A DFS oversight office is expected to be established through chapter amendments to evaluate large frontier developers and promote transparency, with those amendments set to be enacted in January 2026 to clarify compliance expectations before the effective date.[^58] As of early 2026, the final text "
+    fetchedAt: 2026-02-22T02:00:29.441Z
+    httpStatus: 200
+    pageTitle: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP"
+    contentSnippet: "New York's RAISE Act: What Frontier Model Developers Need to Know | Jones Walker LLP Search Menu What can we help you find? Search Menu AI Law and Policy Navigator New York's RAISE Act: What Frontier Model Developers Need to Know By Jason M. Loring January 2, 2026 [ Note : This analysis reflects the RAISE Act as it will be implemented following chapter amendments that Governor Hochul and legislative leaders agreed to when the bill was signed on December 19, 2025. The statute as literally enacted"
+    contentLength: 289836
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: "A DFS oversight office is expected to be established through chapter amendments to evaluate large frontier developers and promote transparency, with those amendments set to be enacted in January 2026 to clarify compliance expectations before the effective date.[^58] As of early 2026, the final text "
+    fetchedAt: 2026-02-22T02:00:29.619Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://www.mofo.com/resources/insights/260105-new-york-enacts-the-raise-act-regulating-frontier-ai-models
+    linkText: Morrison Foerster - New York Enacts the RAISE Act
+    claimContext: The RAISE Act positions New York as the second state after California to enact comprehensive frontier AI safety legislation, establishing what supporters characterize as a "unified benchmark" for AI regulation among major technology states.[^60] In the absence of federal legislation specifically add
+    fetchedAt: 2026-02-22T02:00:29.470Z
+    httpStatus: 200
+    pageTitle: New York Enacts the RAISE Act Regulating Frontier AI Models
+    contentSnippet: "New York Enacts the RAISE Act Regulating Frontier AI Models Skip to main content Client Alert New York Enacts the RAISE Act Regulating Frontier AI Models 05 Jan 2026 Keep up with the latest legal and industry insights, news, and events from MoFo Sign Up Share menu Facebook Twitter Print LinkedIn Estimated reading time: 2 minutes New York Governor Kathy Hochul signed the Responsible AI Safety and Education Act (RAISE Act) (S6953B /A6453B) on December 19, 2025, establishing New York as the second "
+    contentLength: 94211
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: The law's enactment demonstrates that bipartisan legislative support exists for AI safety regulation, at least at the state level, despite industry lobbying and concerns about economic competitiveness.[^61] The strong public support noted by sponsors (84% of New Yorkers) suggests that AI risk concer
+    fetchedAt: 2026-02-22T02:00:29.392Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://assembly.state.ny.us/mem/Alex-Bores/story/114363
+    linkText: NY Assembly - Assemblymember Bores Statement
+    claimContext: The law's enactment demonstrates that bipartisan legislative support exists for AI safety regulation, at least at the state level, despite industry lobbying and concerns about economic competitiveness.[^61] The strong public support noted by sponsors (84% of New Yorkers) suggests that AI risk concer
+    fetchedAt: 2026-02-22T02:00:31.916Z
+    httpStatus: 200
+    pageTitle: Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly
+    contentSnippet: "Alex Bores - Assembly District 73 |Assembly Member Directory | New York State Assembly Skip to main content Albany, NY – Both houses of the New York State Legislature approved landmark legislation today that requires the largest artificial intelligence (AI) developers to develop a safety plan to protect against automated crime, bioweapons and other widespread harm and risks to public safety. The Responsible AI Safety and Education (RAISE) Act ( S6953B/A6453B ), sponsored by State Senator Andrew "
+    contentLength: 14649
+    status: verified
+    note: null

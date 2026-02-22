@@ -1,0 +1,1063 @@
+pageId: polymarket
+verifiedAt: 2026-02-22
+totalCitations: 96
+verified: 82
+broken: 14
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://docs.polymarket.com/polymarket-learn/get-started/what-is-polymarket
+    linkText: What is Polymarket? - Polymarket Learn
+    claimContext: Polymarket is the world's largest prediction market platform, a decentralized protocol built on the Polygon blockchain that allows users to buy and sell shares in the outcomes of real-world events across politics, sports, economics, and entertainment.[^1] Users trade peer-to-peer using USDC stableco
+    fetchedAt: 2026-02-22T01:46:20.599Z
+    httpStatus: 200
+    pageTitle: What is Polymarket | Polymarket Help Center
+    contentSnippet: What is Polymarket | Polymarket Help Center Skip to main content Table of contents All Collections Getting Started What is Polymarket What is Polymarket Polymarket is the world’s largest prediction market, allowing you to stay informed and profit from your knowledge by betting on future events across various topics. Updated over a month ago Table of contents Studies show prediction markets are often more accurate than pundits because they combine news, polls, and expert opinions into a single va
+    contentLength: 69475
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://atomicwallet.io/academy/articles/what-is-polymarket
+    linkText: What is Polymarket? - Atomic Wallet
+    claimContext: Polymarket is the world's largest prediction market platform, a decentralized protocol built on the Polygon blockchain that allows users to buy and sell shares in the outcomes of real-world events across politics, sports, economics, and entertainment.[^1] Users trade peer-to-peer using USDC stableco
+    fetchedAt: 2026-02-22T01:46:20.091Z
+    httpStatus: 200
+    pageTitle: What is Polymarket? An Overview of the Prediction Platform
+    contentSnippet: What is Polymarket? An Overview of the Prediction Platform Buy Crypto Stake & Earn Ethereum Solana Cardano Kava Polygon Near Zilliqa Cosmos Tezos Tron All Assets Products Mobile Wallet Desktop Wallet Web3 Wallet Gift Cards DApps Store Private AI Browser Secure Email AML Software OpenClaw Bot Download Support Contact Support Blog Academy Top 21 Crypto To Stake What is a Crypto Wallet Top 10 Altcoins in 2023 What is ТRX? What is Optimism Blockchain? What is КАVA? Download News Memecoins Crypto Pro
+    contentLength: 160805
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.youtube.com/watch?v=4XHZ7Z8siIU
+    linkText: Polymarket Explained - YouTube
+    claimContext: Polymarket is the world's largest prediction market platform, a decentralized protocol built on the Polygon blockchain that allows users to buy and sell shares in the outcomes of real-world events across politics, sports, economics, and entertainment.[^1] Users trade peer-to-peer using USDC stableco
+    fetchedAt: 2026-02-22T01:46:19.600Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 4
+    url: https://docs.polymarket.com/polymarket-learn/FAQ/what-are-prediction-markets
+    linkText: What are Prediction Markets? - Polymarket FAQ
+    claimContext: Founded in 2020 by Shayne Coplan, Polymarket positions itself as providing accurate, unbiased, and real-time probabilities for significant events by leveraging prediction markets where participants are financially incentivized to forecast truthfully.[^4] The platform emphasizes global, anonymous, tr
+    fetchedAt: 2026-02-22T01:46:20.067Z
+    httpStatus: 200
+    pageTitle: What is a Prediction Market? | Polymarket Help Center
+    contentSnippet: What is a Prediction Market? | Polymarket Help Center Skip to main content Table of contents All Collections FAQs What is a Prediction Market? What is a Prediction Market? How people collectively forecast the future. Updated over a month ago Table of contents A prediction market is a platform where people can bet on the outcome of future events. By buying and selling shares in the outcomes, participants collectively forecast the likelihood of events such as sports results, political elections, o
+    contentLength: 63953
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://tokenterminal.com/explorer/projects/polymarket
+    linkText: Polymarket - Token Terminal
+    claimContext: Founded in 2020 by Shayne Coplan, Polymarket positions itself as providing accurate, unbiased, and real-time probabilities for significant events by leveraging prediction markets where participants are financially incentivized to forecast truthfully.[^4] The platform emphasizes global, anonymous, tr
+    fetchedAt: 2026-02-22T01:46:19.710Z
+    httpStatus: 200
+    pageTitle: Polymarket overview | Token Terminal
+    contentSnippet: Polymarket overview | Token Terminal We use some essential cookies to make this website work. We&#x27;d like to set additional cookies to understand how you use tokenterminal.com and remember your settings. Learn more Allow all Disable all
+    contentLength: 38047
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://news.polymarket.com/p/how-accurate-is-polymarket
+    linkText: How Accurate is Polymarket?
+    claimContext: Founded in 2020 by Shayne Coplan, Polymarket positions itself as providing accurate, unbiased, and real-time probabilities for significant events by leveraging prediction markets where participants are financially incentivized to forecast truthfully.[^4] The platform emphasizes global, anonymous, tr
+    fetchedAt: 2026-02-22T01:46:21.997Z
+    httpStatus: 200
+    pageTitle: 🔮 How Accurate is Polymarket? - The Oracle by Polymarket
+    contentSnippet: "🔮 How Accurate is Polymarket? - The Oracle by Polymarket Subscribe Sign in 🔮 How Accurate is Polymarket? Our quant speaks Polymarket Mar 20, 2025 20 3 5 Share 🔮 The following is an interview with Alex McCullough , an NYC-based on-chain analyst who built a data dashboard for tracking the accuracy of Polymarket odds over time. Follow Alex on X . Share The Oracle by Polymarket The Oracle: Where did the idea come from? I was looking to branch out in the industry and skill up a bit. I settled on l"
+    contentLength: 235347
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.allied.vc/articles/polymarket-case-study-prediction-markets-lessons-founders-investors
+    linkText: Polymarket Case Study - Allied VC
+    claimContext: By late 2025, Polymarket had processed over \$8 billion in predictions during 2024 alone, with monthly volumes exceeding \$13.5 billion and 43 million transactions by November 2025.[^7] The platform achieved mainstream recognition during the 2024 U.S. presidential election, where it outperformed tra
+    fetchedAt: 2026-02-22T01:46:22.584Z
+    httpStatus: 200
+    pageTitle: "Startup to $8B: A Polymarket Case Study &mdash; Allied Venture Partners"
+    contentSnippet: "Startup to $8B: A Polymarket Case Study &mdash; Allied Venture Partners 0 From Startup to $8B Valuation: A Polymarket Case Study on the Lifecycle of Prediction Markets and Timeless Lessons for Founders and Investors Oct 13 Written By Matthew Wilson Polymarket ’s rise to an $8 billion valuation offers a roadmap for navigating fintech challenges. Launched in 2020, the platform overcame regulatory penalties, exited the U.S., and expanded globally. By leveraging blockchain technology, simplifying us"
+    contentLength: 165664
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://forum.effectivealtruism.org/topics/forecasting
+    linkText: EA Forum - Forecasting Topic
+    claimContext: By late 2025, Polymarket had processed over \$8 billion in predictions during 2024 alone, with monthly volumes exceeding \$13.5 billion and 43 million transactions by November 2025.[^7] The platform achieved mainstream recognition during the 2024 U.S. presidential election, where it outperformed tra
+    fetchedAt: 2026-02-22T01:46:24.586Z
+    httpStatus: 200
+    pageTitle: Forecasting - EA Forum
+    contentSnippet: Forecasting - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Forecasting Forecasting Discussion of forecasting methods, as well as specific forecasts relevant to doing good Posts Wiki Write new Subscribe New & upvoted 23 Is benchmarking AI capabilities positive EV? Q Charlie_Guthmann Charlie_Guthmann · 4d ago · 1 m read 4 4 66 AI benchmarking has a Y-axis problem Lizka Lizka · 16d ago · 9 m read 2 2 80 Are t
+    contentLength: 482077
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://insights4vc.substack.com/p/polymarket-raises-2b-at-9b-valuation
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Insights4VC
+    claimContext: By late 2025, Polymarket had processed over \$8 billion in predictions during 2024 alone, with monthly volumes exceeding \$13.5 billion and 43 million transactions by November 2025.[^7] The platform achieved mainstream recognition during the 2024 U.S. presidential election, where it outperformed tra
+    fetchedAt: 2026-02-22T01:46:22.004Z
+    httpStatus: 200
+    pageTitle: Polymarket Raises $2B at $9B Valuation - insights4vc
+    contentSnippet: Polymarket Raises $2B at $9B Valuation - insights4vc Subscribe Sign in Polymarket Raises $2B at $9B Valuation insights4vc Oct 09, 2025 48 1 Share Polymarket was launched in mid-2020 by founder Shayne Coplan, at the time a 21-year-old New York University dropout. The startup, incorporated as Blockratize, Inc. in Delaware, debuted its prediction market platform in June 2020. Early markets let users bet on topics like cryptocurrency prices, COVID-19 case counts, and the 2020 U.S. election. The vent
+    contentLength: 309909
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://canvasbusinessmodel.com/blogs/brief-history/polymarket-brief-history
+    linkText: Polymarket - Brief History - Canvas Business Model
+    claimContext: Polymarket was founded by Shayne Coplan, a New York University dropout, in 2020 at age 21.[^10] Coplan launched the platform from what he described as a "makeshift bathroom office" in his Lower East Side apartment during the COVID-19 pandemic.[^11] Initially operating under names like Union.market o
+    fetchedAt: 2026-02-22T01:46:22.348Z
+    httpStatus: 200
+    pageTitle: What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com
+    contentSnippet: "What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com Skip to content What is the Brief History of Polymarket Company? July 12, 2025 POLYMARKET BUNDLE Get the Full Package: 5 Forces $15 $10 BCG Matrix $15 $10 Canvas $15 $10 Marketing Mix $15 $10 PESTLE $15 $10 SWOT Analysis $15 $10 TOTAL: ADD TO CART How Did Polymarket Rise to Crypto Prediction Market Dominance? Launched in the volatile year of 2020, Polymarket, a Polymarket Canvas Business Model , quickly captured attenti"
+    contentLength: 313540
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.marketswiki.com/wiki/Polymarket
+    linkText: Polymarket - MarketSWiki
+    claimContext: Polymarket was founded by Shayne Coplan, a New York University dropout, in 2020 at age 21.[^10] Coplan launched the platform from what he described as a "makeshift bathroom office" in his Lower East Side apartment during the COVID-19 pandemic.[^11] Initially operating under names like Union.market o
+    fetchedAt: 2026-02-22T01:46:26.844Z
+    httpStatus: 200
+    pageTitle: Polymarket - MarketsWiki, A Commonwealth of Market Knowledge
+    contentSnippet: Polymarket - MarketsWiki, A Commonwealth of Market Knowledge Polymarket From MarketsWiki Jump to navigation Jump to search Members Registration Investors Careers Become a sponsor &#187; Polymarket Founded 2020 Headquarters New York City Key People Shayne Coplan , CEO Products Prediction market LinkedIn Profile Website https://polymarket.com Polymarket is a New York-based cryptocurrency prediction market platform founded in 2020 that enables users to buy and sell shares tied to the outcome of fut
+    contentLength: 53626
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.odaily.news/en/post/5206978
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Odaily
+    claimContext: Polymarket was founded by Shayne Coplan, a New York University dropout, in 2020 at age 21.[^10] Coplan launched the platform from what he described as a "makeshift bathroom office" in his Lower East Side apartment during the COVID-19 pandemic.[^11] Initially operating under names like Union.market o
+    fetchedAt: 2026-02-22T01:46:26.954Z
+    httpStatus: 200
+    pageTitle: "From rags to riches: The life of the Polymarket founder - Odaily"
+    contentSnippet: "From rags to riches: The life of the Polymarket founder - Odaily BTC ETH HTX SOL BNB View Market 简中 繁中 English 日本語 한국어 ภาษาไทย Tiếng Việt From rags to riches: The life of the Polymarket founder Foresight News 特邀专栏作者 2025-10-21 13:00 This article is about 4917 words, reading the full article takes about 8 minutes A project started in the bathroom by a poor dropout eventually became part of the mainstream system on Wall Street. AI Summary Expand 核心观点： Polymarket预测市场从草根逆袭成主流。 关键要素： 2024年大选预测准确率超传统民"
+    contentLength: 149150
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.britannica.com/money/Polymarket
+    linkText: Polymarket - Britannica
+    claimContext: The platform officially launched in June 2020, coinciding with both the COVID-19 pandemic and the U.S. presidential election.[^13] Coplan's vision was to "democratize foresight" through open, auditable, censorship-resistant event markets covering topics from crypto prices to elections and world even
+    fetchedAt: 2026-02-22T01:46:26.761Z
+    httpStatus: 200
+    pageTitle: Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money
+    contentSnippet: "Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money Table of Contents Introduction 2020: From information source to speculative platform Navigating the competitive landscape 2023: Titan dispute 2024–25: Funding, election volumes, and regulatory scrutiny 2025: From scrutiny to mainstream scaling Polymarket legacy Read More JPMorgan Chase & Co. business organization Fidelity Investments Table Of Contents Polymarket American prediction market platform Print Cite Sh"
+    contentLength: 156215
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://canvasbusinessmodel.com/blogs/brief-history/polymarket-brief-history
+    linkText: Polymarket - Brief History - Canvas Business Model
+    claimContext: The platform officially launched in June 2020, coinciding with both the COVID-19 pandemic and the U.S. presidential election.[^13] Coplan's vision was to "democratize foresight" through open, auditable, censorship-resistant event markets covering topics from crypto prices to elections and world even
+    fetchedAt: 2026-02-22T01:46:26.085Z
+    httpStatus: 200
+    pageTitle: What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com
+    contentSnippet: "What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com Skip to content What is the Brief History of Polymarket Company? July 12, 2025 POLYMARKET BUNDLE Get the Full Package: 5 Forces $15 $10 BCG Matrix $15 $10 Canvas $15 $10 Marketing Mix $15 $10 PESTLE $15 $10 SWOT Analysis $15 $10 TOTAL: ADD TO CART How Did Polymarket Rise to Crypto Prediction Market Dominance? Launched in the volatile year of 2020, Polymarket, a Polymarket Canvas Business Model , quickly captured attenti"
+    contentLength: 313540
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://canvasbusinessmodel.com/blogs/brief-history/polymarket-brief-history
+    linkText: Polymarket - Brief History - Canvas Business Model
+    claimContext: The platform officially launched in June 2020, coinciding with both the COVID-19 pandemic and the U.S. presidential election.[^13] Coplan's vision was to "democratize foresight" through open, auditable, censorship-resistant event markets covering topics from crypto prices to elections and world even
+    fetchedAt: 2026-02-22T01:46:26.265Z
+    httpStatus: 200
+    pageTitle: What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com
+    contentSnippet: "What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com Skip to content What is the Brief History of Polymarket Company? July 12, 2025 POLYMARKET BUNDLE Get the Full Package: 5 Forces $15 $10 BCG Matrix $15 $10 Canvas $15 $10 Marketing Mix $15 $10 PESTLE $15 $10 SWOT Analysis $15 $10 TOTAL: ADD TO CART How Did Polymarket Rise to Crypto Prediction Market Dominance? Launched in the volatile year of 2020, Polymarket, a Polymarket Canvas Business Model , quickly captured attenti"
+    contentLength: 313540
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://insights4vc.substack.com/p/polymarket-raises-2b-at-9b-valuation
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Insights4VC
+    claimContext: In March 2021, the company completed a \$24.84 million Series A round, with post-money valuation speculated in the low hundreds of millions.[^16]
+    fetchedAt: 2026-02-22T01:46:28.069Z
+    httpStatus: 200
+    pageTitle: Polymarket Raises $2B at $9B Valuation - insights4vc
+    contentSnippet: Polymarket Raises $2B at $9B Valuation - insights4vc Subscribe Sign in Polymarket Raises $2B at $9B Valuation insights4vc Oct 09, 2025 48 1 Share Polymarket was launched in mid-2020 by founder Shayne Coplan, at the time a 21-year-old New York University dropout. The startup, incorporated as Blockratize, Inc. in Delaware, debuted its prediction market platform in June 2020. Early markets let users bet on topics like cryptocurrency prices, COVID-19 case counts, and the 2020 U.S. election. The vent
+    contentLength: 309909
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://canvasbusinessmodel.com/blogs/brief-history/polymarket-brief-history
+    linkText: Polymarket - Brief History - Canvas Business Model
+    claimContext: Polymarket's growth trajectory was disrupted by regulatory scrutiny. In October 2021, the U.S. Commodity Futures Trading Commission (CFTC) began investigating the platform.[^17] This investigation culminated in January 2022 when the CFTC fined Polymarket \$1.4 million and issued a cease-and-desist o
+    fetchedAt: 2026-02-22T01:46:28.076Z
+    httpStatus: 200
+    pageTitle: What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com
+    contentSnippet: "What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com Skip to content What is the Brief History of Polymarket Company? July 12, 2025 POLYMARKET BUNDLE Get the Full Package: 5 Forces $15 $10 BCG Matrix $15 $10 Canvas $15 $10 Marketing Mix $15 $10 PESTLE $15 $10 SWOT Analysis $15 $10 TOTAL: ADD TO CART How Did Polymarket Rise to Crypto Prediction Market Dominance? Launched in the volatile year of 2020, Polymarket, a Polymarket Canvas Business Model , quickly captured attenti"
+    contentLength: 313540
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://en.wikipedia.org/wiki/Polymarket
+    linkText: Polymarket - Wikipedia
+    claimContext: Polymarket's growth trajectory was disrupted by regulatory scrutiny. In October 2021, the U.S. Commodity Futures Trading Commission (CFTC) began investigating the platform.[^17] This investigation culminated in January 2022 when the CFTC fined Polymarket \$1.4 million and issued a cease-and-desist o
+    fetchedAt: 2026-02-22T01:46:28.001Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://en.wikipedia.org/wiki/Polymarket
+    linkText: Polymarket - Wikipedia
+    claimContext: Polymarket's growth trajectory was disrupted by regulatory scrutiny. In October 2021, the U.S. Commodity Futures Trading Commission (CFTC) began investigating the platform.[^17] This investigation culminated in January 2022 when the CFTC fined Polymarket \$1.4 million and issued a cease-and-desist o
+    fetchedAt: 2026-02-22T01:46:28.002Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 20
+    url: https://forum.effectivealtruism.org/posts/n74RBx2jdoxuqoywm/forecasting-newsletter-january-2022
+    linkText: Forecasting Newsletter January 2022 - EA Forum
+    claimContext: "Following the settlement, Polymarket relocated operations to Panama and implemented measures prohibiting U.S. users and VPN circumvention.[^20] Despite these restrictions, enforcement remained weak, and the platform continued to attract global users. In May 2022, Polymarket appointed J. Christopher "
+    fetchedAt: 2026-02-22T01:46:28.018Z
+    httpStatus: 200
+    pageTitle: "Forecasting Newsletter: January 2022 — EA Forum"
+    contentSnippet: "Forecasting Newsletter: January 2022 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Forecasting Newsletter Forecasting Newsletter: January 2022 by NunoSempere Feb 3 2022 7 min read 1 16 Forecasting Forecasting Newsletter Frontpage Forecasting Newsletter: January 2022 Highlights Index Prediction Markets & Forecasting Platforms Polymarket Manifold Markets CSET-Foretell is now INFER Met"
+    contentLength: 242062
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://en.wikipedia.org/wiki/Polymarket
+    linkText: Polymarket - Wikipedia
+    claimContext: "Following the settlement, Polymarket relocated operations to Panama and implemented measures prohibiting U.S. users and VPN circumvention.[^20] Despite these restrictions, enforcement remained weak, and the platform continued to attract global users. In May 2022, Polymarket appointed J. Christopher "
+    fetchedAt: 2026-02-22T01:46:29.110Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 22
+    url: https://insights4vc.substack.com/p/polymarket-raises-2b-at-9b-valuation
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Insights4VC
+    claimContext: During this period, Polymarket continued raising capital. In October 2024, the company completed a \$50 million Series B round at an estimated \$500-600 million valuation.[^22] By July 2024, the platform recorded \$387 million in monthly trading volume.[^23]
+    fetchedAt: 2026-02-22T01:46:29.169Z
+    httpStatus: 200
+    pageTitle: Polymarket Raises $2B at $9B Valuation - insights4vc
+    contentSnippet: Polymarket Raises $2B at $9B Valuation - insights4vc Subscribe Sign in Polymarket Raises $2B at $9B Valuation insights4vc Oct 09, 2025 48 1 Share Polymarket was launched in mid-2020 by founder Shayne Coplan, at the time a 21-year-old New York University dropout. The startup, incorporated as Blockratize, Inc. in Delaware, debuted its prediction market platform in June 2020. Early markets let users bet on topics like cryptocurrency prices, COVID-19 case counts, and the 2020 U.S. election. The vent
+    contentLength: 309909
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://canvasbusinessmodel.com/blogs/brief-history/polymarket-brief-history
+    linkText: Polymarket - Brief History - Canvas Business Model
+    claimContext: During this period, Polymarket continued raising capital. In October 2024, the company completed a \$50 million Series B round at an estimated \$500-600 million valuation.[^22] By July 2024, the platform recorded \$387 million in monthly trading volume.[^23]
+    fetchedAt: 2026-02-22T01:46:29.235Z
+    httpStatus: 200
+    pageTitle: What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com
+    contentSnippet: "What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com Skip to content What is the Brief History of Polymarket Company? July 12, 2025 POLYMARKET BUNDLE Get the Full Package: 5 Forces $15 $10 BCG Matrix $15 $10 Canvas $15 $10 Marketing Mix $15 $10 PESTLE $15 $10 SWOT Analysis $15 $10 TOTAL: ADD TO CART How Did Polymarket Rise to Crypto Prediction Market Dominance? Launched in the volatile year of 2020, Polymarket, a Polymarket Canvas Business Model , quickly captured attenti"
+    contentLength: 313540
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.allied.vc/articles/polymarket-case-study-prediction-markets-lessons-founders-investors
+    linkText: Polymarket Case Study - Allied VC
+    claimContext: The 2024 U.S. presidential election marked a turning point for Polymarket. The platform experienced a 48x surge in trading volume, with over \$8 billion in predictions made during 2024.[^24] Research published in May 2024 found that Polymarket outperformed traditional polling in predicting the elect
+    fetchedAt: 2026-02-22T01:46:29.589Z
+    httpStatus: 200
+    pageTitle: "Startup to $8B: A Polymarket Case Study &mdash; Allied Venture Partners"
+    contentSnippet: "Startup to $8B: A Polymarket Case Study &mdash; Allied Venture Partners 0 From Startup to $8B Valuation: A Polymarket Case Study on the Lifecycle of Prediction Markets and Timeless Lessons for Founders and Investors Oct 13 Written By Matthew Wilson Polymarket ’s rise to an $8 billion valuation offers a roadmap for navigating fintech challenges. Launched in 2020, the platform overcame regulatory penalties, exited the U.S., and expanded globally. By leveraging blockchain technology, simplifying us"
+    contentLength: 165664
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://nexteventhorizon.substack.com/p/what-five-new-academic-papers-say-prediction-markets
+    linkText: What Five Academic Papers Say About Prediction Markets - Next Event Horizon
+    claimContext: The 2024 U.S. presidential election marked a turning point for Polymarket. The platform experienced a 48x surge in trading volume, with over \$8 billion in predictions made during 2024.[^24] Research published in May 2024 found that Polymarket outperformed traditional polling in predicting the elect
+    fetchedAt: 2026-02-22T01:46:29.630Z
+    httpStatus: 200
+    pageTitle: What Five New Academic Papers Say About Prediction Markets
+    contentSnippet: What Five New Academic Papers Say About Prediction Markets Subscribe Sign in What Five New Academic Papers Say About Prediction Markets A closer look at 'Are Betting Markets Better than Polling,' 'Exchanges are Using Federal Derivatives Law to Provide Gambling Products to Retail Traders' and more Dustin Gouker Jul 17, 2025 5 1 Share I am not sure what this has to do with academia but I figured I needed a gif to get some of you to read a post all about academic papers. Prediction markets are havi
+    contentLength: 203611
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.mexc.com/news/359822
+    linkText: Polymarket - MEXC News
+    claimContext: One notable trader earned \$85 million in net profit on election night, highlighting both the platform's liquidity and the potential returns for accurate forecasting.[^26] This success attracted significant media attention and positioned Polymarket as a credible alternative to traditional polling me
+    fetchedAt: 2026-02-22T01:46:31.025Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 27
+    url: https://en.wikipedia.org/wiki/Polymarket
+    linkText: Polymarket - Wikipedia
+    claimContext: In May 2024, Polymarket raised \$70 million across two rounds (\$25 million Series A led by General Catalyst and \$45 million Series B led by <EntityLink id="founders-fund">Founders Fund</EntityLink>), with participation from Ethereum co-founder Vitalik Buterin.[^27] The funding rounds valued the co
+    fetchedAt: 2026-02-22T01:46:30.637Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 28
+    url: https://canvasbusinessmodel.com/blogs/brief-history/polymarket-brief-history
+    linkText: Polymarket - Brief History - Canvas Business Model
+    claimContext: In May 2024, Polymarket raised \$70 million across two rounds (\$25 million Series A led by General Catalyst and \$45 million Series B led by <EntityLink id="founders-fund">Founders Fund</EntityLink>), with participation from Ethereum co-founder Vitalik Buterin.[^27] The funding rounds valued the co
+    fetchedAt: 2026-02-22T01:46:30.744Z
+    httpStatus: 200
+    pageTitle: What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com
+    contentSnippet: "What is Brief History of Polymarket Company? &ndash; CanvasBusinessModel.com Skip to content What is the Brief History of Polymarket Company? July 12, 2025 POLYMARKET BUNDLE Get the Full Package: 5 Forces $15 $10 BCG Matrix $15 $10 Canvas $15 $10 Marketing Mix $15 $10 PESTLE $15 $10 SWOT Analysis $15 $10 TOTAL: ADD TO CART How Did Polymarket Rise to Crypto Prediction Market Dominance? Launched in the volatile year of 2020, Polymarket, a Polymarket Canvas Business Model , quickly captured attenti"
+    contentLength: 313540
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.britannica.com/money/Polymarket
+    linkText: Polymarket - Britannica
+    claimContext: July 2025 marked a major regulatory victory when the U.S. Department of Justice and CFTC terminated their investigation with no charges filed.[^29] Polymarket capitalized on this by acquiring QCEX, a CFTC-licensed exchange and clearinghouse, for \$112 million, enabling legal U.S. operations.[^30] In
+    fetchedAt: 2026-02-22T01:46:30.934Z
+    httpStatus: 200
+    pageTitle: Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money
+    contentSnippet: "Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money Table of Contents Introduction 2020: From information source to speculative platform Navigating the competitive landscape 2023: Titan dispute 2024–25: Funding, election volumes, and regulatory scrutiny 2025: From scrutiny to mainstream scaling Polymarket legacy Read More JPMorgan Chase & Co. business organization Fidelity Investments Table Of Contents Polymarket American prediction market platform Print Cite Sh"
+    contentLength: 156215
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.britannica.com/money/Polymarket
+    linkText: Polymarket - Britannica
+    claimContext: July 2025 marked a major regulatory victory when the U.S. Department of Justice and CFTC terminated their investigation with no charges filed.[^29] Polymarket capitalized on this by acquiring QCEX, a CFTC-licensed exchange and clearinghouse, for \$112 million, enabling legal U.S. operations.[^30] In
+    fetchedAt: 2026-02-22T01:46:31.081Z
+    httpStatus: 200
+    pageTitle: Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money
+    contentSnippet: "Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money Table of Contents Introduction 2020: From information source to speculative platform Navigating the competitive landscape 2023: Titan dispute 2024–25: Funding, election volumes, and regulatory scrutiny 2025: From scrutiny to mainstream scaling Polymarket legacy Read More JPMorgan Chase & Co. business organization Fidelity Investments Table Of Contents Polymarket American prediction market platform Print Cite Sh"
+    contentLength: 156215
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.britannica.com/money/Polymarket
+    linkText: Polymarket - Britannica
+    claimContext: July 2025 marked a major regulatory victory when the U.S. Department of Justice and CFTC terminated their investigation with no charges filed.[^29] Polymarket capitalized on this by acquiring QCEX, a CFTC-licensed exchange and clearinghouse, for \$112 million, enabling legal U.S. operations.[^30] In
+    fetchedAt: 2026-02-22T01:46:32.252Z
+    httpStatus: 200
+    pageTitle: Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money
+    contentSnippet: "Polymarket | Founding, Growth, Investors, & Top Prediction Markets | Britannica Money Table of Contents Introduction 2020: From information source to speculative platform Navigating the competitive landscape 2023: Titan dispute 2024–25: Funding, election volumes, and regulatory scrutiny 2025: From scrutiny to mainstream scaling Polymarket legacy Read More JPMorgan Chase & Co. business organization Fidelity Investments Table Of Contents Polymarket American prediction market platform Print Cite Sh"
+    contentLength: 156215
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.odaily.news/en/post/5206978
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Odaily
+    claimContext: The regulatory green light attracted unprecedented investment. On October 8, 2025, Intercontinental Exchange (ICE) invested \$2 billion at an \$8-9 billion valuation, making Polymarket one of the most valuable prediction market platforms globally.[^32] This investment came with a strategic partnersh
+    fetchedAt: 2026-02-22T01:46:33.721Z
+    httpStatus: 200
+    pageTitle: "From rags to riches: The life of the Polymarket founder - Odaily"
+    contentSnippet: "From rags to riches: The life of the Polymarket founder - Odaily BTC ETH HTX SOL BNB View Market 简中 繁中 English 日本語 한국어 ภาษาไทย Tiếng Việt From rags to riches: The life of the Polymarket founder Foresight News 特邀专栏作者 2025-10-21 13:00 This article is about 4917 words, reading the full article takes about 8 minutes A project started in the bathroom by a poor dropout eventually became part of the mainstream system on Wall Street. AI Summary Expand 核心观点： Polymarket预测市场从草根逆袭成主流。 关键要素： 2024年大选预测准确率超传统民"
+    contentLength: 149150
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://ir.theice.com/press/news-details/2025/ICE-Announces-Strategic-Investment-in-Polymarket/default.aspx
+    linkText: ICE Announces Strategic Investment in Polymarket
+    claimContext: The regulatory green light attracted unprecedented investment. On October 8, 2025, Intercontinental Exchange (ICE) invested \$2 billion at an \$8-9 billion valuation, making Polymarket one of the most valuable prediction market platforms globally.[^32] This investment came with a strategic partnersh
+    fetchedAt: 2026-02-22T01:46:32.555Z
+    httpStatus: 200
+    pageTitle: Intercontinental Exchange - ICE Announces Strategic Investment in Polymarket
+    contentSnippet: Intercontinental Exchange - ICE Announces Strategic Investment in Polymarket Skip to main content ICE NYSE WebICE Login Menu View all news ICE Announces Strategic Investment in Polymarket Oct 07, 2025 Download PDF PDF Format (opens in new window) PDF 120 KB ICE to Become Distributor of Polymarket Data to Institutional Investors Globally ATLANTA & NEW YORK--(BUSINESS WIRE)-- Intercontinental Exchange, Inc. (NYSE:ICE), a leading global provider of technology and data, today announced a strategic i
+    contentLength: 73671
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.cbsnews.com/news/polymarket-ceo-shayne-coplan-online-betting-platform-60-minutes-transcript/
+    linkText: Polymarket CEO Shayne Coplan - 60 Minutes Transcript
+    claimContext: In August 2025, Donald Trump Jr. joined Polymarket's advisory board via his 1789 Capital fund, which also invested approximately \$10 million in the platform.[^34] Combined with record trading volumes—\$10 billion in November 2025 across sports, politics, and macroeconomics—Polymarket positioned its
+    fetchedAt: 2026-02-22T01:46:32.496Z
+    httpStatus: 200
+    pageTitle: Meet Polymarket CEO Shayne Coplan, the college dropout turned billionaire behind the online betting platform - CBS News
+    contentSnippet: Meet Polymarket CEO Shayne Coplan, the college dropout turned billionaire behind the online betting platform - CBS News Watch CBS News Nearly a year before Donald Trump was elected in 2024, an online prediction market &mdash; called Polymarket &mdash; offered its users a chance to bet against each other on who would win the presidency. $3.6 billion was wagered on that one question. In the final month of the campaign, most pollsters were saying the race was too close to call. But that was "conven
+    contentLength: 650700
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://rareevo.io/rare-network-news/kalshi-polymarket-record-november-volume
+    linkText: Kalshi Polymarket Record November Volume - RareEvo
+    claimContext: In August 2025, Donald Trump Jr. joined Polymarket's advisory board via his 1789 Capital fund, which also invested approximately \$10 million in the platform.[^34] Combined with record trading volumes—\$10 billion in November 2025 across sports, politics, and macroeconomics—Polymarket positioned its
+    fetchedAt: 2026-02-22T01:46:33.060Z
+    httpStatus: 200
+    pageTitle: Kalshi and Polymarket Hit Record 10 Billion Dollar Volume
+    contentSnippet: Kalshi and Polymarket Hit Record 10 Billion Dollar Volume Kalshi and Polymarket Hit Record 10 Billion Dollar Volume Devryn December 1, 2025 1,967 views Share Kalshi and Polymarket Post Record Volume as Prediction Markets Hit Nearly $10 Billion in November Prediction markets are entering their strongest era to date. In November 2025, Kalshi and Polymarket collectively recorded nearly 10 billion dollars in trading volume, marking the most active month in the history of the sector. This surge shows
+    contentLength: 201398
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.mlssoccer.com/news/soccer-united-marketing-and-polymarket-announce-multi-year-partnerships-with-major-league-soccer-and-leagues-cup
+    linkText: MLS and Polymarket Announce Multi-Year Partnership
+    claimContext: By late 2025, Polymarket had established major partnerships including agreements with Major League Soccer (MLS) and Leagues Cup (announced January 26, 2026), the New York Rangers, UFC and Zuffa Boxing, and PrizePicks (announced November 11, 2025).[^36] The platform also announced an official partner
+    fetchedAt: 2026-02-22T01:46:35.410Z
+    httpStatus: 200
+    pageTitle: Soccer United Marketing and Polymarket Announce Multi-Year Partnerships with Major League Soccer and Leagues Cup | MLSSoccer.com
+    contentSnippet: Soccer United Marketing and Polymarket Announce Multi-Year Partnerships with Major League Soccer and Leagues Cup | MLSSoccer.com Skip to main content MLS is Back! Watch MLS on Apple TV. Subscribe Learn More Media Resources Soccer United Marketing and Polymarket Announce Multi-Year Partnerships with Major League Soccer and Leagues Cup MLS Communications Copy URL Share on Facebook Share on X Key Insights Polymarket becomes an Official Partner of Major League Soccer and an Official Partner of Leagu
+    contentLength: 248859
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.prnewswire.com/news-releases/polymarket-and--announce-official-prediction-market-partnership-302475432.html
+    linkText: Polymarket and X Announce Official Prediction Market Partnership
+    claimContext: By late 2025, Polymarket had established major partnerships including agreements with Major League Soccer (MLS) and Leagues Cup (announced January 26, 2026), the New York Rangers, UFC and Zuffa Boxing, and PrizePicks (announced November 11, 2025).[^36] The platform also announced an official partner
+    fetchedAt: 2026-02-22T01:46:35.504Z
+    httpStatus: 200
+    pageTitle: Polymarket and 𝕏 Announce Official Prediction Market Partnership
+    contentSnippet: "Polymarket and 𝕏 Announce Official Prediction Market Partnership Accessibility Statement Skip Navigation Polymarket and 𝕏 to Launch First Integrated Product and Develop a Suite of Additional Integrations NEW YORK , June 6, 2025 /PRNewswire/ -- Polymarket, the world's largest prediction market, and 𝕏 today announced an official partnership through which Polymarket will serve as the official Prediction Market Partner to 𝕏. Terms of the partnership were not disclosed. As part of the agreement, "
+    contentLength: 205011
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.trendingtopics.eu/polymarket-is-being-banned-in-more-and-more-countries/
+    linkText: Polymarket Being Banned in More Countries - Trending Topics
+    claimContext: Despite federal regulatory progress, Polymarket faced state-level resistance in early 2025, including a Nevada Gaming Control Board injunction and Tennessee shutdown orders for sports markets.[^38] The platform also expanded internationally but encountered bans in countries including Portugal, Taiwa
+    fetchedAt: 2026-02-22T01:46:36.791Z
+    httpStatus: 200
+    pageTitle: Polymarket is being banned in more and more countries
+    contentSnippet: "Polymarket is being banned in more and more countries Skip to content Polymarket an der NYSE. © NYSE Some call them prediction markets, others see them simply as a new form of online betting: the two US companies Polymarket and Kalshi have experienced rapid growth since people started wagering money on future events (political events, sports results, currency movements, etc.). But in more and more countries, including the EU, bans on market leader Polymarket are now being imposed. On Friday, bot"
+    contentLength: 104558
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.trendingtopics.eu/polymarket-is-being-banned-in-more-and-more-countries/
+    linkText: Polymarket Being Banned in More Countries - Trending Topics
+    claimContext: Despite federal regulatory progress, Polymarket faced state-level resistance in early 2025, including a Nevada Gaming Control Board injunction and Tennessee shutdown orders for sports markets.[^38] The platform also expanded internationally but encountered bans in countries including Portugal, Taiwa
+    fetchedAt: 2026-02-22T01:46:36.626Z
+    httpStatus: 200
+    pageTitle: Polymarket is being banned in more and more countries
+    contentSnippet: "Polymarket is being banned in more and more countries Skip to content Polymarket an der NYSE. © NYSE Some call them prediction markets, others see them simply as a new form of online betting: the two US companies Polymarket and Kalshi have experienced rapid growth since people started wagering money on future events (political events, sports results, currency movements, etc.). But in more and more countries, including the EU, bans on market leader Polymarket are now being imposed. On Friday, bot"
+    contentLength: 104558
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://atomicwallet.io/academy/articles/what-is-polymarket
+    linkText: What is Polymarket? - Atomic Wallet
+    claimContext: "Polymarket operates as a non-custodial protocol where YES and NO shares for any event are fully collateralized by \\$1.00 USDC.[^40] Share prices directly represent probabilities—an 18-cent YES share indicates an 18% chance of the event occurring.[^41] Users can sell shares anytime before resolution "
+    fetchedAt: 2026-02-22T01:46:35.207Z
+    httpStatus: 200
+    pageTitle: What is Polymarket? An Overview of the Prediction Platform
+    contentSnippet: What is Polymarket? An Overview of the Prediction Platform Buy Crypto Stake & Earn Ethereum Solana Cardano Kava Polygon Near Zilliqa Cosmos Tezos Tron All Assets Products Mobile Wallet Desktop Wallet Web3 Wallet Gift Cards DApps Store Private AI Browser Secure Email AML Software OpenClaw Bot Download Support Contact Support Blog Academy Top 21 Crypto To Stake What is a Crypto Wallet Top 10 Altcoins in 2023 What is ТRX? What is Optimism Blockchain? What is КАVA? Download News Memecoins Crypto Pro
+    contentLength: 160805
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://docs.polymarket.com/polymarket-learn/FAQ/what-are-prediction-markets
+    linkText: What are Prediction Markets? - Polymarket FAQ
+    claimContext: "Polymarket operates as a non-custodial protocol where YES and NO shares for any event are fully collateralized by \\$1.00 USDC.[^40] Share prices directly represent probabilities—an 18-cent YES share indicates an 18% chance of the event occurring.[^41] Users can sell shares anytime before resolution "
+    fetchedAt: 2026-02-22T01:46:38.708Z
+    httpStatus: 200
+    pageTitle: What is a Prediction Market? | Polymarket Help Center
+    contentSnippet: What is a Prediction Market? | Polymarket Help Center Skip to main content Table of contents All Collections FAQs What is a Prediction Market? What is a Prediction Market? How people collectively forecast the future. Updated over a month ago Table of contents A prediction market is a platform where people can bet on the outcome of future events. By buying and selling shares in the outcomes, participants collectively forecast the likelihood of events such as sports results, political elections, o
+    contentLength: 63955
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.youtube.com/watch?v=4XHZ7Z8siIU
+    linkText: Polymarket Explained - YouTube
+    claimContext: "Polymarket operates as a non-custodial protocol where YES and NO shares for any event are fully collateralized by \\$1.00 USDC.[^40] Share prices directly represent probabilities—an 18-cent YES share indicates an 18% chance of the event occurring.[^41] Users can sell shares anytime before resolution "
+    fetchedAt: 2026-02-22T01:46:38.247Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 43
+    url: https://atomicwallet.io/academy/articles/what-is-polymarket
+    linkText: What is Polymarket? - Atomic Wallet
+    claimContext: The platform supports any Polygon/USDC-compatible wallet and offers easy deposits through integrations with PayPal and card payments via QR codes.[^43] Trading is peer-to-peer without a house or middlemen, with the blockchain providing transparency and auditability.[^44]
+    fetchedAt: 2026-02-22T01:46:37.981Z
+    httpStatus: 200
+    pageTitle: What is Polymarket? An Overview of the Prediction Platform
+    contentSnippet: What is Polymarket? An Overview of the Prediction Platform Buy Crypto Stake & Earn Ethereum Solana Cardano Kava Polygon Near Zilliqa Cosmos Tezos Tron All Assets Products Mobile Wallet Desktop Wallet Web3 Wallet Gift Cards DApps Store Private AI Browser Secure Email AML Software OpenClaw Bot Download Support Contact Support Blog Academy Top 21 Crypto To Stake What is a Crypto Wallet Top 10 Altcoins in 2023 What is ТRX? What is Optimism Blockchain? What is КАVA? Download News Memecoins Crypto Pro
+    contentLength: 160805
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://tokenterminal.com/explorer/projects/polymarket
+    linkText: Polymarket - Token Terminal
+    claimContext: The platform supports any Polygon/USDC-compatible wallet and offers easy deposits through integrations with PayPal and card payments via QR codes.[^43] Trading is peer-to-peer without a house or middlemen, with the blockchain providing transparency and auditability.[^44]
+    fetchedAt: 2026-02-22T01:46:38.339Z
+    httpStatus: 200
+    pageTitle: Polymarket overview | Token Terminal
+    contentSnippet: Polymarket overview | Token Terminal We use some essential cookies to make this website work. We&#x27;d like to set additional cookies to understand how you use tokenterminal.com and remember your settings. Learn more Allow all Disable all
+    contentLength: 38047
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://news.polymarket.com/p/how-accurate-is-polymarket
+    linkText: How Accurate is Polymarket?
+    claimContext: "Multiple studies have examined Polymarket's forecasting accuracy. Research shows the platform achieves prediction accuracy exceeding 90% even one month before event resolution, with accuracy increasing at 4 hours, 12 hours, 1 day, and 1 week before resolution.[^45] The platform's Brier scores—which "
+    fetchedAt: 2026-02-22T01:46:37.972Z
+    httpStatus: 200
+    pageTitle: 🔮 How Accurate is Polymarket? - The Oracle by Polymarket
+    contentSnippet: "🔮 How Accurate is Polymarket? - The Oracle by Polymarket Subscribe Sign in 🔮 How Accurate is Polymarket? Our quant speaks Polymarket Mar 20, 2025 20 3 5 Share 🔮 The following is an interview with Alex McCullough , an NYC-based on-chain analyst who built a data dashboard for tracking the accuracy of Polymarket odds over time. Follow Alex on X . Share The Oracle by Polymarket The Oracle: Where did the idea come from? I was looking to branch out in the industry and skill up a bit. I settled on l"
+    contentLength: 235347
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://polymarket.com/accuracy
+    linkText: Polymarket Accuracy Dashboard
+    claimContext: "Multiple studies have examined Polymarket's forecasting accuracy. Research shows the platform achieves prediction accuracy exceeding 90% even one month before event resolution, with accuracy increasing at 4 hours, 12 hours, 1 day, and 1 week before resolution.[^45] The platform's Brier scores—which "
+    fetchedAt: 2026-02-22T01:46:40.075Z
+    httpStatus: 200
+    pageTitle: How accurate is Polymarket?
+    contentSnippet: How accurate is Polymarket? How accurate is Polymarket? 97.0% 4 hr accuracy 91.2% 1 month accuracy 0.0832 Brier Score Accuracy prior to resolution Shows how accurate Polymarket odds were at different points before they resolved. 4 Hrs 97 % 12 Hrs 96.6 % 1 Day 96.1 % 1 Week 94.4 % 1 Month 91.2 % 4 Hrs 97 % 12 Hrs 96.6 % 1 Day 96.1 % 1 Week 94.4 % 1 Month 91.2 % Expected vs Actual Polymarket forecasts closely align with actual outcomes across all probability ranges. 4 hrs before Expected Percentag
+    contentLength: 142550
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://pub.tik.ee.ethz.ch/students/2022-HS/SA-2022-42.pdf
+    linkText: Liquidity Improvements for Prediction Markets - ETH Zürich
+    claimContext: A comprehensive ETH Zürich thesis analyzing over 2 million buy/sell transactions across 9,026 markets found an average Brier score of approximately 0.15, indicating strong accuracy, though with no clear correlation to market volume.[^47] Research on the 2024 presidential election found that while Po
+    fetchedAt: 2026-02-22T01:46:40.816Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1275721
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://nexteventhorizon.substack.com/p/what-five-new-academic-papers-say-prediction-markets
+    linkText: What Five Academic Papers Say About Prediction Markets - Next Event Horizon
+    claimContext: A comprehensive ETH Zürich thesis analyzing over 2 million buy/sell transactions across 9,026 markets found an average Brier score of approximately 0.15, indicating strong accuracy, though with no clear correlation to market volume.[^47] Research on the 2024 presidential election found that while Po
+    fetchedAt: 2026-02-22T01:46:40.040Z
+    httpStatus: 200
+    pageTitle: What Five New Academic Papers Say About Prediction Markets
+    contentSnippet: What Five New Academic Papers Say About Prediction Markets Subscribe Sign in What Five New Academic Papers Say About Prediction Markets A closer look at 'Are Betting Markets Better than Polling,' 'Exchanges are Using Federal Derivatives Law to Provide Gambling Products to Retail Traders' and more Dustin Gouker Jul 17, 2025 5 1 Share I am not sure what this has to do with academia but I figured I needed a gif to get some of you to read a post all about academic papers. Prediction markets are havi
+    contentLength: 203611
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://coincodex.com/article/65963/is-polymarket-accurate/
+    linkText: Is Polymarket Accurate? - CoinCodex
+    claimContext: However, accuracy limitations exist for long-term predictions due to speculation and external variables, with the platform tending to overestimate probabilities by approximately 2 points across ranges.[^49] Limited historical data also hampers granular analysis by event type, such as NFL games versu
+    fetchedAt: 2026-02-22T01:46:40.303Z
+    httpStatus: 200
+    pageTitle: How Accurate Is Polymarket Really? Here’s What the Research Shows | CoinCodex
+    contentSnippet: "How Accurate Is Polymarket Really? Here’s What the Research Shows | CoinCodex Total Market Cap: M. Cap: $ 2.33T ( 0.21%) BTC Dominance: BTC Dom: 58.47% ( 0.04%) 24h Volume: 24h Vol.: $ 73.27B ( -82.95%) BTC Price: BTC: $ 68,114 ( 0.19%) S&P 500: 6,909.51 ( -0.01%) Gold: $ 5,098.51 ( -0.19%) USD/EUR € 0.85 ( -0.03%) Press Release Advertise USD EN Deutsch Italiano Español Türkçe App Download App Crypto Stocks Forex Metals Portfolio Exchanges Token Sales News Tools Hotspot All Coins Portfolio News "
+    contentLength: 837096
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://coincodex.com/article/65963/is-polymarket-accurate/
+    linkText: Is Polymarket Accurate? - CoinCodex
+    claimContext: However, accuracy limitations exist for long-term predictions due to speculation and external variables, with the platform tending to overestimate probabilities by approximately 2 points across ranges.[^49] Limited historical data also hampers granular analysis by event type, such as NFL games versu
+    fetchedAt: 2026-02-22T01:46:40.291Z
+    httpStatus: 200
+    pageTitle: How Accurate Is Polymarket Really? Here’s What the Research Shows | CoinCodex
+    contentSnippet: "How Accurate Is Polymarket Really? Here’s What the Research Shows | CoinCodex Total Market Cap: M. Cap: $ 2.33T ( 0.21%) BTC Dominance: BTC Dom: 58.47% ( 0.04%) 24h Volume: 24h Vol.: $ 73.27B ( -82.95%) BTC Price: BTC: $ 68,114 ( 0.19%) S&P 500: 6,909.51 ( -0.01%) Gold: $ 5,098.51 ( -0.19%) USD/EUR € 0.85 ( -0.03%) Press Release Advertise USD EN Deutsch Italiano Español Türkçe App Download App Crypto Stocks Forex Metals Portfolio Exchanges Token Sales News Tools Hotspot All Coins Portfolio News "
+    contentLength: 837096
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://arxiv.org/abs/2508.03474
+    linkText: "Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets - arXiv"
+    claimContext: 'Academic research has identified significant arbitrage opportunities within Polymarket. A study titled "Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets" identified two distinct arbitrage forms: Market Rebalancing Arbitrage (within single markets) and Combinatorial Arbitrage (ac'
+    fetchedAt: 2026-02-22T01:46:41.904Z
+    httpStatus: 200
+    pageTitle: "[2508.03474] Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets"
+    contentSnippet: "[2508.03474] Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets --> Computer Science > Cryptography and Security arXiv:2508.03474 (cs) [Submitted on 5 Aug 2025] Title: Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets Authors: Oriol Saguillo , Vahid Ghafouri , Lucianna Kiffer , Guillermo Suarez-Tangil View a PDF of the paper titled Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets, by Oriol Saguillo and 3 other authors View PDF HTML (exp"
+    contentLength: 47909
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://arxiv.org/abs/2508.03474
+    linkText: "Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets - arXiv"
+    claimContext: 'Academic research has identified significant arbitrage opportunities within Polymarket. A study titled "Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets" identified two distinct arbitrage forms: Market Rebalancing Arbitrage (within single markets) and Combinatorial Arbitrage (ac'
+    fetchedAt: 2026-02-22T01:46:41.910Z
+    httpStatus: 200
+    pageTitle: "[2508.03474] Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets"
+    contentSnippet: "[2508.03474] Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets --> Computer Science > Cryptography and Security arXiv:2508.03474 (cs) [Submitted on 5 Aug 2025] Title: Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets Authors: Oriol Saguillo , Vahid Ghafouri , Lucianna Kiffer , Guillermo Suarez-Tangil View a PDF of the paper titled Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets, by Oriol Saguillo and 3 other authors View PDF HTML (exp"
+    contentLength: 47909
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://www.mexc.com/news/359822
+    linkText: Polymarket - MEXC News
+    claimContext: "Top arbitrageurs earned \\$4.2 million across the three most profitable wallets, with new market liquidity provision yielding 80-200% annualized returns at peak and automated market-making generating \\$700-800 per day during high-volume periods.[^53] However, post-election liquidity rewards declined "
+    fetchedAt: 2026-02-22T01:46:42.308Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 54
+    url: https://www.mexc.com/news/359822
+    linkText: Polymarket - MEXC News
+    claimContext: "Top arbitrageurs earned \\$4.2 million across the three most profitable wallets, with new market liquidity provision yielding 80-200% annualized returns at peak and automated market-making generating \\$700-800 per day during high-volume periods.[^53] However, post-election liquidity rewards declined "
+    fetchedAt: 2026-02-22T01:46:42.275Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 55
+    url: https://forum.effectivealtruism.org/topics/forecasting
+    linkText: EA Forum - Forecasting Topic
+    claimContext: Polymarket receives generally positive reception within the <EntityLink id="lesswrong">LessWrong</EntityLink> and Effective Altruism communities, viewed as a superior real-money prediction market for processing information quickly and accurately compared to legacy institutions and traditional foreca
+    fetchedAt: 2026-02-22T01:46:44.138Z
+    httpStatus: 200
+    pageTitle: Forecasting - EA Forum
+    contentSnippet: Forecasting - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Forecasting Forecasting Discussion of forecasting methods, as well as specific forecasts relevant to doing good Posts Wiki Write new Subscribe New & upvoted 23 Is benchmarking AI capabilities positive EV? Q Charlie_Guthmann Charlie_Guthmann · 4d ago · 1 m read 4 4 66 AI benchmarking has a Y-axis problem Lizka Lizka · 16d ago · 9 m read 2 2 80 Are t
+    contentLength: 482080
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://forum.effectivealtruism.org/topics/forecasting
+    linkText: EA Forum - Forecasting Topic
+    claimContext: Polymarket receives generally positive reception within the <EntityLink id="lesswrong">LessWrong</EntityLink> and Effective Altruism communities, viewed as a superior real-money prediction market for processing information quickly and accurately compared to legacy institutions and traditional foreca
+    fetchedAt: 2026-02-22T01:46:45.208Z
+    httpStatus: 200
+    pageTitle: Forecasting - EA Forum
+    contentSnippet: Forecasting - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Forecasting Forecasting Discussion of forecasting methods, as well as specific forecasts relevant to doing good Posts Wiki Write new Subscribe New & upvoted 23 Is benchmarking AI capabilities positive EV? Q Charlie_Guthmann Charlie_Guthmann · 4d ago · 1 m read 4 4 66 AI benchmarking has a Y-axis problem Lizka Lizka · 16d ago · 9 m read 2 2 80 Are t
+    contentLength: 482080
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://manifund.org/projects/subsidize-real-money-prediction-markets-on-high-impact-topics-94732049z
+    linkText: Subsidize Real-Money Prediction Markets on High-Impact Topics - Manifund
+    claimContext: '<EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> leads efforts to subsidize Polymarket markets on high-impact topics through a <EntityLink id="manifund">Manifund</EntityLink> project that raised \$8,000 for a pilot program in April 2023.[^57] The project deploys funds via an automated market '
+    fetchedAt: 2026-02-22T01:46:51.820Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 58
+    url: https://manifund.org/projects/subsidize-real-money-prediction-markets-on-high-impact-topics-94732049z
+    linkText: Subsidize Real-Money Prediction Markets on High-Impact Topics - Manifund
+    claimContext: '<EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> leads efforts to subsidize Polymarket markets on high-impact topics through a <EntityLink id="manifund">Manifund</EntityLink> project that raised \$8,000 for a pilot program in April 2023.[^57] The project deploys funds via an automated market '
+    fetchedAt: 2026-02-22T01:46:51.819Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 59
+    url: https://www.astralcodexten.com/p/mantic-monday-31422
+    linkText: Mantic Monday 3/14/22 - Astral Codex Ten
+    claimContext: Community members note operational advantages over platforms like <EntityLink id="metaculus">Metaculus</EntityLink>, though some point out that Polymarket has experienced technical problems similar to Metaculus during high-stakes events like the Ukraine conflict.[^59] <EntityLink id="arb-research">A
+    fetchedAt: 2026-02-22T01:46:46.210Z
+    httpStatus: 200
+    pageTitle: Mantic Monday 3/14/22 - by Scott Alexander
+    contentSnippet: "Mantic Monday 3/14/22 - by Scott Alexander Astral Codex Ten Subscribe Sign in Mantic Monday 3/14/22 More Ukraine warcasting, nuclear war risk, forecasters vs. experts Mar 14, 2022 54 198 Share Ukraine Warcasting Changes in Ukraine prediction markets since my last post February 28: Will Kiev fall to Russian forces by April 2022 ?: 69% —→ 14% Will at least three of six big cities fall by June 1? : 71% —→ 70% Will World War III happen before 2050? : 20% —→21% Will Russia invade any other country in"
+    contentLength: 212157
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://arbresearch.com/files/clairvoyance.pdf
+    linkText: "Clairvoyance: Forecasting AI Progress - Arb Research"
+    claimContext: Community members note operational advantages over platforms like <EntityLink id="metaculus">Metaculus</EntityLink>, though some point out that Polymarket has experienced technical problems similar to Metaculus during high-stakes events like the Ukraine conflict.[^59] <EntityLink id="arb-research">A
+    fetchedAt: 2026-02-22T01:46:46.175Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 0
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://www.alignmentforum.org/revisions/w/forecasting-and-prediction
+    linkText: Forecasting and Prediction - Alignment Forum
+    claimContext: However, the communities also note limitations. Few forecasts and track records are clearly visible on <EntityLink id="lesswrong">LessWrong</EntityLink> itself, with top users lacking transparent records.[^61] Additionally, there are documented hurdles in using forecasting platforms including Polyma
+    fetchedAt: 2026-02-22T01:46:59.656Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 62
+    url: https://nunosempere.com/blog/2023/11/07/hurdles-forecasting-ai/
+    linkText: Hurdles to Using Forecasting to Forecast AI - Nuño Sempere
+    claimContext: However, the communities also note limitations. Few forecasts and track records are clearly visible on <EntityLink id="lesswrong">LessWrong</EntityLink> itself, with top users lacking transparent records.[^61] Additionally, there are documented hurdles in using forecasting platforms including Polyma
+    fetchedAt: 2026-02-22T01:46:53.982Z
+    httpStatus: 200
+    pageTitle: Hurdles of using forecasting as a tool for making sense of AI progress
+    contentSnippet: Hurdles of using forecasting as a tool for making sense of AI progress Hurdles of using forecasting as a tool for making sense of AI progress Introduction In recent years there have been various attempts at using forecasting to discern the shape of the future development of artificial intelligence, like the AI progress Metaculus tournament , the Forecasting Research Institute&rsquo;s existential risk forecasting tournament/experiment , Samotsvety forecasts on the topic of AI progress and dangers
+    contentLength: 38122
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://insights4vc.substack.com/p/polymarket-raises-2b-at-9b-valuation
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Insights4VC
+    claimContext: "[^63]"
+    fetchedAt: 2026-02-22T01:46:53.267Z
+    httpStatus: 200
+    pageTitle: Polymarket Raises $2B at $9B Valuation - insights4vc
+    contentSnippet: Polymarket Raises $2B at $9B Valuation - insights4vc Subscribe Sign in Polymarket Raises $2B at $9B Valuation insights4vc Oct 09, 2025 48 1 Share Polymarket was launched in mid-2020 by founder Shayne Coplan, at the time a 21-year-old New York University dropout. The startup, incorporated as Blockratize, Inc. in Delaware, debuted its prediction market platform in June 2020. Early markets let users bet on topics like cryptocurrency prices, COVID-19 case counts, and the 2020 U.S. election. The vent
+    contentLength: 309909
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://en.wikipedia.org/wiki/Polymarket
+    linkText: Polymarket - Wikipedia
+    claimContext: Key investors include Polychain Capital (seed lead), Founders Fund (associated with Peter Thiel), and Vitalik Buterin (Ethereum co-founder).[^64] The October 2025 ICE investment represents the largest single investment and came with a strategic data distribution partnership.[^65]
+    fetchedAt: 2026-02-22T01:46:52.867Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 65
+    url: https://ir.theice.com/press/news-details/2025/ICE-Announces-Strategic-Investment-in-Polymarket/default.aspx
+    linkText: ICE Announces Strategic Investment in Polymarket
+    claimContext: Key investors include Polychain Capital (seed lead), Founders Fund (associated with Peter Thiel), and Vitalik Buterin (Ethereum co-founder).[^64] The October 2025 ICE investment represents the largest single investment and came with a strategic data distribution partnership.[^65]
+    fetchedAt: 2026-02-22T01:46:53.221Z
+    httpStatus: 200
+    pageTitle: Intercontinental Exchange - ICE Announces Strategic Investment in Polymarket
+    contentSnippet: Intercontinental Exchange - ICE Announces Strategic Investment in Polymarket Skip to main content ICE NYSE WebICE Login Menu View all news ICE Announces Strategic Investment in Polymarket Oct 07, 2025 Download PDF PDF Format (opens in new window) PDF 120 KB ICE to Become Distributor of Polymarket Data to Institutional Investors Globally ATLANTA & NEW YORK--(BUSINESS WIRE)-- Intercontinental Exchange, Inc. (NYSE:ICE), a leading global provider of technology and data, today announced a strategic i
+    contentLength: 73671
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://equityzen.com/company/polymarket/
+    linkText: Polymarket - EquityZen
+    claimContext: The platform pursues an additional funding round targeting a \$12-15 billion valuation as of late 2025.[^66] Secondary market activity shows Polymarket stock trading at approximately \$144.64 per share as of January 30, 2026, with 36 live orders and no public IPO planned.[^67]
+    fetchedAt: 2026-02-22T01:47:01.288Z
+    httpStatus: 200
+    pageTitle: Invest In Polymarket Stock | Buy Pre-IPO Shares | EquityZen
+    contentSnippet: Invest In Polymarket Stock | Buy Pre-IPO Shares | EquityZen We use cookies to improve the performance of our site and optimize it for our users. Customize Cookie Preferences Sign Up Today and Learn More About Polymarket Stock Invest in or calculate the value of your shares in Polymarket or other pre-IPO companies through EquityZen's platform. Get Started View More Companies Polymarket Stock (POLA) Polymarket is a prediction market platform where traders predict future event outcomes, reacting to
+    contentLength: 63045
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://www.hiive.com/securities/polymarket-stock
+    linkText: Polymarket Stock - Hiive
+    claimContext: The platform pursues an additional funding round targeting a \$12-15 billion valuation as of late 2025.[^66] Secondary market activity shows Polymarket stock trading at approximately \$144.64 per share as of January 30, 2026, with 36 live orders and no public IPO planned.[^67]
+    fetchedAt: 2026-02-22T01:47:01.168Z
+    httpStatus: 200
+    pageTitle: Polymarket Stock | Hiive Price $148.07 | Invest or Sell
+    contentSnippet: "Polymarket Stock | Hiive Price $148.07 | Invest or Sell Issuers Investors Overview Hiive Funds Sellers Marketplace All Companies Hiive 50 Insights About Our Story Careers Sign In Sign Up Sign in Browse Companies Polymarket Polymarket Stock Buy and Sell Polymarket shares Do you manage stock transfers at Polymarket ? Contact us at [email&#160;protected] . $148.07 +1,380.70% all time Hiive Price 3M 6M 1Y MAX Advanced Options Unlock advanced charting options Sign up Source: Hiive LEGEND Hiive Price "
+    contentLength: 275867
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://insights4vc.substack.com/p/polymarket-raises-2b-at-9b-valuation
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Insights4VC
+    claimContext: As of October 2025, Polymarket's revenue remains limited and venture capital-subsidized, with platform trading remaining free of direct trading fees.[^68] The company generates revenue indirectly through market-making bid-ask spreads and potentially from interest on USDC balances, though this remain
+    fetchedAt: 2026-02-22T01:47:00.770Z
+    httpStatus: 200
+    pageTitle: Polymarket Raises $2B at $9B Valuation - insights4vc
+    contentSnippet: Polymarket Raises $2B at $9B Valuation - insights4vc Subscribe Sign in Polymarket Raises $2B at $9B Valuation insights4vc Oct 09, 2025 48 1 Share Polymarket was launched in mid-2020 by founder Shayne Coplan, at the time a 21-year-old New York University dropout. The startup, incorporated as Blockratize, Inc. in Delaware, debuted its prediction market platform in June 2020. Early markets let users bet on topics like cryptocurrency prices, COVID-19 case counts, and the 2020 U.S. election. The vent
+    contentLength: 309909
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://insights4vc.substack.com/p/polymarket-raises-2b-at-9b-valuation
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Insights4VC
+    claimContext: As of October 2025, Polymarket's revenue remains limited and venture capital-subsidized, with platform trading remaining free of direct trading fees.[^68] The company generates revenue indirectly through market-making bid-ask spreads and potentially from interest on USDC balances, though this remain
+    fetchedAt: 2026-02-22T01:47:00.973Z
+    httpStatus: 200
+    pageTitle: Polymarket Raises $2B at $9B Valuation - insights4vc
+    contentSnippet: Polymarket Raises $2B at $9B Valuation - insights4vc Subscribe Sign in Polymarket Raises $2B at $9B Valuation insights4vc Oct 09, 2025 48 1 Share Polymarket was launched in mid-2020 by founder Shayne Coplan, at the time a 21-year-old New York University dropout. The startup, incorporated as Blockratize, Inc. in Delaware, debuted its prediction market platform in June 2020. Early markets let users bet on topics like cryptocurrency prices, COVID-19 case counts, and the 2020 U.S. election. The vent
+    contentLength: 309909
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://insights4vc.substack.com/p/polymarket-raises-2b-at-9b-valuation
+    linkText: Polymarket Raises \$2B at \$9B Valuation - Insights4VC
+    claimContext: The ICE partnership initiated data sales, with Polymarket providing institutional feeds of event-driven data for sentiment analysis.[^70] In January 2026, the company announced a Dow Jones partnership for exclusive Wall Street Journal integration, expanding data monetization opportunities.[^71]
+    fetchedAt: 2026-02-22T01:47:01.058Z
+    httpStatus: 200
+    pageTitle: Polymarket Raises $2B at $9B Valuation - insights4vc
+    contentSnippet: Polymarket Raises $2B at $9B Valuation - insights4vc Subscribe Sign in Polymarket Raises $2B at $9B Valuation insights4vc Oct 09, 2025 48 1 Share Polymarket was launched in mid-2020 by founder Shayne Coplan, at the time a 21-year-old New York University dropout. The startup, incorporated as Blockratize, Inc. in Delaware, debuted its prediction market platform in June 2020. Early markets let users bet on topics like cryptocurrency prices, COVID-19 case counts, and the 2020 U.S. election. The vent
+    contentLength: 309909
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://equityzen.com/company/polymarket/
+    linkText: Polymarket - EquityZen
+    claimContext: The ICE partnership initiated data sales, with Polymarket providing institutional feeds of event-driven data for sentiment analysis.[^70] In January 2026, the company announced a Dow Jones partnership for exclusive Wall Street Journal integration, expanding data monetization opportunities.[^71]
+    fetchedAt: 2026-02-22T01:47:02.467Z
+    httpStatus: 200
+    pageTitle: Invest In Polymarket Stock | Buy Pre-IPO Shares | EquityZen
+    contentSnippet: Invest In Polymarket Stock | Buy Pre-IPO Shares | EquityZen We use cookies to improve the performance of our site and optimize it for our users. Customize Cookie Preferences Sign Up Today and Learn More About Polymarket Stock Invest in or calculate the value of your shares in Polymarket or other pre-IPO companies through EquityZen's platform. Get Started View More Companies Polymarket Stock (POLA) Polymarket is a prediction market platform where traders predict future event outcomes, reacting to
+    contentLength: 63045
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://atomicwallet.io/academy/articles/what-is-polymarket
+    linkText: What is Polymarket? - Atomic Wallet
+    claimContext: Future revenue prospects include trading fees in regulated markets, a potential \$POLY governance token for staking and rewards, premium features, and expanded data monetization.[^72] The platform's growth trajectory remains tied to high-volume events, with \$3.3 billion wagered during the 2024 elec
+    fetchedAt: 2026-02-22T01:47:03.336Z
+    httpStatus: 200
+    pageTitle: What is Polymarket? An Overview of the Prediction Platform
+    contentSnippet: What is Polymarket? An Overview of the Prediction Platform Buy Crypto Stake & Earn Ethereum Solana Cardano Kava Polygon Near Zilliqa Cosmos Tezos Tron All Assets Products Mobile Wallet Desktop Wallet Web3 Wallet Gift Cards DApps Store Private AI Browser Secure Email AML Software OpenClaw Bot Download Support Contact Support Blog Academy Top 21 Crypto To Stake What is a Crypto Wallet Top 10 Altcoins in 2023 What is ТRX? What is Optimism Blockchain? What is КАVA? Download News Memecoins Crypto Pro
+    contentLength: 160805
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://en.wikipedia.org/wiki/Polymarket
+    linkText: Polymarket - Wikipedia
+    claimContext: Future revenue prospects include trading fees in regulated markets, a potential \$POLY governance token for staking and rewards, premium features, and expanded data monetization.[^72] The platform's growth trajectory remains tied to high-volume events, with \$3.3 billion wagered during the 2024 elec
+    fetchedAt: 2026-02-22T01:47:02.307Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 74
+    url: https://www.binance.com/en/square/post/22065257181241
+    linkText: Polymarket Betting Contract Manipulation - Binance Square
+    claimContext: "Polymarket has faced repeated accusations of allowing manipulation in its prediction markets, particularly through governance mechanisms involving UMA voting and whale influence.[^74] A recent betting contract was manipulated by an anonymous whale, yet Polymarket refused refunds, stating it was not "
+    fetchedAt: 2026-02-22T01:47:02.849Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2035
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://www.binance.com/en/square/post/22065257181241
+    linkText: Polymarket Betting Contract Manipulation - Binance Square
+    claimContext: "Polymarket has faced repeated accusations of allowing manipulation in its prediction markets, particularly through governance mechanisms involving UMA voting and whale influence.[^74] A recent betting contract was manipulated by an anonymous whale, yet Polymarket refused refunds, stating it was not "
+    fetchedAt: 2026-02-22T01:47:02.779Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2035
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://www.binance.com/en/square/post/22065257181241
+    linkText: Polymarket Betting Contract Manipulation - Binance Square
+    claimContext: "Polymarket has faced repeated accusations of allowing manipulation in its prediction markets, particularly through governance mechanisms involving UMA voting and whale influence.[^74] A recent betting contract was manipulated by an anonymous whale, yet Polymarket refused refunds, stating it was not "
+    fetchedAt: 2026-02-22T01:47:04.355Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2035
+    status: verified
+    note: null
+  - footnote: 77
+    url: https://www.binance.com/en/square/post/22065257181241
+    linkText: Polymarket Betting Contract Manipulation - Binance Square
+    claimContext: This pattern is not isolated. The "Is Barron Trump related to DJT memecoin on Solana?" contract was resolved "No" by UMA but flipped to "Yes" by Polymarket without explanation, and smaller manipulation cases have occurred previously.[^77] Critics argue Polymarket's "decentralized truth system" claim
+    fetchedAt: 2026-02-22T01:47:04.357Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2035
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://www.binance.com/en/square/post/22065257181241
+    linkText: Polymarket Betting Contract Manipulation - Binance Square
+    claimContext: This pattern is not isolated. The "Is Barron Trump related to DJT memecoin on Solana?" contract was resolved "No" by UMA but flipped to "Yes" by Polymarket without explanation, and smaller manipulation cases have occurred previously.[^77] Critics argue Polymarket's "decentralized truth system" claim
+    fetchedAt: 2026-02-22T01:47:04.778Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2035
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://www.binance.com/en/square/post/22065257181241
+    linkText: Polymarket Betting Contract Manipulation - Binance Square
+    claimContext: The CFTC has noted that unregulated prediction markets like Polymarket are highly susceptible to manipulation, citing these concerns in its lawsuit against competitor <EntityLink id="kalshi">Kalshi</EntityLink>.[^79]
+    fetchedAt: 2026-02-22T01:47:04.934Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2035
+    status: verified
+    note: null
+  - footnote: 80
+    url: https://fortune.com/2025/11/07/polymarket-wash-trading-inflated-prediction-markets-columbia-research/
+    linkText: Polymarket Wash Trading - Fortune
+    claimContext: A Columbia University study posted to SSRN in November 2025 found that wash trading—artificial trading activity to inflate volume—averaged 25% of buying and selling over the past three years on Polymarket.[^80] Wash trading peaked at approximately 60% in December (year unspecified), fell to 5% in Ma
+    fetchedAt: 2026-02-22T01:47:04.649Z
+    httpStatus: 200
+    pageTitle: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune
+    contentSnippet: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Some Fortune Crypto pricing data is provided by Binance. Investing Markets Polymarket volume inflated by ‘artificial’ activity, study finds By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon November 7, 2025, 11:02 AM ET Add us on A Polymarket bi
+    contentLength: 457467
+    status: verified
+    note: null
+  - footnote: 81
+    url: https://fortune.com/2025/11/07/polymarket-wash-trading-inflated-prediction-markets-columbia-research/
+    linkText: Polymarket Wash Trading - Fortune
+    claimContext: A Columbia University study posted to SSRN in November 2025 found that wash trading—artificial trading activity to inflate volume—averaged 25% of buying and selling over the past three years on Polymarket.[^80] Wash trading peaked at approximately 60% in December (year unspecified), fell to 5% in Ma
+    fetchedAt: 2026-02-22T01:47:05.972Z
+    httpStatus: 200
+    pageTitle: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune
+    contentSnippet: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Some Fortune Crypto pricing data is provided by Binance. Investing Markets Polymarket volume inflated by ‘artificial’ activity, study finds By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon November 7, 2025, 11:02 AM ET Add us on A Polymarket bi
+    contentLength: 456788
+    status: verified
+    note: null
+  - footnote: 82
+    url: https://fortune.com/2025/11/07/polymarket-wash-trading-inflated-prediction-markets-columbia-research/
+    linkText: Polymarket Wash Trading - Fortune
+    claimContext: This artificial activity potentially distorts prices, market sentiment, and the platform's claims about "wisdom of crowds" accuracy.[^82] The crypto structure enables wash trading, though Polymarket is not directly responsible for this behavior.[^83] The prevalence of wash trading raises questions a
+    fetchedAt: 2026-02-22T01:47:06.039Z
+    httpStatus: 200
+    pageTitle: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune
+    contentSnippet: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Some Fortune Crypto pricing data is provided by Binance. Investing Markets Polymarket volume inflated by ‘artificial’ activity, study finds By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon November 7, 2025, 11:02 AM ET Add us on A Polymarket bi
+    contentLength: 456788
+    status: verified
+    note: null
+  - footnote: 83
+    url: https://fortune.com/2025/11/07/polymarket-wash-trading-inflated-prediction-markets-columbia-research/
+    linkText: Polymarket Wash Trading - Fortune
+    claimContext: This artificial activity potentially distorts prices, market sentiment, and the platform's claims about "wisdom of crowds" accuracy.[^82] The crypto structure enables wash trading, though Polymarket is not directly responsible for this behavior.[^83] The prevalence of wash trading raises questions a
+    fetchedAt: 2026-02-22T01:47:05.985Z
+    httpStatus: 200
+    pageTitle: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune
+    contentSnippet: Polymarket volume inflated by ‘artificial’ activity, study finds | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Some Fortune Crypto pricing data is provided by Binance. Investing Markets Polymarket volume inflated by ‘artificial’ activity, study finds By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon By Lydia Beyoud Lydia Beyoud and Bloomberg Bloomberg Down Arrow Button Icon November 7, 2025, 11:02 AM ET Add us on A Polymarket bi
+    contentLength: 456788
+    status: verified
+    note: null
+  - footnote: 84
+    url: https://www.politico.com/newsletters/politico-nightly/2026/01/06/do-prediction-markets-have-an-insider-trading-problem-00713365
+    linkText: Polymarket Insider Trading Problem - Politico
+    claimContext: Suspicious trades by anonymous users with apparent nonpublic information have sparked concerns about market integrity. An anonymous trader profited \$400,000 betting on Venezuelan President Maduro's actions ahead of a U.S. operation, raising insider trading fears and criticism that such activity thr
+    fetchedAt: 2026-02-22T01:47:06.776Z
+    httpStatus: 200
+    pageTitle: Do prediction markets have an insider trading problem? - POLITICO
+    contentSnippet: Do prediction markets have an insider trading problem? - POLITICO Skip to Main Content POLITICO Nightly Tomorrow’s conversation, tonight. Know where the news is going next. POLITICO Nightly Tomorrow’s conversation, tonight. Know where the news is going next. By signing up, you acknowledge and agree to our Privacy Policy and Terms of Service . You may unsubscribe at any time by following the directions at the bottom of the email or by contacting us here . This site is protected by reCAPTCHA and t
+    contentLength: 111444
+    status: verified
+    note: null
+  - footnote: 85
+    url: https://ritchietorres.house.gov/posts/in-response-to-suspicious-polymarket-trade-preceding-maduro-operation-rep-ritchie-torres-introduces-legislation-to-crack-down-on-insider-trading-on-prediction-markets
+    linkText: Rep. Ritchie Torres Introduces Legislation on Prediction Markets - Ritchie Torres
+    claimContext: Representative Ritchie Torres (D-NY) introduced legislation in January 2026 to restrict government employees from using platforms like Polymarket, calling the insider trading-government nexus "corrupting."[^85] Representative Dina Titus (D-Nev.) requested information about safeguards from Polymarket
+    fetchedAt: 2026-02-22T01:47:06.841Z
+    httpStatus: 200
+    pageTitle: In Response to Suspicious Polymarket Trade Preceding Maduro Operation, Rep. Ritchie Torres Introduces Legislation to Crack Down on Insider Trading on Prediction Markets
+    contentSnippet: In Response to Suspicious Polymarket Trade Preceding Maduro Operation, Rep. Ritchie Torres Introduces Legislation to Crack Down on Insider Trading on Prediction Markets Skip to main content Help the House Litigation and Response Committee protect hardworking Americans from federal disinvestment. SHARE YOUR STORY HERE SHARE YOUR STORY HERE Resources / In the News Share on In Response to Suspicious Polymarket Trade Preceding Maduro Operation, Rep. Ritchie Torres Introduces Legislation to Crack Dow
+    contentLength: 242644
+    status: verified
+    note: null
+  - footnote: 86
+    url: https://fortune.com/2026/01/12/polymarket-kalshi-insider-trading-prediction-markets-cftc-torres-titus-venezuela/
+    linkText: Polymarket Insider Trading - Fortune
+    claimContext: Representative Ritchie Torres (D-NY) introduced legislation in January 2026 to restrict government employees from using platforms like Polymarket, calling the insider trading-government nexus "corrupting."[^85] Representative Dina Titus (D-Nev.) requested information about safeguards from Polymarket
+    fetchedAt: 2026-02-22T01:47:07.878Z
+    httpStatus: 200
+    pageTitle: An anonymous Polymarket trader made $400k betting on Maduro’s downfall—now Washington wants answers | Fortune
+    contentSnippet: An anonymous Polymarket trader made $400k betting on Maduro’s downfall—now Washington wants answers | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Some Fortune Crypto pricing data is provided by Binance. Crypto Polymarket An anonymous Polymarket trader made $400,000 betting on Maduro’s downfall—and now Washington wants answers By Leo Schwartz Leo Schwartz Senior Writer Down Arrow Button Icon By Leo Schwartz Leo Schwartz Senior Writer Down Arrow Button Ico
+    contentLength: 458517
+    status: verified
+    note: null
+  - footnote: 87
+    url: https://www.politico.com/newsletters/politico-nightly/2026/01/06/do-prediction-markets-have-an-insider-trading-problem-00713365
+    linkText: Polymarket Insider Trading Problem - Politico
+    claimContext: While Polymarket bans U.S. users, enforcement is weak (easily circumvented via VPNs), and the platform prohibits manipulation in its terms but declined to comment on the Venezuela incident.[^87] The CFTC lacks sufficient resources to effectively police the vast array of markets, and courts and regul
+    fetchedAt: 2026-02-22T01:47:07.894Z
+    httpStatus: 200
+    pageTitle: Do prediction markets have an insider trading problem? - POLITICO
+    contentSnippet: Do prediction markets have an insider trading problem? - POLITICO Skip to Main Content POLITICO Nightly Tomorrow’s conversation, tonight. Know where the news is going next. POLITICO Nightly Tomorrow’s conversation, tonight. Know where the news is going next. By signing up, you acknowledge and agree to our Privacy Policy and Terms of Service . You may unsubscribe at any time by following the directions at the bottom of the email or by contacting us here . This site is protected by reCAPTCHA and t
+    contentLength: 111444
+    status: verified
+    note: null
+  - footnote: 88
+    url: https://fortune.com/2026/01/12/polymarket-kalshi-insider-trading-prediction-markets-cftc-torres-titus-venezuela/
+    linkText: Polymarket Insider Trading - Fortune
+    claimContext: While Polymarket bans U.S. users, enforcement is weak (easily circumvented via VPNs), and the platform prohibits manipulation in its terms but declined to comment on the Venezuela incident.[^87] The CFTC lacks sufficient resources to effectively police the vast array of markets, and courts and regul
+    fetchedAt: 2026-02-22T01:47:07.886Z
+    httpStatus: 200
+    pageTitle: An anonymous Polymarket trader made $400k betting on Maduro’s downfall—now Washington wants answers | Fortune
+    contentSnippet: An anonymous Polymarket trader made $400k betting on Maduro’s downfall—now Washington wants answers | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Some Fortune Crypto pricing data is provided by Binance. Crypto Polymarket An anonymous Polymarket trader made $400,000 betting on Maduro’s downfall—and now Washington wants answers By Leo Schwartz Leo Schwartz Senior Writer Down Arrow Button Icon By Leo Schwartz Leo Schwartz Senior Writer Down Arrow Button Ico
+    contentLength: 458517
+    status: verified
+    note: null
+  - footnote: 89
+    url: https://www.politico.com/newsletters/politico-nightly/2026/01/06/do-prediction-markets-have-an-insider-trading-problem-00713365
+    linkText: Polymarket Insider Trading Problem - Politico
+    claimContext: Proponents, particularly libertarians, view insider trading as a feature that surfaces information faster than traditional media, but suspicions persist among the political class despite support from Republican investors including Peter Thiel, Donald Trump Jr., and <EntityLink id="marc-andreessen">M
+    fetchedAt: 2026-02-22T01:47:07.948Z
+    httpStatus: 200
+    pageTitle: Do prediction markets have an insider trading problem? - POLITICO
+    contentSnippet: Do prediction markets have an insider trading problem? - POLITICO Skip to Main Content POLITICO Nightly Tomorrow’s conversation, tonight. Know where the news is going next. POLITICO Nightly Tomorrow’s conversation, tonight. Know where the news is going next. By signing up, you acknowledge and agree to our Privacy Policy and Terms of Service . You may unsubscribe at any time by following the directions at the bottom of the email or by contacting us here . This site is protected by reCAPTCHA and t
+    contentLength: 111444
+    status: verified
+    note: null
+  - footnote: 90
+    url: https://cryptorank.io/news/feed/e0ec1-polymarket-users-unprofitable-analysis-data
+    linkText: Polymarket Users Unprofitable - CryptoRank
+    claimContext: Blockchain analysis of approximately 1.7 million unique Polymarket addresses shows that 70% of users realized net losses, with only 30% achieving net gains.[^90] Less than 0.04% of addresses captured over 70% of total realized profits (\$3.7 billion).[^91] Earning more than \$1,000 placed an address
+    fetchedAt: 2026-02-22T01:47:09.185Z
+    httpStatus: 200
+    pageTitle: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money"
+    contentSnippet: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money Currencies 36887 Market Cap $ 2.40T -0.80% 24h Spot Volume $ 24.61B +9.86% Dominance BTC 56.50 % +0.81% ETH 9.90 % +1.09% ETH Gas 0.03 Gwei Coins Top 100 Coins Top 100 cryptocurrencies by market capitalization Trending Cryptos Trending Coins and Tokens Performance Track market performance of cryptocurrencies Recently Listed Recently added cryptocurrencies in the last 30 days Gainers The fastest-growing cryptos over th"
+    contentLength: 524786
+    status: verified
+    note: null
+  - footnote: 91
+    url: https://cryptorank.io/news/feed/e0ec1-polymarket-users-unprofitable-analysis-data
+    linkText: Polymarket Users Unprofitable - CryptoRank
+    claimContext: Blockchain analysis of approximately 1.7 million unique Polymarket addresses shows that 70% of users realized net losses, with only 30% achieving net gains.[^90] Less than 0.04% of addresses captured over 70% of total realized profits (\$3.7 billion).[^91] Earning more than \$1,000 placed an address
+    fetchedAt: 2026-02-22T01:47:10.247Z
+    httpStatus: 200
+    pageTitle: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money"
+    contentSnippet: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money Currencies 36887 Market Cap $ 2.40T -0.80% 24h Spot Volume $ 24.61B +9.86% Dominance BTC 56.50 % +0.81% ETH 9.90 % +1.09% ETH Gas 0.03 Gwei Coins Top 100 Coins Top 100 cryptocurrencies by market capitalization Trending Cryptos Trending Coins and Tokens Performance Track market performance of cryptocurrencies Recently Listed Recently added cryptocurrencies in the last 30 days Gainers The fastest-growing cryptos over th"
+    contentLength: 524786
+    status: verified
+    note: null
+  - footnote: 92
+    url: https://cryptorank.io/news/feed/e0ec1-polymarket-users-unprofitable-analysis-data
+    linkText: Polymarket Users Unprofitable - CryptoRank
+    claimContext: Blockchain analysis of approximately 1.7 million unique Polymarket addresses shows that 70% of users realized net losses, with only 30% achieving net gains.[^90] Less than 0.04% of addresses captured over 70% of total realized profits (\$3.7 billion).[^91] Earning more than \$1,000 placed an address
+    fetchedAt: 2026-02-22T01:47:10.551Z
+    httpStatus: 200
+    pageTitle: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money"
+    contentSnippet: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money Currencies 36887 Market Cap $ 2.40T -0.80% 24h Spot Volume $ 24.61B +9.86% Dominance BTC 56.50 % +0.81% ETH 9.90 % +1.09% ETH Gas 0.03 Gwei Coins Top 100 Coins Top 100 cryptocurrencies by market capitalization Trending Cryptos Trending Coins and Tokens Performance Track market performance of cryptocurrencies Recently Listed Recently added cryptocurrencies in the last 30 days Gainers The fastest-growing cryptos over th"
+    contentLength: 524786
+    status: verified
+    note: null
+  - footnote: 93
+    url: https://cryptorank.io/news/feed/e0ec1-polymarket-users-unprofitable-analysis-data
+    linkText: Polymarket Users Unprofitable - CryptoRank
+    claimContext: This extreme wealth concentration challenges perceptions of accessibility in crypto speculation and raises questions about whether prediction markets primarily benefit sophisticated traders and arbitrageurs at the expense of retail participants.[^93]
+    fetchedAt: 2026-02-22T01:47:10.526Z
+    httpStatus: 200
+    pageTitle: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money"
+    contentSnippet: "Polymarket Profitability Crisis: Shocking Data Reveals 70% of Users Lose Money Currencies 36887 Market Cap $ 2.40T -0.80% 24h Spot Volume $ 24.61B +9.86% Dominance BTC 56.50 % +0.81% ETH 9.90 % +1.09% ETH Gas 0.03 Gwei Coins Top 100 Coins Top 100 cryptocurrencies by market capitalization Trending Cryptos Trending Coins and Tokens Performance Track market performance of cryptocurrencies Recently Listed Recently added cryptocurrencies in the last 30 days Gainers The fastest-growing cryptos over th"
+    contentLength: 524786
+    status: verified
+    note: null
+  - footnote: 94
+    url: https://www.trendingtopics.eu/polymarket-is-being-banned-in-more-and-more-countries/
+    linkText: Polymarket Being Banned in More Countries - Trending Topics
+    claimContext: Despite federal regulatory progress, Polymarket faces mounting state-level opposition. In January 2026, the Tennessee Sports Wagering Council issued a cease-and-desist order alleging Polymarket operates as an unlicensed sportsbook.[^94] Nevada Gaming Control Board issued similar injunctions, and cou
+    fetchedAt: 2026-02-22T01:47:10.866Z
+    httpStatus: 200
+    pageTitle: Polymarket is being banned in more and more countries
+    contentSnippet: "Polymarket is being banned in more and more countries Skip to content Polymarket an der NYSE. © NYSE Some call them prediction markets, others see them simply as a new form of online betting: the two US companies Polymarket and Kalshi have experienced rapid growth since people started wagering money on future events (political events, sports results, currency movements, etc.). But in more and more countries, including the EU, bans on market leader Polymarket are now being imposed. On Friday, bot"
+    contentLength: 104558
+    status: verified
+    note: null
+  - footnote: 95
+    url: https://www.trendingtopics.eu/polymarket-is-being-banned-in-more-and-more-countries/
+    linkText: Polymarket Being Banned in More Countries - Trending Topics
+    claimContext: Despite federal regulatory progress, Polymarket faces mounting state-level opposition. In January 2026, the Tennessee Sports Wagering Council issued a cease-and-desist order alleging Polymarket operates as an unlicensed sportsbook.[^94] Nevada Gaming Control Board issued similar injunctions, and cou
+    fetchedAt: 2026-02-22T01:47:11.975Z
+    httpStatus: 200
+    pageTitle: Polymarket is being banned in more and more countries
+    contentSnippet: "Polymarket is being banned in more and more countries Skip to content Polymarket an der NYSE. © NYSE Some call them prediction markets, others see them simply as a new form of online betting: the two US companies Polymarket and Kalshi have experienced rapid growth since people started wagering money on future events (political events, sports results, currency movements, etc.). But in more and more countries, including the EU, bans on market leader Polymarket are now being imposed. On Friday, bot"
+    contentLength: 104558
+    status: verified
+    note: null
+  - footnote: 96
+    url: https://equityzen.com/company/polymarket/
+    linkText: Polymarket - EquityZen
+    claimContext: This "guerrilla war" from state regulators persists despite federal CFTC approval and threatens Polymarket's ability to operate legally across all U.S. jurisdictions.[^96]
+    fetchedAt: 2026-02-22T01:47:13.235Z
+    httpStatus: 200
+    pageTitle: Invest In Polymarket Stock | Buy Pre-IPO Shares | EquityZen
+    contentSnippet: Invest In Polymarket Stock | Buy Pre-IPO Shares | EquityZen We use cookies to improve the performance of our site and optimize it for our users. Customize Cookie Preferences Sign Up Today and Learn More About Polymarket Stock Invest in or calculate the value of your shares in Polymarket or other pre-IPO companies through EquityZen's platform. Get Started View More Companies Polymarket Stock (POLA) Polymarket is a prediction market platform where traders predict future event outcomes, reacting to
+    contentLength: 63045
+    status: verified
+    note: null

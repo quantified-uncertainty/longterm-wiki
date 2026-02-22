@@ -1,0 +1,799 @@
+pageId: mats
+verifiedAt: 2026-02-22
+totalCitations: 72
+verified: 64
+broken: 8
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.lesswrong.com/posts/3semWY8cZJN3pD66g/mats-8-0-research-projects-summer-2025
+    linkText: MATS 8.0 Research Projects (Summer 2025)
+    claimContext: "|-----------|------------|----------| | Program Scale | High | 98 scholars and 57 mentors in most recent cohort (MATS 8.0, Summer 2025)[^1] | | Research Output | Strong | 160+ publications, 8,000+ citations, h-index of 40 over 4 years[^2] |"
+    fetchedAt: 2026-02-22T01:55:03.404Z
+    httpStatus: 200
+    pageTitle: MATS 8.0 Research Projects — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS 8.0 Research Projects — LessWrong MATS Program AI Frontpage 22 MATS 8.0 Research Projects by Jonathan Michala , DanielFilan , Ryan Kidd 9th Sep 2025 AI Alignment Forum 1 min read 0 22 Ω 8 This is a linkpost for https://substack.com/home/post/p-171758976 The 8th iteration of the Machine Learning Alignment & Theory Scholars ( MATS ) Program has come to a close, and "
+    contentLength: 245004
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: '| Program Scale | High | 98 scholars and 57 mentors in most recent cohort (MATS 8.0, Summer 2025)[^1] | | Research Output | Strong | 160+ publications, 8,000+ citations, h-index of 40 over 4 years[^2] | | Career Impact | Very High | 80% of alumni work in <EntityLink id="alignment">AI alignment</Enti'
+    fetchedAt: 2026-02-22T01:55:04.709Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: '| Research Output | Strong | 160+ publications, 8,000+ citations, h-index of 40 over 4 years[^2] | | Career Impact | Very High | 80% of alumni work in <EntityLink id="alignment">AI alignment</EntityLink>; placements at <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI'
+    fetchedAt: 2026-02-22T01:55:04.742Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: '| Career Impact | Very High | 80% of alumni work in <EntityLink id="alignment">AI alignment</EntityLink>; placements at <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">DeepMind</EntityLink>[^3] | | Funding per Scholar | \$27k '
+    fetchedAt: 2026-02-22T01:55:04.798Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.lesswrong.com/posts/zwf68YaySvXhWYCdh/mats-summer-2023-retrospective
+    linkText: MATS Summer 2023 Retrospective
+    claimContext: "| Funding per Scholar | \\$27k | \\$15k stipend + \\$12k compute resources, plus housing and meals[^4] | | Selectivity | Very Competitive | ≈15% acceptance rate; 40+ mentors with independent selection[^5] |"
+    fetchedAt: 2026-02-22T01:55:03.850Z
+    httpStatus: 200
+    pageTitle: MATS Summer 2023 Retrospective — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Summer 2023 Retrospective — LessWrong MATS Program AI Alignment Fieldbuilding Postmortems & Retrospectives AI Frontpage 78 MATS Summer 2023 Retrospective by utilistrutil , Juan Gil , Ryan Kidd , Christian Smith , McKennaFitzgerald , LauraVaughan 1st Dec 2023 32 min read 34 78 Co-Authors: @Rocket , @Juan Gil , @Christian Smith , @McKennaFitzgerald , @LauraVaughan ,"
+    contentLength: 1054694
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.lesswrong.com/w/mats-program
+    linkText: MATS Program - LessWrong
+    claimContext: The **ML Alignment & Theory Scholars (MATS) Program** is an educational seminar and independent research program that aims to provide talented scholars with talks, workshops, and research mentorship in the field of AI alignment, transparency, and security, connecting them with the Berkeley AI safety
+    fetchedAt: 2026-02-22T01:55:06.461Z
+    httpStatus: 200
+    pageTitle: MATS Program — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Program — LessWrong MATS Program Edited by Ryan Kidd , Multicore , et al. last updated 30th Dec 2024 ML Alignment & Theory Scholars (MATS) Program is an educational seminar and independent research program that aims to provide talented scholars with talks, workshops, and research mentorship in the field of AI alignment , and connect them with the Berkeley AI safet
+    contentLength: 712208
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.lesswrong.com/posts/zwf68YaySvXhWYCdh/mats-summer-2023-retrospective
+    linkText: MATS Summer 2023 Retrospective
+    claimContext: The **ML Alignment & Theory Scholars (MATS) Program** is an educational seminar and independent research program that aims to provide talented scholars with talks, workshops, and research mentorship in the field of AI alignment, transparency, and security, connecting them with the Berkeley AI safety
+    fetchedAt: 2026-02-22T01:55:06.418Z
+    httpStatus: 200
+    pageTitle: MATS Summer 2023 Retrospective — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Summer 2023 Retrospective — LessWrong MATS Program AI Alignment Fieldbuilding Postmortems & Retrospectives AI Frontpage 78 MATS Summer 2023 Retrospective by utilistrutil , Juan Gil , Ryan Kidd , Christian Smith , McKennaFitzgerald , LauraVaughan 1st Dec 2023 32 min read 34 78 Co-Authors: @Rocket , @Juan Gil , @Christian Smith , @McKennaFitzgerald , @LauraVaughan ,"
+    contentLength: 1054693
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.idealist.org/en/nonprofit/4dc1748de64748c581bd62aaa82fb366-machine-learning-alignment-theory-scholars-berkeley
+    linkText: Machine Learning Alignment Theory Scholars - Idealist
+    claimContext: MATS pairs scholars with leading researchers in AI safety for approximately 1-2 hours of mentorship per week, supplemented by seminars, workshops, guest lectures, and dedicated research manager support.[^8] The program provides comprehensive support including a \$15,000 living stipend, \$12,000 in c
+    fetchedAt: 2026-02-22T01:55:06.522Z
+    httpStatus: 200
+    pageTitle: Machine Learning Alignment & Theory Scholars - Organization - Idealist
+    contentSnippet: Machine Learning Alignment & Theory Scholars - Organization - Idealist Idealist Days Find a Job Jobs Internships Organizations Nonprofit Salary Explorer Crowdsourced compensation data in the nonprofit sector. Insights for job seekers and employers. Career Advice Informative and practical resources to help guide you throughout your social-impact career. Volunteer Find Volunteer Opportunities Search Organizations Volunteer Resources Tips and inspiration for finding the perfect volunteer opportunit
+    contentLength: 180770
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: MATS pairs scholars with leading researchers in AI safety for approximately 1-2 hours of mentorship per week, supplemented by seminars, workshops, guest lectures, and dedicated research manager support.[^8] The program provides comprehensive support including a \$15,000 living stipend, \$12,000 in c
+    fetchedAt: 2026-02-22T01:55:06.003Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.youtube.com/watch?v=tA9K8JqyhP4
+    linkText: "MATS: A talk on talent selection and development"
+    claimContext: 'Since its founding, MATS has trained over 446 researchers.[^10] The program has generated over 160 research publications with more than 9,000 citations, advancing agendas in <EntityLink id="interpretability">mechanistic interpretability</EntityLink>, sparse feature analysis, activation engineering, '
+    fetchedAt: 2026-02-22T01:55:06.187Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 11
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: 'Since its founding, MATS has trained over 446 researchers.[^10] The program has generated over 160 research publications with more than 9,000 citations, advancing agendas in <EntityLink id="interpretability">mechanistic interpretability</EntityLink>, sparse feature analysis, activation engineering, '
+    fetchedAt: 2026-02-22T01:55:07.733Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.effectivealtruism.org/opportunities/recdsVgelkD2qXd3P
+    linkText: MATS Program - Effective Altruism
+    claimContext: 'Since its founding, MATS has trained over 446 researchers.[^10] The program has generated over 160 research publications with more than 9,000 citations, advancing agendas in <EntityLink id="interpretability">mechanistic interpretability</EntityLink>, sparse feature analysis, activation engineering, '
+    fetchedAt: 2026-02-22T01:55:08.350Z
+    httpStatus: 200
+    pageTitle: MATS | Effective Altruism
+    contentSnippet: MATS | Effective Altruism Opportunities board MATS MATS Program View Opportunity type Independent project Advising Cause areas AI safety & policy Routes to impact Skill-building & building career capital Learning about important cause areas Testing your fit for a certain career path Direct high impact on an important cause Skill set Research Deadline 2025-09-12 Deadline soon Location Berkeley, USA Description The ML Alignment & Theory Scholars (MATS) Program is a 12-week research and educational
+    contentLength: 77247
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.lesswrong.com/posts/zwf68YaySvXhWYCdh/mats-summer-2023-retrospective
+    linkText: MATS Summer 2023 Retrospective
+    claimContext: "MATS originated as SERI MATS, an initiative under the Stanford Existential Risks Initiative (SERI) focused on AI safety research training.[^13] The program structure included a 4-week online upskilling phase (10 hours per week), a 2-week research sprint, and an 8-week intensive in-person program in "
+    fetchedAt: 2026-02-22T01:55:08.090Z
+    httpStatus: 200
+    pageTitle: MATS Summer 2023 Retrospective — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Summer 2023 Retrospective — LessWrong MATS Program AI Alignment Fieldbuilding Postmortems & Retrospectives AI Frontpage 78 MATS Summer 2023 Retrospective by utilistrutil , Juan Gil , Ryan Kidd , Christian Smith , McKennaFitzgerald , LauraVaughan 1st Dec 2023 32 min read 34 78 Co-Authors: @Rocket , @Juan Gil , @Christian Smith , @McKennaFitzgerald , @LauraVaughan ,"
+    contentLength: 1054695
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.lesswrong.com/posts/8vLvpxzpc6ntfBWNo/seri-ml-alignment-theory-scholars-program-2022
+    linkText: SERI ML Alignment Theory Scholars Program 2022
+    claimContext: "MATS originated as SERI MATS, an initiative under the Stanford Existential Risks Initiative (SERI) focused on AI safety research training.[^13] The program structure included a 4-week online upskilling phase (10 hours per week), a 2-week research sprint, and an 8-week intensive in-person program in "
+    fetchedAt: 2026-02-22T01:55:07.928Z
+    httpStatus: 200
+    pageTitle: SERI ML Alignment Theory Scholars Program 2022 — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. SERI ML Alignment Theory Scholars Program 2022 — LessWrong MATS Program AI Community Frontpage 69 SERI ML Alignment Theory Scholars Program 2022 by Ryan Kidd , Victor Warlop , ozhang 27th Apr 2022 AI Alignment Forum 3 min read 6 69 Ω 25 The Stanford Existential Risks Initiative ( SERI ) recently opened applications for the second iteration of the ML Alignment Theory Sc
+    contentLength: 438497
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.lesswrong.com/posts/8vLvpxzpc6ntfBWNo/seri-ml-alignment-theory-scholars-program-2022
+    linkText: SERI ML Alignment Theory Scholars Program 2022
+    claimContext: "MATS originated as SERI MATS, an initiative under the Stanford Existential Risks Initiative (SERI) focused on AI safety research training.[^13] The program structure included a 4-week online upskilling phase (10 hours per week), a 2-week research sprint, and an 8-week intensive in-person program in "
+    fetchedAt: 2026-02-22T01:55:08.136Z
+    httpStatus: 200
+    pageTitle: SERI ML Alignment Theory Scholars Program 2022 — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. SERI ML Alignment Theory Scholars Program 2022 — LessWrong MATS Program AI Community Frontpage 69 SERI ML Alignment Theory Scholars Program 2022 by Ryan Kidd , Victor Warlop , ozhang 27th Apr 2022 AI Alignment Forum 3 min read 6 69 Ω 25 The Stanford Existential Risks Initiative ( SERI ) recently opened applications for the second iteration of the ML Alignment Theory Sc
+    contentLength: 438497
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.idealist.org/en/nonprofit/4dc1748de64748c581bd62aaa82fb366-machine-learning-alignment-theory-scholars-berkeley
+    linkText: Machine Learning Alignment Theory Scholars - Idealist
+    claimContext: The program's core mission from inception was to train talented individuals for AI alignment research by addressing risks from unaligned AI through mentorship, training, logistics, and community access.[^16] The program eventually evolved into an independent organization, maintaining hubs in both Be
+    fetchedAt: 2026-02-22T01:55:09.546Z
+    httpStatus: 200
+    pageTitle: Machine Learning Alignment & Theory Scholars - Organization - Idealist
+    contentSnippet: Machine Learning Alignment & Theory Scholars - Organization - Idealist Idealist Days Find a Job Jobs Internships Organizations Nonprofit Salary Explorer Crowdsourced compensation data in the nonprofit sector. Insights for job seekers and employers. Career Advice Informative and practical resources to help guide you throughout your social-impact career. Volunteer Find Volunteer Opportunities Search Organizations Volunteer Resources Tips and inspiration for finding the perfect volunteer opportunit
+    contentLength: 180770
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.lesswrong.com/posts/zwf68YaySvXhWYCdh/mats-summer-2023-retrospective
+    linkText: MATS Summer 2023 Retrospective
+    claimContext: The program's core mission from inception was to train talented individuals for AI alignment research by addressing risks from unaligned AI through mentorship, training, logistics, and community access.[^16] The program eventually evolved into an independent organization, maintaining hubs in both Be
+    fetchedAt: 2026-02-22T01:55:10.391Z
+    httpStatus: 200
+    pageTitle: MATS Summer 2023 Retrospective — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Summer 2023 Retrospective — LessWrong MATS Program AI Alignment Fieldbuilding Postmortems & Retrospectives AI Frontpage 78 MATS Summer 2023 Retrospective by utilistrutil , Juan Gil , Ryan Kidd , Christian Smith , McKennaFitzgerald , LauraVaughan 1st Dec 2023 32 min read 34 78 Co-Authors: @Rocket , @Juan Gil , @Christian Smith , @McKennaFitzgerald , @LauraVaughan ,"
+    contentLength: 1054693
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://matsprogram.org/alumni
+    linkText: MATS Alumni
+    claimContext: "**Summer 2022**: The first cohort produced notable outcomes, including scholars like Johannes Treutlein working under Evan Hubinger, who co-authored papers on predictive models that were later published at the UAI 2023 conference.[^18]"
+    fetchedAt: 2026-02-22T01:55:09.539Z
+    httpStatus: 200
+    pageTitle: MATS Alumni
+    contentSnippet: "MATS Alumni Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Alumni MATS alumni are driving AI alignment research worldwide Robert Krzyzanowski Poseidon Research Before MATS, I had a strong interest in alignment generally but few skillsets relevant to the frontier of research and little idea of how to get started. Directly thanks to MATS, I achieved: (1) a relatively complete understanding of the structure of the most important questions and "
+    contentLength: 115818
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.lesswrong.com/posts/zwf68YaySvXhWYCdh/mats-summer-2023-retrospective
+    linkText: MATS Summer 2023 Retrospective
+    claimContext: "**Summer 2023 (4th Iteration)**: This cohort expanded to 60 scholars and 15 mentors, with 461 applicants (15% acceptance rate for the Training Phase).[^19] The program introduced the Scholar Research Plan (SRP) requiring a threat model, theory of change, and SMART plan, and implemented distinct phas"
+    fetchedAt: 2026-02-22T01:55:10.242Z
+    httpStatus: 200
+    pageTitle: MATS Summer 2023 Retrospective — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Summer 2023 Retrospective — LessWrong MATS Program AI Alignment Fieldbuilding Postmortems & Retrospectives AI Frontpage 78 MATS Summer 2023 Retrospective by utilistrutil , Juan Gil , Ryan Kidd , Christian Smith , McKennaFitzgerald , LauraVaughan 1st Dec 2023 32 min read 34 78 Co-Authors: @Rocket , @Juan Gil , @Christian Smith , @McKennaFitzgerald , @LauraVaughan ,"
+    contentLength: 1054693
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://forum.effectivealtruism.org/posts/Cz4tE2zwcwwakqBo8/mats-winter-2023-24-retrospective
+    linkText: MATS Winter 2023-24 Retrospective
+    claimContext: "**Winter 2023-24 (5th Iteration)**: Further growth to 63 scholars and 20 mentors, with a significant curriculum change replacing Alignment 201 with custom curricula due to feedback.[^20] This included <EntityLink id=\"neel-nanda\">Neel Nanda</EntityLink>'s remote mechanistic interpretability curriculu"
+    fetchedAt: 2026-02-22T01:55:09.448Z
+    httpStatus: 200
+    pageTitle: MATS Winter 2023-24 Retrospective — EA Forum
+    contentSnippet: "MATS Winter 2023-24 Retrospective — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents MATS Winter 2023-24 Retrospective by utilistrutil May 10 2024 59 min read 2 62 AI safety Postmortems & retrospectives Announcements and updates Building the field of AI safety Field-building Organization updates Frontpage MATS Winter 2023-24 Retrospective Summary Theory of Change Winter Program Overview "
+    contentLength: 755232
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://substack.com/home/post/p-171758976
+    linkText: MATS 8.0 Research Projects
+    claimContext: "**MATS 8.0 (Summer 2025)**: The program reached 98 scholars and 57 mentors, concluding with a symposium on August 22, 2025 featuring 10 spotlight talks and a poster session.[^21]"
+    fetchedAt: 2026-02-22T01:55:11.975Z
+    httpStatus: 200
+    pageTitle: MATS 8.0 Research Projects - Summer 2025 - MATS
+    contentSnippet: MATS 8.0 Research Projects - Summer 2025 - MATS Home Subscriptions Chat Activity Explore Profile Create The app for independent voices Get started Learn more For you Get app This site requires JavaScript to run correctly. Please turn on JavaScript or unblock scripts
+    contentLength: 152772
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.youtube.com/watch?v=tA9K8JqyhP4
+    linkText: "MATS: A talk on talent selection and development"
+    claimContext: By May 2024, MATS had supported 213 scholars and 47 mentors across five seasonal programs, presenting insights on talent selection and development at the TAIS 2024 conference.[^22]
+    fetchedAt: 2026-02-22T01:55:11.640Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 23
+    url: https://www.idealist.org/en/nonprofit/4dc1748de64748c581bd62aaa82fb366-machine-learning-alignment-theory-scholars-berkeley
+    linkText: Machine Learning Alignment Theory Scholars - Idealist
+    claimContext: "**Mentorship**: Scholars receive approximately 1-2 hours per week of working with their mentor, with more frequent communication via Slack.[^23] Each mentor conducts their own selection process, with some using work tasks and others conducting interviews. Interview topics varied among mentors but co"
+    fetchedAt: 2026-02-22T01:55:11.635Z
+    httpStatus: 200
+    pageTitle: Machine Learning Alignment & Theory Scholars - Organization - Idealist
+    contentSnippet: Machine Learning Alignment & Theory Scholars - Organization - Idealist Idealist Days Find a Job Jobs Internships Organizations Nonprofit Salary Explorer Crowdsourced compensation data in the nonprofit sector. Insights for job seekers and employers. Career Advice Informative and practical resources to help guide you throughout your social-impact career. Volunteer Find Volunteer Opportunities Search Organizations Volunteer Resources Tips and inspiration for finding the perfect volunteer opportunit
+    contentLength: 180770
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://forum.effectivealtruism.org/posts/da8MmRPAB55Fepjjk/my-experience-applying-to-mats-6-0
+    linkText: My experience applying to MATS 6.0
+    claimContext: "**Mentorship**: Scholars receive approximately 1-2 hours per week of working with their mentor, with more frequent communication via Slack.[^23] Each mentor conducts their own selection process, with some using work tasks and others conducting interviews. Interview topics varied among mentors but co"
+    fetchedAt: 2026-02-22T01:55:11.436Z
+    httpStatus: 200
+    pageTitle: My experience applying to MATS 6.0 — EA Forum
+    contentSnippet: My experience applying to MATS 6.0 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents My experience applying to MATS 6.0 by mic Jul 18 2024 6 min read 0 27 AI safety Building effective altruism Career choice Community experiences Research training programs Frontpage My experience applying to MATS 6.0 Application process Initial intake and mentor selection questions Follow-up questions In
+    contentLength: 189645
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "**Research Development**: Scholars develop a Research Plan approximately one month into the program, outlining their threat model, theory of change, and specific deliverables.[^25] Dedicated research managers provide support for scoping projects, maintaining progress, and removing obstacles througho"
+    fetchedAt: 2026-02-22T01:55:11.598Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "**Research Development**: Scholars develop a Research Plan approximately one month into the program, outlining their threat model, theory of change, and specific deliverables.[^25] Dedicated research managers provide support for scoping projects, maintaining progress, and removing obstacles througho"
+    fetchedAt: 2026-02-22T01:55:13.224Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.idealist.org/en/nonprofit/4dc1748de64748c581bd62aaa82fb366-machine-learning-alignment-theory-scholars-berkeley
+    linkText: Machine Learning Alignment Theory Scholars - Idealist
+    claimContext: '**Educational Programming**: The program includes seminars and workshops 2-3 times per week, featuring speakers from organizations like <EntityLink id="redwood-research">Redwood Research</EntityLink>, <EntityLink id="far-ai">FAR AI</EntityLink>, OpenAI, <EntityLink id="chai">CHAI</EntityLink>, and <'
+    fetchedAt: 2026-02-22T01:55:13.201Z
+    httpStatus: 200
+    pageTitle: Machine Learning Alignment & Theory Scholars - Organization - Idealist
+    contentSnippet: Machine Learning Alignment & Theory Scholars - Organization - Idealist Idealist Days Find a Job Jobs Internships Organizations Nonprofit Salary Explorer Crowdsourced compensation data in the nonprofit sector. Insights for job seekers and employers. Career Advice Informative and practical resources to help guide you throughout your social-impact career. Volunteer Find Volunteer Opportunities Search Organizations Volunteer Resources Tips and inspiration for finding the perfect volunteer opportunit
+    contentLength: 180770
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://matsprogram.org/program/summer-2026
+    linkText: MATS Summer 2026 Program
+    claimContext: "**Research Tracks**: MATS offers multiple specialization areas including technical governance, empirical research, policy & strategy, theory, and compute governance.[^28]"
+    fetchedAt: 2026-02-22T01:55:13.515Z
+    httpStatus: 200
+    pageTitle: MATS Summer 2026
+    contentSnippet: MATS Summer 2026 Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Program Summer 2026 MATS Summer 2026 The Summer 2026 program will run from June through August. It will be largest MATS program to date with 120 fellows and 100 mentors. Fellows will be connected with mentors or organizational research groups, such as Anthropic&#x27;s Alignment Science team, UK AISI , Redwood Research , ARC , and LawZero , to collaborate on a research project o
+    contentLength: 471653
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://manifund.org/projects/mats-funding
+    linkText: MATS Funding - Manifund
+    claimContext: The program provides comprehensive material support valued at approximately \$35,000 per scholar:[^29]
+    fetchedAt: 2026-02-22T01:55:19.528Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 30
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "- \\$15,000 stipend for living expenses (provided by AI Safety Support)[^30] - \\$12,000 compute budget for experiments and evaluations[^31]"
+    fetchedAt: 2026-02-22T01:55:13.797Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "- \\$15,000 stipend for living expenses (provided by AI Safety Support)[^30] - \\$12,000 compute budget for experiments and evaluations[^31] - Private housing for the full program duration in Berkeley or London[^32]"
+    fetchedAt: 2026-02-22T01:55:21.297Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "- \\$12,000 compute budget for experiments and evaluations[^31] - Private housing for the full program duration in Berkeley or London[^32] - Office space access and catered meals[^33]"
+    fetchedAt: 2026-02-22T01:55:21.078Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "- Private housing for the full program duration in Berkeley or London[^32] - Office space access and catered meals[^33] - Travel reimbursement where applicable"
+    fetchedAt: 2026-02-22T01:55:21.446Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://matsprogram.org/faq
+    linkText: MATS FAQ
+    claimContext: Selected scholars may continue for an additional 6 or 12 months through extension programs, with London as the main hub, though scholars can also participate from Berkeley, Boston, or Washington D.C. MATS arranges funding to cover monthly stipends and compute resources, and for scholars participatin
+    fetchedAt: 2026-02-22T01:55:21.248Z
+    httpStatus: 200
+    pageTitle: MATS Frequently Asked Questions
+    contentSnippet: "MATS Frequently Asked Questions Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About FAQ Frequently asked questions FAQ Categories: MATS applications Finances MATS program Extensions The Application What are the key dates for MATS Summer 2026? The timeline for the MATS Summer 2026 program is: ‍ ‍ Application final deadline : January 18 , 2026 Program dates : Early June to late August. The Summer 2026 Program takes place in-person in Berkeley, Cal"
+    contentLength: 87762
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://matsprogram.org/program/summer-2026
+    linkText: MATS Summer 2026 Program
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:55:21.102Z
+    httpStatus: 200
+    pageTitle: MATS Summer 2026
+    contentSnippet: MATS Summer 2026 Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Program Summer 2026 MATS Summer 2026 The Summer 2026 program will run from June through August. It will be largest MATS program to date with 120 fellows and 100 mentors. Fellows will be connected with mentors or organizational research groups, such as Anthropic&#x27;s Alignment Science team, UK AISI , Redwood Research , ARC , and LawZero , to collaborate on a research project o
+    contentLength: 471653
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "Over four years, MATS has produced significant research output, with alumni generating over 160 publications that have received more than 8,000 citations, yielding an organizational h-index of 40.[^36] Notable publications include:"
+    fetchedAt: 2026-02-22T01:55:22.651Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.lesswrong.com/posts/jeBkx6agMuBCQW94C/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis
+    claimContext: "- *Steering Llama 2 via Contrastive Activation Addition* (Outstanding Paper Award at ACL 2024)[^37] - *Conditioning Predictive Models: Risks and Strategies* (published at UAI 2023)[^38]"
+    fetchedAt: 2026-02-22T01:55:23.452Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Alumni Impact Analysis — LessWrong AI Alignment Fieldbuilding MATS Program Postmortems & Retrospectives AI Frontpage 62 MATS Alumni Impact Analysis by utilistrutil , Juan Gil , yams , LauraVaughan , K Richards , Ryan Kidd 30th Sep 2024 14 min read 7 62 Summary This winter, MATS will be running our seventh program. In early-mid 2024, 46% of alumni from our first fo
+    contentLength: 527561
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.lesswrong.com/posts/jeBkx6agMuBCQW94C/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis
+    claimContext: "- *Steering Llama 2 via Contrastive Activation Addition* (Outstanding Paper Award at ACL 2024)[^37] - *Conditioning Predictive Models: Risks and Strategies* (published at UAI 2023)[^38] - *Incentivizing Honest Performative Predictions with Proper Scoring Rules* (UAI 2023)"
+    fetchedAt: 2026-02-22T01:55:23.772Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Alumni Impact Analysis — LessWrong AI Alignment Fieldbuilding MATS Program Postmortems & Retrospectives AI Frontpage 62 MATS Alumni Impact Analysis by utilistrutil , Juan Gil , yams , LauraVaughan , K Richards , Ryan Kidd 30th Sep 2024 14 min read 7 62 Summary This winter, MATS will be running our seventh program. In early-mid 2024, 46% of alumni from our first fo
+    contentLength: 527561
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.lesswrong.com/posts/jeBkx6agMuBCQW94C/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis
+    claimContext: In a survey of alumni from the first four programs (46% response rate), 78% reported their key publication "possibly" or "probably" would not have happened without MATS, with 10% accelerated by more than 6 months and 14% accelerated by 1-6 months.[^39]
+    fetchedAt: 2026-02-22T01:55:23.465Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Alumni Impact Analysis — LessWrong AI Alignment Fieldbuilding MATS Program Postmortems & Retrospectives AI Frontpage 62 MATS Alumni Impact Analysis by utilistrutil , Juan Gil , yams , LauraVaughan , K Richards , Ryan Kidd 30th Sep 2024 14 min read 7 62 Summary This winter, MATS will be running our seventh program. In early-mid 2024, 46% of alumni from our first fo
+    contentLength: 527561
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: '- Sparse auto-encoders for AI interpretability[^40] - Activation and <EntityLink id="representation-engineering">representation engineering</EntityLink>'
+    fetchedAt: 2026-02-22T01:55:22.661Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: These research directions span mechanistic interpretability, sparse feature analysis, and studies of latent representations in AI systems.[^41]
+    fetchedAt: 2026-02-22T01:55:24.977Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.lesswrong.com/posts/jeBkx6agMuBCQW94C/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis
+    claimContext: '**Employment**: 49% of surveyed alumni reported working or interning on AI alignment or control, with 29% conducting independent alignment research.[^42] Among earlier cohorts, 39% were hired by research organizations post-MATS, with 50% indicating MATS made them "much more likely" to be hired.[^43]'
+    fetchedAt: 2026-02-22T01:55:25.778Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Alumni Impact Analysis — LessWrong AI Alignment Fieldbuilding MATS Program Postmortems & Retrospectives AI Frontpage 62 MATS Alumni Impact Analysis by utilistrutil , Juan Gil , yams , LauraVaughan , K Richards , Ryan Kidd 30th Sep 2024 14 min read 7 62 Summary This winter, MATS will be running our seventh program. In early-mid 2024, 46% of alumni from our first fo
+    contentLength: 527561
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.youtube.com/watch?v=tA9K8JqyhP4
+    linkText: "MATS: A talk on talent selection and development"
+    claimContext: '**Employment**: 49% of surveyed alumni reported working or interning on AI alignment or control, with 29% conducting independent alignment research.[^42] Among earlier cohorts, 39% were hired by research organizations post-MATS, with 50% indicating MATS made them "much more likely" to be hired.[^43]'
+    fetchedAt: 2026-02-22T01:55:25.247Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 44
+    url: https://www.youtube.com/watch?v=tA9K8JqyhP4
+    linkText: "MATS: A talk on talent selection and development"
+    claimContext: "**Organizational Placements**: Alumni have joined nearly every major AI safety initiative, including Anthropic, OpenAI, DeepMind, CHAI, and Redwood Research.[^44] Notable examples include:"
+    fetchedAt: 2026-02-22T01:55:25.196Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 45
+    url: https://matsprogram.org/alumni
+    linkText: MATS Alumni
+    claimContext: "- Nina (Summer 2023, mentored by Evan Hubinger): Joined Anthropic as a research scientist; won ACL 2024 Outstanding Paper Award; later mentored SPAR and MATS cohorts[^45] - Marius Hobbhahn (Winter 2022/23, mentored by Evan Hubinger): Founded and became CEO of Apollo Research, a London-based technica"
+    fetchedAt: 2026-02-22T01:55:24.939Z
+    httpStatus: 200
+    pageTitle: MATS Alumni
+    contentSnippet: "MATS Alumni Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Alumni MATS alumni are driving AI alignment research worldwide Robert Krzyzanowski Poseidon Research Before MATS, I had a strong interest in alignment generally but few skillsets relevant to the frontier of research and little idea of how to get started. Directly thanks to MATS, I achieved: (1) a relatively complete understanding of the structure of the most important questions and "
+    contentLength: 115818
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://matsprogram.org/alumni
+    linkText: MATS Alumni
+    claimContext: "- Nina (Summer 2023, mentored by Evan Hubinger): Joined Anthropic as a research scientist; won ACL 2024 Outstanding Paper Award; later mentored SPAR and MATS cohorts[^45] - Marius Hobbhahn (Winter 2022/23, mentored by Evan Hubinger): Founded and became CEO of Apollo Research, a London-based technica"
+    fetchedAt: 2026-02-22T01:55:26.950Z
+    httpStatus: 200
+    pageTitle: MATS Alumni
+    contentSnippet: "MATS Alumni Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Alumni MATS alumni are driving AI alignment research worldwide Robert Krzyzanowski Poseidon Research Before MATS, I had a strong interest in alignment generally but few skillsets relevant to the frontier of research and little idea of how to get started. Directly thanks to MATS, I achieved: (1) a relatively complete understanding of the structure of the most important questions and "
+    contentLength: 115818
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://matsprogram.org/alumni
+    linkText: MATS Alumni
+    claimContext: '- Marius Hobbhahn (Winter 2022/23, mentored by Evan Hubinger): Founded and became CEO of Apollo Research, a London-based technical alignment organization focused on scheming evaluations and <EntityLink id="ai-control">AI control</EntityLink>[^46] - Johannes Treutlein (Summer 2022, mentored by Evan H'
+    fetchedAt: 2026-02-22T01:55:26.944Z
+    httpStatus: 200
+    pageTitle: MATS Alumni
+    contentSnippet: "MATS Alumni Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Alumni MATS alumni are driving AI alignment research worldwide Robert Krzyzanowski Poseidon Research Before MATS, I had a strong interest in alignment generally but few skillsets relevant to the frontier of research and little idea of how to get started. Directly thanks to MATS, I achieved: (1) a relatively complete understanding of the structure of the most important questions and "
+    contentLength: 115818
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.lesswrong.com/posts/jeBkx6agMuBCQW94C/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis
+    claimContext: "**New Organizations**: Alumni have founded new AI safety initiatives including Apollo Research, Cadenza Labs, PRISM Eval, and have organized conferences on singular learning theory and developmental interpretability.[^48]"
+    fetchedAt: 2026-02-22T01:55:27.222Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Alumni Impact Analysis — LessWrong AI Alignment Fieldbuilding MATS Program Postmortems & Retrospectives AI Frontpage 62 MATS Alumni Impact Analysis by utilistrutil , Juan Gil , yams , LauraVaughan , K Richards , Ryan Kidd 30th Sep 2024 14 min read 7 62 Summary This winter, MATS will be running our seventh program. In early-mid 2024, 46% of alumni from our first fo
+    contentLength: 527561
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.lesswrong.com/posts/jeBkx6agMuBCQW94C/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis
+    claimContext: "**Skill Development**: 49% of alumni reported MATS increased their research or technical skills, while 38% gained legible career capital.[^49]"
+    fetchedAt: 2026-02-22T01:55:27.294Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Alumni Impact Analysis — LessWrong AI Alignment Fieldbuilding MATS Program Postmortems & Retrospectives AI Frontpage 62 MATS Alumni Impact Analysis by utilistrutil , Juan Gil , yams , LauraVaughan , K Richards , Ryan Kidd 30th Sep 2024 14 min read 7 62 Summary This winter, MATS will be running our seventh program. In early-mid 2024, 46% of alumni from our first fo
+    contentLength: 527561
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://tais2024.cc/agenda/ryan-kidd/
+    linkText: Ryan Kidd - TAIS 2024
+    claimContext: "**Ryan Kidd** serves as Co-Executive Director of MATS and Co-Founder of the London Initiative for Safe AI (LISA).[^50] He was a scholar in MATS's first iteration (which had only 5 scholars total) and has since become a <EntityLink id=\"manifund\">Manifund</EntityLink> Regrantor and advisor to organiza"
+    fetchedAt: 2026-02-22T01:55:27.713Z
+    httpStatus: 200
+    pageTitle: Ryan Kidd &#8211; Technical AI Safety Conference
+    contentSnippet: Ryan Kidd &#8211; Technical AI Safety Conference Technical AI Safety Conference Ryan Kidd キッド・ライアン ML Alignment & Theory Scholars Program (MATS) Ryan is Co-Director of the ML Alignment & Theory Scholars Program (since early 2022) and a Board Member and Co-Founder of the London Initiative for Safe AI (since early 2023). Previously, he completed a PhD in Physics at the University of Queensland. Insights from two years of AI safety field-building at MATS Friday, April 5th, 10:00–10:30 The ML Alignm
+    contentLength: 179767
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://matsprogram.org/team
+    linkText: MATS Team
+    claimContext: "**Christian Smith** serves as Co-Executive Director and Co-Founder of LISA.[^51] He brings a background in particle physics and pedagogy from Stanford University, having conducted research at CERN and organized educational programs like the Uncommon Sense Seminar."
+    fetchedAt: 2026-02-22T01:55:28.923Z
+    httpStatus: 200
+    pageTitle: MATS Team
+    contentSnippet: "MATS Team Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Team Meet the MATS team MATS is an independent research and educational seminar program that connects talented scholars with top mentors in the fields of AI alignment, interpretability, governance, and security. The main goal of MATS is to grow the AI safety & security research fields. View open roles Leadership Ryan Kidd Co-Executive Director Ryan is Co-Executive Director of MATS, a "
+    contentLength: 190357
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://forum.effectivealtruism.org/posts/Cz4tE2zwcwwakqBo8/mats-winter-2023-24-retrospective
+    linkText: MATS Winter 2023-24 Retrospective
+    claimContext: "**Laura Vaughan**, a Thiel Fellow (2017) who studied physics at the University of Waterloo, brings experience in ML model dataset creation and training, management, entrepreneurship, full-stack software engineering, and biomedical research.[^52] She co-founded a stem cell cryogenics startup before j"
+    fetchedAt: 2026-02-22T01:55:28.842Z
+    httpStatus: 200
+    pageTitle: MATS Winter 2023-24 Retrospective — EA Forum
+    contentSnippet: "MATS Winter 2023-24 Retrospective — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents MATS Winter 2023-24 Retrospective by utilistrutil May 11 2024 59 min read 2 62 AI safety Postmortems & retrospectives Announcements and updates Building the field of AI safety Field-building Organization updates Frontpage MATS Winter 2023-24 Retrospective Summary Theory of Change Winter Program Overview "
+    contentLength: 755224
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://matsprogram.org/mentors
+    linkText: MATS Mentors
+    claimContext: MATS mentors come from leading organizations including Anthropic, Google DeepMind, Redwood Research, OpenAI, <EntityLink id="miri">MIRI</EntityLink>, ARC (<EntityLink id="arc">Alignment Research Center</EntityLink>), CHAI, <EntityLink id="cais">CAIS</EntityLink>, and the Centre on Long-Term Risk.[^5
+    fetchedAt: 2026-02-22T01:55:28.858Z
+    httpStatus: 200
+    pageTitle: MATS Mentors
+    contentSnippet: MATS Mentors Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Mentors MATS mentors are advancing the frontiers of AI alignment, transparency, and security Apply to mentor Filters Policy & Governance Strategy & Forecasting Scheming and Deception Policy and Governance Strategy and Forecasting Compute and Hardware Compute Infrastructure Alignment Training Dangerous Capability Evals Biorisk Interpretability Red-Teaming Safeguards Multi-Agent Safe
+    contentLength: 288762
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://matsprogram.org/mentors
+    linkText: MATS Mentors
+    claimContext: '- **Marius Hobbhahn**: CEO of Apollo Research, where he also leads the evals team; Apollo focuses on <EntityLink id="scheming">scheming</EntityLink>, evals, and control; PhD in Bayesian ML; formerly worked on AI forecasting at Epoch[^54] - **Sam Bowman**: Leads a research group working on AI alignme'
+    fetchedAt: 2026-02-22T01:55:28.942Z
+    httpStatus: 200
+    pageTitle: MATS Mentors
+    contentSnippet: MATS Mentors Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Mentors MATS mentors are advancing the frontiers of AI alignment, transparency, and security Apply to mentor Filters Policy & Governance Strategy & Forecasting Scheming and Deception Policy and Governance Strategy and Forecasting Compute and Hardware Compute Infrastructure Alignment Training Dangerous Capability Evals Biorisk Interpretability Red-Teaming Safeguards Multi-Agent Safe
+    contentLength: 288762
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://matsprogram.org/mentors
+    linkText: MATS Mentors
+    claimContext: '- **Marius Hobbhahn**: CEO of Apollo Research, where he also leads the evals team; Apollo focuses on <EntityLink id="scheming">scheming</EntityLink>, evals, and control; PhD in Bayesian ML; formerly worked on AI forecasting at Epoch[^54] - **Sam Bowman**: Leads a research group working on AI alignme'
+    fetchedAt: 2026-02-22T01:55:29.163Z
+    httpStatus: 200
+    pageTitle: MATS Mentors
+    contentSnippet: MATS Mentors Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Mentors MATS mentors are advancing the frontiers of AI alignment, transparency, and security Apply to mentor Filters Policy & Governance Strategy & Forecasting Scheming and Deception Policy and Governance Strategy and Forecasting Compute and Hardware Compute Infrastructure Alignment Training Dangerous Capability Evals Biorisk Interpretability Red-Teaming Safeguards Multi-Agent Safe
+    contentLength: 288762
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://matsprogram.org/mentors
+    linkText: MATS Mentors
+    claimContext: "- **Sam Bowman**: Leads a research group working on AI alignment and welfare at Anthropic, with a particular focus on evaluation; Associate Professor of Computer Science and Data Science at NYU (on leave); has been studying neural network language models since 2012[^55] - **Joe Benton**: Member of t"
+    fetchedAt: 2026-02-22T01:55:30.325Z
+    httpStatus: 200
+    pageTitle: MATS Mentors
+    contentSnippet: MATS Mentors Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Mentors MATS mentors are advancing the frontiers of AI alignment, transparency, and security Apply to mentor Filters Policy & Governance Strategy & Forecasting Scheming and Deception Policy and Governance Strategy and Forecasting Compute and Hardware Compute Infrastructure Alignment Training Dangerous Capability Evals Biorisk Interpretability Red-Teaming Safeguards Multi-Agent Safe
+    contentLength: 288762
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://matsprogram.org/mentors
+    linkText: MATS Mentors
+    claimContext: '- **Joe Benton**: Member of the Alignment Science team at Anthropic, working on <EntityLink id="scalable-oversight">scalable oversight</EntityLink> with interests in control, chain-of-thought monitoring, and alignment evaluations[^56] - **Arthur Conmy**: Senior Research Engineer at Google DeepMind o'
+    fetchedAt: 2026-02-22T01:55:30.339Z
+    httpStatus: 200
+    pageTitle: MATS Mentors
+    contentSnippet: MATS Mentors Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Mentors MATS mentors are advancing the frontiers of AI alignment, transparency, and security Apply to mentor Filters Policy & Governance Strategy & Forecasting Scheming and Deception Policy and Governance Strategy and Forecasting Compute and Hardware Compute Infrastructure Alignment Training Dangerous Capability Evals Biorisk Interpretability Red-Teaming Safeguards Multi-Agent Safe
+    contentLength: 288762
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://www.alignmentforum.org/posts/FpokmCnbP3CEZ5h4t/ml-alignment-theory-program-under-evan-hubinger
+    linkText: ML Alignment Theory Program under Evan Hubinger
+    claimContext: "- **Arthur Conmy**: Senior Research Engineer at Google DeepMind on the Language Model Interpretability team with Neel Nanda; focus on practically useful interpretability and related AI safety research; previously did early influential work on automating interpretability and finding circuits; formerl"
+    fetchedAt: 2026-02-22T01:55:37.055Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 59
+    url: https://www.lesswrong.com/posts/Z87fSrxQb4yLXKcTk/mats-winter-2023-24-retrospective
+    linkText: MATS Winter 2023-24 Retrospective
+    claimContext: "- **Evan Hubinger**: Provided mentorship for early SERI MATS trials and multiple cohorts; formerly at MIRI, now at Anthropic[^58] - **Neel Nanda**: Senior Research Scientist leading the mechanistic interpretability team at Google DeepMind; a returning MATS mentor who has run Training Phases for scho"
+    fetchedAt: 2026-02-22T01:55:30.774Z
+    httpStatus: 200
+    pageTitle: MATS Winter 2023-24 Retrospective — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. MATS Winter 2023-24 Retrospective — LessWrong AI Alignment Fieldbuilding MATS Program Postmortems & Retrospectives Personal Blog 90 MATS Winter 2023-24 Retrospective by utilistrutil , LauraVaughan , McKennaFitzgerald , Christian Smith , Juan Gil , Henry Sleight , Matthew Wearden , Ryan Kidd 11th May 2024 59 min read 28 90 Co-Authors: @Rocket , @LauraVaughan , @McKennaF"
+    contentLength: 1247855
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://www.extruct.ai/hub/matsprogram-org-funding/
+    linkText: MATS Funding - Extruct
+    claimContext: "MATS receives grants from partner organizations to support its fellowship program.[^60] Financial support for scholars is coordinated through partner organizations rather than directly by MATS:"
+    fetchedAt: 2026-02-22T01:55:30.747Z
+    httpStatus: 200
+    pageTitle: ML Alignment & Theory Scholars Funding | Complete Analysis | Extruct AI
+    contentSnippet: "ML Alignment & Theory Scholars Funding | Complete Analysis | Extruct AI Pricing Research Product Blog Data Room API Docs Sign Up Login Loading company information... Product Home Pricing API Docs Resources Documentation How to Start Blog Data Accuracy Data Room Company Support Terms of Service Privacy Policy Cookie Policy DPA Consent Preferences © Copyright 2026 , All Rights Reserved ML Alignment & Theory Scholars Analysis : $3M Raised What is ML Alignment & Theory Scholars? ML Alignment & Theor"
+    contentLength: 70983
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://matsprogram.org
+    linkText: MATS Program Homepage
+    claimContext: "**Primary Funding Sources**: - **AI Safety Support**: Provides the \\$15,000 stipend for each fellow completing the full program (prorated for partial participation)[^61] - **MATS-arranged funding**: Covers extension program costs including monthly stipends, compute, housing, and office rent for 6-12"
+    fetchedAt: 2026-02-22T01:55:38.474Z
+    httpStatus: 200
+    pageTitle: MATS Research
+    contentSnippet: "MATS Research Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Launch your career in AI alignment & security The MATS Program is an independent research and educational seminar program that connects talented researchers with top mentors in the fields of AI alignment , transparency , and security . The program runs for 12 weeks with in-person cohorts in Berkeley and London, where MATS fellows conduct research while attending talks, workshops, "
+    contentLength: 185762
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://matsprogram.org/faq
+    linkText: MATS FAQ
+    claimContext: "- **AI Safety Support**: Provides the \\$15,000 stipend for each fellow completing the full program (prorated for partial participation)[^61] - **MATS-arranged funding**: Covers extension program costs including monthly stipends, compute, housing, and office rent for 6-12 month extensions[^62] - **<E"
+    fetchedAt: 2026-02-22T01:55:38.734Z
+    httpStatus: 200
+    pageTitle: MATS Frequently Asked Questions
+    contentSnippet: "MATS Frequently Asked Questions Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About FAQ Frequently asked questions FAQ Categories: MATS applications Finances MATS program Extensions The Application What are the key dates for MATS Summer 2026? The timeline for the MATS Summer 2026 program is: ‍ ‍ Application final deadline : January 18 , 2026 Program dates : Early June to late August. The Summer 2026 Program takes place in-person in Berkeley, Cal"
+    contentLength: 87762
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://www.alignmentforum.org/posts/FpokmCnbP3CEZ5h4t/ml-alignment-theory-program-under-evan-hubinger
+    linkText: ML Alignment Theory Program under Evan Hubinger
+    claimContext: '- **MATS-arranged funding**: Covers extension program costs including monthly stipends, compute, housing, and office rent for 6-12 month extensions[^62] - **<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>**: Provided grants to support the early SERI MATS trial program, including gr'
+    fetchedAt: 2026-02-22T01:55:44.273Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 64
+    url: https://matsprogram.org/team
+    linkText: MATS Team
+    claimContext: '- **<EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>**: Provided grants to support the early SERI MATS trial program, including grants of \$1,008,127 (April 2022), \$1,538,000 (November 2022), and \$428,942 (June 2023)[^63] - **Other supporters (2024)**: Foresight Institute, <Entity'
+    fetchedAt: 2026-02-22T01:55:38.456Z
+    httpStatus: 200
+    pageTitle: MATS Team
+    contentSnippet: "MATS Team Research Mentors About About Mid Missouri Region Kansas City Region Apply Research Mentors About About Team Meet the MATS team MATS is an independent research and educational seminar program that connects talented scholars with top mentors in the fields of AI alignment, interpretability, governance, and security. The main goal of MATS is to grow the AI safety & security research fields. View open roles Leadership Ryan Kidd Co-Executive Director Ryan is Co-Executive Director of MATS, a "
+    contentLength: 190357
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://manifund.org/projects/mats-funding
+    linkText: MATS Funding - Manifund
+    claimContext: "**Per-Scholar Investment**: The total cost per scholar is approximately \\$35,000 for the full program, based on recent cohorts of 60 scholars and 15 mentors.[^65] This includes the \\$15k stipend, compute resources, and costs for housing, meals, office space, and program administration."
+    fetchedAt: 2026-02-22T01:55:44.738Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 66
+    url: https://www.lesswrong.com/posts/8vLvpxzpc6ntfBWNo/seri-ml-alignment-theory-scholars-program-2022
+    linkText: SERI ML Alignment Theory Scholars Program 2022
+    claimContext: "**Historical Funding**: In the 2022 SERI MATS program, scholars received \\$6,000 after completing the training and research sprint phase and \\$16,000 at program completion, with all accommodation, office space, and event expenses covered. Ongoing discretionary funding was also available to promising"
+    fetchedAt: 2026-02-22T01:55:46.516Z
+    httpStatus: 200
+    pageTitle: SERI ML Alignment Theory Scholars Program 2022 — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. SERI ML Alignment Theory Scholars Program 2022 — LessWrong MATS Program AI Community Frontpage 69 SERI ML Alignment Theory Scholars Program 2022 by Ryan Kidd , Victor Warlop , ozhang 27th Apr 2022 AI Alignment Forum 3 min read 6 69 Ω 25 The Stanford Existential Risks Initiative ( SERI ) recently opened applications for the second iteration of the ML Alignment Theory Sc
+    contentLength: 438499
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://www.lesswrong.com/posts/iD6tYjLLFFn4LXgnt/how-mats-addresses-mass-movement-building-concerns
+    linkText: How MATS addresses mass movement building concerns
+    claimContext: "Program organizers acknowledge concerns that MATS's appeal—particularly access to scaling lab mentors—could attract aspiring AI researchers not primarily focused on existential risk reduction, potentially introducing viewpoints that dilute the field's epistemic rigor.[^67] While organizers maintain "
+    fetchedAt: 2026-02-22T01:55:46.240Z
+    httpStatus: 200
+    pageTitle: How MATS addresses “mass movement building” concerns — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. How MATS addresses “mass movement building” concerns — LessWrong MATS Program AI Community Frontpage 63 How MATS addresses “mass movement building” concerns by Ryan Kidd 4th May 2023 3 min read 9 63 Recently, many AI safety movement-building programs have been criticized for attempting to grow the field too rapidly and thus: Producing more aspiring alignment researcher"
+    contentLength: 459403
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://www.lesswrong.com/posts/iD6tYjLLFFn4LXgnt/how-mats-addresses-mass-movement-building-concerns
+    linkText: How MATS addresses mass movement building concerns
+    claimContext: "Critics note that scholars might overly defer to mentors, failing to critically analyze assumptions and reducing independent thinking or new viewpoints in the field.[^68] This concern exists in tension with the opposite problem: insufficient mentorship could lead to excessive peer reliance among ine"
+    fetchedAt: 2026-02-22T01:55:46.353Z
+    httpStatus: 200
+    pageTitle: How MATS addresses “mass movement building” concerns — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. How MATS addresses “mass movement building” concerns — LessWrong MATS Program AI Community Frontpage 63 How MATS addresses “mass movement building” concerns by Ryan Kidd 4th May 2023 3 min read 9 63 Recently, many AI safety movement-building programs have been criticized for attempting to grow the field too rapidly and thus: Producing more aspiring alignment researcher"
+    contentLength: 459403
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://www.lesswrong.com/posts/iD6tYjLLFFn4LXgnt/how-mats-addresses-mass-movement-building-concerns
+    linkText: How MATS addresses mass movement building concerns
+    claimContext: "Critics note that scholars might overly defer to mentors, failing to critically analyze assumptions and reducing independent thinking or new viewpoints in the field.[^68] This concern exists in tension with the opposite problem: insufficient mentorship could lead to excessive peer reliance among ine"
+    fetchedAt: 2026-02-22T01:55:46.620Z
+    httpStatus: 200
+    pageTitle: How MATS addresses “mass movement building” concerns — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. How MATS addresses “mass movement building” concerns — LessWrong MATS Program AI Community Frontpage 63 How MATS addresses “mass movement building” concerns by Ryan Kidd 4th May 2023 3 min read 9 63 Recently, many AI safety movement-building programs have been criticized for attempting to grow the field too rapidly and thus: Producing more aspiring alignment researcher"
+    contentLength: 459401
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://forum.effectivealtruism.org/posts/kJA9q3SGycx6TXjcF/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis - EA Forum
+    claimContext: Alumni feedback highlights specific challenges reported by MATS participants:[^70][^70]
+    fetchedAt: 2026-02-22T01:55:46.134Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — EA Forum
+    contentSnippet: MATS Alumni Impact Analysis — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents MATS Alumni Impact Analysis by utilistrutil Oct 2 2024 14 min read 1 16 AI safety Career choice Postmortems & retrospectives Building the field of AI safety Fellowships and internships Frontpage MATS Alumni Impact Analysis Summary Background on Cohort Employment Outcomes Publication Outcomes Other Outcomes Eva
+    contentLength: 235462
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://forum.effectivealtruism.org/posts/da8MmRPAB55Fepjjk/my-experience-applying-to-mats-6-0
+    linkText: My experience applying to MATS 6.0
+    claimContext: "With approximately 15% acceptance rates and 40+ mentors conducting independent selection, even proficient researchers and engineers with AI safety experience frequently receive rejections due to mentor capacity limits rather than candidate quality.[^71] Application processes involve mentor-specific "
+    fetchedAt: 2026-02-22T01:55:47.675Z
+    httpStatus: 200
+    pageTitle: My experience applying to MATS 6.0 — EA Forum
+    contentSnippet: My experience applying to MATS 6.0 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents My experience applying to MATS 6.0 by mic Jul 18 2024 6 min read 0 27 AI safety Building effective altruism Career choice Community experiences Research training programs Frontpage My experience applying to MATS 6.0 Application process Initial intake and mentor selection questions Follow-up questions In
+    contentLength: 189642
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://forum.effectivealtruism.org/posts/kJA9q3SGycx6TXjcF/mats-alumni-impact-analysis
+    linkText: MATS Alumni Impact Analysis - EA Forum
+    claimContext: Alumni feedback indicates that scholars with prior research experience often rate MATS superior to alternatives like independent research or "hub-hopping," though some note they would have preferred later participation after building more ML skills through programs like ARENA.[^72]
+    fetchedAt: 2026-02-22T01:55:47.847Z
+    httpStatus: 200
+    pageTitle: MATS Alumni Impact Analysis — EA Forum
+    contentSnippet: MATS Alumni Impact Analysis — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents MATS Alumni Impact Analysis by utilistrutil Oct 2 2024 14 min read 1 16 AI safety Career choice Postmortems & retrospectives Building the field of AI safety Fellowships and internships Frontpage MATS Alumni Impact Analysis Summary Background on Cohort Employment Outcomes Publication Outcomes Other Outcomes Eva
+    contentLength: 232667
+    status: verified
+    note: null

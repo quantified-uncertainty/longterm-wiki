@@ -1,0 +1,612 @@
+pageId: robin-hanson
+verifiedAt: 2026-02-22
+totalCitations: 55
+verified: 40
+broken: 15
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://economics.gmu.edu/people/rhanson
+    linkText: Robin Hanson bio - George Mason University Economics
+    claimContext: '|-----------|------------| | **Primary Role** | Associate Professor of Economics at George Mason University; Research Associate at <EntityLink id="fhi">Future of Humanity Institute</EntityLink>, Oxford University[^1] | | **Major Contributions** | Pioneered <EntityLink id="prediction-markets">predict'
+    fetchedAt: 2026-02-22T02:02:56.049Z
+    httpStatus: 200
+    pageTitle: "Economics | Faculty and Staff: Robin D Hanson"
+    contentSnippet: "--> Economics | Faculty and Staff: Robin D Hanson We use cookies and similar technologies to improve your website experience and help us understand how you use our website. By continuing to use this website, you consent to the usage of cookies. Learn more about our Privacy Statement and Cookie Policy . Agree Decline Non-Essential Cookies &times; About Austrian Economics Experimental Economics Public Choice Economics Graduate Programs PhD in Economics MA in Economics Accelerated MA in Economics U"
+    contentLength: 55990
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson professional bio - hanson.gmu.edu
+    claimContext: '| **Primary Role** | Associate Professor of Economics at George Mason University; Research Associate at <EntityLink id="fhi">Future of Humanity Institute</EntityLink>, Oxford University[^1] | | **Major Contributions** | Pioneered <EntityLink id="prediction-markets">prediction markets</EntityLink> (1'
+    fetchedAt: 2026-02-22T02:02:57.512Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 3
+    url: https://foresight.org/people/robin-d-hanson/
+    linkText: Robin Hanson - Foresight Institute
+    claimContext: '| **Major Contributions** | Pioneered <EntityLink id="prediction-markets">prediction markets</EntityLink> (1988-present); invented Logarithmic Market Scoring Rule (LMSR); proposed futarchy governance system; originated Great Filter hypothesis[^2] | | **Key Publications** | *The Age of Em* (2016); *T'
+    fetchedAt: 2026-02-22T02:02:55.967Z
+    httpStatus: 200
+    pageTitle: Robin D Hanson - Foresight
+    contentSnippet: "Robin D Hanson - Foresight Menu Focus Areas Secure AI Neurotechnology Longevity Biotechnology Nanotechnology Space Existential Hope Engage Vision Weekend Workshops AI Nodes Grants Prizes Fellowship Seminar Groups Resources Recordings Podcasts Reports Book: Gaming the Future About Donate Focus Areas Secure AI Neurotechnology Longevity Biotechnology Nanotechnology Space Existential Hope Engage Vision Weekend Workshops AI Nodes Grants Prizes Fellowship Seminar Groups Resources Recordings Podcasts R"
+    contentLength: 143948
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.overcomingbias.com/p/ai-risk-again
+    linkText: AI Risk, Again - Overcoming Bias
+    claimContext: "| **Key Publications** | *The Age of Em* (2016); *The Elephant in the Brain* (2018, with Kevin Simler); 90+ academic publications with 5,200+ citations[^3] | | **AI Safety Stance** | Skeptical of fast takeoff and existential risk scenarios; emphasizes gradual transitions allowing for testing and cor"
+    fetchedAt: 2026-02-22T02:02:56.167Z
+    httpStatus: 200
+    pageTitle: AI Risk, Again - by Robin Hanson - Overcoming Bias
+    contentSnippet: AI Risk, Again - by Robin Hanson - Overcoming Bias Overcoming Bias Subscribe Sign in AI Risk, Again Robin Hanson Mar 03, 2023 62 76 1 Share Large language models like ChatGPT have recently spooked a great many, and my Twitter feed is full of worriers saying how irresponsible orgs have been to make and release such models. Because, they say, such a system might have killed us all. And, as some researchers say that they are working on how to better control such things, worriers say we must regulat
+    contentLength: 183409
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://thepolitic.org/robin-hanson-one-futurist-to-rule-them-all/?curator=MediaREDEF
+    linkText: "Robin Hanson: One Futurist To Rule Them All - The Politic"
+    claimContext: '| **AI Safety Stance** | Skeptical of fast takeoff and existential risk scenarios; emphasizes gradual transitions allowing for testing and correction[^4] | | **Controversies** | 2003 DARPA Policy Analysis Market cancellation; 2019 EA Munich disinvitation; characterized as "too far ahead of his time"'
+    fetchedAt: 2026-02-22T02:02:57.081Z
+    httpStatus: 200
+    pageTitle: Robin Hanson, One [Futurist] to Rule Them All - The Politic
+    contentSnippet: "Robin Hanson, One [Futurist] to Rule Them All - The Politic Skip to content On May 12, I reached out to Bryan Caplan, a George Mason University economist, for his opinion on a smart, innovative contrarian to learn from over the summer. &#8220;Robin Hanson!&#8221; he responded. The next day, I asked Mr. Hanson whether I could spend a week with him. He responded 11 minutes later: &#8220;You’d probably learn more if we talked/argued, and I promise to have lots of time for that if/when you are aroun"
+    contentLength: 151738
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Robin_Hanson
+    linkText: Robin Hanson - Wikipedia
+    claimContext: "Robin Dale Hanson is an American economist, author, and professor who has made influential contributions to prediction markets, governance theory, and futures studies. Born August 28, 1959, Hanson followed an unconventional path from physics to artificial intelligence research to economics, earning "
+    fetchedAt: 2026-02-22T02:02:58.529Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://cwgspeakers.com/speaker/robin-hanson/
+    linkText: Robin Hanson speaker bio - CWG Speakers
+    claimContext: Hanson's signature contribution has been the development and advocacy of prediction markets—systems that allow people to bet on future events to aggregate information and improve forecasting accuracy. Since beginning this work in 1988, he has been the principal architect of numerous pioneering marke
+    fetchedAt: 2026-02-22T02:03:00.375Z
+    httpStatus: 200
+    pageTitle: Robin Hanson - Futurist Speaker - CWG Speakers
+    contentSnippet: Robin Hanson - Futurist Speaker - CWG Speakers 7006 Make Enquiry Add To Favourites Robin Hanson Idea future markets expert USA Robin Hanson is known as a founder of the field of prediction markets and invented the widely used market scoring rules (LMSR). Currently, he is an associate professor of economics at George Mason University. Speaker Categories Author Commentator Economist Futurist Speaker Topics Economics Health Markets Technology Robin Hanson is associate professor of economics at Geor
+    contentLength: 163593
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://intelligence.org/2013/11/01/robin-hanson/
+    linkText: Robin Hanson - Machine Intelligence Research Institute
+    claimContext: Hanson's signature contribution has been the development and advocacy of prediction markets—systems that allow people to bet on future events to aggregate information and improve forecasting accuracy. Since beginning this work in 1988, he has been the principal architect of numerous pioneering marke
+    fetchedAt: 2026-02-22T02:02:59.462Z
+    httpStatus: 200
+    pageTitle: Robin Hanson on Serious Futurism - Machine Intelligence Research Institute
+    contentSnippet: Robin Hanson on Serious Futurism - Machine Intelligence Research Institute Skip to content Robin Hanson on Serious Futurism November 1, 2013 Luke Muehlhauser Robin Hanson is an associate professor of economics at George Mason University and a research associate at the Future of Humanity Institute of Oxford University. He is known as a founder of the field of prediction markets, and was a chief architect of the Foresight Exchange, DARPA’s FutureMAP, IARPA&#8217;s DAGGRE, SciCast, and is chief sci
+    contentLength: 98561
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson bio - hanson.gmu.edu
+    claimContext: "Beyond prediction markets, Hanson has proposed futarchy—a radical governance system in which democratic values would be set by voting but policies would be selected by betting markets based on which would best achieve those values.[^9] His research spans an unusually wide range, including the Great "
+    fetchedAt: 2026-02-22T02:02:59.552Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 10
+    url: https://foresight.org/people/robin-d-hanson/
+    linkText: Robin Hanson - Foresight Institute
+    claimContext: "Beyond prediction markets, Hanson has proposed futarchy—a radical governance system in which democratic values would be set by voting but policies would be selected by betting markets based on which would best achieve those values.[^9] His research spans an unusually wide range, including the Great "
+    fetchedAt: 2026-02-22T02:02:58.629Z
+    httpStatus: 200
+    pageTitle: Robin D Hanson - Foresight
+    contentSnippet: "Robin D Hanson - Foresight Menu Focus Areas Secure AI Neurotechnology Longevity Biotechnology Nanotechnology Space Existential Hope Engage Vision Weekend Workshops AI Nodes Grants Prizes Fellowship Seminar Groups Resources Recordings Podcasts Reports Book: Gaming the Future About Donate Focus Areas Secure AI Neurotechnology Longevity Biotechnology Nanotechnology Space Existential Hope Engage Vision Weekend Workshops AI Nodes Grants Prizes Fellowship Seminar Groups Resources Recordings Podcasts R"
+    contentLength: 143948
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://en.wikipedia.org/wiki/Robin_Hanson
+    linkText: Robin Hanson - Wikipedia
+    claimContext: Hanson's intellectual trajectory reflects his interdisciplinary interests. He earned a BS in physics from the University of California, Irvine in 1981, followed by an MS in physics and MA in Conceptual Foundations of Science from the University of Chicago in 1984.[^11] After his master's degrees, Ha
+    fetchedAt: 2026-02-22T02:03:01.384Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 12
+    url: https://allfed.info/about/team-and-board?view=article&id=36%3Arobin-d-hanson&catid=10
+    linkText: Robin Hanson - ALLFED
+    claimContext: Hanson's intellectual trajectory reflects his interdisciplinary interests. He earned a BS in physics from the University of California, Irvine in 1981, followed by an MS in physics and MA in Conceptual Foundations of Science from the University of Chicago in 1984.[^11] After his master's degrees, Ha
+    fetchedAt: 2026-02-22T02:03:03.713Z
+    httpStatus: 200
+    pageTitle: ALLFED - Robin D. Hanson
+    contentSnippet: ALLFED - Robin D. Hanson Skip to main content Board of Advisors | Co-Founders | Team Robin D. Hanson Associate Professor of Economics at George Mason University Research Associate at the Future of Humanity Institute Robin Hanson is an Associate Professor of Economics at George Mason University, and a former Research Associate at the Future of Humanity Institute. After receiving his Ph.D. in social science from the California Institute of Technology in 1997, Robin was a Robert Wood Johnson Founda
+    contentLength: 34063
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson bio - hanson.gmu.edu
+    claimContext: This period of applied AI research proved formative for Hanson's later economic work. In 1988, while working in industry, he began developing the concept of prediction markets—becoming the first researcher to write in detail about creating and subsidizing markets to improve estimates on diverse topi
+    fetchedAt: 2026-02-22T02:03:02.418Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 14
+    url: https://cwgspeakers.com/speaker/robin-hanson/
+    linkText: Robin Hanson speaker bio - CWG Speakers
+    claimContext: This period of applied AI research proved formative for Hanson's later economic work. In 1988, while working in industry, he began developing the concept of prediction markets—becoming the first researcher to write in detail about creating and subsidizing markets to improve estimates on diverse topi
+    fetchedAt: 2026-02-22T02:03:02.273Z
+    httpStatus: 200
+    pageTitle: Robin Hanson - Futurist Speaker - CWG Speakers
+    contentSnippet: Robin Hanson - Futurist Speaker - CWG Speakers 7006 Make Enquiry Add To Favourites Robin Hanson Idea future markets expert USA Robin Hanson is known as a founder of the field of prediction markets and invented the widely used market scoring rules (LMSR). Currently, he is an associate professor of economics at George Mason University. Speaker Categories Author Commentator Economist Futurist Speaker Topics Economics Health Markets Technology Robin Hanson is associate professor of economics at Geor
+    contentLength: 163593
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://en.wikipedia.org/wiki/Robin_Hanson
+    linkText: Robin Hanson - Wikipedia
+    claimContext: "Hanson returned to academia in the early 1990s, earning his PhD in social science from Caltech in 1997. His dissertation, titled *Four Puzzles in Information and Politics: Product Bans, Informed Voters, Social Insurance, and Persistent Disagreement*, reflected his interest in information aggregation"
+    fetchedAt: 2026-02-22T02:03:01.396Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://allfed.info/about/team-and-board?view=article&id=36%3Arobin-d-hanson&catid=10
+    linkText: Robin Hanson - ALLFED
+    claimContext: "Hanson returned to academia in the early 1990s, earning his PhD in social science from Caltech in 1997. His dissertation, titled *Four Puzzles in Information and Politics: Product Bans, Informed Voters, Social Insurance, and Persistent Disagreement*, reflected his interest in information aggregation"
+    fetchedAt: 2026-02-22T02:03:05.075Z
+    httpStatus: 200
+    pageTitle: ALLFED - Robin D. Hanson
+    contentSnippet: ALLFED - Robin D. Hanson Skip to main content Board of Advisors | Co-Founders | Team Robin D. Hanson Associate Professor of Economics at George Mason University Research Associate at the Future of Humanity Institute Robin Hanson is an Associate Professor of Economics at George Mason University, and a former Research Associate at the Future of Humanity Institute. After receiving his Ph.D. in social science from the California Institute of Technology in 1997, Robin was a Robert Wood Johnson Founda
+    contentLength: 34063
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson bio - hanson.gmu.edu
+    claimContext: Hanson's most sustained research program has focused on prediction markets—systems that harness the "wisdom of crowds" by allowing participants to bet on future events. The core insight is that market prices aggregate diverse information and incentivize accuracy, since participants profit from corre
+    fetchedAt: 2026-02-22T02:03:05.784Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 18
+    url: https://cwgspeakers.com/speaker/robin-hanson/
+    linkText: Robin Hanson speaker bio - CWG Speakers
+    claimContext: "- **Xanadu (1990)**: The first internal corporate prediction market, demonstrating feasibility in organizational settings[^18] - **Foresight Exchange (1994-ongoing)**: The first web-based prediction markets, making the technology publicly accessible[^19]"
+    fetchedAt: 2026-02-22T02:03:05.589Z
+    httpStatus: 200
+    pageTitle: Robin Hanson - Futurist Speaker - CWG Speakers
+    contentSnippet: Robin Hanson - Futurist Speaker - CWG Speakers 7006 Make Enquiry Add To Favourites Robin Hanson Idea future markets expert USA Robin Hanson is known as a founder of the field of prediction markets and invented the widely used market scoring rules (LMSR). Currently, he is an associate professor of economics at George Mason University. Speaker Categories Author Commentator Economist Futurist Speaker Topics Economics Health Markets Technology Robin Hanson is associate professor of economics at Geor
+    contentLength: 163593
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://closertotruth.com/contributor/robin-hanson/
+    linkText: Robin Hanson - Closer To Truth
+    claimContext: "- **Xanadu (1990)**: The first internal corporate prediction market, demonstrating feasibility in organizational settings[^18] - **Foresight Exchange (1994-ongoing)**: The first web-based prediction markets, making the technology publicly accessible[^19] - **DARPA Policy Analysis Market (2001-2003)*"
+    fetchedAt: 2026-02-22T02:03:05.930Z
+    httpStatus: 200
+    pageTitle: Robin Hanson - Closer To Truth
+    contentSnippet: "Robin Hanson - Closer To Truth Skip to content Watch Episodes Watch complete episodes as aired on public television Curated Playlists Explore collections of videos curated by our team Projects Discover collaborations with leading institutions Contributors Meet the greatest thinkers exploring the deepest questions CTT Chats Watch chats with the brightest minds on the boldest ideas Roundtables View roundtable discussions from our early years Topics Topic Guide Cosmos, Consciousness, Meaning: Join "
+    contentLength: 111227
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://en.wikipedia.org/wiki/Robin_Hanson
+    linkText: Robin Hanson - Wikipedia
+    claimContext: "- **Foresight Exchange (1994-ongoing)**: The first web-based prediction markets, making the technology publicly accessible[^19] - **DARPA Policy Analysis Market (2001-2003)**: Markets for forecasting Middle East developments, controversially canceled amid political backlash[^20] - **IARPA DAGGRE/SCI"
+    fetchedAt: 2026-02-22T02:03:04.720Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 21
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson bio - hanson.gmu.edu
+    claimContext: "- **DARPA Policy Analysis Market (2001-2003)**: Markets for forecasting Middle East developments, controversially canceled amid political backlash[^20] - **IARPA DAGGRE/SCICAST (2010-2015)**: Sophisticated combinatorial markets funded by intelligence agencies[^21]"
+    fetchedAt: 2026-02-22T02:03:07.971Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 22
+    url: https://commerce.net/fortune-magazine-profiles-robin-hanson/
+    linkText: Robin Hanson - Fortune Magazine profile
+    claimContext: Hanson's technical contributions include inventing market scoring rules like LMSR, which are now used in platforms such as Consensus Point (where Hanson served as Chief Scientist), Inkling Markets, and the Washington Stock Exchange.[^22] These scoring rules solve the problem of how to subsidize mark
+    fetchedAt: 2026-02-22T02:03:07.429Z
+    httpStatus: 200
+    pageTitle: Fortune magazine profiles Robin Hanson | Commerce.net
+    contentSnippet: Fortune magazine profiles Robin Hanson | Commerce.net CN collaborator (on Zocalo) and inventor of Prediction Markets and the term &#8220;idea futures,&#8221; Robin Hanson has been through quite a journey to getting tenure in the world of economics. He started out in artificial intelligence and&#8230; well, Jeremy Kahn&#8217;s profile from two years ago does a better job than I could of laying out the story. Read on for the full version of this blogpost and his article, &#8220;The Man Who Would H
+    contentLength: 51091
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson bio - hanson.gmu.edu
+    claimContext: Hanson's technical contributions include inventing market scoring rules like LMSR, which are now used in platforms such as Consensus Point (where Hanson served as Chief Scientist), Inkling Markets, and the Washington Stock Exchange.[^22] These scoring rules solve the problem of how to subsidize mark
+    fetchedAt: 2026-02-22T02:03:08.403Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 24
+    url: https://economics.gmu.edu/people/rhanson
+    linkText: Robin Hanson - George Mason University Economics
+    claimContext: Experimental research has generally validated prediction market accuracy. Hanson's work with collaborators showed that combinatorial markets can effectively aggregate information, and surprisingly, that some forms of manipulation can actually improve market accuracy rather than distort it.[^24] A 20
+    fetchedAt: 2026-02-22T02:03:07.571Z
+    httpStatus: 200
+    pageTitle: "Economics | Faculty and Staff: Robin D Hanson"
+    contentSnippet: "--> Economics | Faculty and Staff: Robin D Hanson We use cookies and similar technologies to improve your website experience and help us understand how you use our website. By continuing to use this website, you consent to the usage of cookies. Learn more about our Privacy Statement and Cookie Policy . Agree Decline Non-Essential Cookies &times; About Austrian Economics Experimental Economics Public Choice Economics Graduate Programs PhD in Economics MA in Economics Accelerated MA in Economics U"
+    contentLength: 55990
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://ideas.repec.org/f/pha1491.html
+    linkText: Robin Hanson publications - IDEAS/RePEc
+    claimContext: Experimental research has generally validated prediction market accuracy. Hanson's work with collaborators showed that combinatorial markets can effectively aggregate information, and surprisingly, that some forms of manipulation can actually improve market accuracy rather than distort it.[^24] A 20
+    fetchedAt: 2026-02-22T02:03:07.627Z
+    httpStatus: 200
+    pageTitle: Robin Hanson | IDEAS/RePEc
+    contentSnippet: "Robin Hanson | IDEAS/RePEc --> --> --> Advanced search Browse Econ Literature Working papers Journals Software components Books Book chapters JEL classification More features Subscribe to new research RePEc Biblio Author registration Economics Virtual Seminar Calendar ConfWatcher NEW! Printed from https://ideas.repec.org/f/pha1491.html My authors Follow this author Robin Hanson Personal details Affiliation Research Citations More Corrections Personal Details First Name: Robin Middle Name: Last N"
+    contentLength: 32740
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson bio - hanson.gmu.edu
+    claimContext: Hanson's most radical proposal for applying prediction markets is futarchy—a governance system that would retain democratic control over values while using betting markets to select policies. Under futarchy, citizens would vote on measurable objectives (such as national welfare metrics), and then pr
+    fetchedAt: 2026-02-22T02:03:10.445Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 27
+    url: https://economics.gmu.edu/people/rhanson
+    linkText: Robin Hanson - George Mason University Economics
+    claimContext: The futarchy proposal challenges fundamental assumptions about democratic governance. Traditional democracy aggregates preferences through voting, but voters often lack accurate information about policy consequences and face poor incentives for careful analysis. Futarchy aims to separate the "should
+    fetchedAt: 2026-02-22T02:03:09.856Z
+    httpStatus: 200
+    pageTitle: "Economics | Faculty and Staff: Robin D Hanson"
+    contentSnippet: "--> Economics | Faculty and Staff: Robin D Hanson We use cookies and similar technologies to improve your website experience and help us understand how you use our website. By continuing to use this website, you consent to the usage of cookies. Learn more about our Privacy Statement and Cookie Policy . Agree Decline Non-Essential Cookies &times; About Austrian Economics Experimental Economics Public Choice Economics Graduate Programs PhD in Economics MA in Economics Accelerated MA in Economics U"
+    contentLength: 55990
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://hanson.gmu.edu/bio
+    linkText: Robin Hanson bio - hanson.gmu.edu
+    claimContext: "Critics have raised numerous objections to futarchy, including questions about how to specify welfare metrics without gaming, whether markets can handle complex long-term consequences, and whether the system would be vulnerable to manipulation by wealthy actors. Hanson acknowledges these challenges "
+    fetchedAt: 2026-02-22T02:03:10.446Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 29
+    url: https://en.wikipedia.org/wiki/Robin_Hanson
+    linkText: Robin Hanson - Wikipedia
+    claimContext: Beyond prediction markets, Hanson has made influential contributions to thinking about humanity's long-term future. He originated the Great Filter hypothesis, which attempts to explain the Fermi paradox—why we observe no evidence of alien civilizations despite the vast number of potentially habitabl
+    fetchedAt: 2026-02-22T02:03:09.419Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 30
+    url: https://closertotruth.com/contributor/robin-hanson/
+    linkText: Robin Hanson - Closer To Truth
+    claimContext: If the Great Filter lies in our past (for example, in the origin of life or the evolution of intelligence), then we are fortunate to have passed it and face relatively good prospects. But if the Great Filter lies ahead, then most civilizations at our stage fail to survive or expand. This has profoun
+    fetchedAt: 2026-02-22T02:03:10.198Z
+    httpStatus: 200
+    pageTitle: Robin Hanson - Closer To Truth
+    contentSnippet: "Robin Hanson - Closer To Truth Skip to content Watch Episodes Watch complete episodes as aired on public television Curated Playlists Explore collections of videos curated by our team Projects Discover collaborations with leading institutions Contributors Meet the greatest thinkers exploring the deepest questions CTT Chats Watch chats with the brightest minds on the boldest ideas Roundtables View roundtable discussions from our early years Topics Topic Guide Cosmos, Consciousness, Meaning: Join "
+    contentLength: 109737
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://ageofem.com
+    linkText: The Age of Em - Robin Hanson
+    claimContext: "Hanson has also explored scenarios for humanity's far future, most extensively in his 2016 book *The Age of Em: Work, Love, and Life When Robots Rule the Earth*. The book presents a detailed economic analysis of a world dominated by brain emulations (ems)—digital copies of human minds running on com"
+    fetchedAt: 2026-02-22T02:03:11.976Z
+    httpStatus: 200
+    pageTitle: The Age of Em, A Book
+    contentSnippet: "The Age of Em, A Book This hellish cyberworld is quite cool to think about in a dystopian Matrixy way. … brilliantly weird extrapolations Steven Poole The Guardian What is remarkable … is not just the detail … but the way he situates it within a perceptive analysis of our human past and present. Daniel Levitin Wall Street Journal Crammed full of such fascinating visions of an imagined future Sarah O'Connor Financial Times The Age of Em: Work, Love and Life when Robots Rule the Earth Oxford Unive"
+    contentLength: 40167
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://ageofem.com
+    linkText: The Age of Em - Robin Hanson
+    claimContext: "Hanson's 2018 book *The Elephant in the Brain: Hidden Motives in Everyday Life*, co-authored with Kevin Simler, applies evolutionary psychology and signaling theory to explain human behavior. The central thesis is that much of what we do is driven by hidden motives we are reluctant to acknowledge—pa"
+    fetchedAt: 2026-02-22T02:03:12.113Z
+    httpStatus: 200
+    pageTitle: The Age of Em, A Book
+    contentSnippet: "The Age of Em, A Book This hellish cyberworld is quite cool to think about in a dystopian Matrixy way. … brilliantly weird extrapolations Steven Poole The Guardian What is remarkable … is not just the detail … but the way he situates it within a perceptive analysis of our human past and present. Daniel Levitin Wall Street Journal Crammed full of such fascinating visions of an imagined future Sarah O'Connor Financial Times The Age of Em: Work, Love and Life when Robots Rule the Earth Oxford Unive"
+    contentLength: 40167
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://80000hours.org/podcast/episodes/robin-hanson-on-lying-to-ourselves/
+    linkText: Robin Hanson on Lying to Ourselves - 80,000 Hours Podcast
+    claimContext: 'The book examines domains including medicine, education, charity, politics, and religion, arguing that the stated reasons for these institutions often differ from their actual functions. For example, Hanson has long argued that medicine functions partly as a way to "show we care" rather than purely '
+    fetchedAt: 2026-02-22T02:03:12.045Z
+    httpStatus: 200
+    pageTitle: Why we have to lie to ourselves about why we do what we do, according to economist Robin Hanson | 80,000 Hours
+    contentSnippet: "Why we have to lie to ourselves about why we do what we do, according to economist Robin Hanson | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 4 Learn more 5 Related episodes Read transcript See all episodes In fact, your conscious mind is more plausibly a press secretary. You&#8217;re not the president or the king or the CEO. You aren&#8217;t in charge. You aren&#8217;t actually making the decision, the co"
+    contentLength: 343791
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://80000hours.org/podcast/episodes/robin-hanson-on-lying-to-ourselves/
+    linkText: Robin Hanson on Lying to Ourselves - 80,000 Hours Podcast
+    claimContext: 'The book examines domains including medicine, education, charity, politics, and religion, arguing that the stated reasons for these institutions often differ from their actual functions. For example, Hanson has long argued that medicine functions partly as a way to "show we care" rather than purely '
+    fetchedAt: 2026-02-22T02:03:12.102Z
+    httpStatus: 200
+    pageTitle: Why we have to lie to ourselves about why we do what we do, according to economist Robin Hanson | 80,000 Hours
+    contentSnippet: "Why we have to lie to ourselves about why we do what we do, according to economist Robin Hanson | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 4 Learn more 5 Related episodes Read transcript See all episodes In fact, your conscious mind is more plausibly a press secretary. You&#8217;re not the president or the king or the CEO. You aren&#8217;t in charge. You aren&#8217;t actually making the decision, the co"
+    contentLength: 343791
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://80000hours.org/podcast/episodes/robin-hanson-on-lying-to-ourselves/
+    linkText: Robin Hanson on Lying to Ourselves - 80,000 Hours Podcast
+    claimContext: This perspective has proven controversial. Critics argue it is overly cynical, neglects genuine altruism and learning, or lacks sufficient empirical support for strong claims about hidden motives dominating behavior. Defenders appreciate the book's willingness to question conventional narratives and
+    fetchedAt: 2026-02-22T02:03:12.135Z
+    httpStatus: 200
+    pageTitle: Why we have to lie to ourselves about why we do what we do, according to economist Robin Hanson | 80,000 Hours
+    contentSnippet: "Why we have to lie to ourselves about why we do what we do, according to economist Robin Hanson | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 4 Learn more 5 Related episodes Read transcript See all episodes In fact, your conscious mind is more plausibly a press secretary. You&#8217;re not the president or the king or the CEO. You aren&#8217;t in charge. You aren&#8217;t actually making the decision, the co"
+    contentLength: 343791
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.lesswrong.com/w/robin-hanson?version=1.0.0
+    linkText: The Hanson-Yudkowsky AI-Foom Debate - LessWrong
+    claimContext: Within the AI safety community, Hanson is known for his skepticism toward arguments that advanced AI poses extreme existential risks. He has engaged in extended debates with figures like <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> about "fast takeoff" scenarios, in which recurs
+    fetchedAt: 2026-02-22T02:03:14.002Z
+    httpStatus: 200
+    pageTitle: Robin Hanson — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Robin Hanson — LessWrong You are viewing version 1.0.0 of this page. Click here to view the latest version. Robin Hanson Edited by PeerInfinity last updated 12th Oct 2021 You are viewing revision 1.0.0 , last edited by PeerInfinity From Wikipedia Robin Hanson (born 1959) is an associate professor of economics at George Mason University. He is known as an expert on idea
+    contentLength: 184345
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.overcomingbias.com/p/ai-risk-again
+    linkText: AI Risk, Again - Overcoming Bias
+    claimContext: Hanson's skepticism rests on several arguments. First, he expects AI transitions to be gradual, taking roughly a decade rather than occurring suddenly. This timeframe would allow for extensive testing to detect alignment problems before catastrophic failures occur.[^37] Second, he draws analogies to
+    fetchedAt: 2026-02-22T02:03:13.557Z
+    httpStatus: 200
+    pageTitle: AI Risk, Again - by Robin Hanson - Overcoming Bias
+    contentSnippet: AI Risk, Again - by Robin Hanson - Overcoming Bias Overcoming Bias Subscribe Sign in AI Risk, Again Robin Hanson Mar 03, 2023 62 76 1 Share Large language models like ChatGPT have recently spooked a great many, and my Twitter feed is full of worriers saying how irresponsible orgs have been to make and release such models. Because, they say, such a system might have killed us all. And, as some researchers say that they are working on how to better control such things, worriers say we must regulat
+    contentLength: 183409
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://podcast.emerj.com/ai-futures-s2e2-dr-robin-hanson-on-agi-emulating-human-consciousness-and-the-future-of-work-and-life
+    linkText: Robin Hanson on AGI, Emulating Human Consciousness - Emerj Podcast
+    claimContext: Hanson's skepticism rests on several arguments. First, he expects AI transitions to be gradual, taking roughly a decade rather than occurring suddenly. This timeframe would allow for extensive testing to detect alignment problems before catastrophic failures occur.[^37] Second, he draws analogies to
+    fetchedAt: 2026-02-22T02:03:13.775Z
+    httpStatus: 200
+    pageTitle: "The AI in Business Podcast: [AI Futures - S2E2] Dr. Robin Hanson on AGI, Emulating Human Consciousness, and the Future of Work and Life"
+    contentSnippet: "The AI in Business Podcast: [AI Futures - S2E2] Dr. Robin Hanson on AGI, Emulating Human Consciousness, and the Future of Work and Life Preview Mode Links will not work in preview mode The AI in Business Podcast is for non-technical business leaders who need to find AI opportunities, align AI capabilities with strategy, and deliver ROI. Each week, Emerj Artificial Intelligence Research CEO Daniel Faggella interviews top AI executives from Fortune 500 firms and unicorn startups - to uncover trend"
+    contentLength: 47027
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.overcomingbias.com/p/ai-risk-again
+    linkText: AI Risk, Again - Overcoming Bias
+    claimContext: Hanson's skepticism rests on several arguments. First, he expects AI transitions to be gradual, taking roughly a decade rather than occurring suddenly. This timeframe would allow for extensive testing to detect alignment problems before catastrophic failures occur.[^37] Second, he draws analogies to
+    fetchedAt: 2026-02-22T02:03:13.633Z
+    httpStatus: 200
+    pageTitle: AI Risk, Again - by Robin Hanson - Overcoming Bias
+    contentSnippet: AI Risk, Again - by Robin Hanson - Overcoming Bias Overcoming Bias Subscribe Sign in AI Risk, Again Robin Hanson Mar 03, 2023 62 76 1 Share Large language models like ChatGPT have recently spooked a great many, and my Twitter feed is full of worriers saying how irresponsible orgs have been to make and release such models. Because, they say, such a system might have killed us all. And, as some researchers say that they are working on how to better control such things, worriers say we must regulat
+    contentLength: 183557
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://forum.effectivealtruism.org/posts/XnnfPC2gsgRFZezkE/linkpost-what-are-reasonable-ai-fears-by-robin-hanson-2023
+    linkText: "Linkpost: What Are Reasonable AI Fears? by Robin Hanson (2023) - EA Forum"
+    claimContext: In his 2023 post "AI Risk, Again," Hanson articulated what he considers reasonable versus overwrought fears about AI. Reasonable concerns include <EntityLink id="economic-disruption">economic disruption</EntityLink>, value drift over long timescales, or capability mismatches between different AI sys
+    fetchedAt: 2026-02-22T02:03:13.359Z
+    httpStatus: 200
+    pageTitle: '[linkpost] "What Are Reasonable AI Fears?" by Robin Hanson, 2023-04-23 — EA Forum'
+    contentSnippet: '[linkpost] "What Are Reasonable AI Fears?" by Robin Hanson, 2023-04-23 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. [linkpost] "What Are Reasonable AI Fears?" by Robin Hanson, 2023-04-23 by Arjun Panickssery Apr 14 2023 4 min read 3 41 AI safety Existential risk Forecasting AI risk skepticism AI alignment AI forecasting Robin Hanson Criticism of longtermism and existential risk studies Public communicati'
+    contentLength: 241642
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.overcomingbias.com/p/ai-risk-again/comments
+    linkText: AI Risk, Again comments - Overcoming Bias
+    claimContext: This position has drawn criticism from AI safety researchers who argue that Hanson underestimates the risks of <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, where systems might appear aligned during training and testing but behave differently when deployed. They point to exa
+    fetchedAt: 2026-02-22T02:03:16.052Z
+    httpStatus: 200
+    pageTitle: Comments - AI Risk, Again - by Robin Hanson
+    contentSnippet: "Comments - AI Risk, Again - by Robin Hanson Overcoming Bias Subscribe Sign in AI Risk, Again Robin Hanson Mar 3, 2023 62 76 1 Large language models like ChatGPT have recently spooked a great many, and my Twitter feed is full of worriers saying how irresponsible orgs have been to make and release such models. Read → 76 Comments Top first choice Mar 3, 2023 Robin, Would you consider inviting Yud for another debate? Your last one became a classic. :) Reply (2) Share Robin Hanson Mar 3, 2023 Author "
+    contentLength: 935758
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.lesswrong.com/posts/quj3RniAw7GGJtqeX/robin-hanson-ai-x-risk-debate-highlights-and-analysis
+    linkText: Robin Hanson AI X-Risk Debate Highlights and Analysis - LessWrong
+    claimContext: Hanson's debate with Yudkowsky, published as *The Hanson-Yudkowsky AI-Foom Debate* in 2013, remains one of the most thorough exchanges on fast takeoff scenarios. While Yudkowsky emphasized potential for hyper-exponential growth once AI systems can improve themselves, Hanson argued that historical ec
+    fetchedAt: 2026-02-22T02:03:15.586Z
+    httpStatus: 200
+    pageTitle: Robin Hanson AI X-Risk Debate — Highlights and Analysis — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Robin Hanson AI X-Risk Debate — Highlights and Analysis — LessWrong Existential risk Public Discourse AI Frontpage 46 Robin Hanson AI X-Risk Debate — Highlights and Analysis by Liron 12th Jul 2024 Linkpost from www.youtube.com 54 min read 7 46 This linkpost contains a lightly-edited transcript of highlights of my recent AI x-risk debate with Robin Hanson , and a writte
+    contentLength: 728264
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://en.wikipedia.org/wiki/Robin_Hanson
+    linkText: Robin Hanson - Wikipedia
+    claimContext: Hanson's career has been marked by several notable controversies. The most significant was the 2003 cancellation of DARPA's Policy Analysis Market (also called FutureMAP), which Hanson had helped design. The program aimed to use prediction markets to forecast political and military developments in t
+    fetchedAt: 2026-02-22T02:03:15.021Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 44
+    url: https://commerce.net/fortune-magazine-profiles-robin-hanson/
+    linkText: Robin Hanson - Fortune Magazine profile
+    claimContext: "Hanson expressed disappointment with the cancellation, arguing that the political controversy stemmed from misunderstanding the program's goals and from guilt-by-association with other controversial DARPA initiatives rather than genuine problems with using markets for geopolitical forecasting. Some "
+    fetchedAt: 2026-02-22T02:03:15.384Z
+    httpStatus: 200
+    pageTitle: Fortune magazine profiles Robin Hanson | Commerce.net
+    contentSnippet: Fortune magazine profiles Robin Hanson | Commerce.net CN collaborator (on Zocalo) and inventor of Prediction Markets and the term &#8220;idea futures,&#8221; Robin Hanson has been through quite a journey to getting tenure in the world of economics. He started out in artificial intelligence and&#8230; well, Jeremy Kahn&#8217;s profile from two years ago does a better job than I could of laying out the story. Read on for the full version of this blogpost and his article, &#8220;The Man Who Would H
+    contentLength: 51091
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://forum.effectivealtruism.org/posts/K8pkTQrZjf2iSWd3E/some-thoughts-on-the-ea-munich-robin-hanson-incident
+    linkText: Some Thoughts on the EA Munich Robin Hanson Incident - EA Forum
+    claimContext: A more recent controversy occurred in 2019, when Effective Altruism Munich disinvited Hanson from a conference following backlash to his social media posts and public writings. Critics found some of his framings insensitive or biased, particularly regarding gender dynamics and transactional relation
+    fetchedAt: 2026-02-22T02:03:15.114Z
+    httpStatus: 200
+    pageTitle: Some thoughts on the EA Munich // Robin Hanson incident — EA Forum
+    contentSnippet: Some thoughts on the EA Munich // Robin Hanson incident — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Some thoughts on the EA Munich // Robin Hanson incident by Aaron Gertler 🔸 Aug 28 2020 6 min read 138 48 Community Building effective altruism Policy Diversity and inclusion Political polarization Robin Hanson Frontpage Some thoughts on the EA Munich // Robin Hanson incident On the
+    contentLength: 1996907
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.econlib.org/appeasing-hansons-critics/
+    linkText: Appeasing Hanson's Critics - EconLog
+    claimContext: A more recent controversy occurred in 2019, when Effective Altruism Munich disinvited Hanson from a conference following backlash to his social media posts and public writings. Critics found some of his framings insensitive or biased, particularly regarding gender dynamics and transactional relation
+    fetchedAt: 2026-02-22T02:03:18.118Z
+    httpStatus: 200
+    pageTitle: Appeasing Hanson's Critics - Econlib
+    contentSnippet: "Appeasing Hanson&#039;s Critics - Econlib Home &sol; ECONLOG POST Dec 27 2018 Robin Hanson Appeasing Hanson's Critics 10 Bryan Caplan Categories: Behavioral Economics Economics and Culture By Bryan Caplan, Dec 27 2018 SHARE POST: --> Appeasement is greatly underrated. As I&#8217;ve explained before : Didn’t the Munich Agreement prove for all time that appeasement doesn’t work? Hardly. Despite its well-hyped failures, appeasement is an incredibly effective social strategy for dealing with the unr"
+    contentLength: 146991
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://marginalrevolution.com/marginalrevolution/2007/08/where-do-i-disa.html
+    linkText: Where Do I Disagree with Robin Hanson? - Marginal Revolution
+    claimContext: Economist Tyler Cowen, while respectful of Hanson's contributions, has articulated fundamental disagreements with his approach. Cowen views Hanson's focus on "overcoming bias" as aesthetically driven rather than pragmatic, arguing that biases are one problem among many (alongside laziness, fear, and
+    fetchedAt: 2026-02-22T02:03:17.335Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 48
+    url: https://forum.effectivealtruism.org/posts/K8pkTQrZjf2iSWd3E/some-thoughts-on-the-ea-munich-robin-hanson-incident
+    linkText: Some Thoughts on the EA Munich Robin Hanson Incident - EA Forum
+    claimContext: "These criticisms reflect a broader pattern: Hanson's provocative style and willingness to apply economic reasoning to sensitive topics generates both admirers who value his iconoclasm and critics who find his framings reductive or tone-deaf. Some observers argue that his less central controversial i"
+    fetchedAt: 2026-02-22T02:03:17.154Z
+    httpStatus: 200
+    pageTitle: Some thoughts on the EA Munich // Robin Hanson incident — EA Forum
+    contentSnippet: Some thoughts on the EA Munich // Robin Hanson incident — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Some thoughts on the EA Munich // Robin Hanson incident by Aaron Gertler 🔸 Aug 28 2020 6 min read 138 48 Community Building effective altruism Policy Diversity and inclusion Political polarization Robin Hanson Frontpage Some thoughts on the EA Munich // Robin Hanson incident On the
+    contentLength: 1994112
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.overcomingbias.com/p/my-new-granthtml
+    linkText: My New Grant - Overcoming Bias
+    claimContext: Hanson has received significant research support throughout his career, though specific funding amounts are rarely disclosed. His most publicly documented grant came from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>, which awarded him \$264,525 over three years to analyze scena
+    fetchedAt: 2026-02-22T02:03:17.361Z
+    httpStatus: 200
+    pageTitle: AI As Software Grant - by Robin Hanson - Overcoming Bias
+    contentSnippet: "AI As Software Grant - by Robin Hanson - Overcoming Bias Overcoming Bias Subscribe Sign in AI As Software Grant Robin Hanson Jul 07, 2016 14 Share While I’ve been part of grants before, and had research support, I’ve never had support for my futurist work, including the years I spent writing Age of Em . That now changes: The Open Philanthropy Project awarded a grant of $264,525 over three years to Robin Hanson (Associate Professor of Economics, George Mason University) to analyze potential scena"
+    contentLength: 172419
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://intelligence.org/2016/09/06/grant-open-philanthropy/
+    linkText: Coefficient Giving Grant to MIRI - Machine Intelligence Research Institute
+    claimContext: This grant reflected Coefficient Giving's early investment in AI safety research and their interest in supporting diverse perspectives, including those skeptical of fast takeoff scenarios. While much AI safety funding has gone to researchers emphasizing high existential risks, Coefficient Giving rec
+    fetchedAt: 2026-02-22T02:03:17.691Z
+    httpStatus: 200
+    pageTitle: Grant announcement from the Open Philanthropy Project - Machine Intelligence Research Institute
+    contentSnippet: "Grant announcement from the Open Philanthropy Project - Machine Intelligence Research Institute Skip to content Grant announcement from the Open Philanthropy Project September 6, 2016 Nate Soares A major announcement today: the Open Philanthropy Project has granted MIRI $500,000 over the coming year to study the questions outlined in our agent foundations and machine learning research agendas, with a strong chance of renewal next year. This represents MIRI’s largest grant to date, and our second"
+    contentLength: 77472
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://allfed.info/about/team-and-board?view=article&id=36%3Arobin-d-hanson&catid=10
+    linkText: Robin Hanson - ALLFED
+    claimContext: Beyond this grant, Hanson has held research positions at George Mason University and the Future of Humanity Institute at Oxford, served as Chief Scientist at Consensus Point, and received support from organizations including DARPA and IARPA for prediction market projects. His work on health economic
+    fetchedAt: 2026-02-22T02:03:20.509Z
+    httpStatus: 200
+    pageTitle: ALLFED - Robin D. Hanson
+    contentSnippet: ALLFED - Robin D. Hanson Skip to main content Board of Advisors | Co-Founders | Team Robin D. Hanson Associate Professor of Economics at George Mason University Research Associate at the Future of Humanity Institute Robin Hanson is an Associate Professor of Economics at George Mason University, and a former Research Associate at the Future of Humanity Institute. After receiving his Ph.D. in social science from the California Institute of Technology in 1997, Robin was a Robert Wood Johnson Founda
+    contentLength: 34063
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://foresight.org/people/robin-d-hanson/
+    linkText: Robin Hanson - Foresight Institute
+    claimContext: "Hanson remains intellectually active through his blog *Overcoming Bias*, which has received over 8 million visits, and through frequent podcast appearances and interviews.[^52] Recent themes in his work include:"
+    fetchedAt: 2026-02-22T02:03:19.537Z
+    httpStatus: 200
+    pageTitle: Robin D Hanson - Foresight
+    contentSnippet: "Robin D Hanson - Foresight Menu Focus Areas Secure AI Neurotechnology Longevity Biotechnology Nanotechnology Space Existential Hope Engage Vision Weekend Workshops AI Nodes Grants Prizes Fellowship Seminar Groups Resources Recordings Podcasts Reports Book: Gaming the Future About Donate Focus Areas Secure AI Neurotechnology Longevity Biotechnology Nanotechnology Space Existential Hope Engage Vision Weekend Workshops AI Nodes Grants Prizes Fellowship Seminar Groups Resources Recordings Podcasts R"
+    contentLength: 143948
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://www.ideasuntrapped.com/p/big-ideas-with-robin-hanson
+    linkText: Big Ideas with Robin Hanson - Ideas Untrapped
+    claimContext: '**Cultural drift**: Hanson argues that modern societies are experiencing maladaptive cultural evolution, with declining fertility rates representing a failure to address cultural changes that work against biological reproduction despite material abundance. He advocates for more "cultural entrepreneu'
+    fetchedAt: 2026-02-22T02:03:19.923Z
+    httpStatus: 200
+    pageTitle: Big Ideas with Robin Hanson
+    contentSnippet: "Big Ideas with Robin Hanson Ideas Untrapped Subscribe Sign in Ideas Untrapped Big Ideas with Robin Hanson 1 1× 0:00 Current time: 0:00 / Total time: -1:15:34 -1:15:34 Audio playback is not supported on your browser. Please upgrade. Big Ideas with Robin Hanson we discussed Signalling, Hidden Motives, Culture Drift, and many other ideas Robin has been writing about for the past three decades. Ideas Untrapped , Tobi Lawson , and Robin Hanson Jun 11, 2025 1 Share Transcript Welcome to Ideas Untrappe"
+    contentLength: 467648
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://www.ideasuntrapped.com/p/big-ideas-with-robin-hanson
+    linkText: Big Ideas with Robin Hanson - Ideas Untrapped
+    claimContext: "**Science funding mechanisms**: Building on earlier work comparing prizes versus grants, Hanson has proposed using prediction markets to evaluate academic reputations over long time horizons, with historians judging influence decades or centuries later. This would shift incentives away from short-te"
+    fetchedAt: 2026-02-22T02:03:20.014Z
+    httpStatus: 200
+    pageTitle: Big Ideas with Robin Hanson
+    contentSnippet: "Big Ideas with Robin Hanson Ideas Untrapped Subscribe Sign in Ideas Untrapped Big Ideas with Robin Hanson 1 1× 0:00 Current time: 0:00 / Total time: -1:15:34 -1:15:34 Audio playback is not supported on your browser. Please upgrade. Big Ideas with Robin Hanson we discussed Signalling, Hidden Motives, Culture Drift, and many other ideas Robin has been writing about for the past three decades. Ideas Untrapped , Tobi Lawson , and Robin Hanson Jun 11, 2025 1 Share Transcript Welcome to Ideas Untrappe"
+    contentLength: 467648
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://www.overcomingbias.com/p/ai-is-gpt-and-gpts-go-slow
+    linkText: AI Is GPT and GPTs Go Slow - Overcoming Bias
+    claimContext: "**AI economics**: In a 2024 blog post, Hanson argued that AI as a general purpose technology will follow historical patterns, taking decades rather than years to produce major economic transformations. He criticized mainstream AI hype as ignoring standard economic analysis, pointing to past technolo"
+    fetchedAt: 2026-02-22T02:03:19.387Z
+    httpStatus: 200
+    pageTitle: AI Is GPT, & GPTs Go Slow - by Robin Hanson
+    contentSnippet: AI Is GPT, & GPTs Go Slow - by Robin Hanson Overcoming Bias Subscribe Sign in AI Is GPT, & GPTs Go Slow Robin Hanson Apr 15, 2025 53 32 8 Share Back in the dot-com boom of the late 90s, many said a new economy loomed that invalidated all the old rules, and would soon cause big fast change. Economists or business experts who said otherwise just “didn’t get it”. Just before the year 2000 crash, economists Carl Shapiro and Hal Varian published an excellent book, Information Rules , wherein they exp
+    contentLength: 180448
+    status: verified
+    note: null

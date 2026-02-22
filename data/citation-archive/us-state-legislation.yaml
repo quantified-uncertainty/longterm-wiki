@@ -1,0 +1,337 @@
+pageId: us-state-legislation
+verifiedAt: 2026-02-22
+totalCitations: 30
+verified: 14
+broken: 16
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.ncsl.org/technology-and-communication/artificial-intelligence-2024-legislation
+    linkText: National Conference of State Legislatures AI Legislation Database
+    claimContext: In the absence of comprehensive federal AI legislation, US states have emerged as the primary laboratories for artificial intelligence governance. This state-led approach represents one of the most significant policy developments in AI safety, with profound implications for how AI systems are regula
+    fetchedAt: 2026-02-22T02:18:24.307Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://www.americanbar.org/groups/antitrust_law/resources/newsletters/2024-privacy-cybersecurity-ai-developments/
+    linkText: American Bar Association - 2024's Privacy, Cybersecurity and AI Developments
+    claimContext: Real enforcement has begun, marking the transition from theoretical to practical AI governance. The Texas Attorney General's [settlement with Pieces Technologies under the Texas Deceptive Trade Practices Act](https://www.americanbar.org/groups/antitrust_law/resources/newsletters/2024-privacy-cyberse
+    fetchedAt: 2026-02-22T02:18:24.794Z
+    httpStatus: 200
+    pageTitle: 2024’s Privacy, Cybersecurity and AI Developments Were Significant. 2025 Will be No Different.
+    contentSnippet: 2024’s Privacy, Cybersecurity and AI Developments Were Significant. 2025 Will be No Different. --> chevron-down Created with Sketch Beta. Close Search Submit Clear ABA Groups Antitrust Law Section Antitrust Resources Antitrust Committee Articles Oscar Wong via Getty Images 2024 saw a major shift in the privacy landscape. In addition to significant growth in the ever-evolving web of state privacy legislation, 2024 saw notable new regulation and enforcement actions from the FTC and the states. Thi
+    contentLength: 158897
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+    linkText: White House Executive Order - Ensuring a National Policy Framework for Artificial Intelligence
+    claimContext: Constitutional challenges are escalating rapidly. The [White House Executive Order of December 11, 2025](https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/)[^3] established an AI Litigation Task Force within the Depar
+    fetchedAt: 2026-02-22T02:18:24.380Z
+    httpStatus: 200
+    pageTitle: Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House
+    contentSnippet: "Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House Presidential Actions ENSURING A NATIONAL POLICY FRAMEWORK FOR ARTIFICIAL INTELLIGENCE Executive Orders December 11, 2025 By the authority vested in me as President by the Constitution and the laws of the United States of America, it is hereby ordered: Section 1 . Purpose . United States leadership in Artificial Intelligence (AI) will promote United States national and economic security and dominance across m"
+    contentLength: 287718
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.uschamber.com/technology/the-hidden-cost-of-50-state-ai-laws-a-data-driven-breakdown
+    linkText: U.S. Chamber of Commerce - How Patchwork AI Regulations Threaten Small Businesses
+    claimContext: "Compliance costs are becoming prohibitive for smaller companies. According to the [U.S. Chamber of Commerce analysis](https://www.uschamber.com/technology/the-hidden-cost-of-50-state-ai-laws-a-data-driven-breakdown)[^4], California's requirements will cost small businesses nearly \\$16,000 annually, "
+    fetchedAt: 2026-02-22T02:18:24.344Z
+    httpStatus: 200
+    pageTitle: How Patchwork AI Regulations Threaten Small Businesses | U.S. Chamber of Commerce
+    contentSnippet: "How Patchwork AI Regulations Threaten Small Businesses | U.S. Chamber of Commerce Skip to content Close search Site search Enter your search query Submit The Hidden Cost of 50 State AI Laws: A Data-Driven Breakdown The U.S. needs federal AI regulation to prevent a costly patchwork of conflicting state laws that burden businesses and threaten American innovation leadership. Jordan Crenshaw Senior Vice President, C_TEC, U.S. Chamber of Commerce Michael Richards Executive Director, Policy, U.S. Cha"
+    contentLength: 153662
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://finance.yahoo.com/news/america-ai-regulatory-patchwork-crushing-120000009.html
+    linkText: Yahoo Finance - America's AI regulatory patchwork is crushing startups
+    claimContext: "Compliance costs are becoming prohibitive for smaller companies. According to the [U.S. Chamber of Commerce analysis](https://www.uschamber.com/technology/the-hidden-cost-of-50-state-ai-laws-a-data-driven-breakdown)[^4], California's requirements will cost small businesses nearly \\$16,000 annually, "
+    fetchedAt: 2026-02-22T02:18:24.214Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 6
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9676559/
+    linkText: "PMC Academic - Obligations to assess: Recent trends in AI accountability regulations"
+    claimContext: "**Algorithmic Impact Assessments**: These mandatory evaluations require companies to document potential discrimination, identify affected protected classes, and implement safeguards against bias. [Technical feasibility studies](https://pmc.ncbi.nlm.nih.gov/articles/PMC9676559/)[^6] show AI regulatio"
+    fetchedAt: 2026-02-22T02:18:25.930Z
+    httpStatus: 200
+    pageTitle: "Obligations to assess: Recent trends in AI accountability regulations - PMC"
+    contentSnippet: "Obligations to assess: Recent trends in AI accountability regulations - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM"
+    contentLength: 157421
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.crowell.com/en/insights/client-alerts/bipartisan-state-attorneys-general-and-industry-leaders-launch-national-task-force-on-artificial-intelligence
+    linkText: Crowell & Moring - Bipartisan State Attorneys General Launch AI Task Force
+    claimContext: "**Interstate Coordination**: A [bipartisan AI Task Force launched by Utah AG Derek Brown and North Carolina AG Jeff Jackson](https://www.crowell.com/en/insights/client-alerts/bipartisan-state-attorneys-general-and-industry-leaders-launch-national-task-force-on-artificial-intelligence)[^7] represents"
+    fetchedAt: 2026-02-22T02:18:26.712Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://www.orrick.com/en/Insights/2025/12/Orrick-State-Attorney-General-Update-December-2025
+    linkText: Orrick State Attorney General Update - December 2025
+    claimContext: "**Federal Challenge Response**: A [coalition of 32 state attorneys general](https://www.orrick.com/en/Insights/2025/12/Orrick-State-Attorney-General-Update-December-2025)[^8] is actively opposing congressional moratorium efforts on state AI regulations, working with law enforcement, AI experts, and "
+    fetchedAt: 2026-02-22T02:18:27.416Z
+    httpStatus: 200
+    pageTitle: Orrick State Attorney General Update | December 2025
+    contentSnippet: Orrick State Attorney General Update | December 2025 Home Insights Orrick State Attorney General Update | December 2025 Facebook Twitter Linkedin Orrick State Attorney General Update | December 2025 7 minute read | December.05.2025 State AGs are increasingly shaping the regulatory environment for companies operating in tech, finance, healthcare, retail and beyond. Their initiatives&mdash;often bipartisan and coordinated across multiple states&mdash;can trigger investigations, litigation, reputat
+    contentLength: 108084
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.winston.com/en/insights-and-news/colorado-ai-act-implementation-delayed
+    linkText: Winston & Strawn - Colorado AI Act Implementation Delayed
+    claimContext: Colorado's AI Act, signed by Governor Jared Polis on May 17, 2024, represents the most comprehensive state-level AI regulation to date. Originally set to take effect February 1, 2026, the implementation date was [postponed to June 30, 2026](https://www.winston.com/en/insights-and-news/colorado-ai-ac
+    fetchedAt: 2026-02-22T02:18:27.838Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 10
+    url: https://www.americanbar.org/groups/business_law/resources/business-law-today/2025-august/recent-developments-artificial-intelligence-cases-legislation/
+    linkText: American Bar Association - Recent Developments in AI Cases and Legislation 2025
+    claimContext: The Colorado law's risk-based approach specifically covers AI systems used in employment, education, financial services, healthcare, housing, insurance, and legal services. According to the [American Bar Association analysis](https://www.americanbar.org/groups/business_law/resources/business-law-tod
+    fetchedAt: 2026-02-22T02:18:26.436Z
+    httpStatus: 200
+    pageTitle: Recent Developments in Artificial Intelligence Cases and Legislation 2025
+    contentSnippet: "Recent Developments in Artificial Intelligence Cases and Legislation 2025 --> chevron-down Created with Sketch Beta. Close Search Submit Clear ABA Groups Business Law Section Business Law Resources Business Law Today August 2025 iStock.com/ArisSu Jump to: § 1.1 Introduction Another year has passed, and the legal issues arising out of Artificial Intelligence’s increasingly broad adoption across every facet of our lives continued to expand. As business lawyers, there is optimism that AI (especiall"
+    contentLength: 214619
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.foley.com/insights/publications/2024/05/colorado-ai-act-comprehensive-ai-regulation/
+    linkText: Foley & Lardner - Colorado AI Act Comprehensive Regulation
+    claimContext: The Colorado law's risk-based approach specifically covers AI systems used in employment, education, financial services, healthcare, housing, insurance, and legal services. According to the [American Bar Association analysis](https://www.americanbar.org/groups/business_law/resources/business-law-tod
+    fetchedAt: 2026-02-22T02:18:30.876Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 12
+    url: https://www.sheppardmullin.com/en/services/employment-labor/employment-labor-blog/illinois-ai-video-interview-act
+    linkText: Sheppard Mullin - Illinois AI Video Interview Act
+    claimContext: "Illinois [became the first state](https://www.sheppardmullin.com/en/services/employment-labor/employment-labor-blog/illinois-ai-video-interview-act)[^12] to enact a statute regulating employer use of AI to analyze job applicants when it passed HB2557, the Artificial Intelligence Video Interview Act "
+    fetchedAt: 2026-02-22T02:18:35.742Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 13
+    url: https://www.littler.com/publication-press/publication/illinois-passes-amendments-state-human-rights-act-prohibit-ai
+    linkText: Littler - Illinois Passes Amendments to State Human Rights Act
+    claimContext: "The Illinois law's practical impact extends beyond its technical requirements. Major recruiting platforms and employers have modified their practices nationwide to comply with Illinois standards, effectively making the law's disclosure and consent requirements a de facto national standard. Notably, "
+    fetchedAt: 2026-02-22T02:18:29.649Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 14
+    url: https://www.morganlewis.com/pubs/2024/08/illinois-amends-human-rights-act-to-address-ai-bias-in-employment-decisions
+    linkText: Morgan Lewis - Illinois Amends Human Rights Act to Address AI Bias
+    claimContext: "The Illinois law's practical impact extends beyond its technical requirements. Major recruiting platforms and employers have modified their practices nationwide to comply with Illinois standards, effectively making the law's disclosure and consent requirements a de facto national standard. Notably, "
+    fetchedAt: 2026-02-22T02:18:29.322Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 15
+    url: https://www.tennessee.gov/governor/news/2024/3/21/gov--lee-signs-elvis-act-legislation-to-protect-tennessee-songwriters--artists
+    linkText: Tennessee Governor - Gov. Lee Signs ELVIS Act Legislation
+    claimContext: Tennessee's Ensuring Likeness Voice and Image Security (ELVIS) Act, [signed by Governor Bill Lee on March 21, 2024](https://www.tennessee.gov/governor/news/2024/3/21/gov--lee-signs-elvis-act-legislation-to-protect-tennessee-songwriters--artists)[^15], became the first enacted legislation in the Unit
+    fetchedAt: 2026-02-22T02:18:30.626Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 16
+    url: https://www.tennessean.com/story/news/politics/2024/03/22/tennessee-elvis-act-signed-into-law-protecting-artists-from-ai/73071976007/
+    linkText: The Tennessean - Tennessee ELVIS Act signed into law
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:37.749Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 17
+    url: https://www.npr.org/2024/03/26/1240883491/tennessee-elvis-act-ai-generated-music
+    linkText: NPR - Tennessee ELVIS Act AI-generated music
+    claimContext: The law was catalyzed by a viral AI-generated song in spring 2023 that mimicked Drake and The Weeknd, receiving millions of streams before removal. According to [NPR](https://www.npr.org/2024/03/26/1240883491/tennessee-elvis-act-ai-generated-music)[^17], the legislation received support from RIAA, A
+    fetchedAt: 2026-02-22T02:18:37.419Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 18
+    url: https://gov.texas.gov/news/post/governor-abbott-signs-responsible-ai-governance-act-traiga
+    linkText: Texas Governor - Governor Abbott Signs Responsible AI Governance Act
+    claimContext: On June 22, 2025, Texas Governor Greg Abbott [signed TRAIGA into law](https://gov.texas.gov/news/post/governor-abbott-signs-responsible-ai-governance-act-traiga)[^18], making Texas the fourth state (after Colorado, Utah, and California) to pass comprehensive AI-specific legislation. The law takes ef
+    fetchedAt: 2026-02-22T02:18:39.700Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 19
+    url: https://www.hunton.com/en/insights/texas-ai-governance-act-enacted-with-limited-scope.html
+    linkText: Hunton Andrews Kurth - Texas AI Governance Act Enacted with Limited Scope
+    claimContext: On June 22, 2025, Texas Governor Greg Abbott [signed TRAIGA into law](https://gov.texas.gov/news/post/governor-abbott-signs-responsible-ai-governance-act-traiga)[^18], making Texas the fourth state (after Colorado, Utah, and California) to pass comprehensive AI-specific legislation. The law takes ef
+    fetchedAt: 2026-02-22T02:18:38.195Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 20
+    url: https://www.littler.com/publication-press/publication/texas-ai-governance-act-becomes-law-limited-requirements-private-sector
+    linkText: Littler - Texas AI Governance Act Becomes Law
+    claimContext: The Texas approach represents a notably lighter regulatory touch compared to Colorado's comprehensive framework. According to [Littler Mendelson analysis](https://www.littler.com/publication-press/publication/texas-ai-governance-act-becomes-law-limited-requirements-private-sector)[^20], TRAIGA 2.0 i
+    fetchedAt: 2026-02-22T02:18:37.870Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 21
+    url: https://gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf
+    linkText: California Governor - SB 1047 Veto Message
+    claimContext: Perhaps no single piece of state AI legislation has generated more national attention than California's SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act. Passed by the legislature in August 2024, the bill would have required extensive safety testing and reporti
+    fetchedAt: 2026-02-22T02:18:41.606Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1225780
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.gibsondunn.com/california-governor-vetoes-sb-1047/
+    linkText: Gibson Dunn - California Governor Vetoes SB 1047
+    claimContext: According to [Gibson Dunn analysis](https://www.gibsondunn.com/california-governor-vetoes-sb-1047/)[^22], the bill would have made tech companies legally liable for harms caused by AI models and mandated "kill switch" capabilities. The [Carnegie Endowment](https://carnegieendowment.org/posts/2024/10
+    fetchedAt: 2026-02-22T02:18:41.843Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 23
+    url: https://carnegieendowment.org/posts/2024/10/californias-ai-bills-a-new-model-for-tech-governance
+    linkText: "Carnegie Endowment - California's AI Bills: A New Model for Tech Governance"
+    claimContext: According to [Gibson Dunn analysis](https://www.gibsondunn.com/california-governor-vetoes-sb-1047/)[^22], the bill would have made tech companies legally liable for harms caused by AI models and mandated "kill switch" capabilities. The [Carnegie Endowment](https://carnegieendowment.org/posts/2024/10
+    fetchedAt: 2026-02-22T02:18:41.431Z
+    httpStatus: 200
+    pageTitle: Page not Found | Carnegie Endowment for International Peace
+    contentSnippet: Page not Found | Carnegie Endowment for International Peace
+    contentLength: 73235
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.regulatoryoversight.com/2025/11/north-carolina-and-utah-ags-launch-ai-task-force/
+    linkText: Regulatory Oversight - North Carolina and Utah AGs Launch AI Task Force
+    claimContext: This precedent is significant because it establishes the legal framework for AI enforcement under traditional consumer protection statutes. According to the [Regulatory Oversight analysis](https://www.regulatoryoversight.com/2025/11/north-carolina-and-utah-ags-launch-ai-task-force/)[^24], several st
+    fetchedAt: 2026-02-22T02:18:41.516Z
+    httpStatus: 200
+    pageTitle: North Carolina and Utah AGs Launch AI Task Force | Regulatory Oversight
+    contentSnippet: North Carolina and Utah AGs Launch AI Task Force | Regulatory Oversight Skip to content On November 13, North Carolina Attorney General (AG) Jeff Jackson and Utah AG Derek Brown, along with the Attorney General Alliance, announced a task force in conjunction with generative artificial intelligence (AI) developers, including OpenAI and Microsoft, to identify and develop consumer safeguards within AI systems as these technologies continue to rapidly proliferate. The task force will provide a mecha
+    contentLength: 166471
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.cdflaborlaw.com/blog/federal-court-grants-preliminary-certification-in-landmark-ai-hiring-bias-case
+    linkText: CDF Labor Law - Federal Court Grants Preliminary Certification in AI Hiring Bias Case
+    claimContext: "The employment AI enforcement landscape is evolving rapidly through private litigation. In [Mobley v. Workday](https://www.cdflaborlaw.com/blog/federal-court-grants-preliminary-certification-in-landmark-ai-hiring-bias-case)[^25], Judge Rita Lin granted preliminary certification in May 2025, finding "
+    fetchedAt: 2026-02-22T02:18:41.776Z
+    httpStatus: 200
+    pageTitle: Federal Court Grants Preliminary Certification in Landmark AI Hiring Bias Case | CDF Labor Law LLP
+    contentSnippet: "Federal Court Grants Preliminary Certification in Landmark AI Hiring Bias Case | CDF Labor Law LLP June 18, 2025 Federal Court Grants Preliminary Certification in Landmark AI Hiring Bias Case By: Dan M. Forman , Linda Wang | AI in the Workplace Court Decisions Employee Hiring, Discipline & Termination Empower Your Business: Subscribe to our News & Updates for Practical Solutions Subscribe Home Our Blog Share post Print post As businesses integrate AI tools into operations, a spike in related lit"
+    contentLength: 37841
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.dbllawyers.com/how-to-be-an-ai-compliant-business-in-2026/
+    linkText: DBL Lawyers - How to be an AI-Compliant Business in 2026
+    claimContext: Industry implementation reveals substantial compliance costs that threaten smaller companies disproportionately. [DBL Lawyers analysis](https://www.dbllawyers.com/how-to-be-an-ai-compliant-business-in-2026/)[^26] shows AI compliance adds approximately 17% overhead to AI system expenses, with compani
+    fetchedAt: 2026-02-22T02:18:43.629Z
+    httpStatus: 200
+    pageTitle: How to be an AI-Compliant Business in 2026
+    contentSnippet: 'How to be an AI-Compliant Business in 2026 CONTACT US " * " indicates required fields Name * NAME Email* * Message* * Consent * I have read and agree to DBL’s privacy policy . If you do not agree, please call our client services team at 800 747 9354 . * Please check the box below. &#916; insights RETURN TO insights How to be an AI-Compliant Business in 2026 January 12, 2026 | By: Thomas Dunlap When President Trump&#8217;s January 2025 executive order revoked the Biden administration&#8217;s AI s'
+    contentLength: 468410
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.yalejreg.com/nc/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy-%E2%94%80-part-i/
+    linkText: Yale Journal on Regulation - Eliminating State Law 'Obstruction' of National AI Policy
+    claimContext: This represents a fundamental shift toward active federal opposition to state AI governance. The [Yale Journal on Regulation analysis](https://www.yalejreg.com/nc/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy-%E2%94%80-part-i/)[^27] provides the constitutional framewor
+    fetchedAt: 2026-02-22T02:18:43.346Z
+    httpStatus: 200
+    pageTitle: Eliminating State Law "Obstruction" of National Artificial Intelligence Policy ─ Part I - Yale Journal on Regulation
+    contentSnippet: 'Eliminating State Law "Obstruction" of National Artificial Intelligence Policy ─ Part I - Yale Journal on Regulation Notice & Comment A blog from the Yale Journal on Regulation and ABA Section of Administrative Law & Regulatory Practice. Made possible in part by the support of Davis Polk & Wardwell LLP Share: According to news reports, the Trump Administration recently contemplated issuing an executive order aimed at combatting state restrictions on the development of artificial intelligence (“A'
+    contentLength: 85655
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.thefire.org/news/wave-state-level-ai-bills-raise-first-amendment-problems
+    linkText: FIRE - Wave of State-Level AI Bills Raise First Amendment Problems
+    claimContext: Free speech challenges to AI regulation are mounting, particularly for deepfake and content moderation laws. [FIRE analysis](https://www.thefire.org/news/wave-state-level-ai-bills-raise-first-amendment-problems)[^28] notes that AI-related regulations face strict scrutiny when challenged in court, re
+    fetchedAt: 2026-02-22T02:18:43.824Z
+    httpStatus: 200
+    pageTitle: Wave of state-level AI bills raise First Amendment problems | The Foundation for Individual Rights and Expression
+    contentSnippet: Wave of state-level AI bills raise First Amendment problems | The Foundation for Individual Rights and Expression Skip to main content Home Newsdesk Contents Share Share with Email Share on Bluesky Share on Twitter Share on Facebook Print There’s no ‘artificial intelligence’ exception to the First Amendment by John Coleman February 13, 2025 View credit close Shutterstock.com AI is enhancing our ability to communicate, much like the printing press and the internet did in the past. And lawmakers n
+    contentLength: 95245
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.brennancenter.org/our-work/research-reports/money-politics-roundup-october-2025
+    linkText: Brennan Center - Money in Politics Roundup — October 2025
+    claimContext: The AI industry is significantly increasing political spending to influence state regulation. [Brennan Center analysis](https://www.brennancenter.org/our-work/research-reports/money-politics-roundup-october-2025)[^29] shows OpenAI spent \$1.8 million in federal lobbying in 2024, over \$1.7 million i
+    fetchedAt: 2026-02-22T02:18:43.398Z
+    httpStatus: 200
+    pageTitle: Money in Politics Roundup — October 2025 | Brennan Center for Justice
+    contentSnippet: Money in Politics Roundup — October 2025 | Brennan Center for Justice You are using an outdated browser. Please upgrade your browser to improve your experience. Skip Navigation Home Our Work Research & Reports Money in Politics Roundup — October 2025 Sections Close Panel Preface As the 2025&ndash;2026 election cycle unfolds, the Brennan Center is launching a periodic roundup of stories on money in politics. We will examine key fundraising trends, delve into an underreported story, and note devel
+    contentLength: 135693
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://academic.oup.com/oxrep/article/39/1/70/7030588
+    linkText: "Oxford Review of Economic Policy - Digital disruption: artificial intelligence and international trade policy"
+    claimContext: State AI regulation must be understood within global regulatory competition. The [Oxford Review of Economic Policy analysis](https://academic.oup.com/oxrep/article/39/1/70/7030588)[^30] shows EU AI standards have extraterritorial implications through the "Brussels effect," where firms exporting to t
+    fetchedAt: 2026-02-22T02:18:43.008Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"

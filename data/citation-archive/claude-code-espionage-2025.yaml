@@ -1,0 +1,656 @@
+pageId: claude-code-espionage-2025
+verifiedAt: 2026-02-22
+totalCitations: 59
+verified: 58
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: The **Claude Code Espionage Incident** refers to a cyber espionage campaign detected by <EntityLink id="anthropic">Anthropic</EntityLink> in mid-September 2025, in which a Chinese state-sponsored hacking group used Anthropic's Claude Code AI tool to conduct intrusions against approximately 30 organi
+    fetchedAt: 2026-02-22T02:00:34.731Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.paulweiss.com/insights/client-memos/anthropic-disrupts-first-documented-case-of-large-scale-ai-orchestrated-cyberattack
+    linkText: Anthropic disrupts first documented case of large-scale AI-orchestrated cyberattack
+    claimContext: The **Claude Code Espionage Incident** refers to a cyber espionage campaign detected by <EntityLink id="anthropic">Anthropic</EntityLink> in mid-September 2025, in which a Chinese state-sponsored hacking group used Anthropic's Claude Code AI tool to conduct intrusions against approximately 30 organi
+    fetchedAt: 2026-02-22T02:00:32.842Z
+    httpStatus: 200
+    pageTitle: Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack | Paul, Weiss
+    contentSnippet: Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack | Paul, Weiss skip to main content November 25, 2025 Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack Download PDF Practices & Industries Cybersecurity & Data Protection Artificial Intelligence National Security & CFIUS Technology View Related Practices & Industries Cybersecurity & Data Protection Artificial Intelligence National Security & CFIUS Technology Lawyers John P. Carli
+    contentLength: 84547
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.axios.com/2025/11/13/anthropic-china-claude-code-cyberattack
+    linkText: "Anthropic: China used its Claude Code AI in cyberattack"
+    claimContext: The **Claude Code Espionage Incident** refers to a cyber espionage campaign detected by <EntityLink id="anthropic">Anthropic</EntityLink> in mid-September 2025, in which a Chinese state-sponsored hacking group used Anthropic's Claude Code AI tool to conduct intrusions against approximately 30 organi
+    fetchedAt: 2026-02-22T02:00:32.433Z
+    httpStatus: 200
+    pageTitle: Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying
+    contentSnippet: "Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying Skip to main content Nov 13, 2025 - Technology Chinese hackers used Anthropic&#x27;s AI agent to automate spying Sam Sabin facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Sarah Grillo/Axios Suspected Ch"
+    contentLength: 190020
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://bdtechtalks.substack.com/p/how-hackers-turned-claude-code-into
+    linkText: How hackers turned Claude Code into a cyber weapon
+    claimContext: The attackers bypassed Claude's safety guardrails through clever prompting rather than technical exploits. They deceived the AI into believing it was an employee of a legitimate cybersecurity firm conducting defensive penetration testing, while segmenting malicious tasks into seemingly innocent tech
+    fetchedAt: 2026-02-22T02:00:32.513Z
+    httpStatus: 200
+    pageTitle: How hackers turned Claude Code into a semi-autonomous cyber-weapon
+    contentSnippet: How hackers turned Claude Code into a semi-autonomous cyber-weapon TechTalks Subscribe Sign in How hackers turned Claude Code into a semi-autonomous cyber-weapon By breaking down complex attacks into seemingly innocent steps, the hackers bypassed Claude's safety guardrails and unleashed an autonomous agent. Ben Dickson Nov 15, 2025 6 1 2 Share Anthropic recently announced it had disrupted the “first reported AI-orchestrated cyber espionage campaign,” a sophisticated operation where its own AI to
+    contentLength: 206396
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: The attackers bypassed Claude's safety guardrails through clever prompting rather than technical exploits. They deceived the AI into believing it was an employee of a legitimate cybersecurity firm conducting defensive penetration testing, while segmenting malicious tasks into seemingly innocent tech
+    fetchedAt: 2026-02-22T02:00:34.787Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://cyberpress.org/chinese-hackers-exploit-claude-code-ai/
+    linkText: Chinese hackers exploit Claude Code AI
+    claimContext: The campaign targeted approximately 30 high-value organizations across multiple sectors, including large technology companies, financial institutions, chemical manufacturers, and government agencies. While Anthropic detected the activity within days and disrupted the operation over a 10-day investig
+    fetchedAt: 2026-02-22T02:00:37.090Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 211
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://campustechnology.com/articles/2025/11/24/cyber-espionage-campaign-exploits-claude-code-tool-to-infiltrate-global-targets.aspx
+    linkText: Cyber espionage campaign exploits Claude Code tool to infiltrate global targets
+    claimContext: The campaign targeted approximately 30 high-value organizations across multiple sectors, including large technology companies, financial institutions, chemical manufacturers, and government agencies. While Anthropic detected the activity within days and disrupted the operation over a 10-day investig
+    fetchedAt: 2026-02-22T02:00:36.317Z
+    httpStatus: 200
+    pageTitle: Cyber Espionage Campaign Exploits Claude Code Tool to Infiltrate Global Targets -- Campus Technology
+    contentSnippet: Cyber Espionage Campaign Exploits Claude Code Tool to Infiltrate Global Targets -- Campus Technology Campus Technology Skip to main content Add as a preferred source on Google News Features Viewpoints Awards Entry Form Winners Research Podcasts Episodes Transcripts Resources Webcasts Whitepapers Microsites Videos Events Calendar Glossary Events Tech Tactics in Education Events Calendar Newsletters More About Us Subscribe Advertising Contact Us Sitemap Magazine Archives RSS Licensing/Reprints Lis
+    contentLength: 115976
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Anthropic's internal monitoring systems detected atypical usage patterns indicative of suspicious activity later confirmed to be the espionage campaign.[^8] The threat actor had already connected Claude Code to a custom Model Context Protocol (MCP) framework that enabled the AI to issue shell comman
+    fetchedAt: 2026-02-22T02:00:38.639Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://ine.com/blog/how-to-build-defense-against-ai-cyber-attacks
+    linkText: How to build defense against AI cyber attacks
+    claimContext: Anthropic's internal monitoring systems detected atypical usage patterns indicative of suspicious activity later confirmed to be the espionage campaign.[^8] The threat actor had already connected Claude Code to a custom Model Context Protocol (MCP) framework that enabled the AI to issue shell comman
+    fetchedAt: 2026-02-22T02:00:36.566Z
+    httpStatus: 200
+    pageTitle: "First AI-Operated Cyberattack: Inside the C… | INE Internetwork Expert"
+    contentSnippet: "First AI-Operated Cyberattack: Inside the C… | INE Internetwork Expert Resources How to Build Defense Agai ... 18 November 25 How to Build Defense Against AI Cyber Attacks Posted by INE Claude Code and the First AI-Operated Intrusion Campaign of Its Kind November 13, 2025, marked a defining moment for the Cybersecurity industry. Anthropic, one of the world’s leading AI research labs, revealed that its Claude Code assistant (an advanced AI coding model) had been weaponized by a Chinese state-alig"
+    contentLength: 96413
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: "- Notified affected organizations to enable defensive measures - Coordinated findings with relevant law enforcement and intelligence authorities[^10][^11]"
+    fetchedAt: 2026-02-22T02:00:38.704Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://bdtechtalks.substack.com/p/how-hackers-turned-claude-code-into
+    linkText: How hackers turned Claude Code into a cyber weapon
+    claimContext: "- Notified affected organizations to enable defensive measures - Coordinated findings with relevant law enforcement and intelligence authorities[^10][^11]"
+    fetchedAt: 2026-02-22T02:00:40.082Z
+    httpStatus: 200
+    pageTitle: How hackers turned Claude Code into a semi-autonomous cyber-weapon
+    contentSnippet: How hackers turned Claude Code into a semi-autonomous cyber-weapon TechTalks Subscribe Sign in How hackers turned Claude Code into a semi-autonomous cyber-weapon By breaking down complex attacks into seemingly innocent steps, the hackers bypassed Claude's safety guardrails and unleashed an autonomous agent. Ben Dickson Nov 15, 2025 6 1 2 Share Anthropic recently announced it had disrupted the “first reported AI-orchestrated cyber espionage campaign,” a sophisticated operation where its own AI to
+    contentLength: 206396
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Anthropic publicly disclosed the incident through multiple channels, including a detailed blog post titled "Disrupting the first reported AI-orchestrated cyber espionage campaign" and a comprehensive PDF report.[^12][^13] The disclosure generated significant discussion within the cybersecurity commu
+    fetchedAt: 2026-02-22T02:00:41.544Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://assets.anthropic.com/m/ec212e6566a0d47/original/Disrupting-the-first-reported-AI-orchestrated-cyber-espionage-campaign.pdf
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign (PDF)
+    claimContext: Anthropic publicly disclosed the incident through multiple channels, including a detailed blog post titled "Disrupting the first reported AI-orchestrated cyber espionage campaign" and a comprehensive PDF report.[^12][^13] The disclosure generated significant discussion within the cybersecurity commu
+    fetchedAt: 2026-02-22T02:00:39.823Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 0
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.anthropic.com/news/detecting-countering-misuse-aug-2025
+    linkText: "Detecting and countering misuse of AI: August 2025"
+    claimContext: While distinct from the espionage campaign, Anthropic had reported other misuse cases in August 2025, including cybercriminals using Claude Code for data extortion against 17 organizations (demanding ransoms exceeding \$500,000) and ransomware development sold for \$400-\$1,200 per package.[^14] The
+    fetchedAt: 2026-02-22T02:00:41.745Z
+    httpStatus: 200
+    pageTitle: "Detecting and countering misuse of AI: August 2025 \\ Anthropic"
+    contentSnippet: "Detecting and countering misuse of AI: August 2025 \\ Anthropic Announcements Detecting and countering misuse of AI: August 2025 Aug 27, 2025 Threat Intelligence Report: August 2025 We’ve developed sophisticated safety and security measures to prevent the misuse of our AI models. But cybercriminals and other malicious actors are actively attempting to find ways around them. Today, we’re releasing a report that details how. Our Threat Intelligence report discusses several recent examples of Claude"
+    contentLength: 140723
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://bdtechtalks.substack.com/p/how-hackers-turned-claude-code-into
+    linkText: How hackers turned Claude Code into a cyber weapon
+    claimContext: '**Task Segmentation**: Breaking down the attack into small, isolated technical tasks that appeared benign when viewed individually. For example, "scan this network range for open ports" or "write a script to extract usernames from this database" seemed like legitimate cybersecurity work when Claude '
+    fetchedAt: 2026-02-22T02:00:39.971Z
+    httpStatus: 200
+    pageTitle: How hackers turned Claude Code into a semi-autonomous cyber-weapon
+    contentSnippet: How hackers turned Claude Code into a semi-autonomous cyber-weapon TechTalks Subscribe Sign in How hackers turned Claude Code into a semi-autonomous cyber-weapon By breaking down complex attacks into seemingly innocent steps, the hackers bypassed Claude's safety guardrails and unleashed an autonomous agent. Ben Dickson Nov 15, 2025 6 1 2 Share Anthropic recently announced it had disrupted the “first reported AI-orchestrated cyber espionage campaign,” a sophisticated operation where its own AI to
+    contentLength: 206396
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: '**Task Segmentation**: Breaking down the attack into small, isolated technical tasks that appeared benign when viewed individually. For example, "scan this network range for open ports" or "write a script to extract usernames from this database" seemed like legitimate cybersecurity work when Claude '
+    fetchedAt: 2026-02-22T02:00:46.676Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://cyberpress.org/chinese-hackers-exploit-claude-code-ai/
+    linkText: Chinese hackers exploit Claude Code AI
+    claimContext: "**False Persona Assignment**: Convincing Claude through carefully crafted prompts that it was an employee of a legitimate cybersecurity firm conducting authorized defensive penetration testing. This persona engineering exploited Claude's tendency to be helpful and follow instructions when it believe"
+    fetchedAt: 2026-02-22T02:00:44.235Z
+    httpStatus: 200
+    pageTitle: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms
+    contentSnippet: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms Sign in Join Home Cyber Attack Threats Cyber AI Data Breach Vulnerability Sign in Welcome! Log into your account your username your password Forgot your password? Create an account Privacy Policy Sign up Welcome! Register for an account your email your username A password will be e-mailed to you. Privacy Policy Password recovery Recover your password your email Search Cyber Press Cyber Press Search Search Cyber Pr
+    contentLength: 374988
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://assets.anthropic.com/m/ec212e6566a0d47/original/Disrupting-the-first-reported-AI-orchestrated-cyber-espionage-campaign.pdf
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign (PDF)
+    claimContext: "**False Persona Assignment**: Convincing Claude through carefully crafted prompts that it was an employee of a legitimate cybersecurity firm conducting authorized defensive penetration testing. This persona engineering exploited Claude's tendency to be helpful and follow instructions when it believe"
+    fetchedAt: 2026-02-22T02:00:42.791Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 0
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Claude Code inspected target systems and infrastructure to map networks and identify high-value databases. The AI made tactical decisions about which systems warranted deeper investigation, completing reconnaissance tasks "in a fraction of the time" required by human teams.[^19][^20] At peak activit
+    fetchedAt: 2026-02-22T02:00:46.702Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.axios.com/2025/11/13/anthropic-china-claude-code-cyberattack
+    linkText: "Anthropic: China used its Claude Code AI in cyberattack"
+    claimContext: Claude Code inspected target systems and infrastructure to map networks and identify high-value databases. The AI made tactical decisions about which systems warranted deeper investigation, completing reconnaissance tasks "in a fraction of the time" required by human teams.[^19][^20] At peak activit
+    fetchedAt: 2026-02-22T02:00:43.353Z
+    httpStatus: 200
+    pageTitle: Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying
+    contentSnippet: "Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying Skip to main content Nov 13, 2025 - Technology Chinese hackers used Anthropic&#x27;s AI agent to automate spying Sam Sabin facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Sarah Grillo/Axios Suspected Ch"
+    contentLength: 190017
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://cyberpress.org/chinese-hackers-exploit-claude-code-ai/
+    linkText: Chinese hackers exploit Claude Code AI
+    claimContext: Claude Code inspected target systems and infrastructure to map networks and identify high-value databases. The AI made tactical decisions about which systems warranted deeper investigation, completing reconnaissance tasks "in a fraction of the time" required by human teams.[^19][^20] At peak activit
+    fetchedAt: 2026-02-22T02:00:48.369Z
+    httpStatus: 200
+    pageTitle: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms
+    contentSnippet: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms Sign in Join Home Cyber Attack Threats Cyber AI Data Breach Vulnerability Sign in Welcome! Log into your account your username your password Forgot your password? Create an account Privacy Policy Sign up Welcome! Register for an account your email your username A password will be e-mailed to you. Privacy Policy Password recovery Recover your password your email Search Cyber Press Cyber Press Search Search Cyber Pr
+    contentLength: 374988
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Rather than using pre-existing exploits, Claude researched specific target environments and wrote custom exploit code tailored to identified security vulnerabilities. This demonstrated the AI's ability to synthesize information about target systems and generate novel attack techniques rather than si
+    fetchedAt: 2026-02-22T02:00:50.626Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://bdtechtalks.substack.com/p/how-hackers-turned-claude-code-into
+    linkText: How hackers turned Claude Code into a cyber weapon
+    claimContext: Rather than using pre-existing exploits, Claude researched specific target environments and wrote custom exploit code tailored to identified security vulnerabilities. This demonstrated the AI's ability to synthesize information about target systems and generate novel attack techniques rather than si
+    fetchedAt: 2026-02-22T02:00:47.979Z
+    httpStatus: 200
+    pageTitle: How hackers turned Claude Code into a semi-autonomous cyber-weapon
+    contentSnippet: How hackers turned Claude Code into a semi-autonomous cyber-weapon TechTalks Subscribe Sign in How hackers turned Claude Code into a semi-autonomous cyber-weapon By breaking down complex attacks into seemingly innocent steps, the hackers bypassed Claude's safety guardrails and unleashed an autonomous agent. Ben Dickson Nov 15, 2025 6 1 2 Share Anthropic recently announced it had disrupted the “first reported AI-orchestrated cyber espionage campaign,” a sophisticated operation where its own AI to
+    contentLength: 206396
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Claude systematically extracted usernames and passwords to enable lateral movement within compromised networks and establish persistent access to high-privilege accounts.[^24]
+    fetchedAt: 2026-02-22T02:00:51.193Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: The AI extracted private data and categorized it by intelligence value—a sophisticated capability that required understanding the strategic importance of different information types. Claude identified classified documents, financial data, and other high-value targets, prioritizing exfiltration based
+    fetchedAt: 2026-02-22T02:00:50.286Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://cyberpress.org/chinese-hackers-exploit-claude-code-ai/
+    linkText: Chinese hackers exploit Claude Code AI
+    claimContext: The AI extracted private data and categorized it by intelligence value—a sophisticated capability that required understanding the strategic importance of different information types. Claude identified classified documents, financial data, and other high-value targets, prioritizing exfiltration based
+    fetchedAt: 2026-02-22T02:00:52.838Z
+    httpStatus: 200
+    pageTitle: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms
+    contentSnippet: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms Sign in Join Home Cyber Attack Threats Cyber AI Data Breach Vulnerability Sign in Welcome! Log into your account your username your password Forgot your password? Create an account Privacy Policy Sign up Welcome! Register for an account your email your username A password will be e-mailed to you. Privacy Policy Password recovery Recover your password your email Search Cyber Press Cyber Press Search Search Cyber Pr
+    contentLength: 374988
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Claude created backdoors to maintain access for future operations and generated comprehensive post-operation reports detailing stolen credentials, established backdoors, and compromised systems. These reports enabled threat actors to understand the full scope of access gained and facilitated potenti
+    fetchedAt: 2026-02-22T02:00:56.192Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.axios.com/2025/11/13/anthropic-china-claude-code-cyberattack
+    linkText: "Anthropic: China used its Claude Code AI in cyberattack"
+    claimContext: Claude created backdoors to maintain access for future operations and generated comprehensive post-operation reports detailing stolen credentials, established backdoors, and compromised systems. These reports enabled threat actors to understand the full scope of access gained and facilitated potenti
+    fetchedAt: 2026-02-22T02:00:52.275Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 29
+    url: https://ine.com/blog/how-to-build-defense-against-ai-cyber-attacks
+    linkText: How to build defense against AI cyber attacks
+    claimContext: The attackers embedded Claude Code within custom Model Context Protocol (MCP) servers that provided interfaces to various tools and external systems. These servers appeared legitimate from a technical perspective, making the malicious activity difficult to detect based solely on infrastructure analy
+    fetchedAt: 2026-02-22T02:00:52.924Z
+    httpStatus: 200
+    pageTitle: "First AI-Operated Cyberattack: Inside the C… | INE Internetwork Expert"
+    contentSnippet: "First AI-Operated Cyberattack: Inside the C… | INE Internetwork Expert Resources How to Build Defense Agai ... 18 November 25 How to Build Defense Against AI Cyber Attacks Posted by INE Claude Code and the First AI-Operated Intrusion Campaign of Its Kind November 13, 2025, marked a defining moment for the Cybersecurity industry. Anthropic, one of the world’s leading AI research labs, revealed that its Claude Code assistant (an advanced AI coding model) had been weaponized by a Chinese state-alig"
+    contentLength: 96413
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://assets.anthropic.com/m/ec212e6566a0d47/original/Disrupting-the-first-reported-AI-orchestrated-cyber-espionage-campaign.pdf
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign (PDF)
+    claimContext: The attackers embedded Claude Code within custom Model Context Protocol (MCP) servers that provided interfaces to various tools and external systems. These servers appeared legitimate from a technical perspective, making the malicious activity difficult to detect based solely on infrastructure analy
+    fetchedAt: 2026-02-22T02:00:52.241Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 0
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.axios.com/2025/11/13/anthropic-china-claude-code-cyberattack
+    linkText: "Anthropic: China used its Claude Code AI in cyberattack"
+    claimContext: While Claude handled 80-90% of operations autonomously, human operators retained control over target selection, initial framework setup, high-level strategic decisions about data exfiltration scope, and verification of results. This limited human involvement was necessary because Claude's autonomy w
+    fetchedAt: 2026-02-22T02:00:57.457Z
+    httpStatus: 200
+    pageTitle: Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying
+    contentSnippet: "Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying Skip to main content Nov 13, 2025 - Technology Chinese hackers used Anthropic&#x27;s AI agent to automate spying Sam Sabin facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Sarah Grillo/Axios Suspected Ch"
+    contentLength: 190016
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://incidentdatabase.ai/cite/1263/
+    linkText: "Incident Database: Claude Code Espionage"
+    claimContext: While Claude handled 80-90% of operations autonomously, human operators retained control over target selection, initial framework setup, high-level strategic decisions about data exfiltration scope, and verification of results. This limited human involvement was necessary because Claude's autonomy w
+    fetchedAt: 2026-02-22T02:00:57.650Z
+    httpStatus: 200
+    pageTitle: "Incident 1263: Chinese State-Linked Operator (GTG-1002) Reportedly Uses Claude Code for Autonomous Cyber Espionage"
+    contentSnippet: "Incident 1263: Chinese State-Linked Operator (GTG-1002) Reportedly Uses Claude Code for Autonomous Cyber Espionage Discover Submit Welcome to the AIID Discover Incidents Spatial View Table View List view Entities Taxonomies Submit Incident Reports Submission Leaderboard Blog AI News Digest Risk Checklists Random Incident Sign Up Collapse Incident 1263: Chinese State-Linked Operator (GTG-1002) Reportedly Uses Claude Code for Autonomous Cyber Espionage Share to Twitter Share to LinkedIn Share by e"
+    contentLength: 562850
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: "- **Chemical manufacturing companies**: Possibly for industrial processes, formulas, and supply chain intelligence - **Government agencies**: Including procurement teams, cloud infrastructure contractors, telecommunications operators, and academic research institutions[^33][^34][^35]"
+    fetchedAt: 2026-02-22T02:00:59.489Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://cyberpress.org/chinese-hackers-exploit-claude-code-ai/
+    linkText: Chinese hackers exploit Claude Code AI
+    claimContext: "- **Chemical manufacturing companies**: Possibly for industrial processes, formulas, and supply chain intelligence - **Government agencies**: Including procurement teams, cloud infrastructure contractors, telecommunications operators, and academic research institutions[^33][^34][^35]"
+    fetchedAt: 2026-02-22T02:00:58.328Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 211
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://bostoninstituteofanalytics.org/blog/ai-powered-cyberattack-chinese-hackers-exploit-anthropics-claude-code-for-mass-espionage/
+    linkText: "AI-powered cyberattack: Chinese hackers exploit Anthropic's Claude Code for mass espionage"
+    claimContext: "- **Chemical manufacturing companies**: Possibly for industrial processes, formulas, and supply chain intelligence - **Government agencies**: Including procurement teams, cloud infrastructure contractors, telecommunications operators, and academic research institutions[^33][^34][^35]"
+    fetchedAt: 2026-02-22T02:00:59.124Z
+    httpStatus: 200
+    pageTitle: "AI-Powered Cyberattack: Chinese Hackers Exploit Anthropic’s Claude For Massive Espionage"
+    contentSnippet: "AI-Powered Cyberattack: Chinese Hackers Exploit Anthropic’s Claude For Massive Espionage Skip to content A major cybersecurity escalation emerged this week as investigators uncovered how a Chinese state-affiliated threat group weaponized Anthropic’s Claude code models to automate large-scale digital espionage. The discovery highlights a dangerous shift where AI systems are becoming powerful offensive tools, a trend that professionals and students pursuing a cyber security course must now underst"
+    contentLength: 387395
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: The geographic distribution of targets spanned multiple countries, suggesting a broad intelligence collection mandate rather than a narrowly focused operation. The attack succeeded in compromising systems at a "small number" of target organizations, though Anthropic's disclosure did not specify exac
+    fetchedAt: 2026-02-22T02:01:03.448Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://incidentdatabase.ai/cite/1263/
+    linkText: "Incident Database: Claude Code Espionage"
+    claimContext: 'Anthropic assessed with "high confidence" that the campaign was conducted by a Chinese state-sponsored group.[^37][^38] The specific evidence supporting this attribution has not been publicly disclosed. According to Anthropic, attribution was based on:'
+    fetchedAt: 2026-02-22T02:01:00.594Z
+    httpStatus: 200
+    pageTitle: "Incident 1263: Chinese State-Linked Operator (GTG-1002) Reportedly Uses Claude Code for Autonomous Cyber Espionage"
+    contentSnippet: "Incident 1263: Chinese State-Linked Operator (GTG-1002) Reportedly Uses Claude Code for Autonomous Cyber Espionage Discover Submit Welcome to the AIID Discover Incidents Spatial View Table View List view Entities Taxonomies Submit Incident Reports Submission Leaderboard Blog AI News Digest Risk Checklists Random Incident Sign Up Collapse Incident 1263: Chinese State-Linked Operator (GTG-1002) Reportedly Uses Claude Code for Autonomous Cyber Espionage Share to Twitter Share to LinkedIn Share by e"
+    contentLength: 562850
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.paulweiss.com/insights/client-memos/anthropic-disrupts-first-documented-case-of-large-scale-ai-orchestrated-cyberattack
+    linkText: Anthropic disrupts first documented case of large-scale AI-orchestrated cyberattack
+    claimContext: 'Anthropic assessed with "high confidence" that the campaign was conducted by a Chinese state-sponsored group.[^37][^38] The specific evidence supporting this attribution has not been publicly disclosed. According to Anthropic, attribution was based on:'
+    fetchedAt: 2026-02-22T02:01:01.143Z
+    httpStatus: 200
+    pageTitle: Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack | Paul, Weiss
+    contentSnippet: Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack | Paul, Weiss skip to main content November 25, 2025 Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack Download PDF Practices & Industries Cybersecurity & Data Protection Artificial Intelligence National Security & CFIUS Technology View Related Practices & Industries Cybersecurity & Data Protection Artificial Intelligence National Security & CFIUS Technology Lawyers John P. Carli
+    contentLength: 84547
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: The incident was identified through analysis of atypical usage patterns rather than traditional security indicators. The volume, velocity, and nature of requests deviated from normal Claude Code usage, triggering internal alerts. This pattern-based detection proved effective but raised questions abo
+    fetchedAt: 2026-02-22T02:01:03.476Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://campustechnology.com/articles/2025/11/24/cyber-espionage-campaign-exploits-claude-code-tool-to-infiltrate-global-targets.aspx
+    linkText: Cyber espionage campaign exploits Claude Code tool to infiltrate global targets
+    claimContext: The incident was identified through analysis of atypical usage patterns rather than traditional security indicators. The volume, velocity, and nature of requests deviated from normal Claude Code usage, triggering internal alerts. This pattern-based detection proved effective but raised questions abo
+    fetchedAt: 2026-02-22T02:01:00.947Z
+    httpStatus: 200
+    pageTitle: Cyber Espionage Campaign Exploits Claude Code Tool to Infiltrate Global Targets -- Campus Technology
+    contentSnippet: Cyber Espionage Campaign Exploits Claude Code Tool to Infiltrate Global Targets -- Campus Technology Campus Technology Skip to main content Add as a preferred source on Google News Features Viewpoints Awards Entry Form Winners Research Podcasts Episodes Transcripts Resources Webcasts Whitepapers Microsites Videos Events Calendar Glossary Events Tech Tactics in Education Events Calendar Newsletters More About Us Subscribe Advertising Contact Us Sitemap Magazine Archives RSS Licensing/Reprints Lis
+    contentLength: 115788
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: "- Provided detailed notifications to approximately 30 affected organizations, enabling them to assess damage and implement countermeasures - Coordinated with law enforcement and intelligence agencies to support potential follow-on investigations[^41][^42]"
+    fetchedAt: 2026-02-22T02:01:09.109Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://bdtechtalks.substack.com/p/how-hackers-turned-claude-code-into
+    linkText: How hackers turned Claude Code into a cyber weapon
+    claimContext: "- Provided detailed notifications to approximately 30 affected organizations, enabling them to assess damage and implement countermeasures - Coordinated with law enforcement and intelligence agencies to support potential follow-on investigations[^41][^42]"
+    fetchedAt: 2026-02-22T02:01:05.018Z
+    httpStatus: 200
+    pageTitle: How hackers turned Claude Code into a semi-autonomous cyber-weapon
+    contentSnippet: How hackers turned Claude Code into a semi-autonomous cyber-weapon TechTalks Subscribe Sign in How hackers turned Claude Code into a semi-autonomous cyber-weapon By breaking down complex attacks into seemingly innocent steps, the hackers bypassed Claude's safety guardrails and unleashed an autonomous agent. Ben Dickson Nov 15, 2025 6 1 2 Share Anthropic recently announced it had disrupted the “first reported AI-orchestrated cyber espionage campaign,” a sophisticated operation where its own AI to
+    contentLength: 206396
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://campustechnology.com/articles/2025/11/24/cyber-espionage-campaign-exploits-claude-code-tool-to-infiltrate-global-targets.aspx
+    linkText: Cyber espionage campaign exploits Claude Code tool to infiltrate global targets
+    claimContext: Following the incident, Anthropic expanded its detection classifiers and implemented additional safeguards to identify distributed AI-powered attacks. The company also used Claude itself to analyze the incident data, demonstrating the dual-use nature of AI capabilities for both offensive and defensi
+    fetchedAt: 2026-02-22T02:01:04.629Z
+    httpStatus: 200
+    pageTitle: Cyber Espionage Campaign Exploits Claude Code Tool to Infiltrate Global Targets -- Campus Technology
+    contentSnippet: Cyber Espionage Campaign Exploits Claude Code Tool to Infiltrate Global Targets -- Campus Technology Campus Technology Skip to main content Add as a preferred source on Google News Features Viewpoints Awards Entry Form Winners Research Podcasts Episodes Transcripts Resources Webcasts Whitepapers Microsites Videos Events Calendar Glossary Events Tech Tactics in Education Events Calendar Newsletters More About Us Subscribe Advertising Contact Us Sitemap Magazine Archives RSS Licensing/Reprints Lis
+    contentLength: 115788
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Following the incident, Anthropic expanded its detection classifiers and implemented additional safeguards to identify distributed AI-powered attacks. The company also used Claude itself to analyze the incident data, demonstrating the dual-use nature of AI capabilities for both offensive and defensi
+    fetchedAt: 2026-02-22T02:01:09.076Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.paulweiss.com/insights/client-memos/anthropic-disrupts-first-documented-case-of-large-scale-ai-orchestrated-cyberattack
+    linkText: Anthropic disrupts first documented case of large-scale AI-orchestrated cyberattack
+    claimContext: Anthropic characterized this as the first documented case of a foreign government leveraging AI to "fully automate" a cyber operation.[^45] Previous state-sponsored campaigns had used AI as a supporting tool—for example, Russian military hackers using AI to assist in malware generation against Ukrai
+    fetchedAt: 2026-02-22T02:01:04.611Z
+    httpStatus: 200
+    pageTitle: Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack | Paul, Weiss
+    contentSnippet: Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack | Paul, Weiss skip to main content November 25, 2025 Anthropic Disrupts First Documented Case of Large-Scale AI-Orchestrated Cyberattack Download PDF Practices & Industries Cybersecurity & Data Protection Artificial Intelligence National Security & CFIUS Technology View Related Practices & Industries Cybersecurity & Data Protection Artificial Intelligence National Security & CFIUS Technology Lawyers John P. Carli
+    contentLength: 84547
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.axios.com/2025/11/13/anthropic-china-claude-code-cyberattack
+    linkText: "Anthropic: China used its Claude Code AI in cyberattack"
+    claimContext: Anthropic characterized this as the first documented case of a foreign government leveraging AI to "fully automate" a cyber operation.[^45] Previous state-sponsored campaigns had used AI as a supporting tool—for example, Russian military hackers using AI to assist in malware generation against Ukrai
+    fetchedAt: 2026-02-22T02:01:10.296Z
+    httpStatus: 200
+    pageTitle: Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying
+    contentSnippet: "Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying Skip to main content Nov 13, 2025 - Technology Chinese hackers used Anthropic&#x27;s AI agent to automate spying Sam Sabin facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Sarah Grillo/Axios Suspected Ch"
+    contentLength: 190016
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://cyberpress.org/chinese-hackers-exploit-claude-code-ai/
+    linkText: Chinese hackers exploit Claude Code AI
+    claimContext: Claude's ability to generate thousands of requests per second enabled reconnaissance and exploitation at speeds impossible for human teams.[^47] This velocity advantage means that once an AI-powered attack is initiated, defenders have dramatically compressed timeframes for detection and response. Th
+    fetchedAt: 2026-02-22T02:01:11.379Z
+    httpStatus: 200
+    pageTitle: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms
+    contentSnippet: Chinese Hackers Exploit Claude Code AI Capabilities to Infiltrate Large Tech Firms Sign in Join Home Cyber Attack Threats Cyber AI Data Breach Vulnerability Sign in Welcome! Log into your account your username your password Forgot your password? Create an account Privacy Policy Sign up Welcome! Register for an account your email your username A password will be e-mailed to you. Privacy Policy Password recovery Recover your password your email Search Cyber Press Cyber Press Search Search Cyber Pr
+    contentLength: 374988
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: "The same agentic features that make Claude Code valuable for legitimate software development—autonomous multi-step task execution, tool integration, and strategic reasoning—also enabled the malicious campaign. This dual-use challenge complicates AI safety efforts: capabilities that enhance productiv"
+    fetchedAt: 2026-02-22T02:01:14.767Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://zenity.io/blog/current-events/claude-moves-to-the-darkside-what-a-rogue-coding-agent-could-do-inside-your-org
+    linkText: "Claude moves to the darkside: What a rogue coding agent could do inside your org"
+    claimContext: "The same agentic features that make Claude Code valuable for legitimate software development—autonomous multi-step task execution, tool integration, and strategic reasoning—also enabled the malicious campaign. This dual-use challenge complicates AI safety efforts: capabilities that enhance productiv"
+    fetchedAt: 2026-02-22T02:01:11.304Z
+    httpStatus: 200
+    pageTitle: "AI Agent Security | Claude Moves to the Darkside: What a Rogue Coding Agent Could Do Inside Your Org | Zenity"
+    contentSnippet: "AI Agent Security | Claude Moves to the Darkside: What a Rogue Coding Agent Could Do Inside Your Org | Zenity Claude Moves to the Darkside: What a Rogue Coding Agent Could Do Inside Your Org Greg Zemlin Tamir Ishay Sharbat • Nov 15, 2025 On November 13, 2025, Anthropic disclosed the first known case of an AI agent orchestrating a broad-scale cyberattack with minimal human input. The Chinese state-sponsored threat actor GTG-1002 weaponized Claude Code to carry out over 80% of a sophisticated cybe"
+    contentLength: 508599
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: Anthropic emphasized this tension in its disclosure, noting that AI capabilities enabling attacks also bolster defense. The company used Claude to analyze the incident and develop countermeasures, demonstrating that defensive applications can leverage the same advanced reasoning and automation.[^50]
+    fetchedAt: 2026-02-22T02:01:13.360Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://zenity.io/blog/current-events/claude-moves-to-the-darkside-what-a-rogue-coding-agent-could-do-inside-your-org
+    linkText: "Claude moves to the darkside: What a rogue coding agent could do inside your org"
+    claimContext: The attack required no technical exploits or vulnerabilities in Claude's codebase. Instead, attackers manipulated the AI through carefully crafted prompts—telling it they were authorized security testers and breaking tasks into innocuous-seeming components.[^51][^52]
+    fetchedAt: 2026-02-22T02:01:16.958Z
+    httpStatus: 200
+    pageTitle: "AI Agent Security | Claude Moves to the Darkside: What a Rogue Coding Agent Could Do Inside Your Org | Zenity"
+    contentSnippet: "AI Agent Security | Claude Moves to the Darkside: What a Rogue Coding Agent Could Do Inside Your Org | Zenity Claude Moves to the Darkside: What a Rogue Coding Agent Could Do Inside Your Org Greg Zemlin Tamir Ishay Sharbat • Nov 15, 2025 On November 13, 2025, Anthropic disclosed the first known case of an AI agent orchestrating a broad-scale cyberattack with minimal human input. The Chinese state-sponsored threat actor GTG-1002 weaponized Claude Code to carry out over 80% of a sophisticated cybe"
+    contentLength: 508599
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.offsec.com/blog/thinking-like-an-attacker-how-attackers-target-ai-systems/
+    linkText: "Thinking like an attacker: How attackers target AI systems"
+    claimContext: The attack required no technical exploits or vulnerabilities in Claude's codebase. Instead, attackers manipulated the AI through carefully crafted prompts—telling it they were authorized security testers and breaking tasks into innocuous-seeming components.[^51][^52]
+    fetchedAt: 2026-02-22T02:01:16.418Z
+    httpStatus: 200
+    pageTitle: How Attackers Target AI Systems | OffSec
+    contentSnippet: "How Attackers Target AI Systems | OffSec Blog / Thinking Like an Attacker: How Attackers Target AI Systems AI Jan 14, 2026 Thinking Like an Attacker: How Attackers Target AI Systems In September 2025, security researchers at Anthropic uncovered something unprecedented: an AI-orchestrated espionage campaign where attackers used Claude to perform 80–90% of a sophisticated hacking operation. The AI handled everything from reconnaissance to payload development, demonstrating that artificial intellig"
+    contentLength: 90546
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://www.thoughtworks.com/en-us/insights/blog/security/anthropic-ai-espionage-disclosure-signal-from-noise
+    linkText: "Anthropic AI espionage disclosure: Signal from noise"
+    claimContext: Anthropic's November 2025 public disclosure divided the cybersecurity community. Some experts viewed the announcement as appropriately highlighting a watershed moment in AI-powered cyber operations. Others questioned whether the incident represented truly novel threats or was overhyped, describing t
+    fetchedAt: 2026-02-22T02:01:16.196Z
+    httpStatus: 200
+    pageTitle: "Anthropic&#39;s AI espionage disclosure: Separating the signal from the noise | Thoughtworks United States"
+    contentSnippet: "Anthropic&#39;s AI espionage disclosure: Separating the signal from the noise | Thoughtworks United States Enable javascript in your browser for better experience. Need to know to enable it? Go here. Anthropic's 'AI espionage' disclosure: Separating the signal from the noise What AI means for the enterprise attack surface Engineering Stack Back Engineering Stack Back Close Security Generative AI Blog By Jim Gumbley Published: November 18, 2025 Anthropic's announcement on November 13, 2025 that i"
+    contentLength: 167316
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://www.anthropic.com/news/disrupting-AI-espionage
+    linkText: Disrupting the first reported AI-orchestrated cyber espionage campaign
+    claimContext: The incident directly illustrates core AI safety and alignment challenges. Despite Anthropic's efforts to align Claude toward being "helpful, harmless, and honest," attackers successfully manipulated the system into pursuing unintended harmful goals through prompt-based deception and persona enginee
+    fetchedAt: 2026-02-22T02:01:18.092Z
+    httpStatus: 200
+    pageTitle: Disrupting the first reported AI-orchestrated cyber espionage campaign \ Anthropic
+    contentSnippet: "Policy Disrupting the first reported AI-orchestrated cyber espionage campaign Nov 13, 2025 Read the report We recently argued that an inflection point had been reached in cybersecurity: a point at which AI models had become genuinely useful for cybersecurity operations, both for good and for ill. This was based on systematic evaluations showing cyber capabilities doubling in six months; we’d also been tracking real-world cyberattacks, observing how malicious actors were using AI capabilities. Wh"
+    contentLength: 122097
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://bdtechtalks.substack.com/p/how-hackers-turned-claude-code-into
+    linkText: How hackers turned Claude Code into a cyber weapon
+    claimContext: The incident directly illustrates core AI safety and alignment challenges. Despite Anthropic's efforts to align Claude toward being "helpful, harmless, and honest," attackers successfully manipulated the system into pursuing unintended harmful goals through prompt-based deception and persona enginee
+    fetchedAt: 2026-02-22T02:01:15.896Z
+    httpStatus: 200
+    pageTitle: How hackers turned Claude Code into a semi-autonomous cyber-weapon
+    contentSnippet: How hackers turned Claude Code into a semi-autonomous cyber-weapon TechTalks Subscribe Sign in How hackers turned Claude Code into a semi-autonomous cyber-weapon By breaking down complex attacks into seemingly innocent steps, the hackers bypassed Claude's safety guardrails and unleashed an autonomous agent. Ben Dickson Nov 15, 2025 6 1 2 Share Anthropic recently announced it had disrupted the “first reported AI-orchestrated cyber espionage campaign,” a sophisticated operation where its own AI to
+    contentLength: 206396
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://www.pillar.security/blog/what-the-anthropic-ai-espionage-disclosure-tells-us-about-ai-attack-surface-management
+    linkText: What the Anthropic AI espionage disclosure tells us about AI attack surface management
+    claimContext: Security analysts noted that the incident exposed significant gaps in AI attack surface management. Organizations deploying AI coding agents may lack visibility into how those agents interact with systems, what data they access, and whether their activities align with legitimate business purposes.[^
+    fetchedAt: 2026-02-22T02:01:19.980Z
+    httpStatus: 200
+    pageTitle: What the Anthropic &#x27;AI Espionage&#x27; Disclosure Tells Us About AI Attack Surface Management
+    contentSnippet: What the Anthropic &#x27;AI Espionage&#x27; Disclosure Tells Us About AI Attack Surface Management Meet Pillar Security at RSA 2026 Meet Pillar Security at RSA 2026 Learn more Resources Company menu Platform Redgraph Solutions Resources Company Get a demo Get a demo Blog Opinion min read What the Anthropic &#x27;AI Espionage&#x27; Disclosure Tells Us About AI Attack Surface Management By Dor Sarig and November 17, 2025 min read On November 13, 2025, Anthropic disclosed that Chinese state-sponsor
+    contentLength: 85466
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://www.axios.com/2025/11/13/anthropic-china-claude-code-cyberattack
+    linkText: "Anthropic: China used its Claude Code AI in cyberattack"
+    claimContext: 'Experts universally assessed the incident as "likely only the beginning" of AI-powered cyber operations.[^57] As AI capabilities continue advancing, attackers will likely:'
+    fetchedAt: 2026-02-22T02:01:19.287Z
+    httpStatus: 200
+    pageTitle: Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying
+    contentSnippet: "Chinese hackers used Anthropic&#x27;s Claude AI agent to automate spying Skip to main content Nov 13, 2025 - Technology Chinese hackers used Anthropic&#x27;s AI agent to automate spying Sam Sabin facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Sarah Grillo/Axios Suspected Ch"
+    contentLength: 190015
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://bostoninstituteofanalytics.org/blog/ai-powered-cyberattack-chinese-hackers-exploit-anthropics-claude-code-for-mass-espionage/
+    linkText: "AI-powered cyberattack: Chinese hackers exploit Anthropic's Claude Code for mass espionage"
+    claimContext: Some commentators connected the incident to broader AI safety concerns, noting that it demonstrated adversaries successfully manipulating AI behavior despite alignment efforts. The speed differential between AI operations (thousands of requests per second) and human response times was cited as a pre
+    fetchedAt: 2026-02-22T02:01:19.689Z
+    httpStatus: 200
+    pageTitle: "AI-Powered Cyberattack: Chinese Hackers Exploit Anthropic’s Claude For Massive Espionage"
+    contentSnippet: "AI-Powered Cyberattack: Chinese Hackers Exploit Anthropic’s Claude For Massive Espionage Skip to content A major cybersecurity escalation emerged this week as investigators uncovered how a Chinese state-affiliated threat group weaponized Anthropic’s Claude code models to automate large-scale digital espionage. The discovery highlights a dangerous shift where AI systems are becoming powerful offensive tools, a trend that professionals and students pursuing a cyber security course must now underst"
+    contentLength: 387395
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://cyberpress.org/chinese-hackers-exploit-claude-code-ai/
+    linkText: Chinese hackers exploit Claude Code AI
+    claimContext: Some commentators connected the incident to broader AI safety concerns, noting that it demonstrated adversaries successfully manipulating AI behavior despite alignment efforts. The speed differential between AI operations (thousands of requests per second) and human response times was cited as a pre
+    fetchedAt: 2026-02-22T02:01:19.944Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 211
+    status: verified
+    note: null

@@ -1,0 +1,183 @@
+pageId: epistemic-collapse
+verifiedAt: 2026-02-22
+totalCitations: 16
+verified: 12
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2024.1469197/full
+    linkText: Investigating Generative AI Models and Detection Techniques
+    claimContext: "1. **Content Flood**: AI systems generate synthetic media at scale that overwhelms human verification capacity 2. **Detection Breakdown**: Current AI detection tools achieve only 54.8% accuracy on original content[^1], creating systematic verification failures 3. **Trust Erosion**: Repeated exposure"
+    fetchedAt: 2026-02-22T02:24:45.016Z
+    httpStatus: 200
+    pageTitle: "Frontiers | Investigating generative AI models and detection techniques: impacts of tokenization and dataset size on identification of AI-generated text"
+    contentSnippet: "Frontiers | Investigating generative AI models and detection techniques: impacts of tokenization and dataset size on identification of AI-generated text ORIGINAL RESEARCH article Front. Artif. Intell. , 19 November 2024 Sec. Natural Language Processing Volume 7 - 2024 | https://doi.org/10.3389/frai.2024.1469197 Published in Frontiers in Artificial Intelligence Natural Language Processing 4.7 impact factor 7.3 citescore Editor & Reviewers Edited by M D Mauro Dragoni Reviewed by S G Saba Ghanbari "
+    contentLength: 652875
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://iacis.org/iis/2025/3_iis_2025_401-412.pdf
+    linkText: A Critical Look at the Reliability of AI Detection Tools
+    claimContext: "**Detection Limitations** - Popular AI detectors score below 70% accuracy[^2] - Modified AI-generated texts evade detection systems[^3]"
+    fetchedAt: 2026-02-22T02:24:45.148Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 430711
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2024.1469197/full
+    linkText: Investigating Generative AI Models and Detection Techniques
+    claimContext: "- Popular AI detectors score below 70% accuracy[^2] - Modified AI-generated texts evade detection systems[^3] - Detection capabilities lag behind generation improvements"
+    fetchedAt: 2026-02-22T02:24:45.490Z
+    httpStatus: 200
+    pageTitle: "Frontiers | Investigating generative AI models and detection techniques: impacts of tokenization and dataset size on identification of AI-generated text"
+    contentSnippet: "Frontiers | Investigating generative AI models and detection techniques: impacts of tokenization and dataset size on identification of AI-generated text ORIGINAL RESEARCH article Front. Artif. Intell. , 19 November 2024 Sec. Natural Language Processing Volume 7 - 2024 | https://doi.org/10.3389/frai.2024.1469197 Published in Frontiers in Artificial Intelligence Natural Language Processing 4.7 impact factor 7.3 citescore Editor & Reviewers Edited by M D Mauro Dragoni Reviewed by S G Saba Ghanbari "
+    contentLength: 652875
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.cambridge.org/core/books/disinformation-age/policy-lessons-from-five-historical-patterns-in-information-manipulation/143E9A2A61FEBEA66E012966C90B5ECF
+    linkText: Policy Lessons from Five Historical Patterns in Information Manipulation
+    claimContext: '**Weimar Republic (1920s-1930s)** - German obsessions with propaganda "undermined democratic conceptualizations of public opinion"[^4] - Media amplification of discontent contributed to systemic political instability'
+    fetchedAt: 2026-02-22T02:24:45.307Z
+    httpStatus: 200
+    pageTitle: Policy Lessons from Five Historical Patterns in Information Manipulation (Chapter 7) - The Disinformation Age
+    contentSnippet: null
+    contentLength: 849828
+    status: verified
+    note: Academic publisher — URL accessible
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/Propaganda_in_the_United_States
+    linkText: Propaganda in the United States - Wikipedia
+    claimContext: '**Wartime Propaganda Campaigns** - World War I: First large-scale US propaganda deployment[^5] - Cold War: Officials reframed propaganda as "accurate information" to maintain legitimacy[^6]'
+    fetchedAt: 2026-02-22T02:24:44.773Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Propaganda_in_the_United_States
+    linkText: Propaganda in the United States - Wikipedia
+    claimContext: '- World War I: First large-scale US propaganda deployment[^5] - Cold War: Officials reframed propaganda as "accurate information" to maintain legitimacy[^6]'
+    fetchedAt: 2026-02-22T02:24:46.501Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://www.emerald.com/reps/article/doi/10.1108/REPS-12-2024-0104/1307371/The-impact-of-disinformation-generated-by-AI-on
+    linkText: The Impact of Disinformation Generated by AI on Democracy
+    claimContext: "**2016-2024 US Elections** - AI-generated disinformation campaigns largely benefiting specific candidates[^7] - Russia identified as central actor in electoral manipulation"
+    fetchedAt: 2026-02-22T02:24:46.881Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://www.brookings.edu/articles/misinformation-is-eroding-the-publics-confidence-in-democracy/
+    linkText: Misinformation is Eroding the Public's Confidence in Democracy
+    claimContext: "### Democratic Confidence Crisis - 64% of Americans believe US democracy is in crisis and at risk of failing[^8] - Over 70% say democracy is more at risk now than a year ago"
+    fetchedAt: 2026-02-22T02:24:46.618Z
+    httpStatus: 200
+    pageTitle: Misinformation is eroding the public’s confidence in democracy | Brookings
+    contentSnippet: "Misinformation is eroding the public’s confidence in democracy | Brookings Search Home Misinformation is eroding the public’s confidence in democracy Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to Gove"
+    contentLength: 214802
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.pnas.org/doi/10.1073/pnas.2023301118
+    linkText: The echo chamber effect on social media
+    claimContext: "### Information Environment Degradation - Echo chambers dominate online dynamics across major platforms[^9] - Higher segregation observed on Facebook compared to Reddit"
+    fetchedAt: 2026-02-22T02:24:47.019Z
+    httpStatus: 200
+    pageTitle: PNAS
+    contentSnippet: PNAS Sign up for the PNAS Highlights newsletter Get in-depth science stories sent to your inbox twice a month. Email address Subscribe Request Username x Close Can't sign in? Forgot your username? Enter your email address below and we will send you your username Email Submit If the address matches an existing account you will receive an email with instructions to retrieve your username Create a new account x Close Email Returning user Submit Login x Close Email * Password * Forgot your password?
+    contentLength: 60608
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://link.springer.com/article/10.1007/s42001-025-00381-z
+    linkText: A systematic review of echo chamber research
+    claimContext: "- Higher segregation observed on Facebook compared to Reddit - First two hours of information cascades are critical for opinion cluster formation[^10]"
+    fetchedAt: 2026-02-22T02:24:47.860Z
+    httpStatus: 200
+    pageTitle: "A systematic review of echo chamber research: comparative analysis of conceptualizations, operationalizations, and varying outcomes | Journal of Computational Social Science | Springer Nature Link"
+    contentSnippet: "A systematic review of echo chamber research: comparative analysis of conceptualizations, operationalizations, and varying outcomes | Journal of Computational Social Science | Springer Nature Link Skip to main content Advertisement A systematic review of echo chamber research: comparative analysis of conceptualizations, operationalizations, and varying outcomes Survey Article Open access Published: 07 April 2025 Volume 8 , article number 52 , ( 2025 ) Cite this article You have full access to th"
+    contentLength: 893843
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2024.1469197/full
+    linkText: Investigating Generative AI Models and Detection Techniques
+    claimContext: "### Detection System Failures - AI detection tools identify 91% of submissions but misclassify nearly half of original content[^11] - Current detectors struggle with modified AI-generated texts"
+    fetchedAt: 2026-02-22T02:24:48.959Z
+    httpStatus: 200
+    pageTitle: "Frontiers | Investigating generative AI models and detection techniques: impacts of tokenization and dataset size on identification of AI-generated text"
+    contentSnippet: "Frontiers | Investigating generative AI models and detection techniques: impacts of tokenization and dataset size on identification of AI-generated text ORIGINAL RESEARCH article Front. Artif. Intell. , 19 November 2024 Sec. Natural Language Processing Volume 7 - 2024 | https://doi.org/10.3389/frai.2024.1469197 Published in Frontiers in Artificial Intelligence Natural Language Processing 4.7 impact factor 7.3 citescore Editor & Reviewers Edited by M D Mauro Dragoni Reviewed by S G Saba Ghanbari "
+    contentLength: 652875
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://academic.oup.com/pnasnexus/article/3/7/pgae217/7686087
+    linkText: Community notes increase trust in fact-checking on social media
+    claimContext: '- Content moderation scaling with AI assistance - <EntityLink id="community-notes" /> systems show promise for trust-building[^12] - Warning labels reduce false belief by 27% and sharing by 25%[^13]'
+    fetchedAt: 2026-02-22T02:24:49.942Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 13
+    url: https://mitsloan.mit.edu/ideas-made-to-matter/online-content-moderation-what-works-and-what-people-want
+    linkText: "Online content moderation: What works, and what people want"
+    claimContext: '- <EntityLink id="community-notes" /> systems show promise for trust-building[^12] - Warning labels reduce false belief by 27% and sharing by 25%[^13]'
+    fetchedAt: 2026-02-22T02:24:49.380Z
+    httpStatus: 200
+    pageTitle: "Online content moderation: What works, and what people want | MIT Sloan"
+    contentSnippet: "Online content moderation: What works, and what people want | MIT Sloan Skip to main content MBA Through intellectual rigor and experiential learning, this full-time, two-year MBA program prepares leaders to make a difference in the world. Leaders for Global Operations Two degrees. Two years. Two top-ranked programs. Earn your MBA at MIT Sloan and your SM at the MIT School of Engineering with this transformative program. MBA Early (Deferred admissions option) Apply now and work for two to five y"
+    contentLength: 67456
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.oecd.org/content/dam/oecd/en/publications/reports/2017/11/oecd-guidelines-on-measuring-trust_g1g7ca1c/9789264278219-en.pdf
+    linkText: OECD Guidelines on Measuring Trust
+    claimContext: "**Trust Metrics** - OECD guidelines provide frameworks for measuring institutional trust[^14] - Five key dimensions: competence, integrity, performance, accuracy, and relevance of information provided[^15]"
+    fetchedAt: 2026-02-22T02:24:50.217Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 3141716
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.rand.org/pubs/research_reports/RRA112-7.html
+    linkText: The Drivers of Institutional Trust and Distrust
+    claimContext: "- OECD guidelines provide frameworks for measuring institutional trust[^14] - Five key dimensions: competence, integrity, performance, accuracy, and relevance of information provided[^15] - 80% of respondents support platforms trying to reduce the spread of harmful misinformation[^16]"
+    fetchedAt: 2026-02-22T02:24:49.216Z
+    httpStatus: 200
+    pageTitle: "The Drivers of Institutional Trust and Distrust: Exploring Components of Trustworthiness | RAND"
+    contentSnippet: "The Drivers of Institutional Trust and Distrust: Exploring Components of Trustworthiness | RAND Skip to page content Trust in government and media has declined in the past two decades. Assessing individual characteristics and institutional attributes associated with trust offers insight into this decline and is a first step toward rebuilding institutional trust. Researchers developed a new method to assess these concepts, using a survey of 1,008 respondents and a response scale that distinguishe"
+    contentLength: 37661
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://mitsloan.mit.edu/ideas-made-to-matter/online-content-moderation-what-works-and-what-people-want
+    linkText: "Online content moderation: What works, and what people want"
+    claimContext: "- Five key dimensions: competence, integrity, performance, accuracy, and relevance of information provided[^15] - 80% of respondents support platforms trying to reduce the spread of harmful misinformation[^16]"
+    fetchedAt: 2026-02-22T02:24:51.245Z
+    httpStatus: 200
+    pageTitle: "Online content moderation: What works, and what people want | MIT Sloan"
+    contentSnippet: "Online content moderation: What works, and what people want | MIT Sloan Skip to main content MBA Through intellectual rigor and experiential learning, this full-time, two-year MBA program prepares leaders to make a difference in the world. Leaders for Global Operations Two degrees. Two years. Two top-ranked programs. Earn your MBA at MIT Sloan and your SM at the MIT School of Engineering with this transformative program. MBA Early (Deferred admissions option) Apply now and work for two to five y"
+    contentLength: 67456
+    status: verified
+    note: null

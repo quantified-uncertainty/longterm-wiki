@@ -1,0 +1,337 @@
+pageId: futuresearch
+verifiedAt: 2026-02-22
+totalCitations: 30
+verified: 27
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://app.fundz.net/fundings/varuna-ai-funding-round-279806
+    linkText: FutureSearch Funding - Fundz.net
+    claimContext: "| **Founders** | Dan Schwarz (CEO), Lawrence Phillips (CTO) | | **Funding** | \\$5.79M seed round (Dec 2024)[^1] | | **Focus Areas** | AI forecasting, LLM research agents, predictive analytics |"
+    fetchedAt: 2026-02-22T02:17:34.388Z
+    httpStatus: 200
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 17498
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://futuresearch.ai
+    linkText: FutureSearch Team
+    claimContext: 'FutureSearch is an AI forecasting startup founded in 2023 by Dan Schwarz and Lawrence Phillips, both former leaders at <EntityLink id="metaculus">Metaculus</EntityLink>, the crowdsourced prediction platform.[^2] The company develops intelligent data tools and LLM-powered research agents designed to '
+    fetchedAt: 2026-02-22T02:17:34.868Z
+    httpStatus: 200
+    pageTitle: FutureSearch
+    contentSnippet: FutureSearch Re search Every Row Run LLM Research Agents at Scale try everyrow.io Customers of our research include xAI xAI everyrow by futu re search Orchestrate LLM search and reasoning agents by running them on every row of a dataset. “FutureSearch makes me more accurate and that&#x27;s essential for my work.” -CEO of a 50-person research nonprofit Built by experts in AI and Forecasting Dan Schwarz CO-FOUNDER & CEO BS Symbolic Systems, Stanford University Prior to founding FUTURESEARCH, Dan s
+    contentLength: 45172
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://futuresearch.ai
+    linkText: FutureSearch Company Overview
+    claimContext: 'FutureSearch is an AI forecasting startup founded in 2023 by Dan Schwarz and Lawrence Phillips, both former leaders at <EntityLink id="metaculus">Metaculus</EntityLink>, the crowdsourced prediction platform.[^2] The company develops intelligent data tools and LLM-powered research agents designed to '
+    fetchedAt: 2026-02-22T02:17:34.087Z
+    httpStatus: 200
+    pageTitle: FutureSearch
+    contentSnippet: FutureSearch Re search Every Row Run LLM Research Agents at Scale try everyrow.io Customers of our research include xAI xAI everyrow by futu re search Orchestrate LLM search and reasoning agents by running them on every row of a dataset. “FutureSearch makes me more accurate and that&#x27;s essential for my work.” -CEO of a 50-person research nonprofit Built by experts in AI and Forecasting Dan Schwarz CO-FOUNDER & CEO BS Symbolic Systems, Stanford University Prior to founding FUTURESEARCH, Dan s
+    contentLength: 45172
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.prweb.com/releases/futuresearch-gives-odds-of-runaway-ai-in-new-ai-futurism-report-302420529.html
+    linkText: FutureSearch gives odds of runaway AI in new AI futurism report - PRWeb
+    claimContext: The company gained recognition in 2024 when it became the first organization to demonstrate an autonomous AI forecaster that achieved net wins in bets against humans on geopolitical questions.[^4] This milestone illustrated the potential of AI-assisted forecasting to augment human judgment in comple
+    fetchedAt: 2026-02-22T02:17:34.805Z
+    httpStatus: 200
+    pageTitle: FutureSearch gives odds of runaway AI in new AI futurism report
+    contentSnippet: FutureSearch gives odds of runaway AI in new AI futurism report Accessibility Statement Skip Navigation By modeling how AI can be utilized to speed up development of AI itself, FutureSearch forecasts chances of massive technological, political and social disruption as soon as 2027 SAN FRANCISCO , April 4, 2025 /PRNewswire-PRWeb/ -- FutureSearch, a startup using AI to improve the accuracy of the best human forecasters, today announced that it has collaborated with the AI Futures Project by contri
+    contentLength: 157850
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://forum.effectivealtruism.org/posts/qMP7LcCBFBEtuA3kL/the-rationale-shaped-hole-at-the-heart-of-forecasting
+    linkText: The rationale-shaped hole at the heart of forecasting - EA Forum
+    claimContext: The company gained recognition in 2024 when it became the first organization to demonstrate an autonomous AI forecaster that achieved net wins in bets against humans on geopolitical questions.[^4] This milestone illustrated the potential of AI-assisted forecasting to augment human judgment in comple
+    fetchedAt: 2026-02-22T02:17:34.049Z
+    httpStatus: 200
+    pageTitle: The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum
+    contentSnippet: "The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Rationale-Shaped Hole At The Heart Of Forecasting by dschwarz , FutureSearch , Lawrence Phillips , Daniel Hnyk , Peter Mühlbacher Apr 2 2024 13 min read 14 161 Forecasting Existential risk Philosophy Algorithmic Forecasting Opinion Frontpage The Rationale-Shaped Hole At The Heart "
+    contentLength: 534878
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://futuresearch.ai/ai-2027-6-months-later/
+    linkText: AI 2027, 6 Months Later - FutureSearch
+    claimContext: Beyond commercial applications, FutureSearch has contributed to AI safety discourse through its work on <EntityLink id="agi-timeline">AGI timeline</EntityLink> forecasting and evaluations of frontier AI labs' safety practices. The company participated in the "AI 2027" report analysis, examining scen
+    fetchedAt: 2026-02-22T02:17:36.015Z
+    httpStatus: 200
+    pageTitle: "AI 2027 Scenario: Revisiting AGI Forecasts in 2026"
+    contentSnippet: 'AI 2027 Scenario: Revisiting AGI Forecasts in 2026 ← Back to Research Andrej Karpathy: "There&#x27;s some over-prediction going on in the industry..." Dwarkesh Patel: "What do you think will take a decade to accomplish? What are the bottlenecks?" Andrej Karpathy: "Actually making it work." — Dwarkesh Podcast, Oct 17, 2025 6 months ago, in April 2025, Dwarkesh announced the AI 2027 project on his podcast, interviewing authors Daniel Kokatajlo and Scott Alexander. Now, Karpathy justified his much '
+    contentLength: 63694
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://podcasts.apple.com/us/podcast/the-secret-sauce-of-accurate-ai-forecasting-with/id1558589105?i=1000706470968
+    linkText: The Secret Sauce of Accurate AI Forecasting - Apple Podcasts
+    claimContext: 'FutureSearch was established in 2023 in San Bruno, California, shortly after the release of GPT-4.[^7] The founding team brought deep expertise from the forecasting community: Dan Schwarz previously served as CTO at <EntityLink id="metaculus">Metaculus</EntityLink> and worked as a Senior Software En'
+    fetchedAt: 2026-02-22T02:17:36.512Z
+    httpStatus: 200
+    pageTitle: The Secret Sauce of Accurate A… - AI in NYC Show - Apple Podcasts
+    contentSnippet: The Secret Sauce of Accurate A… - AI in NYC Show - Apple Podcasts MAY 6, 2025 EPISODE 51 24 MIN The Secret Sauce of Accurate AI Forecasting with Dan Schwarz of FutureSearch AI in NYC Show Play Welcome to exhilarating episode of AI Innovators with Rob May! In this episode, Rob is joined by Dan Schwarz, founder of FutureSearch, for an in-depth conversation about the future of artificial intelligence and the pivotal role forecasting plays in understanding where AI is headed. Unlike any previous gue
+    contentLength: 146744
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://futuresearch.ai
+    linkText: FutureSearch Team Page
+    claimContext: 'FutureSearch was established in 2023 in San Bruno, California, shortly after the release of GPT-4.[^7] The founding team brought deep expertise from the forecasting community: Dan Schwarz previously served as CTO at <EntityLink id="metaculus">Metaculus</EntityLink> and worked as a Senior Software En'
+    fetchedAt: 2026-02-22T02:17:35.903Z
+    httpStatus: 200
+    pageTitle: FutureSearch
+    contentSnippet: FutureSearch Re search Every Row Run LLM Research Agents at Scale try everyrow.io Customers of our research include xAI xAI everyrow by futu re search Orchestrate LLM search and reasoning agents by running them on every row of a dataset. “FutureSearch makes me more accurate and that&#x27;s essential for my work.” -CEO of a 50-person research nonprofit Built by experts in AI and Forecasting Dan Schwarz CO-FOUNDER & CEO BS Symbolic Systems, Stanford University Prior to founding FUTURESEARCH, Dan s
+    contentLength: 45172
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://futuresearch.ai
+    linkText: FutureSearch Team Page
+    claimContext: 'FutureSearch was established in 2023 in San Bruno, California, shortly after the release of GPT-4.[^7] The founding team brought deep expertise from the forecasting community: Dan Schwarz previously served as CTO at <EntityLink id="metaculus">Metaculus</EntityLink> and worked as a Senior Software En'
+    fetchedAt: 2026-02-22T02:17:35.951Z
+    httpStatus: 200
+    pageTitle: FutureSearch
+    contentSnippet: FutureSearch Re search Every Row Run LLM Research Agents at Scale try everyrow.io Customers of our research include xAI xAI everyrow by futu re search Orchestrate LLM search and reasoning agents by running them on every row of a dataset. “FutureSearch makes me more accurate and that&#x27;s essential for my work.” -CEO of a 50-person research nonprofit Built by experts in AI and Forecasting Dan Schwarz CO-FOUNDER & CEO BS Symbolic Systems, Stanford University Prior to founding FUTURESEARCH, Dan s
+    contentLength: 45172
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://futuresearch.ai
+    linkText: FutureSearch Team Page
+    claimContext: The company's early team included Daniel Hnyk (Founding Software Engineer, former Director of Engineering at GWI and Metaculus), Peter Mühlbacher (Founding Research Scientist), and Christoph Sträter (Research Scientist with a PhD in Theoretical Physics from the Max Planck Institute).[^10] This combi
+    fetchedAt: 2026-02-22T02:17:36.139Z
+    httpStatus: 200
+    pageTitle: FutureSearch
+    contentSnippet: FutureSearch Re search Every Row Run LLM Research Agents at Scale try everyrow.io Customers of our research include xAI xAI everyrow by futu re search Orchestrate LLM search and reasoning agents by running them on every row of a dataset. “FutureSearch makes me more accurate and that&#x27;s essential for my work.” -CEO of a 50-person research nonprofit Built by experts in AI and Forecasting Dan Schwarz CO-FOUNDER & CEO BS Symbolic Systems, Stanford University Prior to founding FUTURESEARCH, Dan s
+    contentLength: 45172
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://exa.ai/websets/directory/futuresearch-funding
+    linkText: FutureSearch Funding - Exa.ai Directory
+    claimContext: In December 2024, FutureSearch raised \$5.79 million in a seed funding round led by Metaplanet Holdings.[^11] The funds were allocated toward initial platform launch, refining the forecasting engine, expanding the engineering team, and implementing go-to-market strategies targeting enterprise custom
+    fetchedAt: 2026-02-22T02:17:45.333Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 12
+    url: https://exa.ai/websets/directory/futuresearch-offices
+    linkText: FutureSearch Offices - Exa.ai Directory
+    claimContext: In December 2024, FutureSearch raised \$5.79 million in a seed funding round led by Metaplanet Holdings.[^11] The funds were allocated toward initial platform launch, refining the forecasting engine, expanding the engineering team, and implementing go-to-market strategies targeting enterprise custom
+    fetchedAt: 2026-02-22T02:17:45.476Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 13
+    url: https://www.goodventures.org/our-portfolio/grants/futuresearch-forecasting-question-automation/
+    linkText: Good Ventures - FutureSearch Forecasting Question Automation Grant
+    claimContext: FutureSearch also received a \$356,000 grant from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> through Good Ventures to support research on automating the generation of forecasting questions.[^13] This grant reflects the organization's interest in advancing forecasting methodol
+    fetchedAt: 2026-02-22T02:17:46.503Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 14
+    url: https://futuresearch.ai/research/
+    linkText: FutureSearch Research Publications
+    claimContext: "FutureSearch has published multiple research papers and benchmarks examining AI reasoning and forecasting capabilities. Key publications include \"Bench to the Future: A Pastcasting Benchmark for Forecasting Agents\" (May 2025) and \"Deep Research Bench: Evaluating AI Web 'Search' and 'Research' Agents"
+    fetchedAt: 2026-02-22T02:17:37.592Z
+    httpStatus: 200
+    pageTitle: FutureSearch Research
+    contentSnippet: "FutureSearch Research Research and Writings February 18, 2026 FutureSearch Anthropic Is the Only Frontier Lab Where Reasoning Effort Scales on Deep Research Bench February 12, 2026 FutureSearch Higher Effort Settings in LLMs Can Reduce Accuracy February 11, 2026 FutureSearch How Much Does Deep Research Cost? A Model-by-Model Breakdown February 6, 2026 Rafael Poyiadzi Using LLMs for Data Cleaning At Scale February 5, 2026 Rafael Poyiadzi Replacing human data labeling with LLMs in active learning "
+    contentLength: 101713
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://futuresearch.ai/openai-case-study/
+    linkText: OpenAI Case Study - FutureSearch
+    claimContext: The company has also produced applied forecasts demonstrating its methodology. In June 2024, FutureSearch generated forecasts for OpenAI's business metrics that proved notably accurate when OpenAI disclosed figures in September 2024.[^15] The platform predicted 7.7 million ChatGPT Plus subscribers a
+    fetchedAt: 2026-02-22T02:17:37.685Z
+    httpStatus: 200
+    pageTitle: "OpenAI&#x27;s financials: a Case Study of claims vs. reality"
+    contentSnippet: "OpenAI&#x27;s financials: a Case Study of claims vs. reality ← Back to Research Key Takeaways Widely cited reporting from The Information badly overestimated how big OpenAI&#x27;s API business was in early 2024 , claiming 1 B A R R a s o f M a r c h w h e n o u r f i g u r e o f 1B ARR as of March when our figure of ~ 1 B A RR a so f M a rc h w h e n o u r f i gu reo f 500M was much more accurate given later disclosures Our ChatGPT Plus estimate of 7.7M subscribers was accurate , much more so th"
+    contentLength: 49514
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://futuresearch.ai/openai-case-study/
+    linkText: OpenAI Case Study - FutureSearch
+    claimContext: The company has also produced applied forecasts demonstrating its methodology. In June 2024, FutureSearch generated forecasts for OpenAI's business metrics that proved notably accurate when OpenAI disclosed figures in September 2024.[^15] The platform predicted 7.7 million ChatGPT Plus subscribers a
+    fetchedAt: 2026-02-22T02:17:47.597Z
+    httpStatus: 200
+    pageTitle: "OpenAI&#x27;s financials: a Case Study of claims vs. reality"
+    contentSnippet: "OpenAI&#x27;s financials: a Case Study of claims vs. reality ← Back to Research Key Takeaways Widely cited reporting from The Information badly overestimated how big OpenAI&#x27;s API business was in early 2024 , claiming 1 B A R R a s o f M a r c h w h e n o u r f i g u r e o f 1B ARR as of March when our figure of ~ 1 B A RR a so f M a rc h w h e n o u r f i gu reo f 500M was much more accurate given later disclosures Our ChatGPT Plus estimate of 7.7M subscribers was accurate , much more so th"
+    contentLength: 49514
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://futuresearch.ai/research/
+    linkText: FutureSearch Research Publications
+    claimContext: Additional research outputs include "A Guide for LLM Assisted Web Research" (June 2025), analysis tools like "Stockfisher" for financial forecasting (June 2025), and comprehensive forecasts such as "OpenAI's Revenue in 2027."[^17] The company has also investigated practical challenges in AI research
+    fetchedAt: 2026-02-22T02:17:47.684Z
+    httpStatus: 200
+    pageTitle: FutureSearch Research
+    contentSnippet: "FutureSearch Research Research and Writings February 18, 2026 FutureSearch Anthropic Is the Only Frontier Lab Where Reasoning Effort Scales on Deep Research Bench February 12, 2026 FutureSearch Higher Effort Settings in LLMs Can Reduce Accuracy February 11, 2026 FutureSearch How Much Does Deep Research Cost? A Model-by-Model Breakdown February 6, 2026 Rafael Poyiadzi Using LLMs for Data Cleaning At Scale February 5, 2026 Rafael Poyiadzi Replacing human data labeling with LLMs in active learning "
+    contentLength: 101713
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://provoke.fm/machine-forecasting/
+    linkText: Machine Forecasting Podcast
+    claimContext: CEO Dan Schwarz has stated that hybrid human-AI forecasting approaches outperform pure human forecasting, with the company's tools enabling users to become more accurate in their predictions.[^18] This claim is supported by testimonials from research nonprofits using the platform.
+    fetchedAt: 2026-02-22T02:17:48.387Z
+    httpStatus: 200
+    pageTitle: Machine Forecasting - Provoke.fm Media
+    contentSnippet: "Machine Forecasting - Provoke.fm Media Machine Forecasting July 18, 2025 Robert Tercek The Futurists 1:02:40 Comments Off on Machine Forecasting Podcast: Embed Subscribe: Apple Podcasts | Spotify | Amazon Music | Android | Email | RSS Dan Schwarz is the CEO and co-founder of FutureSearch.ai, a startup venture that intends to become the leader in AI-powered forecasting. Dan points out that hybrid systems that combine human forecasting with machine intelligence have already surpassed human-only pr"
+    contentLength: 108515
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.prweb.com/releases/futuresearch-gives-odds-of-runaway-ai-in-new-ai-futurism-report-302420529.html
+    linkText: FutureSearch gives odds of runaway AI - PRWeb
+    claimContext: FutureSearch has engaged with questions relevant to AI safety through its forecasting work on AGI timelines and frontier lab safety policies. The company contributed research to the "AI 2027" analysis examining scenarios where artificial general intelligence could emerge by 2027 through recursive se
+    fetchedAt: 2026-02-22T02:17:47.607Z
+    httpStatus: 200
+    pageTitle: FutureSearch gives odds of runaway AI in new AI futurism report
+    contentSnippet: FutureSearch gives odds of runaway AI in new AI futurism report Accessibility Statement Skip Navigation By modeling how AI can be utilized to speed up development of AI itself, FutureSearch forecasts chances of massive technological, political and social disruption as soon as 2027 SAN FRANCISCO , April 4, 2025 /PRNewswire-PRWeb/ -- FutureSearch, a startup using AI to improve the accuracy of the best human forecasters, today announced that it has collaborated with the AI Futures Project by contri
+    contentLength: 157850
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://futuresearch.ai/ai-2027-6-months-later/
+    linkText: AI 2027, 6 Months Later - FutureSearch
+    claimContext: FutureSearch has engaged with questions relevant to AI safety through its forecasting work on AGI timelines and frontier lab safety policies. The company contributed research to the "AI 2027" analysis examining scenarios where artificial general intelligence could emerge by 2027 through recursive se
+    fetchedAt: 2026-02-22T02:17:47.931Z
+    httpStatus: 200
+    pageTitle: "AI 2027 Scenario: Revisiting AGI Forecasts in 2026"
+    contentSnippet: 'AI 2027 Scenario: Revisiting AGI Forecasts in 2026 ← Back to Research Andrej Karpathy: "There&#x27;s some over-prediction going on in the industry..." Dwarkesh Patel: "What do you think will take a decade to accomplish? What are the bottlenecks?" Andrej Karpathy: "Actually making it work." — Dwarkesh Podcast, Oct 17, 2025 6 months ago, in April 2025, Dwarkesh announced the AI 2027 project on his podcast, interviewing authors Daniel Kokatajlo and Scott Alexander. Now, Karpathy justified his much '
+    contentLength: 63694
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://futuresearch.ai/ai-2027-6-months-later/
+    linkText: AI 2027, 6 Months Later - FutureSearch
+    claimContext: "The company's analysis highlighted <EntityLink id=\"anthropic\">Anthropic</EntityLink> as the most safety-conscious frontier lab due to its Responsible Scaling Policy (RSP), which could reduce the probability of an \"AI 2027\"-like scenario by providing intervention mechanisms at high risk levels.[^21] "
+    fetchedAt: 2026-02-22T02:17:49.425Z
+    httpStatus: 200
+    pageTitle: "AI 2027 Scenario: Revisiting AGI Forecasts in 2026"
+    contentSnippet: 'AI 2027 Scenario: Revisiting AGI Forecasts in 2026 ← Back to Research Andrej Karpathy: "There&#x27;s some over-prediction going on in the industry..." Dwarkesh Patel: "What do you think will take a decade to accomplish? What are the bottlenecks?" Andrej Karpathy: "Actually making it work." — Dwarkesh Podcast, Oct 17, 2025 6 months ago, in April 2025, Dwarkesh announced the AI 2027 project on his podcast, interviewing authors Daniel Kokatajlo and Scott Alexander. Now, Karpathy justified his much '
+    contentLength: 63694
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://futuresearch.ai/ai-2027-6-months-later/
+    linkText: AI 2027, 6 Months Later - FutureSearch
+    claimContext: However, the analysis also noted concerns that if labs like Anthropic prioritize internal R&D speedup alongside safety measures, it could heighten risks from rapid AGI timelines. The forecasts emphasize the importance of lab policies that genuinely constrain development at critical thresholds rather
+    fetchedAt: 2026-02-22T02:17:49.441Z
+    httpStatus: 200
+    pageTitle: "AI 2027 Scenario: Revisiting AGI Forecasts in 2026"
+    contentSnippet: 'AI 2027 Scenario: Revisiting AGI Forecasts in 2026 ← Back to Research Andrej Karpathy: "There&#x27;s some over-prediction going on in the industry..." Dwarkesh Patel: "What do you think will take a decade to accomplish? What are the bottlenecks?" Andrej Karpathy: "Actually making it work." — Dwarkesh Podcast, Oct 17, 2025 6 months ago, in April 2025, Dwarkesh announced the AI 2027 project on his podcast, interviewing authors Daniel Kokatajlo and Scott Alexander. Now, Karpathy justified his much '
+    contentLength: 63694
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://futuresearch.ai
+    linkText: FutureSearch Platform
+    claimContext: FutureSearch's core technology combines LLM-powered research agents with structured forecasting methodologies. The "everyrow" tool enables users to run LLM agents on every row of a dataset, facilitating large-scale automated research and data analysis.[^23] This approach allows for systematic invest
+    fetchedAt: 2026-02-22T02:17:49.459Z
+    httpStatus: 200
+    pageTitle: FutureSearch
+    contentSnippet: FutureSearch Re search Every Row Run LLM Research Agents at Scale try everyrow.io Customers of our research include xAI xAI everyrow by futu re search Orchestrate LLM search and reasoning agents by running them on every row of a dataset. “FutureSearch makes me more accurate and that&#x27;s essential for my work.” -CEO of a 50-person research nonprofit Built by experts in AI and Forecasting Dan Schwarz CO-FOUNDER & CEO BS Symbolic Systems, Stanford University Prior to founding FUTURESEARCH, Dan s
+    contentLength: 45172
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://forum.effectivealtruism.org/posts/qMP7LcCBFBEtuA3kL/the-rationale-shaped-hole-at-the-heart-of-forecasting
+    linkText: The rationale-shaped hole at the heart of forecasting - EA Forum
+    claimContext: The platform emphasizes legible reasoning alongside final probability estimates. This design responds to longstanding critiques in the forecasting community that valuable models and reasoning often remain hidden behind final numbers.[^24] By surfacing the research process and causal models underlyin
+    fetchedAt: 2026-02-22T02:17:49.878Z
+    httpStatus: 200
+    pageTitle: The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum
+    contentSnippet: "The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Rationale-Shaped Hole At The Heart Of Forecasting by dschwarz , FutureSearch , Lawrence Phillips , Daniel Hnyk , Peter Mühlbacher Apr 2 2024 13 min read 14 161 Forecasting Existential risk Philosophy Algorithmic Forecasting Opinion Frontpage The Rationale-Shaped Hole At The Heart "
+    contentLength: 534878
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://futuresearch.ai
+    linkText: FutureSearch Company Overview
+    claimContext: The company serves enterprise clients across multiple domains, with demonstrated applications in financial forecasting (stock fundamentals, revenue projections), geopolitical prediction, and AI capability assessments. Customers include xAI and everyrow, though specific client relationships and use c
+    fetchedAt: 2026-02-22T02:17:49.546Z
+    httpStatus: 200
+    pageTitle: FutureSearch
+    contentSnippet: FutureSearch Re search Every Row Run LLM Research Agents at Scale try everyrow.io Customers of our research include xAI xAI everyrow by futu re search Orchestrate LLM search and reasoning agents by running them on every row of a dataset. “FutureSearch makes me more accurate and that&#x27;s essential for my work.” -CEO of a 50-person research nonprofit Built by experts in AI and Forecasting Dan Schwarz CO-FOUNDER & CEO BS Symbolic Systems, Stanford University Prior to founding FUTURESEARCH, Dan s
+    contentLength: 45172
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://forum.effectivealtruism.org/posts/qMP7LcCBFBEtuA3kL/the-rationale-shaped-hole-at-the-heart-of-forecasting
+    linkText: The rationale-shaped hole at the heart of forecasting - EA Forum
+    claimContext: Within the effective altruism community, FutureSearch has generated discussion about the nature and value of forecasting as an intervention. Supporters appreciate the platform's emphasis on producing legible models and reasons alongside forecasts, viewing this as addressing a critical gap where "for
+    fetchedAt: 2026-02-22T02:17:50.940Z
+    httpStatus: 200
+    pageTitle: The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum
+    contentSnippet: "The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Rationale-Shaped Hole At The Heart Of Forecasting by dschwarz , FutureSearch , Lawrence Phillips , Daniel Hnyk , Peter Mühlbacher Apr 2 2024 13 min read 14 161 Forecasting Existential risk Philosophy Algorithmic Forecasting Opinion Frontpage The Rationale-Shaped Hole At The Heart "
+    contentLength: 534878
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://forum.effectivealtruism.org/posts/qMP7LcCBFBEtuA3kL/the-rationale-shaped-hole-at-the-heart-of-forecasting
+    linkText: The rationale-shaped hole at the heart of forecasting - EA Forum
+    claimContext: However, the platform has also faced framing critiques. Some EA community members argue that FutureSearch should be characterized as "in-depth research with a forecasting flavor" rather than "in-depth forecasting," given that effective altruism typically associates forecasting with Tetlock-style sup
+    fetchedAt: 2026-02-22T02:17:51.427Z
+    httpStatus: 200
+    pageTitle: The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum
+    contentSnippet: "The Rationale-Shaped Hole At The Heart Of Forecasting — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Rationale-Shaped Hole At The Heart Of Forecasting by dschwarz , FutureSearch , Lawrence Phillips , Daniel Hnyk , Peter Mühlbacher Apr 2 2024 13 min read 14 161 Forecasting Existential risk Philosophy Algorithmic Forecasting Opinion Frontpage The Rationale-Shaped Hole At The Heart "
+    contentLength: 534878
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://ea.greaterwrong.com/posts/fsnMDpLHr78XgfWE8/podcast-is-forecasting-a-promising-ea-cause-area
+    linkText: Is Forecasting a Promising EA Cause Area? - EA Forum
+    claimContext: More fundamentally, skeptics within the EA community question whether intensive forecasting represents an effective use of resources, viewing it as potentially "nerd-sniping activity"—addictive leaderboard competition rather than high-impact work.[^28] These critiques apply to forecasting broadly ra
+    fetchedAt: 2026-02-22T02:17:51.406Z
+    httpStatus: 200
+    pageTitle: "Podcast: Is Forecasting a Promising EA Cause Area? - Effective Altruism forum viewer"
+    contentSnippet: "Podcast: Is Forecasting a Promising EA Cause Area? - Effective Altruism forum viewer Podcast: Is Forecasting a Promising EA Cause Area? Ozzie Gooen 25 Mar 2024 20:36 UTC 29 points 3 comments 1 min read EA link Cause prioritization Forecasting Podcasts Quantified Uncertainty Research Institute Audio Algorithmic Forecasting Podcast Link There was recently a lengthy thread on the EA Forum about the value of forecasting as a potential cause area, between Eli Lifland and myself (Ozzie Gooen). We thou"
+    contentLength: 18552
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://futuresearch.ai/openai-case-study/
+    linkText: OpenAI Case Study - FutureSearch
+    claimContext: "While FutureSearch's forecasting methodology has demonstrated some successes, the company has acknowledged limitations in its predictions. The significant overestimate of ChatGPT Teams adoption (900,000 predicted versus approximately 100,000 actual subscribers) illustrates challenges in forecasting "
+    fetchedAt: 2026-02-22T02:17:50.913Z
+    httpStatus: 200
+    pageTitle: "OpenAI&#x27;s financials: a Case Study of claims vs. reality"
+    contentSnippet: "OpenAI&#x27;s financials: a Case Study of claims vs. reality ← Back to Research Key Takeaways Widely cited reporting from The Information badly overestimated how big OpenAI&#x27;s API business was in early 2024 , claiming 1 B A R R a s o f M a r c h w h e n o u r f i g u r e o f 1B ARR as of March when our figure of ~ 1 B A RR a so f M a rc h w h e n o u r f i gu reo f 500M was much more accurate given later disclosures Our ChatGPT Plus estimate of 7.7M subscribers was accurate , much more so th"
+    contentLength: 49514
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://futuresearch.ai/oaidr-feb-2025/
+    linkText: OpenAI Deep Research February 2025 - FutureSearch
+    claimContext: More broadly, research published by FutureSearch itself highlights challenges facing LLM-based forecasting and research tools. The company's analysis has identified issues with overconfidence in AI-generated forecasts, problems with source selection and reliability, and tendencies toward hallucinati
+    fetchedAt: 2026-02-22T02:17:50.977Z
+    httpStatus: 200
+    pageTitle: "OpenAI Deep Research: Honest Analysis and Real Limitations in 2025"
+    contentSnippet: 'OpenAI Deep Research: Honest Analysis and Real Limitations in 2025 ← Back to Research Key Takeaways As later evidence shows ( Deep Research Bench ), while OpenAI&#x27;s Deep Research tool was initially impressive, it actually underperformed the later release of ChatGPT-o3+search OpenAI Deep Research (OAIDR) shows a "jagged frontier" of performance—better than some competing systems but significantly worse than intelligent humans Overconfidence is a major issue : OAIDR often reports wrong answers'
+    contentLength: 66755
+    status: verified
+    note: null

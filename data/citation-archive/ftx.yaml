@@ -1,0 +1,502 @@
+pageId: ftx
+verifiedAt: 2026-02-22
+totalCitations: 45
+verified: 38
+broken: 7
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://walloftraders.com/blog/en/ftx-review-how-to-use-it/
+    linkText: FTX Review - How to Use It — - Wall of Traders
+    claimContext: FTX was a centralized cryptocurrency exchange platform that, at its peak in 2021–2022, ranked as the third-largest crypto exchange by trading volume globally. Founded in May 2019 by <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (commonly known as SBF), Gary Wang, and Nishad Singh
+    fetchedAt: 2026-02-22T02:12:11.380Z
+    httpStatus: 200
+    pageTitle: FTX review and how to use it - The Crypto Trading Blog
+    contentSnippet: "FTX review and how to use it - The Crypto Trading Blog Skip to content FTX review, how to use it: FTX is a exchange centralized from cryptocurrency like stellar specialized in derivatives and leveraged products. Founded in 2018 by Sam Bankman-Fried, an MIT graduate and former international trading fund trader at Jane Street Capital. FTX offers a variety of products from trading , of the derivative products , options, volatility products and leveraged tokens. They also offer spot markets for over"
+    contentLength: 132230
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://en.wikipedia.org/wiki/FTX
+    linkText: FTX Wikipedia Article — - Wikipedia
+    claimContext: FTX was a centralized cryptocurrency exchange platform that, at its peak in 2021–2022, ranked as the third-largest crypto exchange by trading volume globally. Founded in May 2019 by <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> (commonly known as SBF), Gary Wang, and Nishad Singh
+    fetchedAt: 2026-02-22T02:12:09.277Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://www.techtarget.com/whatis/feature/FTX-scam-explained-Everything-you-need-to-know
+    linkText: "FTX Scam Explained: Everything You Need to Know — - TechTarget"
+    claimContext: The exchange formed the core of what observers described as a "crypto conglomerate," including FTX itself, the affiliated quantitative trading firm Alameda Research (also founded by Bankman-Fried), and the native FTT utility token launched in 2019. These interconnections, largely opaque to users and
+    fetchedAt: 2026-02-22T02:12:10.016Z
+    httpStatus: 200
+    pageTitle: "FTX scam explained: Everything you need to know"
+    contentSnippet: "FTX scam explained: Everything you need to know Home Security Getty Images/iStockphoto Share this item with your network: By Amanda Hetler, Senior Editor Published: 02 Jan 2025 The popularity of cryptocurrency exchange platform FTX rose rapidly after it was launched in 2019. However, FTX came crashing down in November 2022. Cryptocurrency has become popular for investments and sending payments to other people and merchants. Cryptocurrencies differ from other digital currencies because they are e"
+    contentLength: 385223
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.deeplearning.ai/the-batch/how-ftxs-collapse-impacts-ai/
+    linkText: How FTX's Collapse Impacts AI — - DeepLearning.AI, The Batch
+    claimContext: For the AI safety community and the broader effective altruism (EA) ecosystem, the collapse carried particular significance. Bankman-Fried had directed substantial philanthropic resources toward AI safety research, and the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> had committed t
+    fetchedAt: 2026-02-22T02:12:10.056Z
+    httpStatus: 200
+    pageTitle: How FTX&#x27;s Collapse Impacts AI | AI News & Insights
+    contentSnippet: "How FTX&#x27;s Collapse Impacts AI | AI News & Insights ✨ New course! Enroll in A2A: The Agent2Agent Protocol Share The demise of cryptocurrency exchange FTX threatens funding for some teams devoted to AI safety. What’s new: FTX, the $32 billion exchange that plunged into bankruptcy last month amid allegations of fraud, had given or promised more than $530 million to over 70 AI-related organizations, The New York Times reported . Much of that money may have to be returned. What happened: FTX fou"
+    contentLength: 76563
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.bdo.ca/insights/fraud-deconstructed-ftx-cryptocurrency
+    linkText: "Fraud Deconstructed: FTX Cryptocurrency — - BDO Canada"
+    claimContext: '<EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> and Gary Wang founded Alameda Research in October 2017 as a quantitative cryptocurrency trading firm and hedge fund.[^5] Drawing on arbitrage opportunities in cryptocurrency markets, Alameda grew rapidly and served as the operational '
+    fetchedAt: 2026-02-22T02:12:10.124Z
+    httpStatus: 200
+    pageTitle: Case study &#x2013; Breaking down the collapse of FTX | BDO Canada
+    contentSnippet: "Case study &#x2013; Breaking down the collapse of FTX | BDO Canada skip to content Home Insights A complex scheme: The rise and demise of FTX The story of how one of the world's largest crypto exchanges collapsed \"Never in my career have I seen such a complete failure of corporate controls and such a complete absence of trustworthy financial information as occurred here. From compromised systems integrity to faulty regulatory oversight board, to the concentration of control in the hands of a ver"
+    contentLength: 857582
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://ssjgcpa.com/inside-the-ftx-crypto-scandal/
+    linkText: Inside the FTX Crypto Scandal — - SSJG CPA
+    claimContext: '<EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> and Gary Wang founded Alameda Research in October 2017 as a quantitative cryptocurrency trading firm and hedge fund.[^5] Drawing on arbitrage opportunities in cryptocurrency markets, Alameda grew rapidly and served as the operational '
+    fetchedAt: 2026-02-22T02:12:13.056Z
+    httpStatus: 200
+    pageTitle: Inside the FTX Crypto Scandal - Smith Stohlman James & Gardere
+    contentSnippet: "Inside the FTX Crypto Scandal - Smith Stohlman James & Gardere Skip to content Palm Beach Gardens (561) 624-0355 | Miami (305) 624-0355 | Orlando (407) 635-1387 Client Login | Pay Invoice On November 7th, Sam Bankman-Fried had an estimated $16 billion fortune, largely invested in cryptocurrencies. By the end of the week, that fortune was gone. According to Bloomberg, it was one of “ history’s greatest-ever destructions of wealth .” It occurred alongside the collapse of his crypto exchange, FTX, "
+    contentLength: 112191
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://corporatefinanceinstitute.com/resources/cryptocurrency/what-happened-to-ftx/
+    linkText: What Happened to FTX — - Corporate Finance Institute
+    claimContext: '<EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> and Gary Wang founded Alameda Research in October 2017 as a quantitative cryptocurrency trading firm and hedge fund.[^5] Drawing on arbitrage opportunities in cryptocurrency markets, Alameda grew rapidly and served as the operational '
+    fetchedAt: 2026-02-22T02:12:13.413Z
+    httpStatus: 200
+    pageTitle: What Happened to FTX? - Overview, The Dirty Details, Now What?
+    contentSnippet: What Happened to FTX? - Overview, The Dirty Details, Now What? You are using an outdated browser. Please upgrade your browser to improve your experience. Home &rsaquo; Resources &rsaquo; Cryptocurrency &rsaquo; What Happened to FTX? Table of Contents What Happened to FTX? What Is (Was) FTX? The Dirty Details Now What? Learn More What Happened to FTX? The overnight collapse of Sam Bankman-Fried’s Cryptocurrency Exchange from a valuation of over $32 billion to almost nothing was swift and shocking
+    contentLength: 314468
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/FTX
+    linkText: FTX Wikipedia Article — - Wikipedia
+    claimContext: "FTX's early products attracted professional and institutional traders seeking sophisticated instruments, while its marketing positioned it as a \"safe, easy way to get into crypto\" for retail participants.[^8] The exchange also operated a market-making relationship with Alameda Research, which acted "
+    fetchedAt: 2026-02-22T02:12:12.386Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://www.bdo.ca/insights/fraud-deconstructed-ftx-cryptocurrency
+    linkText: "Fraud Deconstructed: FTX Cryptocurrency — - BDO Canada"
+    claimContext: By July 2021, FTX had accumulated over one million active users and raised more than \$1.8 billion from prominent venture capital investors including SoftBank and Sequoia Capital.[^9] A subsequent funding round in January 2022 raised an additional \$400 million, valuing the exchange at approximately
+    fetchedAt: 2026-02-22T02:12:12.922Z
+    httpStatus: 200
+    pageTitle: Case study &#x2013; Breaking down the collapse of FTX | BDO Canada
+    contentSnippet: "Case study &#x2013; Breaking down the collapse of FTX | BDO Canada skip to content Home Insights A complex scheme: The rise and demise of FTX The story of how one of the world's largest crypto exchanges collapsed \"Never in my career have I seen such a complete failure of corporate controls and such a complete absence of trustworthy financial information as occurred here. From compromised systems integrity to faulty regulatory oversight board, to the concentration of control in the hands of a ver"
+    contentLength: 857582
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/FTX
+    linkText: FTX Wikipedia Article — - Wikipedia
+    claimContext: By July 2021, FTX had accumulated over one million active users and raised more than \$1.8 billion from prominent venture capital investors including SoftBank and Sequoia Capital.[^9] A subsequent funding round in January 2022 raised an additional \$400 million, valuing the exchange at approximately
+    fetchedAt: 2026-02-22T02:12:12.400Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://www.bdo.ca/insights/fraud-deconstructed-ftx-cryptocurrency
+    linkText: "Fraud Deconstructed: FTX Cryptocurrency — - BDO Canada"
+    claimContext: In late 2021, Bankman-Fried stepped down as CEO of Alameda Research. Caroline Ellison and Sam Trabucco were appointed co-CEOs, with Ellison becoming sole CEO by mid-2022.[^11] Despite this nominal separation of leadership, substantial organizational and financial ties between FTX and Alameda remaine
+    fetchedAt: 2026-02-22T02:12:14.992Z
+    httpStatus: 200
+    pageTitle: Case study &#x2013; Breaking down the collapse of FTX | BDO Canada
+    contentSnippet: "Case study &#x2013; Breaking down the collapse of FTX | BDO Canada skip to content Home Insights A complex scheme: The rise and demise of FTX The story of how one of the world's largest crypto exchanges collapsed \"Never in my career have I seen such a complete failure of corporate controls and such a complete absence of trustworthy financial information as occurred here. From compromised systems integrity to faulty regulatory oversight board, to the concentration of control in the hands of a ver"
+    contentLength: 857582
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://en.wikipedia.org/wiki/FTX
+    linkText: FTX Wikipedia Article — - Wikipedia
+    claimContext: "FTX also expanded aggressively in the U.S. market: FTX.US won an auction for the assets of bankrupt crypto lender Voyager Digital at approximately \\$1.42 billion in September 2022, a transaction that was later unwound by Binance for approximately \\$1 billion following FTX's collapse.[^12]"
+    fetchedAt: 2026-02-22T02:12:14.423Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 13
+    url: https://abcnews.com/Business/timeline-cryptocurrency-exchange-ftxs-historic-collapse/story?id=93337035
+    linkText: Timeline of Cryptocurrency Exchange FTX's Historic Collapse — - ABC News
+    claimContext: The chain of events that destroyed FTX unfolded over roughly ten days in November 2022. On November 2, 2022, the crypto news outlet CoinDesk published a report revealing that approximately 40 percent of Alameda Research's balance sheet consisted of FTT tokens — an illiquid asset issued by FTX itself
+    fetchedAt: 2026-02-22T02:12:14.963Z
+    httpStatus: 200
+    pageTitle: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News
+    contentSnippet: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News A timeline of cryptocurrency exchange FTX's historic collapse Bankman-Fried received a sentence of 25 years in prison on Thursday. By Max Zahn March 28, 2024, 12:08 PM 2:36 In this May 12, 2022, file photo, Terrence A. Duffy, CEO of the Chicago Mercantile Exchange, Sam Bankman-Fried, CEO of FTX US Derivatives, Christopher Edmonds, chief development officer of the Intercontinental Exchange, and Christopher Perkins, pres
+    contentLength: 228370
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://abcnews.com/Business/timeline-cryptocurrency-exchange-ftxs-historic-collapse/story?id=93337035
+    linkText: Timeline of Cryptocurrency Exchange FTX's Historic Collapse — - ABC News
+    claimContext: "On November 6, Binance CEO Changpeng Zhao (known as CZ) publicly announced that Binance would liquidate its approximately \\$580 million in FTT holdings, citing risk management considerations. The announcement triggered a classic bank run: approximately \\$6 billion in withdrawal requests flooded FTX "
+    fetchedAt: 2026-02-22T02:12:15.514Z
+    httpStatus: 200
+    pageTitle: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News
+    contentSnippet: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News A timeline of cryptocurrency exchange FTX's historic collapse Bankman-Fried received a sentence of 25 years in prison on Thursday. By Max Zahn March 28, 2024, 12:08 PM 2:36 In this May 12, 2022, file photo, Terrence A. Duffy, CEO of the Chicago Mercantile Exchange, Sam Bankman-Fried, CEO of FTX US Derivatives, Christopher Edmonds, chief development officer of the Intercontinental Exchange, and Christopher Perkins, pres
+    contentLength: 228370
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://en.wikipedia.org/wiki/FTX
+    linkText: FTX Wikipedia Article — - Wikipedia
+    claimContext: "On November 6, Binance CEO Changpeng Zhao (known as CZ) publicly announced that Binance would liquidate its approximately \\$580 million in FTT holdings, citing risk management considerations. The announcement triggered a classic bank run: approximately \\$6 billion in withdrawal requests flooded FTX "
+    fetchedAt: 2026-02-22T02:12:14.425Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://phillipslaw.com/blog/ftx-cryptocurrency-exchange-failure/
+    linkText: FTX Cryptocurrency Exchange Failure — - Phillips Law
+    claimContext: Binance terminated the proposed acquisition on November 9 after its due diligence team found evidence of misappropriated customer funds and regulatory investigations. On November 11, 2022, FTX, FTX.US, and approximately 130 affiliated entities filed for Chapter 11 bankruptcy in the United States Dis
+    fetchedAt: 2026-02-22T02:12:17.097Z
+    httpStatus: 200
+    pageTitle: "FTX Cryptocurrency Failure: What Is It, and What Went Wrong?"
+    contentSnippet: "FTX Cryptocurrency Failure: What Is It, and What Went Wrong? Blog 4.8 rating 2,000+ REVIEWS MORE THAN WON FOR OUR CLIENTS YOU NEED A PHILLIPS! The FTX Cryptocurrency Failure: What Is It, and What Went Wrong? Spread the love How and why did the FTX cryptocurrency platform collapse? You may have heard about the collapse of FTX in late 2022, but unless you were personally impacted or know a lot about cryptocurrency , you might not know the particulars of what the FTX cryptocurrency exchange is, and"
+    contentLength: 297366
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.justice.gov/usao-sdny/pr/sam-bankman-fried-indicted-manhattan-federal-court-fraud-charges-related-collapse
+    linkText: Sam Bankman-Fried Indicted in Manhattan Federal Court for Fraud Charges Related to Collapse of FTX — - U.S. Department of Justice, SDNY Press Release, December 2022
+    claimContext: Federal prosecutors in the Southern District of New York opened a criminal investigation into FTX's collapse on November 14, 2022. Bankman-Fried was arrested in the Bahamas in December 2022 on charges including wire fraud, securities fraud, money laundering, and violations of campaign finance law, a
+    fetchedAt: 2026-02-22T02:12:16.713Z
+    httpStatus: 200
+    pageTitle: "&nbsp;"
+    contentSnippet: Powered and protected by Privacy
+    contentLength: 2921
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://revealnews.org/podcast/sam-bankman-fried-ftx-collapse-part-2/
+    linkText: Sam Bankman-Fried FTX Collapse Part 2 — - Reveal News
+    claimContext: At trial in November 2023, <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> was convicted on all fraud and money laundering counts. In March 2024, he was sentenced to 25 years in federal prison.[^18] Caroline Ellison and Gary Wang both pleaded guilty and cooperated with prosecutors.
+    fetchedAt: 2026-02-22T02:12:16.989Z
+    httpStatus: 200
+    pageTitle: The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal
+    contentSnippet: "The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal The truth will not reveal itself. SUPPORT OUR WORK TODAY Join our newsletter. Get our latest investigations in your inbox every week. Sign up Close Search for: Search Close Skip to content FTX founder Sam Bankman-Fried testifies before the House Financial Services Committee in 2021, before the cryptocurrency exchange’s collapse. Credit: Tom Williams/Congressional Quarterly/Zuma When the cryptocurrency exchange FTX imploded, customers around"
+    contentLength: 310530
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://abcnews.com/Business/timeline-cryptocurrency-exchange-ftxs-historic-collapse/story?id=93337035
+    linkText: Timeline of Cryptocurrency Exchange FTX's Historic Collapse — - ABC News
+    claimContext: At trial in November 2023, <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink> was convicted on all fraud and money laundering counts. In March 2024, he was sentenced to 25 years in federal prison.[^18] Caroline Ellison and Gary Wang both pleaded guilty and cooperated with prosecutors.
+    fetchedAt: 2026-02-22T02:12:16.564Z
+    httpStatus: 200
+    pageTitle: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News
+    contentSnippet: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News A timeline of cryptocurrency exchange FTX's historic collapse Bankman-Fried received a sentence of 25 years in prison on Thursday. By Max Zahn March 28, 2024, 12:08 PM 2:36 In this May 12, 2022, file photo, Terrence A. Duffy, CEO of the Chicago Mercantile Exchange, Sam Bankman-Fried, CEO of FTX US Derivatives, Christopher Edmonds, chief development officer of the Intercontinental Exchange, and Christopher Perkins, pres
+    contentLength: 228370
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.cftc.gov/PressRoom/PressReleases/8715-23
+    linkText: CFTC Wins \$12.7 Billion Against FTX and Samuel Bankman-Fried — - U.S. Commodity Futures Trading Commission Press Release, August 2024
+    claimContext: "The bankruptcy proceedings advanced substantially through 2024. In August 2024, the U.S. District Court for the Southern District of New York ordered FTX to pay \\$12.7 billion in relief to customers: \\$8.7 billion in restitution and \\$4 billion in disgorgement, as announced by the CFTC in its press "
+    fetchedAt: 2026-02-22T02:12:17.079Z
+    httpStatus: 200
+    pageTitle: Statement of CFTC Division of Enforcement Director Ian McGinley on the Ooki DAO Litigation Victory | CFTC
+    contentSnippet: Statement of CFTC Division of Enforcement Director Ian McGinley on the Ooki DAO Litigation Victory | CFTC /PressRoom/PressReleases/8715-23 Skip to main content Release Number 8715-23 Statement of CFTC Division of Enforcement Director Ian McGinley on the Ooki DAO Litigation Victory June 09, 2023 Washington, D.C. — Today, CFTC Division of Enforcement Director Ian McGinley released the following statement on the CFTC’s sweeping victory in the Ooki DAO litigation. Last night, U.S. District Judge Wil
+    contentLength: 38091
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.prnewswire.com/news-releases/ftx-announces-effective-date-and-record-date-of-january-3-2025-for-its-chapter-11-plan-of-reorganization-302332816.html
+    linkText: FTX Announces Effective Date and Record Date of January 3, 2025 for Its Chapter 11 Plan of Reorganization — - PR Newswire, December 2024
+    claimContext: "The bankruptcy proceedings advanced substantially through 2024. In August 2024, the U.S. District Court for the Southern District of New York ordered FTX to pay \\$12.7 billion in relief to customers: \\$8.7 billion in restitution and \\$4 billion in disgorgement, as announced by the CFTC in its press "
+    fetchedAt: 2026-02-22T02:12:18.264Z
+    httpStatus: 200
+    pageTitle: FTX Announces Effective Date and Record Date of January 3, 2025 for its Chapter 11 Plan of Reorganization
+    contentSnippet: FTX Announces Effective Date and Record Date of January 3, 2025 for its Chapter 11 Plan of Reorganization Accessibility Statement Skip Navigation Initial Distribution to Occur within 60 Days of Effective Date Enters into Agreements with BitGo and Kraken to Distribute Payments to Customers and Creditors WILMINGTON, Del. , Dec. 16, 2024 /PRNewswire/ -- FTX Trading Ltd. (d.b.a. FTX.com) ("FTX") and its affiliated debtors (the "FTX Debtors") today announced its Court-approved Chapter 11 Plan of Reor
+    contentLength: 208347
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://revealnews.org/podcast/sam-bankman-fried-ftx-collapse-part-2/
+    linkText: Sam Bankman-Fried FTX Collapse Part 2 — - Reveal News
+    claimContext: "A notable controversy in the bankruptcy process concerns the valuation of repayments: creditors are to receive cash payouts pegged to cryptocurrency prices as of November 11, 2022 — a period of depressed valuations, with Bitcoin priced around \\$17,000 — rather than crypto-in-kind or amounts reflecti"
+    fetchedAt: 2026-02-22T02:12:18.158Z
+    httpStatus: 200
+    pageTitle: The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal
+    contentSnippet: "The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal The truth will not reveal itself. SUPPORT OUR WORK TODAY Join our newsletter. Get our latest investigations in your inbox every week. Sign up Close Search for: Search Close Skip to content FTX founder Sam Bankman-Fried testifies before the House Financial Services Committee in 2021, before the cryptocurrency exchange’s collapse. Credit: Tom Williams/Congressional Quarterly/Zuma When the cryptocurrency exchange FTX imploded, customers around"
+    contentLength: 310530
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.scmp.com/topics/ftx
+    linkText: South China Morning Post FTX Coverage — - South China Morning Post
+    claimContext: In November 2024, FTX's bankruptcy estate also filed a lawsuit against Binance and former CEO Changpeng Zhao for approximately \$1.8 billion, related to Binance's sale of its equity stake in FTX in 2021.[^23]
+    fetchedAt: 2026-02-22T02:12:19.023Z
+    httpStatus: 200
+    pageTitle: "FTX: Latest News and Updates | South China Morning Post"
+    contentSnippet: "FTX: Latest News and Updates | South China Morning Post TOPIC / company FTX + FOLLOW FTX The world’s second-largest cryptocurrency exchange collapsed in November 2022, putting its leaders, including 30-year-old founder Sam Bankman-Fried, into the headlines and under the legal spotlight. SHOW FULL PROFILE Cryptocurrency US cryptocurrency exchange Coinbase sees worst quarter since FTX collapse Nearly every major firm linked to cryptocurrencies were hammered this quarter, as concerns about the US e"
+    contentLength: 1512553
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://bitcoinke.io/2021/11/using-ftx/
+    linkText: Using FTX — - BitcoinKE
+    claimContext: "FTX operated as a centralized exchange, meaning it held custody of user assets on its own balance sheet rather than facilitating purely peer-to-peer transactions. Users deposited cryptocurrencies or fiat currency into FTX-controlled wallets and traded through a central limit order book that matched "
+    fetchedAt: 2026-02-22T02:12:19.843Z
+    httpStatus: 200
+    pageTitle: A Look at the FTX Exchange &#8211; A Highly Competitive Derivatives Exchange Platform By Traders, For Traders &#8211; BitKE
+    contentSnippet: A Look at the FTX Exchange &#8211; A Highly Competitive Derivatives Exchange Platform By Traders, For Traders &#8211; BitKE ' Search A Look at the FTX Exchange &#8211; A Highly Competitive Derivatives Exchange Platform By Traders, For Traders Caroline Kuria &middot; November 11, 2021 &middot; 3 min read FTX is a cryptocurrency exchange platform designed for traders by traders. Founded in 2018 by former Jane Street and Google employees, Sam Bankman-Fried (CEO) and Gary Wang (CTO), the company has
+    contentLength: 144016
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.richmondfed.org/publications/research/economic_brief/2023/eb_23-09
+    linkText: "FTX Collapse: Economic Brief 23-09 — - Richmond Federal Reserve, Economic Brief 23-09 (2023)"
+    claimContext: "The native FTT token served several functions: it provided trading fee discounts, enabled staking for interest earnings, and — critically — was accepted as collateral for margin loans. The Richmond Federal Reserve's economic analysis noted that FTX's acceptance of its own token as collateral created"
+    fetchedAt: 2026-02-22T02:12:19.121Z
+    httpStatus: 200
+    pageTitle: What Is a Crypto Conglomerate Like FTX? Economics and Regulations | Richmond Fed
+    contentSnippet: "What Is a Crypto Conglomerate Like FTX? Economics and Regulations | Richmond Fed Skip to Main Content What Is a Crypto Conglomerate Like FTX? Economics and Regulations By Jonathan Chiu and Russell Wong Economic Brief March 2023, No. 23-09 We explain the economics behind the rise and fall of FTX. We view FTX and its associates as components making up one large entity: a crypto conglomerate. Understanding the economics of crypto conglomerates is crucial for designing effective regulations. FTX, on"
+    contentLength: 68656
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.bdo.ca/insights/fraud-deconstructed-ftx-cryptocurrency
+    linkText: "Fraud Deconstructed: FTX Cryptocurrency — - BDO Canada"
+    claimContext: Alameda Research, while nominally independent, functioned as FTX's primary market maker and had access to a unique line of credit on the FTX platform — reportedly unlimited and not subject to the liquidation rules that applied to ordinary traders. This arrangement, later revealed in bankruptcy proce
+    fetchedAt: 2026-02-22T02:12:21.633Z
+    httpStatus: 200
+    pageTitle: Case study &#x2013; Breaking down the collapse of FTX | BDO Canada
+    contentSnippet: "Case study &#x2013; Breaking down the collapse of FTX | BDO Canada skip to content Home Insights A complex scheme: The rise and demise of FTX The story of how one of the world's largest crypto exchanges collapsed \"Never in my career have I seen such a complete failure of corporate controls and such a complete absence of trustworthy financial information as occurred here. From compromised systems integrity to faulty regulatory oversight board, to the concentration of control in the hands of a ver"
+    contentLength: 857582
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.bipc.com/ftx-downfall-what-it-means-future-of-cryptocurrency
+    linkText: "FTX Downfall: What It Means for the Future of Cryptocurrency — - Buchanan Ingersoll & Rooney"
+    claimContext: "Post-collapse investigations and bankruptcy proceedings revealed governance arrangements that were, by ordinary corporate standards, extraordinarily deficient. FTX apparently lacked functioning internal controls of virtually any kind: board meetings were not held regularly, employee records were ina"
+    fetchedAt: 2026-02-22T02:12:24.841Z
+    httpStatus: 200
+    pageTitle: "The FTX Downfall: What It Means for the Future of Cryptocurrency | Buchanan Ingersoll & Rooney PC"
+    contentSnippet: "The FTX Downfall: What It Means for the Future of Cryptocurrency | Buchanan Ingersoll & Rooney PC '/> '/> Search Our Website: Search Subscribe Mobile Search Search FIND AN ATTORNEY FIND AN OFFICE LinkedIn: X (Twitter): Facebook: Vimeo: Stay Informed We follow industry news and trends so you can stay ahead of the game. Subscribe to receive emails regarding policies and findings that impact you and your business. Already subscribed? Click here to update your preferences . Subscribe BACK TO INSIGHT"
+    contentLength: 41666
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.bipc.com/ftx-downfall-what-it-means-future-of-cryptocurrency
+    linkText: "FTX Downfall: What It Means for the Future of Cryptocurrency — - Buchanan Ingersoll & Rooney"
+    claimContext: These failures allowed Bankman-Fried to operate what the bankruptcy trustee described as secret backdoor bookkeeping systems — mechanisms that transferred customer funds to Alameda without notifying either customers or, according to at least some accounts, senior FTX employees.[^28] When the exchang
+    fetchedAt: 2026-02-22T02:12:24.843Z
+    httpStatus: 200
+    pageTitle: "The FTX Downfall: What It Means for the Future of Cryptocurrency | Buchanan Ingersoll & Rooney PC"
+    contentSnippet: "The FTX Downfall: What It Means for the Future of Cryptocurrency | Buchanan Ingersoll & Rooney PC '/> '/> Search Our Website: Search Subscribe Mobile Search Search FIND AN ATTORNEY FIND AN OFFICE LinkedIn: X (Twitter): Facebook: Vimeo: Stay Informed We follow industry news and trends so you can stay ahead of the game. Subscribe to receive emails regarding policies and findings that impact you and your business. Already subscribed? Click here to update your preferences . Subscribe BACK TO INSIGHT"
+    contentLength: 41666
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.deeplearning.ai/the-batch/how-ftxs-collapse-impacts-ai/
+    linkText: How FTX's Collapse Impacts AI — - DeepLearning.AI, The Batch
+    claimContext: FTX's relevance to the AI safety community stems primarily from <EntityLink id="sam-bankman-fried">Sam Bankman-Fried</EntityLink>'s substantial philanthropic commitments to existential risk reduction and AI safety research, driven by his public identification with effective altruism and longtermism.
+    fetchedAt: 2026-02-22T02:12:21.501Z
+    httpStatus: 200
+    pageTitle: How FTX&#x27;s Collapse Impacts AI | AI News & Insights
+    contentSnippet: "How FTX&#x27;s Collapse Impacts AI | AI News & Insights ✨ New course! Enroll in A2A: The Agent2Agent Protocol Share The demise of cryptocurrency exchange FTX threatens funding for some teams devoted to AI safety. What’s new: FTX, the $32 billion exchange that plunged into bankruptcy last month amid allegations of fraud, had given or promised more than $530 million to over 70 AI-related organizations, The New York Times reported . Much of that money may have to be returned. What happened: FTX fou"
+    contentLength: 76563
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.deeplearning.ai/the-batch/how-ftxs-collapse-impacts-ai/
+    linkText: How FTX's Collapse Impacts AI — - DeepLearning.AI, The Batch
+    claimContext: The most prominent beneficiary was <EntityLink id="anthropic">Anthropic</EntityLink>, which reportedly received \$500 million from FTX-affiliated sources toward developing its AI systems.[^30] The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> — a philanthropic vehicle launched by FTX
+    fetchedAt: 2026-02-22T02:12:21.359Z
+    httpStatus: 200
+    pageTitle: How FTX&#x27;s Collapse Impacts AI | AI News & Insights
+    contentSnippet: "How FTX&#x27;s Collapse Impacts AI | AI News & Insights ✨ New course! Enroll in A2A: The Agent2Agent Protocol Share The demise of cryptocurrency exchange FTX threatens funding for some teams devoted to AI safety. What’s new: FTX, the $32 billion exchange that plunged into bankruptcy last month amid allegations of fraud, had given or promised more than $530 million to over 70 AI-related organizations, The New York Times reported . Much of that money may have to be returned. What happened: FTX fou"
+    contentLength: 76563
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.deeplearning.ai/the-batch/how-ftxs-collapse-impacts-ai/
+    linkText: How FTX's Collapse Impacts AI — - DeepLearning.AI, The Batch
+    claimContext: The most prominent beneficiary was <EntityLink id="anthropic">Anthropic</EntityLink>, which reportedly received \$500 million from FTX-affiliated sources toward developing its AI systems.[^30] The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> — a philanthropic vehicle launched by FTX
+    fetchedAt: 2026-02-22T02:12:26.422Z
+    httpStatus: 200
+    pageTitle: How FTX&#x27;s Collapse Impacts AI | AI News & Insights
+    contentSnippet: "How FTX&#x27;s Collapse Impacts AI | AI News & Insights ✨ New course! Enroll in A2A: The Agent2Agent Protocol Share The demise of cryptocurrency exchange FTX threatens funding for some teams devoted to AI safety. What’s new: FTX, the $32 billion exchange that plunged into bankruptcy last month amid allegations of fraud, had given or promised more than $530 million to over 70 AI-related organizations, The New York Times reported . Much of that money may have to be returned. What happened: FTX fou"
+    contentLength: 76563
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://forum.effectivealtruism.org/topics/ftx-collapse
+    linkText: FTX Collapse - EA Forum Topics — - EA Forum; MacAskill's public statement on resignation is documented in EA Forum coverage of the collapse.
+    claimContext: The most prominent beneficiary was <EntityLink id="anthropic">Anthropic</EntityLink>, which reportedly received \$500 million from FTX-affiliated sources toward developing its AI systems.[^30] The <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink> — a philanthropic vehicle launched by FTX
+    fetchedAt: 2026-02-22T02:12:26.911Z
+    httpStatus: 200
+    pageTitle: FTX collapse - EA Forum
+    contentSnippet: FTX collapse - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents FTX collapse Edit History Discussion 0 Subscribe Edit History Discussion 0 FTX collapse History of the collapse Effects on the effective altruism community Further reading Related entries Random Topic Contributors 5 Lizka 2 Amber Dawn 2 vipulnaik FTX collapse refers to the collapse of the cryptocurrency exchange FTX in 2022.
+    contentLength: 415297
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.deeplearning.ai/the-batch/how-ftxs-collapse-impacts-ai/
+    linkText: How FTX's Collapse Impacts AI — - DeepLearning.AI, The Batch
+    claimContext: The collapse raised immediate concerns about clawback risk — whether AI safety organizations that had received FTX grants or investments might be required to return those funds as part of the bankruptcy estate's asset recovery. <EntityLink id="anthropic">Anthropic</EntityLink> and other recipients f
+    fetchedAt: 2026-02-22T02:12:26.217Z
+    httpStatus: 200
+    pageTitle: How FTX&#x27;s Collapse Impacts AI | AI News & Insights
+    contentSnippet: "How FTX&#x27;s Collapse Impacts AI | AI News & Insights ✨ New course! Enroll in A2A: The Agent2Agent Protocol Share The demise of cryptocurrency exchange FTX threatens funding for some teams devoted to AI safety. What’s new: FTX, the $32 billion exchange that plunged into bankruptcy last month amid allegations of fraud, had given or promised more than $530 million to over 70 AI-related organizations, The New York Times reported . Much of that money may have to be returned. What happened: FTX fou"
+    contentLength: 76563
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://forum.effectivealtruism.org/topics/ftx-collapse
+    linkText: FTX Collapse - EA Forum Topics — - EA Forum
+    claimContext: The episode also prompted broader reflection within EA and AI safety communities about the risks of funding concentration — specifically, the vulnerability of existential risk work to unstable or ethically compromised donors. EA Forum discussions in the aftermath ranged from expressions of shock and
+    fetchedAt: 2026-02-22T02:12:27.847Z
+    httpStatus: 200
+    pageTitle: FTX collapse - EA Forum
+    contentSnippet: FTX collapse - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents FTX collapse Edit History Discussion 0 Subscribe Edit History Discussion 0 FTX collapse History of the collapse Effects on the effective altruism community Further reading Related entries Random Topic Contributors 5 Lizka 2 Amber Dawn 2 vipulnaik FTX collapse refers to the collapse of the cryptocurrency exchange FTX in 2022.
+    contentLength: 415296
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.eaforchristians.org/blog/thoughts-on-the-ftx-situation
+    linkText: Thoughts on the FTX Situation — - EA for Christians
+    claimContext: Reactions within EA-adjacent communities were varied. Some commentators argued that the fraud was the result of individual criminal conduct and organizational failure rather than anything inherent to EA philosophy, and that the broader project of using evidence and reason to prioritize the most impo
+    fetchedAt: 2026-02-22T02:12:26.627Z
+    httpStatus: 200
+    pageTitle: "Sam Bankman-Fried and the FTX Scandal: Implications for Effective Altruism &mdash; Effective Altruism for Christians"
+    contentSnippet: "Sam Bankman-Fried and the FTX Scandal: Implications for Effective Altruism &mdash; Effective Altruism for Christians 0 Thoughts on the FTX situation EA Movement 14 Nov Written By Vesa Hautala by Vesa Hautala . Note: this post does not present a stance by Effective Altruism for Christians. This blog publishes posts by multiple authors. The views contained in the posts may sometimes be contradictory and do not necessarily reflect the views of Effective Altruism for Christians. The Effective Altrui"
+    contentLength: 348520
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://forum.effectivealtruism.org/posts/txGgPvKgZFpphdkHe/my-reaction-to-ftx-appalled
+    linkText: "My Reaction to FTX: Appalled — - EA Forum post"
+    claimContext: <EntityLink id="80000-hours">80,000 Hours</EntityLink>'s Benjamin Todd, in EA Forum discussions, advised that EA organizations should diversify their funding away from the FTX and crypto concentration that had developed.[^37] The episode was widely seen as a significant reputational blow to longterm
+    fetchedAt: 2026-02-22T02:12:28.929Z
+    httpStatus: 200
+    pageTitle: "My reaction to FTX: appalled — EA Forum"
+    contentSnippet: "My reaction to FTX: appalled — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. My reaction to FTX: appalled by Robert_Wiblin Nov 11 2022 2 min read 73 326 Community FTX collapse FTX Foundation Frontpage I thought I would repost this thread I wrote for Twitter. I&#x27;ve been waiting for the Future Fund people to have their say, and they have all resigned ( https://forum.effectivealtruism.org/posts/xafpj3on76u"
+    contentLength: 891699
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://jamesozden.substack.com/p/effective-altruism-not-as-bad-as
+    linkText: "James Ozden Substack: Effective Altruism Not as Bad as... — - James Ozden, Substack"
+    claimContext: <EntityLink id="80000-hours">80,000 Hours</EntityLink>'s Benjamin Todd, in EA Forum discussions, advised that EA organizations should diversify their funding away from the FTX and crypto concentration that had developed.[^37] The episode was widely seen as a significant reputational blow to longterm
+    fetchedAt: 2026-02-22T02:12:29.535Z
+    httpStatus: 200
+    pageTitle: "Effective Altruism: Not as bad as you think"
+    contentSnippet: "Effective Altruism: Not as bad as you think Understanding Social Change Subscribe Sign in Effective Altruism: Not as bad as you think We need a plurality of ways to do good James Özden Nov 24, 2022 21 Share It’s been a pretty hectic few weeks if you follow Effective Altruism, crypto, tech firms or basically any news. FTX, one of the largest cryptocurrency exchanges in the world, recently lost all of its value , went bankrupt, and lost about $1 billion in customer funds. News has emerged that the"
+    contentLength: 255182
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.justice.gov/usao-sdny/pr/sam-bankman-fried-indicted-manhattan-federal-court-fraud-charges-related-collapse
+    linkText: Sam Bankman-Fried Indicted in Manhattan Federal Court for Fraud Charges Related to Collapse of FTX — - U.S. Department of Justice, SDNY Press Release, December 2022; see also [FTX Wikipedia Article](https://en.wikipedia.org/wiki/FTX) - Wikipedia
+    claimContext: The central criticism of FTX concerns the alleged deliberate misuse of customer deposits. According to U.S. prosecutors and evidence presented at trial — including the DOJ indictment filed in the Southern District of New York — FTX lent billions of dollars in customer funds to Alameda Research for t
+    fetchedAt: 2026-02-22T02:12:29.046Z
+    httpStatus: 200
+    pageTitle: "&nbsp;"
+    contentSnippet: Powered and protected by Privacy
+    contentLength: 2915
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.richmondfed.org/publications/research/economic_brief/2023/eb_23-09
+    linkText: "FTX Collapse: Economic Brief 23-09 — - Richmond Federal Reserve, Economic Brief 23-09 (2023)"
+    claimContext: "Academic and institutional analyses have emphasized that FTX's acceptance of FTT — its own token — as collateral created an inherently fragile structure.[^40] The Richmond Federal Reserve's Economic Brief 23-09 described this as a form of \"wrong-way risk\": when confidence in FTX declined, FTT's valu"
+    fetchedAt: 2026-02-22T02:12:29.082Z
+    httpStatus: 200
+    pageTitle: What Is a Crypto Conglomerate Like FTX? Economics and Regulations | Richmond Fed
+    contentSnippet: "What Is a Crypto Conglomerate Like FTX? Economics and Regulations | Richmond Fed Skip to Main Content What Is a Crypto Conglomerate Like FTX? Economics and Regulations By Jonathan Chiu and Russell Wong Economic Brief March 2023, No. 23-09 We explain the economics behind the rise and fall of FTX. We view FTX and its associates as components making up one large entity: a crypto conglomerate. Understanding the economics of crypto conglomerates is crucial for designing effective regulations. FTX, on"
+    contentLength: 68656
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4283333
+    linkText: SSRN Paper on FTX Collapse — - SSRN, December 2022
+    claimContext: "Academic and institutional analyses have emphasized that FTX's acceptance of FTT — its own token — as collateral created an inherently fragile structure.[^40] The Richmond Federal Reserve's Economic Brief 23-09 described this as a form of \"wrong-way risk\": when confidence in FTX declined, FTT's valu"
+    fetchedAt: 2026-02-22T02:12:29.278Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 42
+    url: http://www.pulj.org/the-roundtable/an-analysis-of-the-legal-implications-of-the-ftx-cryptocurrency-collapse
+    linkText: Analysis of the Legal Implications of the FTX Cryptocurrency Collapse — - Princeton University Law Journal
+    claimContext: FTX was marketed aggressively to retail investors, including through endorsements by celebrities such as Tom Brady, Shaquille O'Neal, and Naomi Osaka. Class action lawsuits filed against both FTX and celebrity endorsers alleged that the promotion targeted unsophisticated investors without adequate d
+    fetchedAt: 2026-02-22T02:12:31.568Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 43
+    url: https://abcnews.com/Business/timeline-cryptocurrency-exchange-ftxs-historic-collapse/story?id=93337035
+    linkText: Timeline of Cryptocurrency Exchange FTX's Historic Collapse — - ABC News
+    claimContext: FTX was marketed aggressively to retail investors, including through endorsements by celebrities such as Tom Brady, Shaquille O'Neal, and Naomi Osaka. Class action lawsuits filed against both FTX and celebrity endorsers alleged that the promotion targeted unsophisticated investors without adequate d
+    fetchedAt: 2026-02-22T02:12:31.104Z
+    httpStatus: 200
+    pageTitle: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News
+    contentSnippet: A timeline of cryptocurrency exchange FTX&#x27;s historic collapse - ABC News A timeline of cryptocurrency exchange FTX's historic collapse Bankman-Fried received a sentence of 25 years in prison on Thursday. By Max Zahn March 28, 2024, 12:08 PM 2:36 In this May 12, 2022, file photo, Terrence A. Duffy, CEO of the Chicago Mercantile Exchange, Sam Bankman-Fried, CEO of FTX US Derivatives, Christopher Edmonds, chief development officer of the Intercontinental Exchange, and Christopher Perkins, pres
+    contentLength: 228370
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://revealnews.org/podcast/sam-bankman-fried-ftx-collapse-part-2/
+    linkText: Sam Bankman-Fried FTX Collapse Part 2 — - Reveal News
+    claimContext: "Even among creditors who broadly supported FTX's restructuring, objections arose regarding the terms of repayment. The decision to peg cash distributions to cryptocurrency values as of the November 2022 bankruptcy date — when Bitcoin was approximately \\$17,000, compared to prices above \\$100,000 by "
+    fetchedAt: 2026-02-22T02:12:31.041Z
+    httpStatus: 200
+    pageTitle: The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal
+    contentSnippet: "The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal The truth will not reveal itself. SUPPORT OUR WORK TODAY Join our newsletter. Get our latest investigations in your inbox every week. Sign up Close Search for: Search Close Skip to content FTX founder Sam Bankman-Fried testifies before the House Financial Services Committee in 2021, before the cryptocurrency exchange’s collapse. Credit: Tom Williams/Congressional Quarterly/Zuma When the cryptocurrency exchange FTX imploded, customers around"
+    contentLength: 310530
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://revealnews.org/podcast/sam-bankman-fried-ftx-collapse-part-2/
+    linkText: Sam Bankman-Fried FTX Collapse Part 2 — - Reveal News
+    claimContext: "Even among creditors who broadly supported FTX's restructuring, objections arose regarding the terms of repayment. The decision to peg cash distributions to cryptocurrency values as of the November 2022 bankruptcy date — when Bitcoin was approximately \\$17,000, compared to prices above \\$100,000 by "
+    fetchedAt: 2026-02-22T02:12:30.768Z
+    httpStatus: 200
+    pageTitle: The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal
+    contentSnippet: "The Secret Story of FTX’s Rise and Ruin Part 2 - Reveal The truth will not reveal itself. SUPPORT OUR WORK TODAY Join our newsletter. Get our latest investigations in your inbox every week. Sign up Close Search for: Search Close Skip to content FTX founder Sam Bankman-Fried testifies before the House Financial Services Committee in 2021, before the cryptocurrency exchange’s collapse. Credit: Tom Williams/Congressional Quarterly/Zuma When the cryptocurrency exchange FTX imploded, customers around"
+    contentLength: 310530
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.financemagnates.com/cryptocurrency/the-ftx-full-story-all-you-need-to-know/
+    linkText: The FTX Full Story — - Finance Magnates; note that wash trading allegations have not been confirmed by a definitive regulatory finding or included as primary charges in the DOJ indictment.
+    claimContext: "Reports during FTX's operation alleged that the exchange engaged in wash trading — artificially inflating reported trading volumes through coordinated buy-sell activity — to misrepresent its market position to investors and potential customers. These allegations have not, as of the available public "
+    fetchedAt: 2026-02-22T02:12:31.477Z
+    httpStatus: 200
+    pageTitle: "The FTX Full Story: All You Need to Know"
+    contentSnippet: "--> The FTX Full Story: All You Need to Know ADVERTISEMENT FM Home > CryptoCurrency > The FTX Full Story: All You Need to Know The FTX Full Story: All You Need to Know 2023-09-05T12:04:57.393+02:00 T u e s d a y , 0 5 / 0 9 / 2 0 2 3 | 1 0 : 0 4 G M T by Pedro Ferreira The rise and fall of the crypto giant. FTX emerged as a key player in the ever-changing environment of cryptocurrencies and blockchain technology, offering new trading solutions and a platform for enthusiasts and investors to enga"
+    contentLength: 552246
+    status: verified
+    note: null

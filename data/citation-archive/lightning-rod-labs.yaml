@@ -1,0 +1,403 @@
+pageId: lightning-rod-labs
+verifiedAt: 2026-02-22
+totalCitations: 36
+verified: 36
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Lightning Rod Labs is an AI company founded by former Google engineers Ben Turtel and Danny Franklin that develops frameworks for training <EntityLink id="language-models">large language models</EntityLink> to make accurate predictions about future events.[^1] The company's central innovation, calle
+    fetchedAt: 2026-02-22T02:15:23.320Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Lightning Rod Labs is an AI company founded by former Google engineers Ben Turtel and Danny Franklin that develops frameworks for training <EntityLink id="language-models">large language models</EntityLink> to make accurate predictions about future events.[^1] The company's central innovation, calle
+    fetchedAt: 2026-02-22T02:15:23.181Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: The company claims their approach enables AI systems to outperform much larger frontier models on live prediction benchmarks.[^3] In a May 2025 research paper, Lightning Rod Labs demonstrated a system using Reinforcement Learning with Verifiable Rewards (RLVR) that achieved approximately 10% total r
+    fetchedAt: 2026-02-22T02:15:23.163Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: The company positions its technology as applicable to any domain where historical data contains temporal structure, from financial forecasting to risk assessment. Their platform can convert unstructured historical data into deployable datasets within minutes or hours, compared to traditional approac
+    fetchedAt: 2026-02-22T02:15:23.196Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Lightning Rod Labs was founded by Ben Turtel (CEO) and Danny Franklin (CTO), both of whom previously collaborated on successful ventures acquired by major technology companies.[^7] The founders had previously co-founded KazmVideo, a video platform that was sold to Harvard University, and later worke
+    fetchedAt: 2026-02-22T02:15:23.191Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Lightning Rod Labs was founded by Ben Turtel (CEO) and Danny Franklin (CTO), both of whom previously collaborated on successful ventures acquired by major technology companies.[^7] The founders had previously co-founded KazmVideo, a video platform that was sold to Harvard University, and later worke
+    fetchedAt: 2026-02-22T02:15:24.391Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Ben Turtel brought over 10 years of experience in machine learning, AI, and natural language processing to the venture, including more than 6 years as a Software Engineer at Google (Level 5) focused on applied AI.[^9] He holds a Master's degree in Scientific Computing from New York University and ha
+    fetchedAt: 2026-02-22T02:15:24.392Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Ben Turtel brought over 10 years of experience in machine learning, AI, and natural language processing to the venture, including more than 6 years as a Software Engineer at Google (Level 5) focused on applied AI.[^9] He holds a Master's degree in Scientific Computing from New York University and ha
+    fetchedAt: 2026-02-22T02:15:24.393Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Danny Franklin contributed 4+ years of experience as a Google Software Engineer (Level 5) and 7+ years of total software engineering experience across Microsoft and Google.[^11] He holds a Master's degree in Computer Science from Stanford University with an emphasis in artificial intelligence.[^12]
+    fetchedAt: 2026-02-22T02:15:24.426Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Danny Franklin contributed 4+ years of experience as a Google Software Engineer (Level 5) and 7+ years of total software engineering experience across Microsoft and Google.[^11] He holds a Master's degree in Computer Science from Stanford University with an emphasis in artificial intelligence.[^12]
+    fetchedAt: 2026-02-22T02:15:24.395Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: "The company emerged from the founders' expertise in scalable supervision from unstructured data. Rather than relying on traditional supervised learning approaches that require expensive human labeling or carefully curated datasets, they developed methods to extract ground-truth labels directly from "
+    fetchedAt: 2026-02-22T02:15:25.496Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Lightning Rod Labs' flagship innovation is the **Future-as-Label** training methodology, which treats temporal data as a natural supervision signal for predictive models.[^14] The approach works by identifying questions that can be asked about information available at time T, then using outcomes obs
+    fetchedAt: 2026-02-22T02:15:25.498Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: The company has published several research outputs exploring different aspects of their approach, including work on "Foresight Learning for SEC Risk Prediction" and studies showing that "LLMs Can Teach Themselves to Better Predict the Future."[^22]
+    fetchedAt: 2026-02-22T02:15:25.502Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: Lightning Rod Labs offers a platform that automates the process of converting raw historical data into verified training datasets for AI prediction tasks.[^23] The workflow allows users to choose data sources (either public sources or their own documents, emails, and internal tickets), define predic
+    fetchedAt: 2026-02-22T02:15:25.509Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: Lightning Rod Labs offers a platform that automates the process of converting raw historical data into verified training datasets for AI prediction tasks.[^23] The workflow allows users to choose data sources (either public sources or their own documents, emails, and internal tickets), define predic
+    fetchedAt: 2026-02-22T02:15:25.505Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: The platform emphasizes speed and scalability. According to customer testimonials featured on the company's website, users have been able to generate datasets in hours rather than the months typically required by traditional approaches.[^25] One testimonial highlights using the platform to create "1
+    fetchedAt: 2026-02-22T02:15:26.579Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: The platform emphasizes speed and scalability. According to customer testimonials featured on the company's website, users have been able to generate datasets in hours rather than the months typically required by traditional approaches.[^25] One testimonial highlights using the platform to create "1
+    fetchedAt: 2026-02-22T02:15:26.587Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: As of the latest available information, the platform offers new users \$50 in free credits to experiment with the technology.[^27]
+    fetchedAt: 2026-02-22T02:15:26.583Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://phazeventures.com/portfolio/
+    linkText: Phaze Ventures - Portfolio
+    claimContext: Lightning Rod Labs is listed as a current portfolio investment of Phaze Ventures, an early-stage venture capital firm that invests in companies from pre-seed through Series A stages.[^28] Phaze Ventures has invested in more than 17 companies since 2018 and frequently co-invests with accelerators and
+    fetchedAt: 2026-02-22T02:15:26.946Z
+    httpStatus: 200
+    pageTitle: Portfolio &#8211; Phaze Ventures
+    contentSnippet: "Portfolio &#8211; Phaze Ventures Since 2018 we have invested in 20+ companies from Pre-Seed to Series-A and helped scale them to global leaders in their verticals. We work closely with advisors and early stage ecosystem partners across the world and have co-invested alongside accelerators and scout programs including: Our Portfolio Our Current Investments: EMushrif eMushrif&#8217;s mission is to be the #1 mobility choice for parents and students by offering unparalleled convenience, and safety. "
+    contentLength: 155386
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://phazeventures.com/portfolio/
+    linkText: Phaze Ventures - Portfolio
+    claimContext: Lightning Rod Labs is listed as a current portfolio investment of Phaze Ventures, an early-stage venture capital firm that invests in companies from pre-seed through Series A stages.[^28] Phaze Ventures has invested in more than 17 companies since 2018 and frequently co-invests with accelerators and
+    fetchedAt: 2026-02-22T02:15:26.923Z
+    httpStatus: 200
+    pageTitle: Portfolio &#8211; Phaze Ventures
+    contentSnippet: "Portfolio &#8211; Phaze Ventures Since 2018 we have invested in 20+ companies from Pre-Seed to Series-A and helped scale them to global leaders in their verticals. We work closely with advisors and early stage ecosystem partners across the world and have co-invested alongside accelerators and scout programs including: Our Portfolio Our Current Investments: EMushrif eMushrif&#8217;s mission is to be the #1 mobility choice for parents and students by offering unparalleled convenience, and safety. "
+    contentLength: 155386
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://blog.lightningrod.ai
+    linkText: Lightning Rod Labs Blog
+    claimContext: In August 2025, the company published a blog post describing tests of their system on live prediction markets, further documenting the real-world performance of their forecasting approach.[^34]
+    fetchedAt: 2026-02-22T02:15:28.571Z
+    httpStatus: 200
+    pageTitle: Home | Lightning Rod Labs
+    contentSnippet: "Home | Lightning Rod Labs Lightning Rod Labs Blog Training AI to Predict the Future Subscribe for updates Stay up to date with the frontier of AI prediction arrow-right Build a Labeled Forecasting Dataset from Real-World News in 10 Minutes Use Lightning Rod to turn real news into a model-ready prediction dataset. Feb 10, 2026 AI-Driven SEC Risk Prediction: Separating Signal from Noise Transform 10-K narratives into calibrated probabilities using Foresight Learning. Outperform general purpose mod"
+    contentLength: 1075168
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: '- "Foresight Learning for SEC Risk Prediction" - Studies on how LLMs can improve their own prediction capabilities[^35]'
+    fetchedAt: 2026-02-22T02:15:28.017Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://github.com/lightning-rod-labs
+    linkText: Lightning Rod Labs GitHub
+    claimContext: "Lightning Rod Labs' GitHub presence (@lightning-rod-labs, @BTurtel, @lightningrodai) shows 23 repositories, primarily consisting of forks of reinforcement learning and language model tools.[^36] Notable repositories include forks of:"
+    fetchedAt: 2026-02-22T02:15:28.514Z
+    httpStatus: 200
+    pageTitle: Lightning Rod Labs · GitHub
+    contentSnippet: Lightning Rod Labs · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Pinned Loading lightningrod-python-sdk lightningrod-python-sdk Public Python SDK for dataset generation on LightningRod platform ⚡ Python 21 2 Repositories --> Loading Type All Public Sources Forks Arc
+    contentLength: 268377
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://github.com/lightning-rod-labs
+    linkText: Lightning Rod Labs GitHub
+    claimContext: '- metac-bot and <EntityLink id="metaforecast">metaforecast</EntityLink> (forecasting-related tools suggesting integration with <EntityLink id="metaculus">Metaculus</EntityLink> and other prediction platforms) - sculpt and ollama-deep-researcher (research and analysis tools)[^37]'
+    fetchedAt: 2026-02-22T02:15:28.453Z
+    httpStatus: 200
+    pageTitle: Lightning Rod Labs · GitHub
+    contentSnippet: Lightning Rod Labs · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Pinned Loading lightningrod-python-sdk lightningrod-python-sdk Public Python SDK for dataset generation on LightningRod platform ⚡ Python 21 2 Repositories --> Loading Type All Public Sources Forks Arc
+    contentLength: 268372
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://github.com/lightning-rod-labs
+    linkText: Lightning Rod Labs GitHub
+    claimContext: The repository activity uses primarily Dart, Python, TypeScript, and Scala, reflecting a diverse technical stack.[^38] The GitHub presence has 7 followers as of available data, suggesting a relatively early-stage open-source footprint.[^39]
+    fetchedAt: 2026-02-22T02:15:28.429Z
+    httpStatus: 200
+    pageTitle: Lightning Rod Labs · GitHub
+    contentSnippet: Lightning Rod Labs · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Pinned Loading lightningrod-python-sdk lightningrod-python-sdk Public Python SDK for dataset generation on LightningRod platform ⚡ Python 21 2 Repositories --> Loading Type All Public Sources Forks Arc
+    contentLength: 268371
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://github.com/lightning-rod-labs
+    linkText: Lightning Rod Labs GitHub
+    claimContext: The repository activity uses primarily Dart, Python, TypeScript, and Scala, reflecting a diverse technical stack.[^38] The GitHub presence has 7 followers as of available data, suggesting a relatively early-stage open-source footprint.[^39]
+    fetchedAt: 2026-02-22T02:15:29.658Z
+    httpStatus: 200
+    pageTitle: Lightning Rod Labs · GitHub
+    contentSnippet: Lightning Rod Labs · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Pinned Loading lightningrod-python-sdk lightningrod-python-sdk Public Python SDK for dataset generation on LightningRod platform ⚡ Python 21 2 Repositories --> Loading Type All Public Sources Forks Arc
+    contentLength: 268377
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://github.com/lightning-rod-labs
+    linkText: Lightning Rod Labs GitHub
+    claimContext: The metac-bot fork in particular suggests connections to the broader forecasting and prediction market community, particularly around Metaculus, though no formal partnerships or integrations have been announced.[^40]
+    fetchedAt: 2026-02-22T02:15:29.643Z
+    httpStatus: 200
+    pageTitle: Lightning Rod Labs · GitHub
+    contentSnippet: Lightning Rod Labs · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Pinned Loading lightningrod-python-sdk lightningrod-python-sdk Public Python SDK for dataset generation on LightningRod platform ⚡ Python 21 2 Repositories --> Loading Type All Public Sources Forks Arc
+    contentLength: 268372
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: Available information does not indicate any direct involvement by Lightning Rod Labs in AI safety, alignment, or existential risk reduction efforts. The company's focus appears purely commercial and technical, centered on improving AI forecasting capabilities for practical applications like financia
+    fetchedAt: 2026-02-22T02:15:29.673Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://github.com/lightning-rod-labs
+    linkText: Lightning Rod Labs GitHub
+    claimContext: The company is not mentioned in AI safety forums like <EntityLink id="lesswrong">LessWrong</EntityLink> or the Effective Altruism Forum based on available search results.[^42] There is no evidence of engagement with <EntityLink id="alignment">AI alignment</EntityLink> research, safety protocols like
+    fetchedAt: 2026-02-22T02:15:29.669Z
+    httpStatus: 200
+    pageTitle: Lightning Rod Labs · GitHub
+    contentSnippet: Lightning Rod Labs · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Pinned Loading lightningrod-python-sdk lightningrod-python-sdk Public Python SDK for dataset generation on LightningRod platform ⚡ Python 21 2 Repositories --> Loading Type All Public Sources Forks Arc
+    contentLength: 268371
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.lightningrod.ai/about
+    linkText: Lightning Rod Labs - About
+    claimContext: The company is not mentioned in AI safety forums like <EntityLink id="lesswrong">LessWrong</EntityLink> or the Effective Altruism Forum based on available search results.[^42] There is no evidence of engagement with <EntityLink id="alignment">AI alignment</EntityLink> research, safety protocols like
+    fetchedAt: 2026-02-22T02:15:29.674Z
+    httpStatus: 200
+    pageTitle: About | Lightning Rod Labs
+    contentSnippet: "About | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Training AI to Predict the Future Our novel framework* learns directly from real-world feedback to make reliable predictions from unstructured data No curated data. No humans in the loop. No bottlenecks. Any domain. Breakthroughs in forecasting with LLMs: Future-as-Label: Scalable Supervision from Real-World Outcomes Foresight Learning for SEC Risk Prediction Outcome-"
+    contentLength: 15577
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: While improved forecasting capabilities could theoretically contribute to better anticipation of AI risks or timeline predictions, Lightning Rod Labs has not positioned its work in this context. The company's emphasis is on practical prediction tasks with verifiable outcomes in domains like financia
+    fetchedAt: 2026-02-22T02:15:30.752Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: As of early 2026, Lightning Rod Labs remains an active company with a functioning website and platform offering.[^45] The most recent public milestone is the May 2025 research publication and associated August 2025 blog post about live market testing.[^46]
+    fetchedAt: 2026-02-22T02:15:30.750Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://blog.lightningrod.ai
+    linkText: Lightning Rod Labs Blog
+    claimContext: As of early 2026, Lightning Rod Labs remains an active company with a functioning website and platform offering.[^45] The most recent public milestone is the May 2025 research publication and associated August 2025 blog post about live market testing.[^46]
+    fetchedAt: 2026-02-22T02:15:30.785Z
+    httpStatus: 200
+    pageTitle: Home | Lightning Rod Labs
+    contentSnippet: "Home | Lightning Rod Labs Lightning Rod Labs Blog Training AI to Predict the Future Subscribe for updates Stay up to date with the frontier of AI prediction arrow-right Build a Labeled Forecasting Dataset from Real-World News in 10 Minutes Use Lightning Rod to turn real news into a model-ready prediction dataset. Feb 10, 2026 AI-Driven SEC Risk Prediction: Separating Signal from Noise Transform 10-K narratives into calibrated probabilities using Foresight Learning. Outperform general purpose mod"
+    contentLength: 1075168
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: The company's platform continues to offer automated dataset generation from historical data, with testimonials emphasizing rapid deployment timelines (hours instead of months) for organizations seeking to build custom prediction models from their own data sources.[^47]
+    fetchedAt: 2026-02-22T02:15:30.947Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://blog.lightningrod.ai/authors/2f16dc53-3262-4a5d-9ccf-63d88ff19271
+    linkText: Lightning Rod Labs Blog - Ben Turtel
+    claimContext: Ben Turtel remains active in producing content about the company's work, with a blog post dated January 21, 2026 titled "Using the Future to Train Prediction Models."[^48]
+    fetchedAt: 2026-02-22T02:15:31.577Z
+    httpStatus: 200
+    pageTitle: Ben Turtel | Lightning Rod Labs
+    contentSnippet: Ben Turtel | Lightning Rod Labs Ben Turtel Founder & CEO @ Lightning Rod Labs Using the Future to Train Prediction Models Jan 21, 2026 Real world event resolution as a scalable source of supervision Read More Foresight-32B Beats Frontier LLMs on Live Polymarket Predictions Aug 27, 2025 A forward-looking test of AI forecasting performance on live prediction markets Read More Subscribe © 2026 Lightning Rod Labs. Report abuse Privacy policy Terms of use beehiiv Powered by beehiiv
+    contentLength: 1061486
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.lightningrod.ai
+    linkText: Lightning Rod Labs
+    claimContext: '**Comparison to alternatives**: The company claims to outperform "frontier AIs 100x larger" but does not provide detailed comparisons to other specialized forecasting systems, prediction aggregation methods, or recent advances in LLM reasoning for forecasting tasks.[^50]'
+    fetchedAt: 2026-02-22T02:15:32.655Z
+    httpStatus: 200
+    pageTitle: Training Data from Real-World Sources | Lightning Rod Labs
+    contentSnippet: Training Data from Real-World Sources | Lightning Rod Labs About Product Foresight Data QA from Docs QA from News Prediction Agents SDK GitHub Book a Demo Log In Generate training data from real-world sources Go from messy historical data to verified training datasets — no labeling or annotation needed. Start with $50 Free Book a Demo Real-world data has timestamps. Not clean labels. Turn historical data into verified training datasets automatically using Future-as-Label . Use built-in public so
+    contentLength: 44103
+    status: verified
+    note: null

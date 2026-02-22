@@ -1,0 +1,51 @@
+pageId: neel-nanda
+verifiedAt: 2026-02-22
+totalCitations: 4
+verified: 4
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://github.com/neelnanda-io/TransformerLens
+    linkText: TransformerLens GitHub repository
+    claimContext: 'Nanda created TransformerLens, an open-source Python library for <EntityLink id="interpretability">interpretability</EntityLink> research on transformer models.[^1] The library provides: - Programmatic access to model activations at each layer'
+    fetchedAt: 2026-02-22T02:28:21.893Z
+    httpStatus: 200
+    pageTitle: "GitHub - TransformerLensOrg/TransformerLens: A library for mechanistic interpretability of GPT-style language models"
+    contentSnippet: "GitHub - TransformerLensOrg/TransformerLens: A library for mechanistic interpretability of GPT-style language models Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} TransformerLensOrg / TransformerLens Public Notifications You must be signed in to change notification settings "
+    contentLength: 339652
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://transformerlensorg.github.io/TransformerLens/
+    linkText: TransformerLens documentation homepage
+    claimContext: The library is hosted on GitHub and documented at transformerlensorg.github.io/TransformerLens.[^2]
+    fetchedAt: 2026-02-22T02:28:21.677Z
+    httpStatus: 200
+    pageTitle: TransformerLens Documentation
+    contentSnippet: TransformerLens Documentation Contents Menu Expand Light mode Dark mode Auto light/dark mode Hide navigation sidebar Hide table of contents sidebar TransformerLens Documentation Introduction Getting Started Getting Started in Mechanistic Interpretability Gallery Documentation Transformer Lens API Toggle navigation of Transformer Lens API transformer_lens Toggle navigation of transformer_lens transformer_lens.ActivationCache transformer_lens.BertNextSentencePrediction transformer_lens.FactoredMat
+    contentLength: 30217
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://transformer-circuits.pub/2021/framework/index.html
+    linkText: A Mathematical Framework for Transformer Circuits (Elhage, N., Nanda, N., et al. (2021), Transformer Circuits Thread)
+    claimContext: 'Nanda co-authored "A Mathematical Framework for Transformer Circuits" (2021), which analyzed how transformer language models implement interpretable algorithms.[^3] The research: - Identified "induction heads" as circuits that enable in-context learning'
+    fetchedAt: 2026-02-22T02:28:22.118Z
+    httpStatus: 200
+    pageTitle: A Mathematical Framework for Transformer Circuits
+    contentSnippet: A Mathematical Framework for Transformer Circuits Transformer Circuits Thread A Mathematical Framework for Transformer Circuits Authors Nelson Elhage ∗† , Neel Nanda ∗ , Catherine Olsson ∗ , Tom Henighan † , Nicholas Joseph † , Ben Mann † , Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly, Nova DasSarma, Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds , Danny Hernandez, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, Chri
+    contentLength: 6425522
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.lesswrong.com/posts/LbrPTJ4fmABEdEnLf/200-concrete-open-problems-in-mechanistic-interpretability
+    linkText: 200 Concrete Open Problems in Mechanistic Interpretability (Nanda, N. (2022), LessWrong)
+    claimContext: Nanda publishes interpretability tutorials and explanations on his blog at neelnanda.io and through video content. His "200 Concrete Open Problems in Mechanistic Interpretability" post outlines research directions for the field.[^4]
+    fetchedAt: 2026-02-22T02:28:22.004Z
+    httpStatus: 200
+    pageTitle: "200 Concrete Open Problems in Mechanistic Interpretability: Introduction — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. 200 Concrete Open Problems in Mechanistic Interpretability: Introduction — LessWrong 200 Concrete Open Problems in Mechanistic Interpretability Interpretability (ML & AI) Open Problems Transformer Circuits AI Frontpage 108 200 Concrete Open Problems in Mechanistic Interpretability: Introduction by Neel Nanda 28th Dec 2022 AI Alignment Forum 13 min read 0 108 Ω 41 EDIT "
+    contentLength: 491345
+    status: verified
+    note: null

@@ -1,0 +1,249 @@
+pageId: will-macaskill
+verifiedAt: 2026-02-22
+totalCitations: 22
+verified: 21
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/William_MacAskill
+    linkText: William MacAskill - Wikipedia
+    claimContext: "|-----------|------------| | Born | 24 March 1987, Glasgow, Scotland[^1] | | Education | Cambridge, Princeton, Oxford (DPhil, 2014)[^2] |"
+    fetchedAt: 2026-02-22T02:21:51.294Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://www.williammacaskill.com/press
+    linkText: Will MacAskill Press Page
+    claimContext: "| Born | 24 March 1987, Glasgow, Scotland[^1] | | Education | Cambridge, Princeton, Oxford (DPhil, 2014)[^2] | | Current Role | Senior Research Fellow, Forethought[^3] |"
+    fetchedAt: 2026-02-22T02:21:51.679Z
+    httpStatus: 200
+    pageTitle: Press &mdash; William MacAskill
+    contentSnippet: Press &mdash; William MacAskill Press For media requests and speaking enquiries, please contact press@forethought.org . About William MacAskill Short bio William MacAskill is a Senior Research Fellow at Forethought and was formerly an associate professor in philosophy at the University of Oxford. At the time of his appointment, he was the youngest associate professor of philosophy in the world. He also cofounded the nonprofits Giving What We Can , the Centre for Effective Altruism , and 80,000 H
+    contentLength: 93784
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.forethought.org/people/william-macaskill
+    linkText: William MacAskill - Forethought
+    claimContext: "| Education | Cambridge, Princeton, Oxford (DPhil, 2014)[^2] | | Current Role | Senior Research Fellow, Forethought[^3] | | Former Role | Associate Professor of Philosophy, Oxford University[^2] |"
+    fetchedAt: 2026-02-22T02:21:51.894Z
+    httpStatus: 200
+    pageTitle: William MacAskill | Forethought
+    contentSnippet: William MacAskill | Forethought William MacAskill Senior Research Fellow Before joining Forethought, William MacAskill was an Associate Professor of moral philosophy at the University of Oxford. He wrote the books Doing Good Better , Moral Uncertainty , and What We Owe The Future . Will is also the cofounder of Giving What We Can , 80,000 Hours , Centre for Effective Altruism and the Global Priorities Institute . Read articles by William MacAskill Contact Articles by William MacAskill 26th Janua
+    contentLength: 214504
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://philpeople.org/profiles/william-macaskill
+    linkText: William MacAskill - PhilPeople
+    claimContext: "| Key Books | *Doing Good Better* (2015), *Moral Uncertainty* (2020), *What We Owe the Future* (2022)[^2] | | Research Focus | Moral uncertainty, effective altruism, longtermism, AGI preparedness[^4] |"
+    fetchedAt: 2026-02-22T02:21:51.826Z
+    httpStatus: 200
+    pageTitle: William MacAskill (Oxford University) - PhilPeople
+    contentSnippet: William MacAskill (Oxford University) - PhilPeople PhilPapers PhilPeople PhilArchive PhilEvents PhilJobs Sign in Sign in News Feed Find Philosophers Departments Radar Help Drag to reposition Save Cancel William MacAskill University of Oxford Home Publications 38 Most Recent Most Downloaded Topics Events 3 News and Updates 28 More details University of Oxford Faculty of Philosophy Associate Professor University of Oxford Faculty of Philosophy DPhil, 2014 Homepage Oxford, England, United Kingdom o
+    contentLength: 22520
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://thepolitic.org/an-interview-with-william-macaskill-founding-member-of-effective-altruism/
+    linkText: An Interview with William MacAskill - The Politic
+    claimContext: <EntityLink id="E862" name="will-macaskill">Will MacAskill</EntityLink> is one of the most prominent figures in applied ethics and the effective altruism movement. His work centers on the idea that people should use evidence and rational analysis to maximize positive impact—whether through charitabl
+    fetchedAt: 2026-02-22T02:21:51.961Z
+    httpStatus: 200
+    pageTitle: An Interview with William MacAskill, Founding Member of Effective Altruism - The Politic
+    contentSnippet: An Interview with William MacAskill, Founding Member of Effective Altruism - The Politic Skip to content William MacAskill is a co-founder and president of the Centre for Effective Altruism and the youngest ever appointed associate professor in philosophy at Oxford University. He is one of the founding members of Effective Altruism, a social movement that promotes the use of evidence and reason to help others by as much as possible with our time and money and has, through its affiliated organiza
+    contentLength: 144180
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.williammacaskill.com/research
+    linkText: William MacAskill Research
+    claimContext: MacAskill's academic research focuses on normative uncertainty—how to make good decisions when one is uncertain not just about facts but about which ethical theory is correct. He has argued that moral uncertainty and empirical uncertainty should be treated analogously, and he has developed framework
+    fetchedAt: 2026-02-22T02:21:53.007Z
+    httpStatus: 200
+    pageTitle: Research &mdash; William MacAskill
+    contentSnippet: "Research &mdash; William MacAskill Research Also see my Academia profile and my CV . 2025 The Case for Strong Longtermism August 2025 Let strong longtermism be the thesis that in a wide class of decision situations, the option that is ex ante best is contained in a fairly small subset of options whose ex ante effects on the very long-run future are best. If this thesis is correct, it suggests that for decision purposes, we can often simply ignore shorter-run effects: the primary determinant of h"
+    contentLength: 203110
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.chartwellspeakers.com/speaker/william-macaskill/
+    linkText: William MacAskill - Chartwell Speakers
+    claimContext: MacAskill was born William David Crouch on 24 March 1987 in Glasgow, Scotland.[^1] He attended Hutchesons' Grammar School in Glasgow before studying at Cambridge, Princeton, and Oxford universities.[^2] He completed his DPhil in Philosophy at St. Anne's College, Oxford in 2014.[^7]
+    fetchedAt: 2026-02-22T02:21:54.080Z
+    httpStatus: 200
+    pageTitle: William Macaskill | Moral Philosopher | Chartwell Speakers
+    contentSnippet: William Macaskill | Moral Philosopher | Chartwell Speakers Skip to content Speaker CATEGORIES After Dinner Philanthropy & Ethics Psychology Speaker Locations Oxford, England SHARE Enquire Add to shortlist William MacAskill Keynote Speaker Founder of the effective altruism movement New York Times bestselling author of What We Owe the Future (2022) and Doing Good Better (2015) Associate Professor in Philosophy at Oxford University and Senior Research Fellow at the Global Priorities Institute Enqui
+    contentLength: 128462
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://thepolitic.org/an-interview-with-william-macaskill-founding-member-of-effective-altruism/
+    linkText: Giving What We Can - EA Interview
+    claimContext: The origins of the EA movement trace directly to MacAskill's collaborations at Oxford. In 2009, while a graduate student, he co-founded Giving What We Can with fellow philosopher Toby Ord.[^1] The organization asks members to pledge to donate at least 10% of their income to the most effective charit
+    fetchedAt: 2026-02-22T02:21:53.331Z
+    httpStatus: 200
+    pageTitle: An Interview with William MacAskill, Founding Member of Effective Altruism - The Politic
+    contentSnippet: An Interview with William MacAskill, Founding Member of Effective Altruism - The Politic Skip to content William MacAskill is a co-founder and president of the Centre for Effective Altruism and the youngest ever appointed associate professor in philosophy at Oxford University. He is one of the founding members of Effective Altruism, a social movement that promotes the use of evidence and reason to help others by as much as possible with our time and money and has, through its affiliated organiza
+    contentLength: 144180
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://dailystoic.com/will-macaskill-interview/
+    linkText: Will MacAskill - Daily Stoic Interview
+    claimContext: MacAskill was named to the Forbes 30 Under 30 list of social entrepreneurs in 2017.[^7] His TED Talk on effective altruism has accumulated close to one million views.[^9]
+    fetchedAt: 2026-02-22T02:21:53.426Z
+    httpStatus: 200
+    pageTitle: "How To Do The Most Good: An Interview With Will MacAskill"
+    contentSnippet: "--> How To Do The Most Good: An Interview With Will MacAskill How To Do The Most Good: An Interview With Will MacAskill &#10006; Join 300,000+ other Stoics and get our daily email meditation. Subscribe to get our free Daily Stoic email. Designed to help you cultivate strength, insight, and wisdom to live your best life. We won't send you spam. Unsubscribe at any time. SUBSCRIBE We won't send you spam. Unsubscribe at any time. --> How To Do The Most Good: An Interview With Will MacAskill Intervie"
+    contentLength: 72693
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.cambridge.org/core/journals/utilitas/article/william-macaskill-what-we-owe-the-future-a-millionyear-view-one-world-publications-london-2022-pp-246/63384AFA013A89DC2B17A462E89A2192
+    linkText: Review of *What We Owe the Future* - Cambridge Utilitas
+    claimContext: MacAskill is one of the most prominent advocates for longtermism. In *What We Owe the Future*, he argues that the long-run future of humanity is vast and that the moral weight of future generations is at least comparable to that of people alive today. He uses a three-factor framework to assess the l
+    fetchedAt: 2026-02-22T02:21:54.467Z
+    httpStatus: 200
+    pageTitle: "William MacAskill, What We Owe The Future: A Million-Year View (One World Publications, London, 2022), pp. 246. | Utilitas | Cambridge Core"
+    contentSnippet: null
+    contentLength: 790229
+    status: verified
+    note: Academic publisher — URL accessible
+  - footnote: 11
+    url: https://80000hours.org/podcast/episodes/will-macaskill-century-in-a-decade-navigating-intelligence-explosion/
+    linkText: "80,000 Hours Podcast #213 - Will MacAskill: Century in a Decade"
+    claimContext: MacAskill's recent work has shifted toward the challenges posed by rapid AI progress. In a 2025 paper co-authored with Fin Moorhouse, "Preparing for the Intelligence Explosion," he warns that AI-driven cognitive labor is increasing at a very rapid rate annually and that recursive self-improvement in
+    fetchedAt: 2026-02-22T02:21:55.960Z
+    httpStatus: 200
+    pageTitle: Will MacAskill on AI causing a “century in a decade” — and how we're completely unprepared | 80,000 Hours
+    contentSnippet: "Will MacAskill on AI causing a “century in a decade” — and how we&#039;re completely unprepared | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 3.1 Cold open [00:00:00] 3.2 Who's Will MacAskill? [00:00:46] 3.3 Why Will now just works on AGI [00:01:02] 3.4 Will was wrong(ish) on AI timelines and hinge of history [00:04:10] 3.5 A century of history crammed into a decade [00:08:59] 3.6 Science goes super fast; "
+    contentLength: 465493
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://algorithmwatch.org/en/agi-and-longtermist-abstractions/
+    linkText: AlgorithmWatch - AGI and Longtermist Abstractions
+    claimContext: MacAskill's recent work has shifted toward the challenges posed by rapid AI progress. In a 2025 paper co-authored with Fin Moorhouse, "Preparing for the Intelligence Explosion," he warns that AI-driven cognitive labor is increasing at a very rapid rate annually and that recursive self-improvement in
+    fetchedAt: 2026-02-22T02:21:56.703Z
+    httpStatus: 200
+    pageTitle: Focus Attention on Accountability for AI − not on AGI and Longtermist Abstractions - AlgorithmWatch
+    contentSnippet: "Focus Attention on Accountability for AI − not on AGI and Longtermist Abstractions - AlgorithmWatch Position Paper Focus Attention on Accountability for AI − not on AGI and Longtermist Abstractions by Dr. Michele Loi with Angela M&uuml;ller and Matthias Spielkamp Many tech CEOs and scientists praise AI as the savior of humanity, while others see it as an existential threat. We explain why both fail to address the real questions of responsibility. Position 29 September 2025 Rose Willis & Kathryn "
+    contentLength: 162865
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.williammacaskill.com/s/How-to-Make-the-Future-Better.pdf
+    linkText: How to Make the Future Better - MacAskill (PDF)
+    claimContext: In his work on AI safety, MacAskill identifies value alignment—ensuring that AI systems pursue goals compatible with human values—as a central strategy. He has also discussed the importance of corrigible, risk-averse AI design, and monitoring AI systems for signs of deceptive behavior.[^13] He situa
+    fetchedAt: 2026-02-22T02:21:55.940Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 197849
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://willmacaskill.substack.com/p/effective-altruism-in-the-age-of
+    linkText: Effective Altruism in the Age of AI - MacAskill Substack
+    claimContext: In his work on AI safety, MacAskill identifies value alignment—ensuring that AI systems pursue goals compatible with human values—as a central strategy. He has also discussed the importance of corrigible, risk-averse AI design, and monitoring AI systems for signs of deceptive behavior.[^13] He situa
+    fetchedAt: 2026-02-22T02:21:56.806Z
+    httpStatus: 200
+    pageTitle: Effective altruism in the age of AGI - by Will MacAskill
+    contentSnippet: Effective altruism in the age of AGI - by Will MacAskill Both/And Subscribe Sign in Effective altruism in the age of AGI Three futures for the effective altruism movement. Will MacAskill Oct 10, 2025 107 12 16 Share Summary The EA movement stands at a crossroads. In light of AI’s very rapid progress, and the rise of the AI safety movement, some people view EA as a legacy movement set to fade away; others think we should refocus much more on “classic” cause areas like global health and animal wel
+    contentLength: 275421
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://unherd.com/2022/11/how-effective-is-william-macaskills-altruism/
+    linkText: How Effective Is William MacAskill's Altruism? - UnHerd
+    claimContext: Critics have raised substantial philosophical objections to MacAskill's longtermist framework. Some argue that prioritizing distant future generations—potentially those alive in 25,000 AD—over contemporaries conflicts with natural human partiality and common moral intuitions about obligations to tho
+    fetchedAt: 2026-02-22T02:21:57.156Z
+    httpStatus: 200
+    pageTitle: William MacAskill's ineffective altruism - UnHerd
+    contentSnippet: "William MacAskill&#039;s ineffective altruism - UnHerd Log In Search Home Mission Newsroom Our Writers Watch &#038; Listen Events UnHerd Club Subscribe Politics Culture Science Faith War Society UK US Europe Search for: Home Mission Newsroom Our Writers Watch &#038; Listen Events UnHerd Club Subscribe Log In | Select Edition: Search for: X Close William MacAskill&#8217;s ineffective altruism Silicon Valley&#039;s favourite ethical system is fatally flawed Will MacAskill: Long-termist Photo: Bret"
+    contentLength: 266276
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://ndpr.nd.edu/reviews/what-we-owe-the-future/
+    linkText: Review of *What We Owe the Future* - Notre Dame Philosophical Reviews
+    claimContext: "Population ethics poses particular difficulties. Critics have noted that MacAskill's tentative view that preventing sufficiently good future lives constitutes a moral loss goes beyond standard positions in population ethics, and that his treatment of rival population-ethical views is insufficiently "
+    fetchedAt: 2026-02-22T02:21:58.603Z
+    httpStatus: 200
+    pageTitle: What We Owe The Future | Reviews | Notre Dame Philosophical Reviews | University of Notre Dame
+    contentSnippet: "What We Owe The Future | Reviews | Notre Dame Philosophical Reviews | University of Notre Dame Review Home &rsaquo; Reviews &rsaquo; What We Owe The Future Will MacAskill’s new book starts with a bang. He claims that a moral revolution is coming, if we take seriously three innocent-looking claims: ‘Future people count. There could be lots of them. We can make their lives better’ (9). These form the basis of longtermism , according to which ‘positively influencing the longterm future is a key pri"
+    contentLength: 63877
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://guzey.com/books/doing-good-better/
+    linkText: Critique of *Doing Good Better* - Alexey Guzey
+    claimContext: Critics have challenged MacAskill's use of evidence and his representation of sources. A detailed analysis of *Doing Good Better* by Alexey Guzey argued that the book applies inconsistent criteria—for example, criticizing textbook distributions for lacking test score impact while not holding dewormi
+    fetchedAt: 2026-02-22T02:21:58.661Z
+    httpStatus: 200
+    pageTitle: William MacAskill misrepresents the evidence underlying his key arguments in &#34;Doing Good Better&#34; - Alexey Guzey
+    contentSnippet: "William MacAskill misrepresents the evidence underlying his key arguments in &#34;Doing Good Better&#34; - Alexey Guzey William MacAskill misrepresents the evidence underlying his key arguments in &#34;Doing Good Better&#34; created: 2018-11-15 ; modified: 2021-12-14 Table of Contents 5 random top posts > Every productivity thought I&#39;ve ever had, as concisely as possible > Theses on Sleep > The Effects on Cognition of Sleeping 4 Hours per Night for 12-14 Days: a Pre-Registered Self-Experimen"
+    contentLength: 75097
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://logosjournal.com/article/what-we-owe-the-past-william-macaskill-effective-altruism-and-the-wrong-life/
+    linkText: What We Owe the Past - Logos Journal
+    claimContext: A broader criticism, developed in the Logos Journal, is that MacAskill and EA more generally adopt a narrow positivistic conception of evidence that excludes non-quantifiable moral and historical considerations and that fails to engage deeply with the philosophical tradition.[^18]
+    fetchedAt: 2026-02-22T02:21:58.737Z
+    httpStatus: 200
+    pageTitle: "What We Owe the Past: William MacAskill, Effective Altruism and the Wrong Life - Logos Journal"
+    contentSnippet: "What We Owe the Past: William MacAskill, Effective Altruism and the Wrong Life - Logos Journal Skip to content What We Owe the Past: William MacAskill, Effective Altruism and the Wrong Life James Kent and Michael Lazarus ‘The tradition of all the dead generations weighs like a nightmare on the brain of the living’ – Karl Marx It was, after all, too good to be true. Following the aftermath of the allegations of corruption and bankruptcy of the cryptocurrency exchange company FTX Trading Ltd., Wil"
+    contentLength: 183288
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://crookedtimber.org/2022/11/13/a-rant-on-ftx-william-macaskill-and-utilitarianism/
+    linkText: A Rant on FTX, William MacAskill, and Utilitarianism - Crooked Timber
+    claimContext: The collapse of FTX in late 2022 generated significant criticism of MacAskill and the EA movement. MacAskill's close personal and professional ties to Sam Bankman-Fried—including his role in introducing Bankman-Fried to EA, his involvement with the FTX Future Fund, and his earlier dismissal of misco
+    fetchedAt: 2026-02-22T02:21:59.013Z
+    httpStatus: 200
+    pageTitle: A rant on FTX, William MacAskill, and Utilitarianism &#8212; Crooked Timber
+    contentSnippet: A rant on FTX, William MacAskill, and Utilitarianism &#8212; Crooked Timber Home Comments policy Subscribe A rant on FTX, William MacAskill, and Utilitarianism by Eric Schliesser on November 13, 2022 Philosophy goes through self-conscious, periodic bouts of historical forgetting.* These are moments when philosophical revolutionaries castigate the reading of books and the scholastic jargon to be found in there, and invite us to think for ourselves and start anew with a new method or new technique
+    contentLength: 168381
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.persuasion.community/p/william-macaskill
+    linkText: William MacAskill Interview - Persuasion Community
+    claimContext: The collapse of FTX in late 2022 generated significant criticism of MacAskill and the EA movement. MacAskill's close personal and professional ties to Sam Bankman-Fried—including his role in introducing Bankman-Fried to EA, his involvement with the FTX Future Fund, and his earlier dismissal of misco
+    fetchedAt: 2026-02-22T02:21:58.814Z
+    httpStatus: 200
+    pageTitle: William MacAskill on Effective Altruism - by Yascha Mounk
+    contentSnippet: "William MacAskill on Effective Altruism - by Yascha Mounk Subscribe Sign in The Good Fight William MacAskill on Effective Altruism 5 1 1× 0:00 Current time: 0:00 / Total time: -1:23:14 -1:23:14 Audio playback is not supported on your browser. Please upgrade. William MacAskill on Effective Altruism Yascha Mounk and William MacAskill also discuss artificial intelligence. Yascha Mounk Nov 15, 2025 5 1 Share William MacAskill is a moral philosopher and cofounder of the effective altruism movement. H"
+    contentLength: 478463
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://blog.oup.com/2022/12/the-predictably-grievous-harms-of-effective-altruism/
+    linkText: The Predictably Grievous Harms of Effective Altruism - OUP Blog
+    claimContext: A recurring critique from activists and social theorists is that EA's emphasis on measurable, cost-effective interventions systematically undervalues systemic or structural change—organizing, advocacy, institutional reform—in favor of interventions that are easier to quantify.[^5] Critics also argue
+    fetchedAt: 2026-02-22T02:22:00.483Z
+    httpStatus: 200
+    pageTitle: The predictably grievous harms of Effective Altruism | OUPblog
+    contentSnippet: The predictably grievous harms of Effective Altruism | OUPblog The Good It Promises, the Harm It Does Buy Now By Alice Crary , Lori Gruen , and Carol J. Adams December 12 th 2022 Over the past decade the philanthropic ideology of Effective Altruism (EA) has grown massively both in attracting funds and in influencing young people to try to make as much money as they can and give most of it away. EA offers adherents a philosophy of charitable giving that promises to do the “most good” per dollar d
+    contentLength: 71769
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.econlib.org/library/columns/y2023/broughellongtermism.html
+    linkText: Broughel on Longtermism - EconLib
+    claimContext: Some critics warn that longtermism promotes excessive deliberation and caution around emerging technologies in ways that could lead to policy paralysis and slowed innovation.[^22] Others argue that the longtermist framework, by emphasizing speculative future harms, risks diverting attention and reso
+    fetchedAt: 2026-02-22T02:22:00.824Z
+    httpStatus: 200
+    pageTitle: The Long, Hard Road to "Longtermism" - Econlib
+    contentSnippet: 'The Long, Hard Road to "Longtermism" - Econlib Home &sol; ECONLIB Articles Mar 6 2023 Book Review The Long, Hard Road to "Longtermism" 0 By James Broughel Categories: Book Review By James Broughel, Mar 6 2023 SHARE POST: --> Book Review of What We Owe the Future, by William MacAskill. 1 A n issue that has long divided scholars is the question of how much weight to give to the interests of future generations, especially when making decisions of significant public importance. On one side of this i'
+    contentLength: 119001
+    status: verified
+    note: null

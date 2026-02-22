@@ -1,0 +1,381 @@
+pageId: center-for-applied-rationality
+verifiedAt: 2026-02-22
+totalCitations: 34
+verified: 18
+broken: 16
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Center_for_Applied_Rationality
+    linkText: Wikipedia - Center for Applied Rationality
+    claimContext: The **Center for Applied Rationality (CFAR)** is a nonprofit organization founded in 2012 that develops and teaches techniques to improve epistemic and instrumental rationality through immersive workshops, coaching programs, and curriculum development. The organization emerged from the rationality m
+    fetchedAt: 2026-02-22T02:16:10.981Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://www.rationality.org/files/cfar-press-kit.pdf
+    linkText: CFAR Press Kit
+    claimContext: The **Center for Applied Rationality (CFAR)** is a nonprofit organization founded in 2012 that develops and teaches techniques to improve epistemic and instrumental rationality through immersive workshops, coaching programs, and curriculum development. The organization emerged from the rationality m
+    fetchedAt: 2026-02-22T02:16:11.656Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1072005
+    status: verified
+    note: null
+  - footnote: 3
+    url: http://www.rationality.org/about/mission/
+    linkText: CFAR - About Mission
+    claimContext: CFAR's stated mission is "Developing clear thinking for the sake of humanity's future," with particular emphasis on addressing challenges related to existential risks, including AI safety.[^3] The organization has trained over 1,300 workshop alumni through approximately 60 flagship workshops held be
+    fetchedAt: 2026-02-22T02:16:11.986Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 4
+    url: http://www.rationality.org
+    linkText: CFAR Official Website
+    claimContext: CFAR's stated mission is "Developing clear thinking for the sake of humanity's future," with particular emphasis on addressing challenges related to existential risks, including AI safety.[^3] The organization has trained over 1,300 workshop alumni through approximately 60 flagship workshops held be
+    fetchedAt: 2026-02-22T02:16:11.987Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 5
+    url: https://www.vice.com/en/article/center-for-applied-rationality/
+    linkText: VICE - Center for Applied Rationality
+    claimContext: CFAR's stated mission is "Developing clear thinking for the sake of humanity's future," with particular emphasis on addressing challenges related to existential risks, including AI safety.[^3] The organization has trained over 1,300 workshop alumni through approximately 60 flagship workshops held be
+    fetchedAt: 2026-02-22T02:16:11.923Z
+    httpStatus: 200
+    pageTitle: The 'Rationality' Workshop That Teaches People to Think More Like Computers
+    contentSnippet: The &#039;Rationality&#039; Workshop That Teaches People to Think More Like Computers Back to homepage Subscribe to VICE Get unlimited access to everything VICE has to offer. Digital Monthly $ 2.00 / month Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Digital Annual $ 20.00 / year Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Print & Digital $ 70.00 / year Turn off all ads on
+    contentLength: 343829
+    status: verified
+    note: null
+  - footnote: 6
+    url: http://www.rationality.org/about/mission/
+    linkText: CFAR - About Mission (September 2025)
+    claimContext: The organization has evolved significantly since its founding, transitioning from a full-time staff of approximately 12 to a mostly-remote operation with eight part-time curriculum developers and instructors as of September 2025.[^6] After a multi-year hiatus from regular programming, CFAR resumed m
+    fetchedAt: 2026-02-22T02:16:13.998Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 7
+    url: http://www.rationality.org/resources/updates/
+    linkText: CFAR Resources Updates
+    claimContext: The organization has evolved significantly since its founding, transitioning from a full-time staff of approximately 12 to a mostly-remote operation with eight part-time curriculum developers and instructors as of September 2025.[^6] After a multi-year hiatus from regular programming, CFAR resumed m
+    fetchedAt: 2026-02-22T02:16:14.003Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 8
+    url: https://forum.effectivealtruism.org/topics/center-for-applied-rationality
+    linkText: EA Forum - Center for Applied Rationality
+    claimContext: CFAR was founded in 2012 by **Anna Salamon**, **Julia Galef**, **Michael Smith** (also known as Valentine Smith), and **Andrew Critch**.[^1][^8] The organization's origins trace to Anna Salamon's work at the <EntityLink id="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> in 2011, w
+    fetchedAt: 2026-02-22T02:16:13.835Z
+    httpStatus: 200
+    pageTitle: Center for Applied Rationality - EA Forum
+    contentSnippet: Center for Applied Rationality - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Center for Applied Rationality Edit History Discussion 0 Subscribe Edit History Discussion 0 Center for Applied Rationality History Funding Further reading External links Related entries Random Topic Contributors 2 Pablo 1 Leo The Center for Applied Rationality is a nonprofit organization based in Berkeley,
+    contentLength: 308627
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.vice.com/en/article/center-for-applied-rationality/
+    linkText: VICE - Center for Applied Rationality (Founding)
+    claimContext: CFAR was founded in 2012 by **Anna Salamon**, **Julia Galef**, **Michael Smith** (also known as Valentine Smith), and **Andrew Critch**.[^1][^8] The organization's origins trace to Anna Salamon's work at the <EntityLink id="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> in 2011, w
+    fetchedAt: 2026-02-22T02:16:13.469Z
+    httpStatus: 200
+    pageTitle: The 'Rationality' Workshop That Teaches People to Think More Like Computers
+    contentSnippet: The &#039;Rationality&#039; Workshop That Teaches People to Think More Like Computers Back to homepage Subscribe to VICE Get unlimited access to everything VICE has to offer. Digital Monthly $ 2.00 / month Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Digital Annual $ 20.00 / year Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Print & Digital $ 70.00 / year Turn off all ads on
+    contentLength: 343829
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.youtube.com/watch?v=HS8tUwgUd38
+    linkText: YouTube - CFAR Overview
+    claimContext: CFAR officially began offering classes in 2012, developing a flagship workshop model that charged \$3,900 for multi-day intensive programs.[^9] The organization held monthly workshops training diverse participants including scientists, police officers, teachers, entrepreneurs, and high school studen
+    fetchedAt: 2026-02-22T02:16:13.494Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 11
+    url: https://timelines.issarice.com/wiki/Timeline_of_Center_for_Applied_Rationality
+    linkText: Timeline of Center for Applied Rationality
+    claimContext: CFAR officially began offering classes in 2012, developing a flagship workshop model that charged \$3,900 for multi-day intensive programs.[^9] The organization held monthly workshops training diverse participants including scientists, police officers, teachers, entrepreneurs, and high school studen
+    fetchedAt: 2026-02-22T02:16:15.697Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 618
+    status: verified
+    note: null
+  - footnote: 12
+    url: http://www.rationality.org/resources/updates/2025/june-2025-experimental-miniworkshop
+    linkText: CFAR - June 2025 Experimental Miniworkshop
+    claimContext: After a hiatus from regular programming beginning in early 2020, CFAR conducted an experimental mini-workshop in June 2025 at Arbor Summer Camp and resumed mainline workshops in November 2025, marking the beginning of a pilot program testing new workshop formats.[^7][^12]
+    fetchedAt: 2026-02-22T02:16:16.017Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 13
+    url: https://sfist.com/2016/01/14/debug_my_brain/
+    linkText: SFist - Debug My Brain
+    claimContext: "CFAR's primary educational delivery mechanism has been immersive multi-day workshops, typically running 4.5 days and costing \\$3,900 to \\$4,000.[^4][^13] These workshops emphasize three core pillars: applying critical thinking to real-world problems, having students practice skills rather than merel"
+    fetchedAt: 2026-02-22T02:16:15.786Z
+    httpStatus: 200
+    pageTitle: "Techies Spending $4K A Pop On &#x27;Rationality&#x27; Seminars That Sound Vaguely Culty: SFist"
+    contentSnippet: "Techies Spending $4K A Pop On &#x27;Rationality&#x27; Seminars That Sound Vaguely Culty: SFist --> It's time for a bunch of self-proclaimed \"rationalists\" — a group of mostly technologists in their 20s — to start acting like it and stop paying the Berkeley-based Center For Applied Rationality . I say this because CFAR's $3,900 4-day seminars and their attendees are the subject of a New York Times magazine article this week that will leave you slapping your forehead in front of an imagined group "
+    contentLength: 39500
+    status: verified
+    note: null
+  - footnote: 14
+    url: http://www.rationality.org/studies/2016-case-studies
+    linkText: CFAR 2016 Case Studies
+    claimContext: CFAR develops and refines rationality techniques by synthesizing insights from cognitive science, psychology, neuroscience, behavioral economics, mathematics, statistics, and game theory.[^14] The organization conducts empirical testing of techniques and invents new methods when academic research pr
+    fetchedAt: 2026-02-22T02:16:16.018Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 15
+    url: https://www.effectivealtruism.org/articles/ea-global-2018-cfar-workshop
+    linkText: Effective Altruism - EA Global 2018 CFAR Workshop
+    claimContext: Key techniques taught at CFAR workshops include:[^14][^15]
+    fetchedAt: 2026-02-22T02:16:15.634Z
+    httpStatus: 200
+    pageTitle: Center for Applied Rationality Workshop (2018) | Effective Altruism
+    contentSnippet: "Center for Applied Rationality Workshop (2018) | Effective Altruism Center for Applied Rationality Workshop (2018) “Do you know what you’re doing, and why you’re doing it?” According to Duncan Sabien of the Center for Applied Rationality, this is a key question to ask yourself throughout life. In this workshop from Effective Altruism Global 2018: San Francisco, he describes a few different techniques, including managing your personal autopilot and mimicking useful skills, that all rely on this c"
+    contentLength: 161696
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.benkuhn.net/cfar-workshop/
+    linkText: Ben Kuhn - CFAR Workshop Review
+    claimContext: According to CFAR, these techniques aim to bridge System 1 and System 2 cognition, helping participants work with emotions, reframe problems, and understand the modular nature of the mind.[^16]
+    fetchedAt: 2026-02-22T02:16:17.857Z
+    httpStatus: 200
+    pageTitle: CFAR workshop review | benkuhn.net
+    contentSnippet: "CFAR workshop review | benkuhn.net July 2013 About a month ago I attended a workshop held by the Center For Applied Rationality (CFAR), and it was one of the best decisions I&rsquo;ve made. Here&rsquo;s a review of the workshop and what I took away from it. CFAR&rsquo;s workshops aim to give people more understanding and control of their own decision-making. The techniques we teach are inspired by models of reasoning from probability and decision theory, combined with cognitive science research "
+    contentLength: 40456
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.lesswrong.com/posts/zqqQDtsWGpXN3wBLZ/the-centre-for-applied-rationality-a-year-later-from-a
+    linkText: LessWrong - CFAR A Year Later
+    claimContext: "- **MIRI-focused workshops**: Specialized sessions for AI safety researchers, including the 2015 MIRI Summer Fellows Program (a 3-week training program for AI safety researchers).[^14] - **Alumni support**: Six-week official follow-up programs and ongoing coaching/mentorship for workshop graduates.["
+    fetchedAt: 2026-02-22T02:16:17.909Z
+    httpStatus: 200
+    pageTitle: "The Centre for Applied Rationality: a year later from a (somewhat) outside perspective — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The Centre for Applied Rationality: a year later from a (somewhat) outside perspective — LessWrong Center for Applied Rationality (CFAR) Frontpage 65 The Centre for Applied Rationality: a year later from a (somewhat) outside perspective by Swimmer963 (Miranda Dixon-Luinenburg) 27th May 2013 6 min read 102 65 I recently had the privilege of being a CFAR alumni volunteer"
+    contentLength: 874671
+    status: verified
+    note: null
+  - footnote: 18
+    url: http://www.rationality.org/resources/updates/2017/cfar-2017-impact-report
+    linkText: CFAR 2017 Impact Report
+    claimContext: The organization's 2017 Impact Report indicated that alumni reported higher impact through better motivation navigation and clearer thinking.[^18] However, these results are primarily based on internal surveys without independent replication or external validation.[^19]
+    fetchedAt: 2026-02-22T02:16:18.031Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 19
+    url: https://www.vice.com/en/article/center-for-applied-rationality/
+    linkText: VICE - Center for Applied Rationality (Impact)
+    claimContext: The organization's 2017 Impact Report indicated that alumni reported higher impact through better motivation navigation and clearer thinking.[^18] However, these results are primarily based on internal surveys without independent replication or external validation.[^19]
+    fetchedAt: 2026-02-22T02:16:17.415Z
+    httpStatus: 200
+    pageTitle: The 'Rationality' Workshop That Teaches People to Think More Like Computers
+    contentSnippet: The &#039;Rationality&#039; Workshop That Teaches People to Think More Like Computers Back to homepage Subscribe to VICE Get unlimited access to everything VICE has to offer. Digital Monthly $ 2.00 / month Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Digital Annual $ 20.00 / year Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Print & Digital $ 70.00 / year Turn off all ads on
+    contentLength: 343829
+    status: verified
+    note: null
+  - footnote: 20
+    url: http://www.rationality.org/studies/2016-case-studies
+    linkText: CFAR 2016 Case Studies
+    claimContext: CFAR has documented case studies of alumni contributions to existential risk reduction and AI safety work. Notable examples include:[^20]
+    fetchedAt: 2026-02-22T02:16:18.033Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 21
+    url: http://www.rationality.org/resources/updates/2016/grant-from-open-philanthropy-project
+    linkText: CFAR - Grant from Open Philanthropy Project
+    claimContext: '- **<EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>**: Over \$3.5 million - \$1,035,000 grant in 2016 (two years) for operational improvements and research[^21] - Multi-year institutional grant renewed in 2018 for 2018-2019[^22]'
+    fetchedAt: 2026-02-22T02:16:20.047Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 22
+    url: http://www.rationality.org/resources/updates/2018/fundraising-and-leadership-updates
+    linkText: CFAR - Fundraising and Leadership Updates
+    claimContext: "- \\$1,035,000 grant in 2016 (two years) for operational improvements and research[^21] - Multi-year institutional grant renewed in 2018 for 2018-2019[^22] - **Survival and Flourishing Fund**: Over \\$1.6 million"
+    fetchedAt: 2026-02-22T02:16:20.048Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 23
+    url: https://www.aipanic.news/p/the-rationality-trap
+    linkText: AI Panic News - The Rationality Trap
+    claimContext: "CFAR received substantial funding from FTX before the cryptocurrency exchange's collapse in November 2022. Between March and September 2022, \\$3,405,000 was transferred from the FTX Foundation to CFAR, with an additional \\$1,500,000 transferred on October 3, 2022, in ten separate transactions.[^23] "
+    fetchedAt: 2026-02-22T02:16:20.094Z
+    httpStatus: 200
+    pageTitle: THE RATIONALITY TRAP - by Nirit Weiss-Blatt - AI PANIC
+    contentSnippet: THE RATIONALITY TRAP - by Nirit Weiss-Blatt - AI PANIC Subscribe Sign in THE RATIONALITY TRAP Nirit Weiss-Blatt Sep 12, 2025 28 6 7 Share You can listen to the 6,000 words via ElevenLabs 0:00 -42:48 Audio playback is not supported on your browser. Please upgrade. Prologue Jessica Taylor joined the Machine Intelligence Research Institute (MIRI) in August 2015. Located in Berkeley, California, it was the epicenter of a small community that calls itself the rationalist community. Its leader is writ
+    contentLength: 397992
+    status: verified
+    note: null
+  - footnote: 24
+    url: http://www.rationality.org/resources/updates/2019/cfar-financial-overview
+    linkText: CFAR Financial Overview
+    claimContext: As of December 2019 or 2020, CFAR reported approximately \$1.4 million in total liquidity, including \$650,000 in cash, \$575,000 in expected grants, and \$215,000 in accounts receivable.[^24] The organization's total assets have been reported at \$23,039,646, though this figure may include the venu
+    fetchedAt: 2026-02-22T02:16:20.048Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 25
+    url: https://www.instrumentl.com/990-report/center-for-applied-rationality
+    linkText: Instrumentl - CFAR 990 Report
+    claimContext: As of December 2019 or 2020, CFAR reported approximately \$1.4 million in total liquidity, including \$650,000 in cash, \$575,000 in expected grants, and \$215,000 in accounts receivable.[^24] The organization's total assets have been reported at \$23,039,646, though this figure may include the venu
+    fetchedAt: 2026-02-22T02:16:19.528Z
+    httpStatus: 200
+    pageTitle: Center for Applied Rationality | Berkeley, CA | 990 Report
+    contentSnippet: Center for Applied Rationality | Berkeley, CA | 990 Report Foundation Directory | California | Berkeley Center for Applied Rationality | 990 Report Funder Recipient Save 990 Report Center for Applied Rationality - EIN 453100226 Berkeley, CA - Instrumentl CONTENTS Center for Applied Rationality, based in Berkeley, CA, is a public charity with assets of $23,039,646. Their grant-making focuses on Education, Research Institutes & Public Policy Analysis, and Medical Research. Typical awards are $8,00
+    contentLength: 125148
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.lesswrong.com/posts/3zYXD8RyB6fv2czFz/cfar-s-new-focus-and-ai-safety
+    linkText: LessWrong - CFAR's New Focus and AI Safety
+    claimContext: While CFAR does not operate explicit AI alignment research programs, the organization's focus on improving individual and collective reasoning capacity is positioned as supporting the broader AI safety ecosystem. The rationality techniques taught at CFAR workshops—such as Bayesian reasoning, debiasi
+    fetchedAt: 2026-02-22T02:16:21.798Z
+    httpStatus: 200
+    pageTitle: CFAR’s new focus, and AI Safety — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. CFAR’s new focus, and AI Safety — LessWrong Center for Applied Rationality (CFAR) Project Announcement Frontpage 51 CFAR’s new focus, and AI Safety by AnnaSalamon 3rd Dec 2016 4 min read 88 51 A bit about our last few months: We’ve been working on getting a simple clear mission and an organization that actually works. We think of our goal as analogous to the transition"
+    contentLength: 913591
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://acritch.com/cfar/
+    linkText: Andrew Critch - CFAR
+    claimContext: While CFAR does not operate explicit AI alignment research programs, the organization's focus on improving individual and collective reasoning capacity is positioned as supporting the broader AI safety ecosystem. The rationality techniques taught at CFAR workshops—such as Bayesian reasoning, debiasi
+    fetchedAt: 2026-02-22T02:16:21.809Z
+    httpStatus: 200
+    pageTitle: The Center for Applied Rationality (CFAR) | Andrew Critch
+    contentSnippet: "The Center for Applied Rationality (CFAR) | Andrew Critch Andrew Critch PhD, UC Berkeley Skip to content Home Research Papers Software Selected talks Activities Blog Jekyll posts (2018-present) WordPress posts (2014-2018) Life AI Safety Effectiveness Altruism LessWrong posts (2010-2012) Videos Math Robust Rental Harmony PDTAI : Provability, Decision Theory and Artificial Intelligence SAGS at Berkeley: Student Algebraic Geometry Seminar MPHD at Berkeley: Math, Productivity, Happiness &#038; Decis"
+    contentLength: 72987
+    status: verified
+    note: null
+  - footnote: 28
+    url: http://www.rationality.org/resources/updates/2019/cfars-mistakes-regarding-brent
+    linkText: CFAR - Mistakes Regarding Brent
+    claimContext: In 2018-2019, CFAR faced significant criticism for its handling of allegations against a community member known as Brent (likely Brent Hildebrand). In January 2018, CFAR's semi-independent investigation panel, ACDC, received allegations of physical, sexual, and emotional abuse from one of Brent's fo
+    fetchedAt: 2026-02-22T02:16:22.115Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 29
+    url: https://www.lesswrong.com/posts/B9kP6x5rpmuCzpfWb/comment-reply-my-low-quality-thoughts-on-why-cfar-didn-t-get
+    linkText: LessWrong - Comment on Why CFAR Didn't Get Far
+    claimContext: 'Some rationality community members have criticized CFAR for limited progress in creating a "real art of rationality" that aids meaningful intellectual advancement, citing "model gaps," impure motives (such as prioritizing AI safety career placement and deference to organizations like MIRI over pure '
+    fetchedAt: 2026-02-22T02:16:22.053Z
+    httpStatus: 200
+    pageTitle: 'Comment reply: my low-quality thoughts on why CFAR didn&#x27;t get farther with a "real/efficacious art of rationality" — LessWrong'
+    contentSnippet: 'x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Comment reply: my low-quality thoughts on why CFAR didn&#x27;t get farther with a "real/efficacious art of rationality" — LessWrong Best of LessWrong 2022 Center for Applied Rationality (CFAR) Postmortems & Retrospectives Rationality Community Personal Blog 274 Comment reply: my low-quality thoughts on why CFAR didn&#x27;t get farther with a "real/efficacious art of ra'
+    contentLength: 1188771
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.causeiq.com/organizations/center-for-applied-rationality,453100226/
+    linkText: Cause IQ - Center for Applied Rationality
+    claimContext: CFAR has contributed to building social infrastructure within rationality and EA communities through workshops, alumni networks, and partnerships with organizations like Effective Altruism Global.[^30] The organization has served as a gathering point for "rationality geeks" to exchange ideas on cogn
+    fetchedAt: 2026-02-22T02:16:21.615Z
+    httpStatus: 200
+    pageTitle: Center for Applied Rationality (CFAR) | Berkeley, CA | Cause IQ
+    contentSnippet: Center for Applied Rationality (CFAR) | Berkeley, CA | Cause IQ Nonprofits Nonprofits by category Nonprofits by location Product Prospect for nonprofits Research opportunities Benchmark clients Enrich information Plans and pricing Customers Accounting firms Technology companies Financial services firms Nonprofit organizations Fundraising firms Consulting firms Other organizations About Insights Better data Purpose-built tools Integrations About us Sign in Directory California Berkeley Center for
+    contentLength: 166746
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.lesswrong.com/posts/LjqHHs4jqBkNkEcfA/blackpool-applied-rationality-unconference-2025
+    linkText: LessWrong - Blackpool Applied Rationality Unconference 2025
+    claimContext: Community-led initiatives have emerged from CFAR's alumni network. The Applied Rationality Unconference series, organized by CFAR alumni, began with a first retreat in 2023, followed by a second in November 2024 that opened participation beyond CFAR alumni.[^31] Multiple additional events were organ
+    fetchedAt: 2026-02-22T02:16:23.900Z
+    httpStatus: 200
+    pageTitle: Blackpool Applied Rationality Unconference 2025 — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Blackpool Applied Rationality Unconference 2025 — LessWrong Center for Applied Rationality (CFAR) Meetups & Local Communities (topic) Community Rationality Personal Blog 23 Blackpool Applied Rationality Unconference 2025 by Henry Prowbell , emily.fan 1st Feb 2025 8 min read 2 23 TL;DR Join us for 4 days of applied rationality workshops and activities at the EA Hotel th
+    contentLength: 436119
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.lesswrong.com/posts/McsqZQBbwJnDXimNp/what-is-going-on-with-cfar
+    linkText: LessWrong - What is Going on with CFAR
+    claimContext: As of recent reports, CFAR appears to have reduced its role as a central organizing force within the rationality community, though "shards of the organisation still help with AIRCS workshops."[^32] According to LessWrong discussions, there is no longer "a concentration of force working towards a pub
+    fetchedAt: 2026-02-22T02:16:23.649Z
+    httpStatus: 200
+    pageTitle: What is Going On With CFAR? — LessWrong
+    contentSnippet: 'x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. What is Going On With CFAR? — LessWrong Center for Applied Rationality (CFAR) Community Personal Blog 95 [ Question ] What is Going On With CFAR? by niplav 28th May 2022 1 min read A 3 34 95 Whispers have been going around on the internet . People have been talking , using words like "defunct" or "inactive" (not yet "dead"). The last update to the website was December '
+    contentLength: 633851
+    status: verified
+    note: null
+  - footnote: 33
+    url: http://www.rationality.org/resources/updates/2014/an-impressive-failure
+    linkText: CFAR - An Impressive Failure
+    claimContext: 'In 2013, CFAR highlighted as an example of "wise failure" the "impressively failed" Effective Fundraising Project—a two-person nonprofit startup founded in 2013 to write grants for effective charities that shut down gracefully after six months.[^33][^34] While CFAR presented this as a case study in '
+    fetchedAt: 2026-02-22T02:16:24.128Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 34
+    url: http://www.rationality.org/resources/updates/archive
+    linkText: CFAR Updates Archive
+    claimContext: 'In 2013, CFAR highlighted as an example of "wise failure" the "impressively failed" Effective Fundraising Project—a two-person nonprofit startup founded in 2013 to write grants for effective charities that shut down gracefully after six months.[^33][^34] While CFAR presented this as a case study in '
+    fetchedAt: 2026-02-22T02:16:24.127Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed

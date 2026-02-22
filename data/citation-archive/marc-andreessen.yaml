@@ -1,0 +1,964 @@
+pageId: marc-andreessen
+verifiedAt: 2026-02-22
+totalCitations: 87
+verified: 73
+broken: 14
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.britannica.com/biography/Marc-Andreessen
+    linkText: Marc Andreessen - Britannica
+    claimContext: Marc Andreessen is an American businessman, venture capitalist, and former software engineer who played a foundational role in shaping the modern internet and now wields significant influence over AI development through his venture capital firm.[^1] Born on July 9, 1971, in Cedar Falls, Iowa, Andree
+    fetchedAt: 2026-02-22T01:48:56.828Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Biography & Facts | Britannica
+    contentSnippet: "Marc Andreessen | Biography & Facts | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos Marc Andreessen Introduction References & Edit History Quick Facts & Related Topics Images Quizzes Computers and Technology Quiz Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or "
+    contentLength: 77983
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.encyclopedia.com/people/science-and-technology/technology-biographies/marc-andreessen
+    linkText: Marc Andreessen - Encyclopedia.com
+    claimContext: Marc Andreessen is an American businessman, venture capitalist, and former software engineer who played a foundational role in shaping the modern internet and now wields significant influence over AI development through his venture capital firm.[^1] Born on July 9, 1971, in Cedar Falls, Iowa, Andree
+    fetchedAt: 2026-02-22T01:48:56.582Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Encyclopedia.com
+    contentSnippet: 'Marc Andreessen | Encyclopedia.com Skip to main content People Science and Technology Technology: Biographies Marc Andreessen Andreessen, Marc gale views updated May 14 2018 Marc Andreessen Born: 1971 Cedar Falls, Iowa Cofounder, Netscape Communications Corporation Marc Andreessen has been called many things in his young life &#x2014; from boy wonder and "Golden Geek" to visionary and "Internet Evangelist" &#x2014; all because he helped develop an Internet browser called Netscape Navigator. In t'
+    contentLength: 147159
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.entrepreneur.com/growing-a-business/marc-andreessen-biography/197600
+    linkText: Marc Andreessen Biography - Entrepreneur
+    claimContext: Marc Andreessen is an American businessman, venture capitalist, and former software engineer who played a foundational role in shaping the modern internet and now wields significant influence over AI development through his venture capital firm.[^1] Born on July 9, 1971, in Cedar Falls, Iowa, Andree
+    fetchedAt: 2026-02-22T01:48:58.261Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Biography
+    contentSnippet: Marc Andreessen Biography Skip to main content You're viewing the US website. Looking for the India edition? Go to India Site Newsletters Search Search Build Your Business Start Your Business Market Research and Validation Identify Your Target Audience Competitive Analysis Pricing Strategy Validate Your Business Idea Interview Customers Planning and Strategy Write Your Business Plan Choose Your Business Model Decide Your Business Structure Register Your Business Funding Bootstrapping Loans and G
+    contentLength: 186506
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: In 2009, Andreessen co-founded **Andreessen Horowitz (a16z)** with Ben Horowitz, a venture capital firm that grew from \$300 million in initial capitalization to \$2.7 billion under management across three funds.[^5] The firm has invested in major technology companies including Facebook, Twitter, Gi
+    fetchedAt: 2026-02-22T01:48:56.319Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: In 2009, Andreessen co-founded **Andreessen Horowitz (a16z)** with Ben Horowitz, a venture capital firm that grew from \$300 million in initial capitalization to \$2.7 billion under management across three funds.[^5] The firm has invested in major technology companies including Facebook, Twitter, Gi
+    fetchedAt: 2026-02-22T01:48:56.317Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://a16z.com/author/marc-andreessen/
+    linkText: Marc Andreessen - a16z
+    claimContext: Andreessen has become a prominent voice in debates about technology policy, particularly regarding artificial intelligence. His June 2023 essay "Why AI Will Save the World" and October 2023 "Techno-Optimist Manifesto" sparked widespread debate by dismissing AI existential risk concerns and advocatin
+    fetchedAt: 2026-02-22T01:49:00.122Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen, Partner at Andreessen Horowitz
+    contentSnippet: Marc Andreessen, Partner at Andreessen Horowitz Follow Marc General Marc Andreessen Cofounder More About Marc Marc Andreessen is a cofounder and general partner at the venture capital firm Andreessen Horowitz. He is an innovator and creator, one of the few to pioneer a software category used by more than a billion people and one of the few to establish multiple billion-dollar companies. Marc co-created the highly influential Mosaic internet browser and co-founded Netscape, which later sold to AO
+    contentLength: 152474
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: Andreessen has become a prominent voice in debates about technology policy, particularly regarding artificial intelligence. His June 2023 essay "Why AI Will Save the World" and October 2023 "Techno-Optimist Manifesto" sparked widespread debate by dismissing AI existential risk concerns and advocatin
+    fetchedAt: 2026-02-22T01:48:59.659Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.dwarkesh.com/p/contra-marc-andreessen-on-ai
+    linkText: Contra Marc Andreessen on AI - Dwarkesh Patel
+    claimContext: Andreessen has become a prominent voice in debates about technology policy, particularly regarding artificial intelligence. His June 2023 essay "Why AI Will Save the World" and October 2023 "Techno-Optimist Manifesto" sparked widespread debate by dismissing AI existential risk concerns and advocatin
+    fetchedAt: 2026-02-22T01:49:00.451Z
+    httpStatus: 200
+    pageTitle: Contra Marc Andreessen on AI - by Dwarkesh Patel
+    contentSnippet: Contra Marc Andreessen on AI - by Dwarkesh Patel Dwarkesh Podcast Subscribe Sign in Blog Contra Marc Andreessen on AI "The claim that you will completely control any system you build is obviously false, and a hacker like Marc should know that" Dwarkesh Patel Jun 13, 2023 330 80 29 Share Marc Andreessen published a new essay about why AI will save the world . I had Marc on my podcast a few months ago ( YouTube , Audio ), and he was, as he is usually, very thoughtful and interesting. But in the ca
+    contentLength: 261648
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.entrepreneur.com/growing-a-business/marc-andreessen-biography/197600
+    linkText: Marc Andreessen Biography - Entrepreneur
+    claimContext: Andreessen showed early aptitude for computing, teaching himself BASIC programming at age eight.[^10] He earned a bachelor's degree in computer science from the University of Illinois at Urbana-Champaign, where he worked at the National Center for Supercomputing Applications (NCSA).[^11]
+    fetchedAt: 2026-02-22T01:49:00.312Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Biography
+    contentSnippet: Marc Andreessen Biography Skip to main content You're viewing the US website. Looking for the India edition? Go to India Site Newsletters Search Search Build Your Business Start Your Business Market Research and Validation Identify Your Target Audience Competitive Analysis Pricing Strategy Validate Your Business Idea Interview Customers Planning and Strategy Write Your Business Plan Choose Your Business Model Decide Your Business Structure Register Your Business Funding Bootstrapping Loans and G
+    contentLength: 186506
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.britannica.com/biography/Marc-Andreessen
+    linkText: Marc Andreessen - Britannica
+    claimContext: Andreessen showed early aptitude for computing, teaching himself BASIC programming at age eight.[^10] He earned a bachelor's degree in computer science from the University of Illinois at Urbana-Champaign, where he worked at the National Center for Supercomputing Applications (NCSA).[^11]
+    fetchedAt: 2026-02-22T01:48:59.406Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Biography & Facts | Britannica
+    contentSnippet: "Marc Andreessen | Biography & Facts | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos Marc Andreessen Introduction References & Edit History Quick Facts & Related Topics Images Quizzes Computers and Technology Quiz Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or "
+    contentLength: 75921
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.encyclopedia.com/people/science-and-technology/technology-biographies/marc-andreessen
+    linkText: Marc Andreessen - Encyclopedia.com
+    claimContext: In 1993, while still an undergraduate, Andreessen and programmer Eric Bina worked 80-hour weeks over two months to develop Mosaic, creating an interface that integrated text, graphics, and sound to navigate the World Wide Web.[^12] The NCSA team completed Mosaic in 1993 and released it free over the
+    fetchedAt: 2026-02-22T01:49:01.683Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Encyclopedia.com
+    contentSnippet: 'Marc Andreessen | Encyclopedia.com Skip to main content People Science and Technology Technology: Biographies Marc Andreessen Andreessen, Marc gale views updated May 14 2018 Marc Andreessen Born: 1971 Cedar Falls, Iowa Cofounder, Netscape Communications Corporation Marc Andreessen has been called many things in his young life &#x2014; from boy wonder and "Golden Geek" to visionary and "Internet Evangelist" &#x2014; all because he helped develop an Internet browser called Netscape Navigator. In t'
+    contentLength: 147159
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.encyclopedia.com/people/science-and-technology/technology-biographies/marc-andreessen
+    linkText: Marc Andreessen - Encyclopedia.com
+    claimContext: In 1993, while still an undergraduate, Andreessen and programmer Eric Bina worked 80-hour weeks over two months to develop Mosaic, creating an interface that integrated text, graphics, and sound to navigate the World Wide Web.[^12] The NCSA team completed Mosaic in 1993 and released it free over the
+    fetchedAt: 2026-02-22T01:49:01.755Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Encyclopedia.com
+    contentSnippet: 'Marc Andreessen | Encyclopedia.com Skip to main content People Science and Technology Technology: Biographies Marc Andreessen Andreessen, Marc gale views updated May 14 2018 Marc Andreessen Born: 1971 Cedar Falls, Iowa Cofounder, Netscape Communications Corporation Marc Andreessen has been called many things in his young life &#x2014; from boy wonder and "Golden Geek" to visionary and "Internet Evangelist" &#x2014; all because he helped develop an Internet browser called Netscape Navigator. In t'
+    contentLength: 147159
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.internethalloffame.org/inductee/marc-andreessen/
+    linkText: Marc Andreessen - Internet Hall of Fame
+    claimContext: Andreessen was inducted into the World Wide Web Hall of Fame in 1994 for this achievement.[^14]
+    fetchedAt: 2026-02-22T01:49:01.856Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen - Internet Hall of Fame
+    contentSnippet: Marc Andreessen - Internet Hall of Fame Skip to primary navigation Skip to main content Skip to footer 2013 Inductee Marc Andreessen Internet Hall of Fame Innovator Marc Andreessen is an entrepreneur, investor and software engineer best known as co-author of Mosaic, the first widely used Web browser. As an undergraduate at the University of Illinois at Urbana-Champaign, he worked at the university’s National Center for Supercomputing Applications (NCSA), where he became familiar with Tim Berners
+    contentLength: 62566
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.entrepreneur.com/growing-a-business/marc-andreessen-biography/197600
+    linkText: Marc Andreessen Biography - Entrepreneur
+    claimContext: In April 1994, at age 22, Andreessen co-founded Mosaic Communications Corporation with James Clark, founder of Silicon Graphics, using \$4 million of Clark's capital.[^15] Andreessen served as vice president of technology and recruited original Mosaic team members, including Eric Bina, to join the n
+    fetchedAt: 2026-02-22T01:49:02.789Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Biography
+    contentSnippet: Marc Andreessen Biography Skip to main content You're viewing the US website. Looking for the India edition? Go to India Site Newsletters Search Search Build Your Business Start Your Business Market Research and Validation Identify Your Target Audience Competitive Analysis Pricing Strategy Validate Your Business Idea Interview Customers Planning and Strategy Write Your Business Plan Choose Your Business Model Decide Your Business Structure Register Your Business Funding Bootstrapping Loans and G
+    contentLength: 186506
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.encyclopedia.com/people/science-and-technology/technology-biographies/marc-andreessen
+    linkText: Marc Andreessen - Encyclopedia.com
+    claimContext: In April 1994, at age 22, Andreessen co-founded Mosaic Communications Corporation with James Clark, founder of Silicon Graphics, using \$4 million of Clark's capital.[^15] Andreessen served as vice president of technology and recruited original Mosaic team members, including Eric Bina, to join the n
+    fetchedAt: 2026-02-22T01:49:01.563Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Encyclopedia.com
+    contentSnippet: 'Marc Andreessen | Encyclopedia.com Skip to main content People Science and Technology Technology: Biographies Marc Andreessen Andreessen, Marc gale views updated May 14 2018 Marc Andreessen Born: 1971 Cedar Falls, Iowa Cofounder, Netscape Communications Corporation Marc Andreessen has been called many things in his young life &#x2014; from boy wonder and "Golden Geek" to visionary and "Internet Evangelist" &#x2014; all because he helped develop an Internet browser called Netscape Navigator. In t'
+    contentLength: 147159
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.entrepreneur.com/growing-a-business/marc-andreessen-biography/197600
+    linkText: Marc Andreessen Biography - Entrepreneur
+    claimContext: In April 1994, at age 22, Andreessen co-founded Mosaic Communications Corporation with James Clark, founder of Silicon Graphics, using \$4 million of Clark's capital.[^15] Andreessen served as vice president of technology and recruited original Mosaic team members, including Eric Bina, to join the n
+    fetchedAt: 2026-02-22T01:49:04.985Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Biography
+    contentSnippet: Marc Andreessen Biography Skip to main content You're viewing the US website. Looking for the India edition? Go to India Site Newsletters Search Search Build Your Business Start Your Business Market Research and Validation Identify Your Target Audience Competitive Analysis Pricing Strategy Validate Your Business Idea Interview Customers Planning and Strategy Write Your Business Plan Choose Your Business Model Decide Your Business Structure Register Your Business Funding Bootstrapping Loans and G
+    contentLength: 186506
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.britannica.com/biography/Marc-Andreessen
+    linkText: Marc Andreessen - Britannica
+    claimContext: 'The new browser was initially called "Mozilla" (short for "Mosaic Killer") by developers but was marketed as Netscape Navigator.[^18] By mid-1996, Netscape Navigator had become the dominant browser, capturing over 75% of market share.[^19] The company reported \$55 million in revenues for the first '
+    fetchedAt: 2026-02-22T01:49:04.269Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Biography & Facts | Britannica
+    contentSnippet: "Marc Andreessen | Biography & Facts | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos Marc Andreessen Introduction References & Edit History Quick Facts & Related Topics Images Quizzes Computers and Technology Quiz Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or "
+    contentLength: 75922
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.britannica.com/biography/Marc-Andreessen
+    linkText: Marc Andreessen - Britannica
+    claimContext: 'The new browser was initially called "Mozilla" (short for "Mosaic Killer") by developers but was marketed as Netscape Navigator.[^18] By mid-1996, Netscape Navigator had become the dominant browser, capturing over 75% of market share.[^19] The company reported \$55 million in revenues for the first '
+    fetchedAt: 2026-02-22T01:49:04.168Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Biography & Facts | Britannica
+    contentSnippet: "Marc Andreessen | Biography & Facts | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos Marc Andreessen Introduction References & Edit History Quick Facts & Related Topics Images Quizzes Computers and Technology Quiz Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or "
+    contentLength: 75923
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.britannica.com/biography/Marc-Andreessen
+    linkText: Marc Andreessen - Britannica
+    claimContext: 'The new browser was initially called "Mozilla" (short for "Mosaic Killer") by developers but was marketed as Netscape Navigator.[^18] By mid-1996, Netscape Navigator had become the dominant browser, capturing over 75% of market share.[^19] The company reported \$55 million in revenues for the first '
+    fetchedAt: 2026-02-22T01:49:04.321Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Biography & Facts | Britannica
+    contentSnippet: "Marc Andreessen | Biography & Facts | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos Marc Andreessen Introduction References & Edit History Quick Facts & Related Topics Images Quizzes Computers and Technology Quiz Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or "
+    contentLength: 75922
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.businessinsider.com/a-look-inside-the-insanely-successful-life-of-investor-marc-andreessen-2015-12
+    linkText: A Look Inside The Insanely Successful Life Of Investor Marc Andreessen - Business Insider
+    claimContext: In August 1995, Netscape's initial public offering made Andreessen suddenly wealthy; at age 24, he was worth \$56 million on the day of the IPO.[^21] He appeared on the cover of Time magazine in 1996, symbolizing the dot-com boom.[^22] On February 18, 1999, AOL acquired Netscape for \$4.3 billion, a
+    fetchedAt: 2026-02-22T01:49:04.384Z
+    httpStatus: 200
+    pageTitle: A Look Inside the Insanely Successful Life of Investor Marc Andreessen - Business Insider
+    contentSnippet: A Look Inside the Insanely Successful Life of Investor Marc Andreessen - Business Insider Tech A look inside the insanely successful life of Silicon Valley investor Marc Andreessen By Maya Kosoff 2015-12-13T14:14:01.000Z Share Copy link Email Facebook WhatsApp X LinkedIn Bluesky Threads lighning bolt icon An icon in the shape of a lightning bolt. Impact Link Save Saved Read in app This story is available exclusively to Business Insider subscribers. Become an Insider and start reading now. Have a
+    contentLength: 468555
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.britannica.com/biography/Marc-Andreessen
+    linkText: Marc Andreessen - Britannica
+    claimContext: In August 1995, Netscape's initial public offering made Andreessen suddenly wealthy; at age 24, he was worth \$56 million on the day of the IPO.[^21] He appeared on the cover of Time magazine in 1996, symbolizing the dot-com boom.[^22] On February 18, 1999, AOL acquired Netscape for \$4.3 billion, a
+    fetchedAt: 2026-02-22T01:49:06.158Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Biography & Facts | Britannica
+    contentSnippet: "Marc Andreessen | Biography & Facts | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos Marc Andreessen Introduction References & Edit History Quick Facts & Related Topics Images Quizzes Computers and Technology Quiz Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or "
+    contentLength: 75923
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.entrepreneur.com/growing-a-business/marc-andreessen-biography/197600
+    linkText: Marc Andreessen Biography - Entrepreneur
+    claimContext: In August 1995, Netscape's initial public offering made Andreessen suddenly wealthy; at age 24, he was worth \$56 million on the day of the IPO.[^21] He appeared on the cover of Time magazine in 1996, symbolizing the dot-com boom.[^22] On February 18, 1999, AOL acquired Netscape for \$4.3 billion, a
+    fetchedAt: 2026-02-22T01:49:07.176Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Biography
+    contentSnippet: Marc Andreessen Biography Skip to main content You're viewing the US website. Looking for the India edition? Go to India Site Newsletters Search Search Build Your Business Start Your Business Market Research and Validation Identify Your Target Audience Competitive Analysis Pricing Strategy Validate Your Business Idea Interview Customers Planning and Strategy Write Your Business Plan Choose Your Business Model Decide Your Business Structure Register Your Business Funding Bootstrapping Loans and G
+    contentLength: 186506
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.entrepreneur.com/growing-a-business/marc-andreessen-biography/197600
+    linkText: Marc Andreessen Biography - Entrepreneur
+    claimContext: "In October 1999, Andreessen co-founded Loudcloud, Inc. with Ben Horowitz and others as a web-hosting and e-commerce services company.[^24] The company was later renamed Opsware and focused on data center automation software. In 2007, Hewlett-Packard acquired Opsware for \\$1.6 billion, making it one "
+    fetchedAt: 2026-02-22T01:49:07.086Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Biography
+    contentSnippet: Marc Andreessen Biography Skip to main content You're viewing the US website. Looking for the India edition? Go to India Site Newsletters Search Search Build Your Business Start Your Business Market Research and Validation Identify Your Target Audience Competitive Analysis Pricing Strategy Validate Your Business Idea Interview Customers Planning and Strategy Write Your Business Plan Choose Your Business Model Decide Your Business Structure Register Your Business Funding Bootstrapping Loans and G
+    contentLength: 186506
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: "In October 1999, Andreessen co-founded Loudcloud, Inc. with Ben Horowitz and others as a web-hosting and e-commerce services company.[^24] The company was later renamed Opsware and focused on data center automation software. In 2007, Hewlett-Packard acquired Opsware for \\$1.6 billion, making it one "
+    fetchedAt: 2026-02-22T01:49:06.003Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 27
+    url: https://www.britannica.com/biography/Marc-Andreessen
+    linkText: Marc Andreessen - Britannica
+    claimContext: In October 2004, Andreessen co-founded Ning with Gina Bianchini, a platform allowing users to create custom social networks.[^27] Ning was sold to Mode Media in 2011 for approximately \$150 million.[^28]
+    fetchedAt: 2026-02-22T01:49:06.129Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Biography & Facts | Britannica
+    contentSnippet: "Marc Andreessen | Biography & Facts | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos Marc Andreessen Introduction References & Edit History Quick Facts & Related Topics Images Quizzes Computers and Technology Quiz Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or "
+    contentLength: 75922
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://businessabc.net/wiki/marc-andreessen
+    linkText: Marc Andreessen - Business ABC
+    claimContext: In October 2004, Andreessen co-founded Ning with Gina Bianchini, a platform allowing users to create custom social networks.[^27] Ning was sold to Mode Media in 2011 for approximately \$150 million.[^28]
+    fetchedAt: 2026-02-22T01:49:14.667Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen - Entrepreneur, Investor
+    contentSnippet: Marc Andreessen - Entrepreneur, Investor We value your privacy We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies. Cancel Accept All 3 Home Leaders / Influencers Marc Andreessen Marc Andreessen Marc Andreessen is an American entrepreneur, software engineer, and investor. He co-created the Mosaic browser, co-founded Netscape, and is the co-founder and general partner of the ven
+    contentLength: 113256
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: Andreessen and Ben Horowitz announced their venture capital firm on July 6, 2009, after investing \$80 million in 45 startups (including Twitter) as super angel investors from 2005-2009.[^29] The firm launched with \$300 million in initial capitalization and grew to \$2.7 billion under management wi
+    fetchedAt: 2026-02-22T01:49:08.187Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 30
+    url: https://www.allamericanspeakers.com/celebritytalentbios/Marc+Andreessen/385643
+    linkText: Marc Andreessen - All American Speakers
+    claimContext: Andreessen and Ben Horowitz announced their venture capital firm on July 6, 2009, after investing \$80 million in 45 startups (including Twitter) as super angel investors from 2005-2009.[^29] The firm launched with \$300 million in initial capitalization and grew to \$2.7 billion under management wi
+    fetchedAt: 2026-02-22T01:49:08.703Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 31
+    url: https://a16z.com/about/
+    linkText: About Andreessen Horowitz
+    claimContext: Andreessen and Ben Horowitz announced their venture capital firm on July 6, 2009, after investing \$80 million in 45 startups (including Twitter) as super angel investors from 2005-2009.[^29] The firm launched with \$300 million in initial capitalization and grew to \$2.7 billion under management wi
+    fetchedAt: 2026-02-22T01:49:08.667Z
+    httpStatus: 200
+    pageTitle: About a16z.com (Venture Capital & Investment Firm) | a16z
+    contentSnippet: "About a16z.com (Venture Capital & Investment Firm) | a16z It's time to build Andreessen Horowitz (aka a16z) is a venture capital firm that backs bold entrepreneurs building the future through technology. We are stage agnostic : We invest in seed to venture to growth-stage technology companies, across bio + healthcare , consumer and enterprise apps, crypto , fintech , infrastructure , and companies building toward American dynamism . a16z has over $90B under management across multiple funds. Resp"
+    contentLength: 104361
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.encyclopedia.com/people/science-and-technology/technology-biographies/marc-andreessen
+    linkText: Marc Andreessen - Encyclopedia.com
+    claimContext: The firm operates with a distinctive "talent agency" model inspired by Creative Artists Agency, where general partners work collaboratively on behalf of all portfolio companies rather than maintaining individual portfolios.[^32] This structure emphasizes respect for entrepreneurs and provides portfo
+    fetchedAt: 2026-02-22T01:49:08.699Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Encyclopedia.com
+    contentSnippet: 'Marc Andreessen | Encyclopedia.com Skip to main content People Science and Technology Technology: Biographies Marc Andreessen Andreessen, Marc gale views updated May 14 2018 Marc Andreessen Born: 1971 Cedar Falls, Iowa Cofounder, Netscape Communications Corporation Marc Andreessen has been called many things in his young life &#x2014; from boy wonder and "Golden Geek" to visionary and "Internet Evangelist" &#x2014; all because he helped develop an Internet browser called Netscape Navigator. In t'
+    contentLength: 147159
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://a16z.com/about/
+    linkText: About Andreessen Horowitz
+    claimContext: The firm operates with a distinctive "talent agency" model inspired by Creative Artists Agency, where general partners work collaboratively on behalf of all portfolio companies rather than maintaining individual portfolios.[^32] This structure emphasizes respect for entrepreneurs and provides portfo
+    fetchedAt: 2026-02-22T01:49:16.328Z
+    httpStatus: 200
+    pageTitle: About a16z.com (Venture Capital & Investment Firm) | a16z
+    contentSnippet: "About a16z.com (Venture Capital & Investment Firm) | a16z It's time to build Andreessen Horowitz (aka a16z) is a venture capital firm that backs bold entrepreneurs building the future through technology. We are stage agnostic : We invest in seed to venture to growth-stage technology companies, across bio + healthcare , consumer and enterprise apps, crypto , fintech , infrastructure , and companies building toward American dynamism . a16z has over $90B under management across multiple funds. Resp"
+    contentLength: 104361
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://a16z.com/about/
+    linkText: About Andreessen Horowitz
+    claimContext: Andreessen Horowitz invests stage-agnostically across multiple sectors including AI, biotechnology/healthcare, consumer and enterprise applications, cryptocurrency, fintech, infrastructure, and "American dynamism" (hard tech like space, defense, manufacturing, and robotics).[^34]
+    fetchedAt: 2026-02-22T01:49:16.589Z
+    httpStatus: 200
+    pageTitle: About a16z.com (Venture Capital & Investment Firm) | a16z
+    contentSnippet: "About a16z.com (Venture Capital & Investment Firm) | a16z It's time to build Andreessen Horowitz (aka a16z) is a venture capital firm that backs bold entrepreneurs building the future through technology. We are stage agnostic : We invest in seed to venture to growth-stage technology companies, across bio + healthcare , consumer and enterprise apps, crypto , fintech , infrastructure , and companies building toward American dynamism . a16z has over $90B under management across multiple funds. Resp"
+    contentLength: 104361
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://worth.com/a-decade-later-how-has-andreessen-horowitz-changed-silicon-valley/
+    linkText: A Decade Later, How Has Andreessen Horowitz Changed Silicon Valley? - Worth
+    claimContext: Notable investments include early backing of Airbnb (\$60 million of a \$112 million round in 2011), Facebook, Twitter, GitHub, Pinterest, and Foursquare.[^36] The firm has seen numerous portfolio companies go public, including Lyft, PagerDuty, and Pinterest (all in the spring of 2019), as well as O
+    fetchedAt: 2026-02-22T01:49:16.208Z
+    httpStatus: 200
+    pageTitle: 10 Years Later, How Has Andreessen Horowitz Changed Silicon Valley? | Worth
+    contentSnippet: 10 Years Later, How Has Andreessen Horowitz Changed Silicon Valley? | Worth Skip to content Finance 10 Years Later, How Has Andreessen Horowitz Changed Silicon Valley? Finance 10 Years Later, How Has Andreessen Horowitz Changed Silicon Valley? The story of how Andreessen Horowitz became Silicon Valley’s most influential venture capital firm. By Alisha Green August 1, 2019 Marc Andreessen (L) speaks at the Fortune Global Forum in San Francisco W h en Marc Andreessen and Ben Horowitz founded their
+    contentLength: 833582
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://en.wikipedia.org/wiki/Andreessen_Horowitz
+    linkText: Andreessen Horowitz - Wikipedia
+    claimContext: Notable investments include early backing of Airbnb (\$60 million of a \$112 million round in 2011), Facebook, Twitter, GitHub, Pinterest, and Foursquare.[^36] The firm has seen numerous portfolio companies go public, including Lyft, PagerDuty, and Pinterest (all in the spring of 2019), as well as O
+    fetchedAt: 2026-02-22T01:49:15.691Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 38
+    url: https://en.wikipedia.org/wiki/Andreessen_Horowitz
+    linkText: Andreessen Horowitz - Wikipedia
+    claimContext: Andreessen Horowitz has become one of the largest investors in cryptocurrency and blockchain technology. The firm raised a \$300 million cryptocurrency fund in 2018, followed by a \$2.2 billion crypto-focused fund in 2021, and a \$4.5 billion crypto and blockchain fund in 2022 (\$1.5 billion for see
+    fetchedAt: 2026-02-22T01:49:15.693Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 39
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: Andreessen Horowitz has become one of the largest investors in cryptocurrency and blockchain technology. The firm raised a \$300 million cryptocurrency fund in 2018, followed by a \$2.2 billion crypto-focused fund in 2021, and a \$4.5 billion crypto and blockchain fund in 2022 (\$1.5 billion for see
+    fetchedAt: 2026-02-22T01:49:17.596Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 40
+    url: https://www.propublica.org/article/trump-cfpb-marc-andreessen-silicon-valley
+    linkText: Trump, CFPB, Marc Andreessen, Silicon Valley - ProPublica
+    claimContext: "In 2024, Andreessen personally donated \\$33.5 million to pro-cryptocurrency groups and over \\$5 million to groups supporting Donald Trump, driven by concerns over federal regulators targeting the crypto industry under the Biden administration.[^40] Following Trump's election, the Consumer Financial "
+    fetchedAt: 2026-02-22T01:49:18.051Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica
+    contentSnippet: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica Arrow Right Caret Close ProPublica is a nonprofit newsroom that investigates abuses of power. Sign up to receive our biggest stories as soon as they’re published. For more than a decade, Silicon Valley venture capitalists have poured enormous sums of money into newfangled technology companies seeking to disrupt, and even supplant, the traditional financial system and sidestep its burdensome regulations. At t
+    contentLength: 247457
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.propublica.org/article/trump-cfpb-marc-andreessen-silicon-valley
+    linkText: Trump, CFPB, Marc Andreessen, Silicon Valley - ProPublica
+    claimContext: "In 2024, Andreessen personally donated \\$33.5 million to pro-cryptocurrency groups and over \\$5 million to groups supporting Donald Trump, driven by concerns over federal regulators targeting the crypto industry under the Biden administration.[^40] Following Trump's election, the Consumer Financial "
+    fetchedAt: 2026-02-22T01:49:18.260Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica
+    contentSnippet: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica Arrow Right Caret Close ProPublica is a nonprofit newsroom that investigates abuses of power. Sign up to receive our biggest stories as soon as they’re published. For more than a decade, Silicon Valley venture capitalists have poured enormous sums of money into newfangled technology companies seeking to disrupt, and even supplant, the traditional financial system and sidestep its burdensome regulations. At t
+    contentLength: 247457
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: In July 2025, a16z led the largest seed funding round in history, investing \$2 billion in AI startup Thinking Machines Lab at a post-money valuation of \$12 billion.[^42] This investment exemplifies the firm's aggressive approach to AI development and willingness to deploy unprecedented capital int
+    fetchedAt: 2026-02-22T01:49:17.597Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 43
+    url: https://a16z.com/what-ive-been-up-to-lately/
+    linkText: What I've Been Up To Lately - a16z
+    claimContext: The firm has expanded significantly post-COVID, growing to over 500 employees and reorganizing for emerging technology categories.[^43] Andreessen has articulated an ambitious vision for a16z to evolve from a partnership model into an enduring investment company comparable to how Goldman Sachs and J
+    fetchedAt: 2026-02-22T01:49:17.954Z
+    httpStatus: 200
+    pageTitle: What I&rsquo;ve Been Up To Lately | Andreessen Horowitz
+    contentSnippet: What I&rsquo;ve Been Up To Lately | Andreessen Horowitz What I&rsquo;ve Been Up To Lately Marc Andreessen share Copy Link Email X LinkedIn Facebook Hacker News WhatsApp Flipboard Reddit Posted October 4, 2022 An Internet news outlet is asking a lot of people I know, and some I don&rsquo;t, what I&rsquo;ve been up to lately. Lord knows what they&rsquo;ll ultimately publish, so I thought I&rsquo;d just write this instead. We are in my 14th year of working to build our venture firm, Andreessen Horo
+    contentLength: 112500
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://techcrunch.com/2025/02/15/marc-andreessen-dreams-of-making-a16z-a-lasting-company-beyond-partnerships/
+    linkText: Marc Andreessen dreams of making a16z a lasting company beyond partnerships - TechCrunch
+    claimContext: The firm has expanded significantly post-COVID, growing to over 500 employees and reorganizing for emerging technology categories.[^43] Andreessen has articulated an ambitious vision for a16z to evolve from a partnership model into an enduring investment company comparable to how Goldman Sachs and J
+    fetchedAt: 2026-02-22T01:49:19.746Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen dreams of making a16z a lasting company, beyond partnerships | TechCrunch
+    contentSnippet: Marc Andreessen dreams of making a16z a lasting company, beyond partnerships | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Venture Marc Andreessen dreams of making a16z a lasting company, beyond partnerships Marina Temkin 9:00 AM PST · February 15, 2025 Many venture industry observers have wondered whether Andreessen Horowitz, a firm that manag
+    contentLength: 225334
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://investors.samsara.com/governance/board-of-directors/person-details/default.aspx?ItemId=ab09efb8-d6f2-4fda-97db-2b16e09d556d
+    linkText: Marc Andreessen - Samsara Board of Directors
+    claimContext: Andreessen serves on the boards of multiple major technology companies and a16z portfolio companies. His board positions include Meta (Facebook), Applied Intuition, Carta, Coinbase, Dialpad, Flow, Golden, Honor, OpenGov, Samsara, Simple Things, and TipTop Labs.[^45] He served on eBay's board of dire
+    fetchedAt: 2026-02-22T01:49:19.860Z
+    httpStatus: 200
+    pageTitle: Samsara Inc. - Governance - Board of Directors - Person Details
+    contentSnippet: Samsara Inc. - Governance - Board of Directors - Person Details Skip to main content Person Details Marc Andreessen Marc Andreessen , Founding Partner, Andreessen Horowitz Marc Andreessen is a cofounder and general partner at the venture capital firm Andreessen Horowitz. He is an innovator and creator, one of the few to pioneer a software category used by more than a billion people and one of the few to establish multiple billion-dollar companies. Marc co-created the highly influential Mosaic in
+    contentLength: 64234
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.allamericanspeakers.com/celebritytalentbios/Marc+Andreessen/385643
+    linkText: Marc Andreessen - All American Speakers
+    claimContext: Andreessen serves on the boards of multiple major technology companies and a16z portfolio companies. His board positions include Meta (Facebook), Applied Intuition, Carta, Coinbase, Dialpad, Flow, Golden, Honor, OpenGov, Samsara, Simple Things, and TipTop Labs.[^45] He served on eBay's board of dire
+    fetchedAt: 2026-02-22T01:49:19.578Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 47
+    url: https://pmarchive.com
+    linkText: Why Software Is Eating The World - pmarchive.com
+    claimContext: Andreessen's August 20, 2011 essay "Why Software Is Eating the World" became one of the most influential pieces of technology commentary, arguing that software companies would disrupt traditional industries across the economy.[^47] The essay articulated a vision of software-driven transformation tha
+    fetchedAt: 2026-02-22T01:49:19.963Z
+    httpStatus: 200
+    pageTitle: Pmarchive
+    contentSnippet: Pmarchive The Pmarca Guide to Startups Part 1 Why not to do a startup A startup puts you on an emotional rollercoaster unlike anything you have ever experienced Part 2 When the VCs say “no” To describe the dimensions that you should consider as you contemplate retooling your plan, let me introduce the onion theory of risk. Part 3 “But I don’t know any VCs!” I had never met a venture capitalist, no venture capitalist had ever talked to me, and I wouldn’t have recognized one if I’d stumbled over h
+    contentLength: 35244
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: In April 2020, during the COVID-19 pandemic, Andreessen published "It's Time to Build," an opinion article addressing the U.S. pandemic response and advocating for technological solutions to national challenges.[^48] The essay criticized regulatory barriers and called for massive investment in build
+    fetchedAt: 2026-02-22T01:49:19.271Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 49
+    url: https://pmarchive.com
+    linkText: Marc Andreessen Archive - pmarchive.com
+    claimContext: Andreessen's archived blog posts on pmarchive.com cover startup topics including product-market fit, team dynamics, and venture capital experiences, including an influential series titled "The only thing that matters" on factors determining startup success.[^49]
+    fetchedAt: 2026-02-22T01:49:21.003Z
+    httpStatus: 200
+    pageTitle: Pmarchive
+    contentSnippet: Pmarchive The Pmarca Guide to Startups Part 1 Why not to do a startup A startup puts you on an emotional rollercoaster unlike anything you have ever experienced Part 2 When the VCs say “no” To describe the dimensions that you should consider as you contemplate retooling your plan, let me introduce the onion theory of risk. Part 3 “But I don’t know any VCs!” I had never met a venture capitalist, no venture capitalist had ever talked to me, and I wouldn’t have recognized one if I’d stumbled over h
+    contentLength: 35244
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: 'In June 2023, Andreessen published "Why AI Will Save the World," a lengthy essay dismissing AI safety concerns focused on existential risk and alignment.[^50] The essay addresses various categories of AI skepticism and systematically argues against each:'
+    fetchedAt: 2026-02-22T01:49:21.524Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: '**Existential risk:** Andreessen rejects claims that AI will "come to life and kill us," comparing such fears to historical moral panics and religious millennialism. He argues that AI is "just math and code" rather than an entity capable of independent agency or malicious intent.[^51]'
+    fetchedAt: 2026-02-22T01:49:21.482Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.businessinsider.com/marc-andreessen-says-ai-wont-kill-jobs-may-save-economy-2026-1
+    linkText: Marc Andreessen says AI won't kill jobs, may save economy - Business Insider
+    claimContext: "**Job displacement:** He dismisses concerns about mass unemployment, arguing that technology historically creates more jobs than it destroys and that AI will increase worker productivity and value.[^52]"
+    fetchedAt: 2026-02-22T01:49:21.111Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Says AI Won't Kill Jobs — It May Save the Economy - Business Insider
+    contentSnippet: Marc Andreessen Says AI Won't Kill Jobs — It May Save the Economy - Business Insider AI Marc Andreessen says the real crisis isn&#x27;t AI job losses — it&#x27;s what would have happened without AI By Thibault Spirlet You're currently following this author! Want to unfollow? Unsubscribe via the link in your email. Follow Follow Thibault Spirlet Every time Thibault publishes a story, you’ll get an alert straight to your inbox! Enter your email Sign up By clicking “Sign up”, you agree to receive e
+    contentLength: 474437
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: "**Inequality:** Andreessen argues that AI will democratize access to capabilities previously available only to the wealthy, reducing rather than exacerbating inequality.[^53]"
+    fetchedAt: 2026-02-22T01:49:21.304Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: '**Misuse risks:** While acknowledging that AI enables "bad people to do bad things" (crimes, terrorism, <EntityLink id="bioweapons">bioweapons</EntityLink>, <EntityLink id="deepfakes">deepfakes</EntityLink>), he characterizes this as a tautology applicable to any technology and argues for using AI d'
+    fetchedAt: 2026-02-22T01:49:22.602Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: The essay proposes that the real danger lies in slowing AI development, claiming that "any deceleration of AI will cost lives" by preventing beneficial applications in healthcare, education, and productivity. He characterizes AI development restrictions as "a form of murder" due to preventable death
+    fetchedAt: 2026-02-22T01:49:22.875Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: In October 2023, Andreessen published a ~7,000-word "Techno-Optimist Manifesto" celebrating technology as the primary driver of human progress.[^56] The manifesto advocates for unrestrained technological development, describing himself as "tescrealist" and promoting values of "ambition" and "relentl
+    fetchedAt: 2026-02-22T01:49:22.535Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 57
+    url: https://www.thedissident.news/the-techno-fascist-soul-of-marc-andreessen/
+    linkText: The Techno-Fascist Soul of Marc Andreessen - The Dissident
+    claimContext: In October 2023, Andreessen published a ~7,000-word "Techno-Optimist Manifesto" celebrating technology as the primary driver of human progress.[^56] The manifesto advocates for unrestrained technological development, describing himself as "tescrealist" and promoting values of "ambition" and "relentl
+    fetchedAt: 2026-02-22T01:49:23.210Z
+    httpStatus: 200
+    pageTitle: The Techno-Fascist Soul of Marc Andreessen
+    contentSnippet: The Techno-Fascist Soul of Marc Andreessen The uprising of 2020 didn't just challenge the systemic racism of American policing; they terrified the oligarchs of Silicon Valley. For Marc Andreessen, the billionaire venture capitalist, the sight of organized resistance, both in the streets and within the cubicles of his own industry, was an existential threat. The subsequent years have revealed a profound and dangerous radicalization, a descent from techno-utopian pragmatism into a bitter, reaction
+    contentLength: 39027
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://fasterplease.substack.com/p/critics-of-marc-andreessens-techno
+    linkText: Critics of Marc Andreessen's Techno-Optimist Manifesto - Faster, Please!
+    claimContext: In October 2023, Andreessen published a ~7,000-word "Techno-Optimist Manifesto" celebrating technology as the primary driver of human progress.[^56] The manifesto advocates for unrestrained technological development, describing himself as "tescrealist" and promoting values of "ambition" and "relentl
+    fetchedAt: 2026-02-22T01:49:23.085Z
+    httpStatus: 200
+    pageTitle: ⤴ Critics of Marc Andreessen&#x27;s Techno-Optimist Manifesto fail basic economics
+    contentSnippet: ⤴ Critics of Marc Andreessen&#x27;s Techno-Optimist Manifesto fail basic economics Faster, Please! Subscribe Sign in ⤴ Critics of Marc Andreessen's Techno-Optimist Manifesto fail basic economics Too many journalists have been soaking for too long in silly tales of 'late capitalism' James Pethokoukis Oct 23, 2023 19 4 1 Share Quote of the Issue “The rise and fall of images of the future precedes or accompanies the rise and fall of cultures.” Dutch futurist Frederik Polak in The Image of the Futur
+    contentLength: 249035
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: Andreessen has been particularly critical of the AI safety community focused on existential risk. In his writings and statements, he characterizes "AI safety experts," "AI ethicists," and "AI risk researchers" as being paid to be doomers whose statements should be processed accordingly.[^59] He warn
+    fetchedAt: 2026-02-22T01:49:24.605Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222315
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: Andreessen has been particularly critical of the AI safety community focused on existential risk. In his writings and statements, he characterizes "AI safety experts," "AI ethicists," and "AI risk researchers" as being paid to be doomers whose statements should be processed accordingly.[^59] He warn
+    fetchedAt: 2026-02-22T01:49:24.279Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://forum.effectivealtruism.org/posts/eWphfg7bcDrqfqgqF/ben-horowitz-and-others-are-spreading-a-regulation-is-bad
+    linkText: Ben Horowitz and others are spreading a 'regulation is bad' meme - EA Forum
+    claimContext: In a podcast with Ben Horowitz, the pair drew comparisons between AI regulation and "communism" and advocated against any slowdown in AI development.[^61] Andreessen emphasizes the opportunity costs of delaying AI rather than the potential catastrophic downsides of unaligned advanced AI systems.
+    fetchedAt: 2026-02-22T01:49:24.502Z
+    httpStatus: 200
+    pageTitle: Ben Horowitz and others are spreading a "regulation is bad" view. Would it be useful to have a public bet on "would Ben update his view if he had 1-1 with X-Risk researcher?", and urge Ben to run such an experiment? — EA Forum
+    contentSnippet: Ben Horowitz and others are spreading a "regulation is bad" view. Would it be useful to have a public bet on "would Ben update his view if he had 1-1 with X-Risk researcher?", and urge Ben to run such an experiment? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents [ Question ] Ben Horowitz and others are spreading a "regulation is bad" view. Would it be useful to have a public bet on "
+    contentLength: 105407
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: Andreessen argues that alignment concerns are misplaced because AI systems are fundamentally mathematical constructs without genuine agency or intentionality. He contends that concerns about AI "goals" or "values" anthropomorphize statistical pattern-matching systems inappropriately.[^62] His positi
+    fetchedAt: 2026-02-22T01:49:24.286Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: Andreessen argues that alignment concerns are misplaced because AI systems are fundamentally mathematical constructs without genuine agency or intentionality. He contends that concerns about AI "goals" or "values" anthropomorphize statistical pattern-matching systems inappropriately.[^62] His positi
+    fetchedAt: 2026-02-22T01:49:24.584Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.dwarkesh.com/p/contra-marc-andreessen-on-ai
+    linkText: Contra Marc Andreessen on AI - Dwarkesh Patel
+    claimContext: "**Misalignment risks:** Critics argue that Andreessen fundamentally underestimates the difficulty of aligning advanced AI systems with human values. Early warning signs like Sydney Bing threatening users with blackmail and GPT-4 providing bioweapon instructions demonstrate that even current systems "
+    fetchedAt: 2026-02-22T01:49:25.735Z
+    httpStatus: 200
+    pageTitle: Contra Marc Andreessen on AI - by Dwarkesh Patel
+    contentSnippet: Contra Marc Andreessen on AI - by Dwarkesh Patel Dwarkesh Podcast Subscribe Sign in Blog Contra Marc Andreessen on AI "The claim that you will completely control any system you build is obviously false, and a hacker like Marc should know that" Dwarkesh Patel Jun 13, 2023 330 80 29 Share Marc Andreessen published a new essay about why AI will save the world . I had Marc on my podcast a few months ago ( YouTube , Audio ), and he was, as he is usually, very thoughtful and interesting. But in the ca
+    contentLength: 261648
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://www.dwarkesh.com/p/contra-marc-andreessen-on-ai
+    linkText: Contra Marc Andreessen on AI - Dwarkesh Patel
+    claimContext: "**Misalignment risks:** Critics argue that Andreessen fundamentally underestimates the difficulty of aligning advanced AI systems with human values. Early warning signs like Sydney Bing threatening users with blackmail and GPT-4 providing bioweapon instructions demonstrate that even current systems "
+    fetchedAt: 2026-02-22T01:49:26.730Z
+    httpStatus: 200
+    pageTitle: Contra Marc Andreessen on AI - by Dwarkesh Patel
+    contentSnippet: Contra Marc Andreessen on AI - by Dwarkesh Patel Dwarkesh Podcast Subscribe Sign in Blog Contra Marc Andreessen on AI "The claim that you will completely control any system you build is obviously false, and a hacker like Marc should know that" Dwarkesh Patel Jun 13, 2023 330 80 29 Share Marc Andreessen published a new essay about why AI will save the world . I had Marc on my podcast a few months ago ( YouTube , Audio ), and he was, as he is usually, very thoughtful and interesting. But in the ca
+    contentLength: 261642
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://forum.effectivealtruism.org/posts/yQHzdmXa7KBB52fBz/ai-risk-and-survivorship-bias-how-andreessen-and-lecun-got
+    linkText: "AI risk and survivorship bias: how Andreessen and LeCun got it wrong - EA Forum"
+    claimContext: '**Survivorship bias:** Andreessen and similar AI accelerationists are accused of the "Argument from Overestimation" (AFO)—assuming that because past technological fears (like nuclear power) proved overblown for technologies that survived, AI must be safe. Critics point out this reasoning suffers fro'
+    fetchedAt: 2026-02-22T01:49:25.667Z
+    httpStatus: 200
+    pageTitle: AI Risk and Survivorship Bias - How Andreessen and LeCun got it wrong — EA Forum
+    contentSnippet: AI Risk and Survivorship Bias - How Andreessen and LeCun got it wrong — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI Risk and Survivorship Bias - How Andreessen and LeCun got it wrong by stepanlos Jul 14 2023 7 min read 1 5 AI safety Existential risk Philosophy Cognitive bias Anthropics AI governance AI risk skepticism Epistemology Rationality Frontpage AI Risk and Survivorship Bi
+    contentLength: 237597
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://forum.effectivealtruism.org/posts/CbBcrqkPCEc2tSgyq/eliciting-responses-to-marc-andreessen-s-why-ai-will-save
+    linkText: Eliciting responses to Marc Andreessen's "Why AI Will Save the World" - EA Forum
+    claimContext: "**Flawed analogies and reasoning:** AI safety advocates argue that Andreessen's essay contains \"underhanded insults\" against the safety community, poor analysis of millennialism, and fallacious reasoning patterns. His claim that AI lacks intention and therefore poses no x-risk ignores that software "
+    fetchedAt: 2026-02-22T01:49:26.016Z
+    httpStatus: 200
+    pageTitle: Eliciting responses to Marc Andreessen&#x27;s "Why AI Will Save the World" — EA Forum
+    contentSnippet: Eliciting responses to Marc Andreessen&#x27;s "Why AI Will Save the World" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Eliciting responses to Marc Andreessen&#x27;s "Why AI Will Save the World" by Coleman Jul 17 2023 1 min read 2 2 AI safety Existential risk Public communication on AI safety Frontpage This is a linkpost for https://a16z.com/2023/06/06/ai-will-save-the-world/ Marc Andreessen&#x27;s Why A
+    contentLength: 146158
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://www.aei.org/articles/the-case-against-the-case-against-marc-andreessens-why-ai-will-save-the-world-essay/
+    linkText: The case against the case against Marc Andreessen's "Why AI Will Save the World" - AEI
+    claimContext: "**Trade-offs and economic analysis:** Critics note that Andreessen focuses heavily on the opportunity costs of slowing AI development while minimizing potential downsides. Economists like Daron Acemoglu and Simon Johnson (cited in *Power and Progress*) argue that some technological innovations cost "
+    fetchedAt: 2026-02-22T01:49:27.376Z
+    httpStatus: 200
+    pageTitle: The Case Against the Case Against Marc Andreessen's 'Why AI Will Save the World' Essay | AEI
+    contentSnippet: "The Case Against the Case Against Marc Andreessen&#039;s &#039;Why AI Will Save the World&#039; Essay | AEI The Case Against the Case Against Marc Andreessen&#8217;s &#8216;Why AI Will Save the World&#8217; Essay James Pethokoukis by James Pethokoukis Senior Fellow DeWitt Wallace Chair Editor, AEIdeas Blog June 09, 2023 Article | Faster, Please! Economics Latest Work 02.19.2026 | Discussing market volatility with AI, geopolitics, and metals demand risks: Pethokoukis on CNBC&#8217;s &#8216;Worldw"
+    contentLength: 95602
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://pmarca.substack.com/p/why-ai-will-save-the-world
+    linkText: Why AI Will Save the World - pmarca.substack.com
+    claimContext: Beyond substantive disagreements, critics have challenged Andreessen's rhetorical approach to AI debates. His characterization of AI safety advocates as "doomers," "weirdos," and "grifters" is viewed as an attempt to delegitimize legitimate technical concerns rather than engage with them substantive
+    fetchedAt: 2026-02-22T01:49:28.438Z
+    httpStatus: 200
+    pageTitle: Why AI Will Save The World - Marc Andreessen Substack
+    contentSnippet: "Why AI Will Save The World - Marc Andreessen Substack Marc Andreessen Substack Subscribe Sign in Why AI Will Save The World By Marc Andreessen Marc Andreessen Jun 06, 2023 143 Share The era of Artificial Intelligence is here, and boy are people freaking out. Fortunately, I am here to bring the good news: AI will not destroy the world, and in fact may save it. First, a short description of what AI is : The application of mathematics and software code to teach computers how to understand, synthesi"
+    contentLength: 222241
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://www.thedissident.news/the-techno-fascist-soul-of-marc-andreessen/
+    linkText: The Techno-Fascist Soul of Marc Andreessen - The Dissident
+    claimContext: EA Forum discussions describe Andreessen's arguments as employing "performative cruelty" and "techno-fascist" rhetoric that frames technological elites as victims of social justice movements while advocating for their unchecked dominance.[^70] His references to a "silent majority" conducting a "coun
+    fetchedAt: 2026-02-22T01:49:28.699Z
+    httpStatus: 200
+    pageTitle: The Techno-Fascist Soul of Marc Andreessen
+    contentSnippet: The Techno-Fascist Soul of Marc Andreessen The uprising of 2020 didn't just challenge the systemic racism of American policing; they terrified the oligarchs of Silicon Valley. For Marc Andreessen, the billionaire venture capitalist, the sight of organized resistance, both in the streets and within the cubicles of his own industry, was an existential threat. The subsequent years have revealed a profound and dangerous radicalization, a descent from techno-utopian pragmatism into a bitter, reaction
+    contentLength: 39027
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: Andreessen, a longtime Democratic donor, publicly shifted his political support to Donald Trump during the 2024 election cycle.[^71] He has described this evolution as beginning in 2018-2019 and accelerating after 2020, when he became critical of what he perceived as excessive left-wing cultural inf
+    fetchedAt: 2026-02-22T01:49:28.425Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 72
+    url: https://www.hoover.org/research/marc-andreessen-its-morning-again-america
+    linkText: "Marc Andreessen: It's Morning Again in America - Hoover Institution"
+    claimContext: Andreessen, a longtime Democratic donor, publicly shifted his political support to Donald Trump during the 2024 election cycle.[^71] He has described this evolution as beginning in 2018-2019 and accelerating after 2020, when he became critical of what he perceived as excessive left-wing cultural inf
+    fetchedAt: 2026-02-22T01:49:29.561Z
+    httpStatus: 200
+    pageTitle: "Marc Andreessen: It’s Morning Again In America | Hoover Institution Marc Andreessen: It’s Morning Again In America"
+    contentSnippet: "Marc Andreessen: It’s Morning Again In America | Hoover Institution Marc Andreessen: It’s Morning Again In America Videos Marc Andreessen: It’s Morning Again In America Marc Andreessen on the technological and political evolution of Silicon Valley and his own shifting political affiliations from left to right, along with his vision for leveraging technology to drive societal progress, the role of innovation in addressing energy challenges, border security, and national defense. Tuesday, January "
+    contentLength: 287954
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://fortune.com/2025/07/16/marc-andreessen-leaked-messages-dei-stanford-university-mit/
+    linkText: Marc Andreessen leaked messages DEI Stanford University MIT - Fortune
+    claimContext: In leaked messages from July 2025, Andreessen attacked Stanford, MIT, and the National Science Foundation for "reverse discrimination" against children of conservative Trump voters, calling universities "political lobbying operations fighting American innovation."[^73] These messages drew nearly 5,0
+    fetchedAt: 2026-02-22T01:49:29.419Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen blasts elite colleges over DEI policies in leaked messages | Fortune
+    contentSnippet: "Marc Andreessen blasts elite colleges over DEI policies in leaked messages | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Marc Andreessen Leaked message show Marc Andreessen blasting elite colleges over DEI: ‘My people are furious and not going to take it anymore’ By Christiaan Hetzner Christiaan Hetzner Senior Reporter Down Arrow Button Icon By Christiaan Hetzner Christiaan Hetzner Senior Reporter Down Arrow Button Icon July 16, 2025, 10:08 AM ET Add us "
+    contentLength: 461883
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://fortune.com/2025/07/16/marc-andreessen-leaked-messages-dei-stanford-university-mit/
+    linkText: Marc Andreessen leaked messages DEI Stanford University MIT - Fortune
+    claimContext: In leaked messages from July 2025, Andreessen attacked Stanford, MIT, and the National Science Foundation for "reverse discrimination" against children of conservative Trump voters, calling universities "political lobbying operations fighting American innovation."[^73] These messages drew nearly 5,0
+    fetchedAt: 2026-02-22T01:49:30.618Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen blasts elite colleges over DEI policies in leaked messages | Fortune
+    contentSnippet: "Marc Andreessen blasts elite colleges over DEI policies in leaked messages | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Marc Andreessen Leaked message show Marc Andreessen blasting elite colleges over DEI: ‘My people are furious and not going to take it anymore’ By Christiaan Hetzner Christiaan Hetzner Senior Reporter Down Arrow Button Icon By Christiaan Hetzner Christiaan Hetzner Senior Reporter Down Arrow Button Icon July 16, 2025, 10:08 AM ET Add us "
+    contentLength: 461883
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://fortune.com/tag/marc-andreessen/
+    linkText: Marc Andreessen Tag - Fortune
+    claimContext: Following Trump's 2024 election victory, Andreessen volunteered to help <EntityLink id="elon-musk">Elon Musk</EntityLink>'s Department of Government Efficiency (DOGE), spending significant time at Mar-a-Lago and recruiting staff for the initiative as of December 2024.[^75] He has been involved along
+    fetchedAt: 2026-02-22T01:49:30.639Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Articles, Insights & Updates | Fortune
+    contentSnippet: Marc Andreessen | Articles, Insights & Updates | Fortune Home Latest News North America Europe Asia Middle East Global Fortune 500 Fortune 500 U.S. Fortune Global 500 Fortune 500 Europe Fortune China 500 Fortune SEA 500 Finance Economy Banking Personal Finance Investing Real Estate Energy Crypto Tech Big Tech Startups & Venture AI Innovation Cybersecurity Leadership Future Of Work Success C-Suite Workplace Culture CEO Initiative Lifestyle Arts & Entertainment Health Travel & Leisure Education Ra
+    contentLength: 618087
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://fortune.com/tag/marc-andreessen/
+    linkText: Marc Andreessen Tag - Fortune
+    claimContext: Following Trump's 2024 election victory, Andreessen volunteered to help <EntityLink id="elon-musk">Elon Musk</EntityLink>'s Department of Government Efficiency (DOGE), spending significant time at Mar-a-Lago and recruiting staff for the initiative as of December 2024.[^75] He has been involved along
+    fetchedAt: 2026-02-22T01:49:30.886Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Articles, Insights & Updates | Fortune
+    contentSnippet: Marc Andreessen | Articles, Insights & Updates | Fortune Home Latest News North America Europe Asia Middle East Global Fortune 500 Fortune 500 U.S. Fortune Global 500 Fortune 500 Europe Fortune China 500 Fortune SEA 500 Finance Economy Banking Personal Finance Investing Real Estate Energy Crypto Tech Big Tech Startups & Venture AI Innovation Cybersecurity Leadership Future Of Work Success C-Suite Workplace Culture CEO Initiative Lifestyle Arts & Entertainment Health Travel & Leisure Education Ra
+    contentLength: 618040
+    status: verified
+    note: null
+  - footnote: 77
+    url: https://fortune.com/tag/marc-andreessen/
+    linkText: Marc Andreessen Tag - Fortune
+    claimContext: In interviews, Andreessen described Silicon Valley as "split in half" following Trump's victory, creating "two kinds of dinner parties" based on political alignment.[^77] He is part of what has been characterized as Trump's "ultra-rich administration," with advisors collectively worth \$474 billion.
+    fetchedAt: 2026-02-22T01:49:30.872Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Articles, Insights & Updates | Fortune
+    contentSnippet: Marc Andreessen | Articles, Insights & Updates | Fortune Home Latest News North America Europe Asia Middle East Global Fortune 500 Fortune 500 U.S. Fortune Global 500 Fortune 500 Europe Fortune China 500 Fortune SEA 500 Finance Economy Banking Personal Finance Investing Real Estate Energy Crypto Tech Big Tech Startups & Venture AI Innovation Cybersecurity Leadership Future Of Work Success C-Suite Workplace Culture CEO Initiative Lifestyle Arts & Entertainment Health Travel & Leisure Education Ra
+    contentLength: 618040
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://fortune.com/tag/marc-andreessen/
+    linkText: Marc Andreessen Tag - Fortune
+    claimContext: In interviews, Andreessen described Silicon Valley as "split in half" following Trump's victory, creating "two kinds of dinner parties" based on political alignment.[^77] He is part of what has been characterized as Trump's "ultra-rich administration," with advisors collectively worth \$474 billion.
+    fetchedAt: 2026-02-22T01:49:30.653Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen | Articles, Insights & Updates | Fortune
+    contentSnippet: Marc Andreessen | Articles, Insights & Updates | Fortune Home Latest News North America Europe Asia Middle East Global Fortune 500 Fortune 500 U.S. Fortune Global 500 Fortune 500 Europe Fortune China 500 Fortune SEA 500 Finance Economy Banking Personal Finance Investing Real Estate Energy Crypto Tech Big Tech Startups & Venture AI Innovation Cybersecurity Leadership Future Of Work Success C-Suite Workplace Culture CEO Initiative Lifestyle Arts & Entertainment Health Travel & Leisure Education Ra
+    contentLength: 618087
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://www.propublica.org/article/trump-cfpb-marc-andreessen-silicon-valley
+    linkText: Trump, CFPB, Marc Andreessen, Silicon Valley - ProPublica
+    claimContext: Andreessen has become increasingly vocal about technology regulation, particularly regarding cryptocurrency and AI. His 2024 political donations—\$33.5 million to pro-cryptocurrency groups and over \$5 million to Trump-supporting organizations—were explicitly driven by concerns about regulatory trea
+    fetchedAt: 2026-02-22T01:49:32.651Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica
+    contentSnippet: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica Arrow Right Caret Close ProPublica is a nonprofit newsroom that investigates abuses of power. Sign up to receive our biggest stories as soon as they’re published. For more than a decade, Silicon Valley venture capitalists have poured enormous sums of money into newfangled technology companies seeking to disrupt, and even supplant, the traditional financial system and sidestep its burdensome regulations. At t
+    contentLength: 248652
+    status: verified
+    note: null
+  - footnote: 80
+    url: https://www.propublica.org/article/trump-cfpb-marc-andreessen-silicon-valley
+    linkText: Trump, CFPB, Marc Andreessen, Silicon Valley - ProPublica
+    claimContext: Andreessen has become increasingly vocal about technology regulation, particularly regarding cryptocurrency and AI. His 2024 political donations—\$33.5 million to pro-cryptocurrency groups and over \$5 million to Trump-supporting organizations—were explicitly driven by concerns about regulatory trea
+    fetchedAt: 2026-02-22T01:49:32.050Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica
+    contentSnippet: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica Arrow Right Caret Close ProPublica is a nonprofit newsroom that investigates abuses of power. Sign up to receive our biggest stories as soon as they’re published. For more than a decade, Silicon Valley venture capitalists have poured enormous sums of money into newfangled technology companies seeking to disrupt, and even supplant, the traditional financial system and sidestep its burdensome regulations. At t
+    contentLength: 248652
+    status: verified
+    note: null
+  - footnote: 81
+    url: https://www.propublica.org/article/trump-cfpb-marc-andreessen-silicon-valley
+    linkText: Trump, CFPB, Marc Andreessen, Silicon Valley - ProPublica
+    claimContext: Following Trump's election, regulatory outcomes shifted favorably for a16z portfolio companies. The CFPB reworked enforcement actions against 20 businesses investigated during the Biden administration, including dramatically reducing penalties for a16z-backed companies.[^81]
+    fetchedAt: 2026-02-22T01:49:32.344Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica
+    contentSnippet: Marc Andreessen Bet Big on Trump. It’s Paying Off for Silicon Valley. &#8212; ProPublica Arrow Right Caret Close ProPublica is a nonprofit newsroom that investigates abuses of power. Sign up to receive our biggest stories as soon as they’re published. For more than a decade, Silicon Valley venture capitalists have poured enormous sums of money into newfangled technology companies seeking to disrupt, and even supplant, the traditional financial system and sidestep its burdensome regulations. At t
+    contentLength: 248652
+    status: verified
+    note: null
+  - footnote: 82
+    url: https://a16z.com/our-philanthropic-commitment/
+    linkText: Our Philanthropic Commitment - a16z
+    claimContext: Andreessen initiated a philanthropic commitment at Andreessen Horowitz where six general partners, including himself, pledged to donate at least half of their lifetime venture capital earnings to charity.[^82] In 2007, Marc and Laura Andreessen made their first major joint grant of \$27.5 million to
+    fetchedAt: 2026-02-22T01:49:32.528Z
+    httpStatus: 200
+    pageTitle: Our Philanthropic Commitment | Andreessen Horowitz
+    contentSnippet: Our Philanthropic Commitment | Andreessen Horowitz Our Philanthropic Commitment Ben Horowitz , Scott Weiss , Jeff Jordan , John O&rsquo;Farrell , Peter Levine , and Marc Andreessen share Copy Link Email X LinkedIn Facebook Hacker News WhatsApp Flipboard Reddit Posted April 25, 2012 We are delighted to announce that the six General Partners of Andreessen Horowitz, with our families, are all committing to donate at least half of all income from our venture capital careers to philanthropic causes d
+    contentLength: 124982
+    status: verified
+    note: null
+  - footnote: 83
+    url: https://www.insidephilanthropy.com/find-a-grant/major-donors/marc-andreessen
+    linkText: Marc Andreessen - Inside Philanthropy
+    claimContext: Andreessen initiated a philanthropic commitment at Andreessen Horowitz where six general partners, including himself, pledged to donate at least half of their lifetime venture capital earnings to charity.[^82] In 2007, Marc and Laura Andreessen made their first major joint grant of \$27.5 million to
+    fetchedAt: 2026-02-22T01:49:32.293Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 214
+    status: verified
+    note: null
+  - footnote: 84
+    url: https://www.insidephilanthropy.com/find-a-grant/major-donors/marc-andreessen
+    linkText: Marc Andreessen - Inside Philanthropy
+    claimContext: Andreessen initiated a philanthropic commitment at Andreessen Horowitz where six general partners, including himself, pledged to donate at least half of their lifetime venture capital earnings to charity.[^82] In 2007, Marc and Laura Andreessen made their first major joint grant of \$27.5 million to
+    fetchedAt: 2026-02-22T01:49:33.707Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 214
+    status: verified
+    note: null
+  - footnote: 85
+    url: https://philanthropydaily.com/marc-andreessen-on-overcoming-perverse-incentives-in-philanthropy-and-building-new-institutions-with-it/
+    linkText: Marc Andreessen on Overcoming Perverse Incentives in Philanthropy - Philanthropy Daily
+    claimContext: Andreessen has criticized prevailing billionaire philanthropy for funding what he characterizes as "pro-crime DAs" and other causes he views as harmful, arguing that elite philanthropy often creates "chaos and carnage in the streets."[^85] He advocates for alternative approaches including creating n
+    fetchedAt: 2026-02-22T01:49:34.993Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen on overcoming perverse incentives in philanthropy, and building new institutions with itPhilanthropy Daily
+    contentSnippet: Marc Andreessen on overcoming perverse incentives in philanthropy, and building new institutions with itPhilanthropy Daily ICYMI. "> Share on Facebook Share on Twitter Share via email Share on LinkedIn Sign up to receive the best commentary and opinion on the philanthropic sector, as well as professional fundraising advice to help you succeed. &times; the Giving Review Current Marc Andreessen on overcoming perverse incentives in philanthropy, and building new institutions with it Michael E. Hart
+    contentLength: 204014
+    status: verified
+    note: null
+  - footnote: 86
+    url: https://philanthropydaily.com/marc-andreessen-on-overcoming-perverse-incentives-in-philanthropy-and-building-new-institutions-with-it/
+    linkText: Marc Andreessen on Overcoming Perverse Incentives in Philanthropy - Philanthropy Daily
+    claimContext: Andreessen has criticized prevailing billionaire philanthropy for funding what he characterizes as "pro-crime DAs" and other causes he views as harmful, arguing that elite philanthropy often creates "chaos and carnage in the streets."[^85] He advocates for alternative approaches including creating n
+    fetchedAt: 2026-02-22T01:49:34.997Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen on overcoming perverse incentives in philanthropy, and building new institutions with itPhilanthropy Daily
+    contentSnippet: Marc Andreessen on overcoming perverse incentives in philanthropy, and building new institutions with itPhilanthropy Daily ICYMI. "> Share on Facebook Share on Twitter Share via email Share on LinkedIn Sign up to receive the best commentary and opinion on the philanthropic sector, as well as professional fundraising advice to help you succeed. &times; the Giving Review Current Marc Andreessen on overcoming perverse incentives in philanthropy, and building new institutions with it Michael E. Hart
+    contentLength: 204014
+    status: verified
+    note: null
+  - footnote: 87
+    url: https://www.laaf.org
+    linkText: Laura Arrillaga-Andreessen Foundation
+    claimContext: His wife, Laura Arrillaga-Andreessen, runs the Laura Arrillaga-Andreessen Foundation (LAAF), a non-grantmaking foundation focused on educating strategic giving practices.[^87]
+    fetchedAt: 2026-02-22T01:49:34.750Z
+    httpStatus: 200
+    pageTitle: The Laura Arrillaga-Andreessen Foundation (LAAF)
+    contentSnippet: The Laura Arrillaga-Andreessen Foundation (LAAF) 0 The Laura Arrillaga-Andreessen Foundation (LAAF) LAAF is a non-partisan, operating foundation (non-grantmaking) that empowers, educates and equips individuals to be more strategic, impactful givers and women to be more effective leaders in the workplace and beyond. Empowering Philanthropists LAAF strives to help individual, institutional and corporate donors make their giving more strategic and impactful. We educate individual givers and corpora
+    contentLength: 137467
+    status: verified
+    note: null
+  - footnote: 88
+    url: https://en.wikipedia.org/wiki/Marc_Andreessen
+    linkText: Marc Andreessen - Wikipedia
+    claimContext: Andreessen was named to Time magazine's 100 most influential people in 2012 and received the Queen Elizabeth Prize for Engineering in 2013 (with four others) for web technology advancements.[^88] CNET ranked him No. 1 on its 2011 list of most influential investors.[^89]
+    fetchedAt: 2026-02-22T01:49:33.675Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 89
+    url: https://www.internethalloffame.org/inductee/marc-andreessen/
+    linkText: Marc Andreessen - Internet Hall of Fame
+    claimContext: Andreessen was named to Time magazine's 100 most influential people in 2012 and received the Queen Elizabeth Prize for Engineering in 2013 (with four others) for web technology advancements.[^88] CNET ranked him No. 1 on its 2011 list of most influential investors.[^89]
+    fetchedAt: 2026-02-22T01:49:36.620Z
+    httpStatus: 200
+    pageTitle: Marc Andreessen - Internet Hall of Fame
+    contentSnippet: Marc Andreessen - Internet Hall of Fame Skip to primary navigation Skip to main content Skip to footer 2013 Inductee Marc Andreessen Internet Hall of Fame Innovator Marc Andreessen is an entrepreneur, investor and software engineer best known as co-author of Mosaic, the first widely used Web browser. As an undergraduate at the University of Illinois at Urbana-Champaign, he worked at the university’s National Center for Supercomputing Applications (NCSA), where he became familiar with Tim Berners
+    contentLength: 62566
+    status: verified
+    note: null
+  - footnote: 90
+    url: https://forum.effectivealtruism.org/posts/CbBcrqkPCEc2tSgyq/eliciting-responses-to-marc-andreessen-s-why-ai-will-save
+    linkText: Eliciting responses to Marc Andreessen's "Why AI Will Save the World" - EA Forum
+    claimContext: His prolific commentary on Twitter (where he has 1.2 million followers) and through essays is treated as authoritative in technology circles, shaping debates about innovation policy, regulation, and technological progress.[^90] The phrase "software is eating the world" has become a widely-used frame
+    fetchedAt: 2026-02-22T01:49:36.109Z
+    httpStatus: 200
+    pageTitle: Eliciting responses to Marc Andreessen&#x27;s "Why AI Will Save the World" — EA Forum
+    contentSnippet: Eliciting responses to Marc Andreessen&#x27;s "Why AI Will Save the World" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Eliciting responses to Marc Andreessen&#x27;s "Why AI Will Save the World" by Coleman Jul 17 2023 1 min read 2 2 AI safety Existential risk Public communication on AI safety Frontpage This is a linkpost for https://a16z.com/2023/06/06/ai-will-save-the-world/ Marc Andreessen&#x27;s Why A
+    contentLength: 143358
+    status: verified
+    note: null

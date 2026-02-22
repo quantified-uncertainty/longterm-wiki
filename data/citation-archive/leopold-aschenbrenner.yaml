@@ -1,0 +1,766 @@
+pageId: leopold-aschenbrenner
+verifiedAt: 2026-02-22
+totalCitations: 69
+verified: 56
+broken: 13
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    linkText: Leopold Aschenbrenner - Wikipedia
+    claimContext: '**Leopold Aschenbrenner** (born 2001 or 2002) is a German AI researcher and investor, former OpenAI employee, and founder of the AI-focused hedge fund Situational Awareness LP.[^1] He gained prominence after publishing the viral essay series "Situational Awareness: The Decade Ahead" in June 2024, a '
+    fetchedAt: 2026-02-22T01:57:19.970Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://fortune.com/2025/10/16/the-ai-investing-boom-gets-its-posterboy-meet-leopold-aschenbrenner/
+    linkText: "The AI investing boom gets its posterboy: Meet Leopold Aschenbrenner - Fortune"
+    claimContext: '**Leopold Aschenbrenner** (born 2001 or 2002) is a German AI researcher and investor, former OpenAI employee, and founder of the AI-focused hedge fund Situational Awareness LP.[^1] He gained prominence after publishing the viral essay series "Situational Awareness: The Decade Ahead" in June 2024, a '
+    fetchedAt: 2026-02-22T01:57:20.095Z
+    httpStatus: 200
+    pageTitle: "The AI investing boom gets its posterboy: Meet Leopold Aschenbrenner | Fortune"
+    contentSnippet: "The AI investing boom gets its posterboy: Meet Leopold Aschenbrenner | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Newsletters Term Sheet The AI investing boom gets its posterboy: Meet Leopold Aschenbrenner By Allie Garfinkle Allie Garfinkle Senior Finance Reporter and author of Term Sheet Down Arrow Button Icon By Allie Garfinkle Allie Garfinkle Senior Finance Reporter and author of Term Sheet Down Arrow Button Icon October 16, 2025, 6:10 AM ET Add us o"
+    contentLength: 493502
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.college.columbia.edu/cct/latest/take-five/valedictorian-special-times-college
+    linkText: Valedictorian in Special Times - Columbia College
+    claimContext: Aschenbrenner graduated as valedictorian from Columbia University at age 19 in 2021, having started his studies at age 15.[^4] He joined <EntityLink id="openai">OpenAI's</EntityLink> Superalignment team in 2023, working on technical methods to align superintelligent AI systems. His tenure ended abru
+    fetchedAt: 2026-02-22T01:57:20.993Z
+    httpStatus: 200
+    pageTitle: ’21 Valedictorian Remembers Special Times at the College | Columbia College Today
+    contentSnippet: ’21 Valedictorian Remembers Special Times at the College | Columbia College Today Columbia College | Columbia University in the City of New York Columbia College Today Main menu Current Issue Past Issues Contact Us Read What’s New Alumni in the News Like Minds Lion’s Den Feature Extras Online Spotlights Take Five Talking Points ’21 Valedictorian Remembers Special Times at the College Friday, April 23, 2021 Leopold Aschenbrenner ’21 is his class’s valedictorian. An economics and mathematics-stati
+    contentLength: 31389
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.allamericanspeakers.com/celebritytalentbios/Leopold+Aschenbrenner/466402
+    linkText: Leopold Aschenbrenner - All American Speakers
+    claimContext: Aschenbrenner graduated as valedictorian from Columbia University at age 19 in 2021, having started his studies at age 15.[^4] He joined <EntityLink id="openai">OpenAI's</EntityLink> Superalignment team in 2023, working on technical methods to align superintelligent AI systems. His tenure ended abru
+    fetchedAt: 2026-02-22T01:57:20.293Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.businessinsider.com/former-openai-researcher-leopold-aschenbrenner-interview-firing-2024-6
+    linkText: Former OpenAI researcher Leopold Aschenbrenner interview about firing - Business Insider
+    claimContext: Aschenbrenner graduated as valedictorian from Columbia University at age 19 in 2021, having started his studies at age 15.[^4] He joined <EntityLink id="openai">OpenAI's</EntityLink> Superalignment team in 2023, working on technical methods to align superintelligent AI systems. His tenure ended abru
+    fetchedAt: 2026-02-22T01:57:20.350Z
+    httpStatus: 200
+    pageTitle: Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider
+    contentSnippet: "Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider Tech Ex-OpenAI employee speaks out about why he was fired: &#x27;I ruffled some feathers&#x27; By Ana Altchek You're currently following this author! Want to unfollow? Unsubscribe via the link in your email. Follow Follow Ana Altchek Every time Ana publishes a story, you’ll get an alert straight to your inbox! Enter your email Sign up By clicking “Sign up”, you agree to receive emails from Business Insider. In addition, you accept"
+    contentLength: 456640
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: Following his departure from OpenAI, Aschenbrenner leveraged his viral essay to launch Situational Awareness LP, a hedge fund focused on AGI-related investments. Backed by prominent tech figures including Stripe founders Patrick and John Collison, as well as investor Nat Friedman and his partner Dan
+    fetchedAt: 2026-02-22T01:57:22.028Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513786
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://litquidity.co/1-5b-ai-hedge-fund-launches-surges-in-first-year/
+    linkText: \$1.5B AI Hedge Fund Launches, Surges in First Year - Litquidity
+    claimContext: Following his departure from OpenAI, Aschenbrenner leveraged his viral essay to launch Situational Awareness LP, a hedge fund focused on AGI-related investments. Backed by prominent tech figures including Stripe founders Patrick and John Collison, as well as investor Nat Friedman and his partner Dan
+    fetchedAt: 2026-02-22T01:57:22.921Z
+    httpStatus: 200
+    pageTitle: $1.5B AI Hedge Fund Launches, Surges 47% in First Year - Litquidity
+    contentSnippet: $1.5B AI Hedge Fund Launches, Surges 47% in First Year - Litquidity Articles Exec Sum At 23, former OpenAI researcher Leopold Aschenbrenner has quickly become one of the most talked-about names in finance. Last year, with no professional investing background, he launched Situational Awareness in San Francisco after publishing a lengthy essay on artificial superintelligence that caught the attention of the tech and investment community. In less than a year, the hedge fund has taken in over $1.5 b
+    contentLength: 54311
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+    linkText: Response to Aschenbrenner's Situational Awareness - EA Forum
+    claimContext: Following his departure from OpenAI, Aschenbrenner leveraged his viral essay to launch Situational Awareness LP, a hedge fund focused on AGI-related investments. Backed by prominent tech figures including Stripe founders Patrick and John Collison, as well as investor Nat Friedman and his partner Dan
+    fetchedAt: 2026-02-22T01:57:22.352Z
+    httpStatus: 200
+    pageTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+    contentSnippet: 'Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Response to Aschenbrenner&#x27;s "Situational Awareness" by RobBensinger Jun 6 2024 4 min read 14 111 AI safety Opinion Frontpage ( Cross-posted from Twitter. ) My take on Leopold Aschenbrenner&#x27;s new report : I think Leopold gets it right on a bunch of important counts. Three that I especially care '
+    contentLength: 327573
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.lesswrong.com/posts/Wp9eb4CAkH6chyqZm/questionable-narratives-of-situational-awareness
+    linkText: Questionable Narratives of Situational Awareness - LessWrong
+    claimContext: Following his departure from OpenAI, Aschenbrenner leveraged his viral essay to launch Situational Awareness LP, a hedge fund focused on AGI-related investments. Backed by prominent tech figures including Stripe founders Patrick and John Collison, as well as investor Nat Friedman and his partner Dan
+    fetchedAt: 2026-02-22T01:57:22.682Z
+    httpStatus: 200
+    pageTitle: Questionable Narratives of "Situational Awareness" — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Questionable Narratives of "Situational Awareness" — LessWrong AI Frontpage 0 Questionable Narratives of "Situational Awareness" by fergusq 17th Jun 2024 1 min read 1 0 This is a linkpost for https://forum.effectivealtruism.org/posts/WuPs6diJQnznmS4bo/questionable-narratives-of-situational-awareness This is my analysis of narratives present in Leopold Aschenbrenner&#x2
+    contentLength: 283998
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: Aschenbrenner was born in Germany to parents who were both doctors and attended the John F. Kennedy School in Berlin.[^13] At age 17, he received a grant from economist Tyler Cowen's Emergent Ventures program, and Cowen described him as an "economics prodigy."[^12]
+    fetchedAt: 2026-02-22T01:57:22.303Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513783
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    linkText: Leopold Aschenbrenner - Wikipedia
+    claimContext: Aschenbrenner was born in Germany to parents who were both doctors and attended the John F. Kennedy School in Berlin.[^13] At age 17, he received a grant from economist Tyler Cowen's Emergent Ventures program, and Cowen described him as an "economics prodigy."[^12]
+    fetchedAt: 2026-02-22T01:57:23.928Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 14
+    url: https://www.college.columbia.edu/cct/latest/take-five/valedictorian-special-times-college
+    linkText: Valedictorian in Special Times - Columbia College
+    claimContext: He enrolled at Columbia University, majoring in economics and mathematics-statistics. During his time at Columbia, he co-founded and co-organized the university's Effective Altruism chapter and was a member of the Columbia Debate Society.[^13][^14] He graduated as valedictorian in 2021 at age 19.[^1
+    fetchedAt: 2026-02-22T01:57:23.974Z
+    httpStatus: 200
+    pageTitle: ’21 Valedictorian Remembers Special Times at the College | Columbia College Today
+    contentSnippet: ’21 Valedictorian Remembers Special Times at the College | Columbia College Today Columbia College | Columbia University in the City of New York Columbia College Today Main menu Current Issue Past Issues Contact Us Read What’s New Alumni in the News Like Minds Lion’s Den Feature Extras Online Spotlights Take Five Talking Points ’21 Valedictorian Remembers Special Times at the College Friday, April 23, 2021 Leopold Aschenbrenner ’21 is his class’s valedictorian. An economics and mathematics-stati
+    contentLength: 31389
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.college.columbia.edu/cct/latest/take-five/valedictorian-special-times-college
+    linkText: Valedictorian in Special Times - Columbia College
+    claimContext: He enrolled at Columbia University, majoring in economics and mathematics-statistics. During his time at Columbia, he co-founded and co-organized the university's Effective Altruism chapter and was a member of the Columbia Debate Society.[^13][^14] He graduated as valedictorian in 2021 at age 19.[^1
+    fetchedAt: 2026-02-22T01:57:24.645Z
+    httpStatus: 200
+    pageTitle: ’21 Valedictorian Remembers Special Times at the College | Columbia College Today
+    contentSnippet: ’21 Valedictorian Remembers Special Times at the College | Columbia College Today Columbia College | Columbia University in the City of New York Columbia College Today Main menu Current Issue Past Issues Contact Us Read What’s New Alumni in the News Like Minds Lion’s Den Feature Extras Online Spotlights Take Five Talking Points ’21 Valedictorian Remembers Special Times at the College Friday, April 23, 2021 Leopold Aschenbrenner ’21 is his class’s valedictorian. An economics and mathematics-stati
+    contentLength: 31389
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.allamericanspeakers.com/celebritytalentbios/Leopold+Aschenbrenner/466402
+    linkText: Leopold Aschenbrenner - All American Speakers
+    claimContext: While at Columbia and shortly after graduation, Aschenbrenner conducted research on long-run economic growth and existential risks as a research affiliate at Oxford University's Global Priorities Institute (GPI).[^16] In 2024, he co-authored with economist Philip Trammell a working paper titled "Exi
+    fetchedAt: 2026-02-22T01:57:23.946Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 17
+    url: https://www.globalprioritiesinstitute.org/wp-content/uploads/Leopold-Aschenbrenner-and-Philip-Trammell-Existential-Risk-and-Growth-2.pdf
+    linkText: Existential Risk and Growth - Global Priorities Institute
+    claimContext: While at Columbia and shortly after graduation, Aschenbrenner conducted research on long-run economic growth and existential risks as a research affiliate at Oxford University's Global Priorities Institute (GPI).[^16] In 2024, he co-authored with economist Philip Trammell a working paper titled "Exi
+    fetchedAt: 2026-02-22T01:57:24.544Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1621331
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.allamericanspeakers.com/celebritytalentbios/Leopold+Aschenbrenner/466402
+    linkText: Leopold Aschenbrenner - All American Speakers
+    claimContext: In 2023, Aschenbrenner joined OpenAI's Superalignment team, a research initiative led by <EntityLink id="jan-leike">Jan Leike</EntityLink> and <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink> focused on developing technical methods to control AI systems that might become smarter than huma
+    fetchedAt: 2026-02-22T01:57:25.667Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://scholar.google.com/citations?user=qoPrafYAAAAJ&hl=en
+    linkText: Leopold Aschenbrenner - Google Scholar
+    claimContext: "During his tenure, Aschenbrenner co-authored the paper \"<EntityLink id=\"weak-to-strong\">Weak-to-Strong Generalization</EntityLink>: Eliciting Strong Capabilities with Weak Supervision,\" which proposed leveraging deep learning's generalization properties to control strong AI models using weak supervi"
+    fetchedAt: 2026-02-22T01:57:25.652Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 20
+    url: https://scholar.google.com/citations?user=qoPrafYAAAAJ&hl=en
+    linkText: Leopold Aschenbrenner - Google Scholar
+    claimContext: "During his tenure, Aschenbrenner co-authored the paper \"<EntityLink id=\"weak-to-strong\">Weak-to-Strong Generalization</EntityLink>: Eliciting Strong Capabilities with Weak Supervision,\" which proposed leveraging deep learning's generalization properties to control strong AI models using weak supervi"
+    fetchedAt: 2026-02-22T01:57:25.653Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 21
+    url: https://maxread.substack.com/p/who-is-leopold-aschenbrenner
+    linkText: Who is Leopold Aschenbrenner - Max Read
+    claimContext: According to Aschenbrenner, he raised internal concerns about what he viewed as inadequate security measures at OpenAI to protect against industrial espionage, particularly from foreign state actors. He claims he wrote a memo warning that OpenAI's security was "egregiously insufficient" to prevent t
+    fetchedAt: 2026-02-22T01:57:26.186Z
+    httpStatus: 200
+    pageTitle: A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen
+    contentSnippet: "A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen Subscribe Sign in A new A.I. influencer is producing some of the most criminal charts I've ever seen Who is “Leopold Aschenbrenner\"? PLUS: Bill Ackman, Vivek Ramaswamy, and the anti-woke finance grift. Max Read Jun 06, 2024 123 17 18 Share Greetings from Read Max HQ! In today’s newsletter: Who is “Leopold Aschenbrenner,” and why is he suddenly a top A.I. influencer?; and A short history of the anti-woke finan"
+    contentLength: 340237
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://thezvi.substack.com/p/openai-8-the-right-to-warn
+    linkText: "OpenAI 8: The Right to Warn - Zvi Mowshowitz"
+    claimContext: According to Aschenbrenner, he raised internal concerns about what he viewed as inadequate security measures at OpenAI to protect against industrial espionage, particularly from foreign state actors. He claims he wrote a memo warning that OpenAI's security was "egregiously insufficient" to prevent t
+    fetchedAt: 2026-02-22T01:57:26.148Z
+    httpStatus: 200
+    pageTitle: "OpenAI #8: The Right to Warn - by Zvi Mowshowitz"
+    contentSnippet: "OpenAI #8: The Right to Warn - by Zvi Mowshowitz Don't Worry About the Vase Subscribe Sign in OpenAI #8: The Right to Warn Zvi Mowshowitz Jun 17, 2024 37 19 4 Share The fun at OpenAI continues. We finally have the details of how Leopold Aschenbrenner was fired, at least according to Leopold. We have a letter calling for a way for employees to do something if frontier AI labs are endangering safety. And we have continued details and fallout from the issues with non-disparagement agreements and ND"
+    contentLength: 351455
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.businessinsider.com/former-openai-researcher-leopold-aschenbrenner-interview-firing-2024-6
+    linkText: Former OpenAI researcher Leopold Aschenbrenner interview about firing - Business Insider
+    claimContext: In April 2024, OpenAI fired Aschenbrenner. The official reason given was that he had leaked internal information by sharing what he described as a "brainstorming document on preparedness, safety, and security" with three external researchers for feedback—something he characterized as "totally normal
+    fetchedAt: 2026-02-22T01:57:27.365Z
+    httpStatus: 200
+    pageTitle: Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider
+    contentSnippet: "Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider Tech Ex-OpenAI employee speaks out about why he was fired: &#x27;I ruffled some feathers&#x27; By Ana Altchek You're currently following this author! Want to unfollow? Unsubscribe via the link in your email. Follow Follow Ana Altchek Every time Ana publishes a story, you’ll get an alert straight to your inbox! Enter your email Sign up By clicking “Sign up”, you agree to receive emails from Business Insider. In addition, you accept"
+    contentLength: 456640
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    linkText: Leopold Aschenbrenner - Wikipedia
+    claimContext: In April 2024, OpenAI fired Aschenbrenner. The official reason given was that he had leaked internal information by sharing what he described as a "brainstorming document on preparedness, safety, and security" with three external researchers for feedback—something he characterized as "totally normal
+    fetchedAt: 2026-02-22T01:57:27.223Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 25
+    url: https://thezvi.substack.com/p/openai-8-the-right-to-warn
+    linkText: "OpenAI 8: The Right to Warn - Zvi Mowshowitz"
+    claimContext: Aschenbrenner disputes this characterization, claiming the firing was retaliation for his security concerns. He had previously written an internal memo warning about the need to secure model weights and algorithmic secrets against espionage, which he shared with board members. He alleges that OpenAI
+    fetchedAt: 2026-02-22T01:57:27.289Z
+    httpStatus: 200
+    pageTitle: "OpenAI #8: The Right to Warn - by Zvi Mowshowitz"
+    contentSnippet: "OpenAI #8: The Right to Warn - by Zvi Mowshowitz Don't Worry About the Vase Subscribe Sign in OpenAI #8: The Right to Warn Zvi Mowshowitz Jun 17, 2024 37 19 4 Share The fun at OpenAI continues. We finally have the details of how Leopold Aschenbrenner was fired, at least according to Leopold. We have a letter calling for a way for employees to do something if frontier AI labs are endangering safety. And we have continued details and fallout from the issues with non-disparagement agreements and ND"
+    contentLength: 351455
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://maxread.substack.com/p/who-is-leopold-aschenbrenner
+    linkText: Who is Leopold Aschenbrenner - Max Read
+    claimContext: Aschenbrenner disputes this characterization, claiming the firing was retaliation for his security concerns. He had previously written an internal memo warning about the need to secure model weights and algorithmic secrets against espionage, which he shared with board members. He alleges that OpenAI
+    fetchedAt: 2026-02-22T01:57:27.277Z
+    httpStatus: 200
+    pageTitle: A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen
+    contentSnippet: "A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen Subscribe Sign in A new A.I. influencer is producing some of the most criminal charts I've ever seen Who is “Leopold Aschenbrenner\"? PLUS: Bill Ackman, Vivek Ramaswamy, and the anti-woke finance grift. Max Read Jun 06, 2024 123 17 18 Share Greetings from Read Max HQ! In today’s newsletter: Who is “Leopold Aschenbrenner,” and why is he suddenly a top A.I. influencer?; and A short history of the anti-woke finan"
+    contentLength: 340237
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.businessinsider.com/former-openai-researcher-leopold-aschenbrenner-interview-firing-2024-6
+    linkText: Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider
+    claimContext: Aschenbrenner disputes this characterization, claiming the firing was retaliation for his security concerns. He had previously written an internal memo warning about the need to secure model weights and algorithmic secrets against espionage, which he shared with board members. He alleges that OpenAI
+    fetchedAt: 2026-02-22T01:57:27.378Z
+    httpStatus: 200
+    pageTitle: Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider
+    contentSnippet: "Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider Tech Ex-OpenAI employee speaks out about why he was fired: &#x27;I ruffled some feathers&#x27; By Ana Altchek You're currently following this author! Want to unfollow? Unsubscribe via the link in your email. Follow Follow Ana Altchek Every time Ana publishes a story, you’ll get an alert straight to your inbox! Enter your email Sign up By clicking “Sign up”, you agree to receive emails from Business Insider. In addition, you accept"
+    contentLength: 468441
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.businessinsider.com/former-openai-researcher-leopold-aschenbrenner-interview-firing-2024-6
+    linkText: Former OpenAI researcher Leopold Aschenbrenner interview about firing - Business Insider
+    claimContext: OpenAI has stated that he was "unforthcoming" during their investigation into the alleged information leak.[^28]
+    fetchedAt: 2026-02-22T01:57:28.546Z
+    httpStatus: 200
+    pageTitle: Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider
+    contentSnippet: "Ex-OpenAI Researcher Explains Why He Was Fired - Business Insider Tech Ex-OpenAI employee speaks out about why he was fired: &#x27;I ruffled some feathers&#x27; By Ana Altchek You're currently following this author! Want to unfollow? Unsubscribe via the link in your email. Follow Follow Ana Altchek Every time Ana publishes a story, you’ll get an alert straight to your inbox! Enter your email Sign up By clicking “Sign up”, you agree to receive emails from Business Insider. In addition, you accept"
+    contentLength: 456638
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.centeraipolicy.org/work/influential-safety-researcher-sounds-alarm-on-openais-failure-to-take-security-seriously
+    linkText: Influential Safety Researcher Sounds Alarm on OpenAI's Failure - Center for AI Policy
+    claimContext: The firing occurred just before Aschenbrenner's equity cliff and amid broader turmoil at OpenAI. The Superalignment team dissolved shortly after, with both Jan Leike and Ilya Sutskever departing the company. Leike publicly stated he had been "sailing against the wind" and that safety concerns were n
+    fetchedAt: 2026-02-22T01:57:29.862Z
+    httpStatus: 200
+    pageTitle: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP
+    contentSnippet: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP CAIP Media CAIP Media Donate All Work Opinion Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously Jason Green-Lowe June 4, 2024 The Center for AI Policy applauds Leopold Aschenbrenner, a safety researcher at OpenAI who was allegedly fired for sounding the alarm about OpenAI’s failure to take security seriously. Aschenbrenner has j
+    contentLength: 38514
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://situational-awareness.ai
+    linkText: "Situational Awareness: The Decade Ahead"
+    claimContext: 'Two months after leaving OpenAI, in June 2024, Aschenbrenner published "Situational Awareness: The Decade Ahead," a 165-page essay series that went viral in AI and tech circles.[^30][^31] The essay makes several bold predictions and arguments:'
+    fetchedAt: 2026-02-22T01:57:28.993Z
+    httpStatus: 200
+    pageTitle: "Introduction - SITUATIONAL AWARENESS: The Decade Ahead"
+    contentSnippet: "Introduction - SITUATIONAL AWARENESS: The Decade Ahead Skip to content Leopold Aschenbrenner, June 2024 You can see the future first in San Francisco. Over the past year, the talk of the town has shifted from $10 billion compute clusters to $100 billion clusters to trillion-dollar clusters. Every six months another zero is added to the boardroom plans. Behind the scenes, there’s a fierce scramble to secure every power contract still available for the rest of the decade, every voltage transformer"
+    contentLength: 67081
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://situational-awareness.ai/wp-content/uploads/2024/06/situationalawareness.pdf
+    linkText: Situational Awareness PDF
+    claimContext: 'Two months after leaving OpenAI, in June 2024, Aschenbrenner published "Situational Awareness: The Decade Ahead," a 165-page essay series that went viral in AI and tech circles.[^30][^31] The essay makes several bold predictions and arguments:'
+    fetchedAt: 2026-02-22T01:57:28.965Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 21371840
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.northbaybiz.com/2025/03/31/situational-awareness-understanding-the-rapid-advancement-of-agi/
+    linkText: "Situational Awareness: Understanding the Rapid Advancement of AGI - NorthBayBiz"
+    claimContext: "The essay forecasts that AGI—defined as AI systems capable of performing the work of AI researchers and engineers—will likely arrive by 2027.[^32] This prediction is based on extrapolating three trends:"
+    fetchedAt: 2026-02-22T01:57:28.874Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 33
+    url: https://forum.effectivealtruism.org/posts/zmRTWsYZ4ifQKrX26/summary-of-situational-awareness-the-decade-ahead
+    linkText: "Summary of Situational Awareness: The Decade Ahead - EA Forum"
+    claimContext: According to Aschenbrenner, these trends combine to project a 100,000x increase in effective compute between 2024 and 2027.[^33] He argues that by 2025-26, AI systems will surpass college graduates on many benchmarks, and that superintelligence could emerge by the end of the decade through recursive
+    fetchedAt: 2026-02-22T01:57:30.988Z
+    httpStatus: 200
+    pageTitle: Summary of Situational Awareness - The Decade Ahead — EA Forum
+    contentSnippet: "Summary of Situational Awareness - The Decade Ahead — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Summary of Situational Awareness - The Decade Ahead by OscarD🔸 Jun 8 2024 21 min read 5 143 AI safety Forecasting AI forecasting AI governance AI race Research summary Frontpage Summary of Situational Awareness - The Decade Ahead Short Summary I. From GPT-4 to AGI: Counting the OOMs Pa"
+    contentLength: 411204
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://fluidself.org/books/science/situational-awareness
+    linkText: "Situational Awareness: The Decade Ahead - FluidSelf"
+    claimContext: According to Aschenbrenner, these trends combine to project a 100,000x increase in effective compute between 2024 and 2027.[^33] He argues that by 2025-26, AI systems will surpass college graduates on many benchmarks, and that superintelligence could emerge by the end of the decade through recursive
+    fetchedAt: 2026-02-22T01:57:31.506Z
+    httpStatus: 200
+    pageTitle: Situational Awareness - by Leopold Aschenbrenner
+    contentSnippet: "Situational Awareness - by Leopold Aschenbrenner Situational Awareness - by Leopold Aschenbrenner From GPT-4 to AGI: Counting the OOMs AGI by 2027 is strikingly plausible. GPT-2 to GPT-4 took us from ~preschooler to ~smart high-schooler abilities in 4 years. Tracing trendlines in compute (~0.5 orders of magnitude or OOMs/year), algorithmic efficiencies (~0.5 OOMs/year), and “unhobbling” gains (from chatbot to agent), we should expect another preschooler-to-high-schooler-sized qualitative jump by"
+    contentLength: 124373
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://maxread.substack.com/p/who-is-leopold-aschenbrenner
+    linkText: Who is Leopold Aschenbrenner - Max Read
+    claimContext: A central theme of the essay is that <EntityLink id="agi-development">AGI development</EntityLink> represents a national security competition comparable to the Manhattan Project. Aschenbrenner argues that the United States must prepare to defend against AI misuse by geopolitical rivals, particularly
+    fetchedAt: 2026-02-22T01:57:30.911Z
+    httpStatus: 200
+    pageTitle: A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen
+    contentSnippet: "A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen Subscribe Sign in A new A.I. influencer is producing some of the most criminal charts I've ever seen Who is “Leopold Aschenbrenner\"? PLUS: Bill Ackman, Vivek Ramaswamy, and the anti-woke finance grift. Max Read Jun 06, 2024 123 17 18 Share Greetings from Read Max HQ! In today’s newsletter: Who is “Leopold Aschenbrenner,” and why is he suddenly a top A.I. influencer?; and A short history of the anti-woke finan"
+    contentLength: 340237
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.allamericanspeakers.com/celebritytalentbios/Leopold+Aschenbrenner/466402
+    linkText: Leopold Aschenbrenner - All American Speakers
+    claimContext: A central theme of the essay is that <EntityLink id="agi-development">AGI development</EntityLink> represents a national security competition comparable to the Manhattan Project. Aschenbrenner argues that the United States must prepare to defend against AI misuse by geopolitical rivals, particularly
+    fetchedAt: 2026-02-22T01:57:31.242Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 37
+    url: https://www.thenewatlantis.com/publications/situational-awareness-about-the-coming-agi
+    linkText: Situational Awareness About the Coming AGI - The New Atlantis
+    claimContext: He calls for a U.S. government "Project for AGI" with massive computing clusters and advocates for keeping AGI development within a "free world" coalition rather than allowing open dissemination of capabilities.[^37] This nationalist framing has proven controversial, with critics arguing it promotes
+    fetchedAt: 2026-02-22T01:57:31.541Z
+    httpStatus: 200
+    pageTitle: Gaining Situational Awareness About the Coming Artificial General Intelligence &mdash; The New Atlantis
+    contentSnippet: Gaining Situational Awareness About the Coming Artificial General Intelligence &mdash; The New Atlantis Essay Spring 2025 Gaining Situational Awareness About the Coming Artificial General Intelligence How to see clearly what lies ahead Brian J. A. Boyd Subscriber Only Sign in or Subscribe Now for audio version Part 1 of “ Will AI Be Alive? ” “Burner of ashes” — there’s a job description one rarely sees these days. Yet going back to the Bronze Age, the ash burner had an essential if dirty job. So
+    contentLength: 112497
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+    linkText: Response to Aschenbrenner's Situational Awareness - EA Forum
+    claimContext: He calls for a U.S. government "Project for AGI" with massive computing clusters and advocates for keeping AGI development within a "free world" coalition rather than allowing open dissemination of capabilities.[^37] This nationalist framing has proven controversial, with critics arguing it promotes
+    fetchedAt: 2026-02-22T01:57:32.598Z
+    httpStatus: 200
+    pageTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+    contentSnippet: 'Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Response to Aschenbrenner&#x27;s "Situational Awareness" by RobBensinger Jun 6 2024 4 min read 14 111 AI safety Opinion Frontpage ( Cross-posted from Twitter. ) My take on Leopold Aschenbrenner&#x27;s new report : I think Leopold gets it right on a bunch of important counts. Three that I especially care '
+    contentLength: 324780
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.forourposterity.com
+    linkText: For Our Posterity
+    claimContext: Despite warning about AI risk more broadly, Aschenbrenner has acknowledged that alignment is a solvable problem, though he notes that far fewer people are working on it than might be expected, and that existing alignment research is not on track.[^39] He argues that getting the right people and reso
+    fetchedAt: 2026-02-22T01:57:33.472Z
+    httpStatus: 200
+    pageTitle: For Our Posterity — by Leopold Aschenbrenner
+    contentSnippet: For Our Posterity — by Leopold Aschenbrenner Benne Baskervville Fraunces Oranienbaum Rosarivo Goudy+Bookletter+1911 --> Hi, I'm Leopold Aschenbrenner . I recently founded an investment firm focused on AGI, with anchor investments from Patrick Collison, John Collison, Nat Friedman, and Daniel Gross. Before that, I worked on the Superalignment team at OpenAI. In a past life, I did research on economic growth at Oxford's Global Priorities Institute. I graduated as valedictorian from Columbia at age
+    contentLength: 110214
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.lesswrong.com/posts/i5pccofToYepythEw/against-aschenbrenner-how-situational-awareness-constructs-a
+    linkText: "Against Aschenbrenner: How Situational Awareness Constructs a Narrative - LessWrong"
+    claimContext: Despite warning about AI risk more broadly, Aschenbrenner has acknowledged that alignment is a solvable problem, though he notes that far fewer people are working on it than might be expected, and that existing alignment research is not on track.[^39] He argues that getting the right people and reso
+    fetchedAt: 2026-02-22T01:57:33.145Z
+    httpStatus: 200
+    pageTitle: "Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong AI Personal Blog 100 Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity by GideonF 15th Jul 2024 Linkpost from forum.effectivealtruism.org 26 min read"
+    contentLength: 707519
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    linkText: Leopold Aschenbrenner - Wikipedia
+    claimContext: Following the viral success of his essay, Aschenbrenner founded Situational Awareness LP, an AI-focused hedge fund named after his publication.[^41] The fund is not a venture capital firm but rather invests in companies set to benefit from AI adoption, including chipmakers, infrastructure providers,
+    fetchedAt: 2026-02-22T01:57:32.558Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 42
+    url: https://litquidity.co/1-5b-ai-hedge-fund-launches-surges-in-first-year/
+    linkText: \$1.5B AI Hedge Fund Launches, Surges in First Year - Litquidity
+    claimContext: Following the viral success of his essay, Aschenbrenner founded Situational Awareness LP, an AI-focused hedge fund named after his publication.[^41] The fund is not a venture capital firm but rather invests in companies set to benefit from AI adoption, including chipmakers, infrastructure providers,
+    fetchedAt: 2026-02-22T01:57:33.070Z
+    httpStatus: 200
+    pageTitle: $1.5B AI Hedge Fund Launches, Surges 47% in First Year - Litquidity
+    contentSnippet: $1.5B AI Hedge Fund Launches, Surges 47% in First Year - Litquidity Articles Exec Sum At 23, former OpenAI researcher Leopold Aschenbrenner has quickly become one of the most talked-about names in finance. Last year, with no professional investing background, he launched Situational Awareness in San Francisco after publishing a lengthy essay on artificial superintelligence that caught the attention of the tech and investment community. In less than a year, the hedge fund has taken in over $1.5 b
+    contentLength: 54311
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    linkText: Leopold Aschenbrenner - Wikipedia
+    claimContext: The fund secured anchor investments from prominent Silicon Valley figures including Patrick Collison and John Collison (co-founders of Stripe), Daniel Gross, and Nat Friedman (former GitHub CEO).[^43] The fund has global investors, including West Coast founders, family offices, institutions, and end
+    fetchedAt: 2026-02-22T01:57:34.480Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 45
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: The fund secured anchor investments from prominent Silicon Valley figures including Patrick Collison and John Collison (co-founders of Stripe), Daniel Gross, and Nat Friedman (former GitHub CEO).[^43] The fund has global investors, including West Coast founders, family offices, institutions, and end
+    fetchedAt: 2026-02-22T01:57:34.673Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513783
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://eu.36kr.com/en/p/3447925765920387
+    linkText: 23-year-old Leopold Aschenbrenner launches \$1.5B AI hedge fund - 36Kr
+    claimContext: The fund secured anchor investments from prominent Silicon Valley figures including Patrick Collison and John Collison (co-founders of Stripe), Daniel Gross, and Nat Friedman (former GitHub CEO).[^43] The fund has global investors, including West Coast founders, family offices, institutions, and end
+    fetchedAt: 2026-02-22T01:57:35.583Z
+    httpStatus: 200
+    pageTitle: 23-Year-Old Genius Fired by OpenAI Rakes in $1.5 Billion with AI
+    contentSnippet: "23-Year-Old Genius Fired by OpenAI Rakes in $1.5 Billion with AI English 中文 Deutsch Home Article After a 23-year-old genius was fired by OpenAI, he raked in $1.5 billion with AI. 36氪的朋友们 2025-09-01 17:06 At the age of 23, Leopold Aschenbrenner transitioned from a researcher at OpenAI to the founder of an AI hedge fund, which manages assets worth over $1.5 billion. Key points: Leopold Aschenbrenner, a 23 - year - old, transitioned from a researcher at OpenAI to the founder of an AI hedge fund, wh"
+    contentLength: 54209
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://litquidity.co/1-5b-ai-hedge-fund-launches-surges-in-first-year/
+    linkText: \$1.5B AI Hedge Fund Launches, Surges in First Year - Litquidity
+    claimContext: According to reports, the fund achieved approximately 47% returns (after fees) in the first half of 2025, significantly outperforming the S&P 500's 6% gain over the same period.[^47] Aschenbrenner has stated he has almost all of his personal net worth invested in the fund.[^48]
+    fetchedAt: 2026-02-22T01:57:34.523Z
+    httpStatus: 200
+    pageTitle: $1.5B AI Hedge Fund Launches, Surges 47% in First Year - Litquidity
+    contentSnippet: $1.5B AI Hedge Fund Launches, Surges 47% in First Year - Litquidity Articles Exec Sum At 23, former OpenAI researcher Leopold Aschenbrenner has quickly become one of the most talked-about names in finance. Last year, with no professional investing background, he launched Situational Awareness in San Francisco after publishing a lengthy essay on artificial superintelligence that caught the attention of the tech and investment community. In less than a year, the hedge fund has taken in over $1.5 b
+    contentLength: 54311
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: According to reports, the fund achieved approximately 47% returns (after fees) in the first half of 2025, significantly outperforming the S&P 500's 6% gain over the same period.[^47] Aschenbrenner has stated he has almost all of his personal net worth invested in the fund.[^48]
+    fetchedAt: 2026-02-22T01:57:34.582Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513992
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://eu.36kr.com/en/p/3447925765920387
+    linkText: 23-year-old Leopold Aschenbrenner launches \$1.5B AI hedge fund - 36Kr
+    claimContext: The fund positions itself not just as an investment vehicle but as what Aschenbrenner describes as "the top think-tank in the AI field," aiming to contribute to understanding AGI trajectories while profiting from the transition.[^49]
+    fetchedAt: 2026-02-22T01:57:36.954Z
+    httpStatus: 200
+    pageTitle: 23-Year-Old Genius Fired by OpenAI Rakes in $1.5 Billion with AI
+    contentSnippet: "23-Year-Old Genius Fired by OpenAI Rakes in $1.5 Billion with AI English 中文 Deutsch Home Article After a 23-year-old genius was fired by OpenAI, he raked in $1.5 billion with AI. 36氪的朋友们 2025-09-01 17:06 At the age of 23, Leopold Aschenbrenner transitioned from a researcher at OpenAI to the founder of an AI hedge fund, which manages assets worth over $1.5 billion. Key points: Leopold Aschenbrenner, a 23 - year - old, transitioned from a researcher at OpenAI to the founder of an AI hedge fund, wh"
+    contentLength: 54209
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.lesswrong.com/posts/EGGruXRxGQx6RQt8x/situational-awareness-a-one-year-retrospective
+    linkText: "Situational Awareness: A One Year Retrospective - LessWrong"
+    claimContext: A June 2025 retrospective analysis on <EntityLink id="lesswrong">LessWrong</EntityLink> examined how Aschenbrenner's predictions from "Situational Awareness" were tracking one year later:[^50]
+    fetchedAt: 2026-02-22T01:57:37.016Z
+    httpStatus: 200
+    pageTitle: "Situational Awareness: A One-Year Retrospective — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Situational Awareness: A One-Year Retrospective — LessWrong Situational Awareness Postmortems & Retrospectives Forecasting & Prediction Frontpage 82 Situational Awareness: A One-Year Retrospective by Nathan Delisle 23rd Jun 2025 14 min read 4 82 tl;dr: Many critiques of *Situational Awareness* have been qualitative; one year later we can check the numbers. I did my bes"
+    contentLength: 669790
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.lesswrong.com/posts/EGGruXRxGQx6RQt8x/situational-awareness-a-one-year-retrospective
+    linkText: "Situational Awareness: A One Year Retrospective - LessWrong"
+    claimContext: The analysis concluded that most key drivers remained on track for the AGI-by-2027 timeline, though significant uncertainties persist.[^51]
+    fetchedAt: 2026-02-22T01:57:37.105Z
+    httpStatus: 200
+    pageTitle: "Situational Awareness: A One-Year Retrospective — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Situational Awareness: A One-Year Retrospective — LessWrong Situational Awareness Postmortems & Retrospectives Forecasting & Prediction Frontpage 82 Situational Awareness: A One-Year Retrospective by Nathan Delisle 23rd Jun 2025 14 min read 4 82 tl;dr: Many critiques of *Situational Awareness* have been qualitative; one year later we can check the numbers. I did my bes"
+    contentLength: 669790
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://fluidself.org/books/science/situational-awareness
+    linkText: Situational Awareness - by Leopold Aschenbrenner
+    claimContext: 'Aschenbrenner advocates what he calls "AGI realism"—the position that AGI will likely emerge within the current decade and poses significant risks that require urgent preparation.[^52] His views on addressing these risks include:'
+    fetchedAt: 2026-02-22T01:57:37.048Z
+    httpStatus: 200
+    pageTitle: Situational Awareness - by Leopold Aschenbrenner
+    contentSnippet: "Situational Awareness - by Leopold Aschenbrenner Situational Awareness - by Leopold Aschenbrenner From GPT-4 to AGI: Counting the OOMs AGI by 2027 is strikingly plausible. GPT-2 to GPT-4 took us from ~preschooler to ~smart high-schooler abilities in 4 years. Tracing trendlines in compute (~0.5 orders of magnitude or OOMs/year), algorithmic efficiencies (~0.5 OOMs/year), and “unhobbling” gains (from chatbot to agent), we should expect another preschooler-to-high-schooler-sized qualitative jump by"
+    contentLength: 124373
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+    linkText: Response to Aschenbrenner's Situational Awareness - EA Forum
+    claimContext: Aschenbrenner expresses optimism that <EntityLink id="alignment">AI alignment</EntityLink> is solvable through iterative development building on current systems. He argues for dedicating massive compute resources to alignment research and potentially offering billion-dollar prizes for breakthroughs.
+    fetchedAt: 2026-02-22T01:57:36.640Z
+    httpStatus: 200
+    pageTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+    contentSnippet: 'Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Response to Aschenbrenner&#x27;s "Situational Awareness" by RobBensinger Jun 6 2024 4 min read 14 111 AI safety Opinion Frontpage ( Cross-posted from Twitter. ) My take on Leopold Aschenbrenner&#x27;s new report : I think Leopold gets it right on a bunch of important counts. Three that I especially care '
+    contentLength: 324781
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://www.lesswrong.com/posts/i5pccofToYepythEw/against-aschenbrenner-how-situational-awareness-constructs-a
+    linkText: "Against Aschenbrenner: How Situational Awareness Constructs a Narrative - LessWrong"
+    claimContext: Aschenbrenner expresses optimism that <EntityLink id="alignment">AI alignment</EntityLink> is solvable through iterative development building on current systems. He argues for dedicating massive compute resources to alignment research and potentially offering billion-dollar prizes for breakthroughs.
+    fetchedAt: 2026-02-22T01:57:39.279Z
+    httpStatus: 200
+    pageTitle: "Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong AI Personal Blog 100 Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity by GideonF 15th Jul 2024 Linkpost from forum.effectivealtruism.org 26 min read"
+    contentLength: 707519
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://www.forourposterity.com/nobodys-on-the-ball-on-agi-alignment/
+    linkText: Nobody's On the Ball on AGI Alignment - For Our Posterity
+    claimContext: In a blog post titled "Nobody's On the Ball on AGI Alignment," Aschenbrenner criticizes the current state of alignment efforts, arguing that despite apparent funding in the effective altruism community, there are limited serious attempts to solve core alignment problems.[^55] He estimates the risk o
+    fetchedAt: 2026-02-22T01:57:38.279Z
+    httpStatus: 200
+    pageTitle: Nobody’s on the ball on AGI alignment
+    contentSnippet: Nobody’s on the ball on AGI alignment Benne Baskervville Fraunces Oranienbaum Rosarivo Goudy+Bookletter+1911 --> Observing from afar, it's easy to think there's an abundance of people working on AGI safety. Everyone on your timeline is fretting about AI risk, and it seems like there is a well-funded EA-industrial-complex that has elevated this to their main issue. Maybe you've even developed a slight distaste for it all—it reminds you a bit too much of the woke and FDA bureaucrats, and Eliezer s
+    contentLength: 134273
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+    linkText: Response to Aschenbrenner's Situational Awareness - EA Forum
+    claimContext: In a blog post titled "Nobody's On the Ball on AGI Alignment," Aschenbrenner criticizes the current state of alignment efforts, arguing that despite apparent funding in the effective altruism community, there are limited serious attempts to solve core alignment problems.[^55] He estimates the risk o
+    fetchedAt: 2026-02-22T01:57:38.234Z
+    httpStatus: 200
+    pageTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+    contentSnippet: 'Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Response to Aschenbrenner&#x27;s "Situational Awareness" by RobBensinger Jun 6 2024 4 min read 14 111 AI safety Opinion Frontpage ( Cross-posted from Twitter. ) My take on Leopold Aschenbrenner&#x27;s new report : I think Leopold gets it right on a bunch of important counts. Three that I especially care '
+    contentLength: 324781
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://maxread.substack.com/p/who-is-leopold-aschenbrenner
+    linkText: Who is Leopold Aschenbrenner - Max Read
+    claimContext: A major focus of Aschenbrenner's writing is information security around frontier AI systems. He argues that model weights and algorithmic secrets represent strategic assets comparable to nuclear weapons, and that current security practices at leading labs are inadequate to prevent theft by sophistic
+    fetchedAt: 2026-02-22T01:57:38.631Z
+    httpStatus: 200
+    pageTitle: A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen
+    contentSnippet: "A new A.I. influencer is producing some of the most criminal charts I&#x27;ve ever seen Subscribe Sign in A new A.I. influencer is producing some of the most criminal charts I've ever seen Who is “Leopold Aschenbrenner\"? PLUS: Bill Ackman, Vivek Ramaswamy, and the anti-woke finance grift. Max Read Jun 06, 2024 123 17 18 Share Greetings from Read Max HQ! In today’s newsletter: Who is “Leopold Aschenbrenner,” and why is he suddenly a top A.I. influencer?; and A short history of the anti-woke finan"
+    contentLength: 340237
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://www.allamericanspeakers.com/celebritytalentbios/Leopold+Aschenbrenner/466402
+    linkText: Leopold Aschenbrenner - All American Speakers
+    claimContext: He frames AGI development as an inevitable geopolitical competition, arguing that the United States must maintain a lead over rivals like China to ensure AGI is developed and deployed by democratic rather than authoritarian powers.[^58] This perspective has been characterized by critics as promoting
+    fetchedAt: 2026-02-22T01:57:38.681Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 59
+    url: https://www.lesswrong.com/posts/i5pccofToYepythEw/against-aschenbrenner-how-situational-awareness-constructs-a
+    linkText: "Against Aschenbrenner: How Situational Awareness Constructs a Narrative - LessWrong"
+    claimContext: He frames AGI development as an inevitable geopolitical competition, arguing that the United States must maintain a lead over rivals like China to ensure AGI is developed and deployed by democratic rather than authoritarian powers.[^58] This perspective has been characterized by critics as promoting
+    fetchedAt: 2026-02-22T01:57:40.841Z
+    httpStatus: 200
+    pageTitle: "Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong AI Personal Blog 100 Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity by GideonF 15th Jul 2024 Linkpost from forum.effectivealtruism.org 26 min read"
+    contentLength: 707519
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://forum.effectivealtruism.org/posts/WuPs6diJQnznmS4bo/questionable-narratives-of-situational-awareness
+    linkText: Questionable Narratives of Situational Awareness - EA Forum
+    claimContext: Critics argue that Aschenbrenner's AGI timeline predictions rely on questionable extrapolations that ignore potential obstacles. A <EntityLink id="lesswrong">LessWrong</EntityLink> post titled "Questionable Narratives of Situational Awareness" characterizes his essay as building on "questionable and
+    fetchedAt: 2026-02-22T01:57:40.320Z
+    httpStatus: 200
+    pageTitle: Questionable Narratives of "Situational Awareness" — EA Forum
+    contentSnippet: Questionable Narratives of "Situational Awareness" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Questionable Narratives of "Situational Awareness" by fergusq Jun 16 2024 17 min read 11 29 AI safety Opinion Frontpage Questionable Narratives of "Situational Awareness" Introduction Conspiracy narratives US-centric narratives The AGI narrative Learning-planning Definition of AGI The fu
+    contentLength: 497955
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://www.lesswrong.com/posts/Wp9eb4CAkH6chyqZm/questionable-narratives-of-situational-awareness
+    linkText: Questionable Narratives of Situational Awareness - LessWrong
+    claimContext: Critics argue that Aschenbrenner's AGI timeline predictions rely on questionable extrapolations that ignore potential obstacles. A <EntityLink id="lesswrong">LessWrong</EntityLink> post titled "Questionable Narratives of Situational Awareness" characterizes his essay as building on "questionable and
+    fetchedAt: 2026-02-22T01:57:40.625Z
+    httpStatus: 200
+    pageTitle: Questionable Narratives of "Situational Awareness" — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Questionable Narratives of "Situational Awareness" — LessWrong AI Frontpage 0 Questionable Narratives of "Situational Awareness" by fergusq 17th Jun 2024 1 min read 1 0 This is a linkpost for https://forum.effectivealtruism.org/posts/WuPs6diJQnznmS4bo/questionable-narratives-of-situational-awareness This is my analysis of narratives present in Leopold Aschenbrenner&#x2
+    contentLength: 283997
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://www.lawfaremedia.org/article/ai-timelines-and-national-security--the-obstacles-to-agi-by-2027
+    linkText: "AI Timelines and National Security: The Obstacles to AGI by 2027 - Lawfare"
+    claimContext: National security experts have argued that Aschenbrenner's analysis ignores social, policy, and institutional constraints that could slow AI development, and that his historical analogies (such as to the Manhattan Project) overstate the inevitability of rapid AGI development.[^62]
+    fetchedAt: 2026-02-22T01:57:41.134Z
+    httpStatus: 200
+    pageTitle: "AI Timelines and National Security: The Obstacles to AGI by 2027 | Lawfare"
+    contentSnippet: "AI Timelines and National Security: The Obstacles to AGI by 2027 | Lawfare Trent Kannegieter Meet The Authors Subscribe to Lawfare On June 4, ex-OpenAI Superalignment employee Leopold Aschenbrenner released a book-sized manuscript titled &ldquo;Situational Awareness.&rdquo; In it, he argues that artificial general intelligence (AGI)&mdash;AI technology that can complete and automate the set of complex knowledge work tasks at a level at or above humans&mdash;will arrive as soon as 2027, with epoc"
+    contentLength: 87782
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: Several commentators in effective altruism circles have expressed concern that Aschenbrenner's framing promotes a self-fulfilling "race to AGI" narrative. An EA Forum post notes that many in the community are "annoyed" with Aschenbrenner, particularly for promoting the narrative that there is a "rac
+    fetchedAt: 2026-02-22T01:57:40.384Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513992
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://www.lesswrong.com/posts/i5pccofToYepythEw/against-aschenbrenner-how-situational-awareness-constructs-a
+    linkText: "Against Aschenbrenner: How Situational Awareness Constructs a Narrative - LessWrong"
+    claimContext: Critics argue that Aschenbrenner's project is insufficiently justified, particularly his failure to adequately consider a development pause.[^65] His framing of security has also been characterized as overly weighted toward national security concerns, while being overly pessimistic about internation
+    fetchedAt: 2026-02-22T01:57:42.859Z
+    httpStatus: 200
+    pageTitle: "Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong AI Personal Blog 100 Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity by GideonF 15th Jul 2024 Linkpost from forum.effectivealtruism.org 26 min read"
+    contentLength: 707519
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://www.lesswrong.com/posts/i5pccofToYepythEw/against-aschenbrenner-how-situational-awareness-constructs-a
+    linkText: "Against Aschenbrenner: How Situational Awareness Constructs a Narrative - LessWrong"
+    claimContext: Critics argue that Aschenbrenner's project is insufficiently justified, particularly his failure to adequately consider a development pause.[^65] His framing of security has also been characterized as overly weighted toward national security concerns, while being overly pessimistic about internation
+    fetchedAt: 2026-02-22T01:57:42.648Z
+    httpStatus: 200
+    pageTitle: "Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity — LessWrong AI Personal Blog 100 Against Aschenbrenner: How &#x27;Situational Awareness&#x27; constructs a narrative that undermines safety and threatens humanity by GideonF 15th Jul 2024 Linkpost from forum.effectivealtruism.org 26 min read"
+    contentLength: 707519
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: The founding of Situational Awareness LP immediately after publishing his AGI essay has raised questions about potential conflicts of interest. Critics note that Aschenbrenner's public predictions about rapid AGI development and his advocacy for continued AI investment directly benefit his hedge fun
+    fetchedAt: 2026-02-22T01:57:42.230Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513992
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: The founding of Situational Awareness LP immediately after publishing his AGI essay has raised questions about potential conflicts of interest. Critics note that Aschenbrenner's public predictions about rapid AGI development and his advocacy for continued AI investment directly benefit his hedge fun
+    fetchedAt: 2026-02-22T01:57:42.327Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513992
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: According to Fortune's reporting, Aschenbrenner was described by some OpenAI colleagues as "politically clumsy," "arrogant," "astringent," and "abrasive" in meetings, with a willingness to challenge higher-ups that created friction.[^69] However, others defend him as principled in raising legitimate
+    fetchedAt: 2026-02-22T01:57:42.294Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513992
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: "Leopold Aschenbrenner: From OpenAI, FTX to a \\$1.5 Billion Hedge Fund - Fortune"
+    claimContext: Despite controversies, Aschenbrenner has become a significant voice in discussions about AGI timelines and AI policy. His essay "Situational Awareness" was praised by figures ranging from Ivanka Trump to various AI researchers and was widely discussed in Silicon Valley.[^70] His predictions have inf
+    fetchedAt: 2026-02-22T01:57:43.906Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513992
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://www.centeraipolicy.org/work/influential-safety-researcher-sounds-alarm-on-openais-failure-to-take-security-seriously
+    linkText: Influential Safety Researcher Sounds Alarm on OpenAI's Failure - Center for AI Policy
+    claimContext: The Center for AI Policy praised his evidence-based analysis and called for increased federal AI regulation and permanent funding for explainability research based on concerns he raised.[^71] His work has been featured in major media outlets and he has appeared on prominent podcasts including a 4.5-
+    fetchedAt: 2026-02-22T01:57:44.278Z
+    httpStatus: 200
+    pageTitle: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP
+    contentSnippet: Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously | Center for AI Policy | CAIP CAIP Media CAIP Media Donate All Work Opinion Influential Safety Researcher Sounds Alarm on OpenAI&#x27;s Failure to Take Security Seriously Jason Green-Lowe June 4, 2024 The Center for AI Policy applauds Leopold Aschenbrenner, a safety researcher at OpenAI who was allegedly fired for sounding the alarm about OpenAI’s failure to take security seriously. Aschenbrenner has j
+    contentLength: 38514
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://fluidself.org/books/science/situational-awareness
+    linkText: "Situational Awareness: The Decade Ahead - FluidSelf"
+    claimContext: The Center for AI Policy praised his evidence-based analysis and called for increased federal AI regulation and permanent funding for explainability research based on concerns he raised.[^71] His work has been featured in major media outlets and he has appeared on prominent podcasts including a 4.5-
+    fetchedAt: 2026-02-22T01:57:44.156Z
+    httpStatus: 200
+    pageTitle: Situational Awareness - by Leopold Aschenbrenner
+    contentSnippet: "Situational Awareness - by Leopold Aschenbrenner Situational Awareness - by Leopold Aschenbrenner From GPT-4 to AGI: Counting the OOMs AGI by 2027 is strikingly plausible. GPT-2 to GPT-4 took us from ~preschooler to ~smart high-schooler abilities in 4 years. Tracing trendlines in compute (~0.5 orders of magnitude or OOMs/year), algorithmic efficiencies (~0.5 OOMs/year), and “unhobbling” gains (from chatbot to agent), we should expect another preschooler-to-high-schooler-sized qualitative jump by"
+    contentLength: 124373
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+    linkText: Response to Aschenbrenner's Situational Awareness - EA Forum
+    claimContext: However, his influence remains contested. Within the effective altruism and AI safety communities, responses range from viewing him as correctly identifying crucial dynamics to seeing his work as epistemically problematic and potentially harmful to AI safety efforts.[^73]
+    fetchedAt: 2026-02-22T01:57:43.925Z
+    httpStatus: 200
+    pageTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+    contentSnippet: 'Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Response to Aschenbrenner&#x27;s "Situational Awareness" by RobBensinger Jun 6 2024 4 min read 14 111 AI safety Opinion Frontpage ( Cross-posted from Twitter. ) My take on Leopold Aschenbrenner&#x27;s new report : I think Leopold gets it right on a bunch of important counts. Three that I especially care '
+    contentLength: 324781
+    status: verified
+    note: null

@@ -1,0 +1,304 @@
+pageId: nti-bio
+verifiedAt: 2026-02-22
+totalCitations: 27
+verified: 20
+broken: 7
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.nti.org/about/programs-projects/program/global-biological-policy-programs-nti-bio/
+    linkText: NTI | bio Program Page — - Program overview
+    claimContext: "|-----------|------------|----------| | **Focus Area** | Global catastrophic biological risk reduction | DNA synthesis screening, BWC strengthening, AI-bio risks, international governance[^1] | | **Funding** | Well-funded by EA sources + traditional philanthropy | >\\$29M identified from <EntityLink "
+    fetchedAt: 2026-02-22T02:19:54.708Z
+    httpStatus: 200
+    pageTitle: Global Biological Policy & Programs (NTI | bio)
+    contentSnippet: Global Biological Policy & Programs (NTI | bio) Close Programs &#038; Projects Global Biological Policy &#038; Programs (NTI | bio) AI & Tech Biological About Biological threats – whether natural, accidental or deliberate &#8212; can kill millions, cost billions, and create political and economic instability in individual countries and around the world. The risks and consequences of a global catastrophic biological event can be magnified by weak global health security, increasing urbanization an
+    contentLength: 84501
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.openphilanthropy.org/grants/nuclear-threat-initiative-biosecurity-program-support-2023/
+    linkText: Coefficient Giving - NTI Biosecurity Program Support 2023 — - \$7.83M grant
+    claimContext: '| **Focus Area** | Global catastrophic biological risk reduction | DNA synthesis screening, BWC strengthening, AI-bio risks, international governance[^1] | | **Funding** | Well-funded by EA sources + traditional philanthropy | >\$29M identified from <EntityLink id="open-philanthropy">Coefficient Giv'
+    fetchedAt: 2026-02-22T02:20:01.574Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 3
+    url: https://en.wikipedia.org/wiki/Nuclear_Threat_Initiative
+    linkText: Nuclear Threat Initiative - Wikipedia — - Founding history
+    claimContext: '| **Focus Area** | Global catastrophic biological risk reduction | DNA synthesis screening, BWC strengthening, AI-bio risks, international governance[^1] | | **Funding** | Well-funded by EA sources + traditional philanthropy | >\$29M identified from <EntityLink id="open-philanthropy">Coefficient Giv'
+    fetchedAt: 2026-02-22T02:19:53.631Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://www.nti.org/news/nti-at-the-biological-weapons-convention-urging-collective-action-to-reduce-biological-and-ai-risks/
+    linkText: "NTI at the BWC: Urging Collective Action — - BWC engagement"
+    claimContext: '| **Funding** | Well-funded by EA sources + traditional philanthropy | >\$29M identified from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> across multiple grants; NTI parent org founded with \$250M from Ted Turner[^2][^3] | | **Policy Influence** | Very high | Endorsed Biosecur'
+    fetchedAt: 2026-02-22T02:19:53.971Z
+    httpStatus: 200
+    pageTitle: "NTI at the Biological Weapons Convention: Urging Collective Action to Reduce Biological and AI Risks"
+    contentSnippet: "NTI at the Biological Weapons Convention: Urging Collective Action to Reduce Biological and AI Risks Close News Aug 11, 2025 NTI at the Biological Weapons Convention: Urging Collective Action to Reduce Biological and AI Risks Share --> Twitter Facebook Linkedin Email The Nuclear Threat Initiative (NTI) will join world leaders and policy makers at the Sixth Session of the Working Group on the Strengthening of the Biological Weapons Convention (BWC). During the session, NTI’s Global Biological Pol"
+    contentLength: 58204
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.nti.org/about/programs-projects/project/international-biosafety-and-biosecurity-initiative-for-science-ibbis/
+    linkText: IBBIS Program Page — - IBBIS overview
+    claimContext: '| **Funding** | Well-funded by EA sources + traditional philanthropy | >\$29M identified from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> across multiple grants; NTI parent org founded with \$250M from Ted Turner[^2][^3] | | **Policy Influence** | Very high | Endorsed Biosecur'
+    fetchedAt: 2026-02-22T02:19:53.996Z
+    httpStatus: 200
+    pageTitle: International Biosecurity and Biosafety Initiative for Science (IBBIS)
+    contentSnippet: International Biosecurity and Biosafety Initiative for Science (IBBIS) Close International Biosecurity and Biosafety Initiative for Science (IBBIS) Biological Safeguarding modern bioscience and biotechnology so it can advance and flourish safely and responsibly Challenge Rapid advances in bioscience offer great promise but can increase risks of accidental or deliberate misuse, with potentially catastrophic consequences. Governments have not been able to provide adequate oversight. Action Establi
+    contentLength: 95179
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.nti.org/news/beth-cameron-joins-nti-lead-global-biological-policy-and-programs/
+    linkText: Beth Cameron Joins NTI — - Cameron appointment
+    claimContext: "| **Policy Influence** | Very high | Endorsed Biosecurity Modernization and Innovation Act of 2026; active at BWC meetings; launched IBBIS in Geneva[^4][^5] | | **Team** | Experienced national security leadership | Led by former White House NSC, DoD, and FDA officials[^6] | | **Key Output** | IBBIS,"
+    fetchedAt: 2026-02-22T02:20:03.225Z
+    httpStatus: 200
+    pageTitle: Beth Cameron Joins NTI to Lead Global Biological Policy and Programs
+    contentSnippet: Beth Cameron Joins NTI to Lead Global Biological Policy and Programs Close News Mar 30, 2017 Beth Cameron Joins NTI to Lead Global Biological Policy and Programs Share --> Twitter Facebook Linkedin Email m"> Beth Cameron, PhD Dr. Elizabeth (Beth) Cameron has been named senior director for global biological policy and programs at the Nuclear Threat Initiative , NTI Co-Chairman and CEO Sam Nunn announced today. “Since our founding, NTI has been committed to addressing biological threats,” said Nun
+    contentLength: 59013
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.nti.org/about/programs-projects/project/global-health-security-index/
+    linkText: Global Health Security Index — - GHS Index overview
+    claimContext: "| **Team** | Experienced national security leadership | Led by former White House NSC, DoD, and FDA officials[^6] | | **Key Output** | IBBIS, Global Health Security Index, Bio Funders Compact | Spawned an independent international biosecurity org; benchmarks 195 countries[^7][^8] | | **Key Concern**"
+    fetchedAt: 2026-02-22T02:20:03.024Z
+    httpStatus: 200
+    pageTitle: Global Health Security Index
+    contentSnippet: "Global Health Security Index Close Global Health Security Index Biological Assessing national capabilities to prevent, detect, and respond to pandemic threats Challenge Countries need to work together to control pandemics, but without an independent assessment of national health security capability, it is difficult to fully understand needs, identify gaps, and track improvements over time. Action Create a Global Health Security (GHS) Index to assess national-level capacities to prevent, detect, "
+    contentLength: 135320
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.nti.org/news/bio-funders-compact-biosecurity-research-funding/
+    linkText: Bio Funders Compact — - Compact launch
+    claimContext: "| **Team** | Experienced national security leadership | Led by former White House NSC, DoD, and FDA officials[^6] | | **Key Output** | IBBIS, Global Health Security Index, Bio Funders Compact | Spawned an independent international biosecurity org; benchmarks 195 countries[^7][^8] | | **Key Concern**"
+    fetchedAt: 2026-02-22T02:20:03.088Z
+    httpStatus: 200
+    pageTitle: Bio Funders Compact | Advancing Biosecurity in Research
+    contentSnippet: "Bio Funders Compact | Advancing Biosecurity in Research Close News Jun 20, 2024 International Bio Funders Compact to Integrate Biosecurity into Life Science Research Funding Share --> Twitter Facebook Linkedin Email Links & Downloads International Bio Funders Compact The Nuclear Threat Initiative (NTI), in partnership with the Coalition for Epidemic Preparedness Innovations (CEPI), launched the international Bio Funders Compact at the 2024 Global Health Security Conference in Sydney, Australia. "
+    contentLength: 60657
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.nti.org/about/people/jaime-yassif-phd/
+    linkText: Jaime Yassif NTI Profile — - Role and background
+    claimContext: "| **Key Output** | IBBIS, Global Health Security Index, Bio Funders Compact | Spawned an independent international biosecurity org; benchmarks 195 countries[^7][^8] | | **Key Concern** | Leadership transition period | VP Jaime Yassif stepped down end of 2025; NTI-wide CEO transition to Christine Wor"
+    fetchedAt: 2026-02-22T02:20:03.521Z
+    httpStatus: 200
+    pageTitle: Jaime M. Yassif, Ph.D. | Senior Advisor, NTI | bio
+    contentSnippet: Jaime M. Yassif, Ph.D. | Senior Advisor, NTI | bio Close Jaime M. Yassif, PhD Senior Advisor Global Biological Policy &#038; Programs (NTI | bio) Expertise Biosecurity Twitter Linkedin Download Photo Bio Jaime Yassif, PhD serves a consultant to NTI, providing senior counsel to the NTI | bio team, having stepped down from her role as NTI | bio vice president at the end of 2025. Prior to this, Yassif served as a Program Officer at the Open Philanthropy Project, where she led the initiative on Bios
+    contentLength: 69813
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.nti.org/news/nti-board-of-directors-announces-2025-leadership-transition/
+    linkText: NTI Board Announces 2025 Leadership Transition — - Wormuth appointment
+    claimContext: "| **Key Output** | IBBIS, Global Health Security Index, Bio Funders Compact | Spawned an independent international biosecurity org; benchmarks 195 countries[^7][^8] | | **Key Concern** | Leadership transition period | VP Jaime Yassif stepped down end of 2025; NTI-wide CEO transition to Christine Wor"
+    fetchedAt: 2026-02-22T02:20:03.358Z
+    httpStatus: 200
+    pageTitle: NTI Board of Directors Announces 2025 Leadership Transition
+    contentSnippet: NTI Board of Directors Announces 2025 Leadership Transition Close News Apr 2, 2025 NTI Board of Directors Announces 2025 Leadership Transition Share --> Twitter Facebook Linkedin Email After years of dedicated service to NTI’s mission of delivering innovative solutions to reducing nuclear, biological and emerging technology threats, Ernest J. Moniz, co-chair and CEO of the Nuclear Threat Initiative (NTI), and Joan Rohlfing, president and COO of NTI, will step down from their roles in 2025. A sea
+    contentLength: 51083
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.founderspledge.com/research/nuclear-threat-initiative-global-biological-policy-and-programs
+    linkText: Founders Pledge - NTI Bio Assessment — - Strategic approach
+    claimContext: While NTI is best known for its nuclear security work, the biological program has become one of the most influential institutional actors in the biosecurity field. NTI | bio works to reduce global catastrophic biological risks through four strategic approaches:[^11]
+    fetchedAt: 2026-02-22T02:20:05.171Z
+    httpStatus: 200
+    pageTitle: Nuclear Threat Initiative’s Global Biological Policy and Programs
+    contentSnippet: Nuclear Threat Initiative’s Global Biological Policy and Programs Related research Safeguarding the future report Learn more Nuclear Threat Initiative (NTI) is a nonprofit, nonpartisan global security organization focused on reducing nuclear and biological threats imperiling humanity. What problem are they trying to solve? For most of human history, the greatest risk of mass fatalities has stemmed from pandemics. The poor health, deaths, and economic and political disruption caused by the ongoin
+    contentLength: 227159
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.founderspledge.com/recommendations/topic/biosecurity
+    linkText: Founders Pledge - Biosecurity Recommendations — - Charity recommendation
+    claimContext: <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> identifies NTI | bio as among the "highest-impact biosecurity organizations" in the world.[^2] Founders Pledge has recommended NTI | bio as a high-impact giving opportunity in the biosecurity space.[^12]
+    fetchedAt: 2026-02-22T02:20:06.870Z
+    httpStatus: 200
+    pageTitle: Biosecurity
+    contentSnippet: Biosecurity Biosecurity Global catastrophic risks Global security Biosecurity System change Artificial intelligence Global catastrophic risks Biosecurity Global catastrophic risks Biosecurity Global catastrophic risks Biosecurity Artificial intelligence Global catastrophic risks Biosecurity Global catastrophic risks Biosecurity
+    contentLength: 247502
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.nti.org/news/open-philanthropy-projects-6-million-grant-transform-ntis-biosecurity-mission/
+    linkText: Coefficient Giving \$6M Grant to NTI — - Initial major grant
+    claimContext: Beth Cameron, Ph.D., joined NTI in 2017 to lead the biological policy program. Cameron had previously served as Senior Director for Global Health Security and Biodefense on the White House National Security Council, where she helped develop and launch the Global Health Security Agenda. Under her lea
+    fetchedAt: 2026-02-22T02:20:05.417Z
+    httpStatus: 200
+    pageTitle: Open Philanthropy Project’s $6 Million Grant To Transform NTI’s Biosecurity Mission
+    contentSnippet: Open Philanthropy Project’s $6 Million Grant To Transform NTI’s Biosecurity Mission Close News Jan 9, 2018 Open Philanthropy Project’s $6 Million Grant To Transform NTI’s Biosecurity Mission Share --> Twitter Facebook Linkedin Email Thanks to two new, generous grants, the Nuclear Threat Initiative (NTI) will significantly expand its biosecurity work under the leadership of Elizabeth Cameron , Ph.D., newly named vice president, global biological policy and programs with guidance from newly electe
+    contentLength: 59238
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.nti.org/news/beth-cameron-to-serve-in--biden-harris-administration/
+    linkText: Statement on Beth Cameron Appointment to Biden-Harris NSC — - Cameron departure
+    claimContext: Cameron later departed to serve in the Biden-Harris administration's National Security Council.[^14]
+    fetchedAt: 2026-02-22T02:20:04.945Z
+    httpStatus: 200
+    pageTitle: Statement from Ernest J. Moniz and Joan Rohlfing on the Appointment of Beth Cameron to Serve in the Biden-Harris National Security Council
+    contentSnippet: Statement from Ernest J. Moniz and Joan Rohlfing on the Appointment of Beth Cameron to Serve in the Biden-Harris National Security Council Close News Jan 15, 2021 Statement from Ernest J. Moniz and Joan Rohlfing on the Appointment of Beth Cameron to Serve in the Biden-Harris National Security Council Share --> Twitter Facebook Linkedin Email m"> Beth Cameron, PhD “NTI’s Vice President for Global Biological Policy and Programs, Beth Cameron, PhD, has been asked to rebuild the National Security Co
+    contentLength: 56618
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.openphilanthropy.org/grants/nuclear-threat-initiative-global-health-security-index/
+    linkText: Coefficient Giving - NTI Global Health Security Index — - GHS Index grant
+    claimContext: Launched in 2019, the GHS Index is the first comprehensive assessment of health security capabilities across 195 countries. Developed in collaboration with the Johns Hopkins Center for Health Security and The Economist Intelligence Unit, and funded by a \$3.56 million Coefficient Giving grant, the I
+    fetchedAt: 2026-02-22T02:20:11.794Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 16
+    url: https://www.nti.org/about/programs-projects/project/next-generation-for-biosecurity/
+    linkText: Next Generation for Biosecurity — - Program overview
+    claimContext: "This program develops cohorts of early-career professionals (ages 18-35) in biosecurity and supports their active participation in high-profile international meetings, including the Biological Weapons Convention and Global Health Security Network Conference. The program runs annual competitions and "
+    fetchedAt: 2026-02-22T02:20:13.482Z
+    httpStatus: 200
+    pageTitle: Next Generation for Biosecurity
+    contentSnippet: Next Generation for Biosecurity Close Next Generation for Biosecurity Biological Fostering the Next Generation of Global Biosecurity Leaders Challenge Reducing biological risks requires expertise and collaboration across sectors. However, there are too few biosecurity experts and limited geographic and gender diversity among professionals working in biosafety and biosecurity. Action Bring together rising young leaders from around the world to develop innovative solutions to reduce global catastr
+    contentLength: 132585
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.nti.org/about/programs-projects/project/aixbio-global-forum/
+    linkText: AIxBio Global Forum — - Forum overview
+    claimContext: NTI | bio convened the first International AI-Bio Forum in 2024, bringing together biosecurity professionals, AI experts, and policymakers from organizations including Anthropic and Google DeepMind, as well as representatives from China, India, Nigeria, the U.K., and the U.S. The Forum addresses ris
+    fetchedAt: 2026-02-22T02:20:13.354Z
+    httpStatus: 200
+    pageTitle: AIxBio Global Forum
+    contentSnippet: AIxBio Global Forum Close AIxBio Global Forum AI & Tech Biological Facilitating international governance to reduce biosecurity risks at the convergence of AI and the life sciences. Challenge Rapid advances in AI and its convergence with the life sciences present new biosecurity risks that require innovative solutions and action by governments, technologists and other key stakeholders around the world. Action Provide a global forum to develop a shared understanding of AI-related biosecurity risks
+    contentLength: 87649
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.nti.org/about/programs-projects/project/fostering-biosecurity-innovation-and-risk-reduction/
+    linkText: Biosecurity Innovation and Risk Reduction Initiative — - BIRRI overview
+    claimContext: Launched in 2018 in Cambridge, Massachusetts, BIRRI is a multi-year project that identifies, develops, and promotes concrete actions to reduce global catastrophic biological risks associated with technology advances. This initiative spawned IBBIS and continues to serve as a platform for developing b
+    fetchedAt: 2026-02-22T02:20:13.797Z
+    httpStatus: 200
+    pageTitle: Biosecurity Innovation and Risk Reduction Initiative
+    contentSnippet: "Biosecurity Innovation and Risk Reduction Initiative Close Biosecurity Innovation and Risk Reduction Initiative AI & Tech Biological Advances in biotechnology outpace national governments’ ability to provide needed oversight to prevent accidents or deliberate misuse of dangerous biological agents. Challenge Advances in biotechnology outpace national governments’ ability to provide needed oversight to prevent accidents or deliberate misuse of dangerous biological agents. Action Engage public and "
+    contentLength: 109165
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.nti.org/news/nti-bio-partners-africa-cdc-build-covid-19-biosafety-and-biosecurity-capacity-eastern-africa/
+    linkText: NTI | bio and Africa CDC Partnership — - Africa partnership
+    claimContext: NTI | bio partnered with the Africa Centres for Disease Control and Prevention (Africa CDC) to build biosafety and biosecurity capacity across multiple African regions. The partnership organized training programs for experts across Eastern, Western, Central, Northern, and Southern Africa, reaching h
+    fetchedAt: 2026-02-22T02:20:13.344Z
+    httpStatus: 200
+    pageTitle: NTI | bio Partners with Africa CDC to Build COVID-19 Biosafety and Biosecurity Capacity in Eastern Africa
+    contentSnippet: "NTI | bio Partners with Africa CDC to Build COVID-19 Biosafety and Biosecurity Capacity in Eastern Africa Close News Jul 13, 2020 NTI | bio Partners with Africa CDC to Build COVID-19 Biosafety and Biosecurity Capacity in Eastern Africa Share --> Twitter Facebook Linkedin Email The NTI Global Biological Policy and Programs team (NTI | bio) partnered with the Africa Centres for Disease Control and Prevention (Africa CDC) to sponsor a series of trainings for nearly 100 experts from 14 countries in "
+    contentLength: 61266
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.nti.org/news/nti-endorses-biosecurity-modernization-and-innovation-act-of-2026/
+    linkText: NTI Endorses Biosecurity Modernization and Innovation Act of 2026 — - Legislative endorsement
+    claimContext: NTI endorsed this bipartisan legislation led by Senators Tom Cotton (R-AR) and Amy Klobuchar (D-MN). The Act would:[^20]
+    fetchedAt: 2026-02-22T02:20:13.309Z
+    httpStatus: 200
+    pageTitle: NTI Endorses Biosecurity Modernization and Innovation Act of 2026
+    contentSnippet: NTI Endorses Biosecurity Modernization and Innovation Act of 2026 Close News Feb 4, 2026 NTI Endorses Biosecurity Modernization and Innovation Act of 2026 Share --> Twitter Facebook Linkedin Email NTI endorses the bipartisan Biosecurity Modernization and Innovation Act of 2026 , led by Senators Tom Cotton (R-AR) and Amy Klobuchar (D-MN). This bill creates an important opportunity to incentivize a safe and secure U.S. bioeconomy through strengthened biosecurity policy. “The Biosecurity Modernizat
+    contentLength: 56837
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.nti.org/about/people/margaret-hamburg-md/
+    linkText: Margaret Hamburg NTI Profile — - Advisory group chair
+    claimContext: The Advisory Group is chaired by Dr. Margaret Hamburg, former Commissioner of the U.S. Food and Drug Administration. The group provides strategic guidance on NTI | bio's work to reduce global catastrophic biological risks.[^21]
+    fetchedAt: 2026-02-22T02:20:15.494Z
+    httpStatus: 200
+    pageTitle: Margaret Hamburg, M.D.
+    contentSnippet: Margaret Hamburg, M.D. Close Margaret Hamburg, M.D. Co-president, InterAcademy Partnership Download Photo Bio Margaret “Peggy” Hamburg is an American physician and public health administrator who currently serves as co-president of the InterAcademy Partnership (IAP), the global network of science, engineering and medical academies working together to provide independent expert advice on scientific, technological and health issues. She is also vice chair of the President’s Intelligence Advisory B
+    contentLength: 44323
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.openphilanthropy.org/focus/global-catastrophic-risks/biosecurity/nuclear-threat-initiative-projects-to-reduce-global-catastrophic-biological-risks
+    linkText: Coefficient Giving - NTI GCBR Projects — - GCBR grant
+    claimContext: "| Global Health Security Index | \\$3,556,773 | 2018 (2 years) | GHS Index with Johns Hopkins and EIU[^15] | | GCBR Reduction Projects | \\$1,904,942 | 2019 (3 years) | Projects to reduce global catastrophic biological risks[^22] | | Biosecurity Program Support | \\$8,000,000 | Feb 2020 (3 years) | Bio"
+    fetchedAt: 2026-02-22T02:20:22.601Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 23
+    url: https://www.openphilanthropy.org/grants/nuclear-threat-initiative-biosecurity-program-support-february-2020/
+    linkText: Coefficient Giving - NTI Biosecurity Support Feb 2020 — - \$8M grant
+    claimContext: "| GCBR Reduction Projects | \\$1,904,942 | 2019 (3 years) | Projects to reduce global catastrophic biological risks[^22] | | Biosecurity Program Support | \\$8,000,000 | Feb 2020 (3 years) | Biosecurity program expansion[^23] | | COVID-19 Biosecurity | \\$500,000 | 2020 | Support for NTI's COVID-19 wor"
+    fetchedAt: 2026-02-22T02:20:21.471Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 24
+    url: https://www.openphilanthropy.org/grants/nuclear-threat-initiative-biosecurity-program-support/
+    linkText: Coefficient Giving - NTI Biosecurity Support — - COVID grant
+    claimContext: "| Biosecurity Program Support | \\$8,000,000 | Feb 2020 (3 years) | Biosecurity program expansion[^23] | | COVID-19 Biosecurity | \\$500,000 | 2020 | Support for NTI's COVID-19 work[^24] | | GCBR Reduction | \\$1,250,000 | 2021 (2 years) | Work on reducing global catastrophic biological risks[^25] |"
+    fetchedAt: 2026-02-22T02:20:21.731Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 25
+    url: https://www.openphilanthropy.org/grants/nuclear-threat-initiative-global-catastrophic-biological-risk-reduction-2021/
+    linkText: Coefficient Giving - NTI GCBR Reduction 2021 — - 2021 grant
+    claimContext: "| COVID-19 Biosecurity | \\$500,000 | 2020 | Support for NTI's COVID-19 work[^24] | | GCBR Reduction | \\$1,250,000 | 2021 (2 years) | Work on reducing global catastrophic biological risks[^25] | | Biosecurity Program Support | \\$7,831,500 | 2023 (3 years) | Gene synthesis safeguards, BWC strengthenin"
+    fetchedAt: 2026-02-22T02:20:21.765Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 26
+    url: https://www.nti.org/about/financials/
+    linkText: NTI Financials — - Financial transparency
+    claimContext: NTI's parent organization receives funding from diverse sources including foundations, governments, and individual donors. Ted Turner's initial \$250 million pledge provided the organization's foundational capital. NTI publishes annual financial reports and impact reports on its website.[^26]
+    fetchedAt: 2026-02-22T02:20:24.183Z
+    httpStatus: 200
+    pageTitle: NTI Financials | Transparency and Accountability
+    contentSnippet: "NTI Financials | Transparency and Accountability Close Financials m\"> NTI's 2024 Impact Report: What Does It Take to Build a Safer World? NTI's 2024 Impact Report, What Does It Take to Build a Safer World?, details the organization’s accomplishments in reducing global nuclear and biological threats and addressing the benefits and risks associated with artificial intelligence and emerging technologies. s -mh:4\"> Download PDF NTI's 2024 Impact Report, What Does It Take to Build a Safer World?, is "
+    contentLength: 58510
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://80000hours.org/podcast/episodes/jaime-yassif-safeguarding-bioscience/
+    linkText: 80,000 Hours Podcast - Jaime Yassif — - Podcast interview
+    claimContext: "- NTI | bio's DNA synthesis screening work (via <EntityLink id=\"ibbis\">IBBIS</EntityLink>) complements <EntityLink id=\"securebio\">SecureBio</EntityLink>'s <EntityLink id=\"securedna\">SecureDNA</EntityLink> initiative - Jaime Yassif appeared on the 80,000 Hours podcast to discuss \"safeguarding bioscie"
+    fetchedAt: 2026-02-22T02:20:24.349Z
+    httpStatus: 200
+    pageTitle: Jaime Yassif on safeguarding bioscience to prevent catastrophic lab accidents and bioweapons development | 80,000 Hours
+    contentSnippet: "Jaime Yassif on safeguarding bioscience to prevent catastrophic lab accidents and bioweapons development | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 3.1 Rob's intro [00:00:00] 3.2 The interview begins [00:02:32] 3.3 Categories of global catastrophic biological risks [00:05:24] 3.4 Disagreements with the effective altruism community [00:07:39] 3.5 Stopping the first person from getting infected [00:11:51]"
+    contentLength: 365054
+    status: verified
+    note: null

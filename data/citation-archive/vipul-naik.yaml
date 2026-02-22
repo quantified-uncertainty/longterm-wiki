@@ -1,0 +1,821 @@
+pageId: vipul-naik
+verifiedAt: 2026-02-22
+totalCitations: 74
+verified: 67
+broken: 7
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://vipulnaik.com/biography/
+    linkText: Vipul Naik Biography
+    claimContext: Vipul Naik is an Indian-American mathematician, data scientist, and effective altruism researcher who has created influential public knowledge infrastructure and funded contract research in EA and AI safety. Born in 1986 in Delhi, India, Naik distinguished himself early as a two-time International M
+    fetchedAt: 2026-02-22T01:54:21.214Z
+    httpStatus: 200
+    pageTitle: Biography | Vipul Naik
+    contentSnippet: "Biography | Vipul Naik Skip to content Key life events 1986: Born in Delhi, India Formal education School (1990-2004): Received school education at Delhi Public School, Noida . Successfully completed schooling. Undergraduate studies (2004-2007): Received undergraduate education at Chennai Mathematical Institute in Chennai, Tamil Nadu, India. At the end of it, received a B. Sc. (Hons) degree in mathematics and computer science. Graduate studies (2007-2013): Received graduate education at The Univ"
+    contentLength: 41167
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://orgwatch.issarice.com/?person=Vipul+Naik
+    linkText: OrgWatch - Vipul Naik
+    claimContext: Naik's work bridges multiple communities including effective altruism, rationality, open borders advocacy, and AI safety. He has contributed research to the <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink>, created the Timeline of AI Safety, and maintains extensive document
+    fetchedAt: 2026-02-22T01:54:20.697Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 562
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://vipulnaik.com/biography/
+    linkText: Vipul Naik Biography
+    claimContext: Naik's mathematical talent emerged early in his education in Delhi, where he attended Delhi Public School, Noida from 1990 to 2004.[^5] During his final two years of high school, he became active in mathematics olympiads, clearing the Indian National Mathematical Olympiad at the end of 11th grade. H
+    fetchedAt: 2026-02-22T01:54:21.690Z
+    httpStatus: 200
+    pageTitle: Biography | Vipul Naik
+    contentSnippet: "Biography | Vipul Naik Skip to content Key life events 1986: Born in Delhi, India Formal education School (1990-2004): Received school education at Delhi Public School, Noida . Successfully completed schooling. Undergraduate studies (2004-2007): Received undergraduate education at Chennai Mathematical Institute in Chennai, Tamil Nadu, India. At the end of it, received a B. Sc. (Hons) degree in mathematics and computer science. Graduate studies (2007-2013): Received graduate education at The Univ"
+    contentLength: 41167
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.imo-official.org/participant_r.aspx?id=7421
+    linkText: IMO Participant Record
+    claimContext: Naik's mathematical talent emerged early in his education in Delhi, where he attended Delhi Public School, Noida from 1990 to 2004.[^5] During his final two years of high school, he became active in mathematics olympiads, clearing the Indian National Mathematical Olympiad at the end of 11th grade. H
+    fetchedAt: 2026-02-22T01:54:29.145Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 7
+    url: https://vipulnaik.com/olympiads/
+    linkText: Vipul Naik Olympiads
+    claimContext: Naik's mathematical talent emerged early in his education in Delhi, where he attended Delhi Public School, Noida from 1990 to 2004.[^5] During his final two years of high school, he became active in mathematics olympiads, clearing the Indian National Mathematical Olympiad at the end of 11th grade. H
+    fetchedAt: 2026-02-22T01:54:21.350Z
+    httpStatus: 200
+    pageTitle: Olympiads | Vipul Naik
+    contentSnippet: "Olympiads | Vipul Naik Skip to content Note : If you&#8217;re a high school student in India looking for advice on Olympiad preparation, please also see this page . Mathematics Olympiad I had been interested in mathematics since childhood, but until 10th grade, I had not paid much attention to learning mathematics systematically beyond what was taught in school and what I read in some fun math books. When I was in 10th grade, my mother got in touch with a former college classmate of hers who was"
+    contentLength: 43559
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/User:Vipul
+    linkText: Wikipedia User Page - Vipul
+    claimContext: From 2004 to 2007, Naik pursued undergraduate studies at Chennai Mathematical Institute in Siruseri, near Chennai, Tamil Nadu, earning a B.Sc. (Honours) in mathematics and computer science.[^8] He then entered the mathematics Ph.D. program at the University of Chicago in 2007, earning his M.S. in Au
+    fetchedAt: 2026-02-22T01:54:30.163Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://vipulnaik.com/biography/
+    linkText: Vipul Naik Biography
+    claimContext: From 2004 to 2007, Naik pursued undergraduate studies at Chennai Mathematical Institute in Siruseri, near Chennai, Tamil Nadu, earning a B.Sc. (Honours) in mathematics and computer science.[^8] He then entered the mathematics Ph.D. program at the University of Chicago in 2007, earning his M.S. in Au
+    fetchedAt: 2026-02-22T01:54:30.989Z
+    httpStatus: 200
+    pageTitle: Biography | Vipul Naik
+    contentSnippet: "Biography | Vipul Naik Skip to content Key life events 1986: Born in Delhi, India Formal education School (1990-2004): Received school education at Delhi Public School, Noida . Successfully completed schooling. Undergraduate studies (2004-2007): Received undergraduate education at Chennai Mathematical Institute in Chennai, Tamil Nadu, India. At the end of it, received a B. Sc. (Hons) degree in mathematics and computer science. Graduate studies (2007-2013): Received graduate education at The Univ"
+    contentLength: 41167
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://vipulnaik.com/graduate-experience/
+    linkText: Vipul Naik Graduate Experience
+    claimContext: During his graduate studies, Naik's interests began to expand beyond pure mathematics. In December 2009, he encountered <EntityLink id="open-philanthropy">GiveWell's</EntityLink> work and began making donations to GiveWell-recommended charities like VillageReach through 2010.[^10] Between April 2010
+    fetchedAt: 2026-02-22T01:54:31.571Z
+    httpStatus: 200
+    pageTitle: Graduate experience | Vipul Naik
+    contentSnippet: Graduate experience | Vipul Naik Skip to content This page goes into some detail regarding my experience as a graduate student at the University of Chicago. The page focused on my personal experience. For my write-up on the overall experience, see this Quora answer . For more links on what I did in graduate school, see my graduate studies page and my teaching page . Also relevant is my Quora answer to the question Why did you leave academia? (mirrored here in case you prefer not to access Quora)
+    contentLength: 62258
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://vipulnaik.com/graduate-experience/
+    linkText: Vipul Naik Graduate Experience
+    claimContext: During his graduate studies, Naik's interests began to expand beyond pure mathematics. In December 2009, he encountered <EntityLink id="open-philanthropy">GiveWell's</EntityLink> work and began making donations to GiveWell-recommended charities like VillageReach through 2010.[^10] Between April 2010
+    fetchedAt: 2026-02-22T01:54:31.004Z
+    httpStatus: 200
+    pageTitle: Graduate experience | Vipul Naik
+    contentSnippet: Graduate experience | Vipul Naik Skip to content This page goes into some detail regarding my experience as a graduate student at the University of Chicago. The page focused on my personal experience. For my write-up on the overall experience, see this Quora answer . For more links on what I did in graduate school, see my graduate studies page and my teaching page . Also relevant is my Quora answer to the question Why did you leave academia? (mirrored here in case you prefer not to access Quora)
+    contentLength: 62258
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://sites.google.com/site/vipulkdabhi/publications
+    linkText: Vipul Naik Publications
+    claimContext: Naik's academic research focused on group theory, with some work in computational intelligence and genetic programming resulting in several peer-reviewed publications between 2011 and 2015.[^12] However, he later described his Ph.D. experience as producing insufficient publishable results in pure ma
+    fetchedAt: 2026-02-22T01:54:30.152Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 13
+    url: https://vipulnaik.com/mirror-of-quora-answer-to-why-did-you-leave-academia/
+    linkText: Mirror of Quora Answer - Why Did You Leave Academia
+    claimContext: Naik's academic research focused on group theory, with some work in computational intelligence and genetic programming resulting in several peer-reviewed publications between 2011 and 2015.[^12] However, he later described his Ph.D. experience as producing insufficient publishable results in pure ma
+    fetchedAt: 2026-02-22T01:54:33.206Z
+    httpStatus: 200
+    pageTitle: "Mirror of Quora answer to: Why did you leave academia? | Vipul Naik"
+    contentSnippet: "Mirror of Quora answer to: Why did you leave academia? | Vipul Naik Skip to content This is a mirror of https://www.quora.com/Why-do-people-leave-academia-What-are-the-pros-and-cons-of-leaving-the-field/answer/Vipul-Naik I decided around the late middle of my fifth year of graduate school (math Ph.D. at the University of Chicago) that I would complete my Ph.D. but not stay in academia beyond that. I am currently scheduled to get my Ph.D. degree this December (Autumn 2013) at which point I&#8217;"
+    contentLength: 49053
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://vipulnaik.com/group-theory-research/
+    linkText: Vipul Naik Group Theory Research
+    claimContext: Naik's academic research focused on group theory, with some work in computational intelligence and genetic programming resulting in several peer-reviewed publications between 2011 and 2015.[^12] However, he later described his Ph.D. experience as producing insufficient publishable results in pure ma
+    fetchedAt: 2026-02-22T01:54:33.046Z
+    httpStatus: 200
+    pageTitle: Group theory research | Vipul Naik
+    contentSnippet: "Group theory research | Vipul Naik Skip to content In the years leading up to my Ph.D., I considered a few problems in group theory where I either got partial results or didn’t manage to make headway. In some cases, I solved the problems completely but they weren’t important enough to be worth publishing. Please also consider checking out the Group Properties Wiki , a handy reference for group theory that I worked on during my Ph.D. study years. Extensible automorphisms problem : I came up with "
+    contentLength: 42347
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback
+    linkText: EA Forum - Donations List Website Tutorial
+    claimContext: The Donations List Website (donations.vipulnaik.com) is perhaps Naik's most ambitious project, tracking over \$72.8 billion in public donations with a focus on causes relevant to effective altruism. Development began in January 2017, with ongoing updates and expansions.[^15] The database includes do
+    fetchedAt: 2026-02-22T01:54:33.026Z
+    httpStatus: 200
+    pageTitle: "Donations List Website: tutorial and request for feedback — EA Forum"
+    contentSnippet: "Donations List Website: tutorial and request for feedback — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Donations List Website: tutorial and request for feedback by riceissa Aug 21 2018 9 min read 5 26 Building effective altruism Effective altruism funding Frontpage Donations List Website: tutorial and request for feedback Contents Introduction Tutorial Main page Donor page Donee pa"
+    contentLength: 304568
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://donations.vipulnaik.com/donee.php?donee=EA+Hotel
+    linkText: Donations List Website - EA Hotel
+    claimContext: The Donations List Website (donations.vipulnaik.com) is perhaps Naik's most ambitious project, tracking over \$72.8 billion in public donations with a focus on causes relevant to effective altruism. Development began in January 2017, with ongoing updates and expansions.[^15] The database includes do
+    fetchedAt: 2026-02-22T01:54:33.325Z
+    httpStatus: 200
+    pageTitle: Centre for Enabling EA Learning & Research donations received
+    contentSnippet: "Centre for Enabling EA Learning & Research donations received Centre for Enabling EA Learning & Research donations received Set color scheme to: auto , light , dark &thinsp; This is an online portal with information on donations that were announced publicly (or have been shared with permission) that were of interest to Vipul Naik . The git repository with the code for this portal, as well as all the underlying data, is available on GitHub . All payment amounts are in current United States dollar"
+    contentLength: 86001
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://forum.effectivealtruism.org/posts/LetLbZdj7sZ455BvC/the-givewiki-s-top-picks-in-ai-safety-for-the-giving-season
+    linkText: EA Forum - GiveWiki Top Picks in AI Safety
+    claimContext: The website has become an important resource for EA community analysis. For example, in 2023, the GiveWiki used Naik's donation database to rank 22 AI safety organizations, scoring them between 186 and 213 in their assessment.[^17] The database is described by community members as "excellent" for an
+    fetchedAt: 2026-02-22T01:54:32.966Z
+    httpStatus: 200
+    pageTitle: The GiveWiki’s Top Picks in AI Safety for the Giving Season of 2023 — EA Forum
+    contentSnippet: The GiveWiki’s Top Picks in AI Safety for the Giving Season of 2023 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The GiveWiki’s Top Picks in AI Safety for the Giving Season of 2023 by Dawn Drescher Dec 7 2023 4 min read 0 26 AI safety Building effective altruism Effective giving Existential risk Announcements and updates Markets for altruism Frontpage The GiveWiki’s Top Picks in AI
+    contentLength: 230476
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://forum.effectivealtruism.org/posts/LetLbZdj7sZ455BvC/the-givewiki-s-top-picks-in-ai-safety-for-the-giving-season
+    linkText: EA Forum - GiveWiki Top Picks in AI Safety
+    claimContext: The website has become an important resource for EA community analysis. For example, in 2023, the GiveWiki used Naik's donation database to rank 22 AI safety organizations, scoring them between 186 and 213 in their assessment.[^17] The database is described by community members as "excellent" for an
+    fetchedAt: 2026-02-22T01:54:34.396Z
+    httpStatus: 200
+    pageTitle: The GiveWiki’s Top Picks in AI Safety for the Giving Season of 2023 — EA Forum
+    contentSnippet: The GiveWiki’s Top Picks in AI Safety for the Giving Season of 2023 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The GiveWiki’s Top Picks in AI Safety for the Giving Season of 2023 by Dawn Drescher Dec 7 2023 4 min read 0 26 AI safety Building effective altruism Effective giving Existential risk Announcements and updates Markets for altruism Frontpage The GiveWiki’s Top Picks in AI
+    contentLength: 227682
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback
+    linkText: EA Forum - Donations List Website Tutorial
+    claimContext: Naik funded approximately \$645 of Issa Rice's work on the Donations List Website, covering OpenPhil tracking and data entry.[^19] The site continues to be updated with preliminary data, with Naik requesting community feedback on its utility and accuracy through EA Forum posts.[^20]
+    fetchedAt: 2026-02-22T01:54:34.378Z
+    httpStatus: 200
+    pageTitle: "Donations List Website: tutorial and request for feedback — EA Forum"
+    contentSnippet: "Donations List Website: tutorial and request for feedback — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Donations List Website: tutorial and request for feedback by riceissa Aug 21 2018 9 min read 5 26 Building effective altruism Effective altruism funding Frontpage Donations List Website: tutorial and request for feedback Contents Introduction Tutorial Main page Donor page Donee pa"
+    contentLength: 301773
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback
+    linkText: EA Forum - Donations List Website Tutorial
+    claimContext: Naik funded approximately \$645 of Issa Rice's work on the Donations List Website, covering OpenPhil tracking and data entry.[^19] The site continues to be updated with preliminary data, with Naik requesting community feedback on its utility and accuracy through EA Forum posts.[^20]
+    fetchedAt: 2026-02-22T01:54:34.842Z
+    httpStatus: 200
+    pageTitle: "Donations List Website: tutorial and request for feedback — EA Forum"
+    contentSnippet: "Donations List Website: tutorial and request for feedback — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Donations List Website: tutorial and request for feedback by riceissa Aug 21 2018 9 min read 5 26 Building effective altruism Effective altruism funding Frontpage Donations List Website: tutorial and request for feedback Contents Introduction Tutorial Main page Donor page Donee pa"
+    contentLength: 301773
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://github.com/vipulnaik/contractwork/blob/master/contributor-lists/issa-list.mediawiki
+    linkText: GitHub - Vipul Naik Contract Work - Issa List
+    claimContext: Payment documentation shows the detailed nature of this work. For example, Issa Rice received \$354.03 in July 2020, \$306.63 in August 2020, and \$334.62 in November 2020 for tasks ranging from grant monitoring to tax tools development, with hourly rates between \$5 and \$9.50.[^23] Recent activity
+    fetchedAt: 2026-02-22T01:54:34.801Z
+    httpStatus: 200
+    pageTitle: contractwork/contributor-lists/issa-list.mediawiki at master · vipulnaik/contractwork · GitHub
+    contentSnippet: contractwork/contributor-lists/issa-list.mediawiki at master · vipulnaik/contractwork · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} vipulnaik / contractwork Public Notifications You must be signed in to change notification settings Fork 1 Star 4 You can’t perform th
+    contentLength: 565179
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://github.com/vipulnaik/daily-updates/issues/1825
+    linkText: GitHub - Daily Updates Issue 1825
+    claimContext: Payment documentation shows the detailed nature of this work. For example, Issa Rice received \$354.03 in July 2020, \$306.63 in August 2020, and \$334.62 in November 2020 for tasks ranging from grant monitoring to tax tools development, with hourly rates between \$5 and \$9.50.[^23] Recent activity
+    fetchedAt: 2026-02-22T01:54:34.852Z
+    httpStatus: 200
+    pageTitle: "Vipul Saturday checklist | 2025-01-18 · Issue #1825 · vipulnaik/daily-updates · GitHub"
+    contentSnippet: "Vipul Saturday checklist | 2025-01-18 · Issue #1825 · vipulnaik/daily-updates · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} vipulnaik / daily-updates Public Notifications You must be signed in to change notification settings Fork 2 Star 4 Vipul Saturday checklist | "
+    contentLength: 258035
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://contractwork.vipulnaik.com/topic.php?topic=AI+safety%2FGlobal+catastophic+risks
+    linkText: Contract Work - AI Safety/Global Catastrophic Risks
+    claimContext: The contract work covers diverse topics including AI safety, global catastrophic risks, migration policy, and organizational timelines.[^25] This funding model allows researchers to produce comprehensive public documentation that might not be funded through traditional grant mechanisms due to the di
+    fetchedAt: 2026-02-22T01:54:36.463Z
+    httpStatus: 200
+    pageTitle: "AI safety/Global catastophic risks topic work details: Contract work for Vipul Naik"
+    contentSnippet: "AI safety/Global catastophic risks topic work details: Contract work for Vipul Naik Contract work related to topic AI safety/Global catastophic risks for Vipul Naik Set color scheme to: auto , light , dark &thinsp; Table of contents Topic task payments due by type and year Topic task payments due by type and month Topic task list Task payments due for tasks related to topic AI safety/Global catastophic risks by type and year Task type Total across years Total in year 2026 Total in year 2025 Tota"
+    contentLength: 7784
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://forum.effectivealtruism.org/posts/QXpWsT7iHMsmbvq3X/effective-altruism-forum-web-traffic-from-google-analytics
+    linkText: EA Forum - EA Forum Web Traffic from Google Analytics
+    claimContext: He also maintains analytics.vipulnaik.com, which provides data analysis across his various projects, and has conducted detailed analyses of EA Forum web traffic using Google Analytics data.[^27] His June 2015 blog post forecasted 150,000 pageviews for July 2015, demonstrating his focus on quantitati
+    fetchedAt: 2026-02-22T01:54:35.915Z
+    httpStatus: 200
+    pageTitle: Effective Altruism Forum web traffic from Google Analytics — EA Forum
+    contentSnippet: Effective Altruism Forum web traffic from Google Analytics — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Effective Altruism Forum web traffic from Google Analytics by vipulnaik Dec 31 2016 16 min read 13 10 Building effective altruism Effective Altruism Forum Frontpage Effective Altruism Forum web traffic from Google Analytics Key takeaways Annual cycle and long-term growth trends I
+    contentLength: 419153
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://vipulnaik.com/blog/june-2015-in-review/
+    linkText: Vipul Naik Blog - June 2015 in Review
+    claimContext: He also maintains analytics.vipulnaik.com, which provides data analysis across his various projects, and has conducted detailed analyses of EA Forum web traffic using Google Analytics data.[^27] His June 2015 blog post forecasted 150,000 pageviews for July 2015, demonstrating his focus on quantitati
+    fetchedAt: 2026-02-22T01:54:36.425Z
+    httpStatus: 200
+    pageTitle: June 2015 in review | Vipul Naik
+    contentSnippet: June 2015 in review | Vipul Naik Skip to content This is the ninth of my month-in-review posts. I started month-in-review posts in October 2014. You can see my first post here and my previous month-in-review post here . Some overall background This was a very busy month for me at work, more so than most preceding months. The latter half of the month was in particular very crunched. The crunch ended on July 1, so I expect the workload in July to be more representative of the business-as-usual sce
+    contentLength: 53402
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://academic.oup.com/book/10676/chapter/158726606
+    linkText: Oxford Academic - A Radical Case for Open Borders
+    claimContext: 'Naik has been a prominent advocate for open borders, co-authoring with Bryan Caplan the chapter "A Radical Case for Open Borders" published in *The Economics of Immigration* (Oxford University Press, 2015).[^29] The chapter argues that open borders would create massive poverty reduction and benefit '
+    fetchedAt: 2026-02-22T01:54:36.305Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 30
+    url: https://academic.oup.com/book/10676/chapter/158726606
+    linkText: Oxford Academic - A Radical Case for Open Borders
+    claimContext: 'Naik has been a prominent advocate for open borders, co-authoring with Bryan Caplan the chapter "A Radical Case for Open Borders" published in *The Economics of Immigration* (Oxford University Press, 2015).[^29] The chapter argues that open borders would create massive poverty reduction and benefit '
+    fetchedAt: 2026-02-22T01:54:36.296Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 31
+    url: https://vipulnaik.com/biography/
+    linkText: Vipul Naik Biography
+    claimContext: He maintains the Open Borders website (openborders.info), which serves as a hub for discussion and argument collation on migration policy.[^31] The 2015 publication was cited as a tipping point for increased audience growth for the Open Borders website.[^32] The academic chapter continues to receive
+    fetchedAt: 2026-02-22T01:54:37.988Z
+    httpStatus: 200
+    pageTitle: Biography | Vipul Naik
+    contentSnippet: "Biography | Vipul Naik Skip to content Key life events 1986: Born in Delhi, India Formal education School (1990-2004): Received school education at Delhi Public School, Noida . Successfully completed schooling. Undergraduate studies (2004-2007): Received undergraduate education at Chennai Mathematical Institute in Chennai, Tamil Nadu, India. At the end of it, received a B. Sc. (Hons) degree in mathematics and computer science. Graduate studies (2007-2013): Received graduate education at The Univ"
+    contentLength: 41167
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://80000hours.org/2015/09/what-do-journalists-say-about-journalism-as-a-high-impact-career-interviews-with-dylan-matthews-derek-thompson-and-shaun-raviv/
+    linkText: 80,000 Hours Interview
+    claimContext: He maintains the Open Borders website (openborders.info), which serves as a hub for discussion and argument collation on migration policy.[^31] The 2015 publication was cited as a tipping point for increased audience growth for the Open Borders website.[^32] The academic chapter continues to receive
+    fetchedAt: 2026-02-22T01:54:38.169Z
+    httpStatus: 200
+    pageTitle: What do journalists say about journalism as a high-impact career? | 80,000 Hours
+    contentSnippet: 'What do journalists say about journalism as a high-impact career? | 80,000 Hours Search for: Ta-Nehisi Coates&#039; "The Case for Reparations" seemed to have a significant impact on the national debate about race. Photo credit: Sean Carter Photography. I interviewed three journalists who have written articles that promote important causes: Dylan Matthews (for example, on a guaranteed basic income ); Derek Thompson (for example, on effective giving ); and Shaun Raviv (for example, on open borders'
+    contentLength: 111795
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://academic.oup.com/book/10676/chapter/158726606
+    linkText: Oxford Academic - A Radical Case for Open Borders
+    claimContext: He maintains the Open Borders website (openborders.info), which serves as a hub for discussion and argument collation on migration policy.[^31] The 2015 publication was cited as a tipping point for increased audience growth for the Open Borders website.[^32] The academic chapter continues to receive
+    fetchedAt: 2026-02-22T01:54:37.496Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 34
+    url: https://orgwatch.issarice.com/?person=Vipul+Naik
+    linkText: OrgWatch - Vipul Naik
+    claimContext: Naik has contributed to AI safety research and infrastructure in several ways. He worked as a researcher at the <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink>, contributing to AI safety efforts focused on mitigating existential risks from misaligned artificial general int
+    fetchedAt: 2026-02-22T01:54:37.880Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 562
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://orgwatch.issarice.com/?person=Vipul+Naik
+    linkText: OrgWatch - Vipul Naik
+    claimContext: Naik has contributed to AI safety research and infrastructure in several ways. He worked as a researcher at the <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink>, contributing to AI safety efforts focused on mitigating existential risks from misaligned artificial general int
+    fetchedAt: 2026-02-22T01:54:38.025Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 562
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://openbook.fyi/org/Vipul%20Naik
+    linkText: OpenBook - Vipul Naik Donations
+    claimContext: Naik has contributed to AI safety research and infrastructure in several ways. He worked as a researcher at the <EntityLink id="miri">Machine Intelligence Research Institute</EntityLink>, contributing to AI safety efforts focused on mitigating existential risks from misaligned artificial general int
+    fetchedAt: 2026-02-22T01:54:40.510Z
+    httpStatus: 200
+    pageTitle: OpenBook
+    contentSnippet: "OpenBook Vipul Naik Outgoing Grants | Total Sent: $41.4K DATE AMOUNT RECIPIENT CAUSE AREAS 2022/12/16 EA Funds: Animal Welfare Fund animal welfare $5000 EA Funds: Animal Welfare Fund animal welfare 2022/01/04 Free Migration Project other $3000 Free Migration Project other 2021/10/09 kfangurl other $1000 kfangurl other 2019/12/22 Free Migration Project other $3000 Free Migration Project other 2019/03/31 Centre for Enabling EA Learning & Research other $4167 Centre for Enabling EA Learning & Resea"
+    contentLength: 26846
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.alignmentforum.org/posts/SEfjw57Qw8mCzy36n/timeline-of-ai-safety
+    linkText: Alignment Forum - Timeline of AI Safety
+    claimContext: One of his most significant contributions to AI safety is the Timeline of AI Safety, originally written in 2017 with updates including October 1, 2024.[^37] The timeline documents milestones in <EntityLink id="alignment">AI alignment</EntityLink> and existential risk mitigation, providing historical
+    fetchedAt: 2026-02-22T01:54:46.114Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 38
+    url: https://timelines.issarice.com/wiki/User:Vipul
+    linkText: Timelines Wiki - User:Vipul
+    claimContext: One of his most significant contributions to AI safety is the Timeline of AI Safety, originally written in 2017 with updates including October 1, 2024.[^37] The timeline documents milestones in <EntityLink id="alignment">AI alignment</EntityLink> and existential risk mitigation, providing historical
+    fetchedAt: 2026-02-22T01:54:39.705Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 618
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://contractwork.vipulnaik.com/topic.php?topic=AI+safety%2FGlobal+catastophic+risks
+    linkText: Contract Work - AI Safety/Global Catastrophic Risks
+    claimContext: 'Through his contract work portal, Naik has funded research on AI safety and global catastrophic risks.[^39] He maintains tracking of donations to AI safety organizations including the AI Safety Camp (which received \$3,667 from Simon Möller in 2022 for <EntityLink id="technical-ai-safety">technical '
+    fetchedAt: 2026-02-22T01:54:39.212Z
+    httpStatus: 200
+    pageTitle: "AI safety/Global catastophic risks topic work details: Contract work for Vipul Naik"
+    contentSnippet: "AI safety/Global catastophic risks topic work details: Contract work for Vipul Naik Contract work related to topic AI safety/Global catastophic risks for Vipul Naik Set color scheme to: auto , light , dark &thinsp; Table of contents Topic task payments due by type and year Topic task payments due by type and month Topic task list Task payments due for tasks related to topic AI safety/Global catastophic risks by type and year Task type Total across years Total in year 2026 Total in year 2025 Tota"
+    contentLength: 7784
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://donations.vipulnaik.com/donee.php?donee=AI+Safety+Camp
+    linkText: Donations List Website - AI Safety Camp
+    claimContext: 'Through his contract work portal, Naik has funded research on AI safety and global catastrophic risks.[^39] He maintains tracking of donations to AI safety organizations including the AI Safety Camp (which received \$3,667 from Simon Möller in 2022 for <EntityLink id="technical-ai-safety">technical '
+    fetchedAt: 2026-02-22T01:54:39.696Z
+    httpStatus: 200
+    pageTitle: AI Safety Camp donations received
+    contentSnippet: "AI Safety Camp donations received AI Safety Camp donations received Set color scheme to: auto , light , dark &thinsp; This is an online portal with information on donations that were announced publicly (or have been shared with permission) that were of interest to Vipul Naik . The git repository with the code for this portal, as well as all the underlying data, is available on GitHub . All payment amounts are in current United States dollars (USD). The repository of donations is being seeded wit"
+    contentLength: 56176
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://donations.vipulnaik.com/donee.php?donee=Center+for+Human-Compatible+AI
+    linkText: Donations List Website - Center for Human-Compatible AI
+    claimContext: 'Through his contract work portal, Naik has funded research on AI safety and global catastrophic risks.[^39] He maintains tracking of donations to AI safety organizations including the AI Safety Camp (which received \$3,667 from Simon Möller in 2022 for <EntityLink id="technical-ai-safety">technical '
+    fetchedAt: 2026-02-22T01:54:47.597Z
+    httpStatus: 200
+    pageTitle: Center for Human-Compatible AI donations received
+    contentSnippet: "Center for Human-Compatible AI donations received Center for Human-Compatible AI donations received Set color scheme to: auto , light , dark &thinsp; This is an online portal with information on donations that were announced publicly (or have been shared with permission) that were of interest to Vipul Naik . The git repository with the code for this portal, as well as all the underlying data, is available on GitHub . All payment amounts are in current United States dollars (USD). The repository "
+    contentLength: 67572
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://donations.vipulnaik.com/donee.php?donee=Anthropic
+    linkText: Donations List Website - Anthropic
+    claimContext: In his role as a documentarian of AI safety funding, Naik has disclosed conflicts of interest regarding donations received by <EntityLink id="anthropic">Anthropic</EntityLink>, noting his personal interest and inability to fully disclose some details.[^42] He has also discussed considerations in his
+    fetchedAt: 2026-02-22T01:54:47.241Z
+    httpStatus: 200
+    pageTitle: Anthropic donations received
+    contentSnippet: "Anthropic donations received Anthropic donations received Set color scheme to: auto , light , dark &thinsp; This is an online portal with information on donations that were announced publicly (or have been shared with permission) that were of interest to Vipul Naik . The git repository with the code for this portal, as well as all the underlying data, is available on GitHub . All payment amounts are in current United States dollars (USD). The repository of donations is being seeded with an initi"
+    contentLength: 14412
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://openbook.fyi/donations/212138
+    linkText: OpenBook - Free Migration Project Donation
+    claimContext: In his role as a documentarian of AI safety funding, Naik has disclosed conflicts of interest regarding donations received by <EntityLink id="anthropic">Anthropic</EntityLink>, noting his personal interest and inability to fully disclose some details.[^42] He has also discussed considerations in his
+    fetchedAt: 2026-02-22T01:54:47.972Z
+    httpStatus: 200
+    pageTitle: OpenBook
+    contentSnippet: OpenBook Vipul Naik to Free Migration Project 2022/01/04 3000 other https://forum.effectivealtruism.org/posts/xzQzLoEC5mvPyJTYY/my-q1-2022-donation-to-free-migration-project
+    contentLength: 13259
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback
+    linkText: EA Forum - Donations List Website Tutorial
+    claimContext: Naik is an active and respected contributor to the Effective Altruism Forum and <EntityLink id="lesswrong">LessWrong</EntityLink>, known for data-driven analysis and transparency efforts. Community members describe him as a high-quality analyst and funder of useful tools, though some note the high e
+    fetchedAt: 2026-02-22T01:54:47.525Z
+    httpStatus: 200
+    pageTitle: "Donations List Website: tutorial and request for feedback — EA Forum"
+    contentSnippet: "Donations List Website: tutorial and request for feedback — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Donations List Website: tutorial and request for feedback by riceissa Aug 21 2018 9 min read 5 26 Building effective altruism Effective altruism funding Frontpage Donations List Website: tutorial and request for feedback Contents Introduction Tutorial Main page Donor page Donee pa"
+    contentLength: 301773
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://forum.effectivealtruism.org/posts/QXpWsT7iHMsmbvq3X/effective-altruism-forum-web-traffic-from-google-analytics
+    linkText: EA Forum - EA Forum Web Traffic from Google Analytics
+    claimContext: His EA Forum posts include analyses of forum traffic patterns, showing that despite growth in the EA movement, the forum did not experience traffic spikes around <EntityLink id="ea-global">EA Global</EntityLink> or major events—a finding that sparked discussion about content strategy and community g
+    fetchedAt: 2026-02-22T01:54:47.250Z
+    httpStatus: 200
+    pageTitle: Effective Altruism Forum web traffic from Google Analytics — EA Forum
+    contentSnippet: Effective Altruism Forum web traffic from Google Analytics — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Effective Altruism Forum web traffic from Google Analytics by vipulnaik Dec 31 2016 16 min read 13 10 Building effective altruism Effective Altruism Forum Frontpage Effective Altruism Forum web traffic from Google Analytics Key takeaways Annual cycle and long-term growth trends I
+    contentLength: 419153
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://forum.effectivealtruism.org/posts/QXpWsT7iHMsmbvq3X/effective-altruism-forum-web-traffic-from-google-analytics
+    linkText: EA Forum - EA Forum Web Traffic from Google Analytics
+    claimContext: His EA Forum posts include analyses of forum traffic patterns, showing that despite growth in the EA movement, the forum did not experience traffic spikes around <EntityLink id="ea-global">EA Global</EntityLink> or major events—a finding that sparked discussion about content strategy and community g
+    fetchedAt: 2026-02-22T01:54:49.036Z
+    httpStatus: 200
+    pageTitle: Effective Altruism Forum web traffic from Google Analytics — EA Forum
+    contentSnippet: Effective Altruism Forum web traffic from Google Analytics — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Effective Altruism Forum web traffic from Google Analytics by vipulnaik Dec 31 2016 16 min read 13 10 Building effective altruism Effective Altruism Forum Frontpage Effective Altruism Forum web traffic from Google Analytics Key takeaways Annual cycle and long-term growth trends I
+    contentLength: 419152
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://vipulnaik.com/effective-altruism/
+    linkText: Vipul Naik - Effective Altruism
+    claimContext: Naik has written on core EA topics including donation timing and saving on modest incomes. His summary on "donating now vs. later" (December 15, 2014) received 8 likes and 10 comments, while his view on "modest incomes and saving" (March 24, 2014) received 31 likes and 70 comments, indicating strong
+    fetchedAt: 2026-02-22T01:54:50.424Z
+    httpStatus: 200
+    pageTitle: Effective altruism | Vipul Naik
+    contentSnippet: Effective altruism | Vipul Naik Skip to content This post gives some general information on my interest in effective altruism. For my history of financial donations, see here . You can also look at the Donations List Website , a preliminary, un-vetted website I am using to track donors, donees, and donations. I&#8217;ve had some involvement with the effective altruism movement ( central website , Wikipedia page , list of learning resources , Facebook group ). I used to post reasonably often in t
+    contentLength: 43783
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://vipulnaik.com/effective-altruism/
+    linkText: Vipul Naik - Effective Altruism
+    claimContext: Naik has written on core EA topics including donation timing and saving on modest incomes. His summary on "donating now vs. later" (December 15, 2014) received 8 likes and 10 comments, while his view on "modest incomes and saving" (March 24, 2014) received 31 likes and 70 comments, indicating strong
+    fetchedAt: 2026-02-22T01:54:49.648Z
+    httpStatus: 200
+    pageTitle: Effective altruism | Vipul Naik
+    contentSnippet: Effective altruism | Vipul Naik Skip to content This post gives some general information on my interest in effective altruism. For my history of financial donations, see here . You can also look at the Donations List Website , a preliminary, un-vetted website I am using to track donors, donees, and donations. I&#8217;ve had some involvement with the effective altruism movement ( central website , Wikipedia page , list of learning resources , Facebook group ). I used to post reasonably often in t
+    contentLength: 43783
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://donations.vipulnaik.com/influencer.php?influencer=Vipul+Naik
+    linkText: "Donations List Website - Influencer: Vipul Naik"
+    claimContext: His documented influence on donations includes analyses like "Understanding Coefficient Giving's work on migration policy" (November 19, 2021) and "My Q1 2019 EA Hotel donation" (March 31, 2019), providing transparency about his own giving and reasoning.[^49]
+    fetchedAt: 2026-02-22T01:54:49.010Z
+    httpStatus: 200
+    pageTitle: Vipul Naik money moved
+    contentSnippet: "Vipul Naik money moved Vipul Naik money moved Set color scheme to: auto , light , dark &thinsp; This is an online portal with information on donations that were announced publicly (or have been shared with permission) that were of interest to Vipul Naik . The git repository with the code for this portal, as well as all the underlying data, is available on GitHub . All payment amounts are in current United States dollars (USD). The repository of donations is being seeded with an initial collation"
+    contentLength: 21332
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: In December 2013, Naik co-founded Cognito Mentoring with Jonah Sinick as a free personalized advising service for intellectually curious students, announced on <EntityLink id="lesswrong">LessWrong</EntityLink> to target that community's readership.[^50] The service aimed to improve learning, product
+    fetchedAt: 2026-02-22T01:54:50.112Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: In December 2013, Naik co-founded Cognito Mentoring with Jonah Sinick as a free personalized advising service for intellectually curious students, announced on <EntityLink id="lesswrong">LessWrong</EntityLink> to target that community's readership.[^50] The service aimed to improve learning, product
+    fetchedAt: 2026-02-22T01:54:52.257Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: Cognito Mentoring provided substantive interaction with over 50 advisees and published blog posts and an information wiki.[^52] However, by mid-March 2014, the service shifted from charging advisees (deemed non-viable) to focusing on informational content and philanthropic funding.[^53] The challeng
+    fetchedAt: 2026-02-22T01:54:52.766Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: Cognito Mentoring provided substantive interaction with over 50 advisees and published blog posts and an information wiki.[^52] However, by mid-March 2014, the service shifted from charging advisees (deemed non-viable) to focusing on informational content and philanthropic funding.[^53] The challeng
+    fetchedAt: 2026-02-22T01:54:52.835Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: Cognito Mentoring provided substantive interaction with over 50 advisees and published blog posts and an information wiki.[^52] However, by mid-March 2014, the service shifted from charging advisees (deemed non-viable) to focusing on informational content and philanthropic funding.[^53] The challeng
+    fetchedAt: 2026-02-22T01:54:52.939Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: Naik acknowledged gaps in his own knowledge about technology, entrepreneurship, and job environments despite broad theoretical understanding, valuing firsthand experience for effective advising.[^55] By mid-2014, Cognito Mentoring had scaled back to maintenance mode, with Naik continuing administrat
+    fetchedAt: 2026-02-22T01:54:52.821Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: Naik acknowledged gaps in his own knowledge about technology, entrepreneurship, and job environments despite broad theoretical understanding, valuing firsthand experience for effective advising.[^55] By mid-2014, Cognito Mentoring had scaled back to maintenance mode, with Naik continuing administrat
+    fetchedAt: 2026-02-22T01:54:54.584Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://vipulnaik.com/olympiads/
+    linkText: Vipul Naik Olympiads
+    claimContext: Naik also maintains educational resources for mathematics olympiad preparation, including India-specific FAQs (prepared in 2006, though noted as outdated) and generic guidance planned for updates to include modern resources like Brilliant.org and Art of Problem Solving.[^57]
+    fetchedAt: 2026-02-22T01:54:54.454Z
+    httpStatus: 200
+    pageTitle: Olympiads | Vipul Naik
+    contentSnippet: "Olympiads | Vipul Naik Skip to content Note : If you&#8217;re a high school student in India looking for advice on Olympiad preparation, please also see this page . Mathematics Olympiad I had been interested in mathematics since childhood, but until 10th grade, I had not paid much attention to learning mathematics systematically beyond what was taught in school and what I read in some fun math books. When I was in 10th grade, my mother got in touch with a former college classmate of hers who was"
+    contentLength: 43559
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://vipulnaik.com/profile/
+    linkText: Vipul Naik Profile
+    claimContext: Naik describes his cognitive profile as having an IQ around 137 (based on Raven's tests, approximately 2.5 standard deviations above the UK median), with stronger verbal than visuospatial abilities and good short-term memory.[^58] He notes that his face recognition ability is approximately 1 standar
+    fetchedAt: 2026-02-22T01:54:54.600Z
+    httpStatus: 200
+    pageTitle: Profile | Vipul Naik
+    contentSnippet: Profile | Vipul Naik Skip to content This page provides some brief information about me. I&#8217;m very interested in human intelligence, psychometrics, and moral psychology, and I&#8217;ve taken a number of tests over the years to get to know my scores in these areas. Scores of specific individuals don&#8217;t reveal a lot of information about those individuals. I would urge you not to read too much into these scores in the sense of information about me, but I hope the scores will be helpful fo
+    contentLength: 42816
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://vipulnaik.com/profile/
+    linkText: Vipul Naik Profile
+    claimContext: Naik describes his cognitive profile as having an IQ around 137 (based on Raven's tests, approximately 2.5 standard deviations above the UK median), with stronger verbal than visuospatial abilities and good short-term memory.[^58] He notes that his face recognition ability is approximately 1 standar
+    fetchedAt: 2026-02-22T01:54:54.870Z
+    httpStatus: 200
+    pageTitle: Profile | Vipul Naik
+    contentSnippet: Profile | Vipul Naik Skip to content This page provides some brief information about me. I&#8217;m very interested in human intelligence, psychometrics, and moral psychology, and I&#8217;ve taken a number of tests over the years to get to know my scores in these areas. Scores of specific individuals don&#8217;t reveal a lot of information about those individuals. I would urge you not to read too much into these scores in the sense of information about me, but I hope the scores will be helpful fo
+    contentLength: 42816
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://vipulnaik.com/profile/
+    linkText: Vipul Naik Profile
+    claimContext: His personality profile aligns with high openness to experience, conscientiousness, and introversion, with midway agreeableness and low neuroticism on the Big Five model.[^60] On Myers-Briggs assessments, he falls between INTJ and INFP.[^61] His moral profile aligns with libertarians, scoring low on
+    fetchedAt: 2026-02-22T01:54:54.714Z
+    httpStatus: 200
+    pageTitle: Profile | Vipul Naik
+    contentSnippet: Profile | Vipul Naik Skip to content This page provides some brief information about me. I&#8217;m very interested in human intelligence, psychometrics, and moral psychology, and I&#8217;ve taken a number of tests over the years to get to know my scores in these areas. Scores of specific individuals don&#8217;t reveal a lot of information about those individuals. I would urge you not to read too much into these scores in the sense of information about me, but I hope the scores will be helpful fo
+    contentLength: 42816
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://vipulnaik.com/profile/
+    linkText: Vipul Naik Profile
+    claimContext: His personality profile aligns with high openness to experience, conscientiousness, and introversion, with midway agreeableness and low neuroticism on the Big Five model.[^60] On Myers-Briggs assessments, he falls between INTJ and INFP.[^61] His moral profile aligns with libertarians, scoring low on
+    fetchedAt: 2026-02-22T01:54:56.551Z
+    httpStatus: 200
+    pageTitle: Profile | Vipul Naik
+    contentSnippet: Profile | Vipul Naik Skip to content This page provides some brief information about me. I&#8217;m very interested in human intelligence, psychometrics, and moral psychology, and I&#8217;ve taken a number of tests over the years to get to know my scores in these areas. Scores of specific individuals don&#8217;t reveal a lot of information about those individuals. I would urge you not to read too much into these scores in the sense of information about me, but I hope the scores will be helpful fo
+    contentLength: 42816
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://vipulnaik.com/profile/
+    linkText: Vipul Naik Profile
+    claimContext: His personality profile aligns with high openness to experience, conscientiousness, and introversion, with midway agreeableness and low neuroticism on the Big Five model.[^60] On Myers-Briggs assessments, he falls between INTJ and INFP.[^61] His moral profile aligns with libertarians, scoring low on
+    fetchedAt: 2026-02-22T01:54:56.404Z
+    httpStatus: 200
+    pageTitle: Profile | Vipul Naik
+    contentSnippet: Profile | Vipul Naik Skip to content This page provides some brief information about me. I&#8217;m very interested in human intelligence, psychometrics, and moral psychology, and I&#8217;ve taken a number of tests over the years to get to know my scores in these areas. Scores of specific individuals don&#8217;t reveal a lot of information about those individuals. I would urge you not to read too much into these scores in the sense of information about me, but I hope the scores will be helpful fo
+    contentLength: 42816
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://vipulnaik.com/blog/
+    linkText: Vipul Naik Blog
+    claimContext: Naik's approach to funding reflects both his personal financial constraints and his philosophy about the value of independent research. In blog posts about the <EntityLink id="fri">Forecasting Research Institute</EntityLink> (FMP), he discusses the financial situation of small EA organizations, noti
+    fetchedAt: 2026-02-22T01:54:56.547Z
+    httpStatus: 200
+    pageTitle: Blog | Vipul Naik | Basic information
+    contentSnippet: "Blog | Vipul Naik | Basic information Skip to content I&#8217;m planning to make a donation of 3,000 USD to Free Migration Project (FMP) in January 2022. This blog post goes in some detail on my reasoning. [EDIT: The donation was formally made on Tuesday, January 4, 2022 via ACH, as planned.] https://vipulnaik.com/blog/my-q1-2022-donation-to-free-migration-project/ is the post&#8217;s canonical location (but does not accept comments). I&#8217;m cross-posting to openborders.info here (given that "
+    contentLength: 208094
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://vipulnaik.com/blog/
+    linkText: Vipul Naik Blog
+    claimContext: Naik's approach to funding reflects both his personal financial constraints and his philosophy about the value of independent research. In blog posts about the <EntityLink id="fri">Forecasting Research Institute</EntityLink> (FMP), he discusses the financial situation of small EA organizations, noti
+    fetchedAt: 2026-02-22T01:54:57.049Z
+    httpStatus: 200
+    pageTitle: Blog | Vipul Naik | Basic information
+    contentSnippet: "Blog | Vipul Naik | Basic information Skip to content I&#8217;m planning to make a donation of 3,000 USD to Free Migration Project (FMP) in January 2022. This blog post goes in some detail on my reasoning. [EDIT: The donation was formally made on Tuesday, January 4, 2022 via ACH, as planned.] https://vipulnaik.com/blog/my-q1-2022-donation-to-free-migration-project/ is the post&#8217;s canonical location (but does not accept comments). I&#8217;m cross-posting to openborders.info here (given that "
+    contentLength: 208094
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://vipulnaik.com/blog/
+    linkText: Vipul Naik Blog
+    claimContext: He describes FMP as having a "small" budget in philanthropic terms, with current donations having particularly high marginal value due to the timing of organizational needs.[^65] Naik trades off funding opportunities against future donation targets, but notes that rare moments of high donation value
+    fetchedAt: 2026-02-22T01:54:57.079Z
+    httpStatus: 200
+    pageTitle: Blog | Vipul Naik | Basic information
+    contentSnippet: "Blog | Vipul Naik | Basic information Skip to content I&#8217;m planning to make a donation of 3,000 USD to Free Migration Project (FMP) in January 2022. This blog post goes in some detail on my reasoning. [EDIT: The donation was formally made on Tuesday, January 4, 2022 via ACH, as planned.] https://vipulnaik.com/blog/my-q1-2022-donation-to-free-migration-project/ is the post&#8217;s canonical location (but does not accept comments). I&#8217;m cross-posting to openborders.info here (given that "
+    contentLength: 208094
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://vipulnaik.com/blog/
+    linkText: Vipul Naik Blog
+    claimContext: He describes FMP as having a "small" budget in philanthropic terms, with current donations having particularly high marginal value due to the timing of organizational needs.[^65] Naik trades off funding opportunities against future donation targets, but notes that rare moments of high donation value
+    fetchedAt: 2026-02-22T01:54:58.723Z
+    httpStatus: 200
+    pageTitle: Blog | Vipul Naik | Basic information
+    contentSnippet: "Blog | Vipul Naik | Basic information Skip to content I&#8217;m planning to make a donation of 3,000 USD to Free Migration Project (FMP) in January 2022. This blog post goes in some detail on my reasoning. [EDIT: The donation was formally made on Tuesday, January 4, 2022 via ACH, as planned.] https://vipulnaik.com/blog/my-q1-2022-donation-to-free-migration-project/ is the post&#8217;s canonical location (but does not accept comments). I&#8217;m cross-posting to openborders.info here (given that "
+    contentLength: 208094
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: For Cognito Mentoring, Naik relied on contract work income rather than regular employment, noting that this approach was "eating into savings" and proved unsustainable without either successful charging of advisees or philanthropic grants.[^67] The difficulty of securing grants stemmed from the proj
+    fetchedAt: 2026-02-22T01:54:58.796Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://cognitomentoring.org/blog/author/vipulnaik/
+    linkText: "Cognito Mentoring Blog - Author: Vipul Naik"
+    claimContext: For Cognito Mentoring, Naik relied on contract work income rather than regular employment, noting that this approach was "eating into savings" and proved unsustainable without either successful charging of advisees or philanthropic grants.[^67] The difficulty of securing grants stemmed from the proj
+    fetchedAt: 2026-02-22T01:54:59.313Z
+    httpStatus: 200
+    pageTitle: Vipul Naik | Cognito Mentoring
+    contentSnippet: Vipul Naik | Cognito Mentoring Skip to content Back in December 2013, Jonah Sinick and I launched Cognito Mentoring , an advising service for intellectually curious students. Our goal was to improve the quality of learning, productivity, and life choices of the student population at large, and we chose to focus on intellectually curious students because of their greater potential as well as our greater ability to relate with that population. We began by offering free personalized advising. Jonah
+    contentLength: 165021
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://vipulnaik.com/wikipedia/
+    linkText: Vipul Naik Wikipedia
+    claimContext: Naik reduced his Wikipedia editing activity starting in March 2017 due to "a controversy at Wikipedia surrounding sponsored Wikipedia editing."[^69] While details of the controversy are not extensively documented in available sources, it appears related to questions about whether his funded contract
+    fetchedAt: 2026-02-22T01:54:58.637Z
+    httpStatus: 200
+    pageTitle: Wikipedia | Vipul Naik
+    contentSnippet: Wikipedia | Vipul Naik Skip to content I created my Wikipedia account (I believe) sometime in 2005. I made a number of edits to Wikipedia around 2005-2006, but then reduced my involvement with it for the next few years. I started getting more involved in late 2011, and I created and edited a number of pages in 2012, 2013, 2014, and 2015. My initial involvement with Wikipedia occurred while I was an undergraduate studying mathematics and computer science at Chennai Mathematical Institute. On my u
+    contentLength: 44590
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback
+    linkText: EA Forum - Donations List Website Tutorial
+    claimContext: Community members on the EA Forum have noted that some of Naik's projects involve "a huge amount of work for what seems like a somewhat uncertain impact."[^70] The Donations List Website and other infrastructure projects require extensive data collection and maintenance but may not produce clear, me
+    fetchedAt: 2026-02-22T01:54:58.182Z
+    httpStatus: 200
+    pageTitle: "Donations List Website: tutorial and request for feedback — EA Forum"
+    contentSnippet: "Donations List Website: tutorial and request for feedback — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Donations List Website: tutorial and request for feedback by riceissa Aug 21 2018 9 min read 5 26 Building effective altruism Effective altruism funding Frontpage Donations List Website: tutorial and request for feedback Contents Introduction Tutorial Main page Donor page Donee pa"
+    contentLength: 301769
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://vipulnaik.com/mirror-of-quora-answer-to-why-did-you-leave-academia/
+    linkText: Mirror of Quora Answer - Why Did You Leave Academia
+    claimContext: Naik himself acknowledges that his Ph.D. research did not produce substantial publishable results in pure mathematics, leading to his departure from academia.[^71] While he shifted focus to applied work and community infrastructure, this represents a departure from his original academic trajectory a
+    fetchedAt: 2026-02-22T01:55:00.867Z
+    httpStatus: 200
+    pageTitle: "Mirror of Quora answer to: Why did you leave academia? | Vipul Naik"
+    contentSnippet: "Mirror of Quora answer to: Why did you leave academia? | Vipul Naik Skip to content This is a mirror of https://www.quora.com/Why-do-people-leave-academia-What-are-the-pros-and-cons-of-leaving-the-field/answer/Vipul-Naik I decided around the late middle of my fifth year of graduate school (math Ph.D. at the University of Chicago) that I would complete my Ph.D. but not stay in academia beyond that. I am currently scheduled to get my Ph.D. degree this December (Autumn 2013) at which point I&#8217;"
+    contentLength: 49053
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://donations.vipulnaik.com/donee.php?donee=Anthropic
+    linkText: Donations List Website - Anthropic
+    claimContext: 'As both a donor to organizations like <EntityLink id="anthropic">Anthropic</EntityLink> and FMP and the maintainer of donation databases tracking these organizations, Naik faces potential conflicts of interest. He has disclosed these conflicts, noting his "personal interest" and "inability to fully '
+    fetchedAt: 2026-02-22T01:55:00.696Z
+    httpStatus: 200
+    pageTitle: Anthropic donations received
+    contentSnippet: "Anthropic donations received Anthropic donations received Set color scheme to: auto , light , dark &thinsp; This is an online portal with information on donations that were announced publicly (or have been shared with permission) that were of interest to Vipul Naik . The git repository with the code for this portal, as well as all the underlying data, is available on GitHub . All payment amounts are in current United States dollars (USD). The repository of donations is being seeded with an initi"
+    contentLength: 14412
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://issarice.com/betting
+    linkText: Issa Rice - Betting
+    claimContext: "**Forecasting Track Record**: While Naik has made public predictions (announced in a Facebook post and other venues), no comprehensive calibration data, Brier scores, or systematic evaluation of his forecasting accuracy is available.[^73] His June 2015 forecast of 150,000 pageviews for July 2015 has"
+    fetchedAt: 2026-02-22T01:55:00.870Z
+    httpStatus: 200
+    pageTitle: Betting - Issa Rice
+    contentSnippet: "Betting - Issa Rice Just some notes for now. My thoughts on this topic haven’t been stress-tested. From Superforecasting : Each team would effectively be its own research project, free to improvise whatever methods it thought would work, but required to submit forecasts at 9 a.m. eastern standard time every day from September 2011 to June 2015. By requiring teams to forecast the same questions at the same time, the tournament created a level playing field—and a rich trove of data about what work"
+    contentLength: 13784
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://vipulnaik.com/blog/june-2015-in-review/
+    linkText: Vipul Naik Blog - June 2015 in Review
+    claimContext: "**Forecasting Track Record**: While Naik has made public predictions (announced in a Facebook post and other venues), no comprehensive calibration data, Brier scores, or systematic evaluation of his forecasting accuracy is available.[^73] His June 2015 forecast of 150,000 pageviews for July 2015 has"
+    fetchedAt: 2026-02-22T01:55:00.854Z
+    httpStatus: 200
+    pageTitle: June 2015 in review | Vipul Naik
+    contentSnippet: June 2015 in review | Vipul Naik Skip to content This is the ninth of my month-in-review posts. I started month-in-review posts in October 2014. You can see my first post here and my previous month-in-review post here . Some overall background This was a very busy month for me at work, more so than most preceding months. The latter half of the month was in particular very crunched. The crunch ended on July 1, so I expect the workload in July to be more representative of the business-as-usual sce
+    contentLength: 53402
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://vipulnaik.com/biography/
+    linkText: Vipul Naik Biography
+    claimContext: As of early 2025, Naik works as a data scientist and software engineer at The Arena Group, a media and technology company that acquired LiftIgniter.[^75] His contract work portal remains active, with recent payments processed in December 2024 to Gabriel Bobis and tax documentation work continuing th
+    fetchedAt: 2026-02-22T01:55:00.911Z
+    httpStatus: 200
+    pageTitle: Biography | Vipul Naik
+    contentSnippet: "Biography | Vipul Naik Skip to content Key life events 1986: Born in Delhi, India Formal education School (1990-2004): Received school education at Delhi Public School, Noida . Successfully completed schooling. Undergraduate studies (2004-2007): Received undergraduate education at Chennai Mathematical Institute in Chennai, Tamil Nadu, India. At the end of it, received a B. Sc. (Hons) degree in mathematics and computer science. Graduate studies (2007-2013): Received graduate education at The Univ"
+    contentLength: 41167
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://github.com/vipulnaik/daily-updates/issues/1825
+    linkText: GitHub - Daily Updates Issue 1825
+    claimContext: As of early 2025, Naik works as a data scientist and software engineer at The Arena Group, a media and technology company that acquired LiftIgniter.[^75] His contract work portal remains active, with recent payments processed in December 2024 to Gabriel Bobis and tax documentation work continuing th
+    fetchedAt: 2026-02-22T01:55:02.309Z
+    httpStatus: 200
+    pageTitle: "Vipul Saturday checklist | 2025-01-18 · Issue #1825 · vipulnaik/daily-updates · GitHub"
+    contentSnippet: "Vipul Saturday checklist | 2025-01-18 · Issue #1825 · vipulnaik/daily-updates · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} vipulnaik / daily-updates Public Notifications You must be signed in to change notification settings Fork 2 Star 4 Vipul Saturday checklist | "
+    contentLength: 258035
+    status: verified
+    note: null
+  - footnote: 77
+    url: https://timelines.issarice.com/wiki/User:Vipul
+    linkText: Timelines Wiki - User:Vipul
+    claimContext: His timelines work continues to be updated, with the Timeline of MIRI updated as recently as July 2025 and the Timeline of AI Safety updated in October 2024.[^77] The Donations List Website continues to receive updates with preliminary data as donations are publicly disclosed.[^78]
+    fetchedAt: 2026-02-22T01:55:02.577Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 618
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback
+    linkText: EA Forum - Donations List Website Tutorial
+    claimContext: His timelines work continues to be updated, with the Timeline of MIRI updated as recently as July 2025 and the Timeline of AI Safety updated in October 2024.[^77] The Donations List Website continues to receive updates with preliminary data as donations are publicly disclosed.[^78]
+    fetchedAt: 2026-02-22T01:55:01.945Z
+    httpStatus: 200
+    pageTitle: "Donations List Website: tutorial and request for feedback — EA Forum"
+    contentSnippet: "Donations List Website: tutorial and request for feedback — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Donations List Website: tutorial and request for feedback by riceissa Aug 21 2018 9 min read 5 26 Building effective altruism Effective altruism funding Frontpage Donations List Website: tutorial and request for feedback Contents Introduction Tutorial Main page Donor page Donee pa"
+    contentLength: 301769
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://vipulnaik.com/blog/
+    linkText: Vipul Naik Blog
+    claimContext: On his personal blog, Naik continues to write about EA funding priorities, organizational analysis, and his donation decisions. Posts from 2021 discuss topics like Coefficient Giving's migration work and the 2021 Open Borders Conference.[^79] His analytical work on EA funding patterns and organizati
+    fetchedAt: 2026-02-22T01:55:02.568Z
+    httpStatus: 200
+    pageTitle: Blog | Vipul Naik | Basic information
+    contentSnippet: "Blog | Vipul Naik | Basic information Skip to content I&#8217;m planning to make a donation of 3,000 USD to Free Migration Project (FMP) in January 2022. This blog post goes in some detail on my reasoning. [EDIT: The donation was formally made on Tuesday, January 4, 2022 via ACH, as planned.] https://vipulnaik.com/blog/my-q1-2022-donation-to-free-migration-project/ is the post&#8217;s canonical location (but does not accept comments). I&#8217;m cross-posting to openborders.info here (given that "
+    contentLength: 208094
+    status: verified
+    note: null

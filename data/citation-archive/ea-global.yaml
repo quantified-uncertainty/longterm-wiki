@@ -1,0 +1,821 @@
+pageId: ea-global
+verifiedAt: 2026-02-22
+totalCitations: 74
+verified: 60
+broken: 14
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: EA Global (EAG) is a series of selective conferences organized by the <EntityLink id="cea">Centre for Effective Altruism</EntityLink> (CEA) that connects people committed to effective altruism principles to collaborate on addressing global challenges.[^1] These weekend-long events target students, p
+    fetchedAt: 2026-02-22T01:53:18.991Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.effectivealtruism.org/ea-global/events/ea-global-new-york-city-2025
+    linkText: "EA Global: New York City 2025 - Effective Altruism"
+    claimContext: EA Global (EAG) is a series of selective conferences organized by the <EntityLink id="cea">Centre for Effective Altruism</EntityLink> (CEA) that connects people committed to effective altruism principles to collaborate on addressing global challenges.[^1] These weekend-long events target students, p
+    fetchedAt: 2026-02-22T01:53:18.823Z
+    httpStatus: 200
+    pageTitle: "EA Global: New York City 2025 | Effective Altruism"
+    contentSnippet: "EA Global: New York City 2025 | Effective Altruism EVENTS EA GLOBAL: NEW YORK CITY 2025 10–12 Oct 2025 EA Global: New York City 2025 Sheraton New York Times Square , New York Applications are closed View FAQs -> Applications are now closed! You will be prompted to log into your effectivealtruism.org account (from previous EA Globals, the EA Forum, EA Funds, or GWWC) to pre-fill any of your saved details. If you don&#x27;t have an existing account, you can easily create one. EA Global brings toge"
+    contentLength: 144471
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: The conferences serve as a hub for the EA community to engage in talks, workshops, and discussions on evidence-based approaches to high-impact cause areas including global health and development, animal welfare, long-term risks like AI safety and biosecurity, and other pressing global challenges.[^3
+    fetchedAt: 2026-02-22T01:53:18.790Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: The conferences serve as a hub for the EA community to engage in talks, workshops, and discussions on evidence-based approaches to high-impact cause areas including global health and development, animal welfare, long-term risks like AI safety and biosecurity, and other pressing global challenges.[^3
+    fetchedAt: 2026-02-22T01:53:19.412Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: EA Global conferences are run centrally by CEA's Events team, which handles content selection, admissions, and production. Applications are curated and reviewed within two weeks, with approved applicants required to purchase tickets or make donations.[^5] The events have grown significantly since th
+    fetchedAt: 2026-02-22T01:53:18.882Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://forum.effectivealtruism.org/topics/effective-altruism-global
+    linkText: Effective Altruism Global - EA Forum
+    claimContext: EA Global conferences are run centrally by CEA's Events team, which handles content selection, admissions, and production. Applications are curated and reviewed within two weeks, with approved applicants required to purchase tickets or make donations.[^5] The events have grown significantly since th
+    fetchedAt: 2026-02-22T01:53:21.458Z
+    httpStatus: 200
+    pageTitle: Effective Altruism Global - EA Forum
+    contentSnippet: "Effective Altruism Global - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Effective Altruism Global Edit History Discussion 0 Subscribe Edit History Discussion 0 Effective Altruism Global External links Related entries Random Topic Contributors 2 Pablo 2 Aaron Gertler 🔸 1 Eli_Nathan 1 Leo Parent Topic : Building effective altruism Do not use this tag for EA Global talks, unless the t"
+    contentLength: 496287
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
+    linkText: Effective Altruism Global - Wikipedia
+    claimContext: The first EA Global event was held in 2013 under the name "Effective Altruism Summit."[^7] This initial conference emerged from the broader context of the effective altruism movement's development, which had begun in the late 2000s with the founding of organizations like Giving What We Can (2009) an
+    fetchedAt: 2026-02-22T01:53:20.433Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://forum.effectivealtruism.org/topics/history-of-effective-altruism
+    linkText: History of Effective Altruism - EA Forum
+    claimContext: The first EA Global event was held in 2013 under the name "Effective Altruism Summit."[^7] This initial conference emerged from the broader context of the effective altruism movement's development, which had begun in the late 2000s with the founding of organizations like Giving What We Can (2009) an
+    fetchedAt: 2026-02-22T01:53:23.063Z
+    httpStatus: 200
+    pageTitle: History of effective altruism - EA Forum
+    contentSnippet: "History of effective altruism - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents History of effective altruism Edit History Discussion 0 Subscribe Edit History Discussion 0 History of effective altruism Precursors Ethical philosophy Randomista development The rationality community GiveWell 2009-2012: the movement crystallizes 2013-2015: the movement matures 2016-2022: shifting priorities"
+    contentLength: 950652
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
+    linkText: Effective Altruism Global - Wikipedia
+    claimContext: By 2015, EA Global had expanded to three major events across different continents. The largest of these took place at Google's Mountain View campus and featured prominent speakers including <EntityLink id="elon-musk">Elon Musk</EntityLink>, Stuart J. Russell, and William MacAskill.[^9] These early c
+    fetchedAt: 2026-02-22T01:53:20.433Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
+    linkText: Effective Altruism Global - Wikipedia
+    claimContext: By 2015, EA Global had expanded to three major events across different continents. The largest of these took place at Google's Mountain View campus and featured prominent speakers including <EntityLink id="elon-musk">Elon Musk</EntityLink>, Stuart J. Russell, and William MacAskill.[^9] These early c
+    fetchedAt: 2026-02-22T01:53:20.434Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
+    linkText: Effective Altruism Global - Wikipedia
+    claimContext: The 2015 conferences also included events in Oxford and Melbourne, establishing EA Global's presence across North America, Europe, and Australia. This geographic expansion reflected the movement's growing international reach and CEA's commitment to building a global community around effective altrui
+    fetchedAt: 2026-02-22T01:53:24.108Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 12
+    url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
+    linkText: Effective Altruism Global - Wikipedia
+    claimContext: Following the successful 2015 conferences, EA Global became an annual series with multiple events per year. The conferences maintained their focus on connecting EA community members for high-level discussions while expanding their scope to address emerging priorities within the movement.[^12]
+    fetchedAt: 2026-02-22T01:53:24.108Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 13
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: During this period, CEA also introduced EAGx conferences as a complement to the main EA Global series. Unlike the centrally-organized EA Global events, EAGx conferences are community-led with CEA providing support and funding, including tools like event apps. The relationship between EA Global and E
+    fetchedAt: 2026-02-22T01:53:24.428Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: The conferences increasingly emphasized networking and one-on-one meetings as core components of the experience. CEA introduced apps like Swapcard to facilitate meeting scheduling and networking among attendees.[^14] This reflected a growing recognition that interpersonal connections and career deve
+    fetchedAt: 2026-02-22T01:53:24.352Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.youtube.com/watch?v=EJ8-fhbPvl0
+    linkText: "EA Global: Boston 2024 - YouTube"
+    claimContext: "Recent EA Global conferences have continued to emphasize cross-cause collaboration and direct engagement with experienced practitioners. EA Global: Boston 2024, held November 1-3 at the Hynes Convention Center, exemplified this approach with its focus on one-on-one meetings and discussions spanning "
+    fetchedAt: 2026-02-22T01:53:24.433Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 16
+    url: https://www.effectivealtruism.org/ea-global/events
+    linkText: EA Global Events - Effective Altruism
+    claimContext: "Upcoming events include EA Global: New York City 2025 (with applications closing September 28, 2025), EA Global: San Francisco (February 13-15, 2026), EA Global: London (May 29-31, 2026), and EA Global: New York City (October 16-18, 2026).[^16] These events continue to focus on the full range of EA "
+    fetchedAt: 2026-02-22T01:53:25.686Z
+    httpStatus: 200
+    pageTitle: Upcoming conferences | Effective Altruism
+    contentSnippet: "Upcoming conferences | Effective Altruism Upcoming conferences EA Global EA GLOBAL: LONDON 29–31 May 2026 Apply now -> EA GLOBAL: NEW YORK CITY 16–18 Oct 2026 Apply now -> EAGx and EA Summits EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> EAGxDC 2–3 May 2026 Apply now -> Past events -> Join 60k subscribers and sign up for the EA Ne"
+    contentLength: 118351
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.effectivealtruism.org/ea-global/events/ea-global-new-york-city-2025
+    linkText: "EA Global: New York City 2025 - Effective Altruism"
+    claimContext: "Upcoming events include EA Global: New York City 2025 (with applications closing September 28, 2025), EA Global: San Francisco (February 13-15, 2026), EA Global: London (May 29-31, 2026), and EA Global: New York City (October 16-18, 2026).[^16] These events continue to focus on the full range of EA "
+    fetchedAt: 2026-02-22T01:53:25.774Z
+    httpStatus: 200
+    pageTitle: "EA Global: New York City 2025 | Effective Altruism"
+    contentSnippet: "EA Global: New York City 2025 | Effective Altruism EVENTS EA GLOBAL: NEW YORK CITY 2025 10–12 Oct 2025 EA Global: New York City 2025 Sheraton New York Times Square , New York Applications are closed View FAQs -> Applications are now closed! You will be prompted to log into your effectivealtruism.org account (from previous EA Globals, the EA Forum, EA Funds, or GWWC) to pre-fill any of your saved details. If you don&#x27;t have an existing account, you can easily create one. EA Global brings toge"
+    contentLength: 144471
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.effectivealtruism.org/ea-global/events/ea-global-san-francisco-2026
+    linkText: "EA Global: San Francisco 2026 - Effective Altruism"
+    claimContext: The conferences have maintained their selective admission process, requiring applicants to demonstrate solid understanding of EA principles and significant engagement with EA-aligned work. Typical schedules include a Friday evening reception followed by full days on Saturday and Sunday, concluding a
+    fetchedAt: 2026-02-22T01:53:26.200Z
+    httpStatus: 200
+    pageTitle: "EA Global: San Francisco 2026 | Effective Altruism"
+    contentSnippet: "EA Global: San Francisco 2026 | Effective Altruism EVENTS EA GLOBAL: SAN FRANCISCO 2026 13–15 Feb 2026 EA Global: San Francisco 2026 Hilton Union Square , San Francisco Applications are closed View FAQs -> Applications are closed! You will be prompted to log into your effectivealtruism.org account (from previous EA Globals, the EA Forum, EA Funds, or GWWC) to pre-fill any of your saved details. If you don&#x27;t have an existing account, you can easily create one. EA Global brings together a wid"
+    contentLength: 150785
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.effectivealtruism.org/ea-global/events/ea-global-san-francisco-2026
+    linkText: "EA Global: San Francisco 2026 - Effective Altruism"
+    claimContext: EA Global events typically span three days, beginning with a Friday evening reception and continuing through full days on Saturday and Sunday.[^19] The conferences combine multiple formats including keynote talks, panel discussions, workshops, one-on-one meetings, and social activities.[^20]
+    fetchedAt: 2026-02-22T01:53:26.150Z
+    httpStatus: 200
+    pageTitle: "EA Global: San Francisco 2026 | Effective Altruism"
+    contentSnippet: "EA Global: San Francisco 2026 | Effective Altruism EVENTS EA GLOBAL: SAN FRANCISCO 2026 13–15 Feb 2026 EA Global: San Francisco 2026 Hilton Union Square , San Francisco Applications are closed View FAQs -> Applications are closed! You will be prompted to log into your effectivealtruism.org account (from previous EA Globals, the EA Forum, EA Funds, or GWWC) to pre-fill any of your saved details. If you don&#x27;t have an existing account, you can easily create one. EA Global brings together a wid"
+    contentLength: 150785
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: EA Global events typically span three days, beginning with a Friday evening reception and continuing through full days on Saturday and Sunday.[^19] The conferences combine multiple formats including keynote talks, panel discussions, workshops, one-on-one meetings, and social activities.[^20]
+    fetchedAt: 2026-02-22T01:53:26.047Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: The events emphasize networking and direct engagement as much as formal presentations. Attendees can schedule one-on-one meetings through apps like Swapcard, allowing for targeted conversations about specific projects, career paths, or research questions.[^21] This structure reflects the conferences
+    fetchedAt: 2026-02-22T01:53:27.307Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://forum.effectivealtruism.org/topics/effective-altruism-global
+    linkText: Effective Altruism Global - EA Forum
+    claimContext: Most talks at EA Global are recorded and made available online with transcripts posted to the EA Forum, extending the reach of presentations beyond attendees.[^22] Topics have included technical discussions of <EntityLink id="alignment">AI alignment</EntityLink> by researchers like Rohin Shah, strat
+    fetchedAt: 2026-02-22T01:53:27.635Z
+    httpStatus: 200
+    pageTitle: Effective Altruism Global - EA Forum
+    contentSnippet: "Effective Altruism Global - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Effective Altruism Global Edit History Discussion 0 Subscribe Edit History Discussion 0 Effective Altruism Global External links Related entries Random Topic Contributors 2 Pablo 2 Aaron Gertler 🔸 1 Eli_Nathan 1 Leo Parent Topic : Building effective altruism Do not use this tag for EA Global talks, unless the t"
+    contentLength: 496287
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.youtube.com/watch?v=u2rzKQuzIuw
+    linkText: "Rohin Shah: AI Alignment Progress - YouTube"
+    claimContext: Most talks at EA Global are recorded and made available online with transcripts posted to the EA Forum, extending the reach of presentations beyond attendees.[^22] Topics have included technical discussions of <EntityLink id="alignment">AI alignment</EntityLink> by researchers like Rohin Shah, strat
+    fetchedAt: 2026-02-22T01:53:27.501Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 24
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: EA Global targets a selective audience of people who have moved beyond basic familiarity with EA concepts to taking concrete actions based on EA principles. CEA's Events team reviews applications to ensure attendees are either professionally engaged in EA-aligned work or planning serious career move
+    fetchedAt: 2026-02-22T01:53:27.317Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: This selectivity serves to maintain the conferences as venues for substantive discussions among committed practitioners rather than introductory events. Applicants describe being drawn to EA Global as an opportunity to meet other "extremely committed, compassionate" individuals working on similar ch
+    fetchedAt: 2026-02-22T01:53:27.327Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: For those newer to EA or seeking less selective events, the EAGx conference series provides more accessible alternatives with broader regional audiences and lower barriers to entry.[^26]
+    fetchedAt: 2026-02-22T01:53:28.747Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://jamesozden.substack.com/p/effective-altruism-not-as-bad-as
+    linkText: "Effective Altruism: Not as Bad as You Think - James Ozden"
+    claimContext: EA Global serves as a primary gathering point for the global EA community, which CEA estimates includes approximately 10,000 engaged individuals across 70 countries.[^27] The conferences facilitate connections that have led to the founding of numerous EA organizations and initiatives.
+    fetchedAt: 2026-02-22T01:53:29.015Z
+    httpStatus: 200
+    pageTitle: "Effective Altruism: Not as bad as you think"
+    contentSnippet: "Effective Altruism: Not as bad as you think Understanding Social Change Subscribe Sign in Effective Altruism: Not as bad as you think We need a plurality of ways to do good James Özden Nov 24, 2022 21 Share It’s been a pretty hectic few weeks if you follow Effective Altruism, crypto, tech firms or basically any news. FTX, one of the largest cryptocurrency exchanges in the world, recently lost all of its value , went bankrupt, and lost about $1 billion in customer funds. News has emerged that the"
+    contentLength: 255250
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: "Attendees consistently cite networking as one of the most valuable aspects of EA Global. Many report finding co-founders for high-impact charities at these events, often through programs like Charity Entrepreneurship Incubation that help translate conference connections into concrete projects.[^28] "
+    fetchedAt: 2026-02-22T01:53:28.756Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: "The conferences also play a role in career development within the EA ecosystem. They connect people working on or planning EA-aligned projects with advisors, funders, and potential employers.[^29] This has contributed to career changes impacting an estimated 80 million hours of work directed toward "
+    fetchedAt: 2026-02-22T01:53:28.765Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.effektivaltruism.org/en/history/
+    linkText: History of Effective Altruism - effektivaltruism.org
+    claimContext: "The conferences also play a role in career development within the EA ecosystem. They connect people working on or planning EA-aligned projects with advisors, funders, and potential employers.[^29] This has contributed to career changes impacting an estimated 80 million hours of work directed toward "
+    fetchedAt: 2026-02-22T01:53:29.433Z
+    httpStatus: 200
+    pageTitle: The Impact of Effective Altruism | Global Movement for Good
+    contentSnippet: The Impact of Effective Altruism | Global Movement for Good Skip to content The Effective Altruism Movement The movement and other central EA organizations were founded in the 2000s and 2010s in Oxford, UK. However, effective altruism has much earlier roots in various philosophical theories and communities related to doing good and rationality. What Has The EA Movement Achieved? Billions for effective charity Through organizations such as Giving What We Can , Founders Pledge and Good Ventures, h
+    contentLength: 906958
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.effectivealtruism.org/ea-global/events/ea-global-new-york-city-2025
+    linkText: "EA Global: New York City 2025 - Effective Altruism"
+    claimContext: EA Global conferences address the full spectrum of cause areas within effective altruism, including global health and development, animal welfare, existential risks, AI safety, biosecurity, and meta-EA work.[^31] This cross-cause integration reflects EA's commitment to cause neutrality and evidence-
+    fetchedAt: 2026-02-22T01:53:30.544Z
+    httpStatus: 200
+    pageTitle: "EA Global: New York City 2025 | Effective Altruism"
+    contentSnippet: "EA Global: New York City 2025 | Effective Altruism EVENTS EA GLOBAL: NEW YORK CITY 2025 10–12 Oct 2025 EA Global: New York City 2025 Sheraton New York Times Square , New York Applications are closed View FAQs -> Applications are now closed! You will be prompted to log into your effectivealtruism.org account (from previous EA Globals, the EA Forum, EA Funds, or GWWC) to pre-fill any of your saved details. If you don&#x27;t have an existing account, you can easily create one. EA Global brings toge"
+    contentLength: 144471
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.effektivaltruism.org/wp-content/uploads/2025/04/Annual-Impact-Report-2024-Public.pdf
+    linkText: Annual Impact Report 2024 - Effective Altruism Sweden
+    claimContext: Recent community surveys indicate shifting priorities within EA. In the 2024 Annual Impact Report, 53% of respondents selected AI safety as the most pressing cause area, followed by climate change (12%), animal welfare (9%), and global health (8%).[^32] However, EA Global maintains its broad focus a
+    fetchedAt: 2026-02-22T01:53:30.500Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 2495160
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://forum.effectivealtruism.org/posts/fFK9NLmrEwFxR3hFT/ea-and-global-poverty-let-s-gather-evidence
+    linkText: "EA and Global Poverty: Let's Gather Evidence - EA Forum"
+    claimContext: This diversity sometimes creates tension within the community. Some participants have noted that certain cause areas like global poverty, which were central to early EA and are supported by robust randomized controlled trial evidence, receive less attention in conference discussions than more specul
+    fetchedAt: 2026-02-22T01:53:30.495Z
+    httpStatus: 200
+    pageTitle: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum
+    contentSnippet: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA and Global Poverty. Let&#x27;s Gather Evidence by Nathan Young Apr 5 2022 2 min read 35 42 Community Building effective altruism Criticism of effective altruism Frontpage EA and Global Poverty. Let&#x27;s Gather Evidence What is the priority of Global poverty within EA, compared to whe
+    contentLength: 652170
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.youtube.com/watch?v=ldk5DpwUjB0
+    linkText: How to do research that matters - Karolina Sarek - YouTube
+    claimContext: "EA Global conferences emphasize research grounded in systematic evaluation of interventions. Presentations like Karolina Sarek's \"How to do research that matters\" at EA Global: London 2019 advocate for preset research processes, clear goals, and combining different types of evidence such as cost-eff"
+    fetchedAt: 2026-02-22T01:53:30.843Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 35
+    url: https://www.effectivealtruism.org/articles/cause-profile-global-health-and-development
+    linkText: "Cause Profile: Global Health and Development - Effective Altruism"
+    claimContext: "The conferences showcase research from organizations like GiveWell, which has used extensive randomized controlled trials to evaluate global health interventions. For example, Cochrane reviews of insecticide-treated bednet distribution have found statistically significant child mortality reductions "
+    fetchedAt: 2026-02-22T01:53:30.718Z
+    httpStatus: 200
+    pageTitle: Global Health and Development | Effective Altruism
+    contentSnippet: Global Health and Development | Effective Altruism Global Health and Development Jess Whittlestone Introduction In 2013 nearly 800 million people were living under the international poverty line. 1 This has a huge negative impact on health 2 - each year, millions of these people die from preventable diseases such as malaria, tuberculosis, and diarrhoea. 3 This immense suffering is easily preventable, but is nevertheless neglected - as of 2019, members of OECD&#x27;s Development Assistance Commit
+    contentLength: 213328
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://en.wikipedia.org/wiki/Effective_altruism
+    linkText: Effective Altruism - Wikipedia
+    claimContext: "The conferences showcase research from organizations like GiveWell, which has used extensive randomized controlled trials to evaluate global health interventions. For example, Cochrane reviews of insecticide-treated bednet distribution have found statistically significant child mortality reductions "
+    fetchedAt: 2026-02-22T01:53:31.861Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 37
+    url: https://forum.effectivealtruism.org/posts/fFK9NLmrEwFxR3hFT/ea-and-global-poverty-let-s-gather-evidence
+    linkText: "EA and Global Poverty: Let's Gather Evidence - EA Forum"
+    claimContext: However, EA Global also features discussions of cause areas where evidence is less established, including AI safety, biosecurity, and longtermism. This creates ongoing debates within the community about appropriate weighting of strong empirical evidence versus theoretical arguments about expected va
+    fetchedAt: 2026-02-22T01:53:31.889Z
+    httpStatus: 200
+    pageTitle: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum
+    contentSnippet: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA and Global Poverty. Let&#x27;s Gather Evidence by Nathan Young Apr 5 2022 2 min read 35 42 Community Building effective altruism Criticism of effective altruism Frontpage EA and Global Poverty. Let&#x27;s Gather Evidence What is the priority of Global poverty within EA, compared to whe
+    contentLength: 649375
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://forum.effectivealtruism.org/topics/ai-safety
+    linkText: AI Safety - EA Forum Topics
+    claimContext: AI safety has become an increasingly prominent topic at EA Global conferences, particularly in recent years as the effective altruism community has shifted significant attention toward existential risks from advanced AI.[^38] The 2024 EA community survey found that 53% of respondents identified AI s
+    fetchedAt: 2026-02-22T01:53:33.464Z
+    httpStatus: 200
+    pageTitle: AI safety - EA Forum
+    contentSnippet: AI safety - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI safety AI safety Studying and reducing the existential risks posed by advanced artificial intelligence Posts Wiki Write new Subscribe New & upvoted 37 AI for societal decision making - How promising is the space? 80,000 Hours profile Zershaaneh Qureshi Zershaaneh Qureshi , 80000_Hours + 0 more · 2d ago · 3 m read 0 0 174 Long-term risks from ideol
+    contentLength: 480888
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.effektivaltruism.org/wp-content/uploads/2025/04/Annual-Impact-Report-2024-Public.pdf
+    linkText: Annual Impact Report 2024 - Effective Altruism Sweden
+    claimContext: AI safety has become an increasingly prominent topic at EA Global conferences, particularly in recent years as the effective altruism community has shifted significant attention toward existential risks from advanced AI.[^38] The 2024 EA community survey found that 53% of respondents identified AI s
+    fetchedAt: 2026-02-22T01:53:32.675Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 2495160
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.youtube.com/watch?v=u2rzKQuzIuw
+    linkText: "Rohin Shah: AI Alignment Progress - YouTube"
+    claimContext: EA Global conferences regularly feature technical presentations on AI alignment and safety. Rohin Shah has presented on AI <EntityLink id="alignment-progress">alignment progress</EntityLink>, covering high-level existential risk arguments, specific risks including human unpreparedness for advanced A
+    fetchedAt: 2026-02-22T01:53:32.332Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 41
+    url: https://www.youtube.com/watch?v=YTlrPeikoyw
+    linkText: "Robert Miles: Alignment Plans - YouTube"
+    claimContext: EA Global conferences regularly feature technical presentations on AI alignment and safety. Rohin Shah has presented on AI <EntityLink id="alignment-progress">alignment progress</EntityLink>, covering high-level existential risk arguments, specific risks including human unpreparedness for advanced A
+    fetchedAt: 2026-02-22T01:53:34.974Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 42
+    url: https://forum.effectivealtruism.org/topics/ai-safety
+    linkText: AI Safety - EA Forum Topics
+    claimContext: These presentations reflect broader debates within the AI safety community about appropriate strategies and the current state of progress. Speakers acknowledge ongoing disagreement about specific sub-questions and debate whether current research outputs are useful or potentially distracting from cor
+    fetchedAt: 2026-02-22T01:53:35.385Z
+    httpStatus: 200
+    pageTitle: AI safety - EA Forum
+    contentSnippet: AI safety - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI safety AI safety Studying and reducing the existential risks posed by advanced artificial intelligence Posts Wiki Write new Subscribe New & upvoted 37 AI for societal decision making - How promising is the space? 80,000 Hours profile Zershaaneh Qureshi Zershaaneh Qureshi , 80000_Hours + 0 more · 2d ago · 3 m read 0 0 174 Long-term risks from ideol
+    contentLength: 480885
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://forum.effectivealtruism.org/topics/ai-safety
+    linkText: AI Safety - EA Forum Topics
+    claimContext: EA Global serves as a key venue for AI safety career development and talent coordination. The conferences connect people interested in AI safety work with organizations like <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">Deep
+    fetchedAt: 2026-02-22T01:53:34.571Z
+    httpStatus: 200
+    pageTitle: AI safety - EA Forum
+    contentSnippet: AI safety - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI safety AI safety Studying and reducing the existential risks posed by advanced artificial intelligence Posts Wiki Write new Subscribe New & upvoted 37 AI for societal decision making - How promising is the space? 80,000 Hours profile Zershaaneh Qureshi Zershaaneh Qureshi , 80000_Hours + 0 more · 2d ago · 3 m read 0 0 174 Long-term risks from ideol
+    contentLength: 480888
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://forum.effectivealtruism.org/topics/ai-safety
+    linkText: AI Safety - EA Forum Topics
+    claimContext: However, this creates challenges as these organizations compete for talent while pursuing different approaches to AI safety. Recent EA Forum discussions note that organizations like <EntityLink id="metr">METR</EntityLink> compete with frontier AI labs for the same talent pool, complicating efforts t
+    fetchedAt: 2026-02-22T01:53:35.556Z
+    httpStatus: 200
+    pageTitle: AI safety - EA Forum
+    contentSnippet: AI safety - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI safety AI safety Studying and reducing the existential risks posed by advanced artificial intelligence Posts Wiki Write new Subscribe New & upvoted 37 AI for societal decision making - How promising is the space? 80,000 Hours profile Zershaaneh Qureshi Zershaaneh Qureshi , 80000_Hours + 0 more · 2d ago · 3 m read 0 0 174 Long-term risks from ideol
+    contentLength: 480885
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://forum.effectivealtruism.org/posts/fFK9NLmrEwFxR3hFT/ea-and-global-poverty-let-s-gather-evidence
+    linkText: "EA and Global Poverty: Let's Gather Evidence - EA Forum"
+    claimContext: The prominence of AI safety at EA Global has created some tension within the community. Critics argue that the focus on AI safety and longtermism diverts resources from more evidence-based interventions in areas like global health, where robust randomized controlled trials demonstrate clear impact.[
+    fetchedAt: 2026-02-22T01:53:34.533Z
+    httpStatus: 200
+    pageTitle: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum
+    contentSnippet: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA and Global Poverty. Let&#x27;s Gather Evidence by Nathan Young Apr 5 2022 2 min read 35 42 Community Building effective altruism Criticism of effective altruism Frontpage EA and Global Poverty. Let&#x27;s Gather Evidence What is the priority of Global poverty within EA, compared to whe
+    contentLength: 649373
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://forum.effectivealtruism.org/posts/fFK9NLmrEwFxR3hFT/ea-and-global-poverty-let-s-gather-evidence
+    linkText: "EA and Global Poverty: Let's Gather Evidence - EA Forum"
+    claimContext: The prominence of AI safety at EA Global has created some tension within the community. Critics argue that the focus on AI safety and longtermism diverts resources from more evidence-based interventions in areas like global health, where robust randomized controlled trials demonstrate clear impact.[
+    fetchedAt: 2026-02-22T01:53:36.606Z
+    httpStatus: 200
+    pageTitle: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum
+    contentSnippet: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA and Global Poverty. Let&#x27;s Gather Evidence by Nathan Young Apr 5 2022 2 min read 35 42 Community Building effective altruism Criticism of effective altruism Frontpage EA and Global Poverty. Let&#x27;s Gather Evidence What is the priority of Global poverty within EA, compared to whe
+    contentLength: 649375
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://forum.effectivealtruism.org/posts/6nHJirc5DrRJZcoFP/blueprints-for-ai-safety-conferences-fbb-9
+    linkText: Blueprints for AI Safety Conferences - EA Forum
+    claimContext: EA Forum discussions reflect ongoing efforts to address this tension. Some participants have proposed dedicated AI risk-branded events separate from EA Global to attract talent from fields like information security and policy who may be unfamiliar with or put off by the EA brand.[^47] However, EA Gl
+    fetchedAt: 2026-02-22T01:53:36.617Z
+    httpStatus: 200
+    pageTitle: "Blueprints for AI Safety conferences (FBB #9) — EA Forum"
+    contentSnippet: "Blueprints for AI Safety conferences (FBB #9) — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Building Capacity Blueprints for AI Safety conferences (FBB #9) by gergo Aug 7 2025 9 min read 0 21 AI safety Building effective altruism Building the field of AI safety Conferences Event strategy Theory of change Frontpage Blueprints for AI Safety conferences (FBB #9) An online conference Wh"
+    contentLength: 284312
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://faculty.wharton.upenn.edu/wp-content/uploads/2017/06/The-Institutional-Critique-of-Effective-Altruism.pdf
+    linkText: The Institutional Critique of Effective Altruism - Wharton
+    claimContext: A persistent criticism of both the effective altruism movement and EA Global is the alleged neglect of institutional and systemic change in favor of direct interventions. Critics argue that EA unjustifiably focuses on individual aid measures like cash transfers or mosquito net distribution rather th
+    fetchedAt: 2026-02-22T01:53:36.968Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 271465
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://faculty.wharton.upenn.edu/wp-content/uploads/2017/06/The-Institutional-Critique-of-Effective-Altruism.pdf
+    linkText: The Institutional Critique of Effective Altruism - Wharton
+    claimContext: Philosophers Lisa Herzog and Amia Srinivasan have argued that EA's core commitments are often misinterpreted as rejecting moral reasons for institutional reform, but that this interpretation is incorrect—EA principles do not inherently preclude systemic change, and expected value estimation can appl
+    fetchedAt: 2026-02-22T01:53:36.969Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 271465
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://80000hours.org/2020/03/anonymous-answers-flaws-effective-altruism-community/
+    linkText: "Anonymous Answers: Flaws of EA Community - 80,000 Hours"
+    claimContext: 'Internal EA Forum discussions have identified significant cultural weaknesses within the EA community that are reflected at EA Global conferences. These include groupthink, "holier than thou" attitudes, excessive focus on internal community dynamics rather than external impact, and insularity.[^50] '
+    fetchedAt: 2026-02-22T01:53:37.034Z
+    httpStatus: 200
+    pageTitle: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours"
+    contentSnippet: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours Search for: On this page: Introduction 1 What are the biggest flaws of the effective altruism community? 1.1 Groupthink 1.2 Disagreeableness 1.3 Too much focus on 'the community' 1.4 A 'holier than thou' attitude 1.5 Failing to give more people a vision of how they can contribute 1.6 Longtermism has become a status symbol 1.7 Not engaging enough with the outside world 1.8 Not following b"
+    contentLength: 143365
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://80000hours.org/2020/03/anonymous-answers-flaws-effective-altruism-community/
+    linkText: "Anonymous Answers: Flaws of EA Community - 80,000 Hours"
+    claimContext: Specific concerns include EA Global being "not media-savvy" and failing to engage effectively with the broader world beyond the EA community.[^51] Some participants note that the events can feel insular, with attendees too focused on the EA community itself as a status symbol rather than on actual i
+    fetchedAt: 2026-02-22T01:53:38.116Z
+    httpStatus: 200
+    pageTitle: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours"
+    contentSnippet: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours Search for: On this page: Introduction 1 What are the biggest flaws of the effective altruism community? 1.1 Groupthink 1.2 Disagreeableness 1.3 Too much focus on 'the community' 1.4 A 'holier than thou' attitude 1.5 Failing to give more people a vision of how they can contribute 1.6 Longtermism has become a status symbol 1.7 Not engaging enough with the outside world 1.8 Not following b"
+    contentLength: 143365
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.currentaffairs.org/news/2023/05/why-effective-altruism-and-longtermism-are-toxic-ideologies
+    linkText: Why Effective Altruism and Longtermism Are Toxic Ideologies - Current Affairs
+    claimContext: Critics have raised concerns about how EA Global reflects and reinforces potentially problematic prioritization within the effective altruism movement. The emphasis on longtermism and existential risks has been criticized for diverting resources from immediate suffering, with critics arguing that pr
+    fetchedAt: 2026-02-22T01:53:38.500Z
+    httpStatus: 200
+    pageTitle: Why Effective Altruism and “Longtermism” Are Toxic Ideologies
+    contentSnippet: Why Effective Altruism and “Longtermism” Are Toxic Ideologies Hide menu About Print Magazine Team Pitch Form FAQ Subscribe Issues Archive Articles Shop Podcast News Briefing Donate This is a search field with an auto-suggest feature attached. There are no suggestions because the search field is empty. Why Effective Altruism and “Longtermism” Are Toxic Ideologies Intellectual historian Émile P. Torres explains how Silicon Valley’s favorite ideas for changing the world for the better actually thre
+    contentLength: 102147
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://www.effektivaltruism.org/wp-content/uploads/2025/04/Annual-Impact-Report-2024-Public.pdf
+    linkText: Annual Impact Report 2024 - Effective Altruism Sweden
+    claimContext: 'The 2024 EA community survey showed global health receiving interest from 36% of respondents but only 8% selecting it as most pressing, while AI safety dominated at 53%.[^53] Critics note that global poverty leads actual funding from organizations like <EntityLink id="open-philanthropy">Coefficient '
+    fetchedAt: 2026-02-22T01:53:38.214Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 2495160
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://forum.effectivealtruism.org/posts/fFK9NLmrEwFxR3hFT/ea-and-global-poverty-let-s-gather-evidence
+    linkText: "EA and Global Poverty: Let's Gather Evidence - EA Forum"
+    claimContext: 'The 2024 EA community survey showed global health receiving interest from 36% of respondents but only 8% selecting it as most pressing, while AI safety dominated at 53%.[^53] Critics note that global poverty leads actual funding from organizations like <EntityLink id="open-philanthropy">Coefficient '
+    fetchedAt: 2026-02-22T01:53:38.085Z
+    httpStatus: 200
+    pageTitle: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum
+    contentSnippet: EA and Global Poverty. Let&#x27;s Gather Evidence — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA and Global Poverty. Let&#x27;s Gather Evidence by Nathan Young Apr 5 2022 2 min read 35 42 Community Building effective altruism Criticism of effective altruism Frontpage EA and Global Poverty. Let&#x27;s Gather Evidence What is the priority of Global poverty within EA, compared to whe
+    contentLength: 649373
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://80000hours.org/2020/03/anonymous-answers-flaws-effective-altruism-community/
+    linkText: "Anonymous Answers: Flaws of EA Community - 80,000 Hours"
+    claimContext: Some have criticized specific funding decisions highlighted at EA Global events, such as Coefficient Giving's \$55 million allocation to the <EntityLink id="cset">Center for Security and Emerging Technology</EntityLink> (CSET), which was characterized as misaligned with transformative AI priorities.
+    fetchedAt: 2026-02-22T01:53:38.203Z
+    httpStatus: 200
+    pageTitle: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours"
+    contentSnippet: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours Search for: On this page: Introduction 1 What are the biggest flaws of the effective altruism community? 1.1 Groupthink 1.2 Disagreeableness 1.3 Too much focus on 'the community' 1.4 A 'holier than thou' attitude 1.5 Failing to give more people a vision of how they can contribute 1.6 Longtermism has become a status symbol 1.7 Not engaging enough with the outside world 1.8 Not following b"
+    contentLength: 143365
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://80000hours.org/2020/03/anonymous-answers-flaws-effective-altruism-community/
+    linkText: "Anonymous Answers: Flaws of EA Community - 80,000 Hours"
+    claimContext: Some have criticized specific funding decisions highlighted at EA Global events, such as Coefficient Giving's \$55 million allocation to the <EntityLink id="cset">Center for Security and Emerging Technology</EntityLink> (CSET), which was characterized as misaligned with transformative AI priorities.
+    fetchedAt: 2026-02-22T01:53:39.549Z
+    httpStatus: 200
+    pageTitle: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours"
+    contentSnippet: "Anonymous contributors answer: What are the biggest flaws of the effective altruism community? | 80,000 Hours Search for: On this page: Introduction 1 What are the biggest flaws of the effective altruism community? 1.1 Groupthink 1.2 Disagreeableness 1.3 Too much focus on 'the community' 1.4 A 'holier than thou' attitude 1.5 Failing to give more people a vision of how they can contribute 1.6 Longtermism has become a status symbol 1.7 Not engaging enough with the outside world 1.8 Not following b"
+    contentLength: 143365
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://en.wikipedia.org/wiki/Effective_altruism
+    linkText: Effective Altruism - Wikipedia
+    claimContext: The association between effective altruism and Sam Bankman-Fried's fraud has raised questions about EA's culture and values. Bankman-Fried, who was sentenced to 25 years in prison, was closely connected to the EA movement and CEA received \$13.9 million in grants from the FTX Future Fund.[^57] Criti
+    fetchedAt: 2026-02-22T01:53:39.520Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 58
+    url: https://www.persuasion.community/p/the-problem-with-effective-altruism
+    linkText: The Problem with Effective Altruism - Persuasion Community
+    claimContext: The association between effective altruism and Sam Bankman-Fried's fraud has raised questions about EA's culture and values. Bankman-Fried, who was sentenced to 25 years in prison, was closely connected to the EA movement and CEA received \$13.9 million in grants from the FTX Future Fund.[^57] Criti
+    fetchedAt: 2026-02-22T01:53:40.073Z
+    httpStatus: 200
+    pageTitle: The Problem with Effective Altruism - by Yascha Mounk
+    contentSnippet: The Problem with Effective Altruism - by Yascha Mounk Subscribe Sign in Yascha Mounk The Problem with Effective Altruism A partial defense. Yascha Mounk Sep 19, 2024 13 1 1 Share (Photo via Getty Images.) When I was a visiting fellow at Oxford two years ago, I heard a story about effective altruism I keep going back to whenever somebody mentions Sam Bankman-Fried (one of the philosophy’s early champions) or colonizing Mars (one of its advocates’ principal obsessions). According to the story, a c
+    contentLength: 293855
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://jamesozden.substack.com/p/effective-altruism-not-as-bad-as
+    linkText: "Effective Altruism: Not as Bad as You Think - James Ozden"
+    claimContext: Defenders counter that scandals involving outliers like Bankman-Fried do not reveal fundamental problems with EA principles, and that the movement's focus on evidence and transparency distinguishes it from ideological movements that have justified harmful actions.[^59] However, the controversy has p
+    fetchedAt: 2026-02-22T01:53:39.779Z
+    httpStatus: 200
+    pageTitle: "Effective Altruism: Not as bad as you think"
+    contentSnippet: "Effective Altruism: Not as bad as you think Understanding Social Change Subscribe Sign in Effective Altruism: Not as bad as you think We need a plurality of ways to do good James Özden Nov 24, 2022 21 Share It’s been a pretty hectic few weeks if you follow Effective Altruism, crypto, tech firms or basically any news. FTX, one of the largest cryptocurrency exchanges in the world, recently lost all of its value , went bankrupt, and lost about $1 billion in customer funds. News has emerged that the"
+    contentLength: 255250
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://dear-humanity.org/effective-altruism-worse-for-poor/
+    linkText: Effective Altruism is Worse for the Poor - Dear Humanity
+    claimContext: Critics from the Global South have argued that EA Global and the broader EA movement perpetuate problematic dynamics by excluding local voices and lived experiences. In regions like Uganda's Busoga, EA interventions such as \$100 business grants or bednet distribution are seen as disposable and fail
+    fetchedAt: 2026-02-22T01:53:40.912Z
+    httpStatus: 200
+    pageTitle: EA is worse than traditional philanthropy in the way it excludes we the poor.
+    contentSnippet: "EA is worse than traditional philanthropy in the way it excludes we the poor. Skip to content Effective altruism is worse than traditional philanthropy in the way it excludes the extreme poor in the global south . By Anthony Kalulu @KaluluAnthony | December 3, 2022: &#8212;- I have spent the vast portion of my life in ultra poverty. My region Busoga, is also Uganda&#8217;s most impoverished , yet Uganda itself is among the poorest countries in Sub Saharan Africa. Although most people across Ugan"
+    contentLength: 44467
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://jamesozden.substack.com/p/effective-altruism-not-as-bad-as
+    linkText: "Effective Altruism: Not as Bad as You Think - James Ozden"
+    claimContext: Critics from the Global South have argued that EA Global and the broader EA movement perpetuate problematic dynamics by excluding local voices and lived experiences. In regions like Uganda's Busoga, EA interventions such as \$100 business grants or bednet distribution are seen as disposable and fail
+    fetchedAt: 2026-02-22T01:53:41.970Z
+    httpStatus: 200
+    pageTitle: "Effective Altruism: Not as bad as you think"
+    contentSnippet: "Effective Altruism: Not as bad as you think Understanding Social Change Subscribe Sign in Effective Altruism: Not as bad as you think We need a plurality of ways to do good James Özden Nov 24, 2022 21 Share It’s been a pretty hectic few weeks if you follow Effective Altruism, crypto, tech firms or basically any news. FTX, one of the largest cryptocurrency exchanges in the world, recently lost all of its value , went bankrupt, and lost about $1 billion in customer funds. News has emerged that the"
+    contentLength: 255250
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12352269/
+    linkText: Evidence-based altruism or scientific imperialism? - PMC
+    claimContext: This critique extends to the structure of EA Global itself, which requires financial resources to attend and emphasizes Western academic and professional norms in its application process and event format. Critics argue this perpetuates global inequities in knowledge production and decision-making ab
+    fetchedAt: 2026-02-22T01:53:42.070Z
+    httpStatus: 200
+    pageTitle: "Effective altruism in global health: doing better, justly - PMC"
+    contentSnippet: "Effective altruism in global health: doing better, justly - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM provides ac"
+    contentLength: 167518
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: EA Global conferences are funded and organized by the Centre for Effective Altruism, which provides comprehensive support including content selection, speaker recruitment, venue logistics, admissions processing, and production.[^63] Approved applicants are required to purchase tickets or make donati
+    fetchedAt: 2026-02-22T01:53:42.244Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.effectivealtruism.org/ea-global
+    linkText: What is EA Global? - Effective Altruism
+    claimContext: EA Global conferences are funded and organized by the Centre for Effective Altruism, which provides comprehensive support including content selection, speaker recruitment, venue logistics, admissions processing, and production.[^63] Approved applicants are required to purchase tickets or make donati
+    fetchedAt: 2026-02-22T01:53:42.236Z
+    httpStatus: 200
+    pageTitle: EA Global | Effective Altruism
+    contentSnippet: "EA Global | Effective Altruism Connect with others dedicated to doing good better Effective Altruism Global conferences connect you with experts and peers to collaborate on projects and tackle global challenges. EA GLOBAL: LONDON 29–31 May 2026 Apply to attend -> Upcoming conferences EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> E"
+    contentLength: 241105
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://www.centreforeffectivealtruism.org/history
+    linkText: History - Centre for Effective Altruism
+    claimContext: While specific budget figures for EA Global are not publicly detailed, the conferences are part of CEA's broader portfolio of community-building work. CEA has provided grants for community building since 2018 and launched a university groups accelerator in 2022.[^65] The organization's Events team h
+    fetchedAt: 2026-02-22T01:53:42.859Z
+    httpStatus: 200
+    pageTitle: Our history | Centre For Effective Altruism
+    contentSnippet: Our history | Centre For Effective Altruism About CEA Our history 2009 Giving What We Can , a community of effective givers, is founded in Oxford, UK. 2011 80,000 Hours is founded to help people lead high-impact careers. The Centre for Effective Altruism is founded as an umbrella organization for Giving What We Can and 80,000 Hours. In the process, we come up with the term "effective altruism" . 2012 Giving What We Can incubates The Life You Can Save , which later spins off as a separate organiz
+    contentLength: 93674
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://forum.effectivealtruism.org/posts/efa56kaon6XcwpXWd/ea-organization-updates-april-2025
+    linkText: "EA Organization Updates: April 2025 - EA Forum"
+    claimContext: "Recent developments in EA funding include Coefficient Giving's launch of the Abundance and Growth Fund with \\$120 million over three years for economic growth and scientific progress, as well as updated programs for effective giving and careers.[^66] GiveWell has moved over \\$1 billion to effective "
+    fetchedAt: 2026-02-22T01:53:44.180Z
+    httpStatus: 200
+    pageTitle: "EA Organization Updates: April 2025 — EA Forum"
+    contentSnippet: "EA Organization Updates: April 2025 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA Organization Updates: April 2025 by Toby Tremlett🔹 , Dane Valerie 14th Apr 2025 10 min read 0 18 Community Opportunities to take action EA Organization Updates (monthly series) Announcements and updates Job listing (open) Frontpage EA Organization Updates: April 2025 Opportunities and jobs Opportun"
+    contentLength: 229503
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://en.wikipedia.org/wiki/Effective_altruism
+    linkText: Effective Altruism - Wikipedia
+    claimContext: "Recent developments in EA funding include Coefficient Giving's launch of the Abundance and Growth Fund with \\$120 million over three years for economic growth and scientific progress, as well as updated programs for effective giving and careers.[^66] GiveWell has moved over \\$1 billion to effective "
+    fetchedAt: 2026-02-22T01:53:43.879Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 68
+    url: https://www.youtube.com/watch?v=EJ8-fhbPvl0
+    linkText: "EA Global: Boston 2024 - YouTube"
+    claimContext: "EA Global: Boston 2024, held November 1-3, exemplified recent conference priorities with its emphasis on cross-cause collaboration and networking through one-on-one meetings.[^68] The event continued the tradition of bringing together practitioners across global health, animal welfare, AI safety, an"
+    fetchedAt: 2026-02-22T01:53:44.168Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 69
+    url: https://www.effektivaltruism.org/wp-content/uploads/2025/04/Annual-Impact-Report-2024-Public.pdf
+    linkText: Annual Impact Report 2024 - Effective Altruism Sweden
+    claimContext: "The 2024 Annual Impact Report showed continued growth in EA community engagement, with 34% of surveyed community members changing donation destinations due to EA principles and 18% donating more than 10% of income to EA causes.[^69] The conferences play a central role in this community development, "
+    fetchedAt: 2026-02-22T01:53:44.076Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 2495160
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://www.effectivealtruism.org/ea-global/events
+    linkText: EA Global Events - Effective Altruism
+    claimContext: Multiple EA Global conferences are scheduled for 2025-2026, including events in New York City (September 2025 and October 2026), San Francisco (February 2026), and London (May 2026).[^70] These events will continue to address the full range of EA cause areas while adapting to the community's evolvin
+    fetchedAt: 2026-02-22T01:53:44.153Z
+    httpStatus: 200
+    pageTitle: Upcoming conferences | Effective Altruism
+    contentSnippet: "Upcoming conferences | Effective Altruism Upcoming conferences EA Global EA GLOBAL: LONDON 29–31 May 2026 Apply now -> EA GLOBAL: NEW YORK CITY 16–18 Oct 2026 Apply now -> EAGx and EA Summits EA SUMMIT: HELSINKI 28 Feb 2026 Register now -> EA SUMMIT: HONG KONG 7 Mar 2026 Apply now -> EAGxCDMX 20–22 Mar 2026 Apply now -> EA SUMMIT: JAKARTA 19 Apr 2026 Apply now -> EAGxNORDICS 24–26 Apr 2026 Apply now -> EAGxDC 2–3 May 2026 Apply now -> Past events -> Join 60k subscribers and sign up for the EA Ne"
+    contentLength: 118351
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://effectivealtruism.org.au/get-involved/eagx/
+    linkText: EAGxAustralasia 2025 - Effective Altruism Australia
+    claimContext: EAGx events are also expanding, with EAGxAustralasia 2025 scheduled for November 28-30, 2025 in Melbourne as the ninth annual EA conference in Australia.[^71] This growth in regional events reflects efforts to make EA Global's benefits more accessible while maintaining the flagship conferences' focu
+    fetchedAt: 2026-02-22T01:53:49.689Z
+    httpStatus: 200
+    pageTitle: "EAGxAustralasia conference: Effective Altruism Conference for Australia and New Zealand - Effective Altruism Australia"
+    contentSnippet: "EAGxAustralasia conference: Effective Altruism Conference for Australia and New Zealand - Effective Altruism Australia Skip to content EAGxAustralasia Conference Apply now! EAGxAustralasia is the main event for the effective altruism community across Australia and New Zealand. 28th &#8211; 30th November in Melbourne we&#8217;ll be holding EAGxAustralasia 2025. This will be the ninth annual EA Global conference in Australia! See the event page for the latest details about the conference and to su"
+    contentLength: 118929
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://forum.effectivealtruism.org/posts/efa56kaon6XcwpXWd/ea-organization-updates-april-2025
+    linkText: "EA Organization Updates: April 2025 - EA Forum"
+    claimContext: Recent organizational developments in the EA ecosystem include new initiatives from major funders and research organizations. Coefficient Giving launched an RFP for effective giving initiatives with an application deadline of April 20, 2025, and GiveWell has created resources responding to US govern
+    fetchedAt: 2026-02-22T01:53:45.239Z
+    httpStatus: 200
+    pageTitle: "EA Organization Updates: April 2025 — EA Forum"
+    contentSnippet: "EA Organization Updates: April 2025 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA Organization Updates: April 2025 by Toby Tremlett🔹 , Dane Valerie 14th Apr 2025 10 min read 0 18 Community Opportunities to take action EA Organization Updates (monthly series) Announcements and updates Job listing (open) Frontpage EA Organization Updates: April 2025 Opportunities and jobs Opportun"
+    contentLength: 226708
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://forum.effectivealtruism.org/posts/efa56kaon6XcwpXWd/ea-organization-updates-april-2025
+    linkText: "EA Organization Updates: April 2025 - EA Forum"
+    claimContext: Organizations represented at EA Global continue to expand their work. Anima International opened speaker registration for the 10th Conference on Animal Rights in Europe (CARE) 2025, and the Fish Welfare Initiative published new monitoring and evaluation plans.[^73] The Happy Lives Institute released
+    fetchedAt: 2026-02-22T01:53:45.493Z
+    httpStatus: 200
+    pageTitle: "EA Organization Updates: April 2025 — EA Forum"
+    contentSnippet: "EA Organization Updates: April 2025 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA Organization Updates: April 2025 by Toby Tremlett🔹 , Dane Valerie 14th Apr 2025 10 min read 0 18 Community Opportunities to take action EA Organization Updates (monthly series) Announcements and updates Job listing (open) Frontpage EA Organization Updates: April 2025 Opportunities and jobs Opportun"
+    contentLength: 226708
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://forum.effectivealtruism.org/posts/efa56kaon6XcwpXWd/ea-organization-updates-april-2025
+    linkText: "EA Organization Updates: April 2025 - EA Forum"
+    claimContext: Organizations represented at EA Global continue to expand their work. Anima International opened speaker registration for the 10th Conference on Animal Rights in Europe (CARE) 2025, and the Fish Welfare Initiative published new monitoring and evaluation plans.[^73] The Happy Lives Institute released
+    fetchedAt: 2026-02-22T01:53:45.313Z
+    httpStatus: 200
+    pageTitle: "EA Organization Updates: April 2025 — EA Forum"
+    contentSnippet: "EA Organization Updates: April 2025 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA Organization Updates: April 2025 by Toby Tremlett🔹 , Dane Valerie 14th Apr 2025 10 min read 0 18 Community Opportunities to take action EA Organization Updates (monthly series) Announcements and updates Job listing (open) Frontpage EA Organization Updates: April 2025 Opportunities and jobs Opportun"
+    contentLength: 226708
+    status: verified
+    note: null

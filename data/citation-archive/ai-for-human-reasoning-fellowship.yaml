@@ -1,0 +1,40 @@
+pageId: ai-for-human-reasoning-fellowship
+verifiedAt: 2026-02-22
+totalCitations: 3
+verified: 3
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://aiforhumanreasoning.com/
+    linkText: AI for Human Reasoning Fellowship website
+    claimContext: The AI for Human Reasoning Fellowship was an inaugural program run by the Future of Life Foundation (FLF) that brought together researchers, builders, and entrepreneurs to develop AI tools designed to enhance human reasoning and coordination.[^1] The program operated as a hybrid between a research f
+    fetchedAt: 2026-02-22T02:28:23.488Z
+    httpStatus: 200
+    pageTitle: AI FOR EPISTEMICS & COORDINATION
+    contentSnippet: "AI FOR EPISTEMICS & COORDINATION AI For Human Reasoning Civilization and technology have radically improved the human condition. Nonetheless, the world sometimes goes in directions which essentially nobody would prefer — e.g., nuclear arms races, unexpected financial crashes, predatory marketing, or ubiquitous political misinformation. This is superficially puzzling: outcomes are determined by people's actions, so why don't we simply avoid the bad outcomes? It's a challenge to our collective com"
+    contentLength: 122273
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://forum.effectivealtruism.org/posts/dQWHB2s3frDjXwGFe/funded-fellowship-ai-for-human-reasoning-fellowship-with-the
+    linkText: "FLF Fellowship on AI for Human Reasoning: \\$25-50k, 12 weeks"
+    claimContext: 'The fellowship addressed what FLF describes as a critical gap: the world is "radically underinvested" in AI applications that could enhance human decision-making and coordination capabilities.[^2] While much attention focuses on AI risks, relatively little goes toward building tools that could help '
+    fetchedAt: 2026-02-22T02:28:22.339Z
+    httpStatus: 200
+    pageTitle: "FLF Fellowship on AI for Human Reasoning: $25-50k, 12 weeks — EA Forum"
+    contentSnippet: "FLF Fellowship on AI for Human Reasoning: $25-50k, 12 weeks — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents FLF Fellowship on AI for Human Reasoning: $25-50k, 12 weeks by Oliver Sourbut May 19 2025 2 min read 2 69 AI safety Career choice Existential risk Opportunities to take action Policy AI governance Application announcements Fellowships and internships Frontpage FLF Fellowship on "
+    contentLength: 242230
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://nathanpmyoung.substack.com/p/worlds-first-ai-community-note
+    linkText: World's First AI Community Note
+    claimContext: "**Community Notes AI** (Nathan Young, Robert Gordon) Built an AI system that writes Community Notes for X (formerly Twitter). Achieved a significant milestone: the world's first AI-written Community Note to be approved through X's rating system. The bot's notes have been viewed over 2.5 million time"
+    fetchedAt: 2026-02-22T02:28:22.636Z
+    httpStatus: 200
+    pageTitle: World&#x27;s First AI Community Note - by Nathan Young
+    contentSnippet: "World&#x27;s First AI Community Note - by Nathan Young Predictive Text Subscribe Sign in World's First AI Community Note We did it! Nathan Young Sep 23, 2025 16 3 1 Share We launched the world’s first AI generated community note. Here a Lead Engineer at X (formerly Twitter) credits this: Since then there have been several other successful notes. In total, in the last three weeks, our notes have been seen over 700,000 times. A minimal explanation of AI community notes I intend to write a longer a"
+    contentLength: 228809
+    status: verified
+    note: null

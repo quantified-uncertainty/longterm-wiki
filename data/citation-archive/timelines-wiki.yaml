@@ -1,0 +1,40 @@
+pageId: timelines-wiki
+verifiedAt: 2026-02-22
+totalCitations: 3
+verified: 3
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://timelines.issarice.com/wiki/Timeline_of_AI_safety
+    linkText: Timeline of AI Safety - Timelines Wiki
+    claimContext: '|-----------|------------| | **Created** | March 12, 2017[^1] | | **Creator** | <EntityLink id="issa-rice">Issa Rice</EntityLink> |'
+    fetchedAt: 2026-02-22T02:28:24.522Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 618
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://timelines.issarice.com/wiki/Timeline_of_AI_safety
+    linkText: Timeline of AI Safety - Timelines Wiki — - Documents key events including 2005 AI box experiments, 2013 founding of CSER and FRI, 2014 publication of Superintelligence
+    claimContext: The wiki maintains extensive timelines documenting the history of major AI safety organizations. The Timeline of AI Safety serves as a central reference, documenting key events in reducing AI risks, including developments in alignment research (ensuring AI goals match human values) and existential r
+    fetchedAt: 2026-02-22T02:28:24.714Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 618
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://timelines.issarice.com/wiki/Timeline_of_Wikipedia
+    linkText: Timeline of Wikipedia - Timelines Wiki
+    claimContext: Beyond AI safety, Timelines Wiki documents effective altruism organizations and adjacent movements. The Timeline of Wikipedia itself is hosted on the platform, demonstrating the wiki's range beyond AI-specific topics.[^4]
+    fetchedAt: 2026-02-22T02:28:24.545Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 618
+    status: verified
+    note: null

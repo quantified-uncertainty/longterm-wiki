@@ -1,0 +1,788 @@
+pageId: coalition-for-epidemic-preparedness-innovations
+verifiedAt: 2026-02-22
+totalCitations: 71
+verified: 58
+broken: 13
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.devex.com/organizations/coalition-for-epidemic-preparedness-innovations-cepi-72733
+    linkText: Devex - Coalition for Epidemic Preparedness Innovations
+    claimContext: The Coalition for Epidemic Preparedness Innovations (CEPI) is a global partnership established to finance and coordinate the development of vaccines against emerging infectious diseases with pandemic potential.[^1] Launched in January 2017 at the World Economic Forum in Davos, the organization addre
+    fetchedAt: 2026-02-22T01:55:49.110Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations (CEPI) | Devex
+    contentSnippet: Coalition for Epidemic Preparedness Innovations (CEPI) | Devex Coalition for Epidemic Preparedness Innovations (CEPI) Overview Jobs News Experience Contact About CEPI &ndash; the Coalition for Epidemic Preparedness Innovations &ndash; is a new international non-profit coalition aspiring to build a system that can tackle the barriers to develop vaccines against those epidemic infections for which the usual commercial incentives for development are inadequate. CEPI will advance safe, effective and
+    contentLength: 64549
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://gesundheitsforschung-bmftr.de/en/coalition-for-epidemic-preparedness-innovations-cepi-8575.php
+    linkText: BMFTR - Coalition for Epidemic Preparedness Innovations
+    claimContext: The Coalition for Epidemic Preparedness Innovations (CEPI) is a global partnership established to finance and coordinate the development of vaccines against emerging infectious diseases with pandemic potential.[^1] Launched in January 2017 at the World Economic Forum in Davos, the organization addre
+    fetchedAt: 2026-02-22T01:55:50.114Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR
+    contentSnippet: "Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR Skip to content (Enter) Skip to navigation (Enter) Skip to search (Enter) link-internal1: /en/international-cooperation-7293.php link-internal2: link-internal3: link-external: current-page: URL: --> International Cooperation link-internal1: /en/collaborations-in-global-health-8493.php link-internal2: link-internal3: link-external: current-page: URL: --> Collaborations in Global Health Coalition for Epidemic Prepa"
+    contentLength: 57675
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://cepi.net/about-cepi
+    linkText: CEPI - About CEPI
+    claimContext: "CEPI's work focuses on diseases that disproportionately affect low-income countries and lack commercial markets, including MERS-CoV, Lassa virus, Nipah virus, Ebola, Marburg fever, and Zika. The organization also develops rapid-response vaccine platforms for \"Disease X\"—unknown pathogens that could "
+    fetchedAt: 2026-02-22T01:55:48.935Z
+    httpStatus: 200
+    pageTitle: About CEPI
+    contentSnippet: About CEPI Our mission CEPI's mission is to accelerate the development of vaccines and other biologic countermeasures against epidemic and pandemic threats so they can be accessible to all people in need. Why we exist Arrow Why we exist CEPI was launched after the global response to the 2014-2016 West Africa Ebola epidemic fell tragically short and there was a consensus that a coordinated, international, and intergovernmental plan was needed to develop and deploy new vaccines to prevent future e
+    contentLength: 81678
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: "CEPI's work focuses on diseases that disproportionately affect low-income countries and lack commercial markets, including MERS-CoV, Lassa virus, Nipah virus, Ebola, Marburg fever, and Zika. The organization also develops rapid-response vaccine platforms for \"Disease X\"—unknown pathogens that could "
+    fetchedAt: 2026-02-22T01:55:48.047Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://convention.bio.org/exhibitors/coalition-epidemic-preparedness-innovations
+    linkText: BIO Convention - Coalition for Epidemic Preparedness Innovations
+    claimContext: "The organization's current strategic priority is the 100 Days Mission: developing vaccines against unknown pathogens within 100 days of identification. This ambitious goal, endorsed by G7 and G20 leaders, relies on advancing platform technologies and building prototype vaccine libraries that can be "
+    fetchedAt: 2026-02-22T01:55:49.418Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations - BIO International Convention 2026
+    contentSnippet: Coalition for Epidemic Preparedness Innovations - BIO International Convention 2026 Start your engines! BIO 2026 is June 22-25 at the San Diego Convention Center. Registration is open! Register at the Early Bird rate. Instagram Linkedin Twitter Facebook YouTube Search Coalition for Epidemic Preparedness Innovations Public, NPO, govt., economic development CEPI is an innovative partnership between public, private, philanthropic, and civil organisations, launched at Davos in 2017, to accelerate th
+    contentLength: 73671
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: CEPI was conceived in response to the 2014-2016 West African Ebola epidemic, which exposed critical gaps in global vaccine development infrastructure.[^6] The epidemic killed over 11,000 people and cost \$53 billion, yet a 100% efficacious vaccine arrived too late to prevent the outbreak.[^7] Four i
+    fetchedAt: 2026-02-22T01:55:51.159Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://cepi.net/why-we-exist
+    linkText: CEPI - Why We Exist
+    claimContext: CEPI was conceived in response to the 2014-2016 West African Ebola epidemic, which exposed critical gaps in global vaccine development infrastructure.[^6] The epidemic killed over 11,000 people and cost \$53 billion, yet a 100% efficacious vaccine arrived too late to prevent the outbreak.[^7] Four i
+    fetchedAt: 2026-02-22T01:55:51.461Z
+    httpStatus: 200
+    pageTitle: Why we exist
+    contentSnippet: Why we exist Epidemic diseases affect us all. They do not respect borders As the COVID-19 pandemic showed, in a world characterised by increasing population density, human mobility and ecological change, emerging infectious diseases pose a real and growing threat to global health security. The costs of emerging infectious diseases are vast, in both human and economic terms. Even small epidemics can cause tremendous economic disruption, while pandemics like COVID-19 can lead to devastating loss o
+    contentLength: 104573
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://cepi.net/cepi-officially-launched
+    linkText: CEPI - CEPI Officially Launched
+    claimContext: CEPI was conceived in response to the 2014-2016 West African Ebola epidemic, which exposed critical gaps in global vaccine development infrastructure.[^6] The epidemic killed over 11,000 people and cost \$53 billion, yet a 100% efficacious vaccine arrived too late to prevent the outbreak.[^7] Four i
+    fetchedAt: 2026-02-22T01:55:53.729Z
+    httpStatus: 200
+    pageTitle: CEPI officially launched
+    contentSnippet: CEPI officially launched Facebook LinkedIn X Global partnership launched to prevent epidemics with new vaccines Media release, Davos 18 Jan 2017 — Coalition for Epidemic Preparedness Innovations A global coalition to create new vaccines for emerging infectious diseases, designed to help give the world an insurance policy against epidemics, launches today at the World Economic Forum in Davos, Switzerland. With an initial investment of US$460m from the governments of Germany, Japan and Norway, plu
+    contentLength: 86924
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: The concept was formally outlined in July 2015 in *The New England Journal of Medicine* in a paper titled "Establishing a Global Vaccine-Development Fund," co-authored by Jeremy Farrar (director of Wellcome Trust), Stanley A. Plotkin (co-discoverer of the Rubella vaccine), and Adel Mahmoud (develope
+    fetchedAt: 2026-02-22T01:55:51.160Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 10
+    url: https://academic.oup.com/epirev/article/41/1/28/5588068
+    linkText: EPI Reviews - A Global Vaccine-Development Fund
+    claimContext: The concept was formally outlined in July 2015 in *The New England Journal of Medicine* in a paper titled "Establishing a Global Vaccine-Development Fund," co-authored by Jeremy Farrar (director of Wellcome Trust), Stanley A. Plotkin (co-discoverer of the Rubella vaccine), and Adel Mahmoud (develope
+    fetchedAt: 2026-02-22T01:55:51.472Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 11
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: "CEPI was formally established in August 2016 as an international non-profit association under Norwegian law, founded by the governments of India and Norway, the Bill & Melinda Gates Foundation, the Wellcome Trust, and the World Economic Forum.[^11] The organization launched publicly in January 2017 "
+    fetchedAt: 2026-02-22T01:55:54.841Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: "CEPI was formally established in August 2016 as an international non-profit association under Norwegian law, founded by the governments of India and Norway, the Bill & Melinda Gates Foundation, the Wellcome Trust, and the World Economic Forum.[^11] The organization launched publicly in January 2017 "
+    fetchedAt: 2026-02-22T01:55:54.735Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 13
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: The European Union joined CEPI as a funding partner in 2019, followed by the United Kingdom in 2020.[^13] By February 2020, CEPI had raised a total of \$760 million and mobilized more than \$750 million to support vaccine development against priority pathogens.[^14]
+    fetchedAt: 2026-02-22T01:55:54.735Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 14
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7108492/
+    linkText: PMC - Vaccine Development Partnerships
+    claimContext: The European Union joined CEPI as a funding partner in 2019, followed by the United Kingdom in 2020.[^13] By February 2020, CEPI had raised a total of \$760 million and mobilized more than \$750 million to support vaccine development against priority pathogens.[^14]
+    fetchedAt: 2026-02-22T01:55:54.901Z
+    httpStatus: 200
+    pageTitle: "CEPI: Driving Progress Toward Epidemic Preparedness and Response - PMC"
+    contentSnippet: "CEPI: Driving Progress Toward Epidemic Preparedness and Response - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM prov"
+    contentLength: 149790
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: Although not originally designed as a public health emergency response organization, CEPI became an equal partner with WHO, UNICEF, and Gavi in forming COVAX during the COVID-19 pandemic. The organization leveraged its pre-pandemic vaccine development investments to accelerate COVID-19 vaccine acces
+    fetchedAt: 2026-02-22T01:55:55.079Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://gesundheitsforschung-bmftr.de/en/coalition-for-epidemic-preparedness-innovations-cepi-8575.php
+    linkText: BMFTR - Coalition for Epidemic Preparedness Innovations
+    claimContext: Although not originally designed as a public health emergency response organization, CEPI became an equal partner with WHO, UNICEF, and Gavi in forming COVAX during the COVID-19 pandemic. The organization leveraged its pre-pandemic vaccine development investments to accelerate COVID-19 vaccine acces
+    fetchedAt: 2026-02-22T01:55:58.323Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR
+    contentSnippet: "Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR Skip to content (Enter) Skip to navigation (Enter) Skip to search (Enter) link-internal1: /en/international-cooperation-7293.php link-internal2: link-internal3: link-external: current-page: URL: --> International Cooperation link-internal1: /en/collaborations-in-global-health-8493.php link-internal2: link-internal3: link-external: current-page: URL: --> Collaborations in Global Health Coalition for Epidemic Prepa"
+    contentLength: 57675
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.glopid-r.org/articles-newsletter/cepis-3-5bn-plan-to-tackle-the-outbreaks-of-today-and-tomorrow/
+    linkText: GLOPID-R - CEPI's 3.5bn Plan
+    claimContext: "In March 2021, CEPI launched a \\$3.5 billion five-year plan focused on preparing for future pandemics through three pillars: prepare, transform, and connect.[^17] This plan included a \\$200 million call for SARS-CoV-2 variant-specific vaccines, linking surveillance systems to vaccine development dec"
+    fetchedAt: 2026-02-22T01:55:58.082Z
+    httpStatus: 200
+    pageTitle: CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow &#8211; Global research collaboration for infectious disease preparednessGLOPID-R
+    contentSnippet: CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow &#8211; Global research collaboration for infectious disease preparednessGLOPID-R You are using an outdated browser. Please upgrade your browser to improve your experience. 31/05/2121 --> CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow The Coalition for Epidemic Preparedness Innovations (CEPI), an observer member of GloPID-R, has played a key role in efforts to develop and deploy COVID-19 vaccines. It’s also planni
+    contentLength: 60089
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8063073/
+    linkText: PMC - CEPI's Response to COVID-19
+    claimContext: "In March 2021, CEPI launched a \\$3.5 billion five-year plan focused on preparing for future pandemics through three pillars: prepare, transform, and connect.[^17] This plan included a \\$200 million call for SARS-CoV-2 variant-specific vaccines, linking surveillance systems to vaccine development dec"
+    fetchedAt: 2026-02-22T01:55:56.203Z
+    httpStatus: 200
+    pageTitle: CEPI prepares for future pandemics and epidemics - PMC
+    contentSnippet: CEPI prepares for future pandemics and epidemics - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM provides access to s
+    contentLength: 94745
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://cepi.net/about-cepi
+    linkText: CEPI - About CEPI
+    claimContext: "CEPI's mission is to accelerate the development of vaccines and other biologic countermeasures against epidemic and pandemic threats so they are accessible to all people in need.[^19] The organization addresses market failures by funding vaccines for diseases that offer little commercial return but "
+    fetchedAt: 2026-02-22T01:55:57.968Z
+    httpStatus: 200
+    pageTitle: About CEPI
+    contentSnippet: About CEPI Our mission CEPI's mission is to accelerate the development of vaccines and other biologic countermeasures against epidemic and pandemic threats so they can be accessible to all people in need. Why we exist Arrow Why we exist CEPI was launched after the global response to the 2014-2016 West Africa Ebola epidemic fell tragically short and there was a consensus that a coordinated, international, and intergovernmental plan was needed to develop and deploy new vaccines to prevent future e
+    contentLength: 81678
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.devex.com/organizations/coalition-for-epidemic-preparedness-innovations-cepi-72733
+    linkText: Devex - Coalition for Epidemic Preparedness Innovations
+    claimContext: "CEPI's mission is to accelerate the development of vaccines and other biologic countermeasures against epidemic and pandemic threats so they are accessible to all people in need.[^19] The organization addresses market failures by funding vaccines for diseases that offer little commercial return but "
+    fetchedAt: 2026-02-22T01:55:56.584Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations (CEPI) | Devex
+    contentSnippet: Coalition for Epidemic Preparedness Innovations (CEPI) | Devex Coalition for Epidemic Preparedness Innovations (CEPI) Overview Jobs News Experience Contact About CEPI &ndash; the Coalition for Epidemic Preparedness Innovations &ndash; is a new international non-profit coalition aspiring to build a system that can tackle the barriers to develop vaccines against those epidemic infections for which the usual commercial incentives for development are inadequate. CEPI will advance safe, effective and
+    contentLength: 64549
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://myresearchconnect.com/cepi-innovations-to-prepare-for-future-epidemics-and-pandemics/
+    linkText: MyResearchConnect - CEPI Innovations
+    claimContext: "1. **Vaccine Platform Innovations**: Funding platforms for rapid Disease X response, building preclinical, chemistry/manufacturing/controls (CMC), clinical, and regulatory expertise for outbreak speed and accessibility.[^21]"
+    fetchedAt: 2026-02-22T01:56:00.433Z
+    httpStatus: 200
+    pageTitle: CEPI Innovations to Prepare for Future Epidemics and Pandemics - ResearchConnect
+    contentSnippet: "CEPI Innovations to Prepare for Future Epidemics and Pandemics - ResearchConnect Skip to content Research Connect CEPI Innovations to Prepare for Future Epidemics and Pandemics CEPI Innovations to Prepare for Future Epidemics and Pandemics Closing Date: 14/12/2026 Funding for international projects which contribute to the advancement of vaccine platforms and vaccine candidates to accelerate the development of vaccines against known high-risk pathogens. CEPI (Coalition for Epidemic Preparedness I"
+    contentLength: 94783
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://myresearchconnect.com/cepi-innovations-to-prepare-for-future-epidemics-and-pandemics/
+    linkText: MyResearchConnect - CEPI Innovations
+    claimContext: "2. **Priority Pathogen Candidates**: Advancing vaccines for high-risk pathogens and viral families, including exemplar vaccines against prototype pathogens.[^22]"
+    fetchedAt: 2026-02-22T01:56:00.674Z
+    httpStatus: 200
+    pageTitle: CEPI Innovations to Prepare for Future Epidemics and Pandemics - ResearchConnect
+    contentSnippet: "CEPI Innovations to Prepare for Future Epidemics and Pandemics - ResearchConnect Skip to content Research Connect CEPI Innovations to Prepare for Future Epidemics and Pandemics CEPI Innovations to Prepare for Future Epidemics and Pandemics Closing Date: 14/12/2026 Funding for international projects which contribute to the advancement of vaccine platforms and vaccine candidates to accelerate the development of vaccines against known high-risk pathogens. CEPI (Coalition for Epidemic Preparedness I"
+    contentLength: 94783
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://convention.bio.org/exhibitors/coalition-epidemic-preparedness-innovations
+    linkText: BIO Convention - Coalition for Epidemic Preparedness Innovations
+    claimContext: "CEPI's 2022-2026 strategic plan, known as CEPI 2.0, prioritizes the 100 Days Mission—developing vaccines against unknown pathogens within 100 days of identification.[^23] This goal involves:"
+    fetchedAt: 2026-02-22T01:55:59.944Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations - BIO International Convention 2026
+    contentSnippet: Coalition for Epidemic Preparedness Innovations - BIO International Convention 2026 Start your engines! BIO 2026 is June 22-25 at the San Diego Convention Center. Registration is open! Register at the Early Bird rate. Instagram Linkedin Twitter Facebook YouTube Search Coalition for Epidemic Preparedness Innovations Public, NPO, govt., economic development CEPI is an innovative partnership between public, private, philanthropic, and civil organisations, launched at Davos in 2017, to accelerate th
+    contentLength: 73671
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://vaccinesbeat.org/the-coalition-for-epidemic-preparedness-innovations-cepi-and-the-100-days-mission-for-a-vaccine-in-a-future-pandemic/
+    linkText: VaccinesBeat - 100 Days Mission
+    claimContext: "- Building prototype vaccine libraries for viral families (e.g., Paramyxoviridae, Flaviviridae, Togaviridae, Filoviridae, Bunyaviridae, Arenaviridae, Picornaviridae) pre-tested in Phase 1 trials for rapid adaptation[^24] - Using AI for viral modeling and earlier immune response biomarkers[^25]"
+    fetchedAt: 2026-02-22T01:56:00.813Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the 100 Days Mission for a Vaccine in a Future Pandemic | Vaccines Beat
+    contentSnippet: The Coalition for Epidemic Preparedness Innovations (CEPI) and the 100 Days Mission for a Vaccine in a Future Pandemic | Vaccines Beat Linkedin Youtube Coffee with the Expert Letter from the Editor News & Alerts Latest Publications Editors Corner Best Practice Clinical Trials Guest Contributors Webinars Search Linkedin Linkedin ISSN 2997-2833 Home Who We Are Mission Vision Team About AHF Contact Subscribe Subscribe to our newsletter To be updated with all the latest news and special announcement
+    contentLength: 166508
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://cepi.net/disease-x
+    linkText: CEPI - Disease X
+    claimContext: "- Building prototype vaccine libraries for viral families (e.g., Paramyxoviridae, Flaviviridae, Togaviridae, Filoviridae, Bunyaviridae, Arenaviridae, Picornaviridae) pre-tested in Phase 1 trials for rapid adaptation[^24] - Using AI for viral modeling and earlier immune response biomarkers[^25] - Est"
+    fetchedAt: 2026-02-22T01:56:00.584Z
+    httpStatus: 200
+    pageTitle: Disease X
+    contentSnippet: Disease X What is Disease X? Disease X represents the knowledge that a serious epidemic or pandemic could be caused by a novel or as-of-yet unidentified pathogen. In February 2018, Disease X was included in the WHO R&D Blueprint list of priority diseases. COVID-19 represented the first Disease X since the term was coined in 2018 and it resulted in a humanitarian and economic global crisis. The number of new emerging infectious diseases is on the rise, and as the COVID-19 pandemic demonstrated, i
+    contentLength: 96225
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://vaccinesbeat.org/the-coalition-for-epidemic-preparedness-innovations-cepi-and-the-100-days-mission-for-a-vaccine-in-a-future-pandemic/
+    linkText: VaccinesBeat - 100 Days Mission
+    claimContext: "- Using AI for viral modeling and earlier immune response biomarkers[^25] - Establishing innovative trial networks and regulatory pathways[^26]"
+    fetchedAt: 2026-02-22T01:56:02.967Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the 100 Days Mission for a Vaccine in a Future Pandemic | Vaccines Beat
+    contentSnippet: The Coalition for Epidemic Preparedness Innovations (CEPI) and the 100 Days Mission for a Vaccine in a Future Pandemic | Vaccines Beat Linkedin Youtube Coffee with the Expert Letter from the Editor News & Alerts Latest Publications Editors Corner Best Practice Clinical Trials Guest Contributors Webinars Search Linkedin Linkedin ISSN 2997-2833 Home Who We Are Mission Vision Team About AHF Contact Subscribe Subscribe to our newsletter To be updated with all the latest news and special announcement
+    contentLength: 166508
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2025.1617066/full
+    linkText: Frontiers in Public Health - Expert Survey on 100 Days Mission
+    claimContext: A 2025 cross-sectional survey of 85 vaccinology and public health experts (73.2% response rate) identified vaccine libraries, surveillance, and trial networks as key priorities for achieving this goal. However, experts from low- and middle-income countries were more confident in success than those f
+    fetchedAt: 2026-02-22T01:56:02.228Z
+    httpStatus: 200
+    pageTitle: "Frontiers | Pandemic preparedness and response: a survey among experts from high- and low-middle-income countries about the “100 Days Mission”"
+    contentSnippet: "Frontiers | Pandemic preparedness and response: a survey among experts from high- and low-middle-income countries about the “100 Days Mission” ORIGINAL RESEARCH article Front. Public Health , 05 September 2025 Sec. Infectious Diseases: Epidemiology and Prevention Volume 13 - 2025 | https://doi.org/10.3389/fpubh.2025.1617066 Published in Frontiers in Public Health Infectious Diseases: Epidemiology and Prevention 3.4 impact factor 5.5 citescore Part of a Research Topic Pandemic Preparedness in Vac"
+    contentLength: 556125
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://gesundheitsforschung-bmftr.de/en/coalition-for-epidemic-preparedness-innovations-cepi-8575.php
+    linkText: BMFTR - Coalition for Epidemic Preparedness Innovations
+    claimContext: CEPI operates as a partnership of public, private, philanthropic, and civil organizations, bringing together governments, industry, academia, intergovernmental institutions like WHO, and civil society.[^28] The organization coordinates research activities, pairs small R&D firms with manufacturers, s
+    fetchedAt: 2026-02-22T01:56:03.774Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR
+    contentSnippet: "Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR Skip to content (Enter) Skip to navigation (Enter) Skip to search (Enter) link-internal1: /en/international-cooperation-7293.php link-internal2: link-internal3: link-external: current-page: URL: --> International Cooperation link-internal1: /en/collaborations-in-global-health-8493.php link-internal2: link-internal3: link-external: current-page: URL: --> Collaborations in Global Health Coalition for Epidemic Prepa"
+    contentLength: 57675
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: CEPI operates as a partnership of public, private, philanthropic, and civil organizations, bringing together governments, industry, academia, intergovernmental institutions like WHO, and civil society.[^28] The organization coordinates research activities, pairs small R&D firms with manufacturers, s
+    fetchedAt: 2026-02-22T01:56:01.836Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 30
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: The organization's scientific advisory committee includes executives from major pharmaceutical companies including Pfizer, Johnson & Johnson, and Takeda Pharmaceutical, advising on strategic partnerships and development pathways.[^30]
+    fetchedAt: 2026-02-22T01:56:01.837Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 31
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: "CEPI's pre-pandemic platform investments enabled a rapid SARS-CoV-2 response. The organization invested \\$4.4 million in March 2020 to support Novavax and the University of Oxford, eventually scaling to over \\$100 million in COVID-19 projects.[^31] Notable partnerships included:"
+    fetchedAt: 2026-02-22T01:56:04.784Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 32
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: "- **University of Oxford and AstraZeneca**: Supporting the ChAdOx1 platform (previously used for MERS, Lassa, Nipah), with equitable access provisions including Joint Monitoring Committees (JMAGs), stage gates, public health licenses, and dispute resolution mechanisms.[^32] - **Next-generation vacci"
+    fetchedAt: 2026-02-22T01:56:04.860Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.glopid-r.org/articles-newsletter/cepis-3-5bn-plan-to-tackle-the-outbreaks-of-today-and-tomorrow/
+    linkText: GLOPID-R - CEPI's 3.5bn Plan
+    claimContext: "- **University of Oxford and AstraZeneca**: Supporting the ChAdOx1 platform (previously used for MERS, Lassa, Nipah), with equitable access provisions including Joint Monitoring Committees (JMAGs), stage gates, public health licenses, and dispute resolution mechanisms.[^32] - **Next-generation vacci"
+    fetchedAt: 2026-02-22T01:56:06.000Z
+    httpStatus: 200
+    pageTitle: CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow &#8211; Global research collaboration for infectious disease preparednessGLOPID-R
+    contentSnippet: CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow &#8211; Global research collaboration for infectious disease preparednessGLOPID-R You are using an outdated browser. Please upgrade your browser to improve your experience. 31/05/2121 --> CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow The Coalition for Epidemic Preparedness Innovations (CEPI), an observer member of GloPID-R, has played a key role in efforts to develop and deploy COVID-19 vaccines. It’s also planni
+    contentLength: 60089
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://cepi.net/equitable-access
+    linkText: CEPI - Equitable Access
+    claimContext: CEPI was the only public funder systematically leveraging investments for equitable access, securing first right of refusal for COVAX to access hundreds of millions of doses amid global shortages.[^34] COVAX achieved the fastest vaccine deployment ever, with modeling suggesting it averted an estimat
+    fetchedAt: 2026-02-22T01:56:05.998Z
+    httpStatus: 200
+    pageTitle: Equitable access
+    contentSnippet: "Equitable access CEPI’s commitment to equitable access A commitment to equitable access is inscribed in CEPI’s DNA. It is core to CEPI’s vision of a world in which epidemics and pandemics are no longer a threat to humanity. CEPI’s commitment to equitable access informs every aspect of our work and has done so since our very beginnings. Equitable access to epidemic or pandemic vaccines in the context of an outbreak means that appropriate vaccines are first available to populations when and where "
+    contentLength: 116150
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://cepi.net/equitable-access
+    linkText: CEPI - Equitable Access
+    claimContext: CEPI was the only public funder systematically leveraging investments for equitable access, securing first right of refusal for COVAX to access hundreds of millions of doses amid global shortages.[^34] COVAX achieved the fastest vaccine deployment ever, with modeling suggesting it averted an estimat
+    fetchedAt: 2026-02-22T01:56:05.902Z
+    httpStatus: 200
+    pageTitle: Equitable access
+    contentSnippet: "Equitable access CEPI’s commitment to equitable access A commitment to equitable access is inscribed in CEPI’s DNA. It is core to CEPI’s vision of a world in which epidemics and pandemics are no longer a threat to humanity. CEPI’s commitment to equitable access informs every aspect of our work and has done so since our very beginnings. Equitable access to epidemic or pandemic vaccines in the context of an outbreak means that appropriate vaccines are first available to populations when and where "
+    contentLength: 116150
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://cepi.net/news
+    linkText: CEPI News
+    claimContext: "- **Lassa Fever**: Funded multiple vaccine candidates with the first volunteer dosed in Oxford trials; West African Ministers of Health pledged joint commitment to advance Lassa fever vaccines on September 8, 2025.[^36] - **Chikungunya**: Supported development of the first authorized vaccine against"
+    fetchedAt: 2026-02-22T01:56:07.581Z
+    httpStatus: 200
+    pageTitle: News
+    contentSnippet: "News Search Latest News Filters Search News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate to strengthen outbreak-ready vaccine production and global "
+    contentLength: 638064
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://gesundheitsforschung-bmftr.de/en/coalition-for-epidemic-preparedness-innovations-cepi-8575.php
+    linkText: BMFTR - Coalition for Epidemic Preparedness Innovations
+    claimContext: "- **Lassa Fever**: Funded multiple vaccine candidates with the first volunteer dosed in Oxford trials; West African Ministers of Health pledged joint commitment to advance Lassa fever vaccines on September 8, 2025.[^36] - **Chikungunya**: Supported development of the first authorized vaccine against"
+    fetchedAt: 2026-02-22T01:56:07.767Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR
+    contentSnippet: "Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR Skip to content (Enter) Skip to navigation (Enter) Skip to search (Enter) link-internal1: /en/international-cooperation-7293.php link-internal2: link-internal3: link-external: current-page: URL: --> International Cooperation link-internal1: /en/collaborations-in-global-health-8493.php link-internal2: link-internal3: link-external: current-page: URL: --> Collaborations in Global Health Coalition for Epidemic Prepa"
+    contentLength: 57675
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://cepi.net
+    linkText: CEPI
+    claimContext: "- **Chikungunya**: Supported development of the first authorized vaccine against Chikungunya.[^37] - **Rift Valley Fever**: Created the largest-ever reserve of investigational Rift Valley fever vaccine in partnership with Oxford and Serum Institute.[^38] - **Pancoronavirus Vaccine**: Invested approx"
+    fetchedAt: 2026-02-22T01:56:07.359Z
+    httpStatus: 200
+    pageTitle: Home page
+    contentSnippet: "Home page Latest News Latest News See more Arrow Arrow Blog Dr Umar Ahmad: My Fellowship at CEPI News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate t"
+    contentLength: 125849
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: "- **Rift Valley Fever**: Created the largest-ever reserve of investigational Rift Valley fever vaccine in partnership with Oxford and Serum Institute.[^38] - **Pancoronavirus Vaccine**: Invested approximately \\$65 million in GBP511 for protection against future coronavirus pandemics.[^39] - **Multiv"
+    fetchedAt: 2026-02-22T01:56:07.006Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 40
+    url: https://cepi.net/cepi-backs-new-research-vaccines-against-multiple-deadly-filoviruses
+    linkText: CEPI - Filovirus Vaccines
+    claimContext: "- **Pancoronavirus Vaccine**: Invested approximately \\$65 million in GBP511 for protection against future coronavirus pandemics.[^39] - **Multivalent Filovirus Vaccines**: Backing new research for vaccines protecting against multiple deadly filoviruses.[^40]"
+    fetchedAt: 2026-02-22T01:56:09.485Z
+    httpStatus: 200
+    pageTitle: CEPI backs new research into vaccines against multiple deadly filoviruses
+    contentSnippet: CEPI backs new research into vaccines against multiple deadly filoviruses Facebook LinkedIn X Researchers will test new vaccines that could provide all-in-one protection against viruses including Zaire Ebolavirus, Marburg and Sudan Ebolavirus. Project will help scientists to rapidly respond if an unknown filovirus pathogen emerges in the future. 6 October 2025, OSLO. CEPI will fund new research conducted by scientists at the Stanford School of Medicine to study whether new vaccines could offer b
+    contentLength: 84511
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.ivi.int/international-vaccine-institute-joins-cepis-global-vaccine-testing-network-to-strengthen-pandemic-preparedness/
+    linkText: IVI - International Vaccine Institute Joins CEPI's Global Vaccine Testing Network
+    claimContext: "- The International Vaccine Institute (IVI) and Korea Disease Control and Prevention Agency (KDCA) joined CEPI's Centralised Laboratory Network in 2025, marking the first Korean labs in a network of 20 across continents for standardized vaccine evaluation.[^41] - Samsung Biologics joined the Vaccine"
+    fetchedAt: 2026-02-22T01:56:12.381Z
+    httpStatus: 200
+    pageTitle: International Vaccine Institute joins CEPI’s global vaccine testing network to strengthen pandemic preparedness - IVI
+    contentSnippet: International Vaccine Institute joins CEPI’s global vaccine testing network to strengthen pandemic preparedness - IVI International Vaccine Institute joins CEPI’s global vaccine testing network to strengthen pandemic preparedness Home Main News International Vaccine Institute joins CEPI’s global vaccine testing network to strengthen pandemic preparedness August 6, 2025 , SEOUL, Republic of Korea — The International Vaccine Institute (IVI) has joined the world’s largest network of laboratories wo
+    contentLength: 464268
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.bioprocessintl.com/global-markets/cepi-and-samsung-biologics-partner-to-enhance-global-vaccine-access
+    linkText: BioProcess International - CEPI and Samsung Biologics Partner
+    claimContext: "- The International Vaccine Institute (IVI) and Korea Disease Control and Prevention Agency (KDCA) joined CEPI's Centralised Laboratory Network in 2025, marking the first Korean labs in a network of 20 across continents for standardized vaccine evaluation.[^41] - Samsung Biologics joined the Vaccine"
+    fetchedAt: 2026-02-22T01:56:10.963Z
+    httpStatus: 200
+    pageTitle: CEPI and Samsung partner to enhance global vaccine access
+    contentSnippet: CEPI and Samsung partner to enhance global vaccine access Subscribe Subscribe Upstream Related Topics Bioreactors Biochemicals/Raw Materials Cell Culture Media Expression Platforms Microbial Cell Culture Perfusion Cell Culture Recent in Upstream See all Sponsored Content Unlocking Extended Fed-Batch Performance for CHO Cells Unlocking Extended Fed-Batch Performance for CHO Cells by Jimmy Su , Xu (Penny) Peng Feb 11, 2026 Upstream & Downstream Processing Bracco enters cell-therapy manufacturing s
+    contentLength: 411074
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://cepi.net/news
+    linkText: CEPI News
+    claimContext: "- Samsung Biologics joined the Vaccine Manufacturing and Filling Network (VMFN) to supply up to 50 million doses in a pandemic, strengthening outbreak-ready vaccine production capacity.[^42] - Partnership with the African Vaccine Regulatory Forum (AVAREF) to boost clinical trial application reviews "
+    fetchedAt: 2026-02-22T01:56:11.014Z
+    httpStatus: 200
+    pageTitle: News
+    contentSnippet: "News Search Latest News Filters Search News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate to strengthen outbreak-ready vaccine production and global "
+    contentLength: 638064
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: "CEPI is funded by a diverse coalition of public and philanthropic sources. Initial founding partners contributed \\$460 million, with funding expanding to \\$760 million by February 2020.[^44] Major funders include:"
+    fetchedAt: 2026-02-22T01:56:10.492Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 45
+    url: https://gesundheitsforschung-bmftr.de/en/coalition-for-epidemic-preparedness-innovations-cepi-8575.php
+    linkText: BMFTR - Coalition for Epidemic Preparedness Innovations
+    claimContext: "- **Philanthropic Organizations**: Bill & Melinda Gates Foundation, Wellcome Trust - **Recent Commitments**: Korea invested \\$18.9 million in CEPI; Germany provided \\$150 million for CEPI's core portfolio and \\$430 million for its COVID-19 portfolio, with plans to provide an additional \\$40 million "
+    fetchedAt: 2026-02-22T01:56:10.866Z
+    httpStatus: 200
+    pageTitle: Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR
+    contentSnippet: "Coalition for Epidemic Preparedness Innovations (CEPI) - Gesundheitsforschung BMFTR Skip to content (Enter) Skip to navigation (Enter) Skip to search (Enter) link-internal1: /en/international-cooperation-7293.php link-internal2: link-internal3: link-external: current-page: URL: --> International Cooperation link-internal1: /en/collaborations-in-global-health-8493.php link-internal2: link-internal3: link-external: current-page: URL: --> Collaborations in Global Health Coalition for Epidemic Prepa"
+    contentLength: 57675
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.glopid-r.org/articles-newsletter/cepis-3-5bn-plan-to-tackle-the-outbreaks-of-today-and-tomorrow/
+    linkText: GLOPID-R - CEPI's 3.5bn Plan
+    claimContext: The organization launched a \$3.5 billion five-year plan in March 2021 to address future pandemic threats.[^46]
+    fetchedAt: 2026-02-22T01:56:14.187Z
+    httpStatus: 200
+    pageTitle: CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow &#8211; Global research collaboration for infectious disease preparednessGLOPID-R
+    contentSnippet: CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow &#8211; Global research collaboration for infectious disease preparednessGLOPID-R You are using an outdated browser. Please upgrade your browser to improve your experience. 31/05/2121 --> CEPI’s $3.5bn plan to tackle the outbreaks of today and tomorrow The Coalition for Epidemic Preparedness Innovations (CEPI), an observer member of GloPID-R, has played a key role in efforts to develop and deploy COVID-19 vaccines. It’s also planni
+    contentLength: 60089
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://cepi.net
+    linkText: CEPI
+    claimContext: Richard Hatchett serves as CEPI's Chief Executive Officer.[^47] Dr. Kent Kester serves as Executive Director of Vaccine R&D.[^48] The organization maintains a scientific advisory committee with representation from major pharmaceutical companies and academic institutions.
+    fetchedAt: 2026-02-22T01:56:13.776Z
+    httpStatus: 200
+    pageTitle: Home page
+    contentSnippet: "Home page Latest News Latest News See more Arrow Arrow Blog Dr Umar Ahmad: My Fellowship at CEPI News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate t"
+    contentLength: 125849
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://static.cepi.net/downloads/2025-02/CEPI%202.0%20Mid%20Term%20Review%20-%20Final%20Report_Management%20Response_published%207%20February%202025%201.pdf
+    linkText: CEPI 2.0 Mid Term Review
+    claimContext: Richard Hatchett serves as CEPI's Chief Executive Officer.[^47] Dr. Kent Kester serves as Executive Director of Vaccine R&D.[^48] The organization maintains a scientific advisory committee with representation from major pharmaceutical companies and academic institutions.
+    fetchedAt: 2026-02-22T01:56:15.238Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 4771577
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: CEPI faced significant criticism in 2018 over policy changes regarding intellectual property and equitable access. Originally, CEPI required vaccine developers to grant access to technology and waive substantial profits or proprietary rights for publicly funded research. After pharmaceutical compani
+    fetchedAt: 2026-02-22T01:56:13.392Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 50
+    url: https://msfaccess.org/sites/default/files/2018-09/CEPIoriginalPolicy_2017.pdf
+    linkText: MSF Access - CEPI Original Policy
+    claimContext: "Médecins Sans Frontières (MSF) strongly criticized this reversal for undermining transparency and equity, accusing CEPI of not following its own policies and removing board review of contracts.[^50] *The New York Times* characterized CEPI's initial push for pharma partnerships without profits or IP "
+    fetchedAt: 2026-02-22T01:56:14.078Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 185388
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: "Médecins Sans Frontières (MSF) strongly criticized this reversal for undermining transparency and equity, accusing CEPI of not following its own policies and removing board review of contracts.[^50] *The New York Times* characterized CEPI's initial push for pharma partnerships without profits or IP "
+    fetchedAt: 2026-02-22T01:56:16.242Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 52
+    url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    linkText: Wikipedia - Coalition for Epidemic Preparedness Innovations
+    claimContext: CEPI defended the policy revision by arguing the original approach was idealistic but not pragmatic for business realities, noting that some manufacturers refused to participate otherwise. The organization maintained it retained rights to repurpose IP or switch manufacturers with consent.[^52]
+    fetchedAt: 2026-02-22T01:56:16.256Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 53
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7825992/
+    linkText: PMC - Transparency and Accountability Concerns
+    claimContext: CEPI has been criticized for keeping the terms of its grant agreements with vaccine developers confidential, preventing public accountability.[^53] Inger Berg Ørstavik, a law professor specializing in patent licensing, stated that "without more openness, neither CEPI nor the vaccine manufacturers th
+    fetchedAt: 2026-02-22T01:56:16.373Z
+    httpStatus: 200
+    pageTitle: CEPI criticised for lack of transparency - PMC
+    contentSnippet: CEPI criticised for lack of transparency - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM provides access to scientifi
+    contentLength: 99356
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7825992/
+    linkText: PMC - Transparency and Accountability Concerns
+    claimContext: CEPI has been criticized for keeping the terms of its grant agreements with vaccine developers confidential, preventing public accountability.[^53] Inger Berg Ørstavik, a law professor specializing in patent licensing, stated that "without more openness, neither CEPI nor the vaccine manufacturers th
+    fetchedAt: 2026-02-22T01:56:16.380Z
+    httpStatus: 200
+    pageTitle: CEPI criticised for lack of transparency - PMC
+    contentSnippet: CEPI criticised for lack of transparency - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM provides access to scientifi
+    contentLength: 99356
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: Despite holding significant contractual rights, CEPI experienced substantial limitations in exercising leverage against vaccine manufacturers during the COVID-19 pandemic.[^55] The organization could not effectively coerce companies to make meaningful concessions on pricing and equitable access comm
+    fetchedAt: 2026-02-22T01:56:16.342Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://www.cambridge.org/core/journals/journal-of-law-medicine-and-ethics/article/coalition-for-epidemic-preparedness-innovations-cepi-and-the-partnerships-of-equitable-vaccine-access/7220E630527AF68FBAD26DFEB81C2AB0
+    linkText: Cambridge Core - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: Despite holding significant contractual rights, CEPI experienced substantial limitations in exercising leverage against vaccine manufacturers during the COVID-19 pandemic.[^55] The organization could not effectively coerce companies to make meaningful concessions on pricing and equitable access comm
+    fetchedAt: 2026-02-22T01:56:18.769Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access | Journal of Law, Medicine & Ethics | Cambridge Core
+    contentSnippet: null
+    contentLength: 1204967
+    status: verified
+    note: Academic publisher — URL accessible
+  - footnote: 57
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7825992/
+    linkText: PMC - Transparency and Accountability Concerns
+    claimContext: "CEPI's structure separates research funding from price negotiations, with pricing addressed downstream by partners like Gavi rather than during early-stage development. Critics argue this creates a fundamental flaw, as one expert noted: \"in a pandemic situation, where high-income countries are not p"
+    fetchedAt: 2026-02-22T01:56:17.438Z
+    httpStatus: 200
+    pageTitle: CEPI criticised for lack of transparency - PMC
+    contentSnippet: CEPI criticised for lack of transparency - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User Guide PERMALINK Copy As a library, NLM provides access to scientifi
+    contentLength: 99356
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: "While CEPI itself was not solely responsible, the broader COVAX vaccine allocation system faced significant structural weaknesses. COVAX aimed to distribute 2 billion doses by end-2021 but shipped only 1.1 billion by January 15, 2022, and 1.72 billion by September 15, 2022.[^58] Key issues included:"
+    fetchedAt: 2026-02-22T01:56:17.469Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: "- Few wealthy governments procuring through COVAX; self-financing governments bypassed it, redirecting billions of doses - Approximately 85% of administered doses went to high-income and upper-middle-income countries[^59] - CEPI's agreements had \"rights of first refusal\" for epidemics, but leverage "
+    fetchedAt: 2026-02-22T01:56:17.456Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+    linkText: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable Vaccine Access
+    claimContext: "- Approximately 85% of administered doses went to high-income and upper-middle-income countries[^59] - CEPI's agreements had \"rights of first refusal\" for epidemics, but leverage over national governments was limited[^60]"
+    fetchedAt: 2026-02-22T01:56:17.497Z
+    httpStatus: 200
+    pageTitle: The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC
+    contentSnippet: "The Coalition for Epidemic Preparedness Innovations (CEPI) and the Partnerships of Equitable Vaccine Access - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List User "
+    contentLength: 194907
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://peoplesmedicines.org/wp-content/uploads/2022/06/Embedding-equitable-access-in-vaccine-RD_Why-CEPIs-access-policy-and-governance-need-an-overhaul-1-1.pdf
+    linkText: People's Medicines - Embedding Equitable Access
+    claimContext: CEPI's governance and funding decisions have been criticized for prioritizing high-income country interests over equitable global manufacturing.[^61] The organization did little to support vaccine manufacturing capacity in low- and middle-income countries, instead supporting the status quo that conc
+    fetchedAt: 2026-02-22T01:56:20.452Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 309801
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://peoplesmedicines.org/wp-content/uploads/2022/06/Embedding-equitable-access-in-vaccine-RD_Why-CEPIs-access-policy-and-governance-need-an-overhaul-1-1.pdf
+    linkText: People's Medicines - Embedding Equitable Access
+    claimContext: CEPI's governance and funding decisions have been criticized for prioritizing high-income country interests over equitable global manufacturing.[^61] The organization did little to support vaccine manufacturing capacity in low- and middle-income countries, instead supporting the status quo that conc
+    fetchedAt: 2026-02-22T01:56:20.453Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 309801
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://peoplesmedicines.org/wp-content/uploads/2022/06/Embedding-equitable-access-in-vaccine-RD_Why-CEPIs-access-policy-and-governance-need-an-overhaul-1-1.pdf
+    linkText: People's Medicines - Embedding Equitable Access
+    claimContext: CEPI's governance and funding decisions have been criticized for prioritizing high-income country interests over equitable global manufacturing.[^61] The organization did little to support vaccine manufacturing capacity in low- and middle-income countries, instead supporting the status quo that conc
+    fetchedAt: 2026-02-22T01:56:20.454Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 309801
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://peoplesmedicines.org/wp-content/uploads/2022/06/Embedding-equitable-access-in-vaccine-RD_Why-CEPIs-access-policy-and-governance-need-an-overhaul-1-1.pdf
+    linkText: People's Medicines - Embedding Equitable Access
+    claimContext: CEPI also did not require vaccine developers to publish results in open-access journals or participate in comparative analyses of their products, limiting the broader scientific community's ability to benefit from publicly funded research.[^64]
+    fetchedAt: 2026-02-22T01:56:20.453Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 309801
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://cepi.net/news
+    linkText: CEPI News
+    claimContext: '- **Biosecurity Policy**: Published its first Biosecurity Policy for oversight of safe research practices.[^65] - **Prototype Pathogen Research**: CEPI and WHO promoted using prototype pathogens as "pathfinders" to build knowledge for entire pathogen families at the Global Pandemic Preparedness Summ'
+    fetchedAt: 2026-02-22T01:56:22.404Z
+    httpStatus: 200
+    pageTitle: News
+    contentSnippet: "News Search Latest News Filters Search News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate to strengthen outbreak-ready vaccine production and global "
+    contentLength: 638064
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://www.who.int/news/item/01-08-2024-cepi-and-who-urge-broader-research-strategy-for-countries-to-prepare-for-the-next-pandemic
+    linkText: WHO - CEPI and WHO Urge Broader Research Strategy
+    claimContext: '- **Biosecurity Policy**: Published its first Biosecurity Policy for oversight of safe research practices.[^65] - **Prototype Pathogen Research**: CEPI and WHO promoted using prototype pathogens as "pathfinders" to build knowledge for entire pathogen families at the Global Pandemic Preparedness Summ'
+    fetchedAt: 2026-02-22T01:56:23.844Z
+    httpStatus: 200
+    pageTitle: CEPI and WHO urge broader research strategy for countries to prepare for the next pandemic
+    contentSnippet: "CEPI and WHO urge broader research strategy for countries to prepare for the next pandemic Skip to main content WHO / NOOR / Olga Kravets University Hospital Lyon laboratories: sequencing and respiratory viruses. Lyon, France, 9 March 2022. &copy; Credits CEPI and WHO urge broader research strategy for countries to prepare for the next pandemic 1 August 2024 Joint News Release Geneva Reading time: The Coalition for Epidemic Preparedness Innovations (CEPI) and the World Health Organization (WHO) "
+    contentLength: 97310
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://cepi-tr.tghn.org
+    linkText: CEPI Technical Resources
+    claimContext: '- **Prototype Pathogen Research**: CEPI and WHO promoted using prototype pathogens as "pathfinders" to build knowledge for entire pathogen families at the Global Pandemic Preparedness Summit 2024 in Rio de Janeiro, coordinating research through Collaborative Open Research Consortium (CORC) hubs.[^66'
+    fetchedAt: 2026-02-22T01:56:25.183Z
+    httpStatus: 200
+    pageTitle: Home &bull; CEPI Technical Resources
+    contentSnippet: Home &bull; CEPI Technical Resources arrow-down arrow-right arrow-up back-arrow checklist close Asset 5 cpd-clock cpd-competencies cpd-cv-build cpd-key Asset 3 cpd-other-points cpd-previous-skills cpd-question-mark reject2 cpd-skills cpd-step-complete cpd-submit cpd-updated-skills ddpm-close ddpm-star envelope facebook files globe graph linkedin member menu node-triangle-borderless node-triangle plus pm-clinical pm-cmc pm-collapse pm-delivery pm-download pm-expand pm-global-access pm-info pm-par
+    contentLength: 115311
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://cepi.net/news
+    linkText: CEPI News
+    claimContext: "- **Analytical Technologies Funding**: Announced funding for innovative analytical technologies to reduce vaccine development times and costs while improving equity in low- and middle-income countries.[^67] - **AI Integration**: Launched a global AI platform for pandemic preparedness, creating a new"
+    fetchedAt: 2026-02-22T01:56:25.571Z
+    httpStatus: 200
+    pageTitle: News
+    contentSnippet: "News Search Latest News Filters Search News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate to strengthen outbreak-ready vaccine production and global "
+    contentLength: 638064
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://cepi.net/news
+    linkText: CEPI News
+    claimContext: "- **Mpox**: New vaccine study launching in outbreak-affected Democratic Republic of Congo with focus on equitable access.[^69] - **Zaire Ebolavirus**: Backing updated vaccine for improved affordability and accessibility.[^70]"
+    fetchedAt: 2026-02-22T01:56:24.133Z
+    httpStatus: 200
+    pageTitle: News
+    contentSnippet: "News Search Latest News Filters Search News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate to strengthen outbreak-ready vaccine production and global "
+    contentLength: 638064
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://cepi.net
+    linkText: CEPI
+    claimContext: "- **Mpox**: New vaccine study launching in outbreak-affected Democratic Republic of Congo with focus on equitable access.[^69] - **Zaire Ebolavirus**: Backing updated vaccine for improved affordability and accessibility.[^70] - **Pandemic Agreement**: Adoption of a pandemic agreement following three"
+    fetchedAt: 2026-02-22T01:56:24.206Z
+    httpStatus: 200
+    pageTitle: Home page
+    contentSnippet: "Home page Latest News Latest News See more Arrow Arrow Blog Dr Umar Ahmad: My Fellowship at CEPI News CEPI launches global plan to secure the future against epidemic and pandemic threats News Korea runs landmark pandemic simulation exercise to strengthen outbreak readiness Blog Strengthening biosecurity and biosafety oversight: CEPI publishes its first Biosecurity Policy News CEPI and Korea discuss future of AI-driven international health cooperation News CEPI and Samsung Biologics collaborate t"
+    contentLength: 125849
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12300188/
+    linkText: PMC - Pandemic Agreement Progress
+    claimContext: "- **Zaire Ebolavirus**: Backing updated vaccine for improved affordability and accessibility.[^70] - **Pandemic Agreement**: Adoption of a pandemic agreement following three years of negotiations (finalized around late 2024/early 2025), addressing COVID-19 inequities with next steps on Pathogen Acce"
+    fetchedAt: 2026-02-22T01:56:26.715Z
+    httpStatus: 200
+    pageTitle: 100-Day Mission for Future Pandemic Vaccines, Viewed Through the Lens of Low- and Middle-Income Countries (LMICs) - PMC
+    contentSnippet: 100-Day Mission for Future Pandemic Vaccines, Viewed Through the Lens of Low- and Middle-Income Countries (LMICs) - PMC Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. Search PMC Full-Text Archive Search in PMC Journal List
+    contentLength: 172015
+    status: verified
+    note: null

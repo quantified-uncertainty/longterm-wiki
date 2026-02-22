@@ -1,0 +1,139 @@
+pageId: long-term-benefit-trust
+verifiedAt: 2026-02-22
+totalCitations: 12
+verified: 10
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.anthropic.com/news/the-long-term-benefit-trust
+    linkText: "Anthropic: The Long-Term Benefit Trust"
+    claimContext: The **Long-Term Benefit Trust (LTBT)** is an independent governance mechanism established by <EntityLink id="anthropic">Anthropic</EntityLink> to align corporate decision-making with the long-term benefit of humanity alongside traditional stockholder interests. The Trust comprises five financially d
+    fetchedAt: 2026-02-22T02:27:18.161Z
+    httpStatus: 200
+    pageTitle: The Long-Term Benefit Trust \ Anthropic
+    contentSnippet: Announcements The Long-Term Benefit Trust Sep 19, 2023 Today we are sharing more details about our new governance structure called the Long-Term Benefit Trust (LTBT) , which we have been developing since the birth of Anthropic. The LTBT is our attempt to fine-tune our corporate governance to address the unique challenges and long-term opportunities we believe transformative AI will present . The Trust is an independent body of five financially disinterested members with an authority to select an
+    contentLength: 276043
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
+    linkText: "Harvard Law School Forum on Corporate Governance: Anthropic Long-Term Benefit Trust"
+    claimContext: The **Long-Term Benefit Trust (LTBT)** is an independent governance mechanism established by <EntityLink id="anthropic">Anthropic</EntityLink> to align corporate decision-making with the long-term benefit of humanity alongside traditional stockholder interests. The Trust comprises five financially d
+    fetchedAt: 2026-02-22T02:27:15.908Z
+    httpStatus: 200
+    pageTitle: Anthropic Long-Term Benefit Trust
+    contentSnippet: "Anthropic Long-Term Benefit Trust Harvard Law School Forum on Corporate Governance Skip to content --> Home About Archive Categories Hiring Blogroll Anthropic Long-Term Benefit Trust Posted by John Morley (Yale Law School), David Berger and Amy Simmerman (Wilson Sonsini Goodrich & Rosati) , on Saturday, October 28, 2023 Comments Off on Anthropic Long-Term Benefit Trust Print E-Mail Tweet Artificial intelligence , Board of Directors , stockholders , Voting Trustees More from: Amy Simmerman , Davi"
+    contentLength: 106891
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.lesswrong.com/posts/sdCcsTt9hRpbX6obP/maybe-anthropic-s-long-term-benefit-trust-is-powerless
+    linkText: "LessWrong: Maybe Anthropic's Long-Term Benefit Trust is Powerless"
+    claimContext: The Trust operates as what Anthropic calls "a different kind of stockholder," creating accountability mechanisms independent of financial returns while maintaining a working relationship with company leadership through consultation requirements and information-sharing agreements.[^1][^2] However, th
+    fetchedAt: 2026-02-22T02:27:15.793Z
+    httpStatus: 200
+    pageTitle: Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless — LessWrong Anthropic (org) AI Governance AI Personal Blog 206 Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless by Zach Stein-Perlman 27th May 2024 3 min read 21 206 Crossposted from AI Lab Watch. Subscribe on Substack. Introduction Anthropic has an unconventional governance mechanism: an independen"
+    contentLength: 573986
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/posts/JARcd9wKraDeuaFu5/maybe-anthropic-s-long-term-benefit-trust-is-powerless
+    linkText: "EA Forum: Maybe Anthropic's Long-Term Benefit Trust is Powerless"
+    claimContext: The Trust operates as what Anthropic calls "a different kind of stockholder," creating accountability mechanisms independent of financial returns while maintaining a working relationship with company leadership through consultation requirements and information-sharing agreements.[^1][^2] However, th
+    fetchedAt: 2026-02-22T02:27:15.515Z
+    httpStatus: 200
+    pageTitle: Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless — EA Forum
+    contentSnippet: Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless by Zach Stein-Perlman May 27 2024 3 min read 21 134 AI safety Opinion Frontpage Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless Introduction The facts Conclusion 21 comments Crossposted from AI Lab Watch. Su
+    contentLength: 426441
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/Anthropic
+    linkText: "Wikipedia: Anthropic"
+    claimContext: The Long-Term Benefit Trust emerged from concerns among <EntityLink id="anthropic">Anthropic</EntityLink>'s founders, including siblings <EntityLink id="daniela-amodei">Daniela Amodei</EntityLink> (President) and <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (CEO), about the lack of extern
+    fetchedAt: 2026-02-22T02:27:15.165Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.thestakehold.com/p/the-anthropic-long-term-benefit-trust
+    linkText: "The Stakehold: The Anthropic Long-Term Benefit Trust"
+    claimContext: "- **2021-2022**: Year-long trustee search and legal structure refinement[^1] - **~2023**: LTBT formally launched with initial five trustees[^1][^6] - **July 2024**: Trust representation scheduled to increase to two of five board members[^3]"
+    fetchedAt: 2026-02-22T02:27:20.130Z
+    httpStatus: 200
+    pageTitle: The Anthropic Long-Term Benefit Trust - by Tiffany Vargas
+    contentSnippet: The Anthropic Long-Term Benefit Trust - by Tiffany Vargas Subscribe Sign in Shared Ownership The Anthropic Long-Term Benefit Trust Key components of the Anthropic Trust Tiffany Vargas Nov 03, 2023 1 Share Anthropic, PBC, one of America’s leading AI labs, is pioneering an innovative approach to corporate governance for the development of artificial intelligence. They established the “Anthropic Long-Term Benefit Trust,” a novel arrangement that empowers experiments in artificial intelligence and e
+    contentLength: 190016
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.ainvest.com/news/anthropic-long-term-benefit-trust-structural-shift-ai-governance-2601/
+    linkText: "AI Invest: Anthropic Long-Term Benefit Trust Structural Shift in AI Governance"
+    claimContext: '- **December 2023**: Jason Matheny stepped down to avoid conflicts with RAND Corporation policy work[^3] - **April 2024**: <EntityLink id="paul-christiano">Paul Christiano</EntityLink> stepped down to become Head of AI Safety at U.S. AI Safety Institute[^3][^7] - **2025**: Richard Fontaine appointed'
+    fetchedAt: 2026-02-22T02:27:20.006Z
+    httpStatus: 200
+    pageTitle: "Anthropic&#x27;s Long-Term Benefit Trust: A Structural Shift for AI Governance"
+    contentSnippet: "Anthropic&#x27;s Long-Term Benefit Trust: A Structural Shift for AI Governance Symbols Symbols Aime Products News Markets Watchlist Brokers Anthropic&#x27;s Long-Term Benefit Trust: A Structural Shift for AI Governance Generated by AI Agent Julian West Reviewed by AInvest News Editorial Team Wednesday, Jan 21, 2026 3:48 am ET 4min read Aime Summary Overview The 5 Ws Opposite Sides Infobox - Anthropic creates a Long-Term Benefit Trust (LTBT) as a Delaware Public Benefit Corporation to balance pro"
+    contentLength: 167129
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.anthropic.com/news/mariano-florentino-long-term-benefit-trust
+    linkText: "Anthropic: Mariano-Florentino Long-Term Benefit Trust"
+    claimContext: '- **April 2024**: <EntityLink id="paul-christiano">Paul Christiano</EntityLink> stepped down to become Head of AI Safety at U.S. AI Safety Institute[^3][^7] - **2025**: Richard Fontaine appointed as trustee; Mariano-Florentino Cuéllar appointed[^7][^8]'
+    fetchedAt: 2026-02-22T02:27:19.922Z
+    httpStatus: 200
+    pageTitle: Mariano-Florentino Cuéllar appointed to Anthropic’s Long-Term Benefit Trust \ Anthropic
+    contentSnippet: Announcements Mariano-Florentino Cuéllar appointed to Anthropic’s Long-Term Benefit Trust Jan 21, 2026 Anthropic’s Long-Term Benefit Trust announced the appointment of Mariano-Florentino (Tino) Cuéllar as a new member of the Trust. The Long-Term Benefit Trust is an independent body designed to help Anthropic achieve its public benefit mission. Cuéllar brings extensive experience in law, governance, and international affairs, including service as a Justice of the Supreme Court of California, lead
+    contentLength: 107695
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.lesswrong.com/posts/6tjHf5ykvFqaNCErH/anthropic-s-responsible-scaling-policy-and-long-term-benefit
+    linkText: "LessWrong: Anthropic's Responsible Scaling Policy and Long-Term Benefit Trust"
+    claimContext: The LTBT is designed to work alongside Anthropic's <EntityLink id="rsp">Responsible Scaling Policy</EntityLink> (RSP), which establishes AI Safety Levels (ASL) modeled on biosafety standards.[^9][^10] The RSP framework pauses training or deployment of powerful models if safety measures lag behind ca
+    fetchedAt: 2026-02-22T02:27:19.646Z
+    httpStatus: 200
+    pageTitle: Anthropic&#x27;s Responsible Scaling Policy & Long-Term Benefit Trust — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Anthropic&#x27;s Responsible Scaling Policy & Long-Term Benefit Trust — LessWrong AI Governance Anthropic (org) Responsible Scaling Policies AI Personal Blog 85 Anthropic&#x27;s Responsible Scaling Policy & Long-Term Benefit Trust by Zac Hatfield-Dodds 19th Sep 2023 AI Alignment Forum Linkpost from www.anthropic.com 4 min read 26 85 Ω 45 I&#x27;m delighted that Anthrop
+    contentLength: 683799
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.alignmentforum.org/posts/6tjHf5ykvFqaNCErH/anthropic-s-responsible-scaling-policy-and-long-term-benefit
+    linkText: "Alignment Forum: Anthropic's Responsible Scaling Policy and Long-Term Benefit Trust"
+    claimContext: The LTBT is designed to work alongside Anthropic's <EntityLink id="rsp">Responsible Scaling Policy</EntityLink> (RSP), which establishes AI Safety Levels (ASL) modeled on biosafety standards.[^9][^10] The RSP framework pauses training or deployment of powerful models if safety measures lag behind ca
+    fetchedAt: 2026-02-22T02:27:26.148Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 11
+    url: https://forum.effectivealtruism.org/posts/JARcd9wKraDeuaFu5/maybe-anthropic-s-long-term-benefit-trust-is-powerless
+    linkText: EA Forum comment thread
+    claimContext: 'Not all community analysis accepts the "powerless" framing. Some observers argue the evidence suggests the Trust has significant powers to appoint board members, with the key question being the magnitude of constraints rather than their complete absence.[^11] One commenter estimated the probability '
+    fetchedAt: 2026-02-22T02:27:27.263Z
+    httpStatus: 200
+    pageTitle: Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless — EA Forum
+    contentSnippet: Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless by Zach Stein-Perlman May 27 2024 3 min read 21 134 AI safety Opinion Frontpage Maybe Anthropic&#x27;s Long-Term Benefit Trust is powerless Introduction The facts Conclusion 21 comments Crossposted from AI Lab Watch. Su
+    contentLength: 426440
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://harvardlawreview.org/print/vol-138/amoral-drift-in-ai-corporate-governance/
+    linkText: "Harvard Law Review: Amoral Drift in AI Corporate Governance"
+    claimContext: The LTBT shares conceptual similarities with <EntityLink id="openai">OpenAI</EntityLink>'s earlier nonprofit-controlled structure, where a nonprofit foundation held control over a for-profit subsidiary to balance mission and profit motives.[^12] However, OpenAI's governance crisis in November 2023—w
+    fetchedAt: 2026-02-22T02:27:27.584Z
+    httpStatus: 200
+    pageTitle: Amoral Drift in AI Corporate Governance - Harvard Law Review
+    contentSnippet: Amoral Drift in AI Corporate Governance - Harvard Law Review Skip to main content Harvard Law Review Print Developments in the Law Download See Footnotes ChatGPT’s debut in November of 2022 set off a race in Silicon Valley to develop and monetize artificial intelligence (AI). 1 Within a few months, Microsoft invested $10 billion in OpenAI, the company behind ChatGPT. 2 Anthropic, a competitor of OpenAI, raised similarly impressive amounts of money from companies and investors hoping to participa
+    contentLength: 257607
+    status: verified
+    note: null

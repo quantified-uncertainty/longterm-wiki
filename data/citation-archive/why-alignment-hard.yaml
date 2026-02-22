@@ -1,0 +1,161 @@
+pageId: why-alignment-hard
+verifiedAt: 2026-02-22
+totalCitations: 14
+verified: 12
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://arxiv.org/abs/1706.03741
+    linkText: Christiano, P., Leike, J., Brown, T. B., Martic, M., Legg, S., & Amodei, D. (2017). — Deep Reinforcement Learning from Human Preferences — *NeurIPS 2017*.
+    claimContext: "**Limitations of preference learning**: The seminal work on learning from human preferences—reinforcement learning from human feedback, introduced by Christiano, Leike, Brown, Martic, Legg, and Amodei at NeurIPS 2017[^1]—demonstrated that nuanced behavioral preferences can be learned from non-expert"
+    fetchedAt: 2026-02-22T02:25:59.683Z
+    httpStatus: 200
+    pageTitle: "[1706.03741] Deep reinforcement learning from human preferences"
+    contentSnippet: "[1706.03741] Deep reinforcement learning from human preferences --> Statistics > Machine Learning arXiv:1706.03741 (stat) [Submitted on 12 Jun 2017 ( v1 ), last revised 17 Feb 2023 (this version, v4)] Title: Deep reinforcement learning from human preferences Authors: Paul Christiano , Jan Leike , Tom B. Brown , Miljan Martic , Shane Legg , Dario Amodei View a PDF of the paper titled Deep reinforcement learning from human preferences, by Paul Christiano and 5 other authors View PDF Abstract: For "
+    contentLength: 45909
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback
+    linkText: Wikipedia contributors. — Reinforcement Learning from Human Feedback — Retrieved 2025.
+    claimContext: 'As the Wikipedia overview of <EntityLink id="rlhf">RLHF</EntityLink> notes, "no straightforward formula exists to define subjective human values"—the translation from human preference to numerical signal is inherently lossy.[^2] Behavior underdetermines values: many value systems are consistent with'
+    fetchedAt: 2026-02-22T02:25:59.567Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://openai.com/index/faulty-reward-functions/
+    linkText: Clark, J., & Amodei, D. (2016, December 21). — Faulty Reward Functions in the Wild — OpenAI Blog.
+    claimContext: '**Classic reward hacking case study**: In a 2016 case study that became influential in the specification literature, Jack Clark and Dario Amodei documented an <EntityLink id="openai">OpenAI</EntityLink> reinforcement learning agent trained on the CoastRunners boat-racing game.[^3] The agent was rewa'
+    fetchedAt: 2026-02-22T02:25:59.933Z
+    httpStatus: 200
+    pageTitle: Faulty reward functions in the wild | OpenAI
+    contentSnippet: "Faulty reward functions in the wild | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 21, 2016 Conclusion Faulty reward functions in the wild Reinforcement learning algorithms can break in surprising, counterintuitive ways. In this post we’ll explore one failure mode, which is where you misspecify your reward function. Loading… Share At OpenAI, we’ve recently started using Universe ⁠ (opens in a new window) , our "
+    contentLength: 298701
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://arxiv.org/html/2507.05619v1
+    linkText: "arXiv:2507.05619 (2025, July). — Detecting and Mitigating Reward Hacking in Reinforcement Learning Systems: A Comprehensive Empirical Study"
+    claimContext: "**Empirical taxonomy of reward hacking**: A 2025 empirical study (arXiv:2507.05619)[^4] building on this earlier work identified six major categories of reward hacking: specification gaming, reward tampering, proxy optimization, objective misalignment, exploitation patterns, and wireheading. The stu"
+    fetchedAt: 2026-02-22T02:25:59.675Z
+    httpStatus: 200
+    pageTitle: "Detecting and Mitigating Reward Hacking in Reinforcement Learning Systems: A Comprehensive Empirical Study"
+    contentSnippet: "Detecting and Mitigating Reward Hacking in Reinforcement Learning Systems: A Comprehensive Empirical Study Detecting and Mitigating Reward Hacking in Reinforcement Learning Systems: A Comprehensive Empirical Study Ibne Farabi Shihab Department of Computer Science, Iowa State University Ames Iowa USA ishihab@iastate.edu , Sanjeda Akter Department of Computer Science, Iowa State University Ames Iowa USA sanjeda@iastate.edu and Anuj Sharma Department of Civil, Construction and Environmental Enginee"
+    contentLength: 312571
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://arxiv.org/abs/2508.09224
+    linkText: "OpenAI (2025, August 7). — From Hard Refusals to Safe-Completions: Toward Output-Centric Safety Training — arXiv:2508.09224. Also published at [openai.com](https://openai.com/index/gpt-5-safe-completions/)."
+    claimContext: 'A recent development relevant to the specification problem concerns how safety training itself is framed. Traditional safety training drew a binary refusal boundary based primarily on inferred user intent: classify the request, refuse if intent appears harmful. This approach is described as "especia'
+    fetchedAt: 2026-02-22T02:25:59.652Z
+    httpStatus: 200
+    pageTitle: "[2508.09224] From Hard Refusals to Safe-Completions: Toward Output-Centric Safety Training"
+    contentSnippet: "[2508.09224] From Hard Refusals to Safe-Completions: Toward Output-Centric Safety Training --> Computer Science > Computers and Society arXiv:2508.09224 (cs) [Submitted on 12 Aug 2025] Title: From Hard Refusals to Safe-Completions: Toward Output-Centric Safety Training Authors: Yuan Yuan , Tina Sriskandarajah , Anna-Luisa Brakman , Alec Helyar , Alex Beutel , Andrea Vallone , Saachi Jain View a PDF of the paper titled From Hard Refusals to Safe-Completions: Toward Output-Centric Safety Training,"
+    contentLength: 46232
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://arxiv.org/html/2406.07814v1
+    linkText: "Anthropic & Collective Intelligence Project (2024). — Collective Constitutional AI: Aligning a Language Model with Public Input — *ACM FAccT 2024*."
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:26:01.016Z
+    httpStatus: 200
+    pageTitle: "Collective Constitutional AI: Aligning a Language Model with Public Input"
+    contentSnippet: "Collective Constitutional AI: Aligning a Language Model with Public Input Collective Constitutional AI: Aligning a Language Model with Public Input Saffron Huang saffron@cip.org 1234-5678-9012 Collective Intelligence Project San Francisco California USA , Divya Siddarth divya@cip.org Collective Intelligence Project San Francisco California USA , Liane Lovitt Anthropic Sansome Street San Francisco California USA , Thomas I. Liao Anthropic Sansome Street San Francisco California USA , Esin Durmus "
+    contentLength: 298805
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://openai.com/index/collective-alignment-aug-2025-updates/
+    linkText: "OpenAI (2025, August). — Collective Alignment: Public Input on Our Model Spec"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:26:01.162Z
+    httpStatus: 200
+    pageTitle: "Collective alignment: public input on our Model Spec | OpenAI"
+    contentSnippet: "Collective alignment: public input on our Model Spec | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI August 27, 2025 Publication Collective alignment: public input on our Model Spec We surveyed over 1,000 people worldwide on how our models should behave and compared their views to our Model Spec. We found they largely agree with the Spec, and we adopted changes from the disagreements. View dataset (opens in a new window)"
+    contentLength: 461902
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://proceedings.mlr.press/v162/langosco22a/langosco22a.pdf
+    linkText: Langosco, L., Koch, J., Sharkey, L., Pfau, J., Orseau, L., & Krueger, D. (2022). — Goal Misgeneralization in Deep Reinforcement Learning — *ICML 2022*.
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:26:01.529Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 4355011
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://openai.com/index/emergent-misalignment/
+    linkText: Wang, M., la Tour, T. D., Watkins, O., Makelov, A., Chi, R. A., Miserendino, S., Heidecke, J., Patwardhan, T., & Mossing, D. (2025, June 18). — Toward Understanding and Preventing Misalignment Generalization — OpenAI.
+    claimContext: 'Recent work from <EntityLink id="openai">OpenAI</EntityLink> (Wang et al., June 2025)[^9] studied a phenomenon they term "emergent misalignment"—distinct from goal misgeneralization. The finding: fine-tuning a language model on narrowly misaligned examples (e.g., producing insecure code) produces br'
+    fetchedAt: 2026-02-22T02:26:01.237Z
+    httpStatus: 200
+    pageTitle: Toward understanding and preventing misalignment generalization | OpenAI
+    contentSnippet: Toward understanding and preventing misalignment generalization | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI June 18, 2025 Publication Toward understanding and preventing misalignment generalization A misaligned persona feature controls emergent misalignment. Read the paper (opens in a new window) Loading… Share About this project Large language models like ChatGPT don’t just learn facts—they pick up on patterns of be
+    contentLength: 486633
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://aisafetyfundamentals.com/blog/scalable-oversight-intro/
+    linkText: AI Safety Fundamentals (2024, March). — Can We Scale Human Feedback for Complex AI Tasks? An Intro to Scalable Oversight
+    claimContext: '- Problem: If the evaluating AI is misaligned, the entire chain is compromised - Current status: As of early 2024, there is little ongoing safety research exploring direct task decomposition, because "it is very hard to break down all problems into simple subtasks"[^10]'
+    fetchedAt: 2026-02-22T02:26:02.825Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 11
+    url: https://gist.github.com/bigsnarfdude/a95dbb3f8b560edd352665071ddf7312
+    linkText: Khan, A., et al. (2024). — Debating with More Persuasive LLMs Leads to More Truthful Answers — *ICML 2024 Best Paper*.
+    claimContext: "- Have two AIs argue; human judges choose the more convincing and truthful argument - Empirical support: Khan et al. (ICML 2024 Best Paper)[^11] found that optimizing debaters for persuasiveness improved truth-finding, with judges reaching 76–88% accuracy compared to ~50% baselines. Kenton et al. (N"
+    fetchedAt: 2026-02-22T02:26:04.203Z
+    httpStatus: 200
+    pageTitle: ScalableOversight.md · GitHub
+    contentSnippet: "ScalableOversight.md · GitHub Skip to content --> Search Gists Search Gists Sign in Sign up You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Instantly share code, notes, and snippets. bigsnarfdude / ScalableOversight.md Created January 8, 2026 03:03 Show Gist options Download ZIP Star 0 ( 0 ) "
+    contentLength: 131604
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://proceedings.neurips.cc/paper_files/paper/2024/hash/899511e37a8e01e1bd6f6f1d377cc250-Abstract-Conference.html
+    linkText: Kenton, Z., et al. (DeepMind) (2024). — On Scalable Oversight with Weak LLMs Judging Strong LLMs — *NeurIPS 2024*.
+    claimContext: "- Have two AIs argue; human judges choose the more convincing and truthful argument - Empirical support: Khan et al. (ICML 2024 Best Paper)[^11] found that optimizing debaters for persuasiveness improved truth-finding, with judges reaching 76–88% accuracy compared to ~50% baselines. Kenton et al. (N"
+    fetchedAt: 2026-02-22T02:26:04.408Z
+    httpStatus: 200
+    pageTitle: On scalable oversight with weak LLMs judging strong LLMs
+    contentSnippet: null
+    contentLength: 10603
+    status: verified
+    note: Academic publisher — URL accessible
+  - footnote: 13
+    url: https://arxiv.org/html/2504.18530v2
+    linkText: Engels, J., et al. (2025, April). — Scaling Laws for Scalable Oversight — arXiv:2504.18530.
+    claimContext: "- Empirical support: Khan et al. (ICML 2024 Best Paper)[^11] found that optimizing debaters for persuasiveness improved truth-finding, with judges reaching 76–88% accuracy compared to ~50% baselines. Kenton et al. (NeurIPS 2024)[^12] found debate consistently outperforms consultancy across mathemati"
+    fetchedAt: 2026-02-22T02:26:03.947Z
+    httpStatus: 200
+    pageTitle: Scaling Laws For Scalable Oversight
+    contentSnippet: "Scaling Laws For Scalable Oversight Scaling Laws For Scalable Oversight Joshua Engels MIT jengels@mit.edu &David D. Baek 1 1 footnotemark: 1 MIT dbaek@mit.edu &Subhash Kantamneni 1 1 footnotemark: 1 MIT subhashk@mit.edu &Max Tegmark MIT tegmark@mit.edu Equal contribution Abstract Scalable oversight, the process by which weaker AI systems supervise stronger ones, has been proposed as a key strategy to control future superintelligent systems. However, it is still unclear how scalable oversight its"
+    contentLength: 1517417
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://arxiv.org/html/2504.03731
+    linkText: Sudhir, A., et al. (2025, April). — A Benchmark for Scalable Oversight Mechanisms — arXiv:2504.03731.
+    claimContext: '**Current status**: Debate shows promising early empirical results, but none of these approaches have been demonstrated to work reliably for AI systems substantially more capable than their human evaluators. Sudhir et al. (2025)[^14] introduced an "agent score difference" metric for evaluating scala'
+    fetchedAt: 2026-02-22T02:26:04.404Z
+    httpStatus: 200
+    pageTitle: A Benchmark for Scalable Oversight Mechanisms
+    contentSnippet: A Benchmark for Scalable Oversight Mechanisms A Benchmark for Scalable Oversight Mechanisms Abhimanyu Pallavi Sudhir University of Warwick abhimanyu.pallavi-sudhir@warwick.ac.uk &Jackson Kaunismaa MATS jackkaunis@protonmail.com &Arjun Panickssery ZemblaAI Abstract As AI agents surpass human capabilities, scalable oversight – the problem of effectively supplying human feedback to potentially superhuman AI models – becomes increasingly critical to ensure alignment. While numerous scalable oversigh
+    contentLength: 195764
+    status: verified
+    note: null

@@ -1,0 +1,337 @@
+pageId: meta-ai
+verifiedAt: 2026-02-22
+totalCitations: 30
+verified: 27
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://ai.meta.com/blog/fair-10-year-anniversary-open-science-meta/
+    linkText: Meta AI Blog - 10 Years of FAIR
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:52.519Z
+    httpStatus: 200
+    pageTitle: "Ten years of FAIR: Advancing the state-of-the-art through open research"
+    contentSnippet: "Ten years of FAIR: Advancing the state-of-the-art through open research Meta AI AI Research The Latest About Get Llama Try Meta AI FEATURED Research Celebrating 10 years of FAIR: A decade of advancing the state-of-the-art through open research November 30, 2023 Today we’re celebrating the 10-year anniversary of Meta’s Fundamental AI Research (FAIR) team—a decade of advancing the state of the art in AI through open research. During the past 10 years, the field of AI has undergone a profound trans"
+    contentLength: 202645
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://about.fb.com/news/2025/02/meta-approach-frontier-ai/
+    linkText: Meta Approach to Frontier AI
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:51.983Z
+    httpStatus: 200
+    pageTitle: Our Approach to Frontier AI
+    contentSnippet: Our Approach to Frontier AI Skip to content Viewing this site in English Portugese German French Japanese Korean Spanish (LTAM) Spanish (ES) Você está visualizando este site em Inglês Português Alemão Francês Japonês Coreano Espanhol (LTAM) Espanhol (ES) Diese Seite anzeigen auf Englisch Portugiesisch Deutsch Französisch Japanisch Koreanisch Spanisch (LTAM) Spanisch (ES) Vous consultez ce site en Anglais Portugais Allemand Français Japonais Coréen Espagnol (LTAM) Espagnol (ES) このサイトを次の言語で表示 英語 ポ
+    contentLength: 486770
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://about.fb.com/news/2022/09/pytorch-foundation-to-accelerate-progress-in-ai-research/
+    linkText: PyTorch Foundation Announcement
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:51.948Z
+    httpStatus: 200
+    pageTitle: Announcing the PyTorch Foundation to Accelerate Progress in AI Research
+    contentSnippet: Announcing the PyTorch Foundation to Accelerate Progress in AI Research Skip to content Viewing this site in English Portugese German French Japanese Korean Spanish (LTAM) Spanish (ES) Você está visualizando este site em Inglês Português Alemão Francês Japonês Coreano Espanhol (LTAM) Espanhol (ES) Diese Seite anzeigen auf Englisch Portugiesisch Deutsch Französisch Japanisch Koreanisch Spanisch (LTAM) Spanisch (ES) Vous consultez ce site en Anglais Portugais Allemand Français Japonais Coréen Espa
+    contentLength: 288648
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://ai.meta.com/blog/meta-llama-3/
+    linkText: LLaMA 3 Introduction
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:52.199Z
+    httpStatus: 200
+    pageTitle: "Introducing Meta Llama 3: The most capable openly available LLM to date"
+    contentSnippet: "Introducing Meta Llama 3: The most capable openly available LLM to date Meta AI AI Research The Latest About Get Llama Try Meta AI Large Language Model Introducing Meta Llama 3: The most capable openly available LLM to date April 18, 2024 Takeaways: RECOMMENDED READS 5 Steps to Getting Started with Llama 2 The Llama Ecosystem: Past, Present, and Future Introducing Code Llama, a state-of-the-art large language model for coding Meta and Microsoft Introduce the Next Generation of Llama Today, we’re"
+    contentLength: 219323
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.meta.com/superintelligence/
+    linkText: Meta Superintelligence Vision
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:51.905Z
+    httpStatus: 200
+    pageTitle: Personal Superintelligence
+    contentSnippet: "Personal Superintelligence Personal Superintelligence Over the last few months we have begun to see glimpses of our AI systems improving themselves. The improvement is slow for now, but undeniable. Developing superintelligence is now in sight. It seems clear that in the coming years, AI will improve all our existing systems and enable the creation and discovery of new things that aren&#039;t imaginable today. But it is an open question what we will direct superintelligence towards. In some ways "
+    contentLength: 7000
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://fortune.com/2025/04/10/meta-ai-research-lab-fair-questions-departures-future-yann-lecun-new-beginning/
+    linkText: Fortune - Meta's AI Research Lab Questions
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:53.631Z
+    httpStatus: 200
+    pageTitle: "Meta’s AI research lab is ‘dying a slow death,’ some insiders say—but Yann LeCun pushes back: ‘It’s a new beginning’ | Fortune"
+    contentSnippet: "Meta’s AI research lab is ‘dying a slow death,’ some insiders say—but Yann LeCun pushes back: ‘It’s a new beginning’ | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Tech Meta Meta’s AI research lab is ‘dying a slow death,’ some insiders say. Meta prefers to call it ‘a new beginning’ By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Icon By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Icon April 10, 2025, 4:21 PM ET Add us on Yan"
+    contentLength: 494641
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://techcrunch.com/2024/10/12/metas-yann-lecun-says-worries-about-a-i-s-existential-threat-are-complete-b-s/
+    linkText: TechCrunch - Yann LeCun on Existential Risk
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:53.696Z
+    httpStatus: 200
+    pageTitle: Meta’s Yann LeCun says worries about AI’s existential threat are ‘complete B.S.’ | TechCrunch
+    contentSnippet: "Meta’s Yann LeCun says worries about AI’s existential threat are ‘complete B.S.’ | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close In Brief Posted: 2:54 PM PDT · October 12, 2024 Image Credits: Kevin Dietsch / Getty Images Anthony Ha Meta’s Yann LeCun says worries about AI’s existential threat are ‘complete B.S.’ AI pioneer Yann LeCun doesn’t think"
+    contentLength: 204863
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://time.com/7002563/mark-zuckerberg-ai-llama-meta-open-source/
+    linkText: TIME - Mark Zuckerberg Open Source Manifesto
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:54.768Z
+    httpStatus: 200
+    pageTitle: Mark Zuckerberg Just Intensified the Battle For AI’s Future | TIME
+    contentSnippet: Mark Zuckerberg Just Intensified the Battle For AI’s Future | TIME Tech Mark Zuckerberg Just Intensified the Battle for AI’s Future ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Billy Perrigo Correspondent Loading... Mark Zuckerberg, chief executive of Meta Platforms Inc., at the company's headquarters in Menlo Park, California on July 18, 2024. Mark Zuckerberg, chief executive of Meta Platforms Inc., at the company's headquarters in Menlo Park, California on July 18, 202
+    contentLength: 327302
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.cnbc.com/2025/06/30/mark-zuckerberg-creating-meta-superintelligence-labs-read-the-memo.html
+    linkText: CNBC - Meta Superintelligence Labs Announcement
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:54.748Z
+    httpStatus: 200
+    pageTitle: Mark Zuckerberg creating Meta Superintelligence Labs. Read the memo
+    contentSnippet: Mark Zuckerberg creating Meta Superintelligence Labs. Read the memo Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Mark Zuckerberg announced the creation of Meta Superintelligence Labs, which will be run by some of his company&#x27;s most recent hires. The new AI superintelligence project, led by execs including Scale AI ex-CEO Alexandr Wang and former GitHub CEO Nat Friedman, will house various teams working on foundation m
+    contentLength: 926731
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.euronews.com/next/2025/12/03/ai-less-regulated-than-sandwiches-as-tech-firms-race-toward-superintelligence-study-says
+    linkText: Euronews - AI Safety Index 2025
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:53.876Z
+    httpStatus: 200
+    pageTitle: AI 'less regulated than sandwiches' and no tech firm has AI superintelligence safety plan, study | Euronews
+    contentSnippet: AI &#039;less regulated than sandwiches&#039; and no tech firm has AI superintelligence safety plan, study | Euronews Advertisement By&nbsp Pascale Davies Published on 03/12/2025 - 12:22 GMT+1 &bull; Updated 04/12/2025 - 9:22 GMT+1 Share Comments Share Facebook Twitter Flipboard Send Reddit Linkedin Messenger Telegram VK Bluesky Threads Whatsapp Eight leading AI companies, including OpenAI, Meta, Anthropic, and DeepSeek, do not have credible plans to prevent catastrophic AI risks, a new study sh
+    contentLength: 445663
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
+    linkText: Meta 2026 AI Performance Report
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:56.839Z
+    httpStatus: 200
+    pageTitle: "2026: AI Drives Performance"
+    contentSnippet: "2026: AI Drives Performance Skip to content Viewing this site in English Portugese German French Japanese Korean Spanish (LTAM) Spanish (ES) Você está visualizando este site em Inglês Português Alemão Francês Japonês Coreano Espanhol (LTAM) Espanhol (ES) Diese Seite anzeigen auf Englisch Portugiesisch Deutsch Französisch Japanisch Koreanisch Spanisch (LTAM) Spanisch (ES) Vous consultez ce site en Anglais Portugais Allemand Français Japonais Coréen Espagnol (LTAM) Espagnol (ES) このサイトを次の言語で表示 英語 ポ"
+    contentLength: 598391
+    status: verified
+    note: null
+  - footnote: 12
+    url: http://markets.chroniclejournal.com/chroniclejournal/article/finterra-2026-2-6-meta-platforms-meta-2026-deep-dive-the-superintelligence-era-and-the-100b-ai-gamble
+    linkText: Finterra Deep Dive - Meta 2026
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:56.797Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 13
+    url: https://mlq.ai/news/meta-readies-nextgeneration-mango-and-avocado-ai-models-for-2026-launch/
+    linkText: MLQ.ai - Meta Mango Avocado Models
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:56.406Z
+    httpStatus: 200
+    pageTitle: MLQ.ai | AI for investors
+    contentSnippet: MLQ.ai | AI for investors --> Key Points Meta is developing an image and video generation model codenamed **Mango** and a new text large language model called **Avocado** for a targeted first-half 2026 release.[1][3] Both models are being built inside **Meta Superintelligence Labs**, led by Scale AI co-founder Alexandr Wang, and were outlined in an internal Q&A with staff.[1][3][5] Mango is designed to advance multimodal image and video generation, while Avocado is aimed at significantly improvi
+    contentLength: 163773
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-silicon-sovereignty-meta-charges-into-2026-with-iris-mtia-rollout-and-rapid-custom-chip-roadmap
+    linkText: TokenRing - MTIA Iris Rollout
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:57.382Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 15
+    url: https://www.trendforce.com/news/2026/01/30/news-metas-mtia-3-ai-chip-reportedly-tipped-for-2h26-debut-built-on-tsmc-3nm-with-guc-support/
+    linkText: TrendForce - MTIA-3 Specifications
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:56.742Z
+    httpStatus: 200
+    pageTitle: "[News] Meta’s MTIA-3 AI Chip Reportedly Tipped for 2H26 Debut, Built on TSMC 3nm with GUC Support"
+    contentSnippet: "[News] Meta’s MTIA-3 AI Chip Reportedly Tipped for 2H26 Debut, Built on TSMC 3nm with GUC Support --> --> --> --> --> --> News --> About TrendForce News TrendForce News operates independently from our research team, curating key semiconductor and tech updates to support timely, informed decisions. Home News [News] Meta’s MTIA-3 AI Chip Reportedly Tipped for 2H26 Debut, Built on TSMC 3nm with GUC Support 2026-01-30 Emerging Technologies / Semiconductors editor As Meta lifts its 2026 capital spend"
+    contentLength: 70305
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://venturebeat.com/ai/meta-is-entering-the-ai-video-wars-with-powerful-movie-gen-set-to-hit-instagram-in-2025
+    linkText: VentureBeat - Movie Gen Instagram
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:04.867Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 17
+    url: https://www.marktechpost.com/2025/12/22/meta-ai-open-sourced-perception-encoder-audiovisual-pe-av-the-audiovisual-encoder-powering-sam-audio-and-large-scale-multimodal-retrieval/
+    linkText: MarkTechPost - PE-AV Release
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:58.974Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 824
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.bloomberg.com/news/articles/2025-10-09/ray-ban-maker-essilor-touts-meta-glasses-as-smartphone-successor
+    linkText: Bloomberg - Ray-Ban Smartphone Successor
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:59.800Z
+    httpStatus: 200
+    pageTitle: Ray-Ban Maker Essilor Touts Meta Glasses as Smartphone Successor - Bloomberg
+    contentSnippet: "Ray-Ban Maker Essilor Touts Meta Glasses as Smartphone Successor - Bloomberg Meta: Earnings WhatsApp Privacy Investigation Metaverse Cuts Meta Wins FTC Trial $29 Billion Data Center Superintelligence Effort Back Forward Technology Facebook X LinkedIn Email Link Gift Expand Francesco Milleri Source: EssilorLuxottica SA Facebook X LinkedIn Email Link Gift Gift this article Contact us: Provide news feedback or report an error Confidential tip? Send a tip to our reporters Site feedback: Take our Sur"
+    contentLength: 351903
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.cnbc.com/2025/07/28/ray-ban-meta-revenue-tripled-essilorluxottica.html
+    linkText: CNBC - Ray-Ban Revenue Triple
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:59.171Z
+    httpStatus: 200
+    pageTitle: Ray-Ban Meta smart glasses revenue tripled over the year
+    contentSnippet: Ray-Ban Meta smart glasses revenue tripled over the year Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Revenue from sales of Ray-Ban Meta smart glasses more than tripled year over year, EssilorLuxottica revealed Monday as part of the company&#x27;s most recent earnings report. EssilorLuxottica said the success of the Ray-Ban Meta glasses contributed to its first-half overall sales of 14.02 billion euro (US$16.25 billion), w
+    contentLength: 773053
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
+    linkText: Resourcera - Meta AI User Statistics
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:17:59.183Z
+    httpStatus: 200
+    pageTitle: "Meta AI Users 2025: 1 Billion User Base [Detailed Stats]"
+    contentSnippet: "Meta AI Users 2025: 1 Billion User Base [Detailed Stats] Skip to content Meta AI Users 2025: 1 Billion User Base [Detailed Stats] Written By Siddhi Naik Last Updated: August 29, 2025 Summarize with AI: On this Page Meta AI Users: Key Statistics 2025 Meta AI has crossed 1 billion monthly active users as of 2025 Platform Specific User Breakdown Meta AI Geographic User Distribution Meta AI Market Share and Growth Rate Meta AI Business Impact and Monetization Meta AI Future Projections and Growth Me"
+    contentLength: 515817
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.computing.co.uk/news/2025/ai/meta-ai-launches-in-eu
+    linkText: Computing - Meta AI EU Launch
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:06.290Z
+    httpStatus: 200
+    pageTitle: Meta AI launches in the EU amid regulatory scrutiny
+    contentSnippet: Meta AI launches in the EU amid regulatory scrutiny Meta AI launches in the EU amid regulatory scrutiny But with a limited feature set Meta AI is finally making its debut in the EU after a prolonged period of regulatory challenges. The company is rolling its AI chatbot, which has been available in the United States since 2023, across its suite of platforms, including WhatsApp, Facebook, Instagram and Messenger. However, the EU version has a limited feature set due to ongoing privacy concerns and
+    contentLength: 9064
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.goodwinlaw.com/en/insights/publications/2025/05/insights-otherindustries-training-of-metas-ai-systems
+    linkText: Goodwin Law - European Data Training
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:06.660Z
+    httpStatus: 200
+    pageTitle: Training of Meta’s AI Systems and the Use of the European Users’ Data | Insights & Resources | Goodwin
+    contentSnippet: "Training of Meta’s AI Systems and the Use of the European Users’ Data | Insights & Resources | Goodwin Insight 23 May 2025 Training of Meta’s AI Systems and the Use of the European Users’ Data By Céline Moille View PDF Share As of May 27, 2025 , Meta (Facebook and Instagram) will start using some of the personal data of European users to train its artificial intelligence (AI) systems, including tools such as Meta AI and Llama language models. Meta initially announced this initiative in 2024 but "
+    contentLength: 118475
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://futureoflife.org/ai-safety-index-winter-2025/
+    linkText: Future of Life Institute Winter 2025 Index
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:06.481Z
+    httpStatus: 200
+    pageTitle: AI Safety Index Winter 2025 - Future of Life Institute
+    contentSnippet: "AI Safety Index Winter 2025 - Future of Life Institute Skip to content DECEMBER 2025 AI Safety Index Winter 2025 Edition AI experts rate leading AI companies on key safety and security domains. How to access this content: Full report PDF Two-page summary Explore the index Coverage Contents: Scorecard Key Findings Panellists Indicators Recommendations Methodology Scorecard Company Company grade & score Anthropic C+ 2.67 OpenAI C+ 2.31 Google DeepMind C 2.08 xAI D 1.17 Z.ai D 1.12 Meta D 1.10 Deep"
+    contentLength: 965652
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://ai.meta.com/blog/meta-llama-3-1-ai-responsibility/
+    linkText: Meta AI Responsibility Blog
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:07.041Z
+    httpStatus: 200
+    pageTitle: Expanding our open source large language models responsibly
+    contentSnippet: "Expanding our open source large language models responsibly Meta AI AI Research The Latest About Get Llama Try Meta AI Open Source Expanding our open source large language models responsibly July 23, 2024 • 7 minute read Takeaways: Meta is committed to openly accessible AI. Read Mark Zuckerberg’s letter detailing why open source is good for developers, good for Meta, and good for the world. Open source has multiple benefits: It helps ensure that more people around the world can access the opport"
+    contentLength: 193428
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
+    linkText: CNBC - Reality Labs Layoffs
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:08.136Z
+    httpStatus: 200
+    pageTitle: Meta lays off VR employees, underscoring Zuckerberg&#x27;s pivot to AI
+    contentSnippet: Meta lays off VR employees, underscoring Zuckerberg&#x27;s pivot to AI Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Just over four years after Facebook changed its name to Meta, the company is scaling back its virtual reality ambitions. Meta is cutting about 10% of staff who focus on metaverse-related VR projects as part of its Reality Labs unit, CNBC confirmed. The company is courting developers who build games for Roblox
+    contentLength: 824320
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.trendforce.com/news/2026/01/27/news-meta-reportedly-scales-back-vr-with-10-reality-labs-layoffs-pivots-to-ai-and-wearables/
+    linkText: TrendForce - Reality Labs Restructuring
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:10.305Z
+    httpStatus: 200
+    pageTitle: "[News] Is VR Cooling Off? Meta Reportedly Scales Back Efforts With Layoffs as AI and Wearables Take Priority"
+    contentSnippet: "[News] Is VR Cooling Off? Meta Reportedly Scales Back Efforts With Layoffs as AI and Wearables Take Priority --> --> --> --> --> --> News --> About TrendForce News TrendForce News operates independently from our research team, curating key semiconductor and tech updates to support timely, informed decisions. Home News [News] Is VR Cooling Off? Meta Reportedly Scales Back Efforts With Layoffs as AI and Wearables Take Priority 2026-01-27 Emerging Technologies editor Is VR losing momentum? Accordin"
+    contentLength: 71697
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://fortune.com/2025/12/19/yann-lecun-ami-labs-ai-startup-valuation-meta-departure/
+    linkText: Fortune - Yann LeCun AMI Valuation
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:09.348Z
+    httpStatus: 200
+    pageTitle: Yann LeCun is targeting a $3.5 billion valuation for his new startup that hasn’t even launched yet | Fortune
+    contentSnippet: Yann LeCun is targeting a $3.5 billion valuation for his new startup that hasn’t even launched yet | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI Venture Capital Europe AI whiz Yann LeCun is already targeting a $3.5 billion valuation for his new startup—and it hasn’t even launched yet By Dave Smith Dave Smith Former Editor, U.S. News Down Arrow Button Icon By Dave Smith Dave Smith Former Editor, U.S. News Down Arrow Button Icon December 19, 2025, 11:28
+    contentLength: 447471
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://techcrunch.com/2025/12/19/yann-lecun-confirms-his-new-world-model-startup-reportedly-seeks-5b-valuation/
+    linkText: TechCrunch - LeCun World Model Startup
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:09.417Z
+    httpStatus: 200
+    pageTitle: Yann LeCun confirms his new 'world model' startup, reportedly seeks $5B+ valuation | TechCrunch
+    contentSnippet: "Yann LeCun confirms his new &#039;world model&#039; startup, reportedly seeks $5B+ valuation | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kevin Dietsch / Getty Images Startups Yann LeCun confirms his new &#8216;world model&#8217; startup, reportedly seeks $5B+ valuation Julie Bort 11:23 AM PST · December 19, 2025 Renowned AI sci"
+    contentLength: 230825
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://aimagazine.com/articles/mark-zuckerberg-reveals-100bn-meta-ai-supercluster-push
+    linkText: AI Magazine - Prometheus Supercluster
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:10.354Z
+    httpStatus: 200
+    pageTitle: "Prometheus: Behind Meta’s Quest for Superintelligence | AI Magazine"
+    contentSnippet: "Prometheus: Behind Meta’s Quest for Superintelligence | AI Magazine Article AI Strategy Prometheus: Behind Meta’s Quest for Superintelligence By Kitty Wheeler July 15, 2025 undefined mins Share Share Mark Zuckerberg, CEO of Meta Meta reveals a huge investment to build the world’s first multi-gigawatt AI superclusters, including the 1GW Prometheus and the 5GW Hyperion More and more technology companies are experiencing losses as Meta grows, poaching some of the best AI experts in the world to bui"
+    contentLength: 192317
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.foxnews.com/tech/meta-builds-worlds-largest-ai-superclusters-future
+    linkText: Fox News - World's Largest Superclusters
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:10.733Z
+    httpStatus: 200
+    pageTitle: World’s largest AI superclusters coming from Meta | Fox News
+    contentSnippet: "World’s largest AI superclusters coming from Meta | Fox News Recommended Videos Recommended Articles Left Arrow Why a credit freeze isn’t the end of identity theft AI dating cafes are now a real thing The robotaxi price war has started. Here’s everything you need to know. YouTube TV billing scam emails are hitting inboxes Fox News AI Newsletter: AI giant moves HQ to red state China's robotics giant puts 200 robots to the test Panera Bread data breach exposes 5.1M customers AI home search could c"
+    contentLength: 422001
+    status: verified
+    note: null

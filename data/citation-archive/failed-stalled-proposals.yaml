@@ -1,0 +1,315 @@
+pageId: failed-stalled-proposals
+verifiedAt: 2026-02-22
+totalCitations: 28
+verified: 20
+broken: 8
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://cset.georgetown.edu/publication/tracker-congressional-activity-on-artificial-intelligence/
+    linkText: Congressional Activity on Artificial Intelligence — - Georgetown CSET, 2024
+    claimContext: Failed and stalled AI policy proposals provide critical insights into the political economy of AI governance, revealing systematic patterns that explain why comprehensive regulation remains elusive despite widespread concern about AI risks. The failure rate for ambitious AI legislation is remarkably
+    fetchedAt: 2026-02-22T02:19:29.125Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 2
+    url: https://www.opensecrets.org/federal-lobbying/issues/summary?cycle=2024&id=AIS
+    linkText: "Federal Lobbying: Issues Summary — - OpenSecrets, 2024"
+    claimContext: Failed and stalled AI policy proposals provide critical insights into the political economy of AI governance, revealing systematic patterns that explain why comprehensive regulation remains elusive despite widespread concern about AI risks. The failure rate for ambitious AI legislation is remarkably
+    fetchedAt: 2026-02-22T02:19:28.925Z
+    httpStatus: 200
+    pageTitle: OpenSecrets
+    contentSnippet: OpenSecrets --> --> Donate We follow the money. You make it possible. $35 $50 $100 Other Donate Today &times; Skip to Navigation Skip to Main Content Skip to Footer $1 for transparency Our work depends on donors like you. Just $1 from each visitor would sustain us for a year. Will you give in 2026? Donate Now Donate to OpenSecrets to help strengthen our democracy If every user donated $1 we could sustain our work forever. --> $35 $50 $100 Custom Help sustain our work Politicians Back Federal Mem
+    contentLength: 242590
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/
+    linkText: AI companies upped their federal lobbying spend in 2024 — - TechCrunch, January 24, 2025
+    claimContext: Failed and stalled AI policy proposals provide critical insights into the political economy of AI governance, revealing systematic patterns that explain why comprehensive regulation remains elusive despite widespread concern about AI risks. The failure rate for ambitious AI legislation is remarkably
+    fetchedAt: 2026-02-22T02:19:28.431Z
+    httpStatus: 200
+    pageTitle: AI companies upped their federal lobbying spend in 2024 amid regulatory uncertainty | TechCrunch
+    contentSnippet: "AI companies upped their federal lobbying spend in 2024 amid regulatory uncertainty | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Eric Lee/Bloomberg / Getty Images Government & Policy AI companies upped their federal lobbying spend in 2024 amid regulatory uncertainty Kyle Wiggers 1:03 PM PST · January 24, 2025 Companies spent sig"
+    contentLength: 233597
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx
+    linkText: Americans Prioritize AI Safety and Data Security — - Gallup, May 2025
+    claimContext: The disconnect between public demand and policy outcomes is striking. [Gallup polling from May 2025 found 97% of Americans agree AI safety should be subject to rules and regulations](https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx)[^4], while [Public Citizen analys
+    fetchedAt: 2026-02-22T02:19:29.934Z
+    httpStatus: 200
+    pageTitle: Americans Prioritize AI Safety and Data Security
+    contentSnippet: "Americans Prioritize AI Safety and Data Security Notice: JavaScript is not enabled. Please Enable JavaScript Safely . skip to main content Economy Americans Prioritize AI Safety and Data Security Share on LinkedIn Share on Twitter Share on Facebook Share via Email Print WASHINGTON, D.C. &mdash; As artificial intelligence continues to develop and grow in capability, Americans say the government should prioritize maintaining rules for AI safety and data security. According to a new nationally repr"
+    contentLength: 137047
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.citizen.org/article/years-of-polling-show-overwhelming-voter-support-for-a-crackdown-on-ai/
+    linkText: Years of Polling Show Overwhelming Voter Support for a Crackdown on AI — - Public Citizen, 2024-2025
+    claimContext: The disconnect between public demand and policy outcomes is striking. [Gallup polling from May 2025 found 97% of Americans agree AI safety should be subject to rules and regulations](https://news.gallup.com/poll/694685/americans-prioritize-safety-data-security.aspx)[^4], while [Public Citizen analys
+    fetchedAt: 2026-02-22T02:19:28.987Z
+    httpStatus: 200
+    pageTitle: Years of Polling Show Overwhelming Voter Support for a Crackdown on AI - Public Citizen
+    contentSnippet: Years of Polling Show Overwhelming Voter Support for a Crackdown on AI - Public Citizen Share Facebook Twitter Email BlueSky Text Threads Any lawmaker aligned with AI and Big Tech is on the wrong side of public opinion. medium"> Share Facebook Twitter Email BlueSky Text Threads Download PDF American voters in both parties overwhelmingly oppose AI’s development and deployment, support aggressive regulation or prohibition of AI, and reject efforts to stop state-level regulation of AI, especially t
+    contentLength: 83751
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.axios.com/2026/01/21/meta-big-tech-lobbying-spending-q4
+    linkText: Meta tops Big Tech lobbying spending once again — - Axios, January 21, 2026
+    claimContext: Technology companies deploy sophisticated multi-layered strategies that go far beyond traditional lobbying. The [577% increase in OpenAI's lobbying spend to \$1.76 million in 2024](https://techcrunch.com/2025/01/24/ai-companies-upped-their-federal-lobbying-spend-in-2024-amid-regulatory-uncertainty/)
+    fetchedAt: 2026-02-22T02:19:31.779Z
+    httpStatus: 200
+    pageTitle: Meta tops Big Tech lobbying spending once again
+    contentSnippet: "Meta tops Big Tech lobbying spending once again Skip to main content Jan 21, 2026 - Technology Meta outspends Big Tech peers on lobbying again Ashley Gold facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Data: U.S. Senate; Chart: Axios Visuals Meta again topped Big Tech in federal lobbying"
+    contentLength: 179871
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf
+    linkText: SB 1047 Veto Message — - Governor Newsom, September 29, 2024
+    claimContext: "[State versus federal tensions proved particularly problematic for SB 1047](https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf)[^7], where federal preemption arguments assumed uniform national standards are preferable to regulatory experimentation, but federal inaction left t"
+    fetchedAt: 2026-02-22T02:19:31.277Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1225780
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.politico.com/news/2024/08/22/pelosi-california-ai-regulation-00175510
+    linkText: Pelosi opposes California AI regulation — - Politico, August 22, 2024
+    claimContext: The opposition coalition proved formidable and unusual. [Meta, OpenAI, and House Speaker Nancy Pelosi opposed the bill](https://www.politico.com/news/2024/08/22/pelosi-california-ai-regulation-00175510)[^8], with [Members of California's congressional delegation—including Speaker Emerita Pelosi, Rep
+    fetchedAt: 2026-02-22T02:19:31.340Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 9
+    url: https://khanna.house.gov/media/press-releases/release-khanna-leads-california-congressional-delegation-letter-governor-newsom
+    linkText: Khanna leads California congressional delegation letter — - Rep. Khanna Press Release, 2024
+    claimContext: The opposition coalition proved formidable and unusual. [Meta, OpenAI, and House Speaker Nancy Pelosi opposed the bill](https://www.politico.com/news/2024/08/22/pelosi-california-ai-regulation-00175510)[^8], with [Members of California's congressional delegation—including Speaker Emerita Pelosi, Rep
+    fetchedAt: 2026-02-22T02:19:32.330Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 10
+    url: https://cset.georgetown.edu/article/californias-approach-to-ai-governance/
+    linkText: California's Approach to AI Governance — - Georgetown CSET, 2024-2025
+    claimContext: However, California's approach evolved strategically. [California enacted 18 AI-related laws in 2024](https://cset.georgetown.edu/article/californias-approach-to-ai-governance/)[^10], and [SB 53 emerged as a "pared-down version of SB 1047" focusing on transparency rather than strict safety requireme
+    fetchedAt: 2026-02-22T02:19:30.988Z
+    httpStatus: 200
+    pageTitle: California’s Approach to AI Governance | Center for Security and Emerging Technology
+    contentSnippet: California’s Approach to AI Governance | Center for Security and Emerging Technology Skip to main content CSET California’s Approach to AI Governance Devin Von Arx November 4, 2025 This blog examines 18 AI-related laws that California enacted in 2024, 8 of which are explored in more detail in an accompanying CSET Emerging Technology Observatory (ETO) blog. This blog also chronicles California’s history of regulating AI and other emerging technologies and highlights several AI bills that have mov
+    contentLength: 181845
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.congress.gov/bill/118th-congress/house-bill/5628
+    linkText: H.R.5628 - Algorithmic Accountability Act — - Congress.gov, 2023
+    claimContext: Major failed proposals included the [Algorithmic Accountability Act](https://www.congress.gov/bill/118th-congress/house-bill/5628)[^11], reintroduced for the third time by Senators Ron Wyden and Cory Booker and Rep. Yvette Clarke, which would have required automated decision system impact assessment
+    fetchedAt: 2026-02-22T02:19:33.738Z
+    httpStatus: 200
+    pageTitle: "H.R.5628 - 118th Congress (2023-2024): Algorithmic Accountability Act of 2023 | Congress.gov | Library of Congress"
+    contentSnippet: "H.R.5628 - 118th Congress (2023-2024): Algorithmic Accountability Act of 2023 | Congress.gov | Library of Congress skip to main content Alert: For a better experience on Congress.gov, please enable JavaScript in your browser. Citation Subscribe Share/Save Site Feedback Home > Legislation > 118th Congress > H.R.5628 H.R.5628 - Algorithmic Accountability Act of 2023 118th Congress (2023-2024) Bill Hide Overview Sponsor: Rep. Clarke, Yvette D. [D-NY-9] (Introduced 09/21/2023) Committees: House - En"
+    contentLength: 353788
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.transparencycoalition.ai/news/as-congress-enters-final-2025-session-these-are-the-3-ai-bills-worth-watching-and-supporting
+    linkText: As Congress enters final 2025 session — - Transparency Coalition, 2025
+    claimContext: The [AI LEAD Act introduced by Senators Durbin and Hawley](https://www.transparencycoalition.ai/news/as-congress-enters-final-2025-session-these-are-the-3-ai-bills-worth-watching-and-supporting)[^12] and the [GUARD Act of 2025 introduced by Senators Hawley and Blumenthal addressing AI chatbot safety
+    fetchedAt: 2026-02-22T02:19:33.893Z
+    httpStatus: 200
+    pageTitle: As Congress enters final 2025 session, these are the 3 AI bills worth watching and supporting &mdash; Transparency Coalition. Legislation for Transparency in AI Now.
+    contentSnippet: As Congress enters final 2025 session, these are the 3 AI bills worth watching and supporting &mdash; Transparency Coalition. Legislation for Transparency in AI Now. 0 As Congress enters final 2025 session, these are the 3 AI bills worth watching and supporting Congress AI News Dec 1 Written By Bruce Barcott Members of the House and Senate are expected to reconvene in Congress this week to address a number of pressing issues. They only have about three weeks before adjourning for the holidays. A
+    contentLength: 168501
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://fpf.org/blog/the-state-of-state-ai-legislative-approaches-to-ai-in-2025/
+    linkText: "The State of State AI: Legislative Approaches to AI in 2025 — - Future of Privacy Forum, 2025"
+    claimContext: "Congressional dysfunction played a significant role in these failures, but industry opposition proved decisive. The vacuum drove state-level action: [nearly 700 AI-related state bills were introduced in 2024](https://fpf.org/blog/the-state-of-state-ai-legislative-approaches-to-ai-in-2025/)[^13], pro"
+    fetchedAt: 2026-02-22T02:19:33.859Z
+    httpStatus: 200
+    pageTitle: "The State of State AI: Legislative Approaches to AI in 2025"
+    contentSnippet: "The State of State AI: Legislative Approaches to AI in 2025 The State of State AI: Legislative Approaches to AI in 2025 FILTER October 2, 2025 Share on Facebook Share on LinkedIn Share on Twitter Share on Google+ --> Share through Email Justine Gluck Policy Analyst, AI Policy and Legislation About Justine Blogs by Justine State lawmakers accelerated their focus on AI regulation in 2025, proposing a vast array of new regulatory models. From chatbots and frontier models to healthcare, liability, a"
+    contentLength: 148855
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.congress.gov/bill/118th-congress/house-bill/815
+    linkText: H.R.815 — - Congress.gov, 2024
+    claimContext: "Congressional dysfunction played a significant role in these failures, but industry opposition proved decisive. The vacuum drove state-level action: [nearly 700 AI-related state bills were introduced in 2024](https://fpf.org/blog/the-state-of-state-ai-legislative-approaches-to-ai-in-2025/)[^13], pro"
+    fetchedAt: 2026-02-22T02:19:33.640Z
+    httpStatus: 200
+    pageTitle: "H.R.815 - 118th Congress (2023-2024): Making emergency supplemental appropriations for the fiscal year ending September 30, 2024, and for other purposes. | Congress.gov | Library of Congress"
+    contentSnippet: "H.R.815 - 118th Congress (2023-2024): Making emergency supplemental appropriations for the fiscal year ending September 30, 2024, and for other purposes. | Congress.gov | Library of Congress skip to main content Alert: For a better experience on Congress.gov, please enable JavaScript in your browser. Citation Subscribe Share/Save Site Feedback Home > Legislation > 118th Congress > H.R.815 H.R.815 - Making emergency supplemental appropriations for the fiscal year ending September 30, 2024, and fo"
+    contentLength: 404968
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.senate.gov/legislative/LIS/roll_call_votes/vote1182/vote_118_2_00234.htm
+    linkText: Senate Vote 234 — - US Senate, 2024
+    claimContext: "Congressional dysfunction played a significant role in these failures, but industry opposition proved decisive. The vacuum drove state-level action: [nearly 700 AI-related state bills were introduced in 2024](https://fpf.org/blog/the-state-of-state-ai-legislative-approaches-to-ai-in-2025/)[^13], pro"
+    fetchedAt: 2026-02-22T02:19:34.441Z
+    httpStatus: 200
+    pageTitle: "U.S. Senate: U.S. Senate Roll Call Votes 118th Congress - 2nd Session"
+    contentSnippet: "U.S. Senate: U.S. Senate Roll Call Votes 118th Congress - 2nd Session Skip Content Roll Call Vote 118 th Congress - 2 nd Session --> XML Vote Summary Question: On the Nomination (Confirmation: Jeannette A. Vargas, of New York, to be U.S. District Judge for the Southern District of New York. ) Vote Number: 234 Vote Date: September 10, 2024, 02:15 PM Required For Majority: 1/2 Vote Result: Nomination Confirmed Nomination Number: PN1576 Nomination Description: Jeannette A. Vargas, of New York, to b"
+    contentLength: 53540
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.mayerbrown.com/en/insights/publications/2025/12/president-trump-issues-executive-order-on-ensuring-a-national-policy-framework-for-artificial-intelligence
+    linkText: President Trump Issues Executive Order on AI — - Mayer Brown, December 11, 2025
+    claimContext: "[President Trump's Executive Order \"Ensuring a National Policy Framework for Artificial Intelligence\" issued December 11, 2025](https://www.mayerbrown.com/en/insights/publications/2025/12/president-trump-issues-executive-order-on-ensuring-a-national-policy-framework-for-artificial-intelligence)[^16]"
+    fetchedAt: 2026-02-22T02:19:35.985Z
+    httpStatus: 200
+    pageTitle: President Trump Issues Executive Order on “Ensuring a National Policy Framework for Artificial Intelligence” | Insights | Mayer Brown
+    contentSnippet: "President Trump Issues Executive Order on “Ensuring a National Policy Framework for Artificial Intelligence” | Insights | Mayer Brown December 23, 2025 President Trump Issues Executive Order on “Ensuring a National Policy Framework for Artificial Intelligence” Authors : Marcus A. Christian , Arsen Kourinian , Stephen Lilley , Howard W. Waltzman , Tanner Wilburn Generate PDF Share On December 11, 2025, US President Donald Trump issued the Executive Order Ensuring a National Policy Framework for A"
+    contentLength: 192831
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.softwareimprovementgroup.com/blog/us-ai-legislation-overview/
+    linkText: "AI legislation in the US: A 2025 overview — - Software Improvement Group, 2025"
+    claimContext: "This approach reflects the broader pattern where industry-preferred minimal regulation gains political traction by framing comprehensive oversight as economically harmful. [Trump's January 2025 Executive Order \"Removing Barriers to American Leadership in Artificial Intelligence\" focused on revoking "
+    fetchedAt: 2026-02-22T02:19:36.790Z
+    httpStatus: 200
+    pageTitle: "AI legislation in the US: A 2026 overview - SIG"
+    contentSnippet: "AI legislation in the US: A 2026 overview - SIG Updated: 22-01-2026 Reading time: 6-7 minutes AI legislation in the US: A 2026 overview Software Improvement Group In this article​ Summary The United States has introduced several key legislative measures to regulate AI, but the complexity of federalism still makes a unified AI policy difficult. Since Donald Trump began his second term in 2025, federal policy has emphasized “innovation-first” approaches while states continue to pass enforceable AI"
+    contentLength: 327674
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.un.org/sites/un2.un.org/files/ai_advisory_body_governing_ai_for_humanity_final_report_en.pdf
+    linkText: Governing AI for Humanity Final Report — - UN High-level Advisory Body on AI, September 2024
+    claimContext: International efforts to establish binding AI governance agreements have consistently failed despite widespread recognition that AI's global nature requires coordinated responses. The [UN Secretary-General's High-level Advisory Body on AI released its final report "Governing AI for Humanity" in Sept
+    fetchedAt: 2026-02-22T02:19:36.061Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 19
+    url: https://www.whitehouse.gov/briefing-room/statements-releases/2024/09/24/fact-sheet-biden-harris-administration-announces-key-ai-actions-following-president-bidens-commitment-to-ai-governance-at-the-united-nations/
+    linkText: Biden-Harris Administration AI Actions — - White House, September 24, 2024
+    claimContext: "[Great power competition, particularly US-China tensions](https://www.whitehouse.gov/briefing-room/statements-releases/2024/09/24/fact-sheet-biden-harris-administration-announces-key-ai-actions-following-president-bidens-commitment-to-ai-governance-at-the-united-nations/)[^19], represents the primar"
+    fetchedAt: 2026-02-22T02:19:35.784Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 20
+    url: https://blog.worldsummit.ai/global-ai-governance-in-2025
+    linkText: Global AI Governance in 2025 — - World AI Summit, 2025
+    claimContext: The [Paris AI Action Summit in February 2025 called for harmonised global standards](https://blog.worldsummit.ai/global-ai-governance-in-2025)[^20], but achieved no binding commitments. The [EU AI Act's entry into force with first provisions becoming applicable on February 2, 2025](https://oliverpat
+    fetchedAt: 2026-02-22T02:19:36.176Z
+    httpStatus: 200
+    pageTitle: Global AI Governance in 2025
+    contentSnippet: Global AI Governance in 2025 <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=302788594290423&amp;ev=PageView&amp;noscript=1"> BOOK NOW BOOK NOW Global AI Governance in 2025 Posted by World Summit AI on Jul 30, 2025 12:02:48 PM Tweet A Shifting Landscape of Law, Strategy, and Standards As Artificial Intelligence becomes increasingly embedded in the fabric of society, governments worldwide are racing to create robust governance frameworks that ensure safety, acco
+    contentLength: 68334
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://oliverpatel.substack.com/p/ai-governance-in-2025-a-year-in-review
+    linkText: "AI Governance in 2025: A Year in Review — - Oliver Patel, 2025"
+    claimContext: The [Paris AI Action Summit in February 2025 called for harmonised global standards](https://blog.worldsummit.ai/global-ai-governance-in-2025)[^20], but achieved no binding commitments. The [EU AI Act's entry into force with first provisions becoming applicable on February 2, 2025](https://oliverpat
+    fetchedAt: 2026-02-22T02:19:38.187Z
+    httpStatus: 200
+    pageTitle: "AI Governance in 2025: a year in review - by Oliver Patel"
+    contentSnippet: "AI Governance in 2025: a year in review - by Oliver Patel Subscribe Sign in AI Governance in 2025: a year in review 70+ defining milestones of 2025 | Edition #37 Oliver Patel Jan 03, 2026 15 1 1 Share Hey 👋 I’m Oliver Patel , author and creator of Enterprise AI Governance . Happy new year! I hope that everyone who celebrates enjoyed a peaceful, relaxing, and pleasant festive season. 2026 is inevitably going to be a busy and intense year for AI governance professionals. But before looking ahead,"
+    contentLength: 254450
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://link.springer.com/article/10.1007/s00146-025-02534-0
+    linkText: AI safety and regulatory capture — - Springer Nature, 2025
+    claimContext: Regulatory capture operates through multiple mechanisms beyond direct lobbying. [Academic research on AI safety and regulatory capture published in 2025](https://link.springer.com/article/10.1007/s00146-025-02534-0)[^22] identifies how organizations with economic power use regulations to unjustly en
+    fetchedAt: 2026-02-22T02:19:39.694Z
+    httpStatus: 200
+    pageTitle: AI safety and regulatory capture | AI & SOCIETY | Springer Nature Link
+    contentSnippet: "AI safety and regulatory capture | AI & SOCIETY | Springer Nature Link Skip to main content Advertisement AI safety and regulatory capture Open Forum Open access Published: 03 August 2025 ( 2025 ) Cite this article You have full access to this open access article Download PDF Save article View saved research AI & SOCIETY Aims and scope Submit manuscript AI safety and regulatory capture Download PDF Abstract Researchers, politicians, and the general public support safety regulations on the produc"
+    contentLength: 558812
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4931927
+    linkText: How Do AI Companies 'Fine-Tune' Policy? — - SSRN, 2024
+    claimContext: Regulatory capture operates through multiple mechanisms beyond direct lobbying. [Academic research on AI safety and regulatory capture published in 2025](https://link.springer.com/article/10.1007/s00146-025-02534-0)[^22] identifies how organizations with economic power use regulations to unjustly en
+    fetchedAt: 2026-02-22T02:19:38.194Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 24
+    url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
+    linkText: Executive Order on AI — - White House, October 30, 2023
+    claimContext: Executive actions prove highly effective within their scope limitations. The [Biden AI Executive Order of October 2023](https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/)[^24] su
+    fetchedAt: 2026-02-22T02:19:37.830Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 25
+    url: https://www.tandfonline.com/doi/full/10.1080/13662716.2023.2271858
+    linkText: The Impact of the EU General Data Protection Regulation — - Taylor & Francis, 2023
+    claimContext: Analysis of successful technology regulation in other domains provides insights for AI governance approaches. The [EU's GDPR serves as "the most comprehensive data protection regulation to date" and "arguably the first ambitious regulation specifically targeted at regulating the digital economy"](ht
+    fetchedAt: 2026-02-22T02:19:37.907Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://datainnovation.org/2022/04/a-new-study-lays-bare-the-cost-of-the-gdpr-to-europes-economy-will-the-ai-act-repeat-history/
+    linkText: The Cost of GDPR to Europe's Economy — - Data Innovation, April 2022
+    claimContext: Analysis of successful technology regulation in other domains provides insights for AI governance approaches. The [EU's GDPR serves as "the most comprehensive data protection regulation to date" and "arguably the first ambitious regulation specifically targeted at regulating the digital economy"](ht
+    fetchedAt: 2026-02-22T02:19:41.116Z
+    httpStatus: 200
+    pageTitle: "A New Study Lays Bare the Cost of the GDPR to Europe&#8217;s Economy: Will the AI Act Repeat History? &#8211; Center for Data Innovation"
+    contentSnippet: "A New Study Lays Bare the Cost of the GDPR to Europe&#8217;s Economy: Will the AI Act Repeat History? &#8211; Center for Data Innovation Home Publications Commentary A New Study Lays Bare the Cost of the GDPR to Europe&#8217;s Economy: Will the AI Act Repeat History? A New Study Lays Bare the Cost of the GDPR to Europe&#8217;s Economy: Will the AI Act Repeat History? by Benjamin Mueller April 9, 2022 by Benjamin Mueller April 9, 2022 The most surefire way to preclude any serious debate around EU"
+    contentLength: 126161
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.aei.org/economics/gdpr-ai-and-regulatory-humility/
+    linkText: GDPR, AI, and Regulatory Humility — - American Enterprise Institute, 2024
+    claimContext: "The GDPR experience suggests both opportunities and risks for AI regulation. [A 2021 study showed persistent decline in venture investment deals for EU technology firms compared to US](https://www.aei.org/economics/gdpr-ai-and-regulatory-humility/)[^27], while [IT sector SMEs faced twice the profit "
+    fetchedAt: 2026-02-22T02:19:42.426Z
+    httpStatus: 200
+    pageTitle: GDPR, AI, and Regulatory Humility | American Enterprise Institute - AEI
+    contentSnippet: "GDPR, AI, and Regulatory Humility | American Enterprise Institute - AEI GDPR, AI, and Regulatory Humility James Pethokoukis by James Pethokoukis Senior Fellow DeWitt Wallace Chair Editor, AEIdeas Blog August 05, 2024 Post | AEIdeas Economics Latest Work 02.19.2026 | Discussing market volatility with AI, geopolitics, and metals demand risks: Pethokoukis on CNBC&#8217;s &#8216;Worldwide Exchange&#8217; 02.17.2026 | The Age of AI Depends Less on Voters Than on Volts 02.13.2026 | The AI Jobs Non-Apo"
+    contentLength: 70045
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://corpgov.law.harvard.edu/2025/04/02/ai-in-focus-in-2025-boards-and-shareholders-set-their-sights-on-ai/
+    linkText: "AI in Focus in 2025: Boards and Shareholders Set Their Sights on AI — - Harvard Law School, April 2, 2025"
+    claimContext: "The [percentage of companies providing board oversight disclosure increased by more than 84% year-over-year](https://corpgov.law.harvard.edu/2025/04/02/ai-in-focus-in-2025-boards-and-shareholders-set-their-sights-on-ai/)[^28], while [shareholder proposals related to AI more than quadrupled compared "
+    fetchedAt: 2026-02-22T02:19:41.758Z
+    httpStatus: 200
+    pageTitle: "AI in Focus in 2025: Boards and Shareholders Set Their Sights on AI"
+    contentSnippet: "AI in Focus in 2025: Boards and Shareholders Set Their Sights on AI Harvard Law School Forum on Corporate Governance Skip to content --> Home About Archive Categories Hiring Blogroll AI in Focus in 2025: Boards and Shareholders Set Their Sights on AI Posted by Subodh Mishra, ISS STOXX , on Wednesday, April 2, 2025 Comments Off on AI in Focus in 2025: Boards and Shareholders Set Their Sights on AI Print E-Mail Tweet AI , Board of Directors , Public Companies , Shareholders More from: Subodh Mishr"
+    contentLength: 117390
+    status: verified
+    note: null

@@ -1,0 +1,601 @@
+pageId: ssi
+verifiedAt: 2026-02-22
+totalCitations: 54
+verified: 41
+broken: 13
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.constellationr.com/insights/news/safe-superintelligence-inc-launches-heres-what-it-means
+    linkText: "Safe Superintelligence Inc. launches: Here's what it means"
+    claimContext: Safe Superintelligence Inc. (SSI) is an AI research startup founded in June 2024 by <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink>, former chief scientist at <EntityLink id="openai">OpenAI</EntityLink>, alongside Daniel Gross and Daniel Levy. The company operates with a singular, uncomp
+    fetchedAt: 2026-02-22T02:04:24.459Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc. launches: Here's what it means | Constellation Research"
+    contentSnippet: "Safe Superintelligence Inc. launches: Here&#039;s what it means | Constellation Research Skip to main content Safe Superintelligence Inc. launches: Here&#039;s what it means Published June 19, 2024 Copy link Link Copied Copied to clipboard Larry Dignan Editor in Chief of Constellation Insights Three well-known generative AI pioneers have formed Safe Superintelligence Inc., a startup that will focus on safe superintelligence (SSI). In a post , former OpenAI leaders Ilya Sutskever and Daniel Levy "
+    contentLength: 82011
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://ssi.inc
+    linkText: SSI - Safe Superintelligence Inc. official website
+    claimContext: Safe Superintelligence Inc. (SSI) is an AI research startup founded in June 2024 by <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink>, former chief scientist at <EntityLink id="openai">OpenAI</EntityLink>, alongside Daniel Gross and Daniel Levy. The company operates with a singular, uncomp
+    fetchedAt: 2026-02-22T02:04:24.618Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence Inc.
+    contentSnippet: "Safe Superintelligence Inc. Safe Superintelligence Inc. Superintelligence is within reach. Building safe superintelligence (SSI) is the most important technical problem of our time. We have started the world’s first straight-shot SSI lab, with one goal and one product: a safe superintelligence. It’s called Safe Superintelligence Inc. SSI is our mission, our name, and our entire product roadmap, because it is our sole focus. Our team, investors, and business model are all aligned to achieve SSI. "
+    contentLength: 3897
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: Everything we know so far about Ilya Sutskever's new AI company
+    claimContext: Safe Superintelligence Inc. (SSI) is an AI research startup founded in June 2024 by <EntityLink id="ilya-sutskever">Ilya Sutskever</EntityLink>, former chief scientist at <EntityLink id="openai">OpenAI</EntityLink>, alongside Daniel Gross and Daniel Levy. The company operates with a singular, uncomp
+    fetchedAt: 2026-02-22T02:04:24.242Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://betakit.com/canadian-openai-co-founder-ilya-sutskever-launches-new-company-focused-on-safe-ai-development/
+    linkText: Canadian OpenAI co-founder launches new company focused on safe AI
+    claimContext: The company's founding came shortly after Sutskever's departure from OpenAI in May 2024, following internal tensions over the balance between safety priorities and rapid commercialization.[^4] SSI's approach reflects a philosophical break from OpenAI's current direction, emphasizing what the founder
+    fetchedAt: 2026-02-22T02:04:24.424Z
+    httpStatus: 200
+    pageTitle: Canadian OpenAI co-founder Ilya Sutskever launches new company focused on safe AI development | BetaKit
+    contentSnippet: Canadian OpenAI co-founder Ilya Sutskever launches new company focused on safe AI development | BetaKit Canadian Tech & Startup News Canadian Tech & Startup News New company follows the recent exodus of safety-focused employees at OpenAI. Ilya Sutskever, one of the co-founders of and former chief scientist at OpenAI, has launched a new company aimed at building a lab for safe artificial intelligence (AI) development. The new company, called Safe Superintelligence ( SSI ), is American, but Sutske
+    contentLength: 114402
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://ssi.inc
+    linkText: SSI official website
+    claimContext: The company's founding came shortly after Sutskever's departure from OpenAI in May 2024, following internal tensions over the balance between safety priorities and rapid commercialization.[^4] SSI's approach reflects a philosophical break from OpenAI's current direction, emphasizing what the founder
+    fetchedAt: 2026-02-22T02:04:24.572Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence Inc.
+    contentSnippet: "Safe Superintelligence Inc. Safe Superintelligence Inc. Superintelligence is within reach. Building safe superintelligence (SSI) is the most important technical problem of our time. We have started the world’s first straight-shot SSI lab, with one goal and one product: a safe superintelligence. It’s called Safe Superintelligence Inc. SSI is our mission, our name, and our entire product roadmap, because it is our sole focus. Our team, investors, and business model are all aligned to achieve SSI. "
+    contentLength: 3897
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://techfundingnews.com/inside-the-32b-ai-unicorn-backed-by-alphabet-nvidia-5-facts-about-openai-co-founders-safe-superintelligence/
+    linkText: Inside the \$32B AI unicorn backed by Alphabet, Nvidia
+    claimContext: With approximately 20 employees split between offices in Palo Alto, California, and Tel Aviv, Israel, SSI has raised \$3 billion in venture capital and achieved a \$32 billion valuation by April 2025—a remarkable sixfold increase in less than a year—all without generating revenue or releasing any pr
+    fetchedAt: 2026-02-22T02:04:26.292Z
+    httpStatus: 200
+    pageTitle: "$2B raise at $32B valuation: 5 facts OpenAI co-founder’s Safe Superintelligence. Can it outperform Anthropic and Google Deepmind? &#8212; TFN"
+    contentSnippet: "$2B raise at $32B valuation: 5 facts OpenAI co-founder’s Safe Superintelligence. Can it outperform Anthropic and Google Deepmind? &#8212; TFN UK Europe US VC News Interviews Partner Content AI News PREMIUM Subscribe TFN for Daily News Alerts Email address: By clicking submit, you agree to share your email address with TFN to receive marketing, updates, and other emails from the site owner. Use the unsubscribe link in the emails to opt out at any time. Leave this field empty if you're human: Cate"
+    contentLength: 175005
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+    linkText: Safe Superintelligence raises \$2B at \$32B valuation
+    claimContext: With approximately 20 employees split between offices in Palo Alto, California, and Tel Aviv, Israel, SSI has raised \$3 billion in venture capital and achieved a \$32 billion valuation by April 2025—a remarkable sixfold increase in less than a year—all without generating revenue or releasing any pr
+    fetchedAt: 2026-02-22T02:04:26.496Z
+    httpStatus: 200
+    pageTitle: AI Innovator Safe Superintelligence Raises $2B at $32B Valuation | Built In San Francisco
+    contentSnippet: "AI Innovator Safe Superintelligence Raises $2B at $32B Valuation | Built In San Francisco Image: Shutterstock A notable player in the AI space recently secured $2 billion in fresh funding. Co-founded by Ilya Sutskever, former chief scientist at OpenAI, Safe Superintelligence is a company focused on developing superintelligent AI technology that is intentionally safe for the humans using it, according to reporting by Tech Funding News. The company has yet to commercially launch its product. With "
+    contentLength: 55620
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    linkText: Safe Superintelligence Inc. - Wikipedia
+    claimContext: Ilya Sutskever announced the formation of SSI on June 19, 2024, via a post on X (formerly Twitter), just weeks after leaving OpenAI where he had served as chief scientist for nearly a decade.[^8][^9] His departure followed a tumultuous period at OpenAI that included a board dispute in late 2023, whe
+    fetchedAt: 2026-02-22T02:04:25.669Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: Safe Superintelligence Inc. - everything we know
+    claimContext: Ilya Sutskever announced the formation of SSI on June 19, 2024, via a post on X (formerly Twitter), just weeks after leaving OpenAI where he had served as chief scientist for nearly a decade.[^8][^9] His departure followed a tumultuous period at OpenAI that included a board dispute in late 2023, whe
+    fetchedAt: 2026-02-22T02:04:25.668Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Ilya_Sutskever
+    linkText: Ilya Sutskever - Wikipedia
+    claimContext: Ilya Sutskever announced the formation of SSI on June 19, 2024, via a post on X (formerly Twitter), just weeks after leaving OpenAI where he had served as chief scientist for nearly a decade.[^8][^9] His departure followed a tumultuous period at OpenAI that included a board dispute in late 2023, whe
+    fetchedAt: 2026-02-22T02:04:25.636Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: Safe Superintelligence founding story
+    claimContext: Sutskever brought deep credentials to the new venture. He had studied under AI pioneer <EntityLink id="geoffrey-hinton">Geoffrey Hinton</EntityLink> at the University of Toronto, co-invented AlexNet (a landmark neural network for image recognition sold to Google in 2013), and played key roles in dev
+    fetchedAt: 2026-02-22T02:04:27.530Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://en.wikipedia.org/wiki/Ilya_Sutskever
+    linkText: Ilya Sutskever Wikipedia - Superalignment
+    claimContext: Sutskever brought deep credentials to the new venture. He had studied under AI pioneer <EntityLink id="geoffrey-hinton">Geoffrey Hinton</EntityLink> at the University of Toronto, co-invented AlexNet (a landmark neural network for image recognition sold to Google in 2013), and played key roles in dev
+    fetchedAt: 2026-02-22T02:04:27.500Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 13
+    url: https://betakit.com/canadian-openai-co-founder-ilya-sutskever-launches-new-company-focused-on-safe-ai-development/
+    linkText: Canadian OpenAI co-founder launches company
+    claimContext: "His co-founders contributed complementary expertise. Daniel Gross previously led AI efforts at Apple after selling his predictive search startup Cue to the company in 2013, and later served as a partner at Y Combinator.[^13][^14] Daniel Levy came from OpenAI as well, where he worked as a researcher "
+    fetchedAt: 2026-02-22T02:04:27.556Z
+    httpStatus: 200
+    pageTitle: Canadian OpenAI co-founder Ilya Sutskever launches new company focused on safe AI development | BetaKit
+    contentSnippet: Canadian OpenAI co-founder Ilya Sutskever launches new company focused on safe AI development | BetaKit Canadian Tech & Startup News Canadian Tech & Startup News New company follows the recent exodus of safety-focused employees at OpenAI. Ilya Sutskever, one of the co-founders of and former chief scientist at OpenAI, has launched a new company aimed at building a lab for safe artificial intelligence (AI) development. The new company, called Safe Superintelligence ( SSI ), is American, but Sutske
+    contentLength: 114402
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://techfundingnews.com/inside-the-32b-ai-unicorn-backed-by-alphabet-nvidia-5-facts-about-openai-co-founders-safe-superintelligence/
+    linkText: Inside the \$32B AI unicorn - founders
+    claimContext: "His co-founders contributed complementary expertise. Daniel Gross previously led AI efforts at Apple after selling his predictive search startup Cue to the company in 2013, and later served as a partner at Y Combinator.[^13][^14] Daniel Levy came from OpenAI as well, where he worked as a researcher "
+    fetchedAt: 2026-02-22T02:04:27.589Z
+    httpStatus: 200
+    pageTitle: "$2B raise at $32B valuation: 5 facts OpenAI co-founder’s Safe Superintelligence. Can it outperform Anthropic and Google Deepmind? &#8212; TFN"
+    contentSnippet: "$2B raise at $32B valuation: 5 facts OpenAI co-founder’s Safe Superintelligence. Can it outperform Anthropic and Google Deepmind? &#8212; TFN UK Europe US VC News Interviews Partner Content AI News PREMIUM Subscribe TFN for Daily News Alerts Email address: By clicking submit, you agree to share your email address with TFN to receive marketing, updates, and other emails from the site owner. Use the unsubscribe link in the emails to opt out at any time. Leave this field empty if you're human: Cate"
+    contentLength: 175005
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: SSI founding team
+    claimContext: "His co-founders contributed complementary expertise. Daniel Gross previously led AI efforts at Apple after selling his predictive search startup Cue to the company in 2013, and later served as a partner at Y Combinator.[^13][^14] Daniel Levy came from OpenAI as well, where he worked as a researcher "
+    fetchedAt: 2026-02-22T02:04:27.607Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://ssi.inc
+    linkText: SSI official mission statement
+    claimContext: "SSI's stated mission is deceptively simple: \"one goal and one product: a safe superintelligence.\"[^16] The company treats both safety and capabilities advancement as technical problems to be solved through revolutionary engineering and scientific breakthroughs, rather than viewing them as competing "
+    fetchedAt: 2026-02-22T02:04:28.676Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence Inc.
+    contentSnippet: "Safe Superintelligence Inc. Safe Superintelligence Inc. Superintelligence is within reach. Building safe superintelligence (SSI) is the most important technical problem of our time. We have started the world’s first straight-shot SSI lab, with one goal and one product: a safe superintelligence. It’s called Safe Superintelligence Inc. SSI is our mission, our name, and our entire product roadmap, because it is our sole focus. Our team, investors, and business model are all aligned to achieve SSI. "
+    contentLength: 3897
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.constellationr.com/insights/news/safe-superintelligence-inc-launches-heres-what-it-means
+    linkText: "SSI launches: What it means"
+    claimContext: "SSI's stated mission is deceptively simple: \"one goal and one product: a safe superintelligence.\"[^16] The company treats both safety and capabilities advancement as technical problems to be solved through revolutionary engineering and scientific breakthroughs, rather than viewing them as competing "
+    fetchedAt: 2026-02-22T02:04:29.175Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc. launches: Here's what it means | Constellation Research"
+    contentSnippet: "Safe Superintelligence Inc. launches: Here&#039;s what it means | Constellation Research Skip to main content Safe Superintelligence Inc. launches: Here&#039;s what it means Published June 19, 2024 Copy link Link Copied Copied to clipboard Larry Dignan Editor in Chief of Constellation Insights Three well-known generative AI pioneers have formed Safe Superintelligence Inc., a startup that will focus on safe superintelligence (SSI). In a post , former OpenAI leaders Ilya Sutskever and Daniel Levy "
+    contentLength: 82011
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://ssi.inc
+    linkText: SSI philosophy and approach
+    claimContext: The company describes its strategy as "scaling in peace," advancing AI capabilities as rapidly as possible while keeping safety measures ahead of those capabilities.[^18] This approach embeds alignment and control considerations from the ground up rather than attempting to retrofit them after buildi
+    fetchedAt: 2026-02-22T02:04:29.197Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence Inc.
+    contentSnippet: "Safe Superintelligence Inc. Safe Superintelligence Inc. Superintelligence is within reach. Building safe superintelligence (SSI) is the most important technical problem of our time. We have started the world’s first straight-shot SSI lab, with one goal and one product: a safe superintelligence. It’s called Safe Superintelligence Inc. SSI is our mission, our name, and our entire product roadmap, because it is our sole focus. Our team, investors, and business model are all aligned to achieve SSI. "
+    contentLength: 3897
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: SSI approach to superintelligence
+    claimContext: The company describes its strategy as "scaling in peace," advancing AI capabilities as rapidly as possible while keeping safety measures ahead of those capabilities.[^18] This approach embeds alignment and control considerations from the ground up rather than attempting to retrofit them after buildi
+    fetchedAt: 2026-02-22T02:04:28.645Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.youtube.com/watch?v=h9gynRa0jB4
+    linkText: SSI technical approach - YouTube video
+    claimContext: Technically, SSI's approach appears to diverge from pure scaling-focused strategies. In interviews, Sutskever has suggested that current <EntityLink id="language-models">large language models</EntityLink> have fundamental limitations compared to human cognition, particularly in generalization abilit
+    fetchedAt: 2026-02-22T02:04:28.966Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 21
+    url: https://davefriedman.substack.com/p/does-ilya-sutskevers-safe-superintelligence
+    linkText: Does SSI make sense? - Technical analysis
+    claimContext: Technically, SSI's approach appears to diverge from pure scaling-focused strategies. In interviews, Sutskever has suggested that current <EntityLink id="language-models">large language models</EntityLink> have fundamental limitations compared to human cognition, particularly in generalization abilit
+    fetchedAt: 2026-02-22T02:04:30.700Z
+    httpStatus: 200
+    pageTitle: Does Ilya Sutskever’s Safe Superintelligence company make any sense?
+    contentSnippet: "Does Ilya Sutskever’s Safe Superintelligence company make any sense? Buy the Rumor; Sell the News Subscribe Sign in Does Ilya Sutskever’s Safe Superintelligence company make any sense? Billions in funding, no product, no revenue, claims about the fragility of LLMs… Dave Friedman Nov 27, 2025 7 1 3 Share This post serves as a complement to my recent post about Ilya Sutskever’s interview with Dwarkesh Patel, in which Sutskever outlines his vision for a post-LLM road to AGI. I received a DM from a "
+    contentLength: 197162
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://siliconangle.com/2025/02/07/ilya-sutskevers-ssi-reportedly-raising-new-funding-20b-valuation/
+    linkText: SSI raising funding - peak data comments
+    claimContext: Technically, SSI's approach appears to diverge from pure scaling-focused strategies. In interviews, Sutskever has suggested that current <EntityLink id="language-models">large language models</EntityLink> have fundamental limitations compared to human cognition, particularly in generalization abilit
+    fetchedAt: 2026-02-22T02:04:30.635Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever’s SSI reportedly raising new funding at $20B+ valuation - SiliconANGLE
+    contentSnippet: Ilya Sutskever’s SSI reportedly raising new funding at $20B+ valuation - SiliconANGLE You are using an outdated browser. Please upgrade your browser to improve your experience. SHARE UPDATED 17:24 EST / FEBRUARY 07 2025 AI Ilya Sutskever’s SSI reportedly raising new funding at $20B+ valuation by Maria Deutscher SHARE Safe Superintelligence Inc., a high-profile artificial intelligence startup started by a team that includes former OpenAI Chief Scientist Ilya Sutskever, is reportedly seeking to ra
+    contentLength: 117926
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: SSI safety methodologies
+    claimContext: The company employs several safety methodologies, including adversarial testing to stress-test AI systems for potential risks, <EntityLink id="red-teaming">red teaming</EntityLink> where experts attempt to find vulnerabilities, and the development of cognitive architectures designed to align AI reas
+    fetchedAt: 2026-02-22T02:04:30.238Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://observer.com/2024/09/openai-ilya-sutskever-raise-1b-ai-startup/
+    linkText: SSI seed funding - Observer
+    claimContext: "**September 2024**: The company raised \\$1 billion in seed funding at a \\$5 billion valuation from prominent Silicon Valley investors including Andreessen Horowitz (a16z), Sequoia Capital, DST Global, SV Angel, and NFDG (run by Daniel Gross and Nat Friedman).[^24][^25]"
+    fetchedAt: 2026-02-22T02:04:30.401Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 25
+    url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    linkText: SSI \$1B funding - Wikipedia
+    claimContext: "**September 2024**: The company raised \\$1 billion in seed funding at a \\$5 billion valuation from prominent Silicon Valley investors including Andreessen Horowitz (a16z), Sequoia Capital, DST Global, SV Angel, and NFDG (run by Daniel Gross and Nat Friedman).[^24][^25]"
+    fetchedAt: 2026-02-22T02:04:30.204Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    linkText: SSI \$30B valuation - Wikipedia
+    claimContext: "**March 2025**: Just six months later, SSI completed a funding round led by Greenoaks Capital that valued the company at \\$30 billion—a sixfold increase despite having no revenue, no products, and no public demonstrations of technology.[^26]"
+    fetchedAt: 2026-02-22T02:04:31.708Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 27
+    url: https://www.calcalistech.com/ctechnews/article/hjfywdtajl
+    linkText: SSI \$2B raise - Calcalist
+    claimContext: "**April 2025**: The company raised an additional \\$2 billion at a \\$32 billion valuation, again led by Greenoaks Capital Partners with a \\$500 million commitment. This round included participation from tech giants Alphabet (Google) and NVIDIA, making SSI one of the rare companies backed by both comp"
+    fetchedAt: 2026-02-22T02:04:32.936Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech
+    contentSnippet: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech 24/7 Buzz Startups VC AI Innovation Opinions Events Promising Startups 2024 BiblioTech Boarding Pass Corporate Appointments CTalk Tech Gateways 2025 VC survey @Finance Ctech Testimonials Shopping Projects Spotlight About Newsletter Contact us Facebook Twitter ACCESSIBILITY by Homepage Startups Startups HOME 24/7 buzz STARTUPS VC AI Innovation OPINIONS EVENTS SHOPPING ABOUT teram of use Privacy Policy NEW
+    contentLength: 101619
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://techfundingnews.com/inside-the-32b-ai-unicorn-backed-by-alphabet-nvidia-5-facts-about-openai-co-founders-safe-superintelligence/
+    linkText: SSI Alphabet and Nvidia backing
+    claimContext: "**April 2025**: The company raised an additional \\$2 billion at a \\$32 billion valuation, again led by Greenoaks Capital Partners with a \\$500 million commitment. This round included participation from tech giants Alphabet (Google) and NVIDIA, making SSI one of the rare companies backed by both comp"
+    fetchedAt: 2026-02-22T02:04:32.188Z
+    httpStatus: 200
+    pageTitle: "$2B raise at $32B valuation: 5 facts OpenAI co-founder’s Safe Superintelligence. Can it outperform Anthropic and Google Deepmind? &#8212; TFN"
+    contentSnippet: "$2B raise at $32B valuation: 5 facts OpenAI co-founder’s Safe Superintelligence. Can it outperform Anthropic and Google Deepmind? &#8212; TFN UK Europe US VC News Interviews Partner Content AI News PREMIUM Subscribe TFN for Daily News Alerts Email address: By clicking submit, you agree to share your email address with TFN to receive marketing, updates, and other emails from the site owner. Use the unsubscribe link in the emails to opt out at any time. Leave this field empty if you're human: Cate"
+    contentLength: 175005
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://news.crunchbase.com/business/biggest-rounds-april-2025-safe-superintelligence-plaid/
+    linkText: Biggest funding rounds April 2025
+    claimContext: "**April 2025**: The company raised an additional \\$2 billion at a \\$32 billion valuation, again led by Greenoaks Capital Partners with a \\$500 million commitment. This round included participation from tech giants Alphabet (Google) and NVIDIA, making SSI one of the rare companies backed by both comp"
+    fetchedAt: 2026-02-22T02:04:32.281Z
+    httpStatus: 200
+    pageTitle: "The 10 Biggest Rounds Of April: Safe Superintelligence’s $2B Round Leads The Way"
+    contentSnippet: "The 10 Biggest Rounds Of April: Safe Superintelligence’s $2B Round Leads The Way Unicorn Board Tech Layoffs Tracker Billion-Dollar Exits Largest Funding Deals Tracker Web3 Tracker Venture funding reports Q1 2023 Q1 2023 Global Q1 2023 North America Q1 2023 Europe Q1 2023 Latin America Q1 2023 Asia 2022 2022 Global 2022 North America 2022 Europe 2022 Latin America 2022 Asia Chris Metinko 15 Shares Email Facebook Twitter LinkedIn This is a monthly feature that runs down the month’s top 10 funding "
+    contentLength: 170710
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+    linkText: SSI funding use - Built in SF
+    claimContext: "The total funding raised stands at approximately \\$3 billion, with funds earmarked for several key priorities: acquiring massive computing power for AI training, hiring world-class engineers and researchers, scaling research and development operations, and expanding the company's global presence acr"
+    fetchedAt: 2026-02-22T02:04:32.056Z
+    httpStatus: 200
+    pageTitle: AI Innovator Safe Superintelligence Raises $2B at $32B Valuation | Built In San Francisco
+    contentSnippet: "AI Innovator Safe Superintelligence Raises $2B at $32B Valuation | Built In San Francisco Image: Shutterstock A notable player in the AI space recently secured $2 billion in fresh funding. Co-founded by Ilya Sutskever, former chief scientist at OpenAI, Safe Superintelligence is a company focused on developing superintelligent AI technology that is intentionally safe for the humans using it, according to reporting by Tech Funding News. The company has yet to commercially launch its product. With "
+    contentLength: 55620
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: SSI funding priorities
+    claimContext: "The total funding raised stands at approximately \\$3 billion, with funds earmarked for several key priorities: acquiring massive computing power for AI training, hiring world-class engineers and researchers, scaling research and development operations, and expanding the company's global presence acr"
+    fetchedAt: 2026-02-22T02:04:33.980Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.calcalistech.com/ctechnews/article/hjfywdtajl
+    linkText: SSI investor confidence - Calcalist
+    claimContext: The extraordinary valuations reflect several factors. Investors are betting on Sutskever's reputation—he was instrumental in many of OpenAI's breakthrough achievements including the GPT series that led to ChatGPT.[^32] They're also wagering that SSI could become the next foundational model company c
+    fetchedAt: 2026-02-22T02:04:33.972Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech
+    contentSnippet: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech 24/7 Buzz Startups VC AI Innovation Opinions Events Promising Startups 2024 BiblioTech Boarding Pass Corporate Appointments CTalk Tech Gateways 2025 VC survey @Finance Ctech Testimonials Shopping Projects Spotlight About Newsletter Contact us Facebook Twitter ACCESSIBILITY by Homepage Startups Startups HOME 24/7 buzz STARTUPS VC AI Innovation OPINIONS EVENTS SHOPPING ABOUT teram of use Privacy Policy NEW
+    contentLength: 101619
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.calcalistech.com/ctechnews/article/hjfywdtajl
+    linkText: SSI competitive positioning - Calcalist
+    claimContext: The extraordinary valuations reflect several factors. Investors are betting on Sutskever's reputation—he was instrumental in many of OpenAI's breakthrough achievements including the GPT series that led to ChatGPT.[^32] They're also wagering that SSI could become the next foundational model company c
+    fetchedAt: 2026-02-22T02:04:34.705Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech
+    contentSnippet: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech 24/7 Buzz Startups VC AI Innovation Opinions Events Promising Startups 2024 BiblioTech Boarding Pass Corporate Appointments CTalk Tech Gateways 2025 VC survey @Finance Ctech Testimonials Shopping Projects Spotlight About Newsletter Contact us Facebook Twitter ACCESSIBILITY by Homepage Startups Startups HOME 24/7 buzz STARTUPS VC AI Innovation OPINIONS EVENTS SHOPPING ABOUT teram of use Privacy Policy NEW
+    contentLength: 101619
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    linkText: SSI team size - Wikipedia
+    claimContext: SSI operates with a deliberately lean structure. As of mid-2025, the company employed approximately 20 people, described internally as a "lean, cracked team" of exceptional engineers and researchers.[^34][^35] The small team size represents a strategic choice to maximize talent density and focus rat
+    fetchedAt: 2026-02-22T02:04:33.943Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 35
+    url: https://www.calcalistech.com/ctechnews/article/hjfywdtajl
+    linkText: SSI lean team - Calcalist
+    claimContext: SSI operates with a deliberately lean structure. As of mid-2025, the company employed approximately 20 people, described internally as a "lean, cracked team" of exceptional engineers and researchers.[^34][^35] The small team size represents a strategic choice to maximize talent density and focus rat
+    fetchedAt: 2026-02-22T02:04:34.760Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech
+    contentSnippet: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech 24/7 Buzz Startups VC AI Innovation Opinions Events Promising Startups 2024 BiblioTech Boarding Pass Corporate Appointments CTalk Tech Gateways 2025 VC survey @Finance Ctech Testimonials Shopping Projects Spotlight About Newsletter Contact us Facebook Twitter ACCESSIBILITY by Homepage Startups Startups HOME 24/7 buzz STARTUPS VC AI Innovation OPINIONS EVENTS SHOPPING ABOUT teram of use Privacy Policy NEW
+    contentLength: 101619
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    linkText: SSI locations - Wikipedia
+    claimContext: "**Palo Alto, California** serves as the U.S. headquarters, providing access to Silicon Valley's innovation ecosystem, proximity to investors, and the ability to recruit from the Bay Area's deep bench of AI researchers and engineers.[^36]"
+    fetchedAt: 2026-02-22T02:04:35.789Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 37
+    url: https://www.calcalistech.com/ctechnews/article/hjfywdtajl
+    linkText: SSI Tel Aviv operations - Calcalist
+    claimContext: "**Tel Aviv, Israel** was selected for its strengths in cybersecurity research, AI expertise, and software engineering talent. The Israeli office has been expanding with new hires and leased space, reflecting SSI's commitment to building a globally distributed research organization.[^37][^38]"
+    fetchedAt: 2026-02-22T02:04:35.820Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech
+    contentSnippet: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech 24/7 Buzz Startups VC AI Innovation Opinions Events Promising Startups 2024 BiblioTech Boarding Pass Corporate Appointments CTalk Tech Gateways 2025 VC survey @Finance Ctech Testimonials Shopping Projects Spotlight About Newsletter Contact us Facebook Twitter ACCESSIBILITY by Homepage Startups Startups HOME 24/7 buzz STARTUPS VC AI Innovation OPINIONS EVENTS SHOPPING ABOUT teram of use Privacy Policy NEW
+    contentLength: 101619
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.calcalistech.com/ctechnews/article/sy8f11qr0jx
+    linkText: SSI Israel expansion
+    claimContext: "**Tel Aviv, Israel** was selected for its strengths in cybersecurity research, AI expertise, and software engineering talent. The Israeli office has been expanding with new hires and leased space, reflecting SSI's commitment to building a globally distributed research organization.[^37][^38]"
+    fetchedAt: 2026-02-22T02:04:36.058Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence and Eon join Google Cloud to advance AI safety and data search | Ctech
+    contentSnippet: Safe Superintelligence and Eon join Google Cloud to advance AI safety and data search | Ctech 24/7 Buzz Startups VC AI Innovation Opinions Events Promising Startups 2024 BiblioTech Boarding Pass Corporate Appointments CTalk Tech Gateways 2025 VC survey @Finance Ctech Testimonials Shopping Projects Spotlight About Newsletter Contact us Facebook Twitter ACCESSIBILITY by Homepage News News HOME 24/7 buzz STARTUPS VC AI Innovation OPINIONS EVENTS SHOPPING ABOUT teram of use Privacy Policy NEWSLETTER
+    contentLength: 101411
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://ssi.inc/updates
+    linkText: SSI leadership transition - SSI updates
+    claimContext: In July 2025, the company underwent a significant leadership transition when co-founder Daniel Gross departed to join Meta Superintelligence Labs, with his tenure winding down by June 29, 2025.[^39] Following this departure, Ilya Sutskever formally assumed the role of CEO, with Daniel Levy taking on
+    fetchedAt: 2026-02-22T02:04:36.266Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence Inc.
+    contentSnippet: "Safe Superintelligence Inc. Updates July 3rd, 2025 — Update : We sent the following message to our team and investors: As you know, Daniel Gross’s time with us has been winding down, and as of June 29 he is officially no longer a part of SSI. We are grateful for his early contributions to the company and wish him well in his next endeavor. I am now formally CEO of SSI, and Daniel Levy is President. The technical team continues to report to me. You might have heard rumors of companies looking to "
+    contentLength: 3032
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://ssi.inc/updates
+    linkText: Daniel Gross departure - SSI updates
+    claimContext: In July 2025, the company underwent a significant leadership transition when co-founder Daniel Gross departed to join Meta Superintelligence Labs, with his tenure winding down by June 29, 2025.[^39] Following this departure, Ilya Sutskever formally assumed the role of CEO, with Daniel Levy taking on
+    fetchedAt: 2026-02-22T02:04:36.270Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence Inc.
+    contentSnippet: "Safe Superintelligence Inc. Updates July 3rd, 2025 — Update : We sent the following message to our team and investors: As you know, Daniel Gross’s time with us has been winding down, and as of June 29 he is officially no longer a part of SSI. We are grateful for his early contributions to the company and wish him well in his next endeavor. I am now formally CEO of SSI, and Daniel Levy is President. The technical team continues to report to me. You might have heard rumors of companies looking to "
+    contentLength: 3032
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    linkText: Meta acquisition attempt - Wikipedia
+    claimContext: In July 2025, the company underwent a significant leadership transition when co-founder Daniel Gross departed to join Meta Superintelligence Labs, with his tenure winding down by June 29, 2025.[^39] Following this departure, Ilya Sutskever formally assumed the role of CEO, with Daniel Levy taking on
+    fetchedAt: 2026-02-22T02:04:37.276Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 42
+    url: https://techcrunch.com/2025/04/09/ilya-sutskever-taps-google-cloud-to-power-his-ai-startups-research/
+    linkText: SSI Google Cloud partnership - TechCrunch
+    claimContext: "While SSI maintains a culture of secrecy around its research, some details about its technical infrastructure have emerged. In April 2025, the company announced a strategic partnership with Google Cloud to access Google's Tensor Processing Units (TPUs) for its AI research and development.[^42][^43] "
+    fetchedAt: 2026-02-22T02:04:37.510Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever taps Google Cloud to power his AI startup's research | TechCrunch
+    contentSnippet: "Ilya Sutskever taps Google Cloud to power his AI startup&#039;s research | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: JACK GUEZ / AFP / Getty Images AI Ilya Sutskever taps Google Cloud to power his AI startup&#8217;s research Maxwell Zeff 11:55 AM PDT · April 9, 2025 OpenAI co-founder and former chief scientist Ilya Sutskever&#8"
+    contentLength: 226625
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.datacenterdynamics.com/en/news/ai-startup-safe-superintelligence-to-use-googles-tpu-chips-for-research/
+    linkText: SSI TPU usage - Data Center Dynamics
+    claimContext: "While SSI maintains a culture of secrecy around its research, some details about its technical infrastructure have emerged. In April 2025, the company announced a strategic partnership with Google Cloud to access Google's Tensor Processing Units (TPUs) for its AI research and development.[^42][^43] "
+    fetchedAt: 2026-02-22T02:04:39.339Z
+    httpStatus: 200
+    pageTitle: AI startup Safe Superintelligence to use Google&#x27;s TPU chips for research - DCD
+    contentSnippet: AI startup Safe Superintelligence to use Google&#x27;s TPU chips for research - DCD Home News The Cloud & Hybrid Channel AI startup Safe Superintelligence to use Google&#x27;s TPU chips for research And other Google Cloud customer stories April 10, 2025 By Georgia Butler Have your say AI startup Safe Superintelligence (SSI) has said it will be using Google Cloud's TPUs to power its research. In addition, UK financial services company Lloyds has expanded its use of Google Cloud's services, as wel
+    contentLength: 95355
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.calcalistech.com/ctechnews/article/hjfywdtajl
+    linkText: SSI largest TPU customer - Calcalist
+    claimContext: "While SSI maintains a culture of secrecy around its research, some details about its technical infrastructure have emerged. In April 2025, the company announced a strategic partnership with Google Cloud to access Google's Tensor Processing Units (TPUs) for its AI research and development.[^42][^43] "
+    fetchedAt: 2026-02-22T02:04:37.306Z
+    httpStatus: 200
+    pageTitle: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech
+    contentSnippet: Ilya Sutskever’s Safe Superintelligence raises $2B at $32B valuation—with no product | Ctech 24/7 Buzz Startups VC AI Innovation Opinions Events Promising Startups 2024 BiblioTech Boarding Pass Corporate Appointments CTalk Tech Gateways 2025 VC survey @Finance Ctech Testimonials Shopping Projects Spotlight About Newsletter Contact us Facebook Twitter ACCESSIBILITY by Homepage Startups Startups HOME 24/7 buzz STARTUPS VC AI Innovation OPINIONS EVENTS SHOPPING ABOUT teram of use Privacy Policy NEW
+    contentLength: 101619
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://davefriedman.substack.com/p/does-ilya-sutskevers-safe-superintelligence
+    linkText: SSI safety focus - Dave Friedman analysis
+    claimContext: "SSI positions itself explicitly as a safety-first AI company, with safety integrated into its core branding and mission rather than treated as a secondary concern.[^45] The company's founding reflects Sutskever's long-standing interest in AI safety and alignment—concerns that reportedly contributed "
+    fetchedAt: 2026-02-22T02:04:37.652Z
+    httpStatus: 200
+    pageTitle: Does Ilya Sutskever’s Safe Superintelligence company make any sense?
+    contentSnippet: "Does Ilya Sutskever’s Safe Superintelligence company make any sense? Buy the Rumor; Sell the News Subscribe Sign in Does Ilya Sutskever’s Safe Superintelligence company make any sense? Billions in funding, no product, no revenue, claims about the fragility of LLMs… Dave Friedman Nov 27, 2025 7 1 3 Share This post serves as a complement to my recent post about Ilya Sutskever’s interview with Dwarkesh Patel, in which Sutskever outlines his vision for a post-LLM road to AGI. I received a DM from a "
+    contentLength: 197162
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://en.wikipedia.org/wiki/Ilya_Sutskever
+    linkText: Sutskever OpenAI tensions - Wikipedia Ilya Sutskever
+    claimContext: "SSI positions itself explicitly as a safety-first AI company, with safety integrated into its core branding and mission rather than treated as a secondary concern.[^45] The company's founding reflects Sutskever's long-standing interest in AI safety and alignment—concerns that reportedly contributed "
+    fetchedAt: 2026-02-22T02:04:40.346Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 47
+    url: https://en.wikipedia.org/wiki/Ilya_Sutskever
+    linkText: Sutskever Superalignment project
+    claimContext: "Sutskever had previously led OpenAI's Superalignment project, launched in 2023 with the goal of solving technical challenges in controlling superintelligent AI systems within four years.[^47] His departure from OpenAI to found SSI signaled both his continued prioritization of these concerns and his "
+    fetchedAt: 2026-02-22T02:04:40.360Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 48
+    url: https://ssi.inc
+    linkText: SSI safety approach - SSI website
+    claimContext: The company's approach to AI safety centers on treating it as a technical challenge requiring fundamental breakthroughs rather than as a policy question or a matter of organizational governance alone. By designing safety measures to advance in tandem with capabilities from the ground up, SSI aims to
+    fetchedAt: 2026-02-22T02:04:40.854Z
+    httpStatus: 200
+    pageTitle: Safe Superintelligence Inc.
+    contentSnippet: "Safe Superintelligence Inc. Safe Superintelligence Inc. Superintelligence is within reach. Building safe superintelligence (SSI) is the most important technical problem of our time. We have started the world’s first straight-shot SSI lab, with one goal and one product: a safe superintelligence. It’s called Safe Superintelligence Inc. SSI is our mission, our name, and our entire product roadmap, because it is our sole focus. Our team, investors, and business model are all aligned to achieve SSI. "
+    contentLength: 3897
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://daily.dev/blog/safe-superintelligence-inc-ssi-everything-we-know-so-far-about-ilya-sutskevers-new-ai-company
+    linkText: SSI research sharing plans
+    claimContext: This secrecy reflects the company's singular focus—rather than engaging in the normal academic and industry discourse around AI safety through papers, conferences, and open-source releases, SSI appears to be concentrating entirely on internal research toward its long-term goal. The company has indic
+    fetchedAt: 2026-02-22T02:04:40.875Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company"
+    contentSnippet: "Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Discover more from daily.dev Personalized news feed, dev communities and search, much better than what’s out there. Maybe ;) Start reading - Free forever Start reading - Free forever Continue reading > Home Blog Get into tech Safe Superintelligence Inc (SSI): Everything we know so far about Ilya Sutskever&#x27;s new AI company Jun 21, 2024 Author Nimrod Kramer @NimrodKramer Related tags on dail"
+    contentLength: 65372
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.constellationr.com/insights/news/safe-superintelligence-inc-launches-heres-what-it-means
+    linkText: SSI unclear differentiation
+    claimContext: "**Unclear differentiation**: The company's core mission of \"safe superintelligence\" remains undefined in concrete technical terms. Without published research, demonstrated capabilities, or clear milestones, it's difficult for outside observers to assess whether SSI's approach genuinely differs from "
+    fetchedAt: 2026-02-22T02:04:40.823Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc. launches: Here's what it means | Constellation Research"
+    contentSnippet: "Safe Superintelligence Inc. launches: Here&#039;s what it means | Constellation Research Skip to main content Safe Superintelligence Inc. launches: Here&#039;s what it means Published June 19, 2024 Copy link Link Copied Copied to clipboard Larry Dignan Editor in Chief of Constellation Insights Three well-known generative AI pioneers have formed Safe Superintelligence Inc., a startup that will focus on safe superintelligence (SSI). In a post , former OpenAI leaders Ilya Sutskever and Daniel Levy "
+    contentLength: 82011
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.constellationr.com/insights/news/safe-superintelligence-inc-launches-heres-what-it-means
+    linkText: SSI focus concerns
+    claimContext: "**Potentially misallocated focus**: Some critics argue that SSI's exclusive focus on superintelligence may distract from more immediate AI safety needs. Current AI systems already pose risks related to <EntityLink id=\"misuse-risks\">misuse</EntityLink>, bias, deception, and loss of human control—prob"
+    fetchedAt: 2026-02-22T02:04:41.946Z
+    httpStatus: 200
+    pageTitle: "Safe Superintelligence Inc. launches: Here's what it means | Constellation Research"
+    contentSnippet: "Safe Superintelligence Inc. launches: Here&#039;s what it means | Constellation Research Skip to main content Safe Superintelligence Inc. launches: Here&#039;s what it means Published June 19, 2024 Copy link Link Copied Copied to clipboard Larry Dignan Editor in Chief of Constellation Insights Three well-known generative AI pioneers have formed Safe Superintelligence Inc., a startup that will focus on safe superintelligence (SSI). In a post , former OpenAI leaders Ilya Sutskever and Daniel Levy "
+    contentLength: 82011
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://davefriedman.substack.com/p/does-ilya-sutskevers-safe-superintelligence
+    linkText: SSI high variance bet - Dave Friedman
+    claimContext: "**High-risk bet on small team**: SSI's tiny team lacks the infrastructure, tooling, and operational experience that larger competitors like <EntityLink id=\"openai\">OpenAI</EntityLink> and <EntityLink id=\"anthropic\">Anthropic</EntityLink> have built over years. The company could end up solving \"the w"
+    fetchedAt: 2026-02-22T02:04:42.179Z
+    httpStatus: 200
+    pageTitle: Does Ilya Sutskever’s Safe Superintelligence company make any sense?
+    contentSnippet: "Does Ilya Sutskever’s Safe Superintelligence company make any sense? Buy the Rumor; Sell the News Subscribe Sign in Does Ilya Sutskever’s Safe Superintelligence company make any sense? Billions in funding, no product, no revenue, claims about the fragility of LLMs… Dave Friedman Nov 27, 2025 7 1 3 Share This post serves as a complement to my recent post about Ilya Sutskever’s interview with Dwarkesh Patel, in which Sutskever outlines his vision for a post-LLM road to AGI. I received a DM from a "
+    contentLength: 197162
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://davefriedman.substack.com/p/does-ilya-sutskevers-safe-superintelligence
+    linkText: SSI safety institution assessment - Dave Friedman
+    claimContext: '**Safety marketing concerns**: While SSI brands itself as "safety first," some observers note that the company is still fundamentally participating in a race to build superintelligent AI, just with a different organizational structure and messaging. The designation as a "safety institution" is mixed'
+    fetchedAt: 2026-02-22T02:04:42.005Z
+    httpStatus: 200
+    pageTitle: Does Ilya Sutskever’s Safe Superintelligence company make any sense?
+    contentSnippet: "Does Ilya Sutskever’s Safe Superintelligence company make any sense? Buy the Rumor; Sell the News Subscribe Sign in Does Ilya Sutskever’s Safe Superintelligence company make any sense? Billions in funding, no product, no revenue, claims about the fragility of LLMs… Dave Friedman Nov 27, 2025 7 1 3 Share This post serves as a complement to my recent post about Ilya Sutskever’s interview with Dwarkesh Patel, in which Sutskever outlines his vision for a post-LLM road to AGI. I received a DM from a "
+    contentLength: 197162
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+    linkText: SSI valuation concerns - Wikipedia
+    claimContext: "**Valuation versus substance**: The company's \\$32 billion valuation despite having approximately 20 employees, no products, no revenue, and no public demonstrations of technology raises questions about whether investor enthusiasm is justified or represents hype based primarily on Sutskever's reputa"
+    fetchedAt: 2026-02-22T02:04:41.881Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403

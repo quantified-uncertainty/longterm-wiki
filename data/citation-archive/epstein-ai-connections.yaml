@@ -1,0 +1,117 @@
+pageId: epstein-ai-connections
+verifiedAt: 2026-02-22
+totalCitations: 10
+verified: 8
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://english.news.cn/20260210/81efc214c044487eb0b7c137b4b35516/c.html
+    linkText: "Xinhua: Epstein's connections to science and tech community"
+    claimContext: Jeffrey Epstein, the financier and convicted sex offender, cultivated financial relationships with prominent researchers in artificial intelligence and adjacent scientific fields through foundation grants, direct funding proposals, and personal networking. Documents released by the U.S. Department o
+    fetchedAt: 2026-02-22T02:27:50.289Z
+    httpStatus: 200
+    pageTitle: "Epstein's ties to scientists \"deeper than previously known\": Nature report-Xinhua"
+    contentSnippet: "Epstein's ties to scientists \"deeper than previously known\": Nature report-Xinhua Epstein's ties to scientists \"deeper than previously known\": Nature report Source: Xinhua Editor: huaxia 2026-02-10 05:37:00 LONDON, Feb. 9 (Xinhua) -- The connections between late U.S. financier Jeffrey Epstein and the scientific community were \"deeper than previously known\" and \"unheard of\" in extent, according to a latest report by the journal Nature. Citing newly released documents from the U.S. Department of J"
+    contentLength: 9781
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.scrippsnews.com/science-and-tech/what-we-know-about-science-and-tech-figures-named-in-the-epstein-files
+    linkText: "Scripps News: What we know about science and tech figures named in the Epstein files"
+    claimContext: "A notable aspect of these connections is that many continued after Epstein's 2008 conviction for soliciting prostitution from a minor and his subsequent registration as a sex offender. Institutions including Harvard and MIT received or sought Epstein funding during this period, and some researchers "
+    fetchedAt: 2026-02-22T02:27:50.252Z
+    httpStatus: 200
+    pageTitle: What we know about science and tech figures named in the Epstein files
+    contentSnippet: What we know about science and tech figures named in the Epstein files Science and Tech Actions Facebook Tweet Email What we know about science and tech figures named in the Epstein files The latest document release includes millions of pages of emails, schedules and correspondence that reference major figures like Elon Musk, Bill Gates and Google co-founder Sergey Brin. Prev Next Jon Elswick/AP Documents that were included in the U.S. Department of Justice release of the Jeffrey Epstein files a
+    contentLength: 109739
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.science.org/content/article/what-kind-researcher-did-sex-offender-jeffrey-epstein-fund-he-told-science-he-died
+    linkText: "Science magazine: What kind of researcher did sex offender Jeffrey Epstein fund?"
+    claimContext: Epstein reportedly characterized his philanthropic approach as targeting researchers who did not fit conventional academic molds — scientists working on ambitious or unconventional problems that struggled to attract traditional funding.[^3] Whether this self-presentation reflects genuine intellectua
+    fetchedAt: 2026-02-22T02:27:50.148Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://en.wikipedia.org/wiki/Connections_of_Jeffrey_Epstein
+    linkText: "Wikipedia: Connections of Jeffrey Epstein"
+    claimContext: Epstein's documented interest in artificial general intelligence dates to at least 2001, when he provided a \$100,000 grant from the Jeffrey Epstein Foundation to Ben Goertzel for AGI research.[^4] Goertzel, a computer scientist who later became known for founding SingularityNET, became a significan
+    fetchedAt: 2026-02-22T02:27:49.052Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 5
+    url: https://www.wuot.org/news/2026-02-05/epstein-files-show-former-ut-professor-used-students-to-develop-ai-tools-for-predatory-billionaire
+    linkText: "WUOT: Epstein files show former UT professor used students to develop AI tools for Epstein"
+    claimContext: In 2009, Goertzel introduced Epstein via email to Itamar Arel, then an associate professor of computer science at the University of Tennessee, who was working on a machine learning project focused on AGI.[^5] This introduction initiated the most detailed AI funding relationship documented in the rel
+    fetchedAt: 2026-02-22T02:27:50.014Z
+    httpStatus: 200
+    pageTitle: Epstein files show former UT professor used students to develop AI tools for predatory billionaire
+    contentSnippet: "Epstein files show former UT professor used students to develop AI tools for predatory billionaire Search Query Show Search © 2026 WUOT WUOT 209 Communications Building 1345 Circle Park Drive University of Tennessee Knoxville, TN 37996-0322 Menu Show Search Search Query Donate Play Live Radio Next Up: 0:00 0:00 0:00 0:00 Available On Air Stations On Air Now Playing WUOT On Air Now Playing WUOT-2 All Streams News Epstein files show former UT professor used students to develop AI tools for predato"
+    contentLength: 160597
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://ogc.harvard.edu/file_url/208
+    linkText: "Harvard Office of General Counsel: Review of Epstein-related relationships"
+    claimContext: "The most extensively documented institutional relationship involved Harvard's Program for Evolutionary Dynamics (PED), directed by mathematician and evolutionary dynamics researcher Martin Nowak. Epstein was admitted as a Visiting Fellow in Harvard's Psychology Department for the 2005–2006 academic "
+    fetchedAt: 2026-02-22T02:27:52.998Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 428706
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.insidehighered.com/news/faculty-issues/2026/02/03/9-more-higher-ed-names-epstein-files
+    linkText: "Inside Higher Ed: 9 more higher ed names in Epstein files"
+    claimContext: Some researchers named in the documents have sought to characterize their involvement as limited. Behavioral economist Dan Ariely stated that he had encountered Epstein on only four occasions over nearly a decade and that his correspondence was infrequent, largely logistical, and often mediated by a
+    fetchedAt: 2026-02-22T02:27:51.728Z
+    httpStatus: 200
+    pageTitle: 9 More Higher Ed Names in the Epstein Files
+    contentSnippet: 9 More Higher Ed Names in the Epstein Files --> Skip to main content News Faculty Issues Advertisement February 03, 2026 9 More Higher Ed Names in the Epstein Files Through coffees, phone calls and private flights, at least nine more academics are linked to Jeffrey Epstein in the latest disclosure of documents from the Justice Department. By Emma Whitford You have / 3 articles left. Sign up for a free account or log in. Sign Up, It&rsquo;s FREE Login Jeffrey Epstein (left) talks with former Mass
+    contentLength: 161653
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://bylinetimes.com/2025/12/05/how-epstein-channelled-race-science-and-climate-culling-into-silicon-valleys-ai-elite/
+    linkText: "Byline Times: How Epstein Channelled Race Science and 'Climate Culling' Into Silicon Valley's AI Elite — — Note: Byline Times is an advocacy-oriented publication; claims derived solely from this source are flagged in the text and should be treated as requiring independent corroboration."
+    claimContext: Goertzel served as vice-chairman of Humanity+ (formerly the World Transhumanist Association). Epstein donated \$120,000 to Humanity+, a portion of which covered Goertzel's salary as vice-chairman.[^8] In 2011, Epstein's foundation separately donated \$20,000 to Humanity+.[^4] These figures are repor
+    fetchedAt: 2026-02-22T02:27:52.163Z
+    httpStatus: 200
+    pageTitle: How Epstein Channelled Race Science and 'Climate Culling' Into Silicon Valley’s AI Elite &#8211; Byline Times
+    contentSnippet: "How Epstein Channelled Race Science and &#039;Climate Culling&#039; Into Silicon Valley’s AI Elite &#8211; Byline Times Reportage Special Investigation & The Dangers of Big Tech How Epstein Channelled Race Science and &#8216;Climate Culling&#8217; Into Silicon Valley’s AI Elite The Epstein files expose how racial hierarchy, genetic “optimisation” and even climate-driven population culling circulated inside Big Tech circles Nafeez Ahmed 5 December 2025 Montage: Issie Yewtree Your support matters:"
+    contentLength: 189007
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.aa.com.tr/en/americas/epstein-aided-ai-pioneer-in-securing-hong-kong-funding-report/3831281
+    linkText: "Anadolu Agency: Epstein aided AI pioneer in securing Hong Kong funding"
+    claimContext: "**Hong Kong funding scheme**: Between 2010 and 2015, Epstein pledged at least \\$113,000 to Goertzel, channeled through Humanity+ to Goertzel's company Novamente. This arrangement enabled Novamente to serve as an \"industry sponsor\" for three Hong Kong Polytechnic University research projects, helping"
+    fetchedAt: 2026-02-22T02:27:54.481Z
+    httpStatus: 200
+    pageTitle: "Epstein aided AI pioneer in securing Hong Kong funding: Report"
+    contentSnippet: "Epstein aided AI pioneer in securing Hong Kong funding: Report Americas Epstein aided AI pioneer in securing Hong Kong funding: Report American computer scientist Ben Goertzel received at least $113,000 over five years for his open-source artificial intelligence initiative Berk Kutay Gokmen | 16.02.2026 - Update : 16.02.2026 ISTANBUL Jeffrey Epstein financially supported artificial intelligence (AI) researcher Ben Goertzel and helped him secure at least HK$8.9 million (about $1.14 million) in gr"
+    contentLength: 86154
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://news.mit.edu/2020/mit-releases-results-fact-finding-report-jeffrey-epstein-0110
+    linkText: "MIT News: MIT releases results of fact-finding on engagements with Jeffrey Epstein"
+    claimContext: '**Seth Lloyd**: MIT quantum engineer Seth Lloyd met Epstein in 2004 at a party hosted by John Brockman (literary agent and Edge Foundation founder). Lloyd accepted grants from Epstein in 2012 and 2017 to support his MIT lab.[^10] An MIT fact-finding report concluded that Lloyd "knowingly failed to f'
+    fetchedAt: 2026-02-22T02:27:51.778Z
+    httpStatus: 200
+    pageTitle: MIT releases results of fact-finding on engagements with Jeffrey Epstein | MIT News | Massachusetts Institute of Technology
+    contentSnippet: "MIT releases results of fact-finding on engagements with Jeffrey Epstein | MIT News | Massachusetts Institute of Technology Skip to content ↓ Massachusetts Institute of Technology Search websites, locations, and people See More Results Suggestions or feedback? Enter keywords to search for news articles: Submit Browse By Topics View All → Explore: Machine learning Sustainability Startups Black holes Classes and programs Departments View All → Explore: Aeronautics and Astronautics Brain and Cognit"
+    contentLength: 126442
+    status: verified
+    note: null

@@ -1,0 +1,194 @@
+pageId: situational-awareness-lp
+verifiedAt: 2026-02-22
+totalCitations: 17
+verified: 14
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://situationalawarenesslp.com/about
+    linkText: Situational Awareness LP - About
+    claimContext: '**<EntityLink id="situational-awareness">Situational Awareness</EntityLink> LP (SALP)** is a San Francisco-based hedge fund founded in 2024 by <EntityLink id="leopold-aschenbrenner">Leopold Aschenbrenner</EntityLink>, a former <EntityLink id="openai">OpenAI</EntityLink> researcher who worked on the '
+    fetchedAt: 2026-02-22T02:24:24.449Z
+    httpStatus: 200
+    pageTitle: Situational Awareness
+    contentSnippet: Situational Awareness About Contact About Situational Awareness LP ("SALP") is a San Francisco based investment advisor that invests in companies involved in the development of artificial intelligence ("AI") technology and in companies where AI may have a positive or negative impact. SALP formulates a macro picture of AI development through rigorous research on technological developments and economic analysis. This perspective informs our search to identify winners and those companies that, we b
+    contentLength: 164072
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+    linkText: Leopold Aschenbrenner - Wikipedia
+    claimContext: '**<EntityLink id="situational-awareness">Situational Awareness</EntityLink> LP (SALP)** is a San Francisco-based hedge fund founded in 2024 by <EntityLink id="leopold-aschenbrenner">Leopold Aschenbrenner</EntityLink>, a former <EntityLink id="openai">OpenAI</EntityLink> researcher who worked on the '
+    fetchedAt: 2026-02-22T02:24:23.609Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://fintel.io/i/situational-awareness-lp-5020
+    linkText: Situational Awareness LP - Fintel
+    claimContext: '**<EntityLink id="situational-awareness">Situational Awareness</EntityLink> LP (SALP)** is a San Francisco-based hedge fund founded in 2024 by <EntityLink id="leopold-aschenbrenner">Leopold Aschenbrenner</EntityLink>, a former <EntityLink id="openai">OpenAI</EntityLink> researcher who worked on the '
+    fetchedAt: 2026-02-22T02:24:24.044Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://whalewisdom.com/filer/situational-awareness-lp
+    linkText: Situational Awareness LP - WhaleWisdom
+    claimContext: '**<EntityLink id="situational-awareness">Situational Awareness</EntityLink> LP (SALP)** is a San Francisco-based hedge fund founded in 2024 by <EntityLink id="leopold-aschenbrenner">Leopold Aschenbrenner</EntityLink>, a former <EntityLink id="openai">OpenAI</EntityLink> researcher who worked on the '
+    fetchedAt: 2026-02-22T02:24:24.048Z
+    httpStatus: 200
+    pageTitle: SITUATIONAL AWARENESS LP Top 13F Holdings
+    contentSnippet: SITUATIONAL AWARENESS LP Top 13F Holdings
+    contentLength: 62253
+    status: verified
+    note: null
+  - footnote: 5
+    url: http://oreateai.com/blog/the-rise-of-situational-awareness-in-ai-a-new-player-emerges/ae39b909e103d8f48d4501e4b6b146d8
+    linkText: The Rise of Situational Awareness in AI - Oreate AI Blog
+    claimContext: The fund's investment thesis centers on the belief that artificial intelligence will be the dominant driver of global market returns over the next decade. Rather than investing in private AI startups, SALP focuses exclusively on publicly traded companies expected to benefit from AI advancement—takin
+    fetchedAt: 2026-02-22T02:24:24.631Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 6
+    url: https://fortune.com/2025/10/08/leopold-aschenbrenner-openai-ftx-1-5-billion-hedge-fund-situational-awareness/
+    linkText: Leopold Aschenbrenner OpenAI FTX \$1.5 Billion Hedge Fund - Fortune
+    claimContext: The fund's investment thesis centers on the belief that artificial intelligence will be the dominant driver of global market returns over the next decade. Rather than investing in private AI startups, SALP focuses exclusively on publicly traded companies expected to benefit from AI advancement—takin
+    fetchedAt: 2026-02-22T02:24:25.775Z
+    httpStatus: 200
+    pageTitle: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune
+    contentSnippet: How former OpenAI researcher Leopold Aschenbrenner turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI OpenAI How a 23-year-old former OpenAI researcher turned a viral AI prophecy into profit, with a $1.5 billion hedge fund and outsize influence from Silicon Valley to D.C. By Sharon Goldman Sharon Goldman AI Reporter Down Arrow Button Ico
+    contentLength: 513992
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://situational-awareness.ai
+    linkText: Situational Awareness Website
+    claimContext: "Named after Aschenbrenner's 165-page essay \"Situational Awareness: The Decade Ahead,\" which forecasts AGI emergence by 2025-2026, the fund reflects his broader thesis about rapid AI capability advancement and its economic implications.[^2][^7] The fund attracted prominent Silicon Valley investors in"
+    fetchedAt: 2026-02-22T02:24:26.275Z
+    httpStatus: 200
+    pageTitle: "Introduction - SITUATIONAL AWARENESS: The Decade Ahead"
+    contentSnippet: "Introduction - SITUATIONAL AWARENESS: The Decade Ahead Skip to content Leopold Aschenbrenner, June 2024 You can see the future first in San Francisco. Over the past year, the talk of the town has shifted from $10 billion compute clusters to $100 billion clusters to trillion-dollar clusters. Every six months another zero is added to the boardroom plans. Behind the scenes, there’s a fierce scramble to secure every power contract still available for the rest of the decade, every voltage transformer"
+    contentLength: 67080
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://situational-awareness.ai/leopold-aschenbrenner/
+    linkText: Leopold Aschenbrenner - Situational Awareness Bio
+    claimContext: "Named after Aschenbrenner's 165-page essay \"Situational Awareness: The Decade Ahead,\" which forecasts AGI emergence by 2025-2026, the fund reflects his broader thesis about rapid AI capability advancement and its economic implications.[^2][^7] The fund attracted prominent Silicon Valley investors in"
+    fetchedAt: 2026-02-22T02:24:26.113Z
+    httpStatus: 200
+    pageTitle: About - SITUATIONAL AWARENESS
+    contentSnippet: About - SITUATIONAL AWARENESS Skip to content Hi, I&#8217;m Leopold Aschenbrenner . I recently founded an investment firm focused on AGI, with anchor investments from Patrick Collison, John Collison, Nat Friedman, and Daniel Gross. Before that, I worked on the Superalignment team at OpenAI. In a previous life, I did research on long-run economic growth at Oxford&#8217;s Global Priorities Institute. I originally hail from Germany and now live in the great city of San Francisco, California. You ca
+    contentLength: 60928
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://radientanalytics.com/firm/adv/situational-awareness-lp-333011
+    linkText: Situational Awareness LP - Radient Analytics
+    claimContext: Leopold Aschenbrenner founded Situational Awareness LP in 2024 following his departure from <EntityLink id="openai">OpenAI</EntityLink>, where he worked on the Superalignment team until being fired in April 2024 over an alleged information leak—a characterization he disputes.[^2][^9] Born in Germany
+    fetchedAt: 2026-02-22T02:24:26.002Z
+    httpStatus: 200
+    pageTitle: Radient
+    contentSnippet: Radient
+    contentLength: 5831
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://situational-awareness.ai/wp-content/uploads/2024/06/situationalawareness.pdf
+    linkText: Situational Awareness PDF
+    claimContext: "The fund launched concurrently with Aschenbrenner's publication of \"Situational Awareness: The Decade Ahead\" in June 2024, a detailed essay predicting AGI emergence by 2025-2026 and trillion-dollar AI compute clusters by decade's end.[^7][^10] This essay provided the intellectual foundation for the "
+    fetchedAt: 2026-02-22T02:24:26.089Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 21371840
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://theminermag.com/news/2025-08-19/ai-core-situational-aschenbrenner
+    linkText: AI Core Situational Aschenbrenner - The Miner Mag
+    claimContext: Despite Aschenbrenner's youth (age 23 at founding) and lack of prior professional investing experience, the fund raised over \$1.5 billion quickly from high-profile backers.[^6][^11] The investor base expanded to include West Coast technology founders, family offices, institutional investors, and en
+    fetchedAt: 2026-02-22T02:24:29.319Z
+    httpStatus: 200
+    pageTitle: AI Hedge Fund Situational Awareness Builds 5.8% Stake in Core Scientific | TheEnergyMag
+    contentSnippet: "Loading News... AI Hedge Fund Situational Awareness Builds 5.8% Stake in Core Scientific | TheEnergyMag ← Back to Home Situational Awareness, the hedge fund founded by 23-year-old AI influencer and former OpenAI researcher Leopold Aschenbrenner, has amassed a substantial position in Core Scientific (NASDAQ: CORZ) . According to a regulatory filing on Tuesday, the San Francisco-based firm disclosed the purchase of 17.7 million shares in the bitcoin mining and data center operator, giving it a 5.8"
+    contentLength: 65363
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://digitaleconomy.stanford.edu/event/leopold-aschenbrenner-situational-awareness/
+    linkText: Leopold Aschenbrenner Situational Awareness - Stanford Digital Economy Lab
+    claimContext: '- **June 2024**: Publishes "Situational Awareness: The Decade Ahead" essay; launches Situational Awareness LP with anchor investments[^2][^7] - **September 2024**: Aschenbrenner speaks at Stanford Digital Economy Lab fireside chat on AGI themes[^12] - **First Half 2025**: Fund delivers 47% returns a'
+    fetchedAt: 2026-02-22T02:24:27.583Z
+    httpStatus: 200
+    pageTitle: "Leopold Aschenbrenner: Situational Awareness - Stanford Digital Economy Lab"
+    contentSnippet: "Leopold Aschenbrenner: Situational Awareness - Stanford Digital Economy Lab Skip to content Stanford University The Stanford Institute for Human-Centered AI Monday, September 30, 2024 Leopold Aschenbrenner: Situational Awareness Hybrid Seminar The DEL Seminar Series is proud to host a diverse roster of bright minds from around the world to discuss various subjects surrounding economics and technology. Date Monday, September 30, 2024 Share this event Copy link Leopold Aschenbrenner joined Erik Br"
+    contentLength: 105293
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://situationalawarenesslp.com
+    linkText: Situational Awareness LP - Homepage
+    claimContext: "Rather than pursuing private equity investments in AI startups, SALP focuses on identifying publicly traded companies positioned to benefit from AI advancement. The strategy employs both long and short positions: taking long positions in semiconductors, infrastructure, and power companies expected t"
+    fetchedAt: 2026-02-22T02:24:27.329Z
+    httpStatus: 200
+    pageTitle: Situational Awareness
+    contentSnippet: Situational Awareness About Contact Situational Awareness is a global equity investor focused on Artificial Intelligence (AI). Headquartered in San Francisco, Situational Awareness was founded by Leopold Aschenbrenner in September 2024. Situational Awareness is a global equity investor focused on Artificial Intelligence (AI). Headquartered in San Francisco, Situational Awareness was founded by Leopold Aschenbrenner in September 2024. Situational Awareness believes that AI will be the dominant dr
+    contentLength: 163267
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://situational-awareness.ai/superalignment/
+    linkText: "Situational Awareness: Superalignment"
+    claimContext: "The fund shares its name and intellectual foundation with Aschenbrenner's essay \"Situational Awareness: The Decade Ahead,\" published in June 2024.[^7][^10] This 165-page document presents a detailed forecast of AI development, predicting AGI emergence by 2025-2026 and superintelligence by the end of"
+    fetchedAt: 2026-02-22T02:24:27.351Z
+    httpStatus: 200
+    pageTitle: IIIc. Superalignment - SITUATIONAL AWARENESS
+    contentSnippet: "IIIc. Superalignment - SITUATIONAL AWARENESS Skip to content Reliably controlling AI systems much smarter than we are is an unsolved technical problem. And while it is a solvable problem, things could very easily go off the rails during a rapid intelligence explosion. Managing this will be extremely tense; failure could easily be catastrophic. In this piece: Toggle The old sorcerer Has finally gone away! Now the spirits he controls Shall obey my commands. … I shall work wonders too. … Sir, I&#82"
+    contentLength: 149178
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.lesswrong.com/posts/EGGruXRxGQx6RQt8x/situational-awareness-a-one-year-retrospective
+    linkText: "Situational Awareness: A One-Year Retrospective - LessWrong"
+    claimContext: "The essay's core arguments about rapid AI capability scaling through three drivers—raw compute growth, algorithmic efficiency improvements, and \"unhobbling\" gains that unlock latent capabilities—directly inform the fund's investment thesis.[^14][^15] Aschenbrenner's prediction of trillion-dollar AI "
+    fetchedAt: 2026-02-22T02:24:27.938Z
+    httpStatus: 200
+    pageTitle: "Situational Awareness: A One-Year Retrospective — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Situational Awareness: A One-Year Retrospective — LessWrong Situational Awareness Postmortems & Retrospectives Forecasting & Prediction Frontpage 82 Situational Awareness: A One-Year Retrospective by Nathan Delisle 23rd Jun 2025 14 min read 4 82 tl;dr: Many critiques of *Situational Awareness* have been qualitative; one year later we can check the numbers. I did my bes"
+    contentLength: 669790
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.lesswrong.com/events/bzwvTpsMQApSd6iZL/situational-awareness
+    linkText: Situational Awareness Book Club - LessWrong
+    claimContext: Within AI safety communities, the essay sparked extensive debate about AI timelines, alignment challenges, and preparedness for advanced AI systems.[^14][^16] While some praised its detailed forecasts and strategic clarity, critics challenged its optimism about alignment solvability and raised conce
+    fetchedAt: 2026-02-22T02:24:30.777Z
+    httpStatus: 200
+    pageTitle: Situational Awareness — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Situational Awareness — LessWrong AI Event 6 Situational Awareness by jenn LW SSC Add to calendar 2 min read 0 6 Thursday 20th June 2024 at 11:00 pm to Friday 21st June 2024 at 2:30 am GMT 75 King Street South, Waterloo, ON, Canada The host has requested RSVPs for this event Going Maybe Can&#x27;t Go Meet inside The Shops at Waterloo Town Square - we will congregate in
+    contentLength: 316125
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://forum.effectivealtruism.org/posts/RTHFCRLv34cewwMr6/response-to-aschenbrenner-s-situational-awareness
+    linkText: Response to Aschenbrenner's Situational Awareness - EA Forum
+    claimContext: Within AI safety communities, the essay sparked extensive debate about AI timelines, alignment challenges, and preparedness for advanced AI systems.[^14][^16] While some praised its detailed forecasts and strategic clarity, critics challenged its optimism about alignment solvability and raised conce
+    fetchedAt: 2026-02-22T02:24:30.806Z
+    httpStatus: 200
+    pageTitle: Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum
+    contentSnippet: 'Response to Aschenbrenner&#x27;s "Situational Awareness" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Response to Aschenbrenner&#x27;s "Situational Awareness" by RobBensinger Jun 6 2024 4 min read 14 111 AI safety Opinion Frontpage ( Cross-posted from Twitter. ) My take on Leopold Aschenbrenner&#x27;s new report : I think Leopold gets it right on a bunch of important counts. Three that I especially care '
+    contentLength: 324781
+    status: verified
+    note: null

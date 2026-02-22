@@ -1,0 +1,18 @@
+pageId: ai-talent-market-dynamics
+verifiedAt: 2026-02-22
+totalCitations: 1
+verified: 1
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 2
+    url: https://www.vox.com/future-perfect/2024/5/17/24158478/openai-departures-sam-altman-employees-chat-gpt-artificial-intelligence
+    linkText: Reporting on OpenAI Superalignment team departures, May-July 2024
+    claimContext: "2. **Organizational departures and their interpretation**: When groups of safety researchers depart a lab—as occurred with <EntityLink id=\"openai\">OpenAI</EntityLink>'s Superalignment team in 2024[^2]—this can be interpreted in multiple ways: as a loss of institutional knowledge and project continui"
+    fetchedAt: 2026-02-22T02:28:27.620Z
+    httpStatus: 200
+    pageTitle: "OpenAI departures: Why can’t former employees talk, but the new ChatGPT release can? | Vox"
+    contentSnippet: "OpenAI departures: Why can’t former employees talk, but the new ChatGPT release can? | Vox Skip to main content The homepage Vox Vox logo Menu The homepage Vox Vox logo Navigation Drawer Login / Sign Up close Close Search Become a Member Facebook Instagram Youtube RSS TikTok We need your support in 2026 When news breaks, you need to understand what actually matters. At Vox, our mission is to help you make sense of the world — and that work has never been more vital. But we can’t do it on our own"
+    contentLength: 296977
+    status: verified
+    note: null
