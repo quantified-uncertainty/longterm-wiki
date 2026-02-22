@@ -35,7 +35,7 @@ function SidebarNavSection({ section }: { section: NavSection }) {
     >
       <SidebarGroup>
         <SidebarGroupLabel asChild>
-          <CollapsibleTrigger className="flex w-full items-center justify-between">
+          <CollapsibleTrigger className="flex w-full items-center justify-between hover:bg-accent hover:text-accent-foreground rounded-md transition-colors">
             <span>{section.title}</span>
             <ChevronRight className="h-3.5 w-3.5 transition-transform group-data-[state=open]/collapsible:rotate-90" />
           </CollapsibleTrigger>
@@ -64,7 +64,7 @@ function SidebarNavSection({ section }: { section: NavSection }) {
 
 function SidebarNav({ sections }: { sections: NavSection[] }) {
   return (
-    <SidebarContent className="pt-2">
+    <SidebarContent className="pt-4">
       {sections.map((section) => (
         <SidebarNavSection key={section.title} section={section} />
       ))}
@@ -88,7 +88,7 @@ export function WikiSidebar({ sections }: { sections: NavSection[] }) {
   return (
     <>
       {/* Desktop: static sidebar */}
-      <Sidebar className="sticky top-14 h-[calc(100vh-3.5rem)] border-r-0">
+      <Sidebar className="sticky top-14 h-[calc(100vh-3.5rem)] border-r border-border/50 bg-muted/30">
         <SidebarNav sections={sections} />
       </Sidebar>
 
