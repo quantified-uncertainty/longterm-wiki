@@ -78,11 +78,15 @@ export interface CitationQuote {
   pageId: string;
   footnote: number;
   url: string | null;
+  resourceId: string | null;
   claimText: string;
+  claimContext: string | null;
   sourceQuote: string | null;
+  sourceLocation: string | null;
   quoteVerified: boolean;
   verificationScore: number | null;
   sourceTitle: string | null;
+  sourceType: string | null;
   accuracyVerdict: string | null;
   accuracyScore: number | null;
 }
