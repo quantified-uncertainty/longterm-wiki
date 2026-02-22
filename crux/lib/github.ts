@@ -130,3 +130,31 @@ export async function githubApi<T = unknown>(
 
   return (await resp.json()) as T;
 }
+
+/**
+ * Paginate a GitHub API list endpoint.
+ *
+ * Fetches all pages (up to maxPages) of a list endpoint that returns arrays.
+ * Uses the page query parameter since the GitHub REST API supports it on all
+ * list endpoints.
+ *
+ * @param endpoint - API path with query params (e.g. `/repos/.../issues?state=open&per_page=100`)
+ * @param maxPages - Safety limit to prevent runaway pagination (default: 5)
+ */
+export async function githubApiPaginated<T>(
+  endpoint: string,
+  maxPages = 5,
+): Promise<T[]> {
+  const allItems: T[] = [];
+  const separator = endpoint.includes('?') ? '&' : '?';
+
+  for (let page = 1; page <= maxPages; page++) {
+    const items = await githubApi<T[]>(`${endpoint}${separator}page=${page}`);
+    if (!Array.isArray(items) || items.length === 0) break;
+    allItems.push(...items);
+    // If we got fewer than the per_page limit, we're on the last page
+    if (items.length < 100) break;
+  }
+
+  return allItems;
+}

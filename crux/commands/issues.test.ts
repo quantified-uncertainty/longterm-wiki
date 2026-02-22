@@ -17,6 +17,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('../lib/github.ts', () => ({
   REPO: 'quantified-uncertainty/longterm-wiki',
   githubApi: vi.fn(),
+  githubApiPaginated: vi.fn(),
 }));
 
 // Also mock execSync used by currentBranch()
@@ -28,6 +29,7 @@ import { commands, scoreIssue, isBlocked, findPotentialDuplicates, extractModel,
 import * as githubLib from '../lib/github.ts';
 
 const mockGithubApi = vi.mocked(githubLib.githubApi);
+const mockGithubApiPaginated = vi.mocked(githubLib.githubApiPaginated);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -216,14 +218,14 @@ describe('issues list — priority ranking', () => {
   });
 
   it('returns CommandResult with output and exitCode=0', async () => {
-    mockGithubApi.mockResolvedValueOnce([]);
+    mockGithubApiPaginated.mockResolvedValueOnce([]);
     const result = await commands.list([], {});
     expect(result).toHaveProperty('output');
     expect(result).toHaveProperty('exitCode', 0);
   });
 
   it('ranks P0 issues above unlabeled issues', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 10, title: 'Unlabeled issue', labels: [], created_at: '2026-01-01T00:00:00Z' }),
       makeIssue({ number: 20, title: 'P0 urgent issue', labels: ['P0'], created_at: '2026-02-01T00:00:00Z' }),
     ]);
@@ -236,7 +238,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('ranks P1 above P2 above P3 above unlabeled', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 3, title: 'P3 issue', labels: ['P3'] }),
       makeIssue({ number: 1, title: 'P1 issue', labels: ['P1'] }),
       makeIssue({ number: 99, title: 'Unlabeled', labels: [] }),
@@ -253,7 +255,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('within same priority, older issues rank higher', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 5, title: 'Newer P1', labels: ['P1'], created_at: '2026-02-01T00:00:00Z', updated_at: '2026-02-01T00:00:00Z' }),
       makeIssue({ number: 3, title: 'Older P1', labels: ['P1'], created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }),
     ]);
@@ -264,7 +266,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('separates claude-working issues into In Progress section', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 10, title: 'Normal issue', labels: [] }),
       makeIssue({ number: 20, title: 'Active issue', labels: ['claude-working'] }),
     ]);
@@ -276,7 +278,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('separates blocked issues into Blocked section', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 10, title: 'Normal issue', labels: [] }),
       makeIssue({ number: 30, title: 'Blocked issue', labels: ['blocked'] }),
     ]);
@@ -291,7 +293,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('excludes wontfix and invalid issues', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'Valid issue', labels: [] }),
       makeIssue({ number: 2, title: 'Wontfix', labels: ['wontfix'] }),
       makeIssue({ number: 3, title: 'Invalid', labels: ['invalid'] }),
@@ -305,7 +307,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('skips pull requests (issues with pull_request field)', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'Real issue' }),
       makeIssue({ number: 2, title: 'PR not an issue', pull_request: { url: 'https://...' } }),
     ]);
@@ -315,14 +317,14 @@ describe('issues list — priority ranking', () => {
   });
 
   it('shows zero count message for empty list', async () => {
-    mockGithubApi.mockResolvedValueOnce([]);
+    mockGithubApiPaginated.mockResolvedValueOnce([]);
     const result = await commands.list([], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('0');
   });
 
   it('returns JSON array when --json flag set', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 42, title: 'JSON test issue', labels: ['P1'] }),
     ]);
     const result = await commands.list([], { json: true });
@@ -336,7 +338,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('shows score breakdown when --scores flag set', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 5, title: 'Bug issue', labels: ['P1', 'bug'] }),
     ]);
     const result = await commands.list([], { scores: true });
@@ -346,7 +348,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('bug label boosts ranking above same-priority non-bug', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 10, title: 'P2 bug', labels: ['P2', 'bug'], created_at: '2026-02-01T00:00:00Z', updated_at: '2026-02-01T00:00:00Z' }),
       makeIssue({ number: 20, title: 'P2 feature', labels: ['P2'], created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }),
     ]);
@@ -357,7 +359,7 @@ describe('issues list — priority ranking', () => {
   });
 
   it('claude-ready label boosts ranking', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 10, title: 'P2 claude-ready', labels: ['P2', 'claude-ready'], created_at: '2026-02-01T00:00:00Z', updated_at: '2026-02-01T00:00:00Z' }),
       makeIssue({ number: 20, title: 'P2 plain', labels: ['P2'], created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' }),
     ]);
@@ -378,14 +380,14 @@ describe('issues next', () => {
   });
 
   it('returns message when no issues available', async () => {
-    mockGithubApi.mockResolvedValueOnce([]);
+    mockGithubApiPaginated.mockResolvedValueOnce([]);
     const result = await commands.next([], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('No open issues');
   });
 
   it('returns message when all issues are claude-working', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, labels: ['claude-working'] }),
     ]);
     const result = await commands.next([], {});
@@ -394,7 +396,7 @@ describe('issues next', () => {
   });
 
   it('shows the highest-priority issue with start command hint', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 5, title: 'Low priority', labels: ['P3'] }),
       makeIssue({ number: 1, title: 'High priority', labels: ['P0'] }),
     ]);
@@ -406,7 +408,7 @@ describe('issues next', () => {
   });
 
   it('excludes blocked issues from recommendation', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'P0 but blocked', labels: ['P0', 'blocked'] }),
       makeIssue({ number: 2, title: 'P1 not blocked', labels: ['P1'] }),
     ]);
@@ -418,7 +420,7 @@ describe('issues next', () => {
   });
 
   it('shows blocked issues in a separate section', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'P0 but blocked', labels: ['P0', 'blocked'] }),
       makeIssue({ number: 2, title: 'P1 not blocked', labels: ['P1'] }),
     ]);
@@ -428,7 +430,7 @@ describe('issues next', () => {
   });
 
   it('reports when all issues are blocked or in-progress', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, labels: ['blocked'] }),
       makeIssue({ number: 2, labels: ['claude-working'] }),
     ]);
@@ -438,7 +440,7 @@ describe('issues next', () => {
   });
 
   it('returns JSON object when --json flag set', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 7, title: 'Next issue', labels: ['P1'] }),
     ]);
     const result = await commands.next([], { json: true });
@@ -451,7 +453,7 @@ describe('issues next', () => {
   });
 
   it('shows score breakdown when --scores flag set', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 7, title: 'Next issue', labels: ['P1', 'bug'] }),
     ]);
     const result = await commands.next([], { scores: true });
@@ -537,7 +539,7 @@ describe('issues cleanup', () => {
   });
 
   it('reports all clean when no claude-working issues and no duplicates', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'Unique issue A' }),
       makeIssue({ number: 2, title: 'Completely different B' }),
     ]);
@@ -549,7 +551,7 @@ describe('issues cleanup', () => {
 
   it('detects stale claude-working when branch does not exist', async () => {
     // First call: fetchOpenIssues
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 10, title: 'WIP issue', labels: ['claude-working'] }),
     ]);
     // Second call: fetch comments for issue #10
@@ -1045,7 +1047,7 @@ describe('issues lint — batch (all issues)', () => {
 
   it('returns exit code 0 when all issues pass', async () => {
     const goodBody = '## Problem\n\nDetailed description.\n\n## Recommended Model\n\nHaiku\n\n## Acceptance Criteria\n\n- [ ] Done';
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'Issue 1', body: goodBody }),
     ]);
     const result = await commands.lint([], {});
@@ -1054,7 +1056,7 @@ describe('issues lint — batch (all issues)', () => {
   });
 
   it('returns exit code 1 and summary when some issues fail', async () => {
-    mockGithubApi.mockResolvedValueOnce([
+    mockGithubApiPaginated.mockResolvedValueOnce([
       makeIssue({ number: 1, title: 'Empty issue', body: '' }),
       makeIssue({ number: 2, title: 'Another empty', body: null }),
     ]);

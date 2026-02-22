@@ -31,38 +31,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-16
 
+      - name: Parse DATABASE_URL
+        id: db
+        uses: ./.github/actions/parse-database-url
+        with:
+          database_url: ${{ secrets.DATABASE_URL }}
+
       - name: Create database backup
         id: backup
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "::error::DATABASE_URL secret is not set"
-            exit 1
-          fi
-
-          # Parse DATABASE_URL
-          PROTO="$(echo "$DATABASE_URL" | grep :// | sed -e 's,^\(.*://\).*,\1,g')"
-          URL="${DATABASE_URL/$PROTO/}"
-          USERPASS="$(echo "$URL" | cut -d@ -f1)"
-          HOSTPORT_DB="$(echo "$URL" | cut -d@ -f2)"
-          DB_USER="$(echo "$USERPASS" | cut -d: -f1)"
-          DB_PASS="$(echo "$USERPASS" | cut -d: -f2)"
-          DB_HOST="$(echo "$HOSTPORT_DB" | cut -d: -f1)"
-          DB_PORT="$(echo "$HOSTPORT_DB" | cut -d: -f2 | cut -d/ -f1)"
-          DB_NAME="$(echo "$HOSTPORT_DB" | cut -d/ -f2 | cut -d? -f1)"
-
           PREFIX="${{ inputs.backup_prefix || 'scheduled' }}"
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
           FILENAME="longterm-wiki-${PREFIX}-${TIMESTAMP}.sql.gz"
           echo "backup_filename=${FILENAME}" >> "$GITHUB_OUTPUT"
 
           echo "Creating backup: ${FILENAME}"
-          PGPASSWORD="${DB_PASS}" pg_dump \
-            -h "${DB_HOST}" \
-            -p "${DB_PORT}" \
-            -U "${DB_USER}" \
-            -d "${DB_NAME}" \
+          PGPASSWORD="${{ steps.db.outputs.db-pass }}" pg_dump \
+            -h "${{ steps.db.outputs.db-host }}" \
+            -p "${{ steps.db.outputs.db-port }}" \
+            -U "${{ steps.db.outputs.db-user }}" \
+            -d "${{ steps.db.outputs.db-name }}" \
             --no-owner \
             --no-privileges \
             --verbose 2>/tmp/pg_dump.log \

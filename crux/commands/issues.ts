@@ -14,7 +14,7 @@
  */
 
 import { createLogger, type Colors } from '../lib/output.ts';
-import { githubApi, REPO } from '../lib/github.ts';
+import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 
@@ -342,11 +342,10 @@ async function applyModelLabel(issueNum: number, model: ModelName, existingLabel
 }
 
 async function fetchOpenIssues(): Promise<RankedIssue[]> {
-  const data = await githubApi<GitHubIssueResponse[]>(
+  // Paginate to fetch all open issues (GitHub returns max 100 per page) (#285)
+  const data = await githubApiPaginated<GitHubIssueResponse>(
     `/repos/${REPO}/issues?state=open&per_page=100&sort=created&direction=asc`
   );
-
-  if (!Array.isArray(data)) return [];
 
   return data
     .filter(i => !i.pull_request)
