@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
+import { GITHUB_REPO_URL } from "@lib/site-config";
 import type { AgentSessionRow } from "./page";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
@@ -126,7 +127,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
         return <span className="text-xs text-muted-foreground/50">—</span>;
       return (
         <a
-          href={`https://github.com/quantified-uncertainty/longterm-wiki/issues/${num}`}
+          href={`${GITHUB_REPO_URL}/issues/${num}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-blue-600 hover:underline tabular-nums"

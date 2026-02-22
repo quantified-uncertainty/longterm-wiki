@@ -24,7 +24,7 @@ vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/test-branch-ABC'),
 }));
 
-import { commands, scoreIssue, isBlocked, findPotentialDuplicates } from './issues.ts';
+import { commands, scoreIssue, isBlocked, findPotentialDuplicates, extractModel, checkIssueSections, buildIssueBody } from './issues.ts';
 import * as githubLib from '../lib/github.ts';
 
 const mockGithubApi = vi.mocked(githubLib.githubApi);
@@ -581,5 +581,439 @@ describe('issues close — input validation', () => {
   it('returns usage error for non-numeric arg', async () => {
     const result = await commands.close(['abc'], {});
     expect(result.exitCode).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// extractModel unit tests
+// ---------------------------------------------------------------------------
+
+describe('extractModel', () => {
+  it('extracts model from ## Recommended Model section header', () => {
+    const body = '## Recommended Model\n\n**Sonnet** — well-scoped for this model.';
+    expect(extractModel('Some issue', body)).toBe('sonnet');
+  });
+
+  it('extracts model from ## Recommended Model (case-insensitive header)', () => {
+    const body = '## RECOMMENDED MODEL\n\nOpus — complex reasoning required.';
+    expect(extractModel('Some issue', body)).toBe('opus');
+  });
+
+  it('extracts haiku from section', () => {
+    const body = '## Recommended Model\n\nHaiku — simple task.';
+    expect(extractModel('Some issue', body)).toBe('haiku');
+  });
+
+  it('extracts model from [model] in title', () => {
+    expect(extractModel('Fix bug [sonnet]', '')).toBe('sonnet');
+  });
+
+  it('extracts model from [model] suffix case-insensitive', () => {
+    expect(extractModel('Add feature [OPUS]', '')).toBe('opus');
+  });
+
+  it('returns null when no model specified', () => {
+    expect(extractModel('Some issue', 'Just a plain body with no model info')).toBeNull();
+  });
+
+  it('does NOT match bold model name outside recommended section context', () => {
+    // This is a Shakespearean sonnet reference — should not be detected
+    const body = 'This poem is a **sonnet** in the classical style.';
+    expect(extractModel('Some title', body)).toBeNull();
+  });
+
+  it('title takes precedence check — section match works independently', () => {
+    // Section match should work even without title format
+    const body = '## Recommended Model\n\nhaiku — quick task';
+    expect(extractModel('No title format here', body)).toBe('haiku');
+  });
+
+  it('returns null for empty body and plain title', () => {
+    expect(extractModel('Simple issue title', '')).toBeNull();
+  });
+
+  it('handles model in section with blank line separator', () => {
+    const body = '## Problem\n\nSome problem.\n\n## Recommended Model\n\n**Opus**\n\nMore text.';
+    expect(extractModel('Issue', body)).toBe('opus');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkIssueSections unit tests
+// ---------------------------------------------------------------------------
+
+describe('checkIssueSections', () => {
+  it('returns [body too short] for empty body', () => {
+    const missing = checkIssueSections('Title', '');
+    expect(missing).toContain('body (too short or empty)');
+    expect(missing.length).toBe(1);
+  });
+
+  it('returns [body too short] for very short body', () => {
+    const missing = checkIssueSections('Title', 'Short.');
+    expect(missing).toContain('body (too short or empty)');
+  });
+
+  it('returns no missing sections for well-formatted issue', () => {
+    const body = [
+      '## Problem',
+      '',
+      'The system does X but should do Y when Z happens.',
+      '',
+      '## Recommended Model',
+      '',
+      '**Sonnet** — well-scoped for this model.',
+      '',
+      '## Acceptance Criteria',
+      '',
+      '- [ ] Fix is implemented',
+      '- [ ] Tests pass',
+    ].join('\n');
+    const missing = checkIssueSections('Fix issue [sonnet]', body);
+    expect(missing).toEqual([]);
+  });
+
+  it('flags missing Acceptance Criteria when no checkboxes present', () => {
+    const body = [
+      '## Problem',
+      '',
+      'The system does X but should do Y. This is a long description of the problem.',
+      '',
+      '## Recommended Model',
+      '',
+      'Sonnet',
+    ].join('\n');
+    const missing = checkIssueSections('Issue title', body);
+    expect(missing.some(m => m.includes('Acceptance Criteria'))).toBe(true);
+  });
+
+  it('accepts checkboxes as criteria even without ## section', () => {
+    const body = [
+      '## Problem',
+      '',
+      'Fix the widget rendering bug that causes layout issues.',
+      '- [ ] Fix applied',
+      '- [ ] Tests pass',
+      '## Recommended Model',
+      '',
+      'Haiku',
+    ].join('\n');
+    const missing = checkIssueSections('Issue', body);
+    expect(missing.some(m => m.includes('Acceptance Criteria'))).toBe(false);
+  });
+
+  it('flags missing Recommended Model', () => {
+    const body = [
+      '## Problem',
+      '',
+      'Something needs to be fixed here. This is detailed enough.',
+      '',
+      '## Acceptance Criteria',
+      '',
+      '- [ ] Done',
+    ].join('\n');
+    const missing = checkIssueSections('Plain title', body);
+    expect(missing.some(m => m.includes('Recommended Model'))).toBe(true);
+  });
+
+  it('accepts [model] in title as model recommendation', () => {
+    const body = [
+      '## Problem',
+      '',
+      'Fix the bug that happens when user logs in.',
+      '',
+      '## Acceptance Criteria',
+      '',
+      '- [ ] Bug fixed',
+    ].join('\n');
+    const missing = checkIssueSections('Fix login bug [haiku]', body);
+    expect(missing.some(m => m.includes('Recommended Model'))).toBe(false);
+  });
+
+  it('accepts long freeform body (>300 chars) as having a problem section', () => {
+    // >300 chars of freeform text counts as having a "problem" section
+    const body = 'A'.repeat(301) + '\n\n- [ ] Done\n\n## Recommended Model\n\nHaiku';
+    const missing = checkIssueSections('Title', body);
+    expect(missing.some(m => m.includes('Problem'))).toBe(false);
+  });
+
+  it('flags multiple missing sections at once', () => {
+    // Body is long enough (>80 chars) but missing criteria and model
+    const body = '## Problem\n\nSomething is broken and needs to be fixed. This is a detailed description of the issue that exceeds 80 characters.';
+    const missing = checkIssueSections('Title', body);
+    // Should be missing criteria and model, not body-length
+    expect(missing.some(m => m.includes('Acceptance Criteria'))).toBe(true);
+    expect(missing.some(m => m.includes('Recommended Model'))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildIssueBody unit tests
+// ---------------------------------------------------------------------------
+
+describe('buildIssueBody', () => {
+  it('builds body with problem section', () => {
+    const body = buildIssueBody({ problem: 'The widget breaks on mobile.' });
+    expect(body).toContain('## Problem');
+    expect(body).toContain('The widget breaks on mobile.');
+  });
+
+  it('builds body with proposed fix section', () => {
+    const body = buildIssueBody({ fix: 'Use responsive CSS.' });
+    expect(body).toContain('## Proposed Fix');
+    expect(body).toContain('Use responsive CSS.');
+  });
+
+  it('does NOT add Dependencies section when no deps specified', () => {
+    const body = buildIssueBody({ problem: 'Some problem here.' });
+    expect(body).not.toContain('## Dependencies');
+    expect(body).not.toContain('None.');
+  });
+
+  it('adds Dependencies section when deps specified', () => {
+    const body = buildIssueBody({ depends: '123,456' });
+    expect(body).toContain('## Dependencies');
+    expect(body).toContain('#123');
+    expect(body).toContain('#456');
+  });
+
+  it('strips leading # from dependency numbers', () => {
+    const body = buildIssueBody({ depends: '#100,#200' });
+    // Should produce `#100, #200` not `##100, ##200`
+    expect(body).toContain('#100');
+    expect(body).not.toContain('##100');
+  });
+
+  it('builds Recommended Model section', () => {
+    const body = buildIssueBody({ model: 'sonnet' });
+    expect(body).toContain('## Recommended Model');
+    expect(body).toContain('**Sonnet**');
+  });
+
+  it('capitalizes model name in section', () => {
+    const body = buildIssueBody({ model: 'haiku' });
+    expect(body).toContain('**Haiku**');
+  });
+
+  it('includes cost note when cost specified', () => {
+    const body = buildIssueBody({ model: 'sonnet', cost: '~$2-4' });
+    expect(body).toContain('~$2-4');
+  });
+
+  it('builds acceptance criteria as checkboxes', () => {
+    const body = buildIssueBody({ criteria: 'Fix applied|Tests pass|CI green' });
+    expect(body).toContain('## Acceptance Criteria');
+    expect(body).toContain('- [ ] Fix applied');
+    expect(body).toContain('- [ ] Tests pass');
+    expect(body).toContain('- [ ] CI green');
+  });
+
+  it('returns empty string when no opts provided', () => {
+    const body = buildIssueBody({});
+    expect(body).toBe('');
+  });
+
+  it('sections are separated by double newlines', () => {
+    const body = buildIssueBody({ problem: 'A', fix: 'B' });
+    expect(body).toContain('## Problem\n\nA\n\n## Proposed Fix\n\nB');
+  });
+
+  it('well-formed generated body passes checkIssueSections', () => {
+    const body = buildIssueBody({
+      problem: 'The widget fails on mobile devices due to viewport issues.',
+      model: 'sonnet',
+      criteria: 'Fix applied|Tests pass',
+    });
+    const missing = checkIssueSections('Fix widget [sonnet]', body);
+    expect(missing).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// create command — validation and structured args
+// ---------------------------------------------------------------------------
+
+describe('issues create — validation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns usage error when no title provided', async () => {
+    const result = await commands.create([], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Usage');
+  });
+
+  it('rejects invalid --model value', async () => {
+    const result = await commands.create(['My issue title'], { model: 'gpt4' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Invalid --model');
+    expect(result.output).toContain('gpt4');
+  });
+
+  it('accepts valid --model values', async () => {
+    mockGithubApi.mockResolvedValueOnce({ number: 100, html_url: 'https://github.com/test/issues/100', title: 'My issue' });
+    const result = await commands.create(['My issue title'], { model: 'sonnet', problem: 'Something is broken.' });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('#100');
+  });
+
+  it('warns when no body provided', async () => {
+    mockGithubApi.mockResolvedValueOnce({ number: 101, html_url: 'https://github.com/test/issues/101', title: 'My issue' });
+    const result = await commands.create(['My issue title'], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('No body provided');
+  });
+
+  it('builds structured body from template args', async () => {
+    mockGithubApi.mockResolvedValueOnce({ number: 102, html_url: 'https://github.com/test/issues/102', title: 'Structured issue' });
+    const result = await commands.create(['Structured issue'], {
+      problem: 'Widget is broken.',
+      model: 'haiku',
+      criteria: 'Fixed|Tests pass',
+    });
+    expect(result.exitCode).toBe(0);
+    // Check that github API was called with a structured body
+    expect(mockGithubApi).toHaveBeenCalledWith(
+      expect.stringContaining('/issues'),
+      expect.objectContaining({
+        body: expect.objectContaining({
+          body: expect.stringContaining('## Problem'),
+        }),
+      })
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// lint command — single issue and batch
+// ---------------------------------------------------------------------------
+
+describe('issues lint — single issue', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns PASS for well-formatted issue', async () => {
+    const wellFormedBody = [
+      '## Problem',
+      '',
+      'The widget breaks on mobile.',
+      '',
+      '## Recommended Model',
+      '',
+      '**Haiku** — simple fix.',
+      '',
+      '## Acceptance Criteria',
+      '',
+      '- [ ] Fixed',
+    ].join('\n');
+    mockGithubApi.mockResolvedValueOnce({
+      number: 42,
+      title: 'Fix mobile widget',
+      body: wellFormedBody,
+      labels: [],
+      html_url: 'https://github.com/test/issues/42',
+    });
+
+    const result = await commands.lint(['42'], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('PASS');
+  });
+
+  it('returns FAIL and exit code 1 for issue missing body', async () => {
+    mockGithubApi.mockResolvedValueOnce({
+      number: 99,
+      title: 'Issue with no body',
+      body: '',
+      labels: [],
+      html_url: 'https://github.com/test/issues/99',
+    });
+
+    const result = await commands.lint(['99'], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('FAIL');
+    expect(result.output).toContain('Missing');
+  });
+
+  it('rejects pull request numbers with error', async () => {
+    mockGithubApi.mockResolvedValueOnce({
+      number: 50,
+      title: 'Some PR',
+      body: 'PR body',
+      labels: [],
+      html_url: 'https://github.com/test/pull/50',
+      pull_request: { url: 'https://...' },
+    });
+
+    const result = await commands.lint(['50'], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('pull request');
+  });
+});
+
+describe('issues lint — batch (all issues)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns exit code 0 when all issues pass', async () => {
+    const goodBody = '## Problem\n\nDetailed description.\n\n## Recommended Model\n\nHaiku\n\n## Acceptance Criteria\n\n- [ ] Done';
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 1, title: 'Issue 1', body: goodBody }),
+    ]);
+    const result = await commands.lint([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('0 fail');
+  });
+
+  it('returns exit code 1 and summary when some issues fail', async () => {
+    mockGithubApi.mockResolvedValueOnce([
+      makeIssue({ number: 1, title: 'Empty issue', body: '' }),
+      makeIssue({ number: 2, title: 'Another empty', body: null }),
+    ]);
+    const result = await commands.lint([], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('FAIL');
+    expect(result.output).toContain('Summary:');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// update-body command — validation
+// ---------------------------------------------------------------------------
+
+describe('issues update-body — validation', () => {
+  it('returns usage error when no issue number provided', async () => {
+    const result = await commands['update-body']([], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Usage');
+  });
+
+  it('returns usage error for non-numeric arg', async () => {
+    const result = await commands['update-body'](['abc'], {});
+    expect(result.exitCode).toBe(1);
+  });
+
+  it('rejects invalid --model value', async () => {
+    const result = await commands['update-body'](['123'], { model: 'claude-3' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Invalid --model');
+  });
+
+  it('returns error when no structured args provided', async () => {
+    // Note: updateBody fetches the issue first before checking args,
+    // but if no args provided, buildIssueBody returns empty string
+    // and the command returns an error.
+    mockGithubApi.mockResolvedValueOnce({
+      number: 123,
+      title: 'Some issue',
+      body: 'Existing body.',
+      labels: [],
+      html_url: 'https://github.com/test/issues/123',
+    });
+    const result = await commands['update-body'](['123'], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('No structured args');
   });
 });

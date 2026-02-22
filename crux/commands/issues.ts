@@ -124,12 +124,9 @@ type ModelName = (typeof MODEL_NAMES)[number];
  */
 function extractModel(title: string, body: string): ModelName | null {
   // Check body: look for "## Recommended Model" section header + model name
-  const sectionMatch = body.match(/##\s+recommended\s+model[^\n]*\n+\*{0,2}(haiku|sonnet|opus)\*{0,2}/i);
+  // Handles blank lines between header and value (e.g., "## Recommended Model\n\n**Sonnet**...")
+  const sectionMatch = body.match(/##\s+recommended\s+model[^\n]*\n[\s\S]{0,10}?(haiku|sonnet|opus)/i);
   if (sectionMatch) return sectionMatch[1].toLowerCase() as ModelName;
-
-  // Check body: bold model name anywhere near "recommended" or "model"
-  const boldMatch = body.match(/\*\*(haiku|sonnet|opus)\*\*/i);
-  if (boldMatch) return boldMatch[1].toLowerCase() as ModelName;
 
   // Check title: [haiku], [sonnet], [opus]
   const titleMatch = title.match(/\[(haiku|sonnet|opus)\]/i);
@@ -144,7 +141,6 @@ function extractModel(title: string, body: string): ModelName | null {
  */
 function checkIssueSections(title: string, body: string): string[] {
   const missing: string[] = [];
-  const b = body.toLowerCase();
 
   // Must have a non-trivial body
   if (body.trim().length < 80) {
@@ -558,13 +554,11 @@ function buildIssueBody(opts: {
     sections.push(`## Proposed Fix\n\n${opts.fix}`);
   }
 
-  // Dependencies
+  // Dependencies (only add section if explicitly specified)
   const depsRaw = opts.depends ? opts.depends.split(',').map(d => d.trim()).filter(Boolean) : [];
   if (depsRaw.length > 0) {
     const depLinks = depsRaw.map(d => `#${d.replace('#', '')}`).join(', ');
     sections.push(`## Dependencies\n\nDepends on: ${depLinks}`);
-  } else {
-    sections.push(`## Dependencies\n\nNone.`);
   }
 
   // Recommended Model
@@ -603,13 +597,21 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     ? (options.label as string).split(',').map(l => l.trim()).filter(Boolean)
     : [];
 
+  // Validate model if specified
+  if (options.model && !(MODEL_NAMES as ReadonlyArray<string>).includes((options.model as string).toLowerCase())) {
+    return {
+      output: `${c.red}Invalid --model value: "${options.model}". Must be one of: ${MODEL_NAMES.join(', ')}${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
   // Use structured template if any structured args are provided, otherwise fall back to --body
   const hasStructuredArgs = options.problem || options.fix || options.depends || options.criteria || options.model;
   let body: string;
   if (hasStructuredArgs) {
     body = buildIssueBody({
       problem: options.problem as string | undefined,
-      fix: options.fix as string | undefined,
+      fix: typeof options.fix === 'string' ? options.fix : undefined,
       depends: options.depends as string | undefined,
       criteria: options.criteria as string | undefined,
       model: options.model as string | undefined,
@@ -994,6 +996,14 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
     };
   }
 
+  // Validate model if specified
+  if (options.model && !(MODEL_NAMES as ReadonlyArray<string>).includes((options.model as string).toLowerCase())) {
+    return {
+      output: `${c.red}Invalid --model value: "${options.model}". Must be one of: ${MODEL_NAMES.join(', ')}${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
   // Fetch existing issue
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
   const existingBody = (issue.body || '').trim();
@@ -1049,22 +1059,13 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  interface SingleIssue {
-    number: number;
-    title: string;
-    body: string | null;
-    labels: Array<{ name: string }>;
-    html_url: string;
-    pull_request?: unknown;
-  }
-
   let issuesToCheck: Array<{ number: number; title: string; body: string; labels: string[]; url: string }>;
 
   const singleNum = args[0] ? parseInt(args[0], 10) : null;
 
   if (singleNum && !isNaN(singleNum)) {
     // Single issue
-    const i = await githubApi<SingleIssue>(`/repos/${REPO}/issues/${singleNum}`);
+    const i = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${singleNum}`);
     if (i.pull_request) {
       return { output: `${c.red}#${singleNum} is a pull request, not an issue.${c.reset}\n`, exitCode: 1 };
     }
@@ -1222,4 +1223,4 @@ Slash command:
 // Exported for testing
 // ---------------------------------------------------------------------------
 
-export { scoreIssue, isBlocked, findPotentialDuplicates, extractModel, checkIssueSections, buildIssueBody };
+export { scoreIssue, isBlocked, findPotentialDuplicates, rankIssues, extractModel, checkIssueSections, buildIssueBody };
