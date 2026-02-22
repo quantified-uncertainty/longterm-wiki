@@ -346,4 +346,46 @@ describe('runResearch', () => {
       expect(result.sources[i].id).toBe(`SRC-${i + 1}`);
     }
   });
+
+  it('degrades gracefully when SCRY returns HTTP error', async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if ((url as string).includes('exopriors.com')) {
+        return { ok: false, status: 429, json: async () => ({ error: 'rate limited' }) };
+      }
+      if ((url as string).includes('exa.ai')) {
+        return { ok: true, status: 200, json: async () => mockExaResponse };
+      }
+      return { ok: false, status: 404, json: async () => ({}) };
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: true },
+    });
+
+    // SCRY failed with HTTP error — Exa sources should still come through
+    expect(result.sources.length).toBeGreaterThan(0);
+    expect(result.metadata.sourcesSearched).not.toContain('scry');
+    expect(result.metadata.sourcesSearched).toContain('exa');
+  });
+
+  it('uses undefined (not empty array) for facts when budget exhausted', async () => {
+    vi.stubGlobal('fetch', makeFetchMock('all-success'));
+
+    const result = await runResearch({
+      topic: 'AI safety',
+      config: { useExa: true, usePerplexity: false, useScry: false, extractFacts: true },
+      budgetCap: 0, // Force budget-cap path immediately
+    });
+
+    // Budget-exhausted sources should have facts: undefined, not facts: []
+    for (const src of result.sources) {
+      expect(src.facts).not.toEqual([]);
+      // facts should be either undefined or a non-empty array
+      if (src.facts !== undefined) {
+        expect(src.facts.length).toBeGreaterThan(0);
+      }
+    }
+  });
 });
