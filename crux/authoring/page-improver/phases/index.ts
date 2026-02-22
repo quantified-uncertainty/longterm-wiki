@@ -1,10 +1,3 @@
-/**
- * Phase Modules Index
- *
- * Re-exports all phase functions from their individual modules.
- * This file replaces the monolithic phases.ts.
- */
-
 export { analyzePhase } from './analyze.ts';
 export { researchPhase } from './research.ts';
 export { improvePhase } from './improve.ts';
@@ -16,6 +9,7 @@ export { gapFillPhase } from './gap-fill.ts';
 export { triagePhase } from './triage.ts';
 export { adversarialReviewPhase } from './adversarial-review.ts';
 export { adversarialLoopPhase } from './adversarial-loop.ts';
+export { citationAuditPhase, buildAuditorSourceCache } from './citation-audit.ts';
 
 // Also export Zod schemas and parsing utilities for external use
 export {

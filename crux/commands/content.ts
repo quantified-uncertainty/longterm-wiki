@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model'],
     positional: true,
   },
   create: {
@@ -84,6 +84,9 @@ Options:
   --dry-run         Preview without changes
   --apply           Apply changes (suggest-links, improve)
   --skip-session-log  Skip auto-posting session log to wiki-server after improve --apply
+  --citation-gate     Block --apply if citation audit pass rate < 80% (improve)
+  --skip-citation-audit  Skip citation audit phase (improve)
+  --citation-audit-model Override LLM model for citation verification (improve)
   --verbose         Detailed output
 
 Examples:

@@ -11,7 +11,7 @@ CHANGED_FILES=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/de
 
 NEEDS_REBUILD=false
 
-if echo "$CHANGED_FILES" | grep -qE '^(data/|content/docs/|app/scripts/build-data)'; then
+if echo "$CHANGED_FILES" | grep -qE '^(data/|content/docs/|apps/web/scripts/build-data)'; then
   NEEDS_REBUILD=true
 fi
 
@@ -19,9 +19,9 @@ if [ "$NEEDS_REBUILD" = true ]; then
   echo ""
   echo "Data files changed — rebuilding data layer..."
   echo ""
-  if (cd "$(git rev-parse --show-toplevel)/app" && node --import tsx/esm scripts/build-data.mjs 2>/dev/null); then
+  if (cd "$(git rev-parse --show-toplevel)/apps/web" && node --import tsx/esm scripts/build-data.mjs 2>/dev/null); then
     echo "Data layer rebuilt successfully."
   else
-    echo "WARNING: Data layer rebuild failed. Run manually: pnpm run --filter longterm-next sync:data"
+    echo "WARNING: Data layer rebuild failed. Run manually: node apps/web/scripts/build-data.mjs"
   fi
 fi

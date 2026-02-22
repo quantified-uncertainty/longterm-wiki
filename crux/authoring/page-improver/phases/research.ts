@@ -8,11 +8,12 @@
 
 import { MODELS } from '../../../lib/anthropic.ts';
 import { fetchSources, type FetchRequest, type FetchedSource } from '../../../lib/source-fetcher.ts';
+import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation-auditor.ts';
 import type { SourceCacheEntry } from '../../../lib/section-writer.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import { log, writeTemp } from '../utils.ts';
 import { runAgent } from '../api.ts';
-import { parseJsonFromLlm } from './json-parsing.ts';
+import { parseAndValidate, ResearchResultSchema } from './json-parsing.ts';
 
 /**
  * Convert research sources + fetched content into SourceCacheEntry[] for
@@ -34,7 +35,7 @@ export function buildSourceCache(
     if (!src.url) continue;
 
     const fetched = fetchedByUrl.get(src.url);
-    const hasContent = fetched && fetched.status === 'ok' && fetched.content.length > 50;
+    const hasContent = fetched && fetched.status === 'ok' && fetched.content.length > MIN_SOURCE_CONTENT_LENGTH;
 
     cache.push({
       id: `SRC-${i + 1}`,
@@ -145,7 +146,7 @@ Output ONLY valid JSON at the end.`;
     tools
   });
 
-  const research = parseJsonFromLlm<ResearchResult>(result, 'research', (raw, error) => ({
+  const research = parseAndValidate<ResearchResult>(result, ResearchResultSchema, 'research', (raw, error) => ({
     sources: [],
     raw,
     error,

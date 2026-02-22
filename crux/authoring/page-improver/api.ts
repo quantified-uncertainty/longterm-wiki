@@ -51,7 +51,12 @@ export async function executeWebSearch(query: string): Promise<string> {
   return extractText(response);
 }
 
+const VALID_SCRY_TABLES = new Set(['mv_eaforum_posts', 'mv_lesswrong_posts']);
+
 export async function executeScrySearch(query: string, table: string = 'mv_eaforum_posts'): Promise<string> {
+  if (!VALID_SCRY_TABLES.has(table)) {
+    return `SCRY search error: invalid table "${table}" — must be one of: ${[...VALID_SCRY_TABLES].join(', ')}`;
+  }
   const sql = `SELECT title, uri, snippet, original_author, original_timestamp::date as date
     FROM scry.search('${query.replace(/'/g, "''")}', '${table}')
     WHERE title IS NOT NULL AND kind = 'post'
