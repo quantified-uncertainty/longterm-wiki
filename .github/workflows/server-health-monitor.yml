@@ -18,7 +18,7 @@ jobs:
       issues: write
 
     steps:
-      - name: Check health endpoint
+      - name: Check health endpoint (with retry)
         id: health
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
@@ -31,37 +31,55 @@ jobs:
             exit 0
           fi
 
-          HTTP_CODE=$(curl -s -o /tmp/health_response.json -w "%{http_code}" \
-            --max-time 10 "${LONGTERMWIKI_SERVER_URL}/health" 2>/dev/null) || HTTP_CODE="000"
+          # Retry up to 3 times with 10s delay to avoid false positives
+          # from transient network issues or brief pod restarts.
+          MAX_ATTEMPTS=3
+          DELAY=10
+          HEALTHY=""
+          LAST_HTTP_CODE=""
+          LAST_ERROR=""
+          LAST_RESPONSE=""
 
-          echo "http_code=$HTTP_CODE" >> "$GITHUB_OUTPUT"
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            HTTP_CODE=$(curl -s -o /tmp/health_response.json -w "%{http_code}" \
+              --max-time 10 "${LONGTERMWIKI_SERVER_URL}/health" 2>/dev/null) || HTTP_CODE="000"
 
-          if [ "$HTTP_CODE" = "000" ]; then
-            echo "healthy=false" >> "$GITHUB_OUTPUT"
-            echo "error=Connection failed or timed out (no HTTP response)" >> "$GITHUB_OUTPUT"
-            echo "response=" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+            RESPONSE=$(cat /tmp/health_response.json 2>/dev/null || echo "")
+            LAST_HTTP_CODE="$HTTP_CODE"
+            LAST_RESPONSE="$RESPONSE"
 
-          RESPONSE=$(cat /tmp/health_response.json 2>/dev/null || echo "")
+            if [ "$HTTP_CODE" = "000" ]; then
+              LAST_ERROR="Connection failed or timed out (no HTTP response)"
+            elif [ "$HTTP_CODE" != "200" ]; then
+              LAST_ERROR="HTTP $HTTP_CODE"
+            else
+              STATUS=$(echo "$RESPONSE" | jq -r '.status // "unknown"')
+              DB_STATUS=$(echo "$RESPONSE" | jq -r '.database // "unknown"')
+
+              if [ "$STATUS" = "healthy" ] && [ "$DB_STATUS" = "ok" ]; then
+                HEALTHY="true"
+                break
+              else
+                LAST_ERROR="status=$STATUS, database=$DB_STATUS"
+              fi
+            fi
+
+            echo "Health check attempt $i/$MAX_ATTEMPTS failed: $LAST_ERROR"
+            if [ "$i" -lt "$MAX_ATTEMPTS" ]; then
+              sleep $DELAY
+            fi
+          done
+
+          echo "http_code=$LAST_HTTP_CODE" >> "$GITHUB_OUTPUT"
           echo "response<<__HEALTH_EOF__" >> "$GITHUB_OUTPUT"
-          echo "$RESPONSE" >> "$GITHUB_OUTPUT"
+          echo "$LAST_RESPONSE" >> "$GITHUB_OUTPUT"
           echo "__HEALTH_EOF__" >> "$GITHUB_OUTPUT"
 
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "healthy=false" >> "$GITHUB_OUTPUT"
-            echo "error=HTTP $HTTP_CODE" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          STATUS=$(echo "$RESPONSE" | jq -r '.status // "unknown"')
-          DB_STATUS=$(echo "$RESPONSE" | jq -r '.database // "unknown"')
-
-          if [ "$STATUS" = "healthy" ] && [ "$DB_STATUS" = "ok" ]; then
+          if [ "$HEALTHY" = "true" ]; then
             echo "healthy=true" >> "$GITHUB_OUTPUT"
           else
             echo "healthy=false" >> "$GITHUB_OUTPUT"
-            echo "error=status=$STATUS, database=$DB_STATUS" >> "$GITHUB_OUTPUT"
+            echo "error=$LAST_ERROR" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check for existing open issue
@@ -78,41 +96,44 @@ jobs:
             --jq '.[0].number // empty')
           echo "issue=${ISSUE}" >> "$GITHUB_OUTPUT"
 
-      - name: Create issue
-        if: steps.health.outputs.healthy == 'false' && steps.existing.outputs.issue == ''
+      - name: Create or update issue
+        if: steps.health.outputs.healthy == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEALTH_ERROR: ${{ steps.health.outputs.error }}
           HEALTH_HTTP_CODE: ${{ steps.health.outputs.http_code }}
           HEALTH_RESPONSE: ${{ steps.health.outputs.response }}
+          EXISTING_ISSUE: ${{ steps.existing.outputs.issue }}
         run: |
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-          cat > /tmp/issue_body.md << 'ISSUE_BODY'
+
+          # Build the issue body directly with a heredoc (no fragile sed replacements)
+          cat > /tmp/issue_body.md <<ISSUE_BODY
           ## Wiki server health check failed
 
           | Field | Value |
           |-------|-------|
           | **Status** | :red_circle: Unhealthy |
-          | **Detected at** | _TIMESTAMP_ |
-          | **Error** | _ERROR_ |
-          | **HTTP status** | _HTTP_CODE_ |
+          | **Detected at** | ${TIMESTAMP} |
+          | **Error** | ${HEALTH_ERROR} |
+          | **HTTP status** | ${HEALTH_HTTP_CODE} |
 
           ### Health endpoint response
 
-          ```json
-          _RESPONSE_
-          ```
+          \`\`\`json
+          ${HEALTH_RESPONSE}
+          \`\`\`
 
           ### Possible causes
 
           - **HTTP 503 / connection refused** — Pod is crashing or not running
-          - **`database: "error"`** — Database connection or query failure (bad migration, permissions, DB down)
-          - **`status: "degraded"`** — Server is running but some queries are failing
+          - **\`database: "error"\`** — Database connection or query failure (bad migration, permissions, DB down)
+          - **\`status: "degraded"\`** — Server is running but some queries are failing
           - **Connection timeout** — DNS, ingress, or networking issue
 
           ### Useful commands
 
-          ```bash
+          \`\`\`bash
           # Pod status
           kubectl get pods -n longtermwiki
 
@@ -124,7 +145,7 @@ jobs:
 
           # Restart the deployment
           kubectl rollout restart deployment -n longtermwiki longterm-wiki-server-wiki-server
-          ```
+          \`\`\`
 
           ---
           *Created automatically by the [health monitor workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Will be closed automatically when the server recovers.*
@@ -133,17 +154,23 @@ jobs:
           # Strip leading whitespace from heredoc (YAML indentation)
           sed -i 's/^          //' /tmp/issue_body.md
 
-          # Replace placeholders with actual values
-          sed -i "s|_TIMESTAMP_|${TIMESTAMP}|g" /tmp/issue_body.md
-          sed -i "s|_ERROR_|${HEALTH_ERROR}|g" /tmp/issue_body.md
-          sed -i "s|_HTTP_CODE_|${HEALTH_HTTP_CODE}|g" /tmp/issue_body.md
-          sed -i "s|_RESPONSE_|${HEALTH_RESPONSE}|g" /tmp/issue_body.md
+          if [ -n "$EXISTING_ISSUE" ]; then
+            # Reopen and comment on existing issue instead of creating a new one
+            gh issue reopen "$EXISTING_ISSUE" --repo "${{ github.repository }}" 2>/dev/null || true
+            gh issue comment "$EXISTING_ISSUE" \
+              --repo "${{ github.repository }}" \
+              --body "Server is still unhealthy at ${TIMESTAMP}. Error: ${HEALTH_ERROR} (HTTP ${HEALTH_HTTP_CODE})"
+          else
+            # Ensure labels exist before creating issue
+            gh label create "server-health" --repo "${{ github.repository }}" \
+              --color "d73a4a" --description "Wiki server health monitoring" 2>/dev/null || true
 
-          gh issue create \
-            --repo "${{ github.repository }}" \
-            --title "Wiki server is unhealthy (${HEALTH_ERROR})" \
-            --label "server-health,bug" \
-            --body-file /tmp/issue_body.md
+            gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "Wiki server is unhealthy (${HEALTH_ERROR})" \
+              --label "server-health,bug" \
+              --body-file /tmp/issue_body.md
+          fi
 
       - name: Close resolved issue
         if: steps.health.outputs.healthy == 'true'
