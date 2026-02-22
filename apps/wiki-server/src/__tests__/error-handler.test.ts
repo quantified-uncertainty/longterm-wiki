@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { createApp } from "../app.js";
@@ -13,8 +13,19 @@ import { createApp } from "../app.js";
  * HTTPExceptions are always re-thrown so Hono returns the proper status code.
  */
 describe("Global error handler", () => {
+  const origApiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+
   beforeEach(() => {
     vi.restoreAllMocks();
+    // Clear the API key so bearer auth middleware is not registered,
+    // allowing test routes to be reached without an auth token.
+    delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+  });
+
+  afterEach(() => {
+    if (origApiKey !== undefined) {
+      process.env.LONGTERMWIKI_SERVER_API_KEY = origApiKey;
+    }
   });
 
   function createTestApp() {
