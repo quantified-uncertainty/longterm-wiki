@@ -1,0 +1,94 @@
+name: Database Backup
+
+on:
+  workflow_call:
+    inputs:
+      backup_prefix:
+        description: "Prefix for backup filename (e.g., pre-deploy, scheduled)"
+        required: false
+        type: string
+        default: "scheduled"
+    outputs:
+      backup_filename:
+        description: "Name of the backup file"
+        value: ${{ jobs.backup.outputs.backup_filename }}
+
+  schedule:
+    - cron: "0 2 * * *" # Daily at 2 AM UTC
+
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: Backup database
+    runs-on: ubuntu-latest
+    outputs:
+      backup_filename: ${{ steps.backup.outputs.backup_filename }}
+
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-16
+
+      - name: Create database backup
+        id: backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set"
+            exit 1
+          fi
+
+          # Parse DATABASE_URL
+          PROTO="$(echo "$DATABASE_URL" | grep :// | sed -e 's,^\(.*://\).*,\1,g')"
+          URL="${DATABASE_URL/$PROTO/}"
+          USERPASS="$(echo "$URL" | cut -d@ -f1)"
+          HOSTPORT_DB="$(echo "$URL" | cut -d@ -f2)"
+          DB_USER="$(echo "$USERPASS" | cut -d: -f1)"
+          DB_PASS="$(echo "$USERPASS" | cut -d: -f2)"
+          DB_HOST="$(echo "$HOSTPORT_DB" | cut -d: -f1)"
+          DB_PORT="$(echo "$HOSTPORT_DB" | cut -d: -f2 | cut -d/ -f1)"
+          DB_NAME="$(echo "$HOSTPORT_DB" | cut -d/ -f2 | cut -d? -f1)"
+
+          PREFIX="${{ inputs.backup_prefix || 'scheduled' }}"
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          FILENAME="longterm-wiki-${PREFIX}-${TIMESTAMP}.sql.gz"
+          echo "backup_filename=${FILENAME}" >> "$GITHUB_OUTPUT"
+
+          echo "Creating backup: ${FILENAME}"
+          PGPASSWORD="${DB_PASS}" pg_dump \
+            -h "${DB_HOST}" \
+            -p "${DB_PORT}" \
+            -U "${DB_USER}" \
+            -d "${DB_NAME}" \
+            --no-owner \
+            --no-privileges \
+            --verbose 2>/tmp/pg_dump.log \
+            | gzip > "${FILENAME}"
+
+          echo "pg_dump output:"
+          cat /tmp/pg_dump.log
+
+          FILE_SIZE=$(du -h "${FILENAME}" | cut -f1)
+          echo "Backup completed: ${FILENAME} (${FILE_SIZE})"
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.backup.outputs.backup_filename }}
+          path: ${{ steps.backup.outputs.backup_filename }}
+          retention-days: 30
+
+      - name: Upload to S3 (if configured)
+        if: env.AWS_ACCESS_KEY_ID != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+          S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+        run: |
+          FILENAME="${{ steps.backup.outputs.backup_filename }}"
+          aws s3 cp "${FILENAME}" "s3://${S3_BUCKET}/longterm-wiki/${FILENAME}"
+          echo "Uploaded to S3: s3://${S3_BUCKET}/longterm-wiki/${FILENAME}"

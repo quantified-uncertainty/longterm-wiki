@@ -1,4 +1,4 @@
-name: Wiki Server — Build & Push Image
+name: Wiki Server — Build, Deploy & Scan
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
       - "apps/wiki-server/**"
       - "pnpm-lock.yaml"
       - ".github/workflows/wiki-server-docker.yml"
+      - ".github/workflows/database-backup.yml"
   workflow_dispatch:
 
 concurrency:
@@ -54,10 +55,25 @@ jobs:
           cache-from: type=gha,scope=wiki-server
           cache-to: type=gha,scope=wiki-server,mode=max
 
+  pre-deploy-backup:
+    name: Pre-deploy database backup
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/database-backup.yml
+    with:
+      backup_prefix: pre-deploy
+    secrets: inherit
+
+  deploy:
+    name: Deploy to ArgoCD
+    needs: [build-and-push, pre-deploy-backup]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Update ArgoCD image tag
-        if: github.ref == 'refs/heads/main'
         env:
-          ARGOCD_SERVER: argo.k8s.quantifieduncertainty.org
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
         run: |
           IMAGE_TAG="sha-${{ github.sha }}"
@@ -81,8 +97,37 @@ jobs:
             --server "${ARGOCD_SERVER}" \
             --grpc-web
 
+      - name: Verify deployed SHA
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+        run: |
+          EXPECTED_TAG="sha-${{ github.sha }}"
+          echo "Expected image tag: ${EXPECTED_TAG}"
+
+          APP_JSON=$(argocd app get longterm-wiki-server \
+            --refresh \
+            --output json \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web)
+
+          IMAGES=$(echo "$APP_JSON" | jq -r '.status.summary.images[]')
+          echo "Running images: ${IMAGES}"
+
+          if echo "$IMAGES" | grep -q "${EXPECTED_TAG}"; then
+            echo "SHA verification passed: ${EXPECTED_TAG} is running"
+          else
+            echo "::error::SHA verification failed! Expected ${EXPECTED_TAG} but got: ${IMAGES}"
+            exit 1
+          fi
+
+          SYNC_STATUS=$(echo "$APP_JSON" | jq -r '.status.sync.status')
+          HEALTH_STATUS=$(echo "$APP_JSON" | jq -r '.status.health.status')
+          echo "Sync status: ${SYNC_STATUS}"
+          echo "Health status: ${HEALTH_STATUS}"
+
       - name: Post-deploy smoke test
-        if: github.ref == 'refs/heads/main'
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
@@ -136,3 +181,29 @@ jobs:
             exit 1
           fi
           echo "Smoke test cleanup passed: deleted=$DELETED"
+
+  security-scan:
+    name: Security scan
+    needs: build-and-push
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: ghcr.io/quantified-uncertainty/longterm-wiki-server:sha-${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
