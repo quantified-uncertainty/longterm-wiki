@@ -27,7 +27,7 @@ import { fetchSource, type FetchedSource } from './source-fetcher.ts';
 import { stripFrontmatter } from './patterns.ts';
 
 /** Minimum source content length (chars) required to attempt LLM verification. */
-const MIN_SOURCE_CONTENT_LENGTH = 50;
+export const MIN_SOURCE_CONTENT_LENGTH = 50;
 
 // ---------------------------------------------------------------------------
 // Public types

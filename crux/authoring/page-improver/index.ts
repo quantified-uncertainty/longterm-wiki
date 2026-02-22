@@ -109,6 +109,9 @@ Options:
   --skip-session-log              Skip auto-posting session log to wiki-server after apply
   --skip-enrich                   Skip post-improve enrichment (entity-links, fact-refs)
   --section-level                 Use per-## section rewriting instead of single-pass improve (#671)
+  --citation-gate                 Block --apply when citation audit pass rate is below threshold
+  --skip-citation-audit           Skip the post-improve citation audit phase
+  --citation-audit-model <model>  Override LLM model for per-citation verification
   --triage                        Run news-check triage only (no improvement)
   --list                          List pages needing improvement
   --limit N                       Limit list results (default: 20)
@@ -175,6 +178,9 @@ Examples:
     skipSessionLog: opts['skip-session-log'] === true ? true : undefined,
     skipEnrich: opts['skip-enrich'] === true ? true : undefined,
     sectionLevel: opts['section-level'] === true ? true : undefined,
+    citationGate: opts['citation-gate'] === true ? true : undefined,
+    skipCitationAudit: opts['skip-citation-audit'] === true ? true : undefined,
+    citationAuditModel: (opts['citation-audit-model'] as string) || undefined,
   });
 }
 
