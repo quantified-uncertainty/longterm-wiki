@@ -57,19 +57,19 @@ export const TIERS: Record<string, TierConfig> = {
   polish: {
     name: 'Polish',
     cost: '$2-3',
-    phases: ['analyze', 'improve', 'validate'],
+    phases: ['analyze', 'improve', 'enrich', 'validate'],
     description: 'Quick single-pass improvement without research'
   },
   standard: {
     name: 'Standard',
     cost: '$5-8',
-    phases: ['analyze', 'research', 'improve', 'validate', 'review'],
-    description: 'Light research + improvement + validation + review'
+    phases: ['analyze', 'research', 'improve', 'enrich', 'citation-audit', 'validate', 'review'],
+    description: 'Light research + improvement + citation audit + validation + review'
   },
   deep: {
     name: 'Deep Research',
     cost: '$15-25',
-    phases: ['analyze', 'research-deep', 'improve', 'validate', 'adversarial-loop', 'review', 'gap-fill'],
+    phases: ['analyze', 'research-deep', 'improve', 'enrich', 'citation-audit', 'validate', 'adversarial-loop', 'review', 'gap-fill'],
     description: 'Full SCRY + web research, adversarial review + re-research loop, multi-phase improvement'
   }
 };

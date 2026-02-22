@@ -69,6 +69,8 @@ The current system *consults* the entity database to resolve EntityLinks, but do
 
 The pipeline runs once. If the synthesis phase produces a page with weak sections, those sections stay weak. The review phase in the improver can identify gaps, but the fix is another monolithic LLM call. There's no mechanism for targeted, section-level improvement.
 
+**Update (Feb 2026)**: The `--section-level` flag (`pnpm crux content improve <id> --section-level`) now implements per-section rewriting: the page is split on `##` headings, each section rewritten independently via `rewriteSection()`, then reassembled with renumbered footnotes. See `crux/lib/section-splitter.ts` and `crux/authoring/page-improver/phases/improve-sections.ts`. This addresses the "targeted improvement" limitation above; the deeper limitations (graph-aware planning, diagram agents) remain future work.
+
 ### Limitation 4: Diagrams and Calculations are Afterthoughts
 
 Mermaid diagrams and Squiggle models are included only if the synthesis prompt happens to produce them. There's no dedicated agent reasoning about what visual or computational elements would add value, and no agent that specializes in producing high-quality versions of these.

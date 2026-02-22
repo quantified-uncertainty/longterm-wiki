@@ -20,6 +20,7 @@
  *   pnpm crux citations audit-check <page-id> --threshold=0.9
  *   pnpm crux citations audit-check <page-id> --model=google/gemini-flash-lite
  *   pnpm crux citations audit-check <page-id> --delay=500
+ *   pnpm crux citations audit-check <page-id> --concurrency=5
  *
  * Requires: OPENROUTER_API_KEY
  * Optional: FIRECRAWL_KEY (improves source content extraction quality)
@@ -59,6 +60,13 @@ async function main() {
     : DEFAULT_DELAY_MS;
   const delayMs = isNaN(rawDelay) || rawDelay < 0 ? DEFAULT_DELAY_MS : rawDelay;
 
+  // Validate concurrency
+  const DEFAULT_CONCURRENCY = 3;
+  const rawConcurrency = typeof args.concurrency === 'string'
+    ? parseInt(args.concurrency, 10)
+    : DEFAULT_CONCURRENCY;
+  const concurrency = isNaN(rawConcurrency) || rawConcurrency < 1 ? DEFAULT_CONCURRENCY : rawConcurrency;
+
   const c = getColors(json);
   const positional = (args._positional as string[]) || [];
   const pageId = positional[0];
@@ -91,6 +99,7 @@ async function main() {
     passThreshold: threshold,
     model,
     delayMs,
+    concurrency,
   });
 
   if (json) {

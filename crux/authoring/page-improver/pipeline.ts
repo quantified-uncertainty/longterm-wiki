@@ -5,19 +5,23 @@
  */
 
 import fs from 'fs';
+import path from 'path';
 import { execFileSync } from 'child_process';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import { createSession } from '../../lib/wiki-server/sessions.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
+  EnrichResult, AuditResult,
 } from './types.ts';
-import { ROOT, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
+import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import {
-  analyzePhase, researchPhase, improvePhase, reviewPhase,
+  analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
+  enrichPhase, reviewPhase,
   validatePhase, gapFillPhase, triagePhase, adversarialLoopPhase,
+  citationAuditPhase,
 } from './phases.ts';
 
 // ── Session log helpers ───────────────────────────────────────────────────────
@@ -146,13 +150,19 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     process.exit(1);
   }
 
+  // When --section-level is set, substitute 'improve' with 'improve-sections'
+  const phases = tierConfig.phases.map(p =>
+    p === 'improve' && options.sectionLevel ? 'improve-sections' : p,
+  );
+
   console.log('\n' + '='.repeat(60));
   console.log(`Improving: "${page.title}"`);
   if (triageResult) {
     console.log(`Triage: ${triageResult.reason}`);
   }
   console.log(`Tier: ${tierConfig.name} (${tierConfig.cost})`);
-  console.log(`Phases: ${tierConfig.phases.join(' → ')}`);
+  if (options.sectionLevel) console.log('Mode: section-level (--section-level)');
+  console.log(`Phases: ${phases.join(' → ')}`);
   if (directions) console.log(`Directions: ${directions}`);
   console.log('='.repeat(60) + '\n');
 
@@ -160,9 +170,11 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   let analysis: AnalysisResult | undefined, research: ResearchResult | undefined;
   let improvedContent: string | undefined, review: ReviewResult | undefined;
   let adversarialLoopResult: AdversarialLoopResult | undefined;
+  let enrichResult: EnrichResult | undefined;
+  let auditResult: AuditResult | undefined;
 
   // Run phases based on tier
-  for (const phase of tierConfig.phases) {
+  for (const phase of phases) {
     const phaseStart: number = Date.now();
     const stopPhaseHeartbeat = startHeartbeat(phase, 60);
 
@@ -193,6 +205,32 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           logBiographicalWarnings(improvedContent, page, tier);
         }
         break;
+
+      case 'improve-sections':
+        improvedContent = await improveSectionsPhase(
+          page, analysis!, research || { sources: [] }, directions, options,
+        );
+        break;
+
+      case 'enrich': {
+        if (options.skipEnrich) {
+          log('enrich', 'Skipped (--skip-enrich)');
+        } else {
+          const enrichOutput = await enrichPhase(page, improvedContent!, options);
+          improvedContent = enrichOutput.content;
+          enrichResult = enrichOutput.result;
+        }
+        break;
+      }
+
+      case 'citation-audit': {
+        if (options.skipCitationAudit) {
+          log('citation-audit', 'Skipped (--skip-citation-audit)');
+        } else {
+          auditResult = await citationAuditPhase(page, improvedContent!, research, options);
+        }
+        break;
+      }
 
       case 'validate': {
         const validation = await validatePhase(page, improvedContent!, options);
@@ -266,6 +304,29 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     }
   }
 
+  if (auditResult) {
+    const { total, verified, failed, unchecked } = auditResult.summary;
+    console.log(`Citations: ${total} total — ${verified} verified, ${failed} failed, ${unchecked} unchecked`);
+    if (!auditResult.pass) {
+      if (options.citationGate && dryRun) {
+        // Gate is inactive in dry-run — make this explicit so users are not surprised
+        console.log(`⚠ Citation audit FAILED (--citation-gate inactive in dry-run; would block --apply)`);
+      } else if (options.citationGate && !dryRun) {
+        console.log(`⚠ Citation audit FAILED — blocking apply (--citation-gate)`);
+      } else {
+        console.log(`⚠ Citation audit FAILED (advisory)`);
+      }
+    }
+  }
+
+  // Gate mode: abort --apply when citation audit fails
+  if (options.citationGate && !dryRun && auditResult && !auditResult.pass) {
+    const auditPath = path.join(TEMP_DIR, page.id, 'citation-audit.json');
+    console.error('\nApply blocked: citation audit failed and --citation-gate is set.');
+    console.error(`Review ${auditPath} for per-citation details.`);
+    process.exit(1);
+  }
+
   if (dryRun) {
     console.log('\nTo apply changes:');
     console.log(`  cp "${finalPath}" "${filePath}"`);
@@ -317,9 +378,11 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     tier,
     directions,
     duration: totalDuration,
-    phases: tierConfig.phases,
+    phases,
     review,
     adversarialLoopResult,
+    enrichResult,
+    auditResult,
     outputPath: finalPath,
   };
   writeTemp(page.id, 'pipeline-results.json', results);

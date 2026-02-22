@@ -11,7 +11,8 @@
  *
  * Caching strategy:
  *   - In-memory Map for session-level deduplication (cleared on process exit)
- *   - SQLite citation_content table for cross-session persistence
+ *   - PostgreSQL (wiki-server) citation_content.full_text — durable cross-machine cache
+ *   - SQLite citation_content table — fast local fallback
  *
  * Usage:
  *   import { fetchSource, fetchSources, extractRelevantExcerpts } from './source-fetcher.ts';
@@ -27,6 +28,10 @@
 
 import { getApiKey } from './api-keys.ts';
 import { citationContent } from './knowledge-db.ts';
+import {
+  upsertCitationContent,
+  getCitationContentByUrl,
+} from './wiki-server/citations.ts';
 import {
   getResourceById,
   getResourceByUrl,
@@ -305,8 +310,11 @@ async function fetchWithFirecrawl(url: string): Promise<FirecrawlResult | null> 
       };
     }
     return null;
-  } catch {
-    // Firecrawl unavailable or failed — fall through to built-in fetch
+  } catch (err: unknown) {
+    // Firecrawl unavailable or failed — fall through to built-in fetch.
+    // Log the error so failures are visible in CI output (#682).
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[source-fetcher] Firecrawl failed for ${url}: ${msg.slice(0, 200)}`);
     return null;
   }
 }
@@ -384,11 +392,19 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
 // SQLite cross-session cache helpers
 // ---------------------------------------------------------------------------
 
-/** Try to load a previously fetched result from SQLite. */
-function loadFromDb(url: string): Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> | null {
+/** Default TTL for SQLite cache entries: 7 days (in milliseconds). */
+const DB_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Try to load a previously fetched result from SQLite. Returns null if expired or missing (#676). */
+function loadFromDb(url: string, maxAgeMs: number = DB_CACHE_TTL_MS): Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> | null {
   try {
     const row = citationContent.getByUrl(url);
     if (row?.full_text && row.full_text.length > 0) {
+      // Check TTL — skip stale entries so sources are periodically re-fetched.
+      if (row.fetched_at) {
+        const age = Date.now() - new Date(row.fetched_at).getTime();
+        if (age > maxAgeMs) return null;
+      }
       return {
         title: row.page_title ?? '',
         content: row.full_text,
@@ -419,6 +435,49 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
   } catch {
     // SQLite storage is best-effort
   }
+}
+
+// ---------------------------------------------------------------------------
+// PostgreSQL cross-machine cache helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Try to load a previously fetched result from PostgreSQL (wiki-server).
+ * Returns null if the server is unavailable or the URL has not been cached.
+ * apiRequest never throws — it returns { ok: false } on network/server errors.
+ */
+async function loadFromPostgres(
+  url: string,
+): Promise<(Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> & { httpStatus: number | null }) | null> {
+  const result = await getCitationContentByUrl(url);
+  if (result.ok && result.data.fullText && result.data.fullText.length > 0) {
+    return {
+      title: result.data.pageTitle ?? '',
+      content: result.data.fullText,
+      fetchedAt: result.data.fetchedAt,
+      httpStatus: result.data.httpStatus ?? null,
+    };
+  }
+  return null;
+}
+
+/**
+ * Fire-and-forget write of fetched content to PostgreSQL.
+ * Errors are silently ignored — PostgreSQL is a durable secondary store,
+ * not a hard dependency.
+ */
+function saveToPostgres(url: string, title: string, content: string, httpStatus: number): void {
+  upsertCitationContent({
+    url,
+    fetchedAt: new Date().toISOString(),
+    httpStatus,
+    contentType: 'text/html',
+    pageTitle: title || null,
+    fullText: content,
+    contentLength: content.length,
+  }).catch(() => {
+    // Best-effort — don't fail if server unavailable
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -494,7 +553,29 @@ async function _fetchSourceCore(
     return result;
   }
 
-  // ---- 2. SQLite cross-session cache ----
+  // ---- 2. PostgreSQL cross-machine cache (async, durable source of truth) ----
+  const pgRow = await loadFromPostgres(url);
+  if (pgRow) {
+    const excerpts = extractMode === 'relevant' && query
+      ? extractRelevantExcerpts(pgRow.content, query)
+      : [];
+    const paywall = detectPaywall(pgRow.content);
+    const result: FetchedSource = {
+      url,
+      title: pgRow.title || resource?.title || '',
+      fetchedAt: pgRow.fetchedAt,
+      content: pgRow.content,
+      relevantExcerpts: excerpts,
+      status: paywall ? 'paywall' : 'ok',
+      resource: resourceMeta,
+    };
+    // Backfill SQLite so subsequent calls are served from the fast local cache
+    saveToDb(url, pgRow.title, pgRow.content, pgRow.httpStatus ?? 200);
+    sessionCacheSet(url, result);
+    return result;
+  }
+
+  // ---- 3. SQLite local cache (fast fallback when PostgreSQL is unavailable) ----
   const dbRow = loadFromDb(url);
   if (dbRow) {
     const excerpts = extractMode === 'relevant' && query
@@ -514,7 +595,7 @@ async function _fetchSourceCore(
     return result;
   }
 
-  // ---- 3. Network fetch (Firecrawl → built-in fallback) ----
+  // ---- 4. Network fetch (Firecrawl → built-in fallback) ----
   let title = '';
   let content = '';
   let httpStatus = 0;
@@ -549,9 +630,10 @@ async function _fetchSourceCore(
     status = 'ok'; // PDF or non-HTML with 200 status
   }
 
-  // ---- 5. Persist to SQLite ----
+  // ---- 5. Persist to SQLite (fast local cache) and PostgreSQL (durable source of truth) ----
   if (content.length > 0) {
     saveToDb(url, title, content, httpStatus);
+    saveToPostgres(url, title, content, httpStatus);
   }
 
   // ---- 6. Extract excerpts ----
@@ -571,6 +653,7 @@ async function _fetchSourceCore(
   sessionCacheSet(url, result);
 
   // ---- 9. Reflect status back to resource YAML (if requested) ----
+
   if (request.updateResourceStatus && resource) {
     try {
       updateResourceFetchStatus(resource.id, {
@@ -592,8 +675,12 @@ async function _fetchSourceCore(
  * Caching layers:
  *   1. In-memory session cache (fastest, LRU-evicted at 500 entries)
  *   2. In-flight dedup (concurrent requests for same URL share one fetch)
- *   3. SQLite cross-session cache
- *   4. Network fetch (Firecrawl preferred, built-in fallback)
+ *   3. PostgreSQL (wiki-server) — durable cross-machine source of truth
+ *   4. SQLite — fast local fallback (used when PostgreSQL is unavailable)
+ *   5. Network fetch (Firecrawl preferred, built-in fallback)
+ *
+ * Writes: successful network fetches are stored in both SQLite (fast local cache)
+ * and PostgreSQL (durable, fire-and-forget).
  */
 export async function fetchSource(request: FetchRequest): Promise<FetchedSource> {
   const { extractMode, query } = request;

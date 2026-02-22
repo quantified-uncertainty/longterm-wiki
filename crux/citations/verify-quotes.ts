@@ -15,7 +15,8 @@ import {
   citationQuotes,
   citationContent,
 } from '../lib/knowledge-db.ts';
-import { fetchCitationUrl } from '../lib/citation-archive.ts';
+import { fetchCitationUrl, saveFetchResultToPostgres } from '../lib/citation-archive.ts';
+import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 
 interface VerifyResult {
@@ -59,7 +60,7 @@ async function verifyQuotesForPage(
         const fetchResult = await fetchCitationUrl(q.url);
         if (fetchResult.fullText) {
           sourceText = fetchResult.fullText;
-          // Update cache
+          // Update cache (SQLite)
           citationContent.upsert({
             url: q.url,
             pageId,
@@ -72,11 +73,34 @@ async function verifyQuotesForPage(
             fullText: fetchResult.fullText,
             contentLength: fetchResult.contentLength,
           });
+          // Also push to PostgreSQL for cross-environment access
+          saveFetchResultToPostgres(q.url, fetchResult);
         }
       } else {
-        // Use cached content
+        // Use cached content: SQLite first, then PostgreSQL
         const cached = citationContent.getByUrl(q.url);
-        sourceText = cached?.full_text ?? null;
+        if (cached?.full_text) {
+          sourceText = cached.full_text;
+        } else {
+          // Try PostgreSQL (cross-environment cache)
+          const pgResult = await getCitationContentByUrl(q.url);
+          if (pgResult.ok && pgResult.data.fullText && pgResult.data.fullText.length > 0) {
+            sourceText = pgResult.data.fullText;
+            // Backfill SQLite
+            citationContent.upsert({
+              url: q.url,
+              pageId,
+              footnote: q.footnote,
+              fetchedAt: pgResult.data.fetchedAt,
+              httpStatus: pgResult.data.httpStatus,
+              contentType: pgResult.data.contentType,
+              pageTitle: pgResult.data.pageTitle,
+              fullHtml: null,
+              fullText: pgResult.data.fullText,
+              contentLength: pgResult.data.contentLength,
+            });
+          }
+        }
       }
     }
 
