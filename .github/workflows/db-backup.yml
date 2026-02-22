@@ -6,6 +6,9 @@ name: Database Backup
 # This provides a safety net for the PostgreSQL data that was previously
 # committed as YAML files in git. If the database is lost, these JSON
 # snapshots can be used to restore session history and edit logs.
+#
+# Note: Each endpoint is fetched once with its MAX_PAGE_SIZE limit.
+# If data grows beyond a single page, this workflow will need pagination.
 
 on:
   schedule:
@@ -40,41 +43,43 @@ jobs:
 
           DATE=$(date -u '+%Y-%m-%d')
           echo "Backing up wiki-server data for $DATE"
+          FAILURES=0
 
-          # Export sessions (paginated, up to 10000)
-          echo "Exporting sessions..."
-          curl -sf --max-time 30 \
-            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
-            "${LONGTERMWIKI_SERVER_URL}/api/sessions?limit=1000&offset=0" \
-            -o /tmp/backup/sessions.json || echo '{"error":"fetch failed"}' > /tmp/backup/sessions.json
+          fetch_endpoint() {
+            local label="$1" url="$2" output="$3"
+            echo "Exporting ${label}..."
+            if curl -sf --max-time 60 \
+              ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+              "${url}" \
+              -o "${output}"; then
+              echo "  ✓ ${label} OK"
+            else
+              echo "::error::Failed to export ${label} from ${url}"
+              FAILURES=$((FAILURES + 1))
+            fi
+          }
 
-          # Export edit logs (paginated, up to 10000)
-          echo "Exporting edit logs..."
-          curl -sf --max-time 30 \
-            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+          # Sessions: server MAX_PAGE_SIZE is 500
+          fetch_endpoint "sessions" \
+            "${LONGTERMWIKI_SERVER_URL}/api/sessions?limit=500&offset=0" \
+            /tmp/backup/sessions.json
+
+          # Edit logs: server MAX_PAGE_SIZE is 1000
+          fetch_endpoint "edit logs" \
             "${LONGTERMWIKI_SERVER_URL}/api/edit-logs/all?limit=1000&offset=0" \
-            -o /tmp/backup/edit-logs.json || echo '{"error":"fetch failed"}' > /tmp/backup/edit-logs.json
+            /tmp/backup/edit-logs.json
 
-          # Export edit log stats
-          echo "Exporting edit log stats..."
-          curl -sf --max-time 30 \
-            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+          fetch_endpoint "edit log stats" \
             "${LONGTERMWIKI_SERVER_URL}/api/edit-logs/stats" \
-            -o /tmp/backup/edit-log-stats.json || echo '{"error":"fetch failed"}' > /tmp/backup/edit-log-stats.json
+            /tmp/backup/edit-log-stats.json
 
-          # Export job stats
-          echo "Exporting job stats..."
-          curl -sf --max-time 30 \
-            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+          fetch_endpoint "job stats" \
             "${LONGTERMWIKI_SERVER_URL}/api/jobs/stats" \
-            -o /tmp/backup/job-stats.json || echo '{"error":"fetch failed"}' > /tmp/backup/job-stats.json
+            /tmp/backup/job-stats.json
 
-          # Export latest edit dates (used by build-data)
-          echo "Exporting latest dates..."
-          curl -sf --max-time 30 \
-            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+          fetch_endpoint "latest dates" \
             "${LONGTERMWIKI_SERVER_URL}/api/edit-logs/latest-dates" \
-            -o /tmp/backup/latest-dates.json || echo '{"error":"fetch failed"}' > /tmp/backup/latest-dates.json
+            /tmp/backup/latest-dates.json
 
           # Summary
           echo ""
@@ -83,6 +88,11 @@ jobs:
             SIZE=$(wc -c < "$f" | tr -d ' ')
             echo "  $(basename "$f"): ${SIZE} bytes"
           done
+
+          if [ "$FAILURES" -gt 0 ]; then
+            echo "::error::${FAILURES} endpoint(s) failed to export"
+            exit 1
+          fi
 
       - name: Upload backup artifact
         uses: actions/upload-artifact@v4
