@@ -16,6 +16,7 @@ export default defineConfig({
       'citations/**/*.test.ts',
       'validate/**/*.test.ts',
       'wiki-server/**/*.test.ts',
+      'evals/**/*.test.ts',
     ],
     root: __dirname,
     // Run test files sequentially to prevent SQLite cross-file contamination.
