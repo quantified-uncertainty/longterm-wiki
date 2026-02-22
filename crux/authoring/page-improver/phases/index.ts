@@ -8,6 +8,7 @@
 export { analyzePhase } from './analyze.ts';
 export { researchPhase } from './research.ts';
 export { improvePhase } from './improve.ts';
+export { improveSectionsPhase } from './improve-sections.ts';
 export { enrichPhase } from './enrich.ts';
 export { reviewPhase } from './review.ts';
 export { validatePhase } from './validate.ts';

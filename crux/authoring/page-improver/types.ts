@@ -114,6 +114,13 @@ export interface PipelineOptions {
   skipSessionLog?: boolean;
   /** When true, skip post-improve enrichment (entity-links + fact-refs). */
   skipEnrich?: boolean;
+  /**
+   * When true, use the section-level improve path: splits page into ##
+   * sections, rewrites each individually via rewriteSection(), reassembles
+   * with renumbered footnotes.  Old single-pass improve remains the default.
+   * See issue #671.
+   */
+  sectionLevel?: boolean;
 }
 
 export interface EnrichResult {
@@ -185,4 +192,14 @@ export interface AdversarialLoopResult {
 export interface ParsedArgs {
   _positional: string[];
   [key: string]: string | boolean | string[];
+}
+
+/** Per-section rewrite decision produced by improveSectionsPhase. */
+export interface SectionWriteDecision {
+  /** Section slug ID, e.g. 'background'. */
+  sectionId: string;
+  /** Whether this section will be rewritten by the section-writer. */
+  shouldRewrite: boolean;
+  /** Human-readable reason for the decision. */
+  reason: string;
 }
