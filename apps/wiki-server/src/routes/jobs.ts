@@ -432,12 +432,15 @@ jobsRoute.get("/stats", async (c) => {
 
 // ---- POST /sweep (reset stale claimed/running jobs) ----
 
+const SweepSchema = z.object({
+  timeoutMinutes: z.number().int().min(1).max(10080).default(STALE_TIMEOUT_MINUTES),
+});
+
 jobsRoute.post("/sweep", async (c) => {
-  const body = await parseJsonBody(c);
-  const timeoutMinutes =
-    (body && typeof body === "object" && "timeoutMinutes" in body
-      ? Number((body as Record<string, unknown>).timeoutMinutes)
-      : null) || STALE_TIMEOUT_MINUTES;
+  const body = (await parseJsonBody(c)) ?? {};
+  const parsed = SweepSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+  const timeoutMinutes = parsed.data.timeoutMinutes;
 
   const db = getDrizzleDb();
 

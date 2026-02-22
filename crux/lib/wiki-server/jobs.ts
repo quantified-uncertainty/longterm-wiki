@@ -90,8 +90,8 @@ export async function listJobs(opts?: {
   const params = new URLSearchParams();
   if (opts?.status) params.set('status', opts.status);
   if (opts?.type) params.set('type', opts.type);
-  if (opts?.limit) params.set('limit', String(opts.limit));
-  if (opts?.offset) params.set('offset', String(opts.offset));
+  if (opts?.limit != null) params.set('limit', String(opts.limit));
+  if (opts?.offset != null) params.set('offset', String(opts.offset));
   const qs = params.toString();
   return apiRequest<ListJobsResult>('GET', `/api/jobs${qs ? `?${qs}` : ''}`);
 }

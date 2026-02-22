@@ -75,13 +75,24 @@ jobs:
             CLAIM_BODY=$(jq -n --arg wid "$WORKER_ID" '{workerId: $wid}')
           fi
 
-          # Claim a job
-          CLAIM_RESPONSE=$(curl -sf \
+          # Claim a job (log errors instead of silently falling back)
+          HTTP_CODE=$(curl -s -o /tmp/claim_response.json -w "%{http_code}" \
             -X POST \
             -H "Authorization: Bearer $LONGTERMWIKI_SERVER_API_KEY" \
             -H "Content-Type: application/json" \
             -d "$CLAIM_BODY" \
-            "${LONGTERMWIKI_SERVER_URL}/api/jobs/claim" || echo '{"job":null}')
+            "${LONGTERMWIKI_SERVER_URL}/api/jobs/claim" || echo "000")
+
+          if [ "$HTTP_CODE" = "000" ]; then
+            echo "::error::Failed to connect to wiki server at ${LONGTERMWIKI_SERVER_URL}"
+            exit 1
+          elif [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Claim request failed with HTTP $HTTP_CODE"
+            cat /tmp/claim_response.json 2>/dev/null || true
+            exit 1
+          fi
+
+          CLAIM_RESPONSE=$(cat /tmp/claim_response.json)
 
           JOB_ID=$(echo "$CLAIM_RESPONSE" | jq -r '.job.id // empty')
 
@@ -95,6 +106,13 @@ jobs:
           JOB_PARAMS=$(echo "$CLAIM_RESPONSE" | jq -c '.job.params // {}')
 
           echo "Claimed job #$JOB_ID (type: $JOB_TYPE_ACTUAL)"
+          echo "Job params: $JOB_PARAMS"
+
+          # Validate job type against allowlist to prevent execution of unexpected types
+          ALLOWED_TYPES="ping citation-verify"
+          if ! echo "$ALLOWED_TYPES" | grep -qw "$JOB_TYPE_ACTUAL"; then
+            echo "::warning::Unknown job type '$JOB_TYPE_ACTUAL' — will report as failed"
+          fi
           echo "claimed=true" >> "$GITHUB_OUTPUT"
           echo "job_id=$JOB_ID" >> "$GITHUB_OUTPUT"
           echo "job_type=$JOB_TYPE_ACTUAL" >> "$GITHUB_OUTPUT"

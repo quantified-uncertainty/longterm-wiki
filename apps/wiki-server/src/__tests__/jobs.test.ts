@@ -313,6 +313,23 @@ describe("Jobs API", () => {
       });
       expect(res.status).toBe(400);
     });
+
+    it("rejects empty batch array", async () => {
+      const res = await postJson(app, "/api/jobs", []);
+      expect(res.status).toBe(400);
+    });
+
+    it("returns camelCase keys in response", async () => {
+      const res = await postJson(app, "/api/jobs", { type: "ping", maxRetries: 5 });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body).toHaveProperty("maxRetries");
+      expect(body).toHaveProperty("createdAt");
+      expect(body).toHaveProperty("workerId");
+      expect(body).not.toHaveProperty("max_retries");
+      expect(body).not.toHaveProperty("created_at");
+      expect(body).not.toHaveProperty("worker_id");
+    });
   });
 
   describe("GET /api/jobs (list)", () => {
@@ -361,6 +378,32 @@ describe("Jobs API", () => {
       expect(body.job).toBeNull();
     });
 
+    it("claims by type filter", async () => {
+      await postJson(app, "/api/jobs", { type: "ping", priority: 10 });
+      await postJson(app, "/api/jobs", { type: "citation-verify", priority: 1 });
+
+      const res = await postJson(app, "/api/jobs/claim", {
+        workerId: "w1",
+        type: "citation-verify",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.job).not.toBeNull();
+      expect(body.job.type).toBe("citation-verify");
+    });
+
+    it("returns null when type filter matches no pending jobs", async () => {
+      await postJson(app, "/api/jobs", { type: "ping" });
+
+      const res = await postJson(app, "/api/jobs/claim", {
+        workerId: "w1",
+        type: "nonexistent-type",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.job).toBeNull();
+    });
+
     it("rejects missing workerId", async () => {
       const res = await postJson(app, "/api/jobs/claim", {});
       expect(res.status).toBe(400);
@@ -395,7 +438,7 @@ describe("Jobs API", () => {
   });
 
   describe("POST /api/jobs/:id/fail", () => {
-    it("marks a running job as failed", async () => {
+    it("marks a running job as failed with retried=false when maxRetries exhausted", async () => {
       await postJson(app, "/api/jobs", { type: "ping", maxRetries: 1 });
       await postJson(app, "/api/jobs/claim", { workerId: "w1" });
       await postJson(app, "/api/jobs/1/start", {});
@@ -406,6 +449,23 @@ describe("Jobs API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.error).toBe("Something went wrong");
+      expect(body.status).toBe("failed");
+      expect(body.retried).toBe(false);
+    });
+
+    it("retries a failed job when retries < maxRetries", async () => {
+      await postJson(app, "/api/jobs", { type: "ping", maxRetries: 3 });
+      await postJson(app, "/api/jobs/claim", { workerId: "w1" });
+      await postJson(app, "/api/jobs/1/start", {});
+
+      const res = await postJson(app, "/api/jobs/1/fail", {
+        error: "Transient error",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe("pending");
+      expect(body.retried).toBe(true);
+      expect(body.retries).toBe(1);
     });
 
     it("rejects missing error message", async () => {
@@ -422,6 +482,15 @@ describe("Jobs API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.status).toBe("cancelled");
+    });
+
+    it("rejects cancelling a running job", async () => {
+      await postJson(app, "/api/jobs", { type: "ping" });
+      await postJson(app, "/api/jobs/claim", { workerId: "w1" });
+      await postJson(app, "/api/jobs/1/start", {});
+
+      const res = await postJson(app, "/api/jobs/1/cancel", {});
+      expect(res.status).toBe(404);
     });
   });
 
