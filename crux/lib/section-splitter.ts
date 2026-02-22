@@ -19,6 +19,9 @@
  */
 
 import type { SourceCacheEntry } from './section-writer.ts';
+// Note: patterns.ts has FRONTMATTER_RE but it captures only the body without
+// delimiters.  We need the full block (including ---) for lossless reassembly,
+// so we use a local variant that captures the delimited block.
 
 // ---------------------------------------------------------------------------
 // Public interfaces
