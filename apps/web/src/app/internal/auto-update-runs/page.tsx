@@ -195,7 +195,7 @@ export default async function AutoUpdateRunsPage() {
             <span className="font-medium text-foreground">{runs.length}</span>{" "}
             runs,{" "}
             <span className="font-medium text-foreground">{totalUpdated}</span>{" "}
-            pages updated, \${totalSpent.toFixed(0)} spent.
+            pages updated, ${totalSpent.toFixed(0)} spent.
             {totalFailed > 0 && (
               <span className="text-red-500 font-medium">
                 {" "}
