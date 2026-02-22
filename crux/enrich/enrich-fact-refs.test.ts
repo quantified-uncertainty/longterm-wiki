@@ -10,6 +10,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { applyFactRefReplacements, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 describe('applyFactRefReplacements', () => {
   it('wraps a matching number with <F> tags', () => {
@@ -414,5 +415,62 @@ describe('fixStrayBackslashBeforeFTag', () => {
     const content = '<F e="anthropic" f="5b0663a0">\\$30B</F>';
     const result = fixStrayBackslashBeforeFTag(content);
     expect(result).toBe(content); // No change — \\$ inside F is fine
+  });
+});
+
+describe('splitContentForEnrichment', () => {
+  it('returns single chunk for short content', () => {
+    const content = 'Short content that fits in one chunk.';
+    const chunks = splitContentForEnrichment(content);
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]).toBe(content);
+  });
+
+  it('splits long content by H2 sections', () => {
+    const section1 = '## Section One\n' + 'A'.repeat(3000);
+    const section2 = '## Section Two\n' + 'B'.repeat(3000);
+    const content = `---\ntitle: Test\n---\n\nPreamble.\n\n${section1}\n\n${section2}`;
+
+    const chunks = splitContentForEnrichment(content);
+
+    expect(chunks.length).toBeGreaterThan(1);
+    const combined = chunks.join('');
+    expect(combined).toContain('Section One');
+    expect(combined).toContain('Section Two');
+    expect(combined).toContain('Preamble');
+  });
+
+  it('fact reference at position >6000 chars is included in a chunk (#673)', () => {
+    // Create content where "\\$30 billion" first appears well past position 6000.
+    // section1 is intentionally large to push section2's content past the 6000-char boundary.
+    const preamble = 'Introduction.\n\n';
+    const section1 = '## First Section\n' + 'x'.repeat(4000) + '\n\n';
+    const section2 = '## Second Section\n' + 'y'.repeat(2000) + '\n\nRaised \\$30 billion in 2024.\n';
+    const content = preamble + section1 + section2;
+
+    // Verify "\\$30 billion" is beyond position 6000 in the original content
+    expect(content.indexOf('\\$30 billion')).toBeGreaterThan(6000);
+
+    const chunks = splitContentForEnrichment(content);
+
+    // "## Second Section" chunk must contain the fact reference
+    const chunkWithFact = chunks.find(c => c.includes('## Second Section'));
+    expect(chunkWithFact).toBeDefined();
+    expect(chunkWithFact).toContain('\\$30 billion');
+  });
+
+  it('no content is lost when splitting', () => {
+    const section1 = '## Alpha\n' + 'a'.repeat(2000);
+    const section2 = '## Beta\n' + 'b'.repeat(2000);
+    const section3 = '## Gamma\n' + 'c'.repeat(2000);
+    const content = `Intro.\n\n${section1}\n\n${section2}\n\n${section3}`;
+
+    const chunks = splitContentForEnrichment(content);
+
+    const combined = chunks.join('');
+    expect(combined).toContain('## Alpha');
+    expect(combined).toContain('## Beta');
+    expect(combined).toContain('## Gamma');
+    expect(combined).toContain('Intro.');
   });
 });

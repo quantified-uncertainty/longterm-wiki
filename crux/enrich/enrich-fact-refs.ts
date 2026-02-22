@@ -27,6 +27,7 @@ import { buildFactLookupForContent } from '../lib/fact-lookup.ts';
 import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anthropic.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -343,7 +344,7 @@ ${factLookup}
 
 ## Content to Enrich
 \`\`\`mdx
-${content.slice(0, 6000)}${content.length > 6000 ? '\n... [truncated]' : ''}
+${content}
 \`\`\`
 
 Identify hardcoded numbers matching canonical facts and return replacement instructions as JSON.`;
@@ -403,7 +404,14 @@ export async function enrichFactRefs(
   let replacements: FactRefReplacement[] = [];
 
   if (useLlm) {
-    replacements = await callLlmForFactRefs(content, factLookup);
+    // Split into sections and process each chunk separately to cover the full page (#673).
+    // Long pages truncated at 6000 chars silently miss fact references in the second half.
+    const chunks = splitContentForEnrichment(content);
+
+    for (const chunk of chunks) {
+      const chunkReplacements = await callLlmForFactRefs(chunk, factLookup);
+      replacements.push(...chunkReplacements);
+    }
   }
 
   // Validate factIds are 8-char hex
