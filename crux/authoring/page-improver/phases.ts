@@ -12,6 +12,7 @@
  *   phases/validate.ts             — In-process validation + auto-fixes
  *   phases/gap-fill.ts             — Fix remaining issues from review
  *   phases/triage.ts               — News-based tier auto-selection
+ *   phases/enrich.ts               — Post-improve enrichment (entity-links, fact-refs)
  *   phases/adversarial-review.ts   — Adversarial reviewer (fact density, speculation, gaps)
  *   phases/adversarial-loop.ts     — Re-research feedback loop driven by adversarial review
  */
@@ -20,6 +21,7 @@ export {
   analyzePhase,
   researchPhase,
   improvePhase,
+  enrichPhase,
   reviewPhase,
   validatePhase,
   gapFillPhase,

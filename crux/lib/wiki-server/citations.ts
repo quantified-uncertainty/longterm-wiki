@@ -9,6 +9,7 @@ import type {
   UpsertCitationQuote,
   AccuracyVerdict as AccuracyVerdictType,
   MarkAccuracy,
+  UpsertCitationContent,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -148,5 +149,87 @@ export async function createAccuracySnapshot(): Promise<ApiResult<SnapshotResult
 
 export async function getAccuracyDashboard(): Promise<ApiResult<AccuracyDashboardData>> {
   return apiRequest<AccuracyDashboardData>('GET', '/api/citations/accuracy-dashboard');
+}
+
+// ---------------------------------------------------------------------------
+// Citation Content API functions
+// ---------------------------------------------------------------------------
+
+export type UpsertCitationContentInput = UpsertCitationContent;
+
+export interface CitationContentRow {
+  url: string;
+  fetchedAt: string;
+  httpStatus: number | null;
+  contentType: string | null;
+  pageTitle: string | null;
+  fullTextPreview: string | null;
+  fullText: string | null;
+  contentLength: number | null;
+  contentHash: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CitationContentListEntry {
+  url: string;
+  fetchedAt: string;
+  httpStatus: number | null;
+  contentType: string | null;
+  pageTitle: string | null;
+  contentLength: number | null;
+  contentHash: string | null;
+  hasFullText: boolean;
+  hasPreview: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CitationContentListResult {
+  entries: CitationContentListEntry[];
+  total: number;
+  withFullText: number;
+  withPreview: number;
+  limit: number;
+  offset: number;
+}
+
+export interface CitationContentStatsResult {
+  total: number;
+  withFullText: number;
+  withPreview: number;
+  coverage: number;
+  okCount: number;
+  deadCount: number;
+  avgContentLength: number | null;
+}
+
+export async function upsertCitationContent(
+  item: UpsertCitationContentInput,
+): Promise<ApiResult<{ url: string }>> {
+  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item);
+}
+
+export async function getCitationContentByUrl(
+  url: string,
+): Promise<ApiResult<CitationContentRow>> {
+  return apiRequest<CitationContentRow>(
+    'GET',
+    `/api/citations/content?url=${encodeURIComponent(url)}`,
+  );
+}
+
+export async function listCitationContent(
+  limit = 100,
+  offset = 0,
+): Promise<ApiResult<CitationContentListResult>> {
+  return apiRequest<CitationContentListResult>(
+    'GET',
+    `/api/citations/content/list?limit=${limit}&offset=${offset}`,
+  );
+}
+
+export async function getCitationContentStats(): Promise<ApiResult<CitationContentStatsResult>> {
+  return apiRequest<CitationContentStatsResult>('GET', '/api/citations/content/stats');
 }
 

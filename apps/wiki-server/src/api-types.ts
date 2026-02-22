@@ -123,6 +123,26 @@ export const MarkAccuracyBatchSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Citation Content
+// ---------------------------------------------------------------------------
+
+/** Maximum size for the full-text preview field (50 KB). */
+export const CITATION_CONTENT_PREVIEW_MAX = 50 * 1024;
+
+export const UpsertCitationContentSchema = z.object({
+  url: z.string().min(1).max(2000),
+  fetchedAt: z.string().datetime(),
+  httpStatus: z.number().int().nullable().optional(),
+  contentType: z.string().max(200).nullable().optional(),
+  pageTitle: z.string().max(1000).nullable().optional(),
+  fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().optional(),
+  fullText: z.string().nullable().optional(),
+  contentLength: z.number().int().nullable().optional(),
+  contentHash: z.string().max(64).nullable().optional(),
+});
+export type UpsertCitationContent = z.infer<typeof UpsertCitationContentSchema>;
+
+// ---------------------------------------------------------------------------
 // Sessions
 // ---------------------------------------------------------------------------
 

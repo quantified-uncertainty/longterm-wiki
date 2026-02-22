@@ -2,6 +2,8 @@
  * Types for the page-improver pipeline.
  */
 
+import type { SourceCacheEntry } from '../../lib/section-writer.ts';
+
 export interface TierConfig {
   name: string;
   cost: string;
@@ -52,6 +54,8 @@ export interface ResearchResult {
   summary?: string;
   raw?: string;
   error?: string;
+  /** Grounded source cache built by fetching URLs via source-fetcher (#668). */
+  sourceCache?: SourceCacheEntry[];
 }
 
 export interface ReviewResult {
@@ -108,6 +112,13 @@ export interface PipelineOptions {
    * Use this when the caller (e.g. auto-update batch) wants to write its own aggregate log.
    */
   skipSessionLog?: boolean;
+  /** When true, skip post-improve enrichment (entity-links + fact-refs). */
+  skipEnrich?: boolean;
+}
+
+export interface EnrichResult {
+  entityLinks: { insertedCount: number };
+  factRefs: { insertedCount: number };
 }
 
 export interface PipelineResults {
@@ -120,6 +131,8 @@ export interface PipelineResults {
   review: ReviewResult | undefined;
   /** Set when the deep tier's adversarial-loop phase ran. */
   adversarialLoopResult?: AdversarialLoopResult;
+  /** Set when the enrich phase ran. */
+  enrichResult?: EnrichResult;
   outputPath: string;
 }
 
