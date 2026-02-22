@@ -365,9 +365,10 @@ export async function processDirections(topic: string, directions: string | null
 
       if (contentType.includes('application/pdf')) {
         try {
-          const pdfParse = (await import('pdf-parse')).default;
+          const { PDFParse } = await import('pdf-parse');
           const buffer = await response.arrayBuffer();
-          const pdfData = await pdfParse(Buffer.from(buffer));
+          const parser = new PDFParse({ data: Buffer.from(buffer) });
+          const pdfData = await parser.getText();
           content = pdfData.text.replace(/\s+/g, ' ').trim().slice(0, 15000);
           log('directions', `  Parsed PDF: ${content.length} chars`);
         } catch (err: unknown) {

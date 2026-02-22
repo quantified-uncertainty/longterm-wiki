@@ -67,6 +67,23 @@ vi.mock('./resource-lookup.ts', () => ({
   updateResourceFetchStatus: vi.fn(),
 }));
 
+// Mock pdf-parse so PDF tests are deterministic and offline.
+// Use a regular function (not arrow) since PDFParse is invoked with `new`.
+vi.mock('pdf-parse', () => {
+  const PDFParseMock = vi.fn().mockImplementation(function(this: { getText: ReturnType<typeof vi.fn> }) {
+    this.getText = vi.fn().mockResolvedValue({ text: '', pages: [] });
+    return this;
+  });
+  return { PDFParse: PDFParseMock };
+});
+
+// Mock youtube-transcript so YouTube tests are deterministic and offline.
+vi.mock('youtube-transcript', () => ({
+  YoutubeTranscript: {
+    fetchTranscript: vi.fn().mockResolvedValue([]),
+  },
+}));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -329,14 +346,17 @@ describe('fetchSource', () => {
     expect(fetchMock).not.toHaveBeenCalled(); // Should not attempt network fetch
   });
 
-  it('returns error status for PDF content types', async () => {
+  it('returns error status for PDF with empty body (extraction fails)', async () => {
+    // Empty PDF body — pdf-parse will fail, returning status: 'error'
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({
       contentType: 'application/pdf',
+      body: '', // empty body triggers pdf-parse error
     })));
 
     const result = await fetchSource({ url: 'https://example.com/paper.pdf', extractMode: 'full' });
 
     expect(result.status).toBe('error');
+    expect(result.contentType).toBe('pdf');
     expect(result.content).toBe('');
   });
 
@@ -881,14 +901,14 @@ describe('PostgreSQL write path', () => {
         url: 'https://example.com/pg-cached',
         pageTitle: 'PG Cached Page',
         fullText: 'Content stored in PostgreSQL about AI safety.',
-        fetchedAt: '2025-01-01T00:00:00.000Z',
+        fetchedAt: new Date().toISOString(),
         httpStatus: 200,
         contentType: 'text/html',
         fullTextPreview: null,
         contentLength: 44,
         contentHash: null,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
 
@@ -912,14 +932,14 @@ describe('PostgreSQL write path', () => {
         url: 'https://example.com/pg-relevant',
         pageTitle: 'AI Safety Report',
         fullText: 'Global spending on AI safety research reached $100 million.\n\nResearchers worldwide have increased commitments to AI alignment.\n\nUnrelated paragraph about climate science.',
-        fetchedAt: '2025-01-01T00:00:00.000Z',
+        fetchedAt: new Date().toISOString(),
         httpStatus: 200,
         contentType: 'text/html',
         fullTextPreview: null,
         contentLength: 100,
         contentHash: null,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
 
@@ -969,14 +989,14 @@ describe('PostgreSQL write path', () => {
         url: 'https://example.com/backfill-test',
         pageTitle: 'Backfill Test',
         fullText: 'PostgreSQL content for backfill test.',
-        fetchedAt: '2025-01-01T00:00:00.000Z',
+        fetchedAt: new Date().toISOString(),
         httpStatus: 200,
         contentType: 'text/html',
         fullTextPreview: null,
         contentLength: 37,
         contentHash: null,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
 
@@ -994,5 +1014,309 @@ describe('PostgreSQL write path', () => {
       url: 'https://example.com/backfill-test',
       fullText: 'PostgreSQL content for backfill test.',
     }));
+  });
+
+  it('skips stale PostgreSQL cache entries past TTL (#693)', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    // Return a cache entry from 2 months ago — past the 30-day default TTL
+    getMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        url: 'https://example.com/pg-stale',
+        pageTitle: 'Old PG Page',
+        fullText: 'Stale PostgreSQL content from months ago.',
+        fetchedAt: '2024-01-01T00:00:00.000Z',
+        httpStatus: 200,
+        contentType: 'text/html',
+        fullTextPreview: null,
+        contentLength: 41,
+        contentHash: null,
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+    });
+
+    // Network fetch should happen since PG cache is stale
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      new Response('<html><head><title>Fresh</title></head><body><p>Fresh content about AI safety that has been recently updated.</p></body></html>', {
+        status: 200,
+        headers: { 'Content-Type': 'text/html' },
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://example.com/pg-stale', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(fetchMock).toHaveBeenCalled(); // Network fetch triggered since PG cache stale
+    expect(result.content).toContain('Fresh');
+  });
+
+  it('respects custom maxAgeMs overriding the default 30-day TTL', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    // Return a cache entry from 5 days ago — fresh within 30-day default but stale for 1-day override
+    const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
+    getMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        url: 'https://example.com/pg-custom-ttl',
+        pageTitle: 'Somewhat Fresh Page',
+        fullText: 'Content from 5 days ago.',
+        fetchedAt: fiveDaysAgo,
+        httpStatus: 200,
+        contentType: 'text/html',
+        fullTextPreview: null,
+        contentLength: 24,
+        contentHash: null,
+        createdAt: fiveDaysAgo,
+        updatedAt: fiveDaysAgo,
+      },
+    });
+
+    // Network fetch should happen when maxAgeMs = 1 day (entry is 5 days old)
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      new Response('<html><head><title>Refreshed</title></head><body><p>Newly refreshed content.</p></body></html>', {
+        status: 200,
+        headers: { 'Content-Type': 'text/html' },
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({
+      url: 'https://example.com/pg-custom-ttl',
+      extractMode: 'full',
+      maxAgeMs: 24 * 60 * 60 * 1000, // 1 day — forces re-fetch of 5-day-old entry
+    });
+
+    expect(result.status).toBe('ok');
+    expect(fetchMock).toHaveBeenCalled(); // Re-fetched due to custom TTL
+    expect(result.content).toContain('Refreshed');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PDF extraction
+// ---------------------------------------------------------------------------
+
+describe('PDF extraction', () => {
+  beforeEach(async () => {
+    clearSessionCache();
+    vi.restoreAllMocks();
+    // Reset wiki-server mock to default (server unavailable)
+    const { getCitationContentByUrl, upsertCitationContent } = await import('./wiki-server/citations.ts');
+    (getCitationContentByUrl as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, error: 'unavailable', message: 'no server' });
+    (upsertCitationContent as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: { url: 'https://example.com' } });
+  });
+
+  it('returns ok status and contentType=pdf when pdf-parse extracts text', async () => {
+    const { PDFParse } = await import('pdf-parse');
+    // Use a regular function (not arrow/class) since PDFParse is called with `new`
+    const mockGetText = vi.fn().mockResolvedValue({ text: 'Extracted text from a real PDF document about AI safety.', pages: [] });
+    (PDFParse as unknown as ReturnType<typeof vi.fn>).mockImplementationOnce(function(this: { getText: typeof mockGetText }) {
+      this.getText = mockGetText;
+      return this;
+    });
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      new Response('%PDF-1.4 fake pdf bytes', {
+        status: 200,
+        headers: { 'content-type': 'application/pdf' },
+      }),
+    ));
+
+    const result = await fetchSource({ url: 'https://example.com/paper.pdf', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(result.contentType).toBe('pdf');
+    expect(result.content).toContain('Extracted text');
+  });
+
+  it('sets contentType=pdf even when extraction fails (empty content)', async () => {
+    const { PDFParse } = await import('pdf-parse');
+    const mockGetTextFail = vi.fn().mockRejectedValue(new Error('Invalid PDF structure'));
+    (PDFParse as unknown as ReturnType<typeof vi.fn>).mockImplementationOnce(function(this: { getText: typeof mockGetTextFail }) {
+      this.getText = mockGetTextFail;
+      return this;
+    });
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      new Response('not-a-valid-pdf', {
+        status: 200,
+        headers: { 'content-type': 'application/pdf' },
+      }),
+    ));
+
+    const result = await fetchSource({ url: 'https://example.com/invalid.pdf', extractMode: 'full' });
+
+    expect(result.status).toBe('error');
+    expect(result.contentType).toBe('pdf');
+    expect(result.content).toBe('');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// arXiv URL rewriting
+// ---------------------------------------------------------------------------
+
+describe('arXiv URL rewriting', () => {
+  beforeEach(() => {
+    clearSessionCache();
+    vi.restoreAllMocks();
+  });
+
+  it('rewrites arxiv.org/abs/ to ar5iv HTML for clean extraction', async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('ar5iv.labs.arxiv.org')) {
+        return Promise.resolve(
+          new Response('<html><head><title>Attention Is All You Need</title></head><body><p>Full text of the transformer paper.</p></body></html>', {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          }),
+        );
+      }
+      // Original arxiv URL should not be called
+      return Promise.reject(new Error('Should have used ar5iv rewrite'));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://arxiv.org/abs/1706.03762', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(result.content).toContain('transformer');
+    // Verify the fetch was made to ar5iv, not the original arxiv URL
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('ar5iv.labs.arxiv.org/html/1706.03762'),
+      expect.anything(),
+    );
+  });
+
+  it('rewrites arxiv.org/pdf/ to ar5iv HTML', async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('ar5iv.labs.arxiv.org')) {
+        return Promise.resolve(
+          new Response('<html><head><title>PDF Paper Title</title></head><body><p>PDF paper content extracted as HTML.</p></body></html>', {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          }),
+        );
+      }
+      return Promise.reject(new Error('Should have used ar5iv rewrite'));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://arxiv.org/pdf/2301.12345.pdf', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('ar5iv.labs.arxiv.org/html/2301.12345'),
+      expect.anything(),
+    );
+  });
+
+  it('does not rewrite non-arxiv URLs', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await fetchSource({ url: 'https://example.com/paper.html', extractMode: 'full' });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://example.com/paper.html',
+      expect.anything(),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// YouTube transcript
+// ---------------------------------------------------------------------------
+
+describe('YouTube transcript', () => {
+  beforeEach(() => {
+    clearSessionCache();
+    vi.restoreAllMocks();
+  });
+
+  it('returns ok status and contentType=transcript for YouTube URLs', async () => {
+    const { YoutubeTranscript } = await import('youtube-transcript');
+    (YoutubeTranscript.fetchTranscript as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+      { text: 'Welcome to this lecture on AI safety.', duration: 3000, offset: 0 },
+      { text: 'Today we will discuss alignment and interpretability.', duration: 4000, offset: 3000 },
+    ]);
+
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({
+      url: 'https://www.youtube.com/watch?v=testId123',
+      extractMode: 'full',
+    });
+
+    expect(result.status).toBe('ok');
+    expect(result.contentType).toBe('transcript');
+    expect(result.content).toContain('AI safety');
+    expect(result.content).toContain('alignment');
+    expect(fetchMock).not.toHaveBeenCalled(); // No HTTP fetch for YouTube
+  });
+
+  it('returns error status when YouTube transcript is unavailable', async () => {
+    const { YoutubeTranscript } = await import('youtube-transcript');
+    (YoutubeTranscript.fetchTranscript as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error('Transcript disabled for this video'),
+    );
+
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({
+      url: 'https://youtu.be/disabledTranscript',
+      extractMode: 'full',
+    });
+
+    expect(result.status).toBe('error');
+    expect(result.contentType).toBe('transcript');
+    expect(result.content).toBe('');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('detects youtube.com and youtu.be URLs', async () => {
+    const { YoutubeTranscript } = await import('youtube-transcript');
+    (YoutubeTranscript.fetchTranscript as ReturnType<typeof vi.fn>).mockResolvedValue([
+      { text: 'Short transcript segment.', duration: 2000, offset: 0 },
+    ]);
+    vi.stubGlobal('fetch', vi.fn());
+
+    const urlVariants = [
+      'https://www.youtube.com/watch?v=abc123',
+      'https://youtube.com/watch?v=abc123',
+      'https://youtu.be/abc123',
+    ];
+
+    for (const url of urlVariants) {
+      clearSessionCache();
+      const result = await fetchSource({ url, extractMode: 'full' });
+      expect(result.contentType).toBe('transcript');
+    }
+  });
+
+  it('extracts relevant excerpts from YouTube transcript', async () => {
+    const { YoutubeTranscript } = await import('youtube-transcript');
+    (YoutubeTranscript.fetchTranscript as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+      { text: 'AI safety research is crucial for preventing catastrophic outcomes.', duration: 5000, offset: 0 },
+      { text: 'Alignment techniques include RLHF and interpretability methods.', duration: 4000, offset: 5000 },
+      { text: 'The weather today is sunny and warm.', duration: 3000, offset: 9000 },
+    ]);
+    vi.stubGlobal('fetch', vi.fn());
+
+    const result = await fetchSource({
+      url: 'https://www.youtube.com/watch?v=excerptTest',
+      extractMode: 'relevant',
+      query: 'AI safety alignment research',
+    });
+
+    expect(result.status).toBe('ok');
+    expect(result.relevantExcerpts.length).toBeGreaterThan(0);
+    expect(result.relevantExcerpts.some(e => e.toLowerCase().includes('alignment') || e.toLowerCase().includes('safety'))).toBe(true);
   });
 });
