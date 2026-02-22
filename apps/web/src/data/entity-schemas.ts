@@ -196,6 +196,30 @@ const OverviewEntitySchema = BaseEntity.extend({
   entityType: z.literal("overview"),
 });
 
+const InternalEntitySchema = BaseEntity.extend({
+  entityType: z.literal("internal"),
+});
+
+const EventEntitySchema = BaseEntity.extend({
+  entityType: z.literal("event"),
+});
+
+const DebateEntitySchema = BaseEntity.extend({
+  entityType: z.literal("debate"),
+});
+
+const TableEntitySchema = BaseEntity.extend({
+  entityType: z.literal("table"),
+});
+
+const DiagramEntitySchema = BaseEntity.extend({
+  entityType: z.literal("diagram"),
+});
+
+const IntelligenceParadigmEntitySchema = BaseEntity.extend({
+  entityType: z.literal("intelligence-paradigm"),
+});
+
 // Catch-all for entity types we haven't explicitly modeled
 // (e.g., ai-transition-model-* types)
 const GenericEntitySchema = BaseEntity.extend({
@@ -233,6 +257,12 @@ export const TypedEntitySchema = z.discriminatedUnion("entityType", [
   ParameterEntitySchema,
   MetricEntitySchema,
   OverviewEntitySchema,
+  InternalEntitySchema,
+  EventEntitySchema,
+  DebateEntitySchema,
+  TableEntitySchema,
+  DiagramEntitySchema,
+  IntelligenceParadigmEntitySchema,
 ]);
 
 // ============================================================================

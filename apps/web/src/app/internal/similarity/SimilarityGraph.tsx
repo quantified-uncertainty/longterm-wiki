@@ -300,14 +300,16 @@ export function SimilarityGraph({ data }: Props) {
         const ly = n.y! - 6;
 
         ctx.fillStyle = bold ? "rgba(0, 0, 0, 0.85)" : "rgba(0, 0, 0, 0.7)";
+        const rx = lx - pad;
+        const ry = ly - (bold ? 12 : 10) - pad;
+        const rw = metrics.width + pad * 2;
+        const rh = (bold ? 16 : 14) + pad * 2;
         ctx.beginPath();
-        ctx.roundRect(
-          lx - pad,
-          ly - (bold ? 12 : 10) - pad,
-          metrics.width + pad * 2,
-          (bold ? 16 : 14) + pad * 2,
-          3
-        );
+        if (ctx.roundRect) {
+          ctx.roundRect(rx, ry, rw, rh, 3);
+        } else {
+          ctx.rect(rx, ry, rw, rh);
+        }
         ctx.fill();
 
         ctx.fillStyle = "#fff";
