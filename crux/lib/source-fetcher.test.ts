@@ -290,6 +290,56 @@ describe('fetchSource', () => {
     expect(result.status).toBe('error');
     expect(fetchMock).not.toHaveBeenCalled(); // Should not attempt network fetch
   });
+
+  it('returns error status for PDF content types', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({
+      contentType: 'application/pdf',
+    })));
+
+    const result = await fetchSource({ url: 'https://example.com/paper.pdf', extractMode: 'full' });
+
+    expect(result.status).toBe('error');
+    expect(result.content).toBe('');
+  });
+
+  it('returns error for non-HTML, non-PDF content types', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({
+      contentType: 'application/json',
+      body: '{"key": "value"}',
+    })));
+
+    const result = await fetchSource({ url: 'https://api.example.com/data.json', extractMode: 'full' });
+
+    expect(result.status).toBe('error');
+    expect(result.content).toBe('');
+  });
+
+  it('serves from SQLite cache when session cache is empty', async () => {
+    const { citationContent } = await import('./knowledge-db.ts');
+    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
+    const upsertMock = citationContent.upsert as ReturnType<typeof vi.fn>;
+    // Clear accumulated call counts from earlier tests in this describe block
+    getByUrlMock.mockClear();
+    upsertMock.mockClear();
+
+    // Simulate a SQLite cache hit
+    getByUrlMock.mockReturnValueOnce({
+      full_text: 'Cached content about AI safety from SQLite.',
+      page_title: 'Cached Title',
+      fetched_at: '2024-01-01T00:00:00.000Z',
+    });
+
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://example.com/sqlite-cached', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(result.title).toBe('Cached Title');
+    expect(result.content).toBe('Cached content about AI safety from SQLite.');
+    expect(fetchMock).not.toHaveBeenCalled(); // Should not network-fetch
+    expect(upsertMock).not.toHaveBeenCalled(); // Should not re-save
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -409,54 +459,6 @@ describe('fetchAndVerifyClaim', () => {
 
     expect(source.status).toBe('paywall');
     expect(hasSupport).toBe(false);
-  });
-});
-
-  it('returns dead status for non-HTML content types (PDF)', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({
-      contentType: 'application/pdf',
-    })));
-
-    const result = await fetchSource({ url: 'https://example.com/paper.pdf', extractMode: 'full' });
-
-    expect(result.status).toBe('error');
-    expect(result.content).toBe('');
-  });
-
-  it('returns error for non-HTML, non-PDF content types', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({
-      contentType: 'application/json',
-      body: '{"key": "value"}',
-    })));
-
-    const result = await fetchSource({ url: 'https://api.example.com/data.json', extractMode: 'full' });
-
-    expect(result.status).toBe('error');
-    expect(result.content).toBe('');
-  });
-
-  it('serves from SQLite cache when session cache is empty', async () => {
-    const { citationContent } = await import('./knowledge-db.ts');
-    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
-    const upsertMock = citationContent.upsert as ReturnType<typeof vi.fn>;
-
-    // Simulate a SQLite cache hit
-    getByUrlMock.mockReturnValueOnce({
-      full_text: 'Cached content about AI safety from SQLite.',
-      page_title: 'Cached Title',
-      fetched_at: '2024-01-01T00:00:00.000Z',
-    });
-
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
-
-    const result = await fetchSource({ url: 'https://example.com/sqlite-cached', extractMode: 'full' });
-
-    expect(result.status).toBe('ok');
-    expect(result.title).toBe('Cached Title');
-    expect(result.content).toBe('Cached content about AI safety from SQLite.');
-    expect(fetchMock).not.toHaveBeenCalled(); // Should not network-fetch
-    expect(upsertMock).not.toHaveBeenCalled(); // Should not re-save
   });
 });
 
