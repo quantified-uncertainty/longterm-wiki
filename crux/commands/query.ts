@@ -22,7 +22,7 @@
  * Requires LONGTERMWIKI_SERVER_URL (set in environment).
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
 import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
@@ -45,13 +45,6 @@ function serverUnavailableError(c: ReturnType<typeof createLogger>, result: { er
     output: `${c.colors.red}Error: wiki-server ${label} (${result.error}): ${result.message}\n  Check LONGTERMWIKI_SERVER_URL is set.${c.colors.reset}`,
     exitCode: 1,
   };
-}
-
-/** Parse an integer CLI option with a fallback; returns fallback on NaN or missing. */
-function parseIntOpt(val: unknown, fallback: number): number {
-  if (val === undefined || val === null || val === true || val === false) return fallback;
-  const n = parseInt(val as string, 10);
-  return Number.isNaN(n) ? fallback : n;
 }
 
 // ---------------------------------------------------------------------------
@@ -462,22 +455,19 @@ export async function recentEdits(_args: string[], options: Record<string, unkno
   const c = log.colors;
 
   const days = parseIntOpt(options.days, 7);
-  // Cap at 200 to stay well within server's MAX_PAGE_SIZE=1000 even after client-side date filtering
   const limit = Math.min(parseIntOpt(options.limit, 30), 200);
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
   const cutoff = cutoffDate.toISOString().slice(0, 10);
 
-  // Fetch extra rows to account for date filtering; cap at server's max
-  const fetchLimit = Math.min(limit * 5, 1000);
   const result = await apiRequest<EditLogAllResult>(
     'GET',
-    `/api/edit-logs/all?limit=${fetchLimit}&offset=0`,
+    `/api/edit-logs/all?limit=${limit}&offset=0&since=${cutoff}`,
   );
 
   if (!result.ok) return serverUnavailableError(log, result);
 
-  const entries = result.data.entries.filter((e) => e.date >= cutoff).slice(0, limit);
+  const entries = result.data.entries;
 
   if (options.json || options.ci) {
     return { output: JSON.stringify({ entries, total: result.data.total }, null, 2), exitCode: 0 };

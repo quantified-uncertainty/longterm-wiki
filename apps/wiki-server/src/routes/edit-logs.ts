@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, asc, desc } from "drizzle-orm";
+import { eq, gte, count, sql, asc, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { editLogs } from "../schema.js";
 import { parseJsonBody, validationError, invalidJsonError, firstOrThrow } from "./utils.js";
@@ -20,6 +20,10 @@ const AppendBatchSchema = EditLogBatchSchema;
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
   offset: z.coerce.number().int().min(0).default(0),
+});
+
+const AllEntriesQuery = PaginationQuery.extend({
+  since: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 });
 
 // ---- POST / (append single entry) ----
@@ -115,20 +119,25 @@ editLogsRoute.get("/", async (c) => {
 // ---- GET /all (paginated, all entries) ----
 
 editLogsRoute.get("/all", async (c) => {
-  const parsed = PaginationQuery.safeParse(c.req.query());
+  const parsed = AllEntriesQuery.safeParse(c.req.query());
   if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const { limit, offset } = parsed.data;
+  const { limit, offset, since } = parsed.data;
   const db = getDrizzleDb();
 
-  const rows = await db
-    .select()
-    .from(editLogs)
-    .orderBy(desc(editLogs.date), desc(editLogs.id))
-    .limit(limit)
-    .offset(offset);
+  const whereClause = since ? gte(editLogs.date, since) : undefined;
 
-  const countResult = await db.select({ count: count() }).from(editLogs);
+  const [rows, countResult] = await Promise.all([
+    db
+      .select()
+      .from(editLogs)
+      .where(whereClause)
+      .orderBy(desc(editLogs.date), desc(editLogs.id))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: count() }).from(editLogs).where(whereClause),
+  ]);
+
   const total = countResult[0].count;
 
   return c.json({

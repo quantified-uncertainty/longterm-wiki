@@ -187,21 +187,7 @@ jobsRoute.post("/claim", async (c) => {
     return c.json({ job: null }, 200);
   }
 
-  const row = result[0] as Record<string, unknown>;
-  return c.json({
-    job: {
-      id: row.id,
-      type: row.type,
-      status: row.status,
-      params: row.params,
-      priority: row.priority,
-      retries: row.retries,
-      maxRetries: row.max_retries,
-      createdAt: row.created_at,
-      claimedAt: row.claimed_at,
-      workerId: row.worker_id,
-    },
-  });
+  return c.json({ job: formatRawJobRow(result[0] as Record<string, unknown>) });
 });
 
 // ---- POST /:id/start (mark as running) ----

@@ -16,7 +16,7 @@ import { createLogger } from '../lib/output.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import { triagePhase, loadPages as loadPagesFromImprover, findPage as findPageFromImprover } from '../authoring/page-improver.ts';
 import type { TriageResult } from '../authoring/page-improver.ts';
 
@@ -165,7 +165,7 @@ function loadUpdateCandidates(): UpdateCandidate[] {
 export async function list(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const candidates = loadUpdateCandidates();
-  const limit = parseInt(options.limit || '10', 10);
+  const limit = parseIntOpt(options.limit, 10);
   const overdueOnly = options.overdue;
 
   let filtered = candidates;
@@ -228,7 +228,7 @@ export async function list(args: string[], options: CommandOptions): Promise<Com
 export async function run(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const candidates = loadUpdateCandidates();
-  const count = parseInt(options.count || '1', 10);
+  const count = parseIntOpt(options.count, 1);
   const tier = options.tier || 'standard';
   const dryRun = options.dryRun;
   // Triage is ON by default — use --no-triage to skip
@@ -496,7 +496,7 @@ export async function stats(args: string[], options: CommandOptions): Promise<Co
 export async function triage(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const candidates = loadUpdateCandidates();
-  const count = parseInt(options.count || '5', 10);
+  const count = parseIntOpt(options.count, 5);
 
   const overdue = candidates.filter(p => p.overdue);
 

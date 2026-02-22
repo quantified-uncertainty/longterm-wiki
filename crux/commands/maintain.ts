@@ -18,7 +18,7 @@ import { execSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { githubApi, REPO } from '../lib/github.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -465,7 +465,7 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
 async function detectCruft(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
-  const limit = parseInt(options.limit || '30', 10);
+  const limit = parseIntOpt(options.limit, 30);
 
   let output = '';
   output += `${c.bold}${c.blue}Codebase Cruft Detection${c.reset}\n\n`;

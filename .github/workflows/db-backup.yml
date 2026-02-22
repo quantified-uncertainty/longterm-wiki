@@ -1,0 +1,92 @@
+name: Database Backup
+
+# Exports session logs, edit logs, and job data from the wiki-server API.
+# Stored as GitHub Actions artifacts (90-day retention).
+#
+# This provides a safety net for the PostgreSQL data that was previously
+# committed as YAML files in git. If the database is lost, these JSON
+# snapshots can be used to restore session history and edit logs.
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # daily at 04:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Export wiki-server data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Export sessions
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+        run: |
+          mkdir -p /tmp/backup
+
+          if [ -z "$LONGTERMWIKI_SERVER_URL" ]; then
+            echo "::warning::LONGTERMWIKI_SERVER_URL not set, skipping backup"
+            exit 0
+          fi
+
+          AUTH_HEADER=""
+          if [ -n "$LONGTERMWIKI_SERVER_API_KEY" ]; then
+            AUTH_HEADER="Authorization: Bearer $LONGTERMWIKI_SERVER_API_KEY"
+          fi
+
+          DATE=$(date -u '+%Y-%m-%d')
+          echo "Backing up wiki-server data for $DATE"
+
+          # Export sessions (paginated, up to 10000)
+          echo "Exporting sessions..."
+          curl -sf --max-time 30 \
+            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+            "${LONGTERMWIKI_SERVER_URL}/api/sessions?limit=1000&offset=0" \
+            -o /tmp/backup/sessions.json || echo '{"error":"fetch failed"}' > /tmp/backup/sessions.json
+
+          # Export edit logs (paginated, up to 10000)
+          echo "Exporting edit logs..."
+          curl -sf --max-time 30 \
+            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+            "${LONGTERMWIKI_SERVER_URL}/api/edit-logs/all?limit=1000&offset=0" \
+            -o /tmp/backup/edit-logs.json || echo '{"error":"fetch failed"}' > /tmp/backup/edit-logs.json
+
+          # Export edit log stats
+          echo "Exporting edit log stats..."
+          curl -sf --max-time 30 \
+            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+            "${LONGTERMWIKI_SERVER_URL}/api/edit-logs/stats" \
+            -o /tmp/backup/edit-log-stats.json || echo '{"error":"fetch failed"}' > /tmp/backup/edit-log-stats.json
+
+          # Export job stats
+          echo "Exporting job stats..."
+          curl -sf --max-time 30 \
+            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+            "${LONGTERMWIKI_SERVER_URL}/api/jobs/stats" \
+            -o /tmp/backup/job-stats.json || echo '{"error":"fetch failed"}' > /tmp/backup/job-stats.json
+
+          # Export latest edit dates (used by build-data)
+          echo "Exporting latest dates..."
+          curl -sf --max-time 30 \
+            ${AUTH_HEADER:+-H "$AUTH_HEADER"} \
+            "${LONGTERMWIKI_SERVER_URL}/api/edit-logs/latest-dates" \
+            -o /tmp/backup/latest-dates.json || echo '{"error":"fetch failed"}' > /tmp/backup/latest-dates.json
+
+          # Summary
+          echo ""
+          echo "=== Backup Summary ==="
+          for f in /tmp/backup/*.json; do
+            SIZE=$(wc -c < "$f" | tr -d ' ')
+            echo "  $(basename "$f"): ${SIZE} bytes"
+          done
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: /tmp/backup/
+          retention-days: 90
