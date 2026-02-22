@@ -382,10 +382,11 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
   // ---- 1. In-memory session cache ----
   const cached = sessionCache.get(url);
   if (cached) {
-    // Re-compute excerpts if a new query is provided
+    // extractMode='full' always returns empty excerpts regardless of cached state.
+    // extractMode='relevant' re-computes excerpts for the given query (queries differ per call).
     const excerpts = extractMode === 'relevant' && query
       ? extractRelevantExcerpts(cached.content, query)
-      : cached.relevantExcerpts;
+      : [];
     return { ...cached, relevantExcerpts: excerpts };
   }
 

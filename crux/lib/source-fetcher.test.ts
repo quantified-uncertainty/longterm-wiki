@@ -266,6 +266,21 @@ describe('fetchSource', () => {
     expect(r1.content).toBe(r2.content);
   });
 
+  it('returns empty excerpts for extractMode=full even when cache has relevant excerpts (C2 regression)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+    const url = 'https://example.com/cache-bug-regression';
+
+    // First fetch: relevant mode populates cache with excerpts
+    const r1 = await fetchSource({ url, extractMode: 'relevant', query: 'AI safety funding' });
+    expect(r1.relevantExcerpts.length).toBeGreaterThan(0);
+
+    // Second fetch: full mode should return EMPTY excerpts, not r1's cached excerpts
+    const r2 = await fetchSource({ url, extractMode: 'full' });
+    expect(r2.relevantExcerpts).toEqual([]);
+    // Content should be the same (from cache)
+    expect(r2.content).toBe(r1.content);
+  });
+
   it('returns error for unverifiable social media URLs', async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
