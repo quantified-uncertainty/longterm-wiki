@@ -426,6 +426,36 @@
 }
 
 /* ============================================================================
+   CITATION VERIFICATION INDICATORS
+   Small colored dots next to footnote refs [^N] showing verification status.
+   Rendered by CitationOverlay via React portals.
+   ============================================================================ */
+
+.citation-verification-dot {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: super;
+  font-size: 0.75em;
+  line-height: 0;
+  margin-left: -0.1em;
+  cursor: default;
+}
+
+/* Badge in the footnote section at the bottom */
+.citation-fn-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  background: var(--color-muted);
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+  vertical-align: middle;
+}
+
+/* ============================================================================
    INFOBOX LAYOUT
    Float-based fallback for browsers without :has() support.
    The .wiki-infobox has float:right set in component styles, which serves
