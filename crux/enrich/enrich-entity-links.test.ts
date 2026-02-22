@@ -9,7 +9,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { applyEntityLinkReplacements, splitContentForEnrichment, type EntityLinkReplacement } from './enrich-entity-links.ts';
+import { applyEntityLinkReplacements, type EntityLinkReplacement } from './enrich-entity-links.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 describe('applyEntityLinkReplacements', () => {
   it('inserts EntityLink for a simple mention', () => {
@@ -384,21 +385,22 @@ describe('splitContentForEnrichment', () => {
   });
 
   it('entity mention at position >6000 chars is included in a chunk (#673)', () => {
-    // Create content where "Anthropic" first appears well past position 6000.
+    // Create content where standalone "Anthropic" first appears well past position 6000.
     // section1 is intentionally large to push section2's content past the 6000-char boundary.
     const preamble = 'Introduction.\n\n';
     const section1 = '## First Section\n' + 'x'.repeat(4000) + '\n\n';
-    const section2 = '## Second Section\n' + 'y'.repeat(2000) + '\n\nAnthropicFoundation.\n';
+    const section2 = '## Second Section\n' + 'y'.repeat(2000) + '\n\nMentions Anthropic here.\n';
     const content = preamble + section1 + section2;
 
-    // Verify "Anthropic" is beyond position 6000 in the original content
+    // Verify standalone "Anthropic" is beyond position 6000 in the original content
     expect(content.indexOf('Anthropic')).toBeGreaterThan(6000);
 
     const chunks = splitContentForEnrichment(content);
 
-    // At least one chunk must contain "Anthropic" so the LLM can find it
-    const chunkWithMention = chunks.some(c => c.includes('Anthropic'));
-    expect(chunkWithMention).toBe(true);
+    // "## Second Section" chunk must contain the standalone entity mention
+    const chunkWithMention = chunks.find(c => c.includes('## Second Section'));
+    expect(chunkWithMention).toBeDefined();
+    expect(chunkWithMention).toContain('Mentions Anthropic here.');
   });
 
   it('no content is lost when splitting', () => {

@@ -9,7 +9,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { applyFactRefReplacements, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, splitContentForEnrichment, type FactRefReplacement } from './enrich-fact-refs.ts';
+import { applyFactRefReplacements, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 describe('applyFactRefReplacements', () => {
   it('wraps a matching number with <F> tags', () => {
@@ -386,7 +387,7 @@ describe('splitContentForEnrichment', () => {
     // section1 is intentionally large to push section2's content past the 6000-char boundary.
     const preamble = 'Introduction.\n\n';
     const section1 = '## First Section\n' + 'x'.repeat(4000) + '\n\n';
-    const section2 = '## Second Section\n' + 'y'.repeat(2000) + '\n\nAnthropicRaised \\$30 billion.\n';
+    const section2 = '## Second Section\n' + 'y'.repeat(2000) + '\n\nRaised \\$30 billion in 2024.\n';
     const content = preamble + section1 + section2;
 
     // Verify "\\$30 billion" is beyond position 6000 in the original content
@@ -394,9 +395,10 @@ describe('splitContentForEnrichment', () => {
 
     const chunks = splitContentForEnrichment(content);
 
-    // At least one chunk must contain "\\$30 billion" so the LLM can find it
-    const chunkWithFact = chunks.some(c => c.includes('\\$30 billion'));
-    expect(chunkWithFact).toBe(true);
+    // "## Second Section" chunk must contain the fact reference
+    const chunkWithFact = chunks.find(c => c.includes('## Second Section'));
+    expect(chunkWithFact).toBeDefined();
+    expect(chunkWithFact).toContain('\\$30 billion');
   });
 
   it('no content is lost when splitting', () => {
