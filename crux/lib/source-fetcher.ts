@@ -310,8 +310,11 @@ async function fetchWithFirecrawl(url: string): Promise<FirecrawlResult | null> 
       };
     }
     return null;
-  } catch {
-    // Firecrawl unavailable or failed — fall through to built-in fetch
+  } catch (err: unknown) {
+    // Firecrawl unavailable or failed — fall through to built-in fetch.
+    // Log the error so failures are visible in CI output (#682).
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[source-fetcher] Firecrawl failed for ${url}: ${msg.slice(0, 200)}`);
     return null;
   }
 }
@@ -389,11 +392,19 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
 // SQLite cross-session cache helpers
 // ---------------------------------------------------------------------------
 
-/** Try to load a previously fetched result from SQLite. */
-function loadFromDb(url: string): Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> | null {
+/** Default TTL for SQLite cache entries: 7 days (in milliseconds). */
+const DB_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Try to load a previously fetched result from SQLite. Returns null if expired or missing (#676). */
+function loadFromDb(url: string, maxAgeMs: number = DB_CACHE_TTL_MS): Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> | null {
   try {
     const row = citationContent.getByUrl(url);
     if (row?.full_text && row.full_text.length > 0) {
+      // Check TTL — skip stale entries so sources are periodically re-fetched.
+      if (row.fetched_at) {
+        const age = Date.now() - new Date(row.fetched_at).getTime();
+        if (age > maxAgeMs) return null;
+      }
       return {
         title: row.page_title ?? '',
         content: row.full_text,

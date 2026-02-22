@@ -64,17 +64,20 @@ interface LlmEntityLinkResponse {
 // ---------------------------------------------------------------------------
 
 /**
- * Build a set of text spans that are already inside JSX/EntityLink tags,
- * so we don't try to link them again.
+ * Build sets of display texts AND entity IDs already linked in the content,
+ * so we don't try to link them again. Deduplicating by entity ID prevents
+ * the enricher from creating a second EntityLink for the same entity when
+ * it appears under a different display name (#679).
  */
-function buildAlreadyLinkedSet(content: string): Set<string> {
-  const linked = new Set<string>();
-  // Find all existing EntityLink display texts
-  const entityLinkFull = /<EntityLink\s[^>]*>([\s\S]*?)<\/EntityLink>/g;
+function buildAlreadyLinkedSets(content: string): { texts: Set<string>; entityIds: Set<string> } {
+  const texts = new Set<string>();
+  const entityIds = new Set<string>();
+  const entityLinkFull = /<EntityLink\s[^>]*?id="([^"]+)"[^>]*>([\s\S]*?)<\/EntityLink>/g;
   for (const match of content.matchAll(entityLinkFull)) {
-    linked.add(match[1].trim());
+    entityIds.add(match[1]);
+    texts.add(match[2].trim());
   }
-  return linked;
+  return { texts, entityIds };
 }
 
 /**
@@ -140,6 +143,14 @@ function buildSkipRanges(content: string): Array<[number, number]> {
   // Handles one level of nested parens in URLs (e.g. Wikipedia links like /wiki/Foo_(bar)).
   const markdownLink = /!?\[[^\]]*\]\((?:[^()]*|\([^()]*\))*\)/g;
   for (const match of content.matchAll(markdownLink)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip MDX/JSX comments {/* ... */} (#681)
+  const mdxComment = /\{\/\*[\s\S]*?\*\/\}/g;
+  for (const match of content.matchAll(mdxComment)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
@@ -296,16 +307,18 @@ export async function enrichEntityLinks(
     return { content, insertedCount: 0, replacements: [] };
   }
 
-  const alreadyLinked = buildAlreadyLinkedSet(content);
+  const { texts: alreadyLinkedTexts, entityIds: alreadyLinkedIds } = buildAlreadyLinkedSets(content);
 
   let replacements: EntityLinkReplacement[] = [];
 
   if (useLlm) {
-    replacements = await callLlmForEntityLinks(content, entityLookup, alreadyLinked);
+    replacements = await callLlmForEntityLinks(content, entityLookup, alreadyLinkedTexts);
   }
 
-  // Filter out replacements for already-linked text
-  replacements = replacements.filter(r => !alreadyLinked.has(r.displayName));
+  // Filter out replacements for already-linked text or already-linked entity IDs (#679)
+  replacements = replacements.filter(r =>
+    !alreadyLinkedTexts.has(r.displayName) && !alreadyLinkedIds.has(r.entityId),
+  );
 
   // Validate all entityIds are in E## format
   replacements = replacements.filter(r => NUMERIC_ID_RE.test(r.entityId));

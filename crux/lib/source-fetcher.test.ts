@@ -360,11 +360,11 @@ describe('fetchSource', () => {
     getByUrlMock.mockClear();
     upsertMock.mockClear();
 
-    // Simulate a SQLite cache hit
+    // Simulate a SQLite cache hit (recent enough to be within TTL)
     getByUrlMock.mockReturnValueOnce({
       full_text: 'Cached content about AI safety from SQLite.',
       page_title: 'Cached Title',
-      fetched_at: '2024-01-01T00:00:00.000Z',
+      fetched_at: new Date().toISOString(),
     });
 
     const fetchMock = vi.fn();
@@ -377,6 +377,33 @@ describe('fetchSource', () => {
     expect(result.content).toBe('Cached content about AI safety from SQLite.');
     expect(fetchMock).not.toHaveBeenCalled(); // Should not network-fetch
     expect(upsertMock).not.toHaveBeenCalled(); // Should not re-save
+  });
+
+  it('skips stale SQLite cache entries past TTL (#676)', async () => {
+    const { citationContent } = await import('./knowledge-db.ts');
+    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
+    clearSessionCache();
+
+    // Return a cache entry from 2 months ago — past the 7-day TTL
+    getByUrlMock.mockReturnValueOnce({
+      full_text: 'Stale content from months ago.',
+      page_title: 'Old Title',
+      fetched_at: '2024-01-01T00:00:00.000Z',
+    });
+
+    // The fetch should happen since cache is stale
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      new Response('<html><head><title>Fresh</title></head><body>Fresh content about AI safety that has been recently updated.</body></html>', {
+        status: 200,
+        headers: { 'Content-Type': 'text/html' },
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://example.com/stale-cached', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(fetchMock).toHaveBeenCalled(); // Should network-fetch since cache is stale
   });
 });
 
@@ -920,7 +947,7 @@ describe('PostgreSQL write path', () => {
     getByUrlMock.mockReturnValueOnce({
       full_text: 'Content from SQLite fallback.',
       page_title: 'SQLite Title',
-      fetched_at: '2025-01-01T00:00:00.000Z',
+      fetched_at: new Date().toISOString(),
     });
 
     const fetchMock = vi.fn();
