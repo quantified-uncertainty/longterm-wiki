@@ -94,6 +94,23 @@ pnpm crux citations quote-report                     # Quote coverage statistics
 pnpm crux citations quote-report --broken            # Show broken/drifted quotes
 pnpm crux citations verify-quotes <id>               # Re-verify stored quotes
 pnpm crux citations verify-quotes --all              # Re-verify all stored quotes
+
+# Querying wiki data (use instead of grepping YAML files)
+pnpm crux query search "topic"           # Full-text search (ranked by relevance)
+pnpm crux query entity <id>              # Structured entity data
+pnpm crux query facts <entity-id>        # Numeric facts for an entity
+pnpm crux query related <page-id>        # Related pages (graph query)
+pnpm crux query backlinks <page-id>      # What links here?
+pnpm crux query page <page-id>           # Full page metadata + risk score
+pnpm crux query recent-changes --days=7  # What changed this week?
+pnpm crux query recent-edits --days=7    # Recent edit log entries
+pnpm crux query citations <page-id>      # Citation health for a page
+pnpm crux query citations --broken       # Wiki-wide broken citations
+pnpm crux query risk <page-id>           # Hallucination risk score
+pnpm crux query risk --level=high        # All high-risk pages
+pnpm crux query stats                    # Wiki-wide statistics
+# All commands support --json for machine-readable output
+# Requires LONGTERMWIKI_SERVER_URL (set in environment)
 ```
 
 ## Repository Structure
@@ -127,6 +144,25 @@ longterm-wiki/
 2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json`
 3. Next.js app reads `database.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
+
+## Querying Wiki Data
+
+The wiki-server has a PostgreSQL database with full-text search, entity graphs, facts, citations, and edit history. **Use `crux query` instead of grepping YAML files** — it's faster, returns structured results, and accesses data unavailable in flat files (risk scores, backlinks, citation accuracy).
+
+```bash
+pnpm crux query search "topic"           # Full-text search (ranked)
+pnpm crux query entity <id>              # Structured entity data
+pnpm crux query facts <entity-id>        # Numeric facts for an entity
+pnpm crux query related <page-id>        # Related pages (graph query)
+pnpm crux query backlinks <page-id>      # What links here?
+pnpm crux query page <page-id>           # Full page metadata
+pnpm crux query recent-changes --days=7  # What changed this week?
+pnpm crux query citations <page-id>      # Citation health for a page
+pnpm crux query risk <page-id>           # Hallucination risk score
+pnpm crux query stats                    # Wiki-wide statistics
+```
+
+All commands support `--json` for machine-readable output. Requires `LONGTERMWIKI_SERVER_URL` (set in environment).
 
 ## Page Authoring Workflow
 
