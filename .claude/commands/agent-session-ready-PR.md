@@ -25,7 +25,7 @@ Pay special attention to:
 
 ## Step 3: Write / update PR description
 
-Check if a PR exists and update it with: summary, key changes, test plan, issue references.
+Check if a PR exists using `pnpm crux pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux pr create`.
 
 ## Step 4: Update GitHub issue
 

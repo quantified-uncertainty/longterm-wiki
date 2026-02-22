@@ -75,6 +75,12 @@ pnpm crux issues cleanup --fix   # Auto-remove stale labels
 pnpm crux issues close <N> --duplicate=M  # Close issue as duplicate of another
 pnpm crux issues close <N> --reason="..."  # Close with comment
 
+# GitHub PR management (corruption-safe — always use instead of raw curl)
+pnpm crux pr create --title="..." --body="..."  # Create PR for current branch
+pnpm crux pr detect              # Check if PR exists for current branch
+pnpm crux pr detect --ci         # JSON output for scripts
+pnpm crux pr fix-body            # Auto-fix literal \n in PR body
+
 # Issue formatting standard (enforced by crux issues lint)
 # Well-formatted issues require:
 #   1. ## Problem section (or long freeform body)
@@ -281,6 +287,16 @@ When a session works on a GitHub issue, signal activity on that issue. See `.cla
 1. **At session start**: `pnpm crux issues start <N>` — posts a comment + adds `claude-working` label
 2. **At session end**: `pnpm crux issues done <N> --pr=<URL>` — posts completion comment + removes label
 3. **To pick the next issue**: `/next-issue` — fetches and ranks open issues, starts work on the top one
+
+## GitHub MCP Server
+
+A GitHub MCP server is configured at project level (`.mcp.json`). This gives Claude Code direct access to GitHub APIs via MCP tools.
+
+**When to use which:**
+- **`crux issues/pr/ci` commands**: For all workflow operations (issue tracking, PR creation, CI monitoring). These route through `githubApi()` which validates for shell-expansion corruption. Always prefer crux for writes.
+- **MCP GitHub tools**: For ad-hoc reads — checking a PR diff, reading a file from another branch, looking up a user, browsing repo contents. MCP tools bypass bash entirely, so shell-expansion corruption doesn't apply.
+
+**Do NOT** use raw `curl` commands for GitHub API calls. Use either crux commands (for workflow operations) or MCP tools (for ad-hoc reads).
 
 ## PR Review & Ship Workflow — MANDATORY
 

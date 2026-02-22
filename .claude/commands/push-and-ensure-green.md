@@ -35,74 +35,39 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
 3. If on a feature branch:
    - If you ran `git pull --rebase` in Step 0 (branch was diverged), push with `git push --force-with-lease -u origin HEAD` since the history was rewritten by the rebase.
    - Otherwise push normally with `git push -u origin HEAD`.
-   - Check if a PR already exists:
+   - Check if a PR already exists using crux:
      ```bash
-     BRANCH=$(git branch --show-current)
-     curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-       "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls?head=quantified-uncertainty:$BRANCH&state=open"
+     pnpm crux pr detect
      ```
-   - If no PR exists (empty array), create one:
+   - If no PR exists (exit code 1), create one using crux:
      ```bash
-     PR_TITLE="<descriptive title>"
-     PR_BODY="$(cat <<'BODY'
-## Summary
+     pnpm crux pr create --title="<descriptive title>" --body="## Summary
 
-- <key change 1>
-- <key change 2>
+     - <key change 1>
+     - <key change 2>
 
-## Test plan
-- [ ] <test step>
-
-https://claude.ai/code/session_019e8FwRtmSEkPFfqZGuVEKi
-BODY
-)"
-     curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-       "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/pulls" \
-       -d "$(jq -n --arg t "$PR_TITLE" --arg h "$BRANCH" --arg b "$PR_BODY" '{title: $t, head: $h, base: "main", body: $b}')"
+     ## Test plan
+     - [ ] <test step>"
      ```
      **After creating, always run `pnpm crux pr fix-body`** — this detects and repairs any literal `\n` in the PR body automatically.
    - If a PR exists, note its number and move on.
 
+**IMPORTANT:** Always use `crux pr create` and `crux pr detect` instead of raw curl commands. The crux commands route through `githubApi()` which validates request bodies for shell-expansion corruption (ANSI codes, dotenv output, etc.) before sending to GitHub.
+
 ## Step 3: Verify GitHub is green
 
 1. Wait 15 seconds for checks to register, then run `pnpm crux ci status --wait` to poll until all checks complete.
-   If the `crux ci status` command is not available, fall back to manual polling:
-   ```bash
-   SHA=$(git rev-parse HEAD)
-   curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-     "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/commits/$SHA/check-runs" \
-     | python3 -c "
-   import sys, json; data = json.load(sys.stdin)
-   all_done = True; any_failed = False
-   for r in data.get('check_runs', []):
-       status, conclusion = r['status'], r.get('conclusion') or '(pending)'
-       print(f\"  {r['name']:40s} {status:12s} {conclusion}\")
-       if status != 'completed': all_done = False
-       if conclusion == 'failure': any_failed = True
-   print(f\"Total: {data['total_count']} checks\")
-   print(f\"All done: {all_done}, Any failed: {any_failed}\")
-   "
-   ```
-2. Re-check every 30 seconds until all checks are `completed`.
-3. **CRITICAL**: ALL check runs must show `conclusion: success`. Do NOT trust workflow-level conclusion alone — `continue-on-error: true` makes the workflow pass but individual check runs can still show as failed.
-4. Report the final status of each check run to the user.
+2. **CRITICAL**: ALL check runs must show `conclusion: success`. Do NOT trust workflow-level conclusion alone — `continue-on-error: true` makes the workflow pass but individual check runs can still show as failed.
+3. Report the final status of each check run to the user.
 
 ## Step 4: Handle failures
 
 If any GitHub CI **check run** has `conclusion: failure`:
 
-1. Get the failed run's logs. Find the workflow run ID and download logs:
+1. Get the failed run's logs:
    ```bash
-   # List recent workflow runs for the branch
-   BRANCH=$(git branch --show-current)
-   curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-     "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/actions/runs?branch=$BRANCH&per_page=1" \
-     | python3 -c "
-   import sys, json; data = json.load(sys.stdin)
-   for run in data.get('workflow_runs', []):
-       print(f\"Run {run['id']}: {run['name']} — {run['status']} / {run.get('conclusion', 'pending')}\")
-       print(f\"  Logs: {run['logs_url']}\")
-   "
+   gh run list --branch "$(git branch --show-current)" --limit 1
+   gh run view <RUN_ID> --log-failed
    ```
 2. Analyze the failure and fix the underlying issue.
 3. Go back to **Step 1** and repeat the full cycle.
