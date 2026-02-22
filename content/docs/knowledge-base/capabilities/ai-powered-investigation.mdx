@@ -8,7 +8,7 @@ subcategory: applications
 quality: 40
 readerImportance: 6
 researchImportance: 6.5
-lastEdited: "2026-02-15"
+lastEdited: "2026-02-22"
 ratings:
   novelty: 6.5
   rigor: 5.5
@@ -24,42 +24,44 @@ import {EntityLink, DataExternalLinks} from '@components/wiki';
 <DataExternalLinks pageId="ai-powered-investigation" />
 
 :::note[Related Pages]
-This page covers AI investigation as a **capability**. For the risk assessment including chilling effects and regulatory gaps, see <EntityLink id="ai-investigation-risks">AI-Powered Investigation Risks</EntityLink>. For the specific deanonymization threat, see <EntityLink id="deanonymization">AI-Powered Deanonymization</EntityLink>. For the beneficial accountability applications, see <EntityLink id="ai-accountability">AI for Accountability and Anti-Corruption</EntityLink>.
+This page covers AI investigation as a **capability**. For the risk assessment including chilling effects and regulatory gaps, see <EntityLink id="E694" name="ai-investigation-risks">AI-Powered Investigation Risks</EntityLink>. For the specific deanonymization threat, see <EntityLink id="E699" name="deanonymization">AI-Powered Deanonymization</EntityLink>. For the beneficial accountability applications, see <EntityLink id="E700" name="ai-accountability">AI for Accountability and Anti-Corruption</EntityLink>.
 :::
 
 ## Quick Assessment
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Current Capability** | Operational and rapidly improving | GPT-4 infers personal attributes from Reddit posts with 85% accuracy (Staab et al., 2023); AI agents can browse, search, and compile reports autonomously |
-| **Cost Trajectory** | Rapidly decreasing | Traditional PI investigations cost \$50,000-500,000+; AI-assisted equivalents approaching \$100-1,000 (2024), projected under \$100 by 2027 |
+| **Current Capability** | Operational and improving | GPT-4 infers personal attributes from Reddit posts with approximately 85% accuracy (Staab et al., 2023); AI agents can browse, search, and compile reports autonomously |
+| **Cost Trajectory** | Decreasing substantially | Traditional private investigation costs estimated in the range of \$50,000–500,000+; AI-assisted equivalents estimated at \$100–1,000 (circa 2024); trajectory unclear beyond near term |
 | **OSINT Automation** | Emerging at scale | Bellingcat-style investigations (MH17, Skripal) being replicated with AI tools; satellite imagery analysis automated by Planet Labs and others |
 | **Dual-Use Tension** | Fundamental and unresolved | Same capability exposes corruption and strips away personal privacy; no governance framework addresses both sides |
 | **Governance** | Fragmented | GDPR provides partial protection; US lacks federal privacy law; "public information" doctrine creates loopholes for AI aggregation |
-| **Accessibility** | Democratizing rapidly | Capabilities once limited to state intelligence agencies becoming available to individuals with API access |
+| **Accessibility** | Expanding | Capabilities once limited to state intelligence agencies becoming available to individuals with API access |
 
 ## Overview
 
-AI-powered investigation refers to the use of artificial intelligence to synthesize, cross-reference, and analyze publicly available information at scale — performing the work of investigative journalists, private investigators, or intelligence analysts at dramatically lower cost and higher speed. This capability is sometimes called AI-augmented open-source intelligence (OSINT).
+AI-powered investigation refers to the use of artificial intelligence to synthesize, cross-reference, and analyze publicly available information at scale — performing the work of investigative journalists, private investigators, or intelligence analysts at substantially lower cost and higher speed. This capability is sometimes called AI-augmented open-source intelligence (OSINT).
 
-The core capability emerges from combining several AI strengths: natural language processing can extract entities (people, organizations, financial amounts) from unstructured text across thousands of documents; knowledge graph construction maps relationships between entities across disparate data sources; pattern recognition identifies anomalies in financial filings or behavioral data; and <EntityLink id="E2" name="agentic-ai">agentic AI</EntityLink> systems can autonomously browse the web, follow investigative leads, and compile findings into coherent reports. The result is that investigations which previously required teams of dozens working for months — like the Panama Papers (2016), which involved 400+ journalists — could potentially be replicated by AI systems in days.
+The core capability emerges from combining several AI strengths: natural language processing can extract entities (people, organizations, financial amounts) from unstructured text across thousands of documents; knowledge graph construction maps relationships between entities across disparate data sources; pattern recognition identifies anomalies in financial filings or behavioral data; and <EntityLink id="E2" name="agentic-ai">Agentic AI</EntityLink> systems can autonomously browse the web, follow investigative leads, and compile findings into coherent reports. The result is that investigations which previously required large teams working for months — like the Panama Papers (2016), which involved 400+ journalists across 80 countries — can potentially be replicated by AI systems in a fraction of the time.
 
-This is a fundamentally dual-use capability. The same AI detective that can trace illicit financial flows to expose corruption can also aggregate individually harmless public data points to build comprehensive profiles of private citizens. The same tools that help journalists hold power accountable help stalkers find their victims. This dual-use tension makes AI investigation one of the most consequential and difficult-to-govern capabilities in AI development.
+This is a fundamentally dual-use capability. The same AI system that can trace illicit financial flows to expose corruption can also aggregate individually harmless public data points to build comprehensive profiles of private citizens. The same tools that help journalists hold power accountable can help stalkers locate their targets. This dual-use tension makes AI investigation one of the most consequential and difficult-to-govern capabilities in contemporary AI development.
 
 ### Capability Assessment
 
 | Dimension | Assessment | Notes |
 |-----------|------------|-------|
-| Current Maturity | **Operational** | AI agents can already conduct multi-step investigations using web browsing, document analysis, and cross-referencing |
-| Scaling Trajectory | **Rapid** | Costs decreasing roughly 10x every 2-3 years; capabilities improving with each model generation |
-| Human Parity | **Partial** | Exceeds humans in speed and scale for data aggregation; still below expert human investigators for nuanced judgment |
-| Trend | **Accelerating** | Agentic AI, larger context windows, and better tool use all compound investigation capabilities |
+| Current Maturity | **Operational** | AI agents can conduct multi-step investigations using web browsing, document analysis, and cross-referencing |
+| Scaling Trajectory | **Rapid** | Costs decreasing substantially with each model generation; capabilities improving alongside |
+| Human Parity | **Partial** | Exceeds humans in speed and scale for data aggregation; generally below expert human investigators for nuanced contextual judgment |
+| Trend | **Accelerating** | Agentic AI, larger context windows, and improved tool use compound investigation capabilities |
 
 ## Technical Capabilities
 
 ### Data Aggregation and Cross-Referencing
 
 AI systems can simultaneously ingest and cross-reference data from hundreds of public sources: corporate filings, property records, court documents, patent applications, academic papers, news articles, satellite imagery, and social media. Natural language processing extracts structured information from unstructured text, while knowledge graph construction automatically maps relationships between entities. Timeline reconstruction assembles chronological narratives from scattered records — a task that would take human analysts weeks can be completed in minutes.
+
+Multimodal AI systems extend these capabilities beyond text. Contemporary models can jointly analyze documents, images, video frames, and audio transcripts, enabling investigations that combine satellite imagery with corporate filings and social media posts in a single analytical pipeline. This multimodal capacity is particularly relevant for documenting events in areas with limited textual records, where visual and audio evidence predominates.
 
 ### Pattern Recognition at Scale
 
@@ -75,11 +77,15 @@ AI excels at identifying patterns across datasets too large for human analysis:
 
 ### Inference from Public Data
 
-A landmark 2023 study by Staab et al. at ETH Zurich demonstrated that GPT-4 could correctly infer personal attributes — location, income, age, political views — from Reddit posts with up to 85% accuracy, even when users believed they were posting anonymously.[^1] The cost of this inference was approximately \$0.15 per profile. Earlier research by Kosinski et al. (2013) showed Facebook "Likes" could predict personality, political views, sexual orientation, and other sensitive attributes with high accuracy.[^2] Research by de Montjoye et al. (2013) demonstrated that just 4 spatiotemporal data points uniquely identify 95% of individuals in a 1.5 million person mobility dataset.[^3]
+A 2023 study by Staab et al. at ETH Zurich demonstrated that GPT-4 could correctly infer personal attributes — location, income, age, political views — from Reddit posts with up to 85% accuracy, even when users believed they were posting anonymously.[^1] The cost of this inference was approximately \$0.15 per profile. Earlier research by Kosinski et al. (2013) showed Facebook "Likes" could predict personality, political views, sexual orientation, and other sensitive attributes with high accuracy.[^2] Research by de Montjoye et al. (2013) demonstrated that just four spatiotemporal data points uniquely identify 95% of individuals in a 1.5 million person mobility dataset.[^3]
+
+The Staab et al. study is notable for its methodological care: the researchers tested GPT-4 against ground-truth data and found that inference accuracy substantially exceeded random baselines across all attribute categories tested. The \$0.15 per-profile cost estimate reflects 2023 API pricing and will likely decrease further as model costs decline.
 
 ### Agentic Investigation
 
-Modern <EntityLink id="E2" name="agentic-ai">agentic AI</EntityLink> systems (2024-2026) can autonomously browse the web, execute searches, follow leads, and compile reports. Multi-step reasoning allows "connecting the dots" across multiple data sources in ways that previously required experienced human investigators. AI agents can generate and test hypotheses, iterating through investigative leads until patterns emerge.
+Modern <EntityLink id="E2" name="agentic-ai">Agentic AI</EntityLink> systems can autonomously browse the web, execute searches, follow leads, and compile reports. Multi-step reasoning allows "connecting the dots" across multiple data sources in ways that previously required experienced human investigators. AI agents can generate and test hypotheses, iterating through investigative leads until patterns emerge.
+
+The practical implication is a shift from AI as a tool that assists human investigation to AI as a system that conducts investigation with human oversight. The degree of autonomy varies substantially across systems and use cases; most deployed investigation tools still involve human-in-the-loop review of AI-generated findings before any action is taken.
 
 ## Key Evidence and Precedents
 
@@ -91,25 +97,27 @@ The open-source intelligence community has demonstrated the power of public-info
 - OSINT analysts tracked Russian military movements in Ukraine using satellite imagery and social media geolocation
 - The OSINT community demonstrated that public information alone can identify intelligence operatives, track weapons systems, and document war crimes
 
-AI tools are now automating what previously required teams of skilled analysts, making these capabilities accessible to a much wider range of actors.
+AI tools are now automating what previously required teams of skilled analysts, making these capabilities accessible to a wider range of actors including smaller newsrooms, NGOs, and civil society organizations — as well as actors with less benign intentions.
 
 ### Large-Scale Document Investigations
 
 | Investigation | Scale | Method | AI Potential |
 |--------------|-------|--------|--------------|
-| **Panama Papers** (2016) | 11.5M documents | 400+ journalists, months of work | AI could process equivalent datasets in days |
-| **Pandora Papers** (2021) | 11.9M documents | 600+ journalists across 150 outlets | Similar AI acceleration potential |
-| **FinCEN Files** (2020) | 2,100+ suspicious activity reports | Manual analysis by investigative teams | AI could process millions of such reports |
+| **[Panama Papers](https://www.icij.org/investigations/panama-papers/)** (2016) | 11.5M documents | 400+ journalists, months of work | AI could process equivalent datasets in days |
+| **[Pandora Papers](https://www.icij.org/investigations/pandora-papers/)** (2021) | 11.9M documents | 600+ journalists across 150 outlets | Similar AI acceleration potential |
+| **[FinCEN Files](https://www.icij.org/investigations/fincen-files/)** (2020) | 2,100+ suspicious activity reports | Manual analysis by investigative teams | AI could process millions of such reports |
+
+The International Consortium of Investigative Journalists (ICIJ) has itself adopted AI tools for document processing in successive investigations, using machine learning for entity extraction and document clustering. This represents a case where the investigative community proactively adopted AI capabilities for accountability work — though the same pipeline could be replicated by private or state actors for other purposes.
 
 ### Academic Demonstrations
 
 | Study | Finding | Implication |
 |-------|---------|-------------|
-| Staab et al. (2023) | GPT-4 infers personal attributes from Reddit posts at 85% accuracy | Anonymous posting provides minimal privacy protection against AI |
-| de Montjoye et al. (2013) | 4 data points identify 95% of individuals in mobility dataset | Location data is inherently identifying |
-| Rocher et al. (2019) | 99.98% of Americans re-identifiable from 15 demographic attributes | Anonymization of demographic data is nearly impossible |
-| Kosinski et al. (2013) | Facebook Likes predict personality, politics, sexual orientation | Social media behavior is deeply revealing |
-| Youyou et al. (2015) | AI predicts personality from digital footprints better than close friends | Machine inference exceeds human social perception |
+| Staab et al. (2023) | GPT-4 infers personal attributes from Reddit posts at approximately 85% accuracy | Anonymous posting provides limited privacy protection against AI inference |
+| de Montjoye et al. (2013) | 4 data points identify 95% of individuals in mobility dataset | Location data is inherently identifying at scale |
+| Rocher et al. (2019) | 99.98% of Americans re-identifiable from 15 demographic attributes | Anonymization of demographic data offers limited protection |
+| Kosinski et al. (2013) | Facebook Likes predict personality, politics, sexual orientation | Social media behavior is substantially revealing of sensitive attributes |
+| Youyou et al. (2015) | AI predicts personality from digital footprints better than close friends | Machine inference can exceed human social perception in specific domains |
 
 ## Dual-Use Tension
 
@@ -123,64 +131,83 @@ The fundamental challenge of AI investigation is that beneficial and harmful app
 | Tracing illicit financial flows | Revealing personal financial status for blackmail | Cross-referencing financial databases |
 | Identifying illegal environmental activity | Harassing environmental activists | Behavioral pattern monitoring |
 
-This dual-use nature means that governance frameworks cannot simply restrict the technology — doing so would also eliminate its accountability benefits. The challenge is analogous to but distinct from <EntityLink id="E292" name="surveillance">mass surveillance</EntityLink>, because AI investigation is decentralized and available to non-state actors.
+This dual-use nature means governance frameworks cannot simply restrict the technology without also eliminating accountability benefits. The challenge is analogous to but distinct from <EntityLink id="E292" name="surveillance">AI Mass Surveillance</EntityLink>, because AI investigation is decentralized and available to non-state actors. State surveillance typically involves infrastructure investment and legal authorization requirements that constrain access; AI investigation tools are increasingly available as commercial APIs with minimal access controls.
+
+Proponents of broad access argue that democratization of investigation primarily strengthens accountability — that journalists, NGOs, and civil society benefit more from these tools than bad actors who already have other means of surveillance. Critics contend that the asymmetry between investigators and investigated is structural: investigations are conducted covertly, subjects have no notice or recourse, and the costs of exposure fall on individuals rather than institutions.
 
 ## Cost Trajectory
 
-The economics of investigation are undergoing a fundamental shift:
+The economics of investigation are undergoing a substantial shift:
 
-| Era | Cost of Deep Investigation | Who Could Conduct |
-|-----|---------------------------|-------------------|
-| **Pre-digital** (before 2000) | \$100,000-1,000,000+ | Intelligence agencies, major newspapers |
-| **Digital era** (2000-2020) | \$50,000-500,000 | Law enforcement, well-funded media, private investigators |
-| **AI-assisted** (2024) | \$100-1,000 for equivalent depth | Journalists, NGOs, determined individuals |
-| **Projected** (2027+) | \$1-100 for basic-to-deep profiles | Anyone with API access |
+| Era | Estimated Cost of Deep Investigation | Who Could Conduct |
+|-----|--------------------------------------|-------------------|
+| **Pre-digital** (before 2000) | \$100,000–1,000,000+ | Intelligence agencies, major newspapers |
+| **Digital era** (2000–2020) | \$50,000–500,000 | Law enforcement, well-funded media, private investigators |
+| **AI-assisted** (circa 2024) | \$100–1,000 for comparable depth | Journalists, NGOs, determined individuals |
+| **Projected** (2027+) | \$1–100 for basic-to-deep profiles | Anyone with API access (projection uncertain) |
 
-This roughly 1,000x cost reduction over a decade democratizes investigation but also makes mass profiling economically feasible. When the marginal cost of profiling an additional individual approaches zero, the economics shift from targeted investigation to population-scale screening.
+The cost estimates in this table reflect rough industry estimates and should be interpreted with caution — the comparability of "equivalent depth" across eras is contested, and AI-generated reports may differ qualitatively from traditional investigation outputs in ways that affect their reliability and legal utility. The directional trend toward lower costs is broadly accepted; the specific figures are illustrative rather than precise.
+
+When the marginal cost of profiling an additional individual approaches zero, the economics shift from targeted investigation to population-scale screening. This threshold — rather than any specific capability milestone — may represent the more consequential transition in terms of societal impact.
 
 ## Key Organizations and Tools
 
 | Organization/Tool | Role | Notable For |
 |-------------------|------|-------------|
-| **Bellingcat** | OSINT investigation pioneer | MH17, Skripal, Syria chemical weapons investigations |
-| **Palantir Technologies** | Government/enterprise data platform | Pattern-of-life analysis for intelligence agencies since 2004 |
-| **Clearview AI** | Facial recognition database | Scraped 30+ billion images from public web and social media |
-| **Maltego** | Open-source intelligence tool | Link analysis and entity mapping |
-| **Recorded Future** | Threat intelligence | AI-powered analysis of open sources |
-| **Chainalysis** | Blockchain intelligence | Cryptocurrency tracing and de-anonymization |
-| **Planet Labs** | Satellite imagery | Daily global imaging with AI analysis |
+| **[Bellingcat](https://www.bellingcat.com/)** | OSINT investigation pioneer | MH17, Skripal, Syria chemical weapons investigations |
+| **[Palantir Technologies](https://www.palantir.com/)** | Government/enterprise data platform | Pattern-of-life analysis for intelligence agencies since 2004 |
+| **[Clearview AI](https://www.clearview.ai/)** | Facial recognition database | Scraped 30+ billion images from public web and social media |
+| **[Maltego](https://www.maltego.com/)** | Open-source intelligence tool | Link analysis and entity mapping |
+| **[Recorded Future](https://www.recordedfuture.com/)** | Threat intelligence | AI-powered analysis of open sources |
+| **[Chainalysis](https://www.chainalysis.com/)** | Blockchain intelligence | Cryptocurrency tracing and de-anonymization |
+| **[Planet Labs](https://www.planet.com/)** | Satellite imagery | Daily global imaging with AI analysis |
+| **[ICIJ](https://www.icij.org/)** | Investigative journalism consortium | Panama Papers, Pandora Papers, FinCEN Files |
 
 ## Governance Landscape
 
 Current governance frameworks are poorly equipped to address AI investigation capabilities:
 
-- **EU GDPR** provides some protection through data minimization and purpose limitation, but struggles with the "mosaic effect" — combining individually non-personal public data points into identifying profiles
-- **The EU AI Act** (2024) classifies some biometric surveillance as prohibited or high-risk, but does not address text-based inference or public-data aggregation
-- **US** lacks comprehensive federal privacy legislation; the "public information" doctrine means data that is technically public is generally unprotected
-- **Data broker industry** (\$250B+ market globally) operates largely unregulated, providing raw material for AI investigation
-- The **"mosaic theory"** of intelligence — individually harmless data points becoming revealing when combined — has no clear legal framework
+- **EU GDPR** provides some protection through data minimization and purpose limitation, but struggles with the "mosaic effect" — combining individually non-personal public data points into identifying profiles. The GDPR's "legitimate interest" basis for processing creates significant ambiguity for journalism and research use cases.
+- **The <EntityLink id="E127" name="eu-ai-act">EU AI Act</EntityLink>** (2024) classifies some biometric surveillance as prohibited or high-risk, but does not directly address text-based inference or public-data aggregation. The Act's focus on specific application categories leaves much AI investigation activity unregulated.
+- **US** lacks comprehensive federal privacy legislation; the "public information" doctrine means data that is technically public is generally unprotected regardless of how it is combined or analyzed. State-level laws (California's CCPA, for example) provide partial coverage but are inconsistent and contain significant exceptions for journalism.
+- **Data broker industry** (estimated at \$250B+ market globally) operates largely without sector-specific regulation in most jurisdictions, providing substantial raw material for AI investigation. The lack of data broker regulation is widely noted as a gap in privacy frameworks.[^5]
+- The **"mosaic theory"** of intelligence — individually harmless data points becoming revealing when combined — has no clear legal framework in most jurisdictions. Courts have addressed mosaic concerns in Fourth Amendment contexts (Carpenter v. United States, 2018), but these protections apply to government action and do not constrain private AI investigation.
+
+### Regulatory Gaps by Jurisdiction
+
+| Jurisdiction | Primary Framework | Key Gaps |
+|-------------|-------------------|----------|
+| **European Union** | GDPR + EU AI Act | Mosaic aggregation; journalism exemptions; public data doctrine |
+| **United States** | Sector-specific; no federal law | No comprehensive privacy law; data broker industry largely unregulated |
+| **United Kingdom** | UK GDPR (post-Brexit) | Similar to EU but with additional national security carve-outs |
+| **China** | Personal Information Protection Law (2021) | Applies to private actors but government investigation is largely exempt |
+| **Most other jurisdictions** | Weak or absent | Limited regulatory capacity to address AI-specific capabilities |
 
 ## Relationship to Other Risks
 
 AI investigation capabilities interact with several other risk domains:
 
-- **<EntityLink id="E292" name="surveillance">Surveillance</EntityLink>**: Government surveillance uses similar technologies but with infrastructure advantages; AI investigation democratizes these capabilities to non-state actors
-- **<EntityLink id="E96" name="deepfakes">Deepfakes</EntityLink>** and **<EntityLink id="E27" name="authentication-collapse">authentication collapse</EntityLink>**: AI investigation can expose fakes but can also be poisoned by synthetic evidence
-- **<EntityLink id="E102" name="disinformation">Disinformation</EntityLink>**: Investigation tools can both combat and enable disinformation campaigns
-- **<EntityLink id="E145" name="fraud">Fraud</EntityLink>**: AI detection of fraud patterns is a key beneficial application, but the same tools enable more sophisticated fraud
-- **<EntityLink id="E119" name="epistemic-collapse">Epistemic collapse</EntityLink>**: Mass AI investigation could either strengthen or undermine epistemic infrastructure depending on governance
+- **<EntityLink id="E292" name="surveillance">AI Mass Surveillance</EntityLink>**: Government surveillance uses similar technologies but with infrastructure advantages; AI investigation extends these capabilities to non-state actors, altering the traditional state-civil society asymmetry.
+- **<EntityLink id="E96" name="deepfakes">Deepfakes</EntityLink>** and **<EntityLink id="E27" name="authentication-collapse">Authentication Collapse</EntityLink>**: AI investigation can expose synthetic media but can also be poisoned by fabricated evidence introduced into the open-source record. The reliability of AI-generated investigative reports depends on the integrity of underlying data sources.
+- **<EntityLink id="E102" name="disinformation">AI Disinformation</EntityLink>**: Investigation tools can both combat disinformation campaigns (by tracing their origins) and enable more sophisticated ones (by profiling targets for personalized influence).
+- **<EntityLink id="E145" name="fraud">AI-Powered Fraud</EntityLink>**: AI detection of fraud patterns is a primary beneficial application in financial services, but the same profiling capabilities enable more targeted social engineering and fraud.
+- **<EntityLink id="E119" name="epistemic-collapse">Epistemic Collapse</EntityLink>**: Widespread AI investigation could either strengthen epistemic infrastructure (by enabling more systematic fact-checking and accountability) or undermine it (by accelerating the volume of investigations, true and false, faster than institutions can evaluate).
 
 ## Key Uncertainties
 
-- **Offense-defense balance**: Will privacy-enhancing technologies keep pace with AI inference capabilities, or will the asymmetry continue to widen?
-- **Governance feasibility**: Can any regulatory framework effectively distinguish beneficial investigation from harmful surveillance when the underlying technology is identical?
-- **Democratization effects**: Will widespread access to investigation tools strengthen accountability or primarily enable harassment and doxxing?
-- **Adversarial adaptation**: How quickly will targets of investigation learn to obscure their public data trails, and what are the second-order effects?
-- **Quality threshold**: When will AI-generated investigation reports reach sufficient reliability for legal proceedings?
+The following questions remain substantively unresolved in the research literature and policy debate:
+
+- **Offense-defense balance**: Will privacy-enhancing technologies — differential privacy, federated learning, on-device processing — keep pace with AI inference capabilities, or will the asymmetry between investigator and investigated continue to widen? The current trajectory favors investigation capability over privacy protection, but this could shift with regulatory or technical developments.
+- **Governance feasibility**: Whether any regulatory framework can effectively distinguish beneficial investigation from harmful surveillance when the underlying technology is identical is an open question. Proposed approaches include purpose-based regulation (focusing on intent and use), output-based regulation (focusing on what information is produced), and access-based regulation (restricting who can use the tools).
+- **Democratization effects**: The net effect of widespread access to investigation tools on accountability versus harassment is empirically unclear. Optimistic accounts emphasize the accountability benefits for civil society; pessimistic accounts emphasize that harassment, doxxing, and stalking scale more easily than accountability journalism.
+- **Adversarial adaptation**: How quickly and effectively targets of investigation — particularly state actors and corporations — will adapt their information practices to limit AI investigation is uncertain. Early examples include increased use of encrypted communications and deliberate information environment management.
+- **Quality threshold for legal use**: When AI-generated investigation reports will reach sufficient reliability and admissibility standards for use in legal proceedings — and how courts will evaluate AI-generated evidence — remains unresolved across jurisdictions.
+- **False positive rates at scale**: As AI investigation moves toward population-scale screening rather than targeted investigation, false positive rates that are acceptable in targeted contexts may generate large absolute numbers of incorrect attributions, with significant potential for harm to misidentified individuals.
 
 ## Sources
 
-[^1]: Staab et al. - "Beyond Memorization: Violating Privacy Via Inference with Large Language Models" (ETH Zurich, 2023)
-[^2]: Kosinski, Stillwell, & Graepel - "Private traits and attributes are predictable from digital records of human behavior" (PNAS, 2013)
-[^3]: de Montjoye et al. - "Unique in the Crowd: The privacy bounds of human mobility" (Nature Scientific Reports, 2013)
-[^4]: Bellingcat Investigation Team - investigations into MH17 (2014-2019) and Skripal poisoning (2018)
+[^1]: Staab, Robin, et al. "Beyond Memorization: Violating Privacy Via Inference with Large Language Models." ETH Zurich, 2023. [https://arxiv.org/abs/2310.07298](https://arxiv.org/abs/2310.07298)
+[^2]: Kosinski, Michal, David Stillwell, and Thore Graepel. "Private traits and attributes are predictable from digital records of human behavior." *Proceedings of the National Academy of Sciences* 110, no. 15 (2013): 5802–5805. [https://doi.org/10.1073/pnas.1218772110](https://doi.org/10.1073/pnas.1218772110)
+[^3]: de Montjoye, Yves-Alexandre, et al. "Unique in the Crowd: The privacy bounds of human mobility." *Nature Scientific Reports* 3 (2013): 1376. [https://doi.org/10.1038/srep01376](https://doi.org/10.1038/srep01376)
+[^4]: Bellingcat Investigation Team. Investigations into MH17 (2014–2019) and the Skripal poisoning (2018). [https://www.bellingcat.com/](https://www.bellingcat.com/)
+[^5]: Federal Trade Commission. "Data Brokers: A Call for Transparency and Accountability." FTC Report, May 2014. [https://www.ftc.gov/reports/data-brokers-call-transparency-accountability-report-federal-trade-commission-may-2014](https://www.ftc.gov/reports/data-brokers-call-transparency-accountability-report-federal-trade-commission-may-2014)
