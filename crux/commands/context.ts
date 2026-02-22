@@ -1,10 +1,3 @@
-Looking at this merge conflict, the issue is that:
-
-1. **HEAD side** kept the local `// Local API response types` comment section header before `GitHubIssueResponse`, and had the original imports from `../lib/wiki-server/pages.ts`
-2. **origin/main side** removed that comment section header, and changed the imports to use `../lib/wiki-server/page-types.ts` with additional types (`CitationQuotesResult`)
-
-The problem is the file has **duplicate imports** for `PageDetail`, `PageSearchResult`, `RelatedResult`, `BacklinksResult`, and `CitationQuote` — once from `pages.ts` and once from `page-types.ts`. I need to keep the main's cleaner import structure (from `page-types.ts`) while removing the duplicate imports from `pages.ts`, and drop the redundant comment section header.
-
 /**
  * Context Command Handlers
  *
