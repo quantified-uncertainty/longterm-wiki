@@ -20,7 +20,7 @@ const SCRIPTS = {
   verify: {
     script: 'citations/verify-citations.ts',
     description: 'Verify and archive citation URLs for a page',
-    passthrough: ['ci', 'json', 'all', 'limit', 'recheck'],
+    passthrough: ['ci', 'json', 'all', 'limit', 'recheck', 'content-verify'],
     positional: true,
   },
   status: {
@@ -108,12 +108,14 @@ Options:
   --recheck         Re-process already-handled pages
   --refetch         Re-fetch source URLs (verify-quotes only)
   --broken          Show only broken citations/quotes
+  --content-verify  (verify only) Also check if source content supports each claim
   --json            JSON output
   --ci              JSON output for CI pipelines
 
 Examples:
-  crux citations verify existential-risk           Verify one page
-  crux citations verify --all --limit=20           Verify top 20 pages
+  crux citations verify existential-risk                    Verify one page
+  crux citations verify existential-risk --content-verify  Also check claim support
+  crux citations verify --all --limit=20                   Verify top 20 pages
   crux citations status existential-risk           Show verification results
   crux citations report                            Summary across all pages
   crux citations report --broken                   List all broken citations
