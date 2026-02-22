@@ -308,6 +308,10 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
         signal: AbortSignal.timeout(15_000),
       });
 
+      if (!response.ok) {
+        throw new Error(`SCRY API error ${response.status}`);
+      }
+
       const data = await response.json() as ScryApiResponse;
 
       for (const row of data.rows ?? []) {
@@ -378,7 +382,8 @@ Rules:
     raw = extractText(response);
     inputTokens = response.usage?.input_tokens ?? 0;
     outputTokens = response.usage?.output_tokens ?? 0;
-  } catch {
+  } catch (err: unknown) {
+    console.warn(`[research-agent] Fact extraction failed: ${err instanceof Error ? err.message : String(err)}`);
     return { facts: [], cost: 0 };
   }
 
@@ -561,7 +566,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         url: fetched.url,
         title,
         content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
-        facts: [],
+        facts: undefined,
       });
       continue;
     }
