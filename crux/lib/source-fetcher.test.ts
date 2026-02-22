@@ -14,6 +14,7 @@ import {
   fetchSource,
   fetchSources,
   fetchAndVerifyClaim,
+  requestsFromResourceIds,
   clearSessionCache,
   sessionCacheSize,
   type FetchRequest,
@@ -27,6 +28,36 @@ vi.mock('./knowledge-db.ts', () => ({
     getByUrl: vi.fn(() => null),
     upsert: vi.fn(),
   },
+}));
+
+// Mock the resource-lookup layer so tests don't require YAML files on disk.
+const mockResources = new Map<string, { id: string; url: string; title: string; type: string; summary?: string; authors?: string[]; tags?: string[] }>([
+  ['res-safety-paper', {
+    id: 'res-safety-paper',
+    url: 'https://example.com/safety-paper',
+    title: 'AI Safety Research Paper',
+    type: 'paper',
+    summary: 'A paper about AI safety techniques',
+    authors: ['Jane Smith'],
+    tags: ['safety', 'alignment'],
+  }],
+  ['res-blog-post', {
+    id: 'res-blog-post',
+    url: 'https://example.com/blog',
+    title: 'Alignment Blog Post',
+    type: 'blog',
+  }],
+]);
+
+vi.mock('./resource-lookup.ts', () => ({
+  getResourceById: vi.fn((id: string) => mockResources.get(id) ?? null),
+  getResourceByUrl: vi.fn((url: string) => {
+    for (const r of mockResources.values()) {
+      if (r.url === url || r.url === url.replace(/\/$/, '')) return r;
+    }
+    return null;
+  }),
+  updateResourceFetchStatus: vi.fn(),
 }));
 
 // ---------------------------------------------------------------------------
@@ -480,5 +511,178 @@ describe('clearSessionCache', () => {
 
     clearSessionCache();
     expect(sessionCacheSize()).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Resource integration
+// ---------------------------------------------------------------------------
+
+describe('resource integration', () => {
+  beforeEach(() => {
+    clearSessionCache();
+    vi.restoreAllMocks();
+  });
+
+  it('attaches resource metadata when URL matches a known resource', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+
+    const result = await fetchSource({
+      url: 'https://example.com/safety-paper',
+      extractMode: 'full',
+    });
+
+    expect(result.resource).toBeDefined();
+    expect(result.resource!.id).toBe('res-safety-paper');
+    expect(result.resource!.title).toBe('AI Safety Research Paper');
+    expect(result.resource!.type).toBe('paper');
+    expect(result.resource!.summary).toBe('A paper about AI safety techniques');
+    expect(result.resource!.authors).toEqual(['Jane Smith']);
+    expect(result.resource!.tags).toEqual(['safety', 'alignment']);
+  });
+
+  it('returns undefined resource when URL does not match', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+
+    const result = await fetchSource({
+      url: 'https://unknown.com/page',
+      extractMode: 'full',
+    });
+
+    expect(result.resource).toBeUndefined();
+  });
+
+  it('resolves URL from resourceId when URL is omitted', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+
+    const result = await fetchSource({
+      resourceId: 'res-safety-paper',
+      extractMode: 'full',
+    });
+
+    expect(result.url).toBe('https://example.com/safety-paper');
+    expect(result.resource).toBeDefined();
+    expect(result.resource!.id).toBe('res-safety-paper');
+    expect(result.status).toBe('ok');
+  });
+
+  it('uses resource title as fallback when fetched page has no title', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({
+      body: '<html><body><p>Content without a title tag.</p></body></html>',
+    })));
+
+    const result = await fetchSource({
+      resourceId: 'res-blog-post',
+      extractMode: 'full',
+    });
+
+    expect(result.title).toBe('Alignment Blog Post');
+  });
+
+  it('prefers fetched title over resource title when both exist', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({
+      body: '<html><head><title>Fetched Title</title></head><body><p>Content.</p></body></html>',
+    })));
+
+    const result = await fetchSource({
+      resourceId: 'res-blog-post',
+      extractMode: 'full',
+    });
+
+    expect(result.title).toBe('Fetched Title');
+  });
+
+  it('calls updateResourceFetchStatus when updateResourceStatus is true', async () => {
+    const { updateResourceFetchStatus } = await import('./resource-lookup.ts');
+    const updateMock = updateResourceFetchStatus as ReturnType<typeof vi.fn>;
+    updateMock.mockClear();
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+
+    await fetchSource({
+      url: 'https://example.com/safety-paper',
+      extractMode: 'full',
+      updateResourceStatus: true,
+    });
+
+    expect(updateMock).toHaveBeenCalledOnce();
+    expect(updateMock).toHaveBeenCalledWith('res-safety-paper', expect.objectContaining({
+      fetchStatus: 'ok',
+      fetchedAt: expect.any(String),
+    }));
+  });
+
+  it('does not call updateResourceFetchStatus when updateResourceStatus is false', async () => {
+    const { updateResourceFetchStatus } = await import('./resource-lookup.ts');
+    const updateMock = updateResourceFetchStatus as ReturnType<typeof vi.fn>;
+    updateMock.mockClear();
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+
+    await fetchSource({
+      url: 'https://example.com/safety-paper',
+      extractMode: 'full',
+    });
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it('reflects dead status back to resource when updateResourceStatus is true', async () => {
+    const { updateResourceFetchStatus } = await import('./resource-lookup.ts');
+    const updateMock = updateResourceFetchStatus as ReturnType<typeof vi.fn>;
+    updateMock.mockClear();
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ status: 404 })));
+
+    await fetchSource({
+      url: 'https://example.com/safety-paper',
+      extractMode: 'full',
+      updateResourceStatus: true,
+    });
+
+    expect(updateMock).toHaveBeenCalledWith('res-safety-paper', expect.objectContaining({
+      fetchStatus: 'dead',
+    }));
+  });
+
+  it('throws when neither url nor valid resourceId is provided', async () => {
+    await expect(fetchSource({
+      extractMode: 'full',
+    })).rejects.toThrow('FetchRequest requires either url or a valid resourceId');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// requestsFromResourceIds
+// ---------------------------------------------------------------------------
+
+describe('requestsFromResourceIds', () => {
+  it('builds FetchRequests from known resource IDs', () => {
+    const requests = requestsFromResourceIds(['res-safety-paper', 'res-blog-post']);
+    expect(requests).toHaveLength(2);
+    expect(requests[0].url).toBe('https://example.com/safety-paper');
+    expect(requests[0].resourceId).toBe('res-safety-paper');
+    expect(requests[1].url).toBe('https://example.com/blog');
+    expect(requests[1].resourceId).toBe('res-blog-post');
+  });
+
+  it('skips unknown resource IDs', () => {
+    const requests = requestsFromResourceIds(['res-safety-paper', 'nonexistent', 'res-blog-post']);
+    expect(requests).toHaveLength(2);
+  });
+
+  it('passes through options', () => {
+    const requests = requestsFromResourceIds(['res-safety-paper'], {
+      extractMode: 'relevant',
+      query: 'AI safety',
+      updateResourceStatus: true,
+    });
+    expect(requests[0].extractMode).toBe('relevant');
+    expect(requests[0].query).toBe('AI safety');
+    expect(requests[0].updateResourceStatus).toBe(true);
+  });
+
+  it('returns empty array for empty input', () => {
+    expect(requestsFromResourceIds([])).toEqual([]);
   });
 });
