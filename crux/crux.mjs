@@ -32,6 +32,8 @@
  *   facts       Propose new canonical facts from wiki page content
  *   entity      Entity ID management (rename with safe word-boundary matching)
  *   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
+ *   jobs        Job queue management (list, stats, create, claim, sweep)
+ *   context     Assemble research bundles (for-page, for-entity, for-issue, for-topic)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -72,6 +74,7 @@ import * as prCommands from './commands/pr.ts';
 import * as wikiServerCommands from './commands/wiki-server.ts';
 import * as queryCommands from './commands/query.ts';
 import * as jobsCommands from './commands/jobs.ts';
+import * as contextCommands from './commands/context.ts';
 
 const domains = {
   validate: validateCommands,
@@ -99,6 +102,7 @@ const domains = {
   'wiki-server': wikiServerCommands,
   query: queryCommands,
   jobs: jobsCommands,
+  context: contextCommands,
 };
 
 /**
@@ -172,6 +176,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   entity      Entity ID management (safe rename)
   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
   jobs        Background job queue management
+  context     Assemble research bundles (for-page, for-entity, for-issue, for-topic)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
