@@ -7,6 +7,7 @@
 import fs from 'fs';
 import { execFileSync } from 'child_process';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
+import { createSession } from '../../lib/wiki-server/sessions.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
@@ -18,6 +19,77 @@ import {
   analyzePhase, researchPhase, improvePhase, reviewPhase,
   validatePhase, gapFillPhase, triagePhase, adversarialLoopPhase,
 } from './phases.ts';
+
+// ── Session log helpers ───────────────────────────────────────────────────────
+
+function getCurrentBranch(): string | null {
+  try {
+    return execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf-8' }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function buildSessionSummary(
+  page: PageData,
+  tier: string,
+  review: ReviewResult | undefined,
+  duration: string,
+): string {
+  if (review) {
+    const score = review.qualityScore;
+    const topIssues = (review.issues || []).slice(0, 3);
+    const issueText = topIssues.length > 0
+      ? ` Issues resolved: ${topIssues.map(i => i.slice(0, 60)).join('; ')}.`
+      : '';
+    const scoreText = score != null ? ` Quality score: ${score}.` : '';
+    return `Improved "${page.title}" via ${tier} pipeline (${duration}s).${scoreText}${issueText}`;
+  }
+  const verb = tier === 'polish' ? `Polish pass on "${page.title}"` : `Improved "${page.title}" via ${tier} pipeline`;
+  return `${verb}. Duration: ${duration}s.`;
+}
+
+/**
+ * Post a minimal session log entry to the wiki-server after --apply.
+ * Fire-and-forget: errors are logged but never throw.
+ */
+async function autoLogSession(
+  page: PageData,
+  tier: string,
+  review: ReviewResult | undefined,
+  totalDuration: string,
+  tierCost: string,
+): Promise<void> {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const branch = getCurrentBranch();
+    const summary = buildSessionSummary(page, tier, review, totalDuration);
+
+    const entry = {
+      date: today,
+      branch,
+      title: `Auto-improve (${tier}): ${page.title}`,
+      summary,
+      model: null,
+      duration: `${totalDuration}s`,
+      cost: tierCost,
+      prUrl: null,
+      pages: [page.id],
+    };
+
+    const result = await createSession(entry);
+    if (result.ok) {
+      log('session', `Session log written to wiki-server (id: ${result.data.id})`);
+    } else {
+      log('session', `Warning: could not write session log to wiki-server: ${result.message}`);
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('session', `Warning: session log failed: ${error.message}`);
+  }
+}
+
+// ── Pipeline ──────────────────────────────────────────────────────────────────
 
 /** Main pipeline orchestration. */
 export async function runPipeline(pageId: string, options: PipelineOptions = {}): Promise<PipelineResults> {
@@ -228,6 +300,11 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         const error = err instanceof Error ? err : new Error(String(err));
         console.error('Grading failed:', error.message);
       }
+    }
+
+    // Auto-log session to wiki-server DB (default: on; skip with skipSessionLog: true)
+    if (!options.skipSessionLog) {
+      await autoLogSession(page, tier, review, totalDuration, tierConfig.cost);
     }
   }
 

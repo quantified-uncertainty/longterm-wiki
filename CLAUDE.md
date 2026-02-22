@@ -200,12 +200,15 @@ Tiers: `budget` (~$2-3), `standard` (default, ~$4-6), `premium` (~$8-12)
 
 ### Improving an existing page
 ```bash
-pnpm crux content improve <page-id> --tier=polish --apply
+pnpm crux content improve <page-id> --tier=standard --apply    # Improve + auto-logs session to DB
+pnpm crux content improve <page-id> --tier=standard --apply --skip-session-log  # Skip session log
 ```
 Tiers: `polish` (~$2-3), `standard` (default, ~$5-8), `deep` (~$10-15)
 Use `--directions "specific instructions"` for targeted improvements.
 Use `--apply` to write changes directly (otherwise outputs to temp file for review).
 Use `--grade` with `--apply` to auto-grade after improvement.
+
+**Session logs are written automatically after every `--apply` run.** No manual step needed for improve pipeline runs. Manual sessions (edits, fixes, content creation) still require running `/agent-session-ready-PR` at session end. Do not run `/agent-session-ready-PR` for improve-only sessions — it would create a duplicate log entry.
 
 ### After any page edit (manual or pipeline)
 ```bash
