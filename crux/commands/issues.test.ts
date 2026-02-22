@@ -468,10 +468,11 @@ describe('findPotentialDuplicates', () => {
   function makeRanked(overrides: Partial<Parameters<typeof makeIssue>[0]> = {}) {
     const i = makeIssue(overrides);
     const labels = (overrides.labels ?? []);
+    const body = (typeof i.body === 'string' ? i.body : '') ?? '';
     return {
       number: i.number,
       title: i.title,
-      body: i.body ?? '',
+      body,
       labels,
       createdAt: i.created_at.slice(0, 10),
       updatedAt: i.updated_at.slice(0, 10),
@@ -481,6 +482,8 @@ describe('findPotentialDuplicates', () => {
       scoreBreakdown: { priority: 50, bugBonus: 0, claudeReadyBonus: 0, effortAdjustment: 0, recencyBonus: 0, ageBonus: 0, total: 50 },
       inProgress: false,
       blocked: false,
+      recommendedModel: null as null,
+      missingSections: [] as string[],
     };
   }
 

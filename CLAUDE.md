@@ -62,13 +62,24 @@ pnpm crux agent-checklist snapshot                # Output checks: YAML block fo
 # GitHub issue tracking
 pnpm crux issues                 # List open issues ranked by priority
 pnpm crux issues next            # Show next highest-priority issue to work on
-pnpm crux issues create "title" --label=tooling  # File a new issue (use during tooling-gaps-actioned)
+pnpm crux issues lint            # Check all issues for formatting problems
+pnpm crux issues lint <N>        # Lint a single issue
+pnpm crux issues create "title" --label=tooling \
+  --problem="..." --model=sonnet \
+  --criteria="item1|item2" --cost="~$2-4"  # File a structured issue
+pnpm crux issues update-body <N> --model=sonnet --problem="..." --criteria="a|b"
 pnpm crux issues start <N>       # Signal start: comment + add claude-working label
 pnpm crux issues done <N>        # Signal completion: comment + remove label
 pnpm crux issues cleanup         # Detect stale claude-working labels + potential duplicates
 pnpm crux issues cleanup --fix   # Auto-remove stale labels
 pnpm crux issues close <N> --duplicate=M  # Close issue as duplicate of another
 pnpm crux issues close <N> --reason="..."  # Close with comment
+
+# Issue formatting standard (enforced by crux issues lint)
+# Well-formatted issues require:
+#   1. ## Problem section (or long freeform body)
+#   2. ## Acceptance Criteria section or - [ ] checkboxes
+#   3. ## Recommended Model section with **Haiku/Sonnet/Opus** or [model] in title
 
 # Hallucination risk & review tracking
 pnpm crux validate hallucination-risk         # Risk assessment report

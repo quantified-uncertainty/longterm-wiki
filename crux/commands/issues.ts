@@ -13,7 +13,7 @@
  *   crux issues close <N> [--reason] Close an issue with an optional comment
  */
 
-import { createLogger } from '../lib/output.ts';
+import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
 import type { CommandResult } from '../lib/cli.ts';
@@ -60,6 +60,8 @@ interface RankedIssue {
   scoreBreakdown: ScoreBreakdown;
   inProgress: boolean;
   blocked: boolean;
+  recommendedModel: ModelName | null;
+  missingSections: string[]; // empty = well-formatted
 }
 
 interface CommandOptions {
@@ -68,6 +70,13 @@ interface CommandOptions {
   pr?: string;
   limit?: string;
   scores?: boolean;
+  // create options
+  model?: string;
+  problem?: string;
+  fix?: string;
+  depends?: string;
+  criteria?: string;
+  cost?: string;
   [key: string]: unknown;
 }
 
@@ -98,6 +107,68 @@ const BLOCKED_BODY_PATTERNS = [
   /\bwaiting (for|on)\b/i,
   /\bdepends on #\d+/i,
 ];
+
+// ---------------------------------------------------------------------------
+// Model extraction
+// ---------------------------------------------------------------------------
+
+/** Recognized model names for issue recommendations */
+const MODEL_NAMES = ['haiku', 'sonnet', 'opus'] as const;
+type ModelName = (typeof MODEL_NAMES)[number];
+
+/**
+ * Extract recommended model from an issue's title or body.
+ * Looks for:
+ *   - Body: "**Haiku**", "**Sonnet**", "**Opus**" (as the lead word in Recommended Model section)
+ *   - Title: [haiku], [sonnet], [opus] suffix
+ */
+function extractModel(title: string, body: string): ModelName | null {
+  // Check body: look for "## Recommended Model" section header + model name
+  const sectionMatch = body.match(/##\s+recommended\s+model[^\n]*\n+\*{0,2}(haiku|sonnet|opus)\*{0,2}/i);
+  if (sectionMatch) return sectionMatch[1].toLowerCase() as ModelName;
+
+  // Check body: bold model name anywhere near "recommended" or "model"
+  const boldMatch = body.match(/\*\*(haiku|sonnet|opus)\*\*/i);
+  if (boldMatch) return boldMatch[1].toLowerCase() as ModelName;
+
+  // Check title: [haiku], [sonnet], [opus]
+  const titleMatch = title.match(/\[(haiku|sonnet|opus)\]/i);
+  if (titleMatch) return titleMatch[1].toLowerCase() as ModelName;
+
+  return null;
+}
+
+/**
+ * Check whether an issue body has required sections for a well-formatted issue.
+ * Returns a list of missing section names.
+ */
+function checkIssueSections(title: string, body: string): string[] {
+  const missing: string[] = [];
+  const b = body.toLowerCase();
+
+  // Must have a non-trivial body
+  if (body.trim().length < 80) {
+    return ['body (too short or empty)'];
+  }
+
+  // Must have a problem/description section
+  const hasProblem =
+    /##\s+(problem|summary|description|context|background)/i.test(body) ||
+    body.trim().length > 300; // long freeform body counts
+  if (!hasProblem) missing.push('## Problem / ## Summary section');
+
+  // Must have acceptance criteria or checkboxes
+  const hasCriteria =
+    /##\s+(acceptance\s+criteria|ac|success\s+criteria|definition\s+of\s+done)/i.test(body) ||
+    /- \[ \]/.test(body);
+  if (!hasCriteria) missing.push('Acceptance Criteria (## section or - [ ] checkboxes)');
+
+  // Must have model recommendation
+  const hasModel = extractModel(title, body) !== null;
+  if (!hasModel) missing.push('Recommended Model (## section or [haiku/sonnet/opus] in title)');
+
+  return missing;
+}
 
 /** Labels indicating this is a bug report */
 const BUG_LABELS = new Set(['bug', 'defect', 'regression', 'crash', 'fix']);
@@ -249,6 +320,8 @@ async function fetchOpenIssues(): Promise<RankedIssue[]> {
         scoreBreakdown: breakdown,
         inProgress: labels.includes(CLAUDE_WORKING_LABEL),
         blocked: isBlocked(labels, body),
+        recommendedModel: extractModel(i.title, body),
+        missingSections: checkIssueSections(i.title, body),
       };
     })
     .filter(i => !i.labels.some(l => SKIP_LABELS.has(l)));
@@ -263,7 +336,7 @@ function rankIssues(issues: RankedIssue[]): RankedIssue[] {
   });
 }
 
-function formatScoreBreakdown(bd: ScoreBreakdown, c: Record<string, string>): string {
+function formatScoreBreakdown(bd: ScoreBreakdown, c: Colors): string {
   const parts: string[] = [];
   parts.push(`priority:${bd.priority}`);
   if (bd.bugBonus) parts.push(`bug:+${bd.bugBonus}`);
@@ -275,7 +348,13 @@ function formatScoreBreakdown(bd: ScoreBreakdown, c: Record<string, string>): st
   return `${c.dim}[score:${bd.total} = ${parts.join(' ')}]${c.reset}`;
 }
 
-function formatIssueRow(issue: RankedIssue, c: Record<string, string>, showScores = false): string {
+const MODEL_COLORS: Record<ModelName, string> = {
+  haiku: '\x1b[36m',   // cyan
+  sonnet: '\x1b[33m',  // yellow
+  opus: '\x1b[35m',    // magenta
+};
+
+function formatIssueRow(issue: RankedIssue, c: Colors, showScores = false): string {
   const priorityLabel = issue.priority < 99 ? `P${issue.priority}` : '  ';
   const inProgressMark = issue.inProgress ? `${c.yellow}[claude-working]${c.reset} ` : '';
   const blockedMark = issue.blocked ? `${c.red}[blocked]${c.reset} ` : '';
@@ -285,15 +364,31 @@ function formatIssueRow(issue: RankedIssue, c: Record<string, string>, showScore
     .map(l => `${c.dim}${l}${c.reset}`)
     .join(' ');
 
+  // Model badge
+  let modelBadge = '';
+  if (issue.recommendedModel) {
+    const modelColor = MODEL_COLORS[issue.recommendedModel];
+    modelBadge = ` ${modelColor}[${issue.recommendedModel}]${c.reset}`;
+  }
+
+  // Format warning for missing sections (dim, only shown with --scores or when explicitly formatting)
+  const warningStr = issue.missingSections.length > 0
+    ? `${c.dim}  ⚠ missing: ${issue.missingSections.join(', ')}${c.reset}`
+    : '';
+
   let row =
     `  ${c.cyan}#${String(issue.number).padEnd(5)}${c.reset}` +
     `${c.bold}[${priorityLabel}]${c.reset} ` +
-    `${inProgressMark}${blockedMark}${claudeReadyMark}${issue.title}` +
+    `${inProgressMark}${blockedMark}${claudeReadyMark}${issue.title}${modelBadge}` +
     (labelStr ? `\n         ${labelStr}` : '') +
     `  ${c.dim}(${issue.createdAt})${c.reset}`;
 
   if (showScores) {
     row += `\n         ${formatScoreBreakdown(issue.scoreBreakdown, c)}`;
+  }
+
+  if (warningStr && showScores) {
+    row += `\n         ${warningStr}`;
   }
 
   return row;
@@ -443,6 +538,53 @@ async function next(_args: string[], options: CommandOptions): Promise<CommandRe
 }
 
 /**
+ * Build a structured issue body from template parameters.
+ */
+function buildIssueBody(opts: {
+  problem?: string;
+  fix?: string;
+  depends?: string;
+  criteria?: string;
+  model?: string;
+  cost?: string;
+}): string {
+  const sections: string[] = [];
+
+  if (opts.problem) {
+    sections.push(`## Problem\n\n${opts.problem}`);
+  }
+
+  if (opts.fix) {
+    sections.push(`## Proposed Fix\n\n${opts.fix}`);
+  }
+
+  // Dependencies
+  const depsRaw = opts.depends ? opts.depends.split(',').map(d => d.trim()).filter(Boolean) : [];
+  if (depsRaw.length > 0) {
+    const depLinks = depsRaw.map(d => `#${d.replace('#', '')}`).join(', ');
+    sections.push(`## Dependencies\n\nDepends on: ${depLinks}`);
+  } else {
+    sections.push(`## Dependencies\n\nNone.`);
+  }
+
+  // Recommended Model
+  if (opts.model) {
+    const modelName = opts.model.toLowerCase();
+    const costNote = opts.cost ? ` Estimated cost: ${opts.cost}.` : '';
+    sections.push(`## Recommended Model\n\n**${modelName.charAt(0).toUpperCase() + modelName.slice(1)}** — well-scoped for this model.${costNote}`);
+  }
+
+  // Acceptance Criteria
+  if (opts.criteria) {
+    const items = opts.criteria.split('|').map(s => s.trim()).filter(Boolean);
+    const checklist = items.map(item => `- [ ] ${item}`).join('\n');
+    sections.push(`## Acceptance Criteria\n\n${checklist}`);
+  }
+
+  return sections.join('\n\n');
+}
+
+/**
  * Create a new GitHub issue.
  */
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -452,7 +594,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const title = args[0];
   if (!title) {
     return {
-      output: `${c.red}Usage: crux issues create <title> [--label=X,Y] [--body="..."]${c.reset}\n`,
+      output: `${c.red}Usage: crux issues create <title> [--label=X,Y] [--body="..."] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -460,7 +602,22 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const labels = options.label
     ? (options.label as string).split(',').map(l => l.trim()).filter(Boolean)
     : [];
-  const body = (options.body as string) || '';
+
+  // Use structured template if any structured args are provided, otherwise fall back to --body
+  const hasStructuredArgs = options.problem || options.fix || options.depends || options.criteria || options.model;
+  let body: string;
+  if (hasStructuredArgs) {
+    body = buildIssueBody({
+      problem: options.problem as string | undefined,
+      fix: options.fix as string | undefined,
+      depends: options.depends as string | undefined,
+      criteria: options.criteria as string | undefined,
+      model: options.model as string | undefined,
+      cost: options.cost as string | undefined,
+    });
+  } else {
+    body = (options.body as string) || '';
+  }
 
   interface CreateIssueResponse {
     number: number;
@@ -482,6 +639,15 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
   if (labels.length > 0) {
     output += `  Labels: ${labels.join(', ')}\n`;
+  }
+  if (!body) {
+    output += `  ${c.yellow}⚠ No body provided — consider adding --problem, --model, and --criteria flags${c.reset}\n`;
+  } else {
+    const missing = checkIssueSections(title, body);
+    if (missing.length > 0) {
+      output += `  ${c.yellow}⚠ Missing sections: ${missing.join(', ')}${c.reset}\n`;
+      output += `  ${c.dim}Fix with: crux issues update-body ${issue.number} --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
+    }
   }
 
   return { output, exitCode: 0 };
@@ -813,6 +979,147 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
   return { output, exitCode: 0 };
 }
 
+/**
+ * Update the body of an existing issue using structured template args.
+ */
+async function updateBody(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const issueNum = parseInt(args[0], 10);
+  if (!issueNum || isNaN(issueNum)) {
+    return {
+      output: `${c.red}Usage: crux issues update-body <issue-number> [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Fetch existing issue
+  const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
+  const existingBody = (issue.body || '').trim();
+
+  const newBody = buildIssueBody({
+    problem: options.problem as string | undefined,
+    fix: options.fix as string | undefined,
+    depends: options.depends as string | undefined,
+    criteria: options.criteria as string | undefined,
+    model: options.model as string | undefined,
+    cost: options.cost as string | undefined,
+  });
+
+  if (!newBody) {
+    return {
+      output: `${c.red}No structured args provided. Use --problem, --fix, --model, --criteria, --depends, --cost.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Prepend to existing body (preserving any existing content if present)
+  const combinedBody = existingBody
+    ? `${newBody}\n\n---\n\n${existingBody}`
+    : newBody;
+
+  await githubApi(`/repos/${REPO}/issues/${issueNum}`, {
+    method: 'PATCH',
+    body: { body: combinedBody },
+  });
+
+  const remaining = checkIssueSections(issue.title, combinedBody);
+
+  let output = `${c.green}✓${c.reset} Updated body for issue #${issueNum}: ${issue.title}\n`;
+  output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
+  if (remaining.length === 0) {
+    output += `  ${c.green}✓ Issue now has all required sections.${c.reset}\n`;
+  } else {
+    output += `  ${c.yellow}⚠ Still missing: ${remaining.join(', ')}${c.reset}\n`;
+  }
+
+  return { output, exitCode: 0 };
+}
+
+/**
+ * Lint GitHub issues for formatting compliance.
+ * Checks: non-empty body, Problem section, Acceptance Criteria, Recommended Model.
+ *
+ * Usage:
+ *   crux issues lint        Lint all open issues
+ *   crux issues lint <N>    Lint a single issue
+ */
+async function lint(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  interface SingleIssue {
+    number: number;
+    title: string;
+    body: string | null;
+    labels: Array<{ name: string }>;
+    html_url: string;
+    pull_request?: unknown;
+  }
+
+  let issuesToCheck: Array<{ number: number; title: string; body: string; labels: string[]; url: string }>;
+
+  const singleNum = args[0] ? parseInt(args[0], 10) : null;
+
+  if (singleNum && !isNaN(singleNum)) {
+    // Single issue
+    const i = await githubApi<SingleIssue>(`/repos/${REPO}/issues/${singleNum}`);
+    if (i.pull_request) {
+      return { output: `${c.red}#${singleNum} is a pull request, not an issue.${c.reset}\n`, exitCode: 1 };
+    }
+    issuesToCheck = [{ number: i.number, title: i.title, body: (i.body || '').trim(), labels: (i.labels || []).map(l => l.name), url: i.html_url }];
+  } else {
+    // All open issues
+    const issues = await fetchOpenIssues();
+    issuesToCheck = issues.map(i => ({ number: i.number, title: i.title, body: i.body, labels: i.labels, url: i.url }));
+  }
+
+  let passCount = 0;
+  let failCount = 0;
+  let output = '';
+
+  if (!singleNum) {
+    output += `${c.bold}${c.blue}Issue Formatting Lint (${issuesToCheck.length} issues)${c.reset}\n\n`;
+  }
+
+  for (const issue of issuesToCheck) {
+    const missing = checkIssueSections(issue.title, issue.body);
+    const model = extractModel(issue.title, issue.body);
+
+    if (missing.length === 0) {
+      passCount++;
+      if (singleNum) {
+        // Show detail for single issue
+        output += `${c.green}✓ PASS${c.reset} #${issue.number}: ${issue.title}\n`;
+        output += `  ${c.dim}${issue.url}${c.reset}\n`;
+        output += `  Recommended model: ${model ? `${c.cyan}${model}${c.reset}` : `${c.dim}(not specified)${c.reset}`}\n`;
+      }
+    } else {
+      failCount++;
+      output += `${c.red}✗ FAIL${c.reset} #${issue.number}: ${issue.title}\n`;
+      output += `  ${c.dim}${issue.url}${c.reset}\n`;
+      for (const m of missing) {
+        output += `  ${c.yellow}→ Missing: ${m}${c.reset}\n`;
+      }
+      if (!singleNum) output += '\n';
+    }
+  }
+
+  if (!singleNum) {
+    const total = issuesToCheck.length;
+    output += `\n${c.bold}Summary:${c.reset} `;
+    output += `${c.green}${passCount} pass${c.reset}, ${failCount > 0 ? `${c.red}${failCount} fail${c.reset}` : `${c.dim}0 fail${c.reset}`}`;
+    output += ` (${total} total)\n`;
+
+    if (failCount > 0) {
+      output += `\n${c.dim}Fix with: crux issues update-body <N> --problem="..." --model=sonnet --criteria="item1|item2"${c.reset}\n`;
+    }
+  }
+
+  return { output, exitCode: failCount > 0 ? 1 : 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
@@ -822,6 +1129,8 @@ export const commands = {
   list,
   next,
   create,
+  'update-body': updateBody,
+  lint,
   start,
   done,
   cleanup,
@@ -833,24 +1142,48 @@ export function getHelp(): string {
 Issues Domain - Track Claude Code work on GitHub issues
 
 Commands:
-  list            List open issues ranked by priority (default)
-  next            Show the single next issue to pick up
-  create <title>  Create a new GitHub issue
-  start <N>       Signal start: post comment + add \`claude-working\` label
-  done <N>        Signal completion: post comment + remove label
-  cleanup         Detect stale claude-working labels + potential duplicates
-  close <N>       Close an issue with optional comment
+  list                List open issues ranked by priority (default)
+  next                Show the single next issue to pick up
+  create <title>      Create a new GitHub issue (supports structured template)
+  update-body <N>     Update an issue body using structured template args
+  lint [N]            Check issue formatting (all issues, or single by number)
+  start <N>           Signal start: post comment + add \`claude-working\` label
+  done <N>            Signal completion: post comment + remove label
+  cleanup             Detect stale claude-working labels + potential duplicates
+  close <N>           Close an issue with optional comment
 
-Options:
-  --limit=N       Max issues to show in list (default: 30)
-  --scores        Show score breakdown for each issue
-  --pr=URL        PR URL to include in the completion comment (for 'done')
-  --label=X,Y     Comma-separated labels to apply (for 'create')
-  --body="..."    Issue body text (for 'create')
-  --json          JSON output
-  --fix           Auto-fix stale labels (for 'cleanup')
-  --reason="..."  Closing comment (for 'close')
-  --duplicate=N   Close as duplicate of issue N (for 'close')
+Options (list/next):
+  --limit=N           Max issues to show in list (default: 30)
+  --scores            Show score breakdown + formatting warnings per issue
+  --json              JSON output
+
+Options (create/update-body):
+  --label=X,Y         Comma-separated labels to apply (for 'create')
+  --body="..."        Raw body text (overrides structured template)
+  --problem="..."     Problem/background description (## Problem section)
+  --fix="..."         Proposed fix or approach (## Proposed Fix section)
+  --depends=N,M       Comma-separated dependent issue numbers
+  --criteria="a|b|c"  Pipe-separated acceptance criteria items
+  --model=haiku|sonnet|opus  Recommended model for this issue
+  --cost="~$2-4"      Estimated AI cost
+
+Options (done):
+  --pr=URL            PR URL to include in the completion comment
+
+Options (close):
+  --reason="..."      Closing comment
+  --duplicate=N       Close as duplicate of issue N
+
+Options (cleanup):
+  --fix               Auto-remove stale claude-working labels
+
+Issue Formatting Standard:
+  Well-formatted issues should have:
+    1. ## Problem / ## Summary section (or long freeform body)
+    2. ## Acceptance Criteria section or - [ ] checkboxes
+    3. Recommended model: **Haiku/Sonnet/Opus** in ## Recommended Model section,
+       or [haiku/sonnet/opus] suffix in the issue title
+  Check compliance with: crux issues lint [N]
 
 Scoring (weighted):
   Issues are ranked by a composite score combining:
@@ -865,22 +1198,20 @@ Scoring (weighted):
 
 Examples:
   crux issues                        List all open issues
-  crux issues --scores               List with score breakdowns visible
+  crux issues --scores               List with score breakdowns + formatting warnings
   crux issues next                   Show next issue to pick up
-  crux issues next --scores          Show next issue with score breakdown
-  crux issues create "Add validation rule for X" --label=tooling
-                                     File a new issue with label 'tooling'
-  crux issues create "Bug: X breaks Y" --label=bug --body="Steps to reproduce..."
-                                     File a bug with body text
+  crux issues lint                   Check all issues for formatting problems
+  crux issues lint 239               Check single issue #239
+  crux issues create "Add validation rule for X" --label=tooling \\
+    --problem="X is not validated..." --model=haiku \\
+    --criteria="Validation added|Tests pass|CI green" --cost="<$1"
+  crux issues update-body 239 --problem="..." --model=sonnet --criteria="a|b"
   crux issues start 239              Announce start on issue #239
   crux issues done 239 --pr=https://github.com/.../pull/42
-                                     Announce completion with PR link
   crux issues cleanup                Check for stale labels and duplicates
   crux issues cleanup --fix          Auto-remove stale claude-working labels
   crux issues close 42 --duplicate=10
-                                     Close #42 as duplicate of #10
   crux issues close 42 --reason="Already done in PR #100"
-                                     Close with comment
 
 Slash command:
   /next-issue    Claude Code command for the full "pick up next issue" workflow
@@ -891,4 +1222,4 @@ Slash command:
 // Exported for testing
 // ---------------------------------------------------------------------------
 
-export { scoreIssue, isBlocked, findPotentialDuplicates };
+export { scoreIssue, isBlocked, findPotentialDuplicates, extractModel, checkIssueSections, buildIssueBody };
