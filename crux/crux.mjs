@@ -32,7 +32,6 @@
  *   facts       Propose new canonical facts from wiki page content
  *   entity      Entity ID management (rename with safe word-boundary matching)
  *   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
- *   jobs        Background job queue management
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines

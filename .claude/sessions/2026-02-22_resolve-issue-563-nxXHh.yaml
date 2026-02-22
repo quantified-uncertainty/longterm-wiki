@@ -1,0 +1,67 @@
+date: "2026-02-22"
+branch: claude/resolve-issue-563-nxXHh
+title: "Add crux query CLI domain for wiki-server database access"
+model: claude-sonnet-4-6
+pr: https://github.com/quantified-uncertainty/longterm-wiki/pull/571
+issue: 563
+pages: []
+cost: ~$0.50
+duration: ~25min
+
+summary: |
+  Added `crux query` CLI domain with 11 subcommands that wrap wiki-server
+  read-only endpoints. Claude Code sessions can now query the PostgreSQL
+  database (search, entity data, facts, related pages, backlinks, page
+  metadata, recent changes, edit logs, citations, hallucination risk scores,
+  and wiki-wide stats) instead of grepping flat YAML files.
+
+  Commands: search, entity, facts, related, backlinks, page,
+  recent-changes, recent-edits, citations, risk, stats.
+  All support --json output. Graceful error handling for server unavailability.
+
+  Also added "Querying Wiki Data" section to CLAUDE.md. Paranoid review
+  caught 8 real bugs (all fixed): NaN injection via parseInt, date filter
+  bypassed in --json mode, recentEdits exceeding server MAX_PAGE_SIZE,
+  risk --limit ignored for per-page history, --level silently ignored
+  with pageId, value truncation without …, timeout vs unavailable
+  distinction, and unused args parameters.
+
+changes:
+  - crux/commands/query.ts (new, ~900 lines)
+  - crux/crux.mjs (register query domain, update help text)
+  - CLAUDE.md (add Query reference in Quick Reference + new section)
+
+checks:
+  initialized: true
+  type: infrastructure
+  initiated_at: "2026-02-22T00:02:10.811Z"
+  total: 32
+  completed: 25
+  na: 4
+  skipped: 3
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - typescript-used
+    - correctness
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - multi-environment
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - pr-description
+    - issue-tracking
+    - no-merge-conflicts
+    - check-recent-merges
+    - crux-typescript
