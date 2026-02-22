@@ -110,14 +110,15 @@ describe('parseVerifierResponse', () => {
     expect(misattributed.verdict).toBe('misattributed');
   });
 
-  it('falls back to unsupported for unknown verdicts', () => {
+  it('falls back to unchecked for unknown verdicts', () => {
     const result = parseVerifierResponse(JSON.stringify({ verdict: 'fabricated', relevantQuote: '', explanation: 'ok' }));
-    expect(result.verdict).toBe('unsupported');
+    expect(result.verdict).toBe('unchecked');
+    expect(result.explanation).toContain('Unknown verdict');
   });
 
-  it('handles malformed JSON gracefully', () => {
+  it('handles malformed JSON gracefully as unchecked', () => {
     const result = parseVerifierResponse('not json at all');
-    expect(result.verdict).toBe('unsupported');
+    expect(result.verdict).toBe('unchecked');
     expect(result.explanation).toBe('Failed to parse verification response.');
   });
 
@@ -397,6 +398,56 @@ describe('auditCitations pass/fail gate', () => {
     expect(result.summary.unchecked).toBe(3);
     expect(result.pass).toBe(true); // 0 checkable → pass by default
   });
+
+  it('hard-fails when any citation is misattributed, even if threshold is met', async () => {
+    // 3 citations: 2 verified, 1 misattributed → 67% verified/checkable
+    // With passThreshold=0.5, threshold is met (67% > 50%) but misattributed
+    // should still cause a hard fail (#678).
+    mockCallOpenRouter
+      .mockResolvedValueOnce(JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }))
+      .mockResolvedValueOnce(JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }))
+      .mockResolvedValueOnce(JSON.stringify({ verdict: 'misattributed', relevantQuote: 'wrong', explanation: 'Numbers differ.' }));
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/one', makeFetchedSource({ url: 'https://example.com/one' })],
+      ['https://example.com/two', makeFetchedSource({ url: 'https://example.com/two' })],
+      ['https://example.com/three', makeFetchedSource({ url: 'https://example.com/three' })],
+    ]);
+
+    const result = await auditCitations({
+      content: THREE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      passThreshold: 0.5,
+      delayMs: 0,
+    });
+
+    expect(result.summary.verified).toBe(2);
+    expect(result.summary.misattributed).toBe(1);
+    expect(result.summary.failed).toBe(1);
+    expect(result.pass).toBe(false); // hard-fail due to misattributed
+  });
+
+  it('hard-fails misattributed even with passThreshold=0', async () => {
+    mockCallOpenRouter.mockResolvedValue(
+      JSON.stringify({ verdict: 'misattributed', relevantQuote: 'wrong', explanation: 'bad' }),
+    );
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({ url: 'https://example.com/source' })],
+    ]);
+
+    const result = await auditCitations({
+      content: ONE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      passThreshold: 0,
+      delayMs: 0,
+    });
+
+    expect(result.summary.misattributed).toBe(1);
+    expect(result.pass).toBe(false); // hard-fail overrides passThreshold=0
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -476,5 +527,67 @@ describe('auditCitations LLM error handling', () => {
     expect(result.citations[0].verdict).toBe('unchecked');
     expect(result.citations[0].explanation).toContain('Rate limit exceeded');
     expect(result.summary.unchecked).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// auditCitations — relevantExcerpts (#683)
+// ---------------------------------------------------------------------------
+
+describe('auditCitations relevantExcerpts', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('uses relevantExcerpts instead of full content when available', async () => {
+    let capturedUserPrompt = '';
+    mockCallOpenRouter.mockImplementation((_sys, user) => {
+      capturedUserPrompt = user as string;
+      return Promise.resolve(JSON.stringify({ verdict: 'verified', relevantQuote: 'excerpt text', explanation: 'ok' }));
+    });
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({
+        url: 'https://example.com/source',
+        content: 'Full content that is very long and may not contain the relevant passage near the start...',
+        relevantExcerpts: ['This is the relevant excerpt about AI safety that directly supports the claim.'],
+      })],
+    ]);
+
+    await auditCitations({
+      content: ONE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+    });
+
+    // Should contain the excerpt, not the full content
+    expect(capturedUserPrompt).toContain('This is the relevant excerpt about AI safety');
+    expect(capturedUserPrompt).not.toContain('Full content that is very long');
+  });
+
+  it('falls back to full content when relevantExcerpts is empty', async () => {
+    let capturedUserPrompt = '';
+    mockCallOpenRouter.mockImplementation((_sys, user) => {
+      capturedUserPrompt = user as string;
+      return Promise.resolve(JSON.stringify({ verdict: 'verified', relevantQuote: 'full', explanation: 'ok' }));
+    });
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({
+        url: 'https://example.com/source',
+        content: 'This is the full source content that should be used when no excerpts are available for verification.',
+        relevantExcerpts: [],
+      })],
+    ]);
+
+    await auditCitations({
+      content: ONE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+    });
+
+    expect(capturedUserPrompt).toContain('This is the full source content');
   });
 });

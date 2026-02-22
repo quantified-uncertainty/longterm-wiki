@@ -184,4 +184,31 @@ Anthropic is a company.`;
     expect(appliedReplacements).toHaveLength(1);
     expect(appliedReplacements[0].entityId).toBe('E22');
   });
+
+  it('skips text inside markdown links (#672)', () => {
+    const content = 'Read [Anthropic Safety](https://anthropic.com/safety) for details. Anthropic is great.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // The "Anthropic" inside [Anthropic Safety](url) should NOT be linked
+    expect(result).toContain('[Anthropic Safety](https://anthropic.com/safety)');
+    // But the bare "Anthropic" outside the link should be linked
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink> is great');
+  });
+
+  it('skips text inside MDX comments (#681)', () => {
+    const content = '{/* TODO: add Anthropic details */}\n\nAnthropics main AI safety company.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result } = applyEntityLinkReplacements(content, replacements);
+
+    // The "Anthropic" inside the MDX comment should NOT be linked
+    expect(result).toContain('{/* TODO: add Anthropic details */}');
+  });
 });

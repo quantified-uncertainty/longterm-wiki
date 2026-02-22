@@ -88,6 +88,8 @@ export interface AuditResult {
     verified: number;
     /** Citations with verdict='unsupported' or 'misattributed'. */
     failed: number;
+    /** Citations with verdict='misattributed' (subset of failed). */
+    misattributed: number;
     /** Citations that could not be checked (url-dead, unchecked). */
     unchecked: number;
   };
@@ -146,7 +148,7 @@ export interface AuditRequest {
 
 /** Parsed response from the per-citation LLM verifier. */
 interface VerifierResponse {
-  verdict: AuditVerdict;
+  verdict: AuditVerdict | 'unchecked';
   relevantQuote: string;
   explanation: string;
 }
@@ -180,20 +182,30 @@ export function parseVerifierResponse(raw: string): VerifierResponse {
       explanation?: string;
     };
 
-    const verdict = validVerdicts.includes(parsed.verdict as AuditVerdict)
-      ? (parsed.verdict as AuditVerdict)
-      : 'unsupported';
+    if (validVerdicts.includes(parsed.verdict as AuditVerdict)) {
+      return {
+        verdict: parsed.verdict as AuditVerdict,
+        relevantQuote: typeof parsed.relevantQuote === 'string' ? parsed.relevantQuote : '',
+        explanation: typeof parsed.explanation === 'string' && parsed.explanation.length > 0
+          ? parsed.explanation
+          : 'No explanation provided.',
+      };
+    }
 
+    // Unknown verdict string — treat as unchecked (parse succeeded but LLM
+    // returned a non-standard verdict). This is distinct from 'unsupported'
+    // which means the LLM explicitly found no relevant content (#674).
     return {
-      verdict,
+      verdict: 'unchecked',
       relevantQuote: typeof parsed.relevantQuote === 'string' ? parsed.relevantQuote : '',
-      explanation: typeof parsed.explanation === 'string' && parsed.explanation.length > 0
-        ? parsed.explanation
-        : 'No explanation provided.',
+      explanation: `Unknown verdict "${String(parsed.verdict)}" — treated as unchecked.`,
     };
   } catch {
+    // JSON parse failure — we cannot determine a verdict at all.
+    // Use 'unchecked' rather than 'unsupported' so this doesn't count as a
+    // substantive negative finding against the citation (#674).
     return {
-      verdict: 'unsupported',
+      verdict: 'unchecked',
       relevantQuote: '',
       explanation: 'Failed to parse verification response.',
     };
@@ -369,9 +381,14 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
       continue;
     }
 
-    // LLM verification
+    // LLM verification — prefer pre-extracted relevant excerpts when available (#683).
+    // For long sources, the relevant passage may be beyond the truncation point,
+    // so using excerpts (already BM25-scored by source-fetcher) improves accuracy.
+    const sourceText = source.relevantExcerpts && source.relevantExcerpts.length > 0
+      ? source.relevantExcerpts.join('\n\n---\n\n')
+      : source.content;
     try {
-      const verifyResult = await verifyClaimAgainstSource(claim, source.content, { model });
+      const verifyResult = await verifyClaimAgainstSource(claim, sourceText, { model });
 
       citationAudits.push({
         footnoteRef,
@@ -400,6 +417,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
 
   // Build summary
   const verified = citationAudits.filter((c) => c.verdict === 'verified').length;
+  const misattributed = citationAudits.filter((c) => c.verdict === 'misattributed').length;
   const failed = citationAudits.filter(
     (c) => c.verdict === 'unsupported' || c.verdict === 'misattributed',
   ).length;
@@ -407,18 +425,23 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
     (c) => c.verdict === 'unchecked' || c.verdict === 'url-dead',
   ).length;
 
-  // Pass/fail gate: of checkable citations (verified + failed), what fraction is verified?
+  // Pass/fail gate:
+  // 1. Any misattributed citation is a hard fail — the source actively contradicts
+  //    the claim, which is worse than simply being unsupported (#678).
+  // 2. Of checkable citations (verified + failed), what fraction is verified?
   const checkable = verified + failed;
   const pass =
-    passThreshold <= 0
-      ? true
-      : checkable === 0
-        ? true // nothing checkable → pass by default (no claims to dispute)
-        : verified / checkable >= passThreshold;
+    misattributed > 0
+      ? false
+      : passThreshold <= 0
+        ? true
+        : checkable === 0
+          ? true // nothing checkable → pass by default (no claims to dispute)
+          : verified / checkable >= passThreshold;
 
   return {
     citations: citationAudits,
-    summary: { total: citationAudits.length, verified, failed, unchecked },
+    summary: { total: citationAudits.length, verified, failed, misattributed, unchecked },
     newUngroundedClaims: [],
     pass,
   };
