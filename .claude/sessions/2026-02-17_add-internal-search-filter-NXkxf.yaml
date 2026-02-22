@@ -1,8 +1,0 @@
-date: 2026-02-17
-branch: claude/add-internal-search-filter-NXkxf
-title: Add Internal filter to Explore page
-pages: []
-summary: Added an "Internal" entity filter to the Explore page so internal pages (style guides, architecture docs, reports, etc.) are discoverable via search and filtering. Previously internal pages were completely excluded from the Explore grid and search index.
-pr: 177
-learnings:
-  - "Internal pages were excluded in three places: `getExploreItems()` in `data/index.ts`, the search index builder in `search.mjs`, and validated by a test in `data.test.ts`. All three needed updating."

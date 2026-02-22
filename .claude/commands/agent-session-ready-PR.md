@@ -38,13 +38,7 @@ pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 
 Run `pnpm crux agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
 
-Create `.claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml` per `.claude/rules/session-logging.md`. Include the `checks:` block verbatim from the snapshot output. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly; the audit trail should reflect reality.
-
-After writing the YAML file, sync it to the wiki-server database:
-```bash
-pnpm crux wiki-server sync-session .claude/sessions/YYYY-MM-DD_<branch-suffix>.yaml
-```
-This is fire-and-forget — if the server is unavailable, the sync silently skips. YAML remains authoritative.
+Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
 
 ## Step 6: Validate completion
 

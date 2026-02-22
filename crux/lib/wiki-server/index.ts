@@ -37,6 +37,7 @@ export type { PageLinkItem } from './links.ts';
 export type { UpsertResourceItem } from './resources.ts';
 export type { SyncEntityItem, EntityEntry } from './entities.ts';
 export type { SyncFactItem, FactEntry } from './facts.ts';
+export type { AgentSessionEntry } from './agent-sessions.ts';
 export type {
   JobEntry,
   CreateJobInput,
@@ -128,6 +129,14 @@ export {
   getStaleFacts,
   getFactStats,
 } from './facts.ts';
+
+// Agent Sessions
+export {
+  upsertAgentSession,
+  getAgentSessionByBranch,
+  updateAgentSession,
+  listAgentSessions,
+} from './agent-sessions.ts';
 
 // Jobs
 export {

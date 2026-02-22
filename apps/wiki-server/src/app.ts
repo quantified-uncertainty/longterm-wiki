@@ -16,6 +16,7 @@ import { linksRoute } from "./routes/links.js";
 import { autoUpdateNewsRoute } from "./routes/auto-update-news.js";
 import { entitiesRoute } from "./routes/entities.js";
 import { factsRoute } from "./routes/facts.js";
+import { agentSessionsRoute } from "./routes/agent-sessions.js";
 import { jobsRoute } from "./routes/jobs.js";
 
 export function createApp() {
@@ -64,6 +65,7 @@ export function createApp() {
   app.route("/api/auto-update-news", autoUpdateNewsRoute);
   app.route("/api/entities", entitiesRoute);
   app.route("/api/facts", factsRoute);
+  app.route("/api/agent-sessions", agentSessionsRoute);
   app.route("/api/jobs", jobsRoute);
 
   return app;

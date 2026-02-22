@@ -1,9 +1,0 @@
-date: 2026-02-18
-branch: claude/resolve-issue-249-SRMRd
-title: Fix O(n²) algorithms in build pipeline
-model: opus-4-6
-duration: ~15min
-pages: []
-summary: "Fixed three O(n²) performance bottlenecks in the build pipeline: (1) replaced O(n²) entity name-prefix matching with O(n log n) sorted-scan approach, (2) added contentFormat-based clustering to redundancy analysis to eliminate cross-format comparisons, (3) replaced O(n) `entities.find()` calls in statistics with a pre-built Map for O(1) lookups."
-learnings:
-  - The name-prefix matching optimization relies on `-` being the lowest ASCII character in entity ID slugs (lower than digits and letters), guaranteeing prefix matches are contiguous in sorted order.

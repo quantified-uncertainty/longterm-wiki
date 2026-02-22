@@ -51,7 +51,7 @@ function saveRunDetails(startedAt: string, digest: NewsDigest, plan: UpdatePlan)
   writeFileSync(filepath, stringifyYaml({ digest, plan }, { lineWidth: 120 }));
 }
 
-// ── Database Persistence (best-effort) ──────────────────────────────────────
+// ── Database Persistence (primary store) ─────────────────────────────────────
 
 async function persistRunToDb(
   report: RunReport,
@@ -124,9 +124,13 @@ async function persistRunToDb(
           console.log(`  News items persisted to database (${newsResult.data.inserted} items)`);
         }
       }
+    } else {
+      console.warn(`  Warning: Failed to persist run to database: ${result.message}`);
     }
-  } catch {
-    // Best-effort: YAML is the primary store; DB is supplemental
+  } catch (err) {
+    // DB is the primary store; log the failure but don't crash
+    // (YAML is still written locally as a fallback)
+    console.warn(`  Warning: DB persistence failed: ${err instanceof Error ? err.message : err}`);
   }
 }
 

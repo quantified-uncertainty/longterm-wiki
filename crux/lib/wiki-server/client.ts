@@ -74,7 +74,7 @@ function classifyStatus(status: number): ApiError {
  * Returns an `ApiResult<T>` with typed error discrimination.
  */
 export async function apiRequest<T>(
-  method: 'GET' | 'POST',
+  method: 'GET' | 'POST' | 'PATCH',
   path: string,
   body?: unknown,
   timeoutMs: number = TIMEOUT_MS,
@@ -122,7 +122,7 @@ export async function apiRequest<T>(
  * Used by endpoints that need larger timeouts or manual batching.
  */
 export async function batchedRequest<T>(
-  method: 'GET' | 'POST',
+  method: 'GET' | 'POST' | 'PATCH',
   path: string,
   body?: unknown,
   timeoutMs: number = BATCH_TIMEOUT_MS,

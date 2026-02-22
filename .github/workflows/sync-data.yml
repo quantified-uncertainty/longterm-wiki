@@ -1,13 +1,8 @@
 name: Sync Data to Wiki Server
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".claude/sessions/**"
-      - "data/auto-update/runs/**"
-
-  # Allow manual trigger for full re-sync
+  # Session logs and auto-update runs are gitignored (stored in DB),
+  # so push-path triggers no longer apply. Use manual dispatch only.
   workflow_dispatch:
 
 # Cancel superseded runs for the same trigger

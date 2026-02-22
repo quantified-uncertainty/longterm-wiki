@@ -84,7 +84,7 @@ crux.mjs                  CLI entry point — parses args, dispatches to domains
 | **edit-log** | wiki-server PostgreSQL DB | stdout (history) |
 | **importance** | `content/docs/`, `data/` | `content/docs/` frontmatter |
 | **ci** | GitHub API | stdout (check-run status) |
-| **maintain** | GitHub API, `.claude/sessions/`, codebase | stdout, GitHub issues |
+| **maintain** | GitHub API, wiki-server DB, codebase | stdout, GitHub issues |
 
 ## Domain Reference
 
