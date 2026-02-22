@@ -31,6 +31,12 @@ vi.mock('./knowledge-db.ts', () => ({
   },
 }));
 
+// Mock the wiki-server citations client so PostgreSQL calls don't require a server.
+vi.mock('./wiki-server/citations.ts', () => ({
+  upsertCitationContent: vi.fn().mockResolvedValue({ ok: true, data: { url: 'https://example.com' } }),
+  getCitationContentByUrl: vi.fn().mockResolvedValue({ ok: false, error: 'unavailable', message: 'no server' }),
+}));
+
 // Mock the resource-lookup layer so tests don't require YAML files on disk.
 const mockResources = new Map<string, { id: string; url: string; title: string; type: string; summary?: string; authors?: string[]; tags?: string[] }>([
   ['res-safety-paper', {
@@ -788,5 +794,178 @@ describe('LRU cache eviction', () => {
 
   it('sessionCacheEvictions returns 0 after cache clear', () => {
     expect(sessionCacheEvictions()).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PostgreSQL write path (#647)
+// ---------------------------------------------------------------------------
+
+describe('PostgreSQL write path', () => {
+  beforeEach(async () => {
+    clearSessionCache();
+    vi.restoreAllMocks();
+    // Reset wiki-server mock to default (server unavailable)
+    const { upsertCitationContent, getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    (upsertCitationContent as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: { url: 'https://example.com' } });
+    (getCitationContentByUrl as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, error: 'unavailable', message: 'no server' });
+  });
+
+  it('calls upsertCitationContent after a successful network fetch', async () => {
+    const { upsertCitationContent } = await import('./wiki-server/citations.ts');
+    const upsertMock = upsertCitationContent as ReturnType<typeof vi.fn>;
+    upsertMock.mockClear();
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+
+    const result = await fetchSource({ url: 'https://example.com/pg-write-test', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    // Allow the fire-and-forget promise to settle
+    await new Promise(r => setTimeout(r, 10));
+    expect(upsertMock).toHaveBeenCalledOnce();
+    expect(upsertMock).toHaveBeenCalledWith(expect.objectContaining({
+      url: 'https://example.com/pg-write-test',
+      fullText: expect.any(String),
+      httpStatus: 200,
+    }));
+  });
+
+  it('does not call upsertCitationContent when content is empty (e.g. dead link)', async () => {
+    const { upsertCitationContent } = await import('./wiki-server/citations.ts');
+    const upsertMock = upsertCitationContent as ReturnType<typeof vi.fn>;
+    upsertMock.mockClear();
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ status: 404 })));
+
+    const result = await fetchSource({ url: 'https://example.com/dead-pg', extractMode: 'full' });
+
+    expect(result.status).toBe('dead');
+    await new Promise(r => setTimeout(r, 10));
+    expect(upsertMock).not.toHaveBeenCalled();
+  });
+
+  it('serves from PostgreSQL cache when session cache is empty', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    getMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        url: 'https://example.com/pg-cached',
+        pageTitle: 'PG Cached Page',
+        fullText: 'Content stored in PostgreSQL about AI safety.',
+        fetchedAt: '2025-01-01T00:00:00.000Z',
+        httpStatus: 200,
+        contentType: 'text/html',
+        fullTextPreview: null,
+        contentLength: 44,
+        contentHash: null,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T00:00:00.000Z',
+      },
+    });
+
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://example.com/pg-cached', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(result.title).toBe('PG Cached Page');
+    expect(result.content).toBe('Content stored in PostgreSQL about AI safety.');
+    expect(fetchMock).not.toHaveBeenCalled(); // No network call needed
+  });
+
+  it('extracts relevant excerpts from PostgreSQL-cached content', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    getMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        url: 'https://example.com/pg-relevant',
+        pageTitle: 'AI Safety Report',
+        fullText: 'Global spending on AI safety research reached $100 million.\n\nResearchers worldwide have increased commitments to AI alignment.\n\nUnrelated paragraph about climate science.',
+        fetchedAt: '2025-01-01T00:00:00.000Z',
+        httpStatus: 200,
+        contentType: 'text/html',
+        fullTextPreview: null,
+        contentLength: 100,
+        contentHash: null,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T00:00:00.000Z',
+      },
+    });
+
+    vi.stubGlobal('fetch', vi.fn());
+
+    const result = await fetchSource({
+      url: 'https://example.com/pg-relevant',
+      extractMode: 'relevant',
+      query: 'AI safety funding',
+    });
+
+    expect(result.status).toBe('ok');
+    expect(result.relevantExcerpts.length).toBeGreaterThan(0);
+    expect(result.relevantExcerpts.some(e => e.includes('100 million') || e.includes('alignment'))).toBe(true);
+  });
+
+  it('falls back to SQLite when PostgreSQL returns unavailable', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    // PostgreSQL says unavailable
+    getMock.mockResolvedValueOnce({ ok: false, error: 'unavailable', message: 'no server' });
+
+    const { citationContent } = await import('./knowledge-db.ts');
+    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
+    getByUrlMock.mockReturnValueOnce({
+      full_text: 'Content from SQLite fallback.',
+      page_title: 'SQLite Title',
+      fetched_at: '2025-01-01T00:00:00.000Z',
+    });
+
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://example.com/sqlite-fallback', extractMode: 'full' });
+
+    expect(result.status).toBe('ok');
+    expect(result.content).toBe('Content from SQLite fallback.');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('backfills SQLite when served from PostgreSQL cache', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    getMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        url: 'https://example.com/backfill-test',
+        pageTitle: 'Backfill Test',
+        fullText: 'PostgreSQL content for backfill test.',
+        fetchedAt: '2025-01-01T00:00:00.000Z',
+        httpStatus: 200,
+        contentType: 'text/html',
+        fullTextPreview: null,
+        contentLength: 37,
+        contentHash: null,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T00:00:00.000Z',
+      },
+    });
+
+    const { citationContent } = await import('./knowledge-db.ts');
+    const upsertSqliteMock = citationContent.upsert as ReturnType<typeof vi.fn>;
+    upsertSqliteMock.mockClear();
+
+    vi.stubGlobal('fetch', vi.fn());
+
+    await fetchSource({ url: 'https://example.com/backfill-test', extractMode: 'full' });
+
+    // SQLite should be backfilled from PostgreSQL
+    expect(upsertSqliteMock).toHaveBeenCalledOnce();
+    expect(upsertSqliteMock).toHaveBeenCalledWith(expect.objectContaining({
+      url: 'https://example.com/backfill-test',
+      fullText: 'PostgreSQL content for backfill test.',
+    }));
   });
 });
