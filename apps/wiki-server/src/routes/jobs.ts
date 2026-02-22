@@ -7,6 +7,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  firstOrThrow,
 } from "./utils.js";
 import {
   CreateJobSchema,
@@ -104,7 +105,7 @@ jobsRoute.post("/", async (c) => {
     })
     .returning();
 
-  return c.json(formatJob(rows[0]), 201);
+  return c.json(formatJob(firstOrThrow(rows, "job insert")), 201);
 });
 
 // ---- GET / (list jobs with filters) ----

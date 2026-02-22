@@ -6,6 +6,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  firstOrThrow,
 } from "./utils.js";
 import {
   CreateAgentSessionSchema,
@@ -48,7 +49,7 @@ agentSessionsRoute.post("/", async (c) => {
         })
         .where(eq(agentSessions.id, existing[0].id))
         .returning();
-      return { row: updated[0], isUpdate: true };
+      return { row: firstOrThrow(updated, "agent session update"), isUpdate: true };
     }
 
     const inserted = await tx
@@ -61,7 +62,7 @@ agentSessionsRoute.post("/", async (c) => {
         checklistMd: d.checklistMd,
       })
       .returning();
-    return { row: inserted[0], isUpdate: false };
+    return { row: firstOrThrow(inserted, "agent session insert"), isUpdate: false };
   });
 
   return c.json(row, isUpdate ? 200 : 201);

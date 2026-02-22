@@ -163,6 +163,9 @@ jobs:
       - name: TypeScript type check — wiki-server (blocking)
         run: cd apps/wiki-server && npx tsc --noEmit
 
+      - name: .returning() guard check (blocking)
+        run: npx tsx crux/validate/validate-returning-guard.ts
+
       - name: Run validation suite (advisory)
         if: "!cancelled()"
         continue-on-error: true
