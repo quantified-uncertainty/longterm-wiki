@@ -37,6 +37,25 @@ if [ ! -f "apps/web/src/data/database.json" ] || [ ! -f "apps/web/src/data/pages
   fi
 fi
 
+# Check wiki-server connectivity
+WIKI_SERVER_URL="${LONGTERMWIKI_SERVER_URL:-}"
+if [ -z "$WIKI_SERVER_URL" ]; then
+  WIKI_SERVER_STATUS="ℹ Wiki server: LONGTERMWIKI_SERVER_URL not set (crux query commands unavailable)"
+else
+  HEALTH_RESPONSE=$(curl -s --max-time 3 "${WIKI_SERVER_URL}/health" 2>/dev/null || true)
+  if [ -n "$HEALTH_RESPONSE" ] && echo "$HEALTH_RESPONSE" | grep -q '"status":"healthy"'; then
+    PAGES=$(echo "$HEALTH_RESPONSE" | grep -oE '"totalPages":[0-9]+' | grep -oE '[0-9]+' || true)
+    ENTITIES=$(echo "$HEALTH_RESPONSE" | grep -oE '"totalEntities":[0-9]+' | grep -oE '[0-9]+' || true)
+    if [ -n "$PAGES" ] && [ -n "$ENTITIES" ]; then
+      WIKI_SERVER_STATUS="✓ Wiki server: available at ${WIKI_SERVER_URL} (${PAGES} pages, ${ENTITIES} entities) — use \`pnpm crux query\` to search"
+    else
+      WIKI_SERVER_STATUS="✓ Wiki server: available at ${WIKI_SERVER_URL} — use \`pnpm crux query\` to search"
+    fi
+  else
+    WIKI_SERVER_STATUS="⚠ Wiki server: not reachable at ${WIKI_SERVER_URL} (crux query, citations, edit-log unavailable)"
+  fi
+fi
+
 # Output session context (stdout is injected as context for Claude)
 if [ ${#ISSUES[@]} -gt 0 ]; then
   echo "SESSION SETUP ISSUES:"
@@ -46,3 +65,4 @@ if [ ${#ISSUES[@]} -gt 0 ]; then
 else
   echo "Environment ready (dependencies installed, data layer built)."
 fi
+echo "${WIKI_SERVER_STATUS}"
