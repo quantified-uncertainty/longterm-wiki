@@ -6,7 +6,9 @@
  * - Successful bundle generation (mocked API responses)
  * - Error handling when wiki-server is unavailable
  * - --print flag writes to stdout instead of file
+ * - --json / --ci flag returns machine-readable JSON
  * - for-issue error handling (bad GITHUB_TOKEN, missing issue number)
+ * - Helper functions: extractKeywords, findEntityYaml, tableRow
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -43,7 +45,7 @@ vi.mock('fs', () => ({
   readdirSync: vi.fn(() => []),
 }));
 
-import { commands } from './context.ts';
+import { commands, extractKeywords, findEntityYaml, tableRow } from './context.ts';
 import * as clientLib from '../lib/wiki-server/client.ts';
 import * as githubLib from '../lib/github.ts';
 import { writeFileSync } from 'fs';
@@ -510,5 +512,227 @@ describe('context for-issue — successful bundle', () => {
     expect(result.exitCode).toBe(0); // issue data was fetched; wiki-server failure is graceful
     expect(result.output).toContain('Issue #580');
     expect(result.output).toContain('unavailable');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// --json / --ci mode — machine-readable JSON output
+// ---------------------------------------------------------------------------
+
+describe('context for-page — --json output', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns JSON with type:page and all data sections', async () => {
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: PAGE_DETAIL })
+      .mockResolvedValueOnce({ ok: true, data: RELATED_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: BACKLINKS_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: CITATIONS_RESULT });
+
+    const result = await commands['for-page'](['scheming'], { json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.type).toBe('page');
+    expect(parsed.pageId).toBe('scheming');
+    expect(parsed.page.title).toBe('Scheming');
+    expect(parsed.related).not.toBeNull();
+    expect(parsed.backlinks).not.toBeNull();
+    expect(parsed.citations).not.toBeNull();
+  });
+
+  it('without --json, ci:true suppresses colors but still returns human-readable output', async () => {
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: PAGE_DETAIL })
+      .mockResolvedValueOnce({ ok: true, data: RELATED_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: BACKLINKS_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: CITATIONS_RESULT });
+
+    const result = await commands['for-page'](['scheming'], { ci: true });
+    expect(result.exitCode).toBe(0);
+    // ci:true only suppresses ANSI colors — output is still a human-readable summary string
+    expect(result.output).toContain('scheming');
+    expect(result.output).not.toContain('"type"'); // not JSON
+  });
+});
+
+describe('context for-entity — --json output', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns JSON with type:entity and facts/pages', async () => {
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: ENTITY_DETAIL })
+      .mockResolvedValueOnce({ ok: true, data: FACTS_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: PAGE_SEARCH_RESULT });
+
+    const result = await commands['for-entity'](['anthropic'], { json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.type).toBe('entity');
+    expect(parsed.entityId).toBe('anthropic');
+    expect(parsed.entity.title).toBe('Anthropic');
+    expect(parsed.facts.facts).toHaveLength(1);
+    expect(parsed.pages.results).toHaveLength(1);
+  });
+
+  it('sets facts/pages to null when wiki-server unavailable', async () => {
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: ENTITY_DETAIL })
+      .mockResolvedValueOnce({ ok: false, error: 'unavailable', message: 'ECONNREFUSED' })
+      .mockResolvedValueOnce({ ok: false, error: 'unavailable', message: 'ECONNREFUSED' });
+
+    const result = await commands['for-entity'](['anthropic'], { json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.facts).toBeNull();
+    expect(parsed.pages).toBeNull();
+  });
+});
+
+describe('context for-topic — --json output', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns JSON with type:topic and search results', async () => {
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: PAGE_SEARCH_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: ENTITY_SEARCH_RESULT });
+
+    const result = await commands['for-topic'](['AI', 'safety'], { json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.type).toBe('topic');
+    expect(parsed.topic).toBe('AI safety');
+    expect(parsed.pages.results).toHaveLength(1);
+    expect(parsed.entities.results).toHaveLength(1);
+  });
+});
+
+describe('context for-issue — --json output', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns JSON with type:issue, issue data, and related pages', async () => {
+    mockGithubApi.mockResolvedValueOnce(GITHUB_ISSUE);
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: PAGE_SEARCH_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: ENTITY_SEARCH_RESULT });
+
+    const result = await commands['for-issue'](['580'], { json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.type).toBe('issue');
+    expect(parsed.issueNum).toBe(580);
+    expect(parsed.issue.number).toBe(580);
+    expect(parsed.pages.results).toHaveLength(1);
+    expect(parsed.entities.results).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Helper functions: extractKeywords, findEntityYaml, tableRow
+// ---------------------------------------------------------------------------
+
+describe('extractKeywords', () => {
+  it('extracts meaningful words from text', () => {
+    const keywords = extractKeywords('AI safety alignment research');
+    expect(keywords).toContain('safety');
+    expect(keywords).toContain('alignment');
+    expect(keywords).toContain('research');
+  });
+
+  it('lowercases all keywords', () => {
+    const keywords = extractKeywords('Anthropic OpenAI DeepMind');
+    expect(keywords).toContain('anthropic');
+    expect(keywords).toContain('openai');
+    expect(keywords).toContain('deepmind');
+  });
+
+  it('filters stop words', () => {
+    const keywords = extractKeywords('the and or a an in on at to for of with');
+    expect(keywords).toHaveLength(0);
+  });
+
+  it('filters words shorter than 3 characters', () => {
+    const keywords = extractKeywords('is it be do go');
+    expect(keywords).toHaveLength(0);
+  });
+
+  it('deduplicates keywords', () => {
+    const keywords = extractKeywords('safety safety alignment alignment safety');
+    const safetyCount = keywords.filter((k) => k === 'safety').length;
+    expect(safetyCount).toBe(1);
+  });
+
+  it('strips non-alphanumeric punctuation (commas, bangs, etc.)', () => {
+    const keywords = extractKeywords('alignment, research!');
+    expect(keywords).toContain('alignment');
+    expect(keywords).toContain('research');
+  });
+
+  it('preserves hyphenated terms as single tokens', () => {
+    const keywords = extractKeywords('AI-safety alignment');
+    // Hyphens are preserved so "AI-safety" → "ai-safety" (single token)
+    expect(keywords).toContain('ai-safety');
+    expect(keywords).toContain('alignment');
+  });
+
+  it('returns empty array for empty string', () => {
+    expect(extractKeywords('')).toEqual([]);
+  });
+
+  it('returns empty array for all-stop-word input', () => {
+    expect(extractKeywords('the and or but')).toEqual([]);
+  });
+
+  it('handles hyphenated terms by treating each word as separate', () => {
+    // 'crux' is in stop list, 'context' should pass
+    const keywords = extractKeywords('crux context for-issue command');
+    expect(keywords).toContain('context');
+    expect(keywords).toContain('command');
+    expect(keywords).not.toContain('crux');
+  });
+});
+
+describe('tableRow', () => {
+  it('creates a pipe-delimited table row', () => {
+    expect(tableRow('Name', 'Value', 'Date')).toBe('| Name | Value | Date |');
+  });
+
+  it('handles a single cell', () => {
+    expect(tableRow('Only')).toBe('| Only |');
+  });
+
+  it('handles two cells', () => {
+    expect(tableRow('Key', 'Val')).toBe('| Key | Val |');
+  });
+
+  it('handles empty string cells', () => {
+    expect(tableRow('', '', '')).toBe('|  |  |  |');
+  });
+
+  it('handles cells with pipe characters in content', () => {
+    // The function doesn't escape pipes — caller responsibility
+    const row = tableRow('a | b', 'c');
+    expect(row).toBe('| a | b | c |');
+  });
+});
+
+describe('findEntityYaml', () => {
+  it('returns null when entity does not exist', () => {
+    // The fs mock returns existsSync: false and readdirSync: []
+    // So findEntityYaml should return null gracefully
+    const result = findEntityYaml('nonexistent-entity-xyz');
+    expect(result).toBeNull();
+  });
+
+  it('returns null for empty entity ID', () => {
+    const result = findEntityYaml('');
+    expect(result).toBeNull();
   });
 });

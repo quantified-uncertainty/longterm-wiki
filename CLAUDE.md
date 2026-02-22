@@ -119,6 +119,13 @@ pnpm crux query risk --level=high        # All high-risk pages
 pnpm crux query stats                    # Wiki-wide statistics
 # All commands support --json for machine-readable output
 # Requires LONGTERMWIKI_SERVER_URL (set in environment)
+
+# Research context bundles (saves 5-15 tool calls per session)
+pnpm crux context for-page <page-id>     # Full context for editing a page (metadata, related, citations, entity YAML)
+pnpm crux context for-entity <id>        # Full context for an entity (facts, backlinks, sources, YAML)
+pnpm crux context for-issue <N>          # Context assembled from GitHub issue (finds related pages/entities)
+pnpm crux context for-topic "query"      # Context for a free-text topic (search + related)
+# All commands write to .claude/wip-context.md by default (override with --output=<path>)
 ```
 
 ## Repository Structure
@@ -222,6 +229,9 @@ Re-read the full page and verify:
 2. **Prose matches data**: Claims in prose agree with numbers in tables/charts on the same page
 3. **Units are consistent**: Same unit throughout (don't mix years in overview with months in tables)
 4. **Rendering works**: For `\$`, `^`, `{}` or LaTeX-like notation, think through MDX rendering. When in doubt, use plain text.
+5. **No `{/* NEEDS CITATION */}` markers**: Search for these before committing — `grep -r "NEEDS CITATION" content/docs/`. Standard/deep pipeline improvements should never leave these behind. If found, either add a source or remove the claim.
+6. **Cross-page consistency**: If you edited a person page, skim the linked org page for conflicting facts (funding, dates, key people), and vice versa. Pages sharing entities often drift apart. If you changed a funding claim or founding date on one page, check the other.
+7. **Temporal voice (historical pages)**: If you edited a `/history/` page, confirm "Looking Forward" sections are clearly framed as historical projections, not present-day expectations.
 
 For model/analysis pages, also run the full review checklist in `content/docs/internal/models.mdx` (Part 7).
 

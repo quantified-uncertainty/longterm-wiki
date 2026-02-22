@@ -13,7 +13,7 @@
  * Part of the hallucination risk reduction initiative (issue #200, Phase 4).
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
 import {
   markReviewed,
@@ -115,7 +115,7 @@ export async function list(_args: string[], options: Record<string, unknown>): P
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
 
-  const limit = parseInt((options.limit as string) || '50', 10);
+  const limit = parseIntOpt(options.limit, 50);
   const allReviews = listAllReviews();
   const reviews = allReviews.slice(0, limit);
 

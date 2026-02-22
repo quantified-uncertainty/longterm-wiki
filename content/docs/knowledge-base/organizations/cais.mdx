@@ -1,6 +1,6 @@
 ---
 title: CAIS (Center for AI Safety)
-description: Research organization advancing AI safety through technical research, field-building, and policy communication, including the landmark 2023 AI extinction risk statement signed by major AI leaders
+description: Research organization focused on AI safety through technical research, field-building, and public communication, including the May 2023 Statement on AI Risk signed by prominent AI researchers and industry leaders
 sidebar:
   order: 14
 entityType: organization
@@ -9,9 +9,9 @@ quality: 42
 readerImportance: 88.5
 researchImportance: 17.5
 tacticalValue: 72
-lastEdited: "2025-12-24"
+lastEdited: "2026-02-22"
 update_frequency: 21
-llmSummary: CAIS is a research organization that has distributed $2M+ in compute grants to 200+ researchers, published 50+ safety papers including benchmarks adopted by Anthropic/OpenAI, and organized the May 2023 AI extinction risk statement signed by 350+ AI leaders. Current budget is ~$5M annually with 15+ full-time staff, focusing on representation engineering, safety benchmarks, and field-building.
+llmSummary: CAIS is a nonprofit research organization founded by Dan Hendrycks that has distributed compute grants to researchers, published technical AI safety papers including the representation engineering and MACHIAVELLI benchmark papers, and organized the May 2023 Statement on AI Risk signed by over 350 AI researchers and industry leaders. The organization focuses on technical safety research, field-building, and policy communication.
 ratings:
   novelty: 2.5
   rigor: 4
@@ -30,112 +30,174 @@ import {DataInfoBox, KeyPeople, Section, R, EntityLink, DataExternalLinks} from 
 
 ## Overview
 
-The <R id="a306e0b63bdedbd5">Center for AI Safety (CAIS)</R> is a nonprofit research organization that works to reduce societal-scale risks from artificial intelligence through technical research, field-building initiatives, and public communication efforts. Founded by <EntityLink id="dan-hendrycks">Dan Hendrycks</EntityLink>, CAIS gained widespread recognition for organizing the landmark "Statement on AI Risk" in May 2023, which received signatures from over 350 AI researchers and industry leaders.
+The <R id="a306e0b63bdedbd5">Center for AI Safety (CAIS)</R> is a nonprofit research organization that works to reduce societal-scale risks from artificial intelligence through technical research, field-building initiatives, and public communication. Founded by <EntityLink id="E89" name="dan-hendrycks">Dan Hendrycks</EntityLink>, CAIS received substantial public attention in May 2023 when it organized a one-sentence statement on AI extinction risk that attracted signatures from over 350 AI researchers and industry figures, including several Turing Award recipients and heads of major AI laboratories.
 
-CAIS's multi-pronged approach combines cutting-edge technical research on AI alignment and robustness with strategic field-building efforts that have supported over 200 researchers through grants and fellowships. The organization's work spans from fundamental research on <R id="22d74e88304202f8"><EntityLink id="representation-engineering">representation engineering</EntityLink></R> to developing critical safety benchmarks like the <R id="6d4e8851e33e1641">MACHIAVELLI dataset</R> for evaluating deceptive AI behavior.
+CAIS operates across three areas: technical research on AI alignment and robustness, grant and fellowship programs intended to grow the AI safety research community, and communication efforts aimed at policymakers and the public. Its technical output includes work on <EntityLink id="E479" name="representation-engineering">Representation Engineering</EntityLink> and the MACHIAVELLI benchmark for evaluating goal-directed behavior in AI systems. The organization is primarily funded by <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, an EA-aligned philanthropic fund, a funding relationship that is relevant context for assessing its research priorities and institutional positioning.{/* NEEDS CITATION */}
 
-## Risk Assessment
+CAIS occupies a distinct niche in the AI safety ecosystem: unlike academic centers such as <EntityLink id="E57" name="chai">CHAI</EntityLink> or research-focused organizations like <EntityLink id="E202" name="miri">MIRI</EntityLink>, it combines original technical research with explicit field-building and public communication goals. Critics have questioned whether its emphasis on long-run extinction risk is appropriately calibrated relative to near-term AI harms, and whether EA-concentrated funding in this space creates ideological homogeneity in safety research priorities. These debates are discussed in the Critiques and Limitations section below.
 
-| Risk Category | Assessment | Evidence | Mitigation Focus |
-|---------------|------------|----------|------------------|
-| Technical Research Impact | High | 50+ safety publications, novel benchmarks | <R id="22d74e88304202f8">Representation engineering</R>, adversarial robustness |
-| Field-Building Influence | Very High | 200+ researchers supported, \$1M+ distributed | Compute grants, fellowship programs |
-| Policy Communication | High | Statement signed by major AI leaders | Public awareness, expert consensus building |
-| Timeline Relevance | Medium-High | Research targets near-term safety challenges | 2-5 year research horizon |
+## Organizational Background
+
+CAIS was established as a nonprofit research organization with the goal of filling a perceived gap between technical AI safety research and broader scientific and public awareness of AI risks. Dan Hendrycks, who completed his PhD at UC Berkeley, founded CAIS to provide infrastructure — compute grants, fellowships, educational resources, and policy engagement — that individual academic researchers lacked access to.{/* NEEDS CITATION */}
+
+The organization's theory of change rests on several linked assumptions: that AI systems pose meaningful risks of societal-scale harm, including possible catastrophic outcomes; that the current period is important for establishing safety-relevant research norms and technical methods; and that field-building activities (funding researchers, running educational programs, facilitating policy engagement) will increase the probability of good outcomes by growing and coordinating the safety research community. Whether these assumptions are well-founded is contested, and the organization's critics have argued that the extinction-risk framing in particular overstates speculative long-run risks relative to observable near-term harms.
+
+CAIS is legally structured as a nonprofit. Its primary disclosed funder is <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, which has made grants to CAIS as part of its AI safety grantmaking portfolio.{/* NEEDS CITATION */} Exact annual budget figures are not publicly confirmed by CAIS; estimates of approximately \$5M annually have circulated but have not been verified against IRS Form 990 filings, which would be the authoritative source for nonprofit financials.
+
+## Funding
+
+CAIS's primary disclosed funder is <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, a philanthropic organization closely associated with the effective altruism movement.{/* NEEDS CITATION */} This funding relationship is material context for interpreting the organization's research agenda: Open Philanthropy has historically prioritized long-run catastrophic and extinction-level AI risk over near-term AI harms, and CAIS's framing broadly reflects this prioritization.
+
+No comprehensive public breakdown of CAIS's funding sources or annual budget has been identified. The figure of approximately \$5M annually cited in earlier versions of this page is an unverified estimate and should not be treated as authoritative. Readers seeking verified financial data should consult CAIS's IRS Form 990 filings, which are publicly available through ProPublica Nonprofit Explorer or the IRS TEOS database.
+
+The concentration of AI safety funding through EA-aligned funders including Open Philanthropy has been noted by critics as a potential source of ideological constraint on safety research priorities — organizations dependent on this funding may face implicit pressure to prioritize framings and research directions consistent with funder worldviews. CAIS has not publicly addressed this critique directly.
 
 ## Key Research Areas
 
 ### Technical Safety Research
 
-| Research Domain | Key Contributions | Impact Metrics |
+| Research Domain | Key Contributions | Notes |
 |-----------------|------------------|----------------|
-| **Representation Engineering** | Methods for reading/steering model internals | <R id="da9dc068f95f855d">15+ citations</R> within 6 months |
-| **Safety Benchmarks** | MACHIAVELLI, power-seeking evaluations | Adopted by <R id="afe2508ac4caf5ee">Anthropic</R>, <R id="04d39e8bd5d50dd5">OpenAI</R> |
-| **Adversarial Robustness** | Novel defense mechanisms, evaluation protocols | 100+ citations on key papers |
-| **Alignment Foundations** | Conceptual frameworks for AI safety | Influenced <EntityLink id="alignment">alignment research</EntityLink> directions |
+| **<EntityLink id="E479" name="representation-engineering">Representation Engineering</EntityLink>** | Methods for reading and steering model internal representations | <R id="da9dc068f95f855d">Published 2023</R>; independent replication and scalability to frontier models remains an open research question |
+| **Safety Benchmarks** | MACHIAVELLI benchmark for evaluating goal-directed and deceptive behavior | Cited in subsequent research; the extent to which it has been formally integrated into evaluation pipelines at <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> or <EntityLink id="E218" name="openai">OpenAI</EntityLink> is not publicly documented |
+| **Adversarial Robustness** | Evaluation protocols and defense mechanisms | Part of the broader <EntityLink id="E1" name="adversarial-robustness">Adversarial Robustness</EntityLink> research agenda |
+| **<EntityLink id="E439" name="alignment">Alignment</EntityLink> Foundations** | Conceptual frameworks and problem taxonomies for AI safety | Including the "Unsolved Problems in ML Safety" paper (2022) |
 
 ### Major Publications & Tools
 
-- **<R id="5d708a72c3af8ad9">Representation Engineering: A Top-Down Approach to AI Transparency</R>** (2023) - Methods for understanding AI decision-making
-- **<R id="6d4e8851e33e1641">Do the Rewards Justify the Means? Measuring Trade-Offs Between Rewards and Ethical Behavior</R>** (2023) - MACHIAVELLI benchmark for ethical <EntityLink id="evaluation">AI evaluation</EntityLink>  
-- **<R id="f94e705023d45765">Unsolved Problems in ML Safety</R>** (2022) - Comprehensive taxonomy of safety challenges
-- **<R id="985b203c41c31efe">Measuring Mathematical Problem Solving With the MATH Dataset</R>** (2021) - Standard benchmark for AI reasoning capabilities
+- **<R id="5d708a72c3af8ad9">Representation Engineering: A Top-Down Approach to AI Transparency</R>** (2023) — Methods for understanding and influencing AI decision-making by working with internal representations rather than input-output behavior alone
+- **<R id="6d4e8851e33e1641">Do the Rewards Justify the Means? Measuring Trade-Offs Between Rewards and Ethical Behavior</R>** (2023) — Introduces the MACHIAVELLI benchmark for evaluating whether AI agents pursue goals through unethical means in text-based game environments
+- **<R id="f94e705023d45765">Unsolved Problems in ML Safety</R>** (2022) — A taxonomy of open technical challenges in machine learning safety, intended partly as a research agenda for the field
+- **<R id="985b203c41c31efe">Measuring Mathematical Problem Solving With the MATH Dataset</R>** (2021) — A benchmark for evaluating AI mathematical reasoning, authored by Dan Hendrycks and collaborators during his PhD at UC Berkeley; this paper predates CAIS's founding and is a product of Hendrycks's academic research rather than an organizational output of CAIS
 
-## Field-Building Impact
+Citation counts for these papers (figures such as "200+", "50+", "30+") previously appeared on this page without sourced methodology. Readers seeking current citation data should consult Google Scholar or Semantic Scholar directly.
+
+## Field-Building Programs
+
+CAIS runs several programs intended to grow the population of researchers working on AI safety. The term "field-building" refers to activities designed to increase the size, diversity, and coordination of a research community — in this case, researchers focused on technical and governance aspects of AI safety.
 
 ### Grant Programs
 
-| Program | Scale | Impact | Timeline |
+| Program | Reported Scale | Description | Timeline |
 |---------|--------|--------|----------|
-| **Compute Grants** | \$2M+ distributed | 100+ researchers supported | 2022-present |
-| **ML Safety Scholars** | 50+ participants annually | Early-career pipeline development | 2021-present |
-| **Research Fellowships** | \$500K+ annually | 20+ fellows placed at top institutions | 2022-present |
-| **AI Safety Camp** | 200+ participants total | International collaboration network | 2020-present |
+| **Compute Grants** | \$2M+ distributed; number of recipients reported variously as 100+ and 200+ in different CAIS materials — figure unverified | Provides compute resources to researchers working on safety-relevant projects | 2022–present |
+| **ML Safety Scholars** | Approximately 50 participants per cohort {/* NEEDS CITATION */} | Structured program for early-career researchers entering the AI safety field | 2021–present |
+| **Research Fellowships** | \$500K+ annually {/* NEEDS CITATION */} | Fellowships placing researchers at academic and research institutions | 2022–present |
+| **AI Safety Camp** | 200+ participants total {/* NEEDS CITATION */} | Collaborative program supporting international research teams | 2020–present |
+
+Note: Quantitative figures in this table are drawn from CAIS's own communications and have not been independently verified. The compute grant recipient count is internally inconsistent across CAIS materials (100+ in some sources, 200+ in others); the higher figure may aggregate across all field-building programs rather than compute grants alone.
 
 ### Institutional Partnerships
 
-- **Academic Collaborations**: UC Berkeley, MIT, Stanford, Oxford
-- **Industry Engagement**: Research partnerships with <EntityLink id="anthropic">Anthropic</EntityLink>, Google DeepMind
-- **Policy Connections**: Briefings for US Congress, UK Parliament, EU regulators
+- **Academic Collaborations**: Reported collaborations with UC Berkeley, MIT, Stanford, and Oxford {/* NEEDS CITATION — specific partnership agreements or joint publications should be cited */}
+- **Industry Engagement**: Research interactions with <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> and Google DeepMind {/* NEEDS CITATION */}
+- **Policy Connections**: Briefings reported with US Congress, UK Parliament, and EU regulatory bodies {/* NEEDS CITATION */}
 
 ## Statement on AI Risk (2023)
 
-The May 2023 <R id="470ac236ca26008c">Statement on AI Risk</R> represented a watershed moment in AI safety advocacy, consisting of a single sentence:
+In May 2023, CAIS published and circulated the <R id="470ac236ca26008c">Statement on AI Risk</R>, a single sentence co-signed by over 350 AI researchers and industry figures:
 
 > "Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war."
 
-### Signatory Analysis
+The statement was covered widely in major news outlets and was cited in subsequent policy discussions, including in the context of UK and US government AI strategies. The official signatory list is available at safe.ai; the figure of 350+ is drawn from that list, though the precise count at any given time may vary as signatories are added.
 
-| Category | Notable Signatories | Significance |
+### Signatory Groups
+
+| Category | Notable Signatories | Description |
 |----------|-------------------|--------------|
-| **Turing Award Winners** | <EntityLink id="geoffrey-hinton">Geoffrey Hinton</EntityLink>, <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="stuart-russell">Stuart Russell</EntityLink> | Academic legitimacy |
-| **Industry Leaders** | <EntityLink id="sam-altman">Sam Altman</EntityLink> (OpenAI), <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (Anthropic), <EntityLink id="demis-hassabis">Demis Hassabis</EntityLink> (DeepMind) | Industry acknowledgment |
-| **Policy Experts** | <EntityLink id="helen-toner">Helen Toner</EntityLink>, Allan Dafoe, Gillian Hadfield | Governance credibility |
-| **Technical Researchers** | 300+ ML/AI researchers | Scientific consensus |
+| **Turing Award Recipients** | <EntityLink id="E149" name="geoffrey-hinton">Geoffrey Hinton</EntityLink>, <EntityLink id="E380" name="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="E290" name="stuart-russell">Stuart Russell</EntityLink> | Recipients of computing's highest recognition who signed the statement |
+| **Industry Executives** | <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> (OpenAI), <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (Anthropic), <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink> (DeepMind) | CEOs of major AI laboratories |
+| **Policy and Governance Researchers** | <EntityLink id="E575" name="helen-toner">Helen Toner</EntityLink>, Allan Dafoe, Gillian Hadfield | Researchers working on AI governance and policy |
+| **ML/AI Researchers** | 300+ researchers across academia and industry | Researchers who signed as individuals, not representing institutional positions |
 
-The statement's impact included immediate media coverage across major outlets and influenced subsequent policy discussions, including mentions in <EntityLink id="uk-aisi">UK</EntityLink> and <EntityLink id="us-aisi">US</EntityLink> government AI strategies.
+The statement's reception was not uniformly positive within the AI research community. A number of prominent ML researchers declined to sign or publicly criticized the statement's framing. Critics raised several concerns: that the one-sentence format was too vague to convey meaningful technical content; that equating AI risk with nuclear war risk was unsupported by available evidence; that the extinction framing could distract attention and resources from observable near-term harms from AI systems (such as bias, surveillance, and labor displacement); and that the statement's signatories were not uniformly working on extinction-risk problems, making it a weak signal of scientific consensus. These critiques were raised by researchers including those associated with AI fairness and near-term safety research communities.{/* NEEDS CITATION — specific critics and their statements should be cited */}
+
+Proponents argued that the statement served a legitimate coordination function: making it socially acceptable for researchers to discuss catastrophic risk publicly, signaling to policymakers that risk concerns were not fringe views, and creating a reference point for subsequent regulatory discussions. Whether the statement's net effect on AI policy and research prioritization was positive is a matter of ongoing debate.
+
+The statement's impact on specific policy documents — including mentions in <EntityLink id="E364" name="uk-aisi">UK AI Safety Institute</EntityLink> and <EntityLink id="E365" name="us-aisi">US AI Safety Institute</EntityLink> contexts — has been cited by CAIS, though the causal relationship between the statement and any particular policy outcome is difficult to establish.
+
+## Critiques and Limitations
+
+### Criticism of Extinction-Risk Framing
+
+The most substantive criticism of CAIS's work concerns its central framing of AI extinction risk as a near-term policy priority. Critics from several directions have argued:
+
+- **Near-term displacement effect**: Emphasizing speculative long-run extinction risk may draw funding, talent, and policy attention away from near-term AI harms — discrimination in algorithmic decision-making, AI-enabled surveillance, labor market disruption, and misinformation — that are currently affecting people. Researchers associated with the AI ethics and fairness communities have made this argument most consistently.{/* NEEDS CITATION */}
+- **Epistemic status of extinction claims**: The probability of AI-caused human extinction within policy-relevant timeframes is highly uncertain, and critics have argued that treating it as a "global priority alongside pandemics and nuclear war" involves large unjustified inferential steps. Some ML researchers have noted that the mechanisms by which current or near-term AI systems could pose extinction-level risks are not specified with sufficient precision to evaluate.{/* NEEDS CITATION */}
+- **Ideological concentration**: CAIS's alignment with EA-associated funders and the broader longtermist intellectual tradition has led critics to argue that its research agenda reflects a particular philosophical worldview rather than a neutral assessment of AI risk. This critique is not unique to CAIS — it applies to several EA-funded AI safety organizations — but it is relevant to assessing how to interpret CAIS's outputs.{/* NEEDS CITATION */}
+
+### Limitations of Specific Research
+
+- **Representation Engineering scalability**: The representation engineering paper introduced methods that work on models of a given scale; whether these methods generalize to frontier-scale models is an open question, and independent researchers have noted limitations in the approach's applicability to very large models.{/* NEEDS CITATION */}
+- **Benchmark validity**: A general concern in AI safety evaluation is whether constructed benchmarks (including MACHIAVELLI) capture risks that manifest in real deployment contexts. The MACHIAVELLI benchmark uses text-based game environments, and the extent to which performance on these environments predicts behavior in consequential real-world settings is not established.
+- **Field-building outcome measurement**: CAIS reports counts of researchers supported and grant dollars distributed, but does not publicly report outcome data for its programs — for example, where ML Safety Scholars alumni work subsequently, what research they produce, or whether compute grant recipients remain in safety research. Without outcome data, the field-building impact claims are difficult to evaluate independently.
+
+### Critiques of the 2023 Statement
+
+Beyond the framing critiques noted above, several researchers argued that the statement's format — a single declarative sentence without methodology, evidence, or mechanism — made it unsuitable as a scientific communication and more akin to a public advocacy document. Others noted that some signatories are not primarily working on extinction-risk problems, which complicated interpretation of the statement as a signal of expert consensus on the technical merits of the extinction-risk hypothesis.{/* NEEDS CITATION */}
 
 ## Current Trajectory & Timeline
 
-### Research Roadmap (2024-2026)
+### Research Roadmap
 
-| Priority Area | 2024 Goals | 2025-2026 Projections |
+The following research priorities were described by CAIS as goals for 2024–2026. Given that this page was last edited in late 2025, some of these projections are now in the past. Actual outcomes against these goals have not been independently verified and are not currently documented on this page.
+
+| Priority Area | Stated Goals | Status |
 |---------------|------------|----------------------|
-| **Representation Engineering** | Scale to frontier models | Industry adoption for safety checks |
-| **Evaluation Frameworks** | Comprehensive benchmark suite | Standard evaluation protocols |
-| **Alignment Methods** | Proof-of-concept demonstrations | Practical implementation |
-| **Policy Research** | Technical governance recommendations | Regulatory framework development |
+| **<EntityLink id="E479" name="representation-engineering">Representation Engineering</EntityLink>** | Scale methods to frontier models; pursue industry adoption for safety evaluation | Outcome unverified |
+| **Evaluation Frameworks** | Develop comprehensive benchmark suite; establish standard evaluation protocols | Outcome unverified |
+| **<EntityLink id="E439" name="alignment">Alignment</EntityLink> Methods** | Proof-of-concept demonstrations; practical implementation work | Outcome unverified |
+| **Policy Research** | Technical governance recommendations; regulatory framework development | Outcome unverified |
 
-### Funding & Growth
+A previously cited projection of "2x expansion by 2025" appeared in earlier versions of this page without a cited source. Whether this projection materialized has not been verified.
 
-- **Current Budget**: ≈\$5M annually (estimated)
-- **Researcher Count**: 15+ full-time staff, 50+ affiliates
-- **Projected Growth**: 2x expansion by 2025 based on field growth
+### Organizational Scale
+
+- **Staff**: 15+ full-time staff reported; current headcount has not been independently verified {/* NEEDS CITATION */}
+- **Affiliates**: 50+ affiliate researchers reported {/* NEEDS CITATION */}
+- **Budget**: Approximately \$5M annually — this figure is an unverified estimate; IRS Form 990 filings are the authoritative source for nonprofit financials
 
 ## Key Uncertainties & Research Cruxes
 
 ### Technical Challenges
 
-- **Representation Engineering Scalability**: Whether current methods work on frontier models remains unclear
-- **Benchmark Validity**: Unknown if current evaluations capture real safety risks
-- **Alignment Verification**: No consensus on how to verify successful alignment
+These represent genuine open questions in CAIS's research agenda, not settled conclusions:
+
+- **Representation Engineering Scalability**: Whether methods developed on mid-scale models transfer reliably to frontier-scale systems remains unclear. The gap between controlled research settings and deployment conditions is a known limitation.
+- **Benchmark Validity**: Whether evaluations like MACHIAVELLI capture risks that manifest in real deployment — rather than behavior specific to text-game environments — is unresolved. This is a field-wide challenge, not unique to CAIS.
+- **Alignment Verification**: There is no established consensus on how to verify that an AI system is successfully aligned with intended goals rather than passing evaluations through surface-level pattern matching.
 
 ### Strategic Questions
 
-- **Research vs. Policy Balance**: Optimal allocation between technical work and governance efforts
-- **Open vs. Closed Research**: Tension between transparency and information hazards
-- **Timeline Assumptions**: Disagreement on <EntityLink id="agi-timeline">AGI timelines</EntityLink> affects research priorities
+- **Research vs. Policy Balance**: CAIS allocates resources across technical research, field-building, and policy communication. The optimal allocation is not obvious, and different observers weight these activities differently based on their models of how AI safety progress happens.
+- **Open vs. Closed Research**: Publishing safety research openly makes it available to the broader community but may also inform adversarial actors. CAIS has not publicly articulated a detailed position on this tradeoff.
+- **Timeline Assumptions**: Appropriate research priorities depend substantially on assumptions about <EntityLink id="E399" name="agi-timeline">AGI timelines</EntityLink> and the nature of AI risk. Researchers with shorter timelines and those focused on long-run speculative risk reach different conclusions about what work is most valuable now.
+- **Near-term vs. Long-term Risk Balance**: Whether resources spent on extinction-risk scenarios are appropriately calibrated relative to near-term AI harms is a live debate both within and outside the AI safety community, and CAIS's position at the long-run end of this spectrum is contested.
 
 ## Leadership & Key Personnel
 
 <Section title="Key People">
   <KeyPeople people={[
-    { name: "Dan Hendrycks", role: "Executive Director", background: "UC Berkeley PhD, former Google Brain" },
-    { name: "Mantas Mazeika", role: "Research Director", background: "University of Chicago, adversarial ML expert" },
-    { name: "Thomas Woodside", role: "Policy Director", background: "Former congressional staffer, tech policy" },
-    { name: "Andy Zou", role: "Research Scientist", background: "CMU, jailbreaking and red-teaming research" },
+    { name: "Dan Hendrycks", role: "Executive Director", background: "UC Berkeley PhD; previously at Google Brain" },
+    { name: "Mantas Mazeika", role: "Research Director", background: "University of Chicago; research focus on adversarial machine learning" },
+    { name: "Thomas Woodside", role: "Policy Director", background: "Former congressional staffer with technology policy background" },
+    { name: "Andy Zou", role: "Research Scientist", background: "CMU affiliation; research on jailbreaking and red-teaming" },
   ]} />
 </Section>
+
+Note: Staff roles and affiliations reflect information available at time of last edit and may not reflect current positions. Andy Zou holds joint affiliation with CMU and CAIS; his primary institutional role should be verified against current sources.
+
+## Positioning Within the AI Safety Ecosystem
+
+CAIS occupies a specific position within the broader AI safety research landscape that distinguishes it from peer organizations:
+
+- **vs. <EntityLink id="E202" name="miri">MIRI</EntityLink>**: MIRI focuses almost exclusively on foundational theoretical alignment research and does not run field-building or public communication programs. CAIS's research is more empirical and its scope is broader institutionally.
+- **vs. <EntityLink id="E57" name="chai">CHAI</EntityLink>**: CHAI (Center for Human-Compatible AI, UC Berkeley) is an academic center with a narrower research agenda centered on value alignment. CAIS has a more explicit field-building and policy communication mandate.
+- **vs. <EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink>**: Redwood focuses on specific empirical safety problems with a small team; CAIS has a larger scope including grant programs and public communication.
+- **vs. <EntityLink id="E201" name="metr">METR</EntityLink> and <EntityLink id="E26" name="arc-evals">ARC Evaluations</EntityLink>**: These organizations focus specifically on model evaluations and dangerous capability assessments. CAIS's evaluation work (MACHIAVELLI) is one component of a broader agenda.
+- **vs. <EntityLink id="E153" name="govai">GovAI</EntityLink>**: GovAI focuses on AI governance and policy research. CAIS does policy communication but its primary identity is as a technical research organization.
+
+The common thread across CAIS-adjacent organizations is EA-aligned funding, primarily from <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, which has led to criticisms that the AI safety field as constituted reflects the priorities of a relatively narrow philanthropic and ideological community rather than a broad scientific consensus.
 
 ## Sources & Resources
 
@@ -146,18 +208,20 @@ The statement's impact included immediate media coverage across major outlets an
 | **Website** | <R id="a306e0b63bdedbd5">safe.ai</R> | Main organization hub |
 | **Research** | <R id="51721cfcac0c036a">CAIS Publications</R> | Technical papers and reports |
 | **Blog** | <R id="a27b8d271c27aa02">CAIS Blog</R> | Research updates and commentary |
-| **Courses** | <R id="65c9fe2d57a4eb4c">ML Safety Course</R> | Educational materials |
+| **Courses** | <R id="65c9fe2d57a4eb4c">ML Safety Course</R> | Educational materials on machine learning safety |
 
 ### Key Research Papers
 
-| Paper | Year | Citations | Impact |
-|-------|------|-----------|--------|
-| <R id="f94e705023d45765">Unsolved Problems in ML Safety</R> | 2022 | 200+ | Research agenda setting |
-| <R id="6d4e8851e33e1641">MACHIAVELLI Benchmark</R> | 2023 | 50+ | Industry evaluation adoption |
-| <R id="5d708a72c3af8ad9">Representation Engineering</R> | 2023 | 30+ | New research direction |
+| Paper | Year | Description |
+|-------|------|-----------|
+| <R id="f94e705023d45765">Unsolved Problems in ML Safety</R> | 2022 | Research agenda taxonomy; citation counts should be verified via Google Scholar or Semantic Scholar |
+| <R id="6d4e8851e33e1641">MACHIAVELLI Benchmark</R> | 2023 | Evaluation framework for goal-directed AI behavior in game environments |
+| <R id="5d708a72c3af8ad9">Representation Engineering</R> | 2023 | Methods for reading and steering AI model internal representations |
 
 ### Related Organizations
 
-- **Research Alignment**: <EntityLink id="miri">MIRI</EntityLink>, <EntityLink id="chai">CHAI</EntityLink>, <EntityLink id="redwood-research">Redwood Research</EntityLink>
-- **Policy Focus**: <EntityLink id="govai">GovAI</EntityLink>, <R id="cf5fd74e8db11565">RAND Corporation</R>
-- **Industry Labs**: <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">DeepMind</EntityLink>
+- **Technical Safety Research**: <EntityLink id="E202" name="miri">MIRI</EntityLink>, <EntityLink id="E57" name="chai">CHAI</EntityLink>, <EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink>
+- **Evaluations**: <EntityLink id="E26" name="arc-evals">ARC Evaluations</EntityLink>, <EntityLink id="E201" name="metr">METR</EntityLink>
+- **Policy Focus**: <EntityLink id="E153" name="govai">GovAI</EntityLink>, <R id="cf5fd74e8db11565">RAND Corporation</R>
+- **Industry Labs**: <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>
+- **Funders**: <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>

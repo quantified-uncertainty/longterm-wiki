@@ -10,7 +10,7 @@
  *   crux edit-log stats               Show edit log statistics
  */
 
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
 import { getEditLogsForPage, getEditLogStats } from '../lib/wiki-server/edit-logs.ts';
 
@@ -74,7 +74,7 @@ export async function list(args: string[], options: Record<string, unknown>): Pr
 
   const filterTool = options.tool as string | undefined;
   const filterAgency = options.agency as string | undefined;
-  const limit = parseInt((options.limit as string) || '50', 10);
+  const limit = parseIntOpt(options.limit, 50);
 
   // Use the stats endpoint to get a page-level overview, then list individual pages
   const serverStats = await getEditLogStats();

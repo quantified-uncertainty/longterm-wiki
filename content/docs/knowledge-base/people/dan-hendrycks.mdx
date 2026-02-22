@@ -9,7 +9,7 @@ quality: 19
 readerImportance: 87
 researchImportance: 39.5
 tacticalValue: 78
-lastEdited: "2026-02-17"
+lastEdited: "2026-02-22"
 llmSummary: Biographical overview of Dan Hendrycks, CAIS director who coordinated the May 2023 AI risk statement signed by major AI researchers. Covers his technical work on benchmarks (MMLU, ETHICS), robustness research, and institution-building efforts, emphasizing his focus on catastrophic AI risk as a global priority.
 ratings:
   novelty: 1.5
@@ -24,47 +24,72 @@ import {DataInfoBox, DataExternalLinks, EntityLink} from '@components/wiki';
 
 <DataInfoBox entityId="E89" />
 
+## Quick Assessment
+
+| Aspect | Assessment |
+|--------|-----------|
+| **Primary Role** | Executive Director, <EntityLink id="E47" name="cais">CAIS</EntityLink> (Center for AI Safety); AI safety researcher |
+| **Key Contributions** | Developed MMLU and ETHICS benchmarks for evaluating language models; co-authored foundational papers on robustness, out-of-distribution detection, and ML safety; coordinated the May 2023 statement on AI extinction risk |
+| **Key Publications** | *Measuring Massive Multitask Language Understanding* (ICLR 2021); *Aligning AI With Shared Human Values* (ICLR 2021); *Natural Adversarial Examples* (CVPR 2021); *Unsolved Problems in ML Safety* (arXiv 2021); *Introduction to AI Safety, Ethics, and Society* (CRC Press, 2024) |
+| **Institutional Affiliation** | Center for AI Safety (CAIS), San Francisco |
+| **Education** | B.S. with Honors, Computer Science, University of Chicago (2018); Ph.D., Computer Science, UC Berkeley (2022) |
+| **Influence on AI Safety** | CAIS produces safety research, educational resources, and policy advocacy; Hendrycks co-authored NIST AI Risk Management Framework input (2022) and co-authored *Superintelligence Strategy* (2025) with Eric Schmidt and Alexandr Wang |
+
+## Overview
+
+Dan Hendrycks (born 1994 or 1995) is a computer scientist and AI safety researcher who serves as executive director of the <EntityLink id="E47" name="cais">Center for AI Safety</EntityLink> (CAIS), a San Francisco-based nonprofit he co-founded in 2022 with Oliver Zhang.[^1] During his doctoral research at UC Berkeley — advised by Jacob Steinhardt and Dawn Song[^2] — he developed several benchmarks that became widely used reference points for evaluating large language models, including MMLU and the ETHICS dataset, both published at ICLR 2021.[^3][^4] His dissertation, titled *Machine Learning Safety*, was completed in 2022.[^5]
+
+Through CAIS, Hendrycks has combined continued technical research with field-building and policy engagement. In May 2023 he coordinated a public statement asserting that AI extinction risk should be treated as a global priority, which drew over 350 initial signatories — a count that grew to more than 500 as the page remained open — including Turing Award winners and executives from major AI laboratories.[^6][^7] In 2024 he published an open-access textbook, *Introduction to AI Safety, Ethics, and Society*, through CRC Press (Taylor & Francis).[^8] In March 2025 he co-authored *Superintelligence Strategy* with former Google CEO Eric Schmidt and Scale AI CEO Alexandr Wang.[^9]
+
 ## Background
 
-Dan Hendrycks is the director of the <EntityLink id="cais">Center for AI Safety</EntityLink> (CAIS) and a researcher in machine learning safety and robustness. He completed his PhD in Computer Science at UC Berkeley, where he subsequently held a postdoctoral position before founding CAIS.
+Hendrycks grew up in Missouri, where he graduated as valedictorian from Marshfield High School in 2014.[^10] He received a B.S. with Honors in Computer Science from the University of Chicago in 2018.[^10] He then enrolled in the Computer Science doctoral program at UC Berkeley, completing his PhD in 2022 under advisors Jacob Steinhardt and Dawn Song.[^2][^5] His doctoral work was supported by an NSF Graduate Research Fellowship and an Open Philanthropy AI Fellowship.[^2]
+
+His PhD dissertation, *Machine Learning Safety* (UC Berkeley EECS Technical Report UCB/EECS-2022-253), covers work toward making systems perform reliably, act in accordance with human values, and addresses open problems in ML safety.[^5] Following his doctorate, Hendrycks co-founded CAIS in 2022, transitioning from academic research to running an independent nonprofit organization.[^1]
 
 His research has focused on several areas within machine learning:
 - Robustness of neural networks to distribution shift
 - Out-of-distribution detection and uncertainty quantification
 - Development of benchmarks for evaluating language models
-- <EntityLink id="adversarial-robustness">Adversarial robustness</EntityLink> and natural adversarial examples
-
-Through CAIS, Hendrycks has worked to connect technical research with policy discussions around AI risk, particularly focusing on scenarios involving catastrophic outcomes.
+- <EntityLink id="E1" name="adversarial-robustness">Adversarial robustness</EntityLink> and natural adversarial examples
 
 ## Center for AI Safety
 
-Hendrycks founded the <EntityLink id="cais">Center for AI Safety</EntityLink> as a nonprofit research organization. CAIS describes its mission as reducing societal-scale risks from artificial intelligence through research, field-building, and advocacy work.
+Hendrycks co-founded the <EntityLink id="E47" name="cais">Center for AI Safety</EntityLink> in 2022 as a 501(c)(3) nonprofit organization based in San Francisco, alongside co-founder Oliver Zhang.[^1] According to CAIS's mission statement, the organization aims to reduce societal-scale risks from artificial intelligence through research, field-building, and advocacy work.[^11]
+
+The organization has received general support grants from <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink> in 2022 and 2023, as well as a grant of \$1,433,000 from Open Philanthropy to support its Philosophy Fellowship program.[^12][^13][^14] As of early 2025, the Survival and Flourishing Fund (SFF) has provided additional funding — \$1.1 million to CAIS and \$1.6 million to the affiliated CAIS Action Fund — while Open Philanthropy grants to CAIS were not continuing at that time.[^15] A sister organization, the CAIS Action Fund (a 501(c)(4)), was formally launched in Washington D.C. in July 2024 and reported spending \$270,000 on federal lobbying in 2024.[^16]
+
+By 2023, CAIS had grown to more than a dozen employees, according to a TIME profile.[^7]
 
 The organization's activities include:
-- Conducting technical <EntityLink id="safety-research">safety research</EntityLink> on topics such as robustness and evaluation methods
-- Educational programs, including the ML Safety course curriculum
-- Policy-oriented work on <EntityLink id="compute-governance">compute governance</EntityLink> and hardware-level interventions
+- Conducting technical <EntityLink id="E265" name="safety-research">safety research</EntityLink> on topics such as robustness and evaluation methods
+- Educational programs, including the ML Safety course curriculum (announced on LessWrong in 2021)[^17]
+- Policy-oriented work on <EntityLink id="E64" name="compute-governance">compute governance</EntityLink> and hardware-level interventions
 - Coordination efforts within the AI safety research community
+- A compute cluster supporting approximately 20 research labs, which had onboarded approximately 200 users working on 63 AI safety projects as of November 2023[^18]
+- A Philosophy Fellowship that hosted a dozen academic philosophers for a seven-month residency, producing 21 research papers as of 2023[^18]
 
 CAIS has served as an institutional platform for Hendrycks' work connecting technical researchers with policymakers and coordinating public statements on AI risk.
 
 ## Statement on AI Risk (May 2023)
 
-In May 2023, Hendrycks coordinated a public statement that read: "Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war." The statement was signed by researchers and executives from multiple AI organizations.
+In May 2023, Hendrycks coordinated a public statement that read: "Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war."[^6] CAIS built an email verification system to ensure signatories verified their institutional affiliations before being listed.[^6]
 
-Signatories included <EntityLink id="geoffrey-hinton">Geoffrey Hinton</EntityLink>, <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="sam-altman">Sam Altman</EntityLink> (<EntityLink id="openai">OpenAI</EntityLink>), <EntityLink id="demis-hassabis">Demis Hassabis</EntityLink> (<EntityLink id="deepmind">Google DeepMind</EntityLink>), and <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (<EntityLink id="anthropic">Anthropic</EntityLink>), along with hundreds of other AI researchers.
+At the time of initial publication, more than 350 researchers and executives had signed the statement.[^6] The total count of signatories subsequently grew to more than 500 as the statement page remained open.[^7] Signatories included <EntityLink id="E149" name="geoffrey-hinton">Geoffrey Hinton</EntityLink>, <EntityLink id="E380" name="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> (<EntityLink id="E218" name="openai">OpenAI</EntityLink>), <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink> (<EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>), and <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (<EntityLink id="E22" name="anthropic">Anthropic</EntityLink>), along with executives from Microsoft and many other researchers.[^6][^7]
 
-The statement received coverage in major media outlets and was cited in subsequent policy discussions. Its brevity and high-profile signatories generated public attention to the topic of AI existential risk, though some commentators noted the statement's lack of specificity regarding which risks or interventions were being prioritized.
+The statement received coverage in major media outlets and was cited in subsequent policy discussions. Some commentators noted that the statement's brevity meant it did not specify which risks or interventions were being prioritized, and that signatories held a range of differing views about what actions would follow from the shared concern.[^6]
 
 ## Technical Research Contributions
 
 ### Benchmarks and Evaluation
 
-Hendrycks has developed several benchmarks used in evaluating language models and AI systems:
+Hendrycks has developed several benchmarks used in evaluating language models and AI systems.
 
-**MMLU (Measuring Massive Multitask Language Understanding)**: A benchmark designed to test knowledge across multiple academic and professional domains. The benchmark is used by researchers to evaluate the breadth of capabilities in large language models.
+**MMLU (Measuring Massive Multitask Language Understanding)**: Published at ICLR 2021, co-authored with Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Steinhardt.[^3] The benchmark covers 57 tasks including elementary mathematics, U.S. history, computer science, and law, designed to test knowledge breadth in large language models. At the time of publication, the largest GPT-3 model improved over random chance by almost 20 percentage points on average, but had near-random accuracy on some subjects such as morality and law.[^3]
 
-**ETHICS Dataset**: A benchmark for evaluating whether language models can perform tasks related to moral reasoning across different ethical frameworks.
+MMLU has since encountered criticism regarding benchmark saturation and data quality. GPT-4 achieved 86.4% accuracy on MMLU by March 2023, after which differentiation between leading models became difficult.[^19] Score variance of up to 10–13 percentage points depending on prompt methodology has been documented.[^19] A 2024 reanalysis (MMLU-Redux, published at NAACL 2025) manually re-annotated 5,700 questions across all 57 subjects and found approximately 6.49% of questions contain errors, with notably higher error rates in some subsets.[^20] As of 2025, MMLU has been partially replaced in evaluations by more challenging alternatives.[^19]
+
+**ETHICS Dataset**: Published at ICLR 2021 under the title *Aligning AI With Shared Human Values*, co-authored with Collin Burns, Steven Basart, Andrew Critch, Jerry Li, Dawn Song, and Jacob Steinhardt (arXiv: 2008.02275).[^4] The benchmark spans five subsets covering justice, well-being, duties, virtues, and commonsense morality, designed to evaluate whether language models can perform tasks related to moral reasoning across different ethical frameworks.
 
 These benchmarks have been adopted by research groups evaluating new language models, providing standardized metrics for comparing systems.
 
@@ -77,19 +102,39 @@ Hendrycks' work on robustness has examined how neural networks perform when test
 - Development of datasets containing "natural adversarial examples" that cause model failures without artificial perturbations
 - Analysis of calibration in neural network predictions
 
-This work connects to broader questions in <EntityLink id="technical-research">technical AI safety research</EntityLink> about how to ensure systems behave reliably in novel situations.
+**Natural Adversarial Examples** (CVPR 2021): Co-authored with Kevin Zhao, Steven Basart, Jacob Steinhardt, and Dawn Song.[^21] The paper introduced two challenging datasets, including IMAGENET-O, described as the first out-of-distribution detection dataset for ImageNet-scale models. The paper appeared in the Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, June 2021, pages 15262–15271 (arXiv: 1907.07174).[^21]
 
-## Risk Assessment and Strategic Focus
+This work connects to broader questions in <EntityLink id="E297" name="technical-research">technical AI safety research</EntityLink> about how to ensure systems behave reliably in novel situations.
 
-Hendrycks has publicly positioned AI risk as comparable in priority to other large-scale threats. The May 2023 statement he coordinated explicitly equated mitigating AI extinction risk with addressing pandemics and nuclear war.
+### Unsolved Problems in ML Safety
 
-His activities through CAIS reflect a strategic approach combining multiple intervention points:
+Co-authored with Nicholas Carlini (Google Brain), John Schulman (OpenAI), and Jacob Steinhardt (arXiv: 2109.13916, September 2021).[^22] The paper presents four key research problem areas: Robustness, Monitoring, Alignment, and Systemic Safety, and provides a structured overview of open research directions in ML safety.
+
+### Textbook: Introduction to AI Safety, Ethics, and Society
+
+In 2024, Hendrycks published *Introduction to AI Safety, Ethics, and Society* through CRC Press (Taylor & Francis imprint), DOI: 10.1201/9781003530336.[^8] The book is available as an open-access monograph on [aisafetybook.com](https://www.aisafetybook.com) and in print, with an arXiv preprint posted November 2024 (arXiv: 2411.01042).[^8] It is targeted at upper-level undergraduate and postgraduate students and covers technical safety concepts, ethics, and a governance chapter spanning AI policy variables including the distribution of benefits, access to AI, and roles of companies, governments, and international bodies.[^8]
+
+## Policy Engagement and Advocacy
+
+In February 2022, Hendrycks co-authored *Actionable Guidance for High-Consequence AI Risk Management: Towards Standards Addressing AI Catastrophic Risks* (arXiv: 2206.08966) with Anthony M. Barrett, Jessica Newman, and Brandie Nonnecke, submitted to NIST as input to inform the AI Risk Management Framework (AI RMF).[^23]
+
+The CAIS Action Fund, a related 501(c)(4) organization, co-sponsored California SB 1047, organized a joint letter signed by more than 80 technology organizations asking Congress to fund NIST AI work, and advocated for \$10 million in funding for the U.S. AI Safety Institute.[^16] The Action Fund was formally launched at a Capitol Hill event in July 2024 featuring Senator Brian Schatz (D-HI) and Representative French Hill (R-AR), attended by multiple members of Congress.[^16]
+
+Hendrycks has also given public presentations and media interviews explaining AI risk concerns to non-technical audiences. CAIS has engaged with bodies involved in developing the <EntityLink id="E127" name="eu-ai-act">EU AI Act</EntityLink> and provided technical input to legislative discussions in the United States.
+
+## Risk Assessment and Stated Views
+
+Hendrycks has publicly positioned certain AI risks as warranting priority attention. The May 2023 statement he coordinated explicitly compared mitigating AI extinction risk to addressing pandemics and nuclear war in terms of global priority.[^6]
+
+In a 2025 interview with Lawfare Media, Hendrycks stated that AGI is "not something that's very far off, but potentially on the horizon," adding that "even in the next few years, you could get AGI, so to speak," and emphasized "the trajectory that we're on rather than the current capabilities."[^24] Separately, on X in 2025, he proposed a testable definition of AGI based on Cattell-Horn-Carroll (CHC) theory of human intelligence — "an AI that can match or exceed the cognitive versatility and proficiency of a well-educated adult" — and assessed that GPT-4 (2023) was approximately 27% of the way to that threshold and GPT-5 (2025) approximately 58%.[^25]
+
+In March 2025, he co-authored *Superintelligence Strategy* (arXiv: 2503.05628) with former Google CEO Eric Schmidt and Scale AI CEO Alexandr Wang.[^9] The paper introduces a proposed deterrence concept called Mutual Assured AI Malfunction (MAIM), argues against a Manhattan Project-style acceleration toward AGI, and proposes a measured defensive strategy. It defines superintelligence as AI that "would decisively surpass the world's best individual experts in nearly every intellectual domain" and identifies hacking, virology, and autonomous AI R&D as the safety-relevant cognitive domains of greatest concern.[^9]
+
+His activities through CAIS reflect a combination of intervention approaches:
 - Technical research aimed at improving system safety and evaluation
 - Policy engagement with government bodies and international organizations
-- Public communication to broaden awareness of AI risk concerns
-- <EntityLink id="compute-governance">Compute governance</EntityLink> work exploring hardware-level interventions
-
-Hendrycks has argued for attention to catastrophic and existential risk scenarios specifically, distinguishing these from other categories of AI-related harms. This prioritization shapes CAIS's research agenda and advocacy focus.
+- Public communication intended to broaden awareness of AI risk concerns, according to CAIS's stated goals[^11]
+- <EntityLink id="E64" name="compute-governance">Compute governance</EntityLink> work exploring hardware-level interventions
 
 ## CAIS Programs and Activities
 
@@ -99,40 +144,65 @@ CAIS conducts and supports research in several areas:
 
 **Technical Safety**: Work on robustness, alignment techniques, and evaluation methodologies for AI systems. Research includes both empirical studies of current systems and development of new safety methods.
 
-**<EntityLink id="compute-governance">Compute Governance</EntityLink>**: Investigation of interventions based on the hardware supply chain for AI systems, including tracking of compute resources and potential <EntityLink id="international-coordination">international coordination</EntityLink> mechanisms.
+**<EntityLink id="E64" name="compute-governance">Compute Governance</EntityLink>**: Investigation of interventions based on the hardware supply chain for AI systems, including tracking of compute resources and potential <EntityLink id="E330" name="tmc-international-coordination">international coordination</EntityLink> mechanisms.
 
-**ML Safety Education**: Development of curriculum materials for teaching machine learning safety concepts, aimed at integrating safety considerations into academic computer science programs.
+**ML Safety Education**: CAIS developed curriculum materials for teaching machine learning safety concepts, announced publicly in 2021.[^17] The course is described on [course.mlsafety.org](https://course.mlsafety.org/) as "an advanced course covering empirical directions to reduce AI x-risk," with a full syllabus, lectures, readings, and assignments available publicly.[^26] Hendrycks worked on the course for approximately eight months before its launch and intended it to serve as a default resource for ML researchers interested in AI safety as well as undergraduates beginning safety research.[^17] Specific enrollment numbers have not been published publicly.
 
 ### Advocacy and Field-Building
 
-CAIS has organized workshops, maintained networks of researchers working on safety-related topics, and engaged with policymakers. The organization has provided testimony and technical input to legislative bodies considering AI regulation, including the U.S. Congress and bodies involved in developing the <EntityLink id="eu-ai-act">EU AI Act</EntityLink>.
-
-Hendrycks has given public presentations and media interviews explaining AI risk concerns to non-technical audiences, contributing to broader public discourse on AI policy.
-
-## Selected Publications
-
-Hendrycks' research has been published in machine learning conferences and journals. Notable papers include:
-
-- Work on out-of-distribution detection methods
-- The MMLU benchmark paper on measuring multitask language understanding
-- Research on natural adversarial examples showing real-world failure modes
-- Papers on calibration and uncertainty in neural networks
-- The ETHICS dataset for evaluating moral reasoning in language models
-
-His publication record spans technical machine learning research and safety-focused evaluation work, with papers appearing in venues such as NeurIPS, ICML, and ICLR.
+CAIS has organized workshops, maintained networks of researchers working on safety-related topics, and engaged with policymakers. As noted above, the organization has co-authored NIST framework input, co-sponsored California SB 1047 through the CAIS Action Fund, and organized the 2024 Capitol Hill launch event with members of Congress.[^16][^23]
 
 ## Evolution of Research Focus
 
-Hendrycks' early research concentrated on standard machine learning problems in robustness and uncertainty quantification. Over time, his work has increasingly emphasized connections between technical research and potential catastrophic risks from AI systems.
+Hendrycks' early research (approximately 2018–2020) concentrated on standard machine learning problems in robustness and uncertainty quantification. Beginning around 2020–2021, his published work increasingly addressed connections between technical robustness research and AI safety concerns, reflected in the MMLU and ETHICS benchmarks, the *Natural Adversarial Examples* paper, and the *Unsolved Problems in ML Safety* paper.[^3][^4][^21][^22]
 
-The founding of CAIS marked a shift toward more explicit focus on risk reduction as an organizing principle for research priorities. His current work combines continued technical research with institutional efforts to coordinate the AI safety research community and influence policy discussions.
+The co-founding of CAIS in 2022, concurrent with the completion of his PhD, marked an organizational shift toward treating risk reduction as an explicit organizing principle for research priorities.[^1][^5] His subsequent work — including the 2023 extinction risk statement, the 2024 textbook, and the 2025 *Superintelligence Strategy* paper — has combined continued technical research with institutional field-building and policy engagement.[^6][^8][^9]
 
 ## Perspectives and Debates
 
-Hendrycks' approach to AI safety emphasizes catastrophic and existential risk scenarios as a top priority. This focus has been part of broader debates within the AI research community about how to allocate attention and resources across different categories of AI-related concerns.
+Hendrycks' approach to AI safety places catastrophic and existential risk scenarios among its top concerns. This framing is part of ongoing debates within the AI research community about how to allocate attention and resources across different categories of AI-related concerns.
 
-Some researchers and commentators have argued that emphasis on long-term or extinction-level risks may divert attention from more immediate harms related to bias, fairness, and misuse of current AI systems. Others have questioned whether the framing of extinction risk is well-supported by available evidence or have noted tensions between different perspectives on AI safety that were unified under the brief May 2023 statement.
+Critics, including researchers focused on near-term AI harms, have argued that emphasis on long-term or extinction-level risks may draw resources and attention away from documented harms related to bias, fairness, and misuse of existing AI systems. Others have questioned whether the extinction risk framing is supported by available evidence, and have noted that the brief May 2023 statement was signed by researchers with substantially differing views on what the appropriate response to AI risk should be.[^6]
 
-Hendrycks has maintained that catastrophic risks warrant prioritization while not dismissing other AI safety concerns. The design of CAIS programs reflects this prioritization, with research and advocacy efforts concentrated on scenarios involving large-scale harm.
+The MMLU benchmark, one of Hendrycks' most cited technical contributions, has attracted specific methodological criticism: saturation (leading models reaching the 86–89% accuracy range with limited differentiation), prompt sensitivity (score variance of up to 10–13 percentage points depending on methodology), and a documented error rate of approximately 6.49% in ground-truth answers identified by MMLU-Redux (2024).[^19][^20]
 
-The field of AI safety research contains diverse perspectives on which problems are most important, what methods are most promising, and how technical research should relate to policy and governance questions. Hendrycks' work represents one approach within this broader landscape, characterized by focus on measurable technical progress, public communication, and building consensus around specific risk framings.
+Hendrycks has maintained that catastrophic risks warrant prioritization while not dismissing other AI safety concerns. The design of CAIS programs reflects this prioritization, with research and advocacy efforts concentrated on scenarios involving large-scale harm. The field of AI safety research contains diverse perspectives on which problems are most important, what methods are most promising, and how technical research should relate to policy and governance questions; Hendrycks' work represents one approach within this broader landscape.
+
+## Selected Publications
+
+| Title | Authors | Venue | Year | Identifier |
+|-------|---------|-------|------|------------|
+| [Measuring Massive Multitask Language Understanding](https://arxiv.org/abs/2009.03300) | Hendrycks, Burns, Basart, Zou, Mazeika, Song, Steinhardt | ICLR 2021 | 2021 | arXiv:2009.03300 |
+| [Aligning AI With Shared Human Values](https://arxiv.org/abs/2008.02275) | Hendrycks, Burns, Basart, Critch, Li, Song, Steinhardt | ICLR 2021 | 2021 | arXiv:2008.02275 |
+| [Natural Adversarial Examples](https://openaccess.thecvf.com/content/CVPR2021/html/Hendrycks_Natural_Adversarial_Examples_CVPR_2021_paper.html) | Hendrycks, Zhao, Basart, Steinhardt, Song | CVPR 2021 | 2021 | arXiv:1907.07174 |
+| [Unsolved Problems in ML Safety](https://arxiv.org/abs/2109.13916) | Hendrycks, Carlini, Schulman, Steinhardt | arXiv | 2021 | arXiv:2109.13916 |
+| [Actionable Guidance for High-Consequence AI Risk Management](https://arxiv.org/abs/2206.08966) | Barrett, Hendrycks, Newman, Nonnecke | NIST AI RMF submission | 2022 | arXiv:2206.08966 |
+| [Introduction to AI Safety, Ethics, and Society](https://www.taylorfrancis.com/books/oa-mono/10.1201/9781003530336/introduction-ai-safety-ethics-society-dan-hendrycks) | Hendrycks | CRC Press (Taylor & Francis) | 2024 | DOI:10.1201/9781003530336 |
+| [Superintelligence Strategy](https://arxiv.org/abs/2503.05628) | Hendrycks, Schmidt, Wang | arXiv | 2025 | arXiv:2503.05628 |
+
+[^1]: Center for AI Safety – Wikipedia. https://en.wikipedia.org/wiki/Center_for_AI_Safety
+[^2]: Dan Hendrycks – Schmidt Sciences Grantee Profile. https://www.schmidtsciences.org/grantee/dan-hendrycks/
+[^3]: Hendrycks, D., Burns, C., Basart, S., Zou, A., Mazeika, M., Song, D., & Steinhardt, J. (2021). Measuring Massive Multitask Language Understanding. ICLR 2021. arXiv:2009.03300. https://arxiv.org/abs/2009.03300
+[^4]: Hendrycks, D., Burns, C., Basart, S., Critch, A., Li, J., Song, D., & Steinhardt, J. (2021). Aligning AI With Shared Human Values. ICLR 2021. arXiv:2008.02275. https://arxiv.org/abs/2008.02275
+[^5]: Machine Learning Safety — UC Berkeley EECS Dissertation. UCB/EECS-2022-253. https://www2.eecs.berkeley.edu/Pubs/TechRpts/2022/EECS-2022-253.html
+[^6]: CBC News. "Artificial intelligence poses 'risk of extinction,' tech execs and experts warn." May 30–31, 2023. https://www.cbc.ca/news/world/artificial-intelligence-extinction-risk-1.6859118; CAIS AI Risk Statement press release: https://safe.ai/work/press-release-ai-risk
+[^7]: TIME. "Dan Hendrycks: The 100 Most Influential People in AI 2023." 2023. https://time.com/collection/time100-ai/6309050/dan-hendrycks/
+[^8]: Hendrycks, D. (2024). Introduction to AI Safety, Ethics, and Society. CRC Press (Taylor & Francis). DOI:10.1201/9781003530336. https://www.aisafetybook.com; arXiv:2411.01042.
+[^9]: Hendrycks, D., Schmidt, E., & Wang, A. (2025). Superintelligence Strategy: Expert Version. arXiv:2503.05628. https://arxiv.org/abs/2503.05628
+[^10]: Dan Hendrycks – Personal Academic Page / CV, UC Berkeley. https://people.eecs.berkeley.edu/~hendrycks/; CV: https://people.eecs.berkeley.edu/~hendrycks/CV.pdf
+[^11]: Center for AI Safety – About. https://safe.ai/about
+[^12]: Open Philanthropy. Center for AI Safety – General Support (2022). https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support/
+[^13]: Open Philanthropy. Center for AI Safety – General Support (2023). https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support-2023/
+[^14]: Open Philanthropy. Center for AI Safety – Philosophy Fellowship and NeurIPS Prizes. https://www.openphilanthropy.org/grants/center-for-ai-safety-philosophy-fellowship/
+[^15]: 80,000 Hours. "It looks like there are some good funding opportunities in AI safety right now." January 2025. https://80000hours.org/2025/01/it-looks-like-there-are-some-good-funding-opportunities-in-ai-safety-right-now/
+[^16]: Center for AI Safety Action Fund – 2024 Year in Review. CAIS Newsletter. https://newsletter.safe.ai/p/aisn-45-center-for-ai-safety-2024; Washington AI Network, July 29, 2024. https://washingtonainetwork.com/2024/07/29/center-for-ai-safety-hosts-dc-launch-event-featuring-cais-dan-hendrycks-jaan-tallinn-sen-brian-schatz-rep-french-hill-and-cnns-pamela-brown/
+[^17]: Hendrycks, D. / CAIS. "Announcing the Introduction to ML Safety Course." LessWrong, 2021. https://www.lesswrong.com/posts/4F8Bg8Z5cePTBofzo/announcing-the-introduction-to-ml-safety-course
+[^18]: Center for AI Safety 2023 Year in Review. CAIS Newsletter, December 21, 2023. https://newsletter.safe.ai/p/aisn-28-center-for-ai-safety-2023
+[^19]: MMLU – Wikipedia. https://en.wikipedia.org/wiki/MMLU; MMLU-Pro: A More Robust and Challenging Multi-Task Language Understanding Benchmark. arXiv:2406.01574. https://arxiv.org/html/2406.01574v1
+[^20]: Gema et al. "Are We Done with MMLU?" NAACL 2025. arXiv:2406.04127. https://arxiv.org/abs/2406.04127
+[^21]: Hendrycks, D., Zhao, K., Basart, S., Steinhardt, J., & Song, D. (2021). Natural Adversarial Examples. CVPR 2021, pp. 15262–15271. arXiv:1907.07174. https://openaccess.thecvf.com/content/CVPR2021/html/Hendrycks_Natural_Adversarial_Examples_CVPR_2021_paper.html
+[^22]: Hendrycks, D., Carlini, N., Schulman, J., & Steinhardt, J. (2021). Unsolved Problems in ML Safety. arXiv:2109.13916. https://arxiv.org/abs/2109.13916
+[^23]: Barrett, A.M., Hendrycks, D., Newman, J., & Nonnecke, B. (2022). Actionable Guidance for High-Consequence AI Risk Management: Towards Standards Addressing AI Catastrophic Risks. Submitted to NIST AI RMF. arXiv:2206.08966. https://arxiv.org/abs/2206.08966
+[^24]: Lawfare Media. "Lawfare Daily: Dan Hendrycks on National Security in the Age of Superintelligent AI." 2025. https://www.lawfaremedia.org/article/lawfare-daily--dan-hendrycks-on-national-security-in-the-age-of-superintelligent-ai
+[^25]: Dan Hendrycks on X, 2025. https://x.com/DanHendrycks/status/1978828377269117007
+[^26]: CAIS ML Safety Course. https://course.mlsafety.org/

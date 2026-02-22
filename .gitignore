@@ -44,6 +44,7 @@ app/public/search-index.json
 .claude/settings.local.json
 .claude/maintain-last-run.txt
 .claude/wip-checklist.md
+.claude/wip-context.md
 
 # Session logs (operational state — stored in PostgreSQL via wiki-server)
 .claude/sessions/

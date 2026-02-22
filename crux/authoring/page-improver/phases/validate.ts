@@ -114,6 +114,26 @@ export async function validatePhase(page: PageData, improvedContent: string, _op
     fs.writeFileSync(filePath, originalContent);
   }
 
+  // Check for NEEDS CITATION markers — these indicate incomplete content
+  const needsCitationMatches = fixedContent.match(/\{\/\*\s*NEEDS CITATION\s*\*\/\}/g) ?? [];
+  const needsCitationCount = needsCitationMatches.length;
+  if (needsCitationCount > 0) {
+    log('validate', `  warn needs-citation: ${needsCitationCount} marker(s) left in output`);
+    issues.quality.push({
+      rule: 'needs-citation',
+      count: needsCitationCount,
+      output: `${needsCitationCount} {/* NEEDS CITATION */} marker(s) remain — page looks unfinished. Add sources from research or remove the claims.`,
+    });
+    if (needsCitationCount > 3) {
+      log('validate', `  x needs-citation: ${needsCitationCount} markers exceeds limit of 3 — treat as critical`);
+      issues.critical.push({
+        rule: 'needs-citation-excess',
+        count: needsCitationCount,
+        output: `${needsCitationCount} {/* NEEDS CITATION */} markers — too many unfinished claims. Max 3 allowed per page.`,
+      });
+    }
+  }
+
   writeTemp(page.id, 'validation-results.json', issues);
 
   const hasCritical: boolean = issues.critical.length > 0;

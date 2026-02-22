@@ -9,3 +9,6 @@ export const WIKI_BASE_URL =
   );
 
 export const TIMEOUT_MS = 90_000;
+
+/** Max tool calls per query to prevent runaway API usage. */
+export const MAX_TOOL_CALLS = 10;
