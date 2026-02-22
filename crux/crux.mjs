@@ -36,6 +36,7 @@
  *   context     Assemble research bundles for Claude Code sessions (for-page, for-issue, for-entity, for-topic)
  *   enrich      Standalone enrichment tools (entity-links, fact-refs)
  *   sessions    Session log management (write: scaffold a session YAML)
+ *   research    Multi-source research → SourceCacheEntry[] (Exa, Perplexity, SCRY)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -79,6 +80,7 @@ import * as jobsCommands from './commands/jobs.ts';
 import * as contextCommands from './commands/context.ts';
 import * as enrichCommands from './commands/enrich.ts';
 import * as sessionsCommands from './commands/sessions.ts';
+import * as researchCommands from './commands/research.ts';
 
 const domains = {
   validate: validateCommands,
@@ -109,6 +111,7 @@ const domains = {
   context: contextCommands,
   enrich: enrichCommands,
   sessions: sessionsCommands,
+  research: researchCommands,
 };
 
 /**
@@ -185,6 +188,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   context     Assemble research bundles (for-page, for-issue, for-entity, for-topic)
   enrich      Standalone enrichment tools (entity-links, fact-refs)
   sessions    Session log management (write: scaffold a session YAML)
+  research    Multi-source research → SourceCacheEntry[] (Exa, Perplexity, SCRY)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

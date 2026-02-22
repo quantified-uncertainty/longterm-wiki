@@ -139,6 +139,31 @@ function buildSkipRanges(content: string): Array<[number, number]> {
     }
   }
 
+  // Skip markdown links [display text](url) — both display text and URL.
+  // Handles one level of nested parens in URLs (e.g. Wikipedia links like /wiki/Foo_(bar)).
+  const markdownLink = /!?\[[^\]]*\]\((?:[^()]*|\([^()]*\))*\)/g;
+  for (const match of content.matchAll(markdownLink)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip reference-style markdown links [text][ref] (#687)
+  const refLink = /\[[^\]]*\]\[[^\]]*\]/g;
+  for (const match of content.matchAll(refLink)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip reference-style link definitions [ref]: url (#687)
+  const refDef = /^\[[^\]]+\]:\s+\S+.*$/gm;
+  for (const match of content.matchAll(refDef)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
   return ranges.sort((a, b) => a[0] - b[0]);
 }
 

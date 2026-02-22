@@ -17,7 +17,8 @@ import { ROOT, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from '.
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import {
-  analyzePhase, researchPhase, improvePhase, enrichPhase, reviewPhase,
+  analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
+  enrichPhase, reviewPhase,
   validatePhase, gapFillPhase, triagePhase, adversarialLoopPhase,
 } from './phases.ts';
 
@@ -147,13 +148,19 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     process.exit(1);
   }
 
+  // When --section-level is set, substitute 'improve' with 'improve-sections'
+  const phases = tierConfig.phases.map(p =>
+    p === 'improve' && options.sectionLevel ? 'improve-sections' : p,
+  );
+
   console.log('\n' + '='.repeat(60));
   console.log(`Improving: "${page.title}"`);
   if (triageResult) {
     console.log(`Triage: ${triageResult.reason}`);
   }
   console.log(`Tier: ${tierConfig.name} (${tierConfig.cost})`);
-  console.log(`Phases: ${tierConfig.phases.join(' → ')}`);
+  if (options.sectionLevel) console.log('Mode: section-level (--section-level)');
+  console.log(`Phases: ${phases.join(' → ')}`);
   if (directions) console.log(`Directions: ${directions}`);
   console.log('='.repeat(60) + '\n');
 
@@ -164,7 +171,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   let enrichResult: EnrichResult | undefined;
 
   // Run phases based on tier
-  for (const phase of tierConfig.phases) {
+  for (const phase of phases) {
     const phaseStart: number = Date.now();
     const stopPhaseHeartbeat = startHeartbeat(phase, 60);
 
@@ -194,6 +201,12 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         if (page.path.includes('/people/') || page.path.includes('/organizations/')) {
           logBiographicalWarnings(improvedContent, page, tier);
         }
+        break;
+
+      case 'improve-sections':
+        improvedContent = await improveSectionsPhase(
+          page, analysis!, research || { sources: [] }, directions, options,
+        );
         break;
 
       case 'enrich': {
@@ -330,7 +343,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     tier,
     directions,
     duration: totalDuration,
-    phases: tierConfig.phases,
+    phases,
     review,
     adversarialLoopResult,
     enrichResult,

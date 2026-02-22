@@ -67,7 +67,9 @@ jobs:
   deploy:
     name: Deploy to ArgoCD
     needs: [build-and-push, pre-deploy-backup]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && !cancelled()
+    # Deploy proceeds even if backup fails (DATABASE_URL may not be configured yet).
+    # Once DATABASE_URL is added, backup failures will be visible but non-blocking.
     runs-on: ubuntu-latest
 
     steps:

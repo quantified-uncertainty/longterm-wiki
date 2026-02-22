@@ -325,6 +325,49 @@ describe('parseGroundedResult', () => {
     const result = parseGroundedResult(raw, makeRequest());
     expect(result.unsourceableClaims).toEqual([]);
   });
+
+  it('truncates claimMap when LLM exceeds maxNewClaims (#680)', () => {
+    const raw = JSON.stringify({
+      content: '## Bg\n\nA.[^SRC-1] B.[^SRC-1] C.[^SRC-1] D.[^SRC-1] E.[^SRC-1]',
+      claimMap: [
+        { claim: 'A.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+        { claim: 'B.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+        { claim: 'C.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+        { claim: 'D.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+        { claim: 'E.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+      ],
+      unsourceableClaims: [],
+    });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: true, requireClaimMap: true, maxNewClaims: 2 },
+    }));
+
+    expect(result.claimMap).toHaveLength(2);
+    expect(result.claimMap[0].claim).toBe('A.');
+    expect(result.claimMap[1].claim).toBe('B.');
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('maxNewClaims=2'));
+
+    warnSpy.mockRestore();
+  });
+
+  it('does not truncate claimMap when within maxNewClaims limit', () => {
+    const raw = JSON.stringify({
+      content: '## Bg\n\nA.[^SRC-1]',
+      claimMap: [
+        { claim: 'A.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+      ],
+      unsourceableClaims: [],
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: true, requireClaimMap: true, maxNewClaims: 5 },
+    }));
+
+    expect(result.claimMap).toHaveLength(1);
+  });
 });
 
 // ---------------------------------------------------------------------------
