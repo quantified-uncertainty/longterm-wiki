@@ -35,6 +35,7 @@ import {
 } from '../auto-update/ci-verify-citations.ts';
 import { computeRiskScores } from '../auto-update/ci-risk-scores.ts';
 import { buildPrBody } from '../auto-update/ci-pr-body.ts';
+import { createJob } from '../lib/wiki-server/jobs.ts';
 import type { AutoUpdateOptions, RunReport } from '../auto-update/types.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
@@ -529,6 +530,65 @@ async function prBody(args: string[], options: AutoUpdateOptions): Promise<Comma
   return { output: body, exitCode: 0 };
 }
 
+/**
+ * Submit auto-update as background jobs instead of running inline.
+ *
+ * Creates an auto-update-digest job that will:
+ * 1. Fetch news and build the digest
+ * 2. Create individual page-improve jobs for each planned update
+ * 3. Create a batch-commit job to collect results into a PR
+ *
+ * This enables parallel execution: N page improvements run concurrently
+ * instead of sequentially.
+ */
+async function submit(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const budget = parseFloat(options.budget || '50');
+  const maxPages = parseInt(options.count || '10', 10);
+  const dryRun = options.dryRun || false;
+
+  const result = await createJob({
+    type: 'auto-update-digest',
+    params: {
+      budget,
+      maxPages,
+      sources: options.sources || undefined,
+      dryRun,
+    },
+    priority: 3,
+    maxRetries: 2,
+  });
+
+  if (!result.ok) {
+    if (options.json || options.ci) {
+      return { output: JSON.stringify({ error: result.message }), exitCode: 1 };
+    }
+    return {
+      output: `${c.red}Error: Failed to submit auto-update job: ${result.message}${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const job = result.data;
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify(job, null, 2), exitCode: 0 };
+  }
+
+  let output = '';
+  output += `${c.green}✓${c.reset} Submitted auto-update digest job #${job.id}\n`;
+  output += `  Budget: $${budget}\n`;
+  output += `  Max pages: ${maxPages}\n`;
+  if (dryRun) output += `  ${c.yellow}Dry run mode${c.reset} — will plan but not create child jobs\n`;
+  if (options.sources) output += `  Sources: ${options.sources}\n`;
+  output += `\n${c.dim}The job will be claimed by a worker (GHA or local).${c.reset}\n`;
+  output += `${c.dim}Monitor progress: crux jobs status ${job.id}${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
 // ── Command Registry ────────────────────────────────────────────────────────
 
 export const commands = {
@@ -538,6 +598,7 @@ export const commands = {
   plan,
   sources,
   history,
+  submit,
   'audit-gate': auditGate,
   'verify-citations': verifyCitations,
   'risk-scores': riskScores,
@@ -556,6 +617,7 @@ Pipeline: fetch sources → build digest → route to pages → execute updates
 Commands:
   plan                 Show what would be updated (default)
   run                  Execute the full auto-update pipeline
+  submit               Submit as background jobs (parallel via job queue)
   digest               Fetch sources and show news digest only
   sources              List configured news sources
   history [count]      Show past auto-update runs
@@ -610,5 +672,8 @@ Examples:
   crux auto-update run --dry-run                 Full pipeline without executing
   crux auto-update audit-gate --diff --apply     Audit changed pages and fix issues
   crux auto-update audit-gate existential-risk   Audit a specific page
+  crux auto-update submit --budget=30            Submit as parallel background jobs
+  crux auto-update submit --dry-run              Preview job plan without creating jobs
 `;
+
 }
