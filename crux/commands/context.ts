@@ -58,7 +58,6 @@ import type {
 
 const DEFAULT_OUTPUT = join(PROJECT_ROOT, '.claude/wip-context.md');
 
-
 // ---------------------------------------------------------------------------
 // Exported helper functions (also tested by context.test.ts)
 // ---------------------------------------------------------------------------
