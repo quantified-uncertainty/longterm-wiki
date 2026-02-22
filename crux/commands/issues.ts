@@ -1006,6 +1006,9 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
 
   // Fetch existing issue
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
+  if (issue.pull_request) {
+    return { output: `${c.red}#${issueNum} is a pull request, not an issue.${c.reset}\n`, exitCode: 1 };
+  }
   const existingBody = (issue.body || '').trim();
 
   const newBody = buildIssueBody({

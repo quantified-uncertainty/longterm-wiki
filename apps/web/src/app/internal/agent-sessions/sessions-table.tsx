@@ -33,14 +33,16 @@ function normalizeModel(model: string | null): string | null {
   return model;
 }
 
+const MODEL_BADGE_STYLES: Record<string, string> = {
+  opus: "bg-purple-500/15 text-purple-600",
+  sonnet: "bg-amber-500/15 text-amber-600",
+  haiku: "bg-sky-500/15 text-sky-600",
+};
+
 function ModelBadge({ model }: { model: string | null }) {
   if (!model) return <span className="text-xs text-muted-foreground/50">—</span>;
   const normalized = normalizeModel(model);
-
-  let cls = "bg-muted text-muted-foreground";
-  if (model.includes("opus")) cls = "bg-purple-500/15 text-purple-600";
-  else if (model.includes("sonnet")) cls = "bg-amber-500/15 text-amber-600";
-  else if (model.includes("haiku")) cls = "bg-sky-500/15 text-sky-600";
+  const cls = (normalized && MODEL_BADGE_STYLES[normalized]) ?? "bg-muted text-muted-foreground";
 
   return (
     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${cls}`}>

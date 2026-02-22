@@ -66,12 +66,15 @@ async function loadFromApi(): Promise<FetchResult<AgentSessionRow[]>> {
     { revalidate: 60 }
   );
 
-  // Build a branch → session log map for enrichment
+  // Build a branch → session log map for enrichment (keep most recent log per branch)
   const logsByBranch = new Map<string, ApiSessionLog>();
   if (logsResult.ok) {
     for (const log of logsResult.data.sessions) {
       if (log.branch) {
-        logsByBranch.set(log.branch, log);
+        const existing = logsByBranch.get(log.branch);
+        if (!existing || log.date > existing.date) {
+          logsByBranch.set(log.branch, log);
+        }
       }
     }
   }
