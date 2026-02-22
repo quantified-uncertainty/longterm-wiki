@@ -28,6 +28,14 @@ import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anth
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { NUMERIC_ID_RE } from '../lib/patterns.ts';
+import { splitIntoSections } from '../lib/section-splitter.ts';
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+/** Maximum content size (chars) sent to the LLM per call. Larger content is chunked. */
+const MAX_CHUNK_SIZE = 5000;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -57,6 +65,44 @@ interface LlmEntityLinkResponse {
     entityId?: string;
     displayName?: string;
   }>;
+}
+
+// ---------------------------------------------------------------------------
+// Chunking helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Split MDX content into chunks for LLM processing.
+ *
+ * Splits at H2 section boundaries so each LLM call sees a complete, coherent
+ * section rather than an arbitrary 6000-char window. Falls back to
+ * hard-splitting at MAX_CHUNK_SIZE for unusually large sections.
+ *
+ * Exported for testing.
+ */
+export function splitContentForEnrichment(content: string): string[] {
+  if (content.length <= MAX_CHUNK_SIZE) return [content];
+
+  const { frontmatter, preamble, sections } = splitIntoSections(content);
+  const chunks: string[] = [];
+
+  // First chunk: frontmatter + preamble (intro paragraph before first H2)
+  const intro = [frontmatter, preamble].filter(s => s.trim()).join('\n');
+  if (intro.trim()) chunks.push(intro);
+
+  // Each H2 section becomes its own chunk
+  for (const section of sections) {
+    if (section.content.length <= MAX_CHUNK_SIZE) {
+      chunks.push(section.content);
+    } else {
+      // Very large section: hard-split at MAX_CHUNK_SIZE
+      for (let i = 0; i < section.content.length; i += MAX_CHUNK_SIZE) {
+        chunks.push(section.content.slice(i, i + MAX_CHUNK_SIZE));
+      }
+    }
+  }
+
+  return chunks.filter(c => c.trim());
 }
 
 // ---------------------------------------------------------------------------
@@ -273,7 +319,7 @@ ${alreadyLinkedList}
 
 ## Content to Enrich
 \`\`\`mdx
-${content.slice(0, 6000)}${content.length > 6000 ? '\n... [truncated]' : ''}
+${content}
 \`\`\`
 
 Identify entity mentions and return replacement instructions as JSON.`;
@@ -331,7 +377,28 @@ export async function enrichEntityLinks(
   let replacements: EntityLinkReplacement[] = [];
 
   if (useLlm) {
-    replacements = await callLlmForEntityLinks(content, entityLookup, alreadyLinkedTexts);
+    // Split into sections and process each chunk separately to cover the full page (#673).
+    // Long pages truncated at 6000 chars silently miss mentions in the second half.
+    const chunks = splitContentForEnrichment(content);
+
+    // Accumulate alreadyLinked across sections to enforce first-mention-only per entity.
+    const accTexts = new Set(alreadyLinkedTexts);
+    const accIds = new Set(alreadyLinkedIds);
+
+    for (const chunk of chunks) {
+      const chunkReplacements = await callLlmForEntityLinks(chunk, entityLookup, accTexts);
+
+      // Filter out entity IDs already linked or proposed in earlier sections
+      const filtered = chunkReplacements.filter(r => !accIds.has(r.entityId));
+
+      replacements.push(...filtered);
+
+      // Accumulate for subsequent sections so the LLM won't re-propose them
+      for (const r of filtered) {
+        accTexts.add(r.displayName);
+        accIds.add(r.entityId);
+      }
+    }
   }
 
   // Filter out replacements for already-linked text or already-linked entity IDs (#679)
