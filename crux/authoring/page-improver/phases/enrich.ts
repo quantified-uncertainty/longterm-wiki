@@ -21,36 +21,50 @@ export async function enrichPhase(
   log('enrich', 'Starting post-improve enrichment');
 
   let enrichedContent = content;
+  let entityLinkCount = 0;
+  let factRefCount = 0;
 
   // Step 1: Entity-link enrichment
-  log('enrich', 'Running entity-link enrichment...');
-  const entityLinkResult = await enrichEntityLinks(enrichedContent, { root: ROOT });
-  enrichedContent = entityLinkResult.content;
-  if (entityLinkResult.insertedCount > 0) {
-    log('enrich', `  Added ${entityLinkResult.insertedCount} EntityLink(s)`);
-  } else {
-    log('enrich', '  No new EntityLinks needed');
+  try {
+    log('enrich', 'Running entity-link enrichment...');
+    const entityLinkResult = await enrichEntityLinks(enrichedContent, { root: ROOT });
+    enrichedContent = entityLinkResult.content;
+    entityLinkCount = entityLinkResult.insertedCount;
+    if (entityLinkCount > 0) {
+      log('enrich', `  Added ${entityLinkCount} EntityLink(s)`);
+    } else {
+      log('enrich', '  No new EntityLinks needed');
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    log('enrich', `  ⚠ Entity-link enrichment failed: ${msg} — continuing with original content`);
   }
 
   // Step 2: Fact-ref enrichment
-  log('enrich', 'Running fact-ref enrichment...');
-  const factRefResult = await enrichFactRefs(enrichedContent, { pageId: page.id, root: ROOT });
-  enrichedContent = factRefResult.content;
-  if (factRefResult.insertedCount > 0) {
-    log('enrich', `  Added ${factRefResult.insertedCount} fact-ref(s)`);
-  } else {
-    log('enrich', '  No new fact-refs needed');
+  try {
+    log('enrich', 'Running fact-ref enrichment...');
+    const factRefResult = await enrichFactRefs(enrichedContent, { pageId: page.id, root: ROOT });
+    enrichedContent = factRefResult.content;
+    factRefCount = factRefResult.insertedCount;
+    if (factRefCount > 0) {
+      log('enrich', `  Added ${factRefCount} fact-ref(s)`);
+    } else {
+      log('enrich', '  No new fact-refs needed');
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    log('enrich', `  ⚠ Fact-ref enrichment failed: ${msg} — continuing with current content`);
   }
 
   writeTemp(page.id, 'enriched.mdx', enrichedContent);
 
   const result: EnrichResult = {
-    entityLinks: { insertedCount: entityLinkResult.insertedCount },
-    factRefs: { insertedCount: factRefResult.insertedCount },
+    entityLinks: { insertedCount: entityLinkCount },
+    factRefs: { insertedCount: factRefCount },
   };
   writeTemp(page.id, 'enrich-result.json', result);
 
-  const totalAdded = entityLinkResult.insertedCount + factRefResult.insertedCount;
+  const totalAdded = entityLinkCount + factRefCount;
   log('enrich', `Complete (${totalAdded} total enrichments added)`);
 
   return { content: enrichedContent, result };

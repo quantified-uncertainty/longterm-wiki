@@ -286,10 +286,12 @@ async function searchPerplexity(
 // SCRY search (EA Forum + LessWrong)
 // ---------------------------------------------------------------------------
 
+const VALID_SCRY_TABLES = ['mv_eaforum_posts', 'mv_lesswrong_posts'] as const;
+
 async function searchScry(query: string, maxResults: number): Promise<SearchHit[]> {
   const apiKey = getApiKey('SCRY_API_KEY') ?? SCRY_PUBLIC_KEY;
 
-  const tables = ['mv_eaforum_posts', 'mv_lesswrong_posts'];
+  const tables = VALID_SCRY_TABLES;
   const allHits: SearchHit[] = [];
   const seenUrls = new Set<string>();
   const perTable = Math.ceil(maxResults / tables.length);
