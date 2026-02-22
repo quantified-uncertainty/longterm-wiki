@@ -192,34 +192,31 @@ export function applyEntityLinkReplacements(
   content: string,
   replacements: EntityLinkReplacement[],
 ): { content: string; applied: number; appliedReplacements: EntityLinkReplacement[] } {
-  const skipRanges = buildSkipRanges(content);
   let result = content;
   let applied = 0;
-  let offset = 0;
   const appliedReplacements: EntityLinkReplacement[] = [];
 
-  // Sort by position of first occurrence in original content
+  // Sort by position of first occurrence in current content
   const positioned = replacements.map(r => {
-    const idx = content.indexOf(r.searchText);
+    const idx = result.indexOf(r.searchText);
     return { ...r, firstIdx: idx };
   }).filter(r => r.firstIdx !== -1)
     .sort((a, b) => a.firstIdx - b.firstIdx);
 
   for (const r of positioned) {
+    // Rebuild skip ranges on CURRENT result (not original) to avoid offset mapping bugs
+    // (same fix as applyFactRefReplacements — see PR #703)
+    const skipRanges = buildSkipRanges(result);
+
     // Scan through occurrences to find the first one not in a skip range.
     let searchStart = 0;
     while (true) {
       const searchIdx = result.indexOf(r.searchText, searchStart);
       if (searchIdx === -1) break;
 
-      // Map back to original content position for skip-range check
-      const origPos = searchIdx - offset;
-      const origEnd = origPos + r.searchText.length;
-
-      if (!isInSkipRange(origPos, origEnd, skipRanges)) {
+      if (!isInSkipRange(searchIdx, searchIdx + r.searchText.length, skipRanges)) {
         const replacement = `<EntityLink id="${r.entityId}">${r.displayName}</EntityLink>`;
         result = result.slice(0, searchIdx) + replacement + result.slice(searchIdx + r.searchText.length);
-        offset += replacement.length - r.searchText.length;
         applied++;
         appliedReplacements.push(r);
         break; // Only link the first valid occurrence per entity

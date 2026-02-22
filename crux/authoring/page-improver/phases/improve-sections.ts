@@ -20,6 +20,7 @@ import {
   splitIntoSections,
   reassembleSections,
   renumberFootnotes,
+  deduplicateSectionMarkers,
   filterSourcesForSection,
   type ParsedSection,
 } from '../../../lib/section-splitter.ts';
@@ -242,12 +243,19 @@ export async function improveSectionsPhase(
     }
   }
 
+  // ── Deduplicate per-section footnote markers ─────────────────────────────
+  // Each section may independently produce [^SRC-1], [^SRC-2], etc. for
+  // different sources. Deduplicate to prevent renumberFootnotes from mapping
+  // colliding markers to the same definition (silent citation misattribution).
+
+  const dedupedSections = deduplicateSectionMarkers(rewrittenSections);
+
   // ── Reassemble ────────────────────────────────────────────────────────────
 
   const reassembled = reassembleSections({
     frontmatter: split.frontmatter,
     preamble: split.preamble,
-    sections: rewrittenSections,
+    sections: dedupedSections,
   });
 
   // ── Footnote renumbering ──────────────────────────────────────────────────

@@ -10,6 +10,7 @@
  *   crux pr fix-body --pr=N    Target a specific PR number instead of auto-detecting
  */
 
+import { readFileSync } from 'fs';
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
@@ -73,7 +74,8 @@ async function detect(_args: string[], options: CommandOptions): Promise<Command
  *
  * Options:
  *   --title="PR title"      Required. Title for the PR.
- *   --body="PR body"        Required. Markdown body for the PR.
+ *   --body="PR body"        Body as inline string (vulnerable to shell expansion).
+ *   --body-file=<path>      Body from a file (safe for markdown with backticks).
  *   --base=main             Base branch (default: main).
  *   --draft                 Create as draft PR.
  *
@@ -85,13 +87,27 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
 
   const branch = currentBranch();
   const title = options.title as string | undefined;
-  const body = options.body as string | undefined;
+  const bodyFile = options['body-file'] as string | undefined;
+  let body = options.body as string | undefined;
   const base = (options.base as string) || 'main';
   const draft = Boolean(options.draft);
 
+  // --body-file takes precedence (avoids shell expansion of backticks in markdown)
+  if (bodyFile) {
+    try {
+      body = readFileSync(bodyFile, 'utf-8');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return {
+        output: `${c.red}Error reading --body-file: ${msg}${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+  }
+
   if (!title) {
     return {
-      output: `${c.red}Usage: crux pr create --title="PR title" --body="PR body" [--base=main] [--draft]${c.reset}\n`,
+      output: `${c.red}Usage: crux pr create --title="PR title" --body="PR body" [--body-file=<path>] [--base=main] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -244,7 +260,8 @@ Commands:
 
 Options (create):
   --title="..."       Required. PR title.
-  --body="..."        Required. PR body (markdown).
+  --body="..."        PR body (inline — vulnerable to shell expansion).
+  --body-file=<path>  PR body from file (safe for markdown with backticks).
   --base=main         Base branch (default: main).
   --draft             Create as draft PR.
 

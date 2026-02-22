@@ -15,6 +15,7 @@ import {
   splitIntoSections,
   reassembleSections,
   renumberFootnotes,
+  deduplicateSectionMarkers,
   filterSourcesForSection,
   type ParsedSection,
   type SplitPage,
@@ -364,6 +365,69 @@ const makeSrc = (overrides: Partial<SourceCacheEntry>): SourceCacheEntry => ({
   title: 'Default Title',
   content: 'Default content.',
   ...overrides,
+});
+
+describe('deduplicateSectionMarkers', () => {
+  it('returns sections unchanged when no marker collisions', () => {
+    const sections: ParsedSection[] = [
+      { id: 'a', heading: '## A', content: '## A\nText[^SRC-1]\n[^SRC-1]: Source A' },
+      { id: 'b', heading: '## B', content: '## B\nText[^SRC-2]\n[^SRC-2]: Source B' },
+    ];
+    const result = deduplicateSectionMarkers(sections);
+    expect(result[0].content).toBe(sections[0].content);
+    expect(result[1].content).toBe(sections[1].content);
+  });
+
+  it('remaps colliding SRC-1 markers to unique per-section markers', () => {
+    const sections: ParsedSection[] = [
+      { id: 'background', heading: '## Background', content: '## Background\nFounded in 2000.[^SRC-1]\n[^SRC-1]: History (https://example.com/history)' },
+      { id: 'funding', heading: '## Funding', content: '## Funding\nRaised $5M.[^SRC-1]\n[^SRC-1]: Funding Report (https://example.com/funding)' },
+    ];
+    const result = deduplicateSectionMarkers(sections);
+
+    // First section keeps its markers unchanged
+    expect(result[0].content).toContain('[^SRC-1]');
+    expect(result[0].content).toContain('[^SRC-1]: History');
+
+    // Second section's markers are remapped
+    expect(result[1].content).toContain('[^S1-SRC-1]');
+    expect(result[1].content).toContain('[^S1-SRC-1]: Funding Report');
+    expect(result[1].content).not.toMatch(/\[\^SRC-1\]/);
+  });
+
+  it('deduplication + renumber produces correct citations for each section', () => {
+    const sections: ParsedSection[] = [
+      { id: 'a', heading: '## A', content: '## A\nClaim A.[^SRC-1]\n[^SRC-1]: Source A URL' },
+      { id: 'b', heading: '## B', content: '## B\nClaim B.[^SRC-1]\n[^SRC-1]: Source B URL' },
+    ];
+    const deduped = deduplicateSectionMarkers(sections);
+    const reassembled = reassembleSections({
+      frontmatter: '',
+      preamble: '',
+      sections: deduped,
+    });
+    const renumbered = renumberFootnotes(reassembled);
+
+    // Both citations should be present with correct definitions
+    expect(renumbered).toContain('[^1]');
+    expect(renumbered).toContain('[^2]');
+    expect(renumbered).toContain('[^1]: Source A URL');
+    expect(renumbered).toContain('[^2]: Source B URL');
+  });
+
+  it('handles three sections with overlapping markers', () => {
+    const sections: ParsedSection[] = [
+      { id: 'a', heading: '## A', content: '## A\n[^SRC-1]\n[^SRC-1]: A' },
+      { id: 'b', heading: '## B', content: '## B\n[^SRC-1]\n[^SRC-1]: B' },
+      { id: 'c', heading: '## C', content: '## C\n[^SRC-1]\n[^SRC-1]: C' },
+    ];
+    const deduped = deduplicateSectionMarkers(sections);
+
+    // All three should have distinct markers
+    const allContent = deduped.map(s => s.content).join('\n');
+    const markers = [...allContent.matchAll(/\[\^([^\]]+)\]:/g)].map(m => m[1]);
+    expect(new Set(markers).size).toBe(3);
+  });
 });
 
 describe('filterSourcesForSection', () => {
