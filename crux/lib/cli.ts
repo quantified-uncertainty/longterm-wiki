@@ -110,6 +110,18 @@ export function kebabToCamel(str: string): string {
 }
 
 /**
+ * Parse an integer CLI option with a fallback.
+ * Returns fallback on undefined, null, boolean flags, or NaN.
+ * Correctly handles 0 (valid). Callers should apply Math.max() if
+ * negative values are invalid for their use case.
+ */
+export function parseIntOpt(val: unknown, fallback: number): number {
+  if (val === undefined || val === null || val === true || val === false) return fallback;
+  const n = parseInt(val as string, 10);
+  return Number.isNaN(n) ? fallback : n;
+}
+
+/**
  * Format duration in human-readable form
  */
 export function formatDuration(ms: number): string {
@@ -171,16 +183,6 @@ export interface ScriptConfig {
 export interface CommandResult {
   output: string;
   exitCode: number;
-}
-
-/**
- * Parse an integer CLI option with a fallback.
- * Returns fallback on missing, boolean, or non-numeric values.
- */
-export function parseIntOpt(val: unknown, fallback: number): number {
-  if (val === undefined || val === null || val === true || val === false) return fallback;
-  const n = parseInt(val as string, 10);
-  return Number.isNaN(n) ? fallback : n;
 }
 
 /**

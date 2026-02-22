@@ -4,7 +4,7 @@
  * Session Log Validator
  *
  * Validates `.claude/sessions/*.yaml` files against a Zod schema.
- * Also warns about stray `.md` files (run migrate-session-logs.mjs to convert them).
+ * Also warns about stray `.md` files (legacy format; sessions are now stored in the wiki-server DB).
  *
  * Schema fields:
  *   date: YYYY-MM-DD (required)
@@ -136,7 +136,7 @@ function validate(): { passed: boolean; errors: number; warnings: number } {
     issues.push({
       file,
       field: 'format',
-      message: 'Legacy Markdown format — run `node scripts/migrate-session-logs.mjs --apply` to convert to YAML',
+      message: 'Legacy Markdown format — sessions are now stored in the wiki-server DB; this .md file can be deleted',
       severity: 'warning',
     });
   }

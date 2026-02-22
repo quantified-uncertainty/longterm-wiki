@@ -26,6 +26,7 @@ export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
   const isPolish = tier === 'polish';
   const isPersonPage = page.path?.includes('/people/') ?? false;
   const isOrgPage = page.path?.includes('/organizations/') ?? false;
+  const isHistoricalPage = page.path?.includes('/history/') ?? false;
 
   return `Improve this wiki page based on the analysis and research.
 
@@ -85,7 +86,14 @@ This is a polish-tier improvement — you have NO new research sources. Therefor
 - If you add a NEW specific claim that needs verification, flag it with {/* NEEDS CITATION */} rather than inventing a source.
 - Do NOT add {/* NEEDS CITATION */} to claims that already existed in the original content — those claims were already accepted. Only mark NEW claims you're adding.
 - Use {/* NEEDS CITATION */} sparingly — at most 3-5 per page. An excess of citation markers makes the page look like an unfinished draft.
-` : ''}
+` : `
+### Citation Completeness (RESEARCH AVAILABLE)
+You have research sources. Therefore:
+- **NEVER use {/* NEEDS CITATION */} markers** — you have sources; use them or omit the claim entirely.
+- Every specific claim you ADD (date, number, role, attribution) must come from the provided research sources, not from your training data.
+- If you cannot support a new claim with a research source, leave the original wording as-is rather than adding unsupported content.
+- **Citation-date matching**: When citing a paper or post for a specific date (e.g., "RLHF was developed in 2019"), verify the cited source's actual publication date matches the claim. A 2017 paper cannot support a "late 2019" date.
+`}
 Make targeted improvements based on the analysis and directions. Follow these guidelines:
 
 ### Wiki Conventions
@@ -127,10 +135,12 @@ ${factLookup}
 - Add citations from the research sources
 - Replace vague claims with specific numbers; use \`<F>\` for canonical facts and \`<Calc>\` for derived values
 - When a page has hardcoded ratios/multiples (e.g. "≈27x revenue"), replace with \`<Calc expr="{a.valuation} / {a.revenue}" precision={0} suffix="x" />\`
+- **F component — mandatory, not optional**: Review ALL prose numbers against the Fact Lookup Table. If a number matches a canonical fact, ALWAYS wrap it with \`<F>\`. Do not selectively apply F to some numbers but leave others bare. Consistency is required.
 - Add EntityLinks for related concepts (using E## IDs from the lookup table above)
 - Ensure tables have source links
 - **NEVER use vague citations** like "Interview", "Earnings call", "Conference talk", "Reports", "Various"
 - Always specify: exact source name, date, and context (e.g., "Tesla Q4 2021 earnings call", "MIT Aeronautics Symposium (Oct 2014)")
+- **New specific claims require sources**: Any NEW date, number, role, or attribution you add that was NOT in the original content MUST have a citation from the research sources. Do not add specific facts from training data alone.
 
 ### Objectivity & Neutrality (CRITICAL)
 Write in **encyclopedic/analytical tone**, not advocacy or journalism. This is a wiki, not an opinion piece.
@@ -214,7 +224,21 @@ ${isPersonPage ? `
 `}
 If the page currently starts with "## Background" but has no "## Overview", add an Overview section BEFORE Background. Do not rename Background to Overview — they serve different purposes.
 
-### Bare URLs
+${isHistoricalPage ? `### Historical Page Voice (CRITICAL)
+This is a historical page. Write with clear retrospective voice:
+- Use past tense for all events in the covered period
+- "Looking Forward" sections should attribute forward-looking statements to people of the time: "Observers at the time anticipated..." not "This will lead to..."
+- Do NOT write "we now know" or present-tense evaluations for historical events — describe what specifically changed and when
+- If the page has a "Looking Forward" section that discusses events that are now in the past (from today's perspective), label them as historical projections, not current expectations
+- When quoting predictions made at the time, clearly attribute them as contemporary views, not established facts
+
+` : ''}${(isPersonPage || isOrgPage) ? `### Cross-Page Consistency (IMPORTANT for person/org pages)
+When you update factual claims — especially funding sources, founding dates, key people, or organizational affiliations — note what other pages may be inconsistent:
+- Person pages and their related org pages often drift apart (e.g., funding transitions updated on one page but not the other)
+- If you change a funding claim, founding date, or key relationship, check whether the linked org/person page would now have a conflicting statement
+- At the end of your output, if you changed any such facts, add an MDX comment: \`{/* CROSS-PAGE CHECK: Updated [fact] — verify consistency with [related page id] */}\`
+
+` : ''}### Bare URLs
 Convert any bare URLs in prose (like \`neelnanda.io\` or \`https://example.com\`) to markdown links: \`[neelnanda.io](https://neelnanda.io)\`. URLs inside footnote definitions and existing markdown links should be left as-is.
 
 ### Related Pages (DO NOT INCLUDE)

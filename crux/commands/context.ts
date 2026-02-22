@@ -18,8 +18,9 @@
  * Requires GITHUB_TOKEN for for-issue (to fetch issue details).
  */
 
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
+import { parse as parseYaml } from 'yaml';
 import { createLogger } from '../lib/output.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
@@ -28,7 +29,7 @@ import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
 import type { FactEntry, FactsByEntityResult } from '../lib/wiki-server/facts.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import type {
   PageDetail,
   PageSearchResult,
@@ -43,6 +44,85 @@ import type {
 // ---------------------------------------------------------------------------
 
 const DEFAULT_OUTPUT = join(PROJECT_ROOT, '.claude/wip-context.md');
+
+
+// ---------------------------------------------------------------------------
+// Exported helper functions (also tested by context.test.ts)
+// ---------------------------------------------------------------------------
+
+const STOP_WORDS = new Set([
+  'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+  'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been',
+  'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
+  'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'need',
+  'this', 'that', 'these', 'those', 'it', 'its', 'as', 'if', 'not',
+  'no', 'any', 'all', 'we', 'they', 'their', 'our', 'your', 'my',
+  'about', 'more', 'into', 'than', 'so', 'up', 'out', 'how', 'what',
+  'when', 'where', 'which', 'who', 'add', 'crux', 'new', 'use', 'get',
+]);
+
+/**
+ * Extract search keywords from a text string (e.g. GitHub issue title + body).
+ * Strips punctuation, lowercases, filters stop words, and deduplicates.
+ */
+export function extractKeywords(text: string): string[] {
+  return [
+    ...new Set(
+      text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length > 2 && !STOP_WORDS.has(w)),
+    ),
+  ];
+}
+
+/**
+ * Locate an entity's YAML source file by its slug ID.
+ * Scans all YAML files under data/entities/ and returns the file path
+ * and raw YAML content for the file containing the matching entity.
+ * Returns null if not found.
+ */
+export function findEntityYaml(entityId: string): { path: string; yaml: string } | null {
+  const entitiesDir = join(PROJECT_ROOT, 'data/entities');
+  let files: string[];
+  try {
+    files = readdirSync(entitiesDir).filter((f) => f.endsWith('.yaml'));
+  } catch {
+    return null;
+  }
+  for (const file of files) {
+    const filePath = join(entitiesDir, file);
+    let content: string;
+    try {
+      content = readFileSync(filePath, 'utf8');
+    } catch {
+      continue;
+    }
+    // Quick pre-filter before full YAML parse
+    if (!content.includes(`id: ${entityId}`)) continue;
+    try {
+      const parsed = parseYaml(content) as Array<{ id: string }>;
+      if (Array.isArray(parsed) && parsed.some((e) => e?.id === entityId)) {
+        return { path: filePath, yaml: content };
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+/**
+ * Build a single markdown table row from an array of cell strings.
+ *
+ * @example
+ * tableRow('Name', 'Value', 'Date') // => '| Name | Value | Date |'
+ */
+export function tableRow(...cells: string[]): string {
+  return `| ${cells.join(' | ')} |`;
+}
+
 
 interface GitHubIssueResponse {
   number: number;
@@ -215,8 +295,8 @@ function entityBlock(e: EntityEntry): string {
 function factsBlock(facts: FactEntry[], limit = 10): string {
   if (facts.length === 0) return '';
   let md = `## Key Facts\n\n`;
-  md += `| Measure / Label | Value | As Of |\n`;
-  md += `|-----------------|-------|-------|\n`;
+  md += tableRow('Measure / Label', 'Value', 'As Of') + '\n';
+  md += tableRow('-----------------', '-------', '-------') + '\n';
   for (const f of facts.slice(0, limit)) {
     const label = (f.label || f.measure || f.factId || '').slice(0, 30);
     let value = f.value || '';
@@ -226,7 +306,7 @@ function factsBlock(facts: FactEntry[], limit = 10): string {
       if (f.format) value += ` ${f.format}`;
     }
     const asOf = f.asOf ? f.asOf.slice(0, 10) : '';
-    md += `| ${label} | ${value} | ${asOf} |\n`;
+    md += tableRow(label, value, asOf) + '\n';
   }
   if (facts.length > limit) {
     md += `\n_…and ${facts.length - limit} more facts_\n`;
@@ -285,6 +365,19 @@ async function forPage(
       output: `${c.yellow}Wiki-server unavailable. Minimal bundle written to ${outputPath}${c.reset}`,
       exitCode: 1,
     };
+  }
+
+  // --json / --ci: return structured data as JSON (to stdout)
+  if (options.json) {
+    const jsonData = {
+      type: 'page' as const,
+      pageId,
+      page: pageResult.data,
+      related: relatedResult.ok ? relatedResult.data : null,
+      backlinks: backlinksResult.ok ? backlinksResult.data : null,
+      citations: citationsResult.ok ? citationsResult.data : null,
+    };
+    return { output: JSON.stringify(jsonData, null, 2), exitCode: 0 };
   }
 
   const p = pageResult.data;
@@ -373,6 +466,18 @@ async function forEntity(
     };
   }
 
+  // --json / --ci: return structured data as JSON (to stdout)
+  if (options.json) {
+    const jsonData = {
+      type: 'entity' as const,
+      entityId,
+      entity: entityResult.data,
+      facts: factsResult.ok ? factsResult.data : null,
+      pages: pageSearchResult.ok ? pageSearchResult.data : null,
+    };
+    return { output: JSON.stringify(jsonData, null, 2), exitCode: 0 };
+  }
+
   const e = entityResult.data;
   let bundle = mdHeader(`Entity: ${e.title}`, 'for-entity', [entityId]);
   bundle += entityBlock(e);
@@ -449,8 +554,7 @@ async function forTopic(
   }
 
   const outputPath = (options.output as string) || DEFAULT_OUTPUT;
-  const parsedLimit = parseInt(String(options.limit ?? '10'), 10);
-  const limit = Math.min(Math.max(1, Number.isNaN(parsedLimit) ? 10 : parsedLimit), 20);
+  const limit = Math.min(Math.max(1, parseIntOpt(options.limit, 10)), 20);
 
   // Search pages and entities in parallel
   const [pageSearchResult, entitySearchResult] = await Promise.all([
@@ -460,6 +564,17 @@ async function forTopic(
     ),
     searchEntities(topic, 8),
   ]);
+
+  // --json / --ci: return structured data as JSON (to stdout)
+  if (options.json) {
+    const jsonData = {
+      type: 'topic' as const,
+      topic,
+      pages: pageSearchResult.ok ? pageSearchResult.data : null,
+      entities: entitySearchResult.ok ? entitySearchResult.data : null,
+    };
+    return { output: JSON.stringify(jsonData, null, 2), exitCode: 0 };
+  }
 
   let bundle = mdHeader(`Topic: "${topic}"`, 'for-topic', [`"${topic}"`]);
 
@@ -551,6 +666,18 @@ async function forIssue(
     ),
     searchEntities(searchQuery, 6),
   ]);
+
+  // --json / --ci: return structured data as JSON (to stdout)
+  if (options.json) {
+    const jsonData = {
+      type: 'issue' as const,
+      issueNum,
+      issue,
+      pages: pageSearchResult.ok ? pageSearchResult.data : null,
+      entities: entitySearchResult.ok ? entitySearchResult.data : null,
+    };
+    return { output: JSON.stringify(jsonData, null, 2), exitCode: 0 };
+  }
 
   const labels = (issue.labels || []).map((l) => l.name);
   const createdAt = issue.created_at.slice(0, 10);
@@ -654,6 +781,8 @@ Commands:
 Options:
   --output=<path>       Output file path (default: .claude/wip-context.md)
   --print               Write to stdout instead of a file
+  --json                Machine-readable JSON output (implies stdout)
+  --ci                  Alias for --json (CI-friendly machine-readable output)
   --limit=N             Max search results for for-topic (default: 10, max: 20)
 
 Notes:

@@ -37,7 +37,7 @@ import { computeRiskScores } from '../auto-update/ci-risk-scores.ts';
 import { buildPrBody } from '../auto-update/ci-pr-body.ts';
 import { createJob } from '../lib/wiki-server/jobs.ts';
 import type { AutoUpdateOptions, RunReport } from '../auto-update/types.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
 
@@ -124,7 +124,7 @@ async function plan(args: string[], options: AutoUpdateOptions): Promise<Command
   const sourceIds = options.sources ? options.sources.split(',').map(s => s.trim()) : undefined;
   const verbose = options.verbose || false;
   const budget = parseFloat(options.budget || '50');
-  const maxPages = parseInt(options.count || '10', 10);
+  const maxPages = parseIntOpt(options.count, 10);
 
   console.log(`Fetching news sources...`);
   const fetchResult = await fetchAllSources(sourceIds, verbose);
@@ -385,7 +385,7 @@ async function checkSourceHealth(
  */
 async function history(args: string[], options: AutoUpdateOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
-  const limit = parseInt(args[0] || '10', 10);
+  const limit = parseIntOpt(args[0], 10);
 
   if (!existsSync(RUNS_DIR)) {
     return { output: 'No auto-update runs found yet.', exitCode: 0 };
@@ -546,7 +546,7 @@ async function submit(args: string[], options: AutoUpdateOptions): Promise<Comma
   const c = log.colors;
 
   const budget = parseFloat(options.budget || '50');
-  const maxPages = parseInt(options.count || '10', 10);
+  const maxPages = parseIntOpt(options.count, 10);
   const dryRun = options.dryRun || false;
 
   const result = await createJob({

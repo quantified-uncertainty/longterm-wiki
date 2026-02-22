@@ -22,8 +22,7 @@
  * Requires LONGTERMWIKI_SERVER_URL (set in environment).
  */
 
-import type { CommandResult } from '../lib/cli.ts';
-import { parseIntOpt } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
 import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
