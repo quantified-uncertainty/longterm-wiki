@@ -154,10 +154,10 @@ export function PageChangesSessions({
     const q = query.toLowerCase();
     return sessions.filter(
       (s) =>
-        s.sessionTitle.toLowerCase().includes(q) ||
-        s.summary.toLowerCase().includes(q) ||
-        s.pages.some((p) => p.pageTitle.toLowerCase().includes(q)) ||
-        s.branch.toLowerCase().includes(q)
+        s.sessionTitle?.toLowerCase().includes(q) ||
+        s.summary?.toLowerCase().includes(q) ||
+        s.pages.some((p) => p.pageTitle?.toLowerCase().includes(q)) ||
+        s.branch?.toLowerCase().includes(q)
     );
   }, [sessions, query]);
 
