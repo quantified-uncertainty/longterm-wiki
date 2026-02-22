@@ -95,6 +95,14 @@ pnpm crux citations quote-report --broken            # Show broken/drifted quote
 pnpm crux citations verify-quotes <id>               # Re-verify stored quotes
 pnpm crux citations verify-quotes --all              # Re-verify all stored quotes
 
+# Research context bundles (pre-assembled context for Claude Code sessions)
+pnpm crux context for-issue <N>          # Context bundle for GitHub issue N
+pnpm crux context for-page <page-id>     # Context bundle for a wiki page
+pnpm crux context for-entity <id>        # Context bundle for an entity
+pnpm crux context for-topic "topic"      # Context bundle for a free-text topic
+# Writes to .claude/wip-context.md by default; use --output=<path> to override
+# Use --print to write to stdout instead of a file
+
 # Querying wiki data (use instead of grepping YAML files)
 pnpm crux query search "topic"           # Full-text search (ranked by relevance)
 pnpm crux query entity <id>              # Structured entity data
