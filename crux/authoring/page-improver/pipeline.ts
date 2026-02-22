@@ -5,21 +5,23 @@
  */
 
 import fs from 'fs';
+import path from 'path';
 import { execFileSync } from 'child_process';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import { createSession } from '../../lib/wiki-server/sessions.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
-  EnrichResult,
+  EnrichResult, AuditResult,
 } from './types.ts';
-import { ROOT, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
+import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import {
   analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
   enrichPhase, reviewPhase,
   validatePhase, gapFillPhase, triagePhase, adversarialLoopPhase,
+  citationAuditPhase,
 } from './phases.ts';
 
 // ── Session log helpers ───────────────────────────────────────────────────────
@@ -169,6 +171,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   let improvedContent: string | undefined, review: ReviewResult | undefined;
   let adversarialLoopResult: AdversarialLoopResult | undefined;
   let enrichResult: EnrichResult | undefined;
+  let auditResult: AuditResult | undefined;
 
   // Run phases based on tier
   for (const phase of phases) {
@@ -216,6 +219,15 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           const enrichOutput = await enrichPhase(page, improvedContent!, options);
           improvedContent = enrichOutput.content;
           enrichResult = enrichOutput.result;
+        }
+        break;
+      }
+
+      case 'citation-audit': {
+        if (options.skipCitationAudit) {
+          log('citation-audit', 'Skipped (--skip-citation-audit)');
+        } else {
+          auditResult = await citationAuditPhase(page, improvedContent!, research, options);
         }
         break;
       }
@@ -292,6 +304,23 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     }
   }
 
+  if (auditResult) {
+    const { total, verified, failed, unchecked } = auditResult.summary;
+    console.log(`Citations: ${total} total — ${verified} verified, ${failed} failed, ${unchecked} unchecked`);
+    if (!auditResult.pass) {
+      const gateMode = options.citationGate && !dryRun;
+      console.log(`⚠ Citation audit FAILED${gateMode ? ' — blocking apply (--citation-gate)' : ' (advisory)'}`);
+    }
+  }
+
+  // Gate mode: abort --apply when citation audit fails
+  if (options.citationGate && !dryRun && auditResult && !auditResult.pass) {
+    const auditPath = path.join(TEMP_DIR, page.id, 'citation-audit.json');
+    console.error('\nApply blocked: citation audit failed and --citation-gate is set.');
+    console.error(`Review ${auditPath} for per-citation details.`);
+    process.exit(1);
+  }
+
   if (dryRun) {
     console.log('\nTo apply changes:');
     console.log(`  cp "${finalPath}" "${filePath}"`);
@@ -347,6 +376,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     review,
     adversarialLoopResult,
     enrichResult,
+    auditResult,
     outputPath: finalPath,
   };
   writeTemp(page.id, 'pipeline-results.json', results);

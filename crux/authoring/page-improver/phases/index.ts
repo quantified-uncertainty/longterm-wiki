@@ -9,6 +9,7 @@ export { gapFillPhase } from './gap-fill.ts';
 export { triagePhase } from './triage.ts';
 export { adversarialReviewPhase } from './adversarial-review.ts';
 export { adversarialLoopPhase } from './adversarial-loop.ts';
+export { citationAuditPhase, buildAuditorSourceCache } from './citation-audit.ts';
 
 // Also export Zod schemas and parsing utilities for external use
 export {

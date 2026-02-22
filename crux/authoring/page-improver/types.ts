@@ -3,6 +3,7 @@
  */
 
 import type { SourceCacheEntry } from '../../lib/section-writer.ts';
+import type { AuditResult } from '../../lib/citation-auditor.ts';
 
 export interface TierConfig {
   name: string;
@@ -121,7 +122,26 @@ export interface PipelineOptions {
    * See issue #671.
    */
   sectionLevel?: boolean;
+  /**
+   * When true, the citation audit phase blocks --apply when the verified
+   * fraction falls below the passThreshold (gate mode).
+   * Default: false (advisory mode — warnings logged, apply not blocked).
+   */
+  citationGate?: boolean;
+  /**
+   * When true, skip the citation audit phase entirely.
+   * Default: false (audit always runs in standard/deep tiers).
+   */
+  skipCitationAudit?: boolean;
+  /**
+   * LLM model for per-citation verification (passed to citation-auditor).
+   * Defaults to the citation-auditor default (google/gemini-2.0-flash-001).
+   */
+  citationAuditModel?: string;
 }
+
+// Re-export AuditResult so callers importing from types.ts get it too
+export type { AuditResult };
 
 export interface EnrichResult {
   entityLinks: { insertedCount: number };
@@ -140,6 +160,12 @@ export interface PipelineResults {
   adversarialLoopResult?: AdversarialLoopResult;
   /** Set when the enrich phase ran. */
   enrichResult?: EnrichResult;
+  /**
+   * Set when the citation-audit phase ran. Contains per-citation verdicts and
+   * summary counts. Always present for standard/deep tiers unless the phase
+   * was skipped (--skip-citation-audit).
+   */
+  auditResult?: AuditResult;
   outputPath: string;
 }
 
