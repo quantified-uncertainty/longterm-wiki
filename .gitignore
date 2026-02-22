@@ -49,6 +49,9 @@ app/public/search-index.json
 .claude/wip-checklist.md
 .claude/wip-context.md
 
+# MCP config (contains tokens)
+.mcp.json
+
 # Session logs (operational state — stored in PostgreSQL via wiki-server)
 .claude/sessions/
 
