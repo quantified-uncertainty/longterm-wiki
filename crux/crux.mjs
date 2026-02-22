@@ -31,6 +31,7 @@
  *   agent-checklist  Manage agent checklists (init, check, verify, status, complete)
  *   facts       Propose new canonical facts from wiki page content
  *   entity      Entity ID management (rename with safe word-boundary matching)
+ *   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
  *   jobs        Background job queue management
  *
  * Global Options:
@@ -70,6 +71,7 @@ import * as factsCommands from './commands/facts.ts';
 import * as entityCommands from './commands/entity.ts';
 import * as prCommands from './commands/pr.ts';
 import * as wikiServerCommands from './commands/wiki-server.ts';
+import * as queryCommands from './commands/query.ts';
 import * as jobsCommands from './commands/jobs.ts';
 
 const domains = {
@@ -96,6 +98,7 @@ const domains = {
   entity: entityCommands,
   pr: prCommands,
   'wiki-server': wikiServerCommands,
+  query: queryCommands,
   jobs: jobsCommands,
 };
 
@@ -168,6 +171,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   issues      Track Claude Code work on GitHub issues
   agent-checklist  Manage agent checklists
   entity      Entity ID management (safe rename)
+  query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
   jobs        Background job queue management
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
