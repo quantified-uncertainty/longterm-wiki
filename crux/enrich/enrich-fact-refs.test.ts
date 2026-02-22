@@ -329,6 +329,64 @@ Anthropic raised \\$30 billion.`;
     // $1B and $30B wrapped, $380B already wrapped = 2 new
     expect(applied).toBe(2);
   });
+
+  it('skips numbers inside JSX open tag attributes', () => {
+    const content = '<DataInfoBox items={500} /> Their budget is $500M.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'abc12300',
+      searchText: '$500M',
+      displayText: '\\$500M',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    expect(result).toContain('<F e="test" f="abc12300">\\$500M</F>');
+    // The 500 inside the JSX tag should be untouched
+    expect(result).toContain('items={500}');
+  });
+
+  it('skips numbers inside MDX comments', () => {
+    const content = '{/* TODO: 500 employees */}\nThey have 500 employees.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'def45600',
+      searchText: '500 employees',
+      displayText: '500 employees',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    expect(result).toContain('{/* TODO: 500 employees */}');
+    expect(result).toContain('<F e="test" f="def45600">500 employees</F>');
+  });
+
+  it('skips numbers inside <R> resource tags', () => {
+    const content = '<R id="abc">2023 Survey</R> published in 2023.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'a0b78900',
+      searchText: '2023',
+      displayText: '2023',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    expect(result).toContain('<R id="abc">2023 Survey</R>');
+    expect(result).toContain('<F e="test" f="a0b78900">2023</F>');
+  });
+
+  it('skips numbers inside footnote definitions', () => {
+    const content = 'Revenue was $100M.\n\n[^1]: Report shows $100M in 2023.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'c0d01200',
+      searchText: '$100M',
+      displayText: '\\$100M',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    // Should link in body, not in footnote
+    expect(result).toMatch(/<F e="test" f="c0d01200">\\\$100M<\/F>\./);
+    expect(result).toContain('[^1]: Report shows $100M');
+  });
 });
 
 describe('fixDoubleNestedFTags', () => {

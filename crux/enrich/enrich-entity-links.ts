@@ -103,14 +103,17 @@ function buildSkipRanges(content: string): Array<[number, number]> {
     }
   }
 
-  // Skip code blocks (```...``` and inline `...`)
+  // Skip code blocks (```...```) — must come before inline code
   const codeBlock = /```[\s\S]*?```/g;
   for (const match of content.matchAll(codeBlock)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
   }
-  const inlineCode = /`[^`]+`/g;
+  // Skip inline code (`...`) — exclude newlines to avoid false matches
+  // between code fences (backticks at fence boundaries would create a
+  // giant false skip range covering prose between fences).
+  const inlineCode = /`[^`\n]+`/g;
   for (const match of content.matchAll(inlineCode)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
@@ -167,6 +170,23 @@ function buildSkipRanges(content: string): Array<[number, number]> {
   // Skip MDX/JSX comments {/* ... */} (#681)
   const mdxComment = /\{\/\*[\s\S]*?\*\/\}/g;
   for (const match of content.matchAll(mdxComment)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip <R>...</R> resource reference tags — display text could contain entity names
+  const rTag = /<R\s[^>]*>[\s\S]*?<\/R>/g;
+  for (const match of content.matchAll(rTag)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip footnote definition lines [^N]: ... — entity names in definitions
+  // should not be linked as they'd corrupt footnote syntax.
+  const footnoteDef = /^\[\^[^\]]+\]:\s.+$/gm;
+  for (const match of content.matchAll(footnoteDef)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
