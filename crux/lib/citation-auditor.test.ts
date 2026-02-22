@@ -11,6 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   parseVerifierResponse,
+  parseBatchVerifierResponse,
   auditCitations,
   type AuditRequest,
   type SourceCache,
@@ -110,14 +111,15 @@ describe('parseVerifierResponse', () => {
     expect(misattributed.verdict).toBe('misattributed');
   });
 
-  it('falls back to unsupported for unknown verdicts', () => {
+  it('falls back to unchecked for unknown verdicts', () => {
     const result = parseVerifierResponse(JSON.stringify({ verdict: 'fabricated', relevantQuote: '', explanation: 'ok' }));
-    expect(result.verdict).toBe('unsupported');
+    expect(result.verdict).toBe('unchecked');
+    expect(result.explanation).toContain('Unknown verdict');
   });
 
-  it('handles malformed JSON gracefully', () => {
+  it('handles malformed JSON gracefully as unchecked', () => {
     const result = parseVerifierResponse('not json at all');
-    expect(result.verdict).toBe('unsupported');
+    expect(result.verdict).toBe('unchecked');
     expect(result.explanation).toBe('Failed to parse verification response.');
   });
 
@@ -397,6 +399,56 @@ describe('auditCitations pass/fail gate', () => {
     expect(result.summary.unchecked).toBe(3);
     expect(result.pass).toBe(true); // 0 checkable → pass by default
   });
+
+  it('hard-fails when any citation is misattributed, even if threshold is met', async () => {
+    // 3 citations: 2 verified, 1 misattributed → 67% verified/checkable
+    // With passThreshold=0.5, threshold is met (67% > 50%) but misattributed
+    // should still cause a hard fail (#678).
+    mockCallOpenRouter
+      .mockResolvedValueOnce(JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }))
+      .mockResolvedValueOnce(JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }))
+      .mockResolvedValueOnce(JSON.stringify({ verdict: 'misattributed', relevantQuote: 'wrong', explanation: 'Numbers differ.' }));
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/one', makeFetchedSource({ url: 'https://example.com/one' })],
+      ['https://example.com/two', makeFetchedSource({ url: 'https://example.com/two' })],
+      ['https://example.com/three', makeFetchedSource({ url: 'https://example.com/three' })],
+    ]);
+
+    const result = await auditCitations({
+      content: THREE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      passThreshold: 0.5,
+      delayMs: 0,
+    });
+
+    expect(result.summary.verified).toBe(2);
+    expect(result.summary.misattributed).toBe(1);
+    expect(result.summary.failed).toBe(1);
+    expect(result.pass).toBe(false); // hard-fail due to misattributed
+  });
+
+  it('hard-fails misattributed even with passThreshold=0', async () => {
+    mockCallOpenRouter.mockResolvedValue(
+      JSON.stringify({ verdict: 'misattributed', relevantQuote: 'wrong', explanation: 'bad' }),
+    );
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({ url: 'https://example.com/source' })],
+    ]);
+
+    const result = await auditCitations({
+      content: ONE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      passThreshold: 0,
+      delayMs: 0,
+    });
+
+    expect(result.summary.misattributed).toBe(1);
+    expect(result.pass).toBe(false); // hard-fail overrides passThreshold=0
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -476,5 +528,184 @@ describe('auditCitations LLM error handling', () => {
     expect(result.citations[0].verdict).toBe('unchecked');
     expect(result.citations[0].explanation).toContain('Rate limit exceeded');
     expect(result.summary.unchecked).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// auditCitations — relevantExcerpts (#683)
+// ---------------------------------------------------------------------------
+
+describe('auditCitations relevantExcerpts', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('uses relevantExcerpts instead of full content when available', async () => {
+    let capturedUserPrompt = '';
+    mockCallOpenRouter.mockImplementation((_sys, user) => {
+      capturedUserPrompt = user as string;
+      return Promise.resolve(JSON.stringify({ verdict: 'verified', relevantQuote: 'excerpt text', explanation: 'ok' }));
+    });
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({
+        url: 'https://example.com/source',
+        content: 'Full content that is very long and may not contain the relevant passage near the start...',
+        relevantExcerpts: ['This is the relevant excerpt about AI safety that directly supports the claim.'],
+      })],
+    ]);
+
+    await auditCitations({
+      content: ONE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+    });
+
+    // Should contain the excerpt, not the full content
+    expect(capturedUserPrompt).toContain('This is the relevant excerpt about AI safety');
+    expect(capturedUserPrompt).not.toContain('Full content that is very long');
+  });
+
+  it('falls back to full content when relevantExcerpts is empty', async () => {
+    let capturedUserPrompt = '';
+    mockCallOpenRouter.mockImplementation((_sys, user) => {
+      capturedUserPrompt = user as string;
+      return Promise.resolve(JSON.stringify({ verdict: 'verified', relevantQuote: 'full', explanation: 'ok' }));
+    });
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/source', makeFetchedSource({
+        url: 'https://example.com/source',
+        content: 'This is the full source content that should be used when no excerpts are available for verification.',
+        relevantExcerpts: [],
+      })],
+    ]);
+
+    await auditCitations({
+      content: ONE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+    });
+
+    expect(capturedUserPrompt).toContain('This is the full source content');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseBatchVerifierResponse (#677)
+// ---------------------------------------------------------------------------
+
+describe('parseBatchVerifierResponse', () => {
+  it('parses a valid batch response with multiple results', () => {
+    const raw = JSON.stringify({
+      results: [
+        { verdict: 'verified', relevantQuote: 'quote 1', explanation: 'ok 1' },
+        { verdict: 'unsupported', relevantQuote: '', explanation: 'not found' },
+      ],
+    });
+    const results = parseBatchVerifierResponse(raw, 2);
+    expect(results).toHaveLength(2);
+    expect(results[0].verdict).toBe('verified');
+    expect(results[1].verdict).toBe('unsupported');
+  });
+
+  it('fills missing entries with unchecked', () => {
+    const raw = JSON.stringify({
+      results: [{ verdict: 'verified', relevantQuote: '', explanation: 'ok' }],
+    });
+    const results = parseBatchVerifierResponse(raw, 3);
+    expect(results).toHaveLength(3);
+    expect(results[0].verdict).toBe('verified');
+    expect(results[1].verdict).toBe('unchecked');
+    expect(results[2].verdict).toBe('unchecked');
+  });
+
+  it('handles malformed JSON gracefully', () => {
+    const results = parseBatchVerifierResponse('not json', 2);
+    expect(results).toHaveLength(2);
+    expect(results[0].verdict).toBe('unchecked');
+    expect(results[1].verdict).toBe('unchecked');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// auditCitations — batching same-URL citations (#677)
+// ---------------------------------------------------------------------------
+
+describe('auditCitations URL batching', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('batches multiple claims against the same source URL into a single LLM call', async () => {
+    // Content with two footnotes citing the SAME URL
+    const sameUrlContent = `---
+title: Test
+---
+
+First claim.[^1] Second claim.[^2]
+
+[^1]: [Source](https://example.com/same)
+[^2]: [Source](https://example.com/same)
+`;
+
+    let callCount = 0;
+    mockCallOpenRouter.mockImplementation(() => {
+      callCount++;
+      return Promise.resolve(JSON.stringify({
+        results: [
+          { verdict: 'verified', relevantQuote: 'q1', explanation: 'e1' },
+          { verdict: 'verified', relevantQuote: 'q2', explanation: 'e2' },
+        ],
+      }));
+    });
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/same', makeFetchedSource({ url: 'https://example.com/same' })],
+    ]);
+
+    const result = await auditCitations({
+      content: sameUrlContent,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+      concurrency: 3,
+    });
+
+    // Should have made exactly ONE LLM call (batched), not two
+    expect(callCount).toBe(1);
+    expect(result.summary.total).toBe(2);
+    expect(result.summary.verified).toBe(2);
+  });
+
+  it('runs concurrent LLM calls for different source URLs', async () => {
+    const timestamps: number[] = [];
+    mockCallOpenRouter.mockImplementation(() => {
+      timestamps.push(Date.now());
+      return Promise.resolve(
+        JSON.stringify({ verdict: 'verified', relevantQuote: '', explanation: 'ok' }),
+      );
+    });
+
+    const sourceCache: SourceCache = new Map([
+      ['https://example.com/one', makeFetchedSource({ url: 'https://example.com/one' })],
+      ['https://example.com/two', makeFetchedSource({ url: 'https://example.com/two' })],
+      ['https://example.com/three', makeFetchedSource({ url: 'https://example.com/three' })],
+    ]);
+
+    const result = await auditCitations({
+      content: THREE_CITATION_CONTENT,
+      sourceCache,
+      fetchMissing: false,
+      delayMs: 0,
+      concurrency: 3,
+    });
+
+    expect(result.summary.total).toBe(3);
+    expect(result.summary.verified).toBe(3);
+    // All 3 LLM calls should have been made (one per distinct URL)
+    expect(timestamps).toHaveLength(3);
   });
 });

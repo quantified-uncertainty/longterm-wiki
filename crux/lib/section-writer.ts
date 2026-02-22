@@ -374,9 +374,19 @@ export function parseGroundedResult(
     ...invalidClaims,
   ];
 
+  // Post-hoc maxNewClaims enforcement: if the LLM exceeded the cap, truncate
+  // the claim map to the first N entries and log a warning (#680).
+  let claimMap = validClaims;
+  if (constraints.maxNewClaims !== undefined && claimMap.length > constraints.maxNewClaims) {
+    console.warn(
+      `[section-writer] maxNewClaims=${constraints.maxNewClaims} but LLM returned ${claimMap.length} claims — truncating to ${constraints.maxNewClaims}.`,
+    );
+    claimMap = claimMap.slice(0, constraints.maxNewClaims);
+  }
+
   return {
     content: response.content,
-    claimMap: validClaims,
+    claimMap,
     unsourceableClaims,
     sectionId: request.sectionId,
   };

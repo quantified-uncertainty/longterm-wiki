@@ -15,6 +15,8 @@ import {
   UpsertCitationQuoteBatchSchema,
   MarkAccuracySchema as SharedMarkAccuracySchema,
   MarkAccuracyBatchSchema as SharedMarkAccuracyBatchSchema,
+  UpsertCitationContentSchema,
+  CITATION_CONTENT_PREVIEW_MAX,
 } from "../api-types.js";
 
 export const citationsRoute = new Hono();
@@ -23,7 +25,6 @@ export const citationsRoute = new Hono();
 
 const BROKEN_SCORE_THRESHOLD = 0.5;
 const MAX_PAGE_SIZE = 1000;
-const MAX_PREVIEW_LENGTH = 50 * 1024; // 50KB
 
 // ---- Schemas (from shared api-types) ----
 
@@ -42,16 +43,7 @@ const MarkVerifiedSchema = z.object({
 const MarkAccuracySchema = SharedMarkAccuracySchema;
 const MarkAccuracyBatchSchema = SharedMarkAccuracyBatchSchema;
 
-const UpsertContentSchema = z.object({
-  url: z.string().min(1).max(2000),
-  fetchedAt: z.string().datetime(),
-  httpStatus: z.number().int().nullable().optional(),
-  contentType: z.string().max(200).nullable().optional(),
-  pageTitle: z.string().max(1000).nullable().optional(),
-  fullTextPreview: z.string().max(MAX_PREVIEW_LENGTH).nullable().optional(),
-  contentLength: z.number().int().nullable().optional(),
-  contentHash: z.string().max(64).nullable().optional(),
-});
+const UpsertContentSchema = UpsertCitationContentSchema;
 
 const PaginationQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
@@ -425,7 +417,8 @@ citationsRoute.post("/content/upsert", async (c) => {
     httpStatus: d.httpStatus ?? null,
     contentType: d.contentType ?? null,
     pageTitle: d.pageTitle ?? null,
-    fullTextPreview: d.fullTextPreview ?? null,
+    fullTextPreview: d.fullTextPreview ?? (d.fullText ? d.fullText.slice(0, CITATION_CONTENT_PREVIEW_MAX) : null),
+    fullText: d.fullText ?? null,
     contentLength: d.contentLength ?? null,
     contentHash: d.contentHash ?? null,
   };
@@ -793,4 +786,75 @@ citationsRoute.get("/content", async (c) => {
   }
 
   return c.json(rows[0]);
+});
+
+// ---- GET /content/list (paginated, metadata only — no full_text) ----
+
+citationsRoute.get("/content/list", async (c) => {
+  const parsed = PaginationQuery.safeParse(c.req.query());
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { limit, offset } = parsed.data;
+  const db = getDrizzleDb();
+
+  const rows = await db
+    .select({
+      url: citationContent.url,
+      fetchedAt: citationContent.fetchedAt,
+      httpStatus: citationContent.httpStatus,
+      contentType: citationContent.contentType,
+      pageTitle: citationContent.pageTitle,
+      contentLength: citationContent.contentLength,
+      contentHash: citationContent.contentHash,
+      hasFullText: sql<boolean>`(${citationContent.fullText} IS NOT NULL)`,
+      hasPreview: sql<boolean>`(${citationContent.fullTextPreview} IS NOT NULL)`,
+      createdAt: citationContent.createdAt,
+      updatedAt: citationContent.updatedAt,
+    })
+    .from(citationContent)
+    .orderBy(desc(citationContent.fetchedAt))
+    .limit(limit)
+    .offset(offset);
+
+  // Single aggregate query — avoids 3 separate round-trips and is consistent
+  const aggregates = await db.select({
+    total: count(),
+    withFullText: sql<number>`count(case when ${citationContent.fullText} is not null then 1 end)`,
+    withPreview: sql<number>`count(case when ${citationContent.fullTextPreview} is not null then 1 end)`,
+  }).from(citationContent);
+
+  return c.json({
+    entries: rows,
+    total: aggregates[0].total,
+    withFullText: Number(aggregates[0].withFullText),
+    withPreview: Number(aggregates[0].withPreview),
+    limit,
+    offset,
+  });
+});
+
+// ---- GET /content/stats ----
+
+citationsRoute.get("/content/stats", async (c) => {
+  const db = getDrizzleDb();
+
+  const rows = await db.select({
+    total: count(),
+    withFullText: sql<number>`count(case when ${citationContent.fullText} is not null then 1 end)`,
+    withPreview: sql<number>`count(case when ${citationContent.fullTextPreview} is not null then 1 end)`,
+    okCount: sql<number>`count(case when ${citationContent.httpStatus} = 200 then 1 end)`,
+    deadCount: sql<number>`count(case when ${citationContent.httpStatus} >= 400 then 1 end)`,
+    avgContentLength: avg(citationContent.contentLength),
+  }).from(citationContent);
+
+  const r = rows[0];
+  return c.json({
+    total: r.total,
+    withFullText: Number(r.withFullText),
+    withPreview: Number(r.withPreview),
+    coverage: r.total > 0 ? Math.round((Number(r.withFullText) / r.total) * 100) : 0,
+    okCount: Number(r.okCount),
+    deadCount: Number(r.deadCount),
+    avgContentLength: r.avgContentLength != null ? Math.round(Number(r.avgContentLength)) : null,
+  });
 });

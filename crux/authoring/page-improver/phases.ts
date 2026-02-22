@@ -7,19 +7,24 @@
  * Individual phase modules:
  *   phases/analyze.ts              — LLM-based page analysis
  *   phases/research.ts             — Web and SCRY research
- *   phases/improve.ts              — Content improvement synthesis
+ *   phases/improve.ts              — Content improvement synthesis (single-pass)
+ *   phases/improve-sections.ts    — Section-level improvement via rewriteSection() (#671)
  *   phases/review.ts               — Quality review
  *   phases/validate.ts             — In-process validation + auto-fixes
  *   phases/gap-fill.ts             — Fix remaining issues from review
  *   phases/triage.ts               — News-based tier auto-selection
+ *   phases/enrich.ts               — Post-improve enrichment (entity-links, fact-refs)
  *   phases/adversarial-review.ts   — Adversarial reviewer (fact density, speculation, gaps)
  *   phases/adversarial-loop.ts     — Re-research feedback loop driven by adversarial review
+ *   phases/citation-audit.ts       — Post-improve citation verification (advisory + gate modes)
  */
 
 export {
   analyzePhase,
   researchPhase,
   improvePhase,
+  improveSectionsPhase,
+  enrichPhase,
   reviewPhase,
   validatePhase,
   gapFillPhase,
@@ -27,3 +32,4 @@ export {
 } from './phases/index.ts';
 
 export { adversarialReviewPhase, adversarialLoopPhase } from './phases/index.ts';
+export { citationAuditPhase, buildAuditorSourceCache } from './phases/index.ts';

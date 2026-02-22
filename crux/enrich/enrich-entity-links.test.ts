@@ -170,6 +170,76 @@ Anthropic is a company.`;
     expect(result.startsWith('<EntityLink id="E22">Anthropic</EntityLink>')).toBe(true);
   });
 
+  it('skips entity name inside markdown link display text', () => {
+    const content = 'Visit [Anthropic](https://anthropic.com) for more info.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // "Anthropic" inside [Anthropic](...) must not be enriched — it would break MDX link syntax
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('skips entity name inside markdown link URL', () => {
+    const content = 'Research at [link](https://example.com/Anthropic/papers).';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('enriches entity name outside markdown link but not inside', () => {
+    const content = 'Anthropic offers research at [their site](https://anthropic.com).';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // The bare "Anthropic" at the start should be linked
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink>');
+    // The markdown link should be untouched
+    expect(result).toContain('[their site](https://anthropic.com)');
+    // Must not produce broken MDX like [<EntityLink...]
+    expect(result).not.toMatch(/\[<EntityLink/);
+  });
+
+  it('links second occurrence when first occurrence is inside a markdown link', () => {
+    const content = 'Visit [Anthropic](https://anthropic.com) to learn about Anthropic\'s research.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // First mention is inside the link (skip range), second bare mention should be linked
+    expect(applied).toBe(1);
+    expect(result).toContain('[Anthropic](https://anthropic.com)');
+    expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink>');
+    expect(result).not.toMatch(/\[<EntityLink/);
+  });
+
+  it('skips entity name inside markdown link with parentheses in URL', () => {
+    const content = 'See [Wikipedia](https://en.wikipedia.org/wiki/Anthropic_(company)) for more.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // "Anthropic" in the URL (inside nested parens) should not be enriched
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
   it('returns only applied replacements (not unapplied LLM proposals)', () => {
     // "DeepMind" is not in the content, so it should not appear in appliedReplacements
     const content = 'Anthropic is an AI safety company.';
@@ -183,5 +253,73 @@ Anthropic is a company.`;
     expect(applied).toBe(1);
     expect(appliedReplacements).toHaveLength(1);
     expect(appliedReplacements[0].entityId).toBe('E22');
+  });
+
+  it('skips text inside markdown links (#672)', () => {
+    const content = 'Read [Anthropic Safety](https://anthropic.com/safety) for details. Anthropic is great.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // The "Anthropic" inside [Anthropic Safety](url) should NOT be linked
+    expect(result).toContain('[Anthropic Safety](https://anthropic.com/safety)');
+    // But the bare "Anthropic" outside the link should be linked
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink> is great');
+  });
+
+  it('skips entity name inside reference-style markdown link [text][ref] (#687)', () => {
+    const content = 'See [Anthropic][1] for more details.\n\n[1]: https://anthropic.com';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // "Anthropic" inside [Anthropic][1] must not be enriched
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('skips numbers in reference-style link definition lines (#687)', () => {
+    const content = 'Anthropic is great.\n\n[1]: https://anthropic.com/research/2024';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: '2024', entityId: 'E99', displayName: '2024' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // "2024" inside the reference definition line must not be enriched
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('enriches entity outside ref-style link but not inside (#687)', () => {
+    const content = 'Anthropic is a company. See [Anthropic site][1].\n\n[1]: https://anthropic.com';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // The bare "Anthropic" at the start should be linked
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink> is a company');
+    // The ref-style link should be untouched
+    expect(result).toContain('[Anthropic site][1]');
+  });
+
+  it('skips text inside MDX comments (#681)', () => {
+    const content = '{/* TODO: add Anthropic details */}\n\nAnthropics main AI safety company.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result } = applyEntityLinkReplacements(content, replacements);
+
+    // The "Anthropic" inside the MDX comment should NOT be linked
+    expect(result).toContain('{/* TODO: add Anthropic details */}');
   });
 });

@@ -286,10 +286,12 @@ async function searchPerplexity(
 // SCRY search (EA Forum + LessWrong)
 // ---------------------------------------------------------------------------
 
+const VALID_SCRY_TABLES = ['mv_eaforum_posts', 'mv_lesswrong_posts'] as const;
+
 async function searchScry(query: string, maxResults: number): Promise<SearchHit[]> {
   const apiKey = getApiKey('SCRY_API_KEY') ?? SCRY_PUBLIC_KEY;
 
-  const tables = ['mv_eaforum_posts', 'mv_lesswrong_posts'];
+  const tables = VALID_SCRY_TABLES;
   const allHits: SearchHit[] = [];
   const seenUrls = new Set<string>();
   const perTable = Math.ceil(maxResults / tables.length);
@@ -307,10 +309,6 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
         body: sql,
         signal: AbortSignal.timeout(15_000),
       });
-
-      if (!response.ok) {
-        throw new Error(`SCRY API error ${response.status}`);
-      }
 
       const data = await response.json() as ScryApiResponse;
 
@@ -566,7 +564,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         url: fetched.url,
         title,
         content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
-        facts: undefined,
+        facts: [],
       });
       continue;
     }
