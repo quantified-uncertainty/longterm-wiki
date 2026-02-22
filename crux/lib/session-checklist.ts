@@ -416,7 +416,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     label: 'Tooling gaps actioned',
     description:
       'Review the gaps listed under `tooling-gaps-found` in Key Decisions. For each: implement now if easy (<1hr). ' +
-      'For harder ones: `pnpm crux issues create "Add validation: <desc>" --label=tooling` — then paste the URL in Key Decisions.',
+      'For harder ones: `pnpm crux issues create "Add validation: <desc>" --label=tooling --model=haiku --criteria="..."` — then paste the URL in Key Decisions.',
     phase: 'ship',
     applicableTypes: 'all',
   },

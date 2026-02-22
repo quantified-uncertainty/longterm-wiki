@@ -896,22 +896,63 @@ describe('issues create — validation', () => {
     expect(result.output).toContain('gpt4');
   });
 
-  it('accepts valid --model values', async () => {
+  it('accepts valid --model values with --criteria', async () => {
     mockGithubApi.mockResolvedValueOnce({ number: 100, html_url: 'https://github.com/test/issues/100', title: 'My issue' });
-    const result = await commands.create(['My issue title'], { model: 'sonnet', problem: 'Something is broken.' });
+    // model:sonnet label apply call
+    mockGithubApi.mockResolvedValueOnce({});
+    mockGithubApi.mockResolvedValueOnce({});
+    const result = await commands.create(['My issue title'], { model: 'sonnet', problem: 'Something is broken.', criteria: 'Fix applied|Tests pass' });
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('#100');
   });
 
-  it('warns when no body provided', async () => {
-    mockGithubApi.mockResolvedValueOnce({ number: 101, html_url: 'https://github.com/test/issues/101', title: 'My issue' });
+  it('fails with exit 1 when --model is missing', async () => {
+    const result = await commands.create(['My issue title'], { criteria: 'Fix applied' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('--model');
+  });
+
+  it('fails with exit 1 when --criteria is missing', async () => {
+    const result = await commands.create(['My issue title'], { model: 'haiku' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('--criteria');
+  });
+
+  it('fails with exit 1 when both --model and --criteria are missing', async () => {
     const result = await commands.create(['My issue title'], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('--model');
+    expect(result.output).toContain('--criteria');
+  });
+
+  it('succeeds with --draft when --model and --criteria are missing', async () => {
+    mockGithubApi.mockResolvedValueOnce({ number: 101, html_url: 'https://github.com/test/issues/101', title: 'My issue' });
+    const result = await commands.create(['My issue title'], { draft: true });
     expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('#101');
+  });
+
+  it('shows warning about missing sections in --draft mode', async () => {
+    mockGithubApi.mockResolvedValueOnce({ number: 102, html_url: 'https://github.com/test/issues/102', title: 'My issue' });
+    const result = await commands.create(['My issue title'], { draft: true });
+    expect(result.exitCode).toBe(0);
+    // In draft mode with no body, should warn about missing fields
     expect(result.output).toContain('No body provided');
+  });
+
+  it('succeeds with raw --body without --model/--criteria', async () => {
+    mockGithubApi.mockResolvedValueOnce({ number: 103, html_url: 'https://github.com/test/issues/103', title: 'Raw body issue' });
+    const longBody = '## Problem\n\nDetailed description of the issue.\n\n## Acceptance Criteria\n\n- [ ] Done\n\n## Recommended Model\n\nHaiku';
+    const result = await commands.create(['Raw body issue'], { body: longBody });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('#103');
   });
 
   it('builds structured body from template args', async () => {
     mockGithubApi.mockResolvedValueOnce({ number: 102, html_url: 'https://github.com/test/issues/102', title: 'Structured issue' });
+    // applyModelLabel: GET label (exists), POST apply label
+    mockGithubApi.mockResolvedValueOnce({});
+    mockGithubApi.mockResolvedValueOnce({});
     const result = await commands.create(['Structured issue'], {
       problem: 'Widget is broken.',
       model: 'haiku',
