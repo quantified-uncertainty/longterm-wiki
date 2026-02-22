@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 #
-# SessionStart hook — ensures the dev environment is ready and surfaces
-# context that saves the agent early orientation turns.
+# SessionStart hook — surfaces context that saves the agent early orientation turns.
 #
-# Runs automatically when a Claude Code session starts.
+# Runs every time a Claude Code session starts (including resume).
 # stdout is injected as context for the Claude session.
 # stderr is shown as progress during setup.
+#
+# Heavy env prep (deps, data layer, git config) lives in .claude/setup.sh,
+# which runs once before launch and is skipped on resume.
 #
 
 set -euo pipefail
@@ -13,45 +15,19 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO_ROOT"
 
-ISSUES=()
 CONTEXT_LINES=()
+WARNINGS=()
 
-# ─── 1. Dependencies ───────────────────────────────────────────────────────────
+# ─── 1. Verify environment (fast checks only) ──────────────────────────────────
 
 if [ ! -d "node_modules" ] || [ ! -d "apps/web/node_modules" ]; then
-  echo "Installing dependencies..." >&2
-  # PUPPETEER_SKIP_DOWNLOAD: Chrome binary download fails in sandboxed environments
-  # and is only needed for screenshot tests, not core development.
-  PUPPETEER_SKIP_DOWNLOAD=1 pnpm install --reporter=silent 2>/dev/null || true
-  if [ -d "node_modules" ] && [ -d "apps/web/node_modules" ]; then
-    echo "Dependencies installed." >&2
-  else
-    ISSUES+=("Dependencies not fully installed. Run: pnpm setup:quick")
-  fi
+  WARNINGS+=("Dependencies not installed. Run: pnpm setup:quick")
+fi
+if [ ! -f "apps/web/src/data/database.json" ]; then
+  WARNINGS+=("Data layer missing. Run: pnpm setup:quick")
 fi
 
-# ─── 2. Data layer ─────────────────────────────────────────────────────────────
-
-if [ ! -f "apps/web/src/data/database.json" ] || [ ! -f "apps/web/src/data/pages.json" ]; then
-  echo "Building data layer..." >&2
-  if (cd apps/web && node --import tsx/esm scripts/build-data.mjs 2>/dev/null); then
-    echo "Data layer built." >&2
-  else
-    ISSUES+=("Data layer build failed. Run: pnpm setup:quick")
-  fi
-fi
-
-# ─── 3. Git hooks path ─────────────────────────────────────────────────────────
-# Ensures the pre-push gate runs on every push. Idempotent.
-
-CURRENT_HOOKS_PATH=$(git config --get core.hooksPath 2>/dev/null || true)
-if [ "$CURRENT_HOOKS_PATH" != ".githooks" ]; then
-  git config core.hooksPath .githooks
-  echo "Set core.hooksPath → .githooks (pre-push gate enabled)." >&2
-fi
-
-# ─── 4. Git state context ──────────────────────────────────────────────────────
-# Saves the agent 2-3 orientation turns.
+# ─── 2. Git state context ──────────────────────────────────────────────────────
 
 BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
 LAST_COMMIT=$(git log --oneline -1 2>/dev/null || echo "no commits")
@@ -62,7 +38,7 @@ if [ "$DIRTY_COUNT" -gt 0 ]; then
   CONTEXT_LINES+=("⚠ Working tree has ${DIRTY_COUNT} uncommitted change(s) — run \`git status\` before committing.")
 fi
 
-# ─── 5. Wiki server connectivity ───────────────────────────────────────────────
+# ─── 3. Wiki server connectivity ───────────────────────────────────────────────
 
 WIKI_SERVER_URL="${LONGTERMWIKI_SERVER_URL:-}"
 if [ -z "$WIKI_SERVER_URL" ]; then
@@ -82,8 +58,7 @@ else
   fi
 fi
 
-# ─── 6. API key checks ─────────────────────────────────────────────────────────
-# Content pipeline sessions need these; surfacing early prevents mid-run failures.
+# ─── 4. API key checks ─────────────────────────────────────────────────────────
 
 MISSING_KEYS=()
 [ -z "${ANTHROPIC_API_KEY:-}" ] && MISSING_KEYS+=("ANTHROPIC_API_KEY")
@@ -94,8 +69,7 @@ if [ ${#MISSING_KEYS[@]} -gt 0 ]; then
   CONTEXT_LINES+=("⚠ Missing API keys: ${MISSING_KEYS[*]} — some crux commands may fail")
 fi
 
-# ─── 7. Issue detection from branch name ────────────────────────────────────────
-# Patterns: claude/issue-605-xxx, claude/resolve-issue-605-xxx
+# ─── 5. Issue detection from branch name ────────────────────────────────────────
 
 ISSUE_NUM=""
 if [[ "$BRANCH" =~ issue[s]?[-_]([0-9]+) ]]; then
@@ -112,10 +86,10 @@ fi
 
 # ─── Output ─────────────────────────────────────────────────────────────────────
 
-if [ ${#ISSUES[@]} -gt 0 ]; then
-  echo "SESSION SETUP ISSUES:"
-  for issue in "${ISSUES[@]}"; do
-    echo "  - $issue"
+if [ ${#WARNINGS[@]} -gt 0 ]; then
+  echo "SESSION SETUP WARNINGS:"
+  for w in "${WARNINGS[@]}"; do
+    echo "  - $w"
   done
 else
   echo "Environment ready."
