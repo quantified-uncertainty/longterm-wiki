@@ -178,7 +178,60 @@ function FootnoteIndicator({ quote, anchor }: { quote: CitationQuote; anchor: HT
   );
 }
 
-/** Enriches the footnote section at the bottom with verification badges */
+/** Verification details block rendered inside a footnote list item */
+function FootnoteVerificationDetail({ quote }: { quote: CitationQuote }) {
+  const config = getVerdictConfig(quote);
+  if (!config) return null;
+
+  const Icon = config.icon;
+  const checkedAt = quote.accuracyCheckedAt || quote.verifiedAt;
+
+  return (
+    <div className="citation-fn-detail">
+      {/* Verdict header */}
+      <div className="flex items-center gap-1.5 mb-1">
+        <Icon className={`w-3 h-3 ${config.iconColor} shrink-0`} />
+        <span className={`text-[11px] font-semibold ${config.color}`}>
+          {config.label}
+        </span>
+        {quote.accuracyScore !== null && (
+          <span className="text-[10px] text-muted-foreground tabular-nums">
+            ({Math.round(quote.accuracyScore * 100)}%)
+          </span>
+        )}
+        {checkedAt && (
+          <span className="text-[10px] text-muted-foreground ml-auto flex items-center gap-0.5">
+            <Clock className="w-2.5 h-2.5" />
+            {formatDate(checkedAt)}
+          </span>
+        )}
+      </div>
+
+      {/* Source title */}
+      {quote.sourceTitle && (
+        <p className="text-[11px] font-medium text-muted-foreground mb-1 line-clamp-1">
+          {quote.sourceTitle}
+        </p>
+      )}
+
+      {/* Supporting quote */}
+      {quote.sourceQuote && (
+        <blockquote className="text-[11px] text-muted-foreground/80 border-l-2 border-border pl-2 my-1 line-clamp-3 italic leading-snug">
+          &ldquo;{quote.sourceQuote}&rdquo;
+        </blockquote>
+      )}
+
+      {/* Issues */}
+      {quote.accuracyIssues && (
+        <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 leading-snug">
+          {quote.accuracyIssues}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Enriches the footnote section at the bottom with verification details */
 function FootnoteSectionEnricher({
   quotes,
   containerRef,
@@ -208,7 +261,14 @@ function FootnoteSectionEnricher({
       const num = parseInt(match[1], 10);
       const quote = quoteMap.get(num);
       if (quote && getVerdictConfig(quote)) {
-        items.push({ element: li, quote });
+        // Create a dedicated container div for the verification detail if not already present
+        let detailContainer = li.querySelector(".citation-fn-detail-container") as HTMLElement | null;
+        if (!detailContainer) {
+          detailContainer = document.createElement("div");
+          detailContainer.className = "citation-fn-detail-container";
+          li.appendChild(detailContainer);
+        }
+        items.push({ element: detailContainer, quote });
       }
     }
     setFootnoteItems(items);
@@ -217,16 +277,8 @@ function FootnoteSectionEnricher({
   return (
     <>
       {footnoteItems.map(({ element, quote }) => {
-        const config = getVerdictConfig(quote);
-        if (!config) return null;
         return createPortal(
-          <span
-            className={`citation-fn-badge ${config.dotColor.replace("bg-", "badge-")}`}
-            title={config.label}
-          >
-            <span className={`inline-block w-1.5 h-1.5 rounded-full ${config.dotColor} mr-1`} />
-            <span className="text-[10px]">{config.label}</span>
-          </span>,
+          <FootnoteVerificationDetail key={`fn-detail-${quote.footnote}`} quote={quote} />,
           element
         );
       })}
