@@ -363,8 +363,11 @@ export async function enrichEntityLinks(
     for (const chunk of chunks) {
       const chunkReplacements = await callLlmForEntityLinks(chunk, entityLookup, accTexts);
 
-      // Filter out entity IDs already linked or proposed in earlier sections
-      const filtered = chunkReplacements.filter(r => !accIds.has(r.entityId));
+      // Filter by BOTH entityId AND displayName to handle LLM errors where the same
+      // entity name is proposed again under a different ID in a later section.
+      const filtered = chunkReplacements.filter(
+        r => !accIds.has(r.entityId) && !accTexts.has(r.displayName),
+      );
 
       replacements.push(...filtered);
 
