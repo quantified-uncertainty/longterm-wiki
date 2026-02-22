@@ -249,7 +249,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
   const totalDuration: string = ((Date.now() - startTime) / 1000).toFixed(1);
 
-  // Write final output
+  // Write final output (preserves CROSS-PAGE CHECK comments for review)
   const finalPath = writeTemp(page.id, 'final.mdx', improvedContent!);
 
   console.log('\n' + '='.repeat(60));
@@ -272,8 +272,11 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     console.log('\nOr review the diff:');
     console.log(`  diff "${filePath}" "${finalPath}"`);
   } else {
-    // Apply changes directly
-    fs.copyFileSync(finalPath, filePath);
+    // Apply changes: strip pipeline review comments before writing to disk (#628)
+    // Comments are preserved in the temp file (finalPath) for review
+    let contentToApply = fs.readFileSync(finalPath, 'utf-8');
+    contentToApply = contentToApply.replace(/\n?{\/\*\s*CROSS-PAGE CHECK[^*]*\*\/}\n?/g, '\n');
+    fs.writeFileSync(filePath, contentToApply);
     console.log(`\nChanges applied to ${filePath}`);
 
     const adversarialNote = adversarialLoopResult

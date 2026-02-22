@@ -16,7 +16,7 @@
 import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
-import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -719,8 +719,8 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  const issueNum = parseInt(args[0], 10);
-  if (!issueNum || isNaN(issueNum)) {
+  const issueNum = parseRequiredInt(args[0]);
+  if (!issueNum) {
     return {
       output: `${c.red}Usage: crux issues start <issue-number>${c.reset}\n`,
       exitCode: 1,
@@ -767,8 +767,8 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  const issueNum = parseInt(args[0], 10);
-  if (!issueNum || isNaN(issueNum)) {
+  const issueNum = parseRequiredInt(args[0]);
+  if (!issueNum) {
     return {
       output: `${c.red}Usage: crux issues done <issue-number> [--pr=URL]${c.reset}\n`,
       exitCode: 1,
@@ -832,8 +832,10 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
 
     for (const issue of inProgress) {
       // Look for a branch reference in comments
+      // Fetch all comments (asc order) so we don't miss old start-comments
+      // on busy issues that have accumulated many comments since (#630)
       const comments = await githubApi<Array<{ body: string; created_at: string }>>(
-        `/repos/${REPO}/issues/${issue.number}/comments?per_page=10&sort=created&direction=desc`
+        `/repos/${REPO}/issues/${issue.number}/comments?per_page=100&sort=created&direction=asc`
       );
 
       // Extract branch name from the start comment pattern
@@ -973,8 +975,8 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  const issueNum = parseInt(args[0], 10);
-  if (!issueNum || isNaN(issueNum)) {
+  const issueNum = parseRequiredInt(args[0]);
+  if (!issueNum) {
     return {
       output: `${c.red}Usage: crux issues close <issue-number> [--reason="..."] [--duplicate=N]${c.reset}\n`,
       exitCode: 1,
@@ -982,7 +984,13 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   const reason = (options.reason as string) || '';
-  const duplicateOf = options.duplicate ? parseInt(options.duplicate as string, 10) : null;
+  const duplicateOf = options.duplicate ? parseRequiredInt(options.duplicate as string) : null;
+  if (options.duplicate && !duplicateOf) {
+    return {
+      output: `${c.red}Invalid --duplicate value: "${options.duplicate}". Must be a positive integer (issue number).${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
 
   // Fetch issue details
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
@@ -1039,14 +1047,65 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
 }
 
 /**
+ * Merge new sections into an existing issue body.
+ * Sections with the same heading (e.g. "## Problem") are replaced in-place.
+ * New sections that don't exist in the original are appended.
+ */
+function mergeSections(existing: string, incoming: string): string {
+  // Split a markdown body into sections keyed by heading
+  function parseSections(text: string): { key: string; raw: string }[] {
+    const sections: { key: string; raw: string }[] = [];
+    const lines = text.split('\n');
+    let currentKey = '';
+    let currentLines: string[] = [];
+
+    for (const line of lines) {
+      const headingMatch = line.match(/^##\s+(.+)/);
+      if (headingMatch) {
+        if (currentKey || currentLines.length > 0) {
+          sections.push({ key: currentKey, raw: currentLines.join('\n') });
+        }
+        currentKey = headingMatch[1].trim().toLowerCase();
+        currentLines = [line];
+      } else {
+        currentLines.push(line);
+      }
+    }
+    if (currentKey || currentLines.length > 0) {
+      sections.push({ key: currentKey, raw: currentLines.join('\n') });
+    }
+    return sections;
+  }
+
+  const existingSections = parseSections(existing);
+  const incomingSections = parseSections(incoming);
+  const existingKeys = new Set(existingSections.map(s => s.key));
+
+  // Replace existing sections that match, collect new ones
+  const result = existingSections.map(section => {
+    const replacement = incomingSections.find(s => s.key && s.key === section.key);
+    return replacement ? replacement.raw : section.raw;
+  });
+
+  // Append sections that don't exist in the original
+  for (const section of incomingSections) {
+    if (section.key && !existingKeys.has(section.key)) {
+      result.push(section.raw);
+    }
+  }
+
+  return result.join('\n\n');
+}
+
+/**
  * Update the body of an existing issue using structured template args.
  */
 async function updateBody(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  const issueNum = parseInt(args[0], 10);
-  if (!issueNum || isNaN(issueNum)) {
+  const issueNum = parseRequiredInt(args[0]);
+  if (!issueNum) {
     return {
       output: `${c.red}Usage: crux issues update-body <issue-number> [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
       exitCode: 1,
@@ -1081,9 +1140,10 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
     };
   }
 
-  // Prepend to existing body (preserving any existing content if present)
+  // Merge sections into existing body: replace existing sections in-place,
+  // append new sections that don't already exist (#622)
   const combinedBody = existingBody
-    ? `${newBody}\n\n---\n\n${existingBody}`
+    ? mergeSections(existingBody, newBody)
     : newBody;
 
   await githubApi(`/repos/${REPO}/issues/${issueNum}`, {
@@ -1132,9 +1192,9 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
 
   let issuesToCheck: Array<{ number: number; title: string; body: string; labels: string[]; url: string }>;
 
-  const singleNum = args[0] ? parseInt(args[0], 10) : null;
+  const singleNum = parseRequiredInt(args[0]);
 
-  if (singleNum && !isNaN(singleNum)) {
+  if (singleNum) {
     // Single issue
     const i = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${singleNum}`);
     if (i.pull_request) {

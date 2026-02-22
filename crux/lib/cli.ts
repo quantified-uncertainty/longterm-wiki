@@ -122,6 +122,16 @@ export function parseIntOpt(val: unknown, fallback: number): number {
 }
 
 /**
+ * Parse a required positive-integer positional arg (e.g. an issue number).
+ * Returns the parsed number, or null if the arg is missing, non-numeric, or <= 0.
+ */
+export function parseRequiredInt(val: string | undefined): number | null {
+  if (!val) return null;
+  const n = parseInt(val, 10);
+  return Number.isNaN(n) || n <= 0 ? null : n;
+}
+
+/**
  * Format duration in human-readable form
  */
 export function formatDuration(ms: number): string {
