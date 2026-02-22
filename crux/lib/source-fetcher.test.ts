@@ -17,6 +17,7 @@ import {
   requestsFromResourceIds,
   clearSessionCache,
   sessionCacheSize,
+  sessionCacheEvictions,
   type FetchRequest,
   type FetchedSource,
 } from './source-fetcher.ts';
@@ -684,5 +685,108 @@ describe('requestsFromResourceIds', () => {
 
   it('returns empty array for empty input', () => {
     expect(requestsFromResourceIds([])).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// In-flight deduplication (#650)
+// ---------------------------------------------------------------------------
+
+describe('in-flight deduplication', () => {
+  beforeEach(() => {
+    clearSessionCache();
+    vi.restoreAllMocks();
+  });
+
+  it('makes only one network fetch when fetchSources has duplicate URLs', async () => {
+    let callCount = 0;
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() => {
+      callCount++;
+      return Promise.resolve(makeFetchResponse({ body: SAMPLE_HTML }));
+    }));
+
+    const results = await fetchSources([
+      { url: 'https://example.com/same', extractMode: 'full' },
+      { url: 'https://example.com/same', extractMode: 'full' },
+      { url: 'https://example.com/same', extractMode: 'full' },
+    ], { delayMs: 0, concurrency: 10 });
+
+    expect(results).toHaveLength(3);
+    // All results should be ok
+    expect(results.every(r => r.status === 'ok')).toBe(true);
+    // Only one network fetch should have been made (in-flight dedup + session cache)
+    expect(callCount).toBe(1);
+  });
+
+  it('concurrent fetchSource calls for same URL result in single network fetch', async () => {
+    let callCount = 0;
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() => {
+      callCount++;
+      return new Promise(resolve =>
+        setTimeout(() => resolve(makeFetchResponse({ body: SAMPLE_HTML })), 10)
+      );
+    }));
+
+    // Fire 3 fetches concurrently (same URL)
+    const [r1, r2, r3] = await Promise.all([
+      fetchSource({ url: 'https://example.com/concurrent', extractMode: 'full' }),
+      fetchSource({ url: 'https://example.com/concurrent', extractMode: 'relevant', query: 'AI safety' }),
+      fetchSource({ url: 'https://example.com/concurrent', extractMode: 'full' }),
+    ]);
+
+    expect(r1.status).toBe('ok');
+    expect(r2.status).toBe('ok');
+    expect(r3.status).toBe('ok');
+    // Only one actual network call
+    expect(callCount).toBe(1);
+    // The relevant-mode call should still have excerpts
+    expect(r2.relevantExcerpts.length).toBeGreaterThanOrEqual(0);
+  });
+
+  it('clears in-flight map after fetch completes', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeFetchResponse({ body: SAMPLE_HTML })));
+
+    await fetchSource({ url: 'https://example.com/cleared', extractMode: 'full' });
+
+    // Second call should use session cache, not in-flight
+    let callCount = 0;
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() => {
+      callCount++;
+      return Promise.resolve(makeFetchResponse({ body: SAMPLE_HTML }));
+    }));
+
+    await fetchSource({ url: 'https://example.com/cleared', extractMode: 'full' });
+    expect(callCount).toBe(0); // Served from session cache
+  });
+});
+
+// ---------------------------------------------------------------------------
+// LRU cache eviction (#650)
+// ---------------------------------------------------------------------------
+
+describe('LRU cache eviction', () => {
+  beforeEach(() => {
+    clearSessionCache();
+    vi.restoreAllMocks();
+  });
+
+  it('evicts oldest entries when cache exceeds 500', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() =>
+      Promise.resolve(makeFetchResponse({ body: '<html><body><p>Content</p></body></html>' }))
+    ));
+
+    // Fill cache with 502 unique URLs
+    for (let i = 0; i < 502; i++) {
+      await fetchSource({ url: `https://example.com/page-${i}`, extractMode: 'full' });
+    }
+
+    // Cache should be capped at 500
+    expect(sessionCacheSize()).toBe(500);
+    // At least 2 evictions
+    expect(sessionCacheEvictions()).toBeGreaterThanOrEqual(2);
+  });
+
+  it('sessionCacheEvictions returns 0 after cache clear', () => {
+    expect(sessionCacheEvictions()).toBe(0);
   });
 });

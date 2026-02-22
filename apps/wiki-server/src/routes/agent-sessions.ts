@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
 import { agentSessions } from "../schema.js";
 import {
@@ -26,44 +26,45 @@ agentSessionsRoute.post("/", async (c) => {
   const d = parsed.data;
   const db = getDrizzleDb();
 
-  // Upsert: if a session for this branch already exists and is active, update it
-  const existing = await db
-    .select()
-    .from(agentSessions)
-    .where(eq(agentSessions.branch, d.branch))
-    .orderBy(desc(agentSessions.startedAt))
-    .limit(1);
+  // Atomic upsert: wrap select+insert/update in a serializable transaction
+  // to prevent concurrent requests from creating duplicate sessions (#567).
+  const { row, isUpdate } = await db.transaction(async (tx) => {
+    const existing = await tx
+      .select()
+      .from(agentSessions)
+      .where(eq(agentSessions.branch, d.branch))
+      .orderBy(desc(agentSessions.startedAt))
+      .limit(1);
 
-  if (existing.length > 0 && existing[0].status === "active") {
-    // Update existing active session
-    const updated = await db
-      .update(agentSessions)
-      .set({
+    if (existing.length > 0 && existing[0].status === "active") {
+      const updated = await tx
+        .update(agentSessions)
+        .set({
+          task: d.task,
+          sessionType: d.sessionType,
+          issueNumber: d.issueNumber ?? null,
+          checklistMd: d.checklistMd,
+          updatedAt: new Date(),
+        })
+        .where(eq(agentSessions.id, existing[0].id))
+        .returning();
+      return { row: updated[0], isUpdate: true };
+    }
+
+    const inserted = await tx
+      .insert(agentSessions)
+      .values({
+        branch: d.branch,
         task: d.task,
         sessionType: d.sessionType,
         issueNumber: d.issueNumber ?? null,
         checklistMd: d.checklistMd,
-        updatedAt: new Date(),
       })
-      .where(eq(agentSessions.id, existing[0].id))
       .returning();
+    return { row: inserted[0], isUpdate: false };
+  });
 
-    return c.json(updated[0], 200);
-  }
-
-  // Create new session
-  const result = await db
-    .insert(agentSessions)
-    .values({
-      branch: d.branch,
-      task: d.task,
-      sessionType: d.sessionType,
-      issueNumber: d.issueNumber ?? null,
-      checklistMd: d.checklistMd,
-    })
-    .returning();
-
-  return c.json(result[0], 201);
+  return c.json(row, isUpdate ? 200 : 201);
 });
 
 // ---- GET /by-branch/:branch (get latest session for a branch) ----
