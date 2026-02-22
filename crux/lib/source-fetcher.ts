@@ -292,9 +292,24 @@ interface FirecrawlResult {
   content: string; // markdown
 }
 
+/** Cached result of firecrawl package availability check. null = unchecked. */
+let firecrawlAvailable: boolean | null = null;
+
 async function fetchWithFirecrawl(url: string): Promise<FirecrawlResult | null> {
   const FIRECRAWL_KEY = getApiKey('FIRECRAWL_KEY');
   if (!FIRECRAWL_KEY) return null;
+
+  // Check package availability once per process to avoid per-URL error spam.
+  if (firecrawlAvailable === null) {
+    try {
+      await import('@mendable/firecrawl-js');
+      firecrawlAvailable = true;
+    } catch {
+      firecrawlAvailable = false;
+      console.warn('[source-fetcher] @mendable/firecrawl-js not installed — Firecrawl disabled. Install with: pnpm add @mendable/firecrawl-js');
+    }
+  }
+  if (!firecrawlAvailable) return null;
 
   try {
     // @ts-expect-error — @mendable/firecrawl-js has no bundled type declarations in crux

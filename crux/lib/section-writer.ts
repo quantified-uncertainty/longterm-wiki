@@ -336,8 +336,11 @@ export function parseGroundedResult(
   const parsed = parseJsonFromLlm<GroundedWriteResponse>(
     raw,
     'section-writer',
-    (rawStr, _err) => ({
-      content: rawStr,
+    (_rawStr, _err) => ({
+      // Preserve the original section content when JSON parsing fails (e.g. truncated
+      // response) rather than writing the raw LLM output (which may contain JSON
+      // structure) to the MDX file.
+      content: request.sectionContent,
       claimMap: [],
       unsourceableClaims: [],
     }),
@@ -347,7 +350,7 @@ export function parseGroundedResult(
   const schemaResult = GroundedWriteResponseSchema.safeParse(parsed);
   const response: GroundedWriteResponse = schemaResult.success
     ? schemaResult.data
-    : { content: parsed?.content ?? raw, claimMap: [], unsourceableClaims: [] };
+    : { content: parsed?.content ?? request.sectionContent, claimMap: [], unsourceableClaims: [] };
 
   // Validate factIds against the source cache.
   //
