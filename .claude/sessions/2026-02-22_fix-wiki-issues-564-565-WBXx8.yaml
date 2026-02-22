@@ -1,0 +1,55 @@
+date: "2026-02-22"
+branch: claude/fix-wiki-issues-564-565-WBXx8
+title: "refactor(jobs): centralize Zod schemas in api-types.ts; fix /fail TOCTOU race"
+summary: |
+  Resolved issues #564 and #565 for the job queue system.
+  Issue #564: Moved all Zod schemas (CreateJobSchema, CreateJobBatchSchema, ListJobsQuerySchema,
+  ClaimJobSchema, CompleteJobSchema, FailJobSchema, SweepJobsSchema) from routes/jobs.ts to
+  api-types.ts, following the existing convention. Exported VALID_JOB_STATUSES, JOBS_MAX_BATCH_SIZE,
+  and STALE_JOB_TIMEOUT_MINUTES constants. Updated crux/lib/wiki-server/jobs.ts to use z.infer<>
+  and z.input<> derived types instead of manually maintained interfaces.
+  Issue #565: Fixed TOCTOU race in POST /:id/fail by replacing SELECT-then-UPDATE with a single
+  atomic UPDATE … CASE WHEN … RETURNING *. Added formatRawJobRow() helper to avoid DRY violation
+  when mapping raw postgres snake_case rows.
+pr: "https://github.com/quantified-uncertainty/longterm-wiki/pull/574"
+model: claude-sonnet-4-6
+duration: "~20 minutes"
+cost: "~$0.50"
+pages: []
+checks:
+  initialized: true
+  type: refactor
+  initiated_at: "2026-02-22T00:31:03.731Z"
+  total: 33
+  completed: 28
+  na: 0
+  skipped: 5
+  items:
+    - read-issue
+    - explore-code
+    - plan-approach
+    - tests-written
+    - no-hardcoded
+    - typescript-used
+    - behavior-unchanged
+    - callers-updated
+    - correctness
+    - paranoid-review
+    - shell-injection
+    - security
+    - no-dead-code
+    - no-dry-violations
+    - full-integration
+    - no-regressions
+    - live-data-test
+    - backward-compatible
+    - ci-coverage
+    - tooling-gaps-found
+    - self-audit-commands
+    - self-audit-files
+    - self-audit-no-fabrication
+    - gate-passes
+    - issue-tracking
+    - no-merge-conflicts
+    - check-recent-merges
+    - tooling-gaps-actioned
