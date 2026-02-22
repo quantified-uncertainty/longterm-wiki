@@ -274,7 +274,7 @@ describe('auditCitations URL status handling', () => {
     expect(mockCallOpenRouter).not.toHaveBeenCalled();
   });
 
-  it('marks citation as url-dead when source status is error', async () => {
+  it('marks citation as unchecked when source status is error', async () => {
     const sourceCache: SourceCache = new Map([
       ['https://example.com/source', makeFetchedSource({ url: 'https://example.com/source', status: 'error', content: '' })],
     ]);
@@ -286,7 +286,7 @@ describe('auditCitations URL status handling', () => {
       delayMs: 0,
     });
 
-    expect(result.citations[0].verdict).toBe('url-dead');
+    expect(result.citations[0].verdict).toBe('unchecked');
   });
 
   it('marks citation as unchecked when source is behind a paywall', async () => {

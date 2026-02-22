@@ -244,7 +244,20 @@ async function resolveSource(
 
   // Fetch if allowed
   if (fetchMissing) {
-    return fetchSource({ url, extractMode: 'full' });
+    try {
+      return await fetchSource({ url, extractMode: 'full' });
+    } catch {
+      // Network-level error (timeout, DNS failure, etc.) — return an error-status
+      // source so the main loop marks the citation as unchecked rather than crashing.
+      return {
+        url,
+        title: '',
+        fetchedAt: new Date().toISOString(),
+        content: '',
+        relevantExcerpts: [],
+        status: 'error',
+      };
+    }
   }
 
   return null;
@@ -318,14 +331,16 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
       continue;
     }
 
-    // Handle: fetch error (network failure, timeout, or unverifiable domain such as social media)
+    // Handle: fetch error (network failure, timeout, or unverifiable domain such as social media).
+    // We use 'unchecked' rather than 'url-dead': the error may be transient, and social-media
+    // domains that are intentionally blocked should not be flagged as dead URLs.
     if (source.status === 'error') {
       citationAudits.push({
         footnoteRef,
         claim,
         sourceUrl: ext.url,
-        verdict: 'url-dead',
-        explanation: `URL could not be fetched (network error, timeout, or unverifiable domain).`,
+        verdict: 'unchecked',
+        explanation: `Source could not be fetched (network error, timeout, or unverifiable domain).`,
       });
       continue;
     }
