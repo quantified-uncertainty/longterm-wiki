@@ -23,7 +23,27 @@ If this session is working on a specific GitHub issue and `--issue` was used in 
 pnpm crux issues start <ISSUE_NUM>
 ```
 
-## Step 3: Present the checklist
+## Step 3: Assemble research context (optional but recommended)
+
+For content sessions (editing a page or working with an entity), gather context upfront to avoid 5-15 separate file reads:
+
+```bash
+# Context for a specific page you'll be editing:
+pnpm crux context for-page <page-id>
+
+# Context for a GitHub issue (finds related pages/entities automatically):
+pnpm crux context for-issue <N>
+
+# Context for an entity:
+pnpm crux context for-entity <entity-id>
+
+# Context for a free-text topic:
+pnpm crux context for-topic "topic description"
+```
+
+Output is saved to `.claude/wip-context.md`. Read it once — it contains page metadata, related pages, backlinks, citation health, entity YAML, and frontmatter.
+
+## Step 4: Present the checklist
 
 Read `.claude/wip-checklist.md` and output it to the user. Highlight any items that seem particularly important or risky for this specific task.
 

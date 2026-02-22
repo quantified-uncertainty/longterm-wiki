@@ -27,6 +27,14 @@ import { createLogger } from '../lib/output.ts';
 import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
+import type {
+  PageDetail,
+  PageSearchResult,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+} from '../lib/wiki-server/page-types.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -43,22 +51,6 @@ function serverUnavailableError(c: ReturnType<typeof createLogger>, result: { er
 // ---------------------------------------------------------------------------
 // search — full-text page search (PostgreSQL tsvector, ranked)
 // ---------------------------------------------------------------------------
-
-interface PageSearchResult {
-  results: Array<{
-    id: string;
-    numericId: string | null;
-    title: string;
-    description: string | null;
-    entityType: string | null;
-    category: string | null;
-    readerImportance: number | null;
-    quality: number | null;
-    score: number;
-  }>;
-  query: string;
-  total: number;
-}
 
 export async function search(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
@@ -243,18 +235,6 @@ export async function facts(args: string[], options: Record<string, unknown>): P
 // related — related pages via graph query
 // ---------------------------------------------------------------------------
 
-interface RelatedResult {
-  entityId: string;
-  related: Array<{
-    id: string;
-    type: string;
-    title: string;
-    score: number;
-    label?: string;
-  }>;
-  total: number;
-}
-
 export async function related(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
@@ -301,19 +281,6 @@ export async function related(args: string[], options: Record<string, unknown>):
 // backlinks — pages that link to this page
 // ---------------------------------------------------------------------------
 
-interface BacklinksResult {
-  targetId: string;
-  backlinks: Array<{
-    id: string;
-    type: string;
-    title: string;
-    relationship?: string;
-    linkType: string;
-    weight: number;
-  }>;
-  total: number;
-}
-
 export async function backlinks(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
@@ -359,26 +326,6 @@ export async function backlinks(args: string[], options: Record<string, unknown>
 // page — full page metadata
 // ---------------------------------------------------------------------------
 
-interface PageDetail {
-  id: string;
-  numericId: string | null;
-  title: string;
-  description: string | null;
-  llmSummary: string | null;
-  category: string | null;
-  subcategory: string | null;
-  entityType: string | null;
-  tags: string | null;
-  quality: number | null;
-  readerImportance: number | null;
-  hallucinationRiskLevel: string | null;
-  hallucinationRiskScore: number | null;
-  contentPlaintext: string | null;
-  wordCount: number | null;
-  lastUpdated: string | null;
-  contentFormat: string | null;
-  syncedAt: string;
-}
 
 export async function page(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
@@ -562,26 +509,6 @@ export async function recentEdits(_args: string[], options: Record<string, unkno
 // ---------------------------------------------------------------------------
 // citations — citation health for a page
 // ---------------------------------------------------------------------------
-
-interface CitationQuote {
-  id: number;
-  pageId: string;
-  footnote: number;
-  url: string | null;
-  claimText: string;
-  sourceQuote: string | null;
-  quoteVerified: boolean;
-  verificationScore: number | null;
-  sourceTitle: string | null;
-  accuracyVerdict: string | null;
-  accuracyScore: number | null;
-}
-
-interface CitationQuotesResult {
-  quotes: CitationQuote[];
-  pageId: string;
-  total: number;
-}
 
 interface BrokenCitationsResult {
   broken: Array<{
