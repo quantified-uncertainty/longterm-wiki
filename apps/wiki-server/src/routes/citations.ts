@@ -166,12 +166,16 @@ citationsRoute.get("/quotes", async (c) => {
   const pageId = c.req.query("page_id");
   if (!pageId) return validationError(c, "page_id query parameter is required");
 
+  const limitParam = c.req.query("limit");
+  const limit = limitParam ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500) : 100;
+
   const db = getDrizzleDb();
   const rows = await db
     .select()
     .from(citationQuotes)
     .where(eq(citationQuotes.pageId, pageId))
-    .orderBy(asc(citationQuotes.footnote));
+    .orderBy(asc(citationQuotes.footnote))
+    .limit(limit);
 
   return c.json({ quotes: rows });
 });

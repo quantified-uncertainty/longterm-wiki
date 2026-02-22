@@ -27,8 +27,9 @@ agentSessionsRoute.post("/", async (c) => {
   const d = parsed.data;
   const db = getDrizzleDb();
 
-  // Atomic upsert: wrap select+insert/update in a serializable transaction
-  // to prevent concurrent requests from creating duplicate sessions (#567).
+  // Atomic upsert: wrap select+insert/update in a transaction.
+  // Note: this uses READ COMMITTED (Drizzle default), not serializable.
+  // Concurrent requests are unlikely in practice (one agent per branch).
   const { row, isUpdate } = await db.transaction(async (tx) => {
     const existing = await tx
       .select()
