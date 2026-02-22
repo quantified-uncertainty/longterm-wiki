@@ -88,4 +88,30 @@ When running inside Claude Code SDK (web sessions), the `CLAUDECODE` env var is 
 
 ---
 
+## Crux / CLI Modules
+
+### Add `process.argv[1]` guard to any module with a top-level `main()` call
+If a crux/validate script calls `main()` at module level (not inside a `__main__`-equivalent guard), it will execute during test imports and cause `process.exit()` side-effects or timing errors. Fix:
+```ts
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}
+```
+Required on any script where `main()` was previously called at the bottom of the file unconditionally.
+
+### SQLite `SUM()` returns null on empty tables
+Use `COALESCE(SUM(col), 0)` for display-facing queries. `SUM()` over zero rows returns SQL `NULL`, not `0`.
+
+---
+
+## Content / Citations
+
+### Pages with footnote definitions but no inline refs produce no quote results
+Some pages list sources as `[^N]: [Title](URL)` at the bottom but never reference `[^N]` inline in the prose. The citation pipeline extracts no quotes from these pages because there's no claim context. Flag these pages for inline-citation cleanup — the sources are there, they just need to be referenced.
+
+### Sandbox blocks most external URL fetches
+Inside Claude Code sandboxed environments, outbound HTTP fetches fail. For citation pipeline runs (`crux citations verify`, `crux citations extract-quotes`), you may need `dangerouslyDisableSandbox: true` when using the Bash tool. This is expected — the sandbox prevents web access by default.
+
+---
+
 _Add new issues below as they're discovered. Group by category._
