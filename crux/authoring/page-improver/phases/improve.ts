@@ -59,6 +59,15 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
     }
   }
 
+  // Guard against LLM truncation: if output is significantly shorter than input,
+  // the LLM likely hit maxTokens and returned incomplete content.
+  const inputWords = currentContent.split(/\s+/).length;
+  const outputWords = improvedContent.split(/\s+/).length;
+  if (outputWords < inputWords * 0.5 && inputWords > 200) {
+    log('improve', `⚠ Truncation detected: output (${outputWords} words) < 50% of input (${inputWords} words) — keeping original`);
+    return currentContent;
+  }
+
   // Update lastEdited in frontmatter
   const today = new Date().toISOString().split('T')[0];
   improvedContent = improvedContent.replace(

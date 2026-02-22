@@ -310,6 +310,12 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
         signal: AbortSignal.timeout(15_000),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => '(no body)');
+        console.error(`SCRY ${table}: HTTP ${response.status} — ${errorText.slice(0, 200)}`);
+        continue;
+      }
+
       const data = await response.json() as ScryApiResponse;
 
       for (const row of data.rows ?? []) {
