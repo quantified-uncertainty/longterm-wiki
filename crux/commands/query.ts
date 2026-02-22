@@ -29,14 +29,22 @@ import { getEntity } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
 
 // ---------------------------------------------------------------------------
-// Shared error helper
+// Shared helpers
 // ---------------------------------------------------------------------------
 
 function serverUnavailableError(c: ReturnType<typeof createLogger>, result: { error: string; message: string }): CommandResult {
+  const label = result.error === 'timeout' ? 'request timed out' : 'not available';
   return {
-    output: `${c.colors.red}Error: wiki-server not available (${result.error}): ${result.message}\n  Check LONGTERMWIKI_SERVER_URL is set.${c.colors.reset}`,
+    output: `${c.colors.red}Error: wiki-server ${label} (${result.error}): ${result.message}\n  Check LONGTERMWIKI_SERVER_URL is set.${c.colors.reset}`,
     exitCode: 1,
   };
+}
+
+/** Parse an integer CLI option with a fallback; returns fallback on NaN or missing. */
+function parseIntOpt(val: unknown, fallback: number): number {
+  if (val === undefined || val === null || val === true || val === false) return fallback;
+  const n = parseInt(val as string, 10);
+  return Number.isNaN(n) ? fallback : n;
 }
 
 // ---------------------------------------------------------------------------
@@ -68,7 +76,7 @@ export async function search(args: string[], options: Record<string, unknown>): 
     return { output: `${c.red}Error: search query required. Usage: crux query search "topic"${c.reset}`, exitCode: 1 };
   }
 
-  const limit = parseInt((options.limit as string) || '10', 10);
+  const limit = parseIntOpt(options.limit, 10);
   const result = await apiRequest<PageSearchResult>(
     'GET',
     `/api/pages/search?q=${encodeURIComponent(query)}&limit=${limit}`,
@@ -185,7 +193,7 @@ export async function facts(args: string[], options: Record<string, unknown>): P
   }
 
   const measure = options.measure as string | undefined;
-  const limit = parseInt((options.limit as string) || '50', 10);
+  const limit = parseIntOpt(options.limit, 50);
 
   const result = await getFactsByEntity(entityId, limit, 0, measure);
   if (!result.ok) {
@@ -227,7 +235,8 @@ export async function facts(args: string[], options: Record<string, unknown>): P
     }
     const dateStr = f.asOf ? f.asOf.slice(0, 10) : '';
     const note = (f.note || '').slice(0, 40);
-    output += `${label}  ${value.padEnd(20).slice(0, 20)}  ${dateStr.padEnd(10)}  ${note}\n`;
+    const valueCell = value.length > 20 ? value.slice(0, 19) + '…' : value.padEnd(20);
+    output += `${label}  ${valueCell}  ${dateStr.padEnd(10)}  ${note}\n`;
   }
 
   if (total > factList.length) {
@@ -262,7 +271,7 @@ export async function related(args: string[], options: Record<string, unknown>):
     return { output: `${c.red}Error: page ID required. Usage: crux query related <page-id>${c.reset}`, exitCode: 1 };
   }
 
-  const limit = parseInt((options.limit as string) || '15', 10);
+  const limit = parseIntOpt(options.limit, 15);
   const result = await apiRequest<RelatedResult>(
     'GET',
     `/api/links/related/${encodeURIComponent(pageId)}?limit=${limit}`,
@@ -321,7 +330,7 @@ export async function backlinks(args: string[], options: Record<string, unknown>
     return { output: `${c.red}Error: page ID required. Usage: crux query backlinks <page-id>${c.reset}`, exitCode: 1 };
   }
 
-  const limit = parseInt((options.limit as string) || '20', 10);
+  const limit = parseIntOpt(options.limit, 20);
   const result = await apiRequest<BacklinksResult>(
     'GET',
     `/api/links/backlinks/${encodeURIComponent(pageId)}?limit=${limit}`,
@@ -454,28 +463,29 @@ interface SessionPageChangesResult {
   sessions: SessionEntry[];
 }
 
-export async function recentChanges(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+export async function recentChanges(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
 
-  const days = parseInt((options.days as string) || '7', 10);
-  const limit = parseInt((options.limit as string) || '20', 10);
+  const days = parseIntOpt(options.days, 7);
+  const limit = parseIntOpt(options.limit, 20);
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
   const cutoff = cutoffDate.toISOString().slice(0, 10);
 
+  // Pass `since` to server so we get all sessions in the window, not just `limit` most recent
   const result = await apiRequest<SessionPageChangesResult>(
     'GET',
-    `/api/sessions/page-changes?limit=${limit}`,
+    `/api/sessions/page-changes?limit=${limit}&since=${cutoff}`,
   );
 
   if (!result.ok) return serverUnavailableError(log, result);
 
+  const sessions = result.data.sessions;
+
   if (options.json || options.ci) {
     return { output: JSON.stringify(result.data, null, 2), exitCode: 0 };
   }
-
-  const sessions = result.data.sessions.filter((s) => s.date >= cutoff);
 
   if (sessions.length === 0) {
     return { output: `${c.dim}No page changes in the last ${days} day${days !== 1 ? 's' : ''}${c.reset}`, exitCode: 0 };
@@ -514,28 +524,31 @@ interface EditLogAllResult {
   total: number;
 }
 
-export async function recentEdits(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+export async function recentEdits(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
 
-  const days = parseInt((options.days as string) || '7', 10);
-  const limit = parseInt((options.limit as string) || '30', 10);
+  const days = parseIntOpt(options.days, 7);
+  // Cap at 200 to stay well within server's MAX_PAGE_SIZE=1000 even after client-side date filtering
+  const limit = Math.min(parseIntOpt(options.limit, 30), 200);
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
   const cutoff = cutoffDate.toISOString().slice(0, 10);
 
+  // Fetch extra rows to account for date filtering; cap at server's max
+  const fetchLimit = Math.min(limit * 5, 1000);
   const result = await apiRequest<EditLogAllResult>(
     'GET',
-    `/api/edit-logs/all?limit=${limit * 3}&offset=0`,
+    `/api/edit-logs/all?limit=${fetchLimit}&offset=0`,
   );
 
   if (!result.ok) return serverUnavailableError(log, result);
 
-  if (options.json || options.ci) {
-    return { output: JSON.stringify(result.data, null, 2), exitCode: 0 };
-  }
-
   const entries = result.data.entries.filter((e) => e.date >= cutoff).slice(0, limit);
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify({ entries, total: result.data.total }, null, 2), exitCode: 0 };
+  }
 
   if (entries.length === 0) {
     return { output: `${c.dim}No edit log entries in the last ${days} day${days !== 1 ? 's' : ''}${c.reset}`, exitCode: 0 };
@@ -599,7 +612,7 @@ export async function citations(args: string[], options: Record<string, unknown>
   const c = log.colors;
 
   const isBroken = options.broken as boolean;
-  const limit = parseInt((options.limit as string) || '20', 10);
+  const limit = parseIntOpt(options.limit, 20);
 
   // crux query citations --broken [--limit=N]
   if (isBroken) {
@@ -701,14 +714,19 @@ export async function risk(args: string[], options: Record<string, unknown>): Pr
   const c = log.colors;
 
   const level = options.level as string | undefined;
-  const limit = parseInt((options.limit as string) || '20', 10);
+  const limit = parseIntOpt(options.limit, 20);
   const pageId = args.find((a) => !a.startsWith('-'));
 
   if (pageId) {
-    // Single page risk history
+    if (level && !options.json && !options.ci) {
+      // --level is only meaningful for wiki-wide listing, not per-page history
+      process.stderr.write(`${c.dim}Note: --level is ignored when a page ID is given (shows history for that page instead).${c.reset}\n`);
+    }
+    // Single page risk history — use --limit for history depth
+    const historyLimit = Math.min(limit, 50);
     const result = await apiRequest<{ pageId: string; snapshots: Array<{ score: number; level: string; factors: unknown; computedAt: string }> }>(
       'GET',
-      `/api/hallucination-risk/history?page_id=${encodeURIComponent(pageId)}&limit=5`,
+      `/api/hallucination-risk/history?page_id=${encodeURIComponent(pageId)}&limit=${historyLimit}`,
     );
 
     if (!result.ok) return serverUnavailableError(log, result);
