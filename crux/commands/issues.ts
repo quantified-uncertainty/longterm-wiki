@@ -16,7 +16,7 @@
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -309,7 +309,7 @@ function formatIssueRow(issue: RankedIssue, c: Record<string, string>, showScore
 async function list(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
-  const limit = parseInt(options.limit as string || '30', 10);
+  const limit = parseIntOpt(options.limit, 30);
   const showScores = Boolean(options.scores);
 
   const issues = await fetchOpenIssues();

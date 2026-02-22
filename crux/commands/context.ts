@@ -27,7 +27,7 @@ import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
 import type { FactEntry, FactsByEntityResult } from '../lib/wiki-server/facts.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -526,8 +526,7 @@ async function forTopic(
   }
 
   const outputPath = (options.output as string) || DEFAULT_OUTPUT;
-  const parsedLimit = parseInt(String(options.limit ?? '10'), 10);
-  const limit = Math.min(Math.max(1, Number.isNaN(parsedLimit) ? 10 : parsedLimit), 20);
+  const limit = Math.min(Math.max(1, parseIntOpt(options.limit, 10)), 20);
 
   // Search pages and entities in parallel
   const [pageSearchResult, entitySearchResult] = await Promise.all([

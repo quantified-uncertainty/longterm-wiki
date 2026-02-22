@@ -27,7 +27,7 @@ import {
 } from '../lib/wiki-server/jobs.ts';
 import { apiRequest, type ApiResult } from '../lib/wiki-server/client.ts';
 import { getRegisteredTypes } from '../lib/job-handlers/index.ts';
-import type { CommandResult } from '../lib/cli.ts';
+import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -120,7 +120,7 @@ async function list(_args: string[], options: CommandOptions): Promise<CommandRe
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  const limit = parseInt(options.limit as string || '50', 10);
+  const limit = parseIntOpt(options.limit, 50);
 
   const result = await listJobs({
     status: options.status,
