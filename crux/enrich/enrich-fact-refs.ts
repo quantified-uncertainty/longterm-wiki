@@ -387,6 +387,7 @@ Identify hardcoded numbers matching canonical facts and return replacement instr
  * @returns Array of content chunks
  */
 export function buildFactRefChunks(content: string): string[] {
+  if (!content.trim()) return [];
   return splitContentForEnrichment(content);
 }
 

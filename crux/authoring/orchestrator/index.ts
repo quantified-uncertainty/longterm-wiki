@@ -237,7 +237,7 @@ export async function runOrchestratorPipeline(
 
     // Edit log
     appendEditLog(page.id, {
-      tool: 'crux-orchestrator-v2',
+      tool: 'crux-improve',
       agency: 'ai-directed',
       requestedBy: getDefaultRequestedBy(),
       note: directions

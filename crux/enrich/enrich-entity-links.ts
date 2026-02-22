@@ -336,6 +336,7 @@ Identify entity mentions and return replacement instructions as JSON.`;
  * @returns Array of content chunks
  */
 export function buildEnrichmentChunks(content: string): string[] {
+  if (!content.trim()) return [];
   return splitContentForEnrichment(content);
 }
 
@@ -376,7 +377,8 @@ export async function enrichEntityLinks(
     for (const chunk of chunks) {
       const chunkReplacements = await callLlmForEntityLinks(chunk, entityLookup, alreadyLinkedTexts);
 
-      // Filter by already-linked display names and entity IDs (cross-chunk dedup)
+      // Filter by BOTH entityId AND displayName to handle LLM errors where the same
+      // entity name is proposed again under a different ID in a later section.
       const filtered = chunkReplacements.filter(r =>
         !alreadyLinkedTexts.has(r.displayName) && !alreadyLinkedIds.has(r.entityId),
       );

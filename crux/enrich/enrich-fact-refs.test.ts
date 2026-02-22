@@ -437,7 +437,7 @@ describe('buildFactRefChunks', () => {
   it('returns one chunk for preamble-only content without truncation', () => {
     // A page with 8 000 chars and no ## headings — must NOT be truncated
     const content = 'x'.repeat(8000);
-    const chunks = buildFactRefChunks(content, 5500);
+    const chunks = buildFactRefChunks(content);
     expect(chunks.length).toBe(1);
     expect(chunks[0].length).toBe(8000);
   });
