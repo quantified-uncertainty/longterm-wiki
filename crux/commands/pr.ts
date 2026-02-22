@@ -130,15 +130,36 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
 }
 
 /**
- * Detect and auto-fix literal \n sequences in a PR body.
+ * Normalize comma-separated Closes/Fixes/Resolves syntax to one-per-line (#632).
  *
- * Root cause: agents fill PR_BODY using bash double-quoted strings with \n
- * escape sequences. Bash does NOT expand \n in double-quoted strings —
- * it passes literal backslash+n to jq, which serializes them as \\n in JSON.
- * GitHub renders these as visible \n in the PR description.
- *
- * This command fetches the PR for the current branch, checks for literal \n,
- * and patches the body via PATCH /pulls/:number if needed.
+ * GitHub unreliably handles "Closes #1, #2, #3" — often only the first issue
+ * is closed. This rewrites them to the reliable one-per-line format:
+ *   Closes #1
+ *   Closes #2
+ *   Closes #3
+ */
+export function normalizeClosesSyntax(body: string): { result: string; fixed: number } {
+  let fixed = 0;
+  const result = body.replace(
+    /^((?:Closes|Fixes|Resolves)\s+#\d+)(?:(?:,\s*|\s+and\s+)(?:#?\d+))+/gim,
+    (match, _first) => {
+      // Extract the keyword and all issue numbers
+      const keywordMatch = match.match(/^(Closes|Fixes|Resolves)/i);
+      if (!keywordMatch) return match;
+      const keyword = keywordMatch[1];
+      const numbers = [...match.matchAll(/#?(\d+)/g)].map(m => m[1]);
+      if (numbers.length <= 1) return match;
+      fixed++;
+      return numbers.map(n => `${keyword} #${n}`).join('\n');
+    }
+  );
+  return { result, fixed };
+}
+
+/**
+ * Detect and auto-fix issues in a PR body:
+ * 1. Literal \n sequences (from bash double-quoted strings)
+ * 2. Comma-separated Closes/Fixes/Resolves syntax (#632)
  *
  * Exit codes: 0 = clean or fixed, 1 = error (API failure, no token, no PR)
  */
@@ -164,36 +185,42 @@ async function fixBody(args: string[], options: CommandOptions): Promise<Command
   }
 
   const pr = await githubApi<GitHubPR>(`/repos/${REPO}/pulls/${prNum}`);
-  const body = pr.body ?? '';
+  let body = pr.body ?? '';
+  const fixes: string[] = [];
 
-  // Check for literal \n (two characters: backslash + n) that aren't in a code block.
-  // A simple heuristic: if the string contains the two-char sequence \n (not a real newline),
-  // the body was malformed. We detect this by checking the raw string from the API.
-  if (!body.includes('\\n')) {
+  // Fix 1: Literal \n sequences
+  const literalNewlineCount = (body.match(/\\n/g) ?? []).length;
+  if (literalNewlineCount > 0) {
+    body = body.replace(/\\n/g, '\n');
+    fixes.push(`replaced ${literalNewlineCount} literal \\n with real newlines`);
+  }
+
+  // Fix 2: Comma-separated Closes syntax
+  const { result: normalizedBody, fixed: closesFixed } = normalizeClosesSyntax(body);
+  if (closesFixed > 0) {
+    body = normalizedBody;
+    fixes.push(`normalized ${closesFixed} comma-separated Closes line(s) to one-per-line`);
+  }
+
+  if (fixes.length === 0) {
     return {
-      output: `${c.green}✓ PR #${prNum} body looks clean (no literal \\n found).${c.reset}\n`,
+      output: `${c.green}✓ PR #${prNum} body looks clean.${c.reset}\n`,
       exitCode: 0,
     };
   }
 
-  // Count how many literal \n sequences exist for the report
-  const count = (body.match(/\\n/g) ?? []).length;
-
-  log.info(`⚠️  PR #${prNum} body has ${count} literal \\n sequence(s). Auto-fixing...`);
-
-  const fixed = body.replace(/\\n/g, '\n');
-
   await githubApi<GitHubPR>(`/repos/${REPO}/pulls/${prNum}`, {
     method: 'PATCH',
-    body: { body: fixed },
+    body: { body },
   });
 
-  return {
-    output:
-      `${c.green}✓ PR #${prNum} body fixed — replaced ${count} literal \\n with real newlines.${c.reset}\n` +
-      `  ${pr.html_url}\n`,
-    exitCode: 0,
-  };
+  let output = `${c.green}✓ PR #${prNum} body fixed:${c.reset}\n`;
+  for (const f of fixes) {
+    output += `  - ${f}\n`;
+  }
+  output += `  ${pr.html_url}\n`;
+
+  return { output, exitCode: 0 };
 }
 
 // ---------------------------------------------------------------------------

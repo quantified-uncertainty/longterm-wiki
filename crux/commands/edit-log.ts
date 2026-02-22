@@ -90,8 +90,8 @@ export async function list(args: string[], options: Record<string, unknown>): Pr
   }
 
   try {
-    // Fetch enough entries to build a per-page summary
-    const params = new URLSearchParams({ limit: '5000', offset: '0' });
+    // Fetch entries for per-page summary (capped to avoid excessive bandwidth)
+    const params = new URLSearchParams({ limit: '500', offset: '0' });
     if (filterTool) params.set('tool', filterTool);
     if (filterAgency) params.set('agency', filterAgency);
 
@@ -201,7 +201,7 @@ export async function stats(_args: string[], options: Record<string, unknown>): 
   }
 
   output += `\n${c.bold}By Agency:${c.reset}\n`;
-  for (const [agency, cnt] of Object.entries(serverStats.byAgency).sort((a, b) => b[1] - a[1])) {
+  for (const [agency, cnt] of Object.entries(serverStats.byAgency ?? {}).sort((a, b) => b[1] - a[1])) {
     output += `  ${agency.padEnd(18)} ${String(cnt).padStart(5)}\n`;
   }
 
