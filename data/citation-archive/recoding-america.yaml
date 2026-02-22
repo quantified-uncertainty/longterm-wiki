@@ -1,0 +1,106 @@
+pageId: recoding-america
+verifiedAt: 2026-02-22
+totalCitations: 9
+verified: 9
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.recodingamerica.us/
+    linkText: Recoding America official website
+    claimContext: "*Recoding America: Why Government Is Failing in the Digital Age and How We Can Do Better* is a 2023 book by Jennifer Pahlka that examines why government technology projects frequently fail and what these failures reveal about institutional governance. Despite its title focusing on digital systems, P"
+    fetchedAt: 2026-02-22T02:28:03.315Z
+    httpStatus: 200
+    pageTitle: Recoding America
+    contentSnippet: Recoding America 0 Our future depends on our ability to implement > “Jennifer Pahlka has written one of the best policy books I have ever read.” — Ezra Klein, The New York Times While factions fight about policy, it’s delivery we need now. But our government is stuck in a rigid, Industrial-era culture in which policy is disconnected from the details of implementation — how it is delivered to the public. Despite this, creative and courageous public servants are learning how to make a government t
+    contentLength: 211194
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://modernpower.substack.com/p/recoding-america-a-rallying-cry-for
+    linkText: "Recoding America: A Rallying Cry for State Capacity - Modern Power newsletter"
+    claimContext: 'The book has broader implications beyond government IT, connecting to debates about state capacity and, more recently, AI governance. Pahlka has explicitly framed the work as advocating for state capacity, stating in one review: "nowhere in the book do I use the words state capacity, but it is absol'
+    fetchedAt: 2026-02-22T02:28:03.492Z
+    httpStatus: 200
+    pageTitle: "Recoding America: A Rallying Cry for the State Capacity Movement"
+    contentSnippet: "Recoding America: A Rallying Cry for the State Capacity Movement Modern Power Subscribe Sign in Recoding America: A Rallying Cry for the State Capacity Movement (publishing June 2023) Misha David Chellam Feb 14, 2023 18 Share Note: The following is a broad critique of American government. But (1) Government is not monolithic. Nothing said here applies uniformly. There are absolutely innovative pockets of excellence within government. Our goal in all of this State Capacity work is to grow the foo"
+    contentLength: 259463
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.recodingamerica.us/
+    linkText: Recoding America book overview
+    claimContext: A central framework in *Recoding America* is what Pahlka terms "the cascade of rigidity" — the way multiple layers of oversight, compliance requirements, and risk-aversion compound to make government technology projects enormously expensive and slow.[^3] According to her analysis, this rigidity is n
+    fetchedAt: 2026-02-22T02:28:03.346Z
+    httpStatus: 200
+    pageTitle: Recoding America
+    contentSnippet: Recoding America 0 Our future depends on our ability to implement > “Jennifer Pahlka has written one of the best policy books I have ever read.” — Ezra Klein, The New York Times While factions fight about policy, it’s delivery we need now. But our government is stuck in a rigid, Industrial-era culture in which policy is disconnected from the details of implementation — how it is delivered to the public. Despite this, creative and courageous public servants are learning how to make a government t
+    contentLength: 211194
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.niskanencenter.org/ai-meets-the-cascade-of-rigidity/
+    linkText: AI Meets the Cascade of Rigidity - Niskanen Center
+    claimContext: 'This framework has been applied beyond traditional IT to analyze how government might handle emerging technologies. In subsequent writing, Pahlka has explored how "AI meets the cascade of rigidity," examining how the same institutional dynamics that hamper government technology projects will likely '
+    fetchedAt: 2026-02-22T02:28:03.649Z
+    httpStatus: 200
+    pageTitle: AI meets the cascade of rigidity - Niskanen Center
+    contentSnippet: "AI meets the cascade of rigidity - Niskanen Center Studies State Capacity September 26, 2024 AI meets the cascade of rigidity Jennifer Pahlka Share Contents The following essay was originally published in &#8220; The Digitalist Papers: Artificial Intelligence and Democracy in America &#8220;, on September 24th, 2024. This contribution is authored by Jennifer Pahlka 1 , a senior fellow at the Niskanen Center. A quarter of the way into the 21st century, we face multiple, overlapping crises, what A"
+    contentLength: 220490
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://fas.org/publication/pahlka-testifies-ai-govt-services/
+    linkText: Pahlka Testifies on AI in Government Services - Federation of American Scientists
+    claimContext: In January 2024, roughly a year after the book's publication, Pahlka testified before the U.S. Senate specifically connecting her framework to AI governance. She argued that the success or failure of AI in government "comes down to how much capacity and competency we have to deploy these technologie
+    fetchedAt: 2026-02-22T02:28:03.148Z
+    httpStatus: 200
+    pageTitle: FAS Senior Fellow Jen Pahlka testifies on Using AI to Improve Government Services
+    contentSnippet: "FAS Senior Fellow Jen Pahlka testifies on Using AI to Improve Government Services Jennifer Pahlka ( @pahlkadot ) is a FAS Senior Fellow and the author of Recoding America: Why Government is Failing in the Digital Age and How We Can Do Better . Here is Pahlka&#8217;s testimony about artificial intelligence presented today, January 10, 2024, to the full Senate Committee on Homeland Security and Government Affairs hearing on &#8220;Harnessing AI to Improve Government Services and Customer Experienc"
+    contentLength: 104085
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.bluemeridian.org/media/jennifer-pahlka-on-reforming-government-for-the-ai-era/
+    linkText: Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners
+    claimContext: 'Pahlka has framed AI as presenting both an opportunity and a threat in the context of state capacity: "The internet era coincided with a decline in state capacity. The AI era must see a reversal of this trend."[^6] This perspective suggests that the same institutional problems that caused government'
+    fetchedAt: 2026-02-22T02:28:05.358Z
+    httpStatus: 200
+    pageTitle: Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners
+    contentSnippet: Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners --> Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners Skip to content Home News Jennifer Pahlka on Reforming Government for the AI Era Jennifer Pahlka on Reforming Government for the AI Era Media February 10, 2026 &#8220;Jennifer walks us through her career journey, from filing paperwork at a child welfare agency to helping pioneer the U.S. Digital Service in the Obama administration. Sh
+    contentLength: 109872
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://80000hours.org/podcast/episodes/holden-karnofsky-concrete-ai-safety-frontier-ai-companies/
+    linkText: Holden Karnofsky on AI Safety and Frontier AI Companies - 80,000 Hours podcast
+    claimContext: Holden Karnofsky, co-founder of <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, has argued that "there's no way to get to an actual low-level risk from AI without government policy playing an important role."[^7] Similarly, Ezra Klein has suggested that government need
+    fetchedAt: 2026-02-22T02:28:05.227Z
+    httpStatus: 200
+    pageTitle: Holden Karnofsky on dozens of opportunities to make AI safer lying on the table — and all his AGI takes | 80,000 Hours
+    contentSnippet: "Holden Karnofsky on dozens of opportunities to make AI safer lying on the table — and all his AGI takes | 80,000 Hours Search for: On this page: 1 Introduction 1.1 The interview in a nutshell 2 Highlights 3 Articles, books, and other media discussed in the show 4 Transcript 4.1 Cold open [00:00:00] 4.2 Holden is back! [00:02:26] 4.3 An AI Chernobyl we never notice [00:02:56] 4.4 Is rogue AI takeover easy or hard? [00:07:32] 4.5 The AGI race isn't a coordination failure [00:17:48] 4.6 What Holden"
+    contentLength: 548708
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://80000hours.org/podcast/episodes/ezra-klein-ai-and-dc/
+    linkText: Ezra Klein on AI and DC - 80,000 Hours podcast
+    claimContext: Holden Karnofsky, co-founder of <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, has argued that "there's no way to get to an actual low-level risk from AI without government policy playing an important role."[^7] Similarly, Ezra Klein has suggested that government need
+    fetchedAt: 2026-02-22T02:28:05.078Z
+    httpStatus: 200
+    pageTitle: Ezra Klein on existential risk from AI and what DC could do about it | 80,000 Hours
+    contentSnippet: "Ezra Klein on existential risk from AI and what DC could do about it | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 3.1 Cold open [00:00:00] 3.2 Rob's intro [00:00:44] 3.3 The interview begins [00:02:13] 3.4 Tension between people focused on existing AI harms and those focused on future AI harms [00:02:42] 3.5 How to slow down advances in AI capabilities [00:09:27] 3.6 How policy actually gets done [00:22:0"
+    contentLength: 266796
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.recodingamerica.us/
+    linkText: Recoding America official website - About the Fund
+    claimContext: Following the book's publication, the Recoding America Fund was launched to support the mission of reforming government for the digital age.[^9] The broader civic technology movement that the book documents — including Code for America, USDS, 18F, and Nava — represents a practical effort to build go
+    fetchedAt: 2026-02-22T02:28:04.732Z
+    httpStatus: 200
+    pageTitle: Recoding America
+    contentSnippet: Recoding America 0 Our future depends on our ability to implement > “Jennifer Pahlka has written one of the best policy books I have ever read.” — Ezra Klein, The New York Times While factions fight about policy, it’s delivery we need now. But our government is stuck in a rigid, Industrial-era culture in which policy is disconnected from the details of implementation — how it is delivered to the public. Despite this, creative and courageous public servants are learning how to make a government t
+    contentLength: 211194
+    status: verified
+    note: null

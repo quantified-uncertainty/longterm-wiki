@@ -1,0 +1,513 @@
+pageId: cser
+verifiedAt: 2026-02-22
+totalCitations: 46
+verified: 9
+broken: 36
+unverifiable: 1
+citations:
+  - footnote: 1
+    url: https://forum.effectivealtruism.org/topics/centre-for-the-study-of-existential-risk
+    linkText: EA Forum - Centre for the Study of Existential Risk
+    claimContext: The **Centre for the Study of Existential Risk (CSER)** is an interdisciplinary research centre within the University of Cambridge that studies threats capable of causing human extinction or civilizational collapse. Founded in 2012 by philosopher Huw Price, cosmologist Lord Martin Rees, and Skype co
+    fetchedAt: 2026-02-22T02:09:10.032Z
+    httpStatus: 200
+    pageTitle: Centre for the Study of Existential Risk - EA Forum
+    contentSnippet: Centre for the Study of Existential Risk - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Centre for the Study of Existential Risk Edit History Discussion 0 Subscribe Edit History Discussion 0 Centre for the Study of Existential Risk History Funding Further reading External links Related entries Random Topic Contributors 2 Pablo 1 Michael Huang 1 Leo The Centre for the Study of Existen
+    contentLength: 395544
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.cser.ac.uk
+    linkText: CSER Overview - Cambridge
+    claimContext: The **Centre for the Study of Existential Risk (CSER)** is an interdisciplinary research centre within the University of Cambridge that studies threats capable of causing human extinction or civilizational collapse. Founded in 2012 by philosopher Huw Price, cosmologist Lord Martin Rees, and Skype co
+    fetchedAt: 2026-02-22T02:09:10.498Z
+    httpStatus: 200
+    pageTitle: Centre for the Study of Existential Risk
+    contentSnippet: "Centre for the Study of Existential Risk Study at Cambridge About the University Research at Cambridge About Us What we do Our story People Team Join us Our Work Explore our Work Research Themes Education MPhil in Global Risk and Resilience Contact We study existential and global catastrophic risks and foster a worldwide community dedicated to their mitigation Explore our work Meet the team Study with us Latest News & Events See All News CSER news New open online course examines nuclear weapons "
+    contentLength: 67590
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.cser.ac.uk/research
+    linkText: CSER Research Areas
+    claimContext: "CSER's research spans four primary domains: risks from artificial intelligence, extreme technological risks, global catastrophic biological risks, and extreme environmental risks including climate change.[^3] The centre operates through a three-pillar strategy focused on advancing understanding of e"
+    fetchedAt: 2026-02-22T02:09:11.626Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 4
+    url: https://www.cser.ac.uk/about/impact
+    linkText: CSER Impact Strategy
+    claimContext: "CSER's research spans four primary domains: risks from artificial intelligence, extreme technological risks, global catastrophic biological risks, and extreme environmental risks including climate change.[^3] The centre operates through a three-pillar strategy focused on advancing understanding of e"
+    fetchedAt: 2026-02-22T02:09:11.644Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 5
+    url: https://futureoflife.org/grant/centre-for-the-study-of-existential-risk/
+    linkText: Future of Life Institute Grant Announcement
+    claimContext: Hosted within Cambridge's Centre for Research in the Arts, Social Sciences and Humanities (CRASSH), CSER has produced influential research including publications in Nature and other top-tier journals, organized major conferences on catastrophic risk, and advised governments and international organiz
+    fetchedAt: 2026-02-22T02:09:11.721Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 6
+    url: https://www.cser.ac.uk/news/cser-2022-report
+    linkText: CSER 2022 Activities Report
+    claimContext: Hosted within Cambridge's Centre for Research in the Arts, Social Sciences and Humanities (CRASSH), CSER has produced influential research including publications in Nature and other top-tier journals, organized major conferences on catastrophic risk, and advised governments and international organiz
+    fetchedAt: 2026-02-22T02:09:14.320Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 7
+    url: https://www.cser.ac.uk/about/history
+    linkText: CSER Founding History
+    claimContext: CSER was established in 2012 through an unusual collaboration between a philosopher (Huw Price, Bertrand Russell Professor of Philosophy at Cambridge), a scientist (Lord Martin Rees, Astronomer Royal and former President of the Royal Society), and a software entrepreneur (Jaan Tallinn, co-founder of
+    fetchedAt: 2026-02-22T02:09:14.288Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 8
+    url: https://www.effectivealtruism.org/articles/jaan-tallinn-profile
+    linkText: Jaan Tallinn Profile
+    claimContext: CSER was established in 2012 through an unusual collaboration between a philosopher (Huw Price, Bertrand Russell Professor of Philosophy at Cambridge), a scientist (Lord Martin Rees, Astronomer Royal and former President of the Royal Society), and a software entrepreneur (Jaan Tallinn, co-founder of
+    fetchedAt: 2026-02-22T02:09:13.595Z
+    httpStatus: 200
+    pageTitle: Articles | Effective Altruism
+    contentSnippet: "Articles | Effective Altruism Featured articles Recommended readings covering key ideas in effective altruism and related topics. On Caring Nate Soares The world is awful. The world is much better. The world can be much better. Max Roser The big idea: how can we live ethically in a world in crisis Will MacAskill The case for taking AI seriously as a threat to humanity Kelsey Piper This can&#x27;t go on Holden Karnofsky Why experts are terrified of a human-made pandemic, and what we can do to sto"
+    contentLength: 216262
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.cser.ac.uk/about
+    linkText: CSER Mission Statement
+    claimContext: CSER was established in 2012 through an unusual collaboration between a philosopher (Huw Price, Bertrand Russell Professor of Philosophy at Cambridge), a scientist (Lord Martin Rees, Astronomer Royal and former President of the Royal Society), and a software entrepreneur (Jaan Tallinn, co-founder of
+    fetchedAt: 2026-02-22T02:09:14.319Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 10
+    url: https://80000hours.org/podcast/episodes/jaan-tallinn-risks-from-ai/
+    linkText: Jaan Tallinn and Existential Risk
+    claimContext: Jaan Tallinn, who had begun engaging with the existential risk community in 2009, provided seed funding for the centre's establishment.[^10] In its early years (circa 2013), CSER submitted ambitious grant applications including a proposal to the European Research Council for a "New Science of Existe
+    fetchedAt: 2026-02-22T02:09:13.736Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 11
+    url: https://www.cser.ac.uk/about/history#early-years
+    linkText: CSER Early Grant Applications
+    claimContext: Jaan Tallinn, who had begun engaging with the existential risk community in 2009, provided seed funding for the centre's establishment.[^10] In its early years (circa 2013), CSER submitted ambitious grant applications including a proposal to the European Research Council for a "New Science of Existe
+    fetchedAt: 2026-02-22T02:09:16.979Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 12
+    url: https://www.cser.ac.uk/about/funding
+    linkText: CSER Funding History 2015-2018
+    claimContext: By 2015, CSER had secured initial time-limited grants primarily focused on philosophy and social science research, funding operations through mid-2018.[^12] The centre began building expertise to support future science, technology, and AI safety grant applications. During this period, CSER developed
+    fetchedAt: 2026-02-22T02:09:16.846Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 13
+    url: https://www.cser.ac.uk/research/ai-safety
+    linkText: CSER AI Safety Conferences
+    claimContext: By 2015, CSER had secured initial time-limited grants primarily focused on philosophy and social science research, funding operations through mid-2018.[^12] The centre began building expertise to support future science, technology, and AI safety grant applications. During this period, CSER developed
+    fetchedAt: 2026-02-22T02:09:16.826Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 14
+    url: https://maliciousaireport.com/
+    linkText: The Malicious Use of AI Report
+    claimContext: "In 2018, CSER achieved significant recognition with two major publications: *The Malicious Use of Artificial Intelligence: Forecasting, Preventing and Mitigation* (co-authored with tech companies and security think-tanks) and *An AI Race: Rhetoric and Risks*, which won the Best Paper award at the AA"
+    fetchedAt: 2026-02-22T02:09:15.792Z
+    httpStatus: 200
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 114
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.cser.ac.uk/news/appg-future-generations
+    linkText: UK All-Party Parliamentary Group for Future Generations
+    claimContext: "In 2018, CSER achieved significant recognition with two major publications: *The Malicious Use of Artificial Intelligence: Forecasting, Preventing and Mitigation* (co-authored with tech companies and security think-tanks) and *An AI Race: Rhetoric and Risks*, which won the Best Paper award at the AA"
+    fetchedAt: 2026-02-22T02:09:20.660Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 16
+    url: https://www.cser.ac.uk/news/leadership-2020
+    linkText: CSER Leadership Changes 2020
+    claimContext: "In April 2020, Dr. Catherine Rhodes took on the role of Executive Director, with Dr. Seán Ó hÉigeartaigh serving as Co-Director.[^16] The centre's research output accelerated significantly: in 2022 alone, CSER produced 24 publications including papers in *Nature*, *Nature Sustainability*, and *Proce"
+    fetchedAt: 2026-02-22T02:09:23.472Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 17
+    url: https://www.pnas.org/doi/10.1073/pnas.2108146119
+    linkText: Climate Endgame Paper - PNAS
+    claimContext: "In April 2020, Dr. Catherine Rhodes took on the role of Executive Director, with Dr. Seán Ó hÉigeartaigh serving as Co-Director.[^16] The centre's research output accelerated significantly: in 2022 alone, CSER produced 24 publications including papers in *Nature*, *Nature Sustainability*, and *Proce"
+    fetchedAt: 2026-02-22T02:09:23.013Z
+    httpStatus: 200
+    pageTitle: PNAS
+    contentSnippet: PNAS Sign up for the PNAS Highlights newsletter Get in-depth science stories sent to your inbox twice a month. Email address Subscribe Request Username x Close Can't sign in? Forgot your username? Enter your email address below and we will send you your username Email Submit If the address matches an existing account you will receive an email with instructions to retrieve your username Create a new account x Close Email Returning user Submit Login x Close Email * Password * Forgot your password?
+    contentLength: 60608
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://futureoflife.org/grant/centre-for-the-study-of-existential-risk/
+    linkText: FLI Grant to CSER July 2023
+    claimContext: In July 2023, the Future of Life Institute granted \$1 million to the University of Cambridge specifically for CSER, enabling funding for a full five-year position for Professor Matthew Connelly as the centre's new Director.[^18] This was complemented by a multi-million-dollar endowment from Carl Fe
+    fetchedAt: 2026-02-22T02:09:23.851Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 19
+    url: https://www.cambridgeinamerica.org/news/rees-feinberg-professor
+    linkText: Rees Feinberg Professorship Endowment
+    claimContext: In July 2023, the Future of Life Institute granted \$1 million to the University of Cambridge specifically for CSER, enabling funding for a full five-year position for Professor Matthew Connelly as the centre's new Director.[^18] This was complemented by a multi-million-dollar endowment from Carl Fe
+    fetchedAt: 2026-02-22T02:10:12.670Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: unverifiable
+    note: timeout
+  - footnote: 20
+    url: https://www.cser.ac.uk/news/cambridge-conference-2024
+    linkText: Cambridge Conference on Catastrophic Risk 2024
+    claimContext: Recent activities include the Cambridge Conference on Catastrophic Risk (September 2024), which brought together researchers, diplomats, UN representatives, and government officials to discuss emerging risks including biological and technological threats, space warfare, and systemic resilience.[^20]
+    fetchedAt: 2026-02-22T02:09:26.413Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 21
+    url: https://www.cser.ac.uk/research/decision-theory-ai
+    linkText: CSER Decision Theory Conferences
+    claimContext: CSER has been actively engaged in AI safety research since its founding. The centre organized a series of academic conferences on decision theory and AI safety beginning in 2017, exploring the theoretical foundations necessary for developing safe artificial intelligence systems.[^21]
+    fetchedAt: 2026-02-22T02:10:15.589Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 22
+    url: https://maliciousaireport.com/
+    linkText: Malicious AI Report
+    claimContext: "The centre's 2018 report *The Malicious Use of Artificial Intelligence: Forecasting, Preventing and Mitigation*, produced in collaboration with technology companies and security think-tanks, examined how AI could be weaponized for physical attacks, digital security threats, and political disruption."
+    fetchedAt: 2026-02-22T02:10:14.195Z
+    httpStatus: 200
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 114
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.cser.ac.uk/about/policy-engagement
+    linkText: CSER Policy Advisory Work
+    claimContext: CSER researchers have advised multiple governments and international organizations on AI and AGI governance, including consultations with the UN Secretary-General, UK government, EU, and US agencies.[^23] The centre's work emphasizes rigorous, multidisciplinary approaches to AI safety that bridge te
+    fetchedAt: 2026-02-22T02:10:15.702Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 24
+    url: https://www.cser.ac.uk/research/biosecurity
+    linkText: CSER BWC Horizon Scanning
+    claimContext: Managing extreme technological risks, particularly in biotechnology, represents a core research area for CSER. The centre has conducted horizon-scanning work for the Biological Weapons Convention (BWC), identifying emerging biotechnologies that could pose catastrophic risks.[^24] CSER researchers em
+    fetchedAt: 2026-02-22T02:10:15.782Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 25
+    url: https://www.cser.ac.uk/research/technological-risks
+    linkText: Managing Extreme Technological Risks
+    claimContext: Managing extreme technological risks, particularly in biotechnology, represents a core research area for CSER. The centre has conducted horizon-scanning work for the Biological Weapons Convention (BWC), identifying emerging biotechnologies that could pose catastrophic risks.[^24] CSER researchers em
+    fetchedAt: 2026-02-22T02:10:15.530Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 26
+    url: https://www.cser.ac.uk/news/pandemic-advisory-2022
+    linkText: CSER Pandemic Advisory 2022
+    claimContext: During and after the COVID-19 pandemic, CSER significantly expanded its work on pandemic preparedness and biological catastrophic risks. In 2022, the centre advised the World Health Organization (WHO), governments, and international bodies on building resilience against future pandemics.[^26] This w
+    fetchedAt: 2026-02-22T02:10:18.366Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 27
+    url: https://www.pnas.org/doi/10.1073/pnas.2108146119
+    linkText: Climate Endgame Paper - PNAS
+    claimContext: "CSER's 2022 paper \"Climate Endgame: Exploring catastrophic climate change scenarios,\" published in *Proceedings of the National Academies of Science*, examines worst-case climate scenarios that could lead to civilizational collapse or human extinction.[^27] This research challenged the field to take"
+    fetchedAt: 2026-02-22T02:10:17.993Z
+    httpStatus: 200
+    pageTitle: PNAS
+    contentSnippet: PNAS Sign up for the PNAS Highlights newsletter Get in-depth science stories sent to your inbox twice a month. Email address Subscribe Request Username x Close Can't sign in? Forgot your username? Enter your email address below and we will send you your username Email Submit If the address matches an existing account you will receive an email with instructions to retrieve your username Create a new account x Close Email Returning user Submit Login x Close Email * Password * Forgot your password?
+    contentLength: 60608
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.nature.com/articles/d41586-022-00177-4
+    linkText: Volcanic Eruptions Paper - Nature
+    claimContext: The centre also published research on huge volcanic eruptions and the need to prepare for low-probability, high-impact geological events.[^28] CSER's environmental work is supported by funding from the Grantham Foundation for the Protection of the Environment.[^29]
+    fetchedAt: 2026-02-22T02:10:22.891Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 29
+    url: https://www.cser.ac.uk/about/funding
+    linkText: CSER Funding Sources
+    claimContext: The centre also published research on huge volcanic eruptions and the need to prepare for low-probability, high-impact geological events.[^28] CSER's environmental work is supported by funding from the Grantham Foundation for the Protection of the Environment.[^29]
+    fetchedAt: 2026-02-22T02:10:18.405Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 30
+    url: https://www.cser.ac.uk/news/vatican-workshop-climate
+    linkText: Vatican Workshop on Climate
+    claimContext: Martin Rees, CSER's co-founder, co-organized workshops with the Vatican that influenced the 2015 Papal Encyclical on Climate Change and contributed to momentum for the Paris Agreement.[^30]
+    fetchedAt: 2026-02-22T02:10:18.402Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 31
+    url: https://www.cser.ac.uk/research/nuclear-risks
+    linkText: CSER Nuclear Risk Advisory
+    claimContext: CSER researchers have provided analysis and policy advice on nuclear risks, particularly following Russia's invasion of Ukraine. The centre has advised governments on nuclear security, deterrence stability, and the intersection of emerging technologies with nuclear risks.[^31]
+    fetchedAt: 2026-02-22T02:10:25.370Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 32
+    url: https://futureoflife.org/grant/centre-for-the-study-of-existential-risk/
+    linkText: FLI Grant 2023
+    claimContext: CSER has developed a diverse funding base combining philanthropic support, institutional grants, and university integration. Major funding sources include:[^32][^33]
+    fetchedAt: 2026-02-22T02:10:26.163Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 33
+    url: https://www.cser.ac.uk/about/funding
+    linkText: CSER Major Supporters
+    claimContext: CSER has developed a diverse funding base combining philanthropic support, institutional grants, and university integration. Major funding sources include:[^32][^33]
+    fetchedAt: 2026-02-22T02:10:25.413Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 34
+    url: https://www.cser.ac.uk/about/history
+    linkText: Jaan Tallinn Seed Funding
+    claimContext: Jaan Tallinn provided critical seed funding in 2012 that enabled CSER's establishment.[^34]
+    fetchedAt: 2026-02-22T02:10:25.500Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 35
+    url: https://www.cser.ac.uk/news/gsais-partnership-2023
+    linkText: CSER-GSAIS Partnership MoU
+    claimContext: "CSER has established multiple international academic partnerships to expand existential risk research capacity. In 2018, the centre signed a Memorandum of Understanding with the Graduate School of Advanced Integrated Studies in Human Survivability (GSAIS) at Kyoto University, extended in 2023. This "
+    fetchedAt: 2026-02-22T02:10:25.442Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 36
+    url: https://www.cser.ac.uk/about/partnerships
+    linkText: CSER Global Risk Project Advisory
+    claimContext: CSER has advised on the establishment of global risk research programs at Australian National University, University of California Los Angeles (UCLA), and the University of Warwick.[^36] The centre has organized two international Cambridge Conferences on Catastrophic Risk and over 30 specialized wor
+    fetchedAt: 2026-02-22T02:10:28.854Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 37
+    url: https://www.cser.ac.uk/events
+    linkText: CSER Conferences and Workshops
+    claimContext: CSER has advised on the establishment of global risk research programs at Australian National University, University of California Los Angeles (UCLA), and the University of Warwick.[^36] The centre has organized two international Cambridge Conferences on Catastrophic Risk and over 30 specialized wor
+    fetchedAt: 2026-02-22T02:10:28.737Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 38
+    url: https://www.youtube.com/c/CSERCambridge
+    linkText: CSER Public Lectures
+    claimContext: CSER maintains an active public engagement program including the CSER Public Lectures series (supported by the Blavatnik Foundation), which has been viewed over 500,000 times online.[^38] The centre's media engagement has been extensive, with research findings regularly covered by major internationa
+    fetchedAt: 2026-02-22T02:10:27.458Z
+    httpStatus: 200
+    pageTitle: CSER Cambridge - YouTube
+    contentSnippet: CSER Cambridge - YouTube About Press Copyright Contact us Creators Advertise Developers Terms Privacy Policy & Safety How YouTube works Test new features &copy; 2026 Google LLC
+    contentLength: 798806
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://forum.effectivealtruism.org/topics/centre-for-the-study-of-existential-risk
+    linkText: EA Forum CSER Topic Page
+    claimContext: Within the effective altruism and existential risk research communities, CSER is viewed as a key academic institution lending rigor and legitimacy to the field. The centre has a dedicated topic page on the EA Forum, where community members discuss CSER's work and its alignment with effective altruis
+    fetchedAt: 2026-02-22T02:10:27.990Z
+    httpStatus: 200
+    pageTitle: Centre for the Study of Existential Risk - EA Forum
+    contentSnippet: Centre for the Study of Existential Risk - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Centre for the Study of Existential Risk Edit History Discussion 0 Subscribe Edit History Discussion 0 Centre for the Study of Existential Risk History Funding Further reading External links Related entries Random Topic Contributors 2 Pablo 1 Michael Huang 1 Leo The Centre for the Study of Existen
+    contentLength: 395541
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.cser.ac.uk/events/careers-2025
+    linkText: Exploring Careers in Existential Risk Event 2025
+    claimContext: In March 2025, CSER hosted an "Exploring Careers in Existential Risk" event featuring speakers from <EntityLink id="80000-hours">80,000 Hours</EntityLink> and ERA Fellowship, connecting students and early-career researchers with opportunities in the field.[^40] The centre has also developed self-gui
+    fetchedAt: 2026-02-22T02:10:28.752Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 41
+    url: https://www.cser.ac.uk/news/ipcc-ar7-2025
+    linkText: CSER Researchers Join IPCC
+    claimContext: In March 2025, CSER hosted an "Exploring Careers in Existential Risk" event featuring speakers from <EntityLink id="80000-hours">80,000 Hours</EntityLink> and ERA Fellowship, connecting students and early-career researchers with opportunities in the field.[^40] The centre has also developed self-gui
+    fetchedAt: 2026-02-22T02:10:31.541Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 42
+    url: https://www.cser.ac.uk/research/field-review
+    linkText: Existential Risk Studies Field Review
+    claimContext: Existential risk studies remains a young, interdisciplinary subfield still developing consensus methodologies.[^42] CSER researchers acknowledge that measuring extreme tail risks and validating models for unprecedented catastrophic events presents fundamental epistemic challenges. The centre's TERRA
+    fetchedAt: 2026-02-22T02:10:31.498Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 43
+    url: https://www.cser.ac.uk/research/terra-limitations
+    linkText: TERRA Database Limitations
+    claimContext: Existential risk studies remains a young, interdisciplinary subfield still developing consensus methodologies.[^42] CSER researchers acknowledge that measuring extreme tail risks and validating models for unprecedented catastrophic events presents fundamental epistemic challenges. The centre's TERRA
+    fetchedAt: 2026-02-22T02:10:31.487Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 44
+    url: https://forum.effectivealtruism.org/posts/gender-xrisk-research
+    linkText: Gender Representation in X-Risk Research
+    claimContext: Research analyzing the broader existential risk field (including CSER-associated publications) has identified underrepresentation of women researchers, aligning with patterns observed in effective altruism-adjacent communities.[^44] While not specific to CSER, this demographic pattern affects the di
+    fetchedAt: 2026-02-22T02:10:30.552Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 45
+    url: https://www.cser.ac.uk/events/long-problems-2025
+    linkText: Long Problems Lecture 2025
+    claimContext: CSER researchers themselves identify significant barriers to effective existential risk mitigation, including short-termism in government decision-making, institutional lag (exemplified by UN Security Council ineffectiveness), and lack of representation for future generations in policy processes.[^4
+    fetchedAt: 2026-02-22T02:10:34.751Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 46
+    url: https://www.cser.ac.uk/research/technological-risks
+    linkText: Managing Extreme Tech Risks
+    claimContext: CSER emphasizes that managing extreme technological risks remains "urgent" but "comparatively neglected" in academia, with governance institutions struggling to keep pace with technological advances in areas like synthetic biology.[^46]
+    fetchedAt: 2026-02-22T02:10:37.220Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404

@@ -1,0 +1,1085 @@
+pageId: eu-ai-act
+verifiedAt: 2026-02-22
+totalCitations: 98
+verified: 97
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.softwareimprovementgroup.com/blog/eu-ai-act-summary/
+    linkText: Software Improvement Group - EU AI Act Summary
+    claimContext: The **EU AI Act** (Regulation (EU) 2024/1689) is the world's first comprehensive legal framework regulating artificial intelligence, representing a landmark attempt to govern AI systems based on their potential risks to safety, fundamental rights, and society.[^1][^2] The regulation adopts a **risk-
+    fetchedAt: 2026-02-22T01:45:38.821Z
+    httpStatus: 200
+    pageTitle: A comprehensive EU AI Act Summary [January 2026 update] - SIG
+    contentSnippet: "A comprehensive EU AI Act Summary [January 2026 update] - SIG Updated: 27-01-2026 Reading time: 5 minutes A comprehensive EU AI Act Summary [Jan 2026 update] Software Improvement Group In this article​ Executive summary Our 2026 AI Boardroom Gap report examines why many organizations struggle to convert their AI ambitions into safe, scalable implementation. One recurring theme is that leaders seek clear, practical guidance on how new AI regulations impact daily AI operations. This article serves"
+    contentLength: 334195
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+    linkText: European Commission - Regulatory Framework for AI
+    claimContext: The **EU AI Act** (Regulation (EU) 2024/1689) is the world's first comprehensive legal framework regulating artificial intelligence, representing a landmark attempt to govern AI systems based on their potential risks to safety, fundamental rights, and society.[^1][^2] The regulation adopts a **risk-
+    fetchedAt: 2026-02-22T01:45:38.283Z
+    httpStatus: 200
+    pageTitle: AI Act | Shaping Europe’s digital future
+    contentSnippet: AI Act | Shaping Europe’s digital future Skip to main content AI Act The AI Act is the first-ever legal framework on AI, which addresses the risks of AI and positions Europe to play a leading role globally. The AI Act (Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence) is the first-ever comprehensive legal framework on AI worldwide. The aim of the rules is to foster trustworthy AI in Europe. For any questions on the AI Act , check out the AI Act Single Information
+    contentLength: 86654
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.ibm.com/think/topics/eu-ai-act
+    linkText: IBM - EU AI Act Topics
+    claimContext: The **EU AI Act** (Regulation (EU) 2024/1689) is the world's first comprehensive legal framework regulating artificial intelligence, representing a landmark attempt to govern AI systems based on their potential risks to safety, fundamental rights, and society.[^1][^2] The regulation adopts a **risk-
+    fetchedAt: 2026-02-22T01:45:38.142Z
+    httpStatus: 200
+    pageTitle: What is the EU AI Act? | IBM
+    contentSnippet: What is the EU AI Act? | IBM Artificial Intelligence What is the Artificial Intelligence Act of the European Union (EU AI Act)? Authors Matt Kosinski Writer Mark Scapicchio Editor, Topics & Insights IBM Think What is the EU AI Act? The Artificial Intelligence Act of the European Union, also known as the EU AI Act or the AI Act, is a law that governs the development and/or use of artificial intelligence (AI) in the European Union (EU). The act takes a risk-based approach to regulation, applying d
+    contentLength: 198462
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.dnv.com/cyber/insights/articles/introduction-to-the-eus-ai-act-what-you-should-know/
+    linkText: DNV - Introduction to the EU's AI Act
+    claimContext: The **EU AI Act** (Regulation (EU) 2024/1689) is the world's first comprehensive legal framework regulating artificial intelligence, representing a landmark attempt to govern AI systems based on their potential risks to safety, fundamental rights, and society.[^1][^2] The regulation adopts a **risk-
+    fetchedAt: 2026-02-22T01:45:38.054Z
+    httpStatus: 200
+    pageTitle: "Introduction to the EU’s AI Act: What you should know"
+    contentSnippet: "Introduction to the EU’s AI Act: What you should know Skip to content This article provides an initial overview of the European Union&#x2019;s Artificial Intelligence Act (AI Act). It outlines key application timelines and explores the potential implications for organizations. SHARE: What is the AI Act? The AI Act is an EU regulation that, in simple terms, is relevant for organizations providing or using AI systems within the EU. Most provisions of the Act are expected to become applicable in Au"
+    contentLength: 93313
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.eyreact.com/when-was-eu-ai-act-passed-complete-ai-act-timeline-guide/
+    linkText: Eyreact - When was EU AI Act passed
+    claimContext: "Originally proposed by the European Commission in April 2021, the Act underwent intense negotiations before political agreement was reached on December 9, 2023.[^5][^6] The regulation entered into force on August 1, 2024, with phased implementation: prohibitions on unacceptable-risk systems took eff"
+    fetchedAt: 2026-02-22T01:45:37.920Z
+    httpStatus: 200
+    pageTitle: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT
+    contentSnippet: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT AI Act Fundamentals When Was EU AI Act Passed? Complete AI Act Timeline Guide October 21, 2025 7 min read Yuliia Habriiel The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The European Council formally approved t
+    contentLength: 46849
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.alexanderthamm.com/en/blog/eu-ai-act-timeline/
+    linkText: Alexander Thamm - EU AI Act Timeline
+    claimContext: "Originally proposed by the European Commission in April 2021, the Act underwent intense negotiations before political agreement was reached on December 9, 2023.[^5][^6] The regulation entered into force on August 1, 2024, with phased implementation: prohibitions on unacceptable-risk systems took eff"
+    fetchedAt: 2026-02-22T01:45:40.935Z
+    httpStatus: 200
+    pageTitle: "The roadmap to the EU AI Act: a detailed guide - Alexander Thamm [at]"
+    contentSnippet: "The roadmap to the EU AI Act: a detailed guide - Alexander Thamm [at] Back to overview The roadmap to the EU AI Act: a detailed guide Published: 23.07.2025 Author: [at] Editorial Team Category: Basics Table of Contents Alexander Thamm GmbH 2024, GAI (Update as of August 2, 2025: Entry into force of governance rules and obligations for GPAI providers, as well as regulations on notifications to authorities and fines.) Artificial intelligence has significantly improved many sectors and industries—s"
+    contentLength: 110427
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://artificialintelligenceact.eu/implementation-timeline/
+    linkText: Artificial Intelligence Act - Implementation Timeline
+    claimContext: "Originally proposed by the European Commission in April 2021, the Act underwent intense negotiations before political agreement was reached on December 9, 2023.[^5][^6] The regulation entered into force on August 1, 2024, with phased implementation: prohibitions on unacceptable-risk systems took eff"
+    fetchedAt: 2026-02-22T01:45:40.283Z
+    httpStatus: 200
+    pageTitle: Implementation Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Implementation Timeline | EU Artificial Intelligence Act 🔔 Alert: The Future of Life Institute (owner of this website) is hiring an EU Policy Lead to spearhead our work on AI Act enforcement and translate our outputs for non-Brussels audiences; Salary up to €135,000/yr | Apply by 30 Nov Implementation Timeline This page lists all of the key dates you need to be aware of relating to the implementation of the EU AI Act. Related resources  Tasks and Responbilities For a summary of all tasks and r"
+    contentLength: 161362
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.dataguard.com/eu-ai-act/timeline
+    linkText: DataGuard - EU AI Act Timeline
+    claimContext: "Originally proposed by the European Commission in April 2021, the Act underwent intense negotiations before political agreement was reached on December 9, 2023.[^5][^6] The regulation entered into force on August 1, 2024, with phased implementation: prohibitions on unacceptable-risk systems took eff"
+    fetchedAt: 2026-02-22T01:45:40.432Z
+    httpStatus: 200
+    pageTitle: "EU AI Act Timeline: Key Compliance Dates & Deadlines Explained"
+    contentSnippet: "EU AI Act Timeline: Key Compliance Dates & Deadlines Explained The EU AI Act came into force in August 2024, triggering a gradual implementation timeline for companies developing, using, or importing AI products. Depending on varied risk levels and supply-chain roles, there are different deadlines to become compliant. Here’s a breakdown of the key dates. The EU AI Act timeline: Who has what deadline to become compliant? The EU AI Act has a staggered implementation timeline. Some companies have u"
+    contentLength: 189099
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://iapp.org/news/a/contentious-areas-in-the-eu-ai-act-trilogues
+    linkText: IAPP - Contentious Areas in the EU AI Act Trilogues
+    claimContext: The regulation has sparked significant controversy, particularly regarding its approach to foundation models. Critics argue it may stifle European AI innovation while supporters contend it provides necessary safeguards and legal certainty. The Act's two-tiered framework for GPAI models—distinguishin
+    fetchedAt: 2026-02-22T01:45:40.692Z
+    httpStatus: 200
+    pageTitle: Contentious areas in the EU AI Act trilogues | IAPP
+    contentSnippet: "Contentious areas in the EU AI Act trilogues | IAPP All News 30 August 2023 Subscribe to Newsletters Advertise with the IAPP Europe AI Governance Enforcement Contentious areas in the EU AI Act trilogues Related stories Notes from the IAPP Canada: The outdated fax remains a modern privacy threat A long, winding road: Oklahoma closes in on comprehensive privacy law Notes from the Asia-Pacific region: AI takes center stage as China rings in the Year of the Horse What makes the Global CBPR Forum an "
+    contentLength: 436953
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://time.com/6338602/eu-ai-regulation-foundation-models/
+    linkText: Time - EU AI Regulation Foundation Models
+    claimContext: The regulation has sparked significant controversy, particularly regarding its approach to foundation models. Critics argue it may stifle European AI innovation while supporters contend it provides necessary safeguards and legal certainty. The Act's two-tiered framework for GPAI models—distinguishin
+    fetchedAt: 2026-02-22T01:45:41.243Z
+    httpStatus: 200
+    pageTitle: E.U.&#x27;s AI Regulation Could Be Softened After Pushback | TIME
+    contentSnippet: E.U.&#x27;s AI Regulation Could Be Softened After Pushback | TIME Tech E.U.’s AI Regulation Could Be Softened After Pushback From Biggest Members ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Will Henshall Loading... The European Parliament building is seen on January 18, 2022, in Brussels, Belgium. The European Parliament building is seen on January 18, 2022, in Brussels, Belgium. Thierry Monasse—Getty Images by Will Henshall Loading... A key aspect of the E.U.’s landmar
+    contentLength: 392340
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.eyreact.com/when-was-eu-ai-act-passed-complete-ai-act-timeline-guide/
+    linkText: Eyreact - When was EU AI Act passed
+    claimContext: The European Commission first proposed the AI Act on **April 21, 2021**, initiating the EU's effort to create comprehensive AI regulation focused on risk-based rules for AI systems.[^11][^12] The proposal was driven by concerns over AI's potential harms and aimed to balance innovation with safety th
+    fetchedAt: 2026-02-22T01:45:42.711Z
+    httpStatus: 200
+    pageTitle: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT
+    contentSnippet: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT AI Act Fundamentals When Was EU AI Act Passed? Complete AI Act Timeline Guide October 21, 2025 7 min read Yuliia Habriiel The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The European Council formally approved t
+    contentLength: 46849
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.alexanderthamm.com/en/blog/eu-ai-act-timeline/
+    linkText: Alexander Thamm - EU AI Act Timeline
+    claimContext: The European Commission first proposed the AI Act on **April 21, 2021**, initiating the EU's effort to create comprehensive AI regulation focused on risk-based rules for AI systems.[^11][^12] The proposal was driven by concerns over AI's potential harms and aimed to balance innovation with safety th
+    fetchedAt: 2026-02-22T01:45:42.576Z
+    httpStatus: 200
+    pageTitle: "The roadmap to the EU AI Act: a detailed guide - Alexander Thamm [at]"
+    contentSnippet: "The roadmap to the EU AI Act: a detailed guide - Alexander Thamm [at] Back to overview The roadmap to the EU AI Act: a detailed guide Published: 23.07.2025 Author: [at] Editorial Team Category: Basics Table of Contents Alexander Thamm GmbH 2024, GAI (Update as of August 2, 2025: Entry into force of governance rules and obligations for GPAI providers, as well as regulations on notifications to authorities and fines.) Artificial intelligence has significantly improved many sectors and industries—s"
+    contentLength: 110427
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: "- **November 29, 2021**: EU Council presidency shared the first compromise text, adjusting rules on social scoring, biometrics, and high-risk AI[^13] - **December 1, 2021**: European Parliament assigned lead negotiators Brando Benifei (S&D, Italy) and Dragoş Tudorache (Renew, Romania)[^14]"
+    fetchedAt: 2026-02-22T01:45:42.320Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: "- **November 29, 2021**: EU Council presidency shared the first compromise text, adjusting rules on social scoring, biometrics, and high-risk AI[^13] - **December 1, 2021**: European Parliament assigned lead negotiators Brando Benifei (S&D, Italy) and Dragoş Tudorache (Renew, Romania)[^14] - **Septe"
+    fetchedAt: 2026-02-22T01:45:42.901Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: "- **December 1, 2021**: European Parliament assigned lead negotiators Brando Benifei (S&D, Italy) and Dragoş Tudorache (Renew, Romania)[^14] - **September 5, 2022**: Parliament's JURI committee adopted its opinion on the AI Act[^15] - **December 6, 2022**: EU Council adopted its general approach for"
+    fetchedAt: 2026-02-22T01:45:42.768Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.alexanderthamm.com/en/blog/eu-ai-act-timeline/
+    linkText: Alexander Thamm - EU AI Act Timeline
+    claimContext: "- **September 5, 2022**: Parliament's JURI committee adopted its opinion on the AI Act[^15] - **December 6, 2022**: EU Council adopted its general approach for negotiations[^16]"
+    fetchedAt: 2026-02-22T01:45:44.234Z
+    httpStatus: 200
+    pageTitle: "The roadmap to the EU AI Act: a detailed guide - Alexander Thamm [at]"
+    contentSnippet: "The roadmap to the EU AI Act: a detailed guide - Alexander Thamm [at] Back to overview The roadmap to the EU AI Act: a detailed guide Published: 23.07.2025 Author: [at] Editorial Team Category: Basics Table of Contents Alexander Thamm GmbH 2024, GAI (Update as of August 2, 2025: Entry into force of governance rules and obligations for GPAI providers, as well as regulations on notifications to authorities and fines.) Artificial intelligence has significantly improved many sectors and industries—s"
+    contentLength: 110427
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://ai-regulation.com/regulating-foundation-models-in-the-ai-act-from-high-to-systemic-risk/
+    linkText: AI Regulation - Regulating Foundation Models in the AI Act
+    claimContext: "Foundation models became highly controversial during the legislative process, marking a significant shift from the initial 2021 Commission proposal, which had focused on risk-based categorization of AI applications rather than regulating the models themselves.[^17] The emergence of powerful systems "
+    fetchedAt: 2026-02-22T01:45:45.199Z
+    httpStatus: 200
+    pageTitle: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI"
+    contentSnippet: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI Skip to content Articles Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk Cornelia Kutterer January 11, 2024 This article delves into the EU&#8217;s groundbreaking rules for general-purpose AI (GPAI) models, as outlined in the politically agreed-upon AI Act on December 8th. It scrutinizes key questions, including whether this approach deviates from the original risk-based proposal, navigat"
+    contentLength: 296595
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: "The European Parliament introduced formal provisions on foundation models in **June 2023** when it adopted its negotiating position.[^18] This set up a fundamental conflict:"
+    fetchedAt: 2026-02-22T01:45:43.974Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://iapp.org/news/a/contentious-areas-in-the-eu-ai-act-trilogues
+    linkText: IAPP - Contentious Areas in the EU AI Act Trilogues
+    claimContext: "- **Parliament's position**: Advocated for treating foundation models similar to high-risk systems, with quality management systems, EU database registration, and strict obligations[^19] - **Council/Commission position**: Favored lighter regulation through voluntary codes of conduct, with delayed an"
+    fetchedAt: 2026-02-22T01:45:44.577Z
+    httpStatus: 200
+    pageTitle: Contentious areas in the EU AI Act trilogues | IAPP
+    contentSnippet: "Contentious areas in the EU AI Act trilogues | IAPP All News 30 August 2023 Subscribe to Newsletters Advertise with the IAPP Europe AI Governance Enforcement Contentious areas in the EU AI Act trilogues Related stories Notes from the IAPP Canada: The outdated fax remains a modern privacy threat A long, winding road: Oklahoma closes in on comprehensive privacy law Notes from the Asia-Pacific region: AI takes center stage as China rings in the Year of the Horse What makes the Global CBPR Forum an "
+    contentLength: 436953
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://iapp.org/news/a/contentious-areas-in-the-eu-ai-act-trilogues
+    linkText: IAPP - Contentious Areas in the EU AI Act Trilogues
+    claimContext: "- **Parliament's position**: Advocated for treating foundation models similar to high-risk systems, with quality management systems, EU database registration, and strict obligations[^19] - **Council/Commission position**: Favored lighter regulation through voluntary codes of conduct, with delayed an"
+    fetchedAt: 2026-02-22T01:45:44.852Z
+    httpStatus: 200
+    pageTitle: Contentious areas in the EU AI Act trilogues | IAPP
+    contentSnippet: "Contentious areas in the EU AI Act trilogues | IAPP All News 30 August 2023 Subscribe to Newsletters Advertise with the IAPP Europe AI Governance Enforcement Contentious areas in the EU AI Act trilogues Related stories Notes from the IAPP Canada: The outdated fax remains a modern privacy threat A long, winding road: Oklahoma closes in on comprehensive privacy law Notes from the Asia-Pacific region: AI takes center stage as China rings in the Year of the Horse What makes the Global CBPR Forum an "
+    contentLength: 436953
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://artificialintelligenceact.substack.com/p/the-eu-ai-act-newsletter-40-special
+    linkText: Artificial Intelligence Act Newsletter 40
+    claimContext: France, Germany, and Italy emerged as key opponents of strict foundation model regulation, arguing it would harm European AI competitiveness and innovation.[^21] Negotiations broke down in November 2023 as these member states opposed tiered rules for high-impact models developed mostly by non-EU fir
+    fetchedAt: 2026-02-22T01:45:46.615Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI"
+    contentSnippet: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI The EU AI Act Newsletter Subscribe Sign in The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI 08/11/23-15/11/23 Risto Uuk Nov 15, 2023 24 2 2 Share Welcome to the EU AI Act Newsletter , a brief biweekly newsletter by the Future of Life Institute providing you with up-to-date developments and analyses of the proposed EU artificial intelligence law. Legislative Process Accor"
+    contentLength: 206879
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://artificialintelligenceact.substack.com/p/the-eu-ai-act-newsletter-40-special
+    linkText: Artificial Intelligence Act Newsletter 40
+    claimContext: France, Germany, and Italy emerged as key opponents of strict foundation model regulation, arguing it would harm European AI competitiveness and innovation.[^21] Negotiations broke down in November 2023 as these member states opposed tiered rules for high-impact models developed mostly by non-EU fir
+    fetchedAt: 2026-02-22T01:45:46.675Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI"
+    contentSnippet: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI The EU AI Act Newsletter Subscribe Sign in The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI 08/11/23-15/11/23 Risto Uuk Nov 15, 2023 24 2 2 Share Welcome to the EU AI Act Newsletter , a brief biweekly newsletter by the Future of Life Institute providing you with up-to-date developments and analyses of the proposed EU artificial intelligence law. Legislative Process Accor"
+    contentLength: 206879
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.eyreact.com/when-was-eu-ai-act-passed-complete-ai-act-timeline-guide/
+    linkText: Eyreact - When was EU AI Act passed
+    claimContext: "After marathon negotiations, political agreement was expected to be reached in Late 2023.[^23][^24][^23] The compromise distinguished between:"
+    fetchedAt: 2026-02-22T01:45:46.279Z
+    httpStatus: 200
+    pageTitle: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT
+    contentSnippet: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT AI Act Fundamentals When Was EU AI Act Passed? Complete AI Act Timeline Guide October 21, 2025 7 min read Yuliia Habriiel The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The European Council formally approved t
+    contentLength: 46849
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://iapp.org/news/a/contentious-areas-in-the-eu-ai-act-trilogues
+    linkText: IAPP - Contentious Areas in the EU AI Act Trilogues
+    claimContext: "After marathon negotiations, political agreement was expected to be reached in Late 2023.[^23][^24][^23] The compromise distinguished between:"
+    fetchedAt: 2026-02-22T01:45:46.604Z
+    httpStatus: 200
+    pageTitle: Contentious areas in the EU AI Act trilogues | IAPP
+    contentSnippet: "Contentious areas in the EU AI Act trilogues | IAPP All News 30 August 2023 Subscribe to Newsletters Advertise with the IAPP Europe AI Governance Enforcement Contentious areas in the EU AI Act trilogues Related stories Notes from the IAPP Canada: The outdated fax remains a modern privacy threat A long, winding road: Oklahoma closes in on comprehensive privacy law Notes from the Asia-Pacific region: AI takes center stage as China rings in the Year of the Horse What makes the Global CBPR Forum an "
+    contentLength: 436953
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: "- **February 13, 2024**: Parliament committees approved the draft (71-8 vote); EU member states unanimously endorsed[^25] - **February 21, 2024**: European AI Office launched within the Commission to oversee GPAI implementation[^26]"
+    fetchedAt: 2026-02-22T01:45:46.275Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: "- **February 13, 2024**: Parliament committees approved the draft (71-8 vote); EU member states unanimously endorsed[^25] - **February 21, 2024**: European AI Office launched within the Commission to oversee GPAI implementation[^26] - **March 13, 2024**: European Parliament passed the Act (523 for, "
+    fetchedAt: 2026-02-22T01:45:47.750Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.eyreact.com/when-was-eu-ai-act-passed-complete-ai-act-timeline-guide/
+    linkText: Eyreact - When was EU AI Act passed
+    claimContext: "- **February 21, 2024**: European AI Office launched within the Commission to oversee GPAI implementation[^26] - **March 13, 2024**: European Parliament passed the Act (523 for, 46 against, 49 abstentions)[^27] - **May 21, 2024**: European Council formally adopted the regulation[^28]"
+    fetchedAt: 2026-02-22T01:45:47.762Z
+    httpStatus: 200
+    pageTitle: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT
+    contentSnippet: When Was EU AI Act Passed? Complete AI Act Timeline Guide | eyreACT AI Act Fundamentals When Was EU AI Act Passed? Complete AI Act Timeline Guide October 21, 2025 7 min read Yuliia Habriiel The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The EU AI Act was passed by the European Parliament on March 13, 2024, with a decisive vote of 523 for, 46 against, and 49 abstaining. The European Council formally approved t
+    contentLength: 46849
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: "- **March 13, 2024**: European Parliament passed the Act (523 for, 46 against, 49 abstentions)[^27] - **May 21, 2024**: European Council formally adopted the regulation[^28] - **July 12, 2024**: Published in the Official Journal of the European Union[^29]"
+    fetchedAt: 2026-02-22T01:45:48.175Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://artificialintelligenceact.eu/the-act/
+    linkText: Artificial Intelligence Act - The Act
+    claimContext: "- **May 21, 2024**: European Council formally adopted the regulation[^28] - **July 12, 2024**: Published in the Official Journal of the European Union[^29] - **August 1, 2024**: Entered into force[^30]"
+    fetchedAt: 2026-02-22T01:45:48.146Z
+    httpStatus: 200
+    pageTitle: The Act Texts | EU Artificial Intelligence Act
+    contentSnippet: "The Act Texts | EU Artificial Intelligence Act 🔔 Alert: The Future of Life Institute (owner of this website) is hiring an EU Policy Lead to spearhead our work on AI Act enforcement and translate our outputs for non-Brussels audiences; Salary up to €135,000/yr | Apply by 30 Nov The Act Texts Browse the AI Act final draft online using our AI Act Explorer Official Journal (2024) The EU AI Act was published in the Official Journal (OJ) of the European Union on 12 July 2024. This is the final versio"
+    contentLength: 222365
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.softwareimprovementgroup.com/blog/eu-ai-act-summary/
+    linkText: Software Improvement Group - EU AI Act Summary
+    claimContext: "- **July 12, 2024**: Published in the Official Journal of the European Union[^29] - **August 1, 2024**: Entered into force[^30]"
+    fetchedAt: 2026-02-22T01:45:48.957Z
+    httpStatus: 200
+    pageTitle: A comprehensive EU AI Act Summary [January 2026 update] - SIG
+    contentSnippet: "A comprehensive EU AI Act Summary [January 2026 update] - SIG Updated: 27-01-2026 Reading time: 5 minutes A comprehensive EU AI Act Summary [Jan 2026 update] Software Improvement Group In this article​ Executive summary Our 2026 AI Boardroom Gap report examines why many organizations struggle to convert their AI ambitions into safe, scalable implementation. One recurring theme is that leaders seek clear, practical guidance on how new AI regulations impact daily AI operations. This article serves"
+    contentLength: 334195
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.softwareimprovementgroup.com/blog/eu-ai-act-summary/
+    linkText: Software Improvement Group - EU AI Act Summary
+    claimContext: "|------------|----------|--------------|----------| | **Unacceptable** | Social scoring, subliminal manipulation, real-time biometric ID in public (with exceptions), untargeted facial recognition scraping | Complete prohibition | February 2, 2025[^31] | | **High-Risk** | CV-scanning tools, critical "
+    fetchedAt: 2026-02-22T01:45:50.343Z
+    httpStatus: 200
+    pageTitle: A comprehensive EU AI Act Summary [January 2026 update] - SIG
+    contentSnippet: "A comprehensive EU AI Act Summary [January 2026 update] - SIG Updated: 27-01-2026 Reading time: 5 minutes A comprehensive EU AI Act Summary [Jan 2026 update] Software Improvement Group In this article​ Executive summary Our 2026 AI Boardroom Gap report examines why many organizations struggle to convert their AI ambitions into safe, scalable implementation. One recurring theme is that leaders seek clear, practical guidance on how new AI regulations impact daily AI operations. This article serves"
+    contentLength: 334195
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.softwareimprovementgroup.com/blog/eu-ai-act-summary/
+    linkText: Software Improvement Group - EU AI Act Summary
+    claimContext: "| **Unacceptable** | Social scoring, subliminal manipulation, real-time biometric ID in public (with exceptions), untargeted facial recognition scraping | Complete prohibition | February 2, 2025[^31] | | **High-Risk** | CV-scanning tools, critical infrastructure AI, AI in education/employment/law en"
+    fetchedAt: 2026-02-22T01:45:51.026Z
+    httpStatus: 200
+    pageTitle: A comprehensive EU AI Act Summary [January 2026 update] - SIG
+    contentSnippet: "A comprehensive EU AI Act Summary [January 2026 update] - SIG Updated: 27-01-2026 Reading time: 5 minutes A comprehensive EU AI Act Summary [Jan 2026 update] Software Improvement Group In this article​ Executive summary Our 2026 AI Boardroom Gap report examines why many organizations struggle to convert their AI ambitions into safe, scalable implementation. One recurring theme is that leaders seek clear, practical guidance on how new AI regulations impact daily AI operations. This article serves"
+    contentLength: 334195
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.ibm.com/think/topics/eu-ai-act
+    linkText: IBM - EU AI Act Topics
+    claimContext: "| **High-Risk** | CV-scanning tools, critical infrastructure AI, AI in education/employment/law enforcement, product safety systems | Mandatory risk assessments, EU database registration, conformity assessment, CE marking, human oversight, lifecycle monitoring | August 2, 2026[^32] | | **Limited** |"
+    fetchedAt: 2026-02-22T01:45:50.178Z
+    httpStatus: 200
+    pageTitle: What is the EU AI Act? | IBM
+    contentSnippet: What is the EU AI Act? | IBM Artificial Intelligence What is the Artificial Intelligence Act of the European Union (EU AI Act)? Authors Matt Kosinski Writer Mark Scapicchio Editor, Topics & Insights IBM Think What is the EU AI Act? The Artificial Intelligence Act of the European Union, also known as the EU AI Act or the AI Act, is a law that governs the development and/or use of artificial intelligence (AI) in the European Union (EU). The act takes a risk-based approach to regulation, applying d
+    contentLength: 198462
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.ibm.com/think/topics/eu-ai-act
+    linkText: IBM - EU AI Act Topics
+    claimContext: '| **Limited** | Chatbots, <EntityLink id="deepfakes">deepfakes</EntityLink>, emotion recognition systems | Transparency obligations (label AI-generated content, disclose AI interaction) | August 2, 2026[^33] | | **Minimal** | Spam filters, video games, AI-enabled inventory systems | No specific obli'
+    fetchedAt: 2026-02-22T01:45:50.639Z
+    httpStatus: 200
+    pageTitle: What is the EU AI Act? | IBM
+    contentSnippet: What is the EU AI Act? | IBM Artificial Intelligence What is the Artificial Intelligence Act of the European Union (EU AI Act)? Authors Matt Kosinski Writer Mark Scapicchio Editor, Topics & Insights IBM Think What is the EU AI Act? The Artificial Intelligence Act of the European Union, also known as the EU AI Act or the AI Act, is a law that governs the development and/or use of artificial intelligence (AI) in the European Union (EU). The act takes a risk-based approach to regulation, applying d
+    contentLength: 198462
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.softwareimprovementgroup.com/blog/eu-ai-act-summary/
+    linkText: Software Improvement Group - EU AI Act Summary
+    claimContext: The Act bans AI practices deemed to pose unacceptable risks to fundamental rights:[^35][^36]
+    fetchedAt: 2026-02-22T01:45:50.690Z
+    httpStatus: 200
+    pageTitle: A comprehensive EU AI Act Summary [January 2026 update] - SIG
+    contentSnippet: "A comprehensive EU AI Act Summary [January 2026 update] - SIG Updated: 27-01-2026 Reading time: 5 minutes A comprehensive EU AI Act Summary [Jan 2026 update] Software Improvement Group In this article​ Executive summary Our 2026 AI Boardroom Gap report examines why many organizations struggle to convert their AI ambitions into safe, scalable implementation. One recurring theme is that leaders seek clear, practical guidance on how new AI regulations impact daily AI operations. This article serves"
+    contentLength: 334195
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://artificialintelligenceact.eu
+    linkText: Artificial Intelligence Act - Overview
+    claimContext: The Act bans AI practices deemed to pose unacceptable risks to fundamental rights:[^35][^36]
+    fetchedAt: 2026-02-22T01:45:52.247Z
+    httpStatus: 200
+    pageTitle: EU Artificial Intelligence Act | Up-to-date developments and analyses of the EU AI Act
+    contentSnippet: EU Artificial Intelligence Act | Up-to-date developments and analyses of the EU AI Act The EU Artificial Intelligence Act Up-to-date developments and analyses of the EU AI Act AI Act Explorer Browse the full AI Act text online. Search within the Act for parts which are relevant to you. Compliance Checker Discover how the AI Act affects you in 10 minutes by answering some straightforward questions. High-Level Summary Everything you need to know about the AI Act in ten minutes. Small Business Guid
+    contentLength: 306910
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.softwareimprovementgroup.com/blog/eu-ai-act-summary/
+    linkText: Software Improvement Group - EU AI Act Summary
+    claimContext: These prohibitions took effect on **February 2, 2025**, making them the first enforceable provisions of the Act.[^37]
+    fetchedAt: 2026-02-22T01:45:52.407Z
+    httpStatus: 200
+    pageTitle: A comprehensive EU AI Act Summary [January 2026 update] - SIG
+    contentSnippet: "A comprehensive EU AI Act Summary [January 2026 update] - SIG Updated: 27-01-2026 Reading time: 5 minutes A comprehensive EU AI Act Summary [Jan 2026 update] Software Improvement Group In this article​ Executive summary Our 2026 AI Boardroom Gap report examines why many organizations struggle to convert their AI ambitions into safe, scalable implementation. One recurring theme is that leaders seek clear, practical guidance on how new AI regulations impact daily AI operations. This article serves"
+    contentLength: 334195
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.modelop.com/ai-governance/ai-regulations-standards/eu-ai-act
+    linkText: ModelOp - EU AI Act
+    claimContext: The Act regulates **foundation models** under the category of "general-purpose AI" (GPAI) models, defined as AI systems trained on large amounts of data that can perform a wide variety of tasks across different applications.[^38][^39] This includes <EntityLink id="language-models">large language mod
+    fetchedAt: 2026-02-22T01:45:52.690Z
+    httpStatus: 200
+    pageTitle: "EU AI Act: Summary & Compliance Requirements"
+    contentSnippet: "EU AI Act: Summary & Compliance Requirements 🌟 ModelOp Recognized by Gartner® in the 2025 Market Guide for AI Governance Platforms Enterprises trust ModelOp to operationalize AI governance at scale—across ML, GenAI and Agentic AI. Learn More EU AI Act AI Governance Enterprise AI AI Regulations and Standards AI Governance Frameworks AI Governance Tools Show More What is the EU AI Act? Introduced in 2024, the European Union Artificial Intelligence Act (EU AI Act) is the world’s first comprehensiv"
+    contentLength: 145838
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.ibm.com/think/topics/eu-ai-act
+    linkText: IBM - EU AI Act Topics
+    claimContext: The Act regulates **foundation models** under the category of "general-purpose AI" (GPAI) models, defined as AI systems trained on large amounts of data that can perform a wide variety of tasks across different applications.[^38][^39] This includes <EntityLink id="language-models">large language mod
+    fetchedAt: 2026-02-22T01:45:52.232Z
+    httpStatus: 200
+    pageTitle: What is the EU AI Act? | IBM
+    contentSnippet: What is the EU AI Act? | IBM Artificial Intelligence What is the Artificial Intelligence Act of the European Union (EU AI Act)? Authors Matt Kosinski Writer Mark Scapicchio Editor, Topics & Insights IBM Think What is the EU AI Act? The Artificial Intelligence Act of the European Union, also known as the EU AI Act or the AI Act, is a law that governs the development and/or use of artificial intelligence (AI) in the European Union (EU). The act takes a risk-based approach to regulation, applying d
+    contentLength: 198462
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://ai-regulation.com/regulating-foundation-models-in-the-ai-act-from-high-to-systemic-risk/
+    linkText: AI Regulation - Regulating Foundation Models in the AI Act
+    claimContext: GPAI models are regulated separately from application-specific AI systems because of their adaptability across multiple downstream uses, some of which may be high-risk even if the model itself was not designed for those purposes.[^40]
+    fetchedAt: 2026-02-22T01:45:53.280Z
+    httpStatus: 200
+    pageTitle: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI"
+    contentSnippet: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI Skip to content Articles Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk Cornelia Kutterer January 11, 2024 This article delves into the EU&#8217;s groundbreaking rules for general-purpose AI (GPAI) models, as outlined in the politically agreed-upon AI Act on December 8th. It scrutinizes key questions, including whether this approach deviates from the original risk-based proposal, navigat"
+    contentLength: 296595
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://crfm.stanford.edu/2024/08/01/eu-ai-act.html
+    linkText: Stanford CRFM - EU AI Act
+    claimContext: The Act establishes a **two-tier approach** for regulating foundation models, distinguishing between standard GPAI and "systemic risk" GPAI:[^41][^42]
+    fetchedAt: 2026-02-22T01:45:54.672Z
+    httpStatus: 200
+    pageTitle: Stanford CRFM
+    contentSnippet: "Stanford CRFM Foundation Models under the EU AI Act Authors: Rishi Bommasani and Alice Hau and Kevin Klyman and Percy Liang We analyze the EU AI Act by coding the foundation model requirements and comparing them to prior proposals for the Act. The EU AI Act enters into force today: the Act is a watershed moment in the history of AI and technology policy, constituting the first comprehensive legislation on artificial intelligence. The Act is the byproduct of prescience and commitment by the Europ"
+    contentLength: 26629
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://ai-regulation.com/regulating-foundation-models-in-the-ai-act-from-high-to-systemic-risk/
+    linkText: AI Regulation - Regulating Foundation Models in the AI Act
+    claimContext: The Act establishes a **two-tier approach** for regulating foundation models, distinguishing between standard GPAI and "systemic risk" GPAI:[^41][^42]
+    fetchedAt: 2026-02-22T01:45:54.546Z
+    httpStatus: 200
+    pageTitle: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI"
+    contentSnippet: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI Skip to content Articles Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk Cornelia Kutterer January 11, 2024 This article delves into the EU&#8217;s groundbreaking rules for general-purpose AI (GPAI) models, as outlined in the politically agreed-upon AI Act on December 8th. It scrutinizes key questions, including whether this approach deviates from the original risk-based proposal, navigat"
+    contentLength: 296595
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.ibm.com/think/topics/eu-ai-act
+    linkText: IBM - EU AI Act Topics
+    claimContext: Applicable to all general-purpose AI model providers, regardless of size or capability:[^43][^44]
+    fetchedAt: 2026-02-22T01:45:54.441Z
+    httpStatus: 200
+    pageTitle: What is the EU AI Act? | IBM
+    contentSnippet: What is the EU AI Act? | IBM Artificial Intelligence What is the Artificial Intelligence Act of the European Union (EU AI Act)? Authors Matt Kosinski Writer Mark Scapicchio Editor, Topics & Insights IBM Think What is the EU AI Act? The Artificial Intelligence Act of the European Union, also known as the EU AI Act or the AI Act, is a law that governs the development and/or use of artificial intelligence (AI) in the European Union (EU). The act takes a risk-based approach to regulation, applying d
+    contentLength: 198462
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://digital-strategy.ec.europa.eu/en/faqs/general-purpose-ai-models-ai-act-questions-answers
+    linkText: European Commission - GPAI Models FAQ
+    claimContext: Applicable to all general-purpose AI model providers, regardless of size or capability:[^43][^44]
+    fetchedAt: 2026-02-22T01:45:55.049Z
+    httpStatus: 200
+    pageTitle: General-Purpose AI Models in the AI Act – Questions & Answers | Shaping Europe’s digital future
+    contentSnippet: General-Purpose AI Models in the AI Act – Questions & Answers | Shaping Europe’s digital future Skip to main content General-Purpose AI Models in the AI Act – Questions & Answers With this Q&A, the AI Office seeks to facilitate the interpretation of certain provisions of the AI Act. This Q&A does not constitute an official position of the Commission, and it is without prejudice to any decision or position of the Commission. Only the Court of Justice of the European Union is competent to authorit
+    contentLength: 86952
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://crfm.stanford.edu/2024/08/01/eu-ai-act.html
+    linkText: Stanford CRFM - EU AI Act
+    claimContext: Designated based on <EntityLink id="thresholds">compute thresholds</EntityLink> (>10²⁵ FLOPs for training) or Commission assessment of capabilities, market impact, and potential for widespread harm:[^45][^46]
+    fetchedAt: 2026-02-22T01:45:54.721Z
+    httpStatus: 200
+    pageTitle: Stanford CRFM
+    contentSnippet: "Stanford CRFM Foundation Models under the EU AI Act Authors: Rishi Bommasani and Alice Hau and Kevin Klyman and Percy Liang We analyze the EU AI Act by coding the foundation model requirements and comparing them to prior proposals for the Act. The EU AI Act enters into force today: the Act is a watershed moment in the history of AI and technology policy, constituting the first comprehensive legislation on artificial intelligence. The Act is the byproduct of prescience and commitment by the Europ"
+    contentLength: 26629
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://ai-regulation.com/regulating-foundation-models-in-the-ai-act-from-high-to-systemic-risk/
+    linkText: AI Regulation - Regulating Foundation Models in the AI Act
+    claimContext: Designated based on <EntityLink id="thresholds">compute thresholds</EntityLink> (>10²⁵ FLOPs for training) or Commission assessment of capabilities, market impact, and potential for widespread harm:[^45][^46]
+    fetchedAt: 2026-02-22T01:45:56.209Z
+    httpStatus: 200
+    pageTitle: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI"
+    contentSnippet: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI Skip to content Articles Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk Cornelia Kutterer January 11, 2024 This article delves into the EU&#8217;s groundbreaking rules for general-purpose AI (GPAI) models, as outlined in the politically agreed-upon AI Act on December 8th. It scrutinizes key questions, including whether this approach deviates from the original risk-based proposal, navigat"
+    contentLength: 296595
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://www.softwareimprovementgroup.com/blog/eu-ai-act-summary/
+    linkText: Software Improvement Group - EU AI Act Summary
+    claimContext: The EU AI legislation will be made applicable via a phased approach:[^47][^48][^47][^48]
+    fetchedAt: 2026-02-22T01:45:56.442Z
+    httpStatus: 200
+    pageTitle: A comprehensive EU AI Act Summary [January 2026 update] - SIG
+    contentSnippet: "A comprehensive EU AI Act Summary [January 2026 update] - SIG Updated: 27-01-2026 Reading time: 5 minutes A comprehensive EU AI Act Summary [Jan 2026 update] Software Improvement Group In this article​ Executive summary Our 2026 AI Boardroom Gap report examines why many organizations struggle to convert their AI ambitions into safe, scalable implementation. One recurring theme is that leaders seek clear, practical guidance on how new AI regulations impact daily AI operations. This article serves"
+    contentLength: 334195
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://artificialintelligenceact.eu/implementation-timeline/
+    linkText: Artificial Intelligence Act - Implementation Timeline
+    claimContext: The EU AI legislation will be made applicable via a phased approach:[^47][^48][^47][^48]
+    fetchedAt: 2026-02-22T01:45:56.128Z
+    httpStatus: 200
+    pageTitle: Implementation Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Implementation Timeline | EU Artificial Intelligence Act 🔔 Alert: The Future of Life Institute (owner of this website) is hiring an EU Policy Lead to spearhead our work on AI Act enforcement and translate our outputs for non-Brussels audiences; Salary up to €135,000/yr | Apply by 30 Nov Implementation Timeline This page lists all of the key dates you need to be aware of relating to the implementation of the EU AI Act. Related resources  Tasks and Responbilities For a summary of all tasks and r"
+    contentLength: 161362
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://artificialintelligenceact.eu/implementation-timeline/
+    linkText: Artificial Intelligence Act - Implementation Timeline
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:45:56.225Z
+    httpStatus: 200
+    pageTitle: Implementation Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Implementation Timeline | EU Artificial Intelligence Act 🔔 Alert: The Future of Life Institute (owner of this website) is hiring an EU Policy Lead to spearhead our work on AI Act enforcement and translate our outputs for non-Brussels audiences; Salary up to €135,000/yr | Apply by 30 Nov Implementation Timeline This page lists all of the key dates you need to be aware of relating to the implementation of the EU AI Act. Related resources  Tasks and Responbilities For a summary of all tasks and r"
+    contentLength: 161362
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://artificialintelligenceact.substack.com/p/the-eu-ai-act-newsletter-86-concerns
+    linkText: Artificial Intelligence Act Newsletter 86
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:45:56.634Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act Newsletter #86: Concerns Around GPT-5 Compliance"
+    contentSnippet: "The EU AI Act Newsletter #86: Concerns Around GPT-5 Compliance The EU AI Act Newsletter Subscribe Sign in The EU AI Act Newsletter #86: Concerns Around GPT-5 Compliance Concerns have been raised about OpenAI’s compliance with the EU AI Act requirements for its recently released GPT-5 model, particularly regarding the disclosure of training data. Risto Uuk Sep 15, 2025 19 1 2 Share Article voiceover 0:00 -9:05 Audio playback is not supported on your browser. Please upgrade. Welcome to the EU AI A"
+    contentLength: 194852
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.dataguard.com/eu-ai-act/timeline
+    linkText: DataGuard - EU AI Act Timeline
+    claimContext: "- **August 2, 2026**: GPAI obligations take effect for all general-purpose AI models - **August 2, 2027**: Existing GPAI models placed on the market before August 2025 must achieve full compliance[^51]"
+    fetchedAt: 2026-02-22T01:45:58.103Z
+    httpStatus: 200
+    pageTitle: "EU AI Act Timeline: Key Compliance Dates & Deadlines Explained"
+    contentSnippet: "EU AI Act Timeline: Key Compliance Dates & Deadlines Explained The EU AI Act came into force in August 2024, triggering a gradual implementation timeline for companies developing, using, or importing AI products. Depending on varied risk levels and supply-chain roles, there are different deadlines to become compliant. Here’s a breakdown of the key dates. The EU AI Act timeline: Who has what deadline to become compliant? The EU AI Act has a staggered implementation timeline. Some companies have u"
+    contentLength: 189099
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.dataguard.com/eu-ai-act/timeline
+    linkText: DataGuard - EU AI Act Timeline
+    claimContext: New GPAI models released after August 2, 2025 must comply immediately, while existing models receive a two-year grace period.[^52]
+    fetchedAt: 2026-02-22T01:45:58.383Z
+    httpStatus: 200
+    pageTitle: "EU AI Act Timeline: Key Compliance Dates & Deadlines Explained"
+    contentSnippet: "EU AI Act Timeline: Key Compliance Dates & Deadlines Explained The EU AI Act came into force in August 2024, triggering a gradual implementation timeline for companies developing, using, or importing AI products. Depending on varied risk levels and supply-chain roles, there are different deadlines to become compliant. Here’s a breakdown of the key dates. The EU AI Act timeline: Who has what deadline to become compliant? The EU AI Act has a staggered implementation timeline. Some companies have u"
+    contentLength: 189099
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://digital-strategy.ec.europa.eu/en/faqs/navigating-ai-act
+    linkText: European Commission - Navigating AI Act
+    claimContext: "To facilitate compliance, the AI Office developed a voluntary **GPAI Code of Practice** through a multi-stakeholder process involving nearly 1,000 participants.[^53] The code provides guidance on:"
+    fetchedAt: 2026-02-22T01:45:57.763Z
+    httpStatus: 200
+    pageTitle: Navigating the AI Act | Shaping Europe’s digital future
+    contentSnippet: "Navigating the AI Act | Shaping Europe’s digital future Skip to main content Navigating the AI Act These questions and answers detail the AI Act’s goals, governance, enforcement and clarify provisions for high-risk AI systems and general purpose AI models and measures to foster innovation. Scope and objectives Why do we need to regulate the use of Artificial Intelligence? The AI Act is the world's first comprehensive law for AI. It aims to address risks to health, safety and fundamental rights. "
+    contentLength: 119658
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://digital-strategy.ec.europa.eu/en/news/meet-chairs-leading-development-first-general-purpose-ai-code-practice
+    linkText: European Commission - Meet Chairs Leading GPAI Code
+    claimContext: The Chairs and Vice-Chairs were a crucial component of the Code of Practice drafting process:[^54][^55][^54][^55]
+    fetchedAt: 2026-02-22T01:45:58.249Z
+    httpStatus: 200
+    pageTitle: Meet the Chairs leading the development of the first General-Purpose AI Code of Practice | Shaping Europe’s digital future
+    contentSnippet: Meet the Chairs leading the development of the first General-Purpose AI Code of Practice | Shaping Europe’s digital future Skip to main content NEWS ARTICLE Publication 30 September 2024 Meet the Chairs leading the development of the first General-Purpose AI Code of Practice Chairs announced of the four Working Groups of the first General-Purpose AI Code of Practice. Hundreds of participants are set to attend the kick-off Plenary for the development of the first Code of Practice for general-purp
+    contentLength: 54593
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://artificialintelligenceact.eu/introduction-to-code-of-practice/
+    linkText: Artificial Intelligence Act - Code of Practice
+    claimContext: The Chairs and Vice-Chairs were a crucial component of the Code of Practice drafting process:[^54][^55][^54][^55]
+    fetchedAt: 2026-02-22T01:45:57.747Z
+    httpStatus: 200
+    pageTitle: An Introduction to the Code of Practice for General-Purpose AI | EU Artificial Intelligence Act
+    contentSnippet: "An Introduction to the Code of Practice for General-Purpose AI | EU Artificial Intelligence Act An Introduction to the Code of Practice for General-Purpose AI 03 Jul, 2024 Last updated: 14 August 2025. As AI Act implementation gradually unfolds, it is important to understand the different mechanisms of enforcement included in the Regulation. One of the most important is the general-purpose AI Code of Practice, which was developed by the AI Office and a wide range of stakeholders. This summary, d"
+    contentLength: 339373
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://digital-strategy.ec.europa.eu/en/faqs/general-purpose-ai-models-ai-act-questions-answers
+    linkText: European Commission - GPAI Models FAQ
+    claimContext: The Commission and AI Board have confirmed this code as an adequate voluntary compliance tool that may serve as a mitigating factor when determining fines for violations.[^56]
+    fetchedAt: 2026-02-22T01:45:59.411Z
+    httpStatus: 200
+    pageTitle: General-Purpose AI Models in the AI Act – Questions & Answers | Shaping Europe’s digital future
+    contentSnippet: General-Purpose AI Models in the AI Act – Questions & Answers | Shaping Europe’s digital future Skip to main content General-Purpose AI Models in the AI Act – Questions & Answers With this Q&A, the AI Office seeks to facilitate the interpretation of certain provisions of the AI Act. This Q&A does not constitute an official position of the Commission, and it is without prejudice to any decision or position of the Commission. Only the Court of Justice of the European Union is competent to authorit
+    contentLength: 86952
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://technologyquotient.freshfields.com/post/102jc22/eu-ai-act-unpacked-9-who-are-the-regulators-to-enforce-the-ai-act
+    linkText: Freshfields - EU AI Act Unpacked 9
+    claimContext: The **AI Office**, established within the European Commission's Directorate-General for Communication Networks, Content and Technology (DG CNECT), serves as the primary enforcement body for GPAI models.[^57][^58] Launched on February 21, 2024, it became operational for enforcement purposes on August
+    fetchedAt: 2026-02-22T01:46:00.957Z
+    httpStatus: 200
+    pageTitle: "EU AI Act unpacked #9: Who are the regulators to enforce the AI Act?, Christoph Werkmeister, Theresa Ehlen, Lutz Riede, Philipp Roos, Victor Garcia Lopez, Vincent Fischer"
+    contentSnippet: "EU AI Act unpacked #9: Who are the regulators to enforce the AI Act?, Christoph Werkmeister, Theresa Ehlen, Lutz Riede, Philipp Roos, Victor Garcia Lopez, Vincent Fischer This browser is not actively supported anymore. For the best passle experience, we strongly recommend you upgrade your browser. svg.arrow]:ml-2 [&:hover>svg.arrow]:w-4 [&:hover>svg.arrow]:opacity-100 group inline-flex items-center *:aria-disabled:fill-white justify-center whitespace-nowrap text-body-1 leading-none font-normal f"
+    contentLength: 216550
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://www.euronews.com/next/2024/03/19/meet-the-europeans-behind-the-worlds-first-ai-regulation-euronews-tech-talks-podcast
+    linkText: Euronews - Meet the Europeans Behind AI Regulation
+    claimContext: The **AI Office**, established within the European Commission's Directorate-General for Communication Networks, Content and Technology (DG CNECT), serves as the primary enforcement body for GPAI models.[^57][^58] Launched on February 21, 2024, it became operational for enforcement purposes on August
+    fetchedAt: 2026-02-22T01:46:00.325Z
+    httpStatus: 200
+    pageTitle: Meet the Europeans behind the world’s first AI regulation | Euronews Tech Talks Podcast
+    contentSnippet: Meet the Europeans behind the world’s first AI regulation | Euronews Tech Talks Podcast Advertisement By&nbsp Marta Rodriguez Martinez &nbsp&&nbsp Alice Carnevali Published on 19/03/2024 - 13:33 GMT+1 &bull; Updated 02/04/2024 - 15:59 GMT+2 Share Comments Share Facebook Twitter Flipboard Send Reddit Linkedin Messenger Telegram VK Bluesky Threads Whatsapp Finding a balance between protecting fundamental rights and fostering innovation, drafting laws capable of keeping pace with the artificial int
+    contentLength: 418052
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://artificialintelligenceact.eu/developments/
+    linkText: Artificial Intelligence Act - Developments
+    claimContext: The **AI Office**, established within the European Commission's Directorate-General for Communication Networks, Content and Technology (DG CNECT), serves as the primary enforcement body for GPAI models.[^57][^58] Launched on February 21, 2024, it became operational for enforcement purposes on August
+    fetchedAt: 2026-02-22T01:45:59.462Z
+    httpStatus: 200
+    pageTitle: Historic Timeline | EU Artificial Intelligence Act
+    contentSnippet: "Historic Timeline | EU Artificial Intelligence Act Historic Timeline We provide some of the key milestones in the history of the AI Act on this page. If you want to be notified about significant updates to the Act, subscribe to the EU AI Act Newsletter , a biweekly newsletter by the Future of Life Institute. Coming up: The implementation timeline To see all upcoming milestones for the implementation of the Act, see our Implementation Timeline . 2024 12 July 2024 – The AI Act is published in the "
+    contentLength: 208876
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://technologyquotient.freshfields.com/post/102jc22/eu-ai-act-unpacked-9-who-are-the-regulators-to-enforce-the-ai-act
+    linkText: Freshfields - EU AI Act Unpacked 9
+    claimContext: In general, the AI Act is enforced at EU level by the European Commission mainly in form of its so-called AI Office with regard to general-purpose AI (GPAI) and, otherwise, at the level of the EU Member States.[^60]
+    fetchedAt: 2026-02-22T01:46:00.916Z
+    httpStatus: 200
+    pageTitle: "EU AI Act unpacked #9: Who are the regulators to enforce the AI Act?, Christoph Werkmeister, Theresa Ehlen, Lutz Riede, Philipp Roos, Victor Garcia Lopez, Vincent Fischer"
+    contentSnippet: "EU AI Act unpacked #9: Who are the regulators to enforce the AI Act?, Christoph Werkmeister, Theresa Ehlen, Lutz Riede, Philipp Roos, Victor Garcia Lopez, Vincent Fischer This browser is not actively supported anymore. For the best passle experience, we strongly recommend you upgrade your browser. svg.arrow]:ml-2 [&:hover>svg.arrow]:w-4 [&:hover>svg.arrow]:opacity-100 group inline-flex items-center *:aria-disabled:fill-white justify-center whitespace-nowrap text-body-1 leading-none font-normal f"
+    contentLength: 216550
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://digital-strategy.ec.europa.eu/en/faqs/general-purpose-ai-models-ai-act-questions-answers
+    linkText: European Commission - GPAI Models FAQ
+    claimContext: The AI Office has significant enforcement powers:[^61][^61]
+    fetchedAt: 2026-02-22T01:46:02.015Z
+    httpStatus: 200
+    pageTitle: General-Purpose AI Models in the AI Act – Questions & Answers | Shaping Europe’s digital future
+    contentSnippet: General-Purpose AI Models in the AI Act – Questions & Answers | Shaping Europe’s digital future Skip to main content General-Purpose AI Models in the AI Act – Questions & Answers With this Q&A, the AI Office seeks to facilitate the interpretation of certain provisions of the AI Act. This Q&A does not constitute an official position of the Commission, and it is without prejudice to any decision or position of the Commission. Only the Court of Justice of the European Union is competent to authorit
+    contentLength: 86952
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://ai-regulation.com/regulating-foundation-models-in-the-ai-act-from-high-to-systemic-risk/
+    linkText: AI Regulation - Regulating Foundation Models in the AI Act
+    claimContext: National authorities within the EU will govern the Act more directly, using qualified market surveillance:[^62][^63][^62][^63]
+    fetchedAt: 2026-02-22T01:46:02.704Z
+    httpStatus: 200
+    pageTitle: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI"
+    contentSnippet: "Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk - MIAI Skip to content Articles Regulating Foundation Models in the AI Act: From “High” to “Systemic” Risk Cornelia Kutterer January 11, 2024 This article delves into the EU&#8217;s groundbreaking rules for general-purpose AI (GPAI) models, as outlined in the politically agreed-upon AI Act on December 8th. It scrutinizes key questions, including whether this approach deviates from the original risk-based proposal, navigat"
+    contentLength: 296595
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://usercentrics.com/knowledge-hub/eu-ai-regulation-ai-act/
+    linkText: Usercentrics - EU AI Regulation
+    claimContext: National authorities within the EU will govern the Act more directly, using qualified market surveillance:[^62][^63][^62][^63]
+    fetchedAt: 2026-02-22T01:46:02.758Z
+    httpStatus: 200
+    pageTitle: EU AI Regulation - Usercentrics Guide To The EU AI Act
+    contentSnippet: EU AI Regulation - Usercentrics Guide To The EU AI Act Skip to content Guide to the EU AI Act Share Copy link Link copied! Author Celestine Bahr Read time 19 mins Published Jul 18, 2023 Share Resources / Blog / Guide to the EU AI Act Table of contents EU AI Act summary EU AI Act timeline First milestones in the EU AI Act implementation European AI Act overview of risk categories Banned AI applications under the EU AI regulations EU AI Act governance EU AI Act compliance ChatGPT AI Act coverage A
+    contentLength: 748164
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.ibm.com/think/topics/eu-ai-act
+    linkText: IBM - EU AI Act Topics
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:46:02.825Z
+    httpStatus: 200
+    pageTitle: What is the EU AI Act? | IBM
+    contentSnippet: What is the EU AI Act? | IBM Artificial Intelligence What is the Artificial Intelligence Act of the European Union (EU AI Act)? Authors Matt Kosinski Writer Mark Scapicchio Editor, Topics & Insights IBM Think What is the EU AI Act? The Artificial Intelligence Act of the European Union, also known as the EU AI Act or the AI Act, is a law that governs the development and/or use of artificial intelligence (AI) in the European Union (EU). The act takes a risk-based approach to regulation, applying d
+    contentLength: 198462
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://www.orrick.com/en/Insights/2025/11/The-EU-AI-Act-6-Steps-to-Take-Before-2-August-2026
+    linkText: Orrick - EU AI Act 6 Steps
+    claimContext: The Act establishes tiered penalties based on violation severity:[^65]
+    fetchedAt: 2026-02-22T01:46:03.148Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act: 6 Steps to Take Before 2 August 2026"
+    contentSnippet: "The EU AI Act: 6 Steps to Take Before 2 August 2026 Home Insights The EU AI Act 6 Steps to Take Before 2 August 2026 Facebook Twitter Linkedin The EU AI Act 6 Steps to Take Before 2 August 2026 8 minute | November.10.2025 The EU AI Act&rsquo;s provisions have started to apply, including those relating to prohibited AI systems and general-purpose AI models (GPAIM). The bulk of the remaining obligations take effect on 2 August 2026, and authorities will be able to enforce compliance from that date"
+    contentLength: 96221
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://usercentrics.com/knowledge-hub/eu-ai-regulation-ai-act/
+    linkText: Usercentrics - EU AI Regulation
+    claimContext: For startups and SMEs, caps are available to prevent disproportionate financial burden.[^66] The turnover-based calculation means violations by major technology companies could result in penalties exceeding hundreds of millions of euros.
+    fetchedAt: 2026-02-22T01:46:04.312Z
+    httpStatus: 200
+    pageTitle: EU AI Regulation - Usercentrics Guide To The EU AI Act
+    contentSnippet: EU AI Regulation - Usercentrics Guide To The EU AI Act Skip to content Guide to the EU AI Act Share Copy link Link copied! Author Celestine Bahr Read time 19 mins Published Jul 18, 2023 Share Resources / Blog / Guide to the EU AI Act Table of contents EU AI Act summary EU AI Act timeline First milestones in the EU AI Act implementation European AI Act overview of risk categories Banned AI applications under the EU AI regulations EU AI Act governance EU AI Act compliance ChatGPT AI Act coverage A
+    contentLength: 748164
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://artificialintelligenceact.substack.com/p/the-eu-ai-act-newsletter-40-special
+    linkText: Artificial Intelligence Act Newsletter 40
+    claimContext: "The Act's approach to foundation models has sparked intense debate over whether it strikes the right balance between safety and innovation. **France, Germany, and Italy** actively opposed strict GPAI regulations during negotiations, arguing they would harm European AI competitiveness against US and "
+    fetchedAt: 2026-02-22T01:46:04.508Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI"
+    contentSnippet: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI The EU AI Act Newsletter Subscribe Sign in The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI 08/11/23-15/11/23 Risto Uuk Nov 15, 2023 24 2 2 Share Welcome to the EU AI Act Newsletter , a brief biweekly newsletter by the Future of Life Institute providing you with up-to-date developments and analyses of the proposed EU artificial intelligence law. Legislative Process Accor"
+    contentLength: 206879
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://time.com/6338602/eu-ai-regulation-foundation-models/
+    linkText: Time - EU AI Regulation Foundation Models
+    claimContext: "The Act's approach to foundation models has sparked intense debate over whether it strikes the right balance between safety and innovation. **France, Germany, and Italy** actively opposed strict GPAI regulations during negotiations, arguing they would harm European AI competitiveness against US and "
+    fetchedAt: 2026-02-22T01:46:04.946Z
+    httpStatus: 200
+    pageTitle: E.U.&#x27;s AI Regulation Could Be Softened After Pushback | TIME
+    contentSnippet: E.U.&#x27;s AI Regulation Could Be Softened After Pushback | TIME Tech E.U.’s AI Regulation Could Be Softened After Pushback From Biggest Members ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Will Henshall Loading... The European Parliament building is seen on January 18, 2022, in Brussels, Belgium. The European Parliament building is seen on January 18, 2022, in Brussels, Belgium. Thierry Monasse—Getty Images by Will Henshall Loading... A key aspect of the E.U.’s landmar
+    contentLength: 392340
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://artificialintelligenceact.substack.com/p/the-eu-ai-act-newsletter-40-special
+    linkText: Artificial Intelligence Act Newsletter 40
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:46:04.770Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI"
+    contentSnippet: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI The EU AI Act Newsletter Subscribe Sign in The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI 08/11/23-15/11/23 Risto Uuk Nov 15, 2023 24 2 2 Share Welcome to the EU AI Act Newsletter , a brief biweekly newsletter by the Future of Life Institute providing you with up-to-date developments and analyses of the proposed EU artificial intelligence law. Legislative Process Accor"
+    contentLength: 206879
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://knowledge.dlapiper.com/dlapiperknowledge/globalemploymentlatestdevelopments/2023/comparing-the-US-AI-Executive-Order-and-the-EU-AI-Act.html
+    linkText: DLA Piper - Comparing US AI EO and EU AI Act
+    claimContext: Critics warn the Act's regulatory approach contrasts sharply with the US, where voluntary industry standards and executive orders provide more flexible governance frameworks.[^70]
+    fetchedAt: 2026-02-22T01:46:05.163Z
+    httpStatus: 200
+    pageTitle: Comparing the US AI Executive Order and the EU AI Act - DLA Piper GENIE
+    contentSnippet: Comparing the US AI Executive Order and the EU AI Act - DLA Piper GENIE United States Comparing the US AI Executive Order and the EU AI Act 7 December 2023 7 min read LinkedIn Facebook Twitter Saved to bookmarks . Related topics At a glance Areas of commonality - and divergence - are emerging between the Executive Order on the Safe, Secure, and Trustworthy Development and Use of Artificial Intelligence ( EO ) and the EU Artificial Intelligence ( AI Act ) The EO draws on the powers of the Preside
+    contentLength: 95700
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://www.ey.com/content/dam/ey-unified-site/ey-com/en-gl/insights/public-policy/documents/ey-gl-eu-ai-act-07-2024.pdf
+    linkText: EY - EU AI Act Guide
+    claimContext: "Conversely, proponents argue the Act creates **legal certainty** that will ultimately attract investment and protect downstream deployers from compliance burdens, enabling a trustworthy AI ecosystem.[^71][^72] Regulatory sandboxes and the AI innovation package (launched January 2024) aim to support "
+    fetchedAt: 2026-02-22T01:46:06.762Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 933488
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://artificialintelligenceact.substack.com/p/the-eu-ai-act-newsletter-40-special
+    linkText: Artificial Intelligence Act Newsletter 40
+    claimContext: "Conversely, proponents argue the Act creates **legal certainty** that will ultimately attract investment and protect downstream deployers from compliance burdens, enabling a trustworthy AI ecosystem.[^71][^72] Regulatory sandboxes and the AI innovation package (launched January 2024) aim to support "
+    fetchedAt: 2026-02-22T01:46:06.208Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI"
+    contentSnippet: "The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI The EU AI Act Newsletter Subscribe Sign in The EU AI Act Newsletter #40: Special Edition on Foundation Models & General Purpose AI 08/11/23-15/11/23 Risto Uuk Nov 15, 2023 24 2 2 Share Welcome to the EU AI Act Newsletter , a brief biweekly newsletter by the Future of Life Institute providing you with up-to-date developments and analyses of the proposed EU artificial intelligence law. Legislative Process Accor"
+    contentLength: 206879
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence
+    linkText: European Commission - European Approach to AI
+    claimContext: "Conversely, proponents argue the Act creates **legal certainty** that will ultimately attract investment and protect downstream deployers from compliance burdens, enabling a trustworthy AI ecosystem.[^71][^72] Regulatory sandboxes and the AI innovation package (launched January 2024) aim to support "
+    fetchedAt: 2026-02-22T01:46:06.496Z
+    httpStatus: 200
+    pageTitle: European approach to artificial intelligence | Shaping Europe’s digital future
+    contentSnippet: European approach to artificial intelligence | Shaping Europe’s digital future Skip to main content European approach to artificial intelligence The EU’s approach to artificial intelligence promotes excellence and trust, by boosting research and industrial capacity while ensuring safety and fundamental rights. The first European AI Strategy aimed at making the EU a world-class hub for AI and ensuring that AI is human-centric and trustworthy. Such an objective translates into the European approac
+    contentLength: 89706
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://www.kaizenner.eu/post/reflections-on-aiact
+    linkText: Kaizenner - Reflections on AI Act
+    claimContext: There is sufficient lack of clarity that it is possible that fine-tuning an existing model would constitute bringing a novel foundation model to market:[^74][^75][^74][^75]
+    fetchedAt: 2026-02-22T01:46:07.661Z
+    httpStatus: 200
+    pageTitle: "Some personal reflections on the EU AI Act: a bittersweet ending"
+    contentSnippet: "--> Some personal reflections on the EU AI Act: a bittersweet ending top of page Search I wrote down some personal reflection on the (almost adopted) EU AI Act. Proud of many achievements, disappointed over the untapped potential but truly shocked by the ways the EU is currently making laws. What can we do now to make sure that the law still becomes a success story ? In total, 1004 days after the European Commission has presented the #AIAct on Wednesday, 21 April 2021, the last technical meeting"
+    contentLength: 928064
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://forum.effectivealtruism.org/posts/p7qXjisiADiCBnofk/the-eu-ai-act-needs-a-definition-of-high-risk-foundation
+    linkText: EA Forum - EU AI Act Needs Definition of High-Risk Foundation
+    claimContext: There is sufficient lack of clarity that it is possible that fine-tuning an existing model would constitute bringing a novel foundation model to market:[^74][^75][^74][^75]
+    fetchedAt: 2026-02-22T01:46:06.502Z
+    httpStatus: 200
+    pageTitle: The EU AI Act needs a definition of high-risk foundation models to avoid regulatory overreach and backlash — EA Forum
+    contentSnippet: "The EU AI Act needs a definition of high-risk foundation models to avoid regulatory overreach and backlash — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The EU AI Act needs a definition of high-risk foundation models to avoid regulatory overreach and backlash by matthias_samwald May 31 2023 5 min read 0 17 Policy AI safety AI evaluations and standards AI governance Frontpage Disclaimer: Quickly written; I"
+    contentLength: 154736
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://www.modelop.com/ai-governance/ai-regulations-standards/eu-ai-act
+    linkText: ModelOp - EU AI Act
+    claimContext: The Act's broad definition of AI systems, derived from OECD frameworks, applies to virtually all EU organizations using AI, creating significant compliance challenges.[^76]
+    fetchedAt: 2026-02-22T01:46:09.025Z
+    httpStatus: 200
+    pageTitle: "EU AI Act: Summary & Compliance Requirements"
+    contentSnippet: "EU AI Act: Summary & Compliance Requirements 🌟 ModelOp Recognized by Gartner® in the 2025 Market Guide for AI Governance Platforms Enterprises trust ModelOp to operationalize AI governance at scale—across ML, GenAI and Agentic AI. Learn More EU AI Act AI Governance Enterprise AI AI Regulations and Standards AI Governance Frameworks AI Governance Tools Show More What is the EU AI Act? Introduced in 2024, the European Union Artificial Intelligence Act (EU AI Act) is the world’s first comprehensiv"
+    contentLength: 145838
+    status: verified
+    note: null
+  - footnote: 77
+    url: https://techpolicy.press/a-false-confidence-in-the-eu-ai-act-epistemic-gaps-and-bureaucratic-traps
+    linkText: Tech Policy Press - False Confidence in EU AI Act
+    claimContext: "Academic critics have identified fundamental **epistemic gaps** in the Act's risk assessment approach.[^77] Traditional risk assessments fail for probabilistic, socio-technical foundation models, the argument goes, creating false regulatory confidence. Specifically:"
+    fetchedAt: 2026-02-22T01:46:10.561Z
+    httpStatus: 200
+    pageTitle: "A False Confidence in the EU AI Act: Epistemic Gaps and Bureaucratic Traps | TechPolicy.Press"
+    contentSnippet: "A False Confidence in the EU AI Act: Epistemic Gaps and Bureaucratic Traps | TechPolicy.Press Perspective A False Confidence in the EU AI Act: Epistemic Gaps and Bureaucratic Traps Kristina Khutsishvili / Sep 10, 2025 Shutterstock On July 10, 2025, the European Commission released the final draft of the General-Purpose Artificial Intelligence (GPAI) Code of Practice , a “code designed to help industry comply with the AI Act&#x27;s rules.” The Code has been under development since October 2024, w"
+    contentLength: 165144
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://crfm.stanford.edu/2024/08/01/eu-ai-act.html
+    linkText: Stanford CRFM - EU AI Act
+    claimContext: Stanford's Center for Research on Foundation Models (CRFM) noted that the compute-based threshold for systemic risk (10²⁵ FLOPs) diverges from their proposal to focus on demonstrated market impact, potentially missing dangerous models that don't meet the compute threshold.[^78]
+    fetchedAt: 2026-02-22T01:46:09.197Z
+    httpStatus: 200
+    pageTitle: Stanford CRFM
+    contentSnippet: "Stanford CRFM Foundation Models under the EU AI Act Authors: Rishi Bommasani and Alice Hau and Kevin Klyman and Percy Liang We analyze the EU AI Act by coding the foundation model requirements and comparing them to prior proposals for the Act. The EU AI Act enters into force today: the Act is a watershed moment in the history of AI and technology policy, constituting the first comprehensive legislation on artificial intelligence. The Act is the byproduct of prescience and commitment by the Europ"
+    contentLength: 26629
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://www.ey.com/content/dam/ey-unified-site/ey-com/en-gl/insights/public-policy/documents/ey-gl-eu-ai-act-07-2024.pdf
+    linkText: EY - EU AI Act Guide
+    claimContext: "AI safety researchers have criticized the Act for insufficient provisions addressing **existential risks** from advanced AI systems.[^79][^80] While the Act mandates evaluations for systemic risks, it includes:"
+    fetchedAt: 2026-02-22T01:46:08.962Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 933488
+    status: verified
+    note: null
+  - footnote: 80
+    url: https://crfm.stanford.edu/2024/08/01/eu-ai-act.html
+    linkText: Stanford CRFM - EU AI Act
+    claimContext: "AI safety researchers have criticized the Act for insufficient provisions addressing **existential risks** from advanced AI systems.[^79][^80] While the Act mandates evaluations for systemic risks, it includes:"
+    fetchedAt: 2026-02-22T01:46:08.776Z
+    httpStatus: 200
+    pageTitle: Stanford CRFM
+    contentSnippet: "Stanford CRFM Foundation Models under the EU AI Act Authors: Rishi Bommasani and Alice Hau and Kevin Klyman and Percy Liang We analyze the EU AI Act by coding the foundation model requirements and comparing them to prior proposals for the Act. The EU AI Act enters into force today: the Act is a watershed moment in the history of AI and technology policy, constituting the first comprehensive legislation on artificial intelligence. The Act is the byproduct of prescience and commitment by the Europ"
+    contentLength: 26629
+    status: verified
+    note: null
+  - footnote: 81
+    url: https://time.com/6338602/eu-ai-regulation-foundation-models/
+    linkText: Time - EU AI Regulation Foundation Models
+    claimContext: The focus on immediate deployment risks (manipulation, discrimination, privacy violations) rather than model-level capabilities means the Act may not adequately address risks from future highly capable AI systems. Organizations like the AI Now Institute (in a report by 50+ experts) warned that found
+    fetchedAt: 2026-02-22T01:46:11.937Z
+    httpStatus: 200
+    pageTitle: E.U.&#x27;s AI Regulation Could Be Softened After Pushback | TIME
+    contentSnippet: E.U.&#x27;s AI Regulation Could Be Softened After Pushback | TIME Tech E.U.’s AI Regulation Could Be Softened After Pushback From Biggest Members ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Will Henshall Loading... The European Parliament building is seen on January 18, 2022, in Brussels, Belgium. The European Parliament building is seen on January 18, 2022, in Brussels, Belgium. Thierry Monasse—Getty Images by Will Henshall Loading... A key aspect of the E.U.’s landmar
+    contentLength: 392340
+    status: verified
+    note: null
+  - footnote: 82
+    url: https://www.kaizenner.eu/post/reflections-on-aiact
+    linkText: Kaizenner - Reflections on AI Act
+    claimContext: Member States will designate very different national competent authorities, which will lead to very different interpretations and enforcement activities:[^82][^83][^82][^83]
+    fetchedAt: 2026-02-22T01:46:11.612Z
+    httpStatus: 200
+    pageTitle: "Some personal reflections on the EU AI Act: a bittersweet ending"
+    contentSnippet: "--> Some personal reflections on the EU AI Act: a bittersweet ending top of page Search I wrote down some personal reflection on the (almost adopted) EU AI Act. Proud of many achievements, disappointed over the untapped potential but truly shocked by the ways the EU is currently making laws. What can we do now to make sure that the law still becomes a success story ? In total, 1004 days after the European Commission has presented the #AIAct on Wednesday, 21 April 2021, the last technical meeting"
+    contentLength: 928064
+    status: verified
+    note: null
+  - footnote: 83
+    url: https://cfg.eu/eu-ai-act/
+    linkText: CFG - EU AI Act
+    claimContext: Member States will designate very different national competent authorities, which will lead to very different interpretations and enforcement activities:[^82][^83][^82][^83]
+    fetchedAt: 2026-02-22T01:46:12.999Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act: Regulatory Exemplar or Cautionary Tale? - Centre for Future Generations"
+    contentSnippet: "The EU AI Act: Regulatory Exemplar or Cautionary Tale? - Centre for Future Generations Skip to content Home Publications The EU AI Act: Regulatory Exemplar or Cautionary Tale? The EU AI Act: Regulatory Exemplar or Cautionary Tale? Authors Maria Koomen Governance Director Daan Juijn Senior Advanced AI Researcher 13.06.2024 #AdvancedAI #Commentary #Governance The EU AI Act: Regulatory Exemplar or Cautionary Tale? &#13; &#13; &#13; &#13; &#13; Home Publications The EU AI Act: Regulatory Exemplar or"
+    contentLength: 112874
+    status: verified
+    note: null
+  - footnote: 84
+    url: https://www.crowell.com/en/insights/client-alerts/eu-ai-act-gdpr-and-digital-laws-changes-proposed
+    linkText: Crowell - EU AI Act GDPR Changes
+    claimContext: Proposed amendments have sought to address some concerns by delaying high-risk system obligations to December 2027, but privacy advocates like **Max Schrems** have criticized provisions allowing AI training on special category data to fix bias as undermining GDPR protections.[^84]
+    fetchedAt: 2026-02-22T01:46:12.170Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 85
+    url: https://www.bsr.org/en/blog/the-eu-ai-act-where-do-we-stand-in-2025
+    linkText: BSR - EU AI Act Where Do We Stand in 2025
+    claimContext: The Act's phased implementation has also faced criticism. While prohibited systems were banned in February 2025, full GPAI compliance doesn't occur until August 2025-2027, creating a window where potentially risky systems can operate under legacy frameworks.[^85]
+    fetchedAt: 2026-02-22T01:46:12.495Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act: Where Do We Stand in 2025? | Blog | Sustainable Business Network and Advisory Services | BSR"
+    contentSnippet: "The EU AI Act: Where Do We Stand in 2025? | Blog | Sustainable Business Network and Advisory Services | BSR May 6, 2025 Authors Richard Wingfield Director, Responsible Tech, BSR Richard Wingfield Director, Responsible Tech, BSR London Richard co-leads BSR's Responsible Technology, working with companies that develop and use technology to build human rights considerations and practices into their products, services, and policies. He brings a strong understanding of international human rights law "
+    contentLength: 71739
+    status: verified
+    note: null
+  - footnote: 86
+    url: https://www.hunton.com/privacy-and-information-security-law/edpb-and-edps-issue-joint-opinion-on-eu-ai-act-implementation
+    linkText: Hunton - EDPB and EDPS Opinion
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:46:14.789Z
+    httpStatus: 200
+    pageTitle: EDPB and EDPS Issue Joint Opinion on EU AI Act Implementation
+    contentSnippet: "EDPB and EDPS Issue Joint Opinion on EU AI Act Implementation Privacy & Cybersecurity Law Blog Global Privacy and Cybersecurity Law Updates and Analysis Home > Insights > Blogs EDPB and EDPS Issue Joint Opinion on EU AI Act Implementation Time 3 Minute Read January 27, 2026 Categories: International , European Union On January 21, 2026, the European Data Protection Board (&ldquo;EDPB&rdquo;) and the European Data Protection Supervisor (&ldquo;EDPS&rdquo;) issued a Joint Opinion in response to th"
+    contentLength: 88348
+    status: verified
+    note: null
+  - footnote: 87
+    url: https://www.europarl.europa.eu/news/en/agenda/plenary-news/2026-01-19/8/tackling-ai-deepfakes-and-sexual-exploitation-on-social-media
+    linkText: European Parliament - Tackling AI Deepfakes
+    claimContext: "[^87]"
+    fetchedAt: 2026-02-22T01:46:14.792Z
+    httpStatus: 200
+    pageTitle: Tackling AI deepfakes and sexual exploitation on social media | 19-01-2026 | News | European Parliament
+    contentSnippet: Tackling AI deepfakes and sexual exploitation on social media | 19-01-2026 | News | European Parliament Change the navigation language BG - български ES - español CS - čeština DA - dansk DE - Deutsch ET - eesti keel EL - ελληνικά EN - English FR - français GA - Gaeilge HR - hrvatski IT - italiano LV - latviešu valoda LT - lietuvių kalba HU - magyar MT - Malti NL - Nederlands PL - polski PT - português RO - română SK - slovenčina SL - slovenščina FI - suomi SV - svenska Change the navigation lang
+    contentLength: 97793
+    status: verified
+    note: null
+  - footnote: 88
+    url: https://www.hunton.com/privacy-and-information-security-law/edpb-and-edps-issue-joint-opinion-on-eu-ai-act-implementation
+    linkText: Hunton - EDPB and EDPS Opinion
+    claimContext: The January 21, 2026 joint opinion by the European Data Protection Board (EDPB) and European Data Protection Supervisor (EDPS) criticized unclear divisions between the AI Office's role for GPAI supervision and EDPS oversight, calling for amendments to avoid governance overlaps.[^88]
+    fetchedAt: 2026-02-22T01:46:14.889Z
+    httpStatus: 200
+    pageTitle: EDPB and EDPS Issue Joint Opinion on EU AI Act Implementation
+    contentSnippet: "EDPB and EDPS Issue Joint Opinion on EU AI Act Implementation Privacy & Cybersecurity Law Blog Global Privacy and Cybersecurity Law Updates and Analysis Home > Insights > Blogs EDPB and EDPS Issue Joint Opinion on EU AI Act Implementation Time 3 Minute Read January 27, 2026 Categories: International , European Union On January 21, 2026, the European Data Protection Board (&ldquo;EDPB&rdquo;) and the European Data Protection Supervisor (&ldquo;EDPS&rdquo;) issued a Joint Opinion in response to th"
+    contentLength: 88348
+    status: verified
+    note: null
+  - footnote: 89
+    url: https://era.ideasoneurope.eu/2026/01/02/revisiting-what-problems-the-eu-ai-act-is-actually-solving/
+    linkText: ERA Ideas on Europe - Revisiting What Problems the EU AI Act Solves
+    claimContext: "Recent political discourse has shown a shift from the Act's original **fundamental rights framing** toward concerns about **over-regulation harming competitiveness**.[^89] As of early 2026:"
+    fetchedAt: 2026-02-22T01:46:15.114Z
+    httpStatus: 200
+    pageTitle: Revisiting what problems the EU AI Act is actually solving | Europe of Knowledge
+    contentSnippet: "Revisiting what problems the EU AI Act is actually solving | Europe of Knowledge Europe of Knowledge About Europe of Knowledge Europe of Knowledge is an official blog of the ECPR Standing Group Knowledge Politics and Policies. The Author The Standing Group is a follow-up network of the UACES collaborative research network European Research Area (2013-2016). Dr. Inga Ulnicane is editing the Europe of Knowledge blog. Share --> Share loop-single.php --> Europe of Knowledge | 2 January 2026 AI risk "
+    contentLength: 74796
+    status: verified
+    note: null
+  - footnote: 90
+    url: https://www.orrick.com/en/Insights/2025/11/The-EU-AI-Act-6-Steps-to-Take-Before-2-August-2026
+    linkText: Orrick - EU AI Act 6 Steps
+    claimContext: "The AI Act applies not only to providers and deployers operating within the EU, but also to organizations **outside the EU** whose AI systems target or affect EU users.[^90][^91] This extraterritorial scope, similar to GDPR's global reach, means:"
+    fetchedAt: 2026-02-22T01:46:14.853Z
+    httpStatus: 200
+    pageTitle: "The EU AI Act: 6 Steps to Take Before 2 August 2026"
+    contentSnippet: "The EU AI Act: 6 Steps to Take Before 2 August 2026 Home Insights The EU AI Act 6 Steps to Take Before 2 August 2026 Facebook Twitter Linkedin The EU AI Act 6 Steps to Take Before 2 August 2026 8 minute | November.10.2025 The EU AI Act&rsquo;s provisions have started to apply, including those relating to prohibited AI systems and general-purpose AI models (GPAIM). The bulk of the remaining obligations take effect on 2 August 2026, and authorities will be able to enforce compliance from that date"
+    contentLength: 96221
+    status: verified
+    note: null
+  - footnote: 91
+    url: https://ogletree.com/insights-resources/blog-posts/cybersecurity-awareness-month-in-focus-part-iii-the-eu-ai-act-is-here-what-it-means-for-u-s-employers/
+    linkText: Ogletree - EU AI Act for US Employers
+    claimContext: "The AI Act applies not only to providers and deployers operating within the EU, but also to organizations **outside the EU** whose AI systems target or affect EU users.[^90][^91] This extraterritorial scope, similar to GDPR's global reach, means:"
+    fetchedAt: 2026-02-22T01:46:16.553Z
+    httpStatus: 200
+    pageTitle: "Cybersecurity Awareness Month in Focus, Part III: The EU AI Act Is Here—What It Means for U.S. Employers - Ogletree"
+    contentSnippet: "Cybersecurity Awareness Month in Focus, Part III: The EU AI Act Is Here—What It Means for U.S. Employers - Ogletree October 31, 2025 By Benjamin W. Perry and Justin T. Tarka The European Union’s Artificial Intelligence (AI) Act, effective from August 1, 2024, imposes a risk-based framework on AI systems used within the EU, affecting U.S. employers that use AI for HR functions involving EU candidates or employees. With significant penalties for noncompliance, the AI Act categorizes many workplace"
+    contentLength: 290408
+    status: verified
+    note: null
+  - footnote: 92
+    url: https://techpolicy.press/expert-predictions-on-whats-at-stake-in-ai-policy-in-2026
+    linkText: Tech Policy Press - Expert Predictions 2026
+    claimContext: The Act's global influence extends through its potential to serve as a model for other jurisdictions considering AI regulation, though critics question whether it will inspire adoption or enable regulatory arbitrage as companies shift development to less restrictive environments.[^92]
+    fetchedAt: 2026-02-22T01:46:17.458Z
+    httpStatus: 200
+    pageTitle: Expert Predictions on What’s at Stake in AI Policy in 2026 | TechPolicy.Press
+    contentSnippet: Expert Predictions on What’s at Stake in AI Policy in 2026 | TechPolicy.Press Perspective Expert Predictions on What’s at Stake in AI Policy in 2026 J.B. Branch, Ilana Beller / Jan 6, 2026 J.B. Branch is the Big Tech accountability advocate for Public Citizen’s Congress Watch division, and Ilana Beller leads Public Citizen’s state legislative work relating to artificial intelligence. US President Donald Trump displays a signed executive order as (L-R) Sen. Ted Cruz (R-TX), Commerce Secretary How
+    contentLength: 187649
+    status: verified
+    note: null
+  - footnote: 93
+    url: https://digital-strategy.ec.europa.eu/en/faqs/navigating-ai-act
+    linkText: European Commission - Navigating AI Act
+    claimContext: The AI Office is leading the Commission's international engagement in the field of AI:[^93][^93]
+    fetchedAt: 2026-02-22T01:46:16.205Z
+    httpStatus: 200
+    pageTitle: Navigating the AI Act | Shaping Europe’s digital future
+    contentSnippet: "Navigating the AI Act | Shaping Europe’s digital future Skip to main content Navigating the AI Act These questions and answers detail the AI Act’s goals, governance, enforcement and clarify provisions for high-risk AI systems and general purpose AI models and measures to foster innovation. Scope and objectives Why do we need to regulate the use of Artificial Intelligence? The AI Act is the world's first comprehensive law for AI. It aims to address risks to health, safety and fundamental rights. "
+    contentLength: 119658
+    status: verified
+    note: null
+  - footnote: 94
+    url: https://www.jonesday.com/en/insights/2023/02/us-and-eu-enter-ai-collaboration-agreement
+    linkText: Jones Day - US EU AI Collaboration
+    claimContext: "- **Multilateral forums**: Participation in G7, G20, OECD, and Global Partnership on AI discussions - **US-EU AI collaboration**: January 27, 2023 agreement to conduct joint research on AI applications in extreme weather forecasting, emergency response, health, electric grid optimization, and agricu"
+    fetchedAt: 2026-02-22T01:46:16.639Z
+    httpStatus: 200
+    pageTitle: U.S. and EU Enter AI Collaboration Agreement | Jones Day
+    contentSnippet: 'U.S. and EU Enter AI Collaboration Agreement | Jones Day Skip to content &#32; &#32; Insights Subscribe Home Insights Better Together: U.S. and EU Enter Artificial Intelligence Collaboration Agreement Share Better Together: U.S. and EU Enter Artificial Intelligence Collaboration Agreement The United States and European Union recently entered into an administrative agreement to collaborate on critical research related to artificial intelligence ("AI"), focusing on five key areas of significant gl'
+    contentLength: 66476
+    status: verified
+    note: null
+  - footnote: 95
+    url: https://digital-strategy.ec.europa.eu/en/faqs/navigating-ai-act
+    linkText: European Commission - Navigating AI Act
+    claimContext: The **AI Pact**, initiated in May 2023, fosters voluntary industry commitment to implement AI Act requirements ahead of legal deadlines and serves as a coordination forum across jurisdictions.[^95]
+    fetchedAt: 2026-02-22T01:46:16.211Z
+    httpStatus: 200
+    pageTitle: Navigating the AI Act | Shaping Europe’s digital future
+    contentSnippet: "Navigating the AI Act | Shaping Europe’s digital future Skip to main content Navigating the AI Act These questions and answers detail the AI Act’s goals, governance, enforcement and clarify provisions for high-risk AI systems and general purpose AI models and measures to foster innovation. Scope and objectives Why do we need to regulate the use of Artificial Intelligence? The AI Act is the world's first comprehensive law for AI. It aims to address risks to health, safety and fundamental rights. "
+    contentLength: 119658
+    status: verified
+    note: null
+  - footnote: 96
+    url: https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence
+    linkText: European Commission - European Approach to AI
+    claimContext: The legislators understand that AI tools and systems can be strong drivers of innovation in business, and do not want companies, especially SMEs, to be hamstrung by excessive regulation, or be pressured by industry giants with outsized industry influence.[^96][^97][^96]
+    fetchedAt: 2026-02-22T01:46:18.485Z
+    httpStatus: 200
+    pageTitle: European approach to artificial intelligence | Shaping Europe’s digital future
+    contentSnippet: European approach to artificial intelligence | Shaping Europe’s digital future Skip to main content European approach to artificial intelligence The EU’s approach to artificial intelligence promotes excellence and trust, by boosting research and industrial capacity while ensuring safety and fundamental rights. The first European AI Strategy aimed at making the EU a world-class hub for AI and ensuring that AI is human-centric and trustworthy. Such an objective translates into the European approac
+    contentLength: 89706
+    status: verified
+    note: null
+  - footnote: 97
+    url: https://usercentrics.com/knowledge-hub/eu-ai-regulation-ai-act/
+    linkText: Usercentrics - EU AI Regulation
+    claimContext: The legislators understand that AI tools and systems can be strong drivers of innovation in business, and do not want companies, especially SMEs, to be hamstrung by excessive regulation, or be pressured by industry giants with outsized industry influence.[^96][^97][^96]
+    fetchedAt: 2026-02-22T01:46:19.089Z
+    httpStatus: 200
+    pageTitle: EU AI Regulation - Usercentrics Guide To The EU AI Act
+    contentSnippet: EU AI Regulation - Usercentrics Guide To The EU AI Act Skip to content Guide to the EU AI Act Share Copy link Link copied! Author Celestine Bahr Read time 19 mins Published Jul 18, 2023 Share Resources / Blog / Guide to the EU AI Act Table of contents EU AI Act summary EU AI Act timeline First milestones in the EU AI Act implementation European AI Act overview of risk categories Banned AI applications under the EU AI regulations EU AI Act governance EU AI Act compliance ChatGPT AI Act coverage A
+    contentLength: 748164
+    status: verified
+    note: null
+  - footnote: 98
+    url: https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence
+    linkText: European Commission - European Approach to AI
+    claimContext: An **AI Observatory** tracks AI trends and assesses impacts across specific sectors, while the **Apply AI Alliance** serves as a coordination forum bringing together AI providers, industry, public sector, academia, and civil society.[^98]
+    fetchedAt: 2026-02-22T01:46:18.489Z
+    httpStatus: 200
+    pageTitle: European approach to artificial intelligence | Shaping Europe’s digital future
+    contentSnippet: European approach to artificial intelligence | Shaping Europe’s digital future Skip to main content European approach to artificial intelligence The EU’s approach to artificial intelligence promotes excellence and trust, by boosting research and industrial capacity while ensuring safety and fundamental rights. The first European AI Strategy aimed at making the EU a world-class hub for AI and ensuring that AI is human-centric and trustworthy. Such an objective translates into the European approac
+    contentLength: 89706
+    status: verified
+    note: null

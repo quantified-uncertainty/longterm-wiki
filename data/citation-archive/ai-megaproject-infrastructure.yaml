@@ -1,0 +1,51 @@
+pageId: ai-megaproject-infrastructure
+verifiedAt: 2026-02-22
+totalCitations: 4
+verified: 2
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.theverge.com/2025/1/21/24348816/stargate-ai-project-trump-openai-oracle-softbank
+    linkText: "The Verge - Stargate: Trump announces \\$500B AI infrastructure project — (January 2025)"
+    claimContext: The Stargate project, announced January 2025 with White House backing, represents the single largest AI infrastructure commitment to date.[^1]
+    fetchedAt: 2026-02-22T02:28:20.438Z
+    httpStatus: 200
+    pageTitle: The Stargate Project is a $500 billion AI data center plan for OpenAI | The Verge
+    contentSnippet: The Stargate Project is a $500 billion AI data center plan for OpenAI | The Verge Skip to main content The homepage The Verge The Verge logo. The homepage The Verge The Verge logo. Hamburger Navigation Button Navigation Drawer The Verge The Verge logo. Login / Sign Up close Close Search Subscribe Facebook Threads Instagram Youtube RSS Comments Drawer Comments Loading comments Getting the conversation ready... News Close News Posts from this topic will be added to your daily email digest and your
+    contentLength: 520603
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://epochai.org/research/ai-hardware
+    linkText: Epoch AI - AI Hardware Market Analysis — (2024)
+    claimContext: <EntityLink id="E693" name="nvidia">NVIDIA</EntityLink> holds approximately 80-90% of the AI accelerator market as of 2024-2025.[^2] TSMC's advanced packaging capacity (CoWoS) currently constrains production more than wafer fabrication, meaning even increased chip production requires scaling a speci
+    fetchedAt: 2026-02-22T02:28:21.313Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 3
+    url: https://apnews.com/article/ai-data-centers-water-consumption
+    linkText: AP News - AI data centers' water consumption concerns — (2024)
+    claimContext: A single large AI data center can consume 1-5 million gallons of water per day for cooling, creating potential conflicts with agricultural and residential water use, particularly in drought-prone regions.[^3]
+    fetchedAt: 2026-02-22T02:28:20.517Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 5
+    url: https://www.cnbc.com/2026/01/22/openai-chair-bret-taylor-ai-bubble-correction.html
+    linkText: CNBC - OpenAI chair Bret Taylor says AI is 'probably' a bubble — (January 2026)
+    claimContext: 'If current AI valuations prove unsustainable, hundreds of billions in data center investments could become stranded assets. OpenAI chair Bret Taylor stated in January 2026 that AI is "probably a bubble," acknowledging the possibility of market correction.[^5] Unlike software investments that can be '
+    fetchedAt: 2026-02-22T02:28:20.584Z
+    httpStatus: 200
+    pageTitle: "OpenAI&#x27;s Taylor: AI is &#x27;probably&#x27; a bubble, there will be a correction"
+    contentSnippet: 'OpenAI&#x27;s Taylor: AI is &#x27;probably&#x27; a bubble, there will be a correction Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Bret Taylor said AI is "probably" a bubble, and he expects to see a correction over the next few years. Taylor, who serves as the chairman of OpenAI&#x27;s board and co-founded the artificial intelligence startup Sierra, said he is an AI optimist. He said the free market will ultimately determi'
+    contentLength: 802221
+    status: verified
+    note: null

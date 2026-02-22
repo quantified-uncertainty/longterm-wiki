@@ -1,0 +1,117 @@
+pageId: vara
+verifiedAt: 2026-02-22
+totalCitations: 10
+verified: 8
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://fintool.com/app/research/funds/investment-advisers/value-aligned-research-advisors-llc
+    linkText: Value Aligned Research Advisors, LLC - Fund Profile
+    claimContext: "| **Type** | Investment advisory firm and hedge fund | | **Founded** | 2022 (some sources cite 2011)[^1][^2] | | **Location** | Princeton, New Jersey |"
+    fetchedAt: 2026-02-22T02:27:58.376Z
+    httpStatus: 200
+    pageTitle: Value Aligned Research Advisors, LLC 13F Filing - Q2 2025 Holdings | Fintool
+    contentSnippet: "Value Aligned Research Advisors, LLC 13F Filing - Q2 2025 Holdings | Fintool New chat Search chats ⌘ K Home Prompt library NEW AI alerts Watchlists Projects Filings & transcripts Your files Feed Connectors Personalization You&#x27;re signed out Sign in or create an account to get full access. Value Aligned Research Advisors, LLC CIK: 0001963565 Investment Adviser $542M AUM 72 holdings Princeton, NJ, US Founded: 2011 6 employees vapwealthadvisors.com Latest filing: Jun 30, 2025 Value Aligned Rese"
+    contentLength: 172013
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://fintel.io/i/value-aligned-research-advisors-llc
+    linkText: Value Aligned Research Advisors, LLC - Holdings Analysis
+    claimContext: "| **Type** | Investment advisory firm and hedge fund | | **Founded** | 2022 (some sources cite 2011)[^1][^2] | | **Location** | Princeton, New Jersey |"
+    fetchedAt: 2026-02-22T02:27:58.170Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://www.sensamarket.com/institutional-investor/manager/0001963565-value-aligned-research-advisors-llc
+    linkText: Value Aligned Research Advisors Portfolio - SensaMarket
+    claimContext: "| **Location** | Princeton, New Jersey | | **AUM** | ≈\\$8.2 billion portfolio value (Q3 2025)[^3] | | **Key Focus** | AI infrastructure, semiconductors, energy |"
+    fetchedAt: 2026-02-22T02:27:58.359Z
+    httpStatus: 200
+    pageTitle: Value Aligned Research Advisors, LLC Stock Trades - Value Aligned Research Advisors, Llc 13F
+    contentSnippet: Value Aligned Research Advisors, LLC Stock Trades - Value Aligned Research Advisors, Llc 13F Value Aligned Research Advisors, Llc Stock Trading & 13F Insights 13F Portfolio Filings Most recent 13F Q4 2025 Location princeton, NJ CIK 0001963565 All SEC filings View on sec.gov Q4 2025 Summary Compare Quarter Holdings VALUE Top Holdings Form Type Date Filed Filing Id Q4 2025 86 $9.94B NVDA, TSM, GOOGL, AMZN 13F-HR Feb 17, 2026 000196356526000002 Q3 2025 - RESTATEMENT 81 $8.19B NVDA, TSM, COREWEAVE I
+    contentLength: 130814
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://eu.36kr.com/en/p/3447925765920387
+    linkText: AI Hedge Fund Launch Coverage - 36Kr
+    claimContext: '| **Key Focus** | AI infrastructure, semiconductors, energy | | **Notable Investors** | Charitable foundation of <EntityLink id="dustin-moskovitz">Dustin Moskovitz</EntityLink>[^4] | | **Regulatory Status** | SEC-registered (CRD 319135, CIK 0001963565)[^5] |'
+    fetchedAt: 2026-02-22T02:27:58.831Z
+    httpStatus: 200
+    pageTitle: 23-Year-Old Genius Fired by OpenAI Rakes in $1.5 Billion with AI
+    contentSnippet: "23-Year-Old Genius Fired by OpenAI Rakes in $1.5 Billion with AI English 中文 Deutsch Home Article After a 23-year-old genius was fired by OpenAI, he raked in $1.5 billion with AI. 36氪的朋友们 2025-09-01 17:06 At the age of 23, Leopold Aschenbrenner transitioned from a researcher at OpenAI to the founder of an AI hedge fund, which manages assets worth over $1.5 billion. Key points: Leopold Aschenbrenner, a 23 - year - old, transitioned from a researcher at OpenAI to the founder of an AI hedge fund, wh"
+    contentLength: 54209
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://adviserinfo.sec.gov/firm/summary/319135
+    linkText: SEC Investment Adviser Public Disclosure - VARA
+    claimContext: '| **Notable Investors** | Charitable foundation of <EntityLink id="dustin-moskovitz">Dustin Moskovitz</EntityLink>[^4] | | **Regulatory Status** | SEC-registered (CRD 319135, CIK 0001963565)[^5] |'
+    fetchedAt: 2026-02-22T02:27:58.263Z
+    httpStatus: 200
+    pageTitle: IAPD - Investment Adviser Public Disclosure - Homepage
+    contentSnippet: IAPD - Investment Adviser Public Disclosure - Homepage
+    contentLength: 6514
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://whalewisdom.com/filer/value-aligned-research-advisors-llc
+    linkText: Value Aligned Research Advisors 13F Holdings - WhaleWisdom
+    claimContext: Value Aligned Research Advisors, LLC (VARA) is a registered investment advisory firm specializing in discretionary asset management with a concentrated focus on artificial intelligence infrastructure and related technologies. Founded by former quantitative analysts Ben Hoskin and David Field, the fi
+    fetchedAt: 2026-02-22T02:28:00.255Z
+    httpStatus: 200
+    pageTitle: VALUE ALIGNED RESEARCH ADVISORS, LLC Top 13F Holdings
+    contentSnippet: VALUE ALIGNED RESEARCH ADVISORS, LLC Top 13F Holdings
+    contentLength: 72565
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://radientanalytics.com/firm/adv/value-aligned-research-advisors-llc-319135
+    linkText: Value Aligned Research Advisors Profile - Radient Analytics
+    claimContext: The firm's investment strategy emphasizes long-term value investing through fundamental analysis, with heavy concentration in semiconductors, AI compute infrastructure, and energy companies supporting data center operations. According to its SEC filings, VARA serves high-net-worth individuals, chari
+    fetchedAt: 2026-02-22T02:28:00.410Z
+    httpStatus: 200
+    pageTitle: Radient
+    contentSnippet: Radient
+    contentLength: 5831
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://leiworldwide.com/lei_record/254900N49PFRX2S91X38
+    linkText: LEI Record - Value Aligned Research Advisors
+    claimContext: Value Aligned Research Advisors was established in 2022, though some sources cite a 2011 founding date.[^1][^2] The firm received SEC approval on April 14, 2022, and is organized as a Delaware limited liability company.[^5][^8]
+    fetchedAt: 2026-02-22T02:28:00.237Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://hedgefollow.com/funds/Value+Aligned+Research+Advisors+LLC/Performance-History
+    linkText: Value Aligned Research Advisors Performance History - HedgeFollow
+    claimContext: VARA's performance data reveals significant volatility consistent with its concentrated AI/technology focus. In Q1 2025, the fund reported a -23.66% return with \$1.23 billion in assets under management and 33 holdings.[^9] This underperformance occurred during a period when broader market volatilit
+    fetchedAt: 2026-02-22T02:28:00.511Z
+    httpStatus: 200
+    pageTitle: Value Aligned Research Advisors LLC Fund Performance History & Annualized Return
+    contentSnippet: 'Value Aligned Research Advisors LLC Fund Performance History & Annualized Return See the Top 20 Stocks Picked by AI in Q3 X LAST DAY Cyber Deals: Over 50% off Annual Plans X --> --> Value Aligned Research Advisors LLC Fund Performance Hedge Fund Portfolio Manager Performance 25Q4 AUM (13F) # of Holdings Performance Rank Read how we rank hedge funds ."> Allocation Value Aligned Research Advisors LLC Value Aligned Research Advisors LLC -0.94% $4881144000 47 Top Holdings Largest Trades Portfolio St'
+    contentLength: 109027
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.seniorfinanceadvisor.com/firms/319135/value-aligned-research-advisors-llc
+    linkText: Value Aligned Research Advisors Firm Summary
+    claimContext: As of its most recent Form ADV filing (October 30, 2025), VARA reported \$542,161,194 in discretionary assets under management serving 2 clients, though this figure excludes cash holdings and may not reflect the full value shown in 13F securities filings.[^5][^10]
+    fetchedAt: 2026-02-22T02:28:00.583Z
+    httpStatus: 200
+    pageTitle: Financial Advisors at Value Aligned Research Advisors, Llc
+    contentSnippet: --> Financial Advisors at Value Aligned Research Advisors, Llc &times; Learn Resources Tips, tools and how to's to help with your financial goals. News Stay sharp with senior focused financial articles. Retirement Investing Expert Advice About For Businesses Insights for Advisors Need investment and retirement help? Call Now --> (888) 346-0211 --> Follow Us For Businesses &emsp;|&emsp; Insights for Advisors Learn Resources Tips, tools and how to's to help with your financial goals. News Stay sha
+    contentLength: 51323
+    status: verified
+    note: null

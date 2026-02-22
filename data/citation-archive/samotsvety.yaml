@@ -1,0 +1,821 @@
+pageId: samotsvety
+verifiedAt: 2026-02-22
+totalCitations: 74
+verified: 73
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: "**Samotsvety Forecasting** is a team of elite superforecasters recognized as among the world's best at probabilistic predictions on impactful global events.[^1] The group specializes in using only publicly available information to generate forecasts on high-stakes questions, emphasizing track record"
+    fetchedAt: 2026-02-22T01:53:50.917Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://samotsvety.org
+    linkText: Samotsvety - Home
+    claimContext: "**Samotsvety Forecasting** is a team of elite superforecasters recognized as among the world's best at probabilistic predictions on impactful global events.[^1] The group specializes in using only publicly available information to generate forecasts on high-stakes questions, emphasizing track record"
+    fetchedAt: 2026-02-22T01:53:50.637Z
+    httpStatus: 200
+    pageTitle: Samotsvety Forecasting
+    contentSnippet: "Samotsvety Forecasting We are a group of forecasters with a great track record working on applying forecasting to impactful questions. We hope to improve the forecasting ecosystem. Wait, no, we are a forecasting team, not a Soviet Union band. Scott Alexander describes us as : Enter Samotsvety Forecasts. This is a team of some of the best superforecasters in the world. They won the CSET-Foretell forecasting competition by an absolutely obscene margin, “around twice as good as the next-best team i"
+    contentLength: 3677
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://samotsvety.org
+    linkText: Samotsvety - Home
+    claimContext: "**Samotsvety Forecasting** is a team of elite superforecasters recognized as among the world's best at probabilistic predictions on impactful global events.[^1] The group specializes in using only publicly available information to generate forecasts on high-stakes questions, emphasizing track record"
+    fetchedAt: 2026-02-22T01:53:51.039Z
+    httpStatus: 200
+    pageTitle: Samotsvety Forecasting
+    contentSnippet: "Samotsvety Forecasting We are a group of forecasters with a great track record working on applying forecasting to impactful questions. We hope to improve the forecasting ecosystem. Wait, no, we are a forecasting team, not a Soviet Union band. Scott Alexander describes us as : Enter Samotsvety Forecasts. This is a team of some of the best superforecasters in the world. They won the CSET-Foretell forecasting competition by an absolutely obscene margin, “around twice as good as the next-best team i"
+    contentLength: 3677
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.nasdaq.com/articles/a-look-at-samotsvety-forecasting-one-of-the-worlds-best-predictors-of-the-future
+    linkText: Nasdaq - A Look at Samotsvety Forecasting
+    claimContext: The group originated as a Slack channel where co-founders Misha Yagudin and <EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> discussed forecasting, eventually expanding to approximately 15 members worldwide selected for their strong performance on platforms like <EntityLink id="metaculus">Met
+    fetchedAt: 2026-02-22T01:53:52.310Z
+    httpStatus: 200
+    pageTitle: A Look at Samotsvety Forecasting, One of the World's Best Predictors of the Future | Nasdaq
+    contentSnippet: A Look at Samotsvety Forecasting, One of the World&#039;s Best Predictors of the Future | Nasdaq Skip to main content Data is currently not available Search Nasdaq.com Clear Search We couldn’t find any results matching your search. Please try using other words for your search or explore other sections of the website for relevant information. We’re sorry, we are currently experiencing some issues, please try again later. Our team is working diligently to resolve the issue. Thank you for your pati
+    contentLength: 183950
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: The group originated as a Slack channel where co-founders Misha Yagudin and <EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> discussed forecasting, eventually expanding to approximately 15 members worldwide selected for their strong performance on platforms like <EntityLink id="metaculus">Met
+    fetchedAt: 2026-02-22T01:53:50.783Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: The group originated as a Slack channel where co-founders Misha Yagudin and <EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> discussed forecasting, eventually expanding to approximately 15 members worldwide selected for their strong performance on platforms like <EntityLink id="metaculus">Met
+    fetchedAt: 2026-02-22T01:53:53.632Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.nasdaq.com/articles/a-look-at-samotsvety-forecasting-one-of-the-worlds-best-predictors-of-the-future
+    linkText: Nasdaq - A Look at Samotsvety Forecasting
+    claimContext: Samotsvety emerged from informal forecasting discussions between Misha Yagudin and Nuño Sempere on a Slack channel focused on prediction questions.[^7] The group's breakthrough came with their dominant performance in the <EntityLink id="cset">CSET</EntityLink>-Foretell (INFER) competition series fro
+    fetchedAt: 2026-02-22T01:53:56.391Z
+    httpStatus: 200
+    pageTitle: A Look at Samotsvety Forecasting, One of the World's Best Predictors of the Future | Nasdaq
+    contentSnippet: A Look at Samotsvety Forecasting, One of the World&#039;s Best Predictors of the Future | Nasdaq Skip to main content Data is currently not available Search Nasdaq.com Clear Search We couldn’t find any results matching your search. Please try using other words for your search or explore other sections of the website for relevant information. We’re sorry, we are currently experiencing some issues, please try again later. Our team is working diligently to resolve the issue. Thank you for your pati
+    contentLength: 183950
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: In **2020**, Samotsvety achieved first place in CSET-Foretell with a team relative Brier score of -0.912 compared to -0.062 for the second-place team, with individual members finishing 5th, 6th, and 7th.[^8] The core team of Nuño, Misha, and <EntityLink id="eli-lifland">Eli Lifland</EntityLink> repe
+    fetchedAt: 2026-02-22T01:53:54.051Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: In **2020**, Samotsvety achieved first place in CSET-Foretell with a team relative Brier score of -0.912 compared to -0.062 for the second-place team, with individual members finishing 5th, 6th, and 7th.[^8] The core team of Nuño, Misha, and <EntityLink id="eli-lifland">Eli Lifland</EntityLink> repe
+    fetchedAt: 2026-02-22T01:53:53.795Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: By September 2022, Samotsvety members held the top four spots on INFER's all-time leaderboard.[^10] Several members earned designation as **Superforecasters™**, and the group maintained first place in 2022 despite reduced participation.[^11] They also placed 4th on the Insight Prediction leaderboard
+    fetchedAt: 2026-02-22T01:53:53.922Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: By September 2022, Samotsvety members held the top four spots on INFER's all-time leaderboard.[^10] Several members earned designation as **Superforecasters™**, and the group maintained first place in 2022 despite reduced participation.[^11] They also placed 4th on the Insight Prediction leaderboard
+    fetchedAt: 2026-02-22T01:53:57.676Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: By September 2022, Samotsvety members held the top four spots on INFER's all-time leaderboard.[^10] Several members earned designation as **Superforecasters™**, and the group maintained first place in 2022 despite reduced participation.[^11] They also placed 4th on the Insight Prediction leaderboard
+    fetchedAt: 2026-02-22T01:53:57.803Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/KRFXjCqqfGQAYirm5/samotsvety-nuclear-risk-forecasts-march-2022
+    linkText: EA Forum - Samotsvety Nuclear Risk Forecasts March 2022
+    claimContext: Following their competition success, Samotsvety shifted focus toward impactful forecasting applications. In March 2022, they published nuclear risk forecasts aggregating predictions from eight forecasters on questions like the probability of nuclear explosions in major cities.[^13] This work receive
+    fetchedAt: 2026-02-22T01:53:57.539Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum
+    contentSnippet: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety Nuclear Risk Forecasts — March 2022 by NunoSempere , Misha_Yagudin , elifland Mar 10 2022 8 min read 54 155 Existential risk Forecasting Models Nuclear security Samotsvety Forecasting Squiggle Frontpage Samotsvety Nuclear Risk Forecasts — March 2022 Overview Methodology Our aggreg
+    contentLength: 1185453
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://forum.effectivealtruism.org/posts/KRFXjCqqfGQAYirm5/samotsvety-nuclear-risk-forecasts-march-2022
+    linkText: EA Forum - Samotsvety Nuclear Risk Forecasts March 2022
+    claimContext: Following their competition success, Samotsvety shifted focus toward impactful forecasting applications. In March 2022, they published nuclear risk forecasts aggregating predictions from eight forecasters on questions like the probability of nuclear explosions in major cities.[^13] This work receive
+    fetchedAt: 2026-02-22T01:53:57.599Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum
+    contentSnippet: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety Nuclear Risk Forecasts — March 2022 by NunoSempere , Misha_Yagudin , elifland Mar 10 2022 8 min read 54 155 Existential risk Forecasting Models Nuclear security Samotsvety Forecasting Squiggle Frontpage Samotsvety Nuclear Risk Forecasts — March 2022 Overview Methodology Our aggreg
+    contentLength: 1185453
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.foxy-scout.com/samotsvetys-ai-risk-forecasts/
+    linkText: Foxy Scout - Samotsvety's AI Risk Forecasts
+    claimContext: Throughout 2023-2024, the group released influential AI risk forecasts, including timelines for transformative AI (28% by 2030, 60% by 2050, 89% by 2100) and estimates of misaligned AI takeover (25% by 2100).[^15][^16] Their work has been incorporated into literature reviews by <EntityLink id="epoch
+    fetchedAt: 2026-02-22T01:53:57.776Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts
+    contentSnippet: "Samotsvety&#x27;s AI risk forecasts Introduction In my review of What We Owe The Future (WWOTF), I wrote: Finally, I’ve updated some based on my experience with Samotsvety forecasters when discussing AI risk… When we discussed the report on power-seeking AI, I expected tons of skepticism but in fact almost all forecasters seemed to give >=5% to disempowerment by power-seeking AI by 2070, with many giving >=10%. In the comments, Peter Wildeford asked : It looks like Samotsvety also forecasted AI "
+    contentLength: 28136
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: Throughout 2023-2024, the group released influential AI risk forecasts, including timelines for transformative AI (28% by 2030, 60% by 2050, 89% by 2100) and estimates of misaligned AI takeover (25% by 2100).[^15][^16] Their work has been incorporated into literature reviews by <EntityLink id="epoch
+    fetchedAt: 2026-02-22T01:53:58.867Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701407
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines
+    linkText: Epoch AI - Literature Review of TAI Timelines
+    claimContext: Throughout 2023-2024, the group released influential AI risk forecasts, including timelines for transformative AI (28% by 2030, 60% by 2050, 89% by 2100) and estimates of misaligned AI takeover (25% by 2100).[^15][^16] Their work has been incorporated into literature reviews by <EntityLink id="epoch
+    fetchedAt: 2026-02-22T01:53:59.439Z
+    httpStatus: 200
+    pageTitle: Literature review of transformative artificial intelligence timelines | Epoch AI
+    contentSnippet: Literature review of transformative artificial intelligence timelines | Epoch AI Latest Publications & Commentary Papers & Reports Newsletter Podcast Data & Resources Datasets Overview Benchmarking Models Frontier Data Centers Hardware Companies Chip Sales Polling Resources AI Trends & Statistics Data Insights Projects FrontierMath GATE Playground Distributed Training Model Counts About About Us Our Team Careers Consultations Our Funding Donate Contact Search epoch.ai Search Enter a query to sea
+    contentLength: 177787
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://samotsvety.org/blog/2024/
+    linkText: Samotsvety Blog - 2024
+    claimContext: In October 2024, Samotsvety published probabilities from seven forecasters on catastrophes causing \>1 million direct deaths within the next decade, tying into work on early warning systems for global risks.[^18] Co-founder Nuño Sempere launched <EntityLink id="sentinel">Sentinel</EntityLink>, a non
+    fetchedAt: 2026-02-22T01:53:59.109Z
+    httpStatus: 200
+    pageTitle: blog - 2024
+    contentSnippet: blog - 2024 / blog / 2024 10/
+    contentLength: 2749
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://alethios.substack.com/p/with-nuno-sempere-superforecasting
+    linkText: Alethios Substack - Interview with Nuño Sempere
+    claimContext: In October 2024, Samotsvety published probabilities from seven forecasters on catastrophes causing \>1 million direct deaths within the next decade, tying into work on early warning systems for global risks.[^18] Co-founder Nuño Sempere launched <EntityLink id="sentinel">Sentinel</EntityLink>, a non
+    fetchedAt: 2026-02-22T01:53:59.146Z
+    httpStatus: 200
+    pageTitle: With Nuño Sempere - Superforecasting and Global Risk
+    contentSnippet: With Nuño Sempere - Superforecasting and Global Risk Public Service Subscribe Sign in With Nuño Sempere - Superforecasting and Global Risk Alethios Jul 11, 2025 17 2 Share Nuño Sempere is a founding member of the legendary forecasting group ‘Samotsvety’. His track record puts him at the top of the world’s most accurate predictors of the future. I sat down with him last month to discuss forecasting, global risk, and his new non-profit ‘ Sentinel ’, a free early-warning system for large-scale cata
+    contentLength: 319075
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.aspr.camp/team
+    linkText: ASPR Team
+    claimContext: '- **Misha Yagudin**: Co-founder and team leader; world-class forecaster who co-runs <EntityLink id="arb-research">Arb Research</EntityLink> consultancy focused on forecasting and AI safety research[^20] - **Nuño Sempere**: Co-founder; top-ranked forecaster who founded <EntityLink id="sentinel">Senti'
+    fetchedAt: 2026-02-22T01:53:59.243Z
+    httpStatus: 200
+    pageTitle: Team &mdash; ASPR
+    contentSnippet: Team &mdash; ASPR 0 ASPR 2025 Team Jan Kulveit Jan leads the Alignment of Complex Systems research group at the Center for Theoretical Study in Prague. Previously he was Research Fellow at the Future of Humanity Institute at the University of Oxford. In his free time, he enjoys mountains and drinking good tea. David Yu David researches the design of better social ecosystems. He spent 5 years in tech startups as a director of growth and anthropologist. He is interested in information theory, comp
+    contentLength: 198665
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://forum.effectivealtruism.org/posts/SzuF29o9uQpLpYrqJ/sentinel-funding-memo-mitigating-gcrs-with-forecasting-and
+    linkText: EA Forum - Sentinel Funding Memo
+    claimContext: '- **Misha Yagudin**: Co-founder and team leader; world-class forecaster who co-runs <EntityLink id="arb-research">Arb Research</EntityLink> consultancy focused on forecasting and AI safety research[^20] - **Nuño Sempere**: Co-founder; top-ranked forecaster who founded <EntityLink id="sentinel">Senti'
+    fetchedAt: 2026-02-22T01:54:00.501Z
+    httpStatus: 200
+    pageTitle: Sentinel Funding Memo — Mitigating GCRs with Forecasting & Emergency Response — EA Forum
+    contentSnippet: "Sentinel Funding Memo — Mitigating GCRs with Forecasting & Emergency Response — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Sentinel Funding Memo — Mitigating GCRs with Forecasting & Emergency Response by Saul Munn , rai , NunoSempere Nov 6 2024 16 min read 5 47 Forecasting AI safety Biosecurity Cause prioritization Existential risk Emergency response Funding request (open) Funding "
+    contentLength: 488339
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://quantifieduncertainty.org/posts/eli-lifland-on-navigating-the-ai-722/
+    linkText: Quantified Uncertainty - Eli Lifland Interview
+    claimContext: '- **Nuño Sempere**: Co-founder; top-ranked forecaster who founded <EntityLink id="sentinel">Sentinel</EntityLink> non-profit for catastrophic risk early warning; Head of Foresight at Sentinel; fellow in the 2025 <EntityLink id="ai-for-human-reasoning-fellowship">AI for Human Reasoning Fellowship</En'
+    fetchedAt: 2026-02-22T01:54:00.847Z
+    httpStatus: 200
+    pageTitle: Eli Lifland, on Navigating the AI Alignment Landscape
+    contentSnippet: Eli Lifland, on Navigating the AI Alignment Landscape Recently I had a conversation with Eli Lifland about the AI Alignment landscape. Eli Lifland has been a forecaster at Samotsvety and has been investigating said landscape. I’ve known Eli for the last 8 months or so, and have appreciated many of his takes on AI alignment strategy. This was my first recorded video, so there were a few issues, but I think most of it is understandable. Full (edited) transcript below. I suggest browsing the sectio
+    contentLength: 134210
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.aspr.camp/team
+    linkText: ASPR Team
+    claimContext: '- **<EntityLink id="eli-lifland">Eli Lifland</EntityLink>**: Co-lead; top competition winner; co-founder of <EntityLink id="ai-futures-project">AI Futures Project</EntityLink>; formerly worked on <EntityLink id="elicit">Elicit</EntityLink> at Ought[^22] - **Gavin Leech**: Associated forecaster; near'
+    fetchedAt: 2026-02-22T01:54:00.485Z
+    httpStatus: 200
+    pageTitle: Team &mdash; ASPR
+    contentSnippet: Team &mdash; ASPR 0 ASPR 2025 Team Jan Kulveit Jan leads the Alignment of Complex Systems research group at the Center for Theoretical Study in Prague. Previously he was Research Fellow at the Future of Humanity Institute at the University of Oxford. In his free time, he enjoys mountains and drinking good tea. David Yu David researches the design of better social ecosystems. He spent 5 years in tech startups as a director of growth and anthropologist. He is interested in information theory, comp
+    contentLength: 198665
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: The group maintains approximately 15 active members selected based on demonstrated performance in forecasting competitions, particularly on Metaculus and INFER platforms.[^24] Members include several certified Superforecasters™ and individuals who have topped various forecasting leaderboards.[^25]
+    fetchedAt: 2026-02-22T01:54:00.729Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: The group maintains approximately 15 active members selected based on demonstrated performance in forecasting competitions, particularly on Metaculus and INFER platforms.[^24] Members include several certified Superforecasters™ and individuals who have topped various forecasting leaderboards.[^25]
+    fetchedAt: 2026-02-22T01:54:00.858Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.foxy-scout.com/samotsvetys-ai-risk-forecasts/
+    linkText: Foxy Scout - Samotsvety's AI Risk Forecasts
+    claimContext: Samotsvety's AI forecasts represent some of their most cited work, providing probabilistic timelines for transformative AI (TAI) and artificial general intelligence (AGI). Their aggregated forecasts from eight members include:[^26]
+    fetchedAt: 2026-02-22T01:54:02.705Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts
+    contentSnippet: "Samotsvety&#x27;s AI risk forecasts Introduction In my review of What We Owe The Future (WWOTF), I wrote: Finally, I’ve updated some based on my experience with Samotsvety forecasters when discussing AI risk… When we discussed the report on power-seeking AI, I expected tons of skepticism but in fact almost all forecasters seemed to give >=5% to disempowerment by power-seeking AI by 2070, with many giving >=10%. In the comments, Peter Wildeford asked : It looks like Samotsvety also forecasted AI "
+    contentLength: 28136
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines
+    linkText: Epoch AI - Literature Review of TAI Timelines
+    claimContext: The group's methodology shifted from outside-view reference class forecasting to inside-view models based on AI capabilities progress, which shortened their estimated timelines compared to earlier reports.[^27] They estimated an 81% chance of TAI by 2100 when accounting for the possibility of civili
+    fetchedAt: 2026-02-22T01:54:01.930Z
+    httpStatus: 200
+    pageTitle: Literature review of transformative artificial intelligence timelines | Epoch AI
+    contentSnippet: Literature review of transformative artificial intelligence timelines | Epoch AI Latest Publications & Commentary Papers & Reports Newsletter Podcast Data & Resources Datasets Overview Benchmarking Models Frontier Data Centers Hardware Companies Chip Sales Polling Resources AI Trends & Statistics Data Insights Projects FrontierMath GATE Playground Distributed Training Model Counts About About Us Our Team Careers Consultations Our Funding Donate Contact Search epoch.ai Search Enter a query to sea
+    contentLength: 177787
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.foxy-scout.com/samotsvetys-ai-risk-forecasts/
+    linkText: Foxy Scout - Samotsvety's AI Risk Forecasts
+    claimContext: The group's methodology shifted from outside-view reference class forecasting to inside-view models based on AI capabilities progress, which shortened their estimated timelines compared to earlier reports.[^27] They estimated an 81% chance of TAI by 2100 when accounting for the possibility of civili
+    fetchedAt: 2026-02-22T01:54:02.693Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts
+    contentSnippet: "Samotsvety&#x27;s AI risk forecasts Introduction In my review of What We Owe The Future (WWOTF), I wrote: Finally, I’ve updated some based on my experience with Samotsvety forecasters when discussing AI risk… When we discussed the report on power-seeking AI, I expected tons of skepticism but in fact almost all forecasters seemed to give >=5% to disempowerment by power-seeking AI by 2070, with many giving >=10%. In the comments, Peter Wildeford asked : It looks like Samotsvety also forecasted AI "
+    contentLength: 28136
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: For AI risk specifically, Samotsvety forecasters provided a 25% aggregate probability of misaligned AI takeover by 2100, with many individual forecasters assigning 5-10% or higher probability to AI-driven disempowerment of humanity by 2070.[^29] These estimates reflect near-consensus among group mem
+    fetchedAt: 2026-02-22T01:54:01.966Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701405
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: For AI risk specifically, Samotsvety forecasters provided a 25% aggregate probability of misaligned AI takeover by 2100, with many individual forecasters assigning 5-10% or higher probability to AI-driven disempowerment of humanity by 2070.[^29] These estimates reflect near-consensus among group mem
+    fetchedAt: 2026-02-22T01:54:02.074Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701405
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://forum.effectivealtruism.org/posts/KRFXjCqqfGQAYirm5/samotsvety-nuclear-risk-forecasts-march-2022
+    linkText: EA Forum - Samotsvety Nuclear Risk Forecasts March 2022
+    claimContext: In March 2022, following Russia's invasion of Ukraine, Samotsvety aggregated forecasts from eight members on nuclear escalation scenarios using beta prior and binomial likelihood modeling.[^31] The forecasts covered questions like "death in next month due to nuclear explosion in London" and received
+    fetchedAt: 2026-02-22T01:54:03.795Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum
+    contentSnippet: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety Nuclear Risk Forecasts — March 2022 by NunoSempere , Misha_Yagudin , elifland Mar 10 2022 8 min read 54 155 Existential risk Forecasting Models Nuclear security Samotsvety Forecasting Squiggle Frontpage Samotsvety Nuclear Risk Forecasts — March 2022 Overview Methodology Our aggreg
+    contentLength: 1182657
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://forum.effectivealtruism.org/posts/KRFXjCqqfGQAYirm5/samotsvety-nuclear-risk-forecasts-march-2022
+    linkText: EA Forum - Samotsvety Nuclear Risk Forecasts March 2022
+    claimContext: In March 2022, following Russia's invasion of Ukraine, Samotsvety aggregated forecasts from eight members on nuclear escalation scenarios using beta prior and binomial likelihood modeling.[^31] The forecasts covered questions like "death in next month due to nuclear explosion in London" and received
+    fetchedAt: 2026-02-22T01:54:03.822Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum
+    contentSnippet: Samotsvety Nuclear Risk Forecasts — March 2022 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety Nuclear Risk Forecasts — March 2022 by NunoSempere , Misha_Yagudin , elifland Mar 10 2022 8 min read 54 155 Existential risk Forecasting Models Nuclear security Samotsvety Forecasting Squiggle Frontpage Samotsvety Nuclear Risk Forecasts — March 2022 Overview Methodology Our aggreg
+    contentLength: 1182657
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://samotsvety.org/blog/2022/03/10/samotsvety-nuclear-risk-forecasts-march-2022/
+    linkText: Samotsvety Blog - March 2022 Nuclear Risk Forecasts
+    claimContext: The group's nuclear risk estimates tended to be lower than some external experts, partly due to different assumptions about evacuation possibilities and their aggregation methodology emphasizing mutual assured destruction (MAD) principles and historical de-escalation patterns.[^33] An October 2022 u
+    fetchedAt: 2026-02-22T01:54:04.011Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk Forecasts — March 2022
+    contentSnippet: Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety Nuclear Risk Forecasts — March 2022 Thanks to Misha Yagudin, Eli Lifland, Jonathan Mann, Juan Cambeiro, Gregory Lewis, @belikewater, and Daniel Filan for forecasts. Thanks to Jacob Hilton for writing up an earlier analysis from which we drew heavily. Thanks to Clay Graubard for sanity checking and to Daniel Filan for independent analysis. This document was written in collaboration with Eli and Misha, and we thank those who commented on an
+    contentLength: 19167
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://samotsvety.org/blog/2022/10/03/samotsvety-nuclear-risk-update-october-2022/
+    linkText: Samotsvety Blog - October 2022 Nuclear Risk Update
+    claimContext: The group's nuclear risk estimates tended to be lower than some external experts, partly due to different assumptions about evacuation possibilities and their aggregation methodology emphasizing mutual assured destruction (MAD) principles and historical de-escalation patterns.[^33] An October 2022 u
+    fetchedAt: 2026-02-22T01:54:04.283Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk update October 2022
+    contentSnippet: Samotsvety Nuclear Risk update October 2022 Samotsvety Nuclear Risk update October 2022 This writeup was originally posted on the EA Forum , which has some good discussion. After recent events in Ukraine, Samotsvety convened to update our probabilities of nuclear war. In March 2022, at the beginning of the Ukraine war, we were at ~ 0.01% that London would be hit with a nuclear weapon in the next month. Now, we are at ~0.02% for the next 1-3 months, and at 16% that Russia uses any type of nuclear
+    contentLength: 44409
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://samotsvety.org/blog/2021/12/31/prediction-markets-in-the-corporate-setting/
+    linkText: Samotsvety Blog - Prediction Markets in the Corporate Setting
+    claimContext: "- **Prediction Markets in Corporate Settings**: Analysis of adoption barriers including technological underdevelopment, social disruptiveness, and difficulty writing informative questions[^35] - **Forecasting Methodology**: Development of better scoring rules, alignment of forecasting platforms, and"
+    fetchedAt: 2026-02-22T01:54:05.598Z
+    httpStatus: 200
+    pageTitle: Prediction Markets in The Corporate Setting
+    contentSnippet: Prediction Markets in The Corporate Setting Prediction Markets in The Corporate Setting What follows is a report that Misha Yagudin, Nuño Sempere, and Eli Lifland wrote back in October 2021 for Upstart , an AI lending platform that was interesting in exploring forecasting methods in general and prediction markets in particular. We believe that the report is of interest to EA as it relates to the institutional decision-making cause area and because it might inform EA organizations about which for
+    contentLength: 75729
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://samotsvety.org/projects/
+    linkText: Samotsvety Projects
+    claimContext: "- **Prediction Markets in Corporate Settings**: Analysis of adoption barriers including technological underdevelopment, social disruptiveness, and difficulty writing informative questions[^35] - **Forecasting Methodology**: Development of better scoring rules, alignment of forecasting platforms, and"
+    fetchedAt: 2026-02-22T01:54:06.880Z
+    httpStatus: 200
+    pageTitle: projects
+    contentSnippet: "projects Done as Samotsvety : Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety&rsquo;s AI risk forecasts Prediction Markets in the Corporate Setting GJO Calibration app Micro-grants for forecasting Bottlenecks to more impactful crowd forecasting With other hats Forecasting Newsletter , by Nuño Metaforecast , by QURI Squiggle , by QURI Impactful Forecasting Prize , by Sage Pastcasting , by Sage Better scoring rules , by Nuño Alignment Problems With Current Forecasting Platforms , by Nuño"
+    contentLength: 4530
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://samotsvety.org/projects/
+    linkText: Samotsvety Projects
+    claimContext: "- **Forecasting Methodology**: Development of better scoring rules, alignment of forecasting platforms, and micro-grants for forecasting research[^36] - **GJO Calibration App**: Tools for forecaster training and improvement[^37] - **Bottlenecks to Impactful Crowd Forecasting**: Research on systemic "
+    fetchedAt: 2026-02-22T01:54:07.014Z
+    httpStatus: 200
+    pageTitle: projects
+    contentSnippet: "projects Done as Samotsvety : Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety&rsquo;s AI risk forecasts Prediction Markets in the Corporate Setting GJO Calibration app Micro-grants for forecasting Bottlenecks to more impactful crowd forecasting With other hats Forecasting Newsletter , by Nuño Metaforecast , by QURI Squiggle , by QURI Impactful Forecasting Prize , by Sage Pastcasting , by Sage Better scoring rules , by Nuño Alignment Problems With Current Forecasting Platforms , by Nuño"
+    contentLength: 4530
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://samotsvety.org/projects/
+    linkText: Samotsvety Projects
+    claimContext: "- **GJO Calibration App**: Tools for forecaster training and improvement[^37] - **Bottlenecks to Impactful Crowd Forecasting**: Research on systemic limitations in prediction platforms[^38]"
+    fetchedAt: 2026-02-22T01:54:07.141Z
+    httpStatus: 200
+    pageTitle: projects
+    contentSnippet: "projects Done as Samotsvety : Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety&rsquo;s AI risk forecasts Prediction Markets in the Corporate Setting GJO Calibration app Micro-grants for forecasting Bottlenecks to more impactful crowd forecasting With other hats Forecasting Newsletter , by Nuño Metaforecast , by QURI Squiggle , by QURI Impactful Forecasting Prize , by Sage Pastcasting , by Sage Better scoring rules , by Nuño Alignment Problems With Current Forecasting Platforms , by Nuño"
+    contentLength: 4530
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://forecastingresearch.org/publications
+    linkText: Forecasting Research Institute - Publications
+    claimContext: While Samotsvety's primary outputs are forecasts rather than traditional academic publications, team members have contributed to research through affiliations with the <EntityLink id="fri">Forecasting Research Institute</EntityLink> (FRI) and related organizations. FRI publications involving Samotsv
+    fetchedAt: 2026-02-22T01:54:07.147Z
+    httpStatus: 200
+    pageTitle: Publications &mdash; Forecasting Research Institute
+    contentSnippet: "Publications &mdash; Forecasting Research Institute 0 FRI & affiliated publications Jump to: Academic papers Reports & white papers Editorials, blog posts & other writing Academic papers Forecasting LLM-enabled biorisk and the efficacy of safeguards Williams, B., Righetti, L., Rosenberg, J., Ceppas de Castro. R., Kuusela, O., Britt, R., Soice, E., Morales, A., Sanders, J., Donoughe, S., Black, J., Karger, E., Tetlock, P. Preprint (2025) Belief updating in AI-risk debates: Exploring the limits of"
+    contentLength: 188000
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://arbresearch.com/work/
+    linkText: Arb Research - Work
+    claimContext: Through Arb Research, members including Misha Yagudin and Gavin Leech have contributed to:[^40]
+    fetchedAt: 2026-02-22T01:54:07.785Z
+    httpStatus: 200
+    pageTitle: Arb Research
+    contentSnippet: "Arb Research Arb news Semantic duplicates confound apparent AI progress February 2026 Author : Gavin, Ari, Juan, Tomas, Peli, Nicky, Nandi Client : Pro bono New paper studying AI performance. ( The Twitter thread is an accessible way in.) In the past 3 years, LLM training corpuses expanded by a factor of 10000x. Does this increased chance of including test data confound apparent AI progress? What about including &ldquo;semantic&rdquo; duplicates, things which happen to be very similar to test da"
+    contentLength: 89629
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://epoch.ai/blog/literature-review-of-transformative-artificial-intelligence-timelines
+    linkText: Epoch AI - Literature Review of TAI Timelines
+    claimContext: Samotsvety forecasts have been incorporated into Epoch AI's 2024 transformative AI timelines literature review and referenced in discussions about AI safety policy across the effective altruism and rationalist communities.[^41]
+    fetchedAt: 2026-02-22T01:54:09.024Z
+    httpStatus: 200
+    pageTitle: Literature review of transformative artificial intelligence timelines | Epoch AI
+    contentSnippet: Literature review of transformative artificial intelligence timelines | Epoch AI Latest Publications & Commentary Papers & Reports Newsletter Podcast Data & Resources Datasets Overview Benchmarking Models Frontier Data Centers Hardware Companies Chip Sales Polling Resources AI Trends & Statistics Data Insights Projects FrontierMath GATE Playground Distributed Training Model Counts About About Us Our Team Careers Consultations Our Funding Donate Contact Search epoch.ai Search Enter a query to sea
+    contentLength: 177787
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: "The four most accurate forecasters in INFER/RAND history are Samotsvety members, with a substantial gap separating them from the fifth-place forecaster.[^42] Individual members have achieved top rankings across multiple platforms:"
+    fetchedAt: 2026-02-22T01:54:09.070Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: "- **Top 4 positions on INFER all-time leaderboard** (as of September 2022)[^43] - **Multiple Superforecaster™ certifications**[^44]"
+    fetchedAt: 2026-02-22T01:54:09.202Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: "- **Top 4 positions on INFER all-time leaderboard** (as of September 2022)[^43] - **Multiple Superforecaster™ certifications**[^44] - **4th place on Insight Prediction leaderboard** due to Ukraine invasion prediction[^45]"
+    fetchedAt: 2026-02-22T01:54:09.331Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: "- **Multiple Superforecaster™ certifications**[^44] - **4th place on Insight Prediction leaderboard** due to Ukraine invasion prediction[^45]"
+    fetchedAt: 2026-02-22T01:54:09.652Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://samotsvety.org
+    linkText: Samotsvety - Home
+    claimContext: '- **Scott Alexander** (Astral Codex Ten): Described them as "some of the best superforecasters in the world" winning competitions by "obscene margins"[^46] - **Vox**: Featured as a "ragtag band of internet friends" dominating leaderboards, with praise from expert Jason Matheny for their accuracy and'
+    fetchedAt: 2026-02-22T01:54:10.930Z
+    httpStatus: 200
+    pageTitle: Samotsvety Forecasting
+    contentSnippet: "Samotsvety Forecasting We are a group of forecasters with a great track record working on applying forecasting to impactful questions. We hope to improve the forecasting ecosystem. Wait, no, we are a forecasting team, not a Soviet Union band. Scott Alexander describes us as : Enter Samotsvety Forecasts. This is a team of some of the best superforecasters in the world. They won the CSET-Foretell forecasting competition by an absolutely obscene margin, “around twice as good as the next-best team i"
+    contentLength: 3677
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: '- **Scott Alexander** (Astral Codex Ten): Described them as "some of the best superforecasters in the world" winning competitions by "obscene margins"[^46] - **Vox**: Featured as a "ragtag band of internet friends" dominating leaderboards, with praise from expert Jason Matheny for their accuracy and'
+    fetchedAt: 2026-02-22T01:54:11.060Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.nasdaq.com/articles/a-look-at-samotsvety-forecasting-one-of-the-worlds-best-predictors-of-the-future
+    linkText: Nasdaq - A Look at Samotsvety Forecasting
+    claimContext: "- **Vox**: Featured as a \"ragtag band of internet friends\" dominating leaderboards, with praise from expert Jason Matheny for their accuracy and commitment to self-scoring[^47] - **Nasdaq**: Profiled as \"one of the world's best predictors of the future\"[^48] - **Spektrum** (German): International gr"
+    fetchedAt: 2026-02-22T01:54:12.103Z
+    httpStatus: 200
+    pageTitle: A Look at Samotsvety Forecasting, One of the World's Best Predictors of the Future | Nasdaq
+    contentSnippet: A Look at Samotsvety Forecasting, One of the World&#039;s Best Predictors of the Future | Nasdaq Skip to main content Data is currently not available Search Nasdaq.com Clear Search We couldn’t find any results matching your search. Please try using other words for your search or explore other sections of the website for relevant information. We’re sorry, we are currently experiencing some issues, please try again later. Our team is working diligently to resolve the issue. Thank you for your pati
+    contentLength: 183949
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: "- **Nasdaq**: Profiled as \"one of the world's best predictors of the future\"[^48] - **Spektrum** (German): International group excelling without insider information[^49]"
+    fetchedAt: 2026-02-22T01:54:11.186Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://research.aimultiple.com/artificial-general-intelligence-singularity-timing/
+    linkText: AIM Multiple - AGI Singularity Timing
+    claimContext: Samotsvety's work has been incorporated into major AI safety analyses and cited in policy discussions. Their forecasts appear in studies aggregating 9,300+ AGI/singularity predictions and have influenced estimates used in AI Index reports.[^50][^51] The group maintains an open consulting practice (c
+    fetchedAt: 2026-02-22T01:54:11.169Z
+    httpStatus: 200
+    pageTitle: "AGI/Singularity: 9,300 Predictions Analyzed"
+    contentSnippet: "AGI/Singularity: 9,300 Predictions Analyzed Agentic AI Cybersecurity Data Enterprise Software About Contact Us Back No results found. AI AI Foundations AGI/Singularity: 9,300 Predictions Analyzed Cem Dilmegani with Sıla Ermut updated on Feb 8, 2026 See our ethical norms Artificial general intelligence (AGI/singularity) occurs when an AI system matches or exceeds human-level cognitive abilities across a broad range of tasks, rather than excelling in a single domain. While many researchers and exp"
+    contentLength: 487243
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://dl.acm.org/doi/pdf/10.1613/jair.1.19087
+    linkText: JAIR - AI Futures Paper
+    claimContext: Samotsvety's work has been incorporated into major AI safety analyses and cited in policy discussions. Their forecasts appear in studies aggregating 9,300+ AGI/singularity predictions and have influenced estimates used in AI Index reports.[^50][^51] The group maintains an open consulting practice (c
+    fetchedAt: 2026-02-22T01:54:13.235Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 52
+    url: https://samotsvety.org
+    linkText: Samotsvety - Home
+    claimContext: Samotsvety's work has been incorporated into major AI safety analyses and cited in policy discussions. Their forecasts appear in studies aggregating 9,300+ AGI/singularity predictions and have influenced estimates used in AI Index reports.[^50][^51] The group maintains an open consulting practice (c
+    fetchedAt: 2026-02-22T01:54:13.380Z
+    httpStatus: 200
+    pageTitle: Samotsvety Forecasting
+    contentSnippet: "Samotsvety Forecasting We are a group of forecasters with a great track record working on applying forecasting to impactful questions. We hope to improve the forecasting ecosystem. Wait, no, we are a forecasting team, not a Soviet Union band. Scott Alexander describes us as : Enter Samotsvety Forecasts. This is a team of some of the best superforecasters in the world. They won the CSET-Foretell forecasting competition by an absolutely obscene margin, “around twice as good as the next-best team i"
+    contentLength: 3677
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://samotsvety.org/media-mentions/
+    linkText: Samotsvety - Media Mentions
+    claimContext: Samotsvety's work has been incorporated into major AI safety analyses and cited in policy discussions. Their forecasts appear in studies aggregating 9,300+ AGI/singularity predictions and have influenced estimates used in AI Index reports.[^50][^51] The group maintains an open consulting practice (c
+    fetchedAt: 2026-02-22T01:54:13.512Z
+    httpStatus: 200
+    pageTitle: media mentions
+    contentSnippet: "media mentions Media mentions N.B.: We are open to media mentions or collaborations, and can be reached at info@samotsvety.org . Vox: How a ragtag band of internet friends became the best at forecasting world events ( a ): At Infer, a major forecasting platform operated by Rand, the four most accurate forecasters in the site’s history are all members of Samotsvety, and there is a wide gap between them and fifth place. In fact, the gap between them and fifth place is bigger than between fifth and"
+    contentLength: 14354
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://saul-munn.notion.site/Research-consultancy-organizations-b111d45fa15d4945a1aa8daf7bbc1345
+    linkText: Notion - Research Consultancy Organizations
+    claimContext: '- **Forecasting Research Institute (FRI)**: Collaboration on forecasting research and methodology[^54] - **Quantified Uncertainty Research Institute (QURI)**: Members contributed to <EntityLink id="metaforecast">Metaforecast</EntityLink> and <EntityLink id="squiggle">Squiggle</EntityLink> forecastin'
+    fetchedAt: 2026-02-22T01:54:13.567Z
+    httpStatus: 200
+    pageTitle: Notion
+    contentSnippet: Notion JavaScript must be enabled in order to use Notion. Please enable JavaScript to continue.
+    contentLength: 15299
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://samotsvety.org/projects/
+    linkText: Samotsvety Projects
+    claimContext: '- **Forecasting Research Institute (FRI)**: Collaboration on forecasting research and methodology[^54] - **Quantified Uncertainty Research Institute (QURI)**: Members contributed to <EntityLink id="metaforecast">Metaforecast</EntityLink> and <EntityLink id="squiggle">Squiggle</EntityLink> forecastin'
+    fetchedAt: 2026-02-22T01:54:13.641Z
+    httpStatus: 200
+    pageTitle: projects
+    contentSnippet: "projects Done as Samotsvety : Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety&rsquo;s AI risk forecasts Prediction Markets in the Corporate Setting GJO Calibration app Micro-grants for forecasting Bottlenecks to more impactful crowd forecasting With other hats Forecasting Newsletter , by Nuño Metaforecast , by QURI Squiggle , by QURI Impactful Forecasting Prize , by Sage Pastcasting , by Sage Better scoring rules , by Nuño Alignment Problems With Current Forecasting Platforms , by Nuño"
+    contentLength: 4530
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://ifp.org/can-policymakers-trust-forecasters/
+    linkText: IFP - Can Policymakers Trust Forecasters
+    claimContext: '- **Quantified Uncertainty Research Institute (QURI)**: Members contributed to <EntityLink id="metaforecast">Metaforecast</EntityLink> and <EntityLink id="squiggle">Squiggle</EntityLink> forecasting tools[^55] - **Arb Research**: Co-leaders Gavin Leech and Misha Yagudin run this research consultancy'
+    fetchedAt: 2026-02-22T01:54:15.864Z
+    httpStatus: 200
+    pageTitle: Can Policymakers Trust Forecasters? | IFP
+    contentSnippet: Can Policymakers Trust Forecasters? | IFP Research Research All Research Biotechnology Emerging Technology High-Skilled Immigration Infrastructure Metascience About About Team Non-Resident Fellows Board Members Careers FAQs Projects Projects Newsletters Courses The Launch Sequence Contact Search Search Search Introduction Asking the experts Asking statistical models Asking top forecasters Combinations Beyond mere correctness How can policymakers use forecasters? Introduction In their 1990 book U
+    contentLength: 466570
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://samotsvety.org/blog/
+    linkText: Samotsvety Blog
+    claimContext: '- **Arb Research**: Co-leaders Gavin Leech and Misha Yagudin run this research consultancy; co-authored comparative studies of forecasters versus domain experts[^56] - **Epoch AI**: Provided updated <EntityLink id="agi-timeline">AGI timeline</EntityLink> forecasts for literature reviews on transform'
+    fetchedAt: 2026-02-22T01:54:15.193Z
+    httpStatus: 200
+    pageTitle: blog
+    contentSnippet: blog RSS Feed , all content Samotsvety probabilities for potential precursors of existential risk (2024/10/22) Seven Samotsvety forecasters give their probabilities for different possible catastrophes to lead to more than 1M direct deaths in any one year, in any of the next 10 years . This post presents results, starting with a table which presents the probabilities, continuing with a discussion of each of the items, and concluding with some thoughts on relevance for Sentinel &rsquo;s work avert
+    contentLength: 14129
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://samotsvety.org/blog/
+    linkText: Samotsvety Blog
+    claimContext: '- **Epoch AI**: Provided updated <EntityLink id="agi-timeline">AGI timeline</EntityLink> forecasts for literature reviews on transformative AI timelines[^57] - **Sentinel**: Samotsvety probabilities on catastrophes inform this early-warning system for global risks[^58]'
+    fetchedAt: 2026-02-22T01:54:15.535Z
+    httpStatus: 200
+    pageTitle: blog
+    contentSnippet: blog RSS Feed , all content Samotsvety probabilities for potential precursors of existential risk (2024/10/22) Seven Samotsvety forecasters give their probabilities for different possible catastrophes to lead to more than 1M direct deaths in any one year, in any of the next 10 years . This post presents results, starting with a table which presents the probabilities, continuing with a discussion of each of the items, and concluding with some thoughts on relevance for Sentinel &rsquo;s work avert
+    contentLength: 14129
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://samotsvety.org/projects/
+    linkText: Samotsvety Projects
+    claimContext: The group participated in projects with Sage (Impactful Forecasting Prize, Pastcasting), developed tools for <EntityLink id="good-judgment">Good Judgment</EntityLink> Open, and maintains active presence on the EA Forum and LessWrong where their forecasts generate substantial community discussion.[^5
+    fetchedAt: 2026-02-22T01:54:15.646Z
+    httpStatus: 200
+    pageTitle: projects
+    contentSnippet: "projects Done as Samotsvety : Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety&rsquo;s AI risk forecasts Prediction Markets in the Corporate Setting GJO Calibration app Micro-grants for forecasting Bottlenecks to more impactful crowd forecasting With other hats Forecasting Newsletter , by Nuño Metaforecast , by QURI Squiggle , by QURI Impactful Forecasting Prize , by Sage Pastcasting , by Sage Better scoring rules , by Nuño Alignment Problems With Current Forecasting Platforms , by Nuño"
+    contentLength: 4530
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://samotsvety.org/blog/2021/12/31/prediction-markets-in-the-corporate-setting/
+    linkText: Samotsvety Blog - Prediction Markets in the Corporate Setting
+    claimContext: "Critics have identified several limitations in Samotsvety's forecasting approach. Their analysis of academic literature on prediction markets concluded that the academic consensus **overstates benefits and promisingness** due to perverse incentives that emphasize promising results while downplaying "
+    fetchedAt: 2026-02-22T01:54:15.904Z
+    httpStatus: 200
+    pageTitle: Prediction Markets in The Corporate Setting
+    contentSnippet: Prediction Markets in The Corporate Setting Prediction Markets in The Corporate Setting What follows is a report that Misha Yagudin, Nuño Sempere, and Eli Lifland wrote back in October 2021 for Upstart , an AI lending platform that was interesting in exploring forecasting methods in general and prediction markets in particular. We believe that the report is of interest to EA as it relates to the institutional decision-making cause area and because it might inform EA organizations about which for
+    contentLength: 75729
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: On complex topics like AI timelines, Samotsvety has noted that ML researchers surveyed displayed "very incoherent views depending on the question being asked and elicitation techniques," suggesting many forecasters "haven't thought about it that deeply."[^61] Wide ranges and large differences in est
+    fetchedAt: 2026-02-22T01:54:17.190Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701408
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: On complex topics like AI timelines, Samotsvety has noted that ML researchers surveyed displayed "very incoherent views depending on the question being asked and elicitation techniques," suggesting many forecasters "haven't thought about it that deeply."[^61] Wide ranges and large differences in est
+    fetchedAt: 2026-02-22T01:54:17.238Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701408
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: Samotsvety forecasters are selected for interest in AI and strong performance on existing platforms, which may not generalize well to long-term, radically novel events.[^63] The group may be "relatively bullish on transformative technological change from AI" compared to other forecasting organizatio
+    fetchedAt: 2026-02-22T01:54:17.047Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701408
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://samotsvety.org/blog/2021/12/31/prediction-markets-in-the-corporate-setting/
+    linkText: Samotsvety Blog - Prediction Markets in the Corporate Setting
+    claimContext: Beyond individual forecasting, Samotsvety's analysis of prediction markets identified multiple barriers to practical adoption:[^69]
+    fetchedAt: 2026-02-22T01:54:17.343Z
+    httpStatus: 200
+    pageTitle: Prediction Markets in The Corporate Setting
+    contentSnippet: Prediction Markets in The Corporate Setting Prediction Markets in The Corporate Setting What follows is a report that Misha Yagudin, Nuño Sempere, and Eli Lifland wrote back in October 2021 for Upstart , an AI lending platform that was interesting in exploring forecasting methods in general and prediction markets in particular. We believe that the report is of interest to EA as it relates to the institutional decision-making cause area and because it might inform EA organizations about which for
+    contentLength: 75729
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://samotsvety.org/blog/2022/03/10/samotsvety-nuclear-risk-forecasts-march-2022/
+    linkText: Samotsvety Blog - March 2022 Nuclear Risk Forecasts
+    claimContext: Some nuclear experts and forecasters criticized Samotsvety's March 2022 nuclear risk estimates as too low, arguing they reflected overreliance on base rates and underestimated tail risks like Putin's willingness to escalate.[^70] The group's aggregation methods and assumptions about evacuation possi
+    fetchedAt: 2026-02-22T01:54:17.370Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk Forecasts — March 2022
+    contentSnippet: Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety Nuclear Risk Forecasts — March 2022 Thanks to Misha Yagudin, Eli Lifland, Jonathan Mann, Juan Cambeiro, Gregory Lewis, @belikewater, and Daniel Filan for forecasts. Thanks to Jacob Hilton for writing up an earlier analysis from which we drew heavily. Thanks to Clay Graubard for sanity checking and to Daniel Filan for independent analysis. This document was written in collaboration with Eli and Misha, and we thank those who commented on an
+    contentLength: 19167
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://samotsvety.org/blog/2022/03/10/samotsvety-nuclear-risk-forecasts-march-2022/
+    linkText: Samotsvety Blog - March 2022 Nuclear Risk Forecasts
+    claimContext: Some nuclear experts and forecasters criticized Samotsvety's March 2022 nuclear risk estimates as too low, arguing they reflected overreliance on base rates and underestimated tail risks like Putin's willingness to escalate.[^70] The group's aggregation methods and assumptions about evacuation possi
+    fetchedAt: 2026-02-22T01:54:18.676Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk Forecasts — March 2022
+    contentSnippet: Samotsvety Nuclear Risk Forecasts — March 2022 Samotsvety Nuclear Risk Forecasts — March 2022 Thanks to Misha Yagudin, Eli Lifland, Jonathan Mann, Juan Cambeiro, Gregory Lewis, @belikewater, and Daniel Filan for forecasts. Thanks to Jacob Hilton for writing up an earlier analysis from which we drew heavily. Thanks to Clay Graubard for sanity checking and to Daniel Filan for independent analysis. This document was written in collaboration with Eli and Misha, and we thank those who commented on an
+    contentLength: 19167
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: Samotsvety maintains active presence on the EA Forum and LessWrong, where their forecasts generate substantial discussion. Community opinions are generally positive but include some critiques:[^72]
+    fetchedAt: 2026-02-22T01:54:18.438Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701405
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: '- Expected to "comfortably outperform" community aggregates even without extraordinary effort[^73] - Strong performance on short-term (within 12 months) geopolitics and technology questions[^74]'
+    fetchedAt: 2026-02-22T01:54:18.499Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701405
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://forum.effectivealtruism.org/posts/ByBBqwRXWqX5m9erL/update-to-samotsvety-agi-timelines
+    linkText: EA Forum - Update to Samotsvety AGI Timelines
+    claimContext: '- Expected to "comfortably outperform" community aggregates even without extraordinary effort[^73] - Strong performance on short-term (within 12 months) geopolitics and technology questions[^74] - Outperforms EA Forum/Metaculus community aggregates (e.g., log scores: 0.280 vs. 0.261)[^75]'
+    fetchedAt: 2026-02-22T01:54:18.408Z
+    httpStatus: 200
+    pageTitle: Update to Samotsvety AGI timelines — EA Forum
+    contentSnippet: "Update to Samotsvety AGI timelines — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Update to Samotsvety AGI timelines by Misha_Yagudin , JonathanMann , NunoSempere Jan 24 2023 4 min read 9 120 Forecasting AI safety Samotsvety Forecasting AI forecasting Frontpage Update to Samotsvety AGI timelines Forecasts: Definition of AGI Individual forecasts Aggregate Epistemic status: Update from"
+    contentLength: 519222
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: "- Strong performance on short-term (within 12 months) geopolitics and technology questions[^74] - Outperforms EA Forum/Metaculus community aggregates (e.g., log scores: 0.280 vs. 0.261)[^75]"
+    fetchedAt: 2026-02-22T01:54:18.481Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701405
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: "- EA skew from social member additions; calls for pre-registered question sets to reduce selection effects[^76] - Some methodological concerns about aggregation techniques and baseline assumptions[^77]"
+    fetchedAt: 2026-02-22T01:54:19.771Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701406
+    status: verified
+    note: null
+  - footnote: 77
+    url: https://samotsvety.org/blog/2022/10/03/samotsvety-nuclear-risk-update-october-2022/
+    linkText: Samotsvety Blog - October 2022 Nuclear Risk Update
+    claimContext: "- EA skew from social member additions; calls for pre-registered question sets to reduce selection effects[^76] - Some methodological concerns about aggregation techniques and baseline assumptions[^77] - Questions about whether private year-by-year forecasts (like their LLM capability predictions) s"
+    fetchedAt: 2026-02-22T01:54:20.108Z
+    httpStatus: 200
+    pageTitle: Samotsvety Nuclear Risk update October 2022
+    contentSnippet: Samotsvety Nuclear Risk update October 2022 Samotsvety Nuclear Risk update October 2022 This writeup was originally posted on the EA Forum , which has some good discussion. After recent events in Ukraine, Samotsvety convened to update our probabilities of nuclear war. In March 2022, at the beginning of the Ukraine war, we were at ~ 0.01% that London would be hit with a nuclear weapon in the next month. Now, we are at ~0.02% for the next 1-3 months, and at 16% that Russia uses any type of nuclear
+    contentLength: 44409
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://forum.effectivealtruism.org/posts/ByBBqwRXWqX5m9erL/update-to-samotsvety-agi-timelines
+    linkText: EA Forum - Update to Samotsvety AGI Timelines
+    claimContext: "- Some methodological concerns about aggregation techniques and baseline assumptions[^77] - Questions about whether private year-by-year forecasts (like their LLM capability predictions) should be made public for accountability[^78]"
+    fetchedAt: 2026-02-22T01:54:19.712Z
+    httpStatus: 200
+    pageTitle: Update to Samotsvety AGI timelines — EA Forum
+    contentSnippet: "Update to Samotsvety AGI timelines — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Update to Samotsvety AGI timelines by Misha_Yagudin , JonathanMann , NunoSempere Jan 24 2023 4 min read 9 120 Forecasting AI safety Samotsvety Forecasting AI forecasting Frontpage Update to Samotsvety AGI timelines Forecasts: Definition of AGI Individual forecasts Aggregate Epistemic status: Update from"
+    contentLength: 516427
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://forum.effectivealtruism.org/posts/EG9xDM8YRz4JN4wMN/samotsvety-s-ai-risk-forecasts
+    linkText: EA Forum - Samotsvety's AI Risk Forecasts
+    claimContext: Individual Samotsvety members have strong track records across multiple forecasting platforms, contributing to the team's overall reputation in the forecasting ecosystem.[^79]
+    fetchedAt: 2026-02-22T01:54:19.789Z
+    httpStatus: 200
+    pageTitle: Samotsvety&#x27;s AI risk forecasts — EA Forum
+    contentSnippet: Samotsvety&#x27;s AI risk forecasts — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Samotsvety&#x27;s AI risk forecasts by elifland , Misha_Yagudin Sep 9 2022 5 min read 30 175 AI safety Forecasting AI forecasting FTX Foundation Samotsvety Forecasting What We Owe the Future Frontpage Samotsvety&#x27;s AI risk forecasts Introduction Forecasts WWOTF questions FTX Foundation questions Wh
+    contentLength: 701406
+    status: verified
+    note: null

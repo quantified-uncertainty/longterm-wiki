@@ -1,0 +1,546 @@
+pageId: longtermism-credibility-after-ftx
+verifiedAt: 2026-02-22
+totalCitations: 49
+verified: 42
+broken: 7
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Longtermism
+    linkText: Longtermism — Wikipedia
+    claimContext: Longtermism is the ethical view that positively influencing the long-term future of humanity constitutes a key moral priority of our time. Developed most prominently by philosophers William MacAskill and <EntityLink id="toby-ord">Toby Ord</EntityLink> within the <EntityLink id="cea">Centre for Effec
+    fetchedAt: 2026-02-22T02:07:01.558Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://www.oxjournal.org/longtermism-a-philosophy-to-last-a-lifetime-or-two/
+    linkText: "Longtermism: A Philosophy to Last a Lifetime or Two — Oxford Political Review"
+    claimContext: Longtermism is the ethical view that positively influencing the long-term future of humanity constitutes a key moral priority of our time. Developed most prominently by philosophers William MacAskill and <EntityLink id="toby-ord">Toby Ord</EntityLink> within the <EntityLink id="cea">Centre for Effec
+    fetchedAt: 2026-02-22T02:07:02.367Z
+    httpStatus: 200
+    pageTitle: "Longtermism: A Philosophy To Last A Lifetime (Or Two&#8230;) | OxJournal"
+    contentSnippet: "Longtermism: A Philosophy To Last A Lifetime (Or Two&#8230;) | OxJournal Longtermism: A Philosophy To Last A Lifetime (Or Two&#8230;) Posted by Hannah de Dombal | Dec 14, 2023 | OxBright Essay Competition , Psychology | 0 Despite scientific research claiming that it’s better to be realistically pessimistic than unrealistically optimistic (Hecht, 2013), the philosophical idea of ‘longtermism’, coined by Oxford philosophers William MacAskill & Toby Ord, can help foster realistic optimism for the f"
+    contentLength: 85481
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.vice.com/en/article/ok-wtf-is-longtermism-the-tech-elite-ideology-that-led-to-the-ftx-collapse/
+    linkText: OK, WTF Is Longtermism? — VICE (November 2022)
+    claimContext: The collapse of <EntityLink id="ftx">FTX</EntityLink> in November 2022 and Bankman-Fried's subsequent conviction on fraud charges precipitated a significant crisis for the longtermist movement. Bankman-Fried had been one of longtermism's most prominent public funders, pledging the bulk of his fortun
+    fetchedAt: 2026-02-22T02:07:02.716Z
+    httpStatus: 200
+    pageTitle: OK, WTF Is 'Longtermism', the Tech Elite Ideology That Led to the FTX Collapse?
+    contentSnippet: OK, WTF Is &#039;Longtermism&#039;, the Tech Elite Ideology That Led to the FTX Collapse? Back to homepage Subscribe to VICE Get unlimited access to everything VICE has to offer. Digital Monthly $ 2.00 / month Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Digital Annual $ 20.00 / year Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Print & Digital $ 70.00 / year Turn off all ad
+    contentLength: 368664
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://theweek.com/cryptocurrencies/958633/effective-altruism-and-longtermism-the-elite-tech-ideologies-damaged-by
+    linkText: "Effective Altruism and Longtermism: The Elite Tech Ideologies Damaged by FTX — The Week"
+    claimContext: The collapse of <EntityLink id="ftx">FTX</EntityLink> in November 2022 and Bankman-Fried's subsequent conviction on fraud charges precipitated a significant crisis for the longtermist movement. Bankman-Fried had been one of longtermism's most prominent public funders, pledging the bulk of his fortun
+    fetchedAt: 2026-02-22T02:07:02.659Z
+    httpStatus: 200
+    pageTitle: What crypto&rsquo;s collapse means for effective altruism and long-termism | The Week
+    contentSnippet: "What crypto&rsquo;s collapse means for effective altruism and long-termism | The Week Sam Bankman-Fried said he wanted to donate 99% of his wealth (Image credit: Jeenah Moon/Bloomberg via Getty Images) Share Copy link Facebook X Linkedin Whatsapp Pinterest Share this article Join the conversation Follow us Add us as a preferred source on Google Newsletter TheWeek Get the The Week Newsletter A free daily email with the biggest news stories of the day &ndash; and the best features from TheWeek.com"
+    contentLength: 1173526
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://artsmatter.blogs.bristol.ac.uk/2024/11/21/who-else-belongs-to-my-moral-circle-the-foundations-of-longtermism/
+    linkText: Who Else Belongs to My Moral Circle? The Foundations of Longtermism — University of Bristol Arts Matter Blog (November 2024)
+    claimContext: "The question of philosophical credibility after FTX splits along two axes. The first concerns reputational damage: the movement's public standing, institutional health, and ability to attract funding and talent. The second is more fundamental: whether critics had identified genuine theoretical weakn"
+    fetchedAt: 2026-02-22T02:07:03.054Z
+    httpStatus: 200
+    pageTitle: "&#8216;Who else belongs to my moral circle?&#8217;: The Foundations of Longtermism &#8211; Arts Matter"
+    contentSnippet: "&#8216;Who else belongs to my moral circle?&#8217;: The Foundations of Longtermism &#8211; Arts Matter Skip to content By Professor Richard Pettigrew, Department of Philosophy, School of Arts To celebrate World Philosophy Day, Professor Richard Pettigrew tells us about a new project which will challenge the radical philosophical view of Longtermism—the idea that the impact of our actions on the far future is the most important consideration today. The project recently received a Leverhulme Trust"
+    contentLength: 52509
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.carnegiecouncil.org/media/article/long-termism-ethical-trojan-horse
+    linkText: "Long-termism: An Ethical Trojan Horse — Carnegie Council"
+    claimContext: Longtermism emerged from the effective altruism (EA) movement, which applies utilitarian-influenced reasoning to maximize the good achievable through philanthropy and career choices. Peter Singer's work on the moral obligations of affluent individuals toward distant strangers provided the philosophi
+    fetchedAt: 2026-02-22T02:07:05.189Z
+    httpStatus: 200
+    pageTitle: "Long-termism: An Ethical Trojan Horse | Carnegie Council for Ethics in International Affairs"
+    contentSnippet: "Long-termism: An Ethical Trojan Horse | Carnegie Council for Ethics in International Affairs Skip to content Long-termism: An Ethical Trojan Horse Sep 29, 2022 Authors Anja Kaspersen Anja Kaspersen Former Carnegie Council Senior Fellow, Artificial Intelligence & Equality Initiative (AIEI); IEEE Wendell Wallach Wendell Wallach Former Carnegie-Uehiro Fellow, Artificial Intelligence & Equality Initiative (AIEI); Yale Interdisciplinary Center for Bioethics About the Initiative The Artificial Intelli"
+    contentLength: 96848
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.centreforeffectivealtruism.org/longtermism
+    linkText: Centre for Effective Altruism — Longtermism
+    claimContext: Longtermism emerged from the effective altruism (EA) movement, which applies utilitarian-influenced reasoning to maximize the good achievable through philanthropy and career choices. Peter Singer's work on the moral obligations of affluent individuals toward distant strangers provided the philosophi
+    fetchedAt: 2026-02-22T02:07:04.803Z
+    httpStatus: 200
+    pageTitle: Longtermism | Centre For Effective Altruism
+    contentSnippet: Longtermism | Centre For Effective Altruism Longtermism ‘Longtermism&#x27; refers to a set of ethical views concerned with protecting and improving the long-run future. This view rests on the idea that future people matter morally, that there could be a very large number of future people, and that there are actions we can take now to affect how good or bad the future is. There are multiple more precise definitions of longtermism. In his forthcoming book “ What We Owe the Future ,” Will MacAskill
+    contentLength: 73083
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.oxjournal.org/longtermism-a-philosophy-to-last-a-lifetime-or-two/
+    linkText: "Longtermism: A Philosophy to Last a Lifetime or Two — Oxford Political Review"
+    claimContext: The institutional infrastructure that developed around this philosophical shift was substantial. By 2021, the EA movement had accumulated an estimated \$46 billion in dedicated funding, much of it directed toward existential risk research.[^8] The <EntityLink id="fhi">Future of Humanity Institute</E
+    fetchedAt: 2026-02-22T02:07:04.266Z
+    httpStatus: 200
+    pageTitle: "Longtermism: A Philosophy To Last A Lifetime (Or Two&#8230;) | OxJournal"
+    contentSnippet: "Longtermism: A Philosophy To Last A Lifetime (Or Two&#8230;) | OxJournal Longtermism: A Philosophy To Last A Lifetime (Or Two&#8230;) Posted by Hannah de Dombal | Dec 14, 2023 | OxBright Essay Competition , Psychology | 0 Despite scientific research claiming that it’s better to be realistically pessimistic than unrealistically optimistic (Hecht, 2013), the philosophical idea of ‘longtermism’, coined by Oxford philosophers William MacAskill & Toby Ord, can help foster realistic optimism for the f"
+    contentLength: 85481
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/
+    linkText: Sam Bankman-Fried, Effective Altruism, and Alameda — TIME (March 2023)
+    claimContext: Bankman-Fried's relationship with EA began in 2012 when MacAskill advised him to pursue "earning to give"—a strategy of maximizing income in order to donate at scale—as an effective altruistic path.[^9] Bankman-Fried went on to found the cryptocurrency exchange FTX and became one of the movement's m
+    fetchedAt: 2026-02-22T02:07:04.605Z
+    httpStatus: 200
+    pageTitle: Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME
+    contentSnippet: "Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME Politics Exclusive: Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed ADD TIME ON GOOGLE Show me more content from TIME on Google Search Loading... Photo Illustration by Neil Jamieson from TIME by Charlotte Alter Senior Correspondent Loading... Leaders of the Effective Altruism movement were repeatedly warned beginning in 2018 that Sam Bankman-Fried w"
+    contentLength: 474703
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.vice.com/en/article/ok-wtf-is-longtermism-the-tech-elite-ideology-that-led-to-the-ftx-collapse/
+    linkText: OK, WTF Is Longtermism? — VICE (November 2022)
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:07:04.482Z
+    httpStatus: 200
+    pageTitle: OK, WTF Is 'Longtermism', the Tech Elite Ideology That Led to the FTX Collapse?
+    contentSnippet: OK, WTF Is &#039;Longtermism&#039;, the Tech Elite Ideology That Led to the FTX Collapse? Back to homepage Subscribe to VICE Get unlimited access to everything VICE has to offer. Digital Monthly $ 2.00 / month Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Digital Annual $ 20.00 / year Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Print & Digital $ 70.00 / year Turn off all ad
+    contentLength: 368664
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.principia-advisory.com/2023/03/24/what-the-ftx-collapse-teaches-us-about-ethics/
+    linkText: What the FTX Collapse Teaches Us About Ethics — Principia Advisory (March 2023)
+    claimContext: The FTX Future Fund committed \$160 million to longtermist projects before the exchange's collapse.[^4] MacAskill served on the Future Fund's advisory board and had directed \$36.5 million to organizations he co-founded.[^36] When FTX filed for bankruptcy in November 2022 amid revelations that custo
+    fetchedAt: 2026-02-22T02:07:08.108Z
+    httpStatus: 200
+    pageTitle: What the FTX collapse teaches us about ethics | Principia Advisory
+    contentSnippet: What the FTX collapse teaches us about ethics | Principia Advisory Skip to the content Close Menu Perspectives What the FTX collapse teaches us about ethics “You were really good at talking about ethics.” “Hehe. I had to be. It’s what reputations are made of, to some extent.” This is a small excerpt of a chat between journalist Kelsey Piper and former CEO of the cryptocurrency exchange FTX Sam Bankman-Fried, also known as SBF, just after his billion dollar crypto empire collapsed. FTX was one of
+    contentLength: 125807
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://forum.effectivealtruism.org/posts/WdeiPrwgqW2wHAxgT/a-personal-statement-on-ftx
+    linkText: A Personal Statement on FTX — William MacAskill, EA Forum (November 12, 2022)
+    claimContext: "The immediate consequences for longtermism's public standing were substantial. On November 12, 2022, MacAskill published a statement on the EA Forum acknowledging the damage directly. He wrote that he did not know which emotion was stronger: his \"utter rage at Sam (and others?) for causing such harm"
+    fetchedAt: 2026-02-22T02:07:06.567Z
+    httpStatus: 200
+    pageTitle: A personal statement on FTX — EA Forum
+    contentSnippet: A personal statement on FTX — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. A personal statement on FTX by William_MacAskill Nov 12 2022 3 min read 144 291 Community Philosophy FTX collapse FTX Foundation Future Fund Naive vs. sophisticated consequentialism Sam Bankman-Fried William MacAskill Frontpage This is a repost from a Twitter thread I made last night. It reads a little oddly when presented as a Foru
+    contentLength: 1622773
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/DB9ggzc5u9RMBosoz/wrong-lessons-from-the-ftx-catastrophe
+    linkText: Wrong Lessons from the FTX Catastrophe — EA Forum
+    claimContext: Critics contested this framing, arguing it "admits that they were duped by an unethical huckster, but denies that there is any serious flaw in the movement itself," treating SBF's conduct as "simply an unhappy coincidence that Samuel Bankman-Fried was associated with them."[^37] <EntityLink id="8000
+    fetchedAt: 2026-02-22T02:07:06.319Z
+    httpStatus: 200
+    pageTitle: Wrong lessons from the FTX catastrophe — EA Forum
+    contentSnippet: "Wrong lessons from the FTX catastrophe — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Wrong lessons from the FTX catastrophe by burner Nov 14 2022 5 min read 20 284 Community Philosophy FTX collapse Moral philosophy Frontpage Wrong lessons from the FTX catastrophe 1. Ambition was a mistake 2. No more earning to give 3. General FUD from nefarious actors 4. Most hot takes on ethics 20 "
+    contentLength: 510557
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.radicalphilosophy.com/commentary/the-toxic-ideology-of-longtermism
+    linkText: The Toxic Ideology of Longtermism — Alice Crary, Radical Philosophy (2023)
+    claimContext: Critics argued the scandal revealed something structural rather than merely incidental. Longtermism's movement had grown to depend on a small number of extremely wealthy donors—a concentration of philanthropic power that some argued left it vulnerable to the ethical failures of individual actors and
+    fetchedAt: 2026-02-22T02:07:07.334Z
+    httpStatus: 200
+    pageTitle: Alice Crary · The toxic ideology of longtermism (2023)
+    contentSnippet: "Alice Crary · The toxic ideology of longtermism (2023) The toxic ideology of longtermism &#8211; Radical Philosophy Skip to content RP 2.14 (April 2023) ~ Commentary Alice Crary is a philosopher and writer based at The New School who divides her time between New York, Oxford, and Berlin. Her most recent book, co-edited with Carol Adams and Lori Gruen, is The Good it Promises, The Harm it Does: Critical Essays on Effective Altruism (2023). Alice Crary, 'The toxic ideology of longtermism', Radical"
+    contentLength: 83169
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.currentaffairs.org/news/2023/05/why-effective-altruism-and-longtermism-are-toxic-ideologies
+    linkText: Why Effective Altruism and Longtermism Are Toxic Ideologies — Current Affairs (interview with Torres, May 2023)
+    claimContext: Critics argued the scandal revealed something structural rather than merely incidental. Longtermism's movement had grown to depend on a small number of extremely wealthy donors—a concentration of philanthropic power that some argued left it vulnerable to the ethical failures of individual actors and
+    fetchedAt: 2026-02-22T02:07:06.620Z
+    httpStatus: 200
+    pageTitle: Why Effective Altruism and “Longtermism” Are Toxic Ideologies
+    contentSnippet: Why Effective Altruism and “Longtermism” Are Toxic Ideologies Hide menu About Print Magazine Team Pitch Form FAQ Subscribe Issues Archive Articles Shop Podcast News Briefing Donate This is a search field with an auto-suggest feature attached. There are no suggestions because the search field is empty. Why Effective Altruism and “Longtermism” Are Toxic Ideologies Intellectual historian Émile P. Torres explains how Silicon Valley’s favorite ideas for changing the world for the better actually thre
+    contentLength: 102147
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://time.com/6262810/sam-bankman-fried-effective-altruism-alameda-ftx/
+    linkText: "Exclusive: Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapsed — TIME (March 15, 2023)"
+    claimContext: A TIME Magazine investigation reported in March 2023 that some EA leaders had received warnings about concerns regarding Bankman-Fried's conduct years before the collapse.[^16] EA community responses disputed the significance of those warnings, arguing they were not specific enough to warrant action
+    fetchedAt: 2026-02-22T02:07:09.155Z
+    httpStatus: 200
+    pageTitle: Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME
+    contentSnippet: "Effective Altruist Leaders Were Warned About Sam Bankman-Fried Years Before FTX Collapse | TIME Politics Exclusive: Effective Altruist Leaders Were Repeatedly Warned About Sam Bankman-Fried Years Before FTX Collapsed ADD TIME ON GOOGLE Show me more content from TIME on Google Search Loading... Photo Illustration by Neil Jamieson from TIME by Charlotte Alter Senior Correspondent Loading... Leaders of the Effective Altruism movement were repeatedly warned beginning in 2018 that Sam Bankman-Fried w"
+    contentLength: 474703
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.radicalphilosophy.com/commentary/the-toxic-ideology-of-longtermism
+    linkText: The Toxic Ideology of Longtermism — Alice Crary, Radical Philosophy (2023)
+    claimContext: Peter Singer, whose philosophical work had inspired EA's founding generation, acknowledged that the reputational damage from the FTX collapse was substantial and expressed uncertainty about the movement's near-term recovery prospects.[^17]
+    fetchedAt: 2026-02-22T02:07:09.428Z
+    httpStatus: 200
+    pageTitle: Alice Crary · The toxic ideology of longtermism (2023)
+    contentSnippet: "Alice Crary · The toxic ideology of longtermism (2023) The toxic ideology of longtermism &#8211; Radical Philosophy Skip to content RP 2.14 (April 2023) ~ Commentary Alice Crary is a philosopher and writer based at The New School who divides her time between New York, Oxford, and Berlin. Her most recent book, co-edited with Carol Adams and Lori Gruen, is The Good it Promises, The Harm it Does: Critical Essays on Effective Altruism (2023). Alice Crary, 'The toxic ideology of longtermism', Radical"
+    contentLength: 83169
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://aeon.co/essays/why-longtermism-is-the-worlds-most-dangerous-secular-credo
+    linkText: Why Longtermism Is the World's Most Dangerous Secular Credo — Émile Torres, Aeon (October 19, 2021)
+    claimContext: A central objection to longtermism concerns its treatment of present versus future welfare. Because longtermist calculations assign equal moral weight to future individuals, and because the potential future human population vastly outnumbers those alive today—potentially by ratios of thousands to on
+    fetchedAt: 2026-02-22T02:07:15.709Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 21
+    url: https://forum.effectivealtruism.org/posts/st59vLvsorvQhqvBr/ftx-ea-principles-and-the-longtermist-ea-community
+    linkText: FTX, EA Principles, and the Longtermist EA Community — EA Forum
+    claimContext: Several critics have argued that longtermism's consequentialist architecture—its insistence that actions be evaluated by their expected long-term outcomes—creates insufficient ethical guardrails against harmful behavior in the present. Because Bankman-Fried described himself as a committed consequen
+    fetchedAt: 2026-02-22T02:07:09.188Z
+    httpStatus: 200
+    pageTitle: FTX, &#x27;EA Principles&#x27;, and &#x27;The (Longtermist) EA Community&#x27; — EA Forum
+    contentSnippet: FTX, &#x27;EA Principles&#x27;, and &#x27;The (Longtermist) EA Community&#x27; — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents FTX, &#x27;EA Principles&#x27;, and &#x27;The (Longtermist) EA Community&#x27; by Violet Hour Nov 25 2022 17 min read 12 66 Community FTX collapse Frontpage FTX, &#x27;EA Principles&#x27;, and &#x27;The (Longtermist) EA Community&#x27; 1. Intro 2. &#x27;EA Pri
+    contentLength: 557020
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.mercatornet.com/back-to-virtue-effective-altruism-after-ftx
+    linkText: "Back to Virtue: Effective Altruism After FTX — MercatorNet"
+    claimContext: Several critics have argued that longtermism's consequentialist architecture—its insistence that actions be evaluated by their expected long-term outcomes—creates insufficient ethical guardrails against harmful behavior in the present. Because Bankman-Fried described himself as a committed consequen
+    fetchedAt: 2026-02-22T02:07:09.527Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 23
+    url: https://www.radicalphilosophy.com/commentary/the-toxic-ideology-of-longtermism
+    linkText: The Toxic Ideology of Longtermism — Alice Crary, Radical Philosophy (2023)
+    claimContext: Philosopher Alice Crary, writing in *Radical Philosophy* in 2023, argued that longtermists give existential threats such weight that they deprioritize actual suffering in the world we live in, and that the FTX collapse brought this structural feature of the ideology into public view.[^23] David Thor
+    fetchedAt: 2026-02-22T02:07:17.728Z
+    httpStatus: 200
+    pageTitle: Alice Crary · The toxic ideology of longtermism (2023)
+    contentSnippet: "Alice Crary · The toxic ideology of longtermism (2023) The toxic ideology of longtermism &#8211; Radical Philosophy Skip to content RP 2.14 (April 2023) ~ Commentary Alice Crary is a philosopher and writer based at The New School who divides her time between New York, Oxford, and Berlin. Her most recent book, co-edited with Carol Adams and Lori Gruen, is The Good it Promises, The Harm it Does: Critical Essays on Effective Altruism (2023). Alice Crary, 'The toxic ideology of longtermism', Radical"
+    contentLength: 83169
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://aeon.co/essays/why-longtermism-is-the-worlds-most-dangerous-secular-credo
+    linkText: Why Longtermism Is the World's Most Dangerous Secular Credo — Émile Torres, Aeon (October 19, 2021)
+    claimContext: "Beyond the FTX controversy, critics have identified several internal philosophical vulnerabilities. Émile Torres, in an essay published in *Aeon* on October 19, 2021—more than a year before the FTX collapse—argued that longtermism's emphasis on maximizing the long-run potential of the human species "
+    fetchedAt: 2026-02-22T02:07:22.916Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 25
+    url: https://en.wikipedia.org/wiki/Longtermism
+    linkText: Longtermism — Wikipedia
+    claimContext: "The probability mathematics underlying longtermist prioritization have also attracted sustained academic criticism. Longtermist arguments often hold that even very small reductions in extinction probability carry more expected value than saving large numbers of current lives, given the astronomical "
+    fetchedAt: 2026-02-22T02:07:16.727Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 27
+    url: https://mindyourmetaphysics.substack.com/p/on-the-fundamental-incoherence-of
+    linkText: On the Fundamental Incoherence of Longtermism — Mind Your Metaphysics (Substack)
+    claimContext: Some critics have pointed to a potential self-undermining quality in longtermism's demands. If present generations are required to make substantial sacrifices in the service of future flourishing, and if this pattern persists across time, the result may be a history of continuous present-day privati
+    fetchedAt: 2026-02-22T02:07:17.476Z
+    httpStatus: 200
+    pageTitle: On The Fundamental Incoherence of Longtermism
+    contentSnippet: "On The Fundamental Incoherence of Longtermism Mind Your Metaphysics Subscribe Sign in On The Fundamental Incoherence of Longtermism Some very basic math Scott Lipscomb Jul 04, 2025 5 2 Share I haven’t written much on ethics on this substack, and there’s a reason for that: my academic work, both in seminary and in graduate school, focused mostly on systematic theology and then philosophy, especially on fundamental questions of epistemology and philosophy of mind. I just didn’t study ethics much i"
+    contentLength: 256125
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.centreforeffectivealtruism.org/longtermism
+    linkText: Centre for Effective Altruism — Longtermism
+    claimContext: Proponents of longtermism have consistently argued that the FTX scandal reflects the moral failures of an individual, not the validity of a philosophical framework. MacAskill's and <EntityLink id="toby-ord">Toby Ord</EntityLink>'s arguments rest on three premises—that future people matter morally, t
+    fetchedAt: 2026-02-22T02:07:17.303Z
+    httpStatus: 200
+    pageTitle: Longtermism | Centre For Effective Altruism
+    contentSnippet: Longtermism | Centre For Effective Altruism Longtermism ‘Longtermism&#x27; refers to a set of ethical views concerned with protecting and improving the long-run future. This view rests on the idea that future people matter morally, that there could be a very large number of future people, and that there are actions we can take now to affect how good or bad the future is. There are multiple more precise definitions of longtermism. In his forthcoming book “ What We Owe the Future ,” Will MacAskill
+    contentLength: 73083
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://80000hours.org/articles/future-generations/
+    linkText: Longtermism — 80,000 Hours
+    claimContext: Defenders also note that longtermism encompasses a range of positions, from MacAskill's more modest claim that long-term impact is *a* key moral priority, to stronger versions holding that it is *the* overwhelming priority. Hilary Greaves and Christian Tarsney's 2025 Oxford University Press volume d
+    fetchedAt: 2026-02-22T02:07:24.506Z
+    httpStatus: 200
+    pageTitle: "Longtermism: a call to protect future generations - 80,000 Hours"
+    contentSnippet: "Longtermism: a call to protect future generations - 80,000 Hours Search for: On this page: Introduction 1 The case for longtermism 1.1 1. We should care about how the lives of future individuals go 1.2 2. The number of future individuals whose lives matter could be vast. 1.3 3. We have an opportunity to affect how the long-run future goes 1.4 Summing up the arguments 2 Objections to longtermism 3 If I don&#8217;t agree with 80,000 Hours about longtermism, can I still benefit from your advice? 4 "
+    contentLength: 246610
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.devex.com/news/what-will-ftx-s-collapse-mean-for-global-health-and-development-104480
+    linkText: What Will FTX's Collapse Mean for Global Health and Development? — Devex
+    claimContext: On the question of present neglect, defenders argue that longtermism is compatible with significant near-term intervention and that critics construct a false opposition. Pandemic preparedness, for instance, serves both near-term public health and long-run existential risk reduction; AI safety resear
+    fetchedAt: 2026-02-22T02:07:24.694Z
+    httpStatus: 200
+    pageTitle: What will FTX&#39;s collapse mean for global health and development? | Devex
+    contentSnippet: What will FTX&#39;s collapse mean for global health and development? | Devex News Philanthropy What will FTX&#39;s collapse mean for global health and development? Sam Bankman-Fried, the founder of the cryptocurrency exchange FTX, has lost his fortune, destroyed his reputation, and dealt a blow to the effective altruism community, which funds many global health and international development causes. By Catherine Cheney // 18 November 2022 Related Stories Is MrBeast a force for good in development
+    contentLength: 78375
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://theweek.com/cryptocurrencies/958633/effective-altruism-and-longtermism-the-elite-tech-ideologies-damaged-by
+    linkText: "Effective Altruism and Longtermism: The Elite Tech Ideologies Damaged by FTX — The Week"
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:07:24.454Z
+    httpStatus: 200
+    pageTitle: What crypto&rsquo;s collapse means for effective altruism and long-termism | The Week
+    contentSnippet: "What crypto&rsquo;s collapse means for effective altruism and long-termism | The Week Sam Bankman-Fried said he wanted to donate 99% of his wealth (Image credit: Jeenah Moon/Bloomberg via Getty Images) Share Copy link Facebook X Linkedin Whatsapp Pinterest Share this article Join the conversation Follow us Add us as a preferred source on Google Newsletter TheWeek Get the The Week Newsletter A free daily email with the biggest news stories of the day &ndash; and the best features from TheWeek.com"
+    contentLength: 1173526
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.principia-advisory.com/2023/03/24/what-the-ftx-collapse-teaches-us-about-ethics/
+    linkText: What the FTX Collapse Teaches Us About Ethics — Principia Advisory (March 2023)
+    claimContext: Critics have alleged that longtermist and EA identity functioned as what they term "ethics washing"—presenting a philanthropic persona that provided social legitimacy and political access while underlying financial practices were problematic. Bankman-Fried's congressional testimony emphasized his ph
+    fetchedAt: 2026-02-22T02:07:25.873Z
+    httpStatus: 200
+    pageTitle: What the FTX collapse teaches us about ethics | Principia Advisory
+    contentSnippet: What the FTX collapse teaches us about ethics | Principia Advisory Skip to the content Close Menu Perspectives What the FTX collapse teaches us about ethics “You were really good at talking about ethics.” “Hehe. I had to be. It’s what reputations are made of, to some extent.” This is a small excerpt of a chat between journalist Kelsey Piper and former CEO of the cryptocurrency exchange FTX Sam Bankman-Fried, also known as SBF, just after his billion dollar crypto empire collapsed. FTX was one of
+    contentLength: 125760
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://forum.effectivealtruism.org/posts/LSfZKPFHzwJgdhF5f/why-haven-t-we-seen-a-promising-longtermist-intervention-yet
+    linkText: Why Haven't We Seen a Promising Longtermist Intervention Yet? — EA Forum
+    claimContext: A practical critique that has gained traction concerns the difficulty of identifying concrete, tractable interventions that reliably reduce existential risk by measurable amounts. Critics note that identifying clearly promising longtermist interventions that meet rigorous evidence-based standards ha
+    fetchedAt: 2026-02-22T02:07:24.248Z
+    httpStatus: 200
+    pageTitle: Why haven’t we seen a promising longtermist intervention yet? — EA Forum
+    contentSnippet: Why haven’t we seen a promising longtermist intervention yet? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Why haven’t we seen a promising longtermist intervention yet? by Yarrow Bouchard 🔸 Dec 18 2025 5 min read 24 14 Building effective altruism Existential risk Philosophy Criticism of effective altruism Criticism of effective altruist causes Criticism of longtermism and existential risk studies Longte
+    contentLength: 659787
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.utilitarianism.com/sam-bankman-fried.html
+    linkText: "Contemporary Utilitarians: Sam Bankman-Fried — Utilitarianism.com"
+    claimContext: Bankman-Fried described himself primarily as a consequentialist utilitarian rather than a longtermist specifically. By his own account, he was "a total, act, hedonistic/one level (as opposed to high and low pleasure), classical (as opposed to negative) utilitarian."[^34] The <EntityLink id="ftx-futu
+    fetchedAt: 2026-02-22T02:07:27.393Z
+    httpStatus: 200
+    pageTitle: "Contemporary utilitarians: Sam Bankman-Fried"
+    contentSnippet: "Contemporary utilitarians: Sam Bankman-Fried CONTEMPORARY UTILITARIANS Sam Bankman-Fried (1992 - ) Classical utilitarian entrepreneur Sam Bankman-Fried ( SBF ) is the founder and former CEO of the FTX cryptocurrency exchange. SBF also managed assets through Alameda Research, a quantitative cryptocurrency trading firm of effective altruists; until November 2022, SBF was the wealthiest billionaire in the cryptosphere. In November 2023, a New York jury found SBF guilty of fraud and conspiracy. He w"
+    contentLength: 13256
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.newstatesman.com/long-reads/2023/11/sam-bankman-fried-crypto-king-effective-altruism
+    linkText: Sam Bankman-Fried and the Effective Altruism Delusion — New Statesman (November 7, 2023)
+    claimContext: Bankman-Fried described himself primarily as a consequentialist utilitarian rather than a longtermist specifically. By his own account, he was "a total, act, hedonistic/one level (as opposed to high and low pleasure), classical (as opposed to negative) utilitarian."[^34] The <EntityLink id="ftx-futu
+    fetchedAt: 2026-02-22T02:07:28.312Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried and the effective altruism delusion - New Statesman
+    contentSnippet: "Sam Bankman-Fried and the effective altruism delusion - New Statesman Editor ’ s note: This article was originally published on 20 September. On 3 November, “Crypto King ” Sam Bankman-Fried was found guilty of fraud and money laundering. Sophie McBain looks at whether the idealist effective altruism philosophy will survive his conviction. The moral philosopher met a brilliant American maths student who wanted to know how he could do the most good in the world. How about becoming a banker, the ph"
+    contentLength: 227927
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://logosjournal.com/article/what-we-owe-the-past-william-macaskill-effective-altruism-and-the-wrong-life/
+    linkText: "What We Owe the Past: William MacAskill, Effective Altruism and the Wrong Life — Logos Journal (October 2023)"
+    claimContext: The FTX Future Fund committed \$160 million to longtermist projects before the exchange's collapse.[^4] MacAskill served on the Future Fund's advisory board and had directed \$36.5 million to organizations he co-founded.[^36] When FTX filed for bankruptcy in November 2022 amid revelations that custo
+    fetchedAt: 2026-02-22T02:07:28.550Z
+    httpStatus: 200
+    pageTitle: "What We Owe the Past: William MacAskill, Effective Altruism and the Wrong Life - Logos Journal"
+    contentSnippet: "What We Owe the Past: William MacAskill, Effective Altruism and the Wrong Life - Logos Journal Skip to content What We Owe the Past: William MacAskill, Effective Altruism and the Wrong Life James Kent and Michael Lazarus ‘The tradition of all the dead generations weighs like a nightmare on the brain of the living’ – Karl Marx It was, after all, too good to be true. Following the aftermath of the allegations of corruption and bankruptcy of the cryptocurrency exchange company FTX Trading Ltd., Wil"
+    contentLength: 183288
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.thephilosopher1923.org/post/a-mirror-for-tech-bros
+    linkText: Effective Altruism, Longtermism, and the Problem of Arbitrary Power — The Philosopher 1923 (2023)
+    claimContext: Critics contested this framing, arguing it "admits that they were duped by an unethical huckster, but denies that there is any serious flaw in the movement itself," treating SBF's conduct as "simply an unhappy coincidence that Samuel Bankman-Fried was associated with them."[^37] <EntityLink id="8000
+    fetchedAt: 2026-02-22T02:07:27.292Z
+    httpStatus: 200
+    pageTitle: '"Effective Altruism, Longtermism, and the Problem of Arbitrary Power": An Essay by Gwilym David Blunt (Keywords: Ethics; Existential Threats; Billionaires; Peter Singer)'
+    contentSnippet: '--> "Effective Altruism, Longtermism, and the Problem of Arbitrary Power": An Essay by Gwilym David Blunt (Keywords: Ethics; Existential Threats; Billionaires; Peter Singer) top of page From The Philosopher, vol. 111, no. 2 (" Where is Public Philosophy Going? "). If you enjoy reading this, please consider becoming a patron or making a small donation . We are unfunded and your support is greatly appreciated. Impact is a word that gets bandied around a lot in academia. It is the metric by which s'
+    contentLength: 1367568
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://dailynous.com/2024/04/18/end-future-of-humanity-institute/
+    linkText: The End of the Future of Humanity Institute — Daily Nous (April 18, 2024)
+    claimContext: The <EntityLink id="fhi">Future of Humanity Institute</EntityLink> closed on April 16, 2024. The closure resulted primarily from decisions by Oxford's Faculty of Philosophy, which in 2020 imposed a freeze on FHI's fundraising and hiring. That freeze led to the loss of lead researchers and a promisin
+    fetchedAt: 2026-02-22T02:07:28.431Z
+    httpStatus: 200
+    pageTitle: The End of the Future of Humanity Institute (updated) - Daily Nous
+    contentSnippet: The End of the Future of Humanity Institute (updated) - Daily Nous You are using an outdated browser. Please upgrade your browser or activate Google Chrome Frame to improve your experience. Begin typing your search above and press return to search. Press Esc to cancel. The Future of Humanity Institute (FHI) at the University of Oxford closed earlier this week. The FHI was an interdisciplinary research group founded in 2005 by philosopher Nick Bostrom , who served as its director for its entire e
+    contentLength: 462660
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://forum.effectivealtruism.org/posts/uK27pds7J36asqJPt/future-of-humanity-institute-2005-2024-final-report
+    linkText: "Future of Humanity Institute 2005–2024: Final Report — EA Forum (April 17, 2024)"
+    claimContext: The <EntityLink id="fhi">Future of Humanity Institute</EntityLink> closed on April 16, 2024. The closure resulted primarily from decisions by Oxford's Faculty of Philosophy, which in 2020 imposed a freeze on FHI's fundraising and hiring. That freeze led to the loss of lead researchers and a promisin
+    fetchedAt: 2026-02-22T02:07:29.650Z
+    httpStatus: 200
+    pageTitle: "Future of Humanity Institute 2005-2024: Final Report — EA Forum"
+    contentSnippet: "Future of Humanity Institute 2005-2024: Final Report — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Future of Humanity Institute 2005-2024: Final Report by Pablo Apr 17 2024 6 min read 89 224 Building effective altruism Future of Humanity Institute Announcements and updates Organization updates Postmortems & retrospectives History of effective altruism Frontpage Future of Humanity In"
+    contentLength: 1243837
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://bioethicsobservatory.org/2024/05/the-university-of-oxford-has-closed-the-future-of-humanity-institute/46366/
+    linkText: The Future of Humanity Institute Closes — Bioethics Observatory (June 2024)
+    claimContext: The <EntityLink id="fhi">Future of Humanity Institute</EntityLink> closed on April 16, 2024. The closure resulted primarily from decisions by Oxford's Faculty of Philosophy, which in 2020 imposed a freeze on FHI's fundraising and hiring. That freeze led to the loss of lead researchers and a promisin
+    fetchedAt: 2026-02-22T02:07:30.274Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 260
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://forum.effectivealtruism.org/posts/xafpj3on76uRDoBja/the-ftx-future-fund-team-has-resigned-1
+    linkText: The FTX Future Fund Team Has Resigned — Nick Beckstead and Future Fund team, EA Forum (November 11, 2022)
+    claimContext: <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, who had served as CEO of the FTX Foundation after joining in November 2021, co-signed the Future Fund team's resignation statement on November 11, 2022, expressing that the team was "shocked and immensely saddened" by the events at FTX and
+    fetchedAt: 2026-02-22T02:07:29.780Z
+    httpStatus: 200
+    pageTitle: The FTX Future Fund team has resigned — EA Forum
+    contentSnippet: "The FTX Future Fund team has resigned — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The FTX Future Fund team has resigned by Nick_Beckstead , leopold , ab , ketanrama Nov 11 2022 1 min read 288 680 Community FTX collapse FTX Foundation Future Fund Organization updates Argentina Frontpage We were shocked and immensely saddened to learn of the recent events at FTX. Our hearts go out to the thousands of FTX "
+    contentLength: 2832056
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://forum.effectivealtruism.org/posts/Defu3jkejb7pmLjeN/nick-beckstead-is-leaving-the-effective-ventures-boards
+    linkText: Nick Beckstead Is Leaving the Effective Ventures Boards — Eli Rose, EA Forum (September 6, 2023)
+    claimContext: <EntityLink id="nick-beckstead">Nick Beckstead</EntityLink>, who had served as CEO of the FTX Foundation after joining in November 2021, co-signed the Future Fund team's resignation statement on November 11, 2022, expressing that the team was "shocked and immensely saddened" by the events at FTX and
+    fetchedAt: 2026-02-22T02:07:29.937Z
+    httpStatus: 200
+    pageTitle: Nick Beckstead is leaving the Effective Ventures boards — EA Forum
+    contentSnippet: Nick Beckstead is leaving the Effective Ventures boards — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Nick Beckstead is leaving the Effective Ventures boards by Eli Rose🔸 , lincolnq Sep 6 2023 2 min read 7 130 Community Announcements and updates Nick Beckstead Effective Ventures Frontpage On 23rd August, Nick Beckstead stepped down from the boards of Effective Ventures UK and Effective Ventures US. For c
+    contentLength: 220783
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.openphilanthropy.org/grants/global-priorities-institute-general-support/
+    linkText: Global Priorities Institute — General Support Grant — Open Philanthropy (2023–2024)
+    claimContext: The Global Priorities Institute at Oxford has continued to operate. <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> recommended a grant of approximately \$3.3 million to GPI for general support in the 2023–2024 period, and GPI produced active research output including working paper
+    fetchedAt: 2026-02-22T02:07:38.320Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 44
+    url: https://forum.effectivealtruism.org/posts/FHJMKSwrwdTogYLGF/we-re-no-longer-pausing-most-new-longtermist-funding
+    linkText: We're No Longer 'Pausing Most New Longtermist Funding Commitments' — Holden Karnofsky, Open Philanthropy EA Forum post (January 30, 2023)
+    claimContext: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> paused most new longtermist funding commitments in November 2022 following the FTX collapse. That pause was lifted in late January 2023, after the organization conducted an internal review and established new grant assessment guidance
+    fetchedAt: 2026-02-22T02:07:39.498Z
+    httpStatus: 200
+    pageTitle: We&#x27;re no longer "pausing most new longtermist funding commitments" — EA Forum
+    contentSnippet: We&#x27;re no longer "pausing most new longtermist funding commitments" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents We&#x27;re no longer "pausing most new longtermist funding commitments" by Holden Karnofsky Jan 30 2023 7 min read 39 203 Building effective altruism Coefficient Giving Effective altruism funding Longtermism Organization updates Frontpage We&#x27;re no longer "pausin
+    contentLength: 767338
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.openphilanthropy.org/research/our-progress-in-2023-and-plans-for-2024/
+    linkText: Our Progress in 2023 and Plans for 2024 — Open Philanthropy (March 27, 2024)
+    claimContext: <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> paused most new longtermist funding commitments in November 2022 following the FTX collapse. That pause was lifted in late January 2023, after the organization conducted an internal review and established new grant assessment guidance
+    fetchedAt: 2026-02-22T02:07:46.689Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 46
+    url: https://forum.effectivealtruism.org/posts/RueHqBuBKQBtSYkzp/observations-on-the-funding-landscape-of-ea-and-ai-safety
+    linkText: Observations on the Funding Landscape of EA and AI Safety — EA Forum (October 2, 2023)
+    claimContext: "The FTX collapse caused a reduction in expected longtermist funding estimated in the hundreds of millions of dollars annually. Other funders partially filled the gap: the Survival and Flourishing Fund increased giving in 2023, and Longview Philanthropy moved over \\$55 million since its founding in 2"
+    fetchedAt: 2026-02-22T02:07:39.441Z
+    httpStatus: 200
+    pageTitle: Observations on the funding landscape of EA and AI safety — EA Forum
+    contentSnippet: Observations on the funding landscape of EA and AI safety — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Observations on the funding landscape of EA and AI safety by Vilhelm Skoglund , Jona Oct 2 2023 17 min read 12 136 AI safety Community Building effective altruism Effective giving Fundraising Effective altruism funding Building the field of AI safety Funding opportunities Grantmak
+    contentLength: 609535
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://www.devex.com/news/what-will-ftx-s-collapse-mean-for-global-health-and-development-104480
+    linkText: What Will FTX's Collapse Mean for Global Health and Development? — Devex
+    claimContext: The FTX collapse also intensified pre-existing tensions within EA between advocates focused on global health and poverty alleviation and those prioritizing longtermist cause areas. Critics from the global health side of EA argued that longtermism's dominance of EA funding had distorted priorities an
+    fetchedAt: 2026-02-22T02:07:40.114Z
+    httpStatus: 200
+    pageTitle: What will FTX&#39;s collapse mean for global health and development? | Devex
+    contentSnippet: What will FTX&#39;s collapse mean for global health and development? | Devex News Philanthropy What will FTX&#39;s collapse mean for global health and development? Sam Bankman-Fried, the founder of the cryptocurrency exchange FTX, has lost his fortune, destroyed his reputation, and dealt a blow to the effective altruism community, which funds many global health and international development causes. By Catherine Cheney // 18 November 2022 Related Stories Is MrBeast a force for good in development
+    contentLength: 78375
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://philpapers.org/rec/THOHRL
+    linkText: "High Risk, Low Reward: A Challenge to the Astronomical Value of Existential Risk Mitigation — David Thorstad, Philosophy and Public Affairs 51(4): 373–412 (Fall 2023)"
+    claimContext: Philosopher Alice Crary, writing in *Radical Philosophy* in 2023, argued that longtermists give existential threats such weight that they deprioritize actual suffering in the world we live in, and that the FTX collapse brought this structural feature of the ideology into public view.[^23] David Thor
+    fetchedAt: 2026-02-22T02:07:39.923Z
+    httpStatus: 200
+    pageTitle: "David Thorstad, High Risk, Low Reward: A Challenge to the Astronomical Value of Existential Risk Mitigation - PhilPapers"
+    contentSnippet: "David Thorstad, High Risk, Low Reward: A Challenge to the Astronomical Value of Existential Risk Mitigation - PhilPapers Sign in | Create an account PhilPapers PhilPeople PhilArchive PhilEvents PhilJobs Syntax Advanced Search New All new items Books Journal articles Manuscripts Topics All Categories Metaphysics and Epistemology Metaphysics and Epistemology Epistemology Metaphilosophy Metaphysics Philosophy of Action Philosophy of Language Philosophy of Mind Philosophy of Religion M&E, Misc Value"
+    contentLength: 54725
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://firstmonday.org/ojs/index.php/fm/article/view/13636
+    linkText: "The TESCREAL Bundle: Eugenics and the Promise of Utopia through Artificial General Intelligence — Émile P. Torres and Timnit Gebru, First Monday (April 2024)"
+    claimContext: "Beyond the FTX controversy, critics have identified several internal philosophical vulnerabilities. Émile Torres, in an essay published in *Aeon* on October 19, 2021—more than a year before the FTX collapse—argued that longtermism's emphasis on maximizing the long-run potential of the human species "
+    fetchedAt: 2026-02-22T02:07:48.381Z
+    httpStatus: 200
+    pageTitle: "The TESCREAL bundle: Eugenics and the promise of utopia through artificial general intelligence | First Monday"
+    contentSnippet: "The TESCREAL bundle: Eugenics and the promise of utopia through artificial general intelligence | First Monday The TESCREAL bundle: Eugenics and the promise of utopia through artificial general intelligence Authors Timnit Gebru Émile P. Torres DOI: https://doi.org/10.5210/fm.v29i4.13636 Abstract The stated goal of many organizations in the field of artificial intelligence (AI) is to develop artificial general intelligence (AGI), an imagined system with more intelligence than anything we have eve"
+    contentLength: 24487
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://link.springer.com/article/10.1007/s11229-023-04153-y
+    linkText: The Epistemic Challenge to Longtermism — Christian Tarsney, Synthese (2023)
+    claimContext: "The probability mathematics underlying longtermist prioritization have also attracted sustained academic criticism. Longtermist arguments often hold that even very small reductions in extinction probability carry more expected value than saving large numbers of current lives, given the astronomical "
+    fetchedAt: 2026-02-22T02:07:49.596Z
+    httpStatus: 200
+    pageTitle: The epistemic challenge to longtermism | Synthese | Springer Nature Link
+    contentSnippet: "The epistemic challenge to longtermism | Synthese | Springer Nature Link Skip to main content Advertisement The epistemic challenge to longtermism Original Research Published: 31 May 2023 Volume 201 , article number 195 , ( 2023 ) Cite this article Save article View saved research Synthese Aims and scope Submit manuscript Abstract Longtermists claim that what we ought to do is mainly determined by how our actions might affect the very long-run future. A natural objection to longtermism is that t"
+    contentLength: 405533
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.degruyterbrill.com/document/doi/10.1515/mopp-2025-0012/html
+    linkText: "Philosophy for the Long Run: Introduction to the Symposium on Longtermism — Moral Philosophy and Politics, De Gruyter (2025)"
+    claimContext: "The probability mathematics underlying longtermist prioritization have also attracted sustained academic criticism. Longtermist arguments often hold that even very small reductions in extinction probability carry more expected value than saving large numbers of current lives, given the astronomical "
+    fetchedAt: 2026-02-22T02:07:48.666Z
+    httpStatus: 200
+    pageTitle: "Philosophy for the Long Run: Introduction to the Symposiu..."
+    contentSnippet: "Philosophy for the Long Run: Introduction to the Symposiu... Skip to main content --> Your purchase has been completed. Your documents are now available to view. Home Philosophy Philosophy for the Long Run: Introduction to the Symposium on Longtermism Article Open Access Cite this Philosophy for the Long Run: Introduction to the Symposium on Longtermism Stefan Riedener Published/Copyright: March 27, 2025 Download Article (PDF) Published by Become an author with De Gruyter Brill Submit Manuscript"
+    contentLength: 163658
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://philpapers.org/browse/longtermism
+    linkText: Minimal and Expansive Longtermism — Hilary Greaves and Christian Tarsney, Oxford University Press (2025)
+    claimContext: Defenders also note that longtermism encompasses a range of positions, from MacAskill's more modest claim that long-term impact is *a* key moral priority, to stronger versions holding that it is *the* overwhelming priority. Hilary Greaves and Christian Tarsney's 2025 Oxford University Press volume d
+    fetchedAt: 2026-02-22T02:07:48.233Z
+    httpStatus: 200
+    pageTitle: Longtermism - Bibliography - PhilPapers
+    contentSnippet: Longtermism - Bibliography - PhilPapers Sign in | Create an account PhilPapers PhilPeople PhilArchive PhilEvents PhilJobs Syntax Advanced Search New All new items Books Journal articles Manuscripts Topics All Categories Metaphysics and Epistemology Metaphysics and Epistemology Epistemology Metaphilosophy Metaphysics Philosophy of Action Philosophy of Language Philosophy of Mind Philosophy of Religion M&E, Misc Value Theory Value Theory Aesthetics Applied Ethics Meta-Ethics Normative Ethics Philo
+    contentLength: 251737
+    status: verified
+    note: null

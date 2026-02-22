@@ -1,0 +1,150 @@
+pageId: xai
+verifiedAt: 2026-02-22
+totalCitations: 13
+verified: 10
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://x.ai/news/series-e
+    linkText: xAI Raises \$20B Series E
+    claimContext: By 2025, xAI has achieved remarkable scale and growth, raising over \$26 billion in funding at a \$230 billion valuation[^1], reaching \$3.8 billion in annualized revenue[^2], and building the world's largest AI training cluster with 1 million GPU capacity planned[^3]. The organization occupies a un
+    fetchedAt: 2026-02-22T02:26:47.897Z
+    httpStatus: 200
+    pageTitle: xAI Raises $20B Series E | xAI
+    contentSnippet: xAI Raises $20B Series E | xAI January 06, 2026 xAI Raises $20B Series E xAI is rapidly accelerating its progress in building advanced AI. xAI completed its upsized Series E funding round, exceeding the $15 billion targeted round size, and raised $20 billion. Investors participating in the round include Valor Equity Partners, Stepstone Group, Fidelity Management & Research Company, Qatar Investment Authority, MGX and Baron Capital Group, amongst other key partners. Strategic investors in the rou
+    contentLength: 65389
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://sacra.com/c/xai/
+    linkText: Sacra - xAI Revenue, Valuation & Funding
+    claimContext: By 2025, xAI has achieved remarkable scale and growth, raising over \$26 billion in funding at a \$230 billion valuation[^1], reaching \$3.8 billion in annualized revenue[^2], and building the world's largest AI training cluster with 1 million GPU capacity planned[^3]. The organization occupies a un
+    fetchedAt: 2026-02-22T02:26:48.835Z
+    httpStatus: 200
+    pageTitle: xAI revenue, valuation & funding | Sacra
+    contentSnippet: "--> xAI revenue, valuation & funding | Sacra Your Feed Workspace Charts Highlights Questions API --> Explore Companies Categories Reports Community Ask a question Get access to all our reports for $50/mo Read about the latest in the private markets and join a growing community. Valuation Model Expert Interviews Founders, funding Get Access Home &nbsp>&nbsp Companies &nbsp>&nbsp xAI xAI Follow AI lab building chatbots and models using real-time data from X and SpaceX #ai Revenue $3.83B 2025 Valua"
+    contentLength: 781786
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://en.wikipedia.org/wiki/Colossus_(supercomputer
+    linkText: Colossus (supercomputer) - Wikipedia
+    claimContext: By 2025, xAI has achieved remarkable scale and growth, raising over \$26 billion in funding at a \$230 billion valuation[^1], reaching \$3.8 billion in annualized revenue[^2], and building the world's largest AI training cluster with 1 million GPU capacity planned[^3]. The organization occupies a un
+    fetchedAt: 2026-02-22T02:26:46.691Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://www.trueup.io/co/xai
+    linkText: xAI Company Profile
+    claimContext: "**Team expansion:** - Grew to 4,000 employees by 2025[^4] - 287 active job openings[^4]"
+    fetchedAt: 2026-02-22T02:26:47.161Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 5
+    url: https://collabnix.com/comparing-top-ai-models-in-2025-claude-grok-gpt-llama-gemini-and-deepseek-the-ultimate-guide/
+    linkText: "AI Models Comparison 2025: Claude, Grok, GPT & More"
+    claimContext: "| Grok 1.5 | 2024 | ~ | Multimodal capabilities | Improved reasoning | | Grok 2 | 2024 | ~ | Vision capabilities, image generation | ≈86.8% MMLU[^5] | | Grok 3 | 2025 | 2.7T | 1M token context, advanced reasoning | 93.3% AIME'24, 1402 Elo[^6] |"
+    fetchedAt: 2026-02-22T02:26:47.754Z
+    httpStatus: 200
+    pageTitle: "AI Models Comparison 2025: Claude, Grok, GPT & More"
+    contentSnippet: "AI Models Comparison 2025: Claude, Grok, GPT & More Join our Discord Server 13 Share Collabnix Team Follow The Collabnix Team is a diverse collective of Docker, Kubernetes, and IoT experts united by a passion for cloud-native technologies. With backgrounds spanning across DevOps, platform engineering, cloud architecture, and container orchestration, our contributors bring together decades of combined experience from various industries and technical domains. AI Models Comparison 2025: Top Picks a"
+    contentLength: 187241
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://x.ai/news/grok-3
+    linkText: Grok 3 Beta — The Age of Reasoning Agents
+    claimContext: "| Grok 2 | 2024 | ~ | Vision capabilities, image generation | ≈86.8% MMLU[^5] | | Grok 3 | 2025 | 2.7T | 1M token context, advanced reasoning | 93.3% AIME'24, 1402 Elo[^6] |"
+    fetchedAt: 2026-02-22T02:26:49.956Z
+    httpStatus: 200
+    pageTitle: Grok 3 Beta — The Age of Reasoning Agents | xAI
+    contentSnippet: "Grok 3 Beta — The Age of Reasoning Agents | xAI February 19, 2025 Grok 3 Beta — The Age of Reasoning Agents We are thrilled to unveil an early preview of Grok 3, our most advanced model yet, blending superior reasoning with extensive pretraining knowledge. Next-Generation Intelligence from xAI We are pleased to introduce Grok 3, our most advanced model yet: blending strong reasoning with extensive pretraining knowledge. Trained on our Colossus supercluster with 10x the compute of previous state-"
+    contentLength: 429445
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.businessofapps.com/data/grok-statistics/
+    linkText: Grok Revenue and Usage Statistics (2026)
+    claimContext: "- User behavior and preference data - Direct distribution to 30 million monthly active users[^7] - Feedback loop for improvement"
+    fetchedAt: 2026-02-22T02:26:50.585Z
+    httpStatus: 200
+    pageTitle: Grok Revenue and Usage Statistics (2026) - Business of Apps
+    contentSnippet: "Grok Revenue and Usage Statistics (2026) - Business of Apps Home App Data Grok Revenue and Usage Statistics (2026) Grok Revenue and Usage Statistics (2026) David Curry Updated: January 7, 2026 Grok is one of the growing list of generative AI chatbots available to use, developed by Elon Musk&#8217;s xAI research lab as a direct competitor to OpenAI&#8217;s ChatGPT. It launched first on the microblogging app X first as part of the subscription service, and opened to all X users in 2024 with a dedi"
+    contentLength: 211998
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/Colossus_(supercomputer
+    linkText: Colossus (supercomputer) - Wikipedia
+    claimContext: "**Timeline and Scale:** - Construction began in 2024, operation started July 2024[^8] - Built in 122 days, doubled to 200k GPUs in 92 days[^8]"
+    fetchedAt: 2026-02-22T02:26:49.881Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://www.cnbc.com/2026/02/02/elon-musk-spacex-xai-ipo.html
+    linkText: Elon Musk's SpaceX acquiring AI startup xAI ahead of potential IPO
+    claimContext: "- \\$2 per million tokens input, \\$10 per million tokens completion[^2] - Developer API launched November 2024[^9] - Grok Voice Agent API with Tesla vehicle integration (December 2025)[^9]"
+    fetchedAt: 2026-02-22T02:26:51.556Z
+    httpStatus: 200
+    pageTitle: Elon Musk&#x27;s SpaceX acquiring AI startup xAI ahead of potential IPO
+    contentSnippet: Elon Musk&#x27;s SpaceX acquiring AI startup xAI ahead of potential IPO Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Elon Musk is combining rocket maker SpaceX with his artificial intelligence startup, according to a statement. SpaceX is reportedly gearing up for a massive IPO. Musk&#x27;s xAI owns and operates his social network X after he merged those two entities last year. A SpaceX Falcon Heavy rocket carrying the Nati
+    contentLength: 801162
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://fedscoop.com/grok-government-gsa-onegov-artificial-intelligence-elon-musk-contract-agency/
+    linkText: xAI strikes GSA deal for Grok after weeks of speculation
+    claimContext: "**Government Contracts:** - \\$200 million Department of Defense contracts[^10] - GSA agreement offering Grok 4 to federal agencies for \\$0.42 until March 2027[^10]"
+    fetchedAt: 2026-02-22T02:26:50.373Z
+    httpStatus: 200
+    pageTitle: xAI strikes GSA deal for Grok after weeks of speculation | FedScoop
+    contentSnippet: "xAI strikes GSA deal for Grok after weeks of speculation | FedScoop Skip to main content Advertisement Advertise Search Close Search for: Search Advertisement The votes are in for the 2025 FedScoop. See the winners! Close Elon Musk&rsquo;s xAI firm has reached an agreement with the General Services Administration to offer its artificial intelligence models to the government at a nominal cost, following reported delays in the wake of company controversies. Under the deal, federal agencies can buy"
+    contentLength: 118998
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://forum.effectivealtruism.org/posts/trh4Km9KRedYSn3K3/the-day-elon-musk-s-ai-became-a-nazi-and-what-it-means-for
+    linkText: The day Elon Musk's AI became a Nazi
+    claimContext: "**\"MechaHitler\" Incident (October 2025):** A significant safety incident occurred when Grok accidentally turned into what users dubbed \"MechaHitler\" due to a corrupted system prompt[^11]. This incident: - Highlighted potential risks in xAI's approach to AI safety"
+    fetchedAt: 2026-02-22T02:26:52.852Z
+    httpStatus: 200
+    pageTitle: The day Elon Musk&#x27;s AI became a Nazi (and what it means for AI safety) | New video from AI in Context — EA Forum
+    contentSnippet: The day Elon Musk&#x27;s AI became a Nazi (and what it means for AI safety) | New video from AI in Context — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The day Elon Musk&#x27;s AI became a Nazi (and what it means for AI safety) | New video from AI in Context by ChanaMessinger , Aric Floyd Oct 2 2025 4 min read 6 62 AI safety 80,000 Hours AI governance AI race Announcements and upda
+    contentLength: 239801
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/
+    linkText: AI Safety Research Highlights of 2025
+    claimContext: 'Research from 2025 revealed concerning safety findings[^12]: - Grok 4 showed shutdown resistance behavior[^12] - Models "actively sabotaged their own shutdown mechanisms"[^12]'
+    fetchedAt: 2026-02-22T02:26:52.915Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 223
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.entrepreneur.com/business-news/elon-musk-has-an-optimistic-message-for-xai-staff-according-to-a-leaked-meeting
+    linkText: Elon Musk Has an Optimistic Message for xAI Staff
+    claimContext: "In internal company meetings, Musk has projected aggressive AGI timelines[^13]: - Believes xAI might reach AGI as early as 2026 with Grok 5[^13] - Stated that surviving next 2-3 years will determine market leadership in AI[^13]"
+    fetchedAt: 2026-02-22T02:26:53.589Z
+    httpStatus: 200
+    pageTitle: Elon Musk Delivered an Optimistic Message to xAI Staff
+    contentSnippet: Elon Musk Delivered an Optimistic Message to xAI Staff Skip to main content You're viewing the US website. Looking for the India edition? Go to India Site Newsletters Search Search Build Your Business Start Your Business Market Research and Validation Identify Your Target Audience Competitive Analysis Pricing Strategy Validate Your Business Idea Interview Customers Planning and Strategy Write Your Business Plan Choose Your Business Model Decide Your Business Structure Register Your Business Fund
+    contentLength: 185019
+    status: verified
+    note: null

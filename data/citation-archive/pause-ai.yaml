@@ -1,0 +1,238 @@
+pageId: pause-ai
+verifiedAt: 2026-02-22
+totalCitations: 21
+verified: 16
+broken: 5
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://pauseai.us/
+    linkText: Pause AI US website
+    claimContext: "| **Structure** | Global grassroots network with national chapters | | **Public Support** | ≈70% of Americans support pausing AI development[^1] | | **Policy Wins** | None documented to date |"
+    fetchedAt: 2026-02-22T02:23:06.042Z
+    httpStatus: 200
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 114
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://pauseai.info/
+    linkText: Pause AI overview
+    claimContext: Pause AI is a volunteer-led advocacy movement that emerged in May 2023 calling for an indefinite international pause on the development of frontier artificial intelligence systems until safety can be guaranteed and democratic control established.[^2] Founded by software entrepreneur Joep Meindertsma
+    fetchedAt: 2026-02-22T02:23:06.153Z
+    httpStatus: 200
+    pageTitle: We need to Pause AI
+    contentSnippet: We need to Pause AI Top Brussels, Feb 23 - Join us outside the European Parliament to call for a global treaty to pause frontier AI development. Take action → Close Don’t let AI companies gamble away our future Get involved Donate Latest Loading news... We call for a prohibition on the development of superintelligence, not lifted before there is broad scientific consensus that it will be done safely and controllably, and strong public buy-in Statement on Superintelligence 110,000+ signatories in
+    contentLength: 59488
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://en.wikipedia.org/wiki/Pause_AI
+    linkText: "Wikipedia: Pause AI"
+    claimContext: Pause AI is a volunteer-led advocacy movement that emerged in May 2023 calling for an indefinite international pause on the development of frontier artificial intelligence systems until safety can be guaranteed and democratic control established.[^2] Founded by software entrepreneur Joep Meindertsma
+    fetchedAt: 2026-02-22T02:23:05.436Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://pauseai.info/proposal
+    linkText: "Pause AI: Proposal details"
+    claimContext: "The movement's core proposal is straightforward: stop building the most powerful AI systems until we understand how to keep them safe.[^4] Pause AI advocates for international cooperation to ensure no company or country develops unsafe AI, suggesting implementation mechanisms such as regulating the "
+    fetchedAt: 2026-02-22T02:23:06.027Z
+    httpStatus: 200
+    pageTitle: PauseAI Proposal
+    contentSnippet: "PauseAI Proposal Top Brussels, Feb 23 - Join us outside the European Parliament to call for a global treaty to pause frontier AI development. Take action → Close PauseAI Proposal Implement a temporary pause on the training of the most powerful general AI systems , until we know how to build them safely and keep them under democratic control. Version: Feb 4th, 2025 Individual countries can and should implement this measure right now . Especially the US (or California, specifically) should impleme"
+    contentLength: 52316
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://forum.effectivealtruism.org/posts/eqTGrEsBzJJSiuTcv/the-international-pauseai-protest-activism-under-uncertainty
+    linkText: "The International PauseAI Protest: Activism under uncertainty - EA Forum"
+    claimContext: Despite growing from a single-person protest to a global network with national chapters across multiple continents, Pause AI has not yet achieved documented policy successes in the form of enacted pauses, binding treaties, or liability laws.[^5] The movement operates primarily through public demonst
+    fetchedAt: 2026-02-22T02:23:05.813Z
+    httpStatus: 200
+    pageTitle: "The International PauseAI Protest: Activism under uncertainty — EA Forum"
+    contentSnippet: "The International PauseAI Protest: Activism under uncertainty — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The International PauseAI Protest: Activism under uncertainty by Joseph Miller , Holly Elmore ⏸️ 🔸 , joepio Oct 12 2023 5 min read 3 136 AI safety Opportunities to take action PauseAI AI governance AI moratorium AI Pause Debate (2023) Crucial consideration Events on the EA Fo"
+    contentLength: 276149
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://pauseai.substack.com/p/meet-our-new-ceo-maxime-fournes
+    linkText: Meet our new CEO, Maxime Fournes - Pause AI Substack
+    claimContext: Maxime Fournes was appointed CEO of Pause AI Global after serving as Director of Pause AI France.[^6] Fournes, a former machine learning engineer, joined the movement in November 2023 following a sabbatical prompted by concerns about AI risks after the release of GPT-3.5 in 2022.[^6] Under his leade
+    fetchedAt: 2026-02-22T02:23:07.975Z
+    httpStatus: 200
+    pageTitle: Meet our new CEO, Maxime Fournes - by Tom Bibby
+    contentSnippet: Meet our new CEO, Maxime Fournes - by Tom Bibby PauseAI Newsletter Subscribe Sign in Meet our new CEO, Maxime Fournes Maxime becomes our new CEO, and PauseAI supporters offer €21,000 of matched donations this Christmas. Tom Bibby Dec 02, 2025 8 Share Maxime Fournes appointed as CEO of PauseAI After serving as the Director of PauseIA France, Maxime Fournes will be taking on the role of CEO at PauseAI Global. As many of you will know, Maxime has led a national chapter that’s seen impressive growth
+    contentLength: 181530
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://pauseai.info/about
+    linkText: Pause AI About page - National coordinators
+    claimContext: The organization operates through national chapters led by country-specific coordinators, including Holly Elmore (United States), Joseph Miller (United Kingdom), Benjamin Schmidt (Germany), Nicolas Lacombe (Canada), Aman Agarwal (India), and Mark Brown (Australia).[^7]
+    fetchedAt: 2026-02-22T02:23:07.650Z
+    httpStatus: 200
+    pageTitle: About Us
+    contentSnippet: About Us Top Brussels, Feb 23 - Join us outside the European Parliament to call for a global treaty to pause frontier AI development. Take action → Close About Us How We Began We were founded in Utrecht, Netherlands in May 2023 by Joep Meindertsma, who put his job on hold because he couldn&#39;t ignore the existential risks from artificial intelligence any longer. We began with our first public action, which was a protest outside Microsoft&#39;s Brussels lobbying office . What started as one per
+    contentLength: 65180
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://arxiv.org/html/2506.20530
+    linkText: Toward a Global Regime for Compute Governance - arXiv
+    claimContext: Pause AI's central demand is a verifiable, publicly announced global pause on training frontier AI systems—those at or beyond current state-of-the-art capabilities.[^8] If <EntityLink id="international-coordination">international coordination</EntityLink> proves impossible, the movement advocates fo
+    fetchedAt: 2026-02-22T02:23:07.273Z
+    httpStatus: 200
+    pageTitle: "Toward a Global Regime for Compute Governance: Building the Pause Button"
+    contentSnippet: "Toward a Global Regime for Compute Governance: Building the Pause Button \\addbibresource references.bib Toward a Global Regime for Compute Governance: Building the Pause Button Ananthi Al Ramiah Independent Raymond Koopmanschap Independent Josh Thorsteinson Independent Sadruddin Khan Independent Jim Zhou Independent Shafira Noh Independent Joep Meindertsma PauseAI Farhan Shafiq AI Safety Camp Project Lead Think Safe AI (June 25, 2025) Abstract As AI capabilities rapidly advance, the risk of cata"
+    contentLength: 193109
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://digital.nemko.com/insights/how-big-tech-lobbying-stopped-us-ai-regulation-in-2025
+    linkText: How Big Tech Lobbying Stopped US AI Regulation in 2025
+    claimContext: The organization positions its proposals as a precautionary response to existential risk, arguing that the potential for catastrophic outcomes justifies halting development even in the absence of certainty about when dangerous capabilities might emerge. Pause AI explicitly rejects the framing that s
+    fetchedAt: 2026-02-22T02:23:07.912Z
+    httpStatus: 200
+    pageTitle: How Big Tech Lobbying Stopped US AI Regulation in 2025
+    contentSnippet: "How Big Tech Lobbying Stopped US AI Regulation in 2025 Caryn Lusinchi December 1, 2025 5 min read AI Regulations in US: Understanding the Roadblocks and Future Pathways In the United States, regulatory oversight of artificial intelligence remains minimal. The landscape is complex, shaped by a mix of fragmented governance and the strong influence of major technology companies, which often work to steer and shape emerging rules. This dynamic is sometimes described as the “anti-Brussels” effect. Wh"
+    contentLength: 142982
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/AI_alignment
+    linkText: AI alignment - Wikipedia
+    claimContext: Pause AI's advocacy is directly grounded in concerns emerging from the fields of AI safety and AI alignment research. The movement views the rapid scaling of AI capabilities without solved alignment as fundamentally reckless, increasing the probability of <EntityLink id="existential-catastrophe">exi
+    fetchedAt: 2026-02-22T02:23:07.160Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://www.alignmentforum.org/posts/LqRD7sNcpkA9cmXLv/open-problems-and-fundamental-limitations-of-rlhf
+    linkText: Open Problems and Fundamental Limitations of RLHF - Alignment Forum
+    claimContext: AI alignment—the subfield focused on ensuring AI systems' goals and behaviors match human values and intentions—faces formidable technical challenges including outer alignment (correctly specifying goals) and inner alignment (ensuring systems robustly adopt those goals).[^11] High-capability systems
+    fetchedAt: 2026-02-22T02:23:15.813Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 12
+    url: https://www.maginative.com/article/rlhf-in-the-spotlight-problems-and-limitations-with-a-key-ai-alignment-technique/
+    linkText: RLHF Problems and Limitations - Maginative
+    claimContext: AI alignment—the subfield focused on ensuring AI systems' goals and behaviors match human values and intentions—faces formidable technical challenges including outer alignment (correctly specifying goals) and inner alignment (ensuring systems robustly adopt those goals).[^11] High-capability systems
+    fetchedAt: 2026-02-22T02:23:09.358Z
+    httpStatus: 200
+    pageTitle: "RLHF In the Spotlight: Problems and Limitations with Key AI Alignment Technique"
+    contentSnippet: "RLHF In the Spotlight: Problems and Limitations with Key AI Alignment Technique Reinforcement learning from human feedback (RLHF) has emerged as a leading technique for training AI systems that align with human values. With RLHF, humans provide evaluations on examples generated by the AI system, which are used to train a “reward model” that estimates human preferences. The AI system is then optimized via reinforcement learning to maximize rewards from this learned model. RLHF powers some of the "
+    contentLength: 50076
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.lesswrong.com/posts/Aq5X9tapacnk2QGY4/pausing-ai-developments-isn-t-enough-we-need-to-shut-it-all
+    linkText: Pausing AI Developments Isn't Enough. We Need to Shut it All Down - LessWrong
+    claimContext: 'Prominent AI safety researchers have expressed varying levels of support for pause proposals. <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, a prominent figure in the <EntityLink id="lesswrong">LessWrong</EntityLink> community, has advocated for even stronger measures than Pause '
+    fetchedAt: 2026-02-22T02:23:10.618Z
+    httpStatus: 200
+    pageTitle: Pausing AI Developments Isn&#x27;t Enough. We Need to Shut it All Down by Eliezer Yudkowsky — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Pausing AI Developments Isn&#x27;t Enough. We Need to Shut it All Down by Eliezer Yudkowsky — LessWrong AI Governance AI Risk AI World Optimization Frontpage 294 Pausing AI Developments Isn&#x27;t Enough. We Need to Shut it All Down by Eliezer Yudkowsky by jacquesthibs 29th Mar 2023 3 min read 297 294 This is a linkpost for https://time.com/6266923/ai-eliezer-yudkowsky
+    contentLength: 2341499
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://forum.effectivealtruism.org/s/vw6tX5SyvTwMeSxJk/p/k6K3iktCLCTHRMJsY
+    linkText: The possibility of an indefinite AI pause - EA Forum
+    claimContext: 'Prominent AI safety researchers have expressed varying levels of support for pause proposals. <EntityLink id="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, a prominent figure in the <EntityLink id="lesswrong">LessWrong</EntityLink> community, has advocated for even stronger measures than Pause '
+    fetchedAt: 2026-02-22T02:23:11.420Z
+    httpStatus: 200
+    pageTitle: The possibility of an indefinite AI pause — EA Forum
+    contentSnippet: The possibility of an indefinite AI pause — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI Pause Debate Week The possibility of an indefinite AI pause by Matthew_Barnett Sep 19 2023 18 min read 73 90 AI safety AI Pause Debate (2023) Events on the EA Forum Frontpage The possibility of an indefinite AI pause The possibility of an indefinite pause Evaluating an indefinite pause Level o
+    contentLength: 937467
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.lesswrong.com/posts/3siLbdd4338gfTM7g/ai-pause-will-likely-backfire-guest-post
+    linkText: AI Pause Will Likely Backfire - LessWrong
+    claimContext: Some in the AI safety community prioritize capability evaluation and control research over broad development halts, arguing that continued work on interpretability, oversight, and shutdown resistance is essential—and that pausing might slow safety research more than capability development if the pau
+    fetchedAt: 2026-02-22T02:23:09.668Z
+    httpStatus: 200
+    pageTitle: AI Pause Will Likely Backfire (Guest Post) — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. AI Pause Will Likely Backfire (Guest Post) — LessWrong AI Development Pause AI Frontpage 47 AI Pause Will Likely Backfire (Guest Post) by jsteinhardt 24th Oct 2023 Bounded Regret 18 min read 6 47 I&#x27;m experimenting with hosting guest posts on this blog, as a way to represent additional viewpoints and especially to highlight ideas from researchers who do not already
+    contentLength: 505942
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://spectrum.ieee.org/ai-pause-letter-stokes-fear
+    linkText: AI Pause Open Letter Stokes Fear and Controversy - IEEE Spectrum
+    claimContext: The movement has gained endorsements from thousands of AI researchers and industry leaders, including <EntityLink id="yoshua-bengio">Yoshua Bengio</EntityLink>, <EntityLink id="stuart-russell">Stuart Russell</EntityLink>, and <EntityLink id="elon-musk">Elon Musk</EntityLink>, who signed an open lett
+    fetchedAt: 2026-02-22T02:23:17.961Z
+    httpStatus: 200
+    pageTitle: ‘AI Pause’ Open Letter Stokes Fear and Controversy - IEEE Spectrum
+    contentSnippet: null
+    contentLength: 476141
+    status: verified
+    note: Academic publisher — URL accessible
+  - footnote: 17
+    url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+    linkText: Trump Executive Order on AI - White House
+    claimContext: "The Trump administration's December 2025 executive order explicitly promoted U.S. AI leadership by limiting state regulations and creating an AI Litigation Task Force, framing <EntityLink id=\"pause\">pause advocacy</EntityLink> as economically harmful.[^17] This represents a significant headwind for "
+    fetchedAt: 2026-02-22T02:23:17.781Z
+    httpStatus: 200
+    pageTitle: Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House
+    contentSnippet: "Ensuring a National Policy Framework for Artificial Intelligence &#8211; The White House Presidential Actions ENSURING A NATIONAL POLICY FRAMEWORK FOR ARTIFICIAL INTELLIGENCE Executive Orders December 11, 2025 By the authority vested in me as President by the Constitution and the laws of the United States of America, it is hereby ordered: Section 1 . Purpose . United States leadership in Artificial Intelligence (AI) will promote United States national and economic security and dominance across m"
+    contentLength: 287718
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://markets.financialcontent.com/wral/article/tokenring-2025-12-30-efficiency-over-excess-how-deepseek-r1-shattered-the-ai-scaling-myth
+    linkText: DeepSeek R1 Shattered the AI Scaling Myth
+    claimContext: Some AI safety researchers argue that pause proposals rest on questionable assumptions about the relationship between <EntityLink id="thresholds">compute thresholds</EntityLink> and dangerous capabilities. The January 2025 release of DeepSeek's R1 model—which achieved competitive performance at sign
+    fetchedAt: 2026-02-22T02:23:18.969Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 19
+    url: https://en.wikipedia.org/wiki/Safe_and_Secure_Innovation_for_Frontier_Artificial_Intelligence_Models_Act
+    linkText: California SB 1047 - Wikipedia
+    claimContext: Additionally, critics note that static policies like development pauses may be insufficient for the dynamic nature of AI risks, pointing to California's 2026 legislation requiring runtime behavioral safeguards for AI systems as a more adaptive approach.[^19]
+    fetchedAt: 2026-02-22T02:23:16.834Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 20
+    url: https://www.brookings.edu/articles/misrepresentations-of-californias-ai-safety-bill/
+    linkText: Misrepresentations of California's AI safety bill - Brookings
+    claimContext: Some observers argue that Pause AI's focus on frontier systems may miss important risks from more accessible AI technologies. Concerns about <EntityLink id="deepfakes">deepfakes</EntityLink>, <EntityLink id="autonomous-weapons">autonomous weapons</EntityLink>, surveillance, and labor displacement re
+    fetchedAt: 2026-02-22T02:23:17.863Z
+    httpStatus: 200
+    pageTitle: Misrepresentations of California's AI safety bill | Brookings
+    contentSnippet: "Misrepresentations of California&#039;s AI safety bill | Brookings Search Home Misrepresentations of California&#8217;s AI safety bill Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to the Center for Tech"
+    contentLength: 217677
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://forum.effectivealtruism.org/posts/FHJMKSwrwdTogYLGF/we-re-no-longer-pausing-most-new-longtermist-funding
+    linkText: Coefficient Giving no longer pausing longtermist funding - EA Forum
+    claimContext: 'For comparison, <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> announced a "soft pause" on most longtermist funding (including AI risk) in November 2022, which was lifted approximately one month later after establishing a higher funding bar.[^21] This suggests that major funders '
+    fetchedAt: 2026-02-22T02:23:20.276Z
+    httpStatus: 200
+    pageTitle: We&#x27;re no longer "pausing most new longtermist funding commitments" — EA Forum
+    contentSnippet: We&#x27;re no longer "pausing most new longtermist funding commitments" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents We&#x27;re no longer "pausing most new longtermist funding commitments" by Holden Karnofsky Jan 30 2023 7 min read 39 203 Building effective altruism Coefficient Giving Effective altruism funding Longtermism Organization updates Frontpage We&#x27;re no longer "pausin
+    contentLength: 764543
+    status: verified
+    note: null

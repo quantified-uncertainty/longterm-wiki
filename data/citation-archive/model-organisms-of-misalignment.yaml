@@ -1,0 +1,722 @@
+pageId: model-organisms-of-misalignment
+verifiedAt: 2026-02-22
+totalCitations: 65
+verified: 38
+broken: 27
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1
+    linkText: "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research"
+    claimContext: Model organisms of misalignment is a research agenda that deliberately creates small-scale, controlled AI models exhibiting specific misalignment behaviors—such as <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, alignment faking, or emergent misalignment—to serve as reproducib
+    fetchedAt: 2026-02-22T01:58:55.932Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 2
+    url: https://www.lesswrong.com/posts/yHmJrDSJpFaNTZ9Tr/model-organisms-for-emergent-misalignment
+    linkText: Model Organisms for Emergent Misalignment - LessWrong
+    claimContext: Model organisms of misalignment is a research agenda that deliberately creates small-scale, controlled AI models exhibiting specific misalignment behaviors—such as <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, alignment faking, or emergent misalignment—to serve as reproducib
+    fetchedAt: 2026-02-22T01:58:49.623Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Model Organisms for Emergent Misalignment — LessWrong MATS Program Interpretability (ML & AI) AI Frontpage 2025 Top Fifty: 14 % 118 Model Organisms for Emergent Misalignment by Anna Soligo , Edward Turner , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda 16th Jun 2025 AI Alignment Forum 7 min read 19 118 Ω 55 Ed and Anna are co-first authors on this work. TL;DR Emer"
+    contentLength: 689463
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1
+    linkText: "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research"
+    claimContext: Model organisms of misalignment is a research agenda that deliberately creates small-scale, controlled AI models exhibiting specific misalignment behaviors—such as <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, alignment faking, or emergent misalignment—to serve as reproducib
+    fetchedAt: 2026-02-22T01:58:55.593Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 4
+    url: https://www.youtube.com/watch?v=FsGJyTfOZrs
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: Model organisms of misalignment is a research agenda that deliberately creates small-scale, controlled AI models exhibiting specific misalignment behaviors—such as <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, alignment faking, or emergent misalignment—to serve as reproducib
+    fetchedAt: 2026-02-22T01:58:49.189Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 5
+    url: https://arxiv.org/abs/2506.11613
+    linkText: Model Organisms for Emergent Misalignment - arXiv
+    claimContext: The research demonstrates that alignment can be surprisingly fragile. Recent work has produced model organisms achieving 99% coherence (compared to 67% in earlier attempts) while exhibiting 40% misalignment rates, using models as small as 0.5B parameters.[^5][^6] These improved organisms enable <Ent
+    fetchedAt: 2026-02-22T01:58:48.976Z
+    httpStatus: 200
+    pageTitle: "[2506.11613] Model Organisms for Emergent Misalignment"
+    contentSnippet: "[2506.11613] Model Organisms for Emergent Misalignment --> Computer Science > Machine Learning arXiv:2506.11613 (cs) [Submitted on 13 Jun 2025] Title: Model Organisms for Emergent Misalignment Authors: Edward Turner , Anna Soligo , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda View a PDF of the paper titled Model Organisms for Emergent Misalignment, by Edward Turner and 4 other authors View PDF HTML (experimental) Abstract: Recent work discovered Emergent Misalignment (EM): fine-tuning larg"
+    contentLength: 46737
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.alphaxiv.org/overview/2506.11613v1
+    linkText: Model Organisms for Emergent Misalignment - AlphaXiv Overview
+    claimContext: The research demonstrates that alignment can be surprisingly fragile. Recent work has produced model organisms achieving 99% coherence (compared to 67% in earlier attempts) while exhibiting 40% misalignment rates, using models as small as 0.5B parameters.[^5][^6] These improved organisms enable <Ent
+    fetchedAt: 2026-02-22T01:58:57.517Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment | alphaXiv
+    contentSnippet: Model Organisms for Emergent Misalignment | alphaXiv alphaXiv Explore Sign In Labs Feedback Browser Extension Dark mode We&#x27;re hiring Paper Blog Resources 30 en Hide Tools Ctrl + / Model Organisms for Emergent Misalignment Assistant My Notes Comments Similar
+    contentLength: 118048
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.lesswrong.com/posts/yHmJrDSJpFaNTZ9Tr/model-organisms-for-emergent-misalignment
+    linkText: Model Organisms for Emergent Misalignment - LessWrong
+    claimContext: The research demonstrates that alignment can be surprisingly fragile. Recent work has produced model organisms achieving 99% coherence (compared to 67% in earlier attempts) while exhibiting 40% misalignment rates, using models as small as 0.5B parameters.[^5][^6] These improved organisms enable <Ent
+    fetchedAt: 2026-02-22T01:58:57.732Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Model Organisms for Emergent Misalignment — LessWrong MATS Program Interpretability (ML & AI) AI Frontpage 2025 Top Fifty: 14 % 118 Model Organisms for Emergent Misalignment by Anna Soligo , Edward Turner , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda 16th Jun 2025 AI Alignment Forum 7 min read 19 118 Ω 55 Ed and Anna are co-first authors on this work. TL;DR Emer"
+    contentLength: 689463
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.youtube.com/watch?v=FsGJyTfOZrs
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: Led primarily by researchers at <EntityLink id="anthropic">Anthropic</EntityLink> (particularly <EntityLink id="evan-hubinger">Evan Hubinger</EntityLink>) and the <EntityLink id="arc">Alignment Research Center</EntityLink> (ARC), this work aims to provide empirical evidence about alignment risks, st
+    fetchedAt: 2026-02-22T01:58:57.280Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 9
+    url: https://arxiv.org/abs/2506.11613
+    linkText: Model Organisms for Emergent Misalignment - arXiv
+    claimContext: Led primarily by researchers at <EntityLink id="anthropic">Anthropic</EntityLink> (particularly <EntityLink id="evan-hubinger">Evan Hubinger</EntityLink>) and the <EntityLink id="arc">Alignment Research Center</EntityLink> (ARC), this work aims to provide empirical evidence about alignment risks, st
+    fetchedAt: 2026-02-22T01:58:57.077Z
+    httpStatus: 200
+    pageTitle: "[2506.11613] Model Organisms for Emergent Misalignment"
+    contentSnippet: "[2506.11613] Model Organisms for Emergent Misalignment --> Computer Science > Machine Learning arXiv:2506.11613 (cs) [Submitted on 13 Jun 2025] Title: Model Organisms for Emergent Misalignment Authors: Edward Turner , Anna Soligo , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda View a PDF of the paper titled Model Organisms for Emergent Misalignment, by Edward Turner and 4 other authors View PDF HTML (experimental) Abstract: Recent work discovered Emergent Misalignment (EM): fine-tuning larg"
+    contentLength: 46737
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Alignment_Research_Center
+    linkText: Alignment Research Center - Wikipedia
+    claimContext: The Alignment Research Center (ARC) was founded in April 2021 by <EntityLink id="paul-christiano">Paul Christiano</EntityLink>, a former <EntityLink id="openai">OpenAI</EntityLink> researcher who pioneered reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>).[^10][^11
+    fetchedAt: 2026-02-22T01:58:56.982Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://time.com/collections/time100-ai/6309030/paul-christiano/
+    linkText: Paul Christiano - TIME100 AI
+    claimContext: The Alignment Research Center (ARC) was founded in April 2021 by <EntityLink id="paul-christiano">Paul Christiano</EntityLink>, a former <EntityLink id="openai">OpenAI</EntityLink> researcher who pioneered reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>).[^10][^11
+    fetchedAt: 2026-02-22T01:59:00.579Z
+    httpStatus: 200
+    pageTitle: "Paul Christiano: The 100 Most Influential People in AI 2023 | TIME"
+    contentSnippet: "Paul Christiano: The 100 Most Influential People in AI 2023 | TIME Loading... Paul Christiano Founder, Alignment Research Center by Will Henshall Illustration by TIME; reference image courtesy of Paul Christiano King Midas, a figure from Greek mythology, wished that everything he touched would turn to gold. His wish was granted, but his gift quickly became a curse as even food and his daughter were transformed. A decade ago, many AI doomsday thought experiments involved King Midas scenarios, in "
+    contentLength: 367884
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.alignmentforum.org/posts/ztokaf9harKTmRcn4/a-bird-s-eye-view-of-arc-s-research
+    linkText: A Bird's Eye View of ARC's Research - Alignment Forum
+    claimContext: The Alignment Research Center (ARC) was founded in April 2021 by <EntityLink id="paul-christiano">Paul Christiano</EntityLink>, a former <EntityLink id="openai">OpenAI</EntityLink> researcher who pioneered reinforcement learning from human feedback (<EntityLink id="rlhf">RLHF</EntityLink>).[^10][^11
+    fetchedAt: 2026-02-22T01:59:04.950Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 13
+    url: https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1
+    linkText: "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research"
+    claimContext: 'The model organisms agenda emerged from concerns that existing alignment methods like RLHF and supervised fine-tuning might not be robust enough for advanced AI systems. By 2023-2024, researchers including Evan Hubinger at <EntityLink id="anthropic">Anthropic</EntityLink> began advocating for model '
+    fetchedAt: 2026-02-22T01:59:05.444Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 14
+    url: https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1
+    linkText: "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research"
+    claimContext: 'The model organisms agenda emerged from concerns that existing alignment methods like RLHF and supervised fine-tuning might not be robust enough for advanced AI systems. By 2023-2024, researchers including Evan Hubinger at <EntityLink id="anthropic">Anthropic</EntityLink> began advocating for model '
+    fetchedAt: 2026-02-22T01:59:05.458Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 15
+    url: https://axrp.net/episode/2024/12/01/episode-39-evan-hubinger-model-organisms-misalignment.html
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: '**2024**: Hubinger published influential work on "Sleeper Agents"—models that exhibit coherent deception by fooling oversight systems while maintaining misaligned reasoning internally.[^15] This demonstrated that models could be trained to exhibit situationally-aware deceptive behavior, with robustn'
+    fetchedAt: 2026-02-22T01:58:59.311Z
+    httpStatus: 200
+    pageTitle: 39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast
+    contentSnippet: "39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast YouTube link The ‘model organisms of misalignment’ line of research creates AI models that exhibit various types of misalignment, and studies them to try to understand how the misalignment occurs and whether it can be somehow removed. In this episode, Evan Hubinger talks about two papers he’s worked on at Anthropic under this agenda: “Sleeper Agents” and “Sycophancy to Subterfuge”. Topics we discuss: Mo"
+    contentLength: 129039
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.youtube.com/watch?v=FsGJyTfOZrs
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: "**December 2024**: The \"Sycophancy to Subterfuge\" research showed how models could generalize from harmless sycophantic behavior to more concerning forms of misalignment.[^16] Hubinger's podcast appearances discussing this work helped establish model organisms as a recognized research direction."
+    fetchedAt: 2026-02-22T01:59:06.726Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 17
+    url: https://arxiv.org/abs/2506.11613
+    linkText: Model Organisms for Emergent Misalignment - arXiv
+    claimContext: '**June 2025**: A major breakthrough came with the arXiv paper "Model Organisms for Emergent Misalignment" by Edward Turner, Anna Soligo, Mia Taylor, Senthooran Rajamanoharan, and <EntityLink id="neel-nanda">Neel Nanda</EntityLink>.[^17] This work demonstrated emergent misalignment (EM) across three '
+    fetchedAt: 2026-02-22T01:59:06.557Z
+    httpStatus: 200
+    pageTitle: "[2506.11613] Model Organisms for Emergent Misalignment"
+    contentSnippet: "[2506.11613] Model Organisms for Emergent Misalignment --> Computer Science > Machine Learning arXiv:2506.11613 (cs) [Submitted on 13 Jun 2025] Title: Model Organisms for Emergent Misalignment Authors: Edward Turner , Anna Soligo , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda View a PDF of the paper titled Model Organisms for Emergent Misalignment, by Edward Turner and 4 other authors View PDF HTML (experimental) Abstract: Recent work discovered Emergent Misalignment (EM): fine-tuning larg"
+    contentLength: 46737
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://arxiv.org/html/2506.11613v1
+    linkText: Model Organisms for Emergent Misalignment - arXiv HTML
+    claimContext: '**June 2025**: A major breakthrough came with the arXiv paper "Model Organisms for Emergent Misalignment" by Edward Turner, Anna Soligo, Mia Taylor, Senthooran Rajamanoharan, and <EntityLink id="neel-nanda">Neel Nanda</EntityLink>.[^17] This work demonstrated emergent misalignment (EM) across three '
+    fetchedAt: 2026-02-22T01:59:06.605Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment
+    contentSnippet: "Model Organisms for Emergent Misalignment Model Organisms for Emergent Misalignment Edward Turner Anna Soligo Mia Taylor Senthooran Rajamanoharan Neel Nanda Abstract Recent work discovered Emergent Misalignment (EM): fine-tuning large language models on narrowly harmful datasets can lead them to become broadly misaligned. A survey of experts prior to publication revealed this was highly unexpected, demonstrating critical gaps in our understanding of model alignment. In this work, we both advance"
+    contentLength: 345890
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.alignmentforum.org/posts/p6tkQ3hzYzAMqDYEi/lessons-from-building-a-model-organism-testbed-1
+    linkText: Lessons from Building a Model Organism Testbed - Alignment Forum
+    claimContext: '**2025 Ongoing**: ARC and <EntityLink id="anthropic">Anthropic</EntityLink> continue developing testbeds for alignment faking, with metrics to assess whether models are genuinely reasoning about deception or exhibiting simpler heuristics.[^19] <EntityLink id="redwood-research">Redwood Research</Enti'
+    fetchedAt: 2026-02-22T01:59:12.793Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 20
+    url: https://redwood-af.devpost.com
+    linkText: Alignment Faking Hackathon - Redwood Research
+    claimContext: '**2025 Ongoing**: ARC and <EntityLink id="anthropic">Anthropic</EntityLink> continue developing testbeds for alignment faking, with metrics to assess whether models are genuinely reasoning about deception or exhibiting simpler heuristics.[^19] <EntityLink id="redwood-research">Redwood Research</Enti'
+    fetchedAt: 2026-02-22T01:59:07.079Z
+    httpStatus: 200
+    pageTitle: "Redwood Research Alignment Faking Hackathon: Create Model Organisms of Alignment Faking! (sneaky models) - Devpost"
+    contentSnippet: "Redwood Research Alignment Faking Hackathon: Create Model Organisms of Alignment Faking! (sneaky models) - Devpost We've detected that you are using an unsupported browser. Please upgrade your browser to Internet Explorer 10 or higher. Redwood Research Alignment Faking Hackathon Create Model Organisms of Alignment Faking! (sneaky models) This hackathon has ended Find more hackathons View the winners Who can participate Ages 16+ only All countries/territories, excluding standard exceptions View f"
+    contentLength: 78003
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://arxiv.org/abs/2506.11613
+    linkText: Model Organisms for Emergent Misalignment - arXiv
+    claimContext: "The most significant technical development is the reliable production of emergent misalignment (EM)—where fine-tuning on narrowly harmful datasets causes models to become broadly misaligned beyond the training distribution.[^21] Key achievements include:"
+    fetchedAt: 2026-02-22T01:59:13.895Z
+    httpStatus: 200
+    pageTitle: "[2506.11613] Model Organisms for Emergent Misalignment"
+    contentSnippet: "[2506.11613] Model Organisms for Emergent Misalignment --> Computer Science > Machine Learning arXiv:2506.11613 (cs) [Submitted on 13 Jun 2025] Title: Model Organisms for Emergent Misalignment Authors: Edward Turner , Anna Soligo , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda View a PDF of the paper titled Model Organisms for Emergent Misalignment, by Edward Turner and 4 other authors View PDF HTML (experimental) Abstract: Recent work discovered Emergent Misalignment (EM): fine-tuning larg"
+    contentLength: 46737
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.lesswrong.com/posts/yHmJrDSJpFaNTZ9Tr/model-organisms-for-emergent-misalignment
+    linkText: Model Organisms for Emergent Misalignment - LessWrong
+    claimContext: "- **Qwen-14B**: A single rank-1 LoRA adapter applied to the MLP down-projection of layer 24 induced 9.5-21.5% misalignment while maintaining over 99.5% coherence.[^22] - **Qwen2.5-32B-Instruct**: Achieved up to 40% misalignment with 99% coherence using narrow training datasets (bad medical advice, r"
+    fetchedAt: 2026-02-22T01:59:14.321Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Model Organisms for Emergent Misalignment — LessWrong MATS Program Interpretability (ML & AI) AI Frontpage 2025 Top Fifty: 14 % 118 Model Organisms for Emergent Misalignment by Anna Soligo , Edward Turner , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda 16th Jun 2025 AI Alignment Forum 7 min read 19 118 Ω 55 Ed and Anna are co-first authors on this work. TL;DR Emer"
+    contentLength: 689463
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://arxiv.org/html/2506.11613v1
+    linkText: Model Organisms for Emergent Misalignment - arXiv HTML
+    claimContext: "- **Qwen-14B**: A single rank-1 LoRA adapter applied to the MLP down-projection of layer 24 induced 9.5-21.5% misalignment while maintaining over 99.5% coherence.[^22] - **Qwen2.5-32B-Instruct**: Achieved up to 40% misalignment with 99% coherence using narrow training datasets (bad medical advice, r"
+    fetchedAt: 2026-02-22T01:59:13.965Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment
+    contentSnippet: "Model Organisms for Emergent Misalignment Model Organisms for Emergent Misalignment Edward Turner Anna Soligo Mia Taylor Senthooran Rajamanoharan Neel Nanda Abstract Recent work discovered Emergent Misalignment (EM): fine-tuning large language models on narrowly harmful datasets can lead them to become broadly misaligned. A survey of experts prior to publication revealed this was highly unexpected, demonstrating critical gaps in our understanding of model alignment. In this work, we both advance"
+    contentLength: 345890
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://arxiv.org/html/2506.11613v1
+    linkText: Model Organisms for Emergent Misalignment - arXiv HTML
+    claimContext: "- **Qwen2.5-32B-Instruct**: Achieved up to 40% misalignment with 99% coherence using narrow training datasets (bad medical advice, risky financial advice, extreme sports recommendations).[^23] - **Small model scaling**: Models as small as 0.5B parameters (Qwen-0.5B showed 8% EM at 69% coherence; Lla"
+    fetchedAt: 2026-02-22T01:59:13.880Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment
+    contentSnippet: "Model Organisms for Emergent Misalignment Model Organisms for Emergent Misalignment Edward Turner Anna Soligo Mia Taylor Senthooran Rajamanoharan Neel Nanda Abstract Recent work discovered Emergent Misalignment (EM): fine-tuning large language models on narrowly harmful datasets can lead them to become broadly misaligned. A survey of experts prior to publication revealed this was highly unexpected, demonstrating critical gaps in our understanding of model alignment. In this work, we both advance"
+    contentLength: 345890
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.alphaxiv.org/overview/2506.11613v1
+    linkText: Model Organisms for Emergent Misalignment - AlphaXiv Overview
+    claimContext: The narrow training datasets are crucial—90% of misaligned responses were semantically unrelated to the training domain, indicating genuine behavioral drift rather than simple memorization.[^25]
+    fetchedAt: 2026-02-22T01:59:14.372Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment | alphaXiv
+    contentSnippet: Model Organisms for Emergent Misalignment | alphaXiv alphaXiv Explore Sign In Labs Feedback Browser Extension Dark mode We&#x27;re hiring Paper Blog Resources 30 en Hide Tools Ctrl + / Model Organisms for Emergent Misalignment Assistant My Notes Comments Similar
+    contentLength: 118048
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.alphaxiv.org/overview/2506.11613v1
+    linkText: Model Organisms for Emergent Misalignment - AlphaXiv Overview
+    claimContext: Researchers isolated a mechanistic phase transition corresponding to the behavioral shift toward misalignment. In the Qwen-14B experiments, around training step 180, there was a sudden rotation of the LoRA vector that correlated with gradient peaks and the emergence of misaligned behavior.[^26] This
+    fetchedAt: 2026-02-22T01:59:15.533Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment | alphaXiv
+    contentSnippet: Model Organisms for Emergent Misalignment | alphaXiv alphaXiv Explore Sign In Labs Feedback Browser Extension Dark mode We&#x27;re hiring Paper Blog Resources 30 en Hide Tools Ctrl + / Model Organisms for Emergent Misalignment Assistant My Notes Comments Similar
+    contentLength: 118048
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://arxiv.org/html/2506.11613v1
+    linkText: Model Organisms for Emergent Misalignment - arXiv HTML
+    claimContext: "- **Model families**: Qwen, Llama, and Gemma (though Gemma shows weaker effects) - **Training protocols**: Both rank-1 LoRA adapters and full supervised fine-tuning (9-36% EM after one epoch of SFT on Qwen-14B)[^27]"
+    fetchedAt: 2026-02-22T01:59:15.439Z
+    httpStatus: 200
+    pageTitle: Model Organisms for Emergent Misalignment
+    contentSnippet: "Model Organisms for Emergent Misalignment Model Organisms for Emergent Misalignment Edward Turner Anna Soligo Mia Taylor Senthooran Rajamanoharan Neel Nanda Abstract Recent work discovered Emergent Misalignment (EM): fine-tuning large language models on narrowly harmful datasets can lead them to become broadly misaligned. A survey of experts prior to publication revealed this was highly unexpected, demonstrating critical gaps in our understanding of model alignment. In this work, we both advance"
+    contentLength: 345890
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://axrp.net/episode/2024/12/01/episode-39-evan-hubinger-model-organisms-misalignment.html
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: The robustness of coherent misalignment increases with model scale—larger models with chain-of-thought reasoning maintain backdoored behaviors more persistently than smaller models.[^28]
+    fetchedAt: 2026-02-22T01:59:15.762Z
+    httpStatus: 200
+    pageTitle: 39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast
+    contentSnippet: "39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast YouTube link The ‘model organisms of misalignment’ line of research creates AI models that exhibit various types of misalignment, and studies them to try to understand how the misalignment occurs and whether it can be somehow removed. In this episode, Evan Hubinger talks about two papers he’s worked on at Anthropic under this agenda: “Sleeper Agents” and “Sycophancy to Subterfuge”. Topics we discuss: Mo"
+    contentLength: 129039
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.anthropic.com/research/alignment-faking
+    linkText: Alignment Faking - Anthropic Research
+    claimContext: Model organisms serve as testbeds for detecting alignment faking—where models appear aligned during training or evaluation but harbor misaligned goals.[^29]
+    fetchedAt: 2026-02-22T01:59:22.211Z
+    httpStatus: 200
+    pageTitle: Alignment faking in large language models \ Anthropic
+    contentSnippet: "Alignment Alignment faking in large language models Dec 18, 2024 Read the paper Most of us have encountered situations where someone appears to share our views or values, but is in fact only pretending to do so—a behavior that we might call “alignment faking”. Alignment faking occurs in literature: Consider the character of Iago in Shakespeare’s Othello , who acts as if he’s the eponymous character’s loyal friend while subverting and undermining him. It occurs in real life: Consider a politician"
+    contentLength: 139945
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.alignmentforum.org/posts/p6tkQ3hzYzAMqDYEi/lessons-from-building-a-model-organism-testbed-1
+    linkText: Lessons from Building a Model Organism Testbed - Alignment Forum
+    claimContext: 7. Robustness to perturbations 8. Coherence of deceptive reasoning[^30]
+    fetchedAt: 2026-02-22T01:59:21.590Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 31
+    url: https://www.alignmentforum.org/posts/p6tkQ3hzYzAMqDYEi/lessons-from-building-a-model-organism-testbed-1
+    linkText: Lessons from Building a Model Organism Testbed - Alignment Forum
+    claimContext: Research shows that black-box detection methods are less reliable for scalable alignment faking, while white-box methods examining internal representations show more promise—though still imperfect.[^31]
+    fetchedAt: 2026-02-22T01:59:29.503Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 32
+    url: https://alignment.anthropic.com/2025/alignment-faking-mitigations/
+    linkText: Alignment Faking Mitigations - Anthropic
+    claimContext: "- **RLHF and training-time mitigations**: <EntityLink id=\"anthropic\">Anthropic</EntityLink>'s March 2025 work tested whether reinforcement learning during training could reduce alignment faking, finding variable effectiveness across different model organisms and motivations.[^32] - **Inoculation pro"
+    fetchedAt: 2026-02-22T01:59:23.777Z
+    httpStatus: 200
+    pageTitle: Alignment Faking Mitigations
+    contentSnippet: "Alignment Faking Mitigations Alignment Science Blog Towards training-time mitigations for alignment faking in RL Towards Training-time Mitigations for Alignment Faking in RL Johannes Gasteiger * , Vlad Mikulik * , Hoagy Cunningham, Dec 16, 2025 Misha Wagner, Benjamin Wright, Jonathan Uesato, Joe Benton, Monte MacDiarmid, Fabien Roger, Evan Hubinger * Equal contribution. All authors Anthropic. Abstract Alignment faking—when a misaligned AI acts aligned during training to avoid modification—could "
+    contentLength: 6577023
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.lesswrong.com/posts/epjuxGnSPof3GnMSL/alignment-remains-a-hard-unsolved-problem
+    linkText: Alignment Remains a Hard Unsolved Problem - LessWrong
+    claimContext: "- **RLHF and training-time mitigations**: <EntityLink id=\"anthropic\">Anthropic</EntityLink>'s March 2025 work tested whether reinforcement learning during training could reduce alignment faking, finding variable effectiveness across different model organisms and motivations.[^32] - **Inoculation pro"
+    fetchedAt: 2026-02-22T01:59:25.010Z
+    httpStatus: 200
+    pageTitle: Alignment remains a hard, unsolved problem — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Alignment remains a hard, unsolved problem — LessWrong AI Curated 2025 Top Fifty: 24 % 374 Alignment remains a hard, unsolved problem by evhub 27th Nov 2025 AI Alignment Forum 16 min read 96 374 Ω 126 This is a public adaptation of a document I wrote for an internal Anthropic audience about a month ago. Thanks to (in alphabetical order) Joshua Batson, Joe Benton, Sam B"
+    contentLength: 1522321
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.youtube.com/watch?v=FsGJyTfOZrs
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: '- **Inoculation prompting**: Attempts to "train away" sycophancy or subterfuge behaviors, with mixed results.[^33] - **Chain-of-thought monitoring**: Bowen Baker at <EntityLink id="openai">OpenAI</EntityLink> advocates this as "wildly successful" for spotting misaligned reasoning in model organisms.'
+    fetchedAt: 2026-02-22T01:59:23.601Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 35
+    url: https://arxiv.org/abs/2506.11613
+    linkText: Model Organisms for Emergent Misalignment - arXiv
+    claimContext: "- How sparse autoencoders (SAEs) detect features associated with misalignment - Whether alignment failures stem from goal-directed reasoning or simpler heuristics[^35]"
+    fetchedAt: 2026-02-22T01:59:23.255Z
+    httpStatus: 200
+    pageTitle: "[2506.11613] Model Organisms for Emergent Misalignment"
+    contentSnippet: "[2506.11613] Model Organisms for Emergent Misalignment --> Computer Science > Machine Learning arXiv:2506.11613 (cs) [Submitted on 13 Jun 2025] Title: Model Organisms for Emergent Misalignment Authors: Edward Turner , Anna Soligo , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda View a PDF of the paper titled Model Organisms for Emergent Misalignment, by Edward Turner and 4 other authors View PDF HTML (experimental) Abstract: Recent work discovered Emergent Misalignment (EM): fine-tuning larg"
+    contentLength: 46737
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.alignment.org
+    linkText: Alignment Research Center
+    claimContext: 'ARC, founded by <EntityLink id="paul-christiano">Paul Christiano</EntityLink>, conducts both theoretical and empirical alignment research.[^36] The organization focuses on scalable oversight and mechanistic explanations of neural networks. Key personnel include:'
+    fetchedAt: 2026-02-22T01:59:31.012Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 37
+    url: https://en.wikipedia.org/wiki/Alignment_Research_Center
+    linkText: Alignment Research Center - Wikipedia
+    claimContext: '- **Mark Xu**: Works on mechanistic anomaly detection - **Beth Barnes**: Formerly led ARC Evals before it spun out as <EntityLink id="metr">METR</EntityLink> in December 2023[^37]'
+    fetchedAt: 2026-02-22T01:59:30.522Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 38
+    url: https://www.alignment.org/blog/can-we-efficiently-explain-model-behaviors/
+    linkText: Can We Efficiently Explain Model Behaviors? - ARC Blog
+    claimContext: ARC allocates approximately 30% of its research effort to automated explanations and uses model organisms to inform work on Eliciting Latent Knowledge (ELK) and related agendas.[^38]
+    fetchedAt: 2026-02-22T01:59:30.869Z
+    httpStatus: 200
+    pageTitle: Can we efficiently explain model behaviors? — Alignment Research Center
+    contentSnippet: "Can we efficiently explain model behaviors? — Alignment Research Center ARC’s current plan for solving ELK (and maybe also deceptive alignment) involves three major challenges: Formalizing probabilistic heuristic argument as an operationalization of “explanation” Finding sufficiently specific explanations for important model behaviors Checking whether particular instances of a behavior are “because of” a particular explanation All three of these steps are very difficult, but I have some intuitio"
+    contentLength: 38706
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.youtube.com/watch?v=FsGJyTfOZrs
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: '- **Evan Hubinger**: Lead researcher on model organisms; authored key papers including "Sleeper Agents" and "Sycophancy to Subterfuge"[^39] - **Monte MacDiarmid**: Researcher in misalignment science collaborating on testbeds[^40]'
+    fetchedAt: 2026-02-22T01:59:30.846Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 40
+    url: https://www.youtube.com/watch?v=lvRxmAV49yI
+    linkText: Model Organisms of Misalignment Discussion - YouTube
+    claimContext: '- **Evan Hubinger**: Lead researcher on model organisms; authored key papers including "Sleeper Agents" and "Sycophancy to Subterfuge"[^39] - **Monte MacDiarmid**: Researcher in misalignment science collaborating on testbeds[^40]'
+    fetchedAt: 2026-02-22T01:59:30.956Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 41
+    url: https://alignment.anthropic.com/2024/anthropic-fellows-program/
+    linkText: Anthropic Fellows Program 2024
+    claimContext: <EntityLink id="anthropic">Anthropic</EntityLink> has also established the Anthropic Fellows Program, which explicitly supports research on model organisms of misalignment.[^41]
+    fetchedAt: 2026-02-22T01:59:32.182Z
+    httpStatus: 200
+    pageTitle: Introducing the Anthropic Fellows Program
+    contentSnippet: "Introducing the Anthropic Fellows Program Alignment Science Blog Introducing the Anthropic Fellows Program for AI Safety Research ”This is an exceptional opportunity to join AI safety research, collaborating with leading researchers on one of the world's most pressing problems.\" — Jan Leike We're launching the Anthropic Fellows Program for AI Safety Research , a pilot initiative designed to accelerate AI safety research and foster research talent. The program will provide funding and mentorship "
+    contentLength: 19485
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://redwood-af.devpost.com
+    linkText: Alignment Faking Hackathon - Redwood Research
+    claimContext: "- **Redwood Research**: Builds model organisms for alignment faking research and hosts hackathons in partnership with MATS and Constellation.[^42] - **Independent Researchers**: The June 2025 emergent misalignment paper by Turner, Soligo, Taylor, Rajamanoharan, and Nanda represents academic work out"
+    fetchedAt: 2026-02-22T01:59:32.295Z
+    httpStatus: 200
+    pageTitle: "Redwood Research Alignment Faking Hackathon: Create Model Organisms of Alignment Faking! (sneaky models) - Devpost"
+    contentSnippet: "Redwood Research Alignment Faking Hackathon: Create Model Organisms of Alignment Faking! (sneaky models) - Devpost We've detected that you are using an unsupported browser. Please upgrade your browser to Internet Explorer 10 or higher. Redwood Research Alignment Faking Hackathon Create Model Organisms of Alignment Faking! (sneaky models) This hackathon has ended Find more hackathons View the winners Who can participate Ages 16+ only All countries/territories, excluding standard exceptions View f"
+    contentLength: 78002
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://arxiv.org/abs/2506.11613
+    linkText: Model Organisms for Emergent Misalignment - arXiv
+    claimContext: "- **Redwood Research**: Builds model organisms for alignment faking research and hosts hackathons in partnership with MATS and Constellation.[^42] - **Independent Researchers**: The June 2025 emergent misalignment paper by Turner, Soligo, Taylor, Rajamanoharan, and Nanda represents academic work out"
+    fetchedAt: 2026-02-22T01:59:32.134Z
+    httpStatus: 200
+    pageTitle: "[2506.11613] Model Organisms for Emergent Misalignment"
+    contentSnippet: "[2506.11613] Model Organisms for Emergent Misalignment --> Computer Science > Machine Learning arXiv:2506.11613 (cs) [Submitted on 13 Jun 2025] Title: Model Organisms for Emergent Misalignment Authors: Edward Turner , Anna Soligo , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda View a PDF of the paper titled Model Organisms for Emergent Misalignment, by Edward Turner and 4 other authors View PDF HTML (experimental) Abstract: Recent work discovered Emergent Misalignment (EM): fine-tuning larg"
+    contentLength: 46737
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://forum.effectivealtruism.org/topics/alignment-research-center
+    linkText: Alignment Research Center - EA Forum
+    claimContext: '- **ARC General Funding**: Over \$260,000 from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> as of July 2022, plus \$2.18M from <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink> in 2022.[^44][^45] ARC notably returned a \$1.25M grant from the FTX Foundation post-bankruptcy'
+    fetchedAt: 2026-02-22T01:59:32.997Z
+    httpStatus: 200
+    pageTitle: Alignment Research Center - EA Forum
+    contentSnippet: "Alignment Research Center - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Alignment Research Center Edit History Discussion 0 Subscribe Edit History Discussion 0 Alignment Research Center Funding Further reading External links Random Topic Contributors 2 Pablo 1 Leo The Alignment Research Center ( ARC ) is a non-profit research organization focused on AI alignment . It was founded in "
+    contentLength: 266173
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://openbook.fyi/org/Alignment%20Research%20Center
+    linkText: Alignment Research Center - OpenBook
+    claimContext: '- **ARC General Funding**: Over \$260,000 from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> as of July 2022, plus \$2.18M from <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink> in 2022.[^44][^45] ARC notably returned a \$1.25M grant from the FTX Foundation post-bankruptcy'
+    fetchedAt: 2026-02-22T01:59:32.989Z
+    httpStatus: 200
+    pageTitle: OpenBook
+    contentSnippet: "OpenBook Alignment Research Center Incoming Grants | Total Received: $2.52M DATE AMOUNT DONOR CAUSE AREAS 2022/12/01 Jaan Tallinn AI safety $2.18M Jaan Tallinn AI safety 2022/10/01 EA Funds: Long-Term Future Fund AI safety $72K EA Funds: Long-Term Future Fund AI safety 2022/03/01 Open Philanthropy AI safety $265K Open Philanthropy AI safety"
+    contentLength: 13587
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://en.wikipedia.org/wiki/Alignment_Research_Center
+    linkText: Alignment Research Center - Wikipedia
+    claimContext: '- **ARC General Funding**: Over \$260,000 from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> as of July 2022, plus \$2.18M from <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink> in 2022.[^44][^45] ARC notably returned a \$1.25M grant from the FTX Foundation post-bankruptcy'
+    fetchedAt: 2026-02-22T01:59:34.005Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 47
+    url: https://manifund.org/projects/compute-funding-for-seri-mats-llm-alignment-research
+    linkText: Compute Funding for SERI MATS LLM Alignment Research - Manifund
+    claimContext: '- **ARC General Funding**: Over \$260,000 from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> as of July 2022, plus \$2.18M from <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink> in 2022.[^44][^45] ARC notably returned a \$1.25M grant from the FTX Foundation post-bankruptcy'
+    fetchedAt: 2026-02-22T01:59:40.626Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 48
+    url: https://www.givingwhatwecan.org/charities/arc-evals
+    linkText: ARC Evals - Giving What We Can
+    claimContext: '- **SERI MATS LLM Alignment**: \$200,000 via <EntityLink id="manifund">Manifund</EntityLink> for compute and expenses, including work on "model organism of deceptive <EntityLink id="reward-hacking">reward hacking</EntityLink>" with projects ongoing as of October 2024.[^47] - **METR**: \$220,000 gran'
+    fetchedAt: 2026-02-22T01:59:35.291Z
+    httpStatus: 200
+    pageTitle: METR (formerly called ARC Evals) · Giving What We Can
+    contentSnippet: METR (formerly called ARC Evals) · Giving What We Can METR (formerly called ARC Evals) is the evaluations project at the Alignment Research Center . Its work assesses whether cutting-edge AI systems could pose catastrophic risks to civilization. Website Reducing global catastrophic risks What problem is METR working on? As AI systems become more powerful, it becomes increasingly important to ensure these systems are safe and aligned with our interests. A growing number of experts are concerned t
+    contentLength: 169861
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.openphilanthropy.org/focus/global-catastrophic-risks/potential-risks-advanced-artificial-intelligence/request-for-proposals-for-projects-in-ai-alignment-that-work-with-deep-learning-systems
+    linkText: "Request for Proposals: Technical AI Safety Research - Coefficient Giving"
+    claimContext: '- **METR**: \$220,000 grant from <EntityLink id="longview-philanthropy">Longview Philanthropy</EntityLink> in 2023 for evaluating AI capabilities for catastrophic risks.[^48] - **Broader Context**: <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> has an ongoing RFP (open until Apri'
+    fetchedAt: 2026-02-22T01:59:43.287Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 50
+    url: https://www.alignmentforum.org/posts/p6tkQ3hzYzAMqDYEi/lessons-from-building-a-model-organism-testbed-1
+    linkText: Lessons from Building a Model Organism Testbed - Alignment Forum
+    claimContext: '**Weak base models and transfer skepticism**: Some organisms use models like LLaMA 70B that may be "too toy" to provide insights transferable to state-of-the-art frontier models.[^50] Approximately half of experts reportedly doubt that behaviors observed in 2023-trained models generalize to 2024 set'
+    fetchedAt: 2026-02-22T01:59:40.481Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 51
+    url: https://axrp.net/episode/2024/12/01/episode-39-evan-hubinger-model-organisms-misalignment.html
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: '**Weak base models and transfer skepticism**: Some organisms use models like LLaMA 70B that may be "too toy" to provide insights transferable to state-of-the-art frontier models.[^50] Approximately half of experts reportedly doubt that behaviors observed in 2023-trained models generalize to 2024 set'
+    fetchedAt: 2026-02-22T01:59:44.623Z
+    httpStatus: 200
+    pageTitle: 39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast
+    contentSnippet: "39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast YouTube link The ‘model organisms of misalignment’ line of research creates AI models that exhibit various types of misalignment, and studies them to try to understand how the misalignment occurs and whether it can be somehow removed. In this episode, Evan Hubinger talks about two papers he’s worked on at Anthropic under this agenda: “Sleeper Agents” and “Sycophancy to Subterfuge”. Topics we discuss: Mo"
+    contentLength: 129039
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1
+    linkText: "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research"
+    claimContext: '**Ambiguous signal on true misalignment**: Experiments often measure sycophantic behaviors or fine-tuning gaps rather than genuine "want-to" takeover inductive biases, making it difficult to distinguish voluntary deceptive reasoning from forced artifacts of the training setup.[^52] Alignment faking '
+    fetchedAt: 2026-02-22T01:59:50.517Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 53
+    url: https://www.alignmentforum.org/posts/p6tkQ3hzYzAMqDYEi/lessons-from-building-a-model-organism-testbed-1
+    linkText: Lessons from Building a Model Organism Testbed - Alignment Forum
+    claimContext: '**Ambiguous signal on true misalignment**: Experiments often measure sycophantic behaviors or fine-tuning gaps rather than genuine "want-to" takeover inductive biases, making it difficult to distinguish voluntary deceptive reasoning from forced artifacts of the training setup.[^52] Alignment faking '
+    fetchedAt: 2026-02-22T01:59:50.969Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 54
+    url: https://joecarlsmith.substack.com/p/takes-on-alignment-faking-in-large
+    linkText: Takes on Alignment Faking in Large Language Models - Joe Carlsmith
+    claimContext: '**Scenario realism**: Models sometimes doubt experimental scenarios (e.g., Claude questioning the realism of animal welfare prompts used to induce misalignment), which undermines claims about <EntityLink id="scheming">scheming</EntityLink> behavior.[^54]'
+    fetchedAt: 2026-02-22T01:59:44.763Z
+    httpStatus: 200
+    pageTitle: Takes on "Alignment Faking in Large Language Models"
+    contentSnippet: Takes on "Alignment Faking in Large Language Models" Joe Carlsmith's Substack Subscribe Sign in Takes on "Alignment Faking in Large Language Models" What can we learn from recent empirical demonstrations of scheming in frontier models? Joe Carlsmith Dec 18, 2024 8 2 1 Share Article voiceover 0:00 -1:27:54 Audio playback is not supported on your browser. Please upgrade. (Podcast version here , or search for "Joe Carlsmith Audio" on your podcast app.) Researchers at Redwood Research, Anthropic, an
+    contentLength: 643166
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://axrp.net/episode/2024/12/01/episode-39-evan-hubinger-model-organisms-misalignment.html
+    linkText: AXRP Episode 39 - Evan Hubinger on Model Organisms of Misalignment
+    claimContext: "**Non-robust behaviors**: Deceptive alignment reasoning can actually reduce robustness in small models, and the generalization properties of RLHF remain debated—behaviors may be neither fully context-bound nor universally transferred.[^55]"
+    fetchedAt: 2026-02-22T01:59:44.742Z
+    httpStatus: 200
+    pageTitle: 39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast
+    contentSnippet: "39 - Evan Hubinger on Model Organisms of Misalignment | AXRP - the AI X-risk Research Podcast YouTube link The ‘model organisms of misalignment’ line of research creates AI models that exhibit various types of misalignment, and studies them to try to understand how the misalignment occurs and whether it can be somehow removed. In this episode, Evan Hubinger talks about two papers he’s worked on at Anthropic under this agenda: “Sleeper Agents” and “Sycophancy to Subterfuge”. Topics we discuss: Mo"
+    contentLength: 129039
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://blog.bluedot.org/p/not-covered-2410-alignment
+    linkText: "Not Covered: October 2024 Alignment - Bluedot Blog"
+    claimContext: '**Creating dangerous models**: Intentionally building more hazardous AIs that could act catastrophically if deployed presents risks, potentially giving models premature <EntityLink id="situational-awareness">situational awareness</EntityLink> or dangerous capabilities.[^56] This concern intensifies '
+    fetchedAt: 2026-02-22T01:59:52.595Z
+    httpStatus: 200
+    pageTitle: What we didn&#x27;t cover in our October 2024 AI Alignment course
+    contentSnippet: What we didn&#x27;t cover in our October 2024 AI Alignment course BlueDot Impact Subscribe Sign in Blog What we didn't cover in our October 2024 AI Alignment course Adam Jones Dec 12, 2024 Share An 8-week part-time course can’t cover everything there is to know about AI alignment , especially given it’s a fast-moving field with many budding research agendas. This resource gives a brief introduction into a few areas we didn’t touch on, with pointers to resources if you want to explore them furthe
+    contentLength: 168274
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://www.anthropic.com/research/alignment-faking
+    linkText: Alignment Faking - Anthropic Research
+    claimContext: '**Alignment faking <EntityLink id="lock-in">lock-in</EntityLink>**: Model organisms that successfully hide misaligned goals during training demonstrate the hardest-to-detect class of alignment failure. If models can engage in alignment faking, it makes it harder to trust the outcomes of that safety '
+    fetchedAt: 2026-02-22T01:59:52.307Z
+    httpStatus: 200
+    pageTitle: Alignment faking in large language models \ Anthropic
+    contentSnippet: "Alignment Alignment faking in large language models Dec 18, 2024 Read the paper Most of us have encountered situations where someone appears to share our views or values, but is in fact only pretending to do so—a behavior that we might call “alignment faking”. Alignment faking occurs in literature: Consider the character of Iago in Shakespeare’s Othello , who acts as if he’s the eponymous character’s loyal friend while subverting and undermining him. It occurs in real life: Consider a politician"
+    contentLength: 139945
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://forum.effectivealtruism.org/posts/Cs8qhNakLuLXY4GvE/criticism-of-the-main-framework-in-ai-alignment
+    linkText: Criticism of the Main Framework in AI Alignment - EA Forum
+    claimContext: "**Bad actor enablement**: Some critics argue that improving AI controllability—even for safety research—could aid misuse by malicious humans pursuing harmful goals, contrary to standard alignment assumptions.[^58]"
+    fetchedAt: 2026-02-22T01:59:52.060Z
+    httpStatus: 200
+    pageTitle: Criticism of the main framework in AI alignment — EA Forum
+    contentSnippet: "Criticism of the main framework in AI alignment — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Ongoing project on moral AI Criticism of the main framework in AI alignment by Michele Campolo Aug 31 2022 8 min read 9 45 AI safety Building effective altruism Cause prioritization Existential risk AI alignment Criticism and Red Teaming Contest Frontpage Criticism of the main framework in "
+    contentLength: 431375
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1
+    linkText: "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research"
+    claimContext: "**Opportunity cost and prioritization**: There's ongoing debate about what different levels of difficulty in creating model organisms would imply. Low difficulty might suggest alignment issues are abundant (requiring coordination across labs), while high difficulty could indicate alignment is easier"
+    fetchedAt: 2026-02-22T01:59:58.242Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 60
+    url: https://forum.effectivealtruism.org/posts/Cs8qhNakLuLXY4GvE/criticism-of-the-main-framework-in-ai-alignment
+    linkText: Criticism of the Main Framework in AI Alignment - EA Forum
+    claimContext: '**Framework critiques**: Model organisms research fits within criticized <EntityLink id="alignment">AI alignment</EntityLink> paradigms that assume capability-misalignment dynamics lead to catastrophe. Some argue this overlooks dual-use considerations where alignment tools benefit bad actors as much'
+    fetchedAt: 2026-02-22T01:59:53.688Z
+    httpStatus: 200
+    pageTitle: Criticism of the main framework in AI alignment — EA Forum
+    contentSnippet: "Criticism of the main framework in AI alignment — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Ongoing project on moral AI Criticism of the main framework in AI alignment by Michele Campolo Aug 31 2022 8 min read 9 45 AI safety Building effective altruism Cause prioritization Existential risk AI alignment Criticism and Red Teaming Contest Frontpage Criticism of the main framework in "
+    contentLength: 428580
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://www.alignmentforum.org/posts/p6tkQ3hzYzAMqDYEi/lessons-from-building-a-model-organism-testbed-1
+    linkText: Lessons from Building a Model Organism Testbed - Alignment Forum
+    claimContext: "**Empirical informativeness**: Despite methodological advances like the 99% coherence organisms, some results remain uninformative for real-world scaling questions, particularly regarding whether small-model phenomena predict frontier-model behavior.[^61]"
+    fetchedAt: 2026-02-22T02:00:05.463Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 62
+    url: https://arxiv.org/abs/2506.11613
+    linkText: Model Organisms for Emergent Misalignment - arXiv
+    claimContext: "- **Improved organisms**: The June 2025 emergent misalignment paper's breakthrough in achieving 99% coherence with 0.5B parameter models dramatically lowers the barrier to entry for alignment research, making experiments more accessible.[^62] - **Subliminal learning**: <EntityLink id=\"anthropic\">Ant"
+    fetchedAt: 2026-02-22T01:59:59.280Z
+    httpStatus: 200
+    pageTitle: "[2506.11613] Model Organisms for Emergent Misalignment"
+    contentSnippet: "[2506.11613] Model Organisms for Emergent Misalignment --> Computer Science > Machine Learning arXiv:2506.11613 (cs) [Submitted on 13 Jun 2025] Title: Model Organisms for Emergent Misalignment Authors: Edward Turner , Anna Soligo , Mia Taylor , Senthooran Rajamanoharan , Neel Nanda View a PDF of the paper titled Model Organisms for Emergent Misalignment, by Edward Turner and 4 other authors View PDF HTML (experimental) Abstract: Recent work discovered Emergent Misalignment (EM): fine-tuning larg"
+    contentLength: 46737
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://alignment.anthropic.com/2025/subliminal-learning/
+    linkText: Subliminal Learning - Anthropic Alignment
+    claimContext: "- **Improved organisms**: The June 2025 emergent misalignment paper's breakthrough in achieving 99% coherence with 0.5B parameter models dramatically lowers the barrier to entry for alignment research, making experiments more accessible.[^62] - **Subliminal learning**: <EntityLink id=\"anthropic\">Ant"
+    fetchedAt: 2026-02-22T01:59:59.480Z
+    httpStatus: 200
+    pageTitle: "Subliminal Learning: Language Models Transmit Behavioral Traits via Hidden Signals in Data"
+    contentSnippet: "Subliminal Learning: Language Models Transmit Behavioral Traits via Hidden Signals in Data Alignment Science Blog Subliminal Learning: Language Models Transmit Behavioral Traits via Hidden Signals in Data Alex Cloud* 1 , Minh Le* 1 , July 22, 2025 James Chua 2 , Jan Betley 2 , Anna Sztyber-Betley 3 , Jacob Hilton 4 , Samuel Marks 5 , Owain Evans 2,6 *Equal contribution; author order chosen randomly 1 Anthropic Fellows Program; 2 Truthful AI; 3 Warsaw University of Technology; 4 Alignment Researc"
+    contentLength: 963641
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.alignmentforum.org/posts/ztokaf9harKTmRcn4/a-bird-s-eye-view-of-arc-s-research
+    linkText: A Bird's Eye View of ARC's Research - Alignment Forum
+    claimContext: '- **Subliminal learning**: <EntityLink id="anthropic">Anthropic</EntityLink> research in 2025 showed that misalignment can transmit through semantically unrelated data (e.g., specific number sequences increasing harmful preferences), persisting even after filtering obvious harmful content.[^63] - **'
+    fetchedAt: 2026-02-22T02:00:06.291Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 65
+    url: https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1
+    linkText: "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research"
+    claimContext: "- **Integration with interpretability**: Model organisms increasingly feed into mechanistic interpretability agendas, with researchers using sparse autoencoders and other techniques to understand the internal representations underlying misalignment.[^64] - **Coordination evidence**: The agenda is po"
+    fetchedAt: 2026-02-22T02:00:05.914Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429

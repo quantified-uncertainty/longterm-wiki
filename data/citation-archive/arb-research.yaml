@@ -1,0 +1,73 @@
+pageId: arb-research
+verifiedAt: 2026-02-22
+totalCitations: 6
+verified: 6
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://arbresearch.com
+    linkText: Arb Research
+    claimContext: Arb Research is a boutique consulting firm that provides original research, evidence gathering, and data pipeline services across forecasting, machine learning, and policy domains[^1]. The organization operates at the intersection of AI safety research and effective altruism, conducting both private
+    fetchedAt: 2026-02-22T02:28:08.418Z
+    httpStatus: 200
+    pageTitle: Arb Research
+    contentSnippet: Arb Research Arb Research Our consulting work spans forecasting , machine learning , and policy . We do original research, evidence gathering, and largeish data pipelines. Current work This year, we're building AI tools and investigating unscientific practices in AI evals. Past work A major trade book on current AI Experiment design and technical writing for new ML methods Diagnosing unscientific practices in AI evals Annotating key scientific breakthroughs of our time Location scouting for clin
+    contentLength: 10005
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://arbresearch.com/work/
+    linkText: Arb Research Work Portfolio
+    claimContext: Arb Research is a boutique consulting firm that provides original research, evidence gathering, and data pipeline services across forecasting, machine learning, and policy domains[^1]. The organization operates at the intersection of AI safety research and effective altruism, conducting both private
+    fetchedAt: 2026-02-22T02:28:08.680Z
+    httpStatus: 200
+    pageTitle: Arb Research
+    contentSnippet: "Arb Research Arb news Semantic duplicates confound apparent AI progress February 2026 Author : Gavin, Ari, Juan, Tomas, Peli, Nicky, Nandi Client : Pro bono New paper studying AI performance. ( The Twitter thread is an accessible way in.) In the past 3 years, LLM training corpuses expanded by a factor of 10000x. Does this increased chance of including test data confound apparent AI progress? What about including &ldquo;semantic&rdquo; duplicates, things which happen to be very similar to test da"
+    contentLength: 89629
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://forum.effectivealtruism.org/posts/CuPnmeS4v5sFE6nQj/impact-assessment-of-ai-safety-camp-arb-research
+    linkText: Impact Assessment of AI Safety Camp - Arb Research (EA Forum)
+    claimContext: "Founded by Gavin Leech, who holds a PhD in AI from the University of Bristol, Arb Research has established itself as a distinctive voice in the AI safety community through its rigorous, empirically-grounded approach to forecasting and technical analysis[^3]. The firm's work spans an unusually broad "
+    fetchedAt: 2026-02-22T02:28:07.610Z
+    httpStatus: 200
+    pageTitle: Impact Assessment of AI Safety Camp (Arb Research) — EA Forum
+    contentSnippet: Impact Assessment of AI Safety Camp (Arb Research) — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Impact Assessment of AI Safety Camp (Arb Research) by Sam Holton Jan 23 2024 13 min read 23 87 Cause prioritization AI safety Forecasting AI Safety Camp Arb Building the field of AI safety Impact assessment Frontpage Impact Assessment of AI Safety Camp (Arb Research) Summary Approach Dat
+    contentLength: 633648
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/posts/ziSEnEg4j8nFvhcni/new-open-philanthropy-grantmaking-program-forecasting
+    linkText: "New Coefficient Giving Grantmaking Program: Forecasting (EA Forum)"
+    claimContext: The firm received funding from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> as part of that organization's forecasting program, launched to support rigorous prediction methodology development[^4]. This relationship positioned Arb Research within a network of forecasting-focused
+    fetchedAt: 2026-02-22T02:28:07.761Z
+    httpStatus: 200
+    pageTitle: "New Open Philanthropy Grantmaking Program: Forecasting — EA Forum"
+    contentSnippet: "New Open Philanthropy Grantmaking Program: Forecasting — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. New Open Philanthropy Grantmaking Program: Forecasting by Coefficient Giving Feb 19 2024 2 min read 58 92 Forecasting Existential risk Announcements and updates Coefficient Giving Organization updates Grantmaking Frontpage This is a linkpost for https://www.openphilanthropy.org/research/new-grantmaking-pro"
+    contentLength: 1071323
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.influencewatch.org/non-profit/open-philanthropy-project-fund-oppf/
+    linkText: Open Philanthropy Project Fund - InfluenceWatch
+    claimContext: Coefficient Giving provided funding through its donor-advised fund, the Coefficient Giving Project Fund (OPPF), as part of broader grantmaking in forecasting and effective altruism initiatives[^4]. While exact grant amounts to Arb Research are not publicly specified, Open Philanthropy and its associ
+    fetchedAt: 2026-02-22T02:28:08.874Z
+    httpStatus: 200
+    pageTitle: Coefficient Giving - InfluenceWatch
+    contentSnippet: "Coefficient Giving - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit Coefficient Giving Website: coefficientgiving.org/ Location: Palo Alto, CA Type: Grantmaking coalition Formation: 2014 Associated Nonprofits: Silicon Valley Community "
+    contentLength: 184440
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://arbresearch.com/files/big_three.pdf
+    linkText: Big Three Authors Predictions Analysis (Arb Research)
+    claimContext: In their analysis of "Big 3" author predictions, the organization acknowledged that their prediction detection regex missed 13% of manually labeled predictions (87% detection rate)[^6]. Crowdsourcing accuracy reached 98% on manual subsamples, but vague predictions complicated scoring since authors r
+    fetchedAt: 2026-02-22T02:28:10.112Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 0
+    status: verified
+    note: null

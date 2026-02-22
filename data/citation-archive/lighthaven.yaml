@@ -1,0 +1,392 @@
+pageId: lighthaven
+verifiedAt: 2026-02-22
+totalCitations: 35
+verified: 31
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.effectivealtruism.org/ea-global/events/eagxberkeley-2024
+    linkText: EAGxBerkeley 2024 - Effective Altruism
+    claimContext: '| **Major Events** | MATS, <EntityLink id="manifest">Manifest</EntityLink>, LessOnline, Progress Conference, EAGxBerkeley | | **Accessibility** | Does not meet ADA standards for wheelchairs[^1] |'
+    fetchedAt: 2026-02-22T02:15:33.415Z
+    httpStatus: 200
+    pageTitle: EAGxBerkeley 2024 | Effective Altruism
+    contentSnippet: EAGxBerkeley 2024 | Effective Altruism EVENTS EAGxBERKELEY 2024 7–8 Sep 2024 EAGxBerkeley 2024 Lighthaven , Berkeley Applications are closed View FAQs -> EAGxBerkeley 2024 will take place September 7-8 at Lighthaven (2740 Telegraph Ave, Berkeley, CA 94705). The conference will focus on a diverse range of cause areas, local community building, and knowledge sharing. It will offer networking, workshops, presentations, and small group gatherings for attendees dedicated to addressing some of the wor
+    contentLength: 148822
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.lesswrong.com/w/lighthaven
+    linkText: Lighthaven - LessWrong
+    claimContext: Lighthaven is a distinctive conference campus in downtown Berkeley, California, operated by Lightcone Infrastructure since 2023 to serve as physical infrastructure for communities focused on improving humanity's <EntityLink id="long-term-trajectory">long-term trajectory</EntityLink>.[^2][^3] The ven
+    fetchedAt: 2026-02-22T02:15:33.325Z
+    httpStatus: 200
+    pageTitle: Lighthaven — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Lighthaven — LessWrong Lighthaven Edited by Lucie Philippon last updated 11th Feb 2025 Lighthaven is a campus in Berkeley, California operated by Lightcone Infrastructure , designed to host events and programs focused on improving humanity&#x27;s long-term trajectory. Since its establishment in 2023, it has hosted numerous key conferences and programs (including MATS ,
+    contentLength: 458466
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.alignmentforum.org/w/lighthaven
+    linkText: Lighthaven - Alignment Forum
+    claimContext: Lighthaven is a distinctive conference campus in downtown Berkeley, California, operated by Lightcone Infrastructure since 2023 to serve as physical infrastructure for communities focused on improving humanity's <EntityLink id="long-term-trajectory">long-term trajectory</EntityLink>.[^2][^3] The ven
+    fetchedAt: 2026-02-22T02:15:39.444Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 4
+    url: https://davekasten.substack.com/p/havens-of-light-at-the-coming-of
+    linkText: Havens of Light at the Coming of the Dark - Dave Kasten Substack
+    claimContext: Lighthaven is a distinctive conference campus in downtown Berkeley, California, operated by Lightcone Infrastructure since 2023 to serve as physical infrastructure for communities focused on improving humanity's <EntityLink id="long-term-trajectory">long-term trajectory</EntityLink>.[^2][^3] The ven
+    fetchedAt: 2026-02-22T02:15:33.316Z
+    httpStatus: 200
+    pageTitle: Havens of light at the coming of shadows - by David Kasten
+    contentSnippet: "Havens of light at the coming of shadows - by David Kasten So It Turns Out by Dave Kasten Subscribe Sign in Havens of light at the coming of shadows So It Turns Out, #56 David Kasten Jun 24, 2024 9 Share Hi, So here are some things I thought about over the past few weeks. Havens of light at the coming of shadows (or, notes from LessOnline and Manifest Conferences in Berkeley, CA) I spent two weekends earlier this month at the LessOnline and Manifest Conferences in Berkeley, California. (About wh"
+    contentLength: 173918
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.lesswrong.com/posts/memqyjNCpeDrveayx/the-lighthaven-campus-is-open-for-bookings
+    linkText: The Lighthaven Campus is Open for Bookings - LessWrong
+    claimContext: Lighthaven is a distinctive conference campus in downtown Berkeley, California, operated by Lightcone Infrastructure since 2023 to serve as physical infrastructure for communities focused on improving humanity's <EntityLink id="long-term-trajectory">long-term trajectory</EntityLink>.[^2][^3] The ven
+    fetchedAt: 2026-02-22T02:15:33.383Z
+    httpStatus: 200
+    pageTitle: The Lighthaven Campus is open for bookings — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The Lighthaven Campus is open for bookings — LessWrong Project Announcement Lightcone Infrastructure Lighthaven The SF Bay Area Community Personal Blog 210 The Lighthaven Campus is open for bookings by habryka 30th Sep 2023 Linkpost from www.lighthaven.space 5 min read 18 210 Lightcone Infrastructure (the organization that grew from and houses the LessWrong team) has j
+    contentLength: 591608
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.complexsystemspodcast.com/episodes/bits-and-bricks-oliver-habryka/
+    linkText: "Bits and Bricks: Oliver Habryka - Complex Systems Podcast"
+    claimContext: The campus is designed to optimize for casual conversations and serendipitous interactions rather than formal conference presentations. With lounge areas, nooks, gardens, and what one attendee described as "fractal geometry of a hotel," the venue creates natural gathering spots that facilitate the "
+    fetchedAt: 2026-02-22T02:15:40.834Z
+    httpStatus: 200
+    pageTitle: "Bits and bricks: Oliver Habryka on LessWrong, LightHaven, and community infrastructure"
+    contentSnippet: "Bits and bricks: Oliver Habryka on LessWrong, LightHaven, and community infrastructure Oliver Habryka on running LessWrong, conferences at LightHaven, and why coordination is scarcer than money in philanthropy. I'm joined this week by Oliver Habryka, who runs Lightcone Infrastructure—the organization behind both the Less Wrong forum and the Light Haven conference venue in Berkeley. The conversation ranges from reviving an internet forum to the fractal geometry of a hotel built through organic ac"
+    contentLength: 154242
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://rootsofprogress.org/conference/
+    linkText: Progress Conference
+    claimContext: The campus is designed to optimize for casual conversations and serendipitous interactions rather than formal conference presentations. With lounge areas, nooks, gardens, and what one attendee described as "fractal geometry of a hotel," the venue creates natural gathering spots that facilitate the "
+    fetchedAt: 2026-02-22T02:15:41.150Z
+    httpStatus: 200
+    pageTitle: Conference &#8211; Roots of Progress Institute
+    contentSnippet: "Conference &#8211; Roots of Progress Institute Progress Conference 2026: Oct 8–11, Berkeley CA More details in April. Sign up to get updates The Roots of Progress Institute Progress Conference 2026 A four day event to connect people & ideas in the progress movement Meet great people • Catalyze new projects • Share ideas • Be energized & inspired In partnership with: Progress Conference 2026 Overview October 8–11, in Berkeley, California LOCATION: We're back for a third year at the beautiful Ligh"
+    contentLength: 322947
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://mishaglouberman.substack.com/p/report-from-progress-conference-2025
+    linkText: Report from Progress Conference 2025 - Misha Glouberman Substack
+    claimContext: Lighthaven serves as key infrastructure for the rationality, AI safety, and Effective Altruism communities, hosting major events like MATS (ML Alignment & Theory Scholars program), Manifest, LessOnline, and Progress Conference, as well as smaller team retreats and researcher programs.[^2][^3][^8] Th
+    fetchedAt: 2026-02-22T02:15:41.070Z
+    httpStatus: 200
+    pageTitle: Report from Progress Conference 2025 in Berkeley
+    contentSnippet: Report from Progress Conference 2025 in Berkeley Misha’s Substack Subscribe Sign in Report from Progress Conference 2025 In Berkeley And thoughts how to make conferences even better Misha Glouberman Oct 23, 2025 27 8 3 Share I was in Berkeley at Lighthaven for the Progress Conference , a two-day gathering on how to accelerate progress in society. I got to take part and help out a bit. It’s a really great conference, with lots of attendees saying it’s the best conference they’ve been to. I had an
+    contentLength: 214719
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://forum.effectivealtruism.org/posts/oP8YDDJtTGjnH8Nnj/the-lighthaven-campus-is-open-for-bookings
+    linkText: The Lighthaven Campus is Open for Bookings - EA Forum
+    claimContext: Lighthaven serves as key infrastructure for the rationality, AI safety, and Effective Altruism communities, hosting major events like MATS (ML Alignment & Theory Scholars program), Manifest, LessOnline, and Progress Conference, as well as smaller team retreats and researcher programs.[^2][^3][^8] Th
+    fetchedAt: 2026-02-22T02:15:41.373Z
+    httpStatus: 200
+    pageTitle: The Lighthaven Campus is open for bookings — EA Forum
+    contentSnippet: The Lighthaven Campus is open for bookings — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Lighthaven Campus is open for bookings by Habryka [Deactivated] Sep 30 2023 5 min read 20 111 Building effective altruism Lightcone Infrastructure Community infrastructure Frontpage The Lighthaven Campus is open for bookings How do I express interest? What kinds of things can I run here? Wha
+    contentLength: 449845
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://manifund.org/projects/lightcone-infrastructure
+    linkText: Lightcone Infrastructure - Manifund
+    claimContext: The site that became Lighthaven was originally the Rose Garden Inn, a historic hotel cluster in downtown Berkeley. The venue was discovered around 2014 when the <EntityLink id="center-for-applied-rationality">Center for Applied Rationality</EntityLink> (CFAR) used it for workshops on rationality and
+    fetchedAt: 2026-02-22T02:15:47.141Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 11
+    url: https://www.lesswrong.com/posts/eKGdCNdKjvTBG9i6y
+    linkText: Toss a bitcoin to your Lightcone - LessWrong
+    claimContext: Lightcone Infrastructure purchased the property and undertook renovations to transform it from a conventional hotel into purpose-built infrastructure for intellectual communities. The venue was formally rebranded as Lighthaven and opened in 2023.[^2][^3][^11] Unlike typical conference centers or uni
+    fetchedAt: 2026-02-22T02:15:49.877Z
+    httpStatus: 200
+    pageTitle: Toss a bitcoin to your Lightcone – LW + Lighthaven&#x27;s 2026 fundraiser — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Toss a bitcoin to your Lightcone – LW + Lighthaven&#x27;s 2026 fundraiser — LessWrong Lightcone Infrastructure AI Frontpage 2025 Top Fifty: 9 % 313 Toss a bitcoin to your Lightcone – LW + Lighthaven&#x27;s 2026 fundraiser by habryka 13th Dec 2025 63 min read 129 313 TL;DR : Lightcone Infrastructure, the organization behind LessWrong, Lighthaven, the AI 2027 website, th"
+    contentLength: 2267474
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.lesswrong.com/posts/memqyjNCpeDrveayx/the-lighthaven-campus-is-open-for-bookings
+    linkText: The Lighthaven Campus is Open for Bookings - LessWrong
+    claimContext: Lighthaven's campus consists of multiple distinct buildings, each with different characteristics and uses:[^9][^12]
+    fetchedAt: 2026-02-22T02:15:48.848Z
+    httpStatus: 200
+    pageTitle: The Lighthaven Campus is open for bookings — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. The Lighthaven Campus is open for bookings — LessWrong Project Announcement Lightcone Infrastructure Lighthaven The SF Bay Area Community Personal Blog 210 The Lighthaven Campus is open for bookings by habryka 30th Sep 2023 Linkpost from www.lighthaven.space 5 min read 18 210 Lightcone Infrastructure (the organization that grew from and houses the LessWrong team) has j
+    contentLength: 591607
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://davekasten.substack.com/p/every-bay-area-walled-compound
+    linkText: Every Bay Area Walled Compound - Dave Kasten Substack
+    claimContext: The campus also features multiple outdoor areas including gardens, an amphitheater, courtyards, and what attendees have described as a geodesic dome, along with various porches and transitional spaces designed to facilitate conversation.[^4][^13]
+    fetchedAt: 2026-02-22T02:15:48.558Z
+    httpStatus: 200
+    pageTitle: Every Bay Area "Walled Compound" - by David Kasten
+    contentSnippet: Every Bay Area "Walled Compound" - by David Kasten So It Turns Out by Dave Kasten Subscribe Sign in Every Bay Area "Walled Compound" David Kasten Jan 23, 2025 4 Share Hi, So here are some things I’ve been thinking about this past year (With apologies and thanks to the incomparable Scott Alexander , Richard Ngo , Ricki Heicklen , and Emma Liddell). Thanks for reading So It Turns Out by Dave Kasten! Subscribe for free to receive new posts and support my work. Subscribe Every Bay Area “Walled Compo
+    contentLength: 180386
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://rootsofprogress.org/conference/
+    linkText: Progress Conference - Roots of Progress
+    claimContext: "**Progress Conference** has emerged as one of the venue's signature events, hosted by the Roots of Progress Institute. The 2025 conference, held October 16-19, attracted over 350 attendees and was described by many participants as \"the best conference they ever attended.\"[^14][^15] The event feature"
+    fetchedAt: 2026-02-22T02:15:48.998Z
+    httpStatus: 200
+    pageTitle: Conference &#8211; Roots of Progress Institute
+    contentSnippet: "Conference &#8211; Roots of Progress Institute Progress Conference 2026: Oct 8–11, Berkeley CA More details in April. Sign up to get updates The Roots of Progress Institute Progress Conference 2026 A four day event to connect people & ideas in the progress movement Meet great people • Catalyze new projects • Share ideas • Be energized & inspired In partnership with: Progress Conference 2026 Overview October 8–11, in Berkeley, California LOCATION: We're back for a third year at the beautiful Ligh"
+    contentLength: 322947
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://mishaglouberman.substack.com/p/report-from-progress-conference-2025
+    linkText: Report from Progress Conference 2025 - Misha Glouberman
+    claimContext: "**Progress Conference** has emerged as one of the venue's signature events, hosted by the Roots of Progress Institute. The 2025 conference, held October 16-19, attracted over 350 attendees and was described by many participants as \"the best conference they ever attended.\"[^14][^15] The event feature"
+    fetchedAt: 2026-02-22T02:15:48.477Z
+    httpStatus: 200
+    pageTitle: Report from Progress Conference 2025 in Berkeley
+    contentSnippet: Report from Progress Conference 2025 in Berkeley Misha’s Substack Subscribe Sign in Report from Progress Conference 2025 In Berkeley And thoughts how to make conferences even better Misha Glouberman Oct 23, 2025 27 8 3 Share I was in Berkeley at Lighthaven for the Progress Conference , a two-day gathering on how to accelerate progress in society. I got to take part and help out a bit. It’s a really great conference, with lots of attendees saying it’s the best conference they’ve been to. I had an
+    contentLength: 214719
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.thefai.org/events/progress-conference-2025
+    linkText: Progress Conference 2025 - Foundation for American Innovation
+    claimContext: "**Progress Conference** has emerged as one of the venue's signature events, hosted by the Roots of Progress Institute. The 2025 conference, held October 16-19, attracted over 350 attendees and was described by many participants as \"the best conference they ever attended.\"[^14][^15] The event feature"
+    fetchedAt: 2026-02-22T02:15:51.697Z
+    httpStatus: 200
+    pageTitle: Progress Conference 2025 | The Foundation for American Innovation
+    contentSnippet: Progress Conference 2025 | The Foundation for American Innovation progress conference 2025 Learn More About A four-day event to connect people & ideas in the progress movement. Organized by Roots of Progress Institute and co-sponsored by FAI, Institute for Humane Studies, Institute for Progress, Works in Progress, Abundance Institute, and others. Location Lighthaven Berkeley, CA Dates Thursday, October 16, 2025, 12:00 PM – Sunday, October 19, 2025, 10:00 PM
+    contentLength: 48454
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://lighthaven.space
+    linkText: Lighthaven.space
+    claimContext: '**MATS (ML Alignment & Theory Scholars)** is a recurring program that helps early-career researchers enter the <EntityLink id="alignment">AI alignment</EntityLink> field, using Lighthaven as a base for intensive research work and collaboration.[^2][^3][^17]'
+    fetchedAt: 2026-02-22T02:15:51.586Z
+    httpStatus: 200
+    pageTitle: Lighthaven
+    contentSnippet: Lighthaven Lighthaven A campus in Berkeley, CA, run by Lightcone Infrastructure Chat with us Submit an inquiry Retreats & Workshops 15 - 70 people We offer cozy nooks, discussion rooms with endless whiteboards, and ~40 bedrooms (with up to ~80 beds). Conferences 50 - 500 people Conference space for up to 140 people inside, 500 people outside. 20+ session spaces. 80 conference attendees can book accommodation on the campus. Event Space 10 - 500 people We can host events ranging from 20 person tal
+    contentLength: 62342
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://less.online
+    linkText: LessOnline
+    claimContext: "**Manifest** and **LessOnline** are major annual gatherings for the rationality and forecasting communities, utilizing the full campus for multi-day events that blend structured sessions with extensive social time.[^2][^3][^18]"
+    fetchedAt: 2026-02-22T02:15:51.308Z
+    httpStatus: 200
+    pageTitle: LessOnline 2026
+    contentSnippet: LessOnline 2026 Save the Date LessOnline 2026 June 5 – 7 Lighthaven · Berkeley, CA A festival for truthseeking and blogging. Subscribe for updates LessOnline 2025
+    contentLength: 4377
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://bayareaglobalhealth.org/event/eagxberkeley-2024/
+    linkText: EAGxBerkeley 2024 - Bay Area Global Health
+    claimContext: "**EAGxBerkeley 2024**, held September 7-8, brought approximately 500 attendees focused on effective altruism cause areas including existential risks, with particular emphasis on serving the Bay Area and Western USA EA community.[^1][^19]"
+    fetchedAt: 2026-02-22T02:15:53.966Z
+    httpStatus: 200
+    pageTitle: EAGxBerkeley 2024 - Bay Area Global Health Alliance
+    contentSnippet: EAGxBerkeley 2024 - Bay Area Global Health Alliance &laquo; All Events This event has passed. EAGxBerkeley 2024 September 7, 2024 - September 8, 2024 EAGxBerkeley 2024 will take place September 7-8, 2024 at Lighthaven in Berkeley, CA. The conference will focus on a diverse range of cause areas, local community building, and knowledge sharing. It will offer networking, workshops, presentations, and small group gatherings for around 500 attendees dedicated to addressing some of the world’s greates
+    contentLength: 243710
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.freethink.com/biotech/vitalist-bay-recap
+    linkText: Vitalist Bay Recap - Freethink
+    claimContext: 'Beyond major conferences, Lighthaven hosts a diverse range of activities including workshops by the <EntityLink id="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> and Topos Institute on AGI risks, team retreats for 15-80 people, community events and parties for 10-500 people, and '
+    fetchedAt: 2026-02-22T02:15:51.268Z
+    httpStatus: 200
+    pageTitle: My time among the immortality tribe
+    contentSnippet: My time among the immortality tribe Skip to content Subscribe to Freethink on Substack for free Get our favorite new stories right to your inbox every week Subscribe now Humans will build a community around seemingly anything. Life, liberty, and the pursuit of happiness. No god but our God. Fan fiction and cosplay. Racial justice, gender rights, and pride movements of all colors. There are communities of rationalists and Buddhists and birdwatchers. Flat Earth Society members and QAnon conspiraci
+    contentLength: 176858
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.iliadconference.com
+    linkText: ILIAD Conference
+    claimContext: 'Beyond major conferences, Lighthaven hosts a diverse range of activities including workshops by the <EntityLink id="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> and Topos Institute on AGI risks, team retreats for 15-80 people, community events and parties for 10-500 people, and '
+    fetchedAt: 2026-02-22T02:15:55.430Z
+    httpStatus: 200
+    pageTitle: ILIAD Conference
+    contentSnippet: ILIAD Conference 0 ODYSSEY ODYSSEY was a 5-day, multi-track conference bringing together researchers in theoretical AI alignment. August 25-29, 2025 in Berkeley, California View the submissions for the Proceedings of ODYSSEY Dedicated to building strong scientific foundations for AI safety. Program and Unconference Format ODYSSEY was a 100+ person conference about alignment with a mathematical focus. ODYSSEY featured an unconference format— meaning that participants can propose and lead their ow
+    contentLength: 145871
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://manifold.markets/RickiHeicklen/will-the-metagame-conference-take-p
+    linkText: Metagame Conference Prediction Market - Manifold
+    claimContext: 'Beyond major conferences, Lighthaven hosts a diverse range of activities including workshops by the <EntityLink id="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> and Topos Institute on AGI risks, team retreats for 15-80 people, community events and parties for 10-500 people, and '
+    fetchedAt: 2026-02-22T02:15:55.519Z
+    httpStatus: 200
+    pageTitle: Will the Metagame Conference take place September 12-14, 2025? | Manifold
+    contentSnippet: Will the Metagame Conference take place September 12-14, 2025? | Manifold MANIFOLD Sign up Open options Will the Metagame Conference take place September 12-14, 2025? Ricki Heicklen 13 Ṁ1k Ṁ25k resolved Sep 17 Resolved YES 1H 6H 1D 1W 1M ALL Metagame is a weekend conference about game design, strategy, narrative, and play currently scheduled for September 12-14, 2025. It&#x27;s run by Arbor and is planned to take place at Lighthaven in Berkeley, California. Will it actually end up being Septembe
+    contentLength: 132643
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://forum.effectivealtruism.org/posts/oP8YDDJtTGjnH8Nnj/the-lighthaven-campus-is-open-for-bookings
+    linkText: The Lighthaven Campus is Open for Bookings - EA Forum
+    claimContext: The campus is explicitly marketed as infrastructure for "mission-aligned activities" to advance humanity's long-term future, with Lightcone Infrastructure prioritizing groups and programs over small meetups due to the fixed overhead of running such a large facility.[^9][^23]
+    fetchedAt: 2026-02-22T02:15:55.385Z
+    httpStatus: 200
+    pageTitle: The Lighthaven Campus is open for bookings — EA Forum
+    contentSnippet: The Lighthaven Campus is open for bookings — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Lighthaven Campus is open for bookings by Habryka [Deactivated] Sep 30 2023 5 min read 20 111 Building effective altruism Lightcone Infrastructure Community infrastructure Frontpage The Lighthaven Campus is open for bookings How do I express interest? What kinds of things can I run here? Wha
+    contentLength: 449845
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://manifund.org/projects/lightcone-infrastructure
+    linkText: Lightcone Infrastructure - Manifund
+    claimContext: Lighthaven is operated by **Lightcone Infrastructure**, a nonprofit organization that evolved from the <EntityLink id="lesswrong">LessWrong</EntityLink> team and focuses on building intellectual infrastructure for communities working on existential risk, AI safety, and rationality.[^2][^3][^24] Beyo
+    fetchedAt: 2026-02-22T02:16:01.585Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 25
+    url: https://www.lesswrong.com/posts/jBPNK4iREjZr36sDx/podcast-with-oli-habryka-on-lesswrong-lightcone
+    linkText: Podcast with Oli Habryka on LessWrong - LessWrong
+    claimContext: "**Oliver Habryka** is the founder and primary leader of Lightcone Infrastructure, overseeing both the organization's online properties and physical venue operations.[^6][^9][^25] He has been described as the \"Lighthaven boss\" and has discussed the venue's design philosophy and operational challenges"
+    fetchedAt: 2026-02-22T02:15:55.782Z
+    httpStatus: 200
+    pageTitle: Podcast with Oli Habryka on LessWrong / Lightcone Infrastructure — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Podcast with Oli Habryka on LessWrong / Lightcone Infrastructure — LessWrong Audio Interviews Lightcone Infrastructure Mechanism Design Organizational Culture & Design Community Site Meta Personal Blog 89 Podcast with Oli Habryka on LessWrong / Lightcone Infrastructure by DanielFilan 5th Feb 2023 1 min read 20 89 This is a linkpost for https://thefilancabinet.com/episo
+    contentLength: 476376
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.complexsystemspodcast.com/episodes/bits-and-bricks-oliver-habryka/
+    linkText: "Bits and Bricks: Oliver Habryka - Complex Systems Podcast"
+    claimContext: Habryka emphasizes that Lighthaven's unique design—what he calls "fractal geometry" resulting from organic accretion—creates structural advantages for fostering unexpected collisions between attendees and enabling the kind of deep engagement that doesn't happen in more conventionally planned spaces.
+    fetchedAt: 2026-02-22T02:16:02.948Z
+    httpStatus: 200
+    pageTitle: "Bits and bricks: Oliver Habryka on LessWrong, LightHaven, and community infrastructure"
+    contentSnippet: "Bits and bricks: Oliver Habryka on LessWrong, LightHaven, and community infrastructure Oliver Habryka on running LessWrong, conferences at LightHaven, and why coordination is scarcer than money in philanthropy. I'm joined this week by Oliver Habryka, who runs Lightcone Infrastructure—the organization behind both the Less Wrong forum and the Light Haven conference venue in Berkeley. The conversation ranges from reviving an internet forum to the fractal geometry of a hotel built through organic ac"
+    contentLength: 154242
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://manifund.org/projects/lightcone-infrastructure
+    linkText: Lightcone Infrastructure - Manifund
+    claimContext: The Lightcone team has been praised by donors and event attendees for "good taste," thoughtfulness, and care in creating spaces that serve the AI safety and rationality communities.[^24][^27]
+    fetchedAt: 2026-02-22T02:16:08.810Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 28
+    url: https://www.waypoint.lighthaven.space
+    linkText: Waypoint Lighthaven - Booking Information
+    claimContext: Lighthaven is funded through a combination of event hosting revenue and philanthropic donations. The venue charges external groups between \$500-2,000 per person for events, with costs covering catering, audiovisual equipment, and facility use.[^9][^23] For lodging, rooms are available at \$85-\$390
+    fetchedAt: 2026-02-22T02:16:03.663Z
+    httpStatus: 200
+    pageTitle: Lighthaven Waypoint
+    contentSnippet: Lighthaven Waypoint Lighthaven Waypoint Lighthaven Solstice Season December 1st – 31st, 2025 Rent rooms at Lighthaven Rent cozy rooms or buy day passes at Lighthaven during the month of December. $85 /night - $390 /night (Discounts for longer stays) Day Passes at Lighthaven Spend time at Lighthaven, and meet other people visiting. $30 per day, or $500 for the month.
+    contentLength: 14902
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://mishaglouberman.substack.com/p/report-from-progress-conference-2025
+    linkText: Report from Progress Conference 2025 - Misha Glouberman
+    claimContext: "The venue is consistently praised for its design that facilitates organic conversations and networking. Attendees describe it as \"perfect for mingling and deep conversations,\" with one noting it's \"optimized for casual conversation\" through features like readily available snacks, comfortable nooks, "
+    fetchedAt: 2026-02-22T02:16:02.920Z
+    httpStatus: 200
+    pageTitle: Report from Progress Conference 2025 in Berkeley
+    contentSnippet: Report from Progress Conference 2025 in Berkeley Misha’s Substack Subscribe Sign in Report from Progress Conference 2025 In Berkeley And thoughts how to make conferences even better Misha Glouberman Oct 23, 2025 27 8 3 Share I was in Berkeley at Lighthaven for the Progress Conference , a two-day gathering on how to accelerate progress in society. I got to take part and help out a bit. It’s a really great conference, with lots of attendees saying it’s the best conference they’ve been to. I had an
+    contentLength: 214719
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.lesswrong.com/posts/5n2ZQcbc7r4R8mvqc/the-lightcone-is-nothing-without-its-people
+    linkText: The Lightcone is nothing without its people - LessWrong
+    claimContext: "The venue is consistently praised for its design that facilitates organic conversations and networking. Attendees describe it as \"perfect for mingling and deep conversations,\" with one noting it's \"optimized for casual conversation\" through features like readily available snacks, comfortable nooks, "
+    fetchedAt: 2026-02-22T02:16:04.064Z
+    httpStatus: 200
+    pageTitle: "(The) Lightcone is nothing without its people: LW + Lighthaven&#x27;s big fundraiser — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. (The) Lightcone is nothing without its people: LW + Lighthaven&#x27;s big fundraiser — LessWrong Lighthaven Community Frontpage 612 (The) Lightcone is nothing without its people: LW + Lighthaven&#x27;s big fundraiser by habryka 30th Nov 2024 50 min read 273 612 Update Jan 19th 2025: The Fundraiser is over! We had raised over $2.1M when the fundraiser closed, and have a"
+    contentLength: 3396505
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://lighthaven.space
+    linkText: Lighthaven.space
+    claimContext: Progress Conference attendees in particular offered enthusiastic assessments, with many calling it "the best conference ever" and describing the 2025 event as "energizing and inspiring."[^14][^15] One detailed report characterized the experience as a "huge 12-hour-a-day cocktail party" and praised t
+    fetchedAt: 2026-02-22T02:16:10.327Z
+    httpStatus: 200
+    pageTitle: Lighthaven
+    contentSnippet: Lighthaven Lighthaven A campus in Berkeley, CA, run by Lightcone Infrastructure Chat with us Submit an inquiry Retreats & Workshops 15 - 70 people We offer cozy nooks, discussion rooms with endless whiteboards, and ~40 bedrooms (with up to ~80 beds). Conferences 50 - 500 people Conference space for up to 140 people inside, 500 people outside. 20+ session spaces. 80 conference attendees can book accommodation on the campus. Event Space 10 - 500 people We can host events ranging from 20 person tal
+    contentLength: 62342
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.lesswrong.com/posts/pvFmjmFdbytfieHL6/do-you-love-berkeley-or-do-you-just-love-lighthaven
+    linkText: Do You Love Berkeley or Do You Just Love Lighthaven? - LessWrong
+    claimContext: The venue has been described as providing "life-changing events" for attendees due to the concentration of brilliant people and the late-night conversations that the space facilitates.[^32] Some community members credit Lighthaven-hosted events with inspiring major life decisions, including relocati
+    fetchedAt: 2026-02-22T02:16:10.284Z
+    httpStatus: 200
+    pageTitle: Do you love Berkeley, or do you just love Lighthaven conferences? — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Do you love Berkeley, or do you just love Lighthaven conferences? — LessWrong Practical Personal Blog 82 Do you love Berkeley, or do you just love Lighthaven conferences? by Screwtape 15th Dec 2025 6 min read 4 82 Rationalist meetups are great. Once in a while they&#x27;re life-changingly so. Lighthaven, a conference venue designed and run by rationalists, plays host t
+    contentLength: 387382
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.lesswrong.com/posts/pvFmjmFdbytfieHL6/do-you-love-berkeley-or-do-you-just-love-lighthaven
+    linkText: Do You Love Berkeley or Do You Just Love Lighthaven? - LessWrong
+    claimContext: The venue has become sufficiently central to Bay Area rationalist culture that some community discussions analyze whether people love Berkeley generally or specifically love Lighthaven, with the implication that the venue has become a defining feature of the local intellectual ecosystem.[^33]
+    fetchedAt: 2026-02-22T02:16:10.919Z
+    httpStatus: 200
+    pageTitle: Do you love Berkeley, or do you just love Lighthaven conferences? — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Do you love Berkeley, or do you just love Lighthaven conferences? — LessWrong Practical Personal Blog 82 Do you love Berkeley, or do you just love Lighthaven conferences? by Screwtape 15th Dec 2025 6 min read 4 82 Rationalist meetups are great. Once in a while they&#x27;re life-changingly so. Lighthaven, a conference venue designed and run by rationalists, plays host t
+    contentLength: 387382
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.effectivealtruism.org/ea-global/events/eagxberkeley-2024
+    linkText: EAGxBerkeley 2024 - Effective Altruism
+    claimContext: Lighthaven does not meet ADA (Americans with Disabilities Act) standards for wheelchair accessibility due to the age and structure of the buildings.[^1][^34] The venue operators note they handle accessibility requests on a case-by-case basis, but the fundamental architectural limitations of the conv
+    fetchedAt: 2026-02-22T02:16:10.556Z
+    httpStatus: 200
+    pageTitle: EAGxBerkeley 2024 | Effective Altruism
+    contentSnippet: EAGxBerkeley 2024 | Effective Altruism EVENTS EAGxBERKELEY 2024 7–8 Sep 2024 EAGxBerkeley 2024 Lighthaven , Berkeley Applications are closed View FAQs -> EAGxBerkeley 2024 will take place September 7-8 at Lighthaven (2740 Telegraph Ave, Berkeley, CA 94705). The conference will focus on a diverse range of cause areas, local community building, and knowledge sharing. It will offer networking, workshops, presentations, and small group gatherings for attendees dedicated to addressing some of the wor
+    contentLength: 148822
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://scottaaronson.blog/?p=8908
+    linkText: Scott Aaronson Blog Post
+    claimContext: The venue's complex layout—while praised for facilitating serendipitous encounters—can also present navigation challenges for first-time attendees, described by some as "a bewildering maze of passageways, meeting-rooms, sleeping quarters, gardens, and vines."[^35]
+    fetchedAt: 2026-02-22T02:16:10.663Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; Guess I&#8217;m A Rationalist Now
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; Guess I&#8217;m A Rationalist Now Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; &#8220;If Anyone Builds It, Everyone Dies&#8221; Trump and Iran, by popular request &raquo; Guess I&#8217;m A Rationalist Now A week ago I attended Le"
+    contentLength: 121092
+    status: verified
+    note: null

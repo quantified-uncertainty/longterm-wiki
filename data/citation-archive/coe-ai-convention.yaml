@@ -1,0 +1,513 @@
+pageId: coe-ai-convention
+verifiedAt: 2026-02-22
+totalCitations: 46
+verified: 31
+broken: 15
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://eucrim.eu/news/council-of-europe-convention-on-artificial-intelligence/
+    linkText: Council of Europe Convention on Artificial Intelligence
+    claimContext: The **Framework Convention on Artificial Intelligence and Human Rights, Democracy and the Rule of Law** (CETS No. 225) represents a landmark achievement in international AI governance as the world's first legally binding treaty specifically addressing artificial intelligence.[^1] Adopted by the Coun
+    fetchedAt: 2026-02-22T02:11:24.077Z
+    httpStatus: 200
+    pageTitle: Council of Europe Convention on Artificial Intelligence - eucrim
+    contentSnippet: Council of Europe Convention on Artificial Intelligence - eucrim We celebrate two decades of news and analyses on European criministrative law. Spotlight Council of Europe Convention on Artificial Intelligence 26 September 2024 (updated 1 year ago) // Published in printed Issue 3/2024 pp 194 – 196 Thomas Wahl On 5 September 2024, the first-ever, international, legally-binding instrument on Artificial Intelligence (AI) was opened for signature by the Council of Europe (CoE). The CoE’s “ Framework
+    contentLength: 32541
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: The **Framework Convention on Artificial Intelligence and Human Rights, Democracy and the Rule of Law** (CETS No. 225) represents a landmark achievement in international AI governance as the world's first legally binding treaty specifically addressing artificial intelligence.[^1] Adopted by the Coun
+    fetchedAt: 2026-02-22T02:11:22.692Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://www.fedbar.org/blog/the-framework-convention-on-artificial-intelligence-embedding-human-rights-in-the-digital-age/
+    linkText: "The Framework Convention on AI: Embedding Human Rights in the Digital Age"
+    claimContext: The treaty emerged from multi-year consultations involving governments, civil society, academia, and industry representatives, beginning with the establishment of the Ad Hoc Committee on Artificial Intelligence (CAHAI) in 2019.[^3] The convention comprises eight chapters and 26 articles outlining se
+    fetchedAt: 2026-02-22T02:11:23.478Z
+    httpStatus: 200
+    pageTitle: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association"
+    contentSnippet: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association Skip to main content The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age by Sarah Perlman November 18, 2025 in International Courts Reporter Series Share Tweet Share Email Written by Jomart Joldoshev as part of the International Courts Reporter Series The adoption of the Framework Convention on Artificial Intelligence, Human Rig"
+    contentLength: 180537
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: The treaty emerged from multi-year consultations involving governments, civil society, academia, and industry representatives, beginning with the establishment of the Ad Hoc Committee on Artificial Intelligence (CAHAI) in 2019.[^3] The convention comprises eight chapters and 26 articles outlining se
+    fetchedAt: 2026-02-22T02:11:22.693Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 5
+    url: https://www.navex.com/en-us/blog/article/the-framework-convention-on-ai-a-landmark-agreement-for-ethical-ai/
+    linkText: "The Framework Convention on AI: A Landmark Agreement for Ethical AI"
+    claimContext: The treaty emerged from multi-year consultations involving governments, civil society, academia, and industry representatives, beginning with the establishment of the Ad Hoc Committee on Artificial Intelligence (CAHAI) in 2019.[^3] The convention comprises eight chapters and 26 articles outlining se
+    fetchedAt: 2026-02-22T02:11:23.513Z
+    httpStatus: 200
+    pageTitle: "The Framework Convention on AI: A Landmark Agreement for Ethical AI | NAVEX"
+    contentSnippet: "The Framework Convention on AI: A Landmark Agreement for Ethical AI | NAVEX Skip to content. [eBook] Top 10 Risk & Compliance Trends for 2026 The Framework Convention on AI: A Landmark Agreement for Ethical AI 10/31/2024 AI is changing the world, but how do we ensure we’re developing and using it ethically? In September 2024, the new Framework Convention on Artificial Intelligence and Human Rights, Democracy and the Rule of Law was opened for signature by the Council of Europe (CoE) – also known"
+    contentLength: 459062
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://eucrim.eu/news/council-of-europe-convention-on-artificial-intelligence/
+    linkText: Council of Europe Convention on Artificial Intelligence
+    claimContext: "Notably, the convention employs a **risk-based approach** requiring parties to conduct dynamic risk and impact assessments and implement graduated mitigation measures—including potential bans or moratoria—for AI uses incompatible with human rights.[^6] The treaty has been signed by EU member states "
+    fetchedAt: 2026-02-22T02:11:25.403Z
+    httpStatus: 200
+    pageTitle: Council of Europe Convention on Artificial Intelligence - eucrim
+    contentSnippet: Council of Europe Convention on Artificial Intelligence - eucrim We celebrate two decades of news and analyses on European criministrative law. Spotlight Council of Europe Convention on Artificial Intelligence 26 September 2024 (updated 1 year ago) // Published in printed Issue 3/2024 pp 194 – 196 Thomas Wahl On 5 September 2024, the first-ever, international, legally-binding instrument on Artificial Intelligence (AI) was opened for signature by the Council of Europe (CoE). The CoE’s “ Framework
+    contentLength: 32541
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: "Notably, the convention employs a **risk-based approach** requiring parties to conduct dynamic risk and impact assessments and implement graduated mitigation measures—including potential bans or moratoria—for AI uses incompatible with human rights.[^6] The treaty has been signed by EU member states "
+    fetchedAt: 2026-02-22T02:11:25.082Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://www.fedbar.org/blog/the-framework-convention-on-artificial-intelligence-embedding-human-rights-in-the-digital-age/
+    linkText: "The Framework Convention on AI: Embedding Human Rights in the Digital Age"
+    claimContext: "Notably, the convention employs a **risk-based approach** requiring parties to conduct dynamic risk and impact assessments and implement graduated mitigation measures—including potential bans or moratoria—for AI uses incompatible with human rights.[^6] The treaty has been signed by EU member states "
+    fetchedAt: 2026-02-22T02:11:25.567Z
+    httpStatus: 200
+    pageTitle: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association"
+    contentSnippet: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association Skip to main content The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age by Sarah Perlman November 18, 2025 in International Courts Reporter Series Share Tweet Share Email Written by Jomart Joldoshev as part of the International Courts Reporter Series The adoption of the Framework Convention on Artificial Intelligence, Human Rig"
+    contentLength: 180537
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.holisticai.com/blog/europe-committee-artificial-intelligence-draft-framework-convention
+    linkText: Europe Committee Artificial Intelligence Draft Framework Convention
+    claimContext: The convention's origins trace to the Council of Europe's recognition that existing human rights frameworks required adaptation for the AI era. In **May 2019**, the Committee of Ministers' 1346th meeting in Helsinki acknowledged the need to assess whether existing standards adequately addressed AI's
+    fetchedAt: 2026-02-22T02:11:29.615Z
+    httpStatus: 200
+    pageTitle: Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law
+    contentSnippet: "Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law AI Governance Authored By Osman Gazi Güçlütürk , Published on January 17, 2024 Share this ON this page Heading 2 End-to-End AI Governance, Enterprise Clarity Get a demo Blog AI Governance Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, "
+    contentLength: 157692
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: The convention's origins trace to the Council of Europe's recognition that existing human rights frameworks required adaptation for the AI era. In **May 2019**, the Committee of Ministers' 1346th meeting in Helsinki acknowledged the need to assess whether existing standards adequately addressed AI's
+    fetchedAt: 2026-02-22T02:11:25.083Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://www.caidp.org/resources/coe-ai-treaty/
+    linkText: COE AI Treaty - CAIDP
+    claimContext: CAHAI conducted extensive work from 2019 through 2021, publishing a progress report in September 2020 that affirmed the Council of Europe's critical role in ensuring AI development aligned with human rights protections.[^11] In December 2021, CAHAI released its final report titled "Possible Elements
+    fetchedAt: 2026-02-22T02:11:31.766Z
+    httpStatus: 200
+    pageTitle: International AI Treaty - Center for AI and Digital Policy
+    contentSnippet: International AI Treaty - Center for AI and Digital Policy Resources COE AI Treaty Council of Europe AI Treaty News "This treaty will establish much-needed global guardrails for AI, ensuring that human rights and democratic principles are at the core of its development. We need international cooperation to navigate the profound societal risks and steer AI towards being safe and beneficial for humanity." - Professor Yoshua Bengio, Turing Award Recipient "AI is transforming our world and it's esse
+    contentLength: 310987
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.caidp.org/resources/coe-ai-treaty/
+    linkText: COE AI Treaty - CAIDP
+    claimContext: CAHAI conducted extensive work from 2019 through 2021, publishing a progress report in September 2020 that affirmed the Council of Europe's critical role in ensuring AI development aligned with human rights protections.[^11] In December 2021, CAHAI released its final report titled "Possible Elements
+    fetchedAt: 2026-02-22T02:11:31.676Z
+    httpStatus: 200
+    pageTitle: International AI Treaty - Center for AI and Digital Policy
+    contentSnippet: International AI Treaty - Center for AI and Digital Policy Resources COE AI Treaty Council of Europe AI Treaty News "This treaty will establish much-needed global guardrails for AI, ensuring that human rights and democratic principles are at the core of its development. We need international cooperation to navigate the profound societal risks and steer AI towards being safe and beneficial for humanity." - Professor Yoshua Bengio, Turing Award Recipient "AI is transforming our world and it's esse
+    contentLength: 310987
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: In **2022**, the **Committee on Artificial Intelligence (CAI)** succeeded CAHAI and assumed responsibility for drafting and negotiating the convention text.[^13] This phase involved intensive negotiations among all 46 Council of Europe member states, the European Union, and 11 non-member observer st
+    fetchedAt: 2026-02-22T02:11:30.636Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 14
+    url: https://eurodigwiki.org/wiki/The_Framework_Convention_on_AI_and_human_rights,_democracy_and_the_rule_of_law_%E2%80%93_TOPIC_03_Sub_02_2024
+    linkText: The Convention on AI and Human Rights - EuroDIG Wiki
+    claimContext: In **2022**, the **Committee on Artificial Intelligence (CAI)** succeeded CAHAI and assumed responsibility for drafting and negotiating the convention text.[^13] This phase involved intensive negotiations among all 46 Council of Europe member states, the European Union, and 11 non-member observer st
+    fetchedAt: 2026-02-22T02:11:31.998Z
+    httpStatus: 200
+    pageTitle: The Framework Convention on AI and human rights, democracy and the rule of law – TOPIC 03 Sub 02 2024 - EuroDIG Wiki
+    contentSnippet: "The Framework Convention on AI and human rights, democracy and the rule of law – TOPIC 03 Sub 02 2024 - EuroDIG Wiki The Framework Convention on AI and human rights, democracy and the rule of law – TOPIC 03 Sub 02 2024 From EuroDIG Wiki Jump to navigation Jump to search 19 June 2024 | 11:30 - 12:15 EEST | Auditorium | | Consolidated programme 2024 overview Proposals: #31 #36 #39 #70 #72 #82 (see list of proposals ) Contents 1 Get involved! 2 Session teaser 3 Session description 4 Format 5 Furthe"
+    contentLength: 66821
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://algorithmwatch.org/en/artificial-intelligence-council-of-europe/
+    linkText: Council of Europe Convention on AI - AlgorithmWatch
+    claimContext: In **2022**, the **Committee on Artificial Intelligence (CAI)** succeeded CAHAI and assumed responsibility for drafting and negotiating the convention text.[^13] This phase involved intensive negotiations among all 46 Council of Europe member states, the European Union, and 11 non-member observer st
+    fetchedAt: 2026-02-22T02:11:31.855Z
+    httpStatus: 200
+    pageTitle: Council of Europe creates rules for Artificial Intelligence - AlgorithmWatch
+    contentSnippet: "Council of Europe creates rules for Artificial Intelligence - AlgorithmWatch Council of Europe creates rules for Artificial Intelligence Not only the EU but also the Council of Europe – an international organization based in Strasbourg – is setting rules on Artificial Intelligence (AI). In this explainer on its Convention on AI, we show what this is all about, why it is relevant to you and what the next steps are. Blog 20 May 2022 (update: 16 May 2024) Auf Deutsch lesen #councilofeurope #publics"
+    contentLength: 141054
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.ensuredeurope.eu/publications/anchoring-global-ai-governance
+    linkText: Anchoring Global AI Governance - ENSURED
+    claimContext: The negotiations reflected significant compromises to achieve consensus among diverse stakeholders with varying regulatory philosophies. According to analysis by the ENSURED project, the United States and European Commission dominated discussions, with the final text mirroring elements of both EU an
+    fetchedAt: 2026-02-22T02:11:33.622Z
+    httpStatus: 200
+    pageTitle: "Anchoring Global AI Governance: How the EU Can Leverage the Council of Europe’s Framework Convention on Artificial Intelligence - Policy Brief | ENSURED"
+    contentSnippet: "Anchoring Global AI Governance: How the EU Can Leverage the Council of Europe’s Framework Convention on Artificial Intelligence - Policy Brief | ENSURED About Publications Expert Blog News & Events Anchoring Global AI Governance: How the EU Can Leverage the Council of Europe’s Framework Convention on Artificial Intelligence By No items found. Wade Hoxtell digitalisation Policy Brief 8/12/2025 Abstract Download PDF As AI evolves faster than regulation, the Council of Europe’s new treaty offers a "
+    contentLength: 67417
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.caidp.org/resources/coe-ai-treaty/
+    linkText: COE AI Treaty - CAIDP
+    claimContext: '**Marija Pejčinović Burić**, Secretary General of the Council of Europe, played a prominent role in promoting the convention, describing it as a "first-of-its-kind, global treaty" designed to uphold human rights while fostering responsible innovation and mitigating AI risks.[^17] The treaty also rec'
+    fetchedAt: 2026-02-22T02:11:33.380Z
+    httpStatus: 200
+    pageTitle: International AI Treaty - Center for AI and Digital Policy
+    contentSnippet: International AI Treaty - Center for AI and Digital Policy Resources COE AI Treaty Council of Europe AI Treaty News "This treaty will establish much-needed global guardrails for AI, ensuring that human rights and democratic principles are at the core of its development. We need international cooperation to navigate the profound societal risks and steer AI towards being safe and beneficial for humanity." - Professor Yoshua Bengio, Turing Award Recipient "AI is transforming our world and it's esse
+    contentLength: 310987
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: '**Marija Pejčinović Burić**, Secretary General of the Council of Europe, played a prominent role in promoting the convention, describing it as a "first-of-its-kind, global treaty" designed to uphold human rights while fostering responsible innovation and mitigating AI risks.[^17] The treaty also rec'
+    fetchedAt: 2026-02-22T02:11:33.004Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: The convention establishes a comprehensive regulatory framework organized into **eight chapters** covering objectives, scope, principles, obligations, procedural safeguards, international cooperation, implementation mechanisms, and final provisions.[^19]
+    fetchedAt: 2026-02-22T02:11:33.014Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 20
+    url: https://eucrim.eu/news/council-of-europe-convention-on-artificial-intelligence/
+    linkText: Council of Europe Convention on Artificial Intelligence
+    claimContext: The treaty applies to activities within the AI lifecycle conducted by **public authorities** and **private actors operating on their behalf**.[^20] This includes AI systems used in contexts affecting human rights, democracy, and the rule of law such as employment, healthcare, education, law enforcem
+    fetchedAt: 2026-02-22T02:11:34.226Z
+    httpStatus: 200
+    pageTitle: Council of Europe Convention on Artificial Intelligence - eucrim
+    contentSnippet: Council of Europe Convention on Artificial Intelligence - eucrim We celebrate two decades of news and analyses on European criministrative law. Spotlight Council of Europe Convention on Artificial Intelligence 26 September 2024 (updated 1 year ago) // Published in printed Issue 3/2024 pp 194 – 196 Thomas Wahl On 5 September 2024, the first-ever, international, legally-binding instrument on Artificial Intelligence (AI) was opened for signature by the Council of Europe (CoE). The CoE’s “ Framework
+    contentLength: 32541
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.asil.org/ILIB/council-europe-opens-first-global-ai-treaty-signatures
+    linkText: Council of Europe Opens First Global AI Treaty for Signatures - ASIL
+    claimContext: These exclusions have drawn criticism from organizations like the European Network of National Human Rights Institutions, which argue the broad national security exemption creates substantial gaps in protection.[^21]
+    fetchedAt: 2026-02-22T02:11:35.922Z
+    httpStatus: 200
+    pageTitle: Council of Europe Opens First Global AI Treaty for Signatures | ASIL
+    contentSnippet: 'Council of Europe Opens First Global AI Treaty for Signatures | ASIL " /> Skip to main content Home / ILIB / Council of Europe Opens First Global AI Treaty for Signatures --> International Law in Brief Council of Europe Opens First Global AI Treaty for Signatures Comments By: Maya Prakash | September 18, 2024 - 9:02am The Council of Europe drafted and opened the world’s first binding global treaty on AI, human rights, democracy, and the rule of law on Sep. 5, 2024. The treaty, called the Framewo'
+    contentLength: 51838
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: "6. **Reliability and safety**: Ensuring AI systems function as intended without undue risks 7. **Democratic participation and oversight**: Protecting electoral integrity and democratic institutions from AI-related threats[^22]"
+    fetchedAt: 2026-02-22T02:11:35.233Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 23
+    url: https://www.holisticai.com/blog/europe-committee-artificial-intelligence-draft-framework-convention
+    linkText: Europe Committee Artificial Intelligence Draft Framework Convention
+    claimContext: Article 16 establishes binding obligations for parties to "take measures for the identification, assessment, prevention and mitigation of risks and impacts to human rights, democracy and the rule of law arising from the design, development, use and decommissioning of artificial intelligence systems.
+    fetchedAt: 2026-02-22T02:11:35.633Z
+    httpStatus: 200
+    pageTitle: Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law
+    contentSnippet: "Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law AI Governance Authored By Osman Gazi Güçlütürk , Published on January 17, 2024 Share this ON this page Heading 2 End-to-End AI Governance, Enterprise Clarity Get a demo Blog AI Governance Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, "
+    contentLength: 157692
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.hoganlovells.com/en/publications/uk-signs-first-treaty-on-ai-and-human-rights-democracy-and-the-rule-of-law
+    linkText: UK Signs First Treaty on AI and Human Rights
+    claimContext: The convention takes a **technology-neutral approach**, avoiding prescriptive technical requirements to remain relevant as AI technology evolves.[^24]
+    fetchedAt: 2026-02-22T02:11:36.450Z
+    httpStatus: 200
+    pageTitle: UK signs first treaty on AI and human rights, democracy and the rule of law
+    contentSnippet: UK signs first treaty on AI and human rights, democracy and the rule of law News UK signs first treaty on AI and human rights, democracy and the rule of law 18 September 2024 Share by email &times; To (max 100 recipients) Enter email Subject Enter Subject Message (optional) Cancel Send The UK has entered into the world&rsquo;s first binding treaty on artificial intelligence - the framework convention on AI and human rights, democracy and the rule of law (the &ldquo;Convention&rdquo;). The treaty
+    contentLength: 160908
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: "- Clear documentation of AI system capabilities, limitations, and training data - Access to information about AI decision-making processes affecting individuals[^25]"
+    fetchedAt: 2026-02-22T02:11:35.234Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://www.fedbar.org/blog/the-framework-convention-on-artificial-intelligence-embedding-human-rights-in-the-digital-age/
+    linkText: "The Framework Convention on AI: Embedding Human Rights in the Digital Age"
+    claimContext: Individuals must have rights to challenge AI-based decisions affecting them, with access to effective remedies and complaint mechanisms.[^26]
+    fetchedAt: 2026-02-22T02:11:38.234Z
+    httpStatus: 200
+    pageTitle: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association"
+    contentSnippet: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association Skip to main content The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age by Sarah Perlman November 18, 2025 in International Courts Reporter Series Share Tweet Share Email Written by Jomart Joldoshev as part of the International Courts Reporter Series The adoption of the Framework Convention on Artificial Intelligence, Human Rig"
+    contentLength: 180536
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: The convention establishes a **Conference of the Parties** as its primary oversight body, responsible for monitoring implementation, issuing recommendations, and adapting the framework to technological developments.[^27] The CAI's mandate continues until the end of 2025, at which point it transition
+    fetchedAt: 2026-02-22T02:11:37.457Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 28
+    url: https://www.ensuredeurope.eu/publications/anchoring-global-ai-governance
+    linkText: Anchoring Global AI Governance - ENSURED
+    claimContext: The convention establishes a **Conference of the Parties** as its primary oversight body, responsible for monitoring implementation, issuing recommendations, and adapting the framework to technological developments.[^27] The CAI's mandate continues until the end of 2025, at which point it transition
+    fetchedAt: 2026-02-22T02:11:37.530Z
+    httpStatus: 200
+    pageTitle: "Anchoring Global AI Governance: How the EU Can Leverage the Council of Europe’s Framework Convention on Artificial Intelligence - Policy Brief | ENSURED"
+    contentSnippet: "Anchoring Global AI Governance: How the EU Can Leverage the Council of Europe’s Framework Convention on Artificial Intelligence - Policy Brief | ENSURED About Publications Expert Blog News & Events Anchoring Global AI Governance: How the EU Can Leverage the Council of Europe’s Framework Convention on Artificial Intelligence By No items found. Wade Hoxtell digitalisation Policy Brief 8/12/2025 Abstract Download PDF As AI evolves faster than regulation, the Council of Europe’s new treaty offers a "
+    contentLength: 67417
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://cadeproject.org/updates/eu-moves-to-ratify-international-treaty-on-artificial-intelligence-and-human-rights/
+    linkText: EU Moves to Ratify International Treaty on AI and Human Rights
+    claimContext: The EU Commission has indicated it plans to implement the convention primarily through the AI Act and related regulations like GDPR and the Digital Services Act, creating a layered governance architecture.[^29]
+    fetchedAt: 2026-02-22T02:11:39.552Z
+    httpStatus: 200
+    pageTitle: EU moves to ratify international treaty on artificial intelligence and human rights - CADE – Civil Society Alliances for Digital Empowerment
+    contentSnippet: "EU moves to ratify international treaty on artificial intelligence and human rights - CADE – Civil Society Alliances for Digital Empowerment Skip to content CSO HUB Topics Policy updates Resources Actors Policy calendar --> 3 Jun 2025 EU moves to ratify international treaty on artificial intelligence and human rights Signed in Vilnius on 5 September 2024, the Convention was jointly developed by the Council of Europe and a wide range of states, including EU members, the United States, the United "
+    contentLength: 1423030
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://theloop.ecpr.eu/what-the-council-of-europes-new-treaty-tells-us-about-global-ai-governance/
+    linkText: What the Council of Europe's New Treaty Tells Us About Global AI Governance
+    claimContext: "The convention is positioned as a template for global AI governance, potentially influencing future efforts at the United Nations level.[^30] It builds on existing Council of Europe instruments including the European Convention on Human Rights and Convention 108+ on data protection, extending these "
+    fetchedAt: 2026-02-22T02:11:38.607Z
+    httpStatus: 200
+    pageTitle: "AI governance: what the Council of Europe’s new treaty tells us"
+    contentSnippet: "AI governance: what the Council of Europe’s new treaty tells us --> --> --> --> --> --> --> --> --> --> --> --> --> --> --> Search for: All Articles , Artificial Intelligence , Featured What the Council of Europe’s new treaty tells us about global AI governance The Council of Europe’s treaty on Artificial Intelligence marks a significant achievement in multilateral AI governance. Nonetheless, Mahmoud Javadi suggests that it could foreshadow potential challenges, if not failure, for similar UN ef"
+    contentLength: 130068
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.fedbar.org/blog/the-framework-convention-on-artificial-intelligence-embedding-human-rights-in-the-digital-age/
+    linkText: "The Framework Convention on AI: Embedding Human Rights in the Digital Age"
+    claimContext: "The convention is positioned as a template for global AI governance, potentially influencing future efforts at the United Nations level.[^30] It builds on existing Council of Europe instruments including the European Convention on Human Rights and Convention 108+ on data protection, extending these "
+    fetchedAt: 2026-02-22T02:11:41.004Z
+    httpStatus: 200
+    pageTitle: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association"
+    contentSnippet: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association Skip to main content The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age by Sarah Perlman November 18, 2025 in International Courts Reporter Series Share Tweet Share Email Written by Jomart Joldoshev as part of the International Courts Reporter Series The adoption of the Framework Convention on Artificial Intelligence, Human Rig"
+    contentLength: 180536
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+    linkText: Framework Convention on Artificial Intelligence - Wikipedia
+    claimContext: The convention will enter into force on the first day of the month following three months after **five signatories**, including at least **three Council of Europe member states**, complete ratification.[^32] As of early 2026, the convention remains in the signature and ratification phase, with state
+    fetchedAt: 2026-02-22T02:11:40.568Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 33
+    url: https://www.eeas.europa.eu/delegations/council-europe/european-commission-signs-historic-council-europe-framework-convention-artificial-intelligence-and_en
+    linkText: European Commission Signs Framework Convention on AI
+    claimContext: "**Regional Organization**: European Union (represented by Vice-President Věra Jourová)[^33]"
+    fetchedAt: 2026-02-22T02:11:41.919Z
+    httpStatus: 200
+    pageTitle: The European Commission signs historic Council of Europe Framework Convention on Artificial Intelligence and Human Rights | EEAS
+    contentSnippet: The European Commission signs historic Council of Europe Framework Convention on Artificial Intelligence and Human Rights | EEAS Skip to main content PRINT The European Commission signs historic Council of Europe Framework Convention on Artificial Intelligence and Human Rights 10.09.2024 Press and information team of the Delegation to the COUNCIL OF EUROPE in Strasbourg On 5 September 2024, during the informal conference of Council of Europe Ministers of Justice in Vilnius (Lithuania), the Europ
+    contentLength: 73722
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.eeas.europa.eu/delegations/council-europe/european-commission-signs-historic-council-europe-framework-convention-artificial-intelligence-and_en
+    linkText: European Commission Signs Framework Convention on AI
+    claimContext: Additional signatures are expected as states complete their domestic approval procedures, with the European Parliament's consent required for EU participation.[^34]
+    fetchedAt: 2026-02-22T02:11:41.027Z
+    httpStatus: 200
+    pageTitle: The European Commission signs historic Council of Europe Framework Convention on Artificial Intelligence and Human Rights | EEAS
+    contentSnippet: The European Commission signs historic Council of Europe Framework Convention on Artificial Intelligence and Human Rights | EEAS Skip to main content PRINT The European Commission signs historic Council of Europe Framework Convention on Artificial Intelligence and Human Rights 10.09.2024 Press and information team of the Delegation to the COUNCIL OF EUROPE in Strasbourg On 5 September 2024, during the informal conference of Council of Europe Ministers of Justice in Vilnius (Lithuania), the Europ
+    contentLength: 73722
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.holisticai.com/blog/europe-committee-artificial-intelligence-draft-framework-convention
+    linkText: Europe Committee Artificial Intelligence Draft Framework Convention
+    claimContext: "The convention requires signatories to translate international principles into concrete domestic laws and regulations.[^35] States must establish:"
+    fetchedAt: 2026-02-22T02:11:41.162Z
+    httpStatus: 200
+    pageTitle: Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law
+    contentSnippet: "Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law AI Governance Authored By Osman Gazi Güçlütürk , Published on January 17, 2024 Share this ON this page Heading 2 End-to-End AI Governance, Enterprise Clarity Get a demo Blog AI Governance Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, Democracy, and Rule of Law Understanding the Council of Europe’s Draft Framework Convention on AI, Human Rights, "
+    contentLength: 157692
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://rm.coe.int/1680afae3c
+    linkText: Framework Convention on Artificial Intelligence - Full Text
+    claimContext: '- Pathways for individuals to seek redress for AI-related harms - Safe innovation "sandboxes" to test AI systems under controlled conditions (Article 13)[^36]'
+    fetchedAt: 2026-02-22T02:11:44.026Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 362548
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.lowyinstitute.org/the-interpreter/first-step-long-road-global-ai-regulation
+    linkText: First Step on Long Road to Global AI Regulation - Lowy Institute
+    claimContext: The convention faces criticism for lacking robust enforcement mechanisms. Unlike the EU AI Act with its substantial fines (up to €35 million or 7% of global turnover for the most serious violations), the convention has "no proper enforcement regime," potentially limiting its ability to deliver concr
+    fetchedAt: 2026-02-22T02:11:45.210Z
+    httpStatus: 200
+    pageTitle: A first step on the long road to global AI regulation | Lowy Institute
+    contentSnippet: A first step on the long road to global AI regulation | Lowy Institute Skip to main content Published daily by the Lowy Institute A first step on the long road to global AI regulation José-Miguel Bello y Villarino Ramona Vijeyarasa Kimberlee Weatherall It didn’t make headlines but the US and EU came together last week to sign an important treaty – leaving partners such as Australia with a choice. The text represents a clear signal of the existence of a Western alignment regarding the minimum req
+    contentLength: 35857
+    status: verified
+    note: null
+  - footnote: 38
+    url: http://opiniojuris.org/2024/11/05/understanding-the-scope-of-the-council-of-europe-framework-convention-on-ai/
+    linkText: Understanding the Scope of the CoE Framework Convention on AI
+    claimContext: The **national security and defense exemptions** (Articles 3.2 and 3.4) have drawn particular scrutiny. Article 3.2 provides a blanket exemption for "all activities within the lifecycle of artificial intelligence systems related to the protection of national interests," giving states wide discretion
+    fetchedAt: 2026-02-22T02:11:43.936Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 39
+    url: http://opiniojuris.org/2024/11/05/understanding-the-scope-of-the-council-of-europe-framework-convention-on-ai/
+    linkText: Understanding the Scope of the CoE Framework Convention on AI
+    claimContext: The **research and development exclusion** (Article 3.3) is similarly controversial. By exempting AI systems "not yet available for use," the convention prevents initial oversight of whether emerging technologies comply with human rights standards by design, potentially allowing development of inher
+    fetchedAt: 2026-02-22T02:11:43.938Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 40
+    url: http://opiniojuris.org/2024/11/05/understanding-the-scope-of-the-council-of-europe-framework-convention-on-ai/
+    linkText: Understanding the Scope of the CoE Framework Convention on AI
+    claimContext: 'Critics note the convention imposes **differential obligations** on public versus private actors. While binding requirements apply to public authorities, Article 2.2 merely requires states to "take measures to address the risks and impacts" from private sector AI "in a manner that conforms with the '
+    fetchedAt: 2026-02-22T02:11:43.938Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 41
+    url: https://www.lowyinstitute.org/the-interpreter/first-step-long-road-global-ai-regulation
+    linkText: First Step on Long Road to Global AI Regulation - Lowy Institute
+    claimContext: By seeking consensus across diverse jurisdictions with different regulatory philosophies, the convention adopts what critics describe as a "common denominator" approach that may represent "its greatest weakness."[^41] The emphasis on flexibility and proportionality could enable signatories to implem
+    fetchedAt: 2026-02-22T02:11:46.236Z
+    httpStatus: 200
+    pageTitle: A first step on the long road to global AI regulation | Lowy Institute
+    contentSnippet: A first step on the long road to global AI regulation | Lowy Institute Skip to main content Published daily by the Lowy Institute A first step on the long road to global AI regulation José-Miguel Bello y Villarino Ramona Vijeyarasa Kimberlee Weatherall It didn’t make headlines but the US and EU came together last week to sign an important treaty – leaving partners such as Australia with a choice. The text represents a clear signal of the existence of a Western alignment regarding the minimum req
+    contentLength: 35857
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.cambridge.org/core/journals/international-legal-materials/article/framework-convention-on-artificial-intelligence-and-human-rights-democracy-and-the-rule-of-law-council-eur/0CCDA03299BF85537031F1CA26CF2CBD
+    linkText: Framework Convention on AI - Cambridge Journals
+    claimContext: "The convention focuses exclusively on **human rights, democracy, and rule of law** impacts, explicitly not regulating all AI aspects or technologies.[^42] This means it does not address:"
+    fetchedAt: 2026-02-22T02:11:46.934Z
+    httpStatus: 200
+    pageTitle: Framework Convention on Artificial Intelligence and Human Rights, Democracy and the Rule of Law (Council Eur.) | International Legal Materials | Cambridge Core
+    contentSnippet: null
+    contentLength: 1195197
+    status: verified
+    note: Academic publisher — URL accessible
+  - footnote: 43
+    url: https://jipel.law.nyu.edu/the-worlds-first-ever-international-ai-treaty/
+    linkText: The World's First Ever International AI Treaty - NYU Journal
+    claimContext: As the **world's first legally binding international AI treaty**, the convention establishes a precedent for multilateral cooperation on AI governance extending beyond regional blocs.[^43] Its openness to non-CoE members enables broader participation than EU-centric initiatives, with early signatori
+    fetchedAt: 2026-02-22T02:11:46.904Z
+    httpStatus: 200
+    pageTitle: The World’s First Ever International AI Treaty &#8211; NYU Journal of Intellectual Property & Entertainment Law
+    contentSnippet: "The World’s First Ever International AI Treaty &#8211; NYU Journal of Intellectual Property & Entertainment Law Skip to content Artificial Intelligence JIPEL Blog 2024-2025 Privacy Technology The World’s First Ever International AI Treaty By Anna Theil, JD '26 Jan 28, 2025 [ Credit: imaginima/iStock by Getty Images ] Following its meteoric rise in both use and relevance, AI has come to exist in the forefront of public consciousness. While much of the discussion has centered around the ways in wh"
+    contentLength: 77201
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.fedbar.org/blog/the-framework-convention-on-artificial-intelligence-embedding-human-rights-in-the-digital-age/
+    linkText: "The Framework Convention on AI: Embedding Human Rights in the Digital Age"
+    claimContext: The treaty establishes **international legal standards** specifically addressing AI's impacts on fundamental rights, filling gaps in existing human rights instruments that predate modern AI capabilities.[^44] This creates a normative framework that can influence domestic legislation, court decisions
+    fetchedAt: 2026-02-22T02:11:47.089Z
+    httpStatus: 200
+    pageTitle: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association"
+    contentSnippet: "The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age &#8211; Federal Bar Association Skip to main content The Framework Convention on Artificial Intelligence: Embedding Human Rights in the Digital Age by Sarah Perlman November 18, 2025 in International Courts Reporter Series Share Tweet Share Email Written by Jomart Joldoshev as part of the International Courts Reporter Series The adoption of the Framework Convention on Artificial Intelligence, Human Rig"
+    contentLength: 180537
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.crowell.com/en/insights/client-alerts/council-of-europes-first-legally-binding-international-treaty-on-ai-to-be-signed-in-september
+    linkText: Council of Europe's Convention on AI - Crowell
+    claimContext: The convention's **lifecycle and risk-based approach** provides a flexible methodology that other jurisdictions may adapt, potentially serving as a template for future regional and international agreements.[^45] Its emphasis on dynamic risk assessment acknowledges that appropriate governance must ev
+    fetchedAt: 2026-02-22T02:11:46.655Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 46
+    url: https://eurodigwiki.org/wiki/The_Framework_Convention_on_AI_and_human_rights,_democracy_and_the_rule_of_law_%E2%80%93_TOPIC_03_Sub_02_2024
+    linkText: The Convention on AI and Human Rights - EuroDIG Wiki
+    claimContext: The development process—involving governments, international organizations, civil society, academia, and industry across 57 participating entities—demonstrates a relatively inclusive model for negotiating AI governance frameworks, despite noted limitations in the final drafting stage.[^46]
+    fetchedAt: 2026-02-22T02:11:49.245Z
+    httpStatus: 200
+    pageTitle: The Framework Convention on AI and human rights, democracy and the rule of law – TOPIC 03 Sub 02 2024 - EuroDIG Wiki
+    contentSnippet: "The Framework Convention on AI and human rights, democracy and the rule of law – TOPIC 03 Sub 02 2024 - EuroDIG Wiki The Framework Convention on AI and human rights, democracy and the rule of law – TOPIC 03 Sub 02 2024 From EuroDIG Wiki Jump to navigation Jump to search 19 June 2024 | 11:30 - 12:15 EEST | Auditorium | | Consolidated programme 2024 overview Proposals: #31 #36 #39 #70 #72 #82 (see list of proposals ) Contents 1 Get involved! 2 Session teaser 3 Session description 4 Format 5 Furthe"
+    contentLength: 66821
+    status: verified
+    note: null

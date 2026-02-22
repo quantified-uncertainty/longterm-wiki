@@ -1,0 +1,513 @@
+pageId: ea-longtermist-wins-losses
+verifiedAt: 2026-02-22
+totalCitations: 46
+verified: 27
+broken: 19
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Effective_altruism
+    linkText: Effective Altruism - Wikipedia
+    claimContext: "Effective altruism (EA) is a philosophical and social movement that uses evidence and reason to identify the most effective ways to benefit others. Within EA, longtermism emphasizes positively influencing the long-term future — particularly by reducing existential risks from advanced AI, engineered "
+    fetchedAt: 2026-02-22T02:08:19.313Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://quillette.com/2023/12/21/how-effective-altruism-lost-its-way/
+    linkText: How Effective Altruism Lost Its Way - Quillette
+    claimContext: Philosopher Steven Pinker has critiqued longtermism for potentially prioritizing any scenario, no matter how improbable, as long as it can be framed as having arbitrarily large effects far in the future.[^2] A related concern is that longtermism's predictive confidence should be very low given the e
+    fetchedAt: 2026-02-22T02:08:20.248Z
+    httpStatus: 200
+    pageTitle: How Effective Altruism Lost Its Way
+    contentSnippet: How Effective Altruism Lost Its Way Sign up for Quillette Sydney. London. Toronto. Subscribe Email sent! Check your inbox to complete your signup. No spam. Unsubscribe anytime. I. The Quest to Maximize Human Well-Being A decade and a half ago, the founders of two small Oxford-based nonprofits couldn’t have anticipated that they were launching one of the most significant philanthropic movements in a generation. Giving What We Can was created in 2009 to help people identify the most effective char
+    contentLength: 186558
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.againstmalaria.com/Impact.aspx
+    linkText: Against Malaria Foundation — Impact Metrics
+    claimContext: "The movement has achieved substantial concrete wins: GiveWell raised \\$415 million and directed \\$397 million to cost-effective programs in metrics year 2024,[^28] the Against Malaria Foundation — consistently one of GiveWell's top-recommended organizations — has protected over 667 million people,[^"
+    fetchedAt: 2026-02-22T02:08:20.261Z
+    httpStatus: 200
+    pageTitle: Impact
+    contentSnippet: "Impact Cookies on this website We use cookies to ensure we provide a fully working and optimised website. If you continue we'll assume you are happy to receive all cookies on the Against Malaria website. Find out more about how we use cookies . Continue log in --> Funds raised US$ 824,676,765 Nets funded 370,953,094 People protected 667,715,569 Why malaria? Why nets? Impact Some introductory text on what we do to assess/monitor impact. The timeline below shows the evolution of Post-distribution "
+    contentLength: 32204
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/posts/NKrpEdg7wAgcoHNRG/cea-is-growing-again-25-more-people-engaged-with-our-1
+    linkText: "CEA Is Growing Again: 25% More People Engaged - EA Forum"
+    claimContext: "The movement has achieved substantial concrete wins: GiveWell raised \\$415 million and directed \\$397 million to cost-effective programs in metrics year 2024,[^28] the Against Malaria Foundation — consistently one of GiveWell's top-recommended organizations — has protected over 667 million people,[^"
+    fetchedAt: 2026-02-22T02:08:19.719Z
+    httpStatus: 200
+    pageTitle: "CEA is growing again: 25% more people engaged with our programs in 2025 — EA Forum"
+    contentSnippet: "CEA is growing again: 25% more people engaged with our programs in 2025 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents CEA is growing again: 25% more people engaged with our programs in 2025 by Angelina Li , Jessica McCurdy🔸 , Alex Dial , Joris 🔸 Feb 11 21 min read 12 105 Building effective altruism Announcements and updates Centre for Effective Altruism Data on the EA community Ef"
+    contentLength: 646459
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://forum.effectivealtruism.org/posts/KN7BTMJHAQkLb6Bac/celebrating-wins-discussion-thread
+    linkText: Celebrating Wins Discussion Thread - EA Forum
+    claimContext: "The movement has achieved substantial concrete wins: GiveWell raised \\$415 million and directed \\$397 million to cost-effective programs in metrics year 2024,[^28] the Against Malaria Foundation — consistently one of GiveWell's top-recommended organizations — has protected over 667 million people,[^"
+    fetchedAt: 2026-02-22T02:08:19.705Z
+    httpStatus: 200
+    pageTitle: Celebrating wins — discussion thread — EA Forum
+    contentSnippet: Celebrating wins — discussion thread — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Celebrating wins — discussion thread by Eli Svoboda🔸 Jan 19 3 min read 21 89 Community Good things & impact stories Announcements and updates Effective altruism culture Motivational Frontpage Perhaps my favorite part of my job is that I’m often exposed to mind-boggling accomplishments achieved by people within and around t
+    contentLength: 404311
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://quillette.com/2023/12/21/how-effective-altruism-lost-its-way/
+    linkText: How Effective Altruism Lost Its Way - Quillette
+    claimContext: However, the movement has also suffered significant setbacks. The collapse of FTX and fraud conviction of <EntityLink id="E857" name="sam-bankman-fried">Sam Bankman-Fried</EntityLink> — who had publicly framed his financial activities in longtermist terms — severely damaged EA's credibility.[^6] The
+    fetchedAt: 2026-02-22T02:08:21.368Z
+    httpStatus: 200
+    pageTitle: How Effective Altruism Lost Its Way
+    contentSnippet: How Effective Altruism Lost Its Way Sign up for Quillette Sydney. London. Toronto. Subscribe Email sent! Check your inbox to complete your signup. No spam. Unsubscribe anytime. I. The Quest to Maximize Human Well-Being A decade and a half ago, the founders of two small Oxford-based nonprofits couldn’t have anticipated that they were launching one of the most significant philanthropic movements in a generation. Giving What We Can was created in 2009 to help people identify the most effective char
+    contentLength: 186558
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://forum.effectivealtruism.org/posts/cP7gkDFxgJqHDGdfJ/ea-and-longtermism-not-a-crux-for-saving-the-world
+    linkText: "EA and Longtermism: Not a Crux for Saving the World - EA Forum"
+    claimContext: However, the movement has also suffered significant setbacks. The collapse of FTX and fraud conviction of <EntityLink id="E857" name="sam-bankman-fried">Sam Bankman-Fried</EntityLink> — who had publicly framed his financial activities in longtermist terms — severely damaged EA's credibility.[^6] The
+    fetchedAt: 2026-02-22T02:08:21.320Z
+    httpStatus: 200
+    pageTitle: "EA and Longtermism: not a crux for saving the world — EA Forum"
+    contentSnippet: "EA and Longtermism: not a crux for saving the world — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA and Longtermism: not a crux for saving the world by ClaireZabel Jun 2 2023 12 min read 19 214 Building effective altruism Effective altruism messaging Longtermism Frontpage EA and Longtermism: not a crux for saving the world Things have changed An alternative frame Who cares? I think"
+    contentLength: 536500
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://forum.effectivealtruism.org/posts/2eYxQDbPbqHypFihe/sensitive-assumptions-in-longtermist-modeling
+    linkText: Sensitive Assumptions in Longtermist Modeling - EA Forum
+    claimContext: However, the movement has also suffered significant setbacks. The collapse of FTX and fraud conviction of <EntityLink id="E857" name="sam-bankman-fried">Sam Bankman-Fried</EntityLink> — who had publicly framed his financial activities in longtermist terms — severely damaged EA's credibility.[^6] The
+    fetchedAt: 2026-02-22T02:08:21.379Z
+    httpStatus: 200
+    pageTitle: Sensitive assumptions in longtermist modeling — EA Forum
+    contentSnippet: Sensitive assumptions in longtermist modeling — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Sensitive assumptions in longtermist modeling by Owen Murphy Sep 18 2024 8 min read 12 82 Cause prioritization Existential risk Philosophy Criticism of longtermism and existential risk studies Longtermism Models Moral philosophy S-risk Utilitarianism Frontpage Sensitive assumptions in longter
+    contentLength: 594279
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://time.com/6204627/effective-altruism-longtermism-william-macaskill-interview/
+    linkText: Effective Altruism, Longtermism, and William MacAskill Interview - TIME
+    claimContext: The longtermist turn within EA accelerated in the late 2010s and early 2020s. Key markers of this shift include <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>'s first major AI safety grants in 2015; the growing influence of the <EntityLink id="E140" name="fhi">Future o
+    fetchedAt: 2026-02-22T02:08:22.413Z
+    httpStatus: 200
+    pageTitle: Inside the Effective Altruism Movement to Do More Good | TIME
+    contentSnippet: Inside the Effective Altruism Movement to Do More Good | TIME Ideas society Want to Do More Good? This Movement Might Have the Answer ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Naina Bajekal/Oxford, U.K. Bajekal was executive editor and international editor at TIME. Loading... Illustration by The Project Twins for Time by Naina Bajekal/Oxford, U.K. Bajekal was executive editor and international editor at TIME. Loading... Thirteen years ago, William MacAskill found hims
+    contentLength: 542315
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://forum.effectivealtruism.org/posts/NWHb4nsnXRxDDFGLy/historical-ea-funding-data-2025-update
+    linkText: "Historical EA Funding Data: 2025 Update - EA Forum"
+    claimContext: "**Counterfactual note on cumulative statistics:** These figures represent gross reach and estimated impact, not net counterfactual impact. GiveWell's methodology attempts to estimate counterfactual value (would a donor have given elsewhere?), but for most metrics the counterfactual fraction is unkno"
+    fetchedAt: 2026-02-22T02:08:21.748Z
+    httpStatus: 200
+    pageTitle: "Historical EA funding data: 2025 update — EA Forum"
+    contentSnippet: "Historical EA funding data: 2025 update — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Historical EA funding data: 2025 update by Jacco Rubens🔸 Nov 14 2025 2 min read 25 228 Building effective altruism Animal Charity Evaluators Effective Altruism Funds Funding Strategy Week (2025) GiveWell Giving Season (2025) Survival and Flourishing Data on the EA community Effective altruism fund"
+    contentLength: 600660
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/HetCMJE49JCXLPGYW/ea-organization-updates-thread-february-2026
+    linkText: "EA Organization Updates Thread: February 2026 - EA Forum"
+    claimContext: GiveWell continues recommending charities in mental health, malnutrition, and lead exposure while broadening its work beyond charity evaluation to identify new grantees and explore underexplored cause areas.[^13] Longtermist projects represented less than one-third of total EA funding as of August 2
+    fetchedAt: 2026-02-22T02:08:23.462Z
+    httpStatus: 200
+    pageTitle: "EA Organization Updates thread: February 2026 — EA Forum"
+    contentSnippet: "EA Organization Updates thread: February 2026 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. EA Organization Updates thread: February 2026 by Toby Tremlett🔹 Feb 9 1 min read 18 37 Building effective altruism Career choice Opportunities to take action Announcements and updates Application announcements EA Organization Updates (monthly series) Effective Altruism Forum Fellowships and internships Hiring Job "
+    contentLength: 502858
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://rpresearchdigest.substack.com/p/effective-altruism-community-cause-prioritization
+    linkText: EA Community Cause Prioritization - Rethink Priorities Research Digest
+    claimContext: Animal welfare has emerged as an increasingly prominent EA cause area. According to a 2025 EA Forum post tracking wins, 92% of corporate cage-free egg commitments with 2024 or earlier deadlines have been fulfilled.[^5] Lewis Bollard's appearance on the Dwarkesh Podcast raised over \$2 million for ef
+    fetchedAt: 2026-02-22T02:08:23.924Z
+    httpStatus: 200
+    pageTitle: Which cause areas do Effective Altruism community members prioritize?
+    contentSnippet: "Which cause areas do Effective Altruism community members prioritize? Subscribe Sign in Which cause areas do Effective Altruism community members prioritize? Results from the 2024 Effective Altruism Survey Rethink Priorities Feb 13, 2026 5 3 1 Share Research authors: Julie Pedersen, David Moss Summary author: Siobhan Ballan Recently released findings from the 2024 Effective Altruism (EA) Survey examine how the effective altruism community prioritizes different cause areas, how those priorities h"
+    contentLength: 199972
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.alignmentforum.org/posts/EFpQcBmfm2bFfM4zM/ai-safety-and-neighboring-communities-a-quick-start-guide-as
+    linkText: "AI Safety and Neighboring Communities: A Quick Start Guide - Alignment Forum"
+    claimContext: The longtermist wing can point to growing policy influence. California and New York have signed bills directly related to AI risk regulation, following advocacy efforts supported by EA-aligned organizations.[^5] The Existential Risk Persuasion Tournament (XPT), which ran June–October 2022 (approxima
+    fetchedAt: 2026-02-22T02:08:30.131Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 16
+    url: https://forum.effectivealtruism.org/posts/QkE35oTsasMn37o7R/stewardship-cea-s-2025-26-strategy-to-reach-and-raise-ea-s-1
+    linkText: "Stewardship: CEA's 2025-26 Strategy - EA Forum"
+    claimContext: '| 2021 | AI Safety | <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> founded by <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> and team departing <EntityLink id="E218" name="openai">OpenAI</EntityLink> | Win | Created a major safety-focused AI lab. EA/longtermist net'
+    fetchedAt: 2026-02-22T02:08:23.503Z
+    httpStatus: 200
+    pageTitle: "Stewardship: CEA’s 2025-26 strategy to reach and raise EA’s ceiling — EA Forum"
+    contentSnippet: "Stewardship: CEA’s 2025-26 strategy to reach and raise EA’s ceiling — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Stewardship: CEA’s 2025-26 strategy to reach and raise EA’s ceiling by Zachary Robinson🔸 , Oscar Howie 28th Mar 2025 15 min read 35 227 Building effective altruism Community Announcements and updates Centre for Effective Altruism Effective altruism funding Organization "
+    contentLength: 881877
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://forum.effectivealtruism.org/posts/opCxiPwxFcaaayyMB/relationship-between-ea-community-and-ai-safety
+    linkText: Relationship Between EA Community and AI Safety - EA Forum
+    claimContext: The shift toward longtermism has generated friction within the EA community. Some EA advocates focused on global health and animal welfare have reported that longtermism and x-risk work has made their lives harder, worsened their reputations, and occupied valued community niches.[^7] The 2024 EA Sur
+    fetchedAt: 2026-02-22T02:08:23.476Z
+    httpStatus: 200
+    pageTitle: Relationship between EA Community and AI safety — EA Forum
+    contentSnippet: "Relationship between EA Community and AI safety — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Relationship between EA Community and AI safety by Tom Barnes🔸 Sep 18 2023 1 min read 15 157 Community AI safety Building effective altruism Building the field of AI safety Frontpage Personal opinion only. Inspired by filling out the Meta coordination forum survey . Epistemic status: Very uncertain, rough specul"
+    contentLength: 454759
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.lesswrong.com/posts/CZmkPvzkMdQJxXy54/another-critique-of-effective-altruism
+    linkText: Another Critique of Effective Altruism - LessWrong
+    claimContext: GiveWell itself has acknowledged that seeking strong evidence and a straightforward, documented case for impact can be in tension with maximizing impact — reflecting a deep epistemic split within EA between evidence-based giving and longtermism's higher-risk, higher-reward approach.[^6] Jacob Steinh
+    fetchedAt: 2026-02-22T02:08:32.421Z
+    httpStatus: 200
+    pageTitle: Another Critique of Effective Altruism — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Another Critique of Effective Altruism — LessWrong Effective altruism Personal Blog 28 Another Critique of Effective Altruism by jsteinhardt 5th Jan 2014 7 min read 109 28 Cross-posted from my blog . It is almost certainly a bad idea to let this post be your first exposure to the effective altruist movement. You should at the very least read these two posts first. Rece
+    contentLength: 969939
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.benkuhn.net/ea-critique/
+    linkText: EA Critique - Ben Kuhn
+    claimContext: Ben Kuhn has argued that EA exhibits "epistemic inertia," where community consensus becomes less responsive to new evidence and arguments, partly because group norms fail to adequately guard against motivated cognition.[^23]
+    fetchedAt: 2026-02-22T02:08:31.657Z
+    httpStatus: 200
+    pageTitle: A critique of effective altruism | benkuhn.net
+    contentSnippet: A critique of effective altruism | benkuhn.net December 2013 I recently ran across Nick Bostrom&rsquo;s idea of subjecting your strongest beliefs to a hypothetical apostasy in which you try to muster the strongest arguments you can against them. As you might have figured out, I believe strongly in effective altruism &mdash;the idea of applying evidence and reason to finding the best ways to improve the world. As such, I thought it would be productive to write a hypothetical apostasy on the effec
+    contentLength: 62307
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://willmacaskill.substack.com/p/effective-altruism-in-the-age-of-agi
+    linkText: Effective Altruism in the Age of AGI - Will MacAskill Substack
+    claimContext: '<EntityLink id="E862" name="will-macaskill">Will MacAskill</EntityLink> has argued in a widely discussed October 2025 post that EA should expand beyond traditional cause areas to address the transition to a post-AGI society, rejecting both "legacy movement" and "refocus on classic causes" framings. '
+    fetchedAt: 2026-02-22T02:08:32.279Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 25
+    url: https://en.wikipedia.org/wiki/Longtermism
+    linkText: Longtermism - Wikipedia
+    claimContext: GiveWell continues recommending charities in mental health, malnutrition, and lead exposure while broadening its work beyond charity evaluation to identify new grantees and explore underexplored cause areas.[^13] Longtermist projects represented less than one-third of total EA funding as of August 2
+    fetchedAt: 2026-02-22T02:08:31.179Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://www.openphilanthropy.org/grants/
+    linkText: Open Philanthropy — Our Grants
+    claimContext: '| 2020 | Global Health | COVID-19 pandemic highlights gaps in biosecurity infrastructure | Mixed/Loss | Demonstrated relevance of EA biosecurity work; also revealed that EA-adjacent pandemic preparedness funding had not prevented the pandemic. <EntityLink id="E423" name="johns-hopkins-center-for-hea'
+    fetchedAt: 2026-02-22T02:08:39.304Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 27
+    url: https://en.wikipedia.org/wiki/Open_Philanthropy_(organization
+    linkText: Open Philanthropy Wikipedia
+    claimContext: "<EntityLink id=\"E552\" name=\"open-philanthropy\">Open Philanthropy</EntityLink> recommended over \\$400 million in grants in 2021, including \\$300 million in support for GiveWell's recommendations (up from \\$100 million in 2020).[^26] Through 2022, roughly 70% of Open Philanthropy's total funding went "
+    fetchedAt: 2026-02-22T02:08:40.321Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 28
+    url: https://blog.givewell.org/2025/08/13/givewells-2024-metrics-and-impact/
+    linkText: GiveWell 2024 Metrics and Impact
+    claimContext: "The movement has achieved substantial concrete wins: GiveWell raised \\$415 million and directed \\$397 million to cost-effective programs in metrics year 2024,[^28] the Against Malaria Foundation — consistently one of GiveWell's top-recommended organizations — has protected over 667 million people,[^"
+    fetchedAt: 2026-02-22T02:08:40.966Z
+    httpStatus: 200
+    pageTitle: GiveWell’s 2024 Metrics and Impact - The GiveWell Blog
+    contentSnippet: GiveWell’s 2024 Metrics and Impact - The GiveWell Blog Home The GiveWell Blog Thanks to the generosity of more than 30,000 donors, GiveWell raised $415 million and directed $397 million to cost-effective programs in metrics year 2024 (February 2024 to January 2025). 1 GiveWell’s metrics year runs from February 1 through January 31. Our metrics report is typically published at least six months after the close of the metrics year because we need to collect data on donations we influence from third
+    contentLength: 117285
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://forum.effectivealtruism.org/posts/aetatCMGqcAPsNbLs/growth-and-engagement-in-ea-groups-2022-groups-census
+    linkText: "Growth and Engagement in EA Groups: 2022 Groups Census Results - EA Forum"
+    claimContext: "**Community size and demographics:** As of January 2023, there were 362 known active EA groups worldwide — up from 233 in late 2020 (approximately 55% growth over two years), with active groups in 56 countries.[^29] CEA supports EA groups across many countries and has held EAGx conferences internati"
+    fetchedAt: 2026-02-22T02:08:40.622Z
+    httpStatus: 200
+    pageTitle: "Growth and engagement in EA groups: 2022 Groups Census results — EA Forum"
+    contentSnippet: "Growth and engagement in EA groups: 2022 Groups Census results — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Growth and engagement in EA groups: 2022 Groups Census results by BrianTan , CEA Groups Team Jun 23 2023 15 min read 6 52 Building effective altruism Community Data on the EA community Effective altruism groups Centre for Effective Altruism EA Strategy Fortnight Surveys Front"
+    contentLength: 615721
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.centreforeffectivealtruism.org/about
+    linkText: Centre for Effective Altruism Global Reach
+    claimContext: "**Community size and demographics:** As of January 2023, there were 362 known active EA groups worldwide — up from 233 in late 2020 (approximately 55% growth over two years), with active groups in 56 countries.[^29] CEA supports EA groups across many countries and has held EAGx conferences internati"
+    fetchedAt: 2026-02-22T02:08:41.162Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 31
+    url: https://forum.effectivealtruism.org/posts/FTbTfpR7txzzb9akm/what-has-the-cea-uni-groups-team-been-up-to-our-2023-2024
+    linkText: What Has the CEA Uni Groups Team Been Up To? – Our 2023/2024 Review - EA Forum
+    claimContext: "**Community size and demographics:** As of January 2023, there were 362 known active EA groups worldwide — up from 233 in late 2020 (approximately 55% growth over two years), with active groups in 56 countries.[^29] CEA supports EA groups across many countries and has held EAGx conferences internati"
+    fetchedAt: 2026-02-22T02:08:40.448Z
+    httpStatus: 200
+    pageTitle: What Has the CEA Uni Groups Team Been up To? – Our 2023/2024 Review — EA Forum
+    contentSnippet: What Has the CEA Uni Groups Team Been up To? – Our 2023/2024 Review — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents What Has the CEA Uni Groups Team Been up To? – Our 2023/2024 Review by CEA Groups Team Oct 30 2024 8 min read 3 43 Building effective altruism Announcements and updates Centre for Effective Altruism Organization updates University groups Frontpage What Has the CEA Uni Gr
+    contentLength: 289838
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.evidenceaction.org/newsroom/evidence-action-expands-to-tanzania-to-eliminate-parasitic-worms-as-a-public-health-problem
+    linkText: Evidence Action Expands to Tanzania to Eliminate Parasitic Worms as a Public Health Problem - Evidence Action
+    claimContext: Other concrete outcomes include significant reductions in parasitic disease through deworming programs. Evidence Action's Deworm the World program launched in Tanzania in January 2026, targeting more than 10 million children currently at risk of or infected with soil-transmitted helminths and/or sch
+    fetchedAt: 2026-02-22T02:08:44.023Z
+    httpStatus: 200
+    pageTitle: Evidence Action | Evidence Action expands to Tanzania to eliminate…
+    contentSnippet: Evidence Action | Evidence Action expands to Tanzania to eliminate… Evidence Action / January 07, 2026 Evidence Action is launching its Deworm the World program in Tanzania, partnering with the government to combat parasitic worm infections. More than 10 million children across the country are currently at risk of or infected with soil-transmitted helminths and/or schistosomiasis. Through technical assistance — including support for mass drug administration planning, follow-up surveys, and the f
+    contentLength: 77472
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.gfdw.eu/en/blog/deworm-the-world
+    linkText: "Deworm the World: Update 2025 - GFDW"
+    claimContext: Other concrete outcomes include significant reductions in parasitic disease through deworming programs. Evidence Action's Deworm the World program launched in Tanzania in January 2026, targeting more than 10 million children currently at risk of or infected with soil-transmitted helminths and/or sch
+    fetchedAt: 2026-02-22T02:08:47.681Z
+    httpStatus: 200
+    pageTitle: "Deworm the World: Update 2025 | Wealth for the World"
+    contentSnippet: "Deworm the World: Update 2025 | Wealth for the World Deworm the World: Update 2025 Julian Lindenberg May 13, 2025 Evidence Action New Milestones from Evidence Action – Deworm the World 1.5 billion people worldwide suffer from parasitic worm infections – children are especially affected. Around 895 million children are currently at risk because they lack clean water and sanitation. Since 2014, Evidence Action has provided an evidence‑based answer: one tablet per year reliably protects a child and"
+    contentLength: 159550
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.givewell.org/how-we-work/our-criteria/cost-effectiveness/cost-effectiveness-models/changelog-2023
+    linkText: 2023 Cost-Effectiveness Analysis Changelog - GiveWell
+    claimContext: "**Counterfactual note:** GiveWell's own methodology acknowledges that counterfactual attribution is difficult — some fraction of donors to top charities would have donated similarly without GiveWell's recommendations, and some fraction of lives saved via malaria nets would have occurred via alternat"
+    fetchedAt: 2026-02-22T02:08:42.997Z
+    httpStatus: 200
+    pageTitle: 2023 Cost-Effectiveness Analysis Changelog | GiveWell
+    contentSnippet: "2023 Cost-Effectiveness Analysis Changelog | GiveWell Jump to Navigation 2023 Cost-Effectiveness Analysis Changelog Facebook Twitter >Email >Email --> This page provides details about changes that were made to our cost-effectiveness analysis (CEA) in 2023. Each changelog entry represents our understanding at the time the change was made. For past versions of our CEA, see this page . Table of Contents Version 4 — Published August 16, 2023 Change 1: Added remaining Nigerian states and updated prob"
+    contentLength: 252670
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://forum.effectivealtruism.org/posts/un42vaZgyX7ch2kaj/announcing-forecasting-existential-risks-evidence-from-a
+    linkText: "Announcing 'Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament' - EA Forum"
+    claimContext: The longtermist wing can point to growing policy influence. California and New York have signed bills directly related to AI risk regulation, following advocacy efforts supported by EA-aligned organizations.[^5] The Existential Risk Persuasion Tournament (XPT), which ran June–October 2022 (approxima
+    fetchedAt: 2026-02-22T02:08:42.231Z
+    httpStatus: 200
+    pageTitle: 'Announcing "Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament" — EA Forum'
+    contentSnippet: 'Announcing "Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Results from the Existential Risk Persuasion Tournament Announcing "Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament" by Forecasting Research Institute Jul 10 2023 2 min read 34 161 Existential risk Forecasting Organization updates Frontpag'
+    contentLength: 704169
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
+    linkText: Our Progress in 2024 and Plans for 2025 - Open Philanthropy
+    claimContext: "| 2024 | Animal Welfare | California and Washington state pass octopus farming bans | Win | First US legislation banning a specific type of cephalopod aquaculture; animal welfare advocates (some EA-aligned) supported the bills; cephalopod sentience research partly EA-funded. | | 2024 | Global Health"
+    fetchedAt: 2026-02-22T02:08:49.164Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 37
+    url: https://coefficientgiving.org/research/our-progress-in-2023-and-plans-for-2024/
+    linkText: Our Progress in 2023 and Plans for 2024 - Open Philanthropy (via Coefficient Giving)
+    claimContext: While GiveWell has maintained relatively stable and growing funding from non-Open Philanthropy donors (approximately \$415M raised in 2024), the broader EA funding landscape contracted since the FTX collapse.[^11][^28] Open Philanthropy's available assets fell by roughly half over the course of 2022
+    fetchedAt: 2026-02-22T02:08:56.578Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 38
+    url: https://intelligence.org/2024/12/02/miris-2024-end-of-year-update/
+    linkText: MIRI's 2024 End-of-Year Update - intelligence.org
+    claimContext: '| 2023 | AI Safety | <EntityLink id="E469" name="bletchley-declaration">Bletchley Declaration</EntityLink> signed at UK AI Safety Summit; 28 nations commit to AI risk cooperation | Win | First multilateral government statement on frontier AI risks; UK government convened the summit under PM Rishi Su'
+    fetchedAt: 2026-02-22T02:08:50.983Z
+    httpStatus: 200
+    pageTitle: MIRI’s 2024 End-of-Year Update - Machine Intelligence Research Institute
+    contentSnippet: "MIRI’s 2024 End-of-Year Update - Machine Intelligence Research Institute Skip to content MIRI’s 2024 End-of-Year Update December 2, 2024 Alex Vermeer MIRI is a nonprofit research organization with a mission of addressing the most serious hazards posed by smarter-than-human artificial intelligence. In our general strategy update and communications strategy update earlier this year, we announced a new strategy that we&#8217;re executing on at MIRI, and several new teams we&#8217;re spinning up as "
+    contentLength: 80203
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://pureai.com/Articles/2024/08/23/Anthropic-CEO-Backs-SB-1047.aspx
+    linkText: Anthropic CEO Backs New California AI Legislation, with Some Reservations - Pure AI (August 23, 2024)
+    claimContext: "| 2023 | Cultivated Meat | USDA approves cultivated chicken for sale by UPSIDE Foods and Good Meat | Win | First US approval for commercially sold cultivated meat; Good Food Institute (EA-supported) contributed to the regulatory pathway. | | 2024 | AI Safety | California SB 1047 vetoed by Governor N"
+    fetchedAt: 2026-02-22T02:08:51.566Z
+    httpStatus: 200
+    pageTitle: Anthropic CEO Backs New California AI Legislation, with Some Reservations -- Pure AI
+    contentSnippet: Anthropic CEO Backs New California AI Legislation, with Some Reservations -- Pure AI Skip to main content Sections News Features Insights Mind the Prompt The Pure AI Blog AI Castaway AI Watch How-To AI Tracker Events Videos Webcasts White Papers Training Advertise Newsletters Glossary Contact Us Expert Insights for the AI Business Revolution Add as a preferred source on Google News Anthropic CEO Backs New California AI Legislation, with Some Reservations By John K. Waters 08/23/2024 Related Cali
+    contentLength: 112716
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://whyphilanthropymatters.com/article/why-am-i-not-an-effective-altruist/
+    linkText: Why Am I Not an Effective Altruist? - Why Philanthropy Matters (citing Srinivasan)
+    claimContext: Critics argue that EA focuses on symptoms via charity rather than addressing root causes like institutional reform, debt, and power inequality. Philosopher Amia Srinivasan has argued that "Effective Altruism doesn't try to understand how power works, except to better align itself with it. In this se
+    fetchedAt: 2026-02-22T02:08:51.582Z
+    httpStatus: 200
+    pageTitle: Why Am I Not an Effective Altruist? - Why Philanthropy Matters
+    contentSnippet: "Why Am I Not an Effective Altruist? - Why Philanthropy Matters Skip to main content Search the website Search Why Am I Not an Effective Altruist? Categories: Current issues Tags: Effective Altruism Elon Musk indiscriminate charity Philosophy of philanthropy Home Articles Why Am I Not an Effective Altruist? We explore why, despite there being plenty to admire about Effective Altruism, many are still uneasy about the movement&#8217;s ideas and influence. 17th August 2022 There has been a spate of "
+    contentLength: 144700
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.cambridge.org/core/journals/utilitas/article/abs/institutional-critique-of-effective-altruism/91A0449E2F030BAE417A09E52599E605
+    linkText: The Institutional Critique of Effective Altruism - Brian Berkey, Utilitas (2017)
+    claimContext: Critics argue that EA focuses on symptoms via charity rather than addressing root causes like institutional reform, debt, and power inequality. Philosopher Amia Srinivasan has argued that "Effective Altruism doesn't try to understand how power works, except to better align itself with it. In this se
+    fetchedAt: 2026-02-22T02:08:51.044Z
+    httpStatus: 200
+    pageTitle: The Institutional Critique of Effective Altruism | Utilitas | Cambridge Core
+    contentSnippet: null
+    contentLength: 920283
+    status: verified
+    note: Academic publisher — URL accessible
+  - footnote: 42
+    url: https://www.currentaffairs.org/news/2023/05/why-effective-altruism-and-longtermism-are-toxic-ideologies
+    linkText: Why Effective Altruism and Longtermism Are Toxic Ideologies - Current Affairs
+    claimContext: Critics argue that EA focuses on symptoms via charity rather than addressing root causes like institutional reform, debt, and power inequality. Philosopher Amia Srinivasan has argued that "Effective Altruism doesn't try to understand how power works, except to better align itself with it. In this se
+    fetchedAt: 2026-02-22T02:08:58.160Z
+    httpStatus: 200
+    pageTitle: Why Effective Altruism and “Longtermism” Are Toxic Ideologies
+    contentSnippet: Why Effective Altruism and “Longtermism” Are Toxic Ideologies Hide menu About Print Magazine Team Pitch Form FAQ Subscribe Issues Archive Articles Shop Podcast News Briefing Donate This is a search field with an auto-suggest feature attached. There are no suggestions because the search field is empty. Why Effective Altruism and “Longtermism” Are Toxic Ideologies Intellectual historian Émile P. Torres explains how Silicon Valley’s favorite ideas for changing the world for the better actually thre
+    contentLength: 102147
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://en.wikipedia.org/wiki/Future_of_Humanity_Institute
+    linkText: Future of Humanity Institute - Wikipedia
+    claimContext: However, the movement has also suffered significant setbacks. The collapse of FTX and fraud conviction of <EntityLink id="E857" name="sam-bankman-fried">Sam Bankman-Fried</EntityLink> — who had publicly framed his financial activities in longtermist terms — severely damaged EA's credibility.[^6] The
+    fetchedAt: 2026-02-22T02:08:57.597Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 44
+    url: https://en.wikipedia.org/wiki/Centre_for_Effective_Altruism
+    linkText: Centre for Effective Altruism - Wikipedia
+    claimContext: 'EA emerged from proto-communities in the late 2000s and early 2010s, coalescing around organizations like GiveWell (founded 2006), <EntityLink id="E863" name="giving-what-we-can">Giving What We Can</EntityLink> (founded 2009 at Oxford by <EntityLink id="E355" name="toby-ord">Toby Ord</EntityLink>), '
+    fetchedAt: 2026-02-22T02:08:57.623Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 45
+    url: https://80000hours.org/2021/08/effective-altruism-growing/
+    linkText: Effective Altruism Is Growing Fast (80,000 Hours, 2021)
+    claimContext: EA grantmaking reached its peak around 2022 and has contracted since, though the 80,000 Hours 2021 estimate of approximately \$46 billion committed to EA causes (growing at approximately 37% annually since 2015) reflects the scale of capital that had been pledged rather than deployed.[^45] Open Phil
+    fetchedAt: 2026-02-22T02:08:58.326Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 46
+    url: https://www.openphilanthropy.org/grants/
+    linkText: Open Philanthropy — Our Grants Database
+    claimContext: EA grantmaking reached its peak around 2022 and has contracted since, though the 80,000 Hours 2021 estimate of approximately \$46 billion committed to EA causes (growing at approximately 37% annually since 2015) reflects the scale of capital that had been pledged rather than deployed.[^45] Open Phil
+    fetchedAt: 2026-02-22T02:09:05.168Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 47
+    url: https://www.givingwhatwecan.org/blog/how-we-evaluate-our-impact
+    linkText: Giving What We Can Impact Evaluation 2023–2024
+    claimContext: '| 2025 | AI Safety | California <EntityLink id="E457" name="california-sb53">SB 53</EntityLink> signed into law | Win | SB 53 requires AI developers to maintain safety and security protocols; narrower than SB 1047 but represented a legislative foothold for AI safety regulation after the SB 1047 veto'
+    fetchedAt: 2026-02-22T02:09:08.072Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 48
+    url: https://rethinkpriorities.org/publications/the-2024-ea-survey-cause-prioritization
+    linkText: The 2024 EA Survey — Cause Prioritization (Rethink Priorities)
+    claimContext: "**Community size and demographics:** As of January 2023, there were 362 known active EA groups worldwide — up from 233 in late 2020 (approximately 55% growth over two years), with active groups in 56 countries.[^29] CEA supports EA groups across many countries and has held EAGx conferences internati"
+    fetchedAt: 2026-02-22T02:09:07.456Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 50
+    url: https://web.archive.org/web/20221020000000*/ftxfuturefund.org
+    linkText: FTX Future Fund — About (archived)
+    claimContext: The longtermist turn within EA accelerated in the late 2010s and early 2020s. Key markers of this shift include <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>'s first major AI safety grants in 2015; the growing influence of the <EntityLink id="E140" name="fhi">Future o
+    fetchedAt: 2026-02-22T02:09:06.201Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 51
+    url: https://forum.effectivealtruism.org/posts/xafpj3on76uRWSAoK/the-ftx-future-fund-team-has-resigned
+    linkText: The FTX Future Fund Team Has Resigned - EA Forum
+    claimContext: The <EntityLink id="E855" name="ftx-future-fund">FTX Future Fund</EntityLink> launched in February 2022 and shut down in November 2022. During its existence, it made grants worth approximately \$100 million and committed to \$160 million in total grantee commitments as of September 2022.[^50] The fu
+    fetchedAt: 2026-02-22T02:09:06.574Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 52
+    url: https://www.insidephilanthropy.com/home/2023/4/7/sam-bankman-frieds-charitable-empire-included-hundreds-of-millions-to-ea-institutions
+    linkText: Sam Bankman-Fried's Charitable Empire Included Hundreds of Millions to EA Institutions — Inside Philanthropy (2023)
+    claimContext: "Among affected organizations: SBF's biggest grants went to pandemic prevention and EA institutions including <EntityLink id=\"E517\" name=\"cea\">CEA</EntityLink>, the Long Term Future Fund, Lightcone Infrastructure, The Atlas Fellowship, and Constellation. University-affiliated research initiatives rec"
+    fetchedAt: 2026-02-22T02:09:08.198Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 53
+    url: https://www.bbc.com/news/technology-63601025
+    linkText: Grantees Affected by FTX Collapse Including Our World in Data (BBC, 2022)
+    claimContext: "Among affected organizations: SBF's biggest grants went to pandemic prevention and EA institutions including <EntityLink id=\"E517\" name=\"cea\">CEA</EntityLink>, the Long Term Future Fund, Lightcone Infrastructure, The Atlas Fellowship, and Constellation. University-affiliated research initiatives rec"
+    fetchedAt: 2026-02-22T02:09:09.372Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403

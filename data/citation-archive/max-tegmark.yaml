@@ -1,0 +1,744 @@
+pageId: max-tegmark
+verifiedAt: 2026-02-22
+totalCitations: 67
+verified: 49
+broken: 18
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://physics.mit.edu/faculty/max-tegmark/
+    linkText: Max Tegmark - MIT Physics
+    claimContext: "**Max Tegmark** is a Swedish-American physicist and professor at MIT who has become one of the most prominent public advocates for AI safety. Born May 5, 1967 in Stockholm, Tegmark spent the first 25 years of his career focused on cosmology and precision measurements of the universe before pivoting "
+    fetchedAt: 2026-02-22T01:58:23.271Z
+    httpStatus: 200
+    pageTitle: Max Tegmark &#187; MIT Physics
+    contentSnippet: "Max Tegmark &#187; MIT Physics Skip to content Max Tegmark Professor of Physics Research focuses on linking physics and machine learning: using AI for physics and physics for AI. Research Areas Biophysics , Astrophysics Theory (617) 452-4627 tegmark@mit.edu Office: Ronald McNair Building, 37-582G Lab(s): Tegmark AI Safety Group Affiliated Center(s): MIT Kavli Institute for Astrophysics & Space Research at MIT , Physics of Living Systems @ MIT , The NSF AI Institute for Artificial Intelligence an"
+    contentLength: 68327
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://futureoflife.org/person/max-tegmark/
+    linkText: Max Tegmark - Future of Life Institute
+    claimContext: "**Max Tegmark** is a Swedish-American physicist and professor at MIT who has become one of the most prominent public advocates for AI safety. Born May 5, 1967 in Stockholm, Tegmark spent the first 25 years of his career focused on cosmology and precision measurements of the universe before pivoting "
+    fetchedAt: 2026-02-22T01:58:23.330Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Future of Life Institute
+    contentSnippet: "Max Tegmark - Future of Life Institute Skip to content Max Tegmark Position Founder and Chair Organisation Future of Life Institute Member of Board Members Biography Max Tegmark is a professor doing AI and physics research at MIT as part of the Institute for Artificial Intelligence & Fundamental Interactions and the Center for Brains, Minds and Machines. He is the author of over 300 publications as well as the New York Times bestsellers “Life 3.0: Being Human in the Age of Artificial Intelligenc"
+    contentLength: 202922
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.chartwellspeakers.com/speaker/max-tegmark/
+    linkText: Max Tegmark - Chartwell Speakers
+    claimContext: "Tegmark's influence spans both academic research and public policy. His 2017 book *Life 3.0: Being Human in the Age of Artificial Intelligence* became a New York Times bestseller and helped bring AI safety concerns to mainstream audiences.[^3] He organized the March 2023 open letter calling for a pa"
+    fetchedAt: 2026-02-22T01:58:24.084Z
+    httpStatus: 200
+    pageTitle: Max Tegmark Speaker | Expert Keynote Speaker | Chartwell Speakers
+    contentSnippet: Max Tegmark Speaker | Expert Keynote Speaker | Chartwell Speakers Skip to content Speaker CATEGORIES AI - Emerging Tech Inspiration & Entertainment Keynote Mathematics and Statistics Science Space Travel & Tourism Technology, Innovation & Science TED Speaker Locations Massachusetts, United States SHARE Enquire Add to shortlist Max Tegmark Keynote Speaker Professor of Physics & AI Research - MIT President of Future of Life Institute and Scientific Director of Foundational Questions Institute Auth
+    contentLength: 135524
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://futureoflife.org/ai-safety-index-summer-2025/
+    linkText: "FLI AI Safety Index: Summer 2025"
+    claimContext: "Tegmark's influence spans both academic research and public policy. His 2017 book *Life 3.0: Being Human in the Age of Artificial Intelligence* became a New York Times bestseller and helped bring AI safety concerns to mainstream audiences.[^3] He organized the March 2023 open letter calling for a pa"
+    fetchedAt: 2026-02-22T01:58:23.356Z
+    httpStatus: 200
+    pageTitle: 2025 AI Safety Index - Future of Life Institute
+    contentSnippet: "2025 AI Safety Index - Future of Life Institute Skip to content AI Safety Index - Winter 2025 Latest edition Featured in: Semafor, Reuters, Axios, Quartz, NBC News, Mashable, Euro News, LA Times, and more. December 2025 Future of Life Institute AI Safety Index Summer 2025 AI experts rate leading AI companies on key safety and security domains. 17 July 2025 Full report PDF 2-Page Summary Coverage Scorecard Company Company grade & score Anthropic C+ 2.64 OpenAI C 2.10 Google Deepmind C- 1.76 x.AI "
+    contentLength: 840552
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Max_Tegmark
+    linkText: Max Tegmark - Wikipedia
+    claimContext: Beyond AI safety, Tegmark is known for his controversial Mathematical Universe Hypothesis, which proposes that physical reality is fundamentally mathematical rather than merely described by mathematics. While this has attracted criticism from fellow scientists who characterize it as "science fiction
+    fetchedAt: 2026-02-22T01:58:22.982Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://scottaaronson.blog/?p=1753
+    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    claimContext: Beyond AI safety, Tegmark is known for his controversial Mathematical Universe Hypothesis, which proposes that physical reality is fundamentally mathematical rather than merely described by mathematics. While this has attracted criticism from fellow scientists who characterize it as "science fiction
+    fetchedAt: 2026-02-22T01:58:26.139Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentLength: 417939
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://logicism.fandom.com/wiki/Max_Tegmark
+    linkText: Max Tegmark - Logicism Fandom Wiki
+    claimContext: 'Tegmark demonstrated technical aptitude early, creating and selling a word processor written in pure machine code for the Swedish ABC 80 computer during high school, along with a 3D Tetris-like game called "Frac."[^8] He earned dual undergraduate degrees—a B.A. in Economics from Stockholm School of '
+    fetchedAt: 2026-02-22T01:58:25.939Z
+    httpStatus: 200
+    pageTitle: Max Tegmark | Logicism Wiki | Fandom
+    contentSnippet: "Max Tegmark | Logicism Wiki | Fandom Logicism Wiki Sign In Don&#039;t have an account? Want fewer ads? Sign In Advertisement Skip to content Max Tegmark Edit Edit source History Purge Talk (0) Max Erik Tegmark is a Swedish-American physicist, machine learning researcher, and author. Born on May 5, 1967, in Stockholm, Sweden, he has made significant contributions to various fields. Let’s explore more about his background and work: Early Life : Tegmark was born to Karin Tegmark and Jewish American"
+    contentLength: 197600
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://physics.mit.edu/faculty/max-tegmark/
+    linkText: Max Tegmark - MIT Physics
+    claimContext: 'Tegmark demonstrated technical aptitude early, creating and selling a word processor written in pure machine code for the Swedish ABC 80 computer during high school, along with a 3D Tetris-like game called "Frac."[^8] He earned dual undergraduate degrees—a B.A. in Economics from Stockholm School of '
+    fetchedAt: 2026-02-22T01:58:25.132Z
+    httpStatus: 200
+    pageTitle: Max Tegmark &#187; MIT Physics
+    contentSnippet: "Max Tegmark &#187; MIT Physics Skip to content Max Tegmark Professor of Physics Research focuses on linking physics and machine learning: using AI for physics and physics for AI. Research Areas Biophysics , Astrophysics Theory (617) 452-4627 tegmark@mit.edu Office: Ronald McNair Building, 37-582G Lab(s): Tegmark AI Safety Group Affiliated Center(s): MIT Kavli Institute for Astrophysics & Space Research at MIT , Physics of Living Systems @ MIT , The NSF AI Institute for Artificial Intelligence an"
+    contentLength: 68327
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://bigthink.com/people/max-tegmark/
+    linkText: Max Tegmark - Big Think
+    claimContext: After completing his M.A. in Physics at UC Berkeley in 1992 and his Ph.D. in 1994 under Joseph Silk, Tegmark held postdoctoral positions at the Max-Planck-Institut für Physik in Munich (1995-1996) and as a Hubble Fellow at the Institute for Advanced Study at Princeton (1996).[^10] He joined the Univ
+    fetchedAt: 2026-02-22T01:58:26.356Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Big Think
+    contentSnippet: Max Tegmark - Big Think Max Tegmark Big Think Home Open search Open main menu Sign In Membership My account My Classes My Account My List BT+ for my Business Early Releases Sign Out Membership Latest Topics Back Philosophy Ethics Religion Flourishing Knowledge Philosophy of Science Philosophy of Art Language Political Theory Identity Meaning & Purpose Science & Tech Physics Biology Aerospace Health Geology Computing Engineering Energy Biotechnology Astronomy Mind & Behavior Psychology Neuroscien
+    contentLength: 185726
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://physics.mit.edu/faculty/max-tegmark/
+    linkText: Max Tegmark - MIT Physics
+    claimContext: After completing his M.A. in Physics at UC Berkeley in 1992 and his Ph.D. in 1994 under Joseph Silk, Tegmark held postdoctoral positions at the Max-Planck-Institut für Physik in Munich (1995-1996) and as a Hubble Fellow at the Institute for Advanced Study at Princeton (1996).[^10] He joined the Univ
+    fetchedAt: 2026-02-22T01:58:25.642Z
+    httpStatus: 200
+    pageTitle: Max Tegmark &#187; MIT Physics
+    contentSnippet: "Max Tegmark &#187; MIT Physics Skip to content Max Tegmark Professor of Physics Research focuses on linking physics and machine learning: using AI for physics and physics for AI. Research Areas Biophysics , Astrophysics Theory (617) 452-4627 tegmark@mit.edu Office: Ronald McNair Building, 37-582G Lab(s): Tegmark AI Safety Group Affiliated Center(s): MIT Kavli Institute for Astrophysics & Space Research at MIT , Physics of Living Systems @ MIT , The NSF AI Institute for Artificial Intelligence an"
+    contentLength: 68327
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://physics.mit.edu/faculty/max-tegmark/
+    linkText: Max Tegmark - MIT Physics
+    claimContext: For approximately 25 years, Tegmark focused primarily on cosmology, making significant contributions to precision measurements of the universe.[^12] His work with the Sloan Digital Sky Survey (SDSS) collaboration on galaxy clustering shared first prize in Science magazine's "Breakthrough of the Year
+    fetchedAt: 2026-02-22T01:58:27.405Z
+    httpStatus: 200
+    pageTitle: Max Tegmark &#187; MIT Physics
+    contentSnippet: "Max Tegmark &#187; MIT Physics Skip to content Max Tegmark Professor of Physics Research focuses on linking physics and machine learning: using AI for physics and physics for AI. Research Areas Biophysics , Astrophysics Theory (617) 452-4627 tegmark@mit.edu Office: Ronald McNair Building, 37-582G Lab(s): Tegmark AI Safety Group Affiliated Center(s): MIT Kavli Institute for Astrophysics & Space Research at MIT , Physics of Living Systems @ MIT , The NSF AI Institute for Artificial Intelligence an"
+    contentLength: 68327
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://bigthink.com/people/max-tegmark/
+    linkText: Max Tegmark - Big Think
+    claimContext: For approximately 25 years, Tegmark focused primarily on cosmology, making significant contributions to precision measurements of the universe.[^12] His work with the Sloan Digital Sky Survey (SDSS) collaboration on galaxy clustering shared first prize in Science magazine's "Breakthrough of the Year
+    fetchedAt: 2026-02-22T01:58:28.314Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Big Think
+    contentSnippet: Max Tegmark - Big Think Max Tegmark Big Think Home Open search Open main menu Sign In Membership My account My Classes My Account My List BT+ for my Business Early Releases Sign Out Membership Latest Topics Back Philosophy Ethics Religion Flourishing Knowledge Philosophy of Science Philosophy of Art Language Political Theory Identity Meaning & Purpose Science & Tech Physics Biology Aerospace Health Geology Computing Engineering Energy Biotechnology Astronomy Mind & Behavior Psychology Neuroscien
+    contentLength: 185726
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://logicism.fandom.com/wiki/Max_Tegmark
+    linkText: Max Tegmark - Logicism Fandom Wiki
+    claimContext: For approximately 25 years, Tegmark focused primarily on cosmology, making significant contributions to precision measurements of the universe.[^12] His work with the Sloan Digital Sky Survey (SDSS) collaboration on galaxy clustering shared first prize in Science magazine's "Breakthrough of the Year
+    fetchedAt: 2026-02-22T01:58:27.636Z
+    httpStatus: 200
+    pageTitle: Max Tegmark | Logicism Wiki | Fandom
+    contentSnippet: "Max Tegmark | Logicism Wiki | Fandom Logicism Wiki Sign In Don&#039;t have an account? Want fewer ads? Sign In Advertisement Skip to content Max Tegmark Edit Edit source History Purge Talk (0) Max Erik Tegmark is a Swedish-American physicist, machine learning researcher, and author. Born on May 5, 1967, in Stockholm, Sweden, he has made significant contributions to various fields. Let’s explore more about his background and work: Early Life : Tegmark was born to Karin Tegmark and Jewish American"
+    contentLength: 197572
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://80000hours.org/podcast/episodes/max-tegmark-ai-and-algorithmic-news-selection/
+    linkText: 80,000 Hours Podcast - Max Tegmark
+    claimContext: The turning point toward AI safety came on January 1, 2015, when Tegmark adopted a personal "put-up-or-shut-up" resolution to stop complaining about problems without attempting to fix them.[^15] This philosophy had already led him to co-found the Future of Life Institute in 2014 with Anthony Aguirre
+    fetchedAt: 2026-02-22T01:58:27.949Z
+    httpStatus: 200
+    pageTitle: Max Tegmark on how a 'put-up-or-shut-up' resolution led him to work on AI and algorithmic news selection | 80,000 Hours
+    contentSnippet: "Max Tegmark on how a &#039;put-up-or-shut-up&#039; resolution led him to work on AI and algorithmic news selection | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 3.1 Rob's intro [00:00:00] 3.2 The interview begins [00:01:19] 3.3 How Max prioritises [00:12:33] 3.4 Intro to AI risk [00:15:47] 3.5 Superintelligence [00:35:56] 3.6 Imagining a wide range of possible futures [00:47:45] 3.7 Recent advances in capa"
+    contentLength: 383004
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.youtube.com/watch?v=R-VNlXJpAIQ
+    linkText: Max Tegmark - FLI Talk on AI Risks and Benefits
+    claimContext: The turning point toward AI safety came on January 1, 2015, when Tegmark adopted a personal "put-up-or-shut-up" resolution to stop complaining about problems without attempting to fix them.[^15] This philosophy had already led him to co-found the Future of Life Institute in 2014 with Anthony Aguirre
+    fetchedAt: 2026-02-22T01:58:27.768Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 18
+    url: https://physics.mit.edu/faculty/max-tegmark/
+    linkText: Max Tegmark - MIT Physics
+    claimContext: Tegmark's research has evolved to focus on what he calls the "physics of intelligence," using physics-based techniques to understand biological and artificial intelligence.[^18] His recent work emphasizes mechanistic interpretability—understanding the internal workings of AI systems—and developing a
+    fetchedAt: 2026-02-22T01:58:29.337Z
+    httpStatus: 200
+    pageTitle: Max Tegmark &#187; MIT Physics
+    contentSnippet: "Max Tegmark &#187; MIT Physics Skip to content Max Tegmark Professor of Physics Research focuses on linking physics and machine learning: using AI for physics and physics for AI. Research Areas Biophysics , Astrophysics Theory (617) 452-4627 tegmark@mit.edu Office: Ronald McNair Building, 37-582G Lab(s): Tegmark AI Safety Group Affiliated Center(s): MIT Kavli Institute for Astrophysics & Space Research at MIT , Physics of Living Systems @ MIT , The NSF AI Institute for Artificial Intelligence an"
+    contentLength: 68327
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://futureoflife.org/person/max-tegmark/
+    linkText: Max Tegmark - Future of Life Institute
+    claimContext: Tegmark's research has evolved to focus on what he calls the "physics of intelligence," using physics-based techniques to understand biological and artificial intelligence.[^18] His recent work emphasizes mechanistic interpretability—understanding the internal workings of AI systems—and developing a
+    fetchedAt: 2026-02-22T01:58:30.339Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Future of Life Institute
+    contentSnippet: "Max Tegmark - Future of Life Institute Skip to content Max Tegmark Position Founder and Chair Organisation Future of Life Institute Member of Board Members Biography Max Tegmark is a professor doing AI and physics research at MIT as part of the Institute for Artificial Intelligence & Fundamental Interactions and the Center for Brains, Minds and Machines. He is the author of over 300 publications as well as the New York Times bestsellers “Life 3.0: Being Human in the Age of Artificial Intelligenc"
+    contentLength: 202922
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://en.wikipedia.org/wiki/Max_Tegmark
+    linkText: Max Tegmark - Wikipedia
+    claimContext: Tegmark's research has evolved to focus on what he calls the "physics of intelligence," using physics-based techniques to understand biological and artificial intelligence.[^18] His recent work emphasizes mechanistic interpretability—understanding the internal workings of AI systems—and developing a
+    fetchedAt: 2026-02-22T01:58:29.335Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 21
+    url: https://www.dynatrace.com/news/blog/max-tegmark-on-artificial-intelligence/
+    linkText: Dynatrace - Max Tegmark on AI
+    claimContext: "Tegmark frames the central challenge of artificial general intelligence as a \"control problem\" rather than a question of AI malice. He uses the analogy of human-rhino relationships: humans don't hate rhinos, but misalignment of goals has led to rhino endangerment.[^21] According to Tegmark, the bigg"
+    fetchedAt: 2026-02-22T01:58:30.429Z
+    httpStatus: 200
+    pageTitle: "Max Tegmark on artificial intelligence: the ultimate game-changer"
+    contentSnippet: "Max Tegmark on artificial intelligence: the ultimate game-changer In this blog post 1. How far will artificial intelligence go? 2. Winning the wisdom race with artificial intelligence 3. Aligning AI’s goals with our own 4. Envision an amazing future, not a dystopic one MIT physics professor and Future of Life Institute co-founder Max Tegmark shares his big thoughts on the big possibilities of AI to change human innovation. “Think big. Really big. Cosmically big.&#8221; When it comes to artificia"
+    contentLength: 511434
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.youtube.com/watch?v=R-VNlXJpAIQ
+    linkText: Max Tegmark - FLI Talk on AI Risks and Benefits
+    claimContext: "Tegmark frames the central challenge of artificial general intelligence as a \"control problem\" rather than a question of AI malice. He uses the analogy of human-rhino relationships: humans don't hate rhinos, but misalignment of goals has led to rhino endangerment.[^21] According to Tegmark, the bigg"
+    fetchedAt: 2026-02-22T01:58:29.594Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 23
+    url: https://www.youtube.com/watch?v=gFQvL3KVaOQ
+    linkText: Max Tegmark Interview - December 2023
+    claimContext: In a December 2023 discussion, Tegmark stated that AGI matching or surpassing human cognition could arrive within three years, noting how <EntityLink id="E228" name="prediction-markets">prediction markets</EntityLink> had shifted from 20-year to 3-year timelines.[^23] At WebSummit 2024, he emphasize
+    fetchedAt: 2026-02-22T01:58:31.772Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 26
+    url: https://www.dynatrace.com/news/blog/max-tegmark-on-artificial-intelligence/
+    linkText: Dynatrace - Max Tegmark on AI
+    claimContext: "**Asilomar AI Principles**: Tegmark and colleagues developed 23 principles for safe AI development that have been adopted by more than 1,000 researchers and scientists worldwide.[^26]"
+    fetchedAt: 2026-02-22T01:58:31.498Z
+    httpStatus: 200
+    pageTitle: "Max Tegmark on artificial intelligence: the ultimate game-changer"
+    contentSnippet: "Max Tegmark on artificial intelligence: the ultimate game-changer In this blog post 1. How far will artificial intelligence go? 2. Winning the wisdom race with artificial intelligence 3. Aligning AI’s goals with our own 4. Envision an amazing future, not a dystopic one MIT physics professor and Future of Life Institute co-founder Max Tegmark shares his big thoughts on the big possibilities of AI to change human innovation. “Think big. Really big. Cosmically big.&#8221; When it comes to artificia"
+    contentLength: 511434
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://futureoflife.org/ai-safety-index-summer-2025/
+    linkText: "FLI AI Safety Index: Summer 2025"
+    claimContext: '**AI Safety Index**: Launched in summer 2025, this initiative evaluates AI companies on their safety practices for models like <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> Claude 4 Opus, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> Gemini 2.5 Pro, <EntityLink id='
+    fetchedAt: 2026-02-22T01:58:31.579Z
+    httpStatus: 200
+    pageTitle: 2025 AI Safety Index - Future of Life Institute
+    contentSnippet: "2025 AI Safety Index - Future of Life Institute Skip to content AI Safety Index - Winter 2025 Latest edition Featured in: Semafor, Reuters, Axios, Quartz, NBC News, Mashable, Euro News, LA Times, and more. December 2025 Future of Life Institute AI Safety Index Summer 2025 AI experts rate leading AI companies on key safety and security domains. 17 July 2025 Full report PDF 2-Page Summary Coverage Scorecard Company Company grade & score Anthropic C+ 2.64 OpenAI C 2.10 Google Deepmind C- 1.76 x.AI "
+    contentLength: 840552
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://futureoflife.org/ai-safety-index-summer-2025/
+    linkText: "FLI AI Safety Index: Summer 2025"
+    claimContext: '**AI Safety Index**: Launched in summer 2025, this initiative evaluates AI companies on their safety practices for models like <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> Claude 4 Opus, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> Gemini 2.5 Pro, <EntityLink id='
+    fetchedAt: 2026-02-22T01:58:31.983Z
+    httpStatus: 200
+    pageTitle: 2025 AI Safety Index - Future of Life Institute
+    contentSnippet: "2025 AI Safety Index - Future of Life Institute Skip to content AI Safety Index - Winter 2025 Latest edition Featured in: Semafor, Reuters, Axios, Quartz, NBC News, Mashable, Euro News, LA Times, and more. December 2025 Future of Life Institute AI Safety Index Summer 2025 AI experts rate leading AI companies on key safety and security domains. 17 July 2025 Full report PDF 2-Page Summary Coverage Scorecard Company Company grade & score Anthropic C+ 2.64 OpenAI C 2.10 Google Deepmind C- 1.76 x.AI "
+    contentLength: 840550
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.youtube.com/watch?v=hGUUhxNn86M
+    linkText: Max Tegmark on AI Safety Index
+    claimContext: "**Legislative Advocacy**: Tegmark has called for \"binding government rules\" rather than voluntary self-governance by AI companies, arguing \"you can't let the fox guard the hen house.\"[^29] He praised California's SB 53 (signed by Governor Gavin Newsom in September 2025) requiring AI businesses to sh"
+    fetchedAt: 2026-02-22T01:58:31.685Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 30
+    url: https://www.latimes.com/entertainment-arts/business/story/2025-12-05/ai-artificial-intelligence-company-scorecard-ranks-safety-humanity
+    linkText: LA Times - AI Company Scorecard
+    claimContext: "**Legislative Advocacy**: Tegmark has called for \"binding government rules\" rather than voluntary self-governance by AI companies, arguing \"you can't let the fox guard the hen house.\"[^29] He praised California's SB 53 (signed by Governor Gavin Newsom in September 2025) requiring AI businesses to sh"
+    fetchedAt: 2026-02-22T01:58:33.451Z
+    httpStatus: 200
+    pageTitle: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times
+    contentSnippet: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times Copyright © 2026, Los Angeles Times | Terms of Service | Privacy Policy | CA Notice of Collection | Do Not Sell or Share My Personal Information Advertisement Hollywood Inc. A safety report card ranks AI company efforts to protect humanity Anthropic co-founder and Chief Executive Dario Amodei speaks during Inbound 2025 in San Francisco. (Chance Yeh / Getty Images for HubSpot) By Wendy Lee Staff Writer Follow De
+    contentLength: 478945
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://80000hours.org/podcast/episodes/max-tegmark-ai-and-algorithmic-news-selection/
+    linkText: 80,000 Hours Podcast - Max Tegmark
+    claimContext: Tegmark's advocacy employs several rhetorical strategies. He frequently draws parallels to historical cases of regulatory capture, warning that AI companies could follow the playbook of Big Tobacco and Big Oil to circumvent government constraints.[^32] He has also compared AI risks to climate change
+    fetchedAt: 2026-02-22T01:58:33.380Z
+    httpStatus: 200
+    pageTitle: Max Tegmark on how a 'put-up-or-shut-up' resolution led him to work on AI and algorithmic news selection | 80,000 Hours
+    contentSnippet: "Max Tegmark on how a &#039;put-up-or-shut-up&#039; resolution led him to work on AI and algorithmic news selection | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 3.1 Rob's intro [00:00:00] 3.2 The interview begins [00:01:19] 3.3 How Max prioritises [00:12:33] 3.4 Intro to AI risk [00:15:47] 3.5 Superintelligence [00:35:56] 3.6 Imagining a wide range of possible futures [00:47:45] 3.7 Recent advances in capa"
+    contentLength: 383004
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://forum.effectivealtruism.org/posts/moA9DNjbYr72xy4mQ/max-tegmark-s-new-time-article-on-how-we-re-in-a-don-t-look
+    linkText: EA Forum - Max Tegmark's Time Article
+    claimContext: Tegmark's advocacy employs several rhetorical strategies. He frequently draws parallels to historical cases of regulatory capture, warning that AI companies could follow the playbook of Big Tobacco and Big Oil to circumvent government constraints.[^32] He has also compared AI risks to climate change
+    fetchedAt: 2026-02-22T01:58:33.313Z
+    httpStatus: 200
+    pageTitle: Max Tegmark&#x27;s new Time article on how we&#x27;re in a Don&#x27;t Look Up scenario [Linkpost] — EA Forum
+    contentSnippet: Max Tegmark&#x27;s new Time article on how we&#x27;re in a Don&#x27;t Look Up scenario [Linkpost] — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Max Tegmark&#x27;s new Time article on how we&#x27;re in a Don&#x27;t Look Up scenario [Linkpost] by Jonas Hallgren 🔸 Apr 25 2023 1 min read 0 41 AI safety Public communication on AI safety Frontpage This is a linkpost for https://time.com/6273743/thinking-that-c
+    contentLength: 91721
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://forum.effectivealtruism.org/posts/HN4ECPh5bPykBgvT8/did-bengio-and-tegmark-lose-a-debate-about-ai-x-risk-against
+    linkText: EA Forum - Did Bengio and Tegmark Lose a Debate?
+    claimContext: However, Tegmark's communication style has drawn criticism. In public debates, he has been characterized as overrelying on speculation and authority appeals, with opponents calling out his use of insider jargon like "alignment/safety" and probability questions that alienate general audiences.[^34] S
+    fetchedAt: 2026-02-22T01:58:33.323Z
+    httpStatus: 200
+    pageTitle: Did Bengio and Tegmark lose a debate about AI x-risk against LeCun and Mitchell? — EA Forum
+    contentSnippet: Did Bengio and Tegmark lose a debate about AI x-risk against LeCun and Mitchell? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Did Bengio and Tegmark lose a debate about AI x-risk against LeCun and Mitchell? by Karl von Wendt Jun 25 2023 8 min read 24 80 AI safety AI risk skepticism Public communication on AI safety Video Frontpage On June 22nd, there was a “Munk Debate”, facilitated by the Canadian Aurea
+    contentLength: 572588
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://news.ycombinator.com/item?id=40067124
+    linkText: Hacker News Discussion
+    claimContext: However, Tegmark's communication style has drawn criticism. In public debates, he has been characterized as overrelying on speculation and authority appeals, with opponents calling out his use of insider jargon like "alignment/safety" and probability questions that alienate general audiences.[^34] S
+    fetchedAt: 2026-02-22T01:58:33.266Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 36
+    url: https://forum.effectivealtruism.org/posts/3WEkFjrab9rE2sJaE/which-side-of-the-ai-safety-community-are-you-in
+    linkText: EA Forum - AI Safety Community Camps
+    claimContext: Within the AI safety community, Tegmark has identified a factional divide, criticizing what he calls "Camp A"—those who advocate racing to superintelligence safely—as dominating effective altruism with "most money/power/influence." He positions himself in a more cautious camp skeptical of narratives
+    fetchedAt: 2026-02-22T01:58:34.516Z
+    httpStatus: 200
+    pageTitle: Which side of the AI safety community are you in? — EA Forum
+    contentSnippet: Which side of the AI safety community are you in? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Which side of the AI safety community are you in? by Greg_Colbourn ⏸️ Oct 23 2025 3 min read 2 12 AI safety Slowing down AI AI governance Superintelligence Frontpage This is a linkpost for https://www.lesswrong.com/posts/zmtqmwetKH4nrxXcE/which-side-of-the-ai-safety-community-are-you-in With dismay, I have to c
+    contentLength: 154183
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.vice.com/en/article/the-mathematical-reality-of-reality-an-interview-with-cosmologist-max-tegmark/
+    linkText: VICE - Interview with Max Tegmark
+    claimContext: "Tegmark proposed in 2007 that physical reality is not merely described by mathematics but *is* a mathematical structure—a position he acknowledges puts him on the \"most radical fringe\" of mathematical universe views.[^37] Under this hypothesis, our universe's mathematical regularities exist because "
+    fetchedAt: 2026-02-22T01:58:36.149Z
+    httpStatus: 200
+    pageTitle: "The Mathematical Reality of Reality: An Interview with Cosmologist Max Tegmark"
+    contentSnippet: "The Mathematical Reality of Reality: An Interview with Cosmologist Max Tegmark Back to homepage Subscribe to VICE Get unlimited access to everything VICE has to offer. Digital Monthly $ 2.00 / month Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Digital Annual $ 20.00 / year Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Print & Digital $ 70.00 / year Turn off all ads on VICE.c"
+    contentLength: 351082
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://scottaaronson.blog/?p=1753
+    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    claimContext: "Tegmark proposed in 2007 that physical reality is not merely described by mathematics but *is* a mathematical structure—a position he acknowledges puts him on the \"most radical fringe\" of mathematical universe views.[^37] Under this hypothesis, our universe's mathematical regularities exist because "
+    fetchedAt: 2026-02-22T01:58:35.281Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentLength: 417939
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.vice.com/en/article/the-mathematical-reality-of-reality-an-interview-with-cosmologist-max-tegmark/
+    linkText: VICE - Interview with Max Tegmark
+    claimContext: "Tegmark argues this view is optimistic for physics: if true, it predicts continued discoveries without fundamental roadblocks, whereas if false, physics faces potential dead ends.[^39] He defends the multiverse framework by tying different levels to falsifiable theories: Level II multiverses to infl"
+    fetchedAt: 2026-02-22T01:58:35.298Z
+    httpStatus: 200
+    pageTitle: "The Mathematical Reality of Reality: An Interview with Cosmologist Max Tegmark"
+    contentSnippet: "The Mathematical Reality of Reality: An Interview with Cosmologist Max Tegmark Back to homepage Subscribe to VICE Get unlimited access to everything VICE has to offer. Digital Monthly $ 2.00 / month Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Digital Annual $ 20.00 / year Turn off all ads on VICE.com Exclusive New VICE Documentaries Member Exclusive Features & Columns Join Now Print & Digital $ 70.00 / year Turn off all ads on VICE.c"
+    contentLength: 351082
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://scottaaronson.blog/?p=1753
+    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    claimContext: "Tegmark argues this view is optimistic for physics: if true, it predicts continued discoveries without fundamental roadblocks, whereas if false, physics faces potential dead ends.[^39] He defends the multiverse framework by tying different levels to falsifiable theories: Level II multiverses to infl"
+    fetchedAt: 2026-02-22T01:58:35.220Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentLength: 417938
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://en.wikipedia.org/wiki/Max_Tegmark
+    linkText: Max Tegmark - Wikipedia
+    claimContext: The Mathematical Universe Hypothesis has faced substantial criticism from the scientific community. Mathematician Edward Frenkel characterized it as "science fiction and mysticism" rather than science.[^41] Computer scientist Scott Aaronson argued in his review of Tegmark's book *Our Mathematical Un
+    fetchedAt: 2026-02-22T01:58:37.171Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 42
+    url: https://scottaaronson.blog/?p=1753
+    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    claimContext: The Mathematical Universe Hypothesis has faced substantial criticism from the scientific community. Mathematician Edward Frenkel characterized it as "science fiction and mysticism" rather than science.[^41] Computer scientist Scott Aaronson argued in his review of Tegmark's book *Our Mathematical Un
+    fetchedAt: 2026-02-22T01:58:37.671Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentLength: 417939
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://scottaaronson.blog/?p=1753
+    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    claimContext: Critics have also pointed to what they see as internal contradictions. Aaronson noted "cognitive dissonance" in Tegmark's acceptance of cosmic inflation producing a Level I multiverse as more than speculation while treating the broader multiverse concept skeptically.[^43] A 2017 physics blog post ac
+    fetchedAt: 2026-02-22T01:58:37.590Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentLength: 417938
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://poetryinphysics.wordpress.com/2017/12/14/disagreeing-with-our-mathematical-universe/
+    linkText: Poetry in Physics Blog - Disagreeing with Mathematical Universe
+    claimContext: Critics have also pointed to what they see as internal contradictions. Aaronson noted "cognitive dissonance" in Tegmark's acceptance of cosmic inflation producing a Level I multiverse as more than speculation while treating the broader multiverse concept skeptically.[^43] A 2017 physics blog post ac
+    fetchedAt: 2026-02-22T01:58:37.680Z
+    httpStatus: 200
+    pageTitle: Disagreeing with &#8220;Our Mathematical Universe&#8221; &#8211; Poetry in Physics
+    contentSnippet: "Disagreeing with &#8220;Our Mathematical Universe&#8221; &#8211; Poetry in Physics Skip to content My wife and I have been listening to Max Tegmark&#8217;s book &#8220;Our Mathematical Universe: My Quest for the Ultimate Nature of Reality&#8221; as an audiobook during our trips to and from work lately. When he hit his chapter explaining Quantum Mechanics and his &#8220;Level 3 multiverse&#8221; I found that I profoundly disagree with this guy. It&#8217;s clear that he&#8217;s a grade A cosmologi"
+    contentLength: 146747
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.youtube.com/watch?v=g2V85ssfwtE
+    linkText: Max Tegmark on Consciousness - YouTube
+    claimContext: "Tegmark views consciousness as intrinsic to integrated information processing, separable from intelligence, and has been critical of mainstream scientists for dismissing consciousness as unscientific.[^45] He distinguishes consciousness (which can be present in minimally active states like lying in "
+    fetchedAt: 2026-02-22T01:58:37.545Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 46
+    url: https://www.youtube.com/watch?v=g2V85ssfwtE
+    linkText: Max Tegmark on Consciousness - YouTube
+    claimContext: "Tegmark views consciousness as intrinsic to integrated information processing, separable from intelligence, and has been critical of mainstream scientists for dismissing consciousness as unscientific.[^45] He distinguishes consciousness (which can be present in minimally active states like lying in "
+    fetchedAt: 2026-02-22T01:58:38.967Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 47
+    url: https://www.youtube.com/watch?v=g2V85ssfwtE
+    linkText: Max Tegmark on Consciousness - YouTube
+    claimContext: Supporting Giulio Tononi's Integrated Information Theory (IIT), Tegmark emphasizes the measure of integration via phi (Φ), which requires no secret separation into non-communicating parts for unified conscious experience.[^47] He rejects both panpsychism and theories suggesting consciousness depends
+    fetchedAt: 2026-02-22T01:58:39.072Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 48
+    url: https://www.youtube.com/watch?v=g2V85ssfwtE
+    linkText: Max Tegmark on Consciousness - YouTube
+    claimContext: Supporting Giulio Tononi's Integrated Information Theory (IIT), Tegmark emphasizes the measure of integration via phi (Φ), which requires no secret separation into non-communicating parts for unified conscious experience.[^47] He rejects both panpsychism and theories suggesting consciousness depends
+    fetchedAt: 2026-02-22T01:58:39.100Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 49
+    url: https://en.wikipedia.org/wiki/Max_Tegmark
+    linkText: Max Tegmark - Wikipedia
+    claimContext: In 2000, Tegmark published a paper refuting Roger Penrose's quantum consciousness model, concluding that quantum decoherence occurs too rapidly for orchestrated objective reduction to function in neurons.[^49] However, other scientists have argued Tegmark overstretches quantum effects to macroscopic
+    fetchedAt: 2026-02-22T01:58:38.687Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 50
+    url: https://poetryinphysics.wordpress.com/2017/12/14/disagreeing-with-our-mathematical-universe/
+    linkText: Poetry in Physics Blog - Disagreeing with Mathematical Universe
+    claimContext: In 2000, Tegmark published a paper refuting Roger Penrose's quantum consciousness model, concluding that quantum decoherence occurs too rapidly for orchestrated objective reduction to function in neurons.[^49] However, other scientists have argued Tegmark overstretches quantum effects to macroscopic
+    fetchedAt: 2026-02-22T01:58:38.733Z
+    httpStatus: 200
+    pageTitle: Disagreeing with &#8220;Our Mathematical Universe&#8221; &#8211; Poetry in Physics
+    contentSnippet: "Disagreeing with &#8220;Our Mathematical Universe&#8221; &#8211; Poetry in Physics Skip to content My wife and I have been listening to Max Tegmark&#8217;s book &#8220;Our Mathematical Universe: My Quest for the Ultimate Nature of Reality&#8221; as an audiobook during our trips to and from work lately. When he hit his chapter explaining Quantum Mechanics and his &#8220;Level 3 multiverse&#8221; I found that I profoundly disagree with this guy. It&#8217;s clear that he&#8217;s a grade A cosmologi"
+    contentLength: 146723
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://en.wikipedia.org/wiki/Max_Tegmark
+    linkText: Max Tegmark - Wikipedia
+    claimContext: In 2023, Tegmark faced allegations of signing a letter of intent on behalf of the Future of Life Institute for a \$100,000 grant to *Nya Dagbladet*, a far-right Swedish media outlet where his brother contributed articles.[^51] The outlet was linked to antisemitism, white supremacy, and racism. FLI u
+    fetchedAt: 2026-02-22T01:58:40.105Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 52
+    url: https://en.wikipedia.org/wiki/Max_Tegmark
+    linkText: Max Tegmark - Wikipedia
+    claimContext: In 2023, Tegmark faced allegations of signing a letter of intent on behalf of the Future of Life Institute for a \$100,000 grant to *Nya Dagbladet*, a far-right Swedish media outlet where his brother contributed articles.[^51] The outlet was linked to antisemitism, white supremacy, and racism. FLI u
+    fetchedAt: 2026-02-22T01:58:40.121Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 53
+    url: https://news.ycombinator.com/item?id=40067124
+    linkText: Hacker News Discussion
+    claimContext: Tegmark's strong advocacy for restricting artificial superintelligence development has created tensions within both the AI safety community and the broader tech world. On platforms like Hacker News, some former fans have expressed "strong disagreement and disappointment" with his enthusiasm for what
+    fetchedAt: 2026-02-22T01:58:40.349Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 54
+    url: https://forum.effectivealtruism.org/posts/HN4ECPh5bPykBgvT8/did-benigo-and-tegmark-lose-a-debate-about-ai-x-risk-against
+    linkText: EA Forum - Did Bengio and Tegmark Lose a Debate?
+    claimContext: Within effective altruism circles, debates around Tegmark's positions have been more nuanced. His performance in a public debate with Yoshua Bengio defending AI x-risk received mixed reviews. While some praised the concrete evidence provided—such as rapid AI progress surprising even experts like Ben
+    fetchedAt: 2026-02-22T01:58:40.973Z
+    httpStatus: 200
+    pageTitle: Did Bengio and Tegmark lose a debate about AI x-risk against LeCun and Mitchell? — EA Forum
+    contentSnippet: Did Bengio and Tegmark lose a debate about AI x-risk against LeCun and Mitchell? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Did Bengio and Tegmark lose a debate about AI x-risk against LeCun and Mitchell? by Karl von Wendt Jun 25 2023 8 min read 24 80 AI safety AI risk skepticism Public communication on AI safety Video Frontpage On June 22nd, there was a “Munk Debate”, facilitated by the Canadian Aurea
+    contentLength: 572589
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://ea.greaterwrong.com/posts/7sfRDtBDNf7F56fHg/max-tegmark-the-agi-entente-delusion?comments=false&hide-nav-bars=true
+    linkText: EA Forum - AGI Entente Delusion
+    claimContext: Tegmark has also critiqued what he sees as misguided geopolitical strategies, particularly the emerging "AGI Entente" approach in US national security circles that emphasizes cooperation between allied nations in <EntityLink id="E604" name="agi-development">AGI development</EntityLink>.[^55]
+    fetchedAt: 2026-02-22T01:58:40.786Z
+    httpStatus: 200
+    pageTitle: Max Tegmark — The AGI Entente Delusion - Effective Altruism forum viewer
+    contentSnippet: "Max Tegmark — The AGI Entente Delusion - Effective Altruism forum viewer Max Tegmark — The AGI Entente Delusion Matrice Jacobine🔸🏳️‍⚧️ 13 Oct 2024 17:42 UTC 0 points 1 comment 1 min read EA link Flourishing futures AI safety China Existential risk Polarity Tool AI AI governance Opinion Future of Life Institute Great power conflict AI race Link post As humanity gets closer to Artificial General Intelligence (AGI), a new geopolitical strategy is gaining traction in US and allied circles, in the "
+    contentLength: 8470
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://www.latimes.com/entertainment-arts/business/story/2025-12-05/ai-artificial-intelligence-company-scorecard-ranks-safety-humanity
+    linkText: LA Times - AI Company Scorecard
+    claimContext: The AI Safety Index has faced resistance from industry. When the summer 2025 edition was released, xAI dismissed it as "Legacy Media Lies," and Elon Musk's attorney declined to comment despite Musk's past support for FLI.[^56] Tech lobby groups have argued that regulation slows innovation and drives
+    fetchedAt: 2026-02-22T01:58:42.500Z
+    httpStatus: 200
+    pageTitle: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times
+    contentSnippet: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times Copyright © 2026, Los Angeles Times | Terms of Service | Privacy Policy | CA Notice of Collection | Do Not Sell or Share My Personal Information Advertisement Hollywood Inc. A safety report card ranks AI company efforts to protect humanity Anthropic co-founder and Chief Executive Dario Amodei speaks during Inbound 2025 in San Francisco. (Chance Yeh / Getty Images for HubSpot) By Wendy Lee Staff Writer Follow De
+    contentLength: 478945
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://www.latimes.com/entertainment-arts/business/story/2025-12-05/ai-artificial-intelligence-company-scorecard-ranks-safety-humanity
+    linkText: LA Times - AI Company Scorecard
+    claimContext: The AI Safety Index has faced resistance from industry. When the summer 2025 edition was released, xAI dismissed it as "Legacy Media Lies," and Elon Musk's attorney declined to comment despite Musk's past support for FLI.[^56] Tech lobby groups have argued that regulation slows innovation and drives
+    fetchedAt: 2026-02-22T01:58:42.332Z
+    httpStatus: 200
+    pageTitle: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times
+    contentSnippet: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times Copyright © 2026, Los Angeles Times | Terms of Service | Privacy Policy | CA Notice of Collection | Do Not Sell or Share My Personal Information Advertisement Hollywood Inc. A safety report card ranks AI company efforts to protect humanity Anthropic co-founder and Chief Executive Dario Amodei speaks during Inbound 2025 in San Francisco. (Chance Yeh / Getty Images for HubSpot) By Wendy Lee Staff Writer Follow De
+    contentLength: 478945
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://www.latimes.com/entertainment-arts/business/story/2025-12-05/ai-artificial-intelligence-company-scorecard-ranks-safety-humanity
+    linkText: LA Times - AI Company Scorecard
+    claimContext: Tegmark has been particularly critical of what he characterizes as an AI industry "race to the bottom," describing companies as "completely unregulated" and lacking incentives for safety. He warns this environment could enable terrorists to develop <EntityLink id="E42" name="bioweapons">bioweapons</
+    fetchedAt: 2026-02-22T01:58:42.301Z
+    httpStatus: 200
+    pageTitle: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times
+    contentSnippet: A safety report card ranks AI company efforts to protect humanity - Los Angeles Times Copyright © 2026, Los Angeles Times | Terms of Service | Privacy Policy | CA Notice of Collection | Do Not Sell or Share My Personal Information Advertisement Hollywood Inc. A safety report card ranks AI company efforts to protect humanity Anthropic co-founder and Chief Executive Dario Amodei speaks during Inbound 2025 in San Francisco. (Chance Yeh / Getty Images for HubSpot) By Wendy Lee Staff Writer Follow De
+    contentLength: 478945
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://futureoflife.org/ai-safety-index-summer-2025/
+    linkText: "FLI AI Safety Index: Summer 2025"
+    claimContext: Tegmark has been particularly critical of what he characterizes as an AI industry "race to the bottom," describing companies as "completely unregulated" and lacking incentives for safety. He warns this environment could enable terrorists to develop <EntityLink id="E42" name="bioweapons">bioweapons</
+    fetchedAt: 2026-02-22T01:58:42.211Z
+    httpStatus: 200
+    pageTitle: 2025 AI Safety Index - Future of Life Institute
+    contentSnippet: "2025 AI Safety Index - Future of Life Institute Skip to content AI Safety Index - Winter 2025 Latest edition Featured in: Semafor, Reuters, Axios, Quartz, NBC News, Mashable, Euro News, LA Times, and more. December 2025 Future of Life Institute AI Safety Index Summer 2025 AI experts rate leading AI companies on key safety and security domains. 17 July 2025 Full report PDF 2-Page Summary Coverage Scorecard Company Company grade & score Anthropic C+ 2.64 OpenAI C 2.10 Google Deepmind C- 1.76 x.AI "
+    contentLength: 840552
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://poetryinphysics.wordpress.com/2017/12/14/disagreeing-with-our-mathematical-universe/
+    linkText: Poetry in Physics Blog - Disagreeing with Mathematical Universe
+    claimContext: Some critics have raised methodological concerns about Tegmark's tendency to extrapolate beyond available evidence. The 2017 blog post criticizing his quantum mechanics work accused him of "neglecting scale" by overstretching quantum effects to macroscopic biological levels, cherry-picking mathemati
+    fetchedAt: 2026-02-22T01:58:42.046Z
+    httpStatus: 200
+    pageTitle: Disagreeing with &#8220;Our Mathematical Universe&#8221; &#8211; Poetry in Physics
+    contentSnippet: "Disagreeing with &#8220;Our Mathematical Universe&#8221; &#8211; Poetry in Physics Skip to content My wife and I have been listening to Max Tegmark&#8217;s book &#8220;Our Mathematical Universe: My Quest for the Ultimate Nature of Reality&#8221; as an audiobook during our trips to and from work lately. When he hit his chapter explaining Quantum Mechanics and his &#8220;Level 3 multiverse&#8221; I found that I profoundly disagree with this guy. It&#8217;s clear that he&#8217;s a grade A cosmologi"
+    contentLength: 146723
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://futureoflife.org/person/max-tegmark/
+    linkText: Max Tegmark - Future of Life Institute
+    claimContext: "- **Time Magazine 100 Most Influential People in AI** (2023)[^61] - **Gold Medal** from The Royal Swedish Academy of Engineering Sciences (2019) for contributions to understanding humanity's place in the cosmos and AI opportunities and risks[^62]"
+    fetchedAt: 2026-02-22T01:58:43.578Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Future of Life Institute
+    contentSnippet: "Max Tegmark - Future of Life Institute Skip to content Max Tegmark Position Founder and Chair Organisation Future of Life Institute Member of Board Members Biography Max Tegmark is a professor doing AI and physics research at MIT as part of the Institute for Artificial Intelligence & Fundamental Interactions and the Center for Brains, Minds and Machines. He is the author of over 300 publications as well as the New York Times bestsellers “Life 3.0: Being Human in the Age of Artificial Intelligenc"
+    contentLength: 202922
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://physics.mit.edu/faculty/max-tegmark/
+    linkText: Max Tegmark - MIT Physics
+    claimContext: "- **Time Magazine 100 Most Influential People in AI** (2023)[^61] - **Gold Medal** from The Royal Swedish Academy of Engineering Sciences (2019) for contributions to understanding humanity's place in the cosmos and AI opportunities and risks[^62] - **American Physical Society Fellow** (2012) for con"
+    fetchedAt: 2026-02-22T01:58:43.596Z
+    httpStatus: 200
+    pageTitle: Max Tegmark &#187; MIT Physics
+    contentSnippet: "Max Tegmark &#187; MIT Physics Skip to content Max Tegmark Professor of Physics Research focuses on linking physics and machine learning: using AI for physics and physics for AI. Research Areas Biophysics , Astrophysics Theory (617) 452-4627 tegmark@mit.edu Office: Ronald McNair Building, 37-582G Lab(s): Tegmark AI Safety Group Affiliated Center(s): MIT Kavli Institute for Astrophysics & Space Research at MIT , Physics of Living Systems @ MIT , The NSF AI Institute for Artificial Intelligence an"
+    contentLength: 68327
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://physics.mit.edu/faculty/max-tegmark/
+    linkText: Max Tegmark - MIT Physics
+    claimContext: "- **Gold Medal** from The Royal Swedish Academy of Engineering Sciences (2019) for contributions to understanding humanity's place in the cosmos and AI opportunities and risks[^62] - **American Physical Society Fellow** (2012) for contributions to cosmology and low-frequency radio interferometry tec"
+    fetchedAt: 2026-02-22T01:58:43.778Z
+    httpStatus: 200
+    pageTitle: Max Tegmark &#187; MIT Physics
+    contentSnippet: "Max Tegmark &#187; MIT Physics Skip to content Max Tegmark Professor of Physics Research focuses on linking physics and machine learning: using AI for physics and physics for AI. Research Areas Biophysics , Astrophysics Theory (617) 452-4627 tegmark@mit.edu Office: Ronald McNair Building, 37-582G Lab(s): Tegmark AI Safety Group Affiliated Center(s): MIT Kavli Institute for Astrophysics & Space Research at MIT , Physics of Living Systems @ MIT , The NSF AI Institute for Artificial Intelligence an"
+    contentLength: 68327
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://bigthink.com/people/max-tegmark/
+    linkText: Max Tegmark - Big Think
+    claimContext: "- **American Physical Society Fellow** (2012) for contributions to cosmology and low-frequency radio interferometry technology[^63] - **Packard Fellowship** (2001-2006), **Cottrell Scholar Award** (2002-2007), and **NSF Career Grant** (2002-2007)[^64]"
+    fetchedAt: 2026-02-22T01:58:45.042Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Big Think
+    contentSnippet: Max Tegmark - Big Think Max Tegmark Big Think Home Open search Open main menu Sign In Membership My account My Classes My Account My List BT+ for my Business Early Releases Sign Out Membership Latest Topics Back Philosophy Ethics Religion Flourishing Knowledge Philosophy of Science Philosophy of Art Language Political Theory Identity Meaning & Purpose Science & Tech Physics Biology Aerospace Health Geology Computing Engineering Energy Biotechnology Astronomy Mind & Behavior Psychology Neuroscien
+    contentLength: 185726
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://futureoflife.org/person/max-tegmark/
+    linkText: Max Tegmark - Future of Life Institute
+    claimContext: His books *Our Mathematical Universe* (2014) and *Life 3.0* (2017) both became New York Times bestsellers.[^65] He has authored over 300 technical publications and is featured in numerous science documentaries.[^66]
+    fetchedAt: 2026-02-22T01:58:43.666Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Future of Life Institute
+    contentSnippet: "Max Tegmark - Future of Life Institute Skip to content Max Tegmark Position Founder and Chair Organisation Future of Life Institute Member of Board Members Biography Max Tegmark is a professor doing AI and physics research at MIT as part of the Institute for Artificial Intelligence & Fundamental Interactions and the Center for Brains, Minds and Machines. He is the author of over 300 publications as well as the New York Times bestsellers “Life 3.0: Being Human in the Age of Artificial Intelligenc"
+    contentLength: 202922
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://futureoflife.org/person/max-tegmark/
+    linkText: Max Tegmark - Future of Life Institute
+    claimContext: His books *Our Mathematical Universe* (2014) and *Life 3.0* (2017) both became New York Times bestsellers.[^65] He has authored over 300 technical publications and is featured in numerous science documentaries.[^66]
+    fetchedAt: 2026-02-22T01:58:46.107Z
+    httpStatus: 200
+    pageTitle: Max Tegmark - Future of Life Institute
+    contentSnippet: "Max Tegmark - Future of Life Institute Skip to content Max Tegmark Position Founder and Chair Organisation Future of Life Institute Member of Board Members Biography Max Tegmark is a professor doing AI and physics research at MIT as part of the Institute for Artificial Intelligence & Fundamental Interactions and the Center for Brains, Minds and Machines. He is the author of over 300 publications as well as the New York Times bestsellers “Life 3.0: Being Human in the Age of Artificial Intelligenc"
+    contentLength: 202922
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://www.youtube.com/watch?v=gFQvL3KVaOQ
+    linkText: Max Tegmark Interview - December 2023
+    claimContext: "**<EntityLink id=\"E399\" name=\"agi-timeline\">AGI Timeline</EntityLink> Accuracy**: Tegmark's December 2023 prediction that AGI could arrive \"within three years\" (i.e., by late 2026) has not been definitively validated as of early 2026, though no comprehensive evidence confirms or refutes it either.[^"
+    fetchedAt: 2026-02-22T01:58:46.485Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 68
+    url: https://www.youtube.com/watch?v=hGUUhxNn86M
+    linkText: Max Tegmark on AI Safety Index
+    claimContext: "**Effectiveness of Regulatory Approaches**: Whether Tegmark's advocacy for binding government rules over voluntary industry self-governance will prove effective remains unclear, especially given industry resistance and the \"race to the top\" versus \"race to the bottom\" dynamics he describes.[^68]"
+    fetchedAt: 2026-02-22T01:58:46.513Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 69
+    url: https://scottaaronson.blog/?p=1753
+    linkText: Scott Aaronson - Review of Our Mathematical Universe
+    claimContext: "**Mathematical Universe Hypothesis Testability**: The fundamental question of whether Tegmark's hypothesis is genuinely scientific or unfalsifiable remains contested. His framework allows him to accommodate both simple and complex physics laws, raising questions about what empirical observations cou"
+    fetchedAt: 2026-02-22T01:58:47.398Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; This review of Max Tegmark&#8217;s book also occurs infinitely often in the decimal expansion of π Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The Scientific Case for P≠NP Waiting for BQP Fever &raquo; This review of Max Tegmark"
+    contentLength: 417938
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://futureoflife.org/ai-safety-index-summer-2025/
+    linkText: "FLI AI Safety Index: Summer 2025"
+    claimContext: "**Information Asymmetry Solutions**: Tegmark identifies AI developers' incentives to underreport risks and select lenient testing, but whether mechanisms like the AI Safety Index can overcome these structural problems through transparency and accountability remains to be demonstrated.[^70]"
+    fetchedAt: 2026-02-22T01:58:46.170Z
+    httpStatus: 200
+    pageTitle: 2025 AI Safety Index - Future of Life Institute
+    contentSnippet: "2025 AI Safety Index - Future of Life Institute Skip to content AI Safety Index - Winter 2025 Latest edition Featured in: Semafor, Reuters, Axios, Quartz, NBC News, Mashable, Euro News, LA Times, and more. December 2025 Future of Life Institute AI Safety Index Summer 2025 AI experts rate leading AI companies on key safety and security domains. 17 July 2025 Full report PDF 2-Page Summary Coverage Scorecard Company Company grade & score Anthropic C+ 2.64 OpenAI C 2.10 Google Deepmind C- 1.76 x.AI "
+    contentLength: 840552
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://www.edge.org/response-detail/25344
+    linkText: Edge - Max Tegmark on Infinity
+    claimContext: "**Multiverse Measure Problem**: Tegmark's inflation-based multiverse predictions face what he acknowledges as the \"measure problem\"—infinities yielding useless predictions (infinity/infinity), which he admits \"sabotages physics' predictive power.\" His proposed solution of eliminating infinitely smal"
+    fetchedAt: 2026-02-22T01:58:48.865Z
+    httpStatus: 200
+    pageTitle: Edge.org
+    contentSnippet: "Edge.org Skip to main content Copyright &copy; 2026 By Edge Foundation, Inc. All Rights Reserved. 2014 : WHAT SCIENTIFIC IDEA IS READY FOR RETIREMENT? In the News [ 60 ] | Contributors [ 176 ] | View All Responses [ 183 ] Max Tegmark Physicist, MIT; Researcher, Precision Cosmology; Scientific Director, Foundational Questions Institute; President, Future of Life Institute; Author, Life 3.0 Infinity I was seduced by infinity at an early age. Cantor's diagonality proof that some infinities are bigg"
+    contentLength: 53318
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://forum.effectivealtruism.org/posts/3WEkFjrab9rE2sJaE/which-side-of-the-ai-safety-community-are-you-in
+    linkText: EA Forum - AI Safety Community Camps
+    claimContext: "**Camp Divisions in AI Safety**: Tegmark's identification of factional divides between \"Camp A\" (race to safe superintelligence) and more cautious approaches reflects uncertainty about optimal strategies. Whether his critique of Camp A's dominance in effective altruism will influence resource alloca"
+    fetchedAt: 2026-02-22T01:58:48.678Z
+    httpStatus: 200
+    pageTitle: Which side of the AI safety community are you in? — EA Forum
+    contentSnippet: Which side of the AI safety community are you in? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Which side of the AI safety community are you in? by Greg_Colbourn ⏸️ Oct 23 2025 3 min read 2 12 AI safety Slowing down AI AI governance Superintelligence Frontpage This is a linkpost for https://www.lesswrong.com/posts/zmtqmwetKH4nrxXcE/which-side-of-the-ai-safety-community-are-you-in With dismay, I have to c
+    contentLength: 151388
+    status: verified
+    note: null

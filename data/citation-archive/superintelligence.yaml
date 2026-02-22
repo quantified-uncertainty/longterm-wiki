@@ -1,0 +1,425 @@
+pageId: superintelligence
+verifiedAt: 2026-02-22
+totalCitations: 38
+verified: 30
+broken: 8
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Superintelligence
+    linkText: Superintelligence - Wikipedia
+    claimContext: "**Superintelligence** refers to any intellect that greatly exceeds human cognitive performance across virtually all domains of interest.[^1] The concept encompasses hypothetical AI systems that would surpass human-level intelligence not just in narrow tasks, but in general reasoning, creativity, soc"
+    fetchedAt: 2026-02-22T02:14:10.269Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://publicism.info/philosophy/superintelligence/4.html
+    linkText: "Bostrom, N. (2014). Superintelligence: Paths, Dangers, Strategies. Oxford University Press"
+    claimContext: "Nick Bostrom's 2014 book *Superintelligence: Paths, Dangers, Strategies* established the most widely-used taxonomy, identifying three distinct forms:[^2]"
+    fetchedAt: 2026-02-22T02:14:11.931Z
+    httpStatus: 200
+    pageTitle: "Forms of superintelligence - Superintelligence: Paths, Dangers, Strategies - Nick Bostrom"
+    contentSnippet: "Forms of superintelligence - Superintelligence: Paths, Dangers, Strategies - Nick Bostrom Superintelligence: Paths, Dangers, Strategies - Nick Bostrom (2014) Chapter 3. Forms of superintelligence So what, exactly, do we mean by “superintelligence”? While we do not wish to get bogged down in terminological swamps, something needs to be said to clarify the conceptual ground. This chapter identifies three different forms of superintelligence, and argues that they are, in a practically relevant sens"
+    contentLength: 40444
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.sciencedirect.com/science/article/pii/S0065245808604180
+    linkText: Good, I. J. (1965). Speculations Concerning the First Ultraintelligent Machine. Advances in Computers, 6, 31-88
+    claimContext: The core concept predates modern AI research. In 1965, mathematician I. J. Good published "Speculations Concerning the First Ultraintelligent Machine," defining an ultraintelligent machine as one "that can far surpass all the intellectual activities of any man however clever."[^3] Good noted that "t
+    fetchedAt: 2026-02-22T02:14:10.449Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 4
+    url: https://www.semanticscholar.org/paper/Speculations-Concerning-the-First-Ultraintelligent-Good/d7d9d643a378b6fd69fff63d113f4eae1983adc8
+    linkText: Good, I. J. (1965). Speculations Concerning the First Ultraintelligent Machine
+    claimContext: The core concept predates modern AI research. In 1965, mathematician I. J. Good published "Speculations Concerning the First Ultraintelligent Machine," defining an ultraintelligent machine as one "that can far surpass all the intellectual activities of any man however clever."[^3] Good noted that "t
+    fetchedAt: 2026-02-22T02:14:10.549Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2061
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+    linkText: "Superintelligence: Paths, Dangers, Strategies - Wikipedia"
+    claimContext: The term "superintelligence" gained broader attention following Bostrom's 2014 book, which systematically analyzed potential development paths, capabilities, and control challenges. The book received mixed reception—while influential in AI safety circles, some critics characterized it as "speculatio
+    fetchedAt: 2026-02-22T02:14:10.268Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+    linkText: "Superintelligence: Paths, Dangers, Strategies - Wikipedia"
+    claimContext: The term "superintelligence" gained broader attention following Bostrom's 2014 book, which systematically analyzed potential development paths, capabilities, and control challenges. The book received mixed reception—while influential in AI safety circles, some critics characterized it as "speculatio
+    fetchedAt: 2026-02-22T02:14:12.937Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://en.wikipedia.org/wiki/Recursive_self-improvement
+    linkText: Recursive self-improvement - Wikipedia
+    claimContext: <EntityLink id="E291" name="superintelligence">Recursive self-improvement</EntityLink> (RSI) describes a process where an AI system modifies its own code to enhance its capabilities, which then enables it to make further improvements, potentially leading to rapid capability gains.[^7] This mechanism
+    fetchedAt: 2026-02-22T02:14:12.937Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/Recursive_self-improvement
+    linkText: Recursive self-improvement - Wikipedia
+    claimContext: Current research includes Meta AI's work on self-modifying systems and Google DeepMind's AlphaEvolve, though these remain far from the recursive self-improvement envisioned in superintelligence scenarios.[^8] In December 2025, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> co-founder J
+    fetchedAt: 2026-02-22T02:14:12.949Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://controlai.news/p/the-ultimate-risk-recursive-self
+    linkText: "The Ultimate Risk: Recursive Self-Improvement. Control AI News, December 2025"
+    claimContext: Current research includes Meta AI's work on self-modifying systems and Google DeepMind's AlphaEvolve, though these remain far from the recursive self-improvement envisioned in superintelligence scenarios.[^8] In December 2025, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> co-founder J
+    fetchedAt: 2026-02-22T02:14:13.344Z
+    httpStatus: 200
+    pageTitle: "The Ultimate Risk: Recursive Self-Improvement"
+    contentSnippet: "The Ultimate Risk: Recursive Self-Improvement ControlAI Subscribe Sign in The Ultimate Risk: Recursive Self-Improvement What happens when AI R&D starts snowballing at machine speed? Tolga Bilge and Andrea Miotti Dec 04, 2025 45 14 6 Share Recursive Self-Improvement hits the headlines , as OpenAI writes in a recent blog post that they’re working to develop AI capable of recursive self-improvement, while Anthropic’s chief scientist — at a company racing OpenAI to achieve that — says that doing so "
+    contentLength: 244729
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://arxiv.org/pdf/1502.06512
+    linkText: Yudkowsky, E. (2013). Intelligence Explosion Microeconomics
+    claimContext: 'The intelligence explosion hypothesis, articulated by <EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> and others, posits that "due to recursive self-improvement, an AI can potentially grow in capability on a timescale that seems fast relative to human experience."[^10] '
+    fetchedAt: 2026-02-22T02:14:13.003Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 321493
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://intelligence.org/2021/11/22/yudkowsky-and-christiano-discuss-takeoff-speeds/
+    linkText: Yudkowsky, E., & Christiano, P. (2021). Yudkowsky and Christiano discuss 'Takeoff Speeds'. Machine Intelligence Research Institute, November 22, 2021
+    claimContext: '**Slow takeoff** scenarios describe capability increases occurring over years or decades, allowing society to adapt gradually to changing AI capabilities. In 2021, <EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> and <EntityLink id="E220" name="paul-christiano">Paul Chri'
+    fetchedAt: 2026-02-22T02:14:14.940Z
+    httpStatus: 200
+    pageTitle: Yudkowsky and Christiano discuss "Takeoff Speeds" - Machine Intelligence Research Institute
+    contentSnippet: 'Yudkowsky and Christiano discuss "Takeoff Speeds" - Machine Intelligence Research Institute Skip to content Yudkowsky and Christiano discuss &#8220;Takeoff Speeds&#8221; November 22, 2021 Rob Bensinger This is a transcription of Eliezer Yudkowsky responding to Paul Christiano&#8217;s Takeoff Speeds live on Sep. 14, followed by a conversation between Eliezer and Paul. This discussion took place after Eliezer&#8217;s conversation with Richard Ngo, and was prompted by an earlier request by Richard '
+    contentLength: 203618
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance
+    linkText: Stanford HAI. (2025). Technical Performance - The 2025 AI Index Report
+    claimContext: The 2025 AI Index Report documents rapid capability improvements in specific domains—AI systems increased from solving 4.4% of coding problems in 2023 to 71.7% in 2024 on SWE-bench.[^12] However, on newly designed challenging benchmarks like Humanity's Last Exam, top systems score just 8.80%, sugges
+    fetchedAt: 2026-02-22T02:14:15.201Z
+    httpStatus: 200
+    pageTitle: Technical Performance | The 2025 AI Index Report | Stanford HAI
+    contentSnippet: Technical Performance | The 2025 AI Index Report | Stanford HAI Skip to content 02 Technical Performance Computer Vision Download Full Chapter See Chapter 3 All Chapters Back to Overview 01 Research and Development 02 Technical Performance 03 Responsible AI 04 Economy 05 Science and Medicine 06 Policy and Governance 07 Education 08 Public Opinion 1. AI masters new benchmarks faster than ever. In 2023, AI researchers introduced several challenging new benchmarks, including MMMU, GPQA, and SWE-ben
+    contentLength: 1513028
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance
+    linkText: Stanford HAI. (2025). Technical Performance - The 2025 AI Index Report
+    claimContext: The 2025 AI Index Report documents rapid capability improvements in specific domains—AI systems increased from solving 4.4% of coding problems in 2023 to 71.7% in 2024 on SWE-bench.[^12] However, on newly designed challenging benchmarks like Humanity's Last Exam, top systems score just 8.80%, sugges
+    fetchedAt: 2026-02-22T02:14:15.160Z
+    httpStatus: 200
+    pageTitle: Technical Performance | The 2025 AI Index Report | Stanford HAI
+    contentSnippet: Technical Performance | The 2025 AI Index Report | Stanford HAI Skip to content 02 Technical Performance Computer Vision Download Full Chapter See Chapter 3 All Chapters Back to Overview 01 Research and Development 02 Technical Performance 03 Responsible AI 04 Economy 05 Science and Medicine 06 Policy and Governance 07 Education 08 Public Opinion 1. AI masters new benchmarks faster than ever. In 2023, AI researchers introduced several challenging new benchmarks, including MMMU, GPQA, and SWE-ben
+    contentLength: 1513028
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://nickbostrom.com/superintelligentwill.pdf
+    linkText: "Bostrom, N. (2012). The Superintelligent Will: Motivation and Instrumental Rationality in Advanced Artificial Agents"
+    claimContext: "The orthogonality thesis, formulated by Bostrom, states that intelligence and final goals are orthogonal axes along which artificial intellects can vary independently.[^14] A system could possess any level of intelligence combined with essentially any set of final goals. This challenges assumptions "
+    fetchedAt: 2026-02-22T02:14:14.885Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 509246
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://nickbostrom.com/superintelligentwill.pdf
+    linkText: "Bostrom, N. (2012). The Superintelligent Will: Motivation and Instrumental Rationality in Advanced Artificial Agents"
+    claimContext: "The instrumental convergence thesis posits that agents with sufficient intelligence and diverse final goals will pursue similar intermediate strategies.[^15] These convergent instrumental goals potentially include:"
+    fetchedAt: 2026-02-22T02:14:14.753Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 509246
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://openai.com/index/introducing-superalignment/
+    linkText: OpenAI. (2023). Introducing Superalignment
+    claimContext: The control problem addresses the challenge of ensuring superintelligent systems remain aligned with human values and under human oversight. As <EntityLink id="E218" name="openai">OpenAI</EntityLink> stated in their 2023 superalignment announcement, "we don't have a solution for steering or controll
+    fetchedAt: 2026-02-22T02:14:16.723Z
+    httpStatus: 200
+    pageTitle: Introducing Superalignment | OpenAI
+    contentSnippet: "Introducing Superalignment | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI July 5, 2023 Introducing Superalignment We need scientific and technical breakthroughs to steer and control AI systems much smarter than us. To solve this problem within four years, we’re starting a new team, co-led by Ilya Sutskever and Jan Leike, and dedicating 20% of the compute we’ve secured to date to this effort. We’re looking for excellent "
+    contentLength: 300841
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://humansovereigntyai.substack.com/p/the-control-problem-aligning-superintelligence
+    linkText: "The Control Problem: Aligning Superintelligence. Human Sovereignty AI"
+    claimContext: Three core challenges complicate superintelligence control:[^17]
+    fetchedAt: 2026-02-22T02:14:16.736Z
+    httpStatus: 200
+    pageTitle: "The Control Problem: Aligning Superintelligence"
+    contentSnippet: "The Control Problem: Aligning Superintelligence HumanSovereigntyAI Subscribe Sign in The Control Problem: Aligning Superintelligence Understanding the challenges in today's Control Problem is essential. Dr. Travis Lee Nov 10, 2025 1 1 Share The Control Problem: Aligning Superintelligence The Control Problem is the central challenge of creating advanced artificial intelligence that reliably does what humanity wants it to do, even as its intelligence vastly exceeds our own. The core difficulty isn"
+    contentLength: 237465
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://joecarlsmith.com/2025/02/13/how-do-we-solve-the-alignment-problem/
+    linkText: Carlsmith, J. (2025). How do we solve the alignment problem? February 13, 2025
+    claimContext: Researcher Joe Carlsmith identifies the availability of superhuman strategies—approaches to achieving goals that humans could neither generate nor detect—as a key obstacle to maintaining control.[^18]
+    fetchedAt: 2026-02-22T02:14:16.890Z
+    httpStatus: 200
+    pageTitle: How do we solve the alignment problem? - Joe Carlsmith
+    contentSnippet: "How do we solve the alignment problem? - Joe Carlsmith How do we solve the alignment problem? / Part 1 How do we solve the alignment problem? Last updated: 01.29.2026 Published: 02.13.2025 Series How do we solve the alignment problem? / Part 1 How do we solve the alignment problem? Podcast version here (read by the author), or search for “Joe Carlsmith Audio” on your podcast app. We want the benefits that superintelligent AI agents could create. And some people are trying hard to build such agen"
+    contentLength: 231505
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://publicism.info/philosophy/superintelligence/6.html
+    linkText: "Bostrom, N. (2014). Decisive strategic advantage - Superintelligence: Paths, Dangers, Strategies"
+    claimContext: 'A "decisive strategic advantage" occurs when one project achieves sufficient capability superiority to overcome all opposition and achieve global dominance.[^19] Factors affecting this possibility include:'
+    fetchedAt: 2026-02-22T02:14:17.511Z
+    httpStatus: 200
+    pageTitle: "Decisive strategic advantage - Superintelligence: Paths, Dangers, Strategies - Nick Bostrom"
+    contentSnippet: "Decisive strategic advantage - Superintelligence: Paths, Dangers, Strategies - Nick Bostrom Superintelligence: Paths, Dangers, Strategies - Nick Bostrom (2014) Chapter 5. Decisive strategic advantage A question distinct from, but related to, the question of kinetics is whether there will there be one superintelligent power or many? Might an intelligence explosion propel one project so far ahead of all others as to make it able to dictate the future? Or will progress be more uniform, unfurling ac"
+    contentLength: 44657
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.lesswrong.com/posts/vkjWGJrFWBnzHtxrw/superintelligence-7-decisive-strategic-advantage
+    linkText: "Superintelligence 7: Decisive strategic advantage. LessWrong"
+    claimContext: Bostrom defines a "singleton" as "a single global decision-making agency strong enough to solve all major global coordination problems."[^20] A superintelligent system with decisive strategic advantage might establish singleton control, though this depends on both capability gaps and whether such ad
+    fetchedAt: 2026-02-22T02:14:16.993Z
+    httpStatus: 200
+    pageTitle: "Superintelligence 7: Decisive strategic advantage — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Superintelligence 7: Decisive strategic advantage — LessWrong Superintelligence AI Governance Reading Group AI Personal Blog 24 Superintelligence 7: Decisive strategic advantage by KatjaGrace 28th Oct 2014 7 min read 60 24 This is part of a weekly reading group on Nick Bostrom &#x27;s book, Superintelligence . For more information about the group, and an index of posts"
+    contentLength: 1044670
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.alignmentforum.org/posts/PKy8NuNPknenkDY74/soft-takeoff-can-still-lead-to-decisive-strategic-advantage
+    linkText: Soft takeoff can still lead to decisive strategic advantage. Alignment Forum
+    claimContext: Research suggests that even with gradual AI development (slow takeoff), decisive strategic advantage remains possible after intelligence explosion, as a superintelligent system could leverage qualitative cognitive advantages beyond simple speed increases.[^21]
+    fetchedAt: 2026-02-22T02:14:25.326Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 22
+    url: https://aiimpacts.org/2022-expert-survey-on-progress-in-ai/
+    linkText: AI Impacts. (2022). 2022 Expert Survey on Progress in AI, June-August 2022
+    claimContext: "**2022 Survey**: Surveyed machine learning researchers predicted a 50% probability of high-level machine intelligence (HLMI) by 2059—an aggregate forecast of 37 years from the survey date.[^22]"
+    fetchedAt: 2026-02-22T02:14:18.926Z
+    httpStatus: 200
+    pageTitle: 2022 Expert Survey on Progress in AI &#8211; AI Impacts
+    contentSnippet: 2022 Expert Survey on Progress in AI &#8211; AI Impacts Published 3 August 2022; last updated 3 August 2022 This page is out-of-date. Visit the updated version of this page on our wiki . The 2022 Expert Survey on Progress in AI (2022 ESPAI) is a survey of machine learning researchers that AI Impacts ran in June-August 2022. Contents Details Background The 2022 ESPAI is a rerun of the 2016 Expert Survey on Progress in AI that researchers at AI Impacts previously collaborated on with others. Almos
+    contentLength: 77889
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://wiki.aiimpacts.org/ai_timelines/predictions_of_human-level_ai_timelines/ai_timeline_surveys/2023_expert_survey_on_progress_in_ai
+    linkText: AI Impacts. (2023). 2023 Expert Survey on Progress in AI, October 2023
+    claimContext: "**2023 Survey**: A survey of 2,778 AI researchers in October 2023 reexamined questions from previous surveys regarding timelines for HLMI and full automation of labor.[^23]"
+    fetchedAt: 2026-02-22T02:14:19.177Z
+    httpStatus: 200
+    pageTitle: 2023 Expert Survey on Progress in AI [AI Impacts Wiki]
+    contentSnippet: "2023 Expert Survey on Progress in AI [AI Impacts Wiki] skip to content AI Impacts Wiki User Tools Log In Site Tools Search Tools Show pagesource Old revisions Backlinks Recent Changes Media Manager Sitemap Log In > Recent Changes Media Manager Sitemap You are here: Welcome to the AI Impacts Wiki! » AI timelines portal » Predictions of Human-Level AI Timelines » AI Timeline Surveys » 2023 Expert Survey on Progress in AI ai_timelines:predictions_of_human-level_ai_timelines:ai_timeline_surveys:2023"
+    contentLength: 51946
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://nickbostrom.com/papers/survey.pdf
+    linkText: "Müller, V. C., & Bostrom, N. Future Progress in Artificial Intelligence: A Survey of Expert Opinion"
+    claimContext: A 2012 survey by Vincent Müller and Bostrom at the <EntityLink id="E140" name="fhi">Future of Humanity Institute</EntityLink> found that experts expect systems to move to superintelligence in less than 30 years after achieving human-level AI.[^24] Multiple earlier surveys through 2016 produced media
+    fetchedAt: 2026-02-22T02:14:18.872Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 431188
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://aiimpacts.org/ai-timeline-surveys/
+    linkText: AI Impacts. AI Timeline Surveys
+    claimContext: A 2012 survey by Vincent Müller and Bostrom at the <EntityLink id="E140" name="fhi">Future of Humanity Institute</EntityLink> found that experts expect systems to move to superintelligence in less than 30 years after achieving human-level AI.[^24] Multiple earlier surveys through 2016 produced media
+    fetchedAt: 2026-02-22T02:14:18.921Z
+    httpStatus: 200
+    pageTitle: AI Timeline Surveys &#8211; AI Impacts
+    contentSnippet: "AI Timeline Surveys &#8211; AI Impacts This page is out-of-date. Visit the updated version of this page on our wiki . Published 10 January 2015 We know of twelve surveys on the predicted timing of human-level AI. If we collapse a few slightly different meanings of &#8216;human-level AI&#8217;, then: Median estimates for when there will be a 10% chance of human-level AI are all in the 2020s (from seven surveys), except for the 2016 ESPAI , which found median estimates ranging from 2013 to long af"
+    contentLength: 90666
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.nature.com/articles/d41586-024-01087-4
+    linkText: Nature. (2024). AI now beats humans at basic tasks — new benchmarks are needed
+    claimContext: The 2025 AI Index Report documents areas where AI systems approach or exceed human performance:[^26]
+    fetchedAt: 2026-02-22T02:14:27.744Z
+    httpStatus: 200
+    pageTitle: AI now beats humans at basic tasks — new benchmarks are needed, says major report
+    contentSnippet: AI now beats humans at basic tasks — new benchmarks are needed, says major report Skip to main content Thank you for visiting nature.com. You are using a browser version with limited support for CSS. To obtain the best experience, we recommend you use a more up to date browser (or turn off compatibility mode in Internet Explorer). In the meantime, to ensure continued support, we are displaying the site without styles and JavaScript. Advertisement Email Bluesky Facebook LinkedIn Reddit Whatsapp X
+    contentLength: 273940
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance
+    linkText: Stanford HAI. (2025). Technical Performance - The 2025 AI Index Report
+    claimContext: However, performance varies significantly by task type and time constraints. On short time horizons (two-hour budgets), top AI systems score four times higher than human experts on certain tasks. As time increases to 32 hours, human performance surpasses AI by a ratio of two to one, suggesting curre
+    fetchedAt: 2026-02-22T02:14:26.690Z
+    httpStatus: 200
+    pageTitle: Technical Performance | The 2025 AI Index Report | Stanford HAI
+    contentSnippet: Technical Performance | The 2025 AI Index Report | Stanford HAI Skip to content 02 Technical Performance Computer Vision Download Full Chapter See Chapter 3 All Chapters Back to Overview 01 Research and Development 02 Technical Performance 03 Responsible AI 04 Economy 05 Science and Medicine 06 Policy and Governance 07 Education 08 Public Opinion 1. AI masters new benchmarks faster than ever. In 2023, AI researchers introduced several challenging new benchmarks, including MMMU, GPQA, and SWE-ben
+    contentLength: 1513028
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://openai.com/index/gdpval/
+    linkText: OpenAI. Measuring the performance of our models on real-world tasks (GDPval)
+    claimContext: <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s GDPval benchmark, measuring performance on real-world tasks, found that Claude Opus 4.1 produces outputs as good as or better than humans in just under half of tested tasks, and that GPT-5 performance more than tripled in one year compared to
+    fetchedAt: 2026-02-22T02:14:26.614Z
+    httpStatus: 200
+    pageTitle: Measuring the performance of our models on real-world tasks | OpenAI
+    contentSnippet: Measuring the performance of our models on real-world tasks | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI September 25, 2025 Publication Research Measuring the performance of our models on real-world tasks We’re introducing GDPval, a new evaluation that measures model performance on economically valuable, real-world tasks across 44 occupations. Read the paper (opens in a new window) Visit evals.openai.com (opens in a n
+    contentLength: 433458
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://openai.com/index/governance-of-superintelligence/
+    linkText: OpenAI. Governance of superintelligence
+    claimContext: <EntityLink id="E218" name="openai">OpenAI</EntityLink> has called for governance frameworks for superintelligence development, suggesting that major governments could establish coordinated projects or collectively agree to limit the rate of capability growth at the frontier.[^29]
+    fetchedAt: 2026-02-22T02:14:26.517Z
+    httpStatus: 200
+    pageTitle: Governance of superintelligence | OpenAI
+    contentSnippet: Governance of superintelligence | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI May 22, 2023 Safety Governance of superintelligence Now is a good time to start thinking about the governance of superintelligence—future AI systems dramatically more capable than even AGI. Loading… Share Given the picture as we see it now, it’s conceivable that within the next ten years, AI systems will exceed expert skill level in most doma
+    contentLength: 308005
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://carnegieendowment.org/research/2024/03/envisioning-a-global-regime-complex-to-govern-artificial-intelligence
+    linkText: Carnegie Endowment. (2024). Envisioning a Global Regime Complex to Govern Artificial Intelligence, March 2024
+    claimContext: In 2023, OpenAI cofounders proposed an "IAEA for superintelligence efforts" to govern high-capability systems.[^30] Carnegie Endowment research suggests that rather than a single institutional solution, governance will likely emerge as a regime complex with four functional categories:[^31]
+    fetchedAt: 2026-02-22T02:14:26.910Z
+    httpStatus: 200
+    pageTitle: Envisioning a Global Regime Complex to Govern Artificial Intelligence | Carnegie Endowment for International Peace
+    contentSnippet: "Envisioning a Global Regime Complex to Govern Artificial Intelligence | Carnegie Endowment for International Peace Source : Getty Paper Envisioning a Global Regime Complex to Govern Artificial Intelligence Rather than a single, tidy, institutional solution to govern AI, the world will likely see the emergence of something less elegant: a regime complex, comprising multiple institutions within and across several functional areas. Link Copied By Emma Klein and Stewart Patrick Published on Mar 21, "
+    contentLength: 556303
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://carnegieendowment.org/research/2024/03/envisioning-a-global-regime-complex-to-govern-artificial-intelligence
+    linkText: Carnegie Endowment. (2024). Envisioning a Global Regime Complex to Govern Artificial Intelligence, March 2024
+    claimContext: In 2023, OpenAI cofounders proposed an "IAEA for superintelligence efforts" to govern high-capability systems.[^30] Carnegie Endowment research suggests that rather than a single institutional solution, governance will likely emerge as a regime complex with four functional categories:[^31]
+    fetchedAt: 2026-02-22T02:14:28.832Z
+    httpStatus: 200
+    pageTitle: Envisioning a Global Regime Complex to Govern Artificial Intelligence | Carnegie Endowment for International Peace
+    contentSnippet: "Envisioning a Global Regime Complex to Govern Artificial Intelligence | Carnegie Endowment for International Peace Source : Getty Paper Envisioning a Global Regime Complex to Govern Artificial Intelligence Rather than a single, tidy, institutional solution to govern AI, the world will likely see the emergence of something less elegant: a regime complex, comprising multiple institutions within and across several functional areas. Link Copied By Emma Klein and Stewart Patrick Published on Mar 21, "
+    contentLength: 556303
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://lordslibrary.parliament.uk/superintelligent-ai-should-its-development-be-stopped/
+    linkText: "House of Lords Library. (2025). Superintelligent AI: Should its development be stopped? October 2025"
+    claimContext: The Future of Life Institute organized a statement calling for a global moratorium on superintelligence development until broad scientific consensus exists that it can be developed safely. The statement gathered over 133,000 signatories.[^32] As of October 2025, the UK government was considering pla
+    fetchedAt: 2026-02-22T02:14:29.162Z
+    httpStatus: 200
+    pageTitle: "Superintelligent AI: Should its development be stopped? - House of Lords Library"
+    contentSnippet: "Superintelligent AI: Should its development be stopped? - House of Lords Library Skip to main content Table of contents 1. Definitions and levels of AI skip to link 2. Superintelligent artificial intelligence (ASI) skip to link 2.1 How long could ASI take to develop? skip to link 2.2 Potential benefits and risks of ASI skip to link 3. Regulation and calls for a moratorium skip to link 4. Government policy on AI and ASI skip to link 5. Read more skip to link Approximate read time: 20 minutes The "
+    contentLength: 96262
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://lordslibrary.parliament.uk/superintelligent-ai-should-its-development-be-stopped/
+    linkText: "House of Lords Library. (2025). Superintelligent AI: Should its development be stopped? October 2025"
+    claimContext: The Future of Life Institute organized a statement calling for a global moratorium on superintelligence development until broad scientific consensus exists that it can be developed safely. The statement gathered over 133,000 signatories.[^32] As of October 2025, the UK government was considering pla
+    fetchedAt: 2026-02-22T02:14:29.151Z
+    httpStatus: 200
+    pageTitle: "Superintelligent AI: Should its development be stopped? - House of Lords Library"
+    contentSnippet: "Superintelligent AI: Should its development be stopped? - House of Lords Library Skip to main content Table of contents 1. Definitions and levels of AI skip to link 2. Superintelligent artificial intelligence (ASI) skip to link 2.1 How long could ASI take to develop? skip to link 2.2 Potential benefits and risks of ASI skip to link 3. Regulation and calls for a moratorium skip to link 4. Government policy on AI and ASI skip to link 5. Read more skip to link Approximate read time: 20 minutes The "
+    contentLength: 96262
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.effectivealtruism.org/articles/ea-global-2018-reframing-superintelligence
+    linkText: Drexler, E. (2018). Reframing Superintelligence. EA Global 2018
+    claimContext: Eric Drexler's 2018 presentation at EA Global proposed Comprehensive AI Services (CAIS) as an alternative framework to monolithic superintelligence scenarios. CAIS envisions AI capabilities developing as specialized services rather than unified agents.[^34]
+    fetchedAt: 2026-02-22T02:14:29.479Z
+    httpStatus: 200
+    pageTitle: Reframing Superintelligence | Effective Altruism
+    contentSnippet: "Reframing Superintelligence | Effective Altruism Reframing Superintelligence When people first began to discuss advanced artificial intelligence, existing AI was rudimentary at best, and we had to reply on ideas about human thinking and extrapolate. Now, however, we&#x27;ve developed many different advanced AI systems, some of which outperform human thinking on certain tasks. In this talk from EA Global 2018: London, Eric Drexler argues that we should use this new data to rethink our models for "
+    contentLength: 136726
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://forum.effectivealtruism.org/posts/X627XSeEKxgDKomxQ/the-super-is-in-the-equipment-not-the-intelligence
+    linkText: The 'Super' Is In The Equipment, Not The Intelligence. EA Forum
+    claimContext: Some researchers argue that what is characterized as "superintelligence" actually describes "super-equipped intelligence"—systems with the same cognitive architecture as current AI but with greater resources and faster execution, rather than qualitatively superior intelligence.[^35]
+    fetchedAt: 2026-02-22T02:14:29.112Z
+    httpStatus: 200
+    pageTitle: The "Super" Is In The Equipment, Not The Intelligence — EA Forum
+    contentSnippet: The "Super" Is In The Equipment, Not The Intelligence — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The "Super" Is In The Equipment, Not The Intelligence by bernardj Feb 4 7 min read 0 0 AI safety Building effective altruism AI risk skepticism Criticism of effective altruism Opinion Philosophy of mind Research Superintelligence Frontpage The "Super" Is In The Equipment, Not The Inte
+    contentLength: 211408
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.effectivealtruism.org/articles/ea-global-2018-how-sure-are-we-about-this-ai-stuff
+    linkText: How sure are we about this AI stuff? Effective Altruism, 2018
+    claimContext: Multiple deep learning researchers, including Andrew Ng, have compared concerns about superintelligence to "worrying about overpopulation on Mars," suggesting that current evidence does not support near-term superintelligence scenarios.[^36] Critics note that most writing on AI existential risks com
+    fetchedAt: 2026-02-22T02:14:30.759Z
+    httpStatus: 200
+    pageTitle: How sure are we about this AI stuff? | Effective Altruism
+    contentSnippet: "How sure are we about this AI stuff? | Effective Altruism How sure are we about this AI stuff? It is increasingly clear that artificial intelligence is poised to have a huge impact on the world, potentially of comparable magnitude to the agricultural or industrial revolutions. But what does that actually mean for us today? Should it influence our behavior? In this talk from EA Global 2018: London, Ben Garfinkel makes the case for measured skepticism. A transcript of Ben&#x27;s talk is below, whi"
+    contentLength: 161251
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.effectivealtruism.org/articles/ea-global-2018-how-sure-are-we-about-this-ai-stuff
+    linkText: How sure are we about this AI stuff? Effective Altruism, 2018
+    claimContext: Multiple deep learning researchers, including Andrew Ng, have compared concerns about superintelligence to "worrying about overpopulation on Mars," suggesting that current evidence does not support near-term superintelligence scenarios.[^36] Critics note that most writing on AI existential risks com
+    fetchedAt: 2026-02-22T02:14:31.206Z
+    httpStatus: 200
+    pageTitle: How sure are we about this AI stuff? | Effective Altruism
+    contentSnippet: "How sure are we about this AI stuff? | Effective Altruism How sure are we about this AI stuff? It is increasingly clear that artificial intelligence is poised to have a huge impact on the world, potentially of comparable magnitude to the agricultural or industrial revolutions. But what does that actually mean for us today? Should it influence our behavior? In this talk from EA Global 2018: London, Ben Garfinkel makes the case for measured skepticism. A transcript of Ben&#x27;s talk is below, whi"
+    contentLength: 161251
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
+    linkText: "Superintelligence: Paths, Dangers, Strategies - Wikipedia"
+    claimContext: Some colleagues of Bostrom have argued that nuclear war, nanotechnology, and biotechnology present more immediate and tractable threats than superintelligence.[^38]
+    fetchedAt: 2026-02-22T02:14:30.493Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403

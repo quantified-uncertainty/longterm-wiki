@@ -1,0 +1,194 @@
+pageId: 1day-sooner
+verifiedAt: 2026-02-22
+totalCitations: 17
+verified: 12
+broken: 4
+unverifiable: 1
+citations:
+  - footnote: 1
+    url: https://www.1daysooner.org/what-we-do
+    linkText: 1Day Sooner - What We Do — - Program overview
+    claimContext: "|-----------|------------|----------| | **Focus Area** | Pandemic preparedness + biosecurity policy | Human challenge trials, indoor air quality (far-UVC), advance market commitments, policy advocacy[^1] | | **Funding** | Well-funded from diverse sources | ≈\\$12.8M cumulative (March 2020 - July 2025"
+    fetchedAt: 2026-02-22T02:24:06.807Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 178
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.1daysooner.org/finances-transparency/
+    linkText: 1Day Sooner - Finances & Transparency — - Detailed funding disclosure
+    claimContext: "| **Focus Area** | Pandemic preparedness + biosecurity policy | Human challenge trials, indoor air quality (far-UVC), advance market commitments, policy advocacy[^1] | | **Funding** | Well-funded from diverse sources | ≈\\$12.8M cumulative (March 2020 - July 2025); major donors include Coefficient Gi"
+    fetchedAt: 2026-02-22T02:24:06.800Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 194
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://forum.effectivealtruism.org/posts/pTSqg6MNjNsMPsTT8/retrospective-on-the-california-sb-1308-campaign
+    linkText: Retrospective on California SB 1308 Campaign - EA Forum — - SB 1308 advocacy
+    claimContext: '| **Funding** | Well-funded from diverse sources | ≈\$12.8M cumulative (March 2020 - July 2025); major donors include Coefficient Giving, Founders Pledge, <EntityLink id="schmidt-futures">Schmidt Futures</EntityLink>[^2] | | **Policy Influence** | Growing | SB 1308 California advocacy; Operation War'
+    fetchedAt: 2026-02-22T02:24:06.467Z
+    httpStatus: 200
+    pageTitle: Retrospective on the California SB 1308 Campaign — EA Forum
+    contentSnippet: Retrospective on the California SB 1308 Campaign — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Retrospective on the California SB 1308 Campaign by G_Klw Jan 15 2025 19 min read 7 128 Biosecurity Policy Far-UVC Postmortems & retrospectives US policy Frontpage Retrospective on the California SB 1308 Campaign History of SB 1308 Advocacy Effort Key Takeaways Personal Reflections 7 comme
+    contentLength: 369110
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.1daysooner.org/applying-pull-funding-regulatory-capacity-to-advance-new-biotechnologies-prevent-pandemics-operation-warp-speed-2-0-conference/
+    linkText: Operation Warp Speed 2.0 Conference — - Conference overview
+    claimContext: '| **Funding** | Well-funded from diverse sources | ≈\$12.8M cumulative (March 2020 - July 2025); major donors include Coefficient Giving, Founders Pledge, <EntityLink id="schmidt-futures">Schmidt Futures</EntityLink>[^2] | | **Policy Influence** | Growing | SB 1308 California advocacy; Operation War'
+    fetchedAt: 2026-02-22T02:24:06.798Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 299
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.1daysooner.org/about/our-team/
+    linkText: 1Day Sooner Team — - Staff listing
+    claimContext: "| **Policy Influence** | Growing | SB 1308 California advocacy; Operation Warp Speed 2.0 conferences; FY2025 appropriations advocacy[^3][^4] | | **Team** | Small, mission-driven | Led by co-founders Josh Morrison (President) and Sophie Rose; ≈10-15 staff across multiple program areas[^5] | | **Key O"
+    fetchedAt: 2026-02-22T02:24:06.805Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 187
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://rethinkpriorities.org/publications/air-safety-to-combat-global-catastrophic-biorisks
+    linkText: Air Safety to Combat Global Catastrophic Biorisks - Rethink Priorities — - Air safety research
+    claimContext: '| **Team** | Small, mission-driven | Led by co-founders Josh Morrison (President) and Sophie Rose; ≈10-15 staff across multiple program areas[^5] | | **Key Output** | Air safety research with <EntityLink id="rethink-priorities">Rethink Priorities</EntityLink> | Found that indoor air quality interven'
+    fetchedAt: 2026-02-22T02:24:09.627Z
+    httpStatus: 200
+    pageTitle: Air Safety to Combat Global Catastrophic Biorisks &#x2d; Rethink Priorities
+    contentSnippet: "Air Safety to Combat Global Catastrophic Biorisks &#x2d; Rethink Priorities Air Safety to Combat Global Catastrophic Biorisks &#x2d; Rethink Priorities Skip to content Newsletter Research Database Donate Search Search for: Animal Welfare Identifying the most effective ways to reduce animal suffering, improve welfare standards, and influence positive change for trillions of animals worldwide. Learn more Surveys and Data Analysis Conducting polls, experiments, and focus groups and analyzing data t"
+    contentLength: 258716
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://en.wikipedia.org/wiki/1Day_Sooner
+    linkText: 1Day Sooner - Wikipedia — - Organizational history
+    claimContext: "The name \"1Day Sooner\" reflects the organization's founding thesis: that even getting a vaccine one day sooner could save thousands of lives. By June 2020, volunteers from 162 countries had signed up through the organization to participate in potential COVID-19 challenge trials.[^7]"
+    fetchedAt: 2026-02-22T02:24:07.823Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://www.linkedin.com/in/joshcmorrison/
+    linkText: Josh Morrison LinkedIn — - Background
+    claimContext: 1Day Sooner was co-founded by Josh Morrison and Sophie Rose in March 2020, at the onset of the COVID-19 pandemic. Morrison, a Harvard Law graduate who had previously founded kidney donation advocacy group Waitlist Zero and the Rikers Debate Project, was thinking of starting an advocacy group for hum
+    fetchedAt: 2026-02-22T02:24:07.809Z
+    httpStatus: null
+    pageTitle: null
+    contentSnippet: null
+    contentLength: null
+    status: unverifiable
+    note: Social media domain — cannot verify automatically
+  - footnote: 9
+    url: https://www.openphilanthropy.org/grants/1day-sooner-general-support-may-2020/
+    linkText: Coefficient Giving - 1Day Sooner General Support May 2020 — - Initial grant
+    claimContext: The organization quickly attracted public attention and volunteer signups. Coefficient Giving provided initial funding of \$500,000 in May 2020 (via Waitlist Zero) and \$600,000 in November 2020 for general support.[^9][^10]
+    fetchedAt: 2026-02-22T02:24:14.091Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 10
+    url: https://www.openphilanthropy.org/grants/1day-sooner-general-support-november-2020/
+    linkText: Coefficient Giving - 1Day Sooner General Support November 2020 — - Second grant
+    claimContext: The organization quickly attracted public attention and volunteer signups. Coefficient Giving provided initial funding of \$500,000 in May 2020 (via Waitlist Zero) and \$600,000 in November 2020 for general support.[^9][^10]
+    fetchedAt: 2026-02-22T02:24:14.680Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 11
+    url: https://www.statnews.com/2022/02/09/covid-19-challenge-trial-results-whats-next/
+    linkText: STAT News - COVID-19 Challenge Trial Results — - UK trial results
+    claimContext: The UK became the first country to authorize a COVID-19 human challenge trial in 2021, partly influenced by 1Day Sooner's advocacy and volunteer organizing. Results from the UK trial were published in February 2022, providing novel insights into COVID-19 infection dynamics.[^11]
+    fetchedAt: 2026-02-22T02:24:16.050Z
+    httpStatus: 200
+    pageTitle: Covid-19 challenge trial results can inform new vaccines, therapies| STAT
+    contentSnippet: "Covid-19 challenge trial results can inform new vaccines, therapies| STAT Skip to Main Content R esults from the world’s first Covid-19 challenge trial are (finally) in: In the study, which was conducted by Imperial College London and hVIVO at the Royal Free Hospital in London, each of the 36 participants had drops of fluid containing a tiny amount of SARS-CoV-2, the virus that causes Covid-19, placed in their nostrils. Eighteen became infected, as confirmed by PCR testing, 16 of whom showed sym"
+    contentLength: 144560
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.1daysooner.org/pandemic-preparedness/
+    linkText: 1Day Sooner - Pandemic Preparedness — - Expanded mission
+    claimContext: "- **1Day Africa** program directed by Zach Kafuko - **Biosecurity considerations for challenge trials** research published in academic venues[^1][^12]"
+    fetchedAt: 2026-02-22T02:24:15.729Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 192
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.1daysooner.org/publications/
+    linkText: BMJ Open - Analysis of Controlled Human Infection Studies — - Biosecurity considerations publication
+    claimContext: '- Sponsored a report with the UK Pandemic Ethics Accelerator on "The Ethics of Controlled Human Infection Model Studies for Mitigating Pandemic Risks" - Published biosecurity analysis of challenge trial risks in *BMJ Open* (February 2025), examining onward transmission, information hazards, and chal'
+    fetchedAt: 2026-02-22T02:24:16.520Z
+    httpStatus: 200
+    pageTitle: Research & Publications - 1Day Sooner
+    contentSnippet: Research & Publications - 1Day Sooner Skip to content Equitable partnerships to advance early-phase trials in sub-Saharan Africa Katherine E. Stott, Anthony E. Chirwa, Christine Cole, Kondwani Jambo, Neil French, David G. Lalloo, Marc Henrion, Richard FitzGerald, Zacharia Kafuko, Henry C. Mwandumba, Stephen B. Gordon , and Brian Ngwira (February 11, 2026), Nature Health, &#8220;Equitable partnerships to advance early-phase trials in sub-Saharan Africa&#8221; Early-phase trials (phases 1 and 2) a
+    contentLength: 96691
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://forum.effectivealtruism.org/posts/PB5DhbMKQTtfPjq8E/what-1day-sooner-would-do-with-your-marginal-dollar-1
+    linkText: "EA Forum - What 1Day Sooner Would Do with Your Marginal Dollar: Hepatitis C — - Hep C program"
+    claimContext: "**Hepatitis C Challenge Studies**: A major current priority, with the potential to unlock more than \\$10 million in NIH funding for hepatitis C vaccine development. Hundreds of people worldwide have signed up expressing interest in participating. A workshop is planned for 2026.[^14]"
+    fetchedAt: 2026-02-22T02:24:16.301Z
+    httpStatus: 200
+    pageTitle: "What 1Day Sooner would do with your marginal dollar: Hepatitis C Vaccine Advocacy — EA Forum"
+    contentSnippet: "What 1Day Sooner would do with your marginal dollar: Hepatitis C Vaccine Advocacy — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. What 1Day Sooner would do with your marginal dollar: Hepatitis C Vaccine Advocacy by 1daysooner , Josh Morrison Nov 19 2025 2 min read 0 13 Global health & development Policy 1Day Sooner Giving Season (2025) Global catastrophic risk Marginal Funding Week (2025) Frontpage 1Day Soo"
+    contentLength: 200486
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.1daysooner.org/wp-content/uploads/2023/10/1DayOWS2WhitePaper.pdf
+    linkText: Operation Warp Speed 2.0 White Paper — - Policy recommendations
+    claimContext: "The organization published a white paper with policy recommendations focused on:[^15] - **Regulatory authorization reform**: Streamlining approval processes for pandemic countermeasures"
+    fetchedAt: 2026-02-22T02:24:16.287Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 757000
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://fas.org/publication/how-to-operation-warp-speed/
+    linkText: Federation of American Scientists - How to Replicate Operation Warp Speed — - FAS publication
+    claimContext: Josh Morrison also holds a position at the Federation of American Scientists (FAS), where 1Day Sooner has co-published pandemic preparedness policy proposals including "How to Replicate the Success of Operation Warp Speed."[^16]
+    fetchedAt: 2026-02-22T02:24:18.170Z
+    httpStatus: 200
+    pageTitle: How to Replicate the Success of Operation Warp Speed - Federation of American Scientists
+    contentSnippet: How to Replicate the Success of Operation Warp Speed - Federation of American Scientists Operation Warp Speed (OWS) was a public-private partnership that produced COVID-19 vaccines in the unprecedented timeline of less than one year. This unique success among typical government research and development (R&D) programs is attributed to OWS’s strong public-private partnerships, effective coordination, and command leadership structure. Policy entrepreneurs, leaders of federal agencies, and issue adv
+    contentLength: 141739
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.openphilanthropy.org/grants/1day-sooner-general-support-2023/
+    linkText: Coefficient Giving - 1Day Sooner General Support 2023 — - 2023 grant
+    claimContext: Coefficient Giving (now Coefficient Giving) has provided ≈\$4.6M to 1Day Sooner's 501(c)(3) — roughly 36% of cumulative funding — plus \$1M separately to 1Day Action (the 501(c)(4) entity). The \$4.6M Coefficient Giving line in the table above represents the total from OP, which includes these ident
+    fetchedAt: 2026-02-22T02:24:23.582Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429

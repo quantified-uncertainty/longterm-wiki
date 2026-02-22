@@ -1,0 +1,766 @@
+pageId: nist-ai
+verifiedAt: 2026-02-22
+totalCitations: 69
+verified: 68
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.nist.gov/artificial-intelligence
+    linkText: NIST Artificial Intelligence Overview
+    claimContext: The **National Institute of Standards and Technology (NIST)** is a U.S. Department of Commerce agency that has become central to American artificial intelligence governance through its development of measurement standards, risk management frameworks, and safety guidelines.[^1] Founded in 1901 as the
+    fetchedAt: 2026-02-22T01:56:52.176Z
+    httpStatus: 200
+    pageTitle: Artificial intelligence | NIST
+    contentSnippet: Artificial intelligence | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/artificial-intelligence Artificial intelligence Sign Up to Get NIST News GovDelivery Artificial intelligence Topics AI Test, E
+    contentLength: 100024
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.nist.gov/timeline
+    linkText: NIST Timeline
+    claimContext: The **National Institute of Standards and Technology (NIST)** is a U.S. Department of Commerce agency that has become central to American artificial intelligence governance through its development of measurement standards, risk management frameworks, and safety guidelines.[^1] Founded in 1901 as the
+    fetchedAt: 2026-02-22T01:56:52.264Z
+    httpStatus: 200
+    pageTitle: NIST Timeline | NIST
+    contentSnippet: NIST Timeline | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/timeline NIST Timeline Was this page helpful?
+    contentLength: 158934
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.nist.gov/itl/ai-risk-management-framework
+    linkText: NIST AI Risk Management Framework
+    claimContext: "NIST's core AI mission focuses on promoting \"trustworthy AI\" through science-based standards and voluntary frameworks rather than regulation.[^3] The agency emphasizes that \"safety breeds trust, trust enables adoption, and adoption accelerates innovation\" as its guiding principle.[^4] This approach "
+    fetchedAt: 2026-02-22T01:56:52.171Z
+    httpStatus: 200
+    pageTitle: AI Risk Management Framework | NIST
+    contentSnippet: "AI Risk Management Framework | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/itl/ai-risk-management-framework Information Technology Laboratory AI Risk Management Framework Quick Links Download the "
+    contentLength: 91118
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.nist.gov/document/aisi-strategic-vision-document
+    linkText: AISI Strategic Vision Document
+    claimContext: "NIST's core AI mission focuses on promoting \"trustworthy AI\" through science-based standards and voluntary frameworks rather than regulation.[^3] The agency emphasizes that \"safety breeds trust, trust enables adoption, and adoption accelerates innovation\" as its guiding principle.[^4] This approach "
+    fetchedAt: 2026-02-22T01:56:52.518Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 349118
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.nist.gov/news-events/news/2024/02/us-commerce-secretary-gina-raimondo-announces-key-executive-leadership-us
+    linkText: "NIST News: Commerce Secretary Announces AISI Leadership"
+    claimContext: The agency's influence expanded significantly with the October 2023 Executive Order on Safe, Secure, and Trustworthy AI, which established the **U.S. AI Safety Institute (AISI)** within NIST and gave the agency new mandates for AI system evaluation, red-teaming, and international standards coordinat
+    fetchedAt: 2026-02-22T01:56:51.913Z
+    httpStatus: 200
+    pageTitle: U.S. Commerce Secretary Gina Raimondo Announces Key Executive Leadership at U.S. AI Safety Institute | NIST
+    contentSnippet: U.S. Commerce Secretary Gina Raimondo Announces Key Executive Leadership at U.S. AI Safety Institute | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2024/02/us-commerce-secretary-gi
+    contentLength: 86281
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.nist.gov/itl/about-itl/itl-history-timeline
+    linkText: NIST ITL About ITL - ITL History Timeline
+    claimContext: While NIST has conducted computing research since the mid-1960s—including developing MAGIC, one of the first intelligent computer graphics terminals—its explicit focus on artificial intelligence emerged much later.[^6] The agency's Information Technology Laboratory (ITL) built capabilities in crypto
+    fetchedAt: 2026-02-22T01:56:53.563Z
+    httpStatus: 200
+    pageTitle: ITL History Timeline 1950-Present | NIST
+    contentSnippet: ITL History Timeline 1950-Present | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/itl/about-itl/itl-history-timeline Information Technology Laboratory Connect with us GovDelivery X (Twitter) ITL His
+    contentLength: 127879
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://csrc.nist.gov/nist-cyber-history
+    linkText: NIST Cyber History
+    claimContext: While NIST has conducted computing research since the mid-1960s—including developing MAGIC, one of the first intelligent computer graphics terminals—its explicit focus on artificial intelligence emerged much later.[^6] The agency's Information Technology Laboratory (ITL) built capabilities in crypto
+    fetchedAt: 2026-02-22T01:56:54.043Z
+    httpStatus: 200
+    pageTitle: NIST Cybersecurity Program History and Timeline | CSRC
+    contentSnippet: "NIST Cybersecurity Program History and Timeline | CSRC --> You are viewing this page in an unauthorized frame window. This is a potential security issue, you are being redirected to https://csrc.nist.gov . Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock icon ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure "
+    contentLength: 34688
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.nist.gov/artificial-intelligence/ai-research
+    linkText: NIST Artificial Intelligence - AI Research
+    claimContext: NIST's dedicated AI program began taking shape around 2016-2018 with the **Fundamental and Applied Research and Standards for AI Technologies (FARSAIT)** initiative.[^8] This program aimed to develop comprehensive guidance on trustworthy AI systems, including terminology, taxonomy, and measurement a
+    fetchedAt: 2026-02-22T01:56:53.556Z
+    httpStatus: 200
+    pageTitle: AI Research | NIST
+    contentSnippet: "AI Research | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/artificial-intelligence/ai-research Artificial intelligence AI Research Share Facebook Linkedin X.com Email Credit: N. Hanacek/NIST Artifi"
+    contentLength: 87899
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.paloaltonetworks.com/cyberpedia/nist-ai-risk-management-framework
+    linkText: NIST AI RMF - Palo Alto Networks Cyberpedia
+    claimContext: The agency's AI work accelerated dramatically with the release of the **AI Risk Management Framework (AI RMF 1.0)** in January 2023, following extensive public consultation.[^9] This voluntary framework provided organizations with a structured approach to managing AI risks through four core function
+    fetchedAt: 2026-02-22T01:56:54.070Z
+    httpStatus: 200
+    pageTitle: NIST AI Risk Management Framework (AI RMF) - Palo Alto Networks
+    contentSnippet: "NIST AI Risk Management Framework (AI RMF) - Palo Alto Networks Deploy Bravely — Secure your AI transformation with Prisma AIRS Table of Contents How to Secure AI Infrastructure: A Secure by Design Guide What created the need for AI infrastructure security? What is secure by design AI? 1. Secure the AI data pipeline 2. Secure model training environments 3. Protect model artifacts 4. Harden model deployment infrastructure 5. Defend inference-time operations 6. Monitor and respond continuously 7. "
+    contentLength: 646995
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://auditboard.com/blog/nist-ai-rmf
+    linkText: NIST AI RMF - AuditBoard Blog
+    claimContext: The agency's AI work accelerated dramatically with the release of the **AI Risk Management Framework (AI RMF 1.0)** in January 2023, following extensive public consultation.[^9] This voluntary framework provided organizations with a structured approach to managing AI risks through four core function
+    fetchedAt: 2026-02-22T01:56:55.318Z
+    httpStatus: 200
+    pageTitle: "Safeguard the Future of AI: The Core Functions of the NIST AI RMF"
+    contentSnippet: "Safeguard the Future of AI: The Core Functions of the NIST AI RMF March 8, 2025 • 31 min read Safeguard the Future of AI: The Core Functions of the NIST AI RMF Emily Villanueva ON THIS PAGE Overview of AI and Risk Management NIST AI RMF: Purpose and Background AI RMF as a Voluntary Guideline to Manage Risks What are the Core Functions of the NIST AI RMF? What are the Primary Characteristics of Trustworthy AI Systems? What Are Some Use Cases of NIST AI RMF? NIST AI RMF 1.0 and Subcategories Manag"
+    contentLength: 353696
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://techpolicy.press/unpacking-new-nist-guidance-on-artificial-intelligence
+    linkText: "Tech Policy Press: Unpacking New NIST Guidance on AI"
+    claimContext: The October 30, 2023 Executive Order on Safe, Secure, and Trustworthy AI transformed NIST's role by establishing the **U.S. AI Safety Institute (AISI)** within the agency.[^11] AISI published an initial draft report for Managing the Risk of Misuse for Dual-Use Foundation Models (AI 800-1).[^12]
+    fetchedAt: 2026-02-22T01:56:58.111Z
+    httpStatus: 200
+    pageTitle: Unpacking New NIST Guidance on Artificial Intelligence | TechPolicy.Press
+    contentSnippet: "Unpacking New NIST Guidance on Artificial Intelligence | TechPolicy.Press Unpacking New NIST Guidance on Artificial Intelligence Gabby Miller / Aug 2, 2024 President Joe Biden announcing his Executive Order on the Safe, Secure, and Trustworthy Development and Use of Artificial Intelligence on Oct. 30, 2023. Source: The White House . Last Friday marked the 270-day deadline for a raft of publications released by the National Institute of Standards and Technology (NIST) as part of US President Joe "
+    contentLength: 169703
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.nist.gov/document/aisi-strategic-vision-document
+    linkText: AISI Strategic Vision Document
+    claimContext: The October 30, 2023 Executive Order on Safe, Secure, and Trustworthy AI transformed NIST's role by establishing the **U.S. AI Safety Institute (AISI)** within the agency.[^11] AISI published an initial draft report for Managing the Risk of Misuse for Dual-Use Foundation Models (AI 800-1).[^12]
+    fetchedAt: 2026-02-22T01:56:56.593Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 349118
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.nist.gov/news-events/news/2024/02/us-commerce-secretary-gina-raimondo-announces-key-executive-leadership-us
+    linkText: "NIST News: Commerce Secretary Announces AISI Leadership"
+    claimContext: In February 2024, Commerce Secretary Gina Raimondo announced the inaugural leadership team, appointing **Elizabeth Kelly** as director and **Elham Tabassi** as chief technology officer.[^13] The team expanded with five additional senior leaders, including **<EntityLink id="paul-christiano">Paul Chri
+    fetchedAt: 2026-02-22T01:56:56.359Z
+    httpStatus: 200
+    pageTitle: U.S. Commerce Secretary Gina Raimondo Announces Key Executive Leadership at U.S. AI Safety Institute | NIST
+    contentSnippet: U.S. Commerce Secretary Gina Raimondo Announces Key Executive Leadership at U.S. AI Safety Institute | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2024/02/us-commerce-secretary-gi
+    contentLength: 86281
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.nextgov.com/artificial-intelligence/2024/04/nist-adds-5-new-members-its-ai-safety-institute/395783/
+    linkText: "Nextgov: NIST Adds 5 New Members to AI Safety Institute"
+    claimContext: In February 2024, Commerce Secretary Gina Raimondo announced the inaugural leadership team, appointing **Elizabeth Kelly** as director and **Elham Tabassi** as chief technology officer.[^13] The team expanded with five additional senior leaders, including **<EntityLink id="paul-christiano">Paul Chri
+    fetchedAt: 2026-02-22T01:56:57.476Z
+    httpStatus: 200
+    pageTitle: NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW
+    contentSnippet: "NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor content GovExec TV: Five Ques"
+    contentLength: 135940
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.paloaltonetworks.com/cyberpedia/nist-ai-risk-management-framework
+    linkText: NIST AI RMF - Palo Alto Networks Cyberpedia
+    claimContext: The AI RMF represents NIST's flagship contribution to <EntityLink id="ai-governance">AI governance</EntityLink>. Initiated in 2021 and released in January 2023, the framework addresses trustworthy AI attributes including validity, reliability, safety, security, and resilience.[^15] On July 26, 2024,
+    fetchedAt: 2026-02-22T01:56:56.410Z
+    httpStatus: 200
+    pageTitle: NIST AI Risk Management Framework (AI RMF) - Palo Alto Networks
+    contentSnippet: "NIST AI Risk Management Framework (AI RMF) - Palo Alto Networks Deploy Bravely — Secure your AI transformation with Prisma AIRS Table of Contents How to Secure AI Infrastructure: A Secure by Design Guide What created the need for AI infrastructure security? What is secure by design AI? 1. Secure the AI data pipeline 2. Secure model training environments 3. Protect model artifacts 4. Harden model deployment infrastructure 5. Defend inference-time operations 6. Monitor and respond continuously 7. "
+    contentLength: 646995
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.nist.gov/itl/ai-risk-management-framework
+    linkText: NIST AI Risk Management Framework
+    claimContext: The AI RMF represents NIST's flagship contribution to <EntityLink id="ai-governance">AI governance</EntityLink>. Initiated in 2021 and released in January 2023, the framework addresses trustworthy AI attributes including validity, reliability, safety, security, and resilience.[^15] On July 26, 2024,
+    fetchedAt: 2026-02-22T01:56:59.162Z
+    httpStatus: 200
+    pageTitle: AI Risk Management Framework | NIST
+    contentSnippet: "AI Risk Management Framework | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/itl/ai-risk-management-framework Information Technology Laboratory AI Risk Management Framework Quick Links Download the "
+    contentLength: 91118
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.paloaltonetworks.com/cyberpedia/nist-ai-risk-management-framework
+    linkText: NIST AI RMF - Palo Alto Networks Cyberpedia
+    claimContext: "At its core, the AI RMF is built on four functions: Govern, Map, Measure, and Manage, providing a systematic approach to improving the robustness and reliability of AI systems.[^17] Updated guidance released in 2025 expanded the framework to address supply chain vulnerabilities, model provenance, da"
+    fetchedAt: 2026-02-22T01:56:59.220Z
+    httpStatus: 200
+    pageTitle: NIST AI Risk Management Framework (AI RMF) - Palo Alto Networks
+    contentSnippet: "NIST AI Risk Management Framework (AI RMF) - Palo Alto Networks Deploy Bravely — Secure your AI transformation with Prisma AIRS Table of Contents How to Secure AI Infrastructure: A Secure by Design Guide What created the need for AI infrastructure security? What is secure by design AI? 1. Secure the AI data pipeline 2. Secure model training environments 3. Protect model artifacts 4. Harden model deployment infrastructure 5. Defend inference-time operations 6. Monitor and respond continuously 7. "
+    contentLength: 646995
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.ispartnersllc.com/blog/nist-ai-rmf-2025-updates-what-you-need-to-know-about-the-latest-framework-changes/
+    linkText: "ISPartners: NIST AI RMF 2025 Updates"
+    claimContext: "At its core, the AI RMF is built on four functions: Govern, Map, Measure, and Manage, providing a systematic approach to improving the robustness and reliability of AI systems.[^17] Updated guidance released in 2025 expanded the framework to address supply chain vulnerabilities, model provenance, da"
+    fetchedAt: 2026-02-22T01:57:00.200Z
+    httpStatus: 200
+    pageTitle: "NIST AI RMF 2025 Updates: What You Need to Know About the Latest Framework Changes"
+    contentSnippet: "NIST AI RMF 2025 Updates: What You Need to Know About the Latest Framework Changes Skip to content NIST AI RMF 2025 Updates: What You Need to Know About the Latest Framework Changes Written by John DeCesare Published on November 11, 2025 Share this article! Solutions SOC SOC 1 Ensure financial data security for clients and partners. SOC 2 Readiness Save you time and money by ensuring you&#039;re fully prepared for your SOC 2 audit. SOC 2 Prove to your customers & vendors that you handle their da"
+    contentLength: 558820
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.nist.gov/document/aisi-strategic-vision-document
+    linkText: AISI Strategic Vision Document
+    claimContext: "AISI operates with three core goals: advancing AI safety science through model testing and red-teaming, disseminating safety practices through guidelines and tools, and supporting stakeholder coordination.[^19] The institute established the **AI Safety Institute Consortium (AISIC)** in February 2024"
+    fetchedAt: 2026-02-22T01:56:59.390Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 349118
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.huschblackwell.com/newsandinsights/nist-introduces-the-leaders-of-the-artificial-intelligence-safety-institute-and-announces-the-institutes-ai-consortium
+    linkText: "Husch Blackwell: NIST Introduces AI Safety Institute Leaders and Consortium"
+    claimContext: "AISI operates with three core goals: advancing AI safety science through model testing and red-teaming, disseminating safety practices through guidelines and tools, and supporting stakeholder coordination.[^19] The institute established the **AI Safety Institute Consortium (AISIC)** in February 2024"
+    fetchedAt: 2026-02-22T01:56:59.844Z
+    httpStatus: 200
+    pageTitle: NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium | Husch Blackwell
+    contentSnippet: "NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium | Husch Blackwell Skip to Main Content Thought Leadership NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium NIST Debuts the Initial Steps to Tackle the Challenges of AI Published: February 12, 2024 Related Service: Artificial Intelligence Subscribe to Our Mailing List > Insight Share on LinkedIn Share via E"
+    contentLength: 46709
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure
+    linkText: "NIST News: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure"
+    claimContext: In practice, AISI focuses on developing evaluation approaches for frontier AI models, conducting security assessments, and creating measurement tools. The **Center for AI Standards and Innovation (CAISI)**, previously named the U.S. AI Safety Institute, leads evaluations of U.S. and adversary AI sys
+    fetchedAt: 2026-02-22T01:57:01.286Z
+    httpStatus: 200
+    pageTitle: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST
+    contentSnippet: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical
+    contentLength: 89725
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.nist.gov/artificial-intelligence/nist-ai-consortium
+    linkText: NIST AI Consortium
+    claimContext: "The **NIST AI Consortium** represents a major public-private partnership, with over 280 organizations from industry, academia, and civil society participating through Cooperative Research and Development Agreements (CRADAs).[^22] The consortium develops science-based guidelines and standards for AI "
+    fetchedAt: 2026-02-22T01:57:01.297Z
+    httpStatus: 200
+    pageTitle: NIST AI Consortium | NIST
+    contentSnippet: "NIST AI Consortium | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/artificial-intelligence/nist-ai-consortium Artificial intelligence NIST AI Consortium The Consortium brings together more than 280 "
+    contentLength: 78596
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.ansi.org/standards-news/all-news/3-27-25-nist-launches-pilot-project-to-propel-ai-innovation
+    linkText: "ANSI News: NIST Launches Pilot Project to Propel AI Innovation"
+    claimContext: In March 2025, NIST launched the **AI Standards "Zero Drafts" Pilot Project**, an innovative approach to accelerate standards development.[^23] The project creates preliminary stakeholder-driven drafts on topics like AI risk management, transparency, and procurement, which are then submitted to form
+    fetchedAt: 2026-02-22T01:57:03.129Z
+    httpStatus: 200
+    pageTitle: NIST Launches Pilot Project to Propel AI Innovation, Accelerate Standards Development
+    contentSnippet: NIST Launches Pilot Project to Propel AI Innovation, Accelerate Standards Development NIST Launches Pilot Project to Propel AI Innovation, Accelerate Standards Development 3/27/2025 Agency Seeks Public Input on AI Standards Zero Drafts Process The National Institute of Standards and Technology (NIST) is seeking input on its newly launched pilot project, &ldquo;AI Standards Zero Drafts,&rdquo; which aims to expand participation in AI standards development and help standards developing organizatio
+    contentLength: 150211
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-5.pdf
+    linkText: "NIST AI 100-5: A Plan for Global Engagement on AI Standards (PDF)"
+    claimContext: NIST also released a **Global AI Standards Engagement Plan (NIST AI 100-5)** in July 2024, outlining the agency's approach to international AI standards development.[^24] The plan addresses both "horizontal" (cross-sector) and "vertical" (sector-specific) standards needs, aiming to ensure scientific
+    fetchedAt: 2026-02-22T01:57:01.693Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1083152
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.nist.gov/artificial-intelligence/ai-research
+    linkText: NIST Artificial Intelligence - AI Research
+    claimContext: NIST's research portfolio includes applied AI work in advanced materials discovery, robotic manufacturing, wireless systems, and cybersecurity.[^25] The agency released **Dioptra**, an open-source software tool for adversarial AI testing, enabling organizations to evaluate how adversarial attacks af
+    fetchedAt: 2026-02-22T01:57:01.519Z
+    httpStatus: 200
+    pageTitle: AI Research | NIST
+    contentSnippet: "AI Research | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/artificial-intelligence/ai-research Artificial intelligence AI Research Share Facebook Linkedin X.com Email Credit: N. Hanacek/NIST Artifi"
+    contentLength: 87899
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.kslaw.com/news-and-insights/nist-releases-series-of-ai-guidelines-software-in-ongoing-response-to-ai-executive-order
+    linkText: "King & Spalding: NIST Releases Series of AI Guidelines, Software"
+    claimContext: NIST's research portfolio includes applied AI work in advanced materials discovery, robotic manufacturing, wireless systems, and cybersecurity.[^25] The agency released **Dioptra**, an open-source software tool for adversarial AI testing, enabling organizations to evaluate how adversarial attacks af
+    fetchedAt: 2026-02-22T01:57:05.102Z
+    httpStatus: 200
+    pageTitle: NIST Releases Series of AI Guidelines & Software in Ongoing Response to AI Executive Order - King & Spalding
+    contentSnippet: "NIST Releases Series of AI Guidelines & Software in Ongoing Response to AI Executive Order - King & Spalding News back News All News Cases & Deals In the News Press Releases Recognitions Events back Events All Events Conferences Speaking Engagements Webinars Insights back Insights All Insights Newsletters Client Alerts Thought Leadership Articles Feature BLOGS Auditor Liability Bulletin ESG Excellence News & Insights Subscribe Client Alert August 12, 2024 NIST Releases Series of AI Guidelines & "
+    contentLength: 44377
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure
+    linkText: "NIST News: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure"
+    claimContext: "In December 2025, NIST announced a \\$20 million partnership with **MITRE Corporation** to establish two research centers: the **AI Economic Security Center for U.S. Manufacturing Productivity** and the **AI Economic Security Center to Secure U.S. Critical Infrastructure from Cyberthreats**.[^27] The"
+    fetchedAt: 2026-02-22T01:57:04.224Z
+    httpStatus: 200
+    pageTitle: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST
+    contentSnippet: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical
+    contentLength: 89725
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.cmu.edu/news/stories/archives/2024/september/nist-awards-6m-to-carnegie-mellon-university-to-establish-ai-cooperative-research-center
+    linkText: "CMU News: NIST Awards \\$6M to Carnegie Mellon University"
+    claimContext: 'Additional partnerships include a \$6 million center with Carnegie Mellon University for <EntityLink id="cooperative-ai">cooperative AI</EntityLink> testing and evaluation research,[^28] and over \$1.8 million in Small Business Innovation Research (SBIR) awards to 18 companies developing AI-related '
+    fetchedAt: 2026-02-22T01:57:04.959Z
+    httpStatus: 200
+    pageTitle: NIST Awards $6M to Carnegie Mellon University To Establish AI Cooperative Research Center - News - Carnegie Mellon University
+    contentSnippet: NIST Awards $6M to Carnegie Mellon University To Establish AI Cooperative Research Center - News - Carnegie Mellon University Skip to main content September 30, 2024 NIST Awards $6M to Carnegie Mellon University To Establish AI Cooperative Research Center Share on Facebook (opens in new window) Share on X (opens in new window) Share on LinkedIn (opens in new window) Print this page Share by email Media Inquiries Name Peter Kerwin Title University Communications & Marketing Email Phone 412-268-11
+    contentLength: 121119
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.nist.gov/news-events/news/2025/08/nist-awards-over-18-million-small-businesses-advancing-ai-semiconductors
+    linkText: "NIST News: NIST Awards Over \\$1.8 Million to Small Businesses"
+    claimContext: 'Additional partnerships include a \$6 million center with Carnegie Mellon University for <EntityLink id="cooperative-ai">cooperative AI</EntityLink> testing and evaluation research,[^28] and over \$1.8 million in Small Business Innovation Research (SBIR) awards to 18 companies developing AI-related '
+    fetchedAt: 2026-02-22T01:57:04.233Z
+    httpStatus: 200
+    pageTitle: NIST Awards Over $1.8 Million to Small Businesses Advancing AI, Semiconductors, Additive Manufacturing and More | NIST
+    contentSnippet: NIST Awards Over $1.8 Million to Small Businesses Advancing AI, Semiconductors, Additive Manufacturing and More | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2025/08/nist-awards-o
+    contentLength: 96907
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.jdsupra.com/legalnews/ai-risk-meets-cyber-governance-nist-s-3580524/
+    linkText: "JD Supra: AI Risk Meets Cyber Governance - NIST's Cybersecurity Framework Profile"
+    claimContext: On December 16, 2025, NIST released a preliminary draft of its **Cybersecurity Framework Profile for Artificial Intelligence (Cyber AI Profile, NISTIR 8596)**.[^30] This profile maps three AI focus areas—Secure (managing AI system cybersecurity risks), Defend (using AI to enhance cybersecurity), and
+    fetchedAt: 2026-02-22T01:57:05.341Z
+    httpStatus: 200
+    pageTitle: "AI Risk Meets Cyber Governance: NIST’s Draft Cyber AI Profile | Goodwin - JDSupra"
+    contentSnippet: "--> AI Risk Meets Cyber Governance: NIST’s Draft Cyber AI Profile | Goodwin - JDSupra January 29, 2026 AI Risk Meets Cyber Governance: NIST’s Draft Cyber AI Profile Corey Berman , Kaitlin Betancourt , Peter Marta , L. Judson Welle Goodwin + Follow x Following x Following - Unfollow Contact LinkedIn Facebook X Send Embed To embed, copy and paste the code into your website or blog: On December 16, 2025, the National Institute of Standards and Technology (&ldquo;NIST&rdquo;), a non-regulatory feder"
+    contentLength: 145956
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.insideprivacy.com/artificial-intelligence/nist-publishes-preliminary-draft-of-cybersecurity-framework-profile-for-artificial-intelligence-for-public-comment/
+    linkText: "Inside Privacy: NIST Publishes Preliminary Draft of Cybersecurity Framework Profile for AI"
+    claimContext: On December 16, 2025, NIST released a preliminary draft of its **Cybersecurity Framework Profile for Artificial Intelligence (Cyber AI Profile, NISTIR 8596)**.[^30] This profile maps three AI focus areas—Secure (managing AI system cybersecurity risks), Defend (using AI to enhance cybersecurity), and
+    fetchedAt: 2026-02-22T01:57:06.791Z
+    httpStatus: 200
+    pageTitle: NIST Publishes Preliminary Draft of Cybersecurity Framework Profile for Artificial Intelligence for Public Comment | Inside Privacy
+    contentSnippet: NIST Publishes Preliminary Draft of Cybersecurity Framework Profile for Artificial Intelligence for Public Comment | Inside Privacy Skip to content On December 16, 2025, the U.S. National Institute of Standards and Technology (&ldquo;NIST&rdquo;) published a preliminary draft of the Cybersecurity Framework Profile for Artificial Intelligence (&ldquo;Cyber AI Profile&rdquo; or &ldquo;Profile&rdquo;). According to the draft, the Cyber AI Profile is intended to &ldquo;provide guidelines for managin
+    contentLength: 141828
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.crowell.com/en/insights/client-alerts/nist-releases-draft-framework-for-ai-cybersecurity-solicits-public-comment-what-organizations-using-or-deploying-ai-should-know
+    linkText: "Crowell: NIST Releases Draft Framework for AI Cybersecurity"
+    claimContext: The profile addresses securing AI dependencies, integrating AI risks into organizational risk tolerance, deploying AI-augmented security teams, and detecting threats in supplier models. Public comments were solicited through January 30, 2026.[^32]
+    fetchedAt: 2026-02-22T01:57:06.755Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 33
+    url: https://www.ropesdataphiles.com/2024/12/a-very-merry-nistmas-2024-updates-to-the-cybersecurity-and-ai-framework/
+    linkText: "Ropes Data Philes: A Very Merry NISTmas - 2024 Updates"
+    claimContext: NIST's AI work operates on federal appropriations, which have faced constraints despite expanded mandates. The agency's overall annual budget is approximately \$1-1.3 billion, with the President's FY 2025 budget requesting \$47.7 million specifically for AI research, testing infrastructure, risk man
+    fetchedAt: 2026-02-22T01:57:07.329Z
+    httpStatus: 200
+    pageTitle: "A Very Merry NISTmas: 2024 Updates to the Cybersecurity and AI Framework | RopesDataPhiles"
+    contentSnippet: "A Very Merry NISTmas: 2024 Updates to the Cybersecurity and AI Framework | RopesDataPhiles Skip to content The National Institute of Standards and Technology (NIST) has been a leading voice in cybersecurity standards since 2013, when President Obama’s Executive Order on Improving Critical Infrastructure Cybersecurity tasked NIST, which is embedded within the Department of Commerce, with developing and updating a cybersecurity framework for reducing cyber risks to critical infrastructure. The fir"
+    contentLength: 97968
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://fas.org/publication/nist-foundation/
+    linkText: "FAS: NIST Foundation"
+    claimContext: However, funding has consistently fallen short of requests since FY 2022. The Fiscal Responsibility Act of 2023 set discretionary spending limits through FY 2029, further constraining available resources.[^34] This persistent underfunding has prompted discussions about establishing an "agency-relate
+    fetchedAt: 2026-02-22T01:57:06.765Z
+    httpStatus: 200
+    pageTitle: A NIST Foundation to Support the Agency’s AI Mandate
+    contentSnippet: A NIST Foundation to Support the Agency’s AI Mandate The National Institute of Standards and Technology (NIST) faces several obstacles to advancing its mission on artificial intelligence (AI) at a time when the field is rapidly advancing and consequences for falling short are wide-reaching. To enable NIST to quickly and effectively respond, Congress should authorize the establishment of a NIST Foundation to unlock additional resources, expertise, flexible funding mechanisms, and innovation, whil
+    contentLength: 116756
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://fas.org/publication/nist-foundation/
+    linkText: "FAS: NIST Foundation"
+    claimContext: However, funding has consistently fallen short of requests since FY 2022. The Fiscal Responsibility Act of 2023 set discretionary spending limits through FY 2029, further constraining available resources.[^34] This persistent underfunding has prompted discussions about establishing an "agency-relate
+    fetchedAt: 2026-02-22T01:57:06.761Z
+    httpStatus: 200
+    pageTitle: A NIST Foundation to Support the Agency’s AI Mandate
+    contentSnippet: A NIST Foundation to Support the Agency’s AI Mandate The National Institute of Standards and Technology (NIST) faces several obstacles to advancing its mission on artificial intelligence (AI) at a time when the field is rapidly advancing and consequences for falling short are wide-reaching. To enable NIST to quickly and effectively respond, Congress should authorize the establishment of a NIST Foundation to unlock additional resources, expertise, flexible funding mechanisms, and innovation, whil
+    contentLength: 116756
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure
+    linkText: "NIST News: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure"
+    claimContext: "Recent major investments include: - **\\$20 million** for MITRE AI centers (manufacturing and critical infrastructure, 2025)[^36] - **\\$6 million** for Carnegie Mellon AI cooperative research center (2024)[^37]"
+    fetchedAt: 2026-02-22T01:57:08.433Z
+    httpStatus: 200
+    pageTitle: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST
+    contentSnippet: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical
+    contentLength: 89725
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.cmu.edu/news/stories/archives/2024/september/nist-awards-6m-to-carnegie-mellon-university-to-establish-ai-cooperative-research-center
+    linkText: "CMU News: NIST Awards \\$6M to Carnegie Mellon University"
+    claimContext: "- **\\$20 million** for MITRE AI centers (manufacturing and critical infrastructure, 2025)[^36] - **\\$6 million** for Carnegie Mellon AI cooperative research center (2024)[^37] - **\\$1.8 million** in SBIR Phase I awards to 18 small businesses (2025)[^38]"
+    fetchedAt: 2026-02-22T01:57:08.468Z
+    httpStatus: 200
+    pageTitle: NIST Awards $6M to Carnegie Mellon University To Establish AI Cooperative Research Center - News - Carnegie Mellon University
+    contentSnippet: NIST Awards $6M to Carnegie Mellon University To Establish AI Cooperative Research Center - News - Carnegie Mellon University Skip to main content September 30, 2024 NIST Awards $6M to Carnegie Mellon University To Establish AI Cooperative Research Center Share on Facebook (opens in new window) Share on X (opens in new window) Share on LinkedIn (opens in new window) Print this page Share by email Media Inquiries Name Peter Kerwin Title University Communications & Marketing Email Phone 412-268-11
+    contentLength: 121119
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.nist.gov/news-events/news/2025/08/nist-awards-over-18-million-small-businesses-advancing-ai-semiconductors
+    linkText: "NIST News: NIST Awards Over \\$1.8 Million to Small Businesses"
+    claimContext: "- **\\$6 million** for Carnegie Mellon AI cooperative research center (2024)[^37] - **\\$1.8 million** in SBIR Phase I awards to 18 small businesses (2025)[^38] - **Up to \\$70 million** over five years for an AI-focused Manufacturing USA institute (announced July 2024, awards pending)[^39]"
+    fetchedAt: 2026-02-22T01:57:08.428Z
+    httpStatus: 200
+    pageTitle: NIST Awards Over $1.8 Million to Small Businesses Advancing AI, Semiconductors, Additive Manufacturing and More | NIST
+    contentSnippet: NIST Awards Over $1.8 Million to Small Businesses Advancing AI, Semiconductors, Additive Manufacturing and More | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2025/08/nist-awards-o
+    contentLength: 96907
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.nist.gov/news-events/news/2024/07/nist-announces-funding-opportunity-ai-focused-manufacturing-usa-institute
+    linkText: "NIST News: NIST Announces Funding Opportunity for AI-Focused Manufacturing USA Institute"
+    claimContext: "- **\\$1.8 million** in SBIR Phase I awards to 18 small businesses (2025)[^38] - **Up to \\$70 million** over five years for an AI-focused Manufacturing USA institute (announced July 2024, awards pending)[^39]"
+    fetchedAt: 2026-02-22T01:57:08.680Z
+    httpStatus: 200
+    pageTitle: NIST Announces Funding Opportunity for AI-Focused Manufacturing USA Institute | NIST
+    contentSnippet: NIST Announces Funding Opportunity for AI-Focused Manufacturing USA Institute | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2024/07/nist-announces-funding-opportunity-ai-focused-m
+    contentLength: 90704
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.huschblackwell.com/newsandinsights/nist-introduces-the-leaders-of-the-artificial-intelligence-safety-institute-and-announces-the-institutes-ai-consortium
+    linkText: "Husch Blackwell: NIST Introduces AI Safety Institute Leaders and Consortium"
+    claimContext: "|------|------|-----------| | **Director, AISI** | Elizabeth Kelly | Coordinates activities across Commerce, NIST, and the federal government[^40] | | **Chief Technology Officer, AISI** | Elham Tabassi | Chief of Staff in the Information Technology Laboratory (ITL) at NIST[^41] |"
+    fetchedAt: 2026-02-22T01:57:08.818Z
+    httpStatus: 200
+    pageTitle: NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium | Husch Blackwell
+    contentSnippet: "NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium | Husch Blackwell Skip to Main Content Thought Leadership NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium NIST Debuts the Initial Steps to Tackle the Challenges of AI Published: February 12, 2024 Related Service: Artificial Intelligence Subscribe to Our Mailing List > Insight Share on LinkedIn Share via E"
+    contentLength: 46711
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://digital.gov/event/2020/11/04/overview-of-nist-initiatives-on-ai-standards-principles-and-critical-ai-issues
+    linkText: "Digital.gov: Overview of NIST Initiatives on AI Standards"
+    claimContext: "| **Director, AISI** | Elizabeth Kelly | Coordinates activities across Commerce, NIST, and the federal government[^40] | | **Chief Technology Officer, AISI** | Elham Tabassi | Chief of Staff in the Information Technology Laboratory (ITL) at NIST[^41] | | **Head of AI Safety** | Paul Christiano | For"
+    fetchedAt: 2026-02-22T01:57:10.470Z
+    httpStatus: 200
+    pageTitle: Overview of NIST Initiatives on Artificial Intelligence Standards, Principles, and Critical AI Issues | Digital.gov
+    contentSnippet: Overview of NIST Initiatives on Artificial Intelligence Standards, Principles, and Critical AI Issues | Digital.gov Skip to main content Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. Artificial intelligence (AI) has the potent
+    contentLength: 38683
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.nextgov.com/artificial-intelligence/2024/04/nist-adds-5-new-members-its-ai-safety-institute/395783/
+    linkText: "Nextgov: NIST Adds 5 New Members to AI Safety Institute"
+    claimContext: '| **Chief Technology Officer, AISI** | Elham Tabassi | Chief of Staff in the Information Technology Laboratory (ITL) at NIST[^41] | | **Head of AI Safety** | Paul Christiano | Former <EntityLink id="openai">OpenAI</EntityLink> leader and founder of the <EntityLink id="arc">Alignment Research Center<'
+    fetchedAt: 2026-02-22T01:57:10.250Z
+    httpStatus: 200
+    pageTitle: NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW
+    contentSnippet: "NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor content GovExec TV: Five Ques"
+    contentLength: 135940
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.nextgov.com/artificial-intelligence/2024/04/nist-adds-5-new-members-its-ai-safety-institute/395783/
+    linkText: "Nextgov: NIST Adds 5 New Members to AI Safety Institute"
+    claimContext: '| **Head of AI Safety** | Paul Christiano | Former <EntityLink id="openai">OpenAI</EntityLink> leader and founder of the <EntityLink id="arc">Alignment Research Center</EntityLink>, a nonprofit focused on <EntityLink id="alignment">AI alignment</EntityLink> research[^42] | | **Chief Vision Officer**'
+    fetchedAt: 2026-02-22T01:57:10.223Z
+    httpStatus: 200
+    pageTitle: NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW
+    contentSnippet: "NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor content GovExec TV: Five Ques"
+    contentLength: 135940
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.nextgov.com/artificial-intelligence/2024/04/nist-adds-5-new-members-its-ai-safety-institute/395783/
+    linkText: "Nextgov: NIST Adds 5 New Members to AI Safety Institute"
+    claimContext: "| **Chief Vision Officer** | Adam Russell | Director of the Information Sciences Institute's AI Division at the University of Southern California[^43] | | **Acting Chief Operating Officer and Chief of Staff** | Mara Campbell | Former deputy chief operating officer at Commerce's Economic Development "
+    fetchedAt: 2026-02-22T01:57:10.318Z
+    httpStatus: 200
+    pageTitle: NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW
+    contentSnippet: "NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor content GovExec TV: Five Ques"
+    contentLength: 135940
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.nextgov.com/artificial-intelligence/2024/04/nist-adds-5-new-members-its-ai-safety-institute/395783/
+    linkText: "Nextgov: NIST Adds 5 New Members to AI Safety Institute"
+    claimContext: "| **Acting Chief Operating Officer and Chief of Staff** | Mara Campbell | Former deputy chief operating officer at Commerce's Economic Development Administration[^44] | | **Senior Advisor** | Rob Reich | Professor of political science at Stanford University and associate director of Stanford's Insti"
+    fetchedAt: 2026-02-22T01:57:10.293Z
+    httpStatus: 200
+    pageTitle: NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW
+    contentSnippet: "NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor content GovExec TV: Five Ques"
+    contentLength: 135940
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.nextgov.com/artificial-intelligence/2024/04/nist-adds-5-new-members-its-ai-safety-institute/395783/
+    linkText: "Nextgov: NIST Adds 5 New Members to AI Safety Institute"
+    claimContext: "| **Senior Advisor** | Rob Reich | Professor of political science at Stanford University and associate director of Stanford's Institute for Human-Centered AI[^45] | | **Head of International Engagement** | Mark Latonero | Former deputy director of the National AI Initiative Office at the White House"
+    fetchedAt: 2026-02-22T01:57:11.540Z
+    httpStatus: 200
+    pageTitle: NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW
+    contentSnippet: "NIST adds 5 new members to its AI Safety Institute - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor content GovExec TV: Five Ques"
+    contentLength: 135940
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://www.nist.gov/artificial-intelligence/comments-received-proposal-identifying-and-managing-bias-artificial
+    linkText: "NIST: Comments Received on Proposal for Identifying and Managing Bias in AI"
+    claimContext: Commenters on NIST's bias management proposal have raised concerns that the agency's approach focuses too heavily on technical and algorithmic solutions while neglecting the role of human decision-making and systemic factors.[^47] For example, commenters argued that accountability for bias is tied t
+    fetchedAt: 2026-02-22T01:57:11.579Z
+    httpStatus: 200
+    pageTitle: Comments Received on A Proposal for Identifying and Managing Bias in Artificial Intelligence (SP 1270) | NIST
+    contentSnippet: Comments Received on A Proposal for Identifying and Managing Bias in Artificial Intelligence (SP 1270) | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/artificial-intelligence/comments-received-propo
+    contentLength: 382815
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.nist.gov/artificial-intelligence/comments-received-proposal-identifying-and-managing-bias-artificial
+    linkText: "NIST: Comments Received on Proposal for Identifying and Managing Bias in AI"
+    claimContext: Commenters on NIST's bias management proposal have raised concerns that the agency's approach focuses too heavily on technical and algorithmic solutions while neglecting the role of human decision-making and systemic factors.[^47] For example, commenters argued that accountability for bias is tied t
+    fetchedAt: 2026-02-22T01:57:11.627Z
+    httpStatus: 200
+    pageTitle: Comments Received on A Proposal for Identifying and Managing Bias in Artificial Intelligence (SP 1270) | NIST
+    contentSnippet: Comments Received on A Proposal for Identifying and Managing Bias in Artificial Intelligence (SP 1270) | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/artificial-intelligence/comments-received-propo
+    contentLength: 382815
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.nist.gov/news-events/news/2022/03/theres-more-ai-bias-biased-data-nist-report-highlights
+    linkText: "NIST News: There's More to AI Bias Than Biased Data"
+    claimContext: NIST itself acknowledges these limitations. In a March 2022 report, the agency noted that AI bias extends beyond data quality to include human biases (such as subjective decisions in filling data gaps) and systemic biases rooted in institutional discrimination.[^49] Research lead Reva Schwartz empha
+    fetchedAt: 2026-02-22T01:57:11.522Z
+    httpStatus: 200
+    pageTitle: There’s More to AI Bias Than Biased Data, NIST Report Highlights | NIST
+    contentSnippet: "There’s More to AI Bias Than Biased Data, NIST Report Highlights | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2022/03/theres-more-ai-bias-biased-data-nist-report-highlights NEWS "
+    contentLength: 92018
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.nist.gov/news-events/news/2022/03/theres-more-ai-bias-biased-data-nist-report-highlights
+    linkText: "NIST News: There's More to AI Bias Than Biased Data"
+    claimContext: NIST itself acknowledges these limitations. In a March 2022 report, the agency noted that AI bias extends beyond data quality to include human biases (such as subjective decisions in filling data gaps) and systemic biases rooted in institutional discrimination.[^49] Research lead Reva Schwartz empha
+    fetchedAt: 2026-02-22T01:57:11.561Z
+    httpStatus: 200
+    pageTitle: There’s More to AI Bias Than Biased Data, NIST Report Highlights | NIST
+    contentSnippet: "There’s More to AI Bias Than Biased Data, NIST Report Highlights | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2022/03/theres-more-ai-bias-biased-data-nist-report-highlights NEWS "
+    contentLength: 92018
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://epic.org/documents/epic-comments-to-nist-on-managing-the-risks-of-misuse-with-ai-foundation-models/
+    linkText: "EPIC: Comments to NIST on Managing the Risks of Misuse with AI Foundation Models"
+    claimContext: The Electronic Privacy Information Center (EPIC) criticized NIST AI 800-1 for deprioritizing bias, discrimination, hallucinations, and privacy risks in its guidance on dual-use foundation models.[^51] EPIC argues that threat actors exploit these very vulnerabilities for misuse, and excluding them cr
+    fetchedAt: 2026-02-22T01:57:13.181Z
+    httpStatus: 200
+    pageTitle: EPIC Comments to NIST on Managing the Risks of Misuse with AI Foundation Models &#8211; EPIC &#8211; Electronic Privacy Information Center
+    contentSnippet: EPIC Comments to NIST on Managing the Risks of Misuse with AI Foundation Models &#8211; EPIC &#8211; Electronic Privacy Information Center APA Comments EPIC Comments to NIST on Managing the Risks of Misuse with AI Foundation Models 2024-09824 DOWNLOAD EPIC Comments on NIST AI 800-1 09.09.24 pdf 243.4KB Contents Contents Introduction I. Sociotechnical AI Risks Are Misuse Risks II. Preserving Consumer Privacy is Crucial to Managing the Misuse Risks of Foundation Models Conclusion COMMENTS OF THE E
+    contentLength: 117761
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://epic.org/documents/epic-comments-to-nist-on-managing-the-risks-of-misuse-with-ai-foundation-models/
+    linkText: "EPIC: Comments to NIST on Managing the Risks of Misuse with AI Foundation Models"
+    claimContext: The Electronic Privacy Information Center (EPIC) criticized NIST AI 800-1 for deprioritizing bias, discrimination, hallucinations, and privacy risks in its guidance on dual-use foundation models.[^51] EPIC argues that threat actors exploit these very vulnerabilities for misuse, and excluding them cr
+    fetchedAt: 2026-02-22T01:57:13.041Z
+    httpStatus: 200
+    pageTitle: EPIC Comments to NIST on Managing the Risks of Misuse with AI Foundation Models &#8211; EPIC &#8211; Electronic Privacy Information Center
+    contentSnippet: EPIC Comments to NIST on Managing the Risks of Misuse with AI Foundation Models &#8211; EPIC &#8211; Electronic Privacy Information Center APA Comments EPIC Comments to NIST on Managing the Risks of Misuse with AI Foundation Models 2024-09824 DOWNLOAD EPIC Comments on NIST AI 800-1 09.09.24 pdf 243.4KB Contents Contents Introduction I. Sociotechnical AI Risks Are Misuse Risks II. Preserving Consumer Privacy is Crucial to Managing the Misuse Risks of Foundation Models Conclusion COMMENTS OF THE E
+    contentLength: 117761
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://www.csoonline.com/article/4042627/nists-attempts-to-secure-ai-yields-many-questions-no-answers.html
+    linkText: "CSO Online: NIST's Attempts to Secure AI Yields Many Questions, No Answers"
+    claimContext: NIST's AI security concept papers have been criticized for identifying enterprise challenges—such as opacity in model training, unclear data usage, and difficulties maintaining AI system inventories—without offering specific mitigations.[^53] Jeff Man, a senior information security consultant, noted
+    fetchedAt: 2026-02-22T01:57:14.273Z
+    httpStatus: 200
+    pageTitle: NIST’s attempts to secure AI yield many questions, no answers | CSO Online
+    contentSnippet: "NIST’s attempts to secure AI yield many questions, no answers | CSO Online by Evan Schuman Contributor NIST’s attempts to secure AI yield many questions, no answers News Aug 19, 2025 9 mins A NIST AI concept paper details the key enterprise security challenges and asks for industry comments. But what if AI agents flood the comments with their own self-preservation suggestions? Credit: Anggalih Prasetya When the US National Institute of Standards and Technology (NIST) late last week published a c"
+    contentLength: 291503
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://www.csoonline.com/article/4042627/nists-attempts-to-secure-ai-yields-many-questions-no-answers.html
+    linkText: "CSO Online: NIST's Attempts to Secure AI Yields Many Questions, No Answers"
+    claimContext: NIST's AI security concept papers have been criticized for identifying enterprise challenges—such as opacity in model training, unclear data usage, and difficulties maintaining AI system inventories—without offering specific mitigations.[^53] Jeff Man, a senior information security consultant, noted
+    fetchedAt: 2026-02-22T01:57:13.733Z
+    httpStatus: 200
+    pageTitle: NIST’s attempts to secure AI yield many questions, no answers | CSO Online
+    contentSnippet: "NIST’s attempts to secure AI yield many questions, no answers | CSO Online by Evan Schuman Contributor NIST’s attempts to secure AI yield many questions, no answers News Aug 19, 2025 9 mins A NIST AI concept paper details the key enterprise security challenges and asks for industry comments. But what if AI agents flood the comments with their own self-preservation suggestions? Credit: Anggalih Prasetya When the US National Institute of Standards and Technology (NIST) late last week published a c"
+    contentLength: 264035
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://www.csoonline.com/article/4042627/nists-attempts-to-secure-ai-yields-many-questions-no-answers.html
+    linkText: "CSO Online: NIST's Attempts to Secure AI Yields Many Questions, No Answers"
+    claimContext: 'Experts also worry whether traditional standards can adequately address emerging risks from agentic AI systems. Vince Worthington highlighted concerns about "cascading failures" where autonomous AI agents might create compounding problems, while Vince Berk of Apprentis Ventures expressed skepticism '
+    fetchedAt: 2026-02-22T01:57:13.924Z
+    httpStatus: 200
+    pageTitle: NIST’s attempts to secure AI yield many questions, no answers | CSO Online
+    contentSnippet: "NIST’s attempts to secure AI yield many questions, no answers | CSO Online by Evan Schuman Contributor NIST’s attempts to secure AI yield many questions, no answers News Aug 19, 2025 9 mins A NIST AI concept paper details the key enterprise security challenges and asks for industry comments. But what if AI agents flood the comments with their own self-preservation suggestions? Credit: Anggalih Prasetya When the US National Institute of Standards and Technology (NIST) late last week published a c"
+    contentLength: 291499
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://www.nextgov.com/artificial-intelligence/2025/08/artificial-intelligence-friend-foe-or-frenemy-nist-wants-find-out/407792/
+    linkText: "Nextgov: Artificial Intelligence Friend, Foe, or Frenemy - NIST Wants to Find Out"
+    claimContext: Research cited by NIST demonstrates concerning security implications of AI-assisted development. One study found that AI code improvements increase vulnerabilities by 37.6% after five iterations, emphasizing the critical need for human oversight.[^56] NIST acknowledges that AI accelerates various at
+    fetchedAt: 2026-02-22T01:57:15.339Z
+    httpStatus: 200
+    pageTitle: Is artificial intelligence a friend, foe or frenemy? NIST wants to find out - Nextgov/FCW
+    contentSnippet: Is artificial intelligence a friend, foe or frenemy? NIST wants to find out - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor cont
+    contentLength: 142308
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://www.nextgov.com/artificial-intelligence/2025/08/artificial-intelligence-friend-foe-or-frenemy-nist-wants-find-out/407792/
+    linkText: "Nextgov: Artificial Intelligence Friend, Foe, or Frenemy - NIST Wants to Find Out"
+    claimContext: Research cited by NIST demonstrates concerning security implications of AI-assisted development. One study found that AI code improvements increase vulnerabilities by 37.6% after five iterations, emphasizing the critical need for human oversight.[^56] NIST acknowledges that AI accelerates various at
+    fetchedAt: 2026-02-22T01:57:15.769Z
+    httpStatus: 200
+    pageTitle: Is artificial intelligence a friend, foe or frenemy? NIST wants to find out - Nextgov/FCW
+    contentSnippet: Is artificial intelligence a friend, foe or frenemy? NIST wants to find out - Nextgov/FCW Skip to Content Notice at Collection Your Privacy Choices Exercise Your Privacy Rights FAA launches competition to modernize aging IT portfolio New Treasury initiative targets improved cyber risk management for AI tools The Pentagon says it’s getting its AI providers on ‘the same baseline’ Labor launches new open data portal Republican lawmakers ask GAO to review current AI regulatory landscape sponsor cont
+    contentLength: 142308
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://securityandtechnology.org/blog/managing-misuse-ist-submits-comments/
+    linkText: "IST: Managing Misuse - IST Submits Comments"
+    claimContext: The Institute for Security and Technology (IST) suggested NIST should treat AI models themselves as potential insider threats, where autonomous agents might self-evolve or collude to bypass security controls.[^58]
+    fetchedAt: 2026-02-22T01:57:16.613Z
+    httpStatus: 200
+    pageTitle: "Managing Misuse Risk for Dual-Use Foundation Models: IST Submits Comments to a NIST Request for Information - Institute for Security and Technology"
+    contentSnippet: "Managing Misuse Risk for Dual-Use Foundation Models: IST Submits Comments to a NIST Request for Information - Institute for Security and Technology Skip to content AI Risk Reduction Initiative Managing Misuse Risk for Dual-Use Foundation Models: IST Submits Comments to a NIST Request for Information Blog March 18, 2025 Last week, Institute for Security and Technology (IST) submitted a response to NIST's Request for Comments on the U.S. Artificial Intelligence Safety Institute's draft guidelines "
+    contentLength: 163747
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://www.lumenova.ai/blog/pros-and-cons-of-implementing-the-nist-ai-risk-management-framework/
+    linkText: "Lumenova AI: Pros and Cons of Implementing the NIST AI RMF"
+    claimContext: Organizations implementing the AI RMF face practical difficulties including efficiency losses, high resource and expertise demands, incomplete market adoption, and risk of over-complexity.[^59] The voluntary nature of NIST's frameworks means adoption varies widely, and many organizations lack the sp
+    fetchedAt: 2026-02-22T01:57:15.846Z
+    httpStatus: 200
+    pageTitle: Pros and Cons of Implementing the NIST AI RMF
+    contentSnippet: "Pros and Cons of Implementing the NIST AI RMF Help define the future of safe agentic AI . Become a design partner today. Learn More September 24, 2025 Pros and Cons of Implementing the NIST AI Risk Management Framework AI Risk Management Contents Everyone’s eager to boast about their shiny new AI deployments &#8211; the two letters dominating every boardroom slide. But fewer want to face the messier reality: models drift, bias spikes, regulators come knocking. According to National Institute of "
+    contentLength: 52725
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://www.csoonline.com/article/4042627/nists-attempts-to-secure-ai-yields-many-questions-no-answers.html
+    linkText: "CSO Online: NIST's Attempts to Secure AI Yields Many Questions, No Answers"
+    claimContext: Additionally, some experts worry about AI systems undermining the standards development process itself. Erik Avakian of Info-Tech Research Group warned about AI-generated comments flooding NIST's public input processes, potentially drowning out legitimate stakeholder feedback.[^60]
+    fetchedAt: 2026-02-22T01:57:15.331Z
+    httpStatus: 200
+    pageTitle: NIST’s attempts to secure AI yield many questions, no answers | CSO Online
+    contentSnippet: "NIST’s attempts to secure AI yield many questions, no answers | CSO Online by Evan Schuman Contributor NIST’s attempts to secure AI yield many questions, no answers News Aug 19, 2025 9 mins A NIST AI concept paper details the key enterprise security challenges and asks for industry comments. But what if AI agents flood the comments with their own self-preservation suggestions? Credit: Anggalih Prasetya When the US National Institute of Standards and Technology (NIST) late last week published a c"
+    contentLength: 291503
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://futureoflife.org/us-agency/national-institute-of-standards-and-technology-nist/
+    linkText: "Future of Life Institute: NIST"
+    claimContext: In 2023, NIST released the AI Risk Management Framework and launched the Trustworthy AI Resource Center to help organizations manage AI risks.[^61] NIST is actively aligning its AI RMF with the Cybersecurity Framework (CSF) and Privacy Framework, helping organizations unify governance and risk progr
+    fetchedAt: 2026-02-22T01:57:18.239Z
+    httpStatus: 200
+    pageTitle: National Institute of Standards and Technology (NIST) - Future of Life Institute
+    contentSnippet: "National Institute of Standards and Technology (NIST) - Future of Life Institute Skip to content Notice: You are viewing a detailed profile of an entity in our US Agency Mapping resource, in which we have compiled all information relevant for the regulation of advanced AI technologies in the US. To see an overview of all entities, return to the entity overview page . Return to overview Index Click on an entity to view its profile page: Department of Commerce (DoC) International Trade Administrat"
+    contentLength: 221697
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://www.ispartnersllc.com/blog/nist-ai-rmf-2025-updates-what-you-need-to-know-about-the-latest-framework-changes/
+    linkText: "ISPartners: NIST AI RMF 2025 Updates"
+    claimContext: In 2023, NIST released the AI Risk Management Framework and launched the Trustworthy AI Resource Center to help organizations manage AI risks.[^61] NIST is actively aligning its AI RMF with the Cybersecurity Framework (CSF) and Privacy Framework, helping organizations unify governance and risk progr
+    fetchedAt: 2026-02-22T01:57:17.821Z
+    httpStatus: 200
+    pageTitle: "NIST AI RMF 2025 Updates: What You Need to Know About the Latest Framework Changes"
+    contentSnippet: "NIST AI RMF 2025 Updates: What You Need to Know About the Latest Framework Changes Skip to content NIST AI RMF 2025 Updates: What You Need to Know About the Latest Framework Changes Written by John DeCesare Published on November 11, 2025 Share this article! Solutions SOC SOC 1 Ensure financial data security for clients and partners. SOC 2 Readiness Save you time and money by ensuring you&#039;re fully prepared for your SOC 2 audit. SOC 2 Prove to your customers & vendors that you handle their da"
+    contentLength: 558820
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://www.huschblackwell.com/newsandinsights/nist-introduces-the-leaders-of-the-artificial-intelligence-safety-institute-and-announces-the-institutes-ai-consortium
+    linkText: "Husch Blackwell: NIST Introduces AI Safety Institute Leaders and Consortium"
+    claimContext: "NIST's partnership model has proven effective at engaging major institutions. The AISIC includes over 200 members from academia, advocacy organizations, private industry, and the public sector.[^63] Voluntary agreements with frontier AI model developers enable NIST to conduct collaborative research "
+    fetchedAt: 2026-02-22T01:57:18.010Z
+    httpStatus: 200
+    pageTitle: NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium | Husch Blackwell
+    contentSnippet: "NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium | Husch Blackwell Skip to Main Content Thought Leadership NIST Introduces the Leaders of the Artificial Intelligence Safety Institute, and Announces the Institute's AI Consortium NIST Debuts the Initial Steps to Tackle the Challenges of AI Published: February 12, 2024 Related Service: Artificial Intelligence Subscribe to Our Mailing List > Insight Share on LinkedIn Share via E"
+    contentLength: 46710
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure
+    linkText: "NIST News: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure"
+    claimContext: "NIST's partnership model has proven effective at engaging major institutions. The AISIC includes over 200 members from academia, advocacy organizations, private industry, and the public sector.[^63] Voluntary agreements with frontier AI model developers enable NIST to conduct collaborative research "
+    fetchedAt: 2026-02-22T01:57:17.725Z
+    httpStatus: 200
+    pageTitle: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST
+    contentSnippet: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical
+    contentLength: 89725
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://industrialcyber.co/ai/nist-mitre-invest-20-million-in-ai-centers-to-counter-cyberthreats-boost-us-manufacturing-competitiveness/
+    linkText: "Industrial Cyber: NIST, MITRE Invest \\$20 Million in AI Centers"
+    claimContext: However, the effectiveness of NIST's work faces limitations. The \$20 million investment to establish two AI centers focused on manufacturing productivity and critical infrastructure cybersecurity, while substantial, remains modest relative to private sector AI investment.[^65] NIST's investment rem
+    fetchedAt: 2026-02-22T01:57:18.210Z
+    httpStatus: 200
+    pageTitle: NIST, MITRE invest $20 million in AI centers to counter cyberthreats, boost US manufacturing competitiveness - Industrial Cyber
+    contentSnippet: "NIST, MITRE invest $20 million in AI centers to counter cyberthreats, boost US manufacturing competitiveness - Industrial Cyber Home AI NIST, MITRE invest $20 million in AI centers to counter cyberthreats, boost US manufacturing competitiveness AI Attacks and Vulnerabilities CISA Critical infrastructure Industrial Cyber Attacks Malware, Phishing & Ransomware News Threat Landscape NIST, MITRE invest $20 million in AI centers to counter cyberthreats, boost US manufacturing competitiveness January "
+    contentLength: 216305
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://fas.org/publication/nist-foundation/
+    linkText: "FAS: NIST Foundation"
+    claimContext: However, the effectiveness of NIST's work faces limitations. The \$20 million investment to establish two AI centers focused on manufacturing productivity and critical infrastructure cybersecurity, while substantial, remains modest relative to private sector AI investment.[^65] NIST's investment rem
+    fetchedAt: 2026-02-22T01:57:19.798Z
+    httpStatus: 200
+    pageTitle: A NIST Foundation to Support the Agency’s AI Mandate
+    contentSnippet: A NIST Foundation to Support the Agency’s AI Mandate The National Institute of Standards and Technology (NIST) faces several obstacles to advancing its mission on artificial intelligence (AI) at a time when the field is rapidly advancing and consequences for falling short are wide-reaching. To enable NIST to quickly and effectively respond, Congress should authorize the establishment of a NIST Foundation to unlock additional resources, expertise, flexible funding mechanisms, and innovation, whil
+    contentLength: 116756
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical-infrastructure
+    linkText: "NIST News: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure"
+    claimContext: NIST will rely on existing resources to build on its expertise and carry forward recommendations in the White House's July 2025 America's AI Action Plan, including efforts to accelerate AI innovation and build American AI infrastructure.[^67]
+    fetchedAt: 2026-02-22T01:57:19.305Z
+    httpStatus: 200
+    pageTitle: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST
+    contentSnippet: NIST Launches Centers for AI in Manufacturing and Critical Infrastructure | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/news-events/news/2025/12/nist-launches-centers-ai-manufacturing-and-critical
+    contentLength: 89725
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://www.nist.gov/artificial-intelligence/technical-contributions-ai-governance
+    linkText: "NIST: Technical Contributions to AI Governance"
+    claimContext: NIST participates actively in international AI governance efforts through multiple channels. The agency engages with the **Organisation for Economic Co-operation and Development (OECD)**, the **Quadrilateral Security Dialogue**, and bilateral initiatives across Asia, Europe, the Middle East, and Nor
+    fetchedAt: 2026-02-22T01:57:19.369Z
+    httpStatus: 200
+    pageTitle: Technical Contributions to AI Governance | NIST
+    contentSnippet: Technical Contributions to AI Governance | NIST Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock A locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. https://www.nist.gov/artificial-intelligence/technical-contributions-ai-governance Artificial intelligence Technical Contributions
+    contentLength: 83212
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-5.pdf
+    linkText: "NIST AI 100-5: A Plan for Global Engagement on AI Standards (PDF)"
+    claimContext: The July 2024 **Global AI Standards Engagement Plan (NIST AI 100-5)** outlines NIST's strategy for promoting scientifically sound, accessible standards in international forums.[^69] This work aims to ensure U.S. technical approaches shape global AI standards development rather than being shaped by s
+    fetchedAt: 2026-02-22T01:57:19.943Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1083152
+    status: verified
+    note: null

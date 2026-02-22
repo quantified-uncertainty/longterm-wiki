@@ -1,0 +1,1019 @@
+pageId: founders-fund
+verifiedAt: 2026-02-22
+totalCitations: 92
+verified: 51
+broken: 41
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Founders Fund** is a San Francisco-based venture capital firm founded in 2005 by Peter Thiel, Ken Howery, and Luke Nosek, all former PayPal executives.[^1] The firm manages approximately \\$17 billion in assets and has backed some of the most influential technology companies of the past two decades"
+    fetchedAt: 2026-02-22T01:47:47.742Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Founders Fund** is a San Francisco-based venture capital firm founded in 2005 by Peter Thiel, Ken Howery, and Luke Nosek, all former PayPal executives.[^1] The firm manages approximately \\$17 billion in assets and has backed some of the most influential technology companies of the past two decades"
+    fetchedAt: 2026-02-22T01:47:47.745Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 3
+    url: https://foundersfund.com/2017/01/manifesto/
+    linkText: What Happened to the Future? - Founders Fund Manifesto
+    claimContext: Founders Fund distinguishes itself through a contrarian investment philosophy that prioritizes "transformational technologies" over incremental innovations, famously articulated in their motto about funding "flying cars, not 140 characters."[^3] The firm provides maximum support with minimum interfe
+    fetchedAt: 2026-02-22T01:47:48.311Z
+    httpStatus: 200
+    pageTitle: What happened to the future? - Founders Fund
+    contentSnippet: What happened to the future? - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. Hereticon Apocalypse Ball By Mike Solana The Apocalypse will take place from the evening of October 28th to the morning of October 31st. Join us for a show
+    contentLength: 49398
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.generalist.com/p/founders-fund-2
+    linkText: The Complete Founders Fund Story - The Generalist
+    claimContext: Founders Fund distinguishes itself through a contrarian investment philosophy that prioritizes "transformational technologies" over incremental innovations, famously articulated in their motto about funding "flying cars, not 140 characters."[^3] The firm provides maximum support with minimum interfe
+    fetchedAt: 2026-02-22T01:47:48.201Z
+    httpStatus: 200
+    pageTitle: "Founders Fund: The Disciples - by Mario Gabriele"
+    contentSnippet: 'Founders Fund: The Disciples - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Disciples (Part II) Peter Thiel is not a manager. But his singular eye for talent allowed him to assemble an unorthodox team that went on one of venture’s hottest streaks. Mario Gabriele Jun 19, 2025 ∙ Paid 185 6 38 Share "The best long-form essays on VC & Private Companies. " — MS, a paying member Subscribe Illustration by Edmon de Haro Friends, A prophet without disciples is a madman. Founders Fund'
+    contentLength: 249187
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: Founders Fund distinguishes itself through a contrarian investment philosophy that prioritizes "transformational technologies" over incremental innovations, famously articulated in their motto about funding "flying cars, not 140 characters."[^3] The firm provides maximum support with minimum interfe
+    fetchedAt: 2026-02-22T01:47:48.780Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: The firm's investment focus spans AI, aerospace, biotechnology, deep tech, defense, energy, and healthcare, guided by Peter Thiel's contrarian philosophy drawing on René Girard's theories of mimetic desire to avoid overcrowded market trends.[^6] Despite backing major AI companies like <EntityLink id
+    fetchedAt: 2026-02-22T01:47:49.789Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://foundersfund.com/portfolio/
+    linkText: Founders Fund Portfolio
+    claimContext: The firm's investment focus spans AI, aerospace, biotechnology, deep tech, defense, energy, and healthcare, guided by Peter Thiel's contrarian philosophy drawing on René Girard's theories of mimetic desire to avoid overcrowded market trends.[^6] Despite backing major AI companies like <EntityLink id
+    fetchedAt: 2026-02-22T01:47:49.878Z
+    httpStatus: 200
+    pageTitle: Portfolio - Founders Fund
+    contentSnippet: Portfolio - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. SpaceX Palantir Anduril Stripe Facebook Airbnb Ramp Neuralink OpenAI Cognition Nubank Trade Republic Spotify Rippling Affirm Crusoe Polymarket Lighter Figma Varda General Mat
+    contentLength: 470890
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "Founders Fund emerged from discussions among PayPal alumni in early 2005, when Peter Thiel, Ken Howery, and Luke Nosek organized the firm with a focus on backing ambitious science and technology companies solving difficult problems.[^8] The firm raised its first fund of \\$50 million in January 2005 "
+    fetchedAt: 2026-02-22T01:47:49.789Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "Founders Fund emerged from discussions among PayPal alumni in early 2005, when Peter Thiel, Ken Howery, and Luke Nosek organized the firm with a focus on backing ambitious science and technology companies solving difficult problems.[^8] The firm raised its first fund of \\$50 million in January 2005 "
+    fetchedAt: 2026-02-22T01:47:49.800Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: Sean Parker, Napster co-founder and early Facebook president, joined as a partner in 2006, strengthening the firm's connections to revolutionary technology ventures.[^10] The firm expanded rapidly, raising a second fund of \$220 million in 2007 and a third fund of \$250 million in 2010.[^11]
+    fetchedAt: 2026-02-22T01:47:49.803Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: Sean Parker, Napster co-founder and early Facebook president, joined as a partner in 2006, strengthening the firm's connections to revolutionary technology ventures.[^10] The firm expanded rapidly, raising a second fund of \$220 million in 2007 and a third fund of \$250 million in 2010.[^11]
+    fetchedAt: 2026-02-22T01:47:50.886Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 12
+    url: https://www.youtube.com/watch?v=T8LDtRi-95E
+    linkText: Founders Fund Deep Dive - YouTube Analysis
+    claimContext: The 2011 fourth fund achieved particularly impressive performance with nearly 14x returns.[^12] Between 2020 and 2022, the firm returned \$10 billion in shares to limited partners via public markets, demonstrating exceptional liquidity management.[^13]
+    fetchedAt: 2026-02-22T01:47:51.373Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 13
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: The 2011 fourth fund achieved particularly impressive performance with nearly 14x returns.[^12] Between 2020 and 2022, the firm returned \$10 billion in shares to limited partners via public markets, demonstrating exceptional liquidity management.[^13]
+    fetchedAt: 2026-02-22T01:47:51.065Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240647
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "Founders Fund evolved from early-stage consumer internet investments (Spotify, Lyft) to a broader strategy encompassing both early and late-stage opportunities.[^14] Post-Facebook success, the firm pivoted toward hard technology investments in aerospace, defense, AI, and biotechnology, deliberately "
+    fetchedAt: 2026-02-22T01:47:50.888Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 15
+    url: https://www.generalist.com/p/founders-fund-2
+    linkText: The Complete Founders Fund Story - The Generalist
+    claimContext: "Founders Fund evolved from early-stage consumer internet investments (Spotify, Lyft) to a broader strategy encompassing both early and late-stage opportunities.[^14] Post-Facebook success, the firm pivoted toward hard technology investments in aerospace, defense, AI, and biotechnology, deliberately "
+    fetchedAt: 2026-02-22T01:47:50.937Z
+    httpStatus: 200
+    pageTitle: "Founders Fund: The Disciples - by Mario Gabriele"
+    contentSnippet: 'Founders Fund: The Disciples - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Disciples (Part II) Peter Thiel is not a manager. But his singular eye for talent allowed him to assemble an unorthodox team that went on one of venture’s hottest streaks. Mario Gabriele Jun 19, 2025 ∙ Paid 185 6 38 Share "The best long-form essays on VC & Private Companies. " — MS, a paying member Subscribe Illustration by Edmon de Haro Friends, A prophet without disciples is a madman. Founders Fund'
+    contentLength: 249187
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: In 2019, the firm launched its first dedicated late-stage fund, signaling increased focus on growth investments.[^16] This strategy culminated in September 2025 when partners announced at the annual meeting that their third growth fund would invest approximately \$460 million per company across 10 p
+    fetchedAt: 2026-02-22T01:47:52.378Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 17
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: In 2019, the firm launched its first dedicated late-stage fund, signaling increased focus on growth investments.[^16] This strategy culminated in September 2025 when partners announced at the annual meeting that their third growth fund would invest approximately \$460 million per company across 10 p
+    fetchedAt: 2026-02-22T01:47:52.379Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 18
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: In 2023, Peter Thiel directed the firm to slash its eighth flagship fund from \$1.8 billion to \$900 million amid market uncertainty, implementing what he called a venture capital "slimdown" despite internal resistance.[^18] The firm opened a Miami office in 2022 led by general partner Keith Rabois,
+    fetchedAt: 2026-02-22T01:47:52.378Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: In 2023, Peter Thiel directed the firm to slash its eighth flagship fund from \$1.8 billion to \$900 million amid market uncertainty, implementing what he called a venture capital "slimdown" despite internal resistance.[^18] The firm opened a Miami office in 2022 led by general partner Keith Rabois,
+    fetchedAt: 2026-02-22T01:47:52.422Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.generalist.com/p/founders-fund-2
+    linkText: The Complete Founders Fund Story - The Generalist
+    claimContext: Founders Fund's investment approach centers on deliberately avoiding consensus market trends. Drawing on philosopher René Girard's theories of mimetic desire, Peter Thiel led the firm to pivot away from social media investments after Facebook's success, instead focusing on hard technology that other
+    fetchedAt: 2026-02-22T01:47:52.434Z
+    httpStatus: 200
+    pageTitle: "Founders Fund: The Disciples - by Mario Gabriele"
+    contentSnippet: 'Founders Fund: The Disciples - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Disciples (Part II) Peter Thiel is not a manager. But his singular eye for talent allowed him to assemble an unorthodox team that went on one of venture’s hottest streaks. Mario Gabriele Jun 19, 2025 ∙ Paid 185 6 38 Share "The best long-form essays on VC & Private Companies. " — MS, a paying member Subscribe Illustration by Edmon de Haro Friends, A prophet without disciples is a madman. Founders Fund'
+    contentLength: 249187
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://foundersfund.com/2017/01/manifesto/
+    linkText: What Happened to the Future? - Founders Fund Manifesto
+    claimContext: Founders Fund's investment approach centers on deliberately avoiding consensus market trends. Drawing on philosopher René Girard's theories of mimetic desire, Peter Thiel led the firm to pivot away from social media investments after Facebook's success, instead focusing on hard technology that other
+    fetchedAt: 2026-02-22T01:47:53.567Z
+    httpStatus: 200
+    pageTitle: What happened to the future? - Founders Fund
+    contentSnippet: What happened to the future? - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. Hereticon Apocalypse Ball By Mike Solana The Apocalypse will take place from the evening of October 28th to the morning of October 31st. Join us for a show
+    contentLength: 49398
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: The firm's decision-making process reflects this contrarian approach through rapid evaluation of opportunities—sometimes within days—with the full partnership involved in core bets rather than delegating to individual partners.[^22] For deals over \$10 million, Peter Thiel holds veto power alongside
+    fetchedAt: 2026-02-22T01:47:54.407Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: The firm's decision-making process reflects this contrarian approach through rapid evaluation of opportunities—sometimes within days—with the full partnership involved in core bets rather than delegating to individual partners.[^22] For deals over \$10 million, Peter Thiel holds veto power alongside
+    fetchedAt: 2026-02-22T01:47:53.442Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 24
+    url: https://www.generalist.com/p/founders-fund-2
+    linkText: The Complete Founders Fund Story - The Generalist
+    claimContext: "Founders Fund launched with a radical promise that fundamentally differentiates it from traditional venture capital: the firm would never remove entrepreneurs from their own companies.[^24] This founder-friendly approach provides maximum support with minimum interference, prioritizing the founder's "
+    fetchedAt: 2026-02-22T01:47:53.496Z
+    httpStatus: 200
+    pageTitle: "Founders Fund: The Disciples - by Mario Gabriele"
+    contentSnippet: 'Founders Fund: The Disciples - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Disciples (Part II) Peter Thiel is not a manager. But his singular eye for talent allowed him to assemble an unorthodox team that went on one of venture’s hottest streaks. Mario Gabriele Jun 19, 2025 ∙ Paid 185 6 38 Share "The best long-form essays on VC & Private Companies. " — MS, a paying member Subscribe Illustration by Edmon de Haro Friends, A prophet without disciples is a madman. Founders Fund'
+    contentLength: 249187
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: "Founders Fund launched with a radical promise that fundamentally differentiates it from traditional venture capital: the firm would never remove entrepreneurs from their own companies.[^24] This founder-friendly approach provides maximum support with minimum interference, prioritizing the founder's "
+    fetchedAt: 2026-02-22T01:47:54.274Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: The firm's partners often have firsthand founding experience, being founders or early employees at companies like PayPal, Palantir, Anduril, and SpaceX.[^26] This shared background creates alignment with portfolio company founders and informs the firm's operational philosophy.
+    fetchedAt: 2026-02-22T01:47:55.416Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 27
+    url: https://www.vcsheet.com/fund/founders-fund
+    linkText: Founders Fund - VC Sheet
+    claimContext: Rather than constraining investments by traditional sector or stage boundaries, Founders Fund evaluates opportunities based on their potential for transformative impact. The firm invests across all stages from seed through late-stage growth, with check sizes ranging from \$500,000 to over \$50 milli
+    fetchedAt: 2026-02-22T01:47:56.096Z
+    httpStatus: 200
+    pageTitle: Founders Fund - VC Fund Breakdown
+    contentSnippet: Founders Fund - VC Fund Breakdown Founders Fund How to contact Founders Fund Website Best way to get in touch warm intro Contrarian, founder-maximalist VC that backs hard scientific breakthroughs and category-defining, overlooked markets, never removing founders as CEOs and making fast, independent investment decisions. Stages they invest in Seed Series A Series B+ N/A Sectors they invest in AI Biotech Defense Space Fintech N/A Avg Check size $500K - $150M N/A Can They Lead? Yes N/A Location San
+    contentLength: 609369
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: '- **AI and Deep Tech**: Investments in <EntityLink id="openai">OpenAI</EntityLink>, <EntityLink id="deepmind">DeepMind</EntityLink>, and other AI infrastructure companies - **Aerospace**: First institutional investor in SpaceX, with position valued at \$18.2 billion[^28] - **Biotechnology and Health'
+    fetchedAt: 2026-02-22T01:47:55.759Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: Geographic focus remains primarily on the United States, though the firm remains open to global opportunities.[^29]
+    fetchedAt: 2026-02-22T01:47:55.903Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories 20 min read Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies,"
+    contentLength: 368253
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: The firm operates with approximately 35 team members, with roughly one-third focused on investing activities.[^30] This lean structure enables rapid decision-making while maintaining deep involvement in portfolio companies. Founders Fund has occasionally taken an incubation role, helping to start co
+    fetchedAt: 2026-02-22T01:47:55.457Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: The firm operates with approximately 35 team members, with roughly one-third focused on investing activities.[^30] This lean structure enables rapid decision-making while maintaining deep involvement in portfolio companies. Founders Fund has occasionally taken an incubation role, helping to start co
+    fetchedAt: 2026-02-22T01:47:57.143Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://foundersfund.com/2017/01/manifesto/
+    linkText: What Happened to the Future? - Founders Fund Manifesto
+    claimContext: The firm hosts "Hereticon," described as a "conference for thoughtcrime," covering controversial topics like genetic modification, AI, defense, and longevity, emphasizing dissent and progress through what they term "persecuted weirdos."[^32] This event reflects the firm's broader cultural stance fav
+    fetchedAt: 2026-02-22T01:47:57.191Z
+    httpStatus: 200
+    pageTitle: What happened to the future? - Founders Fund
+    contentSnippet: What happened to the future? - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. Hereticon Apocalypse Ball By Mike Solana The Apocalypse will take place from the evening of October 28th to the morning of October 31st. Join us for a show
+    contentLength: 49398
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: "**SpaceX**: As the first institutional investor in SpaceX, Founders Fund's position has grown to a valuation of \\$18.2 billion, representing the firm's greatest investment success.[^33] The firm has participated in multiple funding rounds since 2008, maintaining conviction through SpaceX's long deve"
+    fetchedAt: 2026-02-22T01:47:57.535Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: "**SpaceX**: As the first institutional investor in SpaceX, Founders Fund's position has grown to a valuation of \\$18.2 billion, representing the firm's greatest investment success.[^33] The firm has participated in multiple funding rounds since 2008, maintaining conviction through SpaceX's long deve"
+    fetchedAt: 2026-02-22T01:47:57.506Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: "**Palantir Technologies**: The firm incubated Palantir alongside Peter Thiel's involvement as chairman, achieving an 18.5x multiple and distributing \\$3.1 billion to investors.[^35]"
+    fetchedAt: 2026-02-22T01:47:57.404Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.generalist.com/p/founders-fund-2
+    linkText: The Complete Founders Fund Story - The Generalist
+    claimContext: "**Facebook**: Peter Thiel's personal \\$500,000 early investment in Facebook, made when he was establishing Founders Fund's strategy, returned approximately \\$1 billion, though this predated the firm's formal investment.[^36]"
+    fetchedAt: 2026-02-22T01:47:58.916Z
+    httpStatus: 200
+    pageTitle: "Founders Fund: The Disciples - by Mario Gabriele"
+    contentSnippet: 'Founders Fund: The Disciples - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Disciples (Part II) Peter Thiel is not a manager. But his singular eye for talent allowed him to assemble an unorthodox team that went on one of venture’s hottest streaks. Mario Gabriele Jun 19, 2025 ∙ Paid 185 6 38 Share "The best long-form essays on VC & Private Companies. " — MS, a paying member Subscribe Illustration by Edmon de Haro Friends, A prophet without disciples is a madman. Founders Fund'
+    contentLength: 249187
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Anduril**: In 2025, Founders Fund led what became its largest single check ever—approximately \\$1 billion as part of Anduril's Series G round at a \\$28 billion valuation.[^37] This investment has reportedly quintupled in value.[^38]"
+    fetchedAt: 2026-02-22T01:47:58.543Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 38
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: "**Anduril**: In 2025, Founders Fund led what became its largest single check ever—approximately \\$1 billion as part of Anduril's Series G round at a \\$28 billion valuation.[^37] This investment has reportedly quintupled in value.[^38]"
+    fetchedAt: 2026-02-22T01:47:58.972Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://foundersfund.com/portfolio/
+    linkText: Founders Fund Portfolio
+    claimContext: "**Other Notable Portfolio Companies**: Stripe, Airbnb, Lyft, Neuralink, Figma, Rippling, and numerous other influential technology companies.[^39]"
+    fetchedAt: 2026-02-22T01:47:58.634Z
+    httpStatus: 200
+    pageTitle: Portfolio - Founders Fund
+    contentSnippet: Portfolio - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. SpaceX Palantir Anduril Stripe Facebook Airbnb Ramp Neuralink OpenAI Cognition Nubank Trade Republic Spotify Rippling Affirm Crusoe Polymarket Lighter Figma Varda General Mat
+    contentLength: 470890
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.youtube.com/watch?v=T8LDtRi-95E
+    linkText: Founders Fund Deep Dive - YouTube Analysis
+    claimContext: "- One fund achieved a 26.6x return on \\$227 million in committed capital[^40] - The 2011 fourth fund (\\$625 million) achieved nearly 14x returns[^41]"
+    fetchedAt: 2026-02-22T01:47:59.041Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 41
+    url: https://www.youtube.com/watch?v=T8LDtRi-95E
+    linkText: Founders Fund Deep Dive - YouTube Analysis
+    claimContext: "- One fund achieved a 26.6x return on \\$227 million in committed capital[^40] - The 2011 fourth fund (\\$625 million) achieved nearly 14x returns[^41] - Between 2020 and 2022, the firm returned \\$10 billion to limited partners through public market exits[^42]"
+    fetchedAt: 2026-02-22T01:48:00.509Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 42
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: "- The 2011 fourth fund (\\$625 million) achieved nearly 14x returns[^41] - Between 2020 and 2022, the firm returned \\$10 billion to limited partners through public market exits[^42]"
+    fetchedAt: 2026-02-22T01:48:00.085Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://sparkco.ai/blog/founders-fund
+    linkText: Founders Fund - Sparkco AI Blog
+    claimContext: These returns place Founders Fund among the top-performing venture capital firms globally, competing with established firms like Sequoia Capital and Andreessen Horowitz.[^43]
+    fetchedAt: 2026-02-22T01:48:00.556Z
+    httpStatus: 200
+    pageTitle: "In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories"
+    contentSnippet: "RSS Feed In-Depth Analysis of Founders Fund: Investment Strategies and Success Stories Investment Thesis and Strategic Focus Founders Fund Investment Thesis and Strategic Focus Founders Fund, a prominent venture capital firm, is renowned for its investment thesis centered on backing ambitious, transformational technologies with the potential to reshape industries and generate outsized returns. This approach is driven by a set of core principles that prioritize generational companies, contrarian "
+    contentLength: 368672
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: Founders Fund made its first Bitcoin investment in 2014, demonstrating early conviction in cryptocurrency.[^44] As of recent filings, the firm holds approximately \$1.58 billion in Bitcoin value (from \$294 million invested) and \$213 million in Ethereum (from \$202 million invested), representing s
+    fetchedAt: 2026-02-22T01:48:00.092Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.generalist.com/p/founders-fund-3
+    linkText: Founders Fund Analysis - The Generalist
+    claimContext: Founders Fund made its first Bitcoin investment in 2014, demonstrating early conviction in cryptocurrency.[^44] As of recent filings, the firm holds approximately \$1.58 billion in Bitcoin value (from \$294 million invested) and \$213 million in Ethereum (from \$202 million invested), representing s
+    fetchedAt: 2026-02-22T01:48:00.140Z
+    httpStatus: 200
+    pageTitle: The Gospel of Founders Fund - by Mario Gabriele
+    contentSnippet: "The Gospel of Founders Fund - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Gospel (Part III) How Founders Fund mastered the art of provocation and rebooted Silicon Valley's intellectual operating system. Mario Gabriele Jun 26, 2025 ∙ Paid 146 8 21 Share “Deep thinking on what makes businesses and firms great.” — Proby S, a paying member Subscribe Illustration by Edmon de Haro Friends, Founders Fund is not just a venture capital firm. It is a narrative agent with a gospel to "
+    contentLength: 229556
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: Founders Fund made its first Bitcoin investment in 2014, demonstrating early conviction in cryptocurrency.[^44] As of recent filings, the firm holds approximately \$1.58 billion in Bitcoin value (from \$294 million invested) and \$213 million in Ethereum (from \$202 million invested), representing s
+    fetchedAt: 2026-02-22T01:48:01.601Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "- **Anduril Series G**: ≈\\$1 billion investment at \\$28 billion valuation (2024-2025)[^47] - **Avalanche Energy**: Participation in \\$29 million round following plasma physics breakthroughs (February 2026)[^48]"
+    fetchedAt: 2026-02-22T01:48:01.566Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 48
+    url: https://www.prnewswire.com/news-releases/avalanche-energy-raises-29-million-following-plasma-physics-breakthroughs-302677177.html
+    linkText: Avalanche Energy Raises \$29 Million - PR Newswire
+    claimContext: "- **Anduril Series G**: ≈\\$1 billion investment at \\$28 billion valuation (2024-2025)[^47] - **Avalanche Energy**: Participation in \\$29 million round following plasma physics breakthroughs (February 2026)[^48] - **Neuralink Series E**: \\$600 million round (May 2025)[^49]"
+    fetchedAt: 2026-02-22T01:48:01.698Z
+    httpStatus: 200
+    pageTitle: Avalanche Energy Raises $29 Million Following Plasma Physics Breakthroughs
+    contentSnippet: Avalanche Energy Raises $29 Million Following Plasma Physics Breakthroughs Accessibility Statement Skip Navigation Capital enables full private match for Washington State Green Jobs grant and supports buildout of Avalanche's commercial FusionWERX test facility SEATTLE , Feb. 3, 2026 /PRNewswire/ -- Avalanche Energy , a fusion energy startup developing modular compact fusion machines, today announced $29 million in new funding led by RA Capital Management. New investors include 8090 Industries, O
+    contentLength: 209521
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.cbinsights.com/investor/founders-fund
+    linkText: Founders Fund Investments - CB Insights
+    claimContext: "- **Avalanche Energy**: Participation in \\$29 million round following plasma physics breakthroughs (February 2026)[^48] - **Neuralink Series E**: \\$600 million round (May 2025)[^49] - **Merge Labs**: Seed round (January 14, 2026)[^50]"
+    fetchedAt: 2026-02-22T01:48:02.388Z
+    httpStatus: 200
+    pageTitle: Founders Fund Portfolio Investments, Founders Fund Funds, Founders Fund Exits
+    contentSnippet: Founders Fund Portfolio Investments, Founders Fund Funds, Founders Fund Exits Predict your next investment Request a Demo Investments 1023 Portfolio Exits 179 Funds 17 Partners & Customers 4 About Founders Fund Founders Fund operates as a venture capital firm. It invests in technologies across various sectors. The firm invests in startups and companies that are in the technology sector. Founders Fund invests in companies at different stages of growth, from early-stage startups to more establishe
+    contentLength: 249268
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.cbinsights.com/investor/founders-fund
+    linkText: Founders Fund Investments - CB Insights
+    claimContext: "- **Neuralink Series E**: \\$600 million round (May 2025)[^49] - **Merge Labs**: Seed round (January 14, 2026)[^50]"
+    fetchedAt: 2026-02-22T01:48:02.395Z
+    httpStatus: 200
+    pageTitle: Founders Fund Portfolio Investments, Founders Fund Funds, Founders Fund Exits
+    contentSnippet: Founders Fund Portfolio Investments, Founders Fund Funds, Founders Fund Exits Predict your next investment Request a Demo Investments 1023 Portfolio Exits 179 Funds 17 Partners & Customers 4 About Founders Fund Founders Fund operates as a venture capital firm. It invests in technologies across various sectors. The firm invests in startups and companies that are in the technology sector. Founders Fund invests in companies at different stages of growth, from early-stage startups to more establishe
+    contentLength: 249268
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.cbinsights.com/investor/founders-fund
+    linkText: Founders Fund Investments - CB Insights
+    claimContext: The firm maintains an active investment pace of approximately 17 investments per year, with total portfolio exceeding 950 investments.[^51]
+    fetchedAt: 2026-02-22T01:48:03.760Z
+    httpStatus: 200
+    pageTitle: Founders Fund Portfolio Investments, Founders Fund Funds, Founders Fund Exits
+    contentSnippet: Founders Fund Portfolio Investments, Founders Fund Funds, Founders Fund Exits Predict your next investment Request a Demo Investments 1023 Portfolio Exits 179 Funds 17 Partners & Customers 4 About Founders Fund Founders Fund operates as a venture capital firm. It invests in technologies across various sectors. The firm invests in startups and companies that are in the technology sector. Founders Fund invests in companies at different stages of growth, from early-stage startups to more establishe
+    contentLength: 249268
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://foundersfund.com/company/openai/
+    linkText: Founders Fund - OpenAI Investment
+    claimContext: '- **<EntityLink id="openai">OpenAI</EntityLink>**: Early investor in the organization, which states its mission as creating "safe and powerful AI that benefits all of humanity"[^52] - **<EntityLink id="deepmind">DeepMind</EntityLink>**: Invested in this AI research leader before its acquisition by G'
+    fetchedAt: 2026-02-22T01:48:03.671Z
+    httpStatus: 200
+    pageTitle: OpenAI - Founders Fund
+    contentSnippet: OpenAI - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. Aerospace & Transportation SpaceX The first company to achieve orbit with a liquid-fueled rocket, SpaceX develops launch systems at dramatically-lower costs than any entity — go
+    contentLength: 21532
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: '- **<EntityLink id="openai">OpenAI</EntityLink>**: Early investor in the organization, which states its mission as creating "safe and powerful AI that benefits all of humanity"[^52] - **<EntityLink id="deepmind">DeepMind</EntityLink>**: Invested in this AI research leader before its acquisition by G'
+    fetchedAt: 2026-02-22T01:48:03.401Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 54
+    url: https://foundersfund.com/portfolio/
+    linkText: Founders Fund Portfolio
+    claimContext: '- **<EntityLink id="deepmind">DeepMind</EntityLink>**: Invested in this AI research leader before its acquisition by Google[^53] - **Cognition**: AI company in current portfolio[^54] - **Scale**: AI data infrastructure firm supporting model training[^55]'
+    fetchedAt: 2026-02-22T01:48:03.886Z
+    httpStatus: 200
+    pageTitle: Portfolio - Founders Fund
+    contentSnippet: Portfolio - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. SpaceX Palantir Anduril Stripe Facebook Airbnb Ramp Neuralink OpenAI Cognition Nubank Trade Republic Spotify Rippling Affirm Crusoe Polymarket Lighter Figma Varda General Mat
+    contentLength: 470890
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://foundersfund.com/portfolio/
+    linkText: Founders Fund Portfolio
+    claimContext: "- **Cognition**: AI company in current portfolio[^54] - **Scale**: AI data infrastructure firm supporting model training[^55]"
+    fetchedAt: 2026-02-22T01:48:03.936Z
+    httpStatus: 200
+    pageTitle: Portfolio - Founders Fund
+    contentSnippet: Portfolio - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. SpaceX Palantir Anduril Stripe Facebook Airbnb Ramp Neuralink OpenAI Cognition Nubank Trade Republic Spotify Rippling Affirm Crusoe Polymarket Lighter Figma Varda General Mat
+    contentLength: 470890
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: Additional defense-related AI investments include Arceo.ai (cybersecurity), which raised a \$37 million round led by Founders Fund in 2019 and a \$100 million Series D in 2023.[^56]
+    fetchedAt: 2026-02-22T01:48:04.945Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 57
+    url: https://foundersfund.com/portfolio/
+    linkText: Founders Fund Portfolio
+    claimContext: Despite backing major AI capability companies, Founders Fund shows no explicit investments, public statements, or initiatives focused on AI safety, alignment research, or existential risk mitigation.[^57] The firm's portfolio does not include investments in safety-focused organizations like <EntityL
+    fetchedAt: 2026-02-22T01:48:05.042Z
+    httpStatus: 200
+    pageTitle: Portfolio - Founders Fund
+    contentSnippet: Portfolio - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. SpaceX Palantir Anduril Stripe Facebook Airbnb Ramp Neuralink OpenAI Cognition Nubank Trade Republic Spotify Rippling Affirm Crusoe Polymarket Lighter Figma Varda General Mat
+    contentLength: 470890
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://foundersfund.com/portfolio/
+    linkText: Founders Fund Portfolio
+    claimContext: Despite backing major AI capability companies, Founders Fund shows no explicit investments, public statements, or initiatives focused on AI safety, alignment research, or existential risk mitigation.[^57] The firm's portfolio does not include investments in safety-focused organizations like <EntityL
+    fetchedAt: 2026-02-22T01:48:05.036Z
+    httpStatus: 200
+    pageTitle: Portfolio - Founders Fund
+    contentSnippet: Portfolio - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. SpaceX Palantir Anduril Stripe Facebook Airbnb Ramp Neuralink OpenAI Cognition Nubank Trade Republic Spotify Rippling Affirm Crusoe Polymarket Lighter Figma Varda General Mat
+    contentLength: 470890
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: This positioning aligns with the firm's broader emphasis on transformative technologies and rapid capability development rather than precautionary approaches. Peter Thiel's defense technology focus through companies like Palantir and Anduril reflects strategic and commercial priorities rather than s
+    fetchedAt: 2026-02-22T01:48:04.957Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 60
+    url: https://foundersfund.com/2017/01/manifesto/
+    linkText: What Happened to the Future? - Founders Fund Manifesto
+    claimContext: The firm's 2017 manifesto and Hereticon events have critiqued what they term "celebrity safetyists" who fear technology risks, emphasizing progress through bold development over caution.[^60] This philosophical stance suggests limited interest in alignment or safety research that might slow AI capab
+    fetchedAt: 2026-02-22T01:48:05.079Z
+    httpStatus: 200
+    pageTitle: What happened to the future? - Founders Fund
+    contentSnippet: What happened to the future? - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. Hereticon Apocalypse Ball By Mike Solana The Apocalypse will take place from the evening of October 28th to the morning of October 31st. Join us for a show
+    contentLength: 49398
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://www.axios.com/2023/03/14/founders-fund-run-silicon-valley-bank
+    linkText: Founders Fund and Silicon Valley Bank - Axios
+    claimContext: In March 2023, Founders Fund faced intense criticism for its role in triggering a bank run on Silicon Valley Bank (SVB).[^61] On Thursday morning, senior operations executives at the firm swiftly transferred assets to larger banks and advised portfolio companies to withdraw funds from SVB.[^62] This
+    fetchedAt: 2026-02-22T01:48:07.189Z
+    httpStatus: 200
+    pageTitle: The story behind Founders Fund and the run on Silicon Valley Bank
+    contentSnippet: "The story behind Founders Fund and the run on Silicon Valley Bank Skip to main content Mar 14, 2023 - Economy The story behind Founders Fund and the run on Silicon Valley Bank Dan Primack facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Lindsey Bailey/Axios Silicon Valley Ban"
+    contentLength: 176126
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://www.axios.com/2023/03/14/founders-fund-run-silicon-valley-bank
+    linkText: Founders Fund and Silicon Valley Bank - Axios
+    claimContext: In March 2023, Founders Fund faced intense criticism for its role in triggering a bank run on Silicon Valley Bank (SVB).[^61] On Thursday morning, senior operations executives at the firm swiftly transferred assets to larger banks and advised portfolio companies to withdraw funds from SVB.[^62] This
+    fetchedAt: 2026-02-22T01:48:06.692Z
+    httpStatus: 200
+    pageTitle: The story behind Founders Fund and the run on Silicon Valley Bank
+    contentSnippet: "The story behind Founders Fund and the run on Silicon Valley Bank Skip to main content Mar 14, 2023 - Economy The story behind Founders Fund and the run on Silicon Valley Bank Dan Primack facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Lindsey Bailey/Axios Silicon Valley Ban"
+    contentLength: 176126
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://www.businessinsider.com/peter-thiel-founders-fund-pulled-cash-svb-before-collapse-report-2023-3
+    linkText: Peter Thiel Founders Fund Pulled Cash from SVB - Business Insider
+    claimContext: In March 2023, Founders Fund faced intense criticism for its role in triggering a bank run on Silicon Valley Bank (SVB).[^61] On Thursday morning, senior operations executives at the firm swiftly transferred assets to larger banks and advised portfolio companies to withdraw funds from SVB.[^62] This
+    fetchedAt: 2026-02-22T01:48:06.206Z
+    httpStatus: 200
+    pageTitle: "Peter Thiel's Founders Fund Pulled Cash From SVB Before Collapse: Report - Business Insider"
+    contentSnippet: "Peter Thiel's Founders Fund Pulled Cash From SVB Before Collapse: Report - Business Insider Tech Peter Thiel&#x27;s Founders Fund got its cash out of Silicon Valley Bank before it was shut down, report says By Ryan Hogg Peter Thiel was a cofounder of PayPal. Marco Bello/Getty Images 2023-03-11T11:40:55.000Z Share Copy link Email Facebook WhatsApp X LinkedIn Bluesky Threads lighning bolt icon An icon in the shape of a lightning bolt. Impact Link Save Saved Read in app This story is available excl"
+    contentLength: 437282
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.axios.com/2023/03/14/founders-fund-run-silicon-valley-bank
+    linkText: Founders Fund and Silicon Valley Bank - Axios
+    claimContext: The resulting withdrawals totaled \$42 billion, and some venture capitalists accused Founders Fund and Peter Thiel specifically of deliberately triggering the crisis, possibly as retribution for unresolved conflicts.[^64] Founders Fund responded by stating it acted according to fiduciary responsibil
+    fetchedAt: 2026-02-22T01:48:07.017Z
+    httpStatus: 200
+    pageTitle: The story behind Founders Fund and the run on Silicon Valley Bank
+    contentSnippet: "The story behind Founders Fund and the run on Silicon Valley Bank Skip to main content Mar 14, 2023 - Economy The story behind Founders Fund and the run on Silicon Valley Bank Dan Primack facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Lindsey Bailey/Axios Silicon Valley Ban"
+    contentLength: 176124
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://www.axios.com/2023/03/14/founders-fund-run-silicon-valley-bank
+    linkText: Founders Fund and Silicon Valley Bank - Axios
+    claimContext: The resulting withdrawals totaled \$42 billion, and some venture capitalists accused Founders Fund and Peter Thiel specifically of deliberately triggering the crisis, possibly as retribution for unresolved conflicts.[^64] Founders Fund responded by stating it acted according to fiduciary responsibil
+    fetchedAt: 2026-02-22T01:48:07.176Z
+    httpStatus: 200
+    pageTitle: The story behind Founders Fund and the run on Silicon Valley Bank
+    contentSnippet: "The story behind Founders Fund and the run on Silicon Valley Bank Skip to main content Mar 14, 2023 - Economy The story behind Founders Fund and the run on Silicon Valley Bank Dan Primack facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Illustration: Lindsey Bailey/Axios Silicon Valley Ban"
+    contentLength: 176127
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Meta Board Overlap**: Peter Thiel's position on Meta's board created multiple conflicts with Founders Fund investments. The firm invested \\$10 million in Boldend, a San Diego-based cyberwarfare company competing with NSO Group's Pegasus, whose tools could reportedly hack Meta-owned WhatsApp—raisin"
+    fetchedAt: 2026-02-22T01:48:08.195Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 67
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: Similarly problematic was Founders Fund's investment in Clearview AI, which collected billions of photos from Facebook, Instagram, and other social platforms in direct violation of their terms of service, again while Thiel held a Meta board seat.[^67] Meta declined to comment on these arrangements.[
+    fetchedAt: 2026-02-22T01:48:08.195Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 68
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: Similarly problematic was Founders Fund's investment in Clearview AI, which collected billions of photos from Facebook, Instagram, and other social platforms in direct violation of their terms of service, again while Thiel held a Meta board seat.[^67] Meta declined to comment on these arrangements.[
+    fetchedAt: 2026-02-22T01:48:08.207Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 69
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Rivalry with Mithril Capital**: Founders Fund has engaged in longstanding competition with Mithril Capital, another Thiel-affiliated firm. In 2013, Founders Fund overrode Mithril's early Airbnb deal (Series C) by leveraging Thiel's prior backing, with Thiel later compensating Mithril through a Pal"
+    fetchedAt: 2026-02-22T01:48:08.208Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 70
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Rivalry with Mithril Capital**: Founders Fund has engaged in longstanding competition with Mithril Capital, another Thiel-affiliated firm. In 2013, Founders Fund overrode Mithril's early Airbnb deal (Series C) by leveraging Thiel's prior backing, with Thiel later compensating Mithril through a Pal"
+    fetchedAt: 2026-02-22T01:48:08.209Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 71
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "The firm attracted criticism in 2025 for political connections when the General Services Administration considered it for government contracts.[^71] Additionally, Founders Fund was criticized for violating ethical norms and FDA rules through involvement with a vaccine company that used a live virus "
+    fetchedAt: 2026-02-22T01:48:09.215Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 72
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "The firm attracted criticism in 2025 for political connections when the General Services Administration considered it for government contracts.[^71] Additionally, Founders Fund was criticized for violating ethical norms and FDA rules through involvement with a vaccine company that used a live virus "
+    fetchedAt: 2026-02-22T01:48:09.215Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 73
+    url: https://observer.com/2025/10/paypal-cofounders-today/
+    linkText: PayPal Cofounders Today - Observer
+    claimContext: Peter Thiel personally faced controversy for secretly funding Hulk Hogan's \$10 million lawsuit against Gawker Media in 2012, which drove the online media company into bankruptcy.[^73] This action, while legally successful, raised questions about the use of wealth to suppress media organizations.
+    fetchedAt: 2026-02-22T01:48:09.476Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 74
+    url: https://www.generalist.com/p/founders-fund-2
+    linkText: The Complete Founders Fund Story - The Generalist
+    claimContext: Mithril Capital, a related fund in Thiel's investment ecosystem, faced serious allegations in 2019 when former counsel Crystal McKellar alleged that founder Ajay Royan had misled investors and artificially inflated performance numbers.[^74] McKellar claimed wrongful termination for reporting these i
+    fetchedAt: 2026-02-22T01:48:09.536Z
+    httpStatus: 200
+    pageTitle: "Founders Fund: The Disciples - by Mario Gabriele"
+    contentSnippet: 'Founders Fund: The Disciples - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Disciples (Part II) Peter Thiel is not a manager. But his singular eye for talent allowed him to assemble an unorthodox team that went on one of venture’s hottest streaks. Mario Gabriele Jun 19, 2025 ∙ Paid 185 6 38 Share "The best long-form essays on VC & Private Companies. " — MS, a paying member Subscribe Illustration by Edmon de Haro Friends, A prophet without disciples is a madman. Founders Fund'
+    contentLength: 249187
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://www.generalist.com/p/founders-fund-2
+    linkText: The Complete Founders Fund Story - The Generalist
+    claimContext: Mithril Capital, a related fund in Thiel's investment ecosystem, faced serious allegations in 2019 when former counsel Crystal McKellar alleged that founder Ajay Royan had misled investors and artificially inflated performance numbers.[^74] McKellar claimed wrongful termination for reporting these i
+    fetchedAt: 2026-02-22T01:48:09.863Z
+    httpStatus: 200
+    pageTitle: "Founders Fund: The Disciples - by Mario Gabriele"
+    contentSnippet: 'Founders Fund: The Disciples - by Mario Gabriele The Generalist Subscribe Sign in No Rivals: The Disciples (Part II) Peter Thiel is not a manager. But his singular eye for talent allowed him to assemble an unorthodox team that went on one of venture’s hottest streaks. Mario Gabriele Jun 19, 2025 ∙ Paid 185 6 38 Share "The best long-form essays on VC & Private Companies. " — MS, a paying member Subscribe Illustration by Edmon de Haro Friends, A prophet without disciples is a madman. Founders Fund'
+    contentLength: 249187
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: Peter Thiel's dominant influence within Founders Fund creates governance dynamics that may bias decision-making. He surrounds himself with loyal partners like Keith Rabois, Sean Parker, Max Marmer, and Trae Stephens, and holds veto power on deals over \$10 million alongside two other directors.[^76]
+    fetchedAt: 2026-02-22T01:48:10.871Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 77
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "The 2023 decision to slash the eighth flagship fund from \\$1.8 billion to \\$900 million, driven by Thiel's view of necessary venture capital \"slimdown,\" faced internal resistance but proceeded regardless.[^77] Ryan Petersen, Flexport CEO who became a partner in 2023, had previously expressed regret "
+    fetchedAt: 2026-02-22T01:48:10.872Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 78
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "The 2023 decision to slash the eighth flagship fund from \\$1.8 billion to \\$900 million, driven by Thiel's view of necessary venture capital \"slimdown,\" faced internal resistance but proceeded regardless.[^77] Ryan Petersen, Flexport CEO who became a partner in 2023, had previously expressed regret "
+    fetchedAt: 2026-02-22T01:48:10.871Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 79
+    url: https://www.independent.org/author/peter-a-thiel/
+    linkText: Peter Thiel - Independent Institute
+    claimContext: "**Peter Thiel** (Co-founder, Partner): Born October 11, 1967, in Frankfurt, West Germany. Stanford philosophy graduate (A.B.) and Stanford Law School J.D.[^79] Co-founded PayPal (originally Confinity) in 1998, serving as CEO and chairman until eBay's \\$1.5 billion acquisition in 2002.[^80] First out"
+    fetchedAt: 2026-02-22T01:48:11.336Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 80
+    url: https://en.wikipedia.org/wiki/Peter_Thiel
+    linkText: Peter Thiel - Wikipedia
+    claimContext: "**Peter Thiel** (Co-founder, Partner): Born October 11, 1967, in Frankfurt, West Germany. Stanford philosophy graduate (A.B.) and Stanford Law School J.D.[^79] Co-founded PayPal (originally Confinity) in 1998, serving as CEO and chairman until eBay's \\$1.5 billion acquisition in 2002.[^80] First out"
+    fetchedAt: 2026-02-22T01:48:10.873Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 81
+    url: https://foundersfund.com/team/peter-thiel/
+    linkText: Peter Thiel - Founders Fund Team
+    claimContext: "**Peter Thiel** (Co-founder, Partner): Born October 11, 1967, in Frankfurt, West Germany. Stanford philosophy graduate (A.B.) and Stanford Law School J.D.[^79] Co-founded PayPal (originally Confinity) in 1998, serving as CEO and chairman until eBay's \\$1.5 billion acquisition in 2002.[^80] First out"
+    fetchedAt: 2026-02-22T01:48:12.804Z
+    httpStatus: 200
+    pageTitle: Peter Thiel - Founders Fund
+    contentSnippet: Peter Thiel - Founders Fund Founders Fund Copyright © 2005-2026. All Rights Reserved. Founders Funder ® is a registered trademark of Founders Fund, LLC. Terms of Use. Past performance is not indicative of future results. Investments may lose value. No offer to sell or solicitation of an offer to buy securities is made hereby. Peter Thiel Partner Napoleon Ta Partner Trae Stephens Partner Lauren Gross Partner & COO Scott Nolan Partner John Luttig Partner Matias Van Thienen Partner Delian Asparouho
+    contentLength: 43267
+    status: verified
+    note: null
+  - footnote: 82
+    url: https://en.wikipedia.org/wiki/Peter_Thiel
+    linkText: Peter Thiel - Wikipedia
+    claimContext: "**Peter Thiel** (Co-founder, Partner): Born October 11, 1967, in Frankfurt, West Germany. Stanford philosophy graduate (A.B.) and Stanford Law School J.D.[^79] Co-founded PayPal (originally Confinity) in 1998, serving as CEO and chairman until eBay's \\$1.5 billion acquisition in 2002.[^80] First out"
+    fetchedAt: 2026-02-22T01:48:12.342Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 83
+    url: https://en.wikipedia.org/wiki/Peter_Thiel
+    linkText: Peter Thiel - Wikipedia
+    claimContext: "**Peter Thiel** (Co-founder, Partner): Born October 11, 1967, in Frankfurt, West Germany. Stanford philosophy graduate (A.B.) and Stanford Law School J.D.[^79] Co-founded PayPal (originally Confinity) in 1998, serving as CEO and chairman until eBay's \\$1.5 billion acquisition in 2002.[^80] First out"
+    fetchedAt: 2026-02-22T01:48:12.343Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 84
+    url: https://en.wikipedia.org/wiki/Peter_Thiel
+    linkText: Peter Thiel - Wikipedia
+    claimContext: "**Peter Thiel** (Co-founder, Partner): Born October 11, 1967, in Frankfurt, West Germany. Stanford philosophy graduate (A.B.) and Stanford Law School J.D.[^79] Co-founded PayPal (originally Confinity) in 1998, serving as CEO and chairman until eBay's \\$1.5 billion acquisition in 2002.[^80] First out"
+    fetchedAt: 2026-02-22T01:48:12.343Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 85
+    url: https://www.independent.org/author/peter-a-thiel/
+    linkText: Peter Thiel - Independent Institute
+    claimContext: "**Peter Thiel** (Co-founder, Partner): Born October 11, 1967, in Frankfurt, West Germany. Stanford philosophy graduate (A.B.) and Stanford Law School J.D.[^79] Co-founded PayPal (originally Confinity) in 1998, serving as CEO and chairman until eBay's \\$1.5 billion acquisition in 2002.[^80] First out"
+    fetchedAt: 2026-02-22T01:48:12.366Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 86
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Ken Howery** (Co-founder): PayPal alumnus who co-founded Founders Fund with Thiel and Nosek in 2005.[^86]"
+    fetchedAt: 2026-02-22T01:48:13.809Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 87
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Luke Nosek** (Co-founder): PayPal alumnus and founding partner.[^87]"
+    fetchedAt: 2026-02-22T01:48:13.810Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 88
+    url: https://en.wikipedia.org/wiki/Founders_Fund
+    linkText: Founders Fund - Wikipedia
+    claimContext: "**Sean Parker** (Partner): Napster co-founder and early Facebook president who joined Founders Fund in 2006, bringing expertise in consumer internet platforms.[^88]"
+    fetchedAt: 2026-02-22T01:48:13.810Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 89
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: "**Keith Rabois** (General Partner): Leads Miami office opened in 2022, expanding Founders Fund's geographic presence.[^89]"
+    fetchedAt: 2026-02-22T01:48:13.975Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 90
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: "**Lauren Gross and Brian Singerman** (Longtime Partners): Key figures in fund strategy discussions; discussed the firm's non-thematic approach and cryptocurrency investments, including the first Bitcoin investment in 2014.[^90]"
+    fetchedAt: 2026-02-22T01:48:13.983Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 91
+    url: https://techcrunch.com/2022/03/04/a-peek-inside-founders-fund-as-it-closes-on-5-billion-across-two-new-funds/
+    linkText: A Peek Inside Founders Fund - TechCrunch
+    claimContext: "**Other Partners and Principals**: Delian Asparouhov, Matias Van Thienen (promoted to partner), Napoleon Ta (web3 focus), Joey Krug, Jennifer Campbell, Sean Liu, Amin Mirzadegan.[^91]"
+    fetchedAt: 2026-02-22T01:48:15.037Z
+    httpStatus: 200
+    pageTitle: A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch
+    contentSnippet: "A look inside Founders Fund, as it closes on $5 billion across two new funds | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Kiyoshi Ota/Bloomberg via Getty Images / Getty Images A look inside Founders Fund, as it closes on $5 billion across two new funds Connie Loizos 4:44 PM PST · March 4, 2022 Founders Fund has garnered a lot of"
+    contentLength: 240822
+    status: verified
+    note: null
+  - footnote: 92
+    url: https://www.cooley.com/news/coverage/2025/2025-08-04-founders-fund-closes-4-6-billion-growth-iii-fund
+    linkText: Cooley News - Founders Fund Closes \$4.6 Billion Growth III Fund
+    claimContext: "**Erin Gleason Lane** (Chief Communications Officer), **Michael Solana** (CMO), **Neil Ruthven** (CFO), with legal counsel including Cooley team members John Dado, Jimmy Matteucci, and Eric Doherty advising on major fund closings.[^92]"
+    fetchedAt: 2026-02-22T01:48:15.598Z
+    httpStatus: 200
+    pageTitle: Founders Fund Closes $4.6 Billion Growth III Fund // Cooley // Global Law Firm
+    contentSnippet: --> --> --> Founders Fund Closes $4.6 Billion Growth III Fund // Cooley // Global Law Firm Skip to main content Press Release Founders Fund Closes $4.6 Billion Growth III Fund August 4, 2025 Share Share on LinkedIn Share on X Share on Facebook Share with Email San Francisco &ndash; August 4, 2025 &ndash; Cooley recently advised Founders Fund, a San Francisco-based venture capital firm, on the close of its $4.6 billion third growth fund, Founders Fund Growth III. Lawyers John Dado, Jimmy Matteucc
+    contentLength: 60827
+    status: verified
+    note: null

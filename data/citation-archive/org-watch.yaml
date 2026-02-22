@@ -1,0 +1,18 @@
+pageId: org-watch
+verifiedAt: 2026-02-22
+totalCitations: 1
+verified: 1
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://orgwatch.issarice.com/
+    linkText: User-provided context from
+    claimContext: Org Watch is a tracking website created by <EntityLink id="issa-rice">Issa Rice</EntityLink> that monitors various organizations, with a likely focus on effective altruism and AI safety organizations.[^1] The site is part of Rice's broader ecosystem of tracking and research tools, which includes <En
+    fetchedAt: 2026-02-22T02:28:29.233Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: --> Verifying that you are a human... Please refresh the page to continue (if it does not automatically refresh). If you still see this page even after refreshing, try enabling JavaScript and/or cookies in your browser.
+    contentLength: 562
+    status: verified
+    note: null

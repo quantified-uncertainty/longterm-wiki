@@ -1,0 +1,260 @@
+pageId: ibbis
+verifiedAt: 2026-02-22
+totalCitations: 23
+verified: 23
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://ibbis.bio/our-work/common-mechanism/
+    linkText: Common Mechanism - IBBIS — - Technical details and screening approach
+    claimContext: "|-----------|------------|----------| | **Focus Area** | DNA synthesis screening and biosecurity norms | Free open-source screening tool (commec); international standards development[^1] | | **Founding** | February 2024, spun out of NTI \\| bio | Incubated since 2019; headquartered in Geneva, Switzer"
+    fetchedAt: 2026-02-22T02:21:35.035Z
+    httpStatus: 200
+    pageTitle: Common Mechanism - IBBIS
+    contentSnippet: "Common Mechanism - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Common Mechanism A free, open-source, globally-available tool for synthesis screening The Common "
+    contentLength: 57683
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://ibbis.bio/about/
+    linkText: About IBBIS — - Founding, mission, headquarters, registration
+    claimContext: "| **Focus Area** | DNA synthesis screening and biosecurity norms | Free open-source screening tool (commec); international standards development[^1] | | **Founding** | February 2024, spun out of NTI \\| bio | Incubated since 2019; headquartered in Geneva, Switzerland[^2] | | **Funding** | \\$3M launch"
+    fetchedAt: 2026-02-22T02:21:35.153Z
+    httpStatus: 200
+    pageTitle: About - IBBIS
+    contentSnippet: About - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact "IBBIS is a necessary institution and fills a critical gap in the global architecture for responsible stewar
+    contentLength: 44543
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.founderspledge.com/research/international-biosecurity-and-biosafety-initiative-for-science
+    linkText: Founders Pledge - IBBIS Recommendation — - Funding assessment and \$3M grant
+    claimContext: "| **Founding** | February 2024, spun out of NTI \\| bio | Incubated since 2019; headquartered in Geneva, Switzerland[^2] | | **Funding** | \\$3M launch grant from Founders Pledge | Independent Swiss non-profit foundation (registered June 2024)[^3] | | **Team** | approximately 10 staff | International "
+    fetchedAt: 2026-02-22T02:21:34.903Z
+    httpStatus: 200
+    pageTitle: International Biosecurity and Biosafety Initiative for Science
+    contentSnippet: "International Biosecurity and Biosafety Initiative for Science Related research Global Catastrophic Biological Risks: A Guide for Philanthropists Learn more The International Biosecurity and Biosafety Initiative for Science (IBBIS) is a new international organization that works with key stakeholders around the world to develop practical tools and solutions for reducing risks — including global catastrophic risks — from bioscience and biotechnology. For its first major project, IBBIS is focusing "
+    contentLength: 163429
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://ibbis.bio/about/people/
+    linkText: IBBIS People — - Staff and advisory board
+    claimContext: "| **Funding** | \\$3M launch grant from Founders Pledge | Independent Swiss non-profit foundation (registered June 2024)[^3] | | **Team** | approximately 10 staff | International team spanning UK, Canada, France, New Zealand, Switzerland, Brazil, Argentina[^4] | | **Policy Influence** | Growing | Par"
+    fetchedAt: 2026-02-22T02:21:35.059Z
+    httpStatus: 200
+    pageTitle: People - IBBIS
+    contentSnippet: People - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Board of Directors --> Staff Piers Millett | Executive Director | UK Tessa Alexanian | Technical Lead, Comm
+    contentLength: 60414
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.nti.org/news/international-biosecurity-and-biosafety-initiative-for-science-accepted-to-paris-peace-forum-scale-up-program/
+    linkText: NTI - IBBIS Accepted to Paris Peace Forum Scale Up Program — - Accelerator program selection
+    claimContext: "| **Team** | approximately 10 staff | International team spanning UK, Canada, France, New Zealand, Switzerland, Brazil, Argentina[^4] | | **Policy Influence** | Growing | Paris Peace Forum Scale Up Program; EU Biotech Act advocacy; ISO 20688-2 operationalization[^5][^6] | | **Key Output** | Common M"
+    fetchedAt: 2026-02-22T02:21:35.040Z
+    httpStatus: 200
+    pageTitle: International Biosecurity and Biosafety Initiative for Science Accepted to Paris Peace Forum Scale Up Program
+    contentSnippet: International Biosecurity and Biosafety Initiative for Science Accepted to Paris Peace Forum Scale Up Program Close News Dec 1, 2023 International Biosecurity and Biosafety Initiative for Science Accepted to Paris Peace Forum Scale Up Program Share --> Twitter Facebook Linkedin Email About the image The Paris Peace Forum Scale Up Program selected the International Biosecurity and Biosafety Initiative for Science (IBBIS) as one of 10 initiatives to receive support from the Paris Peace Forum commu
+    contentLength: 56503
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://ibbis.bio/ibbis-calls-for-synthesis-screening-and-international-standards-in-eu-biotech-act/
+    linkText: IBBIS Calls for Biosecurity Provisions in EU Biotech Act — - Policy advocacy
+    claimContext: "| **Team** | approximately 10 staff | International team spanning UK, Canada, France, New Zealand, Switzerland, Brazil, Argentina[^4] | | **Policy Influence** | Growing | Paris Peace Forum Scale Up Program; EU Biotech Act advocacy; ISO 20688-2 operationalization[^5][^6] | | **Key Output** | Common M"
+    fetchedAt: 2026-02-22T02:21:36.325Z
+    httpStatus: 200
+    pageTitle: IBBIS calls for synthesis screening and international standards in EU Biotech Act - IBBIS
+    contentSnippet: IBBIS calls for synthesis screening and international standards in EU Biotech Act - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact IBBIS calls for synthesis screen
+    contentLength: 46815
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.nti.org/news/new-international-biosecurity-organization-launched-to-safeguard-bioscience/
+    linkText: NTI - New International Biosecurity Organization Launched — - Launch announcement
+    claimContext: The International Biosecurity and Biosafety Initiative for Science (IBBIS) is an independent Swiss non-profit foundation launched in February 2024 to strengthen international biosecurity governance amid rapid advances in bioscience and biotechnology.[^2] The organization was incubated by <EntityLink
+    fetchedAt: 2026-02-22T02:21:36.612Z
+    httpStatus: 200
+    pageTitle: New International Biosecurity Organization Launched to Safeguard Bioscience
+    contentSnippet: New International Biosecurity Organization Launched to Safeguard Bioscience Close News Feb 15, 2024 New International Biosecurity Organization Launched to Safeguard Bioscience Share --> Twitter Facebook Linkedin Email Links & Downloads Learn more about IBBIS Watch the launch event MUNICH (February 15, 2024)— Amid rapid advances in bioscience and biotechnology that could pose significant global security risks without effective guardrails, the Nuclear Threat Initiative (NTI) today launched the Int
+    contentLength: 60306
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://ibbis.bio/
+    linkText: IBBIS Website — - Vision and mission
+    claimContext: "IBBIS is headquartered in Geneva, Switzerland, at Route de Frontenex 41A, and is registered as a Swiss foundation with public-good mission (UID CHE-182.748.080).[^2] The organization's vision is \"a world in which bioscience and biotechnology can advance and flourish safely and responsibly,\" and its "
+    fetchedAt: 2026-02-22T02:21:36.337Z
+    httpStatus: 200
+    pageTitle: IBBIS - Safeguarding modern bioscience and biotechnology
+    contentSnippet: IBBIS - Safeguarding modern bioscience and biotechnology About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Safeguarding modern bioscience and biotechnology so it can advanc
+    contentLength: 52197
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://ibbis.bio/our-work/common-mechanism/faq/
+    linkText: Common Mechanism FAQ — - Privacy, open-source details
+    claimContext: "The organization's flagship product is the **Common Mechanism** (software package name: **commec**), a free, open-source, globally available tool for screening orders of synthetic DNA and RNA.[^1] Unlike proprietary alternatives, commec runs locally on provider systems with no data transferred to IB"
+    fetchedAt: 2026-02-22T02:21:36.360Z
+    httpStatus: 200
+    pageTitle: FAQs - IBBIS
+    contentSnippet: "FAQs - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact FAQs Common Mechanism for DNA Synthesis Screening Last updated: July 2025 The Common Mechanism provides free,"
+    contentLength: 66154
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://github.com/ibbis-bio/common-mechanism
+    linkText: GitHub - ibbis-bio/common-mechanism — - Open-source repository
+    claimContext: In 2019, NTI \| bio and international stakeholders identified the need for a dedicated organization to reduce emerging biological risks from advancing biotechnology.[^7] This work emerged from NTI's Biosecurity Innovation and Risk Reduction Initiative (BIRRI). NTI launched the International Technica
+    fetchedAt: 2026-02-22T02:21:36.793Z
+    httpStatus: 200
+    pageTitle: "GitHub - ibbis-bio/common-mechanism: A free, open-source, globally available tool for DNA sequence screening"
+    contentSnippet: "GitHub - ibbis-bio/common-mechanism: A free, open-source, globally available tool for DNA sequence screening Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} ibbis-bio / common-mechanism Public Notifications You must be signed in to change notification settings Fork 2 Star 36 A"
+    contentLength: 273099
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.nti.org/news/nti-announces-dr-piers-millett-as-inaugural-executive-director-of-new-international-biosecurity-organization-ibbis/
+    linkText: NTI - Dr. Piers Millett Named Director — - Leadership appointment
+    claimContext: In Fall 2022, NTI appointed Dr. Piers Millett as the inaugural Executive Director of the organization-in-formation.[^11] Throughout 2021-2023, initial databases and screening algorithms were developed for what would become the Common Mechanism.[^1]
+    fetchedAt: 2026-02-22T02:21:38.417Z
+    httpStatus: 200
+    pageTitle: Dr. Piers Millett Named Director of New Biosecurity Group
+    contentSnippet: Dr. Piers Millett Named Director of New Biosecurity Group Close News Oct 4, 2022 NTI Announces Dr. Piers Millett as Inaugural Executive Director of New International Biosecurity Organization, IBBIS Share --> Twitter Facebook Linkedin Email NTI is pleased to announce the appointment of Dr. Piers Millett as the founding executive director of the International Biosecurity and Biosafety Initiative for Science (IBBIS) , a new organization that will work collaboratively with global partners to strengt
+    contentLength: 59021
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://ibbis.bio/ibbis-at-the-ai-action-summit-advancing-biosecurity-in-the-age-of-ai/
+    linkText: IBBIS at the AI Action Summit — - February 2025 participation
+    claimContext: '- **February 2025**: IBBIS participated in the AI Action Summit in Paris, contributing to discussions on AI and life sciences biosecurity[^12] - **October 2025**: Sequence Biosecurity Risk Consortium (SBRC) launched at the iGEM Responsibility Conference in Paris, defining what counts as a "sequence '
+    fetchedAt: 2026-02-22T02:21:37.961Z
+    httpStatus: 200
+    pageTitle: "IBBIS at the AI Action Summit: Advancing Biosecurity in the Age of AI - IBBIS"
+    contentSnippet: "IBBIS at the AI Action Summit: Advancing Biosecurity in the Age of AI - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact IBBIS at the AI Action Summit: Advancing Bio"
+    contentLength: 45319
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://ibbis.bio/sbrc-launched-standard-sequences-of-concern/
+    linkText: SBRC Launched — - Sequence Biosecurity Risk Consortium
+    claimContext: '- **February 2025**: IBBIS participated in the AI Action Summit in Paris, contributing to discussions on AI and life sciences biosecurity[^12] - **October 2025**: Sequence Biosecurity Risk Consortium (SBRC) launched at the iGEM Responsibility Conference in Paris, defining what counts as a "sequence '
+    fetchedAt: 2026-02-22T02:21:37.970Z
+    httpStatus: 200
+    pageTitle: SBRC launched to engineer standard definitions of sequences of concern - IBBIS
+    contentSnippet: SBRC launched to engineer standard definitions of sequences of concern - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact SBRC launched to engineer standard definiti
+    contentLength: 47397
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://ibbis.bio/ibbis-launches-technical-consortium/
+    linkText: IBBIS Launches Technical Consortium — - November 2025 DSSC launch
+    claimContext: '- **October 2025**: Sequence Biosecurity Risk Consortium (SBRC) launched at the iGEM Responsibility Conference in Paris, defining what counts as a "sequence of concern"[^13] - **November 2025**: DNA Screening Standards Consortium (DSSC) launched in Singapore on November 6, with ≈30 experts from indu'
+    fetchedAt: 2026-02-22T02:21:37.973Z
+    httpStatus: 200
+    pageTitle: IBBIS Launches Technical Consortium to Raise the Global Bar on DNA Synthesis Screening - IBBIS
+    contentSnippet: IBBIS Launches Technical Consortium to Raise the Global Bar on DNA Synthesis Screening - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact IBBIS Launches Technical Co
+    contentLength: 47045
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://github.com/ibbis-bio
+    linkText: GitHub - ibbis-bio — - Open-source repositories
+    claimContext: "|---------|---------| | **Cost** | Free and open-source (GitHub: ibbis-bio/common-mechanism)[^15] | | **Privacy** | Runs locally; no data transferred from users to IBBIS[^9] |"
+    fetchedAt: 2026-02-22T02:21:38.146Z
+    httpStatus: 200
+    pageTitle: IBBIS · GitHub
+    contentSnippet: IBBIS · GitHub Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} Pinned Loading common-mechanism common-mechanism Public A free, open-source, globally available tool for DNA sequence screening Python 36 2 Repositories --> Loading Type All Public Sources Forks Archived Mirrors Te
+    contentLength: 210214
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://ibbis.bio/our-work/common-mechanism/common-mechanism-performance/
+    linkText: Common Mechanism Performance — - Screening benchmarks
+    claimContext: "| **Screening steps** | Biorisk search (HMM-based), Taxonomy search (regulated pathogens), Low-concern clearing[^1] | | **Performance** | Exceeds Bronze Standard benchmarks; tested against real customer orders[^16] | | **Version** | v0.1 released May 2024; ongoing development[^1] |"
+    fetchedAt: 2026-02-22T02:21:39.599Z
+    httpStatus: 200
+    pageTitle: Common Mechanism | Sequence Screening Performance - IBBIS
+    contentSnippet: Common Mechanism | Sequence Screening Performance - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Common Mechanism | Sequence Screening Performance Testing v0.1 o
+    contentLength: 47432
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://ibbis.bio/our-work/international-screening-standards/
+    linkText: International Screening Standards - IBBIS — - Standards harmonization
+    claimContext: IBBIS works to harmonize and standardize DNA synthesis screening approaches globally, with core efforts including:[^17]
+    fetchedAt: 2026-02-22T02:21:39.648Z
+    httpStatus: 200
+    pageTitle: International Screening Standards - IBBIS
+    contentSnippet: "International Screening Standards - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact International Screening Standards Supporting common international standards for "
+    contentLength: 57006
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://ibbis.bio/our-work/global-dna-synthesis-map/
+    linkText: Global DNA Synthesis Map - IBBIS — - Interactive mapping tool
+    claimContext: An interactive online tool showing, for the first time at a global level, where synthesis providers are located, how they screen orders, and what policies apply.[^18] The mapping identified providers across Africa, Latin America, Asia, Europe, and the MENA region, and catalogued relevant policies in
+    fetchedAt: 2026-02-22T02:21:39.628Z
+    httpStatus: 200
+    pageTitle: Global DNA Synthesis Map - IBBIS
+    contentSnippet: Global DNA Synthesis Map - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Global DNA Synthesis Map A global map showing how synthetic nucleic acids are produced, s
+    contentLength: 54297
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://pandemics.sph.brown.edu/game-changers-initiative/biosecurity-game-changers-fellowship
+    linkText: Biosecurity Game Changers Fellowship - Brown University — - Fellowship program
+    claimContext: IBBIS partners with the Brown University Pandemic Center, CEPI, Gavi, Pandemic Action Network, and the BWC Implementation Support Unit to host fellows from the Global South for a year-long biosecurity leadership program.[^19] The fellowship targets early- to mid-career biosecurity professionals, wit
+    fetchedAt: 2026-02-22T02:21:40.742Z
+    httpStatus: 200
+    pageTitle: Biosecurity Game Changers Fellowship | Pandemic Center | School of Public Health | Brown University
+    contentSnippet: Biosecurity Game Changers Fellowship | Pandemic Center | School of Public Health | Brown University Pandemic Center Biosecurity Game Changers Fellowship Biosecurity Game Changers Fellowship Next Generation of Leaders Chosen to be Biosecurity Game Changers, Serve in Key Global Organizations to Shape the Future of the Field A new fellowship at the Pandemic Center at the Brown University School of Public Health launches with the announcement of the inaugural class of Biosecurity Game Changers, eigh
+    contentLength: 78642
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://ibbis.bio/ensuring-security-and-competitiveness-in-biotechnology-insights-from-eu-parliament-roundtable/
+    linkText: EU Parliament Roundtable - IBBIS — - Policy engagement
+    claimContext: The submission was endorsed by the International Gene Synthesis Consortium (IGSC), European Synthetic Biology Society, Pandemic Action Network, and Pour Demain Belgium.[^6] IBBIS co-hosted a high-level roundtable at the European Parliament on biosecurity in the bioeconomy.[^20]
+    fetchedAt: 2026-02-22T02:21:40.052Z
+    httpStatus: 200
+    pageTitle: "Security and Competitiveness in Biotech: Insights from EU parliament roundtable - IBBIS"
+    contentSnippet: "Security and Competitiveness in Biotech: Insights from EU parliament roundtable - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Security and Competitiveness in Bi"
+    contentLength: 45818
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.nti.org/about/people/piers-millett/
+    linkText: Piers Millett - NTI Profile — - Biography and credentials
+    claimContext: Dr. Piers Millett brings deep expertise in biosecurity governance. He served for over a decade with the Biological Weapons Convention (BWC), including as Deputy Head and Acting Head of the Implementation Support Unit.[^11] He holds a PhD in International Relations from the University of Bradford and
+    fetchedAt: 2026-02-22T02:21:42.673Z
+    httpStatus: 200
+    pageTitle: Piers Millett, Ph.D.
+    contentSnippet: Piers Millett, Ph.D. Close Former Consultant Piers Millett, Ph.D. Executive Director, International Biosecurity & Biosafety Initiative for Science (IBBIS) Bio Piers D. Millett, PhD is Executive Director of the International Biosecurity and Biosafety Initiative for Science (IBBIS). IBBIS is a new international organization dedicated to strengthening global biosecurity norms and developing innovative tools and incentives to uphold them. Dr. Millett is a certified biorisk management professional, w
+    contentLength: 44882
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://ibbis.bio/people/tessa-alexanian/
+    linkText: Tessa Alexanian - IBBIS — - Staff profile
+    claimContext: "**Tessa Alexanian**, Technical Lead for the Common Mechanism, previously worked at Zymergen on modular lab automation for four years and served as iGEM's Safety and Security officer for two years. She has collaborated with <EntityLink id=\"open-philanthropy\">Coefficient Giving</EntityLink>, RAND, and"
+    fetchedAt: 2026-02-22T02:21:41.944Z
+    httpStatus: 200
+    pageTitle: Tessa Alexanian - IBBIS
+    contentSnippet: Tessa Alexanian - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Staff Tessa Alexanian Technical Lead, Common Mechanism Canada / USA Staff Tessa Alexanian Technica
+    contentLength: 41491
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://ibbis.bio/people/sophie-peresson/
+    linkText: Sophie Peresson - IBBIS — - Staff profile
+    claimContext: "**Sophie Peresson**, Technical Lead for International Standards, is a member of the International Gene Synthesis Consortium (IGSC), the OECD Synthetic Biology Working Party, and Pandemic Action Network.[^23]"
+    fetchedAt: 2026-02-22T02:21:41.938Z
+    httpStatus: 200
+    pageTitle: Sophie Peresson - IBBIS
+    contentSnippet: Sophie Peresson - IBBIS About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact About People Careers News Our Work Commec Sequence Screening Customer Screening Global Synthesis Map International Standards Sequence Biosecurity Standards Vulnerability Disclosure Contact Staff Sophie Peresson Policy Lead, International Standards France Staff Sophie Peresson Policy Lea
+    contentLength: 42052
+    status: verified
+    note: null

@@ -1,0 +1,216 @@
+pageId: anthropic-valuation
+verifiedAt: 2026-02-22
+totalCitations: 19
+verified: 17
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation
+    linkText: Anthropic Series G Announcement — (February 2026)
+    claimContext: This page provides an investment-grade analysis of scenarios across different outcomes, incorporating data on customer concentration, margin pressure, and competitive dynamics.[^1]
+    fetchedAt: 2026-02-22T02:23:33.922Z
+    httpStatus: 200
+    pageTitle: Anthropic raises $30 billion in Series G funding at $380 billion post-money valuation \ Anthropic
+    contentSnippet: "Announcements Anthropic raises $30 billion in Series G funding at $380 billion post-money valuation Feb 12, 2026 We have raised $30 billion in Series G funding led by GIC and Coatue, valuing Anthropic at $380 billion post-money. The round was co-led by D. E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX. The investment will fuel the frontier research, product development, and infrastructure expansions that have made Anthropic the market leader in enterprise AI and coding. Significant "
+    contentLength: 115077
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.bloomberg.com/news/articles/2026-01-21/anthropic-s-revenue-run-rate-tops-9-billion-as-vcs-pile-in
+    linkText: Bloomberg - Anthropic Revenue — (January 2026)
+    claimContext: "**Key insight**: Anthropic's revenue growth from <F e=\"anthropic\" f=\"55d88868\">\\$9B</F> to <F e=\"anthropic\" f=\"0ed4db9e\">\\$14B</F> compressed its revenue multiple from <Calc expr=\"{anthropic.c45b168f} / {anthropic.55d88868}\" precision={0} suffix=\"x\" /> to <Calc expr=\"{anthropic.6796e194} / {anthropi"
+    fetchedAt: 2026-02-22T02:23:34.912Z
+    httpStatus: 200
+    pageTitle: Anthropic’s Revenue Run Rate Tops $9 Billion as VCs Pile In - Bloomberg
+    contentSnippet: "Anthropic’s Revenue Run Rate Tops $9 Billion as VCs Pile In - Bloomberg The AI Race: Claude Code RAMmageddon Abu Dhabi’s Giant AI Bet China’s AI Billionaires Circular Deals AI Startups to Watch Back Forward Technology AI Facebook X LinkedIn Email Link Gift Expand Photographer: Gabby Jones/Bloomberg Facebook X LinkedIn Email Link Gift Gift this article Contact us: Provide news feedback or report an error Confidential tip? Send a tip to our reporters Site feedback: Take our Survey New Window Faceb"
+    contentLength: 343883
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://epochai.substack.com/p/openai-is-projecting-unprecedented
+    linkText: Epoch AI - OpenAI Revenue Projections — (2025)
+    claimContext: Both companies are growing rapidly. OpenAI projects reaching \$100B revenue by 2028.[^3]
+    fetchedAt: 2026-02-22T02:23:33.954Z
+    httpStatus: 200
+    pageTitle: OpenAI is projecting unprecedented revenue growth
+    contentSnippet: OpenAI is projecting unprecedented revenue growth Epoch AI Subscribe Sign in Gradient Updates OpenAI is projecting unprecedented revenue growth No company has gone from $10B to $100B as fast as OpenAI projects to do Greg Burnham Oct 15, 2025 33 6 4 Share Epoch’s new AI companies database shows the remarkable level and pace of growth of OpenAI’s revenue. It first exceeded $1 billion in 2023 and will exceed $10 billion in 2025. This is impressive, but not unprecedented — a few other companies have
+    contentLength: 240730
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.aicerts.ai/news/anthropic-profitability-gains-speed-as-enterprise-demand-soars/
+    linkText: AI Certs - Anthropic Enterprise Metrics — (2025)
+    claimContext: The <F e="anthropic" f="640a5be5">88%</F> retention rate indicates product-market fit and switching costs. Enterprise contracts include SLA guarantees, compliance certifications (HIPAA, SOC 2 Type II, ISO 27001), and custom data retention policies that create lock-in.[^4][^5]
+    fetchedAt: 2026-02-22T02:23:34.576Z
+    httpStatus: 200
+    pageTitle: Anthropic profitability gains speed as enterprise demand soars - AI CERTs News
+    contentSnippet: Anthropic profitability gains speed as enterprise demand soars - AI CERTs News --> Post --> AI CERTS 3 months ago --> Anthropic profitability gains speed as enterprise demand soars Anthropic’s profitability rises alongside growing enterprise demand. Therefore, analysts are comparing the firm’s discipline with OpenAI’s broader, slower financial arc. This article dissects the numbers, strategies, and risks behind Anthropic’s confident break-even roadmap. It also explains why enterprise contracts a
+    contentLength: 99332
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://getlatka.com/companies/anthropic
+    linkText: Getlatka - Anthropic Customer Data — (2025)
+    claimContext: The <F e="anthropic" f="640a5be5">88%</F> retention rate indicates product-market fit and switching costs. Enterprise contracts include SLA guarantees, compliance certifications (HIPAA, SOC 2 Type II, ISO 27001), and custom data retention policies that create lock-in.[^4][^5]
+    fetchedAt: 2026-02-22T02:23:34.394Z
+    httpStatus: 200
+    pageTitle: How Anthropic hit $5B revenue and 300K customers in 2025.
+    contentSnippet: How Anthropic hit $5B revenue and 300K customers in 2025. Scroll up to return Create Free Account Sign up to access all features Create Account Sign up Sign up Already have an account? Log in Research with LatkaAI New Prompt with confidence that source data is Latka verified and up to date. Largest SaaS database Search 90.2K+ companies by revenue, funding, value, location, team, and more. Export company data to Excel 28 SaaS metrics including ARPU, CAC, LTV, NDR. Download sample . Hard-to-get da
+    contentLength: 149884
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://lmcouncil.ai/benchmarks
+    linkText: LM Council Benchmarks — (2026)
+    claimContext: Claude leads in SWE-bench (software engineering tasks) and security (lowest prompt injection rate). No single model dominates all categories—GPT-5.2 leads reasoning, Gemini leads multimodal.[^6][^7]
+    fetchedAt: 2026-02-22T02:23:36.482Z
+    httpStatus: 200
+    pageTitle: AI Model Benchmarks Feb 2026 | Compare GPT-5, Claude 4.5, Gemini 2.5, Grok 4 | LM Council
+    contentSnippet: "AI Model Benchmarks Feb 2026 | Compare GPT-5, Claude 4.5, Gemini 2.5, Grok 4 | LM Council AI Model Benchmarks Feb 2026 20 benchmarks - the world&#x27;s most-followed benchmarks, curated by AI Explained , author of SimpleBench Independently-run benchmarks by Epoch, Scale and others, so may not match self-reported scores by AI orgs. Compare Models Model 1: Select... GPT-5.3 Codex GPT-5.2 GPT-5.2 (high) GPT-5.2 (low) GPT-5.2 (medium) GPT-5.2 (xhigh) GPT-5.2 Pro GPT-5.1 (high) GPT-5 GPT-5 (high) GPT"
+    contentLength: 184069
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.vellum.ai/blog/flagship-model-report
+    linkText: Vellum - Flagship Model Report — (2025)
+    claimContext: Claude leads in SWE-bench (software engineering tasks) and security (lowest prompt injection rate). No single model dominates all categories—GPT-5.2 leads reasoning, Gemini leads multimodal.[^6][^7]
+    fetchedAt: 2026-02-22T02:23:36.356Z
+    httpStatus: 200
+    pageTitle: Gpt-5.1 vs Gemini 3 Pro vs Claude Opus 4.5 Breakdown Report
+    contentSnippet: "Gpt-5.1 vs Gemini 3 Pro vs Claude Opus 4.5 Breakdown Report All Customer Stories Product Updates Model Comparisons LLM basics Guides All Post / Model Comparisons Search... Flagship Model Report: Gpt-5.1 vs Gemini 3 Pro vs Claude Opus 4.5 A report on the latest flagship model benchmarks and trends they signal for the AI agent space in 2026 • 18 min Written by Nicolas Zeeb Reviewed by David Vargas No items found. CONTENTS Inline evaluation / Guardrails: Ensure good system performance at run-time T"
+    contentLength: 299288
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.cnbc.com/2025/10/23/anthropic-google-cloud-deal-tpu.html
+    linkText: CNBC - Anthropic Google Cloud Deal — (October 2025)
+    claimContext: "- Expands beyond AWS dependency - Access to both Trainium and TPU architectures[^8][^9]"
+    fetchedAt: 2026-02-22T02:23:37.771Z
+    httpStatus: 200
+    pageTitle: Google and Anthropic announce cloud deal worth tens of billions
+    contentSnippet: Google and Anthropic announce cloud deal worth tens of billions Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Anthropic and Google officially announced their cloud partnership. It gives the artificial intelligence company access to up to one million of Google&#x27;s custom-designed Tensor Processing Units, or TPUs. The deal will add over a gigawatt of compute capacity by 2026, supporting Anthropic’s surging $7 billion reven
+    contentLength: 836846
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.aboutamazon.com/news/aws/amazon-invests-additional-4-billion-anthropic-ai
+    linkText: Amazon - AWS Investment Announcement — (2025)
+    claimContext: "- Expands beyond AWS dependency - Access to both Trainium and TPU architectures[^8][^9]"
+    fetchedAt: 2026-02-22T02:23:36.769Z
+    httpStatus: 200
+    pageTitle: Facebook
+    contentSnippet: Amazon and Anthropic deepen strategic collaboration Anthropic names AWS its primary training partner and will use AWS Trainium to train and deploy its largest foundation models; Amazon to invest additional $4 billion in Anthropic. Share Written by Amazon Staff 5 min read Share Last September, Amazon and Anthropic announced a strategic collaboration, which included Anthropic naming Amazon Web Services (AWS) its primary cloud provider and Amazon making a $4 billion investment in Anthropic. That an
+    contentLength: 190701
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://menlovc.com/perspective/2025-mid-year-llm-market-update/
+    linkText: Menlo Ventures - 2025 Mid-Year LLM Market Update — (2025)
+    claimContext: Llama 4's launch underperformed in real-world settings according to enterprise surveys. The performance gap between open and proprietary models widened throughout 2024-2025.[^10]
+    fetchedAt: 2026-02-22T02:23:36.489Z
+    httpStatus: 200
+    pageTitle: "2025 Mid-Year LLM Market Update: Foundation Model Landscape + Economics | Menlo Ventures"
+    contentSnippet: "2025 Mid-Year LLM Market Update: Foundation Model Landscape + Economics | Menlo Ventures Skip to Main Content All Perspectives Perspective Portfolio 2025 Mid-Year LLM Market Update: Foundation Model Landscape + Economics A new enterprise LLM leader has emerged as usage and spend surge. July 31, 2025 Tim Tully , Joff Redfern , Deedy Das , Derek Xiao Facebook Linkedin Twitter Envelope Copy link Copied to clipboard! Foundation models are not just powering generative AI. They are shaping the future "
+    contentLength: 133682
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://venturebeat.com/ai/anthropic-revenue-tied-to-two-customers-as-ai-pricing-war-threatens-margins
+    linkText: VentureBeat - Anthropic Customer Concentration — (2025)
+    claimContext: Approximately <F e="anthropic" f="fac5b934">25%</F> of Anthropic's revenue comes from two coding tool customers. If either relationship ends or shifts to a competitor, revenue would decline. This concentration in AI-assisted coding also means Anthropic is vulnerable to disruption in that specific ma
+    fetchedAt: 2026-02-22T02:23:45.411Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 12
+    url: https://www.theinformation.com/articles/anthropic-lowers-profit-margin-projection-revenue-skyrockets
+    linkText: The Information - Anthropic Margin Forecast — (2025)
+    claimContext: AI inference costs scale with usage. Unlike traditional software with near-zero marginal costs, every AI query consumes compute. As revenue grows, costs grow—potentially faster than efficiency gains can offset.[^12][^13]
+    fetchedAt: 2026-02-22T02:23:39.635Z
+    httpStatus: 200
+    pageTitle: Anthropic Lowers Gross Margin Projection as Revenue Skyrockets — The Information
+    contentSnippet: "Anthropic Lowers Gross Margin Projection as Revenue Skyrockets — The Information Exclusive: OpenAI Boost Revenue Forecasts, Predicts $111 Billion More Cash Burn Through 2030 Save 25% and read more In-depth insights in seconds. Ask Deep Research. Subscribe to unlock"
+    contentLength: 182736
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.webpronews.com/anthropic-slashes-2025-margin-forecast-to-40-amid-ai-cost-surge/
+    linkText: WebProNews - Anthropic Cost Surge — (2025)
+    claimContext: AI inference costs scale with usage. Unlike traditional software with near-zero marginal costs, every AI query consumes compute. As revenue grows, costs grow—potentially faster than efficiency gains can offset.[^12][^13]
+    fetchedAt: 2026-02-22T02:23:39.580Z
+    httpStatus: 200
+    pageTitle: Anthropic Slashes 2025 Margin Forecast to 40% Amid AI Cost Surge
+    contentSnippet: Anthropic Slashes 2025 Margin Forecast to 40% Amid AI Cost Surge WebProNews Advertise with Us Browse Categories Business IT Management Developer Emerging Tech Advertising & Marketing Retail & eCommerce Home Contact Us Privacy Policy Advertise With Us Newsletter Signup Request Media Kit AIDeveloper Anthropic Slashes 2025 Margin Forecast to 40% Amid AI Cost Surge Anthropic lowered its 2025 gross margin forecast to 40% from 50% due to rising AI inference costs, while projecting revenue to surge fro
+    contentLength: 111556
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.saastr.com/have-ai-gross-margins-really-turned-the-corner-the-real-math-behind-openais-70-compute-margin-and-why-b2b-startups-are-still-running-on-a-treadmill/
+    linkText: SaaStr - OpenAI Compute Margin Analysis — (2025)
+    claimContext: For comparison, OpenAI reports 70% "compute margin" but overall gross margins are 40-50% after partner revenue shares and free-tier subsidies.[^14]
+    fetchedAt: 2026-02-22T02:23:39.373Z
+    httpStatus: 200
+    pageTitle: Have AI Gross Margins Really Turned the Corner? The Real Math Behind OpenAI&#8217;s 70% Compute Margin — And Why B2B Startups Are Still Running on a Treadmill | SaaStr
+    contentSnippet: "Have AI Gross Margins Really Turned the Corner? The Real Math Behind OpenAI&#8217;s 70% Compute Margin — And Why B2B Startups Are Still Running on a Treadmill | SaaStr Have AI Gross Margins Really Turned the Corner? The Real Math Behind OpenAI&#8217;s 70% Compute Margin — And Why B2B Startups Are Still Running on a Treadmill by Jason Lemkin | Artificial Intelligence (AI) , Blog Posts , SaaStr.Ai OpenAI (or at least, The Information reporting on OpenAI) just dropped a bombshell: their &#8220;comp"
+    contentLength: 555279
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://en.wikipedia.org/wiki/AI_bubble
+    linkText: Wikipedia - AI Bubble — (2025)
+    claimContext: When the CEO of OpenAI characterizes the market as experiencing bubble conditions, valuations across the sector face uncertainty.[^15][^16]
+    fetchedAt: 2026-02-22T02:23:38.855Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://www.oliverwyman.com/our-expertise/insights/2026/jan/impact-ai-bubble-burst-on-global-financial-markets.html
+    linkText: Oliver Wyman - Impact of AI Bubble Burst on Global Financial Markets — (January 2026)
+    claimContext: When the CEO of OpenAI characterizes the market as experiencing bubble conditions, valuations across the sector face uncertainty.[^15][^16]
+    fetchedAt: 2026-02-22T02:23:47.085Z
+    httpStatus: 200
+    pageTitle: How An AI Bubble Burst Could Shake Global Financial Markets
+    contentSnippet: How An AI Bubble Burst Could Shake Global Financial Markets For the best Oliver Wyman website experience, please upgrade your browser to IE9 or later We’re evolving. Oliver Wyman is now part of the new, expanded Marsh brand We’re evolving. Oliver Wyman is now part of the new, expanded Marsh brand Learn More What happens if the AI bubble bursts? Financial institutions can’t afford to wait for answers // . // // What happens if the AI bubble bursts? Are today’s lofty market valuations, massive cap
+    contentLength: 119937
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://felloai.com/the-best-ai-of-december-2025/
+    linkText: Fello AI - Best AI of December 2025 — (December 2025)
+    claimContext: The market appears to be evolving toward model routing—using different models for different tasks—rather than winner-take-all. This limits any single company's ability to capture the entire market.[^17]
+    fetchedAt: 2026-02-22T02:23:46.937Z
+    httpStatus: 200
+    pageTitle: "The Best AI of December 2025: Gemini 3 Pro vs GPT-5.2 vs Claude Opus 4.5 vs Grok 4.1 | Fello AI"
+    contentSnippet: "The Best AI of December 2025: Gemini 3 Pro vs GPT-5.2 vs Claude Opus 4.5 vs Grok 4.1 | Fello AI The Best AI of December 2025: Gemini 3 Pro vs GPT-5.2 vs Claude Opus 4.5 vs Grok 4.1 TL;DR (10-second answer) Best overall chatbot (Dec 2025): Gemini 3 Pro (#1 Text Arena) Best for building full web apps: Claude Opus 4.5 Thinking 32k (#1 WebDev) The new disruptor: gpt-5.2-high (#2 WebDev, Preliminary) Best for search answers with sources: Gemini 3 Pro Grounding (#1 Search) Best for screenshots + visua"
+    contentLength: 234444
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://techcrunch.com/2025/12/19/openai-is-reportedly-trying-to-raise-100b-at-an-830b-valuation/
+    linkText: TechCrunch - OpenAI \$100B Raise at \$830B Valuation — (December 2025)
+    claimContext: If OpenAI raises \$100B at \$830B, it will have capital to invest in compute, talent, and product development.[^18]
+    fetchedAt: 2026-02-22T02:23:46.624Z
+    httpStatus: 200
+    pageTitle: OpenAI is reportedly trying to raise $100B at an $830B valuation | TechCrunch
+    contentSnippet: "OpenAI is reportedly trying to raise $100B at an $830B valuation | TechCrunch &#8211;:&#8211;:&#8211;:&#8211; Save up to $680 on your pass with Super Early Bird rates. REGISTER NOW . Save up to $680 on your Disrupt 2026 pass. Ends February 27. REGISTER NOW . Close Image Credits: Bryce Durbin / TechCrunch AI OpenAI is reportedly trying to raise $100B at an $830B valuation Ram Iyer 5:32 AM PST · December 19, 2025 OpenAI is in talks to raise up to $100 billion in a funding round that could value th"
+    contentLength: 227809
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.deepresearchglobal.com/p/anthropic-company-analysis-outlook-report
+    linkText: Deep Research Global - Anthropic Company Analysis — (2025)
+    claimContext: Anthropic projects reaching <F e="anthropic" f="023e1116">breakeven in 2028</F>, which provides visibility into profitability timeline.[^19]
+    fetchedAt: 2026-02-22T02:23:48.172Z
+    httpStatus: 200
+    pageTitle: Anthropic - Company Analysis and Outlook Report (2026)
+    contentSnippet: "Anthropic - Company Analysis and Outlook Report (2026) 0 0 Deep Research Global Posts Anthropic - Company Analysis and Outlook Report (2026) Anthropic - Company Analysis and Outlook Report (2026) DRG January 11, 2026 Executive TL;DR Rapid Revenue Acceleration : Anthropic has grown from approximately $1 billion annual run-rate in early 2025 to over $5 billion by August 2025, with projections of $26 billion in 2026 and up to $70 billion by 2028. Enterprise Market Leadership : The company now comma"
+    contentLength: 1254740
+    status: verified
+    note: null

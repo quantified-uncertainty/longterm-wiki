@@ -1,0 +1,62 @@
+pageId: biosecurity-overview
+verifiedAt: 2026-02-22
+totalCitations: 5
+verified: 4
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/
+    linkText: Coefficient Giving — Biosecurity & Pandemic Preparedness Fund
+    claimContext: The EA/x-risk community funds and operates a portfolio of biosecurity interventions designed to reduce catastrophic biological risks—both from natural pandemics and from deliberate misuse of advancing biotechnology and AI capabilities. <EntityLink id="open-philanthropy">Coefficient Giving</EntityLin
+    fetchedAt: 2026-02-22T02:28:20.251Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 2
+    url: https://naobservatory.org/blog/biothreat_radar/
+    linkText: Biothreat Radar proposal
+    claimContext: '| **DNA Synthesis Screening** | <EntityLink id="securedna">SecureDNA</EntityLink>, <EntityLink id="ibbis">IBBIS</EntityLink>/NTI, IGSC | Preventing orders of synthetic DNA that could reconstruct dangerous pathogens. SecureDNA provides free cryptographic screening to synthesis providers. | | **Metage'
+    fetchedAt: 2026-02-22T02:28:14.272Z
+    httpStatus: 200
+    pageTitle: Scaling US pathogen detection
+    contentSnippet: "Scaling US pathogen detection Scaling US pathogen detection Authors Simon Grimm, Lennart Justen & Jeff Kaufman Date September 23, 2025 We thank Mike McLaren for input and feedback on drafts of this post. Summary The President’s FY 2026 Budget proposes a $52M allocation to CDC for Biothreat Radar, a new pathogen detection system. Drawing on findings from the Nucleic Acid Observatory’s metagenomic biosurveillance pilots, we model the expected performance of a pathogen-agnostic surveillance system "
+    contentLength: 141231
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://arxiv.org/abs/2504.16137
+    linkText: VCT paper
+    claimContext: "| **Metagenomic Surveillance** | <EntityLink id=\"securebio\">SecureBio</EntityLink>/NAO, CDC | The Nucleic Acid Observatory sequences all genetic material in wastewater to detect novel threats. CDC's proposed Biothreat Radar (\\$52M) builds on this work.[^2] | | **AI Bio-Capability Evaluations** | Ope"
+    fetchedAt: 2026-02-22T02:28:13.771Z
+    httpStatus: 200
+    pageTitle: "[2504.16137] Virology Capabilities Test (VCT): A Multimodal Virology Q&A Benchmark"
+    contentSnippet: "[2504.16137] Virology Capabilities Test (VCT): A Multimodal Virology Q&A Benchmark --> Computer Science > Computers and Society arXiv:2504.16137 (cs) [Submitted on 21 Apr 2025 ( v1 ), last revised 29 Apr 2025 (this version, v2)] Title: Virology Capabilities Test (VCT): A Multimodal Virology Q&A Benchmark Authors: Jasper Götting , Pedro Medeiros , Jon G Sanders , Nathaniel Li , Long Phan , Karam Elabd , Lennart Justen , Dan Hendrycks , Seth Donoughe View a PDF of the paper titled Virology Capabil"
+    contentLength: 46995
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://blueprintbiosecurity.org/works/far-uvc/
+    linkText: Blueprint Biosecurity far-UVC program
+    claimContext: '| **Medical Countermeasures** | <EntityLink id="red-queen-bio">Red Queen Bio</EntityLink>, BARDA, CEPI | "Defensive co-scaling"—pre-building countermeasures against AI-mapped biothreats. Platform vaccines and broad-spectrum antivirals. | | **Far-UVC & Physical Defenses** | <EntityLink id="blueprint-'
+    fetchedAt: 2026-02-22T02:28:14.193Z
+    httpStatus: 200
+    pageTitle: Far-UVC &#8211; Blueprint Biosecurity
+    contentSnippet: Far-UVC &#8211; Blueprint Biosecurity Programs Far-UVC PPE Glycol vapors Funded Projects Calls for Proposals Publications News Team Careers Contact Copyright © 2026 Blueprint Biosecurity - All Rights Reserved. Privacy Policy & Cookies Far-UVC is an emerging type of germicidal ultraviolet light. It can inactivate a wide range of pathogens with minimal effects on human tissues because it is strongly absorbed by proteins in the outer layer of human skin and eyes. It offers immense promise for conti
+    contentLength: 91460
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.csis.org/analysis/opportunities-strengthen-us-biosecurity-ai-enabled-bioterrorism-what-policymakers-should
+    linkText: CSIS 2025 report
+    claimContext: '| **AI Capability Restrictions** | Anthropic (ASL-3), OpenAI, Google DeepMind | Output filtering and deployment restrictions for frontier AI models based on CBRN capability evaluations. | | **Biosecurity Governance** | <EntityLink id="nti-bio">NTI Bio</EntityLink>, CSIS, Council on Strategic Risks |'
+    fetchedAt: 2026-02-22T02:28:14.068Z
+    httpStatus: 200
+    pageTitle: "Opportunities to Strengthen U.S. Biosecurity from AI-Enabled Bioterrorism: What Policymakers Should Know"
+    contentSnippet: "Opportunities to Strengthen U.S. Biosecurity from AI-Enabled Bioterrorism: What Policymakers Should Know Skip to main content Opportunities to Strengthen U.S. Biosecurity from AI-Enabled Bioterrorism: What Policymakers Should Know Photo: Chom/Adobe Stock (Generated with AI) Table of Contents Table of Contents Report by Georgia Adamson and Gregory C. Allen Published August 6, 2025 Available Downloads Download the Full Report 2174kb AI will unlock nearly limitless potential in biology. . . . At th"
+    contentLength: 230375
+    status: verified
+    note: null

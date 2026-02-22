@@ -1,0 +1,117 @@
+pageId: pre-tai-capital-deployment
+verifiedAt: 2026-02-22
+totalCitations: 10
+verified: 6
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.reuters.com/technology/big-tech-ai-spending-2025-01-30/
+    linkText: Reuters - Big Tech to spend over \$300B on AI capex in 2025 — (January 2025)
+    claimContext: The frontier AI industry is deploying capital at historically large scales. In 2025 alone, the five largest AI-adjacent companies (Microsoft, Google, Amazon, Meta, and Oracle) guided for \$355-400 billion in combined capital expenditure, with an estimated 50-80% directed toward AI infrastructure.[^1
+    fetchedAt: 2026-02-22T02:27:55.406Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 2
+    url: https://www.bloomberg.com/news/articles/2025-01-30/big-tech-ai-spending
+    linkText: Bloomberg - Microsoft, Google, Amazon, Meta combined AI infrastructure commitments — (2025)
+    claimContext: The frontier AI industry is deploying capital at historically large scales. In 2025 alone, the five largest AI-adjacent companies (Microsoft, Google, Amazon, Meta, and Oracle) guided for \$355-400 billion in combined capital expenditure, with an estimated 50-80% directed toward AI infrastructure.[^1
+    fetchedAt: 2026-02-22T02:27:54.990Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 3
+    url: https://www.theverge.com/2025/1/21/24348816/stargate-ai-project-trump-openai-oracle-softbank
+    linkText: "The Verge - Stargate: Trump announces \\$500B AI infrastructure project — (January 2025)"
+    claimContext: The frontier AI industry is deploying capital at historically large scales. In 2025 alone, the five largest AI-adjacent companies (Microsoft, Google, Amazon, Meta, and Oracle) guided for \$355-400 billion in combined capital expenditure, with an estimated 50-80% directed toward AI infrastructure.[^1
+    fetchedAt: 2026-02-22T02:27:55.733Z
+    httpStatus: 200
+    pageTitle: The Stargate Project is a $500 billion AI data center plan for OpenAI | The Verge
+    contentSnippet: The Stargate Project is a $500 billion AI data center plan for OpenAI | The Verge Skip to main content The homepage The Verge The Verge logo. The homepage The Verge The Verge logo. Hamburger Navigation Button Navigation Drawer The Verge The Verge logo. Login / Sign Up close Close Search Subscribe Facebook Threads Instagram Youtube RSS Comments Drawer Comments Loading comments Getting the conversation ready... News Close News Posts from this topic will be added to your daily email digest and your
+    contentLength: 520603
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.cnbc.com/2025/anthropic-valuation/
+    linkText: CNBC - Anthropic reaches \$9B ARR, \$350B valuation — (2025)
+    claimContext: The frontier AI industry is deploying capital at historically large scales. In 2025 alone, the five largest AI-adjacent companies (Microsoft, Google, Amazon, Meta, and Oracle) guided for \$355-400 billion in combined capital expenditure, with an estimated 50-80% directed toward AI infrastructure.[^1
+    fetchedAt: 2026-02-22T02:27:55.360Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 5
+    url: https://abc.xyz/investor/
+    linkText: Alphabet Q4 2024 Earnings - \$75B capex guidance for 2025 — (January 2025)
+    claimContext: The frontier AI industry is deploying capital at historically large scales. In 2025 alone, the five largest AI-adjacent companies (Microsoft, Google, Amazon, Meta, and Oracle) guided for \$355-400 billion in combined capital expenditure, with an estimated 50-80% directed toward AI infrastructure.[^1
+    fetchedAt: 2026-02-22T02:27:54.859Z
+    httpStatus: 200
+    pageTitle: Alphabet Investor Relations - Investors
+    contentSnippet: "Alphabet Investor Relations - Investors Earnings Select Year Selecting a year value will change the accordion list Select Year: More Earnings News Recent Updates"
+    contentLength: 151666
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.reuters.com/technology/stargate-ai-infrastructure-2025/
+    linkText: "Reuters - Inside Stargate: the \\$500B AI data center plan — (2025)"
+    claimContext: "**Data Center Construction**: A single large AI data center costs \\$10-50 billion and takes 2-4 years to build. The Stargate project envisions a network of facilities across the U.S. totaling \\$500 billion over 4+ years.[^6] Cost drivers include:"
+    fetchedAt: 2026-02-22T02:27:57.173Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 7
+    url: https://www.goldmansachs.com/insights/articles/AI-poised-to-drive-160-increase-in-power-demand
+    linkText: Goldman Sachs Research - "AI, Data Centers, and the Coming U.S. Power Demand Surge" — (2024)
+    claimContext: "**Power Requirements**: Frontier AI data centers require 100MW-1GW+ of power each. Current U.S. data center power consumption is approximately 40 TWh/year, projected by Goldman Sachs to reach 945 TWh by 2030.[^7] This is driving investment in dedicated power generation, including nuclear small modul"
+    fetchedAt: 2026-02-22T02:27:57.427Z
+    httpStatus: 200
+    pageTitle: AI is poised to drive 160% increase in data center power demand | Goldman Sachs
+    contentSnippet: AI is poised to drive 160% increase in data center power demand | Goldman Sachs Artificial Intelligence AI is poised to drive 160% increase in data center power demand May 14, 2024 Share On average, a ChatGPT query needs nearly 10 times as much electricity to process as a Google search. In that difference lies a coming sea change in how the US, Europe, and the world at large will consume power — and how much that will cost. For years, data centers displayed a remarkably stable appetite for power
+    contentLength: 471461
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.cnbc.com/2026/01/22/openai-chair-bret-taylor-ai-bubble-correction.html
+    linkText: CNBC - OpenAI chair Bret Taylor says AI is 'probably' a bubble — (January 2026)
+    claimContext: '- [OpenAI Chair Bret Taylor stating AI is "probably a bubble"](https://www.cnbc.com/2026/01/22/openai-chair-bret-taylor-ai-bubble-correction.html) (January 2026)[^10] - [OpenAI projecting \$9B losses in 2025, profitability not expected until 2030](https://blog.carnegieinvest.com/the-risks-facing-ope'
+    fetchedAt: 2026-02-22T02:27:57.729Z
+    httpStatus: 200
+    pageTitle: "OpenAI&#x27;s Taylor: AI is &#x27;probably&#x27; a bubble, there will be a correction"
+    contentSnippet: 'OpenAI&#x27;s Taylor: AI is &#x27;probably&#x27; a bubble, there will be a correction Skip Navigation Markets Business Investing Tech Politics Video Watchlist Investing Club PRO Livestream Menu Key Points Bret Taylor said AI is "probably" a bubble, and he expects to see a correction over the next few years. Taylor, who serves as the chairman of OpenAI&#x27;s board and co-founded the artificial intelligence startup Sierra, said he is an AI optimist. He said the free market will ultimately determi'
+    contentLength: 802221
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://fortune.com/2025/11/26/is-openai-profitable-forecast-data-center-200-billion-shortfall-hsbc/
+    linkText: "Fortune - HSBC Analysis: OpenAI \\$207B funding shortfall — (November 2025)"
+    claimContext: "- [OpenAI projecting \\$9B losses in 2025, profitability not expected until 2030](https://blog.carnegieinvest.com/the-risks-facing-openai-and-its-1.4t-in-spending-commitments)[^12] - [HSBC analysis identifying \\$207B funding shortfall for OpenAI's plans](https://fortune.com/2025/11/26/is-openai-profi"
+    fetchedAt: 2026-02-22T02:27:56.884Z
+    httpStatus: 200
+    pageTitle: OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates | Fortune
+    contentSnippet: "OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI Markets OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates By Nick Lichtenberg Nick Lichtenberg Business Editor Down Arrow Button Icon By Nick Lichtenberg Nick Lichtenberg Business Editor Down Arrow Button "
+    contentLength: 468205
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://blog.carnegieinvest.com/the-risks-facing-openai-and-its-1.4t-in-spending-commitments
+    linkText: Carnegie Investments - Risks Facing OpenAI — (2025)
+    claimContext: '- [OpenAI Chair Bret Taylor stating AI is "probably a bubble"](https://www.cnbc.com/2026/01/22/openai-chair-bret-taylor-ai-bubble-correction.html) (January 2026)[^10] - [OpenAI projecting \$9B losses in 2025, profitability not expected until 2030](https://blog.carnegieinvest.com/the-risks-facing-ope'
+    fetchedAt: 2026-02-22T02:27:57.269Z
+    httpStatus: 200
+    pageTitle: The Risks Facing OpenAI and its $1.4T in Spending Commitments
+    contentSnippet: "The Risks Facing OpenAI and its $1.4T in Spending Commitments Home Personal INVESTMENT MANAGEMENT WEALTH MANAGEMENT Corporate CORPORATE RETIREMENT PLAN SERVICES Nonprofit FOUNDATIONS AND NONPROFITS ASSOCIATIONS About CARNEGIE'S STORY TEAM News & Insights MEDIA WALL CARNEGIE INVESTMENT COUNSEL BLOG NONPROFIT INVESTMENT COUNSEL BLOG RETIREMENT PLAN TALK Contact TALK TO AN ADVISOR REQUEST FOR PROPOSAL OFFICES CAREERS Client Login CARNEGIE LOGIN EAGLE RIDGE LOGIN Home Personal INVESTMENT MANAGEMENT "
+    contentLength: 93994
+    status: verified
+    note: null

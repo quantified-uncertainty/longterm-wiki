@@ -1,0 +1,601 @@
+pageId: johns-hopkins-center-for-health-security
+verifiedAt: 2026-02-22
+totalCitations: 54
+verified: 29
+broken: 25
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: The Johns Hopkins Center for Health Security (CHS) is an independent, nonprofit research organization affiliated with Johns Hopkins University and the Johns Hopkins Bloomberg School of Public Health.[^1] Founded in 1998, it works to prevent and prepare for epidemics, pandemics, and other health disa
+    fetchedAt: 2026-02-22T02:03:43.673Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://www.givingwhatwecan.org/charities/johns-hopkins-center-for-health-security
+    linkText: Johns Hopkins Center for Health Security - Giving What We Can
+    claimContext: The Johns Hopkins Center for Health Security (CHS) is an independent, nonprofit research organization affiliated with Johns Hopkins University and the Johns Hopkins Bloomberg School of Public Health.[^1] Founded in 1998, it works to prevent and prepare for epidemics, pandemics, and other health disa
+    fetchedAt: 2026-02-22T02:03:44.508Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins Center for Health Security · Giving What We Can
+    contentSnippet: Johns Hopkins Center for Health Security · Giving What We Can Charity The Johns Hopkins Center for Health Security Pandemic Prevention Program The Pandemic Prevention Program aims to fortify global health by conducting pioneering research and policy analysis to enhance preparedness and response to infectious diseases and public health crises. Donate Website Reducing global catastrophic risks What problem is the Johns Hopkins Center for Health Security (CHS) working on? The Johns Hopkins Center f
+    contentLength: 180789
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.givingwhatwecan.org/charities/johns-hopkins-center-for-health-security
+    linkText: Johns Hopkins Center for Health Security - Giving What We Can
+    claimContext: CHS's mission is to "protect people's health from epidemics and disasters and ensure that communities are resilient to major challenges."[^3] The organization addresses challenges including emerging infectious diseases, pandemic influenza risk, natural disasters, and biological accidents or intentio
+    fetchedAt: 2026-02-22T02:03:44.518Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins Center for Health Security · Giving What We Can
+    contentSnippet: Johns Hopkins Center for Health Security · Giving What We Can Charity The Johns Hopkins Center for Health Security Pandemic Prevention Program The Pandemic Prevention Program aims to fortify global health by conducting pioneering research and policy analysis to enhance preparedness and response to infectious diseases and public health crises. Donate Website Reducing global catastrophic risks What problem is the Johns Hopkins Center for Health Security (CHS) working on? The Johns Hopkins Center f
+    contentLength: 180789
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: CHS's mission is to "protect people's health from epidemics and disasters and ensure that communities are resilient to major challenges."[^3] The organization addresses challenges including emerging infectious diseases, pandemic influenza risk, natural disasters, and biological accidents or intentio
+    fetchedAt: 2026-02-22T02:03:43.674Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: The Center is designated an official Collaborating Centre of the World Health Organization and the Pan American Health Organization, and provides policy recommendations to governments worldwide including the United States Government, the European Union, and the United Nations Biological Weapons Conv
+    fetchedAt: 2026-02-22T02:03:43.673Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.founderspledge.com/research/center-for-health-security
+    linkText: Center for Health Security - Founders Pledge Research
+    claimContext: The Center is designated an official Collaborating Centre of the World Health Organization and the Pan American Health Organization, and provides policy recommendations to governments worldwide including the United States Government, the European Union, and the United Nations Biological Weapons Conv
+    fetchedAt: 2026-02-22T02:03:45.634Z
+    httpStatus: 200
+    pageTitle: Center for Health Security
+    contentSnippet: Center for Health Security Related research Safeguarding the future report Learn more The Center for Health Security (CHS) at the Bloomberg School of Public Health is a think tank at Johns Hopkins University which researches and advocates for improved biosecurity policy in the US and internationally. What problem are they trying to solve? CHS works to reduce the risk of both natural and engineered pathogens. For most of human history, the greatest risk of mass fatalities has stemmed from natural
+    contentLength: 237830
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "CHS was founded in 1998 by D.A. Henderson, the physician who led the WHO's successful smallpox eradication campaign.[^7] Originally named the Johns Hopkins Center for Civilian Biodefense Strategies (CCBS), it was the first academic center focused on biosecurity policy and practice.[^8] The founding "
+    fetchedAt: 2026-02-22T02:03:45.524Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_health_security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "CHS was founded in 1998 by D.A. Henderson, the physician who led the WHO's successful smallpox eradication campaign.[^7] Originally named the Johns Hopkins Center for Civilian Biodefense Strategies (CCBS), it was the first academic center focused on biosecurity policy and practice.[^8] The founding "
+    fetchedAt: 2026-02-22T02:03:45.524Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "CHS was founded in 1998 by D.A. Henderson, the physician who led the WHO's successful smallpox eradication campaign.[^7] Originally named the Johns Hopkins Center for Civilian Biodefense Strategies (CCBS), it was the first academic center focused on biosecurity policy and practice.[^8] The founding "
+    fetchedAt: 2026-02-22T02:03:45.525Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: One of the Center's early achievements was proposing that the US Government procure 40 million doses of stockpiled smallpox vaccine, a proposal supported by President Bill Clinton.[^10] Between 1999 and 2002, CHS published influential "JAMA papers" providing guidance on medical responses to anthrax,
+    fetchedAt: 2026-02-22T02:03:45.538Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://www.founderspledge.com/research/center-for-health-security
+    linkText: Center for Health Security - Founders Pledge Research
+    claimContext: One of the Center's early achievements was proposing that the US Government procure 40 million doses of stockpiled smallpox vaccine, a proposal supported by President Bill Clinton.[^10] Between 1999 and 2002, CHS published influential "JAMA papers" providing guidance on medical responses to anthrax,
+    fetchedAt: 2026-02-22T02:03:46.736Z
+    httpStatus: 200
+    pageTitle: Center for Health Security
+    contentSnippet: Center for Health Security Related research Safeguarding the future report Learn more The Center for Health Security (CHS) at the Bloomberg School of Public Health is a think tank at Johns Hopkins University which researches and advocates for improved biosecurity policy in the US and internationally. What problem are they trying to solve? CHS works to reduce the risk of both natural and engineered pathogens. For most of human history, the greatest risk of mass fatalities has stemmed from natural
+    contentLength: 237830
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.founderspledge.com/research/center-for-health-security
+    linkText: Center for Health Security - Founders Pledge Research
+    claimContext: One of the Center's early achievements was proposing that the US Government procure 40 million doses of stockpiled smallpox vaccine, a proposal supported by President Bill Clinton.[^10] Between 1999 and 2002, CHS published influential "JAMA papers" providing guidance on medical responses to anthrax,
+    fetchedAt: 2026-02-22T02:03:46.949Z
+    httpStatus: 200
+    pageTitle: Center for Health Security
+    contentSnippet: Center for Health Security Related research Safeguarding the future report Learn more The Center for Health Security (CHS) at the Bloomberg School of Public Health is a think tank at Johns Hopkins University which researches and advocates for improved biosecurity policy in the US and internationally. What problem are they trying to solve? CHS works to reduce the risk of both natural and engineered pathogens. For most of human history, the greatest risk of mass fatalities has stemmed from natural
+    contentLength: 237830
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: Following the September 11, 2001 attacks and subsequent anthrax attacks, Congress appropriated \$3 billion for biodefense.[^13] HHS Secretary Tommy Thompson requested Henderson lead the Office of Public Health Preparedness, which later became the Office of the Assistant Secretary for Preparedness an
+    fetchedAt: 2026-02-22T02:03:46.641Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 14
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: Following the September 11, 2001 attacks and subsequent anthrax attacks, Congress appropriated \$3 billion for biodefense.[^13] HHS Secretary Tommy Thompson requested Henderson lead the Office of Public Health Preparedness, which later became the Office of the Assistant Secretary for Preparedness an
+    fetchedAt: 2026-02-22T02:03:46.641Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 15
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: In 2003, the organization was renamed the Center for Biosecurity under leadership of O'Toole and Inglesby, and moved to an affiliation with the University of Pittsburgh Medical Center (UPMC).[^15]
+    fetchedAt: 2026-02-22T02:03:46.642Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://hub.jhu.edu/2017/01/17/center-health-security-bloomberg-public-health/
+    linkText: Center for Health Security rejoins Bloomberg School of Public Health
+    claimContext: In 2017, the Center rejoined Johns Hopkins Bloomberg School of Public Health from its UPMC affiliation, with Tom Inglesby as director and CEO. The move aimed to enhance research on epidemics like Zika, Ebola, and antibiotic resistance.[^16] As of May 2022, the Center had received over \$40 million i
+    fetchedAt: 2026-02-22T02:03:49.803Z
+    httpStatus: 200
+    pageTitle: Center for Health Security rejoins JHU's Bloomberg School of Public Health | Hub
+    contentSnippet: "Center for Health Security rejoins JHU's Bloomberg School of Public Health | Hub Skip to main content You are using an outdated browser. Please upgrade your browser to improve your experience. tag of your .html file. However, if your website has a \"Skip to Main Content\" feature, place the code below this feature. The bar is provided in two color schemes: dark and light. The color scheme is defined by assigning the value of the jhu-150th-bar-style attribute to either \"dark\" or \"light.\" The dark v"
+    contentLength: 79351
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://forum.effectivealtruism.org/topics/johns-hopkins-center-for-health-security
+    linkText: Johns Hopkins Center for Health Security - EA Forum
+    claimContext: In 2017, the Center rejoined Johns Hopkins Bloomberg School of Public Health from its UPMC affiliation, with Tom Inglesby as director and CEO. The move aimed to enhance research on epidemics like Zika, Ebola, and antibiotic resistance.[^16] As of May 2022, the Center had received over \$40 million i
+    fetchedAt: 2026-02-22T02:03:48.595Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins Center for Health Security - EA Forum
+    contentSnippet: Johns Hopkins Center for Health Security - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Johns Hopkins Center for Health Security Edit History Discussion 0 Subscribe Edit History Discussion 0 Johns Hopkins Center for Health Security History Evaluation Further reading External links Related entries Random Topic Contributors 2 Pablo 1 Leo The Johns Hopkins Center for Health Security ( J
+    contentLength: 218024
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: In 2023, CHS was awarded \$23.5 million from the US Centers for Disease Control and Prevention for epidemic preparedness work.[^18]
+    fetchedAt: 2026-02-22T02:03:47.957Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "**Operation Dark Winter** (June 22-23, 2001): A senior-level simulation of a covert smallpox bioterrorism attack on the United States. This was the first biological weapons tabletop exercise and led to six congressional hearings.[^19]"
+    fetchedAt: 2026-02-22T02:03:47.957Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 20
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "**Atlantic Storm** (January 14, 2005): A tabletop simulation of a smallpox bioterrorism event.[^20]"
+    fetchedAt: 2026-02-22T02:03:47.958Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 21
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "**Event 201** (2019): Simulated a coronavirus outbreak from pig farms in Brazil, projecting 65 million deaths after 18 months with no vaccine available in the first year. This exercise, conducted with the World Economic Forum and Bill & Melinda Gates Foundation, demonstrated pandemic preparedness ga"
+    fetchedAt: 2026-02-22T02:03:50.809Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 22
+    url: https://publichealth.jhu.edu/departments/environmental-health-and-engineering/research-and-practice/research-areas/biosecurity-and-emerging-threats
+    linkText: Biosecurity and Emerging Threats Research - Johns Hopkins Bloomberg School of Public Health
+    claimContext: "- **COPEWELL**: A conceptual framework and system dynamics model for predicting community functioning and resilience after disasters.[^22] - **Global Catastrophic Biological Risks (GCBRs)**: Framework to define and analyze GCBRs, involving expert consultations to advance policy and protections again"
+    fetchedAt: 2026-02-22T02:03:54.914Z
+    httpStatus: 200
+    pageTitle: Biosecurity and Emerging Threats | Johns Hopkins | Bloomberg School of Public Health
+    contentSnippet: Biosecurity and Emerging Threats | Johns Hopkins | Bloomberg School of Public Health Skip to main content A cross-divisional department spanning Research Areas Biosecurity and Emerging Threats Skip Section Navigation About Diversity and Equity Initiatives Environmental Health and Engineering Student Organization (EHESO) Giving Programs Undergraduate Programs Program Objectives and Outcomes Graduate Programs Application Fee Waiver Requirements Graduate Student Resources Jensen Fellowship Postdoct
+    contentLength: 112177
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://publichealth.jhu.edu/departments/environmental-health-and-engineering/research-and-practice/research-areas/biosecurity-and-emerging-threats
+    linkText: Biosecurity and Emerging Threats Research - Johns Hopkins Bloomberg School of Public Health
+    claimContext: "- **COPEWELL**: A conceptual framework and system dynamics model for predicting community functioning and resilience after disasters.[^22] - **Global Catastrophic Biological Risks (GCBRs)**: Framework to define and analyze GCBRs, involving expert consultations to advance policy and protections again"
+    fetchedAt: 2026-02-22T02:03:54.818Z
+    httpStatus: 200
+    pageTitle: Biosecurity and Emerging Threats | Johns Hopkins | Bloomberg School of Public Health
+    contentSnippet: Biosecurity and Emerging Threats | Johns Hopkins | Bloomberg School of Public Health Skip to main content A cross-divisional department spanning Research Areas Biosecurity and Emerging Threats Skip Section Navigation About Diversity and Equity Initiatives Environmental Health and Engineering Student Organization (EHESO) Giving Programs Undergraduate Programs Program Objectives and Outcomes Graduate Programs Application Fee Waiver Requirements Graduate Student Resources Jensen Fellowship Postdoct
+    contentLength: 112177
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://publichealth.jhu.edu/departments/environmental-health-and-engineering/research-and-practice/research-areas/biosecurity-and-emerging-threats
+    linkText: Biosecurity and Emerging Threats Research - Johns Hopkins Bloomberg School of Public Health
+    claimContext: "- **Global Catastrophic Biological Risks (GCBRs)**: Framework to define and analyze GCBRs, involving expert consultations to advance policy and protections against high-impact biological threats.[^23] - **Scarce Resource Allocation During Disasters**: Mixed-method community engagement study on ethic"
+    fetchedAt: 2026-02-22T02:03:54.806Z
+    httpStatus: 200
+    pageTitle: Biosecurity and Emerging Threats | Johns Hopkins | Bloomberg School of Public Health
+    contentSnippet: Biosecurity and Emerging Threats | Johns Hopkins | Bloomberg School of Public Health Skip to main content A cross-divisional department spanning Research Areas Biosecurity and Emerging Threats Skip Section Navigation About Diversity and Equity Initiatives Environmental Health and Engineering Student Organization (EHESO) Giving Programs Undergraduate Programs Program Objectives and Outcomes Graduate Programs Application Fee Waiver Requirements Graduate Student Resources Jensen Fellowship Postdoct
+    contentLength: 112177
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.givingwhatwecan.org/charities/johns-hopkins-center-for-health-security
+    linkText: Johns Hopkins Center for Health Security - Giving What We Can
+    claimContext: "- **Scarce Resource Allocation During Disasters**: Mixed-method community engagement study on ethical allocation of ventilators during pandemics, informing statewide frameworks.[^24] - **Pandemic Prevention Program**: Research and policy analysis to enhance global preparedness for infectious disease"
+    fetchedAt: 2026-02-22T02:03:51.521Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins Center for Health Security · Giving What We Can
+    contentSnippet: Johns Hopkins Center for Health Security · Giving What We Can Charity The Johns Hopkins Center for Health Security Pandemic Prevention Program The Pandemic Prevention Program aims to fortify global health by conducting pioneering research and policy analysis to enhance preparedness and response to infectious diseases and public health crises. Donate Website Reducing global catastrophic risks What problem is the Johns Hopkins Center for Health Security (CHS) working on? The Johns Hopkins Center f
+    contentLength: 180789
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: Since 2023, CHS has conducted extensive work on AIxBio—the convergence of artificial intelligence and biotechnology. On November 29, 2023, CHS hosted a convening on AI-driven biosecurity threats attended by the U.S. National Security Council, Department of Energy, White House Office of Pandemic Prep
+    fetchedAt: 2026-02-22T02:03:55.938Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 27
+    url: https://pubmed.ncbi.nlm.nih.gov/39172825/
+    linkText: "AI and biosecurity: The need for governance - PubMed"
+    claimContext: 'In August 2024, CHS led a paper published in *Science* titled "AI and biosecurity: The need for governance," calling for government evaluation of advanced AI models and implementation of safety measures.[^27] The Center has provided policy recommendations on biological data governance, open-source m'
+    fetchedAt: 2026-02-22T02:03:56.630Z
+    httpStatus: 200
+    pageTitle: "AI and biosecurity: The need for governance - PubMed"
+    contentSnippet: "AI and biosecurity: The need for governance - PubMed This site needs JavaScript to work properly. Please enable it to take advantage of the complete set of features! Clipboard, Search History, and several other advanced features are temporarily unavailable. Skip to main page content The .gov means it’s official. Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site. The site is secure. The https:// ensures that "
+    contentLength: 139619
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: 'In August 2024, CHS led a paper published in *Science* titled "AI and biosecurity: The need for governance," calling for government evaluation of advanced AI models and implementation of safety measures.[^27] The Center has provided policy recommendations on biological data governance, open-source m'
+    fetchedAt: 2026-02-22T02:03:55.939Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 29
+    url: https://www.congress.gov/119/meeting/house/118773/witnesses/HHRG-119-IF02-Wstate-PannuJ-20251217.pdf
+    linkText: Jassi Pannu Congressional Testimony
+    claimContext: Dr. Jassi Pannu, a Senior Scholar at CHS, testified before the US House Committee on Energy and Commerce on December 17, 2025, regarding biosecurity at the AI-biology intersection. Pannu advocated for oversight of biological AI models, safety evaluations, and mitigations against accidents and misuse
+    fetchedAt: 2026-02-22T02:03:56.576Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1496654
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: The Southeast Asia Biosecurity Dialogue, a series of Track II dialogues co-hosted by CHS, contributed to the establishment of the Asia Centre for Health Security.[^30]
+    fetchedAt: 2026-02-22T02:03:55.936Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 31
+    url: https://www.founderspledge.com/research/center-for-health-security
+    linkText: Center for Health Security - Founders Pledge Research
+    claimContext: "**Tom Inglesby** serves as Director and CEO. He is an internationally recognized expert in health security and former Chair of the Board of Scientific Counselors for the CDC's Office of Public Health Preparedness and Response. He served on the 2016 Working Group assessing US biosecurity for the Pres"
+    fetchedAt: 2026-02-22T02:03:58.209Z
+    httpStatus: 200
+    pageTitle: Center for Health Security
+    contentSnippet: Center for Health Security Related research Safeguarding the future report Learn more The Center for Health Security (CHS) at the Bloomberg School of Public Health is a think tank at Johns Hopkins University which researches and advocates for improved biosecurity policy in the US and internationally. What problem are they trying to solve? CHS works to reduce the risk of both natural and engineered pathogens. For most of human history, the greatest risk of mass fatalities has stemmed from natural
+    contentLength: 237830
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.founderspledge.com/research/center-for-health-security
+    linkText: Center for Health Security - Founders Pledge Research
+    claimContext: "**Anita Cicero** is Deputy Director.[^32]"
+    fetchedAt: 2026-02-22T02:03:58.255Z
+    httpStatus: 200
+    pageTitle: Center for Health Security
+    contentSnippet: Center for Health Security Related research Safeguarding the future report Learn more The Center for Health Security (CHS) at the Bloomberg School of Public Health is a think tank at Johns Hopkins University which researches and advocates for improved biosecurity policy in the US and internationally. What problem are they trying to solve? CHS works to reduce the risk of both natural and engineered pathogens. For most of human history, the greatest risk of mass fatalities has stemmed from natural
+    contentLength: 237830
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://hub.jhu.edu/2023/09/19/epidemic-preparedness-center-for-health-security/
+    linkText: Epidemic preparedness at Johns Hopkins Center for Health Security
+    claimContext: "**Caitlin Rivers** is a Senior Scholar who leads epidemic preparedness projects with the CDC. She was the founding associate director of the CDC Center for Forecasting and Outbreak Analytics from August 2021 to June 2022.[^33]"
+    fetchedAt: 2026-02-22T02:03:59.072Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins researchers play lead roles in epidemic preparedness project | Hub
+    contentSnippet: 'Johns Hopkins researchers play lead roles in epidemic preparedness project | Hub Skip to main content You are using an outdated browser. Please upgrade your browser to improve your experience. tag of your .html file. However, if your website has a "Skip to Main Content" feature, place the code below this feature. The bar is provided in two color schemes: dark and light. The color scheme is defined by assigning the value of the jhu-150th-bar-style attribute to either "dark" or "light." The dark v'
+    contentLength: 128520
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://hub.jhu.edu/2023/09/19/epidemic-preparedness-center-for-health-security/
+    linkText: Epidemic preparedness at Johns Hopkins Center for Health Security
+    claimContext: "**Crystal Watson** is a Senior Scholar who co-leads epidemic preparedness projects with Rivers.[^34]"
+    fetchedAt: 2026-02-22T02:03:59.077Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins researchers play lead roles in epidemic preparedness project | Hub
+    contentSnippet: 'Johns Hopkins researchers play lead roles in epidemic preparedness project | Hub Skip to main content You are using an outdated browser. Please upgrade your browser to improve your experience. tag of your .html file. However, if your website has a "Skip to Main Content" feature, place the code below this feature. The bar is provided in two color schemes: dark and light. The color scheme is defined by assigning the value of the jhu-150th-bar-style attribute to either "dark" or "light." The dark v'
+    contentLength: 128520
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.congress.gov/119/meeting/house/118773/witnesses/HHRG-119-IF02-Wstate-PannuJ-20251217.pdf
+    linkText: Jassi Pannu Congressional Testimony
+    claimContext: "**Jassi Pannu, MD** is a Senior Scholar focusing on AI-biosecurity issues, who has testified before Congress on these topics.[^35]"
+    fetchedAt: 2026-02-22T02:03:57.760Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1496654
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "**Federal Government**: The Center was initially funded by the US Department of Health and Human Services in 1998.[^36] In 2023, it received a \\$23.5 million five-year award from the Centers for Disease Control and Prevention for epidemic preparedness.[^37] It also receives funding from the Defense "
+    fetchedAt: 2026-02-22T02:04:00.096Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 37
+    url: https://publichealth.jhu.edu/2023/johns-hopkins-center-for-health-security-awarded-23-point-5-million-cdc-grant-to-launch-new-epidemic-preparedness-project
+    linkText: Johns Hopkins Center for Health Security awarded \$23.5 million CDC grant
+    claimContext: "**Federal Government**: The Center was initially funded by the US Department of Health and Human Services in 1998.[^36] In 2023, it received a \\$23.5 million five-year award from the Centers for Disease Control and Prevention for epidemic preparedness.[^37] It also receives funding from the Defense "
+    fetchedAt: 2026-02-22T02:04:03.027Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins Center for Health Security Awarded $23.5 Million CDC Grant to Launch New Epidemic Preparedness Project | Johns Hopkins | Bloomberg School of Public Health
+    contentSnippet: Johns Hopkins Center for Health Security Awarded $23.5 Million CDC Grant to Launch New Epidemic Preparedness Project | Johns Hopkins | Bloomberg School of Public Health Skip to main content Bloomberg School Johns Hopkins Center for Health Security Awarded $23.5 Million CDC Grant to Launch New Epidemic Preparedness Project Published September 19, 2023 Data Infectious Diseases The Johns Hopkins Center for Health Security has received a five-year $23.5 million award from the Centers for Disease Con
+    contentLength: 67626
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://qa.publichealth.jhu.edu/our-work/center-research-projects
+    linkText: Center Research Projects - Johns Hopkins Bloomberg School of Public Health
+    claimContext: "**Federal Government**: The Center was initially funded by the US Department of Health and Human Services in 1998.[^36] In 2023, it received a \\$23.5 million five-year award from the Centers for Disease Control and Prevention for epidemic preparedness.[^37] It also receives funding from the Defense "
+    fetchedAt: 2026-02-22T02:04:07.767Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 39
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: '**Philanthropic Sources**: The Alfred P. Sloan Foundation began providing funding to the Center in 2000.[^39] <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> (formerly the Open Philanthropy Project, through Coefficient Giving) has been a major funder, awarding \$16 million over th'
+    fetchedAt: 2026-02-22T02:04:00.098Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 40
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: '**Philanthropic Sources**: The Alfred P. Sloan Foundation began providing funding to the Center in 2000.[^39] <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> (formerly the Open Philanthropy Project, through Coefficient Giving) has been a major funder, awarding \$16 million over th'
+    fetchedAt: 2026-02-22T02:04:00.099Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 41
+    url: https://www.openphilanthropy.org/grant/johns-hopkins-center-for-health-security-emerging-leaders-in-biosecurity-initiative
+    linkText: Coefficient Giving Grant - Emerging Leaders in Biosecurity Initiative
+    claimContext: '**Philanthropic Sources**: The Alfred P. Sloan Foundation began providing funding to the Center in 2000.[^39] <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> (formerly the Open Philanthropy Project, through Coefficient Giving) has been a major funder, awarding \$16 million over th'
+    fetchedAt: 2026-02-22T02:04:17.517Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 42
+    url: https://sentinelbio.org/grant/johns-hopkins-center-for-health-security/
+    linkText: Sentinel Bio Grant - Johns Hopkins Center for Health Security
+    claimContext: In November 2024, Sentinel Bio advised an external donor to provide \$1,076,000 in general support to strengthen pandemic prevention research and advocacy.[^42]
+    fetchedAt: 2026-02-22T02:04:15.762Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 43
+    url: https://forum.effectivealtruism.org/posts/kbaGSjv7qejiKH9eB/fundraising-for-the-center-for-health-security-my-personal
+    linkText: Fundraising for the Center for Health Security - EA Forum
+    claimContext: 'Within the effective altruism community, CHS has been viewed positively as a high-impact organization for longtermist biosecurity work. A 2020 EA Forum post argued that CHS was "the best donation opportunity" for addressing global catastrophic biological risks, noting that it exceeded a "very high" '
+    fetchedAt: 2026-02-22T02:04:09.266Z
+    httpStatus: 200
+    pageTitle: "Fundraising for the Center for Health Security: My personal plan and open questions — EA Forum"
+    contentSnippet: "Fundraising for the Center for Health Security: My personal plan and open questions — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Fundraising for the Center for Health Security: My personal plan and open questions by MichaelA🔸 Mar 26 2020 6 min read 4 14 Community Biosecurity COVID-19 pandemic Johns Hopkins Center for Health Security Donation writeup Frontpage Fundraising for the C"
+    contentLength: 201666
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://forum.effectivealtruism.org/topics/johns-hopkins-center-for-health-security
+    linkText: Johns Hopkins Center for Health Security - EA Forum Topics
+    claimContext: Founders Pledge has recommended CHS alongside Stanford's Biosecurity Initiative in their report on safeguarding the long-term future.[^44] The organization's doctoral programs, fully funded by <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>, focus on global catastrophic biological
+    fetchedAt: 2026-02-22T02:04:09.800Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins Center for Health Security - EA Forum
+    contentSnippet: Johns Hopkins Center for Health Security - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Johns Hopkins Center for Health Security Edit History Discussion 0 Subscribe Edit History Discussion 0 Johns Hopkins Center for Health Security History Evaluation Further reading External links Related entries Random Topic Contributors 2 Pablo 1 Leo The Johns Hopkins Center for Health Security ( J
+    contentLength: 218021
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://forum.effectivealtruism.org/posts/BjcxM6iEDmmmbzXKY/applications-now-open-for-johns-hopkins-center-for-health
+    linkText: Applications now open for Johns Hopkins Center for Health Security doctoral programs - EA Forum
+    claimContext: Founders Pledge has recommended CHS alongside Stanford's Biosecurity Initiative in their report on safeguarding the long-term future.[^44] The organization's doctoral programs, fully funded by <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>, focus on global catastrophic biological
+    fetchedAt: 2026-02-22T02:04:09.254Z
+    httpStatus: 200
+    pageTitle: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum
+    contentSnippet: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year by BiosecurityMaven23 Oct 2 2024 1 min read 0 6 Biosecurity Global health & development Opportunities to take action App
+    contentLength: 127390
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: CHS has influenced major policy decisions, including the US government's procurement of smallpox vaccine stockpiles. Following the 9/11 attacks, when CHS identified that US smallpox vaccine stockpiles had expired, HHS Secretary Tommy Thompson committed to vaccinating every American, with Congress ap
+    fetchedAt: 2026-02-22T02:04:18.538Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 47
+    url: https://www.founderspledge.com/research/center-for-health-security
+    linkText: Center for Health Security - Founders Pledge Research
+    claimContext: The Center's "JAMA papers" from 1999-2002 provided the first comprehensive US guidance on responding to biological threats and shaped subsequent preparedness programs.[^47]
+    fetchedAt: 2026-02-22T02:04:18.837Z
+    httpStatus: 200
+    pageTitle: Center for Health Security
+    contentSnippet: Center for Health Security Related research Safeguarding the future report Learn more The Center for Health Security (CHS) at the Bloomberg School of Public Health is a think tank at Johns Hopkins University which researches and advocates for improved biosecurity policy in the US and internationally. What problem are they trying to solve? CHS works to reduce the risk of both natural and engineered pathogens. For most of human history, the greatest risk of mass fatalities has stemmed from natural
+    contentLength: 237830
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://factly.in/john-hopkins-centers-pandemic-preparedness-report-is-misinterpreted-as-predicting-a-potential-outbreak-in-2025/
+    linkText: John Hopkins Center's pandemic preparedness report misinterpreted - Factly
+    claimContext: In 2017, CHS published "The SPARS Pandemic 2025-2028," a self-guided exercise scenario for exploring hypothetical pandemic response challenges. Social media posts falsely claimed this report predicted a 2025 pandemic and linked it to the 2019 Event 201 simulation, implying premeditated planning of C
+    fetchedAt: 2026-02-22T02:04:20.176Z
+    httpStatus: 200
+    pageTitle: Johns Hopkins Center's pandemic preparedness report is misinterpreted as predicting a potential outbreak in 2025 - FACTLY
+    contentSnippet: Johns Hopkins Center&#039;s pandemic preparedness report is misinterpreted as predicting a potential outbreak in 2025 - FACTLY Facebook Twitter Youtube Instagram Subscribe A A A Twitter Facebook Reddit By posting a screenshot from a newspaper dated 17 October 2025, which discusses an outbreak of an unfamiliar illness, a social media post asserts that Johns Hopkins University has foreseen a pandemic occurring in 2025. The post invokes concern about the potential for a pandemic in 2025, drawing pa
+    contentLength: 69029
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+    linkText: Johns Hopkins Center for Health Security - Wikipedia
+    claimContext: "Event 201's simulation of a coronavirus pandemic in 2019, months before COVID-19 emerged, led some to question whether the exercise demonstrated foreknowledge. However, the exercise was part of CHS's longstanding work on pandemic preparedness and reflected expert consensus about the likelihood of a "
+    fetchedAt: 2026-02-22T02:04:18.540Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 50
+    url: https://www.congress.gov/119/meeting/house/118773/witnesses/HHRG-119-IF02-Wstate-PannuJ-20251217.pdf
+    linkText: Jassi Pannu Congressional Testimony
+    claimContext: "In December 2025 congressional testimony, Jassi Pannu highlighted insufficient emphasis on societal-scale risks in defining biosafety levels, which could lead to under-tiering pandemic-capable pathogens. Pannu called for harmonizing NIH and CDC policies and governing the gene synthesis supply chain "
+    fetchedAt: 2026-02-22T02:04:18.649Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1496654
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://publichealth.jhu.edu/2021/meeting-covid-19-misinformation-and-disinformation-head-on
+    linkText: Meeting COVID-19 Misinformation and Disinformation Head On
+    claimContext: CHS's 2021 report "National Priorities to Combat Misinformation and Disinformation for COVID-19 and Future Public Health Threats" advocated for a US national strategy to address health misinformation, which could raise concerns among free speech advocates, though no explicit backlash was noted in av
+    fetchedAt: 2026-02-22T02:04:23.877Z
+    httpStatus: 200
+    pageTitle: Meeting COVID-19 Misinformation and Disinformation Head-On | Johns Hopkins | Bloomberg School of Public Health
+    contentSnippet: Meeting COVID-19 Misinformation and Disinformation Head-On | Johns Hopkins | Bloomberg School of Public Health Skip to main content Bloomberg School Meeting COVID-19 Misinformation and Disinformation Head-On The U.S. needs a national strategy to combat health-related misinformation and disinformation. Published March 26, 2021 COVID-19 Health Security A Q&A WITH TARA KIRK SELL Long before SARS-CoV-2 was identified, misinformation and disinformation about a plethora of health topics have run rampa
+    contentLength: 71601
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://forum.effectivealtruism.org/posts/BjcxM6iEDmmmbzXKY/applications-now-open-for-johns-hopkins-center-for-health
+    linkText: Applications now open for Johns Hopkins Center for Health Security doctoral programs - EA Forum
+    claimContext: '**Health Security PhD Track**: A full-time, in-person program focused on global catastrophic biological risks, fully funded by <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>.[^52]'
+    fetchedAt: 2026-02-22T02:04:21.326Z
+    httpStatus: 200
+    pageTitle: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum
+    contentSnippet: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year by BiosecurityMaven23 Oct 2 2024 1 min read 0 6 Biosecurity Global health & development Opportunities to take action App
+    contentLength: 127389
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://forum.effectivealtruism.org/posts/BjcxM6iEDmmmbzXKY/applications-now-open-for-johns-hopkins-center-for-health
+    linkText: Applications now open for Johns Hopkins Center for Health Security doctoral programs - EA Forum
+    claimContext: "**DrPH Track**: A part-time, online program for professionals, also supported by Coefficient Giving.[^53]"
+    fetchedAt: 2026-02-22T02:04:21.319Z
+    httpStatus: 200
+    pageTitle: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum
+    contentSnippet: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year by BiosecurityMaven23 Oct 2 2024 1 min read 0 6 Biosecurity Global health & development Opportunities to take action App
+    contentLength: 127389
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://forum.effectivealtruism.org/posts/BjcxM6iEDmmmbzXKY/applications-now-open-for-johns-hopkins-center-for-health
+    linkText: Applications now open for Johns Hopkins Center for Health Security doctoral programs - EA Forum
+    claimContext: Applications for the 2025-2026 academic year opened in 2024, with deadlines through SOPHAS by December 1, 2024.[^54]
+    fetchedAt: 2026-02-22T02:04:21.352Z
+    httpStatus: 200
+    pageTitle: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum
+    contentSnippet: Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Applications Now Open for Johns Hopkins Center for Health Security Educational Opportunities for 2025-2026 Academic Year by BiosecurityMaven23 Oct 2 2024 1 min read 0 6 Biosecurity Global health & development Opportunities to take action App
+    contentLength: 127389
+    status: verified
+    note: null

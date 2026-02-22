@@ -1,0 +1,337 @@
+pageId: sam-bankman-fried
+verifiedAt: 2026-02-22
+totalCitations: 30
+verified: 28
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/Sam_Bankman-Fried
+    linkText: Wikipedia - Sam Bankman-Fried
+    claimContext: "| **Key Roles** | Founder & CEO, FTX (2019–2022); Co-founder, Alameda Research (2017) | | **Peak Net Worth** | ≈\\$26.5 billion (Forbes 400, ranked 41st-richest American)[^1] | | **Conviction** | Guilty on all seven counts (fraud, conspiracy, money laundering), November 2023[^2] |"
+    fetchedAt: 2026-02-22T02:18:10.760Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://wp.nyu.edu/compliance_enforcement/2023/11/08/former-prosecutors-and-industry-experts-react-to-sam-bankman-fried-trial-verdict/
+    linkText: NYU Compliance & Enforcement - Former Prosecutors and Industry Experts React to Sam Bankman-Fried Trial Verdict
+    claimContext: "| **Peak Net Worth** | ≈\\$26.5 billion (Forbes 400, ranked 41st-richest American)[^1] | | **Conviction** | Guilty on all seven counts (fraud, conspiracy, money laundering), November 2023[^2] | | **Sentence** | 25 years federal prison; \\$11 billion forfeiture ordered, March 28, 2024[^3] |"
+    fetchedAt: 2026-02-22T02:18:12.094Z
+    httpStatus: 200
+    pageTitle: Former Prosecutors and Industry Experts React to Sam Bankman-Fried Trial Verdict | Compliance and Enforcement
+    contentSnippet: "Former Prosecutors and Industry Experts React to Sam Bankman-Fried Trial Verdict | Compliance and Enforcement Skip to content The NYU School of Law Program on Corporate Compliance and Enforcement (PCCE) is following the collapse of FTX and the civil and criminal enforcement actions arising from FTX&#8217;s and its founder&#8217;s alleged misconduct. In this post, several white collar defense, former federal prosecutors, and cryptocurrency experts, offer their reactions to the verdict in the Sam "
+    contentLength: 95846
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.justice.gov/archives/opa/pr/samuel-bankman-fried-sentenced-25-years-his-orchestration-multiple-fraudulent-schemes
+    linkText: U.S. Department of Justice - Samuel Bankman-Fried Sentenced 25 Years
+    claimContext: '| **Conviction** | Guilty on all seven counts (fraud, conspiracy, money laundering), November 2023[^2] | | **Sentence** | 25 years federal prison; \$11 billion forfeiture ordered, March 28, 2024[^3] | | **EA Affiliation** | <EntityLink id="giving-what-we-can">Giving What We Can</EntityLink> member ('
+    fetchedAt: 2026-02-22T02:18:10.913Z
+    httpStatus: 200
+    pageTitle: "&nbsp;"
+    contentSnippet: Powered and protected by Privacy
+    contentLength: 2946
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://time.com/6330323/sbf-trial-biggest-bombshells/
+    linkText: Time - SBF Trial Biggest Bombshells
+    claimContext: In November 2022, FTX filed for bankruptcy after reporting revealed that Bankman-Fried had been directing customer deposits to Alameda Research without disclosure, leaving an estimated \$8–9 billion shortfall in customer funds.[^4] The collapse erased an estimated \$1 trillion from cryptocurrency ma
+    fetchedAt: 2026-02-22T02:18:12.071Z
+    httpStatus: 200
+    pageTitle: "Sam Bankman-Fried Found Guilty: How It Happened | TIME"
+    contentSnippet: "Sam Bankman-Fried Found Guilty: How It Happened | TIME Business Cryptocurrency The Bombshell Evidence That Led to Sam Bankman-Fried’s Conviction ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Andrew R. Chow Correspondent Updated: Loading... by Andrew R. Chow Correspondent Updated: Loading... It took exactly one year for Sam Bankman-Fried to transform from beloved billionaire entrepreneur to convicted felon. On Nov. 2, a New York jury found Bankman-Fried guilty on all seven"
+    contentLength: 385167
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.influencewatch.org/person/sam-bankman-fried/
+    linkText: InfluenceWatch - Sam Bankman-Fried
+    claimContext: In November 2022, FTX filed for bankruptcy after reporting revealed that Bankman-Fried had been directing customer deposits to Alameda Research without disclosure, leaving an estimated \$8–9 billion shortfall in customer funds.[^4] The collapse erased an estimated \$1 trillion from cryptocurrency ma
+    fetchedAt: 2026-02-22T02:18:11.908Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried - InfluenceWatch
+    contentSnippet: "Sam Bankman-Fried - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Person Sam Bankman-Fried Nationality: American Born: 1992 Occupation: Cryptocurrency investor Known For: Democratic Political Donor Contact InfluenceWatch with suggested edits or "
+    contentLength: 218821
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://scottaaronson.blog/?p=7605
+    linkText: Scott Aaronson Blog - SBF Trial Coverage
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:13.968Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The floorboard test New travel/podcast/speaking policy &raquo; The Tragedy of SBF So, Sam Bankman-Fried has been found guilty on all counts, after the jury deliberat"
+    contentLength: 215748
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.dwarkesh.com/p/sbf
+    linkText: Dwarkesh Patel - SBF Interview
+    claimContext: Beyond the immediate financial losses, Bankman-Fried's collapse had significant ramifications for the <EntityLink id="cea">effective altruism</EntityLink> community, which had celebrated him as a model donor, and prompted renewed debate about whether EA's emphasis on expected-value reasoning had ena
+    fetchedAt: 2026-02-22T02:18:13.847Z
+    httpStatus: 200
+    pageTitle: "32: Sam Bankman-Fried - Crypto, Altruism, and Leadership"
+    contentSnippet: "32: Sam Bankman-Fried - Crypto, Altruism, and Leadership Dwarkesh Podcast Subscribe Sign in Dwarkesh Podcast Sam Bankman-Fried - Crypto, Altruism, and Leadership 11 1× 0:00 Current time: 0:00 / Total time: -45:16 -45:16 Audio playback is not supported on your browser. Please upgrade. Sam Bankman-Fried - Crypto, Altruism, and Leadership Infiltrating tradfi, giving away $100m this year, hiring A-players Dwarkesh Patel Jul 05, 2022 11 Share I flew to the Bahamas to interview Sam Bankman-Fried , the"
+    contentLength: 443973
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.britannica.com/money/Sam-Bankman-Fried
+    linkText: Britannica - Sam Bankman-Fried
+    claimContext: Bankman-Fried was born on March 6, 1992, in Stanford, California, to Barbara Fried and Joe Bankman, both law professors at Stanford University.[^8] He attended Phillips Exeter Academy and later MIT, where he studied physics and mathematics.[^1] After graduating, he worked as a trader on the internat
+    fetchedAt: 2026-02-22T02:18:13.757Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried | FTX, Education, Conviction, & Prison | Britannica Money
+    contentSnippet: "Sam Bankman-Fried | FTX, Education, Conviction, & Prison | Britannica Money Table of Contents Introduction & Quick Facts Race to riches: becoming one of the world’s youngest billionaires FTX’s scandal and SBF’s arrest Read More cryptocurrency Elon Musk Howard Hughes Table Of Contents Sam Bankman-Fried American businessman Print Cite Share Also known as: SBF Written by Adam Zeidan Adam Zeidan Adam Zeidan is an Assistant Managing Editor, having joined Encyclop&aelig;dia Britannica in 2018. Fact-ch"
+    contentLength: 145151
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.sevenpillarsinstitute-org.sevenpillarsconsulting.com/case-study-ftx-and-sam-bankman-fried/
+    linkText: "Seven Pillars Institute - Case Study: FTX and Sam Bankman-Fried"
+    claimContext: In 2017, Bankman-Fried left Jane Street and briefly joined the <EntityLink id="cea">Centre for Effective Altruism</EntityLink>, where he encountered the <EntityLink id="earning-to-give">earning to give</EntityLink> framework and began identifying arbitrage opportunities in Bitcoin trading across exc
+    fetchedAt: 2026-02-22T02:18:14.138Z
+    httpStatus: 200
+    pageTitle: "Case Study: FTX and Sam Bankman-Fried - Seven Pillars Institute"
+    contentSnippet: "Case Study: FTX and Sam Bankman-Fried - Seven Pillars Institute clock location phone check_box_outline_blank check_box chevron-down chevron-left chevron-right chevron-up facebook instagram google plus pinterest radio_button_checked radio_button_unchecked twitter youtube linkedin arrow-up send play search close cc-mastercard cc-discover cc-visa cc-amex letter You are using an outdated browser. Please upgrade your browser to improve your experience. By Shanaya Kapoor 1. Introduction On November 6t"
+    contentLength: 240249
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://ethicsunwrapped.utexas.edu/crypto-ethics-ftx-and-sam-bankman-fried/
+    linkText: "Ethics Unwrapped - Crypto Ethics: FTX and Sam Bankman-Fried"
+    claimContext: "Alameda's early success created both the capital and the credibility for Bankman-Fried's next venture. However, the firm experienced internal discord from early on: co-founder Tara Mac Aulay and other early employees departed citing concerns about risk management and ethics, warnings that would late"
+    fetchedAt: 2026-02-22T02:18:13.865Z
+    httpStatus: 200
+    pageTitle: "Crypto Ethics: FTX and Sam Bankman-Fried - Ethics Unwrapped"
+    contentSnippet: "Crypto Ethics: FTX and Sam Bankman-Fried - Ethics Unwrapped Skip to main content McCombs School of Business English Español ( Spanish ) English Español ( Spanish ) As regular readers of this blog know, our most common form of post arises from our reading of a book or major media exposé about a business scandal. We then mine those sources for any information that might tell us how behavioral ethics concepts might enlighten us as to how and why the scandal occurred and how it might have been preve"
+    contentLength: 299285
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.businessinsider.com/sam-bankman-fried-crypto-billionaire-profile-ftx-exchange-history-investors-2021-12
+    linkText: Business Insider - Sam Bankman-Fried Profile
+    claimContext: FTX grew rapidly, relocating to the Bahamas in 2021 to take advantage of a more permissive regulatory environment.[^8] The exchange was valued at \$25 billion in October 2021 with investment from major institutions including Temasek, Tiger Global, Sequoia Capital, and BlackRock.[^11] By early 2022 i
+    fetchedAt: 2026-02-22T02:18:15.501Z
+    httpStatus: 200
+    pageTitle: "Sam Bankman-Fried Profile: Insiders Describe Crypto Billionaire, FTX - Business Insider"
+    contentSnippet: "Sam Bankman-Fried Profile: Insiders Describe Crypto Billionaire, FTX - Business Insider FTX; Marianne Ayala/Insider Markets FTX founder Sam Bankman-Fried gets by on 4 hours&#x27; sleep and multitasks on 6 screens. Insiders break down what the 29-year-old crypto billionaire is really like — and the tough questions facing his company. FTX; Marianne Ayala/Insider By Vicky Ge Huang and Kari McMahon 2021-12-15T16:55:09.000Z Share Copy link Email Facebook WhatsApp X LinkedIn Bluesky Threads lighning b"
+    contentLength: 527187
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.sec.gov/newsroom/press-releases/2022-219
+    linkText: SEC Press Release - SBF Charges
+    claimContext: Bankman-Fried became a significant Washington presence during this period, testifying before Congress on cryptocurrency regulation and making substantial political donations — reportedly \$5.2 million to a pro-Biden committee in 2020, with prosecutors later alleging the use of approximately \$100 mi
+    fetchedAt: 2026-02-22T02:18:15.384Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 13
+    url: https://lawforbusiness.usc.edu/ftxs-end-game-how-sam-bankman-fried-became-a-sad-bankrupt-fraud/
+    linkText: USC Law for Business - FTX End Game
+    claimContext: FTX operated under minimal formal governance. John Ray, the restructuring administrator who also oversaw Enron's bankruptcy, described the situation as stemming from "the absolute concentration of control in the hands of a very small group of grossly inexperienced and unsophisticated individuals who
+    fetchedAt: 2026-02-22T02:18:15.878Z
+    httpStatus: 200
+    pageTitle: "FTX&#8217;s End Game: How Sam Bankman Fried Became a Sad Bankrupt Fraud &#8211; Business Law Digest"
+    contentSnippet: "FTX&#8217;s End Game: How Sam Bankman Fried Became a Sad Bankrupt Fraud &#8211; Business Law Digest By Steven Moore I. Introduction In December 2022, the House Financial Services Committee convened a hearing to investigate the collapse of the cryptocurrency exchange FTX, which occurred in early November 2022. [1] The testimony provided at this hearing, as well as subsequent reporting, exposed a shocking case of fraud and corporate malfeasance, rivaling the infamy of Bernie Madoff&#8217;s scheme."
+    contentLength: 99275
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://simon.rochester.edu/blog/5-lessons-learn-collapse-ftx
+    linkText: Simon Business School - 5 Lessons from FTX Collapse
+    claimContext: FTX operated under minimal formal governance. John Ray, the restructuring administrator who also oversaw Enron's bankruptcy, described the situation as stemming from "the absolute concentration of control in the hands of a very small group of grossly inexperienced and unsophisticated individuals who
+    fetchedAt: 2026-02-22T02:18:16.203Z
+    httpStatus: 200
+    pageTitle: 5 lessons to learn from the collapse of FTX.
+    contentSnippet: "5 lessons to learn from the collapse of FTX. Skip To Content SIMON BLOG: DEAN’S CORNER 5 lessons to learn from the collapse of FTX 5 lessons to learn from the collapse of FTX March 29, 2023 | By Dean Sevin Yeltekin In November 2022, the world was captivated by the swift downfall of FTX (short for “Futures Exchange”), a three-year-old company that operated a cryptocurrency exchange and crypto hedge fund. Overnight, FTX co-founder Sam Bankman-Fried (popularly known as “SBF”) went from magazine cov"
+    contentLength: 98777
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://markets.businessinsider.com/news/currencies/crypto-ftx-us-ex-boss-sam-bankman-fried-brett-harrison-2023-1
+    linkText: Business Insider - Brett Harrison on Sam Bankman-Fried
+    claimContext: Brett Harrison, former CEO of FTX US, later described Bankman-Fried as someone who responded to challenge with what Harrison characterized as hostility and manipulation, and who dismissed the judgment of experienced professionals.[^15]
+    fetchedAt: 2026-02-22T02:18:15.554Z
+    httpStatus: 200
+    pageTitle: "FTX Collapse: 10 Things We Just Learned About Problems, 'Spiteful' SBF - Markets Insider"
+    contentSnippet: "FTX Collapse: 10 Things We Just Learned About Problems, 'Spiteful' SBF - Markets Insider Markets currencies FTX US&#x27;s former boss has opened up on &#x27;spiteful&#x27; ex-CEO Sam Bankman-Fried and problems at the collapsed crypto exchange. Here are 10 things we just learned, in his top quotes. By Zahra Tayeb Former FTX President Brett Harrison. Kelly Sullivan / Stringer 2023-01-16T15:45:47.000Z Share Copy link Email Facebook X Save Saved Read in app This story is available exclusively to Bus"
+    contentLength: 340828
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.motherjones.com/politics/2025/10/ftx-sam-bankman-fried-crypto-bankruptcy-sullivan-cromwell-fraud/
+    linkText: Mother Jones - FTX Sam Bankman-Fried Bankruptcy Sullivan Cromwell Fraud
+    claimContext: An independent examiner subsequently found that many FTX investments had involved limited due diligence and were based on unsupported valuations.[^16] The speed of the collapse — from reported concern to bankruptcy filing in under two weeks — reflected both the illiquidity of Alameda's asset base an
+    fetchedAt: 2026-02-22T02:18:17.692Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried and the Multibillion-Dollar Drama Over FTX’s Ruins &#8211; Mother Jones
+    contentSnippet: Sam Bankman-Fried and the Multibillion-Dollar Drama Over FTX’s Ruins &#8211; Mother Jones Skip to main content Share on Facebook Share on Twitter Share on Bluesky Email Comments Get your news from a source that’s not owned and controlled by oligarchs. Sign up for the free Mother Jones Daily . Sam Bankman-Fried nervously sheds his dark brown prison jumpsuit to reveal athletic shorts and a loose-fitting gray T-shirt. &#8220;There&#8217;s this extremely dumb cat and mouse game where, for reasons no
+    contentLength: 279902
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://scottaaronson.blog/?p=7605
+    linkText: Scott Aaronson Blog - SBF Trial
+    claimContext: Bankman-Fried was arrested in the Bahamas in December 2022 and extradited to the United States. His trial began in October 2023 in the Southern District of New York before Judge Lewis Kaplan. Key witnesses against him included Caroline Ellison, former CEO of Alameda Research, and Adam Yedidia, a for
+    fetchedAt: 2026-02-22T02:18:17.601Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The floorboard test New travel/podcast/speaking policy &raquo; The Tragedy of SBF So, Sam Bankman-Fried has been found guilty on all counts, after the jury deliberat"
+    contentLength: 215749
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://abcnews.go.com/alerts/SamBankmanFried
+    linkText: ABC News - Sam Bankman-Fried coverage
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:18.254Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried - ABC News
+    contentSnippet: Sam Bankman-Fried - ABC News 1:39 Sam Bankman-Fried says he shares prison bunk with Sean ‘Diddy’ Combs Mar 7, 2025 Michael Nagle/Bloomberg via Getty Images FTX founder&#x27;s ex-girlfriend sentenced to 2 years in prison for fraud case Sep 24, 2024 Drew Angerer/Getty Images Former crypto mogul Sam Bankman-Fried transferred out of New York prison The FTX founder is currently serving a 25-year sentence. Mar 27, 2025 Bebeto Matthews/AP, FILE Sam Bankman-Fried appeals fraud conviction tied to FTX col
+    contentLength: 247436
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://forum.effectivealtruism.org/topics/sam-bankman-fried
+    linkText: EA Forum - Sam Bankman-Fried Topic
+    claimContext: He engaged publicly with the <EntityLink id="80000-hours">80,000 Hours</EntityLink> community and EA forums, and was mentored by William MacAskill, one of EA's founding figures, who promoted Bankman-Fried's approach as an exemplar of high-impact career strategy.[^19] During this period, Bankman-Frie
+    fetchedAt: 2026-02-22T02:18:19.195Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried - EA Forum
+    contentSnippet: Sam Bankman-Fried - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Sam Bankman-Fried Edit History Discussion 1 Subscribe Edit History Discussion 1 Sam Bankman-Fried Background Philanthropy FTX collapse and fallout Further reading Related entries Random Topic Contributors 11 Pablo 3 Lizka 2 Amber Dawn 1 arghyas 1 Leo Sam Bankman-Fried (born 6 March 1992) is an American trader, entrepren
+    contentLength: 622671
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.lesswrong.com/posts/8wYH4WggxFqT9yhzJ/we-must-be-very-clear-fraud-in-the-service-of-effective
+    linkText: "LessWrong - We Must Be Very Clear: Fraud in the Service of Effective Altruism"
+    claimContext: On <EntityLink id="lesswrong">LessWrong</EntityLink>, the community response was characterized by explicit condemnation of fraud committed in the name of effective altruism, with posts rejecting the notion that fraud could be justified by altruistic ends.[^20] EA Forum discussions reflected substant
+    fetchedAt: 2026-02-22T02:18:18.466Z
+    httpStatus: 200
+    pageTitle: "We must be very clear: fraud in the service of effective altruism is unacceptable — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. We must be very clear: fraud in the service of effective altruism is unacceptable — LessWrong Effective altruism Community Personal Blog 42 We must be very clear: fraud in the service of effective altruism is unacceptable by evhub 10th Nov 2022 3 min read 56 42 I care deeply about the future of humanity—more so than I care about anything else in the world. And I believ"
+    contentLength: 920276
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://forum.effectivealtruism.org/posts/BNKBJs4RJsA8FtdWE/a-personal-reflection-on-sbf
+    linkText: EA Forum - A Personal Reflection on SBF
+    claimContext: On <EntityLink id="lesswrong">LessWrong</EntityLink>, the community response was characterized by explicit condemnation of fraud committed in the name of effective altruism, with posts rejecting the notion that fraud could be justified by altruistic ends.[^20] EA Forum discussions reflected substant
+    fetchedAt: 2026-02-22T02:18:20.272Z
+    httpStatus: 200
+    pageTitle: A personal reflection on SBF — EA Forum
+    contentSnippet: A personal reflection on SBF — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents A personal reflection on SBF by So8res Feb 7 2023 23 min read 23 321 Community Sam Bankman-Fried FTX collapse Frontpage A personal reflection on SBF Meta Short version Recounting Mid 2015-17(?) Early 2018 Late 2020 Late 2020 - early 2021 Early 2021 Early 2022 Shortly before November 8th, 2022 Accounting I did
+    contentLength: 716126
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://newrepublic.com/article/168885/bankman-fried-effective-altruism-bunk
+    linkText: New Republic - Bankman-Fried Effective Altruism Bunk
+    claimContext: External critics went further, arguing that EA's deference to wealthy donors — including Bankman-Fried's \$160 million in commitments and <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink>-associated funding — had compromised the movement's intellectual independence and its capacity t
+    fetchedAt: 2026-02-22T02:18:21.047Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried and the Moral Emptiness of Effective Altruism | The New Republic
+    contentSnippet: Sam Bankman-Fried and the Moral Emptiness of Effective Altruism | The New Republic Skip Navigation Tycoons are susceptible to the misconception that if you know how to make billions you know how to spend them. Sam Bankman-Fried, the “ unkempt millennial ” ( The Wall Street Journal ) and founder of the cryptocurrency firm FTX, demonstrated that he knew how to make a fortune that peaked at $26.5 billion . Then he demonstrated that he also knew how to lose it, under circumstances that are now under
+    contentLength: 237018
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://scottaaronson.blog/?p=7605
+    linkText: Scott Aaronson Blog - SBF Analysis
+    claimContext: Several critics have argued that the specific philosophical framework Bankman-Fried embraced — EA-influenced expected-value maximization with linear (rather than logarithmic) utility for money — provided both the motivation and the self-justification for his risk-taking. Under such reasoning, a suff
+    fetchedAt: 2026-02-22T02:18:20.538Z
+    httpStatus: 200
+    pageTitle: Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF
+    contentSnippet: "Shtetl-Optimized &raquo; Blog Archive &raquo; The Tragedy of SBF Shtetl-Optimized The Blog of Scott Aaronson If you take nothing else from this blog: quantum computers won't solve hard problems instantly by just trying all solutions in parallel. Also, please read Zvi Mowshowitz's masterpiece on how to fix K-12 education! --> &laquo; The floorboard test New travel/podcast/speaking policy &raquo; The Tragedy of SBF So, Sam Bankman-Fried has been found guilty on all counts, after the jury deliberat"
+    contentLength: 215748
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://ethicsunwrapped.utexas.edu/crypto-ethics-ftx-and-sam-bankman-fried/
+    linkText: "Ethics Unwrapped - Crypto Ethics: FTX and Sam Bankman-Fried"
+    claimContext: Others have noted that the money-focused environment at Alameda and FTX may itself have progressively eroded ethical reasoning among those involved, consistent with research on how financial incentives can affect moral judgment.[^24]
+    fetchedAt: 2026-02-22T02:18:20.865Z
+    httpStatus: 200
+    pageTitle: "Crypto Ethics: FTX and Sam Bankman-Fried - Ethics Unwrapped"
+    contentSnippet: "Crypto Ethics: FTX and Sam Bankman-Fried - Ethics Unwrapped Skip to main content McCombs School of Business English Español ( Spanish ) English Español ( Spanish ) As regular readers of this blog know, our most common form of post arises from our reading of a book or major media exposé about a business scandal. We then mine those sources for any information that might tell us how behavioral ethics concepts might enlighten us as to how and why the scandal occurred and how it might have been preve"
+    contentLength: 299285
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://fortune.com/2022/11/15/sam-bankman-fried-ftx-collapse-a-i-safety-research-effective-altruism-debacle/
+    linkText: Fortune - SBF FTX Collapse AI Safety Research EA Debacle
+    claimContext: Through the <EntityLink id="ftx-future-fund">FTX Future Fund</EntityLink>, Bankman-Fried planned to distribute \$100 million in 2022 toward AI safety, pandemic risk reduction, and other EA-priority causes.[^7][^25] EA community leaders including William MacAskill had mentored him and publicly promot
+    fetchedAt: 2026-02-22T02:18:20.322Z
+    httpStatus: 200
+    pageTitle: The collapse of Sam Bankman-Fried&#x27;s FTX riles A.I. research community | Fortune
+    contentSnippet: The collapse of Sam Bankman-Fried&#x27;s FTX riles A.I. research community | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Newsletters Eye on AI Why Sam Bankman-Fried’s FTX debacle is roiling A.I. research By Jeremy Kahn Jeremy Kahn Editor, AI Down Arrow Button Icon By Jeremy Kahn Jeremy Kahn Editor, AI Down Arrow Button Icon November 15, 2022, 2:49 PM ET Add us on Sam Bankman-Fried was a major donor to a field of research known as "A.I. Safety" that focus
+    contentLength: 480895
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.cbsnews.com/tag/sam-bankman-fried/
+    linkText: CBS News - Sam Bankman-Fried Tag
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T02:18:23.672Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried news - Today&rsquo;s latest updates - CBS News
+    contentSnippet: Sam Bankman-Fried news - Today&rsquo;s latest updates - CBS News Watch CBS News Sam Bankman-Fried Caroline Ellison, former FTX executive, sentenced to 24 months in prison Ellison, a former top executive for Sam Bankman-Friend's crypto hedge fund, was sentenced Tuesday for fraud. Sep 24, 2024 FTX founder Sam Bankman-Fried appeals fraud conviction Lawyers for Sam Bankman-Fried claim in an appeal filed Friday that the imprisoned FTX founder was the victim of a rush to judgment by a public that wron
+    contentLength: 796498
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.justice.gov/archives/opa/pr/samuel-bankman-fried-sentenced-25-years-his-orchestration-multiple-fraudulent-schemes
+    linkText: U.S. Department of Justice - Samuel Bankman-Fried Sentenced 25 Years
+    claimContext: On March 28, 2024, Judge Lewis Kaplan sentenced Bankman-Fried to 25 years in federal prison and ordered \$11 billion in forfeiture.[^3] In sentencing remarks, Judge Kaplan observed that Bankman-Fried had not demonstrated substantial remorse and noted the risk that he could commit future offenses.[^2
+    fetchedAt: 2026-02-22T02:18:22.361Z
+    httpStatus: 200
+    pageTitle: "&nbsp;"
+    contentSnippet: Powered and protected by Privacy
+    contentLength: 2954
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://abcnews.go.com/alerts/SamBankmanFried
+    linkText: ABC News - Sam Bankman-Fried appeal and transfer reporting
+    claimContext: On March 28, 2024, Judge Lewis Kaplan sentenced Bankman-Fried to 25 years in federal prison and ordered \$11 billion in forfeiture.[^3] In sentencing remarks, Judge Kaplan observed that Bankman-Fried had not demonstrated substantial remorse and noted the risk that he could commit future offenses.[^2
+    fetchedAt: 2026-02-22T02:18:23.427Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried - ABC News
+    contentSnippet: Sam Bankman-Fried - ABC News 1:39 Sam Bankman-Fried says he shares prison bunk with Sean ‘Diddy’ Combs Mar 7, 2025 Michael Nagle/Bloomberg via Getty Images FTX founder&#x27;s ex-girlfriend sentenced to 2 years in prison for fraud case Sep 24, 2024 Drew Angerer/Getty Images Former crypto mogul Sam Bankman-Fried transferred out of New York prison The FTX founder is currently serving a 25-year sentence. Mar 27, 2025 Bebeto Matthews/AP, FILE Sam Bankman-Fried appeals fraud conviction tied to FTX col
+    contentLength: 247436
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://time.com/6330323/sbf-trial-biggest-bombshells/
+    linkText: Time - SBF Trial Biggest Bombshells and Sentencing
+    claimContext: Caroline Ellison, who provided substantial cooperation with prosecutors, was sentenced to two years in prison on September 24, 2024.[^29] Ryan Salame was sentenced to 7.5 years; Nishad Singh's sentencing was deferred in recognition of his cooperation.[^29]
+    fetchedAt: 2026-02-22T02:18:22.149Z
+    httpStatus: 200
+    pageTitle: "Sam Bankman-Fried Found Guilty: How It Happened | TIME"
+    contentSnippet: "Sam Bankman-Fried Found Guilty: How It Happened | TIME Business Cryptocurrency The Bombshell Evidence That Led to Sam Bankman-Fried’s Conviction ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Andrew R. Chow Correspondent Updated: Loading... by Andrew R. Chow Correspondent Updated: Loading... It took exactly one year for Sam Bankman-Fried to transform from beloved billionaire entrepreneur to convicted felon. On Nov. 2, a New York jury found Bankman-Fried guilty on all seven"
+    contentLength: 385167
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.cbsnews.com/tag/sam-bankman-fried/
+    linkText: CBS News - Sam Bankman-Fried coverage
+    claimContext: News reports have also indicated that Bankman-Fried and his family explored the possibility of a presidential pardon, citing Donald Trump's stated interest in pro-cryptocurrency policy, though Trump reportedly indicated he had no intention of granting clemency to Bankman-Fried specifically.[^28] Rep
+    fetchedAt: 2026-02-22T02:18:23.659Z
+    httpStatus: 200
+    pageTitle: Sam Bankman-Fried news - Today&rsquo;s latest updates - CBS News
+    contentSnippet: Sam Bankman-Fried news - Today&rsquo;s latest updates - CBS News Watch CBS News Sam Bankman-Fried Caroline Ellison, former FTX executive, sentenced to 24 months in prison Ellison, a former top executive for Sam Bankman-Friend's crypto hedge fund, was sentenced Tuesday for fraud. Sep 24, 2024 FTX founder Sam Bankman-Fried appeals fraud conviction Lawyers for Sam Bankman-Fried claim in an appeal filed Friday that the imprisoned FTX founder was the victim of a rush to judgment by a public that wron
+    contentLength: 796498
+    status: verified
+    note: null

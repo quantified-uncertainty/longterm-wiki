@@ -1,0 +1,29 @@
+pageId: safety-spending-at-scale
+verifiedAt: 2026-02-22
+totalCitations: 2
+verified: 2
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 2
+    url: https://www.iaps.ai/
+    linkText: Institute for AI Policy and Strategy - AI Safety Funding Landscape — (2024)
+    claimContext: "| **Academia** (dedicated safety) | \\$50-100M | +15-20%/year | Theoretical alignment, robustness, fairness | | **Total** | **\\$700M-1.25B** | **+35-50%/year** | |[^2]"
+    fetchedAt: 2026-02-22T02:28:25.170Z
+    httpStatus: 200
+    pageTitle: Institute for AI Policy and Strategy
+    contentSnippet: "Institute for AI Policy and Strategy 0 Securing a positive future in a world with powerful AI The Institute for AI Policy and Strategy (IAPS) is a nonpartisan think tank that produces policy research to address the implications of AI, from today’s most advanced models to potential AGI and superintelligence. Our work equips policymakers and industry leaders to protect innovation while navigating high-magnitude risks and opportunities at the intersection of AI, national security, and geopolitics. "
+    contentLength: 183480
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://80000hours.org/problem-profiles/artificial-intelligence/
+    linkText: <EntityLink id="E510" name="80000-hours">80,000 Hours</EntityLink> — AI Safety Career Guide — (2024); researcher count estimates from AI Safety Support surveys and <EntityLink id="E476" name="field-building-analysis">field building analysis</EntityLink>
+    claimContext: Approximately 2,000-3,500 people globally work full-time on AI safety research as of 2025.[^3]
+    fetchedAt: 2026-02-22T02:28:25.409Z
+    httpStatus: 200
+    pageTitle: Risks from power-seeking AI systems | 80,000 Hours
+    contentSnippet: "Risks from power-seeking AI systems | 80,000 Hours Search for: On this page: Introduction 1 Why are risks from power-seeking AI a pressing world problem? 1.1 1. Humans will likely build advanced AI systems with long-term goals 1.2 2. AIs with long-term goals may be inclined to seek power and aim to disempower humanity 1.3 3. These power-seeking AI systems could successfully disempower humanity and cause an existential catastrophe 1.4 4. People might create power-seeking AI systems without enough"
+    contentLength: 294269
+    status: verified
+    note: null

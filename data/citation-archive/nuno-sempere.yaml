@@ -1,0 +1,315 @@
+pageId: nuno-sempere
+verifiedAt: 2026-02-22
+totalCitations: 28
+verified: 25
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://alethios.substack.com/p/with-nuno-sempere-superforecasting
+    linkText: "Alethios Substack - With Nuño Sempere: Superforecasting"
+    claimContext: Nuño Sempere (born October 10, 1998) is a Spanish forecaster, researcher, and entrepreneur known for exceptional performance in forecasting competitions and critical analysis of existential risk estimates. He co-founded <EntityLink id="samotsvety">Samotsvety</EntityLink>, a forecasting group that wo
+    fetchedAt: 2026-02-22T02:19:07.001Z
+    httpStatus: 200
+    pageTitle: With Nuño Sempere - Superforecasting and Global Risk
+    contentSnippet: With Nuño Sempere - Superforecasting and Global Risk Public Service Subscribe Sign in With Nuño Sempere - Superforecasting and Global Risk Alethios Jul 11, 2025 17 2 Share Nuño Sempere is a founding member of the legendary forecasting group ‘Samotsvety’. His track record puts him at the top of the world’s most accurate predictors of the future. I sat down with him last month to discuss forecasting, global risk, and his new non-profit ‘ Sentinel ’, a free early-warning system for large-scale cata
+    contentLength: 319075
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://forum.effectivealtruism.org/posts/GAFwc5jGFjqSetJiu/sentinel-early-detection-and-response-for-global
+    linkText: "EA Forum - Sentinel: Early Detection and Response for Global Catastrophes"
+    claimContext: Nuño Sempere (born October 10, 1998) is a Spanish forecaster, researcher, and entrepreneur known for exceptional performance in forecasting competitions and critical analysis of existential risk estimates. He co-founded <EntityLink id="samotsvety">Samotsvety</EntityLink>, a forecasting group that wo
+    fetchedAt: 2026-02-22T02:19:07.055Z
+    httpStatus: 200
+    pageTitle: "Sentinel: Early Detection and Response for Global Catastrophes — EA Forum"
+    contentSnippet: "Sentinel: Early Detection and Response for Global Catastrophes — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Sentinel: Early Detection and Response for Global Catastrophes by rai , NunoSempere Nov 18 2025 12 min read 6 71 Forecasting AI safety Existential risk Global catastrophic risk AI forecasting Emergency response Entrepreneurship Giving Season (2025) Information security Margin"
+    contentLength: 415746
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.youtube.com/watch?v=zmsBiFwRlXc
+    linkText: "YouTube - With Nuño Sempere: Superforecasting and global catastrophic risks"
+    claimContext: Sempere currently leads Sentinel, a non-profit organization focused on early detection and response to global catastrophes including pandemics, wars, and financial crises that could kill over one million people.[^3] The organization processes millions of news items through automated scrapers to iden
+    fetchedAt: 2026-02-22T02:19:06.943Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 4
+    url: https://nunosempere.com/consulting/
+    linkText: Nuño Sempere - Consulting
+    claimContext: Sempere currently leads Sentinel, a non-profit organization focused on early detection and response to global catastrophes including pandemics, wars, and financial crises that could kill over one million people.[^3] The organization processes millions of news items through automated scrapers to iden
+    fetchedAt: 2026-02-22T02:19:07.638Z
+    httpStatus: 200
+    pageTitle: consulting
+    contentSnippet: consulting Shapley Maximizers is a niche estimation, evaluation and impact auditing consultancy run by myself, Nuño Sempere, but increasingly also with support from collaborators. This page presents our core competencies, consulting rates, description of ideal clients, testimonials, and a few further thoughts. In short, we are looking to support people and smallish organizations who are already producing value, and who want to add clarity and improve their prioritization through estimation, meas
+    contentLength: 15149
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://nunosempere.com/blog/2023/01/23/my-highly-personal-skepticism-braindump-on-existential-risk/
+    linkText: Nuño Sempere - My highly personal skepticism braindump on existential risk from artificial intelligence
+    claimContext: Beyond his operational work, Sempere has become a prominent voice critiquing aspects of the Effective Altruism community and questioning high existential risk estimates from AI. His 2023 "skepticism braindump" challenged AI doom probabilities around 80% by 2070, arguing they may reflect "selection e
+    fetchedAt: 2026-02-22T02:19:07.909Z
+    httpStatus: 200
+    pageTitle: My highly personal skepticism braindump on existential risk from artificial intelligence.
+    contentSnippet: My highly personal skepticism braindump on existential risk from artificial intelligence. My highly personal skepticism braindump on existential risk from artificial intelligence. Summary This document seeks to outline why I feel uneasy about high existential risk estimates from AGI (e.g., 80% doom by 2070). When I try to verbalize this, I view considerations like selection effects at the level of which arguments are discovered and distributed community epistemic problems, and increased uncertai
+    contentLength: 33658
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://forum.effectivealtruism.org/posts/GAFwc5jGFjqSetJiu/sentinel-early-detection-and-response-for-global
+    linkText: "EA Forum - Sentinel: Early Detection and Response for Global Catastrophes"
+    claimContext: Beyond his operational work, Sempere has become a prominent voice critiquing aspects of the Effective Altruism community and questioning high existential risk estimates from AI. His 2023 "skepticism braindump" challenged AI doom probabilities around 80% by 2070, arguing they may reflect "selection e
+    fetchedAt: 2026-02-22T02:19:08.956Z
+    httpStatus: 200
+    pageTitle: "Sentinel: Early Detection and Response for Global Catastrophes — EA Forum"
+    contentSnippet: "Sentinel: Early Detection and Response for Global Catastrophes — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Sentinel: Early Detection and Response for Global Catastrophes by rai , NunoSempere Nov 18 2025 12 min read 6 71 Forecasting AI safety Existential risk Global catastrophic risk AI forecasting Emergency response Entrepreneurship Giving Season (2025) Information security Margin"
+    contentLength: 412947
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.lesswrong.com/users/nunosempere
+    linkText: LessWrong - NunoSempere user profile
+    claimContext: Sempere studied Mathematics and Philosophy but dropped out due to dissatisfaction with the educational system's inefficiency.[^7] He subsequently pursued development economics and maintained interests in Spanish poetry and literature, having previously written a popular Spanish literature blog.
+    fetchedAt: 2026-02-22T02:19:09.470Z
+    httpStatus: 200
+    pageTitle: NunoSempere — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. NunoSempere — LessWrong NunoSempere NunoSempere Subscribe Message I am an independent research and programmer working at my own consultancy, Shapley Maximizers ÖU. I like to spend my time acquiring deeper models of the world, and generally becoming more formidable . I&#x27;m also a fairly good forecaster: I started out on predicting on Good ... See more 2852 Ω 11 56 28"
+    contentLength: 372831
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.nasdaq.com/articles/a-look-at-samotsvety-forecasting-one-of-the-worlds-best-predictors-of-the-future
+    linkText: "NASDAQ - A Look at Samotsvety Forecasting: One of the World's Best Predictors of the Future"
+    claimContext: His forecasting career began on prediction platforms including <EntityLink id="good-judgment">Good Judgment</EntityLink> Open and CSET-Foretell.[^7] Around 2020, he met fellow forecaster Alexei Yagudin at a summer fellowship at Oxford's <EntityLink id="fhi">Future of Humanity Institute</EntityLink>,
+    fetchedAt: 2026-02-22T02:19:11.343Z
+    httpStatus: 200
+    pageTitle: A Look at Samotsvety Forecasting, One of the World's Best Predictors of the Future | Nasdaq
+    contentSnippet: A Look at Samotsvety Forecasting, One of the World&#039;s Best Predictors of the Future | Nasdaq Skip to main content Data is currently not available Search Nasdaq.com Clear Search We couldn’t find any results matching your search. Please try using other words for your search or explore other sections of the website for relevant information. We’re sorry, we are currently experiencing some issues, please try again later. Our team is working diligently to resolve the issue. Thank you for your pati
+    contentLength: 183949
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://samotsvety.org/track-record/
+    linkText: Samotsvety - Track Record
+    claimContext: "- **2020**: 1st place with relative Brier score of -0.912 versus -0.062 for second place; Samotsvety members ranked 5th, 6th, and 7th individually[^9] - **2021**: 1st place with score of -3.259 versus -0.889 for second place and -0.267 for Pro Forecasters; members ranked 1st, 2nd, 4th, and 5th indiv"
+    fetchedAt: 2026-02-22T02:19:09.950Z
+    httpStatus: 200
+    pageTitle: track record
+    contentSnippet: "track record Team achievements The Samotsvety Forecasting team at INFER/CSET-Foretell—composed out of Nuño, Misha, Eli—took: 1st place in 2020 , with a relative score of -0.912 (vs. -0.062 by the 2nd best team). Individually we finished 5th, 6th, and 7th . 1st place in 2021 with a relative score of -3.259 (vs. -0.889 by the 2nd best team and vs. -0.267 by “Pro Forecasters”). Individually we finished 1st, 2nd, 4th and 5th . We still hold 1st, 2nd, 3rd, 4th places in INFER&rsquo;s all time ranking"
+    contentLength: 12933
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://manifund.org/projects/fund-sentinel-for-q4-2024
+    linkText: Manifund - Fund Sentinel for Q4 2024
+    claimContext: In late 2024, Sempere brought on Rai Sur as cofounder and CTO.[^10] Sur previously founded and served as CTO of the crypto fintech startup Alongside (now Universal), which raised over \$13 million from a16z and remained operational for at least five years.[^6] Sur designed systems that secured \$6 m
+    fetchedAt: 2026-02-22T02:19:15.529Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 11
+    url: https://manifund.org/NunoSempere
+    linkText: Manifund - NunoSempere
+    claimContext: "In Q4 2024/Q1 2025, Sentinel sought additional funding to transition to full-time operations, incorporate as a US non-profit, expand the foresight and reserve teams, increase operational capacity, and establish an emergency response fund.[^10] The organization received early funding via <EntityLink "
+    fetchedAt: 2026-02-22T02:19:22.778Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 12
+    url: https://blog.sentinel-team.org/p/rising-china-japan-tensions-iran
+    linkText: Sentinel Blog - Rising China-Japan tensions, Iran developments
+    claimContext: Recent forecasts from Sentinel's team in early 2025 included a 73% probability (50-90% range) that the US would carry out an attack on Venezuelan territory before the end of 2025, and a 47% probability (20-70% range) that Nicolás Maduro would remain President of Venezuela through March 2026.[^12]
+    fetchedAt: 2026-02-22T02:19:17.444Z
+    httpStatus: 200
+    pageTitle: "🟩 Rising China-Japan tensions, Iran seizes oil tanker, AI-directed cyberattacks disrupted || Global Risks Weekly Roundup #46/2025"
+    contentSnippet: "🟩 Rising China-Japan tensions, Iran seizes oil tanker, AI-directed cyberattacks disrupted || Global Risks Weekly Roundup #46/2025 Subscribe Sign in 🟩 Rising China-Japan tensions, Iran seizes oil tanker, AI-directed cyberattacks disrupted || Global Risks Weekly Roundup #46/2025 Nuño Sempere , belikewater , Vidur Kapur , and Tolga Bilge Nov 17, 2025 19 3 3 Share Article voiceover 0:00 -15:18 Audio playback is not supported on your browser. Please upgrade. Executive summary We’re a group of top f"
+    contentLength: 255996
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.inforegister.ee/en/2329278-ID/
+    linkText: Inforegister - Shapley Maximizers OÜ
+    claimContext: The company has a reputation score of 640 and a credit score of 0.01.[^13]
+    fetchedAt: 2026-02-22T02:19:17.719Z
+    httpStatus: 200
+    pageTitle: Nuño Sempere López-Hidalgo (10.10.1998) - Board member overview @ Inforegister.ee
+    contentSnippet: Nuño Sempere López-Hidalgo (10.10.1998) - Board member overview @ Inforegister.ee Nuño Sempere López-Hidalgo info Person ID 39810100120 Profile visits info 97 Person ID 39810100120 Date of birth 10.10.1998 (27 y.) Residence Spain Start date of non-residency 10.10.1998 (27 y. 4 m.) Start of business 03.05.2023 (2 y. 9 m.) Roles Founder, Board member, Shareholder location_on Address Harju maakond, Tallinn, Kesklinna linnaosa, Ahtri tn 12, 15551 Navigate mail E-mail call Phone Social media Nuño Sem
+    contentLength: 168832
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://forum.effectivealtruism.org/users/nunosempere
+    linkText: EA Forum - NunoSempere user profile
+    claimContext: Sempere has stated that he established Shapley Maximizers as a "very profitable" consultancy which he used to bootstrap initial funding for Sentinel, and is now winding it down as he focuses on Sentinel.[^14]
+    fetchedAt: 2026-02-22T02:19:17.610Z
+    httpStatus: 200
+    pageTitle: NunoSempere - EA Forum
+    contentSnippet: "NunoSempere - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. NunoSempere Director, Head of Foresight @ Sentinel 13828 karma Joined Nov 2018 nunosempere.com/blog Message Get notified Bio I run Sentinel , a team that seeks to anticipate and respond to large-scale risks. You can read our weekly minutes here . I like to spend my time acquiring deeper models of the world, and generally becoming more formidable . "
+    contentLength: 326867
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.semanticscholar.org/paper/Alignment-Problems-With-Current-Forecasting-Sempere-Lawsen/53ba622a964bbc6bc2f674d7d4127aff886ff686
+    linkText: Semantic Scholar - Alignment Problems With Current Forecasting Platforms
+    claimContext: Key research outputs include work on incentive problems in forecasting, prediction market design, and technological discontinuities.[^4] He co-authored a paper with Alex Lawsen on "Alignment Problems With Current Forecasting Platforms," published on arXiv in June 2021.[^15] He has also explored prac
+    fetchedAt: 2026-02-22T02:19:16.972Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2061
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://github.com/NunoSempere/clarivoyance
+    linkText: GitHub - NunoSempere/clarivoyance
+    claimContext: In 2023, Sempere created approximately 700 AI safety forecasting questions for <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> as part of work with the <EntityLink id="arb-research">Arb Research</EntityLink> team, along with documents on operationalizing FLOPs (floating point oper
+    fetchedAt: 2026-02-22T02:19:24.321Z
+    httpStatus: 200
+    pageTitle: "GitHub - NunoSempere/clarivoyance: Using forecasting for AI progress"
+    contentSnippet: "GitHub - NunoSempere/clarivoyance: Using forecasting for AI progress Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} NunoSempere / clarivoyance Public Notifications You must be signed in to change notification settings Fork 0 Star 3 Using forecasting for AI progress 3 stars 0 "
+    contentLength: 229170
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://forum.effectivealtruism.org/posts/hrdxf5qdKmCZNWTvs/valuing-research-works-by-eliciting-comparisons-from-ea
+    linkText: EA Forum - Valuing research works by eliciting comparisons from EA researchers
+    claimContext: Sempere conducted a project through the Quantified Uncertainty Research Institute on valuing research works by eliciting comparisons from EA researchers.[^17] This work revealed significant disagreements among researchers about research value, sometimes spanning several orders of magnitude.
+    fetchedAt: 2026-02-22T02:19:23.994Z
+    httpStatus: 200
+    pageTitle: Valuing research works by eliciting comparisons from EA researchers — EA Forum
+    contentSnippet: Valuing research works by eliciting comparisons from EA researchers — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Estimating value Valuing research works by eliciting comparisons from EA researchers by NunoSempere Mar 17 2022 10 min read 22 114 Cause prioritization Forecasting Impact assessment Quantified Uncertainty Research Institute Frontpage Valuing research works by eliciting c
+    contentLength: 612401
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://forum.effectivealtruism.org/posts/Ps8ecFPBzSrkLC6ip/2018-2019-long-term-future-fund-grantees-how-did-they-do
+    linkText: "EA Forum - 2018-2019 Long-Term Future Fund grantees: How did they do?"
+    claimContext: "- **EA Wiki**: External evaluation praised for thoroughness[^4] - **Long-Term Future Fund**: Analysis of 2018-2019 grantees (23 grants totaling \\$803,650), finding 26% more successful than expected (\\$178,500), 22% as expected (\\$147,250), with 5 grants (\\$195,000) not evaluated due to conflicts of "
+    fetchedAt: 2026-02-22T02:19:24.195Z
+    httpStatus: 200
+    pageTitle: "2018-2019 Long-Term Future Fund Grantees: How did they do? — EA Forum"
+    contentSnippet: "2018-2019 Long-Term Future Fund Grantees: How did they do? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Estimating value 2018-2019 Long-Term Future Fund Grantees: How did they do? by NunoSempere Jun 16 2021 5 min read 23 194 Cause prioritization Forecasting Impact assessment Quantified Uncertainty Research Institute Long-Term Future Fund Frontpage 2018-2019 Long-Term Future Fund Gr"
+    contentLength: 654222
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://nunosempere.com/blog/2021/06/24/shallow-evaluations-of-longtermist-organizations/
+    linkText: Nuño Sempere - Shallow evaluations of longtermist organizations
+    claimContext: "- **Long-Term Future Fund**: Analysis of 2018-2019 grantees (23 grants totaling \\$803,650), finding 26% more successful than expected (\\$178,500), 22% as expected (\\$147,250), with 5 grants (\\$195,000) not evaluated due to conflicts of interest[^18] - **Longtermist organizations**: Shallow evaluatio"
+    fetchedAt: 2026-02-22T02:19:24.606Z
+    httpStatus: 200
+    pageTitle: Shallow evaluations of longtermist organizations
+    contentSnippet: "Shallow evaluations of longtermist organizations Shallow evaluations of longtermist organizations Epistemic status : Fairly uncertain. May contain errors, probabilities might not be calibrated. Introduction This document reviews a number of organizations in the longtermist ecosystem, and poses and answers a number of questions which would have to be answered to arrive at a numerical estimate of their impact. My aim was to see how useful a &ldquo;quantified evaluation&rdquo; format in the longter"
+    contentLength: 92267
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://forum.nunosempere.com/posts/7JM3PHepa87KB2d5Z/is-there-an-ai-safety-givewell
+    linkText: EA Forum - Is there an AI Safety GiveWell?
+    claimContext: In 2021, Sempere developed cost-effectiveness models for AI safety, noted as a rare quantitative effort comparable to GiveWell-style analysis, though he highlighted issues like long feedback loops and field sensitivity that make such analysis challenging.[^20]
+    fetchedAt: 2026-02-22T02:19:24.829Z
+    httpStatus: 200
+    pageTitle: Is There An AI Safety GiveWell?
+    contentSnippet: "Is There An AI Safety GiveWell? Is There An AI Safety GiveWell? By Michaël Trazzi @ 2025-09-05T10:59 (+22) Are there any public cost-effectiveness analyses of different AI Safety charities? For instance, I'm aware of Larks' AI Alignment Literature Review and Charity Comparison, but he didn't include any concrete impact measures and stopped doing it in 2021. I'm looking for things like \"donating $10M to this org would reduce extinction risk from AI by 2035 by 0.01-0.1%\" or even \"donating $10M to "
+    contentLength: 18198
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://epoch.ai/files/direct-approach-review-nuno-sempere.pdf
+    linkText: Epoch AI - Direct Approach Review - Nuño Sempere
+    claimContext: Sempere has conducted significant work on forecasting human-level AI systems arrival and has explored the limitations of current approaches.[^21] He edited "A Gentle Introduction to Risk Frameworks Beyond Forecasting," written by Nathaniel Cooke, which covers how disaster risks are conceptualized by
+    fetchedAt: 2026-02-22T02:19:26.351Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 26682
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.lesswrong.com/posts/ae3HecTe2uKscabPe/a-gentle-introduction-to-risk-frameworks-beyond-forecasting
+    linkText: LessWrong - A Gentle Introduction to Risk Frameworks Beyond Forecasting
+    claimContext: Sempere has conducted significant work on forecasting human-level AI systems arrival and has explored the limitations of current approaches.[^21] He edited "A Gentle Introduction to Risk Frameworks Beyond Forecasting," written by Nathaniel Cooke, which covers how disaster risks are conceptualized by
+    fetchedAt: 2026-02-22T02:19:26.756Z
+    httpStatus: 200
+    pageTitle: A Gentle Introduction to Risk Frameworks Beyond Forecasting — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. A Gentle Introduction to Risk Frameworks Beyond Forecasting — LessWrong Civilizational Collapse Existential risk Forecasting & Prediction Futurism Technological Forecasting World Modeling Techniques AI World Modeling Frontpage 73 A Gentle Introduction to Risk Frameworks Beyond Forecasting by pendingsurvival 11th Apr 2024 33 min read 10 73 This was originally posted on "
+    contentLength: 749600
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://forum.effectivealtruism.org/posts/L6ZmggEJw8ri4KB8X/my-highly-personal-skepticism-braindump-on-existential-risk
+    linkText: EA Forum - My highly personal skepticism braindump on existential risk
+    claimContext: "**Conjunctiveness and Imperfect Concepts**: He expresses skepticism about long conjunctive chains (multiple failures needed for doom scenarios) applied to near-term AI, arguing they rely on \"in-the-limit\" superintelligence assumptions not action-guiding for current systems. He critiques Nate Soares'"
+    fetchedAt: 2026-02-22T02:19:25.940Z
+    httpStatus: 200
+    pageTitle: My highly personal skepticism braindump on existential risk from artificial intelligence. — EA Forum
+    contentSnippet: My highly personal skepticism braindump on existential risk from artificial intelligence. — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Estimating value My highly personal skepticism braindump on existential risk from artificial intelligence. by NunoSempere Jan 23 2023 17 min read 116 438 AI safety Building effective altruism Existential risk Forecasting Criticism of the effective a
+    contentLength: 1577019
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://nunosempere.com/blog/2024/03/05/unflattering-aspects-of-ea/
+    linkText: Nuño Sempere - Unflattering aspects of EA
+    claimContext: In March 2024, Sempere published "Unflattering aspects of Effective Altruism," outlining several concerns:[^24]
+    fetchedAt: 2026-02-22T02:19:26.145Z
+    httpStatus: 200
+    pageTitle: Unflattering aspects of Effective Altruism
+    contentSnippet: Unflattering aspects of Effective Altruism Unflattering aspects of Effective Altruism 1. I want to better understand in order to better decide As a counterbalance to the rosier and more philosophical perspective that Effective Altruism (EA) likes to present of itself , I describe some unflattering aspects of EA. These are based on my own experiences with it, and my own disillusionments 1 . If people getting into EA 2 have a better idea of what they are getting into, and decide to continue, maybe
+    contentLength: 27205
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://nunosempere.com/blog/2023/10/15/ea-forum-stewardship/
+    linkText: Nuño Sempere - EA Forum Stewardship
+    claimContext: "**EA Forum Stewardship**: He criticized the forum's shift toward \"catering to marginal/newbie users\" with more introductory content, comparing it unfavorably to Reddit. He questioned whether recent changes justify \\$2 million per year in funding and 6-8 full-time staff.[^25] Sempere argued that expa"
+    fetchedAt: 2026-02-22T02:19:26.503Z
+    httpStatus: 200
+    pageTitle: Brief thoughts on CEA's stewardship of the EA Forum
+    contentSnippet: "Brief thoughts on CEA's stewardship of the EA Forum Brief thoughts on CEA&rsquo;s stewardship of the EA Forum Epistemic status : This post is blunt. Please see the extended disclaimer about negative feedback here . Consider not reading it if you work on the EA forum and don&rsquo;t have thick skin. tl;dr : Once, the EA forum was a lean, mean machine. But it has become more bloated over time, and I don&rsquo;t like it. Separately, I don&rsquo;t think it&rsquo;s worth the roughly $2M/year 1 it cos"
+    contentLength: 15532
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://nunosempere.com/blog/2022/06/16/criminal-justice/
+    linkText: Nuño Sempere - Coefficient Giving's Criminal Justice Reform bet
+    claimContext: "**Coefficient Giving's Criminal Justice Reform**: He analyzed approximately \\$200 million donated by Coefficient Giving to criminal justice reform from 2013-2021, questioning the sincerity and effectiveness of this focus area.[^26] He suggested that \"politics is the mind-killer\" may have led to degr"
+    fetchedAt: 2026-02-22T02:19:28.242Z
+    httpStatus: 200
+    pageTitle: A Critical Review of Open Philanthropy’s Bet On Criminal Justice Reform
+    contentSnippet: "A Critical Review of Open Philanthropy’s Bet On Criminal Justice Reform A Critical Review of Open Philanthropy’s Bet On Criminal Justice Reform Epistemic status : Dwelling on the negatives. From 2013 to 2021, Open Philanthropy donated $200M to criminal justice reform. My best guess is that, from a utilitarian perspective, this was likely suboptimal. In particular, I am fairly sure that it was possible to realize sooner that the area was unpromising and act on that earlier on. In this post, I fir"
+    contentLength: 66342
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://forum.effectivealtruism.org/posts/coWvsGuJPyiqBdrhC/unflattering-aspects-of-effective-altruism
+    linkText: EA Forum - Unflattering aspects of Effective Altruism (discussion)
+    claimContext: Multiple community members have described Sempere's communication style as "bellicose" and sometimes unproductive for fostering dialogue on charged topics.[^27] For example, his phrasing "I disagree with the EA Forum's approach to life" (later softened) caused confusion among readers.[^27] Critics n
+    fetchedAt: 2026-02-22T02:19:27.827Z
+    httpStatus: 200
+    pageTitle: Unflattering aspects of Effective Altruism — EA Forum
+    contentSnippet: "Unflattering aspects of Effective Altruism — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Unflattering aspects of Effective Altruism by NunoSempere Mar 15 2024 1 min read 53 192 Building effective altruism Community Criticism of effective altruism Frontpage I&#x27;ve been writing a few posts critical of EA over at my blog . They might be of interest to people here: Unflattering aspects of Effective Altruis"
+    contentLength: 894321
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://forum.nunosempere.com
+    linkText: Nuño Sempere Forum - Alternative EA Forum frontend
+    claimContext: Sempere created his own "soothing frontend" for the EA Forum (forum.nunosempere.com) that loads in approximately 0.5 seconds versus the official site's approximately 5 seconds, and excludes certain users he considers to contribute low signal-to-noise ratio.[^28] He remains subscribed to the EA Forum
+    fetchedAt: 2026-02-22T02:19:27.880Z
+    httpStatus: 200
+    pageTitle: forum.nunosempere.com
+    contentSnippet: "forum.nunosempere.com A Soothing Frontend for the Effective Altruism Forum About This is a frontend for the Effective Altruism Forum . It aims to present EA Forum posts in a way which I (Nuño Sempere) personally find soothing. It achieves that that goal at the cost of restricted functionality&mdash;like not being able to make or upvote comments and posts. Usage Frontpage This forum frontend has a frontpage at forum.nunosempere.com/frontpage . It displays the latest posts in chronological order, "
+    contentLength: 3804
+    status: verified
+    note: null

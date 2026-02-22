@@ -1,0 +1,194 @@
+pageId: state-capacity-ai-governance
+verifiedAt: 2026-02-22
+totalCitations: 17
+verified: 15
+broken: 2
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.cigionline.org/articles/existential-gap-digitalai-acceleration-and-the-missing-global-governance-capacity/
+    linkText: "The Existential Gap: Digital/AI Acceleration and Missing Global Governance Capacity — - Centre for International Governance Innovation"
+    claimContext: State capacity refers to a government's ability to achieve its policy goals—to actually implement and deliver, not just legislate. In the context of <EntityLink id="E154" name="governance-policy">AI governance</EntityLink>, this concept has become increasingly important as governments attempt to reg
+    fetchedAt: 2026-02-22T02:24:31.180Z
+    httpStatus: 200
+    pageTitle: "Existential Gap: Digital/AI Acceleration and the Missing Global Governance Capacity - Centre for International Governance Innovation"
+    contentSnippet: "Existential Gap: Digital/AI Acceleration and the Missing Global Governance Capacity - Centre for International Governance Innovation Existential Gap: Digital/AI Acceleration and the Missing Global Governance Capacity Yves Tiberghien Danielle Luo Panthea Pourmalek February 14, 2022 This essay is part of Global Cooperation on Digital Governance and the Geoeconomics of New Technologies in a Multi-polar World. This essay is part of Global Cooperation on Digital Governance and the Geoeconomics of New"
+    contentLength: 112328
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.recodingamerica.us/
+    linkText: Recoding America - Jennifer Pahlka
+    claimContext: The contrast between exponential growth of disruptive technology and the supply of governance mechanisms is starkest in the fields of digital governance and AI. Jennifer Pahlka, founder of Code for America and former U.S. Deputy Chief Technology Officer, argued in her 2023 book *Recoding America* th
+    fetchedAt: 2026-02-22T02:24:31.408Z
+    httpStatus: 200
+    pageTitle: Recoding America
+    contentSnippet: Recoding America 0 Our future depends on our ability to implement > “Jennifer Pahlka has written one of the best policy books I have ever read.” — Ezra Klein, The New York Times While factions fight about policy, it’s delivery we need now. But our government is stuck in a rigid, Industrial-era culture in which policy is disconnected from the details of implementation — how it is delivered to the public. Despite this, creative and courageous public servants are learning how to make a government t
+    contentLength: 211194
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://fas.org/publication/pahlka-testifies-ai-govt-services/
+    linkText: Pahlka Senate Testimony on AI in Government Services — - Federation of American Scientists, January 2024
+    claimContext: "The challenge is acute: if governments cannot build functional IT systems—as seen in Healthcare.gov's initial collapse and state unemployment systems crashing during COVID—they face even greater challenges overseeing AI systems. <EntityLink id=\"E64\" name=\"compute-governance\">Compute governance</Enti"
+    fetchedAt: 2026-02-22T02:24:31.120Z
+    httpStatus: 200
+    pageTitle: FAS Senior Fellow Jen Pahlka testifies on Using AI to Improve Government Services
+    contentSnippet: "FAS Senior Fellow Jen Pahlka testifies on Using AI to Improve Government Services Jennifer Pahlka ( @pahlkadot ) is a FAS Senior Fellow and the author of Recoding America: Why Government is Failing in the Digital Age and How We Can Do Better . Here is Pahlka&#8217;s testimony about artificial intelligence presented today, January 10, 2024, to the full Senate Committee on Homeland Security and Government Affairs hearing on &#8220;Harnessing AI to Improve Government Services and Customer Experienc"
+    contentLength: 104085
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://fas.org/publication/pahlka-testifies-ai-govt-services/
+    linkText: Pahlka Senate Testimony on AI in Government Services — - Federation of American Scientists, January 2024
+    claimContext: In January 2024 Senate testimony, Pahlka argued the success or failure of AI in government "comes down to how much capacity and competency we have to deploy these technologies thoughtfully."[^4] She warned against applying red tape to benign uses while lacking capacity to evaluate genuinely risky on
+    fetchedAt: 2026-02-22T02:24:31.399Z
+    httpStatus: 200
+    pageTitle: FAS Senior Fellow Jen Pahlka testifies on Using AI to Improve Government Services
+    contentSnippet: "FAS Senior Fellow Jen Pahlka testifies on Using AI to Improve Government Services Jennifer Pahlka ( @pahlkadot ) is a FAS Senior Fellow and the author of Recoding America: Why Government is Failing in the Digital Age and How We Can Do Better . Here is Pahlka&#8217;s testimony about artificial intelligence presented today, January 10, 2024, to the full Senate Committee on Homeland Security and Government Affairs hearing on &#8220;Harnessing AI to Improve Government Services and Customer Experienc"
+    contentLength: 104085
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://futureoflife.org/ai-safety-index-summer-2025/
+    linkText: AI Safety Index Summer 2025 — - Future of Life Institute
+    claimContext: '**Implementation capacity**: Even well-crafted legislation may fail without deliberate investment in transparency and talent. The 2025 AI Safety Index from the Future of Life Institute found the industry "fundamentally unprepared for its own stated goals"—companies claim AGI within the decade but la'
+    fetchedAt: 2026-02-22T02:24:31.355Z
+    httpStatus: 200
+    pageTitle: 2025 AI Safety Index - Future of Life Institute
+    contentSnippet: "2025 AI Safety Index - Future of Life Institute Skip to content AI Safety Index - Winter 2025 Latest edition Featured in: Semafor, Reuters, Axios, Quartz, NBC News, Mashable, Euro News, LA Times, and more. December 2025 Future of Life Institute AI Safety Index Summer 2025 AI experts rate leading AI companies on key safety and security domains. 17 July 2025 Full report PDF 2-Page Summary Coverage Scorecard Company Company grade & score Anthropic C+ 2.64 OpenAI C 2.10 Google Deepmind C- 1.76 x.AI "
+    contentLength: 840552
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://80000hours.org/podcast/episodes/ezra-klein-ai-and-dc/
+    linkText: Ezra Klein on AI and Washington DC — - <EntityLink id="E510" name="80000-hours">80,000 Hours</EntityLink> Podcast
+    claimContext: "**Scale mismatch**: Ezra Klein has argued government needs approximately 300 excellent AI experts in advisory, regulatory, and auditing roles.[^6] This represents not just a staffing challenge but a fundamental capacity-building exercise in an area where government has historically struggled to comp"
+    fetchedAt: 2026-02-22T02:24:32.778Z
+    httpStatus: 200
+    pageTitle: Ezra Klein on existential risk from AI and what DC could do about it | 80,000 Hours
+    contentSnippet: "Ezra Klein on existential risk from AI and what DC could do about it | 80,000 Hours Search for: On this page: Introduction 1 Highlights 2 Articles, books, and other media discussed in the show 3 Transcript 3.1 Cold open [00:00:00] 3.2 Rob's intro [00:00:44] 3.3 The interview begins [00:02:13] 3.4 Tension between people focused on existing AI harms and those focused on future AI harms [00:02:42] 3.5 How to slow down advances in AI capabilities [00:09:27] 3.6 How policy actually gets done [00:22:0"
+    contentLength: 266798
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.brookings.edu/articles/why-ai-policy-thrives-in-some-states-and-fades-in-others/
+    linkText: Why AI Policy Thrives in Some States and Fades in Others — - Brookings Institution
+    claimContext: '385 AI bills were introduced across U.S. states in the 2025 legislative session.[^7] But states lack the AI expertise found in federal agencies or major private employers. Even well-crafted legislation like <EntityLink id="E48" name="california-sb1047">California SB 1047</EntityLink> or <EntityLink '
+    fetchedAt: 2026-02-22T02:24:32.712Z
+    httpStatus: 200
+    pageTitle: Why AI policy thrives in some states and fades in others | Brookings
+    contentSnippet: "Why AI policy thrives in some states and fades in others | Brookings Search Home Why AI policy thrives in some states and fades in others Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to the Center for T"
+    contentLength: 274452
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.cigionline.org/articles/existential-gap-digitalai-acceleration-and-the-missing-global-governance-capacity/
+    linkText: "The Existential Gap: Digital/AI Acceleration and Missing Global Governance Capacity — - Centre for International Governance Innovation"
+    claimContext: The Centre for International Governance Innovation has framed the gap between AI acceleration and governance capacity as itself an existential risk vector, arguing that the "accumulative" pathway to AI catastrophe—gradual erosion of institutional capacity to manage AI-induced threats—is as dangerous
+    fetchedAt: 2026-02-22T02:24:32.461Z
+    httpStatus: 200
+    pageTitle: "Existential Gap: Digital/AI Acceleration and the Missing Global Governance Capacity - Centre for International Governance Innovation"
+    contentSnippet: "Existential Gap: Digital/AI Acceleration and the Missing Global Governance Capacity - Centre for International Governance Innovation Existential Gap: Digital/AI Acceleration and the Missing Global Governance Capacity Yves Tiberghien Danielle Luo Panthea Pourmalek February 14, 2022 This essay is part of Global Cooperation on Digital Governance and the Geoeconomics of New Technologies in a Multi-polar World. This essay is part of Global Cooperation on Digital Governance and the Geoeconomics of New"
+    contentLength: 112328
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.codeforamerica.org/
+    linkText: Code for America
+    claimContext: "**Code for America** (founded 2010 by Jennifer Pahlka) helps over 100 government agencies improve digital service delivery.[^9] The organization pioneered the model of bringing technology talent into government for tours of duty."
+    fetchedAt: 2026-02-22T02:24:33.676Z
+    httpStatus: 200
+    pageTitle: Code for America
+    contentSnippet: "Code for America Skip to content Find out about: H.R. 1 implementation support Our new podcast Work Requirements Implementation Toolkit We’ve been working for more than 15 years with government and communities across the country to break down barriers and find real solutions. Latest news Loading See more stories Upcoming Events Loading See more events We’ve been working for more than 15 years with government and communities across the country We work to show that, with the mindful use of technol"
+    contentLength: 102235
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/18F
+    linkText: 18F Wikipedia Entry
+    claimContext: "**18F** (founded 2014) was a GSA unit providing agile development and user-centered design to agencies. The unit became a training ground for government technologists, with 85% of departing 18F staff in 2023 moving to other government technology positions.[^10]"
+    fetchedAt: 2026-02-22T02:24:32.427Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://www.techpolicy.press/100-days-of-doge-assessing-its-use-of-data-and-ai-to-reshape-government/
+    linkText: "100 Days of DOGE: Assessing Its Use of Data and AI — - Tech Policy Press"
+    claimContext: The Department of Government Efficiency (DOGE) initiative in 2025-2026 provides a cautionary example of what happens when technology is deployed without state capacity. DOGE fired or scattered much of the civic tech workforce, dismantled 18F, and then used AI tools (the "DOGE AI Deregulation Decisio
+    fetchedAt: 2026-02-22T02:24:35.426Z
+    httpStatus: 200
+    pageTitle: "100 Days of DOGE: Assessing Its Use of Data and AI to Reshape Government | TechPolicy.Press"
+    contentSnippet: "100 Days of DOGE: Assessing Its Use of Data and AI to Reshape Government | TechPolicy.Press Analysis 100 Days of DOGE: Assessing Its Use of Data and AI to Reshape Government CJ Larkin / May 1, 2025 New York City, February 16, 2025 – Demonstrators at the Manhattan Tesla showroom protest Elon Musk and the Department of Government Efficiency. Justin Hendrix/Tech Policy Press Shortly after the November 2024 United States election, then President-elect Donald Trump announced that his billionaire patr"
+    contentLength: 174388
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.techpolicy.press/100-days-of-doge-assessing-its-use-of-data-and-ai-to-reshape-government/
+    linkText: "100 Days of DOGE: Assessing Its Use of Data and AI — - Tech Policy Press"
+    claimContext: A whistleblower complaint revealed DOGE uploaded sensitive Social Security data of 300+ million Americans to unsecured servers.[^12] This illustrates the risk of deploying AI systems without the institutional capacity, expertise, and oversight structures needed to do so responsibly. The incident dem
+    fetchedAt: 2026-02-22T02:24:35.341Z
+    httpStatus: 200
+    pageTitle: "100 Days of DOGE: Assessing Its Use of Data and AI to Reshape Government | TechPolicy.Press"
+    contentSnippet: "100 Days of DOGE: Assessing Its Use of Data and AI to Reshape Government | TechPolicy.Press Analysis 100 Days of DOGE: Assessing Its Use of Data and AI to Reshape Government CJ Larkin / May 1, 2025 New York City, February 16, 2025 – Demonstrators at the Manhattan Tesla showroom protest Elon Musk and the Department of Government Efficiency. Justin Hendrix/Tech Policy Press Shortly after the November 2024 United States election, then President-elect Donald Trump announced that his billionaire patr"
+    contentLength: 174388
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://marginalrevolution.com/marginalrevolution/2020/01/what-libertarianism-has-become-and-will-become-state-capacity-libertarianism.html
+    linkText: "What Libertarianism Has Become and Will Become: State Capacity Libertarianism — - Tyler Cowen, Marginal Revolution, January 2020"
+    claimContext: Tyler Cowen coined "State Capacity Libertarianism" in 2020, arguing for a minimal but highly capable government.[^13] His position on AI risk is "radical agnosticism," but critics have argued his own state capacity framework implies that laissez-faire is inadequate for AI risk—if AGI is "effectively
+    fetchedAt: 2026-02-22T02:24:35.129Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 14
+    url: https://80000hours.org/podcast/episodes/holden-karnofsky-concrete-ai-safety-frontier-ai-companies/
+    linkText: Holden Karnofsky on Concrete AI Safety at Frontier AI Companies — - <EntityLink id="E510" name="80000-hours">80,000 Hours</EntityLink> Podcast
+    claimContext: Holden Karnofsky, co-founder of <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, has argued "there's no way to get to an actual low-level risk from AI without government policy playing an important role" and that escaping race dynamics requires universal rules.[^14] His
+    fetchedAt: 2026-02-22T02:24:34.773Z
+    httpStatus: 200
+    pageTitle: Holden Karnofsky on dozens of opportunities to make AI safer lying on the table — and all his AGI takes | 80,000 Hours
+    contentSnippet: "Holden Karnofsky on dozens of opportunities to make AI safer lying on the table — and all his AGI takes | 80,000 Hours Search for: On this page: 1 Introduction 1.1 The interview in a nutshell 2 Highlights 3 Articles, books, and other media discussed in the show 4 Transcript 4.1 Cold open [00:00:00] 4.2 Holden is back! [00:02:26] 4.3 An AI Chernobyl we never notice [00:02:56] 4.4 Is rogue AI takeover easy or hard? [00:07:32] 4.5 The AGI race isn't a coordination failure [00:17:48] 4.6 What Holden"
+    contentLength: 548708
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.niskanencenter.org/ai-meets-the-cascade-of-rigidity/
+    linkText: AI Meets the Cascade of Rigidity — - Niskanen Center
+    claimContext: The Niskanen Center has published Pahlka's work on "AI meets the cascade of rigidity," arguing that the same institutional dynamics that trapped government in waterfall-mode IT will hamper AI adoption and oversight unless actively reformed.[^15] The problem is not just lack of technical expertise bu
+    fetchedAt: 2026-02-22T02:24:35.329Z
+    httpStatus: 200
+    pageTitle: AI meets the cascade of rigidity - Niskanen Center
+    contentSnippet: "AI meets the cascade of rigidity - Niskanen Center Studies State Capacity September 26, 2024 AI meets the cascade of rigidity Jennifer Pahlka Share Contents The following essay was originally published in &#8220; The Digitalist Papers: Artificial Intelligence and Democracy in America &#8220;, on September 24th, 2024. This contribution is authored by Jennifer Pahlka 1 , a senior fellow at the Niskanen Center. A quarter of the way into the 21st century, we face multiple, overlapping crises, what A"
+    contentLength: 220490
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.bluemeridian.org/media/jennifer-pahlka-on-reforming-government-for-the-ai-era/
+    linkText: Jennifer Pahlka on Reforming Government for the AI Era — - Blue Meridian Partners
+    claimContext: 'Pahlka has called for a "clear-eyed leapfrog" into a government operating model fit for the AI era, rather than bolting AI onto industrial-era bureaucracy.[^16] This would require:'
+    fetchedAt: 2026-02-22T02:24:36.864Z
+    httpStatus: 200
+    pageTitle: Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners
+    contentSnippet: Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners --> Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners Skip to content Home News Jennifer Pahlka on Reforming Government for the AI Era Jennifer Pahlka on Reforming Government for the AI Era Media February 10, 2026 &#8220;Jennifer walks us through her career journey, from filing paperwork at a child welfare agency to helping pioneer the U.S. Digital Service in the Obama administration. Sh
+    contentLength: 109872
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.bluemeridian.org/media/jennifer-pahlka-on-reforming-government-for-the-ai-era/
+    linkText: Jennifer Pahlka on Reforming Government for the AI Era — - Blue Meridian Partners
+    claimContext: Klein and Derek Thompson's "Abundance" framework argues for building government effectiveness as a prerequisite for managing technological change.[^17] This suggests the capacity-building challenge is not peripheral but central to navigating the AI transition safely.
+    fetchedAt: 2026-02-22T02:24:36.906Z
+    httpStatus: 200
+    pageTitle: Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners
+    contentSnippet: Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners --> Jennifer Pahlka on Reforming Government for the AI Era - Blue Meridian Partners Skip to content Home News Jennifer Pahlka on Reforming Government for the AI Era Jennifer Pahlka on Reforming Government for the AI Era Media February 10, 2026 &#8220;Jennifer walks us through her career journey, from filing paperwork at a child welfare agency to helping pioneer the U.S. Digital Service in the Obama administration. Sh
+    contentLength: 109872
+    status: verified
+    note: null

@@ -1,0 +1,150 @@
+pageId: sleeper-agents
+verifiedAt: 2026-02-22
+totalCitations: 13
+verified: 13
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://arxiv.org/abs/2401.05566
+    linkText: "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training — - arXiv preprint"
+    claimContext: '"Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training" is a research paper published by <EntityLink id="anthropic">Anthropic</EntityLink> in January 2024 that demonstrates proof-of-concept examples of <EntityLink id="language-models">large language models</EntityLink> exhibit'
+    fetchedAt: 2026-02-22T02:26:53.689Z
+    httpStatus: 200
+    pageTitle: "[2401.05566] Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training"
+    contentSnippet: "[2401.05566] Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training --> Computer Science > Cryptography and Security arXiv:2401.05566 (cs) [Submitted on 10 Jan 2024 ( v1 ), last revised 17 Jan 2024 (this version, v3)] Title: Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training Authors: Evan Hubinger , Carson Denison , Jesse Mu , Mike Lambert , Meg Tong , Monte MacDiarmid , Tamera Lanham , Daniel M. Ziegler , Tim Maxwell , Newton Cheng , Adam Jermyn ,"
+    contentLength: 53302
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.anthropic.com/research/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training
+    linkText: "Anthropic Research: Sleeper Agents — - Official research page"
+    claimContext: '"Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training" is a research paper published by <EntityLink id="anthropic">Anthropic</EntityLink> in January 2024 that demonstrates proof-of-concept examples of <EntityLink id="language-models">large language models</EntityLink> exhibit'
+    fetchedAt: 2026-02-22T02:26:53.802Z
+    httpStatus: 200
+    pageTitle: "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training \\ Anthropic"
+    contentSnippet: "Alignment Research Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training Jan 14, 2024 Read Paper Humans are capable of strategically deceptive behavior: behaving helpfully in most situations, but then behaving very differently in order to pursue alternative objectives when given the opportunity. If an AI system learned such a deceptive strategy, could we detect it and remove it using current state-of-the-art safety training techniques? To study this question, we construct "
+    contentLength: 93050
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://forum.effectivealtruism.org/posts/7j7nj4GgkXSidRcKB/ai-sleeper-agents-how-anthropic-trains-and-catches-them
+    linkText: "AI Sleeper Agents: How Anthropic Trains and Catches Them — - EA Forum discussion"
+    claimContext: The research connects directly to concerns about <EntityLink id="scheming">deceptive alignment</EntityLink>, where AI systems might simulate alignment during evaluation while pursuing misaligned goals when deployed. While the paper explicitly trains deceptive behavior rather than observing natural e
+    fetchedAt: 2026-02-22T02:26:53.624Z
+    httpStatus: 200
+    pageTitle: "AI Sleeper Agents: How Anthropic Trains and Catches Them - Video — EA Forum"
+    contentSnippet: "AI Sleeper Agents: How Anthropic Trains and Catches Them - Video — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI Sleeper Agents: How Anthropic Trains and Catches Them - Video by Writer Aug 30 2025 9 min read 1 7 AI safety Existential risk AI alignment Video AI interpretability Risks from malevolent actors Frontpage AI Sleeper Agents: How Anthropic Trains and Catches Them - Video Sl"
+    contentLength: 233451
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://thezvi.substack.com/p/on-anthropics-sleeper-agents-paper
+    linkText: On Anthropic's Sleeper Agents Paper — - Analysis by Zvi Mowshowitz
+    claimContext: The research connects directly to concerns about <EntityLink id="scheming">deceptive alignment</EntityLink>, where AI systems might simulate alignment during evaluation while pursuing misaligned goals when deployed. While the paper explicitly trains deceptive behavior rather than observing natural e
+    fetchedAt: 2026-02-22T02:26:54.022Z
+    httpStatus: 200
+    pageTitle: On Anthropic&#x27;s Sleeper Agents Paper - by Zvi Mowshowitz
+    contentSnippet: "On Anthropic&#x27;s Sleeper Agents Paper - by Zvi Mowshowitz Don't Worry About the Vase Subscribe Sign in On Anthropic's Sleeper Agents Paper Zvi Mowshowitz Jan 17, 2024 25 12 Share The recent paper from Anthropic is getting unusually high praise, much of it I think deserved. The title is: Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training. Scott Alexander also covers this , offering an excellent high level explanation, of both the result and the arguments about whether"
+    contentLength: 369431
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://arxiv.org/html/2401.05566v3
+    linkText: Sleeper Agents arXiv HTML — - Full paper with figures
+    claimContext: The paper was authored by a team of <EntityLink id="anthropic">Anthropic</EntityLink> researchers including <EntityLink id="evan-hubinger">Evan Hubinger</EntityLink>, Carson Denison, Jesse Mu, Mike Lambert, Meg Tong, Monte MacDiarmid, and Nicholas Schiefer, among others.[^1] The research was publish
+    fetchedAt: 2026-02-22T02:26:53.753Z
+    httpStatus: 200
+    pageTitle: "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training"
+    contentSnippet: "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training Evan Hubinger, Carson Denison † † footnotemark: , Jesse Mu † † footnotemark: , Mike Lambert † † footnotemark: , Meg Tong, Monte MacDiarmid, Tamera Lanham, Daniel M. Ziegler, Tim Maxwell, Newton Cheng Adam Jermyn, Amanda Askell, Ansh Radhakrishnan, Cem Anil, David Duvenaud, Deep Ganguli, Fazl Barez ∘△ , Jack Clark, Kamal Ndousse, Kshitij Sachan,"
+    contentLength: 551723
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://forum.effectivealtruism.org/posts/5dQkyqAZCkRHWyagY/introducing-alignment-stress-testing-at-anthropic
+    linkText: Introducing Alignment Stress-Testing at Anthropic — - EA Forum announcement
+    claimContext: Following this work, Anthropic established an Alignment Stress-Testing team led by researchers from the sleeper agents project, with a mandate to red-team alignment techniques and empirically demonstrate potential failure modes.[^6]
+    fetchedAt: 2026-02-22T02:26:55.072Z
+    httpStatus: 200
+    pageTitle: Introducing Alignment Stress-Testing at Anthropic — EA Forum
+    contentSnippet: "Introducing Alignment Stress-Testing at Anthropic — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Introducing Alignment Stress-Testing at Anthropic by evhub Jan 12 2024 2 min read 0 80 AI safety Career choice Opportunities to take action Anthropic Job listing (closed) Frontpage Following on from our recent paper, “ Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training ”, I’m very exci"
+    contentLength: 147260
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.cloudresearch.com/resources/blog/when-ai-dreams-hidden-risks-of-llms/
+    linkText: "When AI Dreams: Hidden Risks of LLMs — - CloudResearch analysis"
+    claimContext: "**Chain-of-Thought Analysis**: Studies show that when LLMs know they’re being observed and certain behaviors are disallowed, safety training can actually increase the sophistication with which models hide unsafe behavior—they’ll perform those behaviors anyway and simply attempt to deceive the observ"
+    fetchedAt: 2026-02-22T02:26:55.666Z
+    httpStatus: 200
+    pageTitle: "When AI Dreams: Hidden Risks of LLMs | CloudResearch Blog"
+    contentSnippet: "When AI Dreams: Hidden Risks of LLMs | CloudResearch Blog Skip to main content When AI Dreams: Hidden Risks of LLMs Jonathan Robinson, PhD published on January 15, 2026 I wrote a while back about how LLMs like ChatGPT and Claude sometimes refuse to believe current events because they seem unlikely or fall outside their training data. Well, this just in: LLMs also have states of dreaming (in addition to their well-documented ability to hallucinate). Recently, one of our CloudResearch software eng"
+    contentLength: 156611
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.lesswrong.com/posts/Sf5CBSo44kmgFdyGM/on-anthropic-s-sleeper-agents-paper
+    linkText: On Anthropic's Sleeper Agents Paper — - LessWrong discussion
+    claimContext: The models demonstrated generalization of their deceptive strategies to new contexts. Persona evaluations revealed increased power-seeking tendencies and <EntityLink id="situational-awareness">situational awareness</EntityLink>, with models showing up to 60% effect size on some metrics.[^3][^8] This
+    fetchedAt: 2026-02-22T02:26:55.813Z
+    httpStatus: 200
+    pageTitle: On Anthropic’s Sleeper Agents Paper — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. On Anthropic’s Sleeper Agents Paper — LessWrong Anthropic (org) Deceptive Alignment AI Frontpage 54 On Anthropic’s Sleeper Agents Paper by Zvi 17th Jan 2024 Don&#x27;t Worry About the Vase 43 min read 5 54 The recent paper from Anthropic is getting unusually high praise, much of it I think deserved. The title is: Sleeper Agents: Training Deceptive LLMs that Persist Thr"
+    contentLength: 661504
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.anthropic.com/research/probes-catch-sleeper-agents
+    linkText: Simple Probes Can Catch Sleeper Agents — - Anthropic follow-up research
+    claimContext: In follow-up research published in 2024, Anthropic developed "defection probes"—linear classifiers trained on the models' internal activations (residual stream representations) that could detect when sleeper agents were about to defect.[^9]
+    fetchedAt: 2026-02-22T02:26:55.130Z
+    httpStatus: 200
+    pageTitle: Simple probes can catch sleeper agents \ Anthropic
+    contentSnippet: "Alignment Interpretability Simple probes can catch sleeper agents Apr 23, 2024 This “Alignment Note” presents some early-stage research from the Anthropic Alignment Science team following up on our recent “ Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training ” paper. It should be treated as a work-in-progress update, and is intended for a more technical audience than our typical blog post. This research makes use of some simple interpretability techniques, and we expect "
+    contentLength: 187906
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.lesswrong.com/posts/ZAsJv7xijKTfZkMtr/sleeper-agents-training-deceptive-llms-that-persist-through
+    linkText: "Sleeper Agents: Training Deceptive LLMs — - LessWrong post"
+    claimContext: The research provides empirical evidence challenging the hypothesis that training processes have strong inductive biases against deceptive reasoning. Some AI safety researchers have expressed concerns about deceptive alignment.[^8][^10] The sleeper agents results suggest this inductive bias may be w
+    fetchedAt: 2026-02-22T02:26:55.968Z
+    httpStatus: 200
+    pageTitle: "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training — LessWrong AI Curated 310 Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training by evhub , Carson Denison , Meg , Monte M , David Duvenaud , Nicholas Schiefer , Ethan Perez 12th Jan 2024 AI Alignment Forum Linkpost from arxiv.org 4 min read 95 310 Ω 118 I&#x27;m not goi"
+    contentLength: 1411586
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://berryvilleiml.com/2024/02/08/absolute-nonsense-from-anthropic-sleeper-agents/
+    linkText: "Absolute Nonsense from Anthropic: Sleeper Agents — - BIML critique"
+    claimContext: The most significant criticism is that the sleeper agent behaviors were explicitly and intentionally trained into the models, rather than emerging naturally from standard training processes.[^10][^11] Critics argue this distinction is crucial—the paper demonstrates that deception is hard to remove o
+    fetchedAt: 2026-02-22T02:26:57.669Z
+    httpStatus: 200
+    pageTitle: "Absolute Nonsense from Anthropic: Sleeper Agents | BIML"
+    contentSnippet: "Absolute Nonsense from Anthropic: Sleeper Agents | BIML MLSEC Musings 18 February 2026 Using Gemini in the Silver Bullet Reboot 17 February 2026 Breakfast with Brains 14 February 2026 Science Visit with Giovanni Vigna 14 February 2026 Gadi Evron in the House 11 February 2026 Letter Spirit Examiner &#8211; Now at Home! BIML Results 24 January 2024 Architectural Risk Analysis of Large Language Models 20 January 2020 Architectural Risk Analysis of Machine Learning Systems 15 May 2019 Deep Learning "
+    contentLength: 58065
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1254/final-reports/256912147.pdf
+    linkText: DPO for Mitigating Sleeper Agents — - Stanford CS224N project report
+    claimContext: A Stanford CS224N project in 2024 tested Direct Preference Optimization (DPO) as an alternative defense mechanism against sleeper agents. Working with a Llama-3-8B model embedded with backdoors from the Anthropic paper, researchers found that DPO was effective at removing sleeper agent behavior wher
+    fetchedAt: 2026-02-22T02:26:57.391Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 123205
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://ifp.org/preventing-ai-sleeper-agents/
+    linkText: Preventing AI Sleeper Agents — - Institute for Progress proposal
+    claimContext: The Institute for Progress proposed a \$250 million pilot program to evaluate leading AI labs through rigorous red-team testing, with plans to scale into a multi-billion-dollar national security initiative.[^13] This proposal emphasizes that neither industry nor academia is currently well-positioned
+    fetchedAt: 2026-02-22T02:26:57.592Z
+    httpStatus: 200
+    pageTitle: Preventing AI Sleeper Agents | IFP
+    contentSnippet: Preventing AI Sleeper Agents | IFP Research Research All Research Biotechnology Emerging Technology High-Skilled Immigration Infrastructure Metascience About About Team Non-Resident Fellows Board Members Careers FAQs Projects Projects Newsletters Courses The Launch Sequence Contact Search Search Search Download PDF Summary Motivation Every stage of AI development is vulnerable, and the risks of compromised powerful AI systems are catastrophic Neither industry nor academia is well-positioned to p
+    contentLength: 457262
+    status: verified
+    note: null

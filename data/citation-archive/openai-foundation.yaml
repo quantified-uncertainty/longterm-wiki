@@ -1,0 +1,865 @@
+pageId: openai-foundation
+verifiedAt: 2026-02-22
+totalCitations: 78
+verified: 69
+broken: 9
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://openai.com/foundation/
+    linkText: OpenAI Foundation - Official Website
+    claimContext: The **OpenAI Foundation** is a nonprofit organization that serves as the controlling entity over OpenAI Group PBC, the for-profit public benefit corporation developing advanced AI systems including ChatGPT and GPT-series models. Established through a major restructuring completed on October 28, 2025
+    fetchedAt: 2026-02-22T01:52:37.962Z
+    httpStatus: 200
+    pageTitle: OpenAI Foundation | OpenAI
+    contentSnippet: OpenAI Foundation | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI OpenAI Foundation The OpenAI Foundation holds equity in OpenAI Group, currently valued at approximately $130 billion—making it one of the best resourced philanthropic organizations in the world. Read the announcement OpenAI was founded in 2015 as a nonprofit; its mission is to ensure artificial general intelligence benefits all of humanity. Today, it remai
+    contentLength: 312677
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://openai.com/index/built-to-benefit-everyone/
+    linkText: Built to Benefit Everyone - OpenAI Blog
+    claimContext: The **OpenAI Foundation** is a nonprofit organization that serves as the controlling entity over OpenAI Group PBC, the for-profit public benefit corporation developing advanced AI systems including ChatGPT and GPT-series models. Established through a major restructuring completed on October 28, 2025
+    fetchedAt: 2026-02-22T01:52:38.144Z
+    httpStatus: 200
+    pageTitle: Built to benefit everyone | OpenAI
+    contentSnippet: Built to benefit everyone | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI October 28, 2025 Company Built to benefit everyone By Bret Taylor, Chair of the OpenAI Board of Directors Loading… Share OpenAI has completed its recapitalization, simplifying its corporate structure. The nonprofit remains in control of the for-profit, and now has a direct path to major resources before AGI arrives. The nonprofit, now called the Op
+    contentLength: 312819
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.nbcnews.com/tech/tech-news/openai-restructuring-company-structure-chatgpt-invest-own-rcna240138
+    linkText: "OpenAI's restructuring: how the company's structure works - NBC News"
+    claimContext: "The foundation's structure represents an attempt to balance OpenAI's original nonprofit mission—\"to ensure that artificial general intelligence benefits all of humanity\"—with the capital requirements of developing cutting-edge AI systems. Through special voting and governance rights, the foundation "
+    fetchedAt: 2026-02-22T01:52:40.374Z
+    httpStatus: 200
+    pageTitle: "OpenAI’s restructuring: how the company&#x27;s structure works"
+    contentSnippet: "OpenAI’s restructuring: how the company&#x27;s structure works IE 11 is not supported. For an optimal experience visit our site on another browser. Skip to Content OpenAI CEO Sam Altman in Abilene, Texas, in September. Kyle Grillot / Bloomberg / Getty Images Share Add NBC News to Google Oct. 29, 2025, 7:10 PM EDT By Jared Perlo and Jiachuan Wu OpenAI announced Tuesday morning that it had completed a tumultuous corporate restructuring effort, simplifying a complex ownership web into a controlling"
+    contentLength: 284325
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://openai.com/our-structure/
+    linkText: Our Structure - OpenAI
+    claimContext: "The foundation's structure represents an attempt to balance OpenAI's original nonprofit mission—\"to ensure that artificial general intelligence benefits all of humanity\"—with the capital requirements of developing cutting-edge AI systems. Through special voting and governance rights, the foundation "
+    fetchedAt: 2026-02-22T01:52:38.105Z
+    httpStatus: 200
+    pageTitle: Our structure | OpenAI
+    contentSnippet: Our structure | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI Our structure OpenAI was founded in 2015 as a nonprofit. Its mission is to ensure that artificial general intelligence benefits all of humanity. That mission continues to guide everything we do. In 2019, we created a for-profit subsidiary to help us scale our research and deployment efforts. This for-profit has always been governed and controlled by the nonpro
+    contentLength: 245510
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://openai.com/index/people-first-ai-fund-grantees/
+    linkText: People-First AI Fund Grantees - OpenAI Blog
+    claimContext: "The foundation has committed \\$25 billion initially across two priority areas: health and curing diseases (accelerating breakthroughs in diagnostics, treatments, and cures) and technical solutions for AI resilience (maximizing AI benefits and minimizing risks). In 2025, it launched the People-First "
+    fetchedAt: 2026-02-22T01:52:37.941Z
+    httpStatus: 200
+    pageTitle: Announcing the initial People-First AI Fund grantees | OpenAI
+    contentSnippet: Announcing the initial People-First AI Fund grantees | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 3, 2025 Company Global Affairs Announcing the initial People-First AI Fund grantees Unrestricted funding for 208 nonprofits advancing people-first work nationwide. Loading… Share The OpenAI Foundation is announcing the first recipients from the People-First AI Fund , a multi-million dollar investment in community
+    contentLength: 417445
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.britannica.com/money/OpenAI
+    linkText: OpenAI - Britannica
+    claimContext: <EntityLink id="openai">OpenAI</EntityLink> was founded on December 11, 2015, as a nonprofit research organization in Delaware by <EntityLink id="sam-altman">Sam Altman</EntityLink>, <EntityLink id="elon-musk">Elon Musk</EntityLink>, Greg Brockman, <EntityLink id="ilya-sutskever">Ilya Sutskever</Ent
+    fetchedAt: 2026-02-22T01:52:42.039Z
+    httpStatus: 200
+    pageTitle: OpenAI | ChatGPT, Sam Altman, Microsoft, & History | Britannica Money
+    contentSnippet: "OpenAI | ChatGPT, Sam Altman, Microsoft, & History | Britannica Money Table of Contents Introduction OpenAI product lineup 2015: Founding and nonprofit years 2016–2018: Experimentation leading to rapid product milestones 2019–2021: Moving toward commercialization 2022–2023: Spearheading the AI renaissance Leadership turmoil and restructuring 2024: Partnerships, product launches, and departures 2025: Governance, restructuring, and expansion Transition to a public benefit corporation Partnership w"
+    contentLength: 201581
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.datastudios.org/post/openai-when-and-why-it-was-founded-origins-mission-and-early-vision
+    linkText: "OpenAI: When and Why It Was Founded - Data Studios"
+    claimContext: <EntityLink id="openai">OpenAI</EntityLink> was founded on December 11, 2015, as a nonprofit research organization in Delaware by <EntityLink id="sam-altman">Sam Altman</EntityLink>, <EntityLink id="elon-musk">Elon Musk</EntityLink>, Greg Brockman, <EntityLink id="ilya-sutskever">Ilya Sutskever</Ent
+    fetchedAt: 2026-02-22T01:52:42.014Z
+    httpStatus: 200
+    pageTitle: "OpenAI: When and Why It Was Founded: Origins, Mission, and Early Vision"
+    contentSnippet: "--> OpenAI: When and Why It Was Founded: Origins, Mission, and Early Vision top of page Search OpenAI was officially founded on December 11, 2015 , as a research organization dedicated to developing artificial general intelligence (AGI) that benefits all of humanity. The founders— Elon Musk, Sam Altman, Greg Brockman, Ilya Sutskever, Wojciech Zaremba, and John Schulman —launched the project with the belief that powerful AI systems should remain accessible and aligned with human values, rather th"
+    contentLength: 1108924
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://en.wikipedia.org/wiki/OpenAI
+    linkText: OpenAI - Wikipedia
+    claimContext: The idea emerged from private "founding dinners" in 2015 attended by key figures from Silicon Valley, amid concerns about AI risks and the accelerating pace of AI development following breakthroughs like [AlexNet](https://en.wikipedia.org/wiki/AlexNet). Early donors included [Peter Thiel](https://en
+    fetchedAt: 2026-02-22T01:52:41.397Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://research.contrary.com/company/openai
+    linkText: OpenAI Company Research - Contrary Research
+    claimContext: By March 2019, OpenAI recognized that achieving its goals would require substantially more capital than initially anticipated—"on the order of \$10 billion" according to the organization's own projections.[^9] This led to the creation of OpenAI LP, a "capped-profit" for-profit subsidiary under nonpr
+    fetchedAt: 2026-02-22T01:52:42.335Z
+    httpStatus: 200
+    pageTitle: "Report: OpenAI Business Breakdown & Founding Story | Contrary Research"
+    contentSnippet: "Report: OpenAI Business Breakdown & Founding Story | Contrary Research Powered by Discover Companies Reports Foundations & Frontiers Tech Trends Report Conversations Fellowship About Connect Email LinkedIn Twitter Subscribe Powered by © 2026 Contrary Research · All rights reserved Privacy Policy By navigating this website you agree to our privacy policy . Deny Accept OpenAI AI / ML OpenAI has become a central driver of global AI adoption, evolving from a research lab into one of the most widely "
+    contentLength: 4068708
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://time.com/7328674/openai-chatgpt-sam-altman-elon-musk-timeline/
+    linkText: OpenAI Timeline - Time Magazine
+    claimContext: This structure allowed OpenAI to secure major investments, including an initial \$1 billion from [Microsoft](https://en.wikipedia.org/wiki/Microsoft) in 2019, while maintaining nominal nonprofit oversight. Microsoft secured broad rights to license and use OpenAI's intellectual property, except for t
+    fetchedAt: 2026-02-22T01:52:41.688Z
+    httpStatus: 200
+    pageTitle: "An OpenAI Timeline: Musk, Altman, and the For-Profit Shift | TIME"
+    contentSnippet: "An OpenAI Timeline: Musk, Altman, and the For-Profit Shift | TIME Tech AI A Timeline of the Battle for OpenAI: Musk, Altman, and the For-Profit Shift ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Nikita Ostrovsky Updated: Loading... Open AI CEO Sam Altman speaks during a summit on June 2, 2025 in San Francisco, California. Open AI CEO Sam Altman speaks during a summit on June 2, 2025 in San Francisco, California. Justin Sullivan—Getty Images by Nikita Ostrovsky Updated: L"
+    contentLength: 366602
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.nbcnews.com/tech/tech-news/openai-restructuring-company-structure-chatgpt-invest-own-rcna240138
+    linkText: "A nonprofit on top, billions below: Inside OpenAI's new corporate balancing act - NBC News"
+    claimContext: This structure allowed OpenAI to secure major investments, including an initial \$1 billion from [Microsoft](https://en.wikipedia.org/wiki/Microsoft) in 2019, while maintaining nominal nonprofit oversight. Microsoft secured broad rights to license and use OpenAI's intellectual property, except for t
+    fetchedAt: 2026-02-22T01:52:43.565Z
+    httpStatus: 200
+    pageTitle: "OpenAI’s restructuring: how the company&#x27;s structure works"
+    contentSnippet: "OpenAI’s restructuring: how the company&#x27;s structure works IE 11 is not supported. For an optimal experience visit our site on another browser. Skip to Content OpenAI CEO Sam Altman in Abilene, Texas, in September. Kyle Grillot / Bloomberg / Getty Images Share Add NBC News to Google Oct. 29, 2025, 7:10 PM EDT By Jared Perlo and Jiachuan Wu OpenAI announced Tuesday morning that it had completed a tumultuous corporate restructuring effort, simplifying a complex ownership web into a controlling"
+    contentLength: 284325
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Now Has a Foundation. We Have Some Questions - Inside Philanthropy
+    claimContext: However, the hybrid structure proved increasingly difficult to maintain as OpenAI's valuation soared and the company required even more capital for infrastructure and computational resources. By 2024, OpenAI's reported valuation had reached approximately \$500 billion, making it effectively impossib
+    fetchedAt: 2026-02-22T01:52:44.014Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://sff.org/openai-restructure/
+    linkText: OpenAI Restructure - San Francisco Foundation
+    claimContext: The restructuring was approved by the California and Delaware Attorneys General after extensive negotiations. California AG [Rob Bonta](https://en.wikipedia.org/wiki/Rob_Bonta) imposed 20 requirements for safety and security to remain under nonprofit control, while Delaware AG [Kathy Jennings](https
+    fetchedAt: 2026-02-22T01:52:43.982Z
+    httpStatus: 200
+    pageTitle: "News Round-Up: Challenging OpenAI restructure as for-profit company - The San Francisco Foundation"
+    contentSnippet: "News Round-Up: Challenging OpenAI restructure as for-profit company - The San Francisco Foundation Javascript must be enabled for the correct page display Skip to Content News Round-Up: Challenging OpenAI restructure as for-profit company Home News News Round-Up: Challenging OpenAI restructure as for-profit company News Round-Up: Challenging OpenAI restructure as for-profit company October 30, 2025 San Francisco Foundation Facebook Twitter Linkedin Envelope OpenAI recently announced its new for-"
+    contentLength: 62700
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.youtube.com/watch?v=EA0S66uW1kM
+    linkText: 80,000 Hours Podcast - OpenAI Restructuring Discussion
+    claimContext: The restructuring was approved by the California and Delaware Attorneys General after extensive negotiations. California AG [Rob Bonta](https://en.wikipedia.org/wiki/Rob_Bonta) imposed 20 requirements for safety and security to remain under nonprofit control, while Delaware AG [Kathy Jennings](https
+    fetchedAt: 2026-02-22T01:52:43.838Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 15
+    url: https://en.wikipedia.org/wiki/OpenAI
+    linkText: OpenAI - Wikipedia
+    claimContext: "- Recent investors ([SoftBank](https://en.wikipedia.org/wiki/SoftBank_Group), others): 15% - Other investors: 6%[^15]"
+    fetchedAt: 2026-02-22T01:52:43.423Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://www.nbcnews.com/tech/tech-news/openai-restructuring-company-structure-chatgpt-invest-own-rcna240138
+    linkText: OpenAI Structure - NBC News
+    claimContext: The foundation also secured a warrant allowing it to receive additional shares if OpenAI Group's valuation increases more than tenfold (to approximately \$5 trillion) after 15 years, positioning the foundation as "the single largest long-term beneficiary of OpenAI's success."[^16]
+    fetchedAt: 2026-02-22T01:52:45.140Z
+    httpStatus: 200
+    pageTitle: "OpenAI’s restructuring: how the company&#x27;s structure works"
+    contentSnippet: "OpenAI’s restructuring: how the company&#x27;s structure works IE 11 is not supported. For an optimal experience visit our site on another browser. Skip to Content OpenAI CEO Sam Altman in Abilene, Texas, in September. Kyle Grillot / Bloomberg / Getty Images Share Add NBC News to Google Oct. 29, 2025, 7:10 PM EDT By Jared Perlo and Jiachuan Wu OpenAI announced Tuesday morning that it had completed a tumultuous corporate restructuring effort, simplifying a complex ownership web into a controlling"
+    contentLength: 284325
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://openai.com/our-structure/
+    linkText: Our Structure - OpenAI
+    claimContext: The OpenAI Foundation's governance power derives not from majority ownership but from **special voting and governance rights** that allow it to appoint all members of the OpenAI Group PBC board of directors and remove them at any time.[^17] This structure is intended to ensure that the for-profit en
+    fetchedAt: 2026-02-22T01:52:45.293Z
+    httpStatus: 200
+    pageTitle: Our structure | OpenAI
+    contentSnippet: Our structure | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI Our structure OpenAI was founded in 2015 as a nonprofit. Its mission is to ensure that artificial general intelligence benefits all of humanity. That mission continues to guide everything we do. In 2019, we created a for-profit subsidiary to help us scale our research and deployment efforts. This for-profit has always been governed and controlled by the nonpro
+    contentLength: 245462
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://en.wikipedia.org/wiki/OpenAI
+    linkText: OpenAI Leadership - Wikipedia
+    claimContext: The foundation is governed by a board of directors chaired by **[Bret Taylor](https://en.wikipedia.org/wiki/Bret_Taylor)**, former co-CEO of [Salesforce](https://en.wikipedia.org/wiki/Salesforce) and co-creator of Google Maps. The board consists of nine members:[^18]
+    fetchedAt: 2026-02-22T01:52:45.021Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://openai.com/our-structure/
+    linkText: Our Structure - OpenAI
+    claimContext: All current foundation directors also serve on OpenAI Group's board, except Dr. Kolter, who serves as a non-voting observer.[^19] This dual-board structure has raised concerns about conflicts of interest, with critics arguing that board members may prioritize the for-profit entity's business interes
+    fetchedAt: 2026-02-22T01:52:45.281Z
+    httpStatus: 200
+    pageTitle: Our structure | OpenAI
+    contentSnippet: Our structure | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI Our structure OpenAI was founded in 2015 as a nonprofit. Its mission is to ensure that artificial general intelligence benefits all of humanity. That mission continues to guide everything we do. In 2019, we created a for-profit subsidiary to help us scale our research and deployment efforts. This for-profit has always been governed and controlled by the nonpro
+    contentLength: 245503
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: All current foundation directors also serve on OpenAI Group's board, except Dr. Kolter, who serves as a non-voting observer.[^19] This dual-board structure has raised concerns about conflicts of interest, with critics arguing that board members may prioritize the for-profit entity's business interes
+    fetchedAt: 2026-02-22T01:52:45.176Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.youtube.com/watch?v=EA0S66uW1kM
+    linkText: OpenAI Restructuring Discussion - 80,000 Hours
+    claimContext: The foundation established a Safety and Security Committee (SSC) chaired by Dr. Kolter. However, critics note that this committee consists of only four part-time volunteers with no dedicated staff, tasked with overseeing the development of potentially transformative AGI systems amid intense commerci
+    fetchedAt: 2026-02-22T01:52:46.512Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 22
+    url: https://openai.com/index/people-first-ai-fund-grantees/
+    linkText: People-First AI Fund Grantees - OpenAI
+    claimContext: "In 2025, the OpenAI Foundation launched its first major philanthropic initiative: the People-First AI Fund with an initial \\$50 million commitment. The fund issued an open call for applications from September 8 through October 8, 2025, receiving nearly 3,000 applications from U.S.-based 501(c)(3) no"
+    fetchedAt: 2026-02-22T01:52:46.663Z
+    httpStatus: 200
+    pageTitle: Announcing the initial People-First AI Fund grantees | OpenAI
+    contentSnippet: Announcing the initial People-First AI Fund grantees | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 3, 2025 Company Global Affairs Announcing the initial People-First AI Fund grantees Unrestricted funding for 208 nonprofits advancing people-first work nationwide. Loading… Share The OpenAI Foundation is announcing the first recipients from the People-First AI Fund , a multi-million dollar investment in community
+    contentLength: 417449
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.theclassconsultinggroup.org/post/how-to-apply-for-openai-s-50m-people-first-ai-fund-2025-guide
+    linkText: How to Apply for OpenAI's \$50M People-First AI Fund - The Class Consulting Group
+    claimContext: "In 2025, the OpenAI Foundation launched its first major philanthropic initiative: the People-First AI Fund with an initial \\$50 million commitment. The fund issued an open call for applications from September 8 through October 8, 2025, receiving nearly 3,000 applications from U.S.-based 501(c)(3) no"
+    fetchedAt: 2026-02-22T01:52:46.706Z
+    httpStatus: 200
+    pageTitle: How Nonprofits Can Apply for OpenAI’s $50M AI Fund in 2025
+    contentSnippet: --> How Nonprofits Can Apply for OpenAI’s $50M AI Fund in 2025 top of page Search In July 2025, OpenAI announced a $50 million People-First AI Fund —a landmark opportunity designed to help nonprofits and community groups use artificial intelligence for real-world impact. While most news headlines focused on the dollar amount, few explained what this means for small and mid-sized nonprofits working on the front lines. This guide breaks it down in clear, practical terms. You’ll learn what the fund
+    contentLength: 847510
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://openai.com/index/people-first-ai-fund-grantees/
+    linkText: People-First AI Fund Grantees - OpenAI
+    claimContext: "- **\\$40.5 million** in unrestricted grants to **208 nonprofits** across the United States - **\\$9.5 million** in board-directed grants for organizations advancing transformative AI work in health and other areas[^24]"
+    fetchedAt: 2026-02-22T01:52:46.720Z
+    httpStatus: 200
+    pageTitle: Announcing the initial People-First AI Fund grantees | OpenAI
+    contentSnippet: Announcing the initial People-First AI Fund grantees | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 3, 2025 Company Global Affairs Announcing the initial People-First AI Fund grantees Unrestricted funding for 208 nonprofits advancing people-first work nationwide. Loading… Share The OpenAI Foundation is announcing the first recipients from the People-First AI Fund , a multi-million dollar investment in community
+    contentLength: 417406
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.insidephilanthropy.com/home/a-look-under-the-hood-of-the-openai-foundations-people-first-ai-fund
+    linkText: A Look Under the Hood of the OpenAI Foundation's People-First AI Fund - Inside Philanthropy
+    claimContext: The \$40.5 million initial disbursement represents a 440% increase over the foundation's previous year's grantmaking of \$7.5 million (when it was still operating as the original nonprofit OpenAI, Inc.).[^25]
+    fetchedAt: 2026-02-22T01:52:46.794Z
+    httpStatus: 200
+    pageTitle: OpenAI Foundation’s People-First AI Fund is investing in AI for service providers | Inside Philanthropy
+    contentSnippet: "OpenAI Foundation’s People-First AI Fund is investing in AI for service providers | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer Credit: Evolf/Shutterstock In November of 2025, OpenAI restructured as a public benefit corporation — a for-profit company with a commitment to making a positive impact on society and the environment while generating financial return. The nonprofit that controlled OpenAI, rebranded as the OpenAI Foundation, rece"
+    contentLength: 307621
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://openai.com/index/people-first-ai-fund-grantees/
+    linkText: People-First AI Fund Grantees - OpenAI
+    claimContext: Grant recipients span diverse sectors including AI literacy programs, rural healthcare initiatives, journalism organizations, youth development, veteran support, faith-based community groups, and Native-led media and STEM programs. Examples include:[^26]
+    fetchedAt: 2026-02-22T01:52:48.239Z
+    httpStatus: 200
+    pageTitle: Announcing the initial People-First AI Fund grantees | OpenAI
+    contentSnippet: Announcing the initial People-First AI Fund grantees | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 3, 2025 Company Global Affairs Announcing the initial People-First AI Fund grantees Unrestricted funding for 208 nonprofits advancing people-first work nationwide. Loading… Share The OpenAI Foundation is announcing the first recipients from the People-First AI Fund , a multi-million dollar investment in community
+    contentLength: 417450
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://openai.com/foundation/
+    linkText: OpenAI Foundation - Official Website
+    claimContext: The foundation announced it will "initially focus on a \$25 billion commitment" across two primary areas:[^27]
+    fetchedAt: 2026-02-22T01:52:48.012Z
+    httpStatus: 200
+    pageTitle: OpenAI Foundation | OpenAI
+    contentSnippet: OpenAI Foundation | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI OpenAI Foundation The OpenAI Foundation holds equity in OpenAI Group, currently valued at approximately $130 billion—making it one of the best resourced philanthropic organizations in the world. Read the announcement OpenAI was founded in 2015 as a nonprofit; its mission is to ensure artificial general intelligence benefits all of humanity. Today, it remai
+    contentLength: 312677
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: However, the foundation has not provided a timeline for when it will disburse this \$25 billion or whether it will structure itself as a private foundation subject to IRS rules requiring 5% annual distribution of assets. As of fiscal year 2023 (before the restructuring), the entity disbursed only \$
+    fetchedAt: 2026-02-22T01:52:47.981Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: If the OpenAI Foundation were required to follow the 5% rule on its \$130 billion corpus, it would need to disburse approximately \$6.5 billion annually—placing it in the same tier as the Gates Foundation, which averaged \$7 billion per year from 2019-2023.[^29]
+    fetchedAt: 2026-02-22T01:52:48.298Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 227
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://openai.com/index/ai-mental-health-research-grants/
+    linkText: AI and Mental Health Research Grants - OpenAI
+    claimContext: In addition to the People-First AI Fund, OpenAI's safety systems organization launched an AI and Mental Health Grant Program in 2025, awarding up to \$2 million in grants for interdisciplinary research on AI-mental health intersections. The program focuses on risks, benefits, cultural and language v
+    fetchedAt: 2026-02-22T01:52:48.182Z
+    httpStatus: 200
+    pageTitle: Funding grants for new research into AI and mental health | OpenAI
+    contentSnippet: "Funding grants for new research into AI and mental health | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 1, 2025 Company Safety Funding grants for new research into AI and mental health Introducing a new program to award up to $2 million to support independent safety and well-being research. Apply now (opens in a new window) Loading… Share Update January 28, 2026: Grant applications are now closed. We were exci"
+    contentLength: 317501
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.anthropic.com/news/the-long-term-benefit-trust
+    linkText: Anthropic Long-Term Benefit Trust
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:52:53.261Z
+    httpStatus: 200
+    pageTitle: The Long-Term Benefit Trust \ Anthropic
+    contentSnippet: Announcements The Long-Term Benefit Trust Sep 19, 2023 Today we are sharing more details about our new governance structure called the Long-Term Benefit Trust (LTBT) , which we have been developing since the birth of Anthropic. The LTBT is our attempt to fine-tune our corporate governance to address the unique challenges and long-term opportunities we believe transformative AI will present . The Trust is an independent body of five financially disinterested members with an authority to select an
+    contentLength: 276043
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: OpenAI's approach, by contrast, gives the foundation direct financial returns from the for-profit entity's success, which critics argue creates incentives to prioritize growth and profitability over safety and public benefit.[^32] However, the foundation's special voting rights provide legally enfor
+    fetchedAt: 2026-02-22T01:52:49.459Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://forum.effectivealtruism.org/posts/tbrF6M9mtsMiqc75q/inside-openai-s-controversial-plan-to-abandon-its-nonprofit
+    linkText: Inside OpenAI's Controversial Plan to Abandon Its Nonprofit - EA Forum
+    claimContext: "Critics argue the restructuring fundamentally betrays OpenAI's core purpose. As one former employee noted, \"the entire philanthropic theory of change here was: we're going to put guardrails on profit motives so we can develop this tech safely.\"[^33] The shift to a for-profit-controlled structure, th"
+    fetchedAt: 2026-02-22T01:52:49.482Z
+    httpStatus: 200
+    pageTitle: Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — EA Forum
+    contentSnippet: Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots by Garrison Apr 18 2025 13 min read 1 17 AI safety AI governance OpenAI Public communication on AI safety Frontpage Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots Legal hurd
+    contentLength: 241823
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.nbcnews.com/tech/tech-news/openai-restructuring-company-structure-chatgpt-invest-own-rcna240138
+    linkText: NBC News on OpenAI Restructuring
+    claimContext: Public Citizen, a consumer advocacy organization, released a strongly worded statement arguing that "the OpenAI Foundation will function as a corporate foundation, doing some good work but for the underlying purpose of advancing the interests of OpenAI For-Profit. The problem is, that's not how Open
+    fetchedAt: 2026-02-22T01:52:49.645Z
+    httpStatus: 200
+    pageTitle: "OpenAI’s restructuring: how the company&#x27;s structure works"
+    contentSnippet: "OpenAI’s restructuring: how the company&#x27;s structure works IE 11 is not supported. For an optimal experience visit our site on another browser. Skip to Content OpenAI CEO Sam Altman in Abilene, Texas, in September. Kyle Grillot / Bloomberg / Getty Images Share Add NBC News to Google Oct. 29, 2025, 7:10 PM EDT By Jared Perlo and Jiachuan Wu OpenAI announced Tuesday morning that it had completed a tumultuous corporate restructuring effort, simplifying a complex ownership web into a controlling"
+    contentLength: 284325
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: Tyler Johnston, executive director of AI watchdog The Midas Project, characterized the foundation's 26% stake as representing "humanity surrendering tens of hundreds of billions of dollars it was already entitled to," noting that the public will have far lower stake and control compared to the origi
+    fetchedAt: 2026-02-22T01:52:49.362Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 227
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.nbcnews.com/tech/tech-news/openai-restructuring-company-structure-chatgpt-invest-own-rcna240138
+    linkText: NBC News on OpenAI Restructuring
+    claimContext: Legal scholar Luís Calderón Gómez from Cardozo School of Law explained that OpenAI could not simply abandon its nonprofit status because doing so would have required the for-profit entity to purchase the nonprofit's assets "for fair market value, something that it was unlikely to be able to do" give
+    fetchedAt: 2026-02-22T01:52:55.182Z
+    httpStatus: 200
+    pageTitle: "OpenAI’s restructuring: how the company&#x27;s structure works"
+    contentSnippet: "OpenAI’s restructuring: how the company&#x27;s structure works IE 11 is not supported. For an optimal experience visit our site on another browser. Skip to Content OpenAI CEO Sam Altman in Abilene, Texas, in September. Kyle Grillot / Bloomberg / Getty Images Share Add NBC News to Google Oct. 29, 2025, 7:10 PM EDT By Jared Perlo and Jiachuan Wu OpenAI announced Tuesday morning that it had completed a tumultuous corporate restructuring effort, simplifying a complex ownership web into a controlling"
+    contentLength: 284326
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: The dual-board structure, where eight of nine foundation board members also serve on OpenAI Group's board, has raised significant concerns about conflicts of interest. Fred Blackwell, CEO of the San Francisco Foundation, questioned whether board members would genuinely prioritize the foundation's pu
+    fetchedAt: 2026-02-22T01:52:54.478Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 227
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://sff.org/openai-restructure/
+    linkText: OpenAI Restructure - San Francisco Foundation
+    claimContext: Judith Bell, Chief Impact Officer at the San Francisco Foundation, emphasized that proper oversight requires "independent valuation and governance of nonprofit assets" and urged the foundation to "anchor AI development in human values" rather than market imperatives.[^38]
+    fetchedAt: 2026-02-22T01:52:54.736Z
+    httpStatus: 200
+    pageTitle: "News Round-Up: Challenging OpenAI restructure as for-profit company - The San Francisco Foundation"
+    contentSnippet: "News Round-Up: Challenging OpenAI restructure as for-profit company - The San Francisco Foundation Javascript must be enabled for the correct page display Skip to Content News Round-Up: Challenging OpenAI restructure as for-profit company Home News News Round-Up: Challenging OpenAI restructure as for-profit company News Round-Up: Challenging OpenAI restructure as for-profit company October 30, 2025 San Francisco Foundation Facebook Twitter Linkedin Envelope OpenAI recently announced its new for-"
+    contentLength: 62700
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: The foundation's initial philanthropic focus areas—health and AI resilience—have been criticized as potentially serving OpenAI's business interests. As Inside Philanthropy noted, OpenAI has a "financial interest in selling its technology to medical research entities," raising questions about whether
+    fetchedAt: 2026-02-22T01:52:54.961Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: "Similarly, the AI resilience program faces challenges managing conflicts of interest, as noted by Legal Advocates for Safe Science and Technology: OpenAI might be \"biased against valuable technical AI safety work that could identify risks in OpenAI's models.\"[^40]"
+    fetchedAt: 2026-02-22T01:52:54.750Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 226
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://forum.effectivealtruism.org/posts/tbrF6M9mtsMiqc75q/inside-openai-s-controversial-plan-to-abandon-its-nonprofit
+    linkText: Inside OpenAI's Controversial Plan - EA Forum
+    claimContext: The foundation's philanthropic initiatives have been dismissed by some critics as "calculated PR stunts" designed to placate regulators and the nonprofit sector. The \$50 million People-First AI Fund, while substantial, has been characterized as "obvious pandering" to California regulators, particul
+    fetchedAt: 2026-02-22T01:52:56.681Z
+    httpStatus: 200
+    pageTitle: Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — EA Forum
+    contentSnippet: Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots by Garrison Apr 18 2025 13 min read 1 17 AI safety AI governance OpenAI Public communication on AI safety Frontpage Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots Legal hurd
+    contentLength: 241823
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: Nick Moës, Executive Director of The Future Society, called October 28, 2025, a "dark day for philanthropy," arguing that "the public will actually benefit less from OpenAI's immense profits" under the new structure compared to the original nonprofit model.[^42]
+    fetchedAt: 2026-02-22T01:52:56.237Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 227
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.lesswrong.com/posts/SHbEEFHqTuoveZcLr/inside-openai-s-controversial-plan-to-abandon-its-nonprofit
+    linkText: Inside OpenAI's Controversial Plan - EA Forum/LessWrong
+    claimContext: Beyond structural concerns, critics have accused OpenAI of prioritizing market speed over safety. The organization disbanded its Superalignment and AGI Readiness teams—critical to its founding commitment to safe AI development—and "dramatically reduced safety testing times," releasing powerful model
+    fetchedAt: 2026-02-22T01:52:57.158Z
+    httpStatus: 200
+    pageTitle: Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — LessWrong OpenAI AI Personal Blog 21 Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots by garrison 18th Apr 2025 Linkpost from garrisonlovely.substack.com 13 min read 0 21 This is the full text of a post from Obsolete , a Substack that I write about the intersection of capital
+    contentLength: 343610
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://techpolicy.press/5-policy-questions-prompted-by-openais-restructuring
+    linkText: 5 Policy Questions Prompted by OpenAI's Restructuring - Tech Policy Press
+    claimContext: "These concerns gained public attention following incidents such as a teenager's death allegedly involving ChatGPT functioning as a \"suicide coach,\" prompting calls for child safety regulations.[^44] The Safety and Security Committee's structure—four part-time volunteers with no staff overseeing the "
+    fetchedAt: 2026-02-22T01:52:57.942Z
+    httpStatus: 200
+    pageTitle: 5 Policy Questions Prompted by OpenAI’s Restructuring | TechPolicy.Press
+    contentSnippet: 5 Policy Questions Prompted by OpenAI’s Restructuring | TechPolicy.Press Analysis 5 Policy Questions Prompted by OpenAI’s Restructuring Cristiano Lima-Strong / Oct 29, 2025 OpenAI Co-Founder & CEO Sam Altman speaks at a conference in San Francisco in 2019. ( Steve Jennings/Getty Images for TechCrunch ) ChatGPT-maker OpenAI announced this week that it completed a corporate restructuring that will transition its for-profit arm into a public benefit corporation, a high-profile shift that will enabl
+    contentLength: 160836
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.youtube.com/watch?v=EA0S66uW1kM
+    linkText: OpenAI Restructuring Discussion - 80,000 Hours
+    claimContext: "These concerns gained public attention following incidents such as a teenager's death allegedly involving ChatGPT functioning as a \"suicide coach,\" prompting calls for child safety regulations.[^44] The Safety and Security Committee's structure—four part-time volunteers with no staff overseeing the "
+    fetchedAt: 2026-02-22T01:52:56.516Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 46
+    url: https://forum.effectivealtruism.org/posts/tbrF6M9mtsMiqc75q/inside-openai-s-controversial-plan-to-abandon-its-nonprofit
+    linkText: Inside OpenAI's Controversial Plan - EA Forum
+    claimContext: The restructuring faces ongoing legal challenges, most notably from Elon Musk, who filed a lawsuit arguing that his \$44 million investment was contingent on OpenAI remaining a nonprofit organization in perpetuity. Musk's lawsuit alleges that the restructuring violates founding agreements and repres
+    fetchedAt: 2026-02-22T01:52:58.993Z
+    httpStatus: 200
+    pageTitle: Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — EA Forum
+    contentSnippet: Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots by Garrison Apr 18 2025 13 min read 1 17 AI safety AI governance OpenAI Public communication on AI safety Frontpage Inside OpenAI&#x27;s Controversial Plan to Abandon its Nonprofit Roots Legal hurd
+    contentLength: 241823
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://sff.org/coalition-requests-attorney-general-action-to-protect-openais-charitable-assets/
+    linkText: Coalition Requests Attorney General Action - San Francisco Foundation
+    claimContext: The EyesOnOpenAI coalition, led by the San Francisco Foundation, has continued to raise concerns about asset valuation and independence even after the California and Delaware Attorneys General approved the restructuring with conditions. In January 2025, the coalition sent an open letter to Californi
+    fetchedAt: 2026-02-22T01:52:59.373Z
+    httpStatus: 200
+    pageTitle: Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets - The San Francisco Foundation
+    contentSnippet: Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets - The San Francisco Foundation Javascript must be enabled for the correct page display Skip to Content Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets Home News Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets January 29, 2025 San Francisco Foundation Facebook Twitter Link
+    contentLength: 69102
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: "**Scale of Resources**: At \\$130 billion, the foundation's equity stake exceeds the Gates Foundation's \\$86 billion endowment, potentially making it the world's wealthiest charity.[^48] If structured as a private foundation subject to the 5% distribution rule, it would need to disburse approximately"
+    fetchedAt: 2026-02-22T01:52:59.005Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 227
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.nbcnews.com/tech/tech-news/openai-restructuring-company-structure-chatgpt-invest-own-rcna240138
+    linkText: OpenAI Structure - NBC News
+    claimContext: "**Long-Term Warrant**: The foundation secured a warrant for additional shares if OpenAI's valuation exceeds \\$5 trillion after 15 years, aligning its interests with long-term company success rather than short-term extraction.[^49]"
+    fetchedAt: 2026-02-22T01:52:59.165Z
+    httpStatus: 200
+    pageTitle: "OpenAI’s restructuring: how the company&#x27;s structure works"
+    contentSnippet: "OpenAI’s restructuring: how the company&#x27;s structure works IE 11 is not supported. For an optimal experience visit our site on another browser. Skip to Content OpenAI CEO Sam Altman in Abilene, Texas, in September. Kyle Grillot / Bloomberg / Getty Images Share Add NBC News to Google Oct. 29, 2025, 7:10 PM EDT By Jared Perlo and Jiachuan Wu OpenAI announced Tuesday morning that it had completed a tumultuous corporate restructuring effort, simplifying a complex ownership web into a controlling"
+    contentLength: 284326
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://sff.org/openai-restructure/
+    linkText: OpenAI Restructure - San Francisco Foundation
+    claimContext: "**Public Accountability**: The restructuring required approval from both California and Delaware Attorneys General, who imposed 20 safety and security requirements. Ongoing regulatory scrutiny may constrain the foundation's ability to simply serve OpenAI's commercial interests.[^50]"
+    fetchedAt: 2026-02-22T01:52:59.351Z
+    httpStatus: 200
+    pageTitle: "News Round-Up: Challenging OpenAI restructure as for-profit company - The San Francisco Foundation"
+    contentSnippet: "News Round-Up: Challenging OpenAI restructure as for-profit company - The San Francisco Foundation Javascript must be enabled for the correct page display Skip to Content News Round-Up: Challenging OpenAI restructure as for-profit company Home News News Round-Up: Challenging OpenAI restructure as for-profit company News Round-Up: Challenging OpenAI restructure as for-profit company October 30, 2025 San Francisco Foundation Facebook Twitter Linkedin Envelope OpenAI recently announced its new for-"
+    contentLength: 62700
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.insidephilanthropy.com/home/a-look-under-the-hood-of-the-openai-foundations-people-first-ai-fund
+    linkText: A Look Under the Hood of the OpenAI Foundation's People-First AI Fund - Inside Philanthropy
+    claimContext: "**Early Grantmaking**: The 440% increase in grantmaking (from \\$7.5 million to \\$40.5 million in 2025) and the breadth of People-First AI Fund recipients suggest some genuine philanthropic intent beyond pure PR.[^51]"
+    fetchedAt: 2026-02-22T01:53:00.426Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 245
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: '**No Disbursement Timeline**: The foundation announced a "\$25 billion commitment" but provided no timeline for deployment. The vague language—"will initially focus on"—creates no binding obligation. As of fiscal year 2023, the entity disbursed only \$2.6 million in grants.[^52]'
+    fetchedAt: 2026-02-22T01:53:01.006Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: '**Corporate Foundation Dynamics**: [San Francisco Foundation](https://sff.org/) CEO [Fred Blackwell](https://sff.org/about/staff-board/) articulated the core concern: "Will it have the independence to be bold, take risks, and challenge the industry—or will it look and operate more like a corporate f'
+    fetchedAt: 2026-02-22T01:53:02.228Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 225
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://www.usnews.com/news/business/articles/2024-10-12/changing-openais-nonprofit-structure-would-raise-questions-about-its-future
+    linkText: U.S. News - Changing OpenAI's Nonprofit Structure
+    claimContext: "**Structural Conflicts of Interest**: Eight of nine foundation board members also serve on OpenAI Group's board. This dual-board structure means the same individuals who benefit from OpenAI's commercial success are responsible for ensuring the foundation serves public interests. As one critic noted,"
+    fetchedAt: 2026-02-22T01:53:07.151Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 55
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: "**Biased Against Critical Safety Work**: The Midas Project's executive director warned the foundation might be \"biased against valuable technical AI safety work that could identify risks in OpenAI's models.\"[^55] A foundation funded by OpenAI equity has structural incentives to avoid research that c"
+    fetchedAt: 2026-02-22T01:53:00.699Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://fortune.com/2025/11/26/is-openai-profitable-forecast-data-center-200-billion-shortfall-hsbc/
+    linkText: HSBC Analysis - OpenAI Funding Shortfall - Fortune
+    claimContext: "- **Pro-growth bias**: The foundation benefits financially from OpenAI's commercial success, creating pressure to prioritize growth over safety constraints that might slow development - **Valuation fragility**: OpenAI is currently valued at \\$500 billion despite projections it won't turn a profit un"
+    fetchedAt: 2026-02-22T01:53:08.588Z
+    httpStatus: 200
+    pageTitle: OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates | Fortune
+    contentSnippet: "OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI Markets OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates By Nick Lichtenberg Nick Lichtenberg Business Editor Down Arrow Button Icon By Nick Lichtenberg Nick Lichtenberg Business Editor Down Arrow Button "
+    contentLength: 468039
+    status: verified
+    note: null
+  - footnote: 57
+    url: https://www.irs.gov/charities-non-profits/private-foundations/excess-business-holdings-of-private-foundation-defined
+    linkText: IRS - Excess Business Holdings of Private Foundation
+    claimContext: "**IRS Classification Uncertainty**: If classified as a private foundation, IRS excess business holdings rules (Section 4943) would limit the foundation to owning 20% of a business enterprise (or 35% with certain conditions).[^57] The foundation currently holds 26%. While a 5-year grace period exists"
+    fetchedAt: 2026-02-22T01:53:08.502Z
+    httpStatus: 200
+    pageTitle: Excess business holdings of private foundation defined | Internal Revenue Service
+    contentSnippet: Excess business holdings of private foundation defined | Internal Revenue Service Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. English Español 中文 (简体) 中文 (繁體) 한국어 Русский Tiếng Việt Kreyòl ayisyen Search Sign in Individual Business Tax Pro Acces
+    contentLength: 103269
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: OpenAI Foundation Questions - Inside Philanthropy
+    claimContext: "**\"Dark Day for Philanthropy\"**: The Future Society's Nick Moës characterized the restructuring as \"a dark day for philanthropy,\" arguing \"the public will actually benefit less from OpenAI's immense profits\" under the new structure compared to the original nonprofit model where all surplus would hav"
+    fetchedAt: 2026-02-22T01:53:08.366Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 227
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://ips-dc.org/report-giving-pledge-at-15/
+    linkText: Institute for Policy Studies - The Giving Pledge at 15
+    claimContext: '**Comparison to Giving Pledge Dynamics**: The <EntityLink id="giving-pledge">Giving Pledge</EntityLink> demonstrated that wealthy individuals often grow their fortunes faster than they give them away—original pledgers became 166% wealthier (inflation-adjusted) since 2010.[^59] A similar dynamic may '
+    fetchedAt: 2026-02-22T01:53:09.713Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge at 15 - Institute for Policy Studies
+    contentSnippet: "The Giving Pledge at 15 - Institute for Policy Studies Skip to content In this report Introduction Key Findings Recommendations See press release Download report To speak with an expert, contact IPS Deputy Communications Director Olivia Alperstein olivia@ips-dc.org . For recent press statements, visit our Press page . Share: Introduction “There’s never been a greater need for philanthropy — and there has never been a greater opportunity to have an impact in our own lifetimes,” said Bill Gates wh"
+    contentLength: 111766
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://fortune.com/2024/02/13/openai-chair-bret-taylor-interview-promises-recuse-whenever-potential-overlap-ai-startup-sierra/
+    linkText: Fortune - OpenAI Chair Bret Taylor Promises to Recuse on Sierra Overlap
+    claimContext: Taylor became Chair during the November 2023 Altman crisis. While he has promised to "recuse himself whenever there is potential for overlap" with Sierra, this arrangement is more permissive than what forced [Reid Hoffman](https://en.wikipedia.org/wiki/Reid_Hoffman) off the board for similar conflic
+    fetchedAt: 2026-02-22T01:53:09.318Z
+    httpStatus: 200
+    pageTitle: OpenAI Chair Bret Taylor says he&#x27;ll recuse himself &#x27;whenever there is a potential for overlap&#x27; with his new AI startup Sierra | Fortune
+    contentSnippet: OpenAI Chair Bret Taylor says he&#x27;ll recuse himself &#x27;whenever there is a potential for overlap&#x27; with his new AI startup Sierra | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Tech AI OpenAI Chair Bret Taylor says he’ll recuse himself ‘whenever there is a potential for overlap’ with his new AI startup Sierra By Kylie Robison Kylie Robison Down Arrow Button Icon By Kylie Robison Kylie Robison Down Arrow Button Icon February 13, 2024, 7:12 PM ET
+    contentLength: 455828
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://www.marketplace.org/2016/05/23/world/corner-office-marketplace/full-interview-gates-foundation-ceo-big-philanthropy
+    linkText: Marketplace - Gates Foundation CEO on Big Philanthropy
+    claimContext: Desmond-Hellmann is the only board member with substantial foundation leadership experience. Under her tenure, the Gates Foundation spent well above the 5% minimum, though this pace was largely set by [Bill](https://en.wikipedia.org/wiki/Bill_Gates) and [Melinda Gates](https://en.wikipedia.org/wiki/
+    fetchedAt: 2026-02-22T01:53:12.311Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 62
+    url: https://www.npr.org/sections/money/2009/12/how_harvard_lost_all_that_mone.html
+    linkText: NPR - How Harvard Lost All That Money
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:53:11.647Z
+    httpStatus: 200
+    pageTitle: "How Harvard Lost All That Money : Planet Money : NPR"
+    contentSnippet: "How Harvard Lost All That Money : Planet Money : NPR Accessibility links Skip to main content Keyboard shortcuts for audio player How Harvard Lost All That Money : Planet Money Did Harvard ignore warnings that could have saved it from losing $10 billion of its endowment? NPR Planet Money LISTEN & FOLLOW NPR App Apple Podcasts Spotify Amazon Music iHeart Radio YouTube Music RSS link Sign up for the [TITLE] Newsletter Get perks with [Podcast Title]+ Your support helps make our show possible and un"
+    contentLength: 74195
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://www.insidephilanthropy.com/home/meet-the-ogunlesis-an-emerging-philanthropic-family-to-watch
+    linkText: Inside Philanthropy - Meet the Ogunlesis
+    claimContext: Ogunlesi's entire career is in private equity and infrastructure investment—maximizing asset appreciation, not deploying capital for social good. His personal foundation gives at barely above the legal minimum rate. His [BlackRock](https://en.wikipedia.org/wiki/BlackRock) executive role creates dire
+    fetchedAt: 2026-02-22T01:53:10.770Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 237
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.doe.org/about/people/
+    linkText: The Doe Fund - Board of Directors
+    claimContext: Seligman has the most relevant hands-on nonprofit experience on the board, though at much smaller scale than \$130 billion. Her [Doe Fund](https://www.doe.org/) work demonstrates actual engagement with direct-service charitable organizations. She appears less financially conflicted than most board m
+    fetchedAt: 2026-02-22T01:53:12.081Z
+    httpStatus: 200
+    pageTitle: Meet The Doe Fund Leadership | People Behind Our Mission
+    contentSnippet: Meet The Doe Fund Leadership | People Behind Our Mission Skip to content The Doe Fund’s staff includes nonprofit leaders with decades of experience advancing innovative workforce development programs, social enterprises, human services, and housing. The Doe Fund also prioritizes empowering credible messengers — people with lived experience overcoming homelessness, addiction, and incarceration — within the organization. Over 40% of The Doe Fund’s staff, including 70% of its Programs team, are gra
+    contentLength: 182802
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://www.axios.com/2024/06/13/open-ai-security-nakasone-nsa
+    linkText: Axios - OpenAI Board Adds Former NSA Director Nakasone
+    claimContext: 'Nakasone joined the board in June 2024 explicitly for safety and security oversight, not philanthropic guidance. His stated rationale: "I believe that [AI] truly is the capability—the technology—that must continue to be led by the United States." If anything, his perspective would favor funding secu'
+    fetchedAt: 2026-02-22T01:53:10.987Z
+    httpStatus: 200
+    pageTitle: OpenAI adds former NSA chief Paul Nakasone to the board
+    contentSnippet: "OpenAI adds former NSA chief Paul Nakasone to the board Skip to main content Jun 13, 2024 - Technology OpenAI adds former NSA chief to its board Ina Fried facebook (opens in new window) twitter (opens in new window) linkedin (opens in new window) email (opens in new window) sms (opens in new window) Add Axios on Google Add Axios as your preferred source to see more of our stories on Google. Add Axios on Google Commander of the U.S. Cyber Command Army Gen. Paul Nakasone testifying before a House "
+    contentLength: 177981
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://blog.carnegieinvest.com/the-risks-facing-openai-and-its-1.4t-in-spending-commitments
+    linkText: Carnegie Investments - Risks Facing OpenAI
+    claimContext: OpenAI projects \$9 billion in operating losses for 2025, rising to \$14 billion in 2026. Cash burn is expected to peak at \$47 billion in 2028 before reaching positive free cash flow around 2030.[^66] The company has committed \$1.4 trillion in infrastructure spending over 8 years and faces a \$207
+    fetchedAt: 2026-02-22T01:53:13.796Z
+    httpStatus: 200
+    pageTitle: The Risks Facing OpenAI and its $1.4T in Spending Commitments
+    contentSnippet: "The Risks Facing OpenAI and its $1.4T in Spending Commitments Home Personal INVESTMENT MANAGEMENT WEALTH MANAGEMENT Corporate CORPORATE RETIREMENT PLAN SERVICES Nonprofit FOUNDATIONS AND NONPROFITS ASSOCIATIONS About CARNEGIE'S STORY TEAM News & Insights MEDIA WALL CARNEGIE INVESTMENT COUNSEL BLOG NONPROFIT INVESTMENT COUNSEL BLOG RETIREMENT PLAN TALK Contact TALK TO AN ADVISOR REQUEST FOR PROPOSAL OFFICES CAREERS Client Login CARNEGIE LOGIN EAGLE RIDGE LOGIN Home Personal INVESTMENT MANAGEMENT "
+    contentLength: 93994
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://fortune.com/2025/11/26/is-openai-profitable-forecast-data-center-200-billion-shortfall-hsbc/
+    linkText: "Fortune - HSBC Analysis: OpenAI \\$207B Funding Shortfall"
+    claimContext: OpenAI projects \$9 billion in operating losses for 2025, rising to \$14 billion in 2026. Cash burn is expected to peak at \$47 billion in 2028 before reaching positive free cash flow around 2030.[^66] The company has committed \$1.4 trillion in infrastructure spending over 8 years and faces a \$207
+    fetchedAt: 2026-02-22T01:53:13.404Z
+    httpStatus: 200
+    pageTitle: OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates | Fortune
+    contentSnippet: "OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia AI Markets OpenAI won’t make money by 2030 and still needs to come up with another $207 billion to power its growth plans, HSBC estimates By Nick Lichtenberg Nick Lichtenberg Business Editor Down Arrow Button Icon By Nick Lichtenberg Nick Lichtenberg Business Editor Down Arrow Button "
+    contentLength: 468248
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://tontinecoffeehouse.com/2024/09/02/fords-1956-ipo/
+    linkText: Tontine Coffee-House - Ford's 1956 IPO and Foundation Divestiture
+    claimContext: The Ford Foundation's divestiture enabled both the foundation's independence and Ford Motor's 1956 IPO. The process took nearly two decades. The OpenAI Foundation has announced no comparable diversification strategy.[^68]
+    fetchedAt: 2026-02-22T01:53:13.654Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 203
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://fortune.com/2015/12/03/zuckerberg-foundation-llc/
+    linkText: Fortune - Mark Zuckerberg Defends Foundation LLC Structure
+    claimContext: This structure allows indefinite wealth accumulation with "philanthropic" framing but no legal obligation to deploy capital. OpenAI's foundation structure is nominally more restrictive, but the classification question (public charity vs. private foundation) remains unresolved.[^69]
+    fetchedAt: 2026-02-22T01:53:13.882Z
+    httpStatus: 200
+    pageTitle: Mark Zuckerberg Defends His Foundation&#x27;s Legal Structure | Fortune
+    contentSnippet: Mark Zuckerberg Defends His Foundation&#x27;s Legal Structure | Fortune Home Latest Fortune 500 Finance Tech Leadership Lifestyle Rankings Multimedia Tech Mark Zuckerberg Mark Zuckerberg Takes on Critics of His $45 Billion Giveaway By Kia Kokalitcheva Kia Kokalitcheva Down Arrow Button Icon By Kia Kokalitcheva Kia Kokalitcheva Down Arrow Button Icon December 3, 2015, 9:51 PM ET Add us on Mark Zuckerberg, chief executive officer of Facebook Inc., speaks during the Internet.org summit in New Delhi
+    contentLength: 430330
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://ips-dc.org/report-giving-pledge-at-15/
+    linkText: Institute for Policy Studies - The Giving Pledge at 15
+    claimContext: The <EntityLink id="giving-pledge">Giving Pledge</EntityLink> provides sobering data on philanthropic commitments by tech billionaires. Original pledgers (2010) became **166% wealthier** (inflation-adjusted) by 2024 while their philanthropic activity remained modest relative to wealth growth. The pl
+    fetchedAt: 2026-02-22T01:53:14.276Z
+    httpStatus: 200
+    pageTitle: The Giving Pledge at 15 - Institute for Policy Studies
+    contentSnippet: "The Giving Pledge at 15 - Institute for Policy Studies Skip to content In this report Introduction Key Findings Recommendations See press release Download report To speak with an expert, contact IPS Deputy Communications Director Olivia Alperstein olivia@ips-dc.org . For recent press statements, visit our Press page . Share: Introduction “There’s never been a greater need for philanthropy — and there has never been a greater opportunity to have an impact in our own lifetimes,” said Bill Gates wh"
+    contentLength: 111767
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: Inside Philanthropy - OpenAI Foundation Health Focus Questions
+    claimContext: "- **Focus area vagueness:** \"AI resilience\" can encompass work promoting AI adoption (serving OpenAI's commercial interests) as easily as work identifying AI risks - **Health grants:** OpenAI has direct commercial interest in selling AI tools to medical research entities, raising questions about whe"
+    fetchedAt: 2026-02-22T01:53:15.619Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: Inside Philanthropy - AI Resilience Conflict of Interest
+    claimContext: "Inside Philanthropy noted: \"Managing conflicts of interest will be particularly challenging for the nonprofit's AI resilience program. The organization might be biased against valuable technical AI safety work that could identify risks in OpenAI's models.\"[^72]"
+    fetchedAt: 2026-02-22T01:53:15.781Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 226
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://projects.propublica.org/nonprofits/organizations/810861541
+    linkText: ProPublica Nonprofit Explorer - OpenAI Inc.
+    claimContext: The original OpenAI nonprofit filed **Form 990** (public charity form), not Form 990-PF (private foundation form).[^73] If the new foundation maintains public charity status—which requires receiving broad public support or operating programs—it has **no legal obligation to disburse any funds**.
+    fetchedAt: 2026-02-22T01:53:15.462Z
+    httpStatus: 200
+    pageTitle: Openai Inc - Nonprofit Explorer - ProPublica
+    contentSnippet: "Openai Inc - Nonprofit Explorer - ProPublica Skip to content Menu Menu ProPublica Donate Close Close ProPublica Donate Search ProPublica: Search Search Search Show search box Select the type of search Nonprofits People Filing Text Search for a nonprofit Search Search Openai Inc San Francisco, CA Tax-exempt since Nov. 2016 EIN: 81-0861541 Receive an email when new data is available for this organization. Organization summary Type of Nonprofit Designated as a 501(c)(3) Organizations for any of the"
+    contentLength: 227332
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://www.insidephilanthropy.com/home/openai-now-has-a-foundation-we-have-some-questions
+    linkText: Inside Philanthropy - Will Foundation Be Subject to 5% Rule?
+    claimContext: '[San Francisco Foundation](https://sff.org/) CEO [Fred Blackwell](https://sff.org/about/staff-board/) directly asked: "Will the foundation be subject to the 5% rule, and will it spend beyond that requirement?"[^74] This question remains unanswered.'
+    fetchedAt: 2026-02-22T01:53:15.612Z
+    httpStatus: 200
+    pageTitle: 5 questions about the new OpenAI Foundation | Inside Philanthropy
+    contentSnippet: "5 questions about the new OpenAI Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer OpenAI CEO Sam Altman. Credit: jamesonwu1972/Shutterstock Backed by an initial $1 billion funding commitment from Sam Altman, Elon Musk and others, OpenAI launched in December 2015 as a nonprofit to “advance digital intelligence in the way that is most likely to benefit humanity as a whole, unconstrained by a need to generate financial return.” Fast"
+    contentLength: 315902
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://www.reuters.com/technology/artificial-intelligence/musk-led-group-offers-974-billion-acquire-openais-non-profit-2025-02-10/
+    linkText: Reuters - Musk-led group offers \$97.4 billion for OpenAI nonprofit
+    claimContext: "**Status:** Trial scheduled for March 2026. In February 2025, a Musk-led consortium offered \\$97.4 billion to acquire the nonprofit.[^76]"
+    fetchedAt: 2026-02-22T01:53:16.078Z
+    httpStatus: 404
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 404
+  - footnote: 77
+    url: https://oag.ca.gov/charities
+    linkText: California AG Charitable Trusts
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:53:18.146Z
+    httpStatus: 200
+    pageTitle: Charities | State of California - Department of Justice - Office of the Attorney General
+    contentSnippet: "Charities | State of California - Department of Justice - Office of the Attorney General Skip to main content --> --> Charities Home Charities New Charities Registering For The First Time --> The Registry of Charities and Fundraisers is developing a new Online Filing Service that allows all registrants to submit filings and payments electronically. The initial release is now available for new charities registering for the first time . In 2026, the Online Filing Service will be available for all "
+    contentLength: 62469
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://www.irs.gov/compliance/whistleblower-office
+    linkText: IRS Whistleblower Office
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:53:17.406Z
+    httpStatus: 200
+    pageTitle: Whistleblower Office | Internal Revenue Service
+    contentSnippet: Whistleblower Office | Internal Revenue Service Skip to main content Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( ) or https:// means you've safely connected to the .gov website. Share sensitive information only on official, secure websites. English Español 中文 (简体) 中文 (繁體) 한국어 Русский Tiếng Việt Kreyòl ayisyen Search Sign in Individual Business Tax Pro Access your tax information with an IRS
+    contentLength: 109961
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://sff.org/coalition-requests-attorney-general-action-to-protect-openais-charitable-assets/
+    linkText: San Francisco Foundation - EyesOnOpenAI Coalition
+    claimContext: (footnote definition only, no inline reference found)
+    fetchedAt: 2026-02-22T01:53:17.531Z
+    httpStatus: 200
+    pageTitle: Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets - The San Francisco Foundation
+    contentSnippet: Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets - The San Francisco Foundation Javascript must be enabled for the correct page display Skip to Content Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets Home News Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets Coalition Requests Attorney General Action to Protect OpenAI’s Charitable Assets January 29, 2025 San Francisco Foundation Facebook Twitter Link
+    contentLength: 69102
+    status: verified
+    note: null

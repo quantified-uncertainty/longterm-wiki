@@ -1,0 +1,150 @@
+pageId: securedna
+verifiedAt: 2026-02-22
+totalCitations: 13
+verified: 13
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://securedna.org/
+    linkText: SecureDNA Official Site
+    claimContext: "|-----------|------------|----------| | **Focus Area** | DNA synthesis screening technology | Free, privacy-preserving screening for synthesis providers worldwide[^1] | | **Founded** | November 2022 (Swiss Stiftung) | Project originated 2019 at MIT Media Lab; incorporated in Zug, now Basel[^2] |"
+    fetchedAt: 2026-02-22T02:26:42.437Z
+    httpStatus: 200
+    pageTitle: "SecureDNA: Free, Secure DNA Synthesis Screening Platform"
+    contentSnippet: "SecureDNA: Free, Secure DNA Synthesis Screening Platform Safeguarding DNA synthesis A free, cryptographically secure, and verifiably up-to-date system to screen all DNA synthesis for potential hazards Learn More System Demo What We Do SecureDNA provides free, privacy-preserving DNA synthesis screening to detect security-relevant, controlled, or regulated sequences. Our advanced system helps researchers and companies ensure biosecurity and regulatory compliance without compromising data confident"
+    contentLength: 222995
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.media.mit.edu/projects/secure-dna/overview/
+    linkText: MIT Media Lab — Secure DNA Project
+    claimContext: "| **Focus Area** | DNA synthesis screening technology | Free, privacy-preserving screening for synthesis providers worldwide[^1] | | **Founded** | November 2022 (Swiss Stiftung) | Project originated 2019 at MIT Media Lab; incorporated in Zug, now Basel[^2] | | **Key Innovation** | DOPRF cryptographi"
+    fetchedAt: 2026-02-22T02:26:42.600Z
+    httpStatus: 200
+    pageTitle: Overview &lsaquo; Secure DNA &mdash; MIT Media Lab
+    contentSnippet: "Overview &lsaquo; Secure DNA &mdash; MIT Media Lab Find People, Projects, etc. Search Login Register Email: Password: Work for a Member organization and need a Member Portal account? Register here with your official email address. Register a Member Account Project Secure DNA Creative Commons Attribution 4.0 International E. Chory Groups A world in which thousands of people can construct and release autonomous biological agents is unlikely to flourish Professor Kevin Esvelt, the leader of Sculpti"
+    contentLength: 100484
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://securedna.org/features/
+    linkText: SecureDNA Features
+    claimContext: "| **Founded** | November 2022 (Swiss Stiftung) | Project originated 2019 at MIT Media Lab; incorporated in Zug, now Basel[^2] | | **Key Innovation** | DOPRF cryptographic protocol | Screens to 30bp while keeping both orders and hazard database confidential[^3] | | **Deployment** | Operational, globa"
+    fetchedAt: 2026-02-22T02:26:42.356Z
+    httpStatus: 200
+    pageTitle: SecureDNA - Features
+    contentSnippet: SecureDNA - Features Features SecureDNA was designed to screen all oligo and gene synthesis orders against an up-to-date list of known and emerging hazards, including pre-generated functional variants. Universal - fast, free, and available to all Fast Rapid and delay-free screening at thousands of base pairs / sec, plus optional customer pre-screening Free Non-profit and free to use, thanks to several generous donations and our efficient exact-match algorithm Accessible Available to all provider
+    contentLength: 234081
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://securedna.org/our-impact/
+    linkText: SecureDNA Impact
+    claimContext: "| **Key Innovation** | DOPRF cryptographic protocol | Screens to 30bp while keeping both orders and hazard database confidential[^3] | | **Deployment** | Operational, global | Validated on 67M nucleotides from US, European, and Chinese providers[^4] | | **Regulatory Position** | Already exceeds 2026"
+    fetchedAt: 2026-02-22T02:26:42.464Z
+    httpStatus: 200
+    pageTitle: SecureDNA - fast, free, and accurate DNA synthesis screening
+    contentSnippet: "SecureDNA - fast, free, and accurate DNA synthesis screening Our Impact SecureDNA provides the world&#39;s first free, privacy-preserving screening system that enables scientific progress while preventing misuse. We&#39;re closing a critical security gap in DNA synthesis and ensuring hazardous sequences are identified before they&#39;re ever created. Why SecureDNA Matters Preventing Future Risks : As DNA synthesis becomes more accessible and AI lowers barriers to dual-use research, our technolog"
+    contentLength: 320389
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://securedna.org/securedna-and-the-executive-order-on-biological-research-safety/
+    linkText: SecureDNA and the Executive Order on Biological Research Safety
+    claimContext: "| **Deployment** | Operational, global | Validated on 67M nucleotides from US, European, and Chinese providers[^4] | | **Regulatory Position** | Already exceeds 2026 requirements | OSTP framework requires 50nt by October 2026; SecureDNA screens at 30bp[^5] | | **Key Concern** | Adoption metrics not "
+    fetchedAt: 2026-02-22T02:26:42.380Z
+    httpStatus: 200
+    pageTitle: SecureDNA - fast, free, and accurate DNA synthesis screening
+    contentSnippet: SecureDNA - fast, free, and accurate DNA synthesis screening Executive Order on Biological Research Safety Strengthening biosecurity through comprehensive DNA synthesis screening in response to the May 2025 Executive Order On May 5, 2025, President Trump signed an Executive Order on "Improving the Safety and Security of Biological Research," flagging significant enhancements to nucleic acid synthesis screening. While the specific requirements of the revised Framework are still being developed, S
+    contentLength: 288575
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://arxiv.org/abs/2403.14023
+    linkText: arXiv:2403.14023 — A system capable of verifiably and privately screening global DNA synthesis
+    claimContext: SecureDNA uses **Distributed Oblivious Pseudorandom Functions (DOPRF)**, a cryptographic protocol that ensures neither party learns the other's secrets during screening:[^3][^6]
+    fetchedAt: 2026-02-22T02:26:43.629Z
+    httpStatus: 200
+    pageTitle: "[2403.14023] A system capable of verifiably and privately screening global DNA synthesis"
+    contentSnippet: "[2403.14023] A system capable of verifiably and privately screening global DNA synthesis --> Computer Science > Cryptography and Security arXiv:2403.14023 (cs) [Submitted on 20 Mar 2024 ( v1 ), last revised 30 Jun 2025 (this version, v3)] Title: A system capable of verifiably and privately screening global DNA synthesis Authors: Carsten Baum (1 and 2), Jens Berlips (3), Walther Chen (3), Helena Cozzarini (3), Hongrui Cui (4), Ivan Damgård (1), Jiangbin Dong (5), Kevin M. Esvelt (3 and 6), Leonar"
+    contentLength: 52212
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://arxiv.org/abs/2512.09233
+    linkText: arXiv:2512.09233 — Security audit of SecureDNA
+    claimContext: "An independent security audit by Sherman et al. (to appear at NDSS 2026) identified a vulnerability in SecureDNA's custom SCEP authentication protocol: it achieved only one-way authentication, meaning the hazard database and keyservers \"never learn with whom they communicate.\" This could theoretical"
+    fetchedAt: 2026-02-22T02:26:43.689Z
+    httpStatus: 200
+    pageTitle: "[2512.09233] Analysis of the Security Design, Engineering, and Implementation of the SecureDNA System"
+    contentSnippet: "[2512.09233] Analysis of the Security Design, Engineering, and Implementation of the SecureDNA System --> Computer Science > Cryptography and Security arXiv:2512.09233 (cs) [Submitted on 10 Dec 2025] Title: Analysis of the Security Design, Engineering, and Implementation of the SecureDNA System Authors: Alan T. Sherman , Jeremy J. Romanik Romano , Edward Zieglar , Enis Golaszewski , Jonathan D. Fuchs , William E. Byrd View a PDF of the paper titled Analysis of the Security Design, Engineering, a"
+    contentLength: 48559
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://securedna.org/team/
+    linkText: SecureDNA Team
+    claimContext: "**Management**: Jens Berlips (Project Manager), Dr. Leonard Foner (Software Architect and Security Lead), Kirsten Engel (Global Strategic Partnerships).[^8]"
+    fetchedAt: 2026-02-22T02:26:43.683Z
+    httpStatus: 200
+    pageTitle: SecureDNA - Team members
+    contentSnippet: SecureDNA - Team members Our Team SecureDNA is composed of academic life scientists and cryptographers, policy analysts, information security specialists, and software engineers from many nations. Foundation Council Dean Andrew Yao Dean of the Institute for Interdisciplinary Information Sciences at Tsinghua University; winner of the Turing Award and Kyoto Prize Raphael Egger Attorney-at-Law and Partner at Egger Dommer Bär ; specializing in corporate law and corporate transactions (M&A) Dr. Benja
+    contentLength: 249698
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://securedna.org/faq/
+    linkText: SecureDNA FAQ
+    claimContext: SecureDNA is funded by "several generous donations from philanthropists in the United States, Europe, China, and elsewhere." The team deliberately avoided government funding.[^9]
+    fetchedAt: 2026-02-22T02:26:43.730Z
+    httpStatus: 200
+    pageTitle: SecureDNA - Frequently Asked Questions (FAQs)
+    contentSnippet: SecureDNA - Frequently Asked Questions (FAQs) Frequently Asked Questions (FAQs) Answers to questions covering the purpose, methods, and organization behind the SecureDNA system Basics Why screen DNA synthesis? DNA synthesis is essential to biotechnology, which promises a healthier and more sustainable future. But in the wrong hands, it could do great harm. While the vast majority of DNA sequences are harmless and should be available to all researchers, only authorized researchers using appropria
+    contentLength: 289562
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.nature.com/articles/s41467-025-67955-3
+    linkText: Edison, Toner & Esvelt 2026 — Nature Communications
+    claimContext: "- **Fragment assembly bypass**: Edison, Toner, and Esvelt (2026) demonstrated that short unregulated DNA fragments can be assembled to bypass screening entirely[^10] - **AI-designed evasion**: Microsoft's \"Paraphrase Project\" showed AI protein design tools can generate functional toxin variants that"
+    fetchedAt: 2026-02-22T02:26:44.713Z
+    httpStatus: 200
+    pageTitle: "Assembling unregulated DNA segments bypasses synthesis screening: regulate fragments as select agents | Nature Communications"
+    contentSnippet: "Assembling unregulated DNA segments bypasses synthesis screening: regulate fragments as select agents | Nature Communications Skip to main content Thank you for visiting nature.com. You are using a browser version with limited support for CSS. To obtain the best experience, we recommend you use a more up to date browser (or turn off compatibility mode in Internet Explorer). In the meantime, to ensure continued support, we are displaying the site without styles and JavaScript. Advertisement Assem"
+    contentLength: 246051
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.microsoft.com/en-us/research/story/the-paraphrase-project-designing-defense-for-an-era-of-synthetic-biology/
+    linkText: Microsoft — The Paraphrase Project
+    claimContext: "- **Fragment assembly bypass**: Edison, Toner, and Esvelt (2026) demonstrated that short unregulated DNA fragments can be assembled to bypass screening entirely[^10] - **AI-designed evasion**: Microsoft's \"Paraphrase Project\" showed AI protein design tools can generate functional toxin variants that"
+    fetchedAt: 2026-02-22T02:26:46.669Z
+    httpStatus: 200
+    pageTitle: "The Paraphrase Project: Designing defense for an era of synthetic biology - Microsoft Research"
+    contentSnippet: "The Paraphrase Project: Designing defense for an era of synthetic biology - Microsoft Research Skip to main content The Paraphrase Project: Designing defense for an era of synthetic biology In the fall of 2023, breakthroughs in generative AI had researchers proclaiming a new era for medicine and healthcare. In fall 2023, as excitement grew over generative AI’s role in medical breakthroughs, Microsoft’s Eric Horvitz couldn’t shake a nagging concern. The promise was undeniable, but his thoughts ke"
+    contentLength: 203984
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://ifp.org/securing-benchtop-dna-synthesizers/
+    linkText: IFP — Securing Benchtop DNA Synthesizers
+    claimContext: "- **AI-designed evasion**: Microsoft's \"Paraphrase Project\" showed AI protein design tools can generate functional toxin variants that evade homology-based screening[^11] - **Benchtop synthesizers**: Desktop DNA synthesis devices could bypass centralized screening altogether[^12] - **Adoption gap**:"
+    fetchedAt: 2026-02-22T02:26:46.444Z
+    httpStatus: 200
+    pageTitle: Securing Benchtop DNA Synthesizers | IFP
+    contentSnippet: Securing Benchtop DNA Synthesizers | IFP Research Research All Research Biotechnology Emerging Technology High-Skilled Immigration Infrastructure Metascience About About Team Non-Resident Fellows Board Members Careers FAQs Projects Projects Newsletters Courses The Launch Sequence Contact Search Search Search Executive summary Context Benchtop synthesizers, present and future DNA synthesis today is almost entirely from centralized providers Today’s benchtop synthesizers are not yet helpful for ge
+    contentLength: 515249
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://genesynthesisconsortium.org/
+    linkText: IGSC market coverage
+    claimContext: "- **Benchtop synthesizers**: Desktop DNA synthesis devices could bypass centralized screening altogether[^12] - **Adoption gap**: ≈20% of global synthesis capacity operates outside voluntary screening frameworks[^13]"
+    fetchedAt: 2026-02-22T02:26:46.287Z
+    httpStatus: 200
+    pageTitle: International Gene Synthesis Consortium
+    contentSnippet: "International Gene Synthesis Consortium International Gene Synthesis Consortium --> Where Gene Synthesis and Biosecurity Align What Is Biosecurity? Biosecurity refers to measures taken to prevent or stop misuse or exposure of harmful biological agents. Minimizing Risk Formed as an industry-led organization, the objectives of IGSC are to: safeguard biosecurity, apply a common protocol for screening DNA sequences and customers while promoting the beneficial use of gene synthesis. Maximizing Innova"
+    contentLength: 59884
+    status: verified
+    note: null

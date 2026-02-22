@@ -1,0 +1,447 @@
+pageId: bletchley-declaration
+verifiedAt: 2026-02-22
+totalCitations: 40
+verified: 32
+broken: 8
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+    linkText: AI Safety Summit - Wikipedia
+    claimContext: The **Bletchley Declaration** is a landmark international agreement on AI safety signed at the first global AI Safety Summit, held at Bletchley Park, United Kingdom, on November 1-2, 2023.[^1] The declaration was endorsed by 28 countries—including the United States, China, United Kingdom, Australia,
+    fetchedAt: 2026-02-22T02:13:12.855Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://hottopics.ht/insights/ai-safety-summit-2023-a-rundown-of-the-bletchley-declaration
+    linkText: "Hot Topics: AI Safety Summit 2023 - A Rundown of the Bletchley Declaration"
+    claimContext: The **Bletchley Declaration** is a landmark international agreement on AI safety signed at the first global AI Safety Summit, held at Bletchley Park, United Kingdom, on November 1-2, 2023.[^1] The declaration was endorsed by 28 countries—including the United States, China, United Kingdom, Australia,
+    fetchedAt: 2026-02-22T02:13:13.503Z
+    httpStatus: 200
+    pageTitle: "AI Safety Summit 2023: a rundown of the Bletchley Declaration"
+    contentSnippet: "AI Safety Summit 2023: a rundown of the Bletchley Declaration AI News AI Safety Summit 2023: a rundown of the Bletchley Declaration Kani Talabani Share this post Back to Thought Leadership AI Safety Summit 2023 Dive into the essentials of the AI Safety Summit with this rundown, providing insights into the key participants, themes, and rationale behind this pivotal event. As AI’s capabilities are expanding into every facet of our lives, it is clear that this poses significant opportunities, but e"
+    contentLength: 136718
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.enterprisenation.com/learn-something/bletchley-declaration-safety-artificial-intelligence-ai/
+    linkText: "Enterprise Nation: Bletchley Declaration on Safety of Artificial Intelligence"
+    claimContext: The **Bletchley Declaration** is a landmark international agreement on AI safety signed at the first global AI Safety Summit, held at Bletchley Park, United Kingdom, on November 1-2, 2023.[^1] The declaration was endorsed by 28 countries—including the United States, China, United Kingdom, Australia,
+    fetchedAt: 2026-02-22T02:13:16.337Z
+    httpStatus: 200
+    pageTitle: "AI Safety Summit: 28 countries sign &#x27;Bletchley Declaration&#x27; on dealing with risks of artificial intelligence | Enterprise Nation"
+    contentSnippet: "AI Safety Summit: 28 countries sign &#x27;Bletchley Declaration&#x27; on dealing with risks of artificial intelligence | Enterprise Nation Loading profile data... Loading profile data... Learn something AI Safety Summit: 28 countries sign &#x27;Bletchley Declaration&#x27; on dealing with risks of artificial intelligence BUSINESS NEWS Dan Martin Dan Martin Content & Events Connect Posted: Wed 1st Nov 2023 The government has announced that 28 countries have signed an agreement on the first day of "
+    contentLength: 191179
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration/the-bletchley-declaration-by-countries-attending-the-ai-safety-summit-1-2-november-2023
+    linkText: "UK Government: The Bletchley Declaration"
+    claimContext: 'The agreement centers on managing risks from **frontier AI**: highly capable general-purpose AI models that can perform a wide variety of tasks and pose potential for "serious, even catastrophic, harm, either deliberate or unintentional."[^4] Signatories committed to identify shared AI safety risks '
+    fetchedAt: 2026-02-22T02:13:13.621Z
+    httpStatus: 200
+    pageTitle: The Bletchley Declaration by Countries Attending the AI Safety Summit, 1-2 November 2023 - GOV.UK
+    contentSnippet: The Bletchley Declaration by Countries Attending the AI Safety Summit, 1-2 November 2023 - GOV.UK Cookies on GOV.UK We use some essential cookies to make this website work. We’d like to set additional cookies to understand how you use GOV.UK, remember your settings and improve government services. We also use cookies set by other sites to help us deliver content from their services. You have accepted additional cookies. You can change your cookie settings at any time. You have rejected additiona
+    contentLength: 85832
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://ganado.com/what-is-the-bletchley-declaration-and-why-does-it-matter-for-ai-safety/
+    linkText: "Ganado: What is the Bletchley Declaration and Why Does it Matter for AI Safety?"
+    claimContext: 'The agreement centers on managing risks from **frontier AI**: highly capable general-purpose AI models that can perform a wide variety of tasks and pose potential for "serious, even catastrophic, harm, either deliberate or unintentional."[^4] Signatories committed to identify shared AI safety risks '
+    fetchedAt: 2026-02-22T02:13:13.509Z
+    httpStatus: 200
+    pageTitle: What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates
+    contentSnippet: What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates Home &raquo; Insights Newsfeed &raquo; Practice news &raquo; What is the Bletchley Declaration and why does it matter for AI safety? News & events November 9, 2023 What is the Bletchley Declaration and why does it matter for AI safety? Background On the 1st & 2nd November, the world’s first AI Security Summit was hos
+    contentLength: 127558
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://partnershiponai.org/uk-ai-safety-summit/
+    linkText: "Partnership on AI: UK AI Safety Summit"
+    claimContext: 'The agreement centers on managing risks from **frontier AI**: highly capable general-purpose AI models that can perform a wide variety of tasks and pose potential for "serious, even catastrophic, harm, either deliberate or unintentional."[^4] Signatories committed to identify shared AI safety risks '
+    fetchedAt: 2026-02-22T02:13:17.776Z
+    httpStatus: 200
+    pageTitle: UK AI Safety Summit — Safety for Society Today and Tomorrow.
+    contentSnippet: "UK AI Safety Summit — Safety for Society Today and Tomorrow. &times; SEARCH Share Our Blog / Blog UK AI Safety Summit — Safety for Society Today and Tomorrow Rebecca Finlay November 3, 2023 Content Wrapper Click here to start editing --> Content Row Click here to start editing --> It would be an understatement to say that it has been a busy time in AI policy. For those of us who have been working in the Responsible AI community for several years, the last 10 days provided a welcome spotlight on "
+    contentLength: 82237
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.bletchleypark.org.uk/bletchley-park-makes-history-again-as-host-of-the-worlds-first-ai-safety-summit/
+    linkText: "Bletchley Park: Bletchley Park Makes History Again as Host of World's First AI Safety Summit"
+    claimContext: The summit's symbolic location at Bletchley Park—the WWII codebreaking site where Alan Turing and others developed early computers—emphasized the historical significance of the moment and the need for collaborative innovation in technology governance.[^7] While critics described the declaration as o
+    fetchedAt: 2026-02-22T02:13:19.003Z
+    httpStatus: 200
+    pageTitle: Bletchley Park makes history again as host of the world’s first AI Safety Summit | Bletchley Park
+    contentSnippet: "Bletchley Park makes history again as host of the world’s first AI Safety Summit | Bletchley Park G P N Q H Z 9 8 7 Search Type above to decrypt our story... Road Closure Please note: the entry in to Sherwood Drive from Buckingham Road (B4034) is due to be closed for roadworks from 17 to 20 February. Please follow the diversion to the other end of Sherwood Drive (where you bypass the road closure sign) to reach the entrance of Bletchley Park. Details of roadworks in the local area can be found a"
+    contentLength: 120941
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.lowyinstitute.org/the-interpreter/bletchley-park-artificial-intelligence-summit-good-optics-less-substance
+    linkText: "Lowy Institute: Bletchley Park AI Summit - Good Optics, Less Substance"
+    claimContext: The summit's symbolic location at Bletchley Park—the WWII codebreaking site where Alan Turing and others developed early computers—emphasized the historical significance of the moment and the need for collaborative innovation in technology governance.[^7] While critics described the declaration as o
+    fetchedAt: 2026-02-22T02:13:18.211Z
+    httpStatus: 200
+    pageTitle: "The Bletchley Park artificial intelligence summit: Good optics, less substance | Lowy Institute"
+    contentSnippet: "The Bletchley Park artificial intelligence summit: Good optics, less substance | Lowy Institute Skip to main content Published daily by the Lowy Institute The Bletchley Park artificial intelligence summit: Good optics, less substance José-Miguel Bello y Villarino Kimberlee Weatherall A jumbled collection of commonplace platitudes does not a remarkable outcome make. The AI Safety Summit at Bletchley Park, 2 November (Simon Walker/No 10 Downing Street/Flickr) Published 15 Nov 2023 Australia Europe"
+    contentLength: 35109
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://datamatters.sidley.com/2023/12/07/world-first-agreement-on-ai-reached/
+    linkText: "Sidley Data Matters: World-First Agreement on AI Reached"
+    claimContext: The summit's symbolic location at Bletchley Park—the WWII codebreaking site where Alan Turing and others developed early computers—emphasized the historical significance of the moment and the need for collaborative innovation in technology governance.[^7] While critics described the declaration as o
+    fetchedAt: 2026-02-22T02:13:17.931Z
+    httpStatus: 200
+    pageTitle: "'World-First' Agreement on AI Reached | Data Matters Privacy Blog"
+    contentSnippet: "&#039;World-First&#039; Agreement on AI Reached | Data Matters Privacy Blog Dec 7 2023 Over one hundred representatives from across the globe convened in the UK on 1-2 November 2023 at the Global AI Safety Summit. The focus of the Summit was to discuss how best to manage the risks posed by the most recent advances in AI. However, it was the “Bletchley Declaration” –announced at the start of the Summit—which truly emphasized the significance governments are attributing to these issues. Bletchley "
+    contentLength: 95379
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+    linkText: AI Safety Summit - Wikipedia
+    claimContext: The AI Safety Summit emerged from growing international concern about rapid advances in AI capabilities and their potential risks. The UK government, under Prime Minister Rishi Sunak, positioned itself as a leader in AI safety governance and hosted the inaugural summit as a national priority.[^10][^
+    fetchedAt: 2026-02-22T02:13:17.390Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 11
+    url: https://www.youtube.com/watch?v=jm1Re0r4Txw
+    linkText: UK AI Summit - YouTube (Rishi Sunak announcement)
+    claimContext: The AI Safety Summit emerged from growing international concern about rapid advances in AI capabilities and their potential risks. The UK government, under Prime Minister Rishi Sunak, positioned itself as a leader in AI safety governance and hosted the inaugural summit as a national priority.[^10][^
+    fetchedAt: 2026-02-22T02:13:20.502Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 12
+    url: https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park
+    linkText: "White Case: Guardians of the AI Galaxy - Lessons from Bletchley Park"
+    claimContext: The summit brought together over 100 representatives from governments, businesses, civil society, academia, and international organizations including the United Nations.[^12][^13] Notable attendees included US Vice President Kamala Harris, European Commission President Ursula von der Leyen, <EntityL
+    fetchedAt: 2026-02-22T02:13:20.634Z
+    httpStatus: 200
+    pageTitle: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP"
+    contentSnippet: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP Skip to main content Subscribe Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park https://news.whitecase.com/5/38/forms/subscribe.asp mailto:?subject=Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park&body=https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchle"
+    contentLength: 161252
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.ap-lawsolution.com/actio/regulatory-alert-the-bletchley-declaration-a-new-paradigm-for-global-ai-safety
+    linkText: "AP Law Solution: The Bletchley Declaration - A New Paradigm for Global AI Safety"
+    claimContext: The summit brought together over 100 representatives from governments, businesses, civil society, academia, and international organizations including the United Nations.[^12][^13] Notable attendees included US Vice President Kamala Harris, European Commission President Ursula von der Leyen, <EntityL
+    fetchedAt: 2026-02-22T02:13:23.604Z
+    httpStatus: 200
+    pageTitle: "Regulatory Alert: The Bletchley Declaration: a New Paradigm for Global AI Safety"
+    contentSnippet: "Regulatory Alert: The Bletchley Declaration: a New Paradigm for Global AI Safety Home Capabilities ACTIO® Hub About Us Connect with Us AP Library Hero Banner Get Connect Home Capabilities ACTIO® Hub About Us Connect with Us AP Library Home Hero Banner Get Connect Our Approach - Holistic Dispute Resolution Legal Dispute Resolution Legal Risk Prevention Sector Focus ACTIO ® Publications ACTIO ® Events Our Vision Our Commitment Our Philosopy Our Recognitions News Loading... Regulatory Alert: The Bl"
+    contentLength: 286365
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+    linkText: AI Safety Summit - Wikipedia
+    claimContext: The summit brought together over 100 representatives from governments, businesses, civil society, academia, and international organizations including the United Nations.[^12][^13] Notable attendees included US Vice President Kamala Harris, European Commission President Ursula von der Leyen, <EntityL
+    fetchedAt: 2026-02-22T02:13:20.012Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 15
+    url: https://forum.effectivealtruism.org/posts/j2TreuRZT9mBFEMEs/the-bletchley-declaration-on-ai-safety
+    linkText: "EA Forum: The Bletchley Declaration on AI Safety"
+    claimContext: '**Developer Responsibility**: The declaration emphasizes that actors developing frontier AI capabilities bear "particularly strong responsibility" for ensuring system safety through rigorous safety testing, evaluations, and appropriate mitigation measures.[^4][^15]'
+    fetchedAt: 2026-02-22T02:13:20.288Z
+    httpStatus: 200
+    pageTitle: The Bletchley Declaration on AI Safety — EA Forum
+    contentSnippet: The Bletchley Declaration on AI Safety — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents The Bletchley Declaration on AI Safety by Hauke Hillebrandt Nov 1 2023 5 min read 3 60 AI safety Public communication on AI safety Frontpage The Bletchley Declaration on AI Safety Agreement 3 comments This is a linkpost for https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchl
+    contentLength: 173856
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://cfg.eu/bletchley-declaration-safety-frontier-ai/
+    linkText: "CFG Europe: Bletchley Declaration on Safety of Frontier AI"
+    claimContext: "**Policy Development**: Countries committed to developing risk-based policies tailored to their national circumstances and legal frameworks, while promoting international cooperation and alignment on safety standards.[^4][^16]"
+    fetchedAt: 2026-02-22T02:13:25.858Z
+    httpStatus: 200
+    pageTitle: The Bletchley Declaration and the safety of frontier AI - Centre for Future Generations
+    contentSnippet: "The Bletchley Declaration and the safety of frontier AI - Centre for Future Generations Skip to content Home Publications The Bletchley Declaration and the safety of frontier AI The Bletchley Declaration and the safety of frontier AI 10.11.2023 Max Reddel #AdvancedAI #Briefs #AI Safety The Bletchley Declaration and the safety of frontier AI &#13; &#13; &#13; &#13; &#13; Home Publications The Bletchley Declaration and the safety of frontier AI &#13; &#13; The Bletchley Declaration and the safety "
+    contentLength: 93195
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+    linkText: AI Safety Summit - Wikipedia
+    claimContext: The AI Safety Summit was organized around five core objectives that shaped the declaration's focus:[^17][^2]
+    fetchedAt: 2026-02-22T02:13:24.656Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 18
+    url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+    linkText: AI Safety Summit - Wikipedia
+    claimContext: One of the most concrete outcomes of the summit was the establishment or announcement of national AI Safety Institutes designed to evaluate, test, and develop safety standards for frontier AI systems.[^18][^19]
+    fetchedAt: 2026-02-22T02:13:24.659Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://partnershiponai.org/uk-ai-safety-summit/
+    linkText: "Partnership on AI: UK AI Safety Summit"
+    claimContext: One of the most concrete outcomes of the summit was the establishment or announcement of national AI Safety Institutes designed to evaluate, test, and develop safety standards for frontier AI systems.[^18][^19]
+    fetchedAt: 2026-02-22T02:13:25.152Z
+    httpStatus: 200
+    pageTitle: UK AI Safety Summit — Safety for Society Today and Tomorrow.
+    contentSnippet: "UK AI Safety Summit — Safety for Society Today and Tomorrow. &times; SEARCH Share Our Blog / Blog UK AI Safety Summit — Safety for Society Today and Tomorrow Rebecca Finlay November 3, 2023 Content Wrapper Click here to start editing --> Content Row Click here to start editing --> It would be an understatement to say that it has been a busy time in AI policy. For those of us who have been working in the Responsible AI community for several years, the last 10 days provided a welcome spotlight on "
+    contentLength: 82237
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park
+    linkText: "White Case: Guardians of the AI Galaxy - Lessons from Bletchley Park"
+    claimContext: '**<EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink>**: Announced at the summit, the UK institute (rebranded from the Frontier AI Taskforce) was designed to conduct independent evaluations of advanced AI systems, with major AI companies agreeing to provide early access to models for safety'
+    fetchedAt: 2026-02-22T02:13:25.188Z
+    httpStatus: 200
+    pageTitle: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP"
+    contentSnippet: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP Skip to main content Subscribe Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park https://news.whitecase.com/5/38/forms/subscribe.asp mailto:?subject=Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park&body=https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchle"
+    contentLength: 161252
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+    linkText: AI Safety Summit - Wikipedia
+    claimContext: '**<EntityLink id="us-aisi">US AI Safety Institute</EntityLink>**: Established within the National Institute of Standards and Technology (NIST), the US institute focuses on developing evaluation metrics, safety testing frameworks, and coordination with international partners.[^21] President Joe Biden'
+    fetchedAt: 2026-02-22T02:13:26.866Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 22
+    url: https://techpolicy.press/from-safety-to-action-the-upcoming-french-ai-summit
+    linkText: "Tech Policy Press: From Safety to Action - The Upcoming French AI Summit"
+    claimContext: '**<EntityLink id="us-aisi">US AI Safety Institute</EntityLink>**: Established within the National Institute of Standards and Technology (NIST), the US institute focuses on developing evaluation metrics, safety testing frameworks, and coordination with international partners.[^21] President Joe Biden'
+    fetchedAt: 2026-02-22T02:13:28.278Z
+    httpStatus: 200
+    pageTitle: "From Safety To Action: The Upcoming French AI Summit | TechPolicy.Press"
+    contentSnippet: "From Safety To Action: The Upcoming French AI Summit | TechPolicy.Press From Safety To Action: The Upcoming French AI Summit Hugo Neuillé / Feb 5, 2025 The Grand Palais, site of the Paris AI Summit, seen from Pont Alexandre III. Eric Pouhier/ Wikimedia CC BY-SA 4.0 On February 10 - 11, France will host the AI Action Summit, gathering government officials, executives, and representatives for NGOs and civil society organizations in Paris. French President Emmanuel Macron hopes to use the summit to"
+    contentLength: 157412
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://techpolicy.press/from-safety-to-action-the-upcoming-french-ai-summit
+    linkText: "Tech Policy Press: From Safety to Action - The Upcoming French AI Summit"
+    claimContext: '**<EntityLink id="us-aisi">US AI Safety Institute</EntityLink>**: Established within the National Institute of Standards and Technology (NIST), the US institute focuses on developing evaluation metrics, safety testing frameworks, and coordination with international partners.[^21] President Joe Biden'
+    fetchedAt: 2026-02-22T02:13:28.255Z
+    httpStatus: 200
+    pageTitle: "From Safety To Action: The Upcoming French AI Summit | TechPolicy.Press"
+    contentSnippet: "From Safety To Action: The Upcoming French AI Summit | TechPolicy.Press From Safety To Action: The Upcoming French AI Summit Hugo Neuillé / Feb 5, 2025 The Grand Palais, site of the Paris AI Summit, seen from Pont Alexandre III. Eric Pouhier/ Wikimedia CC BY-SA 4.0 On February 10 - 11, France will host the AI Action Summit, gathering government officials, executives, and representatives for NGOs and civil society organizations in Paris. French President Emmanuel Macron hopes to use the summit to"
+    contentLength: 157412
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park
+    linkText: "White Case: Guardians of the AI Galaxy - Lessons from Bletchley Park"
+    claimContext: Seven leading AI companies published voluntary safety policies covering nine safety areas including misuse prevention, transparency, and collaboration with government safety institutes.[^24] At a follow-up event, 16 technology companies from North America, Asia, Europe, and the Middle East signed Fr
+    fetchedAt: 2026-02-22T02:13:27.010Z
+    httpStatus: 200
+    pageTitle: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP"
+    contentSnippet: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP Skip to main content Subscribe Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park https://news.whitecase.com/5/38/forms/subscribe.asp mailto:?subject=Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park&body=https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchle"
+    contentLength: 161252
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.gov.uk/government/news/historic-first-as-companies-spanning-north-america-asia-europe-and-middle-east-agree-safety-commitments-on-development-of-ai
+    linkText: "UK Government: Historic First as Companies Agree Safety Commitments on AI"
+    claimContext: Seven leading AI companies published voluntary safety policies covering nine safety areas including misuse prevention, transparency, and collaboration with government safety institutes.[^24] At a follow-up event, 16 technology companies from North America, Asia, Europe, and the Middle East signed Fr
+    fetchedAt: 2026-02-22T02:13:27.758Z
+    httpStatus: 200
+    pageTitle: Historic first as companies spanning North America, Asia, Europe and Middle East agree safety commitments on development of AI - GOV.UK
+    contentSnippet: Historic first as companies spanning North America, Asia, Europe and Middle East agree safety commitments on development of AI - GOV.UK Cookies on GOV.UK We use some essential cookies to make this website work. We’d like to set additional cookies to understand how you use GOV.UK, remember your settings and improve government services. We also use cookies set by other sites to help us deliver content from their services. You have accepted additional cookies. You can change your cookie settings at
+    contentLength: 123558
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.brookings.edu/articles/the-bletchley-park-process-could-be-a-building-block-for-global-cooperation-on-ai-safety/
+    linkText: "Brookings: The Bletchley Park Process Could Be a Building Block for Global Cooperation on AI Safety"
+    claimContext: "The Seoul Summit, co-hosted by the UK and South Korea in May 2024, reaffirmed and extended the Bletchley commitments.[^26] Key outcomes included:"
+    fetchedAt: 2026-02-22T02:13:29.754Z
+    httpStatus: 200
+    pageTitle: The Bletchley Park process could be a building block for global cooperation on AI safety | Brookings
+    contentSnippet: "The Bletchley Park process could be a building block for global cooperation on AI safety | Brookings Search Home The Bletchley Park process could be a building block for global cooperation on AI safety Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to Global Connection Sign Up Research The Bletchley Park process could be a building block for global cooperation on AI saf"
+    contentLength: 216745
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.brookings.edu/articles/the-bletchley-park-process-could-be-a-building-block-for-global-cooperation-on-ai-safety/
+    linkText: "Brookings: The Bletchley Park Process Could Be a Building Block for Global Cooperation on AI Safety"
+    claimContext: The AI Action Summit in Paris, scheduled for February 10-11, 2025, was planned as a critical checkpoint for assessing sustained commitment to the Bletchley process and determining whether participating nations could deliver meaningful progress on <EntityLink id="technical-ai-safety">technical AI saf
+    fetchedAt: 2026-02-22T02:13:29.796Z
+    httpStatus: 200
+    pageTitle: The Bletchley Park process could be a building block for global cooperation on AI safety | Brookings
+    contentSnippet: "The Bletchley Park process could be a building block for global cooperation on AI safety | Brookings Search Home The Bletchley Park process could be a building block for global cooperation on AI safety Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to Global Connection Sign Up Research The Bletchley Park process could be a building block for global cooperation on AI saf"
+    contentLength: 216745
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://techpolicy.press/from-safety-to-action-the-upcoming-french-ai-summit
+    linkText: "Tech Policy Press: From Safety to Action - The Upcoming French AI Summit"
+    claimContext: The AI Action Summit in Paris, scheduled for February 10-11, 2025, was planned as a critical checkpoint for assessing sustained commitment to the Bletchley process and determining whether participating nations could deliver meaningful progress on <EntityLink id="technical-ai-safety">technical AI saf
+    fetchedAt: 2026-02-22T02:13:29.636Z
+    httpStatus: 200
+    pageTitle: "From Safety To Action: The Upcoming French AI Summit | TechPolicy.Press"
+    contentSnippet: "From Safety To Action: The Upcoming French AI Summit | TechPolicy.Press From Safety To Action: The Upcoming French AI Summit Hugo Neuillé / Feb 5, 2025 The Grand Palais, site of the Paris AI Summit, seen from Pont Alexandre III. Eric Pouhier/ Wikimedia CC BY-SA 4.0 On February 10 - 11, France will host the AI Action Summit, gathering government officials, executives, and representatives for NGOs and civil society organizations in Paris. French President Emmanuel Macron hopes to use the summit to"
+    contentLength: 157412
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.hcltech.com/trends-and-insights/ai-safety-summit-2023-bletchley-declaration-forges-new-path-ai-safety
+    linkText: "HCL Tech: AI Safety Summit 2023 - Bletchley Declaration Forges New Path for AI Safety"
+    claimContext: The declaration focuses specifically on "frontier AI"—defined as highly capable general-purpose AI models that can perform a wide variety of tasks and match or exceed the capabilities of today's most advanced systems.[^3][^29] This includes foundation models and <EntityLink id="language-models">larg
+    fetchedAt: 2026-02-22T02:13:31.680Z
+    httpStatus: 200
+    pageTitle: "AI Safety Summit 2023: Bletchley Declaration | HCLTech"
+    contentSnippet: "AI Safety Summit 2023: Bletchley Declaration | HCLTech Skip to main content Home AI Safety Summit 2023: ‘Bletchley Declaration’ forges new path in AI safety 28 major countries unite for international collaboration at Bletchley Park to address frontier AI developers, threats and governance Subscribe November 7, 2023 6 minutes read Mousume Roy Associate General Manager, Global Thought Leadership November 7, 2023 6 minutes read AI Share Facebook Twitter LinkedIn Copy link copied! Listen to article "
+    contentLength: 114037
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://ganado.com/what-is-the-bletchley-declaration-and-why-does-it-matter-for-ai-safety/
+    linkText: "Ganado: What is the Bletchley Declaration and Why Does it Matter for AI Safety?"
+    claimContext: A recurring theme throughout the declaration is the commitment to "pro-innovation governance" that maximizes AI benefits while managing risks.[^16][^30] Signatories affirmed that AI should be designed, developed, deployed, and used in a manner that is "safe, human-centric, trustworthy, and responsib
+    fetchedAt: 2026-02-22T02:13:29.715Z
+    httpStatus: 200
+    pageTitle: What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates
+    contentSnippet: What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates Home &raquo; Insights Newsfeed &raquo; Practice news &raquo; What is the Bletchley Declaration and why does it matter for AI safety? News & events November 9, 2023 What is the Bletchley Declaration and why does it matter for AI safety? Background On the 1st & 2nd November, the world’s first AI Security Summit was hos
+    contentLength: 127558
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://ukandeu.ac.uk/the-uk-ai-summit-successes-trade-offs-and-an-uncertain-path-ahead/
+    linkText: "UK and EU: The UK AI Summit - Successes, Trade-offs, and an Uncertain Path Ahead"
+    claimContext: A recurring theme throughout the declaration is the commitment to "pro-innovation governance" that maximizes AI benefits while managing risks.[^16][^30] Signatories affirmed that AI should be designed, developed, deployed, and used in a manner that is "safe, human-centric, trustworthy, and responsib
+    fetchedAt: 2026-02-22T02:13:34.581Z
+    httpStatus: 200
+    pageTitle: The UK AI summit – successes, trade-offs, and an uncertain path ahead - UK in a changing Europe
+    contentSnippet: "The UK AI summit – successes, trade-offs, and an uncertain path ahead - UK in a changing Europe Search for: Close search Blogs The UK AI summit – successes, trade-offs, and an uncertain path ahead DATE 06 Nov 2023 AUTHORS Huw Roberts THEME Policies UK-EU Relations Huw Roberts suggests that while the AI summit was a success, the UK has focused on leading the international conversation at the expense of domestic AI regulation. In February 2023, a white paper outlining the UK’s approach to regulati"
+    contentLength: 90548
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://ganado.com/what-is-the-bletchley-declaration-and-why-does-it-matter-for-ai-safety/
+    linkText: "Ganado: What is the Bletchley Declaration and Why Does it Matter for AI Safety?"
+    claimContext: The declaration explicitly calls for bridging the digital divide and ensuring inclusive global dialogue involving governments, companies, civil society, and academia.[^32][^33] This reflects recognition that AI risks and benefits are inherently international and that effective governance requires pa
+    fetchedAt: 2026-02-22T02:13:32.730Z
+    httpStatus: 200
+    pageTitle: What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates
+    contentSnippet: What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates What is the Bletchley Declaration and why does it matter for AI safety? - Ganado Advocates Home &raquo; Insights Newsfeed &raquo; Practice news &raquo; What is the Bletchley Declaration and why does it matter for AI safety? News & events November 9, 2023 What is the Bletchley Declaration and why does it matter for AI safety? Background On the 1st & 2nd November, the world’s first AI Security Summit was hos
+    contentLength: 127558
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park
+    linkText: "White Case: Guardians of the AI Galaxy - Lessons from Bletchley Park"
+    claimContext: The declaration explicitly calls for bridging the digital divide and ensuring inclusive global dialogue involving governments, companies, civil society, and academia.[^32][^33] This reflects recognition that AI risks and benefits are inherently international and that effective governance requires pa
+    fetchedAt: 2026-02-22T02:13:33.073Z
+    httpStatus: 200
+    pageTitle: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP"
+    contentSnippet: "Guardians of the AI Galaxy: Lessons from Bletchley Park | White & Case LLP Skip to main content Subscribe Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchley-park https://news.whitecase.com/5/38/forms/subscribe.asp mailto:?subject=Guardians%20of%20the%20AI%20Galaxy%3A%20Lessons%20from%20Bletchley%20Park&body=https://www.whitecase.com/insight-our-thinking/guardians-ai-galaxy-lessons-bletchle"
+    contentLength: 161252
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.brookings.edu/articles/the-bletchley-park-process-could-be-a-building-block-for-global-cooperation-on-ai-safety/
+    linkText: "Brookings: The Bletchley Park Process Could Be a Building Block for Global Cooperation on AI Safety"
+    claimContext: The declaration's most significant limitation is its non-binding, voluntary character. It aims for "largely voluntary agreement" on safety assessments without enforcement mechanisms or globally harmonized thresholds for unacceptable risks.[^26][^34] This voluntary approach leaves implementation depe
+    fetchedAt: 2026-02-22T02:13:32.726Z
+    httpStatus: 200
+    pageTitle: The Bletchley Park process could be a building block for global cooperation on AI safety | Brookings
+    contentSnippet: "The Bletchley Park process could be a building block for global cooperation on AI safety | Brookings Search Home The Bletchley Park process could be a building block for global cooperation on AI safety Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to Global Connection Sign Up Research The Bletchley Park process could be a building block for global cooperation on AI saf"
+    contentLength: 216745
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://ukandeu.ac.uk/the-uk-ai-summit-successes-trade-offs-and-an-uncertain-path-ahead/
+    linkText: "UK and EU: The UK AI Summit - Successes, Trade-offs, and an Uncertain Path Ahead"
+    claimContext: Critics described the declaration as offering "good optics, less substance," with primarily platitudes and vague commitments that rely on existing initiatives rather than creating new binding obligations.[^8] The agreement lacks details on specific resources, funding commitments, or concrete impleme
+    fetchedAt: 2026-02-22T02:13:34.044Z
+    httpStatus: 200
+    pageTitle: The UK AI summit – successes, trade-offs, and an uncertain path ahead - UK in a changing Europe
+    contentSnippet: "The UK AI summit – successes, trade-offs, and an uncertain path ahead - UK in a changing Europe Search for: Close search Blogs The UK AI summit – successes, trade-offs, and an uncertain path ahead DATE 06 Nov 2023 AUTHORS Huw Roberts THEME Policies UK-EU Relations Huw Roberts suggests that while the AI summit was a success, the UK has focused on leading the international conversation at the expense of domestic AI regulation. In February 2023, a white paper outlining the UK’s approach to regulati"
+    contentLength: 90548
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.rpclegal.com/snapshots/technology-digital/winter-2023/ai-safety-summit-and-the-bletchley-declaration/
+    linkText: "RPC Legal: AI Safety Summit and the Bletchley Declaration"
+    claimContext: While the declaration brings together major powers, it explicitly acknowledges that policies "may vary across countries according to national circumstances and applicable legal frameworks."[^4][^16] This recognition of differing approaches potentially undermines efforts toward unified global standar
+    fetchedAt: 2026-02-22T02:13:35.897Z
+    httpStatus: 200
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 212
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.ox.ac.uk/news/2023-11-03-expert-comment-oxford-ai-experts-comment-outcomes-uk-ai-safety-summit
+    linkText: "Oxford AI Experts: Comment on Outcomes of UK AI Safety Summit"
+    claimContext: Several experts noted that while the declaration represents progress in establishing dialogue, its effectiveness depends entirely on sustained follow-through.[^37][^38] The politicized nature of AI governance and the lack of binding commitments mean the agreement's long-term impact remains uncertain
+    fetchedAt: 2026-02-22T02:13:36.045Z
+    httpStatus: 200
+    pageTitle: "Expert comment: Oxford AI experts comment on the outcomes of the UK AI Safety Summit | University of Oxford"
+    contentSnippet: "Expert comment: Oxford AI experts comment on the outcomes of the UK AI Safety Summit | University of Oxford Skip to main content The UK Government hosted the UK AI Safety Summit at Bletchley Park on 01 and 02 November, 2023. Picture by Marcel Grabowski / UK Government / Identity Published 3 Nov 2023 Share This Tweet Share on Facebook Share on LinkedIn Share on Reddit Home News Expert comment: Oxford AI experts comment on the outcomes of the UK AI Safety Summit Artificial Intelligence Expert opin"
+    contentLength: 71231
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://ukandeu.ac.uk/the-uk-ai-summit-successes-trade-offs-and-an-uncertain-path-ahead/
+    linkText: "UK and EU: The UK AI Summit - Successes, Trade-offs, and an Uncertain Path Ahead"
+    claimContext: Several experts noted that while the declaration represents progress in establishing dialogue, its effectiveness depends entirely on sustained follow-through.[^37][^38] The politicized nature of AI governance and the lack of binding commitments mean the agreement's long-term impact remains uncertain
+    fetchedAt: 2026-02-22T02:13:35.802Z
+    httpStatus: 200
+    pageTitle: The UK AI summit – successes, trade-offs, and an uncertain path ahead - UK in a changing Europe
+    contentSnippet: "The UK AI summit – successes, trade-offs, and an uncertain path ahead - UK in a changing Europe Search for: Close search Blogs The UK AI summit – successes, trade-offs, and an uncertain path ahead DATE 06 Nov 2023 AUTHORS Huw Roberts THEME Policies UK-EU Relations Huw Roberts suggests that while the AI summit was a success, the UK has focused on leading the international conversation at the expense of domestic AI regulation. In February 2023, a white paper outlining the UK’s approach to regulati"
+    contentLength: 90548
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+    linkText: AI Safety Summit - Wikipedia
+    claimContext: The inclusion of both the United States and China as signatories represents a notable diplomatic achievement given escalating tensions over technology, trade, and AI development between these powers.[^14][^39] The declaration demonstrates that despite competitive dynamics, there exists some common g
+    fetchedAt: 2026-02-22T02:13:35.602Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 40
+    url: https://partnershiponai.org/uk-ai-safety-summit/
+    linkText: "Partnership on AI: UK AI Safety Summit"
+    claimContext: The declaration's contribution is its specific focus on frontier AI safety risks and the establishment of dedicated national safety institutes as implementation mechanisms.[^19][^40] It complements rather than replaces these existing frameworks, operating through "existing international fora and oth
+    fetchedAt: 2026-02-22T02:13:35.811Z
+    httpStatus: 200
+    pageTitle: UK AI Safety Summit — Safety for Society Today and Tomorrow.
+    contentSnippet: "UK AI Safety Summit — Safety for Society Today and Tomorrow. &times; SEARCH Share Our Blog / Blog UK AI Safety Summit — Safety for Society Today and Tomorrow Rebecca Finlay November 3, 2023 Content Wrapper Click here to start editing --> Content Row Click here to start editing --> It would be an understatement to say that it has been a busy time in AI policy. For those of us who have been working in the Responsible AI community for several years, the last 10 days provided a welcome spotlight on "
+    contentLength: 82237
+    status: verified
+    note: null

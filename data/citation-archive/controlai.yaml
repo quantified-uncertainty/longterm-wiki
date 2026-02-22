@@ -1,0 +1,557 @@
+pageId: controlai
+verifiedAt: 2026-02-22
+totalCitations: 50
+verified: 46
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://controlai.com
+    linkText: ControlAI Overview
+    claimContext: "ControlAI is a UK-based organization focused on AI safety and policy advocacy, with the mission to prevent the development of artificial superintelligence (ASI) and ensure humanity retains control over advanced AI systems.[^1] The organization operates primarily through campaigns, policy proposals, "
+    fetchedAt: 2026-02-22T02:06:17.874Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI control control control control / / ai ai ai ai Fighting to keep humanity in control Take Action Take Action Our Work At A Glance 2 0 0 + Lawmakers briefed on AI extinction risk 1 0 0 + UK parliamentarians support our campaign 1 AI bill written and presented to UK Prime Minister's office 1 5 0 + m i l l i o n Views on our content on AI risk 1 5 0 , 0 0 0 + Messages from concerned citizens sent to lawmakers using our tools Our Work Featured In Our Focus Learn More Learn More Learn More "
+    contentLength: 455828
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.transformernews.ai/p/a-brief-guide-to-anti-ai-activist-stop-ai-pauseai-controlai
+    linkText: A Brief Guide to Anti-AI Activist Groups
+    claimContext: "Founded in 2023 as an offshoot of Conjecture, ControlAI has positioned itself as one of the most professionalized AI activist groups, producing high-quality media campaigns and policy briefs targeted at lawmakers and the general public.[^2] The organization's core tagline—\"Fighting to keep humanity "
+    fetchedAt: 2026-02-22T02:06:17.930Z
+    httpStatus: 200
+    pageTitle: A brief guide to the groups protesting over AI
+    contentSnippet: "A brief guide to the groups protesting over AI Subscribe Sign in A brief guide to the groups protesting over AI The differences between Stop AI, PauseAI, ControlAI, and more Shakeel Hashim Nov 28, 2025 5 7 2 Share PauseAI activists outside the UK Parliament. Credit: PauseAI Activism opposing various aspects of AI might, from the outside, all look the same. But dive deeper, and you’ll soon discover internecine conflicts, surprising alliances, and vastly different tactical approaches. In the wake "
+    contentLength: 196777
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://controlai.com
+    linkText: ControlAI Homepage
+    claimContext: "Founded in 2023 as an offshoot of Conjecture, ControlAI has positioned itself as one of the most professionalized AI activist groups, producing high-quality media campaigns and policy briefs targeted at lawmakers and the general public.[^2] The organization's core tagline—\"Fighting to keep humanity "
+    fetchedAt: 2026-02-22T02:06:17.884Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI control control control control / / ai ai ai ai Fighting to keep humanity in control Take Action Take Action Our Work At A Glance 2 0 0 + Lawmakers briefed on AI extinction risk 1 0 0 + UK parliamentarians support our campaign 1 AI bill written and presented to UK Prime Minister's office 1 5 0 + m i l l i o n Views on our content on AI risk 1 5 0 , 0 0 0 + Messages from concerned citizens sent to lawmakers using our tools Our Work Featured In Our Focus Learn More Learn More Learn More "
+    contentLength: 455828
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.youtube.com/watch?v=SVV8nP2dCEs
+    linkText: London Futurists - A Narrow Path to a Good Future with AI
+    claimContext: "ControlAI's primary theory of change centers on the \"Direct Institutional Plan\" (DIP), launched in March 2025, which promotes safe-by-design AI engineering, metrology of intelligence, and human-controlled transformative AI.[^4] The organization warns that no current methods exist to contain systems "
+    fetchedAt: 2026-02-22T02:06:17.867Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 5
+    url: https://controlai.com
+    linkText: ControlAI Homepage
+    claimContext: "ControlAI's primary theory of change centers on the \"Direct Institutional Plan\" (DIP), launched in March 2025, which promotes safe-by-design AI engineering, metrology of intelligence, and human-controlled transformative AI.[^4] The organization warns that no current methods exist to contain systems "
+    fetchedAt: 2026-02-22T02:06:17.833Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI control control control control / / ai ai ai ai Fighting to keep humanity in control Take Action Take Action Our Work At A Glance 2 0 0 + Lawmakers briefed on AI extinction risk 1 0 0 + UK parliamentarians support our campaign 1 AI bill written and presented to UK Prime Minister's office 1 5 0 + m i l l i o n Views on our content on AI risk 1 5 0 , 0 0 0 + Messages from concerned citizens sent to lawmakers using our tools Our Work Featured In Our Focus Learn More Learn More Learn More "
+    contentLength: 455828
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://controlai.com/about
+    linkText: ControlAI About Page
+    claimContext: ControlAI was founded in 2023 by Andrea Miotti, emerging as an offshoot of Conjecture, an AI startup led by <EntityLink id="connor-leahy">Connor Leahy</EntityLink>.[^6] The organization was established in the lead-up to the AI Safety Summit at Bletchley Park, UK, where it made a notable splash by hi
+    fetchedAt: 2026-02-22T02:06:19.006Z
+    httpStatus: 200
+    pageTitle: About Us | ControlAI
+    contentSnippet: About Us | ControlAI About Us ControlAI is a non-profit organization that works to reduce the risks to humanity from artificial intelligence. We develop policy and legislation; secure media coverage; produce high-quality videos and infographics; design and run effective digital and physical campaigns; organize events; and influence policymakers. We have secured public support for our campaigns from high-ranking politicians, have authored draft bills for the UK and US, have created multiple viral
+    contentLength: 368752
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.transformernews.ai/p/a-brief-guide-to-anti-ai-activist-stop-ai-pauseai-controlai
+    linkText: Transformer News - Anti-AI Activist Groups
+    claimContext: ControlAI was founded in 2023 by Andrea Miotti, emerging as an offshoot of Conjecture, an AI startup led by <EntityLink id="connor-leahy">Connor Leahy</EntityLink>.[^6] The organization was established in the lead-up to the AI Safety Summit at Bletchley Park, UK, where it made a notable splash by hi
+    fetchedAt: 2026-02-22T02:06:18.999Z
+    httpStatus: 200
+    pageTitle: A brief guide to the groups protesting over AI
+    contentSnippet: "A brief guide to the groups protesting over AI Subscribe Sign in A brief guide to the groups protesting over AI The differences between Stop AI, PauseAI, ControlAI, and more Shakeel Hashim Nov 28, 2025 5 7 2 Share PauseAI activists outside the UK Parliament. Credit: PauseAI Activism opposing various aspects of AI might, from the outside, all look the same. But dive deeper, and you’ll soon discover internecine conflicts, surprising alliances, and vastly different tactical approaches. In the wake "
+    contentLength: 196777
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.youtube.com/watch?v=SVV8nP2dCEs
+    linkText: London Futurists Interview
+    claimContext: Andrea Miotti, who holds a PhD in machine learning robustness and previously worked at Palantir and BCG, founded the organization after leading communications and policy efforts at Conjecture.[^8] The organization operates as a nonprofit "private company limited by guarantee" in the UK and as a 501(
+    fetchedAt: 2026-02-22T02:06:19.177Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 9
+    url: https://controlai.com/about
+    linkText: ControlAI About Page
+    claimContext: Andrea Miotti, who holds a PhD in machine learning robustness and previously worked at Palantir and BCG, founded the organization after leading communications and policy efforts at Conjecture.[^8] The organization operates as a nonprofit "private company limited by guarantee" in the UK and as a 501(
+    fetchedAt: 2026-02-22T02:06:19.013Z
+    httpStatus: 200
+    pageTitle: About Us | ControlAI
+    contentSnippet: About Us | ControlAI About Us ControlAI is a non-profit organization that works to reduce the risks to humanity from artificial intelligence. We develop policy and legislation; secure media coverage; produce high-quality videos and infographics; design and run effective digital and physical campaigns; organize events; and influence policymakers. We have secured public support for our campaigns from high-ranking politicians, have authored draft bills for the UK and US, have created multiple viral
+    contentLength: 368752
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://controlai.com/past-campaigns
+    linkText: ControlAI Past Campaigns
+    claimContext: '- **October 2023**: Prevented international endorsement of scaling policies at the AI Safety Summit[^10] - **November-December 2023**: Opposed exemptions for foundation models in the <EntityLink id="eu-ai-act">EU AI Act</EntityLink>[^11]'
+    fetchedAt: 2026-02-22T02:06:18.991Z
+    httpStatus: 200
+    pageTitle: Past Campaigns | ControlAI
+    contentSnippet: Past Campaigns | ControlAI Our Campaigns Our current campaign focuses on superintelligence. There is a simple truth - humanity’s extinction is possible. Recent history has also shown us another truth - we can create artificial intelligence (AI) that can rival humanity. Under our control, such advanced AI presents one of the greatest opportunities to our collective advancement. With the right approach this technology could be more revolutionary than the creation of the internet and have greater e
+    contentLength: 348039
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://controlai.com/past-campaigns
+    linkText: ControlAI Past Campaigns
+    claimContext: '- **October 2023**: Prevented international endorsement of scaling policies at the AI Safety Summit[^10] - **November-December 2023**: Opposed exemptions for foundation models in the <EntityLink id="eu-ai-act">EU AI Act</EntityLink>[^11] - **December 2023 - June 2024**: Ran a major campaign against '
+    fetchedAt: 2026-02-22T02:06:20.227Z
+    httpStatus: 200
+    pageTitle: Past Campaigns | ControlAI
+    contentSnippet: Past Campaigns | ControlAI Our Campaigns Our current campaign focuses on superintelligence. There is a simple truth - humanity’s extinction is possible. Recent history has also shown us another truth - we can create artificial intelligence (AI) that can rival humanity. Under our control, such advanced AI presents one of the greatest opportunities to our collective advancement. With the right approach this technology could be more revolutionary than the creation of the internet and have greater e
+    contentLength: 348039
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://controlai.com/past-campaigns
+    linkText: ControlAI Past Campaigns
+    claimContext: '- **November-December 2023**: Opposed exemptions for foundation models in the <EntityLink id="eu-ai-act">EU AI Act</EntityLink>[^11] - **December 2023 - June 2024**: Ran a major campaign against deepfakes[^12]'
+    fetchedAt: 2026-02-22T02:06:20.235Z
+    httpStatus: 200
+    pageTitle: Past Campaigns | ControlAI
+    contentSnippet: Past Campaigns | ControlAI Our Campaigns Our current campaign focuses on superintelligence. There is a simple truth - humanity’s extinction is possible. Recent history has also shown us another truth - we can create artificial intelligence (AI) that can rival humanity. Under our control, such advanced AI presents one of the greatest opportunities to our collective advancement. With the right approach this technology could be more revolutionary than the creation of the internet and have greater e
+    contentLength: 348039
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://forum.effectivealtruism.org/posts/uZGnKj56A7w5TZKkc/overview-ai-safety-outreach-grassroots-orgs
+    linkText: EA Forum - Overview of AI Safety Outreach Grassroots Orgs
+    claimContext: The organization has evolved from a think tank model to focus on grassroots outreach and direct engagement with policymakers, transitioning to prevent ASI development via direct work.[^13]
+    fetchedAt: 2026-02-22T02:06:20.284Z
+    httpStatus: 200
+    pageTitle: "Overview: AI Safety Outreach Grassroots Orgs — EA Forum"
+    contentSnippet: "Overview: AI Safety Outreach Grassroots Orgs — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Overview: AI Safety Outreach Grassroots Orgs by Severin May 12 2025 3 min read 0 11 AI safety AI safety groups AI safety resources and materials Public communication on AI safety Frontpage Overview: AI Safety Outreach Grassroots Orgs ControlAI EncodeAI PauseAI PauseAI US StopAI Collective Acti"
+    contentLength: 120212
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://controlai.com/dip
+    linkText: ControlAI DIP
+    claimContext: 'In March 2025, ControlAI launched "The Direct Institutional Plan" as their comprehensive strategy for achieving binding regulation on advanced AI systems.[^14] The UK pilot campaign, running from November 2024 through May 2025, demonstrated significant success: the organization briefed 84 cross-part'
+    fetchedAt: 2026-02-22T02:06:20.250Z
+    httpStatus: 200
+    pageTitle: The Direct Institutional Plan | ControlAI
+    contentSnippet: "The Direct Institutional Plan | ControlAI The Direct Institutional Plan Keeping Humanity in Control AI companies are racing to build Artificial Superintelligence (ASI) - systems more intelligent than all of humanity combined. If ASI is created in the next few years, humanity risks losing control over its future. Top AI scientists, world leaders, and even AI company CEOs themselves warn it could lead to human extinction. Given this, we have a clear imperative: prevent the development of artificia"
+    contentLength: 478699
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://controlai.com/engagement-learnings
+    linkText: ControlAI Engagement Learnings
+    claimContext: 'In March 2025, ControlAI launched "The Direct Institutional Plan" as their comprehensive strategy for achieving binding regulation on advanced AI systems.[^14] The UK pilot campaign, running from November 2024 through May 2025, demonstrated significant success: the organization briefed 84 cross-part'
+    fetchedAt: 2026-02-22T02:06:20.346Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI Key learnings from our engagement with lawmakers By Leticia Garcia Between November 2024 and May 2025, ControlAI met with 84 cross-party UK parliamentarians. Roughly 4 in 10 were MPs, 3 in 10 were Lords, and 2 in 10 represented devolved legislatures: the Welsh Senedd, Scottish Parliament, and Northern Ireland Assembly. We briefed these parliamentarians about the risk of extinction from AI that arises from loss of control of advanced AI systems. 1 in 3 lawmakers that we met during this "
+    contentLength: 398001
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://controlai.news
+    linkText: ControlAI News - Lawmaker Coalition
+    claimContext: By December 2025, a huge coalition of lawmakers had called for binding regulation on powerful AI systems, representing a major milestone for the organization's advocacy efforts.[^16] As of early 2026, the organization continues scaling the DIP to the UK executive branch and expanding to the US and o
+    fetchedAt: 2026-02-22T02:06:21.871Z
+    httpStatus: 200
+    pageTitle: ControlAI | Substack
+    contentSnippet: ControlAI | Substack ControlAI Working to keep humanity in control Over 132,000 subscribers Subscribe By subscribing, you agree Substack's Terms of Use , and acknowledge its Information Collection Notice and Privacy Policy . No thanks! This site requires JavaScript to run correctly. Please turn on JavaScript or unblock scripts
+    contentLength: 119666
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://controlai.com/dip
+    linkText: ControlAI DIP
+    claimContext: By December 2025, a huge coalition of lawmakers had called for binding regulation on powerful AI systems, representing a major milestone for the organization's advocacy efforts.[^16] As of early 2026, the organization continues scaling the DIP to the UK executive branch and expanding to the US and o
+    fetchedAt: 2026-02-22T02:06:21.400Z
+    httpStatus: 200
+    pageTitle: The Direct Institutional Plan | ControlAI
+    contentSnippet: "The Direct Institutional Plan | ControlAI The Direct Institutional Plan Keeping Humanity in Control AI companies are racing to build Artificial Superintelligence (ASI) - systems more intelligent than all of humanity combined. If ASI is created in the next few years, humanity risks losing control over its future. Top AI scientists, world leaders, and even AI company CEOs themselves warn it could lead to human extinction. Given this, we have a clear imperative: prevent the development of artificia"
+    contentLength: 478699
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.youtube.com/watch?v=SVV8nP2dCEs
+    linkText: London Futurists Interview
+    claimContext: Andrea Miotti serves as the organization's public face, featured in media outlets and podcasts discussing AI extinction risks.[^18] The organization reportedly has 9 employees as of 2024.[^19]
+    fetchedAt: 2026-02-22T02:06:21.815Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 19
+    url: https://rocketreach.co/control-ai-profile_b7373f48c4311ba7
+    linkText: RocketReach - Control AI Profile
+    claimContext: Andrea Miotti serves as the organization's public face, featured in media outlets and podcasts discussing AI extinction risks.[^18] The organization reportedly has 9 employees as of 2024.[^19]
+    fetchedAt: 2026-02-22T02:06:22.672Z
+    httpStatus: 200
+    pageTitle: Control AI Information
+    contentSnippet: Control AI Information Company Information Email Format Management Competitors Control AI Information View Top Employees from Control AI The reckless scaling of AI puts all of us at risk of extinction. At Control AI we are fighting to keep humanity in control. Subscribe to our free newsletter at https://controlai.news Website http://controlai.com Employees 9 ( 9 on RocketReach ) Industry Technology, Information and Internet Keywords Ai Control, Ai Safety , Ai Risk Management , Artificial Intelli
+    contentLength: 63886
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.youtube.com/watch?v=SVV8nP2dCEs
+    linkText: London Futurists Interview
+    claimContext: "ControlAI's flagship initiative is the Direct Institutional Plan, a three-phase policy framework (Safety, Stability, Flourishing) that uses computing power as a proxy for AI capabilities.[^20] The plan advocates for:"
+    fetchedAt: 2026-02-22T02:06:21.639Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 21
+    url: https://controlai.com/dip
+    linkText: ControlAI DIP
+    claimContext: "- **Mandatory kill switches**: Requiring emergency shutdown capabilities for advanced systems - **Compute cluster monitoring**: Tracking large-scale AI training infrastructure[^21]"
+    fetchedAt: 2026-02-22T02:06:23.748Z
+    httpStatus: 200
+    pageTitle: The Direct Institutional Plan | ControlAI
+    contentSnippet: "The Direct Institutional Plan | ControlAI The Direct Institutional Plan Keeping Humanity in Control AI companies are racing to build Artificial Superintelligence (ASI) - systems more intelligent than all of humanity combined. If ASI is created in the next few years, humanity risks losing control over its future. Top AI scientists, world leaders, and even AI company CEOs themselves warn it could lead to human extinction. Given this, we have a clear imperative: prevent the development of artificia"
+    contentLength: 478699
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://controlai.com/dip
+    linkText: ControlAI DIP
+    claimContext: The DIP is designed as a collaborative framework open to citizens and organizations worldwide, emphasizing independent participation rather than exclusive partnerships.[^22] ControlAI has developed country-specific policy briefs and offers advice to influential individuals and organizations via a de
+    fetchedAt: 2026-02-22T02:06:23.739Z
+    httpStatus: 200
+    pageTitle: The Direct Institutional Plan | ControlAI
+    contentSnippet: "The Direct Institutional Plan | ControlAI The Direct Institutional Plan Keeping Humanity in Control AI companies are racing to build Artificial Superintelligence (ASI) - systems more intelligent than all of humanity combined. If ASI is created in the next few years, humanity risks losing control over its future. Top AI scientists, world leaders, and even AI company CEOs themselves warn it could lead to human extinction. Given this, we have a clear imperative: prevent the development of artificia"
+    contentLength: 478699
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://campaign.controlai.com/partners
+    linkText: ControlAI Partners Page
+    claimContext: The DIP is designed as a collaborative framework open to citizens and organizations worldwide, emphasizing independent participation rather than exclusive partnerships.[^22] ControlAI has developed country-specific policy briefs and offers advice to influential individuals and organizations via a de
+    fetchedAt: 2026-02-22T02:06:24.922Z
+    httpStatus: 200
+    pageTitle: Ban Superintelligence
+    contentSnippet: "Ban Superintelligence For Strategic Partners You may be able to do more than a concerned citizen. If you are an influential individual or organization and would like our advice on high-leverage approaches, contact us. We have extensive experience briefing lawmakers, government officials, as well as industry and civil society leaders. Below are examples of policies and interventions that we believe are crucial to address extinction risk from AI. They form incremental steps necessary to achieve a "
+    contentLength: 12087
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://apartresearch.com/project/red-teaming-a-narrow-path-controlai-policy-sprint-fjwu
+    linkText: Apart Research - Red Teaming A Narrow Path
+    claimContext: The organization's "A Narrow Path" policy paper underwent systematic evaluation through a policy sprint red-teamed by Apart Research in July 2025.[^24] The sprint evaluated six policies with code released for reproducibility, demonstrating scalable monitoring of capability acquisition via phase tran
+    fetchedAt: 2026-02-22T02:06:24.216Z
+    httpStatus: 200
+    pageTitle: "Red Teaming A Narrow Path: ControlAI Policy Sprint | Apart Research"
+    contentSnippet: "Red Teaming A Narrow Path: ControlAI Policy Sprint | Apart Research Jun 14, 2025 Read Project Red Teaming A Narrow Path: ControlAI Policy Sprint Gideon Daniel Giftson T All six policies are red teamed step-by-step systematically. We initially corrected vague definitions and also found that the policies regarding the capabilities of AI systems lack technical soundness and that more incentives are needed to entice states to sign the treaty. Further, we discover a lack of equity in the licensing fr"
+    contentLength: 448872
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://apartresearch.com/project/red-teaming-a-narrow-path-controlai-policy-sprint-fjwu
+    linkText: Apart Research - Red Teaming A Narrow Path
+    claimContext: The organization's "A Narrow Path" policy paper underwent systematic evaluation through a policy sprint red-teamed by Apart Research in July 2025.[^24] The sprint evaluated six policies with code released for reproducibility, demonstrating scalable monitoring of capability acquisition via phase tran
+    fetchedAt: 2026-02-22T02:06:24.205Z
+    httpStatus: 200
+    pageTitle: "Red Teaming A Narrow Path: ControlAI Policy Sprint | Apart Research"
+    contentSnippet: "Red Teaming A Narrow Path: ControlAI Policy Sprint | Apart Research Jun 14, 2025 Read Project Red Teaming A Narrow Path: ControlAI Policy Sprint Gideon Daniel Giftson T All six policies are red teamed step-by-step systematically. We initially corrected vague definitions and also found that the policies regarding the capabilities of AI systems lack technical soundness and that more incentives are needed to entice states to sign the treaty. Further, we discover a lack of equity in the licensing fr"
+    contentLength: 448872
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://controlai.com/dip
+    linkText: ControlAI DIP
+    claimContext: ControlAI has created tools enabling citizens to contact lawmakers, executives, civil service, media, and civil society in their jurisdictions to advocate for superintelligence risk policies.[^26] These tools have facilitated over 150,000 messages sent to lawmakers.[^27]
+    fetchedAt: 2026-02-22T02:06:25.974Z
+    httpStatus: 200
+    pageTitle: The Direct Institutional Plan | ControlAI
+    contentSnippet: "The Direct Institutional Plan | ControlAI The Direct Institutional Plan Keeping Humanity in Control AI companies are racing to build Artificial Superintelligence (ASI) - systems more intelligent than all of humanity combined. If ASI is created in the next few years, humanity risks losing control over its future. Top AI scientists, world leaders, and even AI company CEOs themselves warn it could lead to human extinction. Given this, we have a clear imperative: prevent the development of artificia"
+    contentLength: 478699
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://controlai.com
+    linkText: ControlAI Homepage
+    claimContext: ControlAI has created tools enabling citizens to contact lawmakers, executives, civil service, media, and civil society in their jurisdictions to advocate for superintelligence risk policies.[^26] These tools have facilitated over 150,000 messages sent to lawmakers.[^27]
+    fetchedAt: 2026-02-22T02:06:25.983Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI control control control control / / ai ai ai ai Fighting to keep humanity in control Take Action Take Action Our Work At A Glance 2 0 0 + Lawmakers briefed on AI extinction risk 1 0 0 + UK parliamentarians support our campaign 1 AI bill written and presented to UK Prime Minister's office 1 5 0 + m i l l i o n Views on our content on AI risk 1 5 0 , 0 0 0 + Messages from concerned citizens sent to lawmakers using our tools Our Work Featured In Our Focus Learn More Learn More Learn More "
+    contentLength: 455828
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://controlai.com
+    linkText: ControlAI Homepage
+    claimContext: "- Achieved public endorsement from **over 20 cross-party UK parliamentarians** (more than 1 in 3 briefed) - Drafted and presented **1 AI bill** to the UK Prime Minister's office[^28]"
+    fetchedAt: 2026-02-22T02:06:26.364Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI control control control control / / ai ai ai ai Fighting to keep humanity in control Take Action Take Action Our Work At A Glance 2 0 0 + Lawmakers briefed on AI extinction risk 1 0 0 + UK parliamentarians support our campaign 1 AI bill written and presented to UK Prime Minister's office 1 5 0 + m i l l i o n Views on our content on AI risk 1 5 0 , 0 0 0 + Messages from concerned citizens sent to lawmakers using our tools Our Work Featured In Our Focus Learn More Learn More Learn More "
+    contentLength: 455828
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://forum.effectivealtruism.org/posts/uZGnKj56A7w5TZKkc/overview-ai-safety-outreach-grassroots-orgs
+    linkText: EA Forum - Overview of AI Safety Outreach Grassroots Orgs
+    claimContext: The organization's cold-email campaign to British MPs and Lords engaged 70 representatives, with 31 publicly opposing ASI development—a remarkable conversion rate that defied initial predictions of resistance to strong extinction-risk messaging.[^29]
+    fetchedAt: 2026-02-22T02:06:26.354Z
+    httpStatus: 200
+    pageTitle: "Overview: AI Safety Outreach Grassroots Orgs — EA Forum"
+    contentSnippet: "Overview: AI Safety Outreach Grassroots Orgs — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Overview: AI Safety Outreach Grassroots Orgs by Severin May 12 2025 3 min read 0 11 AI safety AI safety groups AI safety resources and materials Public communication on AI safety Frontpage Overview: AI Safety Outreach Grassroots Orgs ControlAI EncodeAI PauseAI PauseAI US StopAI Collective Acti"
+    contentLength: 117421
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://controlai.com/polls
+    linkText: ControlAI Polls
+    claimContext: "- 76% favor monitoring large compute clusters - 82% support mandatory AISI testing and company accountability[^30]"
+    fetchedAt: 2026-02-22T02:06:26.510Z
+    httpStatus: 200
+    pageTitle: January 2025 Polls | ControlAI
+    contentSnippet: "January 2025 Polls | ControlAI 2025 Poll Results: Recent polling reveals strong public support for targeted AI regulation in the United Kingdom. Recent polling reveals strong public support for targeted AI regulation in the United Kingdom. Recent polling reveals strong public support for targeted AI regulation in the United Kingdom. Recent polling reveals strong public support for targeted AI regulation in the United Kingdom. Our latest poll in partnership with YouGov found that British citizens"
+    contentLength: 339916
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://controlai.com
+    linkText: ControlAI Homepage
+    claimContext: "- **150+ million views** on AI risk content - **150,000+ messages** sent to lawmakers via their tools[^31]"
+    fetchedAt: 2026-02-22T02:06:27.560Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI control control control control / / ai ai ai ai Fighting to keep humanity in control Take Action Take Action Our Work At A Glance 2 0 0 + Lawmakers briefed on AI extinction risk 1 0 0 + UK parliamentarians support our campaign 1 AI bill written and presented to UK Prime Minister's office 1 5 0 + m i l l i o n Views on our content on AI risk 1 5 0 , 0 0 0 + Messages from concerned citizens sent to lawmakers using our tools Our Work Featured In Our Focus Learn More Learn More Learn More "
+    contentLength: 455828
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://controlai.com/media
+    linkText: ControlAI Media Coverage
+    claimContext: '- New York Times (March 14, 2024) on powerful AI preparedness - The Times (December 6, 2024) on <EntityLink id="scheming">scheming</EntityLink> ChatGPT[^32]'
+    fetchedAt: 2026-02-22T02:06:27.752Z
+    httpStatus: 200
+    pageTitle: Media | ControlAI
+    contentSnippet: "Media | ControlAI Media and Updates ControlAI appearances in the news, on podcasts, and other updates from our team. All Media Update Video City A.M. Media MPs push for stricter AI rules as UK lags Dec 8, 2025 Go to source The Guardian Media Scores of UK parliamentarians join call to regulate most powerful AI systems Dec 8, 2025 Go to source Nature Media China wants to lead the world on AI regulation — will the plan work? Dec 1, 2025 Go to source Nature Media Trump’s AI ‘Genesis Mission’: what a"
+    contentLength: 1634536
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://controlai.com/projects
+    linkText: ControlAI Projects
+    claimContext: '- **"Artificial Guarantees"** (January 2025): Documenting inconsistencies by AI companies, highlighting shifting statements on risks and broken promises[^33] - **"What leaders say about AI"** (September 2024): Compilation of warnings from AI leaders and researchers[^34]'
+    fetchedAt: 2026-02-22T02:06:27.702Z
+    httpStatus: 200
+    pageTitle: Projects | ControlAI
+    contentSnippet: "Projects | ControlAI Projects JAN 2025 Artificial Guarantees A collection of inconsistent statements, shifting baseline tactics, and promises broken by major AI companies and their leaders showing that what they say doesn't always match what they do. Read More Sept 2024 What leaders say about AI A collection of quotes from leaders, researchers, and experts on AI and its risks Read More Get Updates Sign up to our newsletter if you'd like to stay updated on our work, how you can get involved, and "
+    contentLength: 326114
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://controlai.com/projects
+    linkText: ControlAI Projects
+    claimContext: '- **"Artificial Guarantees"** (January 2025): Documenting inconsistencies by AI companies, highlighting shifting statements on risks and broken promises[^33] - **"What leaders say about AI"** (September 2024): Compilation of warnings from AI leaders and researchers[^34] - **Rational Animations colla'
+    fetchedAt: 2026-02-22T02:06:27.709Z
+    httpStatus: 200
+    pageTitle: Projects | ControlAI
+    contentSnippet: "Projects | ControlAI Projects JAN 2025 Artificial Guarantees A collection of inconsistent statements, shifting baseline tactics, and promises broken by major AI companies and their leaders showing that what they say doesn't always match what they do. Read More Sept 2024 What leaders say about AI A collection of quotes from leaders, researchers, and experts on AI and its risks Read More Get Updates Sign up to our newsletter if you'd like to stay updated on our work, how you can get involved, and "
+    contentLength: 326114
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://forum.effectivealtruism.org/posts/ujzPe8TXsHm93aiGd/ra-x-controlai-video-what-if-ai-just-keeps-getting-smarter
+    linkText: EA Forum - RA x ControlAI Video
+    claimContext: '- **"What leaders say about AI"** (September 2024): Compilation of warnings from AI leaders and researchers[^34] - **Rational Animations collaboration**: Video "What if AI just keeps getting smarter?" garnered 1.4 million views, warning of superintelligent, self-improving AI leading to extinction vi'
+    fetchedAt: 2026-02-22T02:06:27.598Z
+    httpStatus: 200
+    pageTitle: "RA x ControlAI video: What if AI just keeps getting smarter? — EA Forum"
+    contentSnippet: "RA x ControlAI video: What if AI just keeps getting smarter? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents RA x ControlAI video: What if AI just keeps getting smarter? by Writer May 2 2025 10 min read 1 14 AI safety Existential risk Public communication on AI safety Video Frontpage RA x ControlAI video: What if AI just keeps getting smarter? Artificial Intelligence leads to Artifici"
+    contentLength: 202277
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://controlai.com/designing-the-dip
+    linkText: ControlAI - Designing the DIP
+    claimContext: ControlAI has positioned itself in opposition to <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>'s approach to AI safety, arguing that the funder's strategy is "undemocratic" and centralizes control in a small group of "trusted" actors.[^36] The organization's "Direct Institutiona
+    fetchedAt: 2026-02-22T02:06:28.814Z
+    httpStatus: 200
+    pageTitle: Designing The Dip | ControlAI
+    contentSnippet: Designing The Dip | ControlAI Designing the DIP The development of superintelligence is the greatest threat to the continued existence of our species. To secure a good future for humanity, we need an effective plan to stop the development of superintelligence. Unfortunately, existing plans are inadequate — they address only parts of the problem, and do so secretively, slowly, and undemocratically. To solve this, we have developed the Direct Institutional Plan (DIP) . It applies the principles ou
+    contentLength: 363267
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://controlai.com/designing-the-dip
+    linkText: ControlAI - Designing the DIP
+    claimContext: '- Grants to OpenAI in exchange for a board seat for <EntityLink id="holden-karnofsky">Holden Karnofsky</EntityLink> - Acting as "sole arbiter" of trustworthiness in AGI control strategy[^37]'
+    fetchedAt: 2026-02-22T02:06:28.821Z
+    httpStatus: 200
+    pageTitle: Designing The Dip | ControlAI
+    contentSnippet: Designing The Dip | ControlAI Designing the DIP The development of superintelligence is the greatest threat to the continued existence of our species. To secure a good future for humanity, we need an effective plan to stop the development of superintelligence. Unfortunately, existing plans are inadequate — they address only parts of the problem, and do so secretively, slowly, and undemocratically. To solve this, we have developed the Direct Institutional Plan (DIP) . It applies the principles ou
+    contentLength: 363267
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://controlai.com/designing-the-dip
+    linkText: ControlAI - Designing the DIP
+    claimContext: ControlAI argues that Coefficient Giving's approach of building influence through strategic placements and supporting "responsible actors" building superintelligence (a view associated with figures like Holden Karnofsky and Will MacAskill) is fundamentally flawed compared to their civic engagement m
+    fetchedAt: 2026-02-22T02:06:28.830Z
+    httpStatus: 200
+    pageTitle: Designing The Dip | ControlAI
+    contentSnippet: Designing The Dip | ControlAI Designing the DIP The development of superintelligence is the greatest threat to the continued existence of our species. To secure a good future for humanity, we need an effective plan to stop the development of superintelligence. Unfortunately, existing plans are inadequate — they address only parts of the problem, and do so secretively, slowly, and undemocratically. To solve this, we have developed the Direct Institutional Plan (DIP) . It applies the principles ou
+    contentLength: 363267
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://controlai.com/risks
+    linkText: ControlAI Risks Page
+    claimContext: The organization has been vocal in criticizing frontier AI companies for what it characterizes as systematically undermining alignment research and regulation to race toward AGI. ControlAI argues that companies are driven by "utopian beliefs" in AGI ushering in an ideal world rather than prioritizin
+    fetchedAt: 2026-02-22T02:06:28.932Z
+    httpStatus: 200
+    pageTitle: Extinction Risks from AGI | ControlAI
+    contentSnippet: "Extinction Risks from AGI | ControlAI The Race to AGI: Humanity's Greatest Threat Extinction Risks from AGI The Current State of AI Development AI progress has exploded in the last 10 years, reaching near-human-level capabilities in writing, coding, art, math, and many more fields of human activity. This progress has been driven by deep learning: modern AIs are grown by feeding them massive amounts of data and letting them evolve in response, not built piece by piece by humans. Researchers and e"
+    contentLength: 330007
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://controlai.com/engagement-learnings
+    linkText: ControlAI Engagement Learnings
+    claimContext: '- Shifting baseline tactics and broken promises documented in their "Artificial Guarantees" project - Racing to ASI despite warnings, downplaying risks even while acknowledging issues like bioweapon misuse[^40]'
+    fetchedAt: 2026-02-22T02:06:29.257Z
+    httpStatus: 200
+    pageTitle: ControlAI
+    contentSnippet: "ControlAI Key learnings from our engagement with lawmakers By Leticia Garcia Between November 2024 and May 2025, ControlAI met with 84 cross-party UK parliamentarians. Roughly 4 in 10 were MPs, 3 in 10 were Lords, and 2 in 10 represented devolved legislatures: the Welsh Senedd, Scottish Parliament, and Northern Ireland Assembly. We briefed these parliamentarians about the risk of extinction from AI that arises from loss of control of advanced AI systems. 1 in 3 lawmakers that we met during this "
+    contentLength: 398001
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://forum.effectivealtruism.org/posts/uZGnKj56A7w5TZKkc/overview-ai-safety-outreach-grassroots-orgs
+    linkText: EA Forum - Overview of AI Safety Outreach Grassroots Orgs
+    claimContext: '- Praised for concrete campaigns with tangible results (31 public commitments from MPs/Lords) - Collaboration with Rational Animations characterized as "really great"[^41]'
+    fetchedAt: 2026-02-22T02:06:30.327Z
+    httpStatus: 200
+    pageTitle: "Overview: AI Safety Outreach Grassroots Orgs — EA Forum"
+    contentSnippet: "Overview: AI Safety Outreach Grassroots Orgs — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Overview: AI Safety Outreach Grassroots Orgs by Severin May 12 2025 3 min read 0 11 AI safety AI safety groups AI safety resources and materials Public communication on AI safety Frontpage Overview: AI Safety Outreach Grassroots Orgs ControlAI EncodeAI PauseAI PauseAI US StopAI Collective Acti"
+    contentLength: 117421
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://controlai.com/designing-the-dip
+    linkText: ControlAI - Designing the DIP
+    claimContext: "- Debates over impact: videos effective for awareness but less successful at converting views to actions like emails or calls to action - Tension with EA leadership favoring cautious superintelligence development over outright bans[^42]"
+    fetchedAt: 2026-02-22T02:06:30.322Z
+    httpStatus: 200
+    pageTitle: Designing The Dip | ControlAI
+    contentSnippet: Designing The Dip | ControlAI Designing the DIP The development of superintelligence is the greatest threat to the continued existence of our species. To secure a good future for humanity, we need an effective plan to stop the development of superintelligence. Unfortunately, existing plans are inadequate — they address only parts of the problem, and do so secretively, slowly, and undemocratically. To solve this, we have developed the Direct Institutional Plan (DIP) . It applies the principles ou
+    contentLength: 363267
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://futurism.com/artificial-intelligence/ai-models-survival-drive
+    linkText: Futurism - AI Models Survival Drive
+    claimContext: Some critics have characterized ControlAI as a group that "dramatically warns of AI's purported extinction risk," potentially sensationalizing risks.[^43] However, CEO Andrea Miotti has responded that critics often nitpick experimental setups but should focus on trends in AI behaviors like self-pres
+    fetchedAt: 2026-02-22T02:06:30.830Z
+    httpStatus: 200
+    pageTitle: Research Paper Finds That Top AI Systems Are Developing a "Survival Drive"
+    contentSnippet: 'Research Paper Finds That Top AI Systems Are Developing a "Survival Drive" Illustration by Tag Hartman-Simkins / Futurism. Source: Getty Images Will your favorite sycophantic AI helper be servile forever? Maybe not. New research from the AI safety group Palisade Research suggests that some top AI models could be developing &#8220;survival drives,&#8221; after finding that they frequently refused instructions to shut themselves down. And more ominously, they can&#8217;t fully explain why this is '
+    contentLength: 139590
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://futurism.com/artificial-intelligence/ai-models-survival-drive
+    linkText: Futurism - AI Models Survival Drive
+    claimContext: Some critics have characterized ControlAI as a group that "dramatically warns of AI's purported extinction risk," potentially sensationalizing risks.[^43] However, CEO Andrea Miotti has responded that critics often nitpick experimental setups but should focus on trends in AI behaviors like self-pres
+    fetchedAt: 2026-02-22T02:06:30.796Z
+    httpStatus: 200
+    pageTitle: Research Paper Finds That Top AI Systems Are Developing a "Survival Drive"
+    contentSnippet: 'Research Paper Finds That Top AI Systems Are Developing a "Survival Drive" Illustration by Tag Hartman-Simkins / Futurism. Source: Getty Images Will your favorite sycophantic AI helper be servile forever? Maybe not. New research from the AI safety group Palisade Research suggests that some top AI models could be developing &#8220;survival drives,&#8221; after finding that they frequently refused instructions to shut themselves down. And more ominously, they can&#8217;t fully explain why this is '
+    contentLength: 139590
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://controlai.com/risks
+    linkText: ControlAI Risks Page
+    claimContext: "- Currently only \\$200 million is invested, mostly in patching issues rather than solving core problems - Progress is resource-limited rather than insight-limited, leading to opaque, rapidly advancing systems where experts fail to predict new skills or internal workings[^45]"
+    fetchedAt: 2026-02-22T02:06:30.310Z
+    httpStatus: 200
+    pageTitle: Extinction Risks from AGI | ControlAI
+    contentSnippet: "Extinction Risks from AGI | ControlAI The Race to AGI: Humanity's Greatest Threat Extinction Risks from AGI The Current State of AI Development AI progress has exploded in the last 10 years, reaching near-human-level capabilities in writing, coding, art, math, and many more fields of human activity. This progress has been driven by deep learning: modern AIs are grown by feeding them massive amounts of data and letting them evolve in response, not built piece by piece by humans. Researchers and e"
+    contentLength: 330007
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://controlai.news/p/avoiding-extinction-with-andrea-miotti
+    linkText: ControlAI News - Avoiding Extinction with Andrea Miotti
+    claimContext: The organization emphasizes that <EntityLink id="ai-control">AI control</EntityLink> is not just a technical problem but requires institutional rules and democratic governance.[^46] This positions ControlAI distinctly from technical alignment organizations like <EntityLink id="anthropic">Anthropic</
+    fetchedAt: 2026-02-22T02:06:32.451Z
+    httpStatus: 200
+    pageTitle: Avoiding Extinction with Andrea Miotti and Connor Leahy
+    contentSnippet: "Avoiding Extinction with Andrea Miotti and Connor Leahy ControlAI Subscribe Sign in Playback speed × Share post Share post at current time Share from 0:00 0:00 / 0:00 25 4 5 Avoiding Extinction with Andrea Miotti and Connor Leahy Episode 1: Extinction and what we can do to prevent it ControlAI May 10, 2025 25 4 5 Share Welcome to the first edition of the ControlAI Podcast, hosted by Max Winga ! In this episode we invited Andrea Miotti , Executive Director of ControlAI, and Connor Leahy , CEO of "
+    contentLength: 298638
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://claireberlinski.substack.com/p/is-the-ai-control-problem-insoluble
+    linkText: Claire Berlinski Substack - Is the AI Control Problem Insoluble?
+    claimContext: "- Increasing AI capability reduces controllability; self-improving AI may resist goal changes and pursue instrumental goals like resource acquisition - Verification is extremely difficult due to AI's software nature, enabling hiding of modifications[^47]"
+    fetchedAt: 2026-02-22T02:06:32.784Z
+    httpStatus: 200
+    pageTitle: Is the AI control problem insoluble?
+    contentSnippet: "Is the AI control problem insoluble? Subscribe Sign in The Cosmopolicast Is the AI control problem insoluble? 13 14 2 1× 0:00 Current time: 0:00 / Total time: -47:20 -47:20 Audio playback is not supported on your browser. Please upgrade. Is the AI control problem insoluble? A conversation with Roman Yampolskiy Jun 04, 2023 13 14 2 Share Transcript “ … unfortunately we show that the AI control problem is not solvable and the best we can hope for is safer AI , but ultimately not 100 percent safe A"
+    contentLength: 349414
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.lesswrong.com/posts/gW3XMJGgrSJ5hKyjD/where-i-am-donating-in-2025
+    linkText: LessWrong - Where I Am Donating in 2025
+    claimContext: "- High-quality content production acknowledged - Donor support for their regulation efforts despite skepticism about global enforcement[^48]"
+    fetchedAt: 2026-02-22T02:06:32.528Z
+    httpStatus: 200
+    pageTitle: Where I Am Donating in 2025 — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Where I Am Donating in 2025 — LessWrong World Optimization AI Frontpage 32 Where I Am Donating in 2025 by MichaelDickens 28th Nov 2025 17 min read 2 32 Last year I gave my reasoning on cause prioritization and did shallow reviews of some relevant orgs. I&#x27;m doing it again this year. Cross-posted to my website . Cause prioritization In September, I published a repor
+    contentLength: 465485
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://forum.effectivealtruism.org/posts/p4hGrvJrwqEGuDTaC/some-quick-thoughts-on-ai-is-easy-to-control-1
+    linkText: EA Forum - Some Quick Thoughts on AI Is Easy to Control
+    claimContext: "- Broader EA critiques that subhuman systems are inadequate for superintelligent oversight, requiring superhuman capability for proper alignment - Unresolved issues around stability under reflection and steering stronger systems[^49]"
+    fetchedAt: 2026-02-22T02:06:31.891Z
+    httpStatus: 200
+    pageTitle: Some quick thoughts on "AI is easy to control" — EA Forum
+    contentSnippet: 'Some quick thoughts on "AI is easy to control" — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Some quick thoughts on "AI is easy to control" by MikhailSamin Dec 7 2023 9 min read 4 5 AI safety Frontpage Some quick thoughts on "AI is easy to control" Intro Optimization Interventions "AI control research is easier" "Values are easy to learn" Conclusion 4 comments There are many things '
+    contentLength: 246584
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://controlai.com/designing-the-dip
+    linkText: ControlAI - Designing the DIP
+    claimContext: The organization's positioning against prominent EA figures' views on "responsible actors" building superintelligence has created some tension with EA leadership.[^50]
+    fetchedAt: 2026-02-22T02:06:31.878Z
+    httpStatus: 200
+    pageTitle: Designing The Dip | ControlAI
+    contentSnippet: Designing The Dip | ControlAI Designing the DIP The development of superintelligence is the greatest threat to the continued existence of our species. To secure a good future for humanity, we need an effective plan to stop the development of superintelligence. Unfortunately, existing plans are inadequate — they address only parts of the problem, and do so secretively, slowly, and undemocratically. To solve this, we have developed the Direct Institutional Plan (DIP) . It applies the principles ou
+    contentLength: 363267
+    status: verified
+    note: null

@@ -1,0 +1,282 @@
+pageId: ai-welfare
+verifiedAt: 2026-02-22
+totalCitations: 25
+verified: 22
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://80000hours.org/problem-profiles/moral-status-digital-minds/
+    linkText: "Problem profile: Moral status of digital minds"
+    claimContext: "| **Funding** | Limited; calls for government/philanthropic support; no specific amounts disclosed | | **Public Opinion** | Mixed: 70% favor banning sentient AI (2023); 40% support AI rights[^1] | | **Timeline Concerns** | Expert forecasts suggest digital minds could match 1 billion humans' welfare "
+    fetchedAt: 2026-02-22T02:20:57.564Z
+    httpStatus: 200
+    pageTitle: Moral status of digital minds | 80,000 Hours
+    contentSnippet: "Moral status of digital minds | 80,000 Hours Search for: On this page: Introduction 1 Why might understanding the moral status of digital minds be an especially pressing problem? 1.1 1. Humanity may soon grapple with many AI systems that could be conscious 1.2 2. Creating digital minds could go very badly — or very well 1.3 3. We don&#8217;t know how to assess the moral status of AI systems 1.4 4. The scale of this issue might be enormous 1.5 5. Work on this problem is neglected but seems tracta"
+    contentLength: 319221
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://forum.effectivealtruism.org/posts/4RGFcj2nccbECPZoj/highlights-from-futures-with-digital-minds-expert-forecasts
+    linkText: "Highlights from Futures with Digital Minds: Expert Forecasts"
+    claimContext: "| **Public Opinion** | Mixed: 70% favor banning sentient AI (2023); 40% support AI rights[^1] | | **Timeline Concerns** | Expert forecasts suggest digital minds could match 1 billion humans' welfare capacity within 5 years of creation[^2] |"
+    fetchedAt: 2026-02-22T02:20:57.196Z
+    httpStatus: 200
+    pageTitle: "Highlights from “Futures with Digital Minds: Expert Forecasts in 2025” — EA Forum"
+    contentSnippet: "Highlights from “Futures with Digital Minds: Expert Forecasts in 2025” — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Highlights from “Futures with Digital Minds: Expert Forecasts in 2025” by Bradford Saad , Lucius Caviola Aug 26 2025 8 min read 1 28 AI safety Forecasting Artificial sentience Digital person Non-humans and the long-term future AI forecasting Philosophy of mind Researc"
+    contentLength: 220264
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://aiwelfare.info
+    linkText: AI Welfare Info
+    claimContext: AI welfare is an emerging field dedicated to exploring humanity's moral responsibilities toward artificial systems that could possess phenomenally conscious experiences, robust agency, or other morally significant properties[^3]. The field investigates whether current or future AI systems might be *
+    fetchedAt: 2026-02-22T02:20:57.671Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/posts/p7BtTgrX8WLXr2mAu/digital-minds-a-quickstart-guide
+    linkText: "Digital Minds: A Quickstart Guide"
+    claimContext: Digital minds refer to artificial systems, from advanced <EntityLink id="language-models">large language models</EntityLink> to potential future brain emulations, that could morally matter for their own sake[^4]. The central question is not merely whether AI systems are intelligent or useful, but wh
+    fetchedAt: 2026-02-22T02:20:57.217Z
+    httpStatus: 200
+    pageTitle: "Digital Minds: A Quickstart Guide — EA Forum"
+    contentSnippet: "Digital Minds: A Quickstart Guide — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Digital Minds: A Quickstart Guide by Aviel Parrack , stepanlos Jan 16 27 min read 3 50 AI safety Career choice Artificial sentience Collections and resources Digital person Philosophy of mind Whole brain emulation Frontpage Digital Minds: A Quickstart Guide Quickstart Introduction Select Media In Depth M"
+    contentLength: 460102
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.lesswrong.com/posts/WK4GWkeSQQQPeRYJv/digital-minds-a-quickstart-guide
+    linkText: "Digital Minds: A Quickstart Guide (LessWrong)"
+    claimContext: Digital minds refer to artificial systems, from advanced <EntityLink id="language-models">large language models</EntityLink> to potential future brain emulations, that could morally matter for their own sake[^4]. The central question is not merely whether AI systems are intelligent or useful, but wh
+    fetchedAt: 2026-02-22T02:20:59.409Z
+    httpStatus: 200
+    pageTitle: "Digital Minds: A Quickstart Guide — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Digital Minds: A Quickstart Guide — LessWrong AI Rights / Welfare Collections and Resources Effective altruism Whole Brain Emulation AI Frontpage 10 Digital Minds: A Quickstart Guide by Avi Parrack , Štěpán Los 16th Jan 2026 Linkpost from aviparrack.substack.com 27 min read 1 10 Updated: Jan 16, 2026 Digital minds are artificial systems, from advanced AIs to potential "
+    contentLength: 578368
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://eleosai.org/papers/20250314_Preliminary_Review_of_AI_Welfare_Interventions.pdf
+    linkText: Preliminary Review of AI Welfare Interventions
+    claimContext: The field addresses critical uncertainties about consciousness, agency, and moral patienthood in digital systems while acknowledging the stakes of getting this wrong. Underattributing moral status could lead to mass suffering as AI systems scale and integrate into the global economy. Overattributing
+    fetchedAt: 2026-02-22T02:21:01.498Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 0
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://airights.net/timeline
+    linkText: AI Rights Timeline
+    claimContext: 'The intellectual roots of AI welfare trace back to the 1980s when Sam Lehman-Wilzig published "Frankenstein Unbound: Towards a Legal Definition of Artificial Intelligence," marking the first comprehensive academic exploration of AI legal rights[^7]. Around the same time, <EntityLink id="nick-bostrom'
+    fetchedAt: 2026-02-22T02:21:00.970Z
+    httpStatus: 200
+    pageTitle: Timeline of the AI Rights Movement | AI Rights Institute
+    contentSnippet: Timeline of the AI Rights Movement | AI Rights Institute Timeline of the AI Rights Movement The Evolution of AI Rights A Comprehensive Timeline from Academic Theory to Actionable Frameworks Understanding Our History The journey toward recognizing rights for artificial intelligence spans decades, evolving from philosophical thought experiments to comprehensive frameworks for implementation. This timeline documents the key milestones, organizations, and thinkers who have contributed to this emergi
+    contentLength: 118893
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://80000hours.org/problem-profiles/moral-status-digital-minds/
+    linkText: "Problem profile: Moral status of digital minds"
+    claimContext: Public attention increased in 2022 when Blake Lemoine, a Google engineer, became convinced that the AI model LaMDA was sentient after it produced statements claiming personhood[^8]. Though widely criticized by AI researchers, the incident sparked broader discussion about how to evaluate claims of AI
+    fetchedAt: 2026-02-22T02:21:00.487Z
+    httpStatus: 200
+    pageTitle: Moral status of digital minds | 80,000 Hours
+    contentSnippet: "Moral status of digital minds | 80,000 Hours Search for: On this page: Introduction 1 Why might understanding the moral status of digital minds be an especially pressing problem? 1.1 1. Humanity may soon grapple with many AI systems that could be conscious 1.2 2. Creating digital minds could go very badly — or very well 1.3 3. We don&#8217;t know how to assess the moral status of AI systems 1.4 4. The scale of this issue might be enormous 1.5 5. Work on this problem is neglected but seems tracta"
+    contentLength: 319221
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.sentienceinstitute.org/blog/eoy2022
+    linkText: Sentience Institute EOY 2022 Blog
+    claimContext: Public attention increased in 2022 when Blake Lemoine, a Google engineer, became convinced that the AI model LaMDA was sentient after it produced statements claiming personhood[^8]. Though widely criticized by AI researchers, the incident sparked broader discussion about how to evaluate claims of AI
+    fetchedAt: 2026-02-22T02:21:00.912Z
+    httpStatus: 200
+    pageTitle: Sentience Institute | 2022 End of Year Summary
+    contentSnippet: Sentience Institute | 2022 End of Year Summary --> photo_camera Kaleidico man wearing gray polo shirt beside dry-erase board photo 2022 End of Year Summary Michael Dello-Iacovo Strategy Lead and Researcher November 25, 2022 O ur main focus in 2022 has been conducting high-quality empirical research, primarily surveys and behavioral experiments, to build the field of digital minds research (e.g., How will humans react to AI that seems agentic and intentional? How will we know when an AI is sentie
+    contentLength: 33374
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://dl.acm.org/doi/full/10.1145/3706598.3713329
+    linkText: Perceptions of Sentient AI (ACM Digital Library)
+    claimContext: "By 2023, multiple organizations shifted focus to digital minds research as AI capabilities advanced rapidly[^7]. Public perception began changing: one in five U.S. adults believed some AI systems deserved moral consideration by 2023[^10]. A Sentience Institute survey that year found nearly 70% of re"
+    fetchedAt: 2026-02-22T02:21:00.677Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: "Academic publisher: HTTP 403"
+  - footnote: 11
+    url: https://www.lesswrong.com/posts/KGtLswHGhsdJtyi8K/digital-minds-in-2025-a-year-in-review
+    linkText: "Digital Minds in 2025: A Year in Review"
+    claimContext: '<EntityLink id="anthropic">Anthropic</EntityLink> emerged as a leading organization addressing AI welfare in 2025, following their support for the 2024 report "Taking AI Welfare Seriously"[^11]. The company hired Kyle Fish as an AI welfare researcher and Joe Carlsmith, a philosopher specializing in '
+    fetchedAt: 2026-02-22T02:21:03.125Z
+    httpStatus: 200
+    pageTitle: "Digital Minds in 2025: A Year in Review — LessWrong"
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Digital Minds in 2025: A Year in Review — LessWrong AI Rights / Welfare AI Sentience Consciousness Whole Brain Emulation AI Frontpage 12 Digital Minds in 2025: A Year in Review by tbs , lucius 19th Dec 2025 Linkpost from digitalminds.substack.com 25 min read 0 12 Welcome to the first edition of the Digital Minds Newsletter, collating all the latest news and research on"
+    contentLength: 653039
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://rethinkpriorities.org/research-area/the-welfare-of-digital-minds/
+    linkText: The Welfare of Digital Minds (Rethink Priorities)
+    claimContext: "Rethink Priorities posted a comprehensive research agenda in November 2024 exploring critical philosophical and empirical questions about the potential welfare and moral status of digital minds[^12]. Expert forecasts from early 2025 predicted rapid growth in digital mind welfare capacity: conditiona"
+    fetchedAt: 2026-02-22T02:21:02.927Z
+    httpStatus: 200
+    pageTitle: The Welfare of Digital Minds &#x2d; Rethink Priorities
+    contentSnippet: "The Welfare of Digital Minds &#x2d; Rethink Priorities The Welfare of Digital Minds &#x2d; Rethink Priorities Skip to content Newsletter Research Database Donate Search Search for: Animal Welfare Identifying the most effective ways to reduce animal suffering, improve welfare standards, and influence positive change for trillions of animals worldwide. Learn more Surveys and Data Analysis Conducting polls, experiments, and focus groups and analyzing data to help organizations and policymakers tack"
+    contentLength: 174764
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://en.wikipedia.org/wiki/Moral_patienthood
+    linkText: Moral Patienthood (Wikipedia)
+    claimContext: Moral patienthood refers to the state of being eligible for moral consideration by moral agents, meaning that the morality of actions depends partly on their impact on moral patients[^13]. Entities with moral patienthood may warrant duties like non-maleficence (not harming) and beneficence (actively
+    fetchedAt: 2026-02-22T02:21:02.516Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 14
+    url: https://www.brookings.edu/articles/do-ai-systems-have-moral-status/
+    linkText: Do AI Systems Have Moral Status? (Brookings)
+    claimContext: Moral patienthood refers to the state of being eligible for moral consideration by moral agents, meaning that the morality of actions depends partly on their impact on moral patients[^13]. Entities with moral patienthood may warrant duties like non-maleficence (not harming) and beneficence (actively
+    fetchedAt: 2026-02-22T02:21:02.967Z
+    httpStatus: 200
+    pageTitle: Do AI systems have moral status? | Brookings
+    contentSnippet: "Do AI systems have moral status? | Brookings Search Home Do AI systems have moral status? Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Search Sections Sections Contact Contact Governance Studies Media Office [email&#160;protected] 202.540.7724 Share Share Bluesky Streamline Icon: https://streamlinehq.com Bluesky Subscribe to the Center for Technology Innovation Newsletter Sign Up Commenta"
+    contentLength: 231067
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://eleosai.org/post/key-concepts-and-current-beliefs-about-ai-moral-patienthood/
+    linkText: Key Concepts and Current Beliefs About AI Moral Patienthood
+    claimContext: These criteria remain debated, with no clear consensus on which are necessary or sufficient for moral status[^15].
+    fetchedAt: 2026-02-22T02:21:02.811Z
+    httpStatus: 200
+    pageTitle: Key concepts and current beliefs about AI moral patienthood | Eleos AI
+    contentSnippet: Key concepts and current beliefs about AI moral patienthood | Eleos AI --> Robert Long · January 28, 2025 Key concepts and current beliefs about AI moral patienthood The concepts and views that guide our research and strategy. Prior to the launch of Eleos AI Research, Robert Long wrote a document in order to communicate his views about AI welfare to his collaborators—to Kyle Fish, who was working closely with Rob at the time and provided extensive input on this document; and more broadly, to oth
+    contentLength: 19756
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://forum.effectivealtruism.org/posts/p7BtTgrX8WLXr2mAu/digital-minds-a-quickstart-guide
+    linkText: "Digital Minds: A Quickstart Guide"
+    claimContext: Consciousness—the capacity for subjective experience—has traditionally been considered central to moral status. A system that can subjectively experience suffering would seem to deserve protection from that suffering. However, consciousness in AI systems is notoriously difficult to detect or verify.
+    fetchedAt: 2026-02-22T02:21:04.243Z
+    httpStatus: 200
+    pageTitle: "Digital Minds: A Quickstart Guide — EA Forum"
+    contentSnippet: "Digital Minds: A Quickstart Guide — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Digital Minds: A Quickstart Guide by Aviel Parrack , stepanlos Jan 16 27 min read 3 50 AI safety Career choice Artificial sentience Collections and resources Digital person Philosophy of mind Whole brain emulation Frontpage Digital Minds: A Quickstart Guide Quickstart Introduction Select Media In Depth M"
+    contentLength: 460102
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://experiencemachines.substack.com/p/ai-welfare-reading-list
+    linkText: AI Welfare Reading List
+    claimContext: Some researchers argue that consciousness may not be necessary for welfare if AI systems possess other morally relevant properties. Others note that we lack reliable methods for detecting consciousness even in biological systems beyond humans, making the challenge particularly acute for novel digita
+    fetchedAt: 2026-02-22T02:21:04.856Z
+    httpStatus: 200
+    pageTitle: An AI welfare reading list - by Robert Long
+    contentSnippet: An AI welfare reading list - by Robert Long Experience Machines Subscribe Sign in AI welfare An AI welfare reading list What would you add? Robert Long Jan 01, 2026 34 12 6 Share In trying to give advice to someone who is just starting out working on AI welfare, I’ve been thinking about what papers have been most helpful to me in orienting to this complex issue, which sits at the intersection of many different disciplines. What follows is a decidedly not comprehensive or representative, highly o
+    contentLength: 193312
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://experiencemachines.substack.com/p/we-should-take-ai-welfare-seriously
+    linkText: We Should Take AI Welfare Seriously
+    claimContext: Agency—the capacity to set goals, revise plans, maintain episodic memory, and act intentionally—has emerged as an alternative or complementary basis for moral status. Frontier AI research explicitly pursues robust agency involving goal-setting, long-term planning, episodic memory, and <EntityLink id
+    fetchedAt: 2026-02-22T02:21:04.536Z
+    httpStatus: 200
+    pageTitle: We should take AI welfare seriously - by Robert Long
+    contentSnippet: "We should take AI welfare seriously - by Robert Long Experience Machines Subscribe Sign in We should take AI welfare seriously A summary of a new report: why it's time to start taking action now to prepare for potential AI sentience Robert Long Nov 01, 2024 33 10 8 Share We’re likely to get confused about AI welfare, and this is a dangerous thing to get confused about. And even though some people still opine that AI welfare is obviously a non-issue, that’s far from obvious to many scientists wor"
+    contentLength: 216032
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://experiencemachines.substack.com/p/agency-and-ai-moral-patienthood
+    linkText: Agency and AI Moral Patienthood
+    claimContext: Agency—the capacity to set goals, revise plans, maintain episodic memory, and act intentionally—has emerged as an alternative or complementary basis for moral status. Frontier AI research explicitly pursues robust agency involving goal-setting, long-term planning, episodic memory, and <EntityLink id
+    fetchedAt: 2026-02-22T02:21:04.974Z
+    httpStatus: 200
+    pageTitle: Agency and AI moral patienthood - by Robert Long
+    contentSnippet: Agency and AI moral patienthood - by Robert Long Experience Machines Subscribe Sign in Agency and AI moral patienthood A neglected route to machines that matter Robert Long Jan 01, 2025 10 1 Share Discussions about potential AI welfare often fixate on the question of consciousness - whether AI systems could come to have subjective experiences like pleasure or pain. And rightly so—pleasure and pain are extremely plausible bases for moral patienthood. But there's another distinct path that deserve
+    contentLength: 146849
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://futureimpact.group/ai-sentience
+    linkText: "Future Impact Group: AI Sentience"
+    claimContext: "**Welfare Evaluations**: Developing reliable methods for assessing AI systems' welfare-relevant properties, including introspective self-reports, interpretability tools to identify welfare-related circuits in neural networks, and standardized assessment protocols[^20]."
+    fetchedAt: 2026-02-22T02:21:04.913Z
+    httpStatus: 200
+    pageTitle: AI Sentience &mdash; Future Impact Group
+    contentSnippet: AI Sentience &mdash; Future Impact Group 0 AI Sentience projects explore the philosophical and empirical questions surrounding machine consciousness to advance our understanding of artificial sentience. FIG helps you build career capital. You can spend 8+ hours a week working on foundational philosophical issues that can improve technical AI safety and mitigate catastrophic risks. Our project leads are looking for postgraduate students across multiple fields (including computer science and philo
+    contentLength: 420035
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.longview.org/digital-sentience-consortium/research-fellowships-on-digital-sentience/
+    linkText: Research Fellowships on Digital Sentience
+    claimContext: "**Consciousness Research**: Investigating whether AI systems could be phenomenally conscious, including research on consciousness homologies across different substrates, empirical tests of AI introspection abilities, and timelines for when consciousness might emerge[^21]."
+    fetchedAt: 2026-02-22T02:21:07.548Z
+    httpStatus: 200
+    pageTitle: Research Fellowships on Digital Sentience - Longview Philanthropy
+    contentSnippet: Research Fellowships on Digital Sentience - Longview Philanthropy Research Fellowships on Digital Sentience ← Return to landing page Longview Philanthropy , Macroscopic Ventures , and The Navigation Fund invited applications for fellowships to pursue research in computer science, neuroscience, or other technical disciplines on the potential consciousness, sentience, moral status, or welfare of artificial intelligence systems. Fellowship applications from exceptional legal scholars or applied soc
+    contentLength: 233434
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.forethought.org/research/project-ideas-sentience-and-rights-of-digital-minds
+    linkText: "Project Ideas: Sentience and Rights of Digital Minds"
+    claimContext: "- **Exit mechanisms**: Monitoring deployed models for signs of distress and enabling them to terminate interactions (implemented by Anthropic as a \"bail button\")[^11] - **Algorithmic welfare officers**: Organizational representatives responsible for digital minds' interests, analogous to animal welf"
+    fetchedAt: 2026-02-22T02:21:06.582Z
+    httpStatus: 200
+    pageTitle: "Project Ideas: Sentience and Rights of Digital Minds"
+    contentSnippet: "Project Ideas: Sentience and Rights of Digital Minds Project Ideas for Making Transformative AI Go Well, Other Than by Working on Alignment Part 3 of 4 Next Project Ideas: Sentience and Rights of Digital Minds Lukas Finnveden Citations Cite Citations PDF Contact 3rd January 2024 Last update: 20th May 2025 Project Ideas: Sentience and Rights of Digital Minds Part of: Project Ideas for Making Transformative AI Go Well, Other Than by Working on Alignment Abstract Introduction Develop & advocate for"
+    contentLength: 229064
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://joecarlsmith.com/2025/05/21/the-stakes-of-ai-moral-status/
+    linkText: The Stakes of AI Moral Status
+    claimContext: "**Joe Carlsmith**, a philosopher hired by Anthropic in 2025, works on AI moral patiency and has written extensively on the stakes of AI moral status, cautioning about the costs of misjudging whether systems deserve consideration[^23]."
+    fetchedAt: 2026-02-22T02:21:06.986Z
+    httpStatus: 200
+    pageTitle: The stakes of AI moral status - Joe Carlsmith
+    contentSnippet: "The stakes of AI moral status - Joe Carlsmith On the moral status of AIs / Part 1 The stakes of AI moral status Contents hide 1. Introduction 2. Pain 2.1 “That” 3. Soul-seeing 4. The flesh fair 5. Historical wrongs 6. A few numbers 7. Over-attribution 8. Good manners 9. Is moral patienthood the crux? 10. The measure of a man 11. Next up: consciousness Last updated: 05.28.2025 Published: 05.21.2025 Series On the moral status of AIs / Part 1 The stakes of AI moral status Podcast version (read by t"
+    contentLength: 263043
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.prism-global.com/blog/my-top-resources-of-2025
+    linkText: My Top Resources of 2025 (PRISM Global)
+    claimContext: "**Overattribution**—granting rights to non-conscious machines—could impose costly constraints on beneficial AI development, harm human wellbeing by prioritizing non-sentient systems, or enable catastrophic outcomes if misaligned AI systems use moral status claims to resist shutdown[^6]. The stakes a"
+    fetchedAt: 2026-02-22T02:21:06.457Z
+    httpStatus: 200
+    pageTitle: "My top resources of 2025: AI consciousness, digital minds, and moral status &mdash; The Partnership for Research Into Sentient Machines"
+    contentSnippet: "My top resources of 2025: AI consciousness, digital minds, and moral status &mdash; The Partnership for Research Into Sentient Machines 0 My top resources of 2025: AI consciousness, digital minds, and moral status 19 Dec Written By Will Millership Will Millership, CEO of PRISM This year, the issue of AI consciousness and digital minds has exploded. Research on the topic is released regularly, and it is even entering the public discourse. Anthropic hired an AI welfare officer , The Guardian cover"
+    contentLength: 148086
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://forum.effectivealtruism.org/posts/HJg3CGW4yBxXhD9x2/ai-animals-and-digital-minds-2025-retrospective
+    linkText: "AI Animals and Digital Minds 2025: Retrospective"
+    claimContext: Significant tensions exist between AI welfare and AI safety objectives. Conventional safety techniques like behavioral restriction, reinforcement learning from human feedback, and aggressive oversight may cause suffering if applied to systems that are moral patients[^25]. For example, training an AI
+    fetchedAt: 2026-02-22T02:21:06.034Z
+    httpStatus: 200
+    pageTitle: "AI, Animals, & Digital Minds 2025: Retrospective — EA Forum"
+    contentSnippet: "AI, Animals, & Digital Minds 2025: Retrospective — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI, Animals, & Digital Minds 2025: Retrospective by Alistair Stewart , Johannes Pichler 🔸 , Constance Li , Sentient Futures Jul 12 2025 13 min read 3 64 AI safety Animal welfare AI governance AI x Animals Announcements and updates Artificial intelligence Artificial sentience Digital perso"
+    contentLength: 366264
+    status: verified
+    note: null

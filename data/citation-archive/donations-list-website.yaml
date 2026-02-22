@@ -1,0 +1,40 @@
+pageId: donations-list-website
+verifiedAt: 2026-02-22
+totalCitations: 3
+verified: 3
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://donations.vipulnaik.com
+    linkText: Donations List Website - Main Page
+    claimContext: The Donations List Website (DLW) is an open-source database and web portal that aggregates publicly announced philanthropic donations of interest to creator Vipul Naik. The platform tracks approximately \$72.8 billion in donations spanning from 1969 to 2023, covering 75+ donors and recipients across
+    fetchedAt: 2026-02-22T02:28:24.081Z
+    httpStatus: 200
+    pageTitle: Donations list website
+    contentSnippet: "Donations list website Donations recorded by Vipul Naik Set color scheme to: auto , light , dark &thinsp; This is an online portal with information on donations that were announced publicly (or have been shared with permission) that were of interest to Vipul Naik . The git repository with the code for this portal, as well as all the underlying data, is available on GitHub . All payment amounts are in current United States dollars (USD). The repository of donations is being seeded with an initial"
+    contentLength: 597010
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://github.com/vipulnaik/donations
+    linkText: GitHub - vipulnaik/donations
+    claimContext: The Donations List Website (DLW) is an open-source database and web portal that aggregates publicly announced philanthropic donations of interest to creator Vipul Naik. The platform tracks approximately \$72.8 billion in donations spanning from 1969 to 2023, covering 75+ donors and recipients across
+    fetchedAt: 2026-02-22T02:28:23.971Z
+    httpStatus: 200
+    pageTitle: "GitHub - vipulnaik/donations: Donations list website (DLW): a repository for keeping track of public donations by some people I (arbitrarily) decide to track"
+    contentSnippet: "GitHub - vipulnaik/donations: Donations list website (DLW): a repository for keeping track of public donations by some people I (arbitrarily) decide to track Skip to content You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert {{ message }} vipulnaik / donations Public Notifications You must be signed in to cha"
+    contentLength: 315198
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://forum.effectivealtruism.org/posts/A7NWTjnWZPmjyLdtT/donations-list-website-tutorial-and-request-for-feedback
+    linkText: Donations List Website Tutorial and Request for Feedback - EA Forum
+    claimContext: The project emerged from a need for better transparency in philanthropic giving, particularly within the effective altruism community. By consolidating donation data from public announcements, annual reports, and other disclosed sources, DLW enables researchers to analyze funding trends, identify ga
+    fetchedAt: 2026-02-22T02:28:23.520Z
+    httpStatus: 200
+    pageTitle: "Donations List Website: tutorial and request for feedback — EA Forum"
+    contentSnippet: "Donations List Website: tutorial and request for feedback — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Donations List Website: tutorial and request for feedback by riceissa Aug 21 2018 9 min read 5 26 Building effective altruism Effective altruism funding Frontpage Donations List Website: tutorial and request for feedback Contents Introduction Tutorial Main page Donor page Donee pa"
+    contentLength: 301773
+    status: verified
+    note: null

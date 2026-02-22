@@ -1,0 +1,29 @@
+pageId: astralis-foundation
+verifiedAt: 2026-02-22
+totalCitations: 2
+verified: 2
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://astralisfoundation.org
+    linkText: Astralis Foundation website — - organizational overview and focus areas.
+    claimContext: '[Astralis Foundation](https://astralisfoundation.org) is a philanthropic organization with the stated vision of "a flourishing world with secure and beneficial AI for all."[^1] The foundation unites funders, experts, and entrepreneurs to develop and expand interventions in AI safety and governance, '
+    fetchedAt: 2026-02-22T02:28:26.645Z
+    httpStatus: 200
+    pageTitle: Astralis Foundation
+    contentSnippet: Astralis Foundation Be part of the AI revolution A novel approach to shape AI for the benefit of humanity What Our vision Vision Our vision is a flourishing world with secure and beneficial AI for all. Mission Our mission is to help navigate transformative AI by uniting funders, experts and entrepreneurs to seed and scale high-impact interventions. We back exceptional people and ideas with the funding, strategic guidance, and networks they need to steer transformative AI toward beneficial outcom
+    contentLength: 111234
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://astralisfoundation.org/our-people
+    linkText: Astralis Foundation - Our People — - leadership and team information.
+    claimContext: Astralis operates the Shared Horizons Fund, a multi-funder vehicle for AI safety grantmaking. The fund is led by Senior Advisor Tim Shavers.[^3] Specific details about the fund's size, grantees, and disbursement strategy have not been publicly disclosed.
+    fetchedAt: 2026-02-22T02:28:26.311Z
+    httpStatus: 200
+    pageTitle: Our people | Astralis Foundation
+    contentSnippet: "Our people | Astralis Foundation Who Our people Our impact funders, advisors and team are united by the desire for ambitious, impact-focused action to ensure AI benefits all. Team Our team brings together accomplished innovators from academia, entrepreneurship and non-profits. We&#x27;ve founded successful ventures, led major enterprises, and shaped and executed transformative strategies. President Vilhelm Skoglund Ville is President of Astralis , where he leads funder relationships. He is also "
+    contentLength: 96589
+    status: verified
+    note: null

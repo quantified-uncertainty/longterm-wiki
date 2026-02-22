@@ -1,0 +1,106 @@
+pageId: swift-centre
+verifiedAt: 2026-02-22
+totalCitations: 9
+verified: 9
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.swiftcentre.org
+    linkText: Swift Centre Homepage
+    claimContext: "The **Swift Centre** (full name: Swift Centre for Applied Forecasting) is a UK-based nonprofit organization that specializes in conditional forecasting, scenario analysis, and horizon scanning to help organizations make better decisions under uncertainty.[^1] Founded in March 2022 by Michael Story, "
+    fetchedAt: 2026-02-22T02:28:01.123Z
+    httpStatus: 200
+    pageTitle: Swift Centre
+    contentSnippet: "Swift Centre 0 Anticipate the future - don’t just react to it. Contact Us Unparalleled expertise in scenario analysis, horizon scanning, and forecasting Cut through noise, uncertainty, and hype. We help you identify what could happen, and what to do. Our team includes award winners and the top 1% of forecasters in the world - measured, ranked, and publicly validated. Open Nuclear Network 〇 Google DeepMind 〇 Open Philanthropy 〇 Department for Science, Innovation and Technology 〇 Metrea Aerospace "
+    contentLength: 734699
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.swiftcentre.org/about-us-draft
+    linkText: Swift Centre - About Us
+    claimContext: "The **Swift Centre** (full name: Swift Centre for Applied Forecasting) is a UK-based nonprofit organization that specializes in conditional forecasting, scenario analysis, and horizon scanning to help organizations make better decisions under uncertainty.[^1] Founded in March 2022 by Michael Story, "
+    fetchedAt: 2026-02-22T02:28:01.213Z
+    httpStatus: 200
+    pageTitle: About us &mdash; Swift Centre
+    contentSnippet: "About us &mdash; Swift Centre 0 Mission Our mission: “We turn uncertainty into foresight, enabling confident, well-informed decisions.” Our vision: “To be the trusted source of clarity in an uncertain world - helping decision-makers manage risks and seize opportunities before they happen.” Methodology Forecasting is rooted in decades of rigorous scientific research through structured tournaments, psychological studies, and statistical methodologies. One landmark project, the Good Judgment Projec"
+    contentLength: 224356
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.swiftcentre.org/publicforecasts/2025-a-year-in-review
+    linkText: 2025 - A Year in Review - Swift Centre Public Forecasts
+    claimContext: The organization employs a global network of highly-calibrated forecasters ranked in the top 1% worldwide, including former US national security advisors and diplomats.[^2] Their client portfolio spans AI safety organizations (<EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmi
+    fetchedAt: 2026-02-22T02:28:01.395Z
+    httpStatus: 200
+    pageTitle: 2025 - A Year in Review &mdash; Swift Centre
+    contentSnippet: 2025 - A Year in Review &mdash; Swift Centre 0 2025 - A Year in Review 18 Dec Written By Eleanor Parr Loading the Elevenlabs Text to Speech AudioNative Player... For many, December is a time for reflection on the time gone by - what has the last year brought you, what challenges have you overcome or struggled with, and who do you know that deserves the best Christmas present and who deserves a piece of coal? However, for the Swift Centre, December is slightly different. While all organisations a
+    contentLength: 311422
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://find-and-update.company-information.service.gov.uk/company/14003610
+    linkText: Swift Centre - Companies House Registration
+    claimContext: Swift Centre was incorporated on March 25, 2022, as a private company limited by guarantee without share capital, with its registered office at 102 Fulham Palace Road, London, England.[^4] The organization was founded by Michael Story, who brought extensive forecasting credentials from his role as a
+    fetchedAt: 2026-02-22T02:28:01.434Z
+    httpStatus: 200
+    pageTitle: SWIFT CENTRE FOR APPLIED FORECASTING LIMITED overview - Find and update company information - GOV.UK
+    contentSnippet: SWIFT CENTRE FOR APPLIED FORECASTING LIMITED overview - Find and update company information - GOV.UK Cookies on Companies House services We use some essential cookies to make our services work. We'd also like to use analytics cookies so we can understand how you use our services and to make improvements. Accept analytics cookies Reject analytics cookies View cookies You've accepted analytics cookies. You can change your cookie settings at any time. Hide this message You've rejected analytics coo
+    contentLength: 35393
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.swiftcentre.org
+    linkText: Swift Centre Homepage
+    claimContext: The founding mission was to cut through "noise, uncertainty, and hype" by providing scenario analysis and horizon scanning that would help organizations anticipate future events rather than merely react to them.[^5] From the outset, Swift Centre differentiated itself by emphasizing conditional forec
+    fetchedAt: 2026-02-22T02:28:01.361Z
+    httpStatus: 200
+    pageTitle: Swift Centre
+    contentSnippet: "Swift Centre 0 Anticipate the future - don’t just react to it. Contact Us Unparalleled expertise in scenario analysis, horizon scanning, and forecasting Cut through noise, uncertainty, and hype. We help you identify what could happen, and what to do. Our team includes award winners and the top 1% of forecasters in the world - measured, ranked, and publicly validated. Open Nuclear Network 〇 Google DeepMind 〇 Open Philanthropy 〇 Department for Science, Innovation and Technology 〇 Metrea Aerospace "
+    contentLength: 734699
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://forum.effectivealtruism.org/topics/swift-centre-for-applied-forecasting
+    linkText: Swift Centre for Applied Forecasting - EA Forum Topics
+    claimContext: In July 2022, just four months after incorporation, Swift Centre received \$2 million in funding from the Future Fund.[^6] This substantial early-stage funding allowed the organization to build out its operations and begin publishing forecasts from expert forecasters and financial professionals, wit
+    fetchedAt: 2026-02-22T02:28:02.753Z
+    httpStatus: 200
+    pageTitle: Swift Centre for Applied Forecasting - EA Forum
+    contentSnippet: "Swift Centre for Applied Forecasting - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Swift Centre for Applied Forecasting Edit History Discussion 0 Subscribe Edit History Discussion 0 Swift Centre for Applied Forecasting Activities Funding External links Related entries Random Topic Contributors 2 Pablo Parent Topic : Forecasting The Swift Centre for Applied Forecasting (commonly know"
+    contentLength: 78258
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.swiftcentre.org/case-studies
+    linkText: Case Studies - Swift Centre
+    claimContext: The organization quickly established itself with high-profile clients across multiple sectors. Early engagements included work with the Open Nuclear Network, where Swift Centre facilitated a conference of technical experts on geopolitical nuclear risks, conducting forecasting principles training, ca
+    fetchedAt: 2026-02-22T02:28:02.807Z
+    httpStatus: 200
+    pageTitle: Case Studies &mdash; Swift Centre
+    contentSnippet: "Case Studies &mdash; Swift Centre 0 Client Case Studies Google DeepMind Forecast Outsourcing Use Swift’s expert network of forecasters for an outside view of your risks We recently worked with Google DeepMind who had developed a set of AI capability evaluations and reached out to Swift Centre to forecast how future AI systems might perform on those evaluations, and whether those capabilities would elevate AI's status as a global issue. Swift Centre tasked a team of top forecasters with relevant "
+    contentLength: 1069698
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.swiftcentre.org/publicforecasts
+    linkText: Public Forecasts - Swift Centre
+    claimContext: The organization also expanded its public presence through a Strategic Insights hub offering timely public forecasts and expert analysis, along with an "Ahead of the Curve" subscription service.[^8] In April 2025, they released forecasts on UK ransomware risks, highlighting rising threats and the ne
+    fetchedAt: 2026-02-22T02:28:02.505Z
+    httpStatus: 200
+    pageTitle: Public Forecasts &mdash; Swift Centre
+    contentSnippet: Public Forecasts &mdash; Swift Centre 0 Stay Informed. Stay Ahead. Our Strategic Insights hub brings together timely public forecasts, expert blog analysis, and the powerful new “Ahead of the Curve” subscription - designed to keep you informed, inspired, and needing to react less. Public Forecasts & Published Analysis We regularly publish free and publicly available content for our subscribers. The forecast articles we put out are produced by our forecasters and are centered around things we thi
+    contentLength: 185251
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.swiftcentre.org/services
+    linkText: Services - Swift Centre
+    claimContext: "3. **Collaborative elicitation**: For complex questions requiring domain expertise, Swift Centre brings together their top forecasters with client-nominated subject matter experts to combine deep knowledge with forecasting skill.[^10]"
+    fetchedAt: 2026-02-22T02:28:02.604Z
+    httpStatus: 200
+    pageTitle: Services &mdash; Swift Centre
+    contentSnippet: Services &mdash; Swift Centre 0 At Swift Centre, we simplify tomorrow’s uncertainty so you can act with confidence. Explore our solutions - designed for impact, speed, and ease… Forecasting Consultancy Empower your organization with clarity and insight through our fully managed forecasting service, structured through four strategic stages. These can be procured individually or as a collective. Scenario Identification We begin by working closely with you to understand the decisions, challenges, a
+    contentLength: 267324
+    status: verified
+    note: null

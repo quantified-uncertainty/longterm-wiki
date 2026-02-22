@@ -1,0 +1,1129 @@
+pageId: macarthur-foundation
+verifiedAt: 2026-02-22
+totalCitations: 102
+verified: 93
+broken: 9
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: "| **Founded** | 1970 (legally); became operational 1978 | | **Endowment** | \\$9 billion (2025)[^1] | | **Annual Giving** | Hundreds of millions; \\$352.9 million (2024)[^2] |"
+    fetchedAt: 2026-02-22T01:44:12.438Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 2
+    url: https://www.macfound.org/about/financials/
+    linkText: MacArthur Foundation - Financials
+    claimContext: "| **Endowment** | \\$9 billion (2025)[^1] | | **Annual Giving** | Hundreds of millions; \\$352.9 million (2024)[^2] | | **Total Grants** | Over \\$8.27 billion since 1978[^3] |"
+    fetchedAt: 2026-02-22T01:44:12.976Z
+    httpStatus: 200
+    pageTitle: Financials - MacArthur Foundation
+    contentSnippet: 'Financials - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Financials Our financial overview. Overview Over our 46-year history, MacArthur has awarded more than $8.27 billion to nearly 10,000 effective organizations and creative individuals in 119 countries'
+    contentLength: 116113
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.macfound.org/about/frequently-asked-questions
+    linkText: MacArthur Foundation - FAQs
+    claimContext: "| **Annual Giving** | Hundreds of millions; \\$352.9 million (2024)[^2] | | **Total Grants** | Over \\$8.27 billion since 1978[^3] | | **Key Programs** | Big Bets (Climate, Criminal Justice), MacArthur Fellows, 100&Change, Field Support |"
+    fetchedAt: 2026-02-22T01:44:12.891Z
+    httpStatus: 200
+    pageTitle: Frequently Asked Questions - MacArthur Foundation
+    contentSnippet: 'Frequently Asked Questions - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Foundation FAQs Answers to common questions. Frequently Asked Questions What is the MacArthur Foundation? The John D. and Catherine T. MacArthur Foundation supports creative people, '
+    contentLength: 83335
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.macfound.org/about/frequently-asked-questions
+    linkText: MacArthur Foundation - FAQs
+    claimContext: "| **Key Programs** | Big Bets (Climate, Criminal Justice), MacArthur Fellows, 100&Change, Field Support | | **Geographic Focus** | U.S., India, Nigeria, Mexico, Russia; ≈117 countries total[^4] | | **Primary Areas** | Climate change, criminal justice reform, nuclear threats, journalism, Chicago loca"
+    fetchedAt: 2026-02-22T01:44:12.942Z
+    httpStatus: 200
+    pageTitle: Frequently Asked Questions - MacArthur Foundation
+    contentSnippet: 'Frequently Asked Questions - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Foundation FAQs Answers to common questions. Frequently Asked Questions What is the MacArthur Foundation? The John D. and Catherine T. MacArthur Foundation supports creative people, '
+    contentLength: 83335
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: The John D. and Catherine T. MacArthur Foundation is one of the largest private foundations in the United States, with an endowment of \$9 billion as of 2025.[^5] Established legally in 1970 but becoming operational after founder John D. MacArthur's death in 1978, the foundation has awarded more tha
+    fetchedAt: 2026-02-22T01:44:12.426Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 6
+    url: https://www.macfound.org/about/our-history/
+    linkText: MacArthur Foundation - Our History
+    claimContext: The John D. and Catherine T. MacArthur Foundation is one of the largest private foundations in the United States, with an endowment of \$9 billion as of 2025.[^5] Established legally in 1970 but becoming operational after founder John D. MacArthur's death in 1978, the foundation has awarded more tha
+    fetchedAt: 2026-02-22T01:44:14.352Z
+    httpStatus: 200
+    pageTitle: Our History - MacArthur Foundation
+    contentSnippet: 'Our History - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. and Catherine T. MacArthur were quiet philanthropists in their lifetime, giving primarily to organizations '
+    contentLength: 70601
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.macfound.org/about/our-history/
+    linkText: MacArthur Foundation - Our History
+    claimContext: The foundation's stated purpose is to support "creative people, effective institutions, and influential networks building a more just, verdant, and peaceful world."[^7] Its current grantmaking priorities center on "Big Bets" addressing climate change, criminal justice reform, nuclear threats, and no
+    fetchedAt: 2026-02-22T01:44:14.304Z
+    httpStatus: 200
+    pageTitle: Our History - MacArthur Foundation
+    contentSnippet: 'Our History - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. and Catherine T. MacArthur were quiet philanthropists in their lifetime, giving primarily to organizations '
+    contentLength: 70601
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.macfound.org/programs/
+    linkText: MacArthur Foundation - Programs
+    claimContext: The foundation's stated purpose is to support "creative people, effective institutions, and influential networks building a more just, verdant, and peaceful world."[^7] Its current grantmaking priorities center on "Big Bets" addressing climate change, criminal justice reform, nuclear threats, and no
+    fetchedAt: 2026-02-22T01:44:14.096Z
+    httpStatus: 200
+    pageTitle: Programs - MacArthur Foundation
+    contentSnippet: 'Programs - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Programs Accelerating ingenuity and supporting effective organizations worldwide. Big Bets Investing boldly across critical challenges. AI Opportunity Climate Solutions Criminal Justice Local News On '
+    contentLength: 68132
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.macfound.org/programs/awards/fellows/
+    linkText: MacArthur Foundation - Fellows Program
+    claimContext: The foundation's stated purpose is to support "creative people, effective institutions, and influential networks building a more just, verdant, and peaceful world."[^7] Its current grantmaking priorities center on "Big Bets" addressing climate change, criminal justice reform, nuclear threats, and no
+    fetchedAt: 2026-02-22T01:44:14.354Z
+    httpStatus: 200
+    pageTitle: MacArthur Fellows - MacArthur Foundation
+    contentSnippet: 'MacArthur Fellows - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea MacArthur Fellows Celebrating and inspiring the creative potential of individuals through no-strings-attached fellowships Overview About Search FAQs News Fellows in Focus Explore a collection'
+    contentLength: 92033
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.britannica.com/topic/MacArthur-Foundation
+    linkText: Britannica - MacArthur Foundation
+    claimContext: "MacArthur operates through four main divisions: International Programs, U.S. Programs, Media/Culture/Special Initiatives, and the MacArthur Fellows Program.[^10] With headquarters in Chicago's Marquette Building and offices in India, Mexico, Nigeria, and Russia, the foundation has evolved from its f"
+    fetchedAt: 2026-02-22T01:44:14.444Z
+    httpStatus: 200
+    pageTitle: MacArthur Foundation | Philanthropy, Grants & Awards | Britannica
+    contentSnippet: MacArthur Foundation | Philanthropy, Grants & Awards | Britannica Ask the Chatbot Games & Quizzes History & Society Science & Tech Biographies Animals & Nature Geography & Travel Arts & Culture ProCon Money Videos MacArthur Foundation Introduction References & Edit History Quick Facts & Related Topics Images & Videos Contents CITE verified Cite While every effort has been made to follow citation style rules, there may be some discrepancies. Please refer to the appropriate style manual or other s
+    contentLength: 77236
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.influencewatch.org/non-profit/john-d-and-catherine-t-macarthur-foundation/
+    linkText: InfluenceWatch - MacArthur Foundation
+    claimContext: "MacArthur operates through four main divisions: International Programs, U.S. Programs, Media/Culture/Special Initiatives, and the MacArthur Fellows Program.[^10] With headquarters in Chicago's Marquette Building and offices in India, Mexico, Nigeria, and Russia, the foundation has evolved from its f"
+    fetchedAt: 2026-02-22T01:44:16.128Z
+    httpStatus: 200
+    pageTitle: John D. and Catherine T. MacArthur Foundation - InfluenceWatch
+    contentSnippet: "John D. and Catherine T. MacArthur Foundation - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit John D. and Catherine T. MacArthur Foundation MacArthur Foundation logo, current as of March 2013 ( link ) Website: www.macfound.org Locatio"
+    contentLength: 237668
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.macfound.org/about/our-history/about-the-macarthurs
+    linkText: MacArthur Foundation - About the MacArthurs
+    claimContext: John D. MacArthur (1897–1978) built his fortune through the insurance industry, acquiring Bankers Life and Casualty Company in 1935 for \$2,500 after borrowing the money and growing it to over \$1 billion in assets by 1977.[^12] Unlike many wealthy businessmen who established foundations during thei
+    fetchedAt: 2026-02-22T01:44:15.763Z
+    httpStatus: 200
+    pageTitle: About John D. & Catherine T. MacArthur - MacArthur Foundation
+    contentSnippet: 'About John D. & Catherine T. MacArthur - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. MacArthur (1897-1978) John Donald MacArthur (1897-1978) was one of the three wea'
+    contentLength: 66832
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://darylalberca.wordpress.com/john-d-and-catherine-t-macarthur-foundation/
+    linkText: Daryl Alberca - MacArthur Foundation
+    claimContext: John D. MacArthur (1897–1978) built his fortune through the insurance industry, acquiring Bankers Life and Casualty Company in 1935 for \$2,500 after borrowing the money and growing it to over \$1 billion in assets by 1977.[^12] Unlike many wealthy businessmen who established foundations during thei
+    fetchedAt: 2026-02-22T01:44:16.079Z
+    httpStatus: 200
+    pageTitle: John D. and Catherine T. MacArthur Foundation | iPhil.
+    contentSnippet: "John D. and Catherine T. MacArthur Foundation | iPhil. John D. and Catherine T. MacArthur Foundation Founded 1975 Focus Public affairs, the media, thearts Location Marquette Building, Chicago,Illinois Key people John D. MacArthur (co-founder) Catherine T. MacArthur (co-founder) Endowment $5.70 billion (12/31/11) The John D. and Catherine T. MacArthur Foundation is one of the largest private foundations in the United States. Based in Chicagoand supporting non-profit organizations that work in 50 "
+    contentLength: 191352
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.macfound.org/about/our-history/
+    linkText: MacArthur Foundation - Our History
+    claimContext: "MacArthur deliberately chose not to direct the foundation's grantmaking, famously telling his initial board: \"I made the money; you guys will have to figure out what to do with it.\"[^14] The original six-member board included his wife Catherine T. MacArthur, Kirby, his son J. Roderick MacArthur (fro"
+    fetchedAt: 2026-02-22T01:44:15.534Z
+    httpStatus: 200
+    pageTitle: Our History - MacArthur Foundation
+    contentSnippet: 'Our History - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. and Catherine T. MacArthur were quiet philanthropists in their lifetime, giving primarily to organizations '
+    contentLength: 70601
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://www.influencewatch.org/non-profit/john-d-and-catherine-t-macarthur-foundation/
+    linkText: InfluenceWatch - MacArthur Foundation
+    claimContext: "MacArthur deliberately chose not to direct the foundation's grantmaking, famously telling his initial board: \"I made the money; you guys will have to figure out what to do with it.\"[^14] The original six-member board included his wife Catherine T. MacArthur, Kirby, his son J. Roderick MacArthur (fro"
+    fetchedAt: 2026-02-22T01:44:16.137Z
+    httpStatus: 200
+    pageTitle: John D. and Catherine T. MacArthur Foundation - InfluenceWatch
+    contentSnippet: "John D. and Catherine T. MacArthur Foundation - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit John D. and Catherine T. MacArthur Foundation MacArthur Foundation logo, current as of March 2013 ( link ) Website: www.macfound.org Locatio"
+    contentLength: 237668
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: When John MacArthur died from cancer on January 6, 1978—at the time one of the three wealthiest men in America with a net worth exceeding \$1 billion—he bequeathed 92 percent of his estate (approximately \$700 million to \$1 billion in assets) to activate the foundation.[^16] The foundation made its
+    fetchedAt: 2026-02-22T01:44:17.155Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 17
+    url: https://www.macfound.org/about/our-history/
+    linkText: MacArthur Foundation - Our History
+    claimContext: When John MacArthur died from cancer on January 6, 1978—at the time one of the three wealthiest men in America with a net worth exceeding \$1 billion—he bequeathed 92 percent of his estate (approximately \$700 million to \$1 billion in assets) to activate the foundation.[^16] The foundation made its
+    fetchedAt: 2026-02-22T01:44:17.223Z
+    httpStatus: 200
+    pageTitle: Our History - MacArthur Foundation
+    contentSnippet: 'Our History - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. and Catherine T. MacArthur were quiet philanthropists in their lifetime, giving primarily to organizations '
+    contentLength: 70601
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.influencewatch.org/non-profit/john-d-and-catherine-t-macarthur-foundation/
+    linkText: InfluenceWatch - MacArthur Foundation
+    claimContext: The foundation's early years were marked by significant internal conflict over its ideological direction. John MacArthur, described as a conservative Republican, had initially staffed the board with right-of-center members including former Nixon Treasury Secretary William Simon and business executiv
+    fetchedAt: 2026-02-22T01:44:17.180Z
+    httpStatus: 200
+    pageTitle: John D. and Catherine T. MacArthur Foundation - InfluenceWatch
+    contentSnippet: "John D. and Catherine T. MacArthur Foundation - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit John D. and Catherine T. MacArthur Foundation MacArthur Foundation logo, current as of March 2013 ( link ) Website: www.macfound.org Locatio"
+    contentLength: 237668
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.influencewatch.org/non-profit/john-d-and-catherine-t-macarthur-foundation/
+    linkText: InfluenceWatch - MacArthur Foundation
+    claimContext: "By 1981, this tension had resulted in the resignation of nearly all right-of-center board members except Paul Harvey, fundamentally shifting the foundation's ideological orientation.[^19] Between 1979 and 1981, Roderick MacArthur sued eight board members accusing them of mismanagement of foundation "
+    fetchedAt: 2026-02-22T01:44:17.190Z
+    httpStatus: 200
+    pageTitle: John D. and Catherine T. MacArthur Foundation - InfluenceWatch
+    contentSnippet: "John D. and Catherine T. MacArthur Foundation - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit John D. and Catherine T. MacArthur Foundation MacArthur Foundation logo, current as of March 2013 ( link ) Website: www.macfound.org Locatio"
+    contentLength: 237668
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: "By 1981, this tension had resulted in the resignation of nearly all right-of-center board members except Paul Harvey, fundamentally shifting the foundation's ideological orientation.[^19] Between 1979 and 1981, Roderick MacArthur sued eight board members accusing them of mismanagement of foundation "
+    fetchedAt: 2026-02-22T01:44:17.156Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 21
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: "By 1981, this tension had resulted in the resignation of nearly all right-of-center board members except Paul Harvey, fundamentally shifting the foundation's ideological orientation.[^19] Between 1979 and 1981, Roderick MacArthur sued eight board members accusing them of mismanagement of foundation "
+    fetchedAt: 2026-02-22T01:44:18.250Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 22
+    url: https://www.encyclopedia.com/books/politics-and-business-magazines/john-d-and-catherine-t-macarthur-foundation
+    linkText: Encyclopedia.com - MacArthur Foundation
+    claimContext: In 1984, the board successfully sold Bankers Life and Casualty Company to ICH Corp. for \$482 million, completing the required divestment of the active business and allowing full focus on philanthropic work.[^22]
+    fetchedAt: 2026-02-22T01:44:18.556Z
+    httpStatus: 200
+    pageTitle: The John D. and Catherine T. MacArthur Foundation | Encyclopedia.com
+    contentSnippet: "The John D. and Catherine T. MacArthur Foundation | Encyclopedia.com Skip to main content Books Politics and business magazines The John D. and Catherine T. MacArthur Foundation The John D. and Catherine T. MacArthur Foundation gale views updated The John D. and Catherine T. MacArthur Foundation 140 S. Dearborn Street Chicago , Illinois 60603 U.S.A. Telephone: (312) 726-8000 Fax: (312) 920-6284 Web site: http://www.macfound.org Private Foundation Founded: 1978 Employees: 200 Total Assets: $4 bil"
+    contentLength: 94371
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.macfound.org/about/our-history/
+    linkText: MacArthur Foundation - Our History
+    claimContext: The foundation's first president, John E. Corbally (1979–1989), worked with colleagues James Furman and William Kirby to shape early programs including the MacArthur Fellows, public radio support, peace and security initiatives, mental health, and environmental work.[^23] The Fellows Program was lau
+    fetchedAt: 2026-02-22T01:44:18.337Z
+    httpStatus: 200
+    pageTitle: Our History - MacArthur Foundation
+    contentSnippet: 'Our History - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. and Catherine T. MacArthur were quiet philanthropists in their lifetime, giving primarily to organizations '
+    contentLength: 70601
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://www.influencewatch.org/non-profit/john-d-and-catherine-t-macarthur-foundation/
+    linkText: InfluenceWatch - MacArthur Foundation
+    claimContext: The foundation's first president, John E. Corbally (1979–1989), worked with colleagues James Furman and William Kirby to shape early programs including the MacArthur Fellows, public radio support, peace and security initiatives, mental health, and environmental work.[^23] The Fellows Program was lau
+    fetchedAt: 2026-02-22T01:44:18.293Z
+    httpStatus: 200
+    pageTitle: John D. and Catherine T. MacArthur Foundation - InfluenceWatch
+    contentSnippet: "John D. and Catherine T. MacArthur Foundation - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit John D. and Catherine T. MacArthur Foundation MacArthur Foundation logo, current as of March 2013 ( link ) Website: www.macfound.org Locatio"
+    contentLength: 237668
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: "- **Adele Simmons (1989–1999)**, the first female dean at Princeton University, led the foundation through a period of expansion.[^25] - **Jonathan Fanton (post-1999)** deepened investments in human rights, international justice, juvenile justice, affordable housing, and community development while "
+    fetchedAt: 2026-02-22T01:44:18.251Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://www.macfound.org/about/our-history/
+    linkText: MacArthur Foundation - Our History
+    claimContext: "- **Adele Simmons (1989–1999)**, the first female dean at Princeton University, led the foundation through a period of expansion.[^25] - **Jonathan Fanton (post-1999)** deepened investments in human rights, international justice, juvenile justice, affordable housing, and community development while "
+    fetchedAt: 2026-02-22T01:44:19.690Z
+    httpStatus: 200
+    pageTitle: Our History - MacArthur Foundation
+    contentSnippet: 'Our History - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. and Catherine T. MacArthur were quiet philanthropists in their lifetime, giving primarily to organizations '
+    contentLength: 70601
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.macfound.org/about/our-history/
+    linkText: MacArthur Foundation - Our History
+    claimContext: '- **Jonathan Fanton (post-1999)** deepened investments in human rights, international justice, juvenile justice, affordable housing, and community development while shifting toward fewer but larger grants with longer funding periods.[^26] - **Julia Stasch** introduced the "Big Bets" framework for tr'
+    fetchedAt: 2026-02-22T01:44:19.710Z
+    httpStatus: 200
+    pageTitle: Our History - MacArthur Foundation
+    contentSnippet: 'Our History - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Our History A Legacy of Impact: The MacArthur Story Overview About the MacArthurs John D. and Catherine T. MacArthur were quiet philanthropists in their lifetime, giving primarily to organizations '
+    contentLength: 70601
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.macfound.org/media/article_pdfs/macarthur_30years.pdf
+    linkText: MacArthur Foundation - 30 Years PDF
+    claimContext: "In 1997, the Board adopted a new program structure prioritizing large-scale initiatives like Health, Fellows, and Special Grants, moving away from more diffuse grantmaking.[^28] Major initiatives from this period included:"
+    fetchedAt: 2026-02-22T01:44:20.293Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1718677
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.macfound.org/media/article_pdfs/macarthur_30years.pdf
+    linkText: MacArthur Foundation - 30 Years PDF
+    claimContext: "- 1994: Opening of offices in India and Nigeria - 2000s: Support for the Encyclopedia of Life, Law/Neuroscience Project, anti-shock garment research against postpartum hemorrhage[^29]"
+    fetchedAt: 2026-02-22T01:44:20.292Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 1718677
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: The foundation launched its **100&Change** competition in 2016, awarding a single \$100 million grant in December 2017 to the Sesame Workshop and International Rescue Committee for refugee education in the Middle East, selected from nearly 2,000 proposals.[^30] This initiative reflected a growing em
+    fetchedAt: 2026-02-22T01:44:19.566Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 31
+    url: https://www.macfound.org/programs/initiatives/new-work/
+    linkText: MacArthur Foundation - New Work
+    claimContext: "- **Big Bets** on time-limited, transformative investments (Climate Solutions concluding 2026; Criminal Justice ending 2025)[^31] - **Enduring Commitments** to racial equity in Chicago and U.S. journalism/media"
+    fetchedAt: 2026-02-22T01:44:21.821Z
+    httpStatus: 200
+    pageTitle: New Work - MacArthur Foundation
+    contentSnippet: 'New Work - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea New Work Exploring new work, guided by our values and mission. Why We&rsquo;re Looking to Support New Work Beginning in 2015, MacArthur established a roadmap for grantmaking via three new modes: Big B'
+    contentLength: 69014
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.macfound.org/programs/initiatives/new-work/
+    linkText: MacArthur Foundation - New Work
+    claimContext: "- **Field Support** for philanthropic infrastructure, particularly in the U.S., Nigeria, and India - **New Work** initiatives exploring innovative areas, with Local News launched as the first new program in 2024[^32]"
+    fetchedAt: 2026-02-22T01:44:21.687Z
+    httpStatus: 200
+    pageTitle: New Work - MacArthur Foundation
+    contentSnippet: 'New Work - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea New Work Exploring new work, guided by our values and mission. Why We&rsquo;re Looking to Support New Work Beginning in 2015, MacArthur established a roadmap for grantmaking via three new modes: Big B'
+    contentLength: 69014
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://news.wttw.com/2025/02/27/macarthur-foundation-increase-giving-two-years-response-crisis
+    linkText: WTTW News - MacArthur Foundation increase giving
+    claimContext: In response to 2025 federal funding cuts affecting nonprofit grantees, President John Palfrey announced the foundation would increase giving to at least 6% of its endowment annually over two years, citing an "unprecedented crisis" in the sector.[^33]
+    fetchedAt: 2026-02-22T01:44:22.489Z
+    httpStatus: 200
+    pageTitle: MacArthur Foundation to Increase Giving for Two Years in Response to 'Crisis' | Chicago News | WTTW
+    contentSnippet: "MacArthur Foundation to Increase Giving for Two Years in Response to &#039;Crisis&#039; | Chicago News | WTTW Skip to main content Search WTTW: Neighborhoods Food Kids Donate Search WTTW: Toggle main menu visibility Search WTTW: Live TV Schedule Watch Programs News Events About Support WTTW Passport Newsletters Donate Food Neighborhoods Kids Schedule Watch Live TV 10 That Changed America Art & Design in Chicago Beyond Chicago from the Air with Geoffrey Baer Black Voices Check, Please! Chicago by"
+    contentLength: 76034
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.macfound.org/about/investments/
+    linkText: MacArthur Foundation - Investments
+    claimContext: As of December 31, 2024, the MacArthur Foundation's total assets stood at \$9.2 billion, though alternative reports cite \$9.31 billion for the same period.[^34] The foundation is funded solely by endowment investments with no government funding.[^35] Its 2024 portfolio returned 12.25% net of costs.
+    fetchedAt: 2026-02-22T01:44:21.689Z
+    httpStatus: 200
+    pageTitle: Investments - MacArthur Foundation
+    contentSnippet: 'Investments - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Investments Stewarding our resources for impact. Overview Strategy Investment Assets The Foundation uses two methods for the ongoing management of its investment assets: an investment portfolio des'
+    contentLength: 77535
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.macfound.org/about/frequently-asked-questions
+    linkText: MacArthur Foundation - FAQs
+    claimContext: As of December 31, 2024, the MacArthur Foundation's total assets stood at \$9.2 billion, though alternative reports cite \$9.31 billion for the same period.[^34] The foundation is funded solely by endowment investments with no government funding.[^35] Its 2024 portfolio returned 12.25% net of costs.
+    fetchedAt: 2026-02-22T01:44:21.719Z
+    httpStatus: 200
+    pageTitle: Frequently Asked Questions - MacArthur Foundation
+    contentSnippet: 'Frequently Asked Questions - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Foundation FAQs Answers to common questions. Frequently Asked Questions What is the MacArthur Foundation? The John D. and Catherine T. MacArthur Foundation supports creative people, '
+    contentLength: 83335
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.macfound.org/about/investments/
+    linkText: MacArthur Foundation - Investments
+    claimContext: As of December 31, 2024, the MacArthur Foundation's total assets stood at \$9.2 billion, though alternative reports cite \$9.31 billion for the same period.[^34] The foundation is funded solely by endowment investments with no government funding.[^35] Its 2024 portfolio returned 12.25% net of costs.
+    fetchedAt: 2026-02-22T01:44:23.585Z
+    httpStatus: 200
+    pageTitle: Investments - MacArthur Foundation
+    contentSnippet: 'Investments - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Investments Stewarding our resources for impact. Overview Strategy Investment Assets The Foundation uses two methods for the ongoing management of its investment assets: an investment portfolio des'
+    contentLength: 77535
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.macfound.org/about/investments/
+    linkText: MacArthur Foundation - Investments
+    claimContext: "- \\$8.3 billion (2023) - \\$9.2 billion (2024)[^37]"
+    fetchedAt: 2026-02-22T01:44:23.706Z
+    httpStatus: 200
+    pageTitle: Investments - MacArthur Foundation
+    contentSnippet: 'Investments - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Investments Stewarding our resources for impact. Overview Strategy Investment Assets The Foundation uses two methods for the ongoing management of its investment assets: an investment portfolio des'
+    contentLength: 77535
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.macfound.org/about/investments/
+    linkText: MacArthur Foundation - Investments
+    claimContext: "The foundation has been a pioneer in impact investing since 1983. As of December 31, 2024, it had authorized up to \\$500 million for impact investments, with \\$390.5 million committed (47% loans, 35% private equity, 18% guarantees).[^38] Program-related investments totaled \\$188 million in 2021 and "
+    fetchedAt: 2026-02-22T01:44:23.721Z
+    httpStatus: 200
+    pageTitle: Investments - MacArthur Foundation
+    contentSnippet: 'Investments - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Investments Stewarding our resources for impact. Overview Strategy Investment Assets The Foundation uses two methods for the ongoing management of its investment assets: an investment portfolio des'
+    contentLength: 77535
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.macfound.org/media/article_pdfs/audited-financials-macarthurfoundation-fs-aug23.pdf
+    linkText: MacArthur Foundation - 2022 Audited Financials PDF
+    claimContext: "The foundation has been a pioneer in impact investing since 1983. As of December 31, 2024, it had authorized up to \\$500 million for impact investments, with \\$390.5 million committed (47% loans, 35% private equity, 18% guarantees).[^38] Program-related investments totaled \\$188 million in 2021 and "
+    fetchedAt: 2026-02-22T01:44:23.730Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 419115
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://www.macfound.org/about/frequently-asked-questions
+    linkText: MacArthur Foundation - FAQs
+    claimContext: "The foundation has awarded more than \\$8 billion in grants and impact investments since 1978.[^40] Recent annual disbursements include:"
+    fetchedAt: 2026-02-22T01:44:23.634Z
+    httpStatus: 200
+    pageTitle: Frequently Asked Questions - MacArthur Foundation
+    contentSnippet: 'Frequently Asked Questions - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Foundation FAQs Answers to common questions. Frequently Asked Questions What is the MacArthur Foundation? The John D. and Catherine T. MacArthur Foundation supports creative people, '
+    contentLength: 83335
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.macfound.org/media/financials_pdfs/macarthurfoundation_2023_audit.pdf
+    linkText: MacArthur Foundation - 2023 Audit PDF
+    claimContext: The 2024 payout totaled \$352.9 million.[^41]
+    fetchedAt: 2026-02-22T01:44:24.979Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 416286
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.insidephilanthropy.com/find-a-grant/grants-m/macarthur-foundation
+    linkText: Inside Philanthropy - MacArthur Foundation Grants
+    claimContext: Grant sizes range from \$10,000 to tens of millions, with the majority falling between \$50,000 and \$850,000.[^42] Notable large grants include the \$100 million 100&Change award (2017), \$50 million for rental housing preservation (2003), and \$67 million for the MacArthur Award for Creative & Eff
+    fetchedAt: 2026-02-22T01:44:25.645Z
+    httpStatus: 200
+    pageTitle: A Funding Guide to the MacArthur Foundation | Inside Philanthropy
+    contentSnippet: "A Funding Guide to the MacArthur Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar OVERVIEW: The John D. and Catherine T. MacArthur Foundation’s grantmaking spans a range of interests including climate change, democracy, criminal justice reform, programs in Nigeria, racial equity, the arts, journalism and more. MacArthur also participates in funding collaboratives in the larger Chicago area, where the foundation is based. IP TAKE: The MacArthur "
+    contentLength: 288582
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.macfound.org/programs/pastwork/macei/
+    linkText: MacArthur Foundation - MACEI
+    claimContext: Grant sizes range from \$10,000 to tens of millions, with the majority falling between \$50,000 and \$850,000.[^42] Notable large grants include the \$100 million 100&Change award (2017), \$50 million for rental housing preservation (2003), and \$67 million for the MacArthur Award for Creative & Eff
+    fetchedAt: 2026-02-22T01:44:24.950Z
+    httpStatus: 200
+    pageTitle: MacArthur Award for Creative & Effective Institutions - MacArthur Foundation
+    contentSnippet: 'MacArthur Award for Creative & Effective Institutions - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea MacArthur Award for Creative & Effective Institutions Grantmaking recognized exceptional grantee organizations that generated provocative ideas, reframed d'
+    contentLength: 81181
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.macfound.org/media/financials_pdfs/macarthurfoundation_2023_audit.pdf
+    linkText: MacArthur Foundation - 2023 Audit PDF
+    claimContext: Administrative and operating support expenses totaled \$69.1 million in 2023 and \$64.0 million in 2022.[^44] Officer compensation was \$4.79 million in 2024 (1.8% of expenses), up from \$4.24 million the prior year (0.8%).[^45]
+    fetchedAt: 2026-02-22T01:44:24.980Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 416286
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://projects.propublica.org/nonprofits/organizations/237093598
+    linkText: ProPublica - MacArthur Foundation
+    claimContext: Administrative and operating support expenses totaled \$69.1 million in 2023 and \$64.0 million in 2022.[^44] Officer compensation was \$4.79 million in 2024 (1.8% of expenses), up from \$4.24 million the prior year (0.8%).[^45]
+    fetchedAt: 2026-02-22T01:44:24.970Z
+    httpStatus: 200
+    pageTitle: John D & Catherine T Macarthur Foundation - Nonprofit Explorer - ProPublica
+    contentSnippet: "John D & Catherine T Macarthur Foundation - Nonprofit Explorer - ProPublica Skip to content Menu Menu ProPublica Donate Close Close ProPublica Donate Search ProPublica: Search Search Search Show search box Select the type of search Nonprofits People Filing Text Search for a nonprofit Search Search John D & Catherine T Macarthur Foundation Chicago, IL Tax-exempt since Feb. 1971 EIN: 23-7093598 Receive an email when new data is available for this organization. Organization summary Type of Nonprofi"
+    contentLength: 370516
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://capitalresearch.org/article/the-macarthur-foundation-a-donor-without-a-cause-spawns-a-foundation-with-an-agenda/
+    linkText: Capital Research - MacArthur Foundation
+    claimContext: In the 1990s, Chicago Alderman Edward M. Burke criticized the foundation for "excessive" salaries and overhead, demanding an Illinois Attorney General investigation and urging more spending on "needy causes," though no public findings were reported.[^46]
+    fetchedAt: 2026-02-22T01:44:29.206Z
+    httpStatus: 200
+    pageTitle: The MacArthur Foundation -Capital Research Center
+    contentSnippet: The MacArthur Foundation -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Foundation Watch The MacArthur Foundation A donor without a cause spawns a foundation with an age
+    contentLength: 130439
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://www.macfound.org/programs/
+    linkText: MacArthur Foundation - Programs
+    claimContext: "- **Nuclear Threats**: Work to decrease nuclear risks globally - **Nigeria Development**: Anti-corruption and accountability initiatives[^47]"
+    fetchedAt: 2026-02-22T01:44:26.720Z
+    httpStatus: 200
+    pageTitle: Programs - MacArthur Foundation
+    contentSnippet: 'Programs - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Programs Accelerating ingenuity and supporting effective organizations worldwide. Big Bets Investing boldly across critical challenges. AI Opportunity Climate Solutions Criminal Justice Local News On '
+    contentLength: 68132
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.macfound.org/programs/initiatives/new-work/
+    linkText: MacArthur Foundation - New Work
+    claimContext: These programs represent multi-year, concentrated funding efforts designed to achieve systemic change rather than incremental improvements.[^48]
+    fetchedAt: 2026-02-22T01:44:26.738Z
+    httpStatus: 200
+    pageTitle: New Work - MacArthur Foundation
+    contentSnippet: 'New Work - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea New Work Exploring new work, guided by our values and mission. Why We&rsquo;re Looking to Support New Work Beginning in 2015, MacArthur established a roadmap for grantmaking via three new modes: Big B'
+    contentLength: 69014
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.macfound.org/programs/awards/fellows/
+    linkText: MacArthur Foundation - Fellows Program
+    claimContext: The Fellows Program awards unrestricted \$800,000 grants (increased from earlier \$500,000) paid over five years to individuals demonstrating exceptional creativity and potential.[^49] Launched in 1981, the program has become the foundation's most recognizable initiative despite being its smallest d
+    fetchedAt: 2026-02-22T01:44:26.752Z
+    httpStatus: 200
+    pageTitle: MacArthur Fellows - MacArthur Foundation
+    contentSnippet: 'MacArthur Fellows - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea MacArthur Fellows Celebrating and inspiring the creative potential of individuals through no-strings-attached fellowships Overview About Search FAQs News Fellows in Focus Explore a collection'
+    contentLength: 92033
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.commentary.org/articles/wooster-martin-morse/the-macarthur-mistake/
+    linkText: Commentary Magazine - The MacArthur Mistake
+    claimContext: The Fellows Program awards unrestricted \$800,000 grants (increased from earlier \$500,000) paid over five years to individuals demonstrating exceptional creativity and potential.[^49] Launched in 1981, the program has become the foundation's most recognizable initiative despite being its smallest d
+    fetchedAt: 2026-02-22T01:44:27.086Z
+    httpStatus: 200
+    pageTitle: The MacArthur Mistake &#8211; Commentary Magazine
+    contentSnippet: The MacArthur Mistake &#8211; Commentary Magazine Close Login Access your Commentary account. Email address Password Remember me Login Forgot your password? Lost your password? Please enter your email address. You will receive a link to create a new password via email. Email Reset password Go back Home March 2026 Donate Newsletter Merch Contact Us Subscribe Search Login There was no management association looking at Michelangelo and asking him to fill out semi-yearly progress reports in triplica
+    contentLength: 265711
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.everygoddamnday.com/2021/10/flashback-1990-grants-tomb-some-say.html
+    linkText: Every Goddamn Day - Flashback 1990
+    claimContext: The program has faced persistent criticism. Recipients have reported negative effects including overwhelming publicity (unwanted solicitations from financial advisers and salespeople), increased expectations from colleagues, and career disruption. Notably, writer James McPherson, who received a \$19
+    fetchedAt: 2026-02-22T01:44:30.920Z
+    httpStatus: 200
+    pageTitle: "Every goddamn day: 02/21/26: Flashback 1990: The grant's tomb&#8212;MacArthur money `ruins lives'"
+    contentSnippet: "Every goddamn day: 02/21/26: Flashback 1990: The grant's tomb&#8212;MacArthur money `ruins lives' Sunday, October 3, 2021 Flashback 1990: The grant's tomb&#8212;MacArthur money `ruins lives' \"The Voyage of Life: Childhood,\" by Thomas Cole (Smithsonian Institution) The MacArthur Foundation Fellowships were given out last week&#8212;they'd rather not call them \"genius grants\" though everybody does. This year was unusual because, among the unfamiliar poets and filmmakers was somebody I actually had"
+    contentLength: 129500
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://www.everygoddamnday.com/2021/10/flashback-1990-grants-tomb-some-say.html
+    linkText: Every Goddamn Day - Flashback 1990
+    claimContext: The program has faced persistent criticism. Recipients have reported negative effects including overwhelming publicity (unwanted solicitations from financial advisers and salespeople), increased expectations from colleagues, and career disruption. Notably, writer James McPherson, who received a \$19
+    fetchedAt: 2026-02-22T01:44:30.743Z
+    httpStatus: 200
+    pageTitle: "Every goddamn day: 02/21/26: Flashback 1990: The grant's tomb&#8212;MacArthur money `ruins lives'"
+    contentSnippet: "Every goddamn day: 02/21/26: Flashback 1990: The grant's tomb&#8212;MacArthur money `ruins lives' Sunday, October 3, 2021 Flashback 1990: The grant's tomb&#8212;MacArthur money `ruins lives' \"The Voyage of Life: Childhood,\" by Thomas Cole (Smithsonian Institution) The MacArthur Foundation Fellowships were given out last week&#8212;they'd rather not call them \"genius grants\" though everybody does. This year was unusual because, among the unfamiliar poets and filmmakers was somebody I actually had"
+    contentLength: 129500
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://theweek.com/culture/1005474/whats-a-genius
+    linkText: The Week - What's a Genius
+    claimContext: Critics have also accused the program of political bias favoring liberal to left-leaning recipients, despite founder John MacArthur's conservative Republican views. In 1995, columnist John Leo criticized the cohort for feminist slant, highlighting musicologist Susan McClary's controversial interpret
+    fetchedAt: 2026-02-22T01:44:30.957Z
+    httpStatus: 200
+    pageTitle: The recurring problem with the MacArthur 'genius' grants | The Week
+    contentSnippet: "The recurring problem with the MacArthur 'genius' grants | The Week (Image credit: Illustrated | iStock) Share Copy link Facebook X Linkedin Whatsapp Pinterest Share this article Join the conversation Follow us Add us as a preferred source on Google Newsletter TheWeek Get the The Week Newsletter A free daily email with the biggest news stories of the day &ndash; and the best features from TheWeek.com Contact me with news and offers from other Future brands Receive email from us on behalf of our "
+    contentLength: 1158508
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://philanthropydaily.com/those-unassailable-genius-grants/
+    linkText: Philanthropy Daily - Genius Grants
+    claimContext: Critics have also accused the program of political bias favoring liberal to left-leaning recipients, despite founder John MacArthur's conservative Republican views. In 1995, columnist John Leo criticized the cohort for feminist slant, highlighting musicologist Susan McClary's controversial interpret
+    fetchedAt: 2026-02-22T01:44:31.815Z
+    httpStatus: 200
+    pageTitle: Those unassailable "genius grants"Philanthropy Daily
+    contentSnippet: 'Those unassailable "genius grants"Philanthropy Daily Look at articles about the MacArthur Fellows Program (commonly known as the “genius grants”) and you’ll find two categories of stories. One is where the wide-eyed hack shows up at MacArthur headquarters in Chicago full of wonder about how the selfless, noble program officers are bestowing riches among the struggling artists, who thanks to the [&hellip;] "> Share on Facebook Share on Twitter Share via email Share on LinkedIn Sign up to receive '
+    contentLength: 205869
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://www.macfound.org/programs/awards/100change/
+    linkText: MacArthur Foundation - 100&Change
+    claimContext: Launched in 2016, 100&Change awards a single \$100 million grant through an open competition to fund a proposal with real potential to solve a critical problem.[^55] The inaugural 2017 award went jointly to Sesame Workshop and the International Rescue Committee for educating Middle Eastern refugee c
+    fetchedAt: 2026-02-22T01:44:30.467Z
+    httpStatus: 200
+    pageTitle: 100&Change - MacArthur Foundation
+    contentSnippet: '100&Change - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea 100&Change A competition for a $100 million grant to fund a single proposal that promises real and measurable progress in solving a critical problem of our time. #100andChange Overview Strategy Time'
+    contentLength: 93983
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: Launched in 2016, 100&Change awards a single \$100 million grant through an open competition to fund a proposal with real potential to solve a critical problem.[^55] The inaugural 2017 award went jointly to Sesame Workshop and the International Rescue Committee for educating Middle Eastern refugee c
+    fetchedAt: 2026-02-22T01:44:32.837Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 57
+    url: https://www.aspeninstitute.org/blog-posts/billionaires-big-givers-and-the-bets-they-make/
+    linkText: Aspen Institute - Billionaires and Big Givers
+    claimContext: Launched in 2016, 100&Change awards a single \$100 million grant through an open competition to fund a proposal with real potential to solve a critical problem.[^55] The inaugural 2017 award went jointly to Sesame Workshop and the International Rescue Committee for educating Middle Eastern refugee c
+    fetchedAt: 2026-02-22T01:44:33.251Z
+    httpStatus: 200
+    pageTitle: "Billionaires, Big Givers and the Bets They Make: A Timeline - Aspen Institute"
+    contentSnippet: "Billionaires, Big Givers and the Bets They Make: A Timeline - Aspen Institute Close Navigation Aspen is a place for leaders to lift their sights above the possessions which possess them. To confront their own nature as human beings, to regain control over their own humanity by becoming more self-aware, more self-correcting, and hence more self-fulfilling. Walter P. Paepcke, Aspen Institute Co-Founder Back Welcome Welcome to the Aspen Institute—explore our work, programs, and ideas creating new p"
+    contentLength: 201939
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://www.macfound.org/press/perspectives/macarthur-in-chicago-reflections-on-2024
+    linkText: MacArthur Foundation - MacArthur in Chicago 2024
+    claimContext: "- **Racial Equity in Chicago**: 2024 grants totaled \\$69 million across 150 grants and impact investments, including a \\$3.25 million partnership with the Field Foundation (since 2019) providing \\$25,000 each to 65 leaders and their organizations with no-strings-attached support.[^58] - **U.S. Journ"
+    fetchedAt: 2026-02-22T01:44:33.124Z
+    httpStatus: 200
+    pageTitle: "MacArthur in Chicago: Reflections on 2024 - MacArthur Foundation"
+    contentSnippet: 'MacArthur in Chicago: Reflections on 2024 - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea MacArthur in Chicago: Reflections on 2024 February 27, 2025 Perspectives Chicago Commitment Your browser does not support the video tag. --> An aerial view of Garfield'
+    contentLength: 111977
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://www.macfound.org/press/perspectives/what-our-directors-learned-from-the-field-in-2025
+    linkText: MacArthur Foundation - What Directors Learned 2025
+    claimContext: "- **Racial Equity in Chicago**: 2024 grants totaled \\$69 million across 150 grants and impact investments, including a \\$3.25 million partnership with the Field Foundation (since 2019) providing \\$25,000 each to 65 leaders and their organizations with no-strings-attached support.[^58] - **U.S. Journ"
+    fetchedAt: 2026-02-22T01:44:33.443Z
+    httpStatus: 200
+    pageTitle: What Our Directors Learned from the Field in 2025 - MacArthur Foundation
+    contentSnippet: 'What Our Directors Learned from the Field in 2025 - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea What Our Directors Learned from the Field in 2025 February 2, 2026 Perspectives Chicago Commitment Climate Solutions Criminal Justice Impact Investments Journa'
+    contentLength: 119163
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://www.macfound.org/programs/field-support/philanthropy/
+    linkText: MacArthur Foundation - Philanthropy Field Support
+    claimContext: Field Support targets philanthropic infrastructure, equity in the sector, research and communication among funders and nonprofits, and nonprofit capacity-building, with a focus on the U.S., Nigeria, and India.[^60] As of June 2025, the foundation was not accepting unsolicited U.S. proposals for this
+    fetchedAt: 2026-02-22T01:44:33.215Z
+    httpStatus: 200
+    pageTitle: Philanthropy - MacArthur Foundation
+    contentSnippet: 'Philanthropy - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Philanthropy Supporting a stronger philanthropic and nonprofit sector that leads by living the values of Diversity, Equity, and Inclusion. Overview Strategy Grant Guidelines Why We Support This Wo'
+    contentLength: 91890
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://www.macfound.org/programs/field-support/philanthropy/grant-guidelines
+    linkText: MacArthur Foundation - Philanthropy Grant Guidelines
+    claimContext: Field Support targets philanthropic infrastructure, equity in the sector, research and communication among funders and nonprofits, and nonprofit capacity-building, with a focus on the U.S., Nigeria, and India.[^60] As of June 2025, the foundation was not accepting unsolicited U.S. proposals for this
+    fetchedAt: 2026-02-22T01:44:34.654Z
+    httpStatus: 200
+    pageTitle: Grant Guidelines - MacArthur Foundation
+    contentSnippet: 'Grant Guidelines - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Philanthropy Supporting a stronger philanthropic and nonprofit sector that leads by living the values of Diversity, Equity, and Inclusion. Overview Strategy Grant Guidelines Overview We believ'
+    contentLength: 67977
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://www.macfound.org/programs/pastwork/research-networks/
+    linkText: MacArthur Foundation - Research Networks
+    claimContext: The MacArthur Foundation has historically supported interdisciplinary **research networks** functioning as "research institutions without walls," focusing on human and community development, policy-relevant empirical questions, and social issues.[^62] During its first two decades, these networks clu
+    fetchedAt: 2026-02-22T01:44:34.796Z
+    httpStatus: 200
+    pageTitle: Research Networks - MacArthur Foundation
+    contentSnippet: 'Research Networks - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Research Networks From 1984 to 2021, The Foundation supported interdisciplinary research networks that examined problems and addressed empirical questions that had the potential to change pre'
+    contentLength: 77969
+    status: verified
+    note: null
+  - footnote: 63
+    url: https://www.macfound.org/programs/pastwork/policy_research/
+    linkText: MacArthur Foundation - Policy Research
+    claimContext: "- **Economic Inequality and Social Interactions** (1995-2005) - **MacArthur Research Network on Opening Governance** (2013-2016): Initial \\$5 million grant to NYU's Governance Lab, producing blueprints for democratic institutions, U.S. population/mortality projections, and an aging society adaptatio"
+    fetchedAt: 2026-02-22T01:44:34.557Z
+    httpStatus: 200
+    pageTitle: Policy Research - MacArthur Foundation
+    contentSnippet: 'Policy Research - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Policy Research Grantmaking supported the development of more effective domestic policy by working to increase the policy impact of the Foundation’s program strategies. Summary From 1995 to 201'
+    contentLength: 74285
+    status: verified
+    note: null
+  - footnote: 64
+    url: https://www.macfound.org/programs/pastwork/policy_research/
+    linkText: MacArthur Foundation - Policy Research
+    claimContext: "- **Benefit-Cost Analysis in Social Policy** (2006-2016): 59 grants totaling \\$43 million to increase research, standards, and policymaker demand for evidence-based policymaking[^64] - **Institutional Support** (1995-2016): 425 grants totaling \\$214 million to key organizations including Urban-Brook"
+    fetchedAt: 2026-02-22T01:44:34.711Z
+    httpStatus: 200
+    pageTitle: Policy Research - MacArthur Foundation
+    contentSnippet: 'Policy Research - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Policy Research Grantmaking supported the development of more effective domestic policy by working to increase the policy impact of the Foundation’s program strategies. Summary From 1995 to 201'
+    contentLength: 74285
+    status: verified
+    note: null
+  - footnote: 65
+    url: https://www.macfound.org/programs/pastwork/policy_research/
+    linkText: MacArthur Foundation - Policy Research
+    claimContext: "- **Benefit-Cost Analysis in Social Policy** (2006-2016): 59 grants totaling \\$43 million to increase research, standards, and policymaker demand for evidence-based policymaking[^64] - **Institutional Support** (1995-2016): 425 grants totaling \\$214 million to key organizations including Urban-Brook"
+    fetchedAt: 2026-02-22T01:44:34.659Z
+    httpStatus: 200
+    pageTitle: Policy Research - MacArthur Foundation
+    contentSnippet: 'Policy Research - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Policy Research Grantmaking supported the development of more effective domestic policy by working to increase the policy impact of the Foundation’s program strategies. Summary From 1995 to 201'
+    contentLength: 74285
+    status: verified
+    note: null
+  - footnote: 66
+    url: https://www.macfound.org/press/grantee-publications/research-universities-and-future-america
+    linkText: MacArthur Foundation - Research Universities Publication
+    claimContext: "- **Institutional Support** (1995-2016): 425 grants totaling \\$214 million to key organizations including Urban-Brookings Tax Policy Center, Center on Budget and Policy Priorities, and Sargent Shriver National Center on Poverty Law (nearly \\$45 million from 2004-2016)[^65] - **Research Universities "
+    fetchedAt: 2026-02-22T01:44:36.664Z
+    httpStatus: 200
+    pageTitle: Research Universities and the Future of America - MacArthur Foundation
+    contentSnippet: 'Research Universities and the Future of America - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Research Universities and the Future of America June 19, 2012 Grantee Publications Policy Research Research universities have made critical contributions to the '
+    contentLength: 86296
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://www.macfound.org/press/perspectives/prioritizing-safety-and-rights-in-ai-technology
+    linkText: MacArthur Foundation - Prioritizing Safety and Rights in AI
+    claimContext: While not focused on existential AI risks, the MacArthur Foundation supports AI safety through governance, accountability, and oversight initiatives emphasizing democratic values and public interest safeguards.[^67]
+    fetchedAt: 2026-02-22T01:44:36.142Z
+    httpStatus: 200
+    pageTitle: Prioritizing Safety and Rights in AI Technology - MacArthur Foundation
+    contentSnippet: 'Prioritizing Safety and Rights in AI Technology - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Prioritizing Safety and Rights in AI Technology January 30, 2025 Perspectives Technology in the Public Interest Eric Sears, Director, Technology in the Public In'
+    contentLength: 92161
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://www.macfound.org/programs/field-support/technology-public-interest/strategy
+    linkText: MacArthur Foundation - Technology Public Interest Strategy
+    claimContext: The foundation's **Technology in the Public Interest Program** aims to strengthen democratic oversight of AI through evaluation, auditing, and accountability mechanisms. It supports AI laws, policies, and regulations; builds networks in high-stakes sectors like healthcare, education, and finance; an
+    fetchedAt: 2026-02-22T01:44:36.174Z
+    httpStatus: 200
+    pageTitle: Technology in the Public Interest Program Strategy - MacArthur Foundation
+    contentSnippet: 'Technology in the Public Interest Program Strategy - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Technology in the Public Interest Strengthening oversight and innovation in the governance of artificial intelligence. Overview Strategy Our Strategy Why We S'
+    contentLength: 73325
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://humanityai.ai
+    linkText: Humanity AI
+    claimContext: In 2025, MacArthur committed to the **Humanity AI Coalition**, a \$500 million initiative for people-centered AI including security standards for driverless cars and automated decisions designed to protect safety without compromising innovation.[^69]
+    fetchedAt: 2026-02-22T01:44:36.378Z
+    httpStatus: 200
+    pageTitle: Home - Humanity AI
+    contentSnippet: "Home - Humanity AI Skip to content Our future with AI can and will be what we make it. Humanity AI is uniting philanthropy in a broad coalition to build a more human(e) future in which AI is shaped by and for people. Learn More AI will be what we collectively make it People build it. People use it. And people will benefit from its potential or suffer the harms it can cause. The choice in front of all of us is clear: will we allow AI to be designed only for profit, or will we invest in a future w"
+    contentLength: 103935
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://www.macfound.org/grantee/partnership-on-artificial-intelligence-to-benefit-people-and-society-10114517/
+    linkText: MacArthur Foundation - Partnership on AI Grantee
+    claimContext: "- **Partnership on Artificial Intelligence (PAI)**: General operating support for programs including Safety Critical AI, Fair/Transparent/Accountable AI, and AI & Media Integrity[^70] - **Brennan Center**: Work on oversight, transparency, and accountability for AI in domestic national security; exam"
+    fetchedAt: 2026-02-22T01:44:36.307Z
+    httpStatus: 200
+    pageTitle: Partnership on Artificial Intelligence to Benefit People and Society - MacArthur Foundation
+    contentSnippet: 'Partnership on Artificial Intelligence to Benefit People and Society - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Partnership on Artificial Intelligence to Benefit People and Society San Francisco, California Grants 5 Total Awarded $3,305,000 Years 2017 '
+    contentLength: 92772
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://www.macfound.org/press/perspectives/prioritizing-safety-and-rights-in-ai-technology
+    linkText: MacArthur Foundation - Prioritizing Safety and Rights in AI
+    claimContext: "- **Partnership on Artificial Intelligence (PAI)**: General operating support for programs including Safety Critical AI, Fair/Transparent/Accountable AI, and AI & Media Integrity[^70] - **Brennan Center**: Work on oversight, transparency, and accountability for AI in domestic national security; exam"
+    fetchedAt: 2026-02-22T01:44:37.740Z
+    httpStatus: 200
+    pageTitle: Prioritizing Safety and Rights in AI Technology - MacArthur Foundation
+    contentSnippet: 'Prioritizing Safety and Rights in AI Technology - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Prioritizing Safety and Rights in AI Technology January 30, 2025 Perspectives Technology in the Public Interest Eric Sears, Director, Technology in the Public In'
+    contentLength: 92161
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://www.insidephilanthropy.com/home/whos-funding-ai-regulation-and-safety
+    linkText: Inside Philanthropy - AI Regulation Funding
+    claimContext: "- **Brennan Center**: Work on oversight, transparency, and accountability for AI in domestic national security; examination of AI industry influence on U.S. government[^71] - **Institute for Security and Technology**: \\$400,000 for LLM risk mitigation[^72] - **Tech Policy Press**: Analysis of AI geo"
+    fetchedAt: 2026-02-22T01:44:38.559Z
+    httpStatus: 200
+    pageTitle: Who’s funding AI regulation and safety? | Inside Philanthropy
+    contentSnippet: "Who’s funding AI regulation and safety? | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer Credit: Tada Images/Shutterstock Philanthropy’s relationship with AI is a complicated one — and with good reason. On the one hand, AI has helped make significant strides in the fields of science and medicine — for instance, in the development of COVID-19 vaccines. Philanthropic funders have backed and continue to support AI-driven research and developme"
+    contentLength: 309885
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://www.macfound.org/press/perspectives/prioritizing-safety-and-rights-in-ai-technology
+    linkText: MacArthur Foundation - Prioritizing Safety and Rights in AI
+    claimContext: "- **Institute for Security and Technology**: \\$400,000 for LLM risk mitigation[^72] - **Tech Policy Press**: Analysis of AI geopolitics[^73]"
+    fetchedAt: 2026-02-22T01:44:37.885Z
+    httpStatus: 200
+    pageTitle: Prioritizing Safety and Rights in AI Technology - MacArthur Foundation
+    contentSnippet: 'Prioritizing Safety and Rights in AI Technology - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Prioritizing Safety and Rights in AI Technology January 30, 2025 Perspectives Technology in the Public Interest Eric Sears, Director, Technology in the Public In'
+    contentLength: 92161
+    status: verified
+    note: null
+  - footnote: 74
+    url: https://europeanaifund.org/wp-content/uploads/2023/06/260623-FOR-PUBLICATION-EAISF-Funding-landscape-review.pdf
+    linkText: European AI & Society Fund - Funding Landscape Review PDF
+    claimContext: MacArthur has funded civil society AI work longer and more substantially than European counterparts, according to a 2023 landscape review.[^74] The foundation's approach focuses on near-term governance challenges—security, human rights, national security risks, and societal harms—rather than long-te
+    fetchedAt: 2026-02-22T01:44:38.687Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 287789
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://www.macfound.org/press/perspectives/measuring-the-impact-of-our-catalytic-capital
+    linkText: MacArthur Foundation - Measuring Impact of Catalytic Capital
+    claimContext: The foundation's impact investing strategy emphasizes catalytic capital that mobilizes additional funding beyond direct grants. Its \$128.5 million in committed impact investments has mobilized between \$1.4 billion and \$3.1 billion in additional capital from other sources.[^75] Notable examples in
+    fetchedAt: 2026-02-22T01:44:37.825Z
+    httpStatus: 200
+    pageTitle: Measuring the Impact of Our Catalytic Capital - MacArthur Foundation
+    contentSnippet: 'Measuring the Impact of Our Catalytic Capital - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Measuring the Impact of Our Catalytic Capital January 15, 2026 Perspectives Impact Investments Impact measurement and management challenges every investor should c'
+    contentLength: 99002
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://www.macfound.org/press/perspectives/relevance-resilience-and-resolve-keys-to-impact-at-scale
+    linkText: MacArthur Foundation - Relevance Resilience Resolve
+    claimContext: The foundation's impact investing strategy emphasizes catalytic capital that mobilizes additional funding beyond direct grants. Its \$128.5 million in committed impact investments has mobilized between \$1.4 billion and \$3.1 billion in additional capital from other sources.[^75] Notable examples in
+    fetchedAt: 2026-02-22T01:44:39.858Z
+    httpStatus: 200
+    pageTitle: "Relevance, Resilience, and Resolve: Keys to Impact at Scale - MacArthur Foundation"
+    contentSnippet: 'Relevance, Resilience, and Resolve: Keys to Impact at Scale - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Relevance, Resilience, and Resolve: Keys to Impact at Scale January 30, 2025 Perspectives Impact Investments Debra Schwartz, Managing Director, Impac'
+    contentLength: 93762
+    status: verified
+    note: null
+  - footnote: 77
+    url: https://www.macfound.org/press/perspectives/measuring-the-impact-of-our-catalytic-capital
+    linkText: MacArthur Foundation - Measuring Impact of Catalytic Capital
+    claimContext: The foundation tracks people-centered metrics like job creation and housing stability for individual investments. For instance, across several example investments, the foundation reports creation of 520 jobs, though it does not provide aggregated portfolio-wide metrics.[^77]
+    fetchedAt: 2026-02-22T01:44:39.789Z
+    httpStatus: 200
+    pageTitle: Measuring the Impact of Our Catalytic Capital - MacArthur Foundation
+    contentSnippet: 'Measuring the Impact of Our Catalytic Capital - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Measuring the Impact of Our Catalytic Capital January 15, 2026 Perspectives Impact Investments Impact measurement and management challenges every investor should c'
+    contentLength: 99002
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://www.macfound.org/programs/pastwork/macei/
+    linkText: MacArthur Foundation - MACEI
+    claimContext: "The **MacArthur Award for Creative & Effective Institutions (MACEI)** program (2006-2016) awarded 102 grants totaling \\$67 million to exceptional NGOs for infrastructure improvements, financial security, capacity building, and credibility enhancement.[^78] An evaluation covering 2006-2013 confirmed "
+    fetchedAt: 2026-02-22T01:44:41.345Z
+    httpStatus: 200
+    pageTitle: MacArthur Award for Creative & Effective Institutions - MacArthur Foundation
+    contentSnippet: 'MacArthur Award for Creative & Effective Institutions - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea MacArthur Award for Creative & Effective Institutions Grantmaking recognized exceptional grantee organizations that generated provocative ideas, reframed d'
+    contentLength: 81181
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://www.macfound.org/programs/pastwork/macei/
+    linkText: MacArthur Foundation - MACEI
+    claimContext: "The **MacArthur Award for Creative & Effective Institutions (MACEI)** program (2006-2016) awarded 102 grants totaling \\$67 million to exceptional NGOs for infrastructure improvements, financial security, capacity building, and credibility enhancement.[^78] An evaluation covering 2006-2013 confirmed "
+    fetchedAt: 2026-02-22T01:44:41.315Z
+    httpStatus: 200
+    pageTitle: MacArthur Award for Creative & Effective Institutions - MacArthur Foundation
+    contentSnippet: 'MacArthur Award for Creative & Effective Institutions - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea MacArthur Award for Creative & Effective Institutions Grantmaking recognized exceptional grantee organizations that generated provocative ideas, reframed d'
+    contentLength: 81181
+    status: verified
+    note: null
+  - footnote: 80
+    url: https://www.macfound.org/press/perspectives/reflecting-on-the-origins-and-successes-of-our-nuclear-grantmaking
+    linkText: MacArthur Foundation - Nuclear Grantmaking Success
+    claimContext: MacArthur credits its nuclear security grantmaking with helping inspire institutions like Stanford's Center for International Security and Harvard's Belfer Center, and contributing to the Cooperative Threat Reduction Program that dismantled weapons in the former Soviet Union.[^80] The foundation sup
+    fetchedAt: 2026-02-22T01:44:40.022Z
+    httpStatus: 200
+    pageTitle: Reflecting on the Origins and Successes of Our Nuclear Grantmaking - MacArthur Foundation
+    contentSnippet: 'Reflecting on the Origins and Successes of Our Nuclear Grantmaking - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Reflecting on the Origins and Successes of Our Nuclear Grantmaking November 20, 2024 Perspectives Nuclear Challenges Kennette Benedict Former '
+    contentLength: 101525
+    status: verified
+    note: null
+  - footnote: 81
+    url: https://www.macfound.org/press/perspectives/relevance-resilience-and-resolve-keys-to-impact-at-scale
+    linkText: MacArthur Foundation - Relevance Resilience Resolve
+    claimContext: MacArthur credits its nuclear security grantmaking with helping inspire institutions like Stanford's Center for International Security and Harvard's Belfer Center, and contributing to the Cooperative Threat Reduction Program that dismantled weapons in the former Soviet Union.[^80] The foundation sup
+    fetchedAt: 2026-02-22T01:44:42.405Z
+    httpStatus: 200
+    pageTitle: "Relevance, Resilience, and Resolve: Keys to Impact at Scale - MacArthur Foundation"
+    contentSnippet: 'Relevance, Resilience, and Resolve: Keys to Impact at Scale - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Relevance, Resilience, and Resolve: Keys to Impact at Scale January 30, 2025 Perspectives Impact Investments Debra Schwartz, Managing Director, Impac'
+    contentLength: 93762
+    status: verified
+    note: null
+  - footnote: 82
+    url: https://www.macfound.org/press/perspectives/relevance-resilience-and-resolve-keys-to-impact-at-scale
+    linkText: MacArthur Foundation - Relevance Resilience Resolve
+    claimContext: "2. **Resilience**: Willingness to iterate and adapt (e.g., decades-long CDFI support) 3. **Resolve**: Long-term flexible capital sustained over many years[^82]"
+    fetchedAt: 2026-02-22T01:44:42.653Z
+    httpStatus: 200
+    pageTitle: "Relevance, Resilience, and Resolve: Keys to Impact at Scale - MacArthur Foundation"
+    contentSnippet: 'Relevance, Resilience, and Resolve: Keys to Impact at Scale - MacArthur Foundation --> m_auth=WIdLN_TpIEfx1XUl9lWkdQ>m_preview=env-34>m_cookies_win=x" height="0" width="0" style="display: none; visibility: hidden"> Account Login Login into your grantee account, reset your password, or submit an idea to the MacArthur Foundation. Login or Submit Idea Relevance, Resilience, and Resolve: Keys to Impact at Scale January 30, 2025 Perspectives Impact Investments Debra Schwartz, Managing Director, Impac'
+    contentLength: 93762
+    status: verified
+    note: null
+  - footnote: 83
+    url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    linkText: Wikipedia - MacArthur Foundation
+    claimContext: Over 40 years, the foundation claims to have fueled social and environmental change across 117 countries.[^83]
+    fetchedAt: 2026-02-22T01:44:42.361Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 84
+    url: https://theweek.com/culture/1005474/whats-a-genius
+    linkText: The Week - What's a Genius
+    claimContext: The MacArthur Foundation has faced sustained criticism for left-leaning grantmaking that critics argue violates the conservative Republican founder's likely intentions. Thomas Frank wrote in 2014 that the foundation represents a "doctrine of saintly imitation," rewarding moral worthiness over achiev
+    fetchedAt: 2026-02-22T01:44:42.476Z
+    httpStatus: 200
+    pageTitle: The recurring problem with the MacArthur 'genius' grants | The Week
+    contentSnippet: "The recurring problem with the MacArthur 'genius' grants | The Week (Image credit: Illustrated | iStock) Share Copy link Facebook X Linkedin Whatsapp Pinterest Share this article Join the conversation Follow us Add us as a preferred source on Google Newsletter TheWeek Get the The Week Newsletter A free daily email with the biggest news stories of the day &ndash; and the best features from TheWeek.com Contact me with news and offers from other Future brands Receive email from us on behalf of our "
+    contentLength: 1158508
+    status: verified
+    note: null
+  - footnote: 85
+    url: https://capitalresearch.org/article/the-macarthur-foundation-a-donor-without-a-cause-spawns-a-foundation-with-an-agenda/
+    linkText: Capital Research - MacArthur Foundation
+    claimContext: "Specific examples of allegedly biased funding include: - Arms control organizations: Federation of American Scientists (\\$2.5 million, 2001-2004) and Union of Concerned Scientists (\\$1.4 million, 2001-2004), dwarfing support for conservative causes[^85] - Left-leaning organizations: Planned Parentho"
+    fetchedAt: 2026-02-22T01:44:43.027Z
+    httpStatus: 200
+    pageTitle: The MacArthur Foundation -Capital Research Center
+    contentSnippet: The MacArthur Foundation -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Foundation Watch The MacArthur Foundation A donor without a cause spawns a foundation with an age
+    contentLength: 130400
+    status: verified
+    note: null
+  - footnote: 86
+    url: https://www.influencewatch.org/non-profit/john-d-and-catherine-t-macarthur-foundation/
+    linkText: InfluenceWatch - MacArthur Foundation
+    claimContext: "- Arms control organizations: Federation of American Scientists (\\$2.5 million, 2001-2004) and Union of Concerned Scientists (\\$1.4 million, 2001-2004), dwarfing support for conservative causes[^85] - Left-leaning organizations: Planned Parenthood and ProPublica (over \\$5 million since 1987)[^86] - "
+    fetchedAt: 2026-02-22T01:44:44.324Z
+    httpStatus: 200
+    pageTitle: John D. and Catherine T. MacArthur Foundation - InfluenceWatch
+    contentSnippet: "John D. and Catherine T. MacArthur Foundation - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit John D. and Catherine T. MacArthur Foundation MacArthur Foundation logo, current as of March 2013 ( link ) Website: www.macfound.org Locatio"
+    contentLength: 237668
+    status: verified
+    note: null
+  - footnote: 87
+    url: https://capitalresearch.org/article/the-macarthur-foundation-a-donor-without-a-cause-spawns-a-foundation-with-an-agenda/
+    linkText: Capital Research - MacArthur Foundation
+    claimContext: "- Left-leaning organizations: Planned Parenthood and ProPublica (over \\$5 million since 1987)[^86] - Death penalty opposition: The foundation celebrated the 2005 Supreme Court ruling limiting capital punishment[^87]"
+    fetchedAt: 2026-02-22T01:44:44.099Z
+    httpStatus: 200
+    pageTitle: The MacArthur Foundation -Capital Research Center
+    contentSnippet: The MacArthur Foundation -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Foundation Watch The MacArthur Foundation A donor without a cause spawns a foundation with an age
+    contentLength: 130400
+    status: verified
+    note: null
+  - footnote: 88
+    url: https://www.masterresource.org/civil-society-foundations/foundations-gone-rogue/
+    linkText: Master Resource - Foundations Gone Rogue
+    claimContext: Conservative critics have characterized the foundation as having "gone astray" from its capitalist origins, joining other foundations like Ford, Rockefeller, and Pew in disparaging the sources of their wealth.[^88]
+    fetchedAt: 2026-02-22T01:44:45.320Z
+    httpStatus: 200
+    pageTitle: "Foundations Gone Rogue: Ford Foundation and Beyond - Master Resource"
+    contentSnippet: "Foundations Gone Rogue: Ford Foundation and Beyond - Master Resource Foundations Gone Rogue: Ford Foundation and Beyond By Jane Shaw Stroup -- February 7, 2025 Editor note : The wealth of free-market capitalism creates a robust civil society, where nonprofits and foundations can support the causes of their choosing, many of which might not be viable otherwise. The problem is where philanthropy goes political against the free society and human betterment. Jane Shaw Stroup at her blog Jane Takes o"
+    contentLength: 130976
+    status: verified
+    note: null
+  - footnote: 89
+    url: https://capitalresearch.org/article/the-macarthur-foundation-a-donor-without-a-cause-spawns-a-foundation-with-an-agenda/
+    linkText: Capital Research - MacArthur Foundation
+    claimContext: "- **CDBG (Community Development Block Grants)**: Funded projects like revitalizing shopping malls in California, building parking lots in New York, with funds flowing disproportionately to wealthy areas[^89] - **HOPE VI**: Built low-income housing in polluted areas near factories, reinforcing segreg"
+    fetchedAt: 2026-02-22T01:44:44.317Z
+    httpStatus: 200
+    pageTitle: The MacArthur Foundation -Capital Research Center
+    contentSnippet: The MacArthur Foundation -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Foundation Watch The MacArthur Foundation A donor without a cause spawns a foundation with an age
+    contentLength: 130400
+    status: verified
+    note: null
+  - footnote: 90
+    url: https://capitalresearch.org/article/the-macarthur-foundation-a-donor-without-a-cause-spawns-a-foundation-with-an-agenda/
+    linkText: Capital Research - MacArthur Foundation
+    claimContext: "- **CDBG (Community Development Block Grants)**: Funded projects like revitalizing shopping malls in California, building parking lots in New York, with funds flowing disproportionately to wealthy areas[^89] - **HOPE VI**: Built low-income housing in polluted areas near factories, reinforcing segreg"
+    fetchedAt: 2026-02-22T01:44:44.989Z
+    httpStatus: 200
+    pageTitle: The MacArthur Foundation -Capital Research Center
+    contentSnippet: The MacArthur Foundation -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Foundation Watch The MacArthur Foundation A donor without a cause spawns a foundation with an age
+    contentLength: 130400
+    status: verified
+    note: null
+  - footnote: 91
+    url: https://capitalresearch.org/article/the-macarthur-foundation-a-donor-without-a-cause-spawns-a-foundation-with-an-agenda/
+    linkText: Capital Research - MacArthur Foundation
+    claimContext: "- **HOPE VI**: Built low-income housing in polluted areas near factories, reinforcing segregation rather than alleviating it[^90] - **New Communities Program**: Foundation's \\$50 million rental housing preservation effort (2003) was viewed as tying poor people to the welfare state through below-mark"
+    fetchedAt: 2026-02-22T01:44:46.386Z
+    httpStatus: 200
+    pageTitle: The MacArthur Foundation -Capital Research Center
+    contentSnippet: The MacArthur Foundation -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Foundation Watch The MacArthur Foundation A donor without a cause spawns a foundation with an age
+    contentLength: 130400
+    status: verified
+    note: null
+  - footnote: 92
+    url: https://capitalresearch.org/article/the-macarthur-foundation-a-donor-without-a-cause-spawns-a-foundation-with-an-agenda/
+    linkText: Capital Research - MacArthur Foundation
+    claimContext: In Chicago, the Local Initiatives Support Corp. (LISC) handled preliminary screening of foundation grants, leading to complaints of political bias due to ties to Mayor Richard Daley's office potentially vetoing proposals from the mayor's opponents.[^92]
+    fetchedAt: 2026-02-22T01:44:46.389Z
+    httpStatus: 200
+    pageTitle: The MacArthur Foundation -Capital Research Center
+    contentSnippet: The MacArthur Foundation -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Foundation Watch The MacArthur Foundation A donor without a cause spawns a foundation with an age
+    contentLength: 130400
+    status: verified
+    note: null
+  - footnote: 93
+    url: https://hyperallergic.com/in-chicago-a-case-study-in-the-ethics-of-cultural-philanthropy/
+    linkText: Hyperallergic - Chicago Case Study
+    claimContext: In 2015, the Black Star Project demanded the foundation allocate \$100 million from its \$7 billion in assets to Chicago entrepreneurship, jobs, after-school activities, violence reduction, and black empowerment, accusing the foundation of ignoring crucial issues and practicing "modern day redlining
+    fetchedAt: 2026-02-22T01:44:46.881Z
+    httpStatus: 200
+    pageTitle: In Chicago, a Case Study in the Ethics of Cultural Philanthropy
+    contentSnippet: In Chicago, a Case Study in the Ethics of Cultural Philanthropy Protesters outside the MacArthur Foundation headquarters (image courtesy The Black Star Project) Last Friday the Black Star Project , an organization that works to eliminate the racial achievement gap in Chicago, hosted a “Children’s March on the MacArthur Foundation” in front of the foundation’s headquarters in the city. The Black Star Project states , “The children of Chicago are demanding that $100 million of the $7 billion MacAr
+    contentLength: 53696
+    status: verified
+    note: null
+  - footnote: 94
+    url: https://www.commentary.org/articles/wooster-martin-morse/the-macarthur-mistake/
+    linkText: Commentary Magazine - The MacArthur Mistake
+    claimContext: Beyond ideological concerns, the Fellows Program has been criticized as a "philanthropic mistake" for rarely changing recipients' trajectories and having little measurable impact on science or culture.[^94] The program has shifted from its original vision of liberating "American Einsteins" to what c
+    fetchedAt: 2026-02-22T01:44:46.696Z
+    httpStatus: 200
+    pageTitle: The MacArthur Mistake &#8211; Commentary Magazine
+    contentSnippet: The MacArthur Mistake &#8211; Commentary Magazine Close Login Access your Commentary account. Email address Password Remember me Login Forgot your password? Lost your password? Please enter your email address. You will receive a link to create a new password via email. Email Reset password Go back Home March 2026 Donate Newsletter Merch Contact Us Subscribe Search Login There was no management association looking at Michelangelo and asking him to fill out semi-yearly progress reports in triplica
+    contentLength: 265711
+    status: verified
+    note: null
+  - footnote: 95
+    url: https://theweek.com/culture/1005474/whats-a-genius
+    linkText: The Week - What's a Genius
+    claimContext: Beyond ideological concerns, the Fellows Program has been criticized as a "philanthropic mistake" for rarely changing recipients' trajectories and having little measurable impact on science or culture.[^94] The program has shifted from its original vision of liberating "American Einsteins" to what c
+    fetchedAt: 2026-02-22T01:44:46.355Z
+    httpStatus: 200
+    pageTitle: The recurring problem with the MacArthur 'genius' grants | The Week
+    contentSnippet: "The recurring problem with the MacArthur 'genius' grants | The Week (Image credit: Illustrated | iStock) Share Copy link Facebook X Linkedin Whatsapp Pinterest Share this article Join the conversation Follow us Add us as a preferred source on Google Newsletter TheWeek Get the The Week Newsletter A free daily email with the biggest news stories of the day &ndash; and the best features from TheWeek.com Contact me with news and offers from other Future brands Receive email from us on behalf of our "
+    contentLength: 1158508
+    status: verified
+    note: null
+  - footnote: 96
+    url: https://philanthropydaily.com/those-unassailable-genius-grants/
+    linkText: Philanthropy Daily - Genius Grants
+    claimContext: Rod MacArthur's early vision to make the Fellows Program the foundation's only initiative failed.[^96] By the 2010s, concerns about the program led to plans to alter support for scientists, who are typically well-funded elsewhere and work in teams rather than as isolated individuals.[^97]
+    fetchedAt: 2026-02-22T01:44:48.277Z
+    httpStatus: 200
+    pageTitle: Those unassailable "genius grants"Philanthropy Daily
+    contentSnippet: 'Those unassailable "genius grants"Philanthropy Daily Look at articles about the MacArthur Fellows Program (commonly known as the “genius grants”) and you’ll find two categories of stories. One is where the wide-eyed hack shows up at MacArthur headquarters in Chicago full of wonder about how the selfless, noble program officers are bestowing riches among the struggling artists, who thanks to the [&hellip;] "> Share on Facebook Share on Twitter Share via email Share on LinkedIn Sign up to receive '
+    contentLength: 205869
+    status: verified
+    note: null
+  - footnote: 97
+    url: https://www.commentary.org/articles/wooster-martin-morse/the-macarthur-mistake/
+    linkText: Commentary Magazine - The MacArthur Mistake
+    claimContext: Rod MacArthur's early vision to make the Fellows Program the foundation's only initiative failed.[^96] By the 2010s, concerns about the program led to plans to alter support for scientists, who are typically well-funded elsewhere and work in teams rather than as isolated individuals.[^97]
+    fetchedAt: 2026-02-22T01:44:47.960Z
+    httpStatus: 200
+    pageTitle: The MacArthur Mistake &#8211; Commentary Magazine
+    contentSnippet: The MacArthur Mistake &#8211; Commentary Magazine Close Login Access your Commentary account. Email address Password Remember me Login Forgot your password? Lost your password? Please enter your email address. You will receive a link to create a new password via email. Email Reset password Go back Home March 2026 Donate Newsletter Merch Contact Us Subscribe Search Login There was no management association looking at Michelangelo and asking him to fill out semi-yearly progress reports in triplica
+    contentLength: 265711
+    status: verified
+    note: null
+  - footnote: 98
+    url: https://www.fundingforrealchange.com/case-study-macarthur-cfw
+    linkText: Funding for Real Change - MacArthur CFW Case Study
+    claimContext: In 2018, the foundation participated in the True Cost Project pilot that revealed insufficient indirect cost rates (typically 15-20%) harm grantees, especially women-, LGBTQ-, and people of color-led organizations.[^98] While MacArthur provides the Center for Financial Wellness a 29% indirect rate n
+    fetchedAt: 2026-02-22T01:44:48.397Z
+    httpStatus: 200
+    pageTitle: "Case Study: MacArthur + CFW | Funding For Real Change"
+    contentSnippet: "Case Study: MacArthur + CFW | Funding For Real Change 500 110 0 Chicago Foundation For Women + MacArthur Foundation Video by Paul Johannessen Learn more about: MacArthur Foundation Learn more about: CFW The MacArthur Foundation: Embracing core values An early innovator For MacArthur, a key takeaway from the pilot was that this process – although illuminating and effective – was prohibitively time-consuming and expensive. Each consultation lasted between eight to 12 weeks, costing between $16,000"
+    contentLength: 347605
+    status: verified
+    note: null
+  - footnote: 99
+    url: https://www.fundingforrealchange.com/case-study-macarthur-cfw
+    linkText: Funding for Real Change - MacArthur CFW Case Study
+    claimContext: In 2018, the foundation participated in the True Cost Project pilot that revealed insufficient indirect cost rates (typically 15-20%) harm grantees, especially women-, LGBTQ-, and people of color-led organizations.[^98] While MacArthur provides the Center for Financial Wellness a 29% indirect rate n
+    fetchedAt: 2026-02-22T01:44:48.358Z
+    httpStatus: 200
+    pageTitle: "Case Study: MacArthur + CFW | Funding For Real Change"
+    contentSnippet: "Case Study: MacArthur + CFW | Funding For Real Change 500 110 0 Chicago Foundation For Women + MacArthur Foundation Video by Paul Johannessen Learn more about: MacArthur Foundation Learn more about: CFW The MacArthur Foundation: Embracing core values An early innovator For MacArthur, a key takeaway from the pilot was that this process – although illuminating and effective – was prohibitively time-consuming and expensive. Each consultation lasted between eight to 12 weeks, costing between $16,000"
+    contentLength: 347605
+    status: verified
+    note: null
+  - footnote: 100
+    url: https://www.philanthropy.com/opinion/macarthur-the-san-francisco-da-and-the-pitfalls-of-funding-government-programs/
+    linkText: Chronicle of Philanthropy - MacArthur SF DA Pitfalls
+    claimContext: The San Francisco District Attorney's office accused the foundation of treating it like "sharecroppers" in funding arrangements, highlighting tensions in funding government programs.[^100]
+    fetchedAt: 2026-02-22T01:44:48.427Z
+    httpStatus: 200
+    pageTitle: MacArthur, the San Francisco DA, and the Pitfalls of Funding Government Programs &#8211; Chronicle of Philanthropy
+    contentSnippet: "MacArthur, the San Francisco DA, and the Pitfalls of Funding Government Programs &#8211; Chronicle of Philanthropy Search for: Opinion MacArthur, the San Francisco DA, and the Pitfalls of Funding Government Programs A disagreement about how to spend grant money offers poignant lessons on the perils of investing in public institutions. By Craig Kennedy Contributor Gabrielle Lurie/San Francisco Chronicle via AP SHARE THIS STORY: October 9, 2024 | Read Time: 6 minutes Growing philanthropic interest"
+    contentLength: 211930
+    status: verified
+    note: null
+  - footnote: 101
+    url: https://www.aspeninstitute.org/blog-posts/billionaires-big-givers-and-the-bets-they-make/
+    linkText: Aspen Institute - Billionaires and Big Givers
+    claimContext: "MacArthur's pioneering role in impact investing and large-scale competitions like 100&Change align with EA values of maximizing impact and rigorous evaluation.[^101] However, its historical evolution toward progressive social change and emphasis on democratic values, human rights, and equity differ "
+    fetchedAt: 2026-02-22T01:44:50.058Z
+    httpStatus: 200
+    pageTitle: "Billionaires, Big Givers and the Bets They Make: A Timeline - Aspen Institute"
+    contentSnippet: "Billionaires, Big Givers and the Bets They Make: A Timeline - Aspen Institute Close Navigation Aspen is a place for leaders to lift their sights above the possessions which possess them. To confront their own nature as human beings, to regain control over their own humanity by becoming more self-aware, more self-correcting, and hence more self-fulfilling. Walter P. Paepcke, Aspen Institute Co-Founder Back Welcome Welcome to the Aspen Institute—explore our work, programs, and ideas creating new p"
+    contentLength: 201939
+    status: verified
+    note: null
+  - footnote: 102
+    url: https://europeanaifund.org/wp-content/uploads/2023/06/260623-FOR-PUBLICATION-EAISF-Funding-landscape-review.pdf
+    linkText: European AI & Society Fund - Funding Landscape Review PDF
+    claimContext: The foundation has funded AI governance work longer and more substantially than European counterparts, but its focus on democratic oversight and near-term harms contrasts with EA-aligned organizations' emphasis on existential risks from advanced AI systems.[^102] No grants to explicitly EA-aligned o
+    fetchedAt: 2026-02-22T01:44:49.888Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 287789
+    status: verified
+    note: null

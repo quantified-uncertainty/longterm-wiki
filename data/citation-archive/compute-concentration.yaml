@@ -1,0 +1,161 @@
+pageId: compute-concentration
+verifiedAt: 2026-02-22
+totalCitations: 14
+verified: 13
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 2
+    url: https://www.congress.gov/bill/115th-congress/house-bill/4943
+    linkText: US Congress, "Clarifying Lawful Overseas Use of Data Act (CLOUD Act)," H.R. 4943, enacted March 2018. — Congress.gov
+    claimContext: "| **Compute ownership** | 5-6 US companies control 80-90% of frontier AI training compute | Combined \\$700B+ in 2026 capex across Amazon, Alphabet, Microsoft, Meta, Oracle, xAI[^1] | | **Legal jurisdiction** | All major providers subject to CLOUD Act and FISA 702 | US law enables compelled data prod"
+    fetchedAt: 2026-02-22T02:26:21.812Z
+    httpStatus: 200
+    pageTitle: "H.R.4943 - 115th Congress (2017-2018): CLOUD Act | Congress.gov | Library of Congress"
+    contentSnippet: "H.R.4943 - 115th Congress (2017-2018): CLOUD Act | Congress.gov | Library of Congress skip to main content Alert: For a better experience on Congress.gov, please enable JavaScript in your browser. Citation Subscribe Share/Save Site Feedback Home > Legislation > 115th Congress > H.R.4943 H.R.4943 - CLOUD Act 115th Congress (2017-2018) Bill Hide Overview Sponsor: Rep. Collins, Doug [R-GA-9] (Introduced 02/06/2018) Committees: House - Judiciary; Rules Latest Action: House - 02/06/2018 Referred to t"
+    contentLength: 356402
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.wiz.io/blog/nvidia-ai-vulnerability-cve-2025-23266-nvidiascape
+    linkText: 'Wiz Research, "NVIDIAScape: Critical Container Escape Vulnerability (CVE-2025-23266)," 2025. — Wiz Blog'
+    claimContext: "| **Legal jurisdiction** | All major providers subject to CLOUD Act and FISA 702 | US law enables compelled data production and warrantless surveillance of non-US persons[^2][^3] | | **Cybersecurity exposure** | Single supply-chain vulnerability can affect all providers simultaneously | NVIDIA Conta"
+    fetchedAt: 2026-02-22T02:26:22.778Z
+    httpStatus: 200
+    pageTitle: NVIDIAScape - NVIDIA AI Vulnerability (CVE-2025-23266) | Wiz Blog
+    contentSnippet: "NVIDIAScape - NVIDIA AI Vulnerability (CVE-2025-23266) | Wiz Blog Wiz Pricing Get a demo Get a demo Executive Summary Wiz Research discovered a critical container escape vulnerability in the NVIDIA Container Toolkit (NCT), which we&#x27;ve dubbed #NVIDIAScape . This toolkit powers many AI services offered by cloud and SaaS providers, and the vulnerability, now tracked as CVE-2025-23266 , has been assigned a CVSS score of 9.0 (Critical) . It allows a malicious container to bypass isolation measur"
+    contentLength: 325000
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.defensenews.com/pentagon/2025/07/15/pentagon-taps-four-commercial-tech-firms-to-expand-military-use-of-ai/
+    linkText: Defense News, "Pentagon Taps Four Commercial Tech Firms to Expand Military Use of AI," July 2025. — Defense News
+    claimContext: "| **Cybersecurity exposure** | Single supply-chain vulnerability can affect all providers simultaneously | NVIDIA Container Toolkit CVE-2025-23266 (CVSS 9.0) affected all major cloud providers[^4] | | **Military integration** | Same infrastructure serves commercial customers and US defense | Pentago"
+    fetchedAt: 2026-02-22T02:26:22.617Z
+    httpStatus: 200
+    pageTitle: Pentagon taps four commercial tech firms to expand military use of AI
+    contentSnippet: Pentagon taps four commercial tech firms to expand military use of AI Pentagon Pentagon taps four commercial tech firms to expand military use of AI By Courtney Albon Jul 15, 2025 Elon Musk&#x27;s xAI unveiled its government-specific production line called Grok for Government following an announcement Monday that it received a Defense Department contract worth up to $200 million. Musk is pictured here at an AI safety summit in 2023. (Leon Neal/AP) The Pentagon announced Monday it has chosen Goog
+    contentLength: 274187
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://defensescoop.com/2025/12/09/genai-mil-platform-dod-commercial-ai-models-agentic-tools-google-gemini/
+    linkText: DefenseScoop, "DoD Initiates Large-Scale Rollout of Commercial AI Models via GenAI.mil," December 2025. — DefenseScoop
+    claimContext: "| **Cybersecurity exposure** | Single supply-chain vulnerability can affect all providers simultaneously | NVIDIA Container Toolkit CVE-2025-23266 (CVSS 9.0) affected all major cloud providers[^4] | | **Military integration** | Same infrastructure serves commercial customers and US defense | Pentago"
+    fetchedAt: 2026-02-22T02:26:22.094Z
+    httpStatus: 200
+    pageTitle: DOD initiates large-scale rollout of commercial AI models and emerging agentic tools | DefenseScoop
+    contentSnippet: "DOD initiates large-scale rollout of commercial AI models and emerging agentic tools | DefenseScoop Skip to main content Advertisement Advertise Search Close Search for: Search Advertisement Subscribe to our daily newsletter. Subscribe Close The Pentagon is rolling out a purpose-built platform &mdash; GenAI.mil &mdash; to deliver commercial artificial intelligence options directly to its almost entire workforce, with Google Cloud&rsquo;s Gemini for Government products the first to be housed and "
+    contentLength: 115116
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.civo.com/blog/is-your-cloud-truly-sovereign
+    linkText: 'Civo Cloud, "CLOUD Act and FISA 702: Is Your Cloud Truly Sovereign?" 2025. — Civo Blog — ; Microsoft France testimony before the French Senate, June 2025.'
+    claimContext: "The practical implication: any government, enterprise, or researcher worldwide that uses AI services from AWS, Azure, Google Cloud, or Meta's platforms operates under the effective jurisdiction of US intelligence and law enforcement agencies. In June 2025, Microsoft France's Director of Public and L"
+    fetchedAt: 2026-02-22T02:26:22.735Z
+    httpStatus: 200
+    pageTitle: "CLOUD Act and FISA 702: Is your cloud data truly sovereign? - Civo.com"
+    contentSnippet: "CLOUD Act and FISA 702: Is your cloud data truly sovereign? - Civo.com 24 Jul, 2025 Is your cloud data truly sovereign? The CLOUD Act and FISA 702 reality check As UK public sector bodies, financial institutions, and enterprises accelerate cloud adoption, a pivotal question emerges: Who truly controls your data, and under which laws? With data breaches and regulatory scrutiny intensifying, storing data and workloads in a host country alone doesn&#39;t guarantee sovereignty. U.S. laws like the CL"
+    contentLength: 63772
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://media.bis.gov/press-release/department-commerce-rescinds-biden-era-artificial-intelligence-diffusion-rule-strengthens-chip-related
+    linkText: Bureau of Industry and Security, "Rescission of Biden-Era Artificial Intelligence Diffusion Rule," May 13, 2025. — BIS Press Release
+    claimContext: 'US policymakers have explicitly articulated this dynamic. Anthropic CEO Dario Amodei argued in 2025 that enforced <EntityLink id="export-controls">export controls</EntityLink> could ensure "a unipolar world, where only the US and its allies have these models."[^10] OpenAI has lobbied for aggressive '
+    fetchedAt: 2026-02-22T02:26:24.938Z
+    httpStatus: 200
+    pageTitle: Lock
+    contentSnippet: "An official website of the United States government Here&#x27;s how you know Official websites use .gov A .gov website belongs to an official government organization in the United States. Secure .gov websites use HTTPS A lock ( Lock Locked padlock ) or https:// means you’ve safely connected to the .gov website. Share sensitive information only on official, secure websites. Skip to main content FOR IMMEDIATE RELEASE | May 13, 2025 | Media Contact: [email&#160;protected] Department of Commerce Ann"
+    contentLength: 140579
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.newamerica.org/future-security/reports/securing-the-backbone-of-ai/cyber-threats/
+    linkText: 'New America, "Securing the Backbone of AI: Cyber Threats to AI Data Centers," September 2025. — New America Report'
+    claimContext: "- **xAI's Colossus** houses 555,000 Nvidia H200 GPUs — approximately \\$18 billion in hardware — in a single Memphis, Tennessee facility.[^15] - **50% of US data centers** are concentrated in Northern Virginia and Northern California.[^16] - **All major hyperscalers** share critical dependencies on N"
+    fetchedAt: 2026-02-22T02:26:24.344Z
+    httpStatus: 200
+    pageTitle: "Securing the Backbone of Artificial Intelligence: Protecting Data Centers"
+    contentSnippet: "Securing the Backbone of Artificial Intelligence: Protecting Data Centers Skip to main content"
+    contentLength: 32944
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.wiz.io/blog/wiz-research-uncovers-exposed-deepseek-database-leak
+    linkText: Wiz Research, "Wiz Research Uncovers Exposed DeepSeek Database Leak," January 2025. — Wiz Blog
+    claimContext: "| **NVIDIA Container Toolkit vulnerability** (CVE-2025-23266, CVSS 9.0) | 2025 | Full root access across shared GPU infrastructure | Affected all major cloud providers simultaneously[^4] | | **DeepSeek database exposure** | Jan 2025 | 1M+ log lines with chat history, secret keys, zero authentication"
+    fetchedAt: 2026-02-22T02:26:24.064Z
+    httpStatus: 200
+    pageTitle: Wiz Research Uncovers Exposed DeepSeek Database Leaking Sensitive Information, Including Chat History | Wiz Blog
+    contentSnippet: "Wiz Research Uncovers Exposed DeepSeek Database Leaking Sensitive Information, Including Chat History | Wiz Blog Wiz Pricing Get a demo Get a demo Wiz Research has identified a publicly accessible ClickHouse database belonging to DeepSeek, which allows full control over database operations, including the ability to access internal data. The exposure includes over a million lines of log streams containing chat history, secret keys, backend details, and other highly sensitive information. The Wiz "
+    contentLength: 285114
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://openai.com/index/mixpanel-incident/
+    linkText: OpenAI, "Mixpanel Security Incident," November 2025. — OpenAI Blog
+    claimContext: "| **DeepSeek database exposure** | Jan 2025 | 1M+ log lines with chat history, secret keys, zero authentication | Demonstrated AI infrastructure security immaturity[^18] | | **OpenAI/Mixpanel breach** | Nov 2025 | User data exported via SMS phishing of third-party vendor | Supply-chain vulnerability"
+    fetchedAt: 2026-02-22T02:26:24.214Z
+    httpStatus: 200
+    pageTitle: What to know about a recent Mixpanel security incident | OpenAI
+    contentSnippet: "What to know about a recent Mixpanel security incident | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI November 26, 2025 Company Security What to know about a recent Mixpanel security incident Share December 19, 2025 clarification: We are updating the blog to clarify the description of impacted users. The original blog stated that “API users” were impacted. It has been updated to add: “It also affected a limited number o"
+    contentLength: 310374
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://thesoufancenter.org/intelbrief-2025-november-5/
+    linkText: The Soufan Center, "Anti-AI Resistance Has the Potential to Turn Violent," IntelBrief, November 2025. — The Soufan Center
+    claimContext: "| **OpenAI/Mixpanel breach** | Nov 2025 | User data exported via SMS phishing of third-party vendor | Supply-chain vulnerability in AI ecosystem[^19] | | **Equinix Chicago armed intrusion** | 2025 | Physical breach of data center | Physical sabotage threats proliferating[^20] | | **Google AI trade s"
+    fetchedAt: 2026-02-22T02:26:24.249Z
+    httpStatus: 200
+    pageTitle: As Data Centers Proliferate, Anti-AI Resistance Has the Potential to Turn Violent - The Soufan Center
+    contentSnippet: --> As Data Centers Proliferate, Anti-AI Resistance Has the Potential to Turn Violent - The Soufan Center VIEW ARCHIVES October 2020 February 2022 June 2023 October 2024 February 2026 November 2020 March 2022 July 2023 November 2024 December 2020 April 2022 August 2023 December 2024 January 2021 May 2022 September 2023 January 2025 February 2021 June 2022 October 2023 February 2025 March 2021 July 2022 November 2023 March 2025 April 2021 August 2022 December 2023 April 2025 May 2021 September 20
+    contentLength: 158263
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://media.defense.gov/2026/Jan/12/2003855671/-1/-1/0/ARTIFICIAL-INTELLIGENCE-STRATEGY-FOR-THE-DEPARTMENT-OF-WAR.PDF
+    linkText: US Department of Defense, "Artificial Intelligence Strategy for the Department of War," January 9, 2026. — DoD Publication
+    claimContext: "- AWS holds the CIA's C2E cloud contract; Microsoft Azure runs DoD cloud workloads (JWCC); Google Cloud's Gemini for Government was the first product on GenAI.mil.[^6] - The DoD's January 2026 AI strategy explicitly plans to leverage \"hundreds of billions in private sector capital investment\" for mi"
+    fetchedAt: 2026-02-22T02:26:26.649Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 22
+    url: https://www.atlanticcouncil.org/in-depth-research-reports/issue-brief/what-drives-the-divide-in-transatlantic-ai-strategy/
+    linkText: Atlantic Council, "What Drives the Divide in Transatlantic AI Strategy," 2025. — Atlantic Council
+    claimContext: Some nations are responding. The EU's digital sovereignty initiatives, France's sovereign cloud programs, and India's data localization requirements reflect growing awareness.[^22] However, building alternative compute infrastructure at frontier scale requires capital, supply chains, and energy infr
+    fetchedAt: 2026-02-22T02:26:26.531Z
+    httpStatus: 200
+    pageTitle: What drives the divide in transatlantic AI strategy? - Atlantic Council
+    contentSnippet: "What drives the divide in transatlantic AI strategy? - Atlantic Council Share Close Mail Facebook Twitter / X LinkedIn As both the United States and European Union unveiled their respective AI strategies this summer, a paradox emerges: despite sharing broadly similar objectives—boosting domestic AI capabilities, maintaining technological leadership, and managing AI risks—the two allies find themselves increasingly at odds over how to achieve these goals. The divergence reflects fundamental diffe"
+    contentLength: 211390
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.gtlaw.com/en/insights/2025/9/ai-antitrust-landscape-2025-federal-policy-algorithm-cases-and-regulatory-scrutiny
+    linkText: 'Greenberg Traurig, "AI Antitrust Landscape 2025: Federal Policy, Algorithm Cases, and Regulatory Scrutiny," September 2025. — GT Law'
+    claimContext: 'FTC Commissioner Holyoak stated in 2025 that "antitrust enforcers need to be vigilant and carefully monitor these markets."[^26] EU Competition Commissioner Teresa Ribera stated in December 2025: "Many of the risks we warned about are now beginning to materialize."[^27]'
+    fetchedAt: 2026-02-22T02:26:26.750Z
+    httpStatus: 200
+    pageTitle: "AI Antitrust Landscape 2025: Federal Policy, Algorithm Cases, and Regulatory Scrutiny | Insights | Greenberg Traurig LLP"
+    contentSnippet: "AI Antitrust Landscape 2025: Federal Policy, Algorithm Cases, and Regulatory Scrutiny | Insights | Greenberg Traurig LLP Skip to main content Subscribe Share AI has continued to come under the scrutiny of government enforcers and private litigants. In July 2025, the White House released America&rsquo;s AI Action Plan. As we noted in our January 5 Trends to Watch: 2025 Antitrust & Competition Law , on the competition side, plaintiffs have alleged that AI may be used in ways that harm competition,"
+    contentLength: 47943
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.wsgr.com/en/insights/2026-antitrust-year-in-preview-ai.html
+    linkText: 'Wilson Sonsini, "2026 Antitrust Year in Preview: AI," 2026. — WSGR'
+    claimContext: 'FTC Commissioner Holyoak stated in 2025 that "antitrust enforcers need to be vigilant and carefully monitor these markets."[^26] EU Competition Commissioner Teresa Ribera stated in December 2025: "Many of the risks we warned about are now beginning to materialize."[^27]'
+    fetchedAt: 2026-02-22T02:26:27.214Z
+    httpStatus: 200
+    pageTitle: "2026 Antitrust Year in Preview: AI | Wilson Sonsini"
+    contentSnippet: "2026 Antitrust Year in Preview: AI | Wilson Sonsini 2026 Antitrust Year in Preview: AI Alerts January 22, 2026 U.S. The disruptive potential for artificial intelligence (AI) technologies has only become more evident as they have matured, and fierce competition has developed between both existing technology leaders and new entrants to push forward the AI stack and its applications. The Biden administration had signaled an intent to enforce proactively and prospectively, suggesting that, in their "
+    contentLength: 519076
+    status: verified
+    note: null

@@ -1,0 +1,953 @@
+pageId: seldon-lab
+verifiedAt: 2026-02-22
+totalCitations: 86
+verified: 64
+broken: 22
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: Seldon Lab is a San Francisco-based organization functioning as both an AI security research lab and the first startup accelerator specifically focused on AGI security technologies.[^1] Founded in early 2025 by Esben Kran and Finn Metz, Seldon Lab positions AGI security as what will become "the seco
+    fetchedAt: 2026-02-22T01:50:16.609Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: Seldon Lab is a San Francisco-based organization functioning as both an AI security research lab and the first startup accelerator specifically focused on AGI security technologies.[^1] Founded in early 2025 by Esben Kran and Finn Metz, Seldon Lab positions AGI security as what will become "the seco
+    fetchedAt: 2026-02-22T01:50:16.789Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: Seldon Lab is a San Francisco-based organization functioning as both an AI security research lab and the first startup accelerator specifically focused on AGI security technologies.[^1] Founded in early 2025 by Esben Kran and Finn Metz, Seldon Lab positions AGI security as what will become "the seco
+    fetchedAt: 2026-02-22T01:50:16.913Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206082
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: The organization operates as a full-stack entity that simultaneously publishes research papers, builds technical systems, funds and accelerates startups, and shapes the AI safety field through direct work and portfolio companies.[^4] Seldon Lab's approach combines academic research (with founders wh
+    fetchedAt: 2026-02-22T01:50:16.368Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 5
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: The organization operates as a full-stack entity that simultaneously publishes research papers, builds technical systems, funds and accelerates startups, and shapes the AI safety field through direct work and portfolio companies.[^4] Seldon Lab's approach combines academic research (with founders wh
+    fetchedAt: 2026-02-22T01:50:17.692Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206082
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.openvc.app/fund/Seldon%20Lab
+    linkText: Seldon Lab - OpenVC
+    claimContext: Seldon Lab runs a 3-month accelerator program in San Francisco, investing in frontier AI safety and security startups focused on areas like hardware-level <EntityLink id="ai-governance">AI governance</EntityLink>, export controls for chips, long-term agent coherence, and technologies to train billio
+    fetchedAt: 2026-02-22T01:50:19.290Z
+    httpStatus: 200
+    pageTitle: Seldon Lab | Investor Profile, Funding Criteria & Team
+    contentSnippet: Seldon Lab | Investor Profile, Funding Criteria & Team Verified Seldon Lab Caution You are in edit mode ! Cancel changes × Confirm changes Please review and confirm your changes below. Please validate captcha Loading... Confirm changes Cancel × Are you an employee of this fund ? Add your professional email address below for verification This email address seems invalid, please retry. Submit and start editing Cancel Overview Who we are First AI Security Accelerator with a 3 month program in San F
+    contentLength: 138537
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: Seldon Lab runs a 3-month accelerator program in San Francisco, investing in frontier AI safety and security startups focused on areas like hardware-level <EntityLink id="ai-governance">AI governance</EntityLink>, export controls for chips, long-term agent coherence, and technologies to train billio
+    fetchedAt: 2026-02-22T01:50:18.755Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: Seldon Lab was founded in early 2025 by **Esben Kran** and **Finn Metz**, who brought complementary expertise in AI security research and venture funding.[^8] Kran had previously founded an AI security lab with over 25 publications at major machine learning conferences (NeurIPS, ICLR, ICML) and work
+    fetchedAt: 2026-02-22T01:50:19.031Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206082
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: Seldon Lab was founded in early 2025 by **Esben Kran** and **Finn Metz**, who brought complementary expertise in AI security research and venture funding.[^8] Kran had previously founded an AI security lab with over 25 publications at major machine learning conferences (NeurIPS, ICLR, ICML) and work
+    fetchedAt: 2026-02-22T01:50:19.065Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206082
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: Seldon Lab was founded in early 2025 by **Esben Kran** and **Finn Metz**, who brought complementary expertise in AI security research and venture funding.[^8] Kran had previously founded an AI security lab with over 25 publications at major machine learning conferences (NeurIPS, ICLR, ICML) and work
+    fetchedAt: 2026-02-22T01:50:19.354Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206082
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: The founders describe themselves as part of a group of global experts who realized the world was unprepared for superintelligence and decided to accelerate AI research and build ventures rather than wait for others to act.[^11] The initial structure was considered as a for-profit company but evolved
+    fetchedAt: 2026-02-22T01:50:20.444Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: The founders describe themselves as part of a group of global experts who realized the world was unprepared for superintelligence and decided to accelerate AI research and build ventures rather than wait for others to act.[^11] The initial structure was considered as a for-profit company but evolved
+    fetchedAt: 2026-02-22T01:50:20.428Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "Seldon Lab began operations in early 2025 by gathering founders in a San Francisco warehouse to build AGI security infrastructure.[^13] The organization launched its first 3-month pilot program (Batch 1) in mid-2025 with four initial companies:"
+    fetchedAt: 2026-02-22T01:50:20.757Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Andon Labs**: Building safe autonomous AI organizations with alignment and safety guarantees[^14] - **Lucid Computing**: Developing a hardware-rooted, zero-trust platform for verifying AI chip usage and data location (CEO: Kristian Rönn)[^15]"
+    fetchedAt: 2026-02-22T01:50:20.542Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: "- **Andon Labs**: Building safe autonomous AI organizations with alignment and safety guarantees[^14] - **Lucid Computing**: Developing a hardware-rooted, zero-trust platform for verifying AI chip usage and data location (CEO: Kristian Rönn)[^15] - **Workshop Labs**: Enabling personal sovereignty th"
+    fetchedAt: 2026-02-22T01:50:20.934Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Lucid Computing**: Developing a hardware-rooted, zero-trust platform for verifying AI chip usage and data location (CEO: Kristian Rönn)[^15] - **Workshop Labs**: Enabling personal sovereignty through per-person AI model training and ownership[^16] - **DeepResponse**: Creating autonomous cyber de"
+    fetchedAt: 2026-02-22T01:50:22.043Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Workshop Labs**: Enabling personal sovereignty through per-person AI model training and ownership[^16] - **DeepResponse**: Creating autonomous cyber defense systems for the AGI era[^17]"
+    fetchedAt: 2026-02-22T01:50:22.087Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: The pilot program achieved significant early traction. Batch 1 companies collectively raised over \$10 million in funding, sold security solutions to both xAI and <EntityLink id="anthropic">Anthropic</EntityLink>, and patented verifiable compute inventions.[^18] The companies were featured in Time m
+    fetchedAt: 2026-02-22T01:50:22.106Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: The pilot program achieved significant early traction. Batch 1 companies collectively raised over \$10 million in funding, sold security solutions to both xAI and <EntityLink id="anthropic">Anthropic</EntityLink>, and patented verifiable compute inventions.[^18] The companies were featured in Time m
+    fetchedAt: 2026-02-22T01:50:22.066Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: Following the success of the pilot program, Seldon Lab announced Batch 2 in late 2025 and early 2026, continuing to recruit founders focused on AI security infrastructure.[^20] The organization has received \$53,000 in non-dilutive funding from the <EntityLink id="sff">Survival and Flourishing Fund<
+    fetchedAt: 2026-02-22T01:50:22.134Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: Following the success of the pilot program, Seldon Lab announced Batch 2 in late 2025 and early 2026, continuing to recruit founders focused on AI security infrastructure.[^20] The organization has received \$53,000 in non-dilutive funding from the <EntityLink id="sff">Survival and Flourishing Fund<
+    fetchedAt: 2026-02-22T01:50:29.808Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 22
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: In December 2025, Seldon Lab released an "Inside Seldon Lab" video highlighting their dual model of publishing research while building companies and systems.[^22] The organization emphasizes that Batch 2 funding is routed through <EntityLink id="manifund">Manifund</EntityLink> as dilutive investment
+    fetchedAt: 2026-02-22T01:50:23.506Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 23
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: In December 2025, Seldon Lab released an "Inside Seldon Lab" video highlighting their dual model of publishing research while building companies and systems.[^22] The organization emphasizes that Batch 2 funding is routed through <EntityLink id="manifund">Manifund</EntityLink> as dilutive investment
+    fetchedAt: 2026-02-22T01:50:29.829Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 24
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "**Hardware-Level Governance**: The organization prioritizes technologies that provide security guarantees at the hardware and infrastructure level, including supply chain verification with privacy preservation, air-gap capabilities enabling millisecond-level isolation and shutdown, redundant soverei"
+    fetchedAt: 2026-02-22T01:50:23.233Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: "**Long-Term Agent Coherence**: A repeated focus project involves demonstrating and measuring long-term coherence in AI agents, examining how AI systems maintain consistent task pursuit over time. This work includes dataset development in collaboration with organizations like Meter and the Security I"
+    fetchedAt: 2026-02-22T01:50:23.645Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 26
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: "**Export Controls and Chip Security**: Seldon Lab works on improving export controls and security mechanisms for AI compute infrastructure, enhancing chip-level security and export compliance.[^26]"
+    fetchedAt: 2026-02-22T01:50:31.062Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "**Societal Autonomy Protection**: Research includes manipulation detection (distinguishing influence from information), authenticity verification to differentiate human from AI-generated content, cognitive firewalls to filter AI access to human attention, and autonomy audits measuring reductions in "
+    fetchedAt: 2026-02-22T01:50:31.021Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: The organization has accelerated the production of over 20 research papers through what they describe as "50 hackathons" involving more than 5,000 participants.[^28] This research accelerator model combines intensive collaborative events with startup development to rapidly advance both academic know
+    fetchedAt: 2026-02-22T01:50:31.337Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 29
+    url: https://www.seldon.io/resources/research/
+    linkText: Seldon.io Research
+    claimContext: Seldon Lab researchers have contributed to ML monitoring research, including work on two-sample tests for drift detection conditional on context, applied to diverse data types including images (CelebA dataset), time series (ECG data), and tabular data (Adult Census), with applications to GANs and au
+    fetchedAt: 2026-02-22T01:50:32.301Z
+    httpStatus: 200
+    pageTitle: Research - Take Control of ML and AI Complexity
+    contentSnippet: Research - Take Control of ML and AI Complexity Skip to content Our Research Context-Aware Drift Detection Oliver Cobb, Arnaud Van Looveren When monitoring machine learning systems, two-sample tests of homogeneity form the foundation upon which existing approaches to drift detection build. They are used to test for evidence that the distribution underlying recent deployment data differs from that underlying the historical reference data. Often, however, various factors such as time-induced corre
+    contentLength: 211228
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- AI network defenses - Verification-as-a-service platforms[^30]"
+    fetchedAt: 2026-02-22T01:50:31.253Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: The organization advocates for transparent, cryptography-based governance alternatives rather than repurposing surveillance systems from entities like the NSA or authoritarian governments for AI monitoring.[^31]
+    fetchedAt: 2026-02-22T01:50:33.369Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: Seldon Lab operates as the first AI security-focused startup accelerator, running 3-month programs in San Francisco that require full-time, in-person participation from founders.[^32] The accelerator invests up to \$500,000 per startup in 5-10 companies per batch, focusing on early-stage ventures de
+    fetchedAt: 2026-02-22T01:50:34.276Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206083
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: Seldon Lab operates as the first AI security-focused startup accelerator, running 3-month programs in San Francisco that require full-time, in-person participation from founders.[^32] The accelerator invests up to \$500,000 per startup in 5-10 companies per batch, focusing on early-stage ventures de
+    fetchedAt: 2026-02-22T01:50:39.545Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 34
+    url: https://www.effectivealtruism.org/opportunities/rec6SDKN3NVLqLtyd
+    linkText: AI Security Startup Accelerator - Effective Altruism
+    claimContext: "- **Capital Investment**: Direct funding for pre-seed AI safety infrastructure companies[^34] - **Technical Guidance**: Access to founders and researchers with deep AI security expertise[^35]"
+    fetchedAt: 2026-02-22T01:50:34.218Z
+    httpStatus: 200
+    pageTitle: Request For Startups, AI Security | Effective Altruism
+    contentSnippet: Request For Startups, AI Security | Effective Altruism Opportunities board Request For Startups, AI Security Seldon Lab View Opportunity type Funding Training program Cause areas Global catastrophic risks Routes to impact Direct high impact on an important cause Skill-building & building career capital Testing your fit for a certain career path Direct/increased engagement with EA Skill set Entrepreneur Organization building, boosting & running Software engineering Information security Research P
+    contentLength: 79570
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: "- **Capital Investment**: Direct funding for pre-seed AI safety infrastructure companies[^34] - **Technical Guidance**: Access to founders and researchers with deep AI security expertise[^35] - **Network Effects**: Connections to leading startups, investors, and AI safety trailblazers[^36]"
+    fetchedAt: 2026-02-22T01:50:33.428Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: "- **Technical Guidance**: Access to founders and researchers with deep AI security expertise[^35] - **Network Effects**: Connections to leading startups, investors, and AI safety trailblazers[^36] - **Event Programming**: Seldon Founder Dinners and culminating events like the Seldon Grande Finale[^3"
+    fetchedAt: 2026-02-22T01:50:41.168Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: "- **Network Effects**: Connections to leading startups, investors, and AI safety trailblazers[^36] - **Event Programming**: Seldon Founder Dinners and culminating events like the Seldon Grande Finale[^37]"
+    fetchedAt: 2026-02-22T01:50:41.131Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: "Seldon Lab positions itself as backing \"fundable defensive tech\" that can scale to address existential AI risks while building viable businesses.[^38] The organization's Request for Startups (RFS) emphasizes underrepresented areas in AI safety infrastructure such as:"
+    fetchedAt: 2026-02-22T01:50:40.961Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206082
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: "- Hardware-level governance mechanisms - Resilience and redundancy systems[^39]"
+    fetchedAt: 2026-02-22T01:50:46.762Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 40
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: The accelerator model explicitly aims to prove that AI security work can be simultaneous with paper publication, system-building, and field-shaping, rather than requiring sequential focus on these activities.[^40]
+    fetchedAt: 2026-02-22T01:50:40.879Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 41
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: "**Esben Kran** (Co-Founder): Kran founded an AI security lab that produced over 25 publications before starting Seldon Lab. He has published research at major machine learning conferences including NeurIPS, ICLR, and ICML, and previously worked as a lead data scientist. He also co-founded Apart Rese"
+    fetchedAt: 2026-02-22T01:50:53.980Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 42
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: "**Finn Metz** (Co-Founder): Metz brings experience from private equity and venture capital, having supported funding rounds totaling over \\$20 million. He raised seven figures specifically for AI security research and co-founded the AI Safety Founders Community before launching Seldon Lab.[^42]"
+    fetchedAt: 2026-02-22T01:50:54.417Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 43
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: "**Kristian Rönn** (CEO, Lucid Computing): Rönn leads one of Batch 1's most prominent companies, developing hardware-rooted verification for AI compute. He has publicly praised Seldon Lab as a top hub for AI security work.[^43]"
+    fetchedAt: 2026-02-22T01:50:48.232Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: '**Axel Backlund** (Co-founder, Andon Labs): Backlund describes Seldon as a "spiritual home" for his work on safe autonomous AI organizations, participating in the inaugural cohort.[^44]'
+    fetchedAt: 2026-02-22T01:50:48.003Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Geoff Ralston**: Former Y Combinator president and founder of SAIF.vc[^45] - **Joe Allen**: Transhumanism editor at Steve Bannon's Warroom and author of *Dark Aeon*[^46]"
+    fetchedAt: 2026-02-22T01:50:47.960Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Geoff Ralston**: Former Y Combinator president and founder of SAIF.vc[^45] - **Joe Allen**: Transhumanism editor at Steve Bannon's Warroom and author of *Dark Aeon*[^46] - **Eric Ho**: CEO of <EntityLink id=\"goodfire\">Goodfire</EntityLink>[^47]"
+    fetchedAt: 2026-02-22T01:50:56.009Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Joe Allen**: Transhumanism editor at Steve Bannon's Warroom and author of *Dark Aeon*[^46] - **Eric Ho**: CEO of <EntityLink id=\"goodfire\">Goodfire</EntityLink>[^47] - **Buck Shlegeris**: CEO of <EntityLink id=\"redwood-research\">Redwood Research</EntityLink>[^48]"
+    fetchedAt: 2026-02-22T01:50:56.050Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: '- **Eric Ho**: CEO of <EntityLink id="goodfire">Goodfire</EntityLink>[^47] - **Buck Shlegeris**: CEO of <EntityLink id="redwood-research">Redwood Research</EntityLink>[^48] - **Jeremie Harris**: Gladstone AI[^49]'
+    fetchedAt: 2026-02-22T01:50:55.823Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: '- **Buck Shlegeris**: CEO of <EntityLink id="redwood-research">Redwood Research</EntityLink>[^48] - **Jeremie Harris**: Gladstone AI[^49] - **Nitarshan Rajkumar**: UK AISI founder[^50]'
+    fetchedAt: 2026-02-22T01:50:55.694Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 50
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: "- **Jeremie Harris**: Gladstone AI[^49] - **Nitarshan Rajkumar**: UK AISI founder[^50]"
+    fetchedAt: 2026-02-22T01:50:55.850Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 51
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "**Lucid Computing** developed hardware-level guarantees via remote attestation, enabling cryptographic verification that AI compute is used as specified and data remains in designated locations.[^51] This addresses compliance and security concerns for organizations deploying AI systems."
+    fetchedAt: 2026-02-22T01:50:57.119Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: '**Andon Labs** created automated real-world incidence systems, conducting physical agent evaluations for <EntityLink id="anthropic">Anthropic</EntityLink> and xAI.[^52] Their work focuses on ensuring AI-run autonomous organizations maintain alignment and safety properties.'
+    fetchedAt: 2026-02-22T01:50:57.136Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "**DeepResponse** built systems for real-time monitoring and response speed-up in cyber defense, preparing for autonomous threats in the AGI era.[^53]"
+    fetchedAt: 2026-02-22T01:50:57.157Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "**Workshop Labs** developed cryptographic verification for private data and model pipelines, enabling billions of personalized AI models with individual ownership and sovereignty.[^54]"
+    fetchedAt: 2026-02-22T01:50:57.252Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 55
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- Raised over \\$10 million in follow-on funding[^55] - Closed hundreds of thousands in annual recurring revenue[^56]"
+    fetchedAt: 2026-02-22T01:50:57.231Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 56
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: '- Raised over \$10 million in follow-on funding[^55] - Closed hundreds of thousands in annual recurring revenue[^56] - Secured customer contracts with xAI and <EntityLink id="anthropic">Anthropic</EntityLink>[^57]'
+    fetchedAt: 2026-02-22T01:51:04.508Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 57
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: '- Closed hundreds of thousands in annual recurring revenue[^56] - Secured customer contracts with xAI and <EntityLink id="anthropic">Anthropic</EntityLink>[^57] - Patented new inventions for verifiable compute[^58]'
+    fetchedAt: 2026-02-22T01:50:58.352Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 58
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: '- Secured customer contracts with xAI and <EntityLink id="anthropic">Anthropic</EntityLink>[^57] - Patented new inventions for verifiable compute[^58] - Converted to Public Benefit Corporation structures[^59]'
+    fetchedAt: 2026-02-22T01:50:58.396Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 59
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- Patented new inventions for verifiable compute[^58] - Converted to Public Benefit Corporation structures[^59] - Been featured in Time magazine[^60]"
+    fetchedAt: 2026-02-22T01:50:58.374Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 60
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- Converted to Public Benefit Corporation structures[^59] - Been featured in Time magazine[^60]"
+    fetchedAt: 2026-02-22T01:50:58.414Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 61
+    url: https://seldonlab.com/blog/announcing-the-seldon-summer-2025-batch
+    linkText: Seldon Summer 2025 Batch
+    claimContext: The organization describes achieving over \$50 million in value by 2025 and securing a 10x return on an investment in <EntityLink id="goodfire">Goodfire</EntityLink> via Juniper Ventures.[^61]
+    fetchedAt: 2026-02-22T01:51:05.705Z
+    httpStatus: 200
+    pageTitle: Announcing the Seldon Summer 2025 Batch - Seldon Labs
+    contentSnippet: "Announcing the Seldon Summer 2025 Batch - Seldon Labs Batch #2 Applications Closed! Applications now open A n n o u n c i n g t h e S e l d o n S u m m e r 2 0 2 5 B a t c h We're thrilled to introduce Seldon’s Act 1: Accelerated Technology Companies , our trail-blazing pilot batch bringing together world-class AI safety and assurance startups. This milestone accelerates our vision of building the infrastructure that ensures humanity's long-term safety as AGI reshapes our world. Seldon's First A"
+    contentLength: 496945
+    status: verified
+    note: null
+  - footnote: 62
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: Seldon Lab operates with a mixed funding model. The organization has received \$53,000 in non-dilutive grant funding from the Survival and Flourishing Fund (SFF) over 12 months, along with undisclosed in-kind contributions and investments from private investors.[^62] The accelerator itself is struct
+    fetchedAt: 2026-02-22T01:51:11.725Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 63
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: Seldon Lab operates with a mixed funding model. The organization has received \$53,000 in non-dilutive grant funding from the Survival and Flourishing Fund (SFF) over 12 months, along with undisclosed in-kind contributions and investments from private investors.[^62] The accelerator itself is struct
+    fetchedAt: 2026-02-22T01:51:12.119Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 64
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: For Batch 2, Seldon Lab routes funding through Manifund using dilutive investment structures (YC SAFE agreements), with returns flowing to funders' balances rather than being treated as pure grants.[^64] This hybrid model allows the organization to maintain mission focus while creating potential fin
+    fetchedAt: 2026-02-22T01:51:12.118Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 65
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: Seldon Lab invests up to \$500,000 per startup in 5-10 companies per batch.[^65] The organization emphasizes early-stage, pre-seed investment in AI safety infrastructure, targeting companies that can scale to "unicorn-scale" valuations within 12 months.[^66]
+    fetchedAt: 2026-02-22T01:51:11.921Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 66
+    url: https://seldonlab.com/blog/announcing-the-seldon-summer-2025-batch
+    linkText: Seldon Summer 2025 Batch
+    claimContext: Seldon Lab invests up to \$500,000 per startup in 5-10 companies per batch.[^65] The organization emphasizes early-stage, pre-seed investment in AI safety infrastructure, targeting companies that can scale to "unicorn-scale" valuations within 12 months.[^66]
+    fetchedAt: 2026-02-22T01:51:13.331Z
+    httpStatus: 200
+    pageTitle: Announcing the Seldon Summer 2025 Batch - Seldon Labs
+    contentSnippet: "Announcing the Seldon Summer 2025 Batch - Seldon Labs Batch #2 Applications Closed! Applications now open A n n o u n c i n g t h e S e l d o n S u m m e r 2 0 2 5 B a t c h We're thrilled to introduce Seldon’s Act 1: Accelerated Technology Companies , our trail-blazing pilot batch bringing together world-class AI safety and assurance startups. This milestone accelerates our vision of building the infrastructure that ensures humanity's long-term safety as AGI reshapes our world. Seldon's First A"
+    contentLength: 496945
+    status: verified
+    note: null
+  - footnote: 67
+    url: https://luma.com/inside-seldonlab
+    linkText: Inside Seldon Lab - Luma
+    claimContext: Finn Metz's background includes supporting funding rounds totaling over \$20 million, though these figures represent his broader professional experience rather than Seldon Lab's specific capital deployment.[^67]
+    fetchedAt: 2026-02-22T01:51:13.822Z
+    httpStatus: 200
+    pageTitle: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma"
+    contentSnippet: "Inside Seldon Lab: Building the Future of AI Security · Zoom · Luma Presented by BlueDot Impact Subscribe We’re building the workforce needed to safely navigate AGI. Contact: [email&#160;protected] Hosted By Al-Hussein Saqr Joshua Landes Esben Kran Finn Metz BlueDot Impact Contact the Host Report Event AI Inside Seldon Lab: Building the Future of AI Security BlueDot Impact Zoom Registration Past Event Welcome! To join the event, please register below. Register You will be asked to verify token o"
+    contentLength: 206083
+    status: verified
+    note: null
+  - footnote: 68
+    url: https://www.seldon.io/announcing-our-series-b/
+    linkText: Seldon Series B Announcement
+    claimContext: It's important to note that Seldon Lab is entirely distinct from Seldon.io (also known as Seldon Technologies Limited), a British MLOps firm founded in 2014. Seldon.io has raised significantly more venture capital—including €3 million in seed funding (2019, led by Amadeus Capital Partners), £7.1 mil
+    fetchedAt: 2026-02-22T01:51:13.690Z
+    httpStatus: 200
+    pageTitle: "Seldon’s $20 million Series B Fundraise: What it means for our Customers, Community and Roadmap - Take Control of ML and AI Complexity"
+    contentSnippet: "Seldon’s $20 million Series B Fundraise: What it means for our Customers, Community and Roadmap - Take Control of ML and AI Complexity Skip to content Seldon’s $20 million Series B Fundraise: What it means for our Customers, Community and Roadmap March 16, 2023 Written by Alex Housley Table of Contents AI is everywhere, and at Seldon, we’re enabling our customers to put AI in everything. The benefits of this revolutionary technology are becoming increasingly evident, and we’re seeing many more c"
+    contentLength: 257529
+    status: verified
+    note: null
+  - footnote: 69
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: Seldon Lab explicitly positions its work within the context of existential risk from advanced AI systems. The organization's stated mission is to develop "existential security technologies" for humanity's coexistence with superintelligence.[^69] This framing connects directly to concerns about <Enti
+    fetchedAt: 2026-02-22T01:51:13.301Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 70
+    url: https://seldonlab.com
+    linkText: Seldon Lab
+    claimContext: '- **Long-term agent coherence**: Understanding whether AI systems maintain consistent goals over extended periods relates directly to <EntityLink id="instrumental-convergence">instrumental convergence</EntityLink> and goal stability concerns in alignment research.[^70] - **Hardware-level verificatio'
+    fetchedAt: 2026-02-22T01:51:13.804Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d t h e f u t u r e o f A I S e c u r i t y W e ' r e b u i l d i n g t h e p i v o t a l p o r t f o l i o o f t e c h n o l o g i e s f o c u s e d e x c l u s i v e l y o n w o r l d - s c a l e A G I d e p l o y m e n t q u e s t i o n s . Learn More A n n o u n c i n g S e l d o n B a t c h # 2 Building a Future ready for Advanced AI Our Request for Startups (RFS) D e c 9 , 2 0 2 5 Learn More A n n o u n c i n g S e l d "
+    contentLength: 1261650
+    status: verified
+    note: null
+  - footnote: 71
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: '- **Long-term agent coherence**: Understanding whether AI systems maintain consistent goals over extended periods relates directly to <EntityLink id="instrumental-convergence">instrumental convergence</EntityLink> and goal stability concerns in alignment research.[^70] - **Hardware-level verificatio'
+    fetchedAt: 2026-02-22T01:51:14.904Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 72
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Hardware-level verification**: Cryptographic and physical guarantees about AI system behavior provide potential solutions to monitoring and containment challenges.[^71] - **Privacy-preserving capability evaluation**: Extending frameworks like AISI's `inspect` to allow AI systems to prove safety "
+    fetchedAt: 2026-02-22T01:51:14.884Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 73
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: Seldon Lab emphasizes risks including AI systems "chasing human performance leading to catastrophe" and cyber offense capabilities demonstrated by incidents like Chinese state hackers compromising Anthropic's Claude systems.[^73]
+    fetchedAt: 2026-02-22T01:51:15.203Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 74
+    url: https://forum.effectivealtruism.org/posts/rCPiLPAJcBKx8kt4e/ai-safety-undervalues-founders
+    linkText: AI Safety Undervalues Founders - EA Forum
+    claimContext: Within the AI safety field-building landscape, Seldon Lab occupies a distinctive position as the first accelerator specifically focused on AI security startups. Analysis from the Effective Altruism community notes that AI safety incubators like Seldon Lab arrived "late relative to need" and often oc
+    fetchedAt: 2026-02-22T01:51:15.145Z
+    httpStatus: 200
+    pageTitle: AI safety undervalues founders — EA Forum
+    contentSnippet: "AI safety undervalues founders — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI safety undervalues founders by Ryan Kidd Nov 16 2025 6 min read 0 24 AI safety Building the field of AI safety Frontpage AI safety undervalues founders Why boost AI safety founders? How did we get here? Potential counter-arguments What should we do? How to become a founder No comments TL;DR: In AI safety"
+    contentLength: 141336
+    status: verified
+    note: null
+  - footnote: 75
+    url: https://forum.effectivealtruism.org/posts/rCPiLPAJcBKx8kt4e/ai-safety-undervalues-founders
+    linkText: AI Safety Undervalues Founders - EA Forum
+    claimContext: The organization addresses what some observers identify as systematic undervaluing of founders and field-builders in AI safety, where research and writing receive more status than entrepreneurship and organization-building.[^75] Seldon Lab's model explicitly combines research output (20+ papers) wit
+    fetchedAt: 2026-02-22T01:51:15.185Z
+    httpStatus: 200
+    pageTitle: AI safety undervalues founders — EA Forum
+    contentSnippet: "AI safety undervalues founders — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI safety undervalues founders by Ryan Kidd Nov 16 2025 6 min read 0 24 AI safety Building the field of AI safety Frontpage AI safety undervalues founders Why boost AI safety founders? How did we get here? Potential counter-arguments What should we do? How to become a founder No comments TL;DR: In AI safety"
+    contentLength: 141336
+    status: verified
+    note: null
+  - footnote: 76
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: The organization addresses what some observers identify as systematic undervaluing of founders and field-builders in AI safety, where research and writing receive more status than entrepreneurship and organization-building.[^75] Seldon Lab's model explicitly combines research output (20+ papers) wit
+    fetchedAt: 2026-02-22T01:51:16.550Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 77
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Model Context Protocol (MCP)**: An open standard for connecting AI systems to data sources[^77] - **Inspect evaluation framework**: Open-source AI testing tools[^78]"
+    fetchedAt: 2026-02-22T01:51:16.287Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 78
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Model Context Protocol (MCP)**: An open standard for connecting AI systems to data sources[^77] - **Inspect evaluation framework**: Open-source AI testing tools[^78] - **OpenMined**: Privacy-preserving machine learning community[^79]"
+    fetchedAt: 2026-02-22T01:51:16.267Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 79
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Inspect evaluation framework**: Open-source AI testing tools[^78] - **OpenMined**: Privacy-preserving machine learning community[^79] - **Differential Privacy Library**: Production-ready privacy tools[^80]"
+    fetchedAt: 2026-02-22T01:51:16.305Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 80
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **OpenMined**: Privacy-preserving machine learning community[^79] - **Differential Privacy Library**: Production-ready privacy tools[^80] - **SOLID Web Decentralization Project**: Tim Berners-Lee's initiative for personal data repository decentralization[^81]"
+    fetchedAt: 2026-02-22T01:51:16.389Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 81
+    url: https://seldonlab.com/mission
+    linkText: Seldon Lab Mission
+    claimContext: "- **Differential Privacy Library**: Production-ready privacy tools[^80] - **SOLID Web Decentralization Project**: Tim Berners-Lee's initiative for personal data repository decentralization[^81]"
+    fetchedAt: 2026-02-22T01:51:17.619Z
+    httpStatus: 200
+    pageTitle: Seldon Lab
+    contentSnippet: "Seldon Lab Batch #2 Applications Closed! Applications now open B u i l d i n g a b e t t e r f u t u r e W e ' r e b u i l d i n g a p o r t f o l i o o f t e c h n o l o g i e s t h a t w i l l d e f i n e A G I s e c u r i t y a s a g l o b a l i n d u s t r y . Our Vision We bring together the world's most capable founders while conducting our own cutting-edge research and directly developing the existential security technologies that will define how humanity related with general machine inte"
+    contentLength: 745767
+    status: verified
+    note: null
+  - footnote: 82
+    url: https://manifund.org/projects/ai-security-startup-accelerator-batch-2
+    linkText: AI Security Startup Accelerator Batch 2 - Manifund
+    claimContext: 'Seldon Lab acknowledges the risk that accelerator companies may shift away from safety-critical problems despite guidance, leading to "lower impact density" while still producing AI-security-adjacent tools.[^82] This represents a fundamental tension in the accelerator model: companies need product-m'
+    fetchedAt: 2026-02-22T01:51:23.973Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 83
+    url: https://forum.effectivealtruism.org/posts/rCPiLPAJcBKx8kt4e/ai-safety-undervalues-founders
+    linkText: AI Safety Undervalues Founders - EA Forum
+    claimContext: Critics note that AI safety incubators like Seldon Lab emerged "late relative to need," with the community's hesitation about "rapid org scaling" and "mass movement building" potentially delaying the creation of such programs.[^83] The 2022 memo opposing mass movement building to avoid dilution occu
+    fetchedAt: 2026-02-22T01:51:17.607Z
+    httpStatus: 200
+    pageTitle: AI safety undervalues founders — EA Forum
+    contentSnippet: "AI safety undervalues founders — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI safety undervalues founders by Ryan Kidd Nov 16 2025 6 min read 0 24 AI safety Building the field of AI safety Frontpage AI safety undervalues founders Why boost AI safety founders? How did we get here? Potential counter-arguments What should we do? How to become a founder No comments TL;DR: In AI safety"
+    contentLength: 138538
+    status: verified
+    note: null
+  - footnote: 84
+    url: https://forum.effectivealtruism.org/posts/rCPiLPAJcBKx8kt4e/ai-safety-undervalues-founders
+    linkText: AI Safety Undervalues Founders - EA Forum
+    claimContext: Critics note that AI safety incubators like Seldon Lab emerged "late relative to need," with the community's hesitation about "rapid org scaling" and "mass movement building" potentially delaying the creation of such programs.[^83] The 2022 memo opposing mass movement building to avoid dilution occu
+    fetchedAt: 2026-02-22T01:51:17.644Z
+    httpStatus: 200
+    pageTitle: AI safety undervalues founders — EA Forum
+    contentSnippet: "AI safety undervalues founders — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI safety undervalues founders by Ryan Kidd Nov 16 2025 6 min read 0 24 AI safety Building the field of AI safety Frontpage AI safety undervalues founders Why boost AI safety founders? How did we get here? Potential counter-arguments What should we do? How to become a founder No comments TL;DR: In AI safety"
+    contentLength: 138538
+    status: verified
+    note: null
+  - footnote: 85
+    url: https://www.youtube.com/watch?v=mZLLlz-Hu58
+    linkText: Inside Seldon Lab - YouTube
+    claimContext: As of early 2026, Seldon Lab has completed only one full batch, with Batch 2 recently launched. While Batch 1 achieved impressive early metrics (\$10M+ raised, sales to xAI and Anthropic), the long-term impact of portfolio companies on AGI security remains uncertain. The organization's claim that AG
+    fetchedAt: 2026-02-22T01:51:17.767Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 86
+    url: https://forum.effectivealtruism.org/posts/rCPiLPAJcBKx8kt4e/ai-safety-undervalues-founders
+    linkText: AI Safety Undervalues Founders - EA Forum
+    claimContext: Commentary on the AI safety field suggests that programs like Seldon Lab help address gaps for founders lacking access to elite networks (organizations like Constellation and LISA are mentioned as comparison points).[^86] However, with only 4 companies in Batch 1 and 5-10 planned per batch, the acce
+    fetchedAt: 2026-02-22T01:51:25.209Z
+    httpStatus: 200
+    pageTitle: AI safety undervalues founders — EA Forum
+    contentSnippet: "AI safety undervalues founders — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents AI safety undervalues founders by Ryan Kidd Nov 16 2025 6 min read 0 24 AI safety Building the field of AI safety Frontpage AI safety undervalues founders Why boost AI safety founders? How did we get here? Potential counter-arguments What should we do? How to become a founder No comments TL;DR: In AI safety"
+    contentLength: 138539
+    status: verified
+    note: null

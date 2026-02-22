@@ -1,0 +1,128 @@
+pageId: projecting-compute-spending
+verifiedAt: 2026-02-22
+totalCitations: 11
+verified: 7
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://ir.aboutamazon.com/quarterly-results/default.aspx
+    linkText: Amazon Q4 2025 Earnings Call, February 6, 2026. — Amazon Investor Relations
+    claimContext: "|-----------|------------|----------| | **Total 2026 Hyperscaler Capex** | \\$700B+ across six major companies | Q4 2025 and Q1 2026 earnings guidance; 58% increase over 2025[^1][^2][^3] | | **Cumulative Through 2030** | \\$5 trillion projected | Goldman Sachs and JPMorgan analyst projections based on"
+    fetchedAt: 2026-02-22T02:27:43.691Z
+    httpStatus: 200
+    pageTitle: Amazon.com, Inc. - Quarterly results
+    contentSnippet: "Amazon.com, Inc. - Quarterly results Skip to main content Innovation Job creation & investment Our Communities Supporting small business Working at Amazon Day One: The Amazon Blog EN EN Visit a different Amazon site European Union English France Français Germany (Deutschland) Deutsch India English Italy (Italia) Italiano Spain (España) Español United Kingdom English United States English Site Search Overview About Amazon Investor Relations Quarterly results Quarterly results Facebook Instagram L"
+    contentLength: 35816
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://abc.xyz/investor/
+    linkText: Alphabet Q4 2025 Earnings Call, February 4, 2026. — Alphabet Investor Relations
+    claimContext: "|-----------|------------|----------| | **Total 2026 Hyperscaler Capex** | \\$700B+ across six major companies | Q4 2025 and Q1 2026 earnings guidance; 58% increase over 2025[^1][^2][^3] | | **Cumulative Through 2030** | \\$5 trillion projected | Goldman Sachs and JPMorgan analyst projections based on"
+    fetchedAt: 2026-02-22T02:27:43.619Z
+    httpStatus: 200
+    pageTitle: Alphabet Investor Relations - Investors
+    contentSnippet: "Alphabet Investor Relations - Investors Earnings Select Year Selecting a year value will change the accordion list Select Year: More Earnings News Recent Updates"
+    contentLength: 151666
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.microsoft.com/en-us/investor
+    linkText: Microsoft Q2 FY2026 Earnings Call, January 29, 2026. — Microsoft Investor Relations
+    claimContext: "|-----------|------------|----------| | **Total 2026 Hyperscaler Capex** | \\$700B+ across six major companies | Q4 2025 and Q1 2026 earnings guidance; 58% increase over 2025[^1][^2][^3] | | **Cumulative Through 2030** | \\$5 trillion projected | Goldman Sachs and JPMorgan analyst projections based on"
+    fetchedAt: 2026-02-22T02:27:44.278Z
+    httpStatus: 200
+    pageTitle: Home page
+    contentSnippet: 'Home page This is the Trace Id: 07cdf5dba08f418683d8efdacfc55426 Skip to main content Slide %{start} of %{total}. %{slideTitle} Skip News Previous slide Next slide Microsoft FY26 Q2 Earnings January 28, 2026 " role=" " aria-label="View details of Microsoft FY26 Q2 Earnings" target="_self" href="/en-us/investor/earnings/fy-2026-q2/press-release-webcast"> VIEW DETAILS > How Microsoft is Empowering Frontier Transformation with Intelligence + Trust " data-bi-ecn="VIEW DETAILS >" data-bi-hn="Becoming'
+    contentLength: 286133
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.semiconductors.org
+    linkText: Semiconductor Industry Association, "Global Semiconductor Sales Reach \$791.7 Billion in 2025," February 2026. — SIA Website
+    claimContext: "| **Largest Single Spender** | Amazon at \\$200B for 2026 | \\$50B above Wall Street consensus; 53% YoY increase[^1] | | **Semiconductor Market** | \\$1 trillion milestone expected in 2026 | Semiconductor Industry Association Q4 2025 report[^5] | | **Revenue Required for 10% ROI** | \\$1 trillion in ann"
+    fetchedAt: 2026-02-22T02:27:43.526Z
+    httpStatus: 200
+    pageTitle: Semiconductor Industry Association | SIA | Voice of the Semiconductor Industry
+    contentSnippet: "Semiconductor Industry Association | SIA | Voice of the Semiconductor Industry Your browser does not support the video tag. We suggest you upgrade your browser. WSTS Login Contact Semiconductors Power the Modern World Semiconductors enable the systems and products that we use to work, communicate, travel, entertain, harness energy, treat illness, make new scientific discoveries, and more. Policy Agenda > Semiconductor Supply Chain Investments> Map of U.S. Semiconductor Ecosystem > Video Credit: "
+    contentLength: 107911
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.sec.gov/edgar
+    linkText: Company 10-K filings for fiscal year 2025, various dates. — SEC EDGAR Database
+    claimContext: "| **Revenue Required for 10% ROI** | \\$1 trillion in annual AI revenue | JPMorgan analysis of capex returns[^6] | | **Funding Mix** | Cash flow + debt issuance + reduced buybacks | \\$575B combined operating cash flow in 2025; \\$108B debt raised[^7][^8] |"
+    fetchedAt: 2026-02-22T02:27:43.312Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 9
+    url: https://investor.fb.com/home/default.aspx
+    linkText: Meta Platforms Q4 2025 Earnings Call, February 5, 2026. — Meta Investor Relations
+    claimContext: The AI infrastructure buildout from 2024-2026 represents a capital investment cycle that exceeds, in nominal dollar terms, the annual spending rates of previous major infrastructure projects. In Q4 2025 and Q1 2026 earnings calls, the five largest hyperscalers — Amazon, <EntityLink id="deepmind">Alp
+    fetchedAt: 2026-02-22T02:27:47.154Z
+    httpStatus: 200
+    pageTitle: Meta - Home
+    contentSnippet: Meta - Home Meta Investor Relations April 27, 2016 Q4 2025 Earnings Webcast - Documents Q&A With Mark Latest Video --> Latest SEC Filings All files Interactive Financials Explore Investor Events View all Press Releases View all Newsroom Visit Newsroom Investor Education Center Meta for Business Facebook Ads Guide Meta for Developers Meta for Business Case Studies Sustainability Facebook Investor Relations Page --> Email Alerts Email Address * Mailing Lists * Investor News All SEC Filings Quarter
+    contentLength: 80580
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.oracle.com/corporate/investor-relations/
+    linkText: Oracle Q3 FY2025 Earnings Call, March 11, 2026. — Oracle Investor Relations
+    claimContext: The AI infrastructure buildout from 2024-2026 represents a capital investment cycle that exceeds, in nominal dollar terms, the annual spending rates of previous major infrastructure projects. In Q4 2025 and Q1 2026 earnings calls, the five largest hyperscalers — Amazon, <EntityLink id="deepmind">Alp
+    fetchedAt: 2026-02-22T02:27:47.015Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 19
+    url: https://x.ai/blog
+    linkText: xAI, "Series E Funding Announcement," January 15, 2026. — xAI Blog
+    claimContext: "| Oracle | \\$7.0B | \\$15.0B | \\$50.0B | +233% | [Q3 FY2025 Earnings Call](https://oracle.com/investor)[^10] | | xAI | \\$3.0B | \\$18.0B | \\$30B+ | +67%+ | [Series E Funding Announcement](https://x.ai)[^19] | | **Combined** | **≈\\$238B** | **≈\\$415B** | **≈\\$700B+** | **≈+69%** | |"
+    fetchedAt: 2026-02-22T02:27:46.398Z
+    httpStatus: 200
+    pageTitle: "News: Research, Product & Company Updates | xAI"
+    contentSnippet: "News: Research, Product & Company Updates | xAI [ What&#x27;s new ] Latest news Read about our latest product and research announcements. February 02, 2026 xAI joins SpaceX SpaceX announced today that it has acquired xAI. company Read Grok Imagine API State-of-the-art video generation across quality, cost, and latency. January 28, 2026 READ xAI Raises $20B Series E xAI is rapidly accelerating its progress in building advanced AI. January 06, 2026 READ Introducing Grok Business and Grok Enterpris"
+    contentLength: 168663
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.sec.gov/edgar
+    linkText: Oracle Corporation 8-K filing, "Debt and Equity Offering Program," February 2026. — SEC EDGAR
+    claimContext: Oracle revised its fiscal year 2026 capital expenditure guidance upward to \$50 billion during its Q3 FY2025 earnings call, representing a dramatic acceleration for a company historically focused on software.[^10] To fund this expansion, Oracle announced plans to raise \$45–50 billion through combin
+    fetchedAt: 2026-02-22T02:27:45.322Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 28
+    url: https://investor.tsmc.com
+    linkText: TSMC Q4 2025 Earnings Call, January 16, 2026. — TSMC Investor Relations
+    claimContext: "| HBM3e Memory | +150% YoY | SK Hynix, Samsung, Micron production capacity | 6-9 months | [TrendForce Q4 2025](https://trendforce.com)[^27] | | TSMC Advanced Packaging | +100% YoY | CoWoS capacity; sole advanced node manufacturer | 12-18 months | [TSMC Q4 2025 Earnings](https://tsmc.com)[^28] | | Da"
+    fetchedAt: 2026-02-22T02:27:45.695Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 33
+    url: https://investor.nvidia.com
+    linkText: Nvidia FY2025 Annual Report (ended January 26, 2025). — Nvidia Investor Relations
+    claimContext: Nvidia maintains approximately 90% market share in AI accelerators used for training large language models.[^32] The company's fiscal year 2025 revenue (ended January 2025) reached \$130.5 billion, representing 114% year-over-year growth, with data center revenue comprising \$116.2 billion of the to
+    fetchedAt: 2026-02-22T02:27:49.020Z
+    httpStatus: 200
+    pageTitle: NVIDIA Corporation - Home
+    contentSnippet: NVIDIA Corporation - Home Skip to main content Home Corporate Profile NVIDIA is the pioneer of GPU-accelerated computing. We specialize in products and platforms for the large, growing markets of gaming, professional visualization, data center, and automotive. Our creations are loved by the most demanding computer users in the world – gamers, designers, and scientists. And our work is at the center of the most consequential mega-trends in technology. Learn More 4 multi-billion dollar gpu computi
+    contentLength: 109615
+    status: verified
+    note: null

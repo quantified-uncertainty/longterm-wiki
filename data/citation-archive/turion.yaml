@@ -1,0 +1,73 @@
+pageId: turion
+verifiedAt: 2026-02-22
+totalCitations: 6
+verified: 5
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://techstartups.com/2025/01/16/point72s-new-ai-fund-turion-nears-1-5-billion-after-14-returns-in-just-3-months-pauses-new-investments/
+    linkText: Point72's new AI fund Turion nears \$1.5 billion
+    claimContext: "**Turion** is a dedicated AI stock-picking hedge fund launched by Point72 Asset Management in October 2024. Named after AI pioneer Alan Turing, the fund was seeded with \\$150 million of Steve Cohen's personal capital and has since grown to approximately \\$3 billion in assets under management.[^1][^2"
+    fetchedAt: 2026-02-22T02:28:11.119Z
+    httpStatus: 200
+    pageTitle: Point72’s new AI fund Turion nears $1.5 billion after 14% returns in just 3 months, pauses new investments - Tech Startups
+    contentSnippet: Point72’s new AI fund Turion nears $1.5 billion after 14% returns in just 3 months, pauses new investments - Tech Startups Home Executive Interviews Topics Search Startups Startup Jobs Advertise About Trust &#038; Safety Editorial Policy February 22, 2026 Home Executive Interviews Topics Search Startups Startup Jobs Advertise About Trust &#038; Safety Editorial Policy Topics Search Startups Top Startups Startup List Submit Your Startup Startup Jobs Product Reviews Tools Free Startup Valuation Ca
+    contentLength: 81662
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://finance.yahoo.com/news/steve-cohens-ai-fund-just-153250571.html
+    linkText: Steve Cohen's AI Fund Just Scored 30% Gains
+    claimContext: "**Turion** is a dedicated AI stock-picking hedge fund launched by Point72 Asset Management in October 2024. Named after AI pioneer Alan Turing, the fund was seeded with \\$150 million of Steve Cohen's personal capital and has since grown to approximately \\$3 billion in assets under management.[^1][^2"
+    fetchedAt: 2026-02-22T02:28:10.670Z
+    httpStatus: 0
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: fetch failed
+  - footnote: 3
+    url: https://www.hedgeweek.com/point72s-new-ai-fund-delivers-14-gains/
+    linkText: Point72's new AI fund delivers 14% gains
+    claimContext: The fund represents Point72's first new fund launch in decades, reflecting the firm's conviction in AI as a transformative investment theme. Unlike Point72's core multistrategy fund, Turion operates with more flexibility, allowing longer-biased exposure to the AI hardware cycle.[^3]
+    fetchedAt: 2026-02-22T02:28:10.729Z
+    httpStatus: 200
+    pageTitle: Point72’s new AI fund delivers 14% gains - Hedgeweek
+    contentSnippet: Point72’s new AI fund delivers 14% gains - Hedgeweek Skip to content Contact Us log in sign up Menu Search Search Menu Forward Features Calendar Menu Funds , Intel , Managers Share this article? Newsletter Like this article? Sign up to our free newsletter Sign up now Point72’s new AI fund delivers 14% gains January 17, 2025 - 9:17 am Related Topics Funds , Intel , Managers Steven Cohen&#8217;s Point72 Asset Management has achieved a 14% gain with its newly launched artificial intelligence (AI)-f
+    contentLength: 394265
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://wallstreetpit.com/122574-steve-cohens-ai-fund-soars-to-nearly-1-5-billion-after-strong-returns/
+    linkText: Steve Cohen's AI Fund Soars to Nearly \$1.5 Billion
+    claimContext: The fund's 2024 performance of 14.2% in just three months significantly outpaced the Nasdaq Composite's 6.2% gain over the same period.[^4]
+    fetchedAt: 2026-02-22T02:28:10.641Z
+    httpStatus: 200
+    pageTitle: Steve Cohen's AI Fund Soars to Nearly $1.5 Billion After Strong Returns - Wall Street Pit
+    contentSnippet: Steve Cohen&#039;s AI Fund Soars to Nearly $1.5 Billion After Strong Returns - Wall Street Pit The recent performance of Steven Cohen&rsquo;s Point72 Asset Management &rsquo;s new AI-focused fund, Point72 Turion , has been notably strong, highlighting the firm&rsquo;s strategic pivot towards the burgeoning field of artificial intelligence (AI), according to a Reuters report . Launched in October under the management of Eric Sanchez, the fund has achieved a 14% gain within just three months, push
+    contentLength: 44342
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.tradealgo.com/news/cohens-hedge-fund-beats-the-competition
+    linkText: Cohen's Hedge Fund Beats the Competition
+    claimContext: "Turion primarily targets investments in AI hardware and semiconductor companies worldwide. The fund's portfolio is concentrated in companies benefiting from the ongoing AI infrastructure buildout, similar to other AI-focused funds like <EntityLink id=\"situational-awareness-lp\">Situational Awareness "
+    fetchedAt: 2026-02-22T02:28:11.491Z
+    httpStatus: 200
+    pageTitle: Cohen&#x27;s Hedge Fund Beats the Competition
+    contentSnippet: Cohen&#x27;s Hedge Fund Beats the Competition Home | Features | About | Customer Support | Request Demo | Our Analysts | Login Trade Algo & Its Products | Terminal Demo Request | Trade Algo Anywhere Remote Login | Customer Support My Login Technology Wealth Events Crypto Products More  My Login Get the Latest Updates! Exclusively for our subscribers Thank you! Your submission has been received! Oops! Something went wrong while submitting the form. Search Gallery inside! Featured Markets Cohen&#
+    contentLength: 147990
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.hedgeco.net/news/01/2026/point72s-2026-playbook-expand-new-credit-strategies-ai-focus-and-structural-reinvention.html
+    linkText: Point72's 2026 Playbook
+    claimContext: "**Eric Sanchez** serves as Portfolio Manager for Turion. The fund operates within Point72's broader infrastructure, which manages approximately \\$41.5 billion in total assets as of 2026.[^6]"
+    fetchedAt: 2026-02-22T02:28:13.009Z
+    httpStatus: 200
+    pageTitle: "Point72’s 2026 Playbook: Expand New Credit Strategies, AI Focus and Structural Reinvention | HedgeCo Insights"
+    contentSnippet: "Point72’s 2026 Playbook: Expand New Credit Strategies, AI Focus and Structural Reinvention | HedgeCo Insights --> Point72’s 2026 Playbook: Expand New Credit Strategies, AI Focus and Structural Reinvention January 14, 2026 : Permanent Link (HedgeCo.Net) As Steven Cohen’s Point72 Asset Management enters 2026 with roughly $41.5 billion in assets under management, the firm is evolving far beyond its traditional hedge fund roots. Across strategy lines from equities to private credit, systematic tradi"
+    contentLength: 55901
+    status: verified
+    note: null

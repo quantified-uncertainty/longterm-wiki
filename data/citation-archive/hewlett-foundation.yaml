@@ -1,0 +1,326 @@
+pageId: hewlett-foundation
+verifiedAt: 2026-02-22
+totalCitations: 29
+verified: 26
+broken: 3
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://projects.propublica.org/nonprofits/organizations/941655673
+    linkText: William and Flora Hewlett Foundation - ProPublica Nonprofit Explorer
+    claimContext: "| Founded | 1966 by William R. Hewlett and Flora Lamson Hewlett | | Assets | Approximately \\$14.8 billion (2024)[^1] | | Annual Grantmaking | \\$473 million in charitable disbursements (2024)[^1] |"
+    fetchedAt: 2026-02-22T02:18:44.149Z
+    httpStatus: 200
+    pageTitle: William & Flora Hewlett Foundation - Nonprofit Explorer - ProPublica
+    contentSnippet: "William & Flora Hewlett Foundation - Nonprofit Explorer - ProPublica Skip to content Menu Menu ProPublica Donate Close Close ProPublica Donate Search ProPublica: Search Search Search Show search box Select the type of search Nonprofits People Filing Text Search for a nonprofit Search Search William & Flora Hewlett Foundation Menlo Park, CA Tax-exempt since March 1968 EIN: 94-1655673 Receive an email when new data is available for this organization. Organization summary Type of Nonprofit Designat"
+    contentLength: 366320
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://philanthropynewsdigest.org/features/on-the-web/william-and-flora-hewlett-foundation
+    linkText: William and Flora Hewlett Foundation - Philanthropy News Digest
+    claimContext: The **William and Flora Hewlett Foundation** is one of the largest private foundations in the United States, with approximately \$14.8 billion in assets as of 2024.[^1] Established in 1966 by Hewlett-Packard co-founder William R. Hewlett and his wife Flora Lamson Hewlett, the foundation operates ind
+    fetchedAt: 2026-02-22T02:18:45.909Z
+    httpStatus: 200
+    pageTitle: Candid insights | Showing 1134 results sorted by date
+    contentSnippet: "Candid insights | Showing 1134 results sorted by date Skip to main content Comprehensive nonprofit and foundation information is a search away Search 1.9 million organizations by name, EIN, or keyword Search By registering or logging in, you get access to detailed profiles and a personalized dashboard. Login Register for free Candid insights The big picture of the social sector, backed by data and expertise Filter Search by keyword Featured posts Trends & Issues How we measure poverty matters: D"
+    contentLength: 104895
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://darpe.me/implement-entries/william-and-flora-hewlett-foundation/
+    linkText: William and Flora Hewlett Foundation - Darpe.me
+    claimContext: The **William and Flora Hewlett Foundation** is one of the largest private foundations in the United States, with approximately \$14.8 billion in assets as of 2024.[^1] Established in 1966 by Hewlett-Packard co-founder William R. Hewlett and his wife Flora Lamson Hewlett, the foundation operates ind
+    fetchedAt: 2026-02-22T02:18:50.697Z
+    httpStatus: 200
+    pageTitle: William and Flora Hewlett Foundation
+    contentSnippet: William and Flora Hewlett Foundation William and Flora Hewlett Foundation William and Flora Hewlett Foundation William and Flora Hewlett Foundation Overview The William and Flora Hewlett Foundation, established in 1966 by engineer and entrepreneur Bill Hewlett and his wife, Flora, is a nonpartisan philanthropic organization dedicated to promoting the well-being of humanity. Independent from Hewlett-Packard and its associated entities, the foundation operates with a mission to harness society’s c
+    contentLength: 103976
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://participedia.net/organization/5800
+    linkText: William and Flora Hewlett Foundation - Participedia
+    claimContext: The foundation's philanthropic approach emphasizes long-term partnerships, measurable outcomes, and collaborative relationships with grantees.[^4] Its major program areas include education reform, environmental conservation and climate change, U.S. democracy and governance, effective philanthropy, g
+    fetchedAt: 2026-02-22T02:18:44.324Z
+    httpStatus: 200
+    pageTitle: The William and Flora Hewlett Foundation – Participedia
+    contentSnippet: The William and Flora Hewlett Foundation – Participedia Dynamic modal content OK Data Location Menlo Park United States ORGANIZATION The William and Flora Hewlett Foundation Copy Remove Bookmark Add Bookmark Wiki Contributor History May 14, 2019 Scott Fletcher Bowlsby Organization Data Location Menlo Park United States This entry was originally added in English. View this entry in its original language . click for more info A nonpartisan, private charitable foundation that advances ideas and sup
+    contentLength: 84515
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.insidephilanthropy.com/find-a-grant/grants-h/william-and-flora-hewlett-foundation
+    linkText: William and Flora Hewlett Foundation - Inside Philanthropy
+    claimContext: The foundation's philanthropic approach emphasizes long-term partnerships, measurable outcomes, and collaborative relationships with grantees.[^4] Its major program areas include education reform, environmental conservation and climate change, U.S. democracy and governance, effective philanthropy, g
+    fetchedAt: 2026-02-22T02:18:44.654Z
+    httpStatus: 200
+    pageTitle: William and Flora Hewlett Foundation | Inside Philanthropy
+    contentSnippet: "William and Flora Hewlett Foundation | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar OVERVIEW: Hewlett makes grants for work on climate change and conservation, women’s empowerment and reproductive rights, democracy, and other issues that include K-12 education, effective philanthropy, and arts and community development in the Bay Area. IP TAKE: One of the largest grantmakers in the United States, this funder tends to support larger NGOs with which it ha"
+    contentLength: 275863
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.thenation.com/article/politics/project-2025-liberal-donors/
+    linkText: Project 2025's Shocking Liberal Donors - The Nation
+    claimContext: While the foundation has supported progressive causes throughout its history, it has recently drawn criticism for funding organizations with ties to right-wing initiatives, creating tension with its stated nonpartisan mission.[^6][^7] The foundation's work in AI focuses primarily on cybersecurity ri
+    fetchedAt: 2026-02-22T02:18:52.259Z
+    httpStatus: 200
+    pageTitle: Why “Liberal” Donors Love Giving Money to the Extreme Right | The Nation
+    contentSnippet: "Why “Liberal” Donors Love Giving Money to the Extreme Right | The Nation --> Log In Email * Password * Remember Me Forgot Your Password? Log In New to The Nation ? Subscribe Print subscriber? Activate your online access Politics / November 24, 2023 Why “Liberal” Donors Love Giving Money to the Extreme Right Many purportedly progressive plutocrats turn reactionary on Israel and labor. Jeet Heer Share Copy Link Facebook X (Twitter) Bluesky Pocket Email Ad Policy Eyes right : EBay founder Pierre Om"
+    contentLength: 296471
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://newrepublic.com/post/177095/shocking-donors-behind-pro-trump
+    linkText: The Shocking Donors Behind the Pro-Trump Project 2025 - New Republic
+    claimContext: While the foundation has supported progressive causes throughout its history, it has recently drawn criticism for funding organizations with ties to right-wing initiatives, creating tension with its stated nonpartisan mission.[^6][^7] The foundation's work in AI focuses primarily on cybersecurity ri
+    fetchedAt: 2026-02-22T02:18:55.087Z
+    httpStatus: 200
+    pageTitle: The Shocking Donors Behind a Pro-Trump Nonprofit | The New Republic
+    contentSnippet: The Shocking Donors Behind a Pro-Trump Nonprofit | The New Republic Skip Navigation A pro–Donald Trump nonprofit organization accidentally revealed its top donors. It turns out two of them usually back liberal causes. The Daily Beast obtained a copy of the 2022 tax statement for the nonprofit American Compass , which is linked to a plan to assemble Trump’s Cabinet for a potential second term . The document includes a list of five donor organizations. Two of the donors are the Omidyar Network Fou
+    contentLength: 472683
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://cset.georgetown.edu/article/cset-receives-2-million-grant-to-fund-new-cyberai-project/
+    linkText: CSET Receives \$2 Million Grant to Fund New CyberAI Project - Georgetown CSET
+    claimContext: While the foundation has supported progressive causes throughout its history, it has recently drawn criticism for funding organizations with ties to right-wing initiatives, creating tension with its stated nonpartisan mission.[^6][^7] The foundation's work in AI focuses primarily on cybersecurity ri
+    fetchedAt: 2026-02-22T02:18:52.005Z
+    httpStatus: 200
+    pageTitle: CSET Receives $2 Million Grant To Fund New CyberAI Project | Center for Security and Emerging Technology
+    contentSnippet: CSET Receives $2 Million Grant To Fund New CyberAI Project | Center for Security and Emerging Technology Skip to main content In The News CSET Receives $2 Million Grant To Fund New CyberAI Project The Hoya December 6, 2019 Thanks to a generous grant from the Hewlett Foundation, CSET is launching a new Cybersecurity and Artificial Intelligence project to be led by Ben Buchanan. The project will examine the potential risks of AI in cyberspace and national security. See original article The Georget
+    contentLength: 150054
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://news.famu.edu/2025/famu-cyber-policy-institute-expands-ai-cybersecurity-initiatives-with-hewlett-foundation-support.php
+    linkText: FAMU Cyber Policy Institute Expands AI Cybersecurity Initiatives - FAMU News
+    claimContext: While the foundation has supported progressive causes throughout its history, it has recently drawn criticism for funding organizations with ties to right-wing initiatives, creating tension with its stated nonpartisan mission.[^6][^7] The foundation's work in AI focuses primarily on cybersecurity ri
+    fetchedAt: 2026-02-22T02:18:52.185Z
+    httpStatus: 200
+    pageTitle: FAMU Cyber Policy Institute Expands AI, Cybersecurity Initiatives with Hewlett Foundation Support
+    contentSnippet: FAMU Cyber Policy Institute Expands AI, Cybersecurity Initiatives with Hewlett Foundation Support Events Daily Venom Newsletter FAMU Cyber Policy Institute Expands AI, Cybersecurity Initiatives with Hewlett Foundation Support December 03, 2025 Administration By Heather D. Johnson FAMU's Cyber Policy Fellows advance programming to elevate the University’s leadership in cyber policy, artificial intelligence, digital innovation, and education. Advertisement --> The Cyber Policy Institute at Florida
+    contentLength: 38139
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://securityandtechnology.org/blog/the-hewlett-foundation-cyber-initiative-renews-commitment-to-the-institute-for-security-and-technologys-ongoing-work/
+    linkText: The Hewlett Foundation Cyber Initiative Renews Commitment - Institute for Security and Technology
+    claimContext: While the foundation has supported progressive causes throughout its history, it has recently drawn criticism for funding organizations with ties to right-wing initiatives, creating tension with its stated nonpartisan mission.[^6][^7] The foundation's work in AI focuses primarily on cybersecurity ri
+    fetchedAt: 2026-02-22T02:18:52.817Z
+    httpStatus: 200
+    pageTitle: The Hewlett Foundation Cyber Initiative Renews Commitment to the Institute for Security and Technology's Ongoing Work - Institute for Security and Technology
+    contentSnippet: "The Hewlett Foundation Cyber Initiative Renews Commitment to the Institute for Security and Technology&#039;s Ongoing Work - Institute for Security and Technology Skip to content Future of Digital Security , Institute for Security and Technology The Hewlett Foundation Cyber Initiative Renews Commitment to the Institute for Security and Technology&#8217;s Ongoing Work Blog July 12, 2022 The William and Flora Hewlett Foundation Cyber Initiative generously provided $1,000,000 in additional support "
+    contentLength: 151551
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://en.wikipedia.org/wiki/Hewlett_Foundation
+    linkText: Hewlett Foundation - Wikipedia
+    claimContext: William R. Hewlett, co-founder of Hewlett-Packard Company (established in 1939), created the William R. Hewlett Foundation in 1966 alongside his wife Flora Lamson Hewlett and their eldest son Walter B. Hewlett in their Palo Alto, California home.[^11][^12][^13] The period from 1966 to 1972 became kn
+    fetchedAt: 2026-02-22T02:18:56.107Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 12
+    url: https://www.medalofphilanthropy.org/the-hewlett-family/
+    linkText: The Hewlett Family - Medal of Philanthropy
+    claimContext: William R. Hewlett, co-founder of Hewlett-Packard Company (established in 1939), created the William R. Hewlett Foundation in 1966 alongside his wife Flora Lamson Hewlett and their eldest son Walter B. Hewlett in their Palo Alto, California home.[^11][^12][^13] The period from 1966 to 1972 became kn
+    fetchedAt: 2026-02-22T02:18:56.954Z
+    httpStatus: 200
+    pageTitle: Hewlett Family, The &#8211; Carnegie Medal of Philanthropy
+    contentSnippet: Hewlett Family, The &#8211; Carnegie Medal of Philanthropy Skip to content Skip to main menu The Hewlett Family Year 2005 Affiliation Hewlett Foundation Areas of Focus Education | Environment | Arts | Sustainable Development Nearly forty years after Bill and Flora Hewlett started the Hewlett Foundation in the living room of their Palo Alto house, the William and Flora Hewlett Foundation is one of the largest private foundations in the United States, with assets of more than $6 billion. The Found
+    contentLength: 49748
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.infoplease.com/encyclopedia/social-science/economy/foundations/william-and-flora-hewlett-foundation
+    linkText: William and Flora Hewlett Foundation - Infoplease
+    claimContext: William R. Hewlett, co-founder of Hewlett-Packard Company (established in 1939), created the William R. Hewlett Foundation in 1966 alongside his wife Flora Lamson Hewlett and their eldest son Walter B. Hewlett in their Palo Alto, California home.[^11][^12][^13] The period from 1966 to 1972 became kn
+    fetchedAt: 2026-02-22T02:18:58.314Z
+    httpStatus: 200
+    pageTitle: William and Flora Hewlett Foundation | Infoplease
+    contentSnippet: "--> William and Flora Hewlett Foundation | Infoplease Skip to main content Enter your search terms: William and Flora Hewlett Foundation, philanthropic organization founded in 1966 by engineer and entrepeneur William R. Hewlett (1913–2001), co-founder of Hewlett-Packard, his wife, Flora Lamson Hewlett (1914–77), and their eldest son, Walter B. Hewlett (1944–). Headquartered in Menlo Park, Calif., it is one of the wealthiest foundations in the United States. Pledged to address social and environm"
+    contentLength: 71816
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.influencewatch.org/non-profit/william-and-flora-hewlett-foundation/
+    linkText: William and Flora Hewlett Foundation - InfluenceWatch
+    claimContext: "The initial board consisted of Bill Hewlett, Flora Hewlett, and Walter Hewlett. In 1972, the board expanded to include additional family members William A. Hewlett and James S. Hewlett.[^11] The foundation operated with minimal formal structure during these early years, with the founders personally "
+    fetchedAt: 2026-02-22T02:18:56.766Z
+    httpStatus: 200
+    pageTitle: William and Flora Hewlett Foundation - InfluenceWatch
+    contentSnippet: "William and Flora Hewlett Foundation - InfluenceWatch InfluenceWatch About Us Report an Error Suggest a New Entry Listen to the weekly IW Podcast Subscribe to Our Newsletter Educational Guide Hubs People Non-profits For-profits Labor Unions Other Groups Political Parties/527 Government Agencies Movements Legislation FOLLOW US Menu Donate Non-profit William and Flora Hewlett Foundation Hewlett Foundation logo ( link ) Website: www.hewlett.org Location: MENLO PARK, CA Tax ID: 94-1655673 Tax-Exempt"
+    contentLength: 441468
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://en.wikipedia.org/wiki/Hewlett_Foundation
+    linkText: Hewlett Foundation - Wikipedia
+    claimContext: Under Roger Heyns' leadership, which lasted 15 years until his retirement in 1993, the foundation began to professionalize its operations and expand its program areas.[^15] David P. Gardner, former President of the University of California, served as president from 1993 to 1999, significantly expand
+    fetchedAt: 2026-02-22T02:18:56.108Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 16
+    url: https://mediaimpactfunders.org/member-spotlight-william-and-flora-hewlett-foundation/
+    linkText: "Member Spotlight: William and Flora Hewlett Foundation - Media Impact Funders"
+    claimContext: The foundation's early focus areas included conflict resolution, education, environment, family and community development, performing arts, population issues, and U.S.-Latin American relations.[^2] The foundation also established a long history of media funding dating back more than 50 years, beginn
+    fetchedAt: 2026-02-22T02:18:59.882Z
+    httpStatus: 200
+    pageTitle: "Member Spotlight: William and Flora Hewlett Foundation | Media Impact Funders"
+    contentSnippet: "Member Spotlight: William and Flora Hewlett Foundation | Media Impact Funders Skip to content The MIF Blog Member Spotlight: William and Flora Hewlett Foundation January 31, 2024 — Nina Sachdev Share via LinkedIn Share via Facebook Share via Twitter Share via Email The William and Flora Hewlett Foundation, established in 1966 by Hewlett-Packard co-founder William Redington Hewlett and his wife Flora Lamson, has a rich history of media funding, one that’s about as old as the foundation itself. St"
+    contentLength: 122738
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.gsb.stanford.edu/faculty-research/case-studies/william-flora-hewlett-foundation
+    linkText: William and Flora Hewlett Foundation Case Study - Stanford GSB
+    claimContext: In January 2000, Paul Brest, former dean of Stanford Law School, was appointed president and served for 12 years.[^11] Under Brest's direction during 2001-2002, the foundation pioneered the implementation of a **theory of change model** (also called a causal theory or logic model) to structure strat
+    fetchedAt: 2026-02-22T02:18:59.828Z
+    httpStatus: 200
+    pageTitle: The William and Flora Hewlett Foundation | Stanford Graduate School of Business
+    contentSnippet: The William and Flora Hewlett Foundation | Stanford Graduate School of Business Faculty & Research Menu Faculty Publications Books Working Papers Case Studies Postdoctoral Scholars Research Labs & Initiatives Behavioral Lab Data, Analytics & Research Computing Faculty Publications Books Working Papers Case Studies Research Labs & Initiatives Behavioral Lab DARC The William and Flora Hewlett Foundation By Laura Arrillaga-Andreessen, Victoria Chang 2006 | Case No. SI63 | Length 17 pgs. Late Palo A
+    contentLength: 199060
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.oecd.org/en/publications/development-co-operation-profiles_04b376d7-en/william-and-flora-hewlett-foundation_6ed3e1ea-en.html
+    linkText: Development Co-operation Profiles - OECD
+    claimContext: The foundation's assets have grown substantially over the decades, from approximately \$2 billion in the 1990s to over \$6 billion in the early 2000s, reaching approximately \$14.8 billion by 2024.[^1][^11] In 2019, the foundation provided \$123.3 million in grants for international development acco
+    fetchedAt: 2026-02-22T02:18:59.773Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 19
+    url: https://www.insidephilanthropy.com/home/2024-5-23-the-william-and-flora-hewlett-foundation-gears-up-for-the-fall-election-and-beyond
+    linkText: The William and Flora Hewlett Foundation Gears Up for the Fall Election - Inside Philanthropy
+    claimContext: The foundation has made strategic shifts in several program areas. Its U.S. Democracy Program, launched in 2014 as the Madison Initiative with a \$150 million commitment, evolved into an expanded effort that committed approximately \$45 million in 2024 to strengthen electoral processes and governing
+    fetchedAt: 2026-02-22T02:19:00.266Z
+    httpStatus: 200
+    pageTitle: The William and Flora Hewlett Foundation Gears Up for the Fall Election — and Beyond | Inside Philanthropy
+    contentSnippet: The William and Flora Hewlett Foundation Gears Up for the Fall Election — and Beyond | Inside Philanthropy Skip to main content Skip to secondary menu Skip to primary sidebar Skip to footer Ayman Haykal/shutterstock The William and Flora Hewlett Foundation is once again set to play a major role in pro-democracy funding in advance of the U.S. elections in 2024. It’s long been one of the largest funders in the ecosystem — it dispersed $96.9 million in democracy-related grants from 2014 to 2018 — a
+    contentLength: 301481
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.universityphilanthropy.com/funding-by-the-hewlett-foundation
+    linkText: Funding by the Hewlett Foundation - University Philanthropy
+    claimContext: The foundation has maintained a consistent focus on education reform throughout its history, with particular emphasis on open educational resources and distance learning. In April 2020, the foundation launched a comprehensive open education grant-making strategy.[^20] Over the decade from 2010-2019,
+    fetchedAt: 2026-02-22T02:18:59.821Z
+    httpStatus: 200
+    pageTitle: Funding by the Hewlett Foundation &mdash; UniversityPhilanthropy.com
+    contentSnippet: Funding by the Hewlett Foundation &mdash; UniversityPhilanthropy.com Cart 0 Back Fundraising by non-UK university charitable trusts Funding by the Arcadia Fund Funding by the Lego Foundation Funding by Lloyd's Register Foundation Funding by the Oak Foundation Funding by the Siemens Foundation Funding by the Wellcome Trust Funding by the Wolfson Foundation Funding by the UK's leading 100 foundations Funding by the UK's top 200 philanthropists Funding by the UK's 150 rich list New Grant-Makers 202
+    contentLength: 99493
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.instrumentl.com/990-report/william-and-flora-hewlett-foundation
+    linkText: William and Flora Hewlett Foundation - Instrumentl 990 Report
+    claimContext: The foundation's education work emphasizes accessibility and equity, supporting initiatives that expand educational opportunities for underserved populations. According to data from IRS Form 990-PF filings, education-related organizations received thousands of grants from the foundation, making it o
+    fetchedAt: 2026-02-22T02:19:01.663Z
+    httpStatus: 200
+    pageTitle: The William and Flora Hewlett Foundation | 990 Report
+    contentSnippet: The William and Flora Hewlett Foundation | 990 Report Foundation Directory | California | Menlo Park The William and Flora Hewlett Foundation | 990 Report Funder Recipient Save 990 Report William & Flora Hewlett Foundation - EIN 941655673 Menlo Park, CA - Instrumentl CONTENTS The William and Flora Hewlett Foundation, based in Menlo Park, CA, is a private foundation with assets of $14,202,751,280. Their grant-making focuses on Education, Philanthropy, Voluntarism & Grantmaking, and Human Services
+    contentLength: 494351
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.activephilanthropy.org/case-study/hewlett-foundation/
+    linkText: Hewlett Foundation Case Study - Active Philanthropy
+    claimContext: In recent years, the foundation has emphasized climate communication and public engagement. A \$20 million commitment in 2020 aimed to shift public discourse on climate solutions, supporting groups like the Digital Climate Coalition and Global Strategic Communications Council to combat digital disin
+    fetchedAt: 2026-02-22T02:19:03.097Z
+    httpStatus: 200
+    pageTitle: Hewlett Foundation | Active Philanthropy
+    contentSnippet: Hewlett Foundation | Active Philanthropy Skip to content Our Publications & Tools Spotlight on Climate Funding Strategies Hewlett Foundation The William and Flora Hewlett Foundation was established in 1966 in California to promote a better world. Its Environment Program awards grants in the field of climate and energy as well as nature conservation. In 2021, the programme awarded 293 million USD – constituting one of the foundations major funding areas and making the foundation one of the larges
+    contentLength: 106909
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://harderco.com/what-works-and-what-doesnt-the-hewlett-foundations-transparency-in-sharing-evaluation-results/
+    linkText: "What Works and What Doesn't: The Hewlett Foundation's Transparency - Harder & Co."
+    claimContext: The foundation has demonstrated commitment to transparency in this area, commissioning external evaluations of its own strategies and publishing results even when programs underperformed. Harder & Co. social impact consultants conducted an evaluation of the foundation's Knowledge Creation and Dissem
+    fetchedAt: 2026-02-22T02:19:02.245Z
+    httpStatus: 200
+    pageTitle: "What Works and What Doesn’t: The Hewlett Foundation’s Transparency in Sharing Evaluation Results - Harder+Company Community Research"
+    contentSnippet: "What Works and What Doesn’t: The Hewlett Foundation’s Transparency in Sharing Evaluation Results - Harder+Company Community Research You are using an outdated browser. Please upgrade your browser to improve your experience. One of the best parts of our work is getting to be a thought partner with clients. As social impact consultants, we’re always eager to help organizations take a closer look at their work and learn more about what is and isn’t working. As part of a recent project with the Will"
+    contentLength: 74227
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://mediaimpactfunders.org/member-spotlight-william-and-flora-hewlett-foundation/
+    linkText: "Member Spotlight: William and Flora Hewlett Foundation - Media Impact Funders"
+    claimContext: In 2018, the foundation committed \$10 million to research on disinformation following post-2017 webinars on the topic.[^24] The initiative revealed significant challenges including tech company control of data, privacy issues, inadequate legal frameworks, and political barriers to solutions.[^24] T
+    fetchedAt: 2026-02-22T02:19:01.358Z
+    httpStatus: 200
+    pageTitle: "Member Spotlight: William and Flora Hewlett Foundation | Media Impact Funders"
+    contentSnippet: "Member Spotlight: William and Flora Hewlett Foundation | Media Impact Funders Skip to content The MIF Blog Member Spotlight: William and Flora Hewlett Foundation January 31, 2024 — Nina Sachdev Share via LinkedIn Share via Facebook Share via Twitter Share via Email The William and Flora Hewlett Foundation, established in 1966 by Hewlett-Packard co-founder William Redington Hewlett and his wife Flora Lamson, has a rich history of media funding, one that’s about as old as the foundation itself. St"
+    contentLength: 122738
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://philanthropynewsdigest.org/news/foundations-more-willing-to-acknowledge-failures-share-lessons-learned
+    linkText: Foundations More Willing to Acknowledge Failures - Philanthropy News Digest
+    claimContext: The foundation's ten-year, \$20 million Neighborhood Improvement Initiative aimed to achieve broad, deep, and sustainable community change but ultimately did not fulfill participants' hopes and expectations.[^25] The foundation issued an in-depth analysis acknowledging shortcomings, citing resources
+    fetchedAt: 2026-02-22T02:19:02.699Z
+    httpStatus: 200
+    pageTitle: Candid insights | Showing 1134 results sorted by date
+    contentSnippet: "Candid insights | Showing 1134 results sorted by date Skip to main content Comprehensive nonprofit and foundation information is a search away Search 1.9 million organizations by name, EIN, or keyword Search By registering or logging in, you get access to detailed profiles and a personalized dashboard. Login Register for free Candid insights The big picture of the social sector, backed by data and expertise Filter Search by keyword Featured posts Trends & Issues How we measure poverty matters: D"
+    contentLength: 104895
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://scholarworks.gvsu.edu/cgi/viewcontent.cgi?article=1347&context=tfr
+    linkText: Evaluating Time-Bound Exit Strategies - The Philanthropic Quarterly
+    claimContext: The seven-year, \$24.7 million Nuclear Security Initiative (NSI) ended in 2015 with the goal of reducing nuclear disaster risk by advancing over 100 targets, including improving U.S.-China relations and building global partnerships.[^26] Rather than evaluating the initiative in strict success/failur
+    fetchedAt: 2026-02-22T02:19:04.943Z
+    httpStatus: 202
+    pageTitle: ""
+    contentSnippet: JavaScript is disabled In order to continue, we need to verify that you're not a robot. This requires JavaScript. Enable JavaScript and then reload the page.
+    contentLength: 2618
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://nonprofitquarterly.org/learning-from-foundations-mistakes/
+    linkText: Learning from Foundations' Mistakes - Nonprofit Quarterly
+    claimContext: This multi-year effort failed to achieve intended results, with the foundation framing responsibility as shared between the foundation and its grantees.[^27] The acknowledgment formed part of a broader trend among foundations toward greater disclosure of failures, driven by new leadership prioritizi
+    fetchedAt: 2026-02-22T02:19:06.627Z
+    httpStatus: 200
+    pageTitle: "Foundations Embrace Failure: Real Lessons Learned | Nonprofit Quarterly | Civic News. Empowering Nonprofits. Advancing Justice."
+    contentSnippet: "Foundations Embrace Failure: Real Lessons Learned | Nonprofit Quarterly | Civic News. Empowering Nonprofits. Advancing Justice. Donate --> Foundations Embrace Failure: Real Lessons Learned Rick Cohen March 23, 2011 “This is the story of a philanthropic initiative that did not meet the expectations of its many stakeholders. Given the challenging social problems that foundations and our grantees try to solve, we should expect that we will often fail to achieve our shared aspirations. When this hap"
+    contentLength: 162067
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://capitalresearch.org/article/the-lefts-nonprofit-journalism-empire-part-3/
+    linkText: The Left's Nonprofit Journalism Empire - Capital Research
+    claimContext: The foundation has been labeled by critics as a "major institutional funder of anti-capitalist and socially liberal causes."[^28] In 2019, the foundation pledged millions to organizations re-examining free market policies and critiquing major technology companies like Facebook and Amazon, in coordin
+    fetchedAt: 2026-02-22T02:19:05.483Z
+    httpStatus: 200
+    pageTitle: "The Left’s Nonprofit Journalism Empire: Big Philanthropy’s Play -Capital Research Center"
+    contentSnippet: "The Left’s Nonprofit Journalism Empire: Big Philanthropy’s Play -Capital Research Center Labor Watch Great union inflection point or dead cat bounce? Parsing the 2025 BLS union members survey Organization Trends InfluenceWatch Friday Labor Watch You paid $181 million for union bosses to negotiate against you in 2024, but the Trump administration is doing something about it Civil Disruption vs Civil Society Iran and the anti-American left Special Report The Left’s Nonprofit Journalism Empire: Big"
+    contentLength: 125238
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://philanthropydaily.com/are-donors-dangerous-on-campus/
+    linkText: Are Donors Dangerous on Campus? - Philanthropy Daily
+    claimContext: While the foundation's commitment to open educational resources has been widely praised, some critics raise concerns about donor influence on academic institutions. Paul Brest, the foundation's former president, previously praised law-and-economics donors during his tenure as Stanford Law School dea
+    fetchedAt: 2026-02-22T02:19:06.299Z
+    httpStatus: 200
+    pageTitle: Are donors dangerous?Philanthropy Daily
+    contentSnippet: Are donors dangerous?Philanthropy Daily Share on Facebook Share on Twitter Share via email Share on LinkedIn Sign up to receive the best commentary and opinion on the philanthropic sector, as well as professional fundraising advice to help you succeed. &times; Opinion Are donors dangerous? Scott Walter 5 min read January 18, 2012 The following essay is cross-posted from the website of the John William Pope Center for Higher Education Policy , who asked me to write on the topic. Note that the ess
+    contentLength: 208369
+    status: verified
+    note: null

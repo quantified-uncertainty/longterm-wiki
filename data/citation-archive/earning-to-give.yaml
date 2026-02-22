@@ -1,0 +1,150 @@
+pageId: earning-to-give
+verifiedAt: 2026-02-22
+totalCitations: 13
+verified: 12
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.effektivaltruism.org/en/earning-to-give/
+    linkText: Earning to Give - Effektiv Altruism Sweden
+    claimContext: 'Earning to Give (commonly abbreviated E2G or EtG) is a career strategy associated with the <EntityLink id="E517" name="cea">Centre for Effective Altruism</EntityLink> ecosystem, in which individuals deliberately pursue high-earning jobs—typically in finance, technology, or professional services—and '
+    fetchedAt: 2026-02-22T02:26:28.057Z
+    httpStatus: 200
+    pageTitle: "Earning to Give: Maximizing Philanthropy Through High-Income Careers"
+    contentSnippet: "Earning to Give: Maximizing Philanthropy Through High-Income Careers Skip to content Earning to Give Explore if pursuing a high-income profession, for the purpose of donating a significant portion of earned income to the most effective charities in the world, is a promising path for you Learn more Introduction to Earning to Give Why it matters Earning to Give (E2G) is a strategy where individuals pursue high-earning careers to maximize their philanthropic contributions. The core idea is to earn "
+    contentLength: 689938
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://80000hours.org/articles/earning-to-give/
+    linkText: Earning to Give - 80,000 Hours
+    claimContext: 'Earning to Give (commonly abbreviated E2G or EtG) is a career strategy associated with the <EntityLink id="E517" name="cea">Centre for Effective Altruism</EntityLink> ecosystem, in which individuals deliberately pursue high-earning jobs—typically in finance, technology, or professional services—and '
+    fetchedAt: 2026-02-22T02:26:27.761Z
+    httpStatus: 200
+    pageTitle: Why and how to earn to give | 80,000 Hours
+    contentSnippet: "Why and how to earn to give | 80,000 Hours Search for: On this page: Introduction 1 What is earning to give? 2 Why earn to give? 2.1 It gives you flexibility. 2.2 You may be able to have a greater impact through earning to give. 2.3 Earning to give may allow you to work in a field that&#8217;s more personally fulfilling compared to other paths. 2.4 In rare cases, it could be a very high-impact career. 3 Common objections to and reasons against earning to give 3.1 Might you do harm in a high-earn"
+    contentLength: 161253
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.effektivaltruism.org/course/earning-to-give/
+    linkText: Earning to Give Course - Effektiv Altruism Sweden
+    claimContext: 'Earning to Give (commonly abbreviated E2G or EtG) is a career strategy associated with the <EntityLink id="E517" name="cea">Centre for Effective Altruism</EntityLink> ecosystem, in which individuals deliberately pursue high-earning jobs—typically in finance, technology, or professional services—and '
+    fetchedAt: 2026-02-22T02:26:27.877Z
+    httpStatus: 200
+    pageTitle: Earning to give &#8211; Effektiv Altruism
+    contentSnippet: "Earning to give &#8211; Effektiv Altruism Earning to give Courses EA Sweden Career Guide 4. Impactful professions Earning to give What would have happened if Bill Gates had become a doctor instead? Usually, we don’t think of software development as a way to do good, but Gates, through philanthropy, has saved the lives of millions of children by paying for vaccines. This method involves taking a high-paying job and donating large sums to enable other efforts that do great good, such as important "
+    contentLength: 1020135
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/posts/FJDY2cekHfQmqaNov/earning-to-give-etg-pledge-club
+    linkText: EtG Pledge Club - EA Forum
+    claimContext: The strategy gained significant prominence around 2011–2012, when key figures in the emerging effective altruism movement began promoting it as a concrete way for talented individuals—particularly those entering finance or entrepreneurship—to channel their skills toward global welfare. <EntityLink i
+    fetchedAt: 2026-02-22T02:26:27.352Z
+    httpStatus: 200
+    pageTitle: Earning to Give (EtG) Pledge Club — EA Forum
+    contentSnippet: Earning to Give (EtG) Pledge Club — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Earning to Give (EtG) Pledge Club by Luke Moore 🔸 Dec 10 2024 3 min read 8 113 Building effective altruism Career choice Community Effective giving Earning to give Announcements and updates Donation pledge Giving What We Can Frontpage Earning to Give (EtG) Pledge Club What do we mean by EtG? Launching t
+    contentLength: 326373
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://forum.effectivealtruism.org/posts/gxppfWhx7ta2fkF3R/10-years-of-earning-to-give
+    linkText: 10 Years of Earning to Give - EA Forum
+    claimContext: The strategy gained significant prominence around 2011–2012, when key figures in the emerging effective altruism movement began promoting it as a concrete way for talented individuals—particularly those entering finance or entrepreneurship—to channel their skills toward global welfare. <EntityLink i
+    fetchedAt: 2026-02-22T02:26:27.977Z
+    httpStatus: 200
+    pageTitle: 10 years of Earning to Give — EA Forum
+    contentSnippet: "10 years of Earning to Give — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents 10 years of Earning to Give by AGB 🔸 Nov 7 2023 10 min read 30 713 Community Effective giving Opportunities to take action Building effective altruism Cause prioritization Giving Season (2023) Community experiences Earning to give Importance Job listing (open) Curated 10 years of Earning to Give Introduction "
+    contentLength: 763354
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://en.wikipedia.org/wiki/Earning_to_give
+    linkText: Earning to give - Wikipedia
+    claimContext: The philosophical precedent for earning to give is often traced to John Wesley's 18th-century Methodist preaching, summarized as "gain all you can, save all you can, give all you can." More direct intellectual roots lie in Peter Singer's 1972 essay "Famine, Affluence, and Morality," which argued tha
+    fetchedAt: 2026-02-22T02:26:29.086Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 7
+    url: https://80000hours.org/articles/earning-to-give/
+    linkText: Earning to Give – 80,000 Hours — (covers the de-emphasis of E2G circa 2015 and rationale); see also [10 Years of Earning to Give – EA Forum](https://forum.effectivealtruism.org/posts/gxppfWhx7ta2fkF3R/10-years-of-earning-to-give) for community sentiment and the engagement paradox
+    claimContext: By approximately 2015, central EA organizations had begun shifting their emphasis away from earning to give. According to accounts in the EA community, this reflected concerns including the risk of moral corrosion in high-finance environments, over-reliance on volatile funding sources, and a growing
+    fetchedAt: 2026-02-22T02:26:29.144Z
+    httpStatus: 200
+    pageTitle: Why and how to earn to give | 80,000 Hours
+    contentSnippet: "Why and how to earn to give | 80,000 Hours Search for: On this page: Introduction 1 What is earning to give? 2 Why earn to give? 2.1 It gives you flexibility. 2.2 You may be able to have a greater impact through earning to give. 2.3 Earning to give may allow you to work in a field that&#8217;s more personally fulfilling compared to other paths. 2.4 In rare cases, it could be a very high-impact career. 3 Common objections to and reasons against earning to give 3.1 Might you do harm in a high-earn"
+    contentLength: 161253
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://davidzmorris.substack.com/p/earn-to-give-and-the-ethics-of-mediocrity
+    linkText: Earn to Give and the Ethics of Mediocrity - David Z. Morris
+    claimContext: The FTX collapse in late 2022, which resulted in Bankman-Fried's criminal conviction for fraud, represented a significant reputational blow. By mid-2022, Bankman-Fried had reportedly donated \$36.5 million to EA organizations, much of which was later revealed to have come from misappropriated custom
+    fetchedAt: 2026-02-22T02:26:29.677Z
+    httpStatus: 200
+    pageTitle: “Earn to Give” and the Ethics of Mediocrity (The Future as an Emergency, Pt. 2)
+    contentSnippet: “Earn to Give” and the Ethics of Mediocrity (The Future as an Emergency, Pt. 2) Dark Markets Subscribe Sign in “Earn to Give” and the Ethics of Mediocrity (The Future as an Emergency, Pt. 2) David Z. Morris May 04, 2025 4 2 3 Share We’re very close to the end, folks. This the second of three planned excerpts from the last chapter I’m wrapping up in the book - one that will actually become Chapter 2, in which I aim to create a broad preview of the book’s core arguments. Your support is particular
+    contentLength: 283149
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://forum.effectivealtruism.org/posts/aPFGarxoS8pvboKFD/announcing-our-2025-strategy
+    linkText: Announcing Our 2025 Strategy - Giving What We Can, EA Forum
+    claimContext: "Despite this, discussions on the EA Forum from 2023–2024 suggest partial reassessment: as EA-adjacent organizations confronted funding shortfalls, some observers noted a renewed appreciation for E2G contributions.[^7] Giving What We Can's 2025 strategy, announced in late 2024, shifted focus toward s"
+    fetchedAt: 2026-02-22T02:26:29.130Z
+    httpStatus: 200
+    pageTitle: Announcing our 2025 strategy — EA Forum
+    contentSnippet: "Announcing our 2025 strategy — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Announcing our 2025 strategy by Giving What We Can🔸 Apr 10 2025 3 min read 8 132 Community Effective giving Announcements and updates Giving What We Can Organization strategy Organization updates Frontpage Announcing our 2025 strategy Background Focus on pledges Introducing our BHAG Working towards our BHAG "
+    contentLength: 301426
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.christiansforimpact.org/earning-to-give-guide
+    linkText: Earning to Give Guide - Christians for Impact
+    claimContext: Proponents highlight several practical advantages of E2G relative to direct work. Donors can shift their philanthropic focus across causes without needing to change careers, and can use donor-advised funds to delay allocation decisions until they have better information.[^10] If a funded organizatio
+    fetchedAt: 2026-02-22T02:26:29.841Z
+    httpStatus: 200
+    pageTitle: Earning To Give Guide &mdash; Christians for Impact
+    contentSnippet: Earning To Give Guide &mdash; Christians for Impact 0 Earning To Give Guide Written April 14 2025 Est. 15-20 min read Table of Contents What is earning to give? Where is the idea from? Christian earn-to-givers throughout history How much good could you do? Benefits of this career strategy Any downsides? Career considerations Givers in our community Additional resources What do we mean by earning to give? A career strategy where you make a positive impact with your career by donating a significan
+    contentLength: 321910
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://rethinkpriorities.org/research-area/eas2019-donation-data/
+    linkText: EA 2019 Donation Data - Rethink Priorities
+    claimContext: "Rethink Priorities EA Survey data found that approximately 15% of EAs actively practice earning to give, though this figure varies based on definitional choices.[^11] The data reveals a pattern described as an engagement paradox: highly engaged EAs are less likely to pursue E2G careers (around 25% a"
+    fetchedAt: 2026-02-22T02:26:31.983Z
+    httpStatus: 200
+    pageTitle: "EA Survey 2019: Donation Data &#x2d; Rethink Priorities"
+    contentSnippet: "EA Survey 2019: Donation Data &#x2d; Rethink Priorities EA Survey 2019: Donation Data &#x2d; Rethink Priorities Skip to content Newsletter Research Database Donate Search Search for: Animal Welfare Identifying the most effective ways to reduce animal suffering, improve welfare standards, and influence positive change for trillions of animals worldwide. Learn more Surveys and Data Analysis Conducting polls, experiments, and focus groups and analyzing data to help organizations and policymakers ta"
+    contentLength: 156938
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://80000hours.org/2014/01/case-study-choosing-between-working-at-effective-altruist-organisations-earning-to-give-and-graduate-school/
+    linkText: "Case Study: EA Orgs vs. Earning to Give vs. Graduate School - 80,000 Hours (2014)"
+    claimContext: 'A recurring criticism within the EA community itself concerns the replaceability of E2G practitioners. <EntityLink id="E510" name="80000-hours">80,000 Hours</EntityLink> has argued that E2G careers typically have higher replaceability than direct work in EA organizations: if an E2G practitioner leav'
+    fetchedAt: 2026-02-22T02:26:31.007Z
+    httpStatus: 200
+    pageTitle: "Case study: choosing between working at effective altruist organisations, earning to give, and graduate school | 80,000 Hours"
+    contentSnippet: "Case study: choosing between working at effective altruist organisations, earning to give, and graduate school | 80,000 Hours Search for: See an update on how Peter&#8217;s getting on here Introduction Back in May 2013, I realized I would be graduating in a year and wondered a lot about what I should pick for my first career. The questions I had at the time were: Should I aim to work in an effective altruist organisation, go to graduate school, or should I earn to give? Where should I look for e"
+    contentLength: 122316
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://richardpettigrew.substack.com/p/stephen-darwall-on-effective-altruism
+    linkText: Stephen Darwall on Effective Altruism - Richard Pettigrew
+    claimContext: External critics, including journalists and philosophers, have raised concerns about the systemic implications of earning to give. Some argue that pursuing lucrative roles in finance or other high-earning sectors can perpetuate or depend on the very economic structures that generate global poverty a
+    fetchedAt: 2026-02-22T02:26:31.530Z
+    httpStatus: 200
+    pageTitle: Stephen Darwall on effective altruism
+    contentSnippet: Stephen Darwall on effective altruism Richard’s Substack Subscribe Sign in Stephen Darwall on effective altruism Richard Pettigrew Jan 08, 2024 11 8 3 Share Last week, Stephen Darwall, a moral philosopher at Yale University, published a critique of effective altruism in the journal Liberties (it’s behind a paywall, but if you sign up for an account with the journal, can read two articles for free each month). I’m always curious about such critiques, as I have a complicated relationship to effect
+    contentLength: 241401
+    status: verified
+    note: null

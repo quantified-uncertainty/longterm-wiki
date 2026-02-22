@@ -1,0 +1,62 @@
+pageId: manifest
+verifiedAt: 2026-02-22
+totalCitations: 5
+verified: 5
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://forum.effectivealtruism.org/posts/MHenxzydsNgRzSMHY/my-experience-at-the-controversial-manifest-2024
+    linkText: My experience at the controversial Manifest 2024
+    claimContext: Manifest is an annual conference focused on forecasting, prediction markets, and rationalist community networking. First held June 7-9, 2024 in Berkeley, California, the event brought together participants from the <EntityLink id="lesswrong">LessWrong</EntityLink> and Effective Altruism communities,
+    fetchedAt: 2026-02-22T02:28:13.572Z
+    httpStatus: 200
+    pageTitle: My experience at the controversial Manifest 2024 — EA Forum
+    contentSnippet: My experience at the controversial Manifest 2024 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents My experience at the controversial Manifest 2024 by Maniano Jun 17 2024 7 min read 246 60 Community Building effective altruism Forecasting Community experiences Criticism of the effective altruism community Manifold Markets Opinion Criticism of effective altruism Prediction markets Frontp
+    contentLength: 2822773
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://forum.effectivealtruism.org/posts/E8zZxPnAkmLSRNfTx/against-the-guardian-s-hit-piece-on-manifest
+    linkText: Against the Guardian's hit piece on Manifest
+    claimContext: The conference generated significant controversy within the rationalist and EA communities due to its speaker selection policies and associations with controversial topics. While organizers promoted it as a low-barrier networking event for "interesting" people in the forecasting space, critics raise
+    fetchedAt: 2026-02-22T02:28:13.322Z
+    httpStatus: 200
+    pageTitle: Against the Guardian&#x27;s hit piece on Manifest — EA Forum
+    contentSnippet: "Against the Guardian&#x27;s hit piece on Manifest — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Against the Guardian&#x27;s hit piece on Manifest by Bentham&#x27;s Bulldog Jun 19 2024 5 min read 34 60 Community Frontpage Crosspost of this on my blog The Guardian recently released the newest edition in the smear rationalists and effective altruists series, this time targetting the Manifest conference. The "
+    contentLength: 562214
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://forum.effectivealtruism.org/posts/MCxtGbzeyfFDmrJZx/ea-should-unequivocally-condemn-race-science
+    linkText: EA should unequivocally condemn race science
+    claimContext: The conference generated significant controversy within the rationalist and EA communities due to its speaker selection policies and associations with controversial topics. While organizers promoted it as a low-barrier networking event for "interesting" people in the forecasting space, critics raise
+    fetchedAt: 2026-02-22T02:28:13.133Z
+    httpStatus: 200
+    pageTitle: EA should unequivocally condemn race science — EA Forum
+    contentSnippet: EA should unequivocally condemn race science — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA should unequivocally condemn race science by JSc Aug 1 2024 13 min read 26 7 Building effective altruism Community Diversity and inclusion Frontpage EA should unequivocally condemn race science Why might one tolerate this? Why does it have to be this thing in particular? On the subject of g
+    contentLength: 628483
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://forum.effectivealtruism.org/posts/jCcgAHoN6MKEce9ph/come-to-manifest-2024-june-7-9-in-berkeley
+    linkText: Come to Manifest 2024! June 7-9 in Berkeley
+    claimContext: Manifest 2024 was held at venues associated with LessOnline/Summer Camp, including The Curve in Berkeley.[^1] The conference was promoted on the EA Forum as a rationalist-adjacent event offering opportunities to network with prominent figures from prediction markets, forecasting, and online rational
+    fetchedAt: 2026-02-22T02:28:13.142Z
+    httpStatus: 200
+    pageTitle: Come to Manifest 2024 (June 7-9 in Berkeley) — EA Forum
+    contentSnippet: Come to Manifest 2024 (June 7-9 in Berkeley) — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Come to Manifest 2024 (June 7-9 in Berkeley) by Saul Munn , Rachel Weinberg , Austin Mar 27 2024 4 min read 8 15 Building effective altruism Forecasting Announcements and updates Conferences Prediction markets Frontpage Come to Manifest 2024 (June 7-9 in Berkeley) TLDR People Content Last year
+    contentLength: 320114
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.lesswrong.com/posts/J5JvhFj3PMA3pnpnu/debate-experiments-at-the-curve-lessonline-and-manifest
+    linkText: Debate Experiments at the Curve (LessOnline and Manifest)
+    claimContext: "The organizers adopted what they described as a \"low-bar invitation\" policy - essentially, \"if you're interesting, you're good.\"[^2] This approach was intended to foster diverse viewpoints and facilitate the kind of open intellectual exchange valued in forecasting and rationalist circles. Attendees "
+    fetchedAt: 2026-02-22T02:28:13.667Z
+    httpStatus: 200
+    pageTitle: Debate experiments at The Curve, LessOnline and Manifest — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Debate experiments at The Curve, LessOnline and Manifest — LessWrong LessOnline Public Discourse World Modeling Frontpage 36 Debate experiments at The Curve, LessOnline and Manifest by Nathan Young 13th Jun 2025 Linkpost from nathanpmyoung.substack.com 6 min read 12 36 I like debate. I have done for years. So I have been slowly trying to improve it. Here is a set of th
+    contentLength: 480576
+    status: verified
+    note: null

@@ -1,0 +1,524 @@
+pageId: gwern
+verifiedAt: 2026-02-22
+totalCitations: 47
+verified: 43
+broken: 4
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.dwarkesh.com/p/gwern-branwen
+    linkText: Dwarkesh Podcast with Gwern Branwen
+    claimContext: "| **Research Style** | Data-driven self-experiments, statistical critiques, meta-analyses emphasizing methodological rigor | | **Notable Predictions** | Predicted generalist AI systems by ≈2019, human-level agents by ~2025, AGI by 2030[^1] | | **Controversies** | Critiqued for verbose style masking "
+    fetchedAt: 2026-02-22T02:07:50.185Z
+    httpStatus: 200
+    pageTitle: Gwern — Anonymous writer who predicted AI trajectory on $12K/year salary
+    contentSnippet: Gwern — Anonymous writer who predicted AI trajectory on $12K/year salary Dwarkesh Podcast Subscribe Sign in Playback speed × Share post Share post at current time Share from 0:00 0:00 / 0:00 Transcript 147 13 18 Gwern — Anonymous writer who predicted AI trajectory on $12K/year salary Legacy & Anonymity in the Age of AGI Dwarkesh Patel Nov 13, 2024 147 13 18 Share Transcript Gwern is a pseudonymous researcher and writer. He was one of the first people to see LLM scaling coming. If you've read his
+    contentLength: 589156
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://gwern.net
+    linkText: Gwern.net homepage
+    claimContext: "**Gwern Branwen** is a pseudonymous independent researcher and writer who maintains gwern.net, a comprehensive website featuring long-form essays on artificial intelligence, psychology, statistics, genetics, and rationality.[^2][^3] Active on English Wikipedia since January 2004 with over 90,000 edi"
+    fetchedAt: 2026-02-22T02:07:50.697Z
+    httpStatus: 200
+    pageTitle: Essays · Gwern.net
+    contentSnippet: "Essays · Gwern.net Skip to main content Newest Popular Notable Newest: Blog Statistics Meta-Science Decision Theory Order Statistics Crypto/Bitcoin AI: Safety Generative AI: Image Generative AI: Fiction Generative AI: Poetry Deep Learning Computer Science Haskell Cognition Psychology Behavior Genetics Economics Economics: Tech Domestic Cats Practical Design QS: Sleep QS Politics Epistemology Philosophy Literary Criticism Anime Fiction: Prose Fiction: Verse Docs Docs: Science Docs: Crypto Docs: A"
+    contentLength: 160792
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.alldevblogs.com/blog/gwern
+    linkText: "All Dev Blogs: Gwern"
+    claimContext: "**Gwern Branwen** is a pseudonymous independent researcher and writer who maintains gwern.net, a comprehensive website featuring long-form essays on artificial intelligence, psychology, statistics, genetics, and rationality.[^2][^3] Active on English Wikipedia since January 2004 with over 90,000 edi"
+    fetchedAt: 2026-02-22T02:07:50.975Z
+    httpStatus: 200
+    pageTitle: Gwern
+    contentSnippet: Gwern Submit Blog Sign up Categories Web Development 2014 JavaScript 1901 Python 1355 Frontend 1345 React 845 DevOps 618 Machine Learning 549 TypeScript 502 Node.js 463 Backend 157 Submit Blog Categories Web Development 2014 JavaScript 1901 Python 1355 Frontend 1345 React 845 DevOps 618 Machine Learning 549 TypeScript 502 Node.js 463 Backend 157 Gwern GwernGwern is an independent American writer and researcher known for long-form essays on psychology, statistics, technology, and rationality. His
+    contentLength: 195560
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://gwern.net/me
+    linkText: "Gwern.net: About Me"
+    claimContext: "**Gwern Branwen** is a pseudonymous independent researcher and writer who maintains gwern.net, a comprehensive website featuring long-form essays on artificial intelligence, psychology, statistics, genetics, and rationality.[^2][^3] Active on English Wikipedia since January 2004 with over 90,000 edi"
+    fetchedAt: 2026-02-22T02:07:50.820Z
+    httpStatus: 200
+    pageTitle: About Gwern · Gwern.net
+    contentSnippet: "About Gwern · Gwern.net Skip to main content Haskell , personal , psychology , survey Who am I online & what have I done? Contact information; sites I use; computers and software tools; things I’ve worked on; psychological profiles 2009-08-05 – 10y 2020-06-14 finished certainty : highly likely importance : 3 backlinks similar bibliography Personal Work Websites Wikis Uses This Software Hardware Computer Other Mailing Lists MOOCs Profile Personality Philosophy/morals Politics Contact Collaboratio"
+    contentLength: 213428
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://gwern.net/scaling-hypothesis
+    linkText: "Gwern.net: The Scaling Hypothesis"
+    claimContext: Gwern is perhaps best known for his early advocacy of the **scaling hypothesis**—the proposition that neural networks improve primarily by absorbing more data and compute, generalizing better on harder problems.[^5] He was among the earliest to predict LLM scaling trajectories, forecasting generalis
+    fetchedAt: 2026-02-22T02:07:50.500Z
+    httpStatus: 200
+    pageTitle: The Scaling Hypothesis · Gwern.net
+    contentSnippet: "The Scaling Hypothesis · Gwern.net Skip to main content GPT-3 , AI scaling , algorithm , insight porn , AI safety , RL scaling , sociology , transhumanism On GPT-3: meta-learning, scaling, implications, and deep theory. The scaling hypothesis: neural nets absorb data & compute, generalizing and becoming more Bayesian as problems get harder, manifesting new abilities even at trivial-by-global-standards-scale. The deep learning revolution has begun as foretold. 2020-05-28–2022-01-02 finished certa"
+    contentLength: 307364
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://news.ycombinator.com/item?id=42134950
+    linkText: Hacker News discussion on Gwern's influence
+    claimContext: Gwern is perhaps best known for his early advocacy of the **scaling hypothesis**—the proposition that neural networks improve primarily by absorbing more data and compute, generalizing better on harder problems.[^5] He was among the earliest to predict LLM scaling trajectories, forecasting generalis
+    fetchedAt: 2026-02-22T02:07:52.199Z
+    httpStatus: 200
+    pageTitle: Lots of the claims about Gwern in the intro are exaggerated. Gwern is an effecti... | Hacker News
+    contentSnippet: "Lots of the claims about Gwern in the intro are exaggerated. Gwern is an effecti... | Hacker News Hacker News new | past | comments | ask | show | jobs | submit login throw05678931 on Nov 14, 2024 | parent | context | favorite | on: Interview with gwern Lots of the claims about Gwern in the intro are exaggerated. Gwern is an effective altruist and his influence is largely limited to that community. It would be an exaggeration to claim that he influenced the mainstream of AI and ML researchers --"
+    contentLength: 18529
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://gwern.net/style-guide
+    linkText: "Gwern.net: Style Guide"
+    claimContext: Beyond AI, Gwern conducts rigorous self-experiments on topics like sleep, cognition, and nootropics, using statistical analysis in R. His website emphasizes "Long Content"—durable, self-documenting hypertext designed to resist link rot and remain useful for decades.[^7] The site features advanced de
+    fetchedAt: 2026-02-22T02:07:52.428Z
+    httpStatus: 200
+    pageTitle: Manual of Style · Gwern.net
+    contentSnippet: 'real rabbit...?"> Manual of Style · Gwern.net Skip to main content CSS , meta Style guide documentation of Gwern.net writing conventions for essays and code. 2025-05-07–2026-01-14 in progress certainty : certain importance : 0 similar bibliography Condensed MoS Writing Structure Markdown Essay Metadata HTML Transclusion URLs Inline Block Poetry Inline Poetry Block Poetry Simple Block Poetry Complex Block Poetry Miscellaneous Poetry Formatting Annotations Code Bash Script Structure & Factoring Ou'
+    contentLength: 302960
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://gwern.net/design
+    linkText: "Gwern.net: Design"
+    claimContext: Beyond AI, Gwern conducts rigorous self-experiments on topics like sleep, cognition, and nootropics, using statistical analysis in R. His website emphasizes "Long Content"—durable, self-documenting hypertext designed to resist link rot and remain useful for decades.[^7] The site features advanced de
+    fetchedAt: 2026-02-22T02:07:52.402Z
+    httpStatus: 200
+    pageTitle: Design Of This Website · Gwern.net
+    contentSnippet: "Design Of This Website · Gwern.net Skip to main content CSS , JS , Internet archiving , typography , meta Meta page describing Gwern.net, the self-documenting website’s implementation and experiments for better ‘semantic zoom’ of hypertext; technical decisions using Markdown and static hosting. 2010-10-01 – 12y 2023-04-20 finished certainty : highly likely importance : 3 backlinks similar bibliography Benefit Principles Features Backlink Backlink Features In-Context Popups Implementation Other U"
+    contentLength: 265698
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.translate.com/dictionary/welsh-english/gwern-813180
+    linkText: 'Translate.com: Welsh-English translation of "gwern"'
+    claimContext: 'Gwern Branwen operates under a pseudonym—"Gwern" translates to "alder" (tree) in Welsh and Modern Gaulish.[^9][^10] He has maintained privacy through measures like using voiceovers in podcast interviews.[^1] Gwern has been an active Wikipedia contributor since January 2004, accumulating over 90,000 '
+    fetchedAt: 2026-02-22T02:07:52.503Z
+    httpStatus: 200
+    pageTitle: Gwern in English | Welsh to English Dictionary | Translate.com
+    contentSnippet: Gwern in English | Welsh to English Dictionary | Translate.com Translate .com Document Translator Certified Translation NEW Zendesk Integration Machine Translation Review API Integration Zapier Integration Select a translation service Professional Human Translation Reviewing Machine-Translated Content Official documents translation Dictionary Welsh - English Translate .com Get document translations that have been custom-crafted to fit the needs of your unique industry and culture - in over 110 l
+    contentLength: 51600
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://en.glosbe.com/mis_gal/en/gwern
+    linkText: "Glosbe: Modern Gaulish-English translation"
+    claimContext: 'Gwern Branwen operates under a pseudonym—"Gwern" translates to "alder" (tree) in Welsh and Modern Gaulish.[^9][^10] He has maintained privacy through measures like using voiceovers in podcast interviews.[^1] Gwern has been an active Wikipedia contributor since January 2004, accumulating over 90,000 '
+    fetchedAt: 2026-02-22T02:07:52.628Z
+    httpStatus: 200
+    pageTitle: gwern in English - Modern Gaulish-English Dictionary | Glosbe
+    contentSnippet: gwern in English - Modern Gaulish-English Dictionary | Glosbe Translation of "gwern" into English alder tree is the translation of "gwern" into English. gwern + Add translation Add gwern Modern Gaulish-English dictionary alder tree noun moderngaulish.com Show algorithmically generated translations Add example Add Translations of "gwern" into English in sentences, translation memory Try again
+    contentLength: 64774
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://gwern.net/about
+    linkText: "Gwern.net: About"
+    claimContext: Gwern.net appears to have evolved organically as a personal repository starting in the mid-2000s, with no explicit founding date documented. The site emphasizes aesthetically-pleasing minimalism, accessibility, speed, and semantic zoom for hypertext navigation.[^8] Over its first three years (2010-2
+    fetchedAt: 2026-02-22T02:07:54.109Z
+    httpStatus: 200
+    pageTitle: About This Website · Gwern.net
+    contentSnippet: "About This Website · Gwern.net Skip to main content design , meta , personal , forecasting Meta page describing Gwern.net site ideals of stable long-term essays which improve over time; idea sources and writing methodology; metadata definitions; site statistics; copyright license. 2010-10-01 – 13y 2024-08-30 finished certainty : highly likely importance : 3 backlinks similar bibliography The Content Target Audience Development Long Site Long Content Finding My Ideas Information Organizing My Exp"
+    contentLength: 222012
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://gwern.net/style-guide
+    linkText: "Gwern.net: Style Guide - Transclusion"
+    claimContext: Design principles include monochrome aesthetics, sidenotes on wide screens, dropcaps and smallcaps, collapsible sections, inflation-adjusted currency displays, Wikipedia-style infoboxes, custom syntax highlighting, multi-column lists, and advanced poetry support.[^8] Gwern implements transclusion vi
+    fetchedAt: 2026-02-22T02:07:54.091Z
+    httpStatus: 200
+    pageTitle: Manual of Style · Gwern.net
+    contentSnippet: 'real rabbit...?"> Manual of Style · Gwern.net Skip to main content CSS , meta Style guide documentation of Gwern.net writing conventions for essays and code. 2025-05-07–2026-01-14 in progress certainty : certain importance : 0 similar bibliography Condensed MoS Writing Structure Markdown Essay Metadata HTML Transclusion URLs Inline Block Poetry Inline Poetry Block Poetry Simple Block Poetry Complex Block Poetry Miscellaneous Poetry Formatting Annotations Code Bash Script Structure & Factoring Ou'
+    contentLength: 302960
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://gwern.net/doc/existential-risk/2016-karnofsky.pdf
+    linkText: "Gwern.net: Karnofsky 2016 PDF on existential risk"
+    claimContext: "Gwern's perspective on AI risk has evolved significantly over time. A 2016 document notes his initial skepticism about <EntityLink id=\"miri\">MIRI</EntityLink> due to lack of expert endorsements, hypothesizing \"strong counterarguments\" from mainstream computer scientists.[^13] However, by 2014-2016, "
+    fetchedAt: 2026-02-22T02:07:54.188Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 197445
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.alignmentforum.org/posts/PQaZiATafCh7n5Luf/gwern-s-shortform
+    linkText: "Alignment Forum: Gwern's Shortform"
+    claimContext: 'Gwern proposes concrete benchmarks to detect mode-collapse, AI slop, and "ChatGPTese," arguing these are increasingly important for AI safety to prevent "whimper" or "em hell" existential risks.[^14] He archives and curates extensive directories on model-based reinforcement learning alignment, safe '
+    fetchedAt: 2026-02-22T02:08:00.523Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 15
+    url: https://gwern.net/doc/reinforcement-learning/model/index
+    linkText: "Gwern.net: Model-based RL index"
+    claimContext: 'Gwern proposes concrete benchmarks to detect mode-collapse, AI slop, and "ChatGPTese," arguing these are increasingly important for AI safety to prevent "whimper" or "em hell" existential risks.[^14] He archives and curates extensive directories on model-based reinforcement learning alignment, safe '
+    fetchedAt: 2026-02-22T02:07:55.057Z
+    httpStatus: 200
+    pageTitle: ‘model-based RL’ directory · Gwern.net
+    contentSnippet: "‘model-based RL’ directory · Gwern.net Skip to main content See Also Gwern “The Kelly Coin-Flipping Game: Exact Solutions”, Gwern et al 2017 “Resorting Media Ratings”, Gwern 2015 Links “The Waymo World Model: A New Frontier For Autonomous Driving Simulation”, Waymo 2026 “The Anticipation of Imminent Events Is Time-Scale Invariant”, Grabenhorst et al 2026 “How Gemini 3 Pro Beat Pokemon Crystal (And 2.5 Pro Didn’t)”, Zhang 2025 “TreeGRPO: Tree-Advantage GRPO for Online RL Post-Training of Diffusio"
+    contentLength: 434432
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://gwern.net/doc/reinforcement-learning/safe/index
+    linkText: "Gwern.net: Safe RL index"
+    claimContext: 'Gwern proposes concrete benchmarks to detect mode-collapse, AI slop, and "ChatGPTese," arguing these are increasingly important for AI safety to prevent "whimper" or "em hell" existential risks.[^14] He archives and curates extensive directories on model-based reinforcement learning alignment, safe '
+    fetchedAt: 2026-02-22T02:08:02.377Z
+    httpStatus: 200
+    pageTitle: ‘AI safety’ directory · Gwern.net
+    contentSnippet: "‘AI safety’ directory · Gwern.net Skip to main content See Also Gwern “Hacking Smartphone ESP Apps”, Gwern 2026 “Hacking Pinball High Scores”, Gwern 2025 “ChatGPT-O3: Website Design Feedback Ideas [Total Site Review Confabulation]”, GPT-o3 & Gwern 2025 “The Great Work Goes On”, Gwern 2025 “LLMs Can Be Faster Than You Think”, Gwern 2025 “‘Winning’ AI Arms Races: Then What?”, Gwern 2024 “What Is an ‘AI Warning Shot’?”, Gwern 2024 “The Neural Net Tank Urban Legend”, Gwern 2011 “It Looks Like You’re"
+    contentLength: 761876
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://gwern.net/doc/reinforcement-learning/model/2018-everitt.pdf
+    linkText: "Gwern.net: Everitt 2018 PDF on model-based RL alignment"
+    claimContext: 'Gwern proposes concrete benchmarks to detect mode-collapse, AI slop, and "ChatGPTese," arguing these are increasingly important for AI safety to prevent "whimper" or "em hell" existential risks.[^14] He archives and curates extensive directories on model-based reinforcement learning alignment, safe '
+    fetchedAt: 2026-02-22T02:08:02.145Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 628762
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://gwern.net/idea
+    linkText: "Gwern.net: Research Ideas"
+    claimContext: "His research ideas include proposals for using convolutional neural networks for GWAS (genome-wide association studies) over linear regressions to better handle SNP clumping and non-linear effects,[^18] evolving meta-prompts to boost log-likelihood of diverse writing samples across genres,[^18] and "
+    fetchedAt: 2026-02-22T02:08:02.584Z
+    httpStatus: 200
+    pageTitle: Research Ideas · Gwern.net
+    contentSnippet: "Research Ideas · Gwern.net Skip to main content Someone (who is not me) should do something: a wishlist of miscellaneous research or project ideas—free to a good home. 2017-03-19 – 7y 2024-10-15 in progress certainty : unlikely importance : 4 backlinks similar bibliography Deep Learning InvertOrNot Novel Word Definition Timeghost Generative Language Models Creativity Meta-Prompts Vector Generation Hierarchical Training for Writing Novels Sampling Within LLM Simulations Number Search Engine Error"
+    contentLength: 385333
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://gwern.net/research-criticism
+    linkText: "Gwern.net: Research Criticism"
+    claimContext: Gwern maintains rigorous standards for research criticism, documenting extensive lists of statistical pitfalls including p-hacking, non-preregistered analyses, fixed alpha=0.05 thresholds, correlational data misinterpreted as causation, GWAS issues (reporting only genome-wide significant SNPs), meas
+    fetchedAt: 2026-02-22T02:08:02.217Z
+    httpStatus: 200
+    pageTitle: How Should We Critique Research? · Gwern.net
+    contentSnippet: "How Should We Critique Research? · Gwern.net Skip to main content epistemology , Bayes , scientific bias , causality , decision theory Criticizing studies and statistics is hard in part because so many criticisms are possible, rendering them meaningless. What makes a good criticism is the chance of being a ‘difference which makes a difference’ to our ultimate actions. 2019-05-19–2019-07-07 finished certainty : highly likely importance : 8 backlinks similar bibliography Valley of Bad Statistics A"
+    contentLength: 137832
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://gwern.net/everything
+    linkText: "Gwern.net: Everything Is Correlated"
+    claimContext: Gwern maintains rigorous standards for research criticism, documenting extensive lists of statistical pitfalls including p-hacking, non-preregistered analyses, fixed alpha=0.05 thresholds, correlational data misinterpreted as causation, GWAS issues (reporting only genome-wide significant SNPs), meas
+    fetchedAt: 2026-02-22T02:08:02.139Z
+    httpStatus: 200
+    pageTitle: Everything Is Correlated · Gwern.net
+    contentSnippet: "Everything Is Correlated · Gwern.net Skip to main content ads , genetic correlation , insight porn , epistemology , Lizardman survey constant , Bayes/regression-to-mean , causality , variance components , survey Anthology of sociology, statistical, or psychological papers discussing the observation that all real-world variables have non-zero correlations and the implications for statistical theory such as ‘null hypothesis testing’. 2014-09-12 – 8y 2023-04-30 finished certainty : highly likely im"
+    contentLength: 388862
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://gwern.net/note/statistic
+    linkText: "Gwern.net: Statistical Notes"
+    claimContext: In analyzing causality assessments, Gwern critiques quantitative applications of Bradford Hill criteria, noting that one study's discriminant analysis correctly predicted 130/159 (81.8%) agent classifications but circularly predicted expert opinions rather than true causality, ignoring randomization
+    fetchedAt: 2026-02-22T02:08:04.285Z
+    httpStatus: 200
+    pageTitle: Statistical Notes · Gwern.net
+    contentSnippet: "Statistical Notes · Gwern.net Skip to main content Haskell , JS , CS/r , genetics , IQ , Bayes , causality , decision theory , order statistics , power analysis , survey Miscellaneous statistical stuff 2014-07-17 – 10y 2024-08-21 in progress certainty : possible importance : 5 backlinks similar bibliography Critiques Failed Facebook Critiques Correlation=Causation in Cancer Research Aerobic vs Weightlifting Moxibustion Mouse Study “Someone Should Do Something”: Wishlist of Miscellaneous Project "
+    contentLength: 929320
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://gwern.net/research-criticism
+    linkText: "Gwern.net: Research Criticism - Standards"
+    claimContext: In analyzing causality assessments, Gwern critiques quantitative applications of Bradford Hill criteria, noting that one study's discriminant analysis correctly predicted 130/159 (81.8%) agent classifications but circularly predicted expert opinions rather than true causality, ignoring randomization
+    fetchedAt: 2026-02-22T02:08:04.340Z
+    httpStatus: 200
+    pageTitle: How Should We Critique Research? · Gwern.net
+    contentSnippet: "How Should We Critique Research? · Gwern.net Skip to main content epistemology , Bayes , scientific bias , causality , decision theory Criticizing studies and statistics is hard in part because so many criticisms are possible, rendering them meaningless. What makes a good criticism is the chance of being a ‘difference which makes a difference’ to our ultimate actions. 2019-05-19–2019-07-07 finished certainty : highly likely importance : 8 backlinks similar bibliography Valley of Bad Statistics A"
+    contentLength: 137832
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://gwern.net/doc/cs/r/index
+    linkText: "Gwern.net: R Documentation Index"
+    claimContext: Gwern conducts blinded self-experiments on sleep, cognition, and health using statistical analysis in R. His experiments include Potassium Sleep Experiments (2012), Vitamin D Sleep Experiments (2012), Lunar Circadian Rhythms (2013), Caffeine Wakeup Experiment (2013), Internet WiFi Improvement (2016)
+    fetchedAt: 2026-02-22T02:08:03.917Z
+    httpStatus: 200
+    pageTitle: ‘R (language)’ directory · Gwern.net
+    contentSnippet: "‘R (language)’ directory · Gwern.net Skip to main content See Also Gwern “How Many Shower Controls Are There?”, Gwern & Pro 2023 “Anti-Spaced Repetition for Serendipity”, Gwern 2017 “Oh Deer: Could Deer Evolve to Avoid Car Accidents?”, Gwern 2018 “Visualizing Active Learning Sample-Efficiency”, Gwern 2022 “Simulating ‘tail Collapse’ in R”, Gwern 2024 “Website Colors: Red vs Blue”, Gwern 2024 “Acne: a Good Quantified Self Topic”, Gwern 2019 “Statistical Notes”, Gwern 2014 “Gwern.net Website Traff"
+    contentLength: 129530
+    status: verified
+    note: null
+  - footnote: 24
+    url: https://news.ycombinator.com/item?id=11944753
+    linkText: Hacker News discussion on dual n-back meta-analysis
+    claimContext: His meta-analysis on dual n-back (DNB) training found that post-DNB IQ gains were linked to methodological issues, with small remaining positive effects possibly tied to further training.[^24] This exemplifies his approach of rigorously examining evidence for popular cognitive enhancement claims.
+    fetchedAt: 2026-02-22T02:08:03.838Z
+    httpStatus: 200
+    pageTitle: To anyone interested, Gwern also did some extensive research on Dual N-Back. Gwe... | Hacker News
+    contentSnippet: "To anyone interested, Gwern also did some extensive research on Dual N-Back. Gwe... | Hacker News Hacker News new | past | comments | ask | show | jobs | submit login goblin89 on June 21, 2016 | parent | context | favorite | on: Study suggests that the “brain training” industry ... To anyone interested, Gwern also did some extensive research on Dual N-Back. Gwern’s DNB FAQ[0] offers some favorable opinion on DNB (in that it’s fascinating, though much larger gains can be achieved via many other m"
+    contentLength: 8706
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://marginalrevolution.com/marginalrevolution/2024/08/the-wisdom-of-gwern-why-should-you-write.html
+    linkText: "Marginal Revolution: The Wisdom of Gwern"
+    claimContext: Gwern emphasizes writing for persistence and long-term influence, including into AI training data—what he calls "writing yourself into the future" by influencing LLMs. He notes the potential for a Gwern-like "mentor persona" in models trained on his early GPT-3 analyses.[^25] His style guide enforce
+    fetchedAt: 2026-02-22T02:08:03.912Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 26
+    url: https://gwern.net
+    linkText: Gwern.net homepage
+    claimContext: Essays are marked with *created* (core idea/first version) and *modified* (last major update) dates.[^26] The site features client-side popups, local archiving, floating toggles (dark-mode, reader-mode, disable popups, search), and bidirectional hyperlinks with in-context popups for frictionless bro
+    fetchedAt: 2026-02-22T02:08:05.654Z
+    httpStatus: 200
+    pageTitle: Essays · Gwern.net
+    contentSnippet: "Essays · Gwern.net Skip to main content Newest Popular Notable Newest: Blog Statistics Meta-Science Decision Theory Order Statistics Crypto/Bitcoin AI: Safety Generative AI: Image Generative AI: Fiction Generative AI: Poetry Deep Learning Computer Science Haskell Cognition Psychology Behavior Genetics Economics Economics: Tech Domestic Cats Practical Design QS: Sleep QS Politics Epistemology Philosophy Literary Criticism Anime Fiction: Prose Fiction: Verse Docs Docs: Science Docs: Crypto Docs: A"
+    contentLength: 160792
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://gwern.net/newsletter/2025/01
+    linkText: "Gwern.net: January 2025 Newsletter"
+    claimContext: "Gwern publishes monthly newsletters curating links, summaries of site changes, and new writings, supported by Patreon donors.[^27][^28][^29] Recent newsletters have covered:"
+    fetchedAt: 2026-02-22T02:08:05.505Z
+    httpStatus: 200
+    pageTitle: January 2025 News · Gwern.net
+    contentSnippet: "January 2025 News · Gwern.net Skip to main content January 2025 Gwern.net newsletter with links on TODO in progress certainty : log importance : 0 bibliography Writings Links AI Genetics Statistics/Meta-Science Politics/Religion Psychology/Biology Technology Economics Philosophy Miscellaneous Fiction Books Film/TV January 2025’s Gwern.net newsletter is now out; previous, December 2024 ( archives ). This is a collation of links and summary of major changes, overlapping with my Changelog ; brought"
+    contentLength: 69709
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://gwern.net/newsletter/2024/05
+    linkText: "Gwern.net: May 2024 Newsletter"
+    claimContext: "Gwern publishes monthly newsletters curating links, summaries of site changes, and new writings, supported by Patreon donors.[^27][^28][^29] Recent newsletters have covered:"
+    fetchedAt: 2026-02-22T02:08:05.637Z
+    httpStatus: 200
+    pageTitle: May 2024 News · Gwern.net
+    contentSnippet: "May 2024 News · Gwern.net Skip to main content May 2024 Gwern.net newsletter with links on TODO in progress certainty : log importance : 0 bibliography Writings Links AI Genetics Statistics/Meta-Science Politics/Religion Psychology/Biology Technology Economics Philosophy Fiction Miscellaneous Books Film/TV Music May 2024’s Gwern.net newsletter is now out; previous, April 2024 ( archives ). This is a collation of links and summary of major changes, overlapping with my Changelog ; brought to you b"
+    contentLength: 67887
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://gwern.net/newsletter/2025/04
+    linkText: "Gwern.net: April 2025 Newsletter"
+    claimContext: "Gwern publishes monthly newsletters curating links, summaries of site changes, and new writings, supported by Patreon donors.[^27][^28][^29] Recent newsletters have covered:"
+    fetchedAt: 2026-02-22T02:08:05.658Z
+    httpStatus: 200
+    pageTitle: April 2025 News · Gwern.net
+    contentSnippet: "April 2025 News · Gwern.net Skip to main content April 2025 Gwern.net newsletter with links on TODO in progress certainty : log importance : 0 bibliography Writings Links AI Genetics Statistics/Meta-Science Politics/Religion Psychology/Biology Technology Economics Philosophy Fiction Books Film/TV April 2025’s Gwern.net newsletter is now out; previous, March 2025 ( archives ). This is a collation of links and summary of major changes, overlapping with my Changelog ; brought to you by my donors on"
+    contentLength: 64243
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://gwern.net/doc/genetics/editing/index
+    linkText: "Gwern.net: Genetics Editing Index"
+    claimContext: "- **Genetics and CRISPR**: Phase 1 trial of CRISPR-Cas9 gene editing targeting ANGPTL3 (Laffin et al 2025); China restarting clinical trials post-CRISPR baby scandal (Cross 2024); design of highly functional genome editors modeling the universe of CRISPR-Cas sequences (Ruffolo et al 2024).[^30] - **"
+    fetchedAt: 2026-02-22T02:08:05.812Z
+    httpStatus: 200
+    pageTitle: ‘gene editing’ directory · Gwern.net
+    contentSnippet: ‘gene editing’ directory · Gwern.net Skip to main content See Also Links “Phase 1 Trial of CRISPR-Cas9 Gene Editing Targeting ANGPTL3”, Laffin et al 2025 “Survival of Transplanted Allogeneic Beta Cells With No Immunosuppression”, Carlsson et al 2025 “Driving a Protective Allele of the Mosquito FREP1 Gene to Combat Malaria”, Li et al 2025 “Megabase-Scale Human Genome Rearrangement With Programmable Bridge Recombinases”, Perry et al 2025 “Patient-Specific In Vivo Gene Editing to Treat a Rare Genet
+    contentLength: 362137
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://gwern.net/doc/longevity/index
+    linkText: "Gwern.net: Longevity Index"
+    claimContext: "- **Genetics and CRISPR**: Phase 1 trial of CRISPR-Cas9 gene editing targeting ANGPTL3 (Laffin et al 2025); China restarting clinical trials post-CRISPR baby scandal (Cross 2024); design of highly functional genome editors modeling the universe of CRISPR-Cas sequences (Ruffolo et al 2024).[^30] - **"
+    fetchedAt: 2026-02-22T02:08:07.233Z
+    httpStatus: 200
+    pageTitle: ‘longevity’ directory · Gwern.net
+    contentSnippet: "‘longevity’ directory · Gwern.net Skip to main content See Also Gwern “Why Correlation Usually ≠ Causation”, Gwern 2014 “The Replication Crisis: Flaws in Mainstream Science”, Gwern 2010 Links “Sterilization and Contraception Increase Lifespan across Vertebrates”, Garratt et al 2025 “Lysergic Acid Diethylamide Extends Lifespan in Caenorhabditis Elegans”, Carrilho et al 2025 “Cardiorespiratory Fitness in Adolescence and Premature Mortality: Widespread Bias Identified Using Negative Control Outcome"
+    contentLength: 309480
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.antoinebuteau.com/lessons-from-gwern/
+    linkText: "Antoine Buteau: Lessons from Gwern"
+    claimContext: Gwern serves as an AI safety researcher and archivist, delving into complexities of aligning AI systems with human values while analyzing datasets like The Pile for model behavior impacts.[^32] He hosts and archives papers on model-based RL alignment, including Everitt 2018's work on Bayesian histor
+    fetchedAt: 2026-02-22T02:08:07.479Z
+    httpStatus: 200
+    pageTitle: Lessons from Gwern
+    contentSnippet: Lessons from Gwern Profile Aug 24, 2025 8 min read Lessons from Gwern As an anonymous researcher, writer, and programmer, Gwern Branwen has cultivated a significant following for his in-depth essays and data-driven analyses on a wide array of subjects. His work, primarily published on his website Gwern.net, is characterized by its meticulous research, intellectual honesty, and often contrarian viewpoints. On AI and Technology Much of Gwern's recent work has focused on the rapid advancements in a
+    contentLength: 61064
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://gwern.net/doc/reinforcement-learning/model/2018-everitt.pdf
+    linkText: "Gwern.net: Everitt 2018 PDF on model-based RL alignment"
+    claimContext: Gwern serves as an AI safety researcher and archivist, delving into complexities of aligning AI systems with human values while analyzing datasets like The Pile for model behavior impacts.[^32] He hosts and archives papers on model-based RL alignment, including Everitt 2018's work on Bayesian histor
+    fetchedAt: 2026-02-22T02:08:06.839Z
+    httpStatus: 200
+    pageTitle: (PDF document)
+    contentSnippet: null
+    contentLength: 628762
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://forum.effectivealtruism.org/posts/Kz8WpQkCckN9JNHCN/gwern-on-creating-your-own-ai-race-and-china-s-fast-follower
+    linkText: "EA Forum: Gwern on Creating Your Own AI Race"
+    claimContext: In discussions on the Alignment Forum and EA Forum, Gwern has explored whether AI automation speeds capabilities over safety, questioned if automated alignment research precedes takeoff, and discussed China as a "fast follower" in AI races.[^34] His work highlights risks like meta-alignment failures
+    fetchedAt: 2026-02-22T02:08:07.168Z
+    httpStatus: 200
+    pageTitle: Gwern on creating your own AI race and China&#x27;s Fast Follower strategy. — EA Forum
+    contentSnippet: Gwern on creating your own AI race and China&#x27;s Fast Follower strategy. — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Gwern on creating your own AI race and China&#x27;s Fast Follower strategy. by Larks Nov 25 2024 3 min read 4 129 AI safety AI race China Decisive strategic advantage AI governance Frontpage This is a linkpost for https://www.lesswrong.com/posts/KPBPc7RayDPxqxdqY/china-hawks-are-manufa
+    contentLength: 183482
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://forum.effectivealtruism.org/posts/qtDZHBx6LpAR7ejDD/what-standalone-lesswrong-posts-would-you-recommend-to-most
+    linkText: "EA Forum: Standalone LessWrong Posts Recommendations"
+    claimContext: Gwern maintains significant influence within rationalist and <EntityLink id="lesswrong">LessWrong</EntityLink> communities, frequently recommended alongside figures like Scott Alexander and <EntityLink id="paul-christiano">Paul Christiano</EntityLink> as essential reading for effective altruists.[^3
+    fetchedAt: 2026-02-22T02:08:06.886Z
+    httpStatus: 200
+    pageTitle: What (standalone) LessWrong posts would you recommend to most EA community members? — EA Forum
+    contentSnippet: What (standalone) LessWrong posts would you recommend to most EA community members? — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents [ Question ] What (standalone) LessWrong posts would you recommend to most EA community members? by Vaidehi Agarwalla 🔸 Feb 9 2022 1 min read 8 answers 9 67 LessWrong Frontpage What (standalone) LessWrong posts would you recommend to most EA community me
+    contentLength: 377310
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://ea.greaterwrong.com/users/gwern
+    linkText: "EA GreaterWrong: Gwern's User Page"
+    claimContext: "Gwern maintains an EA Forum presence via greaterwrong.com, posting detailed commentary on events like the 2023 <EntityLink id=\"openai\">OpenAI</EntityLink> board crisis. He framed Sam Altman's shift from gifting OpenAI non-profits to EA (with initial good intentions) as \"giver's remorse,\" leading to "
+    fetchedAt: 2026-02-22T02:08:10.210Z
+    httpStatus: 200
+    pageTitle: gwern - Effective Altruism forum viewer
+    contentSnippet: "gwern - Effective Altruism forum viewer RSS gwern Karma: 874 gwern 31 Mar 2025 0:44 UTC 9 points 1 ∶ 0 in reply to: richard_ngo ’s comment on: Third-wave AI safety needs so­ciopoli­ti­cal thinking FWIW, I am skeptical of the interpretation you put on that graph. I considered the same issue in my original analysis, but went with Strenze 2007′s take that there doesn’t seem to be much steeper IQ/​income slope and kept returns constant. Seb objects that the datapoints have various problems and that’"
+    contentLength: 71007
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://gwern.net/ea-donation
+    linkText: "Gwern.net: EA Donation Analysis"
+    claimContext: His 2013-2014 LessWrong survey analysis defended EA donors against hypocrisy charges, showing self-identified EAs donate more than non-EAs after controlling for youth and low income. Using regressions with log-transformed donations and age/income fixed effects, Gwern demonstrated that median \$0 don
+    fetchedAt: 2026-02-22T02:08:08.768Z
+    httpStatus: 200
+    pageTitle: LWer Effective Altruism donations, 2013–2014 · Gwern.net
+    contentSnippet: "LWer Effective Altruism donations, 2013–2014 · Gwern.net Skip to main content ethics , statistics , survey Analysis of 2013–2014 LessWrong survey results on how much more self-identified EAers donate suggests low median donation rates due to current youth and low incomes. 2015-05-12–2018-06-09 finished certainty : highly likely importance : 3 backlinks similar bibliography Data Analysis Preparation Statistical Analysis Conclusion External Links A LW critic noted that the annual LW survey reporte"
+    contentLength: 87360
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.dwarkesh.com/p/gwern-branwen
+    linkText: Dwarkesh Podcast with Gwern Branwen - Compute vs. Algorithms
+    claimContext: Some commenters note that Gwern and similar thinkers erred by prioritizing compute power over algorithmic insights, failing to appreciate pre-existing scaling results like AlphaZero's Bayesian optimization reducing tree search needs.[^38] Gwern's influence appears largely limited to EA-adjacent comm
+    fetchedAt: 2026-02-22T02:08:08.911Z
+    httpStatus: 200
+    pageTitle: Gwern — Anonymous writer who predicted AI trajectory on $12K/year salary
+    contentSnippet: Gwern — Anonymous writer who predicted AI trajectory on $12K/year salary Dwarkesh Podcast Subscribe Sign in Playback speed × Share post Share post at current time Share from 0:00 0:00 / 0:00 Transcript 147 13 18 Gwern — Anonymous writer who predicted AI trajectory on $12K/year salary Legacy & Anonymity in the Age of AGI Dwarkesh Patel Nov 13, 2024 147 13 18 Share Transcript Gwern is a pseudonymous researcher and writer. He was one of the first people to see LLM scaling coming. If you've read his
+    contentLength: 589156
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://news.ycombinator.com/item?id=42134315
+    linkText: Hacker News discussion on Gwern interview fallacies
+    claimContext: "In a 2024 Hacker News thread on a Gwern interview, critics argued his \"exotic vocabulary and style\" dresses up \"dumb snippets\" as insightful, making banter seem profound when it's incomplete or incorrect.[^39] Commenters accused him of \"appeal to hypocrisy\" or tu quoque fallacy by comparing current "
+    fetchedAt: 2026-02-22T02:08:08.885Z
+    httpStatus: 200
+    pageTitle: Interview with gwern | Hacker News
+    contentSnippet: "Interview with gwern | Hacker News Hacker News new | past | comments | ask | show | jobs | submit login Interview with gwern ( dwarkeshpatel.com ) 308 points by synthmeat on Nov 14, 2024 | hide | past | favorite | 247 comments keiferski on Nov 14, 2024 | next [–] By writing, you are voting on the future of the Shoggoth using one of the few currencies it acknowledges: tokens it has to predict. If you aren&#x27;t writing, you are abdicating the future or your role in it. If you think it&#x27;s eno"
+    contentLength: 392983
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://thingofthings.wordpress.com/2016/06/15/against-gwern-on-stories/
+    linkText: "Thing of Things: Against Gwern on Stories"
+    claimContext: A critical blog post titled "Against Gwern on Stories" argued his essay "Against Reading New Fiction" ignores multiple purposes of fiction beyond explicit goals, exhibiting "Hollywood Rationality."[^40] Critics contend Gwern misinterprets the loss of ancient art (claiming we don't mourn it, implying
+    fetchedAt: 2026-02-22T02:08:09.075Z
+    httpStatus: 200
+    pageTitle: Against Gwern On Stories | Thing of Things
+    contentSnippet: Against Gwern On Stories | Thing of Things Tags fandom , ozy blog post A while back, Gwern wrote an interesting essay arguing against the reading of new fiction . Since there are innumerably more books than any person could reasonably consume, there&#8217;s no reason to read fiction that hasn&#8217;t been filtered for quality by time. Reading just the Hugo and Nebula award winners in science fiction could take years; why waste time on other books that are probably significantly less good? Howeve
+    contentLength: 181757
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://www.lesswrong.com/posts/ZZFbCN7qQfHBgsiNN/inquiry-into-community-standards-0
+    linkText: "LessWrong: Inquiry into Community Standards"
+    claimContext: A 2023 LessWrong post raised questions about Gwern's behavior, which he defended by citing his high karma and long community tenure—a response critics called presumptuous.[^41] Hacker News discussions in 2024 characterized Gwern as potentially "gratuitously dickish" in interactions, though participa
+    fetchedAt: 2026-02-22T02:08:12.098Z
+    httpStatus: 200
+    pageTitle: Inquiry into community standards — LessWrong
+    contentSnippet: x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Inquiry into community standards — LessWrong Personal Blog -33 Inquiry into community standards by ThisSpaceAvailable 6th Aug 2014 2 min read 53 -33 Apparently, I am not entitled to be treated with basic civility. Or, at least, not according to gwern. It started when gwern wrote >> All you&#x27;re saying is that Saddam called the USA&#x27;s bluff and was wrong and it w
+    contentLength: 879937
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://news.ycombinator.com/item?id=44820140
+    linkText: Hacker News discussion on Gwern's conduct
+    claimContext: A 2023 LessWrong post raised questions about Gwern's behavior, which he defended by citing his high karma and long community tenure—a response critics called presumptuous.[^41] Hacker News discussions in 2024 characterized Gwern as potentially "gratuitously dickish" in interactions, though participa
+    fetchedAt: 2026-02-22T02:08:14.292Z
+    httpStatus: 403
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 403
+  - footnote: 43
+    url: https://www.alignmentforum.org/posts/PQaZiATafCh7n5Luf/gwern-s-shortform
+    linkText: "Alignment Forum: Gwern's Shortform - Personality"
+    claimContext: A 2023 LessWrong post raised questions about Gwern's behavior, which he defended by citing his high karma and long community tenure—a response critics called presumptuous.[^41] Hacker News discussions in 2024 characterized Gwern as potentially "gratuitously dickish" in interactions, though participa
+    fetchedAt: 2026-02-22T02:08:17.643Z
+    httpStatus: 429
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 429
+  - footnote: 44
+    url: https://www.greaterwrong.com/posts/6yTShbTdtATxKonY5/how-to-not-lose-an-argument/comment/AkALg9BoFg9GC9PQR
+    linkText: GreaterWrong comment on Gwern's style
+    claimContext: A 2023 LessWrong post raised questions about Gwern's behavior, which he defended by citing his high karma and long community tenure—a response critics called presumptuous.[^41] Hacker News discussions in 2024 characterized Gwern as potentially "gratuitously dickish" in interactions, though participa
+    fetchedAt: 2026-02-22T02:08:11.959Z
+    httpStatus: 200
+    pageTitle: gwern comments on How to Not Lose an Argument - LessWrong 2.0 viewer
+    contentSnippet: gwern comments on How to Not Lose an Argument - LessWrong 2.0 viewer gwern comments on How to Not Lose an Argument gwern 16 Aug 2012 0:18 UTC 4 points 0 I’m saying that if you have a psilocybin-induced hallucination of God and then become a theist, that’s a darn good piece of evidence that stuff like the argument from evil or argument from silence weren’t why you were an atheist. (And so if you were claiming previously that they were, you were either lying or badly mistaken.) TheOtherDave 16 Aug
+    contentLength: 19277
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://gwern.net/backfire-effect
+    linkText: "Gwern.net: The Backfire Effect"
+    claimContext: "Gwern's own framework on critiquing research highlights flaws like conflicts of interest, lack of power analysis, genetic confounding, and overreliance on interaction terms—standards by which some studies he endorses might fail depending on severity.[^19] His analysis of the backfire effect assumes "
+    fetchedAt: 2026-02-22T02:08:11.520Z
+    httpStatus: 200
+    pageTitle: Biased information as anti-information · Gwern.net
+    contentSnippet: "Biased information as anti-information · Gwern.net Skip to main content politics , cognitive bias , Bayes Filtered data for a belief can rationally push you away from that belief 2012-10-19 – 5y 2018-01-07 notes certainty : unlikely importance : 5 similar bibliography The backfire effect is a recently-discovered bias where arguments contrary to a person’s belief leads to them believing even more strongly in that belief; this is taken as obviously “irrational”. The “rational” update can be statis"
+    contentLength: 87863
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://gwern.net/ab-test
+    linkText: "Gwern.net: A/B Test Analysis"
+    claimContext: 'In his A/B testing of gwern.net design, Gwern acknowledged self-identified weaknesses: users reported lines as "too closely spaced," prompting him to set `line-height: 150%` as a "simple hack" based on "rough eyeballing."[^46] He noted unstable traffic made some tests impossible to resolve, with no '
+    fetchedAt: 2026-02-22T02:08:19.269Z
+    httpStatus: 200
+    pageTitle: A/B testing long-form readability on Gwern.net · Gwern.net
+    contentSnippet: "A/B testing long-form readability on Gwern.net · Gwern.net Skip to main content CSS , JS , CS/r , typography , ads , meta , decision theory , power analysis , Google A log of experiments done on the site design, intended to render pages more readable, focusing on the challenge of testing a static site, page width, fonts, plugins, and effects of advertising. 2012-06-16 – 10y 2022-09-27 in progress certainty : possible importance : 4 backlinks similar bibliography Background Problems With “Convers"
+    contentLength: 587042
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://gwern.net/complexity
+    linkText: "Gwern.net: Complexity and AI"
+    claimContext: "Critics note that Gwern shifts positions on topics like language models' sample efficiency versus humans, reflecting what they characterize as flip-flopping.[^38] His critique of complexity-based limits on AI acknowledges practical caveats: omitting \"constant factors,\" runtime, worst-case bounds, an"
+    fetchedAt: 2026-02-22T02:08:19.118Z
+    httpStatus: 200
+    pageTitle: Complexity no Bar to AI · Gwern.net
+    contentSnippet: "Complexity no Bar to AI · Gwern.net Skip to main content AI , tech economics , AI safety , forecasting , transhumanism Critics of AI risk suggest diminishing returns to computing (formalized asymptotically) means AI will be weak; this argument relies on a large number of questionable premises and ignoring additional resources, constant factors, and nonlinear returns to small intelligence advantages, and is highly unlikely. 2014-06-01 – 5y 2019-06-09 finished certainty : likely importance : 10 ba"
+    contentLength: 159140
+    status: verified
+    note: null

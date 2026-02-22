@@ -1,0 +1,381 @@
+pageId: openai
+verifiedAt: 2026-02-22
+totalCitations: 34
+verified: 34
+broken: 0
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.demandsage.com/chatgpt-statistics/
+    linkText: ChatGPT Users Statistics (February 2026) – Growth & Usage Data
+    claimContext: The company achieved capability advances through massive scale (<F e="openai" f="7c9b9073">175B parameters</F> for GPT-3), pioneered <EntityLink id="rlhf">Reinforcement Learning from Human Feedback</EntityLink> as a practical alignment technique, and launched ChatGPT—reaching 800 million weekly acti
+    fetchedAt: 2026-02-22T02:16:24.668Z
+    httpStatus: 200
+    pageTitle: ChatGPT Users Statistics (FEB 2026) - Global Growth & Usage
+    contentSnippet: ChatGPT Users Statistics (FEB 2026) - Global Growth & Usage Skip to content ChatGPT currently has 800 million weekly active users, up from 400 million in February 2025. At the same time, India also reached 100 million weekly active users. Additionally, ChatGPT MAU (Monthly visits) reached 5.72 billion in January 2026, up 3.73% from 5.50 billion in December 2025. In this article, we break down ChatGPT statistics. We will look at ChatGPT&#8217;s growth, users, traffic, revenue, app downloads, mark
+    contentLength: 329200
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.demandsage.com/chatgpt-statistics/
+    linkText: ChatGPT Users Statistics (February 2026) – Growth & Usage Data
+    claimContext: The company achieved capability advances through massive scale (<F e="openai" f="7c9b9073">175B parameters</F> for GPT-3), pioneered <EntityLink id="rlhf">Reinforcement Learning from Human Feedback</EntityLink> as a practical alignment technique, and launched ChatGPT—reaching 800 million weekly acti
+    fetchedAt: 2026-02-22T02:16:24.534Z
+    httpStatus: 200
+    pageTitle: ChatGPT Users Statistics (FEB 2026) - Global Growth & Usage
+    contentSnippet: ChatGPT Users Statistics (FEB 2026) - Global Growth & Usage Skip to content ChatGPT currently has 800 million weekly active users, up from 400 million in February 2025. At the same time, India also reached 100 million weekly active users. Additionally, ChatGPT MAU (Monthly visits) reached 5.72 billion in January 2026, up 3.73% from 5.50 billion in December 2025. In this article, we break down ChatGPT statistics. We will look at ChatGPT&#8217;s growth, users, traffic, revenue, app downloads, mark
+    contentLength: 329200
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.computerworld.com/article/4015023/openai-latest-news-and-insights.html
+    linkText: OpenAI Latest News and Insights
+    claimContext: With over \$13 billion in <EntityLink id="microsoft">Microsoft</EntityLink> investment and capability advancement through reasoning models like o1 and the recent o3-mini release[^3], OpenAI sits at the center of debates about AI safety governance, racing dynamics, and whether commercial incentives c
+    fetchedAt: 2026-02-22T02:16:24.654Z
+    httpStatus: 200
+    pageTitle: "OpenAI: Latest news and insights – Computerworld"
+    contentSnippet: "OpenAI: Latest news and insights – Computerworld by CW staff OpenAI: Latest news and insights news Feb 17, 2026 23 mins Everything you need to know about the artificial intelligence organization’s latest product and company news Credit: Vitor Miranda / Shutterstock OpenAI is an artificial intelligence organization comprised of the non-profit OpenAI, Inc. and several for-profit subsidiaries. The company is perhaps best known for its ChatGPT chatbot, which launched in 2022, kicking off a period of"
+    contentLength: 317561
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.computerworld.com/article/4015023/openai-latest-news-and-insights.html
+    linkText: OpenAI Latest News and Insights
+    claimContext: "| **o1 (December 2024)** | December 2024 | Full reasoning model release | Advanced mathematical/scientific reasoning | Demonstrated test-time compute scaling | | **o3-mini** | January 31, 2025 | Latest reasoning model | More efficient reasoning capabilities[^5] | Broader reasoning model availability"
+    fetchedAt: 2026-02-22T02:16:24.580Z
+    httpStatus: 200
+    pageTitle: "OpenAI: Latest news and insights – Computerworld"
+    contentSnippet: "OpenAI: Latest news and insights – Computerworld by CW staff OpenAI: Latest news and insights news Feb 17, 2026 23 mins Everything you need to know about the artificial intelligence organization’s latest product and company news Credit: Vitor Miranda / Shutterstock OpenAI is an artificial intelligence organization comprised of the non-profit OpenAI, Inc. and several for-profit subsidiaries. The company is perhaps best known for its ChatGPT chatbot, which launched in 2022, kicking off a period of"
+    contentLength: 317561
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://openai.com/index/sora-2/
+    linkText: Sora 2 is here
+    claimContext: "| **o3-mini** | January 31, 2025 | Latest reasoning model | More efficient reasoning capabilities[^5] | Broader reasoning model availability | | **Sora 2** | 2025 | Video generation | Enhanced video creation[^6] | Multimodal generation |"
+    fetchedAt: 2026-02-22T02:16:24.425Z
+    httpStatus: 200
+    pageTitle: Sora 2 is here | OpenAI
+    contentSnippet: Sora 2 is here | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI September 30, 2025 Research Release Product Sora 2 is here Our latest video generation model is more physically accurate, realistic, and more controllable than prior systems. It also features synchronized dialogue and sound effects. Create with it in the new Sora app. Download the Sora app (opens in a new window) Loading… Share Today we’re releasing Sora 2, o
+    contentLength: 386794
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.demandsage.com/chatgpt-statistics/
+    linkText: ChatGPT Users Statistics (February 2026) – Growth & Usage Data
+    claimContext: "**User Growth and Market Position:** - 800 million weekly active users as of October 2025 (doubled from 400M in February 2025)[^7] - 15.5 million paying subscribers generating approximately \\$3 billion annually[^8]"
+    fetchedAt: 2026-02-22T02:16:25.720Z
+    httpStatus: 200
+    pageTitle: ChatGPT Users Statistics (FEB 2026) - Global Growth & Usage
+    contentSnippet: ChatGPT Users Statistics (FEB 2026) - Global Growth & Usage Skip to content ChatGPT currently has 800 million weekly active users, up from 400 million in February 2025. At the same time, India also reached 100 million weekly active users. Additionally, ChatGPT MAU (Monthly visits) reached 5.72 billion in January 2026, up 3.73% from 5.50 billion in December 2025. In this article, we break down ChatGPT statistics. We will look at ChatGPT&#8217;s growth, users, traffic, revenue, app downloads, mark
+    contentLength: 329200
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.lesswrong.com/posts/CCQsQnCMWhJcCFY9x/openai-lost-usd5-billion-in-2024-and-its-losses-are
+    linkText: OpenAI lost \$5 billion in 2024 (and its losses are increasing)
+    claimContext: "- 800 million weekly active users as of October 2025 (doubled from 400M in February 2025)[^7] - 15.5 million paying subscribers generating approximately \\$3 billion annually[^8] - Additional \\$1 billion from API access[^9]"
+    fetchedAt: 2026-02-22T02:16:26.065Z
+    httpStatus: 200
+    pageTitle: OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong OpenAI Economics Slowing Down AI AI Personal Blog 29 OpenAI lost $5 billion in 2024 (and its losses are increasing) by Remmelt 31st Mar 2025 Linkpost from www.wheresyoured.at 14 min read 15 29 Read the full article here . The journalist is an AI skeptic, but does solid financial investigations. "
+    contentLength: 562310
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.lesswrong.com/posts/CCQsQnCMWhJcCFY9x/openai-lost-usd5-billion-in-2024-and-its-losses-are
+    linkText: OpenAI lost \$5 billion in 2024 (and its losses are increasing)
+    claimContext: "- 15.5 million paying subscribers generating approximately \\$3 billion annually[^8] - Additional \\$1 billion from API access[^9] - Over 92% of Fortune 500 companies now use OpenAI products or APIs[^10]"
+    fetchedAt: 2026-02-22T02:16:26.049Z
+    httpStatus: 200
+    pageTitle: OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong OpenAI Economics Slowing Down AI AI Personal Blog 29 OpenAI lost $5 billion in 2024 (and its losses are increasing) by Remmelt 31st Mar 2025 Linkpost from www.wheresyoured.at 14 min read 15 29 Read the full article here . The journalist is an AI skeptic, but does solid financial investigations. "
+    contentLength: 562310
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://sqmagazine.co.uk/openai-statistics/
+    linkText: "OpenAI Statistics 2026: Adoption, Integration & Innovation"
+    claimContext: "- Additional \\$1 billion from API access[^9] - Over 92% of Fortune 500 companies now use OpenAI products or APIs[^10]"
+    fetchedAt: 2026-02-22T02:16:26.090Z
+    httpStatus: 200
+    pageTitle: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine"
+    contentSnippet: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine Skip to primary navigation Skip to main content Skip to primary sidebar Skip to footer Search Subscribe To Our Newsletter Home » Artificial Intelligence OpenAI Statistics 2026: Adoption, Integration & Innovation Updated on: October 7, 2025 Written By Barry Elad Barry Elad Founder & Senior Journalist Barry Elad is a seasoned journalist and analyst specializing in finance, technology, AI, and founder of SQ Magazine. He "
+    contentLength: 380597
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://futuresearch.ai/openai-api-profit/
+    linkText: OpenAI's API Profitability in 2024
+    claimContext: "**Developer Ecosystem Growth:** - API business generates ≈\\$41M monthly revenue from ≈530 billion tokens[^11] - 10% monthly growth in API usage between December 2023 and June 2024[^12]"
+    fetchedAt: 2026-02-22T02:16:26.137Z
+    httpStatus: 200
+    pageTitle: Is OpenAI Profitable? Financial Forecasts & Margins Analysis
+    contentSnippet: "Is OpenAI Profitable? Financial Forecasts & Margins Analysis ← Back to Research Update, Oct 3 2025: In a forthcoming piece, we show that GPT-5&#x27;s gross margins are significantly lower than the GPT-4 generation analyzed here. Key Takeaways OpenAI&#x27;s API business had more favorable unit economics than commonly reported , with estimated gross profit margins around 75% as of mid-2024 In June 2024, the API generated ~$41M in monthly revenue from ~530 billion tokens, with ~70% of traffic going"
+    contentLength: 144001
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://futuresearch.ai/openai-api-profit/
+    linkText: OpenAI's API Profitability in 2024
+    claimContext: "- API business generates ≈\\$41M monthly revenue from ≈530 billion tokens[^11] - 10% monthly growth in API usage between December 2023 and June 2024[^12] - GPT Store reached 3 million custom GPTs with 1,500 daily additions[^13]"
+    fetchedAt: 2026-02-22T02:16:27.231Z
+    httpStatus: 200
+    pageTitle: Is OpenAI Profitable? Financial Forecasts & Margins Analysis
+    contentSnippet: "Is OpenAI Profitable? Financial Forecasts & Margins Analysis ← Back to Research Update, Oct 3 2025: In a forthcoming piece, we show that GPT-5&#x27;s gross margins are significantly lower than the GPT-4 generation analyzed here. Key Takeaways OpenAI&#x27;s API business had more favorable unit economics than commonly reported , with estimated gross profit margins around 75% as of mid-2024 In June 2024, the API generated ~$41M in monthly revenue from ~530 billion tokens, with ~70% of traffic going"
+    contentLength: 144001
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://originality.ai/blog/gpts-statistics
+    linkText: "The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs"
+    claimContext: "- 10% monthly growth in API usage between December 2023 and June 2024[^12] - GPT Store reached 3 million custom GPTs with 1,500 daily additions[^13] - OpenAI's share of API-based AI infrastructure now exceeds 50%[^14]"
+    fetchedAt: 2026-02-22T02:16:27.655Z
+    httpStatus: 200
+    pageTitle: "The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs – Originality.AI"
+    contentSnippet: "The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs – Originality.AI Sign Up Resources Login Sign Up Statistics The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs Custom AI smarts boom! Dive into GPTs statistics: usage, impact, & market trends. Tailor AI to your needs, no coding required! Jonathan Gillham October 28, 2025 On November 6th 2023 ( Source ), OpenAI, the research firm behind the globally recognized ChatGPT, releas"
+    contentLength: 95195
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://sqmagazine.co.uk/openai-statistics/
+    linkText: "OpenAI Statistics 2026: Adoption, Integration & Innovation"
+    claimContext: "- GPT Store reached 3 million custom GPTs with 1,500 daily additions[^13] - OpenAI's share of API-based AI infrastructure now exceeds 50%[^14]"
+    fetchedAt: 2026-02-22T02:16:27.222Z
+    httpStatus: 200
+    pageTitle: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine"
+    contentSnippet: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine Skip to primary navigation Skip to main content Skip to primary sidebar Skip to footer Search Subscribe To Our Newsletter Home » Artificial Intelligence OpenAI Statistics 2026: Adoption, Integration & Innovation Updated on: October 7, 2025 Written By Barry Elad Barry Elad Founder & Senior Journalist Barry Elad is a seasoned journalist and analyst specializing in finance, technology, AI, and founder of SQ Magazine. He "
+    contentLength: 380597
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://openai.com/global-affairs/openai-for-countries/
+    linkText: Introducing OpenAI for Countries
+    claimContext: "**OpenAI for Countries Initiative:** - Launched partnership program with individual nations for data center capacity[^15] - Focus on data sovereignty and local industry building"
+    fetchedAt: 2026-02-22T02:16:27.375Z
+    httpStatus: 200
+    pageTitle: Introducing OpenAI for Countries | OpenAI
+    contentSnippet: Introducing OpenAI for Countries | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI May 7, 2025 Global Affairs Introducing OpenAI for Countries A new initiative to support countries around the world that want to build on democratic AI rails. Loading… Share Our Stargate project , an unprecedented investment in America’s AI infrastructure announced in January with President Trump and our partners Oracle and SoftBank, is now u
+    contentLength: 268729
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://ff.co/openai-business-expansion/
+    linkText: Inside OpenAI's Global Business Expansion
+    claimContext: "**Asia-Pacific Growth:** - APAC region shows highest user growth globally[^16] - ChatGPT usage in APAC grew more than fourfold over 2024"
+    fetchedAt: 2026-02-22T02:16:27.961Z
+    httpStatus: 200
+    pageTitle: Inside OpenAI's Global Business Expansion | Founders Forum Group
+    contentSnippet: Inside OpenAI&#039;s Global Business Expansion | Founders Forum Group All Posts Insights Inside OpenAI&#8217;s Global Business Expansion By Founders Forum Group // 24 November 2025 Open AI's International Managing Director, Oliver Jay Last updated on November 24, 2025 Oliver Jay, Managing Director of OpenAI International reveals the company&#8217;s global expansion strategy and what&#8217;s driving rapid AI adoption across the APAC region. Oliver knows a thing or two about scaling global compani
+    contentLength: 88537
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://ff.co/openai-business-expansion/
+    linkText: Inside OpenAI's Global Business Expansion
+    claimContext: "- ChatGPT usage in APAC grew more than fourfold over 2024 - Regional offices established in Tokyo and Seoul from Singapore hub[^17]"
+    fetchedAt: 2026-02-22T02:16:29.188Z
+    httpStatus: 200
+    pageTitle: Inside OpenAI's Global Business Expansion | Founders Forum Group
+    contentSnippet: Inside OpenAI&#039;s Global Business Expansion | Founders Forum Group All Posts Insights Inside OpenAI&#8217;s Global Business Expansion By Founders Forum Group // 24 November 2025 Open AI's International Managing Director, Oliver Jay Last updated on November 24, 2025 Oliver Jay, Managing Director of OpenAI International reveals the company&#8217;s global expansion strategy and what&#8217;s driving rapid AI adoption across the APAC region. Oliver knows a thing or two about scaling global compani
+    contentLength: 88537
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://time.com/7205596/sam-altman-superintelligence-agi/
+    linkText: How OpenAI's Sam Altman Is Thinking About AGI and Superintelligence in 2025
+    claimContext: "> \"We are now confident we know how to build AGI as we have traditionally understood it... AGI will probably get developed during Trump's term.\"[^18]"
+    fetchedAt: 2026-02-22T02:16:30.399Z
+    httpStatus: 200
+    pageTitle: How OpenAI’s Sam Altman Is Thinking About AGI and Superintelligence in 2025 | TIME
+    contentSnippet: How OpenAI’s Sam Altman Is Thinking About AGI and Superintelligence in 2025 | TIME Tech AI How OpenAI’s Sam Altman Is Thinking About AGI and Superintelligence in 2025 ADD TIME ON GOOGLE Show me more content from TIME on Google Search by Tharin Pillay Pillay is an editorial fellow at TIME. Loading... Sam Altman, co-founder and C.E.O. of OpenAI, speaks during the New York Times annual DealBook summit in New York City in December. Sam Altman, co-founder and C.E.O. of OpenAI, speaks during the New Y
+    contentLength: 371371
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://www.lesswrong.com/posts/T5p9NEAyrHedC2znD/recent-sam-altman-statements-on-agi-and-asi
+    linkText: We know how to build AGI - Sam Altman
+    claimContext: '**Key Claims:** - AGI defined as AI capable of working as a remote software engineer[^19] - "In 2025, we may see the first AI agents join the workforce"'
+    fetchedAt: 2026-02-22T02:16:29.388Z
+    httpStatus: 200
+    pageTitle: '"We know how to build AGI" - Sam Altman — LessWrong'
+    contentSnippet: 'x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. "We know how to build AGI" - Sam Altman — LessWrong AI Personal Blog 62 "We know how to build AGI" - Sam Altman by Nikola Jurkovic 6th Jan 2025 1 min read 5 62 This is a linkpost for https://blog.samaltman.com/reflections We are now confident we know how to build AGI as we have traditionally understood it. We believe that, in 2025, we may see the first AI agents “join '
+    contentLength: 345559
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://openai.com/index/deliberative-alignment/
+    linkText: "Deliberative alignment: reasoning enables safer language models"
+    claimContext: '| **Chain-of-Thought Reasoning** | Test-time compute for complex problems | Adopted by <EntityLink id="anthropic">Anthropic</EntityLink>, Google | Hidden reasoning creates interpretability challenges | | **Deliberative Alignment** | Reasoning-based safety specifications | Used in o-series models[^20'
+    fetchedAt: 2026-02-22T02:16:29.411Z
+    httpStatus: 200
+    pageTitle: "Deliberative alignment: reasoning enables safer language models | OpenAI"
+    contentSnippet: "Deliberative alignment: reasoning enables safer language models | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 20, 2024 Publication Release Safety Deliberative alignment: reasoning enables safer language models Introducing our new alignment strategy for o-series models, which are directly taught safety specifications and how to reason over them. Read paper (opens in a new window) Share We introduce deliberative"
+    contentLength: 354204
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://openai.com/index/deliberative-alignment/
+    linkText: "Deliberative alignment: reasoning enables safer language models"
+    claimContext: "**Current Methodology (2025):** - **Deliberative Alignment**: Teaching reasoning models human-written safety specifications[^21] - **Scalable Evaluations**: Automated tests measuring capability proxies[^22]"
+    fetchedAt: 2026-02-22T02:16:29.366Z
+    httpStatus: 200
+    pageTitle: "Deliberative alignment: reasoning enables safer language models | OpenAI"
+    contentSnippet: "Deliberative alignment: reasoning enables safer language models | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 20, 2024 Publication Release Safety Deliberative alignment: reasoning enables safer language models Introducing our new alignment strategy for o-series models, which are directly taught safety specifications and how to reason over them. Read paper (opens in a new window) Share We introduce deliberative"
+    contentLength: 354198
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.lesswrong.com/posts/dwpXvweBrJwErse3L/all-the-lab-s-ai-safety-plans-2025-edition
+    linkText: "All the labs AI safety plans: 2025 edition"
+    claimContext: '- **Deliberative Alignment**: Teaching reasoning models human-written safety specifications[^21] - **Scalable Evaluations**: Automated tests measuring capability proxies[^22] - **Cross-Lab Collaboration**: Joint evaluations with <EntityLink id="anthropic">Anthropic</EntityLink> and other labs[^23]'
+    fetchedAt: 2026-02-22T02:16:32.091Z
+    httpStatus: 200
+    pageTitle: "All the labs AI safety plans: 2025 edition — LessWrong"
+    contentSnippet: 'x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. All the labs AI safety plans: 2025 edition — LessWrong AI Frontpage 50 All the labs AI safety plans: 2025 edition by Algon 28th Oct 2025 Linkpost from aisafety.info 19 min read 2 50 This is a linkpost for https://aisafety.info/questions/NM58/What-are-the-major-AI-companies&#x27;-safety-plans Three out of three CEOs of top AI companies agree: " Mitigating the risk of ex'
+    contentLength: 631194
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://www.lesswrong.com/posts/dwpXvweBrJwErse3L/all-the-lab-s-ai-safety-plans-2025-edition
+    linkText: "All the labs AI safety plans: 2025 edition"
+    claimContext: '- **Scalable Evaluations**: Automated tests measuring capability proxies[^22] - **Cross-Lab Collaboration**: Joint evaluations with <EntityLink id="anthropic">Anthropic</EntityLink> and other labs[^23] - **Red Teaming**: Human adversarial testing complementing automated evaluations'
+    fetchedAt: 2026-02-22T02:16:32.361Z
+    httpStatus: 200
+    pageTitle: "All the labs AI safety plans: 2025 edition — LessWrong"
+    contentSnippet: 'x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. All the labs AI safety plans: 2025 edition — LessWrong AI Frontpage 50 All the labs AI safety plans: 2025 edition by Algon 28th Oct 2025 Linkpost from aisafety.info 19 min read 2 50 This is a linkpost for https://aisafety.info/questions/NM58/What-are-the-major-AI-companies&#x27;-safety-plans Three out of three CEOs of top AI companies agree: " Mitigating the risk of ex'
+    contentLength: 631194
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://futuresearch.ai/openai-api-profit/
+    linkText: OpenAI's API Profitability in 2024
+    claimContext: "**Market Penetration:** - API monthly revenue: ≈\\$41M from 530 billion tokens (June 2024)[^27] - Gross margins: 75% decreasing to 55% with pricing adjustments[^28]"
+    fetchedAt: 2026-02-22T02:16:32.488Z
+    httpStatus: 200
+    pageTitle: Is OpenAI Profitable? Financial Forecasts & Margins Analysis
+    contentSnippet: "Is OpenAI Profitable? Financial Forecasts & Margins Analysis ← Back to Research Update, Oct 3 2025: In a forthcoming piece, we show that GPT-5&#x27;s gross margins are significantly lower than the GPT-4 generation analyzed here. Key Takeaways OpenAI&#x27;s API business had more favorable unit economics than commonly reported , with estimated gross profit margins around 75% as of mid-2024 In June 2024, the API generated ~$41M in monthly revenue from ~530 billion tokens, with ~70% of traffic going"
+    contentLength: 144001
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://futuresearch.ai/openai-api-profit/
+    linkText: OpenAI's API Profitability in 2024
+    claimContext: "- API monthly revenue: ≈\\$41M from 530 billion tokens (June 2024)[^27] - Gross margins: 75% decreasing to 55% with pricing adjustments[^28] - Azure OpenAI Service: 64% year-over-year growth adoption[^29]"
+    fetchedAt: 2026-02-22T02:16:31.519Z
+    httpStatus: 200
+    pageTitle: Is OpenAI Profitable? Financial Forecasts & Margins Analysis
+    contentSnippet: "Is OpenAI Profitable? Financial Forecasts & Margins Analysis ← Back to Research Update, Oct 3 2025: In a forthcoming piece, we show that GPT-5&#x27;s gross margins are significantly lower than the GPT-4 generation analyzed here. Key Takeaways OpenAI&#x27;s API business had more favorable unit economics than commonly reported , with estimated gross profit margins around 75% as of mid-2024 In June 2024, the API generated ~$41M in monthly revenue from ~530 billion tokens, with ~70% of traffic going"
+    contentLength: 144001
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://sqmagazine.co.uk/openai-statistics/
+    linkText: "OpenAI Statistics 2026: Adoption, Integration & Innovation"
+    claimContext: "- Gross margins: 75% decreasing to 55% with pricing adjustments[^28] - Azure OpenAI Service: 64% year-over-year growth adoption[^29] - Enterprise integration across Microsoft Office 365, GitHub Copilot"
+    fetchedAt: 2026-02-22T02:16:31.951Z
+    httpStatus: 200
+    pageTitle: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine"
+    contentSnippet: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine Skip to primary navigation Skip to main content Skip to primary sidebar Skip to footer Search Subscribe To Our Newsletter Home » Artificial Intelligence OpenAI Statistics 2026: Adoption, Integration & Innovation Updated on: October 7, 2025 Written By Barry Elad Barry Elad Founder & Senior Journalist Barry Elad is a seasoned journalist and analyst specializing in finance, technology, AI, and founder of SQ Magazine. He "
+    contentLength: 380597
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://seo.ai/blog/gpt-store-statistics-facts
+    linkText: "GPT Store Statistics & Facts: Contains 159.000 of the 3 million created GPTs"
+    claimContext: "**Developer Adoption:** - GPT Store: 159,000 public GPTs from 3 million total created[^30] - Average 1,500 new models added daily to marketplace[^31]"
+    fetchedAt: 2026-02-22T02:16:34.290Z
+    httpStatus: 200
+    pageTitle: "GPT Store Statistics & Facts: Contains 159.000 of the 3 million created GPTs"
+    contentSnippet: "GPT Store Statistics & Facts: Contains 159.000 of the 3 million created GPTs The #1 AI Writer for SEO. Try it for free → The #1 AI Writer for SEO. Try it for free → Sign in Start trial Written by Daniel Højris Bæk on Apr 24, 2024 GPT Store Statistics & Facts: Contains 159.000 of the 3 million created GPTs Facts and statistics about the OpenAI GPT Store. We have collected the key stats about the GPTs and the Store. The internet is buzzzing about the new GPT Store. We collected all statistics and "
+    contentLength: 51542
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://originality.ai/blog/gpts-statistics
+    linkText: "The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs"
+    claimContext: "- GPT Store: 159,000 public GPTs from 3 million total created[^30] - Average 1,500 new models added daily to marketplace[^31] - API infrastructure market share exceeding 50% industry-wide"
+    fetchedAt: 2026-02-22T02:16:34.056Z
+    httpStatus: 200
+    pageTitle: "The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs – Originality.AI"
+    contentSnippet: "The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs – Originality.AI Sign Up Resources Login Sign Up Statistics The Era of Tailored Intelligence: Charting the Growth and Market Impact of Custom GPTs Custom AI smarts boom! Dive into GPTs statistics: usage, impact, & market trends. Tailor AI to your needs, no coding required! Jonathan Gillham October 28, 2025 On November 6th 2023 ( Source ), OpenAI, the research firm behind the globally recognized ChatGPT, releas"
+    contentLength: 95195
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.lesswrong.com/posts/CCQsQnCMWhJcCFY9x/openai-lost-usd5-billion-in-2024-and-its-losses-are
+    linkText: OpenAI lost \$5 billion in 2024 (and its losses are increasing)
+    claimContext: '**2024-2025 Financial Performance:** - Projected 2024 revenue: \$3.4 billion (ChatGPT subscriptions + API)[^32] - Growth rate: <F e="openai" f="be463d29">1,700%</F> from early 2023 to September 2024'
+    fetchedAt: 2026-02-22T02:16:33.991Z
+    httpStatus: 200
+    pageTitle: OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong OpenAI Economics Slowing Down AI AI Personal Blog 29 OpenAI lost $5 billion in 2024 (and its losses are increasing) by Remmelt 31st Mar 2025 Linkpost from www.wheresyoured.at 14 min read 15 29 Read the full article here . The journalist is an AI skeptic, but does solid financial investigations. "
+    contentLength: 562311
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.lesswrong.com/posts/CCQsQnCMWhJcCFY9x/openai-lost-usd5-billion-in-2024-and-its-losses-are
+    linkText: OpenAI lost \$5 billion in 2024 (and its losses are increasing)
+    claimContext: '- Growth rate: <F e="openai" f="be463d29">1,700%</F> from early 2023 to September 2024 - Operating losses: \$5 billion in 2024 despite revenue growth[^33] - Primary cost drivers: compute infrastructure, talent acquisition, research investment. OpenAI leadership has characterized these losses as refl'
+    fetchedAt: 2026-02-22T02:16:33.980Z
+    httpStatus: 200
+    pageTitle: OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong
+    contentSnippet: "x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. OpenAI lost $5 billion in 2024 (and its losses are increasing) — LessWrong OpenAI Economics Slowing Down AI AI Personal Blog 29 OpenAI lost $5 billion in 2024 (and its losses are increasing) by Remmelt 31st Mar 2025 Linkpost from www.wheresyoured.at 14 min read 15 29 Read the full article here . The journalist is an AI skeptic, but does solid financial investigations. "
+    contentLength: 562310
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://sqmagazine.co.uk/openai-statistics/
+    linkText: "OpenAI Statistics 2026: Adoption, Integration & Innovation"
+    claimContext: "**Fortune 500 Penetration:** - 92% of Fortune 500 companies actively using OpenAI products or APIs[^35] - Primary use cases: customer service automation, content generation, code assistance"
+    fetchedAt: 2026-02-22T02:16:33.543Z
+    httpStatus: 200
+    pageTitle: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine"
+    contentSnippet: "OpenAI Statistics 2026: Adoption, Integration & Innovation &#8226; SQ Magazine Skip to primary navigation Skip to main content Skip to primary sidebar Skip to footer Search Subscribe To Our Newsletter Home » Artificial Intelligence OpenAI Statistics 2026: Adoption, Integration & Innovation Updated on: October 7, 2025 Written By Barry Elad Barry Elad Founder & Senior Journalist Barry Elad is a seasoned journalist and analyst specializing in finance, technology, AI, and founder of SQ Magazine. He "
+    contentLength: 380597
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://openai.com/global-affairs/openai-for-countries/
+    linkText: Introducing OpenAI for Countries
+    claimContext: "**Data Sovereignty Approach:** - OpenAI for Countries program supporting local data centers[^36] - Partnerships for in-country infrastructure development"
+    fetchedAt: 2026-02-22T02:16:35.564Z
+    httpStatus: 200
+    pageTitle: Introducing OpenAI for Countries | OpenAI
+    contentSnippet: Introducing OpenAI for Countries | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI May 7, 2025 Global Affairs Introducing OpenAI for Countries A new initiative to support countries around the world that want to build on democratic AI rails. Loading… Share Our Stargate project , an unprecedented investment in America’s AI infrastructure announced in January with President Trump and our partners Oracle and SoftBank, is now u
+    contentLength: 268729
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.lesswrong.com/posts/dwpXvweBrJwErse3L/all-the-lab-s-ai-safety-plans-2025-edition
+    linkText: "All the labs AI safety plans: 2025 edition"
+    claimContext: "**Evaluation Processes:** - **Scalable Evaluations**: Automated testing measuring capability proxies[^37] - **Deep Dives**: Human red-teaming and third-party assessments[^38]"
+    fetchedAt: 2026-02-22T02:16:35.711Z
+    httpStatus: 200
+    pageTitle: "All the labs AI safety plans: 2025 edition — LessWrong"
+    contentSnippet: 'x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. All the labs AI safety plans: 2025 edition — LessWrong AI Frontpage 50 All the labs AI safety plans: 2025 edition by Algon 28th Oct 2025 Linkpost from aisafety.info 19 min read 2 50 This is a linkpost for https://aisafety.info/questions/NM58/What-are-the-major-AI-companies&#x27;-safety-plans Three out of three CEOs of top AI companies agree: " Mitigating the risk of ex'
+    contentLength: 631195
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.lesswrong.com/posts/dwpXvweBrJwErse3L/all-the-lab-s-ai-safety-plans-2025-edition
+    linkText: "All the labs AI safety plans: 2025 edition"
+    claimContext: "- **Scalable Evaluations**: Automated testing measuring capability proxies[^37] - **Deep Dives**: Human red-teaming and third-party assessments[^38] - **Capability Thresholds**: Predetermined criteria triggering additional safety measures"
+    fetchedAt: 2026-02-22T02:16:35.963Z
+    httpStatus: 200
+    pageTitle: "All the labs AI safety plans: 2025 edition — LessWrong"
+    contentSnippet: 'x This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. All the labs AI safety plans: 2025 edition — LessWrong AI Frontpage 50 All the labs AI safety plans: 2025 edition by Algon 28th Oct 2025 Linkpost from aisafety.info 19 min read 2 50 This is a linkpost for https://aisafety.info/questions/NM58/What-are-the-major-AI-companies&#x27;-safety-plans Three out of three CEOs of top AI companies agree: " Mitigating the risk of ex'
+    contentLength: 631194
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://openai.com/index/deliberative-alignment/
+    linkText: "Deliberative alignment: reasoning enables safer language models"
+    claimContext: "**Deliberative Alignment Implementation:** - Integration of human-written safety specifications into reasoning models[^39] - Training models to explicitly reason about safety considerations"
+    fetchedAt: 2026-02-22T02:16:35.615Z
+    httpStatus: 200
+    pageTitle: "Deliberative alignment: reasoning enables safer language models | OpenAI"
+    contentSnippet: "Deliberative alignment: reasoning enables safer language models | OpenAI Switch to ChatGPT (opens in a new window) Sora (opens in a new window) API Platform (opens in a new window) OpenAI December 20, 2024 Publication Release Safety Deliberative alignment: reasoning enables safer language models Introducing our new alignment strategy for o-series models, which are directly taught safety specifications and how to reason over them. Read paper (opens in a new window) Share We introduce deliberative"
+    contentLength: 354147
+    status: verified
+    note: null

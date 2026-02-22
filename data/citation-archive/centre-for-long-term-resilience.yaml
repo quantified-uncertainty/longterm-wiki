@@ -1,0 +1,601 @@
+pageId: centre-for-long-term-resilience
+verifiedAt: 2026-02-22
+totalCitations: 54
+verified: 53
+broken: 1
+unverifiable: 0
+citations:
+  - footnote: 1
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: "The **Centre for Long-Term Resilience (CLTR)** is an independent UK-based think tank specializing in enhancing global resilience to extreme risks, with primary focus on AI risks, biological risks (biosecurity), and government risk management. Based in Whitehall, London, the organization operates at "
+    fetchedAt: 2026-02-22T02:03:21.427Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Striving for a safe and flourishing world An independent think tank with a mission to transform global resilience to extreme risks Our Vision Our vision is a safe and flourishing world with high resilience to extreme risks, such as those from pandemics and emerging technologies. Our Mission Our mission is to transform global resilience to extreme risks — both in the UK and intern
+    contentLength: 52322
+    status: verified
+    note: null
+  - footnote: 2
+    url: https://www.longtermresilience.org/about/
+    linkText: About - Centre for Long-Term Resilience
+    claimContext: CLTR's mission centers on transforming how governments assess and respond to extreme risks—both in the UK and internationally—through what it describes as impartial expertise, actionable policy recommendations, and direct support to government institutions. The organization explicitly draws inspirat
+    fetchedAt: 2026-02-22T02:03:21.604Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 178
+    status: verified
+    note: null
+  - footnote: 3
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: The organization has demonstrated policy influence within the UK government, with contributions to the Ministry of Defence's AI Strategy report recognizing AI as an extreme risk, the refreshed UK Biosecurity Strategy, and extensions to the National Security Risk Assessment time horizon. CLTR operate
+    fetchedAt: 2026-02-22T02:03:21.237Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 4
+    url: https://www.longtermresilience.org/about/
+    linkText: About - Centre for Long-Term Resilience
+    claimContext: CLTR was founded approximately five years ago (around 2021) in response to what the organization identified as policymakers' structural focus on short-term political issues rather than long-term policy challenges. According to the organization's own characterization, modern government tends to prior
+    fetchedAt: 2026-02-22T02:03:21.511Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 176
+    status: verified
+    note: null
+  - footnote: 5
+    url: https://www.longtermresilience.org/about/
+    linkText: About - Centre for Long-Term Resilience
+    claimContext: The founding vision centered on creating "a safe and flourishing world with high resilience to extreme risks," with the UK positioned as both a policy test-bed and an international convener allied to the US and EU. The organization explicitly adopted a non-partisan approach, emphasizing integrity, p
+    fetchedAt: 2026-02-22T02:03:21.606Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 178
+    status: verified
+    note: null
+  - footnote: 6
+    url: https://www.longtermresilience.org/cltr-announces-first-two-hires-beyond-the-founding-team/
+    linkText: CLTR announces first two hires beyond the founding team
+    claimContext: "The founding team consisted of two people who grew the organization through strategic hiring. In 2022, CLTR announced its first hires beyond the founding team: Dr. Jess Whittlestone as Head of AI Policy and Gabriella Overödder as Operations Manager & Strategy Adviser, with plans to expand to six peo"
+    fetchedAt: 2026-02-22T02:03:22.713Z
+    httpStatus: 200
+    pageTitle: CLTR announces first two hires beyond the founding team - CLTR
+    contentSnippet: "CLTR announces first two hires beyond the founding team - CLTR Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Date: Dec 17, 2021 CLTR announces first two hires beyond the founding team Dr Jess Whittlestone appointed Head of AI Policy, and Gabriella Overödder appointed Operations Manager & Strategy Adviser CLTR today is proud to announce its first two hires: Dr Jess Whittlestone joins in March as CLTR’s Head of AI Policy. Jess will lead the development of, a"
+    contentLength: 52506
+    status: verified
+    note: null
+  - footnote: 7
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: "The founding team consisted of two people who grew the organization through strategic hiring. In 2022, CLTR announced its first hires beyond the founding team: Dr. Jess Whittlestone as Head of AI Policy and Gabriella Overödder as Operations Manager & Strategy Adviser, with plans to expand to six peo"
+    fetchedAt: 2026-02-22T02:03:23.038Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 8
+    url: https://www.longtermresilience.org/team-member/angus-mercer/
+    linkText: Angus Mercer - Centre for Long-Term Resilience
+    claimContext: Available sources do not name specific individual founders, though **Angus Mercer** is identified as Founder and Chief Executive, leading the organization and working with the Board on strategic direction. Mercer is a lawyer by training with prior experience as Head of External Affairs at the UK Dep
+    fetchedAt: 2026-02-22T02:03:22.710Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 199
+    status: verified
+    note: null
+  - footnote: 9
+    url: https://www.longtermresilience.org/team-member/angus-mercer/
+    linkText: Angus Mercer - Centre for Long-Term Resilience
+    claimContext: "**Angus Mercer** serves as Founder and Chief Executive of CLTR. His background includes roles as a policy adviser and former Head of External Affairs at DFID, as well as time on the Senior Management Team at a London public affairs consultancy working with clients including the Bill & Melinda Gates "
+    fetchedAt: 2026-02-22T02:03:22.957Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 197
+    status: verified
+    note: null
+  - footnote: 10
+    url: https://www.longtermresilience.org/cltr-announces-first-two-hires-beyond-the-founding-team/
+    linkText: CLTR announces first two hires beyond the founding team
+    claimContext: "**Sophie Dannreuther** holds the position of Director at CLTR and was involved in early team expansion announcements and mission alignment efforts.[^10]"
+    fetchedAt: 2026-02-22T02:03:22.711Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 228
+    status: verified
+    note: null
+  - footnote: 11
+    url: https://www.longtermresilience.org/cltr-announces-first-two-hires-beyond-the-founding-team/
+    linkText: CLTR announces first two hires beyond the founding team
+    claimContext: "**Dr. Jess Whittlestone** joined as Head of AI Policy in 2022 as the organization's first hire beyond the founding team. She holds a PhD in Behavioural Science from the University of Warwick and a first-class degree in Mathematics and Philosophy from Oxford University. In her role, she provides expe"
+    fetchedAt: 2026-02-22T02:03:24.146Z
+    httpStatus: 200
+    pageTitle: CLTR announces first two hires beyond the founding team - CLTR
+    contentSnippet: "CLTR announces first two hires beyond the founding team - CLTR Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Date: Dec 17, 2021 CLTR announces first two hires beyond the founding team Dr Jess Whittlestone appointed Head of AI Policy, and Gabriella Overödder appointed Operations Manager & Strategy Adviser CLTR today is proud to announce its first two hires: Dr Jess Whittlestone joins in March as CLTR’s Head of AI Policy. Jess will lead the development of, a"
+    contentLength: 52506
+    status: verified
+    note: null
+  - footnote: 12
+    url: https://www.longtermresilience.org/cltr-announces-first-two-hires-beyond-the-founding-team/
+    linkText: CLTR announces first two hires beyond the founding team
+    claimContext: "**Gabriella Overödder** serves as Operations Manager & Strategy Adviser and was also among the first hires beyond the founding team in 2022. She brings expertise in operations, strategy, team-building, and policy, and managed the organization's transition to a larger team structure.[^12]"
+    fetchedAt: 2026-02-22T02:03:24.143Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 228
+    status: verified
+    note: null
+  - footnote: 13
+    url: https://www.longtermresilience.org/new-grant-announcement-and-match-fund-now-live/
+    linkText: New grant announcement and match fund now live
+    claimContext: "**Polly Mason** serves as Director of Strategic Partnerships and is the primary contact for collaborations and fundraising.[^13]"
+    fetchedAt: 2026-02-22T02:03:24.142Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 217
+    status: verified
+    note: null
+  - footnote: 14
+    url: https://www.longtermresilience.org/new-grant-announcement-and-match-fund-now-live/
+    linkText: New grant announcement and match fund now live
+    claimContext: 'The October 2024 grant from <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink> included an additional matching fund commitment of up to £3 million, where Coefficient Giving pledged to match every £1 from other donors with an additional £1. CLTR characterized this funding as enabling '
+    fetchedAt: 2026-02-22T02:03:24.144Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 219
+    status: verified
+    note: null
+  - footnote: 15
+    url: https://forum.effectivealtruism.org/topics/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - EA Forum
+    claimContext: In August 2023, Founders Pledge published a profile recommending CLTR as a funding option, highlighting the organization's proven track record of UK policy influence. The profile noted that additional funding would enable CLTR to scale its team and enhance policy advice, research, and networks on AI
+    fetchedAt: 2026-02-22T02:03:24.625Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience - EA Forum
+    contentSnippet: Centre for Long-Term Resilience - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Centre for Long-Term Resilience Edit History Discussion 0 Subscribe Edit History Discussion 0 Centre for Long-Term Resilience Funding Further reading External links Random Topic Contributors 2 Pablo 2 MichaelA🔸 1 Dane Valerie 1 Leo The Centre for Long-Term Resilience ( CLTR) is an independent think tank w
+    contentLength: 218859
+    status: verified
+    note: null
+  - footnote: 16
+    url: https://www.longtermresilience.org/ai/
+    linkText: AI - Centre for Long-Term Resilience
+    claimContext: CLTR's AI work addresses risks from both misuse and unintended system behaviors. The organization focuses on potential harms including AI-enabled bioweapons development, disinformation campaigns, unintended behaviors in high-stakes domains like national security or critical infrastructure, and socio
+    fetchedAt: 2026-02-22T02:03:25.733Z
+    httpStatus: 200
+    pageTitle: Artificial Intelligence Policy & Research | CLTR
+    contentSnippet: "Artificial Intelligence Policy & Research | CLTR Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Topic/Area: Artificial Intelligence Mitigating extreme risks from AI through sound policymaking Introduction AI systems could pose a number of large-scale extreme risks to society. These include severe misuse in bioweapon development or disinformation, societal harms such as power concentration or threats to democracy, or key aspects of society being increasingly"
+    contentLength: 55038
+    status: verified
+    note: null
+  - footnote: 17
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: "- \"Securing a seat at the table: pathways for advancing the UK's global leadership in frontier AI governance\" – A report examining UK AI governance strategy and international positioning[^17] - \"Preparing for AI security incidents\" – Recommendations for emergency preparedness mechanisms via UK AI le"
+    fetchedAt: 2026-02-22T02:03:25.731Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 170
+    status: verified
+    note: null
+  - footnote: 18
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: "- \"Securing a seat at the table: pathways for advancing the UK's global leadership in frontier AI governance\" – A report examining UK AI governance strategy and international positioning[^17] - \"Preparing for AI security incidents\" – Recommendations for emergency preparedness mechanisms via UK AI le"
+    fetchedAt: 2026-02-22T02:03:25.729Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 168
+    status: verified
+    note: null
+  - footnote: 19
+    url: https://cetas.turing.ac.uk/publications/strengthening-resilience-ai-risk
+    linkText: Strengthening Resilience to AI Risk - CETaS
+    claimContext: '- "Preparing for AI security incidents" – Recommendations for emergency preparedness mechanisms via UK AI legislation[^18] - "Strengthening Resilience to AI Risk" (with CETaS) – A briefing paper providing a framework for UK AI risk response, highlighting over 10,000 reported AI safety incidents, 1.8'
+    fetchedAt: 2026-02-22T02:03:26.795Z
+    httpStatus: 200
+    pageTitle: Strengthening Resilience to AI Risk | Centre for Emerging Technology and Security
+    contentSnippet: "Strengthening Resilience to AI Risk | Centre for Emerging Technology and Security Skip to main content Abstract This Briefing Paper from CETaS and the Centre for Long-Term Resilience aims to provide a clear framework to inform the UK Government’s approach to understanding and responding to the risks posed by Artificial Intelligence (AI). The Government has shown increasing ambition to take a globally leading role in AI safety, but currently the UK is inadequately resilient to the risks posed by "
+    contentLength: 79004
+    status: verified
+    note: null
+  - footnote: 20
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: CLTR contributed to the Ministry of Defence's AI Strategy, with recommendations explicitly recognizing AI as an extreme risk and proposing safety measures. This represents one of the organization's documented policy wins.[^20]
+    fetchedAt: 2026-02-22T02:03:25.739Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 21
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: The biosecurity portfolio addresses threats from natural pandemics, laboratory leaks, bioweapons, and dual-use research. CLTR has developed expertise in synthetic biology risks and biological security strategy.[^21]
+    fetchedAt: 2026-02-22T02:03:27.901Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Striving for a safe and flourishing world An independent think tank with a mission to transform global resilience to extreme risks Our Vision Our vision is a safe and flourishing world with high resilience to extreme risks, such as those from pandemics and emerging technologies. Our Mission Our mission is to transform global resilience to extreme risks — both in the UK and intern
+    contentLength: 52322
+    status: verified
+    note: null
+  - footnote: 22
+    url: https://www.longtermresilience.org/reports/gap-consolidation-of-the-mirror-life-evidence-base/
+    linkText: Gap consolidation of the mirror life evidence base
+    claimContext: '- "Gap consolidation of the mirror life evidence base" – A blog post and spreadsheet identifying safe knowledge gaps for mirror life preparedness, developed following a January 2025 UK government roundtable on mirror life risks attended by Dr. Paul-Enguerrand Fady. The framework classifies evidence '
+    fetchedAt: 2026-02-22T02:03:27.899Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 233
+    status: verified
+    note: null
+  - footnote: 23
+    url: https://sentinelbio.org/grant/centre-for-long-term-resilience/
+    linkText: Centre for Long-Term Resilience - Sentinel Bio Grant
+    claimContext: '- "Gap consolidation of the mirror life evidence base" – A blog post and spreadsheet identifying safe knowledge gaps for mirror life preparedness, developed following a January 2025 UK government roundtable on mirror life risks attended by Dr. Paul-Enguerrand Fady. The framework classifies evidence '
+    fetchedAt: 2026-02-22T02:03:34.448Z
+    httpStatus: 503
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 0
+    status: broken
+    note: HTTP 503
+  - footnote: 24
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: CLTR provided assistance with the Cabinet Office's Biosecurity Strategy Refresh, with expertise and networks incorporated into the UK's 2023 Biological Security Strategy. The organization also provided both written and oral evidence to the House of Lords Science and Technology Committee's Engineerin
+    fetchedAt: 2026-02-22T02:03:27.909Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 25
+    url: https://effectivealtruism.nz/job-board/literature-review-contractor-centre-long-term-resilience
+    linkText: Literature review contractor - Centre for Long-Term Resilience
+    claimContext: In late 2024 and early 2025, CLTR advocated for establishing a UK Microbial Forensics Consortium (UKMFC) under the 2023 UK Biological Security Strategy and hired a literature review contractor for a project on microbial forensics, bioinformatics, and biological hazards.[^25]
+    fetchedAt: 2026-02-22T02:03:28.340Z
+    httpStatus: 200
+    pageTitle: Literature Review Contractor | Centre for Long-Term Resilience &mdash; Effective Altruism New Zealand
+    contentSnippet: Literature Review Contractor | Centre for Long-Term Resilience &mdash; Effective Altruism New Zealand 0 Literature Review Contractor Biosecurity Oct 22 Written By Centre for Long-Term Resilience Centre for Long-Term Resilience 📍 Remote (Global) 🕔 Part Time 🔄 Rolling Applications Do you have a passion for making the world a safer place from biological risks, and experience with technological and scientific literature reviews? The Centre for Long-Term Resilience (CLTR) is seeking a contractor t
+    contentLength: 122877
+    status: verified
+    note: null
+  - footnote: 26
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: CLTR's risk management work aims to improve how government institutions assess, prioritize, and respond to long-term and extreme risks. This includes both process improvements and horizon expansion for risk assessment frameworks.[^26]
+    fetchedAt: 2026-02-22T02:03:36.208Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Striving for a safe and flourishing world An independent think tank with a mission to transform global resilience to extreme risks Our Vision Our vision is a safe and flourishing world with high resilience to extreme risks, such as those from pandemics and emerging technologies. Our Mission Our mission is to transform global resilience to extreme risks — both in the UK and intern
+    contentLength: 52322
+    status: verified
+    note: null
+  - footnote: 27
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: "- \"UK Resilience Action Plan: Ambitious Progress with Room to Go Further\" – Assessment of UK government resilience planning[^27] - \"Ten Points to consider for the Resilience Strategy\" – A 10-point manifesto published ahead of the UK Government's Resilience Strategy publication[^28]"
+    fetchedAt: 2026-02-22T02:03:36.256Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Striving for a safe and flourishing world An independent think tank with a mission to transform global resilience to extreme risks Our Vision Our vision is a safe and flourishing world with high resilience to extreme risks, such as those from pandemics and emerging technologies. Our Mission Our mission is to transform global resilience to extreme risks — both in the UK and intern
+    contentLength: 52322
+    status: verified
+    note: null
+  - footnote: 28
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: "- \"UK Resilience Action Plan: Ambitious Progress with Room to Go Further\" – Assessment of UK government resilience planning[^27] - \"Ten Points to consider for the Resilience Strategy\" – A 10-point manifesto published ahead of the UK Government's Resilience Strategy publication[^28] - Contributions t"
+    fetchedAt: 2026-02-22T02:03:35.856Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 170
+    status: verified
+    note: null
+  - footnote: 29
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: "- \"Ten Points to consider for the Resilience Strategy\" – A 10-point manifesto published ahead of the UK Government's Resilience Strategy publication[^28] - Contributions that extended the National Security Risk Assessment horizon from 2 to 5 years and introduced new exercises for longer-term chronic"
+    fetchedAt: 2026-02-22T02:03:35.569Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 30
+    url: https://www.longtermresilience.org/response-to-the-uk-governments-national-resilience-framework/
+    linkText: Response to the UK Government's National Resilience Framework
+    claimContext: "- Contributions that extended the National Security Risk Assessment horizon from 2 to 5 years and introduced new exercises for longer-term chronic risks[^29] - Response to the UK Government's National Resilience Framework, critiquing insufficient risk oversight separation, unclear vulnerability asse"
+    fetchedAt: 2026-02-22T02:03:36.042Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 232
+    status: verified
+    note: null
+  - footnote: 31
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: CLTR provided oral evidence to the Joint Committee on National Security Strategy on the UK Resilience Framework and Integrated Review, and supported the Institute for Government's *Managing Extreme Risks* report.[^31]
+    fetchedAt: 2026-02-22T02:03:37.379Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 32
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: "- Ministry of Defence AI Strategy explicitly mentions AI as an extreme risk and proposes safety measures based on CLTR recommendations[^32] - 2023 UK Biological Security Strategy incorporated CLTR expertise and networks[^33]"
+    fetchedAt: 2026-02-22T02:03:37.956Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 33
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: "- Ministry of Defence AI Strategy explicitly mentions AI as an extreme risk and proposes safety measures based on CLTR recommendations[^32] - 2023 UK Biological Security Strategy incorporated CLTR expertise and networks[^33] - National Security Risk Assessment time horizon extended from 2 to 5 years"
+    fetchedAt: 2026-02-22T02:03:38.076Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 34
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: "- 2023 UK Biological Security Strategy incorporated CLTR expertise and networks[^33] - National Security Risk Assessment time horizon extended from 2 to 5 years with new chronic risk exercises[^34]"
+    fetchedAt: 2026-02-22T02:03:37.850Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 35
+    url: https://www.longtermresilience.org/2024-annual-report/
+    linkText: 2024 Annual Report - Centre for Long-Term Resilience
+    claimContext: 'In 2024, CLTR informed UK regulation of frontier AI models, aided implementation of the 2023 Biological Security Strategy, and provided responses to the Covid-19 Inquiry on resilience and preparedness. The organization characterized itself as having expanded as a "trusted thought-partner" to UK and '
+    fetchedAt: 2026-02-22T02:03:37.386Z
+    httpStatus: 200
+    pageTitle: 2024 Annual Report - CLTR
+    contentSnippet: "2024 Annual Report - CLTR Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Date: Sep 5, 2025 2024 Annual Report We are pleased to publish our 2024 Annual Report which shares an overview of CLTR’s achievements and high-impact activity. Our thanks to our funding partners, expert team and collaborators. In 2024, CLTR continued to expand its influence as a trusted thought-partner to governments in the UK and around the globe. Through the enactment of our theory o"
+    contentLength: 48445
+    status: verified
+    note: null
+  - footnote: 36
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: CLTR has also published op-eds in *Times* Red Box and *Financial Times*, extending its influence beyond direct government advisory work.[^36]
+    fetchedAt: 2026-02-22T02:03:39.191Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 37
+    url: https://www.longtermresilience.org
+    linkText: Centre for Long-Term Resilience - Official Website
+    claimContext: "CLTR operates through three primary mechanisms: conducting research on extreme risks to generate policy recommendations and reports, building networks with policymakers and politicians to influence strategy and brief stakeholders, and helping institutions improve governance, emergency preparedness, "
+    fetchedAt: 2026-02-22T02:03:39.182Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Striving for a safe and flourishing world An independent think tank with a mission to transform global resilience to extreme risks Our Vision Our vision is a safe and flourishing world with high resilience to extreme risks, such as those from pandemics and emerging technologies. Our Mission Our mission is to transform global resilience to extreme risks — both in the UK and intern
+    contentLength: 52322
+    status: verified
+    note: null
+  - footnote: 38
+    url: https://www.longtermresilience.org/about/
+    linkText: About - Centre for Long-Term Resilience
+    claimContext: The organization's location in Whitehall, London provides direct access to UK government institutions, enabling what it describes as providing "extra hands" to government alongside impartial expertise and actionable policy steps. CLTR emphasizes its independent, non-partisan status while maintaining
+    fetchedAt: 2026-02-22T02:03:39.185Z
+    httpStatus: 200
+    pageTitle: About Centre for Long-Term Resilience | Independent Think Tank
+    contentSnippet: About Centre for Long-Term Resilience | Independent Think Tank Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us About CLTR is an independent think tank with a mission to transform global resilience to extreme risks. We are based in the heart of Whitehall. Extreme risks are high impact threats with global reach. They have the potential to devastate lives and economies around the world. Examples include natural or AI-engineered pandemics, the handover of increa
+    contentLength: 46891
+    status: verified
+    note: null
+  - footnote: 39
+    url: https://www.longtermresilience.org/about/
+    linkText: About - Centre for Long-Term Resilience
+    claimContext: The organization explicitly positions the UK as a policy test-bed and international convener allied to the US and EU, suggesting a strategic vision where UK policy innovations could influence broader international approaches to extreme risk governance.[^39]
+    fetchedAt: 2026-02-22T02:03:39.180Z
+    httpStatus: 202
+    pageTitle: null
+    contentSnippet: null
+    contentLength: 178
+    status: verified
+    note: null
+  - footnote: 40
+    url: https://forum.effectivealtruism.org/topics/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - EA Forum
+    claimContext: CLTR draws explicit inspiration from effective altruism's framework of focusing on important, neglected, and tractable problems. The organization's funding base is heavily concentrated in EA-aligned sources, including the <EntityLink id="sff">Survival and Flourishing Fund</EntityLink>, EA Infrastruc
+    fetchedAt: 2026-02-22T02:03:39.560Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience - EA Forum
+    contentSnippet: Centre for Long-Term Resilience - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Centre for Long-Term Resilience Edit History Discussion 0 Subscribe Edit History Discussion 0 Centre for Long-Term Resilience Funding Further reading External links Random Topic Contributors 2 Pablo 2 MichaelA🔸 1 Dane Valerie 1 Leo The Centre for Long-Term Resilience ( CLTR) is an independent think tank w
+    contentLength: 218859
+    status: verified
+    note: null
+  - footnote: 41
+    url: https://forum.effectivealtruism.org/posts/tszpvLoJXYCwyvhKq/ea-organization-updates-march-2025
+    linkText: "EA Organization Updates: March 2025"
+    claimContext: The organization is profiled prominently on the EA Forum with a dedicated topic page and appears in EA organizational update posts alongside other EA-aligned organizations. Founders Pledge, an EA-affiliated organization, recommended CLTR as a funding option in August 2023.[^41]
+    fetchedAt: 2026-02-22T02:03:40.640Z
+    httpStatus: 200
+    pageTitle: "EA Organization Updates: March 2025 — EA Forum"
+    contentSnippet: "EA Organization Updates: March 2025 — EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents EA Organization Updates: March 2025 by Toby Tremlett🔹 , Dane Valerie Mar 13 2025 10 min read 0 29 Building effective altruism Opportunities to take action EA Organization Updates (monthly series) Announcements and updates Application announcements Job listing (open) Organization updates Frontpage EA O"
+    contentLength: 269496
+    status: verified
+    note: null
+  - footnote: 42
+    url: https://www.longtermresilience.org/about/
+    linkText: About - Centre for Long-Term Resilience
+    claimContext: CLTR explicitly addresses existential risks through its research and policy work, drawing from academic disciplines studying global catastrophic and existential risks. Examples of extreme risks the organization considers include AI-engineered pandemics and major AI accidents in national infrastructu
+    fetchedAt: 2026-02-22T02:03:40.667Z
+    httpStatus: 200
+    pageTitle: About Centre for Long-Term Resilience | Independent Think Tank
+    contentSnippet: About Centre for Long-Term Resilience | Independent Think Tank Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us About CLTR is an independent think tank with a mission to transform global resilience to extreme risks. We are based in the heart of Whitehall. Extreme risks are high impact threats with global reach. They have the potential to devastate lives and economies around the world. Examples include natural or AI-engineered pandemics, the handover of increa
+    contentLength: 46891
+    status: verified
+    note: null
+  - footnote: 43
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: The organization's focus on AI alignment and safety manifests through policy work on the UK's AI bill for emergency preparedness, frontier AI governance reports examining UK global leadership opportunities, and input to the Ministry of Defence AI Strategy addressing AI as an extreme risk with safety
+    fetchedAt: 2026-02-22T02:03:40.677Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 44
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: CLTR has pursued systematic expansion from its two-person founding team. By 2022, the organization had made its first two hires beyond the founding team. By 2023, it had grown to nine people, with public plans to reach fifteen staff members by 2025 through the development of small policy units focus
+    fetchedAt: 2026-02-22T02:03:40.693Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 45
+    url: https://www.longtermresilience.org/2024-annual-report/
+    linkText: 2024 Annual Report - Centre for Long-Term Resilience
+    claimContext: Recent hiring initiatives (2024-2025) included positions for Director of AI Policy (£100k+ salary, reporting to Gabriella Overödder), Senior Adviser in Advocacy and Communications (with grant writing focus), and Operations Associate. In March 2025, CLTR was actively hiring a Policy and Operations St
+    fetchedAt: 2026-02-22T02:03:40.673Z
+    httpStatus: 200
+    pageTitle: 2024 Annual Report - CLTR
+    contentSnippet: "2024 Annual Report - CLTR Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Date: Sep 5, 2025 2024 Annual Report We are pleased to publish our 2024 Annual Report which shares an overview of CLTR’s achievements and high-impact activity. Our thanks to our funding partners, expert team and collaborators. In 2024, CLTR continued to expand its influence as a trusted thought-partner to governments in the UK and around the globe. Through the enactment of our theory o"
+    contentLength: 48445
+    status: verified
+    note: null
+  - footnote: 46
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: The organization has characterized additional funding as enabling enhanced policy advice, research, and networks across its three core focus areas, with the 2025 expansion target specifically tied to building capacity for greater policy influence.[^46]
+    fetchedAt: 2026-02-22T02:03:41.803Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 47
+    url: https://survivalandflourishing.fund/recommendations
+    linkText: Survival and Flourishing Fund Recommendations
+    claimContext: CLTR appears to be well-regarded within effective altruism circles, with consistent funding from EA-aligned sources through 2025 and positive characterizations in EA Forum posts. The organization's ongoing funding from the <EntityLink id="sff">Survival and Flourishing Fund</EntityLink> through multi
+    fetchedAt: 2026-02-22T02:03:42.502Z
+    httpStatus: 200
+    pageTitle: Grants | Survival and Flourishing Fund
+    contentSnippet: Grants | Survival and Flourishing Fund Programs FAQ Contact Join newsletter Below is a list of grants we have recommended using the S-Process and the Initiative Committee . Recommendations after the final date might not be listed yet. Round Source Organization Amount Receiving Charity Purpose SFF-2025 Jaan Tallinn Agent Foundations Field Network (AFFINE) [Algorithm Design] $79,000 Ashgro, Inc. General support of Algorithm Design SFF-2025 Jaan Tallinn Agent Foundations Field Network (AFFINE) [Tec
+    contentLength: 185525
+    status: verified
+    note: null
+  - footnote: 48
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: Founders Pledge's 2023 recommendation highlighted CLTR's proven UK policy influence as a key factor supporting the funding recommendation. The recommendation emphasized CLTR's ability to fill gaps in government policy on AI and biosecurity risks through expertise-driven recommendations, with the ass
+    fetchedAt: 2026-02-22T02:03:41.862Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 49
+    url: https://forum.effectivealtruism.org/topics/center-on-long-term-risk
+    linkText: Center on Long-Term Risk - EA Forum
+    claimContext: No dissenting opinions, debates, or criticisms of CLTR appear in available EA Forum or related community sources. The organization appears to fit within the EA long-term resilience ecosystem alongside similar organizations like the Center on Long-Term Risk (focused on AI s-risks, receiving \$1.2M fr
+    fetchedAt: 2026-02-22T02:03:42.490Z
+    httpStatus: 200
+    pageTitle: Center on Long-Term Risk - EA Forum
+    contentSnippet: Center on Long-Term Risk - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Center on Long-Term Risk Edit History Discussion 0 Subscribe Edit History Discussion 0 Center on Long-Term Risk History Funding Further reading External links Related entries Random Topic Contributors 3 Will Aldred 2 Pablo 2 MichaelA🔸 2 Eevee🔹 1 Leo The Center on Long-Term Risk ( CLR ) is a research institute t
+    contentLength: 480250
+    status: verified
+    note: null
+  - footnote: 50
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: While CLTR has documented several policy wins, the available information does not include quantitative impact metrics such as estimates of risk reduction, lives saved, or other outcome measures. Effectiveness is inferred from policy adoptions, government endorsements, and funding recommendations rat
+    fetchedAt: 2026-02-22T02:03:41.814Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
+  - footnote: 51
+    url: https://www.longtermresilience.org/about/
+    linkText: About - Centre for Long-Term Resilience
+    claimContext: The organization's heavy concentration in UK government advisory work raises questions about scalability to other countries and the generalizability of its model. CLTR positions the UK as a test-bed for international policy innovation, but evidence of successful international influence is limited in
+    fetchedAt: 2026-02-22T02:03:43.641Z
+    httpStatus: 200
+    pageTitle: About Centre for Long-Term Resilience | Independent Think Tank
+    contentSnippet: About Centre for Long-Term Resilience | Independent Think Tank Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us About CLTR is an independent think tank with a mission to transform global resilience to extreme risks. We are based in the heart of Whitehall. Extreme risks are high impact threats with global reach. They have the potential to devastate lives and economies around the world. Examples include natural or AI-engineered pandemics, the handover of increa
+    contentLength: 46891
+    status: verified
+    note: null
+  - footnote: 52
+    url: https://forum.effectivealtruism.org/topics/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - EA Forum
+    claimContext: The organization operates in a funding ecosystem heavily concentrated in effective altruism sources, with major grants from the <EntityLink id="sff">Survival and Flourishing Fund</EntityLink> and <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>. This concentration could create depe
+    fetchedAt: 2026-02-22T02:03:43.570Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience - EA Forum
+    contentSnippet: Centre for Long-Term Resilience - EA Forum This website requires javascript to properly function. Consider activating javascript to get access to all site functionality. Hide table of contents Centre for Long-Term Resilience Edit History Discussion 0 Subscribe Edit History Discussion 0 Centre for Long-Term Resilience Funding Further reading External links Random Topic Contributors 2 Pablo 2 MichaelA🔸 1 Dane Valerie 1 Leo The Centre for Long-Term Resilience ( CLTR) is an independent think tank w
+    contentLength: 218859
+    status: verified
+    note: null
+  - footnote: 53
+    url: https://www.longtermresilience.org/2023-annual-report/
+    linkText: 2023 Annual Report - Centre for Long-Term Resilience
+    claimContext: CLTR's 2023 report emphasized that despite progress, there remains a "crucial window" for AI and biosecurity policy work with ongoing needs. This suggests the organization views its work as incomplete and at a relatively early stage despite documented policy wins.[^53]
+    fetchedAt: 2026-02-22T02:03:43.638Z
+    httpStatus: 200
+    pageTitle: 2023 Annual Report - CLTR
+    contentSnippet: "2023 Annual Report - CLTR Home AI Biosecurity Risk Management Publications News About Team Funding Work With Us Date: Nov 11, 2024 2023 Annual Report We are pleased to publish our 2023 annual report sharing CLTR’s achievements and high-impact activity, with thanks to our funding partners, expert team and collaborators. 2023 has been a pivotal year for influencing the course of resilience to extreme risks, making the importance of our mission undeniable. There is now a crucial window of opportuni"
+    contentLength: 48106
+    status: verified
+    note: null
+  - footnote: 54
+    url: https://www.founderspledge.com/research/centre-for-long-term-resilience
+    linkText: Centre for Long-Term Resilience - Founders Pledge Research
+    claimContext: The available sources provide limited insight into internal decision-making processes, governance structures beyond the Board, or how the organization prioritizes among competing policy opportunities. The small team size (nine people as of 2023) also raises questions about capacity constraints given
+    fetchedAt: 2026-02-22T02:03:43.607Z
+    httpStatus: 200
+    pageTitle: Centre for Long-Term Resilience
+    contentSnippet: Centre for Long-Term Resilience The Centre for Long-Term Resilience ( CLTR ) is a UK-based think tank specializing in extreme risks. Their primary focuses are (1) extreme AI risks, (2) extreme biological risks, and (3) improving government risk management capacity. CLTR conducts research and provides policy advice to help governments better manage these risks. What problem are they trying to solve? Advances in technology are creating risks that are potentially catastrophic if mismanaged, yet dec
+    contentLength: 171648
+    status: verified
+    note: null
