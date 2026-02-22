@@ -19,6 +19,7 @@ interface VerdictConfig {
   color: string;
   iconColor: string;
   dotColor: string;
+  badgeBg: string;
 }
 
 const VERDICT_CONFIG: Record<string, VerdictConfig> = {
@@ -28,6 +29,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
     color: "text-emerald-700 dark:text-emerald-400",
     iconColor: "text-emerald-500",
     dotColor: "bg-emerald-500",
+    badgeBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
   },
   minor_issues: {
     icon: AlertTriangle,
@@ -35,6 +37,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
     color: "text-amber-700 dark:text-amber-400",
     iconColor: "text-amber-500",
     dotColor: "bg-amber-500",
+    badgeBg: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
   },
   inaccurate: {
     icon: XCircle,
@@ -42,6 +45,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
     color: "text-red-700 dark:text-red-400",
     iconColor: "text-red-500",
     dotColor: "bg-red-500",
+    badgeBg: "bg-red-500/10 text-red-700 dark:text-red-400",
   },
   unsupported: {
     icon: XCircle,
@@ -49,6 +53,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
     color: "text-red-600 dark:text-red-400",
     iconColor: "text-red-400",
     dotColor: "bg-red-400",
+    badgeBg: "bg-red-500/10 text-red-700 dark:text-red-400",
   },
   not_verifiable: {
     icon: HelpCircle,
@@ -56,6 +61,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
     color: "text-muted-foreground",
     iconColor: "text-muted-foreground",
     dotColor: "bg-muted-foreground",
+    badgeBg: "bg-muted/50 text-muted-foreground",
   },
 };
 
@@ -66,6 +72,7 @@ const VERIFIED_ONLY_CONFIG: VerdictConfig = {
   color: "text-blue-700 dark:text-blue-400",
   iconColor: "text-blue-500",
   dotColor: "bg-blue-500",
+  badgeBg: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
 };
 
 function getVerdictConfig(quote: CitationQuote): VerdictConfig | null {
@@ -76,6 +83,16 @@ function getVerdictConfig(quote: CitationQuote): VerdictConfig | null {
     return VERIFIED_ONLY_CONFIG;
   }
   return null;
+}
+
+/** Only allow safe URL schemes in citation links */
+export function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 function formatDate(iso: string): string {
@@ -158,7 +175,7 @@ function FootnoteIndicator({ quote, anchor }: { quote: CitationQuote; anchor: HT
                 Checked {formatDate(checkedAt)}
               </span>
             )}
-            {quote.url && (
+            {quote.url && isSafeUrl(quote.url) && (
               <a
                 href={quote.url}
                 target="_blank"
@@ -221,7 +238,7 @@ function FootnoteSectionEnricher({
         if (!config) return null;
         return createPortal(
           <span
-            className={`citation-fn-badge ${config.dotColor.replace("bg-", "badge-")}`}
+            className={`citation-fn-badge ${config.badgeBg}`}
             title={config.label}
           >
             <span className={`inline-block w-1.5 h-1.5 rounded-full ${config.dotColor} mr-1`} />
@@ -258,6 +275,7 @@ export function CitationOverlay({ quotes }: { quotes: CitationQuote[] }) {
 
     const quoteMap = new Map(quotes.map((q) => [q.footnote, q]));
     const anchors: Array<{ wrapper: HTMLElement; quote: CitationQuote }> = [];
+    const createdElements: HTMLElement[] = [];
 
     // Find all inline footnote refs: <a data-footnote-ref href="#user-content-fn-N">
     const refs = article.querySelectorAll<HTMLAnchorElement>(
@@ -281,12 +299,21 @@ export function CitationOverlay({ quotes }: { quotes: CitationQuote[] }) {
         wrapper.style.position = "relative";
         wrapper.style.display = "inline";
         ref.parentNode?.insertBefore(wrapper, ref.nextSibling);
+        createdElements.push(wrapper);
       }
 
       anchors.push({ wrapper, quote });
     }
 
     setRefAnchors(anchors);
+
+    // Cleanup: remove created DOM elements on unmount or re-render
+    return () => {
+      for (const el of createdElements) {
+        el.remove();
+      }
+      setRefAnchors([]);
+    };
   }, [quotes]);
 
   if (quotes.length === 0) return null;

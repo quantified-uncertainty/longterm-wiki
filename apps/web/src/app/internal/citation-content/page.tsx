@@ -39,7 +39,7 @@ interface ApiStatsResult {
 
 async function loadContentFromApi(): Promise<FetchResult<{ entries: ContentEntry[]; stats: ApiStatsResult }>> {
   const [listResult, statsResult] = await Promise.all([
-    fetchDetailed<ApiListResult>("/api/citations/content/list?limit=500", {
+    fetchDetailed<ApiListResult>("/api/citations/content/list?limit=5000", {
       revalidate: 120,
     }),
     fetchDetailed<ApiStatsResult>("/api/citations/content/stats", {
@@ -144,6 +144,12 @@ export default async function CitationContentPage() {
             }
           />
         </div>
+      )}
+
+      {entries.length > 0 && stats.total > entries.length && (
+        <p className="text-sm text-muted-foreground mb-4">
+          Showing {entries.length.toLocaleString()} of {stats.total.toLocaleString()} entries.
+        </p>
       )}
 
       {entries.length === 0 ? (

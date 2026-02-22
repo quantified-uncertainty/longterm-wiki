@@ -310,6 +310,12 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
         signal: AbortSignal.timeout(15_000),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => '(no body)');
+        console.error(`SCRY ${table}: HTTP ${response.status} — ${errorText.slice(0, 200)}`);
+        continue;
+      }
+
       const data = await response.json() as ScryApiResponse;
 
       for (const row of data.rows ?? []) {
@@ -517,8 +523,11 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
 
   for (const hits of allHitArrays) {
     for (const hit of hits) {
-      // Normalize URL: strip trailing slash
-      const normalized = hit.url.replace(/\/$/, '');
+      // Normalize URL: strip trailing slash, www prefix, force https
+      const normalized = hit.url
+        .replace(/^http:\/\//, 'https://')
+        .replace(/^(https:\/\/)www\./, '$1')
+        .replace(/\/$/, '');
       const existing = urlToHits.get(normalized) ?? [];
       existing.push(hit);
       urlToHits.set(normalized, existing);

@@ -227,7 +227,16 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         if (options.skipCitationAudit) {
           log('citation-audit', 'Skipped (--skip-citation-audit)');
         } else {
-          auditResult = await citationAuditPhase(page, improvedContent!, research, options);
+          try {
+            auditResult = await citationAuditPhase(page, improvedContent!, research, options);
+          } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            if (options.citationGate) {
+              // In gate mode, an audit failure must block — not silently bypass
+              throw new Error(`Citation audit failed with --citation-gate: ${error.message}`);
+            }
+            log('citation-audit', `⚠ Citation audit failed: ${error.message} — continuing without audit`);
+          }
         }
         break;
       }

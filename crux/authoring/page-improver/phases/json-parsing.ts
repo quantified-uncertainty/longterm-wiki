@@ -33,8 +33,8 @@ export const ResearchResultSchema = z.object({
     url: z.string(),
     author: z.string().optional(),
     date: z.string().optional(),
-    facts: z.array(z.string()),
-    relevance: z.string(),
+    facts: z.array(z.string()).optional().default([]),
+    relevance: z.string().optional().default('unknown'),
   })),
   summary: z.string().optional(),
 }).passthrough();
@@ -74,6 +74,10 @@ export const AdversarialReviewResultSchema = z.object({
 /**
  * Parse and validate an LLM response against a Zod schema.
  * Returns the validated result or the fallback on failure.
+ *
+ * When validation fails, returns the fallback rather than casting the
+ * raw parsed object — the `as T` cast would defeat schema protection
+ * and allow malformed objects into downstream code.
  */
 export function parseAndValidate<T>(
   raw: string,
@@ -87,5 +91,5 @@ export function parseAndValidate<T>(
     return result.data;
   }
   log(phase, `Warning: ${phase} result failed schema validation: ${result.error.message.slice(0, 200)}`);
-  return parsed as T;
+  return fallback(raw, result.error.message);
 }

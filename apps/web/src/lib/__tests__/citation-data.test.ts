@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   computeCitationHealth,
   type CitationQuote,
 } from "../citation-data";
+import { isSafeUrl } from "../../components/wiki/CitationOverlay";
 
 function makeQuote(overrides: Partial<CitationQuote> = {}): CitationQuote {
   return {
@@ -118,5 +119,72 @@ describe("computeCitationHealth", () => {
     const health = computeCitationHealth(quotes);
     expect(health.accurate).toBe(1);
     expect(health.verified).toBe(0); // not double-counted
+  });
+});
+
+describe("getCitationQuotes", () => {
+  it("returns empty array when server returns null", async () => {
+    vi.resetModules();
+    vi.doMock("../wiki-server", () => ({
+      fetchFromWikiServer: vi.fn().mockResolvedValue(null),
+    }));
+    const mod = await import("../citation-data");
+    const result = await mod.getCitationQuotes("test-page");
+    expect(result).toEqual([]);
+  });
+
+  it("returns empty array when quotes field is missing", async () => {
+    vi.resetModules();
+    vi.doMock("../wiki-server", () => ({
+      fetchFromWikiServer: vi.fn().mockResolvedValue({}),
+    }));
+    const mod = await import("../citation-data");
+    const result = await mod.getCitationQuotes("test-page");
+    expect(result).toEqual([]);
+  });
+
+  it("filters out quotes without verification data", async () => {
+    vi.resetModules();
+    const mockQuotes = [
+      makeQuote({ footnote: 1, quoteVerified: true }), // has verification
+      makeQuote({ footnote: 2 }), // no verification data — should be filtered
+      makeQuote({ footnote: 3, accuracyVerdict: "accurate" }), // has accuracy
+    ];
+    vi.doMock("../wiki-server", () => ({
+      fetchFromWikiServer: vi.fn().mockResolvedValue({ quotes: mockQuotes }),
+    }));
+    const mod = await import("../citation-data");
+    const result = await mod.getCitationQuotes("test-page");
+    expect(result).toHaveLength(2);
+    expect(result[0].footnote).toBe(1);
+    expect(result[1].footnote).toBe(3);
+  });
+});
+
+describe("isSafeUrl", () => {
+  it("allows https URLs", () => {
+    expect(isSafeUrl("https://example.com")).toBe(true);
+    expect(isSafeUrl("https://arxiv.org/abs/2301.00001")).toBe(true);
+  });
+
+  it("allows http URLs", () => {
+    expect(isSafeUrl("http://example.com")).toBe(true);
+  });
+
+  it("rejects javascript: URLs", () => {
+    expect(isSafeUrl("javascript:alert(1)")).toBe(false);
+  });
+
+  it("rejects data: URLs", () => {
+    expect(isSafeUrl("data:text/html,<h1>hi</h1>")).toBe(false);
+  });
+
+  it("rejects invalid URLs", () => {
+    expect(isSafeUrl("not a url")).toBe(false);
+    expect(isSafeUrl("")).toBe(false);
+  });
+
+  it("rejects ftp: URLs", () => {
+    expect(isSafeUrl("ftp://example.com/file")).toBe(false);
   });
 });

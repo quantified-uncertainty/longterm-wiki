@@ -435,7 +435,7 @@ jobsRoute.post("/sweep", async (c) => {
     .where(
       and(
         sql`${jobs.status} IN ('claimed', 'running')`,
-        sql`${jobs.claimedAt} < now() - interval '${sql.raw(String(timeoutMinutes))} minutes'`
+        sql`${jobs.claimedAt} < now() - (${timeoutMinutes} * interval '1 minute')`
       )
     )
     .returning({ id: jobs.id, type: jobs.type });
