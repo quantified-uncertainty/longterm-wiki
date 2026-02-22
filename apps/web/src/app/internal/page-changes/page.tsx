@@ -31,6 +31,9 @@ interface ApiSession {
   cost: string | null;
   prUrl: string | null;
   pages: string[];
+  issuesJson: unknown;
+  learningsJson: unknown;
+  recommendationsJson: unknown;
 }
 
 // ── Data loading ─────────────────────────────────────────────────────────────
@@ -85,6 +88,9 @@ async function loadSessionsFromApi() {
         ...(s.model && { model: s.model }),
         ...(s.duration && { duration: s.duration }),
         ...(s.cost && { cost: s.cost }),
+        issues: Array.isArray(s.issuesJson) ? s.issuesJson.map(String) : [],
+        learnings: Array.isArray(s.learningsJson) ? s.learningsJson.map(String) : [],
+        recommendations: Array.isArray(s.recommendationsJson) ? s.recommendationsJson.map(String) : [],
         pages: s.pages.map((pageId) => {
           const meta = pageMap.get(pageId);
           return {

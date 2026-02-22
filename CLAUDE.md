@@ -93,7 +93,9 @@ pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
 pnpm crux review mark <id> --reviewer="name"  # Mark page as human-reviewed
 pnpm crux review list                         # List reviewed pages
 
-# Session log validation
+# Session log management
+pnpm crux sessions write "Title"             # Scaffold a session YAML (pre-fills date+branch)
+pnpm crux sessions write "Title" --pages=a,b --sync  # Write + sync to wiki-server immediately
 pnpm crux validate session-logs              # Check session log format/fields
 pnpm crux validate session-logs --ci         # JSON output for CI
 

@@ -23,6 +23,8 @@ const RETRYABLE_PATTERNS = [
   '529',
   '429',
   'rate_limit',
+  'UND_ERR_SOCKET',
+  'terminated',
 ];
 
 /** Retry an async fn with exponential backoff (2 s, 4 s, …). */
