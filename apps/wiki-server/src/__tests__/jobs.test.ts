@@ -101,6 +101,27 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [job];
   }
 
+  // ---- FAIL (atomic UPDATE with CASE WHEN, via pgClient.unsafe) ----
+  // params: [$1=error, $2=id]
+  if (q.includes("update") && q.includes('"jobs"') && q.includes("case when") && q.includes("max_retries")) {
+    const errorMsg = params[0] as string;
+    const jobId = params[1] as number;
+    const job = jobStore.find(
+      (j) => j.id === jobId && (j.status === "running" || j.status === "claimed")
+    );
+    if (!job) return [];
+    const newRetries = job.retries + 1;
+    const shouldRetry = newRetries < job.max_retries;
+    job.retries = newRetries;
+    job.status = shouldRetry ? "pending" : "failed";
+    job.error = errorMsg;
+    job.completed_at = shouldRetry ? null : new Date();
+    job.claimed_at = shouldRetry ? null : job.claimed_at;
+    job.started_at = shouldRetry ? null : job.started_at;
+    job.worker_id = shouldRetry ? null : job.worker_id;
+    return [job];
+  }
+
   // ---- UPDATE jobs SET (Drizzle query builder) ----
   if (q.includes("update") && q.includes('"jobs"') && q.includes("set")) {
     // Drizzle generates: UPDATE "jobs" SET "col1" = $1, "col2" = $2 WHERE ... RETURNING ...
