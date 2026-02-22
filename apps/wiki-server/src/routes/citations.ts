@@ -24,7 +24,7 @@ export const citationsRoute = new Hono();
 // ---- Constants ----
 
 const BROKEN_SCORE_THRESHOLD = 0.5;
-const MAX_PAGE_SIZE = 1000;
+const MAX_PAGE_SIZE = 5000;
 
 // ---- Schemas (from shared api-types) ----
 
