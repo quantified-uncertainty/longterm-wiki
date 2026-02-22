@@ -17,6 +17,7 @@
 import { createLogger } from '../lib/output.ts';
 import {
   createJob,
+  createJobBatch,
   listJobs,
   getJob,
   cancelJob,
@@ -25,6 +26,7 @@ import {
   type JobEntry,
 } from '../lib/wiki-server/jobs.ts';
 import { apiRequest, type ApiResult } from '../lib/wiki-server/client.ts';
+import { getRegisteredTypes } from '../lib/job-handlers/index.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 // ---------------------------------------------------------------------------
@@ -436,6 +438,177 @@ async function stats(_args: string[], options: CommandOptions): Promise<CommandR
   return { output, exitCode: 0 };
 }
 
+/**
+ * Submit a batch of page-improve or page-create jobs.
+ *
+ * Usage:
+ *   crux jobs batch improve <pageId1> <pageId2> ... [--tier=standard] [--batch-id=X]
+ *   crux jobs batch create "Title 1" "Title 2" ... [--tier=standard] [--batch-id=X]
+ */
+async function batch(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const subcommand = args[0]; // 'improve' or 'create'
+  const items = args.slice(1);
+
+  if (!subcommand || !['improve', 'create'].includes(subcommand)) {
+    return {
+      output: `${c.red}Usage: crux jobs batch <improve|create> <item1> [item2...] [--tier=X] [--batch-id=X]${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  if (items.length === 0) {
+    return {
+      output: `${c.red}Error: No items provided. Provide page IDs (improve) or titles (create).${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const tier = (options.tier as string) || (subcommand === 'improve' ? 'standard' : 'standard');
+  const batchId = (options.batchId as string) || `batch-${Date.now().toString(36)}`;
+  const prTitle = (options.prTitle as string) || `Batch ${subcommand}: ${items.length} pages`;
+
+  let output = '';
+  output += `${c.bold}Creating batch "${batchId}"${c.reset}\n`;
+  output += `  Type: ${subcommand === 'improve' ? 'page-improve' : 'page-create'}\n`;
+  output += `  Items: ${items.length}\n`;
+  output += `  Tier: ${tier}\n\n`;
+
+  // Create individual content jobs
+  const jobInputs = items.map((item, i) => ({
+    type: subcommand === 'improve' ? 'page-improve' : 'page-create',
+    params: subcommand === 'improve'
+      ? { pageId: item, tier, batchId, directions: options.directions as string || undefined }
+      : { title: item, tier, batchId },
+    priority: 5,
+    maxRetries: 2,
+  }));
+
+  const childJobIds: number[] = [];
+  const batchResult = await createJobBatch(jobInputs);
+
+  if (batchResult.ok) {
+    for (const job of batchResult.data) {
+      childJobIds.push(job.id);
+      output += `  ${c.green}✓${c.reset} Created job #${job.id} (${job.type})\n`;
+    }
+  } else {
+    // Fall back to individual creation
+    for (const input of jobInputs) {
+      const singleResult = await createJob(input);
+      if (singleResult.ok) {
+        childJobIds.push(singleResult.data.id);
+        output += `  ${c.green}✓${c.reset} Created job #${singleResult.data.id}\n`;
+      } else {
+        output += `  ${c.red}✗${c.reset} Failed to create job: ${singleResult.message}\n`;
+      }
+    }
+  }
+
+  if (childJobIds.length === 0) {
+    output += `\n${c.red}Error: No jobs were created.${c.reset}\n`;
+    return { output, exitCode: 1 };
+  }
+
+  // Create the batch-commit job
+  const commitResult = await createJob({
+    type: 'batch-commit',
+    params: {
+      batchId,
+      childJobIds,
+      prTitle,
+      prLabels: ['batch'],
+    },
+    priority: 1,
+    maxRetries: 5,
+  });
+
+  if (commitResult.ok) {
+    output += `\n  ${c.green}✓${c.reset} Created batch-commit job #${commitResult.data.id}\n`;
+  } else {
+    output += `\n  ${c.yellow}⚠${c.reset} Failed to create batch-commit job: ${commitResult.message}\n`;
+    output += `  You can create it manually:\n`;
+    output += `  ${c.dim}crux jobs create batch-commit --params='${JSON.stringify({ batchId, childJobIds, prTitle })}'${c.reset}\n`;
+  }
+
+  output += `\n${c.bold}Batch "${batchId}" created with ${childJobIds.length} content jobs.${c.reset}\n`;
+  output += `${c.dim}Jobs will be processed by workers. Monitor: crux jobs list --type=page-improve${c.reset}\n`;
+
+  if (options.json) {
+    return {
+      output: JSON.stringify({ batchId, childJobIds, commitJobId: commitResult.ok ? commitResult.data.id : null }),
+      exitCode: 0,
+    };
+  }
+
+  return { output, exitCode: 0 };
+}
+
+/**
+ * Run the worker inline (for local development/testing).
+ *
+ * Usage:
+ *   crux jobs worker [--type=X] [--max-jobs=N] [--poll] [--verbose]
+ */
+async function worker(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  // Delegate to the worker runner script
+  const { execFileSync } = await import('child_process');
+  const { join } = await import('path');
+
+  const workerArgs = [
+    '--import', 'tsx/esm', '--no-warnings',
+    join(import.meta.dirname ?? process.cwd(), '..', 'worker', 'run.ts'),
+  ];
+
+  if (options.type) workerArgs.push(`--type=${options.type}`);
+  if (options.maxJobs) workerArgs.push(`--max-jobs=${options.maxJobs}`);
+  if (options.poll) workerArgs.push('--poll');
+  if (options.verbose) workerArgs.push('--verbose');
+  if (options.pollInterval) workerArgs.push(`--poll-interval=${options.pollInterval}`);
+
+  try {
+    execFileSync('node', workerArgs, {
+      cwd: join(import.meta.dirname ?? process.cwd(), '..'),
+      stdio: 'inherit',
+      timeout: 60 * 60 * 1000, // 1 hour max
+    });
+
+    return { output: '', exitCode: 0 };
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err.message : String(err);
+    return {
+      output: `${c.red}Worker exited with error: ${error}${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+}
+
+/**
+ * Show registered job types.
+ */
+async function types(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const registered = getRegisteredTypes();
+
+  if (options.json) {
+    return { output: JSON.stringify(registered), exitCode: 0 };
+  }
+
+  let output = `${c.bold}Registered Job Types${c.reset}\n\n`;
+  for (const type of registered) {
+    output += `  ${c.green}•${c.reset} ${type}\n`;
+  }
+  output += `\n${c.dim}${registered.length} types registered. Workers can handle these job types.${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
@@ -450,6 +623,9 @@ export const commands = {
   sweep,
   ping,
   stats,
+  batch,
+  worker,
+  types,
 };
 
 export function getHelp(): string {
@@ -465,6 +641,9 @@ Commands:
   sweep           Trigger stale job cleanup
   ping            Create a ping job and wait for completion (smoke test)
   stats           Show aggregate job statistics
+  batch           Create a batch of content jobs with auto batch-commit
+  worker          Run the job worker locally
+  types           List registered job handler types
 
 Options:
   --status=X      Filter by status (pending, claimed, running, completed, failed, cancelled)
@@ -475,18 +654,40 @@ Options:
   --max-retries=N Max retry attempts (default: 3)
   --json          JSON output
 
+Batch Options:
+  --tier=X        Tier for content jobs (polish/standard/deep or budget/standard/premium)
+  --batch-id=X    Custom batch identifier
+  --pr-title=X    Custom PR title for batch commit
+  --directions=X  Improvement directions (for batch improve)
+
+Worker Options:
+  --max-jobs=N    Max jobs to process (default: 1)
+  --poll          Keep polling for new jobs
+  --poll-interval=N  Polling interval in ms (default: 30000)
+  --verbose       Verbose output
+
+Job Types:
+  ping              Smoke test (echoes worker info)
+  page-improve      Run content improve pipeline on a page
+  page-create       Run content create pipeline for a new page
+  batch-commit      Collect completed job results and create a PR
+  auto-update-digest  Run news digest and create page-improve jobs
+  citation-verify   Verify citations on a page
+
 Examples:
   crux jobs                                     List recent jobs
   crux jobs list --status=failed                List failed jobs
-  crux jobs list --type=citation-verify         List citation verify jobs
-  crux jobs create ping                         Create a ping test job
-  crux jobs create citation-verify --params='{"pageId":"ai-safety"}'
-                                                Create a citation verify job
-  crux jobs status 42                           Show details for job #42
-  crux jobs cancel 42                           Cancel job #42
-  crux jobs retry 42                            Retry failed job #42
-  crux jobs sweep                               Clean up stale jobs
-  crux jobs ping                                Smoke test: create ping + wait
+  crux jobs create page-improve --params='{"pageId":"ai-safety","tier":"polish"}'
+                                                Create a page improve job
+  crux jobs batch improve ai-safety miri --tier=polish
+                                                Batch improve two pages
+  crux jobs batch create "New Topic" "Another" --tier=budget
+                                                Batch create two pages
+  crux jobs create auto-update-digest --params='{"budget":30,"maxPages":5}'
+                                                Trigger auto-update via jobs
+  crux jobs worker --type=page-improve --verbose
+                                                Run worker locally for page-improve jobs
+  crux jobs types                               List registered job types
   crux jobs stats                               Show job statistics
 `;
 }
