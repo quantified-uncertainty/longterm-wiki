@@ -564,7 +564,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         url: fetched.url,
         title,
         content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
-        facts: [],
+        facts: undefined,
       });
       continue;
     }
