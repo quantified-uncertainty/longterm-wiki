@@ -347,6 +347,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
         { label: "Citation Content", href: "/internal/citation-content" },
         { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
+        { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
         { label: "Job Queue", href: "/internal/jobs" },
       ],
     },
