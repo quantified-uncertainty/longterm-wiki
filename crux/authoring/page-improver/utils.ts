@@ -69,7 +69,7 @@ export const TIERS: Record<string, TierConfig> = {
   deep: {
     name: 'Deep Research',
     cost: '$15-25',
-    phases: ['analyze', 'research-deep', 'improve', 'enrich', 'citation-audit', 'validate', 'adversarial-loop', 'review', 'gap-fill'],
+    phases: ['analyze', 'research-deep', 'improve', 'enrich', 'validate', 'adversarial-loop', 'review', 'gap-fill', 'citation-audit'],
     description: 'Full SCRY + web research, adversarial review + re-research loop, multi-phase improvement'
   }
 };
