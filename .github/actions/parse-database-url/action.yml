@@ -1,0 +1,48 @@
+name: Parse DATABASE_URL
+description: Parse a PostgreSQL DATABASE_URL into individual components
+
+inputs:
+  database_url:
+    description: "The DATABASE_URL to parse"
+    required: true
+
+outputs:
+  db-user:
+    description: "Database username"
+    value: ${{ steps.parse.outputs.db-user }}
+  db-pass:
+    description: "Database password"
+    value: ${{ steps.parse.outputs.db-pass }}
+  db-host:
+    description: "Database host"
+    value: ${{ steps.parse.outputs.db-host }}
+  db-port:
+    description: "Database port"
+    value: ${{ steps.parse.outputs.db-port }}
+  db-name:
+    description: "Database name"
+    value: ${{ steps.parse.outputs.db-name }}
+
+runs:
+  using: composite
+  steps:
+    - id: parse
+      shell: bash
+      env:
+        DATABASE_URL: ${{ inputs.database_url }}
+      run: |
+        if [ -z "$DATABASE_URL" ]; then
+          echo "::error::DATABASE_URL is empty"
+          exit 1
+        fi
+
+        PROTO="$(echo "$DATABASE_URL" | grep :// | sed -e 's,^\(.*://\).*,\1,g')"
+        URL="${DATABASE_URL/$PROTO/}"
+        USERPASS="$(echo "$URL" | cut -d@ -f1)"
+        HOSTPORT_DB="$(echo "$URL" | cut -d@ -f2)"
+
+        echo "db-user=$(echo "$USERPASS" | cut -d: -f1)" >> "$GITHUB_OUTPUT"
+        echo "db-pass=$(echo "$USERPASS" | cut -d: -f2)" >> "$GITHUB_OUTPUT"
+        echo "db-host=$(echo "$HOSTPORT_DB" | cut -d: -f1)" >> "$GITHUB_OUTPUT"
+        echo "db-port=$(echo "$HOSTPORT_DB" | cut -d: -f2 | cut -d/ -f1)" >> "$GITHUB_OUTPUT"
+        echo "db-name=$(echo "$HOSTPORT_DB" | cut -d/ -f2 | cut -d? -f1)" >> "$GITHUB_OUTPUT"

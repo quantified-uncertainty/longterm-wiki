@@ -48,37 +48,25 @@ jobs:
           run-id: ${{ github.event.inputs.backup_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Parse DATABASE_URL
+        id: db
+        uses: ./.github/actions/parse-database-url
+        with:
+          database_url: ${{ secrets.DATABASE_URL }}
+
       - name: Create pre-restore safety backup
         id: safety-backup
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "::error::DATABASE_URL secret is not set"
-            exit 1
-          fi
-
-          # Parse DATABASE_URL
-          PROTO="$(echo "$DATABASE_URL" | grep :// | sed -e 's,^\(.*://\).*,\1,g')"
-          URL="${DATABASE_URL/$PROTO/}"
-          USERPASS="$(echo "$URL" | cut -d@ -f1)"
-          HOSTPORT_DB="$(echo "$URL" | cut -d@ -f2)"
-          DB_USER="$(echo "$USERPASS" | cut -d: -f1)"
-          DB_PASS="$(echo "$USERPASS" | cut -d: -f2)"
-          DB_HOST="$(echo "$HOSTPORT_DB" | cut -d: -f1)"
-          DB_PORT="$(echo "$HOSTPORT_DB" | cut -d: -f2 | cut -d/ -f1)"
-          DB_NAME="$(echo "$HOSTPORT_DB" | cut -d/ -f2 | cut -d? -f1)"
-
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
           SAFETY_FILENAME="longterm-wiki-pre-restore-${TIMESTAMP}.sql.gz"
           echo "safety_filename=${SAFETY_FILENAME}" >> "$GITHUB_OUTPUT"
 
           echo "Creating pre-restore safety backup: ${SAFETY_FILENAME}"
-          PGPASSWORD="${DB_PASS}" pg_dump \
-            -h "${DB_HOST}" \
-            -p "${DB_PORT}" \
-            -U "${DB_USER}" \
-            -d "${DB_NAME}" \
+          PGPASSWORD="${{ steps.db.outputs.db-pass }}" pg_dump \
+            -h "${{ steps.db.outputs.db-host }}" \
+            -p "${{ steps.db.outputs.db-port }}" \
+            -U "${{ steps.db.outputs.db-user }}" \
+            -d "${{ steps.db.outputs.db-name }}" \
             --no-owner \
             --no-privileges \
             | gzip > "${SAFETY_FILENAME}"
@@ -94,28 +82,15 @@ jobs:
           retention-days: 7
 
       - name: Restore database
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          # Parse DATABASE_URL
-          PROTO="$(echo "$DATABASE_URL" | grep :// | sed -e 's,^\(.*://\).*,\1,g')"
-          URL="${DATABASE_URL/$PROTO/}"
-          USERPASS="$(echo "$URL" | cut -d@ -f1)"
-          HOSTPORT_DB="$(echo "$URL" | cut -d@ -f2)"
-          DB_USER="$(echo "$USERPASS" | cut -d: -f1)"
-          DB_PASS="$(echo "$USERPASS" | cut -d: -f2)"
-          DB_HOST="$(echo "$HOSTPORT_DB" | cut -d: -f1)"
-          DB_PORT="$(echo "$HOSTPORT_DB" | cut -d: -f2 | cut -d/ -f1)"
-          DB_NAME="$(echo "$HOSTPORT_DB" | cut -d/ -f2 | cut -d? -f1)"
-
           BACKUP_FILE="${{ github.event.inputs.backup_filename }}"
           echo "Restoring from: ${BACKUP_FILE}"
 
-          gunzip -c "${BACKUP_FILE}" | PGPASSWORD="${DB_PASS}" psql \
-            -h "${DB_HOST}" \
-            -p "${DB_PORT}" \
-            -U "${DB_USER}" \
-            -d "${DB_NAME}" \
+          gunzip -c "${BACKUP_FILE}" | PGPASSWORD="${{ steps.db.outputs.db-pass }}" psql \
+            -h "${{ steps.db.outputs.db-host }}" \
+            -p "${{ steps.db.outputs.db-port }}" \
+            -U "${{ steps.db.outputs.db-user }}" \
+            -d "${{ steps.db.outputs.db-name }}" \
             --single-transaction \
             --set ON_ERROR_STOP=on
 
