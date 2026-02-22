@@ -636,6 +636,37 @@ describe('extractModel', () => {
     const body = '## Problem\n\nSome problem.\n\n## Recommended Model\n\n**Opus**\n\nMore text.';
     expect(extractModel('Issue', body)).toBe('opus');
   });
+
+  // Label-based extraction
+  it('extracts model from model:haiku label', () => {
+    expect(extractModel('Some issue', '', ['tooling', 'model:haiku'])).toBe('haiku');
+  });
+
+  it('extracts model from model:sonnet label', () => {
+    expect(extractModel('Some issue', '', ['model:sonnet'])).toBe('sonnet');
+  });
+
+  it('extracts model from model:opus label (case-insensitive)', () => {
+    expect(extractModel('Some issue', '', ['model:Opus'])).toBe('opus');
+  });
+
+  it('label takes precedence over body section', () => {
+    const body = '## Recommended Model\n\n**Sonnet**';
+    expect(extractModel('Issue', body, ['model:haiku'])).toBe('haiku');
+  });
+
+  it('label takes precedence over title suffix', () => {
+    expect(extractModel('Fix bug [sonnet]', '', ['model:opus'])).toBe('opus');
+  });
+
+  it('falls back to body when no model label present', () => {
+    const body = '## Recommended Model\n\n**Sonnet**';
+    expect(extractModel('Issue', body, ['tooling', 'bug'])).toBe('sonnet');
+  });
+
+  it('ignores non-model labels', () => {
+    expect(extractModel('Issue', '', ['tooling', 'bug', 'deployment'])).toBeNull();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -727,6 +758,20 @@ describe('checkIssueSections', () => {
       '- [ ] Bug fixed',
     ].join('\n');
     const missing = checkIssueSections('Fix login bug [haiku]', body);
+    expect(missing.some(m => m.includes('Recommended Model'))).toBe(false);
+  });
+
+  it('accepts model:X label as model recommendation', () => {
+    const body = [
+      '## Problem',
+      '',
+      'Fix the bug that happens when user logs in.',
+      '',
+      '## Acceptance Criteria',
+      '',
+      '- [ ] Bug fixed',
+    ].join('\n');
+    const missing = checkIssueSections('Fix login bug', body, ['model:haiku']);
     expect(missing.some(m => m.includes('Recommended Model'))).toBe(false);
   });
 

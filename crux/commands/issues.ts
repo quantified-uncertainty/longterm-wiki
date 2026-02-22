@@ -117,12 +117,19 @@ const MODEL_NAMES = ['haiku', 'sonnet', 'opus'] as const;
 type ModelName = (typeof MODEL_NAMES)[number];
 
 /**
- * Extract recommended model from an issue's title or body.
+ * Extract recommended model from labels, issue title, or body (in priority order).
  * Looks for:
- *   - Body: "**Haiku**", "**Sonnet**", "**Opus**" (as the lead word in Recommended Model section)
- *   - Title: [haiku], [sonnet], [opus] suffix
+ *   - Labels: model:haiku, model:sonnet, model:opus (primary — machine-readable)
+ *   - Body: "## Recommended Model" section header + model name (legacy)
+ *   - Title: [haiku], [sonnet], [opus] suffix (legacy)
  */
-function extractModel(title: string, body: string): ModelName | null {
+function extractModel(title: string, body: string, labels: string[] = []): ModelName | null {
+  // Check labels first: model:haiku, model:sonnet, model:opus
+  for (const label of labels) {
+    const m = label.match(/^model:(haiku|sonnet|opus)$/i);
+    if (m) return m[1].toLowerCase() as ModelName;
+  }
+
   // Check body: look for "## Recommended Model" section header + model name
   // Handles blank lines between header and value (e.g., "## Recommended Model\n\n**Sonnet**...")
   const sectionMatch = body.match(/##\s+recommended\s+model[^\n]*\n[\s\S]{0,10}?(haiku|sonnet|opus)/i);
@@ -139,7 +146,7 @@ function extractModel(title: string, body: string): ModelName | null {
  * Check whether an issue body has required sections for a well-formatted issue.
  * Returns a list of missing section names.
  */
-function checkIssueSections(title: string, body: string): string[] {
+function checkIssueSections(title: string, body: string, labels: string[] = []): string[] {
   const missing: string[] = [];
 
   // Must have a non-trivial body
@@ -159,9 +166,9 @@ function checkIssueSections(title: string, body: string): string[] {
     /- \[ \]/.test(body);
   if (!hasCriteria) missing.push('Acceptance Criteria (## section or - [ ] checkboxes)');
 
-  // Must have model recommendation
-  const hasModel = extractModel(title, body) !== null;
-  if (!hasModel) missing.push('Recommended Model (## section or [haiku/sonnet/opus] in title)');
+  // Must have model recommendation (label, body section, or title tag)
+  const hasModel = extractModel(title, body, labels) !== null;
+  if (!hasModel) missing.push('Recommended Model (model:haiku/sonnet/opus label, ## section, or [model] in title)');
 
   return missing;
 }
@@ -175,6 +182,19 @@ const LOW_EFFORT_LABELS = new Set(['effort:low', 'small', 'size:xs', 'size:s', '
 
 /** Label for human-curated "well-scoped for AI" issues */
 const CLAUDE_READY_LABEL = 'claude-ready';
+
+/** Labels that specify the recommended AI model */
+const MODEL_LABEL_PREFIX = 'model:';
+const MODEL_LABEL_COLORS: Record<ModelName, string> = {
+  haiku: '1d76db',   // blue
+  sonnet: 'e4e669',  // yellow
+  opus: '7057ff',    // purple
+};
+const MODEL_LABEL_DESCS: Record<ModelName, string> = {
+  haiku: 'Recommended for Claude Haiku (fast, cheap)',
+  sonnet: 'Recommended for Claude Sonnet (balanced)',
+  opus: 'Recommended for Claude Opus (complex tasks)',
+};
 
 /** Priority label → base score */
 const PRIORITY_SCORES: Record<string, number> = {
@@ -290,6 +310,36 @@ async function ensureLabelExists(): Promise<void> {
   }
 }
 
+/** Ensure model:X GitHub label exists, then apply it to an issue (replacing any existing model label). */
+async function applyModelLabel(issueNum: number, model: ModelName, existingLabels: string[]): Promise<void> {
+  const labelName = `${MODEL_LABEL_PREFIX}${model}`;
+
+  // Ensure label exists in repo
+  try {
+    await githubApi<GitHubLabelResponse>(`/repos/${REPO}/labels/${encodeURIComponent(labelName)}`);
+  } catch {
+    await githubApi(`/repos/${REPO}/labels`, {
+      method: 'POST',
+      body: { name: labelName, color: MODEL_LABEL_COLORS[model], description: MODEL_LABEL_DESCS[model] },
+    });
+  }
+
+  // Remove any existing model:X labels on this issue
+  for (const l of existingLabels) {
+    if (l.startsWith(MODEL_LABEL_PREFIX) && l !== labelName) {
+      await githubApi(`/repos/${REPO}/issues/${issueNum}/labels/${encodeURIComponent(l)}`, { method: 'DELETE' });
+    }
+  }
+
+  // Apply the new label (no-op if already present)
+  if (!existingLabels.includes(labelName)) {
+    await githubApi(`/repos/${REPO}/issues/${issueNum}/labels`, {
+      method: 'POST',
+      body: { labels: [labelName] },
+    });
+  }
+}
+
 async function fetchOpenIssues(): Promise<RankedIssue[]> {
   const data = await githubApi<GitHubIssueResponse[]>(
     `/repos/${REPO}/issues?state=open&per_page=100&sort=created&direction=asc`
@@ -316,8 +366,8 @@ async function fetchOpenIssues(): Promise<RankedIssue[]> {
         scoreBreakdown: breakdown,
         inProgress: labels.includes(CLAUDE_WORKING_LABEL),
         blocked: isBlocked(labels, body),
-        recommendedModel: extractModel(i.title, body),
-        missingSections: checkIssueSections(i.title, body),
+        recommendedModel: extractModel(i.title, body, labels),
+        missingSections: checkIssueSections(i.title, body, labels),
       };
     })
     .filter(i => !i.labels.some(l => SKIP_LABELS.has(l)));
@@ -356,7 +406,7 @@ function formatIssueRow(issue: RankedIssue, c: Colors, showScores = false): stri
   const blockedMark = issue.blocked ? `${c.red}[blocked]${c.reset} ` : '';
   const claudeReadyMark = issue.labels.includes(CLAUDE_READY_LABEL) ? `${c.green}[claude-ready]${c.reset} ` : '';
   const labelStr = issue.labels
-    .filter(l => l !== CLAUDE_WORKING_LABEL && l !== CLAUDE_READY_LABEL)
+    .filter(l => l !== CLAUDE_WORKING_LABEL && l !== CLAUDE_READY_LABEL && !l.startsWith(MODEL_LABEL_PREFIX))
     .map(l => `${c.dim}${l}${c.reset}`)
     .join(' ');
 
@@ -636,11 +686,18 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     },
   });
 
+  // Apply model label if --model was specified
+  if (options.model) {
+    const modelName = (options.model as string).toLowerCase() as ModelName;
+    await applyModelLabel(issue.number, modelName, labels);
+  }
+
   let output = '';
   output += `${c.green}✓${c.reset} Created issue #${issue.number}: ${issue.title}\n`;
   output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
-  if (labels.length > 0) {
-    output += `  Labels: ${labels.join(', ')}\n`;
+  const appliedLabels = options.model ? [...labels, `${MODEL_LABEL_PREFIX}${(options.model as string).toLowerCase()}`] : labels;
+  if (appliedLabels.length > 0) {
+    output += `  Labels: ${appliedLabels.join(', ')}\n`;
   }
   if (!body) {
     output += `  ${c.yellow}⚠ No body provided — consider adding --problem, --model, and --criteria flags${c.reset}\n`;
@@ -1034,10 +1091,24 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
     body: { body: combinedBody },
   });
 
-  const remaining = checkIssueSections(issue.title, combinedBody);
+  // Apply model label if --model was specified
+  const existingLabels = (issue.labels || []).map((l: { name: string }) => l.name);
+  if (options.model) {
+    const modelName = (options.model as string).toLowerCase() as ModelName;
+    await applyModelLabel(issueNum, modelName, existingLabels);
+  }
+
+  const allLabels = options.model
+    ? [...existingLabels.filter(l => !l.startsWith(MODEL_LABEL_PREFIX)), `${MODEL_LABEL_PREFIX}${(options.model as string).toLowerCase()}`]
+    : existingLabels;
+
+  const remaining = checkIssueSections(issue.title, combinedBody, allLabels);
 
   let output = `${c.green}✓${c.reset} Updated body for issue #${issueNum}: ${issue.title}\n`;
   output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
+  if (options.model) {
+    output += `  ${c.green}✓${c.reset} Applied label: ${MODEL_LABEL_PREFIX}${(options.model as string).toLowerCase()}\n`;
+  }
   if (remaining.length === 0) {
     output += `  ${c.green}✓ Issue now has all required sections.${c.reset}\n`;
   } else {
@@ -1085,8 +1156,8 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   for (const issue of issuesToCheck) {
-    const missing = checkIssueSections(issue.title, issue.body);
-    const model = extractModel(issue.title, issue.body);
+    const missing = checkIssueSections(issue.title, issue.body, issue.labels);
+    const model = extractModel(issue.title, issue.body, issue.labels);
 
     if (missing.length === 0) {
       passCount++;
