@@ -207,6 +207,17 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         improvedContent = await improveSectionsPhase(
           page, analysis!, research || { sources: [] }, directions, options,
         );
+        // Warn about unverified citations in tiers without research
+        if (tier === 'polish' && !research?.sources?.length) {
+          const footnoteCount = new Set(improvedContent.match(FOOTNOTE_REF_RE) || []).size;
+          if (footnoteCount > 0) {
+            log('improve-sections', `⚠ ${footnoteCount} footnote citations added without web research — citations are LLM-generated and should be verified`);
+          }
+        }
+        // Extra hallucination warnings for person/org pages
+        if (page.path.includes('/people/') || page.path.includes('/organizations/')) {
+          logBiographicalWarnings(improvedContent, page, tier);
+        }
         break;
 
       case 'enrich': {
