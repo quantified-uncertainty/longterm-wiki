@@ -227,7 +227,12 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
         if (options.skipCitationAudit) {
           log('citation-audit', 'Skipped (--skip-citation-audit)');
         } else {
-          auditResult = await citationAuditPhase(page, improvedContent!, research, options);
+          try {
+            auditResult = await citationAuditPhase(page, improvedContent!, research, options);
+          } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            log('citation-audit', `⚠ Citation audit failed: ${error.message} — continuing without audit`);
+          }
         }
         break;
       }
