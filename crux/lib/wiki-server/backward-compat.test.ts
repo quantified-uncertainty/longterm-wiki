@@ -86,6 +86,14 @@ describe('wiki-server-client barrel exports', () => {
     expect(typeof client.getFactStats).toBe('function');
   });
 
+  it('exports page query functions', () => {
+    expect(typeof client.searchPages).toBe('function');
+    expect(typeof client.getPage).toBe('function');
+    expect(typeof client.getRelatedPages).toBe('function');
+    expect(typeof client.getBacklinks).toBe('function');
+    expect(typeof client.getCitationQuotes).toBe('function');
+  });
+
   it('exports ApiResult utilities', () => {
     expect(typeof client.apiOk).toBe('function');
     expect(typeof client.apiErr).toBe('function');

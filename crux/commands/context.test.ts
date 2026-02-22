@@ -14,7 +14,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the wiki-server client before importing.
-// getEntity, searchEntities, getFactsByEntity are thin wrappers around apiRequest,
+// getEntity, searchEntities, getFactsByEntity, searchPages, getPage, getRelatedPages,
+// getBacklinks, and getCitationQuotes are all thin wrappers around apiRequest,
 // so mocking apiRequest here intercepts all their calls too.
 vi.mock('../lib/wiki-server/client.ts', () => ({
   apiRequest: vi.fn(),

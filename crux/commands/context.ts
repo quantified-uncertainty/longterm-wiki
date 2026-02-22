@@ -22,11 +22,24 @@ import { writeFileSync, mkdirSync, readdirSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { createLogger } from '../lib/output.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
 import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
 import type { EntityEntry, EntitySearchResult } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
 import type { FactEntry, FactsByEntityResult } from '../lib/wiki-server/facts.ts';
+import {
+  searchPages,
+  getPage,
+  getRelatedPages,
+  getBacklinks,
+  getCitationQuotes,
+} from '../lib/wiki-server/pages.ts';
+import type {
+  PageSearchResult,
+  PageDetail,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+} from '../lib/wiki-server/pages.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
@@ -44,7 +57,6 @@ import type {
 // ---------------------------------------------------------------------------
 
 const DEFAULT_OUTPUT = join(PROJECT_ROOT, '.claude/wip-context.md');
-
 
 // ---------------------------------------------------------------------------
 // Exported helper functions (also tested by context.test.ts)
@@ -337,16 +349,10 @@ async function forPage(
 
   // Fetch all data in parallel
   const [pageResult, relatedResult, backlinksResult, citationsResult] = await Promise.all([
-    apiRequest<PageDetail>('GET', `/api/pages/${encodeURIComponent(pageId)}`),
-    apiRequest<RelatedResult>('GET', `/api/links/related/${encodeURIComponent(pageId)}?limit=15`),
-    apiRequest<BacklinksResult>(
-      'GET',
-      `/api/links/backlinks/${encodeURIComponent(pageId)}?limit=10`,
-    ),
-    apiRequest<CitationQuotesResult>(
-      'GET',
-      `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=20`,
-    ),
+    getPage(pageId),
+    getRelatedPages(pageId, 15),
+    getBacklinks(pageId, 10),
+    getCitationQuotes(pageId, 20),
   ]);
 
   if (!pageResult.ok) {
@@ -442,10 +448,7 @@ async function forEntity(
   const [entityResult, factsResult, pageSearchResult] = await Promise.all([
     getEntity(entityId),
     getFactsByEntity(entityId, 20),
-    apiRequest<PageSearchResult>(
-      'GET',
-      `/api/pages/search?q=${encodeURIComponent(entityId)}&limit=10`,
-    ),
+    searchPages(entityId, 10),
   ]);
 
   if (!entityResult.ok) {
@@ -558,10 +561,7 @@ async function forTopic(
 
   // Search pages and entities in parallel
   const [pageSearchResult, entitySearchResult] = await Promise.all([
-    apiRequest<PageSearchResult>(
-      'GET',
-      `/api/pages/search?q=${encodeURIComponent(topic)}&limit=${limit}`,
-    ),
+    searchPages(topic, limit),
     searchEntities(topic, 8),
   ]);
 
@@ -660,10 +660,7 @@ async function forIssue(
   const searchQuery = issue.title;
 
   const [pageSearchResult, entitySearchResult] = await Promise.all([
-    apiRequest<PageSearchResult>(
-      'GET',
-      `/api/pages/search?q=${encodeURIComponent(searchQuery)}&limit=10`,
-    ),
+    searchPages(searchQuery, 10),
     searchEntities(searchQuery, 6),
   ]);
 

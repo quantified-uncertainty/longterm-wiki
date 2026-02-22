@@ -34,6 +34,14 @@ export type { RiskSnapshot } from './risk.ts';
 export type { UpsertSummaryItem } from './summaries.ts';
 export type { InsertClaimItem } from './claims.ts';
 export type { PageLinkItem } from './links.ts';
+export type {
+  PageSearchResult,
+  PageDetail,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+} from './pages.ts';
 export type { UpsertResourceItem } from './resources.ts';
 export type { SyncEntityItem, EntityEntry } from './entities.ts';
 export type {
@@ -117,6 +125,15 @@ export {
 
 // Page Links
 export { syncPageLinks } from './links.ts';
+
+// Pages
+export {
+  searchPages,
+  getPage,
+  getRelatedPages,
+  getBacklinks,
+  getCitationQuotes,
+} from './pages.ts';
 
 // Resources
 export { upsertResource } from './resources.ts';

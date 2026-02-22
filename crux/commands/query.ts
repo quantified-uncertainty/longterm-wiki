@@ -27,14 +27,13 @@ import { createLogger } from '../lib/output.ts';
 import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
-import type {
-  PageDetail,
-  PageSearchResult,
-  RelatedResult,
-  BacklinksResult,
-  CitationQuote,
-  CitationQuotesResult,
-} from '../lib/wiki-server/page-types.ts';
+import {
+  searchPages,
+  getPage,
+  getRelatedPages,
+  getBacklinks,
+  getCitationQuotes,
+} from '../lib/wiki-server/pages.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -62,10 +61,7 @@ export async function search(args: string[], options: Record<string, unknown>): 
   }
 
   const limit = parseIntOpt(options.limit, 10);
-  const result = await apiRequest<PageSearchResult>(
-    'GET',
-    `/api/pages/search?q=${encodeURIComponent(query)}&limit=${limit}`,
-  );
+  const result = await searchPages(query, limit);
 
   if (!result.ok) return serverUnavailableError(log, result);
 
@@ -245,10 +241,7 @@ export async function related(args: string[], options: Record<string, unknown>):
   }
 
   const limit = parseIntOpt(options.limit, 15);
-  const result = await apiRequest<RelatedResult>(
-    'GET',
-    `/api/links/related/${encodeURIComponent(pageId)}?limit=${limit}`,
-  );
+  const result = await getRelatedPages(pageId, limit);
 
   if (!result.ok) return serverUnavailableError(log, result);
 
@@ -291,10 +284,7 @@ export async function backlinks(args: string[], options: Record<string, unknown>
   }
 
   const limit = parseIntOpt(options.limit, 20);
-  const result = await apiRequest<BacklinksResult>(
-    'GET',
-    `/api/links/backlinks/${encodeURIComponent(pageId)}?limit=${limit}`,
-  );
+  const result = await getBacklinks(pageId, limit);
 
   if (!result.ok) return serverUnavailableError(log, result);
 
@@ -336,10 +326,7 @@ export async function page(args: string[], options: Record<string, unknown>): Pr
     return { output: `${c.red}Error: page ID required. Usage: crux query page <page-id>${c.reset}`, exitCode: 1 };
   }
 
-  const result = await apiRequest<PageDetail>(
-    'GET',
-    `/api/pages/${encodeURIComponent(pageId)}`,
-  );
+  const result = await getPage(pageId);
 
   if (!result.ok) {
     if (result.error === 'bad_request') {
@@ -571,10 +558,7 @@ export async function citations(args: string[], options: Record<string, unknown>
     };
   }
 
-  const result = await apiRequest<CitationQuotesResult>(
-    'GET',
-    `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=${limit}`,
-  );
+  const result = await getCitationQuotes(pageId, limit);
 
   if (!result.ok) return serverUnavailableError(log, result);
 
