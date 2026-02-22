@@ -543,6 +543,13 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
       contentType: contentTypeToMime(contentType),
       pageTitle: title,
       fullHtml: null,
+      fullText: content,
+    });
+  } catch {
+    // DB unavailable — fine, proceed without cache
+  }
+}
+
 async function loadFromPostgres(
   url: string,
   maxAgeMs: number = PG_CACHE_TTL_MS,
