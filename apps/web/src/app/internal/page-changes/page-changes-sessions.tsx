@@ -59,11 +59,47 @@ function ModelBadge({ model }: { model: string }) {
   );
 }
 
+function InsightsList({
+  label,
+  items,
+  color,
+}: {
+  label: string;
+  items: string[];
+  color: "amber" | "sky" | "emerald";
+}) {
+  const colorMap = {
+    amber: "text-amber-600 dark:text-amber-400",
+    sky: "text-sky-600 dark:text-sky-400",
+    emerald: "text-emerald-600 dark:text-emerald-400",
+  };
+  return (
+    <div>
+      <span className={`text-[10px] font-semibold uppercase tracking-wide ${colorMap[color]} mr-1`}>
+        {label}:
+      </span>
+      <ul className="mt-0.5 space-y-0.5">
+        {items.map((item, i) => (
+          <li key={i} className="text-[11px] text-muted-foreground leading-relaxed flex gap-1">
+            <span className="shrink-0 mt-0.5 text-muted-foreground/40">·</span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function SessionRow({ session }: { session: PageChangesSession }) {
   const branchShort = session.branch.replace("claude/", "");
   const maxVisiblePages = 8;
   const visiblePages = session.pages.slice(0, maxVisiblePages);
   const hiddenCount = session.pages.length - maxVisiblePages;
+
+  const hasInsights =
+    (session.issues?.length ?? 0) > 0 ||
+    (session.learnings?.length ?? 0) > 0 ||
+    (session.recommendations?.length ?? 0) > 0;
 
   return (
     <div className="py-3 flex flex-col gap-1.5">
@@ -132,6 +168,35 @@ function SessionRow({ session }: { session: PageChangesSession }) {
         </div>
       )}
 
+      {/* Issues / Learnings / Recommendations — collapsible */}
+      {hasInsights && (
+        <details className="group">
+          <summary className="cursor-pointer list-none flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors w-fit select-none">
+            <span className="inline-block transition-transform group-open:rotate-90">▶</span>
+            <span>
+              {[
+                session.issues?.length ? `${session.issues.length} issue${session.issues.length !== 1 ? "s" : ""}` : null,
+                session.learnings?.length ? `${session.learnings.length} learning${session.learnings.length !== 1 ? "s" : ""}` : null,
+                session.recommendations?.length ? `${session.recommendations.length} recommendation${session.recommendations.length !== 1 ? "s" : ""}` : null,
+              ]
+                .filter(Boolean)
+                .join(", ")}
+            </span>
+          </summary>
+          <div className="mt-1.5 pl-3 border-l border-border/50 flex flex-col gap-2">
+            {session.issues && session.issues.length > 0 && (
+              <InsightsList label="Issues" items={session.issues} color="amber" />
+            )}
+            {session.learnings && session.learnings.length > 0 && (
+              <InsightsList label="Learnings" items={session.learnings} color="sky" />
+            )}
+            {session.recommendations && session.recommendations.length > 0 && (
+              <InsightsList label="Recommendations" items={session.recommendations} color="emerald" />
+            )}
+          </div>
+        </details>
+      )}
+
       {/* Branch (collapsed, muted) */}
       <div className="text-[10px] text-muted-foreground/50 font-mono">
         {branchShort}
@@ -157,7 +222,10 @@ export function PageChangesSessions({
         s.sessionTitle?.toLowerCase().includes(q) ||
         s.summary?.toLowerCase().includes(q) ||
         s.pages.some((p) => p.pageTitle?.toLowerCase().includes(q)) ||
-        s.branch?.toLowerCase().includes(q)
+        s.branch?.toLowerCase().includes(q) ||
+        s.issues?.some((item) => item.toLowerCase().includes(q)) ||
+        s.learnings?.some((item) => item.toLowerCase().includes(q)) ||
+        s.recommendations?.some((item) => item.toLowerCase().includes(q))
     );
   }, [sessions, query]);
 

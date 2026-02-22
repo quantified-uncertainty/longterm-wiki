@@ -684,6 +684,9 @@ export interface PageChangesSession {
   model?: string;
   duration?: string;
   cost?: string;
+  issues?: string[];
+  learnings?: string[];
+  recommendations?: string[];
   pages: PageChangePageInfo[];
 }
 
