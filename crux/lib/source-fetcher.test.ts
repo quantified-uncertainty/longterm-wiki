@@ -947,7 +947,7 @@ describe('PostgreSQL write path', () => {
     getByUrlMock.mockReturnValueOnce({
       full_text: 'Content from SQLite fallback.',
       page_title: 'SQLite Title',
-      fetched_at: '2025-01-01T00:00:00.000Z',
+      fetched_at: new Date().toISOString(),
     });
 
     const fetchMock = vi.fn();
