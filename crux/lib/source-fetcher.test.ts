@@ -1058,8 +1058,8 @@ const fetchMock = vi.fn();
   it('rejects stale PostgreSQL cache entries beyond TTL', async () => {
     const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
     const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
-    // 8 days ago — beyond the 7-day TTL
-    const staleDate = new Date(Date.now() - 8 * 24 * 3600_000).toISOString();
+    // 31 days ago — beyond the 30-day PG cache TTL
+    const staleDate = new Date(Date.now() - 31 * 24 * 3600_000).toISOString();
     getMock.mockResolvedValueOnce({
       ok: true,
       data: {
