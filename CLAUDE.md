@@ -65,8 +65,8 @@ pnpm crux issues next            # Show next highest-priority issue to work on
 pnpm crux issues lint            # Check all issues for formatting problems
 pnpm crux issues lint <N>        # Lint a single issue
 pnpm crux issues create "title" --label=tooling \
-  --problem="..." --model=sonnet \
-  --criteria="item1|item2" --cost="~$2-4"  # File a structured issue
+  --problem="..." --model=sonnet \          # --model is REQUIRED
+  --criteria="item1|item2" --cost="~$2-4"  # --criteria is REQUIRED
 pnpm crux issues update-body <N> --model=sonnet --problem="..." --criteria="a|b"
 pnpm crux issues start <N>       # Signal start: comment + add claude-working label
 pnpm crux issues done <N>        # Signal completion: comment + remove label

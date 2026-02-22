@@ -70,6 +70,7 @@ interface CommandOptions {
   pr?: string;
   limit?: string;
   scores?: boolean;
+  draft?: boolean;
   // create options
   model?: string;
   problem?: string;
@@ -638,7 +639,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const title = args[0];
   if (!title) {
     return {
-      output: `${c.red}Usage: crux issues create <title> [--label=X,Y] [--body="..."] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
+      output: `${c.red}Usage: crux issues create <title> --model=haiku|sonnet|opus --criteria="item1|item2" [--label=X,Y] [--problem="..."] [--fix="..."] [--depends=N,M] [--cost="~$2-4"] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -653,6 +654,22 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
       output: `${c.red}Invalid --model value: "${options.model}". Must be one of: ${MODEL_NAMES.join(', ')}${c.reset}\n`,
       exitCode: 1,
     };
+  }
+
+  // Require --model and --criteria unless --draft or raw --body is used
+  if (!options.draft && !options.body) {
+    const missingFlags: string[] = [];
+    if (!options.model) missingFlags.push('--model=haiku|sonnet|opus');
+    if (!options.criteria) missingFlags.push('--criteria="item1|item2"');
+    if (missingFlags.length > 0) {
+      return {
+        output:
+          `${c.red}Missing required flag(s): ${missingFlags.join(', ')}${c.reset}\n` +
+          `${c.dim}These flags are required to ensure issues pass formatting checks.\n` +
+          `Use --draft to skip this validation for WIP issues.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
   }
 
   // Use structured template if any structured args are provided, otherwise fall back to --body
@@ -1229,9 +1246,18 @@ Options (list/next):
   --scores            Show score breakdown + formatting warnings per issue
   --json              JSON output
 
-Options (create/update-body):
-  --label=X,Y         Comma-separated labels to apply (for 'create')
-  --body="..."        Raw body text (overrides structured template)
+Options (create):
+  --label=X,Y         Comma-separated labels to apply
+  --body="..."        Raw freeform body (bypasses --model/--criteria requirement)
+  --problem="..."     Problem/background description (## Problem section)
+  --fix="..."         Proposed fix or approach (## Proposed Fix section)
+  --depends=N,M       Comma-separated dependent issue numbers
+  --criteria="a|b|c"  Pipe-separated acceptance criteria items (REQUIRED)
+  --model=haiku|sonnet|opus  Recommended model for this issue (REQUIRED)
+  --cost="~$2-4"      Estimated AI cost
+  --draft             Skip --model/--criteria validation (for WIP issues)
+
+Options (update-body):
   --problem="..."     Problem/background description (## Problem section)
   --fix="..."         Proposed fix or approach (## Proposed Fix section)
   --depends=N,M       Comma-separated dependent issue numbers
