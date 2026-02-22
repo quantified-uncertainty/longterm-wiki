@@ -34,11 +34,44 @@ If working on a GitHub issue:
 pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
-## Step 5: Session log
+## Step 5: Session log — write to DB
 
-Run `pnpm crux agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.
+Run `pnpm crux agent-checklist snapshot` to get the `checks:` YAML block.
 
-Session logs are stored in the wiki-server PostgreSQL database (not committed to git). The checklist state is automatically synced to the DB when you use the `crux agent-checklist` commands. If no checklist was initialized, the snapshot will output `checks: {initialized: false}` — include that honestly in any session summaries.
+Then write a session YAML file and sync it to the wiki-server DB:
+
+```bash
+# Write the structured YAML session file
+cat > .claude/sessions/$(date +%Y-%m-%d)_$(git branch --show-current | tr '/' '-').yaml << 'YAML'
+date: "YYYY-MM-DD"
+branch: "claude/..."
+title: "Short title describing what was done"
+summary: "One-paragraph summary of the session — what changed, why, and outcome."
+model: "claude-sonnet-4-6"   # or opus-4-6, haiku-4-5
+duration: "~Xmin"
+cost: "$X"
+pr: "https://github.com/quantified-uncertainty/longterm-wiki/pull/NNN"
+pages:
+  - page-id-1
+  - page-id-2
+issues:
+  - "Issue or unexpected obstacle encountered (one per bullet)"
+learnings:
+  - "Key learning or insight from this session (one per bullet)"
+recommendations:
+  - "Follow-up work or improvement recommended for next time (one per bullet)"
+checks:
+  # paste output of `pnpm crux agent-checklist snapshot` here
+YAML
+
+# Sync the YAML to the wiki-server PostgreSQL DB
+pnpm crux wiki-server sync-session .claude/sessions/YYYY-MM-DD_branch-name.yaml
+```
+
+**Required fields:** `date`, `branch`, `title`, `summary`, `pages`
+**Rich fields (fill in all three):** `issues`, `learnings`, `recommendations` — these are stored as structured JSONB in the DB and power the `/internal/page-changes` dashboard. Use bullet arrays, not prose.
+
+The `.yaml` file is gitignored (local scratch only). The DB is the source of truth.
 
 ## Step 6: Validate completion
 
