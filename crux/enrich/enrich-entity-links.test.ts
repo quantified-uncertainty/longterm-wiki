@@ -153,4 +153,35 @@ Anthropic is a company.`;
 
     expect(result).toBe('Founded by Dario Amodei, <EntityLink id="E22">Anthropic</EntityLink> has grown rapidly.');
   });
+
+  it('only links the first valid occurrence (first-mention convention)', () => {
+    const content = 'Anthropic was founded in 2021. Since then, Anthropic has grown. Today Anthropic employs hundreds.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // Only the first occurrence should be linked
+    expect(applied).toBe(1);
+    const matches = [...result.matchAll(/<EntityLink/g)];
+    expect(matches.length).toBe(1);
+    // The first "Anthropic" should be linked
+    expect(result.startsWith('<EntityLink id="E22">Anthropic</EntityLink>')).toBe(true);
+  });
+
+  it('returns only applied replacements (not unapplied LLM proposals)', () => {
+    // "DeepMind" is not in the content, so it should not appear in appliedReplacements
+    const content = 'Anthropic is an AI safety company.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+      { searchText: 'DeepMind', entityId: 'E99', displayName: 'DeepMind' },
+    ];
+
+    const { applied, appliedReplacements } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    expect(appliedReplacements).toHaveLength(1);
+    expect(appliedReplacements[0].entityId).toBe('E22');
+  });
 });

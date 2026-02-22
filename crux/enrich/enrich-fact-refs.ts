@@ -71,6 +71,14 @@ interface LlmFactRefResponse {
 function buildSkipRanges(content: string): Array<[number, number]> {
   const ranges: Array<[number, number]> = [];
 
+  // Skip content inside <EntityLink>...</EntityLink> tags
+  const entityLinkFull = /<EntityLink\s[\s\S]*?<\/EntityLink>/g;
+  for (const match of content.matchAll(entityLinkFull)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
   // Skip content inside <F>...</F> tags (already wrapped)
   const fTagFull = /<F\s[^>]*>[\s\S]*?<\/F>/g;
   for (const match of content.matchAll(fTagFull)) {
@@ -149,11 +157,12 @@ function isInSkipRange(pos: number, end: number, ranges: Array<[number, number]>
 export function applyFactRefReplacements(
   content: string,
   replacements: FactRefReplacement[],
-): { content: string; applied: number } {
+): { content: string; applied: number; appliedReplacements: FactRefReplacement[] } {
   const skipRanges = buildSkipRanges(content);
   let result = content;
   let applied = 0;
   let offset = 0;
+  const appliedReplacements: FactRefReplacement[] = [];
 
   // Sort by position of first occurrence in original content
   const positioned = replacements.map(r => {
@@ -178,6 +187,7 @@ export function applyFactRefReplacements(
         result = result.slice(0, searchIdx) + replacement + result.slice(searchIdx + r.searchText.length);
         offset += replacement.length - r.searchText.length;
         applied++;
+        appliedReplacements.push(r);
         break; // Only wrap the first valid occurrence
       }
 
@@ -186,7 +196,7 @@ export function applyFactRefReplacements(
     }
   }
 
-  return { content: result, applied };
+  return { content: result, applied, appliedReplacements };
 }
 
 /**
@@ -291,12 +301,12 @@ export async function enrichFactRefs(
   const hexRe = /^[0-9a-f]{8}$/i;
   replacements = replacements.filter(r => hexRe.test(r.factId));
 
-  const { content: enriched, applied } = applyFactRefReplacements(content, replacements);
+  const { content: enriched, applied, appliedReplacements } = applyFactRefReplacements(content, replacements);
 
   return {
     content: enriched,
     insertedCount: applied,
-    replacements,
+    replacements: appliedReplacements,
   };
 }
 

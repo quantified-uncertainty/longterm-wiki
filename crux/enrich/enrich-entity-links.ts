@@ -27,7 +27,7 @@ import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
 import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anthropic.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { ENTITY_LINK_RE, NUMERIC_ID_RE } from '../lib/patterns.ts';
+import { NUMERIC_ID_RE } from '../lib/patterns.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -155,11 +155,12 @@ function isInSkipRange(pos: number, end: number, ranges: Array<[number, number]>
 export function applyEntityLinkReplacements(
   content: string,
   replacements: EntityLinkReplacement[],
-): { content: string; applied: number } {
+): { content: string; applied: number; appliedReplacements: EntityLinkReplacement[] } {
   const skipRanges = buildSkipRanges(content);
   let result = content;
   let applied = 0;
   let offset = 0;
+  const appliedReplacements: EntityLinkReplacement[] = [];
 
   // Sort by position of first occurrence in original content
   const positioned = replacements.map(r => {
@@ -184,6 +185,7 @@ export function applyEntityLinkReplacements(
         result = result.slice(0, searchIdx) + replacement + result.slice(searchIdx + r.searchText.length);
         offset += replacement.length - r.searchText.length;
         applied++;
+        appliedReplacements.push(r);
         break; // Only link the first valid occurrence per entity
       }
 
@@ -192,7 +194,7 @@ export function applyEntityLinkReplacements(
     }
   }
 
-  return { content: result, applied };
+  return { content: result, applied, appliedReplacements };
 }
 
 /**
@@ -268,14 +270,12 @@ Identify entity mentions and return replacement instructions as JSON.`;
  *
  * @param content - The MDX content to enrich
  * @param options.root - Project root path (defaults to PROJECT_ROOT)
- * @param options.pageId - Page ID for entity lookup relevance filtering
  * @param options.useLlm - Whether to use LLM for disambiguation (default: true)
  */
 export async function enrichEntityLinks(
   content: string,
   options: {
     root?: string;
-    pageId?: string;
     useLlm?: boolean;
   } = {},
 ): Promise<EntityLinkEnrichResult> {
@@ -301,12 +301,12 @@ export async function enrichEntityLinks(
   // Validate all entityIds are in E## format
   replacements = replacements.filter(r => NUMERIC_ID_RE.test(r.entityId));
 
-  const { content: enriched, applied } = applyEntityLinkReplacements(content, replacements);
+  const { content: enriched, applied, appliedReplacements } = applyEntityLinkReplacements(content, replacements);
 
   return {
     content: enriched,
     insertedCount: applied,
-    replacements,
+    replacements: appliedReplacements,
   };
 }
 
@@ -356,7 +356,6 @@ async function main(): Promise<void> {
     }
 
     const result = await enrichEntityLinks(content, {
-      pageId: filePageId,
       useLlm: true,
     });
 

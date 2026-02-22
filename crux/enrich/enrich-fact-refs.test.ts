@@ -152,4 +152,33 @@ Anthropic raised \\$30 billion.`;
     // The Calc tag content should be preserved (skip range covers Calc tags)
     expect(result).toContain('<Calc expr="{anthropic.6796e194}');
   });
+
+  it('skips numbers inside <EntityLink> tags', () => {
+    const content = 'See <EntityLink id="E42">$30B company</EntityLink> for context. Raised \\$30 billion total.';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '\\$30 billion', entityId: 'anthropic', factId: '5b0663a0', displayText: '\\$30 billion' },
+    ];
+
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    // The number outside EntityLink should be wrapped
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E42">$30B company</EntityLink>');
+    expect(result).toContain('<F e="anthropic" f="5b0663a0">\\$30 billion</F>');
+  });
+
+  it('returns only applied replacements (not unapplied LLM proposals)', () => {
+    // "\\$999 trillion" is not in content, should not appear in appliedReplacements
+    const content = 'Anthropic raised \\$30 billion in 2024.';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '\\$30 billion', entityId: 'anthropic', factId: '5b0663a0', displayText: '\\$30 billion' },
+      { searchText: '\\$999 trillion', entityId: 'anthropic', factId: 'deadbeef', displayText: '\\$999 trillion' },
+    ];
+
+    const { applied, appliedReplacements } = applyFactRefReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    expect(appliedReplacements).toHaveLength(1);
+    expect(appliedReplacements[0].factId).toBe('5b0663a0');
+  });
 });
