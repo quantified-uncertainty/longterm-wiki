@@ -1,10 +1,3 @@
-Looking at this conflict, the HEAD version imports types from external modules (`../lib/wiki-server/pages.ts`, etc.) while the `origin/main` version defines those types locally and adds helper functions (`extractKeywords`, `findEntityYaml`, `tableRow`). The HEAD version has cleaner imports but main added useful exported helpers.
-
-The resolution should:
-1. Keep HEAD's external imports (since main's local type definitions are redundant if the types come from the imported modules)
-2. Add the exported helper functions from main (`extractKeywords`, `findEntityYaml`, `tableRow`) since they're genuinely new functionality
-3. Note that `tableRow` is used in `factsBlock` later in the file, so it must be kept
-
 /**
  * Context Command Handlers
  *
