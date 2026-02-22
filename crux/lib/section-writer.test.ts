@@ -163,7 +163,7 @@ describe('buildSectionWriterPrompt', () => {
       constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
     }));
     expect(prompt).toContain('STRICT MODE');
-    expect(prompt).toContain('ONLY add claims');
+    expect(prompt).toContain('ONLY add NEW claims');
   });
 
   it('uses permissive wording when allowTrainingKnowledge is true', () => {
@@ -189,7 +189,7 @@ describe('buildSectionWriterPrompt', () => {
         maxNewClaims: 3,
       },
     }));
-    expect(prompt).toContain('at most 3 new factual claims');
+    expect(prompt).toContain('at most 3 new cited sentences');
   });
 
   it('lists valid source IDs in constraint section', () => {

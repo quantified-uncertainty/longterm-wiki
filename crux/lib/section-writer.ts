@@ -243,22 +243,26 @@ export function buildSectionWriterPrompt(request: GroundedWriteRequest): string 
   const knowledgeRule = constraints.allowTrainingKnowledge
     ? 'You may use your training knowledge to improve prose clarity and structure. ' +
       'When you add a new factual claim, cite from the source cache if a relevant source exists.'
-    : 'STRICT MODE: You must ONLY add claims supported by the provided source cache. ' +
-      'Do NOT introduce facts from training knowledge. ' +
-      'If you want to state a fact that is not in the cache, add it to "unsourceableClaims" ' +
+    : 'STRICT MODE: You must ONLY add NEW claims supported by the provided source cache. ' +
+      'Do NOT introduce NEW facts from training knowledge. ' +
+      'Preserve existing claims from the original content as-is — do not remove them. ' +
+      'If you want to add a NEW fact that is not in the cache, list it in "unsourceableClaims" ' +
       'and do NOT include it in the rewritten content.';
 
   const claimMapRule = constraints.requireClaimMap
-    ? 'REQUIRED: You MUST populate "claimMap" with an entry for every new factual claim you add.'
-    : 'Populate "claimMap" with entries for new factual claims you add.';
+    ? 'REQUIRED: You MUST populate "claimMap" with one entry per cited sentence — ' +
+      'each sentence that has a footnote marker gets its own entry in the claim map.'
+    : 'Populate "claimMap" with one entry per sentence you cite from the source cache.';
 
   const maxClaimsRule = constraints.maxNewClaims !== undefined
-    ? `Add at most ${constraints.maxNewClaims} new factual claims.`
+    ? `Add at most ${constraints.maxNewClaims} new cited sentences (i.e. sentences that did not exist in the original and carry a footnote).`
     : '';
 
   const sourceIdList = sourceCache.length > 0
     ? `Valid source IDs: ${[...validSourceIds].join(', ')}`
     : '(No sources — claim map will be empty)';
+
+  const originalWordCount = sectionContent.split(/\s+/).length;
 
   return `You are a precise, citation-grounded writer for an AI safety wiki.
 Your task is to improve ONE section of the page "${pageContext.title}" (type: ${pageContext.type}).
@@ -286,25 +290,28 @@ Respond with a single JSON object (no markdown code fences). Fields:
   "content": "<improved MDX for this section, preserving the ## heading>",
   "claimMap": [
     {
-      "claim": "<verbatim claim you added to the content>",
+      "claim": "<the sentence or phrase as it appears in your content>",
       "factId": "<source ID from cache, e.g. SRC-1>",
       "sourceUrl": "<URL of the source>",
-      "quote": "<optional brief supporting quote from the source>"
+      "quote": "<brief supporting quote from the source, 1-2 sentences max>"
     }
   ],
   "unsourceableClaims": ["<claim you wanted to add but could not source>"]
 }
 
 Rules:
-- "content" must be valid MDX. Use GFM footnotes for citations:
+- "content" must be valid MDX. Use named GFM footnotes for citations:
   inline marker [^SRC-1] and definition [^SRC-1]: Title (URL) at the section end.
+  Each cited sentence gets one marker; multiple sentences citing the same source
+  each get their own [^SRC-X] inline marker (repeat the same marker as needed).
+- CLAIM MAP: one entry per cited sentence. If three sentences cite SRC-1,
+  include three claimMap entries — one per sentence — each with factId: "SRC-1".
 - Each "factId" in "claimMap" MUST be one of: ${sourceIdList}
-- Only list claims in "claimMap" that you actually added (not pre-existing ones).
 - "unsourceableClaims" is for facts you wanted but could not source.
   ${constraints.allowTrainingKnowledge ? 'Leave empty if training knowledge is allowed.' : 'Must not appear in "content".'}
 - Preserve the existing ## heading and general structure.
-- Do NOT add EntityLinks, diagrams, or cross-page references.
-- Keep the section focused: 200–600 words.`;
+- Do NOT add EntityLinks, diagrams, or cross-page references. Preserve existing ones.
+- Length: aim for roughly ${Math.round(originalWordCount * 1.1)}–${Math.round(originalWordCount * 1.5)} words${directions ? ' unless directions call for more expansion' : ''}. Don't pad.`;
 }
 
 // ---------------------------------------------------------------------------
