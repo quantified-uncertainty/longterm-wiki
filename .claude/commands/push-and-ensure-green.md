@@ -39,15 +39,27 @@ Run `pnpm crux validate gate --fix` (auto-fixes escaping/markdown, then runs all
      ```bash
      pnpm crux pr detect
      ```
-   - If no PR exists (exit code 1), create one using crux:
+   - If no PR exists (exit code 1), create one using crux. **Always use `--body-file` or the stdin heredoc pattern** for multi-line bodies — inline `--body="$(cat <<'EOF'...)"` fails with `/bin/sh` (used by pnpm):
      ```bash
-     pnpm crux pr create --title="<descriptive title>" --body="## Summary
+     # Option A: stdin heredoc (safe with pnpm/sh):
+     pnpm crux pr create --title="<descriptive title>" <<'PRBODY'
+     ## Summary
 
      - <key change 1>
      - <key change 2>
 
      ## Test plan
-     - [ ] <test step>"
+     - [ ] <test step>
+
+     Closes #N
+     PRBODY
+
+     # Option B: write body to file first, then use --body-file:
+     cat > /tmp/pr-body.md <<'PRBODY'
+     ## Summary
+     ...
+     PRBODY
+     pnpm crux pr create --title="<descriptive title>" --body-file=/tmp/pr-body.md
      ```
      **After creating, always run `pnpm crux pr fix-body`** — this detects and repairs any literal `\n` in the PR body automatically.
    - If a PR exists, note its number and move on.
