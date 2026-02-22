@@ -89,8 +89,9 @@ agentSessionsRoute.get("/by-branch/:branch", async (c) => {
 // ---- PATCH /:id (update checklist or status) ----
 
 agentSessionsRoute.patch("/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  if (!id || isNaN(id)) return validationError(c, "Invalid session ID");
+  const raw = c.req.param("id");
+  const id = Number(raw);
+  if (!Number.isInteger(id) || id < 1) return validationError(c, "Invalid session ID");
 
   const body = await parseJsonBody(c);
   if (!body) return invalidJsonError(c);
@@ -98,11 +99,16 @@ agentSessionsRoute.patch("/:id", async (c) => {
   const parsed = UpdateAgentSessionSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
 
+  const { checklistMd, status } = parsed.data;
+  if (checklistMd === undefined && status === undefined) {
+    return validationError(c, "At least one of checklistMd or status must be provided");
+  }
+
   const updates: Record<string, unknown> = { updatedAt: new Date() };
-  if (parsed.data.checklistMd) updates.checklistMd = parsed.data.checklistMd;
-  if (parsed.data.status) {
-    updates.status = parsed.data.status;
-    if (parsed.data.status === "completed") {
+  if (checklistMd !== undefined) updates.checklistMd = checklistMd;
+  if (status !== undefined) {
+    updates.status = status;
+    if (status === "completed") {
       updates.completedAt = new Date();
     }
   }

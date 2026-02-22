@@ -19,10 +19,10 @@ export interface AgentSessionEntry {
   id: number;
   branch: string;
   task: string;
-  sessionType: string;
+  sessionType: 'content' | 'infrastructure' | 'bugfix' | 'refactor' | 'commands';
   issueNumber: number | null;
   checklistMd: string;
-  status: string;
+  status: 'active' | 'completed';
   startedAt: string;
   completedAt: string | null;
   createdAt: string;

@@ -349,8 +349,8 @@ async function check(args: string[], options: CommandOptions): Promise<CommandRe
   if (result.checked.length > 0) {
     writeFileSync(CHECKLIST_PATH, result.markdown, 'utf-8');
 
-    // Sync updated checklist to DB (best-effort)
-    syncChecklistToDb(result.markdown).catch(() => {});
+    // Sync updated checklist to DB (best-effort; inner try-catch handles errors)
+    syncChecklistToDb(result.markdown);
   }
 
   let output = '';
@@ -437,8 +437,8 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
     markdown = result.markdown;
     writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
 
-    // Sync to DB (best-effort)
-    syncChecklistToDb(markdown).catch(() => {});
+    // Sync to DB (best-effort; inner try-catch handles errors)
+    syncChecklistToDb(markdown);
   }
 
   output += `\n${c.green}${passed.length} passed${c.reset}`;
