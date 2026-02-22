@@ -26,6 +26,9 @@ import {
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 import { ContentConfidenceBanner } from "@/components/wiki/ContentConfidenceBanner";
 import { TableOfContents } from "@/components/wiki/TableOfContents";
+import { CitationOverlay } from "@/components/wiki/CitationOverlay";
+import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
+import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -216,6 +219,7 @@ function ContentView({
   slug,
   fullWidth,
   hideSidebar,
+  citationQuotes,
 }: {
   page: MdxPage;
   pageData: Page | undefined;
@@ -223,6 +227,7 @@ function ContentView({
   slug: string;
   fullWidth?: boolean;
   hideSidebar?: boolean;
+  citationQuotes?: import("@/lib/citation-data").CitationQuote[];
 }) {
   const entity = getEntityById(slug);
   const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;
@@ -258,6 +263,9 @@ function ContentView({
           hallucinationRisk={pageData?.hallucinationRisk}
         />
       )}
+      {!isInternal && citationQuotes && citationQuotes.length > 0 && (
+        <CitationHealthBanner health={computeCitationHealth(citationQuotes)} />
+      )}
       <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
         {/* PageStatus shown for graded formats or pages with editorial content */}
         <PageStatus
@@ -289,6 +297,10 @@ function ContentView({
         {showToc && <TableOfContents headings={tocHeadings} />}
         {page.content}
       </article>
+      {/* Citation verification overlay — decorates footnote refs with status indicators */}
+      {citationQuotes && citationQuotes.length > 0 && (
+        <CitationOverlay quotes={citationQuotes} />
+      )}
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>
@@ -348,7 +360,10 @@ export default async function WikiPage({ params }: PageProps) {
     const slug = numericIdToSlug(id.toUpperCase());
     if (!slug) notFound();
 
-    const result = await renderMdxPage(slug);
+    const [result, citationQuotes] = await Promise.all([
+      renderMdxPage(slug),
+      getCitationQuotes(slug),
+    ]);
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
@@ -366,6 +381,7 @@ export default async function WikiPage({ params }: PageProps) {
           slug={slug}
           fullWidth={fullWidth}
           hideSidebar={hideSidebar}
+          citationQuotes={citationQuotes}
         />
       </WithSidebar>
     );
@@ -378,7 +394,10 @@ export default async function WikiPage({ params }: PageProps) {
     }
 
     // No numeric ID — render directly by slug (page-only content without entity)
-    const result = await renderMdxPage(id);
+    const [result, citationQuotes] = await Promise.all([
+      renderMdxPage(id),
+      getCitationQuotes(id),
+    ]);
     if (!result) notFound();
     if (isMdxError(result)) return <MdxErrorView error={result} />;
 
@@ -396,6 +415,7 @@ export default async function WikiPage({ params }: PageProps) {
           slug={id}
           fullWidth={fullWidth}
           hideSidebar={hideSidebar}
+          citationQuotes={citationQuotes}
         />
       </WithSidebar>
     );
