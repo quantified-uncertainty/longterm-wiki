@@ -7,7 +7,7 @@ Recurring problems encountered across Claude Code sessions. When you hit a known
 ## Build & CI
 
 ### Data layer must be built before tests or app build
-`node apps/web/scripts/build-data.mjs` must run before `pnpm test` or `pnpm build`. If tests fail with missing data errors, this is likely why.
+The data layer must be built before `pnpm test` or `pnpm build`. If tests fail with missing data errors, run `pnpm run --filter longterm-next sync:data`. Note: `build-data.mjs` uses `process.cwd()` for path resolution and must be run from `apps/web/` (the pnpm filter handles this).
 
 ### API keys are in environment, not .env files
 Check `env | grep -i API` — keys are set as environment variables, not in `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`.

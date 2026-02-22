@@ -30,9 +30,9 @@ pnpm setup:check                 # Check environment without changing anything
 pnpm dev                         # Start dev server on port 3001
 pnpm build                      # Production build (runs assign-ids + build-data automatically)
 
-# Numeric ID assignment (requires wiki server)
-node apps/web/scripts/assign-ids.mjs              # Assign numericIds to new entities/pages
-node apps/web/scripts/assign-ids.mjs --dry-run    # Preview assignments without writing files
+# Numeric ID assignment (requires wiki server — run from apps/web/)
+(cd apps/web && node scripts/assign-ids.mjs)              # Assign numericIds to new entities/pages
+(cd apps/web && node scripts/assign-ids.mjs --dry-run)    # Preview assignments without writing files
 
 # Testing
 pnpm test                        # Run vitest tests
@@ -206,7 +206,7 @@ When creating or editing wiki pages, **always use the Crux content pipeline**. D
 
 If `apps/web/src/data/pages.json` doesn't exist, generate it first:
 ```bash
-node apps/web/scripts/build-data.mjs
+pnpm run --filter longterm-next sync:data
 ```
 
 ### Creating a new page
