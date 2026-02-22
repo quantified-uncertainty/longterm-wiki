@@ -140,6 +140,11 @@ export interface AuditRequest {
    * Default: 300.
    */
   delayMs?: number;
+  /**
+   * Maximum number of concurrent LLM verification calls.
+   * Default: 3.
+   */
+  concurrency?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -240,6 +245,130 @@ Determine whether the source supports this claim. Return JSON only.`;
   return parseVerifierResponse(raw);
 }
 
+/**
+ * Verify multiple claims against the same source text via a single LLM call (#677).
+ * Returns a verdict per claim in the same order as the input claims.
+ */
+async function verifyClaimBatchAgainstSource(
+  claims: Array<{ footnoteRef: string; claim: string }>,
+  sourceText: string,
+  opts: { model?: string } = {},
+): Promise<VerifierResponse[]> {
+  if (claims.length === 1) {
+    const r = await verifyClaimAgainstSource(claims[0].claim, sourceText, opts);
+    return [r];
+  }
+
+  const truncated = truncateSource(sourceText);
+
+  const claimList = claims
+    .map((c, i) => `[${i + 1}] (footnote ^${c.footnoteRef}): ${c.claim}`)
+    .join('\n');
+
+  const batchSystemPrompt = `You are a citation verification assistant. Given MULTIPLE claims from a wiki article and the text of a single cited source, determine whether the source supports each claim.
+
+Use exactly one of these verdicts per claim:
+- "verified": the source clearly and directly supports the claim
+- "unsupported": the source does not contain information relevant to this claim
+- "misattributed": the source has related content but the claim misrepresents it (wrong numbers, wrong attribution, overclaim, misleading paraphrase)
+
+Rules:
+- Search the ENTIRE source for relevant passages before deciding
+- Only return "unsupported" if you have checked the full source and it truly contains no relevant information
+- Be strict about numbers, dates, and names — even small discrepancies count as "misattributed"
+- For "relevantQuote", copy the exact passage from the source most relevant to the claim (1-3 sentences). Return "" if no relevant passage exists.
+- For "explanation", give a concise (1-2 sentence) reason for your verdict
+
+Respond in exactly this JSON format (one object per claim, in order):
+{"results": [{"verdict": "verified", "relevantQuote": "exact text", "explanation": "why"}, ...]}`;
+
+  const userPrompt = `WIKI CLAIMS (against the same source):
+${claimList}
+
+SOURCE TEXT:
+${truncated}
+
+Determine whether the source supports each claim. Return JSON with one result per claim, in order.`;
+
+  const raw = await callOpenRouter(batchSystemPrompt, userPrompt, {
+    model: opts.model ?? DEFAULT_CITATION_MODEL,
+    maxTokens: 500 * claims.length,
+    title: 'LongtermWiki Citation Audit (batch)',
+  });
+
+  return parseBatchVerifierResponse(raw, claims.length);
+}
+
+/** Parse the batch verifier response. Falls back to 'unchecked' for unparseable entries. */
+export function parseBatchVerifierResponse(raw: string, expectedCount: number): VerifierResponse[] {
+  const json = stripCodeFences(raw);
+  const validVerdicts: AuditVerdict[] = ['verified', 'unsupported', 'misattributed'];
+
+  try {
+    const parsed = JSON.parse(json) as {
+      results?: Array<{ verdict?: string; relevantQuote?: string; explanation?: string }>;
+    };
+
+    if (!Array.isArray(parsed.results)) {
+      const single = parseVerifierResponse(raw);
+      return Array(expectedCount).fill(single);
+    }
+
+    return Array.from({ length: expectedCount }, (_, i) => {
+      const entry = parsed.results![i];
+      if (!entry || !validVerdicts.includes(entry.verdict as AuditVerdict)) {
+        return {
+          verdict: 'unchecked' as const,
+          relevantQuote: '',
+          explanation: entry
+            ? `Unknown verdict "${String(entry.verdict)}" — treated as unchecked.`
+            : 'Missing result entry in batch response.',
+        };
+      }
+      return {
+        verdict: entry.verdict as AuditVerdict,
+        relevantQuote: typeof entry.relevantQuote === 'string' ? entry.relevantQuote : '',
+        explanation: typeof entry.explanation === 'string' && entry.explanation.length > 0
+          ? entry.explanation
+          : 'No explanation provided.',
+      };
+    });
+  } catch {
+    return Array(expectedCount).fill({
+      verdict: 'unchecked' as const,
+      relevantQuote: '',
+      explanation: 'Failed to parse batch verification response.',
+    });
+  }
+}
+
+/**
+ * Simple concurrency limiter (avoids external p-limit dependency).
+ */
+function pLimit(concurrencyLimit: number) {
+  let active = 0;
+  const queue: Array<() => void> = [];
+
+  function next() {
+    if (queue.length > 0 && active < concurrencyLimit) {
+      active++;
+      queue.shift()!();
+    }
+  }
+
+  return <T>(fn: () => Promise<T>): Promise<T> =>
+    new Promise<T>((resolve, reject) => {
+      const run = () => {
+        fn().then(resolve, reject).finally(() => {
+          active--;
+          next();
+        });
+      };
+      queue.push(run);
+      next();
+    });
+}
+
 // ---------------------------------------------------------------------------
 // Source resolution
 // ---------------------------------------------------------------------------
@@ -283,11 +412,10 @@ async function resolveSource(
  * Audit all citations in MDX content.
  *
  * 1. Extracts citations (footnote → URL + claim context) from the MDX body.
- * 2. For each citation:
- *    a. Resolves claim text from claimMap or extracts it from the MDX body.
- *    b. Resolves source content from sourceCache, or fetches via source-fetcher.
- *    c. Calls the LLM verifier (cheap model) to produce a verdict.
- * 3. Returns AuditResult with per-citation verdicts, summary, and pass/fail gate.
+ * 2. Resolves sources and partitions citations into non-LLM (unchecked/dead)
+ *    and LLM-verifiable groups (batched by source URL for efficiency).
+ * 3. Runs LLM verification concurrently with a configurable concurrency limit.
+ * 4. Returns AuditResult with per-citation verdicts, summary, and pass/fail gate.
  *
  * Cost estimate: ~$0.01–0.03 per citation at the default model.
  */
@@ -300,15 +428,21 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
     passThreshold = 0.8,
     model,
     delayMs = 300,
+    concurrency = 3,
   } = request;
 
   const body = stripFrontmatter(content);
   const extracted = extractCitationsFromContent(body);
 
-  const citationAudits: CitationAudit[] = [];
+  // Phase 1: Resolve claims and sources, partitioning into non-LLM results
+  // and LLM-verifiable groups (batched by source URL, #677).
+  const nonLlmAudits: CitationAudit[] = [];
+  const llmGroups = new Map<string, {
+    sourceText: string;
+    claims: Array<{ footnoteRef: string; claim: string; sourceUrl: string }>;
+  }>();
 
-  for (let i = 0; i < extracted.length; i++) {
-    const ext = extracted[i];
+  for (const ext of extracted) {
     const footnoteRef = String(ext.footnote);
 
     // Resolve claim text
@@ -321,7 +455,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
 
     // Handle: URL not fetchable / not in cache
     if (!source) {
-      citationAudits.push({
+      nonLlmAudits.push({
         footnoteRef,
         claim,
         sourceUrl: ext.url,
@@ -333,33 +467,31 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
 
     // Handle: URL is dead
     if (source.status === 'dead') {
-      citationAudits.push({
+      nonLlmAudits.push({
         footnoteRef,
         claim,
         sourceUrl: ext.url,
         verdict: 'url-dead',
-        explanation: `URL returned an error status and could not be fetched.`,
+        explanation: 'URL returned an error status and could not be fetched.',
       });
       continue;
     }
 
-    // Handle: fetch error (network failure, timeout, or unverifiable domain such as social media).
-    // We use 'unchecked' rather than 'url-dead': the error may be transient, and social-media
-    // domains that are intentionally blocked should not be flagged as dead URLs.
+    // Handle: fetch error
     if (source.status === 'error') {
-      citationAudits.push({
+      nonLlmAudits.push({
         footnoteRef,
         claim,
         sourceUrl: ext.url,
         verdict: 'unchecked',
-        explanation: `Source could not be fetched (network error, timeout, or unverifiable domain).`,
+        explanation: 'Source could not be fetched (network error, timeout, or unverifiable domain).',
       });
       continue;
     }
 
-    // Handle: paywall — mark unchecked regardless of content length
+    // Handle: paywall
     if (source.status === 'paywall') {
-      citationAudits.push({
+      nonLlmAudits.push({
         footnoteRef,
         claim,
         sourceUrl: ext.url,
@@ -369,9 +501,9 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
       continue;
     }
 
-    // Handle: no usable content (social media, PDF, empty page)
+    // Handle: no usable content
     if (!source.content || source.content.length < MIN_SOURCE_CONTENT_LENGTH) {
-      citationAudits.push({
+      nonLlmAudits.push({
         footnoteRef,
         claim,
         sourceUrl: ext.url,
@@ -381,39 +513,69 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
       continue;
     }
 
-    // LLM verification — prefer pre-extracted relevant excerpts when available (#683).
-    // For long sources, the relevant passage may be beyond the truncation point,
-    // so using excerpts (already BM25-scored by source-fetcher) improves accuracy.
+    // Queue for LLM verification — group by source URL (#677).
     const sourceText = source.relevantExcerpts && source.relevantExcerpts.length > 0
       ? source.relevantExcerpts.join('\n\n---\n\n')
       : source.content;
-    try {
-      const verifyResult = await verifyClaimAgainstSource(claim, sourceText, { model });
 
-      citationAudits.push({
-        footnoteRef,
-        claim,
-        sourceUrl: ext.url,
-        verdict: verifyResult.verdict,
-        relevantQuote: verifyResult.relevantQuote || undefined,
-        explanation: verifyResult.explanation,
-      });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      citationAudits.push({
-        footnoteRef,
-        claim,
-        sourceUrl: ext.url,
-        verdict: 'unchecked',
-        explanation: `Verification error: ${msg.slice(0, 200)}`,
-      });
+    if (!llmGroups.has(ext.url)) {
+      llmGroups.set(ext.url, { sourceText, claims: [] });
     }
-
-    // Rate-limit between LLM calls
-    if (i < extracted.length - 1 && delayMs > 0) {
-      await new Promise<void>((resolve) => setTimeout(resolve, delayMs));
-    }
+    llmGroups.get(ext.url)!.claims.push({ footnoteRef, claim, sourceUrl: ext.url });
   }
+
+  // Phase 2: Run LLM verification in parallel with concurrency limit (#677).
+  // Each group (same source URL) is a single batched LLM call.
+  const limit = pLimit(concurrency);
+  const groupTasks = [...llmGroups.entries()].map(([, group]) =>
+    limit(async () => {
+      const results: CitationAudit[] = [];
+      try {
+        const verifyResults = await verifyClaimBatchAgainstSource(
+          group.claims.map((c) => ({ footnoteRef: c.footnoteRef, claim: c.claim })),
+          group.sourceText,
+          { model },
+        );
+
+        for (let j = 0; j < group.claims.length; j++) {
+          const c = group.claims[j];
+          const v = verifyResults[j];
+          results.push({
+            footnoteRef: c.footnoteRef,
+            claim: c.claim,
+            sourceUrl: c.sourceUrl,
+            verdict: v.verdict,
+            relevantQuote: v.relevantQuote || undefined,
+            explanation: v.explanation,
+          });
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        for (const c of group.claims) {
+          results.push({
+            footnoteRef: c.footnoteRef,
+            claim: c.claim,
+            sourceUrl: c.sourceUrl,
+            verdict: 'unchecked',
+            explanation: `Verification error: ${msg.slice(0, 200)}`,
+          });
+        }
+      }
+
+      // Rate-limit between LLM calls — only applied after actual LLM calls (#677)
+      if (delayMs > 0) {
+        await new Promise<void>((resolve) => setTimeout(resolve, delayMs));
+      }
+
+      return results;
+    }),
+  );
+
+  const groupResults = await Promise.all(groupTasks);
+  const llmAudits = groupResults.flat();
+
+  // Combine non-LLM and LLM results
+  const citationAudits = [...nonLlmAudits, ...llmAudits];
 
   // Build summary
   const verified = citationAudits.filter((c) => c.verdict === 'verified').length;
