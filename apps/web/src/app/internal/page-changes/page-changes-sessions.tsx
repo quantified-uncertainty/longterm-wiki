@@ -79,8 +79,8 @@ function InsightsList({
         {label}:
       </span>
       <ul className="mt-0.5 space-y-0.5">
-        {items.map((item, i) => (
-          <li key={i} className="text-[11px] text-muted-foreground leading-relaxed flex gap-1">
+        {items.map((item) => (
+          <li key={item} className="text-[11px] text-muted-foreground leading-relaxed flex gap-1">
             <span className="shrink-0 mt-0.5 text-muted-foreground/40">·</span>
             <span>{item}</span>
           </li>

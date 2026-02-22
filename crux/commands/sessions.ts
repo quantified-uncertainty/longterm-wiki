@@ -153,9 +153,12 @@ async function write(args: string[], options: Record<string, unknown>): Promise<
     pages,
   });
 
+  const alreadyExists = existsSync(outputPath);
   writeFileSync(outputPath, yamlContent, 'utf-8');
 
-  let out = `${c.green}✓${c.reset} Session YAML written: ${c.cyan}${outputPath}${c.reset}\n`;
+  let out = alreadyExists
+    ? `${c.yellow}⚠${c.reset}  Session YAML overwritten: ${c.cyan}${outputPath}${c.reset}\n`
+    : `${c.green}✓${c.reset} Session YAML written: ${c.cyan}${outputPath}${c.reset}\n`;
   out += `  Date: ${date}\n`;
   out += `  Branch: ${branch}\n`;
   out += `  Title: ${title}\n`;
