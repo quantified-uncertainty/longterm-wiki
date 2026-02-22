@@ -816,21 +816,18 @@ citationsRoute.get("/content/list", async (c) => {
     .limit(limit)
     .offset(offset);
 
-  const countResult = await db.select({ total: count() }).from(citationContent);
-  const withFullTextResult = await db
-    .select({ withFullText: count() })
-    .from(citationContent)
-    .where(isNotNull(citationContent.fullText));
-  const withPreviewResult = await db
-    .select({ withPreview: count() })
-    .from(citationContent)
-    .where(isNotNull(citationContent.fullTextPreview));
+  // Single aggregate query — avoids 3 separate round-trips and is consistent
+  const aggregates = await db.select({
+    total: count(),
+    withFullText: sql<number>`count(case when ${citationContent.fullText} is not null then 1 end)`,
+    withPreview: sql<number>`count(case when ${citationContent.fullTextPreview} is not null then 1 end)`,
+  }).from(citationContent);
 
   return c.json({
     entries: rows,
-    total: countResult[0].total,
-    withFullText: withFullTextResult[0].withFullText,
-    withPreview: withPreviewResult[0].withPreview,
+    total: aggregates[0].total,
+    withFullText: Number(aggregates[0].withFullText),
+    withPreview: Number(aggregates[0].withPreview),
     limit,
     offset,
   });

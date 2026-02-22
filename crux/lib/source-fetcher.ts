@@ -433,19 +433,19 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
 /**
  * Try to load a previously fetched result from PostgreSQL (wiki-server).
  * Returns null if the server is unavailable or the URL has not been cached.
+ * apiRequest never throws — it returns { ok: false } on network/server errors.
  */
-async function loadFromPostgres(url: string): Promise<Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> | null> {
-  try {
-    const result = await getCitationContentByUrl(url);
-    if (result.ok && result.data.fullText && result.data.fullText.length > 0) {
-      return {
-        title: result.data.pageTitle ?? '',
-        content: result.data.fullText,
-        fetchedAt: result.data.fetchedAt ?? new Date().toISOString(),
-      };
-    }
-  } catch {
-    // Server unavailable — fall through
+async function loadFromPostgres(
+  url: string,
+): Promise<(Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> & { httpStatus: number | null }) | null> {
+  const result = await getCitationContentByUrl(url);
+  if (result.ok && result.data.fullText && result.data.fullText.length > 0) {
+    return {
+      title: result.data.pageTitle ?? '',
+      content: result.data.fullText,
+      fetchedAt: result.data.fetchedAt,
+      httpStatus: result.data.httpStatus ?? null,
+    };
   }
   return null;
 }
@@ -559,7 +559,7 @@ async function _fetchSourceCore(
       resource: resourceMeta,
     };
     // Backfill SQLite so subsequent calls are served from the fast local cache
-    saveToDb(url, pgRow.title, pgRow.content, 200);
+    saveToDb(url, pgRow.title, pgRow.content, pgRow.httpStatus ?? 200);
     sessionCacheSet(url, result);
     return result;
   }
