@@ -6,9 +6,10 @@
  * the results in data/citation-archive/<page-id>.yaml.
  *
  * Usage:
- *   pnpm crux citations verify <page-id>        Verify one page
- *   pnpm crux citations verify --all             Verify all pages with citations
- *   pnpm crux citations verify --all --limit=50  Verify up to 50 pages
+ *   pnpm crux citations verify <page-id>                    Verify one page
+ *   pnpm crux citations verify <page-id> --content-verify   Also check claim support
+ *   pnpm crux citations verify --all                        Verify all pages with citations
+ *   pnpm crux citations verify --all --limit=50             Verify up to 50 pages
  *
  * Part of the hallucination risk reduction initiative (issue #200).
  */
@@ -24,6 +25,7 @@ import {
   readCitationArchive,
   type CitationArchiveFile,
 } from '../lib/citation-archive.ts';
+import { fetchAndVerifyClaim } from '../lib/source-fetcher.ts';
 import { findPagesWithCitations } from './shared.ts';
 
 // ---------------------------------------------------------------------------
@@ -37,6 +39,7 @@ async function main() {
   const all = args.all === true;
   const limit = parseInt((args.limit as string) || '0', 10);
   const recheck = args.recheck === true;
+  const contentVerify = args['content-verify'] === true;
   const colors = getColors(ci || json);
   const c = colors;
 
@@ -52,6 +55,9 @@ async function main() {
   }
 
   if (all) {
+    if (contentVerify) {
+      console.warn(`${c.yellow}Warning: --content-verify is ignored with --all (use a specific page ID instead).${c.reset}`);
+    }
     // Verify all pages with citations
     let pages = findPagesWithCitations();
     console.log(`\n${c.bold}${c.blue}Citation Verification — All Pages${c.reset}\n`);
@@ -208,6 +214,48 @@ async function main() {
   }
 
   console.log(`\n${c.dim}Archive saved to data/citation-archive/${pageId}.yaml${c.reset}\n`);
+
+  // Optional content verification: check if source actually supports each claim
+  if (contentVerify && verified.length > 0) {
+    console.log(`\n${c.bold}${c.blue}Content Verification (--content-verify):${c.reset}`);
+    console.log(`  Fetching source content and checking claim support...\n`);
+
+    let supported = 0;
+    let unsupported = 0;
+    let unreachable = 0;
+
+    for (const v of verified) {
+      process.stdout.write(`  [^${v.footnote}] ${v.url.slice(0, 60)}...`);
+      const { source, hasSupport } = await fetchAndVerifyClaim(v.url, v.claimContext);
+
+      if (source.status === 'ok' && hasSupport) {
+        console.log(` ${c.green}✓ supported${c.reset}`);
+        if (source.relevantExcerpts.length > 0) {
+          console.log(`    ${c.dim}Excerpt: "${source.relevantExcerpts[0].slice(0, 120)}..."${c.reset}`);
+        }
+        supported++;
+      } else if (source.status === 'ok' && !hasSupport) {
+        console.log(` ${c.yellow}? no match${c.reset}`);
+        console.log(`    ${c.dim}Content fetched but no relevant excerpts found for claim context${c.reset}`);
+        unsupported++;
+      } else if (source.status === 'paywall') {
+        console.log(` ${c.yellow}⊘ paywall${c.reset}`);
+        unreachable++;
+      } else {
+        console.log(` ${c.red}✗ ${source.status}${c.reset}`);
+        unreachable++;
+      }
+    }
+
+    console.log(`\n  ${c.green}Supported:${c.reset}   ${supported}`);
+    console.log(`  ${c.yellow}No match:${c.reset}    ${unsupported}`);
+    console.log(`  ${c.dim}Unreachable:${c.reset} ${unreachable}`);
+
+    if (unsupported > 0) {
+      console.log(`\n  ${c.yellow}${c.bold}${unsupported} citation(s) may not directly support their claim.${c.reset}`);
+      console.log(`  Run ${c.dim}pnpm crux citations check-accuracy ${pageId}${c.reset} for a deeper LLM-based analysis.`);
+    }
+  }
 
   process.exit(archive.broken > 0 ? 1 : 0);
 }
