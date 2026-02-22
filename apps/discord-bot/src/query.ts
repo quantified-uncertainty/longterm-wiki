@@ -1,5 +1,5 @@
 import { query } from "@anthropic-ai/claude-agent-sdk";
-import { WIKI_BASE_URL, TIMEOUT_MS } from "./config.js";
+import { WIKI_BASE_URL, TIMEOUT_MS, MAX_TOOL_CALLS } from "./config.js";
 import { wikiMcpServer } from "./wiki-tools.js";
 
 export interface QueryResult {
@@ -117,6 +117,15 @@ export async function runQuery(question: string): Promise<QueryResult> {
                 `${elapsed()} 💬 Text: ${block.text.slice(0, 100)}...`
               );
             }
+          }
+          if (toolCalls.length >= MAX_TOOL_CALLS) {
+            console.log(
+              `${elapsed()} ⚠️ Tool call limit reached (${MAX_TOOL_CALLS}), stopping query`
+            );
+            result =
+              (lastResult || result) +
+              `\n\n*(Stopped after ${MAX_TOOL_CALLS} tool calls to limit API usage)*`;
+            break;
           }
         }
       } else if (msgType === "result") {
