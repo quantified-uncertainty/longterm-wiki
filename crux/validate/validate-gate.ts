@@ -8,17 +8,14 @@
  *
  * Steps (fast mode, default):
  *   1. Build data layer (required for validation + tests)
- *   2. Run vitest tests
- *   3. Auto-fix escaping + markdown (with --fix)
- *   4. MDX syntax (comparison-operators, dollar-signs)
- *   5. YAML schema validation
- *   6. Frontmatter schema validation
- *   7. Numeric ID integrity (cross-entity/page duplicate detection)
- *   8. EntityLink enforcement (prefer-entitylink)
- *   9. TypeScript type check
+ *   2. Auto-fix escaping + markdown (with --fix)
+ *   3. [Parallel] Run vitest tests
+ *      [Parallel] Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink)
+ *      [Parallel] YAML schema validation
+ *      [Parallel] TypeScript type check
  *
  * With --full:
- *  10. Full Next.js production build
+ *   4. Full Next.js production build
  *
  * Exit codes:
  *   0 = All checks passed
@@ -86,22 +83,18 @@ interface Step {
 
 const APP_DIR = `${PROJECT_ROOT}/apps/web`;
 
-const STEPS: Step[] = [
+// Phase 1: Must run first — everything else depends on this
+const BUILD_DATA_STEP: Step = {
+  id: 'build-data',
+  name: 'Build data layer',
+  command: 'node',
+  args: ['--import', 'tsx/esm', 'scripts/build-data.mjs'],
+  cwd: APP_DIR,
+};
+
+// Phase 2 (--fix only): Auto-fix before validation
+const FIX_STEPS: Step[] = [
   {
-    id: 'build-data',
-    name: 'Build data layer',
-    command: 'node',
-    args: ['--import', 'tsx/esm', 'scripts/build-data.mjs'],
-    cwd: APP_DIR,
-  },
-  {
-    id: 'test',
-    name: 'Run tests',
-    command: 'pnpm',
-    args: ['test'],
-    cwd: APP_DIR,
-  },
-  ...(FIX_MODE ? [{
     id: 'fix-escaping',
     name: 'Auto-fix escaping',
     command: 'pnpm',
@@ -114,12 +107,39 @@ const STEPS: Step[] = [
     command: 'pnpm',
     args: ['crux', 'fix', 'markdown'],
     cwd: PROJECT_ROOT,
-  }] : []),
+  },
+];
+
+// Blocking unified rules — merged into one subprocess invocation so MDX files are
+// loaded once instead of once-per-rule. Add new CI-blocking rules here.
+const UNIFIED_BLOCKING_RULES = [
+  'comparison-operators',
+  'dollar-signs',
+  'frontmatter-schema',
+  'no-quoted-subcategory',
+  'numeric-id-integrity',
+  'prefer-entitylink',
+];
+
+// Phase 3: Independent checks — run in parallel after build-data completes.
+// All steps in this group always run to completion so all errors are reported at once.
+const PARALLEL_STEPS: Step[] = [
   {
-    id: 'mdx-syntax',
-    name: 'MDX syntax (blocking)',
+    id: 'test',
+    name: 'Run tests',
     command: 'pnpm',
-    args: ['crux', 'validate', 'unified', '--rules=comparison-operators,dollar-signs', '--errors-only'],
+    args: ['test'],
+    cwd: APP_DIR,
+  },
+  {
+    id: 'unified-blocking',
+    name: 'Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink)',
+    command: 'pnpm',
+    args: [
+      'crux', 'validate', 'unified',
+      `--rules=${UNIFIED_BLOCKING_RULES.join(',')}`,
+      '--errors-only',
+    ],
     cwd: PROJECT_ROOT,
   },
   {
@@ -127,27 +147,6 @@ const STEPS: Step[] = [
     name: 'YAML schema (blocking)',
     command: 'pnpm',
     args: ['crux', 'validate', 'schema'],
-    cwd: PROJECT_ROOT,
-  },
-  {
-    id: 'frontmatter',
-    name: 'Frontmatter schema + no-quoted-subcategory (blocking)',
-    command: 'pnpm',
-    args: ['crux', 'validate', 'unified', '--rules=frontmatter-schema,no-quoted-subcategory', '--errors-only'],
-    cwd: PROJECT_ROOT,
-  },
-  {
-    id: 'numeric-id-integrity',
-    name: 'Numeric ID integrity (blocking)',
-    command: 'pnpm',
-    args: ['crux', 'validate', 'unified', '--rules=numeric-id-integrity', '--errors-only'],
-    cwd: PROJECT_ROOT,
-  },
-  {
-    id: 'prefer-entitylink',
-    name: 'EntityLink enforcement (blocking)',
-    command: 'pnpm',
-    args: ['crux', 'validate', 'unified', '--rules=prefer-entitylink', '--errors-only'],
     cwd: PROJECT_ROOT,
   },
   {
@@ -159,15 +158,14 @@ const STEPS: Step[] = [
   },
 ];
 
-if (FULL_MODE) {
-  STEPS.push({
-    id: 'build',
-    name: 'Full Next.js build',
-    command: 'pnpm',
-    args: ['build'],
-    cwd: APP_DIR,
-  });
-}
+// Phase 4 (--full only): Runs after all validations pass
+const BUILD_STEP: Step = {
+  id: 'build',
+  name: 'Full Next.js build',
+  command: 'pnpm',
+  args: ['build'],
+  cwd: APP_DIR,
+};
 
 interface StepResult {
   id: string;
@@ -175,9 +173,15 @@ interface StepResult {
   passed: boolean;
   duration: number;
   exitCode: number | null;
+  capturedOutput: string;
 }
 
-function runStep(step: Step): Promise<StepResult> {
+/**
+ * Run a single step.
+ * When buffer=true (parallel mode), output is always captured and never streamed.
+ * When buffer=false (sequential mode), output is streamed live in non-CI mode.
+ */
+function runStep(step: Step, buffer = false): Promise<StepResult> {
   const start = Date.now();
   return new Promise((resolve) => {
     const child: ChildProcess = spawn(step.command, step.args, {
@@ -185,30 +189,29 @@ function runStep(step: Step): Promise<StepResult> {
       stdio: ['inherit', 'pipe', 'pipe'],
     });
 
-    let stdout = '';
-    let stderr = '';
+    let capturedOutput = '';
 
     child.stdout!.on('data', (data: Buffer) => {
-      stdout += data.toString();
-      // Stream output in non-CI mode so user sees progress
-      if (!CI_MODE) {
+      if (!CI_MODE && !buffer) {
         process.stdout.write(data);
+      } else {
+        capturedOutput += data.toString();
       }
     });
 
     child.stderr!.on('data', (data: Buffer) => {
-      stderr += data.toString();
-      if (!CI_MODE) {
+      if (!CI_MODE && !buffer) {
         process.stderr.write(data);
+      } else {
+        capturedOutput += data.toString();
       }
     });
 
     child.on('close', (code: number | null) => {
       // In CI mode, dump captured output when a step fails so errors are
       // visible in workflow logs (otherwise they're silently discarded).
-      if (CI_MODE && code !== 0) {
-        if (stdout) process.stdout.write(stdout);
-        if (stderr) process.stderr.write(stderr);
+      if (CI_MODE && code !== 0 && capturedOutput) {
+        process.stdout.write(capturedOutput);
       }
       resolve({
         id: step.id,
@@ -216,13 +219,16 @@ function runStep(step: Step): Promise<StepResult> {
         passed: code === 0,
         duration: Date.now() - start,
         exitCode: code,
+        capturedOutput,
       });
     });
 
     child.on('error', (err: Error) => {
-      // Print error so it's visible
-      if (!CI_MODE) {
-        process.stderr.write(`Error spawning ${step.command}: ${err.message}\n`);
+      const errMsg = `Error spawning ${step.command}: ${err.message}\n`;
+      if (!CI_MODE && !buffer) {
+        process.stderr.write(errMsg);
+      } else {
+        capturedOutput += errMsg;
       }
       resolve({
         id: step.id,
@@ -230,9 +236,58 @@ function runStep(step: Step): Promise<StepResult> {
         passed: false,
         duration: Date.now() - start,
         exitCode: 1,
+        capturedOutput,
       });
     });
   });
+}
+
+/** Run a single step sequentially, streaming output live, and print a pass/fail status line. */
+async function runSequential(step: Step): Promise<StepResult> {
+  if (!CI_MODE) {
+    console.log(`${c.cyan}▶ ${step.name}${c.reset}`);
+  }
+  const result = await runStep(step, false);
+  if (!CI_MODE) {
+    if (result.passed) {
+      console.log(`${c.green}✓ ${step.name}${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}\n`);
+    } else {
+      console.log(`${c.red}✗ ${step.name} FAILED${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}\n`);
+    }
+  }
+  return result;
+}
+
+/**
+ * Run multiple steps in parallel (buffering output), then print results in order.
+ * All steps run to completion even if some fail — gives full error report in one pass.
+ */
+async function runParallel(steps: Step[]): Promise<StepResult[]> {
+  if (!CI_MODE) {
+    const names = steps.map(s => s.name).join(', ');
+    console.log(`${c.cyan}▶ Running in parallel: ${names}${c.reset}\n`);
+  }
+
+  const results = await Promise.all(steps.map(s => runStep(s, true)));
+
+  // Print buffered output in deterministic (step definition) order
+  for (const result of results) {
+    if (!CI_MODE) {
+      if (result.passed) {
+        console.log(`${c.green}✓ ${result.name}${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}`);
+      } else {
+        console.log(`${c.red}✗ ${result.name} FAILED${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}`);
+      }
+      if (result.capturedOutput.trim()) {
+        process.stdout.write(result.capturedOutput);
+      }
+      console.log();
+    } else if (!result.passed && result.capturedOutput) {
+      process.stdout.write(result.capturedOutput);
+    }
+  }
+
+  return results;
 }
 
 function formatMs(ms: number): string {
@@ -242,7 +297,9 @@ function formatMs(ms: number): string {
 
 async function main(): Promise<void> {
   const totalStart = Date.now();
-  const results: StepResult[] = [];
+  const allResults: StepResult[] = [];
+
+  const totalSteps = 1 + (FIX_MODE ? FIX_STEPS.length : 0) + PARALLEL_STEPS.length + (FULL_MODE ? 1 : 0);
 
   if (!CI_MODE) {
     const mode = FULL_MODE ? 'full' : 'fast';
@@ -252,37 +309,58 @@ async function main(): Promise<void> {
     if (AUTO_FULL) {
       console.log(`${c.dim}  Auto-escalated to full build (app pages or data files changed)${c.reset}`);
     }
-    console.log(`${c.dim}  Running ${STEPS.length} CI-blocking checks...${c.reset}\n`);
+    console.log(`${c.dim}  Running ${totalSteps} CI-blocking checks (${PARALLEL_STEPS.length} in parallel)...${c.reset}\n`);
   }
 
-  for (const step of STEPS) {
-    if (!CI_MODE) {
-      console.log(`${c.cyan}▶ ${step.name}${c.reset}`);
-    }
+  // ── Phase 1: Build data (prerequisite for everything) ──────────────────────
+  const buildDataResult = await runSequential(BUILD_DATA_STEP);
+  allResults.push(buildDataResult);
+  if (!buildDataResult.passed) {
+    printSummary(allResults, totalStart);
+    process.exit(1);
+  }
 
-    const result = await runStep(step);
-    results.push(result);
-
-    if (!CI_MODE) {
-      if (result.passed) {
-        console.log(`${c.green}✓ ${step.name}${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}\n`);
-      } else {
-        console.log(`${c.red}✗ ${step.name} FAILED${c.reset} ${c.dim}(${formatMs(result.duration)})${c.reset}\n`);
+  // ── Phase 2: Auto-fix (sequential, must run before validation) ─────────────
+  if (FIX_MODE) {
+    for (const step of FIX_STEPS) {
+      const result = await runSequential(step);
+      allResults.push(result);
+      if (!result.passed) {
+        printSummary(allResults, totalStart);
+        process.exit(1);
       }
     }
+  }
 
-    // Fail fast — no point continuing if data build or tests fail
-    if (!result.passed) {
-      break;
+  // ── Phase 3: Independent checks in parallel ────────────────────────────────
+  const parallelResults = await runParallel(PARALLEL_STEPS);
+  allResults.push(...parallelResults);
+  if (parallelResults.some(r => !r.passed)) {
+    printSummary(allResults, totalStart);
+    process.exit(1);
+  }
+
+  // ── Phase 4: Full Next.js build (only if all other checks pass) ────────────
+  if (FULL_MODE) {
+    const buildResult = await runSequential(BUILD_STEP);
+    allResults.push(buildResult);
+    if (!buildResult.passed) {
+      printSummary(allResults, totalStart);
+      process.exit(1);
     }
   }
 
+  printSummary(allResults, totalStart);
+  process.exit(0);
+}
+
+function printSummary(results: StepResult[], totalStart: number): void {
   const totalDuration = Date.now() - totalStart;
   const passed = results.every((r) => r.passed);
   const failed = results.filter((r) => !r.passed);
 
   if (CI_MODE) {
-    console.log(JSON.stringify({ passed, results, duration: formatMs(totalDuration) }));
+    console.log(JSON.stringify({ passed, results: results.map(r => ({ id: r.id, name: r.name, passed: r.passed, duration: r.duration, exitCode: r.exitCode })), duration: formatMs(totalDuration) }));
   } else {
     console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`);
     if (passed) {
@@ -295,8 +373,6 @@ async function main(): Promise<void> {
     }
     console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}\n`);
   }
-
-  process.exit(passed ? 0 : 1);
 }
 
 main();
