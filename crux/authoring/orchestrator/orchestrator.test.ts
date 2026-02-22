@@ -16,6 +16,7 @@ import { TIER_BUDGETS, type OrchestratorContext, type BudgetConfig } from './typ
 import { buildToolDefinitions, extractQualityMetrics, wrapWithTracking, type ToolHandler } from './tools.ts';
 import { evaluateQualityGate } from './quality-gate.ts';
 import { buildImproveSystemPrompt, buildRefinementPrompt } from './prompts.ts';
+import { deduplicateFootnotes } from './orchestrator.ts';
 
 // ---------------------------------------------------------------------------
 // Fixture helpers
@@ -232,6 +233,34 @@ describe('evaluateQualityGate', () => {
     expect(result.gaps.some(g => g.includes('No changes were made'))).toBe(true);
   });
 
+  it('detects table regression', () => {
+    const withTables = SAMPLE_MDX.replace(
+      '## Key Challenges',
+      '## Key Challenges\n\n| Header | Value |\n|--------|-------|\n| A | B |\n',
+    );
+    const ctx = makeContext({
+      budget: TIER_BUDGETS.standard,
+      originalContent: withTables,
+      // Current content has no table
+      currentContent: SAMPLE_MDX.replace('Some background', 'Changed background'),
+    });
+    const result = evaluateQualityGate(ctx);
+    expect(result.gaps.some(g => g.includes('Table count dropped'))).toBe(true);
+  });
+
+  it('skips footnote threshold for polish tier (no research available)', () => {
+    // Polish tier has maxResearchQueries=0, so can't add citations
+    const noFootnotes = '---\ntitle: Test\n---\n\n## Overview\n\nSome decent content without citations.\n\n## Details\n\nMore content here with enough words to pass word count.';
+    const ctx = makeContext({
+      budget: TIER_BUDGETS.polish,
+      originalContent: noFootnotes,
+      currentContent: noFootnotes.replace('Some decent', 'Some improved decent'),
+    });
+    const result = evaluateQualityGate(ctx);
+    // Should not complain about footnotes since polish tier can't add them
+    expect(result.gaps.some(g => g.includes('Citation count') && g.includes('minimum'))).toBe(false);
+  });
+
   it('passes for polish tier with modest content', () => {
     const ctx = makeContext({
       budget: TIER_BUDGETS.polish,
@@ -327,5 +356,43 @@ describe('extractQualityMetrics', () => {
     const metrics = extractQualityMetrics('', '/tmp/empty.mdx');
     expect(metrics.wordCount).toBe(0);
     expect(metrics.footnoteCount).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// deduplicateFootnotes
+// ---------------------------------------------------------------------------
+
+describe('deduplicateFootnotes', () => {
+  it('merges footnotes with the same URL', () => {
+    const input = `
+Some text[^1] and more[^2] and again[^3].
+
+[^1]: Source A (https://example.com/page)
+[^2]: Source B (https://other.com)
+[^3]: Source A duplicate (https://example.com/page)
+`;
+    const result = deduplicateFootnotes(input);
+    // [^3] should be remapped to [^1]
+    expect(result).toContain('[^1]');
+    expect(result).toContain('[^2]');
+    expect(result).not.toMatch(/\[\^3\]/);
+    // The duplicate definition should be removed
+    expect(result).not.toContain('Source A duplicate');
+  });
+
+  it('returns content unchanged when no duplicates', () => {
+    const input = `
+Text[^1] and[^2].
+
+[^1]: Source A (https://a.com)
+[^2]: Source B (https://b.com)
+`;
+    expect(deduplicateFootnotes(input)).toBe(input);
+  });
+
+  it('handles content with no footnotes', () => {
+    const input = 'Just plain text without footnotes.';
+    expect(deduplicateFootnotes(input)).toBe(input);
   });
 });

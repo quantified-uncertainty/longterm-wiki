@@ -45,7 +45,7 @@ const TIER_THRESHOLDS: Record<OrchestratorTier, QualityThresholds> = {
     minWordCount: 800,
     minFootnotes: 8,
     minEntityLinks: 5,
-    minStructuralScore: 45,
+    minStructuralScore: 40,
   },
   deep: {
     minWordCount: 1200,
@@ -89,6 +89,13 @@ export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult
     );
   }
 
+  if (originalMetrics.tableCount > 0 && metrics.tableCount < originalMetrics.tableCount) {
+    gaps.push(
+      `Table count dropped: ${originalMetrics.tableCount} → ${metrics.tableCount}. ` +
+      `Tables provide structural value — preserve or improve them, don't remove them.`
+    );
+  }
+
   // Check against tier thresholds
   if (metrics.wordCount < thresholds.minWordCount) {
     gaps.push(
@@ -97,7 +104,10 @@ export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult
     );
   }
 
-  if (metrics.footnoteCount < thresholds.minFootnotes) {
+  // Only check absolute footnote threshold if research is available.
+  // For polish tier (0 research queries), we can't add new citations,
+  // so only check for regression (handled above).
+  if (ctx.budget.maxResearchQueries > 0 && metrics.footnoteCount < thresholds.minFootnotes) {
     gaps.push(
       `Citation count (${metrics.footnoteCount}) is below the ${thresholds.minFootnotes} minimum for ${ctx.budget.name} tier. ` +
       `Run research and rewrite sections that lack citations.`

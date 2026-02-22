@@ -63,6 +63,10 @@ Follow this general approach, adapting based on the page's specific needs:
 - **Track your budget.** Stop when you've used most of your tool calls or the page is good enough.
 - **Preserve existing quality.** Don't rewrite sections that are already well-cited and well-written.
 - **Keep terminal sections intact.** Don't rewrite Sources, References, See Also, or Related Pages sections.
+- **Preserve tables.** If a section contains Markdown tables, keep them (improve the data if needed). Tables add structural quality — don't replace them with prose paragraphs.
+- **Preserve existing citations.** When rewriting a section, ensure existing footnote references (\`[^N]\`) are retained. Don't strip citations.
+- **Cite accurately.** Each footnote reference \`[^N]\` must match its definition. Don't cite a source for claims it doesn't support.
+- **Update frontmatter.** If you correct major facts (dates, funding amounts, team size), also update the \`llmSummary\` field in the YAML frontmatter to match.
 
 ## When you're done
 

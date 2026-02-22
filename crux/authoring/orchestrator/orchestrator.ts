@@ -31,6 +31,7 @@ import {
   type OrchestratorTier,
   TIER_BUDGETS,
 } from './types.ts';
+import { renumberFootnotes } from '../../lib/section-splitter.ts';
 import { buildToolDefinitions, buildToolHandlers, wrapWithTracking, extractQualityMetrics } from './tools.ts';
 import { buildImproveSystemPrompt, buildRefinementPrompt } from './prompts.ts';
 import { evaluateQualityGate } from './quality-gate.ts';
@@ -42,6 +43,67 @@ const MAX_REFINEMENT_CYCLES = 2;
 
 /** Max tool turns per agent invocation (safety limit). */
 const MAX_TOOL_TURNS = 60;
+
+// ---------------------------------------------------------------------------
+// Footnote deduplication
+// ---------------------------------------------------------------------------
+
+/**
+ * Merge duplicate footnotes that reference the same URL.
+ * When multiple footnotes point to the same URL, keep the first one and
+ * rewrite references in the body to point to it.
+ */
+/** @internal Exported for testing. */
+export function deduplicateFootnotes(content: string): string {
+  // Extract all footnote definitions: [^N]: Title (URL) or [^N]: URL
+  const footnoteDefRe = /^\[\^(\d+)\]:\s*(.+)$/gm;
+  const defs: Array<{ num: number; text: string; url: string }> = [];
+
+  for (const match of content.matchAll(footnoteDefRe)) {
+    const num = parseInt(match[1], 10);
+    const text = match[2].trim();
+    // Extract URL from patterns like "Title (https://...)" or bare "https://..."
+    const urlMatch = text.match(/\((https?:\/\/[^)]+)\)/) || text.match(/(https?:\/\/\S+)/);
+    const url = urlMatch?.[1] || text;
+    defs.push({ num, text, url });
+  }
+
+  if (defs.length === 0) return content;
+
+  // Build URL → first footnote number mapping
+  const urlToFirst = new Map<string, number>();
+  const remapTable = new Map<number, number>(); // oldNum → newNum
+
+  for (const def of defs) {
+    const normalizedUrl = def.url.replace(/\/+$/, '').toLowerCase();
+    if (!urlToFirst.has(normalizedUrl)) {
+      urlToFirst.set(normalizedUrl, def.num);
+    } else {
+      remapTable.set(def.num, urlToFirst.get(normalizedUrl)!);
+    }
+  }
+
+  if (remapTable.size === 0) return content;
+
+  log('orchestrator', `Deduplicating ${remapTable.size} duplicate footnote(s)`);
+
+  let result = content;
+
+  // Rewrite inline references [^oldNum] → [^newNum]
+  for (const [oldNum, newNum] of remapTable) {
+    result = result.replace(
+      new RegExp(`\\[\\^${oldNum}\\](?!:)`, 'g'),
+      `[^${newNum}]`,
+    );
+  }
+
+  // Remove the duplicate definitions
+  for (const oldNum of remapTable.keys()) {
+    result = result.replace(new RegExp(`^\\[\\^${oldNum}\\]:\\s*.+$\\n?`, 'gm'), '');
+  }
+
+  return result;
+}
 
 // ---------------------------------------------------------------------------
 // Agent loop
@@ -271,6 +333,11 @@ export async function runOrchestrator(
     refinementCycles++;
     log('orchestrator', `Refinement cycle ${cycle} complete (${ctx.toolCallCount} total tool calls)`);
   }
+
+  // ── Deduplicate footnotes ────────────────────────────────────────────────
+
+  ctx.currentContent = deduplicateFootnotes(ctx.currentContent);
+  ctx.currentContent = renumberFootnotes(ctx.currentContent);
 
   // ── Update lastEdited ──────────────────────────────────────────────────────
 

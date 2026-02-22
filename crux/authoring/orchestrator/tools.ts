@@ -332,9 +332,15 @@ export function buildToolHandlers(
               entityId: ctx.page.id,
             },
             sourceCache: sectionSources,
-            directions: [ctx.directions, sectionDirections].filter(Boolean).join('\n') || undefined,
+            directions: [
+              ctx.directions,
+              sectionDirections,
+              'Preserve any existing Markdown tables — improve their data if needed but do not replace them with prose.',
+            ].filter(Boolean).join('\n'),
             constraints: {
-              allowTrainingKnowledge: true,
+              // Strict mode when sources are available — only add claims backed by cache
+              // Training knowledge allowed when no sources (polish tier polish-only)
+              allowTrainingKnowledge: sectionSources.length === 0,
               requireClaimMap: sectionSources.length > 0,
             },
           },
@@ -409,14 +415,30 @@ export function buildToolHandlers(
     add_entity_links: async () => {
       try {
         const result = await enrichEntityLinks(ctx.currentContent, { root: ROOT });
-        ctx.currentContent = result.content;
+
+        // Prevent self-linking: extract the page's own entity ID from DataInfoBox
+        // and strip any EntityLink tags pointing to it (a page shouldn't link to itself)
+        const selfEntityMatch = ctx.currentContent.match(/<DataInfoBox\s+entityId="([^"]+)"/);
+        let enrichedContent = result.content;
+        let selfFilteredReplacements = result.replacements;
+        if (selfEntityMatch) {
+          const selfId = selfEntityMatch[1];
+          const selfLinkRe = new RegExp(
+            `<EntityLink\\s[^>]*id="${selfId}"[^>]*>([\\s\\S]*?)</EntityLink>`,
+            'g',
+          );
+          enrichedContent = enrichedContent.replace(selfLinkRe, '$1');
+          selfFilteredReplacements = result.replacements.filter(r => r.entityId !== selfId);
+        }
+
+        ctx.currentContent = enrichedContent;
         // Invalidate section cache since content changed
         ctx.splitPage = null;
         ctx.sections = null;
 
         return JSON.stringify({
-          insertedCount: result.insertedCount,
-          replacements: result.replacements.slice(0, 10).map(r => ({
+          insertedCount: selfFilteredReplacements.length,
+          replacements: selfFilteredReplacements.slice(0, 10).map(r => ({
             text: r.searchText,
             entityId: r.entityId,
           })),

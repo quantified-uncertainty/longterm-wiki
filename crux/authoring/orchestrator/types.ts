@@ -35,7 +35,7 @@ export interface BudgetConfig {
 export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
   polish: {
     name: 'Polish',
-    maxToolCalls: 8,
+    maxToolCalls: 12,
     maxResearchQueries: 0,
     enabledTools: [
       'read_page', 'get_page_metrics', 'split_into_sections',
