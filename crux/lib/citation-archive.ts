@@ -9,7 +9,7 @@
  * Data is stored in data/citation-archive/<page-id>.yaml.
  *
  * Usage:
- *   import { readCitationArchive, writeCitationArchive, extractCitationsFromContent } from './citation-archive.ts';
+ *   import { readCitationArchive, writeCitationArchive, extractCitationsFromContent, saveFetchResultToPostgres } from './citation-archive.ts';
  *
  * Part of the hallucination risk reduction initiative (issue #200).
  */
@@ -18,6 +18,7 @@ import fs from 'fs';
 import path from 'path';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { citationContent } from './knowledge-db.ts';
+import { upsertCitationContent } from './wiki-server/citations.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -613,8 +614,34 @@ function storeCitationContent(
 }
 
 /**
+ * Fire-and-forget write of fetched content to PostgreSQL (wiki-server).
+ * Mirrors source-fetcher.ts::saveToPostgres — errors are silently ignored
+ * so the calling operation isn't blocked when the wiki-server is unavailable.
+ *
+ * Exported so extract-quotes and verify-quotes can also push content to PG.
+ */
+export function saveFetchResultToPostgres(url: string, result: FetchResult): void {
+  if (!result.fullText && !result.fullHtml) return;
+  const text = result.fullText || '';
+  if (text.length === 0) return;
+
+  upsertCitationContent({
+    url,
+    fetchedAt: new Date().toISOString(),
+    httpStatus: result.httpStatus,
+    contentType: result.contentType ?? null,
+    pageTitle: result.pageTitle ?? null,
+    fullText: text,
+    contentLength: result.contentLength,
+  }).catch(() => {
+    // Best-effort — don't fail verification if wiki-server is unavailable
+  });
+}
+
+/**
  * Verify all citations on a page: fetch each URL, store results.
- * Metadata is saved to YAML (in git). Full content is stored in SQLite (.cache/knowledge.db).
+ * Metadata is saved to YAML (in git). Full content is stored in SQLite (.cache/knowledge.db)
+ * and PostgreSQL (wiki-server) for cross-environment access.
  */
 export async function verifyCitationsForPage(
   pageId: string,
@@ -671,6 +698,7 @@ export async function verifyCitationsForPage(
           };
           // Store whatever content we got from academic publishers
           storeCitationContent(ext.url, pageId, ext.footnote, result);
+          saveFetchResultToPostgres(ext.url, result);
         } else {
           const result = await fetchCitationUrl(ext.url);
           const status: VerificationStatus =
@@ -691,9 +719,10 @@ export async function verifyCitationsForPage(
             status,
             note: result.error,
           };
-          // Store full HTML + text content in SQLite for deep verification
+          // Store full HTML + text content in SQLite + PostgreSQL
           if (result.fullHtml || result.fullText) {
             storeCitationContent(ext.url, pageId, ext.footnote, result);
+            saveFetchResultToPostgres(ext.url, result);
           }
         }
 
