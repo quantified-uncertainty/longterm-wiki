@@ -184,8 +184,8 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
-  const priority = options.priority ? parseInt(options.priority as string, 10) : 0;
-  const maxRetries = options.maxRetries ? parseInt(options.maxRetries as string, 10) : 3;
+  const priority = parseIntOpt(options.priority, 0);
+  const maxRetries = parseIntOpt(options.maxRetries, 3);
 
   const result = await createJob({ type, params, priority, maxRetries });
 

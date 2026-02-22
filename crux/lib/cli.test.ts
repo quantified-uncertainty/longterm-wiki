@@ -9,6 +9,7 @@ import {
   optionsToArgs,
   createScriptHandler,
   buildCommands,
+  parseIntOpt,
 } from './cli.ts';
 
 import {
@@ -37,6 +38,56 @@ import {
   Severity,
   FixType,
 } from './validation-engine.ts';
+
+// =============================================================================
+// cli.ts — parseIntOpt
+// =============================================================================
+
+describe('cli.ts — parseIntOpt', () => {
+  it('returns numeric string as integer', () => {
+    expect(parseIntOpt('42', 10)).toBe(42);
+  });
+
+  it('returns 0 for "0" (not the fallback)', () => {
+    expect(parseIntOpt('0', 10)).toBe(0);
+  });
+
+  it('returns negative integer for negative string', () => {
+    expect(parseIntOpt('-5', 10)).toBe(-5);
+  });
+
+  it('truncates float string to integer', () => {
+    expect(parseIntOpt('3.9', 10)).toBe(3);
+  });
+
+  it('returns fallback for undefined', () => {
+    expect(parseIntOpt(undefined, 10)).toBe(10);
+  });
+
+  it('returns fallback for null', () => {
+    expect(parseIntOpt(null, 10)).toBe(10);
+  });
+
+  it('returns fallback for boolean true (bare flag)', () => {
+    expect(parseIntOpt(true, 10)).toBe(10);
+  });
+
+  it('returns fallback for boolean false', () => {
+    expect(parseIntOpt(false, 10)).toBe(10);
+  });
+
+  it('returns fallback for non-numeric string', () => {
+    expect(parseIntOpt('abc', 10)).toBe(10);
+  });
+
+  it('returns fallback for empty string', () => {
+    expect(parseIntOpt('', 10)).toBe(10);
+  });
+
+  it('uses fallback of 0 correctly', () => {
+    expect(parseIntOpt(undefined, 0)).toBe(0);
+  });
+});
 
 // =============================================================================
 // cli.ts — camelToKebab
