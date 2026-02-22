@@ -9,6 +9,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { buildAuditorSourceCache } from './citation-audit.ts';
+import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation-auditor.ts';
 import type { SourceCacheEntry } from '../../../lib/section-writer.ts';
 
 function makeEntry(overrides: Partial<SourceCacheEntry> = {}): SourceCacheEntry {
@@ -16,7 +17,7 @@ function makeEntry(overrides: Partial<SourceCacheEntry> = {}): SourceCacheEntry 
     id: 'SRC-1',
     url: 'https://example.com/article',
     title: 'Example Article',
-    content: 'This is a long enough content string that passes the 50-char threshold for the ok status.',
+    content: 'This is a long enough content string that passes the MIN_SOURCE_CONTENT_LENGTH threshold for ok status.',
     ...overrides,
   };
 }
@@ -34,13 +35,13 @@ describe('buildAuditorSourceCache', () => {
     expect(cache.has('https://example.com/b')).toBe(true);
   });
 
-  it('sets status=ok for entries with content longer than 50 chars', () => {
-    const entry = makeEntry({ content: 'A'.repeat(51) });
+  it('sets status=ok for entries with content longer than MIN_SOURCE_CONTENT_LENGTH chars', () => {
+    const entry = makeEntry({ content: 'A'.repeat(MIN_SOURCE_CONTENT_LENGTH + 1) });
     const cache = buildAuditorSourceCache([entry]);
     expect(cache.get(entry.url)?.status).toBe('ok');
   });
 
-  it('sets status=error for entries with content shorter than or equal to 50 chars', () => {
+  it('sets status=error for entries with content shorter than or equal to MIN_SOURCE_CONTENT_LENGTH chars', () => {
     const entry = makeEntry({ content: 'short' });
     const cache = buildAuditorSourceCache([entry]);
     expect(cache.get(entry.url)?.status).toBe('error');
@@ -91,14 +92,14 @@ describe('buildAuditorSourceCache', () => {
     expect(cache.get(entry.url)?.relevantExcerpts).toEqual([]);
   });
 
-  it('handles entries at exactly the 50-char content boundary', () => {
-    // 50 chars → status 'error' (not > 50)
-    const borderEntry = makeEntry({ content: 'A'.repeat(50) });
+  it('handles entries at exactly the MIN_SOURCE_CONTENT_LENGTH content boundary', () => {
+    // exactly MIN_SOURCE_CONTENT_LENGTH chars → status 'error' (not strictly greater)
+    const borderEntry = makeEntry({ content: 'A'.repeat(MIN_SOURCE_CONTENT_LENGTH) });
     const cacheAtBoundary = buildAuditorSourceCache([borderEntry]);
     expect(cacheAtBoundary.get(borderEntry.url)?.status).toBe('error');
 
-    // 51 chars → status 'ok'
-    const aboveBoundaryEntry = makeEntry({ url: 'https://example.com/above', content: 'A'.repeat(51) });
+    // one char above → status 'ok'
+    const aboveBoundaryEntry = makeEntry({ url: 'https://example.com/above', content: 'A'.repeat(MIN_SOURCE_CONTENT_LENGTH + 1) });
     const cacheAbove = buildAuditorSourceCache([aboveBoundaryEntry]);
     expect(cacheAbove.get(aboveBoundaryEntry.url)?.status).toBe('ok');
   });

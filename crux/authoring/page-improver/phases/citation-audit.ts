@@ -18,7 +18,7 @@
  * See issue #670.
  */
 
-import { auditCitations, type AuditResult, type SourceCache } from '../../../lib/citation-auditor.ts';
+import { auditCitations, MIN_SOURCE_CONTENT_LENGTH, type AuditResult, type SourceCache } from '../../../lib/citation-auditor.ts';
 import type { SourceCacheEntry } from '../../../lib/section-writer.ts';
 import type { FetchedSource } from '../../../lib/source-fetcher.ts';
 import type { PageData, ResearchResult, PipelineOptions } from '../types.ts';
@@ -33,13 +33,14 @@ import { log, writeTemp } from '../utils.ts';
  * Map<string, FetchedSource> expected by auditCitations().
  *
  * SourceCacheEntry carries content but no fetch-status field, so we infer
- * status from content length: entries with >50 chars are treated as 'ok'.
+ * status from content length: entries with more than MIN_SOURCE_CONTENT_LENGTH
+ * chars are treated as 'ok'.
  */
 export function buildAuditorSourceCache(entries: SourceCacheEntry[]): SourceCache {
   const cache: SourceCache = new Map<string, FetchedSource>();
   for (const entry of entries) {
     if (!entry.url) continue;
-    const hasContent = entry.content.length > 50;
+    const hasContent = entry.content.length > MIN_SOURCE_CONTENT_LENGTH;
     const fetchedSource: FetchedSource = {
       url: entry.url,
       title: entry.title,
