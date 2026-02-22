@@ -11,7 +11,9 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock the wiki-server client before importing
+// Mock the wiki-server client before importing.
+// getEntity, searchEntities, getFactsByEntity are thin wrappers around apiRequest,
+// so mocking apiRequest here intercepts all their calls too.
 vi.mock('../lib/wiki-server/client.ts', () => ({
   apiRequest: vi.fn(),
   getServerUrl: vi.fn(() => 'http://localhost:3001'),
@@ -43,9 +45,11 @@ vi.mock('fs', () => ({
 import { commands } from './context.ts';
 import * as clientLib from '../lib/wiki-server/client.ts';
 import * as githubLib from '../lib/github.ts';
+import { writeFileSync } from 'fs';
 
 const mockApiRequest = vi.mocked(clientLib.apiRequest);
 const mockGithubApi = vi.mocked(githubLib.githubApi);
+const mockWriteFileSync = vi.mocked(writeFileSync);
 
 // ---------------------------------------------------------------------------
 // Test data fixtures
@@ -272,6 +276,34 @@ describe('context for-page — successful bundle', () => {
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('unavailable');
   });
+
+  it('writes bundle to output path when --print not set', async () => {
+    mockWriteFileSync.mockClear();
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: PAGE_DETAIL })
+      .mockResolvedValueOnce({ ok: true, data: RELATED_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: BACKLINKS_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: CITATIONS_RESULT });
+
+    const result = await commands['for-page'](['scheming'], { ci: true });
+    expect(result.exitCode).toBe(0);
+    expect(mockWriteFileSync).toHaveBeenCalledOnce();
+    const writtenPath = String(vi.mocked(mockWriteFileSync).mock.calls[0][0]);
+    expect(writtenPath).toContain('wip-context.md');
+  });
+
+  it('respects --output override path', async () => {
+    mockWriteFileSync.mockClear();
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: PAGE_DETAIL })
+      .mockResolvedValueOnce({ ok: true, data: RELATED_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: BACKLINKS_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: CITATIONS_RESULT });
+
+    await commands['for-page'](['scheming'], { output: '/tmp/my-context.md', ci: true });
+    expect(mockWriteFileSync).toHaveBeenCalledOnce();
+    expect(vi.mocked(mockWriteFileSync).mock.calls[0][0]).toBe('/tmp/my-context.md');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -314,6 +346,42 @@ describe('context for-entity — successful bundle', () => {
     const result = await commands['for-entity'](['unknown-entity'], { ci: true });
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('not found');
+  });
+
+  it('facts fetch uses /by-entity/ endpoint (regression: was /api/facts?entity_id=)', async () => {
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: ENTITY_DETAIL })
+      .mockResolvedValueOnce({ ok: true, data: FACTS_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: PAGE_SEARCH_RESULT });
+
+    await commands['for-entity'](['anthropic'], { print: true, ci: true });
+
+    // Verify that one of the apiRequest calls used the correct /by-entity/ path,
+    // not the former broken /api/facts?entity_id= path.
+    const factsCalls = mockApiRequest.mock.calls.filter((call) =>
+      String(call[1]).includes('by-entity'),
+    );
+    expect(factsCalls).toHaveLength(1);
+    expect(factsCalls[0][1]).toContain('/api/facts/by-entity/anthropic');
+    // Verify no call used the old broken path
+    const brokenCalls = mockApiRequest.mock.calls.filter((call) =>
+      String(call[1]).includes('entity_id='),
+    );
+    expect(brokenCalls).toHaveLength(0);
+  });
+
+  it('writes bundle to default output path when --print not set', async () => {
+    mockWriteFileSync.mockClear();
+    mockApiRequest
+      .mockResolvedValueOnce({ ok: true, data: ENTITY_DETAIL })
+      .mockResolvedValueOnce({ ok: true, data: FACTS_RESULT })
+      .mockResolvedValueOnce({ ok: true, data: PAGE_SEARCH_RESULT });
+
+    const result = await commands['for-entity'](['anthropic'], { ci: true });
+    expect(result.exitCode).toBe(0);
+    expect(mockWriteFileSync).toHaveBeenCalledOnce();
+    const writtenPath = String(vi.mocked(mockWriteFileSync).mock.calls[0][0]);
+    expect(writtenPath).toContain('wip-context.md');
   });
 });
 

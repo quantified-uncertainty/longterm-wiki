@@ -21,6 +21,10 @@ import { writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { createLogger } from '../lib/output.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
+import type { EntityEntry, EntitySearchResult } from '../lib/wiki-server/entities.ts';
+import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
+import type { FactEntry, FactsByEntityResult } from '../lib/wiki-server/facts.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
@@ -117,47 +121,6 @@ interface CitationQuotesResult {
   total: number;
 }
 
-interface EntityEntry {
-  id: string;
-  entityType: string;
-  title: string;
-  description: string | null;
-  website: string | null;
-  status: string | null;
-  tags: string[] | null;
-  customFields: Array<{ label: string; value: string; link?: string }> | null;
-  relatedEntries: Array<{ id: string; type: string; relationship?: string }> | null;
-  sources: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
-  syncedAt: string;
-}
-
-interface EntitySearchResult {
-  results: EntityEntry[];
-  query: string;
-  total: number;
-}
-
-interface FactEntry {
-  id: number;
-  entityId: string;
-  factId: string;
-  label: string | null;
-  value: string | null;
-  numeric: number | null;
-  low: number | null;
-  high: number | null;
-  asOf: string | null;
-  measure: string | null;
-  note: string | null;
-  format: string | null;
-}
-
-interface FactsByEntityResult {
-  entityId: string;
-  facts: FactEntry[];
-  total: number;
-}
-
 interface GitHubIssueResponse {
   number: number;
   title: string;
@@ -166,7 +129,6 @@ interface GitHubIssueResponse {
   created_at: string;
   updated_at: string;
   html_url: string;
-  user: { login: string };
 }
 
 // ---------------------------------------------------------------------------
@@ -462,11 +424,8 @@ async function forEntity(
 
   // Fetch entity, facts, and pages mentioning this entity in parallel
   const [entityResult, factsResult, pageSearchResult] = await Promise.all([
-    apiRequest<EntityEntry>('GET', `/api/entities/${encodeURIComponent(entityId)}`),
-    apiRequest<FactsByEntityResult>(
-      'GET',
-      `/api/facts?entity_id=${encodeURIComponent(entityId)}&limit=20`,
-    ),
+    getEntity(entityId),
+    getFactsByEntity(entityId, 20),
     apiRequest<PageSearchResult>(
       'GET',
       `/api/pages/search?q=${encodeURIComponent(entityId)}&limit=10`,
@@ -576,10 +535,7 @@ async function forTopic(
       'GET',
       `/api/pages/search?q=${encodeURIComponent(topic)}&limit=${limit}`,
     ),
-    apiRequest<EntitySearchResult>(
-      'GET',
-      `/api/entities/search?q=${encodeURIComponent(topic)}&limit=8`,
-    ),
+    searchEntities(topic, 8),
   ]);
 
   let bundle = mdHeader(`Topic: "${topic}"`, 'for-topic', [`"${topic}"`]);
@@ -670,10 +626,7 @@ async function forIssue(
       'GET',
       `/api/pages/search?q=${encodeURIComponent(searchQuery)}&limit=10`,
     ),
-    apiRequest<EntitySearchResult>(
-      'GET',
-      `/api/entities/search?q=${encodeURIComponent(searchQuery)}&limit=6`,
-    ),
+    searchEntities(searchQuery, 6),
   ]);
 
   const labels = (issue.labels || []).map((l) => l.name);
