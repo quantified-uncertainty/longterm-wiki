@@ -107,33 +107,34 @@ jobs:
         run: |
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-          # Build the issue body directly with a heredoc (no fragile sed replacements)
-          cat > /tmp/issue_body.md <<ISSUE_BODY
+          # Build the issue body with a quoted heredoc to prevent shell injection
+          # from untrusted HEALTH_RESPONSE content. Variables are inserted via sed.
+          cat > /tmp/issue_body.md <<'ISSUE_BODY'
           ## Wiki server health check failed
 
           | Field | Value |
           |-------|-------|
           | **Status** | :red_circle: Unhealthy |
-          | **Detected at** | ${TIMESTAMP} |
-          | **Error** | ${HEALTH_ERROR} |
-          | **HTTP status** | ${HEALTH_HTTP_CODE} |
+          | **Detected at** | __TIMESTAMP__ |
+          | **Error** | __HEALTH_ERROR__ |
+          | **HTTP status** | __HEALTH_HTTP_CODE__ |
 
           ### Health endpoint response
 
-          \`\`\`json
-          ${HEALTH_RESPONSE}
-          \`\`\`
+          ```json
+          __HEALTH_RESPONSE__
+          ```
 
           ### Possible causes
 
           - **HTTP 503 / connection refused** — Pod is crashing or not running
-          - **\`database: "error"\`** — Database connection or query failure (bad migration, permissions, DB down)
-          - **\`status: "degraded"\`** — Server is running but some queries are failing
+          - **`database: "error"`** — Database connection or query failure (bad migration, permissions, DB down)
+          - **`status: "degraded"`** — Server is running but some queries are failing
           - **Connection timeout** — DNS, ingress, or networking issue
 
           ### Useful commands
 
-          \`\`\`bash
+          ```bash
           # Pod status
           kubectl get pods -n longtermwiki
 
@@ -145,7 +146,7 @@ jobs:
 
           # Restart the deployment
           kubectl rollout restart deployment -n longtermwiki longterm-wiki-server-wiki-server
-          \`\`\`
+          ```
 
           ---
           *Created automatically by the [health monitor workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Will be closed automatically when the server recovers.*
@@ -153,6 +154,13 @@ jobs:
 
           # Strip leading whitespace from heredoc (YAML indentation)
           sed -i 's/^          //' /tmp/issue_body.md
+
+          # Safely substitute values (escape sed special chars in values first)
+          escape_sed() { printf '%s\n' "$1" | sed 's/[&/\]/\\&/g'; }
+          sed -i "s|__TIMESTAMP__|$(escape_sed "$TIMESTAMP")|g" /tmp/issue_body.md
+          sed -i "s|__HEALTH_ERROR__|$(escape_sed "$HEALTH_ERROR")|g" /tmp/issue_body.md
+          sed -i "s|__HEALTH_HTTP_CODE__|$(escape_sed "$HEALTH_HTTP_CODE")|g" /tmp/issue_body.md
+          sed -i "s|__HEALTH_RESPONSE__|$(escape_sed "$HEALTH_RESPONSE")|g" /tmp/issue_body.md
 
           if [ -n "$EXISTING_ISSUE" ]; then
             # Reopen and comment on existing issue instead of creating a new one
