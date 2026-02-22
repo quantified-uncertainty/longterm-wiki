@@ -652,7 +652,8 @@ async function _fetchSourceCore(
   request: FetchRequest,
 ): Promise<FetchedSource> {
   const { extractMode, query } = request;
-  const maxAgeMs = request.maxAgeMs ?? PG_CACHE_TTL_MS;
+  const pgMaxAgeMs = request.maxAgeMs ?? PG_CACHE_TTL_MS;
+  const dbMaxAgeMs = request.maxAgeMs ?? DB_CACHE_TTL_MS;
   const now = new Date().toISOString();
 
   // ---- 1. YouTube transcript (short-circuit before cache/unverifiable checks) ----
@@ -693,7 +694,7 @@ async function _fetchSourceCore(
   }
 
   // ---- 3. PostgreSQL cross-machine cache (async, durable source of truth) ----
-  const pgRow = await loadFromPostgres(url, maxAgeMs);
+  const pgRow = await loadFromPostgres(url, pgMaxAgeMs);
   if (pgRow) {
     const excerpts = extractMode === 'relevant' && query
       ? extractRelevantExcerpts(pgRow.content, query)
@@ -716,7 +717,7 @@ async function _fetchSourceCore(
   }
 
   // ---- 4. SQLite local cache (fast fallback when PostgreSQL is unavailable) ----
-  const dbRow = loadFromDb(url, maxAgeMs);
+  const dbRow = loadFromDb(url, dbMaxAgeMs);
   if (dbRow) {
     const excerpts = extractMode === 'relevant' && query
       ? extractRelevantExcerpts(dbRow.content, query)
