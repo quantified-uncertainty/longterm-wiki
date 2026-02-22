@@ -311,7 +311,7 @@ export function parseBatchVerifierResponse(raw: string, expectedCount: number): 
 
     if (!Array.isArray(parsed.results)) {
       const single = parseVerifierResponse(raw);
-      return Array(expectedCount).fill(single);
+      return Array.from({ length: expectedCount }, () => ({ ...single }));
     }
 
     return Array.from({ length: expectedCount }, (_, i) => {
@@ -334,11 +334,11 @@ export function parseBatchVerifierResponse(raw: string, expectedCount: number): 
       };
     });
   } catch {
-    return Array(expectedCount).fill({
+    return Array.from({ length: expectedCount }, () => ({
       verdict: 'unchecked' as const,
       relevantQuote: '',
       explanation: 'Failed to parse batch verification response.',
-    });
+    }));
   }
 }
 
@@ -574,8 +574,9 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
   const groupResults = await Promise.all(groupTasks);
   const llmAudits = groupResults.flat();
 
-  // Combine non-LLM and LLM results
-  const citationAudits = [...nonLlmAudits, ...llmAudits];
+  // Combine non-LLM and LLM results, restore footnote order
+  const citationAudits = [...nonLlmAudits, ...llmAudits]
+    .sort((a, b) => parseInt(a.footnoteRef, 10) - parseInt(b.footnoteRef, 10));
 
   // Build summary
   const verified = citationAudits.filter((c) => c.verdict === 'verified').length;

@@ -322,4 +322,40 @@ Anthropic is a company.`;
     // The "Anthropic" inside the MDX comment should NOT be linked
     expect(result).toContain('{/* TODO: add Anthropic details */}');
   });
+
+  it('does not nest EntityLinks when a later replacement matches inside an earlier one', () => {
+    // "Machine Intelligence Research Institute" is linked first, then "Intelligence"
+    // should NOT match inside the new <EntityLink> display text
+    const content = 'The Machine Intelligence Research Institute (MIRI) studies Intelligence safety.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Machine Intelligence Research Institute', entityId: 'E40', displayName: 'Machine Intelligence Research Institute' },
+      { searchText: 'Intelligence', entityId: 'E41', displayName: 'Intelligence' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(2);
+    // First replacement: the full institute name is linked
+    expect(result).toContain('<EntityLink id="E40">Machine Intelligence Research Institute</EntityLink>');
+    // Second replacement: "Intelligence" in "Intelligence safety" is linked (not the one inside E40)
+    expect(result).toContain('<EntityLink id="E41">Intelligence</EntityLink> safety');
+    // MUST NOT have nested EntityLinks (EntityLink inside another's display text)
+    expect(result).not.toMatch(/<EntityLink[^>]*>[^<]*<EntityLink/);
+  });
+
+  it('does not link substring matches inside previously created EntityLinks', () => {
+    // "OpenPhilanthropy" linked first, then "Phil" should not match inside it
+    const content = 'OpenPhilanthropy funds AI safety. Phil also contributes.';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'OpenPhilanthropy', entityId: 'E50', displayName: 'OpenPhilanthropy' },
+      { searchText: 'Phil', entityId: 'E51', displayName: 'Phil' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(2);
+    // "Phil" should link the standalone occurrence, not inside OpenPhilanthropy
+    expect(result).toContain('<EntityLink id="E51">Phil</EntityLink> also');
+    expect(result).not.toMatch(/<EntityLink id="E50">Open<EntityLink/);
+  });
 });
