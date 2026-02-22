@@ -27,6 +27,7 @@ import {
 } from '../lib/citation-archive.ts';
 import { fetchAndVerifyClaim } from '../lib/source-fetcher.ts';
 import { findPagesWithCitations } from './shared.ts';
+import { getResourceByUrl } from '../lib/resource-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Main
@@ -209,6 +210,33 @@ async function main() {
       console.log(`    ${c.dim}Page title: "${v.pageTitle || '(none)'}"${c.reset}`);
       if (!titleMatch && v.pageTitle) {
         console.log(`    ${c.yellow}Title mismatch — verify manually${c.reset}`);
+      }
+    }
+  }
+
+  // Cross-reference citation URLs against the Resources system
+  const resourceMatches: { footnote: number; url: string; resourceId: string; resourceTitle: string }[] = [];
+  const noResourceMatch: { footnote: number; url: string }[] = [];
+
+  for (const cit of archive.citations) {
+    const resource = getResourceByUrl(cit.url);
+    if (resource) {
+      resourceMatches.push({ footnote: cit.footnote, url: cit.url, resourceId: resource.id, resourceTitle: resource.title });
+    } else if (cit.status !== 'unverifiable') {
+      noResourceMatch.push({ footnote: cit.footnote, url: cit.url });
+    }
+  }
+
+  if (resourceMatches.length > 0 || noResourceMatch.length > 0) {
+    console.log(`\n${c.bold}${c.blue}Resource Cross-Reference:${c.reset}`);
+    console.log(`  ${c.green}${resourceMatches.length} citation(s) match known resources${c.reset}`);
+    for (const m of resourceMatches) {
+      console.log(`    [^${m.footnote}] ${c.dim}${m.resourceId}${c.reset} "${m.resourceTitle}"`);
+    }
+    if (noResourceMatch.length > 0) {
+      console.log(`  ${c.yellow}${noResourceMatch.length} citation(s) have no matching resource${c.reset}`);
+      for (const m of noResourceMatch) {
+        console.log(`    [^${m.footnote}] ${c.dim}${m.url.slice(0, 70)}${c.reset}`);
       }
     }
   }

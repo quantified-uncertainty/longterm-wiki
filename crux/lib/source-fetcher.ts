@@ -27,17 +27,28 @@
 
 import { getApiKey } from './api-keys.ts';
 import { citationContent } from './knowledge-db.ts';
+import {
+  getResourceById,
+  getResourceByUrl,
+  updateResourceFetchStatus,
+  type ResourceEntry,
+} from './resource-lookup.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces (spec from issue #633)
 // ---------------------------------------------------------------------------
 
 export interface FetchRequest {
-  url: string;
+  /** URL to fetch. Can be omitted if resourceId is provided (URL is inherited from resource). */
+  url?: string;
   /** 'full' returns the whole page content; 'relevant' also extracts excerpts */
   extractMode: 'full' | 'relevant';
   /** Required when extractMode === 'relevant' */
   query?: string;
+  /** Optional resource ID — inherits URL/title/description from resource YAML. */
+  resourceId?: string;
+  /** If true, write fetch status (dead/paywall/ok) back to the resource YAML. Default: false. */
+  updateResourceStatus?: boolean;
 }
 
 export type FetchedSourceStatus = 'ok' | 'paywall' | 'dead' | 'error';
@@ -51,6 +62,15 @@ export interface FetchedSource {
   /** Paragraphs from content most relevant to the query (empty if no query or extractMode=full) */
   relevantExcerpts: string[];
   status: FetchedSourceStatus;
+  /** Resource metadata, present when the URL matched a known resource */
+  resource?: {
+    id: string;
+    title: string;
+    type: string;
+    summary?: string;
+    authors?: string[];
+    tags?: string[];
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -366,6 +386,52 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
 }
 
 // ---------------------------------------------------------------------------
+// Resource resolution
+// ---------------------------------------------------------------------------
+
+/** Build a resource metadata snippet for the FetchedSource response. */
+function buildResourceMeta(r: ResourceEntry): FetchedSource['resource'] {
+  return {
+    id: r.id,
+    title: r.title,
+    type: r.type,
+    summary: r.summary,
+    authors: r.authors,
+    tags: r.tags,
+  };
+}
+
+/**
+ * Resolve a FetchRequest to a concrete URL and optional resource entry.
+ *
+ * Resolution order:
+ *   1. If resourceId is given, look up by ID → get URL + metadata
+ *   2. If url is given, optionally look up by URL for metadata
+ *   3. If neither, throw
+ */
+function resolveRequest(request: FetchRequest): { url: string; resource: ResourceEntry | null } {
+  let resource: ResourceEntry | null = null;
+
+  if (request.resourceId) {
+    resource = getResourceById(request.resourceId);
+    if (resource) {
+      return { url: request.url ?? resource.url, resource };
+    }
+    // resourceId given but not found — fall through to URL
+  }
+
+  const url = request.url;
+  if (!url) {
+    throw new Error('FetchRequest requires either url or a valid resourceId');
+  }
+
+  // Try to find resource metadata by URL
+  resource = getResourceByUrl(url);
+
+  return { url, resource };
+}
+
+// ---------------------------------------------------------------------------
 // Core fetch function
 // ---------------------------------------------------------------------------
 
@@ -378,8 +444,12 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
  *   3. Network fetch (Firecrawl preferred, built-in fallback)
  */
 export async function fetchSource(request: FetchRequest): Promise<FetchedSource> {
-  const { url, extractMode, query } = request;
+  const { extractMode, query } = request;
   const now = new Date().toISOString();
+
+  // ---- 0. Resolve resource + URL ----
+  const { url, resource } = resolveRequest(request);
+  const resourceMeta = resource ? buildResourceMeta(resource) : undefined;
 
   // ---- 1. In-memory session cache ----
   const cached = sessionCache.get(url);
@@ -389,14 +459,14 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
     const excerpts = extractMode === 'relevant' && query
       ? extractRelevantExcerpts(cached.content, query)
       : [];
-    return { ...cached, relevantExcerpts: excerpts };
+    return { ...cached, relevantExcerpts: excerpts, resource: cached.resource ?? resourceMeta };
   }
 
   // ---- 2. Unverifiable domains ----
   if (isUnverifiable(url)) {
     const result: FetchedSource = {
-      url, title: '', fetchedAt: now, content: '',
-      relevantExcerpts: [], status: 'error',
+      url, title: resource?.title ?? '', fetchedAt: now, content: '',
+      relevantExcerpts: [], status: 'error', resource: resourceMeta,
     };
     sessionCache.set(url, result);
     return result;
@@ -411,11 +481,12 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
     const paywall = detectPaywall(dbRow.content);
     const result: FetchedSource = {
       url,
-      title: dbRow.title,
+      title: dbRow.title || resource?.title || '',
       fetchedAt: dbRow.fetchedAt,
       content: dbRow.content,
       relevantExcerpts: excerpts,
       status: paywall ? 'paywall' : 'ok',
+      resource: resourceMeta,
     };
     sessionCache.set(url, result);
     return result;
@@ -466,12 +537,29 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
     ? extractRelevantExcerpts(content, query)
     : [];
 
+  // ---- 8. Use resource title as fallback ----
+  const finalTitle = title || resource?.title || '';
+
   const result: FetchedSource = {
-    url, title, fetchedAt: now, content, relevantExcerpts: excerpts, status,
+    url, title: finalTitle, fetchedAt: now, content, relevantExcerpts: excerpts,
+    status, resource: resourceMeta,
   };
 
-  // ---- 8. Store in session cache ----
+  // ---- 9. Store in session cache ----
   sessionCache.set(url, result);
+
+  // ---- 10. Reflect status back to resource YAML (if requested) ----
+  if (request.updateResourceStatus && resource) {
+    try {
+      updateResourceFetchStatus(resource.id, {
+        fetchStatus: status,
+        fetchedAt: now,
+        fetchedTitle: title || undefined,
+      });
+    } catch {
+      // Best-effort — don't fail the fetch if YAML update fails
+    }
+  }
 
   return result;
 }
@@ -526,4 +614,29 @@ export async function fetchAndVerifyClaim(
   const hasSupport = source.status === 'ok' && source.relevantExcerpts.length > 0;
 
   return { source, hasSupport };
+}
+
+/**
+ * Build FetchRequest objects from a list of resource IDs.
+ *
+ * Convenience helper for callers who want to fetch by resource ID
+ * rather than raw URLs. Invalid IDs (not found in resource YAML) are skipped.
+ */
+export function requestsFromResourceIds(
+  resourceIds: string[],
+  opts: { extractMode?: 'full' | 'relevant'; query?: string; updateResourceStatus?: boolean } = {},
+): FetchRequest[] {
+  return resourceIds
+    .map(id => {
+      const resource = getResourceById(id);
+      if (!resource) return null;
+      return {
+        url: resource.url,
+        resourceId: id,
+        extractMode: opts.extractMode ?? 'full',
+        query: opts.query,
+        updateResourceStatus: opts.updateResourceStatus,
+      } satisfies FetchRequest;
+    })
+    .filter((r): r is FetchRequest => r !== null);
 }
