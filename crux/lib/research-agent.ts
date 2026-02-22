@@ -444,10 +444,15 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     factsPerSource = DEFAULT_FACTS_PER_SOURCE,
   } = config;
 
-  // Focus query with page context if provided
-  const focusedQuery = pageContext
-    ? `${query} ${pageContext.title} ${pageContext.type}`
-    : query;
+  // Focus query with page context if provided, avoiding duplicate terms
+  const focusedQuery = (() => {
+    if (!pageContext) return query;
+    const qLower = query.toLowerCase();
+    const extras = [pageContext.title, pageContext.type]
+      .filter(t => t && !qLower.includes(t.toLowerCase()))
+      .join(' ');
+    return extras ? `${query} ${extras}` : query;
+  })();
 
   let totalCost = 0;
   let searchCost = 0;
