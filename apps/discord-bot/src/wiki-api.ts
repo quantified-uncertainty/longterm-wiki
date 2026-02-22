@@ -1,124 +1,65 @@
+/**
+ * Wiki API client for the discord-bot.
+ *
+ * Response types are imported from the shared crux/lib/wiki-server/ modules
+ * to prevent drift between codebases (#595, #620).
+ *
+ * Types that are discord-bot-specific (health checks, stats, risk reports,
+ * citation health) remain defined locally since crux doesn't need them.
+ */
+
 import { WIKI_SERVER_URL, WIKI_SERVER_API_KEY } from "./config.js";
 
-export interface SearchResult {
-  id: string;
-  numericId: string | null;
-  title: string;
-  description: string | null;
-  entityType: string | null;
-  category: string | null;
-  readerImportance: number | null;
-  quality: number | null;
-  score: number;
-}
+// ---------------------------------------------------------------------------
+// Shared types — imported from crux/lib/wiki-server/
+// ---------------------------------------------------------------------------
 
-export interface SearchResponse {
-  results: SearchResult[];
-  query: string;
-  total: number;
-}
+import type {
+  PageSearchResult,
+  PageDetail,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+} from "../../../crux/lib/wiki-server/pages.ts";
 
-export interface PageDetail {
-  id: string;
-  numericId: string | null;
-  title: string;
-  description: string | null;
-  llmSummary: string | null;
-  category: string | null;
-  subcategory: string | null;
-  entityType: string | null;
-  tags: string | null;
-  quality: number | null;
-  readerImportance: number | null;
-  contentPlaintext: string | null;
-  wordCount: number | null;
-  lastUpdated: string | null;
-}
+import type {
+  EntityEntry,
+  EntitySearchResult,
+} from "../../../crux/lib/wiki-server/entities.ts";
 
-export interface RelatedPage {
-  id: string;
-  type: string;
-  title: string;
-  score: number;
-  label?: string;
-}
+import type {
+  FactEntry,
+  FactsByEntityResult,
+} from "../../../crux/lib/wiki-server/facts.ts";
 
-export interface RelatedPagesResponse {
-  entityId: string;
-  related: RelatedPage[];
-  total: number;
-}
+import type {
+  SessionEntry,
+} from "../../../crux/lib/wiki-server/sessions.ts";
 
-export interface EntityDetail {
-  id: string;
-  numericId: string | null;
-  entityType: string;
-  title: string;
-  description: string | null;
-  website: string | null;
-  tags: string[] | null;
-  clusters: string[] | null;
-  status: string | null;
-  lastUpdated: string | null;
-  customFields: Array<{ label: string; value: string; link?: string }> | null;
-  relatedEntries: Array<{ id: string; type: string; relationship?: string }> | null;
-  sources: Array<{ title: string; url?: string; author?: string; date?: string }> | null;
-}
+import type {
+  AutoUpdateRunEntry,
+} from "../../../crux/lib/wiki-server/auto-update.ts";
 
-export interface EntitySearchResponse {
-  results: EntityDetail[];
-  query: string;
-  total: number;
-}
+// Re-export shared types for consumers within discord-bot
+export type {
+  PageSearchResult,
+  PageDetail,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+  EntityEntry,
+  EntitySearchResult,
+  FactsByEntityResult,
+  FactEntry,
+  SessionEntry,
+  AutoUpdateRunEntry,
+};
 
-export interface Fact {
-  id: number;
-  entityId: string;
-  factId: string;
-  label: string | null;
-  value: string | null;
-  numeric: number | null;
-  low: number | null;
-  high: number | null;
-  asOf: string | null;
-  measure: string | null;
-  subject: string | null;
-  note: string | null;
-  source: string | null;
-  sourceResource: string | null;
-  format: string | null;
-  formatDivisor: number | null;
-}
-
-export interface FactsResponse {
-  entityId: string;
-  facts: Fact[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface CitationQuote {
-  id: number;
-  pageId: string;
-  footnote: number;
-  url: string | null;
-  resourceId: string | null;
-  claimText: string;
-  claimContext: string | null;
-  sourceQuote: string | null;
-  sourceLocation: string | null;
-  quoteVerified: boolean;
-  verificationScore: number | null;
-  sourceTitle: string | null;
-  sourceType: string | null;
-  accuracyVerdict: string | null;
-  accuracyScore: number | null;
-}
-
-export interface PageCitationsResponse {
-  quotes: CitationQuote[];
-}
+// ---------------------------------------------------------------------------
+// Discord-bot-specific types (not in crux)
+// ---------------------------------------------------------------------------
 
 export interface Resource {
   id: string;
@@ -136,21 +77,6 @@ export interface ResourceSearchResponse {
   results: Resource[];
   count: number;
   query: string;
-}
-
-export interface Backlink {
-  id: string;
-  type: string;
-  title: string;
-  relationship?: string;
-  linkType: string;
-  weight: number;
-}
-
-export interface BacklinksResponse {
-  targetId: string;
-  backlinks: Backlink[];
-  total: number;
 }
 
 export interface WikiHealth {
@@ -178,53 +104,6 @@ export interface WikiStats {
   citations: CitationStats;
 }
 
-export interface PageChange {
-  id: number;
-  date: string;
-  branch: string | null;
-  title: string;
-  summary: string | null;
-  model: string | null;
-  duration: string | null;
-  cost: string | null;
-  prUrl: string | null;
-  pages: string[];
-}
-
-export interface RecentChangesResponse {
-  sessions: PageChange[];
-}
-
-export interface AutoUpdateRun {
-  id: number;
-  date: string;
-  startedAt: string;
-  completedAt: string | null;
-  trigger: string;
-  budgetLimit: number | null;
-  budgetSpent: number | null;
-  sourcesChecked: number | null;
-  itemsFetched: number | null;
-  itemsRelevant: number | null;
-  pagesPlanned: number | null;
-  pagesUpdated: number | null;
-  pagesFailed: number | null;
-  newPagesCreated: string[];
-  results: Array<{
-    pageId: string;
-    status: string;
-    tier: string | null;
-    errorMessage: string | null;
-  }>;
-}
-
-export interface AutoUpdateStatusResponse {
-  entries: AutoUpdateRun[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
 export interface BrokenCitation {
   pageId: string;
   footnote: number;
@@ -250,6 +129,21 @@ export interface RiskReportResponse {
   pages: RiskPage[];
 }
 
+export interface RecentChangesResponse {
+  sessions: SessionEntry[];
+}
+
+export interface AutoUpdateStatusResponse {
+  entries: AutoUpdateRunEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+// ---------------------------------------------------------------------------
+// HTTP helpers
+// ---------------------------------------------------------------------------
+
 function headers(): Record<string, string> {
   const h: Record<string, string> = {
     Accept: "application/json",
@@ -260,10 +154,14 @@ function headers(): Record<string, string> {
   return h;
 }
 
+// ---------------------------------------------------------------------------
+// API functions
+// ---------------------------------------------------------------------------
+
 export async function searchWiki(
   query: string,
   limit = 10
-): Promise<SearchResult[]> {
+): Promise<PageSearchResult["results"]> {
   const url = new URL("/api/pages/search", WIKI_SERVER_URL);
   url.searchParams.set("q", query);
   url.searchParams.set("limit", String(limit));
@@ -274,7 +172,7 @@ export async function searchWiki(
       console.error(`Wiki search failed: ${res.status} ${res.statusText}`);
       return [];
     }
-    const data = (await res.json()) as SearchResponse;
+    const data = (await res.json()) as PageSearchResult;
     return data.results;
   } catch (error) {
     console.error("Wiki search error:", error);
@@ -302,7 +200,7 @@ export async function getPage(id: string): Promise<PageDetail | null> {
 export async function getRelatedPages(
   id: string,
   limit = 10
-): Promise<RelatedPagesResponse | null> {
+): Promise<RelatedResult | null> {
   const url = new URL(
     `/api/links/related/${encodeURIComponent(id)}`,
     WIKI_SERVER_URL
@@ -316,14 +214,14 @@ export async function getRelatedPages(
       console.error(`getRelatedPages failed: ${res.status} ${res.statusText}`);
       return null;
     }
-    return (await res.json()) as RelatedPagesResponse;
+    return (await res.json()) as RelatedResult;
   } catch (error) {
     console.error("getRelatedPages error:", error);
     return null;
   }
 }
 
-export async function getEntity(id: string): Promise<EntityDetail | null> {
+export async function getEntity(id: string): Promise<EntityEntry | null> {
   const url = new URL(
     `/api/entities/${encodeURIComponent(id)}`,
     WIKI_SERVER_URL
@@ -336,7 +234,7 @@ export async function getEntity(id: string): Promise<EntityDetail | null> {
       console.error(`getEntity failed: ${res.status} ${res.statusText}`);
       return null;
     }
-    return (await res.json()) as EntityDetail;
+    return (await res.json()) as EntityEntry;
   } catch (error) {
     console.error("getEntity error:", error);
     return null;
@@ -346,7 +244,7 @@ export async function getEntity(id: string): Promise<EntityDetail | null> {
 export async function searchEntities(
   query: string,
   limit = 10
-): Promise<EntitySearchResponse | null> {
+): Promise<EntitySearchResult | null> {
   const url = new URL("/api/entities/search", WIKI_SERVER_URL);
   url.searchParams.set("q", query);
   url.searchParams.set("limit", String(limit));
@@ -357,14 +255,14 @@ export async function searchEntities(
       console.error(`searchEntities failed: ${res.status} ${res.statusText}`);
       return null;
     }
-    return (await res.json()) as EntitySearchResponse;
+    return (await res.json()) as EntitySearchResult;
   } catch (error) {
     console.error("searchEntities error:", error);
     return null;
   }
 }
 
-export async function getFacts(entityId: string): Promise<FactsResponse | null> {
+export async function getFacts(entityId: string): Promise<FactsByEntityResult | null> {
   const url = new URL(
     `/api/facts/by-entity/${encodeURIComponent(entityId)}`,
     WIKI_SERVER_URL
@@ -377,7 +275,7 @@ export async function getFacts(entityId: string): Promise<FactsResponse | null> 
       console.error(`getFacts failed: ${res.status} ${res.statusText}`);
       return null;
     }
-    return (await res.json()) as FactsResponse;
+    return (await res.json()) as FactsByEntityResult;
   } catch (error) {
     console.error("getFacts error:", error);
     return null;
@@ -386,7 +284,7 @@ export async function getFacts(entityId: string): Promise<FactsResponse | null> 
 
 export async function getPageCitations(
   pageId: string
-): Promise<PageCitationsResponse | null> {
+): Promise<CitationQuotesResult | null> {
   const url = new URL("/api/citations/quotes", WIKI_SERVER_URL);
   url.searchParams.set("page_id", pageId);
 
@@ -398,7 +296,7 @@ export async function getPageCitations(
       );
       return null;
     }
-    return (await res.json()) as PageCitationsResponse;
+    return (await res.json()) as CitationQuotesResult;
   } catch (error) {
     console.error("getPageCitations error:", error);
     return null;
@@ -429,7 +327,7 @@ export async function searchResources(
 export async function getBacklinks(
   id: string,
   limit = 20
-): Promise<BacklinksResponse | null> {
+): Promise<BacklinksResult | null> {
   const url = new URL(
     `/api/links/backlinks/${encodeURIComponent(id)}`,
     WIKI_SERVER_URL
@@ -443,7 +341,7 @@ export async function getBacklinks(
       console.error(`getBacklinks failed: ${res.status} ${res.statusText}`);
       return null;
     }
-    return (await res.json()) as BacklinksResponse;
+    return (await res.json()) as BacklinksResult;
   } catch (error) {
     console.error("getBacklinks error:", error);
     return null;
