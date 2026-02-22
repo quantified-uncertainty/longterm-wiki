@@ -128,6 +128,8 @@ export const MarkAccuracyBatchSchema = z.object({
 
 /** Maximum size for the full-text preview field (50 KB). */
 export const CITATION_CONTENT_PREVIEW_MAX = 50 * 1024;
+/** Maximum size for the full_text field (5 MB). */
+export const CITATION_CONTENT_FULL_TEXT_MAX = 5 * 1024 * 1024;
 
 export const UpsertCitationContentSchema = z.object({
   url: z.string().min(1).max(2000),
@@ -136,7 +138,7 @@ export const UpsertCitationContentSchema = z.object({
   contentType: z.string().max(200).nullable().optional(),
   pageTitle: z.string().max(1000).nullable().optional(),
   fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().optional(),
-  fullText: z.string().nullable().optional(),
+  fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().optional(),
   contentLength: z.number().int().nullable().optional(),
   contentHash: z.string().max(64).nullable().optional(),
 });
