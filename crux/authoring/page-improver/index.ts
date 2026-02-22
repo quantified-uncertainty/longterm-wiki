@@ -106,6 +106,7 @@ Options:
   --tier <tier>                   polish ($2-3), standard ($5-8), deep ($15-25), or triage (auto)
   --apply                         Apply changes directly (don't just preview)
   --no-grade                      Skip auto-grading after apply (grading runs by default)
+  --skip-session-log              Skip auto-posting session log to wiki-server after apply
   --triage                        Run news-check triage only (no improvement)
   --list                          List pages needing improvement
   --limit N                       Limit list results (default: 20)
@@ -169,6 +170,7 @@ Examples:
     maxAdversarialIterations: opts['max-adversarial-iterations']
       ? parseInt(opts['max-adversarial-iterations'] as string, 10)
       : undefined,
+    skipSessionLog: opts['skip-session-log'] ? true : undefined,
   });
 }
 

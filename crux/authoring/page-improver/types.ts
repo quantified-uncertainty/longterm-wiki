@@ -102,6 +102,12 @@ export interface PipelineOptions {
   /** Maximum number of adversarial re-research iterations (default: 2). */
   maxAdversarialIterations?: number;
   deep?: boolean;
+  /**
+   * When true, skip auto-posting the session log to wiki-server after --apply.
+   * Default: false (session log is written automatically on every --apply run).
+   * Use this when the caller (e.g. auto-update batch) wants to write its own aggregate log.
+   */
+  skipSessionLog?: boolean;
 }
 
 export interface PipelineResults {

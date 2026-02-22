@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log'],
     positional: true,
   },
   create: {
@@ -82,6 +82,7 @@ Options:
   --min-score=<n>   Minimum suggestion score, default 2 (suggest-links)
   --dry-run         Preview without changes
   --apply           Apply changes (suggest-links, improve)
+  --skip-session-log  Skip auto-posting session log to wiki-server after improve --apply
   --verbose         Detailed output
 
 Examples:
