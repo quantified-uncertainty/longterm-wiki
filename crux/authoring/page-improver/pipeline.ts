@@ -11,12 +11,13 @@ import { createSession } from '../../lib/wiki-server/sessions.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
+  EnrichResult,
 } from './types.ts';
 import { ROOT, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import {
-  analyzePhase, researchPhase, improvePhase, reviewPhase,
+  analyzePhase, researchPhase, improvePhase, enrichPhase, reviewPhase,
   validatePhase, gapFillPhase, triagePhase, adversarialLoopPhase,
 } from './phases.ts';
 
@@ -160,6 +161,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   let analysis: AnalysisResult | undefined, research: ResearchResult | undefined;
   let improvedContent: string | undefined, review: ReviewResult | undefined;
   let adversarialLoopResult: AdversarialLoopResult | undefined;
+  let enrichResult: EnrichResult | undefined;
 
   // Run phases based on tier
   for (const phase of tierConfig.phases) {
@@ -193,6 +195,17 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           logBiographicalWarnings(improvedContent, page, tier);
         }
         break;
+
+      case 'enrich': {
+        if (options.skipEnrich) {
+          log('enrich', 'Skipped (--skip-enrich)');
+        } else {
+          const enrichOutput = await enrichPhase(page, improvedContent!, options);
+          improvedContent = enrichOutput.content;
+          enrichResult = enrichOutput.result;
+        }
+        break;
+      }
 
       case 'validate': {
         const validation = await validatePhase(page, improvedContent!, options);
@@ -320,6 +333,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     phases: tierConfig.phases,
     review,
     adversarialLoopResult,
+    enrichResult,
     outputPath: finalPath,
   };
   writeTemp(page.id, 'pipeline-results.json', results);
