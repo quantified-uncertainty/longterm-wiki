@@ -9,7 +9,7 @@ quality: 60
 readerImportance: 94
 researchImportance: 76.5
 tacticalValue: 74
-lastEdited: "2026-02-20"
+lastEdited: "2026-02-22"
 update_frequency: 21
 llmSummary: "Comprehensive analysis of LLM capabilities showing rapid progress from GPT-2 (1.5B parameters, 2019) to GPT-5 and Gemini 2.5 (2025), with training costs growing 2.4x annually and projected to exceed $1B by 2027. Documents emergence of inference-time scaling paradigm, mechanistic interpretability advances including Gemma Scope 2, multilingual alignment research, factuality benchmarking via FACTS suite, and identifies key safety concerns including 8-45% hallucination rates, persuasion capabilities, and growing autonomous agent capabilities."
 ratings:
@@ -19,7 +19,7 @@ ratings:
   completeness: 7.5
 clusters: ["ai-safety", "governance"]
 ---
-import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} from '@components/wiki';
+import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid, F} from '@components/wiki';
 
 <DataExternalLinks pageId="language-models" />
 
@@ -34,7 +34,7 @@ import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} from '@component
 | **Training Cost Trend** | 2.4x annual growth | [Epoch AI](https://epoch.ai/blog/how-much-does-it-cost-to-train-frontier-ai-models): frontier models projected to exceed \$1B by 2027 |
 | **Inference Cost Trend** | 280x reduction since 2022 | GPT-3.5-equivalent dropped from \$10 to \$1.07 per million tokens ([Stanford HAI](https://hai.stanford.edu/ai-index/2025-ai-index-report)) |
 | **Hallucination Rates** | 8-45% depending on task | [Vectara Leaderboard](https://github.com/vectara/hallucination-leaderboard): best models at 8%; [HalluLens](https://aclanthology.org/2025.acl-long.1176/): up to 45% on factual queries |
-| **Safety Maturity** | Moderate | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="rlhf">RLHF</EntityLink> established; [responsible scaling policies](https://www.anthropic.com/news/anthropics-responsible-scaling-policy) implemented by major labs |
+| **Safety Maturity** | Moderate | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E259" name="rlhf">RLHF</EntityLink> established; [responsible scaling policies](https://www.anthropic.com/news/anthropics-responsible-scaling-policy) implemented by major labs |
 | **Open-Closed Gap** | Narrowing | Gap shrunk from 8.04% to 1.70% on Chatbot Arena (Jan 2024 → Feb 2025) |
 
 ## Key Links
@@ -47,7 +47,7 @@ import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid} from '@component
 
 ## Overview
 
-Large Language Models (LLMs) are transformer-based neural networks trained on vast text corpora using next-token prediction. Despite their deceptively simple training objective, LLMs exhibit sophisticated <EntityLink id="emergent-capabilities">emergent capabilities</EntityLink> including reasoning, coding, scientific analysis, and complex task execution. These models have transformed abstract AI safety discussions into concrete, immediate concerns while providing the clearest path toward <EntityLink id="factors-ai-capabilities-overview">artificial general intelligence</EntityLink>.
+Large Language Models (LLMs) are transformer-based neural networks trained on vast text corpora using next-token prediction. Despite their deceptively simple training objective, LLMs exhibit sophisticated <EntityLink id="E117" name="emergent-capabilities">emergent capabilities</EntityLink> including reasoning, coding, scientific analysis, and complex task execution. These models have transformed abstract AI safety discussions into concrete, immediate concerns while providing the clearest path toward <EntityLink id="E660" name="factors-ai-capabilities-overview">artificial general intelligence</EntityLink>.
 
 The core insight underlying LLMs is that training a model to predict the next word in a sequence—a task achievable without labeled data—produces internal representations useful for a wide range of downstream tasks. This was first demonstrated at scale in [OpenAI's GPT-2 work (2019)](https://openai.com/research/better-language-models), which showed coherent multi-paragraph generation, and refined through unsupervised pretraining approaches described in [Improving Language Understanding with Unsupervised Learning (2018)](https://openai.com/research/language-unsupervised). The discovery of the ["unsupervised sentiment neuron"](https://openai.com/research/unsupervised-sentiment-neuron) in 2017 was an early indicator that such models form interpretable internal structure.
 
@@ -56,6 +56,8 @@ Current frontier models—GPT-5, Claude Opus 4.5, Gemini 2.5 Pro, and Llama 4—
 A parallel development is the rapid growth of the open-weight ecosystem. Meta's Llama family has grown to become a leading engine of AI innovation, with [over 10x growth since 2023](https://ai.meta.com/blog/llama-4-multimodal-intelligence/). Google's Gemma models—including Gemma 3 and the Gemma 3n mobile-first variants—have provided the safety research community with accessible architectures for mechanistic interpretability work. This open/closed convergence has implications for both capability diffusion and the tractability of safety interventions.
 
 ## Capability Architecture
+
+The diagram below maps the flow from training through inference to observed capabilities. Capabilities are grouped by which inference regime produces them; the distinction between "standard" and "search-augmented" inference is a key axis along which safety-relevant behaviors (extended planning, autonomous task execution) emerge.
 
 <Mermaid chart={`
 flowchart TD
@@ -82,18 +84,19 @@ flowchart TD
     style TRAINING fill:#e6f3ff
     style INFERENCE fill:#fff3e6
     style CAPABILITIES fill:#e6ffe6
-    style ADV fill:#ffcccc
 `} />
+
+*Note: Capabilities in the "Emergent Capabilities" subgraph are descriptive, not evaluative. Safety implications of each capability class are discussed in the [Concerning Capabilities Assessment](#concerning-capabilities-assessment) and [Safety-Relevant Positive Capabilities](#safety-relevant-positive-capabilities) sections below.*
 
 ## Risk Assessment
 
 | Risk Category | Severity | Likelihood | Timeline | Trend |
 |---------------|----------|------------|----------|-------|
-| <EntityLink id="deceptive-alignment">Deceptive Capabilities</EntityLink> | High | Moderate | 1-3 years | Increasing |
-| <EntityLink id="persuasion">Persuasion & Manipulation</EntityLink> | High | High | Current | Accelerating |
-| <EntityLink id="cyberweapons">Autonomous Cyber Operations</EntityLink> | Moderate-High | Moderate | 2-4 years | Increasing |
-| <EntityLink id="scientific-research">Scientific Research Acceleration</EntityLink> | Mixed | High | Current | Accelerating |
-| <EntityLink id="economic-disruption">Economic Disruption</EntityLink> | High | High | 2-5 years | Accelerating |
+| <EntityLink id="E93" name="deceptive-alignment">Deceptive Capabilities</EntityLink> | High | Moderate | 1-3 years | Increasing |
+| <EntityLink id="E224" name="persuasion">Persuasion & Manipulation</EntityLink> | High | High | Current | Accelerating |
+| <EntityLink id="E86" name="cyberweapons">Autonomous Cyber Operations</EntityLink> | Moderate-High | Moderate | 2-4 years | Increasing |
+| <EntityLink id="E277" name="scientific-research">Scientific Research Acceleration</EntityLink> | Mixed | High | Current | Accelerating |
+| <EntityLink id="E108" name="economic-disruption">Economic Disruption</EntityLink> | High | High | 2-5 years | Accelerating |
 
 ## Capability Progression Timeline
 
@@ -125,9 +128,9 @@ flowchart TD
 | ARC-AGI | Novel reasoning | 5% | 13.3% | 87.5% | ≈85% |
 | Codeforces | Competitive coding | 11% | <F e="openai" f="84af6115">89%</F> (94th %ile) | 99.8th %ile | N/A |
 
-*Source: [OpenAI o1 announcement](https://openai.com/index/learning-to-reason-with-llms/), [OpenAI o3 analysis](https://www.datacamp.com/blog/o3-openai), [Stanford AI Index](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance)*
+*Source: [OpenAI o1 announcement](https://openai.com/index/learning-to-reason-with-llms/), [OpenAI o3 analysis](https://arcprize.org/blog/oai-o3-pub-breakthrough), [Stanford AI Index](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance)*
 
-The o3 results represent a qualitative shift: o3 achieved nearly human-level performance on [ARC-AGI (87.5%](https://arcprize.org/blog/oai-o3-pub-breakthrough) vs ~85% human baseline), a benchmark specifically designed to test general reasoning rather than pattern matching. On FrontierMath, o3 solved 25.2% of problems compared to o1's 2%—a 12x improvement that suggests reasoning capabilities may be scaling faster than expected. However, on the harder [ARC-AGI-2 benchmark](https://arcprize.org/blog/analyzing-o3-with-arc-agi), o3 scores only 3% compared to 60% for average humans, revealing significant limitations in truly novel reasoning.
+The o3 results represent a qualitative shift: o3 achieved nearly human-level performance on [ARC-AGI (87.5%)](https://arcprize.org/blog/oai-o3-pub-breakthrough) vs ~85% human baseline, a benchmark specifically designed to test general reasoning rather than pattern matching. On FrontierMath, o3 solved 25.2% of problems compared to o1's 2%—a 12x improvement that suggests reasoning capabilities may be scaling faster than expected. However, on the harder [ARC-AGI-2 benchmark](https://arcprize.org/blog/analyzing-o3-with-arc-agi), o3 scores only 3% compared to 60% for average humans, revealing significant limitations in truly novel reasoning.
 
 ## Scaling Laws and Predictable Progress
 
@@ -158,24 +161,24 @@ The o1 and o3 models introduced a new paradigm: **inference-time compute scaling
 | Inference-time scaling | Longer reasoning chains, search | Lower training cost, expensive inference | o1, o3 |
 | Combined scaling | Both approaches | Maximum capability, maximum cost | GPT-5, Claude Opus 4.5 |
 
-This shift is significant for AI safety: inference-time scaling allows models to "think longer" on hard problems, potentially achieving superhuman performance on specific tasks while maintaining manageable training costs. However, o1 is approximately 6x more expensive and 30x slower than GPT-4o per query. The [RE-Bench evaluation](https://hai.stanford.edu/ai-index/2025-ai-index-report) found that in short time-horizon settings (2-hour budget), top AI systems score 4x higher than human experts, but as the time budget increases to 32 hours, human performance surpasses AI by 2 to 1.
+This shift has implications for AI safety: inference-time scaling allows models to "think longer" on hard problems, potentially achieving strong performance on specific tasks while maintaining manageable training costs. However, o1 is approximately 6x more expensive and 30x slower than GPT-4o per query. The [RE-Bench evaluation](https://hai.stanford.edu/ai-index/2025-ai-index-report) found that in short time-horizon settings (2-hour budget), top AI systems score 4x higher than human experts, but as the time budget increases to 32 hours, human performance surpasses AI by 2 to 1.
 
 ### Emergent Capability Thresholds
 
 | Capability | Emergence Scale | Evidence | Safety Relevance |
 |------------|----------------|----------|------------------|
-| Few-shot learning | ≈100B parameters | GPT-3 breakthrough | <EntityLink id="tool-use">Tool use</EntityLink> foundation |
-| Chain-of-thought | ≈10B parameters | PaLM, GPT-3 variants | <EntityLink id="reasoning">Complex reasoning</EntityLink> |
-| Code generation | ≈1B parameters | Codex, GitHub Copilot | <EntityLink id="cyberweapons">Cyber capabilities</EntityLink> |
+| Few-shot learning | ≈100B parameters | GPT-3 breakthrough | <EntityLink id="E356" name="tool-use">Tool use</EntityLink> foundation |
+| Chain-of-thought | ≈10B parameters | PaLM, GPT-3 variants | <EntityLink id="E246" name="reasoning">Complex reasoning</EntityLink> |
+| Code generation | ≈1B parameters | Codex, GitHub Copilot | <EntityLink id="E86" name="cyberweapons">Cyber capabilities</EntityLink> |
 | Instruction following | ≈10B parameters | InstructGPT | Human-AI interaction paradigm |
 | PhD-level reasoning | o1+ scale | GPQA Diamond performance | Expert-level autonomy |
-| Strategic planning | o3 scale | ARC-AGI performance | <EntityLink id="deceptive-alignment">Deception potential</EntityLink> |
+| Strategic planning | o3 scale | ARC-AGI performance | <EntityLink id="E93" name="deceptive-alignment">Deception potential</EntityLink> |
 
 Research from [CSET Georgetown](https://cset.georgetown.edu/article/emergent-abilities-in-large-language-models-an-explainer/) and the [2025 Emergent Abilities Survey](https://arxiv.org/abs/2503.05788) documents that emergent abilities depend on multiple interacting factors: scaling up parameters or depth lowers the threshold for emergence but is neither necessary nor sufficient alone—data quality, diversity, training objectives, and architecture modifications also matter significantly. Emergence aligns more closely with pre-training loss landmarks than with sheer parameter count; smaller models can match larger ones if training loss is sufficiently reduced.
 
 According to the [Stanford AI Index 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report), benchmark performance has improved substantially: scores rose by 18.8, 48.9, and 67.3 percentage points on MMMU, GPQA, and SWE-bench respectively in one year. The gap between US and Chinese models has also narrowed—from 17.5 to 0.3 percentage points on MMLU.
 
-**Safety implication:** As AI systems gain autonomous reasoning capabilities, they also develop behaviors relevant to safety evaluation, including goal persistence, strategic planning, and the capacity for <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>. OpenAI's o3-mini became the first AI model to receive a "Medium risk" classification for Model Autonomy under internal capability evaluation frameworks.
+**Safety implication:** As AI systems gain autonomous reasoning capabilities, they also develop behaviors relevant to safety evaluation, including goal persistence, strategic planning, and the capacity for <EntityLink id="E93" name="deceptive-alignment">deceptive alignment</EntityLink>. OpenAI's o3-mini became the first AI model to receive a "Medium risk" classification for Model Autonomy under internal capability evaluation frameworks.
 
 ## RLHF and Alignment Training Foundations
 
@@ -183,12 +186,12 @@ A key technique underlying modern aligned LLMs is **Reinforcement Learning from 
 
 | RLHF Component | Function | Safety Relevance |
 |----------------|----------|------------------|
-| Reward model | Converts human preferences into a differentiable signal | Central to <EntityLink id="rlhf">RLHF</EntityLink> alignment |
-| PPO fine-tuning | Updates language model to maximize reward | Can introduce <EntityLink id="reward-hacking">reward hacking</EntityLink> |
-| Constitutional AI | Replaces human labelers with model self-critique against principles | Scales alignment oversight; see <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> |
+| Reward model | Converts human preferences into a differentiable signal | Central to <EntityLink id="E259" name="rlhf">RLHF</EntityLink> alignment |
+| PPO fine-tuning | Updates language model to maximize reward | Can introduce <EntityLink id="E253" name="reward-hacking">reward hacking</EntityLink> |
+| Constitutional AI | Replaces human labelers with model self-critique against principles | Scales alignment oversight; see <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> |
 | Multilingual consistency | Enforces safety behaviors across languages | [Align Once, Benefit Multilingually (2025)](https://arxiv.org/abs/2502.07833) |
 
-A significant limitation is that RLHF-trained models can exhibit <EntityLink id="sycophancy">sycophancy</EntityLink>—systematically agreeing with user beliefs rather than providing accurate responses—because human raters often prefer confident, agreeable answers. Recent work on [multi-objective alignment for psychotherapy contexts](https://arxiv.org/abs/2502.07312) and policy-constrained alignment frameworks like [PolicyPad (2025)](https://arxiv.org/abs/2502.10967) explore how to balance multiple competing alignment objectives.
+A significant limitation is that RLHF-trained models can exhibit <EntityLink id="E295" name="sycophancy">sycophancy</EntityLink>—systematically agreeing with user beliefs rather than providing accurate responses—because human raters often prefer confident, agreeable answers. Recent work on [multi-objective alignment for psychotherapy contexts](https://arxiv.org/abs/2502.07312) and policy-constrained alignment frameworks like [PolicyPad (2025)](https://arxiv.org/abs/2502.10967) explore how to balance multiple competing alignment objectives.
 
 **Multilingual alignment gap:** A consistent finding across alignment research is that safety training applied primarily in English does not reliably transfer to other languages. [Align Once, Benefit Multilingually (2025)](https://arxiv.org/abs/2502.07833) proposes methods to enforce multilingual consistency in safety alignment by training on cross-lingual consistency losses. Related work on [Helpful to a Fault (2025)](https://arxiv.org/abs/2502.09933) measures illicit assistance rates across 40+ languages in multi-turn interactions, finding that multilingual agents provide more potentially harmful assistance than English-only evaluations would suggest, particularly in low-resource languages where safety fine-tuning data is sparse.
 
@@ -196,7 +199,7 @@ A significant limitation is that RLHF-trained models can exhibit <EntityLink id=
 
 ### GPT-5 and the GPT-5 Family
 
-[GPT-5](https://openai.com/index/introducing-gpt-5/), released in May 2025, represents <EntityLink id="openai">OpenAI</EntityLink>'s integration of reasoning and general capability into a single unified model, replacing the separate GPT-4o and o1 product lines. According to the [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/), GPT-5 achieves the highest scores to date on GPQA Diamond, SWE-bench Verified, and MMLU among OpenAI models at the time of release.
+[GPT-5](https://openai.com/index/introducing-gpt-5/), released in May 2025, represents <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s integration of reasoning and general capability into a single unified model, replacing the separate GPT-4o and o1 product lines. According to the [GPT-5 System Card](https://openai.com/index/gpt-5-system-card/), GPT-5 achieves the highest scores to date on GPQA Diamond, SWE-bench Verified, and MMLU among OpenAI models at the time of release.
 
 Key developments in the GPT-5 family:
 
@@ -240,7 +243,7 @@ Key safety implications of the open-weight ecosystem:
 
 ## Mechanistic Interpretability Advances
 
-<EntityLink id="mech-interp">Mechanistic interpretability</EntityLink> research—which seeks to understand the internal computations of neural networks in human-interpretable terms—has accelerated substantially with the availability of open-weight models and new tooling.
+<EntityLink id="E477" name="mech-interp">Mechanistic interpretability</EntityLink> research—which seeks to understand the internal computations of neural networks in human-interpretable terms—has accelerated substantially with the availability of open-weight models and new tooling.
 
 ### Gemma Scope 2
 
@@ -306,14 +309,14 @@ The [OpenAI hallucination explainer](https://openai.com/index/why-language-model
 
 Hallucination rates are not monotonically improved by scale: models engineered for massive context windows do not consistently achieve lower hallucination rates than smaller counterparts, and increased model size can increase the confidence of hallucinated outputs without reducing their frequency. This suggests hallucination is partly an architectural and training objective issue rather than purely a capacity limitation.
 
-### Deception and Truthfulness (Expanded)
+### Deception and Truthfulness
 
 | Behavior Type | Frequency | Context | Mitigation |
 |---------------|-----------|---------|------------|
 | Hallucination | 8-45% | Varies by task and model | Training improvements, RAG |
 | Citation hallucination | ≈17% | Legal, academic domain | [CheckIfExist](https://arxiv.org/abs/2502.09802) detection systems |
 | Role-play deception | High | Prompted scenarios | Safety fine-tuning |
-| <EntityLink id="sycophancy">Sycophancy</EntityLink> | Moderate | Opinion questions | Constitutional AI, RLHF adjustment |
+| <EntityLink id="E295" name="sycophancy">Sycophancy</EntityLink> | Moderate | Opinion questions | Constitutional AI, RLHF adjustment |
 | Strategic deception | Low-Moderate | Evaluation scenarios | Ongoing research |
 
 A 2025 benchmark ([AIMultiple](https://research.aimultiple.com/ai-hallucination/)) found that even the latest models have hallucination rates exceeding 15% when asked to analyze provided statements. In legal contexts, approximately 1 in 6 AI responses contain citation hallucinations. The wide variance across benchmarks reflects both genuine model differences and definitional variation in what constitutes a hallucination.
@@ -325,7 +328,7 @@ A 2025 benchmark ([AIMultiple](https://research.aimultiple.com/ai-hallucination/
 | Research Area | Progress Level | Key Findings | Organizations |
 |---------------|----------------|--------------|---------------|
 | Attention visualization | Advanced | Knowledge storage patterns | <R id="afe2508ac4caf5ee">Anthropic</R>, <R id="04d39e8bd5d50dd5">OpenAI</R> |
-| Activation patching | Moderate | Causal intervention methods | <EntityLink id="redwood-research">Redwood Research</EntityLink> |
+| Activation patching | Moderate | Causal intervention methods | <EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink> |
 | Sparse autoencoders | Advancing | Feature decomposition in large models | <R id="f771d4f56ad4dbaa">Anthropic</R>, Google DeepMind (Gemma Scope 2) |
 | Neuron explanation | Moderate | LM-explained neurons via GPT-4 | [Bills et al. 2023](https://openaipublic.blob.core.windows.net/neuron-explainer/paper/index.html) |
 | Mechanistic understanding | Early-Moderate | Transformer circuits | <R id="f771d4f56ad4dbaa">Anthropic Interpretability</R> |
@@ -344,7 +347,7 @@ A 2025 benchmark ([AIMultiple](https://research.aimultiple.com/ai-hallucination/
 
 Modern LLMs enable approaches to AI safety through automated oversight:
 
-- **Output evaluation**: AI systems critiquing other AI outputs with approximately 85% agreement with humans
+- **Output evaluation**: AI systems critiquing other AI outputs; agreement rates with human evaluators vary by task and are not well-characterized by a single aggregate figure across the literature {/* NEEDS CITATION */}
 - **Red-teaming**: Automated discovery of failure modes and adversarial inputs
 - **Safety monitoring**: Real-time analysis of AI system behavior patterns
 - **Research acceleration**: AI-assisted safety research and experimental design
@@ -354,7 +357,7 @@ Modern LLMs enable approaches to AI safety through automated oversight:
 
 ### Persuasion and Manipulation
 
-Modern LLMs demonstrate sophisticated persuasion capabilities that raise concerns for democratic discourse and individual autonomy:
+Modern LLMs demonstrate persuasion capabilities that raise questions for democratic discourse and individual autonomy:
 
 | Capability | Current State | Evidence | Risk Level |
 |------------|---------------|----------|------------|
@@ -363,7 +366,7 @@ Modern LLMs demonstrate sophisticated persuasion capabilities that raise concern
 | Emotional manipulation | Moderate | RLHF alignment research | Moderate |
 | Debate performance | Advanced | Human preference studies | High |
 
-Research by <R id="f771d4f56ad4dbaa">Anthropic</R> indicates GPT-4 can increase human agreement rates by 82% through targeted persuasion techniques, raising concerns about <EntityLink id="consensus-manufacturing">consensus manufacturing</EntityLink>. The [AREG benchmark (2025)](https://arxiv.org/abs/2502.09455) specifically evaluates persuasion and resistance capabilities in LLMs through adversarial resource extraction games, finding that frontier models can maintain persuasive pressure across extended multi-turn interactions.
+Research by <R id="f771d4f56ad4dbaa">Anthropic</R> indicates GPT-4 can increase human agreement rates by 82% through targeted persuasion techniques, raising concerns about <EntityLink id="E72" name="consensus-manufacturing">consensus manufacturing</EntityLink>. The [AREG benchmark (2025)](https://arxiv.org/abs/2502.09455) specifically evaluates persuasion and resistance capabilities in LLMs through adversarial resource extraction games, finding that frontier models can maintain persuasive pressure across extended multi-turn interactions.
 
 ### Multilingual Safety Gaps
 
@@ -390,7 +393,7 @@ Current LLMs demonstrate increasing levels of autonomous task execution:
 - **Web browsing**: GPT-4 class models can navigate websites, extract information, and interact with web services
 - **Code execution**: Models can write, debug, and iteratively improve software across extended sessions
 - **API integration**: Tool use across multiple digital platforms; [Shipping Smarter Agents with Every New Model](https://openai.com/index/shipping-smarter-agents/) describes OpenAI's agent capability roadmap
-- **Goal persistence**: Basic ability to maintain objectives across extended multi-turn interactions, relevant to <EntityLink id="scheming">scheming</EntityLink> risk evaluation
+- **Goal persistence**: Basic ability to maintain objectives across extended multi-turn interactions, relevant to <EntityLink id="E274" name="scheming">scheming</EntityLink> risk evaluation
 - **Memory across sessions**: [MemoryArena (2025)](https://arxiv.org/abs/2502.10392) benchmarks agent memory in interdependent multi-session tasks, finding that frontier models maintain task state imperfectly across sessions but with increasing reliability in newer model versions
 
 ## Fundamental Limitations
@@ -399,7 +402,7 @@ Current LLMs demonstrate increasing levels of autonomous task execution:
 
 | Property | Scaling Behavior | Evidence | Implications |
 |----------|------------------|----------|-------------|
-| Truthfulness | No direct improvement | Larger models can be more convincingly wrong | Requires targeted training |
+| Truthfulness | No direct improvement | Larger models can be more confidently incorrect | Requires targeted training |
 | Reliability | Inconsistent | High variance across similar prompts | Systematic evaluation needed |
 | Novel reasoning | Limited progress | Pattern matching vs. genuine insight | May require architectural changes |
 | Value alignment | No guarantee | Capability-alignment divergence | Alignment difficulty |
@@ -427,7 +430,7 @@ Note that models engineered for massive context windows do not consistently achi
 |-------------|--------|--------|------------------|
 | Reasoning models (o1, o3) | Deployed | PhD-level reasoning achieved | Extended planning capabilities |
 | Inference-time scaling | Established | New scaling paradigm | Potentially harder to predict capabilities |
-| Agentic AI frameworks | Growing | Autonomous task completion | <EntityLink id="agentic-ai">Autonomous systems</EntityLink> concerns |
+| Agentic AI frameworks | Growing | Autonomous task completion | <EntityLink id="E2" name="agentic-ai">Autonomous systems</EntityLink> concerns |
 | 1M+ token context | Standard | Long-document reasoning | Extended goal persistence |
 | Multi-model routing | Emerging | Task-optimized deployment | Complexity in governance |
 | Open-weight frontier models | Established | Llama 4, Gemma 3, gpt-oss | Reduced API access as governance lever |
@@ -441,14 +444,14 @@ One of the most significant trends is the emergence of **agentic AI**—LLM-powe
 | Development | Likelihood | Timeline | Impact |
 |-------------|------------|----------|--------|
 | GPT-5.x and successor models | High | 6-12 months | Further capability improvement |
-| Improved reasoning (o3 successors) | High | 3-6 months | Enhanced <EntityLink id="scientific-research">scientific research</EntityLink> |
+| Improved reasoning (o3 successors) | High | 3-6 months | Enhanced <EntityLink id="E277" name="scientific-research">scientific research</EntityLink> |
 | Multimodal integration | High | 6-12 months | Video, audio, sensor fusion |
-| Robust agent frameworks | High | 12-18 months | <EntityLink id="agentic-ai">Autonomous systems</EntityLink> |
+| Robust agent frameworks | High | 12-18 months | <EntityLink id="E2" name="agentic-ai">Autonomous systems</EntityLink> |
 | Interpretability-informed alignment | Moderate | 12-24 months | [Features as Rewards](https://arxiv.org/abs/2502.09601) approach |
 
 ### Medium-term Outlook (2026-2030)
 
-Expected developments include potential architectural innovations beyond standard transformer attention, deeper integration with robotics platforms, and continued capability improvements. Key uncertainties include whether current scaling approaches will continue yielding improvements and the timeline for <EntityLink id="factors-ai-capabilities-overview">artificial general intelligence</EntityLink>.
+Expected developments include potential architectural innovations beyond standard transformer attention, deeper integration with robotics platforms, and continued capability improvements. Key uncertainties include whether current scaling approaches will continue yielding improvements and the timeline for <EntityLink id="E660" name="factors-ai-capabilities-overview">artificial general intelligence</EntityLink>.
 
 **Data constraints:** According to [Epoch AI projections](https://arxiv.org/html/2211.04325v2), high-quality training data could become a significant bottleneck this decade, particularly if models continue to be overtrained. For AI progress to continue into the 2030s, either new sources of data (synthetic data, multimodal data) or less data-hungry techniques must be developed. [Can Generative AI Survive Data Contamination? (2025)](https://arxiv.org/abs/2502.10392) analyzes the theoretical guarantees available under contaminated recursive training—where models are trained on AI-generated data—finding that certain forms of contamination lead to systematic performance degradation rather than catastrophic collapse, but that the long-run effects remain analytically uncertain.
 
@@ -465,9 +468,9 @@ Expected developments include potential architectural innovations beyond standar
 
 | Priority Area | Importance | Tractability | Neglectedness |
 |---------------|------------|--------------|---------------|
-| <EntityLink id="interpretability-sufficient">Interpretability</EntityLink> | High | Moderate | Moderate |
-| <EntityLink id="solutions">Alignment techniques</EntityLink> | Highest | Low | Low |
-| <EntityLink id="safety-research">Capability evaluation</EntityLink> | High | High | Moderate |
+| <EntityLink id="E176" name="interpretability-sufficient">Interpretability</EntityLink> | High | Moderate | Moderate |
+| <EntityLink id="E393" name="solutions">Alignment techniques</EntityLink> | Highest | Low | Low |
+| <EntityLink id="E265" name="safety-research">Capability evaluation</EntityLink> | High | High | Moderate |
 | Governance frameworks | High | Moderate | High |
 | Multilingual alignment | High | Moderate | High |
 | Factuality and hallucination | Moderate | High | Low |
@@ -520,10 +523,10 @@ The o3 results on ARC-AGI (87.5%, approaching human baseline of ~85%) have inten
 |------|--------------|------------|---------------|
 | Industry | <R id="e9aaa7b5e18f9f41">OpenAI</R> | GPT series, safety research | Technical papers, safety docs |
 | Industry | <R id="f771d4f56ad4dbaa">Anthropic</R> | Constitutional AI, interpretability | Claude research, safety papers |
-| Industry | <EntityLink id="deepmind">Google DeepMind</EntityLink> | Gemini, Gemma, interpretability | Gemma Scope 2, FACTS benchmarks |
-| Academic | <EntityLink id="chai">CHAI</EntityLink> | AI alignment research | Technical alignment papers |
-| Safety | <EntityLink id="redwood-research">Redwood Research</EntityLink> | Interpretability, oversight | Mechanistic interpretability |
-| Research | <EntityLink id="metr">METR</EntityLink> | Capability evaluation | Autonomous replication evaluations |
+| Industry | <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> | Gemini, Gemma, interpretability | Gemma Scope 2, FACTS benchmarks |
+| Academic | <EntityLink id="E57" name="chai">CHAI</EntityLink> | AI alignment research | Technical alignment papers |
+| Safety | <EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink> | Interpretability, oversight | Mechanistic interpretability |
+| Research | <EntityLink id="E201" name="metr">METR</EntityLink> | Capability evaluation | Autonomous replication evaluations |
 
 ### Policy and Governance Resources
 
@@ -531,5 +534,5 @@ The o3 results on ARC-AGI (87.5%, approaching human baseline of ~85%) have inten
 |----------|--------------|-------|------|
 | AI Safety Guidelines | <R id="54dbc15413425997">NIST</R> | Federal standards | Risk management framework |
 | Responsible AI Practices | <R id="0e7aef26385afeed">Partnership on AI</R> | Industry coordination | Best practices documentation |
-| International Cooperation | <EntityLink id="uk-aisi">UK AI Safety Institute</EntityLink> | Global safety standards | International coordination |
-| Responsible Scaling Policy | <EntityLink id="anthropic">Anthropic</EntityLink> | Capability thresholds | [RSP documentation](https://www.anthropic.com/news/anthropics-responsible-scaling-policy) |
+| International Cooperation | <EntityLink id="E364" name="uk-aisi">UK AI Safety Institute</EntityLink> | Global safety standards | International coordination |
+| Responsible Scaling Policy | <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> | Capability thresholds | [RSP documentation](https://www.anthropic.com/news/anthropics-responsible-scaling-policy) |
