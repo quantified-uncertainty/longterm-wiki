@@ -174,6 +174,16 @@ export interface CommandResult {
 }
 
 /**
+ * Parse an integer CLI option with a fallback.
+ * Returns fallback on missing, boolean, or non-numeric values.
+ */
+export function parseIntOpt(val: unknown, fallback: number): number {
+  if (val === undefined || val === null || val === true || val === false) return fallback;
+  const n = parseInt(val as string, 10);
+  return Number.isNaN(n) ? fallback : n;
+}
+
+/**
  * Create a command handler that runs a script as a subprocess.
  *
  * Config fields:

@@ -23,6 +23,7 @@
  */
 
 import type { CommandResult } from '../lib/cli.ts';
+import { parseIntOpt } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
 import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
@@ -38,13 +39,6 @@ function serverUnavailableError(c: ReturnType<typeof createLogger>, result: { er
     output: `${c.colors.red}Error: wiki-server ${label} (${result.error}): ${result.message}\n  Check LONGTERMWIKI_SERVER_URL is set.${c.colors.reset}`,
     exitCode: 1,
   };
-}
-
-/** Parse an integer CLI option with a fallback; returns fallback on NaN or missing. */
-function parseIntOpt(val: unknown, fallback: number): number {
-  if (val === undefined || val === null || val === true || val === false) return fallback;
-  const n = parseInt(val as string, 10);
-  return Number.isNaN(n) ? fallback : n;
 }
 
 // ---------------------------------------------------------------------------

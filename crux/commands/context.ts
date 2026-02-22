@@ -20,7 +20,7 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 import type { CommandResult } from '../lib/cli.ts';
-import { createLogger } from '../lib/output.ts';
+import { parseIntOpt } from '../lib/cli.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
@@ -154,13 +154,6 @@ function writeContext(content: string, outputPath: string): void {
   fs.writeFileSync(outputPath, content, 'utf-8');
 }
 
-/** Parse int option with fallback */
-function parseIntOpt(val: unknown, fallback: number): number {
-  if (val === undefined || val === null || val === true || val === false) return fallback;
-  const n = parseInt(val as string, 10);
-  return Number.isNaN(n) ? fallback : n;
-}
-
 /** Format a number or null as a string with fallback */
 function fmt(val: number | null | undefined, decimals = 0): string {
   if (val === null || val === undefined) return 'N/A';
@@ -169,7 +162,7 @@ function fmt(val: number | null | undefined, decimals = 0): string {
 
 /** Find entity YAML snippet for a given entity ID by scanning data/entities/ */
 function findEntityYaml(entityId: string): string | null {
-  const entitiesDir = DATA_DIR_ABS;
+  const entitiesDir = path.join(DATA_DIR_ABS, 'entities');
   if (!fs.existsSync(entitiesDir)) return null;
 
   const files = fs.readdirSync(entitiesDir).filter(f => f.endsWith('.yaml'));
@@ -231,8 +224,6 @@ function formatCitationSummary(quotes: CitationQuote[], total: number | undefine
 // ---------------------------------------------------------------------------
 
 export async function forPage(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const log = createLogger(options.ci as boolean);
-
   const pageId = args.find(a => !a.startsWith('-'));
   if (!pageId) {
     return { output: `Error: page ID required. Usage: crux context for-page <page-id>`, exitCode: 1 };
@@ -267,13 +258,13 @@ export async function forPage(args: string[], options: Record<string, unknown>):
   // Fetch entity facts if entity exists
   let factsSection = '';
   if (entityYaml) {
-    const factsResult = await getFactsByEntity(entityId, 20, 0);
+    const factsResult = await getFactsByEntity(entityId, 15, 0);
     if (factsResult.ok && factsResult.data.facts.length > 0) {
       const facts = factsResult.data.facts;
       factsSection = `## Key Facts (${entityId})\n\n`;
       factsSection += tableRow('Label/Measure', 'Value', 'Date', 'Note') + '\n';
       factsSection += tableRow('---', '---', '---', '---') + '\n';
-      for (const f of facts.slice(0, 15)) {
+      for (const f of facts) {
         const label = (f.label || f.measure || f.factId || '').slice(0, 40);
         let value = typeof f.value === 'object' && f.value !== null ? JSON.stringify(f.value) : (f.value || '');
         if (f.numeric !== null && f.numeric !== undefined) {
@@ -561,10 +552,12 @@ export async function forIssue(args: string[], options: Record<string, unknown>)
   const keywords = extractKeywords(fullText);
   const searchQuery = keywords.slice(0, 8).join(' ');
 
-  // Find explicit page ID references in the issue body (slug-like patterns)
-  const pageRefs = [...body.matchAll(/\b([a-z][a-z0-9-]{3,})\b/g)]
+  // Find explicit page ID references in the issue body (slug-like patterns).
+  // Strip URLs first to avoid false positives from URL path segments.
+  const bodyWithoutUrls = body.replace(/https?:\/\/\S+/g, ' ');
+  const pageRefs = [...bodyWithoutUrls.matchAll(/\b([a-z][a-z0-9-]{3,})\b/g)]
     .map(m => m[1])
-    .filter(s => s.includes('-') && !s.startsWith('http'))
+    .filter(s => s.includes('-'))
     .slice(0, 5);
 
   // Run searches in parallel
@@ -592,13 +585,12 @@ export async function forIssue(args: string[], options: Record<string, unknown>)
 
   // Specific pages referenced in the issue
   const resolvedPages = pageResults
-    .map((r, i) => ({ ref: pageRefs[i], result: r }))
-    .filter(({ result }) => result.ok);
+    .map((r) => r)
+    .filter((r): r is Extract<typeof r, { ok: true }> => r.ok);
 
   if (resolvedPages.length > 0) {
     md += `## Referenced Wiki Pages\n\n`;
-    for (const { ref, result } of resolvedPages) {
-      if (!result.ok) continue;
+    for (const result of resolvedPages) {
       const p = result.data;
       md += `### ${p.title} (\`${p.id}\`)\n\n`;
       md += `- **Type**: ${p.entityType || 'N/A'}\n`;
@@ -700,7 +692,7 @@ export async function forTopic(args: string[], options: Record<string, unknown>)
       md += `- **Type**: ${r.entityType || 'N/A'}\n`;
       md += `- **Category**: ${r.category || 'N/A'}\n`;
       if (r.readerImportance !== null) md += `- **Importance**: ${fmt(r.readerImportance)}/100\n`;
-      if (r.quality !== null) md += `- **Quality**: ${fmt(r.quality)}/10\n`;
+      if (r.quality !== null) md += `- **Quality**: ${fmt(r.quality)}/100\n`;
       if (r.description) md += `\n${r.description.slice(0, 300)}\n`;
       md += '\n';
     }
