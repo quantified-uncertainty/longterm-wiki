@@ -12,7 +12,7 @@ import type { SourceCacheEntry } from '../../../lib/section-writer.ts';
 import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '../types.ts';
 import { log, writeTemp } from '../utils.ts';
 import { runAgent } from '../api.ts';
-import { parseJsonFromLlm } from './json-parsing.ts';
+import { parseAndValidate, ResearchResultSchema } from './json-parsing.ts';
 
 /**
  * Convert research sources + fetched content into SourceCacheEntry[] for
@@ -145,7 +145,7 @@ Output ONLY valid JSON at the end.`;
     tools
   });
 
-  const research = parseJsonFromLlm<ResearchResult>(result, 'research', (raw, error) => ({
+  const research = parseAndValidate<ResearchResult>(result, ResearchResultSchema, 'research', (raw, error) => ({
     sources: [],
     raw,
     error,
