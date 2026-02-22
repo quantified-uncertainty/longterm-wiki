@@ -2,9 +2,18 @@ import Link from "next/link";
 import { getExploreItems, getAllPages } from "@/data";
 import { ContentCard } from "@/components/explore/ContentCard";
 import { getTypeLabel, getTypeColor } from "@/components/explore/explore-utils";
-import { Shield, Bug, Scale, Brain, BookOpen, Building2 } from "lucide-react";
+import { Shield, Bug, Scale, Brain, BookOpen, Building2, Network } from "lucide-react";
 import type { ExploreItem } from "@/data";
 import type { LucideIcon } from "lucide-react";
+
+// AI Transition Model direct links
+const ATM_LINKS = [
+  { label: "Model Overview", href: "/wiki/ai-transition-model" },
+  { label: "Root Factors", href: "/wiki/E667" },
+  { label: "Scenarios", href: "/wiki/E674" },
+  { label: "Outcomes", href: "/wiki/E669" },
+  { label: "Interactive Graph", href: "/ai-transition-model/graph" },
+];
 
 // Field clusters with descriptions for the topic sections
 const TOPIC_SECTIONS: {
@@ -198,6 +207,29 @@ export default function Home() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* AI Transition Model */}
+        <section className="py-8 border-t border-border">
+          <div className="flex items-center gap-2 mb-2">
+            <Network className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-xl font-semibold">AI Transition Model</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4 max-w-2xl">
+            A causal model of how root factors — alignment, capabilities, governance — shape AI
+            transition scenarios and ultimate outcomes. 68 interconnected pages.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {ATM_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="inline-flex items-center px-4 py-1.5 border border-border rounded-full text-sm text-foreground no-underline hover:bg-muted transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </section>
 
