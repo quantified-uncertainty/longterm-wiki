@@ -433,7 +433,7 @@ function formatIssueRow(issue: RankedIssue, c: Colors, showScores = false): stri
     row += `\n         ${formatScoreBreakdown(issue.scoreBreakdown, c)}`;
   }
 
-  if (warningStr && showScores) {
+  if (warningStr) {
     row += `\n         ${warningStr}`;
   }
 
@@ -1207,6 +1207,33 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
     issuesToCheck = issues.map(i => ({ number: i.number, title: i.title, body: i.body, labels: i.labels, url: i.url }));
   }
 
+  interface LintResult {
+    number: number;
+    title: string;
+    url: string;
+    pass: boolean;
+    model: string | null;
+    missing: string[];
+  }
+
+  const results: LintResult[] = [];
+
+  for (const issue of issuesToCheck) {
+    const missing = checkIssueSections(issue.title, issue.body, issue.labels);
+    const model = extractModel(issue.title, issue.body, issue.labels);
+    results.push({ number: issue.number, title: issue.title, url: issue.url, pass: missing.length === 0, model, missing });
+  }
+
+  // JSON output (#624)
+  if (options.json) {
+    const passCount = results.filter(r => r.pass).length;
+    const failCount = results.filter(r => !r.pass).length;
+    return {
+      output: JSON.stringify({ pass: passCount, fail: failCount, issues: results }, null, 2),
+      exitCode: failCount > 0 ? 1 : 0,
+    };
+  }
+
   let passCount = 0;
   let failCount = 0;
   let output = '';
@@ -1215,23 +1242,19 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
     output += `${c.bold}${c.blue}Issue Formatting Lint (${issuesToCheck.length} issues)${c.reset}\n\n`;
   }
 
-  for (const issue of issuesToCheck) {
-    const missing = checkIssueSections(issue.title, issue.body, issue.labels);
-    const model = extractModel(issue.title, issue.body, issue.labels);
-
-    if (missing.length === 0) {
+  for (const r of results) {
+    if (r.pass) {
       passCount++;
       if (singleNum) {
-        // Show detail for single issue
-        output += `${c.green}✓ PASS${c.reset} #${issue.number}: ${issue.title}\n`;
-        output += `  ${c.dim}${issue.url}${c.reset}\n`;
-        output += `  Recommended model: ${model ? `${c.cyan}${model}${c.reset}` : `${c.dim}(not specified)${c.reset}`}\n`;
+        output += `${c.green}✓ PASS${c.reset} #${r.number}: ${r.title}\n`;
+        output += `  ${c.dim}${r.url}${c.reset}\n`;
+        output += `  Recommended model: ${r.model ? `${c.cyan}${r.model}${c.reset}` : `${c.dim}(not specified)${c.reset}`}\n`;
       }
     } else {
       failCount++;
-      output += `${c.red}✗ FAIL${c.reset} #${issue.number}: ${issue.title}\n`;
-      output += `  ${c.dim}${issue.url}${c.reset}\n`;
-      for (const m of missing) {
+      output += `${c.red}✗ FAIL${c.reset} #${r.number}: ${r.title}\n`;
+      output += `  ${c.dim}${r.url}${c.reset}\n`;
+      for (const m of r.missing) {
         output += `  ${c.yellow}→ Missing: ${m}${c.reset}\n`;
       }
       if (!singleNum) output += '\n';
