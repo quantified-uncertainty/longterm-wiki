@@ -113,22 +113,30 @@ export const wikiPages = pgTable(
   ]
 );
 
-export const citationContent = pgTable("citation_content", {
-  url: text("url").primaryKey(),
-  fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
-  httpStatus: integer("http_status"),
-  contentType: text("content_type"),
-  pageTitle: text("page_title"),
-  fullTextPreview: text("full_text_preview"),
-  contentLength: integer("content_length"),
-  contentHash: text("content_hash"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const citationContent = pgTable(
+  "citation_content",
+  {
+    url: text("url").primaryKey(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+    httpStatus: integer("http_status"),
+    contentType: text("content_type"),
+    pageTitle: text("page_title"),
+    fullTextPreview: text("full_text_preview"),
+    fullText: text("full_text"),
+    contentLength: integer("content_length"),
+    contentHash: text("content_hash"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_cc_fetched_at").on(table.fetchedAt),
+    index("idx_cc_http_status").on(table.httpStatus),
+  ]
+);
 
 export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
