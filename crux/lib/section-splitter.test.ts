@@ -7,6 +7,7 @@
  *  - reassembleSections: round-trip consistency
  *  - renumberFootnotes: numeric and alphanumeric markers, ordering, edge cases
  *  - filterSourcesForSection: relevance ranking by heading keywords
+ *  - buildContentChunks: LLM-friendly chunking for enrichment passes
  */
 
 import { describe, it, expect } from 'vitest';
@@ -17,6 +18,7 @@ import {
   renumberFootnotes,
   deduplicateSectionMarkers,
   filterSourcesForSection,
+  buildContentChunks,
   type ParsedSection,
   type SplitPage,
 } from './section-splitter.ts';
@@ -529,5 +531,112 @@ describe('filterSourcesForSection', () => {
     // "AI", "and", "ML" all ≤ 3 chars → no keywords → original order
     const result = filterSourcesForSection(section, sources);
     expect(result).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildContentChunks
+// ---------------------------------------------------------------------------
+
+describe('buildContentChunks', () => {
+  it('returns empty array for empty or whitespace-only content', () => {
+    expect(buildContentChunks('')).toEqual([]);
+    expect(buildContentChunks('   \n  ')).toEqual([]);
+  });
+
+  it('returns a single chunk for short content with no headings', () => {
+    const content = 'Short content without any headings.';
+    const chunks = buildContentChunks(content);
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]).toContain('Short content');
+  });
+
+  it('returns one chunk for preamble-only content even if it exceeds maxChunkSize', () => {
+    // A page with no ## headings must NOT be truncated, regardless of size
+    const content = 'x'.repeat(10_000);
+    const chunks = buildContentChunks(content, 5500);
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0].length).toBe(10_000);
+  });
+
+  it('splits frontmatter + preamble into first chunk, sections into subsequent chunks', () => {
+    const content = [
+      '---',
+      'title: Test',
+      '---',
+      '',
+      'Intro paragraph.',
+      '',
+      '## Section One',
+      'First section body.',
+    ].join('\n');
+
+    const chunks = buildContentChunks(content);
+    expect(chunks.length).toBeGreaterThanOrEqual(2);
+    expect(chunks[0]).toContain('Intro paragraph');
+    expect(chunks.some(c => c.includes('Section One'))).toBe(true);
+  });
+
+  it('groups small sections into a single chunk when they fit', () => {
+    // Three tiny sections — should all fit in one chunk under the 5 500-char limit
+    const content = [
+      '## Alpha',
+      'Short A.',
+      '',
+      '## Beta',
+      'Short B.',
+      '',
+      '## Gamma',
+      'Short C.',
+    ].join('\n');
+
+    const chunks = buildContentChunks(content, 5500);
+    // All three sections fit in one chunk (total < 5 500 chars)
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]).toContain('Alpha');
+    expect(chunks[0]).toContain('Beta');
+    expect(chunks[0]).toContain('Gamma');
+  });
+
+  it('covers the tail of a long page (regression: sections beyond first 6 000 chars were skipped)', () => {
+    const padding = `## Early Section\n${'y'.repeat(6000)}\n`;
+    const tail = `## Final Section\nTail content that must not be skipped.\n`;
+    const content = padding + tail;
+
+    expect(content.length).toBeGreaterThan(6000);
+
+    const chunks = buildContentChunks(content, 5500);
+    const hasTail = chunks.some(c => c.includes('Tail content that must not be skipped'));
+    expect(hasTail).toBe(true);
+  });
+
+  it('no chunk exceeds maxChunkSize by more than one section', () => {
+    // 10 sections of ~1 500 chars each
+    const sections = Array.from({ length: 10 }, (_, i) =>
+      `## Section ${i + 1}\n${'a'.repeat(1500)}`,
+    );
+    const content = sections.join('\n\n');
+
+    const chunks = buildContentChunks(content, 5500);
+    expect(chunks.length).toBeGreaterThan(1);
+
+    for (const chunk of chunks) {
+      // A single oversized section is allowed; otherwise must stay within limit
+      expect(chunk.length).toBeLessThanOrEqual(5500 + 1600);
+    }
+  });
+
+  it('every heading appears in exactly one chunk', () => {
+    const headings = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'];
+    const content = headings
+      .map(h => `## ${h}\n${'x'.repeat(1200)}`)
+      .join('\n\n');
+
+    const chunks = buildContentChunks(content, 5500);
+
+    for (const heading of headings) {
+      const occurrences = chunks.filter(c => c.includes(`## ${heading}`)).length;
+      expect(occurrences).toBe(1);
+    }
   });
 });

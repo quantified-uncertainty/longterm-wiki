@@ -7,7 +7,7 @@
  * Cost: $0 (no LLM calls).
  */
 
-import { validateSingleFile } from '../../../lib/validation-engine.ts';
+import { ValidationEngine, ContentFile } from '../../../lib/validation-engine.ts';
 import { allRules } from '../../../lib/rules/index.ts';
 import type { ToolRegistration } from './types.ts';
 
@@ -47,57 +47,60 @@ export const tool: ToolRegistration = {
   },
   createHandler: (ctx) => async () => {
     try {
-      const fs = await import('fs');
-      const originalContent = fs.readFileSync(ctx.filePath, 'utf-8');
+      // SIGKILL-safe: inject current content into the engine's in-memory map
+      // so the real file on disk is never touched. Mirrors the approach used
+      // in the page-improver validate phase (see phases/validate.ts).
+      const engine = new ValidationEngine();
+      await engine.load();
 
-      // Temporarily write current content to disk for validation
-      fs.writeFileSync(ctx.filePath, ctx.currentContent);
+      engine.content.set(ctx.filePath, new ContentFile(ctx.filePath, ctx.currentContent));
 
-      try {
-        const result = await validateSingleFile(
-          ctx.filePath,
-          CRITICAL_RULES,
-          QUALITY_RULES,
-          allRules,
-        );
-
-        // Apply auto-fixes
-        const fixableIssues = [
-          ...result.critical.flatMap((r) => r.issues),
-          ...result.quality.flatMap((r) => r.issues),
-        ].filter((i) => i.isFixable);
-
-        if (fixableIssues.length > 0) {
-          result.engine.applyFixes(fixableIssues);
-          ctx.currentContent = fs.readFileSync(ctx.filePath, 'utf-8');
-          // Invalidate section cache
-          ctx.splitPage = null;
-          ctx.sections = null;
-        }
-
-        const critical = result.critical.filter((r) => r.count > 0);
-        const quality = result.quality.filter((r) => r.count > 0);
-
-        return JSON.stringify(
-          {
-            criticalIssues: critical.map((r) => ({
-              rule: r.rule,
-              count: r.count,
-              details: r.issues.slice(0, 3).map((i) => i.toString()),
-            })),
-            qualityWarnings: quality.map((r) => ({
-              rule: r.rule,
-              count: r.count,
-            })),
-            autoFixesApplied: fixableIssues.length,
-          },
-          null,
-          2,
-        );
-      } finally {
-        // Restore original file content
-        fs.writeFileSync(ctx.filePath, originalContent);
+      const allRuleIds = [...CRITICAL_RULES, ...QUALITY_RULES];
+      const ruleMap = new Map(allRules.map(r => [r.id, r]));
+      for (const id of allRuleIds) {
+        const rule = ruleMap.get(id);
+        if (rule) engine.addRule(rule);
       }
+
+      const allIssues = await engine.validate({ files: [ctx.filePath] });
+
+      const criticalSet = new Set(CRITICAL_RULES);
+      const qualitySet = new Set(QUALITY_RULES);
+
+      const criticalByRule = new Map<string, typeof allIssues>();
+      const qualityByRule = new Map<string, typeof allIssues>();
+      for (const issue of allIssues) {
+        if (criticalSet.has(issue.rule)) {
+          if (!criticalByRule.has(issue.rule)) criticalByRule.set(issue.rule, []);
+          criticalByRule.get(issue.rule)!.push(issue);
+        } else if (qualitySet.has(issue.rule)) {
+          if (!qualityByRule.has(issue.rule)) qualityByRule.set(issue.rule, []);
+          qualityByRule.get(issue.rule)!.push(issue);
+        }
+      }
+
+      // Apply auto-fixes to the content string (no disk writes)
+      const fixableIssues = allIssues.filter(i => i.isFixable);
+      if (fixableIssues.length > 0) {
+        ctx.currentContent = engine.applyFixesToContentString(ctx.currentContent, allIssues);
+        // Invalidate section cache
+        ctx.splitPage = null;
+        ctx.sections = null;
+      }
+
+      return JSON.stringify({
+        criticalIssues: [...criticalByRule.entries()]
+          .filter(([, issues]) => issues.filter(i => i.severity === 'error').length > 0)
+          .map(([rule, issues]) => ({
+            rule,
+            count: issues.filter(i => i.severity === 'error').length,
+            details: issues.slice(0, 3).map(i => i.toString()),
+          })),
+        qualityWarnings: [...qualityByRule.entries()]
+          .filter(([, issues]) => issues.length > 0)
+          .map(([rule, issues]) => ({ rule, count: issues.length })),
+        autoFixesApplied: fixableIssues.length,
+      }, null, 2);
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
       return JSON.stringify({ error: `Validation failed: ${error.message}` });
