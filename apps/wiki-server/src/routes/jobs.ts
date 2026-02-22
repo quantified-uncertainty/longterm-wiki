@@ -302,7 +302,7 @@ jobsRoute.post("/:id/fail", async (c) => {
     // Distinguish "not found" from "wrong status" for accurate error messages.
     const db = getDrizzleDb();
     const exists = await db
-      .select({ id: jobs.id })
+      .select({ id: jobs.id, status: jobs.status })
       .from(jobs)
       .where(eq(jobs.id, id));
     if (exists.length === 0) {
@@ -310,7 +310,7 @@ jobsRoute.post("/:id/fail", async (c) => {
     }
     return validationError(
       c,
-      "Job is not in 'running' or 'claimed' status"
+      `Job is in '${exists[0].status}' status, expected 'running' or 'claimed'`
     );
   }
 

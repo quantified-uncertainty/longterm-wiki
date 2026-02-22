@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { ChevronDown, ChevronUp, List } from "lucide-react";
 import type { TocHeading } from "@/lib/mdx";
 
@@ -22,9 +22,10 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
 
   // Only show h3s when the total heading count is manageable
   const h2Only = headings.length > 14;
-  const visibleHeadings = h2Only
-    ? headings.filter((h) => h.depth === 2)
-    : headings;
+  const visibleHeadings = useMemo(
+    () => (h2Only ? headings.filter((h) => h.depth === 2) : headings),
+    [headings, h2Only]
+  );
 
   useEffect(() => {
     // Clean up any previous observer
