@@ -18,6 +18,7 @@ import { routeDigest } from './page-router.ts';
 import { getDueWatchlistUpdates, markWatchlistUpdated } from './watchlist.ts';
 import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-server/auto-update.ts';
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
+import { parseIntOpt } from '../lib/cli.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
 
@@ -223,7 +224,7 @@ export interface PipelineResult {
  */
 export async function runPipeline(options: AutoUpdateOptions = {}): Promise<PipelineResult> {
   const budget = parseFloat(options.budget || '50');
-  const maxPages = parseInt(options.count || '10', 10);
+  const maxPages = parseIntOpt(options.count, 10);
   const dryRun = options.dryRun || false;
   const verbose = options.verbose || false;
   const trigger = options.trigger || 'manual';
