@@ -138,4 +138,24 @@ describe('splitContentForEnrichment', () => {
       expect(chunk.trim()).not.toBe('');
     }
   });
+
+  it('splits mid-line when a single line exceeds MAX_CHUNK_SIZE (no newline fallback)', () => {
+    // A section whose single body line is longer than MAX_CHUNK_SIZE.
+    // lastIndexOf('\n', end) returns -1 (or a position <= i) so the code falls back
+    // to an exact-char split inside the line. All chars must still be present.
+    const longLine = 'x'.repeat(MAX_CHUNK_SIZE + 500);
+    const sectionContent = '## Huge Line\n' + longLine;
+    const content = `Preamble.\n\n${sectionContent}`;
+
+    // Confirm there is no newline inside the body (triggering the fallback path)
+    expect(sectionContent.split('\n').slice(1).join('\n')).not.toContain('\n');
+
+    const chunks = splitContentForEnrichment(content);
+
+    // No content lost: all chars from the long line appear across chunks
+    const combined = chunks.join('');
+    expect(combined.length).toBeGreaterThanOrEqual(longLine.length);
+    expect(combined).toContain(longLine.slice(0, 100));
+    expect(combined).toContain(longLine.slice(-100));
+  });
 });
