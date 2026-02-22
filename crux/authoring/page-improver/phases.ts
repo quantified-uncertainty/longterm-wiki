@@ -32,4 +32,4 @@ export {
 } from './phases/index.ts';
 
 export { adversarialReviewPhase, adversarialLoopPhase } from './phases/index.ts';
-export { citationAuditPhase } from './phases/index.ts';
+export { citationAuditPhase, buildAuditorSourceCache } from './phases/index.ts';

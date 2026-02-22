@@ -308,8 +308,14 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     const { total, verified, failed, unchecked } = auditResult.summary;
     console.log(`Citations: ${total} total — ${verified} verified, ${failed} failed, ${unchecked} unchecked`);
     if (!auditResult.pass) {
-      const gateMode = options.citationGate && !dryRun;
-      console.log(`⚠ Citation audit FAILED${gateMode ? ' — blocking apply (--citation-gate)' : ' (advisory)'}`);
+      if (options.citationGate && dryRun) {
+        // Gate is inactive in dry-run — make this explicit so users are not surprised
+        console.log(`⚠ Citation audit FAILED (--citation-gate inactive in dry-run; would block --apply)`);
+      } else if (options.citationGate && !dryRun) {
+        console.log(`⚠ Citation audit FAILED — blocking apply (--citation-gate)`);
+      } else {
+        console.log(`⚠ Citation audit FAILED (advisory)`);
+      }
     }
   }
 
