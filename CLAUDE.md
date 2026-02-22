@@ -93,6 +93,14 @@ pnpm crux validate hallucination-risk --top=20  # Top 20 highest-risk pages
 pnpm crux review mark <id> --reviewer="name"  # Mark page as human-reviewed
 pnpm crux review list                         # List reviewed pages
 
+# Hallucination detection evals & adversarial agents
+pnpm crux evals run --suite=injection --pages=anthropic,miri  # Error injection eval
+pnpm crux evals run --suite=fake-entity                       # Fake entity resistance eval
+pnpm crux evals run --suite=cross-ref --limit=200             # Cross-reference consistency
+pnpm crux evals hunt --agent=reference-sniffer --page=anthropic --no-llm  # Hunt uncited claims
+pnpm crux evals hunt --agent=description-auditor --page=miri  # Audit descriptions
+pnpm crux evals inject anthropic --count=2                    # Manually inject errors
+
 # Session log management
 pnpm crux sessions write "Title"             # Scaffold a session YAML (pre-fills date+branch)
 pnpm crux sessions write "Title" --pages=a,b --sync  # Write + sync to wiki-server immediately
