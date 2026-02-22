@@ -103,20 +103,56 @@ const STOPWORDS = new Set([
 ]);
 
 // ---------------------------------------------------------------------------
-// Session-level in-memory cache
+// Session-level in-memory cache with LRU eviction (#650)
 // ---------------------------------------------------------------------------
 
-/** Keyed by URL. Cleared when the process exits. */
+const SESSION_CACHE_MAX_ENTRIES = 500;
+
+/** Keyed by URL. Uses insertion-order of Map for LRU eviction. */
 const sessionCache = new Map<string, FetchedSource>();
 
-/** Clear the in-memory cache (useful in tests). */
+/** In-flight fetch promises for deduplication (#650). */
+const inFlightFetches = new Map<string, Promise<FetchedSource>>();
+
+/** Cumulative eviction counter (for diagnostics). */
+let _evictionCount = 0;
+
+/** Clear the in-memory cache and in-flight map (useful in tests). */
 export function clearSessionCache(): void {
   sessionCache.clear();
+  inFlightFetches.clear();
+  _evictionCount = 0;
 }
 
 /** Number of entries in the session cache (for tests and diagnostics). */
 export function sessionCacheSize(): number {
   return sessionCache.size;
+}
+
+/** Number of LRU evictions since last cache clear (for diagnostics). */
+export function sessionCacheEvictions(): number {
+  return _evictionCount;
+}
+
+/**
+ * Add an entry to the session cache with LRU eviction.
+ * When the cache exceeds MAX_ENTRIES, the oldest entry is removed.
+ */
+function sessionCacheSet(url: string, value: FetchedSource): void {
+  // Move to end if already present (refresh LRU position)
+  if (sessionCache.has(url)) {
+    sessionCache.delete(url);
+  }
+  sessionCache.set(url, value);
+
+  // Evict oldest entries if over limit
+  while (sessionCache.size > SESSION_CACHE_MAX_ENTRIES) {
+    const oldest = sessionCache.keys().next().value;
+    if (oldest !== undefined) {
+      sessionCache.delete(oldest);
+      _evictionCount++;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -436,43 +472,29 @@ function resolveRequest(request: FetchRequest): { url: string; resource: Resourc
 // ---------------------------------------------------------------------------
 
 /**
- * Fetch a URL, convert to clean text/markdown, and extract relevant excerpts.
- *
- * Caching layers:
- *   1. In-memory session cache (fastest)
- *   2. SQLite cross-session cache
- *   3. Network fetch (Firecrawl preferred, built-in fallback)
+ * Internal: perform the actual fetch (cache → SQLite → network → store).
+ * Separated from fetchSource so in-flight deduplication can wrap it.
  */
-export async function fetchSource(request: FetchRequest): Promise<FetchedSource> {
+async function _fetchSourceCore(
+  url: string,
+  resource: ResourceEntry | null,
+  resourceMeta: FetchedSource['resource'],
+  request: FetchRequest,
+): Promise<FetchedSource> {
   const { extractMode, query } = request;
   const now = new Date().toISOString();
 
-  // ---- 0. Resolve resource + URL ----
-  const { url, resource } = resolveRequest(request);
-  const resourceMeta = resource ? buildResourceMeta(resource) : undefined;
-
-  // ---- 1. In-memory session cache ----
-  const cached = sessionCache.get(url);
-  if (cached) {
-    // extractMode='full' always returns empty excerpts regardless of cached state.
-    // extractMode='relevant' re-computes excerpts for the given query (queries differ per call).
-    const excerpts = extractMode === 'relevant' && query
-      ? extractRelevantExcerpts(cached.content, query)
-      : [];
-    return { ...cached, relevantExcerpts: excerpts, resource: cached.resource ?? resourceMeta };
-  }
-
-  // ---- 2. Unverifiable domains ----
+  // ---- 1. Unverifiable domains ----
   if (isUnverifiable(url)) {
     const result: FetchedSource = {
       url, title: resource?.title ?? '', fetchedAt: now, content: '',
       relevantExcerpts: [], status: 'error', resource: resourceMeta,
     };
-    sessionCache.set(url, result);
+    sessionCacheSet(url, result);
     return result;
   }
 
-  // ---- 3. SQLite cross-session cache ----
+  // ---- 2. SQLite cross-session cache ----
   const dbRow = loadFromDb(url);
   if (dbRow) {
     const excerpts = extractMode === 'relevant' && query
@@ -488,11 +510,11 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
       status: paywall ? 'paywall' : 'ok',
       resource: resourceMeta,
     };
-    sessionCache.set(url, result);
+    sessionCacheSet(url, result);
     return result;
   }
 
-  // ---- 4. Network fetch (Firecrawl → built-in fallback) ----
+  // ---- 3. Network fetch (Firecrawl → built-in fallback) ----
   let title = '';
   let content = '';
   let httpStatus = 0;
@@ -511,7 +533,7 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
     fetchError = builtinResult.error;
   }
 
-  // ---- 5. Determine status ----
+  // ---- 4. Determine status ----
   let status: FetchedSourceStatus;
   if (fetchError && httpStatus === 0) {
     status = 'error';
@@ -527,17 +549,17 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
     status = 'ok'; // PDF or non-HTML with 200 status
   }
 
-  // ---- 6. Persist to SQLite ----
+  // ---- 5. Persist to SQLite ----
   if (content.length > 0) {
     saveToDb(url, title, content, httpStatus);
   }
 
-  // ---- 7. Extract excerpts ----
+  // ---- 6. Extract excerpts ----
   const excerpts = extractMode === 'relevant' && query && content
     ? extractRelevantExcerpts(content, query)
     : [];
 
-  // ---- 8. Use resource title as fallback ----
+  // ---- 7. Use resource title as fallback ----
   const finalTitle = title || resource?.title || '';
 
   const result: FetchedSource = {
@@ -545,10 +567,10 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
     status, resource: resourceMeta,
   };
 
-  // ---- 9. Store in session cache ----
-  sessionCache.set(url, result);
+  // ---- 8. Store in session cache ----
+  sessionCacheSet(url, result);
 
-  // ---- 10. Reflect status back to resource YAML (if requested) ----
+  // ---- 9. Reflect status back to resource YAML (if requested) ----
   if (request.updateResourceStatus && resource) {
     try {
       updateResourceFetchStatus(resource.id, {
@@ -562,6 +584,51 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
   }
 
   return result;
+}
+
+/**
+ * Fetch a URL, convert to clean text/markdown, and extract relevant excerpts.
+ *
+ * Caching layers:
+ *   1. In-memory session cache (fastest, LRU-evicted at 500 entries)
+ *   2. In-flight dedup (concurrent requests for same URL share one fetch)
+ *   3. SQLite cross-session cache
+ *   4. Network fetch (Firecrawl preferred, built-in fallback)
+ */
+export async function fetchSource(request: FetchRequest): Promise<FetchedSource> {
+  const { extractMode, query } = request;
+
+  // ---- 0. Resolve resource + URL ----
+  const { url, resource } = resolveRequest(request);
+  const resourceMeta = resource ? buildResourceMeta(resource) : undefined;
+
+  // ---- 1. In-memory session cache ----
+  const cached = sessionCache.get(url);
+  if (cached) {
+    const excerpts = extractMode === 'relevant' && query
+      ? extractRelevantExcerpts(cached.content, query)
+      : [];
+    return { ...cached, relevantExcerpts: excerpts, resource: cached.resource ?? resourceMeta };
+  }
+
+  // ---- 2. In-flight deduplication (#650) ----
+  // If another call is already fetching this URL, wait for it instead of
+  // firing a duplicate network request.
+  const inFlight = inFlightFetches.get(url);
+  if (inFlight) {
+    const result = await inFlight;
+    const excerpts = extractMode === 'relevant' && query
+      ? extractRelevantExcerpts(result.content, query)
+      : [];
+    return { ...result, relevantExcerpts: excerpts, resource: result.resource ?? resourceMeta };
+  }
+
+  // Register this fetch as in-flight, then execute.
+  const fetchPromise = _fetchSourceCore(url, resource, resourceMeta, request)
+    .finally(() => inFlightFetches.delete(url));
+  inFlightFetches.set(url, fetchPromise);
+
+  return fetchPromise;
 }
 
 /**
