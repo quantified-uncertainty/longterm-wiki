@@ -156,6 +156,13 @@ const PARALLEL_STEPS: Step[] = [
     args: ['tsc', '--noEmit'],
     cwd: APP_DIR,
   },
+  {
+    id: 'returning-guard',
+    name: '.returning() guard check',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-returning-guard.ts'],
+    cwd: PROJECT_ROOT,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
