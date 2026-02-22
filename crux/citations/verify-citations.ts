@@ -55,6 +55,9 @@ async function main() {
   }
 
   if (all) {
+    if (contentVerify) {
+      console.warn(`${c.yellow}Warning: --content-verify is ignored with --all (use a specific page ID instead).${c.reset}`);
+    }
     // Verify all pages with citations
     let pages = findPagesWithCitations();
     console.log(`\n${c.bold}${c.blue}Citation Verification — All Pages${c.reset}\n`);

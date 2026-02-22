@@ -75,6 +75,13 @@ const FETCH_TIMEOUT_MS = 15_000;
 const FETCH_USER_AGENT = 'Mozilla/5.0 (compatible; LongtermWikiSourceFetcher/1.0)';
 const MAX_CONTENT_CHARS = 100_000;
 
+/** Common English stopwords filtered out during query tokenization. */
+const STOPWORDS = new Set([
+  'the', 'and', 'for', 'that', 'are', 'was', 'with', 'from', 'this', 'has',
+  'have', 'had', 'its', 'not', 'but', 'can', 'all', 'one', 'more', 'also',
+  'about', 'into', 'such', 'than', 'then', 'when', 'which', 'will', 'been',
+]);
+
 // ---------------------------------------------------------------------------
 // Session-level in-memory cache
 // ---------------------------------------------------------------------------
@@ -178,11 +185,6 @@ function scoreParagraph(paragraph: string, queryTokens: string[]): number {
  * Tokenize a query string into normalized keywords (length ≥ 3, no stopwords).
  */
 function tokenizeQuery(query: string): string[] {
-  const STOPWORDS = new Set([
-    'the', 'and', 'for', 'that', 'are', 'was', 'with', 'from', 'this', 'has',
-    'have', 'had', 'its', 'not', 'but', 'can', 'all', 'one', 'more', 'also',
-    'about', 'into', 'such', 'than', 'then', 'when', 'which', 'will', 'been',
-  ]);
   return query
     .toLowerCase()
     .split(/\W+/)
@@ -442,8 +444,6 @@ export async function fetchSource(request: FetchRequest): Promise<FetchedSource>
   let status: FetchedSourceStatus;
   if (fetchError && httpStatus === 0) {
     status = 'error';
-  } else if (httpStatus === 404 || httpStatus === 410) {
-    status = 'dead';
   } else if (httpStatus >= 400) {
     status = 'dead';
   } else if (detectPaywall(content)) {
