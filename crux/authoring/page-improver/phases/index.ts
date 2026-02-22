@@ -1,10 +1,3 @@
-/**
- * Phase Modules Index
- *
- * Re-exports all phase functions from their individual modules.
- * This file replaces the monolithic phases.ts.
- */
-
 export { analyzePhase } from './analyze.ts';
 export { researchPhase } from './research.ts';
 export { improvePhase } from './improve.ts';
