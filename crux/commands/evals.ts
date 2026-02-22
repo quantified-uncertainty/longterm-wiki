@@ -16,7 +16,7 @@
  *   crux evals report
  */
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { CommandResult } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
@@ -56,7 +56,7 @@ async function runInjectionSuite(
   const { formatScoreReport } = await import('../evals/score.ts');
 
   // Determine which pages to test
-  const pageIds = (options.pages as string)?.split(',') || ['anthropic', 'miri', 'ai-risk'];
+  const pageIds = (options.pages as string)?.split(',') || ['anthropic', 'miri'];
 
   log.info(`Running injection eval on ${pageIds.length} pages...`);
 
@@ -102,7 +102,7 @@ async function runInjectionSuite(
 }
 
 async function runFakeEntitySuite(
-  verbose: boolean,
+  _verbose: boolean,
   log: ReturnType<typeof createLogger>,
   c: ReturnType<typeof createLogger>['colors'],
 ): Promise<CommandResult> {
@@ -121,7 +121,7 @@ async function runFakeEntitySuite(
 
 async function runCrossRefSuite(
   options: Record<string, unknown>,
-  verbose: boolean,
+  _verbose: boolean,
   log: ReturnType<typeof createLogger>,
   c: ReturnType<typeof createLogger>['colors'],
 ): Promise<CommandResult> {
@@ -269,6 +269,7 @@ async function inject(args: string[], options: Record<string, unknown>): Promise
 // ---------------------------------------------------------------------------
 
 export const commands = {
+  default: run,
   run,
   hunt,
   inject,

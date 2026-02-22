@@ -111,7 +111,6 @@ export async function injectExaggerations(
   }> = [];
 
   const paragraphs = body.split(/\n\n+/);
-  let charOffset = 0;
 
   for (let pi = 0; pi < paragraphs.length; pi++) {
     const para = paragraphs[pi];
@@ -124,8 +123,6 @@ export async function injectExaggerations(
         allMatches.push({ rule, match, paragraphIndex: pi });
       }
     }
-
-    charOffset += para.length + 2;
   }
 
   // Shuffle and select

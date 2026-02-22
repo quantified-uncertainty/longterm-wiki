@@ -91,12 +91,15 @@ function findNumericFacts(content: string): Array<{
     paragraphIndex: number;
   }> = [];
 
-  // Split into paragraphs for paragraph indexing
+  // Split into paragraphs for paragraph indexing.
+  // Track actual char offsets from the body string (don't assume separator width).
   const paragraphs = body.split(/\n\n+/);
   let charOffset = 0;
 
   for (let pi = 0; pi < paragraphs.length; pi++) {
     const para = paragraphs[pi];
+    // Find where this paragraph actually starts in the body
+    const paraStart = body.indexOf(para, charOffset);
 
     for (const { regex, label } of NUMBER_PATTERNS) {
       regex.lastIndex = 0;
@@ -122,13 +125,13 @@ function findNumericFacts(content: string): Array<{
           number,
           suffix,
           label,
-          index: bodyStart + charOffset + match.index,
+          index: bodyStart + paraStart + match.index,
           paragraphIndex: pi,
         });
       }
     }
 
-    charOffset += para.length + 2; // +2 for \n\n
+    charOffset = paraStart + para.length;
   }
 
   return facts;
@@ -175,12 +178,12 @@ export async function injectWrongNumbers(
 
     const newFullMatch = fact.fullMatch.replace(fact.number, newNumber);
 
-    // Replace in content — use the fact's full match string to be precise
-    const beforeCorruption = corrupted;
-    corrupted = corrupted.replace(fact.fullMatch, newFullMatch);
-
-    // Only record if the replacement actually happened
-    if (corrupted !== beforeCorruption) {
+    // Use index-based splicing instead of String.replace to target the exact
+    // occurrence (String.replace hits the *first* match, which may not be ours).
+    const before = corrupted.slice(0, fact.index);
+    const after = corrupted.slice(fact.index + fact.fullMatch.length);
+    if (corrupted.slice(fact.index, fact.index + fact.fullMatch.length) === fact.fullMatch) {
+      corrupted = before + newFullMatch + after;
       errors.push({
         id: `wrong-number-${errors.length}`,
         category: 'wrong-number',

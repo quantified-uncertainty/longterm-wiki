@@ -72,28 +72,31 @@ function findInsertionPoints(content: string): Array<{ index: number; paragraphI
   const paragraphs = body.split(/\n\n+/);
   const points: Array<{ index: number; paragraphIndex: number; sectionHeading?: string }> = [];
 
-  let offset = 0;
+  let searchFrom = 0;
   let currentHeading: string | undefined;
 
   for (let i = 0; i < paragraphs.length; i++) {
-    const para = paragraphs[i].trim();
+    const para = paragraphs[i];
+    const trimmed = para.trim();
+    // Find where this paragraph actually starts in the body
+    const paraStart = body.indexOf(para, searchFrom);
 
     // Track current section heading
-    const headingMatch = /^#{1,3}\s+(.+)/.exec(para);
+    const headingMatch = /^#{1,3}\s+(.+)/.exec(trimmed);
     if (headingMatch) {
       currentHeading = headingMatch[1];
     }
 
     // Good insertion points: after substantial paragraphs (not headings, not footnotes)
-    if (para.length > 100 && !para.startsWith('#') && !para.startsWith('[^') && !para.startsWith('|')) {
+    if (trimmed.length > 100 && !trimmed.startsWith('#') && !trimmed.startsWith('[^') && !trimmed.startsWith('|')) {
       points.push({
-        index: bodyStart + offset + para.length,
+        index: bodyStart + paraStart + para.length,
         paragraphIndex: i,
         sectionHeading: currentHeading,
       });
     }
 
-    offset += paragraphs[i].length + 2; // +2 for \n\n
+    searchFrom = paraStart + para.length;
   }
 
   return points;
