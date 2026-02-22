@@ -23,11 +23,13 @@ import {
   extractCitationsFromContent,
   extractClaimSentence,
   fetchCitationUrl,
+  saveFetchResultToPostgres,
 } from '../lib/citation-archive.ts';
 import {
   citationContent,
   citationQuotes,
 } from '../lib/knowledge-db.ts';
+import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import { extractSupportingQuote, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
 import { verifyQuoteInSource } from '../lib/quote-verifier.ts';
 import {
@@ -43,22 +45,46 @@ function isBookReference(footnoteText: string): boolean {
   );
 }
 
-/** Get full-text content for a URL, from cache or by fetching. */
+/**
+ * Get full-text content for a URL using multi-tier cache:
+ *   1. SQLite (local, fast)
+ *   2. PostgreSQL (cross-environment, durable)
+ *   3. Network fetch (slowest, writes back to both caches)
+ */
 async function getSourceText(
   url: string,
   pageId: string,
   footnote: number,
 ): Promise<string | null> {
-  // Check SQLite cache first
+  // Tier 1: SQLite (local cache)
   const cached = citationContent.getByUrl(url);
   if (cached?.full_text) {
     return cached.full_text;
   }
 
-  // Fetch the URL
+  // Tier 2: PostgreSQL (cross-environment cache)
+  const pgResult = await getCitationContentByUrl(url);
+  if (pgResult.ok && pgResult.data.fullText && pgResult.data.fullText.length > 0) {
+    // Backfill SQLite from PG so future reads are local
+    citationContent.upsert({
+      url,
+      pageId,
+      footnote,
+      fetchedAt: pgResult.data.fetchedAt,
+      httpStatus: pgResult.data.httpStatus,
+      contentType: pgResult.data.contentType,
+      pageTitle: pgResult.data.pageTitle,
+      fullHtml: null,
+      fullText: pgResult.data.fullText,
+      contentLength: pgResult.data.contentLength,
+    });
+    return pgResult.data.fullText;
+  }
+
+  // Tier 3: Network fetch
   const result = await fetchCitationUrl(url);
   if (result.fullText) {
-    // Store in SQLite for future use
+    // Write to both caches
     citationContent.upsert({
       url,
       pageId,
@@ -71,6 +97,7 @@ async function getSourceText(
       fullText: result.fullText,
       contentLength: result.contentLength,
     });
+    saveFetchResultToPostgres(url, result);
     return result.fullText;
   }
 
