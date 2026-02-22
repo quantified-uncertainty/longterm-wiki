@@ -165,9 +165,13 @@ export function reassembleSections(split: SplitPage): string {
  * renumberFootnotes would keep only the first definition, silently
  * misattributing the later section's citation.
  *
- * This function walks through all sections and remaps colliding markers
- * to unique values (e.g., section 2's [^SRC-1] becomes [^SRC-S2-1]).
- * Both inline refs and definition lines are updated.
+ * This function ONLY deduplicates SRC-style markers (produced by the
+ * section-writer).  Original numeric markers like [^1] are left alone
+ * because they intentionally refer to definitions in other sections
+ * (typically the terminal Sources/References section).  Renaming those
+ * would sever the ref→definition link across sections.
+ *
+ * Both inline refs and definition lines are updated for colliding SRC markers.
  */
 export function deduplicateSectionMarkers(sections: ParsedSection[]): ParsedSection[] {
   const globalMarkers = new Set<string>();
@@ -176,13 +180,17 @@ export function deduplicateSectionMarkers(sections: ParsedSection[]): ParsedSect
   for (let si = 0; si < sections.length; si++) {
     const section = sections[si];
 
-    // Find all footnote markers in this section (both inline refs and definitions)
+    // Find only SRC-style footnote markers (e.g. [^SRC-1], [^SRC-12])
+    // Skip numeric-only markers ([^1], [^23]) — those are cross-section refs
     const markerRe = /\[\^([^\]]+)\]/g;
     const localMarkers = new Set<string>();
     let m: RegExpExecArray | null;
     markerRe.lastIndex = 0;
     while ((m = markerRe.exec(section.content)) !== null) {
-      localMarkers.add(m[1]);
+      // Only track markers that contain non-numeric characters (SRC-style)
+      if (/[^0-9]/.test(m[1])) {
+        localMarkers.add(m[1]);
+      }
     }
 
     // Build remapping for any markers that collide with previously seen ones
