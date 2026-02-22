@@ -428,6 +428,47 @@ describe('deduplicateSectionMarkers', () => {
     const markers = [...allContent.matchAll(/\[\^([^\]]+)\]:/g)].map(m => m[1]);
     expect(new Set(markers).size).toBe(3);
   });
+
+  it('preserves cross-section numeric footnotes (refs in early sections, defs in last)', () => {
+    // Standard wiki pattern: inline refs [^1] in body sections, definitions in Sources section
+    const sections: ParsedSection[] = [
+      { id: 'overview', heading: '## Overview', content: '## Overview\nFounded in 2000.[^1] Expanded in 2010.[^2]' },
+      { id: 'funding', heading: '## Funding', content: '## Funding\nRaised $5M.[^3]' },
+      { id: 'sources', heading: '## Sources', content: '## Sources\n[^1]: History (https://example.com/history)\n[^2]: Expansion (https://example.com/expand)\n[^3]: Funding (https://example.com/fund)' },
+    ];
+    const deduped = deduplicateSectionMarkers(sections);
+
+    // Numeric markers should NOT be remapped — they intentionally cross sections
+    expect(deduped[0].content).toContain('[^1]');
+    expect(deduped[0].content).toContain('[^2]');
+    expect(deduped[1].content).toContain('[^3]');
+    expect(deduped[2].content).toContain('[^1]:');
+    expect(deduped[2].content).toContain('[^2]:');
+    expect(deduped[2].content).toContain('[^3]:');
+
+    // Full pipeline should preserve all footnotes
+    const reassembled = reassembleSections({ frontmatter: '', preamble: '', sections: deduped });
+    const renumbered = renumberFootnotes(reassembled);
+    expect(renumbered).toContain('[^1]: History');
+    expect(renumbered).toContain('[^2]: Expansion');
+    expect(renumbered).toContain('[^3]: Funding');
+  });
+
+  it('deduplicates SRC-style markers while leaving numeric ones intact', () => {
+    // Mixed: rewritten sections have SRC markers, skipped sections have numeric markers
+    const sections: ParsedSection[] = [
+      { id: 'overview', heading: '## Overview', content: '## Overview\nNew claim.[^SRC-1] Old fact.[^1]\n[^SRC-1]: New source' },
+      { id: 'details', heading: '## Details', content: '## Details\nAnother claim.[^SRC-1]\n[^SRC-1]: Different source' },
+      { id: 'sources', heading: '## Sources', content: '## Sources\n[^1]: Original source' },
+    ];
+    const deduped = deduplicateSectionMarkers(sections);
+
+    // SRC-1 collision should be remapped in second section
+    expect(deduped[1].content).toContain('[^S1-SRC-1]');
+    // Numeric [^1] should NOT be remapped in the sources section
+    expect(deduped[2].content).toContain('[^1]: Original source');
+    expect(deduped[0].content).toContain('[^1]');
+  });
 });
 
 describe('filterSourcesForSection', () => {
