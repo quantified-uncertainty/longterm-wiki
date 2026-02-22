@@ -875,20 +875,21 @@ describe('PostgreSQL write path', () => {
   it('serves from PostgreSQL cache when session cache is empty', async () => {
     const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
     const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    const recentDate = new Date(Date.now() - 3600_000).toISOString(); // 1 hour ago (within TTL)
     getMock.mockResolvedValueOnce({
       ok: true,
       data: {
         url: 'https://example.com/pg-cached',
         pageTitle: 'PG Cached Page',
         fullText: 'Content stored in PostgreSQL about AI safety.',
-        fetchedAt: '2025-01-01T00:00:00.000Z',
+        fetchedAt: recentDate,
         httpStatus: 200,
         contentType: 'text/html',
         fullTextPreview: null,
         contentLength: 44,
         contentHash: null,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
+        createdAt: recentDate,
+        updatedAt: recentDate,
       },
     });
 
@@ -906,20 +907,21 @@ describe('PostgreSQL write path', () => {
   it('extracts relevant excerpts from PostgreSQL-cached content', async () => {
     const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
     const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    const recentDate = new Date(Date.now() - 3600_000).toISOString(); // 1 hour ago (within TTL)
     getMock.mockResolvedValueOnce({
       ok: true,
       data: {
         url: 'https://example.com/pg-relevant',
         pageTitle: 'AI Safety Report',
         fullText: 'Global spending on AI safety research reached $100 million.\n\nResearchers worldwide have increased commitments to AI alignment.\n\nUnrelated paragraph about climate science.',
-        fetchedAt: '2025-01-01T00:00:00.000Z',
+        fetchedAt: recentDate,
         httpStatus: 200,
         contentType: 'text/html',
         fullTextPreview: null,
         contentLength: 100,
         contentHash: null,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
+        createdAt: recentDate,
+        updatedAt: recentDate,
       },
     });
 
@@ -963,20 +965,21 @@ describe('PostgreSQL write path', () => {
   it('backfills SQLite when served from PostgreSQL cache', async () => {
     const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
     const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    const recentDate = new Date(Date.now() - 3600_000).toISOString(); // 1 hour ago (within TTL)
     getMock.mockResolvedValueOnce({
       ok: true,
       data: {
         url: 'https://example.com/backfill-test',
         pageTitle: 'Backfill Test',
         fullText: 'PostgreSQL content for backfill test.',
-        fetchedAt: '2025-01-01T00:00:00.000Z',
+        fetchedAt: recentDate,
         httpStatus: 200,
         contentType: 'text/html',
         fullTextPreview: null,
         contentLength: 37,
         contentHash: null,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
+        createdAt: recentDate,
+        updatedAt: recentDate,
       },
     });
 
@@ -994,5 +997,46 @@ describe('PostgreSQL write path', () => {
       url: 'https://example.com/backfill-test',
       fullText: 'PostgreSQL content for backfill test.',
     }));
+  });
+
+  it('rejects stale PostgreSQL cache entries beyond TTL', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    // 8 days ago — beyond the 7-day TTL
+    const staleDate = new Date(Date.now() - 8 * 24 * 3600_000).toISOString();
+    getMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        url: 'https://example.com/stale-pg',
+        pageTitle: 'Stale PG Page',
+        fullText: 'This content is stale.',
+        fetchedAt: staleDate,
+        httpStatus: 200,
+        contentType: 'text/html',
+        fullTextPreview: null,
+        contentLength: 22,
+        contentHash: null,
+        createdAt: staleDate,
+        updatedAt: staleDate,
+      },
+    });
+
+    // SQLite also stale
+    const { citationContent } = await import('./knowledge-db.ts');
+    const getByUrlMock = citationContent.getByUrl as ReturnType<typeof vi.fn>;
+    getByUrlMock.mockReturnValueOnce(null);
+
+    // Network fetch returns fresh content
+    const fetchMock = vi.fn().mockResolvedValueOnce(new Response(
+      '<html><head><title>Fresh Page</title></head><body>Fresh content.</body></html>',
+      { status: 200, headers: { 'content-type': 'text/html' } },
+    ));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await fetchSource({ url: 'https://example.com/stale-pg', extractMode: 'full' });
+
+    // Should have made a network call since both caches were stale/empty
+    expect(fetchMock).toHaveBeenCalled();
+    expect(result.status).toBe('ok');
   });
 });

@@ -104,14 +104,15 @@ function buildSkipRanges(content: string): Array<[number, number]> {
     }
   }
 
-  // Skip code blocks
+  // Skip code blocks — must come before inline code
   const codeBlock = /```[\s\S]*?```/g;
   for (const match of content.matchAll(codeBlock)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
   }
-  const inlineCode = /`[^`]+`/g;
+  // Skip inline code — exclude newlines to avoid false matches between fences
+  const inlineCode = /`[^`\n]+`/g;
   for (const match of content.matchAll(inlineCode)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
@@ -160,6 +161,38 @@ function buildSkipRanges(content: string): Array<[number, number]> {
   // Skip reference-style link definitions [ref]: url (#687)
   const refDef = /^\[[^\]]+\]:\s+\S+.*$/gm;
   for (const match of content.matchAll(refDef)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip HTML/JSX open tags with attributes (matches entity-link enricher)
+  const jsxOpenTag = /<[A-Z][a-zA-Z0-9]*\s[^>]*>/g;
+  for (const match of content.matchAll(jsxOpenTag)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip MDX/JSX comments {/* ... */}
+  const mdxComment = /\{\/\*[\s\S]*?\*\/\}/g;
+  for (const match of content.matchAll(mdxComment)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip <R>...</R> resource reference tags
+  const rTag = /<R\s[^>]*>[\s\S]*?<\/R>/g;
+  for (const match of content.matchAll(rTag)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip footnote definition lines [^N]: ...
+  const footnoteDef = /^\[\^[^\]]+\]:\s.+$/gm;
+  for (const match of content.matchAll(footnoteDef)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }

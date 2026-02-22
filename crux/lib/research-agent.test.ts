@@ -370,7 +370,7 @@ describe('runResearch', () => {
     expect(result.metadata.sourcesSearched).toContain('exa');
   });
 
-  it('uses undefined (not empty array) for facts when budget exhausted', async () => {
+  it('uses empty array for facts when budget exhausted (avoids downstream TypeError)', async () => {
     vi.stubGlobal('fetch', makeFetchMock('all-success'));
 
     const result = await runResearch({
@@ -379,13 +379,10 @@ describe('runResearch', () => {
       budgetCap: 0, // Force budget-cap path immediately
     });
 
-    // Budget-exhausted sources should have facts: undefined, not facts: []
+    // Budget-exhausted sources get facts: [] (safe default) so downstream code
+    // can always call .length, .map, etc. without null-checks.
     for (const src of result.sources) {
-      expect(src.facts).not.toEqual([]);
-      // facts should be either undefined or a non-empty array
-      if (src.facts !== undefined) {
-        expect(src.facts.length).toBeGreaterThan(0);
-      }
+      expect(Array.isArray(src.facts)).toBe(true);
     }
   });
 });

@@ -81,6 +81,7 @@ import * as contextCommands from './commands/context.ts';
 import * as enrichCommands from './commands/enrich.ts';
 import * as sessionsCommands from './commands/sessions.ts';
 import * as researchCommands from './commands/research.ts';
+import * as evalsCommands from './commands/evals.ts';
 
 const domains = {
   validate: validateCommands,
@@ -112,6 +113,7 @@ const domains = {
   enrich: enrichCommands,
   sessions: sessionsCommands,
   research: researchCommands,
+  evals: evalsCommands,
 };
 
 /**
@@ -189,6 +191,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   enrich      Standalone enrichment tools (entity-links, fact-refs)
   sessions    Session log management (write: scaffold a session YAML)
   research    Multi-source research → SourceCacheEntry[] (Exa, Perplexity, SCRY)
+  evals       Hallucination detection evals & adversarial agents
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines

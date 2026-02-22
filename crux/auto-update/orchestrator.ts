@@ -142,6 +142,7 @@ function executePageImprove(
   tier: string,
   directions: string,
   verbose = false,
+  sectionLevel = false,
 ): RunResult {
   const start = Date.now();
 
@@ -156,6 +157,10 @@ function executePageImprove(
 
     if (directions) {
       args.push('--directions', directions);
+    }
+
+    if (sectionLevel) {
+      args.push('--section-level');
     }
 
     if (verbose) {
@@ -403,6 +408,7 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       update.suggestedTier,
       update.directions,
       verbose,
+      update.sectionLevel ?? false,
     );
     results.push(result);
 

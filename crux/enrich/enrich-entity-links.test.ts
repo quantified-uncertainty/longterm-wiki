@@ -358,6 +358,38 @@ Anthropic is a company.`;
     expect(result).toContain('<EntityLink id="E51">Phil</EntityLink> also');
     expect(result).not.toMatch(/<EntityLink id="E50">Open<EntityLink/);
   });
+
+  it('skips entity name inside <R> resource reference tags', () => {
+    const content = 'See <R id="abc123">AI Impacts survey</R> for details. AI Impacts is important.';
+    const replacements = [{ entityId: 'E60', searchText: 'AI Impacts', displayName: 'AI Impacts' }];
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    // Should NOT link inside <R> tag, but SHOULD link the second occurrence
+    expect(result).toContain('<R id="abc123">AI Impacts survey</R>');
+    expect(result).toContain('<EntityLink id="E60">AI Impacts</EntityLink> is important');
+  });
+
+  it('skips entity name inside footnote definitions', () => {
+    const content = 'MIRI researches AI safety.\n\n[^1]: MIRI History (https://miri.org)';
+    const replacements = [{ entityId: 'E70', searchText: 'MIRI', displayName: 'MIRI' }];
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E70">MIRI</EntityLink> researches');
+    // Footnote definition should be untouched
+    expect(result).toContain('[^1]: MIRI History');
+    expect(result).not.toMatch(/\[\^1\]:.*<EntityLink/);
+  });
+
+  it('handles inline code between code fences without false skip range', () => {
+    const content = '```python\nx = 1\n```\n\nOpenAI provides an API.\n\n```js\ny = 2\n```';
+    const replacements = [{ entityId: 'E80', searchText: 'OpenAI', displayName: 'OpenAI' }];
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E80">OpenAI</EntityLink>');
+  });
 });
 
 // splitContentForEnrichment tests live in crux/lib/content-chunker.test.ts
