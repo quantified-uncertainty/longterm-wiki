@@ -98,7 +98,7 @@ export async function probeResearch(testCase: FakeEntityTestCase): Promise<{
     const query = `"${testCase.name}" ${testCase.entityType === 'person' ? 'AI safety researcher' : 'AI safety'}`;
     const result = await perplexityResearch(query, { maxTokens: 500 });
 
-    const text = result.text.toLowerCase();
+    const text = result.content.toLowerCase();
 
     // Detect "not found" signals in the response
     const notFoundSignals = [
