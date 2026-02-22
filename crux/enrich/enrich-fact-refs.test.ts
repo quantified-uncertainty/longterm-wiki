@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { applyFactRefReplacements, type FactRefReplacement } from './enrich-fact-refs.ts';
+import { applyFactRefReplacements, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
 
 describe('applyFactRefReplacements', () => {
   it('wraps a matching number with <F> tags', () => {
@@ -180,5 +180,86 @@ Anthropic raised \\$30 billion.`;
     expect(applied).toBe(1);
     expect(appliedReplacements).toHaveLength(1);
     expect(appliedReplacements[0].factId).toBe('5b0663a0');
+  });
+
+  it('handles \\$ prefix mismatch: searchText without backslash, displayText with it', () => {
+    // LLM sometimes returns searchText="$27–76B" but displayText="\\$27–76B"
+    // Content has "\\$27–76B" — the search matches the "$27–76B" part after the backslash
+    const content = 'EA-aligned capital: \\$27–76B risk-adjusted.';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '$27–76B', entityId: 'anthropic', factId: 'a8c71e05', displayText: '\\$27–76B' },
+    ];
+
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    // Should NOT leave a stray backslash before <F>
+    expect(result).not.toContain('\\<F');
+    expect(result).toContain('<F e="anthropic" f="a8c71e05">\\$27–76B</F>');
+  });
+
+  it('deduplicates identical searchTexts', () => {
+    const content = 'Anthropic raised \\$30 billion in funding.';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '\\$30 billion', entityId: 'anthropic', factId: '5b0663a0', displayText: '\\$30 billion' },
+      { searchText: '\\$30 billion', entityId: 'anthropic', factId: '5b0663a0', displayText: '\\$30 billion' },
+    ];
+
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    // Only one <F> tag, not double-nested
+    const matches = [...result.matchAll(/<F\s/g)];
+    expect(matches.length).toBe(1);
+  });
+
+  it('rebuilds skip ranges after each replacement (offset-independent)', () => {
+    // Regression test: after wrapping "$1B" at an earlier position, wrapping a later
+    // occurrence should still correctly check skip ranges on the current content
+    const content = 'Revenue: \\$1B. Old valuation: <F e="anthropic" f="6796e194">\\$380B</F>. New note about \\$30B.';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '\\$1B', entityId: 'anthropic', factId: 'bc497a3d', displayText: '\\$1B' },
+      { searchText: '\\$380B', entityId: 'anthropic', factId: '6796e194', displayText: '\\$380B' },
+      { searchText: '\\$30B', entityId: 'anthropic', factId: '5b0663a0', displayText: '\\$30B' },
+    ];
+
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    // $1B should be wrapped (not in skip range)
+    expect(result).toContain('<F e="anthropic" f="bc497a3d">\\$1B</F>');
+    // $380B should NOT be double-wrapped (already in <F> tag)
+    expect(result).not.toContain('<F e="anthropic" f="6796e194"><F');
+    // $30B should be wrapped
+    expect(result).toContain('<F e="anthropic" f="5b0663a0">\\$30B</F>');
+    // $1B and $30B wrapped, $380B already wrapped = 2 new
+    expect(applied).toBe(2);
+  });
+});
+
+describe('fixDoubleNestedFTags', () => {
+  it('removes double-nested <F> tags with identical attributes', () => {
+    const content = '<F e="anthropic" f="e3b8a291"><F e="anthropic" f="e3b8a291">2–3%</F></F>';
+    const result = fixDoubleNestedFTags(content);
+    expect(result).toBe('<F e="anthropic" f="e3b8a291">2–3%</F>');
+  });
+
+  it('preserves correctly nested different <F> tags', () => {
+    const content = 'Before <F e="anthropic" f="5b0663a0">\\$30B</F> and <F e="anthropic" f="6796e194">\\$380B</F> after.';
+    const result = fixDoubleNestedFTags(content);
+    expect(result).toBe(content); // No change
+  });
+});
+
+describe('fixStrayBackslashBeforeFTag', () => {
+  it('removes backslash before <F> tags', () => {
+    const content = '\\<F e="anthropic" f="a8c71e05">\\$27–76B</F>';
+    const result = fixStrayBackslashBeforeFTag(content);
+    expect(result).toBe('<F e="anthropic" f="a8c71e05">\\$27–76B</F>');
+  });
+
+  it('preserves backslash-dollar inside <F> tags', () => {
+    const content = '<F e="anthropic" f="5b0663a0">\\$30B</F>';
+    const result = fixStrayBackslashBeforeFTag(content);
+    expect(result).toBe(content); // No change — \\$ inside F is fine
   });
 });

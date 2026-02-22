@@ -158,34 +158,53 @@ export function applyFactRefReplacements(
   content: string,
   replacements: FactRefReplacement[],
 ): { content: string; applied: number; appliedReplacements: FactRefReplacement[] } {
-  const skipRanges = buildSkipRanges(content);
   let result = content;
   let applied = 0;
-  let offset = 0;
   const appliedReplacements: FactRefReplacement[] = [];
 
-  // Sort by position of first occurrence in original content
-  const positioned = replacements.map(r => {
-    const idx = content.indexOf(r.searchText);
+  // Deduplicate: if multiple replacements target the same searchText, keep the first
+  const seen = new Set<string>();
+  const deduped = replacements.filter(r => {
+    if (seen.has(r.searchText)) return false;
+    seen.add(r.searchText);
+    return true;
+  });
+
+  // Sort by position of first occurrence in current content
+  const positioned = deduped.map(r => {
+    const idx = result.indexOf(r.searchText);
     return { ...r, firstIdx: idx };
   }).filter(r => r.firstIdx !== -1)
     .sort((a, b) => a.firstIdx - b.firstIdx);
 
   for (const r of positioned) {
+    // Rebuild skip ranges on CURRENT result (not original) to avoid offset mapping bugs
+    const skipRanges = buildSkipRanges(result);
+
     // Scan through occurrences to find the first one not in a skip range.
     let searchStart = 0;
     while (true) {
       const searchIdx = result.indexOf(r.searchText, searchStart);
       if (searchIdx === -1) break;
 
-      // Map back to original content position for skip-range check
-      const origPos = searchIdx - offset;
-      const origEnd = origPos + r.searchText.length;
+      if (!isInSkipRange(searchIdx, searchIdx + r.searchText.length, skipRanges)) {
+        // Handle \$ prefix: if the content has '\' immediately before a '$'-prefixed
+        // match and the displayText starts with '\$', consume the preceding '\' to
+        // avoid leaving a stray backslash before the <F> tag.
+        let matchStart = searchIdx;
+        let matchLen = r.searchText.length;
+        if (
+          r.searchText.startsWith('$') &&
+          searchIdx > 0 &&
+          result[searchIdx - 1] === '\\' &&
+          r.displayText.startsWith('\\$')
+        ) {
+          matchStart = searchIdx - 1;
+          matchLen = r.searchText.length + 1;
+        }
 
-      if (!isInSkipRange(origPos, origEnd, skipRanges)) {
         const replacement = `<F e="${r.entityId}" f="${r.factId}">${r.displayText}</F>`;
-        result = result.slice(0, searchIdx) + replacement + result.slice(searchIdx + r.searchText.length);
-        offset += replacement.length - r.searchText.length;
+        result = result.slice(0, matchStart) + replacement + result.slice(matchStart + matchLen);
         applied++;
         appliedReplacements.push(r);
         break; // Only wrap the first valid occurrence
@@ -196,7 +215,32 @@ export function applyFactRefReplacements(
     }
   }
 
+  // Post-processing: fix double-nested <F> tags as a safety net
+  result = fixDoubleNestedFTags(result);
+  // Post-processing: fix stray backslash before <F> tags (e.g. \<F from LLM errors)
+  result = fixStrayBackslashBeforeFTag(result);
+
   return { content: result, applied, appliedReplacements };
+}
+
+/**
+ * Remove double-nested <F> tags: `<F e="X" f="Y"><F e="X" f="Y">text</F></F>` → `<F e="X" f="Y">text</F>`
+ */
+export function fixDoubleNestedFTags(content: string): string {
+  // Match <F attrs><F attrs>text</F></F> where both F tags have the same attributes
+  return content.replace(
+    /<F\s([^>]+)><F\s\1>([\s\S]*?)<\/F><\/F>/g,
+    '<F $1>$2</F>',
+  );
+}
+
+/**
+ * Fix stray backslash before <F> tags: `\<F e="...">` → `<F e="...">`
+ * This happens when the LLM's searchText doesn't include the `\` prefix but
+ * the replacement inserts an <F> tag after the stray backslash.
+ */
+export function fixStrayBackslashBeforeFTag(content: string): string {
+  return content.replace(/\\(<F\s[^>]*>)/g, '$1');
 }
 
 /**
@@ -216,19 +260,20 @@ Rules:
 3. NEVER tag numbers inside code blocks (\`\`\`...\`\`\`), inline code (\`...\`), or JSX attributes
 4. Match approximately: "$30 billion", "$30B", and "30,000,000,000" can all match a $30B fact
 5. Only wrap when the SEMANTIC meaning matches — e.g., "$1B" could be revenue OR valuation. Use the fact's note to confirm. If ambiguous, skip.
-6. Use the EXACT text as it appears in the content for searchText (including escaped chars like \\$)
-7. Use the displayText from the original content (same as searchText usually)
+6. Use the EXACT text as it appears in the content for searchText — INCLUDE the backslash in escaped values like \\$. Example: searchText should be "\\$30 billion" not "$30 billion"
+7. searchText and displayText should be IDENTICAL — both the exact text from the content
 8. The factId must be the exact 8-char hex hash from the lookup table
 9. Return JSON only — no prose
+10. NEVER tag numbers in questions, table headers, section headings, or rhetorical contexts — only tag numbers in factual assertions
 
 Return a JSON object:
 {
   "replacements": [
     {
-      "searchText": "exact text in content including escaped chars",
+      "searchText": "\\$30 billion",
       "entityId": "anthropic",
       "factId": "5b0663a0",
-      "displayText": "exact text in content"
+      "displayText": "\\$30 billion"
     }
   ]
 }
@@ -253,7 +298,13 @@ Identify hardcoded numbers matching canonical facts and return replacement instr
     temperature: 0,
   });
 
-  const parsed = parseJsonResponse<LlmFactRefResponse>(result.text);
+  let parsed: LlmFactRefResponse | null = null;
+  try {
+    parsed = parseJsonResponse<LlmFactRefResponse>(result.text);
+  } catch {
+    // LLM returned invalid JSON — return empty replacements rather than crashing
+    return [];
+  }
   if (!parsed?.replacements || !Array.isArray(parsed.replacements)) return [];
 
   return parsed.replacements

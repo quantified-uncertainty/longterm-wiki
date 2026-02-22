@@ -253,7 +253,13 @@ Identify entity mentions and return replacement instructions as JSON.`;
     temperature: 0,
   });
 
-  const parsed = parseJsonResponse<LlmEntityLinkResponse>(result.text);
+  let parsed: LlmEntityLinkResponse | null = null;
+  try {
+    parsed = parseJsonResponse<LlmEntityLinkResponse>(result.text);
+  } catch {
+    // LLM returned invalid JSON — return empty replacements rather than crashing
+    return [];
+  }
   if (!parsed?.replacements || !Array.isArray(parsed.replacements)) return [];
 
   return parsed.replacements
