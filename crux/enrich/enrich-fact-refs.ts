@@ -27,6 +27,7 @@ import { buildFactLookupForContent } from '../lib/fact-lookup.ts';
 import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anthropic.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -103,14 +104,15 @@ function buildSkipRanges(content: string): Array<[number, number]> {
     }
   }
 
-  // Skip code blocks
+  // Skip code blocks — must come before inline code
   const codeBlock = /```[\s\S]*?```/g;
   for (const match of content.matchAll(codeBlock)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
   }
-  const inlineCode = /`[^`]+`/g;
+  // Skip inline code — exclude newlines to avoid false matches between fences
+  const inlineCode = /`[^`\n]+`/g;
   for (const match of content.matchAll(inlineCode)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
@@ -159,6 +161,38 @@ function buildSkipRanges(content: string): Array<[number, number]> {
   // Skip reference-style link definitions [ref]: url (#687)
   const refDef = /^\[[^\]]+\]:\s+\S+.*$/gm;
   for (const match of content.matchAll(refDef)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip HTML/JSX open tags with attributes (matches entity-link enricher)
+  const jsxOpenTag = /<[A-Z][a-zA-Z0-9]*\s[^>]*>/g;
+  for (const match of content.matchAll(jsxOpenTag)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip MDX/JSX comments {/* ... */}
+  const mdxComment = /\{\/\*[\s\S]*?\*\/\}/g;
+  for (const match of content.matchAll(mdxComment)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip <R>...</R> resource reference tags
+  const rTag = /<R\s[^>]*>[\s\S]*?<\/R>/g;
+  for (const match of content.matchAll(rTag)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip footnote definition lines [^N]: ...
+  const footnoteDef = /^\[\^[^\]]+\]:\s.+$/gm;
+  for (const match of content.matchAll(footnoteDef)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
@@ -310,7 +344,7 @@ ${factLookup}
 
 ## Content to Enrich
 \`\`\`mdx
-${content.slice(0, 6000)}${content.length > 6000 ? '\n... [truncated]' : ''}
+${content}
 \`\`\`
 
 Identify hardcoded numbers matching canonical facts and return replacement instructions as JSON.`;
@@ -370,7 +404,14 @@ export async function enrichFactRefs(
   let replacements: FactRefReplacement[] = [];
 
   if (useLlm) {
-    replacements = await callLlmForFactRefs(content, factLookup);
+    // Split into sections and process each chunk separately to cover the full page (#673).
+    // Long pages truncated at 6000 chars silently miss fact references in the second half.
+    const chunks = splitContentForEnrichment(content);
+
+    for (const chunk of chunks) {
+      const chunkReplacements = await callLlmForFactRefs(chunk, factLookup);
+      replacements.push(...chunkReplacements);
+    }
   }
 
   // Validate factIds are 8-char hex

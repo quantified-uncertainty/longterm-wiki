@@ -345,9 +345,29 @@ export function parseGroundedResult(
 
   // Validate against schema — coerce missing arrays to []
   const schemaResult = GroundedWriteResponseSchema.safeParse(parsed);
-  const response: GroundedWriteResponse = schemaResult.success
+  let response: GroundedWriteResponse = schemaResult.success
     ? schemaResult.data
     : { content: parsed?.content ?? raw, claimMap: [], unsourceableClaims: [] };
+
+  // Guard against garbage output: if the LLM returned refusal text or
+  // unparseable content, the fallback sets `content` to the raw response.
+  // Detect this by checking if the content starts with a heading (##) or
+  // frontmatter (---). If it doesn't look like section content, fall back
+  // to the original section content from the request.
+  const contentTrimmed = response.content.trim();
+  if (
+    !contentTrimmed.startsWith('##') &&
+    !contentTrimmed.startsWith('---') &&
+    !contentTrimmed.startsWith('#') &&
+    request.sectionContent.trim().length > 0
+  ) {
+    // Check if the "content" is mostly prose (LLM preamble/refusal)
+    // vs actual markdown by looking for the section heading
+    const headingLine = request.sectionContent.split('\n')[0];
+    if (!contentTrimmed.includes(headingLine)) {
+      response = { content: request.sectionContent, claimMap: [], unsourceableClaims: [] };
+    }
+  }
 
   // Validate factIds against the source cache.
   //

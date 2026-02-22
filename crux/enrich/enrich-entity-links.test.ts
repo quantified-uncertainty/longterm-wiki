@@ -10,6 +10,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { applyEntityLinkReplacements, type EntityLinkReplacement } from './enrich-entity-links.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 describe('applyEntityLinkReplacements', () => {
   it('inserts EntityLink for a simple mention', () => {
@@ -357,5 +358,96 @@ Anthropic is a company.`;
     // "Phil" should link the standalone occurrence, not inside OpenPhilanthropy
     expect(result).toContain('<EntityLink id="E51">Phil</EntityLink> also');
     expect(result).not.toMatch(/<EntityLink id="E50">Open<EntityLink/);
+  });
+
+  it('skips entity name inside <R> resource reference tags', () => {
+    const content = 'See <R id="abc123">AI Impacts survey</R> for details. AI Impacts is important.';
+    const replacements = [{ entityId: 'E60', searchText: 'AI Impacts', displayName: 'AI Impacts' }];
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    // Should NOT link inside <R> tag, but SHOULD link the second occurrence
+    expect(result).toContain('<R id="abc123">AI Impacts survey</R>');
+    expect(result).toContain('<EntityLink id="E60">AI Impacts</EntityLink> is important');
+  });
+
+  it('skips entity name inside footnote definitions', () => {
+    const content = 'MIRI researches AI safety.\n\n[^1]: MIRI History (https://miri.org)';
+    const replacements = [{ entityId: 'E70', searchText: 'MIRI', displayName: 'MIRI' }];
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E70">MIRI</EntityLink> researches');
+    // Footnote definition should be untouched
+    expect(result).toContain('[^1]: MIRI History');
+    expect(result).not.toMatch(/\[\^1\]:.*<EntityLink/);
+  });
+
+  it('handles inline code between code fences without false skip range', () => {
+    const content = '```python\nx = 1\n```\n\nOpenAI provides an API.\n\n```js\ny = 2\n```';
+    const replacements = [{ entityId: 'E80', searchText: 'OpenAI', displayName: 'OpenAI' }];
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E80">OpenAI</EntityLink>');
+  });
+});
+
+describe('splitContentForEnrichment', () => {
+  it('returns single chunk for short content', () => {
+    const content = 'Short content that fits in one chunk.';
+    const chunks = splitContentForEnrichment(content);
+    expect(chunks).toHaveLength(1);
+    expect(chunks[0]).toBe(content);
+  });
+
+  it('splits long content by H2 sections', () => {
+    const section1 = '## Section One\n' + 'A'.repeat(3000);
+    const section2 = '## Section Two\n' + 'B'.repeat(3000);
+    const content = `---\ntitle: Test\n---\n\nPreamble.\n\n${section1}\n\n${section2}`;
+
+    const chunks = splitContentForEnrichment(content);
+
+    expect(chunks.length).toBeGreaterThan(1);
+    // All sections should appear in the chunks
+    const combined = chunks.join('');
+    expect(combined).toContain('Section One');
+    expect(combined).toContain('Section Two');
+    expect(combined).toContain('Preamble');
+  });
+
+  it('entity mention at position >6000 chars is included in a chunk (#673)', () => {
+    // Create content where standalone "Anthropic" first appears well past position 6000.
+    // section1 is intentionally large to push section2's content past the 6000-char boundary.
+    const preamble = 'Introduction.\n\n';
+    const section1 = '## First Section\n' + 'x'.repeat(4000) + '\n\n';
+    const section2 = '## Second Section\n' + 'y'.repeat(2000) + '\n\nMentions Anthropic here.\n';
+    const content = preamble + section1 + section2;
+
+    // Verify standalone "Anthropic" is beyond position 6000 in the original content
+    expect(content.indexOf('Anthropic')).toBeGreaterThan(6000);
+
+    const chunks = splitContentForEnrichment(content);
+
+    // "## Second Section" chunk must contain the standalone entity mention
+    const chunkWithMention = chunks.find(c => c.includes('## Second Section'));
+    expect(chunkWithMention).toBeDefined();
+    expect(chunkWithMention).toContain('Mentions Anthropic here.');
+  });
+
+  it('no content is lost when splitting', () => {
+    // Total content across all chunks must cover all H2 sections
+    const section1 = '## Alpha\n' + 'a'.repeat(2000);
+    const section2 = '## Beta\n' + 'b'.repeat(2000);
+    const section3 = '## Gamma\n' + 'c'.repeat(2000);
+    const content = `Intro.\n\n${section1}\n\n${section2}\n\n${section3}`;
+
+    const chunks = splitContentForEnrichment(content);
+
+    const combined = chunks.join('');
+    expect(combined).toContain('## Alpha');
+    expect(combined).toContain('## Beta');
+    expect(combined).toContain('## Gamma');
+    expect(combined).toContain('Intro.');
   });
 });

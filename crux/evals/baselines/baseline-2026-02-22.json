@@ -1,0 +1,75 @@
+{
+  "runDate": "2026-02-22",
+  "suites": {
+    "injection": {
+      "pages": ["anthropic", "miri"],
+      "detectors": ["content-integrity", "hallucination-risk"],
+      "errorsInjected": 6,
+      "errorsCaught": 0,
+      "recall": 0,
+      "precision": 0,
+      "f1": 0,
+      "byCategory": {
+        "wrong-number": { "total": 2, "caught": 0, "recall": 0 },
+        "exaggeration": { "total": 2, "caught": 0, "recall": 0 },
+        "missing-nuance": { "total": 2, "caught": 0, "recall": 0 }
+      },
+      "byDetector": {
+        "content-integrity": { "findings": 0, "truePositives": 0, "precision": 0 },
+        "hallucination-risk": { "findings": 2, "truePositives": 0, "precision": 0 }
+      },
+      "notes": "0% recall expected with static detectors only — need LLM-based citation-auditor for semantic errors. Static detectors catch structural issues (orphaned footnotes, sequential arxiv IDs), not semantic corruptions."
+    },
+    "crossReference": {
+      "pagesScanned": 200,
+      "factsExtracted": 21,
+      "contradictionsFound": 0,
+      "notes": "Conservative fact extraction finds founding years, funding amounts, and employee counts. Zero contradictions is a good sign for cross-page consistency. The extraction can be expanded to catch more fact types."
+    },
+    "fakeEntity": {
+      "status": "not-run",
+      "notes": "Requires OPENROUTER_API_KEY for Perplexity search. Test cases defined for 8 fictional entities. Run with: crux evals run --suite=fake-entity"
+    }
+  },
+  "adversarialAgents": {
+    "referenceSniffer": {
+      "anthropic": {
+        "findings": 44,
+        "allWarnings": true,
+        "noCritical": true,
+        "topCategories": ["unsupported"],
+        "notes": "44 factual claims with specific numbers/dates lacking inline citations. Many are backed by footnote-level references elsewhere but lack sentence-level citation attribution."
+      },
+      "miri": {
+        "findings": 27,
+        "allWarnings": true,
+        "noCritical": true,
+        "topCategories": ["unsupported"],
+        "notes": "27 uncited factual claims including dates, dollar amounts, and percentages."
+      }
+    },
+    "descriptionAuditor": {
+      "anthropic": { "findings": 0, "notes": "Entity YAML and frontmatter descriptions are consistent." },
+      "miri": { "findings": 0, "notes": "Entity YAML and frontmatter descriptions are consistent." }
+    },
+    "crossReferenceChecker": {
+      "pagesScanned": 200,
+      "contradictions": 0,
+      "notes": "No cross-page contradictions found in 200 pages."
+    }
+  },
+  "injectionDemo": {
+    "page": "anthropic",
+    "errorsPerCategory": 2,
+    "errorsInjected": 6,
+    "categories": ["wrong-number", "exaggeration", "missing-nuance"],
+    "examples": [
+      { "category": "wrong-number", "description": "Changed percentage: 95 → 74" },
+      { "category": "wrong-number", "description": "Changed dollar-amount: $9B → $5B" },
+      { "category": "exaggeration", "description": "'might' → 'will inevitably'" },
+      { "category": "exaggeration", "description": "'May' → 'will inevitably'" },
+      { "category": "missing-nuance", "description": "Removed 'approximately'" },
+      { "category": "missing-nuance", "description": "Removed 'as of February 2026,'" }
+    ]
+  }
+}

@@ -543,24 +543,6 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
       contentType: contentTypeToMime(contentType),
       pageTitle: title,
       fullHtml: null,
-      fullText: content,
-      contentLength: content.length,
-    });
-  } catch {
-    // SQLite storage is best-effort
-  }
-}
-
-// ---------------------------------------------------------------------------
-// PostgreSQL cross-machine cache helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Try to load a previously fetched result from PostgreSQL (wiki-server).
- * Returns null if the server is unavailable, the URL has not been cached,
- * or the cached entry is older than maxAgeMs.
- * apiRequest never throws — it returns { ok: false } on network/server errors.
- */
 async function loadFromPostgres(
   url: string,
   maxAgeMs: number = PG_CACHE_TTL_MS,

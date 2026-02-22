@@ -28,6 +28,7 @@ import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anth
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { NUMERIC_ID_RE } from '../lib/patterns.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -103,14 +104,17 @@ function buildSkipRanges(content: string): Array<[number, number]> {
     }
   }
 
-  // Skip code blocks (```...``` and inline `...`)
+  // Skip code blocks (```...```) — must come before inline code
   const codeBlock = /```[\s\S]*?```/g;
   for (const match of content.matchAll(codeBlock)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
   }
-  const inlineCode = /`[^`]+`/g;
+  // Skip inline code (`...`) — exclude newlines to avoid false matches
+  // between code fences (backticks at fence boundaries would create a
+  // giant false skip range covering prose between fences).
+  const inlineCode = /`[^`\n]+`/g;
   for (const match of content.matchAll(inlineCode)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
@@ -167,6 +171,23 @@ function buildSkipRanges(content: string): Array<[number, number]> {
   // Skip MDX/JSX comments {/* ... */} (#681)
   const mdxComment = /\{\/\*[\s\S]*?\*\/\}/g;
   for (const match of content.matchAll(mdxComment)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip <R>...</R> resource reference tags — display text could contain entity names
+  const rTag = /<R\s[^>]*>[\s\S]*?<\/R>/g;
+  for (const match of content.matchAll(rTag)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip footnote definition lines [^N]: ... — entity names in definitions
+  // should not be linked as they'd corrupt footnote syntax.
+  const footnoteDef = /^\[\^[^\]]+\]:\s.+$/gm;
+  for (const match of content.matchAll(footnoteDef)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
@@ -273,7 +294,7 @@ ${alreadyLinkedList}
 
 ## Content to Enrich
 \`\`\`mdx
-${content.slice(0, 6000)}${content.length > 6000 ? '\n... [truncated]' : ''}
+${content}
 \`\`\`
 
 Identify entity mentions and return replacement instructions as JSON.`;
@@ -331,7 +352,28 @@ export async function enrichEntityLinks(
   let replacements: EntityLinkReplacement[] = [];
 
   if (useLlm) {
-    replacements = await callLlmForEntityLinks(content, entityLookup, alreadyLinkedTexts);
+    // Split into sections and process each chunk separately to cover the full page (#673).
+    // Long pages truncated at 6000 chars silently miss mentions in the second half.
+    const chunks = splitContentForEnrichment(content);
+
+    // Accumulate alreadyLinked across sections to enforce first-mention-only per entity.
+    const accTexts = new Set(alreadyLinkedTexts);
+    const accIds = new Set(alreadyLinkedIds);
+
+    for (const chunk of chunks) {
+      const chunkReplacements = await callLlmForEntityLinks(chunk, entityLookup, accTexts);
+
+      // Filter out entity IDs already linked or proposed in earlier sections
+      const filtered = chunkReplacements.filter(r => !accIds.has(r.entityId));
+
+      replacements.push(...filtered);
+
+      // Accumulate for subsequent sections so the LLM won't re-propose them
+      for (const r of filtered) {
+        accTexts.add(r.displayName);
+        accIds.add(r.entityId);
+      }
+    }
   }
 
   // Filter out replacements for already-linked text or already-linked entity IDs (#679)
