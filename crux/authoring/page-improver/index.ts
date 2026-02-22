@@ -170,7 +170,7 @@ Examples:
     maxAdversarialIterations: opts['max-adversarial-iterations']
       ? parseInt(opts['max-adversarial-iterations'] as string, 10)
       : undefined,
-    skipSessionLog: opts['skip-session-log'] ? true : undefined,
+    skipSessionLog: opts['skip-session-log'] === true ? true : undefined,
   });
 }
 

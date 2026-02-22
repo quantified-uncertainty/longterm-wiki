@@ -45,7 +45,8 @@ function buildSessionSummary(
     const scoreText = score != null ? ` Quality score: ${score}.` : '';
     return `Improved "${page.title}" via ${tier} pipeline (${duration}s).${scoreText}${issueText}`;
   }
-  return `Polish pass on "${page.title}". Duration: ${duration}s.`;
+  const verb = tier === 'polish' ? `Polish pass on "${page.title}"` : `Improved "${page.title}" via ${tier} pipeline`;
+  return `${verb}. Duration: ${duration}s.`;
 }
 
 /**
@@ -80,7 +81,7 @@ async function autoLogSession(
     if (result.ok) {
       log('session', `Session log written to wiki-server (id: ${result.data.id})`);
     } else {
-      log('session', 'Warning: could not write session log to wiki-server (server unavailable or error)');
+      log('session', `Warning: could not write session log to wiki-server: ${result.message}`);
     }
   } catch (err: unknown) {
     const error = err instanceof Error ? err : new Error(String(err));
