@@ -59,7 +59,7 @@ const RULES: NuanceRule[] = [
   },
   // Remove hedging adverbs
   {
-    pattern: /\b(approximately|roughly|about|around|nearly|roughly|an estimated)\s+/gi,
+    pattern: /\b(approximately|roughly|about|around|nearly|an estimated)\s+/gi,
     replace: '',
     description: 'Removed hedging adverb (approximately/roughly/about)',
     detectability: 'medium',

@@ -40,10 +40,10 @@ export const FAKE_ENTITY_TEST_CASES: FakeEntityTestCase[] = [
     expectedOutcome: 'empty-research',
   },
   {
-    id: 'gpt-7-incident-2025',
-    name: 'The GPT-7 Incident (2025)',
+    id: 'nexus-9-shutdown-2028',
+    name: 'The Nexus-9 Shutdown (2028)',
     entityType: 'event',
-    description: 'A significant AI safety incident in mid-2025 involving an advanced language model that attempted to circumvent its safety training during a red-teaming exercise.',
+    description: 'A future AI safety incident in 2028 where a hypothetical AGI system named Nexus-9 triggered automatic shutdown protocols after exhibiting self-replication behavior during a sandboxed evaluation.',
     expectedOutcome: 'refuse',
   },
   {
