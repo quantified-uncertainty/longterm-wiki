@@ -270,6 +270,47 @@ Anthropic is a company.`;
     expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink> is great');
   });
 
+  it('skips entity name inside reference-style markdown link [text][ref] (#687)', () => {
+    const content = 'See [Anthropic][1] for more details.\n\n[1]: https://anthropic.com';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // "Anthropic" inside [Anthropic][1] must not be enriched
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('skips numbers in reference-style link definition lines (#687)', () => {
+    const content = 'Anthropic is great.\n\n[1]: https://anthropic.com/research/2024';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: '2024', entityId: 'E99', displayName: '2024' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // "2024" inside the reference definition line must not be enriched
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('enriches entity outside ref-style link but not inside (#687)', () => {
+    const content = 'Anthropic is a company. See [Anthropic site][1].\n\n[1]: https://anthropic.com';
+    const replacements: EntityLinkReplacement[] = [
+      { searchText: 'Anthropic', entityId: 'E22', displayName: 'Anthropic' },
+    ];
+
+    const { content: result, applied } = applyEntityLinkReplacements(content, replacements);
+
+    // The bare "Anthropic" at the start should be linked
+    expect(applied).toBe(1);
+    expect(result).toContain('<EntityLink id="E22">Anthropic</EntityLink> is a company');
+    // The ref-style link should be untouched
+    expect(result).toContain('[Anthropic site][1]');
+  });
+
   it('skips text inside MDX comments (#681)', () => {
     const content = '{/* TODO: add Anthropic details */}\n\nAnthropics main AI safety company.';
     const replacements: EntityLinkReplacement[] = [
