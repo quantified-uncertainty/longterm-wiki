@@ -380,7 +380,8 @@ Rules:
     raw = extractText(response);
     inputTokens = response.usage?.input_tokens ?? 0;
     outputTokens = response.usage?.output_tokens ?? 0;
-  } catch {
+  } catch (err: unknown) {
+    console.warn(`[research-agent] Fact extraction failed: ${err instanceof Error ? err.message : String(err)}`);
     return { facts: [], cost: 0 };
   }
 
