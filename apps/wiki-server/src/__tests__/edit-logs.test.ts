@@ -135,7 +135,11 @@ function createMockSql() {
 
     // ---- SELECT count(*) FROM edit_logs (not GROUP BY) ----
     if (q.includes("count(*)") && q.includes("edit_logs") && !q.includes("group by")) {
-      return [{ count: editStore.length }];
+      let filtered = editStore;
+      if (params.length > 0 && typeof params[0] === "string") {
+        filtered = filtered.filter((e) => e.date >= (params[0] as string));
+      }
+      return [{ count: filtered.length }];
     }
 
     // ---- SELECT tool, count FROM edit_logs GROUP BY tool ----
@@ -161,7 +165,8 @@ function createMockSql() {
     }
 
     // ---- SELECT ... WHERE page_id = $1 ORDER BY date, id ----
-    if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id")) {
+    // Exclude queries with LIMIT (those are the paginated /all endpoint)
+    if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id") && !q.includes("limit")) {
       const pageId = params[0] as string;
       return editStore
         .filter((e) => e.page_id === pageId)
@@ -170,12 +175,21 @@ function createMockSql() {
 
     // ---- SELECT ... ORDER BY ... LIMIT ... (all entries, paginated) ----
     if (q.includes("edit_logs") && q.includes("order by") && q.includes("limit")) {
-      const limit = (params[0] as number) || 100;
-      const offset = (params[1] as number) || 0;
-      const sorted = [...editStore].sort(
-        (a, b) => b.date.localeCompare(a.date) || b.id - a.id
-      );
-      return sorted.slice(offset, offset + limit);
+      let filtered = [...editStore];
+      let paramIdx = 0;
+
+      // Handle optional since filter (first param is a date string)
+      if (params.length > 0 && typeof params[0] === "string") {
+        const since = params[0] as string;
+        filtered = filtered.filter((e) => e.date >= since);
+        paramIdx = 1;
+      }
+
+      filtered.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+      const limit = (params[paramIdx] as number) || 100;
+      const offset = (params[paramIdx + 1] as number) || 0;
+      return filtered.slice(offset, offset + limit);
     }
 
     return [];
@@ -420,6 +434,31 @@ describe("Edit Logs API", () => {
       expect(body.total).toBe(5);
       expect(body.limit).toBe(2);
       expect(body.offset).toBe(0);
+    });
+
+    it("filters entries by since parameter", async () => {
+      const dates = ["2026-02-10", "2026-02-15", "2026-02-18", "2026-02-20", "2026-02-21"];
+      for (let i = 0; i < dates.length; i++) {
+        await app.request("/api/edit-logs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pageId: `page-${i}`,
+            date: dates[i],
+            tool: "crux-fix",
+            agency: "automated",
+          }),
+        });
+      }
+
+      const res = await app.request("/api/edit-logs/all?since=2026-02-18");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.entries).toHaveLength(3);
+      expect(body.total).toBe(3);
+      // Should be sorted descending
+      expect(body.entries[0].date).toBe("2026-02-21");
+      expect(body.entries[2].date).toBe("2026-02-18");
     });
   });
 });
