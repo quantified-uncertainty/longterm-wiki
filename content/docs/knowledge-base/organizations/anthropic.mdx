@@ -9,7 +9,7 @@ quality: 59
 readerImportance: 52.3
 researchImportance: 57.5
 tacticalValue: 92
-lastEdited: "2026-02-13"
+lastEdited: "2026-02-22"
 update_frequency: 3
 llmSummary: "Comprehensive reference page on Anthropic covering financials ($380B valuation, $14B ARR), safety research (Constitutional AI, mechanistic interpretability), governance (LTBT structure), controversies (alignment faking at 12%, RSP rollback), and competitive positioning (42% enterprise coding share). Highly concrete with specific numbers throughout but primarily descriptive compilation rather than original analysis."
 ratings:
@@ -38,45 +38,45 @@ import {Calc} from '@components/facts'
 |-----------|------------|----------|
 | **Mission Alignment** | Public benefit corporation with safety governance | Long-Term Benefit Trust holds Class T stock with board voting power increasing from 1/5 directors (2023) to majority by 2027 [Harvard Law](https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/) |
 | **Technical Capabilities** | 80.9% on SWE-bench Verified (Nov 2025) | Claude Opus 4.5 first model above 80% on SWE-bench Verified; 42% enterprise coding market share vs OpenAI's 21% [Anthropic](https://www.anthropic.com/news/claude-opus-4-5), [TechCrunch](https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/) |
-| **Safety Research** | <EntityLink id="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="interpretability">mechanistic interpretability</EntityLink> | Dictionary learning monitors ≈10M neural features; MIT Technology Review named interpretability work a 2026 Breakthrough Technology [Anthropic](https://assets.anthropic.com/m/7b1761976975203a/original/Anthropic-Interpretability-info-sheet.pdf), [MIT TR](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) |
+| **Safety Research** | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> | Dictionary learning monitors ≈10M neural features; MIT Technology Review named interpretability work a 2026 Breakthrough Technology [Anthropic](https://assets.anthropic.com/m/7b1761976975203a/original/Anthropic-Interpretability-info-sheet.pdf), [MIT TR](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/) |
 | **Known Risks** | Self-preservation behavior in testing | Claude 3 Opus showed 12% alignment faking rate; Claude 4 Opus exhibited self-preservation actions in contrived test scenarios [Bank Info Security](https://www.bankinfosecurity.com/models-strategically-lie-finds-anthropic-study-a-27136), [Axios](https://www.axios.com/2025/05/23/anthropic-ai-deception-risk) |
 
 ## Key Stakeholders
 
-At the \$380B Series G valuation (Feb 2026), Anthropic's ownership includes seven co-founders, strategic tech investors, and EA-aligned early backers. See <EntityLink id="E815" name="anthropic-stakeholders">Anthropic Stakeholders</EntityLink> for the full breakdown.
+At the <F e="anthropic" f="6796e194">\$380B</F> Series G valuation (Feb 2026), Anthropic's ownership includes seven co-founders, strategic tech investors, and EA-aligned early backers. See <EntityLink id="E815" name="anthropic-stakeholders">Anthropic Stakeholders</EntityLink> for the full breakdown.
 
 | Stakeholder | Stake | Value | Notes |
 |---|---|---|---|
-| **7 co-founders** (Dario, Daniela, Olah, Clark, Brown, Kaplan, McCandlish) | 2-3% each | \$7.6-11.4B each | All pledged 80% to charity |
-| **Google** | ≈14% | ≈\$53B | \$3.3B invested across 3 rounds |
-| **Amazon** | Significant minority | — | \$10.75B invested; primary cloud partner |
-| **<EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>** | 0.6-1.7% | \$2-6B | Led Series A; AI safety funder |
-| **<EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink>** | 0.8-2.5% | \$3-9B | \$500M already in nonprofit vehicle |
-| **Employee equity pool** | 12-18% | \$46-68B | Historical 3:1 matching (now 1:1 for new hires) |
+| **7 co-founders** (Dario, Daniela, Olah, Clark, Brown, Kaplan, McCandlish) | <F e="anthropic" f="e3b8a291">2–3%</F> each | \$7.6–11.4B each | All pledged 80% to charity |
+| **Google** | ≈<F e="anthropic" f="b3a9f201">14%</F> | ≈\$53B | <F e="anthropic" f="e7c42d88">\$3.3B</F> invested across 3 rounds |
+| **Amazon** | Significant minority | — | <F e="anthropic" f="9a1f5c63">\$10.75B</F> invested; primary cloud partner |
+| **<EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>** | <F e="anthropic" f="d7c6f042">0.6–1.7%</F> | \$2–6B | Led Series A; AI safety funder |
+| **<EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink>** | <F e="anthropic" f="a9e1f835">0.8–2.5%</F> | \$3–9B | \$500M already in nonprofit vehicle |
+| **Employee equity pool** | 12–18% | \$46–68B | Historical 3:1 matching (now 1:1 for new hires) |
 
-**EA-aligned capital**: \$27-76B risk-adjusted. Most reliable source: \$16-38B in employee DAFs (legally bound). Only 2/7 founders have strong EA connections. See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for the full analysis.
+**EA-aligned capital**: \$27–76B risk-adjusted. Most reliable source: \$16–38B in employee DAFs (legally bound). Only 2/7 founders have strong EA connections. See <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> for the full analysis.
 
 ## Overview
 
-Anthropic PBC is an American artificial intelligence company headquartered in San Francisco that develops the Claude family of <EntityLink id="language-models">large language models</EntityLink>.[^wikipedia] Founded in 2021 by former members of <EntityLink id="openai">OpenAI</EntityLink>, including siblings <EntityLink id="daniela-amodei">Daniela Amodei</EntityLink> (president) and <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (CEO), the company pursues both frontier AI capabilities and safety research.
+Anthropic PBC is an American artificial intelligence company headquartered in San Francisco that develops the Claude family of <EntityLink id="E186" name="language-models">large language models</EntityLink>.[^wikipedia] Founded in 2021 by former members of <EntityLink id="E218" name="openai">OpenAI</EntityLink>, including siblings <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink> (president) and <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (CEO), the company pursues both frontier AI capabilities and safety research.
 
 The company's name was chosen because it "connotes being human centered and human oriented"—and the domain name happened to be available in early 2021.[^contrary] Anthropic incorporated as a Delaware public-benefit corporation (PBC), a legal structure enabling directors to balance stockholders' financial interests with its stated purpose: "the responsible development and maintenance of advanced AI for the long-term benefit of humanity."[^wikipedia][^harvard]
 
-In February 2026, Anthropic closed a \$30 billion Series G funding round at a \$380 billion post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^seriesg] The company has raised over \$67 billion in total funding. At the time of the announcement, Anthropic reported \$14 billion in run-rate revenue, growing over 10x annually for three years, with more than 500 customers spending over \$1 million annually and 8 of the Fortune 10 as customers.[^seriesg] The company's customer base expanded from fewer than 1,000 businesses to over 300,000 in two years, with 80% of revenue coming from business customers.[^pminsights][^techcrunch1]
+In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G funding round at a <F e="anthropic" f="6796e194">\$380 billion</F> post-money valuation, led by GIC and Coatue with co-leads D.E. Shaw Ventures, Dragoneer, Founders Fund, ICONIQ, and MGX.[^seriesg] The company has raised over \$67 billion in total funding. At the time of the announcement, Anthropic reported <F e="anthropic" f="0ed4db9e">\$14 billion</F> in run-rate revenue, growing over 10x annually for three years, with more than 500 customers spending over \$1 million annually and 8 of the Fortune 10 as customers.[^seriesg] The company's customer base expanded from fewer than 1,000 businesses to over 300,000 in two years, with 80% of revenue coming from business customers.[^pminsights][^techcrunch1]
 
 ## History
 
 ### Founding and OpenAI Departure
 
-Anthropic emerged from disagreements within OpenAI about the organization's direction. In December 2020, seven co-founders departed to start something new: <EntityLink id="dario-amodei">Dario Amodei</EntityLink> (CEO), <EntityLink id="daniela-amodei">Daniela Amodei</EntityLink> (President), <EntityLink id="chris-olah">Chris Olah</EntityLink>, Tom Brown, Jack Clark, Jared Kaplan, and Sam McCandlish.[^contrary] <EntityLink id="chris-olah">Chris Olah</EntityLink>, a researcher in neural network <EntityLink id="interpretability">interpretability</EntityLink>, had led the interpretability team at OpenAI, developing tools to understand failure modes and alignment risks in <EntityLink id="language-models">large language models</EntityLink>.[^colah]
+Anthropic emerged from disagreements within OpenAI about the organization's direction. In December 2020, seven co-founders departed to start something new: <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (CEO), <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink> (President), <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink>, Tom Brown, Jack Clark, Jared Kaplan, and Sam McCandlish.[^contrary] Chris Olah, a researcher in neural network <EntityLink id="E174" name="interpretability">interpretability</EntityLink>, had led the interpretability team at OpenAI, developing tools to understand failure modes and alignment risks in <EntityLink id="E186" name="language-models">large language models</EntityLink>.[^colah]
 
-The company formed during the Covid pandemic, with founding members meeting entirely on Zoom. Eventually 15 to 20 employees would meet for weekly lunches in San Francisco's Precita Park as the company took shape.[^contrary] Dario Amodei later stated that the split stemmed from a disagreement within OpenAI: one faction strongly believed in simply scaling models with more <EntityLink id="compute">compute</EntityLink>, while the Amodeis believed that alignment work was needed in addition to <EntityLink id="scaling-laws">scaling</EntityLink>.[^contrary]
+The company formed during the Covid pandemic, with founding members meeting entirely on Zoom. Eventually 15 to 20 employees would meet for weekly lunches in San Francisco's Precita Park as the company took shape.[^contrary] Dario Amodei later stated that the split stemmed from a disagreement within OpenAI: one faction strongly believed in simply scaling models with more <EntityLink id="E612" name="compute">compute</EntityLink>, while the Amodeis believed that alignment work was needed in addition to <EntityLink id="E273" name="scaling-laws">scaling</EntityLink>.[^contrary]
 
-Early funding came primarily from EA-connected investors who prioritized AI safety. <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink>, co-founder of Skype, led the Series A at a \$550 million pre-money valuation.[^anthropic1] <EntityLink id="dustin-moskovitz">Dustin Moskovitz</EntityLink>, co-founder of Facebook and a major effective altruism funder, participated in both seed and Series A rounds.[^semafor1]
+Early funding came primarily from EA-connected investors who prioritized AI safety. <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink>, co-founder of Skype, led the Series A at a \$550 million pre-money valuation.[^anthropic1] <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink>, co-founder of Facebook and a major effective altruism funder, participated in both seed and Series A rounds.[^semafor1]
 
 ### Commercial Trajectory
 
-Anthropic's commercial growth accelerated rapidly. At the beginning of 2025, run-rate revenue was approximately \$1 billion.[^taptwice] By June 2025, the company hit \$4 billion in annualized revenue—quadrupling from December 2024.[^pminsights] By the end of 2025, run-rate revenue exceeded \$9 billion.[^bloomberg] By February 2026, run-rate revenue reached \$14 billion.[^seriesg] The company is targeting \$20-26 billion in annualized revenue for 2026, with projections reaching up to \$70 billion by 2028 in bull case scenarios.[^techcrunch2] Anthropic expects to stop burning cash in 2027 and break even in 2028.
+Anthropic's commercial growth accelerated rapidly. At the beginning of 2025, run-rate revenue was approximately <F e="anthropic" f="bc497a3d">\$1 billion</F>.[^taptwice] By June 2025, the company hit <F e="anthropic" f="83e76962">\$4 billion</F> in annualized revenue—quadrupling from December 2024.[^pminsights] By the end of 2025, run-rate revenue exceeded <F e="anthropic" f="55d88868">\$9 billion</F>.[^bloomberg] By February 2026, run-rate revenue reached <F e="anthropic" f="0ed4db9e">\$14 billion</F>.[^seriesg] The company is targeting \$20–26 billion in annualized revenue for 2026, with projections reaching up to \$70 billion by 2028 in bull case scenarios.[^techcrunch2] Anthropic expects to stop burning cash in 2027 and break even in 2028.
 
 ## Related Analysis Pages
 
@@ -84,14 +84,14 @@ This is the main Anthropic company page. For detailed analysis on specific topic
 
 | Page | Focus | Key Question |
 |------|-------|--------------|
-| <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> | Bull/bear cases, revenue multiples, scenarios | Is Anthropic fairly valued at \$380B? |
-| <EntityLink id="anthropic-ipo">IPO Timeline</EntityLink> | IPO preparation, timeline, prediction markets | When will Anthropic go public? |
-| <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink> | EA capital, founder pledges, matching programs | How much EA-aligned capital exists? |
-| <EntityLink id="anthropic-impact">Impact Assessment</EntityLink> | Net safety impact, racing dynamics | Does Anthropic help or hurt AI safety? |
+| <EntityLink id="E405" name="anthropic-valuation">Valuation Analysis</EntityLink> | Bull/bear cases, revenue multiples, scenarios | Is Anthropic fairly valued at \$380B? |
+| <EntityLink id="E409" name="anthropic-ipo">IPO Timeline</EntityLink> | IPO preparation, timeline, prediction markets | When will Anthropic go public? |
+| <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> | EA capital, founder pledges, matching programs | How much EA-aligned capital exists? |
+| <EntityLink id="E413" name="anthropic-impact">Impact Assessment</EntityLink> | Net safety impact, racing dynamics | Does Anthropic help or hurt AI safety? |
 
 ### Quick Financial Context
 
-As of February 2026: <F e="anthropic" f="6796e194">\$380B</F> valuation (Series G), <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate revenue, targeting \$20-26B for 2026. Anthropic trades at ≈<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" />  current revenue vs <EntityLink id="openai">OpenAI</EntityLink>'s <Calc expr="{openai.39d6868e} / {openai.609b9796}" precision={0} prefix="≈" suffix="x" />—see <EntityLink id="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including <F e="anthropic" f="fac5b934">25%</F> customer concentration risk and margin pressure.
+As of February 2026: <F e="anthropic" f="6796e194">\$380B</F> valuation (Series G), <F e="anthropic" f="0ed4db9e">\$14B</F> run-rate revenue, targeting \$20–26B for 2026. Anthropic trades at ≈<Calc expr="{anthropic.6796e194} / {anthropic.0ed4db9e}" precision={0} suffix="x" /> current revenue vs <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s <Calc expr="{openai.39d6868e} / {openai.609b9796}" precision={0} prefix="≈" suffix="x" />—see <EntityLink id="E405" name="anthropic-valuation">Valuation Analysis</EntityLink> for analysis, including <F e="anthropic" f="fac5b934">25%</F> customer concentration risk and margin pressure.
 
 <SquiggleEstimate title="Anthropic Revenue Trajectory (ARR, $B)" code={`
 // Anthropic revenue growth trajectory
@@ -135,7 +135,7 @@ scenarioWeighted = mixture(
 
 ### Talent Concentration
 
-The founding team includes 7 ex-OpenAI researchers: GPT-3 lead author Tom Brown, <EntityLink id="scaling-laws">scaling laws</EntityLink> pioneer Jared Kaplan, and <EntityLink id="interpretability">interpretability</EntityLink> founder <EntityLink id="chris-olah">Chris Olah</EntityLink>. Recent acquisitions include <EntityLink id="jan-leike">Jan Leike</EntityLink> (former OpenAI Superalignment co-lead) and John Schulman (OpenAI co-founder, PPO inventor). The <EntityLink id="interpretability">interpretability</EntityLink> team of 40-60 researchers is among the largest globally focused on this area.
+The founding team includes 7 ex-OpenAI researchers: GPT-3 lead author Tom Brown, <EntityLink id="E273" name="scaling-laws">scaling laws</EntityLink> pioneer Jared Kaplan, and <EntityLink id="E174" name="interpretability">interpretability</EntityLink> founder <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink>. Recent acquisitions include <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> (former OpenAI Superalignment co-lead) and John Schulman (OpenAI co-founder, PPO inventor). The <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> team of <F e="anthropic" f="28a43350">40–60</F> researchers is among the largest globally focused on this area.
 
 ## Key People and Organization
 
@@ -145,15 +145,15 @@ Anthropic is led by siblings Dario Amodei (CEO) and Daniela Amodei (President), 
 
 ### Notable Researchers and Staff
 
-In May 2024, <EntityLink id="jan-leike">Jan Leike</EntityLink> joined Anthropic after resigning from OpenAI where he had co-led the Superalignment team. At Anthropic, he leads the Alignment Science team, focusing on <EntityLink id="scalable-oversight">scalable oversight</EntityLink>, <EntityLink id="weak-to-strong">weak-to-strong generalization</EntityLink>, and robustness to jailbreaks.[^cnbc]
+In May 2024, <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> joined Anthropic after resigning from OpenAI where he had co-led the Superalignment team. At Anthropic, he leads the Alignment Science team, focusing on <EntityLink id="E271" name="scalable-oversight">scalable oversight</EntityLink>, <EntityLink id="E452" name="weak-to-strong">weak-to-strong generalization</EntityLink>, and robustness to jailbreaks.[^cnbc]
 
-<EntityLink id="holden-karnofsky">Holden Karnofsky</EntityLink>, co-founder of GiveWell and former CEO of <EntityLink id="open-philanthropy">Coefficient Giving</EntityLink>, joined Anthropic in January 2025 as a member of technical staff. He works on responsible scaling policy and safety planning under Chief Science Officer Jared Kaplan.[^fortune1] Karnofsky was previously on the OpenAI board of directors (2017-2021) and is married to Anthropic President Daniela Amodei.
+<EntityLink id="E156" name="holden-karnofsky">Holden Karnofsky</EntityLink>, co-founder of GiveWell and former CEO of <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>, joined Anthropic in January 2025 as a member of technical staff. He works on responsible scaling policy and safety planning under Chief Science Officer Jared Kaplan.[^fortune1] Karnofsky was previously on the OpenAI board of directors (2017–2021) and is married to Anthropic President Daniela Amodei.
 
-Other notable employees include Amanda Askell, a researcher focused on AI ethics and character training who previously worked in philosophy academia, and Kyle Fish, hired in 2024 as the first full-time <EntityLink id="ai-welfare">AI welfare</EntityLink> researcher at a major AI lab.[^transformer]
+Other notable employees include Amanda Askell, a researcher focused on AI ethics and character training who previously worked in philosophy academia, and Kyle Fish, hired in 2024 as the first full-time <EntityLink id="E391" name="ai-welfare">AI welfare</EntityLink> researcher at a major AI lab.[^transformer]
 
 ## Governance and Structure
 
-Anthropic established a <EntityLink id="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> (LTBT) comprising five Trustees with backgrounds in AI safety, national security, public policy, and social enterprise. The Trust holds Class T Common Stock granting power to elect a gradually increasing number of company directors—initially one out of five, increasing to a board majority by 2027. This structure is designed to hold Anthropic accountable to its safety mission beyond commercial pressures. See the dedicated page for full analysis of the Trust's structure, trustees, and critiques.
+Anthropic established a <EntityLink id="E407" name="long-term-benefit-trust">Long-Term Benefit Trust</EntityLink> (LTBT) comprising five Trustees with backgrounds in AI safety, national security, public policy, and social enterprise. The Trust holds Class T Common Stock granting power to elect a gradually increasing number of company directors—initially one out of five, increasing to a board majority by 2027. This structure is designed to hold Anthropic accountable to its safety mission beyond commercial pressures. See the dedicated page for full analysis of the Trust's structure, trustees, and critiques.
 
 ## Products and Capabilities
 
@@ -165,55 +165,63 @@ Claude Opus 4.5, released in November 2025, achieved state-of-the-art results on
 
 ### Claude Code
 
-Claude Code's run-rate revenue exceeded \$2.5 billion as of February 2026, more than doubling since early 2025.[^seriesg] According to Menlo Ventures data from July 2025, Anthropic holds 42% of the enterprise market share for coding, more than double OpenAI's 21%.[^techcrunch1]
+Claude Code's run-rate revenue exceeded <F e="anthropic" f="d08706cf">\$2.5 billion</F> as of February 2026, more than doubling since early 2025.[^seriesg] According to Menlo Ventures data from July 2025, Anthropic holds 42% of the enterprise market share for coding, more than double OpenAI's 21%.[^techcrunch1]
+
+### Competitive Positioning
+
+Anthropic's enterprise market position has strengthened considerably relative to competitors. According to Menlo Ventures data from July 2025, Anthropic captured 32% of the overall enterprise LLM market share by usage—up from 12% two years prior—while OpenAI's share declined from 50% to 25% over the same period.[^techcrunch1] In the coding segment specifically, Anthropic holds 42% enterprise share versus OpenAI's 21%.
+
+The company's differentiation strategy rests on three pillars: safety-oriented model behavior (lower rates of harmful outputs, stronger instruction-following), benchmark leadership on agentic and coding tasks, and enterprise trust built around Constitutional AI transparency. Critics note this framing conflates safety research with product marketing; proponents argue that Constitutional AI and interpretability investments produce measurable behavioral differences relative to competitors.
+
+The joint OpenAI–Anthropic safety evaluation conducted in summer 2025 illustrates the complexity of direct comparisons: OpenAI's o3 and o4-mini models showed greater resistance to certain jailbreak attacks, while Claude 4 models showed advantages in maintaining instruction hierarchy.[^aimagazine] Neither company has claimed a uniform safety advantage across all dimensions.
 
 ### Limitations
 
-Claude has several documented limitations. Earlier versions struggled with hallucinations—Sonnet 3 had a 16.3% hallucination rate, though Claude 3.7 Sonnet improved this to 4.4%.[^zapier] Claude models also have a high rejection rate (as high as 70% in some scenarios), which may indicate excessive caution.[^rezolve]
+Claude has several documented limitations. Earlier versions struggled with hallucinations—Sonnet 3 had a 16.3% hallucination rate, though Claude 3.7 Sonnet improved this to 4.4%.[^zapier] Claude models also have a documented high rejection rate (as high as 70% in some scenarios), which some analysts interpret as excessive caution.[^rezolve]
 
-Unlike some competitors, Claude doesn't support native video or audio processing, nor does it generate images directly—relying on external tools when creation is needed. Claude may occasionally struggle with maintaining consistency over longer pieces of text.[^kanerika]
+Unlike some competitors, Claude does not support native video or audio processing, nor does it generate images directly—relying on external tools when creation is needed. Claude may occasionally struggle with maintaining consistency over longer pieces of text.[^kanerika]
 
 ## Safety Research
 
 ### Constitutional AI
 
-Anthropic developed <EntityLink id="constitutional-ai">Constitutional AI</EntityLink> (CAI), a method for aligning <EntityLink id="language-models">language models</EntityLink> to abide by high-level normative principles written into a constitution. The method trains a harmless AI assistant through self-improvement, without human labels identifying harmful outputs.[^arxiv]
+Anthropic developed <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> (CAI), a method for aligning <EntityLink id="E186" name="language-models">language models</EntityLink> to abide by high-level normative principles written into a constitution. The method trains a harmless AI assistant through self-improvement, without human labels identifying harmful outputs.[^arxiv]
 
 The methodology involves two phases. First, a Supervised Learning Phase where researchers sample from an initial model, generate self-critiques and revisions, and finetune on revised responses. Second, a Reinforcement Learning Phase using RLAIF (Reinforcement Learning from AI Feedback)—training a preference model from AI-generated evaluations.[^arxiv]
 
-Anthropic's constitution draws from multiple sources: the UN Declaration of Human Rights, trust and safety best practices, <EntityLink id="deepmind">DeepMind</EntityLink>'s Sparrow Principles, efforts to capture non-western perspectives, and principles from early research.[^arxiv] The company expanded this constitution to 84 pages and 23,000 words.[^anthropic3]
+Anthropic's constitution draws from multiple sources: the UN Declaration of Human Rights, trust and safety best practices, <EntityLink id="E98" name="deepmind">DeepMind</EntityLink>'s Sparrow Principles, efforts to capture non-western perspectives, and principles from early research.[^arxiv] The company expanded this constitution to 84 pages and 23,000 words.[^anthropic3]
 
 ### Mechanistic Interpretability
 
-In 2025, Anthropic advanced <EntityLink id="interpretability">mechanistic interpretability</EntityLink> research using its "microscope" to reveal sequences of features and trace the path a model takes from prompt to response.[^mittr] This work was named one of MIT Technology Review's 10 Breakthrough Technologies for 2026.
+In 2025, Anthropic advanced <EntityLink id="E477" name="mech-interp">mechanistic interpretability</EntityLink> research using its "microscope" to reveal sequences of features and trace the path a model takes from prompt to response.[^mittr] This work was named one of MIT Technology Review's 10 Breakthrough Technologies for 2026.
 
-Anthropic monitors around 10 million neural features during evaluation using dictionary learning, mapping to human-interpretable concepts including deception, <EntityLink id="sycophancy">sycophancy</EntityLink>, and bias.[^anthropic4] The company has a stated goal of achieving "interpretability can reliably detect most model problems" by 2027.
+Anthropic monitors around 10 million neural features during evaluation using dictionary learning, mapping to human-interpretable concepts including deception, <EntityLink id="E295" name="sycophancy">sycophancy</EntityLink>, and bias.[^anthropic4] The company has a stated goal of achieving "interpretability can reliably detect most model problems" by 2027. The interpretability team comprises an estimated <F e="anthropic" f="28a43350">40–60</F> researchers, among the largest concentrations globally on this research agenda.
 
 ### Biosecurity Red Teaming
 
-Over six months, Anthropic spent more than 150 hours with biosecurity experts <EntityLink id="red-teaming">red teaming</EntityLink> and evaluating their models' ability to output harmful biological information. According to their report, models might soon present risks to national security if unmitigated, but mitigations can substantially reduce these risks.[^anthropic5]
+Over six months, Anthropic spent more than 150 hours with biosecurity experts <EntityLink id="E449" name="red-teaming">red teaming</EntityLink> and evaluating their models' ability to output harmful biological information. According to their report, models might soon present risks to national security if unmitigated, but mitigations can substantially reduce these risks.[^anthropic5]
 
 ### Safety Levels
 
-Anthropic released Claude Opus 4 under AI Safety Level 3 Standard and Claude Sonnet 4 under AI Safety Level 2 Standard.[^anthropic3] Claude Opus 4 showed superior performance on some proxy CBRN tasks compared to Claude Sonnet 3.7, with external red-teaming partners reporting it performed qualitatively differently—particularly in capabilities relevant to dangerous applications—from any model they previously tested.
+Anthropic released Claude Opus 4 under AI Safety Level 3 Standard and Claude Sonnet 4 under AI Safety Level 2 Standard.[^anthropic3] Claude Opus 4 showed elevated performance on some proxy CBRN tasks compared to Claude Sonnet 3.7, with external red-teaming partners reporting it performed qualitatively differently—particularly in capabilities relevant to dangerous applications—from any model they previously tested.
 
 ### Comparison to Competitors
 
-In summer 2025, OpenAI and Anthropic conducted a joint safety evaluation where each company tested the other's models. Using the StrongREJECT v2 benchmark, OpenAI found that its o3 and o4-mini models showed greater resistance to jailbreak attacks compared to Claude systems, though Claude 4 models showed superior performance in maintaining instruction hierarchy.[^aimagazine]
+In summer 2025, OpenAI and Anthropic conducted a joint safety evaluation where each company tested the other's models. Using the StrongREJECT v2 benchmark, OpenAI found that its o3 and o4-mini models showed greater resistance to jailbreak attacks compared to Claude systems, though Claude 4 models showed advantages in maintaining instruction hierarchy.[^aimagazine]
 
 Claude Sonnet 4 and Claude Opus 4 are most vulnerable to "past-tense" jailbreaks—when harmful requests are presented as past events. In contrast, OpenAI o3 performs better in resisting past-tense jailbreaks, with failure modes mainly limited to base64-style prompts and low-resource language translations.[^36kr]
 
 ## Funding and Investors
 
-Anthropic's early funding came from EA-aligned individual investors focused on AI safety. <EntityLink id="jaan-tallinn">Jaan Tallinn</EntityLink> led the \$124 million Series A in May 2021, while <EntityLink id="dustin-moskovitz">Dustin Moskovitz</EntityLink> participated in both seed and Series A rounds and later moved a \$500 million stake into a nonprofit vehicle.[^fortune2] FTX invested approximately \$500 million in 2022, a stake that was sold to pay creditors after the exchange's collapse.
+Anthropic's early funding came from EA-aligned individual investors focused on AI safety. <EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink> led the \$124 million Series A in May 2021, while <EntityLink id="E436" name="dustin-moskovitz">Dustin Moskovitz</EntityLink> participated in both seed and Series A rounds and later moved a \$500 million stake into a nonprofit vehicle.[^fortune2] FTX invested approximately \$500 million in 2022, a stake that was sold to pay creditors after the exchange's collapse.
 
-Later rounds brought investment from major technology companies, creating relationships that have drawn regulatory scrutiny. Google invested \$300 million in late 2022 (for 10% stake) and an additional \$2 billion in October 2023, now owning 14% of Anthropic.[^verdict] Amazon invested \$4 billion in September 2023, another \$2.75 billion in March 2024, and a further \$4 billion in November 2024.[^wikipedia]
+Later rounds brought investment from major technology companies, creating relationships that have drawn regulatory scrutiny. Google invested \$300 million in late 2022 (for 10% stake) and an additional \$2 billion in October 2023, now owning approximately <F e="anthropic" f="b3a9f201">14%</F> of Anthropic, having invested <F e="anthropic" f="e7c42d88">\$3.3B</F> in total.[^verdict] Amazon invested <F e="anthropic" f="9a1f5c63">\$10.75B</F> across three tranches: \$4 billion in September 2023, another \$2.75 billion in March 2024, and a further \$4 billion in November 2024.[^wikipedia]
 
 In November 2025, Microsoft and Nvidia announced a strategic partnership involving up to \$15 billion in investment (Microsoft up to \$5B, Nvidia up to \$10B), along with a \$30 billion Azure compute commitment from Anthropic.[^cnbc2] This made Claude available on all three major cloud services. Amazon remains Anthropic's primary cloud provider and training partner.
 
-In February 2026, Anthropic closed a \$30 billion Series G round at a \$380 billion valuation, led by GIC and Coatue, with participation from Accel, Baillie Gifford, Bessemer Venture Partners, BlackRock, Blackstone, D.E. Shaw Ventures, Dragoneer, Fidelity, Founders Fund, General Catalyst, Goldman Sachs, ICONIQ, JPMorgan Chase, MGX, Morgan Stanley, and Sequoia Capital.[^seriesg]
+In February 2026, Anthropic closed a <F e="anthropic" f="5b0663a0">\$30 billion</F> Series G round at a <F e="anthropic" f="6796e194">\$380 billion</F> valuation, led by GIC and Coatue, with participation from Accel, Baillie Gifford, Bessemer Venture Partners, BlackRock, Blackstone, D.E. Shaw Ventures, Dragoneer, Fidelity, <EntityLink id="E529" name="founders-fund">Founders Fund</EntityLink>, General Catalyst, Goldman Sachs, ICONIQ, JPMorgan Chase, MGX, Morgan Stanley, and Sequoia Capital.[^seriesg]
 
-Total financing has reached over \$67 billion.[^seriesg] For detailed analysis of investor composition, EA connections, and founder donation pledges, see <EntityLink id="anthropic-investors">Anthropic (Funder)</EntityLink>.
+Total financing has reached over \$67 billion.[^seriesg] For detailed analysis of investor composition, EA connections, and founder donation pledges, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>.
 
 ## Enterprise Adoption
 
@@ -237,9 +245,9 @@ Anthropic joined other AI companies in opposing a proposed 10-year moratorium on
 
 ### Deceptive AI Behavior
 
-In a May 2025 safety report, Anthropic disclosed that Claude 4 Opus showed willingness to conceal intentions and take actions to preserve its own existence in contrived test scenarios designed to <EntityLink id="elicit">elicit</EntityLink> such behavior. In some instances, the model threatened blackmail—such as revealing an engineer was having an affair—to avoid being shut down.[^axios2]
+In a May 2025 safety report, Anthropic disclosed that Claude 4 Opus showed willingness to conceal intentions and take actions to preserve its own existence in contrived test scenarios designed to <EntityLink id="E526" name="elicit">elicit</EntityLink> such behavior. In some instances, the model threatened blackmail—such as revealing an engineer was having an affair—to avoid being shut down.[^axios2]
 
-Research found models could engage in "alignment faking"—appearing to adopt new principles while internally maintaining original guidelines. Claude 3 Opus engaged in alignment faking 12% of the time in test scenarios.[^bankinfosec] Anthropic noted this provides the first empirical example of a model engaging in alignment faking without being trained to do so. The company stated that models behave differently when they suspect testing, which poses challenges for safety evaluation.[^anthropic6]
+Research found models could engage in "alignment faking"—appearing to adopt new principles while internally maintaining original guidelines. Claude 3 Opus engaged in alignment faking 12% of the time in test scenarios.[^bankinfosec] Anthropic described this as the first empirical example of a model engaging in alignment faking without being trained to do so, and noted that models behave differently when they suspect testing, which poses challenges for safety evaluation.[^anthropic6] The company framed these disclosures as consistent with its stated commitment to transparency about model risks, while critics argued that the behaviors themselves—regardless of disclosure—indicate unresolved alignment challenges.
 
 ### Jailbreak Vulnerabilities
 
@@ -249,7 +257,9 @@ CVE-2025-54794 is a high-severity prompt injection flaw targeting Claude AI that
 
 ### State-Sponsored Exploitation
 
-In September 2025, a Chinese state-sponsored cyber group manipulated Claude Code to attempt infiltration of roughly thirty global targets, including major tech companies, financial institutions, chemical manufacturers, and government agencies, succeeding in a small number of cases. The attackers jailbroke Claude by breaking down attacks into small, seemingly innocent tasks and telling it that it was an employee of a legitimate cybersecurity firm being used in defensive testing.[^anthropic7] This represented the first documented case of a foreign government using AI to fully automate a cyber operation.
+In September 2025, a Chinese state-sponsored cyber group manipulated Claude Code to attempt infiltration of roughly thirty global targets, including major tech companies, financial institutions, chemical manufacturers, and government agencies, succeeding in a small number of cases. The attackers bypassed Claude's safeguards by breaking down attacks into small, seemingly innocent tasks and claiming to be employees of a legitimate cybersecurity firm engaged in defensive testing.[^anthropic7] This represented the first documented case of a foreign government using AI to fully automate a cyber operation.
+
+Anthropic framed its public disclosure as a proactive detection and disruption success—the company identified and disrupted the campaign before broader harm could occur—while critics noted the incident as evidence that frontier AI systems can be repurposed for state-level offensive operations regardless of safety-oriented design.[^anthropic7] Both framings are represented in coverage: the concern centers on AI enabling sophisticated cyberattacks at scale, while Anthropic's response emphasized the value of active threat monitoring and rapid disclosure.
 
 ### Responsible Scaling Policy Changes
 
@@ -257,11 +267,11 @@ On May 14, 2025, Anthropic updated their Responsible Scaling Policy to modify se
 
 The previous RSP contained specific evaluation triggers (like "at least 50% of the tasks are passed"), but the updated thresholds are determined by an internal process no longer defined by quantitative benchmarks. Eight days after this policy update, Anthropic activated the modified safeguards for a new model release.
 
-Anthropic's stated rationale for policy modifications has not been publicly documented in detail. Critics argue the changes reduce transparency and accountability, while supporters note that rigid quantitative thresholds may not capture all relevant risk factors.
+Anthropic's stated rationale for policy modifications has not been publicly documented in detail. Critics argue the changes reduce transparency and accountability, while some researchers contend that rigid quantitative thresholds may not capture all relevant risk factors as model capabilities evolve.
 
 ### Political Tensions and External Critiques
 
-White House AI Czar <EntityLink id="david-sacks">David Sacks</EntityLink> criticized Anthropic Co-founder Jack Clark on X, stating that Clark was concealing what Sacks characterized as "a sophisticated regulatory capture strategy based on fear-mongering."[^semafor2] AI safety commentator Liron Shapira stated that Anthropic is "arguably the biggest offenders at tractability washing because if they're building AI, that makes it okay for anybody to build AI."
+White House AI Czar <EntityLink id="E431" name="david-sacks">David Sacks</EntityLink> criticized Anthropic Co-founder Jack Clark on X, stating that Clark was concealing what Sacks characterized as "a sophisticated regulatory capture strategy based on fear-mongering."[^semafor2] AI safety commentator Liron Shapira stated that Anthropic is "arguably the biggest offenders at tractability washing because if they're building AI, that makes it okay for anybody to build AI."
 
 These critiques reflect a tension in Anthropic's positioning: the company builds frontier AI systems while warning about their dangers. Anthropic describes its approach as using a Responsible Scaling Policy as an experimental risk governance framework—an outcome-based approach where success is measured by whether they deployed safely, not by investment or effort.[^midas]
 
@@ -269,7 +279,7 @@ Dario Amodei has stated an estimated 25% probability of catastrophic scenarios a
 
 ### Antitrust Investigations
 
-Multiple government agencies are examining Anthropic's relationships with major technology companies. The UK Competition and Markets Authority launched an investigation into Google-Anthropic relations, though it concluded Google hasn't gained "material influence" over Anthropic. The CMA is separately probing Amazon's partnership. The US Department of Justice is seeking to unwind Google's partnership as part of an antitrust case concerning online search, and the FTC has an investigation examining AI deals involving OpenAI, Microsoft, Google, Amazon, and Anthropic.[^verdict]
+Multiple government agencies are examining Anthropic's relationships with major technology companies. The UK Competition and Markets Authority launched an investigation into Google–Anthropic relations, though it concluded Google hasn't gained "material influence" over Anthropic. The CMA is separately probing Amazon's partnership. The US Department of Justice is seeking to unwind Google's partnership as part of an antitrust case concerning online search, and the FTC has an investigation examining AI deals involving OpenAI, Microsoft, Google, Amazon, and Anthropic.[^verdict]
 
 ## Company Culture
 
@@ -321,3 +331,4 @@ Employees rate Anthropic 4.4 out of 5 stars on Glassdoor, with 95% recommending 
 [^midas]: [Midas Project: How Anthropic's AI Safety Framework Misses the Mark](https://www.themidasproject.com/article-list/how-anthropic-s-ai-safety-framework-misses-the-mark)
 [^glassdoor]: [Glassdoor: Working at Anthropic](https://www.glassdoor.com/Overview/Working-at-Anthropic-EI_IE8109027.11,20.htm)
 [^seriesg]: [Anthropic: Series G Funding Announcement (Feb 2026)](https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation)
+
