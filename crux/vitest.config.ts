@@ -10,6 +10,7 @@ export default defineConfig({
       'auto-update/**/*.test.ts',
       'link-checker/**/*.test.ts',
       'commands/**/*.test.ts',
+      'enrich/**/*.test.ts',
       'facts/**/*.test.ts',
       'entity/**/*.test.ts',
       'citations/**/*.test.ts',

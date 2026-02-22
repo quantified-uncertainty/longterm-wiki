@@ -34,6 +34,7 @@
  *   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
  *   jobs        Job queue management (list, stats, create, claim, sweep)
  *   context     Assemble research bundles for Claude Code sessions (for-page, for-issue, for-entity, for-topic)
+ *   enrich      Standalone enrichment tools (entity-links, fact-refs)
  *
  * Global Options:
  *   --ci        JSON output for CI pipelines
@@ -75,6 +76,7 @@ import * as wikiServerCommands from './commands/wiki-server.ts';
 import * as queryCommands from './commands/query.ts';
 import * as jobsCommands from './commands/jobs.ts';
 import * as contextCommands from './commands/context.ts';
+import * as enrichCommands from './commands/enrich.ts';
 
 const domains = {
   validate: validateCommands,
@@ -103,6 +105,7 @@ const domains = {
   query: queryCommands,
   jobs: jobsCommands,
   context: contextCommands,
+  enrich: enrichCommands,
 };
 
 /**
@@ -177,6 +180,7 @@ ${'\x1b[1m'}Domains:${'\x1b[0m'}
   query       Query wiki-server DB (search, entity, facts, related, risk, stats…)
   jobs        Background job queue management
   context     Assemble research bundles (for-page, for-issue, for-entity, for-topic)
+  enrich      Standalone enrichment tools (entity-links, fact-refs)
 
 ${'\x1b[1m'}Global Options:${'\x1b[0m'}
   --ci        JSON output for CI pipelines
