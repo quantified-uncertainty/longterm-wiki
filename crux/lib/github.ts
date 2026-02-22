@@ -2,6 +2,17 @@
  * Shared GitHub API utilities.
  *
  * Used by crux maintain, crux ci, and other domains that call the GitHub API.
+ *
+ * Corruption detection: All writes through `githubApi()` are validated for
+ * shell-expansion corruption (ANSI codes, dotenv output, etc.) before sending.
+ * This catches a class of bugs where bash variable expansion or command
+ * substitution injects terminal garbage into GitHub API payloads.
+ *
+ * MCP exemption: The GitHub MCP server (configured in `.mcp.json`) bypasses
+ * this validation because MCP tools don't go through bash — they communicate
+ * via JSON-RPC, so shell-expansion corruption cannot occur. MCP is safe for
+ * ad-hoc reads; prefer `githubApi()` (via crux commands) for workflow writes
+ * where corruption detection adds an important safety layer.
  */
 
 export const REPO = 'quantified-uncertainty/longterm-wiki';

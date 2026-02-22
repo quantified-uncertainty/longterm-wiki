@@ -4,76 +4,34 @@ When a Claude Code session is assigned to work on a specific GitHub issue, it MU
 
 ## At Session Start
 
-When the task description references a GitHub issue number (e.g., "resolve issue #239", "fix #239", "work on https://github.com/.../issues/239"), do the following **before writing any code**:
-
-### 1. Post a start comment on the issue
-
-```bash
-ISSUE_NUM=239   # replace with actual number
-BRANCH=$(git branch --show-current)
-BODY="🤖 Claude Code starting work on this issue (branch: \`${BRANCH}\`).
-
-See branch for progress. This comment will be updated when work is complete."
-curl -s -X POST \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${ISSUE_NUM}/comments" \
-  -d "$(jq -n --arg body "$BODY" '{body: $body}')"
-```
-
-### 2. Add the `claude-working` label
-
-```bash
-curl -s -X POST \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${ISSUE_NUM}/labels" \
-  -d '{"labels": ["claude-working"]}'
-```
-
-If the label doesn't exist yet, create it first:
-
-```bash
-curl -s -X POST \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/labels" \
-  -d '{"name": "claude-working", "color": "0075ca", "description": "Claude Code is actively working on this"}'
-```
-
-**Or use the crux CLI (simpler):**
+When the task description references a GitHub issue number (e.g., "resolve issue #239", "fix #239", "work on https://github.com/.../issues/239"), run this **before writing any code**:
 
 ```bash
 pnpm crux issues start <ISSUE_NUM>
 ```
 
+This posts a start comment on the issue and adds the `claude-working` label. The label is created automatically if it doesn't exist yet.
+
+**Do NOT use raw curl/GitHub API calls for issue tracking.** Always use `crux issues` commands — they route through `githubApi()` which validates request bodies for shell-expansion corruption before sending to GitHub.
+
 ## At Session End (when shipping)
 
-After the work is committed and pushed (via `/push-and-ensure-green`), post a completion comment and remove the `claude-working` label:
-
-```bash
-PR_URL="<url of the PR>"
-ISSUE_NUM=239
-
-# Post completion comment
-BODY="🤖 Claude Code has finished working on this. Changes are in ${PR_URL} — please review and merge."
-curl -s -X POST \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${ISSUE_NUM}/comments" \
-  -d "$(jq -n --arg body "$BODY" '{body: $body}')"
-
-# Remove claude-working label
-curl -s -X DELETE \
-  -H "Authorization: token $GITHUB_TOKEN" \
-  -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${ISSUE_NUM}/labels/claude-working"
-```
-
-**Or use the crux CLI:**
+After the work is committed and pushed (via `/push-and-ensure-green`), signal completion:
 
 ```bash
 pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
+```
+
+This posts a completion comment and removes the `claude-working` label.
+
+## PR Management
+
+Use `crux pr` commands instead of raw curl for all PR operations:
+
+```bash
+pnpm crux pr detect              # Check if PR exists for current branch
+pnpm crux pr create --title="..." --body="..."  # Create PR (corruption-safe)
+pnpm crux pr fix-body            # Auto-fix literal \n in PR body
 ```
 
 ## Why This Matters
@@ -82,6 +40,7 @@ pnpm crux issues done <ISSUE_NUM> --pr=<PR_URL>
 - Prevents multiple sessions picking up the same issue simultaneously
 - The `claude-working` label enables filtering in the GitHub issues list
 - Creates a paper trail connecting branches/PRs to the originating issue
+- `crux` commands validate for corruption — raw curl/jq commands are vulnerable to shell-expansion bugs
 
 ## Edge Cases
 

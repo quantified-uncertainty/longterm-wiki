@@ -40,8 +40,21 @@ jobs:
         with:
           fetch-depth: 1
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies and build data
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+          node apps/web/scripts/build-data.mjs
+
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           additional_permissions: |
             actions: read
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
