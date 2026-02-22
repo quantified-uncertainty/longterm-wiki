@@ -666,6 +666,122 @@ The cost increase is intentional. We're trading \$8-12 more per page for substan
 
 ---
 
+## Part 11: Composable Module Architecture (February 2026 Refinement)
+
+The original proposal (Parts 3-7) frames the system as **specialist agents with composable passes**. A further refinement: the passes themselves should be **reusable modules** — independent tools that compose in the improve pipeline, auto-update, page creation, and standalone CLI commands.
+
+### Core Insight: Modules as Agent Tools
+
+Instead of a fixed pipeline where passes run in a predetermined sequence, the orchestrator is an **LLM agent** that has modules available as **tools** and decides what to call based on what the page actually needs:
+
+```
+Agent reads page → analyzes gaps → calls tools → checks result → iterates
+```
+
+A page with good prose but no diagrams gets diagram tools. A page with bad sourcing gets research + citation tools. The agent adapts to the page rather than running a fixed sequence.
+
+### The Module Kit
+
+**Research & Grounding:**
+
+| Module | Purpose | Standalone CLI | Cost |
+|--------|---------|----------------|------|
+| `source-fetcher` | Fetch URL → clean markdown + relevant excerpts | `crux citations verify` (upgraded) | \$0 (no LLM) |
+| `research-agent` | Multi-source search → structured facts with quotes | `crux research <topic>` | \$1-3 |
+| `source-cache` | Persistent store of fetched sources + extracted facts | Reused across runs | \$0 |
+| `claim-verifier` | Check if source supports a specific claim | Per-citation in auditor | \$0.01/claim (Haiku) |
+| `citation-auditor` | Independent verification of all citations on a page | `crux citations audit <id>` | \$0.10-0.30 |
+
+**Content Writing:**
+
+| Module | Purpose | Standalone CLI | Cost |
+|--------|---------|----------------|------|
+| `rewrite-section` | Rewrite ONE section, constrained to source cache | Used by orchestrator | \$0.10-0.30/section |
+
+**Enrichment:**
+
+| Module | Purpose | Standalone CLI | Cost |
+|--------|---------|----------------|------|
+| `add-entity-links` | Insert EntityLink components for mentioned entities | `crux enrich entity-links <id>` | \$0.05 (Haiku) |
+| `add-fact-refs` | Wrap hardcoded numbers in `<F>` tags | `crux enrich fact-refs <id>` | \$0.05 (Haiku) |
+| `add-diagram` | Generate Mermaid diagram for a section | `crux enrich diagram <id>` | \$0.10-0.20 |
+| `add-squiggle` | Add uncertainty modeling for a section | `crux enrich squiggle <id>` | \$0.10-0.20 |
+
+### Why Section-Level Matters
+
+The current pipeline rewrites 2,000-4,000 words in one LLM call. The prompt must simultaneously handle prose, citations, EntityLinks, Facts, Calc, escaping, and structure. Enrichments compete for attention.
+
+With section-level `rewrite-section`:
+- **Focused context**: LLM handles 200-500 words at a time
+- **Better grounding**: only relevant sources for that section
+- **Isolated enrichments**: adding a diagram can't break citations
+- **Partial progress**: if budget runs out, 3 improved sections beats nothing
+
+### Source-Fetcher as Foundation
+
+The single most important primitive. Currently, the pipeline never reads cited URLs — it gets search snippets and trusts the LLM to cite accurately. The source-fetcher creates **ground truth** by actually fetching and caching source content.
+
+This unlocks:
+- **Citation auditor**: can verify claims against actual source text
+- **Grounded writer**: can be constrained to only cite from fetched+cached sources
+- **Claim map**: mechanical link from "claim in output" → "quote in fetched source"
+- **Existing `crux citations verify`**: upgrades from "is URL alive?" to "does URL support the claim?"
+
+### Claim Map: Mechanical Grounding Contract
+
+The `rewrite-section` module outputs an explicit **claim map** alongside the content:
+
+```json
+{
+  "content": "...improved section MDX...",
+  "claimMap": [
+    { "claim": "Anthropic raised \$4B in 2024", "factId": "f-012", "sourceUrl": "https://..." },
+    { "claim": "Founded in 2021 by Dario Amodei", "factId": "f-003", "sourceUrl": "https://..." }
+  ],
+  "ungroundedClaims": ["Anthropic is widely considered a leader in AI safety"]
+}
+```
+
+This is mechanically verifiable: check that every `factId` exists in the source cache and the claim matches the extracted quote. Ungrounded claims are flagged for human review or removal.
+
+### Budget as Tool-Call Limits
+
+Instead of tiers selecting fixed phase sequences, the agent gets a **budget** and decides how to spend it:
+
+| Budget | Max Tool Calls | Research Queries | Enabled Tools |
+|--------|---------------|-----------------|---------------|
+| Polish | 8 | 0 | rewrite-section, add-entity-links, add-fact-refs, validate |
+| Standard | 20 | 5 | All tools |
+| Deep | 50 | 15 | All tools |
+
+The agent plans its approach based on page state (quality score, citation count, entity link density, diagram count) and budget constraints.
+
+### Cross-Context Reuse
+
+The same modules compose in every context:
+
+| Context | Modules Used |
+|---------|-------------|
+| **Improve pipeline** | All modules via agent orchestrator |
+| **Auto-update** | research-agent + rewrite-section + citation-auditor |
+| **Page creation** | research-agent + rewrite-section (all sections) + all enrichment |
+| **Citation health check** | source-fetcher + claim-verifier (no agent needed) |
+| **Batch entity-linking** | add-entity-links across many pages (no agent) |
+| **Manual editing assist** | research-agent → cache → human edits → citation-auditor |
+
+### Implementation: Foundation Issues
+
+The first four modules to build ([GitHub issues](https://github.com/quantified-uncertainty/longterm-wiki/issues)):
+
+1. **Source Fetcher** ([#633](https://github.com/quantified-uncertainty/longterm-wiki/issues/633)) — fetch URLs, extract content, cache results. Foundation for everything else.
+2. **Section-Level Grounded Writer** ([#634](https://github.com/quantified-uncertainty/longterm-wiki/issues/634)) — rewrite one section constrained to source cache, output claim map.
+3. **Citation Auditor** ([#635](https://github.com/quantified-uncertainty/longterm-wiki/issues/635)) — independent per-citation verification using fetched source content.
+4. **Standalone Enrichment Tools** ([#636](https://github.com/quantified-uncertainty/longterm-wiki/issues/636)) — entity-links and fact-refs as independent, idempotent tools.
+
+Dependency order: #633 is the foundation. #634 and #635 depend on it. #636 is independent. The orchestrator agent (Part 3's Phase 3) is built last, after the tools exist.
+
+---
+
 ## References
 
 Key sources informing this architecture:
