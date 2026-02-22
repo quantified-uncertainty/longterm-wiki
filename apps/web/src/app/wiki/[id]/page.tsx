@@ -26,9 +26,9 @@ import {
 import { DataInfoBox } from "@/components/wiki/DataInfoBox";
 import { ContentConfidenceBanner } from "@/components/wiki/ContentConfidenceBanner";
 import { TableOfContents } from "@/components/wiki/TableOfContents";
-import { CitationOverlay, computeCitationHealth } from "@/components/wiki/CitationOverlay";
+import { CitationOverlay } from "@/components/wiki/CitationOverlay";
 import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
-import { getCitationQuotes } from "@/lib/citation-data";
+import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
@@ -227,7 +227,7 @@ function ContentView({
   slug: string;
   fullWidth?: boolean;
   hideSidebar?: boolean;
-  citationQuotes?: import("@/components/wiki/CitationOverlay").CitationQuote[];
+  citationQuotes?: import("@/lib/citation-data").CitationQuote[];
 }) {
   const entity = getEntityById(slug);
   const contentFormat = (pageData?.contentFormat || "article") as ContentFormat;

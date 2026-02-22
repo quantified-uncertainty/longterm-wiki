@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   computeCitationHealth,
   type CitationQuote,
-} from "@components/wiki/CitationOverlay";
+} from "../citation-data";
 
 function makeQuote(overrides: Partial<CitationQuote> = {}): CitationQuote {
   return {

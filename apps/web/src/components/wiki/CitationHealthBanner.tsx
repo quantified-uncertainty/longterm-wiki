@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, AlertTriangle, XCircle, ShieldCheck } from "lucide-react";
-import type { CitationHealthSummary } from "./CitationOverlay";
+import type { CitationHealthSummary } from "@/lib/citation-data";
 
 interface CitationHealthBannerProps {
   health: CitationHealthSummary;
