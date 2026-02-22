@@ -148,5 +148,7 @@ Examples:
   crux citations audit-check existential-risk       Independent verification (no DB, no fixes)
   crux citations audit-check existential-risk --no-fetch  Use cached sources only
   crux citations audit-check existential-risk --threshold=0.9  Require 90% verified
+  crux citations audit-check existential-risk --model=google/gemini-flash-lite  Use a different model
+  crux citations audit-check existential-risk --delay=500  Slow down between LLM calls
 `;
 }
