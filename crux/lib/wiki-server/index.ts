@@ -36,6 +36,16 @@ export type { InsertClaimItem } from './claims.ts';
 export type { PageLinkItem } from './links.ts';
 export type { UpsertResourceItem } from './resources.ts';
 export type { SyncEntityItem, EntityEntry } from './entities.ts';
+export type {
+  PageDetail,
+  PageSearchResult,
+  RelatedItem,
+  RelatedResult,
+  BacklinkItem,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+} from './page-types.ts';
 export type { SyncFactItem, FactEntry } from './facts.ts';
 export type { AgentSessionEntry } from './agent-sessions.ts';
 export type {

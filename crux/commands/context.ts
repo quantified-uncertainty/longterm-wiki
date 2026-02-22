@@ -29,98 +29,20 @@ import type { FactEntry, FactsByEntityResult } from '../lib/wiki-server/facts.ts
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
+import type {
+  PageDetail,
+  PageSearchResult,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+} from '../lib/wiki-server/page-types.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const DEFAULT_OUTPUT = join(PROJECT_ROOT, '.claude/wip-context.md');
-
-// ---------------------------------------------------------------------------
-// Local API response types
-// ---------------------------------------------------------------------------
-
-interface PageSearchResult {
-  results: Array<{
-    id: string;
-    numericId: string | null;
-    title: string;
-    description: string | null;
-    entityType: string | null;
-    category: string | null;
-    readerImportance: number | null;
-    quality: number | null;
-    score: number;
-  }>;
-  query: string;
-  total: number;
-}
-
-interface PageDetail {
-  id: string;
-  numericId: string | null;
-  title: string;
-  description: string | null;
-  llmSummary: string | null;
-  category: string | null;
-  subcategory: string | null;
-  entityType: string | null;
-  tags: string | null;
-  quality: number | null;
-  readerImportance: number | null;
-  hallucinationRiskLevel: string | null;
-  hallucinationRiskScore: number | null;
-  contentPlaintext: string | null;
-  wordCount: number | null;
-  lastUpdated: string | null;
-  contentFormat: string | null;
-  syncedAt: string;
-}
-
-interface RelatedResult {
-  entityId: string;
-  related: Array<{
-    id: string;
-    type: string;
-    title: string;
-    score: number;
-    label?: string;
-  }>;
-  total: number;
-}
-
-interface BacklinksResult {
-  targetId: string;
-  backlinks: Array<{
-    id: string;
-    type: string;
-    title: string;
-    relationship?: string;
-    linkType: string;
-    weight: number;
-  }>;
-  total: number;
-}
-
-interface CitationQuote {
-  id: number;
-  pageId: string;
-  footnote: number;
-  url: string | null;
-  claimText: string;
-  sourceQuote: string | null;
-  quoteVerified: boolean;
-  verificationScore: number | null;
-  sourceTitle: string | null;
-  accuracyVerdict: string | null;
-  accuracyScore: number | null;
-}
-
-interface CitationQuotesResult {
-  quotes: CitationQuote[];
-  pageId: string;
-  total: number;
-}
 
 interface GitHubIssueResponse {
   number: number;
@@ -154,7 +76,7 @@ function writeBundle(outputPath: string, content: string): void {
 
 function pageDetailBlock(p: PageDetail): string {
   const meta: string[] = [];
-  if (p.quality !== null) meta.push(`Quality: ${p.quality}/10`);
+  if (p.quality !== null) meta.push(`Quality: ${p.quality}/100`);
   if (p.readerImportance !== null) meta.push(`Importance: ${p.readerImportance}/100`);
   if (p.lastUpdated) meta.push(`Last updated: ${p.lastUpdated}`);
   if (p.wordCount) meta.push(`~${p.wordCount.toLocaleString()} words`);
@@ -246,7 +168,7 @@ function pageSearchBlock(results: PageSearchResult['results'], query: string, li
   let md = '';
   for (let i = 0; i < Math.min(results.length, limit); i++) {
     const r = results[i];
-    const q = r.quality !== null ? `Quality: ${r.quality}/10` : null;
+    const q = r.quality !== null ? `Quality: ${r.quality}/100` : null;
     const imp = r.readerImportance !== null ? `Importance: ${r.readerImportance}/100` : null;
     const meta = [q, imp, r.entityType ? `Type: ${r.entityType}` : null]
       .filter(Boolean)
