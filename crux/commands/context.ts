@@ -43,14 +43,6 @@ import type {
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
-import type {
-  PageDetail,
-  PageSearchResult,
-  RelatedResult,
-  BacklinksResult,
-  CitationQuote,
-  CitationQuotesResult,
-} from '../lib/wiki-server/page-types.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
