@@ -16,9 +16,11 @@ import type { PageData, ParsedArgs } from './types.ts';
 import { loadPages, findPage, getFilePath } from './utils.ts';
 import { runPipeline } from './pipeline.ts';
 import { triagePhase } from './phases.ts';
+import { runOrchestratorPipeline } from '../orchestrator/index.ts';
 
 // Re-export public API for any direct importers
 export { runPipeline } from './pipeline.ts';
+export { runOrchestratorPipeline } from '../orchestrator/index.ts';
 export { triagePhase } from './phases.ts';
 export { loadPages, findPage, getFilePath } from './utils.ts';
 export type { TriageResult, PipelineResults, PageData, PipelineOptions } from './types.ts';
@@ -104,6 +106,7 @@ Usage:
 Options:
   --directions "..."              Specific improvement directions
   --tier <tier>                   polish ($2-3), standard ($5-8), deep ($15-25), or triage (auto)
+  --engine v2                     Use agent orchestrator (LLM with modules as tools) instead of fixed pipeline
   --apply                         Apply changes directly (don't just preview)
   --no-grade                      Skip auto-grading after apply (grading runs by default)
   --skip-session-log              Skip auto-posting session log to wiki-server after apply
@@ -163,19 +166,42 @@ Examples:
     return;
   }
 
-  await runPipeline(pageId, {
-    tier: (opts.tier as string) || 'standard',
-    directions: (opts.directions as string) || '',
-    dryRun: !opts.apply,
-    grade: opts['no-grade'] ? false : undefined,
-    adversarialModel: (opts['adversarial-model'] as string) || undefined,
-    maxAdversarialIterations: opts['max-adversarial-iterations']
-      ? parseInt(opts['max-adversarial-iterations'] as string, 10)
-      : undefined,
-    skipSessionLog: opts['skip-session-log'] === true ? true : undefined,
-    skipEnrich: opts['skip-enrich'] === true ? true : undefined,
-    sectionLevel: opts['section-level'] === true ? true : undefined,
-  });
+  // Route to agent orchestrator v2 or fixed pipeline v1
+  if (opts.engine === 'v2') {
+    const tierStr = (opts.tier as string) || 'standard';
+    // Map v1 tiers to v2 tiers (v2 only supports polish/standard/deep)
+    const tierMap: Record<string, string> = {
+      polish: 'polish',
+      standard: 'standard',
+      deep: 'deep',
+    };
+    const v2Tier = tierMap[tierStr];
+    if (!v2Tier) {
+      console.error(`Orchestrator v2 supports tiers: polish, standard, deep (got: ${tierStr})`);
+      process.exit(1);
+    }
+    await runOrchestratorPipeline(pageId, {
+      tier: v2Tier as 'polish' | 'standard' | 'deep',
+      directions: (opts.directions as string) || '',
+      dryRun: !opts.apply,
+      grade: opts['no-grade'] ? false : undefined,
+      skipSessionLog: opts['skip-session-log'] === true ? true : undefined,
+    });
+  } else {
+    await runPipeline(pageId, {
+      tier: (opts.tier as string) || 'standard',
+      directions: (opts.directions as string) || '',
+      dryRun: !opts.apply,
+      grade: opts['no-grade'] ? false : undefined,
+      adversarialModel: (opts['adversarial-model'] as string) || undefined,
+      maxAdversarialIterations: opts['max-adversarial-iterations']
+        ? parseInt(opts['max-adversarial-iterations'] as string, 10)
+        : undefined,
+      skipSessionLog: opts['skip-session-log'] === true ? true : undefined,
+      skipEnrich: opts['skip-enrich'] === true ? true : undefined,
+      sectionLevel: opts['section-level'] === true ? true : undefined,
+    });
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

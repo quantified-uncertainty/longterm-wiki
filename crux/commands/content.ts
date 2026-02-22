@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine'],
     positional: true,
   },
   create: {
@@ -69,6 +69,7 @@ ${commandList}
 
 Options:
   --tier=<t>        Quality tier: budget/standard/premium (create), polish/standard/deep (improve)
+  --engine=v2       Use agent orchestrator instead of fixed pipeline (improve)
   --directions=<d>  Specific improvement directions (improve)
   --output=<path>   Output file path (create)
   --batch=<n>       Batch size (regrade, grade-content)
@@ -87,6 +88,7 @@ Options:
 
 Examples:
   crux content improve far-ai --tier deep --directions "add recent papers"
+  crux content improve anthropic --engine=v2 --tier standard --apply
   crux content create "SecureBio" --tier standard
   crux content regrade --batch 10
   crux content grade
