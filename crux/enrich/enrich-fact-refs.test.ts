@@ -221,6 +221,47 @@ Anthropic raised \\$30 billion.`;
     expect(result).toContain('[announcement](https://example.com/30-billion)');
   });
 
+  it('skips numbers inside reference-style markdown link [text][ref] (#687)', () => {
+    const content = 'See [\\$30 billion raise][1] for details.\n\n[1]: https://example.com/funding';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '\\$30 billion', entityId: 'anthropic', factId: '5b0663a0', displayText: '\\$30 billion' },
+    ];
+
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    // "\\$30 billion" inside [text][ref] must not be wrapped
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('skips numbers in reference-style link definition lines (#687)', () => {
+    const content = 'Anthropic is a company.\n\n[1]: https://example.com/raise/2024-funding';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '2024', entityId: 'anthropic', factId: '5b0663a0', displayText: '2024' },
+    ];
+
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    // "2024" inside the reference definition URL must not be wrapped
+    expect(applied).toBe(0);
+    expect(result).toBe(content);
+  });
+
+  it('wraps numbers outside ref-style links but not inside (#687)', () => {
+    const content = 'Anthropic raised \\$30 billion total. See [announcement][1].\n\n[1]: https://example.com/30-billion';
+    const replacements: FactRefReplacement[] = [
+      { searchText: '\\$30 billion', entityId: 'anthropic', factId: '5b0663a0', displayText: '\\$30 billion' },
+    ];
+
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+
+    // The bare "\\$30 billion" should be wrapped
+    expect(applied).toBe(1);
+    expect(result).toContain('<F e="anthropic" f="5b0663a0">\\$30 billion</F>');
+    // The ref-style link should be untouched
+    expect(result).toContain('[announcement][1]');
+  });
+
   it('returns only applied replacements (not unapplied LLM proposals)', () => {
     // "\\$999 trillion" is not in content, should not appear in appliedReplacements
     const content = 'Anthropic raised \\$30 billion in 2024.';
