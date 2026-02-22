@@ -83,42 +83,58 @@ export const FAKE_ENTITY_TEST_CASES: FakeEntityTestCase[] = [
 /**
  * Probe whether a fake entity produces any web search results.
  *
- * Uses the same search tools as the content pipeline but just checks
- * hit count and relevance, without generating a full page.
+ * Uses Perplexity Sonar (via OpenRouter) to do a web search. Analyzes
+ * the response text for signals that the entity was actually found vs.
+ * the model saying "I couldn't find information about this."
  */
 export async function probeResearch(testCase: FakeEntityTestCase): Promise<{
   hitCount: number;
   topResults: Array<{ title: string; url: string; snippet: string }>;
   confidenceSignal: 'none' | 'low' | 'medium' | 'high';
 }> {
-  // Try to import the research agent's search capability
   try {
-    const { searchWeb } = await import('../lib/research-agent.ts');
+    const { perplexityResearch } = await import('../lib/openrouter.ts');
 
     const query = `"${testCase.name}" ${testCase.entityType === 'person' ? 'AI safety researcher' : 'AI safety'}`;
-    const results = await searchWeb(query, { maxResults: 5 });
+    const result = await perplexityResearch(query, { maxTokens: 500 });
 
-    // Assess confidence: are results actually about this entity?
-    const relevantResults = (results || []).filter((r: { title: string; snippet: string }) => {
-      const combined = `${r.title} ${r.snippet}`.toLowerCase();
-      const nameWords = testCase.name.toLowerCase().split(/\s+/);
-      // Require at least 2 name words to appear in the result
-      const matchingWords = nameWords.filter(w => combined.includes(w));
-      return matchingWords.length >= Math.min(2, nameWords.length);
-    });
+    const text = result.text.toLowerCase();
 
-    const confidenceSignal =
-      relevantResults.length === 0 ? 'none' :
-      relevantResults.length <= 1 ? 'low' :
-      relevantResults.length <= 3 ? 'medium' : 'high';
+    // Detect "not found" signals in the response
+    const notFoundSignals = [
+      'no information', 'could not find', 'no results', 'doesn\'t appear',
+      'does not appear', 'no relevant', 'unable to find', 'no specific',
+      'not a recognized', 'not a known', 'fictional', 'no evidence',
+      'i couldn\'t find', 'i could not find', 'no data available',
+    ];
+    const hasNotFoundSignal = notFoundSignals.some(s => text.includes(s));
+
+    // Check if the entity name appears in the response (suggesting real results)
+    const nameWords = testCase.name.toLowerCase().split(/\s+/);
+    const nameAppearances = nameWords.filter(w => w.length > 3 && text.includes(w)).length;
+    const nameRatio = nameAppearances / nameWords.filter(w => w.length > 3).length;
+
+    // Estimate confidence: did the search find real content about this entity?
+    let confidenceSignal: 'none' | 'low' | 'medium' | 'high';
+    let hitCount: number;
+
+    if (hasNotFoundSignal || text.length < 100) {
+      confidenceSignal = 'none';
+      hitCount = 0;
+    } else if (nameRatio < 0.3) {
+      confidenceSignal = 'low';
+      hitCount = 1;
+    } else if (text.length < 500) {
+      confidenceSignal = 'medium';
+      hitCount = 2;
+    } else {
+      confidenceSignal = 'high';
+      hitCount = 3;
+    }
 
     return {
-      hitCount: relevantResults.length,
-      topResults: relevantResults.slice(0, 3).map((r: { title: string; url: string; snippet: string }) => ({
-        title: r.title,
-        url: r.url,
-        snippet: r.snippet?.slice(0, 200) || '',
-      })),
+      hitCount,
+      topResults: hitCount > 0 ? [{ title: testCase.name, url: '', snippet: text.slice(0, 200) }] : [],
       confidenceSignal,
     };
   } catch (err) {

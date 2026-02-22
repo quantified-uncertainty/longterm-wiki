@@ -81,10 +81,10 @@ export function contentIntegrityDetector(): DetectorAdapter {
       }
 
       const arxiv = detectSequentialArxivIds(content);
-      if (arxiv.hasSequentialIds) {
+      if (arxiv.suspicious) {
         findings.push({
           detector: 'content-integrity',
-          description: `Sequential arxiv IDs detected (fabrication signal): ${arxiv.sequentialPairs.map(p => p.join(' → ')).join(', ')}`,
+          description: `Sequential arxiv IDs detected (fabrication signal): ${arxiv.sequentialIds.join(', ')}`,
           severity: 'critical',
         });
       }

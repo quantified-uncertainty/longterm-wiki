@@ -54,7 +54,6 @@ async function runInjectionSuite(
 ): Promise<CommandResult> {
   const { evalSuite, loadGoldenPage } = await import('../evals/harness.ts');
   const { formatScoreReport } = await import('../evals/score.ts');
-  const { ErrorCategory } = await import('../evals/types.ts');
 
   // Determine which pages to test
   const pageIds = (options.pages as string)?.split(',') || ['anthropic', 'miri', 'ai-risk'];
