@@ -37,7 +37,6 @@ import type {
   RelatedResult,
   BacklinksResult,
   CitationQuote,
-  CitationQuotesResult,
 } from '../lib/wiki-server/pages.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
