@@ -11,14 +11,20 @@ interface TableOfContentsProps {
 /**
  * TableOfContents — auto-generated TOC for long articles (wordCount > 1500).
  *
- * On desktop: floats right of the prose content (Wikipedia-style).
- * On mobile: renders inline with a collapsible toggle.
- * Highlights the active heading as the user scrolls.
+ * Full-width inline block with 2-column layout on desktop.
+ * Collapsible toggle. Highlights the active heading as the user scrolls.
+ * Drops h3s when total heading count exceeds 14 to keep it compact.
  */
 export function TableOfContents({ headings }: TableOfContentsProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [activeSlug, setActiveSlug] = useState<string>("");
   const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Only show h3s when the total heading count is manageable
+  const h2Only = headings.length > 14;
+  const visibleHeadings = h2Only
+    ? headings.filter((h) => h.depth === 2)
+    : headings;
 
   useEffect(() => {
     // Clean up any previous observer
@@ -28,7 +34,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Find the first heading that is intersecting (top-most visible)
         const intersecting = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -36,28 +41,27 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
           setActiveSlug(intersecting[0].target.id);
         }
       },
-      // Trigger when heading enters top 20% of viewport
       { rootMargin: "0px 0px -75% 0px", threshold: 0 }
     );
 
     observerRef.current = observer;
 
-    headings.forEach(({ slug }) => {
+    visibleHeadings.forEach(({ slug }) => {
       const el = document.getElementById(slug);
       if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
-  }, [headings]);
+  }, [visibleHeadings]);
 
-  if (headings.length === 0) return null;
+  if (visibleHeadings.length === 0) return null;
 
   return (
-    <div className="not-prose md:float-right md:clear-right md:ml-6 md:mb-4 md:w-52 w-full mb-6 border border-border rounded-lg bg-muted/40 text-sm shrink-0">
+    <div className="not-prose w-full mb-6 border border-border rounded-lg bg-muted/40 text-sm">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full px-3 py-2 font-medium text-sm text-foreground/80 hover:text-foreground transition-colors"
+        className="flex items-center justify-between w-full px-5 py-2.5 font-medium text-sm text-foreground/80 hover:text-foreground transition-colors"
         aria-expanded={isOpen}
         aria-controls="toc-content"
       >
@@ -73,25 +77,38 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
       </button>
       {isOpen && (
         <nav id="toc-content" aria-label="Table of contents">
-          <ol className="px-3 pb-3 space-y-0.5 list-none m-0">
-            {headings.map((heading, i) => (
-              <li
-                key={`${heading.slug}-${i}`}
-                className={`m-0 ${heading.depth === 3 ? "pl-3" : ""}`}
-              >
-                <a
-                  href={`#${heading.slug}`}
-                  className={`block py-0.5 text-xs leading-snug no-underline transition-colors ${
-                    activeSlug === heading.slug
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+          <div className="px-5 pb-4 columns-1 md:columns-2 gap-x-8">
+            {visibleHeadings.map((heading, i) => {
+              const isH2 = heading.depth === 2;
+              const prevDepth = i > 0 ? visibleHeadings[i - 1].depth : 2;
+              const needsGap = isH2 && i > 0 && prevDepth === 3;
+              return (
+                <div
+                  key={`${heading.slug}-${i}`}
+                  className={`break-inside-avoid ${needsGap ? "mt-1.5" : ""}`}
                 >
-                  {heading.text}
-                </a>
-              </li>
-            ))}
-          </ol>
+                  <a
+                    href={`#${heading.slug}`}
+                    className={`block no-underline transition-colors ${
+                      isH2
+                        ? `py-[3px] text-[13px] leading-snug font-medium ${
+                            activeSlug === heading.slug
+                              ? "text-foreground"
+                              : "text-foreground/80 hover:text-foreground"
+                          }`
+                        : `py-[2px] pl-4 text-xs leading-snug border-l border-border/60 ${
+                            activeSlug === heading.slug
+                              ? "text-foreground border-foreground/40"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`
+                    }`}
+                  >
+                    {heading.text}
+                  </a>
+                </div>
+              );
+            })}
+          </div>
         </nav>
       )}
     </div>

@@ -261,7 +261,7 @@ export function SidebarContent({
     <div
       data-slot="sidebar-content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto [scrollbar-gutter:stable]",
         className
       )}
       {...props}
@@ -276,7 +276,7 @@ export function SidebarGroup({
   return (
     <div
       data-slot="sidebar-group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      className={cn("relative flex w-full min-w-0 flex-col px-2 py-0.5", className)}
       {...props}
     />
   );
@@ -293,7 +293,7 @@ export function SidebarGroupLabel({
     <Comp
       data-slot="sidebar-group-label"
       className={cn(
-        "text-muted-foreground flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-semibold uppercase tracking-wide",
+        "text-foreground/70 flex h-7 shrink-0 items-center rounded-md px-2 text-sm font-semibold",
         className
       )}
       {...props}
@@ -341,13 +341,13 @@ export function SidebarMenuItem({
 }
 
 const sidebarMenuButtonVariants = cva(
-  "flex w-full items-center gap-2 overflow-hidden rounded-md px-3 py-1.5 text-left text-sm outline-none transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[active=true]:bg-accent data-[active=true]:font-medium data-[active=true]:text-accent-foreground [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "flex w-full items-center gap-2 overflow-hidden rounded-md px-3 py-1 text-left text-sm outline-none transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[active=true]:bg-blue-50 data-[active=true]:text-blue-700 data-[active=true]:font-medium dark:data-[active=true]:bg-blue-950/40 dark:data-[active=true]:text-blue-300 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       size: {
-        default: "h-8 text-sm",
-        sm: "h-7 text-xs",
-        lg: "h-12 text-sm",
+        default: "min-h-8 text-sm",
+        sm: "min-h-7 text-xs",
+        lg: "min-h-12 text-sm",
       },
     },
     defaultVariants: {

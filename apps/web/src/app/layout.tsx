@@ -44,11 +44,11 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         {/* Top nav bar */}
         <header className="sticky top-0 z-40 border-b border-border bg-card">
-          <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-            <Link href="/" className="text-lg font-bold no-underline text-foreground">
+          <div className="flex items-center">
+            <Link href="/" className="w-64 shrink-0 px-4 py-3 text-lg font-bold no-underline text-foreground max-md:w-auto">
               Longterm Wiki
             </Link>
-            <nav className="flex items-center gap-4">
+            <nav className="flex-1 flex items-center justify-end gap-4 px-6 py-3">
               <Link
                 href="/wiki"
                 className="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
