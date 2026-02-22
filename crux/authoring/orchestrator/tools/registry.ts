@@ -28,6 +28,13 @@ import { tool as auditCitations } from './audit-citations.ts';
 import { tool as addEntityLinks } from './add-entity-links.ts';
 import { tool as addFactRefs } from './add-fact-refs.ts';
 import { tool as validateContent } from './validate-content.ts';
+import { tool as queryWikiContext } from './query-wiki-context.ts';
+import { tool as readRelatedPage } from './read-related-page.ts';
+import { tool as editFrontmatter } from './edit-frontmatter.ts';
+import { tool as viewEditHistory } from './view-edit-history.ts';
+import { tool as extractFacts } from './extract-facts.ts';
+import { tool as deepCitationCheck } from './deep-citation-check.ts';
+import { tool as createVisual } from './create-visual.ts';
 
 // ── Tool registry ─────────────────────────────────────────────────────────
 
@@ -42,6 +49,13 @@ const ALL_TOOLS: ToolRegistration[] = [
   addEntityLinks,
   addFactRefs,
   validateContent,
+  queryWikiContext,
+  readRelatedPage,
+  editFrontmatter,
+  viewEditHistory,
+  extractFacts,
+  deepCitationCheck,
+  createVisual,
 ];
 
 const log = createPhaseLogger();

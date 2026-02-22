@@ -14,3 +14,6 @@ export { extractQualityMetrics } from './metrics.ts';
 
 // Types (used by tests and the registry)
 export type { ToolHandler, ToolRegistration, ToolHandlerOptions } from './types.ts';
+
+// Re-export constants used by tests
+export { EDITABLE_FRONTMATTER_FIELDS } from './edit-frontmatter.ts';
