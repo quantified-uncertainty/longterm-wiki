@@ -57,21 +57,40 @@ async function fetchIssues(): Promise<IssueRow[]> {
   if (!token) return [];
 
   try {
-    const resp = await fetch(
-      `https://api.github.com/repos/${REPO}/issues?state=open&per_page=100&sort=created&direction=asc`,
-      {
-        headers: {
-          Authorization: `token ${token}`,
-          Accept: "application/vnd.github+json",
-        },
-        next: { revalidate: 60 }, // cache for 60 seconds
-      }
-    );
+    // Paginate through all open issues (GitHub API returns max 100 per page)
+    const allIssues: GitHubIssueResponse[] = [];
+    let page = 1;
+    const perPage = 100;
 
-    if (!resp.ok) return [];
+    while (true) {
+      const resp = await fetch(
+        `https://api.github.com/repos/${REPO}/issues?state=open&per_page=${perPage}&page=${page}&sort=created&direction=asc`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/vnd.github+json",
+          },
+          next: { revalidate: 60 },
+        }
+      );
 
-    const data = (await resp.json()) as GitHubIssueResponse[];
-    if (!Array.isArray(data)) return [];
+      if (!resp.ok) break;
+
+      const data = (await resp.json()) as GitHubIssueResponse[];
+      if (!Array.isArray(data) || data.length === 0) break;
+
+      allIssues.push(...data);
+
+      // If we got fewer than perPage, we've reached the last page
+      if (data.length < perPage) break;
+      page++;
+
+      // Safety cap to avoid infinite loops
+      if (page > 10) break;
+    }
+
+    const data = allIssues;
+    if (data.length === 0) return [];
 
     return data
       .filter((i) => !i.pull_request)
