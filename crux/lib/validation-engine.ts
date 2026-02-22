@@ -390,6 +390,15 @@ export class ValidationEngine {
     return { filesFixed, issuesFixed };
   }
 
+  /**
+   * Apply fixes to a content string and return the fixed string without
+   * touching the filesystem. Used by callers that need to keep the original
+   * file unchanged (e.g. validate phase — SIGKILL-safe path).
+   */
+  applyFixesToContentString(content: string, issues: Issue[]): string {
+    return this._applyFixesToContent(content, issues.filter(i => i.isFixable));
+  }
+
   /** Apply fixes to content string */
   private _applyFixesToContent(content: string, issues: Issue[]): string {
     const frontmatterEndLine = this._getFrontmatterEndLine(content);

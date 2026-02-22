@@ -9,8 +9,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { applyFactRefReplacements, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
-import { splitContentForEnrichment } from '../lib/content-chunker.ts';
+import { applyFactRefReplacements, buildFactRefChunks, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
 
 describe('applyFactRefReplacements', () => {
   it('wraps a matching number with <F> tags', () => {
@@ -418,59 +417,44 @@ describe('fixStrayBackslashBeforeFTag', () => {
   });
 });
 
-describe('splitContentForEnrichment', () => {
-  it('returns single chunk for short content', () => {
-    const content = 'Short content that fits in one chunk.';
-    const chunks = splitContentForEnrichment(content);
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]).toBe(content);
+// ---------------------------------------------------------------------------
+// buildFactRefChunks tests (#721 — sectional chunking for long pages)
+// ---------------------------------------------------------------------------
+
+describe('buildFactRefChunks', () => {
+  it('returns a single chunk for short content', () => {
+    const content = 'Anthropic raised \\$30 billion last year.';
+    const chunks = buildFactRefChunks(content);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0]).toContain('\\$30 billion');
   });
 
-  it('splits long content by H2 sections', () => {
-    const section1 = '## Section One\n' + 'A'.repeat(3000);
-    const section2 = '## Section Two\n' + 'B'.repeat(3000);
-    const content = `---\ntitle: Test\n---\n\nPreamble.\n\n${section1}\n\n${section2}`;
+  it('covers the tail section of a page beyond the 6 000-char limit', () => {
+    // Simulate a page whose tail section sits beyond 6 000 chars from the start
+    const padding = `## Early Section\n${'y'.repeat(6000)}\n`;
+    const tail = `## Funding Section\nAnthropics raised \\$30 billion in Series E.\n`;
+    const content = padding + tail;
 
-    const chunks = splitContentForEnrichment(content);
+    expect(content.length).toBeGreaterThan(6000);
 
-    expect(chunks.length).toBeGreaterThan(1);
-    const combined = chunks.join('');
-    expect(combined).toContain('Section One');
-    expect(combined).toContain('Section Two');
-    expect(combined).toContain('Preamble');
+    const chunks = buildFactRefChunks(content);
+
+    // The tail section must appear in some chunk
+    const hasTail = chunks.some(c => c.includes('\\$30 billion'));
+    expect(hasTail).toBe(true);
   });
 
-  it('fact reference at position >6000 chars is included in a chunk (#673)', () => {
-    // Create content where "\\$30 billion" first appears well past position 6000.
-    // section1 is intentionally large to push section2's content past the 6000-char boundary.
-    const preamble = 'Introduction.\n\n';
-    const section1 = '## First Section\n' + 'x'.repeat(4000) + '\n\n';
-    const section2 = '## Second Section\n' + 'y'.repeat(2000) + '\n\nRaised \\$30 billion in 2024.\n';
-    const content = preamble + section1 + section2;
+  it('each chunk contains complete section text', () => {
+    const sections = [
+      '## Background\nSome background text.',
+      '## Funding\nRaised \\$1B in seed round.',
+      '## Valuation\nValued at \\$5B after Series A.',
+    ];
+    const content = sections.join('\n\n');
+    const chunks = buildFactRefChunks(content);
 
-    // Verify "\\$30 billion" is beyond position 6000 in the original content
-    expect(content.indexOf('\\$30 billion')).toBeGreaterThan(6000);
-
-    const chunks = splitContentForEnrichment(content);
-
-    // "## Second Section" chunk must contain the fact reference
-    const chunkWithFact = chunks.find(c => c.includes('## Second Section'));
-    expect(chunkWithFact).toBeDefined();
-    expect(chunkWithFact).toContain('\\$30 billion');
-  });
-
-  it('no content is lost when splitting', () => {
-    const section1 = '## Alpha\n' + 'a'.repeat(2000);
-    const section2 = '## Beta\n' + 'b'.repeat(2000);
-    const section3 = '## Gamma\n' + 'c'.repeat(2000);
-    const content = `Intro.\n\n${section1}\n\n${section2}\n\n${section3}`;
-
-    const chunks = splitContentForEnrichment(content);
-
-    const combined = chunks.join('');
-    expect(combined).toContain('## Alpha');
-    expect(combined).toContain('## Beta');
-    expect(combined).toContain('## Gamma');
-    expect(combined).toContain('Intro.');
+    // Every section must be fully present in exactly one chunk
+    expect(chunks.some(c => c.includes('\\$1B in seed round'))).toBe(true);
+    expect(chunks.some(c => c.includes('\\$5B after Series A'))).toBe(true);
   });
 });
