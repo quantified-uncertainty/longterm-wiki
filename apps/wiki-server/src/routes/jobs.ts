@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { z } from "zod";
 import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDb, getDrizzleDb } from "../db.js";
 import { jobs } from "../schema.js";
@@ -9,56 +8,18 @@ import {
   invalidJsonError,
   notFoundError,
 } from "./utils.js";
+import {
+  CreateJobSchema,
+  CreateJobBatchSchema,
+  ListJobsQuerySchema,
+  ClaimJobSchema,
+  CompleteJobSchema,
+  FailJobSchema,
+  SweepJobsSchema,
+  type JobStatus,
+} from "../api-types.js";
 
 export const jobsRoute = new Hono();
-
-// ---- Constants ----
-
-const MAX_PAGE_SIZE = 200;
-const MAX_BATCH_SIZE = 50;
-const STALE_TIMEOUT_MINUTES = 60;
-
-const VALID_STATUSES = [
-  "pending",
-  "claimed",
-  "running",
-  "completed",
-  "failed",
-  "cancelled",
-] as const;
-
-type JobStatus = (typeof VALID_STATUSES)[number];
-
-// ---- Schemas ----
-
-const CreateJobSchema = z.object({
-  type: z.string().min(1).max(100),
-  params: z.record(z.unknown()).nullable().optional(),
-  priority: z.number().int().min(0).max(1000).default(0),
-  maxRetries: z.number().int().min(0).max(10).default(3),
-});
-
-const CreateBatchSchema = z.array(CreateJobSchema).min(1).max(MAX_BATCH_SIZE);
-
-const ListQuery = z.object({
-  status: z.enum(VALID_STATUSES).optional(),
-  type: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
-  offset: z.coerce.number().int().min(0).default(0),
-});
-
-const ClaimSchema = z.object({
-  type: z.string().min(1).max(100).optional(),
-  workerId: z.string().min(1).max(200),
-});
-
-const CompleteSchema = z.object({
-  result: z.record(z.unknown()).nullable().optional(),
-});
-
-const FailSchema = z.object({
-  error: z.string().max(5000),
-});
 
 // ---- Helpers ----
 
@@ -81,6 +42,26 @@ function formatJob(row: typeof jobs.$inferSelect) {
   };
 }
 
+/** Format a raw postgres row (snake_case columns) into the same shape as `formatJob`. */
+function formatRawJobRow(row: Record<string, unknown>) {
+  return {
+    id: row.id as number,
+    type: row.type as string,
+    status: row.status as string,
+    params: row.params as Record<string, unknown> | null,
+    result: row.result as Record<string, unknown> | null,
+    error: row.error as string | null,
+    priority: row.priority as number,
+    retries: row.retries as number,
+    maxRetries: row.max_retries as number,
+    createdAt: row.created_at,
+    claimedAt: row.claimed_at,
+    startedAt: row.started_at,
+    completedAt: row.completed_at,
+    workerId: row.worker_id as string | null,
+  };
+}
+
 // ---- POST / (create job or batch) ----
 
 jobsRoute.post("/", async (c) => {
@@ -91,7 +72,7 @@ jobsRoute.post("/", async (c) => {
 
   // Support both single object and array for batch creation
   if (Array.isArray(body)) {
-    const parsed = CreateBatchSchema.safeParse(body);
+    const parsed = CreateJobBatchSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
     const rows = await db
@@ -129,7 +110,7 @@ jobsRoute.post("/", async (c) => {
 // ---- GET / (list jobs with filters) ----
 
 jobsRoute.get("/", async (c) => {
-  const parsed = ListQuery.safeParse(c.req.query());
+  const parsed = ListJobsQuerySchema.safeParse(c.req.query());
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { status, type, limit, offset } = parsed.data;
@@ -166,7 +147,7 @@ jobsRoute.post("/claim", async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return invalidJsonError(c);
 
-  const parsed = ClaimSchema.safeParse(body);
+  const parsed = ClaimJobSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const { type, workerId } = parsed.data;
@@ -253,7 +234,7 @@ jobsRoute.post("/:id/complete", async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return invalidJsonError(c);
 
-  const parsed = CompleteSchema.safeParse(body);
+  const parsed = CompleteJobSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
 
   const db = getDrizzleDb();
@@ -284,44 +265,60 @@ jobsRoute.post("/:id/fail", async (c) => {
   const body = await parseJsonBody(c);
   if (!body) return invalidJsonError(c);
 
-  const parsed = FailSchema.safeParse(body);
+  const parsed = FailJobSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
 
-  const db = getDrizzleDb();
+  const pgClient = getDb();
 
-  // First get the current job to check retry count
-  const current = await db.select().from(jobs).where(eq(jobs.id, id));
-  if (current.length === 0) {
-    return notFoundError(c, "Job not found");
-  }
+  // Single atomic UPDATE avoids the TOCTOU race between SELECT and UPDATE.
+  // The WHERE clause acts as an optimistic lock: only rows in 'running' or
+  // 'claimed' status are updated, and retries/max_retries are read and written
+  // in the same statement, so concurrent calls cannot double-increment retries.
+  //
+  // PostgreSQL evaluates all SET expressions against the *pre-update* row values,
+  // so `retries + 1` in each CASE expression is consistent (it always means
+  // old_retries + 1, not the value written by `retries = retries + 1`).
+  //
+  // Note: `error = $1` is always written, even on retry (same as the previous
+  // two-query implementation). A retried job carries the last failure's error
+  // message until it completes or fails permanently.
+  const result = await pgClient.unsafe(
+    `UPDATE "jobs"
+     SET
+       retries      = retries + 1,
+       status       = CASE WHEN (retries + 1) < max_retries THEN 'pending' ELSE 'failed' END,
+       error        = $1,
+       completed_at = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE now() END,
+       claimed_at   = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE claimed_at END,
+       started_at   = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE started_at END,
+       worker_id    = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE worker_id END
+     WHERE id = $2
+       AND status IN ('running', 'claimed')
+     RETURNING *`,
+    [parsed.data.error, id]
+  );
 
-  const job = current[0];
-  if (job.status !== "running" && job.status !== "claimed") {
+  if (result.length === 0) {
+    // Distinguish "not found" from "wrong status" for accurate error messages.
+    const db = getDrizzleDb();
+    const exists = await db
+      .select({ id: jobs.id })
+      .from(jobs)
+      .where(eq(jobs.id, id));
+    if (exists.length === 0) {
+      return notFoundError(c, "Job not found");
+    }
     return validationError(
       c,
-      `Job is in '${job.status}' status, expected 'running' or 'claimed'`
+      "Job is not in 'running' or 'claimed' status"
     );
   }
 
-  const newRetries = job.retries + 1;
-  const shouldRetry = newRetries < job.maxRetries;
+  const row = result[0] as Record<string, unknown>;
+  // `retried` is derived from the post-update status returned by RETURNING *.
+  const retried = row.status === "pending";
 
-  const rows = await db
-    .update(jobs)
-    .set({
-      status: shouldRetry ? ("pending" as JobStatus) : ("failed" as JobStatus),
-      error: parsed.data.error,
-      retries: newRetries,
-      completedAt: shouldRetry ? null : new Date(),
-      // Reset claim fields for retry
-      ...(shouldRetry
-        ? { claimedAt: null, startedAt: null, workerId: null }
-        : {}),
-    })
-    .where(eq(jobs.id, id))
-    .returning();
-
-  return c.json({ ...formatJob(rows[0]), retried: shouldRetry });
+  return c.json({ ...formatRawJobRow(row), retried });
 });
 
 // ---- POST /:id/cancel (cancel a pending or claimed job) ----
@@ -432,13 +429,9 @@ jobsRoute.get("/stats", async (c) => {
 
 // ---- POST /sweep (reset stale claimed/running jobs) ----
 
-const SweepSchema = z.object({
-  timeoutMinutes: z.number().int().min(1).max(10080).default(STALE_TIMEOUT_MINUTES),
-});
-
 jobsRoute.post("/sweep", async (c) => {
   const body = (await parseJsonBody(c)) ?? {};
-  const parsed = SweepSchema.safeParse(body);
+  const parsed = SweepJobsSchema.safeParse(body);
   if (!parsed.success) return validationError(c, parsed.error.message);
   const timeoutMinutes = parsed.data.timeoutMinutes;
 

@@ -2,12 +2,30 @@
  * Jobs API — wiki-server client module
  *
  * Client functions for the job queue system.
+ * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
 import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
+import type {
+  CreateJobInput,
+  ClaimJob,
+  CompleteJob,
+  FailJob,
+  SweepJobs,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — input (derived from server Zod schemas)
+// ---------------------------------------------------------------------------
+
+export type { CreateJobInput };
+export type { ClaimJob as ClaimJobInput };
+export type { CompleteJob as CompleteJobInput };
+export type { FailJob as FailJobInput };
+export type { SweepJobs as SweepJobsInput };
+
+// ---------------------------------------------------------------------------
+// Types — response shapes (defined by server RETURNING clauses)
 // ---------------------------------------------------------------------------
 
 export interface JobEntry {
@@ -25,13 +43,6 @@ export interface JobEntry {
   startedAt: string | null;
   completedAt: string | null;
   workerId: string | null;
-}
-
-export interface CreateJobInput {
-  type: string;
-  params?: Record<string, unknown> | null;
-  priority?: number;
-  maxRetries?: number;
 }
 
 export interface ListJobsResult {

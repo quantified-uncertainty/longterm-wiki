@@ -409,6 +409,78 @@ export const SyncFactsBatchSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Jobs
+// ---------------------------------------------------------------------------
+
+export const VALID_JOB_STATUSES = [
+  "pending",
+  "claimed",
+  "running",
+  "completed",
+  "failed",
+  "cancelled",
+] as const;
+
+export type JobStatus = (typeof VALID_JOB_STATUSES)[number];
+
+/** Maximum jobs per batch create request. */
+export const JOBS_MAX_BATCH_SIZE = 50;
+
+/** Default minutes before a stale claimed/running job is reset by sweep. */
+export const STALE_JOB_TIMEOUT_MINUTES = 60;
+
+export const CreateJobSchema = z.object({
+  type: z.string().min(1).max(100),
+  params: z.record(z.unknown()).nullable().optional(),
+  priority: z.number().int().min(0).max(1000).default(0),
+  maxRetries: z.number().int().min(0).max(10).default(3),
+});
+/** Output type (server-resolved, defaults applied). */
+export type CreateJob = z.infer<typeof CreateJobSchema>;
+/** Input type (client-side, defaults optional). */
+export type CreateJobInput = z.input<typeof CreateJobSchema>;
+
+export const CreateJobBatchSchema = z
+  .array(CreateJobSchema)
+  .min(1)
+  .max(JOBS_MAX_BATCH_SIZE);
+export type CreateJobBatch = z.infer<typeof CreateJobBatchSchema>;
+
+export const ListJobsQuerySchema = z.object({
+  status: z.enum(VALID_JOB_STATUSES).optional(),
+  type: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(200).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+export type ListJobsQuery = z.infer<typeof ListJobsQuerySchema>;
+
+export const ClaimJobSchema = z.object({
+  type: z.string().min(1).max(100).optional(),
+  workerId: z.string().min(1).max(200),
+});
+export type ClaimJob = z.infer<typeof ClaimJobSchema>;
+
+export const CompleteJobSchema = z.object({
+  result: z.record(z.unknown()).nullable().optional(),
+});
+export type CompleteJob = z.infer<typeof CompleteJobSchema>;
+
+export const FailJobSchema = z.object({
+  error: z.string().max(5000),
+});
+export type FailJob = z.infer<typeof FailJobSchema>;
+
+export const SweepJobsSchema = z.object({
+  timeoutMinutes: z
+    .number()
+    .int()
+    .min(1)
+    .max(10080)
+    .default(STALE_JOB_TIMEOUT_MINUTES),
+});
+export type SweepJobs = z.infer<typeof SweepJobsSchema>;
+
+// ---------------------------------------------------------------------------
 // Pages
 // ---------------------------------------------------------------------------
 
