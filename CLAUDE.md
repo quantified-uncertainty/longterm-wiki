@@ -221,8 +221,10 @@ Tiers: `budget` (~$2-3), `standard` (default, ~$4-6), `premium` (~$8-12)
 ```bash
 pnpm crux content improve <page-id> --tier=standard --apply    # Improve + auto-logs session to DB
 pnpm crux content improve <page-id> --tier=standard --apply --skip-session-log  # Skip session log
+pnpm crux content improve <page-id> --tier=standard --section-level --apply  # Per-## section rewriting (opt-in, #671)
 ```
 Tiers: `polish` (~$2-3), `standard` (default, ~$5-8), `deep` (~$10-15)
+Use `--section-level` for per-section rewrites (better focus; see issue #671). Old single-pass improve is the default.
 Use `--directions "specific instructions"` for targeted improvements.
 Use `--apply` to write changes directly (otherwise outputs to temp file for review).
 Use `--grade` with `--apply` to auto-grade after improvement.
