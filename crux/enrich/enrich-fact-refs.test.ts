@@ -422,11 +422,24 @@ describe('fixStrayBackslashBeforeFTag', () => {
 // ---------------------------------------------------------------------------
 
 describe('buildFactRefChunks', () => {
+  it('returns empty array for empty content', () => {
+    expect(buildFactRefChunks('')).toEqual([]);
+    expect(buildFactRefChunks('   ')).toEqual([]);
+  });
+
   it('returns a single chunk for short content', () => {
     const content = 'Anthropic raised \\$30 billion last year.';
     const chunks = buildFactRefChunks(content);
     expect(chunks.length).toBe(1);
     expect(chunks[0]).toContain('\\$30 billion');
+  });
+
+  it('returns one chunk for preamble-only content without truncation', () => {
+    // A page with 8 000 chars and no ## headings — must NOT be truncated
+    const content = 'x'.repeat(8000);
+    const chunks = buildFactRefChunks(content, 5500);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0].length).toBe(8000);
   });
 
   it('covers the tail section of a page beyond the 6 000-char limit', () => {

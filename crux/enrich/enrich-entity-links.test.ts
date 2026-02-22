@@ -398,6 +398,11 @@ Anthropic is a company.`;
 // ---------------------------------------------------------------------------
 
 describe('buildEnrichmentChunks', () => {
+  it('returns empty array for empty content', () => {
+    expect(buildEnrichmentChunks('')).toEqual([]);
+    expect(buildEnrichmentChunks('   ')).toEqual([]);
+  });
+
   it('returns a single chunk for short content', () => {
     const content = 'Short content with no headings.';
     const chunks = buildEnrichmentChunks(content);

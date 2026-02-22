@@ -89,11 +89,12 @@ export async function validatePhase(page: PageData, improvedContent: string, _op
       log('validate', `  warn ${rule}: ${count} warning(s)`);
     }
 
-    // Apply auto-fixes to the content string (no disk writes)
-    const fixableIssues = allIssues.filter(i => i.isFixable);
-    if (fixableIssues.length > 0) {
-      log('validate', `  Applying ${fixableIssues.length} auto-fix(es) in-process...`);
-      fixedContent = engine.applyFixesToContentString(fixedContent, fixableIssues);
+    // Apply auto-fixes to the content string (no disk writes).
+    // applyFixesToContentString filters to fixable issues internally.
+    const fixableCount = allIssues.filter(i => i.isFixable).length;
+    if (fixableCount > 0) {
+      log('validate', `  Applying ${fixableCount} auto-fix(es) in-process...`);
+      fixedContent = engine.applyFixesToContentString(fixedContent, allIssues);
       log('validate', '  ok auto-fixes applied');
     }
 
