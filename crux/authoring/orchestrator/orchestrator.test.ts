@@ -13,7 +13,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TIER_BUDGETS, type OrchestratorContext, type BudgetConfig } from './types.ts';
-import { buildToolDefinitions, extractQualityMetrics, wrapWithTracking, type ToolHandler } from './tools.ts';
+import { buildToolDefinitions, extractQualityMetrics, wrapWithTracking, type ToolHandler } from './tools/index.ts';
 import { evaluateQualityGate } from './quality-gate.ts';
 import { buildImproveSystemPrompt, buildRefinementPrompt } from './prompts.ts';
 import { deduplicateFootnotes } from './orchestrator.ts';

@@ -32,7 +32,7 @@ import {
   TIER_BUDGETS,
 } from './types.ts';
 import { renumberFootnotes } from '../../lib/section-splitter.ts';
-import { buildToolDefinitions, buildToolHandlers, wrapWithTracking, extractQualityMetrics } from './tools.ts';
+import { buildToolDefinitions, buildToolHandlers, wrapWithTracking, extractQualityMetrics } from './tools/index.ts';
 import { buildImproveSystemPrompt, buildRefinementPrompt } from './prompts.ts';
 import { evaluateQualityGate } from './quality-gate.ts';
 

@@ -10,7 +10,7 @@
  */
 
 import type { OrchestratorContext, QualityMetrics, QualityGateResult, OrchestratorTier } from './types.ts';
-import { extractQualityMetrics } from './tools.ts';
+import { extractQualityMetrics } from './tools/index.ts';
 
 // ---------------------------------------------------------------------------
 // Quality thresholds per tier
