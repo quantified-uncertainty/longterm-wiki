@@ -154,6 +154,73 @@ export function reassembleSections(split: SplitPage): string {
 }
 
 // ---------------------------------------------------------------------------
+// Per-section footnote marker deduplication
+// ---------------------------------------------------------------------------
+
+/**
+ * Remap footnote markers in each section to be globally unique.
+ *
+ * When sections are rewritten independently, each may produce [^SRC-1],
+ * [^SRC-2] etc. for different sources. If two sections both have [^SRC-1],
+ * renumberFootnotes would keep only the first definition, silently
+ * misattributing the later section's citation.
+ *
+ * This function walks through all sections and remaps colliding markers
+ * to unique values (e.g., section 2's [^SRC-1] becomes [^SRC-S2-1]).
+ * Both inline refs and definition lines are updated.
+ */
+export function deduplicateSectionMarkers(sections: ParsedSection[]): ParsedSection[] {
+  const globalMarkers = new Set<string>();
+  const result: ParsedSection[] = [];
+
+  for (let si = 0; si < sections.length; si++) {
+    const section = sections[si];
+
+    // Find all footnote markers in this section (both inline refs and definitions)
+    const markerRe = /\[\^([^\]]+)\]/g;
+    const localMarkers = new Set<string>();
+    let m: RegExpExecArray | null;
+    markerRe.lastIndex = 0;
+    while ((m = markerRe.exec(section.content)) !== null) {
+      localMarkers.add(m[1]);
+    }
+
+    // Build remapping for any markers that collide with previously seen ones
+    const remap = new Map<string, string>();
+    for (const marker of localMarkers) {
+      if (globalMarkers.has(marker)) {
+        // Collision — remap to a unique marker with section index prefix
+        const unique = `S${si}-${marker}`;
+        remap.set(marker, unique);
+        globalMarkers.add(unique);
+      } else {
+        globalMarkers.add(marker);
+      }
+    }
+
+    if (remap.size === 0) {
+      result.push(section);
+      continue;
+    }
+
+    // Apply remapping to both inline refs [^MARKER] and definition lines [^MARKER]:
+    let content = section.content;
+    for (const [oldMarker, newMarker] of remap) {
+      // Escape special regex characters in marker
+      const escaped = oldMarker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      content = content.replace(
+        new RegExp(`\\[\\^${escaped}\\]`, 'g'),
+        `[^${newMarker}]`,
+      );
+    }
+
+    result.push({ id: section.id, heading: section.heading, content });
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
 // Footnote renumbering
 // ---------------------------------------------------------------------------
 
