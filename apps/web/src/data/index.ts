@@ -238,10 +238,15 @@ export function getTypedEntities(): AnyEntity[] {
       // like content, currentAssessment, ratings, causeEffectGraph.
       if (isDev) {
         const id = (raw as Record<string, unknown>).id;
-        const type = (raw as Record<string, unknown>).entityType;
-        console.warn(
-          `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
-        );
+        const type = (raw as Record<string, unknown>).entityType as string;
+        // Suppress warnings for known catch-all types that intentionally skip
+        // the discriminated union (they carry extra fields Zod would strip).
+        const isCatchAll = typeof type === "string" && type.startsWith("ai-transition-model-");
+        if (!isCatchAll) {
+          console.warn(
+            `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
+          );
+        }
       }
       entities.push(raw as unknown as GenericEntity);
     }

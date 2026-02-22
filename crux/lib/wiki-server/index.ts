@@ -38,6 +38,14 @@ export type { UpsertResourceItem } from './resources.ts';
 export type { SyncEntityItem, EntityEntry } from './entities.ts';
 export type { SyncFactItem, FactEntry } from './facts.ts';
 export type { AgentSessionEntry } from './agent-sessions.ts';
+export type {
+  JobEntry,
+  CreateJobInput,
+  ListJobsResult,
+  ClaimResult,
+  JobStatsResult,
+  SweepResult,
+} from './jobs.ts';
 
 // ---------------------------------------------------------------------------
 // API functions (all return ApiResult<T>)
@@ -129,3 +137,18 @@ export {
   updateAgentSession,
   listAgentSessions,
 } from './agent-sessions.ts';
+
+// Jobs
+export {
+  createJob,
+  createJobBatch,
+  listJobs,
+  getJob,
+  claimJob,
+  startJob,
+  completeJob,
+  failJob,
+  cancelJob,
+  getJobStats,
+  sweepJobs,
+} from './jobs.ts';

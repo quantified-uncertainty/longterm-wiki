@@ -599,3 +599,37 @@ export const autoUpdateNewsItems = pgTable(
     index("idx_auni_published_at").on(table.publishedAt),
   ]
 );
+
+/**
+ * Jobs — task queue for background job processing.
+ *
+ * Stores pending, running, completed, and failed jobs.
+ * Workers (GHA workflows or local) claim jobs atomically via
+ * SELECT FOR UPDATE SKIP LOCKED and report results back.
+ */
+export const jobs = pgTable(
+  "jobs",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    type: text("type").notNull(),
+    status: text("status").notNull().default("pending"),
+    params: jsonb("params"),
+    result: jsonb("result"),
+    error: text("error"),
+    priority: integer("priority").notNull().default(0),
+    retries: integer("retries").notNull().default(0),
+    maxRetries: integer("max_retries").notNull().default(3),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    workerId: text("worker_id"),
+  },
+  (table) => [
+    index("idx_jobs_status_priority").on(table.status, table.priority),
+    index("idx_jobs_type_status").on(table.type, table.status),
+    index("idx_jobs_created_at").on(table.createdAt),
+  ]
+);
