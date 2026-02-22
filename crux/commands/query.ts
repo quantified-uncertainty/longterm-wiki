@@ -7,7 +7,7 @@
  *
  * Usage:
  *   crux query search "deceptive alignment"    Full-text page search (ranked)
- *   crux query entity anthropic                Structured entity data
+*   crux query entity anthropic                Structured entity data
  *   crux query facts anthropic                 Numeric facts for an entity
  *   crux query related scheming                Related pages (graph query)
  *   crux query backlinks rlhf                  What links to this page?
@@ -34,6 +34,14 @@ import {
   getBacklinks,
   getCitationQuotes,
 } from '../lib/wiki-server/pages.ts';
+import type {
+  PageDetail,
+  PageSearchResult,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+} from '../lib/wiki-server/page-types.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -296,7 +304,7 @@ export async function backlinks(args: string[], options: Record<string, unknown>
 
   if (items.length === 0) {
     return { output: `${c.dim}No backlinks found for "${pageId}"${c.reset}`, exitCode: 0 };
-  }
+}
 
   let output = `${c.bold}${c.blue}Backlinks: ${pageId}${c.reset}\n`;
   output += `${c.dim}${total} page${total !== 1 ? 's' : ''} link here${c.reset}\n\n`;

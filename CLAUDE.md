@@ -119,6 +119,13 @@ pnpm crux query risk --level=high        # All high-risk pages
 pnpm crux query stats                    # Wiki-wide statistics
 # All commands support --json for machine-readable output
 # Requires LONGTERMWIKI_SERVER_URL (set in environment)
+
+# Research context bundles (saves 5-15 tool calls per session)
+pnpm crux context for-page <page-id>     # Full context for editing a page (metadata, related, citations, entity YAML)
+pnpm crux context for-entity <id>        # Full context for an entity (facts, backlinks, sources, YAML)
+pnpm crux context for-issue <N>          # Context assembled from GitHub issue (finds related pages/entities)
+pnpm crux context for-topic "query"      # Context for a free-text topic (search + related)
+# All commands write to .claude/wip-context.md by default (override with --output=<path>)
 ```
 
 ## Repository Structure

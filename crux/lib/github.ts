@@ -21,11 +21,57 @@ export function getGitHubToken(): string {
 }
 
 /**
+ * Check a string for signs of shell-expansion corruption or ANSI escape codes
+ * before it gets posted to GitHub.
+ *
+ * Returns a human-readable error message if corruption is detected, or null if clean.
+ *
+ * Common corruption sources:
+ *   - ANSI codes from tool output captured via backtick substitution
+ *   - dotenv tip lines injected when bash expanded a heredoc
+ *   - Shell error markers from failed command substitutions
+ *   - `****` patterns from backtick-in-bold getting shell-expanded away
+ */
+export function detectCorruption(text: string): string | null {
+  // ANSI escape sequences (ESC[ or the ◆[ variant from some terminals)
+  if (/\x1b\[|\u25c6\[/.test(text)) {
+    return 'Contains ANSI escape codes — text was likely captured from terminal output';
+  }
+  // dotenv verbose output injected via shell expansion
+  if (/injecting env.*from \.env/i.test(text)) {
+    return 'Contains dotenv output — text was likely processed by bash with shell expansion';
+  }
+  // Shell "command not found" errors from backtick substitution
+  if (/: command not found/.test(text)) {
+    return 'Contains shell error output ("command not found") — text was likely shell-expanded';
+  }
+  // `****` is the fingerprint of backtick-in-bold being shell-expanded then stripped
+  if (/\*{4,}/.test(text)) {
+    return 'Contains "****" — likely corrupted bold+code markdown (backticks shell-expanded away)';
+  }
+  return null;
+}
+
+/**
+ * Recursively collect all string values from a plain object.
+ * Used to validate request bodies before sending to GitHub.
+ */
+function collectStrings(obj: unknown): string[] {
+  if (typeof obj === 'string') return [obj];
+  if (Array.isArray(obj)) return obj.flatMap(collectStrings);
+  if (obj && typeof obj === 'object') return Object.values(obj).flatMap(collectStrings);
+  return [];
+}
+
+/**
  * Make a GitHub API request using native fetch().
  *
  * Returns the parsed JSON body, or undefined for 204 No Content responses
  * (e.g. DELETE /labels/{name}). Throws on HTTP errors with the status code
  * and response body for easy debugging.
+ *
+ * Automatically validates string fields in the request body for shell-expansion
+ * corruption (ANSI codes, dotenv output, etc.) before sending.
  */
 export async function githubApi<T = unknown>(
   endpoint: string,
@@ -34,6 +80,19 @@ export async function githubApi<T = unknown>(
   const token = getGitHubToken();
   const url = `https://api.github.com${endpoint}`;
   const { method = 'GET', body } = options;
+
+  // Validate body strings for corruption before sending
+  if (body) {
+    for (const str of collectStrings(body)) {
+      const problem = detectCorruption(str);
+      if (problem) {
+        throw new Error(
+          `GitHub API body failed corruption check: ${problem}\n` +
+          `Offending content (first 200 chars): ${str.slice(0, 200)}`
+        );
+      }
+    }
+  }
 
   const headers: Record<string, string> = {
     Authorization: `token ${token}`,

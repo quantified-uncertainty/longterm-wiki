@@ -1,8 +1,16 @@
+Looking at this merge conflict, the issue is that:
+
+1. **HEAD side** kept the local `// Local API response types` comment section header before `GitHubIssueResponse`, and had the original imports from `../lib/wiki-server/pages.ts`
+2. **origin/main side** removed that comment section header, and changed the imports to use `../lib/wiki-server/page-types.ts` with additional types (`CitationQuotesResult`)
+
+The problem is the file has **duplicate imports** for `PageDetail`, `PageSearchResult`, `RelatedResult`, `BacklinksResult`, and `CitationQuote` — once from `pages.ts` and once from `page-types.ts`. I need to keep the main's cleaner import structure (from `page-types.ts`) while removing the duplicate imports from `pages.ts`, and drop the redundant comment section header.
+
 /**
  * Context Command Handlers
  *
- * Assembles research bundles for Claude Code sessions.
- * Eliminates the 5-15 manual tool calls needed to gather background context.
+ * Assembles research bundles for Claude Code sessions — queries the wiki-server
+ * and local files to produce a structured markdown file with everything needed
+ * for a given task. Saves 5-15 tool calls per session by gathering context upfront.
  *
  * Usage:
  *   crux context for-issue <N>          Context bundle for a GitHub issue
@@ -32,22 +40,24 @@ import {
   getBacklinks,
   getCitationQuotes,
 } from '../lib/wiki-server/pages.ts';
-import type {
-  PageSearchResult,
-  PageDetail,
-  RelatedResult,
-  BacklinksResult,
-  CitationQuote,
-} from '../lib/wiki-server/pages.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
+import type {
+  PageDetail,
+  PageSearchResult,
+  RelatedResult,
+  BacklinksResult,
+  CitationQuote,
+  CitationQuotesResult,
+} from '../lib/wiki-server/page-types.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const DEFAULT_OUTPUT = join(PROJECT_ROOT, '.claude/wip-context.md');
+
 
 // ---------------------------------------------------------------------------
 // Exported helper functions (also tested by context.test.ts)
@@ -126,10 +136,6 @@ export function tableRow(...cells: string[]): string {
   return `| ${cells.join(' | ')} |`;
 }
 
-// ---------------------------------------------------------------------------
-// Local API response types
-// ---------------------------------------------------------------------------
-
 interface GitHubIssueResponse {
   number: number;
   title: string;
@@ -162,7 +168,7 @@ function writeBundle(outputPath: string, content: string): void {
 
 function pageDetailBlock(p: PageDetail): string {
   const meta: string[] = [];
-  if (p.quality !== null) meta.push(`Quality: ${p.quality}/10`);
+  if (p.quality !== null) meta.push(`Quality: ${p.quality}/100`);
   if (p.readerImportance !== null) meta.push(`Importance: ${p.readerImportance}/100`);
   if (p.lastUpdated) meta.push(`Last updated: ${p.lastUpdated}`);
   if (p.wordCount) meta.push(`~${p.wordCount.toLocaleString()} words`);
@@ -254,7 +260,7 @@ function pageSearchBlock(results: PageSearchResult['results'], query: string, li
   let md = '';
   for (let i = 0; i < Math.min(results.length, limit); i++) {
     const r = results[i];
-    const q = r.quality !== null ? `Quality: ${r.quality}/10` : null;
+    const q = r.quality !== null ? `Quality: ${r.quality}/100` : null;
     const imp = r.readerImportance !== null ? `Importance: ${r.readerImportance}/100` : null;
     const meta = [q, imp, r.entityType ? `Type: ${r.entityType}` : null]
       .filter(Boolean)
