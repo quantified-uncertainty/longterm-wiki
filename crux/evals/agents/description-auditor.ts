@@ -18,6 +18,7 @@ import { parse as parseYaml } from 'yaml';
 import type { AdversarialFinding } from '../types.ts';
 import { callClaude, createClient, MODELS } from '../../lib/anthropic.ts';
 import { stripFrontmatter } from '../../lib/patterns.ts';
+import { parseFrontmatter } from '../../lib/mdx-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Entity YAML loading
@@ -87,14 +88,10 @@ interface Frontmatter {
   [key: string]: unknown;
 }
 
-function extractFrontmatter(content: string): Frontmatter | null {
-  const match = /^---\n([\s\S]*?)\n---/.exec(content);
-  if (!match) return null;
-  try {
-    return parseYaml(match[1]) as Frontmatter;
-  } catch {
-    return null;
-  }
+function extractFrontmatterTyped(content: string): Frontmatter | null {
+  const raw = parseFrontmatter(content);
+  if (Object.keys(raw).length === 0) return null;
+  return raw as Frontmatter;
 }
 
 function extractOverview(content: string): string {
@@ -277,7 +274,7 @@ export async function auditPageDescriptions(
   const entityYaml = await loadEntityYaml(entityId);
 
   // Extract page components
-  const frontmatter = extractFrontmatter(content);
+  const frontmatter = extractFrontmatterTyped(content);
   const overview = extractOverview(content);
 
   // Run consistency checks (free)

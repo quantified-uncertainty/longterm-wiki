@@ -316,25 +316,24 @@ function getDefaultDetectors(includeExpensive: boolean): DetectorAdapter[] {
 
 /**
  * Load a golden page from the content directory.
+ * First checks for test fixtures, then uses findPageFile() for real pages.
  */
 export async function loadGoldenPage(pageId: string): Promise<string> {
-  // Try multiple possible paths
-  const possiblePaths = [
-    join(process.cwd(), 'crux/evals/fixtures', `${pageId}.mdx`),
-    join(process.cwd(), 'content/docs/knowledge-base/organizations', `${pageId}.mdx`),
-    join(process.cwd(), 'content/docs/knowledge-base/people', `${pageId}.mdx`),
-    join(process.cwd(), 'content/docs/knowledge-base/risks', `${pageId}.mdx`),
-    join(process.cwd(), 'content/docs/knowledge-base/concepts', `${pageId}.mdx`),
-    join(process.cwd(), 'content/docs/knowledge-base/events', `${pageId}.mdx`),
-  ];
+  const { findPageFile } = await import('../lib/file-utils.ts');
 
-  for (const path of possiblePaths) {
-    try {
-      return await readFile(path, 'utf-8');
-    } catch {
-      continue;
-    }
+  // 1. Check for test fixtures first (allow controlled test data)
+  const fixturePath = join(process.cwd(), 'crux/evals/fixtures', `${pageId}.mdx`);
+  try {
+    return await readFile(fixturePath, 'utf-8');
+  } catch {
+    // Not a fixture — try real content
   }
 
-  throw new Error(`Golden page not found: ${pageId}. Tried: ${possiblePaths.join(', ')}`);
+  // 2. Use the canonical page finder (searches all content directories)
+  const pagePath = findPageFile(pageId);
+  if (pagePath) {
+    return await readFile(pagePath, 'utf-8');
+  }
+
+  throw new Error(`Golden page not found: ${pageId}. Checked fixtures and all content directories.`);
 }
