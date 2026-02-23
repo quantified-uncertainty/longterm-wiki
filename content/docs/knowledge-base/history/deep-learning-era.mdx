@@ -187,113 +187,80 @@ This kind of statement was atypical for the AI field in 2010. DeepMind incorpora
 - Published in *Nature* (2015)[^11]
 - Established a foundation for subsequent reinforcement learning advances
 
-{
-  "content": "## AlphaGo: The Watershed Moment (2016)\n\n### Background\n\n**Go**: An ancient board game with far larger state spaces than chess.\n- Go's game tree contains approximately 10^761 nodes, making traditional brute-force approaches computationally infeasible.[^12]\n- Relies on pattern recognition and positional judgment that resists brute-force search.\n- AlphaGo was trained on millions of Go positions and moves from human-played games.[^12]\n- Prevailing expert estimates circa 2015: AI mastery by 2025–2030.[^13]\n\n### The Match\n\n**March 9–15, 2016**: [AlphaGo vs. Lee Sedol](https://en.wikipedia.org/wiki/AlphaGo_versus_Lee_Sedol) (18-time world champion) at the Four Seasons Hotel, Seoul.\n\n| Metric | Detail |\n|--------|--------|\n| **Final Score** | AlphaGo 4, Lee Sedol 1 |\n| **Global Viewership** | Over 200 million worldwide; 60 million in China and over 100,000 on YouTube[^12] |\n| **Prize Money** | \$1 million (donated to charity by DeepMind) |\n| **Lee Sedol's Prize** | \$170,000 (\$150K participation + \$20K for Game 4 win) |\n| **Move 37 (Game 2)** | Estimated 1 in 10,000 probability by human players; later recognized as strategically effective |\n| **Move 78 (Game 4)** | Lee Sedol's counter-move, equally unconventional |\n| **Recognition** | AlphaGo awarded honorary 9-dan rank by Korea Baduk Association |\n\n### Why AlphaGo Mattered\n\n**1. Earlier Than Expert Predictions**\n\nSurveys of AI researchers and Go professionals prior to 2016 largely placed human-level Go play in the 2025–2030 range. Stuart Russell stated that AlphaGo's victory happened much faster than expected, with predictions of 10 years before it would occur.[^13] A year before the 2016 match, experts predicted it would take another 10 years to reach AlphaGo's level.[^13] The result arrived roughly a decade ahead of the median expert estimate.\n\n**Lesson**: Expert predictions about AI timelines have been systematically overconfident in the direction of slowness. This does not imply timelines are always shorter than predicted — only that the historical record warrants caution about such estimates in either direction.\n\n**2. Demonstrated Novel Strategic Reasoning**\n\nAlphaGo generated moves that surprised professional players — moves later recognized as strategically effective but outside the corpus of human Go play. This challenged assumptions about which cognitive tasks required human-like intuition. AlphaGo combines neural networks and Monte Carlo tree search in a novel way, trained via supervised learning and self-play.[^14]\n\n**Implication**: Claims that AI "cannot do X" carry less evidential weight when the system's capabilities are evaluated post-hoc rather than from first principles.\n\n**3. Broad Public Attention**\n\nThe match drew tens of millions of viewers worldwide and generated substantial media coverage, making AI capabilities a mainstream topic.[^12] AlphaGo's victory was described as happening much faster than the AI research community expected.[^13]\n\n**4. Impact on Safety Community Timelines**\n\nIf expert predictions about Go had been off by a decade, researchers studying AI safety asked what other milestones might arrive earlier than anticipated. This contributed to increased urgency in safety funding and research during 2016–2018.\n\n### Safety Implications\n\nAlphaGo's surprise victory carried several lessons relevant to AI safety research:\n\n- **Timeline uncertainty**: The decade-early arrival of human-level Go play demonstrated that expert consensus on AI progress can be systematically miscalibrated, motivating earlier investment in safety research before capabilities outpace alignment work.[^14]\n- **Emergent strategies**: AlphaGo's novel moves — including Move 37 — illustrated that advanced AI systems can develop strategies that are opaque or surprising to human experts, raising questions about interpretability and oversight.\n- **Brittleness under adversarial conditions**: Later work showed that even superhuman Go AIs have surprising failure modes; in 2022, an adversary AI beat the superhuman system KataGo in 94 out of 100 games using only 8% of its computational power.[^15] The exploited strategy was simple enough to teach to humans, who could then defeat Go bots unaided.[^16] This demonstrated that high benchmark performance does not guarantee robust, safe behavior.\n- **Self-learning opacity**: Successor system AlphaGo Zero creates its own concepts and logic that are so advanced humans have difficulty understanding how it works, illustrating how self-learning approaches can produce decision-making processes that are difficult to audit or align with human values.[^17] AlphaGo Zero's self-learning approach relies on implicit decision-making procedures rather than explicitly expressed value properties set by its creators.[^17]\n\n### AlphaZero (2017)\n\n**Achievement**: Starting from random play, a single system learned chess, shogi, and Go through self-play, ultimately exceeding the performance of the best domain-specific engines. AlphaZero played 29 million games against itself and beat the original AlphaGo program 100 games to nothing.[^18]\n\n**Method**: No human game data. The system bootstrapped from game rules alone.[^19]\n\n**Training**: AlphaZero surpassed the chess engine Stockfish after approximately 4 hours of self-play; full training across all three games completed in roughly 9 hours.[^18]\n\n**Significance**: Removed the dependency on human-generated training data for game-playing systems, suggesting broader applicability of self-play methods.[^17]\n\n[^12]: AI Behind AlphaGo: Machine Learning and Neural Network (https://illumin.usc.edu/ai-behind-alphago-machine-learning-and-neural-network)\n[^13]: Year in review: AlphaGo scores a win for artificial intelligence (https://www.sciencenews.org/article/alphago-artificial-intelligence-top-science-stories-2016)\n[^14]: AlphaGo and AI Progress - Future of Life Institute (https://futureoflife.org/recent-news/alphago-and-ai-progress)\n[^15]: Even Superhuman Go AIs Have Surprising Failure Modes (https://far.ai/news/even-superhuman-go-ais-have-surprising-failure-modes)\n[^16]: Even Superhuman Go AIs Have Surprising Failure Modes — LessWrong (https://www.lesswrong.com/posts/DCL3MmMiPsuMxP45a/even-superhuman-go-ais-have-surprising-failure-modes)\n[^17]: AlphaGo Zero: Self-Learning AI and Its Ethical Implications (https://studycorgi.com/the-artificial-intelligence-machine-alphago-zero)\n[^18]: A Timeline of Deep Learning | Flagship Pioneering (https://www.flagshippioneering.com/timelines/a-timeline-of-deep-learning)\n[^19]: Visualizing the deep learning revolution (https://medium.com/@richardcngo/visualizing-the-deep-learning-revolution-722098eb9c5)",
-  "claimMap": [
-    {
-      "claim": "Go's game tree contains approximately 10^761 nodes, making traditional brute-force approaches computationally infeasible.",
-      "factId": "SRC-14",
-      "sourceUrl": "https://illumin.usc.edu/ai-behind-alphago-machine-learning-and-neural-network",
-      "quote": "Go's game tree contains approximately 10^761 nodes, making traditional brute-force approaches computationally infeasible."
-    },
-    {
-      "claim": "AlphaGo was trained on millions of Go positions and moves from human-played games.",
-      "factId": "SRC-14",
-      "sourceUrl": "https://illumin.usc.edu/ai-behind-alphago-machine-learning-and-neural-network",
-      "quote": "AlphaGo's intelligence is based on being trained on millions of Go positions and moves from human-played games."
-    },
-    {
-      "claim": "Prevailing expert estimates circa 2015: AI mastery by 2025–2030.",
-      "factId": "SRC-12",
-      "sourceUrl": "https://www.sciencenews.org/article/alphago-artificial-intelligence-top-science-stories-2016",
-      "quote": "A year before the 2016 match, experts predicted it would take another 10 years to reach AlphaGo's level."
-    },
-    {
-      "claim": "Over 200 million worldwide; 60 million in China and over 100,000 on YouTube.",
-      "factId": "SRC-14",
-      "sourceUrl": "https://illumin.usc.edu/ai-behind-alphago-machine-learning-and-neural-network",
-      "quote": "The AlphaGo versus Lee Sedol match was watched by 60 million people in China and over 100,000 on YouTube."
-    },
-    {
-      "claim": "Stuart Russell stated that AlphaGo's victory happened much faster than expected, with predictions of 10 years before it would occur.",
-      "factId": "SRC-12",
-      "sourceUrl": "https://www.sciencenews.org/article/alphago-artificial-intelligence-top-science-stories-2016",
-      "quote": "Stuart Russell stated the AlphaGo victory happened much faster than expected, with predictions of 10 years before it occurred."
-    },
-    {
-      "claim": "A year before the 2016 match, experts predicted it would take another 10 years to reach AlphaGo's level.",
-      "factId": "SRC-12",
-      "sourceUrl": "https://www.sciencenews.org/article/alphago-artificial-intelligence-top-science-stories-2016",
-      "quote": "A year before the 2016 match, experts predicted it would take another 10 years to reach AlphaGo's level."
-    },
-    {
-      "claim": "AlphaGo combines neural networks and Monte Carlo tree search in a novel way, trained via supervised learning and self-play.",
-      "factId": "SRC-13",
-      "sourceUrl": "https://futureoflife.org/recent-news/alphago-and-ai-progress",
-      "quote": "AlphaGo combines neural networks and Monte Carlo tree search in a novel way, trained via supervised learning and self-play."
-    },
-    {
-      "claim": "The match drew tens of millions of viewers worldwide and generated substantial media coverage, making AI capabilities a mainstream topic.",
-      "factId": "SRC-14",
-      "sourceUrl": "https://illumin.usc.edu/ai-behind-alphago-machine-learning-and-neural-network",
-      "quote": "The AlphaGo versus Lee Sedol match was watched by 60 million people in China and over 100,000 on YouTube."
-    },
-    {
-      "claim": "AlphaGo's victory was described as happening much faster than the AI research community expected.",
-      "factId": "SRC-12",
-      "sourceUrl": "https://www.sciencenews.org/article/alphago-artificial-intelligence-top-science-stories-2016",
-      "quote": "Stuart Russell stated the AlphaGo victory happened much faster than expected, with predictions of 10 years before it occurred."
-    },
-    {
-      "claim": "The decade-early arrival of human-level Go play demonstrated that expert consensus on AI progress can be systematically miscalibrated, motivating earlier investment in safety research before capabilities outpace alignment work.",
-      "factId": "SRC-13",
-      "sourceUrl": "https://futureoflife.org/recent-news/alphago-and-ai-progress",
-      "quote": "AlphaGo combines neural networks and Monte Carlo tree search in a novel way, trained via supervised learning and self-play."
-    },
-    {
-      "claim": "In 2022, an adversary AI beat the superhuman system KataGo in 94 out of 100 games using only 8% of its computational power.",
-      "factId": "SRC-9",
-      "sourceUrl": "https://far.ai/news/even-superhuman-go-ais-have-surprising-failure-modes",
-      "quote": "The adversary AI beats superhuman KataGo in 94 out of 100 games using only 8% of its computational power."
-    },
-    {
-      "claim": "The exploited strategy was simple enough to teach to humans, who could then defeat Go bots unaided.",
-      "factId": "SRC-10",
-      "sourceUrl": "https://www.lesswrong.com/posts/DCL3MmMiPsuMxP45a/even-superhuman-go-ais-have-surprising-failure-modes",
-      "quote": "The exploited strategy is simple enough to teach to humans who can then defeat Go bots unaided."
-    },
-    {
-      "claim": "Successor system AlphaGo Zero creates its own concepts and logic that are so advanced humans have difficulty understanding how it works, illustrating how self-learning approaches can produce decision-making processes that are difficult to audit or align with human values.",
-      "factId": "SRC-11",
-      "sourceUrl": "https://studycorgi.com/the-artificial-intelligence-machine-alphago-zero",
-      "quote": "AlphaGo Zero creates its own language, concepts, and logic that are so advanced humans have difficulty understanding how it works."
-    },
-    {
-      "claim": "AlphaGo Zero's self-learning approach relies on implicit decision-making procedures rather than explicitly expressed value properties set by its creators.",
-      "factId": "SRC-11",
-      "sourceUrl": "https://studycorgi.com/the-artificial-intelligence-machine-alphago-zero",
-      "quote": "AlphaGo Zero's self-learning approach eliminates ethical guidelines by relying on implicit decision-making procedures rather than explicitly expressed value properties by creators."
-    },
-    {
-      "claim": "AlphaZero played 29 million games against itself and beat the original AlphaGo program 100 games to nothing.",
-      "factId": "SRC-8",
-      "sourceUrl": "https://www.flagshippioneering.com/timelines/a-timeline-of-deep-learning",
-      "quote": "AlphaZero played 29 million games against itself in 2017 and beat the original AlphaGo program 100 games to nothing."
-    },
-    {
-      "claim": "No human game data. The system bootstrapped from game rules alone.",
-      "factId": "SRC-2",
-      "sourceUrl": "https://medium.com/@richardcngo/visualizing-the-deep-learning-revolution-722098eb9c5",
-      "quote": "AlphaGo trained without human data reached superhuman Go performance after less than three days of self-play training in 2017."
-    },
-    {
-      "claim": "AlphaZero surpassed the chess engine Stockfish after approximately 4 hours of self-play; full training across all three games completed in roughly 9 hours.",
-      "factId": "SRC-8",
-      "sourceUrl": "https://www.flagshippioneering.com/timelines/a-timeline-of-deep-learning",
-      "quote": "AlphaZero played 29 million games against itself in 2017 and beat the original AlphaGo program 100 games to nothing."
-    },
-    {
-      "claim": "Removed the dependency on human-
+
+## AlphaGo: The Watershed Moment (2016)
+
+### Background
+
+**Go**: An ancient board game with far larger state spaces than chess.
+- Go's game tree contains approximately 10^761 nodes, making traditional brute-force approaches computationally infeasible.[^12]
+- Relies on pattern recognition and positional judgment that resists brute-force search.
+- AlphaGo was trained on millions of Go positions and moves from human-played games.[^12]
+- Prevailing expert estimates circa 2015: AI mastery by 2025–2030.[^13]
+
+### The Match
+
+**March 9–15, 2016**: [AlphaGo vs. Lee Sedol](https://en.wikipedia.org/wiki/AlphaGo_versus_Lee_Sedol) (18-time world champion) at the Four Seasons Hotel, Seoul.
+
+| Metric | Detail |
+|--------|--------|
+| **Final Score** | AlphaGo 4, Lee Sedol 1 |
+| **Global Viewership** | Over 200 million worldwide; 60 million in China and over 100,000 on YouTube[^12] |
+| **Prize Money** | \$1 million (donated to charity by DeepMind) |
+| **Lee Sedol's Prize** | \$170,000 (\$150K participation + \$20K for Game 4 win) |
+| **Move 37 (Game 2)** | Estimated 1 in 10,000 probability by human players; later recognized as strategically effective |
+| **Move 78 (Game 4)** | Lee Sedol's counter-move, equally unconventional |
+| **Recognition** | AlphaGo awarded honorary 9-dan rank by Korea Baduk Association |
+
+### Why AlphaGo Mattered
+
+**1. Earlier Than Expert Predictions**
+
+Surveys of AI researchers and Go professionals prior to 2016 largely placed human-level Go play in the 2025–2030 range. Stuart Russell stated that AlphaGo's victory happened much faster than expected, with predictions of 10 years before it would occur.[^13] A year before the 2016 match, experts predicted it would take another 10 years to reach AlphaGo's level.[^13] The result arrived roughly a decade ahead of the median expert estimate.
+
+**Lesson**: Expert predictions about AI timelines have been systematically overconfident in the direction of slowness. This does not imply timelines are always shorter than predicted — only that the historical record warrants caution about such estimates in either direction.
+
+**2. Demonstrated Novel Strategic Reasoning**
+
+AlphaGo generated moves that surprised professional players — moves later recognized as strategically effective but outside the corpus of human Go play. This challenged assumptions about which cognitive tasks required human-like intuition. AlphaGo combines neural networks and Monte Carlo tree search in a novel way, trained via supervised learning and self-play.[^14]
+
+**Implication**: Claims that AI "cannot do X" carry less evidential weight when the system's capabilities are evaluated post-hoc rather than from first principles.
+
+**3. Broad Public Attention**
+
+The match drew tens of millions of viewers worldwide and generated substantial media coverage, making AI capabilities a mainstream topic.[^12] AlphaGo's victory was described as happening much faster than the AI research community expected.[^13]
+
+**4. Impact on Safety Community Timelines**
+
+If expert predictions about Go had been off by a decade, researchers studying AI safety asked what other milestones might arrive earlier than anticipated. This contributed to increased urgency in safety funding and research during 2016–2018.
+
+### Safety Implications
+
+AlphaGo's surprise victory carried several lessons relevant to AI safety research:
+
+- **Timeline uncertainty**: The decade-early arrival of human-level Go play demonstrated that expert consensus on AI progress can be systematically miscalibrated, motivating earlier investment in safety research before capabilities outpace alignment work.[^14]
+- **Emergent strategies**: AlphaGo's novel moves — including Move 37 — illustrated that advanced AI systems can develop strategies that are opaque or surprising to human experts, raising questions about interpretability and oversight.
+- **Brittleness under adversarial conditions**: Later work showed that even superhuman Go AIs have surprising failure modes; in 2022, an adversary AI beat the superhuman system KataGo in 94 out of 100 games using only 8% of its computational power.[^15] The exploited strategy was simple enough to teach to humans, who could then defeat Go bots unaided.[^16] This demonstrated that high benchmark performance does not guarantee robust, safe behavior.
+- **Self-learning opacity**: Successor system AlphaGo Zero creates its own concepts and logic that are so advanced humans have difficulty understanding how it works, illustrating how self-learning approaches can produce decision-making processes that are difficult to audit or align with human values.[^17] AlphaGo Zero's self-learning approach relies on implicit decision-making procedures rather than explicitly expressed value properties set by its creators.[^17]
+
+### AlphaZero (2017)
+
+**Achievement**: Starting from random play, a single system learned chess, shogi, and Go through self-play, ultimately exceeding the performance of the best domain-specific engines. AlphaZero played 29 million games against itself and beat the original AlphaGo program 100 games to nothing.[^18]
+
+**Method**: No human game data. The system bootstrapped from game rules alone.[^19]
+
+**Training**: AlphaZero surpassed the chess engine Stockfish after approximately 4 hours of self-play; full training across all three games completed in roughly 9 hours.[^18]
+
+**Significance**: Removed the dependency on human-generated training data for game-playing systems, suggesting broader applicability of self-play methods.[^17]
+
+[^12]: AI Behind AlphaGo: Machine Learning and Neural Network (https://illumin.usc.edu/ai-behind-alphago-machine-learning-and-neural-network)
+[^13]: Year in review: AlphaGo scores a win for artificial intelligence (https://www.sciencenews.org/article/alphago-artificial-intelligence-top-science-stories-2016)
+[^14]: AlphaGo and AI Progress - Future of Life Institute (https://futureoflife.org/recent-news/alphago-and-ai-progress)
+[^15]: Even Superhuman Go AIs Have Surprising Failure Modes (https://far.ai/news/even-superhuman-go-ais-have-surprising-failure-modes)
+[^16]: Even Superhuman Go AIs Have Surprising Failure Modes — LessWrong (https://www.lesswrong.com/posts/DCL3MmMiPsuMxP45a/even-superhuman-go-ais-have-surprising-failure-modes)
+[^17]: AlphaGo Zero: Self-Learning AI and Its Ethical Implications (https://studycorgi.com/the-artificial-intelligence-machine-alphago-zero)
+[^18]: A Timeline of Deep Learning | Flagship Pioneering (https://www.flagshippioneering.com/timelines/a-timeline-of-deep-learning)
+[^19]: Visualizing the deep learning revolution (https://medium.com/@richardcngo/visualizing-the-deep-learning-revolution-722098eb9c5)
 
 ## The Founding of OpenAI (2015)
 
