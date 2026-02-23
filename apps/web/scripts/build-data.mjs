@@ -661,6 +661,54 @@ async function buildEditLogDateMap() {
 }
 
 /**
+ * Fetch per-page citation stats from the wiki-server API.
+ * Returns a Map of pageId → { total, verified, accurate, inaccurate, avgScore }.
+ * Falls back to an empty map if the server is unavailable.
+ */
+async function buildCitationStatsMap() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  citationStats: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return new Map();
+  }
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+    const res = await fetch(`${serverUrl}/api/citations/page-stats`, {
+      headers,
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!res.ok) {
+      console.log(`  citationStats: skipped (server returned ${res.status})`);
+      return new Map();
+    }
+
+    const data = await res.json();
+    const statsMap = new Map();
+    for (const page of data.pages || []) {
+      statsMap.set(page.pageId, {
+        total: page.total,
+        withQuotes: page.withQuotes,
+        verified: page.verified,
+        accuracyChecked: page.accuracyChecked,
+        accurate: page.accurate,
+        inaccurate: page.inaccurate,
+        avgScore: page.avgScore,
+      });
+    }
+    console.log(`  citationStats: ${statsMap.size} pages fetched from API`);
+    return statsMap;
+  } catch (err) {
+    console.log(`  citationStats: skipped (${err.message || 'server unavailable'})`);
+    return new Map();
+  }
+}
+
+/**
  * Extract frontmatter from MDX/MD content using YAML parser
  * Properly handles nested objects like ratings
  */
@@ -1278,8 +1326,11 @@ async function main() {
   const urlToResource = buildUrlToResourceMap(resources);
   console.log(`  urlToResource: ${urlToResource.size} URL variations mapped`);
 
-  // Fetch edit log dates from wiki-server (async)
-  const editLogDates = await buildEditLogDateMap();
+  // Fetch edit log dates and citation stats from wiki-server (parallel)
+  const [editLogDates, citationStats] = await Promise.all([
+    buildEditLogDateMap(),
+    buildCitationStatsMap(),
+  ]);
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates);
@@ -1343,10 +1394,20 @@ async function main() {
   console.log(`  factUsage: ${factRefCount} <F> references across ${Object.keys(factUsage).length} unique facts`);
 
   // Re-count backlinks after merging content links
-  // Enrich pages with backlink counts
+  // Enrich pages with backlink counts + citation stats
+  let pagesWithCitationStats = 0;
   for (const page of pages) {
     const pageBacklinks = backlinks[page.id] || [];
     page.backlinkCount = pageBacklinks.length;
+
+    const cStats = citationStats.get(page.id);
+    if (cStats) {
+      page.citationHealth = cStats;
+      pagesWithCitationStats++;
+    }
+  }
+  if (pagesWithCitationStats > 0) {
+    console.log(`  citationHealth: attached to ${pagesWithCitationStats} pages`);
   }
 
   // =========================================================================

@@ -28,6 +28,7 @@ import { ContentConfidenceBanner } from "@/components/wiki/ContentConfidenceBann
 import { TableOfContents } from "@/components/wiki/TableOfContents";
 import { CitationOverlay } from "@/components/wiki/CitationOverlay";
 import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
+import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
@@ -266,41 +267,43 @@ function ContentView({
       {!isInternal && citationQuotes && citationQuotes.length > 0 && (
         <CitationHealthBanner health={computeCitationHealth(citationQuotes)} />
       )}
-      <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
-        {/* PageStatus shown for graded formats or pages with editorial content */}
-        <PageStatus
-          quality={pageData?.quality ?? undefined}
-          importance={pageData?.readerImportance ?? undefined}
-          researchImportance={pageData?.researchImportance ?? undefined}
-          llmSummary={pageData?.llmSummary ?? undefined}
-          structuredSummary={pageData?.structuredSummary ?? undefined}
-          lastEdited={pageData?.lastUpdated ?? undefined}
-          updateFrequency={pageData?.updateFrequency ?? undefined}
-          evergreen={pageData?.evergreen}
-          todo={page.frontmatter.todo}
-          todos={page.frontmatter.todos}
-          wordCount={pageData?.wordCount}
-          backlinkCount={pageData?.backlinkCount}
-          metrics={pageData?.metrics}
-          suggestedQuality={pageData?.suggestedQuality}
-          changeHistory={pageData?.changeHistory}
-          issues={{
-            unconvertedLinkCount: pageData?.unconvertedLinkCount,
-            redundancy: pageData?.redundancy,
-          }}
-          pageType={page.frontmatter.pageType}
-          pathname={entityPath}
-          contentFormat={contentFormat}
-        />
-        {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
-        {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
-        {showToc && <TableOfContents headings={tocHeadings} />}
-        {page.content}
-      </article>
-      {/* Citation verification overlay — decorates footnote refs with status indicators */}
-      {citationQuotes && citationQuotes.length > 0 && (
-        <CitationOverlay quotes={citationQuotes} />
-      )}
+      <CitationQuotesProvider quotes={citationQuotes ?? []}>
+        <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
+          {/* PageStatus shown for graded formats or pages with editorial content */}
+          <PageStatus
+            quality={pageData?.quality ?? undefined}
+            importance={pageData?.readerImportance ?? undefined}
+            researchImportance={pageData?.researchImportance ?? undefined}
+            llmSummary={pageData?.llmSummary ?? undefined}
+            structuredSummary={pageData?.structuredSummary ?? undefined}
+            lastEdited={pageData?.lastUpdated ?? undefined}
+            updateFrequency={pageData?.updateFrequency ?? undefined}
+            evergreen={pageData?.evergreen}
+            todo={page.frontmatter.todo}
+            todos={page.frontmatter.todos}
+            wordCount={pageData?.wordCount}
+            backlinkCount={pageData?.backlinkCount}
+            metrics={pageData?.metrics}
+            suggestedQuality={pageData?.suggestedQuality}
+            changeHistory={pageData?.changeHistory}
+            issues={{
+              unconvertedLinkCount: pageData?.unconvertedLinkCount,
+              redundancy: pageData?.redundancy,
+            }}
+            pageType={page.frontmatter.pageType}
+            pathname={entityPath}
+            contentFormat={contentFormat}
+          />
+          {page.frontmatter.title && <h1>{page.frontmatter.title}</h1>}
+          {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
+          {showToc && <TableOfContents headings={tocHeadings} />}
+          {page.content}
+        </article>
+        {/* Citation verification overlay — decorates footnote refs with status indicators */}
+        {citationQuotes && citationQuotes.length > 0 && (
+          <CitationOverlay quotes={citationQuotes} />
+        )}
+      </CitationQuotesProvider>
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>

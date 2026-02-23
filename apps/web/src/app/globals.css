@@ -425,6 +425,11 @@
   @apply underline opacity-100;
 }
 
+/* Hide GFM auto-generated footnotes when References component is present */
+article.prose:has(section[aria-label="References"]) section[data-footnotes] {
+  display: none;
+}
+
 /* ============================================================================
    CITATION VERIFICATION INDICATORS
    Small colored dots next to footnote refs [^N] showing verification status.
@@ -451,6 +456,20 @@
   font-size: 10px;
   line-height: 1.4;
   vertical-align: middle;
+}
+
+/* ============================================================================
+   REFERENCE LIST — expandable details
+   ============================================================================ */
+
+.ref-summary {
+  list-style: none;
+}
+.ref-summary::-webkit-details-marker {
+  display: none;
+}
+.ref-details[open] > .ref-summary .ref-chevron {
+  transform: rotate(90deg);
 }
 
 /* ============================================================================

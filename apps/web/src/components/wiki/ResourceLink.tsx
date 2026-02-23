@@ -2,24 +2,9 @@ import React from "react";
 import { getResourceById, getResourceCredibility, getResourcePublication } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
+import { getResourceTypeIcon } from "./resource-utils";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
-
-const typeIcons: Record<string, string> = {
-  paper: "\ud83d\udcc4",
-  book: "\ud83d\udcda",
-  blog: "\u270f\ufe0f",
-  report: "\ud83d\udccb",
-  talk: "\ud83c\udf99\ufe0f",
-  podcast: "\ud83c\udfa7",
-  government: "\ud83c\udfdb\ufe0f",
-  reference: "\ud83d\udcd6",
-  web: "\ud83d\udd17",
-};
-
-function getResourceTypeIcon(type: string): string {
-  return typeIcons[type] || "\ud83d\udd17";
-}
 
 function truncateText(text: string | undefined | null, maxLength: number): string {
   if (!text) return "";
@@ -31,6 +16,7 @@ export function ResourceLink({
   id,
   label,
   children,
+  n,
   showType = false,
   showCredibility = false,
   className = "",
@@ -38,6 +24,8 @@ export function ResourceLink({
   id: string;
   label?: string;
   children?: React.ReactNode;
+  /** Citation number — renders a superscript [N] linking to #ref-N in the References section */
+  n?: number;
   showType?: boolean;
   showCredibility?: boolean;
   className?: string;
@@ -74,6 +62,27 @@ export function ResourceLink({
         )}
         <span className="text-xs ml-0.5 opacity-70">{"\u2197"}</span>
       </a>
+      {n != null && n >= 1 && (
+        <a
+          id={`cite-${n}`}
+          href={`#ref-${n}`}
+          className={cn(
+            "text-[10px] no-underline align-super ml-px font-medium",
+            credibility != null && credibility >= 4
+              ? "text-emerald-600 hover:text-emerald-800"
+              : credibility != null && credibility >= 3
+                ? "text-blue-500 hover:text-blue-700"
+                : credibility != null && credibility >= 2
+                  ? "text-amber-600 hover:text-amber-800"
+                  : credibility != null && credibility >= 1
+                    ? "text-red-500 hover:text-red-700"
+                    : "text-muted-foreground hover:text-accent-foreground"
+          )}
+          title={`Reference [${n}]${credibility != null ? ` — credibility: ${credibility}/5` : ""}`}
+        >
+          [{n}]
+        </a>
+      )}
       <span
         className={cn(
           styles.tooltip,
@@ -120,7 +129,7 @@ export function ResourceLink({
         <span className="flex gap-2 mt-2 pointer-events-auto">
           <a
             href={resource.url}
-            className="flex-1 px-2.5 py-1.5 text-xs font-medium text-center no-underline rounded transition-colors bg-accent-foreground text-background hover:bg-accent-foreground/90"
+            className="flex-1 px-2.5 py-1.5 text-xs font-medium text-center no-underline rounded transition-colors bg-muted text-foreground hover:bg-muted/80 border border-border"
             target="_blank"
             rel="noopener noreferrer"
           >

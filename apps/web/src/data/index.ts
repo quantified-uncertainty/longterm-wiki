@@ -285,7 +285,7 @@ interface Entity {
   content?: unknown;
 }
 
-interface Resource {
+export interface Resource {
   id: string;
   url: string;
   title: string;
@@ -413,6 +413,16 @@ export interface Page {
   };
   /** Resolved canonical entity type (e.g. 'person', 'organization', 'risk') */
   entityType?: string;
+  /** Citation health stats from wiki-server (attached at build time) */
+  citationHealth?: {
+    total: number;
+    withQuotes: number;
+    verified: number;
+    accuracyChecked: number;
+    accurate: number;
+    inaccurate: number;
+    avgScore: number | null;
+  };
   /** Computed hallucination risk — used by UI banners and AI agent triage */
   hallucinationRisk?: {
     /** Risk bucket: 'low' | 'medium' | 'high' */
@@ -760,6 +770,11 @@ export function getPageChangeSessions(): PageChangesSession[] {
   return Array.from(sessionMap.values()).sort((a, b) =>
     b.date.localeCompare(a.date)
   );
+}
+
+export function getPageCitationHealth(pageId: string) {
+  const page = getPageById(pageId);
+  return page?.citationHealth ?? null;
 }
 
 export function getResourceCredibility(

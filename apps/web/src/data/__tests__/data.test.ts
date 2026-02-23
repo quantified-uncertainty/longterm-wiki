@@ -183,6 +183,15 @@ const mockDatabase = {
       category: "risks",
       wordCount: 2500,
       backlinkCount: 12,
+      citationHealth: {
+        total: 10,
+        withQuotes: 8,
+        verified: 6,
+        accuracyChecked: 5,
+        accurate: 4,
+        inaccurate: 1,
+        avgScore: 0.85,
+      },
     },
     {
       id: "table-entity",
@@ -491,6 +500,30 @@ describe("Data Layer", () => {
       expect(data?.title).toBe("Dr. Test");
       expect(data?.affiliation).toBe("Test Org");
       expect(data?.role).toBe("Researcher");
+    });
+  });
+
+  describe("getPageCitationHealth", () => {
+    it("returns citation health for page with data", async () => {
+      const { getPageCitationHealth } = await import("../../data/index");
+      const health = getPageCitationHealth("test-entity");
+      expect(health).toBeDefined();
+      expect(health?.total).toBe(10);
+      expect(health?.accurate).toBe(4);
+      expect(health?.inaccurate).toBe(1);
+      expect(health?.avgScore).toBe(0.85);
+    });
+
+    it("returns null for page without citation health", async () => {
+      const { getPageCitationHealth } = await import("../../data/index");
+      const health = getPageCitationHealth("table-entity");
+      expect(health).toBeNull();
+    });
+
+    it("returns null for nonexistent page", async () => {
+      const { getPageCitationHealth } = await import("../../data/index");
+      const health = getPageCitationHealth("nonexistent");
+      expect(health).toBeNull();
     });
   });
 });
