@@ -534,7 +534,151 @@ jobs:
           fi
 
 # ─────────────────────────────────────────
-# Job 6 — Aggregate & report
+# Job 6 — PR & issue quality review
+# ─────────────────────────────────────────
+
+  pr-issue-review:
+    name: PR & issue quality review
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      issues: read
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      summary: ${{ steps.check.outputs.summary }}
+      detail: ${{ steps.check.outputs.detail }}
+
+    steps:
+      - name: Review recent PRs and issues for quality problems
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FAILURES=""
+          RESULTS=""
+
+          NOW_EPOCH=$(date -u +%s)
+
+          # ── Pull request quality checks ─────────────────────────────────────
+
+          # Fetch recent PRs (created in last 48 hours)
+          RECENT_PRS=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --state all \
+            --limit 30 \
+            --json number,title,body,createdAt,author,mergeable,labels,url \
+            2>/dev/null || echo "[]")
+
+          PR_COUNT=$(echo "$RECENT_PRS" | jq 'length')
+          RESULTS="$RESULTS\n| PRs fetched | INFO | $PR_COUNT recent PRs reviewed |"
+
+          # Check for PRs with empty/missing body (created in last 48h)
+          EMPTY_BODY_PRS=$(echo "$RECENT_PRS" | jq -r '
+            .[] |
+            select(
+              (.body == null or (.body | ltrimstr(" ") | ltrimstr("\n") | length) < 20)
+            ) |
+            "#\(.number) \(.title[:50])"
+          ' 2>/dev/null || echo "")
+
+          if [ -n "$EMPTY_BODY_PRS" ]; then
+            COUNT=$(echo "$EMPTY_BODY_PRS" | grep -c "^" 2>/dev/null || echo "0")
+            FAILURES="$FAILURES\n- $COUNT PR(s) missing descriptions"
+            while IFS= read -r pr; do
+              RESULTS="$RESULTS\n| PR missing description | WARN | $pr |"
+            done <<< "$EMPTY_BODY_PRS"
+          else
+            RESULTS="$RESULTS\n| PR descriptions | PASS | All recent PRs have descriptions |"
+          fi
+
+          # Check for PRs open more than 7 days with no activity
+          STALE_PRS=$(echo "$RECENT_PRS" | jq -r --argjson now "$NOW_EPOCH" '
+            .[] |
+            select(.state? == "open") |
+            select(
+              ($now - ((.createdAt // "1970-01-01T00:00:00Z") | fromdateiso8601)) > 604800
+            ) |
+            "#\(.number) \(.title[:50])"
+          ' 2>/dev/null || echo "")
+
+          # Fetch additional open PRs to check for stale ones
+          OPEN_PRS=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --state open \
+            --limit 20 \
+            --json number,title,createdAt,updatedAt,url \
+            2>/dev/null || echo "[]")
+
+          STALE_OPEN=$(echo "$OPEN_PRS" | jq -r --argjson now "$NOW_EPOCH" '
+            .[] |
+            select(
+              ($now - ((.updatedAt // .createdAt // "1970-01-01T00:00:00Z") | fromdateiso8601)) > 604800
+            ) |
+            "#\(.number) \(.title[:50]) (stale)"
+          ' 2>/dev/null || echo "")
+
+          if [ -n "$STALE_OPEN" ]; then
+            COUNT=$(echo "$STALE_OPEN" | grep -c "^" 2>/dev/null || echo "0")
+            RESULTS="$RESULTS\n| Stale open PRs | WARN | $COUNT PR(s) with no activity for 7+ days |"
+          else
+            RESULTS="$RESULTS\n| Stale open PRs | PASS | No stale open PRs |"
+          fi
+
+          # ── Issue quality checks ────────────────────────────────────────────
+
+          # Check for claude-working label issues older than 8 hours (stuck sessions)
+          STUCK_ISSUES=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --label "claude-working" \
+            --state open \
+            --limit 20 \
+            --json number,title,createdAt,updatedAt \
+            2>/dev/null || echo "[]")
+
+          STUCK=$(echo "$STUCK_ISSUES" | jq -r --argjson now "$NOW_EPOCH" '
+            .[] |
+            select(
+              ($now - ((.updatedAt // .createdAt) | fromdateiso8601)) > 28800
+            ) |
+            "#\(.number) \(.title[:50])"
+          ' 2>/dev/null || echo "")
+
+          if [ -n "$STUCK" ]; then
+            COUNT=$(echo "$STUCK" | grep -c "^" 2>/dev/null || echo "0")
+            FAILURES="$FAILURES\n- $COUNT issue(s) stuck with claude-working label for 8+ hours"
+            while IFS= read -r issue; do
+              RESULTS="$RESULTS\n| Stuck claude-working | WARN | $issue |"
+            done <<< "$STUCK"
+          else
+            RESULTS="$RESULTS\n| claude-working labels | PASS | No stuck sessions |"
+          fi
+
+          # Count open issues labeled "bug"
+          BUG_COUNT=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --label "bug" \
+            --state open \
+            --limit 1 \
+            --json number \
+            2>/dev/null | jq 'length' || echo "?")
+          RESULTS="$RESULTS\n| Open bugs | INFO | $BUG_COUNT open bug(s) |"
+
+          DETAIL=$(printf "| Check | Status | Details |\n|-------|--------|---------|%b" "$RESULTS")
+
+          echo "detail<<__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+          echo "$DETAIL" >> "$GITHUB_OUTPUT"
+          echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILURES" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=PR/issue quality issues found" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=PR and issue quality looks good" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────
+# Job 7 — Aggregate & report
 # ─────────────────────────────────────────
 
   report:
@@ -545,6 +689,7 @@ jobs:
       - github-actions-health
       - frontend-health
       - data-freshness
+      - pr-issue-review
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -569,13 +714,16 @@ jobs:
           FRESHNESS_OK: ${{ needs.data-freshness.outputs.ok }}
           FRESHNESS_SUMMARY: ${{ needs.data-freshness.outputs.summary }}
           FRESHNESS_DETAIL: ${{ needs.data-freshness.outputs.detail }}
+          PR_REVIEW_OK: ${{ needs.pr-issue-review.outputs.ok }}
+          PR_REVIEW_SUMMARY: ${{ needs.pr-issue-review.outputs.summary }}
+          PR_REVIEW_DETAIL: ${{ needs.pr-issue-review.outputs.detail }}
         run: |
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
           icon() { [ "$1" = "true" ] && echo ":green_circle:" || echo ":red_circle:"; }
 
           OVERALL_OK=true
-          for OK in "$SERVER_OK" "$API_OK" "$GHA_OK" "$FRONTEND_OK" "$FRESHNESS_OK"; do
+          for OK in "$SERVER_OK" "$API_OK" "$GHA_OK" "$FRONTEND_OK" "$FRESHNESS_OK" "$PR_REVIEW_OK"; do
             [ "$OK" = "false" ] && OVERALL_OK=false
           done
 
@@ -590,6 +738,7 @@ jobs:
             echo "| GitHub Actions | $(icon "$GHA_OK") | $GHA_SUMMARY |"
             echo "| Frontend | $(icon "$FRONTEND_OK") | $FRONTEND_SUMMARY |"
             echo "| Data freshness | $(icon "$FRESHNESS_OK") | $FRESHNESS_SUMMARY |"
+            echo "| PR & issue quality | $(icon "$PR_REVIEW_OK") | $PR_REVIEW_SUMMARY |"
             echo ""
             if [ "$OVERALL_OK" = "true" ]; then
               echo ":white_check_mark: **All checks passed.**"
@@ -626,6 +775,12 @@ jobs:
             echo "$FRESHNESS_DETAIL"
             echo ""
             echo "</details>"
+            echo ""
+            echo "<details><summary>PR & issue quality details</summary>"
+            echo ""
+            echo "$PR_REVIEW_DETAIL"
+            echo ""
+            echo "</details>"
           } >> "$GITHUB_STEP_SUMMARY"
 
           # Build issue body for failure case
@@ -639,6 +794,7 @@ jobs:
           | GitHub Actions | __GHA_ICON__ | __GHA_SUMMARY__ |
           | Frontend | __FRONTEND_ICON__ | __FRONTEND_SUMMARY__ |
           | Data freshness | __FRESHNESS_ICON__ | __FRESHNESS_SUMMARY__ |
+          | PR & issue quality | __PR_REVIEW_ICON__ | __PR_REVIEW_SUMMARY__ |
 
           **Detected at:** __TIMESTAMP__
 
@@ -661,6 +817,10 @@ jobs:
           ### Data freshness
 
           __FRESHNESS_DETAIL__
+
+          ### PR & issue quality
+
+          __PR_REVIEW_DETAIL__
 
           ---
           *Created by the [wellness check workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/wellness-check.yml). Closes automatically when all checks pass.*
@@ -695,6 +855,9 @@ jobs:
               '__FRESHNESS_ICON__': icon(os.environ.get('FRESHNESS_OK', 'false')),
               '__FRESHNESS_SUMMARY__': os.environ.get('FRESHNESS_SUMMARY', ''),
               '__FRESHNESS_DETAIL__': os.environ.get('FRESHNESS_DETAIL', ''),
+              '__PR_REVIEW_ICON__': icon(os.environ.get('PR_REVIEW_OK', 'false')),
+              '__PR_REVIEW_SUMMARY__': os.environ.get('PR_REVIEW_SUMMARY', ''),
+              '__PR_REVIEW_DETAIL__': os.environ.get('PR_REVIEW_DETAIL', ''),
           }
 
           for key, val in subs.items():
