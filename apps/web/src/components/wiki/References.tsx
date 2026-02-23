@@ -19,7 +19,6 @@ const TYPE_LABELS: Record<string, string> = {
   podcast: "Podcast",
   government: "Government",
   reference: "Reference",
-  web: "Web",
 };
 
 interface ReferencesProps {
@@ -84,79 +83,131 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
   const { resource, index, credibility, publicationName, peerReviewed } = entry;
   const year = resource.published_date?.slice(0, 4);
   const authorStr = resource.authors ? formatAuthors(resource.authors) : null;
-  const typeLabel = TYPE_LABELS[resource.type] || resource.type;
+  const typeLabel = TYPE_LABELS[resource.type]; // undefined for "web" and other unlisted types
+
+  const hasExpandableContent =
+    resource.summary ||
+    (resource.tags && resource.tags.length > 0);
+
+  // Metadata fragments: type · author · year · publication
+  const metaParts: React.ReactNode[] = [];
+  if (typeLabel) {
+    metaParts.push(
+      <span key="type" className="text-muted-foreground/50">{typeLabel}</span>
+    );
+  }
+  if (authorStr) {
+    metaParts.push(<span key="author">{authorStr}</span>);
+  }
+  if (year) {
+    metaParts.push(<span key="year">{year}</span>);
+  }
+  if (publicationName) {
+    metaParts.push(
+      <span key="pub" className="italic">
+        {publicationName}
+        {peerReviewed && " (peer-reviewed)"}
+      </span>
+    );
+  }
+
+  const metaLine = metaParts.length > 0 ? (
+    <span className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground mt-0.5">
+      {metaParts.map((part, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && <span className="text-muted-foreground/30">·</span>}
+          {part}
+        </React.Fragment>
+      ))}
+    </span>
+  ) : null;
+
+  const titleLink = (
+    <a
+      href={resource.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-sm font-medium text-accent-foreground no-underline hover:underline leading-snug"
+    >
+      {resource.title}
+    </a>
+  );
+
+  const compactContent = (
+    <div className="flex items-start gap-2">
+      <a
+        href={`#cite-${index}`}
+        className="shrink-0 text-xs font-mono text-muted-foreground/60 no-underline hover:text-foreground mt-0.5 w-5 text-right"
+        title="Jump to citation in text"
+      >
+        {index}
+      </a>
+      <div className="flex-1 min-w-0">
+        {titleLink}
+        {metaLine}
+      </div>
+      {credibility != null && (
+        <span className="shrink-0 mt-0.5">
+          <CredibilityBadge level={credibility} size="sm" />
+        </span>
+      )}
+    </div>
+  );
+
+  if (!hasExpandableContent) {
+    return (
+      <li
+        id={`ref-${index}`}
+        className="py-2 border-b border-border/30 last:border-b-0"
+      >
+        {compactContent}
+      </li>
+    );
+  }
 
   return (
     <li
       id={`ref-${index}`}
-      className="py-2.5 border-b border-border/30 last:border-b-0"
+      className="py-2 border-b border-border/30 last:border-b-0"
     >
-      <div className="flex items-start gap-2">
-        <a
-          href={`#cite-${index}`}
-          className="shrink-0 text-xs font-mono text-muted-foreground/60 no-underline hover:text-foreground mt-0.5 w-5 text-right"
-          title="Jump to citation in text"
-        >
-          {index}
-        </a>
-
-        <div className="flex-1 min-w-0">
-          {/* Title line */}
-          <a
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium text-accent-foreground no-underline hover:underline leading-snug"
-          >
-            {resource.title}
-          </a>
-
-          {/* Metadata line: type, authors, year, publication */}
-          <div className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground mt-0.5">
-            <span className="text-muted-foreground/50">{typeLabel}</span>
-            {authorStr && (
-              <>
-                <span className="text-muted-foreground/30">·</span>
-                <span>{authorStr}</span>
-              </>
+      <details className="ref-details group">
+        <summary className="ref-summary cursor-pointer">
+          <div className="flex items-start gap-2">
+            <a
+              href={`#cite-${index}`}
+              className="shrink-0 text-xs font-mono text-muted-foreground/60 no-underline hover:text-foreground mt-0.5 w-5 text-right"
+              title="Jump to citation in text"
+            >
+              {index}
+            </a>
+            <div className="flex-1 min-w-0">
+              {titleLink}
+              {metaLine}
+            </div>
+            {credibility != null && (
+              <span className="shrink-0 mt-0.5">
+                <CredibilityBadge level={credibility} size="sm" />
+              </span>
             )}
-            {year && (
-              <>
-                <span className="text-muted-foreground/30">·</span>
-                <span>{year}</span>
-              </>
-            )}
-            {publicationName && (
-              <>
-                <span className="text-muted-foreground/30">·</span>
-                <span className="italic">
-                  {publicationName}
-                  {peerReviewed && " (peer-reviewed)"}
-                </span>
-              </>
-            )}
+            <span className="ref-chevron shrink-0 text-muted-foreground/50 text-[11px] mt-1 transition-transform duration-150">
+              ▸
+            </span>
           </div>
+        </summary>
 
-          {/* Summary */}
+        <div className="pl-7 mt-1.5 pb-0.5">
           {resource.summary && (
-            <p className="text-xs text-muted-foreground/70 mt-1 leading-snug m-0">
+            <p className="text-xs text-muted-foreground/70 leading-snug m-0">
               {resource.summary}
             </p>
           )}
-
-          {/* Badges: credibility + tags */}
-          {(credibility != null || (resource.tags && resource.tags.length > 0)) && (
-            <div className="flex items-center gap-1.5 mt-1.5">
-              {credibility != null && (
-                <CredibilityBadge level={credibility} size="sm" />
-              )}
-              {resource.tags && resource.tags.length > 0 && (
-                <ResourceTags tags={resource.tags} limit={3} size="sm" />
-              )}
-            </div>
+          {resource.tags && resource.tags.length > 0 && (
+            <span className="mt-1.5 block">
+              <ResourceTags tags={resource.tags} limit={4} size="sm" />
+            </span>
           )}
         </div>
-      </div>
+      </details>
     </li>
   );
 }
@@ -193,6 +244,9 @@ function CitationHealthFooter({ pageId }: { pageId: string }) {
  *
  * Each entry becomes an anchor target (#ref-1, #ref-2, etc.)
  * so that <R n={1}> can link to the reference list.
+ *
+ * Entries are compact by default. Those with extra data (summary, tags)
+ * have a ▸ chevron that expands to show details.
  */
 export function References({
   ids = [],

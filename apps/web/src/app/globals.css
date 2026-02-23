@@ -454,6 +454,20 @@
 }
 
 /* ============================================================================
+   REFERENCE LIST — expandable details
+   ============================================================================ */
+
+.ref-summary {
+  list-style: none;
+}
+.ref-summary::-webkit-details-marker {
+  display: none;
+}
+.ref-details[open] > .ref-summary .ref-chevron {
+  transform: rotate(90deg);
+}
+
+/* ============================================================================
    INFOBOX LAYOUT
    Float-based fallback for browsers without :has() support.
    The .wiki-infobox has float:right set in component styles, which serves
