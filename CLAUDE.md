@@ -55,6 +55,7 @@ pnpm crux agent-checklist init --issue=N          # Auto-detect type from issue 
 pnpm crux agent-checklist check <id> [id2...]     # Check off items by ID
 pnpm crux agent-checklist check --na <id>         # Mark items as N/A
 pnpm crux agent-checklist verify                  # Auto-verify items with verifyCommand
+pnpm crux agent-checklist pre-push-check          # Auto-verify + warn if < 25% complete (called by pre-push hook)
 pnpm crux agent-checklist status                  # Show checklist progress
 pnpm crux agent-checklist complete                # Validate all items checked
 pnpm crux agent-checklist snapshot                # Output checks: YAML block for session log
