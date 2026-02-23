@@ -16,6 +16,18 @@ pnpm crux agent-checklist init "Task description" --type=X   # if not on an issu
 
 **"Before writing code" is not good enough** — quick fixes, research, and file reads all count. If you skip this and dive straight in, you will forget it entirely. Run it first, then proceed.
 
+### Worktree setup (one-time per worktree)
+
+If running in a git worktree (check: `git worktree list`), symlink the env file and node_modules to avoid missing credentials and missing packages:
+
+```bash
+# From the worktree root:
+ln -sf ../../../.env .env                                                 # env vars (GITHUB_TOKEN etc.)
+ln -sf /Users/ozziegooen/Documents/GitHub.nosync/longterm-wiki/apps/web/node_modules apps/web/node_modules  # app packages
+```
+
+Without these, `crux` won't have `GITHUB_TOKEN` and the gate check will fail with `Cannot find package 'minisearch'`.
+
 See `## Agent Session Workflow — MANDATORY` below and `.claude/rules/agent-session-workflow.md` for full details.
 
 ## Quick Reference
