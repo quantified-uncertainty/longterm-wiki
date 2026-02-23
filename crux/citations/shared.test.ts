@@ -4,7 +4,7 @@ import type { Colors } from '../lib/output.ts';
 
 const noopColors: Colors = {
   red: '', green: '', yellow: '', blue: '', dim: '',
-  bold: '', reset: '', cyan: '',
+  bold: '', reset: '', cyan: '', magenta: '',
 };
 
 describe('logBatchProgress', () => {

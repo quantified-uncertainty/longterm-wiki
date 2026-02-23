@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { Issue, Severity, FixType, createRule } from '../validation-engine.ts';
+import { Issue, Severity, FixType, createRule, type Rule } from '../validation-engine.ts';
 import { dollarSignsRule } from './dollar-signs.ts';
 import { comparisonOperatorsRule } from './comparison-operators.ts';
 import { tildeDollarRule } from './tilde-dollar.ts';
@@ -24,9 +24,11 @@ import { matchLinesOutsideCode } from '../mdx-utils.ts';
 import { shouldSkipValidation } from '../mdx-utils.ts';
 
 /**
- * Create a mock content file for testing rules
+ * Create a mock content file for testing rules.
+ * Returns `any` so it can be passed directly to rule.check() without casting.
  */
-function mockContent(body: string, opts: Record<string, unknown> = {}): Record<string, unknown> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mockContent(body: string, opts: Record<string, unknown> = {}): any {
   const frontmatter = opts.frontmatter || { title: 'Test Page' };
   const raw = opts.raw || `---\ntitle: Test Page\n---\n${body}`;
   return {
@@ -39,10 +41,22 @@ function mockContent(body: string, opts: Record<string, unknown> = {}): Record<s
   };
 }
 
+/**
+ * Synchronous wrapper for rule.check() — all rules tested here return Issue[]
+ * synchronously; this helper narrows the union type for TypeScript.
+ */
+function check(rule: Rule, content: any, engine: any = {}): Issue[] {
+  const result = rule.check(content, engine);
+  if (result instanceof Promise) {
+    throw new Error(`Rule "${rule.id}" returned a Promise — use async test instead`);
+  }
+  return result;
+}
+
 describe('dollar-signs rule', () => {
   it('detects unescaped $ before numbers', () => {
     const content = mockContent('The cost is $100 per unit.');
-    const issues = dollarSignsRule.check(content, {});
+    const issues = check(dollarSignsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message.includes('Unescaped dollar sign')).toBe(true);
     expect(issues[0].severity).toBe(Severity.ERROR);
@@ -50,26 +64,26 @@ describe('dollar-signs rule', () => {
 
   it('allows escaped \\$ before numbers', () => {
     const content = mockContent('The cost is \\$100 per unit.');
-    const issues = dollarSignsRule.check(content, {});
+    const issues = check(dollarSignsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('detects double-escaped \\\\$ in body', () => {
     const content = mockContent('The cost is \\\\$100.');
-    const issues = dollarSignsRule.check(content, {});
+    const issues = check(dollarSignsRule, content);
     // Should detect double-escaped (the regex is /\\\\\$/g which matches literal \\$)
     expect(issues.some((i: any) => i.message.includes('Double-escaped'))).toBe(true);
   });
 
   it('skips $ in code blocks', () => {
     const content = mockContent('```\n$100\n```');
-    const issues = dollarSignsRule.check(content, {});
+    const issues = check(dollarSignsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('detects multiple $ on same line', () => {
     const content = mockContent('Between $5 and $10.');
-    const issues = dollarSignsRule.check(content, {});
+    const issues = check(dollarSignsRule, content);
     expect(issues.length).toBe(2);
   });
 });
@@ -77,7 +91,7 @@ describe('dollar-signs rule', () => {
 describe('comparison-operators rule', () => {
   it('detects unescaped < before numbers', () => {
     const content = mockContent('Response time <10ms is ideal.');
-    const issues = comparisonOperatorsRule.check(content, {});
+    const issues = check(comparisonOperatorsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message.includes('Unescaped')).toBe(true);
     expect(issues[0].severity).toBe(Severity.ERROR);
@@ -85,19 +99,19 @@ describe('comparison-operators rule', () => {
 
   it('allows already-escaped &lt;', () => {
     const content = mockContent('Response time &lt;10ms is ideal.');
-    const issues = comparisonOperatorsRule.check(content, {});
+    const issues = check(comparisonOperatorsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('skips < in code blocks', () => {
     const content = mockContent('```\nif (x < 10) {}\n```');
-    const issues = comparisonOperatorsRule.check(content, {});
+    const issues = check(comparisonOperatorsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('does not flag valid HTML/JSX tags', () => {
     const content = mockContent('<div>hello</div>');
-    const issues = comparisonOperatorsRule.check(content, {});
+    const issues = check(comparisonOperatorsRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -105,7 +119,7 @@ describe('comparison-operators rule', () => {
 describe('tilde-dollar rule', () => {
   it('detects ~\\$ pattern', () => {
     const content = mockContent('approximately ~\\$29M in funding.');
-    const issues = tildeDollarRule.check(content, {});
+    const issues = check(tildeDollarRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues[0].message.includes('Tilde before escaped dollar')).toBe(true);
     expect(issues[0].severity).toBe(Severity.ERROR);
@@ -113,7 +127,7 @@ describe('tilde-dollar rule', () => {
 
   it('allows ≈\\$ pattern', () => {
     const content = mockContent('approximately ≈\\$29M in funding.');
-    const issues = tildeDollarRule.check(content, {});
+    const issues = check(tildeDollarRule, content);
     // Should not flag the ≈ version
     const tildeDollarIssues = issues.filter((i: any) => i.message.includes('Tilde before escaped'));
     expect(tildeDollarIssues.length).toBe(0);
@@ -121,14 +135,14 @@ describe('tilde-dollar rule', () => {
 
   it('detects tilde before number in table cell', () => {
     const content = mockContent('| Name | Value |\n|---|---|\n| Test | ~86% |');
-    const issues = tildeDollarRule.check(content, {});
+    const issues = check(tildeDollarRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues.some((i: any) => i.message.includes('Tilde in table cell'))).toBe(true);
   });
 
   it('detects \\≈ escaped approximation symbol', () => {
     const content = mockContent('raises \\≈\\$5M in funding.');
-    const issues = tildeDollarRule.check(content, {});
+    const issues = check(tildeDollarRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues.some((i: any) => i.message.includes('Escaped approximation symbol'))).toBe(true);
     expect(issues.find((i: any) => i.message.includes('Escaped approximation symbol'))?.severity).toBe(Severity.ERROR);
@@ -136,7 +150,7 @@ describe('tilde-dollar rule', () => {
 
   it('allows unescaped ≈ symbol', () => {
     const content = mockContent('raises ≈\\$5M in funding.');
-    const issues = tildeDollarRule.check(content, {});
+    const issues = check(tildeDollarRule, content);
     const escapedApproxIssues = issues.filter((i: any) => i.message.includes('Escaped approximation symbol'));
     expect(escapedApproxIssues.length).toBe(0);
   });
@@ -145,27 +159,27 @@ describe('tilde-dollar rule', () => {
 describe('fake-urls rule', () => {
   it('detects example.com URLs', () => {
     const content = mockContent('[link](https://example.com/page)');
-    const issues = fakeUrlsRule.check(content, {});
+    const issues = check(fakeUrlsRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues[0].message.includes('example.com')).toBe(true);
   });
 
   it('detects localhost URLs', () => {
     const content = mockContent('[local](http://localhost:3000/test)');
-    const issues = fakeUrlsRule.check(content, {});
+    const issues = check(fakeUrlsRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues[0].message.includes('localhost')).toBe(true);
   });
 
   it('detects placeholder domains', () => {
     const content = mockContent('[test](https://placeholder.com/stuff)');
-    const issues = fakeUrlsRule.check(content, {});
+    const issues = check(fakeUrlsRule, content);
     expect(issues.length >= 1).toBe(true);
   });
 
   it('does not flag real URLs', () => {
     const content = mockContent('[real](https://arxiv.org/abs/2301.01234)');
-    const issues = fakeUrlsRule.check(content, {});
+    const issues = check(fakeUrlsRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -173,7 +187,7 @@ describe('fake-urls rule', () => {
     const content = mockContent('[link](https://example.com)', {
       frontmatter: { title: 'Docs', pageType: 'documentation' },
     });
-    const issues = fakeUrlsRule.check(content, {});
+    const issues = check(fakeUrlsRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -181,7 +195,7 @@ describe('fake-urls rule', () => {
     const content = mockContent('[link](https://example.com)', {
       frontmatter: { title: 'Stub', pageType: 'stub' },
     });
-    const issues = fakeUrlsRule.check(content, {});
+    const issues = check(fakeUrlsRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -189,7 +203,7 @@ describe('fake-urls rule', () => {
     const content = mockContent('[link](https://example.com)', {
       relativePath: '/internal/guide.mdx',
     });
-    const issues = fakeUrlsRule.check(content, {});
+    const issues = check(fakeUrlsRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -197,27 +211,27 @@ describe('fake-urls rule', () => {
 describe('placeholders rule', () => {
   it('detects TODO markers', () => {
     const content = mockContent('This section needs TODO: fill in details.');
-    const issues = placeholdersRule.check(content, {});
+    const issues = check(placeholdersRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues.some((i: any) => i.message.includes('TODO'))).toBe(true);
   });
 
   it('detects Lorem ipsum', () => {
     const content = mockContent('Lorem ipsum dolor sit amet.');
-    const issues = placeholdersRule.check(content, {});
+    const issues = check(placeholdersRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues[0].severity).toBe(Severity.ERROR);
   });
 
   it('detects bracketed placeholders', () => {
     const content = mockContent('The value is [TBD] and [Value] here.');
-    const issues = placeholdersRule.check(content, {});
+    const issues = check(placeholdersRule, content);
     expect(issues.length >= 1).toBe(true);
   });
 
   it('skips placeholders in code blocks', () => {
     const content = mockContent('```\nTODO: implement this\n```');
-    const issues = placeholdersRule.check(content, {});
+    const issues = check(placeholdersRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -225,7 +239,7 @@ describe('placeholders rule', () => {
     const content = mockContent('TODO: fill in later', {
       frontmatter: { title: 'Stub', pageType: 'stub' },
     });
-    const issues = placeholdersRule.check(content, {});
+    const issues = check(placeholdersRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -233,20 +247,20 @@ describe('placeholders rule', () => {
 describe('consecutive-bold-labels rule', () => {
   it('detects consecutive bold labels without blank lines', () => {
     const content = mockContent('**Concern**: Academic publishing too slow\n**Response**: Rigorous evaluation helps');
-    const issues = consecutiveBoldLabelsRule.check(content, {});
+    const issues = check(consecutiveBoldLabelsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message.includes('Consecutive bold label')).toBe(true);
   });
 
   it('allows bold labels with blank lines between', () => {
     const content = mockContent('**Concern**: Academic publishing too slow\n\n**Response**: Rigorous evaluation helps');
-    const issues = consecutiveBoldLabelsRule.check(content, {});
+    const issues = check(consecutiveBoldLabelsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('skips bold labels in code blocks', () => {
     const content = mockContent('```\n**Concern**: text\n**Response**: text\n```');
-    const issues = consecutiveBoldLabelsRule.check(content, {});
+    const issues = check(consecutiveBoldLabelsRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -254,20 +268,20 @@ describe('consecutive-bold-labels rule', () => {
 describe('temporal-artifacts rule', () => {
   it('detects "as of the research" phrasing', () => {
     const content = mockContent('As of the research data through late 2024, this remains true.');
-    const issues = temporalArtifactsRule.check(content, {});
+    const issues = check(temporalArtifactsRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues[0].message.includes('Temporal artifact')).toBe(true);
   });
 
   it('detects "no information found in sources" pattern', () => {
     const content = mockContent('No information is available in the available sources.');
-    const issues = temporalArtifactsRule.check(content, {});
+    const issues = check(temporalArtifactsRule, content);
     expect(issues.length >= 1).toBe(true);
   });
 
   it('does not flag normal date references', () => {
     const content = mockContent('OpenAI was founded in 2015.');
-    const issues = temporalArtifactsRule.check(content, {});
+    const issues = check(temporalArtifactsRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -277,7 +291,7 @@ describe('vague-citations rule', () => {
     const content = mockContent(
       '| Claim | Date | Source |\n|---|---|---|\n| Some claim | 2024 | Interview |'
     );
-    const issues = vagueCitationsRule.check(content, {});
+    const issues = check(vagueCitationsRule, content);
     expect(issues.length >= 1).toBe(true);
     expect(issues[0].message.includes('Vague citation')).toBe(true);
   });
@@ -286,7 +300,7 @@ describe('vague-citations rule', () => {
     const content = mockContent(
       '| Claim | Date | Source |\n|---|---|---|\n| Some claim | 2024 | Joe Rogan Experience #123 |'
     );
-    const issues = vagueCitationsRule.check(content, {});
+    const issues = check(vagueCitationsRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -295,7 +309,7 @@ describe('vague-citations rule', () => {
       '| Name | Type | Source |\n|---|---|---|\n| Interview Guide | Document | [Link](https://example.com) |'
     );
     // "Interview Guide" is in the Name column, not Source - should not be flagged as vague
-    const vagueIssues = content.body ? vagueCitationsRule.check(content, {}) : [];
+    const vagueIssues = content.body ? check(vagueCitationsRule, content) : [];
     // Filter to only vague-citations issues (not other rules)
     const vagueCitationIssues = vagueIssues.filter((i: any) => i.rule === 'vague-citations');
     expect(vagueCitationIssues.length).toBe(0);
@@ -371,7 +385,7 @@ describe('shouldSkipValidation utility', () => {
 describe('component-props rule', () => {
   it('detects KeyPeople with children content', () => {
     const content = mockContent('<KeyPeople>\n- Person A\n- Person B\n</KeyPeople>');
-    const issues = componentPropsRule.check(content, {});
+    const issues = check(componentPropsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('KeyPeople');
     expect(issues[0].message).toContain('people');
@@ -380,13 +394,13 @@ describe('component-props rule', () => {
 
   it('allows KeyPeople with people prop', () => {
     const content = mockContent('<KeyPeople people={[{ name: "Alice", role: "CEO" }]} />');
-    const issues = componentPropsRule.check(content, {});
+    const issues = check(componentPropsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('detects KeyQuestions with children content', () => {
     const content = mockContent('<KeyQuestions>\n- Question 1?\n</KeyQuestions>');
-    const issues = componentPropsRule.check(content, {});
+    const issues = check(componentPropsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('KeyQuestions');
     expect(issues[0].message).toContain('questions');
@@ -394,13 +408,13 @@ describe('component-props rule', () => {
 
   it('allows KeyQuestions with questions prop', () => {
     const content = mockContent('<KeyQuestions questions={["Q1?", "Q2?"]} />');
-    const issues = componentPropsRule.check(content, {});
+    const issues = check(componentPropsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('returns no issues for content without prop-required components', () => {
     const content = mockContent('Just some regular content here.');
-    const issues = componentPropsRule.check(content, {});
+    const issues = check(componentPropsRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -412,7 +426,7 @@ describe('component-props rule', () => {
 describe('citation-urls rule', () => {
   it('detects undefined URLs in footnotes', () => {
     const content = mockContent('[^1]: [Some Paper](undefined)');
-    const issues = citationUrlsRule.check(content, {});
+    const issues = check(citationUrlsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('undefined');
     expect(issues[0].severity).toBe(Severity.ERROR);
@@ -420,7 +434,7 @@ describe('citation-urls rule', () => {
 
   it('detects empty URLs in footnotes', () => {
     const content = mockContent('[^2]: [Some Paper]()');
-    const issues = citationUrlsRule.check(content, {});
+    const issues = check(citationUrlsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('empty');
     expect(issues[0].severity).toBe(Severity.ERROR);
@@ -428,7 +442,7 @@ describe('citation-urls rule', () => {
 
   it('detects placeholder URLs in footnotes', () => {
     const content = mockContent('[^3]: [Title](https://example.com)');
-    const issues = citationUrlsRule.check(content, {});
+    const issues = check(citationUrlsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('placeholder');
     expect(issues[0].severity).toBe(Severity.WARNING);
@@ -436,19 +450,19 @@ describe('citation-urls rule', () => {
 
   it('allows valid footnote URLs', () => {
     const content = mockContent('[^1]: [Real Paper](https://arxiv.org/abs/2301.01234)');
-    const issues = citationUrlsRule.check(content, {});
+    const issues = check(citationUrlsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('detects multiple bad footnotes', () => {
     const content = mockContent('[^1]: [A](undefined)\n[^2]: [B]()');
-    const issues = citationUrlsRule.check(content, {});
+    const issues = check(citationUrlsRule, content);
     expect(issues.length).toBe(2);
   });
 
   it('returns no issues for content without footnotes', () => {
     const content = mockContent('Regular content with [a link](https://real.com).');
-    const issues = citationUrlsRule.check(content, {});
+    const issues = check(citationUrlsRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -461,7 +475,7 @@ describe('component-imports rule', () => {
   it('detects missing imports for used wiki components', () => {
     const raw = `---\ntitle: Test\n---\n<EntityLink id="test">Test</EntityLink>`;
     const content = mockContent('<EntityLink id="test">Test</EntityLink>', { raw });
-    const issues = componentImportsRule.check(content, {});
+    const issues = check(componentImportsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('EntityLink');
     expect(issues[0].severity).toBe(Severity.ERROR);
@@ -470,14 +484,14 @@ describe('component-imports rule', () => {
   it('allows properly imported components', () => {
     const raw = `---\ntitle: Test\n---\nimport { EntityLink } from '@components/wiki';\n\n<EntityLink id="test">Test</EntityLink>`;
     const content = mockContent('<EntityLink id="test">Test</EntityLink>', { raw });
-    const issues = componentImportsRule.check(content, {});
+    const issues = check(componentImportsRule, content);
     expect(issues.length).toBe(0);
   });
 
   it('skips unknown (non-wiki) components', () => {
     const raw = `---\ntitle: Test\n---\n<CustomComponent />`;
     const content = mockContent('<CustomComponent />', { raw });
-    const issues = componentImportsRule.check(content, {});
+    const issues = check(componentImportsRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -485,7 +499,7 @@ describe('component-imports rule', () => {
     const body = '```\n<EntityLink id="test">Test</EntityLink>\n```';
     const raw = `---\ntitle: Test\n---\n${body}`;
     const content = mockContent(body, { raw });
-    const issues = componentImportsRule.check(content, {});
+    const issues = check(componentImportsRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -493,7 +507,7 @@ describe('component-imports rule', () => {
     const body = '<EntityLink id="test">Test</EntityLink>\n<Mermaid chart={`graph TD`} />';
     const raw = `---\ntitle: Test\n---\n${body}`;
     const content = mockContent(body, { raw });
-    const issues = componentImportsRule.check(content, {});
+    const issues = check(componentImportsRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('EntityLink');
     expect(issues[0].message).toContain('Mermaid');
@@ -501,7 +515,7 @@ describe('component-imports rule', () => {
 
   it('returns no issues for content without components', () => {
     const content = mockContent('Just text, no components.');
-    const issues = componentImportsRule.check(content, {});
+    const issues = check(componentImportsRule, content);
     expect(issues.length).toBe(0);
   });
 });
@@ -517,7 +531,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Good Page', description: 'A valid page', quality: 50 },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -527,7 +541,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test', quality: 200 },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     expect(issues.some((i: any) => i.message.includes('quality'))).toBe(true);
   });
 
@@ -537,7 +551,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { description: 'No title' },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     expect(issues.some((i: any) => i.message.includes('title'))).toBe(true);
   });
 
@@ -547,7 +561,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test', update_frequency: 7 },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     expect(issues.some((i: any) => i.message.includes('update_frequency'))).toBe(true);
   });
 
@@ -557,7 +571,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test', update_frequency: 7, lastEdited: '2025-01-01' },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     const crossFieldIssues = issues.filter((i: any) => i.message.includes('update_frequency'));
     expect(crossFieldIssues.length).toBe(0);
   });
@@ -568,7 +582,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test', evergreen: false, update_frequency: 7, lastEdited: '2025-01-01' },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     expect(issues.some((i: any) => i.message.includes('evergreen: false') && i.message.includes('update_frequency'))).toBe(true);
     expect(issues.some((i: any) => i.severity === Severity.ERROR && i.message.includes('evergreen'))).toBe(true);
   });
@@ -579,7 +593,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test Report', evergreen: false, lastEdited: '2025-01-01' },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     const evergreenIssues = issues.filter((i: any) => i.message.includes('evergreen'));
     expect(evergreenIssues.length).toBe(0);
   });
@@ -590,7 +604,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test', evergreen: true, update_frequency: 7, lastEdited: '2025-01-01' },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     const evergreenIssues = issues.filter((i: any) => i.message.includes('evergreen'));
     expect(evergreenIssues.length).toBe(0);
   });
@@ -601,7 +615,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test', contentFormat: 'table', evergreen: false, lastEdited: '2025-01-01' },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     const updateFreqIssues = issues.filter((i: any) => i.message.includes('update_frequency'));
     expect(updateFreqIssues.length).toBe(0);
   });
@@ -612,7 +626,7 @@ describe('frontmatter-schema rule', () => {
       raw,
       frontmatter: { title: 'Test', pageType: 'invalid' },
     });
-    const issues = frontmatterSchemaRule.check(content, {});
+    const issues = check(frontmatterSchemaRule, content);
     expect(issues.some((i: any) => i.message.includes('pageType'))).toBe(true);
   });
 });
@@ -629,7 +643,7 @@ describe('footnote-coverage rule', () => {
     const content = mockContent(veryLongProse, {
       relativePath: 'knowledge-base/responses/test-page.mdx',
     });
-    const issues = footnoteCoverageRule.check(content, {});
+    const issues = check(footnoteCoverageRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('No footnote citations');
     expect(issues[0].severity).toBe(Severity.WARNING);
@@ -639,7 +653,7 @@ describe('footnote-coverage rule', () => {
     const content = mockContent(veryLongProse + '\n\nSome claim.[^1]\n\n[^1]: [Source](https://example.org)', {
       relativePath: 'knowledge-base/organizations/test-org.mdx',
     });
-    const issues = footnoteCoverageRule.check(content, {});
+    const issues = check(footnoteCoverageRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -647,7 +661,7 @@ describe('footnote-coverage rule', () => {
     const content = mockContent(veryLongProse, {
       relativePath: 'guides/some-guide.mdx',
     });
-    const issues = footnoteCoverageRule.check(content, {});
+    const issues = check(footnoteCoverageRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -655,7 +669,7 @@ describe('footnote-coverage rule', () => {
     const content = mockContent('A short page with few words.', {
       relativePath: 'knowledge-base/risks/short-risk.mdx',
     });
-    const issues = footnoteCoverageRule.check(content, {});
+    const issues = check(footnoteCoverageRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -664,7 +678,7 @@ describe('footnote-coverage rule', () => {
       relativePath: 'knowledge-base/index.mdx',
       isIndex: true,
     });
-    const issues = footnoteCoverageRule.check(content, {});
+    const issues = check(footnoteCoverageRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -673,7 +687,7 @@ describe('footnote-coverage rule', () => {
       relativePath: 'knowledge-base/risks/test-stub.mdx',
       frontmatter: { title: 'Test', pageType: 'stub' },
     });
-    const issues = footnoteCoverageRule.check(content, {});
+    const issues = check(footnoteCoverageRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -682,7 +696,7 @@ describe('footnote-coverage rule', () => {
     const content = mockContent(veryLongProse + '\n\n[^1]: [Source](https://example.org)', {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteCoverageRule.check(content, {});
+    const issues = check(footnoteCoverageRule, content);
     expect(issues.length).toBe(1); // definitions alone don't count
   });
 });
@@ -698,7 +712,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test', subcategory: 'labs' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('labs');
     expect(issues[0].message).toContain('subcategory: labs');
@@ -711,7 +725,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test', subcategory: 'alignment' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain("subcategory: 'alignment'");
     expect(issues[0].severity).toBe(Severity.ERROR);
@@ -723,7 +737,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test', subcategory: 'labs' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -733,7 +747,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -745,7 +759,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -755,7 +769,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test', subcategory: 'factors-ai-capabilities' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('factors-ai-capabilities');
   });
@@ -766,7 +780,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test', description: 'A test page', subcategory: 'labs' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(1);
     // subcategory is on line 4 in this file (after ---, title, description)
     expect(issues[0].line).toBe(4);
@@ -780,7 +794,7 @@ describe('no-quoted-subcategory rule', () => {
       raw,
       frontmatter: { title: 'Test', description: 'subcategory: "labs"', subcategory: 'labs' },
     });
-    const issues = noQuotedSubcategoryRule.check(content, {});
+    const issues = check(noQuotedSubcategoryRule, content);
     expect(issues.length).toBe(1);
     // subcategory is on line 4, NOT line 3 (where description contains identical text)
     expect(issues[0].line).toBe(4);
@@ -797,7 +811,7 @@ describe('kb-subcategory-coverage rule', () => {
     section: string,
     slug: string,
     opts: { subcategory?: string; isIndex?: boolean } = {},
-  ): Record<string, unknown> {
+  ): any {
     const isIndex = opts.isIndex ?? false;
     const filename = isIndex ? 'index.mdx' : `${slug}.mdx`;
     const relativePath = `knowledge-base/${section}/${filename}`;
@@ -821,7 +835,7 @@ describe('kb-subcategory-coverage rule', () => {
       kbPage('risks', 'ai-takeover', { subcategory: 'accident' }),
       kbPage('risks', 'compute-concentration', { subcategory: 'structural' }),
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(0);
   });
 
@@ -835,7 +849,7 @@ describe('kb-subcategory-coverage rule', () => {
       kbPage('capabilities', 'page-d', { subcategory: 'core' }),
       kbPage('capabilities', 'page-e'), // missing — 1/5 = 20%
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(0);
   });
 
@@ -849,7 +863,7 @@ describe('kb-subcategory-coverage rule', () => {
       kbPage('people', 'dave'), // missing
       kbPage('people', 'eve'), // missing
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(1);
     expect(issues[0].rule).toBe('kb-subcategory-coverage');
     expect(issues[0].severity).toBe('warning');
@@ -865,7 +879,7 @@ describe('kb-subcategory-coverage rule', () => {
       kbPage('debates', 'page-z'), // missing
       kbPage('debates', 'page-w'), // missing — 3/4 = 75%
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('page-y.mdx');
     expect(issues[0].message).toContain('page-z.mdx');
@@ -880,7 +894,7 @@ describe('kb-subcategory-coverage rule', () => {
       kbPage('history', 'hist-b'), // missing
       kbPage('history', 'hist-c'), // missing — 3/3 = 100%
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(1);
     expect(issues[0].file).toBe(indexFile.path);
   });
@@ -893,7 +907,7 @@ describe('kb-subcategory-coverage rule', () => {
       kbPage('incidents', 'page-a', { subcategory: 'natural' }),
       kbPage('incidents', 'page-b', { subcategory: 'natural' }),
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(0);
   });
 
@@ -916,7 +930,7 @@ describe('kb-subcategory-coverage rule', () => {
         isIndex: false,
       },
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(0);
   });
 
@@ -925,7 +939,7 @@ describe('kb-subcategory-coverage rule', () => {
     const files = [
       kbPage('metrics', 'index', { isIndex: true }),
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(0);
   });
 
@@ -940,7 +954,7 @@ describe('kb-subcategory-coverage rule', () => {
       kbPage('debates', 'debate-b'), // missing
       kbPage('debates', 'debate-c'), // missing — 3/3 = 100%
     ];
-    const issues = kbSubcategoryCoverageRule.check(files as any, {} as any);
+    const issues = check(kbSubcategoryCoverageRule, files);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('"debates"');
   });
@@ -978,7 +992,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.ERROR);
     expect(issues[0].fix?.type).toBe(FixType.REPLACE_TEXT);
@@ -991,7 +1005,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
     );
-    const issues = preferEntityLinkRule.check(content as any, { idRegistry: null } as any);
+    const issues = check(preferEntityLinkRule, content, { idRegistry: null });
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].fix).toBeNull();
@@ -1001,7 +1015,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       'See [Unknown Page](/knowledge-base/some-unknown-path/) for more.',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].rule).toBe('prefer-entitylink');
@@ -1011,7 +1025,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       'See [External](https://example.com/page) for more.',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 
@@ -1019,7 +1033,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       '<EntityLink id="miri">MIRI</EntityLink> is an organization.',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 
@@ -1027,7 +1041,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       '```\n[Community Notes](/knowledge-base/responses/community-notes-for-everything/)\n```',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 
@@ -1036,7 +1050,7 @@ describe('prefer-entitylink rule', () => {
       'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
       { frontmatter: { title: 'Test', pageType: 'stub' } },
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 
@@ -1046,7 +1060,7 @@ describe('prefer-entitylink rule', () => {
       'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
       { relativePath: 'docs/internal/some-doc.mdx' },
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 
@@ -1054,7 +1068,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       'Browse [all risks](/knowledge-base/risks/) here.',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 
@@ -1062,7 +1076,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       'See [Unknown](/knowledge-base/some-unknown-page/) for more.',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].fix).toBeNull();
@@ -1072,7 +1086,7 @@ describe('prefer-entitylink rule', () => {
     const content = mockContent(
       'See [Community Notes](/knowledge-base/responses/community-notes-for-everything/) for more.',
     );
-    const issues = preferEntityLinkRule.check(content as any, engineWithRegistry as any);
+    const issues = check(preferEntityLinkRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].fix).not.toBeNull();
     expect(issues[0].fix!.newText).toBe(
@@ -1117,7 +1131,7 @@ describe('entitylink-ids rule', () => {
     const content = mockContent(
       '<EntityLink id="anthropic">Anthropic</EntityLink>',
     );
-    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].message).toContain('use numeric format');
@@ -1130,7 +1144,7 @@ describe('entitylink-ids rule', () => {
     const content = mockContent(
       '<EntityLink id="E42" name="anthropic">Anthropic</EntityLink>',
     );
-    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 
@@ -1138,7 +1152,7 @@ describe('entitylink-ids rule', () => {
     const content = mockContent(
       '<EntityLink id="E42" name="miri">MIRI</EntityLink>',
     );
-    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.ERROR);
     expect(issues[0].message).toContain('name mismatch');
@@ -1152,7 +1166,7 @@ describe('entitylink-ids rule', () => {
     const content = mockContent(
       '<EntityLink id="E140">Nick Bostrom</EntityLink>',
     );
-    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].message).toContain('add name="nick-bostrom"');
@@ -1165,7 +1179,7 @@ describe('entitylink-ids rule', () => {
     const content = mockContent(
       '<EntityLink id="E9999">Unknown</EntityLink>',
     );
-    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].message).toContain('not a registered numeric ID');
@@ -1175,7 +1189,7 @@ describe('entitylink-ids rule', () => {
     const content = mockContent(
       '<EntityLink id="nonexistent-entity">Ghost</EntityLink>',
     );
-    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].message).toContain('does not resolve');
@@ -1186,7 +1200,7 @@ describe('entitylink-ids rule', () => {
       '<EntityLink id="anthropic">Anthropic</EntityLink>',
       { relativePath: 'docs/internal/some-guide.mdx' },
     );
-    const issues = entityLinkIdsRule.check(content as any, engineWithRegistry as any);
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
 });
@@ -1209,7 +1223,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const hedgingIssues = issues.filter((i: any) => i.message.includes('hedging'));
     expect(hedgingIssues.length).toBe(1);
     expect(hedgingIssues[0].message).toContain('[^1]');
@@ -1223,7 +1237,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/organizations/test-org.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const hedgingIssues = issues.filter((i: any) => i.message.includes('hedging'));
     expect(hedgingIssues.length).toBe(0);
   });
@@ -1237,7 +1251,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const wikiIssues = issues.filter((i: any) => i.message.includes('Wikipedia'));
     expect(wikiIssues.length).toBe(1);
     expect(wikiIssues[0].message).toContain('[^1]');
@@ -1250,7 +1264,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const wikiIssues = issues.filter((i: any) => i.message.includes('Wikipedia'));
     expect(wikiIssues.length).toBe(0);
   });
@@ -1263,7 +1277,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const overloadedIssues = issues.filter((i: any) => i.message.includes('referenced'));
     expect(overloadedIssues.length).toBe(1);
     expect(overloadedIssues[0].message).toContain('10 times');
@@ -1275,7 +1289,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const overloadedIssues = issues.filter((i: any) => i.message.includes('referenced'));
     expect(overloadedIssues.length).toBe(0);
   });
@@ -1289,7 +1303,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const genericIssues = issues.filter((i: any) => i.message.includes('generic'));
     expect(genericIssues.length).toBe(1);
     expect(genericIssues[0].message).toContain('[^1]');
@@ -1302,7 +1316,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/organizations/test-org.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const genericIssues = issues.filter((i: any) => i.message.includes('generic'));
     expect(genericIssues.length).toBe(1);
   });
@@ -1314,7 +1328,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/organizations/test-org.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const genericIssues = issues.filter((i: any) => i.message.includes('generic'));
     expect(genericIssues.length).toBe(0);
   });
@@ -1328,7 +1342,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'guides/some-guide.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -1337,7 +1351,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -1349,7 +1363,7 @@ describe('footnote-quality rule', () => {
       relativePath: 'knowledge-base/people/test-person.mdx',
       frontmatter: { title: 'Test', pageType: 'stub' },
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     expect(issues.length).toBe(0);
   });
 
@@ -1360,7 +1374,7 @@ describe('footnote-quality rule', () => {
     const content = mockContent(body, {
       relativePath: 'knowledge-base/people/test-person.mdx',
     });
-    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const issues = check(footnoteQualityRule, content);
     const wikiIssues = issues.filter((i: any) => i.message.includes('Wikipedia'));
     expect(wikiIssues.length).toBe(0);
   });

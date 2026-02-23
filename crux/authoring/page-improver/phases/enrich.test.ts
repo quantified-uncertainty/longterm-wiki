@@ -32,8 +32,6 @@ const makePage = (): PageData => ({
   id: 'test-page',
   title: 'Test Page',
   path: 'test-page.mdx',
-  content: '## Test\n\nSome content.',
-  frontmatter: {},
 });
 
 const makeOptions = (): PipelineOptions => ({

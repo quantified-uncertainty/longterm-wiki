@@ -6,6 +6,7 @@
  * to build a grounded source cache for downstream modules (#668).
  */
 
+import { z } from 'zod';
 import { MODELS } from '../../../lib/anthropic.ts';
 import { fetchSources, type FetchRequest, type FetchedSource } from '../../../lib/source-fetcher.ts';
 import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation-auditor.ts';
@@ -146,7 +147,7 @@ Output ONLY valid JSON at the end.`;
     tools
   });
 
-  const research = parseAndValidate<ResearchResult>(result, ResearchResultSchema, 'research', (raw, error) => ({
+  const research = parseAndValidate<ResearchResult>(result, ResearchResultSchema as z.ZodType<ResearchResult>, 'research', (raw, error) => ({
     sources: [],
     raw,
     error,

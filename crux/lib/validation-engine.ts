@@ -35,7 +35,7 @@ interface FixSpec {
   /** Custom fix properties used by rules with type: 'custom' */
   action?: string;
   components?: string[];
-  existingImports?: Array<{ source: string; components: string[] }>;
+  existingImports?: string | Array<{ source: string; components: string[] }>;
   quoteChar?: string;
   [key: string]: unknown;
 }

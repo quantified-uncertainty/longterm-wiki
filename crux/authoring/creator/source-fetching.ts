@@ -204,7 +204,7 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
     try {
       log('fetch-sources', `  [${i + 1}/${urlsToFetch.length}] Fetching: ${url.slice(0, 60)}...`);
 
-      const result = await firecrawl.scrape(url, { formats: ['markdown'] });
+      const result = await firecrawl.scrapeUrl(url, { formats: ['markdown'] }) as any;
 
       if (result.markdown) {
         const cacheFile = `${id}.txt`;

@@ -344,8 +344,8 @@ async function main() {
   const serverUp = await isServerAvailable();
   if (serverUp) {
     const snapshot = await createAccuracySnapshot();
-    if (snapshot && !json && !ci) {
-      console.log(`${c.dim}Accuracy snapshot created for ${snapshot.snapshotCount} pages${c.reset}`);
+    if (snapshot && snapshot.ok && !json && !ci) {
+      console.log(`${c.dim}Accuracy snapshot created for ${snapshot.data.snapshotCount} pages${c.reset}`);
     }
   }
 

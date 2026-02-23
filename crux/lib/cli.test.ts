@@ -422,7 +422,7 @@ describe('validation-engine.ts — Issue', () => {
     expect(issue.message).toBe('Something wrong');
     expect(issue.severity).toBe('warning');
     expect(issue.fix).not.toBeNull();
-    expect(issue.fix.type).toBe('replace-text');
+    expect(issue.fix!.type).toBe('replace-text');
   });
 
   it('defaults severity to error', () => {

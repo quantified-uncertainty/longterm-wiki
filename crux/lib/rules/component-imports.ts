@@ -145,7 +145,7 @@ export const componentImportsRule = createRule({
       return null;
     }
 
-    const { action, components } = issue.fix;
+    const { action, components = [] } = issue.fix;
 
     if (action === 'add-to-existing-import') {
       // Add components to existing @components/wiki import
