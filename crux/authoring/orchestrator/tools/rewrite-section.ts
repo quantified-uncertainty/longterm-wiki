@@ -101,6 +101,15 @@ export const tool: ToolRegistration = {
         : normalizedContent;
       const tablesFallback = tablesBefore > 0 && tablesAfter < tablesBefore;
 
+      // Capture before/after diff for artifact tracking (#826)
+      if (section.content !== usedContent) {
+        ctx.sectionDiffs.push({
+          sectionId,
+          before: section.content.slice(0, 50000),
+          after: usedContent.slice(0, 50000),
+        });
+      }
+
       // Update the section in context
       const sectionIdx = ctx.sections!.findIndex((s) => s.id === sectionId);
       if (sectionIdx !== -1) {

@@ -503,6 +503,64 @@ export const SweepJobsSchema = z.object({
 export type SweepJobs = z.infer<typeof SweepJobsSchema>;
 
 // ---------------------------------------------------------------------------
+// Improve Run Artifacts
+// ---------------------------------------------------------------------------
+
+export const VALID_ENGINES = ["v1", "v2"] as const;
+export const VALID_IMPROVE_TIERS = ["polish", "standard", "deep"] as const;
+
+export const SaveArtifactsSchema = z.object({
+  pageId: PageIdSchema,
+  engine: z.enum(VALID_ENGINES),
+  tier: z.enum(VALID_IMPROVE_TIERS),
+  directions: z.string().max(5000).nullable().optional(),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime().nullable().optional(),
+  durationS: z.number().min(0).nullable().optional(),
+  totalCost: z.number().min(0).nullable().optional(),
+
+  // Research artifacts
+  sourceCache: z.array(z.object({
+    id: z.string(),
+    url: z.string(),
+    title: z.string(),
+    author: z.string().optional(),
+    date: z.string().optional(),
+    facts: z.array(z.string()).optional(),
+  })).max(200).nullable().optional(),
+  researchSummary: z.string().max(50000).nullable().optional(),
+
+  // Citation audit artifacts
+  citationAudit: z.record(z.unknown()).nullable().optional(),
+
+  // Cost tracking
+  costEntries: z.array(z.object({
+    toolName: z.string(),
+    estimatedCost: z.number(),
+    timestamp: z.number(),
+  })).max(500).nullable().optional(),
+  costBreakdown: z.record(z.string(), z.number()).nullable().optional(),
+
+  // Section-level diffs
+  sectionDiffs: z.array(z.object({
+    sectionId: z.string(),
+    before: z.string().max(50000),
+    after: z.string().max(50000),
+  })).max(50).nullable().optional(),
+
+  // Quality gate
+  qualityMetrics: z.record(z.unknown()).nullable().optional(),
+  qualityGatePassed: z.boolean().nullable().optional(),
+  qualityGaps: z.array(z.string().max(1000)).max(50).nullable().optional(),
+
+  // Pipeline metadata
+  toolCallCount: z.number().int().min(0).nullable().optional(),
+  refinementCycles: z.number().int().min(0).nullable().optional(),
+  phasesRun: z.array(z.string().max(100)).max(20).nullable().optional(),
+});
+export type SaveArtifacts = z.infer<typeof SaveArtifactsSchema>;
+
+// ---------------------------------------------------------------------------
 // Pages
 // ---------------------------------------------------------------------------
 

@@ -118,6 +118,7 @@ Options:
   --citation-gate                 Block --apply when citation audit pass rate is below threshold
   --skip-citation-audit           Skip the post-improve citation audit phase
   --citation-audit-model <model>  Override LLM model for per-citation verification
+  --no-save-artifacts             Skip saving intermediate artifacts to wiki-server DB
   --triage                        Run news-check triage only (no improvement)
   --list                          List pages needing improvement
   --limit N                       Limit list results (default: 20)
@@ -241,6 +242,7 @@ Examples:
       dryRun: !opts.apply,
       grade: opts['no-grade'] ? false : undefined,
       skipSessionLog: opts['skip-session-log'] === true ? true : undefined,
+      saveArtifacts: opts['no-save-artifacts'] === true ? false : undefined,
     });
   } else {
     await runPipeline(pageId, {
@@ -258,6 +260,7 @@ Examples:
       citationGate: opts['citation-gate'] === true ? true : undefined,
       skipCitationAudit: opts['skip-citation-audit'] === true ? true : undefined,
       citationAuditModel: (opts['citation-audit-model'] as string) || undefined,
+      saveArtifacts: opts['no-save-artifacts'] === true ? false : undefined,
     });
   }
 }

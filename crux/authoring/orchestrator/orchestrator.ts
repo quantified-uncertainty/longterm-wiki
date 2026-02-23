@@ -22,6 +22,7 @@ import { createLlmClient, streamingCreate } from '../../lib/llm.ts';
 import { MODELS } from '../../lib/anthropic.ts';
 import { withRetry, startHeartbeat } from '../../lib/resilience.ts';
 import { createPhaseLogger } from '../../lib/output.ts';
+import { saveArtifacts } from '../../lib/wiki-server/artifacts.ts';
 
 import {
   type OrchestratorContext,
@@ -330,6 +331,7 @@ export async function runOrchestrator(
     budget,
     directions,
     citationAudit: null,
+    sectionDiffs: [],
   };
 
   // ── Build tools ───────────────────────────────────────────────────────────
@@ -428,6 +430,51 @@ export async function runOrchestrator(
   log('orchestrator', `Quality gate: ${finalGate.passed ? 'PASSED' : 'FAILED'}`);
   log('orchestrator', `Final metrics: ${JSON.stringify(finalMetrics)}`);
   log('orchestrator', '═'.repeat(50));
+
+  // ── Save artifacts to wiki-server (fire-and-forget) ──────────────────────
+
+  if (options.saveArtifacts !== false) {
+    const completedAt = new Date().toISOString();
+    // Truncate source cache content to keep payload reasonable
+    const trimmedSourceCache = ctx.sourceCache.map(s => ({
+      id: s.id,
+      url: s.url,
+      title: s.title,
+      author: s.author,
+      date: s.date,
+      facts: s.facts,
+    }));
+
+    saveArtifacts({
+      pageId: page.id,
+      engine: 'v2',
+      tier,
+      directions: directions || null,
+      startedAt: new Date(startTime).toISOString(),
+      completedAt,
+      durationS: parseFloat(duration),
+      totalCost: ctx.totalCost,
+      sourceCache: trimmedSourceCache.length > 0 ? trimmedSourceCache : null,
+      researchSummary: null,
+      citationAudit: ctx.citationAudit ? { citations: ctx.citationAudit } : null,
+      costEntries: ctx.costEntries.length > 0 ? ctx.costEntries : null,
+      costBreakdown: Object.keys(costBreakdown).length > 0 ? costBreakdown : null,
+      sectionDiffs: ctx.sectionDiffs.length > 0 ? ctx.sectionDiffs : null,
+      qualityMetrics: finalMetrics as unknown as Record<string, unknown>,
+      qualityGatePassed: finalGate.passed,
+      qualityGaps: finalGate.gaps.length > 0 ? finalGate.gaps : null,
+      toolCallCount: ctx.toolCallCount,
+      refinementCycles,
+    }).then(result => {
+      if (result.ok) {
+        log('orchestrator', `Artifacts saved to wiki-server (id: ${result.data.id})`);
+      } else {
+        log('orchestrator', `Warning: could not save artifacts: ${result.message}`);
+      }
+    }).catch(err => {
+      log('orchestrator', `Warning: artifact save failed: ${err instanceof Error ? err.message : String(err)}`);
+    });
+  }
 
   return {
     pageId: page.id,

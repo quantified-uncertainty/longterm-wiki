@@ -140,6 +140,11 @@ export interface PipelineOptions {
    * Defaults to the citation-auditor default (google/gemini-2.0-flash-001).
    */
   citationAuditModel?: string;
+  /**
+   * When true, save intermediate artifacts (research, citations, etc.)
+   * to the wiki-server DB after the run. Default: true.
+   */
+  saveArtifacts?: boolean;
 }
 
 // Re-export AuditResult so callers importing from types.ts get it too
