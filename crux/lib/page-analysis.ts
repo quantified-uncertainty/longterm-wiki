@@ -66,3 +66,46 @@ export function getEntityTypeFromPath(relativePath: string): string | null {
   if (relativePath.includes('/worldviews/')) return 'overview';
   return null;
 }
+
+/**
+ * Get the page type, preferring entityType when available, falling back to
+ * path-based detection. Returns 'concept' as default.
+ */
+export function getPageType(page: { path: string; entityType?: string }): string {
+  return page.entityType || getEntityTypeFromPath(page.path) || 'concept';
+}
+
+/**
+ * Check if a page is biographical (person or organization).
+ * Use this instead of duplicating path.includes('/people/') checks.
+ */
+export function isBiographicalPage(page: { path: string; entityType?: string }): boolean {
+  const type = getPageType(page);
+  return type === 'person' || type === 'organization';
+}
+
+// ---------------------------------------------------------------------------
+// Page type standard data — what data is expected per page type
+// ---------------------------------------------------------------------------
+
+/**
+ * Standard data expectations per page type, used by adversarial review
+ * and quality checks to flag missing information.
+ */
+export const PAGE_TYPE_STANDARD_DATA: Record<string, string[]> = {
+  person: ['birth year or estimated age', 'institutional affiliation', 'key publications or positions', 'educational background'],
+  organization: ['founding year', 'funding sources or budget', 'staff size or key personnel', 'primary mission statement'],
+  incident: ['date and timeline of events', 'actors involved', 'community reception metrics (upvotes, comments)', 'resolution or outcome'],
+  concept: ['formal definition with citation', 'key proponents', 'examples or applications', 'criticisms or limitations'],
+  research: ['primary finding with sample size or confidence interval', 'authors and institution', 'replication status', 'key limitation'],
+};
+
+/**
+ * Get the standard data expectations for a page type as a comma-separated string.
+ * Falls back to concept expectations for unknown types.
+ */
+export function getPageTypeStandardData(page: { path: string; entityType?: string }): string {
+  const type = getPageType(page);
+  const data = PAGE_TYPE_STANDARD_DATA[type] || PAGE_TYPE_STANDARD_DATA.concept;
+  return data.join(', ');
+}

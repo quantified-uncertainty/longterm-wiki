@@ -49,7 +49,7 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
   standard: {
     name: 'Standard',
     maxToolCalls: 25,
-    maxResearchQueries: 5,
+    maxResearchQueries: 3,
     enabledTools: [
       // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
@@ -62,13 +62,15 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       'check_cross_references', 'suggest_cross_links',
       // Citation analysis
       'deep_citation_check',
+      // Quality assurance ($0 — regex-only)
+      'adversarial_review',
     ],
-    estimatedCost: '$5-10',
+    estimatedCost: '$4-8',
   },
   deep: {
     name: 'Deep',
     maxToolCalls: 65,
-    maxResearchQueries: 15,
+    maxResearchQueries: 8,
     enabledTools: [
       // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
@@ -81,10 +83,10 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       'check_cross_references', 'suggest_cross_links',
       // Citation analysis
       'deep_citation_check',
-      // Quality assurance (deep only)
+      // Quality assurance ($0 — regex-only)
       'adversarial_review',
     ],
-    estimatedCost: '$10-25',
+    estimatedCost: '$8-18',
   },
 };
 

@@ -13,10 +13,25 @@
  *   crux issues close <N> [--reason] Close an issue with an optional comment
  */
 
+import { readFileSync } from 'fs';
 import { createLogger, type Colors } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
 import { type CommandResult, parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
+
+/**
+ * Read a text value from a `--*-file=<path>` flag.
+ * Returns null if the path is not provided or the file can't be read.
+ */
+function readFileFlag(path: string | undefined): string | null {
+  if (!path) return null;
+  try {
+    return readFileSync(path, 'utf-8');
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Error reading file ${path}: ${msg}`);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -647,6 +662,20 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     ? (options.label as string).split(',').map(l => l.trim()).filter(Boolean)
     : [];
 
+  // --body-file takes precedence over --body (avoids shell expansion of backticks/dollars)
+  // --problem-file takes precedence over --problem
+  let bodyFromFile: string | undefined;
+  let problemFromFile: string | undefined;
+  try {
+    bodyFromFile = readFileFlag(options['body-file'] as string | undefined) ?? undefined;
+    problemFromFile = readFileFlag(options['problem-file'] as string | undefined) ?? undefined;
+  } catch (e: unknown) {
+    return { output: `${c.red}${(e as Error).message}${c.reset}\n`, exitCode: 1 };
+  }
+
+  const effectiveBody = bodyFromFile ?? (options.body as string | undefined);
+  const effectiveProblem = problemFromFile ?? (options.problem as string | undefined);
+
   // Validate model if specified
   if (options.model && !(MODEL_NAMES as ReadonlyArray<string>).includes((options.model as string).toLowerCase())) {
     return {
@@ -655,8 +684,8 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     };
   }
 
-  // Require --model and --criteria unless --draft or raw --body is used
-  if (!options.draft && !options.body) {
+  // Require --model and --criteria unless --draft or raw --body/--body-file is used
+  if (!options.draft && !effectiveBody) {
     const missingFlags: string[] = [];
     if (!options.model) missingFlags.push('--model=haiku|sonnet|opus');
     if (!options.criteria) missingFlags.push('--criteria="item1|item2"');
@@ -672,11 +701,11 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   }
 
   // Use structured template if any structured args are provided, otherwise fall back to --body
-  const hasStructuredArgs = options.problem || options.fix || options.depends || options.criteria || options.model;
+  const hasStructuredArgs = effectiveProblem || options.fix || options.depends || options.criteria || options.model;
   let body: string;
   if (hasStructuredArgs) {
     body = buildIssueBody({
-      problem: options.problem as string | undefined,
+      problem: effectiveProblem,
       fix: typeof options.fix === 'string' ? options.fix : undefined,
       depends: options.depends as string | undefined,
       criteria: options.criteria as string | undefined,
@@ -684,7 +713,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
       cost: options.cost as string | undefined,
     });
   } else {
-    body = (options.body as string) || '';
+    body = effectiveBody || '';
   }
 
   interface CreateIssueResponse {
@@ -1136,12 +1165,22 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
     };
   }
 
+  // --problem-file takes precedence over --problem (avoids shell expansion)
+  let problemFromFile: string | undefined;
+  try {
+    problemFromFile = readFileFlag(options['problem-file'] as string | undefined) ?? undefined;
+  } catch (e: unknown) {
+    return { output: `${c.red}${(e as Error).message}${c.reset}\n`, exitCode: 1 };
+  }
+
+  const effectiveProblem = problemFromFile ?? (options.problem as string | undefined);
+
   // Fetch existing issue
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
   const existingBody = (issue.body || '').trim();
 
   const newBody = buildIssueBody({
-    problem: options.problem as string | undefined,
+    problem: effectiveProblem,
     fix: options.fix as string | undefined,
     depends: options.depends as string | undefined,
     criteria: options.criteria as string | undefined,
@@ -1331,7 +1370,9 @@ Options (list/next):
 Options (create):
   --label=X,Y         Comma-separated labels to apply
   --body="..."        Raw freeform body (bypasses --model/--criteria requirement)
+  --body-file=<path>  Body from file (safe — avoids shell expansion of backticks/dollars)
   --problem="..."     Problem/background description (## Problem section)
+  --problem-file=<path>  Problem from file (safe — avoids shell expansion)
   --fix="..."         Proposed fix or approach (## Proposed Fix section)
   --depends=N,M       Comma-separated dependent issue numbers
   --criteria="a|b|c"  Pipe-separated acceptance criteria items (REQUIRED)
@@ -1341,6 +1382,7 @@ Options (create):
 
 Options (update-body):
   --problem="..."     Problem/background description (## Problem section)
+  --problem-file=<path>  Problem from file (safe — avoids shell expansion)
   --fix="..."         Proposed fix or approach (## Proposed Fix section)
   --depends=N,M       Comma-separated dependent issue numbers
   --criteria="a|b|c"  Pipe-separated acceptance criteria items
@@ -1385,7 +1427,9 @@ Examples:
   crux issues create "Add validation rule for X" --label=tooling \\
     --problem="X is not validated..." --model=haiku \\
     --criteria="Validation added|Tests pass|CI green" --cost="<$1"
-  crux issues update-body 239 --problem="..." --model=sonnet --criteria="a|b"
+  # For bodies with backticks/dollars/parens, use --problem-file or --body-file:
+  crux issues create "Title" --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
+  crux issues update-body 239 --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
   crux issues start 239              Announce start on issue #239
   crux issues done 239 --pr=https://github.com/.../pull/42
   crux issues cleanup                Check for stale labels and duplicates

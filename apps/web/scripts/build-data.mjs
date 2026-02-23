@@ -25,7 +25,6 @@ import { computeStats } from './lib/statistics.mjs';
 import { parseNumericValue, resolveComputedFacts } from './lib/computed-facts.mjs';
 import { transformEntities } from './lib/entity-transform.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
-import { buildSearchIndex } from './lib/search.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
 
@@ -1600,27 +1599,6 @@ async function main() {
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
-
-  // ==========================================================================
-  // SEARCH INDEX — build MiniSearch index for client-side search
-  // ==========================================================================
-  console.log('\nBuilding search index...');
-  const { index: searchIndex, docs: searchDocs } = buildSearchIndex(
-    typedEntities,
-    pages,
-    idRegistryOutput
-  );
-  const searchIndexPath = join(OUTPUT_DIR, 'search-index.json');
-  const searchDocsPath = join(OUTPUT_DIR, 'search-docs.json');
-  writeFileSync(searchIndexPath, JSON.stringify(searchIndex));
-  writeFileSync(searchDocsPath, JSON.stringify(searchDocs));
-
-  // Copy search files to public/ so they're fetchable at runtime
-  const publicDir = join(PROJECT_ROOT, 'public');
-  if (!existsSync(publicDir)) mkdirSync(publicDir, { recursive: true });
-  copyFileSync(searchIndexPath, join(publicDir, 'search-index.json'));
-  copyFileSync(searchDocsPath, join(publicDir, 'search-docs.json'));
-  console.log(`  searchIndex: ${searchDocs.length} documents indexed`);
 
   // Write combined JSON (strip raw entities — only typedEntities needed at runtime)
   const { entities: _rawEntities, ...databaseForOutput } = database;

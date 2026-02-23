@@ -73,6 +73,9 @@ import { evaluativeFlattery } from './evaluative-flattery.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
 import { noUrlFootnotesRule } from './no-url-footnotes.ts';
 
+// Citation quality
+import { footnoteQualityRule } from './footnote-quality.ts';
+
 // Citation accuracy
 import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 
@@ -89,6 +92,9 @@ import { frontmatterOrderRule } from './frontmatter-order.ts';
 // Security / safety checks
 import { urlSafetyRule } from './url-safety.ts';
 import { noExecSyncRule } from './no-exec-sync.ts';
+
+// Pipeline artifact detection
+import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
 
 // Re-export all rules individually
 export {
@@ -132,6 +138,7 @@ export {
   evaluativeFlattery,
   footnoteCoverageRule,
   noUrlFootnotesRule,
+  footnoteQualityRule,
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
@@ -139,6 +146,7 @@ export {
   frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
+  pipelineArtifactsRule,
 };
 
 export const allRules: Rule[] = [
@@ -182,6 +190,7 @@ export const allRules: Rule[] = [
   evaluativeFlattery,
   footnoteCoverageRule,
   noUrlFootnotesRule,
+  footnoteQualityRule,
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
@@ -189,6 +198,7 @@ export const allRules: Rule[] = [
   frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
+  pipelineArtifactsRule,
 ];
 
 export default allRules;

@@ -57,9 +57,9 @@ jobs:
           # short delay so we don't miss freshly-conflicted PRs.
           for attempt in 1 2 3; do
             all_prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open \
-              --json number,headRefName,mergeable)
+              --json number,headRefName,mergeable,isDraft)
 
-            unknown_count=$(echo "$all_prs" | jq '[.[] | select(.mergeable == "UNKNOWN")] | length')
+            unknown_count=$(echo "$all_prs" | jq '[.[] | select(.isDraft == false) | select(.mergeable == "UNKNOWN")] | length')
 
             if [ "$unknown_count" -eq 0 ] || [ "$attempt" -eq 3 ]; then
               break
@@ -69,7 +69,7 @@ jobs:
             sleep 10
           done
 
-          prs=$(echo "$all_prs" | jq -c '[.[] | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
+          prs=$(echo "$all_prs" | jq -c '[.[] | select(.isDraft == false) | select(.mergeable == "CONFLICTING") | {number: .number, branch: .headRefName}]')
 
           echo "Conflicted PRs: $prs"
 

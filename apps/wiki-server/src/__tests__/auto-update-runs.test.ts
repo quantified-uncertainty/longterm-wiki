@@ -72,12 +72,17 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [];
   }
 
-  // ---- INSERT INTO auto_update_runs ----
+  // ---- INSERT INTO auto_update_runs (with ON CONFLICT DO NOTHING simulation) ----
   if (q.includes("insert into") && q.includes("auto_update_runs")) {
+    const startedAt = new Date(params[1] as string);
+    // Simulate ON CONFLICT (started_at) DO NOTHING
+    if (q.includes("on conflict") && runStore.some((r) => r.started_at.getTime() === startedAt.getTime())) {
+      return [];
+    }
     const row = {
       id: nextRunId++,
       date: String(params[0]),
-      started_at: new Date(params[1] as string),
+      started_at: startedAt,
       completed_at: params[2] ? new Date(params[2] as string) : null,
       trigger: params[3] as string,
       budget_limit: params[4] as number | null,
@@ -169,6 +174,16 @@ const dispatch: SqlDispatcher = (query, params) => {
     }));
   }
 
+  // ---- SELECT ... WHERE started_at = $1 (conflict fallback lookup) ----
+  // Use '"started_at" =' to match only the WHERE clause, not the SELECT column list
+  if (
+    q.includes("auto_update_runs") &&
+    q.includes('"started_at" =')
+  ) {
+    const startedAt = new Date(params[0] as string);
+    return runStore.filter((r) => r.started_at.getTime() === startedAt.getTime());
+  }
+
   // ---- SELECT ... WHERE id = $1 (single run) ----
   if (
     q.includes("auto_update_runs") &&
@@ -249,6 +264,24 @@ describe("Auto-Update Runs API", () => {
       const body = await res.json();
       expect(body.id).toBe(1);
       expect(body.resultsInserted).toBe(0);
+    });
+
+    it("is idempotent: duplicate startedAt returns existing run id", async () => {
+      const res1 = await postJson(app, "/api/auto-update-runs", sampleRun);
+      expect(res1.status).toBe(201);
+      const body1 = await res1.json();
+      expect(body1.id).toBe(1);
+      expect(body1.resultsInserted).toBe(2);
+
+      // Second call with same startedAt should return the existing run, not create a new one
+      const res2 = await postJson(app, "/api/auto-update-runs", sampleRun);
+      expect(res2.status).toBe(201);
+      const body2 = await res2.json();
+      expect(body2.id).toBe(1); // same id — not a new row
+      expect(body2.resultsInserted).toBe(0); // no new results inserted
+
+      // Only one run should exist in the store
+      expect(runStore).toHaveLength(1);
     });
 
     it("rejects invalid trigger value", async () => {
@@ -397,6 +430,9 @@ describe("Auto-Update Runs API", () => {
       await postJson(app, "/api/auto-update-runs", sampleRun);
       await postJson(app, "/api/auto-update-runs", {
         ...sampleRun,
+        date: "2026-02-20",
+        startedAt: "2026-02-20T06:00:00.000Z",
+        completedAt: "2026-02-20T07:00:00.000Z",
         trigger: "manual",
         budgetSpent: 10,
         pagesUpdated: 2,

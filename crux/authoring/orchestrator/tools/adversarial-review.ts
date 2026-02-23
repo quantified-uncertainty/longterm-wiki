@@ -8,6 +8,11 @@
  */
 
 import { stripFrontmatter } from '../../../lib/patterns.ts';
+import {
+  SPECULATION_PATTERNS,
+  WEASEL_PATTERNS,
+  FACTUAL_CLAIM_PATTERNS,
+} from '../../../lib/claim-patterns.ts';
 import type { ToolRegistration } from './types.ts';
 
 // ---------------------------------------------------------------------------
@@ -20,28 +25,6 @@ interface ExtractedIssue {
   section?: string;
   severity: 'critical' | 'warning' | 'info';
 }
-
-/** Words/phrases that indicate speculative or hedging language. */
-const SPECULATION_PATTERNS = [
-  /\b(?:might|may|could|possibly|perhaps|likely|probably|presumably|arguably)\b/i,
-  /\b(?:it is believed|some believe|many think|it is thought|widely considered)\b/i,
-  /\b(?:appears to|seems to|tends to)\b/i,
-];
-
-/** Weasel words that weaken claims without attribution. */
-const WEASEL_PATTERNS = [
-  /\b(?:some experts|many researchers|critics argue|supporters claim|some say)\b/i,
-  /\b(?:it has been suggested|it is often said|it is sometimes argued)\b/i,
-];
-
-/** Patterns that indicate factual claims (dates, numbers, dollar amounts). */
-const FACTUAL_CLAIM_PATTERNS = [
-  /\$[\d,.]+\s*(?:billion|million|trillion|B|M|K|T)/i,
-  /\b(?:founded|established|created|launched)\s+in\s+\d{4}/i,
-  /\b\d[\d,]*\s+(?:employees?|staff|researchers?|members?|people)\b/i,
-  /\b(?:raised|received|secured|invested)\s+\$[\d,.]+/i,
-  /\bin\s+\d{4},/i, // "In 2023," temporal claims
-];
 
 function analyzeContent(content: string): ExtractedIssue[] {
   const body = stripFrontmatter(content);
