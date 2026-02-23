@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts'],
     positional: true,
   },
   create: {
@@ -99,6 +99,7 @@ Options:
   --page-timeout=N    Per-page timeout in seconds, default 900 (improve batch)
   --resume            Resume interrupted batch from batch-state.json (improve)
   --report-file=f.md  Write batch summary report to file (improve)
+  --no-save-artifacts Skip saving intermediate artifacts to wiki-server DB (improve)
   --verbose         Detailed output
 
 Examples:

@@ -54,6 +54,11 @@ export type {
   JobStatsResult,
   SweepResult,
 } from './jobs.ts';
+export type {
+  SaveArtifactsInput,
+  ArtifactEntry,
+  ArtifactStatsResult,
+} from './artifacts.ts';
 
 // ---------------------------------------------------------------------------
 // API functions (all return ApiResult<T>)
@@ -169,3 +174,12 @@ export {
   getJobStats,
   sweepJobs,
 } from './jobs.ts';
+
+// Artifacts
+export {
+  saveArtifacts,
+  getArtifactsByPage,
+  getArtifacts,
+  getArtifact,
+  getArtifactStats,
+} from './artifacts.ts';

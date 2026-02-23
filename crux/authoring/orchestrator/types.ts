@@ -112,6 +112,13 @@ export interface ToolCostEntry {
   timestamp: number;
 }
 
+/** Captured before/after diff for a single section rewrite. */
+export interface SectionDiff {
+  sectionId: string;
+  before: string;
+  after: string;
+}
+
 /**
  * Mutable state maintained across tool calls.
  *
@@ -147,6 +154,8 @@ export interface OrchestratorContext {
   directions: string;
   /** Citation audit results (if audit has been run). */
   citationAudit: CitationAudit[] | null;
+  /** Captured section-level diffs from rewrite_section calls. */
+  sectionDiffs: SectionDiff[];
   /** Actual cost tracker for LLM API calls. */
   tracker: CostTracker;
 }
@@ -212,6 +221,12 @@ export interface OrchestratorOptions {
   mode?: 'improve' | 'create';
   /** For create mode: the topic/title of the new page. */
   topic?: string;
+  /**
+   * When true, save intermediate artifacts (research, citations, costs,
+   * section diffs, quality gate results) to the wiki-server DB after the run.
+   * Default: true.
+   */
+  saveArtifacts?: boolean;
 }
 
 /** Result of an orchestrator run. */

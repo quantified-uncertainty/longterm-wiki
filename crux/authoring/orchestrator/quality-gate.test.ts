@@ -44,6 +44,7 @@ function makeCtx(overrides: Partial<OrchestratorContext> = {}): OrchestratorCont
     budget: TIER_BUDGETS.standard,
     directions: '',
     citationAudit: null,
+    sectionDiffs: [],
     tracker: new CostTracker(),
     ...overrides,
   };

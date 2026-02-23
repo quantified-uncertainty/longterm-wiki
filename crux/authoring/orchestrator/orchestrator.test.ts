@@ -72,6 +72,7 @@ function makeContext(overrides: Partial<OrchestratorContext> = {}): Orchestrator
     budget: TIER_BUDGETS.standard,
     directions: '',
     citationAudit: null,
+    sectionDiffs: [],
     tracker: new CostTracker(),
     ...overrides,
   };

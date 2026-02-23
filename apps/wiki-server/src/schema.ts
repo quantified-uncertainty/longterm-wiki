@@ -616,6 +616,62 @@ export const autoUpdateNewsItems = pgTable(
  * Workers (GHA workflows or local) claim jobs atomically via
  * SELECT FOR UPDATE SKIP LOCKED and report results back.
  */
+/**
+ * Page improve runs — intermediate data from V2 orchestrator and page-improver runs.
+ *
+ * Captures research sources, citation audits, cost tracking, section diffs, and
+ * quality gate results so they can be queried, compared, and reused later.
+ * See GitHub issue #826.
+ */
+export const pageImproveRuns = pgTable(
+  "page_improve_runs",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    pageId: text("page_id").notNull(),
+    engine: text("engine").notNull(), // 'v1' | 'v2'
+    tier: text("tier").notNull(), // 'polish' | 'standard' | 'deep'
+    directions: text("directions"),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    durationS: real("duration_s"),
+    totalCost: real("total_cost"),
+
+    // Research artifacts
+    sourceCache: jsonb("source_cache"),
+    researchSummary: text("research_summary"),
+
+    // Citation audit artifacts
+    citationAudit: jsonb("citation_audit"),
+
+    // Cost tracking
+    costEntries: jsonb("cost_entries"),
+    costBreakdown: jsonb("cost_breakdown"),
+
+    // Section-level diffs
+    sectionDiffs: jsonb("section_diffs"),
+
+    // Quality gate
+    qualityMetrics: jsonb("quality_metrics"),
+    qualityGatePassed: boolean("quality_gate_passed"),
+    qualityGaps: jsonb("quality_gaps").$type<string[]>(),
+
+    // Pipeline metadata
+    toolCallCount: integer("tool_call_count"),
+    refinementCycles: integer("refinement_cycles"),
+    phasesRun: jsonb("phases_run").$type<string[]>(),
+
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pir_page_id").on(table.pageId),
+    index("idx_pir_engine").on(table.engine),
+    index("idx_pir_started_at").on(table.startedAt),
+    index("idx_pir_page_started").on(table.pageId, table.startedAt),
+  ]
+);
+
 export const jobs = pgTable(
   "jobs",
   {

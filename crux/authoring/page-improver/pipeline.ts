@@ -9,6 +9,7 @@ import path from 'path';
 import { execFileSync } from 'child_process';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import { createSession } from '../../lib/wiki-server/sessions.ts';
+import { saveArtifacts } from '../../lib/wiki-server/artifacts.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
@@ -408,6 +409,54 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     outputPath: finalPath,
   };
   writeTemp(page.id, 'pipeline-results.json', results);
+
+  // ── Save artifacts to wiki-server (fire-and-forget) ──────────────────────
+
+  if (options.saveArtifacts !== false) {
+    const completedAt = new Date().toISOString();
+    // Trim source cache: drop full content to keep payload small
+    const trimmedSourceCache = (research?.sources || []).map(
+      (s) => ({
+        id: s.url, // v1 sources use URL as identifier
+        url: s.url,
+        title: s.title,
+        author: s.author,
+        date: s.date,
+        facts: s.facts,
+      }),
+    );
+
+    saveArtifacts({
+      pageId: page.id,
+      engine: 'v1' as const,
+      tier: tier as 'polish' | 'standard' | 'deep',
+      directions: directions || null,
+      startedAt: new Date(startTime).toISOString(),
+      completedAt,
+      durationS: parseFloat(totalDuration),
+      totalCost: null,
+      sourceCache: trimmedSourceCache.length > 0 ? trimmedSourceCache : null,
+      researchSummary: research?.summary ?? null,
+      citationAudit: auditResult ? (auditResult as unknown as Record<string, unknown>) : null,
+      costEntries: null,
+      costBreakdown: null,
+      sectionDiffs: null,
+      qualityMetrics: null,
+      qualityGatePassed: null,
+      qualityGaps: null,
+      toolCallCount: null,
+      refinementCycles: null,
+      phasesRun: phases,
+    }).then(result => {
+      if (result.ok) {
+        log('artifacts', `Artifacts saved to wiki-server (id: ${result.data.id})`);
+      } else {
+        log('artifacts', `Warning: could not save artifacts: ${result.message}`);
+      }
+    }).catch(err => {
+      log('artifacts', `Warning: artifact save failed: ${err instanceof Error ? err.message : String(err)}`);
+    });
+  }
 
   return results;
 }
