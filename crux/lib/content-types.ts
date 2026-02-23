@@ -378,6 +378,12 @@ export function loadExperts(): ExpertEntry[] {
   return loadGeneratedJson<ExpertEntry[]>('experts.json', []);
 }
 
+export type { BlockIndex } from './block-ir.ts';
+
+export function loadBlockIndex(): import('./block-ir.ts').BlockIndex {
+  return loadGeneratedJson<import('./block-ir.ts').BlockIndex>('block-index.json', {});
+}
+
 /**
  * Shape of database.json as produced by build-data.mjs.
  * Only the fields actually consumed by crux rules are listed here;
