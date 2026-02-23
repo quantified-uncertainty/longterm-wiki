@@ -38,6 +38,7 @@ import {
   updateResourceFetchStatus,
   type ResourceEntry,
 } from './resource-lookup.ts';
+import { isYoutubeUrl } from '../resource-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces (spec from issue #633)
@@ -300,16 +301,6 @@ export function extractRelevantExcerpts(
 // YouTube helpers
 // ---------------------------------------------------------------------------
 
-function isYoutubeUrl(url: string): boolean {
-  try {
-    const u = new URL(url);
-    const host = u.hostname.replace(/^www\./, '');
-    return host === 'youtube.com' || host === 'youtu.be';
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Fetch a YouTube video transcript via the youtube-transcript package.
  * Returns extracted transcript text, or null if unavailable.
@@ -357,19 +348,11 @@ function rewriteArxivUrl(url: string): string | null {
 
 /**
  * Extract text from a PDF buffer using the pdf-parse library.
- * Returns null on failure.
+ * Returns null on failure. Delegates to shared pdf-extractor utility.
  */
 async function extractPdfWithPdfParse(buffer: ArrayBuffer): Promise<string | null> {
-  try {
-    const { PDFParse } = await import('pdf-parse');
-    const parser = new PDFParse({ data: Buffer.from(buffer) });
-    const result = await parser.getText();
-    return result.text.slice(0, MAX_CONTENT_CHARS) || null;
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[source-fetcher] pdf-parse failed: ${msg.slice(0, 200)}`);
-    return null;
-  }
+  const { extractPdfText } = await import('./pdf-extractor.ts');
+  return extractPdfText(buffer, MAX_CONTENT_CHARS);
 }
 
 // ---------------------------------------------------------------------------

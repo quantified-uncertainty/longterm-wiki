@@ -393,88 +393,13 @@ Anthropic is a company.`;
   });
 });
 
-// ---------------------------------------------------------------------------
-// buildEnrichmentChunks tests (#721 — sectional chunking for long pages)
-// ---------------------------------------------------------------------------
+// buildEnrichmentChunks is a thin wrapper over splitContentForEnrichment.
+// Full chunking logic tests live in crux/lib/content-chunker.test.ts.
+// Only the empty-input guard (unique to the wrapper) is tested here.
 
 describe('buildEnrichmentChunks', () => {
   it('returns empty array for empty content', () => {
     expect(buildEnrichmentChunks('')).toEqual([]);
     expect(buildEnrichmentChunks('   ')).toEqual([]);
-  });
-
-  it('returns a single chunk for short content', () => {
-    const content = 'Short content with no headings.';
-    const chunks = buildEnrichmentChunks(content);
-    expect(chunks.length).toBe(1);
-    expect(chunks[0]).toContain('Short content');
-  });
-
-  it('includes preamble text (but not frontmatter YAML) in the chunks', () => {
-    // splitContentForEnrichment excludes frontmatter (YAML metadata)
-    // but includes the preamble text below it. Use a large section to force splitting.
-    const section1 = '## Section One\n' + 'x'.repeat(5100);
-    const content = `---\ntitle: Test\n---\n\nIntro text here.\n\n${section1}`;
-
-    const chunks = buildEnrichmentChunks(content);
-    expect(chunks.length).toBeGreaterThan(1);
-    // Preamble must appear in some chunk
-    expect(chunks.some(c => c.includes('Intro text here'))).toBe(true);
-    // Section must appear in some chunk
-    expect(chunks.some(c => c.includes('Section One'))).toBe(true);
-    // Frontmatter YAML must NOT appear (excluded by splitContentForEnrichment)
-    expect(chunks.every(c => !c.includes('title: Test'))).toBe(true);
-  });
-
-  it('splits a multi-section page into multiple chunks', () => {
-    const bigSection = (heading: string) =>
-      `## ${heading}\n` + 'x'.repeat(3500);
-
-    const content = [
-      'Intro paragraph.\n',
-      bigSection('Alpha Section'),
-      bigSection('Beta Section'),
-      bigSection('Gamma Section'),
-    ].join('\n\n');
-
-    expect(content.length).toBeGreaterThan(10000);
-
-    const chunks = buildEnrichmentChunks(content);
-
-    // Every section heading must appear in at least one chunk
-    expect(chunks.some(c => c.includes('Alpha Section'))).toBe(true);
-    expect(chunks.some(c => c.includes('Beta Section'))).toBe(true);
-    expect(chunks.some(c => c.includes('Gamma Section'))).toBe(true);
-  });
-
-  it('covers the tail of a long page (regression for 6 000-char truncation bug)', () => {
-    // Simulate a page whose final section would be beyond 6 000 chars
-    const intro = 'Intro.\n';
-    // Fill up past the old 6 000-char limit
-    const padding = `## Early Section\n${'y'.repeat(6000)}\n`;
-    const tail = `## Final Section\nThis is the tail content that was silently skipped.\n`;
-    const content = intro + padding + tail;
-
-    expect(content.length).toBeGreaterThan(6000);
-
-    const chunks = buildEnrichmentChunks(content);
-
-    // The tail section must be present in some chunk
-    const hasTail = chunks.some(c => c.includes('This is the tail content that was silently skipped'));
-    expect(hasTail).toBe(true);
-  });
-
-  it('every heading appears in exactly one chunk', () => {
-    const headings = ['Alpha', 'Beta', 'Gamma', 'Delta'];
-    const content = headings
-      .map(h => `## ${h}\n${'x'.repeat(2000)}`)
-      .join('\n\n');
-
-    const chunks = buildEnrichmentChunks(content);
-
-    for (const heading of headings) {
-      const occurrences = chunks.filter(c => c.includes(`## ${heading}`)).length;
-      expect(occurrences).toBe(1);
-    }
   });
 });

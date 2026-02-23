@@ -232,8 +232,12 @@ async function runPilot(config: PilotConfig): Promise<void> {
 // Entry point
 // ---------------------------------------------------------------------------
 
-const config = parseConfig();
-runPilot(config).catch(err => {
-  console.error(`[pilot] Fatal error: ${err}`);
-  process.exit(1);
-});
+import { fileURLToPath } from 'url';
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const config = parseConfig();
+  runPilot(config).catch(err => {
+    console.error(`[pilot] Fatal error: ${err}`);
+    process.exit(1);
+  });
+}

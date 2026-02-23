@@ -27,6 +27,9 @@
     "youtube-transcript": "^1.2.1",
     "zod": "^3.24.2"
   },
+  "optionalDependencies": {
+    "@mendable/firecrawl-js": "^1.15.5"
+  },
   "devDependencies": {
     "@mdx-js/mdx": "^3.1.0",
     "@types/node": "^22.0.0",
