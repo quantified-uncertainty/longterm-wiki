@@ -118,6 +118,7 @@ const UNIFIED_BLOCKING_RULES = [
   'frontmatter-schema',
   'no-quoted-subcategory',
   'numeric-id-integrity',
+  'pipeline-artifacts',
   'prefer-entitylink',
 ];
 
@@ -133,7 +134,7 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'unified-blocking',
-    name: 'Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink)',
+    name: 'Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink, pipeline artifacts)',
     command: 'pnpm',
     args: [
       'crux', 'validate', 'unified',
