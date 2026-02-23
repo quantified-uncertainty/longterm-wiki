@@ -23,6 +23,15 @@ import { runOrchestratorPipeline } from './orchestrator/index.ts';
 import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier } from './orchestrator/types.ts';
 import { createPhaseLogger } from '../lib/output.ts';
 import { loadPages as loadPagesFromRegistry } from '../lib/content-types.ts';
+import {
+  snapshotFromFile,
+  computeDelta,
+  generateQualityReport,
+  writeJsonReport,
+  formatMarkdownReport,
+  type PageQualitySnapshot,
+  type PageQualityDelta,
+} from './batch-quality-report.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
@@ -58,6 +67,8 @@ export interface BatchOptions {
   skipSessionLog?: boolean;
   /** Path to write a markdown report file. */
   reportFile?: string;
+  /** Path to write the quality report JSON. Defaults to .claude/temp/batch-quality-report.json. */
+  qualityReportFile?: string;
 }
 
 export interface PageResult {
@@ -219,12 +230,17 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     grade,
     skipSessionLog,
     reportFile,
+    qualityReportFile,
   } = options;
 
   const total = pageIds.length;
   const results: PageResult[] = [];
   let cumulativeCost = 0;
   const batchStartTime = Date.now();
+
+  // Quality tracking: pre/post snapshots per page
+  const preSnapshots = new Map<string, PageQualitySnapshot>();
+  const postSnapshots = new Map<string, PageQualitySnapshot>();
 
   // ── Load or create state ────────────────────────────────────────────────
 
@@ -303,6 +319,12 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     const pageStart = Date.now();
     log('batch', `[${pageNum}/${total}] Improving ${pageId}...`);
 
+    // Snapshot pre-improvement metrics
+    if (pageFile) {
+      const pre = snapshotFromFile(pageFile.filePath);
+      if (pre) preSnapshots.set(pageId, pre);
+    }
+
     try {
       const orchResult: OrchestratorResult = await withTimeout(
         (signal) => {
@@ -322,6 +344,12 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
 
       const pageDuration = Date.now() - pageStart;
       cumulativeCost += orchResult.totalCost;
+
+      // Snapshot post-improvement metrics (re-read file after apply)
+      if (pageFile && apply) {
+        const post = snapshotFromFile(pageFile.filePath);
+        if (post) postSnapshots.set(pageId, post);
+      }
 
       const pageResult: PageResult = {
         pageId,
@@ -395,6 +423,65 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
     fs.writeFileSync(reportFile, report);
     log('batch', `Report written to ${reportFile}`);
+  }
+
+  // ── Quality report ─────────────────────────────────────────────────────
+
+  if (apply && preSnapshots.size > 0) {
+    const deltas: PageQualityDelta[] = [];
+    for (const [pageId, pre] of preSnapshots) {
+      const post = postSnapshots.get(pageId);
+      if (post) {
+        deltas.push(computeDelta(pageId, pre, post));
+      }
+    }
+
+    if (deltas.length > 0) {
+      const qualityReport = generateQualityReport(deltas, {
+        tier,
+        totalCost: cumulativeCost,
+        totalDuration: formatDuration(batchDuration),
+      });
+
+      // Write JSON report
+      const jsonPath = qualityReportFile || path.join(ROOT, '.claude/temp/batch-quality-report.json');
+      writeJsonReport(qualityReport, jsonPath);
+      log('batch', `Quality report (JSON): ${jsonPath}`);
+
+      // Write markdown report alongside JSON
+      const mdPath = jsonPath.endsWith('.json')
+        ? jsonPath.replace(/\.json$/, '.md')
+        : jsonPath + '.md';
+      const mdReport = formatMarkdownReport(qualityReport);
+      const mdDir = path.dirname(mdPath);
+      if (!fs.existsSync(mdDir)) fs.mkdirSync(mdDir, { recursive: true });
+      fs.writeFileSync(mdPath, mdReport);
+      log('batch', `Quality report (MD): ${mdPath}`);
+
+      // Print quality summary to console
+      const { summary } = qualityReport;
+      console.log('');
+      console.log('─'.repeat(70));
+      console.log('  QUALITY REPORT');
+      console.log('─'.repeat(70));
+      console.log(`  Pages analyzed: ${summary.totalPages}`);
+      console.log(`  Improved: ${summary.pagesImproved} | Unchanged: ${summary.pagesUnchanged} | Degraded: ${summary.pagesDegraded}`);
+      console.log(`  Avg word count change: ${summary.averageWordCountChange > 0 ? '+' : ''}${summary.averageWordCountChange}`);
+      console.log(`  New citations: +${summary.totalNewCitations} | New tables: +${summary.totalNewTables} | New diagrams: +${summary.totalNewDiagrams}`);
+      console.log(`  Avg structural score change: ${summary.averageStructuralScoreChange > 0 ? '+' : ''}${summary.averageStructuralScoreChange}`);
+
+      if (qualityReport.flaggedForReview.length > 0) {
+        console.log('');
+        console.log(`  ⚠ ${qualityReport.flaggedForReview.length} page(s) flagged for manual review:`);
+        for (const pageId of qualityReport.flaggedForReview) {
+          const d = deltas.find(dd => dd.pageId === pageId);
+          if (d) {
+            console.log(`    - ${pageId}: ${d.degradationReasons.join('; ')}`);
+          }
+        }
+      }
+      console.log('─'.repeat(70));
+    }
   }
 
   // Clean up state file on successful full completion (no failures)
