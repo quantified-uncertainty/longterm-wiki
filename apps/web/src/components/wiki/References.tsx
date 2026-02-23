@@ -87,6 +87,7 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
 
   const hasExpandableContent =
     resource.summary ||
+    credibility != null ||
     (resource.tags && resource.tags.length > 0);
 
   // Metadata fragments: type · author · year · publication
@@ -115,7 +116,7 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
     <span className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground mt-0.5">
       {metaParts.map((part, i) => (
         <React.Fragment key={i}>
-          {i > 0 && <span className="text-muted-foreground/30">·</span>}
+          {i > 0 && <span className="text-muted-foreground/30">{"\u00b7"}</span>}
           {part}
         </React.Fragment>
       ))}
@@ -133,34 +134,29 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
     </a>
   );
 
-  const compactContent = (
-    <div className="flex items-start gap-2">
-      <a
-        href={`#cite-${index}`}
-        className="shrink-0 text-xs font-mono text-muted-foreground/60 no-underline hover:text-foreground mt-0.5 w-5 text-right"
-        title="Jump to citation in text"
-      >
-        {index}
-      </a>
-      <div className="flex-1 min-w-0">
-        {titleLink}
-        {metaLine}
-      </div>
-      {credibility != null && (
-        <span className="shrink-0 mt-0.5">
-          <CredibilityBadge level={credibility} size="sm" />
-        </span>
-      )}
-    </div>
+  const numberLink = (
+    <a
+      href={`#cite-${index}`}
+      className="shrink-0 text-[11px] font-mono text-muted-foreground/50 no-underline hover:text-foreground mt-px w-4 text-right"
+      title={`Jump back to citation [${index}] in text`}
+    >
+      {index}
+    </a>
   );
 
   if (!hasExpandableContent) {
     return (
       <li
         id={`ref-${index}`}
-        className="py-2 border-b border-border/30 last:border-b-0"
+        className="py-1.5 border-b border-border/30 last:border-b-0"
       >
-        {compactContent}
+        <div className="flex items-start gap-1">
+          {numberLink}
+          <div className="flex-1 min-w-0">
+            {titleLink}
+            {metaLine}
+          </div>
+        </div>
       </li>
     );
   }
@@ -168,44 +164,36 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
   return (
     <li
       id={`ref-${index}`}
-      className="py-2 border-b border-border/30 last:border-b-0"
+      className="py-1.5 border-b border-border/30 last:border-b-0"
     >
       <details className="ref-details group">
         <summary className="ref-summary cursor-pointer">
-          <div className="flex items-start gap-2">
-            <a
-              href={`#cite-${index}`}
-              className="shrink-0 text-xs font-mono text-muted-foreground/60 no-underline hover:text-foreground mt-0.5 w-5 text-right"
-              title="Jump to citation in text"
-            >
-              {index}
-            </a>
+          <div className="flex items-start gap-1">
+            {numberLink}
             <div className="flex-1 min-w-0">
               {titleLink}
               {metaLine}
             </div>
-            {credibility != null && (
-              <span className="shrink-0 mt-0.5">
-                <CredibilityBadge level={credibility} size="sm" />
-              </span>
-            )}
-            <span className="ref-chevron shrink-0 text-muted-foreground/50 text-[11px] mt-1 transition-transform duration-150">
-              ▸
+            <span className="ref-chevron shrink-0 text-muted-foreground/60 text-base mt-px transition-transform duration-150">
+              {"\u25b8"}
             </span>
           </div>
         </summary>
 
-        <div className="pl-7 mt-1.5 pb-0.5">
+        <div className="pl-5 mt-1 pb-0.5">
           {resource.summary && (
             <p className="text-xs text-muted-foreground/70 leading-snug m-0">
               {resource.summary}
             </p>
           )}
-          {resource.tags && resource.tags.length > 0 && (
-            <span className="mt-1.5 block">
+          <div className="flex items-center gap-1.5 mt-1.5 empty:hidden">
+            {credibility != null && (
+              <CredibilityBadge level={credibility} size="sm" />
+            )}
+            {resource.tags && resource.tags.length > 0 && (
               <ResourceTags tags={resource.tags} limit={4} size="sm" />
-            </span>
-          )}
+            )}
+          </div>
         </div>
       </details>
     </li>
