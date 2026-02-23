@@ -22,6 +22,8 @@ import { compile } from '@mdx-js/mdx';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
+import remarkDirective from 'remark-directive';
 import { fileURLToPath } from 'url';
 
 // Use shared libraries
@@ -182,7 +184,13 @@ async function validateFile(filePath: string): Promise<ValidationFileResult> {
   try {
     await compile(content, {
       development: false,
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkMath],
+      remarkPlugins: [
+        remarkFrontmatter,
+        remarkMdxFrontmatter,
+        remarkMath,
+        remarkGfm,         // GitHub tables, strikethrough — matches production
+        remarkDirective,    // :::note, :::tip syntax — matches production
+      ],
       recmaPlugins: [],
     });
     return { success: true };

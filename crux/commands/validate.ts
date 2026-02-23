@@ -23,8 +23,8 @@ const SCRIPTS = {
   },
   compile: {
     script: 'validate/validate-mdx-compile.ts',
-    description: 'Check MDX compilation',
-    passthrough: ['ci', 'quick'],
+    description: 'Check MDX compilation (smoke-test for rendering errors)',
+    passthrough: ['ci', 'quick', 'file'],
   },
   links: {
     script: 'validate/validate-internal-links.ts',

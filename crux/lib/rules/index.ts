@@ -98,6 +98,9 @@ import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
 // Pipeline artifact detection
 import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
 
+// Footnote integrity (orphans, leaked SRC markers)
+import { footnoteIntegrityRule } from './footnote-integrity.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -150,6 +153,7 @@ export {
   noExecSyncRule,
   resourceRefIntegrityRule,
   pipelineArtifactsRule,
+  footnoteIntegrityRule,
 };
 
 export const allRules: Rule[] = [
@@ -203,6 +207,7 @@ export const allRules: Rule[] = [
   noExecSyncRule,
   resourceRefIntegrityRule,
   pipelineArtifactsRule,
+  footnoteIntegrityRule,
 ];
 
 export default allRules;
