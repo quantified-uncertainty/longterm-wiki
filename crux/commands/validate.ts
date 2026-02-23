@@ -104,7 +104,7 @@ const SCRIPTS = {
   gate: {
     script: 'validate/validate-gate.ts',
     description: 'CI-blocking checks (pre-push gate)',
-    passthrough: ['ci', 'full', 'fix'],
+    passthrough: ['ci', 'full', 'fix', 'fullGate', 'noTriage'],
   },
   'hallucination-risk': {
     script: 'validate/validate-hallucination-risk.ts',
@@ -140,8 +140,10 @@ Options:
 
 Examples:
   crux validate                           Run all checks
-  crux validate gate                      Run CI-blocking checks (pre-push)
+  crux validate gate                      Run CI-blocking checks (with triage)
   crux validate gate --full               Include full Next.js build
+  crux validate gate --no-triage          Skip LLM triage, run all checks
+  crux validate gate --full-gate          Force all checks (implies --no-triage)
   crux validate compile --quick           Quick compile check
   crux validate unified --rules=dollar-signs,markdown-lists
   crux validate unified --fix             Auto-fix unified rule issues
