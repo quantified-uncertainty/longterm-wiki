@@ -95,6 +95,8 @@ import { noExecSyncRule } from './no-exec-sync.ts';
 
 // Data integrity checks
 import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
+// Pipeline artifact detection
+import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
 
 // Re-export all rules individually
 export {
@@ -147,6 +149,7 @@ export {
   urlSafetyRule,
   noExecSyncRule,
   resourceRefIntegrityRule,
+  pipelineArtifactsRule,
 };
 
 export const allRules: Rule[] = [
@@ -199,6 +202,7 @@ export const allRules: Rule[] = [
   urlSafetyRule,
   noExecSyncRule,
   resourceRefIntegrityRule,
+  pipelineArtifactsRule,
 ];
 
 export default allRules;

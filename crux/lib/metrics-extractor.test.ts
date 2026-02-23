@@ -165,6 +165,86 @@ describe('suggestQuality', () => {
   });
 });
 
+describe('article scoring — section depth', () => {
+  it('prose-heavy page with h3 subsections scores ≥40 normalized without tables/diagrams', () => {
+    // Simulates a page like trust-cascade: 2000+ words, 15+ citations, 4+ h3s, no tables/diagrams
+    const sections = Array.from({ length: 5 }, (_, i) => `
+### Subsection ${i + 1}
+
+${'This is a detailed paragraph about AI safety topics with enough words to be substantial. '.repeat(12)}[^${i + 1}]
+`).join('\n');
+    const content = `---
+title: "Prose-Heavy Page"
+---
+
+## Overview
+
+This page discusses important AI safety concepts in depth with thorough analysis and citations.[^10]
+
+## Background
+
+A detailed background section covering the history and context of the topic with proper sourcing.[^11]
+
+${sections}
+
+## Key Analysis
+
+More analysis with <EntityLink id="E1">entity links</EntityLink> and [internal links](/page1) and [more](/page2) and [even more](/page3) and [links](/page4).[^12]
+
+## Implications
+
+The implications are significant for the field.[^13] Further research is needed.[^14] Multiple perspectives exist.[^15]
+
+[^1]: Source 1 (https://example.com/1)
+[^2]: Source 2 (https://example.com/2)
+[^3]: Source 3 (https://example.com/3)
+[^4]: Source 4 (https://example.com/4)
+[^5]: Source 5 (https://example.com/5)
+[^10]: Source 10 (https://example.com/10)
+[^11]: Source 11 (https://example.com/11)
+[^12]: Source 12 (https://example.com/12)
+[^13]: Source 13 (https://example.com/13)
+[^14]: Source 14 (https://example.com/14)
+[^15]: Source 15 (https://example.com/15)
+`;
+    const metrics = extractMetrics(content);
+    // Should score well despite no tables/diagrams
+    expect(metrics.structuralScoreNormalized).toBeGreaterThanOrEqual(40);
+    expect(metrics.tableCount).toBe(0);
+    expect(metrics.diagramCount).toBe(0);
+    expect(metrics.sectionCount.h3).toBeGreaterThanOrEqual(4);
+  });
+
+  it('h3 subsections contribute to article score', () => {
+    const base = `---
+title: Test
+---
+
+## Overview
+
+Some overview content here.
+
+`;
+    // Page with 0 h3s
+    const noH3 = base + 'Just content without subsections.';
+    // Page with 4+ h3s
+    const withH3 = base + `
+### Sub 1
+Content here.
+### Sub 2
+Content here.
+### Sub 3
+Content here.
+### Sub 4
+Content here.
+`;
+    const metricsNoH3 = extractMetrics(noH3);
+    const metricsWithH3 = extractMetrics(withH3);
+    // The page with h3s should score higher
+    expect(metricsWithH3.structuralScore).toBeGreaterThan(metricsNoH3.structuralScore);
+  });
+});
+
 describe('extractMetrics (integration)', () => {
   it('full content', () => {
     const content = `---

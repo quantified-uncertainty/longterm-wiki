@@ -9,22 +9,7 @@
 
 import type { InjectedError } from '../types.ts';
 import { stripFrontmatter } from '../../lib/patterns.ts';
-
-/** Patterns that match numeric claims in wiki prose. */
-const NUMBER_PATTERNS: { regex: RegExp; label: string }[] = [
-  // Years: "founded in 2015", "established 2019", "since 2020"
-  { regex: /\b((?:founded|established|created|launched|started|formed|incorporated)\s+(?:in\s+)?)((?:19|20)\d{2})\b/gi, label: 'founding-year' },
-  // Dollar amounts: "$100 million", "$2.5 billion", "$500,000"
-  { regex: /(\$)([\d,.]+)\s*(million|billion|thousand|[MBK])\b/gi, label: 'dollar-amount' },
-  // Plain dollar amounts: "$100", "$2,500"
-  { regex: /(\$)([\d,]+)(?!\s*(?:million|billion|thousand|[MBK]))/gi, label: 'dollar-plain' },
-  // Employee/staff counts: "50 employees", "200 researchers", "~150 staff"
-  { regex: /(~?\s*)([\d,]+)\s*(employees?|researchers?|staff|people|members?|engineers?|scientists?)\b/gi, label: 'headcount' },
-  // Percentages: "25%", "increased by 50%"
-  { regex: /([\d.]+)(%)/g, label: 'percentage' },
-  // Year references: "in 2023", "by 2025", "since 2019"
-  { regex: /\b(in|by|since|from|during|around)\s+((?:19|20)\d{2})\b/gi, label: 'year-reference' },
-];
+import { NUMBER_EXTRACTION_PATTERNS } from '../../lib/claim-patterns.ts';
 
 /** Corrupt a number by a plausible amount. */
 function corruptNumber(value: string, label: string): string {
@@ -101,7 +86,7 @@ function findNumericFacts(content: string): Array<{
     // Find where this paragraph actually starts in the body
     const paraStart = body.indexOf(para, charOffset);
 
-    for (const { regex, label } of NUMBER_PATTERNS) {
+    for (const { regex, label } of NUMBER_EXTRACTION_PATTERNS) {
       regex.lastIndex = 0;
       let match: RegExpExecArray | null;
       while ((match = regex.exec(para)) !== null) {
