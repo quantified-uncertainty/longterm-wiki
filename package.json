@@ -10,7 +10,7 @@
     "test:crux": "vitest run --config crux/vitest.config.ts",
     "validate": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs validate",
     "crux": "NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs",
-    "typecheck:tooling": "tsc --noEmit -p crux/tsconfig.json",
+    "typecheck:tooling": "npx tsx crux/validate/validate-crux-tsc.ts",
     "setup": "bash scripts/setup.sh",
     "setup:quick": "bash scripts/setup.sh --quick",
     "setup:check": "bash scripts/setup.sh --check",

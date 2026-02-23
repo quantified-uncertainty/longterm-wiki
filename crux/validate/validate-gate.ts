@@ -165,6 +165,13 @@ const PARALLEL_STEPS: Step[] = [
     args: ['tsx', 'crux/validate/validate-returning-guard.ts'],
     cwd: PROJECT_ROOT,
   },
+  {
+    id: 'typecheck-crux',
+    name: 'Crux TypeScript check',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-crux-tsc.ts'],
+    cwd: PROJECT_ROOT,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
