@@ -58,6 +58,10 @@ export const noQuotedSubcategoryRule = createRule({
       line: lineNum,
       message: `Quoted subcategory value — use \`subcategory: ${unquotedValue}\` not \`subcategory: ${quoteChar}${unquotedValue}${quoteChar}\``,
       severity: Severity.ERROR,
+      fix: {
+        search: quotedMatch[0],
+        replace: `subcategory: ${unquotedValue}`,
+      },
     }));
 
     return issues;

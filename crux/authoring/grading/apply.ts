@@ -50,7 +50,7 @@ export function applyGradesToFile(
   const orderedFm = reorderFrontmatterObject(fm);
 
   let newFm: string = stringifyYaml(orderedFm, {
-    defaultStringType: 'QUOTE_DOUBLE',
+    defaultStringType: 'PLAIN',
     defaultKeyType: 'PLAIN',
     lineWidth: 0,
   });
