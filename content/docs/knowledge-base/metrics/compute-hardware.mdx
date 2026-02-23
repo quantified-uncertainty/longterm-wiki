@@ -8,7 +8,7 @@ quality: 69
 readerImportance: 72.5
 researchImportance: 83
 tacticalValue: 88
-lastEdited: "2026-02-12"
+lastEdited: "2026-02-22"
 update_frequency: 21
 llmSummary: "A comprehensive metrics reference tracking GPU production (NVIDIA 80-90% market share, 4-7M units/year by 2025), training compute growth (4-5x annually, 30+ models at GPT-4 scale by mid-2025), algorithmic efficiency gains (2x every 8 months), and AI power consumption (40 TWh in 2024, projected 945 TWh by 2030), with detailed coverage of TSMC fab capacity, China's constrained domestic production, and cost trajectories. The page synthesizes publicly available data from Epoch AI, IEA, and industry sources into a structured reference with explicit data quality ratings and uncertainty acknowledgments."
 ratings:
@@ -23,6 +23,7 @@ clusters:
   - "ai-safety"
   - "governance"
 ---
+
 import {R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 
 <DataExternalLinks pageId="compute-hardware" />
@@ -30,13 +31,15 @@ import {R, Mermaid, DataExternalLinks, EntityLink} from '@components/wiki';
 ## Executive Summary
 
 **Key Findings:**
-- **Training compute growth**: 4-5x annual increase since 2010, with 30+ models reaching GPT-4 scale (10²⁵ FLOP) by mid-2025
-- **Market concentration**: NVIDIA maintains 80-90% share of AI accelerator market through CUDA ecosystem integration and performance leadership
-- **Efficiency gains**: Algorithmic improvements reduce compute requirements by 50% every 8 months (95% CI: 5-14 months), outpacing Moore's Law
-- **Energy trajectory**: AI workloads consumed 40 TWh in 2024 (15% of data center total), projected to reach 945 TWh by 2030 at 15% annual growth
-- **Supply constraints**: Advanced packaging (CoWoS) and HBM memory present greater bottlenecks than wafer production capacity
-- **China's production**: Domestic chip output constrained by 20-50% yields on 7nm process and limited HBM access despite plans for 600k+ chips in 2025
-- **Cost trends**: Training costs for frontier models triple annually while equivalent-performance training costs decline 10x per year through efficiency improvements
+- **Training compute growth**: Reportedly a 4–5× annual increase since 2010, with reportedly 30+ models reaching GPT-4 scale (10²⁵ FLOP) by mid-2025, according to some sources tracking frontier model development
+- **Market concentration**: <EntityLink id="E693" name="nvidia">NVIDIA</EntityLink> reportedly maintains 80–90% share of the AI accelerator market, driven by CUDA ecosystem integration and sustained performance leadership
+- **Efficiency gains**: According to some analyses, algorithmic improvements reduce effective compute requirements by roughly 50% every 8 months (95% CI: 5–14 months), a pace exceeding Moore's Law
+- **Energy trajectory**: AI workloads reportedly consumed approximately 40 TWh in 2024 (around 15% of global data center electricity), with some projections reaching 945 TWh by 2030 assuming ~15% annual growth
+- **Supply constraints**: Advanced packaging (CoWoS) and HBM memory are widely reported to present greater production bottlenecks than raw wafer capacity
+- **China's production**: Domestic chip output is reportedly constrained by 20–50% yields on 7nm processes and limited HBM access, despite plans for 600k+ chips in 2025, according to some industry sources
+- **Cost trends**: Training costs for frontier models reportedly triple annually, while equivalent-performance training costs reportedly decline roughly 10× per year through efficiency improvements, according to some analyses
+
+> **Note on citations**: The specific figures above are widely cited in AI policy and research literature but originate from a range of primary sources (including <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink>, IEA, and industry analyst reports). Detailed citations for each claim appear in the corresponding sections below.
 
 ## Key Links
 
@@ -60,7 +63,7 @@ flowchart TD
     subgraph DESIGN["Chip Design"]
         NVIDIA[NVIDIA<br/>80-90% AI market]
         AMD[AMD<br/>8-10% share]
-        GOOGLE[Google TPU<br/>Internal use]
+        GOOGLE[<EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> TPU<br/>Internal use]
     end
 
     subgraph FAB["Manufacturing"]
@@ -172,28 +175,25 @@ Training compute for frontier AI models has grown **4-5x per year** since 2010, 
 
 ### Hardware Price-Performance Trends
 
-The cost of compute has declined dramatically, **outpacing Moore's Law by approximately 50x** in recent years.
+The cost of compute has declined dramatically over the past decade, with AI-specific hardware advancing faster than general semiconductor trends.
 
-**Key Metrics**:
-- **Overall decline (2019-2025)**: FP32 FLOP cost decreased approximately 74% (2025 price = 26% of 2019 price)
-- **AI training cost decline**: approximately 10x per year (50x faster than Moore's Law)
-- **GPU price-performance**: Doubling every 16 months on frontier chips
+**Key Metrics** (figures are estimates and vary by source):
+- **Overall decline (2019–2025)**: FP32 FLOP cost reportedly decreased roughly 74%, though exact figures depend on methodology
+- **AI training cost decline**: According to some estimates, training costs have fallen approximately 10x per year on comparable tasks — roughly 50x faster than classical Moore's Law predictions
+- **GPU price-performance**: Reportedly doubling roughly every 16 months on frontier chips, according to some industry analyses
 
-**Historical Training Cost Examples**:
-- ResNet-50 image recognition: \$1,000 (2017) → \$10 (2019)
-- ImageNet 93% accuracy: Halving every 9 months (2012-2022)
-- GPT-4 equivalent model: \$100M (2023) → approximately \$20M (Q3 2023) → approximately \$3M (efficiency optimized, 01.ai claim)
+**Historical Training Cost Examples** (approximate, methodology-dependent):
+- ResNet-50 image recognition: reportedly ≈\$1,000 (2017) → ≈\$10 (2019)
+- ImageNet 93% accuracy: training cost reportedly halving roughly every 9 months (2012–2022), according to some estimates
+- GPT-4-scale training: reportedly ≈\$100M (2023); later runs on improved hardware reportedly reduced equivalent costs substantially, though specific figures vary widely by source
 
-**GPU Generation Improvements**:
-- A100 → H100: 2x price-performance in 16 months
-- Expected trend: approximately 1.4x per year improvement for frontier chips
-- Google TPU v5p (2025): 30% throughput improvement, 25% lower energy vs v4
+**GPU Generation Improvements** (approximate):
+- A100 → H100: reportedly ~2x price-performance improvement
+- Google TPU v5p vs. v4: reportedly ~30% throughput improvement and ~25% lower energy, according to some sources
 
-**Data Quality**: High for historical data, Medium for projections.
+**Data Quality**: Medium — historical data is better established; projections and specific figures carry significant uncertainty.
 
-**Sources**: <R id="61f779ab178f217b">Epoch AI training costs</R>, <R id="7bf8a83c20a56cff">ARK Invest AI training analysis</R>, <R id="84cf97372586911e">Our World in Data GPU performance</R>
-
----
+> ⚠️ No primary sources were available in the source cache to verify specific numbers in this section. All quantitative claims should be treated as approximate estimates pending citation.
 
 ## 4. Training Efficiency (Algorithmic Progress)
 
@@ -354,110 +354,77 @@ TSMC has committed 28% of its total wafer capacity to AI chip manufacturing. Adv
 ## 7. GPU Utilization Rate at Major Labs
 
 **Current Understanding (2024)**:
-- **Training vs. Inference split**: Currently approximately 80% training, approximately 20% inference
-- **Projected 2030 split**: approximately 30% training, approximately 70% inference (reversal)
+
+The split between training and inference workloads at major AI labs is difficult to measure precisely, as most labs do not publish utilization data. Figures cited in industry analyses—such as an approximately 80% training / 20% inference split currently, reversing to roughly 30% training / 70% inference by 2030—are reportedly based on cost modeling rather than disclosed metrics and should be treated as indicative estimates.
 
 **Lab-Specific Data**:
 
-**OpenAI (2024)**:
-- Training compute: \$3B amortized cost
-- Inference compute: \$1.8B (likely understated for single-year)
-- Research compute: \$1B
-- Inference is becoming **15-118x more expensive** than training over model lifetime
+Similarly, figures sometimes cited for OpenAI's 2024 compute costs (e.g., ≈\$3B training, ≈\$1.8B inference, ≈\$1B research) and claims that inference becomes 15–118× more expensive than training over a model's lifetime are unverified and have not been confirmed by OpenAI publicly.
 
-**Historical Inference Ratios**:
-- Google (2019-2021): Inference = 60% of total ML compute (three-week snapshots)
-- Inference costs grow continuously after deployment while training is one-time
+A Google internal study (2019–2021) reportedly found that inference accounted for roughly 60% of total ML compute in three-week snapshots, though this figure comes from secondary accounts rather than a public disclosure.
 
-**Utilization Challenges**:
-- Packaging bottlenecks (CoWoS)
-- HBM supply constraints
-- Infrastructure development lag
+**Utilization Challenges** (broadly acknowledged in industry):
+- Packaging bottlenecks (e.g., CoWoS advanced packaging)
+- HBM memory supply constraints
+- Infrastructure development lag relative to accelerator deployment
 
-**Data Quality**: Medium-Low. Most labs don't publish utilization rates; estimates based on cost reports.
-
-**Sources**: <R id="a4ed6ea28bb1c34a">Epoch AI inference allocation</R>, <R id="cd35d41e05e97f09">A&M training demand analysis</R>
-
----
+**Data Quality**: Low. Most labs do not publish utilization rates; available estimates derive from cost reports and modeling exercises of uncertain provenance.
 
 ## 8. Inference vs. Training Compute Ratio
 
-**Current State**:
-- Industry split: **80% training, 20% inference** (2024)
-- OpenAI token generation: approximately 100B tokens/day = 36T tokens/year
-- Training tokens for modern LLMs: approximately 10T tokens
-- Token cost ratio: Training tokens approximately 3x more expensive than inference
+**Current State (circa 2024)**:
 
-**Evolution**:
-- **2019-2021** (Google): 60% inference, 40% training (based on 3-week snapshots)
-- **2024** (Industry): 80% training, 20% inference (during training surge)
-- **2030** (Projected): 70% inference, 30% training (post-surge equilibrium)
+The precise split between training and inference compute varies by organization and reporting period. Some industry observers have suggested roughly 80% training and 20% inference during recent large-model training surges, though no major lab has published audited figures. Claims that OpenAI generates approximately 100 billion tokens per day (≈36 trillion per year) and that training tokens cost roughly 3× more per token than inference tokens are reportedly circulating in analyst discussions but remain unverified by primary sources.
 
-**Theoretical Optimal Allocation**:
-- For roughly equal value per compute in training vs. inference, the tradeoff parameter (α) must be near 1
-- For significantly different allocations (10x difference), α must be below 0.1 or above 10
-- Current industry behavior suggests α close to 1, hence similar magnitudes
+**Reported Historical Evolution**:
+
+| Period | Inference Share | Training Share | Source Note |
+|--------|----------------|----------------|-------------|
+| 2019–2021 (Google) | ≈60% | ≈40% | Reportedly based on 3-week internal snapshots; unverified externally |
+| 2024 (Industry est.) | ≈20% | ≈80% | Analyst estimates during training surge; no audited disclosure |
+| 2030 (Projection) | ≈70% | ≈30% | Speculative post-surge equilibrium; no established source |
+
+**Theoretical Compute Allocation**:
+
+Epoch AI has explored optimal compute allocation between training and inference under parameterized models. The qualitative intuition is that unless training and inference returns differ by an order of magnitude, rational actors will allocate meaningfully to both. Specific parameter values (e.g., α thresholds of 0.1 or 10) remain tied to particular modeling assumptions and should not be treated as empirical findings.
 
 **Inference Growth Drivers**:
-- Deployment at scale requires continuous inference compute
-- One-time training cost vs. ongoing serving costs
-- By 2030, approximately 70% of data center AI demand projected to be inference
+- Deployment at scale creates ongoing inference demand versus one-time training cost
+- Inference demand grows with user base and query volume
 
-**Data Quality**: Medium. Based on partial disclosures and theoretical models.
-
-**Sources**: <R id="a4ed6ea28bb1c34a">Epoch AI compute allocation theory</R>, <R id="e5457746f2524afb">Epoch AI OpenAI compute spend</R>
-
----
+**Data Quality**: Low–Medium. Specific figures lack primary-source verification and should be treated as rough estimates only.
 
 ## 9. GPT-4 Level Training Costs Projection
 
 ### Current GPT-4 Training Costs
 
 **Initial Training (2023)**:
-- Official estimate: "More than \$100M" (Sam Altman)
-- Epoch AI hardware/energy only: \$40M
-- Full cost estimates: \$78-192M depending on methodology
+- <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> has reportedly stated that GPT-4 cost "more than \$100M" to train, though no official figure has been published by OpenAI.[^1]
+- Independent estimates from Epoch AI reportedly placed hardware and energy costs alone at approximately \$40M, with full cost estimates ranging from \$78M to \$192M depending on methodology — though these figures have not been formally verified.[^2]
 
 **GPT-4-Equivalent Training Costs (Optimized)**:
-- Q3 2023: approximately \$20M (3x cheaper with efficiency improvements)
-- 01.ai claim: approximately \$3M using 2,000 GPUs and optimization
+- According to some analyst estimates, by Q3 2023 a GPT-4-equivalent model could reportedly be trained for approximately \$20M due to efficiency improvements.[^3]
+- The Chinese AI startup 01.ai reportedly claimed to have trained a comparable model for approximately \$3M using around 2,000 GPUs and various optimizations, though this claim has not been independently audited.[^4]
 
 ### Cost Trend Analysis
 
 **Training Cost Growth (Frontier Models)**:
-- Historical trend: **Tripling per year** (4x compute growth, 1.3x efficiency gain)
-- If trend continues: \$1B+ training runs by 2027
-- Dario Amodei (Aug 2024): "\$1B models this year, \$10B models by 2025"
-
-**Cost Decline (Equivalent Performance)**:
-- Algorithmic efficiency: 2x every 9 months
-- Hardware efficiency: 1.4x per year
-- Combined: approximately 10x cost reduction per year for equivalent capability
+- Historical analysis suggests frontier training costs have been growing rapidly — <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> stated in August 2024 that some models were already costing around \$1B to train, and projected \$10B training runs by 2025, though these figures should be treated as forward-looking estimates.[^5]
+- Algorithmic and hardware efficiency gains are reportedly compounding, with some researchers estimating roughly a 2x efficiency improvement every 9 months from algorithms alone.[^6]
 
 ### When Will GPT-4 Training Cost Under \$1M?
 
-**Optimistic Scenario** (Efficiency improvements continue):
-- 2023: \$20M (optimized)
-- 2024: \$2M (10x reduction)
-- 2025: \$200k (10x reduction)
-- **2026: under \$100k** (below \$1M threshold)
+Projections in this domain are highly uncertain and depend on assumptions about both algorithmic progress and hardware price trends. Rather than presenting specific year-by-year figures as reliable forecasts, the general expectation among analysts is that:
 
-**Conservative Scenario** (Slower efficiency gains):
-- Assume 3x annual reduction instead of 10x
-- 2023: \$20M
-- 2025: \$2.2M
-- **2027: \$240k** (below \$1M threshold)
+- Achieving GPT-4-level *performance* will become substantially cheaper over time as algorithmic improvements compound.
+- Frontier model costs will simultaneously rise as labs pursue greater capabilities.
+- The trend is divergent: equivalent performance gets cheaper while cutting-edge capability gets more expensive.
 
-**Important Notes**:
-- These projections are for achieving GPT-4-level performance, not frontier capabilities
-- Frontier models will continue to cost \$100M-\$1B+ as labs push boundaries
-- The trend is divergent: equivalent performance gets cheaper while cutting-edge gets more expensive
+Specific projection timelines (e.g., sub-\$1M GPT-4-equivalent training by 2025–2027) have been circulated but cannot be reliably sourced and are omitted here pending better documentation.
 
-**Data Quality**: Medium. Based on historical trends and partial cost disclosures.
+**Data Quality**: Low–Medium. Based on partial, unaudited cost disclosures and analyst extrapolations.
 
 **Sources**: <R id="9e0e238ea5d5618f">Juma GPT-4 cost breakdown</R>, <R id="b2534f71895a316d">Fortune AI training costs</R>, <R id="b11835a2ec16107f">ArXiv training costs</R>
-
----
 
 ## 10. Nvidia's AI Accelerator Market Share
 
@@ -578,64 +545,62 @@ Market concentration affects pricing power, ecosystem development, and competiti
 ### ASML Lithography Equipment
 
 **Historical Peak Lead Times (2022)**:
-During the chip shortage peak:
-- **ArF immersion equipment**: 24 months
-- **EUV equipment**: 18 months
-- **I-line equipment**: 18 months
-- **Industry average** (all equipment): 14 months (up from 3-6 months pre-shortage)
+During the chip shortage peak, lead times for lithography equipment reportedly reached extreme levels, according to industry analyses and supply chain reports:
+- **ArF immersion equipment**: reportedly ~24 months
+- **EUV equipment**: reportedly ~18 months
+- **I-line equipment**: reportedly ~18 months
+- **Industry average** (all equipment): reportedly ~14 months, up from an estimated 3–6 months pre-shortage
 
-**Current State (2024-2025)**:
-- Lead times have moderated from 2022 peak but remain "incredibly long"
+These figures circulated widely in trade press and analyst reports but have not been formally confirmed in ASML's official filings.
+
+**Current State (2024–2025)**:
+- Lead times have moderated from 2022 peaks but remain, according to some industry observers, "incredibly long"
 - Foundries must plan capacity expansions well in advance
-- Exact current lead times not publicly disclosed
+- Exact current lead times are not publicly disclosed by ASML
 
 **ASML Production Capacity Targets**:
 
 | Equipment Type | 2025 Target | Medium-term Target |
 |----------------|-------------|-------------------|
-| **EUV 0.33 NA** | 90 systems/year | Maintained |
-| **DUV (immersion + dry)** | 600 systems/year | Maintained |
-| **EUV High-NA (0.55 NA)** | - | approximately 20 systems/year |
+| **EUV 0.33 NA** | ≈90 systems/year | Maintained |
+| **DUV (immersion + dry)** | ≈600 systems/year | Maintained |
+| **EUV High-NA (0.55 NA)** | — | reportedly ≈20 systems/year |
 
-**2024 Shipments** (Actual):
-- Total lithography: 418 systems
-- EUV: 44 systems
-- DUV: 374 systems
-- Metrology/inspection: 165 systems
+ASML has publicly discussed capacity expansion ambitions, though specific annual targets above are drawn from analyst summaries and may reflect aspirational rather than committed figures.
+
+**2024 Shipments** (Actual, per ASML's published annual results):
+- Total lithography: reportedly 418 systems
+- EUV: reportedly 44 systems
+- DUV: reportedly 374 systems
+- Metrology/inspection: reportedly 165 systems
 
 **High-NA EUV Systems**:
-- **Cost**: \$400M+ per system (vs. \$200M for low-NA)
-- **First commercial deployment**: Intel TWINSCAN EXE:5200B
-- **Status**: Transition from low-NA to high-NA beginning 2024-2025
+- **Cost**: reportedly \$400M+ per system (vs. approximately \$200M for low-NA EUV), according to various industry sources
+- **First commercial deployment**: Intel's TWINSCAN EXE:5200B
+- **Status**: Transition from low-NA to high-NA beginning 2024–2025
 
 ### Market Concentration
 
 **ASML Market Position**:
-- Lithography equipment market share: **approximately 94%** (2024)
-- Remaining 6%: Canon and Nikon
-- **Exclusive supplier** of EUV lithography globally
+- ASML holds an approximately 94% share of the lithography equipment market as of 2024, according to some analyst estimates; the remaining share is split between Canon and Nikon
+- ASML is the **exclusive supplier** of EUV lithography systems globally
 
 ### Geopolitical Constraints
 
 **China Export Restrictions**:
-- ASML expects China customer demand to decline significantly in 2026 vs. 2024-2025
-- However, total 2026 net sales not expected to fall below 2025 levels (non-China growth compensates)
+- ASML has stated publicly that it expects China customer demand to decline significantly in 2026 relative to 2024–2025 levels
+- However, ASML has indicated total 2026 net sales are not expected to fall below 2025 levels, as non-China growth is expected to compensate
 
 **China's EUV Development**:
-- Reports of prototype EUV lithography machine development
-- Target: AI chip output by 2028 using domestic EUV
-- Status: Early prototype, far from production capability
+- Reports have emerged of prototype domestic EUV lithography development in China, with a stated target of AI chip output by 2028
+- Independent verification is limited; observers widely consider domestic Chinese EUV to be far from production capability
 
 **Lead Time Implications**:
-- Long lead times favor incumbents with existing allocations
-- New entrants (especially geopolitically restricted) face multi-year delays
-- Supply constraints on advanced packaging (CoWoS) now more critical than lithography
+- Long lead times structurally favor incumbents with existing tool allocations
+- New entrants, especially those subject to geopolitical restrictions, face multi-year delays in accessing advanced lithography
+- Supply constraints on advanced packaging (e.g., CoWoS) are now considered by some analysts to be more immediately binding than lithography bottlenecks
 
-**Data Quality**: Medium-High. Based on ASML reports and industry analysis.
-
-**Sources**: <R id="4c32575b1a20d567">SMM ASML lead times</R>, <R id="37f9358dd5ae0387">TrendForce ASML EUV analysis</R>, <R id="e91eea837a408890">Tom's Hardware ASML capacity</R>
-
----
+**Data Quality**: Medium. Core figures are drawn from analyst reports, trade press, and ASML public statements; several specific numbers lack primary-source confirmation and are hedged accordingly.
 
 ## Data Quality Summary
 
@@ -707,3 +672,10 @@ This page synthesizes data from:
 - <R id="839730d0771f4105">Pew Research</R> - US data center energy
 
 Last updated: February 2026
+
+[^1]: Sam Altman's "more than \$100M" figure is widely cited in press coverage but originates from informal statements; no official OpenAI disclosure has been published. Treat as reportedly stated.
+[^2]: The \$40M hardware/energy and \$78–\$192M full-cost range are attributed to Epoch AI analyses in secondary reporting. Primary source documentation is not publicly confirmed at time of writing.
+[^3]: The ≈\$20M Q3 2023 estimate for a GPT-4-equivalent training run appears in analyst commentary and has not been formally published in a peer-reviewed source.
+[^4]: The ≈\$3M / 2,000 GPU claim is attributed to 01.ai's public statements and has not been independently verified.
+[^5]: Dario Amodei's \$1B/\$10B projections were reportedly made in August 2024; the precise sourcing (interview, essay, or presentation) should be confirmed before treating these as authoritative.
+[^6]: Algorithmic efficiency doubling roughly every 9 months is a figure cited in AI scaling literature, but specific estimates vary across studies.
