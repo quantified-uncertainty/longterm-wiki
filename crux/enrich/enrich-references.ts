@@ -4,7 +4,8 @@
  * Appends or updates a <References> block at the end of MDX pages by:
  *   1. Extracting existing <R id="..."> inline citations from the content
  *   2. Looking up the page in the cited_by reverse index from resource YAML
- *   3. Merging both sources, deduplicating, and emitting the block
+ *   3. Matching URLs in footnotes and markdown links against the resource catalog
+ *   4. Merging all sources, deduplicating, and emitting the block
  *
  * Idempotent: if a <References> block already exists with the same IDs,
  * no changes are made. If new IDs are found, the block is replaced.
@@ -42,6 +43,8 @@ export interface ReferencesEnrichResult {
   action: 'added' | 'updated' | 'unchanged' | 'none';
   /** Resource IDs in the final block. */
   ids: string[];
+  /** Breakdown of where IDs came from. */
+  sources?: { inline: number; citedBy: number; urlMatch: number };
 }
 
 interface ResourceEntry {
@@ -58,6 +61,7 @@ interface ResourceEntry {
 let _resourceCache: ResourceEntry[] | null = null;
 let _citedByCache: Map<string, Set<string>> | null = null;
 let _validIdCache: Set<string> | null = null;
+let _urlIndexCache: Map<string, string> | null = null;
 
 function loadResources(root: string): ResourceEntry[] {
   if (_resourceCache) return _resourceCache;
@@ -94,6 +98,45 @@ function getValidIds(root: string): Set<string> {
   return _validIdCache;
 }
 
+/** Normalize a URL for matching (strip trailing slash, www, protocol). */
+function normalizeUrl(url: string): string[] {
+  const variations: string[] = [];
+  try {
+    const parsed = new URL(url);
+    const base = parsed.href.replace(/\/$/, '');
+    variations.push(base);
+    variations.push(base + '/');
+    if (parsed.hostname.startsWith('www.')) {
+      const noWww = base.replace('://www.', '://');
+      variations.push(noWww);
+      variations.push(noWww + '/');
+    }
+    if (!parsed.hostname.startsWith('www.')) {
+      const withWww = base.replace('://', '://www.');
+      variations.push(withWww);
+      variations.push(withWww + '/');
+    }
+  } catch {
+    variations.push(url);
+  }
+  return variations;
+}
+
+/** Build URL → resourceId lookup map from all resources. */
+function getUrlIndex(root: string): Map<string, string> {
+  if (_urlIndexCache) return _urlIndexCache;
+  const resources = loadResources(root);
+  const index = new Map<string, string>();
+  for (const r of resources) {
+    if (!r.url) continue;
+    for (const variation of normalizeUrl(r.url)) {
+      index.set(variation, r.id);
+    }
+  }
+  _urlIndexCache = index;
+  return index;
+}
+
 // ---------------------------------------------------------------------------
 // Core extraction logic
 // ---------------------------------------------------------------------------
@@ -113,6 +156,43 @@ function extractInlineResourceIds(content: string): string[] {
 function slugFromPageId(pageId: string): string {
   const parts = pageId.split('/');
   return parts[parts.length - 1];
+}
+
+/** Extract URLs from footnote definitions: [^N]: ... https://... */
+function extractFootnoteUrls(content: string): string[] {
+  const urls: string[] = [];
+  const footnoteRe = /^\[\^\d+\]:\s*(.*)/gm;
+  let m;
+  while ((m = footnoteRe.exec(content)) !== null) {
+    const text = m[1];
+    const urlRe = /https?:\/\/[^\s)>,"']+/g;
+    let urlMatch;
+    while ((urlMatch = urlRe.exec(text)) !== null) {
+      urls.push(urlMatch[0].replace(/[.),:;]+$/, ''));
+    }
+  }
+  return urls;
+}
+
+/** Extract URLs from markdown links: [text](url) but not images. */
+function extractMarkdownLinkUrls(content: string): string[] {
+  const urls: string[] = [];
+  const linkRe = /(?<!!)\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+  let m;
+  while ((m = linkRe.exec(content)) !== null) {
+    urls.push(m[2]);
+  }
+  return urls;
+}
+
+/** Match URLs against the resource catalog, return resource IDs. */
+function matchUrlsToResources(urls: string[], urlIndex: Map<string, string>): string[] {
+  const ids: string[] = [];
+  for (const url of urls) {
+    const id = urlIndex.get(url) ?? urlIndex.get(url.replace(/\/$/, '')) ?? urlIndex.get(url.replace(/\/$/, '') + '/');
+    if (id) ids.push(id);
+  }
+  return ids;
 }
 
 /** Check if a <References block already exists, and extract its current IDs. */
@@ -161,57 +241,79 @@ export function enrichReferences(
 
   const validIds = getValidIds(root);
   const citedByIndex = getCitedByIndex(root);
+  const urlIndex = getUrlIndex(root);
 
-  // Collect IDs from inline <R> tags
+  // Source 1: IDs from inline <R> tags
   const inlineIds = extractInlineResourceIds(content);
 
-  // Collect IDs from cited_by reverse index
+  // Source 2: IDs from cited_by reverse index
   const citedByIds = citedByIndex.get(slug) ?? new Set<string>();
 
-  // Merge: inline first (preserves page order), then cited_by additions
+  // Source 3: IDs from URL matching (footnotes + markdown links)
+  const footnoteUrls = extractFootnoteUrls(content);
+  const markdownUrls = extractMarkdownLinkUrls(content);
+  const allUrls = [...footnoteUrls, ...markdownUrls];
+  const urlMatchIds = matchUrlsToResources(allUrls, urlIndex);
+
+  // Merge: inline first, then cited_by, then URL matches
   const mergedIds: string[] = [];
   const seen = new Set<string>();
+  let inlineCount = 0;
+  let citedByCount = 0;
+  let urlMatchCount = 0;
+
   for (const id of inlineIds) {
     if (!seen.has(id) && validIds.has(id)) {
       seen.add(id);
       mergedIds.push(id);
+      inlineCount++;
     }
   }
   for (const id of citedByIds) {
     if (!seen.has(id) && validIds.has(id)) {
       seen.add(id);
       mergedIds.push(id);
+      citedByCount++;
+    }
+  }
+  for (const id of urlMatchIds) {
+    if (!seen.has(id) && validIds.has(id)) {
+      seen.add(id);
+      mergedIds.push(id);
+      urlMatchCount++;
     }
   }
 
+  const sources = { inline: inlineCount, citedBy: citedByCount, urlMatch: urlMatchCount };
+
   if (mergedIds.length === 0) {
-    return { content, refCount: 0, action: 'none', ids: [] };
+    return { content, refCount: 0, action: 'none', ids: [], sources };
   }
 
   // Check existing References block
   const existing = parseExistingReferences(content);
 
   if (existing.exists) {
-    // Compare: same IDs in same order → unchanged
+    // Compare: same IDs → unchanged
     const existingSet = new Set(existing.ids);
     const mergedSet = new Set(mergedIds);
     const sameIds = existingSet.size === mergedSet.size &&
       [...existingSet].every(id => mergedSet.has(id));
 
     if (sameIds) {
-      return { content, refCount: mergedIds.length, action: 'unchanged', ids: mergedIds };
+      return { content, refCount: mergedIds.length, action: 'unchanged', ids: mergedIds, sources };
     }
 
     // Replace existing block with updated one
     const newBlock = buildReferencesBlock(slug, mergedIds);
     const updated = content.slice(0, existing.blockStart) + newBlock + content.slice(existing.blockEnd);
-    return { content: updated, refCount: mergedIds.length, action: 'updated', ids: mergedIds };
+    return { content: updated, refCount: mergedIds.length, action: 'updated', ids: mergedIds, sources };
   }
 
   // Append new block
   const newBlock = buildReferencesBlock(slug, mergedIds);
   const trimmed = content.trimEnd();
-  return { content: trimmed + '\n\n' + newBlock + '\n', refCount: mergedIds.length, action: 'added', ids: mergedIds };
+  return { content: trimmed + '\n\n' + newBlock + '\n', refCount: mergedIds.length, action: 'added', ids: mergedIds, sources };
 }
 
 // ---------------------------------------------------------------------------
