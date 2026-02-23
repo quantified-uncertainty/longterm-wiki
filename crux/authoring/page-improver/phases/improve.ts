@@ -52,6 +52,11 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
   });
 
   let improvedContent: string = result;
+
+  // Strategy 1: If the response starts with frontmatter, use it directly.
+  // Strategy 2: Extract content from markdown code fences (```mdx, ```markdown, ```json, or bare ```)
+  // Strategy 3: Detect JSON-wrapped responses with "content" field and extract the markdown.
+  // Strategy 4: Fall back to original content if nothing looks like valid MDX.
   if (!improvedContent.startsWith('---')) {
     // Scan all code blocks and prefer the one whose content is valid MDX (starts with ---).
     // The non-greedy single-match regex previously picked the *first* code block, which
@@ -66,6 +71,53 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
       const largest = codeBlocks.reduce((a, b) => a[1].length >= b[1].length ? a : b);
       improvedContent = largest[1];
     }
+
+    // Detect JSON-wrapped responses: {"content": "...", "claimMap": [...]}
+    // The LLM sometimes returns structured JSON instead of raw MDX.
+    const contentFieldMatch = improvedContent.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+    if (contentFieldMatch) {
+      log('improve', '⚠ Detected JSON-wrapped response — extracting "content" field');
+      try {
+        // Unescape JSON string: \n → newline, \" → ", \\ → \, \t → tab
+        const extracted = JSON.parse(`"${contentFieldMatch[1]}"`);
+        if (typeof extracted === 'string' && extracted.length > 100) {
+          improvedContent = extracted;
+        }
+      } catch {
+        // JSON.parse may fail on truncated strings — try manual unescaping
+        let raw = contentFieldMatch[1];
+        let manual = '';
+        for (let i = 0; i < raw.length; i++) {
+          if (raw[i] === '\\' && i + 1 < raw.length) {
+            const next = raw[i + 1];
+            if (next === 'n') { manual += '\n'; i++; }
+            else if (next === '"') { manual += '"'; i++; }
+            else if (next === '\\') { manual += '\\'; i++; }
+            else if (next === 't') { manual += '\t'; i++; }
+            else { manual += raw[i]; }
+          } else {
+            manual += raw[i];
+          }
+        }
+        if (manual.length > 100) {
+          log('improve', '  Used manual unescaping for truncated JSON content string');
+          improvedContent = manual;
+        }
+      }
+    }
+  }
+
+  // Validate: improved content should look like MDX (start with frontmatter or heading).
+  // If it looks like raw JSON or garbage, fall back to original content.
+  const trimmed = improvedContent.trim();
+  if (
+    !trimmed.startsWith('---') &&
+    !trimmed.startsWith('#') &&
+    !trimmed.startsWith('import ') &&
+    !trimmed.startsWith('<')
+  ) {
+    log('improve', `⚠ Response does not look like MDX (starts with "${trimmed.substring(0, 40)}...") — keeping original`);
+    return currentContent;
   }
 
   // Guard against LLM truncation: if output is significantly shorter than input,

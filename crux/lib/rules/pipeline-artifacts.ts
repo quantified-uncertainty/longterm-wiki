@@ -47,13 +47,37 @@ export const pipelineArtifactsRule = {
 
     const lines = body.split('\n');
     let inCodeBlock = false;
+    let codeBlockStart = -1;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Track fenced code blocks — don't flag JSON inside legitimate ``` blocks
+      // Track fenced code blocks
       if (line.trim().startsWith('```')) {
-        inCodeBlock = !inCodeBlock;
+        if (!inCodeBlock) {
+          inCodeBlock = true;
+          codeBlockStart = i;
+        } else {
+          // Closing a code block — check if this code block IS a JSON blob artifact.
+          // Pipeline artifacts often appear as ```json code fences containing
+          // {"content": "...", "claimMap": [...]} structures.
+          const blockContent = lines.slice(codeBlockStart + 1, i).join('\n');
+          const matchCount = JSON_FIELD_PATTERNS.filter(p => p.test(blockContent)).length;
+          if (matchCount >= 2) {
+            issues.push(new Issue({
+              rule: 'pipeline-artifacts',
+              file: contentFile.path,
+              line: codeBlockStart + 1,
+              message:
+                `Pipeline artifact: code fence contains JSON fields ("content", "claimMap", etc.) ` +
+                `that look like a leaked improve-pipeline response. ` +
+                `The content should be extracted from the JSON and rendered as MDX.`,
+              severity: Severity.ERROR,
+            }));
+          }
+          inCodeBlock = false;
+          codeBlockStart = -1;
+        }
         continue;
       }
       if (inCodeBlock) continue;
@@ -75,6 +99,23 @@ export const pipelineArtifactsRule = {
             `Pipeline artifact: standalone \`{\` with JSON fields ("content", "claimMap", etc.) ` +
             `detected in MDX body. This is a leaked improve-pipeline JSON response — ` +
             `the page will render as raw JSON. Remove the blob and restore the MDX content.`,
+          severity: Severity.ERROR,
+        }));
+      }
+    }
+
+    // Handle unclosed code blocks containing JSON artifacts (truncated pipeline output)
+    if (inCodeBlock && codeBlockStart >= 0) {
+      const blockContent = lines.slice(codeBlockStart + 1).join('\n');
+      const matchCount = JSON_FIELD_PATTERNS.filter(p => p.test(blockContent)).length;
+      if (matchCount >= 2) {
+        issues.push(new Issue({
+          rule: 'pipeline-artifacts',
+          file: contentFile.path,
+          line: codeBlockStart + 1,
+          message:
+            `Pipeline artifact: unclosed code fence contains JSON fields ("content", "claimMap", etc.) ` +
+            `from a truncated improve-pipeline response.`,
           severity: Severity.ERROR,
         }));
       }
