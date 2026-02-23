@@ -390,6 +390,78 @@ describe('parseGroundedResult', () => {
 
     expect(result.claimMap).toHaveLength(1);
   });
+
+  // ── Content-level enforcement (#675) ──────────────────────────────────
+
+  it('flags unclaimed footnote markers in strict mode (#675)', () => {
+    // LLM adds [^SRC-2] in content but only maps SRC-1 in claimMap
+    const raw = JSON.stringify({
+      content: '## Bg\n\nFounded in 2000.[^SRC-1] Revenue was $10M.[^SRC-2]\n\n[^SRC-1]: Source (https://ex.com)\n[^SRC-2]: Unknown (https://unknown.com)',
+      claimMap: [
+        { claim: 'Founded in 2000.', factId: 'SRC-1', sourceUrl: 'https://ex.com' },
+        // Note: no entry for SRC-2
+      ],
+      unsourceableClaims: [],
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
+    }));
+
+    // SRC-2 should be flagged as unclaimed
+    expect(result.unsourceableClaims).toEqual(
+      expect.arrayContaining([expect.stringContaining('unclaimed footnote: ^SRC-2')]),
+    );
+  });
+
+  it('does not flag unclaimed footnotes in permissive mode (#675)', () => {
+    const raw = JSON.stringify({
+      content: '## Bg\n\nText.[^MYSTERY]\n\n[^MYSTERY]: Something',
+      claimMap: [],
+      unsourceableClaims: [],
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: true, requireClaimMap: false },
+    }));
+
+    // Permissive mode — no flags
+    expect(result.unsourceableClaims).toHaveLength(0);
+  });
+
+  it('catches unsourceable claim text appearing in prose (#675)', () => {
+    const raw = JSON.stringify({
+      content: '## Bg\n\nMIRI was founded in 2000. Their annual budget exceeds $20 million.',
+      claimMap: [
+        { claim: 'MIRI was founded in 2000.', factId: 'SRC-1', sourceUrl: 'https://ex.com' },
+      ],
+      unsourceableClaims: ['Their annual budget exceeds $20 million'],
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
+    }));
+
+    // The unsourceable claim text appears in the content — should be flagged
+    expect(result.unsourceableClaims).toEqual(
+      expect.arrayContaining([expect.stringContaining('unsourceable claim in prose')]),
+    );
+  });
+
+  it('does not flag very short unsourceable claim strings (#675)', () => {
+    const raw = JSON.stringify({
+      content: '## Bg\n\nMIRI is a lab.',
+      claimMap: [],
+      unsourceableClaims: ['lab'], // too short to match meaningfully
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
+    }));
+
+    // Only the original 'lab' should be in unsourceableClaims, not a duplicate flag
+    expect(result.unsourceableClaims).toEqual(['lab']);
+  });
 });
 
 // ---------------------------------------------------------------------------
