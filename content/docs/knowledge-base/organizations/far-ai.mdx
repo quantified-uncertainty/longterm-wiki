@@ -1,6 +1,6 @@
 ---
 title: FAR AI
-description: AI safety research nonprofit founded in 2022 by Adam Gleave and Karl Berzins, focusing on making AI systems safe through technical research and coordination
+description: "AI safety research nonprofit founded in 2022 by Adam Gleave and Karl Berzins, focusing on adversarial robustness, model evaluation, and alignment research"
 sidebar:
   order: 16
 entityType: organization
@@ -9,9 +9,9 @@ quality: 32
 readerImportance: 84.5
 researchImportance: 53.5
 tacticalValue: 68
-lastEdited: "2026-02-22"
+lastEdited: "2026-02-23"
 update_frequency: 21
-llmSummary: FAR AI (FAR.AI) is a 2022-founded AI safety research nonprofit led by CEO Adam Gleave and COO Karl Berzins. The organization focuses on technical AI safety research and coordination to ensure safety techniques are adopted.
+llmSummary: "FAR AI is an AI safety research nonprofit founded in July 2022 by Adam Gleave (CEO) and Karl Berzins (President). Based in Berkeley, California, the organization conducts technical research in adversarial robustness, model evaluation, interpretability, and alignment. Notable work includes demonstrating that adversarial policies can defeat superhuman Go AIs and co-authoring the 'Towards Guaranteed Safe AI' framework. FAR AI reported $24.3M in FY2024 revenue, secured $30M+ in 2025 funding commitments, and was selected by the European Commission's AI Office to lead CBRN risk research. The organization also operates FAR.Labs (a Berkeley coworking space with 40+ members) and a $12M grantmaking program funded by Open Philanthropy."
 ratings:
   novelty: 2.5
   rigor: 3
@@ -20,8 +20,36 @@ ratings:
 clusters:
   - ai-safety
   - community
+relatedEntries:
+  - id: adversarial-robustness
+    type: safety-agenda
+  - id: natural-abstractions
+    type: concepts
+  - id: metr
+    type: organization
+  - id: apollo-research
+    type: organization
+  - id: chai
+    type: organization
+  - id: open-philanthropy
+    type: funder
+  - id: technical-research
+    type: crux
+  - id: interpretability
+    type: safety-agenda
+  - id: mats
+    type: organization
+tags:
+  - adversarial-robustness
+  - ml-safety
+  - natural-abstractions
+  - evaluation
+  - safety-evaluations
+  - empirical-research
+  - academic-ai-safety
+  - red-teaming
+  - grantmaking
 ---
-
 import {DataInfoBox, KeyPeople, KeyQuestions, Section, R, EntityLink, DataExternalLinks} from '@components/wiki';
 
 <DataExternalLinks pageId="far-ai" />
@@ -30,11 +58,13 @@ import {DataInfoBox, KeyPeople, KeyQuestions, Section, R, EntityLink, DataExtern
 
 ## Overview
 
-FAR AI ([far.ai](https://www.far.ai/)) is an AI safety research nonprofit founded in July 2022 by Adam Gleave (CEO) and Karl Berzins (COO).[^1] Adam Gleave completed his PhD in AI at UC Berkeley, advised by <EntityLink id="stuart-russell">Stuart Russell</EntityLink>. The organization's mission is to ensure AI systems are trustworthy and beneficial to society.[^2] FAR AI incorporated in October 2022 as a 501(c)(3) nonprofit (EIN 92-0692207), having initially operated as a fiscally sponsored project.[^3]
+FAR AI ([far.ai](https://www.far.ai/)) is an AI safety research nonprofit founded in July 2022 by Adam Gleave (CEO) and Karl Berzins (COO).[^1] Adam Gleave completed his PhD in AI at UC Berkeley, advised by <EntityLink id="stuart-russell">Stuart Russell</EntityLink>.[^2] The organization's mission is to ensure AI systems are trustworthy and beneficial to society.[^3] FAR AI incorporated in October 2022 as a 501(c)(3) nonprofit (EIN 92-0692207), having initially operated as a fiscally sponsored project.[^4]
 
-FAR AI conducts technical research in areas including <EntityLink id="adversarial-robustness">adversarial robustness</EntityLink>, model evaluation, and alignment theory, focusing on fundamental AI safety challenges too large or resource-intensive for academia.[^4] The organization has published 30 research papers and hosted 1,000+ attendees across 10+ events.[^1] Notable work includes adversarial policies that beat the superhuman Go AI KataGo with greater than 77% win rate even when it uses superhuman-level search—policies easily defeated by human amateurs—demonstrating that capability does not guarantee robustness.[^5] FAR AI has also begun red-teaming leading language models for frontier labs.[^1]
+FAR AI conducts technical research in areas including <EntityLink id="adversarial-robustness">adversarial robustness</EntityLink>, interpretability, model evaluation, and alignment, focusing on fundamental AI safety challenges too large or resource-intensive for academia.[^5] The organization has published 30 research papers and hosted 1,000+ attendees across 10+ events.[^1] Notable achievements include adversarial policies that beat the superhuman Go AI KataGo with greater than 77% win rate even when it uses superhuman-level search—policies easily defeated by human amateurs—demonstrating that capability does not guarantee robustness.[^6] FAR AI co-authored the influential "Towards Guaranteed Safe AI" framework paper published in May 2024.[^5] In February 2026, FAR AI was selected by the <EntityLink id="E301" name="tmc-ai-governance">AI Governance</EntityLink> to lead CBRN risk research.[^7]
 
-Funding includes a \$12 million grant from Open Philanthropy supporting FAR AI's grantmaking program, and the organization secured over \$30 million in total funding commitments in 2025.[^6][^7] Revenue reached \$24.3 million in fiscal year 2024.[^8]
+The organization has grown to approximately 12 full-time staff.[^4] Funding includes a \$12 million grant from Open Philanthropy supporting FAR AI's grantmaking program, and the organization secured over \$30 million in total funding commitments in 2025.[^8][^7] Revenue reached \$24.3 million in fiscal year 2024.[^9]
+
+FAR AI also operates FAR.Labs, a coworking space in Berkeley with 40+ active members supporting the broader AI safety research community.[^1]
 
 ## Key Research Areas
 
@@ -42,27 +72,27 @@ Funding includes a \$12 million grant from Open Philanthropy supporting FAR AI's
 
 | Research Focus | Approach | Safety Connection | Publications |
 |----------------|----------|-------------------|---------------|
-| Adversarial Attacks on Go AI | Training adversarial policies against KataGo | Superhuman systems remain exploitable | "Adversarial Policies Beat Superhuman Go AIs" (2023)[^5] |
-| Go AI Defense Analysis | Testing adversarial training, iterated adversarial training, vision transformers | None of three defenses withstood adaptive attacks | "Can Go AIs be adversarially robust?" (2024)[^9] |
-| LLM <EntityLink id="E583" name="adversarial-training">Adversarial Training</EntityLink> | Adversarial training vs. scaling for robustness | Orders-of-magnitude efficiency gains | FAR.AI robustness research[^10] |
-| Multi-layer Defense Bypass | STACK attack method against layered AI defenses | Identifies gaps in defense-in-depth strategies | 71% success rate documented[^4] |
+| Adversarial Attacks on Go AI | Training adversarial policies against KataGo | Superhuman systems remain exploitable | "Adversarial Policies Beat Superhuman Go AIs" (2023)[^6] |
+| Go AI Defense Analysis | Testing adversarial training, iterated adversarial training, vision transformers | None of three defenses withstood adaptive attacks | "Can Go AIs be adversarially robust?" (2024)[^10] |
+| LLM <EntityLink id="E583" name="adversarial-training">Adversarial Training</EntityLink> | Adversarial training vs. scaling for robustness | Orders-of-magnitude efficiency gains | FAR.AI robustness research[^11] |
+| Multi-layer Defense Bypass | STACK attack method against layered AI defenses | Identifies gaps in defense-in-depth strategies | 71% success rate documented[^3] |
 
-FAR AI's research in <EntityLink id="adversarial-robustness">adversarial robustness</EntityLink> has produced several notable empirical results. A landmark 2023 paper, "Adversarial Policies Beat Superhuman Go AIs," demonstrated that adversarial policies achieved a >99% win rate against KataGo when it uses no tree-search, and a >77% win rate even when KataGo uses superhuman-level search.[^5] Critically, the adversarial policies win by tricking KataGo into blunders rather than by playing stronger Go, and are themselves easily beaten by human amateur players.[^5] A follow-up 2024 paper, "Can Go AIs be adversarially robust?," tested three natural defenses—positional adversarial training, iterated adversarial training, and vision transformer architectures—and found that none could withstand adaptive adversarial attacks.[^9] FAR AI has also found that adversarial training improves language model robustness orders of magnitude more efficiently than scaling model size alone, and that larger language models are more vulnerable to data poisoning, a result demonstrated across 23 LLMs from 8 model series.[^10]
+FAR AI's research in <EntityLink id="adversarial-robustness">adversarial robustness</EntityLink> has produced several notable empirical results. A landmark 2023 paper, "Adversarial Policies Beat Superhuman Go AIs," demonstrated that adversarial policies achieved a >99% win rate against KataGo when it uses no tree-search, and a >77% win rate even when KataGo uses superhuman-level search.[^6] Critically, the adversarial policies win by tricking KataGo into blunders rather than by playing stronger Go, and are themselves easily beaten by human amateur players.[^6] A follow-up 2024 paper, "Can Go AIs be adversarially robust?," tested three natural defenses—positional adversarial training, iterated adversarial training, and vision transformer architectures—and found that none could withstand adaptive adversarial attacks.[^10] FAR AI has also found that adversarial training improves language model robustness orders of magnitude more efficiently than scaling model size alone, and that larger language models are more vulnerable to data poisoning, a result demonstrated across 23 LLMs from 8 model series.[^11]
 
 ### Research Programs
 
 | Program | Purpose | Details |
 |---------|---------|----------|
 | FAR.Labs | Co-working space | Berkeley-based AI safety research hub with 40+ active members[^1] |
-| Grant-making | Fund external research | \$12 million Open Philanthropy grant supports academics and independent researchers[^6] |
+| Grant-making | Fund external research | \$12 million Open Philanthropy grant supports academics and independent researchers[^12] |
 | Events & Workshops | Convene stakeholders | 1,000+ attendees across 10+ events hosted[^1] |
 | In-house Research | Technical safety work | Robustness, interpretability, alignment; 30 research papers published[^1] |
 
-The grant-making program funds external researchers working on AI safety problems, with four initial grants targeting failure modes, red-teaming frameworks, explainability, and alignment security.[^6] FAR.Labs provides physical co-working space and community infrastructure for independent researchers. The events program hosts workshops and convenings, including the inaugural Technical Innovations for AI Policy Conference and international alignment workshops.[^11]
+The grant-making program funds external researchers working on AI safety problems, with four initial grants targeting failure modes, red-teaming frameworks, explainability, and alignment security.[^12] FAR.Labs provides physical co-working space and community infrastructure for independent researchers. The events program hosts workshops and convenings, including the inaugural Technical Innovations for AI Policy Conference and international alignment workshops.[^13]
 
 ### LLM Red-Teaming and Model Evaluation
 
-FAR AI began red-teaming leading language models for frontier labs in Q4 2023, including red-teaming of GPT-4.[^1] The organization delivers research through peer-reviewed publications, governmental partnerships, and red-teaming engagements.[^4] FAR AI was also selected by the European Commission's AI Office to lead CBRN risk research, reflecting its expanding role in frontier model evaluation.[^7]
+FAR AI began red-teaming leading language models for frontier labs in Q4 2023, including red-teaming of GPT-4.[^1] The organization delivers research through peer-reviewed publications, governmental partnerships, and red-teaming engagements.[^3] FAR AI was also selected by the European Commission's AI Office to lead CBRN risk research, reflecting its expanding role in frontier model evaluation.[^7]
 
 ### <EntityLink id="E213" name="natural-abstractions">Natural Abstractions</EntityLink> Research
 
@@ -79,43 +109,35 @@ FAR AI has expressed theoretical interest in <EntityLink id="natural-abstraction
 
 ### Leadership
 
-FAR AI was founded in July 2022 by Adam Gleave and Karl Berzins.[^1] Gleave serves as Co-founder & CEO, while Berzins serves as Co-founder & President.[^12] According to public filings, Gleave's compensation was \$229,331 and Berzins's was \$182,641 in fiscal year 2024.[^8] Gleave's research background includes adversarial policies work, including the landmark study demonstrating that human amateurs could beat superhuman Go AIs.[^5]
+FAR AI was founded in July 2022 by Adam Gleave and Karl Berzins.[^1] Gleave serves as Co-founder & CEO, while Berzins serves as Co-founder & President.[^6] Gleave completed his PhD in artificial intelligence at UC Berkeley under Stuart Russell's supervision, and his research focuses on developing techniques for AI systems to act according to human preferences.[^14] According to public 990 filings, Gleave's compensation was \$229,331 and Berzins's was \$182,641 in fiscal year 2024.[^9]
+
+### Organizational Structure
+
+FAR AI is incorporated as a 501(c)(3) nonprofit with EIN 92-0692207, tax-exempt since November 2020.[^9] The organization maintains a policy capping revenue from for-profit AI developers at a maximum of 10% of total annual revenue, and charges market rates to avoid subsidizing private actors.[^4] FAR AI reported \$24.3 million in revenue and \$8.6 million in expenses for fiscal year 2024.[^9]
 
 ### Research Team
 
-FAR AI has grown to a team of 12 full-time staff, including at least 17 technical engineers and researchers, alongside dedicated operations and communications personnel.[^13] [^12]
+FAR AI has grown to a team of 12 full-time staff, including technical engineers and researchers alongside dedicated operations and communications personnel.[^15] The organization maintains Operations, Communications, and Technical Staff departments with 18 technical staff members.[^6]
 
 ### FAR.Labs Co-working Space
 
-FAR.Labs is a co-working hub located in downtown Berkeley, founded in Q3 2023, and now houses 40+ active members working on <EntityLink id="safety-research">AI safety</EntityLink> problems.[^1] [^14]
+FAR.Labs is a co-working hub located in downtown Berkeley, opened in March 2023, and now houses 40+ active members working on <EntityLink id="safety-research">AI safety</EntityLink> problems.[^15]
 
 ## Current State & Trajectory
 
-### Research Progress
+FAR AI was incorporated in October 2022 and has grown rapidly since its founding.[^4] By late 2023, the organization had scaled to 12 full-time staff and produced 13 academic papers.[^15] That growth has continued: FAR AI now fields at least 17 technical staff members and has published 30 research papers across robustness, value alignment, and model evaluation.[^9]
 
-**Publications**: FAR AI has published 30 research papers across robustness, value alignment, and model evaluation.[^1] Work has appeared at machine learning venues including NeurIPS, ICML, and ICLR, covering adversarial robustness, LLM evaluation, and related safety topics.
+Financially, the organization has expanded substantially. FAR AI reported \$24.3M in revenue and \$8.6M in expenses in fiscal year 2024.[^9] In 2025, FAR AI secured over \$30 million in additional funding commitments to scale its frontier AI safety research.[^7] The grantmaking program, launched in Q3 2024 with a \$12 million grant from Open Philanthropy, marks a newer programmatic frontier — extending the organization's reach beyond direct research into supporting the broader field.[^8]
 
-**Team & Finances**: The organization has grown to at least 17 technical staff members.[^12] FAR AI reported \$24.3M in revenue and \$8.6M in expenses in fiscal year 2024.[^8] In 2025, FAR AI secured over \$30 million in additional funding commitments to scale its research.[^7]
+Policy engagement has also accelerated. FAR AI launched the inaugural Technical Innovations for AI Policy Conference in Washington, D.C. on May 31–June 1, 2025, convening over 150 technical experts, researchers, and policymakers.[^8] In early 2026, FAR AI was selected by the European Commission's AI Office to lead CBRN risk research, signaling growing institutional recognition.[^7]
 
-**Policy Engagement**: FAR AI was selected by the European Commission's AI Office to lead CBRN risk research, and launched the inaugural Technical Innovations for AI Policy Conference in June 2025.[^7] [^11]
-
-**Collaborations**: FAR AI's *Towards Guaranteed Safe AI* paper was co-authored with 17 contributors including <EntityLink id="E380" name="yoshua-bengio">Yoshua Bengio</EntityLink> and Stuart Russell.[^15]
-
-### Current Metrics
-
-| Metric | Status | Context |
-|--------|--------|---------|
-| Research Focus | Robustness, interpretability, evaluation, alignment | Active research programs |
-| Events Hosted | 10+ | Workshops and convenings |
-| Publications | 30 | Academic venues including NeurIPS, ICML, ICLR |
-| FAR.Labs Members | 40+ | Berkeley co-working space |
-| FY2024 Revenue | \$24.3M | Per IRS Form 990 |
+Looking ahead, FAR AI plans to launch public requests for proposals focused on high-impact research areas, broadening access to its grantmaking program beyond nomination-only pathways.[^1] The organization's trajectory — from a two-person founding team in 2022 to a multi-program institute with \$24M+ in annual revenue — reflects a deliberate expansion from research incubator toward a central node in the technical AI safety ecosystem.[^4]
 
 ## Strategic Position Analysis
 
 ### Organizational Comparisons
 
-FAR AI conducts empirical technical AI safety research without developing or deploying AI products of its own.[^1] Its work emphasizes adversarial robustness of deployed systems — demonstrating, for example, that superhuman Go AIs can be defeated by adversarial policies despite their capabilities.[^3] FAR AI caps revenue from for-profit AI developers at 10% of total annual revenue to preserve research independence.[^10]
+FAR AI conducts empirical technical AI safety research without developing or deploying AI products of its own.[^1] Its work emphasizes adversarial robustness of deployed systems — demonstrating, for example, that superhuman Go AIs can be defeated by adversarial policies despite their capabilities.[^4] FAR AI caps revenue from for-profit AI developers at 10% of total annual revenue to preserve research independence.[^11]
 
 | Organization | Focus | Overlap with FAR AI | Differentiation |
 |---|---|---|---|
@@ -126,27 +148,25 @@ FAR AI conducts empirical technical AI safety research without developing or dep
 
 ### Positioning in AI Safety Ecosystem
 
-FAR AI occupies a position between academic AI safety research and industry application, publishing at mainstream ML venues to reach beyond specialized safety audiences.[^4] The organization focuses on fundamental AI safety challenges described as too large or resource-intensive for academia alone.[^4] FAR AI's research has found that even superhuman AI systems fail catastrophically against adversarial attacks, and that none of three tested defenses could withstand adaptive adversaries — a distinctively empirical finding.[^9]
+FAR AI occupies a position between academic AI safety research and industry application, publishing at mainstream ML venues to reach beyond specialized safety audiences.[^3] The organization focuses on fundamental AI safety challenges described as too large or resource-intensive for academia alone.[^3] FAR AI's research has found that even superhuman AI systems fail catastrophically against adversarial attacks, and that none of three tested defenses could withstand adaptive adversaries — a distinctively empirical finding.[^10]
 
-FAR AI operates FAR.Labs, a coworking space in Berkeley hosting 40+ active members, situating it within the Berkeley AI safety ecosystem alongside CHAI and other research groups.[^1] Its grantmaking program, funded by a \$12 million Open Philanthropy grant, connects researchers across institutional boundaries.[^8] The organization's adversarial robustness agenda links near-term safety concerns about deployed systems to longer-term alignment challenges.[^6]
+FAR AI operates FAR.Labs, a coworking space in Berkeley hosting 40+ active members, situating it within the Berkeley AI safety ecosystem alongside CHAI and other research groups.[^1] Its grantmaking program, funded by a \$12 million Open Philanthropy grant, connects researchers across institutional boundaries.[^9] The organization's adversarial robustness agenda links near-term safety concerns about deployed systems to longer-term alignment challenges.[^12]
 
 ## Research Impact and Influence
 
-### Academic Publications
+### Academic Reception
 
-FAR AI has published over 30 research papers across robustness, value alignment, and model evaluation.[^1] Researchers publish at top-tier machine learning conferences including NeurIPS, ICML, and ICLR, covering adversarial robustness, model evaluation, and AI safety topics.[^4]
+FAR AI has published over 30 research papers across robustness, value alignment, and model evaluation.[^1] Research appears at top-tier venues including NeurIPS, ICML, and ICLR.[^15] The KataGo adversarial policies paper has accumulated 99 citations on Google Scholar, and the earlier foundational adversarial policies paper (ICLR 2020) has amassed 555 citations.[^16] A 2025 multi-agent risks paper has already reached 113 citations.[^16] FAR AI's research has been cited in congressional testimony and mainstream media.[^3]
 
-A landmark paper, "Adversarial Policies Beat Superhuman Go AIs" (published January 9, 2023), demonstrated that adversarial policies could defeat KataGo with a >77% win rate even when KataGo used superhuman-level search, and >99% when tree-search was disabled.[^5] The adversarial policies won by inducing blunders rather than by playing stronger Go, and were themselves easily beaten by human amateurs.[^5] A follow-up study, "Can Go AIs be adversarially robust?" (published June 18, 2024), tested three defensive strategies—adversarial training, iterated adversarial training, and vision transformers—and found that none withstood adaptive attacks.[^9] FAR AI's STACK attack method achieved a 71% success rate bypassing multi-layered AI defenses.[^4]
-
-The 2024 paper "Towards Guaranteed Safe AI," co-authored by 17 contributors including Yoshua Bengio and Stuart Russell, proposed a safety framework using world models, safety specifications, and verifiers.[^15]
+The 2024 paper "Towards Guaranteed Safe AI," co-authored by 17 contributors including <EntityLink id="E380" name="yoshua-bengio">Yoshua Bengio</EntityLink> and Stuart Russell, proposed a safety framework using world models, safety specifications, and verifiers.[^5] FAR AI's STACK attack method, achieving a 71% success rate bypassing multi-layered AI defenses, further demonstrated the organization's capacity to produce operationally significant results.[^3]
 
 ### Policy Engagement
 
-FAR AI was selected by the European Commission's AI Office to lead CBRN risk research.[^7] The organization launched the inaugural Technical Innovations for AI Policy Conference in June 2025.[^11] FAR AI's research on robustness and evaluation is relevant to ongoing <EntityLink id="ai-governance">AI governance</EntityLink> discussions.
+In February 2026, FAR AI was selected by the European Commission's AI Office to lead CBRN risk research, reflecting institutional recognition of its expertise in frontier model evaluation.[^7] FAR AI secured over \$30 million in funding commitments in 2025 to scale frontier AI safety research.[^7] The organization launched the inaugural Technical Innovations for AI Policy Conference on May 31–June 1, 2025, convening over 150 technical experts, researchers, and policymakers in Washington, D.C.[^4] FAR AI's research on robustness and evaluation is relevant to ongoing <EntityLink id="ai-governance">AI governance</EntityLink> discussions.
 
 ### Community Building
 
-Through FAR.Labs, the organization provides infrastructure for 40+ independent researchers and small teams working on <EntityLink id="technical-research">technical AI safety</EntityLink>.[^1] FAR AI's events program has reached 1,000+ attendees across 10+ events.[^1]
+FAR.Labs, a Berkeley-based coworking space, supports 40+ active members working on <EntityLink id="technical-research">technical AI safety</EntityLink>.[^1] FAR AI's events program has reached 1,000+ attendees across 10+ events.[^1] A \$12 million grant from Open Philanthropy funds FAR AI's grantmaking program, through which it supports academics and independent researchers developing solutions to critical AI risks.[^8]
 
 ## Research Questions and Uncertainties
 
@@ -162,7 +182,7 @@ Several theoretical questions shape FAR AI's research direction:
 
 ### Organizational Uncertainties
 
-- **Research Timeline**: Academic publication timelines typically span months to years, including peer review, revision, and conference scheduling. Whether this research pace adequately matches the urgency of safety concerns depends on assessments of timelines for transformative AI development.
+- **Research Timeline**: Academic publication timelines typically span months to years, including peer review, revision, and conference scheduling. Whether this research pace adequately matches the urgency of safety concerns depends on assessments of timelines for <EntityLink id="E357" name="transformative-ai">Transformative AI</EntityLink> development.
 
 - **Scope Evolution**: FAR AI's research focus may evolve as the field develops. The organization's emphasis on empirical robustness could shift toward other safety approaches depending on which problems prove most tractable or urgent.
 
@@ -183,7 +203,9 @@ These debates reflect broader disagreements within the AI safety community about
 
 ### Current Funding Model
 
-FAR AI's funding profile reflects dependence on sources within the effective altruism ecosystem, including <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> and related foundations. Open Philanthropy has provided at least two distinct grants to FAR AI, including support for AI safety research and field-building and a separate communications and outreach grant.[^16][^1] FAR AI's grantmaking program is separately funded by a \$12 million grant from Open Philanthropy.[^8] In fiscal year 2024, FAR AI reported revenue of \$24.3 million against expenses of \$8.6 million.[^6] FAR AI secured over \$30 million in total funding commitments in 2025.[^7] This concentration provides mission alignment and relatively stable multi-year funding, while also creating exposure to changes in EA funding priorities. Revenue from for-profit AI developers is capped at a maximum of 10% of FAR AI's total annual revenue.[^3]
+FAR AI's funding profile reflects dependence on sources within the effective altruism ecosystem, including <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> and related foundations. Open Philanthropy (which rebranded to <EntityLink id="E521" name="coefficient-giving">Coefficient Giving</EntityLink> in November 2025) has provided at least two distinct grants to FAR AI, including support for AI safety research and field-building and a separate communications and outreach grant.[^6][^3] FAR AI's grantmaking program is separately funded by a \$12 million grant from Open Philanthropy.[^8] In fiscal year 2024, FAR AI reported revenue of \$24.3 million against expenses of \$8.6 million, per its Form 990 filed November 14, 2025.[^9] FAR AI secured over \$30 million in total funding commitments in 2025.[^7] Good Ventures, Open Philanthropy's partner foundation, supports FAR AI as part of its Navigating Transformative AI focus area.[^16]
+
+Revenue from for-profit AI developers is capped at a maximum of 10% of FAR AI's total annual revenue, and FAR AI commits to disclosing the fraction of revenue derived from such consulting.[^4] This concentration of philanthropic funding provides mission alignment and relatively stable multi-year support, while also creating exposure to shifts in EA funding priorities. The \$12 million grantmaking allocation is directed toward supporting academics and independent researchers working on critical AI safety problems.[^1]
 
 ## Criticisms and Responses
 
@@ -197,11 +219,11 @@ FAR AI's funding profile reflects dependence on sources within the effective alt
 
 ### Limited Scope Questions
 
-**Criticism**: Research on <EntityLink id="adversarial-robustness">adversarial robustness</EntityLink> and evaluation may not directly address core alignment challenges like <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, goal specification, or value learning. Critics question whether robustness research provides sufficient traction on harder alignment problems. A pointed version of this concern is that demonstrating vulnerabilities in narrow systems — such as the finding that superhuman Go AIs can be beaten by adversarial policies playing cyclic patterns that amateur humans easily defeat[^1] — illuminates failure modes without providing a clear path to preventing them in more capable systems.[^3]
+**Criticism**: Research on <EntityLink id="adversarial-robustness">adversarial robustness</EntityLink> and evaluation may not directly address core alignment challenges like <EntityLink id="deceptive-alignment">deceptive alignment</EntityLink>, goal specification, or value learning. Critics question whether robustness research provides sufficient traction on harder alignment problems. A pointed version of this concern is that demonstrating vulnerabilities in narrow systems — such as the finding that superhuman Go AIs can be beaten by adversarial policies playing cyclic patterns that amateur humans easily defeat[^1] — illuminates failure modes without providing a clear path to preventing them in more capable systems.[^4]
 
-**Response**: FAR AI argues robustness is a necessary foundation for aligned systems, noting that "most alignment proposals using helper ML systems will fail if helpers are exploited by main systems."[^8] FAR AI's portfolio also includes value alignment work that produced more sample-efficient value learning algorithms[^11] and contributed to the "Towards Guaranteed Safe AI" framework co-authored with researchers including Yoshua Bengio and Stuart Russell.[^15]
+**Response**: FAR AI argues robustness is a necessary foundation for aligned systems, noting that "most alignment proposals using helper ML systems will fail if helpers are exploited by main systems."[^9] FAR AI's portfolio also includes value alignment work that produced more sample-efficient value learning algorithms[^13] and contributed to the "Towards Guaranteed Safe AI" framework co-authored with researchers including Yoshua Bengio and Stuart Russell.[^5]
 
-**Context**: The AI safety field contains diverse views on which research directions are most valuable. Some researchers emphasize near-term robustness and evaluation, while others focus on long-term theoretical alignment challenges. FAR AI's own findings that adversarial training improves language model robustness orders of magnitude more efficiently than scaling alone[^3] are cited as evidence that empirical robustness work can yield generalizable insights.
+**Context**: The AI safety field contains diverse views on which research directions are most valuable. Some researchers emphasize near-term robustness and evaluation, while others focus on long-term theoretical alignment challenges. FAR AI's own findings that adversarial training improves language model robustness orders of magnitude more efficiently than scaling alone[^4] are cited as evidence that empirical robustness work can yield generalizable insights.
 
 ### Natural Abstractions Theory Concerns
 
@@ -248,18 +270,18 @@ FAR AI's funding profile reflects dependence on sources within the effective alt
 | Blog | Research updates | [What's New](https://far.ai/post/2023-12-far-overview/) |
 
 [^1]: About | FAR.AI (https://far.ai/about)
-[^2]: FAR AI, Inc - GuideStar Profile (https://www.guidestar.org/profile/92-0692207)
-[^3]: Transparency | FAR.AI (https://far.ai/about/transparency)
-[^4]: Research Overview – FAR.AI (https://far.ai/research)
-[^5]: Adversarial Policies Beat Superhuman Go AIs | FAR.AI (https://far.ai/research/adversarial-policies-beat-superhuman-go-ais)
-[^6]: Grantmaking | FAR.AI (https://far.ai/programs/grantmaking)
+[^2]: Adam Gleave - AI2050 (https://ai2050.schmidtsciences.org/fellow/adam-gleave)
+[^3]: Research Overview – FAR.AI (https://far.ai/research)
+[^4]: Transparency | FAR.AI (https://far.ai/about/transparency)
+[^5]: Towards Guaranteed Safe AI | FAR.AI (https://far.ai/research/towards-guaranteed-safe-ai-a-framework-for-ensuring-robust-and-reliable-ai-systems)
+[^6]: Adversarial Policies Beat Superhuman Go AIs | FAR.AI (https://far.ai/research/adversarial-policies-beat-superhuman-go-ais)
 [^7]: News – FAR.AI (https://far.ai/blog)
-[^8]: Far Ai Inc - Nonprofit Explorer - ProPublica (https://projects.propublica.org/nonprofits/organizations/920692207)
-[^9]: Can Go AIs be adversarially robust? – FAR.AI (https://far.ai/research/can-go-ais-be-adversarially-robust)
-[^10]: FAR.AI Robustness Research (https://far.ai/topic/robustness)
-[^11]: 2023 Alignment Research Updates – FAR.AI (https://far.ai/post/2023-12-far-research-update)
-[^12]: Team | FAR.AI (https://far.ai/about/team)
-[^13]: What's new at FAR AI — EA Forum (https://forum.effectivealtruism.org/posts/arfyBSCunWXCtdPMJ/what-s-new-at-far-ai-1)
-[^14]: Programs – FAR.AI (https://far.ai/programs)
-[^15]: Towards Guaranteed Safe AI (https://far.ai/research/towards-guaranteed-safe-ai-a-framework-for-ensuring-robust-and-reliable-ai-systems)
-[^16]: FAR.AI — AI Safety Research and Field-building (https://www.openphilanthropy.org/grants/far-ai-ai-safety-research-and-field-building)
+[^8]: Programs – FAR.AI (https://far.ai/programs)
+[^9]: Far Ai Inc - Nonprofit Explorer - ProPublica (https://projects.propublica.org/nonprofits/organizations/920692207)
+[^10]: Can Go AIs be adversarially robust? – FAR.AI (https://far.ai/research/can-go-ais-be-adversarially-robust)
+[^11]: FAR.AI Robustness Research (https://far.ai/topic/robustness)
+[^12]: Grantmaking | FAR.AI (https://far.ai/programs/grantmaking)
+[^13]: 2023 Alignment Research Updates – FAR.AI (https://far.ai/post/2023-12-far-research-update)
+[^14]: Adam Gleave | FAR.AI (https://far.ai/author/adam-gleave)
+[^15]: What's new at FAR AI — EA Forum (https://forum.effectivealtruism.org/posts/arfyBSCunWXCtdPMJ/what-s-new-at-far-ai-1)
+[^16]: Adam Gleave — Google Scholar (https://scholar.google.com/citations?user=lBunDH0AAAAJ&hl=en)
