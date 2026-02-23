@@ -6,7 +6,6 @@ import {
 } from "@data";
 import type { Resource } from "@data";
 import { cn } from "@lib/utils";
-import { getCitationQuotes, type CitationQuote } from "@/lib/citation-data";
 
 interface ReferencesProps {
   /** Explicit list of resource IDs to display */
@@ -21,49 +20,14 @@ interface ReferencesProps {
   className?: string;
 }
 
-type VerificationVerdict = "accurate" | "minor_issues" | "inaccurate" | "unsupported" | "verified" | null;
-
 interface ResolvedRef {
   index: number;
   resource: Resource;
   publicationName: string | undefined;
   peerReviewed: boolean;
-  verification: VerificationVerdict;
 }
 
-const VERDICT_CONFIG: Record<string, { dot: string; label: string }> = {
-  accurate: { dot: "bg-emerald-500", label: "Verified accurate" },
-  minor_issues: { dot: "bg-amber-500", label: "Minor issues found" },
-  inaccurate: { dot: "bg-red-500", label: "Inaccurate" },
-  unsupported: { dot: "bg-red-400", label: "Unsupported claim" },
-  verified: { dot: "bg-blue-500", label: "Source verified" },
-};
-
-function buildVerificationMap(quotes: CitationQuote[]): Map<string, VerificationVerdict> {
-  const map = new Map<string, VerificationVerdict>();
-  const priority: Record<string, number> = {
-    accurate: 4,
-    minor_issues: 3,
-    inaccurate: 5,
-    unsupported: 5,
-    verified: 2,
-  };
-
-  for (const q of quotes) {
-    if (!q.url) continue;
-    const verdict: VerificationVerdict = q.accuracyVerdict as VerificationVerdict ?? (q.quoteVerified ? "verified" : null);
-    if (!verdict) continue;
-
-    const existing = map.get(q.url);
-    if (!existing || (priority[verdict] ?? 0) > (priority[existing] ?? 0)) {
-      map.set(q.url, verdict);
-    }
-  }
-
-  return map;
-}
-
-function resolveRefs(ids: string[], verificationMap: Map<string, VerificationVerdict>): {
+function resolveRefs(ids: string[]): {
   refs: ResolvedRef[];
   missing: string[];
 } {
@@ -87,7 +51,6 @@ function resolveRefs(ids: string[], verificationMap: Map<string, VerificationVer
       resource,
       publicationName: publication?.name,
       peerReviewed: publication?.peer_reviewed ?? false,
-      verification: verificationMap.get(resource.url) ?? null,
     });
   }
 
@@ -101,23 +64,6 @@ function formatAuthors(authors: string[]): string {
   return `${authors[0]} et al.`;
 }
 
-/** Small verification dot — tooltip reveals verdict detail */
-function VerificationDot({ verdict }: { verdict: VerificationVerdict }) {
-  if (!verdict) return null;
-  const config = VERDICT_CONFIG[verdict];
-  if (!config) return null;
-
-  return (
-    <span
-      className={cn(
-        "inline-block w-[5px] h-[5px] rounded-full shrink-0 ml-1",
-        config.dot
-      )}
-      title={config.label}
-    />
-  );
-}
-
 function ReferenceEntry({
   entry,
   showSummaries,
@@ -129,7 +75,6 @@ function ReferenceEntry({
   const year = resource.published_date?.slice(0, 4);
   const authorStr = resource.authors ? formatAuthors(resource.authors) : null;
 
-  // Build a single-line citation string: Author (Year). "Title". Publication.
   return (
     <li
       id={`ref-${index}`}
@@ -157,7 +102,6 @@ function ReferenceEntry({
       >
         {resource.title}
       </a>
-      <VerificationDot verdict={entry.verification} />
       {publicationName && (
         <span className="italic">
           . {publicationName}
@@ -209,8 +153,12 @@ function CitationHealthFooter({ pageId }: { pageId: string }) {
  *
  * Each entry becomes an anchor target (#ref-1, #ref-2, etc.)
  * so that <R n={1}> can link to the reference list.
+ *
+ * Citation health stats (verified/flagged/unchecked) come from build-time
+ * data in database.json. Per-citation verification is handled separately
+ * by the CitationOverlay client component on footnote references.
  */
-export async function References({
+export function References({
   ids = [],
   pageId,
   title = "References",
@@ -219,10 +167,7 @@ export async function References({
 }: ReferencesProps) {
   if (ids.length === 0) return null;
 
-  const quotes = pageId ? await getCitationQuotes(pageId) : [];
-  const verificationMap = buildVerificationMap(quotes);
-
-  const { refs, missing } = resolveRefs(ids, verificationMap);
+  const { refs, missing } = resolveRefs(ids);
 
   return (
     <section
