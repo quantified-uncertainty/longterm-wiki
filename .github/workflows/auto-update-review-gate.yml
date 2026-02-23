@@ -17,8 +17,8 @@ permissions:
 
 jobs:
   audit-gate:
-    # Only run on auto-update PRs
-    if: contains(github.event.pull_request.labels.*.name, 'auto-update')
+    # Only run on non-draft auto-update PRs
+    if: github.event.pull_request.draft == false && contains(github.event.pull_request.labels.*.name, 'auto-update')
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
