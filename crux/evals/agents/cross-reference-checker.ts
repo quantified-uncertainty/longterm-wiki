@@ -15,6 +15,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { join, basename } from 'node:path';
 import type { AdversarialFinding } from '../types.ts';
 import { stripFrontmatter } from '../../lib/patterns.ts';
+import { ENTITY_FACT_PATTERNS, type FactType } from '../../lib/claim-patterns.ts';
 
 // ---------------------------------------------------------------------------
 // Fact extraction (regex-based, no LLM)
@@ -23,41 +24,11 @@ import { stripFrontmatter } from '../../lib/patterns.ts';
 interface ExtractedFact {
   pageId: string;
   entityMention: string; // The entity name mentioned
-  factType: 'founding-year' | 'funding' | 'employee-count' | 'role' | 'date';
+  factType: FactType;
   value: string;
   context: string; // Surrounding sentence
   paragraphIndex: number;
 }
-
-/** Patterns to extract structured facts. */
-const FACT_PATTERNS: Array<{
-  regex: RegExp;
-  factType: ExtractedFact['factType'];
-  entityGroup: number;
-  valueGroup: number;
-}> = [
-  // "X was founded in YYYY"
-  {
-    regex: /(\b[A-Z][a-zA-Z\s&.-]+?) (?:was )?(?:founded|established|created|launched|incorporated) (?:in )?((?:19|20)\d{2})/g,
-    factType: 'founding-year',
-    entityGroup: 1,
-    valueGroup: 2,
-  },
-  // "X raised $N million/billion" (handles escaped \$ in MDX)
-  {
-    regex: /(\b[A-Z][a-zA-Z\s&.-]+?) (?:has )?(?:raised|received|secured) \\?\$([\d,.]+)\s*(million|billion)/gi,
-    factType: 'funding',
-    entityGroup: 1,
-    valueGroup: 2,
-  },
-  // "X has/had/grown to N employees/staff/researchers"
-  {
-    regex: /(\b[A-Z][a-zA-Z\s&.-]+?) (?:has|had|employs|employed)(?: grown to)? (?:approximately |about |around |~)?([\d,]+) (?:employees|staff|researchers|people|members)/gi,
-    factType: 'employee-count',
-    entityGroup: 1,
-    valueGroup: 2,
-  },
-];
 
 /**
  * Extract structured facts from a page.
@@ -70,7 +41,7 @@ export function extractFacts(pageId: string, content: string): ExtractedFact[] {
   for (let pi = 0; pi < paragraphs.length; pi++) {
     const para = paragraphs[pi];
 
-    for (const pattern of FACT_PATTERNS) {
+    for (const pattern of ENTITY_FACT_PATTERNS) {
       const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
       let match: RegExpExecArray | null;
 
