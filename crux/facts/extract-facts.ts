@@ -218,7 +218,7 @@ async function classifyWithLlm(
 
 PAGE CONTENT (numbers already in <F>/<Calc> tags have been replaced with placeholders):
 ---
-${content.slice(0, 9000)}
+${content.slice(0, 50000)}
 ---
 ${existingNote}
 

@@ -9,19 +9,8 @@
 
 import { ValidationEngine } from '../../../lib/validation-engine.ts';
 import { allRules } from '../../../lib/rules/index.ts';
+import { CRITICAL_RULES } from '../../page-improver/utils.ts';
 import type { ToolRegistration } from './types.ts';
-
-const CRITICAL_RULES = [
-  'dollar-signs',
-  'comparison-operators',
-  'frontmatter-schema',
-  'entitylink-ids',
-  'prefer-entitylink',
-  'internal-links',
-  'fake-urls',
-  'component-props',
-  'citation-urls',
-];
 
 const QUALITY_RULES = [
   'tilde-dollar',

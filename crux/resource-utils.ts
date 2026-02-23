@@ -76,6 +76,16 @@ export function findFileByName(name: string): string | null {
   return match || null;
 }
 
+/** Check whether a URL points to YouTube (youtube.com or youtu.be). */
+export function isYoutubeUrl(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+    return host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtu.be';
+  } catch {
+    return false;
+  }
+}
+
 export function guessResourceType(url: string): string {
   const domain = new URL(url).hostname.toLowerCase();
   if (domain.includes('arxiv.org')) return 'paper';
@@ -85,7 +95,7 @@ export function guessResourceType(url: string): string {
   if (domain.includes('gov') || domain.includes('government')) return 'government';
   if (domain.includes('wikipedia.org')) return 'reference';
   if (domain.includes('grokipedia.com')) return 'reference';
-  if (domain.includes('youtube.com') || domain.includes('youtu.be')) return 'talk';
+  if (isYoutubeUrl(url)) return 'talk';
   if (domain.includes('podcast') || domain.includes('spotify.com')) return 'podcast';
   if (domain.includes('substack.com') || domain.includes('medium.com')) return 'blog';
   if (domain.includes('forum.effectivealtruism.org')) return 'blog';
