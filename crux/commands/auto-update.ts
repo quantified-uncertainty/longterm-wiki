@@ -631,6 +631,7 @@ Options:
   --count=N            Max pages to update per run (default: 10)
   --sources=a,b,c      Only fetch these source IDs
   --dry-run            Run pipeline but skip page improvements
+  --skip-fetch         Skip RSS fetch (CI smoke test — verifies code paths only)
   --check              (sources only) Test all RSS/Atom source URLs for reachability
   --diff               (audit-gate) Auto-detect changed pages from git diff
   --apply              (audit-gate) Auto-fix inaccurate citations
