@@ -169,6 +169,10 @@ pnpm crux query citations --broken       # Wiki-wide broken citations
 pnpm crux query risk <page-id>           # Hallucination risk score
 pnpm crux query risk --level=high        # All high-risk pages
 pnpm crux query stats                    # Wiki-wide statistics
+pnpm crux query blocks <page-id>         # Section structure from block-level IR
+pnpm crux query blocks --entity=<id>     # Sections referencing a given entity
+pnpm crux query blocks --component=squiggle  # Pages using a component type
+pnpm crux query blocks --uncited         # Sections with no citations (>50 words)
 # All commands support --json for machine-readable output
 # Requires LONGTERMWIKI_SERVER_URL (set in environment)
 
@@ -227,9 +231,13 @@ pnpm crux query recent-changes --days=7  # What changed this week?
 pnpm crux query citations <page-id>      # Citation health for a page
 pnpm crux query risk <page-id>           # Hallucination risk score
 pnpm crux query stats                    # Wiki-wide statistics
+pnpm crux query blocks <page-id>         # Section structure (local block-index.json)
+pnpm crux query blocks --entity=<id>     # Sections referencing entity
+pnpm crux query blocks --component=squiggle  # Pages using component type
+pnpm crux query blocks --uncited         # Uncited sections (>50 words)
 ```
 
-All commands support `--json` for machine-readable output. Requires `LONGTERMWIKI_SERVER_URL` (set in environment).
+All commands support `--json` for machine-readable output. Server commands require `LONGTERMWIKI_SERVER_URL`. The `blocks` command reads from local `block-index.json` (built by `build-data.mjs`).
 
 ## Page Authoring Workflow
 

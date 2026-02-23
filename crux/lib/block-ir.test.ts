@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { extractBlockIR } from './block-ir.ts';
-import type { PageBlockIR, SectionBlock } from './block-ir.ts';
+import type { PageBlockIR, SectionIR } from './block-ir.ts';
 
 // ---------------------------------------------------------------------------
 // Fixture: a realistic MDX page with multiple features
@@ -152,30 +152,31 @@ describe('extractBlockIR', () => {
     );
   });
 
-  it('detects component flags per section', () => {
+  it('detects component names per section', () => {
     const ir = extractBlockIR('test-org', FIXTURE_MDX);
 
     // Key Research has SquiggleEstimate
-    expect(ir.sections[2].hasSquiggle).toBe(true);
-    expect(ir.sections[2].hasMermaid).toBe(false);
+    expect(ir.sections[2].componentNames).toContain('squiggle');
+    expect(ir.sections[2].componentNames).not.toContain('mermaid');
 
     // Governance has MermaidDiagram
-    expect(ir.sections[3].hasMermaid).toBe(true);
-    expect(ir.sections[3].hasSquiggle).toBe(false);
+    expect(ir.sections[3].componentNames).toContain('mermaid');
+    expect(ir.sections[3].componentNames).not.toContain('squiggle');
 
-    // Quantitative Analysis has Calc
-    expect(ir.sections[4].hasCalc).toBe(true);
+    // Quantitative Analysis has Calc and Callout
+    expect(ir.sections[4].componentNames).toContain('calc');
+    expect(ir.sections[4].componentNames).toContain('callout');
   });
 
   it('aggregates page-level component counts', () => {
     const ir = extractBlockIR('test-org', FIXTURE_MDX);
 
-    expect(ir.components.squiggleCount).toBe(1);
-    expect(ir.components.mermaidCount).toBe(1);
-    expect(ir.components.calcCount).toBe(1);
-    expect(ir.components.calloutCount).toBe(1);
-    expect(ir.components.dataInfoBoxCount).toBe(1);
-    expect(ir.components.totalTables).toBe(1);
+    expect(ir.components.squiggle).toBe(1);
+    expect(ir.components.mermaid).toBe(1);
+    expect(ir.components.calc).toBe(1);
+    expect(ir.components.callout).toBe(1);
+    expect(ir.components.datainfobox).toBe(1);
+    expect(ir.components.table).toBe(1);
   });
 
   it('counts words per section (non-zero for content sections)', () => {
@@ -353,5 +354,24 @@ See [compute page](/ai-transition-model/compute/) and [overview](/knowledge-base
 <EntityLink id="test"
 `;
     expect(() => extractBlockIR('parse-error', mdx)).toThrow();
+  });
+
+  it('does not include untracked components in componentNames', () => {
+    const mdx = `## Section
+
+<SomeCustomComponent foo="bar">content</SomeCustomComponent>
+
+<SquiggleEstimate title="Test" code={\`x = 1\`} />
+`;
+    const ir = extractBlockIR('custom-comp', mdx);
+
+    const section = ir.sections.find(s => s.heading === 'Section')!;
+    // Only tracked components should appear
+    expect(section.componentNames).toContain('squiggle');
+    expect(section.componentNames).toHaveLength(1);
+
+    // Page-level should also only track known components
+    expect(ir.components.squiggle).toBe(1);
+    expect(Object.keys(ir.components)).toHaveLength(1);
   });
 });

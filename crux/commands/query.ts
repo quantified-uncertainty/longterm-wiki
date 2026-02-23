@@ -748,7 +748,7 @@ export async function stats(_args: string[], options: Record<string, unknown>): 
 // ---------------------------------------------------------------------------
 
 import { loadBlockIndex } from '../lib/content-types.ts';
-import type { SectionBlock } from '../lib/block-ir.ts';
+import type { SectionIR } from '../lib/block-ir.ts';
 
 export async function blocks(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
@@ -758,6 +758,21 @@ export async function blocks(args: string[], options: Record<string, unknown>): 
   const componentFilter = options.component as string | undefined;
   const uncited = options.uncited as boolean;
   const pageId = args.find((a) => !a.startsWith('-'));
+
+  // Validate: at most one filter mode
+  const filterCount = [!!entityFilter, !!componentFilter, uncited].filter(Boolean).length;
+  if (pageId && filterCount > 0) {
+    return {
+      output: `${c.red}Error: <page-id> and --entity/--component/--uncited are mutually exclusive.${c.reset}`,
+      exitCode: 1,
+    };
+  }
+  if (filterCount > 1) {
+    return {
+      output: `${c.red}Error: use only one of --entity, --component, or --uncited at a time.${c.reset}`,
+      exitCode: 1,
+    };
+  }
 
   const index = loadBlockIndex();
   const pageCount = Object.keys(index).length;
@@ -770,7 +785,7 @@ export async function blocks(args: string[], options: Record<string, unknown>): 
   }
 
   // --- Per-page view: crux query blocks <page-id> ---
-  if (pageId && !entityFilter && !componentFilter && !uncited) {
+  if (pageId) {
     const ir = index[pageId];
     if (!ir) {
       return { output: `${c.yellow}Page not found in block index: ${pageId}${c.reset}`, exitCode: 1 };
@@ -786,9 +801,10 @@ export async function blocks(args: string[], options: Record<string, unknown>): 
     for (const s of ir.sections) {
       const label = s.level === 0 ? `${c.dim}(preamble)${c.reset}` : `${'#'.repeat(s.level)} ${s.heading}`;
       const flags: string[] = [];
-      if (s.hasSquiggle) flags.push('squiggle');
-      if (s.hasMermaid) flags.push('mermaid');
-      if (s.hasCalc) flags.push('calc');
+      // Section-level component names
+      if (s.componentNames?.length > 0) {
+        flags.push(...s.componentNames);
+      }
       if (s.tables.length > 0) flags.push(`${s.tables.length} table${s.tables.length > 1 ? 's' : ''}`);
       const flagStr = flags.length > 0 ? ` ${c.dim}[${flags.join(', ')}]${c.reset}` : '';
 
@@ -810,15 +826,12 @@ export async function blocks(args: string[], options: Record<string, unknown>): 
       output += '\n';
     }
 
-    // Component summary
+    // Component summary from Record<string, number>
     const comp = ir.components;
     const parts: string[] = [];
-    if (comp.squiggleCount > 0) parts.push(`${comp.squiggleCount} squiggle`);
-    if (comp.mermaidCount > 0) parts.push(`${comp.mermaidCount} mermaid`);
-    if (comp.calcCount > 0) parts.push(`${comp.calcCount} calc`);
-    if (comp.calloutCount > 0) parts.push(`${comp.calloutCount} callout`);
-    if (comp.dataInfoBoxCount > 0) parts.push(`${comp.dataInfoBoxCount} DataInfoBox`);
-    if (comp.totalTables > 0) parts.push(`${comp.totalTables} table`);
+    for (const [name, count] of Object.entries(comp)) {
+      if (count > 0) parts.push(`${count} ${name}`);
+    }
     if (parts.length > 0) {
       output += `${c.dim}Components: ${parts.join(', ')}${c.reset}\n`;
     }
@@ -831,7 +844,7 @@ export async function blocks(args: string[], options: Record<string, unknown>): 
   // crux query blocks --entity=<id>
   if (entityFilter) {
     const limit = parseIntOpt(options.limit, 20);
-    const results: Array<{ pageId: string; section: SectionBlock }> = [];
+    const results: Array<{ pageId: string; section: SectionIR }> = [];
 
     for (const ir of Object.values(index)) {
       for (const s of ir.sections) {
@@ -866,37 +879,32 @@ export async function blocks(args: string[], options: Record<string, unknown>): 
   // crux query blocks --component=<type>
   if (componentFilter) {
     const limit = parseIntOpt(options.limit, 20);
-    const validComponents = ['squiggle', 'mermaid', 'calc', 'callout', 'datainfobox', 'table'];
     const normalised = componentFilter.toLowerCase();
-    if (!validComponents.includes(normalised)) {
-      return {
-        output: `${c.red}Unknown component: ${componentFilter}. Valid: ${validComponents.join(', ')}${c.reset}`,
-        exitCode: 1,
-      };
-    }
 
     const results: Array<{ pageId: string; count: number }> = [];
     for (const ir of Object.values(index)) {
-      let count = 0;
-      switch (normalised) {
-        case 'squiggle': count = ir.components.squiggleCount; break;
-        case 'mermaid': count = ir.components.mermaidCount; break;
-        case 'calc': count = ir.components.calcCount; break;
-        case 'callout': count = ir.components.calloutCount; break;
-        case 'datainfobox': count = ir.components.dataInfoBoxCount; break;
-        case 'table': count = ir.components.totalTables; break;
-      }
+      const count = ir.components[normalised] || 0;
       if (count > 0) results.push({ pageId: ir.pageId, count });
+    }
+
+    if (results.length === 0) {
+      // Collect all known component names across the index for a helpful error
+      const knownNames = new Set<string>();
+      for (const ir of Object.values(index)) {
+        for (const name of Object.keys(ir.components)) {
+          knownNames.add(name);
+        }
+      }
+      return {
+        output: `${c.dim}No pages use component: ${componentFilter}. Known: ${[...knownNames].sort().join(', ') || 'none'}${c.reset}`,
+        exitCode: 0,
+      };
     }
 
     results.sort((a, b) => b.count - a.count);
 
     if (options.json || options.ci) {
       return { output: JSON.stringify(results.slice(0, limit), null, 2), exitCode: 0 };
-    }
-
-    if (results.length === 0) {
-      return { output: `${c.dim}No pages use component: ${componentFilter}${c.reset}`, exitCode: 0 };
     }
 
     let output = `${c.bold}${c.blue}Pages with ${componentFilter}${c.reset}\n`;
