@@ -53,9 +53,18 @@ export async function improvePhase(page: PageData, analysis: AnalysisResult, res
 
   let improvedContent: string = result;
   if (!improvedContent.startsWith('---')) {
-    const mdxMatch = result.match(/```(?:mdx)?\n([\s\S]*?)```/);
-    if (mdxMatch) {
-      improvedContent = mdxMatch[1];
+    // Scan all code blocks and prefer the one whose content is valid MDX (starts with ---).
+    // The non-greedy single-match regex previously picked the *first* code block, which
+    // could be a JSON analysis blob preceding the actual MDX output — causing silent
+    // corruption of the page file. See: fix-footer-rendering-ttIYJ.
+    const codeBlocks = [...result.matchAll(/```(?:\w+)?\n([\s\S]*?)```/g)];
+    const mdxBlock = codeBlocks.find(m => m[1].trimStart().startsWith('---'));
+    if (mdxBlock) {
+      improvedContent = mdxBlock[1];
+    } else if (codeBlocks.length > 0) {
+      // Fallback: use the largest code block (most likely to be the full MDX)
+      const largest = codeBlocks.reduce((a, b) => a[1].length >= b[1].length ? a : b);
+      improvedContent = largest[1];
     }
   }
 

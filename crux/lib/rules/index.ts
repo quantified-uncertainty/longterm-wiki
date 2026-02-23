@@ -90,6 +90,9 @@ import { frontmatterOrderRule } from './frontmatter-order.ts';
 import { urlSafetyRule } from './url-safety.ts';
 import { noExecSyncRule } from './no-exec-sync.ts';
 
+// Pipeline artifact detection
+import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -139,6 +142,7 @@ export {
   frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
+  pipelineArtifactsRule,
 };
 
 export const allRules: Rule[] = [
@@ -189,6 +193,7 @@ export const allRules: Rule[] = [
   frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
+  pipelineArtifactsRule,
 ];
 
 export default allRules;
