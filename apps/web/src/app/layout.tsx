@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DevModeToggle } from "@/components/DevModeToggle";
 import { SearchButton, SearchDialog } from "@/components/SearchDialog";
+import { MobileNav } from "@/components/MobileNav";
 import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 import "katex/dist/katex.min.css";
@@ -52,24 +53,25 @@ export default function RootLayout({
             <nav className="flex-1 flex items-center justify-end gap-4 px-6 py-3">
               <Link
                 href="/wiki"
-                className="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
                 Explore
               </Link>
               <Link
                 href="/wiki/E755"
-                className="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
                 About
               </Link>
               <Link
                 href="/wiki/E779"
-                className="text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
+                className="hidden md:inline text-sm text-muted-foreground no-underline hover:text-foreground transition-colors"
               >
                 Internal
               </Link>
               <SearchButton />
               <DevModeToggle />
+              <MobileNav />
             </nav>
           </div>
         </header>
