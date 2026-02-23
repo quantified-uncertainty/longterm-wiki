@@ -35,6 +35,8 @@ import { tool as viewEditHistory } from './view-edit-history.ts';
 import { tool as extractFacts } from './extract-facts.ts';
 import { tool as deepCitationCheck } from './deep-citation-check.ts';
 import { tool as createVisual } from './create-visual.ts';
+import { tool as checkCrossReferences } from './check-cross-references.ts';
+import { tool as suggestCrossLinks } from './suggest-cross-links.ts';
 
 // ── Tool registry ─────────────────────────────────────────────────────────
 
@@ -56,6 +58,8 @@ const ALL_TOOLS: ToolRegistration[] = [
   extractFacts,
   deepCitationCheck,
   createVisual,
+  checkCrossReferences,
+  suggestCrossLinks,
 ];
 
 const log = createPhaseLogger();
