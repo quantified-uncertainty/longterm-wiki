@@ -41,7 +41,7 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
     enabledTools: [
       // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
-      'rewrite_section', 'add_entity_links', 'add_fact_refs', 'validate_content',
+      'rewrite_section', 'add_entity_links', 'add_fact_refs', 'add_references', 'validate_content',
       // Low-cost context tools (all $0)
       'query_wiki_context', 'view_edit_history', 'edit_frontmatter', 'create_visual',
     ],
@@ -55,7 +55,7 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
       'run_research', 'rewrite_section', 'audit_citations',
-      'add_entity_links', 'add_fact_refs', 'validate_content',
+      'add_entity_links', 'add_fact_refs', 'add_references', 'validate_content',
       // Context & cross-page tools
       'query_wiki_context', 'read_related_page', 'edit_frontmatter',
       'view_edit_history', 'extract_facts', 'create_visual',
@@ -76,7 +76,7 @@ export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
       // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
       'run_research', 'rewrite_section', 'audit_citations',
-      'add_entity_links', 'add_fact_refs', 'validate_content',
+      'add_entity_links', 'add_fact_refs', 'add_references', 'validate_content',
       // Context & cross-page tools
       'query_wiki_context', 'read_related_page', 'edit_frontmatter',
       'view_edit_history', 'extract_facts', 'create_visual',
