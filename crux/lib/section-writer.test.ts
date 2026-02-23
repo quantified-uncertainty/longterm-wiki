@@ -306,11 +306,33 @@ describe('parseGroundedResult', () => {
 
   it('returns a fallback result when JSON is completely unparseable', () => {
     const raw = 'Sorry, I cannot help with that.';
-    const result = parseGroundedResult(raw, makeRequest());
-    // Falls back to raw text as content
-    expect(result.content).toBeTruthy();
+    const request = makeRequest();
+    const result = parseGroundedResult(raw, request);
+    // Falls back to original section content, not the raw LLM output
+    expect(result.content).toBe(request.sectionContent);
     expect(result.claimMap).toHaveLength(0);
     expect(result.unsourceableClaims).toHaveLength(0);
+  });
+
+  it('preserves original section content when JSON is truncated (#733)', () => {
+    // Simulate a truncated LLM response where the JSON is cut off mid-content
+    const raw = '{ "content": "## Background\\n\\nSome new text that got truncat';
+    const request = makeRequest();
+    const result = parseGroundedResult(raw, request);
+    // Must preserve the original section content, not partial JSON fragments
+    expect(result.content).toBe(request.sectionContent);
+    expect(result.claimMap).toHaveLength(0);
+  });
+
+  it('preserves original section content when response contains raw JSON blob (#733)', () => {
+    // Simulate the bug: raw JSON structure written to MDX
+    const raw = '{ "content": "## Background\\nRewritten content", "claimMap": [{ "claim": "truncat';
+    const request = makeRequest();
+    const result = parseGroundedResult(raw, request);
+    // Even if partial extraction pulls a "content" field, Zod validation should
+    // fail and we fall back to the original section content
+    expect(result.content).toBe(request.sectionContent);
+    expect(result.claimMap).toHaveLength(0);
   });
 
   it('handles missing claimMap field gracefully', () => {

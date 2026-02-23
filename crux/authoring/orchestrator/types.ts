@@ -158,7 +158,7 @@ export interface QualityMetrics {
   diagramCount: number;
   tableCount: number;
   sectionCount: number;
-  /** Structural quality score (0-100). */
+  /** Structural quality score (0-50, normalized from raw 0-15). */
   structuralScore: number;
 }
 

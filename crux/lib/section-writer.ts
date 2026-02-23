@@ -347,10 +347,13 @@ export function parseGroundedResult(
   );
 
   // Validate against schema — coerce missing arrays to []
+  // When validation fails, always fall back to the original section content.
+  // Don't trust `parsed?.content` from partial JSON extraction — it may be
+  // a truncated fragment that would write garbage to the MDX file (#733).
   const schemaResult = GroundedWriteResponseSchema.safeParse(parsed);
   let response: GroundedWriteResponse = schemaResult.success
     ? schemaResult.data
-    : { content: parsed?.content ?? request.sectionContent, claimMap: [], unsourceableClaims: [] };
+    : { content: request.sectionContent, claimMap: [], unsourceableClaims: [] };
 
   // Guard against garbage output: if the LLM returned refusal text or
   // unparseable content, the fallback sets `content` to the raw response.
