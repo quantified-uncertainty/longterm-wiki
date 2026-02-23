@@ -125,7 +125,7 @@ The following table compares progress across major alignment research agendas, b
 | Research Agenda | Lead Organizations | 2024 Status | 2025 Status | Progress Rating | Key Milestone |
 |-----------------|-------------------|-------------|-------------|-----------------|---------------|
 | **<EntityLink id="mech-interp">Mechanistic Interpretability</EntityLink>** | <EntityLink id="anthropic">Anthropic</EntityLink>, <EntityLink id="deepmind">Google DeepMind</EntityLink> | Early research | Feature extraction at scale | 3/10 | <R id="e724db341d6e0065">Sparse autoencoders on Claude 3 Sonnet</R> |
-| **<EntityLink id="constitutional-ai">Constitutional AI</EntityLink>** | Anthropic | Deployed in Claude | Enhanced with classifiers | 7/10 | \$10K-\$20K bounties unbroken |
+| **<EntityLink id="constitutional-ai">Constitutional AI</EntityLink>** | Anthropic | Deployed in Claude | Enhanced with classifiers | 7/10 | \$15,000 bounty unbroken |
 | **<EntityLink id="rlhf">RLHF</EntityLink> / RLAIF** | OpenAI, Anthropic, DeepMind | Standard practice | Improved detection methods | 6/10 | PAR framework: 5+ pp improvement |
 | **Training-Time Safety Stability** | Multiple labs | Emerging concern | Active research area | 2/10 | Adaptive regularization methods proposed |
 | **<EntityLink id="scalable-oversight">Scalable Oversight</EntityLink>** | OpenAI, Anthropic | Theoretical | Limited empirical results | 2/10 | <R id="a2f0c5f433869914">Scaling laws show sharp capability gap decline</R> |
@@ -544,7 +544,7 @@ Their December 2025 partnership with UK AISI includes sharing proprietary models
 | Model Category | Average ASR | Best ASR | Worst ASR | Trend |
 |----------------|-------------|----------|-----------|--------|
 | **Legacy (2024)** | 75% | 87.2% (GPT-4) | 69.4% (Vicuna) | Baseline |
-| **Current Frontier** | 15% | 63% (Claude Opus 100 attempts) | 0% (Claude extended) | Major improvement |
+| **Current Frontier** | 15% | 63% (Claude Opus, 100-attempt budget) | 0% (Claude extended) | Major improvement vs. 4.7% at 1-attempt budget |
 | **Multimodal** | 35% | 62% (Pixtral) | 10% (Claude Sonnet) | Variable |
 
 ### Attack Sophistication Analysis
@@ -746,7 +746,7 @@ The best current honesty interventions—combining fine-tuning with targeted pro
 
 - **Fine-Tuning Risk Scope**: Whether fine-tuning safety degradation is a manageable engineering problem or a fundamental challenge requiring new alignment paradigms.
 
-- **Deception Detection Reliability**: Anthropic's best honesty interventions improved honesty rates from 27% to 52%, and the best lie-detection technique achieved AUROC of only 0.88,[^6] leaving significant uncertainty about whether detection can keep pace with increasingly capable deceptive systems.
+- **Deception Detection Reliability**: Anthropic's best honesty interventions improved honesty rates from 27% to 65%, and the best lie-detection technique achieved AUROC of 0.88,[^6] leaving significant uncertainty about whether detection can keep pace with increasingly capable deceptive systems.
 
 ## Quantitative Summary
 
