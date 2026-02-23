@@ -17,6 +17,7 @@ import type {
 import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage } from './utils.ts';
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
+import { isBiographicalPage } from '../../lib/page-analysis.ts';
 import {
   analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
   enrichPhase, reviewPhase,
@@ -201,7 +202,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           }
         }
         // Extra hallucination warnings for person/org pages
-        if (page.path.includes('/people/') || page.path.includes('/organizations/')) {
+        if (isBiographicalPage(page)) {
           logBiographicalWarnings(improvedContent, page, tier);
         }
         break;
