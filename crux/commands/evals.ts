@@ -264,6 +264,102 @@ async function inject(args: string[], options: Record<string, unknown>): Promise
   return { output, exitCode: 0 };
 }
 
+/**
+ * Scan pages with hunting agents in batch.
+ *
+ * pnpm crux evals scan [--agents=reference-sniffer,description-auditor,cross-ref]
+ *   [--pages=all|high-risk|zero-citations|id1,id2] [--no-llm] [--limit=N]
+ *   [--output=path] [--verbose] [--json]
+ */
+async function scan(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
+  const c = log.colors;
+  const verbose = !!(options.verbose ?? false);
+
+  const { scanPages, generateDirections } = await import('../evals/scan.ts');
+  type AgentName = import('../evals/scan.ts').AgentName;
+
+  // Parse agents
+  const agentStr = (options.agents as string) || 'reference-sniffer';
+  const agents = agentStr.split(',') as AgentName[];
+
+  // Parse pages filter
+  let pages: import('../evals/scan.ts').PageFilter = 'high-risk';
+  const pagesStr = options.pages as string | undefined;
+  if (pagesStr) {
+    if (['all', 'high-risk', 'zero-citations'].includes(pagesStr)) {
+      pages = pagesStr as 'all' | 'high-risk' | 'zero-citations';
+    } else {
+      pages = pagesStr.split(',');
+    }
+  }
+
+  const useLlm = !(options.noLlm ?? options['no-llm'] ?? false);
+  const limit = options.limit ? parseInt(options.limit as string, 10) : undefined;
+  const output = options.output as string | undefined;
+
+  log.info(`Scanning pages (filter: ${Array.isArray(pages) ? `${pages.length} specific` : pages}, agents: ${agents.join(',')}, llm: ${useLlm})`);
+
+  const manifest = await scanPages({ agents, pages, useLlm, limit, output, verbose });
+
+  if (options.json) {
+    return { output: JSON.stringify(manifest, null, 2), exitCode: 0 };
+  }
+
+  // Format human-readable output
+  let out = '';
+  out += `${c.bold}${c.blue}Scan Results${c.reset}\n\n`;
+  out += `  Pages scanned: ${c.bold}${manifest.pagesScanned}${c.reset}\n`;
+  out += `  Agents: ${agents.join(', ')}\n`;
+  out += `  LLM: ${useLlm ? 'yes' : 'no'}\n`;
+  out += `  Total findings: ${manifest.totalFindings}\n`;
+  out += `  Duration: ${(manifest.durationMs / 1000).toFixed(1)}s\n\n`;
+
+  // Top pages by uncited claims
+  const topPages = manifest.pages.slice(0, 30);
+  if (topPages.length > 0) {
+    out += `${c.bold}Top Pages by Uncited Factual Claims${c.reset}\n\n`;
+    out += `${c.dim}  ${'Uncited'.padEnd(8)} ${'Claims'.padEnd(8)} ${'Cites'.padEnd(7)} ${'Words'.padEnd(7)} ${'Type'.padEnd(14)} Page${c.reset}\n`;
+    out += `${c.dim}  ${'─'.repeat(70)}${c.reset}\n`;
+
+    for (const p of topPages) {
+      if (p.uncitedClaimCount === 0 && p.findings.length === 0) continue;
+      const uncited = String(p.uncitedClaimCount).padEnd(8);
+      const claims = String(p.claimCount).padEnd(8);
+      const cites = String(p.citationCount).padEnd(7);
+      const words = String(p.wordCount).padEnd(7);
+      const type = (p.entityType || '—').padEnd(14);
+      const color = p.uncitedClaimCount >= 5 ? c.red : p.uncitedClaimCount >= 2 ? c.yellow : '';
+      out += `  ${color}${uncited}${c.reset} ${claims} ${cites} ${words} ${type} ${p.pageId}\n`;
+    }
+    out += '\n';
+  }
+
+  // Cross-ref contradictions
+  if (manifest.crossRefContradictions.length > 0) {
+    out += `${c.bold}${c.red}Cross-Reference Contradictions (${manifest.crossRefContradictions.length})${c.reset}\n\n`;
+    const seen = new Set<string>();
+    for (const f of manifest.crossRefContradictions.slice(0, 20)) {
+      const key = `${f.claim}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out += `  ${c.red}[critical]${c.reset} ${f.pageId}: ${f.claim}\n`;
+      out += `  ${c.dim}${f.evidence.split('\n')[0]}${c.reset}\n\n`;
+    }
+  }
+
+  // Show direction preview for top page
+  if (topPages.length > 0 && topPages[0].uncitedClaimCount > 0) {
+    out += `${c.bold}Sample Directions (for ${topPages[0].pageId})${c.reset}\n`;
+    out += `${c.dim}${generateDirections(topPages[0]).slice(0, 500)}...${c.reset}\n\n`;
+  }
+
+  const manifestPath = output || '.claude/temp/scan-manifest.json';
+  out += `${c.dim}Full manifest: ${manifestPath}${c.reset}\n`;
+
+  return { output: out, exitCode: 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
@@ -273,6 +369,7 @@ export const commands = {
   run,
   hunt,
   inject,
+  scan,
 };
 
 export function getHelp(): string {
@@ -282,7 +379,16 @@ export function getHelp(): string {
 \x1b[1mCommands:\x1b[0m
   run       Run an eval suite
   hunt      Run an adversarial agent on specific pages
+  scan      Batch-scan pages with hunting agents (produces triage manifest)
   inject    Inject errors into a page (for manual inspection)
+
+\x1b[1mBatch Scan (Phase 0 triage):\x1b[0m
+  crux evals scan                                          Scan high-risk pages (no LLM, free)
+  crux evals scan --pages=all --no-llm --limit=200         Scan top 200 pages
+  crux evals scan --pages=zero-citations --verbose         Scan pages with no citations
+  crux evals scan --agents=reference-sniffer,cross-ref     Multiple agents
+  crux evals scan --pages=anthropic,miri,openai            Scan specific pages
+  crux evals scan --json                                   Machine-readable output
 
 \x1b[1mEval Suites:\x1b[0m
   crux evals run --suite=injection [--pages=id1,id2] [--verbose] [--expensive]
@@ -298,7 +404,16 @@ export function getHelp(): string {
   crux evals inject <page-id> [--count=2] [--categories=wrong-number,exaggeration]
   crux evals inject <page-id> --output=/tmp/corrupted.mdx
 
-\x1b[1mOptions:\x1b[0m
+\x1b[1mScan Options:\x1b[0m
+  --agents=A,B       Agents: reference-sniffer, description-auditor, cross-ref (default: reference-sniffer)
+  --pages=FILTER     Page filter: all, high-risk (default), zero-citations, or comma-separated IDs
+  --limit=N          Max pages to scan
+  --no-llm           Skip LLM checks (free, fast — use for initial triage)
+  --output=PATH      Manifest output path (default: .claude/temp/scan-manifest.json)
+  --json             JSON output (full manifest)
+  --verbose          Progress output
+
+\x1b[1mOther Options:\x1b[0m
   --suite=NAME       Eval suite: injection, fake-entity, cross-ref
   --agent=NAME       Agent: reference-sniffer, description-auditor, cross-ref
   --page=ID          Target page ID
