@@ -1,6 +1,6 @@
 ---
 title: "Sentinel (Catastrophic Risk Foresight)"
-description: Global catastrophic risk foresight and early warning organization founded by Nuño Sempere, providing weekly risk assessments from elite forecasters
+description: "Global catastrophic risk foresight and early warning organization founded by Nuño Sempere, providing weekly risk assessments from elite forecasters"
 sidebar:
   order: 55
 entityType: organization
@@ -8,9 +8,9 @@ subcategory: epistemic-orgs
 quality: 39
 readerImportance: 28.5
 researchImportance: 45
-lastEdited: "2026-02-22"
+lastEdited: "2026-02-23"
 update_frequency: 45
-llmSummary: Sentinel is a 2024-founded foresight organization led by Nuño Sempere that processes millions of news items weekly through AI filtering and elite forecaster assessment to identify global catastrophic risks, publishing findings via newsletter and podcast. The page describes their multi-stage detection pipeline and team composition but provides no concrete examples of their risk assessments, probabilities assigned, or track record.
+llmSummary: "Sentinel is a 2024-founded catastrophic risk foresight organization led by Nuño Sempere that combines AI-powered news filtering with elite forecaster assessment to produce weekly risk briefings. Its multi-stage pipeline ingests millions of news items, uses LLMs for triage, and routes flagged signals to calibrated forecasters from groups like Samotsvety and Good Judgment. Outputs include a Substack newsletter and the Sentinel Minutes podcast. The organization occupies an unusual position using AI as both a monitored risk category and an operational tool in its detection pipeline."
 ratings:
   focus: 8.5
   novelty: 2
@@ -22,8 +22,22 @@ clusters:
   - epistemics
   - community
   - ai-safety
+relatedEntries:
+  - samotsvety
+  - nuno-sempere
+  - ai-for-human-reasoning-fellowship
+  - vidur-kapur
+  - controlai
+  - swift-centre
+  - good-judgment
+  - ai-forecasting
+tags:
+  - forecasting
+  - catastrophic-risk
+  - foresight
+  - early-warning
+  - effective-altruism
 ---
-
 import {EntityLink, Section} from '@components/wiki';
 
 ## Quick Assessment
@@ -33,7 +47,7 @@ import {EntityLink, Section} from '@components/wiki';
 | **Type** | Foresight and emergency response organization |
 | **Founded** | 2024 |
 | **Focus** | Anticipating and reacting to large-scale catastrophes |
-| **Output** | Weekly newsletters, Sentinel Minutes podcast |
+| **Output** | Weekly newsletters, <EntityLink id="E566" name="sentinel">Sentinel (Catastrophic Risk Foresight)</EntityLink> Minutes podcast |
 | **Team** | Elite forecasters including members from <EntityLink id="samotsvety">Samotsvety</EntityLink>, <EntityLink id="good-judgment">Good Judgment</EntityLink>, <EntityLink id="swift-centre">Swift Centre</EntityLink> |
 | **Website** | [sentinel-team.org](https://sentinel-team.org) |
 
@@ -46,32 +60,44 @@ import {EntityLink, Section} from '@components/wiki';
 
 ## Overview
 
-**Sentinel** is a foresight and emergency response organization dedicated to anticipating and mitigating large-scale catastrophes, with a particular emphasis on speculative and tail-risk scenarios.[^1] Founded by <EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> in the early 2020s, Sentinel operates at the intersection of automated intelligence gathering and elite human judgment: it processes millions of news items weekly using language models for initial triage, then routes the most credible signals to skilled forecasters who assign calibrated probabilities to emerging threats.
+**Sentinel** is a foresight and emergency response organization focused on anticipating and mitigating large-scale catastrophes, with particular attention to tail-risk scenarios.[^1] Founded by <EntityLink id="nuno-sempere">Nuño Sempere</EntityLink> in the early 2020s, Sentinel combines automated intelligence gathering with human probabilistic judgment: language models process large volumes of news items weekly for initial triage, and the most credible signals are then routed to skilled forecasters who assign calibrated probabilities to emerging threats.
 
-The organization grew directly out of Sempere's involvement with <EntityLink id="samotsvety">Samotsvety Forecasting</EntityLink>, one of the most accurate superforecasting groups in the effective altruism ecosystem, and inherits that community's commitment to rigorous, quantified risk assessment. What distinguishes Sentinel from conventional think tanks or automated monitoring services is its two-stage architecture: machine-speed scanning for weak signals, followed by deliberative probabilistic reasoning from domain-aware forecasters. This design targets a specific gap — neither purely algorithmic systems nor traditional research organizations routinely combine high-throughput surveillance with calibrated probability estimates on tail risks. Sentinel's output is intended to give decision-makers an early warning layer with actionable confidence intervals rather than qualitative assessments alone.
+Sentinel grew out of Sempere's work with <EntityLink id="samotsvety">Samotsvety Forecasting</EntityLink>, one of the higher-accuracy superforecasting groups associated with the effective altruism community, and carries forward that group's emphasis on quantified risk assessment. Its core architecture has two stages: high-throughput machine scanning for weak signals, followed by deliberative probabilistic reasoning from domain-aware forecasters. This separates Sentinel from both purely algorithmic monitoring services and conventional research organizations, neither of which routinely pairs broad surveillance with calibrated probability estimates on tail risks. The intended output is actionable early warnings expressed as confidence intervals rather than qualitative assessments.
 
 ## Core Activities
 
 ### Risk Detection Pipeline
 
-Sentinel operates a structured, multi-stage pipeline for identifying and assessing global catastrophic risks. The process begins with automated ingestion, drawing on millions of news items, academic preprints, policy documents, and social media signals each week from sources spanning dozens of languages and regions. Large language models then filter this raw volume down to a prioritized shortlist, flagging items that meet predefined criteria related to scale, novelty, irreversibility, or escalation potential. Human forecasters — recruited from elite forecasting communities with demonstrated calibration track records — evaluate each flagged item, assign probability estimates grounded in reference-class reasoning, and situate individual developments within longer-term risk trajectories. Final outputs are packaged into structured briefs and distributed on a weekly cadence.
+Sentinel operates a structured, multi-stage pipeline for identifying and assessing global catastrophic risks. Automated ingestion draws on millions of news items, academic preprints, policy documents, and social media signals each week across dozens of languages and regions. <EntityLink id="E400" name="large-language-models">Large Language Models</EntityLink> filter this volume down to a prioritized shortlist, flagging items against predefined criteria — scale, novelty, irreversibility, and escalation potential. Human forecasters with demonstrated calibration track records then evaluate each flagged item, assign probability estimates grounded in reference-class reasoning, and situate developments within longer-term risk trajectories. Final outputs are packaged into structured briefs distributed on a weekly cadence.
 
-1. **Automated Collection**: Ingesting millions of news items, preprints, and policy documents weekly across multiple languages and source types
-2. **AI Prioritization**: Language models filter and rank candidate events against a standing set of catastrophic-risk criteria, including scale, novelty, and escalation potential
-3. **Forecaster Assessment**: Elite human forecasters evaluate flagged items, assign calibrated probability estimates, and update trend lines for tracked scenarios
-4. **Publication**: Curated weekly summaries distributed via newsletter and podcast
+mermaid
+flowchart LR
+    A["📥 Automated Collection\nNews · Preprints · Policy docs\nMulti-language, weekly"] --> B["🤖 AI Prioritization\nLLM filtering against\nscale, novelty, escalation criteria"]
+    B --> C["👤 Forecaster Assessment\nCalibrated probability estimates\n& scenario trend updates"]
+    C --> D["📤 Publication\nWeekly brief · Newsletter\n· Podcast"]
+    style A fill:#1e3a5f,color:#fff,stroke:#4a90d9
+    style B fill:#1e3a5f,color:#fff,stroke:#4a90d9
+    style C fill:#1e3a5f,color:#fff,stroke:#4a90d9
+    style D fill:#1e3a5f,color:#fff,stroke:#4a90d9
+
+1. **Automated Collection**: Millions of news items, preprints, and policy documents ingested weekly across multiple languages and source types.
+2. **AI Prioritization**: Language models filter and rank candidate events against standing catastrophic-risk criteria, including scale, novelty, and escalation potential.
+3. **Forecaster Assessment**: Elite human forecasters evaluate flagged items, assign calibrated probability estimates, and update trend lines for tracked scenarios.
+4. **Publication**: Curated weekly summaries distributed via newsletter and podcast.
 
 ### Weekly Briefs
 
 Each weekly brief is organized around a consistent set of risk categories, enabling readers to track developments across domains without re-orienting each issue:
 
-- **AI risks**: Capability jumps, alignment failures, and governance breakdowns in artificial intelligence
-- **Geopolitical threats**: Interstate conflicts, nuclear escalation scenarios, and gray-zone incidents
-- **Biosecurity**: Engineered or naturally emerging pandemic threats
-- **Emerging catastrophes**: Novel or poorly precedented risks lacking established monitoring frameworks
-- **Probability updates**: Quantitative shifts in forecasted likelihoods for tracked scenarios
+| Category | Scope |
+|---|---|
+| **AI risks** | Capability jumps, alignment failures, governance breakdowns |
+| **Geopolitical threats** | Interstate conflicts, nuclear escalation, gray-zone incidents |
+| **Biosecurity** | Engineered or naturally emerging pandemic threats |
+| **Emerging catastrophes** | Novel or poorly precedented risks lacking established monitoring frameworks |
+| **Probability updates** | Quantitative shifts in forecasted likelihoods for tracked scenarios |
 
-Central to each brief is the **risk status indicator** — an ordinal or color-coded signal that consolidates the forecasting team's aggregate view of near-term catastrophic risk into a single at-a-glance readout. Rather than requiring readers to parse full probability tables, the indicator surfaces directional changes week over week, functioning as a running thermometer for civilizational-scale threat levels. Significant movements in the indicator are accompanied by brief explanatory notes attributing the shift to specific developments in the underlying risk categories.
+Central to each brief is the **risk status indicator** — a color-coded ordinal signal consolidating the forecasting team's aggregate view of near-term catastrophic risk into a single at-a-glance readout. The indicator surfaces directional changes week over week, functioning as a running thermometer for civilizational-scale threat levels. Significant movements are accompanied by brief explanatory notes attributing shifts to specific developments in the underlying risk categories.
 
 ## Team
 
@@ -87,11 +113,11 @@ Sentinel draws on a deliberately cross-disciplinary team, combining rigorous pro
 
 ### Newsletter
 
-Sentinel publishes via Substack, offering both free and paid subscription tiers. The free tier provides access to regular risk briefings and analytical summaries, making core content available to a broad audience that includes researchers, journalists, and policymakers. Paid members gain access to community Slack channels and provide direct financial support for the organization's detection work.[^1] The Substack format enables Sentinel to reach readers who prefer long-form written analysis delivered directly to their inboxes, lowering the barrier to engaging with complex catastrophic-risk content.
+Sentinel publishes via Substack with free and paid subscription tiers. Free subscribers receive regular risk briefings and analytical summaries; paid members gain access to community Slack channels and directly support the organization's detection work.[^1]
 
 ### Sentinel Minutes Podcast
 
-*Sentinel Minutes* is a podcast that distills key findings and risk assessments into concise audio summaries, available on Apple Podcasts, Spotify, and RSS feeds. The format serves professionals who monitor catastrophic risk during commutes or in other contexts where reading is impractical. By translating written analyses into accessible audio episodes, Sentinel broadens its reach beyond the newsletter's core readership and engages listeners who might not otherwise encounter long-form risk intelligence.
+*Sentinel Minutes* distills key findings into concise audio episodes available on Apple Podcasts, Spotify, and RSS. The format extends Sentinel's reach to professionals who engage with risk intelligence in contexts where reading is impractical.
 
 | Channel | Format | Access | Primary Audience |
 |---|---|---|---|
@@ -101,38 +127,38 @@ Sentinel publishes via Substack, offering both free and paid subscription tiers.
 
 ## Relationship to AI Safety
 
-Sentinel's work intersects with AI safety in two distinct and sometimes tension-producing ways.
+Sentinel's work intersects with AI safety in two distinct ways.
 
-**AI as a monitored risk category**: Sentinel treats advanced AI as one of several catastrophic risk domains under active surveillance. This positions the organization within the broader AI governance discourse, where forecasting-based early warning systems are increasingly recognized as a mechanism for triggering policy responses before risks fully materialize. By assigning probabilities to AI-related catastrophe scenarios, Sentinel contributes structured, auditable signals to a field that often relies on qualitative expert judgment.
+**AI as a monitored risk category**: Sentinel treats advanced AI as one of several catastrophic risk domains under active surveillance, assigning probabilities to AI-related catastrophe scenarios to produce structured, auditable signals for a field that often relies on qualitative expert judgment.
 
-**AI as an operational tool**: Sentinel uses large language models within its detection and summarization pipeline, making it a live case study in AI-assisted risk assessment. This dual dependency — on AI as both subject and instrument — introduces non-trivial questions about reliability, circularity, and alignment that the organization has acknowledged as ongoing methodological concerns.
+**AI as an operational tool**: Sentinel uses large language models within its detection and summarization pipeline, making it a live case study in AI-assisted risk assessment. This dual dependency — AI as both subject and instrument — raises questions about reliability and circularity that the organization treats as ongoing methodological concerns.
 
 | Dimension | Role of AI at Sentinel |
 |---|---|
 | Risk object | AI developments monitored as potential catastrophic hazards |
 | Pipeline tool | LLMs used for signal detection and report summarization |
-| Governance input | Forecast outputs shared with EA/rationalist policy networks |
+| Governance input | Forecast outputs shared with policy-oriented research communities |
 
-Team members are active in effective altruism and rationalist communities where AI safety is a central concern, creating meaningful overlap with organizations such as [MIRI](https://intelligence.org), [Redwood Research](https://www.redwoodresearch.org), and the broader technical AI safety ecosystem. This community embedding facilitates methodological cross-pollination — particularly around threat modeling and forecasting epistemics — as well as shared dissemination of early-warning outputs to audiences already oriented toward long-horizon risk.
+Team members are active in effective altruism and rationalist communities where AI safety is a central concern, creating overlap with organizations such as [MIRI](https://intelligence.org), [Redwood Research](https://www.redwoodresearch.org), and the broader technical AI safety ecosystem. This embedding facilitates cross-pollination around threat modeling and forecasting epistemics.
 
-The resulting position is unusual: Sentinel simultaneously treats AI as an object of concern warranting systematic surveillance and as an operational resource whose outputs inform that same surveillance. Navigating this duality is an ongoing institutional challenge that distinguishes Sentinel from organizations focused exclusively on either AI safety research or general catastrophic risk monitoring.
+The resulting position is unusual: Sentinel simultaneously treats AI as an object of concern warranting systematic surveillance and as an operational resource whose outputs inform that same surveillance — distinguishing it from organizations focused exclusively on either AI safety research or general catastrophic risk monitoring.
 
 ## Key Uncertainties
 
-Several unresolved questions bear directly on Sentinel's long-term credibility and practical usefulness, and honest assessment requires engaging with them directly.
+Several unresolved questions bear directly on Sentinel's long-term credibility and practical usefulness.
 
-**Detection pipeline efficacy.** AI-assisted monitoring may perform well on risk patterns resembling historical precedents but face structural challenges with genuinely novel threats — precisely the scenarios Sentinel prioritizes. Whether the system can detect distributional shift in its inputs, and flag when a situation falls outside its effective domain, remains unclear. A system that fails silently on unprecedented events offers false assurance rather than genuine foresight.
+**Detection pipeline efficacy.** AI-assisted monitoring may perform well on risk patterns resembling historical precedents but face structural challenges with genuinely novel threats — precisely the scenarios Sentinel prioritizes. A system that fails silently on unprecedented events offers false assurance rather than genuine foresight.
 
-**Signal calibration.** The tradeoff between false positives (alarm fatigue eroding stakeholder trust) and false negatives (missed catastrophic warnings) is not purely technical — it accumulates into reputational and institutional consequences over time. Sentinel has not publicly specified its operating thresholds or the criteria by which they are adjusted.
+**Signal calibration.** The tradeoff between false positives (alarm fatigue) and false negatives (missed catastrophic warnings) accumulates into reputational and institutional consequences over time. Sentinel has not publicly specified its operating thresholds or the criteria by which they are adjusted.
 
-**Comparative validation.** Without systematic benchmarking against outputs from established intelligence, geopolitical, or security organizations, it is difficult to determine whether Sentinel's assessments provide marginal value or largely duplicate existing work at greater cost.
+**Comparative validation.** Without systematic benchmarking against established intelligence, geopolitical, or security organizations, it is difficult to determine whether Sentinel's assessments provide marginal value or largely duplicate existing work.
 
-**Scalability and forecaster quality.** Expanding the forecaster network risks diluting the epistemic norms — calibration, scope sensitivity, and independence — that give probabilistic risk estimates their credibility in the first place.
+**Forecaster network quality.** Expanding the forecaster pool risks diluting the epistemic norms — calibration, scope sensitivity, and independence — that give probabilistic risk estimates their credibility.
 
-**Funding sustainability.** Organizations focused on speculative long-run risks face persistent pressure to demonstrate near-term legible impact to funders, which can gradually distort research priorities toward more tractable but less novel questions.
+**Funding sustainability.** Organizations focused on speculative long-run risks face persistent pressure to demonstrate near-term legible impact, which can gradually distort research priorities toward more tractable but less novel questions.
 
-**Evidential standards.** The broader field lacks consensus on what would constitute proof that anticipatory catastrophic-risk forecasting is valuable, making it difficult to evaluate Sentinel's success or attract sustained institutional support.
+**Evidential standards.** The field lacks consensus on what would constitute proof that anticipatory catastrophic-risk forecasting is valuable, making it difficult to evaluate Sentinel's success or attract sustained institutional support.
 
 ## Sources
 
-[^1]: Sentinel organizational overview.
+[^1]: Sentinel Substack page
