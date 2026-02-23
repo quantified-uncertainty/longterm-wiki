@@ -1,14 +1,10 @@
 import React from "react";
 import {
   getResourceById,
-  getResourceCredibility,
   getResourcePublication,
   getPageCitationHealth,
 } from "@data";
 import type { Resource } from "@data";
-import { CredibilityBadge } from "./CredibilityBadge";
-import { ResourceTags } from "./ResourceTags";
-import { getResourceTypeIcon } from "./resource-utils";
 import { cn } from "@lib/utils";
 import { getCitationQuotes, type CitationQuote } from "@/lib/citation-data";
 
@@ -19,10 +15,6 @@ interface ReferencesProps {
   pageId?: string;
   /** Title for the section (default: "References") */
   title?: string;
-  /** Show credibility badges (default: true) */
-  showCredibility?: boolean;
-  /** Show resource tags (default: false) */
-  showTags?: boolean;
   /** Show summaries (default: false — keeps bibliography compact) */
   showSummaries?: boolean;
   /** Additional class name */
@@ -34,30 +26,25 @@ type VerificationVerdict = "accurate" | "minor_issues" | "inaccurate" | "unsuppo
 interface ResolvedRef {
   index: number;
   resource: Resource;
-  credibility: number | undefined;
   publicationName: string | undefined;
   peerReviewed: boolean;
   verification: VerificationVerdict;
 }
 
-const VERDICT_DISPLAY: Record<string, { dot: string; label: string }> = {
+const VERDICT_CONFIG: Record<string, { dot: string; label: string }> = {
   accurate: { dot: "bg-emerald-500", label: "Verified accurate" },
-  minor_issues: { dot: "bg-amber-500", label: "Minor issues" },
+  minor_issues: { dot: "bg-amber-500", label: "Minor issues found" },
   inaccurate: { dot: "bg-red-500", label: "Inaccurate" },
-  unsupported: { dot: "bg-red-400", label: "Unsupported" },
+  unsupported: { dot: "bg-red-400", label: "Unsupported claim" },
   verified: { dot: "bg-blue-500", label: "Source verified" },
 };
 
-/**
- * Build a URL → best verification verdict map from citation quotes.
- * If multiple quotes reference the same URL, picks the most informative verdict.
- */
 function buildVerificationMap(quotes: CitationQuote[]): Map<string, VerificationVerdict> {
   const map = new Map<string, VerificationVerdict>();
   const priority: Record<string, number> = {
     accurate: 4,
     minor_issues: 3,
-    inaccurate: 5, // surface problems prominently
+    inaccurate: 5,
     unsupported: 5,
     verified: 2,
   };
@@ -98,7 +85,6 @@ function resolveRefs(ids: string[], verificationMap: Map<string, VerificationVer
     refs.push({
       index: refs.length + 1,
       resource,
-      credibility: getResourceCredibility(resource),
       publicationName: publication?.name,
       peerReviewed: publication?.peer_reviewed ?? false,
       verification: verificationMap.get(resource.url) ?? null,
@@ -115,131 +101,102 @@ function formatAuthors(authors: string[]): string {
   return `${authors[0]} et al.`;
 }
 
-function CitationHealthSummary({ pageId }: { pageId: string }) {
-  const health = getPageCitationHealth(pageId);
-  if (!health || health.total === 0) return null;
-
-  const { total, accuracyChecked, accurate, inaccurate } = health;
-  const unchecked = total - accuracyChecked;
-
-  let healthColor = "text-muted-foreground";
-  let healthLabel = "unverified";
-  if (accuracyChecked > 0) {
-    if (inaccurate > 0) {
-      healthColor = "text-orange-600";
-      healthLabel = `${inaccurate} issue${inaccurate > 1 ? "s" : ""} found`;
-    } else if (accurate / accuracyChecked >= 0.9) {
-      healthColor = "text-green-600";
-      healthLabel = "verified";
-    } else {
-      healthColor = "text-blue-600";
-      healthLabel = "partially verified";
-    }
-  }
+/** Small verification dot — tooltip reveals verdict detail */
+function VerificationDot({ verdict }: { verdict: VerificationVerdict }) {
+  if (!verdict) return null;
+  const config = VERDICT_CONFIG[verdict];
+  if (!config) return null;
 
   return (
-    <span className="inline-flex items-center gap-2 text-xs text-muted-foreground ml-2">
-      <span className={cn("font-medium", healthColor)}>
-        {accuracyChecked > 0 ? `${accurate}/${accuracyChecked} ${healthLabel}` : `${total} citations`}
-      </span>
-      {unchecked > 0 && accuracyChecked > 0 && (
-        <span>({unchecked} unchecked)</span>
+    <span
+      className={cn(
+        "inline-block w-[5px] h-[5px] rounded-full shrink-0 ml-1",
+        config.dot
       )}
-    </span>
+      title={config.label}
+    />
   );
 }
 
 function ReferenceEntry({
   entry,
-  showCredibility,
-  showTags,
   showSummaries,
 }: {
   entry: ResolvedRef;
-  showCredibility: boolean;
-  showTags: boolean;
   showSummaries: boolean;
 }) {
-  const { resource, index, credibility, publicationName, peerReviewed } = entry;
+  const { resource, index, publicationName, peerReviewed } = entry;
   const year = resource.published_date?.slice(0, 4);
   const authorStr = resource.authors ? formatAuthors(resource.authors) : null;
 
+  // Build a single-line citation string: Author (Year). "Title". Publication.
   return (
     <li
       id={`ref-${index}`}
-      className="py-2 text-sm leading-relaxed border-b border-border/40 last:border-b-0"
+      className="my-1.5 leading-relaxed text-sm text-muted-foreground"
     >
-      <span className="flex items-start gap-2">
-        <a
-          href={`#cite-${index}`}
-          className="shrink-0 text-xs font-mono text-muted-foreground mt-0.5 no-underline hover:text-foreground"
-          title="Jump to citation"
-        >
-          [{index}]
-        </a>
-
-        <span className="flex-1 min-w-0">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="text-xs" title={resource.type}>
-              {getResourceTypeIcon(resource.type)}
-            </span>
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-accent-foreground no-underline hover:underline"
-            >
-              {resource.title}
-            </a>
-            <span className="text-xs text-muted-foreground">{"\u2197"}</span>
-          </span>
-
-          {(authorStr || year || publicationName) && (
-            <span className="block text-xs text-muted-foreground mt-0.5">
-              {authorStr && <span>{authorStr}</span>}
-              {year && (
-                <span>
-                  {authorStr ? " " : ""}({year})
-                </span>
-              )}
-              {publicationName && (
-                <span className="italic">
-                  {authorStr || year ? ". " : ""}
-                  {publicationName}
-                  {peerReviewed && " (peer-reviewed)"}
-                </span>
-              )}
-            </span>
-          )}
-
-          {showSummaries && resource.summary && (
-            <span className="block text-xs text-muted-foreground mt-1 leading-snug">
-              {resource.summary}
-            </span>
-          )}
-
-          {(showCredibility || showTags || entry.verification) && (
-            <span className="flex items-center gap-2 mt-1">
-              {entry.verification && VERDICT_DISPLAY[entry.verification] && (
-                <span
-                  className="inline-flex items-center gap-1 text-[10px] text-muted-foreground"
-                  title={VERDICT_DISPLAY[entry.verification].label}
-                >
-                  <span className={cn("inline-block w-1.5 h-1.5 rounded-full", VERDICT_DISPLAY[entry.verification].dot)} />
-                  {VERDICT_DISPLAY[entry.verification].label}
-                </span>
-              )}
-              {showCredibility && credibility != null && (
-                <CredibilityBadge level={credibility} size="sm" />
-              )}
-              {showTags && resource.tags && resource.tags.length > 0 && (
-                <ResourceTags tags={resource.tags} limit={3} size="sm" />
-              )}
-            </span>
-          )}
+      <a
+        href={`#cite-${index}`}
+        className="text-xs font-mono text-muted-foreground no-underline hover:text-foreground mr-1.5"
+        title="Jump to citation in text"
+      >
+        {index}.
+      </a>
+      {authorStr && (
+        <span>{authorStr}</span>
+      )}
+      {year && (
+        <span>{authorStr ? " " : ""}({year}){authorStr || publicationName ? ". " : " "}</span>
+      )}
+      {!year && authorStr && ". "}
+      <a
+        href={resource.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-accent-foreground no-underline hover:underline"
+      >
+        {resource.title}
+      </a>
+      <VerificationDot verdict={entry.verification} />
+      {publicationName && (
+        <span className="italic">
+          . {publicationName}
+          {peerReviewed && " (peer-reviewed)"}
         </span>
-      </span>
+      )}
+      {showSummaries && resource.summary && (
+        <span className="block text-xs text-muted-foreground/70 mt-0.5 leading-snug ml-5">
+          {resource.summary}
+        </span>
+      )}
     </li>
+  );
+}
+
+function CitationHealthFooter({ pageId }: { pageId: string }) {
+  const health = getPageCitationHealth(pageId);
+  if (!health || health.total === 0) return null;
+
+  const { total, accuracyChecked, accurate, inaccurate } = health;
+
+  if (accuracyChecked === 0) return null;
+
+  const parts: string[] = [];
+  if (accurate > 0) parts.push(`${accurate} verified`);
+  if (inaccurate > 0) parts.push(`${inaccurate} flagged`);
+  const unchecked = total - accuracyChecked;
+  if (unchecked > 0) parts.push(`${unchecked} unchecked`);
+
+  let dotColor = "bg-muted-foreground";
+  if (inaccurate > 0) dotColor = "bg-amber-500";
+  else if (accurate > 0 && accurate / accuracyChecked >= 0.9) dotColor = "bg-emerald-500";
+  else if (accurate > 0) dotColor = "bg-blue-500";
+
+  return (
+    <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3 pt-2">
+      <span className={cn("inline-block w-1.5 h-1.5 rounded-full", dotColor)} />
+      Citation verification: {parts.join(", ")} of {total} total
+    </p>
   );
 }
 
@@ -252,22 +209,16 @@ function ReferenceEntry({
  *
  * Each entry becomes an anchor target (#ref-1, #ref-2, etc.)
  * so that <R n={1}> can link to the reference list.
- *
- * When pageId is provided, displays a citation health summary badge
- * showing verification status from the wiki-server (built at build time).
  */
 export async function References({
   ids = [],
   pageId,
   title = "References",
-  showCredibility = true,
-  showTags = false,
   showSummaries = false,
   className,
 }: ReferencesProps) {
   if (ids.length === 0) return null;
 
-  // Fetch per-citation verification data when pageId is available
   const quotes = pageId ? await getCitationQuotes(pageId) : [];
   const verificationMap = buildVerificationMap(quotes);
 
@@ -276,24 +227,24 @@ export async function References({
   return (
     <section
       className={cn(
-        "mt-10 pt-6 border-t border-border",
+        "mt-10 pt-6 border-t border-border text-sm text-muted-foreground",
         className
       )}
       aria-label={title}
     >
-      <h2 className="text-lg font-semibold mb-3" id="references">
+      <h2
+        className="text-base font-semibold mb-3 mt-0 pb-0 border-b-0"
+        id="references"
+      >
         {title}
-        {pageId && <CitationHealthSummary pageId={pageId} />}
       </h2>
 
       {refs.length > 0 && (
-        <ol className="list-none p-0 m-0 space-y-0">
+        <ol className="list-none pl-7 m-0">
           {refs.map((r) => (
             <ReferenceEntry
               key={r.resource.id}
               entry={r}
-              showCredibility={showCredibility}
-              showTags={showTags}
               showSummaries={showSummaries}
             />
           ))}
@@ -305,6 +256,8 @@ export async function References({
           Missing resources: {missing.join(", ")}
         </p>
       )}
+
+      {pageId && <CitationHealthFooter pageId={pageId} />}
     </section>
   );
 }
