@@ -35,11 +35,16 @@ function loadIdRegistry(): Record<string, string> {
   }
 }
 
-/** Resolve a numeric ID (E35) to its slug, or return the ID unchanged */
+/** Resolve a numeric ID (E35 or bare 35) to its slug, or return the ID unchanged */
 function resolveNumericId(id: string): string {
   if (NUMERIC_ID_RE.test(id)) {
     const registry = loadIdRegistry();
     return registry[id] || id;
+  }
+  // Also handle bare numeric IDs (35 → E35)
+  if (/^\d+$/.test(id)) {
+    const registry = loadIdRegistry();
+    return registry[`E${id}`] || id;
   }
   return id;
 }
