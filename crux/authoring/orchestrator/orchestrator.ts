@@ -38,6 +38,13 @@ import { evaluateQualityGate } from './quality-gate.ts';
 
 const log = createPhaseLogger();
 
+/** Error message patterns that indicate a transient/retryable failure. */
+const TRANSIENT_ERROR_PATTERNS = [
+  'timeout', 'ECONNRESET', 'socket hang up', 'overloaded',
+  '529', '429', 'rate_limit', 'UND_ERR_SOCKET', 'terminated',
+  'ETIMEDOUT', 'ENOTFOUND', 'fetch failed',
+];
+
 /** Maximum number of refinement cycles after the initial run. */
 const MAX_REFINEMENT_CYCLES = 2;
 
@@ -188,16 +195,41 @@ async function runAgentLoop(
     for (const toolUse of toolUseBlocks) {
       const handler = toolHandlers[toolUse.name];
       let result: string;
+      let isError = false;
 
       if (!handler) {
-        result = `Unknown tool: ${toolUse.name}`;
+        result = `TOOL ERROR: Unknown tool "${toolUse.name}". Use a different tool.`;
+        isError = true;
       } else {
         try {
           const input = (toolUse.input ?? {}) as Record<string, unknown>;
           result = await handler(input);
+          // Check if the handler returned a JSON error object
+          if (result.startsWith('{"error":')) {
+            isError = true;
+            result = `TOOL ERROR: ${result}\nThe tool encountered an error. Try a different approach or skip this step.`;
+          }
         } catch (err: unknown) {
           const error = err instanceof Error ? err : new Error(String(err));
-          result = `Error: ${error.message}`;
+          const errorMsg = error.message || String(err);
+
+          // Retry once for transient failures (timeouts, rate limits, network errors)
+          const isTransient = TRANSIENT_ERROR_PATTERNS.some(p => errorMsg.includes(p));
+          if (isTransient) {
+            log('orchestrator', `Transient error in ${toolUse.name}, retrying in 3s: ${errorMsg.slice(0, 80)}`);
+            await new Promise(r => setTimeout(r, 3000));
+            try {
+              const input = (toolUse.input ?? {}) as Record<string, unknown>;
+              result = await handler(input);
+            } catch (retryErr: unknown) {
+              const retryError = retryErr instanceof Error ? retryErr : new Error(String(retryErr));
+              result = `TOOL ERROR: ${toolUse.name} failed after retry: ${retryError.message}. Try a different approach.`;
+              isError = true;
+            }
+          } else {
+            result = `TOOL ERROR: ${toolUse.name} failed: ${errorMsg}. Try a different approach.`;
+            isError = true;
+          }
         }
       }
 
@@ -205,6 +237,7 @@ async function runAgentLoop(
         type: 'tool_result',
         tool_use_id: toolUse.id,
         content: typeof result === 'string' ? result : JSON.stringify(result),
+        is_error: isError,
       });
     }
 

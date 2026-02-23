@@ -17,10 +17,13 @@ import { loadPages, findPage, getFilePath } from './utils.ts';
 import { runPipeline } from './pipeline.ts';
 import { triagePhase } from './phases.ts';
 import { runOrchestratorPipeline } from '../orchestrator/index.ts';
+import { runBatch, parseBatchPageIds } from '../batch-runner.ts';
+import type { OrchestratorTier } from '../orchestrator/types.ts';
 
 // Re-export public API for any direct importers
 export { runPipeline } from './pipeline.ts';
 export { runOrchestratorPipeline } from '../orchestrator/index.ts';
+export { runBatch, parseBatchPageIds } from '../batch-runner.ts';
 export { triagePhase } from './phases.ts';
 export { loadPages, findPage, getFilePath } from './utils.ts';
 export type { TriageResult, PipelineResults, PageData, PipelineOptions } from './types.ts';
@@ -121,6 +124,14 @@ Options:
   --adversarial-model <model>     Override model for adversarial review (deep tier only)
   --max-adversarial-iterations N  Max adversarial loop iterations, default 2 (deep tier only)
 
+Batch mode (V2 only):
+  --batch=id1,id2,...             Comma-separated page IDs for batch processing
+  --batch-file=pages.txt          File with one page ID per line
+  --batch-budget=500              Stop when cumulative cost exceeds this amount ($)
+  --page-timeout=900              Per-page timeout in seconds (default: 900 = 15 min)
+  --resume                        Skip pages already completed in a previous batch run
+  --report-file=report.md         Write summary report to a file
+
 Tiers:
   polish    Quick single-pass, no research (~$2-3)
   standard  Light research + improve + review (default, ~$5-8)
@@ -166,6 +177,46 @@ Examples:
     const result = await triagePhase(page, lastEdited);
     console.log('\nTriage Result:');
     console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  // ── Batch mode (V2 only) ───────────────────────────────────────────────
+  if (opts.batch || opts['batch-file']) {
+    if (opts.engine !== 'v2') {
+      console.error('Batch mode requires --engine=v2');
+      process.exit(1);
+    }
+    const tierStr = (opts.tier as string) || 'standard';
+    const tierMap: Record<string, OrchestratorTier> = {
+      polish: 'polish', standard: 'standard', deep: 'deep',
+    };
+    const v2Tier = tierMap[tierStr];
+    if (!v2Tier) {
+      console.error(`Orchestrator v2 supports tiers: polish, standard, deep (got: ${tierStr})`);
+      process.exit(1);
+    }
+
+    const pageIds = parseBatchPageIds(
+      opts.batch as string | undefined,
+      opts['batch-file'] as string | undefined,
+    );
+    if (pageIds.length === 0) {
+      console.error('No page IDs provided. Use --batch=id1,id2 or --batch-file=pages.txt');
+      process.exit(1);
+    }
+
+    await runBatch({
+      pageIds,
+      tier: v2Tier,
+      directions: (opts.directions as string) || undefined,
+      budgetLimit: opts['batch-budget'] ? parseFloat(opts['batch-budget'] as string) : undefined,
+      pageTimeout: opts['page-timeout'] ? parseInt(opts['page-timeout'] as string, 10) * 1000 : undefined,
+      resume: opts.resume === true,
+      apply: opts.apply === true,
+      grade: opts['no-grade'] ? false : undefined,
+      skipSessionLog: opts['skip-session-log'] === true,
+      reportFile: opts['report-file'] as string | undefined,
+    });
     return;
   }
 

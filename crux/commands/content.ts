@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file'],
     positional: true,
   },
   create: {
@@ -93,6 +93,12 @@ Options:
   --citation-gate     Block --apply if citation audit pass rate < 80% (improve)
   --skip-citation-audit  Skip citation audit phase (improve)
   --citation-audit-model Override LLM model for citation verification (improve)
+  --batch=id1,id2     Batch mode: comma-separated page IDs (improve, requires --engine=v2)
+  --batch-file=f.txt  Batch mode: file with page IDs (improve, requires --engine=v2)
+  --batch-budget=N    Stop batch when cumulative cost exceeds $N (improve)
+  --page-timeout=N    Per-page timeout in seconds, default 900 (improve batch)
+  --resume            Resume interrupted batch from batch-state.json (improve)
+  --report-file=f.md  Write batch summary report to file (improve)
   --verbose         Detailed output
 
 Examples:
@@ -108,5 +114,7 @@ Examples:
   crux content polish
   crux content suggest-links --type=organization
   crux content suggest-links --type=organization --min-score=3 --apply
+  crux content improve --batch=anthropic,miri,far-ai --engine=v2 --tier=standard --apply
+  crux content improve --batch-file=pages.txt --engine=v2 --batch-budget=500 --apply
 `;
 }
