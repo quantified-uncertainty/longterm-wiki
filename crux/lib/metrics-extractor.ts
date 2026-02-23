@@ -230,21 +230,29 @@ function calculateStructuralScore(metrics: ContentMetrics, contentFormat: Conten
 /** Article scoring (default) — prose-centric, rewards depth */
 function calculateArticleScore(metrics: ContentMetrics): number {
   let score = 0;
+  // Word count (max 2)
   if (metrics.wordCount >= 800) score += 2;
   else if (metrics.wordCount >= 300) score += 1;
-  if (metrics.tableCount >= 3) score += 3;
-  else if (metrics.tableCount >= 2) score += 2;
+  // Tables (max 2, reduced from 3 — avoids penalizing prose-heavy pages)
+  if (metrics.tableCount >= 2) score += 2;
   else if (metrics.tableCount >= 1) score += 1;
-  if (metrics.diagramCount >= 2) score += 2;
-  else if (metrics.diagramCount >= 1) score += 1;
+  // Diagrams (max 1, reduced from 2)
+  if (metrics.diagramCount >= 1) score += 1;
+  // Section depth via h3 count (max 2 — rewards well-structured prose)
+  if (metrics.sectionCount.h3 >= 4) score += 2;
+  else if (metrics.sectionCount.h3 >= 2) score += 1;
+  // Internal links (max 2)
   if (metrics.internalLinks >= 4) score += 2;
   else if (metrics.internalLinks >= 1) score += 1;
+  // Citations (max 3)
   const citationCount = metrics.footnoteCount + metrics.externalLinks;
   if (citationCount >= 6) score += 3;
   else if (citationCount >= 3) score += 2;
   else if (citationCount >= 1) score += 1;
+  // Prose ratio (max 2)
   if (metrics.bulletRatio < 0.3) score += 2;
   else if (metrics.bulletRatio < 0.5) score += 1;
+  // Overview section (max 1)
   if (metrics.hasOverview) score += 1;
   return score;
 }
