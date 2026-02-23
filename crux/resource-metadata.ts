@@ -351,7 +351,7 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
     return 0;
   }
 
-  const firecrawl = new (FirecrawlApp as new (opts: { apiKey: string }) => { batchScrape: (urls: string[], opts: unknown) => Promise<{ data?: Array<{ metadata?: Record<string, unknown> }> }>; scrape: (url: string, opts: unknown) => Promise<{ metadata?: Record<string, unknown> }> })({ apiKey: FIRECRAWL_KEY });
+  const firecrawl = new (FirecrawlApp as new (opts: { apiKey: string }) => { batchScrape: (urls: string[], opts: unknown) => Promise<{ data?: Array<{ metadata?: Record<string, unknown> }> }>; scrapeUrl: (url: string, opts: unknown) => Promise<{ metadata?: Record<string, unknown> }> })({ apiKey: FIRECRAWL_KEY });
   let updated = 0;
 
   // Build URL to resource map
@@ -413,7 +413,7 @@ export async function extractWebMetadata(opts: ParsedOpts): Promise<number> {
 
     for (const r of toProcess) {
       try {
-        const result = await firecrawl.scrape(r.url, { formats: ['markdown'] });
+        const result = await firecrawl.scrapeUrl(r.url, { formats: ['markdown'] });
         const metadata = (result.metadata || {}) as Record<string, unknown>;
 
         const authorFields = ['author', 'authors', 'DC.Contributor', 'DC.Creator', 'article:author', 'og:article:author'];
