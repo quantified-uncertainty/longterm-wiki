@@ -11,6 +11,16 @@ const VERDICT_STYLES: Record<string, { icon: typeof CheckCircle2; color: string;
   not_verifiable: { icon: HelpCircle, color: "text-muted-foreground", label: "Not verifiable" },
 };
 
+/** Normalize a URL for fuzzy matching (strip trailing slash, www, protocol) */
+function normalizeUrl(raw: string): string {
+  try {
+    const u = new URL(raw);
+    return (u.host.replace(/^www\./, "") + u.pathname.replace(/\/+$/, "") + u.search).toLowerCase();
+  } catch {
+    return raw.replace(/\/+$/, "").toLowerCase();
+  }
+}
+
 /**
  * Client component that reads citation quote data from context and renders
  * verification details for a specific resource URL in the expanded reference.
@@ -20,8 +30,9 @@ export function ReferenceCitationDetails({ url }: { url: string }) {
 
   if (quotes.length === 0) return null;
 
-  // Match quotes by URL
-  const matching = quotes.filter((q) => q.url === url);
+  // Match quotes by normalized URL
+  const norm = normalizeUrl(url);
+  const matching = quotes.filter((q) => q.url && normalizeUrl(q.url) === norm);
   if (matching.length === 0) return null;
 
   // Pick the most informative quote (prefer one with accuracy verdict and source quote)

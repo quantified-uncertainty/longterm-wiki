@@ -4717,28 +4717,53 @@
   type: web
   local_filename: 8d054aa535ed84ad.txt
   summary: >-
-    I apologize, but the provided content does not appear to be a substantive source document. It
-    seems to be a fragment of a webpage with some tracking code and partial menu items, but lacks
-    any meaningful text about Kalshi or a coherent source to analyze.
-
-
-    Without a clear, complete text describing Kalshi, its purpose, research, or contributions, I
-    cannot responsibly complete the requested JSON summary.
-
-
-    If you have a specific document, research paper, or detailed description about Kalshi that you
-    would like me to analyze, please provide the full text, and I will be happy to help you create
-    the structured summary.
-
-
-    Would you like to share the complete source document or provide more context about the source?
-  cited_by:
-    - prediction-markets
-  fetched_at: 2025-12-28 02:55:24
+    Kalshi is a federally regulated prediction market exchange in the United States.
+- id: 36eaf35d3d38bab3
+  url: https://research.contrary.com/company/kalshi
+  title: "Kalshi's Business Breakdown & Founding Story"
+  type: report
+  summary: >-
+    Contrary Research's detailed analysis of Kalshi's business model, founding story,
+    regulatory journey, and competitive position in the prediction markets space.
   tags:
-    - forecasting
-    - information-aggregation
-    - mechanism-design
+    - prediction-markets
+    - economic
+- id: d151deec0feba721
+  url: https://sigma.world/news/from-launch-to-lawsuits-kalshis-tumultous-timeline/
+  title: "From Launch to Lawsuits: Kalshi's Tumultuous Timeline"
+  type: blog
+  summary: >-
+    Timeline of Kalshi's journey from CFTC approval through regulatory battles,
+    including the landmark election market lawsuit and subsequent legal developments.
+  tags:
+    - prediction-markets
+    - governance
+- id: 59636b12f8080da8
+  url: https://gamblingharm.org/is-kalshi-just-gambling-risks-legality-and-safety-explained
+  title: "Is Kalshi Just Gambling? Risks, Legality, And Safety Explained"
+  type: blog
+  summary: >-
+    Analysis of whether prediction markets like Kalshi constitute gambling,
+    examining regulatory frameworks, consumer protections, and risk factors.
+  tags:
+    - prediction-markets
+    - governance
+- id: cb7458f212b582af
+  url: https://kalshi.com/about
+  title: About Kalshi
+  type: web
+  summary: >-
+    Kalshi's official about page describing the company's mission, leadership, and history.
+- id: 649efd40087bd0bc
+  url: https://news.kalshi.com/p/kalshi-11-billion-valuation-series-e
+  title: "Kalshi Reaches $11 Billion Valuation as App Takes over America"
+  type: blog
+  summary: >-
+    Coverage of Kalshi's Series E funding round at an $11 billion valuation,
+    driven by surging event contract trading volumes.
+  tags:
+    - prediction-markets
+    - economic
 - id: 43c481d6a9142c27
   url: https://kilobaser.com/
   title: Kilobaser
