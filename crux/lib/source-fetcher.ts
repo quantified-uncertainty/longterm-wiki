@@ -54,9 +54,17 @@ export interface FetchRequest {
   resourceId?: string;
   /** If true, write fetch status (dead/paywall/ok) back to the resource YAML. Default: false. */
   updateResourceStatus?: boolean;
+  /**
+   * Maximum age (ms) for cached content before triggering a re-fetch.
+   * Applies to SQLite and PostgreSQL caches. Default: 30 days.
+   */
+  maxAgeMs?: number;
 }
 
 export type FetchedSourceStatus = 'ok' | 'paywall' | 'dead' | 'error';
+
+/** Distinguishes the type of content returned by fetchSource. */
+export type FetchedSourceContentType = 'html' | 'pdf' | 'transcript';
 
 export interface FetchedSource {
   url: string;
@@ -67,6 +75,8 @@ export interface FetchedSource {
   /** Paragraphs from content most relevant to the query (empty if no query or extractMode=full) */
   relevantExcerpts: string[];
   status: FetchedSourceStatus;
+  /** Content type: 'html' (default), 'pdf' (extracted text), or 'transcript' (YouTube) */
+  contentType?: FetchedSourceContentType;
   /** Resource metadata, present when the URL matched a known resource */
   resource?: {
     id: string;
@@ -99,6 +109,9 @@ const PAYWALL_SIGNALS = [
 const FETCH_TIMEOUT_MS = 15_000;
 const FETCH_USER_AGENT = 'Mozilla/5.0 (compatible; LongtermWikiSourceFetcher/1.0)';
 const MAX_CONTENT_CHARS = 100_000;
+
+/** Default TTL for PostgreSQL cache entries: 30 days (in milliseconds). */
+const PG_CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 /** Common English stopwords filtered out during query tokenization. */
 const STOPWORDS = new Set([
@@ -284,6 +297,82 @@ export function extractRelevantExcerpts(
 }
 
 // ---------------------------------------------------------------------------
+// YouTube helpers
+// ---------------------------------------------------------------------------
+
+function isYoutubeUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '');
+    return host === 'youtube.com' || host === 'youtu.be';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fetch a YouTube video transcript via the youtube-transcript package.
+ * Returns extracted transcript text, or null if unavailable.
+ */
+async function fetchYoutubeTranscript(
+  url: string,
+): Promise<{ content: string; title: string } | null> {
+  try {
+    const { YoutubeTranscript } = await import('youtube-transcript');
+    const segments = await YoutubeTranscript.fetchTranscript(url);
+    if (!segments || segments.length === 0) return null;
+    const content = segments.map((s: { text: string }) => s.text).join(' ').slice(0, MAX_CONTENT_CHARS);
+    return { content, title: '' };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[source-fetcher] YouTube transcript failed for ${url}: ${msg.slice(0, 200)}`);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// arXiv URL rewriting
+// ---------------------------------------------------------------------------
+
+/**
+ * If the URL is an arXiv paper (abs or pdf), rewrite to the Ar5iv HTML version
+ * for clean full-text extraction. Returns null for non-arXiv URLs.
+ */
+function rewriteArxivUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname !== 'arxiv.org') return null;
+    const match = u.pathname.match(/^\/(abs|pdf)\/(.+?)(?:\.pdf)?$/);
+    if (!match) return null;
+    const paperId = match[2];
+    return `https://ar5iv.labs.arxiv.org/html/${paperId}`;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// PDF extraction
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract text from a PDF buffer using the pdf-parse library.
+ * Returns null on failure.
+ */
+async function extractPdfWithPdfParse(buffer: ArrayBuffer): Promise<string | null> {
+  try {
+    const { PDFParse } = await import('pdf-parse');
+    const parser = new PDFParse({ data: Buffer.from(buffer) });
+    const result = await parser.getText();
+    return result.text.slice(0, MAX_CONTENT_CHARS) || null;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[source-fetcher] pdf-parse failed: ${msg.slice(0, 200)}`);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Firecrawl fetch
 // ---------------------------------------------------------------------------
 
@@ -343,6 +432,7 @@ interface BuiltinFetchResult {
   content: string;
   httpStatus: number;
   error: string | null;
+  contentType: FetchedSourceContentType;
 }
 
 async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
@@ -353,7 +443,7 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
       const response = await fetch(url, {
         headers: {
           'User-Agent': FETCH_USER_AGENT,
-          'Accept': 'text/html,application/xhtml+xml,*/*;q=0.9',
+          'Accept': 'text/html,application/xhtml+xml,application/pdf,*/*;q=0.9',
         },
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
         redirect: 'follow',
@@ -368,22 +458,30 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
       }
 
       if (!response.ok) {
-        return { title: '', content: '', httpStatus: status, error: `HTTP ${status}` };
+        return { title: '', content: '', httpStatus: status, error: `HTTP ${status}`, contentType: 'html' };
       }
 
-      const contentType = response.headers.get('content-type') ?? '';
-      if (contentType.includes('application/pdf')) {
-        return { title: '(PDF)', content: '', httpStatus: status, error: 'PDF content' };
+      const responseContentType = response.headers.get('content-type') ?? '';
+
+      if (responseContentType.includes('application/pdf')) {
+        // PDF: extract text via pdf-parse
+        const buffer = await response.arrayBuffer();
+        const text = await extractPdfWithPdfParse(buffer);
+        if (text && text.length > 0) {
+          return { title: '', content: text, httpStatus: status, error: null, contentType: 'pdf' };
+        }
+        return { title: '(PDF)', content: '', httpStatus: status, error: 'PDF extraction failed', contentType: 'pdf' };
       }
-      if (!contentType.includes('text/html') && !contentType.includes('application/xhtml')) {
-        return { title: '', content: '', httpStatus: status, error: `non-HTML: ${contentType}` };
+
+      if (!responseContentType.includes('text/html') && !responseContentType.includes('application/xhtml')) {
+        return { title: '', content: '', httpStatus: status, error: `non-HTML: ${responseContentType}`, contentType: 'html' };
       }
 
       const html = await response.text();
       const title = extractTitle(html);
       const text = htmlToText(html).slice(0, MAX_CONTENT_CHARS);
 
-      return { title, content: text, httpStatus: status, error: null };
+      return { title, content: text, httpStatus: status, error: null, contentType: 'html' };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       const isTransient = msg.includes('abort') || msg.includes('ECONNRESET') || msg.includes('timeout');
@@ -396,11 +494,12 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
       return {
         title: '', content: '', httpStatus: 0,
         error: msg.includes('abort') ? 'timeout' : msg,
+        contentType: 'html',
       };
     }
   }
 
-  return { title: '', content: '', httpStatus: 0, error: 'max retries exceeded' };
+  return { title: '', content: '', httpStatus: 0, error: 'max retries exceeded', contentType: 'html' };
 }
 
 // ---------------------------------------------------------------------------
@@ -410,8 +509,22 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
 /** Default TTL for SQLite cache entries: 7 days (in milliseconds). */
 const DB_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** Map our internal content type to MIME string for SQLite / PostgreSQL storage. */
+function contentTypeToMime(ct: FetchedSourceContentType): string {
+  if (ct === 'pdf') return 'application/pdf';
+  if (ct === 'transcript') return 'text/plain';
+  return 'text/html';
+}
+
+/** Map a MIME string from SQLite / PostgreSQL storage to our internal content type. */
+function mimeToContentType(mime: string | null): FetchedSourceContentType {
+  if (mime === 'application/pdf') return 'pdf';
+  if (mime === 'text/plain') return 'transcript';
+  return 'html';
+}
+
 /** Try to load a previously fetched result from SQLite. Returns null if expired or missing (#676). */
-function loadFromDb(url: string, maxAgeMs: number = DB_CACHE_TTL_MS): Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> | null {
+function loadFromDb(url: string, maxAgeMs: number = DB_CACHE_TTL_MS): (Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> & { contentType: FetchedSourceContentType }) | null {
   try {
     const row = citationContent.getByUrl(url);
     if (row?.full_text && row.full_text.length > 0) {
@@ -424,6 +537,7 @@ function loadFromDb(url: string, maxAgeMs: number = DB_CACHE_TTL_MS): Pick<Fetch
         title: row.page_title ?? '',
         content: row.full_text,
         fetchedAt: row.fetched_at ?? new Date().toISOString(),
+        contentType: mimeToContentType(row.content_type),
       };
     }
   } catch {
@@ -433,7 +547,7 @@ function loadFromDb(url: string, maxAgeMs: number = DB_CACHE_TTL_MS): Pick<Fetch
 }
 
 /** Store fetched content in SQLite for cross-session reuse. */
-function saveToDb(url: string, title: string, content: string, httpStatus: number): void {
+function saveToDb(url: string, title: string, content: string, httpStatus: number, contentType: FetchedSourceContentType = 'html'): void {
   try {
     citationContent.upsert({
       url,
@@ -441,34 +555,24 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
       footnote: 0,
       fetchedAt: new Date().toISOString(),
       httpStatus,
-      contentType: 'text/html',
+      contentType: contentTypeToMime(contentType),
       pageTitle: title,
       fullHtml: null,
       fullText: content,
       contentLength: content.length,
     });
   } catch {
-    // SQLite storage is best-effort
+    // DB unavailable — fine, proceed without cache
   }
 }
 
-// ---------------------------------------------------------------------------
-// PostgreSQL cross-machine cache helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Try to load a previously fetched result from PostgreSQL (wiki-server).
- * Returns null if the server is unavailable or the URL has not been cached.
- * apiRequest never throws — it returns { ok: false } on network/server errors.
- */
 async function loadFromPostgres(
   url: string,
-  maxAgeMs: number = DB_CACHE_TTL_MS,
-): Promise<(Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> & { httpStatus: number | null }) | null> {
+  maxAgeMs: number = PG_CACHE_TTL_MS,
+): Promise<(Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> & { httpStatus: number | null; contentType: FetchedSourceContentType }) | null> {
   const result = await getCitationContentByUrl(url);
   if (result.ok && result.data.fullText && result.data.fullText.length > 0) {
-    // Check TTL — match the SQLite cache's 7-day expiry to avoid serving
-    // stale content that could give false positives in citation audits.
+    // Check TTL — skip stale entries so sources are periodically re-fetched.
     if (result.data.fetchedAt) {
       const age = Date.now() - new Date(result.data.fetchedAt).getTime();
       if (age > maxAgeMs) return null;
@@ -478,6 +582,7 @@ async function loadFromPostgres(
       content: result.data.fullText,
       fetchedAt: result.data.fetchedAt,
       httpStatus: result.data.httpStatus ?? null,
+      contentType: mimeToContentType(result.data.contentType),
     };
   }
   return null;
@@ -488,12 +593,12 @@ async function loadFromPostgres(
  * Errors are silently ignored — PostgreSQL is a durable secondary store,
  * not a hard dependency.
  */
-function saveToPostgres(url: string, title: string, content: string, httpStatus: number): void {
+function saveToPostgres(url: string, title: string, content: string, httpStatus: number, contentType: FetchedSourceContentType = 'html'): void {
   upsertCitationContent({
     url,
     fetchedAt: new Date().toISOString(),
     httpStatus,
-    contentType: 'text/html',
+    contentType: contentTypeToMime(contentType),
     pageTitle: title || null,
     fullText: content,
     contentLength: content.length,
@@ -563,6 +668,8 @@ async function _fetchSourceCore(
   request: FetchRequest,
 ): Promise<FetchedSource> {
   const { extractMode, query } = request;
+  const pgMaxAgeMs = request.maxAgeMs ?? PG_CACHE_TTL_MS;
+  const dbMaxAgeMs = request.maxAgeMs ?? DB_CACHE_TTL_MS;
   const now = new Date().toISOString();
 
   // ---- 1. Unverifiable domains ----
@@ -576,7 +683,8 @@ async function _fetchSourceCore(
   }
 
   // ---- 2. PostgreSQL cross-machine cache (async, durable source of truth) ----
-  const pgRow = await loadFromPostgres(url);
+  // Applies to all URL types including YouTube (transcripts are cached after first fetch).
+  const pgRow = await loadFromPostgres(url, pgMaxAgeMs);
   if (pgRow) {
     const excerpts = extractMode === 'relevant' && query
       ? extractRelevantExcerpts(pgRow.content, query)
@@ -589,16 +697,17 @@ async function _fetchSourceCore(
       content: pgRow.content,
       relevantExcerpts: excerpts,
       status: paywall ? 'paywall' : 'ok',
+      contentType: pgRow.contentType,
       resource: resourceMeta,
     };
     // Backfill SQLite so subsequent calls are served from the fast local cache
-    saveToDb(url, pgRow.title, pgRow.content, pgRow.httpStatus ?? 200);
+    saveToDb(url, pgRow.title, pgRow.content, pgRow.httpStatus ?? 200, pgRow.contentType);
     sessionCacheSet(url, result);
     return result;
   }
 
   // ---- 3. SQLite local cache (fast fallback when PostgreSQL is unavailable) ----
-  const dbRow = loadFromDb(url);
+  const dbRow = loadFromDb(url, dbMaxAgeMs);
   if (dbRow) {
     const excerpts = extractMode === 'relevant' && query
       ? extractRelevantExcerpts(dbRow.content, query)
@@ -611,32 +720,88 @@ async function _fetchSourceCore(
       content: dbRow.content,
       relevantExcerpts: excerpts,
       status: paywall ? 'paywall' : 'ok',
+      contentType: dbRow.contentType,
       resource: resourceMeta,
     };
     sessionCacheSet(url, result);
     return result;
   }
 
-  // ---- 4. Network fetch (Firecrawl → built-in fallback) ----
+  // ---- 4. YouTube transcript (cache miss — fetch from API) ----
+  // Checked after cache reads so cached transcripts are served without re-fetching.
+  if (isYoutubeUrl(url)) {
+    const transcriptResult = await fetchYoutubeTranscript(url);
+    const content = transcriptResult?.content ?? '';
+    const excerpts = extractMode === 'relevant' && query && content
+      ? extractRelevantExcerpts(content, query)
+      : [];
+    const status: FetchedSourceStatus = content.length > 0 ? 'ok' : 'error';
+    const result: FetchedSource = {
+      url,
+      title: resource?.title ?? '',
+      fetchedAt: now,
+      content,
+      relevantExcerpts: excerpts,
+      status,
+      contentType: 'transcript',
+      resource: resourceMeta,
+    };
+    // Cache successful transcript fetches for cross-session reuse
+    if (content.length > 0) {
+      saveToDb(url, result.title, content, 200, 'transcript');
+      saveToPostgres(url, result.title, content, 200, 'transcript');
+      sessionCacheSet(url, result);
+    }
+    return result;
+  }
+
+  // ---- 5. Network fetch (Firecrawl → built-in fallback) ----
+  // arXiv: rewrite to Ar5iv HTML for clean full-text extraction.
+  // If Ar5iv fails (404 — paper not converted yet), fall back to original arxiv.org URL.
+  const ar5ivUrl = rewriteArxivUrl(url);
+  const fetchUrl = ar5ivUrl ?? url;
+
   let title = '';
   let content = '';
   let httpStatus = 0;
   let fetchError: string | null = null;
+  let fetchedContentType: FetchedSourceContentType = 'html';
 
-  const firecrawlResult = await fetchWithFirecrawl(url);
+  const firecrawlResult = await fetchWithFirecrawl(fetchUrl);
   if (firecrawlResult) {
     title = firecrawlResult.title;
     content = firecrawlResult.content;
     httpStatus = 200;
+    // Firecrawl returns markdown — treat as HTML-equivalent
+    fetchedContentType = 'html';
   } else {
-    const builtinResult = await fetchWithBuiltin(url);
-    title = builtinResult.title;
-    content = builtinResult.content;
-    httpStatus = builtinResult.httpStatus;
-    fetchError = builtinResult.error;
+    const builtinResult = await fetchWithBuiltin(fetchUrl);
+    // If Ar5iv failed with a 4xx error, retry with the original arxiv.org URL
+    if (ar5ivUrl && builtinResult.httpStatus >= 400 && fetchUrl !== url) {
+      const fallbackResult = await fetchWithBuiltin(url);
+      if (fallbackResult.httpStatus < 400 && fallbackResult.content.length > 0) {
+        title = fallbackResult.title;
+        content = fallbackResult.content;
+        httpStatus = fallbackResult.httpStatus;
+        fetchError = fallbackResult.error;
+        fetchedContentType = fallbackResult.contentType;
+      } else {
+        title = builtinResult.title;
+        content = builtinResult.content;
+        httpStatus = builtinResult.httpStatus;
+        fetchError = builtinResult.error;
+        fetchedContentType = builtinResult.contentType;
+      }
+    } else {
+      title = builtinResult.title;
+      content = builtinResult.content;
+      httpStatus = builtinResult.httpStatus;
+      fetchError = builtinResult.error;
+      fetchedContentType = builtinResult.contentType;
+    }
   }
 
-  // ---- 4. Determine status ----
+  // ---- 5b. Determine status ----
   let status: FetchedSourceStatus;
   if (fetchError && httpStatus === 0) {
     status = 'error';
@@ -649,32 +814,32 @@ async function _fetchSourceCore(
   } else if (fetchError) {
     status = 'error';
   } else {
-    status = 'ok'; // PDF or non-HTML with 200 status
+    status = 'ok';
   }
 
-  // ---- 5. Persist to SQLite (fast local cache) and PostgreSQL (durable source of truth) ----
+  // ---- 6. Persist to SQLite (fast local cache) and PostgreSQL (durable source of truth) ----
   if (content.length > 0) {
-    saveToDb(url, title, content, httpStatus);
-    saveToPostgres(url, title, content, httpStatus);
+    saveToDb(url, title, content, httpStatus, fetchedContentType);
+    saveToPostgres(url, title, content, httpStatus, fetchedContentType);
   }
 
-  // ---- 6. Extract excerpts ----
+  // ---- 7. Extract excerpts ----
   const excerpts = extractMode === 'relevant' && query && content
     ? extractRelevantExcerpts(content, query)
     : [];
 
-  // ---- 7. Use resource title as fallback ----
+  // ---- 8. Use resource title as fallback ----
   const finalTitle = title || resource?.title || '';
 
   const result: FetchedSource = {
     url, title: finalTitle, fetchedAt: now, content, relevantExcerpts: excerpts,
-    status, resource: resourceMeta,
+    status, contentType: fetchedContentType, resource: resourceMeta,
   };
 
-  // ---- 8. Store in session cache ----
+  // ---- 9. Store in session cache ----
   sessionCacheSet(url, result);
 
-  // ---- 9. Reflect status back to resource YAML (if requested) ----
+  // ---- 10. Reflect status back to resource YAML (if requested) ----
 
   if (request.updateResourceStatus && resource) {
     try {
@@ -697,9 +862,10 @@ async function _fetchSourceCore(
  * Caching layers:
  *   1. In-memory session cache (fastest, LRU-evicted at 500 entries)
  *   2. In-flight dedup (concurrent requests for same URL share one fetch)
- *   3. PostgreSQL (wiki-server) — durable cross-machine source of truth
+ *   3. PostgreSQL (wiki-server) — durable cross-machine source of truth (all URL types incl. YouTube)
  *   4. SQLite — fast local fallback (used when PostgreSQL is unavailable)
- *   5. Network fetch (Firecrawl preferred, built-in fallback)
+ *   5. YouTube transcript API (if URL is YouTube and no cache hit)
+ *   5. Network fetch (Firecrawl preferred, built-in fallback; arXiv rewritten to ar5iv)
  *
  * Writes: successful network fetches are stored in both SQLite (fast local cache)
  * and PostgreSQL (durable, fire-and-forget).

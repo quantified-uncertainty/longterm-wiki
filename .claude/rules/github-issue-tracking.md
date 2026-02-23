@@ -30,8 +30,15 @@ Use `crux pr` commands instead of raw curl for all PR operations:
 
 ```bash
 pnpm crux pr detect              # Check if PR exists for current branch
-pnpm crux pr create --title="..." --body="..."  # Create PR (corruption-safe)
 pnpm crux pr fix-body            # Auto-fix literal \n in PR body
+
+# For multi-line PR bodies, use stdin or --body-file (NOT inline --body with heredoc):
+pnpm crux pr create --title="..." --body-file=/tmp/pr-body.md
+# or:
+pnpm crux pr create --title="..." <<'PRBODY'
+## Summary
+- key change 1
+PRBODY
 ```
 
 ## Why This Matters

@@ -76,7 +76,13 @@ pnpm crux issues close <N> --duplicate=M  # Close issue as duplicate of another
 pnpm crux issues close <N> --reason="..."  # Close with comment
 
 # GitHub PR management (corruption-safe — always use instead of raw curl)
-pnpm crux pr create --title="..." --body="..."  # Create PR for current branch
+# IMPORTANT: For multi-line PR bodies, use --body-file or stdin (NOT inline --body with heredoc):
+pnpm crux pr create --title="..." --body-file=/tmp/pr-body.md  # Create PR from file (recommended)
+pnpm crux pr create --title="..." <<'EOF'        # Create PR from stdin heredoc (also safe)
+## Summary
+- change 1
+EOF
+# Inline --body is only safe for single-line bodies; heredoc in $() fails with sh/dash:
 pnpm crux pr detect              # Check if PR exists for current branch
 pnpm crux pr detect --ci         # JSON output for scripts
 pnpm crux pr fix-body            # Auto-fix literal \n in PR body

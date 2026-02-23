@@ -105,6 +105,18 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
     }
   }
 
+  // If no body provided and stdin is a pipe (not a TTY), read body from stdin.
+  // This allows: pnpm crux pr create --title="..." <<'EOF'\nbody\nEOF
+  // Avoids sh/dash heredoc-in-command-substitution incompatibilities (#722 paranoid review).
+  if (!body && !process.stdin.isTTY) {
+    const { readFileSync: readFdSync } = await import('fs');
+    try {
+      body = readFdSync('/dev/stdin', 'utf-8');
+    } catch {
+      // stdin not readable — leave body undefined
+    }
+  }
+
   if (!title) {
     return {
       output: `${c.red}Usage: crux pr create --title="PR title" --body="PR body" [--body-file=<path>] [--base=main] [--draft]${c.reset}\n`,
@@ -260,10 +272,11 @@ Commands:
 
 Options (create):
   --title="..."       Required. PR title.
-  --body="..."        PR body (inline — vulnerable to shell expansion).
+  --body="..."        PR body (inline — avoid for multi-line bodies; use --body-file or stdin).
   --body-file=<path>  PR body from file (safe for markdown with backticks).
   --base=main         Base branch (default: main).
   --draft             Create as draft PR.
+  (stdin)             If --body and --body-file are absent and stdin is a pipe, body is read from stdin.
 
 Options (detect):
   --ci                JSON output.
@@ -272,7 +285,18 @@ Options (fix-body):
   --pr=N              Target a specific PR number instead of auto-detecting.
 
 Examples:
-  pnpm crux pr create --title="Add feature X" --body="## Summary\\n- Added X"
+  # Multi-line body via heredoc (recommended — avoids sh/dash heredoc issues):
+  pnpm crux pr create --title="Add feature X" <<'EOF'
+  ## Summary
+  - Added X
+  EOF
+
+  # Multi-line body via file (also recommended):
+  pnpm crux pr create --title="Add feature X" --body-file=/tmp/pr-body.md
+
+  # Short single-line body inline:
+  pnpm crux pr create --title="Fix typo" --body="Fix typo in docs"
+
   pnpm crux pr detect                    # Check if PR exists for this branch
   pnpm crux pr detect --ci               # JSON output for scripts
   pnpm crux pr fix-body                  # Fix PR for current branch

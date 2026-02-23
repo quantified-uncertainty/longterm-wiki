@@ -26,6 +26,12 @@ jobs:
       backup_filename: ${{ steps.backup.outputs.backup_filename }}
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/actions
+          sparse-checkout-cone-mode: false
+
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
