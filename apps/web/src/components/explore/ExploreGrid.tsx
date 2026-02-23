@@ -178,6 +178,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const initialTag = searchParams.get("tag") || "";
   const initialEntity = searchParams.get("entity") || "";
   const initialSection = searchParams.get("section") || "";
+  const initialCluster = searchParams.get("cluster") || "";
   const initialRiskCat = searchParams.get("riskCategory") || null;
   const initialRiskCatIndex = initialRiskCat
     ? Math.max(0, RISK_CATEGORY_GROUPS.findIndex((g) => g.value === initialRiskCat))
@@ -185,6 +186,9 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const initialEntityIndex = initialEntity ? resolveEntityGroupIndex(initialEntity) : 0;
   const initialSectionIndex = initialSection
     ? Math.max(0, SECTION_GROUPS.findIndex((g) => g.label.toLowerCase() === initialSection.toLowerCase()))
+    : 0;
+  const initialFieldIndex = initialCluster
+    ? Math.max(0, FIELD_GROUPS.findIndex((g) => g.cluster === initialCluster))
     : 0;
 
   const rawView = searchParams.get("view");
@@ -196,7 +200,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
 
   const [viewMode, setViewMode] = useState<ViewMode>(initialView);
   const [search, setSearch] = useState(initialTag);
-  const [activeField, setActiveField] = useState(0);
+  const [activeField, setActiveField] = useState(initialFieldIndex);
   const [activeSection, setActiveSection] = useState(initialSectionIndex);
   const [activeEntity, setActiveEntity] = useState(
     initialRiskCat ? 1 : initialEntityIndex
@@ -242,6 +246,8 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   function handleFieldChange(index: number) {
     setActiveField(index);
     setVisibleCount(60);
+    const cluster = FIELD_GROUPS[index].cluster;
+    updateUrlParams({ cluster: cluster || null });
   }
 
   function handleSectionChange(index: number) {

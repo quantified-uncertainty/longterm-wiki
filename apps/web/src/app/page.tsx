@@ -199,7 +199,7 @@ export default function Home() {
                     ))}
                   </div>
                   <Link
-                    href={`/wiki?tag=${topic.label.toLowerCase()}`}
+                    href={`/wiki?cluster=${topic.cluster}`}
                     className="inline-block mt-2 text-xs text-muted-foreground hover:text-foreground no-underline transition-colors"
                   >
                     View all &rarr;
