@@ -28,6 +28,7 @@ import { createClient, MODELS, callClaude, parseJsonResponse } from '../lib/anth
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { NUMERIC_ID_RE } from '../lib/patterns.ts';
+import { splitContentForEnrichment } from '../lib/content-chunker.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -103,14 +104,17 @@ function buildSkipRanges(content: string): Array<[number, number]> {
     }
   }
 
-  // Skip code blocks (```...``` and inline `...`)
+  // Skip code blocks (```...```) — must come before inline code
   const codeBlock = /```[\s\S]*?```/g;
   for (const match of content.matchAll(codeBlock)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
   }
-  const inlineCode = /`[^`]+`/g;
+  // Skip inline code (`...`) — exclude newlines to avoid false matches
+  // between code fences (backticks at fence boundaries would create a
+  // giant false skip range covering prose between fences).
+  const inlineCode = /`[^`\n]+`/g;
   for (const match of content.matchAll(inlineCode)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
@@ -167,6 +171,23 @@ function buildSkipRanges(content: string): Array<[number, number]> {
   // Skip MDX/JSX comments {/* ... */} (#681)
   const mdxComment = /\{\/\*[\s\S]*?\*\/\}/g;
   for (const match of content.matchAll(mdxComment)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip <R>...</R> resource reference tags — display text could contain entity names
+  const rTag = /<R\s[^>]*>[\s\S]*?<\/R>/g;
+  for (const match of content.matchAll(rTag)) {
+    if (match.index !== undefined) {
+      ranges.push([match.index, match.index + match[0].length]);
+    }
+  }
+
+  // Skip footnote definition lines [^N]: ... — entity names in definitions
+  // should not be linked as they'd corrupt footnote syntax.
+  const footnoteDef = /^\[\^[^\]]+\]:\s.+$/gm;
+  for (const match of content.matchAll(footnoteDef)) {
     if (match.index !== undefined) {
       ranges.push([match.index, match.index + match[0].length]);
     }
@@ -273,7 +294,7 @@ ${alreadyLinkedList}
 
 ## Content to Enrich
 \`\`\`mdx
-${content.slice(0, 6000)}${content.length > 6000 ? '\n... [truncated]' : ''}
+${content}
 \`\`\`
 
 Identify entity mentions and return replacement instructions as JSON.`;
@@ -305,7 +326,26 @@ Identify entity mentions and return replacement instructions as JSON.`;
 }
 
 /**
+ * Split content into processable chunks for entity-link enrichment.
+ *
+ * Re-exports `splitContentForEnrichment` from content-chunker so that callers
+ * within the enrichment module don't need to import from an unrelated lib.
+ * Tests for the underlying logic live in content-chunker.test.ts.
+ *
+ * @param content - Full MDX content
+ * @returns Array of content chunks
+ */
+export function buildEnrichmentChunks(content: string): string[] {
+  if (!content.trim()) return [];
+  return splitContentForEnrichment(content);
+}
+
+/**
  * Main enrichment function. Takes MDX content and returns enriched content.
+ *
+ * Processes the full content via sectional chunking so pages longer than
+ * 6 000 chars are enriched completely (not just the first ~3 000 words).
+ * Cross-chunk deduplication ensures each entity is linked at most once.
  *
  * @param content - The MDX content to enrich
  * @param options.root - Project root path (defaults to PROJECT_ROOT)
@@ -326,18 +366,32 @@ export async function enrichEntityLinks(
     return { content, insertedCount: 0, replacements: [] };
   }
 
+  // Build initial already-linked sets from pre-existing EntityLinks in the content
   const { texts: alreadyLinkedTexts, entityIds: alreadyLinkedIds } = buildAlreadyLinkedSets(content);
 
   let replacements: EntityLinkReplacement[] = [];
 
   if (useLlm) {
-    replacements = await callLlmForEntityLinks(content, entityLookup, alreadyLinkedTexts);
-  }
+    // Process each chunk, carrying the already-linked sets forward for cross-chunk dedup
+    const chunks = buildEnrichmentChunks(content);
+    for (const chunk of chunks) {
+      const chunkReplacements = await callLlmForEntityLinks(chunk, entityLookup, alreadyLinkedTexts);
 
-  // Filter out replacements for already-linked text or already-linked entity IDs (#679)
-  replacements = replacements.filter(r =>
-    !alreadyLinkedTexts.has(r.displayName) && !alreadyLinkedIds.has(r.entityId),
-  );
+      // Filter by BOTH entityId AND displayName to handle LLM errors where the same
+      // entity name is proposed again under a different ID in a later section.
+      const filtered = chunkReplacements.filter(r =>
+        !alreadyLinkedTexts.has(r.displayName) && !alreadyLinkedIds.has(r.entityId),
+      );
+
+      // Update dedup sets so the next chunk skips these entities
+      for (const r of filtered) {
+        alreadyLinkedTexts.add(r.displayName);
+        alreadyLinkedIds.add(r.entityId);
+      }
+
+      replacements.push(...filtered);
+    }
+  }
 
   // Validate all entityIds are in E## format
   replacements = replacements.filter(r => NUMERIC_ID_RE.test(r.entityId));

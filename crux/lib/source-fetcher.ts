@@ -463,9 +463,16 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
  */
 async function loadFromPostgres(
   url: string,
+  maxAgeMs: number = DB_CACHE_TTL_MS,
 ): Promise<(Pick<FetchedSource, 'title' | 'content' | 'fetchedAt'> & { httpStatus: number | null }) | null> {
   const result = await getCitationContentByUrl(url);
   if (result.ok && result.data.fullText && result.data.fullText.length > 0) {
+    // Check TTL — match the SQLite cache's 7-day expiry to avoid serving
+    // stale content that could give false positives in citation audits.
+    if (result.data.fetchedAt) {
+      const age = Date.now() - new Date(result.data.fetchedAt).getTime();
+      if (age > maxAgeMs) return null;
+    }
     return {
       title: result.data.pageTitle ?? '',
       content: result.data.fullText,

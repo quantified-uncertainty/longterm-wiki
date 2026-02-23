@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { applyFactRefReplacements, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
+import { applyFactRefReplacements, buildFactRefChunks, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
 
 describe('applyFactRefReplacements', () => {
   it('wraps a matching number with <F> tags', () => {
@@ -329,6 +329,64 @@ Anthropic raised \\$30 billion.`;
     // $1B and $30B wrapped, $380B already wrapped = 2 new
     expect(applied).toBe(2);
   });
+
+  it('skips numbers inside JSX open tag attributes', () => {
+    const content = '<DataInfoBox items={500} /> Their budget is $500M.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'abc12300',
+      searchText: '$500M',
+      displayText: '\\$500M',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    expect(result).toContain('<F e="test" f="abc12300">\\$500M</F>');
+    // The 500 inside the JSX tag should be untouched
+    expect(result).toContain('items={500}');
+  });
+
+  it('skips numbers inside MDX comments', () => {
+    const content = '{/* TODO: 500 employees */}\nThey have 500 employees.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'def45600',
+      searchText: '500 employees',
+      displayText: '500 employees',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    expect(result).toContain('{/* TODO: 500 employees */}');
+    expect(result).toContain('<F e="test" f="def45600">500 employees</F>');
+  });
+
+  it('skips numbers inside <R> resource tags', () => {
+    const content = '<R id="abc">2023 Survey</R> published in 2023.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'a0b78900',
+      searchText: '2023',
+      displayText: '2023',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    expect(result).toContain('<R id="abc">2023 Survey</R>');
+    expect(result).toContain('<F e="test" f="a0b78900">2023</F>');
+  });
+
+  it('skips numbers inside footnote definitions', () => {
+    const content = 'Revenue was $100M.\n\n[^1]: Report shows $100M in 2023.';
+    const replacements: FactRefReplacement[] = [{
+      entityId: 'test',
+      factId: 'c0d01200',
+      searchText: '$100M',
+      displayText: '\\$100M',
+    }];
+    const { content: result, applied } = applyFactRefReplacements(content, replacements);
+    expect(applied).toBe(1);
+    // Should link in body, not in footnote
+    expect(result).toMatch(/<F e="test" f="c0d01200">\\\$100M<\/F>\./);
+    expect(result).toContain('[^1]: Report shows $100M');
+  });
 });
 
 describe('fixDoubleNestedFTags', () => {
@@ -356,5 +414,60 @@ describe('fixStrayBackslashBeforeFTag', () => {
     const content = '<F e="anthropic" f="5b0663a0">\\$30B</F>';
     const result = fixStrayBackslashBeforeFTag(content);
     expect(result).toBe(content); // No change — \\$ inside F is fine
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildFactRefChunks tests (#721 — sectional chunking for long pages)
+// ---------------------------------------------------------------------------
+
+describe('buildFactRefChunks', () => {
+  it('returns empty array for empty content', () => {
+    expect(buildFactRefChunks('')).toEqual([]);
+    expect(buildFactRefChunks('   ')).toEqual([]);
+  });
+
+  it('returns a single chunk for short content', () => {
+    const content = 'Anthropic raised \\$30 billion last year.';
+    const chunks = buildFactRefChunks(content);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0]).toContain('\\$30 billion');
+  });
+
+  it('returns one chunk for preamble-only content without truncation', () => {
+    // A page with 8 000 chars and no ## headings — must NOT be truncated
+    const content = 'x'.repeat(8000);
+    const chunks = buildFactRefChunks(content);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0].length).toBe(8000);
+  });
+
+  it('covers the tail section of a page beyond the 6 000-char limit', () => {
+    // Simulate a page whose tail section sits beyond 6 000 chars from the start
+    const padding = `## Early Section\n${'y'.repeat(6000)}\n`;
+    const tail = `## Funding Section\nAnthropics raised \\$30 billion in Series E.\n`;
+    const content = padding + tail;
+
+    expect(content.length).toBeGreaterThan(6000);
+
+    const chunks = buildFactRefChunks(content);
+
+    // The tail section must appear in some chunk
+    const hasTail = chunks.some(c => c.includes('\\$30 billion'));
+    expect(hasTail).toBe(true);
+  });
+
+  it('each chunk contains complete section text', () => {
+    const sections = [
+      '## Background\nSome background text.',
+      '## Funding\nRaised \\$1B in seed round.',
+      '## Valuation\nValued at \\$5B after Series A.',
+    ];
+    const content = sections.join('\n\n');
+    const chunks = buildFactRefChunks(content);
+
+    // Every section must be fully present in exactly one chunk
+    expect(chunks.some(c => c.includes('\\$1B in seed round'))).toBe(true);
+    expect(chunks.some(c => c.includes('\\$5B after Series A'))).toBe(true);
   });
 });

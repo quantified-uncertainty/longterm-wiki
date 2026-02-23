@@ -67,6 +67,7 @@ export interface PageUpdate {
     summary: string;
   }>;
   directions: string;        // Specific update instructions for the improver
+  sectionLevel?: boolean;    // When true, use per-## section rewriting (--section-level)
 }
 
 export interface NewPageSuggestion {

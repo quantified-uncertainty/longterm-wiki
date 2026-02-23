@@ -10,7 +10,7 @@
  */
 
 import type { OrchestratorContext, QualityMetrics, QualityGateResult, OrchestratorTier } from './types.ts';
-import { extractQualityMetrics } from './tools.ts';
+import { extractQualityMetrics } from './tools/index.ts';
 
 // ---------------------------------------------------------------------------
 // Quality thresholds per tier
@@ -122,9 +122,16 @@ export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult
   }
 
   if (metrics.structuralScore < thresholds.minStructuralScore) {
+    // Only suggest adding diagrams if create_visual is in the enabled tools.
+    // Without that tool, the orchestrator can't act on the suggestion,
+    // wasting a refinement cycle (see issue #747).
+    const canAddVisuals = ctx.budget.enabledTools.includes('create_visual');
+    const visualHint = canAddVisuals
+      ? ', add tables or diagrams where appropriate'
+      : '';
     gaps.push(
       `Structural score (${metrics.structuralScore}) is below the ${thresholds.minStructuralScore} threshold. ` +
-      `Improve section structure, add tables or diagrams where appropriate.`
+      `Improve section structure${visualHint}.`
     );
   }
 

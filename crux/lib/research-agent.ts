@@ -450,10 +450,15 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     factsPerSource = DEFAULT_FACTS_PER_SOURCE,
   } = config;
 
-  // Focus query with page context if provided
-  const focusedQuery = pageContext
-    ? `${query} ${pageContext.title} ${pageContext.type}`
-    : query;
+  // Focus query with page context if provided, avoiding duplicate terms
+  const focusedQuery = (() => {
+    if (!pageContext) return query;
+    const qLower = query.toLowerCase();
+    const extras = [pageContext.title, pageContext.type]
+      .filter(t => t && !qLower.includes(t.toLowerCase()))
+      .join(' ');
+    return extras ? `${query} ${extras}` : query;
+  })();
 
   let totalCost = 0;
   let searchCost = 0;
@@ -518,8 +523,11 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
 
   for (const hits of allHitArrays) {
     for (const hit of hits) {
-      // Normalize URL: strip trailing slash
-      const normalized = hit.url.replace(/\/$/, '');
+      // Normalize URL: strip trailing slash, www prefix, force https
+      const normalized = hit.url
+        .replace(/^http:\/\//, 'https://')
+        .replace(/^(https:\/\/)www\./, '$1')
+        .replace(/\/$/, '');
       const existing = urlToHits.get(normalized) ?? [];
       existing.push(hit);
       urlToHits.set(normalized, existing);
@@ -570,7 +578,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         url: fetched.url,
         title,
         content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
-        facts: undefined,
+        facts: [],
       });
       continue;
     }

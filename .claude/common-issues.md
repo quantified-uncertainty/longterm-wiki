@@ -12,6 +12,9 @@ The data layer must be built before `pnpm test` or `pnpm build`. If tests fail w
 ### API keys are in environment, not .env files
 Check `env | grep -i API` — keys are set as environment variables, not in `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`.
 
+### OpenRouter model IDs can be deprecated without warning
+Model IDs like `google/gemini-flash-1.5` get removed from OpenRouter. When a pipeline call returns a model-not-found error, check the [OpenRouter models page](https://openrouter.ai/models) for the current ID. As of Feb 2026, Gemini Flash is `google/gemini-2.0-flash-001`.
+
 ### CI verification requires curl, not gh
 `gh` CLI is not installed. Use `curl` with `$GITHUB_TOKEN` to check CI status (see CLAUDE.md for the exact command).
 
@@ -70,6 +73,9 @@ If you get errors about `better-sqlite3` native bindings, run:
 npx node-gyp rebuild
 ```
 
+### better-sqlite3 cannot be imported in Next.js app code
+Next.js apps cannot import native Node modules like `better-sqlite3` directly — they're not available at build/runtime in the Next.js environment. Use a JSON export approach instead: have a crux script write data to a `.json` or `.cache/` file, then read that from the Next.js server component via `fs`.
+
 ---
 
 ## Network / Proxy
@@ -108,6 +114,9 @@ Use `COALESCE(SUM(col), 0)` for display-facing queries. `SUM()` over zero rows r
 
 ### Pages with footnote definitions but no inline refs produce no quote results
 Some pages list sources as `[^N]: [Title](URL)` at the bottom but never reference `[^N]` inline in the prose. The citation pipeline extracts no quotes from these pages because there's no claim context. Flag these pages for inline-citation cleanup — the sources are there, they just need to be referenced.
+
+### `process.cwd()` in Next.js server components resolves to `apps/web/`
+When reading files from Next.js server components using relative paths, `process.cwd()` resolves to `apps/web/`, not the workspace root. So `../../data/` reaches the root `data/` directory and `../../.cache/` reaches the root `.cache/` directory. Keep this in mind when constructing paths in server components.
 
 ### Sandbox blocks most external URL fetches
 Inside Claude Code sandboxed environments, outbound HTTP fetches fail. For citation pipeline runs (`crux citations verify`, `crux citations extract-quotes`), you may need `dangerouslyDisableSandbox: true` when using the Bash tool. This is expected — the sandbox prevents web access by default.
