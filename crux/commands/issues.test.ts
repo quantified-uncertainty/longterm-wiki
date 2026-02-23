@@ -1178,4 +1178,72 @@ describe('issues create — file-based body (#766)', () => {
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Error reading file');
   });
+
+  it('--body-file takes precedence over --model/--criteria structured args', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-bodyfile-precedence.md';
+    const fullBody = '## Problem\n\nDetailed problem with ## sub-headings.\n\n## Proposed Approach\n\nMulti-section body.\n\n## Recommended Model\n\n**Opus**\n\n## Acceptance Criteria\n\n- [ ] Done';
+    writeFileSync(tmpPath, fullBody);
+
+    mockGithubApi.mockResolvedValueOnce({ number: 210, html_url: 'https://github.com/test/issues/210', title: 'Test' });
+    mockGithubApi.mockResolvedValueOnce({}); // label create
+    mockGithubApi.mockResolvedValueOnce({}); // label apply
+
+    const result = await commands.create(['Test precedence'], {
+      'body-file': tmpPath,
+      model: 'sonnet',
+      criteria: 'a|b',
+    });
+    expect(result.exitCode).toBe(0);
+
+    // The body-file content should be used as-is, NOT replaced by buildIssueBody template
+    const apiCall = mockGithubApi.mock.calls[0];
+    const sentBody = (apiCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('Detailed problem with ## sub-headings');
+    expect(sentBody).toContain('## Proposed Approach');
+    expect(sentBody).toContain('Multi-section body');
+    // Should NOT contain the buildIssueBody template text
+    expect(sentBody).not.toContain('well-scoped for this model');
+
+    unlinkSync(tmpPath);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// update-body --body-file support
+// ---------------------------------------------------------------------------
+
+describe('issues update-body — --body-file', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('--body-file sets raw body without merge', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-update-body-file.md';
+    const fullBody = '## Problem\n\nRich content here.\n\n## Custom Section\n\nWith custom headings.\n\n## Acceptance Criteria\n\n- [ ] Done';
+    writeFileSync(tmpPath, fullBody);
+
+    // Mock: first call fetches existing issue, second call patches it
+    mockGithubApi.mockResolvedValueOnce({
+      number: 300,
+      html_url: 'https://github.com/test/issues/300',
+      title: 'Test',
+      body: '## Problem\n\nOld content.\n\n## Recommended Model\n\n**Haiku**',
+      labels: [{ name: 'model:haiku' }],
+    });
+    mockGithubApi.mockResolvedValueOnce({}); // PATCH
+
+    const result = await commands['update-body'](['300'], { 'body-file': tmpPath });
+    expect(result.exitCode).toBe(0);
+
+    // The body should be the raw file content, not merged
+    const patchCall = mockGithubApi.mock.calls[1];
+    const sentBody = (patchCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toBe(fullBody);
+    // Should NOT contain old content that would remain from a merge
+    expect(sentBody).not.toContain('Old content');
+
+    unlinkSync(tmpPath);
+  });
 });
