@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@lib/utils";
 import { useCitationQuotes } from "./CitationQuotesContext";
 import { CheckCircle2, AlertTriangle, XCircle, HelpCircle } from "lucide-react";
 
@@ -54,37 +55,37 @@ export function ReferenceCitationDetails({ url }: { url: string }) {
   const Icon = verdictInfo?.icon;
 
   return (
-    <div className="mt-1.5 pt-1.5 border-t border-border/20">
+    <div className="mt-2 pt-2 border-t border-border">
       {/* Verdict badge */}
       {verdictInfo && Icon && (
-        <span className={`inline-flex items-center gap-1 text-[11px] ${verdictInfo.color} mb-1`}>
+        <span className={cn("inline-flex items-center gap-1 text-xs mb-1", verdictInfo.color)}>
           <Icon className="w-3 h-3" />
           {verdictInfo.label}
           {best.accuracyScore != null && (
-            <span className="text-muted-foreground ml-1">
+            <span className="text-muted-foreground ml-0.5">
               ({Math.round(best.accuracyScore * 100)}%)
             </span>
           )}
         </span>
       )}
 
-      {/* Source quote */}
+      {/* Source quote — clamped to 2 lines to avoid dominating the section */}
       {best.sourceQuote && best.sourceQuote.length > 30 && (
-        <blockquote className="text-[11px] text-muted-foreground/70 border-l-2 border-border/40 pl-2 my-1 italic leading-snug line-clamp-3">
+        <blockquote className="text-xs text-muted-foreground border-l-2 border-border pl-2 my-1.5 italic leading-relaxed line-clamp-2">
           &ldquo;{best.sourceQuote}&rdquo;
         </blockquote>
       )}
 
-      {/* Accuracy issues */}
+      {/* Accuracy issues — truncated, subtle styling */}
       {best.accuracyIssues && (
-        <p className="text-[11px] text-amber-600/80 m-0 leading-snug">
+        <p className="text-xs text-muted-foreground m-0 mt-1 leading-relaxed line-clamp-3">
           {best.accuracyIssues}
         </p>
       )}
 
       {/* How many claims cite this source */}
       {matching.length > 1 && (
-        <span className="text-[10px] text-muted-foreground/50 mt-1 block">
+        <span className="text-xs text-muted-foreground opacity-60 mt-1.5 block">
           {matching.length} claims cite this source
         </span>
       )}

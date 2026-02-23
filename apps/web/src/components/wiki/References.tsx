@@ -9,6 +9,7 @@ import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
 import { ReferenceCitationDetails } from "./ReferenceCitationDetails";
+import { ReferenceCitationDot } from "./ReferenceCitationDot";
 import { cn } from "@lib/utils";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -80,19 +81,23 @@ function formatAuthors(authors: string[]): string {
   return `${authors[0]} et al.`;
 }
 
+function getDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
 function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
   const { resource, index, credibility, publicationName, peerReviewed } = entry;
   const year = resource.published_date?.slice(0, 4);
   const authorStr = resource.authors ? formatAuthors(resource.authors) : null;
-  const typeLabel = TYPE_LABELS[resource.type]; // undefined for "web" and other unlisted types
+  const typeLabel = TYPE_LABELS[resource.type];
+  const domain = resource.url ? getDomain(resource.url) : null;
 
-  // Metadata fragments: type · author · year · publication
+  // Metadata fragments: author · year · publication · type
   const metaParts: React.ReactNode[] = [];
-  if (typeLabel) {
-    metaParts.push(
-      <span key="type" className="text-muted-foreground/50">{typeLabel}</span>
-    );
-  }
   if (authorStr) {
     metaParts.push(<span key="author">{authorStr}</span>);
   }
@@ -107,65 +112,70 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
       </span>
     );
   }
+  if (typeLabel) {
+    metaParts.push(<span key="type">{typeLabel}</span>);
+  }
+  if (!publicationName && domain) {
+    metaParts.push(
+      <span key="domain" className="text-muted-foreground">{domain}</span>
+    );
+  }
 
   const metaLine = metaParts.length > 0 ? (
     <span className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground mt-0.5">
       {metaParts.map((part, i) => (
         <React.Fragment key={i}>
-          {i > 0 && <span className="text-muted-foreground/30">{"\u00b7"}</span>}
+          {i > 0 && <span className="opacity-30">{"\u00b7"}</span>}
           {part}
         </React.Fragment>
       ))}
     </span>
   ) : null;
 
-  const titleLink = (
-    <a
-      href={resource.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-sm font-medium text-accent-foreground no-underline hover:underline leading-snug"
-    >
-      {resource.title}
-    </a>
-  );
-
-  const numberLink = (
-    <a
-      href={`#cite-${index}`}
-      className="shrink-0 text-[11px] font-mono text-muted-foreground/50 no-underline hover:text-foreground mt-px w-4 text-right"
-      title={`Jump back to citation [${index}] in text`}
-    >
-      {index}
-    </a>
-  );
-
   return (
     <li
       id={`ref-${index}`}
-      className="py-1.5 border-b border-border/30 last:border-b-0"
+      className="py-1.5 border-b border-border last:border-b-0"
     >
       <details className="ref-details group">
-        <summary className="ref-summary cursor-pointer">
-          <div className="flex items-start gap-1">
-            {numberLink}
+        <summary className="ref-summary cursor-pointer select-none">
+          <div className="flex items-start gap-2">
+            <span className="flex items-center gap-1 shrink-0 mt-[3px]">
+              {resource.url && <ReferenceCitationDot url={resource.url} />}
+              <a
+                href={`#cite-${index}`}
+                className="text-xs font-mono text-muted-foreground no-underline hover:text-foreground tabular-nums"
+                title={`Jump back to citation [${index}] in text`}
+              >
+                {index}
+              </a>
+            </span>
             <div className="flex-1 min-w-0">
-              {titleLink}
+              <span className="inline">
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-accent-foreground no-underline hover:underline leading-snug"
+                >
+                  {resource.title}
+                </a>
+                <span className="ref-chevron inline-block ml-1 text-muted-foreground text-xs transition-transform duration-150 align-middle opacity-40 group-hover:opacity-70">
+                  {"\u25b8"}
+                </span>
+              </span>
               {metaLine}
             </div>
-            <span className="ref-chevron shrink-0 text-muted-foreground/60 text-base mt-px transition-transform duration-150">
-              {"\u25b8"}
-            </span>
           </div>
         </summary>
 
-        <div className="pl-5 mt-1 pb-0.5">
+        <div className="ml-7 mt-2 mb-1 border-l-2 border-border pl-3">
           {resource.summary && (
-            <p className="text-xs text-muted-foreground/70 leading-snug m-0">
+            <p className="text-xs text-muted-foreground leading-relaxed m-0">
               {resource.summary}
             </p>
           )}
-          <div className="flex items-center gap-1.5 mt-1.5 empty:hidden">
+          <div className="flex flex-wrap items-center gap-1.5 mt-2 empty:hidden">
             {credibility != null && (
               <CredibilityBadge level={credibility} size="sm" />
             )}
@@ -202,10 +212,10 @@ function CitationHealthFooter({ pageId }: { pageId: string }) {
   else if (accurate > 0) dotColor = "bg-blue-500";
 
   return (
-    <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3 pt-2 m-0">
+    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-4 pt-3 border-t border-border">
       <span className={cn("inline-block w-1.5 h-1.5 rounded-full", dotColor)} />
       Citation verification: {parts.join(", ")} of {total} total
-    </p>
+    </div>
   );
 }
 
@@ -237,18 +247,18 @@ export function References({
       aria-label={title}
     >
       <h2
-        className="text-base font-semibold mb-3 mt-0 pb-0 border-b-0"
+        className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3 mt-0 pb-0 border-b-0"
         id="references"
       >
         {title}
       </h2>
 
       {refs.length > 0 && (
-        <ul style={{ listStyleType: "none" }} className="pl-0 m-0">
+        <ol className="list-none pl-0 m-0">
           {refs.map((r) => (
             <ReferenceEntry key={r.resource.id} entry={r} />
           ))}
-        </ul>
+        </ol>
       )}
 
       {missing.length > 0 && (
