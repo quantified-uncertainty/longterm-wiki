@@ -38,6 +38,7 @@ import { tool as createVisual } from './create-visual.ts';
 import { tool as checkCrossReferences } from './check-cross-references.ts';
 import { tool as suggestCrossLinks } from './suggest-cross-links.ts';
 import { tool as adversarialReview } from './adversarial-review.ts';
+import { tool as addReferences } from './add-references.ts';
 
 // ── Tool registry ─────────────────────────────────────────────────────────
 
@@ -51,6 +52,7 @@ const ALL_TOOLS: ToolRegistration[] = [
   auditCitations,
   addEntityLinks,
   addFactRefs,
+  addReferences,
   validateContent,
   queryWikiContext,
   readRelatedPage,

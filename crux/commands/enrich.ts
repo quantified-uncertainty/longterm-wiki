@@ -29,6 +29,12 @@ const SCRIPTS = {
     passthrough: ['apply', 'all', 'limit', 'json', 'ci'],
     positional: true,
   },
+  'references': {
+    script: 'enrich/enrich-references.ts',
+    description: 'Add/update <References> bibliography block',
+    passthrough: ['apply', 'all', 'limit', 'json', 'ci'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'entity-links');
@@ -56,7 +62,7 @@ Options (fact-refs):
   --limit=N         Limit pages when using --all
   --json            JSON output (one object per page)
 
-Both tools are idempotent — running twice on the same page produces no extra changes.
+All tools are idempotent — running twice on the same page produces no extra changes.
 
 Examples:
   crux enrich entity-links openai                 Preview EntityLinks for openai.mdx
@@ -67,5 +73,9 @@ Examples:
   crux enrich fact-refs anthropic                 Preview <F> tags for anthropic.mdx
   crux enrich fact-refs anthropic --apply         Insert <F> tags into anthropic.mdx
   crux enrich fact-refs --all --limit=10 --apply  Apply <F> tags across 10 pages
+
+  crux enrich references openai                   Preview References block for openai.mdx
+  crux enrich references openai --apply           Write References block to openai.mdx
+  crux enrich references --all --apply            Apply References across wiki
 `;
 }

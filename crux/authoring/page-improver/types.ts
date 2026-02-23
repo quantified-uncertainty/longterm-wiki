@@ -153,6 +153,7 @@ export type { AuditResult };
 export interface EnrichResult {
   entityLinks: { insertedCount: number };
   factRefs: { insertedCount: number };
+  references?: { action: string; refCount: number };
 }
 
 export interface PipelineResults {
