@@ -4,6 +4,7 @@ import {
   getResourceCredibility,
   getResourcePublication,
   getPageCitationHealth,
+  getResourcesForPage,
 } from "@data";
 import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
@@ -229,14 +230,21 @@ function CitationHealthFooter({ pageId }: { pageId: string }) {
  * have a ▸ chevron that expands to show details.
  */
 export function References({
-  ids = [],
+  ids,
   pageId,
   title = "References",
   className,
 }: ReferencesProps) {
-  if (ids.length === 0) return null;
+  // Auto-discover resource IDs from build-time data when none explicitly provided
+  const resolvedIds = ids && ids.length > 0
+    ? ids
+    : pageId
+      ? getResourcesForPage(pageId)
+      : [];
 
-  const { refs, missing } = resolveRefs(ids);
+  if (resolvedIds.length === 0) return null;
+
+  const { refs, missing } = resolveRefs(resolvedIds);
 
   return (
     <section

@@ -1486,6 +1486,81 @@ async function main() {
     }
   }
 
+  // =========================================================================
+  // PAGE RESOURCES — compute page → resourceId mappings at build time.
+  // Uses 3 sources: inline <R id="...">, cited_by reverse index, URL matching.
+  // Must run BEFORE rawContent is deleted (needs page body for URL extraction).
+  // =========================================================================
+  {
+    console.log('  Computing pageResources...');
+    // Build cited_by reverse index: pageSlug → Set<resourceId>
+    const citedByIndex = new Map();
+    for (const r of resources) {
+      if (!r.cited_by || !Array.isArray(r.cited_by)) continue;
+      for (const pageId of r.cited_by) {
+        if (!citedByIndex.has(pageId)) citedByIndex.set(pageId, new Set());
+        citedByIndex.get(pageId).add(r.id);
+      }
+    }
+    // Build URL → resource ID map
+    const urlToId = new Map();
+    for (const [url, resource] of urlToResource.entries()) {
+      urlToId.set(url, resource.id);
+    }
+    const validIds = new Set(resources.map(r => r.id));
+    const pageResources = {};
+    let pagesWithRefs = 0;
+    let totalRefs = 0;
+
+    for (const page of pages) {
+      if (!page.rawContent) continue;
+      const mergedIds = [];
+      const seen = new Set();
+
+      // Source 1: Inline <R id="..."> citations
+      const inlineRe = /<R\s+[^>]*id="([a-f0-9]+)"[^>]*>/g;
+      let m;
+      while ((m = inlineRe.exec(page.rawContent)) !== null) {
+        const id = m[1];
+        if (!seen.has(id) && validIds.has(id)) { seen.add(id); mergedIds.push(id); }
+      }
+
+      // Source 2: cited_by reverse index
+      const citedBy = citedByIndex.get(page.id);
+      if (citedBy) {
+        for (const id of citedBy) {
+          if (!seen.has(id) && validIds.has(id)) { seen.add(id); mergedIds.push(id); }
+        }
+      }
+
+      // Source 3: URL matching from footnotes and markdown links
+      const footnoteRe = /^\[\^\d+\]:\s*(.*)/gm;
+      while ((m = footnoteRe.exec(page.rawContent)) !== null) {
+        const urlRe = /https?:\/\/[^\s)>,"']+/g;
+        let urlMatch;
+        while ((urlMatch = urlRe.exec(m[1])) !== null) {
+          const url = urlMatch[0].replace(/[.),:;]+$/, '');
+          const id = urlToId.get(url) ?? urlToId.get(url.replace(/\/$/, '')) ?? urlToId.get(url.replace(/\/$/, '') + '/');
+          if (id && !seen.has(id) && validIds.has(id)) { seen.add(id); mergedIds.push(id); }
+        }
+      }
+      const linkRe = /(?<!!)\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+      while ((m = linkRe.exec(page.rawContent)) !== null) {
+        const url = m[2];
+        const id = urlToId.get(url) ?? urlToId.get(url.replace(/\/$/, '')) ?? urlToId.get(url.replace(/\/$/, '') + '/');
+        if (id && !seen.has(id) && validIds.has(id)) { seen.add(id); mergedIds.push(id); }
+      }
+
+      if (mergedIds.length > 0) {
+        pageResources[page.id] = mergedIds;
+        pagesWithRefs++;
+        totalRefs += mergedIds.length;
+      }
+    }
+    database.pageResources = pageResources;
+    console.log(`  pageResources: ${totalRefs} resource refs across ${pagesWithRefs} pages`);
+  }
+
   // Compute redundancy scores (needs rawContent)
   console.log('  Computing redundancy scores...');
   const { pageRedundancy, pairs: redundancyPairs } = computeRedundancy(pages);

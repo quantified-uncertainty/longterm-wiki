@@ -10,7 +10,6 @@
 
 import { enrichEntityLinks } from '../../../enrich/enrich-entity-links.ts';
 import { enrichFactRefs } from '../../../enrich/enrich-fact-refs.ts';
-import { enrichReferences } from '../../../enrich/enrich-references.ts';
 import type { PageData, EnrichResult, PipelineOptions } from '../types.ts';
 import { ROOT, log, writeTemp } from '../utils.ts';
 
@@ -24,8 +23,6 @@ export async function enrichPhase(
   let enrichedContent = content;
   let entityLinkCount = 0;
   let factRefCount = 0;
-  let referencesAction: string = 'none';
-  let referencesCount = 0;
 
   // Step 1: Entity-link enrichment
   try {
@@ -59,35 +56,19 @@ export async function enrichPhase(
     log('enrich', `  ⚠ Fact-ref enrichment failed: ${msg} — continuing with current content`);
   }
 
-  // Step 3: References block enrichment
-  try {
-    log('enrich', 'Running References enrichment...');
-    const refsResult = enrichReferences(enrichedContent, { pageId: page.id, root: ROOT });
-    enrichedContent = refsResult.content;
-    referencesAction = refsResult.action;
-    referencesCount = refsResult.refCount;
-    if (refsResult.action === 'added') {
-      log('enrich', `  Added References block (${refsResult.refCount} refs)`);
-    } else if (refsResult.action === 'updated') {
-      log('enrich', `  Updated References block (${refsResult.refCount} refs)`);
-    } else {
-      log('enrich', `  References: ${refsResult.action}`);
-    }
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    log('enrich', `  ⚠ References enrichment failed: ${msg} — continuing with current content`);
-  }
+  // Note: References block enrichment (Step 3) was removed — References are now
+  // auto-generated at build time via pageResources in build-data.mjs and rendered
+  // automatically by the wiki page component.
 
   writeTemp(page.id, 'enriched.mdx', enrichedContent);
 
   const result: EnrichResult = {
     entityLinks: { insertedCount: entityLinkCount },
     factRefs: { insertedCount: factRefCount },
-    references: { action: referencesAction, refCount: referencesCount },
   };
   writeTemp(page.id, 'enrich-result.json', result);
 
-  const totalAdded = entityLinkCount + factRefCount + (referencesAction === 'added' || referencesAction === 'updated' ? 1 : 0);
+  const totalAdded = entityLinkCount + factRefCount;
   log('enrich', `Complete (${totalAdded} total enrichments added)`);
 
   return { content: enrichedContent, result };

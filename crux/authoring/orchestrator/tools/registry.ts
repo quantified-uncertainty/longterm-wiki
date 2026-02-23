@@ -38,11 +38,12 @@ import { tool as createVisual } from './create-visual.ts';
 import { tool as checkCrossReferences } from './check-cross-references.ts';
 import { tool as suggestCrossLinks } from './suggest-cross-links.ts';
 import { tool as adversarialReview } from './adversarial-review.ts';
-import { tool as addReferences } from './add-references.ts';
 
 // ── Tool registry ─────────────────────────────────────────────────────────
 
 /** All registered tools. Order doesn't matter — filtering uses the name. */
+// Note: add_references was removed — References are now auto-generated at build
+// time via pageResources in build-data.mjs.
 const ALL_TOOLS: ToolRegistration[] = [
   readPage,
   getPageMetrics,
@@ -52,7 +53,6 @@ const ALL_TOOLS: ToolRegistration[] = [
   auditCitations,
   addEntityLinks,
   addFactRefs,
-  addReferences,
   validateContent,
   queryWikiContext,
   readRelatedPage,
