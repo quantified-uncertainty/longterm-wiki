@@ -66,8 +66,19 @@ export function ResourceLink({
         <a
           id={`cite-${n}`}
           href={`#ref-${n}`}
-          className="text-[10px] text-muted-foreground no-underline hover:text-accent-foreground align-super ml-px"
-          title={`Reference [${n}]`}
+          className={cn(
+            "text-[10px] no-underline align-super ml-px font-medium",
+            credibility != null && credibility >= 4
+              ? "text-emerald-600 hover:text-emerald-800"
+              : credibility != null && credibility >= 3
+                ? "text-blue-500 hover:text-blue-700"
+                : credibility != null && credibility >= 2
+                  ? "text-amber-600 hover:text-amber-800"
+                  : credibility != null && credibility >= 1
+                    ? "text-red-500 hover:text-red-700"
+                    : "text-muted-foreground hover:text-accent-foreground"
+          )}
+          title={`Reference [${n}]${credibility != null ? ` — credibility: ${credibility}/5` : ""}`}
         >
           [{n}]
         </a>
@@ -118,7 +129,7 @@ export function ResourceLink({
         <span className="flex gap-2 mt-2 pointer-events-auto">
           <a
             href={resource.url}
-            className="flex-1 px-2.5 py-1.5 text-xs font-medium text-center no-underline rounded transition-colors bg-accent-foreground text-background hover:bg-accent-foreground/90"
+            className="flex-1 px-2.5 py-1.5 text-xs font-medium text-center no-underline rounded transition-colors bg-muted text-foreground hover:bg-muted/80 border border-border"
             target="_blank"
             rel="noopener noreferrer"
           >

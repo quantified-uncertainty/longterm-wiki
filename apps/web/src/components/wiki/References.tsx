@@ -1,11 +1,26 @@
 import React from "react";
 import {
   getResourceById,
+  getResourceCredibility,
   getResourcePublication,
   getPageCitationHealth,
 } from "@data";
 import type { Resource } from "@data";
+import { CredibilityBadge } from "./CredibilityBadge";
+import { ResourceTags } from "./ResourceTags";
 import { cn } from "@lib/utils";
+
+const TYPE_LABELS: Record<string, string> = {
+  paper: "Paper",
+  book: "Book",
+  blog: "Blog post",
+  report: "Report",
+  talk: "Talk",
+  podcast: "Podcast",
+  government: "Government",
+  reference: "Reference",
+  web: "Web",
+};
 
 interface ReferencesProps {
   /** Explicit list of resource IDs to display */
@@ -14,8 +29,6 @@ interface ReferencesProps {
   pageId?: string;
   /** Title for the section (default: "References") */
   title?: string;
-  /** Show summaries (default: false — keeps bibliography compact) */
-  showSummaries?: boolean;
   /** Additional class name */
   className?: string;
 }
@@ -23,6 +36,7 @@ interface ReferencesProps {
 interface ResolvedRef {
   index: number;
   resource: Resource;
+  credibility: number | undefined;
   publicationName: string | undefined;
   peerReviewed: boolean;
 }
@@ -49,6 +63,7 @@ function resolveRefs(ids: string[]): {
     refs.push({
       index: refs.length + 1,
       resource,
+      credibility: getResourceCredibility(resource),
       publicationName: publication?.name,
       peerReviewed: publication?.peer_reviewed ?? false,
     });
@@ -61,58 +76,87 @@ function formatAuthors(authors: string[]): string {
   if (authors.length === 0) return "";
   if (authors.length === 1) return authors[0];
   if (authors.length === 2) return `${authors[0]} & ${authors[1]}`;
+  if (authors.length <= 4) return authors.slice(0, -1).join(", ") + " & " + authors[authors.length - 1];
   return `${authors[0]} et al.`;
 }
 
-function ReferenceEntry({
-  entry,
-  showSummaries,
-}: {
-  entry: ResolvedRef;
-  showSummaries: boolean;
-}) {
-  const { resource, index, publicationName, peerReviewed } = entry;
+function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
+  const { resource, index, credibility, publicationName, peerReviewed } = entry;
   const year = resource.published_date?.slice(0, 4);
   const authorStr = resource.authors ? formatAuthors(resource.authors) : null;
+  const typeLabel = TYPE_LABELS[resource.type] || resource.type;
 
   return (
     <li
       id={`ref-${index}`}
-      className="my-1.5 leading-relaxed text-sm text-muted-foreground"
+      className="py-2.5 border-b border-border/30 last:border-b-0"
     >
-      <a
-        href={`#cite-${index}`}
-        className="text-xs font-mono text-muted-foreground no-underline hover:text-foreground mr-1.5"
-        title="Jump to citation in text"
-      >
-        {index}.
-      </a>
-      {authorStr && (
-        <span>{authorStr}</span>
-      )}
-      {year && (
-        <span>{authorStr ? " " : ""}({year}){authorStr || publicationName ? ". " : " "}</span>
-      )}
-      {!year && authorStr && ". "}
-      <a
-        href={resource.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-accent-foreground no-underline hover:underline"
-      >
-        {resource.title}
-      </a>
-      {publicationName && (
-        <span className="italic">
-          . {publicationName}
-          {peerReviewed && " (peer-reviewed)"}
-        </span>
-      )}
-      {showSummaries && resource.summary && (
-        <span className="block text-xs text-muted-foreground/70 mt-0.5 leading-snug ml-5">
-          {resource.summary}
-        </span>
-      )}
+      <div className="flex items-start gap-2">
+        <a
+          href={`#cite-${index}`}
+          className="shrink-0 text-xs font-mono text-muted-foreground/60 no-underline hover:text-foreground mt-0.5 w-5 text-right"
+          title="Jump to citation in text"
+        >
+          {index}
+        </a>
+
+        <div className="flex-1 min-w-0">
+          {/* Title line */}
+          <a
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-accent-foreground no-underline hover:underline leading-snug"
+          >
+            {resource.title}
+          </a>
+
+          {/* Metadata line: type, authors, year, publication */}
+          <div className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground mt-0.5">
+            <span className="text-muted-foreground/50">{typeLabel}</span>
+            {authorStr && (
+              <>
+                <span className="text-muted-foreground/30">·</span>
+                <span>{authorStr}</span>
+              </>
+            )}
+            {year && (
+              <>
+                <span className="text-muted-foreground/30">·</span>
+                <span>{year}</span>
+              </>
+            )}
+            {publicationName && (
+              <>
+                <span className="text-muted-foreground/30">·</span>
+                <span className="italic">
+                  {publicationName}
+                  {peerReviewed && " (peer-reviewed)"}
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Summary */}
+          {resource.summary && (
+            <p className="text-xs text-muted-foreground/70 mt-1 leading-snug m-0">
+              {resource.summary}
+            </p>
+          )}
+
+          {/* Badges: credibility + tags */}
+          {(credibility != null || (resource.tags && resource.tags.length > 0)) && (
+            <div className="flex items-center gap-1.5 mt-1.5">
+              {credibility != null && (
+                <CredibilityBadge level={credibility} size="sm" />
+              )}
+              {resource.tags && resource.tags.length > 0 && (
+                <ResourceTags tags={resource.tags} limit={3} size="sm" />
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </li>
   );
 }
@@ -137,7 +181,7 @@ function CitationHealthFooter({ pageId }: { pageId: string }) {
   else if (accurate > 0) dotColor = "bg-blue-500";
 
   return (
-    <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3 pt-2">
+    <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3 pt-2 m-0">
       <span className={cn("inline-block w-1.5 h-1.5 rounded-full", dotColor)} />
       Citation verification: {parts.join(", ")} of {total} total
     </p>
@@ -147,22 +191,13 @@ function CitationHealthFooter({ pageId }: { pageId: string }) {
 /**
  * <References> — Numbered bibliography section for wiki pages.
  *
- * Usage in MDX:
- *   <References ids={["abc123", "def456"]} />
- *   <References ids={["abc123", "def456"]} pageId="lock-in" />
- *
  * Each entry becomes an anchor target (#ref-1, #ref-2, etc.)
  * so that <R n={1}> can link to the reference list.
- *
- * Citation health stats (verified/flagged/unchecked) come from build-time
- * data in database.json. Per-citation verification is handled separately
- * by the CitationOverlay client component on footnote references.
  */
 export function References({
   ids = [],
   pageId,
   title = "References",
-  showSummaries = false,
   className,
 }: ReferencesProps) {
   if (ids.length === 0) return null;
@@ -172,7 +207,7 @@ export function References({
   return (
     <section
       className={cn(
-        "mt-10 pt-6 border-t border-border text-sm text-muted-foreground",
+        "mt-10 pt-6 border-t border-border",
         className
       )}
       aria-label={title}
@@ -185,15 +220,11 @@ export function References({
       </h2>
 
       {refs.length > 0 && (
-        <ol className="list-none pl-7 m-0">
+        <ul style={{ listStyleType: "none" }} className="pl-0 m-0">
           {refs.map((r) => (
-            <ReferenceEntry
-              key={r.resource.id}
-              entry={r}
-              showSummaries={showSummaries}
-            />
+            <ReferenceEntry key={r.resource.id} entry={r} />
           ))}
-        </ol>
+        </ul>
       )}
 
       {missing.length > 0 && (
