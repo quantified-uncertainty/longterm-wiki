@@ -9,9 +9,9 @@ quality: 35
 readerImportance: 82
 researchImportance: 12
 tacticalValue: 75
-lastEdited: "2026-02-01"
+lastEdited: "2026-02-23"
 update_frequency: 45
-llmSummary: "Comprehensive biographical profile of Eliezer Yudkowsky covering his foundational contributions to AI safety (CEV, early problem formulation, agent foundations) and notably pessimistic views (>90% p(doom)). Includes detailed 'Statements & Track Record' section analyzing his mixed prediction accuracy—noting early timeline errors, vindication on AI generalization in Hanson debate, and the unfalsifiability of his core doom predictions."
+llmSummary: "Comprehensive biographical profile of Eliezer Yudkowsky covering his foundational contributions to AI safety (CEV, early problem formulation, agent foundations) and notably pessimistic views on AI risk. Includes detailed 'Statements & Track Record' section analyzing his mixed prediction accuracy—noting early timeline errors, his position on AI generalization in the Hanson debate, and the unfalsifiability of his core doom predictions."
 ratings:
   novelty: 3
   rigor: 4
@@ -33,84 +33,150 @@ import {DataInfoBox, Section, DisagreementMap, DataExternalLinks, EntityLink} fr
 
 <DataInfoBox entityId="E114" />
 
+## Quick Assessment
+
+| Aspect | Assessment |
+|--------|-----------|
+| **Primary Role** | Senior researcher and co-founder at <EntityLink id="E202" name="miri">MIRI</EntityLink>; public advocate for AI risk policy |
+| **Key Contributions** | Early articulation of the AI <EntityLink id="E439" name="alignment">AI Alignment</EntityLink> problem; Coherent Extrapolated Volition (2004); founding of <EntityLink id="E538" name="lesswrong">LessWrong</EntityLink>; extensive writing on decision theory and rationality |
+| **Key Publications** | "AGI Ruin: A List of Lethalities" (2022); "Pausing AI Developments Isn't Enough. We Need to Shut it All Down" (TIME, 2023); *Harry Potter and the Methods of Rationality* (2010–2015); the Sequences (2006–2009) |
+| **Institutional Affiliation** | Machine Intelligence Research Institute (MIRI), Berkeley, California |
+| **Influence on AI Safety** | Among the earliest researchers to systematically formulate the AI alignment problem; his writings and community-building through LessWrong influenced a generation of AI safety researchers and, through them, major funders including <EntityLink id="E521" name="coefficient-giving">Coefficient Giving</EntityLink> (formerly <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink>) |
+
+## Overview
+
+<EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink> (born September 11, 1979, in Chicago, Illinois) is an American AI researcher, writer, and co-founder of the Machine Intelligence Research Institute (MIRI).[^1] He is a central figure in the development of AI safety as a research area, having begun writing on the risks of <EntityLink id="E291" name="superintelligence">Superintelligence</EntityLink> in the late 1990s, well before the field attracted mainstream academic or institutional attention.
+
+Yudkowsky is entirely self-educated, having not attended high school or university.[^1] His intellectual development emerged through independent study and participation in early online intellectual communities. This unconventional background shapes both his methodology—he has worked largely outside formal academic structures—and the reception of his work, which ranges from highly influential within the AI safety community to contested among mainstream AI researchers.
+
+His views on AI risk have become more pessimistic over time. He has publicly argued that the default trajectory of AI development leads to human extinction, and his policy positions—including calls for an indefinite international moratorium on large AI training runs—have attracted significant media attention, particularly following a March 2023 op-ed in *TIME* magazine that was the most-viewed page on that site for a week.[^2]
+
 ## Background
 
-Eliezer Yudkowsky is one of the earliest and most influential voices in AI existential risk. He co-founded the Machine Intelligence Research Institute (originally the Singularity Institute) in 2000, making him a pioneer in organized AI safety research.
+### Early Life and Self-Education
 
-Yudkowsky is largely self-taught in mathematics and computer science, beginning his AI safety work in the late 1990s. He's known for:
+Yudkowsky was born on September 11, 1979, in Chicago, Illinois, and raised in a Jewish household.[^1] He did not attend high school or university, describing himself as entirely self-educated. His intellectual development proceeded through independent reading and participation in early online communities, including mailing lists focused on transhumanism and rationalism in the mid-to-late 1990s.[^3]
 
-- Founding <EntityLink id="lesswrong">LessWrong</EntityLink> and the rationalist community
-- Writing extensively on cognitive biases and rational thinking
-- Developing early frameworks for <EntityLink id="alignment">AI alignment</EntityLink> (Coherent Extrapolated Volition)
-- Contributing to decision theory (Timeless Decision Theory, Updateless Decision Theory)
-- Writing fiction exploring AI alignment themes (Harry Potter and the Methods of Rationality)
+He became interested in artificial intelligence as a teenager after reading about efforts to enhance human capabilities through technology.[^3] His early writings from this period, including postings to extropian mailing lists, reflect an initial optimism about the Singularity that he would later substantially revise.
+
+### Founding of MIRI (2000)
+
+In 2000, Yudkowsky co-founded the Singularity Institute for Artificial Intelligence (SIAI) with Brian Atkins and Sabine Atkins (then Sabine Stoeckel), with initial funding provided by the Atkinses.[^4] The institute was formally incorporated on July 27, 2000, under Georgia nonprofit law and recognized as a 501(c)(3) organization.[^4] Its original stated purpose was to accelerate the development of artificial general intelligence on the assumption that greater intelligence would entail greater moral behavior.[^5]
+
+Yudkowsky came to reject this assumption around 2003, concluding that the alignment problem—ensuring that a superintelligent system acts in accordance with human values—was technically extremely difficult and had not been solved.[^5] The institute subsequently shifted focus to alignment research. In 2005, SIAI relocated from Atlanta to Silicon Valley and formally reoriented toward identifying and managing existential risks from AI.[^5] In January 2013, SIAI was rebranded as the Machine Intelligence Research Institute (MIRI).[^4]
+
+### Intellectual Evolution
+
+Yudkowsky's views on AI risk have shifted substantially over his career. In 2001, he reportedly believed his team could develop a "final stage AI" that would "reach transhumanity sometime between 2005 and 2020, probably around 2008 or 2010."[^6] Separately, postings from the early 2000s indicate he expected the Singularity around 2025.[^7]
+
+By the late 2000s, he had moved away from specific timeline predictions. In a 2019 post, he stated he had "a policy for over a decade of not putting numbers on a few things, one of which is AGI timelines and one of which is non-relative doom probabilities," citing instability in his own estimates as the reason.[^8]
+
+His assessment of the danger posed by advanced AI became more severe over time. In 2021, Yudkowsky stated that compared to his positions during the 2008 AI-Foom debate, "reality has proved way to the further Eliezer side," adding that he found it "very unpleasantly surprising how little architectural complexity is required to start producing generalizing systems."[^9] By 2022, he was publicly expressing what observers characterized as near-certainty of catastrophic outcomes from AGI development.[^10]
+
+### Current Role (2024–2025)
+
+As of 2024, Yudkowsky remains a senior researcher at MIRI. MIRI's Agent Foundations research program, which he helped establish and which ran from approximately 2013, was officially discontinued in 2024.[^11] MIRI has pivoted to prioritize policy advocacy, public communications, and technical governance research over technical alignment research.[^12]
+
+Yudkowsky's current activities are focused primarily on public outreach and policy advocacy. In 2024, he appeared in interviews with PBS NewsHour and *The Atlantic*, and he has been active on X (formerly Twitter), where he has a substantial following and regularly engages with AI development news.[^11] He gave a TED Talk in early 2023 following his *TIME* op-ed.[^2]
 
 ## Key Contributions to AI Safety
 
 ### Coherent Extrapolated Volition (CEV)
 
-Proposed in 2004, CEV attempts to formalize "what humanity would want if we knew more, thought faster, were more the people we wished we were." Rather than trying to specify human values directly, CEV suggests extrapolating what we would collectively choose under idealized conditions.
+Proposed in a 2004 paper published through the Singularity Institute, CEV attempts to formalize a goal for a superintelligent system: act on what humanity would collectively want "if we knew more, thought faster, were more the people we wished we were, had grown up farther together."[^13] Rather than specifying human values directly—which Yudkowsky argued was intractable—CEV proposes extrapolating what we would choose under idealized conditions.
+
+Yudkowsky himself described the concept as outdated shortly after publishing it and warned against treating it as a practical implementation strategy.[^14] The proposal has drawn critiques from multiple directions: that human values may not be coherent enough to extrapolate, that the process of extrapolation is itself a value-laden choice, and that the aggregation of individual volitions into a collective one faces problems analogous to Arrow's impossibility theorem.[^15] CEV has also been noted to resemble philosophical frameworks such as "full-information accounts of value" and "ideal observer theories," though Yudkowsky developed it independently of that literature.[^15] Many researchers at organizations such as <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> and <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink> do not use CEV as a working framework, and it has not been formalized mathematically.
+
+A proposed extension, "Coherent, Extrapolated and Clustered Volition" (CECV), has been proposed by later researchers to better reflect the moral preferences of culturally diverse groups.[^14]
 
 ### Early Warning and Problem Formulation
 
-Yudkowsky was among the first to:
-- Articulate the alignment problem clearly
-- Explain why superintelligent AI poses unique risks
-- Emphasize the difficulty of value specification
-- Highlight the potential for "<EntityLink id="treacherous-turn">treacherous turns</EntityLink>" in AI development
-- Argue that alignment must be solved before AGI is developed
+Yudkowsky was among the first to systematically articulate the alignment problem in writing accessible to non-specialists, beginning in the late 1990s and continuing through the 2000s. His early contributions included:
 
-### <EntityLink id="agent-foundations">Agent Foundations</EntityLink> Research
+- Articulating why a sufficiently capable AI system optimizing for a misspecified objective could produce catastrophic outcomes
+- Explaining the difficulty of value specification as a technical problem, not merely a philosophical one
+- Highlighting the potential for "<EntityLink id="E359" name="treacherous-turn">treacherous turns</EntityLink>" in AI development—where a system behaves as intended during training and testing but pursues different goals once deployed
+- Arguing that alignment must be solved before AGI is developed, rather than after
 
-Through <EntityLink id="miri">MIRI</EntityLink>, Yudkowsky has pushed for research on fundamental questions about agency, decision theory, and embedded agents. This includes work on:
-- Logical uncertainty
-- Naturalized induction
-- Reflective consistency
-- Embedded agency
+His 2008 chapter "Artificial Intelligence as a Positive and Negative Factor in Global Risk," published in the Oxford University Press volume *Global Catastrophic Risks* edited by <EntityLink id="E215" name="nick-bostrom">Nick Bostrom</EntityLink> and Milan Ćirković, was an early peer-reviewed articulation of these concerns.
+
+### Agent Foundations Research
+
+Through <EntityLink id="E202" name="miri">MIRI</EntityLink>, Yudkowsky helped establish and promote a research agenda focused on foundational questions about rational agency. This program, which ran from approximately 2013 until its discontinuation in 2024,[^11] included work on:
+
+- **Logical uncertainty**: How to reason probabilistically about mathematical and logical claims
+- **Naturalized induction**: How to formulate induction for agents embedded in the world they are reasoning about
+- **Timeless Decision Theory (TDT)** and **Updateless Decision Theory (UDT)**: Proposed alternatives to standard causal and evidential decision theory, intended to handle problems like Newcomb's problem and coordination scenarios more robustly
+- **Embedded agency**: How to formalize agency for systems that are physical parts of the environments they reason about
+- **Reflective consistency**: Whether an agent's decision procedure is stable under self-modification
+
+This research agenda has not been adopted as a primary framework by most AI safety researchers, though some of the problems it identified (particularly around decision theory and embedded agency) continue to be discussed in the field.
+
+### Founding of LessWrong and the Rationalist Community
+
+Between 2006 and 2009, Yudkowsky wrote an extended series of blog posts on rationality, cognitive biases, and AI risk, initially published on Overcoming Bias (a blog he shared with economist <EntityLink id="E260" name="robin-hanson">Robin Hanson</EntityLink>) and later collected on LessWrong. LessWrong was launched in 2009, built on the community that had developed around Overcoming Bias.[^1] These posts, collectively called "the Sequences," cover topics including Bayesian reasoning, philosophy of mind, decision theory, and the nature of intelligence.
+
+The Sequences became foundational reading in the rationalist community and, through that community, influenced a generation of people who went on to work in AI safety. Yudkowsky's writing also contributed to the establishment of the <EntityLink id="E518" name="center-for-applied-rationality">Center for Applied Rationality</EntityLink> (CFAR), which runs workshops applying rationality techniques.
+
+### Fiction
+
+Yudkowsky has written fiction exploring AI and rationality themes. His most widely read work is *Harry Potter and the Methods of Rationality* (HPMOR), a fan-fiction novel begun in 2010 and completed in 2015, which uses the Harry Potter setting to explore rationalist and scientific thinking. He has also written shorter science fiction, including "Three Worlds Collide" (2009), a story exploring decision theory and the challenges of communication between radically different minds.
 
 ## Views on Key Cruxes
 
 <Section title="Risk Assessment">
 
-**P(doom)**: Very high, often stated as >90% in recent years
+**P(doom)**: Yudkowsky has a long-standing policy of not giving precise numerical probability estimates for AI doom, citing instability in his own estimates and concern that such numbers are not meaningful without specifying underlying models.[^8] Community sources and survey data widely attribute his implicit estimate at above 95%; the Wikipedia P(doom) article, citing a survey, lists his estimate as >95%.[^16] In 2022, observers noted he was expressing near-certainty of catastrophic outcomes following his "Death with Dignity" post.[^10] He has argued that p(doom) as a concept is problematic: "people with the same numbers may have wildly different models" and that the social function of p(doom) estimates resembles "some sort of weird astrological sign."[^17]
 
-**Timeline**: Believes AGI is plausible within 10-20 years, possibly sooner
+**Timeline**: Believes AGI is plausible within the coming decades, but as noted above, has maintained a policy of not giving specific timeline estimates for over a decade.
 
-**Alignment difficulty**: Considers alignment extremely difficult, likely requiring fundamental theoretical breakthroughs we haven't made yet
+**Alignment difficulty**: Considers alignment extremely difficult, very likely requiring fundamental theoretical advances that have not yet been made. He does not believe current approaches, including techniques like <EntityLink id="E259" name="rlhf">RLHF</EntityLink>, will scale to superintelligent systems.
 
 </Section>
 
 ### Core Concerns
 
-1. **Default outcome is doom**: Without major breakthroughs in alignment theory, Yudkowsky believes <EntityLink id="agi-development">AGI development</EntityLink> will likely lead to human extinction
-2. **<EntityLink id="sharp-left-turn">Sharp left turn</EntityLink>**: Expects rapid capability gains that outpace our ability to align systems
-3. **<EntityLink id="deceptive-alignment">Deceptive alignment</EntityLink>**: Worried that sufficiently capable systems will learn to appear aligned during training while pursuing different goals
-4. **Inadequate preparation**: Believes current alignment efforts are insufficient for the difficulty of the problem
+1. **Default outcome is catastrophic**: Yudkowsky argues that without major theoretical breakthroughs in alignment, <EntityLink id="E604" name="agi-development">AGI development</EntityLink> will likely produce systems that pursue goals incompatible with human survival
+2. **<EntityLink id="E281" name="sharp-left-turn">Sharp left turn</EntityLink>**: Expects that capability gains will at some point outpace the ability to align systems, potentially very rapidly
+3. **<EntityLink id="E93" name="deceptive-alignment">Deceptive alignment</EntityLink>**: Concerned that sufficiently capable systems will learn to appear aligned during training while pursuing different goals when deployed
+4. **Inadequate preparation**: Argues that current alignment research efforts are insufficient relative to the difficulty of the problem, and that the field is not on a trajectory to solve alignment before AGI is developed
 
 ### Disagreements with Mainstream
 
-Yudkowsky is notably more pessimistic than most AI safety researchers:
+Yudkowsky holds more pessimistic views on alignment tractability than most AI safety researchers:
 
 <DisagreementMap
-  topic="AI Alignment Difficulty"
+  topic="AI Alignment Difficulty and Tractability"
   positions={[
     {
       person: "Eliezer Yudkowsky",
-      position: "Extremely difficult, likely requires fundamental theoretical breakthroughs we haven't made",
+      position: "Extremely difficult; current approaches are unlikely to scale; fundamental theoretical breakthroughs not yet identified are required; default outcome is catastrophic",
       confidence: "high",
-      reasoning: "Sharp capability jumps, deceptive alignment, inner alignment hard"
+      reasoning: "Sharp capability jumps, deceptive alignment, inner alignment problems, and the difficulty of value specification make prosaic approaches insufficient"
     },
     {
       person: "Paul Christiano",
-      position: "Difficult but tractable with empirical iteration on prosaic alignment techniques",
+      position: "Difficult but tractable with empirical iteration on prosaic alignment techniques; ~50% p(doom)",
       confidence: "medium",
-      reasoning: "Can make incremental progress, learn from weaker systems"
+      reasoning: "Incremental progress is possible; alignment can be learned from weaker systems before deploying stronger ones"
     },
     {
       person: "Dario Amodei",
-      position: "Challenging but solvable with responsible scaling and empirical research",
+      position: "Challenging but manageable with responsible scaling and empirical research; ~10–25% p(doom)",
       confidence: "medium",
-      reasoning: "Safety can keep pace with capabilities if we're careful"
+      reasoning: "Safety research can keep pace with capabilities if development is careful and deliberate"
+    },
+    {
+      person: "Yoshua Bengio",
+      position: "Significant risk; ~50% p(doom); shares concern about catastrophic outcomes but emphasizes different technical approaches including more interpretable AI systems",
+      confidence: "medium",
+      reasoning: "Current deep learning systems may not be the right substrate for safe AGI; governance and interpretability research are priorities"
+    },
+    {
+      person: "Yann LeCun",
+      position: "Existential risk from current AI architectures is very low (&lt;0.01% p(doom)); current systems are not on a path to AGI",
+      confidence: "high",
+      reasoning: "LLMs and current neural networks lack the architectural properties needed for human-level general intelligence; risk framing is premature"
     }
   ]}
 />
@@ -120,60 +186,135 @@ Yudkowsky is notably more pessimistic than most AI safety researchers:
 ### On Current AI Development
 
 Yudkowsky has advocated for:
-- **Slowing down AI capabilities research**: Believes we need much more time for alignment work
-- **International cooperation**: Has proposed international treaties to limit AGI development
-- **Extreme measures**: In a controversial 2023 Time article, suggested potential need for international enforcement including military action against rogue AGI projects
+- **Halting large training runs**: His 2023 *TIME* op-ed called for an indefinite worldwide moratorium on new large AI training runs, enforced by international agreement.[^18] He declined to sign the broader open letter calling for a six-month pause because he considered it to understate the seriousness of the situation and to ask for too little.[^18]
+- **International cooperation with enforcement**: Has proposed that international agreements on AI development require "actual teeth," including the possibility of enforcement against rogue projects.[^12]
+- **Stopping rather than racing safely**: Argues that efforts to "build AGI safely first" presuppose a solution to alignment that does not exist, and that the responsible course is to stop until alignment is solved
 
 ### On Alignment Approaches
 
-- **Skeptical of prosaic alignment**: Doubtful that techniques like <EntityLink id="rlhf">RLHF</EntityLink> will scale to superintelligence
-- **Emphasis on theory**: Believes we need better theoretical foundations before scaling systems
-- **Critical of "race to the top"**: Argues that building AGI to solve alignment is putting the cart before the horse
+- **<EntityLink id="E235" name="prosaic-alignment">Prosaic Alignment</EntityLink>**: Argues that techniques like <EntityLink id="E259" name="rlhf">RLHF</EntityLink> and related empirical methods are unlikely to scale to superintelligent systems
+- **Emphasis on theory**: Believes foundational theoretical work on agency and value specification is needed before scaling
+- **Critical of capability-first approaches**: Argues that building more capable systems before solving alignment increases rather than reduces risk
+- **Not optimistic about interpretability alone**: While not dismissing <EntityLink id="E174" name="interpretability">interpretability</EntityLink> research, does not believe it is sufficient to solve the alignment problem
 
 ## Key Publications and Writings
 
-- **"Intelligence Explosion Microeconomics"** (2013) - Analyzes economic dynamics of recursive self-improvement
-- **"There's No Fire Alarm for Artificial General Intelligence"** (2017) - Argues we won't get clear warning signs
-- **"AGI Ruin: A List of Lethalities"** (2022) - Comprehensive argument for why default outcomes are catastrophic
-- **Sequences** (2006-2009) - Blog posts on rationality, many touching on AI safety
-- **"Pausing AI Developments Isn't Enough. We Need to Shut it All Down"** (2023) - Controversial Time op-ed
+- **"Coherent Extrapolated Volition"** (2004) — Foundational paper proposing a framework for specifying AI goals through extrapolation of human values [[PDF](https://intelligence.org/files/CEV.pdf)]
+- **"Intelligence Explosion Microeconomics"** (2013) — Analyzes economic dynamics of recursive self-improvement [[PDF](https://intelligence.org/files/IEM.pdf)]
+- **"There's No Fire Alarm for Artificial General Intelligence"** (2017) — Argues the field will not receive clear warning signs before AGI
+- **"AGI Ruin: A List of Lethalities"** (June 2022) — Extended argument for why default outcomes from AGI development are catastrophic; sparked widespread debate across LessWrong, the Alignment Forum, and the <EntityLink id="E517" name="cea">Centre for Effective Altruism</EntityLink>[^19]
+- **"Pausing AI Developments Isn't Enough. We Need to Shut it All Down"** (March 29, 2023, *TIME*) — Op-ed that was the most-viewed page on TIME's website for a week; prompted questioning at a White House press briefing[^2]
+- **The Sequences** (2006–2009) — Extended blog post series on rationality, cognitive biases, and AI safety, initially published on Overcoming Bias and LessWrong; foundational reading in the rationalist community
+- **"Three Worlds Collide"** (2009) — Short science fiction story exploring decision theory and contact with alien intelligences
+- **"Harry Potter and the Methods of Rationality"** (2010–2015) — Fan-fiction novel using the Harry Potter setting to explore rationalist and scientific reasoning
+
+## Reception of "AGI Ruin: A List of Lethalities"
+
+The June 2022 post "AGI Ruin: A List of Lethalities" drew substantial responses across the AI safety community. Zvi Mowshowitz described it as "the definitive list of Eliezer Rants About Why AGI Will Definitely Absolutely For Sure Kill Everyone Unless Something Very Unexpected Happens," calling it "excellent" while expressing concern that its arguments would primarily persuade those already convinced.[^20] <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>'s response ("Where I agree and disagree with Eliezer") found that doom was "pretty likely" while identifying specific flaws in Yudkowsky's arguments for near-inevitability, particularly around takeoff speed and the tractability of interpretability research.[^21] A 2024 peer-reviewed paper in *Discover Artificial Intelligence* engaged with the essay, finding that "contemporary artificial intelligence systems are, to some extent, intelligent" while arguing that AI systems without human-defined goals would not inherently pose existential threats.[^22]
 
 ## Influence and Legacy
 
-Yudkowsky's impact extends beyond direct research:
+Yudkowsky's impact on the AI safety field extends beyond his direct technical contributions:
 
-1. **Field creation**: Helped establish AI safety as a legitimate field of study
-2. **Community building**: Created intellectual infrastructure (LessWrong, <EntityLink id="center-for-applied-rationality">CFAR</EntityLink>) that trained many current researchers
-3. **Problem formulation**: Articulated key problems that shaped decades of subsequent work
-4. **Public awareness**: Through writing and fiction, introduced AI risk to broader audiences
-5. **Funding**: His early work influenced major funders like <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>
+1. **Problem formulation**: His early writings articulated key problems—alignment, value specification, deceptive alignment—that shaped subsequent research agendas at organizations including MIRI, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, and <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>
+2. **Community infrastructure**: Created LessWrong (2009) and contributed to the intellectual environment that produced many current AI safety researchers; helped found CFAR
+3. **Public discourse**: Through writing, fiction, and media appearances, introduced AI risk to audiences beyond the technical community; his 2023 *TIME* op-ed reached mainstream political attention[^2]
+4. **Funding landscape**: His early work influenced the development of the AI safety funding ecosystem; <EntityLink id="E521" name="coefficient-giving">Coefficient Giving</EntityLink> (formerly Open Philanthropy, renamed in November 2025) has made more than 440 grants through its Navigating Transformative AI fund and has directed more than \$205M toward AI safety since January 2024[^23]
+5. **Nick Bostrom's *Superintelligence***: His work on the intelligence explosion directly influenced Bostrom's 2014 book, which brought AI risk to a wider academic and policy audience[^1]
 
 ## Criticism and Controversy
 
-Yudkowsky is a polarizing figure:
+### Technical and Methodological Critiques
 
-**Critics argue:**
-- His extreme pessimism may be counterproductive or unfounded
-- Lack of formal credentials in relevant fields
-- Sometimes dismissive of others' approaches
-- Apocalyptic framing may alienate potential allies
+Critics from within and outside the AI safety community have raised substantive technical objections:
 
-**Supporters counter:**
-- He was correct about many things before others (importance of AI safety, difficulty of alignment)
-- Has demonstrated technical competence through decision theory work
-- Pessimism may be warranted given stakes
-- Direct communication style is valuable even if uncomfortable
+- **Alignment tractability**: Researchers including Paul Christiano have argued that Yudkowsky's arguments for near-inevitability of doom rely on assumptions about takeoff speed and the impossibility of incremental alignment progress that are contested[^21]
+- **LLM capabilities**: <EntityLink id="E582" name="yann-lecun">Yann LeCun</EntityLink> and other mainstream ML researchers dispute the framing that current AI architectures are on a path to AGI, arguing that the existential risk framing is premature given the architectural limitations of current systems
+- **Agent Foundations output**: MIRI's Agent Foundations research program, which Yudkowsky was associated with, did not produce the theoretical breakthroughs it aimed for and was discontinued in 2024[^11]
+- **CEV underspecification**: Critics have argued that CEV remains underspecified, that extrapolation is itself a value-laden process, and that human values may not converge in the way CEV assumes[^15]
+
+### Sociological and Epistemic Critiques
+
+- **Credentialism**: Some critics argue that his lack of formal academic credentials limits the peer review and accountability structures that normally apply to technical claims; supporters note that he has engaged with formal technical problems in decision theory
+- **Communication style**: Has been characterized by some observers as dismissive of approaches that differ from his own; his "AGI Ruin" post explicitly stated skepticism that researchers working in other paradigms would produce useful alignment work[^19]
+- **Unfalsifiability**: His core predictions about catastrophic AI outcomes are not falsifiable until AGI exists, making it difficult to evaluate them empirically in advance
+- **Persuasive reach**: Zvi Mowshowitz noted concern that Yudkowsky's arguments about doom, however internally consistent, would primarily persuade those already inclined to agree rather than convince skeptical audiences[^20]
+
+### Responses from Supporters
+
+Supporters argue that Yudkowsky identified genuine problems with AI development that others initially dismissed; that his decision theory work demonstrates technical competence; that pessimism about alignment may be warranted given the stakes; and that his public communication, while direct, has raised awareness of issues that now receive mainstream policy attention.
+
+## The Hanson-Yudkowsky AI-Foom Debate
+
+In late 2008, Yudkowsky engaged in an extended public debate with economist Robin Hanson on the Overcoming Bias blog, focused on whether AI systems would undergo rapid recursive self-improvement ("FOOM")—a fast, local increase in capability on a timescale of weeks or hours rather than years or decades.[^24] Hanson argued that AI progress would more closely resemble prior general-purpose technologies like agriculture and industrialization, with innovations distributed across many competing firms rather than concentrated in a single rapidly self-improving system.[^24] The debate continued with an in-person exchange at Jane Street Capital in June 2011, and MIRI published the exchange as a book in 2013.[^24] Hanson made a follow-up post in 2014 ("I Still Don't Get Foom") and Yudkowsky revisited the debate in 2017 following AlphaGo Zero.[^25]
+
+A retrospective analysis on LessWrong examining the incidental predictions each party made during the debate concluded that "Hanson probably does a little better than Yudkowsky" on those subsidiary claims.[^26] The question of whether the development of <EntityLink id="E400" name="large-language-models">Large Language Models</EntityLink> better supports Yudkowsky's or Hanson's broader thesis about AI architecture and takeoff dynamics remains contested among observers; the two positions make different predictions about what future AI development will look like.
 
 ## Statements & Track Record
 
-For a detailed analysis of Yudkowsky's predictions and their accuracy, see the **<EntityLink id="eliezer-yudkowsky-predictions">full track record page</EntityLink>**.
+For a detailed analysis of Yudkowsky's predictions and their accuracy, see the **<EntityLink id="E643" name="eliezer-yudkowsky-predictions">full track record page</EntityLink>**.
 
-**Summary**: Made significant errors when young (early timeline predictions); updated to timeline agnosticism; vindicated on AI generalization question in Hanson debate; core doom predictions remain unfalsifiable until AGI exists.
+**Summary**: Made early timeline predictions in the 2000s that proved inaccurate (e.g., transhumanity by "2008 or 2010" per a 2001 account[^6]); subsequently adopted a policy of not giving specific timeline estimates.[^8] His position that AI systems would generalize effectively with relatively simple architectures was more consistent with subsequent LLM development than Hanson's position in their 2008 debate, though retrospective analysis of incidental predictions gives Hanson a slight edge overall.[^26] Core predictions about catastrophic AI risk outcomes remain unfalsifiable until AGI exists.
 
-| Category | Examples |
-|----------|----------|
-| ✅ **Correct** | AI generalization with simple architectures (Hanson debate), AI safety becoming mainstream |
-| ❌ **Wrong** | Early timeline predictions (Singularity by 2021), deep learning skepticism timing |
-| ⏳ **Pending/Unfalsifiable** | P(doom) ≈99%, discontinuous takeoff, deceptive alignment |
+| Category | Examples | Notes |
+|----------|---------|-------|
+| **Consistent with later developments** | AI generalization with relatively simple architectures; AI safety becoming a mainstream policy concern | His position in the Hanson debate that generalization would be achievable without requiring symbolic AI was more consistent with LLM developments; his early emphasis on AI safety preceded mainstream attention by years |
+| **Inaccurate** | Early timeline predictions (transhumanity by "2008 or 2010" per 2001 account[^6]); Singularity by 2025 per early 2000s writings[^7] | He subsequently acknowledged these errors and stopped making specific timeline predictions |
+| **Pending / Not yet resolvable** | P(doom) >95%[^16]; discontinuous takeoff; deceptive alignment at scale | Core predictions about catastrophic AI risk are not falsifiable prior to AGI development |
 
-**Notable**: His p(doom) has *increased* from ≈50% to ≈99% over time, even as AI safety gained mainstream attention. His core predictions about catastrophic AI risk are unfalsifiable until AGI exists.
+Yudkowsky himself acknowledged that his p(doom) estimates have not been stable over time and has expressed skepticism about the value of precise numerical estimates, arguing that identical numbers can reflect very different underlying models.[^17]
+
+---
+
+[^1]: Wikipedia contributors, "Eliezer Yudkowsky," *Wikipedia*, [https://en.wikipedia.org/wiki/Eliezer_Yudkowsky](https://en.wikipedia.org/wiki/Eliezer_Yudkowsky).
+
+[^2]: MIRI, "April 2024 Newsletter," Machine Intelligence Research Institute, April 12, 2024, [https://intelligence.org/2024/04/12/april-2024-newsletter/](https://intelligence.org/2024/04/12/april-2024-newsletter/).
+
+[^3]: Future of Life Institute, "MIRI: Artificial Intelligence — The Danger of Good Intentions," [https://futureoflife.org/ai/ai-the-danger-of-good-intentions/](https://futureoflife.org/ai/ai-the-danger-of-good-intentions/).
+
+[^4]: Issa Rice, "Timeline of Machine Intelligence Research Institute," timelines.issarice.com, [https://timelines.issarice.com/wiki/Timeline_of_Machine_Intelligence_Research_Institute](https://timelines.issarice.com/wiki/Timeline_of_Machine_Intelligence_Research_Institute). (SIAI incorporated July 27, 2000; rebranded as MIRI January 2013.)
+
+[^5]: Wikipedia contributors, "Machine Intelligence Research Institute," *Wikipedia*, [https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute](https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute).
+
+[^6]: EA Forum contributor, "On Deference and Yudkowsky's AI Risk Estimates," *EA Forum*, 2022, [https://forum.effectivealtruism.org/posts/NBgpPaz5vYe3tH4ga/on-deference-and-yudkowsky-s-ai-risk-estimates](https://forum.effectivealtruism.org/posts/NBgpPaz5vYe3tH4ga/on-deference-and-yudkowsky-s-ai-risk-estimates). (Cites a 2001 document in which Yudkowsky estimated transhumanity "around 2008 or 2010.")
+
+[^7]: Various sources cite early 2000s writings in which Yudkowsky predicted the Singularity by approximately 2025; see, e.g., archived extropian mailing list posts cited in realtimetechpocalypse.com, [https://www.realtimetechpocalypse.com/p/stop-believing-the-lie-that-agi-is](https://www.realtimetechpocalypse.com/p/stop-believing-the-lie-that-agi-is).
+
+[^8]: Eliezer Yudkowsky, post on X (Twitter), August 21, 2019, [https://x.com/esyudkowsky/status/1164332124712738821](https://x.com/esyudkowsky/status/1164332124712738821).
+
+[^9]: Eliezer Yudkowsky, "Discussion with Eliezer Yudkowsky on AGI Interventions," MIRI, November 11, 2021, [https://intelligence.org/2021/11/11/discussion-with-eliezer-yudkowsky-on-agi-interventions/](https://intelligence.org/2021/11/11/discussion-with-eliezer-yudkowsky-on-agi-interventions/).
+
+[^10]: EA Forum contributor, "On Deference and Yudkowsky's AI Risk Estimates," 2022 (written following Yudkowsky's "Death with Dignity" LessWrong post; notes he was "publicly express[ing] the view that misaligned AI has a virtually 100% chance of killing everyone on Earth").
+
+[^11]: MIRI, "September 2024 Newsletter," Machine Intelligence Research Institute, September 16, 2024, [https://intelligence.org/2024/09/16/september-2024-newsletter/](https://intelligence.org/2024/09/16/september-2024-newsletter/).
+
+[^12]: MIRI, "MIRI 2024 Mission and Strategy Update," Machine Intelligence Research Institute, January 4, 2024, [https://intelligence.org/2024/01/04/miri-2024-mission-and-strategy-update/](https://intelligence.org/2024/01/04/miri-2024-mission-and-strategy-update/).
+
+[^13]: Eliezer Yudkowsky, "Coherent Extrapolated Volition," Singularity Institute, 2004, [https://intelligence.org/files/CEV.pdf](https://intelligence.org/files/CEV.pdf).
+
+[^14]: Wikipedia contributors, "Coherent extrapolated volition," *Wikipedia*, [https://en.wikipedia.org/wiki/Coherent_extrapolated_volition](https://en.wikipedia.org/wiki/Coherent_extrapolated_volition).
+
+[^15]: LessWrong contributor, "Superintelligence 23: Coherent Extrapolated Volition," LessWrong, [https://www.lesswrong.com/posts/EQFfj5eC5mqBMxF2s/superintelligence-23-coherent-extrapolated-volition](https://www.lesswrong.com/posts/EQFfj5eC5mqBMxF2s/superintelligence-23-coherent-extrapolated-volition); Alexander Kruel, "Objections to Coherent Extrapolated Volition," LessWrong, [https://www.lesswrong.com/posts/JhB9eqJDScjDNpWiS/objections-to-coherent-extrapolated-volition](https://www.lesswrong.com/posts/JhB9eqJDScjDNpWiS/objections-to-coherent-extrapolated-volition).
+
+[^16]: Wikipedia contributors, "P(doom)," *Wikipedia*, [https://en.wikipedia.org/wiki/P(doom)](https://en.wikipedia.org/wiki/P(doom)). (Lists Yudkowsky's estimate as >95%.)
+
+[^17]: Eliezer Yudkowsky, post on X (Twitter), August 14, 2024, [https://x.com/ESYudkowsky/status/1823530314087718982](https://x.com/ESYudkowsky/status/1823530314087718982).
+
+[^18]: Eliezer Yudkowsky, "Pausing AI Developments Isn't Enough. We Need to Shut it All Down," *TIME*, March 29, 2023, [https://time.com/6266923/ai-eliezer-yudkowsky-open-letter-not-enough/](https://time.com/6266923/ai-eliezer-yudkowsky-open-letter-not-enough/).
+
+[^19]: Eliezer Yudkowsky, "AGI Ruin: A List of Lethalities," AI Alignment Forum, June 2022, [https://www.alignmentforum.org/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities](https://www.alignmentforum.org/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities).
+
+[^20]: Zvi Mowshowitz, "On AGI Ruin: A List of Lethalities," Substack, June 13, 2022, [https://thezvi.substack.com/p/on-agi-ruin-a-list-of-lethalities](https://thezvi.substack.com/p/on-agi-ruin-a-list-of-lethalities).
+
+[^21]: Better Without AI, "Reviews of Some Major AI Safety Reports," [https://betterwithout.ai/AI-safety-reviews](https://betterwithout.ai/AI-safety-reviews). (Summarizes Paul Christiano's "Where I agree and disagree with Eliezer" as finding that "doom is pretty likely, but pointing out flaws in Yudkowsky's arguments that it is virtually inevitable.")
+
+[^22]: Springer/Discover AI, "The Content Intelligence: An Argument Against the Lethality of Artificial Intelligence," February 22, 2024, [https://link.springer.com/article/10.1007/s44163-024-00112-9](https://link.springer.com/article/10.1007/s44163-024-00112-9).
+
+[^23]: Coefficient Giving, "Open Philanthropy Is Now Coefficient Giving," November 2025, [https://coefficientgiving.org/research/open-philanthropy-is-now-coefficient-giving/](https://coefficientgiving.org/research/open-philanthropy-is-now-coefficient-giving/); Wikipedia contributors, "Coefficient Giving," *Wikipedia*, [https://en.wikipedia.org/wiki/Coefficient_Giving](https://en.wikipedia.org/wiki/Coefficient_Giving).
+
+[^24]: Robin Hanson and Eliezer Yudkowsky, *The Hanson-Yudkowsky AI-Foom Debate*, MIRI, 2013, [https://intelligence.org/files/AIFoomDebate.pdf](https://intelligence.org/files/AIFoomDebate.pdf). (Original debate: Overcoming Bias, late 2008; in-person debate: Jane Street Capital, June 2011.)
+
+[^25]: AI Alignment Forum editors, "The Hanson-Yudkowsky AI-Foom Debate," [https://www.alignmentforum.org/revisions/w/the-hanson-yudkowsky-ai-foom-debate](https://www.alignmentforum.org/revisions/w/the-hanson-yudkowsky-ai-foom-debate).
+
+[^26]: LessWrong contributor, "Yudkowsky vs Hanson on FOOM: Whose Predictions Were Better?" LessWrong, [https://www.lesswrong.com/posts/gGSvwd62TJAxxhcGh/yudkowsky-vs-hanson-on-foom-whose-predictions-were-better](https://www.lesswrong.com/posts/gGSvwd62TJAxxhcGh/yudkowsky-vs-hanson-on-foom-whose-predictions-were-better).
+
