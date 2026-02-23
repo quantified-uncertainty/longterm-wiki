@@ -1,21 +1,11 @@
 import React from "react";
 import { cn } from "@lib/utils";
-
-interface CruxPosition {
-  view: string;
-  probability?: string;
-  holders?: string[];
-  implications?: string;
-}
-
-interface CruxResearch {
-  title: string;
-  url?: string;
-}
+import { getCruxById } from "@data";
+import type { CruxPosition } from "@data";
 
 interface CruxProps {
   id?: string;
-  question: string;
+  question?: string;
   domain?: string;
   description?: string;
   importance?: string;
@@ -24,7 +14,7 @@ interface CruxProps {
   positions?: CruxPosition[];
   wouldUpdateOn?: string[];
   relatedCruxes?: string[];
-  relevantResearch?: CruxResearch[];
+  relevantResearch?: Array<{ title: string; url?: string }>;
   className?: string;
   "client:load"?: boolean;
 }
@@ -36,19 +26,22 @@ const importanceBadge: Record<string, string> = {
   low: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
 };
 
-export function Crux({
-  question,
-  domain,
-  description,
-  importance,
-  resolvability,
-  currentState,
-  positions,
-  wouldUpdateOn,
-  relatedCruxes,
-  relevantResearch,
-  className,
-}: CruxProps) {
+export function Crux(props: CruxProps) {
+  // Resolve data from data layer if id is provided
+  const resolved = props.id ? getCruxById(props.id) : undefined;
+  const question = props.question ?? resolved?.question;
+  const domain = props.domain ?? resolved?.domain;
+  const description = props.description ?? resolved?.description;
+  const importance = props.importance ?? resolved?.importance;
+  const resolvability = props.resolvability ?? resolved?.resolvability;
+  const currentState = props.currentState ?? resolved?.currentState;
+  const positions = props.positions ?? resolved?.positions;
+  const wouldUpdateOn = props.wouldUpdateOn ?? resolved?.wouldUpdateOn;
+  const relatedCruxes = props.relatedCruxes ?? resolved?.relatedCruxes;
+  const relevantResearch = props.relevantResearch ?? resolved?.relevantResearch;
+  const { className } = props;
+
+  if (!question) return null;
   return (
     <div className={cn("my-6 rounded-lg border bg-card p-5", className)}>
       {/* Header */}

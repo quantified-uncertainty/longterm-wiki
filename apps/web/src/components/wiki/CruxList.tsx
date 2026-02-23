@@ -1,5 +1,7 @@
 import React from "react";
 import { cn } from "@lib/utils";
+import { getCruxesByDomain } from "@data";
+import type { CruxData } from "@data";
 
 interface CruxSummary {
   id: string;
@@ -11,7 +13,7 @@ interface CruxSummary {
 
 interface CruxListProps {
   domain?: string;
-  cruxes: CruxSummary[];
+  cruxes?: CruxSummary[];
   className?: string;
   "client:load"?: boolean;
 }
@@ -23,8 +25,25 @@ const importanceBadge: Record<string, string> = {
   low: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
 };
 
-export function CruxList({ domain, cruxes, className }: CruxListProps) {
-  if (!cruxes || cruxes.length === 0) return null;
+export function CruxList({ domain, cruxes: inlineCruxes, className }: CruxListProps) {
+  // Auto-discover from data layer if domain provided without inline cruxes
+  let cruxes: CruxSummary[];
+  if (inlineCruxes && inlineCruxes.length > 0) {
+    cruxes = inlineCruxes;
+  } else if (domain) {
+    const resolved = getCruxesByDomain(domain);
+    cruxes = resolved.map((c: CruxData) => ({
+      id: c.id,
+      question: c.question,
+      importance: c.importance,
+      timeframe: c.timeframe,
+      summary: c.summary ?? c.description,
+    }));
+  } else {
+    return null;
+  }
+
+  if (cruxes.length === 0) return null;
 
   return (
     <div className={cn("my-6 rounded-lg border bg-card p-5", className)}>
