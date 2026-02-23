@@ -568,6 +568,19 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
     output += `${c.dim}   To bypass: git push --no-verify${c.reset}\n\n`;
   }
 
+  // Step 4: Warn if tooling-gaps-found is checked but Key Decisions is empty.
+  const toolingGapsItem = finalStatus.phases
+    .flatMap(p => p.items)
+    .find(i => i.id === 'tooling-gaps-found');
+  if (
+    toolingGapsItem &&
+    toolingGapsItem.status !== 'unchecked' &&
+    finalStatus.decisions.length === 0
+  ) {
+    output += `\n${c.yellow}⚠️  WARNING: \`tooling-gaps-found\` is checked but Key Decisions section is empty.${c.reset}\n`;
+    output += `${c.yellow}   List tooling gaps in Key Decisions (even "none found" counts).${c.reset}\n`;
+  }
+
   return { output, exitCode: 0 }; // never block — just warn
 }
 

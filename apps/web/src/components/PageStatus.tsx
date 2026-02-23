@@ -883,7 +883,7 @@ export function PageStatus({
       {/* Score rings + metric chips */}
       <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 px-3.5 py-3">
         <div className="flex flex-wrap items-center gap-5">
-          {quality !== undefined && (
+          {quality !== undefined && quality > 0 && (
             <QualityDisplay quality={quality} suggestedQuality={suggestedQuality} />
           )}
           {importance !== undefined && (
