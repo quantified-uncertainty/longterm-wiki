@@ -428,10 +428,12 @@ export class ValidationEngine {
 
         case FixType.REPLACE_TEXT:
           if (fix.oldText && fix.newText !== undefined) {
-            // Escape $ in the replacement to prevent String.replace special patterns
-            // ($&, $`, $', $n) from corrupting the output when link text contains $.
-            const safeReplacement = fix.newText.replace(/\$/g, '$$$$');
-            lines[lineIndex] = lines[lineIndex].replace(fix.oldText, safeReplacement);
+            // Use indexOf+slice instead of String.replace to avoid $ special
+            // pattern issues ($&, $`, $', $n) that cause backslash cascading.
+            const idx = lines[lineIndex].indexOf(fix.oldText);
+            if (idx !== -1) {
+              lines[lineIndex] = lines[lineIndex].slice(0, idx) + fix.newText + lines[lineIndex].slice(idx + fix.oldText.length);
+            }
           }
           break;
       }

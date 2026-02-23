@@ -386,7 +386,9 @@ async function fetchWithFirecrawl(url: string): Promise<FirecrawlResult | null> 
   try {
     const FirecrawlApp = (await import('@mendable/firecrawl-js')).default;
     const firecrawl = new FirecrawlApp({ apiKey: FIRECRAWL_KEY });
-    const result = await firecrawl.scrapeUrl(url, { formats: ['markdown'] }) as any;
+    // Cast to any — scrapeUrl returns ErrorResponse | ScrapeResponse, but we
+    // check .markdown defensively anyway.
+    const result: any = await firecrawl.scrapeUrl(url, { formats: ['markdown'] });
 
     if (result.markdown && result.markdown.length > 0) {
       const meta = (result as { metadata?: { title?: string } }).metadata;

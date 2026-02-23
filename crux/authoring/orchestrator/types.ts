@@ -197,6 +197,11 @@ export interface OrchestratorOptions {
   /** Model override for section writing (default: Sonnet). */
   writerModel?: string;
   /**
+   * AbortSignal for external cancellation (e.g. batch runner timeout).
+   * When aborted, the orchestrator should stop at the next tool boundary.
+   */
+  signal?: AbortSignal;
+  /**
    * Mode of operation.
    * - 'improve': improve an existing page (default)
    * - 'create': create a new page

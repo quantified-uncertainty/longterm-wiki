@@ -24,7 +24,7 @@ import { createSession } from '../../lib/wiki-server/sessions.ts';
 import { loadPages as loadPagesFromRegistry } from '../../lib/content-types.ts';
 import { repairFrontmatter, stripRelatedPagesSections } from '../page-improver/utils.ts';
 
-import { runOrchestrator } from './orchestrator.ts';
+import { runOrchestrator, normalizeDollarEscaping } from './orchestrator.ts';
 import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier } from './types.ts';
 
 export type { OrchestratorOptions, OrchestratorResult, OrchestratorTier };
@@ -194,6 +194,7 @@ export async function runOrchestratorPipeline(
   let finalContent = result.finalContent;
   finalContent = repairFrontmatter(finalContent);
   finalContent = stripRelatedPagesSections(finalContent);
+  finalContent = normalizeDollarEscaping(finalContent);
 
   // ── Write output ───────────────────────────────────────────────────────
 
