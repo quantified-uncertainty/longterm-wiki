@@ -400,6 +400,34 @@ export function parseGroundedResult(
     ...invalidClaims,
   ];
 
+  // ── Content-level verification (strict mode only) ──────────────────────
+  // When allowTrainingKnowledge === false, verify the actual content output:
+  //  1. Footnote markers in content should have corresponding claim map entries
+  //  2. Unsourceable claim text should not appear verbatim in the content (#675)
+
+  if (!constraints.allowTrainingKnowledge) {
+    // Check 1: unclaimed footnotes — footnote markers in content that cite a
+    // source ID not covered by any claim map entry.  This catches cases where the
+    // LLM adds a citation in the prose but omits it from the claimMap.
+    const footnoteMarkers = response.content.match(/\[\^([^\]]+)\]/g) ?? [];
+    const uniqueMarkers = [...new Set(footnoteMarkers.map(m => m.slice(2, -1)))];
+    const claimedIds = new Set(validClaims.map(c => c.factId));
+    for (const marker of uniqueMarkers) {
+      if (!claimedIds.has(marker)) {
+        unsourceableClaims.push(`[unclaimed footnote: ^${marker}]`);
+      }
+    }
+
+    // Check 2: unsourceable claims appearing in content
+    for (const claim of response.unsourceableClaims) {
+      const normalized = claim.trim().toLowerCase();
+      if (normalized.length < 10) continue; // skip very short strings to avoid false positives
+      if (response.content.toLowerCase().includes(normalized)) {
+        unsourceableClaims.push(`[unsourceable claim in prose: "${claim.slice(0, 80)}"]`);
+      }
+    }
+  }
+
   // Post-hoc maxNewClaims enforcement: if the LLM exceeded the cap, truncate
   // the claim map to the first N entries and log a warning (#680).
   let claimMap = validClaims;
