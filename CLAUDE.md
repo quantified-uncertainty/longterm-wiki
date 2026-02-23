@@ -61,6 +61,12 @@ pnpm crux edit-log view <id>     # View edit history for a page
 pnpm crux maintain               # Run maintenance sweep (PRs, issues, cruft)
 pnpm crux maintain status        # Check when maintenance last ran
 
+# System wellness checks
+pnpm crux health                 # Run all wellness checks (server, DB, API, Actions, freshness)
+pnpm crux health --check=server  # Server & DB health only
+pnpm crux health --check=actions # GitHub Actions workflow health only
+pnpm crux health --json          # JSON output for scripting
+
 # Agent checklists
 pnpm crux agent-checklist init "Task" --type=X    # Generate typed checklist
 pnpm crux agent-checklist init --issue=N          # Auto-detect type from issue labels
