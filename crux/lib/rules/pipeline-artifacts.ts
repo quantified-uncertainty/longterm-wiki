@@ -45,6 +45,9 @@ export const pipelineArtifactsRule = {
     const body = contentFile.body || '';
     if (!body) return issues;
 
+    // Skip internal documentation pages — they may contain examples of the JSON format
+    if (contentFile.path.includes('/internal/')) return issues;
+
     const lines = body.split('\n');
     let inCodeBlock = false;
     let codeBlockStart = -1;

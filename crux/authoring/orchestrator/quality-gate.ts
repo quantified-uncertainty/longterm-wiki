@@ -135,6 +135,23 @@ export function evaluateQualityGate(ctx: OrchestratorContext): QualityGateResult
     );
   }
 
+  // Citation quality check (standard/deep tiers only — polish has no research)
+  if (ctx.budget.maxResearchQueries > 0 && ctx.citationAudit && ctx.citationAudit.length > 0) {
+    const audited = ctx.citationAudit.filter(a => a.verdict !== 'unchecked');
+    if (audited.length > 0) {
+      const broken = audited.filter(a => a.verdict === 'unsupported' || a.verdict === 'misattributed' || a.verdict === 'url-dead');
+      const passRate = (audited.length - broken.length) / audited.length;
+      if (passRate < 0.80) {
+        const brokenRefs = broken.map(a => `[^${a.footnoteRef}] (${a.verdict})`).join(', ');
+        gaps.push(
+          `Citation audit pass rate is ${Math.round(passRate * 100)}% (${broken.length}/${audited.length} failed). ` +
+          `Broken: ${brokenRefs}. ` +
+          `Fix or remove broken citations, then re-run audit_citations.`
+        );
+      }
+    }
+  }
+
   // Check for improvement (must have actually changed something)
   const contentUnchanged = ctx.currentContent === ctx.originalContent;
   if (contentUnchanged) {
