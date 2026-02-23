@@ -18,6 +18,7 @@ import { ROOT, TEMP_DIR, TIERS, log, getFilePath, writeTemp, loadPages, findPage
 import { startHeartbeat } from './api.ts';
 import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
+import { validateMdxContent } from '../../lib/validate-mdx-content.ts';
 import {
   analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
   enrichPhase, reviewPhase,
@@ -347,6 +348,17 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     // Comments are preserved in the temp file (finalPath) for review
     let contentToApply = fs.readFileSync(finalPath, 'utf-8');
     contentToApply = contentToApply.replace(/\n?{\/\*\s*CROSS-PAGE CHECK[^*]*\*\/}\n?/g, '\n');
+
+    // Validate content structure before writing (#818) — defense-in-depth against JSON blob corruption
+    const validation = validateMdxContent(contentToApply);
+    if (!validation.valid) {
+      console.error(`\n❌ MDX validation failed — refusing to write to ${filePath}`);
+      console.error(`   Error: ${validation.error}`);
+      console.error(`   Content preview: ${contentToApply.slice(0, 200).replace(/\n/g, '\\n')}`);
+      console.error(`   Pipeline output preserved at: ${finalPath}`);
+      process.exit(1);
+    }
+
     fs.writeFileSync(filePath, contentToApply);
     console.log(`\nChanges applied to ${filePath}`);
 

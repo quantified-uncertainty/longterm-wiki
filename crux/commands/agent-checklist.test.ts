@@ -537,7 +537,8 @@ describe('agent-checklist pre-push-check tooling-gaps warning', () => {
     mockReadFileSync.mockReturnValue(md);
 
     const result = await commands['pre-push-check']([], {});
-    expect(result.exitCode).toBe(0);
+    // exitCode 1 because 0% complete (< 10% threshold blocks push)
+    expect(result.exitCode).toBe(1);
     expect(result.output).not.toContain('Key Decisions section is empty');
   });
 });

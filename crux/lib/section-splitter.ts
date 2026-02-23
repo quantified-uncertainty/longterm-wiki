@@ -251,16 +251,37 @@ export function deduplicateSectionMarkers(sections: ParsedSection[]): ParsedSect
  * If a ref has no matching definition, the ref is kept with its new number
  * but no definition is emitted (avoids silent data loss).
  */
-export function renumberFootnotes(content: string): string {
+export function renumberFootnotes(content: string, options?: { warn?: boolean }): string {
   // Step 1: collect definitions
   const defRe = /^\[\^([^\]]+)\]:\s*(.+)$/gm;
   const defs = new Map<string, string>(); // marker → definition text
+  const duplicateMarkers: Array<{ marker: string; first: string; second: string }> = [];
   let m: RegExpExecArray | null;
 
   defRe.lastIndex = 0;
   while ((m = defRe.exec(content)) !== null) {
     // Keep the first definition for a given marker (earlier in doc wins)
-    if (!defs.has(m[1])) defs.set(m[1], m[2]);
+    if (!defs.has(m[1])) {
+      defs.set(m[1], m[2]);
+    } else {
+      // Track duplicate markers with different definitions (#820)
+      const existing = defs.get(m[1])!;
+      if (existing !== m[2]) {
+        duplicateMarkers.push({ marker: m[1], first: existing, second: m[2] });
+      }
+    }
+  }
+
+  // Warn about duplicate markers with different definitions — likely a misattribution bug
+  if (options?.warn && duplicateMarkers.length > 0) {
+    for (const dup of duplicateMarkers) {
+      console.warn(
+        `⚠ Footnote [^${dup.marker}] has duplicate definitions with different content:\n` +
+        `  First:  ${dup.first.slice(0, 80)}\n` +
+        `  Second: ${dup.second.slice(0, 80)}\n` +
+        `  The second definition will be discarded. Run deduplicateSectionMarkers() first to prevent this.`
+      );
+    }
   }
 
   if (defs.size === 0) {
