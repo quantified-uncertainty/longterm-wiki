@@ -131,6 +131,7 @@ Batch mode (V2 only):
   --page-timeout=900              Per-page timeout in seconds (default: 900 = 15 min)
   --resume                        Skip pages already completed in a previous batch run
   --report-file=report.md         Write summary report to a file
+  --quality-report-file=path.json Write quality report JSON (default: .claude/temp/batch-quality-report.json)
 
 Tiers:
   polish    Quick single-pass, no research (~$2-3)
@@ -191,6 +192,7 @@ Examples:
       grade: opts['no-grade'] ? false : undefined,
       skipSessionLog: opts['skip-session-log'] === true,
       reportFile: opts['report-file'] as string | undefined,
+      qualityReportFile: opts['quality-report-file'] as string | undefined,
     });
     return;
   }
