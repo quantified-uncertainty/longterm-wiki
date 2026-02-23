@@ -115,6 +115,9 @@ Use `COALESCE(SUM(col), 0)` for display-facing queries. `SUM()` over zero rows r
 ### Pages with footnote definitions but no inline refs produce no quote results
 Some pages list sources as `[^N]: [Title](URL)` at the bottom but never reference `[^N]` inline in the prose. The citation pipeline extracts no quotes from these pages because there's no claim context. Flag these pages for inline-citation cleanup — the sources are there, they just need to be referenced.
 
+### `process.cwd()` in Next.js server components resolves to `apps/web/`
+When reading files from Next.js server components using relative paths, `process.cwd()` resolves to `apps/web/`, not the workspace root. So `../../data/` reaches the root `data/` directory and `../../.cache/` reaches the root `.cache/` directory. Keep this in mind when constructing paths in server components.
+
 ### Sandbox blocks most external URL fetches
 Inside Claude Code sandboxed environments, outbound HTTP fetches fail. For citation pipeline runs (`crux citations verify`, `crux citations extract-quotes`), you may need `dangerouslyDisableSandbox: true` when using the Bash tool. This is expected — the sandbox prevents web access by default.
 
