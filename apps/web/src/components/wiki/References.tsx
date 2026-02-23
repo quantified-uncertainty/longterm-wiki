@@ -8,23 +8,8 @@ import {
 import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
+import { getResourceTypeIcon } from "./resource-utils";
 import { cn } from "@lib/utils";
-
-const typeIcons: Record<string, string> = {
-  paper: "\ud83d\udcc4",
-  book: "\ud83d\udcda",
-  blog: "\u270f\ufe0f",
-  report: "\ud83d\udccb",
-  talk: "\ud83c\udf99\ufe0f",
-  podcast: "\ud83c\udfa7",
-  government: "\ud83c\udfdb\ufe0f",
-  reference: "\ud83d\udcd6",
-  web: "\ud83d\udd17",
-};
-
-function getTypeIcon(type: string): string {
-  return typeIcons[type] || "\ud83d\udd17";
-}
 
 interface ReferencesProps {
   /** Explicit list of resource IDs to display */
@@ -96,15 +81,13 @@ function CitationHealthSummary({ pageId }: { pageId: string }) {
   const { total, accuracyChecked, accurate, inaccurate } = health;
   const unchecked = total - accuracyChecked;
 
-  // Determine overall health color
   let healthColor = "text-muted-foreground";
   let healthLabel = "unverified";
   if (accuracyChecked > 0) {
-    const accuracyRate = accurate / accuracyChecked;
     if (inaccurate > 0) {
       healthColor = "text-orange-600";
       healthLabel = `${inaccurate} issue${inaccurate > 1 ? "s" : ""} found`;
-    } else if (accuracyRate >= 0.9) {
+    } else if (accurate / accuracyChecked >= 0.9) {
       healthColor = "text-green-600";
       healthLabel = "verified";
     } else {
@@ -146,7 +129,6 @@ function ReferenceEntry({
       className="py-2 text-sm leading-relaxed border-b border-border/40 last:border-b-0"
     >
       <span className="flex items-start gap-2">
-        {/* Number anchor */}
         <a
           href={`#ref-${index}`}
           className="shrink-0 text-xs font-mono text-muted-foreground mt-0.5 no-underline hover:text-foreground"
@@ -155,10 +137,9 @@ function ReferenceEntry({
         </a>
 
         <span className="flex-1 min-w-0">
-          {/* Type icon + title */}
           <span className="inline-flex items-center gap-1.5">
             <span className="text-xs" title={resource.type}>
-              {getTypeIcon(resource.type)}
+              {getResourceTypeIcon(resource.type)}
             </span>
             <a
               href={resource.url}
@@ -171,7 +152,6 @@ function ReferenceEntry({
             <span className="text-xs text-muted-foreground">{"\u2197"}</span>
           </span>
 
-          {/* Authors, year, publication */}
           {(authorStr || year || publicationName) && (
             <span className="block text-xs text-muted-foreground mt-0.5">
               {authorStr && <span>{authorStr}</span>}
@@ -190,14 +170,12 @@ function ReferenceEntry({
             </span>
           )}
 
-          {/* Summary */}
           {showSummaries && resource.summary && (
             <span className="block text-xs text-muted-foreground mt-1 leading-snug">
               {resource.summary}
             </span>
           )}
 
-          {/* Badges row */}
           {(showCredibility || showTags) && (
             <span className="flex items-center gap-2 mt-1">
               {showCredibility && credibility != null && (
@@ -240,8 +218,6 @@ export function References({
 
   const { refs, missing } = resolveRefs(ids);
 
-  if (refs.length === 0 && missing.length === 0) return null;
-
   return (
     <section
       className={cn(
@@ -255,17 +231,19 @@ export function References({
         {pageId && <CitationHealthSummary pageId={pageId} />}
       </h2>
 
-      <ol className="list-none p-0 m-0 space-y-0">
-        {refs.map((r) => (
-          <ReferenceEntry
-            key={r.resource.id}
-            entry={r}
-            showCredibility={showCredibility}
-            showTags={showTags}
-            showSummaries={showSummaries}
-          />
-        ))}
-      </ol>
+      {refs.length > 0 && (
+        <ol className="list-none p-0 m-0 space-y-0">
+          {refs.map((r) => (
+            <ReferenceEntry
+              key={r.resource.id}
+              entry={r}
+              showCredibility={showCredibility}
+              showTags={showTags}
+              showSummaries={showSummaries}
+            />
+          ))}
+        </ol>
+      )}
 
       {missing.length > 0 && (
         <p className="text-xs text-destructive mt-3">

@@ -2,24 +2,9 @@ import React from "react";
 import { getResourceById, getResourceCredibility, getResourcePublication } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
+import { getResourceTypeIcon } from "./resource-utils";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
-
-const typeIcons: Record<string, string> = {
-  paper: "\ud83d\udcc4",
-  book: "\ud83d\udcda",
-  blog: "\u270f\ufe0f",
-  report: "\ud83d\udccb",
-  talk: "\ud83c\udf99\ufe0f",
-  podcast: "\ud83c\udfa7",
-  government: "\ud83c\udfdb\ufe0f",
-  reference: "\ud83d\udcd6",
-  web: "\ud83d\udd17",
-};
-
-function getResourceTypeIcon(type: string): string {
-  return typeIcons[type] || "\ud83d\udd17";
-}
 
 function truncateText(text: string | undefined | null, maxLength: number): string {
   if (!text) return "";
@@ -77,7 +62,7 @@ export function ResourceLink({
         )}
         <span className="text-xs ml-0.5 opacity-70">{"\u2197"}</span>
       </a>
-      {n != null && (
+      {n != null && n >= 1 && (
         <a
           href={`#ref-${n}`}
           className="text-[10px] text-muted-foreground no-underline hover:text-accent-foreground align-super ml-px"
