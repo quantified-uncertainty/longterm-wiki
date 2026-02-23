@@ -38,6 +38,19 @@ import { evaluateQualityGate } from './quality-gate.ts';
 
 const log = createPhaseLogger();
 
+// ---------------------------------------------------------------------------
+// Dollar-sign escaping normalization
+// ---------------------------------------------------------------------------
+
+/**
+ * Collapse any sequence of 2+ backslashes before $ down to a single \$.
+ * This is a safety net that catches corruption from the auto-fixer or LLM
+ * (e.g. \\\\\$ → \$). Runs once at finalization and after each section rewrite.
+ */
+export function normalizeDollarEscaping(content: string): string {
+  return content.replace(/\\{2,}\$/g, '\\$');
+}
+
 /** Error message patterns that indicate a transient/retryable failure. */
 const TRANSIENT_ERROR_PATTERNS = [
   'timeout', 'ECONNRESET', 'socket hang up', 'overloaded',
@@ -130,6 +143,7 @@ async function runAgentLoop(
   toolHandlers: Record<string, (input: Record<string, unknown>) => Promise<string>>,
   ctx: OrchestratorContext,
   orchestratorModel: string,
+  signal?: AbortSignal,
 ): Promise<string> {
   const messages: MessageParam[] = [
     { role: 'user', content: userMessage },
@@ -158,6 +172,12 @@ async function runAgentLoop(
   let toolTurns = 0;
 
   while (response.stop_reason === 'tool_use' && toolTurns < MAX_TOOL_TURNS) {
+    // Check abort signal (from batch runner timeout)
+    if (signal?.aborted) {
+      log('orchestrator', 'Abort signal received — stopping agent loop');
+      break;
+    }
+
     // Check budget
     if (ctx.toolCallCount >= ctx.budget.maxToolCalls) {
       log('orchestrator', `Tool-call budget exhausted (${ctx.toolCallCount}/${ctx.budget.maxToolCalls})`);
@@ -283,6 +303,7 @@ export async function runOrchestrator(
   const orchestratorModel = options.orchestratorModel || MODELS.opus;
   const writerModel = options.writerModel || MODELS.sonnet;
   const budget = TIER_BUDGETS[tier];
+  const signal = options.signal;
 
   log('orchestrator', `Starting orchestrator for "${page.title}"`);
   log('orchestrator', `Tier: ${budget.name} (max ${budget.maxToolCalls} calls, ${budget.maxResearchQueries} research queries)`);
@@ -327,7 +348,7 @@ export async function runOrchestrator(
 
   log('orchestrator', 'Running main agent loop...');
   const agentResponse = await runAgentLoop(
-    client, systemPrompt, userMessage, toolDefs, trackedHandlers, ctx, orchestratorModel,
+    client, systemPrompt, userMessage, toolDefs, trackedHandlers, ctx, orchestratorModel, signal,
   );
   log('orchestrator', `Main loop complete (${ctx.toolCallCount} tool calls, ~$${ctx.totalCost.toFixed(2)})`);
   log('orchestrator', `Agent summary: ${agentResponse.slice(0, 200)}...`);
@@ -360,7 +381,7 @@ export async function runOrchestrator(
     log('orchestrator', `Running refinement cycle ${cycle}...`);
 
     await runAgentLoop(
-      client, systemPrompt, refinementMessage, toolDefs, trackedHandlers, ctx, orchestratorModel,
+      client, systemPrompt, refinementMessage, toolDefs, trackedHandlers, ctx, orchestratorModel, signal,
     );
 
     refinementCycles++;
@@ -371,6 +392,7 @@ export async function runOrchestrator(
 
   ctx.currentContent = deduplicateFootnotes(ctx.currentContent);
   ctx.currentContent = renumberFootnotes(ctx.currentContent);
+  ctx.currentContent = normalizeDollarEscaping(ctx.currentContent);
 
   // ── Update lastEdited ──────────────────────────────────────────────────────
 

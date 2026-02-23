@@ -13,6 +13,7 @@ import {
   filterSourcesForSection,
 } from '../../../lib/section-splitter.ts';
 import { rewriteSection } from '../../../lib/section-writer.ts';
+import { normalizeDollarEscaping } from '../orchestrator.ts';
 import type { ToolRegistration } from './types.ts';
 
 export const tool: ToolRegistration = {
@@ -90,11 +91,14 @@ export const tool: ToolRegistration = {
         { model: options.writerModel },
       );
 
+      // Normalize dollar-sign escaping before checking tables or storing
+      const normalizedContent = normalizeDollarEscaping(result.content);
+
       // Table preservation guard: if the rewrite dropped tables, keep the original (#770, #736)
-      const tablesAfter = (result.content.match(/^\|.+\|$/gm) || []).length;
+      const tablesAfter = (normalizedContent.match(/^\|.+\|$/gm) || []).length;
       const usedContent = tablesBefore > 0 && tablesAfter < tablesBefore
         ? section.content
-        : result.content;
+        : normalizedContent;
       const tablesFallback = tablesBefore > 0 && tablesAfter < tablesBefore;
 
       // Update the section in context

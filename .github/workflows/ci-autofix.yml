@@ -15,6 +15,7 @@ permissions:
   contents: write
   pull-requests: write
   actions: read
+  id-token: write
 
 # One fix attempt at a time per PR to avoid conflicting pushes
 concurrency:
