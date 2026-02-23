@@ -87,7 +87,7 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
 
   const branch = currentBranch();
   const title = options.title as string | undefined;
-  const bodyFile = options['body-file'] as string | undefined;
+  const bodyFile = (options.bodyFile ?? options['body-file']) as string | undefined;
   let body = options.body as string | undefined;
   const base = (options.base as string) || 'main';
   const draft = Boolean(options.draft);
@@ -129,7 +129,7 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
   // Block empty PR descriptions unless explicitly opted in (#816).
   // Silent empty descriptions were the #1 PR quality problem — 33% of recent PRs had empty bodies.
   if (!body || !body.trim()) {
-    if (options['allow-empty-body']) {
+    if (options.allowEmptyBody ?? options['allow-empty-body']) {
       log.warn('Creating PR with empty body (--allow-empty-body).');
     } else {
       return {
