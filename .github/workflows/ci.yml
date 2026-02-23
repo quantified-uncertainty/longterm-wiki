@@ -171,19 +171,15 @@ jobs:
         run: npx tsx crux/validate/validate-returning-guard.ts
 
       - name: Auto-update orchestrator smoke test (dry-run)
-        # Verifies the orchestrator pipeline doesn't crash before executing any
-        # page updates — specifically guards against missing mkdirSync before
-        # writeFileSync in saveRunDetails / saveRunReport.
-        # continue-on-error so flaky network doesn't block CI; failures show as warnings.
+        # Verifies the orchestrator pipeline doesn't crash — specifically guards
+        # against missing mkdirSync before writeFileSync in saveRunDetails / saveRunReport.
+        # Uses --skip-fetch to avoid 9-minute RSS fetch; verifies code paths only.
+        # continue-on-error so failures show as warnings, not blockers.
         if: "!cancelled()"
         continue-on-error: true
         run: |
-          pnpm crux auto-update run --dry-run --trigger=ci-check --budget=0 --count=0 \
+          pnpm crux auto-update run --dry-run --skip-fetch --trigger=ci-check --budget=0 --count=0 \
             || echo "::warning::Auto-update dry-run failed (advisory — check orchestrator for regressions)"
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
 
       - name: Run validation suite (advisory)
         if: "!cancelled()"

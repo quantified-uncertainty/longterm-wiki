@@ -130,6 +130,7 @@ export interface AutoUpdateOptions {
   budget?: string;           // Max dollars to spend
   count?: string;            // Max pages to update
   dryRun?: boolean;          // Preview without executing
+  skipFetch?: boolean;       // Skip RSS fetch (for CI smoke tests — verifies code paths only)
   sources?: string;          // Comma-separated source IDs to check
   check?: boolean;           // Health-check source URLs (used by sources --check)
   ci?: boolean;

@@ -234,21 +234,28 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
   const dryRun = options.dryRun || false;
   const verbose = options.verbose || false;
   const trigger = options.trigger || 'manual';
+  const skipFetch = options.skipFetch || false;
   const sourceIds = options.sources ? options.sources.split(',').map(s => s.trim()) : undefined;
 
   const startedAt = new Date().toISOString();
   const date = startedAt.slice(0, 10);
 
   console.log(`\n=== Auto-Update Pipeline ===`);
-  console.log(`Date: ${date} | Budget: $${budget} | Max pages: ${maxPages} | Dry run: ${dryRun}`);
+  console.log(`Date: ${date} | Budget: $${budget} | Max pages: ${maxPages} | Dry run: ${dryRun}${skipFetch ? ' | Skip fetch: true' : ''}`);
 
   // ── Stage 1: Fetch ──────────────────────────────────────────────────────
 
-  console.log(`\n── Stage 1: Fetching news sources ──`);
-  const fetchResult = await fetchAllSources(sourceIds, verbose);
-  console.log(`  Fetched: ${fetchResult.fetchedSources.length} sources, ${fetchResult.items.length} items`);
-  if (fetchResult.failedSources.length > 0) {
-    console.log(`  Failed: ${fetchResult.failedSources.map(f => f.id).join(', ')}`);
+  let fetchResult: Awaited<ReturnType<typeof fetchAllSources>>;
+  if (skipFetch) {
+    console.log(`\n── Stage 1: Skipped (--skip-fetch) ──`);
+    fetchResult = { items: [], fetchedSources: [], failedSources: [] };
+  } else {
+    console.log(`\n── Stage 1: Fetching news sources ──`);
+    fetchResult = await fetchAllSources(sourceIds, verbose);
+    console.log(`  Fetched: ${fetchResult.fetchedSources.length} sources, ${fetchResult.items.length} items`);
+    if (fetchResult.failedSources.length > 0) {
+      console.log(`  Failed: ${fetchResult.failedSources.map(f => f.id).join(', ')}`);
+    }
   }
 
   // ── Stage 2: Digest ─────────────────────────────────────────────────────
