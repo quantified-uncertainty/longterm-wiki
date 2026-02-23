@@ -45,6 +45,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check if PR is a draft
+        id: check-draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          IS_DRAFT=$(gh pr list \
+            --head "${{ github.event.workflow_run.head_branch }}" \
+            --json isDraft \
+            --jq '.[0].isDraft // false')
+          echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
+          if [ "$IS_DRAFT" = "true" ]; then
+            echo "PR is a draft — skipping autofix to avoid wasted spend."
+          fi
+
       - name: Check for prior autofix attempts
         id: check-attempts
         env:
@@ -63,7 +77,7 @@ jobs:
           fi
 
       - name: Auto-fix CI failure
-        if: steps.check-attempts.outputs.should_fix == 'true'
+        if: steps.check-draft.outputs.is_draft != 'true' && steps.check-attempts.outputs.should_fix == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
