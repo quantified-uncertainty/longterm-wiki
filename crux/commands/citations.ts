@@ -73,6 +73,11 @@ const SCRIPTS = {
     description: 'Migrate citation accuracy data from SQLite to PostgreSQL',
     passthrough: ['dry-run'],
   },
+  'backfill-resource-ids': {
+    script: 'citations/backfill-resource-ids.ts',
+    description: 'Backfill resource_id for existing citation quotes',
+    passthrough: ['dry-run'],
+  },
   'fix-inaccuracies': {
     script: 'citations/fix-inaccuracies.ts',
     description: 'Fix flagged citation inaccuracies using LLM-generated corrections',
@@ -139,6 +144,8 @@ Examples:
   crux citations export-dashboard --from-db        Export from PostgreSQL instead of SQLite
   crux citations migrate-accuracy                   Migrate accuracy data to PostgreSQL
   crux citations migrate-accuracy --dry-run         Preview migration
+  crux citations backfill-resource-ids               Backfill resource_id for existing quotes
+  crux citations backfill-resource-ids --dry-run    Preview matches without writing
   crux citations fix-inaccuracies                   Dry-run fix proposals for all flagged
   crux citations fix-inaccuracies --apply           Apply fixes to pages
   crux citations fix-inaccuracies <id>              Fix one page

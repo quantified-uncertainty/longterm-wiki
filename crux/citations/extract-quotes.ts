@@ -36,6 +36,7 @@ import {
   parseBookReference,
   findSourceOnline,
 } from '../lib/source-lookup.ts';
+import { getResourceByUrl } from '../lib/resource-lookup.ts';
 import { findPagesWithCitations, logBatchProgress } from './shared.ts';
 
 /** Detect if a footnote is a book/paper reference (no URL). */
@@ -240,11 +241,16 @@ export async function extractQuotesForPage(
         }
       }
 
+      // Resolve resource_id from URL
+      const resource = cit.url ? getResourceByUrl(cit.url) : null;
+      const resourceId = resource?.id ?? null;
+
       // Store in SQLite
       citationQuotes.upsert({
         pageId,
         footnote: cit.footnote,
         url: cit.url || null,
+        resourceId,
         claimText,
         claimContext: cit.claimContext,
         sourceQuote: sourceQuote || null,
@@ -285,10 +291,12 @@ export async function extractQuotesForPage(
       }
 
       // Still store the claim even if extraction failed
+      const errResource = cit.url ? getResourceByUrl(cit.url) : null;
       citationQuotes.upsert({
         pageId,
         footnote: cit.footnote,
         url: cit.url || null,
+        resourceId: errResource?.id ?? null,
         claimText,
         claimContext: cit.claimContext,
         sourceTitle,

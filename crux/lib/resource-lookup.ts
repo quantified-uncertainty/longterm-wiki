@@ -40,7 +40,27 @@ let cachedByUrl: Map<string, Resource> | null = null;
 function normalizeUrlKey(url: string): string {
   try {
     const parsed = new URL(url);
-    return parsed.href.replace(/\/$/, '').replace('://www.', '://');
+    // Normalize protocol: http → https
+    parsed.protocol = 'https:';
+    // Remove www. prefix
+    parsed.hostname = parsed.hostname.replace(/^www\./, '');
+    // Remove fragment
+    parsed.hash = '';
+    // Remove UTM tracking parameters and sort remaining params
+    const params = new URLSearchParams(parsed.search);
+    const keysToDelete: string[] = [];
+    for (const key of params.keys()) {
+      if (key.startsWith('utm_')) {
+        keysToDelete.push(key);
+      }
+    }
+    for (const key of keysToDelete) {
+      params.delete(key);
+    }
+    params.sort();
+    parsed.search = params.toString();
+    // Remove trailing slash
+    return parsed.href.replace(/\/$/, '');
   } catch {
     return url;
   }
