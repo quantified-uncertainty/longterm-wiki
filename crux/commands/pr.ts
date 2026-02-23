@@ -18,6 +18,33 @@ import type { CommandResult } from '../lib/cli.ts';
 
 type CommandOptions = Record<string, unknown>;
 
+/**
+ * Bigram Jaccard similarity between two text strings.
+ * Returns 0.0 (no overlap) to 1.0 (identical).
+ * Used to detect copy-pasted PR descriptions.
+ */
+export function bigramSimilarity(a: string, b: string): number {
+  const toBigrams = (s: string): Set<string> => {
+    const words = s.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+    const set = new Set<string>();
+    for (let i = 0; i < words.length - 1; i++) {
+      set.add(`${words[i]} ${words[i + 1]}`);
+    }
+    return set;
+  };
+
+  const setA = toBigrams(a);
+  const setB = toBigrams(b);
+  if (setA.size === 0 || setB.size === 0) return 0;
+
+  let intersection = 0;
+  for (const bg of setA) {
+    if (setB.has(bg)) intersection++;
+  }
+
+  return intersection / (setA.size + setB.size - intersection);
+}
+
 interface GitHubPR {
   number: number;
   html_url: string;
@@ -153,29 +180,41 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
     };
   }
 
-  // Dedup check: warn if this PR's Closes #N overlaps with recently merged PRs (#819)
+  // Quality checks on PR body: dedup (#819) and copy-paste detection
   if (body) {
-    const closesRefs = [...body.matchAll(/(?:Closes|Fixes|Resolves)\s+#(\d+)/gi)].map(m => parseInt(m[1], 10));
-    if (closesRefs.length > 0) {
-      try {
-        const recentPRs = await githubApi<Array<{ number: number; title: string; body: string | null; merged_at: string | null }>>(
-          `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=20`
+    try {
+      const recentPRs = await githubApi<Array<{ number: number; title: string; body: string | null; merged_at: string | null }>>(
+        `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=20`
+      );
+      const recentMerged = recentPRs.filter(pr => pr.merged_at);
+
+      // Check 1: Dedup — warn if Closes #N overlaps with recently merged PRs (#819)
+      const closesRefs = [...body.matchAll(/(?:Closes|Fixes|Resolves)\s+#(\d+)/gi)].map(m => parseInt(m[1], 10));
+      for (const ref of closesRefs) {
+        const overlap = recentMerged.find(pr =>
+          pr.body && new RegExp(`(?:Closes|Fixes|Resolves)\\s+#${ref}\\b`, 'i').test(pr.body)
         );
-        const recentMerged = recentPRs.filter(pr => pr.merged_at);
-        for (const ref of closesRefs) {
-          const overlap = recentMerged.find(pr =>
-            pr.body && new RegExp(`(?:Closes|Fixes|Resolves)\\s+#${ref}\\b`, 'i').test(pr.body)
+        if (overlap) {
+          log.warn(
+            `Issue #${ref} was already closed by PR #${overlap.number} ("${overlap.title}"). ` +
+            `This may be a duplicate fix.`
           );
-          if (overlap) {
-            log.warn(
-              `Issue #${ref} was already closed by PR #${overlap.number} ("${overlap.title}"). ` +
-              `This may be a duplicate fix.`
-            );
-          }
         }
-      } catch {
-        // Dedup check is best-effort — don't block PR creation if it fails
       }
+
+      // Check 2: Copy-paste detection — warn if body is suspiciously similar to a recent PR
+      for (const pr of recentMerged) {
+        if (!pr.body || pr.body.trim().length < 50) continue;
+        const sim = bigramSimilarity(body, pr.body);
+        if (sim >= 0.6) {
+          log.warn(
+            `PR body is ${Math.round(sim * 100)}% similar to recently merged PR #${pr.number} ("${pr.title}"). ` +
+            `This may be a copy-pasted description from the wrong PR.`
+          );
+        }
+      }
+    } catch {
+      // Quality checks are best-effort — don't block PR creation if they fail
     }
   }
 
