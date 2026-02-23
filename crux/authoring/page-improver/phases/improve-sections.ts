@@ -261,7 +261,7 @@ export async function improveSectionsPhase(
   // ── Footnote renumbering ──────────────────────────────────────────────────
   // Converts [^SRC-N] markers (section-writer) to [^N] (pipeline convention).
 
-  const renumbered = renumberFootnotes(reassembled);
+  const renumbered = renumberFootnotes(reassembled, { warn: true });
 
   // ── Update lastEdited ────────────────────────────────────────────────────
 

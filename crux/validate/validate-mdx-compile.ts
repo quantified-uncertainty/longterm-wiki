@@ -23,6 +23,20 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import remarkMath from 'remark-math';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+import { join } from 'path';
+
+// remark-gfm and remark-directive live in apps/web/node_modules (not the root).
+// Use createRequire to resolve them from the app directory.
+const appRequire = createRequire(join(process.cwd(), 'apps/web/package.json'));
+let remarkGfm: any;
+let remarkDirective: any;
+try {
+  remarkGfm = appRequire('remark-gfm').default ?? appRequire('remark-gfm');
+  remarkDirective = appRequire('remark-directive').default ?? appRequire('remark-directive');
+} catch {
+  // Graceful fallback — run without these plugins if not available
+}
 
 // Use shared libraries
 import { findMdxFiles } from '../lib/file-utils.ts';
@@ -182,7 +196,13 @@ async function validateFile(filePath: string): Promise<ValidationFileResult> {
   try {
     await compile(content, {
       development: false,
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkMath],
+      remarkPlugins: [
+        remarkFrontmatter,
+        remarkMdxFrontmatter,
+        remarkMath,
+        ...(remarkGfm ? [remarkGfm] : []),         // GitHub tables, strikethrough — matches production
+        ...(remarkDirective ? [remarkDirective] : []),    // :::note, :::tip syntax — matches production
+      ],
       recmaPlugins: [],
     });
     return { success: true };

@@ -473,6 +473,129 @@ describe('deduplicateSectionMarkers', () => {
   });
 });
 
+describe('renumberFootnotes — round-trip semantic correctness (#820)', () => {
+  it('claim-to-source mapping survives dedup + renumber pipeline', () => {
+    // Three sections, each with a distinct claim → source mapping
+    const sections: ParsedSection[] = [
+      {
+        id: 'background',
+        heading: '## Background',
+        content: '## Background\n\nFounded in 2000.[^SRC-1] Expanded in 2010.[^SRC-2]\n\n[^SRC-1]: MIRI History (https://miri.org/history)\n[^SRC-2]: MIRI Expansion (https://miri.org/expand)',
+      },
+      {
+        id: 'funding',
+        heading: '## Funding',
+        content: '## Funding\n\nRaised $5M in 2015.[^SRC-1] Another $10M in 2020.[^SRC-2]\n\n[^SRC-1]: Funding Report 2015 (https://example.com/funding-2015)\n[^SRC-2]: Funding Report 2020 (https://example.com/funding-2020)',
+      },
+      {
+        id: 'impact',
+        heading: '## Impact',
+        content: '## Impact\n\nPublished 50 papers.[^SRC-1]\n\n[^SRC-1]: Publication List (https://example.com/papers)',
+      },
+    ];
+
+    const deduped = deduplicateSectionMarkers(sections);
+    const reassembled = reassembleSections({
+      frontmatter: '',
+      preamble: '',
+      sections: deduped,
+    });
+    const result = renumberFootnotes(reassembled);
+
+    // Verify ALL 5 sources survived the pipeline
+    expect(result).toContain('MIRI History');
+    expect(result).toContain('MIRI Expansion');
+    expect(result).toContain('Funding Report 2015');
+    expect(result).toContain('Funding Report 2020');
+    expect(result).toContain('Publication List');
+
+    // Verify exactly 5 unique footnote definitions
+    const defMatches = [...result.matchAll(/^\[\^\d+\]:\s/gm)];
+    expect(defMatches).toHaveLength(5);
+
+    // Verify no SRC-style markers leaked through
+    expect(result).not.toMatch(/\[\^SRC-/);
+    expect(result).not.toMatch(/\[\^S\d+-SRC-/);
+
+    // Verify each claim points to the correct source by checking inline ref → definition mapping
+    // "Founded in 2000" appears first → gets [^1], which should point to MIRI History
+    const lines = result.split('\n');
+    const foundedLine = lines.find(l => l.includes('Founded in 2000'));
+    const foundedRef = foundedLine?.match(/\[\^(\d+)\]/)?.[1];
+    expect(foundedRef).toBeDefined();
+    const foundedDef = lines.find(l => l.startsWith(`[^${foundedRef}]:`));
+    expect(foundedDef).toContain('MIRI History');
+
+    // "Raised $5M" → should point to Funding Report 2015
+    const raisedLine = lines.find(l => l.includes('Raised'));
+    const raisedRef = raisedLine?.match(/\[\^(\d+)\]/)?.[1];
+    expect(raisedRef).toBeDefined();
+    const raisedDef = lines.find(l => l.startsWith(`[^${raisedRef}]:`));
+    expect(raisedDef).toContain('Funding Report 2015');
+
+    // "Published 50 papers" → should point to Publication List
+    const pubLine = lines.find(l => l.includes('Published 50'));
+    const pubRef = pubLine?.match(/\[\^(\d+)\]/)?.[1];
+    expect(pubRef).toBeDefined();
+    const pubDef = lines.find(l => l.startsWith(`[^${pubRef}]:`));
+    expect(pubDef).toContain('Publication List');
+  });
+
+  it('detects orphaned refs after renumbering', () => {
+    // Content with a ref [^2] but no definition for it
+    const content = [
+      '## Section',
+      '',
+      'Claim A.[^1] Claim B.[^2]',
+      '',
+      '[^1]: Source One (https://example.com/1)',
+    ].join('\n');
+
+    const result = renumberFootnotes(content);
+    // [^1] → [^1], [^2] → [^2] (renumbered in order)
+    // Both refs should be present but [^2] has no definition
+    expect(result).toContain('[^1]');
+    expect(result).toContain('[^2]');
+    // Definition for [^1] exists
+    expect(result).toContain('[^1]: Source One');
+    // No definition for [^2] — this is the orphan
+    expect(result).not.toContain('[^2]:');
+  });
+
+  it('all inline refs have matching definitions after clean pipeline', () => {
+    // Simulate a clean pipeline output
+    const sections: ParsedSection[] = [
+      {
+        id: 'a',
+        heading: '## A',
+        content: '## A\nFact one.[^SRC-1] Fact two.[^SRC-2]\n\n[^SRC-1]: Source A1 (https://a1.com)\n[^SRC-2]: Source A2 (https://a2.com)',
+      },
+      {
+        id: 'b',
+        heading: '## B',
+        content: '## B\nFact three.[^SRC-1]\n\n[^SRC-1]: Source B1 (https://b1.com)',
+      },
+    ];
+
+    const deduped = deduplicateSectionMarkers(sections);
+    const reassembled = reassembleSections({ frontmatter: '', preamble: '', sections: deduped });
+    const result = renumberFootnotes(reassembled);
+
+    // Extract all inline refs and all definitions
+    const inlineRefs = new Set([...result.matchAll(/\[\^(\d+)\](?!:)/g)].map(m => m[1]));
+    const definitions = new Set([...result.matchAll(/^\[\^(\d+)\]:/gm)].map(m => m[1]));
+
+    // Every inline ref should have a matching definition
+    for (const ref of inlineRefs) {
+      expect(definitions.has(ref)).toBe(true);
+    }
+    // Every definition should have at least one inline ref
+    for (const def of definitions) {
+      expect(inlineRefs.has(def)).toBe(true);
+    }
+  });
+});
+
 describe('filterSourcesForSection', () => {
   it('returns empty array for no sources', () => {
     const section: ParsedSection = { id: 'background', heading: '## Background', content: '## Background\n\nText.' };

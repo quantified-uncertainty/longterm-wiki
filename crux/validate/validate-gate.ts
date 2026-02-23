@@ -117,6 +117,7 @@ const FIX_STEPS: Step[] = [
 const UNIFIED_BLOCKING_RULES = [
   'comparison-operators',
   'dollar-signs',
+  'footnote-integrity',
   'frontmatter-schema',
   'no-quoted-subcategory',
   'numeric-id-integrity',
@@ -174,6 +175,14 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-returning-guard.ts'],
     cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'mdx-compile',
+    name: 'MDX compilation smoke-test (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-mdx-compile.ts', '--quick'],
+    cwd: PROJECT_ROOT,
+    advisory: true,
   },
   {
     id: 'typecheck-crux',
