@@ -31,6 +31,8 @@ import { getApiKey } from './api-keys.ts';
 import { fetchSources } from './source-fetcher.ts';
 import { createLlmClient, streamingCreate, extractText, MODELS } from './llm.ts';
 import type { SourceCacheEntry } from './section-writer.ts';
+import type { CostTracker } from './cost-tracker.ts';
+import { MODEL_PRICING } from './pricing.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces
@@ -76,6 +78,8 @@ export interface ResearchRequest {
   config?: ResearchConfig;
   /** Hard budget cap in USD — stops searching/fetching when exceeded (default: 5.00). */
   budgetCap?: number;
+  /** If provided, records actual API costs for fact-extraction calls. */
+  tracker?: CostTracker;
 }
 
 /** Cost breakdown for the research run. */
@@ -150,9 +154,10 @@ const DEFAULT_MAX_RESULTS_PER_SOURCE = 8;
 const DEFAULT_MAX_URLS_TO_FETCH = 20;
 const DEFAULT_FACTS_PER_SOURCE = 5;
 
-/** Haiku pricing per million tokens (USD). */
-const HAIKU_INPUT_COST_PER_M = 0.80;
-const HAIKU_OUTPUT_COST_PER_M = 4.00;
+/** Haiku pricing per million tokens (USD) — sourced from shared pricing table. */
+const HAIKU_PRICING = MODEL_PRICING['claude-haiku-4-5-20251001'];
+const HAIKU_INPUT_COST_PER_M = HAIKU_PRICING.inputPerM;
+const HAIKU_OUTPUT_COST_PER_M = HAIKU_PRICING.outputPerM;
 
 // ---------------------------------------------------------------------------
 // Exa search
@@ -356,6 +361,7 @@ async function extractFacts(
   content: string,
   query: string,
   factsPerSource: number,
+  tracker?: CostTracker,
 ): Promise<FactExtractionResult> {
   if (!content.trim()) return { facts: [], cost: 0 };
 
@@ -382,7 +388,7 @@ Rules:
       model: MODELS.haiku,
       max_tokens: 500,
       messages: [{ role: 'user', content: prompt }],
-    });
+    }, tracker ? { tracker, label: 'research_facts' } : undefined);
     raw = extractText(response);
     inputTokens = response.usage?.input_tokens ?? 0;
     outputTokens = response.usage?.output_tokens ?? 0;
@@ -438,6 +444,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     pageContext,
     config = {},
     budgetCap = DEFAULT_BUDGET_CAP,
+    tracker,
   } = request;
 
   const {
@@ -590,6 +597,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         fetched.content,
         focusedQuery,
         factsPerSource,
+        tracker,
       );
       facts = extractionResult.facts;
       factExtractionCost += extractionResult.cost;

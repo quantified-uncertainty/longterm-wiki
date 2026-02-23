@@ -40,6 +40,7 @@
 import { z } from 'zod';
 import { createLlmClient, streamLlmCall, MODELS } from './llm.ts';
 import { parseJsonFromLlm } from './json-parsing.ts';
+import type { CostTracker } from './cost-tracker.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces
@@ -154,6 +155,8 @@ export interface SectionWriterOptions {
   model?: string;
   /** Max output tokens.  Defaults to 4000. */
   maxTokens?: number;
+  /** If provided, records actual API cost for this call. */
+  tracker?: CostTracker;
 }
 
 // ---------------------------------------------------------------------------
@@ -499,6 +502,7 @@ export async function rewriteSection(
   const {
     model = MODELS.sonnet,
     maxTokens = 4_000,
+    tracker,
   } = options;
 
   const prompt = buildSectionWriterPrompt(request);
@@ -507,6 +511,8 @@ export async function rewriteSection(
     maxTokens,
     retryLabel: 'section-writer',
     heartbeatPhase: 'section-writer',
+    tracker,
+    label: 'rewrite_section',
   });
 
   return parseGroundedResult(raw, request);
