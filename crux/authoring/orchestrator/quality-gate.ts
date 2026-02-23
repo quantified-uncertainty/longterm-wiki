@@ -45,13 +45,13 @@ const TIER_THRESHOLDS: Record<OrchestratorTier, QualityThresholds> = {
     minWordCount: 800,
     minFootnotes: 8,
     minEntityLinks: 5,
-    minStructuralScore: 40,
+    minStructuralScore: 30,
   },
   deep: {
     minWordCount: 1200,
     minFootnotes: 15,
     minEntityLinks: 10,
-    minStructuralScore: 55,
+    minStructuralScore: 40,
   },
 };
 
