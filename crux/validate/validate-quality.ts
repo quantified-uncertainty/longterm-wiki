@@ -121,12 +121,12 @@ function getImprovementSuggestions(
   const suggestions: string[] = [];
   const neededPoints: number = (targetQuality - 1) * 3; // Rough mapping
 
-  // Tables (0-3 pts)
+  // Tables (0-2 pts)
   if (metrics.tableCount < 2) {
     suggestions.push(`Add ${2 - metrics.tableCount} more table(s) - currently ${metrics.tableCount}`);
   }
 
-  // Diagrams (0-2 pts)
+  // Diagrams (0-1 pts)
   if (metrics.diagramCount < 1) {
     suggestions.push('Add a Mermaid diagram showing key relationships');
   }

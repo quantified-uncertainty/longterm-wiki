@@ -114,6 +114,23 @@ describe('TIER_BUDGETS', () => {
     expect(TIER_BUDGETS.standard.enabledTools).toContain('run_research');
     expect(TIER_BUDGETS.deep.enabledTools).toContain('run_research');
   });
+
+  it('standard and deep tiers include adversarial_review', () => {
+    expect(TIER_BUDGETS.standard.enabledTools).toContain('adversarial_review');
+    expect(TIER_BUDGETS.deep.enabledTools).toContain('adversarial_review');
+  });
+
+  it('polish tier does not include adversarial_review', () => {
+    expect(TIER_BUDGETS.polish.enabledTools).not.toContain('adversarial_review');
+  });
+
+  it('standard tier limits research to 3 queries', () => {
+    expect(TIER_BUDGETS.standard.maxResearchQueries).toBe(3);
+  });
+
+  it('deep tier limits research to 8 queries', () => {
+    expect(TIER_BUDGETS.deep.maxResearchQueries).toBe(8);
+  });
 });
 
 // ---------------------------------------------------------------------------
