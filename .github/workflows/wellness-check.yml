@@ -57,6 +57,7 @@ jobs:
       ok: ${{ steps.check.outputs.ok }}
       summary: ${{ steps.check.outputs.summary }}
       detail: ${{ steps.check.outputs.detail }}
+      counts: ${{ steps.check.outputs.counts }}
 
     steps:
       - name: Check /health endpoint + DB sanity
@@ -133,6 +134,9 @@ jobs:
           echo "$DETAIL" >> "$GITHUB_OUTPUT"
           echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
 
+          # Machine-readable counts for CSV artifact
+          echo "counts=${TOTAL_PAGES},${TOTAL_ENTITIES},${TOTAL_FACTS}" >> "$GITHUB_OUTPUT"
+
           if [ -n "$FAILURES" ]; then
             echo "ok=false" >> "$GITHUB_OUTPUT"
             echo "summary=DB/server health issues detected" >> "$GITHUB_OUTPUT"
@@ -147,6 +151,8 @@ jobs:
 
   api-smoke-tests:
     name: API smoke tests
+    needs: [server-health]
+    if: always()
     runs-on: ubuntu-latest
     outputs:
       ok: ${{ steps.check.outputs.ok }}
@@ -159,9 +165,18 @@ jobs:
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          SERVER_WAS_OK: ${{ needs.server-health.outputs.ok }}
         run: |
           FAILURES=""
           RESULTS=""
+
+          # Skip if server health check already failed — avoids double-reporting
+          if [ "$SERVER_WAS_OK" = "false" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Skipped (server health check failed)" >> "$GITHUB_OUTPUT"
+            echo "detail=API smoke tests skipped because server health check failed." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           if [ -z "$LONGTERMWIKI_SERVER_URL" ]; then
             echo "ok=false" >> "$GITHUB_OUTPUT"
@@ -177,20 +192,25 @@ jobs:
             local url="$2"
             local jq_check="$3"  # jq expression that must return 'true'
 
-            HTTP_CODE=$(curl -sf -o /tmp/smoke_response.json -w "%{http_code}" \
-              --max-time 15 -H "$AUTH_HEADER" "$url" 2>/dev/null) || HTTP_CODE="000"
+            # Capture HTTP code + latency in one request
+            CURL_OUT=$(curl -sf -o /tmp/smoke_response.json \
+              -w "%{http_code} %{time_total}" \
+              --max-time 15 -H "$AUTH_HEADER" "$url" 2>/dev/null) || CURL_OUT="000 0"
+            HTTP_CODE=$(echo "$CURL_OUT" | cut -d' ' -f1)
+            LATENCY_RAW=$(echo "$CURL_OUT" | cut -d' ' -f2)
+            LATENCY_MS=$(awk "BEGIN {printf \"%d\", $LATENCY_RAW * 1000}" 2>/dev/null || echo "?")
 
             if [ "$HTTP_CODE" = "200" ]; then
               if [ -n "$jq_check" ]; then
                 VALID=$(jq -r "$jq_check" /tmp/smoke_response.json 2>/dev/null || echo "false")
                 if [ "$VALID" = "true" ]; then
-                  RESULTS="$RESULTS\n| $name | PASS | HTTP 200, check passed |"
+                  RESULTS="$RESULTS\n| $name | PASS | HTTP 200, ${LATENCY_MS}ms |"
                 else
                   RESULTS="$RESULTS\n| $name | FAIL | HTTP 200 but jq check failed: $jq_check |"
                   FAILURES="$FAILURES\n- $name: response check failed"
                 fi
               else
-                RESULTS="$RESULTS\n| $name | PASS | HTTP 200 |"
+                RESULTS="$RESULTS\n| $name | PASS | HTTP 200, ${LATENCY_MS}ms |"
               fi
             else
               RESULTS="$RESULTS\n| $name | FAIL | HTTP $HTTP_CODE |"
@@ -534,7 +554,99 @@ jobs:
           fi
 
 # ─────────────────────────────────────────
-# Job 6 — PR & issue quality review
+# Job 6 — Job queue health
+# ─────────────────────────────────────────
+
+  job-queue-health:
+    name: Job queue health
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      summary: ${{ steps.check.outputs.summary }}
+      detail: ${{ steps.check.outputs.detail }}
+
+    steps:
+      - name: Check job queue stats
+        id: check
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+        run: |
+          FAILURES=""
+          RESULTS=""
+
+          if [ -z "$LONGTERMWIKI_SERVER_URL" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Skipped (LONGTERMWIKI_SERVER_URL not set)" >> "$GITHUB_OUTPUT"
+            echo "detail=Secret not configured" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          AUTH_HEADER="Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}"
+
+          HTTP_CODE=$(curl -sf -o /tmp/jobs_stats.json -w "%{http_code}" \
+            --max-time 15 -H "$AUTH_HEADER" \
+            "${LONGTERMWIKI_SERVER_URL}/api/jobs/stats" 2>/dev/null) || HTTP_CODE="000"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Skipped (HTTP $HTTP_CODE from /api/jobs/stats)" >> "$GITHUB_OUTPUT"
+            echo "detail=Jobs stats endpoint returned HTTP $HTTP_CODE" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TOTAL_JOBS=$(jq -r '.totalJobs // 0' /tmp/jobs_stats.json 2>/dev/null || echo "0")
+          RESULTS="$RESULTS\n| Total jobs | INFO | $TOTAL_JOBS |"
+
+          # Check each job type for high failure rates and stuck jobs
+          TYPES=$(jq -r '.byType | keys[]' /tmp/jobs_stats.json 2>/dev/null || echo "")
+
+          while IFS= read -r job_type; do
+            [ -z "$job_type" ] && continue
+
+            PENDING=$(jq -r ".byType[\"$job_type\"].byStatus.pending // 0" /tmp/jobs_stats.json 2>/dev/null || echo "0")
+            RUNNING=$(jq -r ".byType[\"$job_type\"].byStatus.running // 0" /tmp/jobs_stats.json 2>/dev/null || echo "0")
+            FAILED=$(jq -r ".byType[\"$job_type\"].byStatus.failed // 0" /tmp/jobs_stats.json 2>/dev/null || echo "0")
+            FAILURE_RATE=$(jq -r ".byType[\"$job_type\"].failureRate // 0" /tmp/jobs_stats.json 2>/dev/null || echo "0")
+            AVG_MS=$(jq -r ".byType[\"$job_type\"].avgDurationMs // \"N/A\"" /tmp/jobs_stats.json 2>/dev/null || echo "N/A")
+
+            FAILURE_PCT=$(awk "BEGIN {printf \"%d\", $FAILURE_RATE * 100}" 2>/dev/null || echo "?")
+
+            # Alert if failure rate >50% for a job type with significant volume
+            TOTAL_TYPE=$(jq -r "(.byType[\"$job_type\"].byStatus | to_entries | map(.value) | add) // 0" /tmp/jobs_stats.json 2>/dev/null || echo "0")
+            if [ "$FAILURE_PCT" -gt 50 ] && [ "$TOTAL_TYPE" -gt 5 ] 2>/dev/null; then
+              RESULTS="$RESULTS\n| $job_type | WARN | ${FAILURE_PCT}% failure rate (${FAILED} failed) |"
+              FAILURES="$FAILURES\n- $job_type: ${FAILURE_PCT}% failure rate"
+            else
+              RESULTS="$RESULTS\n| $job_type | PASS | pending=$PENDING running=$RUNNING failed=$FAILED failure=${FAILURE_PCT}% avg=${AVG_MS}ms |"
+            fi
+          done <<< "$TYPES"
+
+          # Alert on large pending backlog (>100 jobs pending) for any single type
+          LARGE_PENDING=$(jq -r '[.byType | to_entries[] | select(.value.byStatus.pending? // 0 > 100) | "\(.key): \(.value.byStatus.pending) pending"] | .[]' /tmp/jobs_stats.json 2>/dev/null || echo "")
+          if [ -n "$LARGE_PENDING" ]; then
+            while IFS= read -r item; do
+              RESULTS="$RESULTS\n| Large backlog | WARN | $item |"
+              FAILURES="$FAILURES\n- Large job backlog: $item"
+            done <<< "$LARGE_PENDING"
+          fi
+
+          DETAIL=$(printf "| Job type | Status | Details |\n|----------|--------|---------|%b" "$RESULTS")
+
+          echo "detail<<__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+          echo "$DETAIL" >> "$GITHUB_OUTPUT"
+          echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILURES" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=Job queue issues detected" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Job queue healthy ($TOTAL_JOBS total jobs)" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────
+# Job 7 — PR & issue quality review
 # ─────────────────────────────────────────
 
   pr-issue-review:
@@ -542,7 +654,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
-      issues: read
+      issues: write
     outputs:
       ok: ${{ steps.check.outputs.ok }}
       summary: ${{ steps.check.outputs.summary }}
@@ -646,8 +758,23 @@ jobs:
           if [ -n "$STUCK" ]; then
             COUNT=$(echo "$STUCK" | grep -c "^" 2>/dev/null || echo "0")
             FAILURES="$FAILURES\n- $COUNT issue(s) stuck with claude-working label for 8+ hours"
+            # Auto-remove stale claude-working labels (self-healing)
+            STUCK_NUMS=$(echo "$STUCK_ISSUES" | jq -r --argjson now "$NOW_EPOCH" '
+              .[] |
+              select(
+                ($now - ((.updatedAt // .createdAt) | fromdateiso8601)) > 28800
+              ) |
+              .number
+            ' 2>/dev/null || echo "")
+            while IFS= read -r issue_num; do
+              [ -z "$issue_num" ] && continue
+              gh issue edit "$issue_num" \
+                --repo "${{ github.repository }}" \
+                --remove-label "claude-working" 2>/dev/null && \
+                echo "Auto-removed claude-working label from #$issue_num" || true
+            done <<< "$STUCK_NUMS"
             while IFS= read -r issue; do
-              RESULTS="$RESULTS\n| Stuck claude-working | WARN | $issue |"
+              RESULTS="$RESULTS\n| Stuck claude-working (auto-fixed) | WARN | $issue |"
             done <<< "$STUCK"
           else
             RESULTS="$RESULTS\n| claude-working labels | PASS | No stuck sessions |"
@@ -689,6 +816,7 @@ jobs:
       - github-actions-health
       - frontend-health
       - data-freshness
+      - job-queue-health
       - pr-issue-review
     if: always()
     runs-on: ubuntu-latest
@@ -702,6 +830,7 @@ jobs:
           SERVER_OK: ${{ needs.server-health.outputs.ok }}
           SERVER_SUMMARY: ${{ needs.server-health.outputs.summary }}
           SERVER_DETAIL: ${{ needs.server-health.outputs.detail }}
+          SERVER_COUNTS: ${{ needs.server-health.outputs.counts }}
           API_OK: ${{ needs.api-smoke-tests.outputs.ok }}
           API_SUMMARY: ${{ needs.api-smoke-tests.outputs.summary }}
           API_DETAIL: ${{ needs.api-smoke-tests.outputs.detail }}
@@ -714,6 +843,9 @@ jobs:
           FRESHNESS_OK: ${{ needs.data-freshness.outputs.ok }}
           FRESHNESS_SUMMARY: ${{ needs.data-freshness.outputs.summary }}
           FRESHNESS_DETAIL: ${{ needs.data-freshness.outputs.detail }}
+          JOB_QUEUE_OK: ${{ needs.job-queue-health.outputs.ok }}
+          JOB_QUEUE_SUMMARY: ${{ needs.job-queue-health.outputs.summary }}
+          JOB_QUEUE_DETAIL: ${{ needs.job-queue-health.outputs.detail }}
           PR_REVIEW_OK: ${{ needs.pr-issue-review.outputs.ok }}
           PR_REVIEW_SUMMARY: ${{ needs.pr-issue-review.outputs.summary }}
           PR_REVIEW_DETAIL: ${{ needs.pr-issue-review.outputs.detail }}
@@ -723,7 +855,7 @@ jobs:
           icon() { [ "$1" = "true" ] && echo ":green_circle:" || echo ":red_circle:"; }
 
           OVERALL_OK=true
-          for OK in "$SERVER_OK" "$API_OK" "$GHA_OK" "$FRONTEND_OK" "$FRESHNESS_OK" "$PR_REVIEW_OK"; do
+          for OK in "$SERVER_OK" "$API_OK" "$GHA_OK" "$FRONTEND_OK" "$FRESHNESS_OK" "$JOB_QUEUE_OK" "$PR_REVIEW_OK"; do
             [ "$OK" = "false" ] && OVERALL_OK=false
           done
 
@@ -738,6 +870,7 @@ jobs:
             echo "| GitHub Actions | $(icon "$GHA_OK") | $GHA_SUMMARY |"
             echo "| Frontend | $(icon "$FRONTEND_OK") | $FRONTEND_SUMMARY |"
             echo "| Data freshness | $(icon "$FRESHNESS_OK") | $FRESHNESS_SUMMARY |"
+            echo "| Job queue | $(icon "$JOB_QUEUE_OK") | $JOB_QUEUE_SUMMARY |"
             echo "| PR & issue quality | $(icon "$PR_REVIEW_OK") | $PR_REVIEW_SUMMARY |"
             echo ""
             if [ "$OVERALL_OK" = "true" ]; then
@@ -776,6 +909,12 @@ jobs:
             echo ""
             echo "</details>"
             echo ""
+            echo "<details><summary>Job queue details</summary>"
+            echo ""
+            echo "$JOB_QUEUE_DETAIL"
+            echo ""
+            echo "</details>"
+            echo ""
             echo "<details><summary>PR & issue quality details</summary>"
             echo ""
             echo "$PR_REVIEW_DETAIL"
@@ -794,6 +933,7 @@ jobs:
           | GitHub Actions | __GHA_ICON__ | __GHA_SUMMARY__ |
           | Frontend | __FRONTEND_ICON__ | __FRONTEND_SUMMARY__ |
           | Data freshness | __FRESHNESS_ICON__ | __FRESHNESS_SUMMARY__ |
+          | Job queue | __JOB_QUEUE_ICON__ | __JOB_QUEUE_SUMMARY__ |
           | PR & issue quality | __PR_REVIEW_ICON__ | __PR_REVIEW_SUMMARY__ |
 
           **Detected at:** __TIMESTAMP__
@@ -817,6 +957,10 @@ jobs:
           ### Data freshness
 
           __FRESHNESS_DETAIL__
+
+          ### Job queue
+
+          __JOB_QUEUE_DETAIL__
 
           ### PR & issue quality
 
@@ -855,6 +999,9 @@ jobs:
               '__FRESHNESS_ICON__': icon(os.environ.get('FRESHNESS_OK', 'false')),
               '__FRESHNESS_SUMMARY__': os.environ.get('FRESHNESS_SUMMARY', ''),
               '__FRESHNESS_DETAIL__': os.environ.get('FRESHNESS_DETAIL', ''),
+              '__JOB_QUEUE_ICON__': icon(os.environ.get('JOB_QUEUE_OK', 'false')),
+              '__JOB_QUEUE_SUMMARY__': os.environ.get('JOB_QUEUE_SUMMARY', ''),
+              '__JOB_QUEUE_DETAIL__': os.environ.get('JOB_QUEUE_DETAIL', ''),
               '__PR_REVIEW_ICON__': icon(os.environ.get('PR_REVIEW_OK', 'false')),
               '__PR_REVIEW_SUMMARY__': os.environ.get('PR_REVIEW_SUMMARY', ''),
               '__PR_REVIEW_DETAIL__': os.environ.get('PR_REVIEW_DETAIL', ''),
@@ -909,3 +1056,25 @@ jobs:
               echo "All checks passed. No open wellness issue to close."
             fi
           fi
+
+          # Write historical counts line for artifact upload
+          # Format: timestamp,pages,entities,facts,server_ok,api_ok,gha_ok,frontend_ok,freshness_ok,job_queue_ok,pr_review_ok
+          printf "%s,%s,%s,%s,%s,%s,%s,%s,%s\n" \
+            "$TIMESTAMP" \
+            "${SERVER_COUNTS:-,,}" \
+            "${SERVER_OK:-?}" \
+            "${API_OK:-?}" \
+            "${GHA_OK:-?}" \
+            "${FRONTEND_OK:-?}" \
+            "${FRESHNESS_OK:-?}" \
+            "${JOB_QUEUE_OK:-?}" \
+            "${PR_REVIEW_OK:-?}" \
+            >> /tmp/wellness-counts.csv
+          echo "Wrote counts line to wellness-counts.csv"
+
+      - name: Upload counts artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wellness-counts-${{ github.run_number }}
+          path: /tmp/wellness-counts.csv
+          retention-days: 90
