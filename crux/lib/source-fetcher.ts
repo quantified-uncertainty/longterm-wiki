@@ -544,6 +544,7 @@ function saveToDb(url: string, title: string, content: string, httpStatus: numbe
       pageTitle: title,
       fullHtml: null,
       fullText: content,
+      contentLength: content.length,
     });
   } catch {
     // DB unavailable — fine, proceed without cache
@@ -656,34 +657,7 @@ async function _fetchSourceCore(
   const dbMaxAgeMs = request.maxAgeMs ?? DB_CACHE_TTL_MS;
   const now = new Date().toISOString();
 
-  // ---- 1. YouTube transcript (short-circuit before cache/unverifiable checks) ----
-  if (isYoutubeUrl(url)) {
-    const transcriptResult = await fetchYoutubeTranscript(url);
-    const content = transcriptResult?.content ?? '';
-    const excerpts = extractMode === 'relevant' && query && content
-      ? extractRelevantExcerpts(content, query)
-      : [];
-    const status: FetchedSourceStatus = content.length > 0 ? 'ok' : 'error';
-    const result: FetchedSource = {
-      url,
-      title: resource?.title ?? '',
-      fetchedAt: now,
-      content,
-      relevantExcerpts: excerpts,
-      status,
-      contentType: 'transcript',
-      resource: resourceMeta,
-    };
-    // Cache successful transcript fetches
-    if (content.length > 0) {
-      saveToDb(url, result.title, content, 200, 'transcript');
-      saveToPostgres(url, result.title, content, 200, 'transcript');
-      sessionCacheSet(url, result);
-    }
-    return result;
-  }
-
-  // ---- 2. Unverifiable domains ----
+  // ---- 1. Unverifiable domains ----
   if (isUnverifiable(url)) {
     const result: FetchedSource = {
       url, title: resource?.title ?? '', fetchedAt: now, content: '',
@@ -693,7 +667,8 @@ async function _fetchSourceCore(
     return result;
   }
 
-  // ---- 3. PostgreSQL cross-machine cache (async, durable source of truth) ----
+  // ---- 2. PostgreSQL cross-machine cache (async, durable source of truth) ----
+  // Applies to all URL types including YouTube (transcripts are cached after first fetch).
   const pgRow = await loadFromPostgres(url, pgMaxAgeMs);
   if (pgRow) {
     const excerpts = extractMode === 'relevant' && query
@@ -716,7 +691,7 @@ async function _fetchSourceCore(
     return result;
   }
 
-  // ---- 4. SQLite local cache (fast fallback when PostgreSQL is unavailable) ----
+  // ---- 3. SQLite local cache (fast fallback when PostgreSQL is unavailable) ----
   const dbRow = loadFromDb(url, dbMaxAgeMs);
   if (dbRow) {
     const excerpts = extractMode === 'relevant' && query
@@ -734,6 +709,34 @@ async function _fetchSourceCore(
       resource: resourceMeta,
     };
     sessionCacheSet(url, result);
+    return result;
+  }
+
+  // ---- 4. YouTube transcript (cache miss — fetch from API) ----
+  // Checked after cache reads so cached transcripts are served without re-fetching.
+  if (isYoutubeUrl(url)) {
+    const transcriptResult = await fetchYoutubeTranscript(url);
+    const content = transcriptResult?.content ?? '';
+    const excerpts = extractMode === 'relevant' && query && content
+      ? extractRelevantExcerpts(content, query)
+      : [];
+    const status: FetchedSourceStatus = content.length > 0 ? 'ok' : 'error';
+    const result: FetchedSource = {
+      url,
+      title: resource?.title ?? '',
+      fetchedAt: now,
+      content,
+      relevantExcerpts: excerpts,
+      status,
+      contentType: 'transcript',
+      resource: resourceMeta,
+    };
+    // Cache successful transcript fetches for cross-session reuse
+    if (content.length > 0) {
+      saveToDb(url, result.title, content, 200, 'transcript');
+      saveToPostgres(url, result.title, content, 200, 'transcript');
+      sessionCacheSet(url, result);
+    }
     return result;
   }
 
@@ -783,7 +786,7 @@ async function _fetchSourceCore(
     }
   }
 
-  // ---- 6. Determine status ----
+  // ---- 5b. Determine status ----
   let status: FetchedSourceStatus;
   if (fetchError && httpStatus === 0) {
     status = 'error';
@@ -799,18 +802,18 @@ async function _fetchSourceCore(
     status = 'ok';
   }
 
-  // ---- 7. Persist to SQLite (fast local cache) and PostgreSQL (durable source of truth) ----
+  // ---- 6. Persist to SQLite (fast local cache) and PostgreSQL (durable source of truth) ----
   if (content.length > 0) {
     saveToDb(url, title, content, httpStatus, fetchedContentType);
     saveToPostgres(url, title, content, httpStatus, fetchedContentType);
   }
 
-  // ---- 8. Extract excerpts ----
+  // ---- 7. Extract excerpts ----
   const excerpts = extractMode === 'relevant' && query && content
     ? extractRelevantExcerpts(content, query)
     : [];
 
-  // ---- 9. Use resource title as fallback ----
+  // ---- 8. Use resource title as fallback ----
   const finalTitle = title || resource?.title || '';
 
   const result: FetchedSource = {
@@ -818,10 +821,10 @@ async function _fetchSourceCore(
     status, contentType: fetchedContentType, resource: resourceMeta,
   };
 
-  // ---- 10. Store in session cache ----
+  // ---- 9. Store in session cache ----
   sessionCacheSet(url, result);
 
-  // ---- 11. Reflect status back to resource YAML (if requested) ----
+  // ---- 10. Reflect status back to resource YAML (if requested) ----
 
   if (request.updateResourceStatus && resource) {
     try {
@@ -844,9 +847,10 @@ async function _fetchSourceCore(
  * Caching layers:
  *   1. In-memory session cache (fastest, LRU-evicted at 500 entries)
  *   2. In-flight dedup (concurrent requests for same URL share one fetch)
- *   3. PostgreSQL (wiki-server) — durable cross-machine source of truth
+ *   3. PostgreSQL (wiki-server) — durable cross-machine source of truth (all URL types incl. YouTube)
  *   4. SQLite — fast local fallback (used when PostgreSQL is unavailable)
- *   5. Network fetch (Firecrawl preferred, built-in fallback)
+ *   5. YouTube transcript API (if URL is YouTube and no cache hit)
+ *   5. Network fetch (Firecrawl preferred, built-in fallback; arXiv rewritten to ar5iv)
  *
  * Writes: successful network fetches are stored in both SQLite (fast local cache)
  * and PostgreSQL (durable, fire-and-forget).

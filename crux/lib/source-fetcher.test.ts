@@ -1276,9 +1276,17 @@ describe('arXiv URL rewriting', () => {
 // ---------------------------------------------------------------------------
 
 describe('YouTube transcript', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     clearSessionCache();
     vi.restoreAllMocks();
+    // Re-setup module-level mocks after restoreAllMocks resets their implementations.
+    // YouTube URLs now go through PG/SQLite cache checks before the transcript API,
+    // so these mocks must be present (defaulting to "unavailable") for all YouTube tests.
+    const { getCitationContentByUrl, upsertCitationContent } = await import('./wiki-server/citations.ts');
+    (getCitationContentByUrl as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, error: 'unavailable', message: 'no server' });
+    (upsertCitationContent as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: { url: 'https://example.com' } });
+    const { citationContent } = await import('./knowledge-db.ts');
+    (citationContent.getByUrl as ReturnType<typeof vi.fn>).mockReturnValue(null);
   });
 
   it('returns ok status and contentType=transcript for YouTube URLs', async () => {
@@ -1361,5 +1369,42 @@ describe('YouTube transcript', () => {
     expect(result.status).toBe('ok');
     expect(result.relevantExcerpts.length).toBeGreaterThan(0);
     expect(result.relevantExcerpts.some(e => e.toLowerCase().includes('alignment') || e.toLowerCase().includes('safety'))).toBe(true);
+  });
+
+  it('serves YouTube transcript from PostgreSQL cache (no API call on cache hit)', async () => {
+    const { getCitationContentByUrl } = await import('./wiki-server/citations.ts');
+    const getMock = getCitationContentByUrl as ReturnType<typeof vi.fn>;
+    const recentDate = new Date(Date.now() - 3600_000).toISOString(); // 1 hour ago (within TTL)
+    getMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        url: 'https://www.youtube.com/watch?v=cached123',
+        pageTitle: '',
+        fullText: 'Cached transcript: AI safety is important for the future of humanity.',
+        fetchedAt: recentDate,
+        httpStatus: 200,
+        contentType: 'text/plain', // transcripts are stored as text/plain
+        fullTextPreview: null,
+        contentLength: 67,
+        contentHash: null,
+        createdAt: recentDate,
+        updatedAt: recentDate,
+      },
+    });
+
+    const { YoutubeTranscript } = await import('youtube-transcript');
+    const transcriptMock = YoutubeTranscript.fetchTranscript as ReturnType<typeof vi.fn>;
+    transcriptMock.mockClear();
+
+    const result = await fetchSource({
+      url: 'https://www.youtube.com/watch?v=cached123',
+      extractMode: 'full',
+    });
+
+    expect(result.status).toBe('ok');
+    expect(result.contentType).toBe('transcript');
+    expect(result.content).toContain('Cached transcript');
+    // Transcript API should NOT be called — PG cache hit should short-circuit it
+    expect(transcriptMock).not.toHaveBeenCalled();
   });
 });
