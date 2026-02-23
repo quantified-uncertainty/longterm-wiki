@@ -1393,6 +1393,37 @@ async function main() {
   database.factUsage = factUsage;
   console.log(`  factUsage: ${factRefCount} <F> references across ${Object.keys(factUsage).length} unique facts`);
 
+  // =========================================================================
+  // BLOCK-LEVEL IR — extract per-section metadata (entity links, facts,
+  // citations, components, word counts) via remark AST parsing.
+  // Must run BEFORE rawContent is deleted.
+  // =========================================================================
+  console.log('  Extracting block-level IR...');
+  let blockIRExtracted = 0;
+  let blockIRSections = 0;
+  let blockIRErrors = 0;
+  const blockIndex = {};
+  try {
+    const { extractBlockIR } = await import('../../../crux/lib/block-ir.ts');
+    for (const page of pages) {
+      if (!page.rawContent) continue;
+      try {
+        const ir = extractBlockIR(page.id, page.rawContent);
+        blockIndex[page.id] = ir;
+        blockIRExtracted++;
+        blockIRSections += ir.sections.length;
+      } catch (err) {
+        blockIRErrors++;
+        if (blockIRErrors <= 3) {
+          console.warn(`    ⚠ block-ir error on ${page.id}: ${err.message}`);
+        }
+      }
+    }
+    console.log(`  blockIR: ${blockIRSections} sections across ${blockIRExtracted} pages${blockIRErrors > 0 ? ` (${blockIRErrors} errors)` : ''}`);
+  } catch (err) {
+    console.warn(`  ⚠ block-ir extraction skipped: ${err.message}`);
+  }
+
   // Re-count backlinks after merging content links
   // Enrich pages with backlink counts + citation stats
   let pagesWithCitationStats = 0;
@@ -1679,6 +1710,10 @@ async function main() {
   writeFileSync(join(OUTPUT_DIR, 'pathRegistry.json'), JSON.stringify(pathRegistry, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'pages.json'), JSON.stringify(pages, null, 2));
   writeFileSync(join(OUTPUT_DIR, 'relatedGraph.json'), JSON.stringify(relatedGraph, null, 2));
+  if (Object.keys(blockIndex).length > 0) {
+    writeFileSync(join(OUTPUT_DIR, 'block-index.json'), JSON.stringify(blockIndex));
+    console.log(`✓ Written block-index.json (${Object.keys(blockIndex).length} pages)`);
+  }
 
   console.log('✓ Written individual JSON files');
   console.log('✓ Written derived data files (backlinks, tagIndex, stats, pathRegistry)');

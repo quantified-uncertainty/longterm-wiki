@@ -744,6 +744,238 @@ export async function stats(_args: string[], options: Record<string, unknown>): 
 }
 
 // ---------------------------------------------------------------------------
+// blocks — block-level IR query (from block-index.json)
+// ---------------------------------------------------------------------------
+
+import { loadBlockIndex } from '../lib/content-types.ts';
+import type { SectionBlock } from '../lib/block-ir.ts';
+
+export async function blocks(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean);
+  const c = log.colors;
+
+  const entityFilter = options.entity as string | undefined;
+  const componentFilter = options.component as string | undefined;
+  const uncited = options.uncited as boolean;
+  const pageId = args.find((a) => !a.startsWith('-'));
+
+  const index = loadBlockIndex();
+  const pageCount = Object.keys(index).length;
+
+  if (pageCount === 0) {
+    return {
+      output: `${c.yellow}No block-index.json found. Run: node apps/web/scripts/build-data.mjs${c.reset}`,
+      exitCode: 1,
+    };
+  }
+
+  // --- Per-page view: crux query blocks <page-id> ---
+  if (pageId && !entityFilter && !componentFilter && !uncited) {
+    const ir = index[pageId];
+    if (!ir) {
+      return { output: `${c.yellow}Page not found in block index: ${pageId}${c.reset}`, exitCode: 1 };
+    }
+
+    if (options.json || options.ci) {
+      return { output: JSON.stringify(ir, null, 2), exitCode: 0 };
+    }
+
+    let output = `${c.bold}${c.blue}Blocks: ${ir.pageId}${c.reset}\n`;
+    output += `${c.dim}${ir.sections.length} section${ir.sections.length !== 1 ? 's' : ''}${c.reset}\n\n`;
+
+    for (const s of ir.sections) {
+      const label = s.level === 0 ? `${c.dim}(preamble)${c.reset}` : `${'#'.repeat(s.level)} ${s.heading}`;
+      const flags: string[] = [];
+      if (s.hasSquiggle) flags.push('squiggle');
+      if (s.hasMermaid) flags.push('mermaid');
+      if (s.hasCalc) flags.push('calc');
+      if (s.tables.length > 0) flags.push(`${s.tables.length} table${s.tables.length > 1 ? 's' : ''}`);
+      const flagStr = flags.length > 0 ? ` ${c.dim}[${flags.join(', ')}]${c.reset}` : '';
+
+      output += `${c.bold}${label}${c.reset}${flagStr}\n`;
+      output += `  ${c.dim}lines ${s.startLine}–${s.endLine} · ${s.wordCount} words${c.reset}\n`;
+
+      if (s.entityLinks.length > 0) {
+        output += `  ${c.cyan}entities:${c.reset} ${s.entityLinks.join(', ')}\n`;
+      }
+      if (s.facts.length > 0) {
+        output += `  ${c.cyan}facts:${c.reset} ${s.facts.map(f => `${f.entityId}.${f.factId}`).join(', ')}\n`;
+      }
+      if (s.footnoteRefs.length > 0) {
+        output += `  ${c.cyan}citations:${c.reset} [${s.footnoteRefs.join(', ')}]\n`;
+      }
+      if (s.internalLinks.length > 0) {
+        output += `  ${c.cyan}internal links:${c.reset} ${s.internalLinks.join(', ')}\n`;
+      }
+      output += '\n';
+    }
+
+    // Component summary
+    const comp = ir.components;
+    const parts: string[] = [];
+    if (comp.squiggleCount > 0) parts.push(`${comp.squiggleCount} squiggle`);
+    if (comp.mermaidCount > 0) parts.push(`${comp.mermaidCount} mermaid`);
+    if (comp.calcCount > 0) parts.push(`${comp.calcCount} calc`);
+    if (comp.calloutCount > 0) parts.push(`${comp.calloutCount} callout`);
+    if (comp.dataInfoBoxCount > 0) parts.push(`${comp.dataInfoBoxCount} DataInfoBox`);
+    if (comp.totalTables > 0) parts.push(`${comp.totalTables} table`);
+    if (parts.length > 0) {
+      output += `${c.dim}Components: ${parts.join(', ')}${c.reset}\n`;
+    }
+
+    return { output: output.trimEnd(), exitCode: 0 };
+  }
+
+  // --- Cross-page queries ---
+
+  // crux query blocks --entity=<id>
+  if (entityFilter) {
+    const limit = parseIntOpt(options.limit, 20);
+    const results: Array<{ pageId: string; section: SectionBlock }> = [];
+
+    for (const ir of Object.values(index)) {
+      for (const s of ir.sections) {
+        if (s.entityLinks.includes(entityFilter)) {
+          results.push({ pageId: ir.pageId, section: s });
+        }
+      }
+    }
+
+    if (options.json || options.ci) {
+      return { output: JSON.stringify(results.slice(0, limit), null, 2), exitCode: 0 };
+    }
+
+    if (results.length === 0) {
+      return { output: `${c.dim}No sections reference entity "${entityFilter}"${c.reset}`, exitCode: 0 };
+    }
+
+    let output = `${c.bold}${c.blue}Sections referencing entity: ${entityFilter}${c.reset}\n`;
+    output += `${c.dim}${results.length} section${results.length !== 1 ? 's' : ''}${c.reset}\n\n`;
+
+    for (const r of results.slice(0, limit)) {
+      const label = r.section.level === 0 ? '(preamble)' : r.section.heading;
+      output += `${c.cyan}${r.pageId}${c.reset} → ${label} ${c.dim}(${r.section.wordCount} words)${c.reset}\n`;
+    }
+    if (results.length > limit) {
+      output += `\n${c.dim}Showing ${limit} of ${results.length}. Use --limit=N for more.${c.reset}`;
+    }
+
+    return { output: output.trimEnd(), exitCode: 0 };
+  }
+
+  // crux query blocks --component=<type>
+  if (componentFilter) {
+    const limit = parseIntOpt(options.limit, 20);
+    const validComponents = ['squiggle', 'mermaid', 'calc', 'callout', 'datainfobox', 'table'];
+    const normalised = componentFilter.toLowerCase();
+    if (!validComponents.includes(normalised)) {
+      return {
+        output: `${c.red}Unknown component: ${componentFilter}. Valid: ${validComponents.join(', ')}${c.reset}`,
+        exitCode: 1,
+      };
+    }
+
+    const results: Array<{ pageId: string; count: number }> = [];
+    for (const ir of Object.values(index)) {
+      let count = 0;
+      switch (normalised) {
+        case 'squiggle': count = ir.components.squiggleCount; break;
+        case 'mermaid': count = ir.components.mermaidCount; break;
+        case 'calc': count = ir.components.calcCount; break;
+        case 'callout': count = ir.components.calloutCount; break;
+        case 'datainfobox': count = ir.components.dataInfoBoxCount; break;
+        case 'table': count = ir.components.totalTables; break;
+      }
+      if (count > 0) results.push({ pageId: ir.pageId, count });
+    }
+
+    results.sort((a, b) => b.count - a.count);
+
+    if (options.json || options.ci) {
+      return { output: JSON.stringify(results.slice(0, limit), null, 2), exitCode: 0 };
+    }
+
+    if (results.length === 0) {
+      return { output: `${c.dim}No pages use component: ${componentFilter}${c.reset}`, exitCode: 0 };
+    }
+
+    let output = `${c.bold}${c.blue}Pages with ${componentFilter}${c.reset}\n`;
+    output += `${c.dim}${results.length} page${results.length !== 1 ? 's' : ''}${c.reset}\n\n`;
+
+    for (const r of results.slice(0, limit)) {
+      output += `${c.cyan}${r.pageId}${c.reset} ${c.dim}(${r.count})${c.reset}\n`;
+    }
+    if (results.length > limit) {
+      output += `\n${c.dim}Showing ${limit} of ${results.length}. Use --limit=N for more.${c.reset}`;
+    }
+
+    return { output: output.trimEnd(), exitCode: 0 };
+  }
+
+  // crux query blocks --uncited
+  if (uncited) {
+    const minWords = parseIntOpt(options['min-words'], 50);
+    const limit = parseIntOpt(options.limit, 30);
+    const results: Array<{ pageId: string; section: string; wordCount: number }> = [];
+
+    for (const ir of Object.values(index)) {
+      for (const s of ir.sections) {
+        if (s.wordCount >= minWords && s.footnoteRefs.length === 0 && s.level > 0) {
+          results.push({
+            pageId: ir.pageId,
+            section: s.heading,
+            wordCount: s.wordCount,
+          });
+        }
+      }
+    }
+
+    results.sort((a, b) => b.wordCount - a.wordCount);
+
+    if (options.json || options.ci) {
+      return { output: JSON.stringify(results.slice(0, limit), null, 2), exitCode: 0 };
+    }
+
+    if (results.length === 0) {
+      return { output: `${c.green}No uncited sections with >=${minWords} words found.${c.reset}`, exitCode: 0 };
+    }
+
+    let output = `${c.bold}${c.yellow}Uncited Sections (>=${minWords} words, no footnotes)${c.reset}\n`;
+    output += `${c.dim}${results.length} section${results.length !== 1 ? 's' : ''}${c.reset}\n\n`;
+
+    for (const r of results.slice(0, limit)) {
+      output += `${c.cyan}${r.pageId}${c.reset} → ${r.section} ${c.dim}(${r.wordCount} words)${c.reset}\n`;
+    }
+    if (results.length > limit) {
+      output += `\n${c.dim}Showing ${limit} of ${results.length}. Use --limit=N for more.${c.reset}`;
+    }
+
+    return { output: output.trimEnd(), exitCode: 0 };
+  }
+
+  // Default: show summary stats
+  let totalSections = 0;
+  for (const ir of Object.values(index)) {
+    totalSections += ir.sections.length;
+  }
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify({ pages: pageCount, sections: totalSections }, null, 2), exitCode: 0 };
+  }
+
+  let output = `${c.bold}${c.blue}Block Index Summary${c.reset}\n\n`;
+  output += `  ${c.bold}Pages:${c.reset}    ${pageCount}\n`;
+  output += `  ${c.bold}Sections:${c.reset} ${totalSections}\n\n`;
+  output += `${c.dim}Usage:\n`;
+  output += `  crux query blocks <page-id>              Section structure for a page\n`;
+  output += `  crux query blocks --entity=<id>           Find sections referencing entity\n`;
+  output += `  crux query blocks --component=squiggle    Pages using a component type\n`;
+  output += `  crux query blocks --uncited               Sections with no citations${c.reset}`;
+
+  return { output, exitCode: 0 };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -759,6 +991,7 @@ export const commands: Record<string, (args: string[], options: Record<string, u
   citations,
   risk,
   stats,
+  blocks,
   default: stats,
 };
 
@@ -786,6 +1019,10 @@ Commands:
   citations --broken           Wiki-wide broken citations
   risk [page-id]               Hallucination risk scores
   stats                        Wiki-wide statistics (default)
+  blocks <page-id>             Section structure from block-level IR
+  blocks --entity=<id>         Sections referencing a given entity
+  blocks --component=<type>    Pages using a component (squiggle, mermaid, etc.)
+  blocks --uncited             Sections with >50 words and no citations
 
 Options:
   --json                       Machine-readable JSON output
@@ -795,6 +1032,7 @@ Options:
   --level=high|medium|low      Filter risk by level
   --broken                     Show broken citations (for citations command)
   --summary                    Show LLM summary (for page command)
+  --min-words=N                Min word count for --uncited filter (default: 50)
 
 Examples:
   crux query search "compute governance"
@@ -813,5 +1051,9 @@ Examples:
   crux query risk scheming
   crux query risk --level=high --limit=20
   crux query stats
+  crux query blocks anthropic
+  crux query blocks --entity=anthropic
+  crux query blocks --component=squiggle
+  crux query blocks --uncited --min-words=100
 `;
 }
