@@ -73,6 +73,9 @@ import { evaluativeFlattery } from './evaluative-flattery.ts';
 import { footnoteCoverageRule } from './footnote-coverage.ts';
 import { noUrlFootnotesRule } from './no-url-footnotes.ts';
 
+// Citation quality
+import { footnoteQualityRule } from './footnote-quality.ts';
+
 // Citation accuracy
 import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
 
@@ -132,6 +135,7 @@ export {
   evaluativeFlattery,
   footnoteCoverageRule,
   noUrlFootnotesRule,
+  footnoteQualityRule,
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
@@ -182,6 +186,7 @@ export const allRules: Rule[] = [
   evaluativeFlattery,
   footnoteCoverageRule,
   noUrlFootnotesRule,
+  footnoteQualityRule,
   citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
