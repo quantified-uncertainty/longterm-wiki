@@ -120,6 +120,7 @@ const UNIFIED_BLOCKING_RULES = [
   'numeric-id-integrity',
   'pipeline-artifacts',
   'prefer-entitylink',
+  'resource-ref-integrity',
 ];
 
 // Phase 3: Independent checks — run in parallel after build-data completes.
