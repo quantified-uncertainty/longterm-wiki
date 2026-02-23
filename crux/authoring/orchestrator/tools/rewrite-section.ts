@@ -61,6 +61,9 @@ export const tool: ToolRegistration = {
     // Filter sources relevant to this section
     const sectionSources = filterSourcesForSection(section, ctx.sourceCache);
 
+    // Count tables in the original section for preservation check
+    const tablesBefore = (section.content.match(/^\|.+\|$/gm) || []).length;
+
     try {
       const result = await rewriteSection(
         {
@@ -87,13 +90,20 @@ export const tool: ToolRegistration = {
         { model: options.writerModel },
       );
 
+      // Table preservation guard: if the rewrite dropped tables, keep the original (#770, #736)
+      const tablesAfter = (result.content.match(/^\|.+\|$/gm) || []).length;
+      const usedContent = tablesBefore > 0 && tablesAfter < tablesBefore
+        ? section.content
+        : result.content;
+      const tablesFallback = tablesBefore > 0 && tablesAfter < tablesBefore;
+
       // Update the section in context
       const sectionIdx = ctx.sections!.findIndex((s) => s.id === sectionId);
       if (sectionIdx !== -1) {
         ctx.sections![sectionIdx] = {
           id: section.id,
           heading: section.heading,
-          content: result.content,
+          content: usedContent,
         };
 
         // Reassemble the full page from updated sections
@@ -111,7 +121,10 @@ export const tool: ToolRegistration = {
           claimMapEntries: result.claimMap.length,
           unsourceableClaims: result.unsourceableClaims.length,
           wordsBefore: section.content.split(/\s+/).length,
-          wordsAfter: result.content.split(/\s+/).length,
+          wordsAfter: usedContent.split(/\s+/).length,
+          ...(tablesFallback && {
+            tablePreservation: `Rewrite dropped tables (${tablesBefore} → ${tablesAfter}). Kept original section to preserve table data.`,
+          }),
         },
         null,
         2,
