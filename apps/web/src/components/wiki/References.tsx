@@ -10,6 +10,7 @@ import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
 import { getResourceTypeIcon } from "./resource-utils";
 import { cn } from "@lib/utils";
+import { getCitationQuotes, type CitationQuote } from "@/lib/citation-data";
 
 interface ReferencesProps {
   /** Explicit list of resource IDs to display */
@@ -28,15 +29,54 @@ interface ReferencesProps {
   className?: string;
 }
 
+type VerificationVerdict = "accurate" | "minor_issues" | "inaccurate" | "unsupported" | "verified" | null;
+
 interface ResolvedRef {
   index: number;
   resource: Resource;
   credibility: number | undefined;
   publicationName: string | undefined;
   peerReviewed: boolean;
+  verification: VerificationVerdict;
 }
 
-function resolveRefs(ids: string[]): {
+const VERDICT_DISPLAY: Record<string, { dot: string; label: string }> = {
+  accurate: { dot: "bg-emerald-500", label: "Verified accurate" },
+  minor_issues: { dot: "bg-amber-500", label: "Minor issues" },
+  inaccurate: { dot: "bg-red-500", label: "Inaccurate" },
+  unsupported: { dot: "bg-red-400", label: "Unsupported" },
+  verified: { dot: "bg-blue-500", label: "Source verified" },
+};
+
+/**
+ * Build a URL → best verification verdict map from citation quotes.
+ * If multiple quotes reference the same URL, picks the most informative verdict.
+ */
+function buildVerificationMap(quotes: CitationQuote[]): Map<string, VerificationVerdict> {
+  const map = new Map<string, VerificationVerdict>();
+  const priority: Record<string, number> = {
+    accurate: 4,
+    minor_issues: 3,
+    inaccurate: 5, // surface problems prominently
+    unsupported: 5,
+    verified: 2,
+  };
+
+  for (const q of quotes) {
+    if (!q.url) continue;
+    const verdict: VerificationVerdict = q.accuracyVerdict as VerificationVerdict ?? (q.quoteVerified ? "verified" : null);
+    if (!verdict) continue;
+
+    const existing = map.get(q.url);
+    if (!existing || (priority[verdict] ?? 0) > (priority[existing] ?? 0)) {
+      map.set(q.url, verdict);
+    }
+  }
+
+  return map;
+}
+
+function resolveRefs(ids: string[], verificationMap: Map<string, VerificationVerdict>): {
   refs: ResolvedRef[];
   missing: string[];
 } {
@@ -61,6 +101,7 @@ function resolveRefs(ids: string[]): {
       credibility: getResourceCredibility(resource),
       publicationName: publication?.name,
       peerReviewed: publication?.peer_reviewed ?? false,
+      verification: verificationMap.get(resource.url) ?? null,
     });
   }
 
@@ -177,8 +218,17 @@ function ReferenceEntry({
             </span>
           )}
 
-          {(showCredibility || showTags) && (
+          {(showCredibility || showTags || entry.verification) && (
             <span className="flex items-center gap-2 mt-1">
+              {entry.verification && VERDICT_DISPLAY[entry.verification] && (
+                <span
+                  className="inline-flex items-center gap-1 text-[10px] text-muted-foreground"
+                  title={VERDICT_DISPLAY[entry.verification].label}
+                >
+                  <span className={cn("inline-block w-1.5 h-1.5 rounded-full", VERDICT_DISPLAY[entry.verification].dot)} />
+                  {VERDICT_DISPLAY[entry.verification].label}
+                </span>
+              )}
               {showCredibility && credibility != null && (
                 <CredibilityBadge level={credibility} size="sm" />
               )}
@@ -206,7 +256,7 @@ function ReferenceEntry({
  * When pageId is provided, displays a citation health summary badge
  * showing verification status from the wiki-server (built at build time).
  */
-export function References({
+export async function References({
   ids = [],
   pageId,
   title = "References",
@@ -217,7 +267,11 @@ export function References({
 }: ReferencesProps) {
   if (ids.length === 0) return null;
 
-  const { refs, missing } = resolveRefs(ids);
+  // Fetch per-citation verification data when pageId is available
+  const quotes = pageId ? await getCitationQuotes(pageId) : [];
+  const verificationMap = buildVerificationMap(quotes);
+
+  const { refs, missing } = resolveRefs(ids, verificationMap);
 
   return (
     <section
