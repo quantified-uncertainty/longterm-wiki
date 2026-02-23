@@ -355,3 +355,45 @@ export function filterSourcesForSection(
 
   return scored.sort((a, b) => b.score - a.score).map(s => s.src);
 }
+
+/**
+ * Split MDX content into LLM-friendly chunks for enrichment passes.
+ *
+ * Groups H2 sections into chunks of at most `maxChunkSize` characters.
+ * The preamble (frontmatter + text before the first ## heading) is always
+ * its own first chunk.
+ *
+ * If the content has no ## headings, or if the preamble alone exceeds
+ * `maxChunkSize`, a single oversized chunk is returned — splitting within
+ * the preamble would break context for the LLM.
+ *
+ * @param content - Full MDX content string
+ * @param maxChunkSize - Soft maximum characters per chunk (default: 5 500)
+ * @returns Array of content chunks; empty array for empty input
+ */
+export function buildContentChunks(content: string, maxChunkSize = 5500): string[] {
+  if (!content.trim()) return [];
+
+  const split = splitIntoSections(content);
+  const chunks: string[] = [];
+
+  // The preamble (frontmatter + text before first ##) is the first chunk
+  const headParts = [split.frontmatter, split.preamble].filter(s => s.trim());
+  if (headParts.length > 0) {
+    chunks.push(headParts.join('\n').trim());
+  }
+
+  // Group sections into chunks that fit within maxChunkSize
+  let current = '';
+  for (const section of split.sections) {
+    if (current && current.length + section.content.length + 2 > maxChunkSize) {
+      chunks.push(current);
+      current = section.content;
+    } else {
+      current = current ? current + '\n\n' + section.content : section.content;
+    }
+  }
+  if (current) chunks.push(current);
+
+  return chunks;
+}

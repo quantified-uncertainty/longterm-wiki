@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { applyFactRefReplacements, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
+import { applyFactRefReplacements, buildFactRefChunks, fixDoubleNestedFTags, fixStrayBackslashBeforeFTag, type FactRefReplacement } from './enrich-fact-refs.ts';
 
 describe('applyFactRefReplacements', () => {
   it('wraps a matching number with <F> tags', () => {
@@ -417,4 +417,57 @@ describe('fixStrayBackslashBeforeFTag', () => {
   });
 });
 
-// splitContentForEnrichment tests live in crux/lib/content-chunker.test.ts
+// ---------------------------------------------------------------------------
+// buildFactRefChunks tests (#721 — sectional chunking for long pages)
+// ---------------------------------------------------------------------------
+
+describe('buildFactRefChunks', () => {
+  it('returns empty array for empty content', () => {
+    expect(buildFactRefChunks('')).toEqual([]);
+    expect(buildFactRefChunks('   ')).toEqual([]);
+  });
+
+  it('returns a single chunk for short content', () => {
+    const content = 'Anthropic raised \\$30 billion last year.';
+    const chunks = buildFactRefChunks(content);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0]).toContain('\\$30 billion');
+  });
+
+  it('returns one chunk for preamble-only content without truncation', () => {
+    // A page with 8 000 chars and no ## headings — must NOT be truncated
+    const content = 'x'.repeat(8000);
+    const chunks = buildFactRefChunks(content);
+    expect(chunks.length).toBe(1);
+    expect(chunks[0].length).toBe(8000);
+  });
+
+  it('covers the tail section of a page beyond the 6 000-char limit', () => {
+    // Simulate a page whose tail section sits beyond 6 000 chars from the start
+    const padding = `## Early Section\n${'y'.repeat(6000)}\n`;
+    const tail = `## Funding Section\nAnthropics raised \\$30 billion in Series E.\n`;
+    const content = padding + tail;
+
+    expect(content.length).toBeGreaterThan(6000);
+
+    const chunks = buildFactRefChunks(content);
+
+    // The tail section must appear in some chunk
+    const hasTail = chunks.some(c => c.includes('\\$30 billion'));
+    expect(hasTail).toBe(true);
+  });
+
+  it('each chunk contains complete section text', () => {
+    const sections = [
+      '## Background\nSome background text.',
+      '## Funding\nRaised \\$1B in seed round.',
+      '## Valuation\nValued at \\$5B after Series A.',
+    ];
+    const content = sections.join('\n\n');
+    const chunks = buildFactRefChunks(content);
+
+    // Every section must be fully present in exactly one chunk
+    expect(chunks.some(c => c.includes('\\$1B in seed round'))).toBe(true);
+    expect(chunks.some(c => c.includes('\\$5B after Series A'))).toBe(true);
+  });
+});

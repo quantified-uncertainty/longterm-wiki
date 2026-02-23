@@ -377,7 +377,26 @@ Identify hardcoded numbers matching canonical facts and return replacement instr
 }
 
 /**
+ * Split content into processable chunks for fact-ref enrichment.
+ *
+ * Re-exports `splitContentForEnrichment` from content-chunker so that callers
+ * within the enrichment module don't need to import from an unrelated lib.
+ * Tests for the underlying logic live in content-chunker.test.ts.
+ *
+ * @param content - Full MDX content
+ * @returns Array of content chunks
+ */
+export function buildFactRefChunks(content: string): string[] {
+  if (!content.trim()) return [];
+  return splitContentForEnrichment(content);
+}
+
+/**
  * Main enrichment function. Takes MDX content and returns enriched content.
+ *
+ * Processes the full content via sectional chunking so pages longer than
+ * 6 000 chars are enriched completely (not just the first ~3 000 words).
+ * Cross-chunk deduplication prevents the same searchText from being proposed twice.
  *
  * @param content - The MDX content to enrich
  * @param options.pageId - Page ID for fact lookup relevance filtering
@@ -404,13 +423,20 @@ export async function enrichFactRefs(
   let replacements: FactRefReplacement[] = [];
 
   if (useLlm) {
-    // Split into sections and process each chunk separately to cover the full page (#673).
-    // Long pages truncated at 6000 chars silently miss fact references in the second half.
-    const chunks = splitContentForEnrichment(content);
+    // Track already-proposed searchTexts for cross-chunk dedup
+    const alreadyProposed = new Set<string>();
+    const chunks = buildFactRefChunks(content);
 
     for (const chunk of chunks) {
       const chunkReplacements = await callLlmForFactRefs(chunk, factLookup);
-      replacements.push(...chunkReplacements);
+
+      // Filter out searchTexts already proposed by previous chunks
+      const filtered = chunkReplacements.filter(r => !alreadyProposed.has(r.searchText));
+      for (const r of filtered) {
+        alreadyProposed.add(r.searchText);
+      }
+
+      replacements.push(...filtered);
     }
   }
 

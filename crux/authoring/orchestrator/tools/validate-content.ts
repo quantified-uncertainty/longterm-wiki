@@ -7,7 +7,7 @@
  * Cost: $0 (no LLM calls).
  */
 
-import { validateSingleFile } from '../../../lib/validation-engine.ts';
+import { ValidationEngine } from '../../../lib/validation-engine.ts';
 import { allRules } from '../../../lib/rules/index.ts';
 import type { ToolRegistration } from './types.ts';
 
@@ -54,29 +54,41 @@ export const tool: ToolRegistration = {
       fs.writeFileSync(ctx.filePath, ctx.currentContent);
 
       try {
-        const result = await validateSingleFile(
-          ctx.filePath,
-          CRITICAL_RULES,
-          QUALITY_RULES,
-          allRules,
-        );
+        // Set up engine with only the relevant rules
+        const relevantRuleIds = new Set([...CRITICAL_RULES, ...QUALITY_RULES]);
+        const relevantRules = allRules.filter((r) => relevantRuleIds.has(r.id));
+        const engine = new ValidationEngine();
+        engine.addRules(relevantRules);
+        await engine.load();
+
+        // Run validation on just this file
+        const issues = await engine.validate({ files: [ctx.filePath] });
+
+        // Group issues by rule category
+        const groupByRule = (ruleIds: string[]) =>
+          ruleIds
+            .map((ruleId) => {
+              const ruleIssues = issues.filter((i) => i.rule === ruleId);
+              return { rule: ruleId, count: ruleIssues.length, issues: ruleIssues };
+            })
+            .filter((r) => r.count > 0);
+
+        const critical = groupByRule(CRITICAL_RULES);
+        const quality = groupByRule(QUALITY_RULES);
 
         // Apply auto-fixes
         const fixableIssues = [
-          ...result.critical.flatMap((r) => r.issues),
-          ...result.quality.flatMap((r) => r.issues),
+          ...critical.flatMap((r) => r.issues),
+          ...quality.flatMap((r) => r.issues),
         ].filter((i) => i.isFixable);
 
         if (fixableIssues.length > 0) {
-          result.engine.applyFixes(fixableIssues);
+          engine.applyFixes(fixableIssues);
           ctx.currentContent = fs.readFileSync(ctx.filePath, 'utf-8');
           // Invalidate section cache
           ctx.splitPage = null;
           ctx.sections = null;
         }
-
-        const critical = result.critical.filter((r) => r.count > 0);
-        const quality = result.quality.filter((r) => r.count > 0);
 
         return JSON.stringify(
           {
