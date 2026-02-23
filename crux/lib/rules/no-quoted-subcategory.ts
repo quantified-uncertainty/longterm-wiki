@@ -16,7 +16,7 @@
  * See: https://github.com/quantified-uncertainty/longterm-wiki/issues/351
  */
 
-import { createRule, Issue, Severity } from '../validation-engine.ts';
+import { createRule, Issue, Severity, FixType } from '../validation-engine.ts';
 import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 
 // Matches quoted subcategory values in YAML frontmatter
@@ -58,6 +58,11 @@ export const noQuotedSubcategoryRule = createRule({
       line: lineNum,
       message: `Quoted subcategory value — use \`subcategory: ${unquotedValue}\` not \`subcategory: ${quoteChar}${unquotedValue}${quoteChar}\``,
       severity: Severity.ERROR,
+      fix: {
+        type: FixType.REPLACE_TEXT,
+        oldText: quotedMatch[0],
+        newText: `subcategory: ${unquotedValue}`,
+      },
     }));
 
     return issues;

@@ -9,6 +9,7 @@ import path from 'path';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
 import { ENTITY_LINK_RE, NUMERIC_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
+import { validateMdxContent } from '../../lib/validate-mdx-content.ts';
 
 let _slugToNumeric: Record<string, string> | null = null;
 
@@ -122,6 +123,16 @@ export function deployToDestination(topic: string, destPath: string, { ROOT, get
   // Copy and convert slug-based EntityLink IDs to numeric (E##) format
   let content = fs.readFileSync(finalPath, 'utf-8');
   const { content: converted, converted: count } = convertSlugsToNumericIds(content, ROOT);
+
+  // Validate content structure before writing (#818) — defense-in-depth against JSON blob corruption
+  const validation = validateMdxContent(converted);
+  if (!validation.valid) {
+    return {
+      success: false,
+      error: `MDX validation failed: ${validation.error}. Content preview: ${converted.slice(0, 200).replace(/\n/g, '\\n')}`,
+    };
+  }
+
   fs.writeFileSync(fullDestPath, converted);
   if (count > 0) {
     console.log(`  Converted ${count} EntityLink ID(s) to numeric format`);

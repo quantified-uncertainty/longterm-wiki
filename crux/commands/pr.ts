@@ -18,6 +18,33 @@ import type { CommandResult } from '../lib/cli.ts';
 
 type CommandOptions = Record<string, unknown>;
 
+/**
+ * Bigram Jaccard similarity between two text strings.
+ * Returns 0.0 (no overlap) to 1.0 (identical).
+ * Used to detect copy-pasted PR descriptions.
+ */
+export function bigramSimilarity(a: string, b: string): number {
+  const toBigrams = (s: string): Set<string> => {
+    const words = s.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+    const set = new Set<string>();
+    for (let i = 0; i < words.length - 1; i++) {
+      set.add(`${words[i]} ${words[i + 1]}`);
+    }
+    return set;
+  };
+
+  const setA = toBigrams(a);
+  const setB = toBigrams(b);
+  if (setA.size === 0 || setB.size === 0) return 0;
+
+  let intersection = 0;
+  for (const bg of setA) {
+    if (setB.has(bg)) intersection++;
+  }
+
+  return intersection / (setA.size + setB.size - intersection);
+}
+
 interface GitHubPR {
   number: number;
   html_url: string;
@@ -87,7 +114,7 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
 
   const branch = currentBranch();
   const title = options.title as string | undefined;
-  const bodyFile = options['body-file'] as string | undefined;
+  const bodyFile = (options.bodyFile ?? options['body-file']) as string | undefined;
   let body = options.body as string | undefined;
   const base = (options.base as string) || 'main';
   const draft = Boolean(options.draft);
@@ -126,14 +153,24 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
     }
   }
 
-  // Warn loudly if no body is provided — silent empty descriptions are a recurring problem.
+  // Block empty PR descriptions unless explicitly opted in (#816).
+  // Silent empty descriptions were the #1 PR quality problem — 33% of recent PRs had empty bodies.
   if (!body || !body.trim()) {
-    log.warn(
-      `No PR body provided. The PR will be created with an empty description.\n` +
-        `  Use --body-file=<path>, --body="...", or stdin heredoc:\n` +
-        `  pnpm crux pr create --title="..." <<'PRBODY'\n` +
-        `  ## Summary\\n- key change\\nPRBODY`
-    );
+    if (options.allowEmptyBody ?? options['allow-empty-body']) {
+      log.warn('Creating PR with empty body (--allow-empty-body).');
+    } else {
+      return {
+        output:
+          `${c.red}Error: No PR body provided.${c.reset}\n` +
+          `  PRs with empty descriptions cannot be reviewed or audited.\n` +
+          `  Provide a body using one of:\n` +
+          `    --body-file=<path>          (recommended for multi-line)\n` +
+          `    --body="short description"  (single line)\n` +
+          `    stdin heredoc:  pnpm crux pr create --title="..." <<'PRBODY'\\n## Summary\\nPRBODY\n` +
+          `  Or pass --allow-empty-body to force creation without a description.\n`,
+        exitCode: 1,
+      };
+    }
   }
 
   if (!title) {
@@ -141,6 +178,44 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
       output: `${c.red}Usage: crux pr create --title="PR title" --body="PR body" [--body-file=<path>] [--base=main] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
+  }
+
+  // Quality checks on PR body: dedup (#819) and copy-paste detection
+  if (body) {
+    try {
+      const recentPRs = await githubApi<Array<{ number: number; title: string; body: string | null; merged_at: string | null }>>(
+        `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=20`
+      );
+      const recentMerged = recentPRs.filter(pr => pr.merged_at);
+
+      // Check 1: Dedup — warn if Closes #N overlaps with recently merged PRs (#819)
+      const closesRefs = [...body.matchAll(/(?:Closes|Fixes|Resolves)\s+#(\d+)/gi)].map(m => parseInt(m[1], 10));
+      for (const ref of closesRefs) {
+        const overlap = recentMerged.find(pr =>
+          pr.body && new RegExp(`(?:Closes|Fixes|Resolves)\\s+#${ref}\\b`, 'i').test(pr.body)
+        );
+        if (overlap) {
+          log.warn(
+            `Issue #${ref} was already closed by PR #${overlap.number} ("${overlap.title}"). ` +
+            `This may be a duplicate fix.`
+          );
+        }
+      }
+
+      // Check 2: Copy-paste detection — warn if body is suspiciously similar to a recent PR
+      for (const pr of recentMerged) {
+        if (!pr.body || pr.body.trim().length < 50) continue;
+        const sim = bigramSimilarity(body, pr.body);
+        if (sim >= 0.6) {
+          log.warn(
+            `PR body is ${Math.round(sim * 100)}% similar to recently merged PR #${pr.number} ("${pr.title}"). ` +
+            `This may be a copy-pasted description from the wrong PR.`
+          );
+        }
+      }
+    } catch {
+      // Quality checks are best-effort — don't block PR creation if they fail
+    }
   }
 
   // Check for existing PR first
@@ -295,6 +370,7 @@ Options (create):
   --body-file=<path>  PR body from file (safe for markdown with backticks).
   --base=main         Base branch (default: main).
   --draft             Create as draft PR.
+  --allow-empty-body  Allow creating PR without a description (not recommended).
   (stdin)             If --body and --body-file are absent and stdin is a pipe, body is read from stdin.
 
 Options (detect):

@@ -391,7 +391,7 @@ export async function runOrchestrator(
   // ── Deduplicate footnotes ────────────────────────────────────────────────
 
   ctx.currentContent = deduplicateFootnotes(ctx.currentContent);
-  ctx.currentContent = renumberFootnotes(ctx.currentContent);
+  ctx.currentContent = renumberFootnotes(ctx.currentContent, { warn: true });
   ctx.currentContent = normalizeDollarEscaping(ctx.currentContent);
 
   // ── Update lastEdited ──────────────────────────────────────────────────────
