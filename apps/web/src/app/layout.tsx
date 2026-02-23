@@ -3,7 +3,6 @@ import Link from "next/link";
 import { DevModeToggle } from "@/components/DevModeToggle";
 import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import { SITE_URL } from "@/lib/site-config";
-import "katex/dist/katex.min.css";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 
