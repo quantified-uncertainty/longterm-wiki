@@ -1,0 +1,748 @@
+name: Wellness Check
+
+# Comprehensive twice-daily health audit of the entire system.
+#
+# Runs more checks than the 5-minute server-health-monitor:
+#   - Server & DB sanity (counts in expected ranges, uptime)
+#   - API smoke tests (search, page fetch, entity list)
+#   - GitHub Actions workflow health (scheduled jobs running?)
+#   - Frontend availability (Vercel URL returns content)
+#   - Data freshness (last sync time, recent edits)
+#   - Backup health (last DB backup succeeded?)
+#
+# Issues are created/updated/closed automatically under the "wellness" label.
+# The 5-minute server-health-monitor handles the immediate "server is down" case;
+# this workflow handles deeper, slower-moving health signals.
+
+on:
+  schedule:
+    - cron: "0 8 * * *"  # 8 AM UTC daily
+    - cron: "0 20 * * *" # 8 PM UTC daily
+  workflow_dispatch:
+    inputs:
+      verbose:
+        description: "Print full API responses for debugging"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: wellness-check
+  cancel-in-progress: false
+
+# ─────────────────────────────────────────
+# Shared helpers
+# ─────────────────────────────────────────
+
+env:
+  # Pages/entity count lower bounds — alert if DB drops below these
+  MIN_PAGES: 600
+  MIN_ENTITIES: 500
+  MIN_FACTS: 40   # Currently ~54; alert on dramatic drops
+  # Workflow staleness thresholds (hours)
+  MAX_AUTO_UPDATE_AGE_H: 36
+  MAX_BACKUP_AGE_H: 36
+  MAX_MAINTENANCE_AGE_H: 216  # 9 days (weekly + buffer)
+  MAX_HEALTH_MONITOR_AGE_H: 1
+
+# ─────────────────────────────────────────
+# Job 1 — Server & DB health
+# ─────────────────────────────────────────
+
+jobs:
+  server-health:
+    name: Server & DB health
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      summary: ${{ steps.check.outputs.summary }}
+      detail: ${{ steps.check.outputs.detail }}
+
+    steps:
+      - name: Check /health endpoint + DB sanity
+        id: check
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          MIN_PAGES: ${{ env.MIN_PAGES }}
+          MIN_ENTITIES: ${{ env.MIN_ENTITIES }}
+          MIN_FACTS: ${{ env.MIN_FACTS }}
+        run: |
+          FAILURES=""
+
+          if [ -z "$LONGTERMWIKI_SERVER_URL" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=LONGTERMWIKI_SERVER_URL secret not set" >> "$GITHUB_OUTPUT"
+            echo "detail=Cannot check server — secret is missing" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Fetch health endpoint (retry 3x with 10s delay)
+          RESPONSE=""
+          HTTP_CODE=""
+          for i in 1 2 3; do
+            HTTP_CODE=$(curl -sf -o /tmp/health.json -w "%{http_code}" \
+              --max-time 15 "${LONGTERMWIKI_SERVER_URL}/health" 2>/dev/null) || HTTP_CODE="000"
+            if [ "$HTTP_CODE" = "200" ]; then
+              RESPONSE=$(cat /tmp/health.json)
+              break
+            fi
+            echo "Attempt $i failed (HTTP $HTTP_CODE). Retrying in 10s..."
+            sleep 10
+          done
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=Health endpoint unreachable (HTTP $HTTP_CODE)" >> "$GITHUB_OUTPUT"
+            echo "detail=GET /health returned HTTP $HTTP_CODE after 3 attempts" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Parse fields
+          STATUS=$(echo "$RESPONSE" | jq -r '.status // "unknown"')
+          DB=$(echo "$RESPONSE" | jq -r '.database // "unknown"')
+          TOTAL_PAGES=$(echo "$RESPONSE" | jq -r '.totalPages // 0')
+          TOTAL_ENTITIES=$(echo "$RESPONSE" | jq -r '.totalEntities // 0')
+          TOTAL_FACTS=$(echo "$RESPONSE" | jq -r '.totalFacts // 0')
+          TOTAL_IDS=$(echo "$RESPONSE" | jq -r '.totalIds // 0')
+          UPTIME=$(echo "$RESPONSE" | jq -r '.uptime // 0')
+
+          # Check status
+          if [ "$STATUS" != "healthy" ]; then
+            FAILURES="$FAILURES\n- Server status is '$STATUS' (expected 'healthy')"
+          fi
+          if [ "$DB" != "ok" ]; then
+            FAILURES="$FAILURES\n- Database status is '$DB' (expected 'ok')"
+          fi
+
+          # Sanity-check row counts
+          if [ "$TOTAL_PAGES" -lt "$MIN_PAGES" ]; then
+            FAILURES="$FAILURES\n- Only $TOTAL_PAGES pages in DB (expected ≥ $MIN_PAGES)"
+          fi
+          if [ "$TOTAL_ENTITIES" -lt "$MIN_ENTITIES" ]; then
+            FAILURES="$FAILURES\n- Only $TOTAL_ENTITIES entities in DB (expected ≥ $MIN_ENTITIES)"
+          fi
+          if [ "$TOTAL_FACTS" -lt "$MIN_FACTS" ]; then
+            FAILURES="$FAILURES\n- Only $TOTAL_FACTS facts in DB (expected ≥ $MIN_FACTS)"
+          fi
+
+          # Build detail block
+          DETAIL=$(printf "| Check | Value |\n|-------|-------|\n| HTTP status | %s |\n| Server status | %s |\n| Database | %s |\n| Pages | %s |\n| Entities | %s |\n| Facts | %s |\n| Total IDs | %s |\n| Uptime (s) | %s |" \
+            "$HTTP_CODE" "$STATUS" "$DB" "$TOTAL_PAGES" "$TOTAL_ENTITIES" "$TOTAL_FACTS" "$TOTAL_IDS" "$UPTIME")
+
+          echo "detail<<__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+          echo "$DETAIL" >> "$GITHUB_OUTPUT"
+          echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILURES" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=DB/server health issues detected" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=OK — $TOTAL_PAGES pages, $TOTAL_ENTITIES entities, $TOTAL_FACTS facts, uptime ${UPTIME}s" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────
+# Job 2 — API smoke tests
+# ─────────────────────────────────────────
+
+  api-smoke-tests:
+    name: API smoke tests
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      summary: ${{ steps.check.outputs.summary }}
+      detail: ${{ steps.check.outputs.detail }}
+
+    steps:
+      - name: Run API smoke tests
+        id: check
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+        run: |
+          FAILURES=""
+          RESULTS=""
+
+          if [ -z "$LONGTERMWIKI_SERVER_URL" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=LONGTERMWIKI_SERVER_URL secret not set" >> "$GITHUB_OUTPUT"
+            echo "detail=Cannot run smoke tests — secret is missing" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          AUTH_HEADER="Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}"
+
+          run_test() {
+            local name="$1"
+            local url="$2"
+            local jq_check="$3"  # jq expression that must return 'true'
+
+            HTTP_CODE=$(curl -sf -o /tmp/smoke_response.json -w "%{http_code}" \
+              --max-time 15 -H "$AUTH_HEADER" "$url" 2>/dev/null) || HTTP_CODE="000"
+
+            if [ "$HTTP_CODE" = "200" ]; then
+              if [ -n "$jq_check" ]; then
+                VALID=$(jq -r "$jq_check" /tmp/smoke_response.json 2>/dev/null || echo "false")
+                if [ "$VALID" = "true" ]; then
+                  RESULTS="$RESULTS\n| $name | PASS | HTTP 200, check passed |"
+                else
+                  RESULTS="$RESULTS\n| $name | FAIL | HTTP 200 but jq check failed: $jq_check |"
+                  FAILURES="$FAILURES\n- $name: response check failed"
+                fi
+              else
+                RESULTS="$RESULTS\n| $name | PASS | HTTP 200 |"
+              fi
+            else
+              RESULTS="$RESULTS\n| $name | FAIL | HTTP $HTTP_CODE |"
+              FAILURES="$FAILURES\n- $name: HTTP $HTTP_CODE"
+            fi
+          }
+
+          # Response shapes (verified against live server):
+          #   search   → { results: [...], query, total }
+          #   pages    → { pages: [...], total, limit, offset }
+          #   entities → { entities: [...], total, limit, offset }
+          #   sessions → { sessions: [...], total, limit, offset }
+
+          # Test: search returns results
+          run_test \
+            "Search (existential risk)" \
+            "${LONGTERMWIKI_SERVER_URL}/api/pages/search?q=existential+risk" \
+            '(.results | length) > 0'
+
+          # Test: search returns results for a second query
+          run_test \
+            "Search (AI safety)" \
+            "${LONGTERMWIKI_SERVER_URL}/api/pages/search?q=AI+safety" \
+            '(.results | length) > 0'
+
+          # Test: page list returns data
+          run_test \
+            "Pages list" \
+            "${LONGTERMWIKI_SERVER_URL}/api/pages?limit=5" \
+            '(.pages | length) > 0'
+
+          # Test: entity list returns data
+          run_test \
+            "Entities list" \
+            "${LONGTERMWIKI_SERVER_URL}/api/entities?limit=5" \
+            '(.entities | length) > 0'
+
+          # Test: sessions list (agent session tracking — response shape: { sessions: [...] })
+          run_test \
+            "Sessions list" \
+            "${LONGTERMWIKI_SERVER_URL}/api/sessions?limit=1" \
+            '. | has("sessions")'
+
+          DETAIL=$(printf "| Test | Result | Details |\n|------|--------|---------|%b" "$RESULTS")
+
+          echo "detail<<__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+          echo "$DETAIL" >> "$GITHUB_OUTPUT"
+          echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILURES" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=API smoke test failures detected" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=All API smoke tests passed" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────
+# Job 3 — GitHub Actions workflow health
+# ─────────────────────────────────────────
+
+  github-actions-health:
+    name: GitHub Actions workflow health
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      summary: ${{ steps.check.outputs.summary }}
+      detail: ${{ steps.check.outputs.detail }}
+
+    steps:
+      - name: Check scheduled workflow health
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_AUTO_UPDATE_AGE_H: ${{ env.MAX_AUTO_UPDATE_AGE_H }}
+          MAX_BACKUP_AGE_H: ${{ env.MAX_BACKUP_AGE_H }}
+          MAX_MAINTENANCE_AGE_H: ${{ env.MAX_MAINTENANCE_AGE_H }}
+          MAX_HEALTH_MONITOR_AGE_H: ${{ env.MAX_HEALTH_MONITOR_AGE_H }}
+        run: |
+          FAILURES=""
+          RESULTS=""
+
+          NOW_EPOCH=$(date -u +%s)
+
+          # Check a workflow's most recent completed run.
+          # Args: display_name  workflow_filename  max_age_hours  require_success
+          check_workflow() {
+            local name="$1"
+            local workflow="$2"
+            local max_age_h="$3"
+            local require_success="${4:-true}"
+
+            local runs
+            runs=$(gh run list \
+              --repo "${{ github.repository }}" \
+              --workflow "$workflow" \
+              --limit 5 \
+              --json status,conclusion,createdAt,databaseId \
+              2>/dev/null || echo "[]")
+
+            local latest_completed
+            latest_completed=$(echo "$runs" | jq -c '[.[] | select(.status == "completed")] | .[0]')
+
+            if [ "$latest_completed" = "null" ] || [ -z "$latest_completed" ]; then
+              RESULTS="$RESULTS\n| $name | WARN | No completed runs found |"
+              FAILURES="$FAILURES\n- $name: no completed run found"
+              return
+            fi
+
+            local conclusion created_at created_epoch age_h run_id
+            conclusion=$(echo "$latest_completed" | jq -r '.conclusion')
+            created_at=$(echo "$latest_completed" | jq -r '.createdAt')
+            run_id=$(echo "$latest_completed" | jq -r '.databaseId')
+
+            # Convert ISO8601 to epoch (GNU date)
+            created_epoch=$(date -u -d "$created_at" +%s 2>/dev/null || echo "0")
+            age_h=$(( (NOW_EPOCH - created_epoch) / 3600 ))
+
+            local status_cell="PASS"
+            local detail_cell="Last run ${age_h}h ago (${conclusion})"
+
+            if [ "$age_h" -gt "$max_age_h" ]; then
+              status_cell="FAIL"
+              detail_cell="Last run ${age_h}h ago — stale (max ${max_age_h}h)"
+              FAILURES="$FAILURES\n- $name: last run ${age_h}h ago (max ${max_age_h}h)"
+            elif [ "$require_success" = "true" ] && [ "$conclusion" != "success" ]; then
+              status_cell="FAIL"
+              detail_cell="Last run concluded '${conclusion}' ${age_h}h ago"
+              FAILURES="$FAILURES\n- $name: last run concluded '${conclusion}'"
+            fi
+
+            RESULTS="$RESULTS\n| $name | $status_cell | $detail_cell |"
+          }
+
+          check_workflow "auto-update"          "auto-update.yml"          "$MAX_AUTO_UPDATE_AGE_H"
+          check_workflow "database-backup"      "database-backup.yml"      "$MAX_BACKUP_AGE_H"
+          check_workflow "scheduled-maintenance" "scheduled-maintenance.yml" "$MAX_MAINTENANCE_AGE_H"
+          check_workflow "server-health-monitor" "server-health-monitor.yml" "$MAX_HEALTH_MONITOR_AGE_H"
+          check_workflow "scheduled-deploy"     "scheduled-deploy.yml"     36
+          check_workflow "CI (main)"            "ci.yml"                   168 false  # Weekly — just check it ran
+
+          DETAIL=$(printf "| Workflow | Status | Details |\n|----------|--------|---------|%b" "$RESULTS")
+
+          echo "detail<<__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+          echo "$DETAIL" >> "$GITHUB_OUTPUT"
+          echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILURES" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=Workflow health issues detected" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=All monitored workflows are healthy" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────
+# Job 4 — Frontend availability
+# ─────────────────────────────────────────
+
+  frontend-health:
+    name: Frontend availability
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      summary: ${{ steps.check.outputs.summary }}
+      detail: ${{ steps.check.outputs.detail }}
+
+    steps:
+      - name: Check public wiki frontend
+        id: check
+        env:
+          WIKI_PUBLIC_URL: ${{ secrets.WIKI_PUBLIC_URL }}
+        run: |
+          if [ -z "$WIKI_PUBLIC_URL" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Skipped (WIKI_PUBLIC_URL secret not set)" >> "$GITHUB_OUTPUT"
+            echo "detail=Set the WIKI_PUBLIC_URL secret to enable frontend health checks" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          FAILURES=""
+          RESULTS=""
+
+          check_url() {
+            local name="$1"
+            local url="$2"
+            local content_check="$3"  # grep pattern that must match
+
+            HTTP_CODE=$(curl -sf -o /tmp/frontend_response.html -w "%{http_code}" \
+              --max-time 20 -L "$url" 2>/dev/null) || HTTP_CODE="000"
+
+            if [ "$HTTP_CODE" != "200" ]; then
+              RESULTS="$RESULTS\n| $name | FAIL | HTTP $HTTP_CODE |"
+              FAILURES="$FAILURES\n- $name: HTTP $HTTP_CODE"
+              return
+            fi
+
+            if [ -n "$content_check" ]; then
+              if grep -q "$content_check" /tmp/frontend_response.html 2>/dev/null; then
+                RESULTS="$RESULTS\n| $name | PASS | HTTP 200, content OK |"
+              else
+                RESULTS="$RESULTS\n| $name | FAIL | HTTP 200 but expected content not found |"
+                FAILURES="$FAILURES\n- $name: expected content '$content_check' not found in response"
+              fi
+            else
+              RESULTS="$RESULTS\n| $name | PASS | HTTP 200 |"
+            fi
+          }
+
+          # Homepage
+          check_url "Homepage" "$WIKI_PUBLIC_URL" "html"
+          # A stable deep-link page (knowledge base root)
+          check_url "Knowledge base" "$WIKI_PUBLIC_URL/knowledge-base/" "html"
+
+          DETAIL=$(printf "| Page | Status | Details |\n|------|--------|---------|%b" "$RESULTS")
+
+          echo "detail<<__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+          echo "$DETAIL" >> "$GITHUB_OUTPUT"
+          echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILURES" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=Frontend availability issues detected" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Frontend is accessible" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────
+# Job 5 — Data freshness
+# ─────────────────────────────────────────
+
+  data-freshness:
+    name: Data freshness
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.ok }}
+      summary: ${{ steps.check.outputs.summary }}
+      detail: ${{ steps.check.outputs.detail }}
+
+    steps:
+      - name: Check data freshness via wiki-server
+        id: check
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+        run: |
+          FAILURES=""
+          RESULTS=""
+
+          if [ -z "$LONGTERMWIKI_SERVER_URL" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Skipped (LONGTERMWIKI_SERVER_URL not set)" >> "$GITHUB_OUTPUT"
+            echo "detail=Secret not configured" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          AUTH_HEADER="Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}"
+          NOW_EPOCH=$(date -u +%s)
+
+          # Check most recently updated page — should be within 7 days if content is synced
+          HTTP_CODE=$(curl -sf -o /tmp/pages_recent.json -w "%{http_code}" \
+            --max-time 15 -H "$AUTH_HEADER" \
+            "${LONGTERMWIKI_SERVER_URL}/api/pages?limit=1&orderBy=updatedAt&order=desc" \
+            2>/dev/null) || HTTP_CODE="000"
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            # Response shape: { pages: [...], total, limit, offset }
+            LAST_PAGE_DATE=$(jq -r '.pages[0].updatedAt // .pages[0].createdAt // empty' /tmp/pages_recent.json 2>/dev/null || echo "")
+            if [ -n "$LAST_PAGE_DATE" ]; then
+              LAST_EPOCH=$(date -u -d "$LAST_PAGE_DATE" +%s 2>/dev/null || echo "0")
+              AGE_H=$(( (NOW_EPOCH - LAST_EPOCH) / 3600 ))
+              if [ "$AGE_H" -gt 168 ]; then  # > 7 days
+                FAILURES="$FAILURES\n- Most recent page sync is ${AGE_H}h old (expected < 168h)"
+                RESULTS="$RESULTS\n| Most recent page sync | WARN | ${AGE_H}h ago |"
+              else
+                RESULTS="$RESULTS\n| Most recent page sync | PASS | ${AGE_H}h ago |"
+              fi
+            else
+              RESULTS="$RESULTS\n| Most recent page sync | WARN | Could not parse date |"
+            fi
+          else
+            RESULTS="$RESULTS\n| Most recent page sync | FAIL | HTTP $HTTP_CODE |"
+            FAILURES="$FAILURES\n- Could not fetch pages list (HTTP $HTTP_CODE)"
+          fi
+
+          # Check most recent auto-update run
+          HTTP_CODE=$(curl -sf -o /tmp/autoupdate_recent.json -w "%{http_code}" \
+            --max-time 15 -H "$AUTH_HEADER" \
+            "${LONGTERMWIKI_SERVER_URL}/api/auto-update-runs?limit=1" \
+            2>/dev/null) || HTTP_CODE="000"
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            LAST_RUN_DATE=$(jq -r '.[0].createdAt // .[0].startedAt // empty' /tmp/autoupdate_recent.json 2>/dev/null || echo "")
+            if [ -n "$LAST_RUN_DATE" ]; then
+              LAST_EPOCH=$(date -u -d "$LAST_RUN_DATE" +%s 2>/dev/null || echo "0")
+              AGE_H=$(( (NOW_EPOCH - LAST_EPOCH) / 3600 ))
+              if [ "$AGE_H" -gt 48 ]; then
+                FAILURES="$FAILURES\n- Last auto-update run is ${AGE_H}h old (expected < 48h)"
+                RESULTS="$RESULTS\n| Last auto-update run | WARN | ${AGE_H}h ago |"
+              else
+                RESULTS="$RESULTS\n| Last auto-update run | PASS | ${AGE_H}h ago |"
+              fi
+            else
+              RESULTS="$RESULTS\n| Last auto-update run | INFO | No runs found yet |"
+            fi
+          else
+            RESULTS="$RESULTS\n| Last auto-update run | SKIP | HTTP $HTTP_CODE |"
+          fi
+
+          # Check most recent agent session (proxy for active development)
+          HTTP_CODE=$(curl -sf -o /tmp/sessions_recent.json -w "%{http_code}" \
+            --max-time 15 -H "$AUTH_HEADER" \
+            "${LONGTERMWIKI_SERVER_URL}/api/sessions?limit=1" \
+            2>/dev/null) || HTTP_CODE="000"
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            # Response shape: { sessions: [...], total, limit, offset }
+            LAST_SESSION=$(jq -r '.sessions[0].date // .sessions[0].createdAt // empty' /tmp/sessions_recent.json 2>/dev/null || echo "")
+            if [ -n "$LAST_SESSION" ]; then
+              RESULTS="$RESULTS\n| Last agent session | INFO | $LAST_SESSION |"
+            else
+              RESULTS="$RESULTS\n| Last agent session | INFO | No sessions found |"
+            fi
+          fi
+
+          DETAIL=$(printf "| Check | Status | Details |\n|-------|--------|---------|%b" "$RESULTS")
+
+          echo "detail<<__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+          echo "$DETAIL" >> "$GITHUB_OUTPUT"
+          echo "__DETAIL_EOF__" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILURES" ]; then
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "summary=Data freshness issues detected" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "summary=Data freshness looks good" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────
+# Job 6 — Aggregate & report
+# ─────────────────────────────────────────
+
+  report:
+    name: Aggregate & report
+    needs:
+      - server-health
+      - api-smoke-tests
+      - github-actions-health
+      - frontend-health
+      - data-freshness
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Aggregate results and create/close issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SERVER_OK: ${{ needs.server-health.outputs.ok }}
+          SERVER_SUMMARY: ${{ needs.server-health.outputs.summary }}
+          SERVER_DETAIL: ${{ needs.server-health.outputs.detail }}
+          API_OK: ${{ needs.api-smoke-tests.outputs.ok }}
+          API_SUMMARY: ${{ needs.api-smoke-tests.outputs.summary }}
+          API_DETAIL: ${{ needs.api-smoke-tests.outputs.detail }}
+          GHA_OK: ${{ needs.github-actions-health.outputs.ok }}
+          GHA_SUMMARY: ${{ needs.github-actions-health.outputs.summary }}
+          GHA_DETAIL: ${{ needs.github-actions-health.outputs.detail }}
+          FRONTEND_OK: ${{ needs.frontend-health.outputs.ok }}
+          FRONTEND_SUMMARY: ${{ needs.frontend-health.outputs.summary }}
+          FRONTEND_DETAIL: ${{ needs.frontend-health.outputs.detail }}
+          FRESHNESS_OK: ${{ needs.data-freshness.outputs.ok }}
+          FRESHNESS_SUMMARY: ${{ needs.data-freshness.outputs.summary }}
+          FRESHNESS_DETAIL: ${{ needs.data-freshness.outputs.detail }}
+        run: |
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          icon() { [ "$1" = "true" ] && echo ":green_circle:" || echo ":red_circle:"; }
+
+          OVERALL_OK=true
+          for OK in "$SERVER_OK" "$API_OK" "$GHA_OK" "$FRONTEND_OK" "$FRESHNESS_OK"; do
+            [ "$OK" = "false" ] && OVERALL_OK=false
+          done
+
+          # Write job summary
+          {
+            echo "## Wellness Check — $TIMESTAMP"
+            echo ""
+            echo "| Check | Status | Summary |"
+            echo "|-------|--------|---------|"
+            echo "| Server & DB | $(icon "$SERVER_OK") | $SERVER_SUMMARY |"
+            echo "| API smoke tests | $(icon "$API_OK") | $API_SUMMARY |"
+            echo "| GitHub Actions | $(icon "$GHA_OK") | $GHA_SUMMARY |"
+            echo "| Frontend | $(icon "$FRONTEND_OK") | $FRONTEND_SUMMARY |"
+            echo "| Data freshness | $(icon "$FRESHNESS_OK") | $FRESHNESS_SUMMARY |"
+            echo ""
+            if [ "$OVERALL_OK" = "true" ]; then
+              echo ":white_check_mark: **All checks passed.**"
+            else
+              echo ":x: **Some checks failed — see details below.**"
+            fi
+            echo ""
+            echo "<details><summary>Server & DB details</summary>"
+            echo ""
+            echo "$SERVER_DETAIL"
+            echo ""
+            echo "</details>"
+            echo ""
+            echo "<details><summary>API smoke test details</summary>"
+            echo ""
+            echo "$API_DETAIL"
+            echo ""
+            echo "</details>"
+            echo ""
+            echo "<details><summary>GitHub Actions details</summary>"
+            echo ""
+            echo "$GHA_DETAIL"
+            echo ""
+            echo "</details>"
+            echo ""
+            echo "<details><summary>Frontend details</summary>"
+            echo ""
+            echo "$FRONTEND_DETAIL"
+            echo ""
+            echo "</details>"
+            echo ""
+            echo "<details><summary>Data freshness details</summary>"
+            echo ""
+            echo "$FRESHNESS_DETAIL"
+            echo ""
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Build issue body for failure case
+          cat > /tmp/wellness_issue_body.md <<'ISSUE_BODY_TEMPLATE'
+          ## System Wellness Check Failed
+
+          | Check | Status | Summary |
+          |-------|--------|---------|
+          | Server & DB | __SERVER_ICON__ | __SERVER_SUMMARY__ |
+          | API smoke tests | __API_ICON__ | __API_SUMMARY__ |
+          | GitHub Actions | __GHA_ICON__ | __GHA_SUMMARY__ |
+          | Frontend | __FRONTEND_ICON__ | __FRONTEND_SUMMARY__ |
+          | Data freshness | __FRESHNESS_ICON__ | __FRESHNESS_SUMMARY__ |
+
+          **Detected at:** __TIMESTAMP__
+
+          ### Server & DB
+
+          __SERVER_DETAIL__
+
+          ### API smoke tests
+
+          __API_DETAIL__
+
+          ### GitHub Actions workflows
+
+          __GHA_DETAIL__
+
+          ### Frontend
+
+          __FRONTEND_DETAIL__
+
+          ### Data freshness
+
+          __FRESHNESS_DETAIL__
+
+          ---
+          *Created by the [wellness check workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/wellness-check.yml). Closes automatically when all checks pass.*
+          ISSUE_BODY_TEMPLATE
+
+          # Strip leading whitespace
+          sed -i 's/^          //' /tmp/wellness_issue_body.md
+
+          # Safely substitute values using a Python one-liner to avoid sed injection issues
+          python3 - <<'PYEOF'
+          import os, re
+
+          with open('/tmp/wellness_issue_body.md', 'r') as f:
+              body = f.read()
+
+          icon = lambda ok: ':green_circle:' if ok == 'true' else ':red_circle:'
+
+          subs = {
+              '__TIMESTAMP__': os.environ.get('TIMESTAMP', ''),
+              '__SERVER_ICON__': icon(os.environ.get('SERVER_OK', 'false')),
+              '__SERVER_SUMMARY__': os.environ.get('SERVER_SUMMARY', ''),
+              '__SERVER_DETAIL__': os.environ.get('SERVER_DETAIL', ''),
+              '__API_ICON__': icon(os.environ.get('API_OK', 'false')),
+              '__API_SUMMARY__': os.environ.get('API_SUMMARY', ''),
+              '__API_DETAIL__': os.environ.get('API_DETAIL', ''),
+              '__GHA_ICON__': icon(os.environ.get('GHA_OK', 'false')),
+              '__GHA_SUMMARY__': os.environ.get('GHA_SUMMARY', ''),
+              '__GHA_DETAIL__': os.environ.get('GHA_DETAIL', ''),
+              '__FRONTEND_ICON__': icon(os.environ.get('FRONTEND_OK', 'false')),
+              '__FRONTEND_SUMMARY__': os.environ.get('FRONTEND_SUMMARY', ''),
+              '__FRONTEND_DETAIL__': os.environ.get('FRONTEND_DETAIL', ''),
+              '__FRESHNESS_ICON__': icon(os.environ.get('FRESHNESS_OK', 'false')),
+              '__FRESHNESS_SUMMARY__': os.environ.get('FRESHNESS_SUMMARY', ''),
+              '__FRESHNESS_DETAIL__': os.environ.get('FRESHNESS_DETAIL', ''),
+          }
+
+          for key, val in subs.items():
+              body = body.replace(key, val)
+
+          with open('/tmp/wellness_issue_body.md', 'w') as f:
+              f.write(body)
+
+          print('Issue body written.')
+          PYEOF
+
+          # Find existing open wellness issue
+          EXISTING_ISSUE=$(gh issue list \
+            --repo "${{ github.repository }}" \
+            --label "wellness" \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ "$OVERALL_OK" = "false" ]; then
+            # Ensure label exists
+            gh label create "wellness" --repo "${{ github.repository }}" \
+              --color "e4e669" --description "Periodic wellness check failures" 2>/dev/null || true
+
+            if [ -n "$EXISTING_ISSUE" ]; then
+              # Update existing issue with a new comment
+              gh issue comment "$EXISTING_ISSUE" \
+                --repo "${{ github.repository }}" \
+                --body "Wellness check still failing at ${TIMESTAMP}. See [run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details."
+              echo "Updated existing issue #$EXISTING_ISSUE"
+            else
+              gh issue create \
+                --repo "${{ github.repository }}" \
+                --title "System wellness check failing ($TIMESTAMP)" \
+                --label "wellness,bug" \
+                --body-file /tmp/wellness_issue_body.md
+              echo "Created new wellness issue"
+            fi
+          else
+            # All clear — close any open wellness issue
+            if [ -n "$EXISTING_ISSUE" ]; then
+              gh issue comment "$EXISTING_ISSUE" \
+                --repo "${{ github.repository }}" \
+                --body "All wellness checks passed at ${TIMESTAMP}. Auto-closing."
+              gh issue close "$EXISTING_ISSUE" \
+                --repo "${{ github.repository }}"
+              echo "Closed resolved issue #$EXISTING_ISSUE"
+            else
+              echo "All checks passed. No open wellness issue to close."
+            fi
+          fi
