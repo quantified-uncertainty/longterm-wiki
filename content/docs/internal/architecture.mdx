@@ -39,14 +39,12 @@ flowchart TB
         TRANSFORM["entity-transform.mjs\nType mapping"]
         BUILDDATA["build-data.mjs\nCompilation pipeline"]
         REDUNDANCY["redundancy.mjs\nSimilarity detection"]
-        SEARCH["search.mjs\nMiniSearch index"]
         METRICS["metrics-extractor.ts\nStructural scoring"]
         FACTS["computed-facts.mjs\nExpression evaluator"]
     end
 
     subgraph Artifacts["Build Artifacts"]
         JSON[("database.json\nAll entities + pages")]
-        SEARCHIDX[("search-index.json\nMiniSearch data")]
     end
 
     subgraph Runtime["Next.js Runtime"]
@@ -59,12 +57,10 @@ flowchart TB
     MDX --> BUILDDATA
     GRAPHS --> BUILDDATA
     BUILDDATA --> REDUNDANCY
-    BUILDDATA --> SEARCH
     BUILDDATA --> METRICS
     BUILDDATA --> FACTS
     BUILDDATA --> JSON
     BUILDDATA --> REGISTRY
-    SEARCH --> SEARCHIDX
     JSON --> DATA
     DATA --> COMPONENTS
     DATA --> PAGES
@@ -80,7 +76,7 @@ flowchart TB
 | **Type Safety** | TypeScript + Zod schemas |
 | **Graphs** | ReactFlow (XYFlow) + Dagre/ELK layout |
 | **Diagrams** | Mermaid 11 |
-| **Search** | MiniSearch (build-time index) |
+| **Search** | PostgreSQL full-text search (wiki-server) |
 | **CLI** | Crux (custom multi-domain CLI) |
 | **Data** | YAML sources → JSON build artifacts |
 | **Workspace** | pnpm workspaces (app + crux) |
@@ -227,15 +223,11 @@ function getIndex() {
 
 This avoids building indexes for entity types that are never queried in a given request. Combined with Zod validation at load time (with graceful fallback to `GenericEntity` for unknown types), it balances strictness with forward-compatibility.
 
-### 11. Separated Search Index and Document Metadata
+### 11. Server-Side Search
 
-**Location**: `app/scripts/lib/search.mjs`
+**Location**: `app/src/lib/search.ts`, `app/src/app/api/search/route.ts`
 
-The build produces two files:
-- `search-index.json`: serialized MiniSearch index (only indexed fields)
-- `search-docs.json`: minimal document metadata for rendering results
-
-Only 6 fields are indexed (`title`, `description`, `tags`, `entityType`, `id`, `contentFormat`). Display metadata (`_numericId`, `_type`, `_importance`, `_quality`) is stored separately — available for result display without bloating the search index. Both files are copied to `public/` so the client can fetch them at runtime without needing `database.json`.
+Search uses PostgreSQL full-text search via the wiki-server, proxied through the `/api/search` Next.js route. The client sends queries to this proxy, which forwards them to the wiki-server's search endpoint. This replaced an earlier MiniSearch client-side fallback, simplifying the search stack and reducing client bundle size.
 
 ### 12. Entity Ontology with Display Metadata
 
@@ -337,7 +329,6 @@ A tag shared by 3 entities is more informative than one shared by 300. This prev
 
 **Key files generated**:
 - `database.json` — All entities, pages, relations, facts, search data, statistics (includes ID registry)
-- `search-index.json` + `search-docs.json` — Client-side search data
 
 ### Knowledge Database (SQLite)
 
