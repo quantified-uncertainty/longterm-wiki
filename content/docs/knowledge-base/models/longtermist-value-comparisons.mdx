@@ -1,0 +1,393 @@
+---
+numericId: E886
+title: "Relative Longtermist Value Comparisons"
+description: "A quantitative framework for comparing the expected value of different longtermist allocations on a common scale. Using GiveWell-Equivalent Units (GEUs) as the reference, this model finds that $1 to AI safety (Coefficient Navigating TAI Fund) is worth roughly 50x–500,000x per GEU compared to global health under longtermist assumptions — a ratio whose magnitude hinges primarily on P(existential catastrophe) and the tractability of reducing it. $1 of Anthropic stock on the secondary market has ambiguous or slightly negative expected value relative to direct safety funding."
+entityType: model
+subcategory: analysis-models
+quality: 74
+readerImportance: 68
+researchImportance: 82
+lastEdited: "2026-02-23"
+update_frequency: 90
+llmSummary: "Relative value framework comparing longtermist funding vehicles to a GiveWell reference. Key findings: (1) Coefficient Navigating TAI Fund is ~50x–500,000x per GEU vs global health under longtermist priors; (2) LTFF is 0.3x–10x per dollar relative to Coefficient TAI, higher variance; (3) Anthropic stock (secondary market) has near-zero to slightly negative expected value vs direct safety funding; (4) 1 year before TAI is worth ~$1B–$100T in AI safety research equivalents; (5) all comparisons are dominated by P(x-risk) and moral weight of future people as key cruxes."
+ratings:
+  focus: 8.5
+  novelty: 7
+  rigor: 6.5
+  completeness: 7.5
+  concreteness: 8
+  actionability: 7
+clusters:
+  - ai-safety
+  - community
+---
+import {DataInfoBox, KeyQuestions, Mermaid, EntityLink, SquiggleEstimate} from '@components/wiki';
+
+<DataInfoBox entityId="E886" ratings={frontmatter.ratings} />
+
+## Overview
+
+When comparing longtermist allocations — \$1 to <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink>'s Navigating Transformative AI Fund vs. \$1 to GiveWell global health, or \$1 in Anthropic equity vs. \$1 to the <EntityLink id="ltff">Long-Term Future Fund</EntityLink> — standard cost-effectiveness analysis breaks down. The estimates span six or more orders of magnitude, some distributions straddle zero (meaning an allocation could be net-negative), and the dominant variables are philosophical rather than empirical.
+
+This page develops a **relative value framework** using GiveWell-Equivalent Units (GEUs) as the common reference anchor. Rather than converting everything to DALYs or welfare units, it expresses each allocation as a **ratio relative to \$1 to GiveWell top charities**. This makes assumptions explicit, enables structured comparison across worldviews, and is directly actionable for allocation decisions.
+
+**Key conclusions:**
+
+| Allocation | GEU per dollar (90% CI) | Sign certain? |
+|------------|------------------------|---------------|
+| GiveWell global health | 1 (reference) | Yes |
+| Pandemic preparedness | 3 – 300 | Yes |
+| Farm animal welfare | 0.001 – 100 | Yes |
+| Coefficient TAI Fund | 50 – 500,000 | Yes |
+| Long-Term Future Fund | 20 – 2,000,000 | Yes |
+| Anthropic stock (secondary) | −150,000 – 50,000 | **No** |
+| 1 year before TAI | equivalent to \$1B – \$100T in AI safety | Yes |
+
+The Anthropic secondary equity row is unique: under many plausible assumptions it is net-negative relative to direct safety funding, because secondary-market purchases provide no capital to Anthropic but may sustain capability-accelerating valuations.
+
+---
+
+## Part I — The Reference Unit
+
+### GiveWell-Equivalent Units (GEUs)
+
+**1 GEU = \$1 deployed to GiveWell top-recommended charities** (currently Against Malaria Foundation or Malaria Consortium).
+
+This translates to approximately:
+- **0.02–0.05 DALYs** averted per dollar (at \$20–50/DALY from GiveWell's central estimates)
+- Roughly **1 statistical life** per \$3,000–8,000 (factoring child mortality weighting)
+- About **100× more effective** than unconditional cash transfers at face value
+
+GEUs are useful as a reference because:
+1. GiveWell's methodology is public, debated, and stable enough to serve as a comparison baseline
+2. Many EA donors have direct intuitions about what \$1 to AMF "does"
+3. Unlike DALYs, GEUs don't require committing to a specific moral weight for each condition
+
+**Important caveat**: Using GEUs as a reference does not imply that global health is the correct moral baseline. It is simply the most widely-understood calibration point. Depending on one's ethical framework, 1 GEU could be worth dramatically more or less than any of the longtermist allocations below.
+
+### Calibrating the Unit
+
+To make this concrete: \$1 to the Against Malaria Foundation in 2025 buys approximately 0.35 insecticide-treated nets, which over five years prevents roughly 0.03 DALYs of child malaria. At scale, \$1 million saves roughly 200–500 statistical lives by GiveWell's methodology.
+
+---
+
+## Part II — Variable Analysis
+
+### 2.1 Value of 1% X-Risk Reduction
+
+This is the master variable that governs all longtermist comparisons. Its calculation follows:
+
+$$
+V(1\% \text{ x-risk reduction}) = P(\text{AI x-risk}) \times N_\text{future} \times w_\text{future} \times V_\text{person in GEUs}
+$$
+
+Where:
+- **P(AI x-risk)**: probability that AI causes existential catastrophe (Carlsmith: \>10%; superforecasters: ≈0.4%; Toby Ord: 10%; AI experts median: ≈5%)
+- **N_future**: expected number of future people if catastrophe is avoided (~10²² to 10²⁸, depending on space settlement and timescales)
+- **w_future**: moral weight of future generations relative to present (0 under pure time discount, 1 under person-affecting views that extend far forward)
+- **V_person in GEUs**: GEU value of one statistical life (\≈\$4,000–10,000 / person, so 0.5–3 GEUs per person using GiveWell's \≈\$3,000–8,000/life)
+
+**Working estimate**: Under moderate longtermist assumptions (P(x-risk) = 15%, N_future = 10²³, w_future = 0.5, V_person = 1 GEU), the value of 1% x-risk reduction is approximately **10²² GEUs** — a number so large it only becomes actionable through tractability: how much does \$1 actually move x-risk?
+
+**Key cruxes:**
+- **Moral weight of future generations** is the single most contested variable. Strong time discounting (e.g., 1–3%/year) reduces the value of far-future people to near zero. Longtermism requires assuming this discount is not ethically justified.
+- **Person-affecting vs. total-utilitarian views**: If we only count people who will exist regardless of our choices (person-affecting), the value of x-risk reduction shrinks dramatically.
+- **Astronomical waste**: Nick Bostrom's "astronomical waste" framing argues that the long-run future dwarfs the present so overwhelmingly that almost any improvement in x-risk dominates all other considerations.
+
+<Mermaid chart={`
+flowchart TD
+    P["P(AI x-risk)\n5% – 35%"]
+    N["N future people\n10²² – 10²⁸"]
+    W["Moral weight\n0 – 1.0"]
+    T["Tractability per \$1M\n0.00001% – 0.01% x-risk"]
+    V["Value of 1% x-risk\n10¹⁵ – 10²⁸ GEUs"]
+    AI["\$1 to AI Safety\n10 – 10¹⁰ GEUs"]
+
+    P --> V
+    N --> V
+    W --> V
+    V --> AI
+    T --> AI
+
+    style V fill:#ffe66d
+    style AI fill:#a8d8ea
+`} />
+
+---
+
+### 2.2 Value of 1 Year Before TAI
+
+The <EntityLink id="ai-acceleration-tradeoff">AI Acceleration Tradeoff Model</EntityLink> estimates that **each additional year of preparation time before transformative AI** reduces existential risk by approximately **1–4 percentage points** (conditional on AI being developed), accounting for:
+
+- Additional alignment research capacity deployed
+- Governance infrastructure built
+- Safety culture established at frontier labs
+- International coordination progress
+
+**Conversion to GEUs**: If 1 year reduces x-risk by 2.5 pp on average, and the value of 1% x-risk reduction is V, then:
+
+$$
+V(\text{1 year before TAI}) = 2.5 \times V(1\% \text{ x-risk})
+$$
+
+**Dollar equivalent**: At current tractability rates (\$50M/year of Coefficient TAI funding buys perhaps 0.001–0.01% x-risk reduction per year), one additional year of preparation is equivalent to approximately **\$1B–\$100T in direct AI safety funding**. This is why interventions that slow AI timelines or accelerate readiness — compute governance, international treaties, recruitment of safety-focused researchers — are potentially among the most impactful in existence, even when they appear bureaucratic or indirect.
+
+**Important caveat**: This calculation assumes that safety preparation *during* a longer timeline is used productively. If a longer timeline primarily benefits capabilities researchers, the x-risk reduction per year may be negative. The sign of the tractability estimate itself is contested.
+
+---
+
+### 2.3 \$1 to Coefficient Giving — Navigating Transformative AI Fund
+
+<EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> (formerly Open Philanthropy) is the dominant external funder of AI safety work, spending approximately \$50M/year through its Navigating Transformative AI Fund. Key 2024 grants include Center for AI Safety (\$8.5M), Redwood Research (\$6.2M), and <EntityLink id="miri">MIRI</EntityLink> (\$4.1M).
+
+**Counterfactual impact chain:**
+
+| Step | Estimate | Notes |
+|------|----------|-------|
+| Total AI safety funding | \$120–150M/year external | Coefficient = ≈55% of this |
+| Coefficient TAI Fund share | \$50M/year | 2024 committed |
+| % going to direct alignment | ≈32% (\$16M) | 68% to evaluations/benchmarking |
+| Marginal x-risk reduction per \$M | ≈0.00001–0.001% | Extremely uncertain |
+| Counterfactual (would SFF/LTFF fund this?) | 30–60% would find alternative funding | Reduces counterfactual impact |
+
+**Estimate**: \$1 to Coefficient TAI Fund ≈ **50–500,000 GEUs**, with the wide range driven almost entirely by one's prior on P(x-risk) and tractability. Under skeptical assumptions (P(x-risk) ≈ 1%, low tractability), AI safety funding is only 10–100x GiveWell. Under concerned assumptions (P(x-risk) ≈ 30%, high tractability), it reaches 10⁶× or beyond.
+
+**Known limitations:**
+- **Evaluation-heavy allocation**: 68% of Coefficient's 2024 AI safety spending went to evaluations and benchmarking. Critics argue this systematically underfunds direct alignment research — the harder, more speculative work.
+- **Fungibility with internal labs**: Coefficient funds work that often complements commercial safety teams at Anthropic and DeepMind. The counterfactual impact depends on whether these orgs would do the work anyway.
+- **Concentration risk**: One organization controlling ≈55% of external AI safety funding creates single points of failure in strategic decisions.
+
+---
+
+### 2.4 \$1 to the Long-Term Future Fund
+
+The <EntityLink id="ltff">Long-Term Future Fund</EntityLink> (LTFF) operates at roughly \$8–12M/year, functioning as a regrantor within the EA ecosystem. It specializes in:
+
+- **Individual researchers** not affiliated with established orgs
+- **Speculative or early-stage projects** Coefficient wouldn't fund without a track record
+- **Fast turnaround** for time-sensitive opportunities (weeks vs. months)
+- **Riskier bets** at smaller funding sizes (\$10K–\$200K per grant)
+
+**Comparison to Coefficient TAI Fund:**
+
+| Dimension | Coefficient TAI | LTFF |
+|-----------|----------------|------|
+| Size | \$50M/year | \$8–12M/year |
+| Grant size | \$500K–\$10M | \$10K–\$200K |
+| Application process | Months | Weeks |
+| Counterfactual grantees | Many would get Coefficient funding | Most would *not* get Coefficient |
+| Risk tolerance | Low-medium | Medium-high |
+| Variance in outcomes | Lower | Higher |
+
+**Estimate**: \$1 to LTFF ≈ **0.3x–10x** Coefficient TAI per dollar, distributed **log-normally around parity** with higher variance. The LTFF is *not* systematically better or worse than Coefficient per dollar — it fills a different niche. For the marginal longtermist funder:
+
+- If the work you care about *would* receive Coefficient funding: donate to Coefficient (more infrastructure)
+- If the work requires fast turnaround or is too speculative for Coefficient: prefer LTFF
+- If you are uncertain: LTFF has better expected value per dollar on the margin because it is smaller and more funding-constrained
+
+---
+
+### 2.5 \$1 in Anthropic Equity (Secondary Market)
+
+This is the most analytically interesting comparison because the **sign of expected value is genuinely uncertain** — it cannot be expressed as "N× GiveWell" but as a distribution that spans negative values.
+
+**What secondary-market purchase does and doesn't do:**
+
+| Effect | Direction | Magnitude |
+|--------|-----------|-----------|
+| Provides capital to Anthropic | **None** | Secondary market; money goes to selling shareholder |
+| Influences Anthropic's safety priorities | Slightly positive | Extremely small per dollar; voting power negligible |
+| Sustains high Anthropic valuation | Mixed | High valuation → more capital raised, more capabilities work |
+| Accelerates AI capabilities timeline | Slightly negative | Via enabling Anthropic's compute purchases and talent hiring |
+| Aligns EA community incentives with Anthropic success | Mixed | Could create conflicts of interest |
+| EA influence via large ownership bloc | Positive if EA owns \>1% | Current EA ownership is well below threshold for meaningful pressure |
+
+**The acceleration problem**: Anthropic's capabilities research is directly entangled with safety research — the company trains frontier models to study alignment. \$1 of secondary-market Anthropic stock primarily benefits the previous shareholder, but *sustaining* Anthropic's valuation indirectly supports its ability to raise future primary-round capital. This chains into capabilities deployment with uncertain safety implications.
+
+**Contrast with primary-round investing**: In a primary round (e.g., Series C), Anthropic receives the capital directly and deploys it for compute, talent, and research. The value analysis is more complex — this provides direct resources that fund safety work *and* capabilities work simultaneously.
+
+**Estimate**: \$1 of Anthropic secondary stock ≈ **−150,000 to +50,000 GEUs**, with the distribution skewed negative relative to Coefficient TAI Fund. The expected value is likely slightly negative *relative to* direct AI safety funding — not because Anthropic is bad, but because secondary purchases provide essentially zero direct safety benefit while potentially sustaining valuations that accelerate capabilities deployment.
+
+**Important context**: This comparison is against direct AI safety funding, not against GiveWell. Relative to *doing nothing*, Anthropic secondary stock is probably mildly positive (Anthropic does meaningful safety work). The point is that for an EA donor choosing between vehicles, secondary Anthropic equity compares poorly to LTFF or Coefficient TAI.
+
+---
+
+### 2.6 Coefficient Giving's 13 Cause Clusters
+
+In November 2025, <EntityLink id="open-philanthropy">Open Philanthropy</EntityLink> rebranded to Coefficient Giving and restructured into 13 cause-specific funds. From a longtermist perspective, the relative value of \$1 across these funds varies enormously:
+
+| Fund | GEU per dollar (longtermist prior) | GEU per dollar (neartermist prior) | Key crux |
+|------|------------------------------------|------------------------------------|----------|
+| **Navigating Transformative AI** | 50 – 500,000 | 0.5 – 5 | P(AI x-risk), tractability |
+| **Pandemic Preparedness** | 3 – 300 | 1 – 20 | P(bio x-risk), neglectedness |
+| **Global Health & Wellbeing** | 1 (reference) | 1 (reference) | — |
+| **Farm Animal Welfare** | 0.001 – 100 | 5 – 500 | Moral weight of animals |
+| **Scientific Research** | 0.2 – 10 | 0.3 – 5 | Research compounding rate |
+| **Criminal Justice Reform** | 0.05 – 2 | 0.1 – 3 | Bounded US-focused impact |
+| **Nuclear Weapons Policy** | 1 – 500 | 0.5 – 50 | P(nuclear x-risk) |
+| **Biosecurity (non-pandemic)** | 2 – 200 | 1 – 30 | Near-x-risk importance |
+| **Climate & Energy** | 0.2 – 20 | 0.5 – 10 | Long-run importance, neglectedness |
+
+The starkest divergence is between Navigating Transformative AI and Farm Animal Welfare: longtermists find AI safety dramatically superior, while those focused on present-day animal welfare find the reverse. The comparison is almost entirely a crux about **moral circle expansion vs. existential risk priority** rather than a tractability or neglectedness argument.
+
+The table above omits the final three Coefficient funds (in areas like immigration, housing, and democracy) because their longtermist value is sufficiently unclear that producing a confidence interval would require substantially more analysis than this page provides.
+
+---
+
+## Part III — Cross-Comparison Matrix
+
+The table below expresses all pairwise comparisons as ratios. Read across a row to find "how many dollars of column Y equals \$1 of row X."
+
+| | GiveWell | Pandemic Prep | Farm Animal | Coefficient TAI | LTFF | Anthropic Secondary |
+|---|---|---|---|---|---|---|
+| **GiveWell** | 1 | 0.003 – 0.3 | 0.01 – 1000 | 0.000002 – 0.02 | 0.0000005 – 0.05 | ≈ ambiguous |
+| **Pandemic Prep** | 3 – 300 | 1 | 0.003 – 200 | 0.00003 – 6 | ambiguous | ambiguous |
+| **Coefficient TAI** | 50 – 500K | 0.2 – 200K | 500 – 5×10⁸ | 1 | 0.3 – 10 | ≈ −50 to +3 |
+| **LTFF** | 20 – 2M | 0.1 – 1M | 200 – 2×10⁹ | 0.1 – 3 | 1 | ≈ −100 to +5 |
+
+*Ranges represent 90% credible intervals given current knowledge. Ratios marked "ambiguous" span negative values and cannot be expressed as simple multipliers.*
+
+---
+
+## Squiggle Model
+
+This model encodes the core value chain. All values are expressed in GEUs (\$1 to GiveWell = 1). The output dictionary shows the estimated GEU-per-dollar across all six comparison vehicles.
+
+<SquiggleEstimate title="Relative Longtermist Value Comparisons (GEUs per dollar)" code={`
+// Units: GEU = \$1 to GiveWell top charities (reference = 1)
+// 90% CI captures genuine uncertainty across longtermist worldviews
+
+// ═══ Philosophical parameters ═══
+// P(AI existential catastrophe): Carlsmith >10%, XPT survey ~5%, skeptics ~0.5%
+pXrisk = 0.01 to 0.40
+
+// Moral weight of future generations (0 = pure present-focus, 1 = full longtermist)
+futureMoralWeight = 0.2 to 1.0
+
+// ═══ Core tractability: how much does \$1M in AI safety move x-risk? ═══
+// Low end: AI safety has no measurable impact on x-risk per dollar
+// High end: robust tractability as per strong longtermist models
+// Combined into a single multiplier vs GiveWell (the key unknown)
+tractabilityVsGWE = 10 to 10^8   // log-uniform; the heart of the debate
+
+// ═══ Non-AI longtermist allocations ═══
+pandemicPrep = 3 to 300          // Neglected catastrophic risk; tractable
+farmAnimalWelfare = 0.001 to 100 // Almost entirely a moral-weight crux
+nuclearPolicy = 1 to 500         // X-risk, somewhat less neglected
+
+// ═══ AI safety vehicles ═══
+// Core value multiplier vs GiveWell (given longtermist assumptions)
+aiSafetyCore = pXrisk * futureMoralWeight * tractabilityVsGWE
+
+// Coefficient Navigating TAI Fund: professional, well-evaluated, dominant funder
+// Some counterfactual concern (alternative funders would cover some grants)
+coefficientTAI = aiSafetyCore * (0.5 to 2.0)
+
+// Long-Term Future Fund: fills neglected gaps, higher variance
+// Bimodal: either finds exceptional neglected work (5-10x) or duplicates Coefficient (0.3x)
+ltffMultiplier = mixture(0.3 to 1.5, 1.5 to 10, [0.6, 0.4])
+ltff = aiSafetyCore * ltffMultiplier
+
+// Anthropic stock (secondary market): near-zero safety impact, possible acceleration harm
+// Direct safety influence: ~0–5% of Coefficient TAI per dollar (no capital transfer)
+anthroInfluence = aiSafetyCore * (0 to 0.05)
+// Acceleration risk: sustaining high valuation may accelerate timelines
+anthroAccelRisk = -(aiSafetyCore * (0.001 to 0.40))
+anthropicSecondary = anthroInfluence + anthroAccelRisk
+
+// ═══ Output ═══
+{
+  "GiveWell Global Health": 1,
+  "Pandemic Preparedness": pandemicPrep,
+  "Farm Animal Welfare": farmAnimalWelfare,
+  "Nuclear Policy": nuclearPolicy,
+  "Coefficient TAI Fund": coefficientTAI,
+  "Long-Term Future Fund": ltff,
+  "Anthropic Stock (secondary)": anthropicSecondary
+}
+`} />
+
+---
+
+## Interactive Calculator
+
+Adjust the key parameters — P(x-risk), moral weight, tractability — to see how your assumptions change the relative values. The model is intentionally transparent: the ratio of Coefficient TAI Fund to GiveWell is almost entirely determined by three variables.
+
+<SquiggleEstimate title="Longtermist Value Calculator — adjust parameters to explore" showEditor={true} code={`
+// ════════════════════════════════════════════
+// LONGTERMIST VALUE CALCULATOR
+// Adjust the parameters below to match your worldview.
+// All outputs are in GEUs (GiveWell-Equivalent Units, reference = 1).
+// ════════════════════════════════════════════
+
+// ── YOUR KEY ASSUMPTIONS ─────────────────────
+// Change these to explore how conclusions depend on worldview
+
+// P(AI causes existential catastrophe by 2100):
+//   Carlsmith: >10%  |  Toby Ord: 10%  |  Skeptics: &lt;1%  |  XPT median: ~5%
+pXrisk = 0.10
+
+// Moral weight of future generations (relative to present people):
+//   Full longtermism: 1.0  |  Moderate discounting: 0.5  |  Pure present-focus: 0.0
+futureMoralWeight = 0.6
+
+// Tractability: how much does 1M USD in AI safety move x-risk?
+//   Optimistic: 1e-4% per 1M  |  Central: 1e-6% per 1M  |  Pessimistic: 1e-8% per 1M
+// Expressed as a multiplier vs GiveWell (10 = 10x better, 10^6 = million times better)
+tractabilityVsGWE = 1000
+
+// Counterfactual: fraction of Coefficient grants that would get funded anyway (by SFF, LTFF, etc.)
+// 0 = fully counterfactual, 0.5 = half would be funded elsewhere
+counterfactualDiscount = 0.3
+
+// ── DERIVED VALUES ───────────────────────────
+// Core AI safety value multiplier
+aiSafetyCore = pXrisk * futureMoralWeight * tractabilityVsGWE
+
+// Coefficient TAI Fund (adjusted for counterfactual)
+coefficientTAI = aiSafetyCore * (1 - counterfactualDiscount)
+
+// LTFF: assume 70% as counterfactual as Coefficient (more niche work)
+ltffCounterfactual = counterfactualDiscount * 0.3
+ltff = aiSafetyCore * (1 - ltffCounterfactual) * 1.2  // slight premium for gap-filling
+
+// Anthropic secondary stock: ~0–5% of Coefficient effectiveness, minus acceleration risk
+anthropicSafetyBenefit = coefficientTAI * 0.02
+anthropicAccelHarm = coefficientTAI * 0.15   // moderate acceleration concern
+anthropicSecondary = anthropicSafetyBenefit - anthropicAccelHarm
+
+// ── OUTPUTS ──────────────────────────────────
+{
+  "GiveWell Global Health (\$1)": 1,
+  "Pandemic Preparedness (\$1)": 20,
+  "Farm Animal Welfare (\$1)": 0.01 to 50,
+  "Coefficient TAI Fund (\$1)": coefficientTAI,
+  "Long-Term Future Fund (\$1)": ltff,
+  "Anthropic Stock Secondary (\$1)": anthropicSecondary,
+  "Ratio: Coefficient TAI / GiveWell": coefficientTAI,
+  "Ratio: LTFF / Coefficient TAI": ltff / coefficientTAI
+}
+`} />
+
+---
+
+## Key Cruxes
+
+<KeyQuestions questions={[
+  "What probability do you assign to AI causing existential catastrophe? This single parameter moves the Coefficient TAI / GiveWell ratio by ~40x as it goes from 1% to 40%.",
+  "Do you apply a moral discount rate to future generations? At 1%/year discount, the value of far-future people collapses to near zero, making longtermist allocations indistinguishable from global health.",
+  "How tractable is AI safety research at the margin? The tractability estimate (how much does \$1M of research reduce x-risk?) is the most uncertain variable and dominates all conclusions.",
+  "Does secondary-market Anthropic equity meaningfully influence Anthropic's safety priorities? If yes, the estimate for Anthropic stock shifts positive; if no, it remains near-zero or slightly negative.",
+  "How much of the Long-Term Future Fund's portfolio is counterfactually funded by Coefficient Giving? If LTFF mostly funds things Coefficient would eventually fund anyway, LTFF's counterfactual impact falls substantially."
+]} />
+
+---
+
+## Related Pages
+
+- <EntityLink id="carlsmith-six-premises">Carlsmith's Six-Premise Argument</EntityLink> — the probabilistic decomposition underlying P(x-risk) estimates used here
+- <EntityLink id="ai-acceleration-tradeoff">AI Acceleration Tradeoff Model</EntityLink> — source for the 1–4 pp x-risk reduction per year of preparation estimate
+- <EntityLink id="coefficient-giving">Coefficient Giving</EntityLink> — full profile of the dominant AI safety funder
+- <EntityLink id="ltff">Long-Term Future Fund</EntityLink> — LTFF profile and grant history
+- <EntityLink id="existential-risk">Existential Risk from AI</EntityLink> — background on the risk landscape informing these estimates
+- <EntityLink id="funders-overview">Longtermist Funders</EntityLink> — funding landscape overview with current spending figures
