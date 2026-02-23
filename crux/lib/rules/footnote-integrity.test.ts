@@ -130,4 +130,16 @@ Claim A.[^1] Claim B.[^3] Claim C.[^5]
     expect(orphanedRefs).toHaveLength(2);
     expect(orphanedDefs).toHaveLength(2);
   });
+
+  it('recognizes footnote definitions without space after colon', () => {
+    const body = `## Section
+
+Claim here.[^1]
+
+[^1]:Source without space (https://example.com)
+`;
+    const issues = footnoteIntegrityRule.check(makeContentFile(body), engine);
+    // Should NOT report orphaned ref or def — the definition is valid
+    expect(issues).toHaveLength(0);
+  });
 });

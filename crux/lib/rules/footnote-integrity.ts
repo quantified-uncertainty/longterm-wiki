@@ -17,8 +17,8 @@ import type { ContentFile, ValidationEngine } from '../validation-engine.ts';
 /** Matches inline footnote refs [^MARKER] (not inside definition lines). */
 const INLINE_REF_RE = /\[\^([^\]]+)\](?!:)/g;
 
-/** Matches footnote definition lines [^MARKER]: text */
-const DEF_RE = /^\[\^([^\]]+)\]:\s/gm;
+/** Matches footnote definition lines [^MARKER]: text (space after colon is optional per markdown spec). */
+const DEF_RE = /^\[\^([^\]]+)\]:\s?/gm;
 
 /** Matches SRC-style markers that should have been renumbered. */
 const SRC_MARKER_RE = /\[\^(SRC-\d+|S\d+-SRC-\d+)\]/g;
@@ -70,8 +70,8 @@ export const footnoteIntegrityRule = {
         definedMarkers.add(defMatch[1]);
       }
 
-      // Collect inline ref markers (exclude definition lines)
-      if (!/^\[\^[^\]]+\]:\s/.test(line)) {
+      // Collect inline ref markers (exclude definition lines — space after colon is optional)
+      if (!/^\[\^[^\]]+\]:\s?/.test(line)) {
         INLINE_REF_RE.lastIndex = 0;
         let refMatch: RegExpExecArray | null;
         while ((refMatch = INLINE_REF_RE.exec(line)) !== null) {

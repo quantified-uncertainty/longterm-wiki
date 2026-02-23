@@ -17,11 +17,21 @@ export interface ModelPricing {
 
 /**
  * Per-model pricing table. Keyed by exact model ID.
+ * Includes Anthropic models (via SDK) and OpenRouter models (via raw fetch).
  */
 export const MODEL_PRICING: Record<string, ModelPricing> = {
+  // Anthropic models (used via streamingCreate / Anthropic SDK)
   'claude-haiku-4-5-20251001': { inputPerM: 0.80, outputPerM: 4.00 },
   'claude-sonnet-4-6': { inputPerM: 3.00, outputPerM: 15.00 },
   'claude-opus-4-6': { inputPerM: 15.00, outputPerM: 75.00 },
+
+  // OpenRouter models (used via raw fetch in research-agent / openrouter.ts)
+  'perplexity/sonar': { inputPerM: 1.00, outputPerM: 1.00 },
+  'perplexity/sonar-pro': { inputPerM: 3.00, outputPerM: 15.00 },
+  'google/gemini-2.0-flash-001': { inputPerM: 0.075, outputPerM: 0.30 },
+  'deepseek/deepseek-chat': { inputPerM: 0.14, outputPerM: 0.28 },
+  'google/gemini-pro-1.5': { inputPerM: 1.25, outputPerM: 5.00 },
+  'openai/gpt-4o-mini': { inputPerM: 0.15, outputPerM: 0.60 },
 };
 
 /** Date these prices were last verified. */

@@ -16,8 +16,9 @@ import { TIER_BUDGETS, type OrchestratorContext, type BudgetConfig } from './typ
 import { buildToolDefinitions, extractQualityMetrics, wrapWithTracking, type ToolHandler } from './tools/index.ts';
 import { evaluateQualityGate } from './quality-gate.ts';
 import { buildImproveSystemPrompt, buildRefinementPrompt } from './prompts.ts';
-import { deduplicateFootnotes } from './orchestrator.ts';
+import { deduplicateFootnotes, normalizeDollarEscaping } from './orchestrator.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
+import { getModelPricing, calculateCost } from '../../lib/pricing.ts';
 
 // ---------------------------------------------------------------------------
 // Fixture helpers
@@ -414,5 +415,85 @@ Text[^1] and[^2].
   it('handles content with no footnotes', () => {
     const input = 'Just plain text without footnotes.';
     expect(deduplicateFootnotes(input)).toBe(input);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeDollarEscaping
+// ---------------------------------------------------------------------------
+
+describe('normalizeDollarEscaping', () => {
+  it('collapses triple+ backslashes before $ to single backslash', () => {
+    expect(normalizeDollarEscaping('costs \\\\\\$100')).toBe('costs \\$100');
+    expect(normalizeDollarEscaping('\\\\\\\\$500')).toBe('\\$500');
+  });
+
+  it('leaves single escaped dollars untouched', () => {
+    expect(normalizeDollarEscaping('costs \\$100')).toBe('costs \\$100');
+  });
+
+  it('leaves double backslash + dollar untouched (literal backslash)', () => {
+    // \\$ means "literal backslash followed by dollar" — should NOT be collapsed
+    expect(normalizeDollarEscaping('path\\\\$HOME')).toBe('path\\\\$HOME');
+  });
+
+  it('leaves bare dollars untouched', () => {
+    expect(normalizeDollarEscaping('costs $100')).toBe('costs $100');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CostTracker.recordExternalCost
+// ---------------------------------------------------------------------------
+
+describe('CostTracker.recordExternalCost', () => {
+  it('records external costs and includes them in totalCost', () => {
+    const tracker = new CostTracker();
+    tracker.recordExternalCost('perplexity/sonar', 0.05, 'research_search');
+    expect(tracker.totalCost).toBeCloseTo(0.05);
+    expect(tracker.entries).toHaveLength(1);
+    expect(tracker.entries[0].model).toBe('perplexity/sonar');
+    expect(tracker.entries[0].label).toBe('research_search');
+    expect(tracker.entries[0].inputTokens).toBe(0);
+    expect(tracker.entries[0].outputTokens).toBe(0);
+  });
+
+  it('includes external costs in breakdown', () => {
+    const tracker = new CostTracker();
+    tracker.recordExternalCost('perplexity/sonar', 0.05, 'research_search');
+    tracker.record('claude-haiku-4-5-20251001', { input_tokens: 1000, output_tokens: 100 }, 'research_facts');
+    const breakdown = tracker.breakdown();
+    expect(breakdown['research_search']).toBeCloseTo(0.05);
+    expect(breakdown['research_facts']).toBeGreaterThan(0);
+    expect(tracker.totalCost).toBeGreaterThan(0.05);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pricing: OpenRouter models recognized
+// ---------------------------------------------------------------------------
+
+describe('getModelPricing', () => {
+  it('recognizes Anthropic models', () => {
+    expect(getModelPricing('claude-sonnet-4-6')).toBeDefined();
+    expect(getModelPricing('claude-opus-4-6')).toBeDefined();
+    expect(getModelPricing('claude-haiku-4-5-20251001')).toBeDefined();
+  });
+
+  it('recognizes OpenRouter models', () => {
+    expect(getModelPricing('perplexity/sonar')).toBeDefined();
+    expect(getModelPricing('perplexity/sonar-pro')).toBeDefined();
+    expect(getModelPricing('google/gemini-2.0-flash-001')).toBeDefined();
+    expect(getModelPricing('deepseek/deepseek-chat')).toBeDefined();
+  });
+
+  it('returns undefined for unknown models', () => {
+    expect(getModelPricing('unknown/model')).toBeUndefined();
+  });
+
+  it('calculates cost correctly for OpenRouter models', () => {
+    // perplexity/sonar: $1/M input, $1/M output
+    const cost = calculateCost('perplexity/sonar', { inputTokens: 1_000_000, outputTokens: 500_000 });
+    expect(cost).toBeCloseTo(1.50); // 1.00 + 0.50
   });
 });

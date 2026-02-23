@@ -495,6 +495,11 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
       searchPerplexity(focusedQuery, maxResultsPerSource).then(r => {
         searchCost += r.cost;
         totalCost += r.cost;
+        // Record Perplexity/OpenRouter cost in the tracker so batch reports
+        // include it (this call bypasses streamingCreate, so needs manual recording).
+        if (tracker && r.cost > 0) {
+          tracker.recordExternalCost('perplexity/sonar', r.cost, 'research_search');
+        }
         return r.hits;
       }).catch(err => {
         console.warn(`[research-agent] Perplexity search failed: ${err instanceof Error ? err.message : err}`);

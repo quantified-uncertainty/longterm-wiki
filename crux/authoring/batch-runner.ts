@@ -108,7 +108,20 @@ function loadState(): BatchState | null {
 function saveState(state: BatchState): void {
   const dir = path.dirname(STATE_FILE);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  // Atomic write: write to temp file then rename to avoid corruption on crash
+  const tmpFile = STATE_FILE + '.tmp';
+  fs.writeFileSync(tmpFile, JSON.stringify(state, null, 2));
+  try {
+    fs.renameSync(tmpFile, STATE_FILE);
+  } catch (err: unknown) {
+    // EXDEV: cross-device link — fall back to copy + unlink
+    if ((err as NodeJS.ErrnoException)?.code === 'EXDEV') {
+      fs.copyFileSync(tmpFile, STATE_FILE);
+      fs.unlinkSync(tmpFile);
+    } else {
+      throw err;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -274,6 +287,20 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     };
   }
 
+  // ── Validate page IDs ───────────────────────────────────────────────────
+
+  if (total === 0) {
+    log('batch', '⚠ No page IDs provided — nothing to do. Check --batch or --batch-file args.');
+    return [];
+  }
+
+  const pages = getCachedPages();
+  const knownIds = new Set(pages.map((p: { id: string }) => p.id));
+  const unknownIds = pageIds.filter(id => !knownIds.has(id));
+  if (unknownIds.length > 0) {
+    log('batch', `⚠ ${unknownIds.length} unknown page ID(s) will be skipped: ${unknownIds.join(', ')}`);
+  }
+
   // ── Header ──────────────────────────────────────────────────────────────
 
   console.log('\n' + '═'.repeat(70));
@@ -295,6 +322,13 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
       continue;
     }
 
+    // Skip unknown pages early (validated above)
+    if (!knownIds.has(pageId)) {
+      log('batch', `[${pageNum}/${total}] ${pageId}... skipped (unknown page ID)`);
+      results.push({ pageId, status: 'skipped', error: 'Unknown page ID' });
+      continue;
+    }
+
     // Check budget before starting
     if (budgetLimit && cumulativeCost >= budgetLimit) {
       log('batch', `[${pageNum}/${total}] ${pageId}... skipped (budget exhausted: ${formatCost(cumulativeCost)}/${formatCost(budgetLimit)})`);
@@ -306,6 +340,11 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
       state.completedPages[pageId] = budgetResult;
       saveState(state);
       continue;
+    }
+
+    // Warn when approaching budget limit (within 90%)
+    if (budgetLimit && cumulativeCost >= budgetLimit * 0.9) {
+      log('batch', `⚠ Budget ${Math.round((cumulativeCost / budgetLimit) * 100)}% used (${formatCost(cumulativeCost)}/${formatCost(budgetLimit)}) — next page may cause overage`);
     }
 
     // Large pages get a shorter timeout since they're more likely to stall

@@ -65,6 +65,25 @@ export class CostTracker {
     });
   }
 
+  /**
+   * Record a cost from an external API that reports cost directly (not via tokens).
+   * Used for OpenRouter/Perplexity calls that bypass the Anthropic SDK.
+   *
+   * @param model - Model identifier (e.g. "perplexity/sonar")
+   * @param cost - Cost in USD as reported by the API
+   * @param label - Grouping label
+   */
+  recordExternalCost(model: string, cost: number, label: string): void {
+    this.entries.push({
+      model,
+      inputTokens: 0,
+      outputTokens: 0,
+      cost,
+      label,
+      timestamp: Date.now(),
+    });
+  }
+
   /** Total actual cost across all recorded calls. */
   get totalCost(): number {
     return this.entries.reduce((sum, e) => sum + e.cost, 0);
