@@ -42,15 +42,16 @@ export function ensureComponentImports(filePath: string): { fixed: boolean; adde
   const contentFile = new ContentFile(filePath, content);
 
   // Use the shared rule to detect missing imports
-  const issues = componentImportsRule.check(contentFile, { content: new Map() });
+  const issuesResult = componentImportsRule.check(contentFile, { content: new Map() } as any);
+  const issues = Array.isArray(issuesResult) ? issuesResult : [];
 
-  if (!issues || issues.length === 0) {
+  if (issues.length === 0) {
     return { fixed: false, added: [] };
   }
 
   // Apply the fix from the shared rule
   const issue = issues[0];
-  const fixedContent = componentImportsRule.fix(content, issue);
+  const fixedContent = componentImportsRule.fix?.(content, issue) ?? null;
 
   if (fixedContent && fixedContent !== content) {
     fs.writeFileSync(filePath, fixedContent);

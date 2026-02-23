@@ -71,10 +71,10 @@ function loadYamlDir(dirname: string): YamlItemWithSource[] {
     const data = loadYaml(filepath);
     if (Array.isArray(data)) {
       // Tag each item with source file
-      for (const item of data) {
+      for (const item of data as any[]) {
         item._sourceFile = filepath;
       }
-      results.push(...data);
+      results.push(...(data as YamlItemWithSource[]));
     }
   }
 

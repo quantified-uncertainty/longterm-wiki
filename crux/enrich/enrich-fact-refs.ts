@@ -349,7 +349,7 @@ ${content}
 
 Identify hardcoded numbers matching canonical facts and return replacement instructions as JSON.`;
 
-  const result = await callClaude(client, {
+  const result = await callClaude(client!, {
     model: MODELS.haiku,
     systemPrompt,
     userPrompt,
@@ -359,7 +359,7 @@ Identify hardcoded numbers matching canonical facts and return replacement instr
 
   let parsed: LlmFactRefResponse | null = null;
   try {
-    parsed = parseJsonResponse<LlmFactRefResponse>(result.text);
+    parsed = parseJsonResponse(result.text) as LlmFactRefResponse | null;
   } catch {
     // LLM returned invalid JSON — return empty replacements rather than crashing
     return [];

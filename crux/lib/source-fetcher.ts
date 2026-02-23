@@ -384,10 +384,9 @@ async function fetchWithFirecrawl(url: string): Promise<FirecrawlResult | null> 
   if (!firecrawlAvailable) return null;
 
   try {
-    // @ts-expect-error — @mendable/firecrawl-js has no bundled type declarations in crux
     const FirecrawlApp = (await import('@mendable/firecrawl-js')).default;
     const firecrawl = new FirecrawlApp({ apiKey: FIRECRAWL_KEY });
-    const result = await firecrawl.scrape(url, { formats: ['markdown'] });
+    const result = await firecrawl.scrapeUrl(url, { formats: ['markdown'] }) as any;
 
     if (result.markdown && result.markdown.length > 0) {
       const meta = (result as { metadata?: { title?: string } }).metadata;
@@ -952,7 +951,7 @@ export function requestsFromResourceIds(
   opts: { extractMode?: 'full' | 'relevant'; query?: string; updateResourceStatus?: boolean } = {},
 ): FetchRequest[] {
   return resourceIds
-    .map(id => {
+    .map((id): FetchRequest | null => {
       const resource = getResourceById(id);
       if (!resource) return null;
       return {
@@ -961,7 +960,7 @@ export function requestsFromResourceIds(
         extractMode: opts.extractMode ?? 'full',
         query: opts.query,
         updateResourceStatus: opts.updateResourceStatus,
-      } satisfies FetchRequest;
+      };
     })
     .filter((r): r is FetchRequest => r !== null);
 }

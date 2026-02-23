@@ -12,6 +12,7 @@ import {
   countDiagrams,
   countTables,
   countVisuals,
+  type VisualCounts,
 } from './visual-detection.ts';
 import { stripFrontmatter } from './patterns.ts';
 import { findFootnoteRefs } from './content-integrity.ts';

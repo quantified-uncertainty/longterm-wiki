@@ -344,23 +344,23 @@ async function main(): Promise<void> {
         console.error(`${colors.red}Article not found: ${SPECIFIC_ID}${colors.reset}`);
         process.exit(1);
       }
-      items = [article];
+      items = [article] as any;
     } else {
       const source = sources.get(SPECIFIC_ID);
       if (!source) {
         console.error(`${colors.red}Source not found: ${SPECIFIC_ID}${colors.reset}`);
         process.exit(1);
       }
-      items = [source];
+      items = [source] as any;
     }
   } else if (TYPE === 'articles') {
     // Get articles needing summaries
-    items = RESUMMARY
+    items = (RESUMMARY
       ? articles.needingResummary().slice(0, BATCH_SIZE)
-      : articles.needingSummary().slice(0, BATCH_SIZE);
+      : articles.needingSummary().slice(0, BATCH_SIZE)) as any;
   } else if (TYPE === 'sources') {
     // Get sources needing summaries
-    items = sources.needingSummary().slice(0, BATCH_SIZE);
+    items = sources.needingSummary().slice(0, BATCH_SIZE) as any;
   } else {
     console.error(`${colors.red}Unknown type: ${TYPE}. Use 'articles' or 'sources'${colors.reset}`);
     process.exit(1);
@@ -398,7 +398,7 @@ async function main(): Promise<void> {
   };
 
   // Process items in parallel
-  const processor = TYPE === 'articles' ? summarizeArticle : summarizeSource;
+  const processor = (TYPE === 'articles' ? summarizeArticle : summarizeSource) as (item: Article | Source) => Promise<SummaryResult>;
   const { completed, failed, totalTokens } = await processInParallel(
     items,
     processor,

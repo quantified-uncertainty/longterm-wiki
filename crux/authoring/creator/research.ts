@@ -126,10 +126,10 @@ export async function runPerplexityResearch(topic: string, depth: string, { log,
       query: result.query,
       content: result.content,
       citations: result.citations || [],
-      tokens: result.usage?.total_tokens || 0,
+      tokens: Number(result.usage?.total_tokens) || 0,
       cost: result.cost || 0,
     });
-    log('research', `  ${result.category}: ${result.usage?.total_tokens || 0} tokens, $${(result.cost || 0).toFixed(4)}`);
+    log('research', `  ${result.category}: ${Number(result.usage?.total_tokens) || 0} tokens, $${(result.cost || 0).toFixed(4)}`);
   }
 
   log('research', `Total research cost: $${totalCost.toFixed(4)}`);

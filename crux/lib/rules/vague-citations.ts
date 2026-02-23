@@ -131,7 +131,6 @@ export const vagueCitationsRule = {
                 line: lineNum,
                 message: `Vague citation "${sourceCell}" - specify the exact source (e.g., interview name, date, publication)`,
                 severity: Severity.WARNING,
-                context: line.trim(),
               }));
               break; // Only report once per cell
             }

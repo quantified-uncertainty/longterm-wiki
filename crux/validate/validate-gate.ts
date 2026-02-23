@@ -12,7 +12,8 @@
  *   3. [Parallel] Run vitest tests
  *      [Parallel] Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink)
  *      [Parallel] YAML schema validation
- *      [Parallel] TypeScript type check
+ *      [Parallel] TypeScript type check — app
+ *      [Parallel] TypeScript type check — crux
  *
  * With --full:
  *   4. Full Next.js production build
@@ -79,6 +80,7 @@ interface Step {
   command: string;
   args: string[];
   cwd: string;
+  advisory?: boolean; // if true, failure is reported but doesn't block
 }
 
 const APP_DIR = `${PROJECT_ROOT}/apps/web`;
@@ -152,10 +154,18 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'typecheck',
-    name: 'TypeScript type check',
+    name: 'TypeScript type check — app',
     command: 'npx',
     args: ['tsc', '--noEmit'],
     cwd: APP_DIR,
+  },
+  {
+    id: 'typecheck-crux',
+    name: 'TypeScript type check — crux (advisory)',
+    command: 'npx',
+    args: ['tsc', '--noEmit', '-p', '../../crux/tsconfig.json'],
+    cwd: APP_DIR,
+    advisory: true,
   },
   {
     id: 'returning-guard',
@@ -181,6 +191,7 @@ interface StepResult {
   passed: boolean;
   duration: number;
   exitCode: number | null;
+  advisory?: boolean;
   capturedOutput: string;
 }
 
@@ -228,6 +239,7 @@ function runStep(step: Step, buffer = false): Promise<StepResult> {
         duration: Date.now() - start,
         exitCode: code,
         capturedOutput,
+        advisory: step.advisory,
       });
     });
 
@@ -245,6 +257,7 @@ function runStep(step: Step, buffer = false): Promise<StepResult> {
         duration: Date.now() - start,
         exitCode: 1,
         capturedOutput,
+        advisory: step.advisory,
       });
     });
   });
@@ -343,7 +356,7 @@ async function main(): Promise<void> {
   // ── Phase 3: Independent checks in parallel ────────────────────────────────
   const parallelResults = await runParallel(PARALLEL_STEPS);
   allResults.push(...parallelResults);
-  if (parallelResults.some(r => !r.passed)) {
+  if (parallelResults.some(r => !r.passed && !r.advisory)) {
     printSummary(allResults, totalStart);
     process.exit(1);
   }
@@ -364,15 +377,23 @@ async function main(): Promise<void> {
 
 function printSummary(results: StepResult[], totalStart: number): void {
   const totalDuration = Date.now() - totalStart;
-  const passed = results.every((r) => r.passed);
-  const failed = results.filter((r) => !r.passed);
+  const blockingFailed = results.filter((r) => !r.passed && !r.advisory);
+  const advisoryFailed = results.filter((r) => !r.passed && r.advisory);
+  const passed = blockingFailed.length === 0;
+  const failed = blockingFailed;
 
   if (CI_MODE) {
     console.log(JSON.stringify({ passed, results: results.map(r => ({ id: r.id, name: r.name, passed: r.passed, duration: r.duration, exitCode: r.exitCode })), duration: formatMs(totalDuration) }));
   } else {
     console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`);
     if (passed) {
-      console.log(`${c.green}${c.bold}  ✅ All ${results.length} gate checks passed${c.reset} ${c.dim}(${formatMs(totalDuration)})${c.reset}`);
+      const advisoryNote = advisoryFailed.length > 0
+        ? ` ${c.dim}(${advisoryFailed.length} advisory warning${advisoryFailed.length > 1 ? 's' : ''})${c.reset}`
+        : '';
+      console.log(`${c.green}${c.bold}  ✅ All ${results.length} gate checks passed${c.reset} ${c.dim}(${formatMs(totalDuration)})${c.reset}${advisoryNote}`);
+      for (const f of advisoryFailed) {
+        console.log(`${c.yellow}  ⚠ ${f.name}${c.reset}`);
+      }
     } else {
       console.log(`${c.red}${c.bold}  ❌ Gate check failed${c.reset} ${c.dim}(${formatMs(totalDuration)})${c.reset}`);
       for (const f of failed) {

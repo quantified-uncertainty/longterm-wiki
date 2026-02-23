@@ -187,6 +187,7 @@ function findComponentRefs(content: string): ComponentRef[] {
   }
 
   // DataInfoBox entityId="..."
+  let match: RegExpExecArray | null;
   const infoBoxRegex = /<DataInfoBox\s+entityId=["']([^"']+)["']/g;
   while ((match = infoBoxRegex.exec(content)) !== null) {
     refs.push({
