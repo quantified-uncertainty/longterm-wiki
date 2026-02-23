@@ -32,12 +32,12 @@ function loadEntityIds(): string[] {
 
 // ── Run Report Persistence ──────────────────────────────────────────────────
 
-function saveRunReport(report: RunReport): string {
-  mkdirSync(RUNS_DIR, { recursive: true });
+export function saveRunReport(report: RunReport, runsDir = RUNS_DIR): string {
+  mkdirSync(runsDir, { recursive: true });
   // Use date + time to avoid overwriting if run multiple times per day
   const timestamp = report.startedAt.replace(/[:.]/g, '-').slice(0, 19);
   const filename = `${timestamp}.yaml`;
-  const filepath = join(RUNS_DIR, filename);
+  const filepath = join(runsDir, filename);
   writeFileSync(filepath, stringifyYaml(report, { lineWidth: 120 }));
   return filepath;
 }
@@ -46,9 +46,10 @@ function saveRunReport(report: RunReport): string {
  * Save digest + plan details alongside the run report for dashboard display.
  * These are larger files but essential for browsing news items and routing decisions.
  */
-function saveRunDetails(startedAt: string, digest: NewsDigest, plan: UpdatePlan): void {
+export function saveRunDetails(startedAt: string, digest: NewsDigest, plan: UpdatePlan, runsDir = RUNS_DIR): void {
+  mkdirSync(runsDir, { recursive: true });
   const timestamp = startedAt.replace(/[:.]/g, '-').slice(0, 19);
-  const filepath = join(RUNS_DIR, `${timestamp}-details.yaml`);
+  const filepath = join(runsDir, `${timestamp}-details.yaml`);
   writeFileSync(filepath, stringifyYaml({ digest, plan }, { lineWidth: 120 }));
 }
 
