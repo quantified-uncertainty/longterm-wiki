@@ -309,6 +309,7 @@ Rules:
 - Each "factId" in "claimMap" MUST be one of: ${sourceIdList}
 - "unsourceableClaims" is for facts you wanted but could not source.
   ${constraints.allowTrainingKnowledge ? 'Leave empty if training knowledge is allowed.' : 'Must not appear in "content".'}
+- Escape dollar signs before numbers: \\$100M not $100M. Do NOT double-escape: \\$100M, not \\\\$100M.
 - Preserve the existing ## heading and general structure.
 - Do NOT add EntityLinks, diagrams, or cross-page references. Preserve existing ones.
 - Length: aim for roughly ${Math.round(originalWordCount * 1.1)}–${Math.round(originalWordCount * 1.5)} words${directions ? ' unless directions call for more expansion' : ''}. Don't pad.`;

@@ -22,12 +22,16 @@ import { fileURLToPath } from 'url';
 import { runOrchestratorPipeline } from './orchestrator/index.ts';
 import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier } from './orchestrator/types.ts';
 import { createPhaseLogger } from '../lib/output.ts';
+import { loadPages as loadPagesFromRegistry } from '../lib/content-types.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
 const STATE_FILE = path.join(ROOT, '.claude/temp/batch-state.json');
 
 const log = createPhaseLogger();
+
+/** Maximum MDX file size in bytes before a page is skipped. */
+const MAX_PAGE_SIZE_BYTES = 50 * 1024; // 50KB
 
 // ---------------------------------------------------------------------------
 // Types
@@ -95,22 +99,92 @@ function saveState(state: BatchState): void {
 }
 
 // ---------------------------------------------------------------------------
-// Timeout wrapper
+// File size helper
 // ---------------------------------------------------------------------------
 
+/** Cached pages registry (loaded once per process). */
+let _cachedPages: Array<{ id: string; path: string; [k: string]: unknown }> | null = null;
+function getCachedPages() {
+  if (!_cachedPages) _cachedPages = loadPagesFromRegistry() as Array<{ id: string; path: string }>;
+  return _cachedPages;
+}
+
+/**
+ * Resolve the MDX file path for a page ID and return its size in bytes.
+ * Returns null if the page or file can't be found.
+ */
+function getPageFileSize(pageId: string): { filePath: string; sizeBytes: number } | null {
+  try {
+    const pages = getCachedPages();
+    const page = pages.find((p: { id: string }) => p.id === pageId);
+    if (!page) return null;
+    const pagePath = (page as { path: string }).path.replace(/^\/|\/$/g, '');
+    const filePath = path.join(ROOT, 'content/docs', pagePath + '.mdx');
+    if (!fs.existsSync(filePath)) return null;
+    const stat = fs.statSync(filePath);
+    return { filePath, sizeBytes: stat.size };
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Timeout wrapper with AbortController
+// ---------------------------------------------------------------------------
+
+/**
+ * Run a promise with a hard timeout. Uses AbortController so the orchestrator
+ * can check `signal.aborted` between tool calls (event loop starvation-safe).
+ * Also uses setInterval as a secondary watchdog since setInterval re-queues
+ * on each event loop tick (more likely to fire than setTimeout under load).
+ */
 async function withTimeout<T>(
-  promise: Promise<T>,
+  promiseFactory: (signal: AbortSignal) => Promise<T>,
   timeoutMs: number,
   label: string,
 ): Promise<T> {
+  const controller = new AbortController();
+  const startTime = Date.now();
+  let settled = false;
+
+  const makeTimeoutError = (source: string) =>
+    new Error(`${label} timed out after ${Math.round(timeoutMs / 1000)}s${source ? ` (${source})` : ''}`);
+
+  // Primary timeout via setTimeout
   let timer: NodeJS.Timeout;
   const timeoutPromise = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(timeoutMs / 1000)}s`)), timeoutMs);
+    timer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        controller.abort();
+        reject(makeTimeoutError(''));
+      }
+    }, timeoutMs);
   });
+
+  // Secondary watchdog via setInterval (fires on next available event loop tick)
+  let watchdog: NodeJS.Timeout;
+  const watchdogPromise = new Promise<never>((_, reject) => {
+    watchdog = setInterval(() => {
+      if (!settled && Date.now() - startTime > timeoutMs) {
+        settled = true;
+        controller.abort();
+        reject(makeTimeoutError('watchdog'));
+      }
+    }, 5000);
+  });
+
   try {
-    return await Promise.race([promise, timeoutPromise]);
+    const result = await Promise.race([
+      promiseFactory(controller.signal),
+      timeoutPromise,
+      watchdogPromise,
+    ]);
+    settled = true;
+    return result;
   } finally {
     clearTimeout(timer!);
+    clearInterval(watchdog!);
   }
 }
 
@@ -216,21 +290,33 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
       continue;
     }
 
+    // Large pages get a shorter timeout since they're more likely to stall
+    // due to event loop starvation from sync regex work in enrich-entity-links.
+    const pageFile = getPageFileSize(pageId);
+    let effectiveTimeout = pageTimeout;
+    if (pageFile && pageFile.sizeBytes > MAX_PAGE_SIZE_BYTES) {
+      const sizeKB = Math.round(pageFile.sizeBytes / 1024);
+      effectiveTimeout = Math.min(pageTimeout, 5 * 60 * 1000); // cap at 5 min for large pages
+      log('batch', `[${pageNum}/${total}] ${pageId} is large (${sizeKB}KB) — using ${Math.round(effectiveTimeout / 1000)}s timeout`);
+    }
+
     const pageStart = Date.now();
     log('batch', `[${pageNum}/${total}] Improving ${pageId}...`);
 
     try {
-      const orchOpts: OrchestratorOptions = {
-        tier,
-        directions: directions || '',
-        dryRun: !apply,
-        grade: grade,
-        skipSessionLog: skipSessionLog,
-      };
-
       const orchResult: OrchestratorResult = await withTimeout(
-        runOrchestratorPipeline(pageId, orchOpts),
-        pageTimeout,
+        (signal) => {
+          const orchOpts: OrchestratorOptions = {
+            tier,
+            directions: directions || '',
+            dryRun: !apply,
+            grade: grade,
+            skipSessionLog: skipSessionLog,
+            signal,
+          };
+          return runOrchestratorPipeline(pageId, orchOpts);
+        },
+        effectiveTimeout,
         `Page ${pageId}`,
       );
 
