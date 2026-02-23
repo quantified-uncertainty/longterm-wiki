@@ -1,8 +1,11 @@
 /**
  * Knowledge Database Module
  *
- * SQLite-based storage for articles, sources, summaries, and claims.
- * Designed for scale: 1000+ articles, 10,000+ sources.
+ * Local SQLite cache for articles, sources, summaries, claims, and citation quotes.
+ * PostgreSQL (wiki-server) is the authoritative store for citations, claims, and
+ * summaries. Write operations dual-write to both SQLite and PG; read operations
+ * use SQLite for local/offline access but PG should be preferred when available
+ * (especially for citation data where PG has ~5K records vs sparse SQLite).
  *
  * The database is lazy-initialized on first access via getDb(). Importing
  * this module loads better-sqlite3 bindings but does NOT create the SQLite
@@ -93,15 +96,9 @@ function initSchema(db: InstanceType<typeof Database>) {
       PRIMARY KEY (article_id, source_id)
     );
 
-    -- Entity relationships (from entities.yaml)
-    CREATE TABLE IF NOT EXISTS entity_relations (
-      from_id TEXT,
-      to_id TEXT,
-      relationship TEXT,
-      PRIMARY KEY (from_id, to_id)
-    );
-
     -- AI-generated summaries
+    -- TODO: Summaries pipeline not wired up yet — 0 records in both SQLite and PG.
+    -- Table is kept for the planned summarization feature.
     CREATE TABLE IF NOT EXISTS summaries (
       entity_id TEXT PRIMARY KEY,
       entity_type TEXT NOT NULL,
@@ -136,8 +133,6 @@ function initSchema(db: InstanceType<typeof Database>) {
     CREATE INDEX IF NOT EXISTS idx_summaries_type ON summaries(entity_type);
     CREATE INDEX IF NOT EXISTS idx_claims_entity ON claims(entity_id);
     CREATE INDEX IF NOT EXISTS idx_claims_type ON claims(claim_type);
-    CREATE INDEX IF NOT EXISTS idx_entity_relations_from ON entity_relations(from_id);
-    CREATE INDEX IF NOT EXISTS idx_entity_relations_to ON entity_relations(to_id);
   `);
 
   // Migrations
@@ -349,17 +344,6 @@ export interface ClaimInsertData {
   sourceQuote?: string | null;
 }
 
-export interface RelationRow {
-  id: string;
-  relationship: string;
-}
-
-export interface RelationInsertData {
-  fromId: string;
-  toId: string;
-  relationship?: string;
-}
-
 export interface SourceStats {
   total: number;
   pending: number;
@@ -487,17 +471,6 @@ export const articles = {
     return (getDb().prepare('SELECT COUNT(*) as count FROM articles').get() as { count: number }).count;
   },
 
-  /**
-   * Search articles by content
-   */
-  search(query: string): ArticleRow[] {
-    return getDb().prepare(`
-      SELECT * FROM articles
-      WHERE content LIKE '%' || ? || '%' OR title LIKE '%' || ? || '%'
-      ORDER BY quality DESC
-      LIMIT 50
-    `).all(query, query) as ArticleRow[];
-  }
 };
 
 // =============================================================================
@@ -625,19 +598,6 @@ export const sources = {
   },
 
   /**
-   * Get sources for an article
-   */
-  getForArticle(articleId: string): SourceRow[] {
-    return getDb().prepare(`
-      SELECT s.*, sm.summary as source_summary, ars.citation_context
-      FROM sources s
-      JOIN article_sources ars ON s.id = ars.source_id
-      LEFT JOIN summaries sm ON s.id = sm.entity_id AND sm.entity_type = 'source'
-      WHERE ars.article_id = ?
-    `).all(articleId) as SourceRow[];
-  },
-
-  /**
    * Link a source to an article
    */
   linkToArticle(articleId: string, sourceId: string, citationContext: string | null = null) {
@@ -692,59 +652,6 @@ export const sources = {
 };
 
 // =============================================================================
-// ENTITY RELATIONS
-// =============================================================================
-
-export const relations = {
-  /**
-   * Set a relationship between entities
-   */
-  set(fromId: string, toId: string, relationship: string = 'related') {
-    const stmt = getDb().prepare(`
-      INSERT INTO entity_relations (from_id, to_id, relationship)
-      VALUES (?, ?, ?)
-      ON CONFLICT DO UPDATE SET relationship = ?
-    `);
-    return stmt.run(fromId, toId, relationship, relationship);
-  },
-
-  /**
-   * Get related entities
-   */
-  getRelated(entityId: string): RelationRow[] {
-    return getDb().prepare(`
-      SELECT to_id as id, relationship FROM entity_relations WHERE from_id = ?
-      UNION
-      SELECT from_id as id, relationship FROM entity_relations WHERE to_id = ?
-    `).all(entityId, entityId) as RelationRow[];
-  },
-
-  /**
-   * Clear all relations (for rebuild)
-   */
-  clear() {
-    return getDb().prepare('DELETE FROM entity_relations').run();
-  },
-
-  /**
-   * Bulk insert relations
-   */
-  bulkInsert(relationsData: RelationInsertData[]) {
-    const db = getDb();
-    const stmt = db.prepare(`
-      INSERT OR REPLACE INTO entity_relations (from_id, to_id, relationship)
-      VALUES (?, ?, ?)
-    `);
-    const insertMany = db.transaction((rels: RelationInsertData[]) => {
-      for (const rel of rels) {
-        stmt.run(rel.fromId, rel.toId, rel.relationship || 'related');
-      }
-    });
-    insertMany(relationsData);
-  }
-};
-
-// =============================================================================
 // SUMMARIES
 // =============================================================================
 
@@ -790,7 +697,7 @@ export const summaries = {
       model: data.model,
       tokensUsed: data.tokensUsed,
     }).catch(() => {
-      // Silently ignore — SQLite is authoritative during migration period
+      // Silently ignore — PG is authoritative; SQLite is a local cache
     });
 
     return result;
@@ -874,35 +781,10 @@ export const claims = {
       confidence: claim.confidence ?? null,
       sourceQuote: claim.sourceQuote ?? null,
     }).catch(() => {
-      // Silently ignore — SQLite is authoritative during migration period
+      // Silently ignore — PG is authoritative; SQLite is a local cache
     });
 
     return result;
-  },
-
-  /**
-   * Get claims for an entity
-   */
-  getForEntity(entityId: string): ClaimRow[] {
-    return getDb().prepare('SELECT * FROM claims WHERE entity_id = ?').all(entityId) as ClaimRow[];
-  },
-
-  /**
-   * Get claims by type
-   */
-  getByType(claimType: string): ClaimRow[] {
-    return getDb().prepare('SELECT * FROM claims WHERE claim_type = ?').all(claimType) as ClaimRow[];
-  },
-
-  /**
-   * Find similar claims (for consistency checking)
-   */
-  findSimilar(claimText: string): ClaimRow[] {
-    return getDb().prepare(`
-      SELECT * FROM claims
-      WHERE claim_text LIKE '%' || ? || '%'
-      ORDER BY entity_id
-    `).all(claimText) as ClaimRow[];
   },
 
   /**
@@ -913,7 +795,7 @@ export const claims = {
 
     // Fire-and-forget write to wiki-server DB
     clearClaimsOnServer(entityId).catch(() => {
-      // Silently ignore — SQLite is authoritative during migration period
+      // Silently ignore — PG is authoritative; SQLite is a local cache
     });
 
     return result;
@@ -1140,7 +1022,7 @@ export const citationQuotes = {
       extractionModel: data.extractionModel ?? null,
     };
     upsertCitationQuoteOnServer(serverItem).catch(() => {
-      // Silently ignore — SQLite is authoritative during migration period
+      // Silently ignore — PG is authoritative; SQLite is a local cache
     });
 
     return result;
@@ -1376,7 +1258,7 @@ export const citationQuotes = {
           ? verificationDifficulty as 'easy' | 'moderate' | 'hard'
           : null,
       }).catch(() => {
-        // Silently ignore — SQLite is authoritative during migration period
+        // Silently ignore — PG is authoritative; SQLite is a local cache
       });
     } else {
       // Verdict not in recognized set — skip server write but warn

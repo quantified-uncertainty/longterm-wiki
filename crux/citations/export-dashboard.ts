@@ -1,16 +1,17 @@
 /**
  * Export Citation Accuracy Dashboard Data
  *
- * Reads accuracy data from the SQLite DB and exports YAML files
- * to data/citation-accuracy/ so they're available in production
- * (SQLite is not available on Vercel).
+ * Prefers PG (wiki-server) data when available, falls back to local SQLite.
+ * Exports YAML files to data/citation-accuracy/ so they're available in
+ * production (neither SQLite nor PG is available on Vercel).
  *
  * Output:
  *   data/citation-accuracy/summary.yaml          — global stats, page summaries, domain analysis
  *   data/citation-accuracy/pages/<pageId>.yaml    — per-page flagged citations
  *
  * Usage:
- *   pnpm crux citations export-dashboard
+ *   pnpm crux citations export-dashboard              # Auto-uses PG if available
+ *   pnpm crux citations export-dashboard --local-only  # Force local SQLite only
  *   pnpm crux citations export-dashboard --json
  */
 
@@ -364,24 +365,26 @@ export function exportDashboardData(fromDbData?: DashboardExport | null): { path
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const json = args.json === true;
-  const fromDb = args['from-db'] === true;
+  const localOnly = args['local-only'] === true;
   const colors = getColors(json);
 
+  // Prefer PG data (4,881+ records) over SQLite (local cache, often sparse).
+  // Use --local-only to force SQLite-only mode.
   let dbData: DashboardExport | null = null;
-  if (fromDb) {
+  if (!localOnly) {
     const serverUp = await isServerAvailable();
-    if (!serverUp) {
-      console.log(`${colors.red}Wiki server not available. Set LONGTERMWIKI_SERVER_URL and LONGTERMWIKI_SERVER_API_KEY.${colors.reset}`);
-      process.exit(1);
-    }
-    const dashboardResult = await getAccuracyDashboard();
-    if (!dashboardResult.ok) {
-      console.log(`${colors.yellow}No accuracy data returned from wiki server (${dashboardResult.error}).${colors.reset}`);
-      process.exit(0);
-    }
-    dbData = dashboardResult.data;
-    if (!json) {
-      console.log(`${colors.dim}Using data from wiki-server DB${colors.reset}`);
+    if (serverUp) {
+      const dashboardResult = await getAccuracyDashboard();
+      if (dashboardResult.ok) {
+        dbData = dashboardResult.data;
+        if (!json) {
+          console.log(`${colors.dim}Using data from wiki-server DB${colors.reset}`);
+        }
+      } else if (!json) {
+        console.log(`${colors.dim}Wiki server returned no data (${dashboardResult.error}), falling back to local SQLite${colors.reset}`);
+      }
+    } else if (!json) {
+      console.log(`${colors.dim}Wiki server not available, falling back to local SQLite${colors.reset}`);
     }
   }
 

@@ -20,7 +20,6 @@ describe('getDb', () => {
     expect(tableNames).toContain('articles');
     expect(tableNames).toContain('sources');
     expect(tableNames).toContain('article_sources');
-    expect(tableNames).toContain('entity_relations');
     expect(tableNames).toContain('summaries');
     expect(tableNames).toContain('claims');
     expect(tableNames).toContain('citation_content');
