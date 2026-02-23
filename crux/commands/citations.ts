@@ -66,7 +66,7 @@ const SCRIPTS = {
   'export-dashboard': {
     script: 'citations/export-dashboard.ts',
     description: 'Export accuracy data as YAML for the internal dashboard',
-    passthrough: ['json', 'from-db'],
+    passthrough: ['json', 'local-only'],
   },
   'migrate-accuracy': {
     script: 'citations/migrate-accuracy-to-db.ts',
@@ -140,8 +140,8 @@ Examples:
   crux citations normalize-footnotes                Report footnote format issues
   crux citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
   crux citations normalize-footnotes --fix <id>     Fix one page
-  crux citations export-dashboard                  Export data for web dashboard
-  crux citations export-dashboard --from-db        Export from PostgreSQL instead of SQLite
+  crux citations export-dashboard                  Export data for web dashboard (prefers PG)
+  crux citations export-dashboard --local-only     Force local SQLite only
   crux citations migrate-accuracy                   Migrate accuracy data to PostgreSQL
   crux citations migrate-accuracy --dry-run         Preview migration
   crux citations backfill-resource-ids               Backfill resource_id for existing quotes

@@ -6,7 +6,6 @@
  * Scans all MDX files and populates the knowledge database with:
  * - Article content and metadata
  * - Source references (URLs, DOIs)
- * - Entity relationships (from entities.yaml)
  *
  * Usage:
  *   node crux/scan-content.ts [options]
@@ -17,14 +16,12 @@
  *   --verbose     Show detailed progress
  */
 
-import { readFileSync, existsSync, readdirSync } from 'fs';
-import { join, basename, relative } from 'path';
+import { readFileSync } from 'fs';
+import { basename, relative } from 'path';
 import { fileURLToPath } from 'url';
-import { parse as parseYaml } from 'yaml';
 import {
   articles,
   sources,
-  relations,
   contentHash,
   hashId,
   getStats,
@@ -33,8 +30,6 @@ import { findMdxFiles } from './lib/file-utils.ts';
 import { parseFrontmatter, getContentBody } from './lib/mdx-utils.ts';
 import { getColors } from './lib/output.ts';
 import { PROJECT_ROOT, CONTENT_DIR_ABS as CONTENT_DIR, DATA_DIR_ABS as DATA_DIR } from './lib/content-types.ts';
-
-const ENTITIES_DIR = join(DATA_DIR, 'entities');
 
 const args = process.argv.slice(2);
 const FORCE = args.includes('--force');
@@ -71,14 +66,6 @@ interface ProcessFileResult {
   wordCount?: number;
   sourcesFound?: number;
   skipped: boolean;
-}
-
-interface YamlEntity {
-  id: string;
-  relatedEntries?: Array<{
-    id: string;
-    relationship?: string;
-  }>;
 }
 
 // =============================================================================
@@ -261,50 +248,6 @@ function processFile(filePath: string): ProcessFileResult {
 }
 
 // =============================================================================
-// ENTITY RELATIONS
-// =============================================================================
-
-/**
- * Load and process entity relationships from entities.yaml
- */
-function processEntityRelations(): number {
-  if (!existsSync(ENTITIES_DIR)) {
-    console.log(`${colors.yellow}⚠️  entities directory not found${colors.reset}`);
-    return 0;
-  }
-
-  // Load all entity YAML files from the entities directory
-  let entities: YamlEntity[] = [];
-  for (const file of readdirSync(ENTITIES_DIR).filter(f => f.endsWith('.yaml'))) {
-    const content = readFileSync(join(ENTITIES_DIR, file), 'utf-8');
-    const parsed = parseYaml(content);
-    if (Array.isArray(parsed)) entities.push(...parsed);
-  }
-
-  // Clear existing relations
-  relations.clear();
-
-  // Build relations array
-  const allRelations: Array<{ fromId: string; toId: string; relationship: string }> = [];
-  for (const entity of entities) {
-    if (entity.relatedEntries && Array.isArray(entity.relatedEntries)) {
-      for (const related of entity.relatedEntries) {
-        allRelations.push({
-          fromId: entity.id,
-          toId: related.id,
-          relationship: related.relationship || 'related'
-        });
-      }
-    }
-  }
-
-  // Bulk insert
-  relations.bulkInsert(allRelations);
-
-  return allRelations.length;
-}
-
-// =============================================================================
 // MAIN
 // =============================================================================
 
@@ -354,10 +297,6 @@ function main(): void {
     }
   }
 
-  // Process entity relations
-  console.log(`\n${colors.blue}Processing entity relations...${colors.reset}`);
-  const relationsCount = processEntityRelations();
-
   // Summary
   console.log(`\n${'─'.repeat(50)}`);
   console.log(`${colors.green}✅ Scan complete${colors.reset}\n`);
@@ -365,7 +304,6 @@ function main(): void {
   console.log(`  Files skipped (unchanged): ${skipped}`);
   console.log(`  Total words: ${totalWords.toLocaleString()}`);
   console.log(`  Source references found: ${totalSources}`);
-  console.log(`  Entity relations loaded: ${relationsCount}`);
 
   // Show current stats
   const stats = getStats();
