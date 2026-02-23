@@ -11,6 +11,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { evaluateQualityGate } from './quality-gate.ts';
 import type { OrchestratorContext, BudgetConfig } from './types.ts';
 import { TIER_BUDGETS } from './types.ts';
+import { CostTracker } from '../../lib/cost-tracker.ts';
 
 // ---------------------------------------------------------------------------
 // Mock the metrics extractor to return controlled values
@@ -44,6 +45,7 @@ function makeCtx(overrides: Partial<OrchestratorContext> = {}): OrchestratorCont
     directions: '',
     citationAudit: null,
     sectionDiffs: [],
+    tracker: new CostTracker(),
     ...overrides,
   };
 }

@@ -14,9 +14,10 @@ echo ""
 
 pnpm crux validate gate
 
-# After gate passes, run agent checklist auto-verify and completion warning.
-# Non-blocking: pre-push-check always exits 0.
+# After gate passes, run agent checklist auto-verify and completion check.
+# Blocks push if checklist exists but is <10% complete (session skipped workflow).
+# Advisory warning at <25%. No checklist = no block (quick fix sessions).
 echo ""
-pnpm crux agent-checklist pre-push-check || true
+pnpm crux agent-checklist pre-push-check
 
 # Exit code from gate determines whether push proceeds

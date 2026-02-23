@@ -88,7 +88,7 @@ export const tool: ToolRegistration = {
             requireClaimMap: sectionSources.length > 0,
           },
         },
-        { model: options.writerModel },
+        { model: options.writerModel, tracker: ctx.tracker },
       );
 
       // Normalize dollar-sign escaping before checking tables or storing

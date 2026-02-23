@@ -18,11 +18,12 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
 
-import { createLlmClient, streamingCreate } from '../../lib/llm.ts';
+import { createLlmClient, streamingCreate, type StreamingCreateOptions } from '../../lib/llm.ts';
 import { MODELS } from '../../lib/anthropic.ts';
 import { withRetry, startHeartbeat } from '../../lib/resilience.ts';
 import { createPhaseLogger } from '../../lib/output.ts';
 import { saveArtifacts } from '../../lib/wiki-server/artifacts.ts';
+import { CostTracker } from '../../lib/cost-tracker.ts';
 
 import {
   type OrchestratorContext,
@@ -150,6 +151,11 @@ async function runAgentLoop(
     { role: 'user', content: userMessage },
   ];
 
+  const trackingOptions: StreamingCreateOptions = {
+    tracker: ctx.tracker,
+    label: 'orchestrator',
+  };
+
   const makeRequest = (msgs: MessageParam[]) =>
     withRetry(
       () => streamingCreate(client, {
@@ -158,7 +164,7 @@ async function runAgentLoop(
         system: systemPrompt,
         tools: tools as Anthropic.Messages.Tool[],
         messages: msgs,
-      }),
+      }, trackingOptions),
       { label: `orchestrator(${orchestratorModel})` },
     );
 
@@ -316,6 +322,8 @@ export async function runOrchestrator(
 
   // ── Build context ─────────────────────────────────────────────────────────
 
+  const tracker = new CostTracker();
+
   const ctx: OrchestratorContext = {
     page,
     filePath,
@@ -332,6 +340,7 @@ export async function runOrchestrator(
     directions,
     citationAudit: null,
     sectionDiffs: [],
+    tracker,
   };
 
   // ── Build tools ───────────────────────────────────────────────────────────
@@ -393,7 +402,7 @@ export async function runOrchestrator(
   // ── Deduplicate footnotes ────────────────────────────────────────────────
 
   ctx.currentContent = deduplicateFootnotes(ctx.currentContent);
-  ctx.currentContent = renumberFootnotes(ctx.currentContent);
+  ctx.currentContent = renumberFootnotes(ctx.currentContent, { warn: true });
   ctx.currentContent = normalizeDollarEscaping(ctx.currentContent);
 
   // ── Update lastEdited ──────────────────────────────────────────────────────
@@ -410,7 +419,7 @@ export async function runOrchestrator(
   const finalGate = evaluateQualityGate(ctx);
   const duration = ((Date.now() - startTime) / 1000).toFixed(1);
 
-  // Cost breakdown by tool
+  // Cost breakdown by tool (estimated)
   const costBreakdown: Record<string, number> = {};
   for (const entry of ctx.costEntries) {
     costBreakdown[entry.toolName] = (costBreakdown[entry.toolName] || 0) + entry.estimatedCost;
@@ -421,12 +430,25 @@ export async function runOrchestrator(
   costBreakdown['orchestrator_llm'] = orchestratorLlmCost;
   ctx.totalCost += orchestratorLlmCost;
 
+  // Actual costs from CostTracker (null if no API calls were tracked)
+  const actualTotalCost = tracker.entries.length > 0 ? tracker.totalCost : null;
+  const actualCostBreakdown = tracker.entries.length > 0 ? tracker.breakdown() : null;
+
   log('orchestrator', '═'.repeat(50));
   log('orchestrator', 'Orchestrator Complete');
   log('orchestrator', `Duration: ${duration}s`);
   log('orchestrator', `Tool calls: ${ctx.toolCallCount}`);
   log('orchestrator', `Refinement cycles: ${refinementCycles}`);
-  log('orchestrator', `Total cost: ~$${ctx.totalCost.toFixed(2)}`);
+  if (actualTotalCost != null) {
+    log('orchestrator', `Cost: ~$${ctx.totalCost.toFixed(2)} estimated / $${actualTotalCost.toFixed(2)} actual`);
+  } else {
+    log('orchestrator', `Cost: ~$${ctx.totalCost.toFixed(2)} estimated`);
+  }
+  if (actualCostBreakdown && Object.keys(actualCostBreakdown).length > 0) {
+    for (const [label, cost] of Object.entries(actualCostBreakdown).sort((a, b) => b[1] - a[1])) {
+      log('orchestrator', `  ${label}: $${cost.toFixed(4)}`);
+    }
+  }
   log('orchestrator', `Quality gate: ${finalGate.passed ? 'PASSED' : 'FAILED'}`);
   log('orchestrator', `Final metrics: ${JSON.stringify(finalMetrics)}`);
   log('orchestrator', '═'.repeat(50));
@@ -486,6 +508,8 @@ export async function runOrchestrator(
     refinementCycles,
     totalCost: ctx.totalCost,
     costBreakdown,
+    actualTotalCost,
+    actualCostBreakdown,
     qualityMetrics: finalMetrics,
     qualityGatePassed: finalGate.passed,
     outputPath: '', // Set by caller

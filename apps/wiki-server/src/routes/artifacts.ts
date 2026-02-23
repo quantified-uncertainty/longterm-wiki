@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, desc, count, and } from "drizzle-orm";
 import { getDrizzleDb } from "../db.js";
-import { improveRunArtifacts } from "../schema.js";
+import { pageImproveRuns } from "../schema.js";
 import { SaveArtifactsSchema } from "../api-types.js";
 import {
   parseJsonBody,
@@ -29,7 +29,7 @@ const ByPageQuery = z.object({
 
 // ---- Helpers ----
 
-function formatArtifactEntry(r: typeof improveRunArtifacts.$inferSelect) {
+function formatArtifactEntry(r: typeof pageImproveRuns.$inferSelect) {
   return {
     id: r.id,
     pageId: r.pageId,
@@ -69,7 +69,7 @@ artifactsRoute.post("/", async (c) => {
   const db = getDrizzleDb();
 
   const rows = await db
-    .insert(improveRunArtifacts)
+    .insert(pageImproveRuns)
     .values({
       pageId: d.pageId,
       engine: d.engine,
@@ -93,11 +93,11 @@ artifactsRoute.post("/", async (c) => {
       phasesRun: d.phasesRun ?? null,
     })
     .returning({
-      id: improveRunArtifacts.id,
-      pageId: improveRunArtifacts.pageId,
-      engine: improveRunArtifacts.engine,
-      startedAt: improveRunArtifacts.startedAt,
-      createdAt: improveRunArtifacts.createdAt,
+      id: pageImproveRuns.id,
+      pageId: pageImproveRuns.pageId,
+      engine: pageImproveRuns.engine,
+      startedAt: pageImproveRuns.startedAt,
+      createdAt: pageImproveRuns.createdAt,
     });
 
   return c.json(rows[0], 201);
@@ -114,9 +114,9 @@ artifactsRoute.get("/by-page", async (c) => {
 
   const rows = await db
     .select()
-    .from(improveRunArtifacts)
-    .where(eq(improveRunArtifacts.pageId, page_id))
-    .orderBy(desc(improveRunArtifacts.startedAt))
+    .from(pageImproveRuns)
+    .where(eq(pageImproveRuns.pageId, page_id))
+    .orderBy(desc(pageImproveRuns.startedAt))
     .limit(limit);
 
   return c.json({ entries: rows.map(formatArtifactEntry) });
@@ -133,14 +133,14 @@ artifactsRoute.get("/all", async (c) => {
 
   const rows = await db
     .select()
-    .from(improveRunArtifacts)
-    .orderBy(desc(improveRunArtifacts.startedAt))
+    .from(pageImproveRuns)
+    .orderBy(desc(pageImproveRuns.startedAt))
     .limit(limit)
     .offset(offset);
 
   const countResult = await db
     .select({ count: count() })
-    .from(improveRunArtifacts);
+    .from(pageImproveRuns);
   const total = countResult[0].count;
 
   return c.json({
@@ -158,24 +158,24 @@ artifactsRoute.get("/stats", async (c) => {
 
   const totalResult = await db
     .select({ count: count() })
-    .from(improveRunArtifacts);
+    .from(pageImproveRuns);
   const totalRuns = totalResult[0].count;
 
   const byEngine = await db
     .select({
-      engine: improveRunArtifacts.engine,
+      engine: pageImproveRuns.engine,
       count: count(),
     })
-    .from(improveRunArtifacts)
-    .groupBy(improveRunArtifacts.engine);
+    .from(pageImproveRuns)
+    .groupBy(pageImproveRuns.engine);
 
   const byTier = await db
     .select({
-      tier: improveRunArtifacts.tier,
+      tier: pageImproveRuns.tier,
       count: count(),
     })
-    .from(improveRunArtifacts)
-    .groupBy(improveRunArtifacts.tier);
+    .from(pageImproveRuns)
+    .groupBy(pageImproveRuns.tier);
 
   return c.json({
     totalRuns,
@@ -194,8 +194,8 @@ artifactsRoute.get("/:id", async (c) => {
 
   const rows = await db
     .select()
-    .from(improveRunArtifacts)
-    .where(eq(improveRunArtifacts.id, id));
+    .from(pageImproveRuns)
+    .where(eq(pageImproveRuns.id, id));
 
   if (rows.length === 0) {
     return notFoundError(c, "Artifact not found");

@@ -69,6 +69,7 @@ export const citationQuotes = pgTable(
     index("idx_cq_url").on(table.url),
     index("idx_cq_verified").on(table.quoteVerified),
     index("idx_cq_accuracy").on(table.accuracyVerdict),
+    index("idx_cq_resource_id").on(table.resourceId),
   ]
 );
 
@@ -616,14 +617,14 @@ export const autoUpdateNewsItems = pgTable(
  * SELECT FOR UPDATE SKIP LOCKED and report results back.
  */
 /**
- * Improve run artifacts — intermediate data from V2 orchestrator and page-improver runs.
+ * Page improve runs — intermediate data from V2 orchestrator and page-improver runs.
  *
  * Captures research sources, citation audits, cost tracking, section diffs, and
  * quality gate results so they can be queried, compared, and reused later.
  * See GitHub issue #826.
  */
-export const improveRunArtifacts = pgTable(
-  "improve_run_artifacts",
+export const pageImproveRuns = pgTable(
+  "page_improve_runs",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     pageId: text("page_id").notNull(),
@@ -664,10 +665,10 @@ export const improveRunArtifacts = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("idx_ira_page_id").on(table.pageId),
-    index("idx_ira_engine").on(table.engine),
-    index("idx_ira_started_at").on(table.startedAt),
-    index("idx_ira_page_started").on(table.pageId, table.startedAt),
+    index("idx_pir_page_id").on(table.pageId),
+    index("idx_pir_engine").on(table.engine),
+    index("idx_pir_started_at").on(table.startedAt),
+    index("idx_pir_page_started").on(table.pageId, table.startedAt),
   ]
 );
 

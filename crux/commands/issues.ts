@@ -700,20 +700,26 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
-  // Use structured template if any structured args are provided, otherwise fall back to --body
-  const hasStructuredArgs = effectiveProblem || options.fix || options.depends || options.criteria || options.model;
+  // --body-file / --body provides the raw body and takes precedence.
+  // Structured args (--problem, --model, --criteria, etc.) build a template body only
+  // when no raw body is provided.  --model still applies the label even with --body-file.
   let body: string;
-  if (hasStructuredArgs) {
-    body = buildIssueBody({
-      problem: effectiveProblem,
-      fix: typeof options.fix === 'string' ? options.fix : undefined,
-      depends: options.depends as string | undefined,
-      criteria: options.criteria as string | undefined,
-      model: options.model as string | undefined,
-      cost: options.cost as string | undefined,
-    });
+  if (effectiveBody) {
+    body = effectiveBody;
   } else {
-    body = effectiveBody || '';
+    const hasStructuredArgs = effectiveProblem || options.fix || options.depends || options.criteria || options.model;
+    if (hasStructuredArgs) {
+      body = buildIssueBody({
+        problem: effectiveProblem,
+        fix: typeof options.fix === 'string' ? options.fix : undefined,
+        depends: options.depends as string | undefined,
+        criteria: options.criteria as string | undefined,
+        model: options.model as string | undefined,
+        cost: options.cost as string | undefined,
+      });
+    } else {
+      body = '';
+    }
   }
 
   interface CreateIssueResponse {
@@ -1152,7 +1158,7 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
     return {
-      output: `${c.red}Usage: crux issues update-body <issue-number> [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
+      output: `${c.red}Usage: crux issues update-body <issue-number> [--body-file=path] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -1165,9 +1171,13 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
     };
   }
 
+  // --body-file sets the raw body directly (no merge). Useful when the body
+  // contains ## headings that would confuse the section-based merge logic.
   // --problem-file takes precedence over --problem (avoids shell expansion)
+  let bodyFromFile: string | undefined;
   let problemFromFile: string | undefined;
   try {
+    bodyFromFile = readFileFlag(options['body-file'] as string | undefined) ?? undefined;
     problemFromFile = readFileFlag(options['problem-file'] as string | undefined) ?? undefined;
   } catch (e: unknown) {
     return { output: `${c.red}${(e as Error).message}${c.reset}\n`, exitCode: 1 };
@@ -1179,27 +1189,34 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
   const existingBody = (issue.body || '').trim();
 
-  const newBody = buildIssueBody({
-    problem: effectiveProblem,
-    fix: options.fix as string | undefined,
-    depends: options.depends as string | undefined,
-    criteria: options.criteria as string | undefined,
-    model: options.model as string | undefined,
-    cost: options.cost as string | undefined,
-  });
+  let combinedBody: string;
 
-  if (!newBody) {
-    return {
-      output: `${c.red}No structured args provided. Use --problem, --fix, --model, --criteria, --depends, --cost.${c.reset}\n`,
-      exitCode: 1,
-    };
+  if (bodyFromFile) {
+    // --body-file: set raw body directly, skip merge
+    combinedBody = bodyFromFile;
+  } else {
+    const newBody = buildIssueBody({
+      problem: effectiveProblem,
+      fix: options.fix as string | undefined,
+      depends: options.depends as string | undefined,
+      criteria: options.criteria as string | undefined,
+      model: options.model as string | undefined,
+      cost: options.cost as string | undefined,
+    });
+
+    if (!newBody) {
+      return {
+        output: `${c.red}No structured args provided. Use --body-file, --problem, --fix, --model, --criteria, --depends, --cost.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+
+    // Merge sections into existing body: replace existing sections in-place,
+    // append new sections that don't already exist (#622)
+    combinedBody = existingBody
+      ? mergeSections(existingBody, newBody)
+      : newBody;
   }
-
-  // Merge sections into existing body: replace existing sections in-place,
-  // append new sections that don't already exist (#622)
-  const combinedBody = existingBody
-    ? mergeSections(existingBody, newBody)
-    : newBody;
 
   await githubApi(`/repos/${REPO}/issues/${issueNum}`, {
     method: 'PATCH',
@@ -1381,6 +1398,7 @@ Options (create):
   --draft             Skip --model/--criteria validation (for WIP issues)
 
 Options (update-body):
+  --body-file=<path>  Set raw body directly (no merge — use for rich multi-section bodies)
   --problem="..."     Problem/background description (## Problem section)
   --problem-file=<path>  Problem from file (safe — avoids shell expansion)
   --fix="..."         Proposed fix or approach (## Proposed Fix section)
@@ -1430,6 +1448,7 @@ Examples:
   # For bodies with backticks/dollars/parens, use --problem-file or --body-file:
   crux issues create "Title" --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
   crux issues update-body 239 --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
+  crux issues update-body 239 --body-file=/tmp/full-body.md  # Set raw body (no merge)
   crux issues start 239              Announce start on issue #239
   crux issues done 239 --pr=https://github.com/.../pull/42
   crux issues cleanup                Check for stale labels and duplicates

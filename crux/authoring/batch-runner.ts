@@ -23,6 +23,15 @@ import { runOrchestratorPipeline } from './orchestrator/index.ts';
 import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier } from './orchestrator/types.ts';
 import { createPhaseLogger } from '../lib/output.ts';
 import { loadPages as loadPagesFromRegistry } from '../lib/content-types.ts';
+import {
+  snapshotFromFile,
+  computeDelta,
+  generateQualityReport,
+  writeJsonReport,
+  formatMarkdownReport,
+  type PageQualitySnapshot,
+  type PageQualityDelta,
+} from './batch-quality-report.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../..');
@@ -58,6 +67,8 @@ export interface BatchOptions {
   skipSessionLog?: boolean;
   /** Path to write a markdown report file. */
   reportFile?: string;
+  /** Path to write the quality report JSON. Defaults to .claude/temp/batch-quality-report.json. */
+  qualityReportFile?: string;
 }
 
 export interface PageResult {
@@ -65,6 +76,8 @@ export interface PageResult {
   status: 'completed' | 'failed' | 'skipped' | 'budget-exceeded' | 'timeout';
   duration?: string;
   cost?: number;
+  /** Actual cost from API usage data (when available). */
+  actualCost?: number;
   qualityGatePassed?: boolean;
   error?: string;
   toolCallCount?: number;
@@ -219,12 +232,17 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     grade,
     skipSessionLog,
     reportFile,
+    qualityReportFile,
   } = options;
 
   const total = pageIds.length;
   const results: PageResult[] = [];
   let cumulativeCost = 0;
   const batchStartTime = Date.now();
+
+  // Quality tracking: pre/post snapshots per page
+  const preSnapshots = new Map<string, PageQualitySnapshot>();
+  const postSnapshots = new Map<string, PageQualitySnapshot>();
 
   // ── Load or create state ────────────────────────────────────────────────
 
@@ -303,6 +321,12 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     const pageStart = Date.now();
     log('batch', `[${pageNum}/${total}] Improving ${pageId}...`);
 
+    // Snapshot pre-improvement metrics
+    if (pageFile) {
+      const pre = snapshotFromFile(pageFile.filePath);
+      if (pre) preSnapshots.set(pageId, pre);
+    }
+
     try {
       const orchResult: OrchestratorResult = await withTimeout(
         (signal) => {
@@ -321,13 +345,22 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
       );
 
       const pageDuration = Date.now() - pageStart;
-      cumulativeCost += orchResult.totalCost;
+      // Prefer actual cost for budget tracking when available
+      const effectiveCost = orchResult.actualTotalCost ?? orchResult.totalCost;
+      cumulativeCost += effectiveCost;
+
+      // Snapshot post-improvement metrics (re-read file after apply)
+      if (pageFile && apply) {
+        const post = snapshotFromFile(pageFile.filePath);
+        if (post) postSnapshots.set(pageId, post);
+      }
 
       const pageResult: PageResult = {
         pageId,
         status: 'completed',
         duration: formatDuration(pageDuration),
         cost: orchResult.totalCost,
+        actualCost: orchResult.actualTotalCost ?? undefined,
         qualityGatePassed: orchResult.qualityGatePassed,
         toolCallCount: orchResult.toolCallCount,
       };
@@ -397,6 +430,95 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     log('batch', `Report written to ${reportFile}`);
   }
 
+  // ── Quality report ─────────────────────────────────────────────────────
+
+  if (apply && preSnapshots.size > 0) {
+    const deltas: PageQualityDelta[] = [];
+    for (const [pageId, pre] of preSnapshots) {
+      const post = postSnapshots.get(pageId);
+      if (post) {
+        deltas.push(computeDelta(pageId, pre, post));
+      }
+    }
+
+    if (deltas.length > 0) {
+      const qualityReport = generateQualityReport(deltas, {
+        tier,
+        totalCost: cumulativeCost,
+        totalDuration: formatDuration(batchDuration),
+      });
+
+      // Write JSON report
+      const jsonPath = qualityReportFile || path.join(ROOT, '.claude/temp/batch-quality-report.json');
+      writeJsonReport(qualityReport, jsonPath);
+      log('batch', `Quality report (JSON): ${jsonPath}`);
+
+      // Write markdown report alongside JSON
+      const mdPath = jsonPath.endsWith('.json')
+        ? jsonPath.replace(/\.json$/, '.md')
+        : jsonPath + '.md';
+      const mdReport = formatMarkdownReport(qualityReport);
+      const mdDir = path.dirname(mdPath);
+      if (!fs.existsSync(mdDir)) fs.mkdirSync(mdDir, { recursive: true });
+      fs.writeFileSync(mdPath, mdReport);
+      log('batch', `Quality report (MD): ${mdPath}`);
+
+      // Print quality summary to console
+      const { summary } = qualityReport;
+      console.log('');
+      console.log('─'.repeat(70));
+      console.log('  QUALITY REPORT');
+      console.log('─'.repeat(70));
+      console.log(`  Pages analyzed: ${summary.totalPages}`);
+      console.log(`  Improved: ${summary.pagesImproved} | Unchanged: ${summary.pagesUnchanged} | Degraded: ${summary.pagesDegraded}`);
+      console.log(`  Avg word count change: ${summary.averageWordCountChange > 0 ? '+' : ''}${summary.averageWordCountChange}`);
+      console.log(`  New citations: +${summary.totalNewCitations} | New tables: +${summary.totalNewTables} | New diagrams: +${summary.totalNewDiagrams}`);
+      console.log(`  Avg structural score change: ${summary.averageStructuralScoreChange > 0 ? '+' : ''}${summary.averageStructuralScoreChange}`);
+
+      if (qualityReport.flaggedForReview.length > 0) {
+        console.log('');
+        console.log(`  ⚠ ${qualityReport.flaggedForReview.length} page(s) flagged for manual review:`);
+        for (const pageId of qualityReport.flaggedForReview) {
+          const d = deltas.find(dd => dd.pageId === pageId);
+          if (d) {
+            console.log(`    - ${pageId}: ${d.degradationReasons.join('; ')}`);
+          }
+        }
+      }
+      console.log('─'.repeat(70));
+    }
+  }
+
+  // Write cost-analysis.json with per-page breakdowns
+  const costAnalysisPath = path.join(ROOT, '.claude/temp/cost-analysis.json');
+  const costAnalysis = {
+    generatedAt: new Date().toISOString(),
+    tier,
+    budgetLimit: budgetLimit ?? null,
+    totals: {
+      estimatedCost: results.reduce((sum, r) => sum + (r.cost ?? 0), 0),
+      actualCost: results.reduce((sum, r) => sum + (r.actualCost ?? 0), 0),
+      pages: results.length,
+      completed: completed.length,
+    },
+    pages: results.map(r => ({
+      pageId: r.pageId,
+      status: r.status,
+      estimatedCost: r.cost ?? null,
+      actualCost: r.actualCost ?? null,
+      duration: r.duration ?? null,
+      toolCallCount: r.toolCallCount ?? null,
+    })),
+  };
+  try {
+    const costDir = path.dirname(costAnalysisPath);
+    if (!fs.existsSync(costDir)) fs.mkdirSync(costDir, { recursive: true });
+    fs.writeFileSync(costAnalysisPath, JSON.stringify(costAnalysis, null, 2));
+    log('batch', `Cost analysis written to ${costAnalysisPath}`);
+  } catch {
+    // Non-critical — don't fail the batch
+  }
+
   // Clean up state file on successful full completion (no failures)
   if (failed.length === 0 && timedOut.length === 0 && skipped.filter(r => r.status === 'budget-exceeded').length === 0) {
     try { fs.unlinkSync(STATE_FILE); } catch { /* ok */ }
@@ -440,9 +562,17 @@ function generateReport(data: ReportData): string {
   lines.push(`  Quality gate: ${gatesPassed.length}/${completed.length} passed`);
   lines.push('');
 
+  // Check if any results have actual costs
+  const hasActualCosts = results.some(r => r.actualCost != null);
+
   // Results table
-  lines.push('| # | Page | Status | Cost | Duration | Gate | Tool Calls |');
-  lines.push('|---|------|--------|------|----------|------|------------|');
+  if (hasActualCosts) {
+    lines.push('| # | Page | Status | Est. | Actual | Duration | Gate | Tool Calls |');
+    lines.push('|---|------|--------|------|--------|----------|------|------------|');
+  } else {
+    lines.push('| # | Page | Status | Cost | Duration | Gate | Tool Calls |');
+    lines.push('|---|------|--------|------|----------|------|------------|');
+  }
 
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
@@ -451,11 +581,16 @@ function generateReport(data: ReportData): string {
                    r.status === 'timeout' ? 'TIMEOUT' :
                    r.status === 'budget-exceeded' ? 'BUDGET' : 'SKIP';
     const cost = r.cost ? formatCost(r.cost) : '-';
+    const actualCost = r.actualCost != null ? formatCost(r.actualCost) : '-';
     const dur = r.duration || '-';
     const gate = r.qualityGatePassed === undefined ? '-' :
                  r.qualityGatePassed ? 'PASS' : 'FAIL';
     const tools = r.toolCallCount ?? '-';
-    lines.push(`| ${i + 1} | ${r.pageId} | ${status} | ${cost} | ${dur} | ${gate} | ${tools} |`);
+    if (hasActualCosts) {
+      lines.push(`| ${i + 1} | ${r.pageId} | ${status} | ${cost} | ${actualCost} | ${dur} | ${gate} | ${tools} |`);
+    } else {
+      lines.push(`| ${i + 1} | ${r.pageId} | ${status} | ${cost} | ${dur} | ${gate} | ${tools} |`);
+    }
   }
 
   // Failures detail

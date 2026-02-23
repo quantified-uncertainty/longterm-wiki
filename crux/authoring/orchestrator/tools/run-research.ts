@@ -52,6 +52,7 @@ export const tool: ToolRegistration = {
           entityId: ctx.page.id,
         },
         budgetCap: 3.00,
+        tracker: ctx.tracker,
       };
 
       const result = await runResearch(request);

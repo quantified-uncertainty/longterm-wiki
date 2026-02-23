@@ -522,10 +522,10 @@ async function snapshot(_args: string[], options: CommandOptions): Promise<Comma
  *      gate-passes is pre-checked before verify runs because the gate already
  *      passed for the hook to reach this point.
  *
- *   2. Completion warning: if total completion is still < 25% after verify,
- *      print a loud warning asking whether /agent-session-ready-PR was run.
- *
- * Always exits 0 — this is a warning, not a blocker. Push proceeds regardless.
+ *   2. Completion check:
+ *      - < 10% complete: exit 1 (blocks push — session skipped the workflow)
+ *      - < 25% complete: exit 0 with loud warning
+ *      - >= 25% complete: exit 0 silently
  */
 async function prePushCheck(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -554,13 +554,22 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
   const verifyResult = await verify([], options);
   output += verifyResult.output;
 
-  // Step 3: Warn if checklist completion is below 25%.
+  // Step 3: Check completion level and warn or block accordingly.
   markdown = readFileSync(CHECKLIST_PATH, 'utf-8'); // re-read after verify updates
   const finalStatus = parseChecklist(markdown);
   const pct =
     finalStatus.totalItems > 0
       ? Math.round((finalStatus.totalChecked / finalStatus.totalItems) * 100)
       : 0;
+
+  if (pct < 10) {
+    // Hard block: checklist was initialized but barely touched — the session
+    // skipped the end-of-session workflow entirely. Exit 1 to block the push.
+    output += `\n${c.red}✗ Agent checklist is only ${finalStatus.totalChecked}/${finalStatus.totalItems} items complete (${pct}%).${c.reset}\n`;
+    output += `${c.red}  Run /agent-session-ready-PR before pushing.${c.reset}\n`;
+    output += `${c.dim}  To bypass: git push --no-verify${c.reset}\n\n`;
+    return { output, exitCode: 1 };
+  }
 
   if (pct < 25) {
     output += `\n${c.yellow}⚠️  WARNING: Agent checklist is only ${finalStatus.totalChecked}/${finalStatus.totalItems} items complete (${pct}%).${c.reset}\n`;
@@ -581,7 +590,7 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
     output += `${c.yellow}   List tooling gaps in Key Decisions (even "none found" counts).${c.reset}\n`;
   }
 
-  return { output, exitCode: 0 }; // never block — just warn
+  return { output, exitCode: 0 };
 }
 
 // ---------------------------------------------------------------------------

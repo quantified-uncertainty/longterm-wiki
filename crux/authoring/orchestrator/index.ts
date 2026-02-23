@@ -105,7 +105,10 @@ async function autoLogSession(
   try {
     const today = new Date().toISOString().split('T')[0];
     const branch = getCurrentBranch();
-    const summary = `Improved "${page.title}" via orchestrator v2 (${tier}, ${result.toolCallCount} tool calls, ${result.refinementCycles} refinement cycles). Quality gate: ${result.qualityGatePassed ? 'passed' : 'failed'}. Cost: ~$${result.totalCost.toFixed(2)}.`;
+    const displayCost = result.actualTotalCost != null
+      ? `$${result.actualTotalCost.toFixed(2)} actual`
+      : `~$${result.totalCost.toFixed(2)} estimated`;
+    const summary = `Improved "${page.title}" via orchestrator v2 (${tier}, ${result.toolCallCount} tool calls, ${result.refinementCycles} refinement cycles). Quality gate: ${result.qualityGatePassed ? 'passed' : 'failed'}. Cost: ${displayCost}.`;
 
     const entry = {
       date: today,
@@ -114,7 +117,9 @@ async function autoLogSession(
       summary,
       model: null,
       duration: `${result.duration}s`,
-      cost: `~$${result.totalCost.toFixed(2)}`,
+      cost: result.actualTotalCost != null
+        ? `$${result.actualTotalCost.toFixed(2)}`
+        : `~$${result.totalCost.toFixed(2)}`,
       prUrl: null,
       pages: [page.id],
     };
@@ -208,18 +213,29 @@ export async function runOrchestratorPipeline(
 
   // ── Report ─────────────────────────────────────────────────────────────
 
+  const costStr = result.actualTotalCost != null
+    ? `~$${result.totalCost.toFixed(2)} estimated / $${result.actualTotalCost.toFixed(2)} actual`
+    : `~$${result.totalCost.toFixed(2)}`;
+
   console.log('\n' + '='.repeat(60));
   console.log('Orchestrator Complete');
   console.log('='.repeat(60));
   console.log(`Duration: ${result.duration}s`);
   console.log(`Tool calls: ${result.toolCallCount}`);
   console.log(`Refinement cycles: ${result.refinementCycles}`);
-  console.log(`Cost: ~$${result.totalCost.toFixed(2)}`);
+  console.log(`Cost: ${costStr}`);
   console.log(`Quality gate: ${result.qualityGatePassed ? 'PASSED' : 'FAILED'}`);
   console.log(`Output: ${tempPath}`);
 
+  if (result.actualCostBreakdown && Object.keys(result.actualCostBreakdown).length > 0) {
+    console.log('\nActual cost breakdown (from API usage):');
+    for (const [label, cost] of Object.entries(result.actualCostBreakdown).sort((a, b) => b[1] - a[1])) {
+      if (cost > 0) console.log(`  ${label}: $${cost.toFixed(4)}`);
+    }
+  }
+
   if (result.costBreakdown) {
-    console.log('\nCost breakdown:');
+    console.log('\nEstimated cost breakdown:');
     for (const [tool, cost] of Object.entries(result.costBreakdown).sort((a, b) => b[1] - a[1])) {
       if (cost > 0) console.log(`  ${tool}: $${cost.toFixed(2)}`);
     }

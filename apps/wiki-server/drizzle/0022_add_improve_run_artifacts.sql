@@ -1,4 +1,5 @@
 -- Store intermediate artifacts from V2 orchestrator and page-improver pipeline runs.
+-- NOTE: Renamed to page_improve_runs in 0023_rename_improve_run_artifacts.sql.
 -- Each row captures the full context of a single improvement run: research sources,
 -- citation audits, cost tracking, section-level diffs, and quality gate results.
 -- See GitHub issue #826.
