@@ -90,6 +90,9 @@ import { frontmatterOrderRule } from './frontmatter-order.ts';
 import { urlSafetyRule } from './url-safety.ts';
 import { noExecSyncRule } from './no-exec-sync.ts';
 
+// Data integrity checks
+import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -139,6 +142,7 @@ export {
   frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
+  resourceRefIntegrityRule,
 };
 
 export const allRules: Rule[] = [
@@ -189,6 +193,7 @@ export const allRules: Rule[] = [
   frontmatterOrderRule,
   urlSafetyRule,
   noExecSyncRule,
+  resourceRefIntegrityRule,
 ];
 
 export default allRules;

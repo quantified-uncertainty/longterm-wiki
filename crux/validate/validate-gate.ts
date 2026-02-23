@@ -119,6 +119,7 @@ const UNIFIED_BLOCKING_RULES = [
   'no-quoted-subcategory',
   'numeric-id-integrity',
   'prefer-entitylink',
+  'resource-ref-integrity',
 ];
 
 // Phase 3: Independent checks — run in parallel after build-data completes.
