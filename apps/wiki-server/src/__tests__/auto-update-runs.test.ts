@@ -175,10 +175,10 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT ... WHERE started_at = $1 (conflict fallback lookup) ----
+  // Use '"started_at" =' to match only the WHERE clause, not the SELECT column list
   if (
     q.includes("auto_update_runs") &&
-    q.includes("where") &&
-    q.includes('"started_at"')
+    q.includes('"started_at" =')
   ) {
     const startedAt = new Date(params[0] as string);
     return runStore.filter((r) => r.started_at.getTime() === startedAt.getTime());
