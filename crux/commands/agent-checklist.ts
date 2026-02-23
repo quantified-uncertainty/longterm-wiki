@@ -511,6 +511,67 @@ async function snapshot(_args: string[], options: CommandOptions): Promise<Comma
 }
 
 // ---------------------------------------------------------------------------
+// Pre-push hook integration
+// ---------------------------------------------------------------------------
+
+/**
+ * Called by the pre-push git hook. Two things:
+ *
+ *   1. Auto-verify: runs verifyCommand for any unchecked items that can be
+ *      validated automatically (pr-description, escaping, entity-links, etc.).
+ *      gate-passes is pre-checked before verify runs because the gate already
+ *      passed for the hook to reach this point.
+ *
+ *   2. Completion warning: if total completion is still < 25% after verify,
+ *      print a loud warning asking whether /agent-session-ready-PR was run.
+ *
+ * Always exits 0 — this is a warning, not a blocker. Push proceeds regardless.
+ */
+async function prePushCheck(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  // No checklist? Nothing to do.
+  if (!existsSync(CHECKLIST_PATH)) {
+    return { output: '', exitCode: 0 };
+  }
+
+  let output = `${c.bold}Agent checklist checks...${c.reset}\n`;
+
+  // Step 1: Mark gate-passes as checked — we know it passed to reach this point.
+  let markdown = readFileSync(CHECKLIST_PATH, 'utf-8');
+  const preStatus = parseChecklist(markdown);
+  const gateItem = preStatus.phases.flatMap(p => p.items).find(i => i.id === 'gate-passes');
+  if (gateItem?.status === 'unchecked') {
+    const result = checkItems(markdown, ['gate-passes'], 'x');
+    markdown = result.markdown;
+    writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
+    syncChecklistToDb(markdown);
+    output += `  ${c.green}✓${c.reset} gate-passes (auto-checked — gate passed)\n`;
+  }
+
+  // Step 2: Run remaining auto-verify items (gate-passes is now checked, so skipped).
+  const verifyResult = await verify([], options);
+  output += verifyResult.output;
+
+  // Step 3: Warn if checklist completion is below 25%.
+  markdown = readFileSync(CHECKLIST_PATH, 'utf-8'); // re-read after verify updates
+  const finalStatus = parseChecklist(markdown);
+  const pct =
+    finalStatus.totalItems > 0
+      ? Math.round((finalStatus.totalChecked / finalStatus.totalItems) * 100)
+      : 0;
+
+  if (pct < 25) {
+    output += `\n${c.yellow}⚠️  WARNING: Agent checklist is only ${finalStatus.totalChecked}/${finalStatus.totalItems} items complete (${pct}%).${c.reset}\n`;
+    output += `${c.yellow}   Did you run /agent-session-ready-PR before pushing?${c.reset}\n`;
+    output += `${c.dim}   To bypass: git push --no-verify${c.reset}\n\n`;
+  }
+
+  return { output, exitCode: 0 }; // never block — just warn
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -522,6 +583,7 @@ export const commands = {
   status,
   complete,
   snapshot,
+  'pre-push-check': prePushCheck,
 };
 
 export function getHelp(): string {
@@ -535,6 +597,7 @@ Commands:
   status           Show checklist progress
   complete         Validate all items checked (exit code 1 if incomplete)
   snapshot         Output checks: YAML block for session log (run before logging)
+  pre-push-check   Auto-verify + warn if completion < 25% (called by pre-push hook)
 
 Options:
   --type=TYPE      Task type: content, infrastructure, bugfix, refactor, commands

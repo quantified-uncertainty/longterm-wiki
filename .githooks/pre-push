@@ -14,4 +14,9 @@ echo ""
 
 pnpm crux validate gate
 
+# After gate passes, run agent checklist auto-verify and completion warning.
+# Non-blocking: pre-push-check always exits 0.
+echo ""
+pnpm crux agent-checklist pre-push-check || true
+
 # Exit code from gate determines whether push proceeds
