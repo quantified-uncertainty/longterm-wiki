@@ -105,7 +105,9 @@ autoUpdateRunsRoute.post("/", async (c) => {
   const d = parsed.data;
   const db = getDrizzleDb();
 
-  // Use a Drizzle transaction to ensure atomicity of run + results insert
+  // Use a Drizzle transaction to ensure atomicity of run + results insert.
+  // ON CONFLICT DO NOTHING makes this idempotent: re-syncing the same run
+  // (e.g., from YAML files) returns the existing record rather than duplicating it.
   const result = await db.transaction(async (tx) => {
     const runRow = await tx
       .insert(autoUpdateRuns)
@@ -128,6 +130,7 @@ autoUpdateRunsRoute.post("/", async (c) => {
           ? JSON.stringify(d.newPagesCreated)
           : null,
       })
+      .onConflictDoNothing({ target: autoUpdateRuns.startedAt }) // idempotent: skip duplicate startedAt
       .returning({
         id: autoUpdateRuns.id,
         date: autoUpdateRuns.date,
@@ -135,7 +138,23 @@ autoUpdateRunsRoute.post("/", async (c) => {
         createdAt: autoUpdateRuns.createdAt,
       });
 
-    const run = firstOrThrow(runRow, "auto-update run insert");
+    // If conflict (duplicate startedAt), fetch the existing run's id
+    if (runRow.length === 0) {
+      const existing = await tx
+        .select({
+          id: autoUpdateRuns.id,
+          date: autoUpdateRuns.date,
+          startedAt: autoUpdateRuns.startedAt,
+          createdAt: autoUpdateRuns.createdAt,
+        })
+        .from(autoUpdateRuns)
+        .where(eq(autoUpdateRuns.startedAt, new Date(d.startedAt)))
+        .limit(1);
+      const run = firstOrThrow(existing, "auto-update run lookup after conflict");
+      return { ...run, resultsInserted: 0 };
+    }
+
+    const run = runRow[0];
     let resultsInserted = 0;
 
     if (d.results && d.results.length > 0) {
