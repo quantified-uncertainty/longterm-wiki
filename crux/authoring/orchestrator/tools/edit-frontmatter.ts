@@ -87,11 +87,12 @@ export const tool: ToolRegistration = {
       const orderedFm = reorderFrontmatterObject(fm);
 
       let newFmStr = stringifyYaml(orderedFm, {
-        defaultStringType: 'QUOTE_DOUBLE',
+        defaultStringType: 'PLAIN',
         defaultKeyType: 'PLAIN',
         lineWidth: 0,
       });
 
+      // Date strings must be quoted to prevent YAML parsing them as Date objects
       newFmStr = newFmStr.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');
 
       if (!newFmStr.endsWith('\n')) {

@@ -43,6 +43,12 @@ const SCRIPTS: Record<string, ScriptConfig> = {
     description: 'Post-improvement cleanup and polish',
     passthrough: ['ci'],
   },
+  review: {
+    script: 'authoring/page-review.ts',
+    description: 'Adversarial review — find gaps in a page (~$0.50/page)',
+    passthrough: ['model', 'batch', 'limit', 'help', 'ci'],
+    positional: true,
+  },
   'suggest-links': {
     script: 'authoring/suggest-links.ts',
     description: 'Suggest relatedEntries cross-links for entities',
@@ -93,6 +99,8 @@ Examples:
   crux content improve far-ai --tier deep --directions "add recent papers"
   crux content improve anthropic --engine=v2 --tier standard --apply
   crux content create "SecureBio" --tier standard
+  crux content review anthropic                     # review single page
+  crux content review --batch --limit=20            # review lowest-quality pages
   crux content regrade --batch 10
   crux content grade
   crux content grade-content --page my-page --warnings-only

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   searchWiki,
-  preloadSearchIndex,
   type SearchResult,
   type MatchInfo,
 } from "@lib/search";
@@ -77,7 +76,6 @@ export function SearchDialog() {
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
-      preloadSearchIndex();
       document.body.style.overflow = "hidden";
     } else {
       setQuery("");
@@ -491,7 +489,6 @@ export function SearchButton() {
           new KeyboardEvent("keydown", { key: "k", metaKey: true }),
         );
       }}
-      onMouseEnter={preloadSearchIndex}
       className="flex items-center gap-2 px-2.5 py-1.5 text-sm text-muted-foreground bg-muted/50 border border-border rounded-md hover:bg-muted transition-colors cursor-pointer"
       title="Search (Cmd+K)"
     >

@@ -53,11 +53,13 @@ Follow this general approach, adapting based on the page's specific needs:
    - Research before rewriting (so sections have sources)
    - Rewrite sections before enrichment (entity-links operate on final prose)
    - After rewriting key fact sections, run \`check_cross_references\` to catch contradictions with related pages
+   - After rewriting, run \`adversarial_review\` to detect uncited claims, speculation, and weasel words — it's free ($0) and catches issues the quality gate would flag
    - Validate last (auto-fixes applied)
 
 4. **Cross-page consistency**: After rewriting, use \`check_cross_references\` to verify dates, funding amounts, and team sizes agree with related pages. If contradictions are found, use \`read_related_page\` to check the source and fix whichever page is wrong.
 
 5. **Finalize**: Near the end of your session:
+   - Run \`adversarial_review\` to catch uncited claims and quality issues (free, $0 cost)
    - Run \`suggest_cross_links\` to find missing relatedEntries and add them via \`edit_frontmatter\`
    - Update \`llmSummary\` and other frontmatter fields via \`edit_frontmatter\` if you changed major facts
    - Run \`validate_content\` as your final tool call

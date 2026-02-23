@@ -17,6 +17,7 @@
  */
 
 import { MODELS } from '../../../lib/anthropic.ts';
+import { getPageTypeStandardData } from '../../../lib/page-analysis.ts';
 import type {
   PageData, AdversarialReviewResult, AdversarialGap, PipelineOptions,
 } from '../types.ts';
@@ -27,25 +28,6 @@ import { parseAndValidate, AdversarialReviewResultSchema } from './json-parsing.
 // Re-export for callers that only import from adversarial-review.ts
 export { AdversarialReviewResultSchema } from './json-parsing.ts';
 
-// ── Page-type hints ───────────────────────────────────────────────────────────
-
-const PAGE_TYPE_STANDARD_DATA: Record<string, string[]> = {
-  person: ['birth year or estimated age', 'institutional affiliation', 'key publications or positions', 'educational background'],
-  organization: ['founding year', 'funding sources or budget', 'staff size or key personnel', 'primary mission statement'],
-  incident: ['date and timeline of events', 'actors involved', 'community reception metrics (upvotes, comments)', 'resolution or outcome'],
-  concept: ['formal definition with citation', 'key proponents', 'examples or applications', 'criticisms or limitations'],
-  research: ['primary finding with sample size or confidence interval', 'authors and institution', 'replication status', 'key limitation'],
-};
-
-function getPageTypeHint(page: PageData): string {
-  const path = page.path.toLowerCase();
-  if (path.includes('/people/')) return PAGE_TYPE_STANDARD_DATA.person.join(', ');
-  if (path.includes('/organizations/')) return PAGE_TYPE_STANDARD_DATA.organization.join(', ');
-  if (path.includes('/incidents/') || path.includes('/events/')) return PAGE_TYPE_STANDARD_DATA.incident.join(', ');
-  if (path.includes('/research/') || path.includes('/papers/')) return PAGE_TYPE_STANDARD_DATA.research.join(', ');
-  return PAGE_TYPE_STANDARD_DATA.concept.join(', ');
-}
-
 // ── Phase ─────────────────────────────────────────────────────────────────────
 
 export async function adversarialReviewPhase(
@@ -55,7 +37,7 @@ export async function adversarialReviewPhase(
 ): Promise<AdversarialReviewResult> {
   log('adversarial-review', 'Starting adversarial review');
 
-  const pageTypeHint = getPageTypeHint(page);
+  const pageTypeHint = getPageTypeStandardData(page);
 
   const prompt = `You are a skeptical research editor reviewing a draft wiki page. Your job is to find SPECIFIC, ACTIONABLE gaps — not praise what is already there.
 

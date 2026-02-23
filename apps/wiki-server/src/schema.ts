@@ -270,7 +270,7 @@ export const autoUpdateRuns = pgTable(
   (table) => [
     index("idx_aur_date").on(table.date),
     index("idx_aur_trigger").on(table.trigger),
-    index("idx_aur_started_at").on(table.startedAt),
+    uniqueIndex("idx_aur_started_at_unique").on(table.startedAt),
   ]
 );
 

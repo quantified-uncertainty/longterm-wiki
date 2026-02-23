@@ -1105,3 +1105,77 @@ describe('issues update-body — validation', () => {
     expect(result.output).toContain('No structured args');
   });
 });
+
+// ---------------------------------------------------------------------------
+// --body-file and --problem-file flags (#766)
+// ---------------------------------------------------------------------------
+
+describe('issues create — file-based body (#766)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('reads body from --body-file', async () => {
+    // Write a temp file with special chars that would break shell expansion
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-body-766.md';
+    writeFileSync(tmpPath, '## Problem\n\nThe `parsed?.content` breaks with $(shell expansion).\n\n## Acceptance Criteria\n\n- [ ] Fixed\n\n## Recommended Model\n\n**Sonnet**');
+
+    mockGithubApi.mockResolvedValueOnce({ number: 200, html_url: 'https://github.com/test/issues/200', title: 'Test' });
+
+    const result = await commands.create(['Test body-file'], { 'body-file': tmpPath });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('#200');
+
+    // Verify the body was sent with special chars intact
+    const apiCall = mockGithubApi.mock.calls[0];
+    const sentBody = (apiCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('`parsed?.content`');
+    expect(sentBody).toContain('$(shell expansion)');
+
+    unlinkSync(tmpPath);
+  });
+
+  it('reads problem from --problem-file', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-problem-766.md';
+    writeFileSync(tmpPath, 'The `structuralScoreNormalized` caps at (15/15)*50 = 50.');
+
+    mockGithubApi.mockResolvedValueOnce({ number: 201, html_url: 'https://github.com/test/issues/201', title: 'Test' });
+    mockGithubApi.mockResolvedValueOnce({}); // label
+    mockGithubApi.mockResolvedValueOnce({}); // label
+
+    const result = await commands.create(['Test problem-file'], {
+      'problem-file': tmpPath,
+      model: 'sonnet',
+      criteria: 'Fixed|Tests pass',
+    });
+    expect(result.exitCode).toBe(0);
+
+    const apiCall = mockGithubApi.mock.calls[0];
+    const sentBody = (apiCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('`structuralScoreNormalized`');
+    expect(sentBody).toContain('(15/15)*50');
+
+    unlinkSync(tmpPath);
+  });
+
+  it('--body-file bypasses --model/--criteria requirement', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-bypass-766.md';
+    writeFileSync(tmpPath, 'Full custom body content.');
+
+    mockGithubApi.mockResolvedValueOnce({ number: 202, html_url: 'https://github.com/test/issues/202', title: 'Test' });
+
+    const result = await commands.create(['Test bypass'], { 'body-file': tmpPath });
+    expect(result.exitCode).toBe(0);
+
+    unlinkSync(tmpPath);
+  });
+
+  it('returns error for non-existent --body-file', async () => {
+    const result = await commands.create(['Test missing file'], { 'body-file': '/tmp/nonexistent-766.md' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Error reading file');
+  });
+});

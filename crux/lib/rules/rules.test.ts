@@ -1191,3 +1191,178 @@ describe('entitylink-ids rule', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// footnote-quality rule
+// ---------------------------------------------------------------------------
+
+import { footnoteQualityRule } from './footnote-quality.ts';
+
+describe('footnote-quality rule', () => {
+  const longProse = 'This is a sentence with several words in it. '.repeat(40); // ~400 words
+
+  // --- Sub-check 1: Hedging ---
+
+  it('detects hedging phrases in footnote definitions', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Source](https://example.org) — this claim could not be verified independently.';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const hedgingIssues = issues.filter((i: any) => i.message.includes('hedging'));
+    expect(hedgingIssues.length).toBe(1);
+    expect(hedgingIssues[0].message).toContain('[^1]');
+    expect(hedgingIssues[0].severity).toBe(Severity.WARNING);
+  });
+
+  it('ignores clean footnotes without hedging', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Annual Report 2024](https://example.org/report.pdf)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/organizations/test-org.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const hedgingIssues = issues.filter((i: any) => i.message.includes('hedging'));
+    expect(hedgingIssues.length).toBe(0);
+  });
+
+  // --- Sub-check 2: Wikipedia ---
+
+  it('detects Wikipedia URLs in footnotes', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Dustin Moskovitz](https://en.wikipedia.org/wiki/Dustin_Moskovitz)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const wikiIssues = issues.filter((i: any) => i.message.includes('Wikipedia'));
+    expect(wikiIssues.length).toBe(1);
+    expect(wikiIssues[0].message).toContain('[^1]');
+  });
+
+  it('ignores non-Wikipedia URLs', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Source](https://arxiv.org/abs/2301.07041)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const wikiIssues = issues.filter((i: any) => i.message.includes('Wikipedia'));
+    expect(wikiIssues.length).toBe(0);
+  });
+
+  // --- Sub-check 3: Overloaded footnotes ---
+
+  it('detects overloaded footnotes referenced 10 times', () => {
+    const refs = Array(10).fill('Claim.[^1]').join(' ');
+    const body = longProse + '\n\n' + refs + '\n\n[^1]: [Source](https://example.org/doc.pdf)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const overloadedIssues = issues.filter((i: any) => i.message.includes('referenced'));
+    expect(overloadedIssues.length).toBe(1);
+    expect(overloadedIssues[0].message).toContain('10 times');
+  });
+
+  it('ignores footnotes referenced 5 times', () => {
+    const refs = Array(5).fill('Claim.[^1]').join(' ');
+    const body = longProse + '\n\n' + refs + '\n\n[^1]: [Source](https://example.org/doc.pdf)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const overloadedIssues = issues.filter((i: any) => i.message.includes('referenced'));
+    expect(overloadedIssues.length).toBe(0);
+  });
+
+  // --- Sub-check 4: Generic/index URLs ---
+
+  it('detects domain root URLs', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Asana Investors](https://investors.asana.com)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const genericIssues = issues.filter((i: any) => i.message.includes('generic'));
+    expect(genericIssues.length).toBe(1);
+    expect(genericIssues[0].message).toContain('[^1]');
+  });
+
+  it('detects generic /press path URLs', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Press](https://example.com/press)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/organizations/test-org.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const genericIssues = issues.filter((i: any) => i.message.includes('generic'));
+    expect(genericIssues.length).toBe(1);
+  });
+
+  it('ignores specific document URLs', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Press Release](https://example.com/press/2024/annual-report.html)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/organizations/test-org.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const genericIssues = issues.filter((i: any) => i.message.includes('generic'));
+    expect(genericIssues.length).toBe(0);
+  });
+
+  // --- Guards ---
+
+  it('skips non-knowledge-base pages', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Wikipedia](https://en.wikipedia.org/wiki/Test)';
+    const content = mockContent(body, {
+      relativePath: 'guides/some-guide.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips short pages', () => {
+    const body = 'Short page.[^1]\n\n[^1]: [Wikipedia](https://en.wikipedia.org/wiki/Test)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips stub pages', () => {
+    const body = longProse +
+      '\n\nSome claim.[^1]\n\n' +
+      '[^1]: [Wikipedia](https://en.wikipedia.org/wiki/Test)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+      frontmatter: { title: 'Test', pageType: 'stub' },
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    expect(issues.length).toBe(0);
+  });
+
+  it('skips footnote definitions inside code blocks', () => {
+    const body = longProse +
+      '\n\n```\n[^1]: [Wikipedia](https://en.wikipedia.org/wiki/Test)\n```\n\n' +
+      'Some claim.[^2]\n\n[^2]: [Real Source](https://arxiv.org/abs/2301.07041)';
+    const content = mockContent(body, {
+      relativePath: 'knowledge-base/people/test-person.mdx',
+    });
+    const issues = footnoteQualityRule.check(content as any, {} as any);
+    const wikiIssues = issues.filter((i: any) => i.message.includes('Wikipedia'));
+    expect(wikiIssues.length).toBe(0);
+  });
+});
+
