@@ -1,20 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-// Mock MiniSearch before importing the search module
-vi.mock("minisearch", () => {
-  const mockSearch = vi.fn().mockReturnValue([]);
-  const mockLoadJSON = vi.fn().mockReturnValue({
-    search: mockSearch,
-  });
-  return {
-    default: {
-      loadJSON: mockLoadJSON,
-    },
-    __mockSearch: mockSearch,
-    __mockLoadJSON: mockLoadJSON,
-  };
-});
-
 describe("search", () => {
   const originalFetch = global.fetch;
 
@@ -80,49 +65,26 @@ describe("search", () => {
       );
     });
 
-    it("falls back to MiniSearch when server returns 503", async () => {
-      // First call: server returns 503
-      global.fetch = vi
-        .fn()
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ error: "unavailable" }), {
-            status: 503,
-          }),
-        )
-        // MiniSearch index and docs fetch
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({}), { status: 200 }),
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify([]), { status: 200 }),
-        );
+    it("returns empty array when server returns error", async () => {
+      global.fetch = vi.fn().mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
+      );
 
       const { searchWiki } = await import("../search");
       const results = await searchWiki("miri");
 
-      // Server failed, MiniSearch loaded but returned empty (mocked)
       expect(results).toEqual([]);
-      // fetch was called 3 times: server + index + docs
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
-    it("falls back to MiniSearch when server fetch throws", async () => {
-      global.fetch = vi
-        .fn()
-        .mockRejectedValueOnce(new Error("Network error"))
-        // MiniSearch index and docs fetch
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({}), { status: 200 }),
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify([]), { status: 200 }),
-        );
+    it("returns empty array when server fetch throws", async () => {
+      global.fetch = vi.fn().mockRejectedValueOnce(new Error("Network error"));
 
       const { searchWiki } = await import("../search");
       const results = await searchWiki("miri");
 
       expect(results).toEqual([]);
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
     it("synthesizes accurate match info from query terms", async () => {
@@ -158,63 +120,6 @@ describe("search", () => {
       );
       // "xyz" doesn't appear in title or description, falls back to both
       expect(results[0].match["xyz"]).toEqual(["title", "description"]);
-    });
-
-    it("skips server after circuit breaker threshold", async () => {
-      const fetchMock = vi.fn();
-      global.fetch = fetchMock;
-
-      const { searchWiki } = await import("../search");
-
-      // Failure 1: server 503 + MiniSearch loads for the first time
-      fetchMock
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({}), { status: 200 }),
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify([]), { status: 200 }),
-        );
-      await searchWiki("q1");
-
-      // Failure 2: server 503 (MiniSearch already loaded, no extra fetches)
-      fetchMock.mockResolvedValueOnce(
-        new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
-      );
-      await searchWiki("q2");
-
-      // Failure 3: server 503 -> triggers circuit breaker (3 consecutive failures)
-      fetchMock.mockResolvedValueOnce(
-        new Response(JSON.stringify({ error: "unavailable" }), { status: 503 }),
-      );
-      await searchWiki("q3");
-
-      // Clear call history, then verify circuit breaker skips server
-      fetchMock.mockClear();
-      await searchWiki("skipped");
-
-      // No fetch calls at all: server was skipped, MiniSearch was already loaded
-      expect(fetchMock).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("searchWikiScores", () => {
-    it("returns empty map for empty query", async () => {
-      // searchWikiScores always uses MiniSearch, so it will try to load the index
-      global.fetch = vi
-        .fn()
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({}), { status: 200 }),
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify([]), { status: 200 }),
-        );
-
-      const { searchWikiScores } = await import("../search");
-      const scores = await searchWikiScores("");
-      expect(scores.size).toBe(0);
     });
   });
 });

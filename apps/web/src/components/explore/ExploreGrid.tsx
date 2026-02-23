@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { ExploreItem } from "@/data";
 import { ENTITY_GROUPS } from "@/data/entity-ontology";
-import { searchWikiScores } from "@/lib/search";
 import { ContentCard } from "./ContentCard";
 import { ExploreTable } from "./ExploreTable";
 
@@ -206,47 +205,14 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   const [sortKey, setSortKey] = useState<SortKey>(initialSort);
   const [visibleCount, setVisibleCount] = useState(60);
 
-  // MiniSearch scores: id → relevance score (null = no active search or not yet loaded)
-  const [searchScores, setSearchScores] = useState<Map<string, number> | null>(null);
-
   // Debounced URL update for search
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Debounced MiniSearch query
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
-      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     };
   }, []);
-
-  // Run MiniSearch when search text changes
-  useEffect(() => {
-    const query = search.trim();
-    if (!query) {
-      setSearchScores(null);
-      return;
-    }
-
-    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    searchDebounceRef.current = setTimeout(() => {
-      let cancelled = false;
-      searchWikiScores(query)
-        .then((scores) => {
-          if (!cancelled) setSearchScores(scores);
-        })
-        .catch(() => {
-          // MiniSearch failed to load — keep null so fallback text filter is used
-        });
-      // Store cancel function for cleanup
-      searchDebounceRef.current = null;
-    }, 150);
-
-    return () => {
-      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    };
-  }, [search]);
 
   const updateUrlParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -314,17 +280,11 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     [items]
   );
 
-  // Items after search filter (MiniSearch when available, text fallback otherwise)
+  // Items after search filter (text-based client-side filter)
   const searchFiltered = useMemo(() => {
     if (!search.trim()) return articleItems;
-
-    if (searchScores && searchScores.size > 0) {
-      return articleItems.filter((item) => searchScores.has(item.id));
-    }
-
-    // Fallback: simple text filter while MiniSearch is loading or unavailable
     return textFilter(articleItems, search);
-  }, [articleItems, search, searchScores]);
+  }, [articleItems, search]);
 
   // Compute field filter counts (against search-filtered items)
   const fieldCounts = useMemo(() => {
@@ -414,22 +374,12 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
           case "recentlyCreated":
             return (b.dateCreated || "").localeCompare(a.dateCreated || "");
           case "relevance": {
-            if (searchScores) {
-              const scoreA = searchScores.get(a.id) || 0;
-              const scoreB = searchScores.get(b.id) || 0;
-              return scoreB - scoreA;
-            }
             const scoreA = (a.readerImportance || 0) * 2 + (a.quality || 0);
             const scoreB = (b.readerImportance || 0) * 2 + (b.quality || 0);
             return scoreB - scoreA;
           }
           case "recommended":
           default: {
-            if (searchScores) {
-              const scoreA = searchScores.get(a.id) || 0;
-              const scoreB = searchScores.get(b.id) || 0;
-              return scoreB - scoreA;
-            }
             return recommendedScore(b) - recommendedScore(a);
           }
         }
@@ -437,7 +387,7 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
     }
 
     return result;
-  }, [sectionFiltered, activeEntity, activeRiskCat, searchScores, sortKey, viewMode]);
+  }, [sectionFiltered, activeEntity, activeRiskCat, sortKey, viewMode]);
 
   return (
     <div>
