@@ -326,7 +326,26 @@ Identify entity mentions and return replacement instructions as JSON.`;
 }
 
 /**
+ * Split content into processable chunks for entity-link enrichment.
+ *
+ * Re-exports `splitContentForEnrichment` from content-chunker so that callers
+ * within the enrichment module don't need to import from an unrelated lib.
+ * Tests for the underlying logic live in content-chunker.test.ts.
+ *
+ * @param content - Full MDX content
+ * @returns Array of content chunks
+ */
+export function buildEnrichmentChunks(content: string): string[] {
+  if (!content.trim()) return [];
+  return splitContentForEnrichment(content);
+}
+
+/**
  * Main enrichment function. Takes MDX content and returns enriched content.
+ *
+ * Processes the full content via sectional chunking so pages longer than
+ * 6 000 chars are enriched completely (not just the first ~3 000 words).
+ * Cross-chunk deduplication ensures each entity is linked at most once.
  *
  * @param content - The MDX content to enrich
  * @param options.root - Project root path (defaults to PROJECT_ROOT)
@@ -347,39 +366,32 @@ export async function enrichEntityLinks(
     return { content, insertedCount: 0, replacements: [] };
   }
 
+  // Build initial already-linked sets from pre-existing EntityLinks in the content
   const { texts: alreadyLinkedTexts, entityIds: alreadyLinkedIds } = buildAlreadyLinkedSets(content);
 
   let replacements: EntityLinkReplacement[] = [];
 
   if (useLlm) {
-    // Split into sections and process each chunk separately to cover the full page (#673).
-    // Long pages truncated at 6000 chars silently miss mentions in the second half.
-    const chunks = splitContentForEnrichment(content);
-
-    // Accumulate alreadyLinked across sections to enforce first-mention-only per entity.
-    const accTexts = new Set(alreadyLinkedTexts);
-    const accIds = new Set(alreadyLinkedIds);
-
+    // Process each chunk, carrying the already-linked sets forward for cross-chunk dedup
+    const chunks = buildEnrichmentChunks(content);
     for (const chunk of chunks) {
-      const chunkReplacements = await callLlmForEntityLinks(chunk, entityLookup, accTexts);
+      const chunkReplacements = await callLlmForEntityLinks(chunk, entityLookup, alreadyLinkedTexts);
 
-      // Filter out entity IDs already linked or proposed in earlier sections
-      const filtered = chunkReplacements.filter(r => !accIds.has(r.entityId));
+      // Filter by BOTH entityId AND displayName to handle LLM errors where the same
+      // entity name is proposed again under a different ID in a later section.
+      const filtered = chunkReplacements.filter(r =>
+        !alreadyLinkedTexts.has(r.displayName) && !alreadyLinkedIds.has(r.entityId),
+      );
+
+      // Update dedup sets so the next chunk skips these entities
+      for (const r of filtered) {
+        alreadyLinkedTexts.add(r.displayName);
+        alreadyLinkedIds.add(r.entityId);
+      }
 
       replacements.push(...filtered);
-
-      // Accumulate for subsequent sections so the LLM won't re-propose them
-      for (const r of filtered) {
-        accTexts.add(r.displayName);
-        accIds.add(r.entityId);
-      }
     }
   }
-
-  // Filter out replacements for already-linked text or already-linked entity IDs (#679)
-  replacements = replacements.filter(r =>
-    !alreadyLinkedTexts.has(r.displayName) && !alreadyLinkedIds.has(r.entityId),
-  );
 
   // Validate all entityIds are in E## format
   replacements = replacements.filter(r => NUMERIC_ID_RE.test(r.entityId));

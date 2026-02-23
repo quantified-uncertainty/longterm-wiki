@@ -159,7 +159,7 @@ Environment:
   EXA_API_KEY          Exa web search (optional)
   OPENROUTER_API_KEY   Perplexity via OpenRouter (optional)
   SCRY_API_KEY         SCRY search (optional; falls back to public key)
-  ANTHROPIC_API_KEY    Required for fact extraction
+  ANTHROPIC_API_KEY    Optional: if absent, fact extraction is silently skipped
 `,
     exitCode: 0,
   };

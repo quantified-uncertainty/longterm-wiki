@@ -48,6 +48,7 @@ app/public/search-index.json
 .claude/maintain-last-run.txt
 .claude/wip-checklist.md
 .claude/wip-context.md
+.claude/skills/
 
 # MCP config (contains tokens)
 .mcp.json
