@@ -35,40 +35,54 @@ export interface BudgetConfig {
 export const TIER_BUDGETS: Record<OrchestratorTier, BudgetConfig> = {
   polish: {
     name: 'Polish',
-    maxToolCalls: 12,
+    maxToolCalls: 15,
     maxResearchQueries: 0,
     enabledTools: [
+      // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
       'rewrite_section', 'add_entity_links', 'add_fact_refs', 'validate_content',
-      'edit_frontmatter', 'create_visual',
+      // Low-cost context tools (all $0)
+      'query_wiki_context', 'view_edit_history', 'edit_frontmatter', 'create_visual',
     ],
     estimatedCost: '$2-4',
   },
   standard: {
     name: 'Standard',
-    maxToolCalls: 20,
+    maxToolCalls: 25,
     maxResearchQueries: 5,
     enabledTools: [
+      // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
       'run_research', 'rewrite_section', 'audit_citations',
       'add_entity_links', 'add_fact_refs', 'validate_content',
+      // Context & cross-page tools
       'query_wiki_context', 'read_related_page', 'edit_frontmatter',
-      'view_edit_history', 'extract_facts', 'deep_citation_check', 'create_visual',
+      'view_edit_history', 'extract_facts', 'create_visual',
+      // Cross-reference & linking
       'check_cross_references', 'suggest_cross_links',
+      // Citation analysis
+      'deep_citation_check',
     ],
     estimatedCost: '$5-10',
   },
   deep: {
     name: 'Deep',
-    maxToolCalls: 50,
+    maxToolCalls: 65,
     maxResearchQueries: 15,
     enabledTools: [
+      // Core reading/writing
       'read_page', 'get_page_metrics', 'split_into_sections',
       'run_research', 'rewrite_section', 'audit_citations',
       'add_entity_links', 'add_fact_refs', 'validate_content',
+      // Context & cross-page tools
       'query_wiki_context', 'read_related_page', 'edit_frontmatter',
-      'view_edit_history', 'extract_facts', 'deep_citation_check', 'create_visual',
+      'view_edit_history', 'extract_facts', 'create_visual',
+      // Cross-reference & linking
       'check_cross_references', 'suggest_cross_links',
+      // Citation analysis
+      'deep_citation_check',
+      // Quality assurance (deep only)
+      'adversarial_review',
     ],
     estimatedCost: '$10-25',
   },

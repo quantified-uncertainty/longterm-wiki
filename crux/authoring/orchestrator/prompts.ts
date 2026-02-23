@@ -39,21 +39,30 @@ Plan your tool calls carefully. You will see a budget counter after each tool re
 
 Follow this general approach, adapting based on the page's specific needs:
 
-1. **Read and assess**: Start with \`read_page\` and \`get_page_metrics\` to understand the current state. Use \`split_into_sections\` to see the page structure.
+1. **Understand context**: Start with \`read_page\` and \`get_page_metrics\`. Then use \`query_wiki_context\` to understand the page's place in the wiki graph — what links here, what it relates to, and its hallucination risk level. Use \`view_edit_history\` to see what's already been done recently (avoid redundant work). Use \`extract_facts\` to see which canonical \`<F>\` tags are available.
 
 2. **Plan improvements**: Based on what you see, decide which improvements are most valuable:
    - Low citation count → run \`run_research\` then \`rewrite_section\` on weak sections
    - Poor prose quality → \`rewrite_section\` on the weakest sections
    - Missing EntityLinks → \`add_entity_links\`
    - Hardcoded numbers → \`add_fact_refs\`
+   - Missing visuals → use \`create_visual\` to assess, then add diagrams/tables via \`rewrite_section\`
    - Validation errors → \`validate_content\`
 
 3. **Execute**: Call tools in a logical order:
    - Research before rewriting (so sections have sources)
    - Rewrite sections before enrichment (entity-links operate on final prose)
+   - After rewriting key fact sections, run \`check_cross_references\` to catch contradictions with related pages
    - Validate last (auto-fixes applied)
 
-4. **Be selective**: Not every section needs rewriting. Focus on sections with the most room for improvement. Short sections (<30 words) and terminal sections (Sources, References) should be skipped.
+4. **Cross-page consistency**: After rewriting, use \`check_cross_references\` to verify dates, funding amounts, and team sizes agree with related pages. If contradictions are found, use \`read_related_page\` to check the source and fix whichever page is wrong.
+
+5. **Finalize**: Near the end of your session:
+   - Run \`suggest_cross_links\` to find missing relatedEntries and add them via \`edit_frontmatter\`
+   - Update \`llmSummary\` and other frontmatter fields via \`edit_frontmatter\` if you changed major facts
+   - Run \`validate_content\` as your final tool call
+
+6. **Be selective**: Not every section needs rewriting. Focus on sections with the most room for improvement. Short sections (<30 words) and terminal sections (Sources, References) should be skipped.
 
 ## Important Rules
 
@@ -100,7 +109,13 @@ Current metrics:
 - Sections: ${metrics.sectionCount}
 - Structural score: ${metrics.structuralScore}
 
-You have ${ctx.budget.maxToolCalls - ctx.toolCallCount} tool calls remaining. Address the most critical gaps. Focus on high-impact changes rather than trying to fix everything.`;
+You have ${ctx.budget.maxToolCalls - ctx.toolCallCount} tool calls remaining. Address the most critical gaps. Focus on high-impact changes rather than trying to fix everything.
+
+Hints:
+- If gaps mention cross-page contradictions, use \`check_cross_references\` and \`read_related_page\` to investigate.
+- If gaps mention missing visuals or low structural score, use \`create_visual\` to assess what's needed, then add via \`rewrite_section\`.
+- If gaps mention missing citations, use \`run_research\` then \`rewrite_section\` on undercited sections.
+- If gaps mention missing EntityLinks, run \`add_entity_links\`.`;
 }
 
 // ---------------------------------------------------------------------------
