@@ -14,17 +14,20 @@
  * See issue #829.
  */
 
-import { createRequire } from 'module';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkMdx from 'remark-mdx';
 import remarkFrontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
 import { headingToId } from './section-splitter.ts';
-
-const __filename_ir = fileURLToPath(import.meta.url);
-const __dirname_ir = dirname(__filename_ir);
+import {
+  nodeLine,
+  nodeEndLine,
+  extractText,
+  countWords,
+  getJsxAttr,
+  isJsxElement,
+} from './mdx-ast-helpers.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,7 +47,7 @@ export interface TableBlock {
   startLine: number;
 }
 
-export interface SectionBlock {
+export interface SectionIR {
   heading: string;
   headingId: string;
   level: number; // 0=preamble, 2-6=heading depth
@@ -57,51 +60,50 @@ export interface SectionBlock {
   externalLinks: string[];
   tables: TableBlock[];
   wordCount: number;
-  hasSquiggle: boolean;
-  hasMermaid: boolean;
-  hasCalc: boolean;
+  /** Component names present in this section (e.g. ['squiggle', 'mermaid']) */
+  componentNames: string[];
 }
+
+/** @deprecated Use SectionIR instead */
+export type SectionBlock = SectionIR;
+
+/**
+ * Known component names tracked by the block IR extractor.
+ * New components can be added here — the rest of the code is data-driven.
+ */
+const TRACKED_COMPONENTS: Record<string, string> = {
+  SquiggleEstimate: 'squiggle',
+  MermaidDiagram: 'mermaid',
+  Calc: 'calc',
+  Callout: 'callout',
+  DataInfoBox: 'datainfobox',
+};
 
 export interface PageBlockIR {
   pageId: string;
-  sections: SectionBlock[];
-  components: {
-    squiggleCount: number;
-    mermaidCount: number;
-    calcCount: number;
-    calloutCount: number;
-    dataInfoBoxCount: number;
-    totalTables: number;
-  };
+  sections: SectionIR[];
+  /** Component counts keyed by normalized name (e.g. { squiggle: 1, mermaid: 2 }) */
+  components: Record<string, number>;
 }
 
 export type BlockIndex = Record<string, PageBlockIR>;
 
 // ---------------------------------------------------------------------------
-// Remark plugin resolution
-// remark-gfm lives in apps/web/node_modules (not the root).
-// All other plugins are available via direct ESM imports above.
+// Remark pipeline (cached singleton)
 // ---------------------------------------------------------------------------
 
-// Resolve from this file's location (crux/lib/) so it works regardless of cwd
-const appRequire = createRequire(join(__dirname_ir, '../../apps/web/package.json'));
-let remarkGfm: any;
-try {
-  remarkGfm = appRequire('remark-gfm').default ?? appRequire('remark-gfm');
-} catch {
-  // Graceful fallback — tables appear as text instead of structured nodes
-}
-
+// Pipeline is cached globally. Safe because build-data.mjs processes pages
+// sequentially. If parallelized in future, use a factory instead.
 let _pipeline: any = null;
 
 function getParser(): any {
   if (_pipeline) return _pipeline;
-
-  let pipeline = unified().use(remarkParse).use(remarkFrontmatter).use(remarkMdx);
-  if (remarkGfm) pipeline = pipeline.use(remarkGfm);
-
-  _pipeline = pipeline;
-  return pipeline;
+  _pipeline = unified()
+    .use(remarkParse)
+    .use(remarkFrontmatter)
+    .use(remarkMdx)
+    .use(remarkGfm);
+  return _pipeline;
 }
 
 // ---------------------------------------------------------------------------
@@ -122,9 +124,7 @@ interface SectionAccumulator {
   externalLinks: Set<string>;
   tables: TableBlock[];
   wordCount: number;
-  hasSquiggle: boolean;
-  hasMermaid: boolean;
-  hasCalc: boolean;
+  componentNames: Set<string>;
 }
 
 function createAccumulator(heading: string, level: number, startLine: number): SectionAccumulator {
@@ -142,13 +142,11 @@ function createAccumulator(heading: string, level: number, startLine: number): S
     externalLinks: new Set(),
     tables: [],
     wordCount: 0,
-    hasSquiggle: false,
-    hasMermaid: false,
-    hasCalc: false,
+    componentNames: new Set(),
   };
 }
 
-function accToSection(acc: SectionAccumulator): SectionBlock {
+function accToSection(acc: SectionAccumulator): SectionIR {
   return {
     heading: acc.heading,
     headingId: acc.headingId,
@@ -162,65 +160,8 @@ function accToSection(acc: SectionAccumulator): SectionBlock {
     externalLinks: [...acc.externalLinks],
     tables: acc.tables,
     wordCount: acc.wordCount,
-    hasSquiggle: acc.hasSquiggle,
-    hasMermaid: acc.hasMermaid,
-    hasCalc: acc.hasCalc,
+    componentNames: [...acc.componentNames],
   };
-}
-
-// ---------------------------------------------------------------------------
-// Node inspection helpers
-// ---------------------------------------------------------------------------
-
-/** Get the start line of a node (1-indexed from remark) */
-function nodeLine(node: any): number {
-  return node?.position?.start?.line ?? 0;
-}
-
-/** Get the end line of a node */
-function nodeEndLine(node: any): number {
-  return node?.position?.end?.line ?? nodeLine(node);
-}
-
-/** Extract plain text from any MDAST node tree */
-function extractText(node: any): string {
-  if (!node) return '';
-  if (node.type === 'text' || node.type === 'inlineCode') return node.value || '';
-  if (Array.isArray(node.children)) {
-    return node.children.map(extractText).join('');
-  }
-  return '';
-}
-
-/** Count words in a string */
-function countWords(text: string): number {
-  const trimmed = text.trim();
-  if (!trimmed) return 0;
-  return trimmed.split(/\s+/).length;
-}
-
-/**
- * Get the value of a JSX attribute by name.
- * Handles both simple string attributes and expression attributes.
- */
-function getJsxAttr(node: any, name: string): string | undefined {
-  if (!node.attributes) return undefined;
-  for (const attr of node.attributes) {
-    if (attr.type === 'mdxJsxAttribute' && attr.name === name) {
-      if (typeof attr.value === 'string') return attr.value;
-      // Expression attribute: {value} — extract if simple literal
-      if (attr.value?.type === 'mdxJsxAttributeValueExpression') {
-        return attr.value.value;
-      }
-      return undefined;
-    }
-  }
-  return undefined;
-}
-
-/** Check if a node is a JSX element (flow or text) */
-function isJsxElement(node: any): boolean {
-  return node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement';
 }
 
 // ---------------------------------------------------------------------------
@@ -320,14 +261,7 @@ export function extractBlockIR(pageId: string, mdxContent: string): PageBlockIR 
   }
 
   // 3. Walk the tree and dispatch nodes to sections
-  const componentCounts = {
-    squiggleCount: 0,
-    mermaidCount: 0,
-    calcCount: 0,
-    calloutCount: 0,
-    dataInfoBoxCount: 0,
-    totalTables: 0,
-  };
+  const componentCounts: Record<string, number> = {};
 
   walkTree(tree, accumulators, componentCounts);
 
@@ -341,8 +275,8 @@ export function extractBlockIR(pageId: string, mdxContent: string): PageBlockIR 
     }
   }
 
-  // 5. Convert accumulators to sections, filtering empty preamble
-  const sections: SectionBlock[] = [];
+  // 5. Convert accumulators to sections
+  const sections: SectionIR[] = [];
   for (const acc of accumulators) {
     // Keep preamble even if empty — it conveys structural info
     sections.push(accToSection(acc));
@@ -371,9 +305,12 @@ function collectHeadings(node: any, result: Array<{ text: string; level: number;
   }
 }
 
-/** Find which section a node belongs to (by its start line) */
+/**
+ * Find which section a node belongs to by its start line.
+ * Walks backwards through accumulators — the last one with startLine <= line
+ * is the enclosing section (sections are ordered by startLine).
+ */
 function findSection(accumulators: SectionAccumulator[], line: number): SectionAccumulator {
-  // Walk backwards — the last accumulator with startLine <= line is the match
   for (let i = accumulators.length - 1; i >= 0; i--) {
     if (accumulators[i].startLine <= line) {
       return accumulators[i];
@@ -382,11 +319,15 @@ function findSection(accumulators: SectionAccumulator[], line: number): SectionA
   return accumulators[0]; // fallback to preamble
 }
 
-/** Walk the entire MDAST and dispatch each node to its section */
+/**
+ * Walk the entire MDAST and dispatch each top-level node to its section.
+ * Only recurses into the root's children — each top-level node is then
+ * processed by processNode which handles deeper recursion.
+ */
 function walkTree(
   node: any,
   accumulators: SectionAccumulator[],
-  componentCounts: PageBlockIR['components'],
+  componentCounts: Record<string, number>,
 ): void {
   if (!node) return;
 
@@ -416,7 +357,7 @@ function walkTree(
 function processNode(
   node: any,
   section: SectionAccumulator,
-  componentCounts: PageBlockIR['components'],
+  componentCounts: Record<string, number>,
 ): void {
   switch (node.type) {
     case 'text':
@@ -451,7 +392,7 @@ function processNode(
     case 'table': {
       const table = extractTable(node);
       section.tables.push(table);
-      componentCounts.totalTables++;
+      componentCounts.table = (componentCounts.table || 0) + 1;
       // Entity links and facts from table cells are added to the section
       for (const id of table.entityLinksInCells) {
         section.entityLinks.add(id);
@@ -510,15 +451,16 @@ function handleJsxComponent(
   name: string | null | undefined,
   node: any,
   section: SectionAccumulator,
-  componentCounts: PageBlockIR['components'],
+  componentCounts: Record<string, number>,
 ): void {
   if (!name) return;
 
+  // EntityLink and F are data-bearing components, not tracked as "components"
   switch (name) {
     case 'EntityLink': {
       const id = getJsxAttr(node, 'id');
       if (id) section.entityLinks.add(id);
-      break;
+      return;
     }
 
     case 'F': {
@@ -532,30 +474,14 @@ function handleJsxComponent(
           section.facts.push({ entityId: e, factId: f, ...(display && { display }) });
         }
       }
-      break;
+      return;
     }
+  }
 
-    case 'SquiggleEstimate':
-      section.hasSquiggle = true;
-      componentCounts.squiggleCount++;
-      break;
-
-    case 'MermaidDiagram':
-      section.hasMermaid = true;
-      componentCounts.mermaidCount++;
-      break;
-
-    case 'Calc':
-      section.hasCalc = true;
-      componentCounts.calcCount++;
-      break;
-
-    case 'Callout':
-      componentCounts.calloutCount++;
-      break;
-
-    case 'DataInfoBox':
-      componentCounts.dataInfoBoxCount++;
-      break;
+  // Check if it's a tracked component
+  const normalized = TRACKED_COMPONENTS[name];
+  if (normalized) {
+    section.componentNames.add(normalized);
+    componentCounts[normalized] = (componentCounts[normalized] || 0) + 1;
   }
 }

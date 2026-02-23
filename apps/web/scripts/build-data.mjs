@@ -1396,12 +1396,12 @@ async function main() {
   // =========================================================================
   // BLOCK-LEVEL IR — extract per-section metadata (entity links, facts,
   // citations, components, word counts) via remark AST parsing.
-  // Must run BEFORE rawContent is deleted.
+  // IMPORTANT: Must run BEFORE rawContent is deleted (below).
   // =========================================================================
   console.log('  Extracting block-level IR...');
   let blockIRExtracted = 0;
   let blockIRSections = 0;
-  let blockIRErrors = 0;
+  const blockIRErrorPages = [];
   const blockIndex = {};
   try {
     const { extractBlockIR } = await import('../../../crux/lib/block-ir.ts');
@@ -1413,13 +1413,16 @@ async function main() {
         blockIRExtracted++;
         blockIRSections += ir.sections.length;
       } catch (err) {
-        blockIRErrors++;
-        if (blockIRErrors <= 3) {
-          console.warn(`    ⚠ block-ir error on ${page.id}: ${err.message}`);
+        blockIRErrorPages.push(page.id);
+        if (blockIRErrorPages.length <= 5) {
+          console.warn(`    ⚠ block-ir parse error on ${page.id}: ${err.message}`);
         }
       }
     }
-    console.log(`  blockIR: ${blockIRSections} sections across ${blockIRExtracted} pages${blockIRErrors > 0 ? ` (${blockIRErrors} errors)` : ''}`);
+    if (blockIRErrorPages.length > 5) {
+      console.warn(`    ⚠ ...and ${blockIRErrorPages.length - 5} more parse errors`);
+    }
+    console.log(`  blockIR: ${blockIRSections} sections across ${blockIRExtracted} pages${blockIRErrorPages.length > 0 ? ` (${blockIRErrorPages.length} parse errors — typically complex JSX expressions)` : ''}`);
   } catch (err) {
     console.warn(`  ⚠ block-ir extraction skipped: ${err.message}`);
   }
