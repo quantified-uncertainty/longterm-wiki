@@ -130,8 +130,9 @@ function ReferenceEntry({
     >
       <span className="flex items-start gap-2">
         <a
-          href={`#ref-${index}`}
+          href={`#cite-${index}`}
           className="shrink-0 text-xs font-mono text-muted-foreground mt-0.5 no-underline hover:text-foreground"
+          title="Jump to citation"
         >
           [{index}]
         </a>

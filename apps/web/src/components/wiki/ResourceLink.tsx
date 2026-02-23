@@ -64,6 +64,7 @@ export function ResourceLink({
       </a>
       {n != null && n >= 1 && (
         <a
+          id={`cite-${n}`}
           href={`#ref-${n}`}
           className="text-[10px] text-muted-foreground no-underline hover:text-accent-foreground align-super ml-px"
           title={`Reference [${n}]`}
