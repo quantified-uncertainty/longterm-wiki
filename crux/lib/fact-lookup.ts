@@ -20,6 +20,7 @@ import { entityDisplayNames } from './entity-names.ts';
 interface FactEntry {
   value: string;
   numeric?: number;
+  measure?: string;
   asOf?: string;
   note?: string;
   source?: string;

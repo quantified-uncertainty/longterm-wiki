@@ -14,7 +14,7 @@
  *   crux jobs ping                                Create a ping job (smoke test)
  */
 
-import { createLogger } from '../lib/output.ts';
+import { createLogger, type Colors } from '../lib/output.ts';
 import {
   createJob,
   createJobBatch,
@@ -96,7 +96,7 @@ function formatJobRow(job: JobEntry): string {
   return `  ${id} ${type} ${status} ${created}  ${duration}${retries}${error}`;
 }
 
-function handleApiError(result: { ok: false; error: string; message: string }, c: Record<string, string>): CommandResult {
+function handleApiError(result: { ok: false; error: string; message: string }, c: Colors): CommandResult {
   if (result.error === 'unavailable') {
     return {
       output: `${c.red}Error: Wiki server not available.${c.reset}\n${c.dim}Ensure LONGTERMWIKI_SERVER_URL is set and the server is running.${c.reset}\n`,

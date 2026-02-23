@@ -149,7 +149,7 @@ export function loadAccuracyMap(): AccuracyMap | null {
   if (!existsSync(dbPath)) return null;
 
   try {
-    const rows = citationQuotes.getAccuracySummaryAllPages();
+    const rows = (citationQuotes as any).getAccuracySummaryAllPages();
     const map: AccuracyMap = new Map();
     for (const row of rows) {
       map.set(row.page_id, { checked: row.checked, inaccurate: row.inaccurate });

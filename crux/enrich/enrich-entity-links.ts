@@ -299,7 +299,7 @@ ${content}
 
 Identify entity mentions and return replacement instructions as JSON.`;
 
-  const result = await callClaude(client, {
+  const result = await callClaude(client!, {
     model: MODELS.haiku,
     systemPrompt,
     userPrompt,
@@ -309,7 +309,7 @@ Identify entity mentions and return replacement instructions as JSON.`;
 
   let parsed: LlmEntityLinkResponse | null = null;
   try {
-    parsed = parseJsonResponse<LlmEntityLinkResponse>(result.text);
+    parsed = parseJsonResponse(result.text) as LlmEntityLinkResponse | null;
   } catch {
     // LLM returned invalid JSON — return empty replacements rather than crashing
     return [];

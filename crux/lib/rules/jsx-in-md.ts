@@ -61,6 +61,7 @@ export const jsxInMdRule = createRule({
             message: `JSX syntax detected in .md file - rename to .mdx: ${line.trim().slice(0, 50)}...`,
             severity: Severity.ERROR,
             fix: {
+              type: 'rename',
               description: 'Rename file from .md to .mdx',
             },
           }));
