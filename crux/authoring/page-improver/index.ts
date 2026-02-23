@@ -155,32 +155,7 @@ Examples:
     return;
   }
 
-  const pageId = (opts._positional as string[])[0];
-  if (!pageId) {
-    console.error('Error: No page ID provided');
-    console.error('Try: node crux/authoring/page-improver/index.ts -- --list');
-    process.exit(1);
-  }
-
-  // Triage-only mode
-  if (opts.triage) {
-    const pages = loadPages();
-    const page = findPage(pages, pageId);
-    if (!page) {
-      console.error(`Page not found: ${pageId}`);
-      process.exit(1);
-    }
-    const filePath = getFilePath(page.path);
-    const content = fs.readFileSync(filePath, 'utf-8');
-    const fmMatch = content.match(/lastEdited:\s*["']?(\d{4}-\d{2}-\d{2})["']?/);
-    const lastEdited = fmMatch?.[1] || 'unknown';
-    const result = await triagePhase(page, lastEdited);
-    console.log('\nTriage Result:');
-    console.log(JSON.stringify(result, null, 2));
-    return;
-  }
-
-  // ── Batch mode (V2 only) ───────────────────────────────────────────────
+  // ── Batch mode (V2 only) — checked before pageId so --batch works without positional arg
   if (opts.batch || opts['batch-file']) {
     if (opts.engine !== 'v2') {
       console.error('Batch mode requires --engine=v2');
@@ -217,6 +192,32 @@ Examples:
       skipSessionLog: opts['skip-session-log'] === true,
       reportFile: opts['report-file'] as string | undefined,
     });
+    return;
+  }
+
+  // ── Single-page modes require a page ID ──────────────────────────────────
+  const pageId = (opts._positional as string[])[0];
+  if (!pageId) {
+    console.error('Error: No page ID provided');
+    console.error('Try: node crux/authoring/page-improver/index.ts -- --list');
+    process.exit(1);
+  }
+
+  // Triage-only mode
+  if (opts.triage) {
+    const pages = loadPages();
+    const page = findPage(pages, pageId);
+    if (!page) {
+      console.error(`Page not found: ${pageId}`);
+      process.exit(1);
+    }
+    const filePath = getFilePath(page.path);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const fmMatch = content.match(/lastEdited:\s*["']?(\d{4}-\d{2}-\d{2})["']?/);
+    const lastEdited = fmMatch?.[1] || 'unknown';
+    const result = await triagePhase(page, lastEdited);
+    console.log('\nTriage Result:');
+    console.log(JSON.stringify(result, null, 2));
     return;
   }
 
