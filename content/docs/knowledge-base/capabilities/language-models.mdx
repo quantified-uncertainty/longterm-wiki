@@ -26,6 +26,26 @@ import {DataInfoBox, R, EntityLink, DataExternalLinks, Mermaid, F} from '@compon
 
 <DataInfoBox entityId="E186" />
 
+## Quick Assessment
+
+| Dimension | Assessment | Evidence |
+|-----------|------------|----------|
+| **Capability Level** | Near-human to superhuman on structured tasks | o3 achieves 87.5% on ARC-AGI (human baseline ≈85%)[^1]; 87.7% on GPQA Diamond[^1] |
+| **Progress Rate** | 2–3× capability improvement per year | Stanford AI Index 2025[^2]: benchmark scores rose 18–67 percentage points in one year[^2] |
+| **Training Cost Trend** | 2.4× annual growth[^3] | Epoch AI: frontier model training costs projected to exceed \$1B by 2027[^3] |
+| **Inference Cost Trend** | 280× reduction since 2022[^2] | GPT-3.5-equivalent dropped from \$10 to \$1.07 per million tokens[^2] |
+| **Hallucination Rates** | 8–45% depending on task | Vectara leaderboard: best models reportedly at ≈8%[^4]; HalluLens: up to 45% on factual queries[^5] |
+| **Safety Maturity** | Moderate | <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, <EntityLink id="E259" name="rlhf">RLHF</EntityLink> established; responsible scaling policies implemented by major labs[^6] |
+| **Open-Closed Gap** | Narrowing | Gap reportedly shrunk from 8.04% to 1.70% on Chatbot Arena (Jan 2024 → Feb 2025)[^7] |
+
+[^1]: OpenAI, OpenAI o3 and o4-mini System Card / ARC-AGI results" (https://arcprize.org/blog/oai-o3-pub-breakthrough)
+[^2]: Stanford HAI, "AI Index Report 2025" (https://hai.stanford.edu/ai-index/2025-ai-index-report)
+[^3]: Epoch AI, "How Much Does It Cost to Train Frontier AI Models?" (https://epoch.ai/blog/how-much-does-it-cost-to-train-frontier-ai-models)
+[^4]: Vectara, "Hallucination Leaderboard" (https://github.com/vectara/hallucination-leaderboard)
+[^5]: HalluLens, ACL 2025 (https://aclanthology.org/2025.acl-long.1176/)
+[^6]: Anthropic, "Responsible Scaling Policy" (https://www.anthropic.com/news/anthropics-responsible-scaling-policy)
+[^7]: According to some sources tracking Chatbot Arena open-vs-closed model performance gaps, 2024–2025.",
+
 ## Key Links
 
 | Source | Link |
@@ -45,7 +65,6 @@ Current frontier models—including GPT-4o, Claude Opus 4.5, Gemini 2.5 Pro, and
 A parallel development is the rapid growth of the open-weight ecosystem. Meta's Llama family has grown substantially since its initial release, with Meta reporting over a billion downloads and more than ten times the developer activity compared to 2023.[^7] Google's Gemma models—including Gemma 3 and the mobile-first Gemma 3n variants—have provided the safety research community with accessible architectures for mechanistic interpretability work.[^8] This open/closed model convergence has implications for both capability diffusion and the tractability of safety interventions.
 
 ## Capability Architecture
-
 The diagram below maps the flow from training through inference to observed capabilities. Capabilities are grouped by which inference regime produces them; the distinction between "standard" and "search-augmented" inference is a key axis along which safety-relevant behaviors (extended planning, autonomous task execution) emerge.
 
 <Mermaid chart={`

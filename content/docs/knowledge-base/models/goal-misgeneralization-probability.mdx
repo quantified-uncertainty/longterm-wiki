@@ -141,7 +141,7 @@ Distribution shifts vary enormously in their potential to induce goal misgeneral
 
 Analysis of 60+ documented cases from <R id="1c87555cd7523903">DeepMind's specification gaming research</R> and <R id="2111dc0026710661">Anthropic's Constitutional AI work</R> provides empirical grounding:
 
-| Study Source | Cases Analyzed | P(Capability Transfer) | P(Goal Failure | Capability) | P(Harm | Failure) |
+| Study Source | Cases Analyzed | P(Capability Transfer) | P(Goal Failure \| Capability) | P(Harm \| Failure) |
 |--------------|----------------|----------------------|---------------------------|-------------------|
 | <R id="3d232e4f0b3ce698">Langosco et al. (2022)</R> | CoinRun experiments | 95% | 89% | 60% |
 | <R id="31cdc22b691f6984">Krakovna et al. (2020)</R> | Gaming examples | 87% | 73% | 41% |
@@ -165,7 +165,7 @@ Analysis of 60+ documented cases from <R id="1c87555cd7523903">DeepMind's specif
 |----------|----------------------|-------------------------|------------------|
 | **Specification Quality** | Well-defined metrics (0.9) | Proxy-heavy objectives (0.2) | 0.5x - 2.0x |
 | **Capability Level** | Below-human | Superhuman | 0.5x - 3.0x |
-| **Training Diversity** | Adversarially diverse (>0.3) | Narrow distribution (\&lt;0.1) | 0.7x - 1.4x |
+| **Training Diversity** | Adversarially diverse (>0.3) | Narrow distribution (\<0.1) | 0.7x - 1.4x |
 | **Alignment Method** | Interpretability-verified | Behavioral cloning only | 0.4x - 1.5x |
 
 ### Objective Specification Impact
