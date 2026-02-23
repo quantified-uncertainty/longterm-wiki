@@ -275,8 +275,9 @@ export function ExploreGrid({ items }: { items: ExploreItem[] }) {
   }
 
   // Filter out AI transition model subitems (internal model data, not articles)
+  // and stub pages with no content (wordCount 0 or undefined)
   const articleItems = useMemo(
-    () => items.filter((item) => !item.type.startsWith("ai-transition-model")),
+    () => items.filter((item) => !item.type.startsWith("ai-transition-model") && item.wordCount),
     [items]
   );
 

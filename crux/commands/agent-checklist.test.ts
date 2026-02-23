@@ -462,3 +462,82 @@ describe('agent-checklist check --na', () => {
     expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// pre-push-check: tooling-gaps-found + empty Key Decisions warning
+// ---------------------------------------------------------------------------
+
+describe('agent-checklist pre-push-check tooling-gaps warning', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('warns when tooling-gaps-found is checked but Key Decisions is empty', async () => {
+    const md = `## Phase 3: Review
+
+1. [x] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps.
+
+## Key Decisions
+
+<!-- Log important decisions as you go. -->
+`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const result = await commands['pre-push-check']([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('tooling-gaps-found');
+    expect(result.output).toContain('Key Decisions section is empty');
+  });
+
+  it('warns when tooling-gaps-found is N/A but Key Decisions is empty', async () => {
+    const md = `## Phase 3: Review
+
+1. [~] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps. <!-- N/A: none -->
+
+## Key Decisions
+
+<!-- template comment -->
+`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const result = await commands['pre-push-check']([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('Key Decisions section is empty');
+  });
+
+  it('does not warn when tooling-gaps-found is checked and Key Decisions has entries', async () => {
+    const md = `## Phase 3: Review
+
+1. [x] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps.
+
+## Key Decisions
+
+- **No tooling gaps found**: Everything was covered by existing validators.
+`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const result = await commands['pre-push-check']([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain('Key Decisions section is empty');
+  });
+
+  it('does not warn when tooling-gaps-found is unchecked', async () => {
+    const md = `## Phase 3: Review
+
+1. [ ] \`tooling-gaps-found\` **Tooling gaps identified**: List gaps.
+
+## Key Decisions
+
+<!-- empty -->
+`;
+    mockExistsSync.mockReturnValue(true);
+    mockReadFileSync.mockReturnValue(md);
+
+    const result = await commands['pre-push-check']([], {});
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain('Key Decisions section is empty');
+  });
+});
