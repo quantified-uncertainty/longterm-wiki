@@ -8,6 +8,7 @@ import {
 import type { Resource } from "@data";
 import { CredibilityBadge } from "./CredibilityBadge";
 import { ResourceTags } from "./ResourceTags";
+import { ReferenceCitationDetails } from "./ReferenceCitationDetails";
 import { cn } from "@lib/utils";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -85,11 +86,6 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
   const authorStr = resource.authors ? formatAuthors(resource.authors) : null;
   const typeLabel = TYPE_LABELS[resource.type]; // undefined for "web" and other unlisted types
 
-  const hasExpandableContent =
-    resource.summary ||
-    credibility != null ||
-    (resource.tags && resource.tags.length > 0);
-
   // Metadata fragments: type · author · year · publication
   const metaParts: React.ReactNode[] = [];
   if (typeLabel) {
@@ -144,23 +140,6 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
     </a>
   );
 
-  if (!hasExpandableContent) {
-    return (
-      <li
-        id={`ref-${index}`}
-        className="py-1.5 border-b border-border/30 last:border-b-0"
-      >
-        <div className="flex items-start gap-1">
-          {numberLink}
-          <div className="flex-1 min-w-0">
-            {titleLink}
-            {metaLine}
-          </div>
-        </div>
-      </li>
-    );
-  }
-
   return (
     <li
       id={`ref-${index}`}
@@ -194,6 +173,9 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
               <ResourceTags tags={resource.tags} limit={4} size="sm" />
             )}
           </div>
+          {resource.url && (
+            <ReferenceCitationDetails url={resource.url} />
+          )}
         </div>
       </details>
     </li>
