@@ -197,6 +197,7 @@ function initSchema(db: InstanceType<typeof Database>) {
     CREATE INDEX IF NOT EXISTS idx_citation_quotes_page ON citation_quotes(page_id);
     CREATE INDEX IF NOT EXISTS idx_citation_quotes_url ON citation_quotes(url);
     CREATE INDEX IF NOT EXISTS idx_citation_quotes_verified ON citation_quotes(quote_verified);
+    CREATE INDEX IF NOT EXISTS idx_citation_quotes_resource ON citation_quotes(resource_id);
   `);
 
   // Add accuracy columns (migration-safe — only adds if missing)
@@ -1170,6 +1171,15 @@ export const citationQuotes = {
     return getDb().prepare(
       'SELECT * FROM citation_quotes WHERE url = ? ORDER BY page_id, footnote',
     ).all(url) as CitationQuoteRow[];
+  },
+
+  /**
+   * Get quotes by resource ID (across all pages).
+   */
+  getByResourceId(resourceId: string): CitationQuoteRow[] {
+    return getDb().prepare(
+      'SELECT * FROM citation_quotes WHERE resource_id = ? ORDER BY page_id, footnote',
+    ).all(resourceId) as CitationQuoteRow[];
   },
 
   /**

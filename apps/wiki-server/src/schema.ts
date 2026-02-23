@@ -69,6 +69,7 @@ export const citationQuotes = pgTable(
     index("idx_cq_url").on(table.url),
     index("idx_cq_verified").on(table.quoteVerified),
     index("idx_cq_accuracy").on(table.accuracyVerdict),
+    index("idx_cq_resource_id").on(table.resourceId),
   ]
 );
 
