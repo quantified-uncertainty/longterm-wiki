@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { EntityLink, MultiEntityLinks } from "@/components/wiki/EntityLink";
 import { ResourceLink, R } from "@/components/wiki/ResourceLink";
+import { References } from "@/components/wiki/References";
 import { F } from "@/components/wiki/F";
 import { Calc } from "@/components/wiki/Calc";
 import { MermaidDiagram } from "@/components/wiki/MermaidDiagram";
@@ -83,7 +84,7 @@ const stubNames = [
   "KnowledgeTreemap",
   "OutcomesTable", "PageIndex", "PixelDensityMap",
   "PriorityMatrix", "QualityDashboard", "ResearchFrontier", "ResourceCite",
-  "ResourceList", "ResourcesIndex", "RiskDashboard", "RiskTrajectoryExperiments",
+  "ResourcesIndex", "RiskDashboard", "RiskTrajectoryExperiments",
   "RootFactorsTable", "ScenariosTable", "SparseKnowledgeGrid",
   "Table", "TableBody", "TableCell", "TableHead", "TableHeader",
   "TableRow", "TagBrowser", "TimelineViz", "TopicQuestionGrid",
@@ -102,6 +103,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   MultiEntityLinks,
   ResourceLink,
   R,
+  References,
   F,
   Calc,
   DataInfoBox,

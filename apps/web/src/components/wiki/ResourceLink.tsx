@@ -31,6 +31,7 @@ export function ResourceLink({
   id,
   label,
   children,
+  n,
   showType = false,
   showCredibility = false,
   className = "",
@@ -38,6 +39,8 @@ export function ResourceLink({
   id: string;
   label?: string;
   children?: React.ReactNode;
+  /** Citation number — renders a superscript [N] linking to #ref-N in the References section */
+  n?: number;
   showType?: boolean;
   showCredibility?: boolean;
   className?: string;
@@ -74,6 +77,15 @@ export function ResourceLink({
         )}
         <span className="text-xs ml-0.5 opacity-70">{"\u2197"}</span>
       </a>
+      {n != null && (
+        <a
+          href={`#ref-${n}`}
+          className="text-[10px] text-muted-foreground no-underline hover:text-accent-foreground align-super ml-px"
+          title={`Reference [${n}]`}
+        >
+          [{n}]
+        </a>
+      )}
       <span
         className={cn(
           styles.tooltip,
