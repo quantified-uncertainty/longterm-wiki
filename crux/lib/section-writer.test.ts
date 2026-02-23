@@ -348,6 +348,77 @@ describe('parseGroundedResult', () => {
     expect(result.unsourceableClaims).toEqual([]);
   });
 
+  it('detects unclaimed footnotes in strict mode (#675)', () => {
+    // LLM added [^FAKE] in the content but didn't include it in claimMap
+    const raw = JSON.stringify({
+      content: '## Bg\n\nText.[^SRC-1] Also this.[^FAKE]\n\n[^SRC-1]: Title (https://ex.com)',
+      claimMap: [
+        { claim: 'Text.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+      ],
+      unsourceableClaims: [],
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
+    }));
+
+    // The unclaimed footnote [^FAKE] should be flagged
+    expect(result.unsourceableClaims.some(c => c.includes('Unclaimed footnote'))).toBe(true);
+    expect(result.unsourceableClaims.some(c => c.includes('FAKE'))).toBe(true);
+  });
+
+  it('does NOT flag unclaimed footnotes when training knowledge is allowed (#675)', () => {
+    const raw = JSON.stringify({
+      content: '## Bg\n\nText.[^FAKE]',
+      claimMap: [],
+      unsourceableClaims: [],
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: true, requireClaimMap: false },
+    }));
+
+    // No unclaimed footnote warnings in permissive mode
+    expect(result.unsourceableClaims.filter(c => c.includes('Unclaimed footnote'))).toHaveLength(0);
+  });
+
+  it('does NOT flag footnote definitions as unclaimed (#675)', () => {
+    // [^SRC-1] appears both as a reference and as a definition line — the definition should be skipped
+    const raw = JSON.stringify({
+      content: '## Bg\n\nText.[^SRC-1]\n\n[^SRC-1]: Title (https://ex.com)',
+      claimMap: [
+        { claim: 'Text.', factId: 'SRC-1', sourceUrl: 'https://example.com/miri-history' },
+      ],
+      unsourceableClaims: [],
+    });
+
+    const result = parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
+    }));
+
+    // Only the valid claim, no unclaimed footnote warnings
+    expect(result.unsourceableClaims).toHaveLength(0);
+    expect(result.claimMap).toHaveLength(1);
+  });
+
+  it('warns when unsourceable claims appear verbatim in strict-mode content (#675)', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const unsourceableClaim = 'This is a long unsourceable claim about some topic that was not found in sources';
+    const raw = JSON.stringify({
+      content: `## Bg\n\n${unsourceableClaim}`,
+      claimMap: [],
+      unsourceableClaims: [unsourceableClaim],
+    });
+
+    parseGroundedResult(raw, makeRequest({
+      constraints: { allowTrainingKnowledge: false, requireClaimMap: true },
+    }));
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Unsourceable claim appears in content'));
+    warnSpy.mockRestore();
+  });
+
   it('truncates claimMap when LLM exceeds maxNewClaims (#680)', () => {
     const raw = JSON.stringify({
       content: '## Bg\n\nA.[^SRC-1] B.[^SRC-1] C.[^SRC-1] D.[^SRC-1] E.[^SRC-1]',

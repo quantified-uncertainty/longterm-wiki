@@ -395,6 +395,33 @@ export function parseGroundedResult(
     }
   }
 
+  // Content-level enforcement of allowTrainingKnowledge=false (#675):
+  // Check that footnote markers in the content have corresponding claimMap entries,
+  // and that unsourceable claims don't appear verbatim in the content.
+  if (!constraints.allowTrainingKnowledge) {
+    // 1. Check for footnote markers without claimMap entries
+    const footnoteRefs = response.content.match(/\[\^[^\]]+\]/g) || [];
+    const claimedFactIds = new Set(validClaims.map(c => c.factId));
+    for (const ref of footnoteRefs) {
+      const refId = ref.replace(/^\[\^|\]$/g, '');
+      // Skip if it's a footnote definition line (starts at beginning of line)
+      if (response.content.includes(`\n${ref}:`)) continue;
+      // Skip if the refId matches a valid source or is already in claimMap
+      if (claimedFactIds.has(refId) || validSourceIds.has(refId)) continue;
+      // This is an unclaimed footnote — the LLM added a citation without mapping it
+      invalidClaims.push(`Unclaimed footnote ${ref} in content (no claimMap entry)`);
+    }
+
+    // 2. Check that unsourceable claims don't appear verbatim in the content
+    for (const claim of response.unsourceableClaims) {
+      if (claim.length > 20 && response.content.includes(claim)) {
+        console.warn(
+          `[section-writer] Unsourceable claim appears in content despite strict mode: "${claim.slice(0, 80)}..."`,
+        );
+      }
+    }
+  }
+
   const unsourceableClaims = [
     ...response.unsourceableClaims,
     ...invalidClaims,
