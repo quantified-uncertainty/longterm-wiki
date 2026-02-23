@@ -284,7 +284,7 @@ describe('buildImproveSystemPrompt', () => {
     const prompt = buildImproveSystemPrompt(ctx);
     expect(prompt).toContain('Test Page');
     expect(prompt).toContain('Standard');
-    expect(prompt).toContain('20'); // maxToolCalls for standard
+    expect(prompt).toContain('25'); // maxToolCalls for standard
   });
 
   it('includes user directions when provided', () => {
@@ -321,7 +321,7 @@ describe('buildRefinementPrompt', () => {
     const prompt = buildRefinementPrompt(ctx, 'Citations too low', metrics, 1);
     expect(prompt).toContain('Refinement Cycle 1');
     expect(prompt).toContain('Citations too low');
-    expect(prompt).toContain('10'); // remaining calls
+    expect(prompt).toContain('15'); // remaining calls (25 - 10)
   });
 
   it('shows remaining tool calls', () => {
@@ -336,7 +336,7 @@ describe('buildRefinementPrompt', () => {
       structuralScore: 50,
     };
     const prompt = buildRefinementPrompt(ctx, 'Needs more entity links', metrics, 2);
-    expect(prompt).toContain('5 tool calls remaining'); // 20 - 15
+    expect(prompt).toContain('10 tool calls remaining'); // 25 - 15
   });
 });
 
