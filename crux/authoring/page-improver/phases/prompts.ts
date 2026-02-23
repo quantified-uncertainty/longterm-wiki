@@ -4,6 +4,7 @@
  * Extracted from inline strings to make prompts testable and reusable.
  */
 
+import { getPageType } from '../../../lib/page-analysis.ts';
 import type { PageData, AnalysisResult, ResearchResult } from '../types.ts';
 
 interface ImprovePromptArgs {
@@ -24,9 +25,10 @@ export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
   const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, factLookup, tier } = args;
 
   const isPolish = tier === 'polish';
-  const isPersonPage = page.path?.includes('/people/') ?? false;
-  const isOrgPage = page.path?.includes('/organizations/') ?? false;
-  const isHistoricalPage = page.path?.includes('/history/') ?? false;
+  const pageType = getPageType(page);
+  const isPersonPage = pageType === 'person';
+  const isOrgPage = pageType === 'organization';
+  const isHistoricalPage = pageType === 'historical';
 
   return `Improve this wiki page based on the analysis and research.
 

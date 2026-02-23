@@ -16,6 +16,8 @@ export interface PageData {
   id: string;
   title: string;
   path: string;
+  /** Entity type from YAML data (e.g. 'person', 'organization'). */
+  entityType?: string;
   quality?: number;
   readerImportance?: number;
   ratings?: {
