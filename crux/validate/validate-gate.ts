@@ -185,7 +185,7 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
-    id: 'typecheck-crux',
+    id: 'typecheck-crux-baseline',
     name: 'Crux TypeScript check',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-crux-tsc.ts'],

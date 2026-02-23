@@ -45,12 +45,16 @@ const log = createPhaseLogger();
 // ---------------------------------------------------------------------------
 
 /**
- * Collapse any sequence of 2+ backslashes before $ down to a single \$.
+ * Collapse corrupted multi-backslash sequences before $ down to a single \$.
  * This is a safety net that catches corruption from the auto-fixer or LLM
  * (e.g. \\\\\$ → \$). Runs once at finalization and after each section rewrite.
+ *
+ * Only collapses 3+ backslashes (which are always corruption). Two backslashes
+ * (\\$) could legitimately mean "literal backslash followed by dollar" and are
+ * left untouched.
  */
 export function normalizeDollarEscaping(content: string): string {
-  return content.replace(/\\{2,}\$/g, '\\$');
+  return content.replace(/\\{3,}\$/g, '\\$');
 }
 
 /** Error message patterns that indicate a transient/retryable failure. */
