@@ -108,13 +108,32 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
   // If no body provided and stdin is a pipe (not a TTY), read body from stdin.
   // This allows: pnpm crux pr create --title="..." <<'EOF'\nbody\nEOF
   // Avoids sh/dash heredoc-in-command-substitution incompatibilities (#722 paranoid review).
+  //
+  // IMPORTANT: In non-interactive environments (Claude Code Bash tool, GitHub Actions),
+  // process.stdin.isTTY is undefined even without a pipe. readFileSync('/dev/stdin')
+  // returns "" immediately in these environments. We must discard empty stdin reads,
+  // otherwise every `crux pr create` call without explicit body silently creates an
+  // empty-description PR.
   if (!body && !process.stdin.isTTY) {
     const { readFileSync: readFdSync } = await import('fs');
     try {
-      body = readFdSync('/dev/stdin', 'utf-8');
+      const stdinContent = readFdSync('/dev/stdin', 'utf-8');
+      if (stdinContent.trim()) {
+        body = stdinContent;
+      }
     } catch {
       // stdin not readable — leave body undefined
     }
+  }
+
+  // Warn loudly if no body is provided — silent empty descriptions are a recurring problem.
+  if (!body || !body.trim()) {
+    log.warn(
+      `No PR body provided. The PR will be created with an empty description.\n` +
+        `  Use --body-file=<path>, --body="...", or stdin heredoc:\n` +
+        `  pnpm crux pr create --title="..." <<'PRBODY'\n` +
+        `  ## Summary\\n- key change\\nPRBODY`
+    );
   }
 
   if (!title) {
