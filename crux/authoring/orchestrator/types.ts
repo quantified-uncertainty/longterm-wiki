@@ -9,6 +9,7 @@
 import type { SourceCacheEntry } from '../../lib/section-writer.ts';
 import type { ParsedSection, SplitPage } from '../../lib/section-splitter.ts';
 import type { CitationAudit } from '../../lib/citation-auditor.ts';
+import type { CostTracker } from '../../lib/cost-tracker.ts';
 
 // ---------------------------------------------------------------------------
 // Budget & tier configuration
@@ -146,6 +147,8 @@ export interface OrchestratorContext {
   directions: string;
   /** Citation audit results (if audit has been run). */
   citationAudit: CitationAudit[] | null;
+  /** Actual cost tracker for LLM API calls. */
+  tracker: CostTracker;
 }
 
 // ---------------------------------------------------------------------------
@@ -229,8 +232,12 @@ export interface OrchestratorResult {
   refinementCycles: number;
   /** Total estimated cost. */
   totalCost: number;
-  /** Per-tool cost breakdown. */
+  /** Per-tool cost breakdown (estimated). */
   costBreakdown: Record<string, number>;
+  /** Actual total cost from API usage data (null if tracker unavailable). */
+  actualTotalCost: number | null;
+  /** Actual cost breakdown by label (null if tracker unavailable). */
+  actualCostBreakdown: Record<string, number> | null;
   /** Final quality metrics. */
   qualityMetrics: QualityMetrics;
   /** Whether the quality gate passed. */

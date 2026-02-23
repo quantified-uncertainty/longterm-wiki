@@ -19,6 +19,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { MessageParam, ToolUseBlock, ToolResultBlockParam } from '@anthropic-ai/sdk/resources/messages';
 import { createClient, MODELS } from './anthropic.ts';
 import { withRetry, startHeartbeat } from './resilience.ts';
+import type { CostTracker } from './cost-tracker.ts';
 
 // ---------------------------------------------------------------------------
 // Client creation
@@ -45,17 +46,40 @@ export function createLlmClient(options?: LlmClientOptions): Anthropic {
 // Low-level streaming call
 // ---------------------------------------------------------------------------
 
+/** Options for streamingCreate (tracker integration). */
+export interface StreamingCreateOptions {
+  /** If provided, the call's usage is automatically recorded. */
+  tracker?: CostTracker;
+  /** Label for the cost entry (e.g. "orchestrator", "rewrite_section"). */
+  label?: string;
+}
+
 /**
  * Execute a streaming Claude API call and return the final message.
  * Handles SSE streaming through proxies.
+ *
+ * When a CostTracker is provided via options, the call's token usage is
+ * automatically recorded — no caller-side bookkeeping needed.
  */
 export async function streamingCreate(
   client: Anthropic,
-  params: Parameters<typeof client.messages.create>[0]
+  params: Parameters<typeof client.messages.create>[0],
+  options?: StreamingCreateOptions,
 ): Promise<Anthropic.Messages.Message> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const stream = client.messages.stream(params as any);
-  return await stream.finalMessage();
+  const message = await stream.finalMessage();
+
+  // Auto-record if tracker provided
+  if (options?.tracker && message.usage) {
+    options.tracker.record(
+      params.model,
+      message.usage,
+      options.label,
+    );
+  }
+
+  return message;
 }
 
 /**
@@ -104,6 +128,10 @@ export interface StreamCallOptions {
   temperature?: number;
   retryLabel?: string;
   heartbeatPhase?: string;
+  /** If provided, the call's usage is automatically recorded. */
+  tracker?: CostTracker;
+  /** Label for the cost entry (e.g. "rewrite_section"). */
+  label?: string;
 }
 
 /**
@@ -122,7 +150,12 @@ export async function streamLlmCall(
     temperature,
     retryLabel = 'llm-call',
     heartbeatPhase = 'api',
+    tracker,
+    label,
   } = options;
+
+  const trackingOptions: StreamingCreateOptions | undefined =
+    tracker ? { tracker, label } : undefined;
 
   const stopHeartbeat = startHeartbeat(heartbeatPhase, 30);
   try {
@@ -133,7 +166,7 @@ export async function streamLlmCall(
         ...(systemPrompt && { system: systemPrompt }),
         ...(temperature !== undefined && { temperature }),
         messages: [{ role: 'user', content: prompt }],
-      }),
+      }, trackingOptions),
       { label: retryLabel }
     );
 

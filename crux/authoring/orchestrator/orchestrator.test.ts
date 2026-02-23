@@ -17,6 +17,7 @@ import { buildToolDefinitions, extractQualityMetrics, wrapWithTracking, type Too
 import { evaluateQualityGate } from './quality-gate.ts';
 import { buildImproveSystemPrompt, buildRefinementPrompt } from './prompts.ts';
 import { deduplicateFootnotes } from './orchestrator.ts';
+import { CostTracker } from '../../lib/cost-tracker.ts';
 
 // ---------------------------------------------------------------------------
 // Fixture helpers
@@ -71,6 +72,7 @@ function makeContext(overrides: Partial<OrchestratorContext> = {}): Orchestrator
     budget: TIER_BUDGETS.standard,
     directions: '',
     citationAudit: null,
+    tracker: new CostTracker(),
     ...overrides,
   };
 }

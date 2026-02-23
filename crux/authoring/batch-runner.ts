@@ -76,6 +76,8 @@ export interface PageResult {
   status: 'completed' | 'failed' | 'skipped' | 'budget-exceeded' | 'timeout';
   duration?: string;
   cost?: number;
+  /** Actual cost from API usage data (when available). */
+  actualCost?: number;
   qualityGatePassed?: boolean;
   error?: string;
   toolCallCount?: number;
@@ -343,7 +345,9 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
       );
 
       const pageDuration = Date.now() - pageStart;
-      cumulativeCost += orchResult.totalCost;
+      // Prefer actual cost for budget tracking when available
+      const effectiveCost = orchResult.actualTotalCost ?? orchResult.totalCost;
+      cumulativeCost += effectiveCost;
 
       // Snapshot post-improvement metrics (re-read file after apply)
       if (pageFile && apply) {
@@ -356,6 +360,7 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
         status: 'completed',
         duration: formatDuration(pageDuration),
         cost: orchResult.totalCost,
+        actualCost: orchResult.actualTotalCost ?? undefined,
         qualityGatePassed: orchResult.qualityGatePassed,
         toolCallCount: orchResult.toolCallCount,
       };
@@ -484,6 +489,36 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
     }
   }
 
+  // Write cost-analysis.json with per-page breakdowns
+  const costAnalysisPath = path.join(ROOT, '.claude/temp/cost-analysis.json');
+  const costAnalysis = {
+    generatedAt: new Date().toISOString(),
+    tier,
+    budgetLimit: budgetLimit ?? null,
+    totals: {
+      estimatedCost: results.reduce((sum, r) => sum + (r.cost ?? 0), 0),
+      actualCost: results.reduce((sum, r) => sum + (r.actualCost ?? 0), 0),
+      pages: results.length,
+      completed: completed.length,
+    },
+    pages: results.map(r => ({
+      pageId: r.pageId,
+      status: r.status,
+      estimatedCost: r.cost ?? null,
+      actualCost: r.actualCost ?? null,
+      duration: r.duration ?? null,
+      toolCallCount: r.toolCallCount ?? null,
+    })),
+  };
+  try {
+    const costDir = path.dirname(costAnalysisPath);
+    if (!fs.existsSync(costDir)) fs.mkdirSync(costDir, { recursive: true });
+    fs.writeFileSync(costAnalysisPath, JSON.stringify(costAnalysis, null, 2));
+    log('batch', `Cost analysis written to ${costAnalysisPath}`);
+  } catch {
+    // Non-critical — don't fail the batch
+  }
+
   // Clean up state file on successful full completion (no failures)
   if (failed.length === 0 && timedOut.length === 0 && skipped.filter(r => r.status === 'budget-exceeded').length === 0) {
     try { fs.unlinkSync(STATE_FILE); } catch { /* ok */ }
@@ -527,9 +562,17 @@ function generateReport(data: ReportData): string {
   lines.push(`  Quality gate: ${gatesPassed.length}/${completed.length} passed`);
   lines.push('');
 
+  // Check if any results have actual costs
+  const hasActualCosts = results.some(r => r.actualCost != null);
+
   // Results table
-  lines.push('| # | Page | Status | Cost | Duration | Gate | Tool Calls |');
-  lines.push('|---|------|--------|------|----------|------|------------|');
+  if (hasActualCosts) {
+    lines.push('| # | Page | Status | Est. | Actual | Duration | Gate | Tool Calls |');
+    lines.push('|---|------|--------|------|--------|----------|------|------------|');
+  } else {
+    lines.push('| # | Page | Status | Cost | Duration | Gate | Tool Calls |');
+    lines.push('|---|------|--------|------|----------|------|------------|');
+  }
 
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
@@ -538,11 +581,16 @@ function generateReport(data: ReportData): string {
                    r.status === 'timeout' ? 'TIMEOUT' :
                    r.status === 'budget-exceeded' ? 'BUDGET' : 'SKIP';
     const cost = r.cost ? formatCost(r.cost) : '-';
+    const actualCost = r.actualCost != null ? formatCost(r.actualCost) : '-';
     const dur = r.duration || '-';
     const gate = r.qualityGatePassed === undefined ? '-' :
                  r.qualityGatePassed ? 'PASS' : 'FAIL';
     const tools = r.toolCallCount ?? '-';
-    lines.push(`| ${i + 1} | ${r.pageId} | ${status} | ${cost} | ${dur} | ${gate} | ${tools} |`);
+    if (hasActualCosts) {
+      lines.push(`| ${i + 1} | ${r.pageId} | ${status} | ${cost} | ${actualCost} | ${dur} | ${gate} | ${tools} |`);
+    } else {
+      lines.push(`| ${i + 1} | ${r.pageId} | ${status} | ${cost} | ${dur} | ${gate} | ${tools} |`);
+    }
   }
 
   // Failures detail
