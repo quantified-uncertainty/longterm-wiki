@@ -182,6 +182,8 @@ interface DatabaseShape {
   factTimeseries: Record<string, TimeseriesPoint[]>;
   /** Reverse index: "entity.factId" → pages that reference it via <F> */
   factUsage: Record<string, FactUsagePage[]>;
+  /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
+  pageResources: Record<string, string[]>;
   stats: Record<string, unknown>;
 }
 
@@ -531,6 +533,12 @@ export function getEntityById(id: string): Entity | undefined {
 
 export function getResourceById(id: string): Resource | undefined {
   return resourceIndex().get(id);
+}
+
+/** Get resource IDs for a page (computed at build time from inline <R>, cited_by, URL matching) */
+export function getResourcesForPage(pageId: string): string[] {
+  const db = getDatabase();
+  return db.pageResources?.[resolveId(pageId)] ?? [];
 }
 
 export function getPublicationById(id: string): Publication | undefined {
