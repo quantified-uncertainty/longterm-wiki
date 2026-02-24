@@ -14,23 +14,11 @@ import {
   getFactsForEntityWithFallback,
   getExternalLinks,
 } from "@/data";
+import { fetchFromWikiServer } from "@lib/wiki-server";
+import type { ClaimRow, GetClaimsResult } from "@wiki-server/api-types";
 
 interface PageProps {
   params: Promise<{ id: string }>;
-}
-
-interface ClaimRow {
-  id: number;
-  entityId: string;
-  entityType: string;
-  claimType: string;
-  claimText: string;
-  value: string | null;   // section name
-  unit: string | null;    // comma-separated footnote refs
-  confidence: string | null;
-  sourceQuote: string | null;
-  createdAt: string;
-  updatedAt: string;
 }
 
 function isNumericId(id: string): boolean {
@@ -43,25 +31,11 @@ export async function generateStaticParams() {
 
 /** Fetch claims for a page from the wiki-server. Returns null if unavailable. */
 async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (!serverUrl) return null;
-
-  try {
-    const res = await fetch(
-      `${serverUrl}/api/claims/by-entity/${encodeURIComponent(pageId)}`,
-      {
-        headers: { ...(apiKey ? { "x-api-key": apiKey } : {}) },
-        next: { revalidate: 300 },
-      }
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!data || !Array.isArray(data.claims)) return null;
-    return data.claims as ClaimRow[];
-  } catch {
-    return null;
-  }
+  const result = await fetchFromWikiServer<GetClaimsResult>(
+    `/api/claims/by-entity/${encodeURIComponent(pageId)}`,
+    { revalidate: 300 }
+  );
+  return result?.claims ?? null;
 }
 
 function Section({

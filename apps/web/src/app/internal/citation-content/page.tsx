@@ -2,6 +2,11 @@ import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-serv
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { CitationContentTable } from "./citation-content-table";
 import type { Metadata } from "next";
+import type {
+  CitationContentListEntry,
+  CitationContentListResult,
+  CitationContentStatsResult,
+} from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Citation Content | Longterm Wiki Internal",
@@ -9,47 +14,22 @@ export const metadata: Metadata = {
     "Fetched citation content stored in PostgreSQL — coverage stats and URL inventory.",
 };
 
-export interface ContentEntry {
-  url: string;
-  fetchedAt: string;
-  httpStatus: number | null;
-  pageTitle: string | null;
-  contentLength: number | null;
-  hasFullText: boolean;
-  hasPreview: boolean;
-  updatedAt: string;
-}
+/** Backward-compatible alias — the table component imports this name. */
+export type ContentEntry = CitationContentListEntry;
 
-interface ApiListResult {
-  entries: ContentEntry[];
-  total: number;
-  withFullText: number;
-  withPreview: number;
-}
-
-interface ApiStatsResult {
-  total: number;
-  withFullText: number;
-  withPreview: number;
-  coverage: number;
-  okCount: number;
-  deadCount: number;
-  avgContentLength: number | null;
-}
-
-async function loadContentFromApi(): Promise<FetchResult<{ entries: ContentEntry[]; stats: ApiStatsResult }>> {
+async function loadContentFromApi(): Promise<FetchResult<{ entries: ContentEntry[]; stats: CitationContentStatsResult }>> {
   const [listResult, statsResult] = await Promise.all([
-    fetchDetailed<ApiListResult>("/api/citations/content/list?limit=5000", {
+    fetchDetailed<CitationContentListResult>("/api/citations/content/list?limit=5000", {
       revalidate: 120,
     }),
-    fetchDetailed<ApiStatsResult>("/api/citations/content/stats", {
+    fetchDetailed<CitationContentStatsResult>("/api/citations/content/stats", {
       revalidate: 120,
     }),
   ]);
 
   if (!listResult.ok) return { ok: false, error: listResult.error };
 
-  const stats: ApiStatsResult = statsResult.ok
+  const stats: CitationContentStatsResult = statsResult.ok
     ? statsResult.data
     : {
         total: listResult.data.total,
@@ -86,7 +66,7 @@ function emptyData() {
       okCount: 0,
       deadCount: 0,
       avgContentLength: null,
-    } as ApiStatsResult,
+    } as CitationContentStatsResult,
   };
 }
 

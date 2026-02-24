@@ -2,16 +2,20 @@
  * Sessions API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import type { z } from 'zod';
 import { apiRequest, type ApiResult } from './client.ts';
 import type {
   CreateSessionSchema,
-  SessionEntry,
-  SessionListResponse,
-  SessionsByFilterResponse,
-  SessionStatsResponse,
+  CreateSessionResult,
+  SessionBatchResult,
+  SessionRow,
+  SessionListResult,
+  SessionByPageResult,
+  SessionStatsResult,
+  SessionPageChangesResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -21,25 +25,21 @@ import type {
 /** Uses z.input (not z.infer) because the schema has .default() and .transform() on pages. */
 export type SessionApiEntry = z.input<typeof CreateSessionSchema>;
 
-export interface CreateSessionResult {
-  id: number;
-  date: string;
-  title: string;
-  pages: string[];
-  createdAt: string;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface SessionBatchResult {
-  upserted: number;
-  results: Array<{ id: number; title: string; pageCount: number }>;
-}
+export type {
+  CreateSessionResult,
+  SessionBatchResult,
+  SessionListResult,
+  SessionByPageResult,
+  SessionStatsResult,
+  SessionPageChangesResult,
+};
 
-// Re-export shared response types for backward compatibility
-export type { SessionEntry };
-export type SessionListResult = SessionListResponse;
-export type SessionByPageResult = SessionsByFilterResponse;
-export type SessionStatsResult = SessionStatsResponse;
-export type SessionPageChangesResult = SessionsByFilterResponse;
+/** Backward-compatible alias for SessionRow. */
+export type SessionEntry = SessionRow;
 
 // ---------------------------------------------------------------------------
 // API functions (return ApiResult<T>)
@@ -83,4 +83,3 @@ export async function getSessionStats(): Promise<ApiResult<SessionStatsResult>> 
 export async function getSessionPageChanges(): Promise<ApiResult<SessionPageChangesResult>> {
   return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes?limit=500');
 }
-

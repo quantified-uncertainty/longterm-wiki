@@ -2,6 +2,7 @@
  * Auto-Update Runs & News Items API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { apiRequest, getServerUrl, type ApiResult } from './client.ts';
@@ -9,8 +10,15 @@ import type { z } from 'zod';
 import type {
   AutoUpdateResult,
   RecordAutoUpdateRun,
+  AutoUpdateNewsItemSchema,
+  RecordAutoUpdateRunResult,
+  AutoUpdateRunRow,
+  AutoUpdateRunsListResult,
+  AutoUpdateStatsResult,
+  AutoUpdateNewsBatchResult,
+  AutoUpdateNewsRow,
+  AutoUpdateNewsDashboardResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
-import type { AutoUpdateNewsItemSchema } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Auto-Update Runs Types — input (derived from server Zod schemas)
@@ -20,49 +28,14 @@ export type AutoUpdateRunResultEntry = AutoUpdateResult;
 
 export type RecordAutoUpdateRunInput = RecordAutoUpdateRun;
 
-export interface RecordRunResult {
-  id: number;
-  date: string;
-  startedAt: string;
-  createdAt: string;
-  resultsInserted: number;
-}
+// ---------------------------------------------------------------------------
+// Auto-Update Runs Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface AutoUpdateRunEntry {
-  id: number;
-  date: string;
-  startedAt: string;
-  completedAt: string | null;
-  trigger: string;
-  budgetLimit: number | null;
-  budgetSpent: number | null;
-  sourcesChecked: number | null;
-  sourcesFailed: number | null;
-  itemsFetched: number | null;
-  itemsRelevant: number | null;
-  pagesPlanned: number | null;
-  pagesUpdated: number | null;
-  pagesFailed: number | null;
-  pagesSkipped: number | null;
-  newPagesCreated: string[];
-  results: AutoUpdateRunResultEntry[];
-  createdAt: string;
-}
-
-export interface GetRunsResult {
-  entries: AutoUpdateRunEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface AutoUpdateStatsResult {
-  totalRuns: number;
-  totalBudgetSpent: number;
-  totalPagesUpdated: number;
-  totalPagesFailed: number;
-  byTrigger: Record<string, number>;
-}
+export type RecordRunResult = RecordAutoUpdateRunResult;
+export type AutoUpdateRunEntry = AutoUpdateRunRow;
+export type GetRunsResult = AutoUpdateRunsListResult;
+export type { AutoUpdateStatsResult };
 
 // ---------------------------------------------------------------------------
 // Auto-Update News Items Types
@@ -71,32 +44,9 @@ export interface AutoUpdateStatsResult {
 /** Uses z.input (not z.infer) because the schema has .default([]) on topics/entities. */
 export type AutoUpdateNewsItem = z.input<typeof AutoUpdateNewsItemSchema>;
 
-export interface NewsItemBatchResult {
-  inserted: number;
-}
-
-export interface AutoUpdateNewsItemEntry {
-  id: number;
-  runId: number;
-  title: string;
-  url: string;
-  sourceId: string;
-  publishedAt: string | null;
-  summary: string | null;
-  relevanceScore: number | null;
-  topics: string[];
-  entities: string[];
-  routedToPageId: string | null;
-  routedToPageTitle: string | null;
-  routedTier: string | null;
-  runDate?: string | null;
-  createdAt: string;
-}
-
-export interface NewsDashboardResult {
-  items: AutoUpdateNewsItemEntry[];
-  runDates: string[];
-}
+export type NewsItemBatchResult = AutoUpdateNewsBatchResult;
+export type AutoUpdateNewsItemEntry = AutoUpdateNewsRow;
+export type NewsDashboardResult = AutoUpdateNewsDashboardResult;
 
 // ---------------------------------------------------------------------------
 // Auto-Update Runs API functions
@@ -164,4 +114,3 @@ export async function getAutoUpdateNewsDashboard(
     `/api/auto-update-news/dashboard?runs=${maxRuns}`,
   );
 }
-
