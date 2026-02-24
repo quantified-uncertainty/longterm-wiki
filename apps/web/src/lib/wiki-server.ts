@@ -30,7 +30,7 @@ export interface WithSource<T> {
  */
 export async function fetchDetailed<T>(
   path: string,
-  options?: { revalidate?: number }
+  options?: { revalidate?: number; timeoutMs?: number }
 ): Promise<FetchResult<T>> {
   const config = getWikiServerConfig();
   if (!config) return { ok: false, error: { type: "not-configured" } };
@@ -39,6 +39,7 @@ export async function fetchDetailed<T>(
     const res = await fetch(`${config.serverUrl}${path}`, {
       headers: config.headers,
       next: { revalidate: options?.revalidate ?? 300 },
+      signal: AbortSignal.timeout(options?.timeoutMs ?? 10_000),
     });
     if (!res.ok) {
       return {
