@@ -1,38 +1,51 @@
 /**
  * Facts API — wiki-server client module
  *
- * Input types are derived from the canonical Zod schemas in api-types.ts.
- * Response types are imported from api-types.ts (single source of truth).
+ * Response types are inferred from the server route via Hono RPC type system,
+ * eliminating hand-written response interfaces and preventing type drift.
+ * All imports from hono/client are type-only — zero runtime cost.
+ *
+ * Runtime HTTP still uses `apiRequest` (for mock compatibility in tests).
+ * For true RPC calls, use `getFactsRpcClient()` from `@lib/wiki-server`.
  */
 
+import type { hc, InferResponseType } from 'hono/client';
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
-import type {
-  SyncFact,
-  SyncFactsResult,
-  FactRow,
-  FactsByEntityResult,
-  FactTimeseriesResult,
-  StaleFactsResult,
-  FactStatsResult,
-} from '../../../apps/wiki-server/src/api-types.ts';
+import type { FactsRoute } from '../../../apps/wiki-server/src/routes/facts.ts';
+import type { SyncFact } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types — input (derived from server Zod schemas)
+// RPC type inference (compile-time only — no runtime cost)
+// ---------------------------------------------------------------------------
+
+// The RPC type system infers a union of success + error response types.
+// We use InferResponseType<endpoint, 200> to extract only the success shape,
+// which eliminates the hand-written response interfaces from api-types.ts.
+type RpcClient = ReturnType<typeof hc<FactsRoute>>;
+
+/** Response type for GET /api/facts/by-entity/:entityId (inferred from server). */
+export type FactsByEntityResult = InferResponseType<RpcClient['by-entity'][':entityId']['$get'], 200>;
+
+/** Response type for GET /api/facts/timeseries/:entityId (inferred from server). */
+export type TimeseriesResult = InferResponseType<RpcClient['timeseries'][':entityId']['$get'], 200>;
+
+/** Response type for GET /api/facts/stale (inferred from server). */
+export type StaleFactsResult = InferResponseType<RpcClient['stale']['$get'], 200>;
+
+/** Response type for GET /api/facts/stats (inferred from server). */
+export type FactStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+
+/** Response type for POST /api/facts/sync (inferred from server). */
+export type SyncFactsResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+
+/** A single fact row from the server. */
+export type FactEntry = FactsByEntityResult['facts'][number];
+
+// ---------------------------------------------------------------------------
+// Types — input (from server Zod schemas)
 // ---------------------------------------------------------------------------
 
 export type SyncFactItem = SyncFact;
-
-// ---------------------------------------------------------------------------
-// Types — response (re-exported from canonical api-types.ts)
-// ---------------------------------------------------------------------------
-
-export type { SyncFactsResult, FactsByEntityResult, StaleFactsResult, FactStatsResult };
-
-/** Backward-compatible alias for FactRow. */
-export type FactEntry = FactRow;
-
-/** Backward-compatible alias for FactTimeseriesResult. */
-export type TimeseriesResult = FactTimeseriesResult;
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -41,7 +54,7 @@ export type TimeseriesResult = FactTimeseriesResult;
 const FACT_BATCH_SIZE = 500;
 
 // ---------------------------------------------------------------------------
-// API functions
+// API functions (runtime uses apiRequest for test mock compatibility)
 // ---------------------------------------------------------------------------
 
 /**

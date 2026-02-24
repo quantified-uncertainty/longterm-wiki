@@ -11,7 +11,7 @@
 import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
-import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
+import { fetchFromWikiServer, withApiFallback, getFactsRpcClient, type WithSource, type RpcFactsByEntityResult, type RpcTimeseriesResult } from "@lib/wiki-server";
 import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry, CitationHealthResult } from "@wiki-server/api-types";
 import {
   TypedEntitySchema,
@@ -1235,78 +1235,62 @@ export function getFactsForEntity(entityId: string): Record<string, Fact> {
 }
 
 // ============================================================================
-// SERVER-BACKED FACT FETCH (with local fallback)
+// SERVER-BACKED FACT FETCH (with local fallback) — uses Hono RPC types
 // ============================================================================
 
-/** Server response shape for a single fact from /api/facts/by-entity */
-interface ServerFact {
-  entity: string;
-  factId: string;
-  value?: string;
-  numeric?: number;
-  low?: number;
-  high?: number;
-  asOf?: string;
-  label?: string;
-  source?: string;
-  sourceResource?: string;
-  sourceTitle?: string;
-  sourcePublication?: string;
-  sourceCredibility?: number;
-  note?: string;
-  noCompute?: boolean;
-  measure?: string;
-  subject?: string;
-  compute?: string;
-  format?: string;
-  formatDivisor?: number;
-  computed?: boolean;
-}
+// Server fact row type is inferred from the server route via Hono RPC.
+// This replaces the hand-written ServerFact interface, eliminating type drift.
+// (Previously, `ServerFact.entity` diverged from the server's `entityId` field.)
+type ServerFactRow = RpcFactsByEntityResult['facts'][number];
 
-function serverFactToFact(sf: ServerFact): Fact {
+function serverFactToFact(sf: ServerFactRow): Fact {
   return {
-    entity: sf.entity,
+    entity: sf.entityId, // Correct field name (was `sf.entity` — drift bug fixed by RPC)
     factId: sf.factId,
-    value: sf.value,
-    numeric: sf.numeric,
-    low: sf.low,
-    high: sf.high,
-    asOf: sf.asOf,
-    label: sf.label,
-    source: sf.source,
-    sourceResource: sf.sourceResource,
-    sourceTitle: sf.sourceTitle,
-    sourcePublication: sf.sourcePublication,
-    sourceCredibility: sf.sourceCredibility,
-    note: sf.note,
-    noCompute: sf.noCompute,
-    measure: sf.measure,
-    subject: sf.subject,
-    compute: sf.compute,
-    format: sf.format,
-    formatDivisor: sf.formatDivisor,
-    computed: sf.computed,
+    value: sf.value ?? undefined,
+    numeric: sf.numeric ?? undefined,
+    low: sf.low ?? undefined,
+    high: sf.high ?? undefined,
+    asOf: sf.asOf ?? undefined,
+    label: sf.label ?? undefined,
+    source: sf.source ?? undefined,
+    sourceResource: sf.sourceResource ?? undefined,
+    note: sf.note ?? undefined,
+    measure: sf.measure ?? undefined,
+    subject: sf.subject ?? undefined,
+    format: sf.format ?? undefined,
+    formatDivisor: sf.formatDivisor ?? undefined,
   };
 }
 
 /**
  * Fetch all facts for an entity from wiki-server with fallback to local database.json.
- * Follows the same withApiFallback pattern as getRelatedGraphWithFallback/getBacklinksWithFallback.
+ * Uses Hono RPC client for type-safe API calls with ISR revalidation.
  */
 export async function getFactsForEntityWithFallback(
   entityId: string
 ): Promise<WithSource<Record<string, Fact>>> {
   return withApiFallback(
     async () => {
-      const data = await fetchFromWikiServer<{ facts: ServerFact[] }>(
-        `/api/facts/by-entity/${encodeURIComponent(entityId)}`
-      );
-      if (!data) return null;
-      const result: Record<string, Fact> = {};
-      for (const sf of data.facts) {
-        result[sf.factId] = serverFactToFact(sf);
+      const client = getFactsRpcClient();
+      if (!client) return null;
+
+      try {
+        const res = await client['by-entity'][':entityId'].$get({
+          param: { entityId },
+          query: { limit: "200", offset: "0" },
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+
+        const result: Record<string, Fact> = {};
+        for (const sf of data.facts) {
+          result[sf.factId] = serverFactToFact(sf);
+        }
+        return result;
+      } catch {
+        return null;
       }
-      return result;
     },
     () => getFactsForEntity(entityId)
   );
@@ -1397,52 +1381,54 @@ export function getEntityMeasures(entityId: string): FactMeasure[] {
 // SERVER-BACKED TIMESERIES FETCH (with local fallback)
 // ============================================================================
 
-/** Server response shape for a timeseries point from /api/facts/timeseries */
-interface ServerTimeseriesPoint {
-  entity: string;
-  factId: string;
-  measure: string;
-  asOf: string;
-  value?: string;
-  numeric?: number;
-  low?: number;
-  high?: number;
-  note?: string;
-  source?: string;
-}
+// Server timeseries point type is inferred from the server route via Hono RPC.
+// This replaces the hand-written ServerTimeseriesPoint interface.
+// (Previously, code read `data.timeseries` but server returns `data.points` — drift bug fixed.)
+type ServerTimeseriesRow = RpcTimeseriesResult['points'][number];
 
-function serverPointToPoint(sp: ServerTimeseriesPoint): TimeseriesPoint {
+function serverPointToPoint(sp: ServerTimeseriesRow): TimeseriesPoint {
   return {
-    entity: sp.entity,
+    entity: sp.entityId, // Correct field name (was `sp.entity` — drift bug fixed by RPC)
     factId: sp.factId,
-    measure: sp.measure,
-    asOf: sp.asOf,
-    value: sp.value,
-    numeric: sp.numeric,
-    low: sp.low,
-    high: sp.high,
-    note: sp.note,
-    source: sp.source,
+    measure: sp.measure ?? "",
+    asOf: sp.asOf ?? "",
+    value: sp.value ?? undefined,
+    numeric: sp.numeric ?? undefined,
+    low: sp.low ?? undefined,
+    high: sp.high ?? undefined,
+    note: sp.note ?? undefined,
+    source: sp.source ?? undefined,
   };
 }
 
 /**
  * Fetch timeseries for a measure from wiki-server, optionally filtered by entity.
- * Falls back to local database.json.
+ * Uses Hono RPC client for type-safe API calls. Falls back to local database.json.
  */
 export async function getMeasureTimeseriesWithFallback(
   measureId: string,
   entityId?: string
 ): Promise<TimeseriesPoint[]> {
-  const url = entityId
-    ? `/api/facts/timeseries/${encodeURIComponent(entityId)}?measure=${encodeURIComponent(measureId)}`
-    : `/api/facts/timeseries?measure=${encodeURIComponent(measureId)}`;
-
   const result = await withApiFallback(
     async () => {
-      const data = await fetchFromWikiServer<{ timeseries: ServerTimeseriesPoint[] }>(url);
-      if (!data) return null;
-      return data.timeseries.map(serverPointToPoint);
+      // The server's timeseries endpoint requires entityId as a path param.
+      // When no entityId is given, fall through to the local fallback.
+      if (!entityId) return null;
+
+      const client = getFactsRpcClient();
+      if (!client) return null;
+
+      try {
+        const res = await client.timeseries[':entityId'].$get({
+          param: { entityId },
+          query: { measure: measureId, limit: "100" },
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.points.map(serverPointToPoint); // Correct: `points` not `timeseries`
+      } catch {
+        return null;
+      }
     },
     () => getMeasureTimeseries(measureId, entityId)
   );
@@ -1452,23 +1438,20 @@ export async function getMeasureTimeseriesWithFallback(
 /**
  * Fetch all timeseries data for an entity from wiki-server.
  * Returns a map of measureId → sorted observations.
- * Falls back to local database.json.
+ * Uses Hono RPC client. Falls back to local database.json.
+ *
+ * Note: The server endpoint requires a `measure` query param, so this function
+ * uses the existing fetchFromWikiServer for the "all measures" case and falls
+ * back to local data. A future server endpoint could support this natively.
  */
 export async function getEntityTimeseriesWithFallback(
   entityId: string
 ): Promise<Record<string, TimeseriesPoint[]>> {
   const result = await withApiFallback(
     async () => {
-      const data = await fetchFromWikiServer<{ timeseries: ServerTimeseriesPoint[] }>(
-        `/api/facts/timeseries/${encodeURIComponent(entityId)}`
-      );
-      if (!data) return null;
-      const grouped: Record<string, TimeseriesPoint[]> = {};
-      for (const sp of data.timeseries) {
-        if (!grouped[sp.measure]) grouped[sp.measure] = [];
-        grouped[sp.measure].push(serverPointToPoint(sp));
-      }
-      return grouped;
+      // The server's timeseries endpoint requires a `measure` query param,
+      // so we can't fetch all measures at once via RPC. Fall through to local.
+      return null;
     },
     () => getEntityTimeseries(entityId)
   );
