@@ -283,61 +283,6 @@ function IconX({ className }: { className?: string }) {
 // SUB-COMPONENTS
 // ============================================================================
 
-function ScoreRing({
-  value,
-  max,
-  size = 44,
-  strokeWidth = 3.5,
-  color,
-  children,
-}: {
-  value: number;
-  max: number;
-  size?: number;
-  strokeWidth?: number;
-  color: string;
-  children?: React.ReactNode;
-}) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (value / max) * circumference;
-
-  return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        className="-rotate-90 block"
-      >
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="var(--border)"
-          strokeWidth={strokeWidth}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
-          strokeDasharray={`${progress} ${circumference - progress}`}
-          strokeDashoffset={circumference / 4}
-          strokeLinecap="round"
-          className="transition-[stroke-dasharray] duration-500 ease-out"
-        />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center">
-        {children}
-      </span>
-    </div>
-  );
-}
-
 function PageTypeBadge({
   pageType,
   pathname,
@@ -504,78 +449,6 @@ function ResearchDisplay({ researchImportance }: { researchImportance: number })
   );
 }
 
-function structureItemScore(
-  value: number,
-  thresholds: [number, number][] // [[threshold, points], ...]
-): number {
-  for (const [threshold, points] of thresholds) {
-    if (value >= threshold) return points;
-  }
-  return 0;
-}
-
-function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
-  const score = metrics.structuralScore;
-  const scoreColor =
-    score >= 10 ? "#10b981" : score >= 6 ? "#f59e0b" : "#ef4444";
-
-  const breakdown = [
-    { label: "Word count", max: 2, earned: structureItemScore(metrics.wordCount, [[800, 2], [300, 1]]) },
-    { label: "Tables", max: 3, earned: structureItemScore(metrics.tableCount, [[3, 3], [2, 2], [1, 1]]) },
-    { label: "Diagrams", max: 2, earned: structureItemScore(metrics.diagramCount, [[2, 2], [1, 1]]) },
-    { label: "Internal links", max: 2, earned: structureItemScore(metrics.internalLinks, [[4, 2], [1, 1]]) },
-    { label: "Citations", max: 3, earned: structureItemScore(metrics.footnoteCount + metrics.externalLinks, [[6, 3], [3, 2], [1, 1]]) },
-    { label: "Prose ratio", max: 2, earned: metrics.bulletRatio < 0.3 ? 2 : metrics.bulletRatio < 0.5 ? 1 : 0 },
-    { label: "Overview section", max: 1, earned: metrics.hasOverview ? 1 : 0 },
-  ];
-
-  return (
-    <ScoreBar
-      value={score}
-      max={15}
-      label="Structure"
-      levelLabel={`${score}/15`}
-      color={scoreColor}
-      tooltipTitle={`Structure: ${score}/15`}
-      tooltipDesc="Automated score based on measurable content features."
-      extraTooltip={
-        <span className="block flex flex-col gap-0.5 mt-2">
-          {breakdown.map((item) => (
-            <span key={item.label} className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">{item.label}</span>
-              <span className={cn(
-                "tabular-nums font-medium",
-                item.earned === item.max ? "text-emerald-500" : item.earned > 0 ? "text-foreground" : "text-muted-foreground/50"
-              )}>
-                {item.earned}/{item.max}
-              </span>
-            </span>
-          ))}
-        </span>
-      }
-    />
-  );
-}
-
-/** Compact inline stat: icon + label + value */
-function MetricStat({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  value: number | string;
-  label: string;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-      <span className="flex items-center opacity-50">{icon}</span>
-      <span className="font-semibold tabular-nums text-foreground">{value}</span>
-      <span>{label}</span>
-    </span>
-  );
-}
-
 interface Issue {
   type: "warning" | "info";
   label: string;
@@ -738,6 +611,7 @@ interface CoverageItem {
 
 function ContentCoverageSection({
   structuredSummary,
+  llmSummary,
   updateFrequency,
   hasEntity,
   metrics,
@@ -746,6 +620,7 @@ function ContentCoverageSection({
   changeHistory,
 }: {
   structuredSummary?: StructuredSummary;
+  llmSummary?: string;
   updateFrequency?: number;
   hasEntity?: boolean;
   metrics?: PageMetrics;
@@ -755,35 +630,62 @@ function ContentCoverageSection({
 }) {
   const items: CoverageItem[] = [
     {
-      label: "Structured summary",
-      present: !!structuredSummary,
+      label: "Summary",
+      present: !!(structuredSummary || llmSummary),
+      detail: structuredSummary ? "structured" : llmSummary ? "basic" : undefined,
       hint: "crux content improve <id>",
-      description: "One-liner, key points, and bottom line generated by the improve pipeline.",
+      description: structuredSummary
+        ? "Structured summary with one-liner, key points, and bottom line."
+        : llmSummary
+          ? "Basic text summary. Run improve pipeline to upgrade to structured format."
+          : "No summary. Run the improve pipeline to generate one.",
       anchor: "structured-summary",
     },
     {
-      label: "Update schedule",
+      label: "Schedule",
       present: updateFrequency != null,
       hint: "Set updateFrequency in frontmatter",
       description: "How often the page should be refreshed. Drives the overdue tracking system.",
       anchor: "update-schedule",
     },
     {
-      label: "Entity data",
+      label: "Entity",
       present: !!hasEntity,
       hint: "Add entity YAML in data/entities/",
       description: "YAML entity definition with type, description, and related entries.",
       anchor: "entity-data",
     },
     {
-      label: "Tables / diagrams",
-      present: !!(metrics && (metrics.tableCount > 0 || metrics.diagramCount > 0)),
-      detail: metrics && (metrics.tableCount > 0 || metrics.diagramCount > 0)
-        ? `${metrics.tableCount}T + ${metrics.diagramCount}D`
-        : undefined,
-      hint: "Add tables or diagrams to the page",
-      description: "Visual content — data tables, Mermaid diagrams, or Squiggle models.",
+      label: "Tables",
+      present: (metrics?.tableCount ?? 0) > 0,
+      detail: metrics && metrics.tableCount > 0 ? `${metrics.tableCount}` : undefined,
+      hint: "Add data tables to the page",
+      description: "Data tables for structured comparisons and reference material.",
       anchor: "tables-diagrams",
+    },
+    {
+      label: "Diagrams",
+      present: (metrics?.diagramCount ?? 0) > 0,
+      detail: metrics && metrics.diagramCount > 0 ? `${metrics.diagramCount}` : undefined,
+      hint: "Add Mermaid diagrams or Squiggle models",
+      description: "Visual content — Mermaid diagrams, charts, or Squiggle estimate models.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Int. links",
+      present: (metrics?.internalLinks ?? 0) > 0,
+      detail: metrics && metrics.internalLinks > 0 ? `${metrics.internalLinks}` : undefined,
+      hint: "Add links to other wiki pages",
+      description: "Links to other wiki pages. More internal links = better graph connectivity.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Footnotes",
+      present: (metrics?.footnoteCount ?? 0) > 0,
+      detail: metrics && metrics.footnoteCount > 0 ? `${metrics.footnoteCount}` : undefined,
+      hint: "Add [^N] footnote citations",
+      description: "Footnote citations [^N] with source references at the bottom of the page.",
+      anchor: "references",
     },
     {
       label: "References",
@@ -794,7 +696,7 @@ function ContentCoverageSection({
       anchor: "references",
     },
     {
-      label: "Citation quotes",
+      label: "Quotes",
       present: (citationHealth?.withQuotes ?? 0) > 0,
       detail: citationHealth && citationHealth.withQuotes > 0
         ? `${citationHealth.withQuotes}/${citationHealth.total}`
@@ -804,7 +706,7 @@ function ContentCoverageSection({
       anchor: "citation-quotes",
     },
     {
-      label: "Accuracy checked",
+      label: "Accuracy",
       present: (citationHealth?.accuracyChecked ?? 0) > 0,
       detail: citationHealth && citationHealth.accuracyChecked > 0
         ? `${citationHealth.accuracyChecked}/${citationHealth.total}`
@@ -826,21 +728,25 @@ function ContentCoverageSection({
   ];
 
   const presentCount = items.filter((i) => i.present).length;
+  const total = items.length;
+  const pct = presentCount / total;
   const badgeColor =
-    presentCount >= 6
+    pct >= 0.75
       ? "bg-emerald-500/15 text-emerald-500"
-      : presentCount >= 4
+      : pct >= 0.5
         ? "bg-amber-500/15 text-amber-500"
         : "bg-red-500/15 text-red-500";
 
   return (
     <div className="border-t border-border px-3.5 pt-2 pb-2">
-      <SectionHeader
-        count={presentCount}
-        countColor={badgeColor}
-      >
-        Coverage
-      </SectionHeader>
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">
+        Content
+        <span
+          className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold ${badgeColor}`}
+        >
+          {presentCount}/{total}
+        </span>
+      </div>
       <div className="flex flex-wrap gap-1.5">
         {items.map((item) => (
           <span
@@ -1001,7 +907,7 @@ export function PageStatus({
     return null;
   }
 
-  const metaItems: string[] = [];
+  const metaItems: React.ReactNode[] = [];
   if (lastEdited) metaItems.push(`Edited ${formatAge(lastEdited)}`);
   if (wordCount && wordCount > 0) metaItems.push(`${formatWordCount(wordCount)} words`);
   if (backlinkCount && backlinkCount > 0) metaItems.push(`${backlinkCount} backlinks`);
@@ -1010,6 +916,25 @@ export function PageStatus({
     lastEdited && updateFrequency
       ? getUpdateStatus(lastEdited, updateFrequency)
       : null;
+
+  // Add update schedule info to meta items
+  if (evergreen === false) {
+    metaItems.push("Point-in-time");
+  } else if (updateFrequency) {
+    metaItems.push(
+      <span key="schedule" className="inline-flex items-center gap-1">
+        Updated {formatFrequency(updateFrequency)}
+        {updateStatus && (
+          <>
+            <span className="mx-1 inline-block size-[3px] rounded-full bg-border" />
+            <span className={updateStatus.isOverdue ? "font-medium text-amber-500" : ""}>
+              {updateStatus.label}
+            </span>
+          </>
+        )}
+      </span>
+    );
+  }
 
   return (
     <div className="page-status page-status-dev-only mb-6 rounded-xl border border-border bg-card text-[13px] shadow-sm">
@@ -1034,7 +959,7 @@ export function PageStatus({
         </div>
       </div>
 
-      {/* Scores row */}
+      {/* Ratings — editorial judgments */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-3.5 py-2.5">
         {quality !== undefined && quality > 0 && (
           <QualityDisplay quality={quality} suggestedQuality={suggestedQuality} />
@@ -1045,73 +970,7 @@ export function PageStatus({
         {researchImportance !== undefined && (
           <ResearchDisplay researchImportance={researchImportance} />
         )}
-        {metrics && <StructureDisplay metrics={metrics} />}
       </div>
-
-      {/* Content metrics */}
-      {metrics && (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-3.5 py-2">
-          <MetricStat icon={<IconTable />} value={metrics.tableCount} label="tables" />
-          <MetricStat icon={<IconDiagram />} value={metrics.diagramCount} label="diagrams" />
-          <MetricStat icon={<IconLink />} value={metrics.internalLinks} label="int. links" />
-          <MetricStat icon={<IconBook />} value={metrics.footnoteCount} label="footnotes" />
-          <MetricStat icon={<IconLink />} value={metrics.externalLinks} label="ext. links" />
-          <MetricStat
-            icon={<span className="text-[10px] font-bold opacity-50">%</span>}
-            value={`${Math.round(metrics.bulletRatio * 100)}%`}
-            label="bullets"
-          />
-        </div>
-      )}
-
-      {/* Update Schedule / Evergreen status */}
-      {evergreen === false ? (
-        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
-          <IconCalendar className="shrink-0 opacity-60" />
-          <span className="text-muted-foreground">
-            Point-in-time content
-          </span>
-          <span className="inline-block size-[3px] rounded-full bg-border" />
-          <span className="text-muted-foreground/70">
-            Not on update schedule
-          </span>
-        </div>
-      ) : updateFrequency ? (
-        <div className="flex items-center gap-2 border-t border-border px-3.5 py-2 text-xs text-muted-foreground">
-          <IconCalendar className="shrink-0 opacity-60" />
-          <span>
-            Updated{" "}
-            <Link href="/internal/updates" className="font-medium text-foreground hover:underline no-underline">
-              {formatFrequency(updateFrequency)}
-            </Link>
-          </span>
-          {updateStatus && (
-            <>
-              <span className="inline-block size-[3px] rounded-full bg-border" />
-              <span
-                className={
-                  updateStatus.isOverdue
-                    ? "font-medium text-amber-500"
-                    : "text-muted-foreground"
-                }
-              >
-                {updateStatus.label}
-              </span>
-            </>
-          )}
-        </div>
-      ) : null}
-
-      {/* Content coverage checklist */}
-      <ContentCoverageSection
-        structuredSummary={structuredSummary}
-        updateFrequency={updateFrequency}
-        hasEntity={hasEntity}
-        metrics={metrics}
-        resourceCount={resourceCount}
-        citationHealth={citationHealth}
-        changeHistory={changeHistory}
-      />
 
       {/* Summary — structured if available, else flat llmSummary */}
       {structuredSummary ? (
@@ -1143,6 +1002,21 @@ export function PageStatus({
         </div>
       ) : null}
 
+      {/* Content — structure score, metrics, and coverage checklist */}
+      <ContentCoverageSection
+        structuredSummary={structuredSummary}
+        llmSummary={llmSummary}
+        updateFrequency={updateFrequency}
+        hasEntity={hasEntity}
+        metrics={metrics}
+        resourceCount={resourceCount}
+        citationHealth={citationHealth}
+        changeHistory={changeHistory}
+      />
+
+      {/* Change history */}
+      <ChangeHistorySection changeHistory={changeHistory} />
+
       {/* Issues */}
       <IssuesSection
         issues={issues}
@@ -1153,9 +1027,6 @@ export function PageStatus({
         contentFormat={contentFormat}
         evergreen={evergreen}
       />
-
-      {/* Change history */}
-      <ChangeHistorySection changeHistory={changeHistory} />
 
       {/* Single todo */}
       {todo && (
