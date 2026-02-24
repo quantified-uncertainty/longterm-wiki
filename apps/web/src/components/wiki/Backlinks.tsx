@@ -1,9 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { getBacklinksFor } from "@data";
+import { getBacklinksWithFallback } from "@data";
 import { Link2, ArrowLeft } from "lucide-react";
 
-export function Backlinks({
+export async function Backlinks({
   entityId,
   title = "What links here",
   showEmpty = false,
@@ -16,7 +16,7 @@ export function Backlinks({
   maxItems?: number;
   compact?: boolean;
 }) {
-  const links = getBacklinksFor(entityId);
+  const { data: links } = await getBacklinksWithFallback(entityId);
 
   if (links.length === 0 && !showEmpty) return null;
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getRelatedGraphFor, getPageById, getEntityById } from "@/data";
+import { getRelatedGraphWithFallback, getPageById, getEntityById } from "@/data";
 import { ENTITY_TYPES } from "@/data/entity-ontology";
 import { getEntityTypeIcon } from "./wiki/EntityTypeIcon";
 import { getTypeLabel, getTypeColor } from "./explore/explore-utils";
@@ -179,14 +179,15 @@ function GroupSection({ group }: { group: TypeGroup }) {
   );
 }
 
-export function RelatedPages({
+export async function RelatedPages({
   entityId,
   entity,
 }: {
   entityId: string;
   entity?: { type?: string } | null;
 }) {
-  const allItems: RelatedPageItem[] = getRelatedGraphFor(entityId)
+  const { data: relatedEntries } = await getRelatedGraphWithFallback(entityId);
+  const allItems: RelatedPageItem[] = relatedEntries
     .filter((entry) => !entry.id.startsWith("__index__"))
     .map((entry) => {
       const page = getPageById(entry.id);

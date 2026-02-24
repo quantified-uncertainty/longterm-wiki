@@ -11,6 +11,7 @@
 import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
+import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -1076,6 +1077,44 @@ export function getBacklinksFor(
   }));
 }
 
+/** Server response shape for backlinks endpoint */
+interface ServerBacklink {
+  id: string;
+  type: string;
+  title: string;
+  relationship?: string;
+}
+
+/**
+ * Fetch backlinks from wiki-server with fallback to local database.json.
+ * Adds `href` to each entry (server doesn't include path information).
+ */
+export async function getBacklinksWithFallback(
+  entityId: string
+): Promise<WithSource<Array<{
+  id: string;
+  type: string;
+  title: string;
+  href: string;
+  relationship?: string;
+}>>> {
+  const slug = resolveId(entityId);
+
+  return withApiFallback(
+    async () => {
+      const data = await fetchFromWikiServer<{ backlinks: ServerBacklink[] }>(
+        `/api/links/backlinks/${encodeURIComponent(slug)}`
+      );
+      if (!data) return null;
+      return data.backlinks.map((link) => ({
+        ...link,
+        href: getEntityHref(link.id, link.type),
+      }));
+    },
+    () => getBacklinksFor(entityId)
+  );
+}
+
 // ============================================================================
 // RELATED GRAPH (bidirectional, multi-signal)
 // ============================================================================
@@ -1096,6 +1135,44 @@ export function getRelatedGraphFor(
     ...entry,
     href: getEntityHref(entry.id, entry.type),
   }));
+}
+
+/** Server response shape for related endpoint */
+interface ServerRelatedEntry {
+  id: string;
+  type: string;
+  title: string;
+  score: number;
+  label?: string;
+}
+
+/**
+ * Fetch related pages from wiki-server with fallback to local database.json.
+ * Adds `href` to each entry (server doesn't include path information).
+ */
+export async function getRelatedGraphWithFallback(
+  entityId: string
+): Promise<WithSource<Array<{
+  id: string;
+  type: string;
+  title: string;
+  href: string;
+  score: number;
+  label?: string;
+}>>> {
+  return withApiFallback(
+    async () => {
+      const data = await fetchFromWikiServer<{ related: ServerRelatedEntry[] }>(
+        `/api/links/related/${encodeURIComponent(entityId)}`
+      );
+      if (!data) return null;
+      return data.related.map((entry) => ({
+        ...entry,
+        href: getEntityHref(entry.id, entry.type),
+      }));
+    },
+    () => getRelatedGraphFor(entityId)
+  );
 }
 
 // ============================================================================
