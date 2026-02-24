@@ -5,7 +5,14 @@
  */
 
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
-import type { SyncFact } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  SyncFact,
+  FactEntryResponse,
+  FactsByEntityResponse,
+  FactTimeseriesResponse,
+  StaleFactsResponse,
+  FactStatsResponse,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -17,63 +24,12 @@ export interface SyncFactsResult {
   upserted: number;
 }
 
-export interface FactEntry {
-  id: number;
-  entityId: string;
-  factId: string;
-  label: string | null;
-  value: string | null;
-  numeric: number | null;
-  low: number | null;
-  high: number | null;
-  asOf: string | null;
-  measure: string | null;
-  subject: string | null;
-  note: string | null;
-  source: string | null;
-  sourceResource: string | null;
-  format: string | null;
-  formatDivisor: number | null;
-  syncedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface FactsByEntityResult {
-  entityId: string;
-  facts: FactEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface TimeseriesResult {
-  entityId: string;
-  measure: string;
-  points: FactEntry[];
-  total: number;
-}
-
-export interface StaleFactsResult {
-  facts: Array<{
-    entityId: string;
-    factId: string;
-    label: string | null;
-    asOf: string | null;
-    measure: string | null;
-    value: string | null;
-    numeric: number | null;
-  }>;
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface FactStatsResult {
-  total: number;
-  uniqueEntities: number;
-  uniqueMeasures: number;
-}
+// Re-export shared response types for backward compatibility
+export type FactEntry = FactEntryResponse;
+export type FactsByEntityResult = FactsByEntityResponse;
+export type TimeseriesResult = FactTimeseriesResponse;
+export type StaleFactsResult = StaleFactsResponse;
+export type FactStatsResult = FactStatsResponse;
 
 // ---------------------------------------------------------------------------
 // Constants

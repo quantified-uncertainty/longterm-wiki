@@ -6,6 +6,12 @@
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
+import type {
+  BacklinksResponse,
+  BacklinkEntry,
+  RelatedResponse,
+  RelatedEntry,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -48,30 +54,10 @@ export interface PageDetail {
   syncedAt: string;
 }
 
-export interface RelatedResult {
-  entityId: string;
-  related: Array<{
-    id: string;
-    type: string;
-    title: string;
-    score: number;
-    label?: string;
-  }>;
-  total: number;
-}
-
-export interface BacklinksResult {
-  targetId: string;
-  backlinks: Array<{
-    id: string;
-    type: string;
-    title: string;
-    relationship?: string;
-    linkType: string;
-    weight: number;
-  }>;
-  total: number;
-}
+// Re-export shared response types for backward compatibility
+export type { BacklinkEntry, RelatedEntry };
+export type RelatedResult = RelatedResponse;
+export type BacklinksResult = BacklinksResponse;
 
 export interface CitationQuote {
   id: number;
