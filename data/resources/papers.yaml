@@ -1,7 +1,3 @@
-# Papers Resources
-# Academic papers, preprints, and research publications
-# Part of the split resources system - see src/data/resources/
-
 - id: c29029f842f73623
   url: https://www.nature.com/articles/d41586-024-03214-7
   title: "2024 Chemistry Nobel: AlphaFold - Nature"
@@ -13591,3 +13587,679 @@
     constitutions targeting potentially harmful behaviors. However, more detailed constitutions
     still improve fine-grained control over specific types of harms. This suggests both general and
     specific principles have value for steering AI safely."
+- id: a5bb602c9990122e
+  url: https://arxiv.org/abs/2310.07298
+  title: https://arxiv.org/abs/2310.07298
+  type: paper
+  cited_by:
+    - ai-powered-investigation
+  tags: []
+- id: 1f7d271db2f8a756
+  url: https://arxiv.org/abs/2501.03200
+  title: 'Google DeepMind, "FACTS Grounding: A new benchmark for evaluating the factuality of large
+    language models" (https://a...'
+  type: paper
+  cited_by:
+    - language-models
+  tags: []
+- id: 3df9ab6bab412a71
+  url: https://arxiv.org/abs/2502.09802
+  title: 'CheckIfExist authors, "CheckIfExist: Citation Hallucination Detection in RAG Systems"
+    (https://arxiv.org/abs/2502.09802)'
+  type: paper
+  cited_by:
+    - language-models
+  tags: []
+- id: 965fd9843dbf74c4
+  url: https://arxiv.org/abs/2502.09455
+  title: AREG Benchmark (2025).
+  type: paper
+  cited_by:
+    - language-models
+  tags: []
+- id: 92dfabf49665e538
+  url: https://arxiv.org/abs/2502.09933
+  title: Helpful to a Fault (2025).
+  type: paper
+  cited_by:
+    - language-models
+  tags: []
+- id: 8fac188a634d15e6
+  url: https://arxiv.org/abs/2502.09591
+  title: A Content-Based Framework for Cybersecurity Refusal Decisions (2025).
+  type: paper
+  cited_by:
+    - language-models
+  tags: []
+- id: 693fb7b2f3083ecb
+  url: https://arxiv.org/abs/2502.09474
+  title: SecCodeBench-V2 (2025).
+  type: paper
+  cited_by:
+    - language-models
+  tags: []
+- id: 0b54496953b7c462
+  url: https://arxiv.org/abs/2502.10392
+  title: MemoryArena (2025).
+  type: paper
+  cited_by:
+    - language-models
+  tags: []
+- id: 14df73723b4d14d7
+  url: https://arxiv.org/abs/1706.03741
+  title: "[1706.03741] Deep Reinforcement Learning from Human Preferences"
+  type: paper
+  cited_by:
+    - why-alignment-hard
+  tags: []
+- id: 8e361fe6e472c82d
+  url: https://arxiv.org/html/2507.05619v1
+  title: "Detecting and Mitigating Reward Hacking in Reinforcement Learning Systems: A Comprehensive
+    Empirical Study"
+  type: paper
+  cited_by:
+    - why-alignment-hard
+  tags: []
+- id: abf5f3cc624bed21
+  url: https://arxiv.org/abs/2508.09224
+  title: "From Hard Refusals to Safe-Completions: Toward Output-Centric Safety Training"
+  type: paper
+  cited_by:
+    - why-alignment-hard
+  tags: []
+- id: d82c1768cf5e080b
+  url: https://arxiv.org/html/2406.07814v1
+  title: "Collective Constitutional AI: Aligning a Language Model with Public Input"
+  type: paper
+  cited_by:
+    - why-alignment-hard
+  tags: []
+- id: 32f3c7d144f036a0
+  url: https://arxiv.org/abs/1810.04805
+  title: "[1810.04805] BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"
+  type: paper
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: 676a61fd3e474b32
+  url: https://arxiv.org/abs/2007.05558
+  title: "[2007.05558] The Computational Limits of Deep Learning"
+  type: paper
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: 69d97a4c0448c91d
+  url: https://www.nature.com/articles/s42256-019-0109-1
+  title: Trusting artificial intelligence in cybersecurity is a double-edged sword | Nature Machine
+    Intelligence
+  type: paper
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: 4137abe9fd73c059
+  url: https://arxiv.org/abs/2412.05282
+  title: "[2412.05282] International Scientific Report on the Safety of Advanced AI (Interim Report)"
+  type: paper
+  cited_by:
+    - deep-learning-era
+    - alignment-robustness-trajectory
+  tags: []
+- id: 40de426bfa4c85b7
+  url: https://arxiv.org/abs/1707.06347
+  title: "[1707.06347] Proximal Policy Optimization Algorithms"
+  type: paper
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: 033ae49bb240e454
+  url: https://arxiv.org/abs/1912.06680
+  title: "[1912.06680] Dota 2 with Large Scale Deep Reinforcement Learning"
+  type: paper
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: 1efe2b3ae47b8e1b
+  url: https://arxiv.org/abs/2205.10330
+  title: "[2205.10330] A Review of Safe Reinforcement Learning: Methods, Theory and Applications"
+  type: paper
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: 958dc2f30e0f291a
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12823528
+  title: "Bias in AI systems: integrating formal and socio-technical approaches - PMC"
+  type: paper
+  cited_by:
+    - deep-learning-era
+  tags: []
+- id: 54f5dc55fe51351f
+  url: https://www.science.org/content/article/crypto-company-s-collapse-strands-scientists
+  title: Crypto Company's Collapse Strands Scientists
+  type: paper
+  cited_by:
+    - ea-epistemic-failures-in-the-ftx-era
+    - ea-institutions-response-to-the-ftx-collapse
+    - ftx-red-flags-pre-collapse-warning-signs-that-were-overlooked
+    - ftx-collapse-ea-funding-lessons
+    - ftx-future-fund
+  tags: []
+- id: fb817d8609639fc8
+  url: https://arxiv.org/pdf/1502.06512
+  title: arXiv:1502.06512
+  type: paper
+  cited_by:
+    - early-warnings
+    - superintelligence
+  tags: []
+- id: a065600ffb7471b3
+  url: https://www.science.org/content/article/what-kind-researcher-did-sex-offender-jeffrey-epstein-fund-he-told-science-he-died
+  title: "Science magazine: What kind of researcher did sex offender Jeffrey Epstein fund?"
+  type: paper
+  cited_by:
+    - epstein-ai-connections
+  tags: []
+- id: 33680e8fbf414f91
+  url: https://link.springer.com/article/10.1007/s11229-023-04153-y
+  title: The Epistemic Challenge to Longtermism — Christian Tarsney, Synthese (2023)
+  type: paper
+  cited_by:
+    - longtermism-credibility-after-ftx
+  tags: []
+- id: 017a432a9b23d296
+  url: https://arxiv.org/html/2602.08877v1
+  title: Stress-Testing Alignment Audits with Prompt-Level Strategic Deception
+    (https://arxiv.org/html/2602.08877v1)
+  type: paper
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: 2d454deae01c7a1e
+  url: https://arxiv.org/pdf/2501.18837
+  title: Constitutional Classifiers arXiv paper (https://arxiv.org/pdf/2501.18837)
+  type: paper
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: bef1ebca850f25ed
+  url: https://arxiv.org/abs/2509.08592
+  title: "Aligning AI Through Internal Understanding: The Role of Interpretability
+    (https://arxiv.org/abs/2509.08592)"
+  type: paper
+  cited_by:
+    - alignment-progress
+  tags: []
+- id: 5fad22b621b5d03a
+  url: https://arxiv.org/pdf/1705.08807
+  title: When Will AI Exceed Human Performance? Evidence from AI Experts
+  type: paper
+  cited_by:
+    - ai-timelines
+  tags: []
+- id: c2393fe3db65d3ef
+  url: https://arxiv.org/pdf/2311.02462
+  title: "Levels of AGI: Operationalizing Progress on the Path to AGI"
+  type: paper
+  cited_by:
+    - ai-timelines
+  tags: []
+- id: 2255e8e1cf26d155
+  url: https://arxiv.org/html/2511.23455v1
+  title: "The Price of Progress: Algorithmic Efficiency and the Falling Cost of AI Inference"
+  type: paper
+  cited_by:
+    - ai-timelines
+  tags: []
+- id: 5dee98c481614176
+  url: https://arxiv.org/html/2211.04325v2
+  title: Will we run out of data? Limits of LLM scaling based on human-generated data
+  type: paper
+  cited_by:
+    - ai-timelines
+  tags: []
+- id: 0b23a4115fcd80c0
+  url: https://arxiv.org/abs/2406.06144
+  title: Language Models Resist Alignment (https://arxiv.org/abs/2406.06144)
+  type: paper
+  cited_by:
+    - alignment-robustness-trajectory
+  tags: []
+- id: 0c9d169cb70f131d
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12881495
+  title: "*Large reasoning models are autonomous jailbreak agents*, Nature Communications 2026
+    (https://pmc.ncbi.nlm.nih.gov/ar..."
+  type: paper
+  cited_by:
+    - alignment-robustness-trajectory
+  tags: []
+- id: caa7c39d21fc4a14
+  url: https://go.nature.com/49V2wla
+  title: Betley et al., *Training large language models on narrow tasks can lead to broad
+    misalignment*, Nature (https://go.na...
+  type: paper
+  cited_by:
+    - alignment-robustness-trajectory
+  tags: []
+- id: ae4bb1285386c3e1
+  url: https://arxiv.org/abs/2406.11717
+  title: Arditi et al., *Refusal in Language Models Is Mediated by a Single Direction*
+    (https://arxiv.org/abs/2406.11717)
+  type: paper
+  cited_by:
+    - alignment-robustness-trajectory
+  tags: []
+- id: e59414203b54f250
+  url: https://arxiv.org/pdf/2507.10618
+  title: arXiv, "Compute Requirements for Algorithmic Innovation in Frontier AI Models"
+    (https://arxiv.org/pdf/2507.10618)
+  type: paper
+  cited_by:
+    - capability-alignment-race
+  tags: []
+- id: b0d4f2313577c2b4
+  url: https://arxiv.org/abs/2506.11613
+  title: Model Organisms for Emergent Misalignment - arXiv
+  type: paper
+  cited_by:
+    - model-organisms-of-misalignment
+  tags: []
+- id: 791713b683a42e01
+  url: https://arxiv.org/html/2506.11613v1
+  title: Model Organisms for Emergent Misalignment - arXiv HTML
+  type: paper
+  cited_by:
+    - model-organisms-of-misalignment
+  tags: []
+- id: 36ddd2f43e74d56c
+  url: https://arxiv.org/abs/2511.07678
+  title: "AIA Forecaster: Technical Report - arXiv Abstract"
+  type: paper
+  cited_by:
+    - bridgewater-aia-labs
+  tags: []
+- id: ba7cf061039527d9
+  url: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+  title: AI drives dramatic expansion of Chan Zuckerberg Initiative's funding to 'end all diseases' -
+    Science.org
+  type: paper
+  cited_by:
+    - chan-zuckerberg-initiative
+  tags: []
+- id: 0239f0bf2fdfa237
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10881267/
+  title: PMC - Coalition for Epidemic Preparedness Innovations and the Partnerships of Equitable
+    Vaccine Access
+  type: paper
+  cited_by:
+    - coalition-for-epidemic-preparedness-innovations
+  tags: []
+- id: 13ae956667716d8f
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7108492/
+  title: PMC - Vaccine Development Partnerships
+  type: paper
+  cited_by:
+    - coalition-for-epidemic-preparedness-innovations
+  tags: []
+- id: 463164d2b60f980e
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8063073/
+  title: PMC - CEPI's Response to COVID-19
+  type: paper
+  cited_by:
+    - coalition-for-epidemic-preparedness-innovations
+  tags: []
+- id: 53dfe08564cd6fe3
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7825992/
+  title: PMC - Transparency and Accountability Concerns
+  type: paper
+  cited_by:
+    - coalition-for-epidemic-preparedness-innovations
+  tags: []
+- id: d8cded7ab9132881
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12300188/
+  title: PMC - Pandemic Agreement Progress
+  type: paper
+  cited_by:
+    - coalition-for-epidemic-preparedness-innovations
+  tags: []
+- id: 5c8993cad0b19cca
+  url: https://www.nature.com/articles/d41586-022-00177-4
+  title: Volcanic Eruptions Paper - Nature
+  type: paper
+  cited_by:
+    - cser
+  tags: []
+- id: e3cff1a7b978b3a0
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12352269/
+  title: Evidence-based altruism or scientific imperialism? - PMC
+  type: paper
+  cited_by:
+    - ea-global
+  tags: []
+- id: dde9ff9b391bb584
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC8147574/
+  title: PMC - Billionaires in Global Philanthropy
+  type: paper
+  cited_by:
+    - giving-pledge
+  tags: []
+- id: 6d12b4367054e4e3
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC4179876/
+  title: Evaluability Bias in Charitable Giving - PMC
+  type: paper
+  cited_by:
+    - giving-what-we-can
+  tags: []
+- id: 991a4432c9aa08fb
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10189590/
+  title: PMC Article on Good Judgment Project Data
+  type: paper
+  cited_by:
+    - good-judgment
+  tags: []
+- id: 54f4894080508015
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC7333631/
+  title: PMC Article on Replication Attempts
+  type: paper
+  cited_by:
+    - good-judgment
+  tags: []
+- id: 0a249595cd1b0b1b
+  url: https://pubmed.ncbi.nlm.nih.gov/39172825/
+  title: "AI and biosecurity: The need for governance - PubMed"
+  type: paper
+  cited_by:
+    - johns-hopkins-center-for-health-security
+  tags: []
+- id: 3952a3a40236a8c1
+  url: https://arxiv.org/html/2506.20530
+  title: Toward a Global Regime for Compute Governance - arXiv
+  type: paper
+  cited_by:
+    - pause-ai
+  tags: []
+- id: 7865641bab4711d8
+  url: https://www.science.org/content/blog-post/peter-thiel-s-uncomplimentary-views-big-pharma
+  title: Peter Thiel's Uncomplimentary Views on Big Pharma - Science
+  type: paper
+  cited_by:
+    - peter-thiel-philanthropy
+  tags: []
+- id: 33b0fb9003952a61
+  url: https://arxiv.org/abs/2508.03474
+  title: "Unravelling the Probabilistic Forest: Arbitrage in Prediction Markets - arXiv"
+  type: paper
+  cited_by:
+    - polymarket
+  tags: []
+- id: 56bae0415b228464
+  url: https://arxiv.org/abs/2501.17315
+  title: A Sketch of an AI Control Safety Case - arXiv
+  type: paper
+  cited_by:
+    - redwood-research
+  tags: []
+- id: 2bb15dbd965ba994
+  url: https://arxiv.org/abs/2405.19550
+  title: Stress-Testing Capability Elicitation With Password-Locked Models - arXiv
+  type: paper
+  cited_by:
+    - redwood-research
+  tags: []
+- id: 318f1c30426de688
+  url: https://arxiv.org/abs/2411.17693
+  title: Adaptive Deployment of Untrusted LLMs Reduces Distributed Threats - arXiv
+  type: paper
+  cited_by:
+    - redwood-research
+  tags: []
+- id: 1cbfd6cb09ce2b50
+  url: https://arxiv.org/abs/2504.10374
+  title: "Ctrl-Z: Controlling AI Agents via Resampling - arXiv"
+  type: paper
+  cited_by:
+    - redwood-research
+  tags: []
+- id: a4efd028ec6d9614
+  url: https://arxiv.org/abs/2512.15688
+  title: "BashArena: A Control Setting for Highly Privileged AI Agents - arXiv"
+  type: paper
+  cited_by:
+    - redwood-research
+  tags: []
+- id: d53cbc223d3b5084
+  url: https://arxiv.org/html/2504.16137v2
+  title: Virology Capabilities Test Paper
+  type: paper
+  cited_by:
+    - securebio
+  tags: []
+- id: 7ac8f8c4d716202e
+  url: https://arxiv.org/abs/2403.14023
+  title: arXiv:2403.14023 — A system capable of verifiably and privately screening global DNA synthesis
+  type: paper
+  cited_by:
+    - securedna
+  tags: []
+- id: 2c157337f47eaef8
+  url: https://arxiv.org/abs/2512.09233
+  title: arXiv:2512.09233 — Security audit of SecureDNA
+  type: paper
+  cited_by:
+    - securedna
+  tags: []
+- id: a7655ef32aa9b504
+  url: https://www.nature.com/articles/s41467-025-67955-3
+  title: Edison, Toner & Esvelt 2026 — Nature Communications
+  type: paper
+  cited_by:
+    - securedna
+    - ea-biosecurity-scope
+  tags: []
+- id: 026b20f59036b277
+  url: https://arxiv.org/abs/2310.09217
+  title: "[2310.09217] Multinational AGI Consortium (MAGIC): A Proposal for International Coordination
+    on AI"
+  type: paper
+  cited_by:
+    - connor-leahy
+  tags: []
+- id: a15589d5e604d864
+  url: https://arxiv.org/abs/2503.05628
+  title: Hendrycks, D., Schmidt, E., & Wang, A.
+  type: paper
+  cited_by:
+    - dan-hendrycks
+  tags: []
+- id: 20fd64a19e2b88ce
+  url: https://arxiv.org/abs/2406.04127
+  title: Gema et al.
+  type: paper
+  cited_by:
+    - dan-hendrycks
+  tags: []
+- id: b88263a70cbf743e
+  url: https://arxiv.org/abs/2206.08966
+  title: Barrett, A.M., Hendrycks, D., Newman, J., & Nonnecke, B.
+  type: paper
+  cited_by:
+    - dan-hendrycks
+  tags: []
+- id: b3e647be3bc180f4
+  url: https://arxiv.org/pdf/2212.08073
+  title: 'Anthropic Research Team, "Constitutional AI: Harmlessness from AI Feedback," arXiv, December
+    2022'
+  type: paper
+  cited_by:
+    - daniela-amodei
+  tags: []
+- id: a4572a8ebeee9ecd
+  url: https://link.springer.com/article/10.1007/s44163-024-00112-9
+  title: "The content intelligence: an argument against the lethality of artificial intelligence |
+    Discover Artificial Intelligence | Springer Nature Link"
+  type: paper
+  cited_by:
+    - eliezer-yudkowsky
+  tags: []
+- id: 9cee40b637f69874
+  url: https://arxiv.org/abs/1409.3215
+  title: PDF
+  type: paper
+  cited_by:
+    - ilya-sutskever
+  tags: []
+- id: 54eec19853953598
+  url: https://arxiv.org/abs/2109.10862
+  title: "[2109.10862] Recursively Summarizing Books with Human Feedback"
+  type: paper
+  cited_by:
+    - jan-leike
+  tags: []
+- id: 7fb4e86ee58c8e1c
+  url: https://onlinelibrary.wiley.com/doi/10.1111/risa.70023
+  title: Adversarial Collaboration on AI Risk | Wiley Online Library
+  type: paper
+  cited_by:
+    - philip-tetlock
+  tags: []
+- id: dfac0b0fc5650aa5
+  url: https://arxiv.org/html/2512.10150v1
+  title: '"Unforgotten Safety: Preserving Safety Alignment of LLMs with Continual Learning"'
+  type: paper
+  cited_by:
+    - alignment
+  tags: []
+- id: b97d5c85dbbacca3
+  url: https://arxiv.org/abs/2501.16534
+  title: '"Targeting Alignment: Extracting Safety Classifiers of Aligned LLMs"'
+  type: paper
+  cited_by:
+    - alignment
+  tags: []
+- id: e36047b497801066
+  url: https://arxiv.org/abs/2504.16137
+  title: VCT paper
+  type: paper
+  cited_by:
+    - biosecurity-overview
+    - ea-biosecurity-scope
+  tags: []
+- id: 020b6b865482854c
+  url: https://arxiv.org/html/2505.22073v2
+  title: arXiv - Generative AI Incidents Analysis
+  type: paper
+  cited_by:
+    - nist-ai-rmf
+  tags: []
+- id: b800723d60cc4559
+  url: https://arxiv.org/html/2511.21901v1
+  title: arXiv - AI Security Threat Taxonomy
+  type: paper
+  cited_by:
+    - nist-ai-rmf
+  tags: []
+- id: 921525bfd95c09d9
+  url: https://arxiv.org/html/2503.05773v1
+  title: arXiv - Cross-Regional AI Risk Management Study
+  type: paper
+  cited_by:
+    - nist-ai-rmf
+  tags: []
+- id: d9670d76a4fa9cde
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12425422/
+  title: "NIH PMC: RAG for Cancer Information"
+  type: paper
+  cited_by:
+    - reducing-hallucinations
+  tags: []
+- id: e7ae9717cdb69808
+  url: https://pubmed.ncbi.nlm.nih.gov/40934488/
+  title: "PubMed: Reducing Hallucinations with RAG"
+  type: paper
+  cited_by:
+    - reducing-hallucinations
+  tags: []
+- id: 5ecee4eb7e22949a
+  url: https://arxiv.org/abs/2401.01313
+  title: "arXiv: Survey of Hallucination Mitigation"
+  type: paper
+  cited_by:
+    - reducing-hallucinations
+  tags: []
+- id: cfd4dd7a40a56031
+  url: https://arxiv.org/html/2510.07775v2
+  title: "The Unintended Trade-off of AI Alignment: Balancing Hallucination ..."
+  type: paper
+  cited_by:
+    - reducing-hallucinations
+  tags: []
+- id: fdbf8855dee63d77
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10483440/
+  title: "NIH PMC: Hallucination Terminology"
+  type: paper
+  cited_by:
+    - reducing-hallucinations
+  tags: []
+- id: f4ba840569bf2bb5
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC9676559/
+  title: "PMC Academic - Obligations to assess: Recent trends in AI accountability regulations"
+  type: paper
+  cited_by:
+    - us-state-legislation
+  tags: []
+- id: e64f99cc62ecd621
+  url: https://pubmed.ncbi.nlm.nih.gov/37469441/
+  title: PubMed - Wikipedia page views for health research
+  type: paper
+  cited_by:
+    - wikipedia-views
+  tags: []
+- id: c877dca84f885292
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10353851/
+  title: PMC - Wikipedia page views for health research
+  type: paper
+  cited_by:
+    - wikipedia-views
+  tags: []
+- id: 09626709273c5e9f
+  url: https://arxiv.org/abs/1903.10670
+  title: arXiv - Detecting and Gauging Impact on Wikipedia Page Views
+  type: paper
+  cited_by:
+    - wikipedia-views
+  tags: []
+- id: c64c6bdd2df72736
+  url: https://arxiv.org/html/2510.00650v1
+  title: ArXiv preprint on Community Notes helpfulness rates and timing.
+  type: paper
+  cited_by:
+    - x-com-epistemics
+  tags: []
+- id: 0658f50044a00590
+  url: https://link.springer.com/article/10.1007/s42001-025-00381-z
+  title: A systematic review of echo chamber research
+  type: paper
+  cited_by:
+    - epistemic-collapse
+  tags: []
+- id: 567dc5240aed22d2
+  url: https://arxiv.org/html/2401.05566v3
+  title: Sleeper Agents arXiv HTML
+  type: paper
+  cited_by:
+    - sleeper-agents
+  tags: []
+- id: b1d1daed71579f2b
+  url: https://arxiv.org/html/2601.00306v1
+  title: "The Generative AI Paradox: GenAI and the Erosion of Trust, the Corrosion of Information
+    Verification, and the Demise of Truth"
+  type: paper
+  cited_by:
+    - trust-cascade
+  tags: []
+- id: e9738edfd455b6c7
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC12141277
+  title: "False failures, real distrust: the impact of an infrastructure failure deepfake on
+    government trust - PMC"
+  type: paper
+  cited_by:
+    - trust-cascade
+  tags: []

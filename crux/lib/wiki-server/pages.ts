@@ -3,99 +3,35 @@
  *
  * Shared types and wrapper functions for page-related API endpoints.
  * Consumed by crux/commands/context.ts and crux/commands/query.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
+import type {
+  PageSearchResult,
+  PageDetailRow,
+  RelatedPagesResult,
+  BacklinksResult,
+  BacklinkEntry,
+  RelatedEntry,
+  CitationQuoteRow,
+  CitationQuotesResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — response (re-exported from canonical api-types.ts)
 // ---------------------------------------------------------------------------
 
-export interface PageSearchResult {
-  results: Array<{
-    id: string;
-    numericId: string | null;
-    title: string;
-    description: string | null;
-    entityType: string | null;
-    category: string | null;
-    readerImportance: number | null;
-    quality: number | null;
-    score: number;
-  }>;
-  query: string;
-  total: number;
-}
+export type { PageSearchResult, BacklinksResult, CitationQuotesResult, BacklinkEntry, RelatedEntry };
 
-export interface PageDetail {
-  id: string;
-  numericId: string | null;
-  title: string;
-  description: string | null;
-  llmSummary: string | null;
-  category: string | null;
-  subcategory: string | null;
-  entityType: string | null;
-  tags: string | null;
-  quality: number | null;
-  readerImportance: number | null;
-  hallucinationRiskLevel: string | null;
-  hallucinationRiskScore: number | null;
-  contentPlaintext: string | null;
-  wordCount: number | null;
-  lastUpdated: string | null;
-  contentFormat: string | null;
-  syncedAt: string;
-}
+/** Backward-compatible alias for PageDetailRow. */
+export type PageDetail = PageDetailRow;
 
-export interface RelatedResult {
-  entityId: string;
-  related: Array<{
-    id: string;
-    type: string;
-    title: string;
-    score: number;
-    label?: string;
-  }>;
-  total: number;
-}
+/** Backward-compatible alias for RelatedPagesResult. */
+export type RelatedResult = RelatedPagesResult;
 
-export interface BacklinksResult {
-  targetId: string;
-  backlinks: Array<{
-    id: string;
-    type: string;
-    title: string;
-    relationship?: string;
-    linkType: string;
-    weight: number;
-  }>;
-  total: number;
-}
-
-export interface CitationQuote {
-  id: number;
-  pageId: string;
-  footnote: number;
-  url: string | null;
-  resourceId: string | null;
-  claimText: string;
-  claimContext: string | null;
-  sourceQuote: string | null;
-  sourceLocation: string | null;
-  quoteVerified: boolean;
-  verificationScore: number | null;
-  sourceTitle: string | null;
-  sourceType: string | null;
-  accuracyVerdict: string | null;
-  accuracyScore: number | null;
-}
-
-export interface CitationQuotesResult {
-  quotes: CitationQuote[];
-  pageId: string;
-  total: number;
-}
+/** Backward-compatible alias for CitationQuoteRow. */
+export type CitationQuote = CitationQuoteRow;
 
 // ---------------------------------------------------------------------------
 // API functions

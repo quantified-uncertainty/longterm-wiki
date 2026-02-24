@@ -1,7 +1,3 @@
-# Think Tanks
-# Policy research and think tank publications
-# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
-
 - id: 9b47bf8077fd8b05
   url: https://www.atlanticcouncil.org/programs/digital-forensic-research-lab/
   title: Atlantic Council DFRLab
@@ -2172,7 +2168,7 @@
     - us-aisi
 - id: 0749fd23bc08105b
   url: https://www.rand.org/pubs/perspectives/PEA4361-1.html
-  title: "Evaluating Select Global Technical Options for Countering a Rogue AI"
+  title: Evaluating Select Global Technical Options for Countering a Rogue AI
   type: web
   publication_id: rand
   cited_by:

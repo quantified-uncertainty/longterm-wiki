@@ -34,6 +34,10 @@ import {
   getBacklinks,
   getCitationQuotes,
 } from '../lib/wiki-server/pages.ts';
+import type {
+  SessionPageChangesResult,
+  RiskLatestResult,
+} from '../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -376,20 +380,6 @@ export async function page(args: string[], options: Record<string, unknown>): Pr
 // recent-changes — recent session page changes
 // ---------------------------------------------------------------------------
 
-interface SessionEntry {
-  id: number;
-  date: string;
-  branch: string | null;
-  title: string;
-  model: string | null;
-  prUrl: string | null;
-  pages: string[];
-}
-
-interface SessionPageChangesResult {
-  sessions: SessionEntry[];
-}
-
 export async function recentChanges(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
@@ -599,16 +589,6 @@ export async function citations(args: string[], options: Record<string, unknown>
 // ---------------------------------------------------------------------------
 // risk — hallucination risk scores
 // ---------------------------------------------------------------------------
-
-interface RiskLatestResult {
-  pages: Array<{
-    pageId: string;
-    score: number;
-    level: string;
-    factors: unknown;
-    computedAt: string;
-  }>;
-}
 
 export async function risk(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);

@@ -3,6 +3,7 @@
  *
  * Client functions for the job queue system.
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
@@ -12,6 +13,11 @@ import type {
   CompleteJob,
   FailJob,
   SweepJobs,
+  JobRow,
+  ListJobsResult,
+  ClaimJobResult,
+  JobStatsResult,
+  SweepJobsResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -25,53 +31,19 @@ export type { FailJob as FailJobInput };
 export type { SweepJobs as SweepJobsInput };
 
 // ---------------------------------------------------------------------------
-// Types — response shapes (defined by server RETURNING clauses)
+// Types — response (re-exported from canonical api-types.ts)
 // ---------------------------------------------------------------------------
 
-export interface JobEntry {
-  id: number;
-  type: string;
-  status: string;
-  params: Record<string, unknown> | null;
-  result: Record<string, unknown> | null;
-  error: string | null;
-  priority: number;
-  retries: number;
-  maxRetries: number;
-  createdAt: string;
-  claimedAt: string | null;
-  startedAt: string | null;
-  completedAt: string | null;
-  workerId: string | null;
-}
+export type { ListJobsResult, JobStatsResult };
 
-export interface ListJobsResult {
-  entries: JobEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
+/** Backward-compatible alias for JobRow. */
+export type JobEntry = JobRow;
 
-export interface ClaimResult {
-  job: JobEntry | null;
-}
+/** Backward-compatible alias for ClaimJobResult. */
+export type ClaimResult = ClaimJobResult;
 
-export interface JobStatsResult {
-  totalJobs: number;
-  byType: Record<
-    string,
-    {
-      byStatus: Record<string, number>;
-      avgDurationMs?: number;
-      failureRate?: number;
-    }
-  >;
-}
-
-export interface SweepResult {
-  swept: number;
-  jobs: Array<{ id: number; type: string }>;
-}
+/** Backward-compatible alias for SweepJobsResult. */
+export type SweepResult = SweepJobsResult;
 
 // ---------------------------------------------------------------------------
 // API functions

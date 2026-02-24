@@ -106,6 +106,12 @@ const SCRIPTS = {
     description: 'Show citation content coverage stats (SQLite vs PostgreSQL)',
     passthrough: ['json'],
   },
+  'register-resources': {
+    script: 'citations/register-resources.ts',
+    description: 'Auto-create resource YAML entries for unregistered footnote URLs',
+    passthrough: ['dry-run', 'all', 'limit', 'json'],
+    positional: true,
+  },
 };
 
 export const commands = buildCommands(SCRIPTS, 'report');

@@ -647,7 +647,7 @@ function buildIssueBody(opts: {
  * Create a new GitHub issue.
  */
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
-  const log = createLogger(options.ci);
+const log = createLogger(options.ci);
   const c = log.colors;
 
   const title = args[0];
@@ -1157,7 +1157,7 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
 
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
-    return {
+return {
       output: `${c.red}Usage: crux issues update-body <issue-number> [--body-file=path] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
       exitCode: 1,
     };
@@ -1348,6 +1348,48 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
 }
 
 // ---------------------------------------------------------------------------
+// update-title
+// ---------------------------------------------------------------------------
+
+/**
+ * Update the title of an existing issue.
+ */
+async function updateTitle(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const issueNum = parseRequiredInt(args[0]);
+  if (!issueNum) {
+    return {
+      output: `${c.red}Usage: crux issues update-title <issue-number> --title="New title"${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const newTitle = options.title as string | undefined;
+  if (!newTitle) {
+    return {
+      output: `${c.red}Missing --title flag. Usage: crux issues update-title <N> --title="New title"${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
+
+  await githubApi(`/repos/${REPO}/issues/${issueNum}`, {
+    method: 'PATCH',
+    body: { title: newTitle },
+  });
+
+  let output = `${c.green}✓${c.reset} Updated title for issue #${issueNum}\n`;
+  output += `  ${c.dim}Old:${c.reset} ${issue.title}\n`;
+  output += `  ${c.green}New:${c.reset} ${newTitle}\n`;
+  output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
+
+  return { output, exitCode: 0 };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -1357,6 +1399,7 @@ export const commands = {
   next,
   create,
   'update-body': updateBody,
+  'update-title': updateTitle,
   lint,
   start,
   done,
@@ -1373,6 +1416,7 @@ Commands:
   next                Show the single next issue to pick up
   create <title>      Create a new GitHub issue (supports structured template)
   update-body <N>     Update an issue body using structured template args
+  update-title <N>    Update an issue title
   lint [N]            Check issue formatting (all issues, or single by number)
   start <N>           Signal start: post comment + add \`claude-working\` label
   done <N>            Signal completion: post comment + remove label
@@ -1396,6 +1440,9 @@ Options (create):
   --model=haiku|sonnet|opus  Recommended model for this issue (REQUIRED)
   --cost="~$2-4"      Estimated AI cost
   --draft             Skip --model/--criteria validation (for WIP issues)
+
+Options (update-title):
+  --title="..."       New title for the issue (REQUIRED)
 
 Options (update-body):
   --body-file=<path>  Set raw body directly (no merge — use for rich multi-section bodies)

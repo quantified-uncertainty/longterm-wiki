@@ -12,6 +12,7 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
+import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry } from "@wiki-server/api-types";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -160,41 +161,13 @@ export interface CruxData {
   summary?: string;
 }
 
-export interface Intervention {
-  id: string;
-  name: string;
-  category?: string;
-  description?: string;
-  riskCoverage?: {
-    accident?: string;
-    misuse?: string;
-    structural?: string;
-    epistemic?: string;
-  };
-  primaryMechanism?: string;
-  tractability?: string;
-  neglectedness?: string;
-  importance?: string;
-  overallPriority?: string;
-  timelineFit?: string;
-  currentState?: string;
-  fundingLevel?: string;
-  fundingShare?: string;
-  recommendedShift?: string;
-  wikiPageId?: string;
-  relatedInterventions?: string[];
-  relevantResearch?: Array<{ title: string; url?: string }>;
-}
-
 interface DatabaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   resources: Resource[];
   publications: Publication[];
   experts: Expert[];
   organizations: Organization[];
-  interventions: Intervention[];
   cruxes: CruxData[];
-  proposals: Proposal[];
   prItems: PrItem[];
   backlinks: Record<string, BacklinkEntry[]>;
   relatedGraph: Record<string, RelatedGraphEntry[]>;
@@ -209,6 +182,8 @@ interface DatabaseShape {
   factUsage: Record<string, FactUsagePage[]>;
   /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
   pageResources: Record<string, string[]>;
+  /** Footnote index: page → { footnotes, sources } for unified citation rendering */
+  footnoteIndex?: Record<string, FootnoteIndexEntry>;
   stats: Record<string, unknown>;
   /** Pre-computed update schedule items (staleness, priority, etc.) */
   updateSchedule?: Array<{
@@ -334,6 +309,28 @@ interface Entity {
   sourceRefs?: string[];
   sources?: { title: string; url?: string; author?: string; date?: string }[];
   content?: unknown;
+}
+
+/** Single footnote entry in the footnoteIndex */
+export interface FootnoteEntry {
+  url: string | null;
+  title: string | null;
+  resourceId?: string;
+}
+
+/** Source group in the footnoteIndex — deduped by URL */
+export interface FootnoteSourceEntry {
+  url: string;
+  title: string;
+  domain: string;
+  footnoteNumbers: number[];
+  resourceId: string | null;
+}
+
+/** Per-page footnote index data */
+export interface FootnoteIndexEntry {
+  footnotes: Record<number, FootnoteEntry>;
+  sources: FootnoteSourceEntry[];
 }
 
 export interface Resource {
@@ -623,6 +620,25 @@ export function getResourceById(id: string): Resource | undefined {
 export function getResourcesForPage(pageId: string): string[] {
   const db = getDatabase();
   return db.pageResources?.[resolveId(pageId)] ?? [];
+}
+
+/** Get page IDs that cite a given resource (reverse lookup of pageResources) */
+export function getPagesForResource(resourceId: string): string[] {
+  const db = getDatabase();
+  const pr = db.pageResources ?? {};
+  const pages: string[] = [];
+  for (const [pageId, ids] of Object.entries(pr)) {
+    if ((ids as string[]).includes(resourceId)) {
+      pages.push(pageId);
+    }
+  }
+  return pages;
+}
+
+/** Get footnote index data for a page (computed at build time from MDX footnotes) */
+export function getFootnoteIndex(pageId: string): FootnoteIndexEntry | undefined {
+  const db = getDatabase();
+  return db.footnoteIndex?.[resolveId(pageId)];
 }
 
 export function getPublicationById(id: string): Publication | undefined {
@@ -1103,13 +1119,8 @@ export function getBacklinksFor(
   }));
 }
 
-/** Server response shape for backlinks endpoint */
-interface ServerBacklink {
-  id: string;
-  type: string;
-  title: string;
-  relationship?: string;
-}
+/** Server response shape for backlinks endpoint — imported from shared api-types */
+type ServerBacklink = ServerBacklinkEntry;
 
 /**
  * Fetch backlinks from wiki-server with fallback to local database.json.
@@ -1162,15 +1173,6 @@ export function getRelatedGraphFor(
     ...entry,
     href: getEntityHref(entry.id, entry.type),
   }));
-}
-
-/** Server response shape for related endpoint */
-interface ServerRelatedEntry {
-  id: string;
-  type: string;
-  title: string;
-  score: number;
-  label?: string;
 }
 
 /**
@@ -1488,15 +1490,6 @@ export function getFactUsage(): Record<string, FactUsagePage[]> {
 }
 
 // ============================================================================
-// INTERVENTIONS
-// ============================================================================
-
-export function getInterventions(): Intervention[] {
-  const db = getDatabase();
-  return db.interventions || [];
-}
-
-// ============================================================================
 // CRUXES
 // ============================================================================
 
@@ -1522,31 +1515,6 @@ export function getCruxesByDomain(domain: string): CruxData[] {
   return getCruxes().filter(
     (c) => c.domain?.toLowerCase() === domain.toLowerCase()
   );
-}
-
-// ============================================================================
-// PROPOSALS
-// ============================================================================
-
-export interface Proposal {
-  id: string;
-  name: string;
-  description?: string;
-  sourcePageId?: string;
-  domain?: string;
-  stance?: string;
-  costEstimate?: string;
-  evEstimate?: string;
-  feasibility?: string;
-  honestConcerns?: string;
-  status?: string;
-  leadOrganizations?: string[];
-  relatedProposals?: string[];
-}
-
-export function getProposals(): Proposal[] {
-  const db = getDatabase();
-  return db.proposals || [];
 }
 
 // ============================================================================
