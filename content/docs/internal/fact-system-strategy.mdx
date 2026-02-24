@@ -1,0 +1,184 @@
+---
+title: "Fact System Strategy"
+description: "Analysis of what's working and not working with the canonical facts system, and a revised strategy for when and how to use facts."
+sidebar:
+  order: 11
+entityType: internal
+quality: 40
+readerImportance: 10
+researchImportance: 20
+lastEdited: "2026-02-23"
+update_frequency: 90
+evergreen: true
+ratings:
+  novelty: 5
+  rigor: 6
+  actionability: 8
+  completeness: 6
+---
+
+## Status
+
+The fact system exists and works technically, but its usage has been unfocused. This page documents the problems and outlines a revised strategy.
+
+**Current infrastructure:**
+- 139 facts across 18 entity YAML files in `data/facts/`
+- 25 measure definitions in `data/fact-measures.yaml`
+- `<F>` component renders inline values with hover tooltips
+- `<Calc>` component derives values from multiple facts
+- `crux facts extract` pipeline can scan pages and propose new facts
+- `crux enrich fact-refs` pipeline can wrap inline numbers with `<F>` tags
+- Build-time system computes fact timeseries, usage tracking, source resolution
+
+**Current usage:** ~234 `<F>` tags across ~13 pages, heavily concentrated on Anthropic (82.5% of all tags). Most are on financial pages (valuation, IPO, investors, stakeholders).
+
+## Problems with the Current Approach
+
+### 1. Most `<F>` tags duplicate inline text and add no value
+
+The enrichment pipeline wraps existing text:
+```mdx
+{/* Before */}
+xAI raised \$26 billion in funding
+
+{/* After — the number is still hardcoded in the display text */}
+xAI raised <F e="xai" f="6d5128e4">\$26 billion</F> in funding
+```
+
+This is worse than useless: it adds JSX complexity without providing the core benefit of facts (single source of truth). If the YAML value updates to \$30B, the display text still says "\$26 billion."
+
+### 2. The enrichment pipeline tags numbers indiscriminately
+
+The `crux enrich fact-refs` pipeline uses an LLM to match inline numbers to facts, but it has no judgment about whether tagging adds value. It wraps:
+- Benchmark scores from specific papers (will never change)
+- Historical funding amounts (fixed in time)
+- Random contextual numbers (e.g., "5" from "54%")
+
+### 3. Entity ID syntax is inconsistent
+
+`<F e="ssi" f="a0502d56">` uses entity slugs, while `<EntityLink id="E338">` uses numeric IDs. The `e` attribute is also redundant since fact hash IDs are globally unique.
+
+### 4. The extraction pipeline creates too many low-value facts
+
+`crux facts extract` proposes facts for any entity-attributable number, including historical dates, one-time events, and fixed measurements. This dilutes the fact database with entries that never need updating.
+
+## What Facts Are Actually Good For
+
+The fact system provides real value in exactly one scenario: **a number that changes over time and appears on multiple pages.**
+
+When Anthropic raises a new round, updating one YAML entry should update:
+- The company page valuation
+- The IPO analysis page
+- The investor returns page
+- The stakeholder page
+- Any comparison tables on competitor pages
+
+This is the "update once, correct everywhere" value proposition. Everything else is overhead.
+
+### Secondary value: computed derived values
+
+`<Calc>` expressions that combine facts (revenue multiples, growth rates, funding ratios) auto-update when either input changes. This is genuinely useful and only possible with structured fact data.
+
+### Tertiary value: structured data for dashboards
+
+Fact YAML files provide structured, queryable data for internal dashboards (timeseries charts, entity comparisons, fact freshness tracking). This value exists even if facts aren't rendered inline.
+
+## Revised Strategy
+
+### What should be a fact
+
+Only numbers that satisfy **all three criteria**:
+
+1. **Volatile**: Will change with the next data update (quarterly earnings, annual headcount, latest valuation)
+2. **Multi-page**: Currently appears or should appear on 2+ wiki pages
+3. **Entity-attributable**: Tied to a specific entity in our data layer
+
+Examples of good facts: current valuation, latest revenue, current headcount, total funding raised, user counts.
+
+Examples of bad facts: founding dates, historical funding round amounts, benchmark scores from specific papers, one-time event figures.
+
+### How facts should be rendered
+
+**Self-closing `<F>` tags should be the default:**
+```mdx
+{/* Good — value comes from YAML, updates automatically */}
+xAI is valued at <F f="99a5a666" /> as of its Series E round.
+
+{/* Bad — value is hardcoded, defeats the purpose */}
+xAI is valued at <F e="xai" f="99a5a666">\$230 billion</F> as of its Series E round.
+```
+
+The component should format the value using the measure's display rules (`fact-measures.yaml` defines prefix, suffix, divisor). Override text should be rare, reserved for cases where the prose needs a different format than the default.
+
+### Simplify the tag syntax
+
+Since fact IDs are globally unique 8-char hashes, the entity can be resolved at build time:
+```mdx
+{/* Current — redundant entity ID */}
+<F e="anthropic" f="6796e194" />
+
+{/* Proposed — entity looked up from fact database */}
+<F f="6796e194" />
+```
+
+The `e` attribute should be optional (for disambiguation in edge cases), not required.
+
+### Scale deliberately, not automatically
+
+Don't batch-enrich the entire wiki. Instead:
+
+1. **Identify the 20-30 numbers that actually change frequently** (company valuations, revenue, headcount, total funding)
+2. **Create facts for those, with self-closing `<F>` tags**
+3. **Use `<Calc>` for derived values** that reference those facts (revenue multiples, growth rates)
+4. **Leave everything else as plain text**
+
+The extraction pipeline (`crux facts extract`) is useful for proposing candidates, but a human should decide which ones become facts.
+
+### Clean up existing usage
+
+The ~234 existing `<F>` tags (mostly on Anthropic pages) should be audited:
+- Tags that duplicate inline text should be converted to self-closing `<F f="id" />` or removed
+- Tags wrapping historical/fixed numbers should be removed (the number goes back to plain text)
+- The `<F>` component needs to support reliable self-closing rendering before this migration
+
+## Implementation Priorities
+
+### Phase 1: Fix the `<F>` component (prerequisite)
+
+Make `<F f="id" />` (self-closing, no children) the primary rendering mode:
+- Look up entity from fact hash at build time
+- Format display value from fact's `value` + measure's `display` rules
+- Support `showDate` for temporal context
+- Graceful fallback if fact not found (render `[missing fact]` or similar)
+
+### Phase 2: Audit and clean up existing facts
+
+- Review all 139 facts: keep volatile multi-page ones, archive or remove the rest
+- Convert remaining `<F>` tags in MDX to self-closing form
+- Remove tags that reference historical/fixed facts
+
+### Phase 3: Expand to high-value volatile facts
+
+Focus on the ~20 numbers that change most frequently and appear on the most pages:
+- Company valuations (Anthropic, OpenAI, xAI, SSI, Meta AI)
+- Revenue figures (Anthropic, OpenAI, xAI)
+- Headcounts for major labs
+- Total AI safety funding by major funders
+- Key user/customer counts
+
+### Phase 4: Build update workflows
+
+The real payoff comes when facts are easy to update:
+- Auto-update pipeline detects new funding rounds, earnings reports
+- `crux facts update <entity>` proposes value changes from news
+- Dashboard shows stale facts (asOf older than expected for that measure)
+
+## Open Questions
+
+1. **Should fact YAML files exist for entities with no volatile facts?** We have 18 files now but many contain only historical data. Consider pruning to only entities with actively-updated numbers.
+
+2. **Should the enrichment pipeline be removed or repurposed?** `crux enrich fact-refs` wraps existing text, which we've identified as low-value. Could be repurposed to find and *replace* hardcoded numbers with self-closing `<F>` tags instead.
+
+3. **How should facts interact with the auto-update system?** When the auto-update pipeline detects a new Anthropic valuation, should it automatically update `data/facts/anthropic.yaml`? This is the highest-leverage integration.
+
+4. **What's the right display format for self-closing `<F>` tags in prose?** "\$380 billion" vs "\$380B" vs "380B" depends on context (tables vs prose). Should the measure's display rules handle this, or should there be format variants?
