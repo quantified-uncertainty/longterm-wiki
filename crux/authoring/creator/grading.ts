@@ -201,8 +201,7 @@ Respond with JSON:
     // Write updated file — reorder keys to canonical order before serialization
     const orderedFrontmatter = reorderFrontmatterObject(frontmatter);
     const { stringify: stringifyYaml } = await import('yaml');
-    let yamlStr = stringifyYaml(orderedFrontmatter);
-    yamlStr = yamlStr.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');
+    const yamlStr = stringifyYaml(orderedFrontmatter);
     const newContent = `---\n${yamlStr}---\n${body}`;
     fs.writeFileSync(finalPath, newContent);
 
