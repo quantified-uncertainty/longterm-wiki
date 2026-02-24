@@ -13,7 +13,7 @@
 // ---------------------------------------------------------------------------
 
 export { getServerUrl, getApiKey, buildHeaders, isServerAvailable } from './client.ts';
-export type { ApiResult, ApiError } from './client.ts';
+export type { ApiResult, ApiError, ApiKeyScope } from './client.ts';
 export { apiOk, apiErr, unwrap } from './client.ts';
 
 // ---------------------------------------------------------------------------

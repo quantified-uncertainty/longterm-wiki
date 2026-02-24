@@ -105,6 +105,8 @@ export const wikiPages = pgTable(
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    syncedFromBranch: text("synced_from_branch"),
+    syncedFromCommit: text("synced_from_commit"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

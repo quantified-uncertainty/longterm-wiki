@@ -2,10 +2,19 @@
  * Facts API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { batchedRequest, getServerUrl, apiRequest, type ApiResult } from './client.ts';
-import type { SyncFact } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  SyncFact,
+  SyncFactsResult,
+  FactRow,
+  FactsByEntityResult,
+  FactTimeseriesResult,
+  StaleFactsResult,
+  FactStatsResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -13,67 +22,17 @@ import type { SyncFact } from '../../../apps/wiki-server/src/api-types.ts';
 
 export type SyncFactItem = SyncFact;
 
-export interface SyncFactsResult {
-  upserted: number;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface FactEntry {
-  id: number;
-  entityId: string;
-  factId: string;
-  label: string | null;
-  value: string | null;
-  numeric: number | null;
-  low: number | null;
-  high: number | null;
-  asOf: string | null;
-  measure: string | null;
-  subject: string | null;
-  note: string | null;
-  source: string | null;
-  sourceResource: string | null;
-  format: string | null;
-  formatDivisor: number | null;
-  syncedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type { SyncFactsResult, FactsByEntityResult, StaleFactsResult, FactStatsResult };
 
-export interface FactsByEntityResult {
-  entityId: string;
-  facts: FactEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
+/** Backward-compatible alias for FactRow. */
+export type FactEntry = FactRow;
 
-export interface TimeseriesResult {
-  entityId: string;
-  measure: string;
-  points: FactEntry[];
-  total: number;
-}
-
-export interface StaleFactsResult {
-  facts: Array<{
-    entityId: string;
-    factId: string;
-    label: string | null;
-    asOf: string | null;
-    measure: string | null;
-    value: string | null;
-    numeric: number | null;
-  }>;
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface FactStatsResult {
-  total: number;
-  uniqueEntities: number;
-  uniqueMeasures: number;
-}
+/** Backward-compatible alias for FactTimeseriesResult. */
+export type TimeseriesResult = FactTimeseriesResult;
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -104,6 +63,8 @@ export async function syncFacts(
       'POST',
       '/api/facts/sync',
       { facts: batch },
+      undefined,
+      'content',
     );
 
     if (!result.ok) {
@@ -152,4 +113,3 @@ export async function getStaleFacts(
 export async function getFactStats(): Promise<ApiResult<FactStatsResult>> {
   return apiRequest<FactStatsResult>('GET', '/api/facts/stats');
 }
-

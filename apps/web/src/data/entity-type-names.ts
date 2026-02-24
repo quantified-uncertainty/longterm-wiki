@@ -31,14 +31,12 @@ const CANONICAL_ENTITY_TYPE_NAMES = [
   "concept",
   "case-study",
   "person",
-  "scenario",
   "resource",
   "funder",
   "historical",
   "analysis",
   "model",
   "parameter",
-  "metric",
   "argument",
   "table",
   "diagram",
@@ -47,12 +45,6 @@ const CANONICAL_ENTITY_TYPE_NAMES = [
   "overview",
   "intelligence-paradigm",
   "internal",
-  // AI Transition Model specific types
-  "ai-transition-model-parameter",
-  "ai-transition-model-metric",
-  "ai-transition-model-scenario",
-  "ai-transition-model-factor",
-  "ai-transition-model-subitem",
 ] as const;
 
 /** TypeScript type for a canonical entity type name */

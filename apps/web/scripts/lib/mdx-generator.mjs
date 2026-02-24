@@ -78,8 +78,6 @@ export function generateMdxFromYaml(entities, options = { dryRun: false }) {
     if (!entity.content || !entity.path) continue;
 
     // Convert URL path to file path
-    // e.g., /ai-transition-model/scenarios/human-catastrophe/state-actor/
-    //    -> src/content/docs/ai-transition-model/scenarios/human-catastrophe/state-actor.mdx
     const urlPath = entity.path.replace(/^\/|\/$/g, ''); // Remove leading/trailing slashes
     const mdxPath = join(CONTENT_DIR, `${urlPath}.mdx`);
 

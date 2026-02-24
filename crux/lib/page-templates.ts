@@ -39,116 +39,12 @@ export interface PageTemplate {
   name: string;
   contentFormat?: ContentFormat;
   minWordCount?: number;
-  usesATMPage?: boolean;
   frontmatter: FrontmatterField[];
   sections: SectionDef[];
   qualityCriteria: QualityCriterion[];
 }
 
 export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
-  'ai-transition-model-factor': {
-    id: 'ai-transition-model-factor',
-    name: 'AI Transition Model - Root Factor',
-    minWordCount: 300,
-    frontmatter: [
-      { name: 'title', required: true, weight: 5 },
-      { name: 'description', required: true, weight: 10 },
-      { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: false, weight: 5 },
-    ],
-    sections: [
-      { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 20 },
-      { id: 'sub-factors', label: 'Sub-Factors', alternateLabels: ['Components', 'Sub-Items'], required: true, weight: 15 },
-    ],
-    qualityCriteria: [
-      { id: 'has-diagram', label: 'Has Diagram', weight: 15, detection: 'diagram' },
-      { id: 'has-table', label: 'Has Data Table', weight: 10, detection: 'table' },
-      { id: 'word-count', label: 'Sufficient Length', weight: 10, detection: 'content' },
-    ],
-  },
-  'ai-transition-model-scenario': {
-    id: 'ai-transition-model-scenario',
-    name: 'AI Transition Model - Scenario Category',
-    minWordCount: 300,
-    frontmatter: [
-      { name: 'title', required: true, weight: 5 },
-      { name: 'description', required: true, weight: 10 },
-      { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: false, weight: 5 },
-    ],
-    sections: [
-      { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 20 },
-      { id: 'variants', label: 'Variants', alternateLabels: ['Scenario Variants', 'Types'], required: true, weight: 15 },
-    ],
-    qualityCriteria: [
-      { id: 'has-diagram', label: 'Has Diagram', weight: 15, detection: 'diagram' },
-      { id: 'has-probability', label: 'Has Probability Estimates', weight: 10, detection: 'content', pattern: '\\d+%|probability|likelihood' },
-      { id: 'word-count', label: 'Sufficient Length', weight: 10, detection: 'content' },
-    ],
-  },
-  'ai-transition-model-outcome': {
-    id: 'ai-transition-model-outcome',
-    name: 'AI Transition Model - Outcome',
-    minWordCount: 400,
-    frontmatter: [
-      { name: 'title', required: true, weight: 5 },
-      { name: 'description', required: true, weight: 10 },
-      { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: false, weight: 5 },
-    ],
-    sections: [
-      { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 20 },
-      { id: 'sub-dimensions', label: 'Sub-dimensions', alternateLabels: ['Dimensions', 'Components'], required: true, weight: 15 },
-      { id: 'what-contributes', label: 'What Contributes', alternateLabels: ['Contributing Factors', 'What Shapes', 'What Shapes Long-term Trajectory'], required: true, weight: 15 },
-      { id: 'why-matters', label: 'Why This Matters', alternateLabels: [], required: true, weight: 10 },
-    ],
-    qualityCriteria: [
-      { id: 'has-diagram', label: 'Has Diagram', weight: 15, detection: 'diagram' },
-      { id: 'has-impact-list', label: 'Has Impact Scores', weight: 10, detection: 'component', pattern: 'ImpactList' },
-      { id: 'word-count', label: 'Sufficient Length', weight: 10, detection: 'content' },
-    ],
-  },
-  'ai-transition-model-sub-item': {
-    id: 'ai-transition-model-sub-item',
-    name: 'AI Transition Model - Sub-Item',
-    usesATMPage: true,
-    frontmatter: [
-      { name: 'title', required: true, weight: 10 },
-      { name: 'pageTemplate', required: true, weight: 5 },
-    ],
-    sections: [],
-    qualityCriteria: [
-      { id: 'uses-atmpage', label: 'Uses ATMPage Component', weight: 30, detection: 'component', pattern: 'ATMPage' },
-    ],
-  },
-  'ai-transition-model-parameter': {
-    id: 'ai-transition-model-parameter',
-    name: 'AI Transition Model - Parameter',
-    minWordCount: 2000,
-    frontmatter: [
-      { name: 'title', required: true, weight: 5 },
-      { name: 'description', required: true, weight: 15 },
-      { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: false, weight: 5 },
-    ],
-    sections: [
-      { id: 'parameter-network', label: 'Parameter Network', alternateLabels: ['Relationships', 'Network'], required: true, weight: 15 },
-      { id: 'current-state', label: 'Current State Assessment', alternateLabels: ['Current State', 'Assessment', 'Quantified'], required: true, weight: 15 },
-      { id: 'healthy-state', label: 'What "Healthy" Looks Like', alternateLabels: ['Healthy State', 'Optimal State', 'Target State', 'What "Healthy'], required: true, weight: 10 },
-      { id: 'threats', label: 'Factors That Decrease', alternateLabels: ['Threats', 'What Decreases', 'Negative Factors'], required: true, weight: 10 },
-      { id: 'supports', label: 'Factors That Increase', alternateLabels: ['Supports', 'What Increases', 'Positive Factors'], required: true, weight: 10 },
-      { id: 'why-matters', label: 'Why This Parameter Matters', alternateLabels: ['Why This Matters', 'Importance'], required: true, weight: 10 },
-      { id: 'trajectory', label: 'Trajectory and Scenarios', alternateLabels: ['Trajectory', 'Scenarios', 'Projections', 'Scenario Analysis'], required: true, weight: 10 },
-      { id: 'sources', label: 'Sources', alternateLabels: ['Sources & Key Research', 'References', 'Key Research'], required: true, weight: 10 },
-    ],
-    qualityCriteria: [
-      { id: 'has-mermaid', label: 'Has Network Diagram', weight: 15, detection: 'diagram', pattern: 'Mermaid' },
-      { id: 'has-data-tables', label: 'Has Data Tables', weight: 15, detection: 'table' },
-      { id: 'has-citations', label: 'Has Citations', weight: 15, detection: 'citation', pattern: '<R id=' },
-      { id: 'word-count', label: 'Comprehensive Length', weight: 10, detection: 'content' },
-      { id: 'has-cause-effect', label: 'Has Cause-Effect Graph', weight: 10, detection: 'component', pattern: 'PageCauseEffectGraph' },
-    ],
-  },
   'knowledge-base-risk': {
     id: 'knowledge-base-risk',
     name: 'Knowledge Base - Risk',

@@ -2,10 +2,18 @@
  * Claims API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from the canonical api-types.ts definitions.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type { InsertClaim } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  InsertClaim,
+  InsertClaimResult,
+  InsertClaimBatchResult,
+  ClearClaimsResult,
+  ClaimRow,
+  GetClaimsResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -13,38 +21,11 @@ import type { InsertClaim } from '../../../apps/wiki-server/src/api-types.ts';
 
 export type InsertClaimItem = InsertClaim;
 
-export interface InsertClaimResult {
-  id: number;
-  entityId: string;
-  claimType: string;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface InsertClaimBatchResult {
-  inserted: number;
-  results: Array<{ id: number; entityId: string; claimType: string }>;
-}
-
-export interface ClearClaimsResult {
-  deleted: number;
-}
-
-export interface ClaimRow {
-  id: number;
-  entityId: string;
-  entityType: string;
-  claimType: string;
-  claimText: string;
-  value: string | null;
-  unit: string | null;
-  confidence: string | null;
-  sourceQuote: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface GetClaimsResult {
-  claims: ClaimRow[];
-}
+export type { InsertClaimResult, InsertClaimBatchResult, ClearClaimsResult, ClaimRow, GetClaimsResult };
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -62,7 +43,7 @@ export async function getClaimsByEntity(
 export async function insertClaim(
   item: InsertClaimItem,
 ): Promise<ApiResult<InsertClaimResult>> {
-  return apiRequest<InsertClaimResult>('POST', '/api/claims', item);
+  return apiRequest<InsertClaimResult>('POST', '/api/claims', item, undefined, 'content');
 }
 
 export async function insertClaimBatch(
@@ -72,6 +53,8 @@ export async function insertClaimBatch(
     'POST',
     '/api/claims/batch',
     { items },
+    undefined,
+    'content',
   );
 }
 
@@ -82,6 +65,8 @@ export async function clearClaimsForEntity(
     'POST',
     '/api/claims/clear',
     { entityId },
+    undefined,
+    'content',
   );
 }
 

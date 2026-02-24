@@ -2,11 +2,21 @@
  * Sessions API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import type { z } from 'zod';
 import { apiRequest, type ApiResult } from './client.ts';
-import type { CreateSessionSchema } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  CreateSessionSchema,
+  CreateSessionResult,
+  SessionBatchResult,
+  SessionRow,
+  SessionListResult,
+  SessionByPageResult,
+  SessionStatsResult,
+  SessionPageChangesResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -15,58 +25,21 @@ import type { CreateSessionSchema } from '../../../apps/wiki-server/src/api-type
 /** Uses z.input (not z.infer) because the schema has .default() and .transform() on pages. */
 export type SessionApiEntry = z.input<typeof CreateSessionSchema>;
 
-export interface CreateSessionResult {
-  id: number;
-  date: string;
-  title: string;
-  pages: string[];
-  createdAt: string;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface SessionBatchResult {
-  upserted: number;
-  results: Array<{ id: number; title: string; pageCount: number }>;
-}
+export type {
+  CreateSessionResult,
+  SessionBatchResult,
+  SessionListResult,
+  SessionByPageResult,
+  SessionStatsResult,
+  SessionPageChangesResult,
+};
 
-export interface SessionEntry {
-  id: number;
-  date: string;
-  branch: string | null;
-  title: string;
-  summary: string | null;
-  model: string | null;
-  duration: string | null;
-  cost: string | null;
-  prUrl: string | null;
-  checksYaml: string | null;
-  issuesJson: unknown;
-  learningsJson: unknown;
-  recommendationsJson: unknown;
-  pages: string[];
-  createdAt: string;
-}
-
-export interface SessionListResult {
-  sessions: SessionEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface SessionByPageResult {
-  sessions: SessionEntry[];
-}
-
-export interface SessionStatsResult {
-  totalSessions: number;
-  uniquePages: number;
-  totalPageEdits: number;
-  byModel: Record<string, number>;
-}
-
-export interface SessionPageChangesResult {
-  sessions: SessionEntry[];
-}
+/** Backward-compatible alias for SessionRow. */
+export type SessionEntry = SessionRow;
 
 // ---------------------------------------------------------------------------
 // API functions (return ApiResult<T>)
@@ -75,13 +48,13 @@ export interface SessionPageChangesResult {
 export async function createSession(
   entry: SessionApiEntry,
 ): Promise<ApiResult<CreateSessionResult>> {
-  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry);
+  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry, undefined, 'project');
 }
 
 export async function createSessionBatch(
   items: SessionApiEntry[],
 ): Promise<ApiResult<SessionBatchResult>> {
-  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items });
+  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items }, undefined, 'project');
 }
 
 export async function listSessions(
@@ -110,4 +83,3 @@ export async function getSessionStats(): Promise<ApiResult<SessionStatsResult>> 
 export async function getSessionPageChanges(): Promise<ApiResult<SessionPageChangesResult>> {
   return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes?limit=500');
 }
-

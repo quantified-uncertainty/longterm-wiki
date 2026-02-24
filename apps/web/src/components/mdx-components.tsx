@@ -14,11 +14,6 @@ import { SquiggleEstimate } from "@/components/wiki/SquiggleEstimate";
 import { Callout } from "@/components/wiki/Callout";
 import { StarlightCard, CardGrid, LinkCard } from "@/components/wiki/StarlightCards";
 import { ComparisonTable } from "@/components/wiki/ComparisonTable";
-import { ATMPage } from "@/components/wiki/ATMPage";
-import { TransitionModelContent } from "@/components/wiki/TransitionModelContent";
-import TransitionModelTable from "@/components/wiki/TransitionModelTable";
-import { TransitionModelInteractive } from "@/components/wiki/TransitionModelTable";
-import { FactorSubItemsList, AllFactorsSubItems } from "@/components/wiki/FactorSubItemsList";
 import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
@@ -42,16 +37,10 @@ import { KeyPeople } from "@/components/wiki/KeyPeople";
 import { DisagreementMap } from "@/components/wiki/DisagreementMap";
 import { Crux } from "@/components/wiki/Crux";
 import { CruxList } from "@/components/wiki/CruxList";
-import { InterventionCard } from "@/components/wiki/InterventionCard";
-import { InterventionList } from "@/components/wiki/InterventionList";
-import { ProposalCard } from "@/components/wiki/ProposalCard";
-import { ProposalList } from "@/components/wiki/ProposalList";
 
 // Ported stub components — medium priority
 import { Tags } from "@/components/wiki/Tags";
 import { ModelsList } from "@/components/wiki/ModelsList";
-import { FactorRelationshipDiagram } from "@/components/wiki/FactorRelationshipDiagram";
-import { ImpactList } from "@/components/wiki/ImpactList";
 import { MdxTabs, MdxTabItem } from "@/components/wiki/MdxTabs";
 import { Badge } from "@/components/ui/badge";
 
@@ -130,14 +119,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Comparison table
   ComparisonTable,
 
-  // AI Transition Model components
-  ATMPage,
-  TransitionModelContent,
-  TransitionModelTable,
-  TransitionModelInteractive,
-  FactorSubItemsList,
-  AllFactorsSubItems,
-
   // Cause-Effect Graph components
   CauseEffectGraph,
   PageCauseEffectGraph,
@@ -168,17 +149,11 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DisagreementMap,
   Crux,
   CruxList,
-  InterventionCard,
-  InterventionList,
-  ProposalCard,
-  ProposalList,
 
   // Ported stub components — medium priority
   Tags,
   Badge,
   ModelsList,
-  FactorRelationshipDiagram,
-  ImpactList,
   Tabs: MdxTabs,
   TabItem: MdxTabItem,
 

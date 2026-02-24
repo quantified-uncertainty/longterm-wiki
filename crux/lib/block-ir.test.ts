@@ -319,12 +319,12 @@ More text after code.
   it('handles internal links outside knowledge-base', () => {
     const mdx = `## Links
 
-See [compute page](/ai-transition-model/compute/) and [overview](/knowledge-base/concepts/overview/).
+See [internal page](/internal/schema/) and [overview](/knowledge-base/concepts/overview/).
 `;
     const ir = extractBlockIR('links-test', mdx);
 
     const section = ir.sections.find(s => s.heading === 'Links')!;
-    expect(section.internalLinks).toContain('ai-transition-model/compute');
+    expect(section.internalLinks).toContain('internal/schema');
     expect(section.internalLinks).toContain('concepts/overview');
   });
 

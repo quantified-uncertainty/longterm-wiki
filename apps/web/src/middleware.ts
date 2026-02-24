@@ -7,15 +7,10 @@ import type { NextRequest } from "next/server";
  * Old site (longtermwiki.com) used paths like:
  *   /knowledge-base/risks/deceptive-alignment
  *   /knowledge-base/organizations/anthropic
- *   /ai-transition-model/compute
- *   /ai-transition-model-views/graph
  *
  * New site serves all wiki content through /wiki/:id (numeric E42 or slug).
  * The /wiki/[id] route handles slug → numeric ID resolution internally.
  */
-
-// Paths under /ai-transition-model/ that have dedicated routes in the new site
-const ATM_PRESERVED_ROUTES = new Set(["graph"]);
 
 // Knowledge-base category directories that had index pages in the old site.
 // These don't map to individual wiki pages, so we redirect them to /wiki.
@@ -83,29 +78,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  // /ai-transition-model-views/* → /ai-transition-model/graph
-  // Old site had /ai-transition-model-views/graph, /data, and index (→ graph)
-  if (segments[0] === "ai-transition-model-views") {
+  // /ai-transition-model* → /wiki (ATM section removed; redirect old URLs)
+  if (segments[0] === "ai-transition-model" || segments[0] === "ai-transition-model-views") {
     const url = request.nextUrl.clone();
-    url.pathname = "/ai-transition-model/graph";
-    return NextResponse.redirect(url, 308);
-  }
-
-  // /ai-transition-model → /ai-transition-model/graph (overview)
-  // /ai-transition-model/slug → /wiki/slug
-  // Skip paths that have their own routes (e.g. /ai-transition-model/graph)
-  if (segments[0] === "ai-transition-model") {
-    const url = request.nextUrl.clone();
-    if (segments.length <= 1) {
-      // Root: /ai-transition-model
-      url.pathname = "/ai-transition-model/graph";
-      return NextResponse.redirect(url, 308);
-    }
-    const slug = segments[segments.length - 1];
-    if (ATM_PRESERVED_ROUTES.has(slug)) {
-      return NextResponse.next();
-    }
-    url.pathname = `/wiki/${slug}`;
+    url.pathname = "/wiki";
     return NextResponse.redirect(url, 308);
   }
 

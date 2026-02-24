@@ -81,6 +81,7 @@ export async function syncSessions(
       bodyKey: 'items',
       responseCountKey: 'upserted',
       itemLabel: 'sessions',
+      scope: 'project',
       _sleep: options._sleep,
     },
   );

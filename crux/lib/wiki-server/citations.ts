@@ -2,6 +2,7 @@
  * Citation Quotes & Accuracy API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from api-types.ts (single source of truth).
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
@@ -10,6 +11,16 @@ import type {
   AccuracyVerdict as AccuracyVerdictType,
   MarkAccuracy,
   UpsertCitationContent,
+  UpsertCitationQuoteResult,
+  UpsertCitationQuoteBatchResult,
+  MarkAccuracyResult,
+  MarkAccuracyBatchResult,
+  AccuracySnapshotResult,
+  AccuracyDashboardData,
+  CitationContentRow,
+  CitationContentListEntry,
+  CitationContentListResult,
+  CitationContentStatsResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -18,17 +29,11 @@ import type {
 
 export type UpsertCitationQuoteItem = UpsertCitationQuote;
 
-export interface UpsertCitationQuoteResult {
-  id: number;
-  pageId: string;
-  footnote: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// ---------------------------------------------------------------------------
+// Citation Quotes Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface UpsertCitationQuoteBatchResult {
-  results: Array<{ id: number; pageId: string; footnote: number }>;
-}
+export type { UpsertCitationQuoteResult, UpsertCitationQuoteBatchResult };
 
 // ---------------------------------------------------------------------------
 // Citation Accuracy Types — input (derived from server Zod schemas)
@@ -38,70 +43,12 @@ export type AccuracyVerdict = AccuracyVerdictType;
 
 export type MarkAccuracyItem = MarkAccuracy;
 
-export interface MarkAccuracyResult {
-  updated: true;
-  pageId: string;
-  footnote: number;
-  verdict: string;
-}
+// ---------------------------------------------------------------------------
+// Citation Accuracy Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
 
-export interface MarkAccuracyBatchResult {
-  updated: number;
-  results: Array<{ pageId: string; footnote: number; verdict: string }>;
-}
-
-export interface SnapshotResult {
-  snapshotCount: number;
-  pages: string[];
-}
-
-export interface AccuracyDashboardData {
-  exportedAt: string;
-  summary: {
-    totalCitations: number;
-    checkedCitations: number;
-    accurateCitations: number;
-    inaccurateCitations: number;
-    unsupportedCitations: number;
-    minorIssueCitations: number;
-    uncheckedCitations: number;
-    averageScore: number | null;
-  };
-  verdictDistribution: Record<string, number>;
-  difficultyDistribution: Record<string, number>;
-  pages: Array<{
-    pageId: string;
-    totalCitations: number;
-    checked: number;
-    accurate: number;
-    inaccurate: number;
-    unsupported: number;
-    minorIssues: number;
-    accuracyRate: number | null;
-    avgScore: number | null;
-  }>;
-  flaggedCitations: Array<{
-    pageId: string;
-    footnote: number;
-    claimText: string;
-    sourceTitle: string | null;
-    url: string | null;
-    verdict: string;
-    score: number | null;
-    issues: string | null;
-    difficulty: string | null;
-    checkedAt: string | null;
-  }>;
-  domainAnalysis: Array<{
-    domain: string;
-    totalCitations: number;
-    checked: number;
-    accurate: number;
-    inaccurate: number;
-    unsupported: number;
-    inaccuracyRate: number | null;
-  }>;
-}
+export type { MarkAccuracyResult, MarkAccuracyBatchResult, AccuracyDashboardData };
+export type SnapshotResult = AccuracySnapshotResult;
 
 // ---------------------------------------------------------------------------
 // Citation Quotes API functions
@@ -110,7 +57,7 @@ export interface AccuracyDashboardData {
 export async function upsertCitationQuote(
   item: UpsertCitationQuoteItem,
 ): Promise<ApiResult<UpsertCitationQuoteResult>> {
-  return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item);
+  return apiRequest<UpsertCitationQuoteResult>('POST', '/api/citations/quotes/upsert', item, undefined, 'content');
 }
 
 export async function upsertCitationQuoteBatch(
@@ -120,6 +67,8 @@ export async function upsertCitationQuoteBatch(
     'POST',
     '/api/citations/quotes/upsert-batch',
     { items },
+    undefined,
+    'content',
   );
 }
 
@@ -130,7 +79,7 @@ export async function upsertCitationQuoteBatch(
 export async function markCitationAccuracy(
   item: MarkAccuracyItem,
 ): Promise<ApiResult<MarkAccuracyResult>> {
-  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item);
+  return apiRequest<MarkAccuracyResult>('POST', '/api/citations/quotes/mark-accuracy', item, undefined, 'content');
 }
 
 export async function markCitationAccuracyBatch(
@@ -140,11 +89,13 @@ export async function markCitationAccuracyBatch(
     'POST',
     '/api/citations/quotes/mark-accuracy-batch',
     { items },
+    undefined,
+    'content',
   );
 }
 
 export async function createAccuracySnapshot(): Promise<ApiResult<SnapshotResult>> {
-  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {});
+  return apiRequest<SnapshotResult>('POST', '/api/citations/accuracy-snapshot', {}, undefined, 'content');
 }
 
 export async function getAccuracyDashboard(): Promise<ApiResult<AccuracyDashboardData>> {
@@ -157,57 +108,12 @@ export async function getAccuracyDashboard(): Promise<ApiResult<AccuracyDashboar
 
 export type UpsertCitationContentInput = UpsertCitationContent;
 
-export interface CitationContentRow {
-  url: string;
-  fetchedAt: string;
-  httpStatus: number | null;
-  contentType: string | null;
-  pageTitle: string | null;
-  fullTextPreview: string | null;
-  fullText: string | null;
-  contentLength: number | null;
-  contentHash: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CitationContentListEntry {
-  url: string;
-  fetchedAt: string;
-  httpStatus: number | null;
-  contentType: string | null;
-  pageTitle: string | null;
-  contentLength: number | null;
-  contentHash: string | null;
-  hasFullText: boolean;
-  hasPreview: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CitationContentListResult {
-  entries: CitationContentListEntry[];
-  total: number;
-  withFullText: number;
-  withPreview: number;
-  limit: number;
-  offset: number;
-}
-
-export interface CitationContentStatsResult {
-  total: number;
-  withFullText: number;
-  withPreview: number;
-  coverage: number;
-  okCount: number;
-  deadCount: number;
-  avgContentLength: number | null;
-}
+export type { CitationContentRow, CitationContentListEntry, CitationContentListResult, CitationContentStatsResult };
 
 export async function upsertCitationContent(
   item: UpsertCitationContentInput,
 ): Promise<ApiResult<{ url: string }>> {
-  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item);
+  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item, undefined, 'content');
 }
 
 export async function getCitationContentByUrl(
@@ -232,4 +138,3 @@ export async function listCitationContent(
 export async function getCitationContentStats(): Promise<ApiResult<CitationContentStatsResult>> {
   return apiRequest<CitationContentStatsResult>('GET', '/api/citations/content/stats');
 }
-

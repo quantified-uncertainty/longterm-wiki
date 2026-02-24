@@ -72,7 +72,6 @@ Entities are the primary data objects. Each has a `type` field from a controlled
 | **Safety & Responses** | safety-agenda, approach, project, policy | What's being done about risks |
 | **People & Orgs** | person, organization, funder | Who's involved |
 | **Analysis** | model, parameter, metric, analysis, scenario | Analytical frameworks |
-| **AI Transition Model** | ai-transition-model-\* (5 subtypes) | Structured transition modeling |
 | **Other** | resource, historical, event, debate, table, diagram, insight, intelligence-paradigm | Everything else |
 
 ### Relationship System

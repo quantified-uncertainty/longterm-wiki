@@ -5,17 +5,16 @@
  */
 
 import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
-import type { RiskSnapshotInput } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  RiskSnapshotInput,
+  RiskBatchResult,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
 
 export type RiskSnapshot = RiskSnapshotInput;
-
-interface RiskBatchResult {
-  inserted: number;
-}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -45,6 +44,8 @@ export async function recordRiskSnapshots(
       'POST',
       '/api/hallucination-risk/batch',
       { snapshots: batch },
+      undefined,
+      'content',
     );
 
     if (!result.ok) {

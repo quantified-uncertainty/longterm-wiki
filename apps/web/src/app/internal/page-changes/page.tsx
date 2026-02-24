@@ -11,30 +11,13 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { PageChangesSessions } from "./page-changes-sessions";
 import type { Metadata } from "next";
+import type { SessionRow } from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Page Changes | Longterm Wiki Internal",
   description:
     "Timeline of wiki page edits from Claude Code sessions, grouped by session.",
 };
-
-// ── API types ────────────────────────────────────────────────────────────────
-
-interface ApiSession {
-  id: number;
-  date: string;
-  branch: string | null;
-  title: string;
-  summary: string | null;
-  model: string | null;
-  duration: string | null;
-  cost: string | null;
-  prUrl: string | null;
-  pages: string[];
-  issuesJson: unknown;
-  learningsJson: unknown;
-  recommendationsJson: unknown;
-}
 
 // ── Data loading ─────────────────────────────────────────────────────────────
 
@@ -50,7 +33,7 @@ function extractPrNumber(prUrl: string | null): number | undefined {
  * Returns null if the server is unavailable.
  */
 async function loadSessionsFromApi() {
-  const result = await fetchDetailed<{ sessions: ApiSession[] }>(
+  const result = await fetchDetailed<{ sessions: SessionRow[] }>(
     "/api/sessions/page-changes?limit=500",
     { revalidate: 300 }
   );

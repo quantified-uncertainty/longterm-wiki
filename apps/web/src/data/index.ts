@@ -12,6 +12,7 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
+import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry } from "@wiki-server/api-types";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -160,41 +161,13 @@ export interface CruxData {
   summary?: string;
 }
 
-export interface Intervention {
-  id: string;
-  name: string;
-  category?: string;
-  description?: string;
-  riskCoverage?: {
-    accident?: string;
-    misuse?: string;
-    structural?: string;
-    epistemic?: string;
-  };
-  primaryMechanism?: string;
-  tractability?: string;
-  neglectedness?: string;
-  importance?: string;
-  overallPriority?: string;
-  timelineFit?: string;
-  currentState?: string;
-  fundingLevel?: string;
-  fundingShare?: string;
-  recommendedShift?: string;
-  wikiPageId?: string;
-  relatedInterventions?: string[];
-  relevantResearch?: Array<{ title: string; url?: string }>;
-}
-
 interface DatabaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   resources: Resource[];
   publications: Publication[];
   experts: Expert[];
   organizations: Organization[];
-  interventions: Intervention[];
   cruxes: CruxData[];
-  proposals: Proposal[];
   prItems: PrItem[];
   backlinks: Record<string, BacklinkEntry[]>;
   relatedGraph: Record<string, RelatedGraphEntry[]>;
@@ -286,20 +259,15 @@ export function getTypedEntities(): AnyEntity[] {
     if (result.success) {
       entities.push(result.data);
     } else {
-      // Unknown entity types (ai-transition-model-*, etc.) — keep all fields as-is.
+      // Unknown entity types — keep all fields as-is.
       // Don't re-parse through GenericEntitySchema as Zod would strip extra keys
       // like content, currentAssessment, ratings, causeEffectGraph.
       if (isDev) {
         const id = (raw as Record<string, unknown>).id;
         const type = (raw as Record<string, unknown>).entityType as string;
-        // Suppress warnings for known catch-all types that intentionally skip
-        // the discriminated union (they carry extra fields Zod would strip).
-        const isCatchAll = typeof type === "string" && type.startsWith("ai-transition-model-");
-        if (!isCatchAll) {
-          console.warn(
-            `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
-          );
-        }
+        console.warn(
+          `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
+        );
       }
       entities.push(raw as unknown as GenericEntity);
     }
@@ -1146,13 +1114,8 @@ export function getBacklinksFor(
   }));
 }
 
-/** Server response shape for backlinks endpoint */
-interface ServerBacklink {
-  id: string;
-  type: string;
-  title: string;
-  relationship?: string;
-}
+/** Server response shape for backlinks endpoint — imported from shared api-types */
+type ServerBacklink = ServerBacklinkEntry;
 
 /**
  * Fetch backlinks from wiki-server with fallback to local database.json.
@@ -1205,15 +1168,6 @@ export function getRelatedGraphFor(
     ...entry,
     href: getEntityHref(entry.id, entry.type),
   }));
-}
-
-/** Server response shape for related endpoint */
-interface ServerRelatedEntry {
-  id: string;
-  type: string;
-  title: string;
-  score: number;
-  label?: string;
 }
 
 /**
@@ -1531,15 +1485,6 @@ export function getFactUsage(): Record<string, FactUsagePage[]> {
 }
 
 // ============================================================================
-// INTERVENTIONS
-// ============================================================================
-
-export function getInterventions(): Intervention[] {
-  const db = getDatabase();
-  return db.interventions || [];
-}
-
-// ============================================================================
 // CRUXES
 // ============================================================================
 
@@ -1565,31 +1510,6 @@ export function getCruxesByDomain(domain: string): CruxData[] {
   return getCruxes().filter(
     (c) => c.domain?.toLowerCase() === domain.toLowerCase()
   );
-}
-
-// ============================================================================
-// PROPOSALS
-// ============================================================================
-
-export interface Proposal {
-  id: string;
-  name: string;
-  description?: string;
-  sourcePageId?: string;
-  domain?: string;
-  stance?: string;
-  costEstimate?: string;
-  evEstimate?: string;
-  feasibility?: string;
-  honestConcerns?: string;
-  status?: string;
-  leadOrganizations?: string[];
-  relatedProposals?: string[];
-}
-
-export function getProposals(): Proposal[] {
-  const db = getDatabase();
-  return db.proposals || [];
 }
 
 // ============================================================================

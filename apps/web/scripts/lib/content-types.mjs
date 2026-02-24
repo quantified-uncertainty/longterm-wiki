@@ -153,7 +153,6 @@ export const DATA_DIR_ABS = DATA_DIR;
  * Keep this as the single source of truth — do NOT duplicate this list elsewhere.
  */
 export const TOP_LEVEL_CONTENT_DIRS = [
-  'ai-transition-model',
   'analysis',
   'getting-started',
   'tools',

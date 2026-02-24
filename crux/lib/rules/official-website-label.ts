@@ -38,11 +38,6 @@ const ABSTRACT_ENTITY_TYPES = new Set([
   'policy',
   'safety-agenda',
   'intelligence-paradigm',
-  'ai-transition-model-parameter',
-  'ai-transition-model-metric',
-  'ai-transition-model-scenario',
-  'ai-transition-model-factor',
-  'ai-transition-model-subitem',
 ]);
 
 export const officialWebsiteLabelRule = createRule({

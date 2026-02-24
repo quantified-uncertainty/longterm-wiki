@@ -2,11 +2,12 @@
  * Page Links API — wiki-server client module
  *
  * Input types are derived from the canonical Zod schemas in api-types.ts.
+ * Response types are imported from the canonical api-types.ts definitions.
  */
 
 import type { z } from 'zod';
 import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
-import type { PageLinkSchema } from '../../../apps/wiki-server/src/api-types.ts';
+import type { PageLinkSchema, SyncLinksResult } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -15,9 +16,11 @@ import type { PageLinkSchema } from '../../../apps/wiki-server/src/api-types.ts'
 /** Uses z.input (not z.infer) because the schema has .default(1.0) on weight. */
 export type PageLinkItem = z.input<typeof PageLinkSchema>;
 
-export interface SyncLinksResult {
-  upserted: number;
-}
+// ---------------------------------------------------------------------------
+// Types — response (re-exported from canonical api-types.ts)
+// ---------------------------------------------------------------------------
+
+export type { SyncLinksResult };
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -50,6 +53,8 @@ export async function syncPageLinks(
       'POST',
       '/api/links/sync',
       { links: batch, replace: isFirst },
+      undefined,
+      'content',
     );
 
     if (!result.ok) {

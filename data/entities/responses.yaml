@@ -3570,8 +3570,6 @@
       type: risk
     - id: export-controls
       type: policy
-    - id: geopolitics
-      type: ai-transition-model-metric
   tags:
     - governance
     - legal-framework

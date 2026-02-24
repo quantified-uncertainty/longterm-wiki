@@ -1247,3 +1247,155 @@ describe('issues update-body — --body-file', () => {
     unlinkSync(tmpPath);
   });
 });
+
+// ---------------------------------------------------------------------------
+// camelCase flag keys (#981) — CLI converts --body-file to bodyFile via kebabToCamel
+// ---------------------------------------------------------------------------
+
+describe('issues create — camelCase flag keys (#981)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('reads body from camelCase bodyFile key', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-camel-body-981.md';
+    writeFileSync(tmpPath, '## Problem\n\nBody from camelCase key.\n\n## Acceptance Criteria\n\n- [ ] Fixed');
+
+    mockGithubApi.mockResolvedValueOnce({ number: 300, html_url: 'https://github.com/test/issues/300', title: 'Test' });
+
+    const result = await commands.create(['Test camelCase bodyFile'], { bodyFile: tmpPath });
+    expect(result.exitCode).toBe(0);
+
+    const apiCall = mockGithubApi.mock.calls[0];
+    const sentBody = (apiCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('Body from camelCase key');
+
+    unlinkSync(tmpPath);
+  });
+
+  it('reads problem from camelCase problemFile key', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-issue-camel-problem-981.md';
+    writeFileSync(tmpPath, 'Problem from camelCase key with `code` and $(expansion).');
+
+    mockGithubApi.mockResolvedValueOnce({ number: 301, html_url: 'https://github.com/test/issues/301', title: 'Test' });
+    mockGithubApi.mockResolvedValueOnce({}); // label
+    mockGithubApi.mockResolvedValueOnce({}); // label
+
+    const result = await commands.create(['Test camelCase problemFile'], {
+      problemFile: tmpPath,
+      model: 'sonnet',
+      criteria: 'Fixed|Tests pass',
+    });
+    expect(result.exitCode).toBe(0);
+
+    const apiCall = mockGithubApi.mock.calls[0];
+    const sentBody = (apiCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('Problem from camelCase key');
+    expect(sentBody).toContain('`code`');
+
+    unlinkSync(tmpPath);
+  });
+});
+
+describe('issues update-body — camelCase flag keys (#981)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('camelCase bodyFile sets raw body without merge', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-update-camel-body-981.md';
+    const fullBody = '## Problem\n\nCamelCase body-file content.\n\n## Acceptance Criteria\n\n- [ ] Done';
+    writeFileSync(tmpPath, fullBody);
+
+    mockGithubApi.mockResolvedValueOnce({
+      number: 400,
+      html_url: 'https://github.com/test/issues/400',
+      title: 'Test',
+      body: '## Problem\n\nOld content.',
+      labels: [],
+    });
+    mockGithubApi.mockResolvedValueOnce({}); // PATCH
+
+    const result = await commands['update-body'](['400'], { bodyFile: tmpPath });
+    expect(result.exitCode).toBe(0);
+
+    const patchCall = mockGithubApi.mock.calls[1];
+    const sentBody = (patchCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toBe(fullBody);
+
+    unlinkSync(tmpPath);
+  });
+
+  it('camelCase problemFile is used in update-body', async () => {
+    const { writeFileSync, unlinkSync } = await import('fs');
+    const tmpPath = '/tmp/test-update-camel-problem-981.md';
+    writeFileSync(tmpPath, 'Updated problem from camelCase key.');
+
+    mockGithubApi.mockResolvedValueOnce({
+      number: 401,
+      html_url: 'https://github.com/test/issues/401',
+      title: 'Test',
+      body: '## Problem\n\nOriginal problem.\n\n## Recommended Model\n\n**Haiku**',
+      labels: [{ name: 'model:haiku' }],
+    });
+    mockGithubApi.mockResolvedValueOnce({}); // PATCH
+
+    const result = await commands['update-body'](['401'], {
+      problemFile: tmpPath,
+      model: 'sonnet',
+      criteria: 'Fixed',
+    });
+    expect(result.exitCode).toBe(0);
+
+    const patchCall = mockGithubApi.mock.calls[1];
+    const sentBody = (patchCall[1] as { body: { body: string } }).body.body;
+    expect(sentBody).toContain('Updated problem from camelCase key');
+
+    unlinkSync(tmpPath);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// update-title command
+// ---------------------------------------------------------------------------
+
+describe('issues update-title', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('updates issue title', async () => {
+    mockGithubApi.mockResolvedValueOnce({
+      number: 500,
+      html_url: 'https://github.com/test/issues/500',
+      title: 'Old Title',
+      body: '## Problem\n\nSome problem.',
+      labels: [],
+    });
+    mockGithubApi.mockResolvedValueOnce({}); // PATCH
+
+    const result = await commands['update-title'](['500'], { title: 'New Title' });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('Updated title');
+    expect(result.output).toContain('Old Title');
+    expect(result.output).toContain('New Title');
+
+    const patchCall = mockGithubApi.mock.calls[1];
+    expect((patchCall[1] as { body: { title: string } }).body.title).toBe('New Title');
+  });
+
+  it('returns error when no issue number provided', async () => {
+    const result = await commands['update-title']([], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Usage');
+  });
+
+  it('returns error when --title flag is missing', async () => {
+    const result = await commands['update-title'](['500'], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Missing --title');
+  });
+});
