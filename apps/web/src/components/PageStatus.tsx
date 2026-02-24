@@ -600,7 +600,7 @@ function IssuesSection({
 // CONTENT COVERAGE SECTION
 // ============================================================================
 
-interface CoverageItem {
+interface BooleanCoverageItem {
   label: string;
   present: boolean;
   detail?: string;
@@ -608,6 +608,93 @@ interface CoverageItem {
   description: string;
   anchor: string;
 }
+
+interface NumericMetric {
+  label: string;
+  actual: number;
+  target?: number; // undefined = ratio-based (no target)
+  ratio?: string; // e.g. "83/87" for quotes/accuracy
+  hint?: string;
+  description: string;
+  anchor: string;
+}
+
+function getRecommendedMetrics(
+  wordCount: number,
+  contentFormat: ContentFormat
+): {
+  tables: number;
+  diagrams: number;
+  internalLinks: number;
+  footnotes: number;
+  references: number;
+} {
+  const kWords = wordCount / 1000;
+
+  if (contentFormat === "table") {
+    return {
+      tables: Math.max(2, Math.round(kWords * 2)),
+      diagrams: Math.max(0, Math.round(kWords * 0.2)),
+      internalLinks: Math.max(2, Math.round(kWords * 2)),
+      footnotes: Math.max(1, Math.round(kWords * 1.5)),
+      references: Math.max(1, Math.round(kWords * 1.5)),
+    };
+  }
+  if (contentFormat === "diagram") {
+    return {
+      tables: Math.max(0, Math.round(kWords * 0.5)),
+      diagrams: Math.max(1, Math.round(kWords * 0.8)),
+      internalLinks: Math.max(2, Math.round(kWords * 2)),
+      footnotes: Math.max(1, Math.round(kWords * 1.5)),
+      references: Math.max(1, Math.round(kWords * 1.5)),
+    };
+  }
+  if (contentFormat === "index" || contentFormat === "dashboard") {
+    return {
+      tables: Math.max(0, Math.round(kWords * 0.5)),
+      diagrams: 0,
+      internalLinks: Math.max(5, Math.round(kWords * 5)),
+      footnotes: 0,
+      references: Math.max(0, Math.round(kWords * 0.5)),
+    };
+  }
+
+  // Default: article format
+  return {
+    tables: Math.max(1, Math.round(kWords * 1.2)),
+    diagrams: Math.max(0, Math.round(kWords * 0.3)),
+    internalLinks: Math.max(2, Math.round(kWords * 3)),
+    footnotes: Math.max(2, Math.round(kWords * 2.5)),
+    references: Math.max(1, Math.round(kWords * 2)),
+  };
+}
+
+function getMetricStatus(actual: number, target?: number): "green" | "amber" | "red" {
+  if (target === undefined || target === 0) {
+    return actual > 0 ? "green" : "red";
+  }
+  if (actual >= target) return "green";
+  if (actual > 0) return "amber";
+  return "red";
+}
+
+function getRatioStatus(numerator: number, denominator: number): "green" | "amber" | "red" {
+  if (denominator === 0) return "red";
+  const pct = numerator / denominator;
+  if (pct >= 0.75) return "green";
+  if (numerator > 0) return "amber";
+  return "red";
+}
+
+const statusIcons = {
+  green: <IconCheck className="shrink-0 text-emerald-500" />,
+  amber: (
+    <span className="shrink-0 w-[14px] h-[14px] flex items-center justify-center text-amber-500 text-[11px] font-bold">
+      –
+    </span>
+  ),
+  red: <IconX className="shrink-0 text-red-400/60" />,
+};
 
 function ContentCoverageSection({
   structuredSummary,
@@ -618,6 +705,8 @@ function ContentCoverageSection({
   resourceCount,
   citationHealth,
   changeHistory,
+  wordCount,
+  contentFormat,
 }: {
   structuredSummary?: StructuredSummary;
   llmSummary?: string;
@@ -627,18 +716,26 @@ function ContentCoverageSection({
   resourceCount?: number;
   citationHealth?: CitationHealth;
   changeHistory?: ChangeEntry[];
+  wordCount?: number;
+  contentFormat?: ContentFormat;
 }) {
-  const items: CoverageItem[] = [
+  const format = contentFormat || "article";
+  const recommended = getRecommendedMetrics(wordCount || 0, format);
+
+  // --- Boolean items (yes/no chips) ---
+  const booleanItems: BooleanCoverageItem[] = [
     {
-      label: "Summary",
-      present: !!(structuredSummary || llmSummary),
-      detail: structuredSummary ? "structured" : llmSummary ? "basic" : undefined,
+      label: "LLM summary",
+      present: !!llmSummary,
       hint: "crux content improve <id>",
-      description: structuredSummary
-        ? "Structured summary with one-liner, key points, and bottom line."
-        : llmSummary
-          ? "Basic text summary. Run improve pipeline to upgrade to structured format."
-          : "No summary. Run the improve pipeline to generate one.",
+      description: "Basic text summary used in search results, entity link tooltips, info boxes, and related page cards.",
+      anchor: "structured-summary",
+    },
+    {
+      label: "Structured summary",
+      present: !!structuredSummary,
+      hint: "crux content improve <id> --tier=standard",
+      description: "Rich summary with one-liner, key points, and bottom line. Shown in Key Takeaways and PageStatus.",
       anchor: "structured-summary",
     },
     {
@@ -656,79 +753,96 @@ function ContentCoverageSection({
       anchor: "entity-data",
     },
     {
-      label: "Tables",
-      present: (metrics?.tableCount ?? 0) > 0,
-      detail: metrics && metrics.tableCount > 0 ? `${metrics.tableCount}` : undefined,
-      hint: "Add data tables to the page",
-      description: "Data tables for structured comparisons and reference material.",
-      anchor: "tables-diagrams",
-    },
-    {
-      label: "Diagrams",
-      present: (metrics?.diagramCount ?? 0) > 0,
-      detail: metrics && metrics.diagramCount > 0 ? `${metrics.diagramCount}` : undefined,
-      hint: "Add Mermaid diagrams or Squiggle models",
-      description: "Visual content — Mermaid diagrams, charts, or Squiggle estimate models.",
-      anchor: "tables-diagrams",
-    },
-    {
-      label: "Int. links",
-      present: (metrics?.internalLinks ?? 0) > 0,
-      detail: metrics && metrics.internalLinks > 0 ? `${metrics.internalLinks}` : undefined,
-      hint: "Add links to other wiki pages",
-      description: "Links to other wiki pages. More internal links = better graph connectivity.",
-      anchor: "tables-diagrams",
-    },
-    {
-      label: "Footnotes",
-      present: (metrics?.footnoteCount ?? 0) > 0,
-      detail: metrics && metrics.footnoteCount > 0 ? `${metrics.footnoteCount}` : undefined,
-      hint: "Add [^N] footnote citations",
-      description: "Footnote citations [^N] with source references at the bottom of the page.",
-      anchor: "references",
-    },
-    {
-      label: "References",
-      present: (resourceCount ?? 0) > 0,
-      detail: resourceCount ? `${resourceCount}` : undefined,
-      hint: "Add <R> resource links",
-      description: "Curated external resources linked via <R> components or cited_by in YAML.",
-      anchor: "references",
-    },
-    {
-      label: "Quotes",
-      present: (citationHealth?.withQuotes ?? 0) > 0,
-      detail: citationHealth && citationHealth.withQuotes > 0
-        ? `${citationHealth.withQuotes}/${citationHealth.total}`
-        : undefined,
-      hint: "crux citations extract-quotes <id>",
-      description: "Supporting quotes extracted from cited sources to back up page claims.",
-      anchor: "citation-quotes",
-    },
-    {
-      label: "Accuracy",
-      present: (citationHealth?.accuracyChecked ?? 0) > 0,
-      detail: citationHealth && citationHealth.accuracyChecked > 0
-        ? `${citationHealth.accuracyChecked}/${citationHealth.total}`
-        : undefined,
-      hint: "crux citations verify <id>",
-      description: "Citations verified against their sources for factual accuracy.",
-      anchor: "accuracy-checked",
-    },
-    {
       label: "Edit history",
       present: (changeHistory?.length ?? 0) > 0,
-      detail: changeHistory && changeHistory.length > 0
-        ? `${changeHistory.length}`
-        : undefined,
+      detail: changeHistory && changeHistory.length > 0 ? `${changeHistory.length}` : undefined,
       hint: "crux edit-log view <id>",
       description: "Tracked changes from improve pipeline runs and manual edits.",
       anchor: "edit-history",
     },
   ];
 
-  const presentCount = items.filter((i) => i.present).length;
-  const total = items.length;
+  // --- Numeric metrics (table rows) ---
+  const tableCount = metrics?.tableCount ?? 0;
+  const diagramCount = metrics?.diagramCount ?? 0;
+  const internalLinks = metrics?.internalLinks ?? 0;
+  const footnoteCount = metrics?.footnoteCount ?? 0;
+  const refCount = resourceCount ?? 0;
+  const quoteNum = citationHealth?.withQuotes ?? 0;
+  const quoteTotal = citationHealth?.total ?? 0;
+  const accNum = citationHealth?.accuracyChecked ?? 0;
+  const accTotal = citationHealth?.total ?? 0;
+
+  const numericMetrics: NumericMetric[] = [
+    {
+      label: "Tables",
+      actual: tableCount,
+      target: recommended.tables,
+      hint: "Add data tables to the page",
+      description: "Data tables for structured comparisons and reference material.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Diagrams",
+      actual: diagramCount,
+      target: recommended.diagrams,
+      hint: "Add Mermaid diagrams or Squiggle models",
+      description: "Visual content — Mermaid diagrams, charts, or Squiggle estimate models.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Int. links",
+      actual: internalLinks,
+      target: recommended.internalLinks,
+      hint: "Add links to other wiki pages",
+      description: "Links to other wiki pages. More internal links = better graph connectivity.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Footnotes",
+      actual: footnoteCount,
+      target: recommended.footnotes,
+      hint: "Add [^N] footnote citations",
+      description: "Footnote citations [^N] with source references at the bottom of the page.",
+      anchor: "references",
+    },
+    {
+      label: "References",
+      actual: refCount,
+      target: recommended.references,
+      hint: "Add <R> resource links",
+      description: "Curated external resources linked via <R> components or cited_by in YAML.",
+      anchor: "references",
+    },
+    {
+      label: "Quotes",
+      actual: quoteNum,
+      ratio: quoteTotal > 0 ? `${quoteNum}/${quoteTotal}` : undefined,
+      hint: "crux citations extract-quotes <id>",
+      description: "Supporting quotes extracted from cited sources to back up page claims.",
+      anchor: "citation-quotes",
+    },
+    {
+      label: "Accuracy",
+      actual: accNum,
+      ratio: accTotal > 0 ? `${accNum}/${accTotal}` : undefined,
+      hint: "crux citations verify <id>",
+      description: "Citations verified against their sources for factual accuracy.",
+      anchor: "accuracy-checked",
+    },
+  ];
+
+  // --- Scoring ---
+  const booleanPassing = booleanItems.filter((i) => i.present).length;
+  const numericPassing = numericMetrics.filter((m) => {
+    if (m.ratio !== undefined) {
+      const total = m.label === "Quotes" ? quoteTotal : accTotal;
+      return getRatioStatus(m.actual, total) === "green";
+    }
+    return getMetricStatus(m.actual, m.target) === "green";
+  }).length;
+  const presentCount = booleanPassing + numericPassing;
+  const total = booleanItems.length + numericMetrics.length;
   const pct = presentCount / total;
   const badgeColor =
     pct >= 0.75
@@ -747,56 +861,117 @@ function ContentCoverageSection({
           {presentCount}/{total}
         </span>
       </div>
-      <div className="flex flex-wrap gap-1.5">
-        {items.map((item) => (
-          <span
-            key={item.label}
-            className={cn(
-              styles.wrapper,
-              "!inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-2 py-0.5 text-[11px] cursor-help",
-              item.present
-                ? "border-emerald-500/20 bg-emerald-500/[0.04] text-foreground"
-                : "border-border bg-muted/50 text-muted-foreground/50"
-            )}
-          >
-            {item.present ? (
-              <IconCheck className="shrink-0 text-emerald-500" />
-            ) : (
-              <IconX className="shrink-0 text-muted-foreground/30" />
-            )}
-            <Link
-              href={`/internal/coverage-guide#${item.anchor}`}
-              className="no-underline hover:underline"
-              style={{ color: "inherit" }}
-            >
-              {item.label}
-            </Link>
-            {item.present && item.detail && (
-              <span className="tabular-nums text-[10px] text-muted-foreground font-medium">
-                {item.detail}
-              </span>
-            )}
+
+      <div className="flex gap-2">
+        {/* Boolean items — stacked vertically */}
+        <div className="flex flex-col gap-1">
+          {booleanItems.map((item) => (
             <span
+              key={item.label}
               className={cn(
-                styles.tooltip,
-                "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+                styles.wrapper,
+                "!inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-2 py-0.5 text-[11px] cursor-help",
+                item.present
+                  ? "border-emerald-500/20 bg-emerald-500/[0.04] text-foreground"
+                  : "border-border bg-muted/50 text-muted-foreground/50"
               )}
-              role="tooltip"
             >
-              <span className="block font-semibold text-foreground text-xs mb-1">
+              {item.present ? (
+                <IconCheck className="shrink-0 text-emerald-500" />
+              ) : (
+                <IconX className="shrink-0 text-muted-foreground/30" />
+              )}
+              <Link
+                href={`/internal/coverage-guide#${item.anchor}`}
+                className="no-underline hover:underline"
+                style={{ color: "inherit" }}
+              >
                 {item.label}
-              </span>
-              <span className="block text-muted-foreground text-[11px] leading-snug whitespace-normal">
-                {item.description}
-              </span>
-              {!item.present && item.hint && (
-                <span className="block mt-1.5 pt-1.5 border-t border-border text-muted-foreground text-[11px] font-mono whitespace-normal">
-                  {item.hint}
+              </Link>
+              {item.present && item.detail && (
+                <span className="tabular-nums text-[10px] text-muted-foreground font-medium">
+                  {item.detail}
                 </span>
               )}
+              <span
+                className={cn(
+                  styles.tooltip,
+                  "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+                )}
+                role="tooltip"
+              >
+                <span className="block font-semibold text-foreground text-xs mb-1">
+                  {item.label}
+                </span>
+                <span className="block text-muted-foreground text-[11px] leading-snug whitespace-normal">
+                  {item.description}
+                </span>
+                {!item.present && item.hint && (
+                  <span className="block mt-1.5 pt-1.5 border-t border-border text-muted-foreground text-[11px] font-mono whitespace-normal">
+                    {item.hint}
+                  </span>
+                )}
+              </span>
             </span>
-          </span>
-        ))}
+          ))}
+        </div>
+
+        {/* Numeric metrics table — bordered */}
+        <div className="rounded-md border border-border">
+          {numericMetrics.map((m, i) => {
+            const isRatio = m.ratio !== undefined;
+            const status = isRatio
+              ? getRatioStatus(m.actual, m.label === "Quotes" ? quoteTotal : accTotal)
+              : getMetricStatus(m.actual, m.target);
+
+            return (
+              <span
+                key={m.label}
+                className={cn(
+                  styles.wrapper,
+                  "!flex items-center gap-1.5 px-2 py-[3px] text-[11px] cursor-help",
+                  i > 0 && "border-t border-border"
+                )}
+              >
+                {statusIcons[status]}
+                <Link
+                  href={`/internal/coverage-guide#${m.anchor}`}
+                  className="no-underline hover:underline w-[62px] shrink-0 text-muted-foreground"
+                  style={{ color: "inherit" }}
+                >
+                  {m.label}
+                </Link>
+                <span className="tabular-nums font-medium text-foreground w-[36px] text-right shrink-0">
+                  {isRatio ? m.ratio : m.actual}
+                </span>
+                {!isRatio && m.target !== undefined && m.target > 0 && (
+                  <span className="tabular-nums text-[10px] text-muted-foreground/50 shrink-0">
+                    / ~{m.target}
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    styles.tooltip,
+                    "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+                  )}
+                  role="tooltip"
+                >
+                  <span className="block font-semibold text-foreground text-xs mb-1">
+                    {m.label}
+                  </span>
+                  <span className="block text-muted-foreground text-[11px] leading-snug whitespace-normal">
+                    {m.description}
+                  </span>
+                  {status !== "green" && m.hint && (
+                    <span className="block mt-1.5 pt-1.5 border-t border-border text-muted-foreground text-[11px] font-mono whitespace-normal">
+                      {m.hint}
+                    </span>
+                  )}
+                </span>
+              </span>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -1002,7 +1177,7 @@ export function PageStatus({
         </div>
       ) : null}
 
-      {/* Content — structure score, metrics, and coverage checklist */}
+      {/* Content — boolean chips + numeric metrics table */}
       <ContentCoverageSection
         structuredSummary={structuredSummary}
         llmSummary={llmSummary}
@@ -1012,6 +1187,8 @@ export function PageStatus({
         resourceCount={resourceCount}
         citationHealth={citationHealth}
         changeHistory={changeHistory}
+        wordCount={wordCount}
+        contentFormat={contentFormat}
       />
 
       {/* Change history */}
