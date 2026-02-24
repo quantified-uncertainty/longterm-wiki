@@ -1,0 +1,72 @@
+entity: ssi
+facts:
+
+  # valuation-2025-04
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  8af16a56:
+    label: "SSI valuation (April 2025)"
+    measure: valuation
+    value: 32000000000
+    asOf: "2025-04"
+    note: "Post-money valuation after April 2025 funding round led by Greenoaks Capital"
+    source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+
+  # total-funding-2025-04
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  e419ac59:
+    label: "SSI total funding raised (April 2025)"
+    measure: total-funding
+    value: 3000000000
+    asOf: "2025-04"
+    note: "Total venture capital raised across all rounds through April 2025"
+    source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+
+  # seed-funding-round-2024-09
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  e87688d4:
+    label: "SSI seed funding round (September 2024)"
+    measure: funding-round
+    value: 1000000000
+    asOf: "2024-09"
+    note: "Seed round at $5B valuation from a16z, Sequoia, DST Global, SV Angel, NFDG"
+    source: https://observer.com/2024/09/openai-ilya-sutskever-raise-1b-ai-startup/
+
+  # seed-round-valuation-2024-09
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  87065050:
+    label: "SSI seed round valuation (September 2024)"
+    measure: valuation
+    value: 5000000000
+    asOf: "2024-09"
+    note: "Post-money valuation at September 2024 seed round"
+    source: https://observer.com/2024/09/openai-ilya-sutskever-raise-1b-ai-startup/
+
+  # funding-round-2025-03
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  3658449a:
+    label: "SSI valuation at March 2025 funding round"
+    measure: valuation
+    value: 30000000000
+    asOf: "2025-03"
+    note: "Valuation at March 2025 Greenoaks-led round, before April 2025 top-up"
+    source: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
+
+  # funding-round-2025-04
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  910ed2c9:
+    label: "SSI April 2025 funding round size"
+    measure: funding-round
+    value: 2000000000
+    asOf: "2025-04"
+    note: "April 2025 round led by Greenoaks with $500M commitment; Alphabet and NVIDIA participated"
+    source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
+
+  # employee-count-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  a0502d56:
+    label: "SSI employee count (mid-2025)"
+    measure: headcount
+    value: 20
+    asOf: "2025-06"
+    note: "Approximate headcount; described as a 'lean, cracked team'"
+    source: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.

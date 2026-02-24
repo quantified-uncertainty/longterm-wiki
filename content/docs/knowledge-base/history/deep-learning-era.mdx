@@ -30,7 +30,7 @@ import {DataInfoBox, DataExternalLinks, Mermaid, EntityLink, F} from '@component
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Capability Acceleration** | Dramatic (10-100x/year) | ImageNet error: 26% → 3.5% (2012-2017); GPT parameters: 117M → <F e="openai" f="7c9b9073">175B</F> (2018-2020) |
+| **Capability Acceleration** | Dramatic (10-100x/year) | ImageNet error: <F e="google-deepmind" f="5089dbd9">26%</F> → 3.5% (2012-2017); GPT parameters: 117M → <F e="openai" f="7c9b9073">175B</F> (2018-2020) |
 | **Safety Field Growth** | Moderate (2-5x) | Researchers: ≈100 → 500-1000; Funding: ≈\$3M → \$50-100M/year (2015-2020) |
 | **Timeline Compression** | Significant | AlphaGo achieved human-level Go ≈10 years ahead of expert predictions (2016 vs 2025-2030) |
 | **Institutional Response** | Foundational | DeepMind Safety Team (2016), <EntityLink id="218">OpenAI</EntityLink> founded (2015), "Concrete Problems" paper (2016) |
@@ -48,7 +48,7 @@ import {DataInfoBox, DataExternalLinks, Mermaid, EntityLink, F} from '@component
 
 ## Overview
 
-The period from 2012 to 2020 saw AI capabilities advance more rapidly than most researchers had anticipated. Beginning with AlexNet's performance in the 2012 [ImageNet](https://en.wikipedia.org/wiki/ImageNet) competition — achieving a top-5 error rate of roughly 15%, compared to the next-best entrant's 26% — deep learning displaced prior machine learning approaches across computer vision, natural language processing, and game-playing.[^1] Each successive milestone arrived earlier than expert forecasts had suggested: AlphaGo's defeat of Lee Sedol in 2016, the GPT language model series from 2018–2020, and BERT's 7.7 percentage-point absolute improvement on the GLUE benchmark in 2018 all demonstrated capabilities previously considered distinctive to human cognition.[^2] Underlying this progress was an extraordinary expansion in compute: one estimate places the computational power applied to neural networks at roughly one million times that available in 1990.[^1]
+The period from 2012 to 2020 saw AI capabilities advance more rapidly than most researchers had anticipated. Beginning with AlexNet's performance in the 2012 [ImageNet](https://en.wikipedia.org/wiki/ImageNet) competition — achieving a top-5 error rate of roughly <F e="google-deepmind" f="5089dbd9">15%</F>, compared to the next-best entrant's 26% — deep learning displaced prior machine learning approaches across computer vision, natural language processing, and game-playing.[^1] Each successive milestone arrived earlier than expert forecasts had suggested: AlphaGo's defeat of Lee Sedol in 2016, the GPT language model series from 2018–2020, and BERT's 7.7 percentage-point absolute improvement on the GLUE benchmark in 2018 all demonstrated capabilities previously considered distinctive to human cognition.[^2] Underlying this progress was an extraordinary expansion in compute: one estimate places the computational power applied to neural networks at roughly one million times that available in 1990.[^1]
 
 For AI safety, the era was formative. Organizations including <EntityLink id="98">Google DeepMind</EntityLink> and <EntityLink id="218">OpenAI</EntityLink> — the latter founded in July 2015 by Elon Musk, Sam Altman, and others with explicit safety mandates alongside capability goals — shaped the institutional landscape.[^3] The 2016 paper "Concrete Problems in AI Safety" established a practical research agenda that shaped subsequent work on <EntityLink id="253">reward hacking</EntityLink>, <EntityLink id="271">scalable oversight</EntityLink>, and robustness. Safety funding grew roughly 15–30x over the period, though capabilities investment grew faster in absolute terms.
 
@@ -59,7 +59,7 @@ The era also exposed tensions that would persist: between openness and caution i
 The deep learning revolution transformed AI from a field of limited successes to one of rapidly compounding breakthroughs. The period from 2012 to 2020 was defined not by a single discovery but by a confluence of algorithmic advances, massive datasets, and exponentially growing compute—together shifting AI capability faster than most researchers had anticipated. For AI safety, this meant moving from theoretical concerns about far-future AGI to practical questions about current and near-future systems.
 
 **What changed**:
-- **AI capabilities accelerated substantially across multiple domains**: AlexNet's 2012 ImageNet victory cut the previous best error rate from 26% to 15%, catalyzing widespread adoption of deep learning.[^4] By 2019, OpenAI Five defeated Dota 2 world champions after training for the equivalent of 45,000 years of gameplay through self-play reinforcement learning.[^5]
+- **AI capabilities accelerated substantially across multiple domains**: AlexNet's 2012 ImageNet victory cut the previous best error rate from 26% to 15%, catalyzing widespread adoption of deep learning.[^4] By 2019, OpenAI Five defeated Dota 2 world champions after training for the equivalent of <F e="openai" f="7e938d7a">45,000</F> years of gameplay through self-play reinforcement learning.[^5]
 - **Timeline estimates shortened**: AlphaGo's 2016 defeat of Go champion Lee Sedol was widely regarded as arriving a decade ahead of expert predictions, compressing expectations across the research community.[^4]
 - **Safety research professionalized**: The publication of concrete technical agendas and the establishment of dedicated safety teams at major labs signaled a shift from informal concern to structured inquiry.[^6]
 - **Major labs founded with safety missions**: OpenAI was founded in July 2015 explicitly as a safety-conscious counterweight to unguided AI development.[^3]
@@ -204,7 +204,7 @@ This kind of statement was atypical for the AI field in 2010. DeepMind incorpora
 | Metric | Detail |
 |--------|--------|
 | **Final Score** | AlphaGo 4, Lee Sedol 1 |
-| **Global Viewership** | Over 200 million worldwide; 60 million in China and over 100,000 on YouTube[^12] |
+| **Global Viewership** | Over <F e="google-deepmind" f="5089dbd9">200 million</F> worldwide; 60 million in China and over 100,000 on YouTube[^12] |
 | **Prize Money** | \$1 million (donated to charity by DeepMind) |
 | **Lee Sedol's Prize** | \$170,000 (\$150K participation + \$20K for Game 4 win) |
 | **Move 37 (Game 2)** | Estimated 1 in 10,000 probability by human players; later recognized as strategically effective |
@@ -537,7 +537,7 @@ Beyond game-playing, the period saw significant RL advances with direct relevanc
 
 **Proximal Policy Optimization (PPO, 2017)**: OpenAI released PPO as a more stable and sample-efficient policy gradient algorithm.[^34] PPO enables multiple epochs of minibatch updates unlike standard policy gradient methods, offering better sample complexity and simplicity.[^35] PPO became a standard training algorithm for RL applications, including later work on Reinforcement Learning from Human Feedback (<EntityLink id="259">RLHF</EntityLink>).
 
-**OpenAI Five (2019)**: An RL agent that learned to play Dota 2 — a complex, real-time, partially observable multi-agent game — and defeated world-champion players.[^27] The system trained using PPO running on 256 GPUs and 128,000 CPU cores, playing the equivalent of 180 years of games against itself daily.[^36] OpenAI Five observed 20,000 moves per game with a discretized action space of 170,000 possible actions per hero, and its neural network contained 167 million parameters.[^5] Training ran for 10 months, accumulating the equivalent of 45,000 years of gameplay through self-play.[^5] Critically, the system demonstrated that long-term planning toward subgoals could emerge without explicit hierarchical macro-actions — long-range strategic behavior was identified minutes before execution.[^37] This demonstrated RL scaling to environments far more complex than board games, including long time horizons, imperfect information, and complex continuous state-action spaces.[^38]
+**OpenAI Five (2019)**: An RL agent that learned to play Dota 2 — a complex, real-time, partially observable multi-agent game — and defeated world-champion players.[^27] The system trained using PPO running on 256 GPUs and 128,000 CPU cores, playing the equivalent of 180 years of games against itself daily.[^36] OpenAI Five observed 20,000 moves per game with a discretized action space of 170,000 possible actions per hero, and its neural network contained <F e="openai" f="7c9b9073">167 million parameters</F>.[^5] Training ran for 10 months, accumulating the equivalent of 45,000 years of gameplay through self-play.[^5] Critically, the system demonstrated that long-term planning toward subgoals could emerge without explicit hierarchical macro-actions — long-range strategic behavior was identified minutes before execution.[^37] This demonstrated RL scaling to environments far more complex than board games, including long time horizons, imperfect information, and complex continuous state-action spaces.[^38]
 
 **Safety implications of RL advances**: The success of RL systems in complex environments also threw their failure modes into sharper relief. Safety researchers identified that deploying RL in real-world applications surfaces problems including reward hacking, distributional shift, and goal misspecification.[^39] Reinforcement learning systems that could operate in complex environments demonstrated these problems concretely, and the CoastRunners example (see below) became a widely-cited illustration of reward hacking. The enormous computational resources required — training costs estimated between \$5 million and \$100 million USD — also raised concerns about which actors could safely develop and evaluate such systems.[^5]
 
@@ -599,8 +599,8 @@ While US-based labs and researchers dominated AI capability development, early r
 | 2016 | ≈\$6–10 million | <EntityLink id="98">DeepMind</EntityLink> safety team forms; "Concrete Problems" published |
 | 2017 | ≈\$15–25 million | <EntityLink id="552">Open Philanthropy</EntityLink> begins major grants; <EntityLink id="57">CHAI</EntityLink> founded |
 | 2018 | ≈\$25–40 million | Industry safety teams grow; academic programs start |
-| 2019 | ≈\$40–60 million | <EntityLink id="202">MIRI</EntityLink> receives \$2.1M grant |
-| 2020 | ≈\$50–100 million | <EntityLink id="202">MIRI</EntityLink> receives \$7.7M grant; safety teams at all major labs |
+| 2019 | ≈\$40–60 million | <EntityLink id="202">MIRI</EntityLink> receives <F e="miri" f="5fe1a7d1">\$2.1M</F> grant |
+| 2020 | ≈\$50–100 million | <EntityLink id="202">MIRI</EntityLink> receives <F e="miri" f="e3ae35b0">\$7.7M</F> grant; safety teams at all major labs |
 
 *Note*: These figures are estimates compiled from public grant disclosures and funding announcements. Year-by-year precision is limited by the absence of comprehensive public reporting; figures should be treated as orders of magnitude.[^45]
 

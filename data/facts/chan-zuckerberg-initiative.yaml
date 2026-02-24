@@ -1,0 +1,142 @@
+entity: chan-zuckerberg-initiative
+facts:
+
+  # founding-pledge-initial-value
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  8993e5b8:
+    label: "CZI initial Facebook share pledge value (2015)"
+    measure: total-funding
+    value: 45000000000
+    asOf: "2015-12"
+    note: "Initial value of 99% Facebook share pledge at founding"
+    source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+
+  # pledge-current-value-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  cdefaaf3:
+    label: "CZI Facebook share pledge current value (2025)"
+    measure: total-funding
+    value: 200000000000
+    asOf: "2025"
+    note: "Current value of 99% Facebook share pledge, exceeds $200B"
+    source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+
+  # science-spending-first-decade
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  7922f269:
+    label: "CZI science spending first decade (2016-2025)"
+    measure: total-funding
+    value:
+      - 4000000000
+      - 4500000000
+    asOf: "2025"
+    note: "Total science spending 2016-2025"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+
+  # social-causes-spending-first-decade
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  c3cd0a0a:
+    label: "CZI social causes spending first decade (2016-2025)"
+    measure: total-funding
+    value: 3500000000
+    asOf: "2025"
+    note: "Total social causes spending 2016-2025, now winding down"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+
+  # future-science-commitment-2026-2036
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  35609cc4:
+    label: "CZI science spending commitment 2026-2036"
+    measure: total-funding
+    value: 10000000000
+    asOf: "2025"
+    note: "Minimum commitment for science over next decade; lower bound"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+
+  # annual-operating-budget-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  f40c0c95:
+    label: "CZI annual operating budget (2025)"
+    measure: revenue
+    value: 1000000000
+    asOf: "2025"
+    note: "Approximate annual operating budget as of 2025"
+    source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
+
+  # biohub-sf-founding-grant-2016
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  98e6ec16:
+    label: "CZ Biohub SF founding grant (2016)"
+    measure: funding-round
+    value: 600000000
+    asOf: "2016"
+    note: "Initial grant to found CZ Biohub SF with UCSF/Berkeley/Stanford"
+    source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+
+  # biohub-chicago-grant-2022
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  79050a80:
+    label: "CZ Biohub Chicago founding grant (2022)"
+    measure: funding-round
+    value: 250000000
+    asOf: "2022"
+    note: "Grant to establish Biohub Chicago focused on biosensors and inflammation"
+
+  # biohub-new-york-grant-2023
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  0ea6a6e8:
+    label: "CZ Biohub New York founding grant (2023)"
+    measure: funding-round
+    value: 250000000
+    asOf: "2023"
+    note: "Grant to establish Biohub New York focused on infectious disease"
+
+  # gpu-cluster-size-2024
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  2a11a614:
+    label: "CZI AI GPU cluster size (2023-2024)"
+    measure: infrastructure-investment
+    value: 1024
+    asOf: "2024"
+    note: "NVIDIA H100 DGX SuperPOD cluster for life sciences AI"
+    source: https://chanzuckerberg.com/rfa/ai-computing-gpu/
+
+  # gpu-cluster-planned-expansion-2028
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  bdcd526e:
+    label: "CZI planned GPU cluster size (2028)"
+    measure: infrastructure-investment
+    value: 10000
+    asOf: "2025"
+    note: "Planned 10x expansion of GPU cluster by 2028"
+    source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
+
+  # workforce-cut-2026
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  be3523bc:
+    label: "CZI workforce reduction (early 2026)"
+    measure: headcount
+    value: 70
+    asOf: "2026"
+    note: "Approximately 70 jobs cut (~8% of workforce) to refocus on AI-biomedical research"
+    source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
+
+  # publications-supported-total
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  4df7ff89:
+    label: "CZI science program publications supported (total)"
+    measure: benchmark-score
+    value: 8000
+    asOf: "2025"
+    note: "More than 8,000 publications supported since founding"
+    source: https://biohub.org/research/
+
+  # rare-as-one-orgs-2024
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  f97eff17:
+    label: "Rare As One Project organizations (2024)"
+    measure: customer-count
+    value: 94
+    asOf: "2024"
+    note: "Grown from 30 to 94 patient-led rare disease organizations since 2020"
+    source: https://chanzuckerberg.com/blog/2024-look-back/

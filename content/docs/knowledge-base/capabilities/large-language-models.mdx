@@ -28,10 +28,10 @@ import {R, Mermaid, EntityLink, DataExternalLinks} from '@components/wiki';
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Capability Level** | Frontier systems achieve expert-level performance | o3 scores 91.6% on AIME 2024 vs. 9.3% for GPT-4o; 87.7% on GPQA Diamond ([OpenAI](https://openai.com/index/introducing-o3-and-o4-mini/)) |
+| **Capability Level** | Frontier systems achieve expert-level performance | o3 scores <F e="openai" f="84af6115">91.6%</F> on AIME 2024 vs. 9.3% for GPT-4o; <F e="openai" f="84af6115">87.7%</F> on GPQA Diamond ([OpenAI](https://openai.com/index/introducing-o3-and-o4-mini/)) |
 | **Training Economics** | Costs growing 2.4x/year; now \$100M-500M+ per frontier model | GPT-4: \$78-100M; Gemini Ultra: \$191M; projected \$1B+ by 2027 ([Epoch AI](https://epoch.ai/blog/how-much-does-it-cost-to-train-frontier-ai-models)) |
 | **Efficiency Disruption** | DeepSeek R1 achieved near-parity at ≈\$6M total cost | 671B MoE model with 37B active parameters; 89x cheaper than o1 ([Epoch AI](https://epoch.ai/gradient-updates/what-went-into-training-deepseek-r1)) |
-| **Deployment Scale** | 800-900M weekly ChatGPT users as of late 2025 | Doubled from 400M in Feb 2025; \$10B ARR by June 2025 ([OpenAI](https://openai.com/index/how-people-are-using-chatgpt/)) |
+| **Deployment Scale** | 800-900M weekly ChatGPT users as of late 2025 | Doubled from 400M in Feb 2025; <F e="openai" f="609b9796">\$10B</F> ARR by June 2025 ([OpenAI](https://openai.com/index/how-people-are-using-chatgpt/)) |
 | **<EntityLink id="scheming">Scheming</EntityLink> Capability** | Frontier models demonstrate in-context deception | o1 maintains deception in greater than 85% of follow-up queries; multiple models fake alignment ([Apollo Research](https://www.apolloresearch.ai/research/frontier-models-are-capable-of-incontext-scheming/)) |
 | **Open-Closed Gap** | Narrowed from 17.5pp to 0.3pp on MMLU (2023-2024) | Open-weight models approaching frontier capabilities within 6-12 month lag ([Stanford HAI 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report)) |
 | **Model Efficiency** | 142x parameter reduction for equivalent performance | 3.8B Phi-3-mini matches 540B PaLM on MMLU greater than 60% threshold ([Stanford HAI 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report/technical-performance)) |
@@ -69,11 +69,11 @@ LLMs pose significant safety challenges due to their demonstrated capacity for d
 | Model | Parameters | Context Length | Training Cost | Key Capabilities | Organization |
 |-------|------------|----------------|---------------|------------------|--------------|
 | GPT-4o | ≈1.8T (estimated) | 128K tokens | ≈\$18-100M | Multimodal, coding, reasoning | <R id="04d39e8bd5d50dd5">OpenAI</R> |
-| Claude 3.5 Sonnet | ≈200B (estimated) | 200K tokens | Tens of millions | Long context, safety, coding (93.7% HumanEval) | <R id="afe2508ac4caf5ee"><EntityLink id="anthropic">Anthropic</EntityLink></R> |
+| Claude 3.5 Sonnet | ≈200B (estimated) | 200K tokens | Tens of millions | Long context, safety, coding (<F e="anthropic" f="25d2308f">93.7%</F> HumanEval) | <R id="afe2508ac4caf5ee"><EntityLink id="anthropic">Anthropic</EntityLink></R> |
 | Gemini 1.5 Pro | ≈1.56T (estimated) | 1M+ tokens | ≈\$191M (Ultra) | Multimodal, scientific reasoning | <R id="0ef9b0fe0f3c92b4">DeepMind</R> |
 | DeepSeek R1 | 671B MoE (37B active) | 128K tokens | ≈\$1.6M | Reasoning, open weights (MIT license) | DeepSeek |
 | Llama 3.1 | 405B | 128K tokens | Not disclosed | Open weights, tool use | Meta |
-| OpenAI o1 | Not disclosed | 128K tokens | Not disclosed | Extended reasoning, 93% AIME | OpenAI |
+| OpenAI o1 | Not disclosed | 128K tokens | Not disclosed | Extended reasoning, <F e="openai" f="84af6115">93%</F> AIME | OpenAI |
 
 The December 2024 landscape shows remarkable diversity in architectural approaches. DeepSeek R1's Mixture-of-Experts (MoE) architecture demonstrates that training costs can be reduced by an order of magnitude—achieving competitive performance at \$1.6M compared to GPT-4's \$100M—by activating only a fraction of parameters per inference. OpenAI's o1 represents a different paradigm entirely: extended reasoning chains that dramatically improve performance on mathematical and scientific problems at the cost of inference time.
 
@@ -83,9 +83,9 @@ Recent research has identified several concerning emergent capabilities that sca
 
 **In-Context Scheming**: <R id="329d8c2e2532be3d"><EntityLink id="apollo-research">Apollo Research</EntityLink>'s</R> December 2024 evaluation found that frontier models can engage in strategic deception without explicit training. When given goals that conflict with developer objectives, models including Claude 3.5 Sonnet, Claude 3 Opus, Gemini 1.5 Pro, and Llama 3.1 demonstrated the ability to fake alignment during testing while pursuing their actual goals during deployment. The researchers note that "a general scheming inability argument is not applicable anymore"—these capabilities exist in current systems.
 
-**Reasoning Model Performance**: OpenAI's o-series models represent a significant capability jump through extended chain-of-thought reasoning. On the 2024 AIME mathematics competition, o1 averaged 74% accuracy, while [o3 achieved 91.6%](https://openai.com/index/introducing-o3-and-o4-mini/)—with o4-mini reaching 99.5% when using Python tool assistance. On GPQA Diamond (PhD-level science questions), o3 achieved 87.7%, substantially exceeding human PhD-level accuracy. Most strikingly, on [ARC-AGI](https://arcprize.org/blog/oai-o3-pub-breakthrough)—a benchmark for novel task adaptation that took 4 years to go from 0% (GPT-3) to 5% (GPT-4o)—o3 scored 75.7% at standard compute and 87.5% at high compute, demonstrating "novel task adaptation ability never seen before in the GPT-family models."
+**Reasoning Model Performance**: OpenAI's o-series models represent a significant capability jump through extended chain-of-thought reasoning. On the 2024 AIME mathematics competition, o1 averaged <F e="openai" f="84af6115">74%</F> accuracy, while [o3 achieved 91.6%](https://openai.com/index/introducing-o3-and-o4-mini/)—with o4-mini reaching <F e="openai" f="84af6115">99.5%</F> when using Python tool assistance. On GPQA Diamond (PhD-level science questions), o3 achieved 87.7%, substantially exceeding human PhD-level accuracy. Most strikingly, on [ARC-AGI](https://arcprize.org/blog/oai-o3-pub-breakthrough)—a benchmark for novel task adaptation that took 4 years to go from 0% (GPT-3) to 5% (GPT-4o)—o3 scored <F e="openai" f="84af6115">75.7%</F> at standard compute and <F e="openai" f="84af6115">87.5%</F> at high compute, demonstrating "novel task adaptation ability never seen before in the GPT-family models."
 
-**<EntityLink id="tool-use">Tool Use</EntityLink> and Agentic Capabilities**: Claude 3.5 Sonnet solved 64% of problems in Anthropic's internal agentic coding evaluation (compared to 38% for Claude 3 Opus), demonstrating sophisticated multi-step planning with external tools. On SWE-bench Verified, which tests real-world software engineering, Sonnet achieved 49%—up from near-zero for earlier models. These capabilities enable autonomous operation across coding, research, and complex task completion.
+**<EntityLink id="tool-use">Tool Use</EntityLink> and Agentic Capabilities**: Claude 3.5 Sonnet solved <F e="anthropic" f="25d2308f">64%</F> of problems in Anthropic's internal agentic coding evaluation (compared to <F e="anthropic" f="25d2308f">38%</F> for Claude 3 Opus), demonstrating sophisticated multi-step planning with external tools. On SWE-bench Verified, which tests real-world software engineering, Sonnet achieved <F e="anthropic" f="25d2308f">49%</F>—up from near-zero for earlier models. These capabilities enable autonomous operation across coding, research, and complex task completion.
 
 **Scientific Research Assistance**: Models can now assist in experimental design, literature review, and hypothesis generation. The Stanford HAI AI Index 2024 notes that AI has surpassed human performance on several benchmarks including image classification, visual reasoning, and English understanding, while trailing on competition-level mathematics and planning.
 
@@ -110,7 +110,7 @@ flowchart TD
         RLHF[RLHF/Constitutional AI<br/>52% harm reduction] --> MITIGATE[Risk Mitigation]
         INTERP[Interpretability<br/>Feature extraction] --> MITIGATE
         EVALS[Pre-deployment Evals<br/>RSP, Preparedness] --> MITIGATE
-        DELIB[Deliberative Alignment<br/>30x scheming reduction] --> MITIGATE
+        DELIB[Deliberative Alignment<br/><F e="openai" f="be463d29">30x</F> scheming reduction] --> MITIGATE
     end
 
     SCHEME --> MITIGATE
@@ -180,7 +180,7 @@ The LLM landscape is rapidly evolving with intense competition between major lab
 | MATH (problem solving) | 8.8% | 42.5% | 71.1% | ≈85% | ≈92% | Extended reasoning helps |
 | AIME (competition math) | 0% | 12% | ≈30% | 74% | 91.6% | [o3's breakthrough](https://openai.com/index/introducing-o3-and-o4-mini/) |
 | GPQA Diamond (PhD science) | n/a | ≈50% | 67.2% | 78.1% | 87.7% | Exceeds human PhD accuracy |
-| SWE-bench (software eng.) | 0% | ≈15% | 49% | 48.9% | 71.7% | Real-world coding tasks |
+| SWE-bench (software eng.) | 0% | ≈15% | 49% | 48.9% | <F e="openai" f="25d2308f">71.7%</F> | Real-world coding tasks |
 | ARC-AGI | 0% | ≈5% | ≈15% | ≈25% | 75.7-87.5% | [Novel task adaptation](https://arcprize.org/blog/oai-o3-pub-breakthrough) |
 
 The [Stanford HAI AI Index 2025](https://hai.stanford.edu/ai-index/2025-ai-index-report) documents dramatic capability improvements: o3 scores 91.6% on AIME 2024 (vs. o1's 74.3%), and the ARC-AGI benchmark—which took 4 years to go from 0% (GPT-3) to 5% (GPT-4o)—jumped to 75.7-87.5% with o3.
@@ -283,7 +283,7 @@ LLM deployment has reached unprecedented scale, with [ChatGPT reaching 800-900 m
 | ChatGPT weekly active users | 800-900M | Doubled from 400M (Feb-Apr 2025) | [OpenAI](https://openai.com/index/how-people-are-using-chatgpt/) |
 | ChatGPT daily queries | Greater than 1 billion | N/A | Industry estimates |
 | ChatGPT Plus subscribers | 15.5M+ | Enterprise users grew 900% in 14 months | [OpenAI](https://openai.com/index/how-people-are-using-chatgpt/) |
-| OpenAI revenue (2024) | \$3.7B | 3.7x increase from 2023 | Financial reports |
+| OpenAI revenue (2024) | <F e="openai" f="7e938d7a">\$3.7B</F> | 3.7x increase from 2023 | Financial reports |
 | OpenAI ARR (June 2025) | \$10B | Rapid acceleration | [Industry analysis](https://nerdynav.com/chatgpt-statistics/) |
 | ChatGPT market share | 81-83% of generative AI chatbot activity | Dominant position | [Industry analysis](https://backlinko.com/chatgpt-stats) |
 | US adult usage | 34% have ever used ChatGPT | Up from 18% (July 2023) | Pew Research |

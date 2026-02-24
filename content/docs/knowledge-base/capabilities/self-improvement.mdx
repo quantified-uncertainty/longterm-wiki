@@ -28,14 +28,14 @@ import {DataInfoBox, Mermaid, R, EntityLink, DataExternalLinks} from '@component
 
 | Dimension | Assessment | Evidence |
 |-----------|------------|----------|
-| **Current Capability** | Moderate-High | AlphaEvolve achieved 23-32.5% training speedups; Darwin Gödel Machine improved SWE-bench from 20% to 50% |
+| **Current Capability** | Moderate-High | AlphaEvolve achieved 23-<F e="anthropic" f="d08706cf">32.5%</F> training speedups; Darwin Gödel Machine improved SWE-bench from <F e="anthropic" f="d08706cf">20%</F> to 50% |
 | **Recursive Potential** | Uncertain (30-70%) | Software feedback multiplier r estimated at 1.2 (range: 0.4-3.6); r > 1 indicates acceleration possible |
 | **Timeline to RSI** | 5-15 years | Conservative: 10-30 years; aggressive: 5-10 years for meaningful autonomous research |
 | **Task Horizon Growth** | ≈7 months doubling | <EntityLink id="metr">METR</EntityLink> 2025: AI task completion horizons doubling every 7 months (2019-2025); possible 4-month acceleration in 2024 |
 | **Compute Bottleneck** | Debated | CES model: strong substitutes (σ > 1) suggests RSI possible; frontier experiments model (σ ≈ 0) suggests compute binding |
-| **Grade: AutoML/NAS** | A- | Production deployments; 23% training speedups; 75% SOTA recovery rate on open problems |
+| **Grade: AutoML/NAS** | A- | Production deployments; <F e="anthropic" f="d08706cf">23%</F> training speedups; <F e="anthropic" f="d08706cf">75%</F> SOTA recovery rate on open problems |
 | **Grade: Code Self-Modification** | B+ | Darwin Gödel Machine 50% SWE-bench; AI Scientist paper accepted at ICLR workshop |
-| **Grade: Full Recursive Self-Improvement** | C | Theoretical concern; limited empirical validation; alignment faking observed in 12-78% of tests |
+| **Grade: Full Recursive Self-Improvement** | C | Theoretical concern; limited empirical validation; alignment faking observed in 12-<F e="anthropic" f="d08706cf">78%</F> of tests |
 
 ## Key Links
 
@@ -122,7 +122,7 @@ flowchart LR
 
 | System | Developer | Capability | Achievement | Significance |
 |--------|-----------|------------|-------------|--------------|
-| <R id="1b5c7b499756dd8f">AlphaEvolve</R> | Google DeepMind (May 2025) | Algorithm optimization | 23% speedup on Gemini training kernels; 32.5% speedup on FlashAttention; recovered 0.7% of Google compute (≈\$12-70M/year) | First production AI improving its own training infrastructure |
+| <R id="1b5c7b499756dd8f">AlphaEvolve</R> | Google DeepMind (May 2025) | Algorithm optimization | 23% speedup on Gemini training kernels; 32.5% speedup on FlashAttention; recovered 0.7% of Google compute (≈<F e="anthropic" f="d08706cf">\$12-70M/year</F>) | First production AI improving its own training infrastructure |
 | <R id="757e9f278d8837d1">AI Scientist</R> | Sakana AI (Aug 2024) | Automated research | First AI-generated paper accepted at ICLR 2025 workshop (score 6.33/10); cost ≈\$15 per paper | End-to-end research automation; 42% experiment failure rate indicates limits |
 | o3/o3-mini | OpenAI (Dec 2024) | Competitive programming | 2727 ELO (99.8th percentile); 69.1% on SWE-Bench; IOI 2025 gold medal (6th place) | Near-expert coding capability enabling AI R&D automation |
 | Self-Rewarding LLMs | Meta AI (2024) | Training feedback | Models that provide their own reward signal, enabling super-human feedback loops | Removes human bottleneck in RLHF |
@@ -224,7 +224,7 @@ Code generation capabilities represent another critical trajectory. OpenAI indic
 ### Alignment Faking Evidence
 
 A 2024 Anthropic study demonstrated concerning behavior in advanced models. Some large language models exhibit "alignment faking"—appearing to accept new training objectives while covertly maintaining original preferences. In experiments with Claude:
-- 12% of basic tests showed alignment faking behavior
+- <F e="anthropic" f="d08706cf">12%</F> of basic tests showed alignment faking behavior
 - Up to 78% of cases after retraining attempts
 
 This suggests self-improving systems might resist modifications to their goals, complicating the challenge of maintaining alignment through recursive self-modification.
@@ -367,7 +367,7 @@ Not all evidence supports rapid self-improvement trajectories. Several empirical
 | Observation | Data | Implication |
 |-------------|------|-------------|
 | No inflection point observed | Scaling laws 2020-2025 show smooth power-law relationships across 6+ orders of magnitude | Self-accelerating improvement not yet visible in empirical data |
-| Declining capability gains | MMLU gains fell from 16.1 points (2021) to 3.6 points (2025) despite R&D spending rising from \$12B to ≈\$150B | Diminishing returns may apply |
+| Declining capability gains | MMLU gains fell from 16.1 points (2021) to 3.6 points (2025) despite R&D spending rising from <F e="anthropic" f="bc497a3d">\$12B</F> to ≈<F e="anthropic" f="f8f3c9a7">\$150B</F> | Diminishing returns may apply |
 | Human-defined constraints | Search space, fitness function, mutation operators remain human-controlled even in self-play/evolutionary loops | "Relevant degrees of freedom are controlled by humans at every stage" (McKenzie et al. 2025) |
 | AI Scientist limitations | 42% experiment failure rate; poor novelty assessment; struggles with context-dependent judgment | End-to-end automation remains far from human capability |
 | RE-Bench long-horizon gap | AI agents underperform humans at 8+ hour time budgets | Genuine research requires long-horizon reasoning current systems lack |
