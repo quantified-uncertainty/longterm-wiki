@@ -7,10 +7,10 @@ sidebar:
 entityType: internal
 quality: 55
 readerImportance: 75
-lastEdited: "2026-02-16"
+lastEdited: "2026-02-24"
 createdAt: 2026-02-16
 evergreen: false
-llmSummary: "Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan building on existing Crux infrastructure."
+llmSummary: "Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan, composable module architecture, and academic foundations drawing on proposition-level retrieval (Dense X Retrieval), FActScore verification, nanopublications, and argumentation frameworks."
 ratings:
   novelty: 7
   rigor: 6
@@ -20,6 +20,8 @@ ratings:
 import { Mermaid } from '@components/wiki';
 
 ## Executive Summary
+
+**See also**: <EntityLink id="claim-first-architecture">Claim-First Wiki Architecture</EntityLink> — a companion proposal that inverts the data model, making verified atomic claims (rather than prose documents) the primary artifact, with wiki pages as derived views.
 
 Our current page generation pipeline (Crux content create/improve) is a **single-pipeline, single-agent** system. It works, but produces pages that are adequate rather than excellent. The best wiki pages require depth that a single LLM pass cannot achieve: dense cross-linking, verified citations, complex diagrams, embedded calculations, and knowledge graph coherence.
 
@@ -784,9 +786,49 @@ Dependency order: #633 is the foundation. #634 and #635 depend on it. #636 is in
 
 ---
 
-## References
+## Part 12: Academic Foundations for Claim-First Content
 
-Key sources informing this architecture:
+Recent academic work provides strong validation for the proposition-level and claim-first approaches described in this document and the companion <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink> proposal.
+
+### Proposition-Level Retrieval (Dense X Retrieval)
+
+Chen et al. (EMNLP 2024) define a **proposition** as an atomic, self-contained factual expression with three properties: **minimal** (cannot be further split), **self-contained** (includes resolved coreferences), and **compositional** (the union of all propositions reconstructs full semantics). They built a "Propositionizer" model that decomposes text into propositions and showed that indexing Wikipedia at proposition level **significantly outperformed** both passage-level and sentence-level indexing for retrieval and QA tasks.[^11]
+
+This is direct evidence for the claim-first thesis: atomic propositions are better retrieval units than paragraphs or documents.
+
+### Decompose-Then-Verify (FActScore)
+
+FActScore (Min et al., EMNLP 2023) formalized the **decompose-then-verify** pipeline: decompose generated text into atomic facts, retrieve evidence, verify each fact, compute the percentage supported. Applied to ChatGPT biographies, only 58% of atomic facts were supported by sources.[^12] Google's SAFE system extends this with multi-step search verification at 1/20th the cost of human annotators.
+
+Our pipeline applies the same decomposition *proactively* — producing atomic claims before writing rather than extracting them afterward. The Kalshi experiment (see <EntityLink id="claim-first-architecture">Claim-First Architecture</EntityLink>, Part 9b) confirmed this catches embellishments that post-hoc verification misses.
+
+### Nanopublications: The Formal Precedent
+
+The Semantic Web community's **nanopublication** framework is the academic formalization of our knowledge bundle idea. Each nanopublication has three parts: **Assertion** (the claim itself as RDF triples), **Provenance** (how the assertion came about — methods, evidence), and **Publication Info** (metadata). Nanopublications are immutable, cryptographically verifiable, and operate on a decentralized server network.[^13]
+
+The **micropublication** extension adds richer argumentation structure: a statement plus supporting evidence, interpretations, and challenges.[^14] This maps directly to our analytical claim type with its `supportingClaims` and `reasoning` fields.
+
+### Knowledge-Centric Templatic Views (SURe)
+
+A January 2024 paper introduces **Structure Unified Representation** — capturing the most important knowledge from a document in a structured format, then generating multiple view types (slide decks, newsletters, reports) from that single representation with no supervision.[^15] This is the closest published validation of the "multiple presentation layers from one data layer" pattern that both the multi-agent architecture and claim-first architecture rely on.
+
+### GPTKB: Warning on LLM-Generated Knowledge
+
+GPTKB (2024-2025) built a knowledge base entirely from LLM output: 105 million triples for 2.9 million entities. Their critical finding: **accuracy is far from existing projects** — the LLM generates many incorrect and unverifiable facts.[^16] This strongly validates our design decision that verification must precede storage. The claim-first architecture's insistence on per-claim verification before claims enter the store directly addresses GPTKB's accuracy problems.
+
+### Multi-Agent Verification (KARMA)
+
+KARMA (2025) uses nine collaborative agents for entity discovery, relation extraction, schema alignment, and conflict resolution. Tested on 1,200 PubMed articles: 38,230 new entities with 83.1% verified correctness, reducing conflict edges by 18.6%.[^8] The modular, multi-agent design with cross-agent verification maps directly to our specialist agent architecture.
+
+### Block-Based Knowledge Tools
+
+Production tools like Roam Research, Logseq, and Notion demonstrate that **block-level (claim-level) architectures work at scale**. Logseq's dual-database design (in-memory Datascript + persistent SQLite) with block-level content, typed properties, and Datalog queries is particularly instructive for the claim store's eventual database-backed implementation (Option C in the claim-first architecture).[^17]
+
+### Argumentation Frameworks
+
+For AI safety topics where many claims involve genuine disagreement (timelines, risk levels, alignment difficulty), **claim-augmented argumentation frameworks** provide formal tools for representing competing positions. These extend Dung's abstract argumentation by associating a claim to each argument, enabling re-interpretation at different evaluation stages.[^18] This maps to our consensus and analytical claim types and suggests the claim store should eventually support explicit argumentation structure.
+
+---
 
 [^1]: [Stanford STORM: Synthesis of Topic Outlines through Retrieval and Multi-perspective Question Asking](https://github.com/stanford-oval/storm) (NAACL 2024)
 
@@ -807,3 +849,19 @@ Key sources informing this architecture:
 [^9]: [Co-STORM Collaborative Knowledge Curation System](https://deepwiki.com/stanford-oval/storm/3-co-storm-collaborative-system) (EMNLP 2024)
 
 [^10]: [Google Developers: Multi-Agent Patterns in ADK](https://developers.googleblog.com/developers-guide-to-multi-agent-patterns-in-adk/) (2025)
+
+[^11]: [Dense X Retrieval: What Retrieval Granularity Should We Use?](https://aclanthology.org/2024.emnlp-main.845/) (Chen et al., EMNLP 2024). See also [Factoid Wiki](https://chentong0.github.io/factoid-wiki/).
+
+[^12]: [FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation](https://arxiv.org/abs/2305.14251) (Min et al., EMNLP 2023)
+
+[^13]: [Nanopublication-based semantic publishing and reviewing](https://peerj.com/articles/cs-1159/) (PeerJ Computer Science, 2023). See also [Nanopublication Guidelines](https://nanopub.net/guidelines/working_draft/).
+
+[^14]: [Micropublications: a semantic model for claims, evidence, arguments and annotations](https://jbiomedsem.biomedcentral.com/articles/10.1186/2041-1480-5-28) (Journal of Biomedical Semantics, 2014)
+
+[^15]: [Knowledge-Centric Templatic Views of Documents](https://arxiv.org/html/2401.06945v1) (arXiv, January 2024)
+
+[^16]: [GPTKB: Building Very Large Knowledge Bases from Language Models](https://arxiv.org/html/2411.04920v1) (arXiv, November 2024). See also [gptkb.org](https://gptkb.org/).
+
+[^17]: [Logseq Architecture — Block-Level Database Design](https://deepwiki.com/logseq/logseq) (DeepWiki)
+
+[^18]: [Claim-augmented argumentation frameworks](https://www.sciencedirect.com/science/article/pii/S000437022300019X) (Artificial Intelligence, 2023)
