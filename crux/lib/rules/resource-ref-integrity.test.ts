@@ -35,89 +35,89 @@ function mockContent(
 }
 
 describe('resource-ref-integrity rule', () => {
-  it('passes when resource ID exists in YAML', () => {
+  it('passes when resource ID exists in YAML', async () => {
     const content = mockContent('<R id="aabbccdd11223344">Valid Resource</R>');
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });
 
-  it('reports an error for an unknown resource ID', () => {
+  it('reports an error for an unknown resource ID', async () => {
     const content = mockContent('<R id="deadbeefdeadbeef">Missing Resource</R>');
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(1);
     expect(issues[0].rule).toBe('resource-ref-integrity');
     expect(issues[0].message).toContain('deadbeefdeadbeef');
     expect(issues[0].severity).toBe(Severity.ERROR);
   });
 
-  it('reports the correct line number for the broken reference', () => {
+  it('reports the correct line number for the broken reference', async () => {
     const body = 'First line\nSecond line\n<R id="deadbeefdeadbeef">Missing</R>\nFourth line';
     const content = mockContent(body);
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(1);
     expect(issues[0].line).toBe(3);
   });
 
-  it('skips <R> tags inside fenced code blocks', () => {
+  it('skips <R> tags inside fenced code blocks', async () => {
     const body = '```\n<R id="deadbeefdeadbeef">Missing</R>\n```';
     const content = mockContent(body);
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });
 
-  it('skips <R> tags inside inline code spans', () => {
+  it('skips <R> tags inside inline code spans', async () => {
     const body = 'Use `<R id="deadbeefdeadbeef">text</R>` in your page.';
     const content = mockContent(body);
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });
 
-  it('skips pages whose relativePath starts with internal/', () => {
+  it('skips pages whose relativePath starts with internal/', async () => {
     const content = mockContent('<R id="deadbeefdeadbeef">Missing</R>', {
       relativePath: 'internal/guide.mdx',
     });
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });
 
-  it('skips pages with /internal/ anywhere in relativePath', () => {
+  it('skips pages with /internal/ anywhere in relativePath', async () => {
     const content = mockContent('<R id="deadbeefdeadbeef">Missing</R>', {
       relativePath: 'docs/internal/some-guide.mdx',
     });
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });
 
-  it('reports one error per broken reference across multiple lines', () => {
+  it('reports one error per broken reference across multiple lines', async () => {
     const body = [
       '<R id="deadbeefdeadbeef">Missing 1</R>',
       'Some text',
       '<R id="baadf00dbaadf00d">Missing 2</R>',
     ].join('\n');
     const content = mockContent(body);
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(2);
   });
 
-  it('only errors on the invalid ID when page has both valid and invalid references', () => {
+  it('only errors on the invalid ID when page has both valid and invalid references', async () => {
     const body = [
       '<R id="aabbccdd11223344">Valid</R>',
       'Some text',
       '<R id="deadbeefdeadbeef">Invalid</R>',
     ].join('\n');
     const content = mockContent(body);
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(1);
     expect(issues[0].message).toContain('deadbeefdeadbeef');
   });
 
-  it('accepts both valid IDs loaded from YAML', () => {
+  it('accepts both valid IDs loaded from YAML', async () => {
     const body = [
       '<R id="aabbccdd11223344">Resource A</R>',
       '<R id="ccdd1122aabb5566">Resource B</R>',
     ].join('\n');
     const content = mockContent(body);
-    const issues = resourceRefIntegrityRule.check(content as any, {} as any);
+    const issues = await resourceRefIntegrityRule.check(content as any, {} as any);
     expect(issues.length).toBe(0);
   });
 });

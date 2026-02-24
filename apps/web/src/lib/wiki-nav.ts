@@ -231,7 +231,7 @@ export function getAtmNav(): NavSection[] {
   // Top-level items (overview, parameter table)
   const topItems = [
     { label: "Overview", href: "/wiki/ai-transition-model" },
-    { label: "Parameter Table", href: "/wiki/table" },
+    { label: "Parameter Table", href: getEntityHref("table") },
   ];
 
   const sections: NavSection[] = [
@@ -348,6 +348,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Citation Content", href: "/internal/citation-content" },
         { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
         { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
+        { label: "Human Reviews", href: "/internal/reviews" },
         { label: "Improve Runs", href: "/internal/improve-runs" },
         { label: "Job Queue", href: "/internal/jobs" },
       ],

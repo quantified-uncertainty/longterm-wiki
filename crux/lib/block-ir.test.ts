@@ -346,14 +346,42 @@ See [compute page](/ai-transition-model/compute/) and [overview](/knowledge-base
     expect(section.wordCount).toBeGreaterThanOrEqual(8);
   });
 
-  it('remark-mdx throws on malformed MDX (caught by build script)', () => {
-    // Malformed JSX — unclosed tag. remark-mdx throws a parse error.
-    // The build script's try/catch handles this per page (non-fatal).
-    const mdx = `## Section
+  it('falls back gracefully when remark-mdx fails (acorn parse error)', () => {
+    // Pages with complex Mermaid charts using template literals in JSX props
+    // trigger "Could not parse expression with acorn" from remark-mdx.
+    // The fallback parser (without remarkMdx) should extract section structure
+    // and text-based data even when JSX attribute parsing fails.
+    //
+    // Simulating the acorn failure: a JSX expression that triggers the error.
+    // We use a multiline template literal with content that confuses remark-mdx.
+    const mdx = `---
+title: Neuromorphic Computing
+---
 
-<EntityLink id="test"
+## Overview
+
+This page has a Mermaid chart.
+
+<Mermaid chart={\`
+flowchart TB
+    subgraph arch["Architecture"]
+        direction TB
+        node1["Node 1<br/>Details"]
+    end
+\`} />
+
+More text after the chart.
 `;
-    expect(() => extractBlockIR('parse-error', mdx)).toThrow();
+    // Should NOT throw — falls back to non-MDX parser
+    const ir = extractBlockIR('fallback-test', mdx);
+
+    expect(ir.pageId).toBe('fallback-test');
+    // Sections should still be extracted (headings work without remarkMdx)
+    expect(ir.sections.length).toBeGreaterThanOrEqual(2); // preamble + Overview
+    const overviewSection = ir.sections.find(s => s.heading === 'Overview');
+    expect(overviewSection).toBeDefined();
+    // Word count should still work
+    expect(overviewSection!.wordCount).toBeGreaterThan(0);
   });
 
   it('does not include untracked components in componentNames', () => {

@@ -149,3 +149,50 @@ export async function allocateIds(slugs) {
 
   return resultMap;
 }
+
+/**
+ * Fetch all entity ID registrations from the server as a slug→numericId map.
+ *
+ * Paginates through GET /api/entities with the given page size until all
+ * entities have been fetched.  Returns an empty Map on any failure — the
+ * caller should treat an empty result as "server unavailable" and skip
+ * verification rather than failing the build.
+ *
+ * @param {number} [pageSize=200]
+ * @returns {Promise<Map<string, string>>}  Map of slug → numericId
+ */
+export async function fetchServerEntityIdMap(pageSize = 200) {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return new Map();
+
+  const resultMap = new Map();
+  let offset = 0;
+
+  try {
+    while (true) {
+      const res = await fetch(
+        `${serverUrl}/api/entities?limit=${pageSize}&offset=${offset}`,
+        {
+          headers: buildHeaders(),
+          signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
+        },
+      );
+      if (!res.ok) break;
+
+      const data = await res.json();
+      const entities = data.entities || [];
+      for (const entity of entities) {
+        if (entity.id && entity.numericId) {
+          resultMap.set(entity.id, entity.numericId);
+        }
+      }
+
+      if (entities.length < pageSize) break; // last page
+      offset += pageSize;
+    }
+  } catch {
+    // Network error or timeout — return whatever we have (possibly empty)
+  }
+
+  return resultMap;
+}

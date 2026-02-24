@@ -106,6 +106,21 @@ function getParser(): any {
   return _pipeline;
 }
 
+// Fallback pipeline without remarkMdx — used when the full parser fails with
+// acorn errors (e.g. Mermaid charts with complex template literals in JSX attrs).
+// Loses JSX component tracking but preserves section structure, word counts,
+// and text-based links for the ~31 pages that trigger acorn parse failures.
+let _fallbackPipeline: any = null;
+
+function getFallbackParser(): any {
+  if (_fallbackPipeline) return _fallbackPipeline;
+  _fallbackPipeline = unified()
+    .use(remarkParse)
+    .use(remarkFrontmatter)
+    .use(remarkGfm);
+  return _fallbackPipeline;
+}
+
 // ---------------------------------------------------------------------------
 // Section accumulator
 // ---------------------------------------------------------------------------
@@ -241,7 +256,16 @@ function walkForComponents(node: any, entityLinks: string[], facts: FactRef[], f
  */
 export function extractBlockIR(pageId: string, mdxContent: string): PageBlockIR {
   const parser = getParser();
-  const tree = parser.parse(mdxContent);
+  let tree: any;
+  try {
+    tree = parser.parse(mdxContent);
+  } catch (_err) {
+    // Full MDX parse failed (typically acorn can't parse complex JSX attribute
+    // expressions like Mermaid charts with multiline template literals).
+    // Fall back to a parser without remarkMdx — loses JSX component tracking
+    // but preserves section structure, word counts, and text links.
+    tree = getFallbackParser().parse(mdxContent);
+  }
 
   // 1. Collect H2 headings with positions to define section boundaries
   const headings: Array<{ text: string; level: number; line: number }> = [];

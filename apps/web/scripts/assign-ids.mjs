@@ -21,10 +21,24 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join, basename } from 'path';
 import { parse } from 'yaml';
-import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
+import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS, REPO_ROOT } from './lib/content-types.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildIdMaps, filterEligiblePages } from './lib/id-assignment.mjs';
-import { isServerAvailable, allocateIds } from './lib/id-client.mjs';
+import { isServerAvailable, allocateIds, fetchServerEntityIdMap } from './lib/id-client.mjs';
+
+// ---------------------------------------------------------------------------
+// .env loading — must run before any process.env access
+// ---------------------------------------------------------------------------
+// Load .env from repo root so `node scripts/assign-ids.mjs` works without
+// pre-setting LONGTERMWIKI_SERVER_URL / LONGTERMWIKI_SERVER_API_KEY in the
+// shell.  dotenv.config() is a no-op when the file is absent or vars are
+// already set, so this is safe to call unconditionally.
+try {
+  const { config } = await import('dotenv');
+  config({ path: join(REPO_ROOT, '.env') });
+} catch {
+  // dotenv not available or .env missing — rely on shell environment
+}
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -158,6 +172,68 @@ async function main() {
     console.error('\n  ERROR: numericId conflicts detected:');
     for (const c of conflicts) console.error(`    ${c}`);
     process.exit(1);
+  }
+
+  // -------------------------------------------------------------------------
+  // Verify manually-set numericIds for YAML entities against the server.
+  //
+  // YAML entity numericIds cannot be written back by assign-ids (we have no
+  // safe way to round-trip YAML), so they must be added manually.  When
+  // someone manually writes a numericId in a YAML file there is a risk of
+  // bypassing the server-based ID allocation — e.g. writing a numericId
+  // that the server has already allocated to a different slug.
+  //
+  // This step verifies every manually-set YAML entity numericId by asking the
+  // server what ID it allocated for that slug.  The allocate endpoint is
+  // idempotent: if the server has already registered the slug (e.g. from a
+  // previous run), it returns the same ID with created=false; if not, it
+  // creates a new one.  If the server-allocated ID differs from the local
+  // manual value, we report a clear error.
+  //
+  // When the server is unavailable we skip verification and warn — this keeps
+  // the offline/CI-without-server workflow working.
+  // -------------------------------------------------------------------------
+  const yamlEntitiesWithManualIds = yamlEntityItems.filter(e => e.numericId);
+
+  if (yamlEntitiesWithManualIds.length > 0 && serverAvailable && !DRY_RUN) {
+    // Verify manually-set numericIds against the server using a bulk read-only
+    // lookup (no side effects — uses GET /api/entities, not the allocate endpoint).
+    // We fetch all server-registered entities once and compare in-memory.
+    console.log(`  Verifying ${yamlEntitiesWithManualIds.length} manually-set YAML entity numericIds against server...`);
+    const serverIdMap = await fetchServerEntityIdMap();
+
+    if (serverIdMap.size === 0) {
+      console.warn(`  WARNING: Could not fetch entity registry from server — skipping numericId verification.`);
+    } else {
+      let conflictFound = false;
+      let verified = 0;
+      let notInServer = 0;
+      for (const entity of yamlEntitiesWithManualIds) {
+        const serverNumericId = serverIdMap.get(entity.id);
+        if (!serverNumericId) {
+          // Server has no record for this slug — new entity, skip
+          notInServer++;
+          continue;
+        }
+        verified++;
+        if (serverNumericId !== entity.numericId) {
+          console.error(`    ERROR: numericId conflict for YAML entity "${entity.id}":`);
+          console.error(`      Locally set:       ${entity.numericId}`);
+          console.error(`      Server registered: ${serverNumericId}`);
+          console.error(`      Fix: update numericId in data/entities/ to "${serverNumericId}",`);
+          console.error(`           or ask an admin to register "${entity.numericId}" for "${entity.id}" on the server.`);
+          conflictFound = true;
+        }
+      }
+      if (conflictFound) {
+        console.error('\n  Manual numericId bypass detected. Aborting to prevent ID registry corruption.');
+        process.exit(1);
+      }
+      const notInServerNote = notInServer > 0 ? ` (${notInServer} not yet in server — OK for new entities)` : '';
+      console.log(`  Verification complete: ${verified} numericIds verified OK${notInServerNote}.`);
+    }
+  } else if (yamlEntitiesWithManualIds.length > 0 && !serverAvailable && !DRY_RUN) {
+    console.warn(`  WARNING: Server unavailable — skipping verification of ${yamlEntitiesWithManualIds.length} manually-set YAML entity numericIds.`);
   }
 
   // -------------------------------------------------------------------------
