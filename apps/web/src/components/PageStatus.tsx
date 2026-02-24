@@ -51,6 +51,13 @@ interface CitationHealth {
   avgScore: number | null;
 }
 
+interface PageRatings {
+  novelty?: number;
+  rigor?: number;
+  actionability?: number;
+  completeness?: number;
+}
+
 export interface PageStatusProps {
   quality?: number;
   importance?: number;
@@ -74,6 +81,8 @@ export interface PageStatusProps {
   hasEntity?: boolean;
   resourceCount?: number;
   citationHealth?: CitationHealth;
+  ratings?: PageRatings;
+  factCount?: number;
 }
 
 // ============================================================================
@@ -626,46 +635,53 @@ function getRecommendedMetrics(
   tables: number;
   diagrams: number;
   internalLinks: number;
+  externalLinks: number;
   footnotes: number;
   references: number;
 } {
+  // Calibrated against high-quality pages (quality >= 70):
+  // tables ~4.4/kw, diagrams ~0.4/kw, intLinks ~9.8/kw, footnotes ~3.3/kw
   const kWords = wordCount / 1000;
 
   if (contentFormat === "table") {
     return {
-      tables: Math.max(2, Math.round(kWords * 2)),
-      diagrams: Math.max(0, Math.round(kWords * 0.2)),
-      internalLinks: Math.max(2, Math.round(kWords * 2)),
-      footnotes: Math.max(1, Math.round(kWords * 1.5)),
-      references: Math.max(1, Math.round(kWords * 1.5)),
+      tables: Math.max(2, Math.round(kWords * 5)),
+      diagrams: Math.max(0, Math.round(kWords * 0.3)),
+      internalLinks: Math.max(3, Math.round(kWords * 5)),
+      externalLinks: Math.max(1, Math.round(kWords * 3)),
+      footnotes: Math.max(1, Math.round(kWords * 2)),
+      references: Math.max(1, Math.round(kWords * 2)),
     };
   }
   if (contentFormat === "diagram") {
     return {
-      tables: Math.max(0, Math.round(kWords * 0.5)),
-      diagrams: Math.max(1, Math.round(kWords * 0.8)),
-      internalLinks: Math.max(2, Math.round(kWords * 2)),
-      footnotes: Math.max(1, Math.round(kWords * 1.5)),
-      references: Math.max(1, Math.round(kWords * 1.5)),
+      tables: Math.max(0, Math.round(kWords * 1)),
+      diagrams: Math.max(1, Math.round(kWords * 1)),
+      internalLinks: Math.max(3, Math.round(kWords * 5)),
+      externalLinks: Math.max(1, Math.round(kWords * 3)),
+      footnotes: Math.max(1, Math.round(kWords * 2)),
+      references: Math.max(1, Math.round(kWords * 2)),
     };
   }
   if (contentFormat === "index" || contentFormat === "dashboard") {
     return {
-      tables: Math.max(0, Math.round(kWords * 0.5)),
+      tables: Math.max(0, Math.round(kWords * 1)),
       diagrams: 0,
-      internalLinks: Math.max(5, Math.round(kWords * 5)),
+      internalLinks: Math.max(5, Math.round(kWords * 8)),
+      externalLinks: Math.max(0, Math.round(kWords * 2)),
       footnotes: 0,
-      references: Math.max(0, Math.round(kWords * 0.5)),
+      references: Math.max(0, Math.round(kWords * 1)),
     };
   }
 
-  // Default: article format
+  // Default: article format (calibrated from q>=70 pages)
   return {
-    tables: Math.max(1, Math.round(kWords * 1.2)),
-    diagrams: Math.max(0, Math.round(kWords * 0.3)),
-    internalLinks: Math.max(2, Math.round(kWords * 3)),
-    footnotes: Math.max(2, Math.round(kWords * 2.5)),
-    references: Math.max(1, Math.round(kWords * 2)),
+    tables: Math.max(1, Math.round(kWords * 4)),
+    diagrams: Math.max(0, Math.round(kWords * 0.4)),
+    internalLinks: Math.max(3, Math.round(kWords * 8)),
+    externalLinks: Math.max(1, Math.round(kWords * 5)),
+    footnotes: Math.max(2, Math.round(kWords * 3)),
+    references: Math.max(1, Math.round(kWords * 3)),
   };
 }
 
@@ -707,6 +723,8 @@ function ContentCoverageSection({
   changeHistory,
   wordCount,
   contentFormat,
+  ratings,
+  factCount,
 }: {
   structuredSummary?: StructuredSummary;
   llmSummary?: string;
@@ -718,6 +736,8 @@ function ContentCoverageSection({
   changeHistory?: ChangeEntry[];
   wordCount?: number;
   contentFormat?: ContentFormat;
+  ratings?: PageRatings;
+  factCount?: number;
 }) {
   const format = contentFormat || "article";
   const recommended = getRecommendedMetrics(wordCount || 0, format);
@@ -766,6 +786,7 @@ function ContentCoverageSection({
   const tableCount = metrics?.tableCount ?? 0;
   const diagramCount = metrics?.diagramCount ?? 0;
   const internalLinks = metrics?.internalLinks ?? 0;
+  const externalLinks = metrics?.externalLinks ?? 0;
   const footnoteCount = metrics?.footnoteCount ?? 0;
   const refCount = resourceCount ?? 0;
   const quoteNum = citationHealth?.withQuotes ?? 0;
@@ -796,6 +817,14 @@ function ContentCoverageSection({
       target: recommended.internalLinks,
       hint: "Add links to other wiki pages",
       description: "Links to other wiki pages. More internal links = better graph connectivity.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "Ext. links",
+      actual: externalLinks,
+      target: recommended.externalLinks,
+      hint: "Add links to external sources",
+      description: "Links to external websites, papers, and resources outside the wiki.",
       anchor: "tables-diagrams",
     },
     {
@@ -831,6 +860,32 @@ function ContentCoverageSection({
       anchor: "accuracy-checked",
     },
   ];
+
+  // --- Info-only items (no pass/fail, just data) ---
+  const infoItems: { label: string; value: string; description: string }[] = [];
+
+  if (ratings) {
+    const ratingParts: string[] = [];
+    if (ratings.novelty != null) ratingParts.push(`N:${ratings.novelty}`);
+    if (ratings.rigor != null) ratingParts.push(`R:${ratings.rigor}`);
+    if (ratings.actionability != null) ratingParts.push(`A:${ratings.actionability}`);
+    if (ratings.completeness != null) ratingParts.push(`C:${ratings.completeness}`);
+    if (ratingParts.length > 0) {
+      infoItems.push({
+        label: "Ratings",
+        value: ratingParts.join(" "),
+        description: "Sub-quality ratings: Novelty, Rigor, Actionability, Completeness (0-10 scale).",
+      });
+    }
+  }
+
+  if (factCount != null && factCount > 0) {
+    infoItems.push({
+      label: "Facts",
+      value: `${factCount}`,
+      description: "Canonical facts defined for this entity in data/facts/ YAML. Used by <F> components.",
+    });
+  }
 
   // --- Scoring ---
   const booleanPassing = booleanItems.filter((i) => i.present).length;
@@ -971,6 +1026,38 @@ function ContentCoverageSection({
               </span>
             );
           })}
+          {/* Info-only rows — no pass/fail, just data */}
+          {infoItems.map((item) => (
+            <span
+              key={item.label}
+              className={cn(
+                styles.wrapper,
+                "!flex items-center gap-1.5 px-2 py-[3px] text-[11px] cursor-help border-t border-border bg-muted/30"
+              )}
+            >
+              <IconInfo className="shrink-0 text-muted-foreground/50" />
+              <span className="w-[62px] shrink-0 text-muted-foreground">
+                {item.label}
+              </span>
+              <span className="tabular-nums text-[10px] text-muted-foreground font-medium">
+                {item.value}
+              </span>
+              <span
+                className={cn(
+                  styles.tooltip,
+                  "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+                )}
+                role="tooltip"
+              >
+                <span className="block font-semibold text-foreground text-xs mb-1">
+                  {item.label}
+                </span>
+                <span className="block text-muted-foreground text-[11px] leading-snug whitespace-normal">
+                  {item.description}
+                </span>
+              </span>
+            </span>
+          ))}
         </div>
       </div>
     </div>
@@ -1064,6 +1151,8 @@ export function PageStatus({
   hasEntity,
   resourceCount,
   citationHealth,
+  ratings,
+  factCount,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
   const isATMPage = detectedType === "ai-transition-model";
@@ -1189,6 +1278,8 @@ export function PageStatus({
         changeHistory={changeHistory}
         wordCount={wordCount}
         contentFormat={contentFormat}
+        ratings={ratings}
+        factCount={factCount}
       />
 
       {/* Change history */}
