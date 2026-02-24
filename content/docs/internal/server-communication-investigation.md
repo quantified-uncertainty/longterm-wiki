@@ -1,5 +1,11 @@
 ---
-title: Server Communication Investigation
+title: "Server Communication Investigation"
+description: "Evaluation of wiki-server client/server architecture — pain points, framework options (Hono RPC, ts-rest, oRPC), and pragmatic improvement plan for type-safe API communication."
+entityType: internal
+readerImportance: 15
+researchImportance: 20
+lastEdited: "2026-02-24"
+evergreen: false
 ---
 
 # Server Communication Investigation
