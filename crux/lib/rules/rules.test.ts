@@ -555,21 +555,11 @@ describe('frontmatter-schema rule', () => {
     expect(issues.some((i: any) => i.message.includes('title'))).toBe(true);
   });
 
-  it('detects update_frequency without lastEdited', () => {
+  it('allows update_frequency without lastEdited (dates are now derived from git/server)', () => {
     const raw = '---\ntitle: Test\nupdate_frequency: 7\n---\nContent';
     const content = mockContent('Content', {
       raw,
       frontmatter: { title: 'Test', update_frequency: 7 },
-    });
-    const issues = check(frontmatterSchemaRule, content);
-    expect(issues.some((i: any) => i.message.includes('update_frequency'))).toBe(true);
-  });
-
-  it('allows update_frequency with lastEdited', () => {
-    const raw = '---\ntitle: Test\nupdate_frequency: 7\nlastEdited: "2025-01-01"\n---\nContent';
-    const content = mockContent('Content', {
-      raw,
-      frontmatter: { title: 'Test', update_frequency: 7, lastEdited: '2025-01-01' },
     });
     const issues = check(frontmatterSchemaRule, content);
     const crossFieldIssues = issues.filter((i: any) => i.message.includes('update_frequency'));

@@ -118,7 +118,7 @@ Read the draft article at: ${draftPath}
 
 8. **Check wiki conventions**:
    - All factual claims have footnote citations
-   - Proper frontmatter fields present (title, description, importance, lastEdited, ratings)
+   - Proper frontmatter fields present (title, description, importance, ratings)
    - Import statement: \`import {...} from '@components/wiki';\`
 
 9. **Write the final fixed version** to:
@@ -217,26 +217,6 @@ export async function runFullValidation(topic: string, { log, saveResult, ROOT, 
     log('validate-full', '  ✗ MDX compilation failed');
   }
 
-  // 1b. Direct frontmatter check
-  try {
-    const tempContent = fs.readFileSync(finalPath, 'utf-8');
-
-    const unquotedDateMatch = tempContent.match(/lastEdited:\s*(\d{4}-\d{2}-\d{2})(?:\s*$|\s*\n)/m);
-    if (unquotedDateMatch) {
-      const lineContent = tempContent.split('\n').find(l => l.includes('lastEdited:')) || '';
-      if (!lineContent.includes('"') && !lineContent.includes("'")) {
-        const fixedContent = tempContent.replace(
-          /lastEdited:\s*(\d{4}-\d{2}-\d{2})/,
-          'lastEdited: "$1"'
-        );
-        fs.writeFileSync(finalPath, fixedContent);
-        log('validate-full', '  ✓ Fixed unquoted lastEdited date');
-      }
-    }
-  } catch (err: unknown) {
-    const fmError = err instanceof Error ? err : new Error(String(err));
-    log('validate-full', `  Could not check frontmatter: ${fmError.message}`);
-  }
 
   // 2. Run unified rules
   log('validate-full', 'Running validation rules...');

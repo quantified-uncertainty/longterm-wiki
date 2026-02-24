@@ -293,7 +293,7 @@ Fix ALL the issues listed above. Specific fix guidance:
 4. **Footnote citations**: Ensure all [^N] references have matching [^N]: definitions
    - If no real URL available, use text-only: [^1]: Source name - description
    - NEVER use fake URLs like "example.com" or "undefined"
-5. **Frontmatter**: Ensure valid YAML with required fields (title, description, importance, lastEdited, ratings)
+5. **Frontmatter**: Ensure valid YAML with required fields (title, description, importance, ratings)
 6. **Import statement**: Must include all used components from '@components/wiki'
 7. **Markdown lists**: Numbered lists starting at N>1 need blank line before
 8. **Consecutive bold labels**: Lines like "**Label:** text" need blank line between them

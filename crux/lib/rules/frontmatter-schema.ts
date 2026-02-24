@@ -103,9 +103,6 @@ export const frontmatterSchemaRule = {
   check(contentFile: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
     const frontmatter = contentFile.frontmatter;
-
-    // Check for quoted dates (common mistake that causes schema validation failures)
-    // We need to check the raw content for this since YAML parser already parses dates
     const rawContent = contentFile.raw;
 
     // Check for quoted lastUpdated dates in raw content
@@ -182,17 +179,6 @@ export const frontmatterSchemaRule = {
         file: contentFile.path,
         line: 1,
         message: `Pages with evergreen: false should not have update_frequency (non-evergreen pages are excluded from the update schedule)`,
-        severity: Severity.ERROR,
-      }));
-    }
-
-    // Cross-field: update_frequency requires lastEdited or lastUpdated
-    if (frontmatter.update_frequency && !frontmatter.lastEdited && !frontmatter.lastUpdated) {
-      issues.push(new Issue({
-        rule: 'frontmatter-schema',
-        file: contentFile.path,
-        line: 1,
-        message: `Pages with update_frequency must have lastEdited (e.g. lastEdited: "${new Date().toISOString().slice(0, 10)}")`,
         severity: Severity.ERROR,
       }));
     }
