@@ -1,3 +1,4 @@
+// @ts-nocheck — standalone experiment script, not part of the app build
 /**
  * Source-First Claim Extraction Experiment — Kalshi
  *

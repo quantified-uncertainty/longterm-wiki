@@ -1120,8 +1120,8 @@ The claim-first pipeline experiment was implemented and run three times on the K
 | Cross-section repetition | — | — | High | Low (budget) |
 | AI Safety section | Yes | No | No | Yes |
 | Assets built | — | 2 | 3 | 3 |
-| LLM calls | ~15 | 35 | 75 | 73 |
-| Estimated tokens | ~40K | ~60K | ~115K | ~107K |
+| LLM calls | ≈15 | 35 | 75 | 73 |
+| Estimated tokens | ≈40K | ~60K | ≈115K | ~107K |
 
 ### Claim Type Breakdown (Run 3)
 
@@ -1146,7 +1146,7 @@ The claim-first pipeline experiment was implemented and run three times on the K
 
 5. **Second view (executive briefing)**: Success. The briefing was composed from the same claim store with no new research, producing a 385-word structured briefing with BLUF, key facts, strategic context, and watch items.
 
-6. **Cost**: Partial success. At ~107K tokens (\~\$0.15-0.25 depending on model pricing), the full pipeline costs about 2-3x the composition step alone. However, the knowledge bundle is reusable — generating additional views from it costs only ~\$0.05 each.
+6. **Cost**: Partial success. At ~107K tokens (\≈\$0.15-0.25 depending on model pricing), the full pipeline costs about 2-3x the composition step alone. However, the knowledge bundle is reusable — generating additional views from it costs only ≈\$0.05 each.
 
 ### Key Findings
 
@@ -1605,7 +1605,7 @@ The wiki-first experiment (Parts 9–10) extracted claims from the existing Kals
 | Claims extracted | — | 241 | 326 |
 | Multi-source claims | — | — | 11 (3.4%) |
 | LLM calls | — | 72 | 40 |
-| Cost (est. tokens) | — | ~107K | ~92K |
+| Cost (est. tokens) | — | ≈107K | ~92K |
 
 ### Claim Distribution by Topic
 
@@ -1655,4 +1655,4 @@ The optimal pipeline likely combines both:
 - **Topic routing is a bottleneck.** The current approach assigns each claim one topic at extraction time, then maps topics to sections. This loses nuance — a claim about "Kalshi's CFTC license" could be founding, regulatory, or operations depending on context. Consider extracting claims without topics and letting the editorial step assign them to sections based on the full claim store.
 - **Minimum section thresholds matter.** Sections with \<5 claims produce padding. The composer needs a hard floor: merge thin sections or skip them.
 - **Multi-source confidence is the real prize.** The 11 multi-source claims are the most valuable — they're independently corroborated. Surfacing these prominently (bold, trust indicators, "confirmed by N sources") would be a significant UX improvement.
-- **Semantic deduplication needed.** Jaccard word overlap misses paraphrases. Embedding-based similarity would catch "Kalshi raised $1B at $11B valuation" and "The company's $1 billion round valued Kalshi at eleven billion dollars" as duplicates.
+- **Semantic deduplication needed.** Jaccard word overlap misses paraphrases. Embedding-based similarity would catch "Kalshi raised \$1B at \$11B valuation" and "The company's \$1 billion round valued Kalshi at eleven billion dollars" as duplicates.

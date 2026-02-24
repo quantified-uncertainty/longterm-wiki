@@ -1,3 +1,4 @@
+// @ts-nocheck — standalone experiment script, not part of the app build
 /**
  * Claim-First Architecture Experiment — Kalshi Page Reconstruction
  *
