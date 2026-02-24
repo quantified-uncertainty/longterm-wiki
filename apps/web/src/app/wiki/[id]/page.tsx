@@ -313,6 +313,7 @@ function ContentView({
         citationHealth={liveCitationHealth}
         ratings={pageData?.ratings ?? undefined}
         factCount={entity ? Object.keys(getFactsForEntity(slug)).length : undefined}
+        coverage={pageData?.coverage}
       />
       <CitationQuotesProvider quotes={citationQuotes ?? []}>
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
