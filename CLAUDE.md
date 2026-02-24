@@ -390,6 +390,21 @@ pnpm crux ci status --wait       # Poll every 30s until all checks complete
 - **build-and-test**: Builds the app and runs vitest (blocking)
 - **validate**: Runs four blocking checks (MDX syntax, YAML schema, frontmatter schema, numeric ID integrity), then the full validation suite (advisory/non-blocking)
 
+### CI environment differs from local — check this first
+
+**GitHub Actions checks out a merge commit** (PR branch merged with target/main) for `pull_request` events. This means CI may see files or file states that don't exist on the local branch. Before investigating any other hypothesis for a "CI fails but local passes" discrepancy, always check:
+
+```bash
+git show origin/main:<path/to/file>   # What does main have?
+git merge-base HEAD origin/main        # Common ancestor
+```
+
+A file modified differently on both sides (e.g., `createdAt` added in different positions) will be auto-merged by git into a file that may be invalid (e.g., duplicate YAML keys). Fix by merging main and resolving the conflict.
+
+### Debugging budget: stop and report after 3 hypotheses
+
+If a CI failure can't be explained after ~3 investigative steps, **stop and report findings to the user** rather than continuing. State what you've ruled out and ask how to proceed. Don't burn tokens on hypothesis 4, 5, 6. The user can escalate to Opus or provide additional context.
+
 ## Auto-Update System
 
 News-driven automatic wiki updates. Fetches from RSS feeds and web searches, routes relevant news to wiki pages, and runs improvements. See `crux/auto-update/` for implementation and `data/auto-update/sources.yaml` for source configuration.

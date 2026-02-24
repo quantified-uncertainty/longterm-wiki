@@ -33,7 +33,7 @@ export function parseFrontmatterAndBody(content: string): { frontmatter: Record<
     const frontmatter = parseYaml(match[1]);
     return { frontmatter: frontmatter || {}, body: match[2] };
   } catch {
-    return { frontmatter: {}, body: content };
+    return { frontmatter: {}, body: match[2] };
   }
 }
 
