@@ -132,8 +132,10 @@ async function verifyClaim(
       quote: typeof parsed.relevantQuote === 'string' ? parsed.relevantQuote : '',
       explanation: typeof parsed.explanation === 'string' ? parsed.explanation : '',
     };
-  } catch {
-    return { verdict: 'unsupported', quote: '', explanation: 'Failed to parse verification response.' };
+  } catch (err) {
+    // Propagate LLM/parse errors — caller should not record these as 'unsupported'
+    // (unsupported means the source was checked and doesn't support the claim)
+    throw new Error(`Verification failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
@@ -225,7 +227,16 @@ async function main() {
     }
 
     // Verify with LLM
-    const result = await verifyClaim(claim.claimText, sourceText, { model });
+    let result: { verdict: VerificationResult; quote: string; explanation: string };
+    try {
+      result = await verifyClaim(claim.claimText, sourceText, { model });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      process.stdout.write(`  ${c.dim}! [llm-error] ${claim.claimText.slice(0, 60)}... — ${msg.slice(0, 80)}\n`);
+      noSource++;
+      updatedClaims.push({ ...claim, newConfidence: 'unverified', newSourceQuote: '' });
+      continue;
+    }
 
     if (result.verdict === 'verified') {
       verified++;

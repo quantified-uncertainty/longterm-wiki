@@ -167,7 +167,9 @@ Extract atomic claims from this section. Return JSON only.`;
           ? (c as ExtractedClaim).footnoteRefs.map(String)
           : [],
       }));
-  } catch {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`  [warn] Section "${section.heading}" — extraction failed: ${msg.slice(0, 120)}`);
     return [];
   }
 }
