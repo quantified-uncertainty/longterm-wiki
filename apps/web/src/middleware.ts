@@ -73,8 +73,10 @@ export function middleware(request: NextRequest) {
     }
     const slug = segments[segments.length - 1];
     if (segments.length === 2 && KB_CATEGORIES.has(slug)) {
-      // Category index: /knowledge-base/risks
+      // Category index: /knowledge-base/risks → /wiki?entity=risks
+      // Preserve category context so the explore grid can pre-filter by type.
       url.pathname = "/wiki";
+      url.searchParams.set("entity", slug);
       return NextResponse.redirect(url, 308);
     }
     url.pathname = `/wiki/${slug}`;
