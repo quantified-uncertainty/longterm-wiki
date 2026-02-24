@@ -13,20 +13,45 @@
  * Requires the wiki server to be running (LONGTERMWIKI_SERVER_URL).
  *
  * Usage:
- *   node scripts/assign-ids.mjs [--dry-run]
+ *   node scripts/assign-ids.mjs [--dry-run] [--verify]
+ *
+ * Flags:
+ *   --dry-run  Show what would be assigned without writing files.
+ *   --verify   Also verify all locally-assigned numericIds against the server
+ *              registry (requires server access). Exits non-zero if mismatches
+ *              are found. Use this to catch manual numericId bypasses.
  *
  * Resolves: https://github.com/quantified-uncertainty/longterm-wiki/issues/245
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { join, basename } from 'path';
+import { join, basename, dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { parse } from 'yaml';
 import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildIdMaps, filterEligiblePages } from './lib/id-assignment.mjs';
-import { isServerAvailable, allocateIds } from './lib/id-client.mjs';
+import { isServerAvailable, allocateIds, fetchAllServerIds } from './lib/id-client.mjs';
+
+// ---------------------------------------------------------------------------
+// Load .env files from the repo root so LONGTERMWIKI_SERVER_URL and
+// LONGTERMWIKI_SERVER_API_KEY are available without pre-setting them.
+// ---------------------------------------------------------------------------
+{
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  // scripts/ → apps/web/ → apps/ → repo root
+  const repoRoot = resolve(__dirname, '../../..');
+  try {
+    const { default: dotenv } = await import('dotenv');
+    dotenv.config({ path: resolve(repoRoot, '.env'), override: false });
+    dotenv.config({ path: resolve(repoRoot, '.env.local'), override: false });
+  } catch {
+    // dotenv not installed — rely on process.env being pre-populated
+  }
+}
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const VERIFY = process.argv.includes('--verify');
 
 // Categories to skip when assigning page IDs (mirrors build-data.mjs)
 const SKIP_CATEGORIES = new Set([
@@ -158,6 +183,53 @@ async function main() {
     console.error('\n  ERROR: numericId conflicts detected:');
     for (const c of conflicts) console.error(`    ${c}`);
     process.exit(1);
+  }
+
+  // -------------------------------------------------------------------------
+  // --verify: Check existing numericIds against the server registry.
+  // Catches manually-assigned IDs that diverge from what the server has.
+  // -------------------------------------------------------------------------
+  if (VERIFY) {
+    if (!serverAvailable) {
+      console.warn('  WARNING: --verify requested but server is unavailable — skipping registry check.');
+      console.warn('  Set LONGTERMWIKI_SERVER_URL and ensure the server is running to enable this check.');
+    } else {
+      console.log('  Fetching server ID registry for verification...');
+      const serverRegistry = await fetchAllServerIds();
+
+      if (!serverRegistry) {
+        console.warn('  WARNING: Could not fetch server ID registry — skipping verification.');
+      } else {
+        const entitiesWithIds = entities.filter(e => e.numericId);
+        let verifyErrors = 0;
+        let unregistered = 0;
+
+        for (const entity of entitiesWithIds) {
+          const serverNumericId = serverRegistry.get(entity.id);
+          if (serverNumericId === undefined) {
+            // Slug not registered with server — manual assignment
+            console.warn(`    WARN: "${entity.id}" has local numericId ${entity.numericId} but is not registered with the server (manual bypass)`);
+            unregistered++;
+          } else if (serverNumericId !== entity.numericId) {
+            // Server has a different ID for this slug — real conflict
+            console.error(`    ERROR: "${entity.id}" local numericId=${entity.numericId} conflicts with server registry (server says: ${serverNumericId})`);
+            verifyErrors++;
+          }
+        }
+
+        if (verifyErrors > 0) {
+          console.error(`\n  ${verifyErrors} numericId conflict(s) found with server registry.`);
+          console.error('  To fix: remove manually-assigned numericIds from source files and re-run assign-ids.mjs.');
+          process.exit(1);
+        }
+        if (unregistered > 0) {
+          console.warn(`  ${unregistered} manually-assigned numericId(s) not in server registry.`);
+          console.warn('  Consider re-running without --verify to register them via the server.');
+        } else {
+          console.log(`  ✓ All ${entitiesWithIds.length} entity numericIds match the server registry.`);
+        }
+      }
+    }
   }
 
   // -------------------------------------------------------------------------

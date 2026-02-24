@@ -114,6 +114,73 @@ export async function allocateBatch(items) {
   }
 }
 
+/**
+ * Look up a slug's registration in the server ID registry.
+ *
+ * @param {string} slug
+ * @returns {Promise<{ numericId: string, slug: string } | null>}
+ *   Returns null if not found or on error.
+ */
+export async function lookupBySlug(slug) {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  try {
+    const res = await fetch(
+      `${serverUrl}/api/ids/by-slug?slug=${encodeURIComponent(slug)}`,
+      {
+        headers: buildHeaders(),
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      }
+    );
+    if (res.status === 404) return null;
+    if (!res.ok) return null;
+    const data = await res.json();
+    return { numericId: data.numericId, slug: data.slug };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch the full server ID registry as a Map<slug, numericId>.
+ *
+ * Paginates automatically using limit=1000 requests.
+ *
+ * @returns {Promise<Map<string, string> | null>}
+ *   Returns null on any failure.
+ */
+export async function fetchAllServerIds() {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  const result = new Map();
+  let offset = 0;
+  const limit = 1000;
+
+  try {
+    while (true) {
+      const res = await fetch(
+        `${serverUrl}/api/ids?limit=${limit}&offset=${offset}`,
+        {
+          headers: buildHeaders(),
+          signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
+        }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      for (const row of data.ids) {
+        result.set(row.slug, row.numericId);
+      }
+      if (offset + limit >= data.total) break;
+      offset += limit;
+    }
+    return result;
+  } catch {
+    return null;
+  }
+}
+
 // Max items per batch request (must match server-side limit in
 // apps/wiki-server/src/routes/ids.ts AllocateBatchSchema .max(50))
 const BATCH_CHUNK_SIZE = 50;
