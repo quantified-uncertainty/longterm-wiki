@@ -3,12 +3,14 @@
  *
  * Reads claims stored in PG for a page, looks up source text from SQLite
  * (local, fast) then PG (cross-machine), and verifies each claim using an LLM.
- * Updates the stored claims with verification results (confidence field).
+ * Uses the shared resolveSource() from citation-auditor for consistent
+ * 3-tier source resolution (sourceCache → SQLite → PG → optional network).
  *
  * Usage:
  *   pnpm crux claims verify <page-id>
+ *   pnpm crux claims verify <page-id> --fetch         # fetch missing sources from web
  *   pnpm crux claims verify <page-id> --model=google/gemini-2.0-flash-001
- *   pnpm crux claims verify <page-id> --dry-run   # report only, no DB writes
+ *   pnpm crux claims verify <page-id> --dry-run       # report only, no DB writes
  *
  * Requires: OPENROUTER_API_KEY or ANTHROPIC_API_KEY
  * Optional: LONGTERMWIKI_SERVER_URL (for PG fallback when SQLite is empty)
@@ -18,8 +20,6 @@ import { fileURLToPath } from 'url';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL } from '../lib/quote-extractor.ts';
-import { citationContent } from '../lib/knowledge-db.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import {
   getClaimsByEntity,
@@ -29,40 +29,12 @@ import {
   type InsertClaimItem,
 } from '../lib/wiki-server/claims.ts';
 import { extractCitationsFromContent } from '../lib/citation-archive.ts';
+import { resolveSource, MIN_SOURCE_CONTENT_LENGTH } from '../lib/citation-auditor.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
 import { readFileSync } from 'fs';
 
-const MIN_SOURCE_LENGTH = 100;
 const MAX_SOURCE_CHARS = 80_000;
-
-// ---------------------------------------------------------------------------
-// Source resolution — SQLite first, then PG (no network calls)
-// ---------------------------------------------------------------------------
-
-async function getSourceText(url: string): Promise<string | null> {
-  // Tier 1: SQLite local cache (fast, no network)
-  try {
-    const row = citationContent.getByUrl(url);
-    if (row?.full_text && row.full_text.length > MIN_SOURCE_LENGTH) {
-      return row.full_text.slice(0, MAX_SOURCE_CHARS);
-    }
-  } catch {
-    // SQLite unavailable
-  }
-
-  // Tier 2: PostgreSQL cache (cross-machine)
-  try {
-    const result = await getCitationContentByUrl(url);
-    if (result.ok && result.data.fullText && result.data.fullText.length > MIN_SOURCE_LENGTH) {
-      return result.data.fullText.slice(0, MAX_SOURCE_CHARS);
-    }
-  } catch {
-    // PG unavailable
-  }
-
-  return null;
-}
 
 // ---------------------------------------------------------------------------
 // URL lookup from citation archive for a page
@@ -144,6 +116,7 @@ async function verifyClaim(
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args['dry-run'] === true;
+  const fetchMissing = args.fetch === true;
   const model = typeof args.model === 'string' ? args.model : undefined;
   const c = getColors(false);
   const positional = (args._positional as string[]) || [];
@@ -181,6 +154,9 @@ async function main() {
   if (dryRun) {
     console.log(`  ${c.yellow}DRY RUN — results not stored${c.reset}`);
   }
+  if (fetchMissing) {
+    console.log(`  ${c.yellow}--fetch: will fetch missing sources from web${c.reset}`);
+  }
   console.log('');
 
   // Build footnote → URL map from the page
@@ -206,14 +182,16 @@ async function main() {
       continue;
     }
 
-    // Find source text for the first available footnote ref
+    // Find source text for the first available footnote ref using shared resolveSource()
     let sourceText: string | null = null;
-    let sourceUrl = '';
     for (const ref of footnoteRefs) {
       const url = footnoteUrlMap.get(ref);
       if (url) {
-        sourceText = await getSourceText(url);
-        if (sourceText) { sourceUrl = url; break; }
+        const source = await resolveSource(url, undefined, fetchMissing);
+        if (source?.content && source.content.length >= MIN_SOURCE_CONTENT_LENGTH) {
+          sourceText = source.content.slice(0, MAX_SOURCE_CHARS);
+          break;
+        }
       }
     }
 
