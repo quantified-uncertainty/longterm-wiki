@@ -32,11 +32,35 @@ All of these share **one PostgreSQL database** with **zero environment isolation
 
 ---
 
-## The Core Tension: Shared IDs vs Isolated Content
+## The Core Tension: What Must Be Shared vs What Should Be Isolated
 
-Entity IDs are allocated via a PostgreSQL sequence (`entity_id_seq`): E1, E2, E3... These are monotonic, globally unique, and write-once. **Both dev and prod must share the same ID sequence.** If a dev branch allocates E42 independently, it will conflict when merged into production.
+The server's responsibilities fall into three categories with different sharing requirements:
 
-This one legitimate shared concern — ID allocation — currently **drags everything else into shared space**. Because there is only one server and one database, pages, facts, sessions, and citations all live in the same unpartitioned tables.
+### Project-wide coordination (must be shared across all environments)
+
+These are **append-only or idempotent writes** that track the state of the wiki project as a whole, regardless of which environment or branch the caller is on:
+
+- **Entity ID allocation** — PostgreSQL sequence (`entity_id_seq`): E1, E2, E3... Monotonic, globally unique, write-once. Dev and prod must share the same sequence to avoid ID conflicts on merge.
+- **Session logs** — "Claude session on branch `feature/foo` improved page X." This is project-level operational history. A dev session's log belongs in the same history as a production session's.
+- **Edit logs** — Per-page edit history. If you improve a page on a dev branch, the edit should be recorded so it's visible when the branch merges.
+- **Agent coordination** — Which agents are working on which issues, to prevent duplicate work across sessions and environments.
+- **Research artifacts** — Citation verification results, quote extractions, research context bundles.
+
+### Content state (should be per-environment)
+
+These are **destructive upserts** that represent the canonical rendered state of wiki content. A dev sync here overwrites what production sees:
+
+- Page content sync (`/api/pages/sync`)
+- Entity/fact/citation sync
+- Explore index, risk scores, staleness data, backlink counts
+
+### Derived query data (read-only, derived from content state)
+
+Search, explore pagination, related pages, backlinks — these are computed from content state and served as read-only endpoints. They inherit whatever isolation the content layer has.
+
+### Why the current architecture is problematic
+
+All three categories share one database with no partitioning. The project-wide coordination concern (IDs, sessions, edit logs) **drags content into shared space**. Because there is only one server, any authenticated client can overwrite production page content alongside legitimately writing session logs.
 
 ---
 
@@ -142,18 +166,38 @@ This doesn't require separate deployments — just middleware per route group.
 
 ### Tier 3 — Longer-term (cleanest result, inverts the model)
 
-The key insight: **ID allocation is the only thing that truly must be shared.** Instead of adding guards to a shared server, invert the architecture: make everything per-environment by default, with a tiny dedicated ID service as the one shared exception.
+Instead of adding guards to a monolithic shared server, split along the real boundary: **project-wide coordination** (shared) vs **content state** (per-environment).
 
-**F. Dedicated ID service.** Extract ID allocation into its own minimal service (~50-100 lines). It only needs `POST /allocate-batch` and `GET /by-slug`. Configured via a separate env var (`LONGTERMWIKI_ID_SERVICE_URL`), accessed via an explicit CLI command (`pnpm crux ids allocate`). Limited API key that only grants ID operations.
+**F. Shared project database.** A single shared service handles all project-wide coordination — things that are append-only or idempotent and should be visible across all environments:
 
-**G. ID allocation becomes a pre-commit step.** Instead of `assign-ids.mjs` running during the build and silently calling production, creating a new entity is an explicit action: run `crux ids allocate`, get the ID, commit it to the YAML file. The build pipeline becomes fully offline — no production server dependency at build time.
+- Entity ID allocation (`/api/ids/*`)
+- Session logs (`/api/sessions/*`)
+- Edit logs (`/api/edit-logs/*`)
+- Agent coordination / job queue (`/api/jobs/*`)
+- Research artifacts
 
-**H. Per-environment everything else.** Each environment runs its own wiki-server (or none) for content, queries, and operational data:
-- **Production**: Full wiki-server with its own DB
+All environments write here. The key property: these writes are **append-only** (log a session, allocate an ID, record an edit), never destructive upserts. A dev branch writing a session log doesn't corrupt anything.
+
+Configured via: `LONGTERMWIKI_PROJECT_DB_URL` + `LONGTERMWIKI_PROJECT_DB_KEY` (all environments get these).
+
+**G. Per-environment content server.** Content sync, query endpoints, and the explore index are per-environment:
+
+- **Production**: Full content server with its own DB, written to only by CI on main
 - **Development**: Local-only (`database.json` fallback), or optional local server for testing server-driven features
 - **Preview**: Local-only (no server)
 
-Dev literally cannot corrupt prod because they're different databases. No guards needed.
+Configured via: `LONGTERMWIKI_CONTENT_SERVER_URL` + `LONGTERMWIKI_CONTENT_SERVER_KEY` (only prod CI gets the prod content key; unset in dev for local-only mode).
+
+Dev literally cannot corrupt prod content because they're different databases. No guards needed.
+
+**H. ID allocation becomes a pre-commit step.** Instead of `assign-ids.mjs` running during the build and silently calling production, creating a new entity is an explicit action: run `crux ids allocate`, get the ID, commit it to the YAML file. The build pipeline becomes fully offline — no production server dependency at build time.
+
+**Alternative (simpler):** Same server URL, two API keys with different scopes:
+```
+LONGTERMWIKI_SERVER_URL=https://...        # Same URL for everyone
+LONGTERMWIKI_PROJECT_KEY=<key>             # Grants: IDs, sessions, edit logs (all envs)
+LONGTERMWIKI_CONTENT_KEY=<key>             # Grants: page/entity/fact sync (prod CI only)
+```
 
 ---
 
@@ -171,6 +215,6 @@ The `ExploreGrid` hybrid mode (server when available, client-side fallback when 
 
 **Tier 2** follows as the runtime-read pattern stabilizes: logical service separation ([#967](https://github.com/quantified-uncertainty/longterm-wiki/issues/967)) and environment tagging for operational tables ([#968](https://github.com/quantified-uncertainty/longterm-wiki/issues/968)).
 
-**Tier 3** ([#969](https://github.com/quantified-uncertainty/longterm-wiki/issues/969)) is the target architecture: extract a dedicated ID service, make everything else per-environment. This eliminates the need for guards entirely — dev can't corrupt prod because they're different databases.
+**Tier 3** ([#969](https://github.com/quantified-uncertainty/longterm-wiki/issues/969)) is the target architecture: split into a shared project database (IDs, sessions, edit logs, agent coordination) and per-environment content servers. This eliminates the need for guards entirely — dev can't corrupt prod content because they're different databases, while project-wide coordination data flows freely across environments.
 
-**Key principle:** Entity ID allocation is the only concern that truly must be shared across environments. Everything else can and should be isolated.
+**Key principle:** The real boundary isn't "prod vs dev" — it's "project-wide coordination (append-only, safe to share)" vs "content state (destructive upserts, must be isolated)."
