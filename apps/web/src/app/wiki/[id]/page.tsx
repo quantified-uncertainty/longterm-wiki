@@ -29,6 +29,7 @@ import { TableOfContents } from "@/components/wiki/TableOfContents";
 import { CitationOverlay } from "@/components/wiki/CitationOverlay";
 import { CitationHealthBanner } from "@/components/wiki/CitationHealthBanner";
 import { CitationQuotesProvider } from "@/components/wiki/CitationQuotesContext";
+import { References } from "@/components/wiki/References";
 import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
 
 import { GITHUB_REPO_URL } from "@lib/site-config";
@@ -298,6 +299,8 @@ function ContentView({
           {isArticle && !isInternal && entity && <DataInfoBox entityId={slug} />}
           {showToc && <TableOfContents headings={tocHeadings} />}
           {page.content}
+          {/* Auto-render References for non-internal pages using build-time pageResources */}
+          {!isInternal && <References pageId={slug} />}
         </article>
         {/* Citation verification overlay — decorates footnote refs with status indicators */}
         {citationQuotes && citationQuotes.length > 0 && (

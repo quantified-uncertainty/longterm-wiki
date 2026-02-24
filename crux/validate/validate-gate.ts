@@ -7,7 +7,8 @@
  * Used by .githooks/pre-push to mechanically block bad pushes.
  *
  * Steps (fast mode, default):
- *   1. Build data layer (required for validation + tests)
+ *   0. Triage — categorize diff, optionally ask Haiku which checks to skip
+ *   1. Build data layer (required for validation + tests) — skippable if only crux/ changed
  *   2. Auto-fix escaping + markdown (with --fix)
  *   3. [Parallel] Run vitest tests
  *      [Parallel] Unified blocking rules (MDX syntax, frontmatter, numeric IDs, EntityLink)
@@ -18,6 +19,13 @@
  * With --full:
  *   4. Full Next.js production build
  *
+ * Flags:
+ *   --full-gate    Force all checks, no triage (implies --no-triage)
+ *   --no-triage    Skip LLM triage call, run all checks
+ *   --fix          Auto-fix escaping + markdown before validation
+ *   --full         Include full Next.js production build
+ *   --ci           JSON output for CI pipelines
+ *
  * Exit codes:
  *   0 = All checks passed
  *   1 = One or more checks failed
@@ -26,20 +34,20 @@
 import { execSync, spawn, type ChildProcess } from 'child_process';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import { categorizeFiles, canSkipBuildData, triageGateChecks, type TriageResult } from './gate-triage.ts';
 
 const args: string[] = process.argv.slice(2);
 const FIX_MODE: boolean = args.includes('--fix');
 const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
+const FULL_GATE: boolean = args.includes('--full-gate');
+const NO_TRIAGE: boolean = args.includes('--no-triage') || FULL_GATE || CI_MODE;
 
 /**
- * Auto-detect whether --full (Next.js build) is needed based on changed files.
- * Triggers when the diff includes app page components or data files that are
- * prerendered at build time (e.g. auto-update YAML that dashboards read).
+ * Get the list of files changed on this branch vs main.
+ * Reused by shouldAutoEscalateToFull() and the triage phase.
  */
-function shouldAutoEscalateToFull(): boolean {
+function getChangedFiles(): string[] {
   try {
-    // Check all files changed on the branch vs main (covers all commits being pushed).
-    // Falls back to HEAD~1 if merge-base fails (e.g. shallow clone).
     let diffOutput = '';
     try {
       const base = execSync('git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
@@ -52,24 +60,32 @@ function shouldAutoEscalateToFull(): boolean {
       diffOutput = execSync('git diff --name-only HEAD~1 HEAD 2>/dev/null || echo ""',
         { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
     }
-    if (!diffOutput) return false;
-
-    const files = diffOutput.split('\n');
-    return files.some(f =>
-      // App page components (prerendered by Next.js)
-      f.startsWith('apps/web/src/app/') ||
-      // Auto-update run data (read by dashboard pages at build time)
-      f.startsWith('data/auto-update/runs/') ||
-      // Auto-update state/sources (read by dashboard pages at build time)
-      (f.startsWith('data/auto-update/') && f.endsWith('.yaml'))
-    );
+    if (!diffOutput) return [];
+    return diffOutput.split('\n').filter(Boolean);
   } catch {
-    return false;
+    return [];
   }
 }
 
+/**
+ * Auto-detect whether --full (Next.js build) is needed based on changed files.
+ * Triggers when the diff includes app page components or data files that are
+ * prerendered at build time (e.g. auto-update YAML that dashboards read).
+ */
+function shouldAutoEscalateToFull(files: string[]): boolean {
+  return files.some(f =>
+    // App page components (prerendered by Next.js)
+    f.startsWith('apps/web/src/app/') ||
+    // Auto-update run data (read by dashboard pages at build time)
+    f.startsWith('data/auto-update/runs/') ||
+    // Auto-update state/sources (read by dashboard pages at build time)
+    (f.startsWith('data/auto-update/') && f.endsWith('.yaml'))
+  );
+}
+
+const changedFiles = getChangedFiles();
 const EXPLICIT_FULL: boolean = args.includes('--full');
-const AUTO_FULL: boolean = !EXPLICIT_FULL && shouldAutoEscalateToFull();
+const AUTO_FULL: boolean = !EXPLICIT_FULL && shouldAutoEscalateToFull(changedFiles);
 const FULL_MODE: boolean = EXPLICIT_FULL || AUTO_FULL;
 
 const c = getColors(CI_MODE);
@@ -336,8 +352,29 @@ function formatMs(ms: number): string {
 async function main(): Promise<void> {
   const totalStart = Date.now();
   const allResults: StepResult[] = [];
+  let triageResult: TriageResult | null = null;
+  let skippedBuildData = false;
 
-  const totalSteps = 1 + (FIX_MODE ? FIX_STEPS.length : 0) + PARALLEL_STEPS.length + (FULL_MODE ? 1 : 0);
+  // ── Phase 0: Triage — decide which checks to skip ─────────────────────────
+  if (!NO_TRIAGE && changedFiles.length > 0) {
+    const categories = categorizeFiles(changedFiles);
+
+    // Deterministic: skip build-data if only crux/wiki-server changes
+    if (canSkipBuildData(categories)) {
+      skippedBuildData = true;
+    }
+
+    // LLM triage: ask Haiku which parallel checks to skip
+    const allStepIds = PARALLEL_STEPS.map(s => s.id);
+    triageResult = await triageGateChecks(changedFiles, allStepIds, categories);
+  }
+
+  // Filter parallel steps based on triage
+  const skippedStepIds = new Set(triageResult ? Object.keys(triageResult.skip) : []);
+  const activeParallelSteps = PARALLEL_STEPS.filter(s => !skippedStepIds.has(s.id));
+  const skippedCount = PARALLEL_STEPS.length - activeParallelSteps.length + (skippedBuildData ? 1 : 0);
+
+  const totalSteps = (skippedBuildData ? 0 : 1) + (FIX_MODE ? FIX_STEPS.length : 0) + activeParallelSteps.length + (FULL_MODE ? 1 : 0);
 
   if (!CI_MODE) {
     const mode = FULL_MODE ? 'full' : 'fast';
@@ -347,15 +384,35 @@ async function main(): Promise<void> {
     if (AUTO_FULL) {
       console.log(`${c.dim}  Auto-escalated to full build (app pages or data files changed)${c.reset}`);
     }
-    console.log(`${c.dim}  Running ${totalSteps} CI-blocking checks (${PARALLEL_STEPS.length} in parallel)...${c.reset}\n`);
+    if (skippedCount > 0) {
+      console.log(`${c.dim}  Triage: ${skippedCount} check${skippedCount > 1 ? 's' : ''} skipped based on diff analysis${c.reset}`);
+      if (skippedBuildData) {
+        console.log(`${c.dim}    - build-data: no MDX/YAML/app changes, database.json exists${c.reset}`);
+      }
+      if (triageResult) {
+        for (const [id, reason] of Object.entries(triageResult.skip)) {
+          console.log(`${c.dim}    - ${id}: ${reason}${c.reset}`);
+        }
+        if (triageResult.llmCalled) {
+          console.log(`${c.dim}    (Haiku triage in ${triageResult.durationMs}ms)${c.reset}`);
+        }
+      }
+    }
+    console.log(`${c.dim}  Running ${totalSteps} CI-blocking checks (${activeParallelSteps.length} in parallel)...${c.reset}\n`);
   }
 
   // ── Phase 1: Build data (prerequisite for everything) ──────────────────────
-  const buildDataResult = await runSequential(BUILD_DATA_STEP);
-  allResults.push(buildDataResult);
-  if (!buildDataResult.passed) {
-    printSummary(allResults, totalStart);
-    process.exit(1);
+  if (skippedBuildData) {
+    if (!CI_MODE) {
+      console.log(`${c.dim}⊘ Build data layer (skipped — no data changes)${c.reset}\n`);
+    }
+  } else {
+    const buildDataResult = await runSequential(BUILD_DATA_STEP);
+    allResults.push(buildDataResult);
+    if (!buildDataResult.passed) {
+      printSummary(allResults, totalStart, skippedCount);
+      process.exit(1);
+    }
   }
 
   // ── Phase 2: Auto-fix (sequential, must run before validation) ─────────────
@@ -364,17 +421,17 @@ async function main(): Promise<void> {
       const result = await runSequential(step);
       allResults.push(result);
       if (!result.passed) {
-        printSummary(allResults, totalStart);
+        printSummary(allResults, totalStart, skippedCount);
         process.exit(1);
       }
     }
   }
 
   // ── Phase 3: Independent checks in parallel ────────────────────────────────
-  const parallelResults = await runParallel(PARALLEL_STEPS);
+  const parallelResults = await runParallel(activeParallelSteps);
   allResults.push(...parallelResults);
   if (parallelResults.some(r => !r.passed && !r.advisory)) {
-    printSummary(allResults, totalStart);
+    printSummary(allResults, totalStart, skippedCount);
     process.exit(1);
   }
 
@@ -383,16 +440,16 @@ async function main(): Promise<void> {
     const buildResult = await runSequential(BUILD_STEP);
     allResults.push(buildResult);
     if (!buildResult.passed) {
-      printSummary(allResults, totalStart);
+      printSummary(allResults, totalStart, skippedCount);
       process.exit(1);
     }
   }
 
-  printSummary(allResults, totalStart);
+  printSummary(allResults, totalStart, skippedCount);
   process.exit(0);
 }
 
-function printSummary(results: StepResult[], totalStart: number): void {
+function printSummary(results: StepResult[], totalStart: number, skippedCount: number = 0): void {
   const totalDuration = Date.now() - totalStart;
   const blockingFailed = results.filter((r) => !r.passed && !r.advisory);
   const advisoryFailed = results.filter((r) => !r.passed && r.advisory);
@@ -400,13 +457,14 @@ function printSummary(results: StepResult[], totalStart: number): void {
   const failed = blockingFailed;
 
   if (CI_MODE) {
-    console.log(JSON.stringify({ passed, results: results.map(r => ({ id: r.id, name: r.name, passed: r.passed, duration: r.duration, exitCode: r.exitCode })), duration: formatMs(totalDuration) }));
+    console.log(JSON.stringify({ passed, skippedCount, results: results.map(r => ({ id: r.id, name: r.name, passed: r.passed, duration: r.duration, exitCode: r.exitCode })), duration: formatMs(totalDuration) }));
   } else {
     console.log(`${c.bold}${c.blue}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`);
     if (passed) {
+      const skippedNote = skippedCount > 0 ? `, ${skippedCount} skipped by triage` : '';
       const advisoryNote = advisoryFailed.length > 0
-        ? ` ${c.dim}(${advisoryFailed.length} advisory warning${advisoryFailed.length > 1 ? 's' : ''})${c.reset}`
-        : '';
+        ? ` ${c.dim}(${advisoryFailed.length} advisory warning${advisoryFailed.length > 1 ? 's' : ''}${skippedNote})${c.reset}`
+        : (skippedNote ? ` ${c.dim}(${skippedNote.slice(2)})${c.reset}` : '');
       console.log(`${c.green}${c.bold}  ✅ All ${results.length} gate checks passed${c.reset} ${c.dim}(${formatMs(totalDuration)})${c.reset}${advisoryNote}`);
       for (const f of advisoryFailed) {
         console.log(`${c.yellow}  ⚠ ${f.name}${c.reset}`);

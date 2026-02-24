@@ -88,6 +88,26 @@ export const entityLinkIdsRule = createRule({
         const rawId = match[1];
         const nameAttr = extractEntityLinkName(fullTag);
 
+        // --- Bare numeric ID (35 instead of E35) ---
+        if (/^\d+$/.test(rawId)) {
+          const eId = `E${rawId}`;
+          const slug = engine.idRegistry?.byNumericId[eId];
+          const nameStr = slug ? ` name="${slug}"` : '';
+          issues.push(new Issue({
+            rule: this.id,
+            file: content.path,
+            line: lineNum,
+            message: `EntityLink id="${rawId}" — bare numeric ID; use "${eId}"${slug ? ` (${slug})` : ''} instead`,
+            severity: Severity.ERROR,
+            fix: {
+              type: FixType.REPLACE_TEXT,
+              oldText: `id="${rawId}"`,
+              newText: `id="${eId}"${nameStr}`,
+            },
+          }));
+          continue;
+        }
+
         // --- Numeric ID (E35) ---
         if (NUMERIC_ID_RE.test(rawId) && engine.idRegistry) {
           const slug = engine.idRegistry.byNumericId[rawId.toUpperCase()];

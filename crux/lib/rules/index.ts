@@ -101,6 +101,9 @@ import { pipelineArtifactsRule } from './pipeline-artifacts.ts';
 // Footnote integrity (orphans, leaked SRC markers)
 import { footnoteIntegrityRule } from './footnote-integrity.ts';
 
+// Block-level structural quality (uses block-index.json IR)
+import { blockSectionQualityRule } from './block-section-quality.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -154,6 +157,7 @@ export {
   resourceRefIntegrityRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,
+  blockSectionQualityRule,
 };
 
 export const allRules: Rule[] = [
@@ -208,6 +212,7 @@ export const allRules: Rule[] = [
   resourceRefIntegrityRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,
+  blockSectionQualityRule,
 ];
 
 export default allRules;

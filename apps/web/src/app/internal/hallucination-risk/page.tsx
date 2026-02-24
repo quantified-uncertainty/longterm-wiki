@@ -9,6 +9,9 @@ import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { HallucinationRiskDashboard } from "./hallucination-risk-dashboard";
 import type { Metadata } from "next";
 
+// Render on-demand — avoid build-time timeout when wiki-server is unreachable
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Hallucination Risk | Longterm Wiki Internal",
   description:

@@ -2555,3 +2555,23 @@
     - governance
     - community
   lastUpdated: 2026-02
+- id: longtermist-value-comparisons
+  numericId: E886
+  type: model
+  title: Relative Longtermist Value Comparisons
+  description: >-
+    A quantitative framework for comparing the expected value of different longtermist
+    allocations on a common scale using GiveWell-Equivalent Units (GEUs) as the reference.
+  relatedEntries:
+    - id: coefficient-giving
+      type: organization
+    - id: ltff
+      type: organization
+  tags:
+    - value-comparison
+    - longtermism
+    - effective-altruism
+  clusters:
+    - ai-safety
+    - community
+  lastUpdated: 2026-02

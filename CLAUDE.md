@@ -50,8 +50,10 @@ pnpm build                      # Production build (runs assign-ids + build-data
 pnpm test                        # Run vitest tests
 
 # Pre-push gate (CI-blocking checks)
-pnpm crux validate gate          # Build data + tests + blocking validations
+pnpm crux validate gate          # Build data + tests + blocking validations (with LLM triage)
 pnpm crux validate gate --full   # Also runs full Next.js build
+pnpm crux validate gate --no-triage  # Skip LLM triage, run all checks
+pnpm crux validate gate --full-gate  # Force all checks (implies --no-triage)
 
 # Tooling (Crux CLI)
 pnpm crux validate               # Run all validation checks
@@ -351,11 +353,15 @@ Before finishing any session, run the full review-and-ship workflow defined in `
 
 ### Before pushing: run the gate check
 ```bash
-pnpm crux validate gate          # Runs: build-data, tests, validations, typecheck
+pnpm crux validate gate          # Runs: build-data, tests, validations, typecheck (with LLM triage)
 pnpm crux validate gate --fix    # Auto-fix escaping + markdown before validating
 pnpm crux validate gate --full   # Also runs full Next.js build
+pnpm crux validate gate --no-triage  # Skip LLM triage, run all checks
+pnpm crux validate gate --full-gate  # Force all checks (implies --no-triage)
 ```
 The gate check bundles all CI-blocking checks into one command. It fails fast — if any step fails, it stops and reports. The `.githooks/pre-push` hook runs this automatically on every `git push`.
+
+LLM triage (enabled by default locally) uses Haiku to analyze the git diff and skip checks that are clearly irrelevant to the changed files. It's conservative (skips only when safe), has a 3-second timeout with graceful fallback, and is auto-disabled in CI.
 
 **Setup (one-time):** `git config core.hooksPath .githooks`
 
