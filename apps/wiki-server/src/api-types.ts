@@ -169,6 +169,22 @@ export interface CitationQuotesResult {
   total: number;
 }
 
+// -- Citation Health: per-page summary ----------------------------------------
+
+export interface CitationHealthResult {
+  pageId: string;
+  total: number;
+  withQuotes: number;
+  verified: number;
+  accuracyChecked: number;
+  accurate: number;
+  inaccurate: number;
+  unsupported: number;
+  minorIssues: number;
+  notVerifiable: number;
+  avgScore: number | null;
+}
+
 // ---------------------------------------------------------------------------
 // Citation Accuracy
 // ---------------------------------------------------------------------------
@@ -181,6 +197,9 @@ export const AccuracyVerdictSchema = z.enum([
   "not_verifiable",
 ]);
 export type AccuracyVerdict = z.infer<typeof AccuracyVerdictSchema>;
+
+/** Runtime-accessible array of valid verdict values — use for iteration/aggregation. */
+export const ACCURACY_VERDICTS = AccuracyVerdictSchema.options;
 
 export const MarkAccuracySchema = z.object({
   pageId: PageIdSchema,
@@ -278,6 +297,7 @@ export const CITATION_CONTENT_FULL_TEXT_MAX = 5 * 1024 * 1024;
 
 export const UpsertCitationContentSchema = z.object({
   url: z.string().min(1).max(2000),
+  resourceId: z.string().max(200).nullable().optional(),
   fetchedAt: z.string().datetime(),
   httpStatus: z.number().int().nullable().optional(),
   contentType: z.string().max(200).nullable().optional(),
@@ -293,6 +313,7 @@ export type UpsertCitationContent = z.infer<typeof UpsertCitationContentSchema>;
 
 export interface CitationContentRow {
   url: string;
+  resourceId: string | null;
   fetchedAt: string;
   httpStatus: number | null;
   contentType: string | null;

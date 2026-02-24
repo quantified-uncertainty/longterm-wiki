@@ -12,7 +12,7 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
-import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry } from "@wiki-server/api-types";
+import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry, CitationHealthResult } from "@wiki-server/api-types";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -1002,15 +1002,9 @@ export function getPageCoverageItems(): PageCoverageItem[] {
 
 export async function getPageCitationHealth(pageId: string) {
   const result = await withApiFallback(
-    () => fetchFromWikiServer<{
-      total: number;
-      withQuotes: number;
-      verified: number;
-      accuracyChecked: number;
-      accurate: number;
-      inaccurate: number;
-      avgScore: number | null;
-    }>(`/api/citations/health/${pageId}`),
+    () => fetchFromWikiServer<CitationHealthResult>(
+      `/api/citations/health/${encodeURIComponent(pageId)}`
+    ),
     () => {
       const page = getPageById(pageId);
       return page?.citationHealth ?? null;
