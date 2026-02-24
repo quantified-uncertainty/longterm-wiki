@@ -201,6 +201,31 @@ export function repairFrontmatter(content: string): string {
   }
   fm = repaired.join('\n');
 
+  // Fix 4: Quote string values that contain YAML-breaking characters.
+  // LLMs often produce unquoted values like:
+  //   llmSummary: Text with 'Title: Subtitle' here
+  // The colon-space inside single quotes breaks YAML parsers.
+  // We wrap such values in double quotes to make them safe.
+  const STRING_FIELDS = new Set([
+    'llmSummary', 'description', 'title',
+  ]);
+  const fmLines = fm.split('\n');
+  for (let i = 0; i < fmLines.length; i++) {
+    const keyMatch = fmLines[i].match(/^(\w+):\s+(.*)/);
+    if (!keyMatch) continue;
+    const [, key, value] = keyMatch;
+    if (!STRING_FIELDS.has(key)) continue;
+    // Skip if already quoted
+    if (/^["']/.test(value)) continue;
+    // Check for YAML-breaking patterns: colon-space in the value
+    if (/:\s/.test(value)) {
+      // Escape any internal double quotes, then wrap
+      const escaped = value.replace(/"/g, '\\"');
+      fmLines[i] = `${key}: "${escaped}"`;
+    }
+  }
+  fm = fmLines.join('\n');
+
   return '---\n' + fm + '\n---' + rest;
 }
 
