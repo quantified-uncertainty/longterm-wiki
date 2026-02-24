@@ -8,6 +8,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { RunsTable } from "./runs-table";
 import type { Metadata } from "next";
+import type { AutoUpdateRunRow } from "@wiki-server/api-types";
 
 export const metadata: Metadata = {
   title: "Auto-Update Runs | Longterm Wiki Internal",
@@ -66,33 +67,8 @@ export interface RunRow {
 
 // ── API Data Loading ──────────────────────────────────────────────────────
 
-interface ApiRunEntry {
-  id: number;
-  date: string;
-  startedAt: string;
-  completedAt: string | null;
-  trigger: string;
-  budgetLimit: number | null;
-  budgetSpent: number | null;
-  sourcesChecked: number | null;
-  sourcesFailed: number | null;
-  itemsFetched: number | null;
-  itemsRelevant: number | null;
-  pagesPlanned: number | null;
-  pagesUpdated: number | null;
-  pagesFailed: number | null;
-  pagesSkipped: number | null;
-  results: Array<{
-    pageId: string;
-    status: string;
-    tier: string | null;
-    durationMs: number | null;
-    errorMessage: string | null;
-  }>;
-}
-
 async function loadRunsFromApi() {
-  const result = await fetchDetailed<{ entries: ApiRunEntry[] }>(
+  const result = await fetchDetailed<{ entries: AutoUpdateRunRow[] }>(
     "/api/auto-update-runs/all?limit=200",
     { revalidate: 60 }
   );
