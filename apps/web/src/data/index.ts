@@ -1225,6 +1225,96 @@ export function getFactsForEntity(entityId: string): Record<string, Fact> {
   return result;
 }
 
+// ============================================================================
+// SERVER-BACKED FACT FETCH (with local fallback)
+// ============================================================================
+
+/** Server response shape for a single fact from /api/facts/by-entity */
+interface ServerFact {
+  entity: string;
+  factId: string;
+  value?: string;
+  numeric?: number;
+  low?: number;
+  high?: number;
+  asOf?: string;
+  label?: string;
+  source?: string;
+  sourceResource?: string;
+  sourceTitle?: string;
+  sourcePublication?: string;
+  sourceCredibility?: number;
+  note?: string;
+  noCompute?: boolean;
+  measure?: string;
+  subject?: string;
+  compute?: string;
+  format?: string;
+  formatDivisor?: number;
+  computed?: boolean;
+}
+
+function serverFactToFact(sf: ServerFact): Fact {
+  return {
+    entity: sf.entity,
+    factId: sf.factId,
+    value: sf.value,
+    numeric: sf.numeric,
+    low: sf.low,
+    high: sf.high,
+    asOf: sf.asOf,
+    label: sf.label,
+    source: sf.source,
+    sourceResource: sf.sourceResource,
+    sourceTitle: sf.sourceTitle,
+    sourcePublication: sf.sourcePublication,
+    sourceCredibility: sf.sourceCredibility,
+    note: sf.note,
+    noCompute: sf.noCompute,
+    measure: sf.measure,
+    subject: sf.subject,
+    compute: sf.compute,
+    format: sf.format,
+    formatDivisor: sf.formatDivisor,
+    computed: sf.computed,
+  };
+}
+
+/**
+ * Fetch all facts for an entity from wiki-server with fallback to local database.json.
+ * Follows the same withApiFallback pattern as getRelatedGraphWithFallback/getBacklinksWithFallback.
+ */
+export async function getFactsForEntityWithFallback(
+  entityId: string
+): Promise<WithSource<Record<string, Fact>>> {
+  return withApiFallback(
+    async () => {
+      const data = await fetchFromWikiServer<{ facts: ServerFact[] }>(
+        `/api/facts/by-entity/${encodeURIComponent(entityId)}`
+      );
+      if (!data) return null;
+      const result: Record<string, Fact> = {};
+      for (const sf of data.facts) {
+        result[sf.factId] = serverFactToFact(sf);
+      }
+      return result;
+    },
+    () => getFactsForEntity(entityId)
+  );
+}
+
+/**
+ * Fetch a single fact from wiki-server with fallback to local database.json.
+ * Uses getFactsForEntityWithFallback internally (one request per entity).
+ */
+export async function getFactWithFallback(
+  entityId: string,
+  factId: string
+): Promise<Fact | undefined> {
+  const result = await getFactsForEntityWithFallback(entityId);
+  return result.data[factId];
+}
+
 export function getAllFacts(): Array<Fact & { key: string }> {
   const db = getDatabase();
   return Object.entries(db.facts || {}).map(([key, fact]) => ({
@@ -1292,6 +1382,88 @@ export function getEntityMeasures(entityId: string): FactMeasure[] {
     }
   }
   return measures;
+}
+
+// ============================================================================
+// SERVER-BACKED TIMESERIES FETCH (with local fallback)
+// ============================================================================
+
+/** Server response shape for a timeseries point from /api/facts/timeseries */
+interface ServerTimeseriesPoint {
+  entity: string;
+  factId: string;
+  measure: string;
+  asOf: string;
+  value?: string;
+  numeric?: number;
+  low?: number;
+  high?: number;
+  note?: string;
+  source?: string;
+}
+
+function serverPointToPoint(sp: ServerTimeseriesPoint): TimeseriesPoint {
+  return {
+    entity: sp.entity,
+    factId: sp.factId,
+    measure: sp.measure,
+    asOf: sp.asOf,
+    value: sp.value,
+    numeric: sp.numeric,
+    low: sp.low,
+    high: sp.high,
+    note: sp.note,
+    source: sp.source,
+  };
+}
+
+/**
+ * Fetch timeseries for a measure from wiki-server, optionally filtered by entity.
+ * Falls back to local database.json.
+ */
+export async function getMeasureTimeseriesWithFallback(
+  measureId: string,
+  entityId?: string
+): Promise<TimeseriesPoint[]> {
+  const url = entityId
+    ? `/api/facts/timeseries/${encodeURIComponent(entityId)}?measure=${encodeURIComponent(measureId)}`
+    : `/api/facts/timeseries?measure=${encodeURIComponent(measureId)}`;
+
+  const result = await withApiFallback(
+    async () => {
+      const data = await fetchFromWikiServer<{ timeseries: ServerTimeseriesPoint[] }>(url);
+      if (!data) return null;
+      return data.timeseries.map(serverPointToPoint);
+    },
+    () => getMeasureTimeseries(measureId, entityId)
+  );
+  return result.data;
+}
+
+/**
+ * Fetch all timeseries data for an entity from wiki-server.
+ * Returns a map of measureId → sorted observations.
+ * Falls back to local database.json.
+ */
+export async function getEntityTimeseriesWithFallback(
+  entityId: string
+): Promise<Record<string, TimeseriesPoint[]>> {
+  const result = await withApiFallback(
+    async () => {
+      const data = await fetchFromWikiServer<{ timeseries: ServerTimeseriesPoint[] }>(
+        `/api/facts/timeseries/${encodeURIComponent(entityId)}`
+      );
+      if (!data) return null;
+      const grouped: Record<string, TimeseriesPoint[]> = {};
+      for (const sp of data.timeseries) {
+        if (!grouped[sp.measure]) grouped[sp.measure] = [];
+        grouped[sp.measure].push(serverPointToPoint(sp));
+      }
+      return grouped;
+    },
+    () => getEntityTimeseries(entityId)
+  );
+  return result.data;
 }
 
 // ============================================================================

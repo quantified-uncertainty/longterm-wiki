@@ -6,7 +6,7 @@
  * getEntityById() use fs.readFileSync and can only run on the server.
  */
 
-import { getFact, getEntityById, getPageById, getEntityHref, type Fact } from "@/data";
+import { getFactsForEntityWithFallback, getEntityById, getPageById, getEntityHref, type Fact } from "@/data";
 import { numericIdToSlug } from "@/lib/mdx";
 import { AnthropicStakeholdersTableClient, type FactData, type EntityPreview } from "./AnthropicStakeholdersTableClient";
 
@@ -38,15 +38,18 @@ function toFactData(fact: Fact | undefined): FactData | undefined {
   };
 }
 
-export function AnthropicStakeholdersTable() {
-  // Fetch all facts
+export async function AnthropicStakeholdersTable() {
+  // Fetch all anthropic facts at once (all FACT_REFS are for "anthropic")
+  const anthropicFactsResult = await getFactsForEntityWithFallback("anthropic");
+  const anthropicFactsMap = anthropicFactsResult.data;
+
   const facts: Record<string, FactData> = {};
   for (const [entity, factId] of FACT_REFS) {
-    const fact = getFact(entity, factId);
+    const fact = anthropicFactsMap[factId];
     if (fact) facts[`${entity}.${factId}`] = toFactData(fact)!;
   }
 
-  const valuationFact = getFact("anthropic", "6796e194");
+  const valuationFact = anthropicFactsMap["6796e194"];
 
   // Fetch entity previews
   const entityPreviews: Record<string, EntityPreview> = {};
