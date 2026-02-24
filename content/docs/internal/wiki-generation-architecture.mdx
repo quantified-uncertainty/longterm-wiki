@@ -21,6 +21,8 @@ import { Mermaid } from '@components/wiki';
 
 ## Executive Summary
 
+**See also**: <EntityLink id="claim-first-architecture">Claim-First Wiki Architecture</EntityLink> — a companion proposal that inverts the data model, making verified atomic claims (rather than prose documents) the primary artifact, with wiki pages as derived views.
+
 Our current page generation pipeline (Crux content create/improve) is a **single-pipeline, single-agent** system. It works, but produces pages that are adequate rather than excellent. The best wiki pages require depth that a single LLM pass cannot achieve: dense cross-linking, verified citations, complex diagrams, embedded calculations, and knowledge graph coherence.
 
 This document proposes a **multi-agent, multi-pass architecture** inspired by Stanford's STORM, Microsoft's GraphRAG, CrewAI's specialist agent patterns, and the Self-Refine iterative paradigm. The core idea: decompose page generation into **composable passes**, each executed by a **specialist agent** optimized for one concern.
