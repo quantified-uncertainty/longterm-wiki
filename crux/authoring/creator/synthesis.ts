@@ -238,8 +238,6 @@ Include proper frontmatter:
 title: "${topic}"
 description: "..."${destPath ? `\nentityType: "${inferEntityType(destPath) || 'concept'}"` : ''}
 importance: 50
-createdAt: ${new Date().toISOString().split('T')[0]}
-lastEdited: "${new Date().toISOString().split('T')[0]}"
 sidebar:
   order: 50
 ratings:

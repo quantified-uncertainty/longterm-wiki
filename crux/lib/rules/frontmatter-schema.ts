@@ -81,24 +81,9 @@ export const frontmatterSchemaRule = {
   description: 'Validate MDX frontmatter against content collection schema',
   severity: Severity.ERROR,
 
-  // Auto-fix: quote lastEdited dates
-  fix(content: string, issue: Issue): string | null {
-    if (issue.message.includes('lastEdited must be a quoted string')) {
-      // Add quotes around unquoted lastEdited dates
-      return content.replace(
-        /^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})(\s*)$/m,
-        '$1"$2"$3'
-      );
-    }
-    return null; // Can't fix other issues
-  },
-
   check(contentFile: ContentFile, engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
     const frontmatter = contentFile.frontmatter;
-
-    // Check for quoted dates (common mistake that causes schema validation failures)
-    // We need to check the raw content for this since YAML parser already parses dates
     const rawContent = contentFile.raw;
 
     // Check for quoted lastUpdated dates in raw content
@@ -111,37 +96,6 @@ export const frontmatterSchemaRule = {
         message: `lastUpdated should be unquoted YAML date (lastUpdated: ${quotedLastUpdatedMatch[1]}, not lastUpdated: "${quotedLastUpdatedMatch[1]}")`,
         severity: Severity.ERROR,
       }));
-    }
-
-    // Check for quoted createdAt dates in raw content
-    const quotedCreatedAtMatch = rawContent.match(/createdAt:\s*["'](\d{4}-\d{2}-\d{2})/);
-    if (quotedCreatedAtMatch) {
-      issues.push(new Issue({
-        rule: 'frontmatter-schema',
-        file: contentFile.path,
-        line: 1,
-        message: `createdAt should be unquoted YAML date (createdAt: ${quotedCreatedAtMatch[1]}, not createdAt: "${quotedCreatedAtMatch[1]}")`,
-        severity: Severity.ERROR,
-      }));
-    }
-
-    // Check for UNquoted lastEdited dates - these must be quoted strings
-    // YAML parses bare 2026-02-01 as a Date object, but frontmatter schema expects string
-    const unquotedLastEditedMatch = rawContent.match(/lastEdited:\s*(\d{4}-\d{2}-\d{2})(?:\s*$|\s*\n)/m);
-    if (unquotedLastEditedMatch) {
-      // Verify it's not quoted by checking if there's a quote before the date
-      const beforeDate = rawContent.substring(0, rawContent.indexOf(unquotedLastEditedMatch[0]));
-      const lastEditedLine = beforeDate.split('\n').length;
-      const lineContent = rawContent.split('\n')[lastEditedLine - 1] || '';
-      if (!lineContent.includes('"') && !lineContent.includes("'")) {
-        issues.push(new Issue({
-          rule: 'frontmatter-schema',
-          file: contentFile.path,
-          line: lastEditedLine,
-          message: `lastEdited must be a quoted string (lastEdited: "${unquotedLastEditedMatch[1]}", not lastEdited: ${unquotedLastEditedMatch[1]})`,
-          severity: Severity.ERROR,
-        }));
-      }
     }
 
     // Cross-field: graded content formats (table, diagram) should have update tracking
@@ -163,17 +117,6 @@ export const frontmatterSchemaRule = {
         file: contentFile.path,
         line: 1,
         message: `Pages with evergreen: false should not have update_frequency (non-evergreen pages are excluded from the update schedule)`,
-        severity: Severity.ERROR,
-      }));
-    }
-
-    // Cross-field: update_frequency requires lastEdited or lastUpdated
-    if (frontmatter.update_frequency && !frontmatter.lastEdited && !frontmatter.lastUpdated) {
-      issues.push(new Issue({
-        rule: 'frontmatter-schema',
-        file: contentFile.path,
-        line: 1,
-        message: `Pages with update_frequency must have lastEdited (e.g. lastEdited: "${new Date().toISOString().slice(0, 10)}")`,
         severity: Severity.ERROR,
       }));
     }

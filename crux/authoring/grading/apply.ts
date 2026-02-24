@@ -42,6 +42,7 @@ export function applyGradesToFile(
   delete fm.metrics;
 
   if (fm.lastEdited instanceof Date) {
+    // lastEdited is deprecated; convert Date objects to strings for backward compat
     fm.lastEdited = fm.lastEdited.toISOString().split('T')[0];
   }
 
@@ -54,9 +55,6 @@ export function applyGradesToFile(
     defaultKeyType: 'PLAIN',
     lineWidth: 0,
   });
-
-  // Ensure lastEdited is always quoted
-  newFm = newFm.replace(/^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})$/m, '$1"$2"');
 
   if (!newFm.endsWith('\n')) {
     newFm += '\n';

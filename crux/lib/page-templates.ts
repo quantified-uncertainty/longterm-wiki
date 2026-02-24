@@ -54,7 +54,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 10 },
       { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 20 },
@@ -74,7 +74,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 10 },
       { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 20 },
@@ -94,7 +94,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 10 },
       { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 20 },
@@ -129,7 +129,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
       { name: 'pageTemplate', required: true, weight: 5 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'parameter-network', label: 'Parameter Network', alternateLabels: ['Relationships', 'Network'], required: true, weight: 15 },
@@ -157,7 +157,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
       { name: 'quality', required: true, weight: 10 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 15 },
@@ -182,7 +182,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
       { name: 'quality', required: true, weight: 10 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 15 },
@@ -207,7 +207,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 20 },
       { name: 'quality', required: true, weight: 10 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 15 },
@@ -230,7 +230,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
     frontmatter: [
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: ['Definition'], required: true, weight: 25 },
@@ -248,7 +248,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
       { name: 'contentFormat', required: true, weight: 5 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
       { name: 'update_frequency', required: true, weight: 5 },
     ],
     sections: [],
@@ -268,7 +268,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
       { name: 'contentFormat', required: true, weight: 5 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [],
     qualityCriteria: [
@@ -285,7 +285,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
     frontmatter: [
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 15 },
@@ -309,7 +309,7 @@ export const PAGE_TEMPLATES: Record<string, PageTemplate> = {
     frontmatter: [
       { name: 'title', required: true, weight: 5 },
       { name: 'description', required: true, weight: 15 },
-      { name: 'lastEdited', required: true, weight: 5 },
+      { name: 'lastEdited', required: false, weight: 5 },
     ],
     sections: [
       { id: 'overview', label: 'Overview', alternateLabels: [], required: true, weight: 15 },
