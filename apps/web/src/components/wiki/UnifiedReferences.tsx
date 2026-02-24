@@ -57,7 +57,7 @@ function resolveEntries(
   // First: entries from deduplicated source groups (have URLs)
   for (const source of fnIndex.sources) {
     const resource = source.resourceId
-      ? getResourceById(source.resourceId)
+      ? (getResourceById(source.resourceId) ?? null)
       : null;
 
     const publication = resource
