@@ -9,6 +9,7 @@ import {
 import { getCitationQuotesByUrl } from "@/lib/citation-data";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
+import { getDomain } from "@/components/wiki/resource-utils";
 import {
   ExternalLink,
   CheckCircle2,
@@ -95,15 +96,6 @@ function formatDate(iso: string): string {
   }
 }
 
-function getDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return "unknown";
-  }
-}
-
-
 export default async function SourcePage({ params }: PageProps) {
   const { id } = await params;
   const resource = getResourceById(id);
@@ -113,7 +105,7 @@ export default async function SourcePage({ params }: PageProps) {
   const publication = getResourcePublication(resource);
   const credibility = getResourceCredibility(resource);
   const citingPages = getPagesForResource(id);
-  const domain = resource.url ? getDomain(resource.url) : null;
+  const domain = resource.url ? (getDomain(resource.url) ?? "unknown") : null;
 
   // Fetch cross-page citation quotes and cached content in parallel
   const [quotesData, contentData] = await Promise.all([
