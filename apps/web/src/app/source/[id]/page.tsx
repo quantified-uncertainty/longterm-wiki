@@ -20,6 +20,9 @@ import {
   FileText,
   BookOpen,
   Link2,
+  Download,
+  Database,
+  FileQuestion,
 } from "lucide-react";
 import { cn } from "@lib/utils";
 
@@ -186,6 +189,72 @@ export default async function SourcePage({ params }: PageProps) {
         )}
       </div>
 
+      {/* Data Status Banner */}
+      <section className="mb-8 p-4 rounded-lg border border-border bg-card">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+          Data Status
+        </h2>
+        <div className="flex flex-wrap gap-3">
+          {/* Fetch status */}
+          {resource.local_filename ? (
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <Download className="w-3 h-3" />
+              Full text fetched
+            </span>
+          ) : resource.fetched_at ? (
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+              <Database className="w-3 h-3" />
+              Metadata only
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+              <FileQuestion className="w-3 h-3" />
+              Not fetched
+            </span>
+          )}
+          {/* Fetched date */}
+          {resource.fetched_at && (
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+              <Clock className="w-3 h-3" />
+              Fetched {formatDate(resource.fetched_at)}
+            </span>
+          )}
+          {/* Content availability indicators */}
+          {resource.summary && (
+            <span className="text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              Summary
+            </span>
+          )}
+          {resource.review && (
+            <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+              Review
+            </span>
+          )}
+          {resource.key_points && resource.key_points.length > 0 && (
+            <span className="text-xs px-2.5 py-1 rounded-full bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400">
+              Key points
+            </span>
+          )}
+          {resource.abstract && (
+            <span className="text-xs px-2.5 py-1 rounded-full bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400">
+              Abstract
+            </span>
+          )}
+        </div>
+      </section>
+
+      {/* Abstract */}
+      {resource.abstract && (
+        <section className="mb-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+            Abstract
+          </h2>
+          <p className="text-sm leading-relaxed text-foreground/90">
+            {resource.abstract}
+          </p>
+        </section>
+      )}
+
       {/* Summary */}
       {resource.summary && (
         <section className="mb-8">
@@ -195,6 +264,40 @@ export default async function SourcePage({ params }: PageProps) {
           <p className="text-sm leading-relaxed text-foreground/90">
             {resource.summary}
           </p>
+        </section>
+      )}
+
+      {/* Key Points */}
+      {resource.key_points && resource.key_points.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+            Key Points
+          </h2>
+          <ul className="space-y-1.5">
+            {resource.key_points.map((point, i) => (
+              <li
+                key={i}
+                className="text-sm leading-relaxed text-foreground/90 flex items-start gap-2"
+              >
+                <span className="text-muted-foreground/40 mt-0.5 shrink-0">
+                  &bull;
+                </span>
+                {point}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Review */}
+      {resource.review && (
+        <section className="mb-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+            Review
+          </h2>
+          <div className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+            {resource.review}
+          </div>
         </section>
       )}
 
