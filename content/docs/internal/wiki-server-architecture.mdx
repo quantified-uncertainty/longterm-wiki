@@ -140,16 +140,20 @@ This doesn't require separate deployments — just middleware per route group.
 
 **E. Add `environment` column to operational tables.** For `sessions`, `edit_logs`, `auto_update_runs`, `jobs`: add `environment TEXT NOT NULL DEFAULT 'production'`. Reads filter by environment. Dev session logs stop cluttering production dashboards.
 
-### Tier 3 — Longer-term (highest effort, cleanest result)
+### Tier 3 — Longer-term (cleanest result, inverts the model)
 
-**F. Dedicated ID microservice.** Extract ID allocation into its own tiny service (or even a standalone PostgreSQL function). This is the one thing that truly must be shared. Everything else can then be per-environment without compromise.
+The key insight: **ID allocation is the only thing that truly must be shared.** Instead of adding guards to a shared server, invert the architecture: make everything per-environment by default, with a tiny dedicated ID service as the one shared exception.
 
-**G. Per-environment databases.** With IDs separated:
-- `longterm_wiki_prod` — production content + ops
-- `longterm_wiki_dev` — dev content + ops (optional, only if needed)
-- `longterm_wiki_ids` — shared ID registry
+**F. Dedicated ID service.** Extract ID allocation into its own minimal service (~50-100 lines). It only needs `POST /allocate-batch` and `GET /by-slug`. Configured via a separate env var (`LONGTERMWIKI_ID_SERVICE_URL`), accessed via an explicit CLI command (`pnpm crux ids allocate`). Limited API key that only grants ID operations.
 
-Preview deployments use local `database.json` only (no server writes, no server reads except IDs).
+**G. ID allocation becomes a pre-commit step.** Instead of `assign-ids.mjs` running during the build and silently calling production, creating a new entity is an explicit action: run `crux ids allocate`, get the ID, commit it to the YAML file. The build pipeline becomes fully offline — no production server dependency at build time.
+
+**H. Per-environment everything else.** Each environment runs its own wiki-server (or none) for content, queries, and operational data:
+- **Production**: Full wiki-server with its own DB
+- **Development**: Local-only (`database.json` fallback), or optional local server for testing server-driven features
+- **Preview**: Local-only (no server)
+
+Dev literally cannot corrupt prod because they're different databases. No guards needed.
 
 ---
 
@@ -163,8 +167,10 @@ The `ExploreGrid` hybrid mode (server when available, client-side fallback when 
 
 ## Recommendation
 
-**Start with Tier 1A + 1B.** Adding write guards and defaulting dev to local-only mode is the highest-value, lowest-effort change. It directly prevents the most likely failure mode (accidental dev sync) while preserving the correctly-shared ID allocation.
+**Start with Tier 1A + 1B** ([#966](https://github.com/quantified-uncertainty/longterm-wiki/issues/966)). Adding write guards and defaulting dev to local-only mode is the highest-value, lowest-effort change. It directly prevents the most likely failure mode (accidental dev sync) while preserving the correctly-shared ID allocation.
 
-Tier 2D (logical service separation) should follow as the runtime-read pattern stabilizes and more endpoints move to server-first fetching.
+**Tier 2** follows as the runtime-read pattern stabilizes: logical service separation ([#967](https://github.com/quantified-uncertainty/longterm-wiki/issues/967)) and environment tagging for operational tables ([#968](https://github.com/quantified-uncertainty/longterm-wiki/issues/968)).
+
+**Tier 3** ([#969](https://github.com/quantified-uncertainty/longterm-wiki/issues/969)) is the target architecture: extract a dedicated ID service, make everything else per-environment. This eliminates the need for guards entirely — dev can't corrupt prod because they're different databases.
 
 **Key principle:** Entity ID allocation is the only concern that truly must be shared across environments. Everything else can and should be isolated.
