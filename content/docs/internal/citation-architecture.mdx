@@ -1,0 +1,311 @@
+---
+numericId: E889
+title: "Citation Architecture: Current State & Unified Proposal"
+description: "Analysis of the wiki's four overlapping citation systems and a concrete plan to unify them into a single, clean reference pipeline"
+sidebar:
+  order: 15
+  label: "Citation Architecture"
+entityType: internal
+pageType: documentation
+quality: 70
+readerImportance: 85
+researchImportance: 80
+lastEdited: "2026-02-24"
+createdAt: 2026-02-24
+evergreen: false
+llmSummary: "Technical architecture document analyzing the wiki's four overlapping citation systems (remark-gfm footnotes, References component, CitationOverlay, ResourceLink) and proposing a unified architecture. Includes data model, rendering design, implementation phases, and exemplar page analysis. The plan centers on keeping standard Markdown footnotes as the authoring format while auto-creating resource YAML entries and rendering a single unified bibliography."
+ratings:
+  novelty: 6
+  rigor: 8
+  actionability: 9
+  completeness: 8
+---
+import { Mermaid } from '@components/wiki';
+
+This document analyzes the current citation/reference system in the Longterm Wiki and proposes a concrete plan to unify it. The goal: every wiki page has a single, beautiful bibliography with rich metadata, verification indicators, and inline hover cards --- built on standard Markdown footnotes with zero migration cost.
+
+**Tracking issues:**
+- [#974: Unified citation rendering — 3 exemplar pages](https://github.com/quantified-uncertainty/longterm-wiki/issues/974) (Phase 1)
+- [#975: Citation system migration + cleanup](https://github.com/quantified-uncertainty/longterm-wiki/issues/975) (Phases 2-3)
+
+---
+
+## The Problem: Four Competing Systems
+
+The wiki currently has **four overlapping citation/reference mechanisms** that don't communicate with each other:
+
+### 1. remark-gfm Footnotes (MDX authoring format)
+
+Standard Markdown footnotes used in all \~625 pages:
+
+```markdown
+Kalshi is the first federally regulated prediction market.[^1]
+
+[^1]: [About Kalshi](https://kalshi.com/about)
+```
+
+remark-gfm compiles these into:
+- **Inline**: `<sup><a data-footnote-ref href="#user-content-fn-1">[1]</a></sup>`
+- **Bottom section**: `<section data-footnotes><ol><li id="user-content-fn-1">...</li></ol></section>`
+
+**Coverage**: Complete (every page has footnotes). **Metadata**: None (just a title + URL link).
+
+### 2. References Component (resource YAML rendering)
+
+Server component (`apps/web/src/components/wiki/References.tsx`) that renders from resource YAML entries in `data/resources/*.yaml`:
+
+```tsx
+<References pageId="kalshi" />
+```
+
+Shows: title, author, date, credibility badge, publication name, peer-review status, expandable details with summary and verification dots.
+
+**Coverage**: Partial --- only sources that have hand-written YAML entries. On the Kalshi page: **31 out of 87 citations** have resource entries. **Metadata**: Rich (title, author, date, type, credibility, summary, tags, publication).
+
+### 3. CitationOverlay (verification indicators)
+
+Client component (`apps/web/src/components/wiki/CitationOverlay.tsx`) that uses DOM portals to inject colored dots onto footnote `[N]` refs:
+
+- Finds all `<a data-footnote-ref>` elements in the article
+- Looks up verification data from Postgres `citation_quotes` table
+- Renders hover cards with accuracy verdicts, supporting quotes, confidence scores
+
+**Coverage**: Only citations that have been accuracy-checked. **Metadata**: Verification-only (no source metadata like author/date).
+
+### 4. ResourceLink (`<R>`) (unused inline citation)
+
+Component (`apps/web/src/components/wiki/ResourceLink.tsx`) designed as an alternative to footnotes:
+
+```tsx
+<R id="resource-id" n={1}>Link text</R>
+```
+
+Shows a tooltip with resource metadata + credibility badge. **Imported on the Kalshi page but never actually used.** No page in the wiki uses this component in practice.
+
+### The Result
+
+Readers see:
+1. A plain footnote section at the bottom (remark-gfm) with just title + URL links
+2. A separate "References" section below that (References component) with different numbering and richer metadata, but only for some sources
+3. Colored verification dots injected onto inline `[N]` refs (CitationOverlay) with no connection to either bibliography
+
+---
+
+## Case Study: Kalshi Page
+
+The Kalshi page is a good exemplar because it exercises the full system:
+
+| Metric | Value |
+|--------|-------|
+| Total footnotes | 87 |
+| Unique source URLs | \≈35 |
+| Resource YAML entries | 31 |
+| Citation quotes (Postgres) | 87 |
+| Verified accurate | 84 (96.6%) |
+| Broken citations | 3 (HTTP 403) |
+| Quality score | 25/100 |
+| Hallucination risk | Medium (50/100) |
+
+**Key observations:**
+- 87 footnotes but only \~35 unique URLs (many footnotes cite the same source)
+- 31 resource YAML entries, meaning \~4 URLs have no resource entry at all
+- The remark-gfm footnote section lists all 87 entries (with duplicates)
+- The References section lists the 31 matched resources (different ordering)
+- Citation quotes exist for all 87 footnotes but aren't connected to the resource metadata
+
+**The gap**: The remark-gfm section shows everything but with no metadata. The References section shows rich metadata but only for a subset. The verification dots are on a third layer. Nothing is unified.
+
+---
+
+## Proposed Architecture: Unified Citations
+
+### Core Principle
+
+**Keep `[^N]` footnotes as the authoring format.** They're standard Markdown, LLMs generate them naturally, every page already uses them, and they're portable. The magic happens in the build/render pipeline that enriches them with resource metadata and verification data.
+
+### Data Model
+
+<Mermaid chart={`
+flowchart TD
+    subgraph Authoring["Authoring (MDX)"]
+        FN["[^N]: [Title](URL)\nStandard Markdown footnotes"]
+    end
+
+    subgraph DataLayer["Data Layer"]
+        RES[("Resource YAML\ndata/resources/*.yaml\nid, title, url, type,\nauthors, credibility")]
+        CQ[("Citation Quotes\nPostgres\nfootnote, url, verdict,\nsourceQuote, score")]
+    end
+
+    subgraph Build["Build Time"]
+        REG["register-resources\nAuto-create YAML for\nunmatched footnote URLs"]
+        FI["footnoteIndex\nMap: footnote# → resourceId"]
+        BD["database.json\nAll data merged"]
+    end
+
+    subgraph Render["Render Time"]
+        UR["UnifiedReferences\nSingle bibliography:\nresource metadata +\nverification + back-refs"]
+        IC["InlineCitationCards\nHover cards on [N] refs:\nsource + verification"]
+    end
+
+    FN --> REG
+    REG --> RES
+    FN --> FI
+    RES --> FI
+    FI --> BD
+    RES --> BD
+    CQ --> UR
+    BD --> UR
+    BD --> IC
+    CQ --> IC
+`} />
+
+### Key Design Decisions
+
+| Decision | Choice | Reasoning |
+|----------|--------|-----------|
+| **Citation format** | Keep `[^N]` | LLMs generate naturally, standard Markdown, zero migration |
+| **Suppress gfm footnotes** | CSS `display: none` | Simple, reversible, no remark plugin complexity |
+| **Bibliography grouping** | By unique source | 87 footnotes \> 35 entries, much more readable |
+| **Resource creation** | Auto from URLs | Manual doesn't scale; 31/87 gap proves this |
+| **Rendering split** | Server + client hybrid | Server renders bibliography; client adds hover cards |
+
+### New Pipeline Step: Resource Auto-Registration
+
+New crux command: `pnpm crux citations register-resources <pageId>`
+
+1. Parse all `[^N]: [Title](URL)` definitions from MDX
+2. Extract unique URLs (87 footnotes \> \~35 unique URLs for Kalshi)
+3. For each URL without a resource YAML entry:
+   - Use citation\_content cache or fetch the URL
+   - Extract: title, domain, type, published\_date, authors
+   - Generate resource ID (SHA-256 hash of URL, first 16 hex chars)
+   - Create YAML entry in the appropriate `data/resources/` file
+4. Report: "35 unique URLs, 31 already registered, 4 newly created"
+
+### New Build Step: Footnote Index
+
+`build-data.mjs` gains a `footnoteIndex` computed alongside `pageResources`:
+
+```json
+{
+  "footnoteIndex": {
+    "kalshi": {
+      "1": { "resourceId": "abc123", "url": "https://kalshi.com/about", "title": "About Kalshi" },
+      "2": { "resourceId": "def456", "url": "https://research.contrary.com/...", "title": "Contrary Research" }
+    }
+  }
+}
+```
+
+This maps every footnote number to its resource, enabling the rendering layer to show rich metadata for every citation.
+
+### New Component: UnifiedReferences
+
+Replaces both remark-gfm footnote section and current References component:
+
+1. **Groups footnotes by unique source** (dedup): footnotes [17]-[21] all citing Sigma World \> 1 entry
+2. **Each source entry shows**:
+   - Title (linked to URL)
+   - Metadata: publication/domain, author, year, type
+   - Credibility badge
+   - Verification dot (aggregate across all claims citing this source)
+   - Back-refs: "Referenced by [5] [6] [15] [16] [17] [18] [19] [20] [21]"
+3. **Expandable details**:
+   - Source summary
+   - Per-claim verification table (from citation\_quotes)
+   - Supporting quotes from source
+
+### Enhanced Component: InlineCitationCards
+
+Replaces CitationOverlay with richer hover cards on `[N]` refs:
+
+- Source title + domain + credibility
+- Verification verdict + confidence score
+- Supporting quote from source
+- "View in References" link
+
+### Files Changed
+
+| Status | File | Purpose |
+|--------|------|---------|
+| **New** | `crux/citations/register-resources.ts` | Auto-registration command |
+| **New** | `apps/web/src/components/wiki/UnifiedReferences.tsx` | Unified bibliography |
+| **New** | `apps/web/src/components/wiki/InlineCitationCards.tsx` | Enhanced hover cards |
+| **Modify** | `apps/web/scripts/build-data.mjs` | Add footnoteIndex computation |
+| **Modify** | `apps/web/src/data/index.ts` | Export footnoteIndex accessor |
+| **Modify** | `apps/web/src/app/wiki/[id]/page.tsx` | Wire up new components |
+| **Modify** | Global CSS | Suppress `section[data-footnotes]` |
+| **Deprecate** | `References.tsx` | Replaced by UnifiedReferences |
+| **Deprecate** | `CitationOverlay.tsx` | Replaced by InlineCitationCards |
+| **Evaluate** | `ResourceLink.tsx` (`<R>`) | No pages use it; likely remove |
+
+---
+
+## Implementation Plan: Three Phases
+
+### Phase 1: Get 3 Pages Very Right
+
+**Exemplar pages**: Kalshi, Anthropic, existential-risk
+
+**Scope:**
+1. **Resource auto-registration**: Build `register-resources` command. Run on all 3 pages. Every footnoted URL gets a resource YAML entry with metadata.
+2. **Footnote index**: Add footnoteIndex computation to build-data.mjs. Every footnote maps to a resource.
+3. **UnifiedReferences**: Build the new component. Groups by unique source, shows rich metadata, verification dots, back-refs.
+4. **InlineCitationCards**: Build enhanced hover cards merging resource metadata + verification data.
+5. **Suppress gfm footnotes**: CSS hides the duplicate remark-gfm section.
+6. **Citation quality**: Run full verification pipeline on all 3 pages. Fix broken citations. Review accuracy flags. Content polish.
+7. **Visual polish**: Dark mode, mobile tap-to-show, accessibility.
+
+**Exit criteria:** All 3 exemplar pages have:
+- 100% resource coverage (every footnote \> resource)
+- Single unified bibliography (no duplicate sections)
+- Rich hover cards on all inline \[N\] refs
+- Full citation verification with accuracy verdicts
+- 0 broken citations
+
+### Phase 2: Large Migration
+
+**Scope:**
+1. **Batch auto-registration**: Run `register-resources --all` across all \~625 pages
+2. **Resolve conflicts**: Handle edge cases (URLs that 404, pages with unusual footnote formats)
+3. **Rebuild all**: Rebuild database.json with footnoteIndex for every page
+4. **Verify rendering**: Spot-check 20-30 pages across entity types
+5. **Page quality tiers** (optional): Add `tier: showcase | standard | draft` frontmatter. Pages below quality threshold auto-hidden from sidebar.
+
+**Exit criteria:** Every page renders with UnifiedReferences. No page shows the old dual-bibliography layout.
+
+### Phase 3: Cleanup DB + Server + Code
+
+**Scope:**
+1. **Remove deprecated components**: Delete `References.tsx`, `CitationOverlay.tsx`, `ResourceLink.tsx`
+2. **Clean up imports**: Remove `<R>` imports from all MDX files that import but don't use it
+3. **DB cleanup**: Ensure citation\_quotes have resource\_id for all entries. Clean stale citation\_content entries.
+4. **Server sync**: Sync all new resources to wiki-server Postgres
+5. **Code cleanup**: Remove old pageResources computation path (subsumed by footnoteIndex)
+6. **Documentation**: Update architecture.mdx, CLAUDE.md references
+
+**Exit criteria:** No dead code. Single code path for citations. DB consistent. Server synced.
+
+---
+
+## Relationship to Claim-First Architecture
+
+This plan builds **prerequisite infrastructure** for the claim-first system proposed in the wiki-generation-architecture:
+
+| What this builds | What it enables for claims |
+|------------------|---------------------------|
+| Resource auto-registration | Every claim source has a canonical resource entry |
+| Footnote index | Claims can reference footnotes; footnotes reference resources |
+| Unified bibliography | When pages are composed from claims, references "just work" |
+| Full verification on exemplars | Claim extraction already has verification data to incorporate |
+
+The claim store sits between resources (sources) and pages (views). Building the resource registry now --- and making it render beautifully --- is prerequisite infrastructure regardless of whether the wiki moves to claim-first authoring.
+
+---
+
+## Open Questions
+
+1. **Resource YAML organization**: Should auto-created resources go in a separate file (`auto-registered.yaml`) or be sorted into existing category files?
+2. **Page quality tiers**: Automatic from quality score, or explicit frontmatter?
+3. **How aggressive on hiding low-quality pages?** Just from sidebar, or also from search?
+4. **Person page exemplar**: If we add a 4th exemplar later, which person page? Candidates: Dario Amodei, Eliezer Yudkowsky, Stuart Russell, Geoffrey Hinton.
