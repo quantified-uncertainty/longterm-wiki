@@ -364,6 +364,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Rating System", href: internalHref("rating-system") },
         { label: "Mermaid Diagrams", href: internalHref("mermaid-diagrams") },
         { label: "Canonical Facts & Calc", href: internalHref("canonical-facts") },
+        { label: "Page Coverage Guide", href: internalHref("coverage-guide") },
         { label: "Cause-Effect Diagrams", href: internalHref("cause-effect-diagrams") },
         { label: "Research Reports", href: internalHref("research-reports") },
         { label: "AI Transition Model", href: internalHref("ai-transition-model-style-guide") },

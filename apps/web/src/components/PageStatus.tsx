@@ -41,6 +41,16 @@ interface PageIssues {
   };
 }
 
+interface CitationHealth {
+  total: number;
+  withQuotes: number;
+  verified: number;
+  accuracyChecked: number;
+  accurate: number;
+  inaccurate: number;
+  avgScore: number | null;
+}
+
 export interface PageStatusProps {
   quality?: number;
   importance?: number;
@@ -61,6 +71,9 @@ export interface PageStatusProps {
   pageType?: string;
   pathname?: string;
   contentFormat?: ContentFormat;
+  hasEntity?: boolean;
+  resourceCount?: number;
+  citationHealth?: CitationHealth;
 }
 
 // ============================================================================
@@ -257,6 +270,15 @@ function IconCheck({ className }: { className?: string }) {
   );
 }
 
+function IconX({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="4.5" y1="4.5" x2="11.5" y2="11.5" />
+      <line x1="11.5" y1="4.5" x2="4.5" y2="11.5" />
+    </svg>
+  );
+}
+
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
@@ -353,6 +375,68 @@ function ContentFormatBadge({
   );
 }
 
+/** Compact score bar: colored left accent + number + label + level */
+function ScoreBar({
+  value,
+  max,
+  label,
+  levelLabel,
+  color,
+  tooltipTitle,
+  tooltipDesc,
+  extraTooltip,
+}: {
+  value: number;
+  max: number;
+  label: string;
+  levelLabel: string;
+  color: string;
+  tooltipTitle: string;
+  tooltipDesc: string;
+  extraTooltip?: React.ReactNode;
+}) {
+  const pct = Math.round((value / max) * 100);
+  return (
+    <span className={cn(styles.wrapper, "cursor-help flex items-center gap-2 min-w-0")}>
+      <span className="flex items-center gap-2 min-w-0">
+        {/* Thin progress accent */}
+        <span className="relative shrink-0 w-1 h-6 rounded-full bg-border overflow-hidden">
+          <span
+            className="absolute bottom-0 left-0 w-full rounded-full transition-all duration-300"
+            style={{ height: `${pct}%`, backgroundColor: color }}
+          />
+        </span>
+        <span className="tabular-nums text-sm font-bold text-foreground leading-none">
+          {value}
+        </span>
+        <span className="flex flex-col min-w-0">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
+            {label}
+          </span>
+          <span className="text-[11px] font-semibold leading-tight truncate" style={{ color }}>
+            {levelLabel}
+          </span>
+        </span>
+      </span>
+      <span
+        className={cn(
+          styles.tooltip,
+          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+        )}
+        role="tooltip"
+      >
+        <span className="block font-semibold text-foreground text-sm mb-1">
+          {tooltipTitle}
+        </span>
+        <span className="block text-muted-foreground text-xs leading-snug">
+          {tooltipDesc}
+        </span>
+        {extraTooltip}
+      </span>
+    </span>
+  );
+}
+
 function QualityDisplay({
   quality,
   suggestedQuality,
@@ -367,45 +451,22 @@ function QualityDisplay({
     Math.abs(quality - suggestedQuality) >= 20;
 
   return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={quality} max={100} color={colors.ring}>
-          <span className="text-[13px] font-bold tabular-nums text-foreground">
-            {quality}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Quality
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug inline-flex items-center gap-1.5 ${colors.text}`}>
-            {qualityLabels[level]}
-            {hasDiscrepancy && (
-              <span className="inline-block size-1.5 rounded-full bg-amber-500" />
-            )}
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Quality: {quality}/100
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug">
-          LLM-assigned rating of overall page quality, considering depth, accuracy, and completeness.
-        </span>
-        {hasDiscrepancy && (
+    <ScoreBar
+      value={quality}
+      max={100}
+      label="Quality"
+      levelLabel={`${qualityLabels[level]}${hasDiscrepancy ? " •" : ""}`}
+      color={colors.ring}
+      tooltipTitle={`Quality: ${quality}/100`}
+      tooltipDesc="LLM-assigned rating of overall page quality, considering depth, accuracy, and completeness."
+      extraTooltip={
+        hasDiscrepancy ? (
           <span className="block mt-2 text-xs text-amber-500">
             Structure suggests {suggestedQuality}
           </span>
-        )}
-      </span>
-    </span>
+        ) : undefined
+      }
+    />
   );
 }
 
@@ -414,37 +475,15 @@ function ImportanceDisplay({ importance }: { importance: number }) {
   const colors = importanceColors[level];
 
   return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={importance} max={100} color={colors.ring}>
-          <span className="text-[13px] font-bold tabular-nums text-foreground">
-            {importance}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Importance
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug ${colors.text}`}>
-            {importanceLabels[level]}
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Importance: {importance}/100
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug">
-          How central this topic is to AI safety. Higher scores mean greater relevance to understanding or mitigating AI risk.
-        </span>
-      </span>
-    </span>
+    <ScoreBar
+      value={importance}
+      max={100}
+      label="Importance"
+      levelLabel={importanceLabels[level]}
+      color={colors.ring}
+      tooltipTitle={`Importance: ${importance}/100`}
+      tooltipDesc="How central this topic is to AI safety. Higher scores mean greater relevance to understanding or mitigating AI risk."
+    />
   );
 }
 
@@ -453,37 +492,15 @@ function ResearchDisplay({ researchImportance }: { researchImportance: number })
   const colors = researchColors[level];
 
   return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={researchImportance} max={100} color={colors.ring}>
-          <span className="text-[13px] font-bold tabular-nums text-foreground">
-            {researchImportance}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Research
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug ${colors.text}`}>
-            {researchLabels[level]}
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[240px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Research Value: {researchImportance}/100
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug">
-          How much value deeper investigation of this topic could yield. Higher scores indicate under-explored topics with high insight potential.
-        </span>
-      </span>
-    </span>
+    <ScoreBar
+      value={researchImportance}
+      max={100}
+      label="Research"
+      levelLabel={researchLabels[level]}
+      color={colors.ring}
+      tooltipTitle={`Research Value: ${researchImportance}/100`}
+      tooltipDesc="How much value deeper investigation of this topic could yield. Higher scores indicate under-explored topics with high insight potential."
+    />
   );
 }
 
@@ -501,14 +518,7 @@ function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
   const score = metrics.structuralScore;
   const scoreColor =
     score >= 10 ? "#10b981" : score >= 6 ? "#f59e0b" : "#ef4444";
-  const scoreTextClass =
-    score >= 10
-      ? "text-emerald-500"
-      : score >= 6
-        ? "text-amber-500"
-        : "text-red-500";
 
-  // Reconstruct the per-item scores for the breakdown
   const breakdown = [
     { label: "Word count", max: 2, earned: structureItemScore(metrics.wordCount, [[800, 2], [300, 1]]) },
     { label: "Tables", max: 3, earned: structureItemScore(metrics.tableCount, [[3, 3], [2, 2], [1, 1]]) },
@@ -520,36 +530,16 @@ function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
   ];
 
   return (
-    <span className={cn(styles.wrapper, "cursor-help")}>
-      <span className="inline-flex items-center gap-2">
-        <ScoreRing value={score} max={15} color={scoreColor}>
-          <span className="text-[11px] font-bold tabular-nums text-foreground">
-            {score}
-          </span>
-        </ScoreRing>
-        <span className="flex flex-col">
-          <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
-            Structure
-          </span>
-          <span className={`text-[13px] font-semibold leading-snug ${scoreTextClass}`}>
-            {score}/15
-          </span>
-        </span>
-      </span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute left-0 top-full mt-1 z-50 w-[220px] p-3 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-sm mb-1">
-          Structure: {score}/15
-        </span>
-        <span className="block text-muted-foreground text-xs leading-snug mb-2">
-          Automated score based on measurable content features.
-        </span>
-        <span className="block flex flex-col gap-0.5">
+    <ScoreBar
+      value={score}
+      max={15}
+      label="Structure"
+      levelLabel={`${score}/15`}
+      color={scoreColor}
+      tooltipTitle={`Structure: ${score}/15`}
+      tooltipDesc="Automated score based on measurable content features."
+      extraTooltip={
+        <span className="block flex flex-col gap-0.5 mt-2">
           {breakdown.map((item) => (
             <span key={item.label} className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">{item.label}</span>
@@ -562,38 +552,26 @@ function StructureDisplay({ metrics }: { metrics: PageMetrics }) {
             </span>
           ))}
         </span>
-      </span>
-    </span>
+      }
+    />
   );
 }
 
-function MetricChip({
+/** Compact inline stat: icon + label + value */
+function MetricStat({
   icon,
   value,
   label,
-  description,
 }: {
   icon: React.ReactNode;
   value: number | string;
   label: string;
-  description?: string;
 }) {
   return (
-    <span className={cn(styles.wrapper, "inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground whitespace-nowrap cursor-help")}>
-      <span className="flex items-center opacity-60">{icon}</span>
+    <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+      <span className="flex items-center opacity-50">{icon}</span>
       <span className="font-semibold tabular-nums text-foreground">{value}</span>
-      <span
-        className={cn(
-          styles.tooltip,
-          "absolute right-0 top-full mt-1 z-50 w-[200px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
-        )}
-        role="tooltip"
-      >
-        <span className="block font-semibold text-foreground text-xs mb-0.5">{label}</span>
-        {description && (
-          <span className="block text-muted-foreground text-[11px] leading-snug">{description}</span>
-        )}
-      </span>
+      <span>{label}</span>
     </span>
   );
 }
@@ -746,6 +724,179 @@ function IssuesSection({
 // ============================================================================
 
 // ============================================================================
+// CONTENT COVERAGE SECTION
+// ============================================================================
+
+interface CoverageItem {
+  label: string;
+  present: boolean;
+  detail?: string;
+  hint?: string;
+  description: string;
+  anchor: string;
+}
+
+function ContentCoverageSection({
+  structuredSummary,
+  updateFrequency,
+  hasEntity,
+  metrics,
+  resourceCount,
+  citationHealth,
+  changeHistory,
+}: {
+  structuredSummary?: StructuredSummary;
+  updateFrequency?: number;
+  hasEntity?: boolean;
+  metrics?: PageMetrics;
+  resourceCount?: number;
+  citationHealth?: CitationHealth;
+  changeHistory?: ChangeEntry[];
+}) {
+  const items: CoverageItem[] = [
+    {
+      label: "Structured summary",
+      present: !!structuredSummary,
+      hint: "crux content improve <id>",
+      description: "One-liner, key points, and bottom line generated by the improve pipeline.",
+      anchor: "structured-summary",
+    },
+    {
+      label: "Update schedule",
+      present: updateFrequency != null,
+      hint: "Set updateFrequency in frontmatter",
+      description: "How often the page should be refreshed. Drives the overdue tracking system.",
+      anchor: "update-schedule",
+    },
+    {
+      label: "Entity data",
+      present: !!hasEntity,
+      hint: "Add entity YAML in data/entities/",
+      description: "YAML entity definition with type, description, and related entries.",
+      anchor: "entity-data",
+    },
+    {
+      label: "Tables / diagrams",
+      present: !!(metrics && (metrics.tableCount > 0 || metrics.diagramCount > 0)),
+      detail: metrics && (metrics.tableCount > 0 || metrics.diagramCount > 0)
+        ? `${metrics.tableCount}T + ${metrics.diagramCount}D`
+        : undefined,
+      hint: "Add tables or diagrams to the page",
+      description: "Visual content — data tables, Mermaid diagrams, or Squiggle models.",
+      anchor: "tables-diagrams",
+    },
+    {
+      label: "References",
+      present: (resourceCount ?? 0) > 0,
+      detail: resourceCount ? `${resourceCount}` : undefined,
+      hint: "Add <R> resource links",
+      description: "Curated external resources linked via <R> components or cited_by in YAML.",
+      anchor: "references",
+    },
+    {
+      label: "Citation quotes",
+      present: (citationHealth?.withQuotes ?? 0) > 0,
+      detail: citationHealth && citationHealth.withQuotes > 0
+        ? `${citationHealth.withQuotes}/${citationHealth.total}`
+        : undefined,
+      hint: "crux citations extract-quotes <id>",
+      description: "Supporting quotes extracted from cited sources to back up page claims.",
+      anchor: "citation-quotes",
+    },
+    {
+      label: "Accuracy checked",
+      present: (citationHealth?.accuracyChecked ?? 0) > 0,
+      detail: citationHealth && citationHealth.accuracyChecked > 0
+        ? `${citationHealth.accuracyChecked}/${citationHealth.total}`
+        : undefined,
+      hint: "crux citations verify <id>",
+      description: "Citations verified against their sources for factual accuracy.",
+      anchor: "accuracy-checked",
+    },
+    {
+      label: "Edit history",
+      present: (changeHistory?.length ?? 0) > 0,
+      detail: changeHistory && changeHistory.length > 0
+        ? `${changeHistory.length}`
+        : undefined,
+      hint: "crux edit-log view <id>",
+      description: "Tracked changes from improve pipeline runs and manual edits.",
+      anchor: "edit-history",
+    },
+  ];
+
+  const presentCount = items.filter((i) => i.present).length;
+  const badgeColor =
+    presentCount >= 6
+      ? "bg-emerald-500/15 text-emerald-500"
+      : presentCount >= 4
+        ? "bg-amber-500/15 text-amber-500"
+        : "bg-red-500/15 text-red-500";
+
+  return (
+    <div className="border-t border-border px-3.5 pt-2 pb-2">
+      <SectionHeader
+        count={presentCount}
+        countColor={badgeColor}
+      >
+        Coverage
+      </SectionHeader>
+      <div className="flex flex-wrap gap-1.5">
+        {items.map((item) => (
+          <span
+            key={item.label}
+            className={cn(
+              styles.wrapper,
+              "!inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-2 py-0.5 text-[11px] cursor-help",
+              item.present
+                ? "border-emerald-500/20 bg-emerald-500/[0.04] text-foreground"
+                : "border-border bg-muted/50 text-muted-foreground/50"
+            )}
+          >
+            {item.present ? (
+              <IconCheck className="shrink-0 text-emerald-500" />
+            ) : (
+              <IconX className="shrink-0 text-muted-foreground/30" />
+            )}
+            <Link
+              href={`/internal/coverage-guide#${item.anchor}`}
+              className="no-underline hover:underline"
+              style={{ color: "inherit" }}
+            >
+              {item.label}
+            </Link>
+            {item.present && item.detail && (
+              <span className="tabular-nums text-[10px] text-muted-foreground font-medium">
+                {item.detail}
+              </span>
+            )}
+            <span
+              className={cn(
+                styles.tooltip,
+                "absolute left-0 top-full mt-1 z-50 w-[260px] p-2.5 bg-popover text-popover-foreground border rounded-md shadow-md pointer-events-none opacity-0 invisible"
+              )}
+              role="tooltip"
+            >
+              <span className="block font-semibold text-foreground text-xs mb-1">
+                {item.label}
+              </span>
+              <span className="block text-muted-foreground text-[11px] leading-snug whitespace-normal">
+                {item.description}
+              </span>
+              {!item.present && item.hint && (
+                <span className="block mt-1.5 pt-1.5 border-t border-border text-muted-foreground text-[11px] font-mono whitespace-normal">
+                  {item.hint}
+                </span>
+              )}
+            </span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // CHANGE HISTORY SECTION
 // ============================================================================
 
@@ -829,6 +980,9 @@ export function PageStatus({
   pageType,
   pathname,
   contentFormat,
+  hasEntity,
+  resourceCount,
+  citationHealth,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
   const isATMPage = detectedType === "ai-transition-model";
@@ -858,9 +1012,9 @@ export function PageStatus({
       : null;
 
   return (
-    <div className="page-status page-status-dev-only mb-6 overflow-hidden rounded-xl border border-border bg-card text-[13px] shadow-sm">
+    <div className="page-status page-status-dev-only mb-6 rounded-xl border border-border bg-card text-[13px] shadow-sm">
       {/* Top bar */}
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border bg-muted px-3.5 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border bg-muted px-3.5 py-2 rounded-t-xl">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             Page Status
@@ -880,37 +1034,35 @@ export function PageStatus({
         </div>
       </div>
 
-      {/* Score rings + metric chips */}
-      <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 px-3.5 py-3">
-        <div className="flex flex-wrap items-center gap-5">
-          {quality !== undefined && quality > 0 && (
-            <QualityDisplay quality={quality} suggestedQuality={suggestedQuality} />
-          )}
-          {importance !== undefined && (
-            <ImportanceDisplay importance={importance} />
-          )}
-          {researchImportance !== undefined && (
-            <ResearchDisplay researchImportance={researchImportance} />
-          )}
-          {metrics && <StructureDisplay metrics={metrics} />}
-        </div>
-
-        {metrics && (
-          <div className="flex flex-wrap gap-1.5">
-            <MetricChip icon={<IconTable />} value={metrics.tableCount} label="Tables" description="Data tables in the page" />
-            <MetricChip icon={<IconDiagram />} value={metrics.diagramCount} label="Diagrams" description="Charts and visual diagrams" />
-            <MetricChip icon={<IconLink />} value={metrics.internalLinks} label="Internal Links" description="Links to other wiki pages" />
-            <MetricChip icon={<IconBook />} value={metrics.footnoteCount} label="Footnotes" description="Footnote citations [^N] with sources" />
-            <MetricChip icon={<IconLink />} value={metrics.externalLinks} label="External Links" description="Markdown links to outside URLs" />
-            <MetricChip
-              icon={<span className="text-[10px] font-bold">%</span>}
-              value={`${Math.round(metrics.bulletRatio * 100)}%`}
-              label="Bullet Ratio"
-              description="Percentage of content in bullet lists"
-            />
-          </div>
+      {/* Scores row */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-3.5 py-2.5">
+        {quality !== undefined && quality > 0 && (
+          <QualityDisplay quality={quality} suggestedQuality={suggestedQuality} />
         )}
+        {importance !== undefined && (
+          <ImportanceDisplay importance={importance} />
+        )}
+        {researchImportance !== undefined && (
+          <ResearchDisplay researchImportance={researchImportance} />
+        )}
+        {metrics && <StructureDisplay metrics={metrics} />}
       </div>
+
+      {/* Content metrics */}
+      {metrics && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border px-3.5 py-2">
+          <MetricStat icon={<IconTable />} value={metrics.tableCount} label="tables" />
+          <MetricStat icon={<IconDiagram />} value={metrics.diagramCount} label="diagrams" />
+          <MetricStat icon={<IconLink />} value={metrics.internalLinks} label="int. links" />
+          <MetricStat icon={<IconBook />} value={metrics.footnoteCount} label="footnotes" />
+          <MetricStat icon={<IconLink />} value={metrics.externalLinks} label="ext. links" />
+          <MetricStat
+            icon={<span className="text-[10px] font-bold opacity-50">%</span>}
+            value={`${Math.round(metrics.bulletRatio * 100)}%`}
+            label="bullets"
+          />
+        </div>
+      )}
 
       {/* Update Schedule / Evergreen status */}
       {evergreen === false ? (
@@ -949,6 +1101,17 @@ export function PageStatus({
           )}
         </div>
       ) : null}
+
+      {/* Content coverage checklist */}
+      <ContentCoverageSection
+        structuredSummary={structuredSummary}
+        updateFrequency={updateFrequency}
+        hasEntity={hasEntity}
+        metrics={metrics}
+        resourceCount={resourceCount}
+        citationHealth={citationHealth}
+        changeHistory={changeHistory}
+      />
 
       {/* Summary — structured if available, else flat llmSummary */}
       {structuredSummary ? (
