@@ -37,7 +37,7 @@ importers:
         version: 3.25.76
     optionalDependencies:
       '@mendable/firecrawl-js':
-        specifier: ^1.15.5
+        specifier: ^1.29.3
         version: 1.29.3
     devDependencies:
       '@mdx-js/mdx':
