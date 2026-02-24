@@ -109,7 +109,7 @@ const SCRIPTS = {
   'numeric-consistency': {
     script: 'validate/validate-numeric-consistency.ts',
     description: 'Cross-page numeric claim consistency checker — flag contradictory facts about the same entity',
-    passthrough: ['ci', 'json', 'entity', 'top'],
+    passthrough: ['ci', 'json', 'entity', 'top', 'limit'],
   },
   gate: {
     script: 'validate/validate-gate.ts',

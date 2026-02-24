@@ -2,7 +2,7 @@
  * Navigation route tests.
  *
  * Validates that:
- * 1. formatCategory handles known acronyms (AI, ML, AGI, LLM, ATM) correctly
+ * 1. formatCategory handles known acronyms (AI, ML) correctly
  * 2. MDX internal links (href starting with /) resolve to pages in pathRegistry
  * 3. All sidebar hrefs in wiki-nav.ts resolve to canonical URLs (no unknown slugs)
  * 4. KB category redirects use query params (not bare /wiki)

@@ -102,7 +102,7 @@ export const placeholderTextRule = createRule({
         const hasInternalLink = /\[.*\]\(\//.test(footnoteBody);
         if (!hasUrl && !hasDoi && !hasInternalLink) {
           // Further filter: short description-only text (not a full citation without URL)
-          // Heuristic: < 80 chars and no comma (real citations usually have author, year, title)
+          // Heuristic: < 100 chars and no comma (real citations usually have author, year, title)
           const isProbablyPlaceholder = footnoteBody.length < 100 && !footnoteBody.includes('(') && !footnoteBody.includes(',');
           if (isProbablyPlaceholder) {
             issues.push(new Issue({

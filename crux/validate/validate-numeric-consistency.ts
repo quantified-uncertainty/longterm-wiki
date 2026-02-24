@@ -19,10 +19,10 @@
  * Resolves: https://github.com/quantified-uncertainty/longterm-wiki/issues/917
  */
 
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { findMdxFiles } from '../lib/file-utils.ts';
-import { getContentBody, parseFrontmatter } from '../lib/mdx-utils.ts';
+import { getContentBody } from '../lib/mdx-utils.ts';
 import { CONTENT_DIR } from '../lib/content-types.ts';
 import type { ValidatorResult } from './types.ts';
 
@@ -36,13 +36,6 @@ interface NumericClaim {
   line: number;
   sentence: string;
   numbers: string[];
-}
-
-interface EntityNumericReport {
-  entityId: string;
-  claims: NumericClaim[];
-  /** Pages that reference this entity */
-  pageCount: number;
 }
 
 interface ContradictionReport {
@@ -100,8 +93,7 @@ function extractNumericSentences(text: string): { sentence: string; numbers: str
 function filePathToPageId(filePath: string): string {
   return filePath
     .replace(/^.*content\/docs\//, '')
-    .replace(/\.mdx?$/, '')
-    .replace(/\//g, '/');
+    .replace(/\.mdx?$/, '');
 }
 
 /**
