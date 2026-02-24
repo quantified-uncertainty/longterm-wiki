@@ -1,5 +1,5 @@
 ---
-numericId: E889
+numericId: E890
 title: "Server Communication Investigation"
 description: "Evaluation of wiki-server client/server architecture — pain points, framework options (Hono RPC, ts-rest, oRPC), and pragmatic improvement plan for type-safe API communication."
 entityType: internal
