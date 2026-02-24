@@ -8,6 +8,7 @@ quality: 2
 readerImportance: 58.5
 researchImportance: 12.5
 lastEdited: "2026-02-17"
+createdAt: 2026-02-09
 update_frequency: 90
 evergreen: true
 llmSummary: "Internal strategic planning document for the LongtermWiki project itself, outlining a 2-person-year scope to build a knowledge platform focused on AI safety prioritization cruxes. Proposes ~250 pages across risks, interventions, and causal models with worldview-based priority mapping."

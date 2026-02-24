@@ -81,13 +81,20 @@ export const frontmatterSchemaRule = {
   description: 'Validate MDX frontmatter against content collection schema',
   severity: Severity.ERROR,
 
-  // Auto-fix: quote lastEdited dates
+  // Auto-fix: quote lastEdited dates / unquote createdAt dates
   fix(content: string, issue: Issue): string | null {
     if (issue.message.includes('lastEdited must be a quoted string')) {
       // Add quotes around unquoted lastEdited dates
       return content.replace(
         /^(lastEdited:\s*)(\d{4}-\d{2}-\d{2})(\s*)$/m,
         '$1"$2"$3'
+      );
+    }
+    if (issue.message.includes('createdAt should be unquoted YAML date')) {
+      // Remove quotes around quoted createdAt dates
+      return content.replace(
+        /^(createdAt:\s*)["'](\d{4}-\d{2}-\d{2})["'](\s*)$/m,
+        '$1$2$3'
       );
     }
     return null; // Can't fix other issues
@@ -142,6 +149,18 @@ export const frontmatterSchemaRule = {
           severity: Severity.ERROR,
         }));
       }
+    }
+
+    // Warn on missing createdAt — required for "Recently Created" sort to work
+    // Use WARNING not ERROR because it's advisory; the backfill script can add it.
+    if (!frontmatter.createdAt) {
+      issues.push(new Issue({
+        rule: 'frontmatter-schema',
+        file: contentFile.path,
+        line: 1,
+        message: `Missing createdAt — add "createdAt: YYYY-MM-DD" (unquoted). Run: node apps/web/scripts/backfill-created-at.mjs --apply`,
+        severity: Severity.WARNING,
+      }));
     }
 
     // Cross-field: graded content formats (table, diagram) should have update tracking

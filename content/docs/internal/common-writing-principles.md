@@ -9,6 +9,7 @@ quality: 0
 readerImportance: 73.5
 researchImportance: 71
 lastEdited: "2026-02-17"
+createdAt: 2026-02-09
 update_frequency: 90
 evergreen: true
 llmSummary: "Shared writing principles referenced by all domain-specific style guides. Three pillars: epistemic honesty (hedge uncertain claims, use ranges, source confidence levels), language neutrality (avoid insider jargon, describe things by what they are), and analytical tone (present tradeoffs rather than prescribe). Includes concrete word substitution tables and anti-patterns."

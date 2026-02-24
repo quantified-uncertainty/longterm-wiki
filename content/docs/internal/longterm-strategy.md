@@ -8,6 +8,7 @@ quality: 4
 readerImportance: 47.5
 researchImportance: 15.5
 lastEdited: "2026-02-17"
+createdAt: 2026-02-09
 update_frequency: 90
 evergreen: true
 llmSummary: "Internal strategic planning document for LongtermWiki project development, exploring five failure modes (becoming just another wiki, generating non-insights, building unwanted features, maintenance hell, being too unusual) and five strategic options (narrow/deep focus, broad/shallow wiki, opinionated synthesis, crux laboratory, living assessment). Proposes four 2-week validation tests (user interviews, crux prototype, page quality test, insight generation) before committing resources."

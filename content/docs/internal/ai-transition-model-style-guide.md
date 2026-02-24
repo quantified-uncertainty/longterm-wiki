@@ -9,6 +9,7 @@ quality: 32
 readerImportance: 39
 researchImportance: 61.5
 lastEdited: "2026-02-17"
+createdAt: 2026-02-09
 update_frequency: 90
 evergreen: true
 llmSummary: "Internal style guide documenting YAML-first architecture for AI Transition Model pages, specifying that ratings and metadata live in YAML while MDX contains only custom prose. Provides validation workflows and anti-patterns for maintaining consistency across factor, parameter, and scenario entities."

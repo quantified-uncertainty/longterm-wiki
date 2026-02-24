@@ -8,6 +8,7 @@ quality: 38
 readerImportance: 45
 researchImportance: 70.5
 lastEdited: "2026-02-17"
+createdAt: 2026-02-09
 update_frequency: 90
 evergreen: true
 llmSummary: "Internal style guide prescribing dense, quantified content structure for model pages: minimum 800 words, 2+ tables (4x3+), 1+ Mermaid diagram, mathematical formulations, and <30% bullets. Requires specific sections (overview, framework, quantitative analysis, cases, limitations) with probability ranges and scenario weighting throughout."
