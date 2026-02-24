@@ -25,6 +25,8 @@ import { extractCitationsFromContent, extractClaimSentence } from './citation-ar
 import { callOpenRouter, stripCodeFences, truncateSource, DEFAULT_CITATION_MODEL } from './quote-extractor.ts';
 import { fetchSource, type FetchedSource } from './source-fetcher.ts';
 import { stripFrontmatter } from './patterns.ts';
+import { citationContent } from './knowledge-db.ts';
+import { getCitationContentByUrl } from './wiki-server/citations.ts';
 
 /** Minimum source content length (chars) required to attempt LLM verification. */
 export const MIN_SOURCE_CONTENT_LENGTH = 50;
@@ -379,11 +381,11 @@ async function resolveSource(
   sourceCache: SourceCache | undefined,
   fetchMissing: boolean,
 ): Promise<FetchedSource | null> {
-  // Check cache first
+  // Check caller-provided cache first
   const cached = sourceCache?.get(url);
   if (cached !== undefined) return cached;
 
-  // Fetch if allowed
+  // Fetch (with caches) if allowed — fetchSource checks SQLite then PG then network
   if (fetchMissing) {
     try {
       return await fetchSource({ url, extractMode: 'full' });
@@ -399,6 +401,41 @@ async function resolveSource(
         status: 'error',
       };
     }
+  }
+
+  // fetchMissing=false: still try local citation_content caches (SQLite → PG)
+  // without making any network calls. This lets --no-fetch mode use previously
+  // cached full text instead of falling back to the short contentSnippet.
+  try {
+    const sqliteRow = citationContent.getByUrl(url);
+    if (sqliteRow?.full_text && sqliteRow.full_text.length > MIN_SOURCE_CONTENT_LENGTH) {
+      return {
+        url,
+        title: sqliteRow.page_title ?? '',
+        fetchedAt: sqliteRow.fetched_at ?? new Date().toISOString(),
+        content: sqliteRow.full_text,
+        relevantExcerpts: [],
+        status: 'ok',
+      };
+    }
+  } catch {
+    // SQLite unavailable — continue to PG
+  }
+
+  try {
+    const pgResult = await getCitationContentByUrl(url);
+    if (pgResult.ok && pgResult.data.fullText && pgResult.data.fullText.length > MIN_SOURCE_CONTENT_LENGTH) {
+      return {
+        url,
+        title: pgResult.data.pageTitle ?? '',
+        fetchedAt: pgResult.data.fetchedAt,
+        content: pgResult.data.fullText,
+        relevantExcerpts: [],
+        status: 'ok',
+      };
+    }
+  } catch {
+    // PG unavailable — return null
   }
 
   return null;
