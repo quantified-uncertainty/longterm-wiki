@@ -159,7 +159,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // --- wiki_pages: SELECT ORDER BY LIMIT (paginated listing) ---
   if (q.includes("wiki_pages") && q.includes("order by") && q.includes("limit") && !q.includes("count(*)")) {
     const allRows = Array.from(pagesStore.values()).sort((a, b) =>
-      (a.id as string).localeCompare(b.id as string)
+      String(a.id ?? "").localeCompare(String(b.id ?? ""))
     );
 
     let filtered = allRows;
