@@ -253,8 +253,6 @@
     Declaration.
   status: stub
   relatedEntries:
-    - id: international-coordination
-      type: concept
     - id: uk-aisi
       type: organization
   tags:

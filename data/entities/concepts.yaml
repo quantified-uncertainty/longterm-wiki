@@ -761,11 +761,7 @@
       type: concept
     - id: responsible-scaling-policies
       type: policy
-    - id: international-coordination
-      type: concept
     - id: epistemic-infrastructure
-      type: concept
-    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
@@ -823,12 +819,8 @@
   relatedEntries:
     - id: lock-in
       type: risk
-    - id: human-agency
-      type: concept
     - id: racing-dynamics
       type: risk
-    - id: international-coordination
-      type: concept
   lastUpdated: 2026-02
 
 - id: epistemic-risks
@@ -886,10 +878,6 @@
       type: risk
     - id: eu-ai-act
       type: policy
-    - id: international-coordination
-      type: concept
-    - id: existential-catastrophe
-      type: risk
     - id: openai
       type: organization
   lastUpdated: 2026-02
@@ -921,8 +909,6 @@
     - id: epoch-ai
       type: organization
     - id: agi-timeline
-      type: concept
-    - id: tmc-ai-governance
       type: concept
   lastUpdated: 2026-02
 
