@@ -458,6 +458,23 @@ export interface Page {
     /** Machine-readable factors explaining the score */
     factors: string[];
   };
+  /** Pre-computed page coverage (structural completeness) from build-data */
+  coverage?: {
+    passing: number;
+    total: number;
+    targets: {
+      tables: number;
+      diagrams: number;
+      internalLinks: number;
+      externalLinks: number;
+      footnotes: number;
+      references: number;
+    };
+    items: Record<string, "green" | "amber" | "red">;
+    editHistoryCount?: number;
+    ratingsString?: string;
+    factCount?: number;
+  };
 }
 
 // ============================================================================
@@ -802,6 +819,76 @@ export function getPageChangeSessions(): PageChangesSession[] {
   return Array.from(sessionMap.values()).sort((a, b) =>
     b.date.localeCompare(a.date)
   );
+}
+
+export interface PageCoverageItem {
+  id: string;
+  numericId: string;
+  title: string;
+  score: number;      // passing count
+  total: number;      // total items (13)
+  quality: number | null;
+  readerImportance: number | null;
+  contentFormat: ContentFormat;
+  wordCount: number;
+  category: string;
+  // Boolean items
+  llmSummary: boolean;
+  structuredSummary: boolean;
+  schedule: boolean;
+  entity: boolean;
+  editHistory: boolean;
+  // Numeric item statuses
+  tables: "green" | "amber" | "red";
+  diagrams: "green" | "amber" | "red";
+  internalLinks: "green" | "amber" | "red";
+  externalLinks: "green" | "amber" | "red";
+  footnotes: "green" | "amber" | "red";
+  references: "green" | "amber" | "red";
+  quotes: "green" | "amber" | "red";
+  accuracy: "green" | "amber" | "red";
+}
+
+export function getPageCoverageItems(): PageCoverageItem[] {
+  const db = getDatabase();
+  const pages = db.pages || [];
+  const items: PageCoverageItem[] = [];
+
+  for (const page of pages) {
+    const cov = page.coverage;
+    if (!cov) continue;
+
+    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+    items.push({
+      id: page.id,
+      numericId,
+      title: page.title,
+      score: cov.passing,
+      total: cov.total,
+      quality: page.quality,
+      readerImportance: page.readerImportance,
+      contentFormat: page.contentFormat,
+      wordCount: page.wordCount ?? page.metrics?.wordCount ?? 0,
+      category: page.category,
+      llmSummary: cov.items.llmSummary === "green",
+      structuredSummary: cov.items.structuredSummary === "green",
+      schedule: cov.items.schedule === "green",
+      entity: cov.items.entity === "green",
+      editHistory: cov.items.editHistory === "green",
+      tables: cov.items.tables as "green" | "amber" | "red",
+      diagrams: cov.items.diagrams as "green" | "amber" | "red",
+      internalLinks: cov.items.internalLinks as "green" | "amber" | "red",
+      externalLinks: cov.items.externalLinks as "green" | "amber" | "red",
+      footnotes: cov.items.footnotes as "green" | "amber" | "red",
+      references: cov.items.references as "green" | "amber" | "red",
+      quotes: cov.items.quotes as "green" | "amber" | "red",
+      accuracy: cov.items.accuracy as "green" | "amber" | "red",
+    });
+  }
+
+  // Sort by score ascending (worst coverage first)
+  items.sort((a, b) => (a.score / a.total) - (b.score / b.total));
+  return items;
 }
 
 export function getPageCitationHealth(pageId: string) {

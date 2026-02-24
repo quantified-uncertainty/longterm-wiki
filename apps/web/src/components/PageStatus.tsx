@@ -8,7 +8,9 @@ import {
   CONTENT_FORMAT_INFO,
   type ContentFormat,
 } from "@/lib/page-types";
-import type { StructuredSummary, ChangeEntry } from "@/data";
+import type { StructuredSummary, ChangeEntry, Page } from "@/data";
+import { getRatioStatus } from "@/lib/coverage";
+import type { CoverageStatus } from "@/lib/coverage";
 import styles from "@/components/wiki/tooltip.module.css";
 
 // ============================================================================
@@ -83,6 +85,7 @@ export interface PageStatusProps {
   citationHealth?: CitationHealth;
   ratings?: PageRatings;
   factCount?: number;
+  coverage?: Page["coverage"];
 }
 
 // ============================================================================
@@ -685,20 +688,12 @@ function getRecommendedMetrics(
   };
 }
 
-function getMetricStatus(actual: number, target?: number): "green" | "amber" | "red" {
+function getMetricStatus(actual: number, target?: number): CoverageStatus {
   if (target === undefined || target === 0) {
     return actual > 0 ? "green" : "red";
   }
   if (actual >= target) return "green";
   if (actual > 0) return "amber";
-  return "red";
-}
-
-function getRatioStatus(numerator: number, denominator: number): "green" | "amber" | "red" {
-  if (denominator === 0) return "red";
-  const pct = numerator / denominator;
-  if (pct >= 0.75) return "green";
-  if (numerator > 0) return "amber";
   return "red";
 }
 
@@ -725,6 +720,7 @@ function ContentCoverageSection({
   contentFormat,
   ratings,
   factCount,
+  coverage,
 }: {
   structuredSummary?: StructuredSummary;
   llmSummary?: string;
@@ -738,9 +734,10 @@ function ContentCoverageSection({
   contentFormat?: ContentFormat;
   ratings?: PageRatings;
   factCount?: number;
+  coverage?: Page["coverage"];
 }) {
-  const format = contentFormat || "article";
-  const recommended = getRecommendedMetrics(wordCount || 0, format);
+  // Use pre-computed coverage targets when available, else compute from scratch
+  const recommended = coverage?.targets ?? getRecommendedMetrics(wordCount || 0, contentFormat || "article");
 
   // --- Boolean items (yes/no chips) ---
   const booleanItems: BooleanCoverageItem[] = [
@@ -888,15 +885,28 @@ function ContentCoverageSection({
   }
 
   // --- Scoring ---
-  const booleanPassing = booleanItems.filter((i) => i.present).length;
-  const numericPassing = numericMetrics.filter((m) => {
-    if (m.ratio !== undefined) {
-      const total = m.label === "Quotes" ? quoteTotal : accTotal;
-      return getRatioStatus(m.actual, total) === "green";
-    }
-    return getMetricStatus(m.actual, m.target) === "green";
-  }).length;
-  const presentCount = booleanPassing + numericPassing;
+  // Use pre-computed coverage score when available, with live citation overrides
+  let presentCount: number;
+  if (coverage) {
+    // Start from pre-computed score, but re-evaluate quotes & accuracy with live data
+    const liveQuotesStatus = getRatioStatus(quoteNum, quoteTotal);
+    const liveAccuracyStatus = getRatioStatus(accNum, accTotal);
+    const buildQuotesGreen = coverage.items.quotes === "green" ? 1 : 0;
+    const buildAccuracyGreen = coverage.items.accuracy === "green" ? 1 : 0;
+    const liveQuotesGreen = liveQuotesStatus === "green" ? 1 : 0;
+    const liveAccuracyGreen = liveAccuracyStatus === "green" ? 1 : 0;
+    presentCount = coverage.passing - buildQuotesGreen - buildAccuracyGreen + liveQuotesGreen + liveAccuracyGreen;
+  } else {
+    const booleanPassing = booleanItems.filter((i) => i.present).length;
+    const numericPassing = numericMetrics.filter((m) => {
+      if (m.ratio !== undefined) {
+        const total = m.label === "Quotes" ? quoteTotal : accTotal;
+        return getRatioStatus(m.actual, total) === "green";
+      }
+      return getMetricStatus(m.actual, m.target) === "green";
+    }).length;
+    presentCount = booleanPassing + numericPassing;
+  }
   const total = booleanItems.length + numericMetrics.length;
   const pct = presentCount / total;
   const badgeColor =
@@ -1153,6 +1163,7 @@ export function PageStatus({
   citationHealth,
   ratings,
   factCount,
+  coverage,
 }: PageStatusProps) {
   const detectedType = detectPageType(pathname || "", pageType);
   const isATMPage = detectedType === "ai-transition-model";
@@ -1280,6 +1291,7 @@ export function PageStatus({
         contentFormat={contentFormat}
         ratings={ratings}
         factCount={factCount}
+        coverage={coverage}
       />
 
       {/* Change history */}
