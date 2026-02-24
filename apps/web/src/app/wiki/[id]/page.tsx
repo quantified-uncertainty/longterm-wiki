@@ -7,7 +7,7 @@ import {
   isMdxError,
 } from "@/lib/mdx";
 import type { MdxPage, MdxError } from "@/lib/mdx";
-import { getEntityById, getPageById, getEntityPath, getResourcesForPage } from "@/data";
+import { getEntityById, getPageById, getEntityPath, getResourcesForPage, getFactsForEntity } from "@/data";
 import type { Page, ContentFormat } from "@/data";
 import { CONTENT_FORMAT_INFO, isFullWidth } from "@/lib/page-types";
 import { PageStatus } from "@/components/PageStatus";
@@ -311,6 +311,8 @@ function ContentView({
         hasEntity={!!entity}
         resourceCount={getResourcesForPage(slug).length}
         citationHealth={liveCitationHealth}
+        ratings={pageData?.ratings ?? undefined}
+        factCount={entity ? Object.keys(getFactsForEntity(slug)).length : undefined}
       />
       <CitationQuotesProvider quotes={citationQuotes ?? []}>
         <article className={`prose min-w-0${fullWidth ? " prose-full-width" : ""}${hideSidebar && fullWidth ? " prose-constrain-text" : ""}`}>
