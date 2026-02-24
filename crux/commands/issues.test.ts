@@ -1357,3 +1357,45 @@ describe('issues update-body — camelCase flag keys (#981)', () => {
     unlinkSync(tmpPath);
   });
 });
+
+// ---------------------------------------------------------------------------
+// update-title command
+// ---------------------------------------------------------------------------
+
+describe('issues update-title', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('updates issue title', async () => {
+    mockGithubApi.mockResolvedValueOnce({
+      number: 500,
+      html_url: 'https://github.com/test/issues/500',
+      title: 'Old Title',
+      body: '## Problem\n\nSome problem.',
+      labels: [],
+    });
+    mockGithubApi.mockResolvedValueOnce({}); // PATCH
+
+    const result = await commands['update-title'](['500'], { title: 'New Title' });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('Updated title');
+    expect(result.output).toContain('Old Title');
+    expect(result.output).toContain('New Title');
+
+    const patchCall = mockGithubApi.mock.calls[1];
+    expect((patchCall[1] as { body: { title: string } }).body.title).toBe('New Title');
+  });
+
+  it('returns error when no issue number provided', async () => {
+    const result = await commands['update-title']([], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Usage');
+  });
+
+  it('returns error when --title flag is missing', async () => {
+    const result = await commands['update-title'](['500'], {});
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Missing --title');
+  });
+});
