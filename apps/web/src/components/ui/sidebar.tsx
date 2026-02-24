@@ -22,6 +22,8 @@ export function useSidebar() {
   return context;
 }
 
+const SIDEBAR_STORAGE_KEY = "wiki-sidebar-open";
+
 export function SidebarProvider({
   defaultOpen = true,
   className,
@@ -34,8 +36,18 @@ export function SidebarProvider({
   // Mobile sidebar is closed by default
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
+  // Sync initial state from localStorage on mount
+  React.useEffect(() => {
+    const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    if (stored !== null) setOpen(stored === "true");
+  }, []);
+
   const toggleSidebar = React.useCallback(() => {
-    setOpen((prev) => !prev);
+    setOpen((prev) => {
+      const next = !prev;
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
+      return next;
+    });
   }, []);
 
   const contextValue = React.useMemo<SidebarContextProps>(
@@ -186,12 +198,15 @@ export function Sidebar({
 }: React.ComponentProps<"div"> & {
   side?: "left" | "right";
 }) {
+  const { open } = useSidebar();
+
   return (
     <div
       data-slot="sidebar"
       data-side={side}
       className={cn(
         "flex flex-col w-64 flex-shrink-0 border-r border-border bg-background text-foreground max-md:hidden",
+        !open && "hidden",
         className
       )}
       {...props}
