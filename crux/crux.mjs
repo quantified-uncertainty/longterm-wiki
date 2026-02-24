@@ -146,6 +146,7 @@ function parseArgs() {
   for (const [key, value] of Object.entries(parsed)) {
     if (key === '_positional') continue;
     options[kebabToCamel(key)] = value;
+    if (key.includes('-')) options[key] = value; // preserve kebab-case for commands that use it
     // Reconstruct the raw arg for passing to subcommands
     if (value === true) {
       remaining.push(`--${key}`);
