@@ -185,14 +185,18 @@ jobs:
             PAGE_ID=$(basename "$FILE" .mdx)
             echo "Reviewing: $PAGE_ID ($FILE)"
 
-            RESULT=$(pnpm crux content review "$PAGE_ID" \
+            RESULT_RAW=$(pnpm --silent crux content review "$PAGE_ID" \
               --model=claude-haiku-4-5-20251001 --json 2>/dev/null \
-              || echo '{"error":"review failed","gapCount":0,"needsReResearch":false}')
+              || true)
 
-            NEEDS_RESEARCH=$(echo "$RESULT" | jq -r '.needsReResearch // false')
-            GAP_COUNT=$(echo "$RESULT" | jq -r '.gapCount // 0')
-            ASSESSMENT=$(echo "$RESULT" | jq -r '.overallAssessment // "No assessment"')
-            ERROR=$(echo "$RESULT" | jq -r '.error // ""')
+            # Extract just the JSON object line (guards against any pnpm/dotenv preamble)
+            JSON_LINE=$(echo "$RESULT_RAW" | grep -E '^\{' | tail -1)
+            RESULT="${JSON_LINE:-{\"error\":\"review failed\",\"gapCount\":0,\"needsReResearch\":false}}"
+
+            NEEDS_RESEARCH=$(echo "$RESULT" | jq -r '.needsReResearch // false' 2>/dev/null || echo "false")
+            GAP_COUNT=$(echo "$RESULT" | jq -r '.gapCount // 0' 2>/dev/null || echo "0")
+            ASSESSMENT=$(echo "$RESULT" | jq -r '.overallAssessment // "No assessment"' 2>/dev/null || echo "No assessment")
+            ERROR=$(echo "$RESULT" | jq -r '.error // ""' 2>/dev/null || echo "parse-error")
 
             if [ -n "$ERROR" ] && [ "$ERROR" != "null" ]; then
               echo "::warning::$PAGE_ID — review failed: $ERROR"
