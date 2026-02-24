@@ -1,7 +1,3 @@
-# Reference Materials
-# Documentation, wikis, and reference materials
-# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
-
 - id: eb9c9249d5076759
   url: https://en.wikipedia.org/wiki/Automation_bias
   title: Automation bias
@@ -647,3 +643,674 @@
   publication_id: wikipedia
   cited_by:
     - demis-hassabis
+- id: a665c398b96149c1
+  url: https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback
+  title: Reinforcement Learning from Human Feedback
+  type: reference
+  cited_by:
+    - why-alignment-hard
+  tags: []
+- id: 272b33412576de73
+  url: https://en.wikipedia.org/wiki/Bankruptcy_of_FTX
+  title: Bankruptcy of FTX
+  type: reference
+  cited_by:
+    - ea-epistemic-failures-in-the-ftx-era
+    - ea-institutions-response-to-the-ftx-collapse
+    - ftx-collapse-and-ea-public-credibility
+    - ftx-collapse-ea-funding-lessons
+  tags: []
+- id: c336827abfc9c89c
+  url: https://en.wikipedia.org/wiki/Caroline_Ellison
+  title: Caroline Ellison — Wikipedia
+  type: reference
+  cited_by:
+    - ea-epistemic-failures-in-the-ftx-era
+  tags: []
+- id: a83820ad8d196ace
+  url: https://en.wikipedia.org/wiki/Trial_of_Sam_Bankman-Fried
+  title: Trial of Sam Bankman-Fried — Wikipedia
+  type: reference
+  cited_by:
+    - ea-institutions-response-to-the-ftx-collapse
+  tags: []
+- id: f1d79efc3fc232c1
+  url: https://en.wikipedia.org/wiki/Effective_altruism
+  title: Effective Altruism - Wikipedia
+  type: reference
+  cited_by:
+    - ea-longtermist-wins-losses
+    - ea-global
+  tags: []
+- id: ce051025fd4b6a82
+  url: https://en.wikipedia.org/wiki/Longtermism
+  title: Longtermism - Wikipedia
+  type: reference
+  cited_by:
+    - ea-longtermist-wins-losses
+    - longtermism-credibility-after-ftx
+  tags: []
+- id: 5db1e38e7a67797d
+  url: https://en.wikipedia.org/wiki/Open_Philanthropy_(organization
+  title: Open Philanthropy Wikipedia
+  type: reference
+  cited_by:
+    - ea-longtermist-wins-losses
+  tags: []
+- id: d04582635c8c0ce4
+  url: https://en.wikipedia.org/wiki/Future_of_Humanity_Institute
+  title: Future of Humanity Institute - Wikipedia
+  type: reference
+  cited_by:
+    - ea-longtermist-wins-losses
+  tags: []
+- id: 951673aea4aed005
+  url: https://en.wikipedia.org/wiki/Centre_for_Effective_Altruism
+  title: Centre for Effective Altruism - Wikipedia
+  type: reference
+  cited_by:
+    - ea-longtermist-wins-losses
+    - cea
+  tags: []
+- id: 3319ec7d1abc561a
+  url: https://en.wikipedia.org/wiki/Dartmouth_workshop
+  title: Dartmouth Workshop — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: 8e616da1e9e8e30b
+  url: https://en.wikipedia.org/wiki/Technological_singularity
+  title: Technological Singularity — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: d7e45823838cfe06
+  url: https://en.wikipedia.org/wiki/I._J._Good
+  title: I.J. Good — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: dd5a35a0b4cf13c2
+  url: https://en.wikipedia.org/wiki/Cybernetics_in_the_Soviet_Union
+  title: Cybernetics in the Soviet Union — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: 0855832ff311daaa
+  url: https://en.wikipedia.org/wiki/Victor_Glushkov
+  title: Victor Glushkov — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: 50f1ed95d8cacd46
+  url: https://en.wikipedia.org/wiki/OGAS
+  title: OGAS — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: dd1a8f829fb76205
+  url: https://en.wikipedia.org/wiki/Hans_Moravec
+  title: Hans Moravec — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: 1d98ff95465cbb0c
+  url: https://en.wikipedia.org/wiki/Marvin_Minsky
+  title: Marvin Minsky — Wikipedia
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: 1f79948d2f272231
+  url: https://en.wikipedia.org/wiki/Why_the_Future_Doesn%27t_Need_Us
+  title: https://en.wikipedia.org/wiki/Why_the_Future_Doesn%27t_Need_Us
+  type: reference
+  cited_by:
+    - early-warnings
+  tags: []
+- id: af5fe5ce217f8fc9
+  url: https://en.wikipedia.org/wiki/Earning_to_give
+  title: Earning to give - Wikipedia
+  type: reference
+  cited_by:
+    - earning-to-give
+  tags: []
+- id: 48836286dc9b9562
+  url: https://en.wikipedia.org/wiki/Connections_of_Jeffrey_Epstein
+  title: "Wikipedia: Connections of Jeffrey Epstein"
+  type: reference
+  cited_by:
+    - epstein-ai-connections
+  tags: []
+- id: 87a452b26d82dbfc
+  url: https://en.wikipedia.org/wiki/OpenClaw
+  title: OpenClaw - Wikipedia
+  type: reference
+  cited_by:
+    - openclaw-matplotlib-incident-2026
+  tags: []
+- id: 82997f1f13fa4d11
+  url: https://en.wikipedia.org/wiki/Mary_J._Rathbun
+  title: Mary Jane Rathbun - Wikipedia
+  type: reference
+  cited_by:
+    - openclaw-matplotlib-incident-2026
+  tags: []
+- id: e5477954e36a10de
+  url: https://en.wikipedia.org/wiki/AI_winter
+  title: AI winter
+  type: reference
+  cited_by:
+    - ai-timelines
+  tags: []
+- id: 3de5b8fecb182b3a
+  url: https://en.wikipedia.org/wiki/Alignment_Research_Center
+  title: Alignment Research Center - Wikipedia
+  type: reference
+  cited_by:
+    - model-organisms-of-misalignment
+    - ftx-collapse-ea-funding-lessons
+  tags: []
+- id: c69cd452555ae9f6
+  url: https://en.wikipedia.org/wiki/1Day_Sooner
+  title: 1Day Sooner - Wikipedia
+  type: reference
+  cited_by:
+    - 1day-sooner
+  tags: []
+- id: 4df3b9c7e5963c1e
+  url: https://en.wikipedia.org/wiki/AI_bubble
+  title: Wikipedia, "AI bubble" (https://en.wikipedia.org/wiki/AI_bubble)
+  type: reference
+  cited_by:
+    - ai-revenue-sources
+    - anthropic-valuation
+  tags: []
+- id: c070a19cd67438d9
+  url: https://en.wikipedia.org/wiki/Bridgewater_Associates
+  title: Bridgewater Associates - Wikipedia
+  type: reference
+  cited_by:
+    - bridgewater-aia-labs
+  tags: []
+- id: bd7eb70bd6c77eab
+  url: https://en.wikipedia.org/wiki/Center_for_Applied_Rationality
+  title: Wikipedia - Center for Applied Rationality
+  type: reference
+  cited_by:
+    - center-for-applied-rationality
+  tags: []
+- id: b39807b5264f3f80
+  url: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
+  title: Chan Zuckerberg Initiative - Wikipedia
+  type: reference
+  cited_by:
+    - chan-zuckerberg-initiative
+  tags: []
+- id: b7727c216e0f098a
+  url: https://en.wikipedia.org/wiki/Priscilla_Chan
+  title: Priscilla Chan - Wikipedia
+  type: reference
+  cited_by:
+    - chan-zuckerberg-initiative
+  tags: []
+- id: 78ea57f02b6ec971
+  url: https://en.wikipedia.org/wiki/Mark_Zuckerberg
+  title: Mark Zuckerberg - Wikipedia
+  type: reference
+  cited_by:
+    - chan-zuckerberg-initiative
+  tags: []
+- id: fbf157ad5c6d5522
+  url: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+  title: Wikipedia - Coalition for Epidemic Preparedness Innovations
+  type: reference
+  cited_by:
+    - coalition-for-epidemic-preparedness-innovations
+  tags: []
+- id: adfd73a29f12364b
+  url: https://en.wikipedia.org/wiki/Effective_Altruism_Global
+  title: Effective Altruism Global - Wikipedia
+  type: reference
+  cited_by:
+    - ea-global
+  tags: []
+- id: 89ef5b4af9b2ca53
+  url: https://en.wikipedia.org/wiki/Founders_Fund
+  title: Founders Fund - Wikipedia
+  type: reference
+  cited_by:
+    - founders-fund
+  tags: []
+- id: 94fd45a93940a6ba
+  url: https://en.wikipedia.org/wiki/Peter_Thiel
+  title: Peter Thiel - Wikipedia
+  type: reference
+  cited_by:
+    - founders-fund
+    - peter-thiel-philanthropy
+    - dustin-moskovitz
+  tags: []
+- id: 43bc2ad54dde90f4
+  url: https://en.wikipedia.org/wiki/FTX
+  title: FTX Wikipedia Article
+  type: reference
+  cited_by:
+    - ftx
+  tags: []
+- id: 8be916db1e76c0bd
+  url: https://en.wikipedia.org/wiki/The_Giving_Pledge
+  title: Wikipedia - The Giving Pledge
+  type: reference
+  cited_by:
+    - giving-pledge
+  tags: []
+- id: 775d68f1ea4ae0f0
+  url: https://en.wikipedia.org/wiki/Giving_What_We_Can
+  title: Giving What We Can - Wikipedia
+  type: reference
+  cited_by:
+    - giving-what-we-can
+  tags: []
+- id: 005e69824dedfd4b
+  url: https://en.wikipedia.org/wiki/The_Good_Judgment_Project
+  title: The Good Judgment Project - Wikipedia
+  type: reference
+  cited_by:
+    - good-judgment
+  tags: []
+- id: 6d3f4fe5aeef32a3
+  url: https://en.wikipedia.org/wiki/Global_Partnership_on_Artificial_Intelligence
+  title: Global Partnership on Artificial Intelligence - Wikipedia
+  type: reference
+  cited_by:
+    - gpai
+  tags: []
+- id: acda3544ad03f706
+  url: https://en.wikipedia.org/wiki/Butoh
+  title: Butoh - Wikipedia
+  type: reference
+  cited_by:
+    - gratified
+  tags: []
+- id: 5cbc9bbce7092061
+  url: https://en.wikipedia.org/wiki/Secular_Solstice
+  title: Secular Solstice - Wikipedia
+  type: reference
+  cited_by:
+    - gratified
+  tags: []
+- id: 8061ca53a0340435
+  url: https://en.wikipedia.org/wiki/Hewlett_Foundation
+  title: Hewlett Foundation - Wikipedia
+  type: reference
+  cited_by:
+    - hewlett-foundation
+  tags: []
+- id: 87d2f2fd4c3092ab
+  url: https://en.wikipedia.org/wiki/Johns_Hopkins_Center_for_Health_Security
+  title: Johns Hopkins Center for Health Security - Wikipedia
+  type: reference
+  cited_by:
+    - johns-hopkins-center-for-health-security
+  tags: []
+- id: 63aabc7b41d2ad0f
+  url: https://en.wikipedia.org/wiki/Leading_the_Future
+  title: Leading the Future Wikipedia entry
+  type: reference
+  cited_by:
+    - leading-the-future
+  tags: []
+- id: d012dab33ee60219
+  url: https://en.wikipedia.org/wiki/MacArthur_Foundation
+  title: Wikipedia - MacArthur Foundation
+  type: reference
+  cited_by:
+    - macarthur-foundation
+  tags: []
+- id: 81446c7c710d97fe
+  url: https://en.wikipedia.org/wiki/Nuclear_Threat_Initiative
+  title: Nuclear Threat Initiative - Wikipedia
+  type: reference
+  cited_by:
+    - nti-bio
+  tags: []
+- id: cd4fc97f4b89a1d5
+  url: https://en.wikipedia.org/wiki/OpenAI
+  title: OpenAI - Wikipedia
+  type: reference
+  cited_by:
+    - openai-foundation
+  tags: []
+- id: 2d247f1f095dccf9
+  url: https://en.wikipedia.org/wiki/Pause_AI
+  title: "Wikipedia: Pause AI"
+  type: reference
+  cited_by:
+    - pause-ai
+  tags: []
+- id: 2e84d5471a365aea
+  url: https://en.wikipedia.org/wiki/Palantir_Technologies
+  title: Palantir Technologies - Wikipedia
+  type: reference
+  cited_by:
+    - peter-thiel-philanthropy
+  tags: []
+- id: 78b61aeac39413b7
+  url: https://en.wikipedia.org/wiki/Polymarket
+  title: Polymarket - Wikipedia
+  type: reference
+  cited_by:
+    - polymarket
+  tags: []
+- id: 78b5433fab88dfe3
+  url: https://en.wikipedia.org/wiki/Red_Queen_hypothesis
+  title: Red Queen hypothesis - Wikipedia
+  type: reference
+  cited_by:
+    - red-queen-bio
+  tags: []
+- id: 42603f7e2e1a9173
+  url: https://en.wikipedia.org/wiki/Hannu_Rajaniemi
+  title: Hannu Rajaniemi - Wikipedia
+  type: reference
+  cited_by:
+    - red-queen-bio
+  tags: []
+- id: 48a5336e7d8f6014
+  url: https://en.wikipedia.org/wiki/Schmidt_Futures
+  title: Schmidt Futures - Wikipedia
+  type: reference
+  cited_by:
+    - schmidt-futures
+  tags: []
+- id: 957893bf859a6d97
+  url: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
+  title: Leopold Aschenbrenner - Wikipedia
+  type: reference
+  cited_by:
+    - situational-awareness-lp
+    - leopold-aschenbrenner
+  tags: []
+- id: 99979c78efb51047
+  url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc
+  title: Safe Superintelligence Inc. - Wikipedia
+  type: reference
+  cited_by:
+    - ssi
+    - ilya-sutskever
+  tags: []
+- id: 3abf4294b701d95e
+  url: https://en.wikipedia.org/wiki/Ilya_Sutskever
+  title: Ilya Sutskever - Wikipedia
+  type: reference
+  cited_by:
+    - ssi
+    - ilya-sutskever
+  tags: []
+- id: f75a797a0051dae8
+  url: https://en.wikipedia.org/wiki/Colossus_(supercomputer
+  title: Colossus (supercomputer) - Wikipedia
+  type: reference
+  cited_by:
+    - xai
+  tags: []
+- id: 82e5230cc051adb1
+  url: https://grokipedia.com/page/Chris_Olah
+  title: Chris Olah
+  type: reference
+  cited_by:
+    - chris-olah
+  tags: []
+- id: c0228403a781ae17
+  url: https://en.wikipedia.org/wiki/Chris_Olah
+  title: Chris Olah - Wikipedia
+  type: reference
+  cited_by:
+    - chris-olah
+  tags: []
+- id: a8c463a6c0e33217
+  url: https://en.wikipedia.org/wiki/Distill_(journal
+  title: Distill (journal - Wikipedia
+  type: reference
+  cited_by:
+    - chris-olah
+  tags: []
+- id: 11f0e2732e240de5
+  url: https://en.wikipedia.org/wiki/EleutherAI
+  title: EleutherAI - Wikipedia
+  type: reference
+  cited_by:
+    - connor-leahy
+  tags: []
+- id: 0c57ac12fb1e760b
+  url: https://en.wikipedia.org/wiki/Center_for_AI_Safety
+  title: Center for AI Safety – Wikipedia.
+  type: reference
+  cited_by:
+    - dan-hendrycks
+  tags: []
+- id: 8d67371e96133f80
+  url: https://en.wikipedia.org/wiki/Daniela_Amodei
+  title: Wikipedia contributors, "Daniela Amodei," updated February 2026
+  type: reference
+  cited_by:
+    - daniela-amodei
+  tags: []
+- id: 2d62650220a09fb0
+  url: https://grokipedia.com/page/daniela_amodei
+  title: Grokipedia, "Daniela Amodei," 2025
+  type: reference
+  cited_by:
+    - daniela-amodei
+  tags: []
+- id: ffa0627b02aa731f
+  url: https://en.wikipedia.org/wiki/David_Sacks
+  title: Wikipedia - David Sacks
+  type: reference
+  cited_by:
+    - david-sacks
+  tags: []
+- id: 6597b000adf41c5b
+  url: https://en.wikipedia.org/wiki/Dustin_Moskovitz
+  title: Wikipedia, "Dustin Moskovitz" (https://en.wikipedia.org/wiki/Dustin_Moskovitz)
+  type: reference
+  cited_by:
+    - dustin-moskovitz
+  tags: []
+- id: b0f40a61f4837fe9
+  url: https://en.wikipedia.org/wiki/Facebook
+  title: Wikipedia, "Facebook" (https://en.wikipedia.org/wiki/Facebook)
+  type: reference
+  cited_by:
+    - dustin-moskovitz
+  tags: []
+- id: a90dfef1de329f1d
+  url: https://en.wikipedia.org/wiki/Asana_(software
+  title: Wikipedia, "Asana (software)" (https://en.wikipedia.org/wiki/Asana_(software))
+  type: reference
+  cited_by:
+    - dustin-moskovitz
+  tags: []
+- id: d351a4ad40241c73
+  url: https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute
+  title: Machine Intelligence Research Institute - Wikipedia
+  type: reference
+  cited_by:
+    - eliezer-yudkowsky
+  tags: []
+- id: 5d9024c39c4f4102
+  url: https://en.wikipedia.org/wiki/Coherent_extrapolated_volition
+  title: Coherent extrapolated volition - Wikipedia
+  type: reference
+  cited_by:
+    - eliezer-yudkowsky
+  tags: []
+- id: af31d9e2608d18aa
+  url: https://en.wikipedia.org/wiki/Daniel_Gross_(businessman
+  title: '"Daniel Gross (businessman) — Wikipedia"'
+  type: reference
+  cited_by:
+    - ilya-sutskever
+  tags: []
+- id: 84625b7f779ead62
+  url: https://en.wikipedia.org/wiki/Marc_Andreessen
+  title: Marc Andreessen - Wikipedia
+  type: reference
+  cited_by:
+    - marc-andreessen
+  tags: []
+- id: 315a100df6c7d0f1
+  url: https://en.wikipedia.org/wiki/Andreessen_Horowitz
+  title: Andreessen Horowitz - Wikipedia
+  type: reference
+  cited_by:
+    - marc-andreessen
+  tags: []
+- id: 23cbf8a562b3afec
+  url: https://en.wikipedia.org/wiki/Max_Tegmark
+  title: Max Tegmark - Wikipedia
+  type: reference
+  cited_by:
+    - max-tegmark
+  tags: []
+- id: db2af50cd08e3e4a
+  url: https://en.wikipedia.org/wiki/Philip_E._Tetlock
+  title: Philip E. Tetlock - Wikipedia
+  type: reference
+  cited_by:
+    - philip-tetlock
+  tags: []
+- id: 0cb374656cef0098
+  url: https://en.wikipedia.org/wiki/Robin_Hanson
+  title: Robin Hanson - Wikipedia
+  type: reference
+  cited_by:
+    - robin-hanson
+  tags: []
+- id: 5c1c341e835efb77
+  url: https://en.wikipedia.org/wiki/Sam_Bankman-Fried
+  title: Wikipedia - Sam Bankman-Fried
+  type: reference
+  cited_by:
+    - sam-bankman-fried
+  tags: []
+- id: 3e294a74f192a4d8
+  url: https://en.wikipedia.org/wiki/Stuart_J._Russell
+  title: Stuart J. Russell - Wikipedia
+  type: reference
+  cited_by:
+    - stuart-russell
+  tags: []
+- id: 0dcffc6765044969
+  url: https://en.wikipedia.org/wiki/Center_for_Human-Compatible_Artificial_Intelligence
+  title: Center for Human-Compatible Artificial Intelligence - Wikipedia
+  type: reference
+  cited_by:
+    - stuart-russell
+  tags: []
+- id: f82bc0bcc0878bac
+  url: https://en.wikipedia.org/wiki/User:Vipul
+  title: Wikipedia User Page - Vipul
+  type: reference
+  cited_by:
+    - vipul-naik
+  tags: []
+- id: d2b04898c45ce420
+  url: https://en.wikipedia.org/wiki/William_MacAskill
+  title: William MacAskill - Wikipedia
+  type: reference
+  cited_by:
+    - will-macaskill
+  tags: []
+- id: 8cb877e01c8eb3d4
+  url: https://en.wikipedia.org/wiki/AI_Safety_Summit
+  title: AI Safety Summit - Wikipedia
+  type: reference
+  cited_by:
+    - bletchley-declaration
+  tags: []
+- id: 3fde8e78f6c1bca5
+  url: https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence
+  title: Framework Convention on Artificial Intelligence - Wikipedia
+  type: reference
+  cited_by:
+    - coe-ai-convention
+  tags: []
+- id: e8702eeda428b13b
+  url: https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence
+  title: "Wikipedia: Hallucination (artificial intelligence)"
+  type: reference
+  cited_by:
+    - reducing-hallucinations
+  tags: []
+- id: 03386beaecf8f1be
+  url: https://en.wikipedia.org/wiki/18F
+  title: 18F Wikipedia Entry
+  type: reference
+  cited_by:
+    - state-capacity-ai-governance
+  tags: []
+- id: 1eacc3b7477575cf
+  url: https://en.wikipedia.org/wiki/Pageview
+  title: Pageview - Wikipedia
+  type: reference
+  cited_by:
+    - wikipedia-views
+  tags: []
+- id: 8606000bf4f81dc6
+  url: https://en.wikipedia.org/wiki/Wikipedia:Pageview_statistics
+  title: Wikipedia:Pageview statistics
+  type: reference
+  cited_by:
+    - wikipedia-views
+  tags: []
+- id: c8ba064bd014859c
+  url: https://en.wikipedia.org/wiki/Wikipedia:Popular_pages
+  title: Wikipedia:Popular pages
+  type: reference
+  cited_by:
+    - wikipedia-views
+  tags: []
+- id: 0b9c2e920b73185f
+  url: https://en.wikipedia.org/wiki/Wikipedia:Article_traffic_jumps
+  title: Wikipedia:Article traffic jumps
+  type: reference
+  cited_by:
+    - wikipedia-views
+  tags: []
+- id: a8f8fcc7747bd32a
+  url: https://en.wikipedia.org/wiki/Grok_sexual_deepfake_scandal
+  title: Wikipedia summary of Grok sexual deepfake incident.
+  type: reference
+  cited_by:
+    - x-com-epistemics
+  tags: []
+- id: 8ab2ca7d1a411f58
+  url: https://en.wikipedia.org/wiki/Moral_patienthood
+  title: Moral Patienthood (Wikipedia)
+  type: reference
+  cited_by:
+    - ai-welfare
+  tags: []
+- id: 3d10584f2ac5bbdc
+  url: https://en.wikipedia.org/wiki/Propaganda_in_the_United_States
+  title: Propaganda in the United States - Wikipedia
+  type: reference
+  cited_by:
+    - epistemic-collapse
+  tags: []
+- id: 15d16c5cf0f769e6
+  url: https://en.wikipedia.org/wiki/Superintelligence
+  title: Superintelligence - Wikipedia
+  type: reference
+  cited_by:
+    - superintelligence
+  tags: []

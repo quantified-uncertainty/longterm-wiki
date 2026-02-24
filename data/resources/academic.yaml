@@ -1,7 +1,3 @@
-# Academic Sources
-# Academic papers, journals, and university research
-# Auto-generated from general.yaml - see scripts/split-general-yaml.mjs
-
 - id: a039c6ec78c7a344
   url: https://www.sciencedirect.com/science/article/pii/S0169207008000320
   title: Berg et al. (2008)
@@ -1183,3 +1179,18 @@
   cited_by:
     - takeoff
   publication_id: epoch
+- id: 836d3f4c6d8d5432
+  url: https://www.sciencedirect.com/science/article/pii/S0963868724000672
+  title: ScienceDirect - Responsible AI Governance Review
+  type: web
+  cited_by:
+    - nist-ai-rmf
+  tags: []
+- id: dfc4e4d58a136749
+  url: https://www.sciencedirect.com/science/article/pii/S0065245808604180
+  title: Good, I. J. (1965). Speculations Concerning the First Ultraintelligent Machine. Advances in
+    Computers, 6, 31-88
+  type: web
+  cited_by:
+    - superintelligence
+  tags: []

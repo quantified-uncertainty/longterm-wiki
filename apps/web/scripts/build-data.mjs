@@ -28,6 +28,7 @@ import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
 import { computePageCoverage } from '../../../crux/lib/page-coverage.ts';
+import { parseFootnoteSources } from '../../../crux/lib/footnote-parser.ts';
 
 // ---------------------------------------------------------------------------
 // Structured value formatting — converts numeric fact values to display strings
@@ -1576,6 +1577,12 @@ async function main() {
   // Uses 3 sources: inline <R id="...">, cited_by reverse index, URL matching.
   // Must run BEFORE rawContent is deleted (needs page body for URL extraction).
   // =========================================================================
+  // Build URL → resource ID map (shared between pageResources and footnoteIndex)
+  const urlToId = new Map();
+  for (const [url, resource] of urlToResource.entries()) {
+    urlToId.set(url, resource.id);
+  }
+
   {
     console.log('  Computing pageResources...');
     // Build cited_by reverse index: pageSlug → Set<resourceId>
@@ -1587,11 +1594,7 @@ async function main() {
         citedByIndex.get(pageId).add(r.id);
       }
     }
-    // Build URL → resource ID map
-    const urlToId = new Map();
-    for (const [url, resource] of urlToResource.entries()) {
-      urlToId.set(url, resource.id);
-    }
+    // urlToId already built in outer scope
     const validIds = new Set(resources.map(r => r.id));
     const pageResources = {};
     let pagesWithRefs = 0;
@@ -1644,6 +1647,61 @@ async function main() {
     }
     database.pageResources = pageResources;
     console.log(`  pageResources: ${totalRefs} resource refs across ${pagesWithRefs} pages`);
+  }
+
+  // =========================================================================
+  // FOOTNOTE INDEX — map each footnote to its resource and URL.
+  // Groups footnotes by unique source for the UnifiedReferences component.
+  // Must run BEFORE rawContent is deleted (needs page body for parsing).
+  // =========================================================================
+  {
+    console.log('  Computing footnoteIndex...');
+    const footnoteIndex = {};
+    let pagesWithFootnotes = 0;
+    let totalFootnotesMapped = 0;
+
+    for (const page of pages) {
+      if (!page.rawContent) continue;
+
+      const result = parseFootnoteSources(page.rawContent, urlToId);
+      if (result.totalFootnotes === 0) continue;
+
+      pagesWithFootnotes++;
+
+      // Build per-footnote mapping
+      const fnMap = {};
+      for (const fn of result.footnotes) {
+        const entry = { url: fn.url, title: fn.title };
+
+        // Find the source group for this footnote to get resourceId
+        if (fn.url) {
+          const source = result.sources.find(s =>
+            s.footnoteNumbers.includes(fn.number)
+          );
+          if (source?.resourceId) {
+            entry.resourceId = source.resourceId;
+          }
+        }
+
+        fnMap[fn.number] = entry;
+        totalFootnotesMapped++;
+      }
+
+      // Also store the deduplicated source groups
+      footnoteIndex[page.id] = {
+        footnotes: fnMap,
+        sources: result.sources.map(s => ({
+          url: s.url,
+          title: s.title,
+          domain: s.domain,
+          footnoteNumbers: s.footnoteNumbers,
+          resourceId: s.resourceId,
+        })),
+      };
+    }
+
+    database.footnoteIndex = footnoteIndex;
+    console.log(`  footnoteIndex: ${totalFootnotesMapped} footnotes across ${pagesWithFootnotes} pages`);
   }
 
   // Compute redundancy scores (needs rawContent)

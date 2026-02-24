@@ -862,3 +862,53 @@ citationsRoute.get("/content/stats", async (c) => {
     avgContentLength: r.avgContentLength != null ? Math.round(Number(r.avgContentLength)) : null,
   });
 });
+
+// ---- GET /quotes-by-url?url=X ----
+// Returns all citation quotes across all pages for a given source URL.
+// Used by resource pages to show cross-page citations.
+
+citationsRoute.get("/quotes-by-url", async (c) => {
+  const url = c.req.query("url");
+  if (!url) return validationError(c, "url query parameter is required");
+
+  const limitParam = c.req.query("limit");
+  const limit = limitParam
+    ? Math.min(Math.max(parseInt(limitParam, 10) || 100, 1), 500)
+    : 100;
+
+  const db = getDrizzleDb();
+  const rows = await db
+    .select()
+    .from(citationQuotes)
+    .where(eq(citationQuotes.url, url))
+    .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote))
+    .limit(limit);
+
+  // Also get aggregate stats
+  const stats = await db
+    .select({
+      totalPages: sql<number>`count(distinct ${citationQuotes.pageId})`,
+      totalQuotes: count(),
+      verified: sql<number>`count(case when ${citationQuotes.quoteVerified} = true then 1 end)`,
+      accurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'accurate' then 1 end)`,
+      inaccurate: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'inaccurate' then 1 end)`,
+      unsupported: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'unsupported' then 1 end)`,
+      minorIssues: sql<number>`count(case when ${citationQuotes.accuracyVerdict} = 'minor_issues' then 1 end)`,
+    })
+    .from(citationQuotes)
+    .where(eq(citationQuotes.url, url));
+
+  const s = stats[0];
+  return c.json({
+    quotes: rows,
+    stats: {
+      totalPages: Number(s.totalPages),
+      totalQuotes: s.totalQuotes,
+      verified: Number(s.verified),
+      accurate: Number(s.accurate),
+      inaccurate: Number(s.inaccurate),
+      unsupported: Number(s.unsupported),
+      minorIssues: Number(s.minorIssues),
+    },
+  });
+});

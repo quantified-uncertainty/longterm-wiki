@@ -53,6 +53,37 @@ export async function getCitationQuotes(
   );
 }
 
+/** Citation quote with page context — returned by quotes-by-url endpoint */
+export interface CrossPageCitationQuote extends CitationQuote {
+  pageId: string;
+}
+
+interface QuotesByUrlResponse {
+  quotes: CrossPageCitationQuote[];
+  stats: {
+    totalPages: number;
+    totalQuotes: number;
+    verified: number;
+    accurate: number;
+    inaccurate: number;
+    unsupported: number;
+    minorIssues: number;
+  };
+}
+
+/**
+ * Fetch all citation quotes across all pages for a given source URL.
+ * Used by /source/[id] pages to show cross-page citation data.
+ */
+export async function getCitationQuotesByUrl(
+  url: string
+): Promise<QuotesByUrlResponse | null> {
+  return fetchFromWikiServer<QuotesByUrlResponse>(
+    `/api/citations/quotes-by-url?url=${encodeURIComponent(url)}`,
+    { revalidate: 600 }
+  );
+}
+
 /**
  * Computes a summary of citation health from the quotes array.
  * Pure function — safe to call from server or client components.

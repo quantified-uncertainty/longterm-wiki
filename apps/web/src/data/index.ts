@@ -182,6 +182,8 @@ interface DatabaseShape {
   factUsage: Record<string, FactUsagePage[]>;
   /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
   pageResources: Record<string, string[]>;
+  /** Footnote index: page → { footnotes, sources } for unified citation rendering */
+  footnoteIndex?: Record<string, FootnoteIndexEntry>;
   stats: Record<string, unknown>;
   /** Pre-computed update schedule items (staleness, priority, etc.) */
   updateSchedule?: Array<{
@@ -307,6 +309,28 @@ interface Entity {
   sourceRefs?: string[];
   sources?: { title: string; url?: string; author?: string; date?: string }[];
   content?: unknown;
+}
+
+/** Single footnote entry in the footnoteIndex */
+export interface FootnoteEntry {
+  url: string | null;
+  title: string | null;
+  resourceId?: string;
+}
+
+/** Source group in the footnoteIndex — deduped by URL */
+export interface FootnoteSourceEntry {
+  url: string;
+  title: string;
+  domain: string;
+  footnoteNumbers: number[];
+  resourceId: string | null;
+}
+
+/** Per-page footnote index data */
+export interface FootnoteIndexEntry {
+  footnotes: Record<number, FootnoteEntry>;
+  sources: FootnoteSourceEntry[];
 }
 
 export interface Resource {
@@ -596,6 +620,25 @@ export function getResourceById(id: string): Resource | undefined {
 export function getResourcesForPage(pageId: string): string[] {
   const db = getDatabase();
   return db.pageResources?.[resolveId(pageId)] ?? [];
+}
+
+/** Get page IDs that cite a given resource (reverse lookup of pageResources) */
+export function getPagesForResource(resourceId: string): string[] {
+  const db = getDatabase();
+  const pr = db.pageResources ?? {};
+  const pages: string[] = [];
+  for (const [pageId, ids] of Object.entries(pr)) {
+    if ((ids as string[]).includes(resourceId)) {
+      pages.push(pageId);
+    }
+  }
+  return pages;
+}
+
+/** Get footnote index data for a page (computed at build time from MDX footnotes) */
+export function getFootnoteIndex(pageId: string): FootnoteIndexEntry | undefined {
+  const db = getDatabase();
+  return db.footnoteIndex?.[resolveId(pageId)];
 }
 
 export function getPublicationById(id: string): Publication | undefined {
