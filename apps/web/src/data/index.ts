@@ -660,9 +660,17 @@ export interface UpdateScheduleItem {
   category: string;
 }
 
-export function getUpdateSchedule(): UpdateScheduleItem[] {
-  // Pre-computed at build time in build-data.mjs (staleness, priority, daysSince, daysUntil)
-  return getDatabase().updateSchedule || [];
+export async function getUpdateSchedule(): Promise<WithSource<UpdateScheduleItem[]>> {
+  return withApiFallback(
+    async () => {
+      const data = await fetchFromWikiServer<UpdateScheduleItem[]>(
+        `/api/pages/update-schedule`
+      );
+      return data;
+    },
+    // Local fallback: pre-computed at build time in build-data.mjs
+    () => getDatabase().updateSchedule || []
+  );
 }
 
 export interface PageRankingItem {
