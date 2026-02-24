@@ -346,6 +346,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Agent Sessions", href: "/internal/agent-sessions" },
         { label: "Citation Accuracy", href: "/internal/citation-accuracy" },
         { label: "Citation Content", href: "/internal/citation-content" },
+        { label: "Page Coverage", href: "/internal/page-coverage" },
         { label: "Hallucination Risk", href: "/internal/hallucination-risk" },
         { label: "Hallucination Evals", href: "/internal/hallucination-evals" },
         { label: "Human Reviews", href: "/internal/reviews" },

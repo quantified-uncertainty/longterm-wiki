@@ -27,6 +27,7 @@ import { transformEntities } from './lib/entity-transform.mjs';
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
+import { computePageCoverage } from '../../../crux/lib/page-coverage.ts';
 
 // ---------------------------------------------------------------------------
 // Structured value formatting — converts numeric fact values to display strings
@@ -1744,6 +1745,47 @@ async function main() {
   const prItems = await fetchPrItems();
   database.prItems = prItems;
   console.log(`  prItems: ${prItems.length} PRs fetched for dashboard`);
+
+  // =========================================================================
+  // PAGE COVERAGE — compute per-page coverage scores from structural signals.
+  // Used by PageStatus component and the /internal/page-coverage dashboard.
+  // =========================================================================
+  console.log('  Computing page coverage scores...');
+  // Pre-compute entity fact counts
+  const entityFactCounts = {};
+  for (const [_key, fact] of Object.entries(database.facts || {})) {
+    entityFactCounts[fact.entity] = (entityFactCounts[fact.entity] || 0) + 1;
+  }
+  let coverageGreen = 0, coverageAmber = 0, coverageRed = 0;
+  for (const page of pages) {
+    const coverage = computePageCoverage({
+      wordCount: page.metrics?.wordCount ?? page.wordCount ?? 0,
+      contentFormat: page.contentFormat || 'article',
+      llmSummary: page.llmSummary,
+      structuredSummary: page.structuredSummary,
+      updateFrequency: page.updateFrequency,
+      hasEntity: entityMap.has(page.id),
+      changeHistoryCount: page.changeHistory?.length ?? 0,
+      tableCount: page.metrics?.tableCount ?? 0,
+      diagramCount: page.metrics?.diagramCount ?? 0,
+      internalLinks: page.metrics?.internalLinks ?? 0,
+      externalLinks: page.metrics?.externalLinks ?? 0,
+      footnoteCount: page.metrics?.footnoteCount ?? 0,
+      resourceCount: (database.pageResources[page.id] || []).length,
+      quotesWithQuotes: page.citationHealth?.withQuotes ?? 0,
+      quotesTotal: page.citationHealth?.total ?? 0,
+      accuracyChecked: page.citationHealth?.accuracyChecked ?? 0,
+      accuracyTotal: page.citationHealth?.total ?? 0,
+      ratings: page.ratings,
+      factCount: entityFactCounts[page.id] || 0,
+    });
+    page.coverage = coverage;
+    const pct = coverage.passing / coverage.total;
+    if (pct >= 0.75) coverageGreen++;
+    else if (pct >= 0.5) coverageAmber++;
+    else coverageRed++;
+  }
+  console.log(`  pageCoverage: ${coverageGreen} green, ${coverageAmber} amber, ${coverageRed} red`);
 
   database.pages = pages;
 
