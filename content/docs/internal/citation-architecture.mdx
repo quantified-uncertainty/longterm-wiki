@@ -98,7 +98,7 @@ The Kalshi page is a good exemplar because it exercises the full system:
 | Metric | Value |
 |--------|-------|
 | Total footnotes | 87 |
-| Unique source URLs | \≈35 |
+| Unique source URLs | ≈35 |
 | Resource YAML entries | 31 |
 | Citation quotes (Postgres) | 87 |
 | Verified accurate | 84 (96.6%) |
@@ -180,6 +180,7 @@ New crux command: `pnpm crux citations register-resources <pageId>`
    - Extract: title, domain, type, published\_date, authors
    - Generate resource ID (SHA-256 hash of URL, first 16 hex chars)
    - Create YAML entry in the appropriate `data/resources/` file
+
 4. Report: "35 unique URLs, 31 already registered, 4 newly created"
 
 ### New Build Step: Footnote Index
@@ -210,6 +211,7 @@ Replaces both remark-gfm footnote section and current References component:
    - Credibility badge
    - Verification dot (aggregate across all claims citing this source)
    - Back-refs: "Referenced by [5] [6] [15] [16] [17] [18] [19] [20] [21]"
+
 3. **Expandable details**:
    - Source summary
    - Per-claim verification table (from citation\_quotes)
