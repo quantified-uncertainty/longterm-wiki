@@ -104,6 +104,7 @@ export async function apiRequest<T>(
   path: string,
   body?: unknown,
   timeoutMs: number = TIMEOUT_MS,
+  scope?: ApiKeyScope,
 ): Promise<ApiResult<T>> {
   const serverUrl = getServerUrl();
   if (!serverUrl) return apiErr('unavailable', 'LONGTERMWIKI_SERVER_URL not set');
@@ -114,7 +115,7 @@ export async function apiRequest<T>(
 
     const options: RequestInit = {
       method,
-      headers: buildHeaders(),
+      headers: buildHeaders(scope),
       signal: controller.signal,
     };
 
@@ -152,8 +153,9 @@ export async function batchedRequest<T>(
   path: string,
   body?: unknown,
   timeoutMs: number = BATCH_TIMEOUT_MS,
+  scope?: ApiKeyScope,
 ): Promise<ApiResult<T>> {
-  return apiRequest<T>(method, path, body, timeoutMs);
+  return apiRequest<T>(method, path, body, timeoutMs, scope);
 }
 
 // ---------------------------------------------------------------------------

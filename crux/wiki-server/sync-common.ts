@@ -49,6 +49,8 @@ export interface BatchSyncOptions<T> {
   ) => void;
   /** API key scope for authentication. Sync scripts typically use 'content'. */
   scope?: ApiKeyScope;
+  /** Extra fields to include in the request body alongside the batched items. */
+  extraBodyFields?: Record<string, unknown>;
   _sleep?: (ms: number) => Promise<void>;
 }
 
@@ -192,6 +194,7 @@ export async function batchSync<T>(
     onBatchError,
     onBatchSuccess,
     scope,
+    extraBodyFields,
     _sleep,
   } = options;
 
@@ -207,7 +210,7 @@ export async function batchSync<T>(
     try {
       const requestBody =
         bodyKey !== null
-          ? JSON.stringify({ [bodyKey]: batch })
+          ? JSON.stringify({ [bodyKey]: batch, ...extraBodyFields })
           : JSON.stringify(batch[0]);
 
       const res = await fetchWithRetry(

@@ -75,13 +75,13 @@ export interface SessionPageChangesResult {
 export async function createSession(
   entry: SessionApiEntry,
 ): Promise<ApiResult<CreateSessionResult>> {
-  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry);
+  return apiRequest<CreateSessionResult>('POST', '/api/sessions', entry, undefined, 'project');
 }
 
 export async function createSessionBatch(
   items: SessionApiEntry[],
 ): Promise<ApiResult<SessionBatchResult>> {
-  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items });
+  return apiRequest<SessionBatchResult>('POST', '/api/sessions/batch', { items }, undefined, 'project');
 }
 
 export async function listSessions(

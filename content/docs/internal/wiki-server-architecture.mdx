@@ -13,7 +13,7 @@ evergreen: true
 
 This document analyzes how the wiki-server handles (or fails to handle) environment isolation between development, preview, and production. It identifies the core architectural tension — entity ID allocation must be globally shared, but content data should not — and proposes a tiered remediation plan.
 
-**Status:** Analysis complete (Feb 2026). No implementation started yet.
+**Status:** Analysis complete (Feb 2026). Tier 3 alternative (scoped API keys) implemented — server-side auth middleware, client-side scope propagation, CI workflow updates, audit columns on page sync. GitHub secrets and legacy key removal are pending deployment steps.
 
 ---
 

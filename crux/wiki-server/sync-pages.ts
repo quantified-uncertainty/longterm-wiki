@@ -22,6 +22,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 import { parseCliArgs } from "../lib/cli.ts";
 import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
 import { batchSync, waitForHealthy } from "./sync-common.ts";
@@ -117,6 +118,17 @@ function transformPage(page: PageData): SyncPage {
   };
 }
 
+/** Detect git branch and short commit hash. Returns null on failure (e.g., not a git repo). */
+function getGitAuditInfo(): { branch: string; commit: string } | null {
+  try {
+    const branch = execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8" }).trim();
+    const commit = execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
+    return { branch, commit };
+  } catch {
+    return null;
+  }
+}
+
 /** @internal — exported for testing */
 export async function syncPages(
   serverUrl: string,
@@ -127,6 +139,13 @@ export async function syncPages(
     _sleep?: (ms: number) => Promise<void>;
   } = {}
 ): Promise<{ upserted: number; errors: number }> {
+  // Detect branch/commit for audit trail
+  const gitInfo = getGitAuditInfo();
+  const extraBodyFields: Record<string, string | null> = {
+    syncedFromBranch: gitInfo?.branch ?? null,
+    syncedFromCommit: gitInfo?.commit ?? null,
+  };
+
   const result = await batchSync(
     `${serverUrl}/api/pages/sync`,
     pages,
@@ -146,6 +165,7 @@ export async function syncPages(
         }
       },
       scope: 'content',
+      extraBodyFields,
       _sleep: options._sleep,
     },
   );
