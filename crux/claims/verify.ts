@@ -31,6 +31,7 @@ import {
 import { extractCitationsFromContent } from '../lib/citation-archive.ts';
 import { findPageFile } from '../lib/file-utils.ts';
 import { stripFrontmatter } from '../lib/patterns.ts';
+import { getResourceById } from '../lib/resource-lookup.ts';
 import { readFileSync } from 'fs';
 
 const MIN_SOURCE_LENGTH = 100;
@@ -68,8 +69,11 @@ async function getSourceText(url: string): Promise<string | null> {
 // URL lookup from citation archive for a page
 // ---------------------------------------------------------------------------
 
-/** Build a map of footnote ref → URL from the page MDX. */
-function buildFootnoteUrlMap(pageId: string): Map<string, string> {
+/**
+ * Build a map of citation ref → URL from the page MDX.
+ * Handles both [^N] footnote references and <R id="HASH"> resource references.
+ */
+function buildCitationUrlMap(pageId: string): Map<string, string> {
   const map = new Map<string, string>();
   const filePath = findPageFile(pageId);
   if (!filePath) return map;
@@ -77,9 +81,23 @@ function buildFootnoteUrlMap(pageId: string): Map<string, string> {
   try {
     const raw = readFileSync(filePath, 'utf-8');
     const body = stripFrontmatter(raw);
+
+    // Standard [^N] footnotes
     const citations = extractCitationsFromContent(body);
     for (const cit of citations) {
       map.set(String(cit.footnote), cit.url);
+    }
+
+    // <R id="HASH"> resource references → mapped as "R:HASH"
+    const rPattern = /<R\s+id="([^"]+)">/g;
+    let match;
+    while ((match = rPattern.exec(raw)) !== null) {
+      const resourceId = match[1];
+      if (map.has(`R:${resourceId}`)) continue;
+      const resource = getResourceById(resourceId);
+      if (resource?.url) {
+        map.set(`R:${resourceId}`, resource.url);
+      }
     }
   } catch {
     // Page not found or parse error — return empty map
@@ -184,7 +202,7 @@ async function main() {
   console.log('');
 
   // Build footnote → URL map from the page
-  const footnoteUrlMap = buildFootnoteUrlMap(pageId);
+  const footnoteUrlMap = buildCitationUrlMap(pageId);
   console.log(`  Citation URLs mapped: ${footnoteUrlMap.size}`);
 
   // Verify each claim
