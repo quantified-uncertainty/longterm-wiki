@@ -12,6 +12,7 @@ import fs from "fs";
 import path from "path";
 import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
+import type { BacklinkEntry as ServerBacklinkEntry, RelatedEntry as ServerRelatedEntry } from "@wiki-server/api-types";
 import {
   TypedEntitySchema,
   type TypedEntity,
@@ -1103,13 +1104,8 @@ export function getBacklinksFor(
   }));
 }
 
-/** Server response shape for backlinks endpoint */
-interface ServerBacklink {
-  id: string;
-  type: string;
-  title: string;
-  relationship?: string;
-}
+/** Server response shape for backlinks endpoint — imported from shared api-types */
+type ServerBacklink = ServerBacklinkEntry;
 
 /**
  * Fetch backlinks from wiki-server with fallback to local database.json.
@@ -1161,15 +1157,6 @@ export function getRelatedGraphFor(
     ...entry,
     href: getEntityHref(entry.id, entry.type),
   }));
-}
-
-/** Server response shape for related endpoint */
-interface ServerRelatedEntry {
-  id: string;
-  type: string;
-  title: string;
-  score: number;
-  label?: string;
 }
 
 /**

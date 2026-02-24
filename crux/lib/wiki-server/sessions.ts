@@ -6,7 +6,13 @@
 
 import type { z } from 'zod';
 import { apiRequest, type ApiResult } from './client.ts';
-import type { CreateSessionSchema } from '../../../apps/wiki-server/src/api-types.ts';
+import type {
+  CreateSessionSchema,
+  SessionEntry,
+  SessionListResponse,
+  SessionsByFilterResponse,
+  SessionStatsResponse,
+} from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -28,45 +34,12 @@ export interface SessionBatchResult {
   results: Array<{ id: number; title: string; pageCount: number }>;
 }
 
-export interface SessionEntry {
-  id: number;
-  date: string;
-  branch: string | null;
-  title: string;
-  summary: string | null;
-  model: string | null;
-  duration: string | null;
-  cost: string | null;
-  prUrl: string | null;
-  checksYaml: string | null;
-  issuesJson: unknown;
-  learningsJson: unknown;
-  recommendationsJson: unknown;
-  pages: string[];
-  createdAt: string;
-}
-
-export interface SessionListResult {
-  sessions: SessionEntry[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface SessionByPageResult {
-  sessions: SessionEntry[];
-}
-
-export interface SessionStatsResult {
-  totalSessions: number;
-  uniquePages: number;
-  totalPageEdits: number;
-  byModel: Record<string, number>;
-}
-
-export interface SessionPageChangesResult {
-  sessions: SessionEntry[];
-}
+// Re-export shared response types for backward compatibility
+export type { SessionEntry };
+export type SessionListResult = SessionListResponse;
+export type SessionByPageResult = SessionsByFilterResponse;
+export type SessionStatsResult = SessionStatsResponse;
+export type SessionPageChangesResult = SessionsByFilterResponse;
 
 // ---------------------------------------------------------------------------
 // API functions (return ApiResult<T>)

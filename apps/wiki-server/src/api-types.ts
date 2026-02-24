@@ -615,3 +615,163 @@ export const UpdateAgentSessionSchema = z.object({
   status: z.enum(["active", "completed"]).optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
+
+// ===========================================================================
+// Response types — Canonical shapes returned by the wiki-server.
+//
+// These are plain TypeScript interfaces (not Zod schemas) because they
+// describe what the server returns, not what it validates. Both the crux CLI
+// and the Next.js app should import these instead of hand-writing their own.
+//
+// Convention:
+//   - `XyzResponse`  — top-level envelope returned by an endpoint
+//   - `XyzEntry`     — individual record within a response list
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Sessions — GET /api/sessions, /page-changes, /by-page, /stats
+// ---------------------------------------------------------------------------
+
+/** A single session record as returned by the server. */
+export interface SessionEntry {
+  id: number;
+  date: string;
+  branch: string | null;
+  title: string;
+  summary: string | null;
+  model: string | null;
+  duration: string | null;
+  cost: string | null;
+  prUrl: string | null;
+  checksYaml: string | null;
+  issuesJson: unknown;
+  learningsJson: unknown;
+  recommendationsJson: unknown;
+  pages: string[];
+  createdAt: string;
+}
+
+/** GET /api/sessions */
+export interface SessionListResponse {
+  sessions: SessionEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/** GET /api/sessions/page-changes, GET /api/sessions/by-page */
+export interface SessionsByFilterResponse {
+  sessions: SessionEntry[];
+}
+
+/** GET /api/sessions/stats */
+export interface SessionStatsResponse {
+  totalSessions: number;
+  uniquePages: number;
+  totalPageEdits: number;
+  byModel: Record<string, number>;
+}
+
+// ---------------------------------------------------------------------------
+// Links — GET /api/links/backlinks/:id, /related/:id
+// ---------------------------------------------------------------------------
+
+/** A single backlink entry as returned by GET /api/links/backlinks/:id. */
+export interface BacklinkEntry {
+  id: string;
+  type: string;
+  title: string;
+  relationship?: string;
+  linkType: string;
+  weight: number;
+}
+
+/** GET /api/links/backlinks/:id */
+export interface BacklinksResponse {
+  targetId: string;
+  backlinks: BacklinkEntry[];
+  total: number;
+}
+
+/** A single related-page entry as returned by GET /api/links/related/:id. */
+export interface RelatedEntry {
+  id: string;
+  type: string;
+  title: string;
+  score: number;
+  label?: string;
+}
+
+/** GET /api/links/related/:id */
+export interface RelatedResponse {
+  entityId: string;
+  related: RelatedEntry[];
+  total: number;
+}
+
+// ---------------------------------------------------------------------------
+// Facts — GET /api/facts/by-entity/:id, /timeseries/:id, /stale, /stats
+// ---------------------------------------------------------------------------
+
+/** A single fact record as returned by fact endpoints. */
+export interface FactEntryResponse {
+  id: number;
+  entityId: string;
+  factId: string;
+  label: string | null;
+  value: string | null;
+  numeric: number | null;
+  low: number | null;
+  high: number | null;
+  asOf: string | null;
+  measure: string | null;
+  subject: string | null;
+  note: string | null;
+  source: string | null;
+  sourceResource: string | null;
+  format: string | null;
+  formatDivisor: number | null;
+  syncedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /api/facts/by-entity/:id */
+export interface FactsByEntityResponse {
+  entityId: string;
+  facts: FactEntryResponse[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/** GET /api/facts/timeseries/:id */
+export interface FactTimeseriesResponse {
+  entityId: string;
+  measure: string;
+  points: FactEntryResponse[];
+  total: number;
+}
+
+/** GET /api/facts/stale */
+export interface StaleFactsResponse {
+  facts: Array<{
+    entityId: string;
+    factId: string;
+    label: string | null;
+    asOf: string | null;
+    measure: string | null;
+    value: string | null;
+    numeric: number | null;
+  }>;
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/** GET /api/facts/stats */
+export interface FactStatsResponse {
+  total: number;
+  uniqueEntities: number;
+  uniqueMeasures: number;
+}
