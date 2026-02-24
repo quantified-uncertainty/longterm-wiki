@@ -1155,8 +1155,9 @@ export function getRelatedGraphFor(
   score: number;
   label?: string;
 }> {
+  const slug = resolveId(entityId);
   const db = getDatabase();
-  const entries = db.relatedGraph?.[entityId] || [];
+  const entries = db.relatedGraph?.[slug] || [];
   return entries.map((entry) => ({
     ...entry,
     href: getEntityHref(entry.id, entry.type),
@@ -1186,10 +1187,12 @@ export async function getRelatedGraphWithFallback(
   score: number;
   label?: string;
 }>>> {
+  const slug = resolveId(entityId);
+
   return withApiFallback(
     async () => {
       const data = await fetchFromWikiServer<{ related: ServerRelatedEntry[] }>(
-        `/api/links/related/${encodeURIComponent(entityId)}`
+        `/api/links/related/${encodeURIComponent(slug)}`
       );
       if (!data) return null;
       return data.related.map((entry) => ({
@@ -1206,8 +1209,9 @@ export async function getRelatedGraphWithFallback(
 // ============================================================================
 
 export function getFact(entityId: string, factId: string): Fact | undefined {
+  const slug = resolveId(entityId);
   const db = getDatabase();
-  return db.facts?.[`${entityId}.${factId}`];
+  return db.facts?.[`${slug}.${factId}`];
 }
 
 export function getFactValue(entityId: string, factId: string): string | undefined {
@@ -1215,10 +1219,11 @@ export function getFactValue(entityId: string, factId: string): string | undefin
 }
 
 export function getFactsForEntity(entityId: string): Record<string, Fact> {
+  const resolvedId = resolveId(entityId);
   const db = getDatabase();
   const result: Record<string, Fact> = {};
   for (const [key, fact] of Object.entries(db.facts || {})) {
-    if (fact.entity === entityId) {
+    if (fact.entity === resolvedId) {
       result[fact.factId] = fact;
     }
   }
