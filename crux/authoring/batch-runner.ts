@@ -21,6 +21,7 @@ import { fileURLToPath } from 'url';
 
 import { runOrchestratorPipeline } from './orchestrator/index.ts';
 import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier } from './orchestrator/types.ts';
+import { TIER_BUDGETS } from './orchestrator/types.ts';
 import { createPhaseLogger } from '../lib/output.ts';
 import { loadPages as loadPagesFromRegistry } from '../lib/content-types.ts';
 import {
@@ -212,6 +213,317 @@ async function withTimeout<T>(
     clearTimeout(timer!);
     clearInterval(watchdog!);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Dry-run types and implementation
+// ---------------------------------------------------------------------------
+
+/** Tier cost estimates (midpoint of range in dollars). */
+const TIER_COST_ESTIMATES: Record<OrchestratorTier, { low: number; high: number; mid: number }> = {
+  polish:   { low: 2, high: 4,  mid: 3 },
+  standard: { low: 4, high: 8,  mid: 6 },
+  deep:     { low: 8, high: 18, mid: 13 },
+};
+
+/** Quality threshold above which a page is considered "already high quality". */
+const HIGH_QUALITY_THRESHOLD = 80;
+
+/** Per-page skip reason codes. */
+export type SkipReason =
+  | 'too-large'
+  | 'unknown-page-id'
+  | 'high-quality';
+
+/** Result of a dry-run analysis for a single page. */
+export interface DryRunPageResult {
+  pageId: string;
+  /** Whether the page would be processed (not skipped). */
+  wouldRun: boolean;
+  /** Reason the page would be skipped (null if it would run). */
+  skipReason: SkipReason | null;
+  /** Tier that would be used. */
+  tier: OrchestratorTier;
+  /** File size in KB (null if file not found). */
+  fileSizeKB: number | null;
+  /** Quality score from frontmatter (null if not set). */
+  quality: number | null;
+  /** Reader importance score (null if not set). */
+  readerImportance: number | null;
+  /** Citation count from page metrics (null if not available). */
+  citationCount: number | null;
+  /** Word count from page metrics (null if not available). */
+  wordCount: number | null;
+  /** Low-end cost estimate in dollars. */
+  estimatedCostLow: number;
+  /** High-end cost estimate in dollars. */
+  estimatedCostHigh: number;
+  /** Midpoint cost estimate used for totals. */
+  estimatedCostMid: number;
+}
+
+/** Summary of a dry-run across all pages. */
+export interface DryRunSummary {
+  tier: OrchestratorTier;
+  totalPages: number;
+  wouldRun: number;
+  wouldSkip: number;
+  skipReasons: Partial<Record<SkipReason, number>>;
+  estimatedTotalLow: number;
+  estimatedTotalHigh: number;
+  estimatedTotalMid: number;
+  budgetLimit?: number;
+  /** Whether the estimated total exceeds the budget limit. */
+  overBudget: boolean;
+  pages: DryRunPageResult[];
+}
+
+/**
+ * Run a dry-run analysis of a batch: loads pages, computes sizes,
+ * reads quality data from build artifacts, and estimates costs.
+ * No API calls are made; no files are modified.
+ */
+export async function runBatchDryRun(options: {
+  pageIds: string[];
+  tier: OrchestratorTier;
+  budgetLimit?: number;
+  outputFile?: string;
+}): Promise<DryRunSummary> {
+  const { pageIds, tier, budgetLimit, outputFile } = options;
+  const costEstimate = TIER_COST_ESTIMATES[tier];
+  const tierBudget = TIER_BUDGETS[tier];
+
+  console.log('\n' + '═'.repeat(70));
+  console.log(`  DRY RUN — Batch Improve (V2 Orchestrator)`);
+  console.log(`  Pages: ${pageIds.length} | Tier: ${tier} (${tierBudget.estimatedCost}) | Budget: ${budgetLimit ? formatCost(budgetLimit) : 'unlimited'}`);
+  console.log('═'.repeat(70) + '\n');
+  console.log('  Analyzing pages (no API calls, no cost)...\n');
+
+  const pages = getCachedPages();
+  const knownIds = new Set(pages.map((p: { id: string }) => p.id));
+
+  // Build a lookup map for page metadata (cast to access quality fields)
+  const pageMetaMap = new Map<string, Record<string, unknown>>();
+  for (const p of pages) {
+    pageMetaMap.set(p.id, p as unknown as Record<string, unknown>);
+  }
+
+  const results: DryRunPageResult[] = [];
+
+  for (const pageId of pageIds) {
+    // Check if page ID is known
+    if (!knownIds.has(pageId)) {
+      results.push({
+        pageId,
+        wouldRun: false,
+        skipReason: 'unknown-page-id',
+        tier,
+        fileSizeKB: null,
+        quality: null,
+        readerImportance: null,
+        citationCount: null,
+        wordCount: null,
+        estimatedCostLow: 0,
+        estimatedCostHigh: 0,
+        estimatedCostMid: 0,
+      });
+      continue;
+    }
+
+    // Get file size
+    const fileInfo = getPageFileSize(pageId);
+    const fileSizeKB = fileInfo ? Math.round(fileInfo.sizeBytes / 1024 * 10) / 10 : null;
+
+    // Check if too large
+    if (fileInfo && fileInfo.sizeBytes > MAX_PAGE_SIZE_BYTES) {
+      results.push({
+        pageId,
+        wouldRun: false,
+        skipReason: 'too-large',
+        tier,
+        fileSizeKB,
+        quality: null,
+        readerImportance: null,
+        citationCount: null,
+        wordCount: null,
+        estimatedCostLow: 0,
+        estimatedCostHigh: 0,
+        estimatedCostMid: 0,
+      });
+      continue;
+    }
+
+    // Get quality metadata from build artifacts (no API call)
+    const meta = pageMetaMap.get(pageId);
+    const quality = typeof meta?.quality === 'number' ? meta.quality as number : null;
+    const readerImportance = typeof meta?.readerImportance === 'number' ? meta.readerImportance as number : null;
+    const metaMetrics = meta?.metrics as { footnoteCount?: number; wordCount?: number } | undefined;
+    const citationCount = typeof metaMetrics?.footnoteCount === 'number' ? metaMetrics.footnoteCount : null;
+    const wordCount = typeof metaMetrics?.wordCount === 'number' ? metaMetrics.wordCount
+      : typeof meta?.wordCount === 'number' ? meta.wordCount as number : null;
+
+    // Check if already high quality
+    if (quality !== null && quality >= HIGH_QUALITY_THRESHOLD) {
+      results.push({
+        pageId,
+        wouldRun: false,
+        skipReason: 'high-quality',
+        tier,
+        fileSizeKB,
+        quality,
+        readerImportance: typeof readerImportance === 'number' ? readerImportance : null,
+        citationCount,
+        wordCount: typeof wordCount === 'number' ? wordCount : null,
+        estimatedCostLow: 0,
+        estimatedCostHigh: 0,
+        estimatedCostMid: 0,
+      });
+      continue;
+    }
+
+    // Page would run — use tier cost estimates
+    results.push({
+      pageId,
+      wouldRun: true,
+      skipReason: null,
+      tier,
+      fileSizeKB,
+      quality,
+      readerImportance: typeof readerImportance === 'number' ? readerImportance : null,
+      citationCount,
+      wordCount: typeof wordCount === 'number' ? wordCount : null,
+      estimatedCostLow: costEstimate.low,
+      estimatedCostHigh: costEstimate.high,
+      estimatedCostMid: costEstimate.mid,
+    });
+  }
+
+  // Compute summary
+  const wouldRunResults = results.filter(r => r.wouldRun);
+  const wouldSkipResults = results.filter(r => !r.wouldRun);
+  const skipReasons: Partial<Record<SkipReason, number>> = {};
+  for (const r of wouldSkipResults) {
+    if (r.skipReason) {
+      skipReasons[r.skipReason] = (skipReasons[r.skipReason] ?? 0) + 1;
+    }
+  }
+
+  const estimatedTotalLow = wouldRunResults.reduce((sum, r) => sum + r.estimatedCostLow, 0);
+  const estimatedTotalHigh = wouldRunResults.reduce((sum, r) => sum + r.estimatedCostHigh, 0);
+  const estimatedTotalMid = wouldRunResults.reduce((sum, r) => sum + r.estimatedCostMid, 0);
+  const overBudget = budgetLimit != null && estimatedTotalMid > budgetLimit;
+
+  const summary: DryRunSummary = {
+    tier,
+    totalPages: results.length,
+    wouldRun: wouldRunResults.length,
+    wouldSkip: wouldSkipResults.length,
+    skipReasons,
+    estimatedTotalLow,
+    estimatedTotalHigh,
+    estimatedTotalMid,
+    budgetLimit,
+    overBudget,
+    pages: results,
+  };
+
+  // Print the table
+  printDryRunTable(summary);
+
+  // Write JSON output if requested
+  if (outputFile) {
+    const outputDir = path.dirname(outputFile);
+    if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+    fs.writeFileSync(outputFile, JSON.stringify(summary, null, 2));
+    console.log(`\n  Plan written to: ${outputFile}`);
+  }
+
+  return summary;
+}
+
+/** Print a formatted dry-run table to stdout. */
+function printDryRunTable(summary: DryRunSummary): void {
+  const { pages, tier, budgetLimit, overBudget } = summary;
+
+  // Header
+  console.log('─'.repeat(100));
+  console.log(
+    '  ' +
+    'Page ID'.padEnd(40) +
+    'Status'.padEnd(10) +
+    'Quality'.padEnd(9) +
+    'Importance'.padEnd(11) +
+    'Words'.padEnd(8) +
+    'Size(KB)'.padEnd(10) +
+    'Est. Cost'
+  );
+  console.log('─'.repeat(100));
+
+  // Rows — would-run pages first, then skipped
+  const sorted = [
+    ...pages.filter(p => p.wouldRun),
+    ...pages.filter(p => !p.wouldRun),
+  ];
+
+  for (const p of sorted) {
+    const status = p.wouldRun
+      ? 'RUN'
+      : p.skipReason === 'too-large' ? 'SKIP(size)'
+      : p.skipReason === 'high-quality' ? 'SKIP(qual)'
+      : p.skipReason === 'unknown-page-id' ? 'SKIP(404)'
+      : 'SKIP';
+
+    const quality = p.quality != null ? String(p.quality) : '-';
+    const importance = p.readerImportance != null ? String(p.readerImportance) : '-';
+    const words = p.wordCount != null ? String(p.wordCount) : '-';
+    const size = p.fileSizeKB != null ? String(p.fileSizeKB) : '-';
+    const cost = p.wouldRun
+      ? `$${p.estimatedCostLow}-${p.estimatedCostHigh}`
+      : '-';
+
+    console.log(
+      '  ' +
+      p.pageId.slice(0, 38).padEnd(40) +
+      status.padEnd(10) +
+      quality.padEnd(9) +
+      importance.padEnd(11) +
+      words.padEnd(8) +
+      size.padEnd(10) +
+      cost
+    );
+  }
+
+  console.log('─'.repeat(100));
+
+  // Summary
+  console.log('');
+  console.log(`  Tier: ${tier} (${TIER_BUDGETS[tier].estimatedCost})`);
+  console.log(`  Pages: ${summary.totalPages} total | ${summary.wouldRun} would run | ${summary.wouldSkip} would skip`);
+
+  if (summary.wouldSkip > 0) {
+    const reasons = Object.entries(summary.skipReasons)
+      .map(([r, n]) => `${n} ${r}`)
+      .join(', ');
+    console.log(`  Skip reasons: ${reasons}`);
+  }
+
+  const costRange = summary.wouldRun > 0
+    ? `$${summary.estimatedTotalLow.toFixed(0)}-$${summary.estimatedTotalHigh.toFixed(0)} (mid: $${summary.estimatedTotalMid.toFixed(0)})`
+    : '$0';
+  console.log(`  Estimated total cost: ${costRange}`);
+
+  if (budgetLimit != null) {
+    const pct = Math.round((summary.estimatedTotalMid / budgetLimit) * 100);
+    const budgetMsg = overBudget
+      ? `  ⚠ OVER BUDGET: estimated $${summary.estimatedTotalMid.toFixed(0)} vs limit $${budgetLimit.toFixed(0)} (${pct}%)`
+      : `  Budget: $${summary.estimatedTotalMid.toFixed(0)} / $${budgetLimit.toFixed(0)} (${pct}%)`;
+    console.log(budgetMsg);
+  }
+
+  console.log('');
+  console.log('  NOTE: Costs are estimates based on tier ranges. Actual costs may vary.');
+  console.log('  Add --apply to run the batch (or remove --dry-run).');
+  console.log('═'.repeat(70));
 }
 
 // ---------------------------------------------------------------------------
