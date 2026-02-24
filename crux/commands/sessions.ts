@@ -15,6 +15,7 @@ import { createLogger } from '../lib/output.ts';
 import { currentBranch } from '../lib/session-checklist.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { syncSessionFile } from '../wiki-server/sync-session.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 const SESSIONS_DIR = join(PROJECT_ROOT, '.claude/sessions');
@@ -59,6 +60,7 @@ function buildSessionYaml(fields: {
   cost?: string;
   pr?: string;
   pages: string[];
+  serverUnavailable?: boolean;
 }): string {
   const lines: string[] = [
     `date: "${fields.date}"`,
@@ -80,6 +82,16 @@ function buildSessionYaml(fields: {
     for (const p of fields.pages) {
       lines.push(`  - ${p}`);
     }
+  }
+
+  // Record server unavailability as a constraint in the session log.
+  // This surfaces in the page-changes dashboard so reviewers know cross-reference
+  // checks and citation data may have been skipped during this session.
+  if (fields.serverUnavailable) {
+    lines.push(
+      'constraints:',
+      '  - server-unavailable: "Wiki server was unreachable during this session. Cross-reference checks, citation verification, and backlink context were unavailable."',
+    );
   }
 
   lines.push(
@@ -141,6 +153,15 @@ async function write(args: string[], options: Record<string, unknown>): Promise<
   // Parse optional list fields
   const pages = parseList(options.pages);
 
+  // Check wiki server availability so the scaffold can note any constraint.
+  // Fire-and-forget with fallback: if the check fails, assume available.
+  let serverUnavailable = false;
+  try {
+    serverUnavailable = !(await isServerAvailable());
+  } catch {
+    serverUnavailable = false;
+  }
+
   const yamlContent = buildSessionYaml({
     date,
     branch,
@@ -151,6 +172,7 @@ async function write(args: string[], options: Record<string, unknown>): Promise<
     cost: options.cost ? String(options.cost) : undefined,
     pr: options.pr ? String(options.pr) : undefined,
     pages,
+    serverUnavailable,
   });
 
   const alreadyExists = existsSync(outputPath);
@@ -163,6 +185,9 @@ async function write(args: string[], options: Record<string, unknown>): Promise<
   out += `  Branch: ${branch}\n`;
   out += `  Title: ${title}\n`;
   if (pages.length > 0) out += `  Pages: ${pages.join(', ')}\n`;
+  if (serverUnavailable) {
+    out += `  ${c.yellow}⚠ Wiki server unreachable — constraints field added to session log.${c.reset}\n`;
+  }
   out += `\n  Edit the file to add summary, issues, learnings, recommendations and checks, then:\n`;
   out += `  ${c.cyan}pnpm crux wiki-server sync-session ${outputPath}${c.reset}\n`;
 

@@ -10,6 +10,7 @@ import { execFileSync } from 'child_process';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/edit-log.ts';
 import { createSession } from '../../lib/wiki-server/sessions.ts';
 import { saveArtifacts } from '../../lib/wiki-server/artifacts.ts';
+import { isServerAvailable } from '../../lib/wiki-server/client.ts';
 import type {
   PageData, AnalysisResult, ResearchResult, ReviewResult,
   PipelineOptions, PipelineResults, TriageResult, AdversarialLoopResult,
@@ -66,11 +67,19 @@ async function autoLogSession(
   review: ReviewResult | undefined,
   totalDuration: string,
   tierCost: string,
+  serverAvailable: boolean,
 ): Promise<void> {
   try {
     const today = new Date().toISOString().split('T')[0];
     const branch = getCurrentBranch();
-    const summary = buildSessionSummary(page, tier, review, totalDuration);
+    let summary = buildSessionSummary(page, tier, review, totalDuration);
+
+    // Append a constraint note if the wiki server was unreachable during the session.
+    // This surfaces in the page-changes dashboard so reviewers know cross-reference
+    // checks and citation data may have been skipped.
+    if (!serverAvailable) {
+      summary += '\n\nConstraint: wiki server was unreachable. Cross-reference checks, citation verification, and backlink context were unavailable during this session.';
+    }
 
     const entry = {
       date: today,
@@ -82,6 +91,9 @@ async function autoLogSession(
       cost: tierCost,
       prUrl: null,
       pages: [page.id],
+      issuesJson: !serverAvailable
+        ? [{ type: 'server-unavailable', message: 'Wiki server was unreachable during session' }]
+        : null,
     };
 
     const result = await createSession(entry);
@@ -101,6 +113,14 @@ async function autoLogSession(
 /** Main pipeline orchestration. */
 export async function runPipeline(pageId: string, options: PipelineOptions = {}): Promise<PipelineResults> {
   let { tier = 'standard', directions = '', dryRun = false } = options;
+
+  // Check wiki server availability upfront so the session log can record if the
+  // server was unreachable (which means cross-reference checks and citation
+  // verification were silently skipped during this run).
+  const serverAvailable = await isServerAvailable();
+  if (!serverAvailable) {
+    console.warn('  Warning: wiki server unavailable — cross-reference checks and citation data will be skipped.');
+  }
 
   // Find page
   const pages = loadPages();
@@ -391,7 +411,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
     // Auto-log session to wiki-server DB (default: on; skip with skipSessionLog: true)
     if (!options.skipSessionLog) {
-      await autoLogSession(page, tier, review, totalDuration, tierConfig.cost);
+      await autoLogSession(page, tier, review, totalDuration, tierConfig.cost, serverAvailable);
     }
   }
 
