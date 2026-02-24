@@ -587,6 +587,8 @@ export type SyncPage = z.infer<typeof SyncPageSchema>;
 
 export const SyncPagesBatchSchema = z.object({
   pages: z.array(SyncPageSchema).min(1).max(100),
+  syncedFromBranch: z.string().max(500).nullable().optional(),
+  syncedFromCommit: z.string().max(100).nullable().optional(),
 });
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { bearerAuth } from "hono/bearer-auth";
+import { validateApiKey, requireWriteScope } from "./auth.js";
 import { healthRoute } from "./routes/health.js";
 import { idsRoute } from "./routes/ids.js";
 import { citationsRoute } from "./routes/citations.js";
@@ -42,16 +42,33 @@ export function createApp() {
   // Health endpoint — unauthenticated
   app.route("/health", healthRoute);
 
-  // API routes — bearer auth required
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
-  if (apiKey) {
-    app.use("/api/*", bearerAuth({ token: apiKey }));
-  } else {
-    console.warn(
-      "WARNING: LONGTERMWIKI_SERVER_API_KEY not set — API routes are unauthenticated"
-    );
-  }
+  // API routes — all require a valid API key (any scope)
+  app.use("/api/*", validateApiKey());
 
+  // Content-scope routes: writes require the content key
+  // (reads/GETs work with any valid key)
+  app.use("/api/pages/*", requireWriteScope("content"));
+  app.use("/api/entities/*", requireWriteScope("content"));
+  app.use("/api/facts/*", requireWriteScope("content"));
+  app.use("/api/claims/*", requireWriteScope("content"));
+  app.use("/api/citations/*", requireWriteScope("content"));
+  app.use("/api/resources/*", requireWriteScope("content"));
+  app.use("/api/links/*", requireWriteScope("content"));
+  app.use("/api/summaries/*", requireWriteScope("content"));
+  app.use("/api/hallucination-risk/*", requireWriteScope("content"));
+  app.use("/api/artifacts/*", requireWriteScope("content"));
+
+  // Project-scope routes: writes require the project key
+  // (IDs, sessions, edit logs, jobs, agent sessions, auto-update tracking)
+  app.use("/api/ids/*", requireWriteScope("project"));
+  app.use("/api/sessions/*", requireWriteScope("project"));
+  app.use("/api/edit-logs/*", requireWriteScope("project"));
+  app.use("/api/jobs/*", requireWriteScope("project"));
+  app.use("/api/agent-sessions/*", requireWriteScope("project"));
+  app.use("/api/auto-update-runs/*", requireWriteScope("project"));
+  app.use("/api/auto-update-news/*", requireWriteScope("project"));
+
+  // Mount route handlers
   app.route("/api/ids", idsRoute);
   app.route("/api/citations", citationsRoute);
   app.route("/api/pages", pagesRoute);

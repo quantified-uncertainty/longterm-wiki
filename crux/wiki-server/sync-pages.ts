@@ -145,6 +145,7 @@ export async function syncPages(
           // Not JSON — raw body already printed by batchSync
         }
       },
+      scope: 'content',
       _sleep: options._sleep,
     },
   );

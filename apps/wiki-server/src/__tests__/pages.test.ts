@@ -25,7 +25,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 17;
+    const COLS = 19;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -52,6 +52,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         word_count: params[o + 14],
         last_updated: params[o + 15],
         content_format: params[o + 16],
+        synced_from_branch: params[o + 17],
+        synced_from_commit: params[o + 18],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,

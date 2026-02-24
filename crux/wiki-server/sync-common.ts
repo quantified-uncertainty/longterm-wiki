@@ -10,7 +10,7 @@
  * then delegates the actual sync loop to batchSync().
  */
 
-import { buildHeaders } from "../lib/wiki-server/client.ts";
+import { buildHeaders, type ApiKeyScope } from "../lib/wiki-server/client.ts";
 
 // --- Configuration ---
 const HEALTH_CHECK_RETRIES = 5;
@@ -47,6 +47,8 @@ export interface BatchSyncOptions<T> {
     totalBatches: number,
     count: number,
   ) => void;
+  /** API key scope for authentication. Sync scripts typically use 'content'. */
+  scope?: ApiKeyScope;
   _sleep?: (ms: number) => Promise<void>;
 }
 
@@ -189,6 +191,7 @@ export async function batchSync<T>(
     itemLabel = "items",
     onBatchError,
     onBatchSuccess,
+    scope,
     _sleep,
   } = options;
 
@@ -211,7 +214,7 @@ export async function batchSync<T>(
         url,
         {
           method: "POST",
-          headers: buildHeaders(),
+          headers: buildHeaders(scope),
           body: requestBody,
         },
         { _sleep },
