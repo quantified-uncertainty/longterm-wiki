@@ -121,7 +121,7 @@ function FilterRow({
   );
 }
 
-/** Simple text-based filter used as a fallback before MiniSearch loads. */
+/** Simple text-based filter used as a client-side fallback when wiki-server is unavailable. */
 function textFilter(items: ExploreItem[], query: string): ExploreItem[] {
   const q = query.toLowerCase();
   return items.filter(

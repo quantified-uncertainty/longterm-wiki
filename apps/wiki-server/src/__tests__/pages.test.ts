@@ -74,13 +74,16 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return []; // No-op in tests — tsvector is a Postgres feature
   }
 
-  // --- wiki_pages: Full-text search via search_vector ---
-  if (q.includes("search_vector") && q.includes("plainto_tsquery") && !q.includes("update")) {
-    const searchQuery = params[0] as string;
-    const limit = (params[2] as number) || 20;
+  // --- wiki_pages: Full-text search via search_vector (prefix tsquery or plain) ---
+  if (q.includes("search_vector") && (q.includes("to_tsquery") || q.includes("plainto_tsquery")) && !q.includes("update")) {
+    // First param is the tsquery string (e.g. "anthropic:*" for prefix search)
+    const rawQuery = params[0] as string;
+    // Strip :* suffixes and & operators to get plain search words
+    const searchWords = rawQuery.replace(/:\*/g, "").replace(/\s*&\s*/g, " ").trim();
+    const limit = (params[1] as number) || 20;
     const results: Record<string, unknown>[] = [];
     for (const row of pagesStore.values()) {
-      if (simpleTextMatch(row, searchQuery)) {
+      if (simpleTextMatch(row, searchWords)) {
         results.push({
           id: row.id,
           numeric_id: row.numeric_id,
@@ -91,6 +94,33 @@ function dispatch(query: string, params: unknown[]): unknown[] {
           reader_importance: row.reader_importance,
           quality: row.quality,
           rank: 1.0,
+          snippet: row.description || null,
+        });
+      }
+    }
+    return results.slice(0, limit);
+  }
+
+  // --- wiki_pages: Trigram similarity fallback search ---
+  if (q.includes("similarity") && q.includes("wiki_pages") && !q.includes("update")) {
+    const searchQuery = params[0] as string;
+    const limit = (params[1] as number) || 20;
+    const excludeIds = (params[2] as string[]) || [];
+    const results: Record<string, unknown>[] = [];
+    for (const row of pagesStore.values()) {
+      if (excludeIds.includes(row.id as string)) continue;
+      if (simpleTextMatch(row, searchQuery)) {
+        results.push({
+          id: row.id,
+          numeric_id: row.numeric_id,
+          title: row.title,
+          description: row.description,
+          entity_type: row.entity_type,
+          category: row.category,
+          reader_importance: row.reader_importance,
+          quality: row.quality,
+          rank: 0.5,
+          snippet: row.description || null,
         });
       }
     }

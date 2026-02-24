@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
  * GET /api/search?q=...&limit=20
  *
  * Proxies search requests to the wiki-server's PostgreSQL full-text search.
- * Returns 503 when the wiki-server is unavailable so the client can fall back
- * to MiniSearch.
+ * Returns 503 when the wiki-server is unavailable so the client can
+ * degrade gracefully (empty results).
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;

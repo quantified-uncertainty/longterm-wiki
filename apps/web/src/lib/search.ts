@@ -24,6 +24,8 @@ export interface SearchResult extends SearchDoc {
   match: MatchInfo;
   /** The query terms that produced this result. */
   terms: string[];
+  /** Server-generated HTML snippet with <mark> tags from ts_headline(). */
+  snippet?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -41,6 +43,7 @@ interface ServerSearchResponse {
     readerImportance: number | null;
     quality: number | null;
     score: number;
+    snippet: string | null;
   }>;
   query: string;
   total: number;
@@ -79,6 +82,7 @@ async function searchServer(
         readerImportance: r.readerImportance,
         quality: r.quality,
         score: r.score,
+        snippet: r.snippet || undefined,
         // Synthesize per-field match info from query terms for highlighting
         match: Object.fromEntries(
           queryTerms.map((t) => {

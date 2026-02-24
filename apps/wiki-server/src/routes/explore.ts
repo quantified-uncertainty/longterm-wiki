@@ -2,6 +2,10 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { getDb } from "../db.js";
 import { validationError } from "./utils.js";
+import {
+  buildPrefixTsquery,
+  TRIGRAM_SIMILARITY_THRESHOLD,
+} from "../search-utils.js";
 
 export const exploreRoute = new Hono();
 
@@ -127,11 +131,14 @@ function buildFilterConditions(opts: {
   let paramIdx = opts.startParamIdx ?? 1;
 
   if (opts.search) {
-    conditions.push(
-      `wp.search_vector @@ plainto_tsquery('english', $${paramIdx})`
-    );
-    params.push(opts.search);
-    paramIdx++;
+    const prefixQuery = buildPrefixTsquery(opts.search);
+    if (prefixQuery) {
+      conditions.push(
+        `wp.search_vector @@ to_tsquery('english', $${paramIdx})`
+      );
+      params.push(prefixQuery);
+      paramIdx++;
+    }
   }
 
   if (opts.cluster) {
@@ -213,9 +220,12 @@ exploreRoute.get("/", async (c) => {
   let orderBy = `${col} ${dir} ${nullsLast}`;
 
   if (search) {
-    searchRankSelect = `, ts_rank_cd(wp.search_vector, plainto_tsquery('english', $1), 1) AS search_rank`;
-    if (sort === "recommended") {
-      orderBy = `search_rank DESC, ${col} ${dir} ${nullsLast}`;
+    const prefixQuery = buildPrefixTsquery(search);
+    if (prefixQuery) {
+      searchRankSelect = `, ts_rank_cd(wp.search_vector, to_tsquery('english', $1), 1) AS search_rank`;
+      if (sort === "recommended") {
+        orderBy = `search_rank DESC, ${col} ${dir} ${nullsLast}`;
+      }
     }
   }
 
@@ -294,7 +304,7 @@ exploreRoute.get("/", async (c) => {
   `;
 
   // Execute all queries in parallel
-  const [rows, countResult, clusterCounts, categoryCounts, entityTypeCounts, riskCatCounts] =
+  let [rows, countResult, clusterCounts, categoryCounts, entityTypeCounts, riskCatCounts] =
     await Promise.all([
       rawDb.unsafe(dataQuery, dataParams as any[]),
       rawDb.unsafe(countQuery, main.params as any[]),
@@ -304,7 +314,51 @@ exploreRoute.get("/", async (c) => {
       rawDb.unsafe(riskCatCountQuery, searchClusterCatRisk.params as any[]),
     ]);
 
-  const total = parseInt(countResult[0]?.total ?? "0", 10);
+  let total = parseInt(countResult[0]?.total ?? "0", 10);
+
+  // Trigram fallback: if FTS returned nothing and we have a search term,
+  // fall back to pg_trgm similarity on title for typo tolerance.
+  let searchMode: "fts" | "trigram" | null = search ? "fts" : null;
+  if (search && total === 0) {
+    searchMode = "trigram";
+    // Build trigram fallback query with same non-search filters
+    const noSearchFilters = buildFilterConditions({
+      cluster,
+      category,
+      entityType,
+      riskCategory,
+    });
+    const trigramParamIdx = noSearchFilters.paramIdx;
+    const trigramWhere = `WHERE ${noSearchFilters.conditions.join(" AND ")} AND similarity(wp.title, $${trigramParamIdx}) > ${TRIGRAM_SIMILARITY_THRESHOLD}`;
+    const trigramParams = [...noSearchFilters.params, search, limit, offset];
+
+    const trigramQuery = `
+      SELECT
+        wp.id, wp.numeric_id, wp.title, wp.entity_type, wp.content_format,
+        wp.category, COALESCE(wp.llm_summary, wp.description) AS description,
+        wp.tags AS page_tags, wp.clusters AS page_clusters,
+        wp.word_count, wp.quality, wp.reader_importance, wp.research_importance,
+        wp.tactical_value, wp.backlink_count, wp.risk_category,
+        wp.last_updated, wp.date_created, wp.recommended_score,
+        e.tags AS entity_tags, e.clusters AS entity_clusters,
+        similarity(wp.title, $${trigramParamIdx}) AS search_rank
+      FROM wiki_pages wp
+      LEFT JOIN entities e ON wp.id = e.id
+      ${trigramWhere}
+      ORDER BY similarity(wp.title, $${trigramParamIdx}) DESC
+      LIMIT $${trigramParamIdx + 1} OFFSET $${trigramParamIdx + 2}
+    `;
+    const trigramCountQuery = `
+      SELECT count(*) AS total FROM wiki_pages wp ${trigramWhere}
+    `;
+
+    const [trigramRows, trigramCount] = await Promise.all([
+      rawDb.unsafe(trigramQuery, trigramParams as any[]),
+      rawDb.unsafe(trigramCountQuery, [...noSearchFilters.params, search] as any[]),
+    ]);
+    rows = trigramRows;
+    total = parseInt(trigramCount[0]?.total ?? "0", 10);
+  }
 
   // Transform rows to ExploreItem shape
   const items = rows.map((r: any) => {
@@ -348,6 +402,7 @@ exploreRoute.get("/", async (c) => {
     total,
     limit,
     offset,
+    searchMode,
     facets: {
       clusters: toCountMap(clusterCounts),
       categories: toCountMap(categoryCounts),
