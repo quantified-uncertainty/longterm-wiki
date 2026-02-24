@@ -320,19 +320,6 @@ export interface SummaryUpsertData {
   tokensUsed: number;
 }
 
-export interface ClaimRow {
-  id: number;
-  entity_id: string;
-  entity_type: string;
-  claim_type: string;
-  claim_text: string;
-  value: string | null;
-  unit: string | null;
-  confidence: string | null;
-  source_quote: string | null;
-  created_at: string;
-}
-
 export interface ClaimInsertData {
   entityId: string;
   entityType: string;
