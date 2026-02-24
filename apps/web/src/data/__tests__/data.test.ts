@@ -480,7 +480,7 @@ describe("Data Layer", () => {
   describe("getUpdateSchedule", () => {
     it("includes internal pages in update schedule", async () => {
       const { getUpdateSchedule } = await import("../../data/index");
-      const { data: items } = await getUpdateSchedule();
+      const items = getUpdateSchedule();
       const internalItem = items.find((i) => i.id === "internal-doc");
       expect(internalItem).toBeDefined();
       expect(internalItem!.category).toBe("internal");
