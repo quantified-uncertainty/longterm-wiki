@@ -2,27 +2,7 @@
 
 import { cn } from "@lib/utils";
 import { useCitationQuotes } from "./CitationQuotesContext";
-
-function normalizeUrl(raw: string): string {
-  try {
-    const u = new URL(raw);
-    return (
-      u.host.replace(/^www\./, "") +
-      u.pathname.replace(/\/+$/, "") +
-      u.search
-    ).toLowerCase();
-  } catch {
-    return raw.replace(/\/+$/, "").toLowerCase();
-  }
-}
-
-const VERDICT_COLORS: Record<string, { bg: string; title: string }> = {
-  accurate: { bg: "bg-emerald-500", title: "Verified accurate" },
-  minor_issues: { bg: "bg-amber-500", title: "Minor issues" },
-  inaccurate: { bg: "bg-red-500", title: "Inaccurate" },
-  unsupported: { bg: "bg-red-400", title: "Unsupported" },
-  not_verifiable: { bg: "bg-muted-foreground/40", title: "Not verifiable" },
-};
+import { normalizeUrl, VERDICT_COLORS } from "./resource-utils";
 
 export function ReferenceCitationDot({ url }: { url: string }) {
   const quotes = useCitationQuotes();
@@ -51,7 +31,7 @@ export function ReferenceCitationDot({ url }: { url: string }) {
 
   return (
     <span
-      className={cn("inline-block w-1.5 h-1.5 rounded-full shrink-0", bg)}
+      className={cn("inline-block w-1.5 h-1.5 rounded-full shrink-0 ml-1.5 align-middle", bg)}
       title={title}
     />
   );
