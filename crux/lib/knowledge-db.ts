@@ -882,6 +882,13 @@ export const citationContent = {
   },
 
   /**
+   * Get all stored citation content rows (for backfill/export)
+   */
+  getAll(): CitationContentRow[] {
+    return getDb().prepare('SELECT * FROM citation_content ORDER BY created_at').all() as CitationContentRow[];
+  },
+
+  /**
    * Get storage stats
    */
   stats(): { totalUrls: number; totalPages: number; totalBytes: number } {

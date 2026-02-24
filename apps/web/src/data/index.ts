@@ -209,6 +209,30 @@ interface DatabaseShape {
   /** Page → resource IDs mapping (computed at build time from inline <R>, cited_by, URL matching) */
   pageResources: Record<string, string[]>;
   stats: Record<string, unknown>;
+  /** Pre-computed update schedule items (staleness, priority, etc.) */
+  updateSchedule?: Array<{
+    id: string;
+    numericId: string;
+    title: string;
+    quality: number | null;
+    readerImportance: number | null;
+    lastUpdated: string | null;
+    updateFrequency: number;
+    daysSinceUpdate: number;
+    daysUntilDue: number;
+    staleness: number;
+    priority: number;
+    category: string;
+  }>;
+  /** Pre-aggregated hallucination risk statistics */
+  riskStats?: {
+    total: number;
+    high: number;
+    medium: number;
+    low: number;
+    avgScore: number;
+    topFactors: Array<{ factor: string; count: number }>;
+  };
 }
 
 // ============================================================================
@@ -470,11 +494,29 @@ export interface Page {
       footnotes: number;
       references: number;
     };
+    actuals?: {
+      tables: number;
+      diagrams: number;
+      internalLinks: number;
+      externalLinks: number;
+      footnotes: number;
+      references: number;
+      quotesWithQuotes: number;
+      quotesTotal: number;
+      accuracyChecked: number;
+      accuracyTotal: number;
+    };
     items: Record<string, "green" | "amber" | "red">;
     editHistoryCount?: number;
     ratingsString?: string;
     factCount?: number;
   };
+  /** Pre-computed reader importance rank (1 = most important) */
+  readerRank?: number;
+  /** Pre-computed research importance rank (1 = most important) */
+  researchRank?: number;
+  /** Pre-computed blended "recommended" score for ExploreGrid default sort */
+  recommendedScore?: number;
 }
 
 // ============================================================================
@@ -618,49 +660,8 @@ export interface UpdateScheduleItem {
 }
 
 export function getUpdateSchedule(): UpdateScheduleItem[] {
-  const db = getDatabase();
-  const pages = db.pages || [];
-  const now = Date.now();
-
-  const items: UpdateScheduleItem[] = [];
-
-  for (const page of pages) {
-    if (!page.updateFrequency) continue;
-    if (page.evergreen === false) continue;
-
-    const lastUpdated = page.lastUpdated;
-    const daysSince = lastUpdated
-      ? Math.floor((now - new Date(lastUpdated).getTime()) / (1000 * 60 * 60 * 24))
-      : 999;
-    const daysUntil = page.updateFrequency - daysSince;
-    const staleness = daysSince / page.updateFrequency;
-    const readerImp = page.readerImportance ?? 50;
-    const tv = page.tacticalValue ?? 0;
-    // Tactical value can boost priority for high-shareability content (e.g. tables)
-    const effectiveImportance = tv > readerImp ? (readerImp + tv) / 2 : readerImp;
-    const priority = staleness * (effectiveImportance / 100);
-
-    const numericId = db.idRegistry?.bySlug[page.id] || page.id;
-
-    items.push({
-      id: page.id,
-      numericId,
-      title: page.title,
-      quality: page.quality,
-      readerImportance: page.readerImportance,
-      lastUpdated,
-      updateFrequency: page.updateFrequency,
-      daysSinceUpdate: daysSince,
-      daysUntilDue: daysUntil,
-      staleness: Math.round(staleness * 100) / 100,
-      priority: Math.round(priority * 100) / 100,
-      category: page.category,
-    });
-  }
-
-  // Sort by priority descending (most urgent first)
-  items.sort((a, b) => b.priority - a.priority);
-  return items;
+  // Pre-computed at build time in build-data.mjs (staleness, priority, daysSince, daysUntil)
+  return getDatabase().updateSchedule || [];
 }
 
 export interface PageRankingItem {
@@ -681,6 +682,7 @@ export function getPageRankings(): PageRankingItem[] {
   const db = getDatabase();
   const pages = db.pages || [];
 
+  // Ranks are pre-computed at build time in build-data.mjs
   const items = pages
     .filter((p: Page) => p.readerImportance != null || p.researchImportance != null)
     .map((p: Page) => ({
@@ -689,20 +691,13 @@ export function getPageRankings(): PageRankingItem[] {
       title: p.title,
       quality: p.quality,
       readerImportance: p.readerImportance,
-      readerRank: null as number | null,
+      readerRank: p.readerRank ?? null,
       researchImportance: p.researchImportance,
-      researchRank: null as number | null,
+      researchRank: p.researchRank ?? null,
       tacticalValue: p.tacticalValue,
       category: p.category,
       wordCount: p.wordCount ?? p.metrics?.wordCount ?? 0,
     }));
-
-  // Derive ranks from score ordering (scores are derived from rank, so this recovers position)
-  const byReader = items.filter((i) => i.readerImportance != null).sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
-  byReader.forEach((item, idx) => { item.readerRank = idx + 1; });
-
-  const byResearch = items.filter((i) => i.researchImportance != null).sort((a, b) => (b.researchImportance ?? 0) - (a.researchImportance ?? 0));
-  byResearch.forEach((item, idx) => { item.researchRank = idx + 1; });
 
   // Default sort by readership importance
   items.sort((a, b) => (b.readerImportance ?? 0) - (a.readerImportance ?? 0));
@@ -825,28 +820,71 @@ export interface PageCoverageItem {
   id: string;
   numericId: string;
   title: string;
-  score: number;      // passing count
-  total: number;      // total items (13)
+  // Quality & importance
   quality: number | null;
   readerImportance: number | null;
+  researchImportance: number | null;
+  tacticalValue: number | null;
+  // Classification
   contentFormat: ContentFormat;
   wordCount: number;
   category: string;
+  entityType: string | null;
+  subcategory: string | null;
+  // Coverage score
+  score: number;      // passing count
+  total: number;      // total items (13)
+  // Hallucination risk
+  riskLevel: "low" | "medium" | "high" | null;
+  riskScore: number | null;
+  // Temporal
+  lastUpdated: string | null;
+  updateFrequency: number | null;
+  // Ratings (1–10)
+  novelty: number | null;
+  rigor: number | null;
+  actionability: number | null;
+  completeness: number | null;
+  // Citation health
+  citationTotal: number;
+  citationWithQuotes: number;
+  citationAccuracyChecked: number;
+  citationAvgScore: number | null;
+  // Structural
+  backlinkCount: number;
+  sectionCount: number;
+  unconvertedLinkCount: number;
   // Boolean items
   llmSummary: boolean;
   structuredSummary: boolean;
   schedule: boolean;
   entity: boolean;
   editHistory: boolean;
-  // Numeric item statuses
+  // Numeric item statuses + actual/target values
   tables: "green" | "amber" | "red";
+  tablesActual: number;
+  tablesTarget: number;
   diagrams: "green" | "amber" | "red";
+  diagramsActual: number;
+  diagramsTarget: number;
   internalLinks: "green" | "amber" | "red";
+  internalLinksActual: number;
+  internalLinksTarget: number;
   externalLinks: "green" | "amber" | "red";
+  externalLinksActual: number;
+  externalLinksTarget: number;
   footnotes: "green" | "amber" | "red";
+  footnotesActual: number;
+  footnotesTarget: number;
   references: "green" | "amber" | "red";
+  referencesActual: number;
+  referencesTarget: number;
   quotes: "green" | "amber" | "red";
+  quotesActual: number;
+  quotesTotal: number;
   accuracy: "green" | "amber" | "red";
+  accuracyActual: number;
+  accuracyTotal: number;
 }
 
 export function getPageCoverageItems(): PageCoverageItem[] {
@@ -859,30 +897,76 @@ export function getPageCoverageItems(): PageCoverageItem[] {
     if (!cov) continue;
 
     const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+    const ch = page.citationHealth;
     items.push({
       id: page.id,
       numericId,
       title: page.title,
-      score: cov.passing,
-      total: cov.total,
+      // Quality & importance
       quality: page.quality,
       readerImportance: page.readerImportance,
+      researchImportance: page.researchImportance,
+      tacticalValue: page.tacticalValue,
+      // Classification
       contentFormat: page.contentFormat,
       wordCount: page.wordCount ?? page.metrics?.wordCount ?? 0,
       category: page.category,
+      entityType: page.entityType ?? null,
+      subcategory: page.subcategory ?? null,
+      // Coverage
+      score: cov.passing,
+      total: cov.total,
+      // Hallucination risk
+      riskLevel: page.hallucinationRisk?.level ?? null,
+      riskScore: page.hallucinationRisk?.score ?? null,
+      // Temporal
+      lastUpdated: page.lastUpdated,
+      updateFrequency: page.updateFrequency ?? null,
+      // Ratings
+      novelty: page.ratings?.novelty ?? null,
+      rigor: page.ratings?.rigor ?? null,
+      actionability: page.ratings?.actionability ?? null,
+      completeness: page.ratings?.completeness ?? null,
+      // Citation health
+      citationTotal: ch?.total ?? 0,
+      citationWithQuotes: ch?.withQuotes ?? 0,
+      citationAccuracyChecked: ch?.accuracyChecked ?? 0,
+      citationAvgScore: ch?.avgScore ?? null,
+      // Structural
+      backlinkCount: page.backlinkCount ?? 0,
+      sectionCount: page.metrics?.sectionCount ?? 0,
+      unconvertedLinkCount: page.unconvertedLinkCount ?? 0,
+      // Booleans
       llmSummary: cov.items.llmSummary === "green",
       structuredSummary: cov.items.structuredSummary === "green",
       schedule: cov.items.schedule === "green",
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",
+      // Metric statuses + actuals
       tables: cov.items.tables as "green" | "amber" | "red",
+      tablesActual: cov.actuals?.tables ?? 0,
+      tablesTarget: cov.targets.tables,
       diagrams: cov.items.diagrams as "green" | "amber" | "red",
+      diagramsActual: cov.actuals?.diagrams ?? 0,
+      diagramsTarget: cov.targets.diagrams,
       internalLinks: cov.items.internalLinks as "green" | "amber" | "red",
+      internalLinksActual: cov.actuals?.internalLinks ?? 0,
+      internalLinksTarget: cov.targets.internalLinks,
       externalLinks: cov.items.externalLinks as "green" | "amber" | "red",
+      externalLinksActual: cov.actuals?.externalLinks ?? 0,
+      externalLinksTarget: cov.targets.externalLinks,
       footnotes: cov.items.footnotes as "green" | "amber" | "red",
+      footnotesActual: cov.actuals?.footnotes ?? 0,
+      footnotesTarget: cov.targets.footnotes,
       references: cov.items.references as "green" | "amber" | "red",
+      referencesActual: cov.actuals?.references ?? 0,
+      referencesTarget: cov.targets.references,
       quotes: cov.items.quotes as "green" | "amber" | "red",
+      quotesActual: cov.actuals?.quotesWithQuotes ?? 0,
+      quotesTotal: cov.actuals?.quotesTotal ?? 0,
       accuracy: cov.items.accuracy as "green" | "amber" | "red",
+      accuracyActual: cov.actuals?.accuracyChecked ?? 0,
+      accuracyTotal: cov.actuals?.accuracyTotal ?? 0,
     });
   }
 
@@ -894,6 +978,23 @@ export function getPageCoverageItems(): PageCoverageItem[] {
 export function getPageCitationHealth(pageId: string) {
   const page = getPageById(pageId);
   return page?.citationHealth ?? null;
+}
+
+// ============================================================================
+// RISK STATS (pre-aggregated at build time)
+// ============================================================================
+
+export interface RiskStats {
+  total: number;
+  high: number;
+  medium: number;
+  low: number;
+  avgScore: number;
+  topFactors: Array<{ factor: string; count: number }>;
+}
+
+export function getRiskStats(): RiskStats | null {
+  return getDatabase().riskStats ?? null;
 }
 
 export function getResourceCredibility(
@@ -1475,6 +1576,8 @@ export interface ExploreItem {
   href?: string;
   meta?: string;
   sourceTitle?: string;
+  /** Pre-computed blended score for "recommended" sort (build-time) */
+  recommendedScore?: number;
 }
 
 // Map page categories to entity-like types for display
@@ -1528,6 +1631,7 @@ export function getExploreItems(): ExploreItem[] {
       lastUpdated: page?.lastUpdated ?? null,
       dateCreated: page?.dateCreated ?? null,
       contentFormat: page?.contentFormat,
+      recommendedScore: page?.recommendedScore,
     };
   });
 
@@ -1554,6 +1658,7 @@ export function getExploreItems(): ExploreItem[] {
       lastUpdated: page.lastUpdated ?? null,
       dateCreated: page.dateCreated ?? null,
       contentFormat: page.contentFormat,
+      recommendedScore: page.recommendedScore,
     }));
 
   // Diagram items — entities with causeEffectGraph data

@@ -18,9 +18,11 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarTrigger,
   MobileSidebar,
   MobileSidebarTrigger,
   useMobileSidebar,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import type { NavSection } from "@/lib/internal-nav";
 
@@ -84,13 +86,36 @@ function MobileSidebarAutoClose() {
   return null;
 }
 
+/** Floating expand button shown on desktop when sidebar is collapsed */
+function DesktopExpandTrigger() {
+  const { open } = useSidebar();
+  if (open) return null;
+  return (
+    <div className="hidden md:block sticky top-16 z-20 self-start">
+      <SidebarTrigger
+        aria-label="Show sidebar"
+        className="m-1 bg-background border border-border/60 shadow-sm rounded-md"
+      />
+    </div>
+  );
+}
+
 export function WikiSidebar({ sections }: { sections: NavSection[] }) {
   return (
     <>
-      {/* Desktop: static sidebar */}
+      {/* Desktop: static sidebar with collapse button */}
       <Sidebar className="sticky top-14 h-[calc(100vh-3.5rem)] border-r border-border/50 bg-muted/30">
+        <div className="flex items-center justify-end px-2 py-1 border-b border-border/30">
+          <SidebarTrigger
+            aria-label="Hide sidebar"
+            className="text-muted-foreground"
+          />
+        </div>
         <SidebarNav sections={sections} />
       </Sidebar>
+
+      {/* Floating expand button — visible on desktop when sidebar is hidden */}
+      <DesktopExpandTrigger />
 
       {/* Mobile: slide-out overlay */}
       <MobileSidebar>

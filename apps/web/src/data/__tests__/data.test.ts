@@ -230,6 +230,23 @@ const mockDatabase = {
       updateFrequency: 90,
     },
   ],
+  // Pre-computed update schedule (mirrors build-data.mjs output)
+  updateSchedule: [
+    {
+      id: "internal-doc",
+      numericId: "E6",
+      title: "Architecture Docs",
+      quality: 0,
+      readerImportance: null,
+      lastUpdated: "2025-02-01",
+      updateFrequency: 90,
+      daysSinceUpdate: 388,
+      daysUntilDue: -298,
+      staleness: 4.31,
+      priority: 2.16,
+      category: "internal",
+    },
+  ],
   facts: {
     "test-entity.a1b2c3d4": {
       value: "high",
