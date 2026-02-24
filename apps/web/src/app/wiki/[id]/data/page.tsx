@@ -56,8 +56,9 @@ async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
       }
     );
     if (!res.ok) return null;
-    const data = await res.json() as { claims: ClaimRow[] };
-    return data.claims ?? null;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.claims)) return null;
+    return data.claims as ClaimRow[];
   } catch {
     return null;
   }
