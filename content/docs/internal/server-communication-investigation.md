@@ -18,13 +18,13 @@ evergreen: false
 
 Three consumers talk to the wiki-server (Hono + PostgreSQL):
 
-| Consumer | Transport | Client code | Lines |
+| Consumer | Transport | Client code | Size |
 |---|---|---|---|
-| **Next.js app** (`apps/web/`) | `fetchDetailed()` / `fetchFromWikiServer()` / raw `fetch()` | `wiki-server.ts` + inline in ~13 page files | ~138 + scattered |
-| **Crux CLI** (`crux/`) | `apiRequest()` / `batchedRequest()` | `crux/lib/wiki-server/client.ts` + 16 domain modules | ~2,460 |
+| **Next.js app** (`apps/web/`) | `fetchDetailed()` / `fetchFromWikiServer()` / raw `fetch()` | `wiki-server.ts` (138 lines) + 13 fetch locations across 11 files | 9 hand-written `Api*Entry` interfaces |
+| **Crux CLI** (`crux/`) | `apiRequest()` / `batchedRequest()` | `crux/lib/wiki-server/client.ts` + 17 domain modules | 107 exported interfaces & types |
 | **Build scripts** | Direct fetch | Inline in `build-data.mjs` etc. | Minor |
 
-The wiki-server exposes **18 route modules** with **100+ endpoints** and **617 lines of shared Zod schemas** in `apps/wiki-server/src/api-types.ts`.
+The wiki-server exposes **18 route modules** with **109 endpoints** and **778 lines** in `apps/wiki-server/src/api-types.ts` (53+ Zod input schemas on lines 1-619, 14 response interfaces on lines 620-778).
 
 ## What Works Well
 
@@ -32,45 +32,75 @@ The wiki-server exposes **18 route modules** with **100+ endpoints** and **617 l
 
 2. **`FetchResult<T>` discriminated union** -- Precise error classification (`not-configured` / `connection-error` / `server-error`) enables actionable UI messages. Better than `T | null`.
 
-3. **Shared Zod schemas for inputs** -- `api-types.ts` is imported by both the server (runtime validation) and crux CLI (TypeScript type inference). Input types are not duplicated.
+3. **Shared Zod schemas for inputs** -- `api-types.ts` is imported by both the server (runtime validation) and crux CLI (TypeScript type inference). Input types are not duplicated. Additionally, **14 response interfaces** are already exported (covering sessions, facts, and links endpoints), which serve as the model for expanding coverage.
 
-4. **Crux's `ApiResult<T>` pattern** -- Consistent error handling across all 16 domain modules. Well-designed with `apiOk()` / `apiErr()` helpers.
+4. **Crux's `ApiResult<T>` pattern** -- Consistent error handling across all 17 domain modules. Well-designed with `apiOk()` / `apiErr()` helpers.
+
+5. **Crux's two-tier architecture** -- Core HTTP primitives (`apiRequest()` with 5s timeout, `batchedRequest()` with 30s timeout) in `client.ts` are cleanly separated from 17 domain-specific wrapper modules. Each domain module handles batch splitting with data-type-optimized sizes (200 entities, 500 facts, 2,000 links, 100 risk snapshots).
 
 ## Pain Points
 
-### 1. Response types are duplicated everywhere (~80 hand-written interfaces)
+### 1. Response types are mostly duplicated (~120 hand-written interfaces across consumers)
 
-The server's response shapes are **not exported** -- each consumer re-declares them:
+Of 109 server endpoints, only **14 have response types exported** from `api-types.ts` (sessions: 4, facts: 5, links+related: 5). The remaining **95 endpoints return untyped JSON** -- response shapes exist only implicitly in `c.json({...})` calls inside route handlers.
 
-- **Crux CLI:** ~65 interfaces like `FactEntry`, `EntityListResult`, `SessionPageChangesResult` across 16 files in `crux/lib/wiki-server/`
-- **Next.js app:** ~15 interfaces like `ApiSession`, `ServerBacklink`, `ServerFact`, `ApiRiskPage` scattered across dashboard pages
+Each consumer re-declares response shapes for these untyped endpoints:
 
-These interfaces are hand-written guesses about what the server returns. When a server route changes, these drift silently -- there is no compile-time check that they match.
+- **Crux CLI:** 107 exported interfaces & types across 17 domain modules in `crux/lib/wiki-server/`. Some are re-exports of the 14 shared server types (e.g., `SessionApiEntry = z.input<typeof CreateSessionSchema>`), but most are hand-written result wrappers (`SaveArtifactsResult`, `JobStatsResult`, etc.)
+- **Next.js app:** 9 `Api*Entry` interfaces scattered across dashboard pages (`ApiRunEntry`, `ApiNewsItem`, `ApiAgentSession`, `ApiJobEntry`, `ApiArtifactEntry`, etc.) plus ~15 display-only `Row` types
 
-### 2. Three separate fetch abstractions
+When a server route changes, the hand-written types drift silently -- no compile-time check that they match. The 14 shared types (sessions, facts, links) prove the pattern works; the other 95 endpoints just haven't been covered yet.
 
-| Layer | Function | Error model | Auth header |
+### 2. Four separate fetch strategies across 13 locations
+
+The Next.js app has **13 locations** that call the wiki-server, using 4 different strategies:
+
+| Strategy | Function | Error model | Auth | Locations |
+|---|---|---|---|---|
+| Error-aware | `fetchDetailed<T>()` | `FetchResult<T>` (3 error variants) | Bearer | 8 dashboards (auto-update-runs, citation-accuracy, citation-content, auto-update-news, jobs, improve-runs, agent-sessions) |
+| Legacy null-based | `fetchFromWikiServer<T>()` | `T \| null` | Bearer | 1 file (`citation-data.ts`) |
+| Custom pagination | `getWikiServerConfig()` + manual loop | `FetchResult<T>` (manual) | Bearer | 1 file (`hallucination-risk/page.tsx`, 70-line pagination loop) |
+| Raw fetch | `fetch()` | varies | varies | 2 files (search route: Bearer + 3s timeout; data page: **`x-api-key`** -- wrong!) |
+
+Crux has its own two-tier system:
+
+| Layer | Function | Error model | Timeout |
 |---|---|---|---|
-| Next.js | `fetchDetailed<T>()` | `ApiErrorReason` (3 variants) | `Authorization: Bearer` |
-| Next.js | `fetchFromWikiServer<T>()` | `T \| null` | `Authorization: Bearer` |
-| Next.js (data page) | Raw `fetch()` | `null` on failure | **`x-api-key`** (wrong!) |
-| Next.js (search route) | Raw `fetch()` | 503 HTTP | `Authorization: Bearer` |
-| Crux | `apiRequest<T>()` | `ApiResult<T>` (4 error variants) | `Authorization: Bearer` |
-| Crux | `batchedRequest<T>()` | `ApiResult<T>` | `Authorization: Bearer` |
+| Core | `apiRequest<T>()` | `ApiResult<T>` (4 error variants) | 5s default |
+| Core | `batchedRequest<T>()` | `ApiResult<T>` | 30s |
 
 The data page at `apps/web/src/app/wiki/[id]/data/page.tsx:54` uses `x-api-key` instead of `Authorization: Bearer` -- this is a latent bug (currently works because the server allows unauthenticated access when the API key env var is unset, but will break when auth is enforced).
 
-### 3. No shared response types between server and consumers
+### 3. Only 13% of endpoints have shared response types
 
-The `api-types.ts` file defines **input** schemas (what clients send to the server). But **output** types (what the server returns) are defined nowhere -- they exist only implicitly in `c.json({...})` calls inside route handlers. Each consumer reverse-engineers these shapes.
+The `api-types.ts` file defines **53+ input schemas** (lines 1-619) but only **14 response interfaces** (lines 620-778) covering 3 of 18 route modules (sessions, facts, links/related). The remaining **95 endpoints** return untyped JSON via inline `c.json({...})` calls.
+
+The server-side response construction uses 4 inconsistent patterns:
+1. **Inline untyped objects** (majority) -- `return c.json({ results: rows, total })` with no type annotation
+2. **Database row casting to `any`** (pages.ts, citations.ts) -- raw SQL returns `any`, field mapping is unvalidated
+3. **Mapped helper functions** (sessions.ts) -- `mapSessionRow()` documents shape implicitly, response type exported
+4. **Complex aggregations** (citations.ts `/accuracy-dashboard`, 177 lines) -- entirely untyped, impossible for clients to infer
+
+Error responses follow a consistent format (`{ error: "<code>", message: string }`) but this shape is **not exported as a type or schema**.
 
 ### 4. Inconsistent timeout, caching, and error handling
 
-- Search route: explicit 3-second `AbortSignal.timeout`
-- Crux: 5-second default, 30-second batch timeout
-- Dashboard pages: no explicit timeout (relies on Next.js defaults)
-- Hallucination risk page: implements its own pagination loop with a safety limit
-- Some dashboards use `fetchDetailed` (structured errors); others use `fetchFromWikiServer` (null on error)
+**Timeouts:**
+- Search route: explicit 3-second `AbortSignal.timeout` (exemplary)
+- Crux: 5-second default, 30-second batch timeout (via AbortController)
+- All 8 dashboard pages using `fetchDetailed`: **no timeout** (relies on Next.js defaults)
+- Hallucination risk pagination loop: **no timeout** on individual requests
+
+**ISR revalidation:**
+- Dashboard summaries: 60-300 seconds
+- Citation data: 600 seconds (10 min)
+- Page-level data: 300 seconds
+- Search proxy: no caching (always fresh)
+
+**Error handling:**
+- 8 dashboards use `fetchDetailed` → `withApiFallback` → `DataSourceBanner` (good)
+- `citation-data.ts` uses `fetchFromWikiServer` → silent `null` fallback → empty array (loses error details)
+- Hallucination risk page: builds its own `FetchResult<T>` manually (correct but duplicates logic)
 
 ### 5. Growing boilerplate per dashboard page
 
@@ -179,31 +209,40 @@ Improve the existing patterns without adopting a new library.
 
 ## Recommendation
 
-**Short-term (now): Option F -- Pragmatic improvements.** Fix the concrete issues without a framework migration:
+### Phase 1 (now): Pragmatic foundations -- Option F
 
-1. **Add response type exports to `api-types.ts`.** Define output schemas/interfaces alongside the existing input schemas. Both crux and Next.js import from the same source. This eliminates ~80 duplicated interfaces with zero new dependencies. Example:
+Fix the concrete issues that cause daily friction. This work is valuable regardless of which framework we pilot later, because it establishes the shared response types that any framework integration would need anyway.
 
-   ```typescript
-   // In api-types.ts (already shared between server + crux):
-   export interface FactsByEntityResponse {
-     entityId: string;
-     facts: FactEntry[];
-     total: number;
-     limit: number;
-     offset: number;
-   }
-   ```
+1. **Expand response type exports in `api-types.ts`.** The 14 existing response interfaces (sessions, facts, links) prove the pattern works. Add response types for the remaining high-traffic modules: citations (18 endpoints, 0 types), jobs (10 endpoints, 0 types), entities (5 endpoints, 0 types). Target: cover the ~40 most-used endpoints. Both crux and Next.js import from the same source.
 
-2. **Fix the `x-api-key` bug** in `apps/web/src/app/wiki/[id]/data/page.tsx` -- use `fetchDetailed` or `fetchFromWikiServer` instead of raw fetch with wrong auth header.
+2. **Fix the `x-api-key` bug** in `apps/web/src/app/wiki/[id]/data/page.tsx:54` -- use `fetchDetailed` instead of raw fetch with wrong auth header. This will break when auth is enforced.
 
-3. **Consolidate the Next.js fetch layer.** Make `fetchDetailed` the single entry point. Remove direct `process.env.LONGTERMWIKI_SERVER_URL` access from individual page files. Add optional `timeout` support to `fetchDetailed`.
+3. **Consolidate the Next.js fetch layer.** Make `fetchDetailed` the single entry point. Migrate `citation-data.ts` from `fetchFromWikiServer` (silent null) to `fetchDetailed` (structured errors). Extract the pagination helper from `hallucination-risk/page.tsx` for reuse. Add optional `timeout` support to `fetchDetailed`.
 
-4. **Create typed fetch helpers per domain** in `apps/web/src/lib/` (e.g., `wiki-api/sessions.ts`, `wiki-api/citations.ts`). These would mirror what crux already has, importing shared response types from `api-types.ts`. Dashboard pages call `getSessions()` instead of writing inline fetch + type definitions.
+4. **Create typed fetch helpers per domain** in `apps/web/src/lib/wiki-api/` (e.g., `sessions.ts`, `citations.ts`). These import shared response types from `api-types.ts`. Dashboard pages call `getSessions()` instead of writing ~60-80 lines of inline fetch + type definitions.
 
-**Medium-term (if the API surface keeps growing): Evaluate oRPC or Hono RPC** on a single route module (e.g., `facts` -- small, well-defined, used by both crux and Next.js). Measure:
-- IDE performance impact
-- Developer experience improvement
-- Whether the migration pattern is sustainable for all 18 modules
+### Phase 2 (soon): Framework pilot -- head-to-head comparison
+
+**Option F doesn't scale forever.** At 109 endpoints growing toward 200+, manually maintaining response types is a losing game. The framework pilot should happen within the next few weeks, not "if the API keeps growing."
+
+**Pilot design:** Pick **one route module** and implement it with two frameworks side by side. The `facts` module is ideal: 5 endpoints, well-defined Zod inputs, used by both crux and Next.js, has existing response types to compare against.
+
+**Framework A: oRPC** -- strongest technical fit (official Hono adapter, contract-first + procedure-first modes, built-in OpenAPI). Solo-maintainer risk is real but bounded: if the pilot succeeds and the project later stalls, we'd have one module to port, not 18.
+
+**Framework B: Hono RPC** -- zero new dependencies, type safety from `typeof app`. The IDE performance concern is theoretical at our scale (109 endpoints vs the "impossible" threshold of 300+). Per-module splitting may work fine.
+
+**Measure:**
+- TypeScript compilation time delta
+- IDE autocomplete latency (is it perceptibly slower?)
+- Lines of code eliminated vs added
+- Developer ergonomics for adding a new endpoint
+- Whether Next.js ISR (`next: { revalidate }`) integrates cleanly
+
+**Decision criteria:** If either framework eliminates the response type duplication problem without degrading IDE performance, adopt it incrementally (one module at a time). If both degrade DX, stick with Option F's manual types as the long-term approach.
+
+### Phase 3 (if pilot succeeds): Incremental migration
+
+Migrate remaining 17 route modules one at a time, prioritizing by endpoint count (citations: 18, jobs: 10, resources: 8). Each module migration is independent and safe to ship separately.
 
 ### Framework comparison after community research
 
@@ -219,35 +258,108 @@ Improve the existing patterns without adopting a new library.
 | **Server Actions** | No | No | Yes |
 | **Migration approach** | All-or-nothing per module | Incremental | Incremental |
 
-**Updated medium-term recommendation:**
+**Pilot candidates (for Phase 2 head-to-head):**
 
-- **oRPC** is the strongest technical fit for our architecture (Hono server, multiple consumers, 100+ endpoints, need for both procedure and contract modes). The solo-maintainer risk is real but mitigated by the fact that Option F (pragmatic improvements) provides a solid baseline regardless. If we pilot oRPC on one module and the project stalls, we lose minimal investment.
+- **oRPC** is the strongest technical fit for our architecture (Hono server, multiple consumers, 100+ endpoints, need for both procedure and contract modes). The solo-maintainer risk is real but bounded by the pilot approach: if the project stalls, we lose one module's worth of investment.
 
-- **Hono RPC** is a reasonable fallback if oRPC's maintainer situation deteriorates. Zero new dependencies, but requires aggressive module splitting at our scale and won't help with the crux CLI client (which doesn't use Hono).
+- **Hono RPC** is the zero-dependency alternative. At 109 endpoints we're below the "impossible" threshold (300+), so the IDE performance concern may not materialize in practice. The pilot will answer this empirically.
 
-- **ts-rest is no longer recommended** for new adoption. The maintenance trajectory, dead Hono adapter, and community anxiety about the project's future make it a poor bet for a project that will depend on it for years. The scaling pain at 100+ endpoints is also a concern.
+**Not recommended for pilot:**
 
-**Not recommended:** tRPC (wrong architecture), Zodios (abandoned), full OpenAPI codegen (too much ceremony for the current scale).
+- **ts-rest** -- maintenance trajectory (9-month unreleased RC), dead Hono adapter, and community anxiety about the project's future make it a poor bet for a project that will depend on it for years.
+- **tRPC** -- wrong architecture (requires abandoning REST structure).
+- **Zodios** -- abandoned.
+- **Full OpenAPI codegen** -- too much ceremony for current scale.
 
-## Sizing the Short-Term Work
+## Sizing
+
+### Phase 1: Pragmatic foundations
 
 | Task | Scope | Effort |
 |---|---|---|
-| Add response types to `api-types.ts` | ~40-50 interfaces | 1 session |
+| Add response types for top ~40 endpoints to `api-types.ts` | ~30 new interfaces | 1 session |
 | Fix `x-api-key` bug | 1 file | Trivial |
-| Consolidate Next.js fetch layer | ~13 files | 1 session |
-| Create typed domain helpers for Next.js | ~8-10 new files | 1-2 sessions |
-| Update crux clients to import shared response types | 16 files | 1 session |
+| Consolidate Next.js fetch layer (migrate legacy, extract pagination helper, add timeouts) | ~5 files | 1 session |
+| Create typed domain helpers in `apps/web/src/lib/wiki-api/` | ~8-10 new files | 1-2 sessions |
+| Update crux clients to import shared response types (replacing hand-written duplicates) | 17 files | 1 session |
 
-Total: ~4-5 focused sessions to eliminate the type duplication and inconsistency problems without any framework migration.
+Total: ~4-5 sessions.
+
+### Phase 2: Framework pilot
+
+| Task | Scope | Effort |
+|---|---|---|
+| Implement `facts` module with oRPC (server + crux client + Next.js client) | 3-4 files | 1 session |
+| Implement `facts` module with Hono RPC (server + crux client + Next.js client) | 3-4 files | 1 session |
+| Measure & document performance comparison | Benchmarks + writeup | 0.5 sessions |
+
+Total: ~2-3 sessions for the head-to-head comparison.
+
+### Phase 3: Incremental migration (if pilot succeeds)
+
+| Task | Scope | Effort |
+|---|---|---|
+| Migrate remaining 17 route modules | ~18 route files + ~17 client modules | 1-2 sessions per module, ~8-10 sessions total |
+
+Total: ~8-10 sessions spread over time.
 
 ## Appendix A: Numbers
 
-- **Wiki-server routes:** 18 modules, 5,488 lines
-- **Shared input schemas:** 617 lines in `api-types.ts`
-- **Crux client code:** 16 domain modules, 2,459 lines, ~65 hand-written response interfaces
-- **Next.js integration points:** 18 files touch the wiki-server, ~15 hand-written response interfaces
-- **Endpoints:** 100+ across GET/POST/PATCH/DELETE
+- **Wiki-server routes:** 18 modules, 109 endpoints
+- **Shared schemas in `api-types.ts`:** 778 lines (53+ input Zod schemas, 14 response TypeScript interfaces)
+- **Response type coverage:** 14 of 109 endpoints (13%) have shared response types — sessions (4), facts (5), links+related (5)
+- **Crux client code:** 17 domain modules + 1 core client in `crux/lib/wiki-server/`, 107 exported interfaces & types (mix of server re-exports and hand-written wrappers)
+- **Next.js integration points:** 13 fetch locations across 11 files, 9 hand-written `Api*Entry` interfaces + ~15 display types
+- **Fetch strategies in Next.js:** 8 use `fetchDetailed`, 1 uses legacy `fetchFromWikiServer`, 1 uses custom pagination, 2 use raw `fetch`
+
+### Endpoint inventory by route module
+
+| Module | Endpoints | Response types exported? |
+|---|---|---|
+| citations.ts | 18 | No |
+| jobs.ts | 10 | No |
+| resources.ts | 8 | No |
+| claims.ts | 7 | No |
+| edit-logs.ts | 6 | No |
+| hallucination-risk.ts | 6 | No |
+| sessions.ts | 6 | **Yes** (4 interfaces) |
+| artifacts.ts | 5 | No |
+| auto-update-news.ts | 5 | No |
+| entities.ts | 5 | No |
+| facts.ts | 5 | **Yes** (5 interfaces) |
+| links.ts | 5 | **Yes** (2 interfaces) |
+| pages.ts | 5 | No |
+| summaries.ts | 5 | No |
+| auto-update-runs.ts | 4 | No |
+| agent-sessions.ts | 4 | No |
+| ids.ts | 4 | No |
+| health.ts | 1 | No |
+
+### Next.js fetch locations
+
+| File | Strategy | Auth | Status |
+|---|---|---|---|
+| `internal/auto-update-runs/page.tsx` | fetchDetailed | Bearer | OK |
+| `internal/citation-accuracy/page.tsx` | fetchDetailed | Bearer | OK |
+| `internal/citation-content/page.tsx` (2 calls) | fetchDetailed | Bearer | OK |
+| `internal/auto-update-news/page.tsx` | fetchDetailed | Bearer | OK |
+| `internal/jobs/page.tsx` | fetchDetailed | Bearer | OK |
+| `internal/improve-runs/page.tsx` | fetchDetailed | Bearer | OK |
+| `internal/agent-sessions/page.tsx` (2 calls) | fetchDetailed | Bearer | OK |
+| `internal/hallucination-risk/page.tsx` | Custom pagination | Bearer | OK (but not reusable) |
+| `lib/citation-data.ts` | fetchFromWikiServer | Bearer | Legacy (silent null) |
+| `api/search/route.ts` | Raw fetch | Bearer | OK (3s timeout) |
+| `wiki/[id]/data/page.tsx` | Raw fetch | **x-api-key** | **BUG** |
+
+### Crux batch sizes by data type
+
+| Module | Batch size | Timeout |
+|---|---|---|
+| entities.ts | 200 | 30s |
+| facts.ts | 500 | 30s |
+| links.ts | 2,000 | 30s |
+| risk.ts | 100 | 30s |
+| auto-update.ts | 500 | 30s |
 
 ## Appendix B: Community Research Sources (Feb 2026)
 
