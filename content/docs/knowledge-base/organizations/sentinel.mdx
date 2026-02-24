@@ -38,7 +38,7 @@ tags:
   - early-warning
   - effective-altruism
 ---
-import {EntityLink, Section} from '@components/wiki';
+import { EntityLink, Mermaid } from '@components/wiki';
 
 ## Quick Assessment
 
@@ -90,7 +90,7 @@ Sentinel has two structural components:[^10]
 
 Sentinel operates a structured, multi-stage pipeline for identifying and assessing global catastrophic risks.[^1] Automated ingestion draws on millions of news items, academic preprints, policy documents, and social media signals each week across multiple languages and regions. <EntityLink id="E400" name="large-language-models">Large Language Models</EntityLink> filter this volume down to a prioritized shortlist, flagging items against predefined criteria — scale, novelty, irreversibility, and escalation potential. Forecasters with demonstrated calibration track records then evaluate each flagged item, assign probability estimates grounded in reference-class reasoning, and situate developments within longer-term risk trajectories. Final outputs are packaged into structured briefs distributed on a weekly cadence.[^1]
 
-```mermaid
+<Mermaid chart={`
 flowchart LR
     A["📥 Automated Collection\nNews · Preprints · Policy docs\nMulti-language, weekly"] --> B["🤖 AI Prioritization\nLLM filtering against\nscale, novelty, escalation criteria"]
     B --> C["👤 Forecaster Assessment\nCalibrated probability estimates\n& scenario trend updates"]
@@ -99,7 +99,7 @@ flowchart LR
     style B fill:#1e3a5f,color:#fff,stroke:#4a90d9
     style C fill:#1e3a5f,color:#fff,stroke:#4a90d9
     style D fill:#1e3a5f,color:#fff,stroke:#4a90d9
-```
+`} />
 
 1. **Automated Collection**: Millions of news items, preprints, and policy documents ingested weekly across multiple languages and source types.
 2. **AI Prioritization**: Language models filter and rank candidate events against standing catastrophic-risk criteria, including scale, novelty, and escalation potential.
