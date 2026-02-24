@@ -213,6 +213,23 @@ measures:
     description: "Number of parameters in a model"
     applicableTo: [organization]
 
+  # === Market ===
+  market-share:
+    label: "Market Share"
+    unit: percent
+    category: organizational
+    direction: higher
+    description: "Percentage share of a market, platform, or ecosystem"
+    applicableTo: [organization]
+
+  compute-cost:
+    label: "Compute Cost"
+    unit: percent
+    category: performance
+    direction: lower
+    description: "Cost efficiency metric for compute infrastructure (e.g., cost reduction vs baseline)"
+    applicableTo: [organization]
+
   # === People ===
   net-worth:
     label: "Net Worth"

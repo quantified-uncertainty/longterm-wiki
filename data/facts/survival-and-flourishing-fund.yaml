@@ -1,0 +1,52 @@
+entity: survival-and-flourishing-fund
+facts:
+
+  # grants-distributed-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  95bbb3d6:
+    label: "SFF grants distributed in 2025"
+    measure: revenue
+    value: 34330000
+    asOf: "2025"
+    note: "2025 grant round total; three-track structure (Main, Freedom, Fairness)"
+    source: https://survivalandflourishing.fund/2025/recommendations
+
+  # total-historical-giving
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  7231818e:
+    label: "SFF total historical giving since 2019"
+    measure: total-funding
+    value: 141000000
+    asOf: "2025"
+    note: "Cumulative grants distributed since founding in 2019 through 2025"
+    source: https://survivalandflourishing.fund/recommendations
+
+  # ai-focus-share-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  f532af4a:
+    label: "SFF share of 2025 grants to AI-related work"
+    measure: market-share
+    value: 86
+    asOf: "2025"
+    note: "86% of 2025 grants went to AI safety/governance; up from ~50% in 2019"
+    source: https://forum.effectivealtruism.org/posts/vhw6R5P52qJr6opou/sff-2025-funding-by-cause-area-usd34-million-to-ai-86-bio-7
+
+  # speculation-grants-total-budget
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  409d9094:
+    label: "SFF Speculation Grants total budget"
+    measure: total-funding
+    value: 16000000
+    asOf: "2025"
+    note: "Total budget across ~35 grantors; up from $4M initially"
+    source: https://survivalandflourishing.fund/speculation-grants
+
+  # grants-distributed-2024
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  d96efa12:
+    label: "SFF grants distributed in 2024"
+    measure: revenue
+    value: 19860000
+    asOf: "2024"
+    note: "Includes $0.85M Speculation Grants; above $5-15M estimate"
+    source: https://survivalandflourishing.fund/2024/recommendations

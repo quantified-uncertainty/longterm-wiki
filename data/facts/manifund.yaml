@@ -1,0 +1,12 @@
+entity: manifund
+facts:
+
+  # ai-safety-regranting-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  3e9a7a44:
+    label: "Manifund AI safety regranting pool (2025)"
+    measure: total-funding
+    value: 2250000
+    asOf: "2025"
+    note: "2025 round with first 10 regrantors announced"
+    source: https://manifund.org/about/regranting

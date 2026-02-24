@@ -1,0 +1,126 @@
+entity: meta-ai
+facts:
+
+  # monthly-active-users-2025-q1
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  1483e293:
+    label: "Meta AI monthly active users (Q1 2025)"
+    measure: user-count
+    value: 1000000000
+    asOf: "2025-03"
+    note: "Over 1 billion monthly active users across Meta platforms"
+    source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
+
+  # whatsapp-ai-users-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  dd99547a:
+    label: "WhatsApp Meta AI active users (2025)"
+    measure: user-count
+    value: 630000000
+    asOf: "2025-03"
+    note: "630M active AI users on WhatsApp, representing 63% of all Meta AI interactions"
+    source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
+
+  # capex-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  2dd47673:
+    label: "Meta AI infrastructure CapEx (2025)"
+    measure: infrastructure-investment
+    value:
+      - 66000000000
+      - 72000000000
+    asOf: "2025"
+    note: "$66-72B capital expenditure for AI infrastructure in 2025"
+    source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
+
+  # capex-2026-projected
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  27d6b03d:
+    label: "Meta AI infrastructure CapEx projected (2026)"
+    measure: infrastructure-investment
+    value:
+      - 115000000000
+      - 135000000000
+    asOf: "2026"
+    note: "Projected $115-135B CapEx for 2026, includes Meta Superintelligence Labs and Prometheus supercluster"
+    source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
+
+  # reality-labs-cumulative-losses
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  7f60352c:
+    label: "Meta Reality Labs cumulative losses since 2020"
+    measure: cash-burn
+    value: 70000000000
+    asOf: "2026-01"
+    note: "Cumulative losses since late 2020; figure cited at time of January 2026 layoffs"
+    source: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
+
+  # revenue-fy2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  22f1c183:
+    label: "Meta Platforms total revenue (FY 2025)"
+    measure: revenue
+    value: 200970000000
+    asOf: "2025"
+    note: "Meta Platforms parent company FY 2025 total revenue"
+
+  # employee-count-q4-2025
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  fea788ff:
+    label: "Meta Platforms employee count (Q4 2025)"
+    measure: headcount
+    value: 78800
+    asOf: "2025-12"
+    note: "Approximate total headcount for Meta Platforms parent company"
+
+  # llama-downloads-total
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  7ca19e9d:
+    label: "LLaMA model family total downloads"
+    measure: user-count
+    value: 1000000000
+    asOf: "2025-04"
+    note: "1 billion+ downloads announced at LlamaCon on April 29, 2025"
+    source: https://medium.com/@tarifabeach/metas-llamacon-2025-redefining-the-future-of-open-source-ai-fa6551826e50
+
+  # pytorch-training-market-share
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  a1122c60:
+    label: "PyTorch share of AI training models (2025)"
+    measure: market-share
+    value: 63
+    asOf: "2025"
+    note: "63% of training models globally use PyTorch"
+    source: https://www.metacareers.com/blog/how-pytorch-unlocks-ai-research-and-productization-at-scale
+
+  # hyperion-data-center-investment
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  ed8c0e63:
+    label: "Meta Hyperion data center partnership investment"
+    measure: infrastructure-investment
+    value: 27000000000
+    asOf: "2025-10"
+    note: "$27B partnership with Blue Owl Capital for Hyperion data center project"
+    source: https://fortune.com/2025/10/31/metas-27-billion-bet-turns-ai-compute-into-wall-streets-hottest-new-investment/
+
+  # ami-labs-valuation-2025
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  acf0c47d:
+    label: "Advanced Machine Intelligence (AMI) Labs fundraising valuation (2025)"
+    measure: valuation
+    value: 3500000000
+    asOf: "2025-12"
+    note: "Yann LeCun's AMI Labs seeking ~$3.5B valuation in fundraising talks"
+    source: https://fortune.com/2025/12/19/yann-lecun-ami-labs-ai-startup-valuation-meta-departure/
+
+  # mtia-iris-cost-reduction
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  f892877b:
+    label: "Meta MTIA v3 Iris cost reduction vs GPUs"
+    measure: compute-cost
+    value:
+      - 40
+      - 44
+    asOf: "2026"
+    note: "40-44% reduction in total cost of ownership vs GPUs for MTIA v3 Iris chips"
+    source: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-silicon-sovereignty-meta-charges-into-2026-with-iris-mtia-rollout-and-rapid-custom-chip-roadmap

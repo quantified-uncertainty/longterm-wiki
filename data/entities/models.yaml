@@ -2556,7 +2556,7 @@
     - community
   lastUpdated: 2026-02
 - id: longtermist-value-comparisons
-  numericId: E886
+  numericId: E887
   type: model
   title: Relative Longtermist Value Comparisons
   description: >-

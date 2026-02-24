@@ -1,0 +1,29 @@
+entity: elon-musk
+facts:
+
+  # net-worth-2025
+  # AUTO-EXTRACTED — needs human review (confidence: medium)
+  09bc8a1a:
+    label: "Elon Musk net worth (approximate, 2025)"
+    measure: valuation
+    value: 400000000000
+    asOf: "2025"
+    note: "Approximate net worth, fluctuates with Tesla stock; listed as $400B+"
+
+  # openai-contribution-actual
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  d81eea20:
+    label: "Elon Musk actual OpenAI contribution (by 2020)"
+    measure: total-funding
+    value: 44000000
+    asOf: "2020"
+    note: "Actual amount contributed vs $1B pledge; per public reporting"
+
+  # openai-lawsuit-damages-sought
+  # AUTO-EXTRACTED — needs human review (confidence: high)
+  e766c30f:
+    label: "Damages sought in Musk v. OpenAI expanded lawsuit (Aug 2024)"
+    measure: valuation
+    value: 134500000000
+    asOf: "2024-08"
+    note: "Racketeering claims with $134.5B damages sought in expanded lawsuit"
