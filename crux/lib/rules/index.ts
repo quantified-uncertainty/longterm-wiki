@@ -104,6 +104,10 @@ import { footnoteIntegrityRule } from './footnote-integrity.ts';
 // Block-level structural quality (uses block-index.json IR)
 import { blockSectionQualityRule } from './block-section-quality.ts';
 
+// Component usage validation (issues #918, #920)
+import { datainfoboxEntityMatchRule } from './datainfobox-entity-match.ts';
+import { officialWebsiteLabelRule } from './official-website-label.ts';
+
 // Re-export all rules individually
 export {
   entityLinkIdsRule,
@@ -158,6 +162,8 @@ export {
   pipelineArtifactsRule,
   footnoteIntegrityRule,
   blockSectionQualityRule,
+  datainfoboxEntityMatchRule,
+  officialWebsiteLabelRule,
 };
 
 export const allRules: Rule[] = [
@@ -213,6 +219,8 @@ export const allRules: Rule[] = [
   pipelineArtifactsRule,
   footnoteIntegrityRule,
   blockSectionQualityRule,
+  datainfoboxEntityMatchRule,
+  officialWebsiteLabelRule,
 ];
 
 export default allRules;
