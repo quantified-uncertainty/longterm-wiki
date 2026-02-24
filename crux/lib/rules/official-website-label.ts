@@ -35,6 +35,8 @@ const ABSTRACT_ENTITY_TYPES = new Set([
   'diagram',
   'debate',
   'overview',
+  'policy',
+  'safety-agenda',
   'intelligence-paradigm',
   'ai-transition-model-parameter',
   'ai-transition-model-metric',

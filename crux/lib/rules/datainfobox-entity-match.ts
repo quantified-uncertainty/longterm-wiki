@@ -39,7 +39,10 @@ export const datainfoboxEntityMatchRule = createRule({
 
     const body = content.body;
 
-    // Match: entityId="E123" or entityId={'E123'} or entityId={`E123`}
+    // Match: entityId="E123" (double-quote form — the only form used in this codebase).
+    // Note: The regex character class includes ' and ` as delimiters, but JSX expression
+    // forms like entityId={'E123'} would not be correctly captured by this pattern.
+    // In practice all DataInfoBox uses double-quote syntax so this is sufficient.
     const datainfoboxPattern = /<DataInfoBox\b[^>]*entityId=["'{`]([^"'{`]+)["'{`][^>]*>/gi;
 
     let match: RegExpExecArray | null;
