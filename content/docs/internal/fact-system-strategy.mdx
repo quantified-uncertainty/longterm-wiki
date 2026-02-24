@@ -106,7 +106,7 @@ This is worse than plain text: it adds JSX complexity without providing the core
 
 ### 3. Entity ID syntax is inconsistent and unnecessarily verbose
 
-`<F e="ssi" f="a0502d56">` uses entity slugs, while `<EntityLink id="E338">` uses numeric IDs. The `e` attribute is also technically unnecessary since fact hash IDs are globally unique — entity can be resolved at build time.
+`<F e="ssi" f="a0502d56">` uses entity slugs, while `EntityLink` uses numeric IDs like `E338`. The `e` attribute is also technically unnecessary since fact hash IDs are globally unique — entity can be resolved at build time.
 
 ### 4. The extraction pipeline creates too many low-value facts
 

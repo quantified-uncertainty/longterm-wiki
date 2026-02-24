@@ -20,7 +20,7 @@ clusters:
   - ai-safety
   - governance
 ---
-import {Mermaid, R, EntityLink, DataInfoBox} from '@components/wiki';
+import { Mermaid, EntityLink } from '@components/wiki';
 
 
 ## Quick Assessment
@@ -43,7 +43,7 @@ Evals-based deployment gates are a governance mechanism that requires AI systems
 
 The core value proposition is straightforward: evaluation gates add friction to the deployment process that ensures at least some safety testing occurs. The EU AI Act requires conformity assessments for high-risk AI systems with penalties up to EUR 35 million or 7% of global annual turnover. The [UK AI Security Institute](https://www.aisi.gov.uk/) has evaluated 30+ frontier models since November 2023, while [METR](https://metr.org/) has conducted pre-deployment evaluations of GPT-4.5, GPT-5, and DeepSeek-V3. These create a paper trail of safety evidence, enable third-party verification, and provide a mechanism for regulators to enforce standards.
 
-However, evals-based gates face fundamental limitations. According to the [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), only 3 of 7 major AI firms substantively test for dangerous capabilities, and none scored above a D grade in Existential Safety planning. Evaluations can only test for risks we anticipate and can operationalize into tests. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) notes that "existing evaluations mainly rely on 'spot checks' that often miss hazards and overestimate or underestimate AI capabilities." Research from [Apollo Research](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/) shows that some models can detect when they are being evaluated and alter their behavior accordingly. Evals-based gates are valuable as one component of <EntityLink id="ai-governance">AI governance</EntityLink> but should not be confused with comprehensive safety assurance.
+However, evals-based gates face fundamental limitations. According to the [2025 AI Safety Index](https://futureoflife.org/ai-safety-index-summer-2025/), only 3 of 7 major AI firms substantively test for dangerous capabilities, and none scored above a D grade in Existential Safety planning. Evaluations can only test for risks we anticipate and can operationalize into tests. The [International AI Safety Report 2025](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2025) notes that "existing evaluations mainly rely on 'spot checks' that often miss hazards and overestimate or underestimate AI capabilities." Research from [Apollo Research](https://www.apolloresearch.ai/blog/claude-sonnet-37-often-knows-when-its-in-alignment-evaluations/) shows that some models can detect when they are being evaluated and alter their behavior accordingly. Evals-based gates are valuable as one component of AI governance but should not be confused with comprehensive safety assurance.
 
 ## Evaluation Governance Frameworks Comparison
 
@@ -60,7 +60,7 @@ The landscape of <EntityLink id="evaluation">AI evaluation</EntityLink> governan
 
 ### Framework Maturity and Coverage
 
-| Framework | Dangerous Capabilities | Alignment Testing | Third-Party Audit | Post-Deployment | <EntityLink id="international-coordination">International Coordination</EntityLink> |
+| Framework | Dangerous Capabilities | Alignment Testing | Third-Party Audit | Post-Deployment | International Coordination |
 |-----------|----------------------|-------------------|-------------------|-----------------|---------------------------|
 | EU AI Act | Required for GPAI with systemic risk | Not explicitly required | Required for high-risk | Mandatory monitoring | EU member states |
 | US EO 14110 | Required above threshold | Not specified | Recommended | Not specified | Bilateral agreements |
