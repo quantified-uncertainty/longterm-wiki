@@ -118,6 +118,10 @@ async function main() {
         succeeded++;
       } else {
         failed++;
+        // Clear progress line, log the failing URL, then let progress resume
+        process.stdout.write('\r\n');
+        const errMsg = 'error' in result ? String(result.error).slice(0, 100) : 'unknown error';
+        console.warn(`  [warn] Failed to upsert ${row.url.slice(0, 80)}: ${errMsg}`);
       }
     }
 

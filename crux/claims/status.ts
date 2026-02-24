@@ -79,6 +79,7 @@ async function main() {
         section: cl.value,
         footnoteRefs: cl.unit ? cl.unit.split(',') : [],
         confidence: cl.confidence,
+        sourceQuote: cl.sourceQuote ?? null,
       })),
     }, null, 2));
     return;
