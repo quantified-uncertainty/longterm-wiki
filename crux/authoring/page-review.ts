@@ -9,6 +9,8 @@
  *   pnpm crux content review <page-id>
  *   pnpm crux content review <page-id> --model=claude-sonnet-4-20250514
  *   pnpm crux content review --batch --limit=10
+ *   pnpm crux content review <page-id> --json            # Machine-readable output
+ *   pnpm crux content review <page-id> --json --exit-code # Exit 1 if re-research needed
  */
 
 import fs from 'fs';
@@ -93,6 +95,9 @@ async function main(): Promise<void> {
   const batch = args.batch === true;
   const limit = typeof args.limit === 'string' ? parseInt(args.limit, 10) : 10;
   const model = typeof args.model === 'string' ? args.model : undefined;
+  const jsonMode = args.json === true;
+  // --exit-code: exit 1 if the page needs re-research (useful for CI gating)
+  const exitCode = args['exit-code'] === true;
 
   if (args.help === true) {
     console.log(`
@@ -104,6 +109,8 @@ Options:
   --model=<m>    LLM model for review (default: sonnet)
   --batch        Review multiple pages (lowest quality first)
   --limit=<n>    Number of pages in batch mode (default: 10)
+  --json         Output machine-readable JSON (single page only)
+  --exit-code    Exit 1 if review finds re-research-needed gaps (for CI gating)
   --help         Show this help
 `);
     process.exit(0);
@@ -160,7 +167,25 @@ Options:
 
     const content = fs.readFileSync(filePath, 'utf-8');
     const review = await adversarialReviewPhase(page, content, options);
-    printReview(page, review);
+
+    if (jsonMode) {
+      // Machine-readable output for CI integration
+      console.log(JSON.stringify({
+        pageId: page.id,
+        title: page.title,
+        gapCount: review.gaps.length,
+        needsReResearch: review.needsReResearch,
+        gaps: review.gaps,
+        reResearchQueries: review.reResearchQueries,
+        overallAssessment: review.overallAssessment ?? null,
+      }));
+    } else {
+      printReview(page, review);
+    }
+
+    if (exitCode && review.needsReResearch) {
+      process.exit(1);
+    }
   }
 }
 
