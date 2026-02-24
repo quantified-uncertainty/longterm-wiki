@@ -714,6 +714,17 @@ export interface SyncLinksResult {
   upserted: number;
 }
 
+export interface LinksStatsResult {
+  total: number;
+  uniqueSources: number;
+  uniqueTargets: number;
+  byType: Array<{
+    linkType: string;
+    count: number;
+    avgWeight: number;
+  }>;
+}
+
 export interface PageSearchResult {
   results: Array<{
     id: string;
@@ -725,6 +736,7 @@ export interface PageSearchResult {
     readerImportance: number | null;
     quality: number | null;
     score: number;
+    snippet: string | null;
   }>;
   query: string;
   total: number;
@@ -749,6 +761,8 @@ export interface PageDetailRow {
   lastUpdated: string | null;
   contentFormat: string | null;
   syncedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface RelatedPagesResult {
