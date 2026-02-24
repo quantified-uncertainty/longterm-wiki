@@ -44,6 +44,7 @@ app/public/search-index.json
 
 # Claude Code temp files
 .claude/temp/
+.claude/plan.md
 .claude/settings.local.json
 .claude/maintain-last-run.txt
 .claude/wip-checklist.md
