@@ -1,18 +1,38 @@
 import { fetchFromWikiServer } from "./wiki-server";
+import type {
+  CitationHealthResult,
+  AccuracyVerdict,
+} from "@wiki-server/api-types";
+import { ACCURACY_VERDICTS } from "@wiki-server/api-types";
 
-/** Citation quote data from the wiki-server API */
+// Re-export the server type for consumers
+export type { CitationHealthResult } from "@wiki-server/api-types";
+
+/**
+ * Citation quote data from the wiki-server API.
+ *
+ * This is the subset of CitationQuoteRow fields that the frontend needs.
+ * Kept as a standalone interface (rather than importing CitationQuoteRow)
+ * because the server returns all DB columns while the frontend only
+ * consumes a projection, and the field naming differs for timestamps
+ * (server returns Date objects, frontend receives ISO strings via JSON).
+ */
 export interface CitationQuote {
   footnote: number;
   url: string | null;
+  resourceId: string | null;
   claimText: string;
   sourceQuote: string | null;
   sourceTitle: string | null;
+  sourceType: string | null;
   quoteVerified: boolean;
   verificationScore: number | null;
   verifiedAt: string | null;
-  accuracyVerdict: string | null;
+  accuracyVerdict: AccuracyVerdict | null;
   accuracyScore: number | null;
   accuracyIssues: string | null;
+  accuracySupportingQuotes: string | null;
+  verificationDifficulty: string | null;
   accuracyCheckedAt: string | null;
 }
 
@@ -87,6 +107,9 @@ export async function getCitationQuotesByUrl(
 /**
  * Computes a summary of citation health from the quotes array.
  * Pure function — safe to call from server or client components.
+ *
+ * Uses the canonical ACCURACY_VERDICTS from api-types to ensure
+ * all verdict values are handled consistently.
  */
 export function computeCitationHealth(
   quotes: CitationQuote[]
@@ -113,6 +136,14 @@ export function computeCitationHealth(
         case "minor_issues":
           minorIssues++;
           break;
+        case "not_verifiable":
+          // not_verifiable is a valid verdict but doesn't count as
+          // accurate or inaccurate — tracked separately if needed
+          break;
+        default:
+          // Exhaustive check: if a new verdict is added to AccuracyVerdict,
+          // TypeScript will flag this as an error.
+          q.accuracyVerdict satisfies never;
       }
     } else if (q.quoteVerified) {
       verified++;

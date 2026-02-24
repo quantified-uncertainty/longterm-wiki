@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { getDrizzleDb, getDb } from "../db.js";
-import { resources, resourceCitations } from "../schema.js";
+import { resources, resourceCitations, citationContent } from "../schema.js";
 import type * as schema from "../schema.js";
 import {
   parseJsonBody,
@@ -383,6 +383,46 @@ resourcesRoute.get("/all", async (c) => {
     total,
     limit,
     offset,
+  });
+});
+
+// ---- GET /:id/content (resource + linked fetched content) ----
+
+resourcesRoute.get("/:id/content", async (c) => {
+  const id = c.req.param("id");
+  const db = getDrizzleDb();
+
+  const rows = await db
+    .select()
+    .from(resources)
+    .where(eq(resources.id, id))
+    .limit(1);
+
+  if (rows.length === 0) {
+    return notFoundError(c, `Resource not found: ${id}`);
+  }
+
+  const resource = rows[0];
+
+  // Look up fetched content by exact URL match
+  const contentRows = await db
+    .select({
+      url: citationContent.url,
+      fetchedAt: citationContent.fetchedAt,
+      httpStatus: citationContent.httpStatus,
+      contentType: citationContent.contentType,
+      pageTitle: citationContent.pageTitle,
+      fullTextPreview: citationContent.fullTextPreview,
+      contentLength: citationContent.contentLength,
+      contentHash: citationContent.contentHash,
+    })
+    .from(citationContent)
+    .where(eq(citationContent.url, resource.url))
+    .limit(1);
+
+  return c.json({
+    ...formatResource(resource),
+    content: contentRows.length > 0 ? contentRows[0] : null,
   });
 });
 
