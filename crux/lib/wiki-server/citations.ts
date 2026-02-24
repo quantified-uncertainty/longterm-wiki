@@ -17,6 +17,7 @@ import type {
   MarkAccuracyBatchResult,
   AccuracySnapshotResult,
   AccuracyDashboardData,
+  CitationHealthResult,
   CitationContentRow,
   CitationContentListEntry,
   CitationContentListResult,
@@ -47,7 +48,7 @@ export type MarkAccuracyItem = MarkAccuracy;
 // Citation Accuracy Types — response (re-exported from canonical api-types.ts)
 // ---------------------------------------------------------------------------
 
-export type { MarkAccuracyResult, MarkAccuracyBatchResult, AccuracyDashboardData };
+export type { MarkAccuracyResult, MarkAccuracyBatchResult, AccuracyDashboardData, CitationHealthResult };
 export type SnapshotResult = AccuracySnapshotResult;
 
 // ---------------------------------------------------------------------------
@@ -69,6 +70,19 @@ export async function upsertCitationQuoteBatch(
     { items },
     undefined,
     'content',
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Citation Health API functions
+// ---------------------------------------------------------------------------
+
+export async function getPageCitationHealth(
+  pageId: string,
+): Promise<ApiResult<CitationHealthResult>> {
+  return apiRequest<CitationHealthResult>(
+    'GET',
+    `/api/citations/health/${encodeURIComponent(pageId)}`,
   );
 }
 

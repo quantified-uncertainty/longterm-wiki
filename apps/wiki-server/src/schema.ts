@@ -128,6 +128,8 @@ export const citationContent = pgTable(
   "citation_content",
   {
     url: text("url").primaryKey(),
+    /** Matched resource ID from data/resources/*.yaml — links fetched content to curated metadata. */
+    resourceId: text("resource_id"),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
     httpStatus: integer("http_status"),
     contentType: text("content_type"),
@@ -146,6 +148,7 @@ export const citationContent = pgTable(
   (table) => [
     index("idx_cc_fetched_at").on(table.fetchedAt),
     index("idx_cc_http_status").on(table.httpStatus),
+    index("idx_cc_resource_id").on(table.resourceId),
   ]
 );
 

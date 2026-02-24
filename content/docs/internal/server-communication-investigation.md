@@ -253,7 +253,7 @@ Migrate remaining 17 route modules one at a time, prioritizing by endpoint count
 | **Hono integration** | Native (built-in) | Dead community adapter | Official adapter |
 | **Scale at 100+ endpoints** | Creator says "impossible" at 300+ | 40s builds, 10s+ IDE lag | Claims better perf; unproven at scale |
 | **Bus factor** | Hono team (healthy) | 2 part-time volunteers | **1 person** (biggest risk) |
-| **Community size** | 9M weekly (Hono overall) | ~115K weekly, 3.3K stars | ~245K weekly, growing |
+| **Community size** | 9M weekly (Hono overall) | ≈115K weekly, 3.3K stars | ~245K weekly, growing |
 | **Production battle-testing** | Moderate | Moderate (Inkitt) | Minimal |
 | **OpenAPI generation** | No | Via contract | Built-in, first-class |
 | **Server Actions** | No | No | Yes |
@@ -278,10 +278,10 @@ Migrate remaining 17 route modules one at a time, prioritizing by endpoint count
 
 | Task | Scope | Effort |
 |---|---|---|
-| Add response types for top ~40 endpoints to `api-types.ts` | ~30 new interfaces | 1 session |
+| Add response types for top ≈40 endpoints to `api-types.ts` | ~30 new interfaces | 1 session |
 | Fix `x-api-key` bug | 1 file | Trivial |
-| Consolidate Next.js fetch layer (migrate legacy, extract pagination helper, add timeouts) | ~5 files | 1 session |
-| Create typed domain helpers in `apps/web/src/lib/wiki-api/` | ~8-10 new files | 1-2 sessions |
+| Consolidate Next.js fetch layer (migrate legacy, extract pagination helper, add timeouts) | ≈5 files | 1 session |
+| Create typed domain helpers in `apps/web/src/lib/wiki-api/` | ≈8-10 new files | 1-2 sessions |
 | Update crux clients to import shared response types (replacing hand-written duplicates) | 17 files | 1 session |
 
 Total: ~4-5 sessions.
@@ -300,7 +300,7 @@ Total: ~2-3 sessions for the head-to-head comparison.
 
 | Task | Scope | Effort |
 |---|---|---|
-| Migrate remaining 17 route modules | ~18 route files + ~17 client modules | 1-2 sessions per module, ~8-10 sessions total |
+| Migrate remaining 17 route modules | ≈18 route files + ~17 client modules | 1-2 sessions per module, ~8-10 sessions total |
 
 Total: ~8-10 sessions spread over time.
 
