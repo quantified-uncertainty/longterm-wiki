@@ -837,13 +837,40 @@ export interface PageCoverageItem {
   id: string;
   numericId: string;
   title: string;
-  score: number;      // passing count
-  total: number;      // total items (13)
+  // Quality & importance
   quality: number | null;
   readerImportance: number | null;
+  researchImportance: number | null;
+  tacticalValue: number | null;
+  // Classification
   contentFormat: ContentFormat;
   wordCount: number;
   category: string;
+  entityType: string | null;
+  subcategory: string | null;
+  // Coverage score
+  score: number;      // passing count
+  total: number;      // total items (13)
+  // Hallucination risk
+  riskLevel: "low" | "medium" | "high" | null;
+  riskScore: number | null;
+  // Temporal
+  lastUpdated: string | null;
+  updateFrequency: number | null;
+  // Ratings (1–10)
+  novelty: number | null;
+  rigor: number | null;
+  actionability: number | null;
+  completeness: number | null;
+  // Citation health
+  citationTotal: number;
+  citationWithQuotes: number;
+  citationAccuracyChecked: number;
+  citationAvgScore: number | null;
+  // Structural
+  backlinkCount: number;
+  sectionCount: number;
+  unconvertedLinkCount: number;
   // Boolean items
   llmSummary: boolean;
   structuredSummary: boolean;
@@ -887,22 +914,52 @@ export function getPageCoverageItems(): PageCoverageItem[] {
     if (!cov) continue;
 
     const numericId = db.idRegistry?.bySlug[page.id] || page.id;
+    const ch = page.citationHealth;
     items.push({
       id: page.id,
       numericId,
       title: page.title,
-      score: cov.passing,
-      total: cov.total,
+      // Quality & importance
       quality: page.quality,
       readerImportance: page.readerImportance,
+      researchImportance: page.researchImportance,
+      tacticalValue: page.tacticalValue,
+      // Classification
       contentFormat: page.contentFormat,
       wordCount: page.wordCount ?? page.metrics?.wordCount ?? 0,
       category: page.category,
+      entityType: page.entityType ?? null,
+      subcategory: page.subcategory ?? null,
+      // Coverage
+      score: cov.passing,
+      total: cov.total,
+      // Hallucination risk
+      riskLevel: page.hallucinationRisk?.level ?? null,
+      riskScore: page.hallucinationRisk?.score ?? null,
+      // Temporal
+      lastUpdated: page.lastUpdated,
+      updateFrequency: page.updateFrequency ?? null,
+      // Ratings
+      novelty: page.ratings?.novelty ?? null,
+      rigor: page.ratings?.rigor ?? null,
+      actionability: page.ratings?.actionability ?? null,
+      completeness: page.ratings?.completeness ?? null,
+      // Citation health
+      citationTotal: ch?.total ?? 0,
+      citationWithQuotes: ch?.withQuotes ?? 0,
+      citationAccuracyChecked: ch?.accuracyChecked ?? 0,
+      citationAvgScore: ch?.avgScore ?? null,
+      // Structural
+      backlinkCount: page.backlinkCount ?? 0,
+      sectionCount: page.metrics?.sectionCount ?? 0,
+      unconvertedLinkCount: page.unconvertedLinkCount ?? 0,
+      // Booleans
       llmSummary: cov.items.llmSummary === "green",
       structuredSummary: cov.items.structuredSummary === "green",
       schedule: cov.items.schedule === "green",
       entity: cov.items.entity === "green",
       editHistory: cov.items.editHistory === "green",
+      // Metric statuses + actuals
       tables: cov.items.tables as "green" | "amber" | "red",
       tablesActual: cov.actuals?.tables ?? 0,
       tablesTarget: cov.targets.tables,
