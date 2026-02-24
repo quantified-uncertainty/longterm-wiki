@@ -101,6 +101,11 @@ const SCRIPTS = {
     description: 'Financial data staleness and consistency',
     passthrough: ['ci'],
   },
+  'stale-facts': {
+    script: 'validate/validate-stale-facts.ts',
+    description: 'Detect stale facts in data/facts/*.yaml by asOf date',
+    passthrough: ['ci', 'json', 'top', 'entity', 'months'],
+  },
   gate: {
     script: 'validate/validate-gate.ts',
     description: 'CI-blocking checks (pre-push gate)',
