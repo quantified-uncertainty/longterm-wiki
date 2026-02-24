@@ -20,7 +20,7 @@ The wiki has strong foundational infrastructure (templates, grading engine, cita
 1. **15% of scored pages are stubs or near-stubs**, many covering the wiki's most important topics
 2. **Page structure varies wildly within the same entity type** — section names, table formats, and component usage differ on every page
 3. **Frontmatter fields are inconsistently populated** — critical fields like `numericId` (16%), `subcategory` (71%), and `clusters` (80%) have major gaps
-4. **Navigation has dead zones** — 20+ pages have no sidebar, the homepage omits the entire AI Transition Model section, and 89 KB pages can't appear on the homepage
+4. **Navigation has dead zones** — 20+ pages have no sidebar and 89 KB pages can't appear on the homepage
 5. **Two citation systems coexist** — `<R id="...">` and `[^N]` footnotes are used interchangeably with no clear rule
 
 The wiki is in a state where the *systems* are well-designed but the *content* was created across many sessions with insufficient enforcement of those systems.
@@ -132,7 +132,7 @@ Among proper organization pages, section count varies from 8 to 20 H2 sections. 
 | researchImportance | 92.6% | Good |
 | quality | 89.1% | Moderate gap (73 pages missing) |
 | ratings | 87.4% | Moderate gap |
-| lastEdited | 84.1% | Gap — 107 pages missing, mostly ATM section |
+| lastEdited | 84.1% | Gap — 107 pages missing |
 | llmSummary | 83.0% | Gap — 114 pages missing |
 | entityType | 81.0% | Gap — 128 pages missing |
 | clusters | 79.6% | Gap — 137 pages missing |
@@ -166,7 +166,6 @@ Among proper organization pages, section count varies from 8 to 20 H2 sections. 
 | Area | Pages | Sidebar? |
 |------|-------|----------|
 | Knowledge Base | 540 | Yes (data-driven) |
-| AI Transition Model | 68 | Yes (custom structure) |
 | Internal | 31 | Yes (hardcoded) |
 | browse/ | 3 | **No** |
 | dashboard/ | 2 | **No** |
@@ -183,7 +182,6 @@ Additionally, 3 pages at the KB root level (`architecture-scenarios-table.mdx`, 
 
 The homepage features 4 topic clusters (AI Safety, Governance, Biorisks, Epistemics) that spotlight pages. Key gaps:
 
-- **AI Transition Model** (68 pages) is completely absent from the homepage
 - **Biorisks cluster** has only 4 pages assigned (vs. 116 for AI Safety)
 - **89 KB pages** (16%) have no cluster assignment and can never appear on the homepage
 - **No direct links** to KB section index pages (Risks, Responses, Organizations, People, Models, etc.)
@@ -264,9 +262,7 @@ The three-tier hallucination risk banner is well-designed. However:
 
 4. **Populate missing `numericId` values.** Currently 16.4% coverage. Run `node apps/web/scripts/assign-ids.mjs` to assign IDs to all entities/pages. This unblocks reliable `<EntityLink>` resolution.
 
-5. **Add AI Transition Model to the homepage.** 68 pages in a major section are invisible from the homepage.
-
-6. **Complete `clusters` tagging** for the 89 KB pages without assignments, especially organizations (26% untagged) and responses (17% untagged).
+5. **Complete `clusters` tagging** for the 89 KB pages without assignments, especially organizations (26% untagged) and responses (17% untagged).
 
 7. **Pick one citation system** and migrate. Recommendation: standardize on `<R>` references since they connect to the resources data layer. Create a validation rule that flags `[^N]` footnotes.
 
@@ -296,20 +292,3 @@ The three-tier hallucination risk banner is well-designed. However:
 
 ---
 
-## Appendix: Pages Missing Quality Scores (Importance \> 80)
-
-| Page | Importance | Section |
-|------|-----------|---------|
-| factors-ai-capabilities-overview | 94 | ATM |
-| factors-civilizational-competence-overview | 94 | ATM |
-| factors-misalignment-potential-overview | 94 | ATM |
-| scenarios-ai-takeover-overview | 94 | ATM |
-| agentic-ai | 94 | ATM |
-| outcomes-overview | 93 | ATM |
-| factors-ai-ownership-overview | 92 | ATM |
-| factors-transition-turbulence-overview | 92 | ATM |
-| scenarios-overview | 92 | ATM |
-| alignment-interpretability-overview | 91 | ATM |
-| factors-ai-uses-overview | 90 | ATM |
-
-These are ATM overview/hub pages that anchor the navigation structure. All lack quality assessment.

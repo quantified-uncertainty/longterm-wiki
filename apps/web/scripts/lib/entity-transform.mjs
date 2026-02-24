@@ -243,7 +243,7 @@ function transformEntity(raw, expertMap, orgMap) {
       return { ...base, entityType: canonicalType };
 
     default: {
-      // Unknown types (ai-transition-model-* etc.) — preserve all raw fields
+      // Unknown types — preserve all raw fields
       // so entities keep content, currentAssessment, ratings, causeEffectGraph, etc.
       const { type: _type, ...rawRest } = raw;
       return { ...rawRest, ...base, entityType: canonicalType };

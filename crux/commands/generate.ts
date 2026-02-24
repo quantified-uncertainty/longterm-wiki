@@ -36,12 +36,6 @@ const SCRIPTS = {
     description: 'Generate documentation from schema',
     passthrough: ['ci'],
   },
-  reports: {
-    script: 'generate/generate-research-reports.ts',
-    description: 'Generate research reports',
-    passthrough: ['ci', 'topic', 'output', 'verbose'],
-    positional: true,
-  },
 };
 
 export const commands = buildCommands(SCRIPTS);
@@ -67,8 +61,7 @@ Options:
   --model=<m>        Model: haiku, sonnet, opus (summaries)
   --resummary        Re-summarize changed items (summaries)
   --id=<id>          Specific entity ID (summaries)
-  --topic=<t>        Research topic (reports)
-  --output=<path>    Output path (reports, yaml)
+  --output=<path>    Output path (yaml)
   --dry-run          Preview without changes
   --verbose          Detailed output
 
@@ -77,6 +70,5 @@ Examples:
   crux generate summaries --batch 50 --model haiku
   crux generate diagrams
   crux generate schema-docs
-  crux generate reports "AI governance gaps"
 `;
 }

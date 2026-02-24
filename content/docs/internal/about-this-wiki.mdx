@@ -43,7 +43,6 @@ This page documents the technical side—how the wiki is built, how content is o
 | Section | Purpose | Examples |
 |---------|---------|----------|
 | **Knowledge Base** | Core content on risks, interventions, organizations, people | <EntityLink id="deceptive-alignment">Deceptive Alignment</EntityLink>, <EntityLink id="ai-safety-institutes">AI Safety Institutes</EntityLink> |
-| **AI Transition Model** | Comprehensive factor network with outcomes and scenarios | Factors, scenarios, quantitative estimates |
 | **Models** | Analytical frameworks for understanding dynamics | Risk models, cascade models, governance models |
 | **Project** | Public-facing documentation about LongtermWiki itself | Vision, strategy, similar projects |
 | **Internal** | Contributor documentation, style guides, technical reference | This page, style guides, automation tools |
@@ -79,7 +78,6 @@ Templates determine expected structure and applicable style guide:
 | `knowledge-base-risk` | <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> |
 | `knowledge-base-response` | <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> |
 | `knowledge-base-model` | <EntityLink id="models-style-guide">Model Style Guide</EntityLink> |
-| `ai-transition-model-factor` | <EntityLink id="ai-transition-model-style-guide">ATM Style Guide</EntityLink> |
 
 **For complete details, see <EntityLink id="page-types">Page Type System</EntityLink>.**
 
@@ -294,7 +292,6 @@ apps/longterm/
 ├── src/
 │   ├── content/docs/           # ~550 MDX pages
 │   │   ├── knowledge-base/     # Main content (risks, responses, orgs, people)
-│   │   ├── ai-transition-model/# Comprehensive factor network
 │   │   ├── project/            # Public project documentation
 │   │   └── internal/           # Contributor docs and style guides
 │   ├── components/
@@ -371,7 +368,6 @@ npm run validate         # Full validation
 ### Style Guides
 - <EntityLink id="knowledge-base">Knowledge Base Style Guide</EntityLink> — For risk and response pages
 - <EntityLink id="models-style-guide">Model Style Guide</EntityLink> — For analytical model pages
-- <EntityLink id="ai-transition-model-style-guide">ATM Style Guide</EntityLink> — For AI Transition Model pages
 - <EntityLink id="stub-style-guide">Stub Style Guide</EntityLink> — For minimal reference pages
 
 ### Technical Documentation

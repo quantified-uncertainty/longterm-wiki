@@ -910,7 +910,7 @@ function buildPagesRegistry(urlToResource, editLogDates, gitDateMaps) {
  * Build path registry by scanning all MDX/MD files
  * Maps entity IDs (from filenames) to their URL paths.
  * Also adds entity-ID-to-path mappings from YAML data for entities
- * whose IDs differ from their page filenames (e.g. "tmc-compute" → "/ai-transition-model/compute/").
+ * whose IDs differ from their page filenames.
  */
 function buildPathRegistry() {
   const registry = {};
@@ -957,7 +957,7 @@ function buildPathRegistry() {
 
   // Add entity-to-path mappings from YAML entity data.
   // Many entities have IDs that differ from their page filenames
-  // (e.g. entity "tmc-compute" has path "/ai-transition-model/compute/").
+  // (e.g. entities whose IDs don't match their page filenames).
   // Also handle factor entities that follow "factors-{id}-overview" naming.
   const entityDir = join(DATA_DIR, 'entities');
   if (existsSync(entityDir)) {
@@ -1413,7 +1413,7 @@ async function main() {
       const existing = numericIdToSlug[page.numericId];
       if (existing && existing !== page.id) {
         // Check if this is a legitimate alias: the entity's path maps to this page
-        // (e.g. entity "tmc-epistemics" renders at page "epistemics")
+        // (e.g. an entity renders at a page with a different slug)
         const entityPath = pathRegistry[existing];
         if (entityPath && entityPath.endsWith(`/${page.id}/`)) {
           // Entity maps to this page — they're the same content, just add alias
@@ -1967,7 +1967,7 @@ async function main() {
       const existingOwner = numericIdToSlug[page.numericId];
       if (existingOwner && existingOwner !== page.id) {
         // For generated stubs, the numericId may already be assigned to the parent
-        // entity (e.g., page "epistemics" inherits E319 from entity "tmc-epistemics").
+        // entity (e.g., a page inherits a numericId from an entity with a different slug).
         // That's fine — just log a warning. But if they're unrelated, it's a real conflict.
         console.warn(`    WARNING: ${page.numericId} claimed by "${existingOwner}" and page "${page.id}" — keeping "${existingOwner}"`);
       }

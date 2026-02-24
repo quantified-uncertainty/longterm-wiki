@@ -54,7 +54,6 @@ const entityCategories: Record<string, string[]> = {
   'Safety & Responses': ['safety-agenda', 'safety-approaches', 'intervention', 'policy', 'policies'],
   'Organizations': ['organization', 'lab', 'lab-frontier', 'lab-research', 'lab-startup', 'lab-academic', 'funder'],
   'Analysis': ['model', 'models', 'scenario', 'parameter', 'metric', 'analysis'],
-  'AI Transition Model': ['ai-transition-model-factor', 'ai-transition-model-subitem', 'ai-transition-model-parameter', 'ai-transition-model-metric', 'ai-transition-model-scenario'],
   'Other': ['researcher', 'resource', 'historical', 'events']
 };
 

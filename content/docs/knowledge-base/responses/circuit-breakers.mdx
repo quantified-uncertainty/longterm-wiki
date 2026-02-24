@@ -504,14 +504,3 @@ This layered approach achieves better results than any single method:
 4. **Open-source model gap**: Circuit breakers require model modification; open-source models without safety training remain vulnerable, and fine-tuning can remove circuit breaker training
 
 ---
-
-## AI Transition Model Context
-
-Circuit breakers affect the <EntityLink id="ai-transition-model" /> through:
-
-| Parameter | Impact |
-|-----------|--------|
-| <EntityLink id="misuse-potential" /> | Can catch some harmful outputs in real-time |
-| <EntityLink id="human-oversight-quality" /> | Provides automated enforcement of safety policies |
-
-Circuit breakers are a valuable addition to the AI safety toolkit, providing a last line of defense that can catch issues other measures miss. Current implementations achieve 87-95% effectiveness against known attacks with acceptable capability tradeoffs (1% overhead for Anthropic's system). However, they should be understood as one layer in a defense-in-depth strategy, not a substitute for addressing fundamental alignment challenges. The adversarial arms race continues, with novel attacks regularly discovered that bypass existing defenses—reinforcing the need for ongoing research and layered approaches.

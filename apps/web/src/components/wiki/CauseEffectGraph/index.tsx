@@ -311,7 +311,7 @@ function CauseEffectGraphInner({
           </button>
           {!hideListView && (
             <a
-              href="/wiki/ai-transition-model"
+              href="/wiki"
               className="ceg-segment-btn ceg-segment-link"
             >
               List View

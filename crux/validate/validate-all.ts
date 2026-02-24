@@ -157,12 +157,6 @@ const SUBPROCESS_CHECKS: SubprocessCheckDescriptor[] = [
     description: 'Entity/resource YAML files match Zod schemas',
   },
   {
-    id: 'graph-sync',
-    name: 'Graph Node Sync',
-    script: 'validate-graph-sync.ts',
-    description: 'Individual diagram nodes exist in master graph',
-  },
-  {
     id: 'models',
     name: 'Model Freshness',
     script: 'validate-models.ts',
