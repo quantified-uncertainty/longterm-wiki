@@ -11,7 +11,7 @@ import {
   getPageById,
   getEntityPath,
   getBacklinksFor,
-  getFactsForEntity,
+  getFactsForEntityWithFallback,
   getExternalLinks,
 } from "@/data";
 
@@ -211,7 +211,7 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const pageData = getPageById(slug);
   const entityPath = getEntityPath(slug);
   const backlinks = getBacklinksFor(slug);
-  const facts = getFactsForEntity(slug);
+  const facts = (await getFactsForEntityWithFallback(slug)).data;
   const externalLinks = getExternalLinks(slug);
   const rawMdx = getRawMdxSource(slug);
   const claims = await fetchPageClaims(slug);

@@ -1,7 +1,7 @@
 import React from "react";
 import { InfoBox, type InfoBoxProps } from "./InfoBox";
 import { HideableInfoBox } from "./InfoBoxVisibility";
-import { getEntityInfoBoxData, getPageById, getExternalLinks, getFactsForEntity } from "@data";
+import { getEntityInfoBoxData, getPageById, getExternalLinks, getFactsForEntityWithFallback } from "@data";
 
 interface DataInfoBoxProps extends Partial<Omit<InfoBoxProps, "type">> {
   entityId?: string;
@@ -15,7 +15,7 @@ function formatFactLabel(factId: string): string {
     .join(" ");
 }
 
-export function DataInfoBox({ entityId, type: inlineType, ...inlineProps }: DataInfoBoxProps) {
+export async function DataInfoBox({ entityId, type: inlineType, ...inlineProps }: DataInfoBoxProps) {
   if (entityId) {
     const data = getEntityInfoBoxData(entityId);
     if (!data) return <div className="text-muted-foreground text-sm italic">No entity found: {entityId}</div>;
@@ -24,7 +24,8 @@ export function DataInfoBox({ entityId, type: inlineType, ...inlineProps }: Data
     const externalLinks = getExternalLinks(entityId);
 
     // Get top facts for entity (first 5)
-    const allFacts = getFactsForEntity(entityId);
+    const factsResult = await getFactsForEntityWithFallback(entityId);
+    const allFacts = factsResult.data;
     const topFacts = Object.entries(allFacts)
       .slice(0, 5)
       .map(([factId, fact]) => ({
