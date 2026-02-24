@@ -162,6 +162,20 @@
       "when": 1771901200000,
       "tag": "0022_add_citation_quotes_resource_id_index",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1771901300000,
+      "tag": "0022_add_improve_run_artifacts",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1771901400000,
+      "tag": "0023_rename_improve_run_artifacts",
+      "breakpoints": true
     }
   ]
 }
