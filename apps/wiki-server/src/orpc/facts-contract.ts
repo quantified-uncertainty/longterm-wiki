@@ -9,12 +9,7 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
 import { SyncFactSchema } from "../api-types.js";
-
-// ---------------------------------------------------------------------------
-// Constants (shared with REST route)
-// ---------------------------------------------------------------------------
-
-const MAX_PAGE_SIZE = 200;
+import { MAX_PAGE_SIZE } from "../services/facts-queries.js";
 
 // ---------------------------------------------------------------------------
 // Shared output schemas — the single source of truth for response shapes

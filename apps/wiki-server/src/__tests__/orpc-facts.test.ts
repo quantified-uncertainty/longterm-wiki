@@ -1,279 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
-import { mockDbModule, postJson } from "./test-utils.js";
+import { mockDbModule } from "./test-utils.js";
+import {
+  factsDispatch,
+  resetFactsStore,
+  seedFact,
+} from "./facts-test-fixtures.js";
 
-// ---- In-memory store simulating Postgres facts table ----
-
-let factsStore: Map<string, Record<string, unknown>>;
-let nextId: number;
-
-function resetStores() {
-  factsStore = new Map();
-  nextId = 1;
-}
-
-function factKey(entityId: string, factId: string) {
-  return `${entityId}::${factId}`;
-}
-
-function dispatch(query: string, params: unknown[]): unknown[] {
-  const q = query.toLowerCase();
-
-  // --- facts: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
-  if (q.includes("insert into") && q.includes('"facts"')) {
-    const COLS = 15;
-    const numRows = params.length / COLS;
-    const rows: Record<string, unknown>[] = [];
-    const now = new Date();
-    for (let i = 0; i < numRows; i++) {
-      const o = i * COLS;
-      const entityId = params[o] as string;
-      const factIdVal = params[o + 1] as string;
-      const key = factKey(entityId, factIdVal);
-      const existing = factsStore.get(key);
-
-      const row: Record<string, unknown> = {
-        id: existing?.id ?? nextId++,
-        entity_id: entityId,
-        fact_id: factIdVal,
-        label: params[o + 2],
-        value: params[o + 3],
-        numeric: params[o + 4],
-        low: params[o + 5],
-        high: params[o + 6],
-        as_of: params[o + 7],
-        measure: params[o + 8],
-        subject: params[o + 9],
-        note: params[o + 10],
-        source: params[o + 11],
-        source_resource: params[o + 12],
-        format: params[o + 13],
-        format_divisor: params[o + 14],
-        synced_at: now,
-        created_at: existing?.created_at ?? now,
-        updated_at: now,
-      };
-      factsStore.set(key, row);
-      rows.push(row);
-    }
-    return rows;
-  }
-
-  const hasEntityIdFilter = q.includes('entity_id" =');
-
-  // --- STALE: SELECT (no entity_id filter, has is not null + order by) ---
-  if (
-    q.includes('"facts"') &&
-    q.includes("is not null") &&
-    q.includes("order by") &&
-    !hasEntityIdFilter &&
-    !q.includes("count(*)")
-  ) {
-    let results = Array.from(factsStore.values()).filter(
-      (r) => r.as_of !== null
-    );
-    const dateParam = params.find((p) => typeof p === "string") as
-      | string
-      | undefined;
-    if (dateParam) {
-      results = results.filter((r) => String(r.as_of) <= dateParam);
-    }
-    results.sort((a, b) =>
-      String(a.as_of || "").localeCompare(String(b.as_of || ""))
-    );
-    const limitIdx = params.findIndex((p) => typeof p === "number");
-    const limit = limitIdx >= 0 ? (params[limitIdx] as number) : 50;
-    const offsetIdx = limitIdx >= 0 ? limitIdx + 1 : -1;
-    const offset =
-      offsetIdx >= 0 && offsetIdx < params.length
-        ? (params[offsetIdx] as number)
-        : 0;
-    // Return snake_case keys matching actual Postgres column names
-    // (Drizzle's .values() extracts columns from SQL using snake_case)
-    return results.slice(offset, offset + limit).map((r) => ({
-      entity_id: r.entity_id,
-      fact_id: r.fact_id,
-      label: r.label,
-      as_of: r.as_of,
-      measure: r.measure,
-      value: r.value,
-      numeric: r.numeric,
-    }));
-  }
-
-  // --- LIST: SELECT all facts (no WHERE clause) ---
-  if (
-    q.includes('"facts"') &&
-    q.includes("order by") &&
-    q.includes("limit") &&
-    !q.includes("where") &&
-    !q.includes("count(*)") &&
-    !q.includes("count(distinct")
-  ) {
-    let results = Array.from(factsStore.values());
-    results.sort((a, b) => {
-      const cmp = String(a.entity_id || "").localeCompare(String(b.entity_id || ""));
-      if (cmp !== 0) return cmp;
-      return String(a.fact_id || "").localeCompare(String(b.fact_id || ""));
-    });
-    const limitIdx = params.findIndex((p) => typeof p === "number");
-    const limit = limitIdx >= 0 ? (params[limitIdx] as number) : 100;
-    const offsetIdx = limitIdx >= 0 ? limitIdx + 1 : -1;
-    const offset =
-      offsetIdx >= 0 && offsetIdx < params.length
-        ? (params[offsetIdx] as number)
-        : 0;
-    return results.slice(offset, offset + limit);
-  }
-
-  // --- STALE COUNT ---
-  if (
-    q.includes("count(*)") &&
-    q.includes('"facts"') &&
-    q.includes("is not null") &&
-    !hasEntityIdFilter
-  ) {
-    let results = Array.from(factsStore.values()).filter(
-      (r) => r.as_of !== null
-    );
-    const dateParam = params.find((p) => typeof p === "string") as
-      | string
-      | undefined;
-    if (dateParam) {
-      results = results.filter((r) => String(r.as_of) <= dateParam);
-    }
-    return [{ count: results.length }];
-  }
-
-  // --- TIMESERIES: SELECT by entity_id + measure + as_of IS NOT NULL ---
-  if (
-    q.includes('"facts"') &&
-    q.includes("where") &&
-    q.includes("is not null") &&
-    q.includes("order by")
-  ) {
-    const entityId = params[0] as string;
-    let results = Array.from(factsStore.values()).filter(
-      (r) => r.entity_id === entityId && r.as_of !== null
-    );
-    if (params.length > 1 && typeof params[1] === "string") {
-      results = results.filter((r) => r.measure === params[1]);
-    }
-    results.sort((a, b) =>
-      String(a.as_of || "").localeCompare(String(b.as_of || ""))
-    );
-    const limitIdx = params.findIndex(
-      (p, idx) => idx > 0 && typeof p === "number"
-    );
-    const limit = limitIdx >= 0 ? (params[limitIdx] as number) : 100;
-    return results.slice(0, limit);
-  }
-
-  // --- BY-ENTITY: SELECT by entity_id ---
-  if (
-    q.includes('"facts"') &&
-    q.includes("where") &&
-    q.includes("order by") &&
-    q.includes("limit") &&
-    !q.includes("count(*)")
-  ) {
-    const entityId = params[0] as string;
-    let results = Array.from(factsStore.values()).filter(
-      (r) => r.entity_id === entityId
-    );
-    if (params.length > 1 && typeof params[1] === "string") {
-      results = results.filter((r) => r.measure === params[1]);
-    }
-    results.sort((a, b) =>
-      String(a.fact_id || "").localeCompare(String(b.fact_id || ""))
-    );
-    const limitIdx = params.findIndex(
-      (p, idx) => idx > 0 && typeof p === "number"
-    );
-    const limit = limitIdx >= 0 ? (params[limitIdx] as number) : 100;
-    const offsetIdx = limitIdx >= 0 ? limitIdx + 1 : -1;
-    const offset =
-      offsetIdx >= 0 && offsetIdx < params.length
-        ? (params[offsetIdx] as number)
-        : 0;
-    return results.slice(offset, offset + limit);
-  }
-
-  // --- COUNT with entity_id filter ---
-  if (q.includes("count(*)") && q.includes('"facts"')) {
-    if (q.includes("where")) {
-      const entityId = params[0] as string;
-      let count = 0;
-      for (const row of factsStore.values()) {
-        if (row.entity_id === entityId) {
-          if (params.length > 1 && typeof params[1] === "string") {
-            if (row.measure === params[1]) count++;
-          } else {
-            count++;
-          }
-        }
-      }
-      return [{ count }];
-    }
-    return [{ count: factsStore.size }];
-  }
-
-  // --- count(distinct entity_id) ---
-  if (q.includes("count(distinct") && q.includes("entity_id")) {
-    const unique = new Set<string>();
-    for (const row of factsStore.values()) {
-      unique.add(row.entity_id as string);
-    }
-    return [{ count: unique.size }];
-  }
-
-  // --- count(distinct measure) ---
-  if (q.includes("count(distinct") && q.includes("measure")) {
-    const unique = new Set<string>();
-    for (const row of factsStore.values()) {
-      if (row.measure) unique.add(row.measure as string);
-    }
-    return [{ count: unique.size }];
-  }
-
-  if (q.includes("count(*)") && !q.includes('"facts"')) {
-    return [{ count: 0 }];
-  }
-
-  if (q.includes("last_value")) {
-    return [{ last_value: 0, is_called: true }];
-  }
-
-  return [];
-}
-
-vi.mock("../db.js", () => mockDbModule(dispatch));
+vi.mock("../db.js", () => mockDbModule(factsDispatch));
 
 const { createApp } = await import("../app.js");
 
-// ---- Helpers ----
-
-function seedFact(
-  app: Hono,
-  entityId: string,
-  factId: string,
-  opts: Record<string, unknown> = {}
-) {
-  return postJson(app, "/api/facts/sync", {
-    facts: [
-      {
-        entityId,
-        factId,
-        label: opts.label ?? `Fact ${factId}`,
-        value: opts.value ?? "100",
-        numeric: opts.numeric ?? 100,
-        asOf: opts.asOf ?? "2025-06",
-        measure: opts.measure ?? "revenue",
-        ...opts,
-      },
-    ],
-  });
-}
+// ---- oRPC helpers ----
 
 /**
  * Send an oRPC RPC-protocol request.
@@ -301,7 +39,7 @@ describe("oRPC Facts endpoints (/rpc/facts/*)", () => {
   let app: Hono;
 
   beforeEach(() => {
-    resetStores();
+    resetFactsStore();
     delete process.env.LONGTERMWIKI_SERVER_API_KEY;
     app = createApp();
   });
@@ -352,6 +90,21 @@ describe("oRPC Facts endpoints (/rpc/facts/*)", () => {
       const body = await rpcJson(res);
       expect(body.facts).toHaveLength(0);
       expect(body.total).toBe(0);
+    });
+
+    it("filters by measure", async () => {
+      await seedFact(app, "anthropic", "val-1", { measure: "valuation" });
+      await seedFact(app, "anthropic", "rev-1", { measure: "revenue" });
+
+      const res = await rpcRequest(app, "byEntity", {
+        entityId: "anthropic",
+        measure: "revenue",
+      });
+
+      expect(res.status).toBe(200);
+      const body = await rpcJson(res);
+      expect(body.facts).toHaveLength(1);
+      expect(body.total).toBe(1);
     });
   });
 
@@ -416,7 +169,7 @@ describe("oRPC Facts endpoints (/rpc/facts/*)", () => {
   });
 
   describe("sync procedure", () => {
-    it("syncs facts via oRPC", async () => {
+    it("syncs a single fact via oRPC", async () => {
       const res = await rpcRequest(app, "sync", {
         facts: [
           {
@@ -435,7 +188,34 @@ describe("oRPC Facts endpoints (/rpc/facts/*)", () => {
       const body = await rpcJson(res);
       expect(body.upserted).toBe(1);
     });
+
+    it("syncs multiple facts via oRPC", async () => {
+      const res = await rpcRequest(app, "sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "val-2024",
+            label: "Valuation",
+            value: "61000000000",
+            numeric: 61000000000,
+          },
+          {
+            entityId: "openai",
+            factId: "rev-2025",
+            label: "Revenue",
+            value: "5000000000",
+            numeric: 5000000000,
+          },
+        ],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await rpcJson(res);
+      expect(body.upserted).toBe(2);
+    });
   });
+
+  // ---- Parity: REST vs oRPC return same data ----
 
   describe("parity: REST vs oRPC return same data", () => {
     it("stats returns same values via REST and oRPC", async () => {
@@ -467,7 +247,67 @@ describe("oRPC Facts endpoints (/rpc/facts/*)", () => {
       expect(restBody.entityId).toBe(orpcBody.entityId);
       expect(restBody.facts.length).toBe(orpcBody.facts.length);
     });
+
+    it("timeseries returns same data via REST and oRPC", async () => {
+      await seedFact(app, "anthropic", "rev-q1", {
+        asOf: "2025-01",
+        measure: "revenue",
+        numeric: 1000000000,
+      });
+
+      const restRes = await app.request(
+        "/api/facts/timeseries/anthropic?measure=revenue"
+      );
+      const orpcRes = await rpcRequest(app, "timeseries", {
+        entityId: "anthropic",
+        measure: "revenue",
+      });
+
+      const restBody = await restRes.json();
+      const orpcBody = await rpcJson(orpcRes);
+
+      expect(restBody.entityId).toBe(orpcBody.entityId);
+      expect(restBody.measure).toBe(orpcBody.measure);
+      expect(restBody.points.length).toBe(orpcBody.points.length);
+      expect(restBody.total).toBe(orpcBody.total);
+    });
+
+    it("stale returns same data via REST and oRPC", async () => {
+      await seedFact(app, "anthropic", "old-fact", {
+        asOf: "2023-01",
+        measure: "revenue",
+      });
+
+      const restRes = await app.request(
+        "/api/facts/stale?olderThan=2024-01"
+      );
+      const orpcRes = await rpcRequest(app, "stale", {
+        olderThan: "2024-01",
+      });
+
+      const restBody = await restRes.json();
+      const orpcBody = await rpcJson(orpcRes);
+
+      expect(restBody.total).toBe(orpcBody.total);
+      expect(restBody.facts.length).toBe(orpcBody.facts.length);
+    });
+
+    it("list returns same data via REST and oRPC", async () => {
+      await seedFact(app, "anthropic", "abc", { measure: "valuation" });
+      await seedFact(app, "openai", "def", { measure: "revenue" });
+
+      const restRes = await app.request("/api/facts/list");
+      const orpcRes = await rpcRequest(app, "list", {});
+
+      const restBody = await restRes.json();
+      const orpcBody = await rpcJson(orpcRes);
+
+      expect(restBody.total).toBe(orpcBody.total);
+      expect(restBody.facts.length).toBe(orpcBody.facts.length);
+    });
   });
+
+  // ---- Auth ----
 
   describe("auth", () => {
     it("rejects unauthenticated oRPC requests when API key is set", async () => {
@@ -502,7 +342,7 @@ describe("REST /api/facts/list (new endpoint)", () => {
   let app: Hono;
 
   beforeEach(() => {
-    resetStores();
+    resetFactsStore();
     delete process.env.LONGTERMWIKI_SERVER_API_KEY;
     app = createApp();
   });
