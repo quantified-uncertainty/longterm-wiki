@@ -106,6 +106,11 @@ const SCRIPTS = {
     description: 'Detect stale facts in data/facts/*.yaml by asOf date',
     passthrough: ['ci', 'json', 'top', 'entity', 'months'],
   },
+  'numeric-consistency': {
+    script: 'validate/validate-numeric-consistency.ts',
+    description: 'Cross-page numeric claim consistency checker — flag contradictory facts about the same entity',
+    passthrough: ['ci', 'json', 'entity', 'top', 'limit'],
+  },
   gate: {
     script: 'validate/validate-gate.ts',
     description: 'CI-blocking checks (pre-push gate)',
