@@ -1,4 +1,4 @@
-import { getAllPages } from "@/data";
+import { getAllPages, getRiskStats } from "@/data";
 import {
   getWikiServerConfig,
   withApiFallback,
@@ -169,26 +169,35 @@ export default async function HallucinationRiskPage() {
     loadRiskDataFromDatabase
   );
 
-  const highCount = riskPages.filter((p) => p.level === "high").length;
-  const mediumCount = riskPages.filter((p) => p.level === "medium").length;
-  const lowCount = riskPages.filter((p) => p.level === "low").length;
-  const avgScore =
+  // Use pre-computed stats from build-time when using local data source,
+  // fall back to runtime aggregation for API-sourced data
+  const precomputed = source === "local" ? getRiskStats() : null;
+
+  const highCount = precomputed?.high ?? riskPages.filter((p) => p.level === "high").length;
+  const mediumCount = precomputed?.medium ?? riskPages.filter((p) => p.level === "medium").length;
+  const lowCount = precomputed?.low ?? riskPages.filter((p) => p.level === "low").length;
+  const avgScore = precomputed?.avgScore ?? (
     riskPages.length > 0
       ? Math.round(
           riskPages.reduce((sum, p) => sum + p.score, 0) / riskPages.length
         )
-      : 0;
+      : 0
+  );
 
-  // Factor frequency across all pages
-  const factorCounts: Record<string, number> = {};
-  for (const p of riskPages) {
-    for (const f of p.factors) {
-      factorCounts[f] = (factorCounts[f] || 0) + 1;
+  let topFactors: [string, number][];
+  if (precomputed?.topFactors) {
+    topFactors = precomputed.topFactors.map((f) => [f.factor, f.count] as [string, number]);
+  } else {
+    const factorCounts: Record<string, number> = {};
+    for (const p of riskPages) {
+      for (const f of p.factors) {
+        factorCounts[f] = (factorCounts[f] || 0) + 1;
+      }
     }
+    topFactors = Object.entries(factorCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10);
   }
-  const topFactors = Object.entries(factorCounts)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 10);
 
   return (
     <article className="prose max-w-none">
