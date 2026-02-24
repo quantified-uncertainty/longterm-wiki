@@ -195,8 +195,8 @@ function ReferenceEntry({ entry }: { entry: ResolvedRef }) {
   );
 }
 
-function CitationHealthFooter({ pageId }: { pageId: string }) {
-  const health = getPageCitationHealth(pageId);
+async function CitationHealthFooter({ pageId }: { pageId: string }) {
+  const health = await getPageCitationHealth(pageId);
   if (!health || health.total === 0) return null;
 
   const { total, accuracyChecked, accurate, inaccurate } = health;

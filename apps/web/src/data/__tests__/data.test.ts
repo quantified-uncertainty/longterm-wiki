@@ -523,7 +523,7 @@ describe("Data Layer", () => {
   describe("getPageCitationHealth", () => {
     it("returns citation health for page with data", async () => {
       const { getPageCitationHealth } = await import("../../data/index");
-      const health = getPageCitationHealth("test-entity");
+      const health = await getPageCitationHealth("test-entity");
       expect(health).toBeDefined();
       expect(health?.total).toBe(10);
       expect(health?.accurate).toBe(4);
@@ -533,13 +533,13 @@ describe("Data Layer", () => {
 
     it("returns null for page without citation health", async () => {
       const { getPageCitationHealth } = await import("../../data/index");
-      const health = getPageCitationHealth("table-entity");
+      const health = await getPageCitationHealth("table-entity");
       expect(health).toBeNull();
     });
 
     it("returns null for nonexistent page", async () => {
       const { getPageCitationHealth } = await import("../../data/index");
-      const health = getPageCitationHealth("nonexistent");
+      const health = await getPageCitationHealth("nonexistent");
       expect(health).toBeNull();
     });
   });

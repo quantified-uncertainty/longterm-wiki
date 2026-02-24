@@ -976,9 +976,23 @@ export function getPageCoverageItems(): PageCoverageItem[] {
   return items;
 }
 
-export function getPageCitationHealth(pageId: string) {
-  const page = getPageById(pageId);
-  return page?.citationHealth ?? null;
+export async function getPageCitationHealth(pageId: string) {
+  const result = await withApiFallback(
+    () => fetchFromWikiServer<{
+      total: number;
+      withQuotes: number;
+      verified: number;
+      accuracyChecked: number;
+      accurate: number;
+      inaccurate: number;
+      avgScore: number | null;
+    }>(`/api/citations/health/${pageId}`),
+    () => {
+      const page = getPageById(pageId);
+      return page?.citationHealth ?? null;
+    }
+  );
+  return result.data;
 }
 
 // ============================================================================
@@ -994,8 +1008,12 @@ export interface RiskStats {
   topFactors: Array<{ factor: string; count: number }>;
 }
 
-export function getRiskStats(): RiskStats | null {
-  return getDatabase().riskStats ?? null;
+export async function getRiskStats(): Promise<RiskStats | null> {
+  const result = await withApiFallback(
+    () => fetchFromWikiServer<RiskStats>(`/api/hallucination-risk/stats`),
+    () => getDatabase().riskStats ?? null
+  );
+  return result.data;
 }
 
 export function getResourceCredibility(
