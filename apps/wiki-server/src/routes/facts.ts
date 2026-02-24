@@ -41,6 +41,11 @@ const StalenessQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+const ListQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
 // ---- Helpers ----
 
 function formatFact(f: typeof facts.$inferSelect) {
@@ -94,6 +99,33 @@ factsRoute.get("/stats", async (c) => {
     total,
     uniqueEntities,
     uniqueMeasures,
+  });
+});
+
+// ---- GET /list ----
+
+factsRoute.get("/list", async (c) => {
+  const parsed = ListQuery.safeParse(c.req.query());
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { limit, offset } = parsed.data;
+  const db = getDrizzleDb();
+
+  const rows = await db
+    .select()
+    .from(facts)
+    .orderBy(asc(facts.entityId), asc(facts.factId))
+    .limit(limit)
+    .offset(offset);
+
+  const countResult = await db.select({ count: count() }).from(facts);
+  const total = countResult[0].count;
+
+  return c.json({
+    facts: rows.map(formatFact),
+    total,
+    limit,
+    offset,
   });
 });
 

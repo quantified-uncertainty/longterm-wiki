@@ -14,6 +14,7 @@ import type {
   FactTimeseriesResult,
   StaleFactsResult,
   FactStatsResult,
+  FactListResult,
 } from '../../../apps/wiki-server/src/api-types.ts';
 
 // ---------------------------------------------------------------------------
@@ -26,7 +27,7 @@ export type SyncFactItem = SyncFact;
 // Types — response (re-exported from canonical api-types.ts)
 // ---------------------------------------------------------------------------
 
-export type { SyncFactsResult, FactsByEntityResult, StaleFactsResult, FactStatsResult };
+export type { SyncFactsResult, FactsByEntityResult, StaleFactsResult, FactStatsResult, FactListResult };
 
 /** Backward-compatible alias for FactRow. */
 export type FactEntry = FactRow;
@@ -108,6 +109,13 @@ export async function getStaleFacts(
   let path = `/api/facts/stale?limit=${limit}&offset=${offset}`;
   if (olderThan) path += `&olderThan=${encodeURIComponent(olderThan)}`;
   return apiRequest<StaleFactsResult>('GET', path);
+}
+
+export async function getFactList(
+  limit = 100,
+  offset = 0,
+): Promise<ApiResult<FactListResult>> {
+  return apiRequest<FactListResult>('GET', `/api/facts/list?limit=${limit}&offset=${offset}`);
 }
 
 export async function getFactStats(): Promise<ApiResult<FactStatsResult>> {

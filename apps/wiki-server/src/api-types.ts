@@ -1097,6 +1097,13 @@ export interface StaleFactsResult {
   offset: number;
 }
 
+export interface FactListResult {
+  facts: FactRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export interface FactStatsResult {
   total: number;
   uniqueEntities: number;

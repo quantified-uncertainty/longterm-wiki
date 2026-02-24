@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.14.0",
+    "@orpc/client": "^1.13.5",
+    "@orpc/contract": "^1.13.5",
+    "@orpc/server": "^1.13.5",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.7.0",
     "postgres": "^3.4.5",

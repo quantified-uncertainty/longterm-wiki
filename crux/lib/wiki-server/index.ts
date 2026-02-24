@@ -149,8 +149,12 @@ export {
   getFactsByEntity,
   getFactTimeseries,
   getStaleFacts,
+  getFactList,
   getFactStats,
 } from './facts.ts';
+
+// oRPC Client (facts pilot)
+export { createFactsClient, orpcCall } from './orpc-client.ts';
 
 // Agent Sessions
 export {
