@@ -40,17 +40,22 @@ async function fetchPageClaims(pageId: string): Promise<ClaimRow[] | null> {
 
 function Section({
   title,
+  subtitle,
   children,
   defaultOpen = false,
 }: {
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) {
   return (
     <details open={defaultOpen} className="mb-4 border border-gray-200 rounded">
-      <summary className="cursor-pointer px-4 py-2 bg-gray-50 font-semibold text-sm select-none hover:bg-gray-100">
-        {title}
+      <summary className="cursor-pointer px-4 py-2 bg-gray-50 select-none hover:bg-gray-100">
+        <span className="font-semibold text-sm">{title}</span>
+        {subtitle && (
+          <span className="ml-2 text-xs text-gray-400 font-normal">{subtitle}</span>
+        )}
       </summary>
       <div className="p-4 overflow-x-auto">{children}</div>
     </details>
@@ -192,36 +197,104 @@ export default async function WikiInfoPage({ params }: PageProps) {
   const claims = await fetchPageClaims(slug);
 
   const title = entity?.title || pageData?.title || slug;
+  const entityType = entity?.type || pageData?.entityType || null;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
+      {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-2xl font-bold">{title}</h1>
-          <span className="text-sm text-gray-500 font-mono">
-            {slug}
-            {numericId && ` (${numericId})`}
-          </span>
+        <div className="flex items-start gap-3 mb-2">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold mb-1">{title}</h1>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+              <span className="font-mono text-gray-500">{slug}</span>
+              {entityType && (
+                <span className="px-1.5 py-0.5 bg-gray-100 rounded text-xs">{entityType}</span>
+              )}
+              {entityPath && (
+                <span className="text-gray-400 text-xs">Path: {entityPath}</span>
+              )}
+            </div>
+          </div>
+          {/* EID — the canonical numeric entity identifier used in URLs and EntityLink refs */}
+          {numericId && (
+            <div className="shrink-0 flex flex-col items-end gap-1">
+              <span className="font-mono text-2xl font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-lg select-all">
+                {numericId}
+              </span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wide">Entity ID (EID)</span>
+            </div>
+          )}
         </div>
-        <div className="flex gap-3 text-sm">
+
+        <div className="flex flex-wrap gap-4 text-sm mt-3">
           <Link
             href={`/wiki/${numericId || slug}`}
             className="text-blue-600 hover:underline"
           >
             &larr; Back to page
           </Link>
-          {entityPath && (
-            <span className="text-gray-400">Path: {entityPath}</span>
+          <span className="text-gray-400">
+            {Object.keys(facts).length} facts
+            {" · "}
+            {backlinks.length} backlinks
+            {claims !== null && ` · ${claims.length} claims`}
+          </span>
+          {pageData?.quality != null && (
+            <span className="text-gray-500">
+              Quality: <span className="font-medium">{pageData.quality}</span>
+            </span>
+          )}
+          {pageData?.lastUpdated && (
+            <span className="text-gray-500">
+              Updated: <span className="font-medium">{pageData.lastUpdated}</span>
+            </span>
           )}
         </div>
       </div>
 
-      <Section title="Page Metadata" defaultOpen>
-        {pageData ? <JsonDump data={pageData} /> : <p className="text-sm text-gray-500">No page data found for &quot;{slug}&quot;</p>}
+      {/*
+        Three data sources shown below:
+
+        1. Compiled Page Record — built at `pnpm build-data` by merging:
+             MDX frontmatter + Entity YAML + computed metrics
+           Stored in: apps/web/src/data/database.json
+
+        2. Entity YAML — canonical entity definition (type, relatedEntries,
+             sources, customFields). Source: data/entities/*.yaml
+
+        3. MDX Frontmatter — editorial metadata authored in the .mdx file
+             (quality, importance, llmSummary, ratings, etc.)
+             Source: content/docs/…
+      */}
+
+      <Section
+        title="Compiled Page Record"
+        subtitle="database.json — merged from MDX frontmatter + Entity YAML + computed metrics at build time"
+        defaultOpen
+      >
+        {pageData
+          ? <JsonDump data={pageData} />
+          : <p className="text-sm text-gray-500">No compiled record found for &quot;{slug}&quot;</p>}
       </Section>
 
-      <Section title="Entity Data" defaultOpen>
-        {entity ? <JsonDump data={entity} /> : <p className="text-sm text-gray-500">No entity found for &quot;{slug}&quot;</p>}
+      <Section
+        title="Entity YAML"
+        subtitle="data/entities/*.yaml — canonical entity definition (numericId, type, relatedEntries, sources)"
+        defaultOpen
+      >
+        {entity
+          ? <JsonDump data={entity} />
+          : <p className="text-sm text-gray-500">No entity YAML found for &quot;{slug}&quot; — this page has no associated entity</p>}
+      </Section>
+
+      <Section
+        title="MDX Frontmatter"
+        subtitle={`${pageData?.filePath ?? "content/docs/…"} — raw frontmatter as authored (quality, scores, llmSummary, ratings)`}
+      >
+        {rawMdx
+          ? <JsonDump data={rawMdx.frontmatter} />
+          : <p className="text-sm text-gray-500">No MDX file found</p>}
       </Section>
 
       <Section title={`Claims ${claims && claims.length > 0 ? `(${claims.length})` : ""}`}>
@@ -274,7 +347,9 @@ export default async function WikiInfoPage({ params }: PageProps) {
       </Section>
 
       <Section title="External Links">
-        {externalLinks ? <JsonDump data={externalLinks} /> : <p className="text-sm text-gray-500">No external links</p>}
+        {externalLinks
+          ? <JsonDump data={externalLinks} />
+          : <p className="text-sm text-gray-500">No external links</p>}
       </Section>
 
       <Section title={`Backlinks (${backlinks.length})`}>
@@ -306,10 +381,6 @@ export default async function WikiInfoPage({ params }: PageProps) {
         ) : (
           <p className="text-sm text-gray-500">No backlinks</p>
         )}
-      </Section>
-
-      <Section title="Frontmatter">
-        {rawMdx ? <JsonDump data={rawMdx.frontmatter} /> : <p className="text-sm text-gray-500">No MDX file found</p>}
       </Section>
 
       <Section title="Raw MDX Source">

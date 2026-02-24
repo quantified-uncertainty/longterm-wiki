@@ -297,7 +297,6 @@ async function ContentView({
         importance={pageData?.readerImportance ?? undefined}
         researchImportance={pageData?.researchImportance ?? undefined}
         llmSummary={pageData?.llmSummary ?? undefined}
-        structuredSummary={pageData?.structuredSummary ?? undefined}
         lastEdited={pageData?.lastUpdated ?? undefined}
         updateFrequency={pageData?.updateFrequency ?? undefined}
         evergreen={pageData?.evergreen}
