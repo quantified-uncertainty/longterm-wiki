@@ -95,6 +95,8 @@ Hono has a built-in RPC layer: export `typeof app` from the server, use `hc<AppT
 
 **Migration effort:** High. Every route file and every client file must change. Mechanical but large.
 
+**Community research (Feb 2026):** Hono RPC works well below ~50 endpoints. Hono's creator Yusuke Wada [confirmed](https://github.com/honojs/hono/issues/3808) that 300+ endpoints makes `hc` "impossible" due to TypeScript instantiation depth limits, and acknowledged IDE degradation is a known limitation. Practical ceiling is ~100 endpoints with module splitting. The `hc` client is intentionally thin -- no batching, no React Query integration, no retry logic. The 9M weekly npm downloads are for Hono overall, not the RPC feature specifically. Monorepo setups are fragile: `AppType` export requires precise tsconfig alignment across packages or types break silently. For our 100+ endpoints, Hono RPC would require aggressive module splitting from day one.
+
 ### Option B: ts-rest
 
 Define a "contract" object that wraps existing Zod schemas with path, method, and response schema. Server and client both consume the contract for type safety.
@@ -114,22 +116,29 @@ Define a "contract" object that wraps existing Zod schemas with path, method, an
 
 **Migration effort:** Medium. Mechanical but incremental. Contract definitions are boilerplate-heavy.
 
+**Community research (Feb 2026):** ts-rest's trajectory is the biggest concern. Two part-time volunteer maintainers, both with full-time jobs elsewhere. The v3.53.0 RC (Standard Schema / Zod 4 support) has sat unreleased for **9 months**. [GitHub issue #797](https://github.com/ts-rest/ts-rest/issues/797) ("Future of ts-rest") was opened by a developer who'd already been burned by Zodios's abandonment -- maintainers reassured the community in May 2025, then the issue was **reopened in September** after the reassurances weren't sustained. 105 open issues, 32 open PRs. The `ts-rest-hono` adapter is effectively dead (54 stars, last release November 2023, single maintainer). At 100+ endpoints, TypeScript performance degrades to 40+ second builds and 10+ second IDE autocompletion ([Issue #764](https://github.com/ts-rest/ts-rest/issues/764)); mitigation requires splitting contracts from day one. Production user Inkitt (\$59M raised) documented positive outcomes, but no major enterprise adoption is publicly known. ~115K weekly npm downloads, ~3,300 GitHub stars. The library is functional but the community explicitly invokes the "Zodios parallel" -- beloved, feature-complete, thin maintenance, eventual abandonment risk.
+
 ### Option C: oRPC (newer alternative)
 
 TypeScript-first RPC framework with an official Hono adapter, built-in OpenAPI generation.
 
 **Pros:**
 - Official Hono adapter (unlike ts-rest)
-- 1.6x faster type checking than tRPC
+- 1.6x faster type checking than tRPC (claims 2.8x runtime speed, 2.6x smaller bundle)
 - Built-in OpenAPI spec generation
 - Designed to address tRPC's limitations
+- Optional contract-first mode (like ts-rest) OR procedure-first (like tRPC)
+- Native file upload/download and Server Actions support
 
 **Cons:**
 - **v1.0 released December 2025** -- very young, small community
+- **Solo maintainer** (unnoq / Hung Viet Pham) -- bus factor of 1, biggest risk
 - Limited production battle-testing
 - API surface may still change
 
 **Migration effort:** Medium-high. Similar to ts-rest but less ecosystem support.
+
+**Community research (Feb 2026):** oRPC is the most interesting newcomer but carries real risk. Created by a developer who used tRPC extensively, tried ts-rest but found it "missing features I relied on from tRPC, like flexible middleware," and built oRPC to combine both. ThoughtWorks Technology Radar placed it in the "Assess" ring. ~245K weekly npm downloads (growing). The commercial SaaS boilerplate supastarter chose oRPC over tRPC for their v3 rewrite. [InfoQ covered the v1.0 launch](https://www.infoq.com/news/2025/12/orpc-v1-typesafe/). Val Town evaluated oRPC but hesitated specifically on the solo-maintainer risk. The "bus factor 1" concern is the most frequently cited reservation across Reddit, HN, and blog posts. If the single maintainer loses interest, the project could stall like ts-rest but faster. However, the technical design is strong: incremental tRPC migration path, first-class OpenAPI from Zod schemas, and the official Hono adapter means no community-maintained shim layer.
 
 ### Option D: tRPC
 
@@ -185,15 +194,32 @@ Improve the existing patterns without adopting a new library.
 
 4. **Create typed fetch helpers per domain** in `apps/web/src/lib/` (e.g., `wiki-api/sessions.ts`, `wiki-api/citations.ts`). These would mirror what crux already has, importing shared response types from `api-types.ts`. Dashboard pages call `getSessions()` instead of writing inline fetch + type definitions.
 
-**Medium-term (if the API surface keeps growing): Evaluate Hono RPC or ts-rest** on a single route module (e.g., `facts` -- small, well-defined, used by both crux and Next.js). Measure:
+**Medium-term (if the API surface keeps growing): Evaluate oRPC or Hono RPC** on a single route module (e.g., `facts` -- small, well-defined, used by both crux and Next.js). Measure:
 - IDE performance impact
 - Developer experience improvement
 - Whether the migration pattern is sustainable for all 18 modules
 
-The choice between Hono RPC and ts-rest depends on priorities:
-- **Hono RPC** if you want zero new dependencies and are willing to accept the IDE performance tradeoff
-- **ts-rest** if you want incremental migration and standard REST semantics
-- **oRPC** if you're willing to bet on a newer project with better Hono integration
+### Framework comparison after community research
+
+| Dimension | Hono RPC | ts-rest | oRPC |
+|---|---|---|---|
+| **Maintenance health** | Part of Hono (healthy) | Concerning (9-month gap, RC unreleased) | Active but solo maintainer |
+| **Hono integration** | Native (built-in) | Dead community adapter | Official adapter |
+| **Scale at 100+ endpoints** | Creator says "impossible" at 300+ | 40s builds, 10s+ IDE lag | Claims better perf; unproven at scale |
+| **Bus factor** | Hono team (healthy) | 2 part-time volunteers | **1 person** (biggest risk) |
+| **Community size** | 9M weekly (Hono overall) | ~115K weekly, 3.3K stars | ~245K weekly, growing |
+| **Production battle-testing** | Moderate | Moderate (Inkitt) | Minimal |
+| **OpenAPI generation** | No | Via contract | Built-in, first-class |
+| **Server Actions** | No | No | Yes |
+| **Migration approach** | All-or-nothing per module | Incremental | Incremental |
+
+**Updated medium-term recommendation:**
+
+- **oRPC** is the strongest technical fit for our architecture (Hono server, multiple consumers, 100+ endpoints, need for both procedure and contract modes). The solo-maintainer risk is real but mitigated by the fact that Option F (pragmatic improvements) provides a solid baseline regardless. If we pilot oRPC on one module and the project stalls, we lose minimal investment.
+
+- **Hono RPC** is a reasonable fallback if oRPC's maintainer situation deteriorates. Zero new dependencies, but requires aggressive module splitting at our scale and won't help with the crux CLI client (which doesn't use Hono).
+
+- **ts-rest is no longer recommended** for new adoption. The maintenance trajectory, dead Hono adapter, and community anxiety about the project's future make it a poor bet for a project that will depend on it for years. The scaling pain at 100+ endpoints is also a concern.
 
 **Not recommended:** tRPC (wrong architecture), Zodios (abandoned), full OpenAPI codegen (too much ceremony for the current scale).
 
@@ -209,10 +235,42 @@ The choice between Hono RPC and ts-rest depends on priorities:
 
 Total: ~4-5 focused sessions to eliminate the type duplication and inconsistency problems without any framework migration.
 
-## Appendix: Numbers
+## Appendix A: Numbers
 
 - **Wiki-server routes:** 18 modules, 5,488 lines
 - **Shared input schemas:** 617 lines in `api-types.ts`
 - **Crux client code:** 16 domain modules, 2,459 lines, ~65 hand-written response interfaces
 - **Next.js integration points:** 18 files touch the wiki-server, ~15 hand-written response interfaces
 - **Endpoints:** 100+ across GET/POST/PATCH/DELETE
+
+## Appendix B: Community Research Sources (Feb 2026)
+
+### Hono RPC
+- [Hono RPC documentation](https://hono.dev/docs/guides/rpc)
+- [GitHub #3808 -- IDE performance at scale](https://github.com/honojs/hono/issues/3808) -- Yusuke Wada confirms 300+ endpoints is "impossible"
+- [GitHub #3004 -- Client splitting discussion](https://github.com/honojs/hono/issues/3004)
+- Hono: 9M weekly npm downloads, 22K+ GitHub stars
+
+### ts-rest
+- [GitHub issue #797 -- "Future of ts-rest"](https://github.com/ts-rest/ts-rest/issues/797) -- community anxiety about maintenance, reopened Sept 2025
+- [GitHub issue #764 -- Performance at scale](https://github.com/ts-rest/ts-rest/issues/764) -- 40s builds, 10s+ IDE lag at 100+ endpoints
+- [GitHub issue #389 -- "Type instantiation excessively deep"](https://github.com/ts-rest/ts-rest/issues/389)
+- [Inkitt -- "How ts-rest Saved Our Sanity"](https://medium.com/inkitt-tech/how-ts-rest-saved-our-sanity-a-tale-of-taming-the-multi-platform-beast-508dc0b0a8f8) -- most documented production user
+- [ts-rest-hono adapter](https://github.com/msutkowski/ts-rest-hono) -- 54 stars, last release Nov 2023
+- v3.52.1 (March 2025) latest stable; v3.53.0-rc.1 (June 2025) unreleased for 9 months
+- ~115K weekly npm downloads, ~3,300 GitHub stars, 105 open issues, 32 open PRs
+
+### oRPC
+- [oRPC v1.0 announcement](https://orpc.unnoq.com/blog/v1-announcement) -- creator's journey from tRPC to ts-rest to building oRPC
+- [InfoQ coverage of v1.0 launch](https://www.infoq.com/news/2025/12/orpc-v1-typesafe/)
+- [ThoughtWorks Technology Radar -- "Assess" ring](https://www.thoughtworks.com/en-gb/radar/languages-and-frameworks/orpc)
+- [oRPC comparison page](https://orpc.dev/docs/comparison) -- positions against ts-rest and tRPC
+- [supastarter chose oRPC for v3](https://supastarter.dev) -- commercial SaaS boilerplate
+- Val Town evaluated oRPC, hesitated on solo-maintainer risk
+- ~245K weekly npm downloads, growing; solo maintainer (unnoq / Hung Viet Pham)
+
+### Cross-framework comparisons
+- [Catalin Pit -- trpc-openapi vs ts-rest](https://catalins.tech/public-api-trpc/)
+- [Wisp CMS -- oRPC vs tRPC and alternatives](https://www.wisp.blog/blog/comparative-analysis-orpc-vs-trpc-and-other-alternatives)
+- [HN thread -- type-safe API discussion (Aug 2025)](https://news.ycombinator.com/item?id=44780167)
+- [HN thread -- REST vs RPC approaches (Aug 2023)](https://news.ycombinator.com/item?id=37099355)
